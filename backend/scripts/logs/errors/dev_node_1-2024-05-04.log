@@ -1,0 +1,2 @@
+[31merror[39m: dev_node_1: 04-05-2024 20:10:52: [31mdatabase setup failed![39m |====| {"error":{"length":115,"name":"error","severity":"ERROR","code":"42P07","file":"heap.c","line":"1146","routine":"heap_create_with_catalog"}}
+[31merror[39m: dev_node_1: 04-05-2024 20:11:19: [31mdatabase setup failed![39m |====| {"error":{"length":90,"name":"error","severity":"FATAL","code":"3D000","file":"postinit.c","line":"1019","routine":"InitPostgres"}}

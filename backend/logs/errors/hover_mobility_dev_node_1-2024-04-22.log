@@ -1,0 +1,30 @@
+[31merror[39m: hover_mobility_dev_node_1: 22-04-2024 00:27:54: [31mauthMiddleware:catch-3[39m |====| {"error":{"code":"INVALID_USER","message":"User not found"}}
+[31merror[39m: hover_mobility_dev_node_1: 22-04-2024 00:27:55: [31mauthMiddleware:catch-3[39m |====| {"error":{"code":"INVALID_USER","message":"User not found"}}
+[31merror[39m: hover_mobility_dev_node_1: 22-04-2024 00:27:57: [31mauthMiddleware:catch-3[39m |====| {"error":{"code":"INVALID_USER","message":"User not found"}}
+[31merror[39m: hover_mobility_dev_node_1: 22-04-2024 00:28:02: [31mauthMiddleware:catch-3[39m |====| {"error":{"code":"INVALID_USER","message":"User not found"}}
+[31merror[39m: hover_mobility_dev_node_1: 22-04-2024 00:28:03: [31mauthMiddleware:catch-3[39m |====| {"error":{"code":"INVALID_USER","message":"User not found"}}
+[31merror[39m: hover_mobility_dev_node_1: 22-04-2024 00:29:22: [31mauthMiddleware:catch-3[39m |====| {"error":{"code":"INVALID_USER","message":"User not found"}}
+[31merror[39m: hover_mobility_dev_node_1: 22-04-2024 00:29:25: [31mauthMiddleware:catch-3[39m |====| {"error":{"code":"INVALID_USER","message":"User not found"}}
+[31merror[39m: hover_mobility_dev_node_1: 22-04-2024 00:29:26: [31mauthMiddleware:catch-3[39m |====| {"error":{"code":"INVALID_USER","message":"User not found"}}
+[31merror[39m: hover_mobility_dev_node_1: 22-04-2024 00:29:28: [31mauthMiddleware:catch-3[39m |====| {"error":{"code":"INVALID_USER","message":"User not found"}}
+[31merror[39m: hover_mobility_dev_node_1: 22-04-2024 00:29:37: [31mauthMiddleware:catch-3[39m |====| {"error":{"code":"INVALID_USER","message":"User not found"}}
+[31merror[39m: hover_mobility_dev_node_1: 22-04-2024 00:29:38: [31mauthMiddleware:catch-3[39m |====| {"error":{"code":"INVALID_USER","message":"User not found"}}
+[31merror[39m: hover_mobility_dev_node_1: 22-04-2024 00:42:41: [31mgenericController:getTableStatistics:catch-1[39m |====| {"error":{}}
+[31merror[39m: hover_mobility_dev_node_1: 22-04-2024 00:42:41: [31mgenericController:getAllRows:catch-1[39m |====| {"error":{}}
+[31merror[39m: hover_mobility_dev_node_1: 22-04-2024 00:42:43: [31mgenericController:getTableStatistics:catch-1[39m |====| {"error":{}}
+[31merror[39m: hover_mobility_dev_node_1: 22-04-2024 00:42:43: [31mgenericController:getAllRows:catch-1[39m |====| {"error":{}}
+[31merror[39m: hover_mobility_dev_node_1: 22-04-2024 00:42:43: [31mgenericController:getTableStatistics:catch-1[39m |====| {"error":{}}
+[31merror[39m: hover_mobility_dev_node_1: 22-04-2024 00:42:43: [31mgenericController:getAllRows:catch-1[39m |====| {"error":{}}
+[31merror[39m: hover_mobility_dev_node_1: 22-04-2024 00:44:26: [31mgenericController:getAllRows:catch-1[39m |====| {"error":{}}
+[31merror[39m: hover_mobility_dev_node_1: 22-04-2024 00:44:26: [31mgenericController:getTableStatistics:catch-1[39m |====| {"error":{}}
+[31merror[39m: hover_mobility_dev_node_1: 22-04-2024 00:44:53: [31mgenericController:getTableStatistics:catch-1[39m |====| {"error":{}}
+[31merror[39m: hover_mobility_dev_node_1: 22-04-2024 00:44:53: [31mgenericController:getAllRows:catch-1[39m |====| {"error":{}}
+[31merror[39m: hover_mobility_dev_node_1: 22-04-2024 00:51:57: [31mgenericController:getAllRows:catch-1[39m |====| {"error":{}}
+[31merror[39m: hover_mobility_dev_node_1: 22-04-2024 00:51:57: [31mgenericController:getTableStatistics:catch-1[39m |====| {"error":{}}
+[31merror[39m: hover_mobility_dev_node_1: 22-04-2024 00:53:28: [31mgenericController:getAllRows:catch-1[39m |====| {"error":{}}
+[31merror[39m: hover_mobility_dev_node_1: 22-04-2024 00:53:28: [31mgenericController:getTableStatistics:catch-1[39m |====| {"error":{}}
+[31merror[39m: hover_mobility_dev_node_1: 22-04-2024 01:03:43: [31mgenericController:getAllRows:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: hover_mobility_dev_node_1: 22-04-2024 01:05:11: [31mgenericController:getAllRows:catch-1[39m |====| {"error":{}}
+[31merror[39m: hover_mobility_dev_node_1: 22-04-2024 01:06:20: [31mgenericController:getAllRows:catch-1[39m |====| {"error":{}}
+[31merror[39m: hover_mobility_dev_node_1: 22-04-2024 01:06:27: [31mgenericController:getAllRows:catch-1[39m |====| {"error":{}}
+[31merror[39m: hover_mobility_dev_node_1: 22-04-2024 01:06:32: [31mgenericController:getAllRows:catch-1[39m |====| {"error":{}}

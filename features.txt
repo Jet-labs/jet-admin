@@ -1,0 +1,8 @@
+1. String search
+2. Field based Filters
+3. Field based Sorting
+
+issues
+------
+
+1. Date as primary key does not work

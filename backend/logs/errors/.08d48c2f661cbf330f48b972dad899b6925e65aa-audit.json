@@ -1,0 +1,15 @@
+{
+    "keep": {
+        "days": true,
+        "amount": 5
+    },
+    "auditLog": "logs\\errors\\.08d48c2f661cbf330f48b972dad899b6925e65aa-audit.json",
+    "files": [
+        {
+            "date": 1713726434042,
+            "name": "logs\\errors\\hover_mobility_prod_node_1-2024-04-22.log",
+            "hash": "b32fde9cb012595d73093e880708b750b69473c4987154e7a26c9f7d2ff81ff1"
+        }
+    ],
+    "hashType": "sha256"
+}

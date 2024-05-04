@@ -1,0 +1,52 @@
+[31merror[39m: dev_node_1: 30-04-2024 00:06:29: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-04-29T18:36:24.000Z"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:06:29: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:08:31: [31mTableService:getTableRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:08:31: [31mtableController:getRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:08:32: [31mTableService:getTableRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:08:32: [31mtableController:getRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:25:52: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-04-29T18:51:29.000Z"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:25:52: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:26:11: [31mTableService:getTableRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:26:11: [31mtableController:getRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:26:12: [31mTableService:getTableRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:26:12: [31mtableController:getRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:30:16: [31mTableService:getTableRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:30:16: [31mtableController:getRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:30:17: [31mTableService:getTableRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:30:17: [31mtableController:getRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:30:19: [31mTableService:getTableRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:30:19: [31mtableController:getRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:30:20: [31mTableService:getTableRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:30:20: [31mtableController:getRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:30:50: [31mTableService:getTableRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:30:50: [31mtableController:getRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:30:51: [31mTableService:getTableRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:30:51: [31mtableController:getRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:30:53: [31mTableService:getTableRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:30:53: [31mtableController:getRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:30:54: [31mTableService:getTableRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:30:54: [31mtableController:getRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:36:08: [31mTableService:getTableRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:36:08: [31mtableController:getRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:36:09: [31mTableService:getTableRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:36:09: [31mtableController:getRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:36:58: [31mTableService:getTableRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:36:58: [31mtableController:getRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:37:00: [31mTableService:getTableRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:37:00: [31mtableController:getRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:42:24: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-04-29T19:10:52.000Z"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:42:24: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:42:24: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-04-29T19:10:52.000Z"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:42:24: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 30-04-2024 00:42:24: [31mtableController:getRowByID:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 30-04-2024 00:42:25: [31mtableController:getRowByID:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 30-04-2024 00:42:29: [31mtableController:getRowByID:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 30-04-2024 00:42:30: [31mtableController:getRowByID:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 30-04-2024 00:42:51: [31mtableController:getRowByID:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 30-04-2024 00:42:52: [31mtableController:getRowByID:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 30-04-2024 00:42:56: [31mtableController:getRowByID:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 30-04-2024 00:42:57: [31mtableController:getRowByID:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 30-04-2024 00:43:15: [31mtableController:getRowByID:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 30-04-2024 00:43:16: [31mtableController:getRowByID:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 30-04-2024 00:43:26: [31mtableController:getRowByID:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 30-04-2024 00:43:27: [31mtableController:getRowByID:catch-1[39m |====| {"error":{}}

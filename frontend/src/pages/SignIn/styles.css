@@ -1,0 +1,35 @@
+.signin_main {
+  position: relative;
+  height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+}
+.scan_button_main {
+  position: absolute !important;
+  bottom: 20px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  height: 72px !important;
+  width: 72px !important;
+}
+
+.menu_button_main {
+  position: absolute !important;
+  bottom: 36px !important;
+  left: calc(50% - 72px) !important;
+  transform: translateX(-50%) !important;
+  height: 40px !important;
+  width: 40px !important;
+}
+
+.location_button_main {
+  position: absolute !important;
+  bottom: 36px !important;
+  left: calc(50% + 72px) !important;
+  transform: translateX(-50%) !important;
+  height: 40px !important;
+  width: 40px !important;
+}

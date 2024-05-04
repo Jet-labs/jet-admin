@@ -1,0 +1,242 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model actor {
+  actor_id    Int          @id @default(autoincrement())
+  first_name  String
+  last_name   String
+  last_update DateTime     @default(now()) @db.Timestamptz(6)
+  film_actor  film_actor[]
+
+  @@index([last_name], map: "idx_actor_last_name")
+}
+
+model address {
+  address_id  Int        @id @default(autoincrement())
+  address     String
+  address2    String?
+  district    String
+  city_id     Int
+  postal_code String?
+  phone       String
+  last_update DateTime   @default(now()) @db.Timestamptz(6)
+  city        city       @relation(fields: [city_id], references: [city_id])
+  customer    customer[]
+  staff       staff[]
+  store       store[]
+
+  @@index([city_id], map: "idx_fk_city_id")
+}
+
+model category {
+  category_id   Int             @id @default(autoincrement())
+  name          String
+  last_update   DateTime        @default(now()) @db.Timestamptz(6)
+  film_category film_category[]
+}
+
+model city {
+  city_id     Int       @id @default(autoincrement())
+  city        String
+  country_id  Int
+  last_update DateTime  @default(now()) @db.Timestamptz(6)
+  address     address[]
+  country     country   @relation(fields: [country_id], references: [country_id])
+
+  @@index([country_id], map: "idx_fk_country_id")
+}
+
+model country {
+  country_id  Int      @id @default(autoincrement())
+  country     String
+  last_update DateTime @default(now()) @db.Timestamptz(6)
+  city        city[]
+}
+
+model customer {
+  customer_id Int       @id @default(autoincrement())
+  store_id    Int
+  first_name  String
+  last_name   String
+  email       String?
+  address_id  Int
+  activebool  Boolean   @default(true)
+  create_date DateTime  @default(dbgenerated("CURRENT_DATE")) @db.Date
+  last_update DateTime? @default(now()) @db.Timestamptz(6)
+  active      Int?
+  address     address   @relation(fields: [address_id], references: [address_id])
+  store       store     @relation(fields: [store_id], references: [store_id])
+  rental      rental[]
+
+  @@index([address_id], map: "idx_fk_address_id")
+  @@index([store_id], map: "idx_fk_store_id")
+  @@index([last_name], map: "idx_last_name")
+}
+
+model film {
+  film_id                                      Int                     @id @default(autoincrement())
+  title                                        String
+  description                                  String?
+  release_year                                 Int?
+  language_id                                  Int
+  original_language_id                         Int?
+  rental_duration                              Int                     @default(3) @db.SmallInt
+  rental_rate                                  Decimal                 @default(4.99) @db.Decimal(4, 2)
+  length                                       Int?                    @db.SmallInt
+  replacement_cost                             Decimal                 @default(19.99) @db.Decimal(5, 2)
+  rating                                       mpaa_rating?            @default(G)
+  last_update                                  DateTime                @default(now()) @db.Timestamptz(6)
+  special_features                             String[]
+  fulltext                                     Unsupported("tsvector")
+  language_film_language_idTolanguage          language                @relation("film_language_idTolanguage", fields: [language_id], references: [language_id])
+  language_film_original_language_idTolanguage language?               @relation("film_original_language_idTolanguage", fields: [original_language_id], references: [language_id], onDelete: Restrict)
+  film_actor                                   film_actor[]
+  film_category                                film_category[]
+  inventory                                    inventory[]
+
+  @@index([fulltext], type: Gist)
+  @@index([language_id], map: "idx_fk_language_id")
+  @@index([original_language_id], map: "idx_fk_original_language_id")
+  @@index([title], map: "idx_title")
+}
+
+model film_actor {
+  actor_id    Int
+  film_id     Int
+  last_update DateTime @default(now()) @db.Timestamptz(6)
+  actor       actor    @relation(fields: [actor_id], references: [actor_id])
+  film        film     @relation(fields: [film_id], references: [film_id])
+
+  @@id([actor_id, film_id])
+  @@index([film_id], map: "idx_fk_film_id")
+}
+
+model film_category {
+  film_id     Int
+  category_id Int
+  last_update DateTime @default(now()) @db.Timestamptz(6)
+  category    category @relation(fields: [category_id], references: [category_id])
+  film        film     @relation(fields: [film_id], references: [film_id])
+
+  @@id([film_id, category_id])
+}
+
+model inventory {
+  inventory_id Int      @id @default(autoincrement())
+  film_id      Int
+  store_id     Int
+  last_update  DateTime @default(now()) @db.Timestamptz(6)
+  film         film     @relation(fields: [film_id], references: [film_id])
+  store        store    @relation(fields: [store_id], references: [store_id])
+  rental       rental[]
+
+  @@index([store_id, film_id], map: "idx_store_id_film_id")
+}
+
+model language {
+  language_id                              Int      @id @default(autoincrement())
+  name                                     String   @db.Char(20)
+  last_update                              DateTime @default(now()) @db.Timestamptz(6)
+  film_film_language_idTolanguage          film[]   @relation("film_language_idTolanguage")
+  film_film_original_language_idTolanguage film[]   @relation("film_original_language_idTolanguage")
+}
+
+/// This table is a partition table and requires additional setup for migrations. Visit https://pris.ly/d/partition-tables for more info.
+model payment {
+  payment_id   Int      @default(autoincrement())
+  customer_id  Int
+  staff_id     Int
+  rental_id    Int
+  amount       Decimal  @db.Decimal(5, 2)
+  payment_date DateTime @db.Timestamptz(6)
+
+  @@id([payment_date, payment_id])
+}
+
+model rental {
+  rental_id    Int       @id @default(autoincrement())
+  rental_date  DateTime  @db.Timestamptz(6)
+  inventory_id Int
+  customer_id  Int
+  return_date  DateTime? @db.Timestamptz(6)
+  staff_id     Int
+  last_update  DateTime  @default(now()) @db.Timestamptz(6)
+  customer     customer  @relation(fields: [customer_id], references: [customer_id])
+  inventory    inventory @relation(fields: [inventory_id], references: [inventory_id])
+  staff        staff     @relation(fields: [staff_id], references: [staff_id])
+
+  @@unique([rental_date, inventory_id, customer_id], map: "idx_unq_rental_rental_date_inventory_id_customer_id")
+  @@index([inventory_id], map: "idx_fk_inventory_id")
+}
+
+model staff {
+  staff_id    Int      @id @default(autoincrement())
+  first_name  String
+  last_name   String
+  address_id  Int
+  email       String?
+  store_id    Int
+  active      Boolean  @default(true)
+  username    String
+  password    String?
+  last_update DateTime @default(now()) @db.Timestamptz(6)
+  picture     Bytes?
+  rental      rental[]
+  address     address  @relation(fields: [address_id], references: [address_id])
+  store       store    @relation(fields: [store_id], references: [store_id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model store {
+  store_id         Int         @id @default(autoincrement())
+  manager_staff_id Int         @unique(map: "idx_unq_manager_staff_id")
+  address_id       Int
+  last_update      DateTime    @default(now()) @db.Timestamptz(6)
+  customer         customer[]
+  inventory        inventory[]
+  staff            staff[]
+  address          address     @relation(fields: [address_id], references: [address_id])
+}
+
+model tbl_pm_policy_objects {
+  pm_policy_object_id Int            @id @default(autoincrement())
+  title               String         @db.VarChar
+  description         String?        @db.VarChar
+  is_disabled         Boolean?       @default(false)
+  created_at          DateTime       @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime       @default(now()) @db.Timestamptz(6)
+  disabled_at         DateTime?      @db.Timestamptz(6)
+  disable_reason      String?        @db.VarChar
+  policy              Json?
+  tbl_pm_users        tbl_pm_users[]
+}
+
+model tbl_pm_users {
+  pm_user_id            Int                    @id @default(autoincrement())
+  first_name            String?                @db.VarChar
+  last_name             String?                @db.VarChar
+  address1              String?                @db.VarChar
+  pm_policy_object_id   Int?
+  is_disabled           Boolean?               @default(false)
+  created_at            DateTime               @default(now()) @db.Timestamptz(6)
+  updated_at            DateTime               @default(now()) @db.Timestamptz(6)
+  disabled_at           DateTime?              @db.Timestamptz(6)
+  disable_reason        String?                @db.VarChar
+  username              String?                @db.VarChar
+  password_hash         String?                @db.VarChar
+  salt                  String?                @db.VarChar
+  tbl_pm_policy_objects tbl_pm_policy_objects? @relation(fields: [pm_policy_object_id], references: [pm_policy_object_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_tbl_pm_users_tbl_pm_policy_object_pm_policy_onject_id")
+}
+
+enum mpaa_rating {
+  G
+  PG
+  PG_13 @map("PG-13")
+  R
+  NC_17 @map("NC-17")
+}

@@ -1,0 +1,1 @@
+{"super_admin_policy":{"actions":{},"tables":{"tbl_pm_policy_objects":true,"tbl_pm_users":true,"actor":true,"address":true,"category":true,"city":true,"country":true,"customer":true,"film":true,"film_actor":true,"film_category":true,"inventory":true,"language":true,"payment":true,"rental":true,"staff":true,"store":true}}}

@@ -1,0 +1,76 @@
+[31merror[39m: dev_node_1: 04-05-2024 13:52:03: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-04-29T19:27:24.000Z"}}
+[31merror[39m: dev_node_1: 04-05-2024 13:52:04: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 04-05-2024 13:52:04: [31mAuthService:verifyRefreshToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-04-30T04:04:12.000Z"}}
+[31merror[39m: dev_node_1: 04-05-2024 13:52:04: [31mauthController:refreshAccessToken:catch-1[39m |====| {"error":{"code":"USER_REFRESH_TOKEN_EXPIRED","message":"User refresh token expired"}}
+[31merror[39m: dev_node_1: 04-05-2024 13:53:08: [31mTableService:updateTableRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 04-05-2024 13:53:08: [31mtableController:updateRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 04-05-2024 15:07:47: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-05-04T08:37:13.000Z"}}
+[31merror[39m: dev_node_1: 04-05-2024 15:07:47: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 04-05-2024 15:14:25: [31mtableController:updateRowByID:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 04-05-2024 15:15:11: [31mTableService:updateTableRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 04-05-2024 15:15:11: [31mtableController:updateRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 04-05-2024 15:18:12: [31mTableService:updateTableRowByID:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 04-05-2024 15:18:12: [31mtableController:updateRowByID:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 04-05-2024 15:25:19: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-05-04T09:52:47.000Z"}}
+[31merror[39m: dev_node_1: 04-05-2024 15:25:19: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 04-05-2024 15:30:23: [31mtableController:getRowByID:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 04-05-2024 15:30:24: [31mtableController:getRowByID:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 04-05-2024 15:40:32: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-05-04T10:10:19.000Z"}}
+[31merror[39m: dev_node_1: 04-05-2024 15:40:32: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 04-05-2024 15:56:21: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-05-04T10:25:32.000Z"}}
+[31merror[39m: dev_node_1: 04-05-2024 15:56:21: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 04-05-2024 16:11:58: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-05-04T10:41:21.000Z"}}
+[31merror[39m: dev_node_1: 04-05-2024 16:11:58: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 04-05-2024 17:23:02: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-05-04T10:56:58.000Z"}}
+[31merror[39m: dev_node_1: 04-05-2024 17:23:02: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 04-05-2024 17:26:49: [31mtableAuthorizationMiddleware:populateAuthorizationPolicies:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 04-05-2024 17:26:49: [31mtableAuthorizationMiddleware:populateAuthorizationPolicies:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 04-05-2024 17:42:05: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-05-04T12:08:17.000Z"}}
+[31merror[39m: dev_node_1: 04-05-2024 17:42:05: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 04-05-2024 17:49:09: [31mTableService:updateTableRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientUnknownRequestError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 04-05-2024 17:49:09: [31mtableController:updateRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientUnknownRequestError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 04-05-2024 17:58:06: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-05-04T12:27:05.000Z"}}
+[31merror[39m: dev_node_1: 04-05-2024 17:58:06: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 04-05-2024 18:12:29: [31mtableController:addRowByID:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 04-05-2024 18:13:29: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-05-04T12:43:06.000Z"}}
+[31merror[39m: dev_node_1: 04-05-2024 18:13:29: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 04-05-2024 18:13:53: [31mTableService:deleteTableRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 04-05-2024 18:13:53: [31mtableController:deleteRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 04-05-2024 18:16:04: [31mtableController:deleteRowByID:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 04-05-2024 18:16:22: [31mTableService:deleteTableRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 04-05-2024 18:16:22: [31mtableController:deleteRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 04-05-2024 18:17:19: [31mTableService:deleteTableRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 04-05-2024 18:17:19: [31mtableController:deleteRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 04-05-2024 18:20:37: [31mTableService:deleteTableRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 04-05-2024 18:20:37: [31mtableController:deleteRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 04-05-2024 18:21:01: [31mTableService:deleteTableRowByID:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 04-05-2024 18:21:01: [31mtableController:deleteRowByID:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 04-05-2024 18:21:24: [31mTableService:deleteTableRowByID:catch-2[39m |====| {"error":{"code":"PERMISSION_DENIED","message":"Permission denied"}}
+[31merror[39m: dev_node_1: 04-05-2024 18:21:24: [31mTableService:deleteTableRowByID:catch-1[39m |====| {"error":{"code":"PERMISSION_DENIED","message":"Permission denied"}}
+[31merror[39m: dev_node_1: 04-05-2024 18:21:24: [31mtableController:deleteRowByID:catch-1[39m |====| {"error":{"code":"PERMISSION_DENIED","message":"Permission denied"}}
+[31merror[39m: dev_node_1: 04-05-2024 18:23:02: [31mTableService:deleteTableRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientKnownRequestError","code":"P2003","clientVersion":"5.7.1","meta":{"modelName":"inventory","field_name":"rental_inventory_id_fkey (index)"}}}
+[31merror[39m: dev_node_1: 04-05-2024 18:23:02: [31mtableController:deleteRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientKnownRequestError","code":"P2003","clientVersion":"5.7.1","meta":{"modelName":"inventory","field_name":"rental_inventory_id_fkey (index)"}}}
+[31merror[39m: dev_node_1: 04-05-2024 19:08:44: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-05-04T12:58:29.000Z"}}
+[31merror[39m: dev_node_1: 04-05-2024 19:08:44: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 04-05-2024 19:24:18: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-05-04T13:53:44.000Z"}}
+[31merror[39m: dev_node_1: 04-05-2024 19:24:18: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 04-05-2024 19:24:37: [31mTableService:deleteTableRowByID:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 04-05-2024 19:24:37: [31mtableController:deleteRowByID:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 04-05-2024 19:24:45: [31mTableService:deleteTableRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientKnownRequestError","code":"P2003","clientVersion":"5.7.1","meta":{"modelName":"inventory","field_name":"rental_inventory_id_fkey (index)"}}}
+[31merror[39m: dev_node_1: 04-05-2024 19:24:45: [31mtableController:deleteRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientKnownRequestError","code":"P2003","clientVersion":"5.7.1","meta":{"modelName":"inventory","field_name":"rental_inventory_id_fkey (index)"}}}
+[31merror[39m: dev_node_1: 04-05-2024 19:24:51: [31mTableService:deleteTableRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientKnownRequestError","code":"P2003","clientVersion":"5.7.1","meta":{"modelName":"language","field_name":"film_language_id_fkey (index)"}}}
+[31merror[39m: dev_node_1: 04-05-2024 19:24:51: [31mtableController:deleteRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientKnownRequestError","code":"P2003","clientVersion":"5.7.1","meta":{"modelName":"language","field_name":"film_language_id_fkey (index)"}}}
+[31merror[39m: dev_node_1: 04-05-2024 19:24:57: [31mTableService:deleteTableRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientKnownRequestError","code":"P2003","clientVersion":"5.7.1","meta":{"modelName":"customer","field_name":"payment_p2022_01_customer_id_fkey (index)"}}}
+[31merror[39m: dev_node_1: 04-05-2024 19:24:57: [31mtableController:deleteRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientKnownRequestError","code":"P2003","clientVersion":"5.7.1","meta":{"modelName":"customer","field_name":"payment_p2022_01_customer_id_fkey (index)"}}}
+[31merror[39m: dev_node_1: 04-05-2024 19:25:02: [31mTableService:deleteTableRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientKnownRequestError","code":"P2003","clientVersion":"5.7.1","meta":{"modelName":"category","field_name":"film_category_category_id_fkey (index)"}}}
+[31merror[39m: dev_node_1: 04-05-2024 19:25:02: [31mtableController:deleteRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientKnownRequestError","code":"P2003","clientVersion":"5.7.1","meta":{"modelName":"category","field_name":"film_category_category_id_fkey (index)"}}}
+[31merror[39m: dev_node_1: 04-05-2024 19:25:08: [31mTableService:deleteTableRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientKnownRequestError","code":"P2003","clientVersion":"5.7.1","meta":{"modelName":"country","field_name":"city_country_id_fkey (index)"}}}
+[31merror[39m: dev_node_1: 04-05-2024 19:25:08: [31mtableController:deleteRowByID:catch-1[39m |====| {"error":{"name":"PrismaClientKnownRequestError","code":"P2003","clientVersion":"5.7.1","meta":{"modelName":"country","field_name":"city_country_id_fkey (index)"}}}
+[31merror[39m: dev_node_1: 04-05-2024 19:25:14: [31mTableService:deleteTableRowByID:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 04-05-2024 19:25:14: [31mtableController:deleteRowByID:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 04-05-2024 19:39:39: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-05-04T14:09:18.000Z"}}
+[31merror[39m: dev_node_1: 04-05-2024 19:39:39: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 04-05-2024 20:00:30: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-05-04T14:24:39.000Z"}}
+[31merror[39m: dev_node_1: 04-05-2024 20:00:30: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 04-05-2024 20:51:13: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-05-04T14:45:30.000Z"}}
+[31merror[39m: dev_node_1: 04-05-2024 20:51:13: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}

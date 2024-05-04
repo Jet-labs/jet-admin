@@ -1,0 +1,237 @@
+{
+  "actions": {
+    "machines": {
+      "actions": {
+        "command": true
+      }
+    },
+    "bookings": {
+      "actions": {
+        "reopen": true,
+        "close": true
+      }
+    }
+  },
+  "tables": {
+    "tbl_pm_policy_objects": true,
+    "tbl_pm_users": {
+      "read": {
+        "columns": true,
+        "rows": true
+      },
+      "edit": {
+        "columns": true,
+        "rows": true
+      }
+    },
+    "tbl_booking_reviews": {
+      "read": {
+        "columns": true,
+        "rows": true
+      },
+      "edit": {
+        "columns": false,
+        "rows": false
+      }
+    },
+    "tbl_stations": {
+      "read": {
+        "columns": true,
+        "rows": true
+      },
+      "edit": {
+        "columns": true,
+        "rows": true
+      },
+      "add": true
+    },
+    "tbl_machines": {
+      "read": {
+        "columns": true,
+        "rows": true,
+        "include": {
+          "tbl_machine_types": {
+            "select": {
+              "description": true
+            }
+          },
+          "tbl_stations": {
+            "select": {
+              "address": true
+            }
+          }
+        }
+      },
+      "edit": {
+        "columns": true,
+        "rows": true
+      },
+      "add": true
+    },
+    "tbl_master": {
+      "read": {
+        "columns": true,
+        "rows": true,
+        "include": {
+          "tbl_users": {
+            "select": {
+              "user_id": true,
+              "first_name": true,
+              "last_name": true,
+              "address1": true,
+              "tbl_user_station_map": {
+                "select": {
+                  "tbl_stations": {
+                    "select": {
+                      "address": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "tbl_bookings": {
+            "select": {
+              "booking_id": true,
+              "machine_id": true
+            }
+          }
+        }
+      },
+      "edit": {
+        "columns": true,
+        "rows": true
+      }
+    },
+    "tbl_transactions": {
+      "read": {
+        "columns": true,
+        "rows": true
+      },
+      "edit": {
+        "columns": true,
+        "rows": true
+      }
+    },
+    "tbl_offer_types": {
+      "add": true,
+      "read": {
+        "columns": true,
+        "rows": true
+      },
+      "edit": {
+        "columns": true,
+        "rows": true
+      }
+    },
+    "tbl_offers": {
+      "add": true,
+      "read": {
+        "columns": true,
+        "rows": true
+      },
+      "edit": {
+        "columns": true,
+        "rows": true
+      }
+    },
+    "tbl_user_station_map": {
+      "add": true,
+      "read": {
+        "columns": true,
+        "rows": true
+      },
+      "edit": {
+        "columns": true,
+        "rows": true
+      }
+    },
+    "tbl_payment_orders": {
+      "read": {
+        "columns": true,
+        "rows": true,
+        "include": {
+          "tbl_users": {
+            "select": {
+              "user_id": true,
+              "first_name": true,
+              "last_name": true,
+              "address1": true,
+              "tbl_user_station_map": {
+                "select": {
+                  "tbl_stations": {
+                    "select": {
+                      "address": true
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "edit": {
+        "columns": true,
+        "rows": true
+      }
+    },
+    "tbl_payment_transactions": {
+      "read": {
+        "columns": true,
+        "rows": true
+      },
+      "edit": {
+        "columns": true,
+        "rows": true
+      }
+    },
+    "tbl_wallets": {
+      "read": {
+        "columns": true,
+        "rows": true
+      },
+      "edit": {
+        "columns": true,
+        "rows": true
+      }
+    },
+    "tbl_machine_types": {
+      "read": {
+        "columns": true,
+        "rows": true
+      },
+      "edit": {
+        "columns": true,
+        "rows": true
+      },
+      "add": true
+    },
+    "tbl_users": {
+      "read": {
+        "columns": true,
+        "rows": true,
+        "include": {
+          "tbl_wallets": {
+            "select": {
+              "balance": true
+            }
+          }
+        }
+      },
+      "edit": {
+        "columns": true,
+        "rows": true
+      }
+    },
+    "tbl_bookings": {
+      "read": {
+        "columns": true,
+        "rows": true
+      },
+      "edit": {
+        "columns": true,
+        "rows": true
+      }
+    }
+  }
+}

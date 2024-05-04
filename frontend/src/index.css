@@ -1,0 +1,68 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+/* width */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 8px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #121212;
+  border-radius: 4px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  border-radius: 20px;
+  background-color: rgb(60, 59, 128);
+  border: 1px solid #121212;
+}
+::-webkit-scrollbar-corner {
+  background-color: #ddd;
+}
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #6562ff;
+}
+html {
+  font-family: "Cabin", sans-serif;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-family: "Inter", sans-serif;
+  font-family: "Karla", sans-serif;
+  font-family: "Manrope", sans-serif;
+
+  height: -webkit-fill-available;
+  display: block;
+  background-color: #fff;
+
+  
+}
+body {
+  margin: 0;
+  font-family: "Cabin", sans-serif;
+  font-family: "IBM Plex Sans", sans-serif;
+  font-family: "Inter", sans-serif;
+  font-family: "Karla", sans-serif;
+  font-family: "Manrope", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  height: -webkit-fill-available;
+  display: block;
+  
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+:root{
+  
+  --toastify-color-success: #7b79ff!important;
+  --toastify-icon-color-success: var(--toastify-color-success)!important;
+  --toastify-color-progress-success: var(--toastify-color-success)!important;
+}
