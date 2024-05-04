@@ -4,9 +4,6 @@ export class PMUser {
     first_name,
     address1,
     pm_policy_object_id,
-    identification_document_id,
-    razorpay_customer_id,
-    wallet_id,
     email,
     is_disabled,
     created_at,
@@ -19,9 +16,6 @@ export class PMUser {
     this.first_name = first_name;
     this.address1 = address1;
     this.pm_policy_object_id = pm_policy_object_id;
-    this.identification_document_id = identification_document_id;
-    this.razorpay_customer_id = razorpay_customer_id;
-    this.wallet_id = wallet_id;
     this.email = email;
     this.is_disabled = is_disabled;
     this.created_at = created_at;
@@ -31,7 +25,6 @@ export class PMUser {
     this.is_profile_complete = this.first_name && this.email && this.address1;
     this.tbl_pm_policy_objects = tbl_pm_policy_objects;
     this.policy = tbl_pm_policy_objects ? tbl_pm_policy_objects.policy : null;
-    
   }
 
   isPolicyEditor = () => {

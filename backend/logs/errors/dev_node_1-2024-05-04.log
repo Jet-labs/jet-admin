@@ -74,3 +74,5 @@
 [31merror[39m: dev_node_1: 04-05-2024 20:00:30: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
 [31merror[39m: dev_node_1: 04-05-2024 20:51:13: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-05-04T14:45:30.000Z"}}
 [31merror[39m: dev_node_1: 04-05-2024 20:51:13: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 04-05-2024 22:48:59: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-05-04T15:36:13.000Z"}}
+[31merror[39m: dev_node_1: 04-05-2024 22:48:59: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
