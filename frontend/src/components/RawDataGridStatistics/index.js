@@ -11,7 +11,11 @@ import { Loading } from "../../pages/Loading";
 import { displayError } from "../../utils/notification";
 import { ErrorComponent } from "../ErrorComponent";
 
-export const RawDatagridStatistics = ({ tableName, filterQuery }) => {
+export const RawDatagridStatistics = ({
+  tableName,
+  altTableName,
+  filterQuery,
+}) => {
   const { pmUser } = useAuthState();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -52,7 +56,9 @@ export const RawDatagridStatistics = ({ tableName, filterQuery }) => {
   ) : data?.statistics && pmUser ? (
     <Grid container columnSpacing={2} rowSpacing={1} className="!mb-4">
       <Grid item xs={12}>
-        <span className="!text-xl !font-bold">{`${tableName}`}</span>
+        <span className="!text-xl !font-bold">
+          {altTableName ? altTableName : `${tableName}`}
+        </span>
       </Grid>
       <Grid item xs={12}>
         <span className="!text-sm !font-thin !text-slate-400">{`Total records : ${data.statistics.rowCount}`}</span>

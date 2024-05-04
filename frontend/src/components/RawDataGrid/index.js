@@ -1,7 +1,13 @@
 import { useNavigate } from "react-router-dom";
 
 import { Pagination } from "@mui/material";
-import { DataGrid } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridToolbar,
+  GridToolbarColumnsButton,
+  GridToolbarContainer,
+  GridToolbarDensitySelector,
+} from "@mui/x-data-grid";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { fetchAllRowsAPI } from "../../api/get";
@@ -162,6 +168,14 @@ export const RawDatagrid = ({
             autoHeight={true}
             rowHeight={150}
             getRowHeight={() => "auto"}
+            slots={{
+              toolbar: () => (
+                <GridToolbarContainer>
+                  <GridToolbarDensitySelector />
+                  <GridToolbarColumnsButton />
+                </GridToolbarContainer>
+              ),
+            }}
           />
           <div className="flex flex-row w-full justify-end pb-2">
             <Pagination

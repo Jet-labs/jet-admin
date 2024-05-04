@@ -91,7 +91,7 @@ export const LOCAL_CONSTANTS = {
       code: ":id",
       path: (id) => `${id}`,
     },
-    STATIONS: "/stations",
+    ACCOUNTS: "/accounts",
     ACTIONS: {
       code: "actions/:entity",
       path: (entity) => `/actions/${entity}`,
@@ -198,6 +198,7 @@ export const LOCAL_CONSTANTS = {
   STRINGS: {
     ACCESS_TOKEN_LOCAL_STORAGE: "access_token",
     REFRESH_TOKEN_LOCAL_STORAGE: "refresh_token",
+    PM_USER_TABLE_NAME: "tbl_pm_users",
     POLICY_OBJECT_TABLE_NAME: "tbl_pm_policy_objects",
   },
 

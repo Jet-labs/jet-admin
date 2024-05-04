@@ -1,0 +1,14 @@
+{
+  "name": "pg_admin_web",
+  "version": "1.0.0",
+  "description": "PostgreSQL Management Web Application\r =====================================",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start:frontend": "cd frontend && npm run start",
+    "start:backend": "cd backend && npm run dev-w",
+    "dev": "start cmd /k \"cd backend && npm run dev-w\" && start cmd /k \"cd frontend && npm start\""
+  },
+  "author": "",
+  "license": "ISC"
+}

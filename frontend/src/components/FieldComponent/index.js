@@ -39,6 +39,7 @@ export const FieldComponent = ({
   customMapping,
   selectOptions,
   setFieldValue,
+  showDefault,
 }) => {
   const CustomDateTimePicker = styled(
     dateTimePicker === "normal" ? DateTimePicker : StaticDateTimePicker
@@ -417,7 +418,7 @@ export const FieldComponent = ({
     }
     default: {
       console.log({ value });
-      component = (
+      component = showDefault ? (
         <FormControl fullWidth size="small">
           {label && (
             <span className="text-xs font-light  !lowercase mb-1">{label}</span>
@@ -431,7 +432,7 @@ export const FieldComponent = ({
             // onModeChange={this.onModeChange}
           />
         </FormControl>
-      );
+      ) : null;
     }
   }
 

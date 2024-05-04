@@ -1,4 +1,4 @@
-import { Circle, ExpandLess, ExpandMore, TableRows } from "@mui/icons-material";
+import { Circle, ExpandLess, ExpandMore, PeopleAlt, TableRows } from "@mui/icons-material";
 import PolicyIcon from "@mui/icons-material/Policy";
 import {
   Collapse,
@@ -197,6 +197,26 @@ export const DrawerList = ({
                   sx: { marginLeft: -2 },
                 }}
                 primary={"Policy editor"}
+              />
+            </ListItemButton>
+          </ListItem>
+        </Link>
+      }
+      {
+        <Link
+          to={LOCAL_CONSTANTS.ROUTES.ACCOUNTS}
+          key={LOCAL_CONSTANTS.ROUTES.ACCOUNTS}
+        >
+          <ListItem disablePadding>
+            <ListItemButton>
+              <ListItemIcon>
+                <PeopleAlt sx={{}} />
+              </ListItemIcon>
+              <ListItemText
+                primaryTypographyProps={{
+                  sx: { marginLeft: -2 },
+                }}
+                primary={"Manage accounts"}
               />
             </ListItemButton>
           </ListItem>

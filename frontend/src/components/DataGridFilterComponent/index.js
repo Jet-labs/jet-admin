@@ -228,6 +228,7 @@ export const DataGridFilterComponent = ({
                 value={filterValue}
                 onChange={_handleFilterValue}
                 required={true}
+                showDefault={true}
               />
             </Grid>
           )}

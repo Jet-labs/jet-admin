@@ -9,12 +9,14 @@ import { lazy } from "react";
 import SignIn from "../pages/SignIn";
 
 
+
 const Home = lazy(() => import("../pages/Home"));
 const TableView = lazy(() => import("../pages/TableView"));
 const RowView = lazy(() => import("../pages/RowView"));
 const AddRow = lazy(() => import("../pages/AddRow"));
 const PolicyEditor = lazy(() => import("../pages/PolicyEditor"));
 const PolicyView = lazy(() => import("../pages/PolicyView"));
+const Accounts = lazy(() => import("../pages/Accounts"));
 /**
  *
  * @param {object} param0
@@ -127,6 +129,17 @@ const AppRouter = ({}) => {
               }
             />
           </Route>
+
+          <Route
+            path={LOCAL_CONSTANTS.ROUTES.ACCOUNTS}
+            element={
+              <ProtectedRoute
+                successComponent={Accounts}
+                fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
+                loadingComponent={() => <Loading fullScreen />}
+              />
+            }
+          />
 
           <Route
             exact={true}
