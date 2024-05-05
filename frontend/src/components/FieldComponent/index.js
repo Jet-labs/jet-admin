@@ -239,7 +239,10 @@ export const FieldComponent = ({
             mode={jsonMode ? jsonMode : "text"}
             modes={["tree", "form", "view", "code", "text"]}
             indentation={4}
-            onChange={onChange}
+            onChange={(value) => {
+              console.log({ value });
+              setFieldValue(name, value);
+            }}
             // onModeChange={this.onModeChange}
           />
         </FormControl>
@@ -428,8 +431,10 @@ export const FieldComponent = ({
             mode={jsonMode ? jsonMode : "text"}
             modes={["tree", "form", "view", "code", "text"]}
             indentation={4}
-            onChange={onChange}
-            // onModeChange={this.onModeChange}
+            onChange={(value) => {
+              console.log({ value });
+              setFieldValue(name, value);
+            }}
           />
         </FormControl>
       ) : null;

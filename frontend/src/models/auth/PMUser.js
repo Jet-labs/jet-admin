@@ -167,12 +167,8 @@ export class PMUser {
       authorization = false;
     } else if (this.policy.tables[tableName] === true) {
       authorization = true;
-    } else if (!this.policy.tables[tableName].delete) {
-      authorization = false;
-    } else if (this.policy.tables[tableName].delete === true) {
-      authorization = true;
     } else {
-      authorization = false;
+      authorization = Boolean(this.policy.tables[tableName].delete);
     }
     return authorization;
   };

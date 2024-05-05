@@ -26,7 +26,7 @@ const PolicySettings = () => {
   } = useQuery({
     queryKey: [`REACT_QUERY_KEY_${String(tableName).toUpperCase()}`, id],
     queryFn: () => fetchRowByIDAPI({ tableName, id }),
-    cacheTime: Infinity,
+    cacheTime: 0,
     retry: 1,
     staleTime: Infinity,
   });

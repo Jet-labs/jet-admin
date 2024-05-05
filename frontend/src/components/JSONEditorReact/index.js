@@ -10,13 +10,13 @@ const modes = ["tree", "form", "view", "code", "text"];
 export const JSONEditorReact = ({ json, onChange, label, mode }) => {
   const containerRef = useRef();
   const _mode = mode ? mode : "code";
-  console.log({ _mode });
 
   const editorRef = useRef();
 
   const handleChange = () => {
     if (onChange && editorRef.current) {
       onChange(editorRef.current.get());
+      editorRef.current.expandAll();
     }
   };
 
@@ -36,9 +36,11 @@ export const JSONEditorReact = ({ json, onChange, label, mode }) => {
           mainMenuBar: true,
           enableSort: true,
           theme: "dark",
+
+          // onChangeJSON: _mode === "tree" ? onChange : null,
         });
         editorRef.current.set(json);
-        // editorRef.current.expandAll();
+        editorRef.current.expandAll();
       }
     }
   }, [containerRef, json, _mode]);
