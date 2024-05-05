@@ -40,6 +40,7 @@ export const FieldComponent = ({
   selectOptions,
   setFieldValue,
   showDefault,
+  jsonMode,
 }) => {
   const CustomDateTimePicker = styled(
     dateTimePicker === "normal" ? DateTimePicker : StaticDateTimePicker
@@ -235,7 +236,7 @@ export const FieldComponent = ({
           )}
           <JSONEditorReact
             json={value}
-            mode={"text"}
+            mode={jsonMode ? jsonMode : "text"}
             modes={["tree", "form", "view", "code", "text"]}
             indentation={4}
             onChange={onChange}
@@ -417,7 +418,6 @@ export const FieldComponent = ({
       break;
     }
     default: {
-      console.log({ value });
       component = showDefault ? (
         <FormControl fullWidth size="small">
           {label && (
@@ -425,7 +425,7 @@ export const FieldComponent = ({
           )}
           <JSONEditorReact
             json={value}
-            mode={"text"}
+            mode={jsonMode ? jsonMode : "text"}
             modes={["tree", "form", "view", "code", "text"]}
             indentation={4}
             onChange={onChange}

@@ -73,8 +73,6 @@ export const LOCAL_CONSTANTS = {
   ROUTES: {
     HOME: "/",
     SIGNIN: "/signin",
-    EMAIL_LOGIN: "/email_login",
-    EMAIL_REGISTER: "/email_register",
     TABLE_VIEW: {
       code: "tables/:table_name",
       path: (table_name) => `/tables/${table_name}`,
@@ -86,12 +84,16 @@ export const LOCAL_CONSTANTS = {
       code: ":id",
       path: (id) => `${id}`,
     },
-    POLICY_EDITOR: "/policy_editor",
-    POLICY_VIEW: {
+    POLICY_MANAGEMENT: "/policy_editor",
+    POLICY_SETTINGS: {
       code: ":id",
       path: (id) => `${id}`,
     },
-    ACCOUNTS: "/accounts",
+    ACCOUNT_MANAGEMENT: "/account_management",
+    ACCOUNT_SETTINGS: {
+      code: ":id",
+      path: (id) => `${id}`,
+    },
     ACTIONS: {
       code: "actions/:entity",
       path: (entity) => `/actions/${entity}`,

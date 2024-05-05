@@ -14,9 +14,10 @@ const Home = lazy(() => import("../pages/Home"));
 const TableView = lazy(() => import("../pages/TableView"));
 const RowView = lazy(() => import("../pages/RowView"));
 const AddRow = lazy(() => import("../pages/AddRow"));
-const PolicyEditor = lazy(() => import("../pages/PolicyEditor"));
-const PolicyView = lazy(() => import("../pages/PolicyView"));
-const Accounts = lazy(() => import("../pages/Accounts"));
+const PolicyManagement = lazy(() => import("../pages/PolicyManagement"));
+const PolicySettings = lazy(() => import("../pages/PolicySettings"));
+const AccountManagement = lazy(() => import("../pages/AccountManagement"));
+const AccountSettings = lazy(() => import("../pages/AccountSettings"));
 /**
  *
  * @param {object} param0
@@ -107,22 +108,22 @@ const AppRouter = ({}) => {
             /> */}
           {/* </Route> */}
 
-          <Route path={LOCAL_CONSTANTS.ROUTES.POLICY_EDITOR}>
+          <Route path={LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT}>
             <Route
               index
               element={
                 <ProtectedRoute
-                  successComponent={PolicyEditor}
+                  successComponent={PolicyManagement}
                   fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
                   loadingComponent={() => <Loading fullScreen />}
                 />
               }
             />
             <Route
-              path={LOCAL_CONSTANTS.ROUTES.POLICY_VIEW.code}
+              path={LOCAL_CONSTANTS.ROUTES.POLICY_SETTINGS.code}
               element={
                 <ProtectedRoute
-                  successComponent={PolicyView}
+                  successComponent={PolicySettings}
                   fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
                   loadingComponent={() => <Loading fullScreen />}
                 />
@@ -130,16 +131,28 @@ const AppRouter = ({}) => {
             />
           </Route>
 
-          <Route
-            path={LOCAL_CONSTANTS.ROUTES.ACCOUNTS}
-            element={
-              <ProtectedRoute
-                successComponent={Accounts}
-                fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
-                loadingComponent={() => <Loading fullScreen />}
-              />
-            }
-          />
+          <Route path={LOCAL_CONSTANTS.ROUTES.ACCOUNT_MANAGEMENT}>
+            <Route
+              index
+              element={
+                <ProtectedRoute
+                  successComponent={AccountManagement}
+                  fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
+                  loadingComponent={() => <Loading fullScreen />}
+                />
+              }
+            />
+            <Route
+              path={LOCAL_CONSTANTS.ROUTES.ACCOUNT_SETTINGS.code}
+              element={
+                <ProtectedRoute
+                  successComponent={AccountSettings}
+                  fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
+                  loadingComponent={() => <Loading fullScreen />}
+                />
+              }
+            />
+          </Route>
 
           <Route
             exact={true}

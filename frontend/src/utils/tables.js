@@ -5,7 +5,7 @@ import moment from "moment";
 import { LOCAL_CONSTANTS } from "../constants";
 import { Model } from "../models/data/model";
 import { jsonToReadable } from "./string";
-
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 /**
  *
  * @param {String} tableName
@@ -96,14 +96,35 @@ export const getFieldFormatting = ({ type, isList, isID, params }) => {
       break;
     }
     case LOCAL_CONSTANTS.DATA_TYPES.DATETIME: {
-      let value = params.value;
       if (isList) {
-        value = JSON.stringify(params.value);
+        params.value.map((data) => {
+          return (
+            <ListItem key={data}>
+              <Chip
+                label={`${data}`}
+                size="small"
+                variant="outlined"
+                color={"secondary"}
+                sx={{
+                  borderRadius: 1,
+                }}
+                icon={<CalendarMonthIcon />}
+              />
+            </ListItem>
+          );
+        });
       }
       f = (
-        <span className="!text-justify break-all text-ellipsis whitespace-pre-wrap">
-          {value}
-        </span>
+        <Chip
+          label={`${params.value}`}
+          size="small"
+          variant="outlined"
+          color={"secondary"}
+          icon={<CalendarMonthIcon />}
+          sx={{
+            borderRadius: 1,
+          }}
+        />
       );
       break;
     }

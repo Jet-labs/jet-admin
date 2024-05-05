@@ -1,25 +1,25 @@
 import { useNavigate } from "react-router-dom";
+import { useAuthState } from "../../contexts/authContext";
 
 import { Chip, Pagination } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { fetchAllRowsAPI } from "../../api/get";
-import { useAuthState } from "../../contexts/authContext";
 
 import { LOCAL_CONSTANTS } from "../../constants";
 import { useConstants } from "../../contexts/constantsContext";
-import { Loading } from "../../pages/Loading";
-import { getAllTableFields, getTableIDProperty } from "../../utils/tables";
+import { Loading } from "../Loading";
 
+import moment from "moment";
 import "react-data-grid/lib/styles.css";
 import { DataGridActionComponent } from "../../components/DataGridActionComponent";
-import { RawDatagridStatistics } from "../../components/RawDataGridStatistics";
 import { ErrorComponent } from "../../components/ErrorComponent";
-import moment from "moment";
+import { RawDatagridStatistics } from "../../components/RawDataGridStatistics";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 
-const Accounts = () => {
-  const tableName = LOCAL_CONSTANTS.STRINGS.PM_USER_TABLE_NAME;
+const PolicyManagement = () => {
+  const tableName = LOCAL_CONSTANTS.STRINGS.POLICY_OBJECT_TABLE_NAME;
   const { dbModel } = useConstants();
   const { pmUser } = useAuthState();
   const navigate = useNavigate();
@@ -27,13 +27,13 @@ const Accounts = () => {
   const [filterQuery, setFilterQuery] = useState(null);
   const [sortModel, setSortModel] = useState(null);
   const {
-    isLoading: isLoadingAllAccounts,
+    isLoading: isLoadingAllPolicies,
     data: data,
-    isError: isLoadAllAccountsError,
-    error: loadAllAccountsError,
-    isFetching: isFetchingAllAllAccounts,
-    isPreviousData: isPreviousAllAccountsData,
-    refetch: reloadAllAccounts,
+    isError: isLoadAllPoliciesError,
+    error: loadAllPoliciesError,
+    isFetching: isFetchingAllAllPolicies,
+    isPreviousData: isPreviousAllPoliciesData,
+    refetch: reloadAllPolicies,
   } = useQuery({
     queryKey: [
       `REACT_QUERY_KEY_${String(tableName).toUpperCase()}`,
@@ -57,43 +57,56 @@ const Accounts = () => {
   });
 
   const getRowId = (row) => {
-    return row.pm_user_id;
+    return row.pm_policy_object_id;
   };
   console.log({ row: data?.rows });
 
   const columns = [
-    { field: "pm_user_id", headerName: "User ID" },
-    { field: "username", headerName: "Username", width: 200 },
-    {
-      field: "tbl_pm_policy_objects",
-      headerName: "Role",
-      width: 200,
-      valueGetter: (value, row) => {
-        return value.value.title;
-      },
-      renderCell: (params) => (
-        <Chip
-          label={`${params.value}`}
-          size="small"
-          variant="outlined"
-          color={"info"}
-        />
-      ),
-    },
+    { field: "pm_policy_object_id", headerName: "User ID" },
+    { field: "title", headerName: "Title", width: 200 },
+    { field: "description", headerName: "Description", width: 200 },
     {
       field: "created_at",
       headerName: "Created at",
-      width: 200,
+      width: 300,
       valueGetter: (value, row) => {
         return moment(value).format("dddd, MMMM Do YYYY, h:mm:ss a");
+      },
+      renderCell: (params) => {
+        return (
+          <Chip
+            label={`${params.value}`}
+            size="small"
+            variant="outlined"
+            color={"secondary"}
+            icon={<CalendarMonthIcon />}
+            sx={{
+              borderRadius: 1,
+            }}
+          />
+        );
       },
     },
     {
       field: "updated_at",
       headerName: "Updated at",
-      width: 200,
+      width: 300,
       valueGetter: (value, row) => {
         return moment(value).format("dddd, MMMM Do YYYY, h:mm:ss a");
+      },
+      renderCell: (params) => {
+        return (
+          <Chip
+            label={`${params.value}`}
+            size="small"
+            variant="outlined"
+            color={"secondary"}
+            icon={<CalendarMonthIcon />}
+            sx={{
+              borderRadius: 1,
+            }}
+          />
+        );
       },
     },
   ];
@@ -102,25 +115,25 @@ const Accounts = () => {
       <div className={`!w-full !p-4`}>
         <RawDatagridStatistics
           tableName={tableName}
-          altTableName={"User accounts"}
+          altTableName={"Policy management"}
           filterQuery={filterQuery}
         />
         <DataGridActionComponent
           filterQuery={filterQuery}
           setFilterQuery={setFilterQuery}
-          reloadData={reloadAllAccounts}
+          reloadData={reloadAllPolicies}
           tableName={tableName}
           setSortModel={setSortModel}
           sortModel={sortModel}
         />
       </div>
-      {isLoadingAllAccounts ? (
+      {isLoadingAllPolicies ? (
         <Loading />
       ) : data?.rows && pmUser ? (
         <div className="px-4">
           <DataGrid
             rows={data.rows}
-            loading={isLoadingAllAccounts || isFetchingAllAllAccounts}
+            loading={isLoadingAllPolicies || isFetchingAllAllPolicies}
             columns={columns}
             initialState={{}}
             editMode="row"
@@ -132,7 +145,11 @@ const Accounts = () => {
             hideFooter={true}
             onRowClick={(param) => {
               navigate(
-                LOCAL_CONSTANTS.ROUTES.ROW_VIEW.path(param.row.pm_user_id)
+                LOCAL_CONSTANTS.ROUTES.POLICY_SETTINGS.path(
+                  JSON.stringify({
+                    pm_policy_object_id: param.row.pm_policy_object_id,
+                  })
+                )
               );
             }}
             disableColumnFilter
@@ -160,7 +177,7 @@ const Accounts = () => {
         <div className="!w-full !p-4">
           <ErrorComponent
             error={
-              loadAllAccountsError || LOCAL_CONSTANTS.ERROR_CODES.SERVER_ERROR
+              loadAllPoliciesError || LOCAL_CONSTANTS.ERROR_CODES.SERVER_ERROR
             }
           />
         </div>
@@ -169,4 +186,4 @@ const Accounts = () => {
   );
 };
 
-export default Accounts;
+export default PolicyManagement;

@@ -21,7 +21,7 @@ export const DrawerList = ({
   currentPageTitle,
   setCurrentPageTitle,
 }) => {
-  const [isTableListOpen, setIsTableListOpen] = useState(true);
+  const [isTableListOpen, setIsTableListOpen] = useState(false);
   const [isActionListOpen, setIsActionListOpen] = useState(false);
   const { pmUser } = useAuthState();
   const theme = useTheme();
@@ -184,8 +184,8 @@ export const DrawerList = ({
 
       {
         <Link
-          to={LOCAL_CONSTANTS.ROUTES.POLICY_EDITOR}
-          key={LOCAL_CONSTANTS.ROUTES.POLICY_EDITOR}
+          to={LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT}
+          key={LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT}
         >
           <ListItem disablePadding>
             <ListItemButton>
@@ -196,7 +196,7 @@ export const DrawerList = ({
                 primaryTypographyProps={{
                   sx: { marginLeft: -2 },
                 }}
-                primary={"Policy editor"}
+                primary={"Roles Management"}
               />
             </ListItemButton>
           </ListItem>
@@ -204,8 +204,8 @@ export const DrawerList = ({
       }
       {
         <Link
-          to={LOCAL_CONSTANTS.ROUTES.ACCOUNTS}
-          key={LOCAL_CONSTANTS.ROUTES.ACCOUNTS}
+          to={LOCAL_CONSTANTS.ROUTES.ACCOUNT_MANAGEMENT}
+          key={LOCAL_CONSTANTS.ROUTES.ACCOUNT_MANAGEMENT}
         >
           <ListItem disablePadding>
             <ListItemButton>
@@ -216,7 +216,7 @@ export const DrawerList = ({
                 primaryTypographyProps={{
                   sx: { marginLeft: -2 },
                 }}
-                primary={"Manage accounts"}
+                primary={"Accounts Management"}
               />
             </ListItemButton>
           </ListItem>

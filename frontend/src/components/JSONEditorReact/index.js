@@ -7,8 +7,10 @@ import "jsoneditor/dist/jsoneditor.css";
 
 import "./style.css";
 const modes = ["tree", "form", "view", "code", "text"];
-export const JSONEditorReact = ({ json, onChange, label, mode = "code" }) => {
+export const JSONEditorReact = ({ json, onChange, label, mode }) => {
   const containerRef = useRef();
+  const _mode = mode ? mode : "code";
+  console.log({ _mode });
 
   const editorRef = useRef();
 
@@ -23,12 +25,12 @@ export const JSONEditorReact = ({ json, onChange, label, mode = "code" }) => {
       if (editorRef.current != null) {
         editorRef.current.set(json);
         // editorRef.current.expandAll();
-        if (mode) {
-          editorRef.current.setMode(mode);
+        if (_mode) {
+          editorRef.current.setMode(_mode);
         }
       } else {
         editorRef.current = new JSONEditor(containerRef.current, {
-          mode: mode,
+          mode: _mode,
           indentation: 4,
           onChange: handleChange,
           mainMenuBar: true,
@@ -39,7 +41,7 @@ export const JSONEditorReact = ({ json, onChange, label, mode = "code" }) => {
         // editorRef.current.expandAll();
       }
     }
-  }, [containerRef, json, mode]);
+  }, [containerRef, json, _mode]);
 
   useEffect(
     () => () => {
