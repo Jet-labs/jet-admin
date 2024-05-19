@@ -16,6 +16,7 @@ const RowView = lazy(() => import("../pages/RowView"));
 const AddRow = lazy(() => import("../pages/AddRow"));
 const PolicyManagement = lazy(() => import("../pages/PolicyManagement"));
 const PolicySettings = lazy(() => import("../pages/PolicySettings"));
+const AddPolicy = lazy(() => import("../pages/AddPolicy"));
 const AccountManagement = lazy(() => import("../pages/AccountManagement"));
 const AccountSettings = lazy(() => import("../pages/AccountSettings"));
 const AddAccount = lazy(() => import("../pages/AddAccount"));
@@ -75,40 +76,6 @@ const AppRouter = ({}) => {
             />
           </Route>
 
-          {/* <Route path={LOCAL_CONSTANTS.ROUTES.ACTIONS.code}>
-            <Route
-              index
-              element={
-                <ProtectedRoute
-                  successComponent={ActionsView}
-                  fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
-                  loadingComponent={() => <Loading fullScreen />}
-                />
-              }
-            ></Route> */}
-          {/* <Route
-              path={LOCAL_CONSTANTS.ROUTES.ROW_VIEW.code}
-              element={
-                <ProtectedRoute
-                  successComponent={RowView}
-                  fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
-                  loadingComponent={() => <Loading fullScreen />}
-                />
-              }
-            /> */}
-
-          {/* <Route
-              path={LOCAL_CONSTANTS.ROUTES.ADD_ROW.code}
-              element={
-                <ProtectedRoute
-                  successComponent={AddRow}
-                  fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
-                  loadingComponent={() => <Loading fullScreen />}
-                />
-              }
-            /> */}
-          {/* </Route> */}
-
           <Route path={LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT}>
             <Route
               index
@@ -125,6 +92,16 @@ const AppRouter = ({}) => {
               element={
                 <ProtectedRoute
                   successComponent={PolicySettings}
+                  fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
+                  loadingComponent={() => <Loading fullScreen />}
+                />
+              }
+            />
+            <Route
+              path={LOCAL_CONSTANTS.ROUTES.ADD_POLICY.code}
+              element={
+                <ProtectedRoute
+                  successComponent={AddPolicy}
                   fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
                   loadingComponent={() => <Loading fullScreen />}
                 />

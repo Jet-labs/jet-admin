@@ -16,7 +16,7 @@ export const JSONEditorReact = ({ json, onChange, label, mode }) => {
   const handleChange = () => {
     if (onChange && editorRef.current) {
       onChange(editorRef.current.get());
-      editorRef.current.expandAll();
+      // editorRef.current?.expandAll();
     }
   };
 
@@ -39,8 +39,8 @@ export const JSONEditorReact = ({ json, onChange, label, mode }) => {
 
           // onChangeJSON: _mode === "tree" ? onChange : null,
         });
-        editorRef.current.set(json);
-        editorRef.current.expandAll();
+        editorRef.current?.set(json);
+        // editorRef.current?.expandAll();
       }
     }
   }, [containerRef, json, _mode]);

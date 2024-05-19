@@ -89,6 +89,9 @@ export const LOCAL_CONSTANTS = {
       code: ":id",
       path: (id) => `${id}`,
     },
+    ADD_POLICY: {
+      code: "add",
+    },
     ACCOUNT_MANAGEMENT: "/account_management",
     ACCOUNT_SETTINGS: {
       code: ":id",

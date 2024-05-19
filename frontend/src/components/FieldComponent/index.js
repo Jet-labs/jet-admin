@@ -49,6 +49,7 @@ export const FieldComponent = ({
       padding: "8.5px 14px",
     },
   }));
+  console.log({ type });
   const label = name
     ? String(name).charAt(0).toUpperCase() + String(name).slice(1)
     : null;
@@ -217,7 +218,7 @@ export const FieldComponent = ({
               // placeholder={label}
               onChange={onChange}
               onBlur={onBlur}
-              value={moment(new Date(value))}
+              value={value ? moment(new Date(value)) : null}
               helperText={helperText}
               error={error}
               className="!w-full"
@@ -229,13 +230,14 @@ export const FieldComponent = ({
       break;
     }
     case LOCAL_CONSTANTS.DATA_TYPES.JSON: {
-      component = value ? (
+      console.log({ value });
+      component = (
         <FormControl fullWidth size="small">
           {label && (
             <span className="text-xs font-light  !lowercase mb-1">{label}</span>
           )}
           <JSONEditorReact
-            json={value}
+            json={value ? value : null}
             mode={jsonMode ? jsonMode : "text"}
             modes={["tree", "form", "view", "code", "text"]}
             indentation={4}
@@ -246,7 +248,8 @@ export const FieldComponent = ({
             // onModeChange={this.onModeChange}
           />
         </FormControl>
-      ) : null;
+      );
+
       break;
     }
     case LOCAL_CONSTANTS.DATA_TYPES.INT: {
