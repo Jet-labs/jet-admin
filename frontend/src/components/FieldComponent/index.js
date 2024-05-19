@@ -13,16 +13,13 @@ import {
 import {
   DateTimePicker,
   LocalizationProvider,
-  MobileDateTimePicker,
   StaticDateTimePicker,
 } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
-import moment from "moment";
-import { useConstants } from "../../contexts/constantsContext";
-import { JSONEditorReact } from "../JSONEditorReact";
 import { isNull } from "lodash";
-import { extractError } from "../../utils/error";
+import moment from "moment";
 import { LOCAL_CONSTANTS } from "../../constants";
+import { JSONEditorReact } from "../JSONEditorReact";
 
 export const FieldComponent = ({
   type,
