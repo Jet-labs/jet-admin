@@ -14,7 +14,7 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import logo from "../../assets/logo.svg";
+import logo from "../../assets/logo.png";
 import { useAuthActions, useAuthState } from "../../contexts/authContext";
 import { useConstants } from "../../contexts/constantsContext";
 import { LOCAL_CONSTANTS } from "../../constants";
@@ -26,7 +26,7 @@ export const Navbar = ({ children, handleDrawerOpen }) => {
   const { pmUser } = useAuthState();
 
   const theme = useTheme();
-  const isSmallDevice = useMediaQuery(theme.breakpoints.down("md"));
+  const isSmallDevice = useMediaQuery(theme.breakpoints.down("lg"));
   const isProfileOpen = Boolean(profileAnchor);
 
   const _handleProfileClick = (e) => {
@@ -57,7 +57,7 @@ export const Navbar = ({ children, handleDrawerOpen }) => {
                 <MenuIcon />
               </IconButton>
             )}
-            <img src={logo}></img>
+            <img className="!h-11 !w-14" src={logo}></img>
 
             {/* <span className="font-bold normal-case mx-2">
                   {currentPageTitle}
@@ -90,36 +90,30 @@ export const Navbar = ({ children, handleDrawerOpen }) => {
           }}
           PaperProps={{
             elevation: 0,
+
             sx: {
               overflow: "visible",
-              // filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
-              mt: 1.5,
+              borderRadius: 2,
+              mt: 2.5,
               "& .MuiAvatar-root": {
                 width: 32,
                 height: 32,
                 ml: -0.5,
                 mr: 1,
+                background: "white",
               },
-              // "&:before": {
-              //   content: '""',
-              //   display: "block",
-              //   position: "absolute",
-              //   top: 0,
-              //   right: 14,
-              //   width: 10,
-              //   height: 10,
-              //   bgcolor: "#2e2e2e",
-              //   transform: "translateY(-50%) rotate(45deg)",
-              //   zIndex: 0,
-              // },
+              "& .MuiMenu-list": {
+                background: theme.palette.primary.dark,
+                borderRadius: 2,
+              },
             },
           }}
         >
           <MenuItem>
-            <ListItemIcon>
+            {/* <ListItemIcon>
               <Phone fontSize="small" />
-            </ListItemIcon>
-            {pmUser?.phone_number}
+            </ListItemIcon> */}
+            {pmUser?.username}
           </MenuItem>
           <Divider />
           <MenuItem onClick={signOut}>

@@ -81,7 +81,7 @@ export const RowAdditionForm = ({ tableName }) => {
       addRow({ tableName, data: values });
     },
   });
-
+console.log({ allColumns, requiredColumns });
   return allColumns && allColumns.length > 0 && requiredColumns ? (
     <div className="flex flex-col justify-start items-center w-full pb-5 p-2">
       <div className=" flex flex-row justify-between 2xl:w-3/5 xl:w-3/4 lg:w-2/3 md:w-full mt-3 ">

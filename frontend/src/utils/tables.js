@@ -290,7 +290,6 @@ export const getAllTableFields = (dbModel, tableName) => {
   try {
     const tableModel = getTableModelFromModel(tableName, dbModel);
     return tableModel.fields.map((field) => {
-      console.log({ dbModel });
       return {
         field: field.name,
         name: field.name,

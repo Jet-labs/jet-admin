@@ -94,6 +94,9 @@ export const LOCAL_CONSTANTS = {
       code: ":id",
       path: (id) => `${id}`,
     },
+    ADD_ACCOUNT: {
+      code: "add",
+    },
     ACTIONS: {
       code: "actions/:entity",
       path: (entity) => `/actions/${entity}`,

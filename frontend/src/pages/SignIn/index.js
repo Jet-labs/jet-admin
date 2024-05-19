@@ -8,7 +8,7 @@ import {
 import { Formik } from "formik";
 import * as React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import logo from "../../assets/logo.svg";
+import logo from "../../assets/logo.png";
 import { ErrorComponent } from "../../components/ErrorComponent";
 import { LOCAL_CONSTANTS } from "../../constants";
 import { useAuthActions, useAuthState } from "../../contexts/authContext";

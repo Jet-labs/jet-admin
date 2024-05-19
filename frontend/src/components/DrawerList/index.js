@@ -3,6 +3,7 @@ import PolicyIcon from "@mui/icons-material/Policy";
 import {
   Collapse,
   Divider,
+  Grid,
   List,
   ListItem,
   ListItemButton,
@@ -16,15 +17,94 @@ import { LOCAL_CONSTANTS } from "../../constants";
 import { useAuthState } from "../../contexts/authContext";
 import { useConstants } from "../../contexts/constantsContext";
 import TouchAppIcon from "@mui/icons-material/TouchApp";
-export const DrawerList = ({
-  setIsDrawerOpen,
-  currentPageTitle,
+import StorageIcon from "@mui/icons-material/Storage";
+import DataObjectIcon from "@mui/icons-material/DataObject";
+const TableList = ({
+  authorizedTables,
   setCurrentPageTitle,
+  currentPageTitle,
 }) => {
-  const [isTableListOpen, setIsTableListOpen] = useState(false);
-  const [isActionListOpen, setIsActionListOpen] = useState(false);
+  const theme = useTheme();
+  return (
+    <List
+      sx={{}}
+      component="nav"
+      aria-labelledby="nested-list-subheader"
+      className=" !h-[calc(100vh-66px)] !overflow-y-auto !overflow-x-hidden !border-r !border-white !border-opacity-10 w-full"
+    >
+      <ListItemButton>
+        <ListItemIcon>
+          <TableRows sx={{}} />
+        </ListItemIcon>
+        <ListItemText
+          primaryTypographyProps={{
+            sx: { marginLeft: -2 },
+          }}
+          primary="Tables"
+        />
+        {/* {isTableListOpen ? <ExpandLess /> : <ExpandMore />} */}
+      </ListItemButton>
+      {authorizedTables?.map((key) => {
+        return (
+          <Link
+            to={LOCAL_CONSTANTS.ROUTES.TABLE_VIEW.path(key)}
+            onClick={() => {
+              setCurrentPageTitle(key);
+            }}
+            key={key}
+          >
+            <ListItem
+              key={key}
+              disablePadding
+              sx={{
+                borderRight: key == currentPageTitle ? 3 : 0,
+                borderColor: theme.palette.primary.main,
+              }}
+            >
+              <ListItemButton
+                sx={{ background: theme.palette.background.default }}
+                selected={key == currentPageTitle}
+              >
+                <ListItemIcon
+                  className="!ml-1"
+                  sx={{
+                    color:
+                      key == currentPageTitle
+                        ? theme.palette.primary.main
+                        : theme.palette.primary.contrastText,
+                  }}
+                >
+                  <DataObjectIcon sx={{ fontSize: 16 }} />
+                </ListItemIcon>
+                <ListItemText
+                  sx={{
+                    color:
+                      key == currentPageTitle
+                        ? theme.palette.primary.main
+                        : theme.palette.primary.contrastText,
+                  }}
+                  primary={key}
+                  primaryTypographyProps={{
+                    sx: {
+                      fontWeight: key == currentPageTitle ? "700" : "500",
+                      marginLeft: -2,
+                    },
+                  }}
+                />
+              </ListItemButton>
+            </ListItem>
+            {/* <Divider className="!mx-4" /> */}
+          </Link>
+        );
+      })}
+    </List>
+  );
+};
+export const DrawerList = ({ currentPageTitle, setCurrentPageTitle }) => {
+  // const [isTableListOpen, setIsTableListOpen] = useState(true);
   const { pmUser } = useAuthState();
   const theme = useTheme();
+  console.log({ currentPageTitle });
 
   const authorizedTables = useMemo(() => {
     if (pmUser) {
@@ -35,193 +115,141 @@ export const DrawerList = ({
     }
   }, [pmUser]);
 
-  const authorizedActions = useMemo(() => {
-    if (pmUser) {
-      const c = pmUser.extractAuthorizedActionEntities();
-      return c;
-    } else {
-      return null;
-    }
-  }, [pmUser]);
-
-  const _handleToggleIsTableListOpen = () => {
-    setIsTableListOpen(!isTableListOpen);
-  };
-  const _handleToggleIsActionListOpen = () => {
-    setIsActionListOpen(!isActionListOpen);
-  };
-
   return (
-    <List
-      sx={{}}
-      component="nav"
-      aria-labelledby="nested-list-subheader"
-      className=" !h-[calc(100vh-66px)] !overflow-y-auto !overflow-x-hidden !border-r !border-white !border-opacity-10 w-full"
-    >
-      <ListItemButton onClick={_handleToggleIsTableListOpen}>
-        <ListItemIcon>
-          <TableRows sx={{}} />
-        </ListItemIcon>
-        <ListItemText
-          primaryTypographyProps={{
-            sx: { marginLeft: -2 },
-          }}
-          primary="Tables"
-        />
-        {isTableListOpen ? <ExpandLess /> : <ExpandMore />}
-      </ListItemButton>
-      <Collapse in={isTableListOpen} timeout="auto" unmountOnExit>
-        {authorizedTables?.map((key) => {
-          return (
+    <Grid container className="!w-full">
+      <Grid item xs={6} md={6} lg={5}>
+        <List
+          sx={{}}
+          component="nav"
+          aria-labelledby="nested-list-subheader"
+          className="!py-0 !h-[calc(100vh-66px)] !overflow-y-auto !overflow-x-hidden !border-r !border-white !border-opacity-10 w-full"
+        >
+          {
             <Link
-              to={LOCAL_CONSTANTS.ROUTES.TABLE_VIEW.path(key)}
+              to={LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT}
+              key={LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT}
               onClick={() => {
-                setIsDrawerOpen(false);
-                setCurrentPageTitle(key);
+                setCurrentPageTitle(LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT);
               }}
-              key={key}
             >
               <ListItem
-                key={key}
                 disablePadding
+                selected={
+                  LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT == currentPageTitle
+                }
                 sx={{
-                  borderRight: key == currentPageTitle ? 3 : 0,
+                  borderRight:
+                    LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT == currentPageTitle
+                      ? 3
+                      : 0,
                   borderColor: theme.palette.primary.main,
                 }}
               >
-                <ListItemButton
-                  sx={{ background: theme.palette.background.default }}
-                  selected={key == currentPageTitle}
-                >
+                <ListItemButton>
                   <ListItemIcon
-                    className="!ml-1"
                     sx={{
                       color:
-                        key == currentPageTitle
+                        LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT ==
+                        currentPageTitle
                           ? theme.palette.primary.main
                           : theme.palette.primary.contrastText,
                     }}
                   >
-                    <Circle sx={{ fontSize: 10 }} />
+                    <PolicyIcon sx={{}} />
                   </ListItemIcon>
                   <ListItemText
+                    primaryTypographyProps={{
+                      sx: {
+                        marginLeft: -2,
+                        fontWeight:
+                          LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT ==
+                          currentPageTitle
+                            ? "700"
+                            : "500",
+                      },
+                    }}
                     sx={{
                       color:
-                        key == currentPageTitle
+                        LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT ==
+                        currentPageTitle
                           ? theme.palette.primary.main
                           : theme.palette.primary.contrastText,
                     }}
-                    primary={key}
-                    primaryTypographyProps={{
-                      sx: {
-                        fontWeight: key == currentPageTitle ? "700" : "500",
-                        marginLeft: -2,
-                      },
-                    }}
+                    primary={"Roles Management"}
                   />
                 </ListItemButton>
               </ListItem>
-              {/* <Divider className="!mx-4" /> */}
             </Link>
-          );
-        })}
-      </Collapse>
-      {/* <ListItemButton onClick={_handleToggleIsActionListOpen}>
-        <ListItemIcon>
-          <TouchAppIcon sx={{}} />
-        </ListItemIcon>
-        <ListItemText
-          primaryTypographyProps={{
-            sx: { marginLeft: -2 },
-          }}
-          primary="Actions"
-        />
-        {isActionListOpen ? <ExpandLess /> : <ExpandMore />}
-      </ListItemButton> */}
-      {/* <Collapse in={isActionListOpen} timeout="auto" unmountOnExit>
-        {authorizedActions &&
-          Object.keys(authorizedActions).map((entity) => {
-            return (
-              <Link
-                to={LOCAL_CONSTANTS.ROUTES.ACTIONS.path(entity)}
-                onClick={() => {
-                  setIsDrawerOpen(false);
-                  setCurrentPageTitle(`${entity} - actions`);
+          }
+          {
+            <Link
+              to={LOCAL_CONSTANTS.ROUTES.ACCOUNT_MANAGEMENT}
+              key={LOCAL_CONSTANTS.ROUTES.ACCOUNT_MANAGEMENT}
+              onClick={() => {
+                setCurrentPageTitle(LOCAL_CONSTANTS.ROUTES.ACCOUNT_MANAGEMENT);
+              }}
+            >
+              <ListItem
+                disablePadding
+                selected={
+                  LOCAL_CONSTANTS.ROUTES.ACCOUNT_MANAGEMENT == currentPageTitle
+                }
+                sx={{
+                  borderRight:
+                    LOCAL_CONSTANTS.ROUTES.ACCOUNT_MANAGEMENT ==
+                    currentPageTitle
+                      ? 3
+                      : 0,
+                  borderColor: theme.palette.primary.main,
                 }}
-                key={entity}
               >
-                <ListItem key={entity} disablePadding>
-                  <ListItemButton
-                    sx={{ background: theme.palette.background.default }}
+                <ListItemButton>
+                  <ListItemIcon
+                    sx={{
+                      color:
+                        LOCAL_CONSTANTS.ROUTES.ACCOUNT_MANAGEMENT ==
+                        currentPageTitle
+                          ? theme.palette.primary.main
+                          : theme.palette.primary.contrastText,
+                    }}
                   >
-                    <ListItemIcon
-                      className="!ml-1"
-                      sx={{
-                        color:
-                          entity == currentPageTitle
-                            ? theme.palette.primary.main
-                            : theme.palette.primary.contrastText,
-                      }}
-                    >
-                      <Circle sx={{ fontSize: 10 }} />
-                    </ListItemIcon>
-                    <ListItemText
-                      primary={entity.charAt(0).toUpperCase() + entity.slice(1)}
-                      primaryTypographyProps={{
-                        sx: {
-                          fontWeight:
-                            entity == currentPageTitle ? "700" : "500",
-                          marginLeft: -2,
-                        },
-                      }}
-                    />
-                  </ListItemButton>
-                </ListItem>
-              </Link>
-            );
-          })}
-      </Collapse> */}
-
+                    <PeopleAlt sx={{}} />
+                  </ListItemIcon>
+                  <ListItemText
+                    primaryTypographyProps={{
+                      sx: {
+                        marginLeft: -2,
+                        fontWeight:
+                          LOCAL_CONSTANTS.ROUTES.ACCOUNT_MANAGEMENT ==
+                          currentPageTitle
+                            ? "700"
+                            : "500",
+                      },
+                    }}
+                    sx={{
+                      color:
+                        LOCAL_CONSTANTS.ROUTES.ACCOUNT_MANAGEMENT ==
+                        currentPageTitle
+                          ? theme.palette.primary.main
+                          : theme.palette.primary.contrastText,
+                    }}
+                    primary={"Accounts Management"}
+                  />
+                </ListItemButton>
+              </ListItem>
+            </Link>
+          }
+        </List>
+      </Grid>
       {
-        <Link
-          to={LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT}
-          key={LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT}
-        >
-          <ListItem disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                <PolicyIcon sx={{}} />
-              </ListItemIcon>
-              <ListItemText
-                primaryTypographyProps={{
-                  sx: { marginLeft: -2 },
-                }}
-                primary={"Roles Management"}
-              />
-            </ListItemButton>
-          </ListItem>
-        </Link>
+        <Grid item xs={6} md={6} lg={7}>
+          <TableList
+            authorizedTables={authorizedTables}
+            setCurrentPageTitle={setCurrentPageTitle}
+            currentPageTitle={currentPageTitle}
+          />
+        </Grid>
       }
-      {
-        <Link
-          to={LOCAL_CONSTANTS.ROUTES.ACCOUNT_MANAGEMENT}
-          key={LOCAL_CONSTANTS.ROUTES.ACCOUNT_MANAGEMENT}
-        >
-          <ListItem disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                <PeopleAlt sx={{}} />
-              </ListItemIcon>
-              <ListItemText
-                primaryTypographyProps={{
-                  sx: { marginLeft: -2 },
-                }}
-                primary={"Accounts Management"}
-              />
-            </ListItemButton>
-          </ListItem>
-        </Link>
-      }
-    </List>
+    </Grid>
   );
 };

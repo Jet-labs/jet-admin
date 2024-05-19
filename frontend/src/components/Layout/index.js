@@ -6,7 +6,7 @@ import {
   useMediaQuery,
   useTheme,
 } from "@mui/material";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { DrawerList } from "../DrawerList";
 import { Navbar } from "../Navbar";
@@ -17,7 +17,7 @@ export const Layout = ({ children }) => {
   const [currentPageTitle, setCurrentPageTitle] = useState("Home");
   // const isSmallDevice = useMediaQuery("only screen and (max-width : 768px)");
   const theme = useTheme();
-  const isSmallDevice = useMediaQuery(theme.breakpoints.down("md"));
+  const isSmallDevice = useMediaQuery(theme.breakpoints.down("lg"));
 
   const _handleDrawerOpen = () => {
     setIsDrawerOpen(true);
@@ -27,48 +27,54 @@ export const Layout = ({ children }) => {
     setIsDrawerOpen(false);
   };
 
+  const stickyDrawer = useMemo(() => {
+    return (
+      <Grid item sm={0} md={0} lg={4} xl={3}>
+        <DrawerList
+          setCurrentPageTitle={setCurrentPageTitle}
+          currentPageTitle={currentPageTitle}
+        />
+      </Grid>
+    );
+  }, [currentPageTitle]);
+  const floatingDrawer = useMemo(() => {
+    return (
+      <Drawer
+        anchor="left"
+        open={isDrawerOpen}
+        onClose={_handleDrawerClose}
+        onRequestChange={_handleDrawerClose}
+        variant="temporary"
+      >
+        <div className="!w-full">
+          <div className="flex flex-row justify-end items-center w-full">
+            <IconButton onClick={_handleDrawerClose} edge="start">
+              <CloseIcon />
+            </IconButton>
+          </div>
+
+          <DrawerList
+            setCurrentPageTitle={setCurrentPageTitle}
+            currentPageTitle={currentPageTitle}
+          />
+        </div>
+      </Drawer>
+    );
+  }, [currentPageTitle, isDrawerOpen]);
+
   return (
     <Grid container>
       <Grid item xs={12} md={12}>
         <Navbar handleDrawerOpen={_handleDrawerOpen} />
       </Grid>
-      {isSmallDevice ? (
-        <Drawer
-          anchor="left"
-          open={isDrawerOpen}
-          onClose={_handleDrawerClose}
-          onRequestChange={_handleDrawerClose}
-          variant="temporary"
-        >
-          <div className="!w-72">
-            <div className="flex flex-row justify-end items-center w-full">
-              <IconButton onClick={_handleDrawerClose} edge="start">
-                <CloseIcon />
-              </IconButton>
-            </div>
-
-            <DrawerList
-              setCurrentPageTitle={setCurrentPageTitle}
-              setIsDrawerOpen={setIsDrawerOpen}
-              currentPageTitle={currentPageTitle}
-            />
-          </div>
-        </Drawer>
-      ) : (
-        <Grid item sm={0} md={3} lg={2}>
-          <DrawerList
-            setCurrentPageTitle={setCurrentPageTitle}
-            setIsDrawerOpen={setIsDrawerOpen}
-            currentPageTitle={currentPageTitle}
-          />
-        </Grid>
-      )}
+      {isSmallDevice ? floatingDrawer : stickyDrawer}
 
       <Grid
         xs={12}
         sm={12}
-        md={9}
-        lg={10}
+        md={12}
+        lg={8}
+        xl={9}
         className="!h-[calc(100vh-66px)] !overflow-y-auto"
       >
         {children}

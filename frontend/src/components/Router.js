@@ -18,6 +18,7 @@ const PolicyManagement = lazy(() => import("../pages/PolicyManagement"));
 const PolicySettings = lazy(() => import("../pages/PolicySettings"));
 const AccountManagement = lazy(() => import("../pages/AccountManagement"));
 const AccountSettings = lazy(() => import("../pages/AccountSettings"));
+const AddAccount = lazy(() => import("../pages/AddAccount"));
 /**
  *
  * @param {object} param0
@@ -147,6 +148,16 @@ const AppRouter = ({}) => {
               element={
                 <ProtectedRoute
                   successComponent={AccountSettings}
+                  fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
+                  loadingComponent={() => <Loading fullScreen />}
+                />
+              }
+            />
+            <Route
+              path={LOCAL_CONSTANTS.ROUTES.ADD_ACCOUNT.code}
+              element={
+                <ProtectedRoute
+                  successComponent={AddAccount}
                   fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
                   loadingComponent={() => <Loading fullScreen />}
                 />

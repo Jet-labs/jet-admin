@@ -41,7 +41,7 @@ const pool = new Pool({
 });
 
 // Define the SQL queries to create the tables
-const createPolicyTable = `
+const create_policy_table_query = `
   CREATE TABLE tbl_pm_policy_objects
 (
     pm_policy_object_id serial NOT NULL,
@@ -58,7 +58,7 @@ const createPolicyTable = `
 
 `;
 
-const createUserTable = `
+const create_user_table_query = `
  CREATE TABLE IF NOT EXISTS public.tbl_pm_users
 (
     pm_user_id serial NOT NULL,
@@ -82,6 +82,37 @@ const createUserTable = `
 )
 `;
 
+const super_admin_policy_query = `
+      INSERT INTO tbl_pm_policy_objects(title, description, is_disabled, policy)
+      VALUES($1, $2, $3, $4)
+      RETURNING pm_policy_object_id;
+    `;
+const super_user_query_text = `
+      INSERT INTO public.tbl_pm_users(
+        first_name, last_name, address1, pm_policy_object_id, 
+        is_disabled, username, password_hash, salt
+      )
+      VALUES($1, $2, $3, $4, $5, $6, $7, $8)
+      RETURNING pm_user_id;
+    `;
+const create_trigger_query = `
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+  NEW.updated_at = NOW();
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER set_updated_at_tbl_pm_users
+BEFORE UPDATE ON tbl_pm_users
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER set_updated_at_tbl_pm_policy_objects
+BEFORE UPDATE ON tbl_pm_policy_objects
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();`;
 
 async function setup_database() {
   try {
@@ -91,8 +122,8 @@ async function setup_database() {
 
     // create required pm_user and pm_user_policy tables
     await client.query("BEGIN");
-    await client.query(createPolicyTable);
-    await client.query(createUserTable);
+    await client.query(create_policy_table_query);
+    await client.query(create_user_table_query);
     await client.query("COMMIT");
 
     Logger.log("success", {
@@ -107,15 +138,9 @@ async function setup_database() {
       message: "setup_database:super admin policy creation started...",
     });
 
-    const super_admin_policy_query_text = `
-      INSERT INTO tbl_pm_policy_objects(title, description, is_disabled, policy)
-      VALUES($1, $2, $3, $4)
-      RETURNING pm_policy_object_id;
-    `;
-
     await client.query("BEGIN");
     const { rows: super_admin_policy_db_entry } = await client.query(
-      super_admin_policy_query_text,
+      super_admin_policy_query,
       [
         "super_admin",
         "This policy grants super admin privileges.",
@@ -133,16 +158,6 @@ async function setup_database() {
     Logger.log("info", {
       message: "setup_database:super admin user creation started...",
     });
-
-    const super_user_query_text = `
-      INSERT INTO public.tbl_pm_users(
-        first_name, last_name, address1, pm_policy_object_id, 
-        is_disabled, username, password_hash, salt
-      )
-      VALUES($1, $2, $3, $4, $5, $6, $7, $8)
-      RETURNING pm_user_id;
-    `;
-
     await client.query("BEGIN");
     const { rows: super_user_db_entry } = await client.query(
       super_user_query_text,
@@ -161,6 +176,18 @@ async function setup_database() {
     await client.query("COMMIT");
     Logger.log("success", {
       message: "setup_database:super admin user creation completed!",
+    });
+
+    // create triggers in database
+
+    Logger.log("info", {
+      message: "setup_database:triggers creation started...",
+    });
+    await client.query("BEGIN");
+    const triggers = await client.query(create_trigger_query);
+    await client.query("COMMIT");
+    Logger.log("success", {
+      message: "setup_database:triggers creation completed!",
     });
 
     client.release();
