@@ -1,5 +1,6 @@
 import { Circle, ExpandLess, ExpandMore, PeopleAlt, TableRows } from "@mui/icons-material";
 import PolicyIcon from "@mui/icons-material/Policy";
+import InsertChartIcon from "@mui/icons-material/InsertChart";
 import {
   Collapse,
   Divider,
@@ -234,6 +235,63 @@ export const DrawerList = ({ currentPageTitle, setCurrentPageTitle }) => {
                           : theme.palette.primary.contrastText,
                     }}
                     primary={"Accounts Management"}
+                  />
+                </ListItemButton>
+              </ListItem>
+            </Link>
+          }
+          {
+            <Link
+              to={LOCAL_CONSTANTS.ROUTES.ALL_GRAPHS.code}
+              key={LOCAL_CONSTANTS.ROUTES.ALL_GRAPHS.code}
+              onClick={() => {
+                setCurrentPageTitle(LOCAL_CONSTANTS.ROUTES.ALL_GRAPHS.code);
+              }}
+            >
+              <ListItem
+                disablePadding
+                selected={
+                  LOCAL_CONSTANTS.ROUTES.ALL_GRAPHS.code == currentPageTitle
+                }
+                sx={{
+                  borderRight:
+                    LOCAL_CONSTANTS.ROUTES.ALL_GRAPHS.code == currentPageTitle
+                      ? 3
+                      : 0,
+                  borderColor: theme.palette.primary.main,
+                }}
+              >
+                <ListItemButton>
+                  <ListItemIcon
+                    sx={{
+                      color:
+                        LOCAL_CONSTANTS.ROUTES.ALL_GRAPHS.code ==
+                        currentPageTitle
+                          ? theme.palette.primary.main
+                          : theme.palette.primary.contrastText,
+                    }}
+                  >
+                    <InsertChartIcon sx={{}} />
+                  </ListItemIcon>
+                  <ListItemText
+                    primaryTypographyProps={{
+                      sx: {
+                        marginLeft: -2,
+                        fontWeight:
+                          LOCAL_CONSTANTS.ROUTES.ALL_GRAPHS.code ==
+                          currentPageTitle
+                            ? "700"
+                            : "500",
+                      },
+                    }}
+                    sx={{
+                      color:
+                        LOCAL_CONSTANTS.ROUTES.ALL_GRAPHS.code ==
+                        currentPageTitle
+                          ? theme.palette.primary.main
+                          : theme.palette.primary.contrastText,
+                    }}
+                    primary={"Graphs"}
                   />
                 </ListItemButton>
               </ListItem>

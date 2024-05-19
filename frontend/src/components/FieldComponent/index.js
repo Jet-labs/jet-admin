@@ -9,6 +9,7 @@ import {
   OutlinedInput,
   Select,
   TextField,
+  useTheme,
 } from "@mui/material";
 import {
   DateTimePicker,
@@ -39,6 +40,7 @@ export const FieldComponent = ({
   showDefault,
   jsonMode,
 }) => {
+  const theme = useTheme();
   const CustomDateTimePicker = styled(
     dateTimePicker === "normal" ? DateTimePicker : StaticDateTimePicker
   )(({ theme }) => ({
@@ -115,7 +117,9 @@ export const FieldComponent = ({
       component = (
         <FormControl fullWidth size="small">
           {label && (
-            <InputLabel id="multiple-select-small-label">{label}</InputLabel>
+            <InputLabel id="multiple-select-small-label" className="lowercase">
+              {label}
+            </InputLabel>
           )}
           <Select
             labelId="multiple-select-small-label"
@@ -141,7 +145,12 @@ export const FieldComponent = ({
             renderValue={(selected) => (
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                 {selected.map((value) => (
-                  <Chip key={value.value} label={value.label} size="small" />
+                  <Chip
+                    key={value.value}
+                    label={value.label}
+                    size="small"
+                    color="primary"
+                  />
                 ))}
               </Box>
             )}

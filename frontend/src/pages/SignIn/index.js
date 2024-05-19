@@ -23,8 +23,7 @@ const LoginForm = ({}) => {
         Sign In
       </span>
       <span className="!font-thin text-justify text-sm w-full mb-2 mt-2">
-        Please enter details to begin. This console is not for customers and
-        only for managers. Please exit if you have accidently came here
+        Please enter details to begin.
       </span>
       <Formik
         initialValues={{ username: "ragsav", password: "password" }}
@@ -129,7 +128,7 @@ const SignIn = ({}) => {
     <div className="signin_main">
       <AppBar position="sticky" className="!bg-transparent" elevation={0}>
         <Toolbar>
-          <img src={logo} className="mr-2"></img>
+          <img src={logo} className="mr-2 !h-12 !w-14"></img>
           <span className="font-bold text-lg flex-grow ">
             {LOCAL_CONSTANTS.APP_NAME}
           </span>

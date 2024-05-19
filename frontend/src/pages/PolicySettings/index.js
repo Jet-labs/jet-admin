@@ -128,7 +128,7 @@ const PolicySettings = () => {
               key={"pm_policy_object_id"}
             >
               <FieldComponent
-                type={"Int"}
+                type={LOCAL_CONSTANTS.DATA_TYPES.INT}
                 name={"pm_policy_object_id"}
                 value={policyObjectUpdateForm.values["pm_policy_object_id"]}
                 onBlur={policyObjectUpdateForm.handleBlur}
@@ -145,7 +145,7 @@ const PolicySettings = () => {
             </Grid>
             <Grid item xs={12} sm={12} md={12} lg={12} key={"title"}>
               <FieldComponent
-                type={"String"}
+                type={LOCAL_CONSTANTS.DATA_TYPES.STRING}
                 name={"title"}
                 value={policyObjectUpdateForm.values["title"]}
                 onBlur={policyObjectUpdateForm.handleBlur}
@@ -159,7 +159,7 @@ const PolicySettings = () => {
             </Grid>
             <Grid item xs={12} sm={12} md={12} lg={12} key={"is_disabled"}>
               <FieldComponent
-                type={"Boolean"}
+                type={LOCAL_CONSTANTS.DATA_TYPES.BOOLEAN}
                 name={"is_disabled"}
                 value={policyObjectUpdateForm.values["is_disabled"]}
                 onBlur={policyObjectUpdateForm.handleBlur}
@@ -173,7 +173,7 @@ const PolicySettings = () => {
             </Grid>
             <Grid item xs={12} sm={12} md={12} lg={12} key={"policy"}>
               <FieldComponent
-                type={"Json"}
+                type={LOCAL_CONSTANTS.DATA_TYPES.JSON}
                 name={"policy"}
                 value={policyObjectUpdateForm.values["policy"]}
                 onBlur={policyObjectUpdateForm.handleBlur}

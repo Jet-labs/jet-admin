@@ -73,8 +73,19 @@ export const LOCAL_CONSTANTS = {
   ROUTES: {
     HOME: "/",
     SIGNIN: "/signin",
+
+    ALL_GRAPHS: {
+      code: "/graphs",
+    },
+    ADD_GRAPH: {
+      code: "add",
+    },
+    GRAPH_VIEW: {
+      code: ":id",
+      path: (id) => `${id}`,
+    },
     TABLE_VIEW: {
-      code: "tables/:table_name",
+      code: "/tables/:table_name",
       path: (table_name) => `/tables/${table_name}`,
     },
     ADD_ROW: {

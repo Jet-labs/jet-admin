@@ -54,3 +54,23 @@
 [31merror[39m: dev_node_1: 19-05-2024 12:17:48: [31mtableController:getRowByID:catch-1[39m |====| {"error":{}}
 [31merror[39m: dev_node_1: 19-05-2024 12:21:33: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-05-19T06:51:32.000Z"}}
 [31merror[39m: dev_node_1: 19-05-2024 12:21:33: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 19-05-2024 13:14:24: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-05-19T07:06:33.000Z"}}
+[31merror[39m: dev_node_1: 19-05-2024 13:14:24: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 19-05-2024 19:38:16: [31mAuthService:loginUserWithUsernamePassword:catch-1[39m |====| {"error":{"name":"PrismaClientInitializationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 19-05-2024 19:38:16: [31mauthController:login:catch-1[39m |====| {"error":{"name":"PrismaClientInitializationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 19-05-2024 19:51:44: [31mtableController:getRowByID:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 19-05-2024 19:51:45: [31mtableController:getRowByID:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 19-05-2024 19:54:02: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-05-19T14:23:33.000Z"}}
+[31merror[39m: dev_node_1: 19-05-2024 19:54:02: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 19-05-2024 22:56:27: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-05-19T14:39:02.000Z"}}
+[31merror[39m: dev_node_1: 19-05-2024 22:56:27: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 19-05-2024 22:56:29: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"PrismaClientInitializationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 19-05-2024 22:56:29: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 19-05-2024 22:56:31: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"PrismaClientInitializationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 19-05-2024 22:56:31: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 19-05-2024 22:56:33: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"PrismaClientInitializationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 19-05-2024 22:56:33: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 19-05-2024 22:56:37: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"PrismaClientInitializationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 19-05-2024 22:56:37: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 19-05-2024 23:11:45: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-05-19T17:41:38.000Z"}}
+[31merror[39m: dev_node_1: 19-05-2024 23:11:45: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
