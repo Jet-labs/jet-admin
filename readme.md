@@ -8,6 +8,10 @@ Overview
 
 This project aims to provide users with a user-friendly interface to manage their PostgreSQL databases. It includes features such as database creation, deletion, querying, and visualization of database statistics.
 
+
+https://github.com/ragsav/pg-admin-web/assets/45696355/71a6ecaa-df93-4ea2-9b28-b740521886b6
+
+
 Features
 --------
 

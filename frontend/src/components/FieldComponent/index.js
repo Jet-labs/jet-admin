@@ -244,7 +244,7 @@ export const FieldComponent = ({
           )}
           <JSONEditorReact
             json={value ? value : null}
-            mode={jsonMode ? jsonMode : "text"}
+            mode={jsonMode ? jsonMode : "code"}
             modes={["tree", "form", "view", "code", "text"]}
             indentation={4}
             onChange={(value) => {

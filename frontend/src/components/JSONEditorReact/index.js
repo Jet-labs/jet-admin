@@ -1,6 +1,4 @@
 import React, { Component, useEffect, useRef, useState } from "react";
-import isEqual from "lodash/isEqual";
-import cloneDeep from "lodash/cloneDeep";
 
 import JSONEditor from "jsoneditor";
 import "jsoneditor/dist/jsoneditor.css";
@@ -35,7 +33,7 @@ export const JSONEditorReact = ({ json, onChange, label, mode }) => {
           onChange: handleChange,
           mainMenuBar: true,
           enableSort: true,
-          theme: "dark",
+          // theme: "/ace/theme/github",
 
           // onChangeJSON: _mode === "tree" ? onChange : null,
         });

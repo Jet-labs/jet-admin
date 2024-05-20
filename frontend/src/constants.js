@@ -256,4 +256,11 @@ export const LOCAL_CONSTANTS = {
   CUSTOM_INT_MAPPINGS: {},
 
   CUSTOM_INT_COLOR_MAPPINGS: {},
+
+  GRAPH_TYPES: {
+    CHART: { label: "Chart", value: "CHART" },
+    BAR: { label: "Bar", value: "BAR" },
+    LINE: { label: "Line", value: "LINE" },
+    PIE: { label: "Pie", value: "PIE" },
+  },
 };
