@@ -45,8 +45,6 @@ axiosInstance.interceptors.response.use(
         throw refreshError;
       }
     } else {
-      // window.location.reload();
-      console.log("here");
     }
   },
   async (error) => {

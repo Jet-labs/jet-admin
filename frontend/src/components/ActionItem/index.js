@@ -33,7 +33,6 @@ export const ActionItem = ({
   const isFormDataQueriesSuccess = formDataQueries.some((q) => q.data);
 
   useEffect(() => {
-    console.log({ formDataQueries });
     const _fieldDataMap = {};
     Object.keys(actionFormData.fields).forEach((field, index) => {
       if (actionFormData.fields[field].options?.method == "dynamic") {
@@ -68,7 +67,6 @@ export const ActionItem = ({
     mutate: sendAction,
   } = useMutation({
     mutationFn: (values) => {
-      console.log("inside mutate", { values });
       return sendActionAPI(actionSubmitFunction(values));
     },
 

@@ -115,7 +115,6 @@ export const RowUpdateForm = ({ tableName, id }) => {
       return errors;
     },
     onSubmit: (values) => {
-      console.log({ values });
       updateRow({ tableName, id, data: values });
     },
   });

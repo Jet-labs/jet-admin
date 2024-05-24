@@ -59,7 +59,6 @@ const PolicyManagement = () => {
   const getRowId = (row) => {
     return row.pm_policy_object_id;
   };
-  console.log({ row: data?.rows });
 
   const columns = [
     { field: "pm_policy_object_id", headerName: "User ID" },

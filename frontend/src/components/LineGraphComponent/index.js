@@ -73,25 +73,8 @@ const data = {
   ],
 };
 
-export const LineGraphComponent = ({
-  legendPosition,
-  legendDisplay,
-  title,
-}) => {
+export const LineGraphComponent = ({ options }) => {
   const theme = useTheme();
-  const options = useMemo(() => {
-    return {
-      responsive: true,
-      plugins: {
-        legend: {
-          position: legendPosition ? legendPosition : "top",
-        },
-        title: {
-          display: Boolean(legendDisplay),
-          text: title ? title : "Chart title here",
-        },
-      },
-    };
-  }, [legendPosition, legendDisplay, title]);
+
   return <Line options={options} data={data} />;
 };

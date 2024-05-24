@@ -69,6 +69,14 @@ export const LOCAL_CONSTANTS = {
   APP_VERSION: "1.0.2",
   APP_VERSION_RELEASE: 1,
 
+  STRINGS: {
+    ACCESS_TOKEN_LOCAL_STORAGE: "access_token",
+    REFRESH_TOKEN_LOCAL_STORAGE: "refresh_token",
+    PM_USER_TABLE_NAME: "tbl_pm_users",
+    POLICY_OBJECT_TABLE_NAME: "tbl_pm_policy_objects",
+    UNTITLED_CHART_TITLE: "Untitled chart",
+  },
+
   // routes
   ROUTES: {
     HOME: "/",
@@ -214,13 +222,6 @@ export const LOCAL_CONSTANTS = {
     ON_SERVER_SIDE_ERROR: "ON_SERVER_SIDE_ERROR",
   },
 
-  STRINGS: {
-    ACCESS_TOKEN_LOCAL_STORAGE: "access_token",
-    REFRESH_TOKEN_LOCAL_STORAGE: "refresh_token",
-    PM_USER_TABLE_NAME: "tbl_pm_users",
-    POLICY_OBJECT_TABLE_NAME: "tbl_pm_policy_objects",
-  },
-
   DATA_TYPES: {
     STRING: "String",
     BOOLEAN: "Boolean",
@@ -260,7 +261,14 @@ export const LOCAL_CONSTANTS = {
   GRAPH_TYPES: {
     CHART: { label: "Chart", value: "CHART" },
     BAR: { label: "Bar", value: "BAR" },
-    LINE: { label: "Line", value: "LINE" },
+    LINE: { label: "Line", value: "LINE", fields: ["x_axis", "y_axis"] },
     PIE: { label: "Pie", value: "PIE" },
+  },
+
+  GRAPH_LEGEND_POSITION: {
+    TOP: "top",
+    BOTTOM: "bottom",
+    LEFT: "left",
+    RIGHT: "right",
   },
 };

@@ -80,8 +80,6 @@ export const DataGridFilterComponent = ({
     }
   }, [dbModel, tableName, filterField]);
 
-  console.log({ fieldType });
-
   const _handleChangeFilterField = (e) => {
     setFilterField(e.target.value);
   };

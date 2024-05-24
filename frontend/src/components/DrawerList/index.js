@@ -105,7 +105,6 @@ export const DrawerList = ({ currentPageTitle, setCurrentPageTitle }) => {
   // const [isTableListOpen, setIsTableListOpen] = useState(true);
   const { pmUser } = useAuthState();
   const theme = useTheme();
-  console.log({ currentPageTitle });
 
   const authorizedTables = useMemo(() => {
     if (pmUser) {

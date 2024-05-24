@@ -53,7 +53,6 @@ export const RowDeletionForm = ({ tableName, id }) => {
   const _handleDeleteRow = () => {
     deleteRow({ tableName, id });
   };
-  console.log({ deleteRowAuthorization });
   return (
     deleteRowAuthorization && (
       <>

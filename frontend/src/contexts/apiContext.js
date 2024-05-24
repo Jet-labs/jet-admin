@@ -30,7 +30,6 @@ const APIContextProvider = ({ children }) => {
     // cacheTime: Infinity,
     // staleTime: Infinity,
     onSuccess: (data) => {
-      console.log("setting user");
       setPMUser(data);
     },
   });

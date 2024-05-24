@@ -17,7 +17,6 @@ export const fetchAllRowsAPI = async ({
     );
     if (response.data && response.data.success == true) {
       if (response.data.rows && Array.isArray(response.data.rows)) {
-        console.log({ response: response.data });
         return {
           rows: response.data.rows,
           nextPage: response.data.nextPage,

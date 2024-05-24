@@ -64,7 +64,6 @@ const PolicySettings = () => {
       return errors;
     },
     onSubmit: (values) => {
-      console.log({ values });
       updateRow({ tableName, id, data: values });
     },
   });

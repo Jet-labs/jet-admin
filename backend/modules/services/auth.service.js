@@ -109,7 +109,6 @@ class AuthService {
    */
   static verifyRefreshToken = async ({ refreshToken }) => {
     try {
-      console.log({ refreshToken });
       const payload = await jwt.verify(
         refreshToken,
         environmentVariables.JWT_REFRESH_TOKEN_SECRET

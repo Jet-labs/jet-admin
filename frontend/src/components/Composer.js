@@ -9,7 +9,6 @@ import { customDarkTheme, customLightTheme } from "../theme";
 
 const theme = createTheme(customDarkTheme);
 
-// console.log({ theme });
 const queryClient = new QueryClient();
 function Composer({ children }) {
   return (

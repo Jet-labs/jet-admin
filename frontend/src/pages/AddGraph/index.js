@@ -1,100 +1,35 @@
-import { Grid, useTheme } from "@mui/material";
+import { Button, Grid, useTheme } from "@mui/material";
 import { useFormik } from "formik";
 import React, { useMemo } from "react";
 import { FieldComponent } from "../../components/FieldComponent";
 import { LOCAL_CONSTANTS } from "../../constants";
-import { useAuthState } from "../../contexts/authContext";
-import { getAllTableFields } from "../../utils/tables";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-} from "chart.js";
-import { Line } from "react-chartjs-2";
-
-import { faker } from "@faker-js/faker";
 import { LineGraphComponent } from "../../components/LineGraphComponent";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend
-);
-
-class LineChartDataset {
-  /**
-   *
-   * @param {object} param0
-   * @param {String} param0.label
-   * @param {Array<Number>} param0.data
-   * @param {String} param0.borderColor
-   * @param {String} param0.backgroundColor
-   */
-  constructor({ label, data, borderColor, backgroundColor }) {
-    this.label = label;
-    this.data = data;
-    this.borderColor = borderColor;
-    this.backgroundColor = backgroundColor;
-  }
-}
-class LineChartData {
-  /**
-   *
-   * @param {object} param0
-   * @param {Array<String>} param0.labels
-   * @param {Array<LineChartDataset>} param0.datasets
-   */
-  constructor({ labels, datasets }) {
-    this.labels = labels;
-    this.datasets = datasets;
-  }
-}
-
-const labels = ["January", "February", "March", "April", "May", "June", "July"];
-
-export const data = {
-  labels,
-  datasets: [
-    {
-      label: "Dataset 1",
-      data: labels.map(() => faker.datatype.number({ min: -1000, max: 1000 })),
-      borderColor: "rgb(255, 99, 132)",
-      backgroundColor: "rgba(255, 99, 132, 0.5)",
-    },
-    {
-      label: "Dataset 2",
-      data: labels.map(() => faker.datatype.number({ min: -1000, max: 1000 })),
-      borderColor: "rgb(53, 162, 235)",
-      backgroundColor: "rgba(53, 162, 235, 0.5)",
-    },
-  ],
-};
-
-const GraphBuilderPreview = ({ legendPosition, legendDisplay, title }) => {
+const GraphBuilderPreview = ({
+  graphType,
+  legendPosition,
+  legendDisplay,
+  graphTitle,
+}) => {
   const theme = useTheme();
   const options = useMemo(() => {
     return {
       responsive: true,
       plugins: {
         legend: {
-          position: legendPosition ? legendPosition : "top",
+          position: legendPosition
+            ? legendPosition
+            : LOCAL_CONSTANTS.GRAPH_LEGEND_POSITION.TOP,
         },
         title: {
           display: Boolean(legendDisplay),
-          text: title ? title : "Chart title here",
+          text: graphTitle
+            ? graphTitle
+            : LOCAL_CONSTANTS.STRINGS.UNTITLED_CHART_TITLE,
         },
       },
     };
-  }, [legendPosition, legendDisplay, title]);
+  }, [legendPosition, legendDisplay, graphTitle]);
   return (
     <div className="!pt-10">
       <Grid
@@ -103,74 +38,95 @@ const GraphBuilderPreview = ({ legendPosition, legendDisplay, title }) => {
         className="rounded !p-3"
         style={{ background: theme.palette.action.selected }}
       >
-        {options && <LineGraphComponent />}
+        {options && <LineGraphComponent options={options} />}
       </Grid>
     </div>
   );
 };
-const GraphBuilderForm = () => {
+
+/**
+ *
+ * @param {object} param0
+ * @param {import("formik").FormikConfig} param0.graphForm
+ * @returns
+ */
+const GraphBuilderForm = ({ graphForm }) => {
   const theme = useTheme();
-  // const { pmUser } = useAuthState();
-  // const authorizedTables = useMemo(() => {
-  //   if (pmUser) {
-  //     const c = pmUser.extractAuthorizedTables();
-  //     return c;
-  //   } else {
-  //     return null;
-  //   }
-  // }, [pmUser]);
 
-  // const allColumns = useMemo(() => {
-  //   if (pmUser && tableName) {
-  //     const u = pmUser;
-  //     const c = u.extractAuthorizationForRowAdditionFromPolicyObject(tableName);
-  //     if (!c) {
-  //       return null;
-  //     } else {
-  //       return getAllTableFields(dbModel, tableName);
-  //     }
-  //   } else {
-  //     return null;
-  //   }
-  // }, [pmUser, dbModel, tableName]);
+  const _handleAddDataset = () => {
+    const newQueryArrayFieldValue = graphForm.values["query_array"];
+    graphForm.setFieldValue("query_array", [
+      ...newQueryArrayFieldValue,
+      { dataset_title: "", query: {} },
+    ]);
+    console.log(graphForm.values["query_array"]);
+  };
 
-  const graphForm = useFormik({
-    initialValues: {
-      title: "",
-      graph_type: LOCAL_CONSTANTS.GRAPH_TYPES.BAR.value,
-      query: { where: {} },
-    },
-    validateOnMount: false,
-    validateOnChange: false,
-    validate: (values) => {
-      const errors = {};
+  const _handleUpdateDatasetLabel = (index, value) => {
+    let updatedQueryArrayFieldValue = graphForm.values["query_array"];
+    updatedQueryArrayFieldValue[index].dataset_title = value;
+    graphForm.setFieldValue("query_array", updatedQueryArrayFieldValue);
+  };
 
-      return errors;
-    },
-    onSubmit: (values) => {
-      console.log({ graph: values });
-    },
-  });
+  console.log({ values: graphForm.values["query_array"] });
 
   return (
-    <form onSubmit={graphForm.handleSubmit} className="!pt-10">
+    <form onSubmit={graphForm.handleSubmit} className="!pt-3">
       <Grid
         container
-        rowSpacing={2}
+        spacing={2}
         className="rounded !p-3"
-        style={{ background: theme.palette.action.selected }}
+        // style={{ background: theme.palette.action.selected }}
       >
-        <Grid item xs={12} sm={12} md={12} lg={12} key={"title"}>
+        <Grid item xs={12} sm={12} md={12} lg={12} key={"graph_title"}>
           <FieldComponent
             type={LOCAL_CONSTANTS.DATA_TYPES.STRING}
-            name={"title"}
-            value={graphForm.values["title"]}
+            name={"graph_title"}
+            value={graphForm.values["graph_title"]}
             onBlur={graphForm.handleBlur}
             onChange={graphForm.handleChange}
             setFieldValue={graphForm.setFieldValue}
-            helperText={graphForm.errors["title"]}
-            error={Boolean(graphForm.errors["title"])}
+            helperText={graphForm.errors["graph_title"]}
+            error={Boolean(graphForm.errors["graph_title"])}
             required={true}
+          />
+        </Grid>
+        <Grid item xs={12} sm={12} md={6} lg={6} key={"legend_enabled"}>
+          <FieldComponent
+            type={LOCAL_CONSTANTS.DATA_TYPES.BOOLEAN}
+            name={"legend_enabled"}
+            value={graphForm.values["legend_enabled"]}
+            onBlur={graphForm.handleBlur}
+            onChange={graphForm.handleChange}
+            setFieldValue={graphForm.setFieldValue}
+            helperText={graphForm.errors["legend_enabled"]}
+            error={Boolean(graphForm.errors["legend_enabled"])}
+            required={true}
+            customMapping={null}
+            jsonMode={"code"}
+          />
+        </Grid>
+        <Grid item xs={12} sm={12} md={6} lg={6} key={"legend_position"}>
+          <FieldComponent
+            type={LOCAL_CONSTANTS.DATA_TYPES.SINGLE_SELECT}
+            selectOptions={Object.keys(
+              LOCAL_CONSTANTS.GRAPH_LEGEND_POSITION
+            ).map((e) => {
+              return {
+                label: e,
+                value: LOCAL_CONSTANTS.GRAPH_LEGEND_POSITION[e],
+              };
+            })}
+            name={"legend_position"}
+            value={graphForm.values["legend_position"]}
+            onBlur={graphForm.handleBlur}
+            onChange={graphForm.handleChange}
+            setFieldValue={graphForm.setFieldValue}
+            helperText={graphForm.errors["legend_position"]}
+            error={Boolean(graphForm.errors["legend_position"])}
+            required={true}
+            customMapping={null}
+            jsonMode={"code"}
           />
         </Grid>
         <Grid item xs={12} sm={12} md={12} lg={12} key={"graph_type"}>
@@ -191,35 +147,106 @@ const GraphBuilderForm = () => {
             jsonMode={"code"}
           />
         </Grid>
-        <Grid item xs={12} sm={12} md={12} lg={12} key={"query"}>
-          <FieldComponent
-            type={LOCAL_CONSTANTS.DATA_TYPES.JSON}
-            name={"query"}
-            value={graphForm.values["query"]}
-            onBlur={graphForm.handleBlur}
-            onChange={graphForm.handleChange}
-            setFieldValue={graphForm.setFieldValue}
-            helperText={graphForm.errors["query"]}
-            error={Boolean(graphForm.errors["query"])}
-            required={true}
-            customMapping={null}
-            jsonMode={"code"}
-          />
+        {LOCAL_CONSTANTS.GRAPH_TYPES[
+          graphForm.values["graph_type"]
+        ]?.fields?.includes("x_axis") && (
+          <Grid item xs={12} sm={12} md={6} lg={6} key={"x_axis"}>
+            <FieldComponent
+              type={LOCAL_CONSTANTS.DATA_TYPES.STRING}
+              name={"x_axis"}
+              value={graphForm.values["x_axis"]}
+              onBlur={graphForm.handleBlur}
+              onChange={graphForm.handleChange}
+              setFieldValue={graphForm.setFieldValue}
+              helperText={graphForm.errors["x_axis"]}
+              error={Boolean(graphForm.errors["x_axis"])}
+              required={true}
+            />
+          </Grid>
+        )}
+        {LOCAL_CONSTANTS.GRAPH_TYPES[
+          graphForm.values["graph_type"]
+        ]?.fields?.includes("y_axis") && (
+          <Grid item xs={12} sm={12} md={6} lg={6} key={"y_axis"}>
+            <FieldComponent
+              type={LOCAL_CONSTANTS.DATA_TYPES.STRING}
+              name={"y_axis"}
+              value={graphForm.values["y_axis"]}
+              onBlur={graphForm.handleBlur}
+              onChange={graphForm.handleChange}
+              setFieldValue={graphForm.setFieldValue}
+              helperText={graphForm.errors["y_axis"]}
+              error={Boolean(graphForm.errors["y_axis"])}
+              required={true}
+            />
+          </Grid>
+        )}
+
+        <Grid item xs={12} sm={12} md={12} lg={12} key={"query_array"}>
+          <Button variant="contained" onClick={_handleAddDataset}>
+            Add dataset
+          </Button>
         </Grid>
+
+        {graphForm.values["query_array"]?.map((dataset, index) => {
+          return (
+            <>
+              <Grid item xs={12} sm={12} md={12} lg={12} key={"query_array"}>
+                <FieldComponent
+                  type={LOCAL_CONSTANTS.DATA_TYPES.STRING}
+                  name={`query_array-${index}-label`}
+                  value={dataset.label}
+                  onBlur={graphForm.handleBlur}
+                  onChange={(e) => {
+                    _handleUpdateDatasetLabel(index, e.target.value);
+                  }}
+                  required={true}
+                  customMapping={null}
+                />
+              </Grid>
+            </>
+          );
+        })}
       </Grid>
     </form>
   );
 };
 
 const AddGraph = () => {
+  const graphForm = useFormik({
+    initialValues: {
+      graph_type: LOCAL_CONSTANTS.GRAPH_TYPES.BAR.value,
+      legend_enabled: true,
+      legend_position: LOCAL_CONSTANTS.GRAPH_LEGEND_POSITION.TOP,
+      graph_title: "",
+      x_axis: "",
+      y_axis: "",
+      query_array: [{ dataset_title: "", query: {} }],
+    },
+    validateOnMount: false,
+    validateOnChange: false,
+    validate: (values) => {
+      const errors = {};
+
+      return errors;
+    },
+    onSubmit: (values) => {
+      console.log({ graph: values });
+    },
+  });
+
   return (
-    <div className="w-full ">
-      <Grid container columnSpacing={2} className="!px-3">
+    <div className="w-full">
+      <Grid container spacing={1} className="!px-3">
         <Grid item lg={5} md={4} className="w-full">
-          <GraphBuilderForm />
+          <GraphBuilderForm graphForm={graphForm} />
         </Grid>
         <Grid item lg={7} md={8} className="w-full">
-          <GraphBuilderPreview />
+          <GraphBuilderPreview
+            legendPosition={graphForm.values["legend_position"]}
+            legendDisplay={graphForm.values["legend_enabled"]}
+            graphTitle={graphForm.values["graph_title"]}
+          />
         </Grid>
       </Grid>
     </div>

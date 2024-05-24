@@ -114,7 +114,6 @@ export class PMUser {
   extractAuthorizedActions = (actionEntity) => {
     try {
       const entities = this.policy ? this.policy.actions : {};
-      console.log(entities);
       if (
         entities &&
         entities[actionEntity] &&
@@ -123,7 +122,6 @@ export class PMUser {
       ) {
         const actions = Object.keys(entities[actionEntity].actions).map(
           (action) => {
-            console.log(entities[actionEntity].actions[action]);
             return entities[actionEntity].actions[action] == true
               ? action
               : null;
@@ -134,7 +132,6 @@ export class PMUser {
         return [];
       }
     } catch (error) {
-      console.log(error);
       return [];
     }
   };

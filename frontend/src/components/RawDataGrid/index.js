@@ -116,7 +116,6 @@ export const RawDatagrid = ({
     for (let i = 0; i < primaryColumns.length; i++) {
       _query[primaryColumns[i]] = row[primaryColumns[i]];
     }
-    console.log(_query, _queryName);
     return primaryColumns.length > 1 ? { [_queryName]: _query } : _query;
   };
 

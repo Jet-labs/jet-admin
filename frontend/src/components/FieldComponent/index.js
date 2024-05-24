@@ -4,7 +4,6 @@ import {
   Box,
   Chip,
   FormControl,
-  InputLabel,
   MenuItem,
   OutlinedInput,
   Select,
@@ -48,7 +47,6 @@ export const FieldComponent = ({
       padding: "8.5px 14px",
     },
   }));
-  console.log({ type });
   const label = name
     ? String(name).charAt(0).toUpperCase() + String(name).slice(1)
     : null;
@@ -86,13 +84,13 @@ export const FieldComponent = ({
     case LOCAL_CONSTANTS.DATA_TYPES.SINGLE_SELECT: {
       component = (
         <FormControl fullWidth size="small">
-          {label && <InputLabel id="select-small-label">{label}</InputLabel>}
+          {label && (
+            <span className="text-xs font-light  !lowercase mb-1">{label}</span>
+          )}
 
           <Select
-            labelId="select-small-label"
-            id="select-small"
+            id={name}
             value={value}
-            label={label}
             onChange={onChange}
             onBlur={onBlur}
             error={error}
@@ -117,16 +115,12 @@ export const FieldComponent = ({
       component = (
         <FormControl fullWidth size="small">
           {label && (
-            <InputLabel id="multiple-select-small-label" className="lowercase">
-              {label}
-            </InputLabel>
+            <span className="text-xs font-light  !lowercase mb-1">{label}</span>
           )}
           <Select
-            labelId="multiple-select-small-label"
-            id="multiple-select-small"
+            id={name}
             multiple
             value={value}
-            label={label}
             onChange={onChange}
             onBlur={onBlur}
             error={error}
@@ -178,7 +172,9 @@ export const FieldComponent = ({
           className="!flex !flex-col !justify-start !items-start"
           size="small"
         >
-          <span className="text-xs font-light  !lowercase mb-1">{label}</span>
+          {label && (
+            <span className="text-xs font-light  !lowercase mb-1">{label}</span>
+          )}
           <Select
             id={name}
             name={name}
@@ -236,7 +232,6 @@ export const FieldComponent = ({
       break;
     }
     case LOCAL_CONSTANTS.DATA_TYPES.JSON: {
-      console.log({ value });
       component = (
         <FormControl fullWidth size="small">
           {label && (
@@ -248,7 +243,6 @@ export const FieldComponent = ({
             modes={["tree", "form", "view", "code", "text"]}
             indentation={4}
             onChange={(value) => {
-              console.log({ value });
               setFieldValue(name, value);
             }}
             // onModeChange={this.onModeChange}
@@ -441,7 +435,6 @@ export const FieldComponent = ({
             modes={["tree", "form", "view", "code", "text"]}
             indentation={4}
             onChange={(value) => {
-              console.log({ value });
               setFieldValue(name, value);
             }}
           />

@@ -85,7 +85,6 @@ const AccountSettings = () => {
       return errors;
     },
     onSubmit: (values) => {
-      console.log({ values });
       updateRow({ tableName, id, data: values });
     },
   });
@@ -113,7 +112,6 @@ const AccountSettings = () => {
   }, [policyObjectData]);
 
   useEffect(() => {
-    console.log({ customPolicyObjectMapping });
   }, [customPolicyObjectMapping]);
 
   return !isLoadingPMUserData && !isLoadingPolicyObjectData && pmUserData ? (
