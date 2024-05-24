@@ -10,6 +10,8 @@
     }
   },
   "dependencies": {
+    "@codemirror/lang-javascript": "^6.2.2",
+    "@codemirror/lang-json": "^6.0.1",
     "@emotion/react": "^11.10.4",
     "@emotion/styled": "^11.10.4",
     "@faker-js/faker": "^8.4.1",
@@ -22,6 +24,8 @@
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
     "@uidotdev/usehooks": "^2.3.1",
+    "@uiw/codemirror-theme-dracula": "^4.22.1",
+    "@uiw/react-codemirror": "^4.22.1",
     "axios": "^1.1.2",
     "chart.js": "^4.4.3",
     "dayjs": "^1.11.10",
@@ -32,6 +36,7 @@
     "luxon": "^3.3.0",
     "mem": "^10.0.0",
     "moment": "^2.29.4",
+    "prismjs": "^1.29.0",
     "react": "^18.2.0",
     "react-animate-height": "^3.1.0",
     "react-chartjs-2": "^5.2.0",

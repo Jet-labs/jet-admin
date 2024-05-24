@@ -1,9 +1,10 @@
-import { Button, Grid, useTheme } from "@mui/material";
+import { Box, Button, Grid, IconButton, useTheme } from "@mui/material";
 import { useFormik } from "formik";
 import React, { useMemo } from "react";
 import { FieldComponent } from "../../components/FieldComponent";
 import { LOCAL_CONSTANTS } from "../../constants";
 import { LineGraphComponent } from "../../components/LineGraphComponent";
+import { Close, Delete } from "@mui/icons-material";
 
 const GraphBuilderPreview = ({
   graphType,
@@ -31,7 +32,7 @@ const GraphBuilderPreview = ({
     };
   }, [legendPosition, legendDisplay, graphTitle]);
   return (
-    <div className="!pt-10">
+    <div className="!pt-10  !sticky !top-0 !z-50">
       <Grid
         container
         rowSpacing={2}
@@ -57,7 +58,7 @@ const GraphBuilderForm = ({ graphForm }) => {
     const newQueryArrayFieldValue = graphForm.values["query_array"];
     graphForm.setFieldValue("query_array", [
       ...newQueryArrayFieldValue,
-      { dataset_title: "", query: {} },
+      { dataset_title: "", color: "#D84545", query: {} },
     ]);
     console.log(graphForm.values["query_array"]);
   };
@@ -65,6 +66,18 @@ const GraphBuilderForm = ({ graphForm }) => {
   const _handleUpdateDatasetLabel = (index, value) => {
     let updatedQueryArrayFieldValue = graphForm.values["query_array"];
     updatedQueryArrayFieldValue[index].dataset_title = value;
+    graphForm.setFieldValue("query_array", updatedQueryArrayFieldValue);
+  };
+
+  const _handleUpdateDatasetQuery = (index, value) => {
+    let updatedQueryArrayFieldValue = graphForm.values["query_array"];
+    updatedQueryArrayFieldValue[index].query = value;
+    graphForm.setFieldValue("query_array", updatedQueryArrayFieldValue);
+  };
+
+  const _handleDeleteDataset = (index) => {
+    let updatedQueryArrayFieldValue = graphForm.values["query_array"];
+    updatedQueryArrayFieldValue.splice(index, 1);
     graphForm.setFieldValue("query_array", updatedQueryArrayFieldValue);
   };
 
@@ -190,12 +203,48 @@ const GraphBuilderForm = ({ graphForm }) => {
 
         {graphForm.values["query_array"]?.map((dataset, index) => {
           return (
-            <>
-              <Grid item xs={12} sm={12} md={12} lg={12} key={"query_array"}>
+            <Grid
+              className="!rounded  !mt-3 !ml-3.5 !p-3"
+              sx={{
+                background: theme.palette.action.selected,
+              }}
+              rowSpacing={2}
+              container
+              xs={12}
+              sm={12}
+              md={12}
+              lg={12}
+            >
+              <Grid
+                item
+                xs={12}
+                sm={12}
+                md={12}
+                lg={12}
+                key={"query_array"}
+                className="!flex justify-end !-mt-3"
+              >
+                <IconButton
+                  aria-label="delete"
+                  color="error"
+                  className="!p-0"
+                  onClick={() => _handleDeleteDataset(index)}
+                >
+                  <Close />
+                </IconButton>
+              </Grid>
+              <Grid
+                item
+                xs={12}
+                sm={12}
+                md={12}
+                lg={12}
+                key={`query_array_title-${index}`}
+              >
                 <FieldComponent
                   type={LOCAL_CONSTANTS.DATA_TYPES.STRING}
-                  name={`query_array-${index}-label`}
-                  value={dataset.label}
+                  name={`query_array_title-${index}`}
+                  value={dataset.dataset_title}
                   onBlur={graphForm.handleBlur}
                   onChange={(e) => {
                     _handleUpdateDatasetLabel(index, e.target.value);
@@ -204,7 +253,62 @@ const GraphBuilderForm = ({ graphForm }) => {
                   customMapping={null}
                 />
               </Grid>
-            </>
+
+              <Grid
+                item
+                xs={12}
+                sm={12}
+                md={12}
+                lg={12}
+                key={`query_array_color-${index}`}
+              >
+                <FieldComponent
+                  type={LOCAL_CONSTANTS.DATA_TYPES.COLOR}
+                  name={`query_array_color-${index}`}
+                  value={dataset.color}
+                  onBlur={graphForm.handleBlur}
+                  onChange={(e) => {
+                    _handleUpdateDatasetQuery(index, e.target.value);
+                  }}
+                  setFieldValue={(name, value) => {
+                    _handleUpdateDatasetQuery(
+                      parseInt(String(name).split("-")[1]),
+                      value
+                    );
+                  }}
+                  required={true}
+                  customMapping={null}
+                />
+              </Grid>
+
+              <Grid
+                item
+                xs={12}
+                sm={12}
+                md={12}
+                lg={12}
+                key={`query_array_query-${index}`}
+              >
+                <FieldComponent
+                  type={LOCAL_CONSTANTS.DATA_TYPES.CODE}
+                  name={`query_array_query-${index}`}
+                  value={dataset.query}
+                  onBlur={graphForm.handleBlur}
+                  onChange={(e) => {
+                    _handleUpdateDatasetQuery(index, e.target.value);
+                  }}
+                  setFieldValue={(name, value) => {
+                    _handleUpdateDatasetQuery(
+                      parseInt(String(name).split("-")[1]),
+                      value
+                    );
+                  }}
+                  required={true}
+                  jsonMode={"code"}
+                  customMapping={null}
+                />
+              </Grid>
+            </Grid>
           );
         })}
       </Grid>
@@ -221,7 +325,7 @@ const AddGraph = () => {
       graph_title: "",
       x_axis: "",
       y_axis: "",
-      query_array: [{ dataset_title: "", query: {} }],
+      query_array: [{ dataset_title: "", query: "" }],
     },
     validateOnMount: false,
     validateOnChange: false,

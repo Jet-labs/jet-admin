@@ -224,6 +224,8 @@ export const LOCAL_CONSTANTS = {
 
   DATA_TYPES: {
     STRING: "String",
+    COLOR: "Color",
+    CODE: "Code",
     BOOLEAN: "Boolean",
     INT: "Int",
     BIGINT: "BigInt",

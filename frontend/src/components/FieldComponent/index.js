@@ -20,6 +20,7 @@ import { isNull } from "lodash";
 import moment from "moment";
 import { LOCAL_CONSTANTS } from "../../constants";
 import { JSONEditorReact } from "../JSONEditorReact";
+import { CodeEditor } from "../CodeEditorComponent";
 
 export const FieldComponent = ({
   type,
@@ -74,6 +75,66 @@ export const FieldComponent = ({
             onChange={onChange}
             onBlur={onBlur}
             value={value}
+            helperText={helperText}
+            error={error}
+          />
+        </FormControl>
+      );
+      break;
+    }
+    case LOCAL_CONSTANTS.DATA_TYPES.COLOR: {
+      component = (
+        <FormControl
+          fullWidth
+          className="!flex !flex-col !justify-start !items-start"
+          size="small"
+        >
+          {label && (
+            <span className="text-xs font-light mb-1 !lowercase">{label}</span>
+          )}
+          <TextField
+            disabled={readOnly}
+            required={required}
+            fullWidth
+            size="small"
+            variant="outlined"
+            type="color"
+            name={name}
+            // placeholder={label}
+            onChange={onChange}
+            onBlur={onBlur}
+            value={value}
+            helperText={helperText}
+            error={error}
+          />
+        </FormControl>
+      );
+      break;
+    }
+    case LOCAL_CONSTANTS.DATA_TYPES.CODE: {
+      component = (
+        <FormControl
+          fullWidth
+          className="!flex !flex-col !justify-start !items-start"
+          size="small"
+        >
+          {label && (
+            <span className="text-xs font-light mb-1 !lowercase">{label}</span>
+          )}
+          <CodeEditor
+            disabled={readOnly}
+            required={required}
+            fullWidth
+            size="small"
+            variant="outlined"
+            type="color"
+            name={name}
+            // placeholder={label}
+            setCode={(value) => {
+              setFieldValue(name, value);
+            }}
+            onBlur={onBlur}
+            code={value}
             helperText={helperText}
             error={error}
           />
