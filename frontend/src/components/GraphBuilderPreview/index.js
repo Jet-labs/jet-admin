@@ -3,6 +3,7 @@ import React from "react";
 
 import { LineGraphComponent } from "../LineGraphComponent";
 import { LOCAL_CONSTANTS } from "../../constants";
+import { BarGraphComponent } from "../BarGraphComponent";
 
 export const GraphBuilderPreview = ({
   graphType,
@@ -23,6 +24,14 @@ export const GraphBuilderPreview = ({
       >
         {graphType === LOCAL_CONSTANTS.GRAPH_TYPES.LINE.value && (
           <LineGraphComponent
+            legendPosition={legendPosition}
+            legendDisplay={legendDisplay}
+            graphTitle={graphTitle}
+            data={data}
+          />
+        )}
+        {graphType === LOCAL_CONSTANTS.GRAPH_TYPES.BAR.value && (
+          <BarGraphComponent
             legendPosition={legendPosition}
             legendDisplay={legendDisplay}
             graphTitle={graphTitle}
