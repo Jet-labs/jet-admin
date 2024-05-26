@@ -1,29 +1,14 @@
 import { useTheme } from "@mui/material";
-import {
-  BarElement,
-  CategoryScale,
-  Chart as ChartJS,
-  Legend,
-  LinearScale,
-  Title,
-  Tooltip,
-} from "chart.js";
+import { ArcElement, Chart as ChartJS, Legend, Tooltip } from "chart.js";
 import React, { useMemo } from "react";
-import { Bar } from "react-chartjs-2";
+import { Pie } from "react-chartjs-2";
 
 import { faker } from "@faker-js/faker";
 import { LOCAL_CONSTANTS } from "../../constants";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Title,
-  Tooltip,
-  Legend
-);
+ChartJS.register(ArcElement, Tooltip, Legend);
 
-export class BarChartDataset {
+export class PieChartDataset {
   /**
    *
    * @param {object} param0
@@ -39,12 +24,12 @@ export class BarChartDataset {
     this.backgroundColor = backgroundColor;
   }
 }
-export class BarChartData {
+export class PieChartData {
   /**
    *
    * @param {object} param0
    * @param {Array<String>} param0.labels
-   * @param {Array<BarChartDataset>} param0.datasets
+   * @param {Array<PieChartDataset>} param0.datasets
    */
   constructor({ labels, datasets }) {
     this.labels = labels;
@@ -72,7 +57,7 @@ const demoData = {
   ],
 };
 
-export const BarGraphComponent = ({
+export const PieGraphComponent = ({
   legendPosition,
   titleDisplayEnabled,
   graphTitle,
@@ -103,6 +88,5 @@ export const BarGraphComponent = ({
     };
   }, [legendPosition, titleDisplayEnabled, graphTitle]);
 
-  console.log({ data, demoData });
-  return <Bar options={options} data={data ? data : demoData} />;
+  return <Pie options={options} data={data ? data : demoData} />;
 };

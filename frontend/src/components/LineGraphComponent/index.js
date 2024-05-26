@@ -2,6 +2,7 @@ import { useTheme } from "@mui/material";
 import {
   CategoryScale,
   Chart as ChartJS,
+  Filler,
   Legend,
   LinearScale,
   LineElement,
@@ -22,6 +23,7 @@ ChartJS.register(
   LineElement,
   Title,
   Tooltip,
+  Filler,
   Legend
 );
 
@@ -76,7 +78,7 @@ const demoData = {
 
 export const LineGraphComponent = ({
   legendPosition,
-  legendDisplay,
+  titleDisplayEnabled,
   graphTitle,
   data,
 }) => {
@@ -96,14 +98,14 @@ export const LineGraphComponent = ({
             : LOCAL_CONSTANTS.GRAPH_LEGEND_POSITION.TOP,
         },
         title: {
-          display: Boolean(legendDisplay),
+          display: Boolean(titleDisplayEnabled),
           text: graphTitle
             ? graphTitle
             : LOCAL_CONSTANTS.STRINGS.UNTITLED_CHART_TITLE,
         },
       },
     };
-  }, [legendPosition, legendDisplay, graphTitle]);
+  }, [legendPosition, titleDisplayEnabled, graphTitle]);
 
   console.log({ data, demoData });
   return <Line options={options} data={data ? data : demoData} />;

@@ -277,7 +277,11 @@ export const LOCAL_CONSTANTS = {
       value: "BAR",
       fields: ["x_axis", "y_axis", "index_axis"],
     },
-    LINE: { label: "Line", value: "LINE", fields: ["x_axis", "y_axis"] },
+    LINE: {
+      label: "Line",
+      value: "LINE",
+      fields: ["x_axis", "y_axis", "fill"],
+    },
     PIE: { label: "Pie", value: "PIE" },
   },
 

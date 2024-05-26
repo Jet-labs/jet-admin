@@ -4,11 +4,12 @@ import React from "react";
 import { LineGraphComponent } from "../LineGraphComponent";
 import { LOCAL_CONSTANTS } from "../../constants";
 import { BarGraphComponent } from "../BarGraphComponent";
+import { PieGraphComponent } from "../PieChartComponent";
 
 export const GraphBuilderPreview = ({
   graphType,
   legendPosition,
-  legendDisplay,
+  titleDisplayEnabled,
   graphTitle,
   data,
 }) => {
@@ -25,7 +26,7 @@ export const GraphBuilderPreview = ({
         {graphType === LOCAL_CONSTANTS.GRAPH_TYPES.LINE.value && (
           <LineGraphComponent
             legendPosition={legendPosition}
-            legendDisplay={legendDisplay}
+            titleDisplayEnabled={titleDisplayEnabled}
             graphTitle={graphTitle}
             data={data}
           />
@@ -33,7 +34,15 @@ export const GraphBuilderPreview = ({
         {graphType === LOCAL_CONSTANTS.GRAPH_TYPES.BAR.value && (
           <BarGraphComponent
             legendPosition={legendPosition}
-            legendDisplay={legendDisplay}
+            titleDisplayEnabled={titleDisplayEnabled}
+            graphTitle={graphTitle}
+            data={data}
+          />
+        )}
+        {graphType === LOCAL_CONSTANTS.GRAPH_TYPES.PIE.value && (
+          <PieGraphComponent
+            legendPosition={legendPosition}
+            titleDisplayEnabled={titleDisplayEnabled}
             graphTitle={graphTitle}
             data={data}
           />

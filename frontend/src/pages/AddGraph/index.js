@@ -7,8 +7,10 @@ import { GraphBuilderForm } from "../../components/GraphBuilderForm";
 import { GraphBuilderPreview } from "../../components/GraphBuilderPreview";
 import { LOCAL_CONSTANTS } from "../../constants";
 import { displayError, displaySuccess } from "../../utils/notification";
+import { useTheme } from "@emotion/react";
 
 const AddGraph = () => {
+  const theme = useTheme();
   const {
     isPending: isAddingGraph,
     isSuccess: isAddingGraphSuccess,
@@ -30,7 +32,7 @@ const AddGraph = () => {
   const graphForm = useFormik({
     initialValues: {
       graph_type: LOCAL_CONSTANTS.GRAPH_TYPES.BAR.value,
-      legend_enabled: true,
+      title_display_enabled: true,
       legend_position: LOCAL_CONSTANTS.GRAPH_LEGEND_POSITION.TOP,
       graph_title: "",
       x_axis: "",
@@ -52,6 +54,12 @@ const AddGraph = () => {
 
   return (
     <div className="w-full">
+      <div
+        className="flex flex-col items-start justify-start p-3 px-6 !border-b !border-white !border-opacity-10"
+        style={{ background: theme.palette.background.paper }}
+      >
+        <span className="text-lg font-bold text-start mt-1">{`Add new graph`}</span>
+      </div>
       <Grid container spacing={1} className="!px-3">
         <Grid item lg={5} md={4} className="w-full">
           <GraphBuilderForm isLoading={isAddingGraph} graphForm={graphForm} />
@@ -60,7 +68,7 @@ const AddGraph = () => {
           <GraphBuilderPreview
             graphType={graphForm.values["graph_type"]}
             legendPosition={graphForm.values["legend_position"]}
-            legendDisplay={graphForm.values["legend_enabled"]}
+            titleDisplayEnabled={graphForm.values["title_display_enabled"]}
             graphTitle={graphForm.values["graph_title"]}
           />
         </Grid>

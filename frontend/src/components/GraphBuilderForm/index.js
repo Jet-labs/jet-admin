@@ -30,6 +30,13 @@ export const GraphBuilderForm = ({ graphForm }) => {
   const _handleUpdateDatasetColor = (index, value) => {
     let updatedQueryArrayFieldValue = graphForm.values["query_array"];
     updatedQueryArrayFieldValue[index].color = value;
+    updatedQueryArrayFieldValue[index].backgroundColor = `${value}80`;
+    graphForm.setFieldValue("query_array", updatedQueryArrayFieldValue);
+  };
+  const _handleUpdateDatasetFill = (index, value) => {
+    let updatedQueryArrayFieldValue = graphForm.values["query_array"];
+    updatedQueryArrayFieldValue[index].fill = value;
+
     graphForm.setFieldValue("query_array", updatedQueryArrayFieldValue);
   };
   const _handleUpdateDatasetXAxis = (index, value) => {
@@ -80,16 +87,16 @@ export const GraphBuilderForm = ({ graphForm }) => {
             required={true}
           />
         </Grid>
-        <Grid item xs={12} sm={12} md={6} lg={6} key={"legend_enabled"}>
+        <Grid item xs={12} sm={12} md={6} lg={6} key={"title_display_enabled"}>
           <FieldComponent
             type={LOCAL_CONSTANTS.DATA_TYPES.BOOLEAN}
-            name={"legend_enabled"}
-            value={graphForm.values["legend_enabled"]}
+            name={"title_display_enabled"}
+            value={graphForm.values["title_display_enabled"]}
             onBlur={graphForm.handleBlur}
             onChange={graphForm.handleChange}
             setFieldValue={graphForm.setFieldValue}
-            helperText={graphForm.errors["legend_enabled"]}
-            error={Boolean(graphForm.errors["legend_enabled"])}
+            helperText={graphForm.errors["title_display_enabled"]}
+            error={Boolean(graphForm.errors["title_display_enabled"])}
             required={true}
             customMapping={null}
             language={"json"}
@@ -255,6 +262,33 @@ export const GraphBuilderForm = ({ graphForm }) => {
                   />
                 </Grid>
               )}
+
+              <Grid
+                item
+                xs={12}
+                sm={12}
+                md={12}
+                lg={12}
+                key={`query_array_fill-${index}`}
+              >
+                <FieldComponent
+                  type={LOCAL_CONSTANTS.DATA_TYPES.BOOLEAN}
+                  name={`query_array_fill-${index}`}
+                  value={dataset.fill}
+                  onBlur={graphForm.handleBlur}
+                  onChange={(e) => {
+                    _handleUpdateDatasetFill(index, e.target.value);
+                  }}
+                  setFieldValue={(name, value) => {
+                    _handleUpdateDatasetFill(
+                      parseInt(String(name).split("-")[1]),
+                      value
+                    );
+                  }}
+                  required={true}
+                  customMapping={null}
+                />
+              </Grid>
 
               <Grid
                 item

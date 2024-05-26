@@ -51,7 +51,7 @@ const GraphView = () => {
   const graphForm = useFormik({
     initialValues: {
       graph_type: LOCAL_CONSTANTS.GRAPH_TYPES.BAR.value,
-      legend_enabled: true,
+      title_display_enabled: true,
       legend_position: LOCAL_CONSTANTS.GRAPH_LEGEND_POSITION.TOP,
       graph_title: "",
       x_axis: "",
@@ -77,8 +77,8 @@ const GraphView = () => {
     if (graphData) {
       graphForm.setFieldValue("graph_type", graphData.graph_options.graph_type);
       graphForm.setFieldValue(
-        "legend_enabled",
-        graphData.graph_options.legend_enabled
+        "title_display_enabled",
+        graphData.graph_options.title_display_enabled
       );
       graphForm.setFieldValue(
         "legend_position",
@@ -96,6 +96,15 @@ const GraphView = () => {
 
   return (
     <div className="w-full">
+      <div
+        className="flex flex-col items-start justify-start p-3 px-6 !border-b !border-white !border-opacity-10"
+        style={{ background: theme.palette.background.paper }}
+      >
+        <span className="text-lg font-bold text-start ">{`Update graph`}</span>
+        {graphData && (
+          <span className="text-xs font-thin text-start text-slate-300">{`${graphData.title} | Graph ID : ${graphData.pm_graph_id}`}</span>
+        )}
+      </div>
       <Grid container spacing={1} className="!px-3">
         <Grid item lg={5} md={4} className="w-full">
           <GraphBuilderForm isLoading={isUpdatingGraph} graphForm={graphForm} />
@@ -105,7 +114,7 @@ const GraphView = () => {
             <GraphBuilderPreview
               graphType={graphForm.values["graph_type"]}
               legendPosition={graphForm.values["legend_position"]}
-              legendDisplay={graphForm.values["legend_enabled"]}
+              titleDisplayEnabled={graphForm.values["title_display_enabled"]}
               graphTitle={graphForm.values["graph_title"]}
               data={graphData.dataset}
             />
