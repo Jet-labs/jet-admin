@@ -5,6 +5,7 @@ import { LineGraphComponent } from "../LineGraphComponent";
 import { LOCAL_CONSTANTS } from "../../constants";
 import { BarGraphComponent } from "../BarGraphComponent";
 import { PieGraphComponent } from "../PieChartComponent";
+import { DoughnutGraphComponent } from "../DoughnutChartComponent";
 
 export const GraphBuilderPreview = ({
   graphType,
@@ -41,6 +42,14 @@ export const GraphBuilderPreview = ({
         )}
         {graphType === LOCAL_CONSTANTS.GRAPH_TYPES.PIE.value && (
           <PieGraphComponent
+            legendPosition={legendPosition}
+            titleDisplayEnabled={titleDisplayEnabled}
+            graphTitle={graphTitle}
+            data={data}
+          />
+        )}
+        {graphType === LOCAL_CONSTANTS.GRAPH_TYPES.DOUGHNUT.value && (
+          <DoughnutGraphComponent
             legendPosition={legendPosition}
             titleDisplayEnabled={titleDisplayEnabled}
             graphTitle={graphTitle}

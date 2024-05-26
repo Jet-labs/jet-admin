@@ -226,3 +226,21 @@
 [31merror[39m: dev_node_1: 26-05-2024 19:03:56: [31mgraphController:getGraphData:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
 [31merror[39m: dev_node_1: 26-05-2024 19:04:51: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-05-26T13:34:33.000Z"}}
 [31merror[39m: dev_node_1: 26-05-2024 19:04:51: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 26-05-2024 19:07:31: [31mGraphService:getGraphData:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 26-05-2024 19:07:31: [31mgraphController:getGraphData:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 26-05-2024 19:07:32: [31mGraphService:getGraphData:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 26-05-2024 19:07:32: [31mgraphController:getGraphData:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 26-05-2024 19:10:47: [31mGraphService:getGraphData:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 26-05-2024 19:10:47: [31mgraphController:getGraphData:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 26-05-2024 19:10:48: [31mGraphService:getGraphData:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 26-05-2024 19:10:48: [31mgraphController:getGraphData:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 26-05-2024 19:14:12: [31mGraphService:getGraphData:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 26-05-2024 19:14:12: [31mgraphController:getGraphData:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 26-05-2024 19:14:58: [31mGraphService:getGraphData:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 26-05-2024 19:14:58: [31mgraphController:getGraphData:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 26-05-2024 19:19:57: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-05-26T13:49:51.000Z"}}
+[31merror[39m: dev_node_1: 26-05-2024 19:19:57: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 26-05-2024 19:20:09: [31mGraphService:getGraphData:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 26-05-2024 19:20:09: [31mgraphController:getGraphData:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 26-05-2024 19:20:10: [31mGraphService:getGraphData:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 26-05-2024 19:20:10: [31mgraphController:getGraphData:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}

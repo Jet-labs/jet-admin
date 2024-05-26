@@ -54,8 +54,6 @@ const GraphView = () => {
       title_display_enabled: true,
       legend_position: LOCAL_CONSTANTS.GRAPH_LEGEND_POSITION.TOP,
       graph_title: "",
-      x_axis: "",
-      y_axis: "",
       query_array: [{ dataset_title: "", query: "" }],
     },
     validateOnMount: false,
@@ -75,6 +73,7 @@ const GraphView = () => {
 
   useEffect(() => {
     if (graphData) {
+      console.log({ graphData });
       graphForm.setFieldValue("graph_type", graphData.graph_options.graph_type);
       graphForm.setFieldValue(
         "title_display_enabled",
@@ -85,8 +84,7 @@ const GraphView = () => {
         graphData.graph_options.legend_position
       );
       graphForm.setFieldValue("graph_title", graphData.title);
-      graphForm.setFieldValue("x_axis", graphData.graph_options.x_axis);
-      graphForm.setFieldValue("y_axis", graphData.graph_options.y_axis);
+
       graphForm.setFieldValue(
         "query_array",
         graphData.graph_options.query_array
@@ -109,7 +107,7 @@ const GraphView = () => {
         <Grid item lg={5} md={4} className="w-full">
           <GraphBuilderForm isLoading={isUpdatingGraph} graphForm={graphForm} />
         </Grid>
-        {graphData && (
+        {graphData && graphData.dataset && (
           <Grid item lg={7} md={8} className="w-full">
             <GraphBuilderPreview
               graphType={graphForm.values["graph_type"]}

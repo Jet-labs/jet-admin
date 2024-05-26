@@ -113,7 +113,9 @@ class GraphService {
 
       if (
         graph.graph_options.graph_type == constants.GRAPH_TYPES.LINE.value ||
-        graph.graph_options.graph_type == constants.GRAPH_TYPES.BAR.value
+        graph.graph_options.graph_type == constants.GRAPH_TYPES.BAR.value ||
+        graph.graph_options.graph_type == constants.GRAPH_TYPES.PIE.value ||
+        graph.graph_options.graph_type == constants.GRAPH_TYPES.DOUGHNUT.value
       ) {
         let _labels = {};
 

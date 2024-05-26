@@ -283,6 +283,7 @@ export const LOCAL_CONSTANTS = {
       fields: ["x_axis", "y_axis", "fill"],
     },
     PIE: { label: "Pie", value: "PIE" },
+    DOUGHNUT: { label: "Doughnut", value: "DOUGHNUT" },
   },
 
   GRAPH_LEGEND_POSITION: {
