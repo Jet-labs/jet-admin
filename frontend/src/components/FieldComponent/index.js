@@ -19,7 +19,6 @@ import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import { isNull } from "lodash";
 import moment from "moment";
 import { LOCAL_CONSTANTS } from "../../constants";
-import { JSONEditorReact } from "../JSONEditorReact";
 import { CodeEditor } from "../CodeEditorComponent";
 
 export const FieldComponent = ({
@@ -38,7 +37,7 @@ export const FieldComponent = ({
   selectOptions,
   setFieldValue,
   showDefault,
-  jsonMode,
+  language,
 }) => {
   const theme = useTheme();
   const CustomDateTimePicker = styled(
@@ -298,15 +297,25 @@ export const FieldComponent = ({
           {label && (
             <span className="text-xs font-light  !lowercase mb-1">{label}</span>
           )}
-          <JSONEditorReact
-            json={value ? value : null}
-            mode={jsonMode ? jsonMode : "code"}
-            modes={["tree", "form", "view", "code", "text"]}
-            indentation={4}
-            onChange={(value) => {
+          <CodeEditor
+            disabled={readOnly}
+            required={required}
+            fullWidth
+            size="small"
+            variant="outlined"
+            type="color"
+            name={name}
+            // placeholder={label}
+            setCode={(value) => {
               setFieldValue(name, value);
             }}
-            // onModeChange={this.onModeChange}
+            language={language ? language : "json"}
+            onBlur={onBlur}
+            code={
+              typeof value === "object" ? JSON.stringify(value, null, 2) : value
+            }
+            helperText={helperText}
+            error={error}
           />
         </FormControl>
       );
@@ -490,14 +499,25 @@ export const FieldComponent = ({
           {label && (
             <span className="text-xs font-light  !lowercase mb-1">{label}</span>
           )}
-          <JSONEditorReact
-            json={value}
-            mode={jsonMode ? jsonMode : "text"}
-            modes={["tree", "form", "view", "code", "text"]}
-            indentation={4}
-            onChange={(value) => {
+          <CodeEditor
+            disabled={readOnly}
+            required={required}
+            fullWidth
+            size="small"
+            variant="outlined"
+            type="color"
+            name={name}
+            // placeholder={label}
+            setCode={(value) => {
               setFieldValue(name, value);
             }}
+            language={language ? language : "json"}
+            onBlur={onBlur}
+            code={
+              typeof value === "object" ? JSON.stringify(value, null, 2) : value
+            }
+            helperText={helperText}
+            error={error}
           />
         </FormControl>
       ) : null;

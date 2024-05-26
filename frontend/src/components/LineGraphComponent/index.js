@@ -12,7 +12,8 @@ import {
 import React, { useMemo } from "react";
 import { Line } from "react-chartjs-2";
 
-import { faker } from "@faker-js/faker";
+import { da, faker } from "@faker-js/faker";
+import { LOCAL_CONSTANTS } from "../../constants";
 
 ChartJS.register(
   CategoryScale,
@@ -55,7 +56,7 @@ export class LineChartData {
 
 const labels = ["January", "February", "March", "April", "May", "June", "July"];
 
-const data = {
+const demoData = {
   labels,
   datasets: [
     {
@@ -73,8 +74,37 @@ const data = {
   ],
 };
 
-export const LineGraphComponent = ({ options }) => {
+export const LineGraphComponent = ({
+  legendPosition,
+  legendDisplay,
+  graphTitle,
+  data,
+}) => {
   const theme = useTheme();
+  const options = useMemo(() => {
+    return {
+      responsive: true,
+      elements: {
+        bar: {
+          borderWidth: 2,
+        },
+      },
+      plugins: {
+        legend: {
+          position: legendPosition
+            ? legendPosition
+            : LOCAL_CONSTANTS.GRAPH_LEGEND_POSITION.TOP,
+        },
+        title: {
+          display: Boolean(legendDisplay),
+          text: graphTitle
+            ? graphTitle
+            : LOCAL_CONSTANTS.STRINGS.UNTITLED_CHART_TITLE,
+        },
+      },
+    };
+  }, [legendPosition, legendDisplay, graphTitle]);
 
-  return <Line options={options} data={data} />;
+  console.log({ data, demoData });
+  return <Line options={options} data={data ? data : demoData} />;
 };

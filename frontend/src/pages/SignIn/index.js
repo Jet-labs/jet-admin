@@ -26,7 +26,7 @@ const LoginForm = ({}) => {
         Please enter details to begin.
       </span>
       <Formik
-        initialValues={{ username: "ragsav", password: "password" }}
+        initialValues={{ username: "local_admin", password: "password" }}
         validate={(values) => {
           const errors = {};
           if (!values.username) {

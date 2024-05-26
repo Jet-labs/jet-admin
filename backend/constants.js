@@ -64,6 +64,17 @@ const constants = {
   SOCKET_EVENTS: {
     ON_USER_UPDATE: "ON_USER_UPDATE",
   },
+
+  GRAPH_TYPES: {
+    CHART: { label: "Chart", value: "CHART" },
+    BAR: {
+      label: "Bar",
+      value: "BAR",
+      fields: ["x_axis", "y_axis", "index_axis"],
+    },
+    LINE: { label: "Line", value: "LINE", fields: ["x_axis", "y_axis"] },
+    PIE: { label: "Pie", value: "PIE" },
+  },
 };
 
 module.exports = constants;

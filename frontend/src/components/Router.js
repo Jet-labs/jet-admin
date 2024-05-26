@@ -13,6 +13,7 @@ import ProtectedRoute from "./ProtectedRoute";
 
 import { lazy } from "react";
 import SignIn from "../pages/SignIn";
+import GraphView from "../pages/GraphView";
 
 const Home = lazy(() => import("../pages/Home"));
 const TableView = lazy(() => import("../pages/TableView"));
@@ -41,7 +42,8 @@ const AppRouter = ({}) => {
             element={
               <ProtectedRoute
                 successComponent={() => (
-                  <Navigate to={LOCAL_CONSTANTS.ROUTES.ALL_GRAPHS.code} />
+                  // <Navigate to={LOCAL_CONSTANTS.ROUTES.ALL_GRAPHS.code} />
+                  <GraphView />
                 )}
                 fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
                 loadingComponent={() => <Loading />}

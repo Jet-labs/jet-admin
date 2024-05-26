@@ -14,6 +14,7 @@ expressApp.use(
 );
 
 expressApp.use("/admin_api/tables", require("./modules/routes/table.route"));
+expressApp.use("/admin_api/graphs", require("./modules/routes/graph.route"));
 
 expressApp.get("/", async (req, res) => {
   Logger.log("warning", {

@@ -154,7 +154,8 @@ export const LOCAL_CONSTANTS = {
       sendAction: ({ action }) => `/admin_api/actions/${action}`,
     },
     GRAPH: {
-      getGraphData: ({ id }) => `/admin_api/graphs/${id}`,
+      addGraph: () => `/admin_api/graphs`,
+      getGraphDataByID: ({ id }) => `/admin_api/graphs/${id}/data`,
     },
 
     CONSTANTS: {
@@ -262,7 +263,11 @@ export const LOCAL_CONSTANTS = {
 
   GRAPH_TYPES: {
     CHART: { label: "Chart", value: "CHART" },
-    BAR: { label: "Bar", value: "BAR" },
+    BAR: {
+      label: "Bar",
+      value: "BAR",
+      fields: ["x_axis", "y_axis", "index_axis"],
+    },
     LINE: { label: "Line", value: "LINE", fields: ["x_axis", "y_axis"] },
     PIE: { label: "Pie", value: "PIE" },
   },

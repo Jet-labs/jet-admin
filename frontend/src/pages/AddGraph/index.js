@@ -5,6 +5,9 @@ import { FieldComponent } from "../../components/FieldComponent";
 import { LOCAL_CONSTANTS } from "../../constants";
 import { LineGraphComponent } from "../../components/LineGraphComponent";
 import { Close, Delete } from "@mui/icons-material";
+import { useMutation } from "@tanstack/react-query";
+import { addGraphAPI } from "../../api/graphs";
+import { displayError, displaySuccess } from "../../utils/notification";
 
 const GraphBuilderPreview = ({
   graphType,
@@ -13,24 +16,7 @@ const GraphBuilderPreview = ({
   graphTitle,
 }) => {
   const theme = useTheme();
-  const options = useMemo(() => {
-    return {
-      responsive: true,
-      plugins: {
-        legend: {
-          position: legendPosition
-            ? legendPosition
-            : LOCAL_CONSTANTS.GRAPH_LEGEND_POSITION.TOP,
-        },
-        title: {
-          display: Boolean(legendDisplay),
-          text: graphTitle
-            ? graphTitle
-            : LOCAL_CONSTANTS.STRINGS.UNTITLED_CHART_TITLE,
-        },
-      },
-    };
-  }, [legendPosition, legendDisplay, graphTitle]);
+  console.log({ graphType });
   return (
     <div className="!pt-10  !sticky !top-0 !z-50">
       <Grid
@@ -39,7 +25,13 @@ const GraphBuilderPreview = ({
         className="rounded !p-3"
         style={{ background: theme.palette.action.selected }}
       >
-        {options && <LineGraphComponent options={options} />}
+        {graphType === LOCAL_CONSTANTS.GRAPH_TYPES.LINE.value && (
+          <LineGraphComponent
+            legendPosition={legendPosition}
+            legendDisplay={legendDisplay}
+            graphTitle={graphTitle}
+          />
+        )}
       </Grid>
     </div>
   );
@@ -68,6 +60,11 @@ const GraphBuilderForm = ({ graphForm }) => {
     updatedQueryArrayFieldValue[index].dataset_title = value;
     graphForm.setFieldValue("query_array", updatedQueryArrayFieldValue);
   };
+  const _handleUpdateDatasetColor = (index, value) => {
+    let updatedQueryArrayFieldValue = graphForm.values["query_array"];
+    updatedQueryArrayFieldValue[index].color = value;
+    graphForm.setFieldValue("query_array", updatedQueryArrayFieldValue);
+  };
 
   const _handleUpdateDatasetQuery = (index, value) => {
     let updatedQueryArrayFieldValue = graphForm.values["query_array"];
@@ -81,7 +78,9 @@ const GraphBuilderForm = ({ graphForm }) => {
     graphForm.setFieldValue("query_array", updatedQueryArrayFieldValue);
   };
 
-  console.log({ values: graphForm.values["query_array"] });
+  const _handleSubmit = () => {
+    graphForm.handleSubmit();
+  };
 
   return (
     <form onSubmit={graphForm.handleSubmit} className="!pt-3">
@@ -116,7 +115,7 @@ const GraphBuilderForm = ({ graphForm }) => {
             error={Boolean(graphForm.errors["legend_enabled"])}
             required={true}
             customMapping={null}
-            jsonMode={"code"}
+            language={"json"}
           />
         </Grid>
         <Grid item xs={12} sm={12} md={6} lg={6} key={"legend_position"}>
@@ -139,7 +138,7 @@ const GraphBuilderForm = ({ graphForm }) => {
             error={Boolean(graphForm.errors["legend_position"])}
             required={true}
             customMapping={null}
-            jsonMode={"code"}
+            language={"json"}
           />
         </Grid>
         <Grid item xs={12} sm={12} md={12} lg={12} key={"graph_type"}>
@@ -157,7 +156,7 @@ const GraphBuilderForm = ({ graphForm }) => {
             error={Boolean(graphForm.errors["graph_type"])}
             required={true}
             customMapping={null}
-            jsonMode={"code"}
+            language={"json"}
           />
         </Grid>
         {LOCAL_CONSTANTS.GRAPH_TYPES[
@@ -268,10 +267,10 @@ const GraphBuilderForm = ({ graphForm }) => {
                   value={dataset.color}
                   onBlur={graphForm.handleBlur}
                   onChange={(e) => {
-                    _handleUpdateDatasetQuery(index, e.target.value);
+                    _handleUpdateDatasetColor(index, e.target.value);
                   }}
                   setFieldValue={(name, value) => {
-                    _handleUpdateDatasetQuery(
+                    _handleUpdateDatasetColor(
                       parseInt(String(name).split("-")[1]),
                       value
                     );
@@ -304,19 +303,42 @@ const GraphBuilderForm = ({ graphForm }) => {
                     );
                   }}
                   required={true}
-                  jsonMode={"code"}
+                  language={"sql"}
                   customMapping={null}
                 />
               </Grid>
             </Grid>
           );
         })}
+        <Grid item xs={12} sm={12} md={12} lg={12} key={"submit"}>
+          <Button variant="contained" onClick={_handleSubmit}>
+            Add graph
+          </Button>
+        </Grid>
       </Grid>
     </form>
   );
 };
 
 const AddGraph = () => {
+  const {
+    isPending: isAddingGraph,
+    isSuccess: isAddingGraphSuccess,
+    isError: isAddingGraphError,
+    error: addGraphError,
+    mutate: addGraph,
+  } = useMutation({
+    mutationFn: ({ data }) => {
+      return addGraphAPI({ data });
+    },
+    retry: false,
+    onSuccess: () => {
+      displaySuccess("Added graph successfully");
+    },
+    onError: (error) => {
+      displayError(error);
+    },
+  });
   const graphForm = useFormik({
     initialValues: {
       graph_type: LOCAL_CONSTANTS.GRAPH_TYPES.BAR.value,
@@ -335,7 +357,8 @@ const AddGraph = () => {
       return errors;
     },
     onSubmit: (values) => {
-      console.log({ graph: values });
+      const { graph_title, ...graph_options } = values;
+      addGraph({ data: { graph_title, graph_options } });
     },
   });
 
@@ -347,6 +370,7 @@ const AddGraph = () => {
         </Grid>
         <Grid item lg={7} md={8} className="w-full">
           <GraphBuilderPreview
+            graphType={graphForm.values["graph_type"]}
             legendPosition={graphForm.values["legend_position"]}
             legendDisplay={graphForm.values["legend_enabled"]}
             graphTitle={graphForm.values["graph_title"]}

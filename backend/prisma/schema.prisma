@@ -233,6 +233,18 @@ model tbl_pm_users {
   tbl_pm_policy_objects tbl_pm_policy_objects? @relation(fields: [pm_policy_object_id], references: [pm_policy_object_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_tbl_pm_users_tbl_pm_policy_object_pm_policy_onject_id")
 }
 
+model tbl_pm_graphs {
+  pm_graph_id    Int       @id @default(autoincrement())
+  title          String    @db.VarChar
+  description    String?   @db.VarChar
+  is_disabled    Boolean?  @default(false)
+  created_at     DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at     DateTime  @default(now()) @db.Timestamptz(6)
+  disabled_at    DateTime? @db.Timestamptz(6)
+  disable_reason String?   @db.VarChar
+  graph_options  Json?
+}
+
 enum mpaa_rating {
   G
   PG

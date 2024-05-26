@@ -182,7 +182,7 @@ const PolicySettings = () => {
                 error={Boolean(policyObjectUpdateForm.errors["policy"])}
                 required={true}
                 customMapping={null}
-                jsonMode={"tree"}
+                language={"json"}
               />
             </Grid>
           </Grid>

@@ -4,7 +4,8 @@ const { morganMiddleware } = require("./morgan");
 
 var whitelist = [
   "http://localhost:3000",
-  "http://127.0.0.1:3000" /** other domains if any */,
+  "http://127.0.0.1:3000",
+  undefined /** other domains if any */,
 ];
 
 var corsOptions = {
@@ -14,6 +15,7 @@ var corsOptions = {
     if (whitelist.indexOf(origin) !== -1) {
       callback(null, true);
     } else {
+      console.log(origin);
       callback(new Error("Not allowed by CORS"));
     }
   },
