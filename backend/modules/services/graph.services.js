@@ -49,6 +49,45 @@ class GraphService {
    *
    * @param {object} param0
    * @param {Number} param0.graphID
+   * @param {String} param0.title
+   * @param {any} param0.graphOptions
+   * @returns {any|null}
+   */
+  static updateGraph = async ({ graphID, title, graphOptions }) => {
+    Logger.log("info", {
+      message: "GraphService:updateGraph:params",
+      params: { graphID, title, graphOptions },
+    });
+    try {
+      const updatedGraph = await prisma.tbl_pm_graphs.update({
+        where: {
+          pm_graph_id: graphID,
+        },
+        data: {
+          title: String(title),
+          graph_options: graphOptions,
+        },
+      });
+      Logger.log("success", {
+        message: "GraphService:updateGraph:newGraph",
+        params: {
+          updatedGraph,
+        },
+      });
+      return updatedGraph;
+    } catch (error) {
+      Logger.log("error", {
+        message: "GraphService:updateGraph:catch-1",
+        params: { error },
+      });
+      throw error;
+    }
+  };
+
+  /**
+   *
+   * @param {object} param0
+   * @param {Number} param0.graphID
    * @returns {any|null}
    */
   static getGraphData = async ({ graphID }) => {
@@ -83,12 +122,13 @@ class GraphService {
           const result = await prisma.$queryRaw`${Prisma.raw(queryItem.query)}`;
 
           const _y = [];
+          console.log({ queryItem });
           result.forEach((_r) => {
-            _labels[_r[graph.graph_options.x_axis]] = true;
+            _labels[_r[queryItem.x_axis]] = true;
             _y.push(
-              typeof _r[graph.graph_options.y_axis] === "bigint"
-                ? Number(_r[graph.graph_options.y_axis])
-                : _r[graph.graph_options.y_axis]
+              typeof _r[queryItem.y_axis] === "bigint"
+                ? Number(_r[queryItem.y_axis])
+                : _r[queryItem.y_axis]
             );
           });
 
@@ -115,6 +155,33 @@ class GraphService {
     } catch (error) {
       Logger.log("error", {
         message: "GraphService:getGraphData:catch-1",
+        params: { error },
+      });
+      throw error;
+    }
+  };
+
+  /**
+   *
+   * @param {object} param0
+   * @returns {any|null}
+   */
+  static getAllGraphs = async () => {
+    Logger.log("info", {
+      message: "GraphService:getAllGraphs:params",
+    });
+    try {
+      const graphs = await prisma.tbl_pm_graphs.findMany({});
+      Logger.log("info", {
+        message: "GraphService:getAllGraphs:graph",
+        params: {
+          graphsLength: graphs?.length,
+        },
+      });
+      return graphs;
+    } catch (error) {
+      Logger.log("error", {
+        message: "GraphService:getAllGraphs:catch-1",
         params: { error },
       });
       throw error;

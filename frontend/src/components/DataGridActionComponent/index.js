@@ -82,7 +82,7 @@ export const DataGridActionComponent = ({
     setIsSortMenuOpen(false);
   };
   const _handleNavigateRowAdditionForm = () => {
-    navigate(LOCAL_CONSTANTS.ROUTES.ADD_ROW.code);
+    navigate(LOCAL_CONSTANTS.ROUTES.ADD_ROW.path(tableName));
   };
 
   const _handleDeleteFilter = (index) => {

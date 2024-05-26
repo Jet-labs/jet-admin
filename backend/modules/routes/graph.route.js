@@ -9,11 +9,14 @@ const { graphController } = require("../controllers/graph.controller");
 const router = express.Router();
 
 // get all data of table
+router.get("/", authMiddleware.authProvider, graphController.getAllGraphs);
 router.post("/", authMiddleware.authProvider, graphController.addGraph);
+router.put("/", authMiddleware.authProvider, graphController.updateGraph);
 router.get(
   "/:id/data",
   authMiddleware.authProvider,
   graphController.getGraphData
 );
+
 
 module.exports = router;

@@ -84,24 +84,31 @@ export const LOCAL_CONSTANTS = {
 
     ALL_GRAPHS: {
       code: "/graphs",
+      path: () => "/graphs",
     },
     ADD_GRAPH: {
-      code: "add",
+      code: "/graphs/add",
+      path: () => "/graphs/add",
     },
     GRAPH_VIEW: {
-      code: ":id",
-      path: (id) => `${id}`,
+      code: "/graphs/:id",
+      path: (id) => `/graphs/${id}`,
+    },
+    ALL_TABLES: {
+      code: "/tables",
+      path: () => "/tables",
     },
     TABLE_VIEW: {
       code: "/tables/:table_name",
       path: (table_name) => `/tables/${table_name}`,
     },
     ADD_ROW: {
-      code: "add",
+      code: "/tables/:table_name/add",
+      path: (table_name) => `/tables/${table_name}/add`,
     },
     ROW_VIEW: {
-      code: ":id",
-      path: (id) => `${id}`,
+      code: "/tables/:table_name/:id",
+      path: (table_name, id) => `/tables/${table_name}/${id}`,
     },
     POLICY_MANAGEMENT: "/policy_editor",
     POLICY_SETTINGS: {
@@ -154,7 +161,9 @@ export const LOCAL_CONSTANTS = {
       sendAction: ({ action }) => `/admin_api/actions/${action}`,
     },
     GRAPH: {
+      getAllGraphs: () => `/admin_api/graphs`,
       addGraph: () => `/admin_api/graphs`,
+      updateGraph: () => `/admin_api/graphs`,
       getGraphDataByID: ({ id }) => `/admin_api/graphs/${id}/data`,
     },
 

@@ -8,6 +8,7 @@ import { RowUpdateForm } from "../../components/RowUpdateForm";
  */
 const RowView = ({}) => {
   const { table_name, id } = useParams();
+  console.log({ id });
   return (
     <div className="flex flex-col justify-start items-stretch w-full h-full">
       {table_name && id && <RowUpdateForm tableName={table_name} id={id} />}

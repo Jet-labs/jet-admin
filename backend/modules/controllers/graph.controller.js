@@ -50,6 +50,46 @@ graphController.addGraph = async (req, res) => {
  * @param {import("express").Response} res
  * @returns
  */
+graphController.updateGraph = async (req, res) => {
+  try {
+    const { pmUser, state, body } = req;
+    const pm_user_id = parseInt(pmUser.pm_user_id);
+
+    Logger.log("info", {
+      message: "graphController:updateGraph:params",
+      params: { pm_user_id, body },
+    });
+
+    const updatedGraph = await GraphService.updateGraph({
+      graphID:parseInt(body.graph_id),
+      title: body.graph_title,
+      graphOptions: body.graph_options,
+    });
+
+    Logger.log("success", {
+      message: "graphController:updateGraph:success",
+      params: { pm_user_id, updatedGraph },
+    });
+
+    return res.json({
+      success: true,
+      graph: updatedGraph,
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "graphController:updateGraph:catch-1",
+      params: { error },
+    });
+    return res.json({ success: false, error: extractError(error) });
+  }
+};
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @returns
+ */
 graphController.getGraphData = async (req, res) => {
   try {
     const { pmUser, state, params } = req;
@@ -77,6 +117,43 @@ graphController.getGraphData = async (req, res) => {
   } catch (error) {
     Logger.log("error", {
       message: "graphController:getGraphData:catch-1",
+      params: { error },
+    });
+    return res.json({ success: false, error: extractError(error) });
+  }
+};
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @returns
+ */
+graphController.getAllGraphs = async (req, res) => {
+  try {
+    const { pmUser, state, params } = req;
+    const pm_user_id = parseInt(pmUser.pm_user_id);
+    
+
+    Logger.log("info", {
+      message: "graphController:getAllGraphs:params",
+      params: { pm_user_id },
+    });
+
+    const graphs = await GraphService.getAllGraphs();
+
+    Logger.log("success", {
+      message: "graphController:getAllGraphs:success",
+      params: { pm_user_id, graphs },
+    });
+
+    return res.json({
+      success: true,
+      graphs: graphs,
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "graphController:getAllGraphs:catch-1",
       params: { error },
     });
     return res.json({ success: false, error: extractError(error) });

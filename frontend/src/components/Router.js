@@ -51,38 +51,49 @@ const AppRouter = ({}) => {
             }
           />
 
-          <Route path={LOCAL_CONSTANTS.ROUTES.TABLE_VIEW.code}>
+          <Route path={LOCAL_CONSTANTS.ROUTES.ALL_TABLES.code}>
             <Route
               index
               element={
                 <ProtectedRoute
-                  successComponent={TableView}
+                  successComponent={() => <div>tables</div>}
                   fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
                   loadingComponent={() => <Loading fullScreen />}
                 />
               }
             ></Route>
-            <Route
-              path={LOCAL_CONSTANTS.ROUTES.ROW_VIEW.code}
-              element={
-                <ProtectedRoute
-                  successComponent={RowView}
-                  fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
-                  loadingComponent={() => <Loading fullScreen />}
-                />
-              }
-            />
-
-            <Route
-              path={LOCAL_CONSTANTS.ROUTES.ADD_ROW.code}
-              element={
-                <ProtectedRoute
-                  successComponent={AddRow}
-                  fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
-                  loadingComponent={() => <Loading fullScreen />}
-                />
-              }
-            />
+            <Route path={LOCAL_CONSTANTS.ROUTES.TABLE_VIEW.code}>
+              <Route
+                index
+                element={
+                  <ProtectedRoute
+                    successComponent={TableView}
+                    fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
+                    loadingComponent={() => <Loading fullScreen />}
+                  />
+                }
+              />
+              <Route
+                path={LOCAL_CONSTANTS.ROUTES.ADD_ROW.code}
+                element={
+                  <ProtectedRoute
+                    successComponent={AddRow}
+                    fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
+                    loadingComponent={() => <Loading fullScreen />}
+                  />
+                }
+              />
+              <Route
+                path={LOCAL_CONSTANTS.ROUTES.ROW_VIEW.code}
+                element={
+                  <ProtectedRoute
+                    successComponent={RowView}
+                    fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
+                    loadingComponent={() => <Loading fullScreen />}
+                  />
+                }
+              />
+            </Route>
           </Route>
 
           <Route path={LOCAL_CONSTANTS.ROUTES.ALL_GRAPHS.code}>
@@ -102,7 +113,7 @@ const AppRouter = ({}) => {
               path={LOCAL_CONSTANTS.ROUTES.GRAPH_VIEW.code}
               element={
                 <ProtectedRoute
-                  successComponent={PolicySettings}
+                  successComponent={GraphView}
                   fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
                   loadingComponent={() => <Loading fullScreen />}
                 />

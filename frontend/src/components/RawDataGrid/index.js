@@ -158,6 +158,7 @@ export const RawDatagrid = ({
                 ? onRowClick(param)
                 : navigate(
                     LOCAL_CONSTANTS.ROUTES.ROW_VIEW.path(
+                      tableName,
                       JSON.stringify(selectByIDQueryBuilder(param.row))
                     )
                   );
