@@ -54,6 +54,7 @@ graphController.updateGraph = async (req, res) => {
   try {
     const { pmUser, state, body } = req;
     const pm_user_id = parseInt(pmUser.pm_user_id);
+    const authorized_graphs = state.authorized_graphs;
 
     Logger.log("info", {
       message: "graphController:updateGraph:params",
@@ -61,9 +62,10 @@ graphController.updateGraph = async (req, res) => {
     });
 
     const updatedGraph = await GraphService.updateGraph({
-      graphID:parseInt(body.graph_id),
+      graphID: parseInt(body.graph_id),
       title: body.graph_title,
       graphOptions: body.graph_options,
+      authorizedGraphs: authorized_graphs,
     });
 
     Logger.log("success", {
@@ -133,14 +135,16 @@ graphController.getAllGraphs = async (req, res) => {
   try {
     const { pmUser, state, params } = req;
     const pm_user_id = parseInt(pmUser.pm_user_id);
-    
+    const authorized_graphs = state.authorized_graphs;
 
     Logger.log("info", {
       message: "graphController:getAllGraphs:params",
       params: { pm_user_id },
     });
 
-    const graphs = await GraphService.getAllGraphs();
+    const graphs = await GraphService.getAllGraphs({
+      authorizedGraphs: authorized_graphs,
+    });
 
     Logger.log("success", {
       message: "graphController:getAllGraphs:success",

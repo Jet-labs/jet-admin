@@ -169,4 +169,40 @@ export class PMUser {
     }
     return authorization;
   };
+
+  extractAuthorizedGraphsForReadFromPolicyObject = () => {
+    const authorizeGraphIDs = [];
+    if (this.policy.graphs.read) {
+      return true;
+    } else if (this.policy.graphs && this.policy.graphs.graph_ids) {
+      Object.keys(this.policy.graphs.graph_ids).forEach((graphID) => {
+        if (this.policy.graphs.graph_ids[graphID].read) {
+          authorizeGraphIDs.push(parseInt(graphID));
+        }
+      });
+    }
+    return authorizeGraphIDs;
+  };
+
+  extractAuthorizedGraphsForUpdateFromPolicyObject = () => {
+    const authorizeGraphIDs = [];
+    if (this.policy.graphs.edit) {
+      return true;
+    } else if (this.policy.graphs && this.policy.graphs.graph_ids) {
+      Object.keys(this.policy.graphs.graph_ids).forEach((graphID) => {
+        if (this.policy.graphs.graph_ids[graphID].edit) {
+          authorizeGraphIDs.push(parseInt(graphID));
+        }
+      });
+    }
+    return authorizeGraphIDs;
+  };
+
+  extractAuthorizationForGraphAddFromPolicyObject = () => {
+    console.log(this.policy.graphs);
+    if (this.policy.graphs.add) {
+      return true;
+    }
+    return false;
+  };
 }

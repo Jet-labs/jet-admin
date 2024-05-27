@@ -13,10 +13,16 @@ import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
 import { getAllGraphAPI } from "../../api/graphs";
 import { LOCAL_CONSTANTS } from "../../constants";
+import { useAuthState } from "../../contexts/authContext";
+import { useMemo } from "react";
 
 export const GraphsList = ({ setCurrentPageTitle, currentPageTitle }) => {
   const theme = useTheme();
+  const { pmUser } = useAuthState();
   const navigate = useNavigate();
+  const isAuthorizedToAddGraph = useMemo(() => {
+    return pmUser && pmUser.extractAuthorizationForGraphAddFromPolicyObject();
+  }, [pmUser]);
   const {
     isLoading: isLoadingGraphs,
     data: graphs,
@@ -51,15 +57,17 @@ export const GraphsList = ({ setCurrentPageTitle, currentPageTitle }) => {
           primary="Graphs"
         />
       </ListItemButton>
-      <div className="!p-3 !w-full">
-        <Button
-          onClick={_navigateToAddMoreGraph}
-          variant="outlined"
-          className="!w-full"
-        >
-          Add more graphs
-        </Button>
-      </div>
+      {isAuthorizedToAddGraph && (
+        <div className="!p-3 !w-full">
+          <Button
+            onClick={_navigateToAddMoreGraph}
+            variant="outlined"
+            className="!w-full"
+          >
+            Add more graphs
+          </Button>
+        </div>
+      )}
 
       {graphs?.map((graph) => {
         const key = `graph_${graph.pm_graph_id}`;

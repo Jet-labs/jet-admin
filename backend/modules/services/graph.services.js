@@ -51,18 +51,32 @@ class GraphService {
    * @param {Number} param0.graphID
    * @param {String} param0.title
    * @param {any} param0.graphOptions
+   * @param {Boolean|Array<Number>} param0.authorizedGraphs
    * @returns {any|null}
    */
-  static updateGraph = async ({ graphID, title, graphOptions }) => {
+  static updateGraph = async ({
+    graphID,
+    title,
+    graphOptions,
+    authorizedGraphs,
+  }) => {
     Logger.log("info", {
       message: "GraphService:updateGraph:params",
       params: { graphID, title, graphOptions },
     });
     try {
       const updatedGraph = await prisma.tbl_pm_graphs.update({
-        where: {
-          pm_graph_id: graphID,
-        },
+        where:
+          authorizedGraphs === true
+            ? {
+                pm_graph_id: graphID,
+              }
+            : {
+                AND: [
+                  { pm_graph_id: graphID },
+                  { pm_graph_id: { in: authorizedGraphs } },
+                ],
+              },
         data: {
           title: String(title),
           graph_options: graphOptions,
@@ -166,14 +180,24 @@ class GraphService {
   /**
    *
    * @param {object} param0
+   * @param {Boolean|Array<Number>} param0.authorizedGraphs
    * @returns {any|null}
    */
-  static getAllGraphs = async () => {
+  static getAllGraphs = async ({ authorizedGraphs }) => {
     Logger.log("info", {
       message: "GraphService:getAllGraphs:params",
     });
     try {
-      const graphs = await prisma.tbl_pm_graphs.findMany({});
+      const graphs = await prisma.tbl_pm_graphs.findMany({
+        where:
+          authorizedGraphs === true
+            ? null
+            : {
+                pm_graph_id: {
+                  in: authorizedGraphs,
+                },
+              },
+      });
       Logger.log("info", {
         message: "GraphService:getAllGraphs:graph",
         params: {

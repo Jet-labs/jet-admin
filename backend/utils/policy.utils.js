@@ -19,6 +19,47 @@ policyUtils.extractAuthorizationForActions = ({
   return false;
 };
 
+policyUtils.extractAuthorizedGraphsForReadFromPolicyObject = ({
+  policyObject,
+}) => {
+  const authorizeGraphIDs = [];
+  if (policyObject.graphs.read) {
+    return true;
+  } else if (policyObject.graphs && policyObject.graphs.graph_ids) {
+    Object.keys(policyObject.graphs.graph_ids).forEach((graphID) => {
+      if (policyObject.graphs.graph_ids[graphID].read) {
+        authorizeGraphIDs.push(parseInt(graphID));
+      }
+    });
+  }
+  return authorizeGraphIDs;
+};
+
+policyUtils.extractAuthorizedGraphsForUpdateFromPolicyObject = ({
+  policyObject,
+}) => {
+  const authorizeGraphIDs = [];
+  if (policyObject.graphs.edit) {
+    return true;
+  } else if (policyObject.graphs && policyObject.graphs.graph_ids) {
+    Object.keys(policyObject.graphs.graph_ids).forEach((graphID) => {
+      if (policyObject.graphs.graph_ids[graphID].edit) {
+        authorizeGraphIDs.push(parseInt(graphID));
+      }
+    });
+  }
+  return authorizeGraphIDs;
+};
+
+policyUtils.extractAuthorizationForGraphAddFromPolicyObject = ({
+  policyObject,
+}) => {
+  if (policyObject.graphs.add) {
+    return true;
+  }
+  return false;
+};
+
 policyUtils.extractAuthorizedRowsForEditFromPolicyObject = ({
   policyObject,
   tableName,
