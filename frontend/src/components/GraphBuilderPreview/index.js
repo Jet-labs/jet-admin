@@ -7,6 +7,7 @@ import { BarGraphComponent } from "../BarGraphComponent";
 import { PieGraphComponent } from "../PieChartComponent";
 import { DoughnutGraphComponent } from "../DoughnutChartComponent";
 import { PolarAreaGraphComponent } from "../PolarAreaChartComponent";
+import { RadarGraphComponent } from "../RadarChartComponent";
 
 export const GraphBuilderPreview = ({
   graphType,
@@ -59,6 +60,14 @@ export const GraphBuilderPreview = ({
         )}
         {graphType === LOCAL_CONSTANTS.GRAPH_TYPES.POLAR_AREA.value && (
           <PolarAreaGraphComponent
+            legendPosition={legendPosition}
+            titleDisplayEnabled={titleDisplayEnabled}
+            graphTitle={graphTitle}
+            data={data}
+          />
+        )}
+        {graphType === LOCAL_CONSTANTS.GRAPH_TYPES.RADAR.value && (
+          <RadarGraphComponent
             legendPosition={legendPosition}
             titleDisplayEnabled={titleDisplayEnabled}
             graphTitle={graphTitle}

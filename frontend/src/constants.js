@@ -285,6 +285,7 @@ export const LOCAL_CONSTANTS = {
     PIE: { label: "Pie", value: "PIE" },
     DOUGHNUT: { label: "Doughnut", value: "DOUGHNUT" },
     POLAR_AREA: { label: "Polar Area", value: "POLAR_AREA" },
+    RADAR: { label: "Radar", value: "RADAR" },
   },
 
   GRAPH_LEGEND_POSITION: {

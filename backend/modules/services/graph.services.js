@@ -65,30 +65,39 @@ class GraphService {
       params: { graphID, title, graphOptions },
     });
     try {
-      const updatedGraph = await prisma.tbl_pm_graphs.update({
-        where:
-          authorizedGraphs === true
-            ? {
-                pm_graph_id: graphID,
-              }
-            : {
-                AND: [
-                  { pm_graph_id: graphID },
-                  { pm_graph_id: { in: authorizedGraphs } },
-                ],
-              },
-        data: {
-          title: String(title),
-          graph_options: graphOptions,
-        },
-      });
-      Logger.log("success", {
-        message: "GraphService:updateGraph:newGraph",
-        params: {
-          updatedGraph,
-        },
-      });
-      return updatedGraph;
+      if (authorizedGraphs.includes(graphID)) {
+        const updatedGraph = await prisma.tbl_pm_graphs.update({
+          where:
+            authorizedGraphs === true
+              ? {
+                  pm_graph_id: graphID,
+                }
+              : {
+                  AND: [
+                    { pm_graph_id: graphID },
+                    { pm_graph_id: { in: authorizedGraphs } },
+                  ],
+                },
+          data: {
+            title: String(title),
+            graph_options: graphOptions,
+          },
+        });
+        Logger.log("success", {
+          message: "GraphService:updateGraph:newGraph",
+          params: {
+            updatedGraph,
+          },
+        });
+        return updatedGraph;
+      } else {
+        Logger.log("error", {
+          message: "GraphService:updateGraph:catch-2",
+          params: { error: constants.ERROR_CODES.PERMISSION_DENIED },
+        });
+        throw constants.ERROR_CODES.PERMISSION_DENIED;
+      }
+      
     } catch (error) {
       Logger.log("error", {
         message: "GraphService:updateGraph:catch-1",
@@ -131,7 +140,9 @@ class GraphService {
         graph.graph_options.graph_type == constants.GRAPH_TYPES.PIE.value ||
         graph.graph_options.graph_type ==
           constants.GRAPH_TYPES.DOUGHNUT.value ||
-        graph.graph_options.graph_type == constants.GRAPH_TYPES.POLAR_AREA.value
+        graph.graph_options.graph_type ==
+          constants.GRAPH_TYPES.POLAR_AREA.value ||
+        graph.graph_options.graph_type == constants.GRAPH_TYPES.RADAR.value
       ) {
         let _labels = {};
 
