@@ -263,32 +263,36 @@ export const GraphBuilderForm = ({ graphForm }) => {
                 </Grid>
               )}
 
-              <Grid
-                item
-                xs={12}
-                sm={12}
-                md={12}
-                lg={12}
-                key={`query_array_fill-${index}`}
-              >
-                <FieldComponent
-                  type={LOCAL_CONSTANTS.DATA_TYPES.BOOLEAN}
-                  name={`query_array_fill-${index}`}
-                  value={dataset.fill}
-                  onBlur={graphForm.handleBlur}
-                  onChange={(e) => {
-                    _handleUpdateDatasetFill(index, e.target.value);
-                  }}
-                  setFieldValue={(name, value) => {
-                    _handleUpdateDatasetFill(
-                      parseInt(String(name).split("-")[1]),
-                      value
-                    );
-                  }}
-                  required={true}
-                  customMapping={null}
-                />
-              </Grid>
+              {LOCAL_CONSTANTS.GRAPH_TYPES[
+                graphForm.values["fill"]
+              ]?.fields?.includes("y_axis") && (
+                <Grid
+                  item
+                  xs={12}
+                  sm={12}
+                  md={12}
+                  lg={12}
+                  key={`query_array_fill-${index}`}
+                >
+                  <FieldComponent
+                    type={LOCAL_CONSTANTS.DATA_TYPES.BOOLEAN}
+                    name={`query_array_fill-${index}`}
+                    value={dataset.fill}
+                    onBlur={graphForm.handleBlur}
+                    onChange={(e) => {
+                      _handleUpdateDatasetFill(index, e.target.value);
+                    }}
+                    setFieldValue={(name, value) => {
+                      _handleUpdateDatasetFill(
+                        parseInt(String(name).split("-")[1]),
+                        value
+                      );
+                    }}
+                    required={true}
+                    customMapping={null}
+                  />
+                </Grid>
+              )}
 
               <Grid
                 item

@@ -79,6 +79,7 @@ const constants = {
     },
     PIE: { label: "Pie", value: "PIE" },
     DOUGHNUT: { label: "Doughnut", value: "DOUGHNUT" },
+    POLAR_AREA: { label: "Polar Area", value: "POLAR_AREA" },
   },
 };
 
