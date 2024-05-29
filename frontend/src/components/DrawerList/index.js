@@ -17,7 +17,11 @@ import { useAuthState } from "../../contexts/authContext";
 import { TablesList } from "../TablesDrawerList";
 import { GraphsList } from "../GraphsDrawerList";
 
-export const DrawerList = ({ currentPageTitle, setCurrentPageTitle }) => {
+export const DrawerList = ({
+  currentPageTitle,
+  setCurrentPageTitle,
+  isSubDrawerListOpen,
+}) => {
   const { pmUser } = useAuthState();
   const theme = useTheme();
 
@@ -30,11 +34,14 @@ export const DrawerList = ({ currentPageTitle, setCurrentPageTitle }) => {
     }
   }, [pmUser]);
 
-  console.log({ currentPageTitle, r: currentPageTitle?.includes("graph") });
-
   return (
     <Grid container className="!w-full">
-      <Grid item xs={6} md={6} lg={5}>
+      <Grid
+        item
+        xs={isSubDrawerListOpen ? 6 : 12}
+        md={isSubDrawerListOpen ? 6 : 12}
+        lg={isSubDrawerListOpen ? 5 : 12}
+      >
         <List
           sx={{}}
           component="nav"
@@ -270,22 +277,88 @@ export const DrawerList = ({ currentPageTitle, setCurrentPageTitle }) => {
               </ListItem>
             </Link>
           }
+          {
+            <Link
+              to={LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.code}
+              key={LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.code}
+              onClick={() => {
+                setCurrentPageTitle(
+                  LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.code
+                );
+              }}
+            >
+              <ListItem
+                disablePadding
+                selected={
+                  LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.code ==
+                  currentPageTitle
+                }
+                sx={{
+                  borderRight:
+                    LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.code ==
+                    currentPageTitle
+                      ? 3
+                      : 0,
+                  borderColor: theme.palette.primary.main,
+                }}
+              >
+                <ListItemButton>
+                  <ListItemIcon
+                    sx={{
+                      color:
+                        LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.code ==
+                        currentPageTitle
+                          ? theme.palette.primary.main
+                          : theme.palette.primary.contrastText,
+                    }}
+                  >
+                    <InsertChartIcon sx={{}} />
+                  </ListItemIcon>
+                  <ListItemText
+                    primaryTypographyProps={{
+                      sx: {
+                        marginLeft: -2,
+                        fontWeight:
+                          LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.code ==
+                          currentPageTitle
+                            ? "700"
+                            : "500",
+                      },
+                    }}
+                    sx={{
+                      color:
+                        LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.code ==
+                        currentPageTitle
+                          ? theme.palette.primary.main
+                          : theme.palette.primary.contrastText,
+                    }}
+                    primary={"Dashboards"}
+                  />
+                </ListItemButton>
+              </ListItem>
+            </Link>
+          }
         </List>
       </Grid>
       {
-        <Grid item xs={6} md={6} lg={7}>
+        <Grid
+          item
+          xs={isSubDrawerListOpen ? 6 : 0}
+          md={isSubDrawerListOpen ? 6 : 0}
+          lg={isSubDrawerListOpen ? 7 : 0}
+        >
           {String(currentPageTitle).includes("graph") ? (
             <GraphsList
               setCurrentPageTitle={setCurrentPageTitle}
               currentPageTitle={currentPageTitle}
             />
-          ) : (
+          ) : String(currentPageTitle).includes("table") ? (
             <TablesList
               authorizedTables={authorizedTables}
               setCurrentPageTitle={setCurrentPageTitle}
               currentPageTitle={currentPageTitle}
             />
-          )}
+          ) : null}
         </Grid>
       }
     </Grid>

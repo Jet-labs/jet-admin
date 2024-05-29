@@ -82,6 +82,20 @@ const create_user_table_query = `
 )
 `;
 
+const create_graph_table_query = `CREATE TABLE IF NOT EXISTS public.tbl_pm_graphs
+(
+    pm_graph_id serial NOT NULL,
+    title character varying COLLATE pg_catalog."default" NOT NULL,
+    description character varying COLLATE pg_catalog."default",
+    is_disabled boolean DEFAULT false,
+    created_at timestamp(6) with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp(6) with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    disabled_at timestamp(6) with time zone,
+    disable_reason character varying COLLATE pg_catalog."default",
+    graph_options jsonb,
+    CONSTRAINT tbl_pm_graphs_pkey PRIMARY KEY (pm_graph_id)
+);`;
+
 const super_admin_policy_query = `
       INSERT INTO tbl_pm_policy_objects(title, description, is_disabled, policy)
       VALUES($1, $2, $3, $4)
@@ -124,6 +138,7 @@ async function setup_database() {
     await client.query("BEGIN");
     await client.query(create_policy_table_query);
     await client.query(create_user_table_query);
+    await client.query(create_graph_table_query);
     await client.query("COMMIT");
 
     Logger.log("success", {

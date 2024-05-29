@@ -94,6 +94,18 @@ export const LOCAL_CONSTANTS = {
       code: "/graphs/:id",
       path: (id) => `/graphs/${id}`,
     },
+    ALL_DASHBOARD_LAYOUTS: {
+      code: "/dashboards",
+      path: () => "/dashboards",
+    },
+    ADD_DASHBOARD_LAYOUT: {
+      code: "/dashboards/add",
+      path: () => "/dashboards/add",
+    },
+    DASHBOARD_LAYOUT_VIEW: {
+      code: "/dashboards/:id",
+      path: (id) => `/dashboards/${id}`,
+    },
     ALL_TABLES: {
       code: "/tables",
       path: () => "/tables",

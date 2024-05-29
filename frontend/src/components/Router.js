@@ -15,6 +15,7 @@ import { lazy } from "react";
 import SignIn from "../pages/SignIn";
 import GraphView from "../pages/GraphView";
 
+
 const Home = lazy(() => import("../pages/Home"));
 const TableView = lazy(() => import("../pages/TableView"));
 const RowView = lazy(() => import("../pages/RowView"));
@@ -26,6 +27,9 @@ const AccountManagement = lazy(() => import("../pages/AccountManagement"));
 const AccountSettings = lazy(() => import("../pages/AccountSettings"));
 const AddAccount = lazy(() => import("../pages/AddAccount"));
 const AddGraph = lazy(() => import("../pages/AddGraph"));
+const AddDashboardLayoutView = lazy(() =>
+  import("../pages/AddDashboardLayoutView")
+);
 /**
  *
  * @param {object} param0
@@ -124,6 +128,43 @@ const AppRouter = ({}) => {
               element={
                 <ProtectedRoute
                   successComponent={AddGraph}
+                  fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
+                  loadingComponent={() => <Loading fullScreen />}
+                />
+              }
+            />
+          </Route>
+
+          <Route path={LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.code}>
+            <Route
+              index
+              element={
+                <ProtectedRoute
+                  successComponent={() => (
+                    <Navigate
+                      to={LOCAL_CONSTANTS.ROUTES.ADD_DASHBOARD_LAYOUT.code}
+                    />
+                  )}
+                  fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
+                  loadingComponent={() => <Loading fullScreen />}
+                />
+              }
+            />
+            {/* <Route
+              path={LOCAL_CONSTANTS.ROUTES.DASHBOARD_LAYOUT_VIEW.code}
+              element={
+                <ProtectedRoute
+                  successComponent={GraphView}
+                  fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
+                  loadingComponent={() => <Loading fullScreen />}
+                />
+              }
+            /> */}
+            <Route
+              path={LOCAL_CONSTANTS.ROUTES.ADD_DASHBOARD_LAYOUT.code}
+              element={
+                <ProtectedRoute
+                  successComponent={AddDashboardLayoutView}
                   fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
                   loadingComponent={() => <Loading fullScreen />}
                 />
