@@ -24,11 +24,13 @@ axiosInstance.interceptors.request.use(
 // Response interceptor for API calls
 axiosInstance.interceptors.response.use(
   async (response) => {
-    if (response.data.success === true) {
-      return response;
-    } else if (
+    console.log({ response });
+    if (
+      response &&
+      response.data &&
+      response.data.error &&
       response.data.error.code ==
-      LOCAL_CONSTANTS.ERROR_CODES.USER_AUTH_TOKEN_EXPIRED.code
+        LOCAL_CONSTANTS.ERROR_CODES.USER_AUTH_TOKEN_EXPIRED.code
     ) {
       try {
         const newAccessToken = await refreshAccessToken();
@@ -45,6 +47,7 @@ axiosInstance.interceptors.response.use(
         throw refreshError;
       }
     } else {
+      return response;
     }
   },
   async (error) => {

@@ -28,3 +28,25 @@
 [31merror[39m: dev_node_1: 28-05-2024 08:16:46: [31mgraphController:getGraphData:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
 [31merror[39m: dev_node_1: 28-05-2024 08:19:01: [31mGraphService:updateGraph:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
 [31merror[39m: dev_node_1: 28-05-2024 08:19:01: [31mgraphController:updateGraph:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 28-05-2024 08:20:44: [31mGraphService:updateGraph:catch-2[39m |====| {"error":{"code":"PERMISSION_DENIED","message":"Permission denied"}}
+[31merror[39m: dev_node_1: 28-05-2024 08:20:44: [31mGraphService:updateGraph:catch-1[39m |====| {"error":{"code":"PERMISSION_DENIED","message":"Permission denied"}}
+[31merror[39m: dev_node_1: 28-05-2024 08:20:44: [31mgraphController:updateGraph:catch-1[39m |====| {"error":{"code":"PERMISSION_DENIED","message":"Permission denied"}}
+[31merror[39m: dev_node_1: 28-05-2024 08:21:06: [31mGraphService:updateGraph:catch-2[39m |====| {"error":{"code":"PERMISSION_DENIED","message":"Permission denied"}}
+[31merror[39m: dev_node_1: 28-05-2024 08:21:06: [31mGraphService:updateGraph:catch-1[39m |====| {"error":{"code":"PERMISSION_DENIED","message":"Permission denied"}}
+[31merror[39m: dev_node_1: 28-05-2024 08:21:06: [31mgraphController:updateGraph:catch-1[39m |====| {"error":{"code":"PERMISSION_DENIED","message":"Permission denied"}}
+[31merror[39m: dev_node_1: 28-05-2024 08:21:09: [31mGraphService:getGraphData:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 28-05-2024 08:21:09: [31mgraphController:getGraphData:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 28-05-2024 08:21:10: [31mGraphService:getGraphData:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 28-05-2024 08:21:10: [31mgraphController:getGraphData:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 28-05-2024 08:21:17: [31mGraphService:updateGraph:catch-2[39m |====| {"error":{"code":"PERMISSION_DENIED","message":"Permission denied"}}
+[31merror[39m: dev_node_1: 28-05-2024 08:21:17: [31mGraphService:updateGraph:catch-1[39m |====| {"error":{"code":"PERMISSION_DENIED","message":"Permission denied"}}
+[31merror[39m: dev_node_1: 28-05-2024 08:21:17: [31mgraphController:updateGraph:catch-1[39m |====| {"error":{"code":"PERMISSION_DENIED","message":"Permission denied"}}
+[31merror[39m: dev_node_1: 28-05-2024 08:22:19: [31mGraphService:updateGraph:catch-2[39m |====| {"error":{"code":"PERMISSION_DENIED","message":"Permission denied"}}
+[31merror[39m: dev_node_1: 28-05-2024 08:22:19: [31mGraphService:updateGraph:catch-1[39m |====| {"error":{"code":"PERMISSION_DENIED","message":"Permission denied"}}
+[31merror[39m: dev_node_1: 28-05-2024 08:22:19: [31mgraphController:updateGraph:catch-1[39m |====| {"error":{"code":"PERMISSION_DENIED","message":"Permission denied"}}
+[31merror[39m: dev_node_1: 28-05-2024 08:23:15: [31mGraphService:updateGraph:catch-2[39m |====| {"error":{"code":"PERMISSION_DENIED","message":"Permission denied"}}
+[31merror[39m: dev_node_1: 28-05-2024 08:23:15: [31mGraphService:updateGraph:catch-1[39m |====| {"error":{"code":"PERMISSION_DENIED","message":"Permission denied"}}
+[31merror[39m: dev_node_1: 28-05-2024 08:23:15: [31mgraphController:updateGraph:catch-1[39m |====| {"error":{"code":"PERMISSION_DENIED","message":"Permission denied"}}
+[31merror[39m: dev_node_1: 28-05-2024 08:24:14: [31mGraphService:updateGraph:catch-2[39m |====| {"error":{"code":"PERMISSION_DENIED","message":"Permission denied"}}
+[31merror[39m: dev_node_1: 28-05-2024 08:24:14: [31mGraphService:updateGraph:catch-1[39m |====| {"error":{"code":"PERMISSION_DENIED","message":"Permission denied"}}
+[31merror[39m: dev_node_1: 28-05-2024 08:24:14: [31mgraphController:updateGraph:catch-1[39m |====| {"error":{"code":"PERMISSION_DENIED","message":"Permission denied"}}

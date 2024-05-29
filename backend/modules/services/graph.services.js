@@ -65,19 +65,11 @@ class GraphService {
       params: { graphID, title, graphOptions },
     });
     try {
-      if (authorizedGraphs.includes(graphID)) {
+      if (authorizedGraphs === true || authorizedGraphs.includes(graphID)) {
         const updatedGraph = await prisma.tbl_pm_graphs.update({
-          where:
-            authorizedGraphs === true
-              ? {
-                  pm_graph_id: graphID,
-                }
-              : {
-                  AND: [
-                    { pm_graph_id: graphID },
-                    { pm_graph_id: { in: authorizedGraphs } },
-                  ],
-                },
+          where: {
+            pm_graph_id: graphID,
+          },
           data: {
             title: String(title),
             graph_options: graphOptions,
@@ -97,7 +89,6 @@ class GraphService {
         });
         throw constants.ERROR_CODES.PERMISSION_DENIED;
       }
-      
     } catch (error) {
       Logger.log("error", {
         message: "GraphService:updateGraph:catch-1",
@@ -111,9 +102,10 @@ class GraphService {
    *
    * @param {object} param0
    * @param {Number} param0.graphID
+   * @param {Boolean|Array<Number>} param0.authorizedGraphs
    * @returns {any|null}
    */
-  static getGraphData = async ({ graphID }) => {
+  static getGraphData = async ({ graphID, authorizedGraphs }) => {
     Logger.log("info", {
       message: "GraphService:getGraphData:params",
       params: {
@@ -121,66 +113,76 @@ class GraphService {
       },
     });
     try {
-      const graph = await prisma.tbl_pm_graphs.findUnique({
-        where: {
-          pm_graph_id: graphID,
-        },
-      });
-      Logger.log("info", {
-        message: "GraphService:getGraphData:graph",
-        params: {
-          graph,
-        },
-      });
-      let dataset = { labels: null, datasets: [] };
-
-      if (
-        graph.graph_options.graph_type == constants.GRAPH_TYPES.LINE.value ||
-        graph.graph_options.graph_type == constants.GRAPH_TYPES.BAR.value ||
-        graph.graph_options.graph_type == constants.GRAPH_TYPES.PIE.value ||
-        graph.graph_options.graph_type ==
-          constants.GRAPH_TYPES.DOUGHNUT.value ||
-        graph.graph_options.graph_type ==
-          constants.GRAPH_TYPES.POLAR_AREA.value ||
-        graph.graph_options.graph_type == constants.GRAPH_TYPES.RADAR.value
-      ) {
-        let _labels = {};
-
-        const queryArray = Array.from(graph.graph_options.query_array);
-        const results = queryArray.map(async (queryItem) => {
-          const result = await prisma.$queryRaw`${Prisma.raw(queryItem.query)}`;
-
-          const _y = [];
-          console.log({ queryItem });
-          result.forEach((_r) => {
-            _labels[_r[queryItem.x_axis]] = true;
-            _y.push(
-              typeof _r[queryItem.y_axis] === "bigint"
-                ? Number(_r[queryItem.y_axis])
-                : _r[queryItem.y_axis]
-            );
-          });
-
-          dataset.datasets.push({
-            label: queryItem.dataset_title,
-            borderColor: queryItem.color,
-            backgroundColor: `${queryItem.color}80`,
-            data: _y,
-          });
+      if (authorizedGraphs === true || authorizedGraphs.includes(graphID)) {
+        const graph = await prisma.tbl_pm_graphs.findUnique({
+          where: {
+            pm_graph_id: graphID,
+          },
         });
-        await Promise.all(results);
-        dataset.labels = Object.keys(_labels).map((key) => key);
-      }
-      Logger.log("success", {
-        message: "GraphService:getGraphData:dataset",
-        params: {
-          graph,
-          dataset,
-        },
-      });
-      graph.dataset = dataset;
+        Logger.log("info", {
+          message: "GraphService:getGraphData:graph",
+          params: {
+            graph,
+          },
+        });
+        let dataset = { labels: null, datasets: [] };
 
-      return graph;
+        if (
+          graph.graph_options.graph_type == constants.GRAPH_TYPES.LINE.value ||
+          graph.graph_options.graph_type == constants.GRAPH_TYPES.BAR.value ||
+          graph.graph_options.graph_type == constants.GRAPH_TYPES.PIE.value ||
+          graph.graph_options.graph_type ==
+            constants.GRAPH_TYPES.DOUGHNUT.value ||
+          graph.graph_options.graph_type ==
+            constants.GRAPH_TYPES.POLAR_AREA.value ||
+          graph.graph_options.graph_type == constants.GRAPH_TYPES.RADAR.value
+        ) {
+          let _labels = {};
+
+          const queryArray = Array.from(graph.graph_options.query_array);
+          const results = queryArray.map(async (queryItem) => {
+            const result = await prisma.$queryRaw`${Prisma.raw(
+              queryItem.query
+            )}`;
+
+            const _y = [];
+            console.log({ queryItem });
+            result.forEach((_r) => {
+              _labels[_r[queryItem.x_axis]] = true;
+              _y.push(
+                typeof _r[queryItem.y_axis] === "bigint"
+                  ? Number(_r[queryItem.y_axis])
+                  : _r[queryItem.y_axis]
+              );
+            });
+
+            dataset.datasets.push({
+              label: queryItem.dataset_title,
+              borderColor: queryItem.color,
+              backgroundColor: `${queryItem.color}80`,
+              data: _y,
+            });
+          });
+          await Promise.all(results);
+          dataset.labels = Object.keys(_labels).map((key) => key);
+        }
+        Logger.log("success", {
+          message: "GraphService:getGraphData:dataset",
+          params: {
+            graph,
+            dataset,
+          },
+        });
+        graph.dataset = dataset;
+
+        return graph;
+      } else {
+        Logger.log("error", {
+          message: "GraphService:getGraphData:catch-2",
+          params: { error: constants.ERROR_CODES.PERMISSION_DENIED },
+        });
+        throw constants.ERROR_CODES.PERMISSION_DENIED;
+      }
     } catch (error) {
       Logger.log("error", {
         message: "GraphService:getGraphData:catch-1",
@@ -204,7 +206,7 @@ class GraphService {
       const graphs = await prisma.tbl_pm_graphs.findMany({
         where:
           authorizedGraphs === true
-            ? null
+            ? {}
             : {
                 pm_graph_id: {
                   in: authorizedGraphs,

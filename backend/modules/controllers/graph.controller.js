@@ -97,6 +97,7 @@ graphController.getGraphData = async (req, res) => {
     const { pmUser, state, params } = req;
     const pm_user_id = parseInt(pmUser.pm_user_id);
     const graph_id = parseInt(params.id);
+    const authorized_graphs = state.authorized_graphs;
 
     Logger.log("info", {
       message: "graphController:getGraphData:params",
@@ -105,6 +106,7 @@ graphController.getGraphData = async (req, res) => {
 
     const graph = await GraphService.getGraphData({
       graphID: graph_id,
+      authorizedGraphs: authorized_graphs,
     });
 
     Logger.log("success", {
