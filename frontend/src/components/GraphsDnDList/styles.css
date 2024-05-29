@@ -1,0 +1,13 @@
+.draggable-graph-item.dragging {
+  opacity: 1 !important;
+  border: 1px solid red !important
+}
+.draggable-graph-drag-icon-main{
+  min-width: 0 !important;
+  margin-left: 10px;
+                  
+}
+.draggable-graph-drag-icon-main:hover{
+  
+    cursor: -webkit-grab; cursor: grab;
+}

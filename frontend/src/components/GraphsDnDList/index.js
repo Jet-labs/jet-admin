@@ -1,4 +1,11 @@
-import { SsidChart, BarChart, DataUsage, TableRows } from "@mui/icons-material";
+import {
+  SsidChart,
+  BarChart,
+  DataUsage,
+  TableRows,
+  TrackChanges,
+  DragIndicator,
+} from "@mui/icons-material";
 import DataObjectIcon from "@mui/icons-material/DataObject";
 import {
   Button,
@@ -15,7 +22,7 @@ import { getAllGraphAPI } from "../../api/graphs";
 import { LOCAL_CONSTANTS } from "../../constants";
 import { useAuthState } from "../../contexts/authContext";
 import { useMemo } from "react";
-
+import "./styles.css";
 export const GraphsDnDList = ({}) => {
   const theme = useTheme();
   const { pmUser } = useAuthState();
@@ -34,27 +41,37 @@ export const GraphsDnDList = ({}) => {
     staleTime: Infinity,
   });
 
+  const _handleDragStart = (e) => {
+    e.dataTransfer.setData("text", e.currentTarget.id);
+  };
+
   return (
     <List
-      sx={{}}
-      component="nav"
       aria-labelledby="nested-list-subheader"
-      className="!overflow-y-auto !overflow-x-hidden !border-r !border-white !border-opacity-10 w-full"
+      className="!overflow-y-auto !overflow-x-hidden w-full !py-0 !px-2"
     >
-      {graphs?.map((graph) => {
+      {graphs?.map((graph, index) => {
         const key = `graph_${graph.pm_graph_id}`;
         return (
           <ListItem
-            key={`_graph_${graph.pm_graph_id}`}
+            key={`graph_${graph.pm_graph_id}`}
+            id={`graph_${graph.pm_graph_id}`}
             disablePadding
-            sx={{
-              borderRight: 0,
-              borderColor: theme.palette.primary.main,
-            }}
+            // sx={{
+            //   borderRight: 0,
+            //   borderColor: theme.palette.primary.main,
+            // }}
             draggable
+            onDragStart={_handleDragStart}
+            className="draggable-graph-item"
+            sx={{
+              marginTop: 1,
+              marginBottom: index === graphs.length - 1 ? 1 : 0,
+            }}
           >
             <ListItemButton
               sx={{ background: theme.palette.background.default }}
+              className="!rounded !shadow-md !flex !flex-row !justify-between !items-center !w-full"
             >
               <ListItemIcon
                 sx={{
@@ -65,8 +82,15 @@ export const GraphsDnDList = ({}) => {
                 LOCAL_CONSTANTS.GRAPH_TYPES.BAR.value ? (
                   <BarChart sx={{ fontSize: 16 }} />
                 ) : graph.graph_options.graph_type ===
-                  LOCAL_CONSTANTS.GRAPH_TYPES.PIE.value ? (
+                    LOCAL_CONSTANTS.GRAPH_TYPES.PIE.value ||
+                  graph.graph_options.graph_type ===
+                    LOCAL_CONSTANTS.GRAPH_TYPES.DOUGHNUT.value ||
+                  graph.graph_options.graph_type ===
+                    LOCAL_CONSTANTS.GRAPH_TYPES.POLAR_AREA.value ? (
                   <DataUsage sx={{ fontSize: 16 }} />
+                ) : graph.graph_options.graph_type ===
+                  LOCAL_CONSTANTS.GRAPH_TYPES.RADAR.value ? (
+                  <TrackChanges sx={{ fontSize: 16 }} />
                 ) : (
                   <SsidChart sx={{ fontSize: 16 }} />
                 )}
@@ -82,6 +106,14 @@ export const GraphsDnDList = ({}) => {
                   },
                 }}
               />
+              <ListItemIcon
+                sx={{
+                  color: theme.palette.primary.contrastText,
+                }}
+                className="draggable-graph-drag-icon-main"
+              >
+                <DragIndicator sx={{ fontSize: 16 }} />
+              </ListItemIcon>
             </ListItemButton>
           </ListItem>
         );

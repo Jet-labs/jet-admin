@@ -1,4 +1,10 @@
-import { SsidChart, BarChart, DataUsage, TableRows } from "@mui/icons-material";
+import {
+  SsidChart,
+  BarChart,
+  DataUsage,
+  TableRows,
+  TrackChanges,
+} from "@mui/icons-material";
 import DataObjectIcon from "@mui/icons-material/DataObject";
 import {
   Button,
@@ -104,8 +110,15 @@ export const GraphsList = ({ setCurrentPageTitle, currentPageTitle }) => {
                   LOCAL_CONSTANTS.GRAPH_TYPES.BAR.value ? (
                     <BarChart sx={{ fontSize: 16 }} />
                   ) : graph.graph_options.graph_type ===
-                    LOCAL_CONSTANTS.GRAPH_TYPES.PIE.value ? (
+                      LOCAL_CONSTANTS.GRAPH_TYPES.PIE.value ||
+                    graph.graph_options.graph_type ===
+                      LOCAL_CONSTANTS.GRAPH_TYPES.DOUGHNUT.value ||
+                    graph.graph_options.graph_type ===
+                      LOCAL_CONSTANTS.GRAPH_TYPES.POLAR_AREA.value ? (
                     <DataUsage sx={{ fontSize: 16 }} />
+                  ) : graph.graph_options.graph_type ===
+                    LOCAL_CONSTANTS.GRAPH_TYPES.RADAR.value ? (
+                    <TrackChanges sx={{ fontSize: 16 }} />
                   ) : (
                     <SsidChart sx={{ fontSize: 16 }} />
                   )}
