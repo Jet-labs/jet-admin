@@ -1,20 +1,14 @@
 import { Button, Grid, useTheme } from "@mui/material";
-import { useMutation, useQuery } from "@tanstack/react-query";
-import React, { useEffect, useState } from "react";
-import {
-  addGraphAPI,
-  getGraphDataByIDAPI,
-  updateGraphAPI,
-} from "../../api/graphs";
-import { LineGraphComponent } from "../../components/LineGraphComponent";
-import { LOCAL_CONSTANTS } from "../../constants";
+import { useMutation } from "@tanstack/react-query";
+import React, { useState } from "react";
+
 import { useFormik } from "formik";
-import { GraphBuilderForm } from "../../components/GraphBuilderForm";
-import { GraphBuilderPreview } from "../../components/GraphBuilderPreview";
-import { displayError, displaySuccess } from "../../utils/notification";
-import { useParams } from "react-router-dom";
+import { addDashboardLayoutAPI } from "../../api/dashboardLayouts";
+import { FieldComponent } from "../../components/FieldComponent";
 import { GraphsDnDList } from "../../components/GraphsDnDList";
-import { GraphBuilderPreviewWrapper } from "../../components/GraphBuilderPreviewWrapper";
+import { GraphWidgetComponent } from "../../components/GraphWidgetComponent";
+import { LOCAL_CONSTANTS } from "../../constants";
+import { displayError, displaySuccess } from "../../utils/notification";
 
 const GraphLayoutDropZoneComponent = ({ graphIDs, setGraphIDs }) => {
   const theme = useTheme();
@@ -28,14 +22,13 @@ const GraphLayoutDropZoneComponent = ({ graphIDs, setGraphIDs }) => {
 
   const _handleDrop = (e) => {
     const id = e.dataTransfer.getData("text");
-    console.log(`Somebody dropped an element with id: ${id}`);
-    if (graphIDs && id && !graphIDs.includes(parseInt(id.split("_")[1]))) {
+    if (graphIDs && id) {
       const _graphIDs = [...graphIDs, parseInt(id.split("_")[1])];
       setGraphIDs(_graphIDs);
     }
     setIsDraggableInDropZone(false);
   };
-  console.log({ graphIDs });
+
   return (
     <div
       className="w-full h-full p-2"
@@ -68,8 +61,8 @@ const GraphLayoutDropZoneComponent = ({ graphIDs, setGraphIDs }) => {
       >
         {graphIDs?.map((graphID, index) => {
           return (
-            <Grid item sx={6}>
-              <GraphBuilderPreviewWrapper id={graphID} />
+            <Grid item sx={6} md={6} lg={6} className="!p-1">
+              <GraphWidgetComponent id={graphID} />
             </Grid>
           );
         })}
@@ -79,11 +72,29 @@ const GraphLayoutDropZoneComponent = ({ graphIDs, setGraphIDs }) => {
 };
 const AddDashboardLayoutView = () => {
   const theme = useTheme();
-  const [graphIDs, setGraphIDs] = useState([]);
+
+  const {
+    isPending: isAddingDashboardLayout,
+    isSuccess: isAddingDashboardLayoutSuccess,
+    isError: isAddingDashboardLayoutError,
+    error: addDashboardLayoutError,
+    mutate: addDashboardLayout,
+  } = useMutation({
+    mutationFn: ({ data }) => {
+      return addDashboardLayoutAPI({ data });
+    },
+    retry: false,
+    onSuccess: () => {
+      displaySuccess("Added dashboard layout successfully");
+    },
+    onError: (error) => {
+      displayError(error);
+    },
+  });
   const dashboardLayoutForm = useFormik({
     initialValues: {
-      dashboard_title: "",
-      dashboard_description: "",
+      dashboard_layout_title: "",
+      graph_ids: [],
     },
     validateOnMount: false,
     validateOnChange: false,
@@ -93,11 +104,12 @@ const AddDashboardLayoutView = () => {
       return errors;
     },
     onSubmit: (values) => {
-      const { dashboard_title, dashboard_description, ...graph_options } =
-        values;
+      const { dashboard_layout_title, ...dashboard_layout_options } = values;
+      addDashboardLayout({
+        data: { dashboard_layout_title, dashboard_layout_options },
+      });
     },
   });
-
   return (
     <div className="w-full h-full">
       <Grid container className="!h-full">
@@ -106,7 +118,7 @@ const AddDashboardLayoutView = () => {
           lg={3}
           md={3}
           sm={4}
-          className="w-full !border-r !border-white !border-opacity-10 "
+          className="w-full !border-r !border-white !border-opacity-10"
         >
           <Grid sm={12}>
             <div
@@ -114,17 +126,47 @@ const AddDashboardLayoutView = () => {
               style={{ background: theme.palette.background.paper }}
             >
               <span className="text-lg font-bold text-start">{`Add new dashboard`}</span>
-              <Button variant="contained">Save</Button>
+              <Button
+                variant="contained"
+                onClick={dashboardLayoutForm.handleSubmit}
+              >
+                Save
+              </Button>
             </div>
           </Grid>
           <Grid sm={12}>
             <GraphsDnDList />
           </Grid>
         </Grid>
-        <Grid item lg={9} md={9} sm={8} className="w-full">
+
+        <Grid
+          item
+          lg={9}
+          md={9}
+          sm={8}
+          className="w-full !overflow-y-auto"
+          style={{ background: theme.palette.divider }}
+        >
+          <Grid
+            xs={12}
+            md={12}
+            lg={12}
+            item
+            className="!p-2"
+            style={{ background: theme.palette.divider }}
+          >
+            <FieldComponent
+              name={"dashboard_layout_title"}
+              type={LOCAL_CONSTANTS.DATA_TYPES.STRING}
+              value={dashboardLayoutForm.values["dashboard_layout_title"]}
+              onChange={dashboardLayoutForm.handleChange}
+            />
+          </Grid>
           <GraphLayoutDropZoneComponent
-            graphIDs={graphIDs}
-            setGraphIDs={setGraphIDs}
+            graphIDs={dashboardLayoutForm.values["graph_ids"]}
+            setGraphIDs={(value) =>
+              dashboardLayoutForm.setFieldValue("graph_ids", value)
+            }
           />
         </Grid>
       </Grid>

@@ -1,4 +1,4 @@
-import { PeopleAlt, Storage } from "@mui/icons-material";
+import { Dashboard, PeopleAlt, Storage } from "@mui/icons-material";
 import InsertChartIcon from "@mui/icons-material/InsertChart";
 import PolicyIcon from "@mui/icons-material/Policy";
 import {
@@ -312,7 +312,7 @@ export const DrawerList = ({
                           : theme.palette.primary.contrastText,
                     }}
                   >
-                    <InsertChartIcon sx={{}} />
+                    <Dashboard sx={{}} />
                   </ListItemIcon>
                   <ListItemText
                     primaryTypographyProps={{

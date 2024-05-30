@@ -60,6 +60,64 @@ policyUtils.extractAuthorizationForGraphAddFromPolicyObject = ({
   return false;
 };
 
+policyUtils.extractAuthorizedDashboardLayoutsForReadFromPolicyObject = ({
+  policyObject,
+}) => {
+  const authorizeDashboardLayoutIDs = [];
+  if (policyObject.dashboard_layouts?.read) {
+    return true;
+  } else if (
+    policyObject.dashboard_layouts &&
+    policyObject.dashboard_layouts.dashboard_layout_ids
+  ) {
+    Object.keys(policyObject.dashboard_layouts.dashboard_layout_ids).forEach(
+      (dashboardLayoutID) => {
+        if (
+          policyObject.dashboard_layouts.dashboard_layout_ids[dashboardLayoutID]
+            .read
+        ) {
+          authorizeDashboardLayoutIDs.push(parseInt(dashboardLayoutID));
+        }
+      }
+    );
+  }
+  return authorizeDashboardLayoutIDs;
+};
+
+policyUtils.extractAuthorizedDashboardLayoutsForUpdateFromPolicyObject = ({
+  policyObject,
+}) => {
+  const authorizeDashboardLayoutIDs = [];
+  if (policyObject.dashboard_layouts?.edit) {
+    return true;
+  } else if (
+    policyObject.dashboard_layouts &&
+    policyObject.dashboard_layouts.dashboard_layout_ids
+  ) {
+    Object.keys(policyObject.dashboard_layouts.dashboard_layout_ids).forEach(
+      (dashboardLayoutID) => {
+        if (
+          policyObject.dashboard_layouts.dashboard_layout_ids[dashboardLayoutID]
+            .edit
+        ) {
+          authorizeDashboardLayoutIDs.push(parseInt(dashboardLayoutID));
+        }
+      }
+    );
+  }
+  return authorizeDashboardLayoutIDs;
+};
+
+policyUtils.extractAuthorizationForDashboardLayoutAddFromPolicyObject = ({
+  policyObject,
+}) => {
+  if (policyObject.dashboard_layouts?.add) {
+    return true;
+  }
+  return false;
+};
+
+
 policyUtils.extractAuthorizedRowsForEditFromPolicyObject = ({
   policyObject,
   tableName,

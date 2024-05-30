@@ -67,7 +67,7 @@ export const GraphsList = ({ setCurrentPageTitle, currentPageTitle }) => {
         <div className="!p-3 !w-full">
           <Button
             onClick={_navigateToAddMoreGraph}
-            variant="outlined"
+            variant="contained"
             className="!w-full"
           >
             Add more graphs

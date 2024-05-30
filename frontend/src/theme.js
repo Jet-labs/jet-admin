@@ -1,4 +1,8 @@
 export const customDarkTheme = {
+  typography: {
+    fontFamily: "Roboto, Helvetica, Arial, sans-serif",
+    fontSize: 12,
+  },
   palette: {
     mode: "dark",
     common: {
@@ -89,6 +93,7 @@ export const customDarkTheme = {
       styleOverrides: {
         // Name of the slot
         root: {
+          fontSize: "0.75rem !important",
           // Some CSS
           background: "rgba(34, 34, 53, 1)",
           // paddingTop: 10,
@@ -100,6 +105,7 @@ export const customDarkTheme = {
     },
     MuiListItemButton: {
       defaultProps: {
+        fontSize: "0.75rem !important",
         // The props to change the default for.
         disableRipple: true, // No more ripple, on the whole application 💣!
       },
@@ -156,33 +162,28 @@ export const customDarkTheme = {
       },
     },
     MuiIconButton: {
-      // styleOverrides: {
-      //   // Name of the slot
-      //   root: {
-      //     // Some CSS
-      //     background: "rgba(34, 34, 53, 1)",
-      //     borderRadius: 4,
-      //     borderColor: "rgb(50, 50, 77)",
-      //     borderWidth: "1px",
-      //     border: "1px solid rgb(50, 50, 77)",
-      //     fontSize: 10,
-      //   },
-      // },
+      styleOverrides: {
+        // Name of the slot
+        root: {
+          fontSize: "0.75rem !important",
+        },
+      },
       defaultProps: {
         // The props to change the default for.
         disableRipple: true, // No more ripple, on the whole application 💣!
         elevation: 0,
+        fontSize: "0.75rem !important",
       },
     },
     MuiButton: {
       styleOverrides: {
         // Name of the slot
         root: {
-          fontSize: "0.75rem !important",
-          paddingTop: "6px !important",
-          paddingBottom: "6px !important",
-          paddingLeft: "10px !important",
-          paddingRight: "10px !important",
+          fontSize: "0.60rem !important",
+          paddingTop: "4px !important",
+          paddingBottom: "4px !important",
+          paddingLeft: "8px !important",
+          paddingRight: "8px !important",
           fontWeight: 600,
         },
         contained: {
@@ -200,9 +201,9 @@ export const customDarkTheme = {
       styleOverrides: {
         // Name of the slot
         root: {
-          // fontSize: "0.75rem !important",
-          paddingTop: "6px !important",
-          paddingBottom: "6px !important",
+          fontSize: "0.75rem !important",
+          paddingTop: "3px !important",
+          paddingBottom: "3px !important",
           paddingLeft: "10px !important",
           paddingRight: "10px !important",
 
@@ -242,8 +243,8 @@ export const customDarkTheme = {
       styleOverrides: {
         select: {
           fontSize: "0.75rem !important",
-          paddingTop: "0px !important",
-          paddingBottom: "0px !important",
+          paddingTop: "3px !important",
+          paddingBottom: "3px !important",
           paddingLeft: "0px !important",
           paddingRight: "0px !important",
 

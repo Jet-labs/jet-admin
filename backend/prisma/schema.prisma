@@ -246,15 +246,15 @@ model tbl_pm_graphs {
 }
 
 model tbl_pm_dashboard_layouts {
-  pm_dashboard_layout_id Int       @id(map: "tbl_pm_dashboard_layout_pkey") @default(autoincrement())
-  title                  String    @db.VarChar
-  description            String?   @db.VarChar
-  is_disabled            Boolean?  @default(false)
-  created_at             DateTime  @default(now()) @db.Timestamptz(6)
-  updated_at             DateTime  @default(now()) @db.Timestamptz(6)
-  disabled_at            DateTime? @db.Timestamptz(6)
-  disable_reason         String?   @db.VarChar
-  layout_options         Json?
+  pm_dashboard_layout_id   Int       @id(map: "tbl_pm_dashboard_layout_pkey") @default(autoincrement())
+  title                    String    @db.VarChar
+  description              String?   @db.VarChar
+  is_disabled              Boolean?  @default(false)
+  created_at               DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at               DateTime  @default(now()) @db.Timestamptz(6)
+  disabled_at              DateTime? @db.Timestamptz(6)
+  disable_reason           String?   @db.VarChar
+  dashboard_layout_options Json?
 }
 
 enum mpaa_rating {

@@ -178,6 +178,12 @@ export const LOCAL_CONSTANTS = {
       updateGraph: () => `/admin_api/graphs`,
       getGraphDataByID: ({ id }) => `/admin_api/graphs/${id}/data`,
     },
+    DASHBOARD_LAYOUT: {
+      getAllDashboardLayouts: () => `/admin_api/dashboard_layouts`,
+      getDashboardLayoutByID: ({ id }) => `/admin_api/dashboard_layouts/${id}`,
+      addDashboardLayout: () => `/admin_api/dashboard_layouts`,
+      updateDashboardLayout: () => `/admin_api/dashboard_layouts`,
+    },
 
     CONSTANTS: {
       fetchRemoteConstants: () => `/admin_api/constants/admin/`,
