@@ -17,33 +17,39 @@ import {
 } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
-import { getAllGraphAPI } from "../../api/graphs";
+import { getAllDashboardLayoutAPI } from "../../api/dashboardLayouts";
 import { LOCAL_CONSTANTS } from "../../constants";
 import { useAuthState } from "../../contexts/authContext";
 import { useMemo } from "react";
 
-export const GraphsDrawerList = ({ setCurrentPageTitle, currentPageTitle }) => {
+export const DashboardLayoutsList = ({
+  setCurrentPageTitle,
+  currentPageTitle,
+}) => {
   const theme = useTheme();
   const { pmUser } = useAuthState();
   const navigate = useNavigate();
-  const isAuthorizedToAddGraph = useMemo(() => {
-    return pmUser && pmUser.extractAuthorizationForGraphAddFromPolicyObject();
+  const isAuthorizedToAddDashboardLayout = useMemo(() => {
+    return (
+      pmUser &&
+      pmUser.extractAuthorizationForDashboardLayoutAddFromPolicyObject()
+    );
   }, [pmUser]);
   const {
-    isLoading: isLoadingGraphs,
-    data: graphs,
-    error: loadGraphsError,
-    refetch: refetchGraphs,
+    isLoading: isLoadingDashboardLayouts,
+    data: dashboardLayouts,
+    error: loadDashboardLayoutsError,
+    refetch: refetchDashboardLayouts,
   } = useQuery({
-    queryKey: [`REACT_QUERY_KEY_GRAPH`],
-    queryFn: () => getAllGraphAPI(),
+    queryKey: [`REACT_QUERY_KEY_DASHBOARD_LAYOUTS`],
+    queryFn: () => getAllDashboardLayoutAPI(),
     cacheTime: 0,
     retry: 1,
     staleTime: Infinity,
   });
 
-  const _navigateToAddMoreGraph = () => {
-    navigate(LOCAL_CONSTANTS.ROUTES.ADD_GRAPH.path());
+  const _navigateToAddMoreDashboardLayout = () => {
+    navigate(LOCAL_CONSTANTS.ROUTES.ADD_DASHBOARD_LAYOUT.path());
   };
   return (
     <List
@@ -60,33 +66,35 @@ export const GraphsDrawerList = ({ setCurrentPageTitle, currentPageTitle }) => {
           primaryTypographyProps={{
             sx: { marginLeft: -2 },
           }}
-          primary="Graphs"
+          primary="Dashboard Layouts"
         />
       </ListItemButton>
-      {isAuthorizedToAddGraph && (
+      {isAuthorizedToAddDashboardLayout && (
         <div className="!p-3 !w-full">
           <Button
-            onClick={_navigateToAddMoreGraph}
+            onClick={_navigateToAddMoreDashboardLayout}
             variant="contained"
             className="!w-full"
           >
-            Add more graphs
+            Add more dashboards
           </Button>
         </div>
       )}
 
-      {graphs?.map((graph) => {
-        const key = `graph_${graph.pm_graph_id}`;
+      {dashboardLayouts?.map((dashboardLayout) => {
+        const key = `dashboard_layout_${dashboardLayout.pm_dashboard_layout_id}`;
         return (
           <Link
-            to={LOCAL_CONSTANTS.ROUTES.GRAPH_VIEW.path(graph.pm_graph_id)}
+            to={LOCAL_CONSTANTS.ROUTES.GRAPH_VIEW.path(
+              dashboardLayout.pm_dashboard_layout_id
+            )}
             onClick={() => {
               setCurrentPageTitle(key);
             }}
             key={key}
           >
             <ListItem
-              key={`_graph_${graph.pm_graph_id}`}
+              key={`_dashboard_layout_${dashboardLayout.pm_dashboard_layout_id}`}
               disablePadding
               sx={{
                 borderRight: key == currentPageTitle ? 3 : 0,
@@ -106,22 +114,7 @@ export const GraphsDrawerList = ({ setCurrentPageTitle, currentPageTitle }) => {
                         : theme.palette.primary.contrastText,
                   }}
                 >
-                  {graph.graph_options.graph_type ===
-                  LOCAL_CONSTANTS.GRAPH_TYPES.BAR.value ? (
-                    <BarChart sx={{ fontSize: 16 }} />
-                  ) : graph.graph_options.graph_type ===
-                      LOCAL_CONSTANTS.GRAPH_TYPES.PIE.value ||
-                    graph.graph_options.graph_type ===
-                      LOCAL_CONSTANTS.GRAPH_TYPES.DOUGHNUT.value ||
-                    graph.graph_options.graph_type ===
-                      LOCAL_CONSTANTS.GRAPH_TYPES.POLAR_AREA.value ? (
-                    <DataUsage sx={{ fontSize: 16 }} />
-                  ) : graph.graph_options.graph_type ===
-                    LOCAL_CONSTANTS.GRAPH_TYPES.RADAR.value ? (
-                    <TrackChanges sx={{ fontSize: 16 }} />
-                  ) : (
-                    <SsidChart sx={{ fontSize: 16 }} />
-                  )}
+                  <SsidChart sx={{ fontSize: 16 }} />
                 </ListItemIcon>
                 <ListItemText
                   sx={{
@@ -130,7 +123,7 @@ export const GraphsDrawerList = ({ setCurrentPageTitle, currentPageTitle }) => {
                         ? theme.palette.primary.main
                         : theme.palette.primary.contrastText,
                   }}
-                  primary={graph.title}
+                  primary={dashboardLayout.title}
                   primaryTypographyProps={{
                     sx: {
                       fontWeight: key == currentPageTitle ? "700" : "500",

@@ -65,7 +65,7 @@ export const getAllDashboardLayoutAPI = async () => {
       LOCAL_CONSTANTS.APIS.DASHBOARD_LAYOUT.getAllDashboardLayouts()
     );
     if (response.data && response.data.success == true) {
-      return DashboardLayout.toList(response.data.graphs);
+      return DashboardLayout.toList(response.data.dashboardLayouts);
     } else if (response.data.error) {
       throw response.data.error;
     } else {

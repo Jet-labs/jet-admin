@@ -52,15 +52,15 @@ export const GraphLayoutDropZoneComponent = ({
           isDraggableInDropZone
             ? {
                 background: theme.palette.divider,
-                borderRadius: 2,
-                borderWidth: 2,
+                borderRadius: 4,
+                borderWidth: 3,
                 borderStyle: "dotted",
                 borderColor: theme.palette.info.main,
               }
             : {
                 background: theme.palette.divider,
-                borderRadius: 2,
-                borderWidth: 1,
+                borderRadius: 4,
+                borderWidth: 2,
                 borderStyle: "dotted",
                 borderColor: theme.palette.info.dark,
               }

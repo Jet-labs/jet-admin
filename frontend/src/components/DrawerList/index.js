@@ -15,7 +15,8 @@ import { Link } from "react-router-dom";
 import { LOCAL_CONSTANTS } from "../../constants";
 import { useAuthState } from "../../contexts/authContext";
 import { TablesList } from "../TablesDrawerList";
-import { GraphsList } from "../GraphsDrawerList";
+import { GraphsDrawerList } from "../GraphsDrawerList";
+import { DashboardLayoutsList } from "../DashboardLayoutDrawerList";
 
 export const DrawerList = ({
   currentPageTitle,
@@ -34,6 +35,7 @@ export const DrawerList = ({
     }
   }, [pmUser]);
 
+  console.log({ currentPageTitle });
   return (
     <Grid container className="!w-full">
       <Grid
@@ -348,13 +350,18 @@ export const DrawerList = ({
           lg={isSubDrawerListOpen ? 7 : 0}
         >
           {String(currentPageTitle).includes("graph") ? (
-            <GraphsList
+            <GraphsDrawerList
               setCurrentPageTitle={setCurrentPageTitle}
               currentPageTitle={currentPageTitle}
             />
           ) : String(currentPageTitle).includes("table") ? (
             <TablesList
               authorizedTables={authorizedTables}
+              setCurrentPageTitle={setCurrentPageTitle}
+              currentPageTitle={currentPageTitle}
+            />
+          ) : String(currentPageTitle).includes("dashboard_layout") ? (
+            <DashboardLayoutsList
               setCurrentPageTitle={setCurrentPageTitle}
               currentPageTitle={currentPageTitle}
             />
