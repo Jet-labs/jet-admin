@@ -103,6 +103,6 @@ export const BarGraphComponent = ({
     };
   }, [legendPosition, titleDisplayEnabled, graphTitle]);
 
-  console.log({ data, demoData });
+
   return <Bar options={options} data={data ? data : demoData} />;
 };

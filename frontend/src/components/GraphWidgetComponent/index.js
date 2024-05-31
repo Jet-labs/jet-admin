@@ -1,4 +1,4 @@
-import { Grid, useTheme } from "@mui/material";
+import { Grid, IconButton, useTheme } from "@mui/material";
 import React from "react";
 
 import { LineGraphComponent } from "../LineGraphComponent";
@@ -10,6 +10,7 @@ import { PolarAreaGraphComponent } from "../PolarAreaChartComponent";
 import { RadarGraphComponent } from "../RadarChartComponent";
 import { useQuery } from "@tanstack/react-query";
 import { getGraphDataByIDAPI } from "../../api/graphs";
+import { Delete } from "@mui/icons-material";
 
 export const GraphWidgetComponent = ({ id }) => {
   const theme = useTheme();
@@ -31,12 +32,14 @@ export const GraphWidgetComponent = ({ id }) => {
   const legendPosition = graphData?.graph_options.legend_position;
   const titleDisplayEnabled = graphData?.graph_options.title_display_enabled;
   const data = graphData?.dataset;
-  console.log({ graphTitle });
+
   return (
-    <Grid
-      container
-      className="rounded !p-3"
-      style={{ background: theme.palette.action.selected }}
+    <div
+      className="rounded !p-3 !w-full"
+      style={{
+        background: theme.palette.action.selected,
+        height: 400,
+      }}
     >
       {graphType === LOCAL_CONSTANTS.GRAPH_TYPES.LINE.value && (
         <LineGraphComponent
@@ -86,6 +89,6 @@ export const GraphWidgetComponent = ({ id }) => {
           data={data}
         />
       )}
-    </Grid>
+    </div>
   );
 };

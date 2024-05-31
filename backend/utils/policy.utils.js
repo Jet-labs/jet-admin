@@ -117,7 +117,6 @@ policyUtils.extractAuthorizationForDashboardLayoutAddFromPolicyObject = ({
   return false;
 };
 
-
 policyUtils.extractAuthorizedRowsForEditFromPolicyObject = ({
   policyObject,
   tableName,
@@ -234,6 +233,7 @@ policyUtils.extractAuthorizedIncludeColumnsForReadFromPolicyObject = ({
 
   return authorized_include_columns;
 };
+
 policyUtils.extractAuthorizedForRowAdditionFromPolicyObject = ({
   policyObject,
   tableName,

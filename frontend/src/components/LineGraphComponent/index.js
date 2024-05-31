@@ -107,6 +107,6 @@ export const LineGraphComponent = ({
     };
   }, [legendPosition, titleDisplayEnabled, graphTitle]);
 
-  console.log({ data, demoData });
+
   return <Line options={options} data={data ? data : demoData} />;
 };

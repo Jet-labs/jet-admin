@@ -19,7 +19,6 @@ export const GraphBuilderForm = ({ graphForm }) => {
       ...newQueryArrayFieldValue,
       { dataset_title: "", color: "#D84545", query: "" },
     ]);
-    console.log(graphForm.values["query_array"]);
   };
 
   const _handleUpdateDatasetLabel = (index, value) => {

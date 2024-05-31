@@ -26,7 +26,7 @@ export const updateDashboardLayoutAPI = async ({ data }) => {
       LOCAL_CONSTANTS.APIS.DASHBOARD_LAYOUT.updateDashboardLayout(),
       data
     );
-    console.log({ response });
+
     if (response.data && response.data.success == true) {
       return true;
     } else if (response.data && response.data.error) {

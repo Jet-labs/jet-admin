@@ -17,7 +17,6 @@ export const GraphBuilderPreview = ({
   data,
 }) => {
   const theme = useTheme();
-  console.log({ graphType });
   return (
     <div className="!pt-10  !sticky !top-0 !z-50">
       <Grid
