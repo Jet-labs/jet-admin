@@ -5,7 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { AuthContextProvider } from "../contexts/authContext";
 import { SocketContextProvider } from "../contexts/socketContext";
 import { ConstantsContextProvider } from "../contexts/constantsContext";
-import { customDarkTheme, customLightTheme } from "../theme";
+import { customDarkTheme } from "../theme";
 
 const theme = createTheme(customDarkTheme);
 

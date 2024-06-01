@@ -70,7 +70,7 @@ export const DashboardLayoutsList = ({
         />
       </ListItemButton>
       {isAuthorizedToAddDashboardLayout && (
-        <div className="!p-3 !w-full">
+        <div className="!p-3 !w-full !pb-1.5">
           <Button
             onClick={_navigateToAddMoreDashboardLayout}
             variant="contained"
@@ -96,14 +96,12 @@ export const DashboardLayoutsList = ({
             <ListItem
               key={`_dashboard_layout_${dashboardLayout.pm_dashboard_layout_id}`}
               disablePadding
-              sx={{
-                borderRight: key == currentPageTitle ? 3 : 0,
-                borderColor: theme.palette.primary.main,
-              }}
+              className="!px-3 !py-1.5"
             >
               <ListItemButton
                 sx={{ background: theme.palette.background.default }}
                 selected={key == currentPageTitle}
+                className="!rounded"
               >
                 <ListItemIcon
                   className="!ml-1"

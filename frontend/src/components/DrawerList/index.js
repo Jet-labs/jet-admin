@@ -167,10 +167,10 @@ export const DrawerList = ({
           }
           {
             <Link
-              to={LOCAL_CONSTANTS.ROUTES.ALL_TABLES.code}
-              key={LOCAL_CONSTANTS.ROUTES.ALL_TABLES.code}
+              to={LOCAL_CONSTANTS.ROUTES.ALL_TABLES.path()}
+              key={LOCAL_CONSTANTS.ROUTES.ALL_TABLES.path()}
               onClick={() => {
-                setCurrentPageTitle(LOCAL_CONSTANTS.ROUTES.ALL_TABLES.code);
+                setCurrentPageTitle?.(LOCAL_CONSTANTS.ROUTES.ALL_TABLES.code);
               }}
             >
               <ListItem
@@ -351,12 +351,6 @@ export const DrawerList = ({
         >
           {String(currentPageTitle).includes("graph") ? (
             <GraphsDrawerList
-              setCurrentPageTitle={setCurrentPageTitle}
-              currentPageTitle={currentPageTitle}
-            />
-          ) : String(currentPageTitle).includes("table") ? (
-            <TablesList
-              authorizedTables={authorizedTables}
               setCurrentPageTitle={setCurrentPageTitle}
               currentPageTitle={currentPageTitle}
             />

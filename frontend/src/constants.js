@@ -107,20 +107,20 @@ export const LOCAL_CONSTANTS = {
       path: (id) => `/dashboard_layout/${id}`,
     },
     ALL_TABLES: {
-      code: "/tables",
+      code: "/tables/*",
       path: () => "/tables",
     },
     TABLE_VIEW: {
-      code: "/tables/:table_name",
-      path: (table_name) => `/tables/${table_name}`,
+      code: ":table_name",
+      path: (table_name) => `${table_name}`,
     },
     ADD_ROW: {
-      code: "/tables/:table_name/add",
-      path: (table_name) => `/tables/${table_name}/add`,
+      code: ":table_name/add",
+      path: (table_name) => `${table_name}/add`,
     },
     ROW_VIEW: {
-      code: "/tables/:table_name/:id",
-      path: (table_name, id) => `/tables/${table_name}/${id}`,
+      code: ":table_name/:id",
+      path: (table_name, id) => `${table_name}/${id}`,
     },
     POLICY_MANAGEMENT: "/policy_editor",
     POLICY_SETTINGS: {
@@ -300,10 +300,22 @@ export const LOCAL_CONSTANTS = {
       value: "LINE",
       fields: ["x_axis", "y_axis", "fill"],
     },
-    PIE: { label: "Pie", value: "PIE" },
-    DOUGHNUT: { label: "Doughnut", value: "DOUGHNUT" },
-    POLAR_AREA: { label: "Polar Area", value: "POLAR_AREA" },
-    RADAR: { label: "Radar", value: "RADAR" },
+    PIE: { label: "Pie", value: "PIE", fields: ["x_axis", "y_axis"] },
+    DOUGHNUT: {
+      label: "Doughnut",
+      value: "DOUGHNUT",
+      fields: ["x_axis", "y_axis"],
+    },
+    POLAR_AREA: {
+      label: "Polar Area",
+      value: "POLAR_AREA",
+      fields: ["x_axis", "y_axis"],
+    },
+    RADAR: {
+      label: "Radar",
+      value: "RADAR",
+      fields: ["x_axis", "y_axis"],
+    },
   },
 
   GRAPH_LEGEND_POSITION: {

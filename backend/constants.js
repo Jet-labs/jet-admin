@@ -15,7 +15,7 @@ const constants = {
   ACCESS_TOKEN_TIMEOUT: 900, // in sec
   REFRESH_TOKEN_TIMEOUT: 86400, // in sec
 
-  ROW_PAGE_SIZE: 10,
+  ROW_PAGE_SIZE: 100,
 
   DUMMY_PERMISSION: {
     tables: {

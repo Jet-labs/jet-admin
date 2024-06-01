@@ -29,7 +29,6 @@ export const Layout = ({ children }) => {
 
   const isSubDrawerListOpen =
     String(currentPageTitle).includes("graph") ||
-    String(currentPageTitle).includes("table") ||
     String(currentPageTitle).includes("dashboard_layout");
 
   const stickyDrawer = useMemo(() => {

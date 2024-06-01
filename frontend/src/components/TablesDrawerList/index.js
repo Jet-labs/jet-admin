@@ -40,22 +40,24 @@ export const TablesList = ({
         return (
           <Link
             to={LOCAL_CONSTANTS.ROUTES.TABLE_VIEW.path(table)}
-            onClick={() => {
-              setCurrentPageTitle(key);
-            }}
+            // onClick={() => {
+            //   setCurrentPageTitle(key);
+            // }}
             key={key}
           >
             <ListItem
               key={key}
               disablePadding
-              sx={{
-                borderRight: key == currentPageTitle ? 3 : 0,
-                borderColor: theme.palette.primary.main,
-              }}
+              className="!px-3 !py-1.5"
+              // sx={{
+              //   borderRight: key == currentPageTitle ? 3 : 0,
+              //   borderColor: theme.palette.primary.main,
+              // }}
             >
               <ListItemButton
                 sx={{ background: theme.palette.background.default }}
                 selected={key == currentPageTitle}
+                className="!rounded"
               >
                 <ListItemIcon
                   className="!ml-1"

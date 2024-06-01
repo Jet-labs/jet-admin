@@ -64,7 +64,7 @@ export const GraphsDrawerList = ({ setCurrentPageTitle, currentPageTitle }) => {
         />
       </ListItemButton>
       {isAuthorizedToAddGraph && (
-        <div className="!p-3 !w-full">
+        <div className="!p-3 !w-full !pb-1.5">
           <Button
             onClick={_navigateToAddMoreGraph}
             variant="contained"
@@ -88,14 +88,16 @@ export const GraphsDrawerList = ({ setCurrentPageTitle, currentPageTitle }) => {
             <ListItem
               key={`_graph_${graph.pm_graph_id}`}
               disablePadding
-              sx={{
-                borderRight: key == currentPageTitle ? 3 : 0,
-                borderColor: theme.palette.primary.main,
-              }}
+              // sx={{
+              //   borderRight: key == currentPageTitle ? 3 : 0,
+              //   borderColor: theme.palette.primary.main,
+              // }}
+              className="!px-3 !py-1.5"
             >
               <ListItemButton
                 sx={{ background: theme.palette.background.default }}
                 selected={key == currentPageTitle}
+                className="!rounded"
               >
                 <ListItemIcon
                   className="!ml-1"
