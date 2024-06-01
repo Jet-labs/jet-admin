@@ -154,14 +154,21 @@ class DashboardLayoutService {
   }) => {
     Logger.log("info", {
       message: "DashboardLayoutService:getDashboardLayoutByID:params",
+      params: {
+        authorizedDashboardLayouts,
+      },
     });
     try {
-      if (authorizedDashboardLayouts.includes(dashboardLayoutID)) {
-        const dashboardLayout = await prisma.tbl_pm_dashboard_layouts.findMany({
-          where: {
-            pm_dashboard_layout_id: dashboardLayoutID,
-          },
-        });
+      if (
+        authorizedDashboardLayouts === true ||
+        authorizedDashboardLayouts.includes(dashboardLayoutID)
+      ) {
+        const dashboardLayout =
+          await prisma.tbl_pm_dashboard_layouts.findUnique({
+            where: {
+              pm_dashboard_layout_id: dashboardLayoutID,
+            },
+          });
         Logger.log("info", {
           message:
             "DashboardLayoutService:getDashboardLayoutByID:dashboardLayout",

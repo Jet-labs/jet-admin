@@ -8,12 +8,8 @@ import {
 } from "@mui/material";
 import { FaDatabase, FaTable } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import { LOCAL_CONSTANTS } from "../../constants";
-export const TableDrawerList = ({
-  authorizedTables,
-  setCurrentPageTitle,
-  currentPageTitle,
-}) => {
+import { LOCAL_CONSTANTS } from "../../../constants";
+export const TableDrawerList = ({ authorizedTables, currentPageTitle }) => {
   const theme = useTheme();
   return (
     <List
@@ -37,13 +33,7 @@ export const TableDrawerList = ({
       {authorizedTables?.map((table) => {
         const key = `table_${table}`;
         return (
-          <Link
-            to={LOCAL_CONSTANTS.ROUTES.TABLE_VIEW.path(table)}
-            // onClick={() => {
-            //   setCurrentPageTitle(key);
-            // }}
-            key={key}
-          >
+          <Link to={LOCAL_CONSTANTS.ROUTES.TABLE_VIEW.path(table)} key={key}>
             <ListItem
               key={key}
               disablePadding

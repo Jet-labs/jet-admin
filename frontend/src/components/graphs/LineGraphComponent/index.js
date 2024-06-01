@@ -1,14 +1,33 @@
 import { useTheme } from "@mui/material";
-import { ArcElement, Chart as ChartJS, Legend, Tooltip } from "chart.js";
+import {
+  CategoryScale,
+  Chart as ChartJS,
+  Filler,
+  Legend,
+  LinearScale,
+  LineElement,
+  PointElement,
+  Title,
+  Tooltip,
+} from "chart.js";
 import React, { useMemo } from "react";
-import { Pie } from "react-chartjs-2";
+import { Line } from "react-chartjs-2";
 
-import { faker } from "@faker-js/faker";
-import { LOCAL_CONSTANTS } from "../../constants";
+import { da, faker } from "@faker-js/faker";
+import { LOCAL_CONSTANTS } from "../../../constants";
 
-ChartJS.register(ArcElement, Tooltip, Legend);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Filler,
+  Legend
+);
 
-export class PieChartDataset {
+export class LineChartDataset {
   /**
    *
    * @param {object} param0
@@ -24,12 +43,12 @@ export class PieChartDataset {
     this.backgroundColor = backgroundColor;
   }
 }
-export class PieChartData {
+export class LineChartData {
   /**
    *
    * @param {object} param0
    * @param {Array<String>} param0.labels
-   * @param {Array<PieChartDataset>} param0.datasets
+   * @param {Array<LineChartDataset>} param0.datasets
    */
   constructor({ labels, datasets }) {
     this.labels = labels;
@@ -57,7 +76,7 @@ const demoData = {
   ],
 };
 
-export const PieGraphComponent = ({
+export const LineGraphComponent = ({
   legendPosition,
   titleDisplayEnabled,
   graphTitle,
@@ -88,5 +107,5 @@ export const PieGraphComponent = ({
     };
   }, [legendPosition, titleDisplayEnabled, graphTitle]);
 
-  return <Pie options={options} data={data ? data : demoData} />;
+  return <Line options={options} data={data ? data : demoData} />;
 };

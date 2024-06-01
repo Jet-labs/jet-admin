@@ -8,33 +8,28 @@ import {
 } from "@mui/material";
 import { lazy, useMemo, useState } from "react";
 import { Outlet, Route, Routes, useNavigate } from "react-router-dom";
-import { useAuthState } from "../../contexts/authContext";
-import { Navbar } from "../Navbar";
-import { TableDrawerList } from "../TableDrawerList";
-import { LOCAL_CONSTANTS } from "../../constants";
-import ProtectedRoute from "../ProtectedRoute";
-import { Loading } from "../../pages/Loading";
-import { GraphDrawerList } from "../GraphDrawerList";
+import { useAuthState } from "../../../contexts/authContext";
+import { Navbar } from "../../Navbar";
+import { TableDrawerList } from "../../drawerLists/TableDrawerList";
+import { LOCAL_CONSTANTS } from "../../../constants";
+import ProtectedRoute from "../../ProtectedRoute";
+import { Loading } from "../../../pages/Loading";
+import { GraphDrawerList } from "../../drawerLists/GraphDrawerList";
 // import TableView from "../../pages/TableView";
 
-const GraphView = lazy(() => import("../../pages/GraphView"));
-const AddGraph = lazy(() => import("../../pages/AddGraph"));
+const GraphView = lazy(() => import("../../../pages/GraphView"));
+const AddGraph = lazy(() => import("../../../pages/AddGraph"));
 
 const GraphLayout = () => {
-  const theme = useTheme();
-  const stickyDrawer = useMemo(() => {
-    return (
-      <Grid item sm={0} md={0} lg={3} xl={2}>
-        <GraphDrawerList />
-      </Grid>
-    );
-  }, []);
-
   return (
     <Grid container>
-      {stickyDrawer}
+      <Grid item xs={3} sm={3} md={3} lg={3} xl={2}>
+        <GraphDrawerList />
+      </Grid>
       <Grid
-        md={12}
+        xs={9}
+        sm={9}
+        md={9}
         lg={9}
         xl={10}
         className="!h-[calc(100vh-66px)] !overflow-y-auto"

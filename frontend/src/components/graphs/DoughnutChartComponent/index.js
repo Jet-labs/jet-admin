@@ -1,33 +1,14 @@
 import { useTheme } from "@mui/material";
-import {
-  CategoryScale,
-  Chart as ChartJS,
-  Filler,
-  Legend,
-  LinearScale,
-  LineElement,
-  PointElement,
-  Title,
-  Tooltip,
-} from "chart.js";
+import { ArcElement, Chart as ChartJS, Legend, Tooltip } from "chart.js";
 import React, { useMemo } from "react";
-import { Line } from "react-chartjs-2";
+import { Doughnut } from "react-chartjs-2";
 
-import { da, faker } from "@faker-js/faker";
-import { LOCAL_CONSTANTS } from "../../constants";
+import { faker } from "@faker-js/faker";
+import { LOCAL_CONSTANTS } from "../../../constants";
 
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Filler,
-  Legend
-);
+ChartJS.register(ArcElement, Tooltip, Legend);
 
-export class LineChartDataset {
+export class DoughnutChartDataset {
   /**
    *
    * @param {object} param0
@@ -43,12 +24,12 @@ export class LineChartDataset {
     this.backgroundColor = backgroundColor;
   }
 }
-export class LineChartData {
+export class DoughnutChartData {
   /**
    *
    * @param {object} param0
    * @param {Array<String>} param0.labels
-   * @param {Array<LineChartDataset>} param0.datasets
+   * @param {Array<DoughnutChartDataset>} param0.datasets
    */
   constructor({ labels, datasets }) {
     this.labels = labels;
@@ -76,7 +57,7 @@ const demoData = {
   ],
 };
 
-export const LineGraphComponent = ({
+export const DoughnutGraphComponent = ({
   legendPosition,
   titleDisplayEnabled,
   graphTitle,
@@ -107,6 +88,5 @@ export const LineGraphComponent = ({
     };
   }, [legendPosition, titleDisplayEnabled, graphTitle]);
 
-
-  return <Line options={options} data={data ? data : demoData} />;
+  return <Doughnut options={options} data={data ? data : demoData} />;
 };

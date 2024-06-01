@@ -57,7 +57,7 @@ dashboardLayoutController.updateDashboardLayout = async (req, res) => {
   try {
     const { pmUser, state, body } = req;
     const pm_user_id = parseInt(pmUser.pm_user_id);
-    const authorized_dashboardLayouts = state.authorized_dashboardLayouts;
+    const authorized_dashboard_layouts = state.authorized_dashboard_layouts;
 
     Logger.log("info", {
       message: "dashboardLayoutController:updateDashboardLayout:params",
@@ -69,7 +69,7 @@ dashboardLayoutController.updateDashboardLayout = async (req, res) => {
         dashboardLayoutID: parseInt(body.dashboardLayout_id),
         title: body.dashboard_layout_title,
         dashboardLayoutOptions: body.dashboard_layout_options,
-        authorizedDashboardLayouts: authorized_dashboardLayouts,
+        authorizedDashboardLayouts: authorized_dashboard_layouts,
       });
 
     Logger.log("success", {
@@ -100,7 +100,7 @@ dashboardLayoutController.getAllDashboardLayouts = async (req, res) => {
   try {
     const { pmUser, state, params } = req;
     const pm_user_id = parseInt(pmUser.pm_user_id);
-    const authorized_dashboardLayouts = state.authorized_dashboardLayouts;
+    const authorized_dashboard_layouts = state.authorized_dashboard_layouts;
 
     Logger.log("info", {
       message: "dashboardLayoutController:getAllDashboardLayouts:params",
@@ -109,7 +109,7 @@ dashboardLayoutController.getAllDashboardLayouts = async (req, res) => {
 
     const dashboardLayouts =
       await DashboardLayoutService.getAllDashboardLayouts({
-        authorizedDashboardLayouts: authorized_dashboardLayouts,
+        authorizedDashboardLayouts: authorized_dashboard_layouts,
       });
 
     Logger.log("success", {
@@ -141,27 +141,28 @@ dashboardLayoutController.getDashboardLayoutByID = async (req, res) => {
     const { pmUser, state, params } = req;
     const id = parseInt(params.id);
     const pm_user_id = parseInt(pmUser.pm_user_id);
-    const authorized_dashboardLayouts = state.authorized_dashboardLayouts;
+    const authorized_dashboard_layouts = state.authorized_dashboard_layouts;
 
     Logger.log("info", {
       message: "dashboardLayoutController:getDashboardLayoutByID:params",
       params: { pm_user_id },
     });
 
-    const dashboardLayouts =
-      await DashboardLayoutService.getDashboardLayoutByID({
+    const dashboardLayout = await DashboardLayoutService.getDashboardLayoutByID(
+      {
         dashboardLayoutID: id,
-        authorizedDashboardLayouts: authorized_dashboardLayouts,
-      });
+        authorizedDashboardLayouts: authorized_dashboard_layouts,
+      }
+    );
 
     Logger.log("success", {
       message: "dashboardLayoutController:getDashboardLayoutByID:success",
-      params: { pm_user_id, dashboardLayouts },
+      params: { pm_user_id, dashboardLayout },
     });
 
     return res.json({
       success: true,
-      dashboardLayouts: dashboardLayouts,
+      dashboardLayout: dashboardLayout,
     });
   } catch (error) {
     Logger.log("error", {

@@ -8,14 +8,12 @@ import {
 } from "@mui/material";
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { DrawerList } from "../DrawerList";
-import { Navbar } from "../Navbar";
+import { MainDrawerList } from "../../drawerLists/MainDrawerList";
+import { Navbar } from "../../Navbar";
 
-export const Layout = ({ children }) => {
-  const navigate = useNavigate();
+export const MainLayout = ({ children }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
   const [currentPageTitle, setCurrentPageTitle] = useState("Home");
-  // const isSmallDevice = useMediaQuery("only screen and (max-width : 768px)");
   const theme = useTheme();
   const isSmallDevice = useMediaQuery(theme.breakpoints.down("lg"));
 
@@ -27,17 +25,10 @@ export const Layout = ({ children }) => {
     setIsDrawerOpen(false);
   };
 
-  const isSubDrawerListOpen =
-    String(currentPageTitle).includes("dashboard_layout");
-
   const stickyDrawer = useMemo(() => {
     return (
-      <Grid item sm={0} md={0} lg={2} xl={1.5}>
-        <DrawerList
-          setCurrentPageTitle={setCurrentPageTitle}
-          currentPageTitle={currentPageTitle}
-          isSubDrawerListOpen={isSubDrawerListOpen}
-        />
+      <Grid item md={0} lg={2} xl={1.5}>
+        <MainDrawerList currentPageTitle={currentPageTitle} />
       </Grid>
     );
   }, [currentPageTitle]);
@@ -57,11 +48,7 @@ export const Layout = ({ children }) => {
             </IconButton>
           </div>
 
-          <DrawerList
-            setCurrentPageTitle={setCurrentPageTitle}
-            currentPageTitle={currentPageTitle}
-            isSubDrawerListOpen={isSubDrawerListOpen}
-          />
+          <MainDrawerList currentPageTitle={currentPageTitle} />
         </div>
       </Drawer>
     );
@@ -75,11 +62,9 @@ export const Layout = ({ children }) => {
       {isSmallDevice ? floatingDrawer : stickyDrawer}
 
       <Grid
-        xs={12}
-        sm={12}
         md={12}
-        lg={isSubDrawerListOpen ? 9 : 10}
-        xl={isSubDrawerListOpen ? 10 : 10}
+        lg={10}
+        xl={10.5}
         className="!h-[calc(100vh-66px)] !overflow-y-auto"
       >
         {children}

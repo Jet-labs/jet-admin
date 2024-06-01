@@ -1,20 +1,29 @@
 import { useTheme } from "@mui/material";
 import {
-  ArcElement,
+  BarElement,
+  CategoryScale,
   Chart as ChartJS,
   Legend,
-  RadialLinearScale,
+  LinearScale,
+  Title,
   Tooltip,
 } from "chart.js";
 import React, { useMemo } from "react";
-import { Radar } from "react-chartjs-2";
+import { Bar } from "react-chartjs-2";
 
 import { faker } from "@faker-js/faker";
-import { LOCAL_CONSTANTS } from "../../constants";
+import { LOCAL_CONSTANTS } from "../../../constants";
 
-ChartJS.register(RadialLinearScale, ArcElement, Tooltip, Legend);
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  BarElement,
+  Title,
+  Tooltip,
+  Legend
+);
 
-export class RadarChartDataset {
+export class BarChartDataset {
   /**
    *
    * @param {object} param0
@@ -30,12 +39,12 @@ export class RadarChartDataset {
     this.backgroundColor = backgroundColor;
   }
 }
-export class RadarChartData {
+export class BarChartData {
   /**
    *
    * @param {object} param0
    * @param {Array<String>} param0.labels
-   * @param {Array<RadarChartDataset>} param0.datasets
+   * @param {Array<BarChartDataset>} param0.datasets
    */
   constructor({ labels, datasets }) {
     this.labels = labels;
@@ -63,7 +72,7 @@ const demoData = {
   ],
 };
 
-export const RadarGraphComponent = ({
+export const BarGraphComponent = ({
   legendPosition,
   titleDisplayEnabled,
   graphTitle,
@@ -94,5 +103,5 @@ export const RadarGraphComponent = ({
     };
   }, [legendPosition, titleDisplayEnabled, graphTitle]);
 
-  return <Radar options={options} data={data ? data : demoData} />;
+  return <Bar options={options} data={data ? data : demoData} />;
 };

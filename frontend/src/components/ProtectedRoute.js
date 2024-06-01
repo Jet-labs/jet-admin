@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuthState } from "../contexts/authContext";
-import { Layout } from "./Layout";
+import { MainLayout } from "./layouts/MainLayout";
 
 /**
  *
@@ -22,9 +22,9 @@ const ProtectedRoute = ({
   return isLoadingPMUser || isLoggingIn ? (
     <LoadingComponent />
   ) : pmUser ? (
-    <Layout>
+    <MainLayout>
       <SuccessComponent />
-    </Layout>
+    </MainLayout>
   ) : (
     <Navigate to={fallbackPath} />
   );

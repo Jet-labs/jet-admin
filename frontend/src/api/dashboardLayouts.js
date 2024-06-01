@@ -48,7 +48,7 @@ export const getDashboardLayoutByIDAPI = async ({ graphID }) => {
       })
     );
     if (response.data && response.data.success == true) {
-      return new DashboardLayout(response.data.graph);
+      return new DashboardLayout(response.data.dashboardLayout);
     } else if (response.data.error) {
       throw response.data.error;
     } else {

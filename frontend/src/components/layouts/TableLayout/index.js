@@ -1,14 +1,14 @@
 import { Grid, useTheme } from "@mui/material";
 import { lazy, useMemo } from "react";
 import { Outlet, Route, Routes } from "react-router-dom";
-import { LOCAL_CONSTANTS } from "../../constants";
-import { useAuthState } from "../../contexts/authContext";
-import { TableDrawerList } from "../TableDrawerList";
+import { LOCAL_CONSTANTS } from "../../../constants";
+import { useAuthState } from "../../../contexts/authContext";
+import { TableDrawerList } from "../../drawerLists/TableDrawerList";
 // import TableView from "../../pages/TableView";
 
-const RowView = lazy(() => import("../../pages/RowView"));
-const AddRow = lazy(() => import("../../pages/AddRow"));
-const TableView = lazy(() => import("../../pages/TableView"));
+const RowView = lazy(() => import("../../../pages/RowView"));
+const AddRow = lazy(() => import("../../../pages/AddRow"));
+const TableView = lazy(() => import("../../../pages/TableView"));
 
 const TableLayout = () => {
   const { pmUser } = useAuthState();
@@ -22,19 +22,16 @@ const TableLayout = () => {
     }
   }, [pmUser]);
 
-  const stickyDrawer = useMemo(() => {
-    return (
-      <Grid item sm={0} md={0} lg={3} xl={2}>
-        <TableDrawerList authorizedTables={authorizedTables} />
-      </Grid>
-    );
-  }, []);
-
   return (
     <Grid container>
-      {stickyDrawer}
+      <Grid item xs={3} sm={3} md={3} lg={3} xl={2}>
+        <TableDrawerList authorizedTables={authorizedTables} />
+      </Grid>
       <Grid
-        md={12}
+        item
+        xs={9}
+        sm={9}
+        md={9}
         lg={9}
         xl={10}
         className="!h-[calc(100vh-66px)] !overflow-y-auto"
