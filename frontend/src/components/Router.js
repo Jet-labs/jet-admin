@@ -1,7 +1,6 @@
 import React, { Suspense } from "react";
 import {
   Navigate,
-  redirect,
   Route,
   BrowserRouter as Router,
   Routes,
@@ -12,14 +11,9 @@ import { Loading } from "../pages/Loading";
 import ProtectedRoute from "./ProtectedRoute";
 
 import { lazy } from "react";
-import SignIn from "../pages/SignIn";
 import GraphView from "../pages/GraphView";
+import SignIn from "../pages/SignIn";
 
-
-const Home = lazy(() => import("../pages/Home"));
-const TableView = lazy(() => import("../pages/TableView"));
-const RowView = lazy(() => import("../pages/RowView"));
-const AddRow = lazy(() => import("../pages/AddRow"));
 const PolicyManagement = lazy(() => import("../pages/PolicyManagement"));
 const PolicySettings = lazy(() => import("../pages/PolicySettings"));
 const AddPolicy = lazy(() => import("../pages/AddPolicy"));
@@ -28,7 +22,7 @@ const AccountSettings = lazy(() => import("../pages/AccountSettings"));
 const AddAccount = lazy(() => import("../pages/AddAccount"));
 const AddGraph = lazy(() => import("../pages/AddGraph"));
 const TableLayout = lazy(() => import("./TableLayout"));
-
+const GraphLayout = lazy(() => import("./GraphLayout"));
 const AddDashboardLayoutView = lazy(() =>
   import("../pages/AddDashboardLayoutView")
 );
@@ -67,41 +61,16 @@ const AppRouter = ({}) => {
               />
             }
           ></Route>
-
-          <Route path={LOCAL_CONSTANTS.ROUTES.ALL_GRAPHS.code}>
-            <Route
-              index
-              element={
-                <ProtectedRoute
-                  successComponent={() => (
-                    <Navigate to={LOCAL_CONSTANTS.ROUTES.ADD_GRAPH.code} />
-                  )}
-                  fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
-                  loadingComponent={() => <Loading fullScreen />}
-                />
-              }
-            />
-            <Route
-              path={LOCAL_CONSTANTS.ROUTES.GRAPH_VIEW.code}
-              element={
-                <ProtectedRoute
-                  successComponent={GraphView}
-                  fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
-                  loadingComponent={() => <Loading fullScreen />}
-                />
-              }
-            />
-            <Route
-              path={LOCAL_CONSTANTS.ROUTES.ADD_GRAPH.code}
-              element={
-                <ProtectedRoute
-                  successComponent={AddGraph}
-                  fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
-                  loadingComponent={() => <Loading fullScreen />}
-                />
-              }
-            />
-          </Route>
+          <Route
+            path={LOCAL_CONSTANTS.ROUTES.ALL_GRAPHS.code}
+            element={
+              <ProtectedRoute
+                successComponent={GraphLayout}
+                fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
+                loadingComponent={() => <Loading fullScreen />}
+              />
+            }
+          ></Route>
 
           <Route path={LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.code}>
             <Route

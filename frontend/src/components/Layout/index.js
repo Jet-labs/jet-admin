@@ -28,18 +28,11 @@ export const Layout = ({ children }) => {
   };
 
   const isSubDrawerListOpen =
-    String(currentPageTitle).includes("graph") ||
     String(currentPageTitle).includes("dashboard_layout");
 
   const stickyDrawer = useMemo(() => {
     return (
-      <Grid
-        item
-        sm={0}
-        md={0}
-        lg={isSubDrawerListOpen ? 4 : 2}
-        xl={isSubDrawerListOpen ? 3 : 2}
-      >
+      <Grid item sm={0} md={0} lg={2} xl={1.5}>
         <DrawerList
           setCurrentPageTitle={setCurrentPageTitle}
           currentPageTitle={currentPageTitle}
@@ -85,16 +78,12 @@ export const Layout = ({ children }) => {
         xs={12}
         sm={12}
         md={12}
-        lg={isSubDrawerListOpen ? 8 : 10}
-        xl={isSubDrawerListOpen ? 9 : 10}
+        lg={isSubDrawerListOpen ? 9 : 10}
+        xl={isSubDrawerListOpen ? 10 : 10}
         className="!h-[calc(100vh-66px)] !overflow-y-auto"
       >
         {children}
       </Grid>
-      {/* <div className="w-full">{children}</div> */}
     </Grid>
-    // <div className="w-full h-full">
-
-    // </div>
   );
 };

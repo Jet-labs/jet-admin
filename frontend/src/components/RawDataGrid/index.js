@@ -7,6 +7,7 @@ import {
   GridToolbarColumnsButton,
   GridToolbarContainer,
   GridToolbarDensitySelector,
+  GridToolbarExport,
 } from "@mui/x-data-grid";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
@@ -177,9 +178,8 @@ export const RawDatagrid = ({
               getRowHeight={() => "auto"}
               slots={{
                 toolbar: () => (
-                  <GridToolbarContainer className="!px-2.5">
-                    <GridToolbarDensitySelector />
-                    <GridToolbarColumnsButton />
+                  <GridToolbarContainer className="!px-2.5 justify-end">
+                    <GridToolbarExport />
                   </GridToolbarContainer>
                 ),
                 loadingOverlay: LinearProgress,

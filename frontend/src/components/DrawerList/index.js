@@ -1,6 +1,3 @@
-import { Dashboard, PeopleAlt, Storage } from "@mui/icons-material";
-import InsertChartIcon from "@mui/icons-material/InsertChart";
-import PolicyIcon from "@mui/icons-material/Policy";
 import {
   Grid,
   List,
@@ -10,12 +7,15 @@ import {
   ListItemText,
   useTheme,
 } from "@mui/material";
-import { useMemo } from "react";
+import {
+  FaDatabase,
+  FaRegChartBar,
+  FaRegUser,
+  FaUserLock,
+} from "react-icons/fa";
+import { VscDashboard } from "react-icons/vsc";
 import { Link } from "react-router-dom";
 import { LOCAL_CONSTANTS } from "../../constants";
-import { useAuthState } from "../../contexts/authContext";
-import { TablesList } from "../TablesDrawerList";
-import { GraphsDrawerList } from "../GraphsDrawerList";
 import { DashboardLayoutsList } from "../DashboardLayoutDrawerList";
 
 export const DrawerList = ({
@@ -23,19 +23,8 @@ export const DrawerList = ({
   setCurrentPageTitle,
   isSubDrawerListOpen,
 }) => {
-  const { pmUser } = useAuthState();
   const theme = useTheme();
 
-  const authorizedTables = useMemo(() => {
-    if (pmUser) {
-      const c = pmUser.extractAuthorizedTables();
-      return c;
-    } else {
-      return null;
-    }
-  }, [pmUser]);
-
-  console.log({ currentPageTitle });
   return (
     <Grid container className="!w-full">
       <Grid
@@ -81,7 +70,7 @@ export const DrawerList = ({
                           : theme.palette.primary.contrastText,
                     }}
                   >
-                    <PolicyIcon sx={{}} />
+                    <FaUserLock className="!text-sm" />
                   </ListItemIcon>
                   <ListItemText
                     primaryTypographyProps={{
@@ -139,7 +128,7 @@ export const DrawerList = ({
                           : theme.palette.primary.contrastText,
                     }}
                   >
-                    <PeopleAlt sx={{}} />
+                    <FaRegUser className="!text-sm" />
                   </ListItemIcon>
                   <ListItemText
                     primaryTypographyProps={{
@@ -196,7 +185,7 @@ export const DrawerList = ({
                           : theme.palette.primary.contrastText,
                     }}
                   >
-                    <Storage sx={{}} />
+                    <FaDatabase className="!text-sm" />
                   </ListItemIcon>
                   <ListItemText
                     primaryTypographyProps={{
@@ -224,10 +213,10 @@ export const DrawerList = ({
           }
           {
             <Link
-              to={LOCAL_CONSTANTS.ROUTES.ALL_GRAPHS.code}
-              key={LOCAL_CONSTANTS.ROUTES.ALL_GRAPHS.code}
+              to={LOCAL_CONSTANTS.ROUTES.ALL_GRAPHS.path()}
+              key={LOCAL_CONSTANTS.ROUTES.ALL_GRAPHS.path()}
               onClick={() => {
-                setCurrentPageTitle(LOCAL_CONSTANTS.ROUTES.ALL_GRAPHS.code);
+                setCurrentPageTitle?.(LOCAL_CONSTANTS.ROUTES.ALL_GRAPHS.code);
               }}
             >
               <ListItem
@@ -253,7 +242,7 @@ export const DrawerList = ({
                           : theme.palette.primary.contrastText,
                     }}
                   >
-                    <InsertChartIcon sx={{}} />
+                    <FaRegChartBar className="!text-sm" />
                   </ListItemIcon>
                   <ListItemText
                     primaryTypographyProps={{
@@ -314,7 +303,7 @@ export const DrawerList = ({
                           : theme.palette.primary.contrastText,
                     }}
                   >
-                    <Dashboard sx={{}} />
+                    <VscDashboard className="!text-sm" />
                   </ListItemIcon>
                   <ListItemText
                     primaryTypographyProps={{
@@ -349,12 +338,7 @@ export const DrawerList = ({
           md={isSubDrawerListOpen ? 6 : 0}
           lg={isSubDrawerListOpen ? 7 : 0}
         >
-          {String(currentPageTitle).includes("graph") ? (
-            <GraphsDrawerList
-              setCurrentPageTitle={setCurrentPageTitle}
-              currentPageTitle={currentPageTitle}
-            />
-          ) : String(currentPageTitle).includes("dashboard_layout") ? (
+          {String(currentPageTitle).includes("dashboard_layout") ? (
             <DashboardLayoutsList
               setCurrentPageTitle={setCurrentPageTitle}
               currentPageTitle={currentPageTitle}

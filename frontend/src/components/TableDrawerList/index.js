@@ -1,5 +1,3 @@
-import { TableRows } from "@mui/icons-material";
-import DataObjectIcon from "@mui/icons-material/DataObject";
 import {
   List,
   ListItem,
@@ -8,9 +6,10 @@ import {
   ListItemText,
   useTheme,
 } from "@mui/material";
+import { FaDatabase, FaTable } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { LOCAL_CONSTANTS } from "../../constants";
-export const TablesList = ({
+export const TableDrawerList = ({
   authorizedTables,
   setCurrentPageTitle,
   currentPageTitle,
@@ -25,7 +24,7 @@ export const TablesList = ({
     >
       <ListItemButton>
         <ListItemIcon>
-          <TableRows sx={{}} />
+          <FaDatabase sx={{}} />
         </ListItemIcon>
         <ListItemText
           primaryTypographyProps={{
@@ -68,7 +67,7 @@ export const TablesList = ({
                         : theme.palette.primary.contrastText,
                   }}
                 >
-                  <DataObjectIcon sx={{ fontSize: 16 }} />
+                  <FaTable sx={{}} />
                 </ListItemIcon>
                 <ListItemText
                   sx={{

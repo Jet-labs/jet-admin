@@ -83,16 +83,16 @@ export const LOCAL_CONSTANTS = {
     SIGNIN: "/signin",
 
     ALL_GRAPHS: {
-      code: "/graphs",
+      code: "/graphs/*",
       path: () => "/graphs",
     },
     ADD_GRAPH: {
-      code: "/graphs/add",
-      path: () => "/graphs/add",
+      code: "add",
+      path: () => "add",
     },
     GRAPH_VIEW: {
-      code: "/graphs/:id",
-      path: (id) => `/graphs/${id}`,
+      code: ":id",
+      path: (id) => `${id}`,
     },
     ALL_DASHBOARD_LAYOUTS: {
       code: "/dashboard_layout",

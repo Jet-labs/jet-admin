@@ -1,11 +1,10 @@
 import {
-  SsidChart,
   BarChart,
   DataUsage,
+  SsidChart,
   TableRows,
   TrackChanges,
 } from "@mui/icons-material";
-import DataObjectIcon from "@mui/icons-material/DataObject";
 import {
   Button,
   List,
@@ -16,13 +15,13 @@ import {
   useTheme,
 } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { getAllGraphAPI } from "../../api/graphs";
 import { LOCAL_CONSTANTS } from "../../constants";
 import { useAuthState } from "../../contexts/authContext";
-import { useMemo } from "react";
 
-export const GraphsDrawerList = ({ setCurrentPageTitle, currentPageTitle }) => {
+export const GraphDrawerList = ({ setCurrentPageTitle, currentPageTitle }) => {
   const theme = useTheme();
   const { pmUser } = useAuthState();
   const navigate = useNavigate();
@@ -81,7 +80,7 @@ export const GraphsDrawerList = ({ setCurrentPageTitle, currentPageTitle }) => {
           <Link
             to={LOCAL_CONSTANTS.ROUTES.GRAPH_VIEW.path(graph.pm_graph_id)}
             onClick={() => {
-              setCurrentPageTitle(key);
+              setCurrentPageTitle?.(key);
             }}
             key={key}
           >
@@ -142,7 +141,6 @@ export const GraphsDrawerList = ({ setCurrentPageTitle, currentPageTitle }) => {
                 />
               </ListItemButton>
             </ListItem>
-            {/* <Divider className="!mx-4" /> */}
           </Link>
         );
       })}
