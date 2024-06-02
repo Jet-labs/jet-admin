@@ -41,4 +41,12 @@ router.put(
   dashboardController.updateDashboard
 );
 
+router.delete(
+  "/:id",
+  authMiddleware.authProvider,
+  policyMiddleware.populateAuthorizationPolicies,
+  dashboardAuthorizationMiddleware.populateAuthorizedDashboardsForDelete,
+  dashboardController.deleteDashboard
+);
+
 module.exports = router;

@@ -177,12 +177,14 @@ export const LOCAL_CONSTANTS = {
       addGraph: () => `/admin_api/graphs`,
       updateGraph: () => `/admin_api/graphs`,
       getGraphDataByID: ({ id }) => `/admin_api/graphs/${id}/data`,
+      deleteGraphByID: ({ id }) => `/admin_api/graphs/${id}`,
     },
     DASHBOARD_LAYOUT: {
       getAllDashboards: () => `/admin_api/dashboards`,
       getDashboardByID: ({ id }) => `/admin_api/dashboards/${id}`,
       addDashboard: () => `/admin_api/dashboards`,
       updateDashboard: () => `/admin_api/dashboards`,
+      deleteDashboardByID: ({ id }) => `/admin_api/dashboards/${id}`,
     },
 
     CONSTANTS: {

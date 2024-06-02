@@ -1,8 +1,9 @@
 import { Grid, useTheme } from "@mui/material";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useEffect } from "react";
 import {
   addGraphAPI,
+  deleteGraphByIDAPI,
   getGraphDataByIDAPI,
   updateGraphAPI,
 } from "../../api/graphs";
@@ -17,6 +18,7 @@ import { useParams } from "react-router-dom";
 const GraphView = () => {
   const theme = useTheme();
   const { id } = useParams();
+  const queryClient = useQueryClient();
   const {
     isLoading: isLoadingGraphData,
     data: graphData,
@@ -41,13 +43,34 @@ const GraphView = () => {
     },
     retry: false,
     onSuccess: () => {
-      displaySuccess("Submitted graph successfully");
-      refetchGraphData();
+      displaySuccess("Updated graph successfully");
+      queryClient.invalidateQueries([`REACT_QUERY_KEY_GRAPH`]);
     },
     onError: (error) => {
       displayError(error);
     },
   });
+
+  const {
+    isPending: isDeletingGraph,
+    isSuccess: isDeletingGraphSuccess,
+    isError: isDeletingGraphError,
+    error: deleteGraphError,
+    mutate: deleteGraph,
+  } = useMutation({
+    mutationFn: () => {
+      return deleteGraphByIDAPI({ graphID: id });
+    },
+    retry: false,
+    onSuccess: () => {
+      displaySuccess("Deleted graph layout successfully");
+      queryClient.invalidateQueries([`REACT_QUERY_KEY_GRAPH`]);
+    },
+    onError: (error) => {
+      displayError(error);
+    },
+  });
+
   const graphForm = useFormik({
     initialValues: {
       graph_type: LOCAL_CONSTANTS.GRAPH_TYPES.BAR.value,
@@ -105,7 +128,11 @@ const GraphView = () => {
       </div>
       <Grid container spacing={1} className="!px-3">
         <Grid item lg={5} md={4} className="w-full">
-          <GraphBuilderForm isLoading={isUpdatingGraph} graphForm={graphForm} />
+          <GraphBuilderForm
+            isLoading={isUpdatingGraph}
+            graphForm={graphForm}
+            deleteGraph={deleteGraph}
+          />
         </Grid>
         {graphData && graphData.dataset && (
           <Grid item lg={7} md={8} className="w-full">

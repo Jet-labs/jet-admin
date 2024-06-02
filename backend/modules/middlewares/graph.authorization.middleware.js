@@ -102,6 +102,52 @@ graphAuthorizationMiddleware.populateAuthorizedGraphsForUpdate = async (
  * @param {import("express").NextFunction} next
  * @returns
  */
+graphAuthorizationMiddleware.populateAuthorizedGraphsForDelete = async (
+  req,
+  res,
+  next
+) => {
+  try {
+    const { pmUser, state } = req;
+    const authorization_policy = state?.authorization_policy;
+    const pm_user_id = parseInt(pmUser.pm_user_id);
+    Logger.log("info", {
+      message:
+        "graphAuthorizationMiddleware:populateAuthorizedGraphsForDelete:params",
+      params: { pm_user_id },
+    });
+    let authorized_graphs =
+      policyUtils.extractAuthorizedGraphsForDeleteFromPolicyObject({
+        policyObject: authorization_policy,
+      });
+
+    req.state = { ...req.state, authorized_graphs };
+    Logger.log("success", {
+      message:
+        "graphAuthorizationMiddleware:populateAuthorizedGraphsForDelete:success",
+      params: { pm_user_id, authorized_graphs },
+    });
+    return next();
+  } catch (error) {
+    Logger.log("error", {
+      message:
+        "graphAuthorizationMiddleware:populateAuthorizedGraphsForDelete:catch-1",
+      params: { error },
+    });
+    return res.json({
+      success: false,
+      error: constants.ERROR_CODES.SERVER_ERROR,
+    });
+  }
+};
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @param {import("express").NextFunction} next
+ * @returns
+ */
 graphAuthorizationMiddleware.populateAuthorizationForGraphAddition = async (
   req,
   res,

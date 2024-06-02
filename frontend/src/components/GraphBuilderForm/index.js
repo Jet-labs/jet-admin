@@ -1,8 +1,9 @@
 import { Close } from "@mui/icons-material";
 import { Button, Grid, IconButton, useTheme } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import { FieldComponent } from "../FieldComponent";
 import { LOCAL_CONSTANTS } from "../../constants";
+import { ConfirmationDialog } from "../ConfirmationDialog";
 
 /**
  *
@@ -10,8 +11,10 @@ import { LOCAL_CONSTANTS } from "../../constants";
  * @param {import("formik").FormikConfig} param0.graphForm
  * @returns
  */
-export const GraphBuilderForm = ({ graphForm }) => {
+export const GraphBuilderForm = ({ graphForm, deleteGraph }) => {
   const theme = useTheme();
+  const [isDeleteGraphConfirmationOpen, setIsDeleteGraphConfirmationOpen] =
+    useState(false);
 
   const _handleAddDataset = () => {
     const newQueryArrayFieldValue = graphForm.values["query_array"];
@@ -65,8 +68,26 @@ export const GraphBuilderForm = ({ graphForm }) => {
     graphForm.handleSubmit();
   };
 
+  const _handleOpenDeleteGraphConfirmation = () => {
+    setIsDeleteGraphConfirmationOpen(true);
+  };
+  const _handleDeclineDeleteGraphConfirmation = () => {
+    setIsDeleteGraphConfirmationOpen(false);
+  };
+
+  const _handleAcceptDeleteGraphConfirmation = () => {
+    deleteGraph();
+    setIsDeleteGraphConfirmationOpen(false);
+  };
   return (
     <form onSubmit={graphForm.handleSubmit} className="!pt-3">
+      <ConfirmationDialog
+        open={isDeleteGraphConfirmationOpen}
+        onAccepted={_handleAcceptDeleteGraphConfirmation}
+        onDecline={_handleDeclineDeleteGraphConfirmation}
+        title={"Delete graph?"}
+        message={`Are you sure you want to delete graph : ${graphForm?.values?.["graph_title"]}`}
+      />
       <Grid
         container
         spacing={2}
@@ -353,6 +374,14 @@ export const GraphBuilderForm = ({ graphForm }) => {
         <Grid item xs={12} sm={12} md={12} lg={12} key={"submit"}>
           <Button variant="contained" onClick={_handleSubmit}>
             Submit
+          </Button>
+          <Button
+            color="error"
+            className="!ml-2"
+            variant="outlined"
+            onClick={_handleOpenDeleteGraphConfirmation}
+          >
+            Delete
           </Button>
         </Grid>
       </Grid>

@@ -41,5 +41,13 @@ router.get(
   graphController.getGraphData
 );
 
+router.delete(
+  "/:id",
+  authMiddleware.authProvider,
+  policyMiddleware.populateAuthorizationPolicies,
+  graphAuthorizationMiddleware.populateAuthorizedGraphsForDelete,
+  graphController.deleteGraph
+);
+
 
 module.exports = router;

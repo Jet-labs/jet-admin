@@ -57,6 +57,23 @@ export const getGraphDataByIDAPI = async ({ graphID }) => {
   }
 };
 
+export const deleteGraphByIDAPI = async ({ graphID }) => {
+  try {
+    const response = await axiosInstance.delete(
+      LOCAL_CONSTANTS.APIS.GRAPH.deleteGraphByID({ id: graphID })
+    );
+    if (response.data && response.data.success == true) {
+      return new Graph(response.data.graph);
+    } else if (response.data.error) {
+      throw response.data.error;
+    } else {
+      throw LOCAL_CONSTANTS.ERROR_CODES.SERVER_ERROR;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const getAllGraphAPI = async () => {
   try {
     const response = await axiosInstance.get(

@@ -9,7 +9,7 @@ import { GraphLayoutDropZoneComponent } from "../../components/GraphLayoutDropZo
 import { GraphsDnDList } from "../../components/GraphsDnDList";
 import { LOCAL_CONSTANTS } from "../../constants";
 import { displayError, displaySuccess } from "../../utils/notification";
-
+import { FiPlus } from "react-icons/fi";
 const AddDashboardView = () => {
   const theme = useTheme();
 
@@ -61,21 +61,6 @@ const AddDashboardView = () => {
           className="w-full !h-[calc(100vh-66px)]"
           style={{ background: theme.palette.divider }}
         >
-          {/* <Grid
-            xs={12}
-            md={12}
-            lg={12}
-            item
-            className="!p-2"
-            style={{ background: theme.palette.divider }}
-          >
-            <FieldComponent
-              name={"dashboard_title"}
-              type={LOCAL_CONSTANTS.DATA_TYPES.STRING}
-              value={dashboardForm.values["dashboard_title"]}
-              onChange={dashboardForm.handleChange}
-            />
-          </Grid> */}
           <GraphLayoutDropZoneComponent
             graphIDData={dashboardForm.values["graph_ids"]}
             setGraphIDData={(value) =>
@@ -92,13 +77,11 @@ const AddDashboardView = () => {
         >
           <Grid sm={12} className="!top-0 !sticky !z-50">
             <div
-              className="flex flex-row justify-between items-center p-3 !border-b !border-white !border-opacity-10"
+              className="flex flex-row justify-start items-center p-3 !border-b !border-white !border-opacity-10"
               style={{ background: theme.palette.background.paper }}
             >
-              <span className="text-lg font-bold text-start">{`Add new dashboard`}</span>
-              <Button variant="contained" onClick={dashboardForm.handleSubmit}>
-                Save
-              </Button>
+              <FiPlus className="!text-base !font-semibold" />
+              <span className="text-sm font-semibold text-start ml-2">{`Add new dashboard`}</span>
             </div>
             <div
               className="flex flex-col justify-center items-start p-3 !border-b !border-white !border-opacity-10"
@@ -117,6 +100,14 @@ const AddDashboardView = () => {
                 value={dashboardForm.values["dashboard_description"]}
                 onChange={dashboardForm.handleChange}
               />
+              <div className="mt-3 w-full flex flex-row justify-end">
+                <Button
+                  variant="contained"
+                  onClick={dashboardForm.handleSubmit}
+                >
+                  Save
+                </Button>
+              </div>
             </div>
           </Grid>
           <Grid sm={12}>
