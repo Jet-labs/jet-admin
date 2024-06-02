@@ -72,6 +72,7 @@ export const RadarGraphComponent = ({
   const theme = useTheme();
   const options = useMemo(() => {
     return {
+      maintainAspectRatio: false,
       responsive: true,
       elements: {
         bar: {
@@ -94,5 +95,7 @@ export const RadarGraphComponent = ({
     };
   }, [legendPosition, titleDisplayEnabled, graphTitle]);
 
-  return <Radar options={options} data={data ? data : demoData} />;
+  return (
+    <Radar options={options} height={"300 px"} data={data ? data : demoData} />
+  );
 };

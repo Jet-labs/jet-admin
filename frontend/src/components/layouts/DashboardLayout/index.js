@@ -4,9 +4,7 @@ import { Outlet, Route, Routes } from "react-router-dom";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { DashboardsList } from "../../drawerLists/DashboardDrawerList";
 const AddDashboardView = lazy(() => import("../../../pages/AddDashboardView"));
-const UpdateDashboardView = lazy(() =>
-  import("../../../pages/UpdateDashboardView")
-);
+const DashboardView = lazy(() => import("../../../pages/DashboardView"));
 
 const DashboardLayout = () => {
   return (
@@ -36,7 +34,7 @@ const DashboardLayout = () => {
           />
           <Route
             path={LOCAL_CONSTANTS.ROUTES.DASHBOARD_LAYOUT_VIEW.code}
-            element={<UpdateDashboardView />}
+            element={<DashboardView />}
           />
         </Routes>
         <Outlet />

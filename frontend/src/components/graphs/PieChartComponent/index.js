@@ -66,6 +66,7 @@ export const PieGraphComponent = ({
   const theme = useTheme();
   const options = useMemo(() => {
     return {
+      maintainAspectRatio: false,
       responsive: true,
       elements: {
         bar: {
@@ -88,5 +89,7 @@ export const PieGraphComponent = ({
     };
   }, [legendPosition, titleDisplayEnabled, graphTitle]);
 
-  return <Pie options={options} data={data ? data : demoData} />;
+  return (
+    <Pie options={options} height={"300 px"} data={data ? data : demoData} />
+  );
 };

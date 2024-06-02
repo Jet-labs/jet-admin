@@ -15,7 +15,7 @@ import { LOCAL_CONSTANTS } from "../../constants";
 import { displayError, displaySuccess } from "../../utils/notification";
 import { useParams } from "react-router-dom";
 
-const UpdateDashboardView = () => {
+const DashboardView = () => {
   const { id } = useParams();
   const theme = useTheme();
 
@@ -62,11 +62,13 @@ const UpdateDashboardView = () => {
       return errors;
     },
     onSubmit: (values) => {
-      const { dashboard_title, ...dashboard_options } = values;
+      const { dashboard_title, dashboard_description, ...dashboard_options } =
+        values;
       updateDashboard({
         data: {
           pm_dashboard_id: id,
           dashboard_title: dashboard_title,
+          dashboard_description: dashboard_description,
           dashboard_options,
         },
       });
@@ -76,6 +78,10 @@ const UpdateDashboardView = () => {
   useEffect(() => {
     if (dashboard) {
       dashboardForm.setFieldValue("dashboard_title", dashboard.dashboard_title);
+      dashboardForm.setFieldValue(
+        "dashboard_description",
+        dashboard.dashboard_description
+      );
       dashboardForm.setFieldValue(
         "graph_ids",
         dashboard.dashboard_options.graph_ids
@@ -87,13 +93,27 @@ const UpdateDashboardView = () => {
       <Grid container className="!h-full">
         <Grid
           item
-          xl={2}
+          lg={9}
+          md={9}
+          sm={8}
+          className="w-full !h-[calc(100vh-66px)]"
+          style={{ background: theme.palette.divider }}
+        >
+          <GraphLayoutDropZoneComponent
+            graphIDData={dashboardForm.values["graph_ids"]}
+            setGraphIDData={(value) =>
+              dashboardForm.setFieldValue("graph_ids", value)
+            }
+          />
+        </Grid>
+        <Grid
+          item
           lg={3}
           md={3}
-          sm={3}
-          className="w-full !border-r !border-white !border-opacity-10"
+          sm={4}
+          className="w-full !border-r !border-white !border-opacity-10 !h-[calc(100vh-66px)] !overflow-y-auto"
         >
-          <Grid sm={12}>
+          <Grid sm={12} className="!top-0 !sticky !z-50">
             <div
               className="flex flex-row justify-between items-center p-3 !border-b !border-white !border-opacity-10"
               style={{ background: theme.palette.background.paper }}
@@ -103,46 +123,33 @@ const UpdateDashboardView = () => {
                 Save
               </Button>
             </div>
+            <div
+              className="flex flex-col justify-center items-start p-3 !border-b !border-white !border-opacity-10"
+              style={{ background: theme.palette.background.paper }}
+            >
+              <FieldComponent
+                name={"dashboard_title"}
+                type={LOCAL_CONSTANTS.DATA_TYPES.STRING}
+                value={dashboardForm.values["dashboard_title"]}
+                onChange={dashboardForm.handleChange}
+              />
+              <div className="mt-2"></div>
+              <FieldComponent
+                name={"dashboard_description"}
+                type={LOCAL_CONSTANTS.DATA_TYPES.STRING}
+                value={dashboardForm.values["dashboard_description"]}
+                onChange={dashboardForm.handleChange}
+              />
+            </div>
           </Grid>
+
           <Grid sm={12}>
             <GraphsDnDList />
           </Grid>
-        </Grid>
-
-        <Grid
-          item
-          xl={10}
-          lg={9}
-          md={9}
-          sm={9}
-          className="w-full !overflow-y-auto"
-          style={{ background: theme.palette.divider }}
-        >
-          <Grid
-            xs={12}
-            md={12}
-            lg={12}
-            item
-            className="!p-2"
-            style={{ background: theme.palette.divider }}
-          >
-            <FieldComponent
-              name={"dashboard_title"}
-              type={LOCAL_CONSTANTS.DATA_TYPES.STRING}
-              value={dashboardForm.values["dashboard_title"]}
-              onChange={dashboardForm.handleChange}
-            />
-          </Grid>
-          <GraphLayoutDropZoneComponent
-            graphIDData={dashboardForm.values["graph_ids"]}
-            setGraphIDData={(value) =>
-              dashboardForm.setFieldValue("graph_ids", value)
-            }
-          />
         </Grid>
       </Grid>
     </div>
   );
 };
 
-export default UpdateDashboardView;
+export default DashboardView;

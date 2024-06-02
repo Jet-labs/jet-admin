@@ -28,7 +28,7 @@ export const GraphWidgetComponent = ({ id }) => {
     staleTime: Infinity,
   });
   const graphType = graphData?.graph_options.graph_type;
-  const graphTitle = graphData?.title;
+  const graphTitle = graphData?.graph_title;
   const legendPosition = graphData?.graph_options.legend_position;
   const titleDisplayEnabled = graphData?.graph_options.title_display_enabled;
   const data = graphData?.dataset;

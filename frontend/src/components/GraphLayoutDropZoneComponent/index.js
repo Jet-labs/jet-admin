@@ -46,7 +46,7 @@ export const GraphLayoutDropZoneComponent = ({
       style={{ background: theme.palette.divider }}
     >
       <Grid
-        className="w-full h-full"
+        className="w-full h-full  !overflow-y-auto "
         container
         style={
           isDraggableInDropZone

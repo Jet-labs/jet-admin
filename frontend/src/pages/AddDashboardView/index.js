@@ -55,36 +55,13 @@ const AddDashboardView = () => {
       <Grid container className="!h-full">
         <Grid
           item
-          lg={3}
-          md={3}
-          sm={4}
-          className="w-full !border-r !border-white !border-opacity-10"
-        >
-          <Grid sm={12}>
-            <div
-              className="flex flex-row justify-between items-center p-3 !border-b !border-white !border-opacity-10"
-              style={{ background: theme.palette.background.paper }}
-            >
-              <span className="text-lg font-bold text-start">{`Add new dashboard`}</span>
-              <Button variant="contained" onClick={dashboardForm.handleSubmit}>
-                Save
-              </Button>
-            </div>
-          </Grid>
-          <Grid sm={12}>
-            <GraphsDnDList />
-          </Grid>
-        </Grid>
-
-        <Grid
-          item
           lg={9}
           md={9}
           sm={8}
-          className="w-full !overflow-y-auto"
+          className="w-full !h-[calc(100vh-66px)]"
           style={{ background: theme.palette.divider }}
         >
-          <Grid
+          {/* <Grid
             xs={12}
             md={12}
             lg={12}
@@ -98,13 +75,53 @@ const AddDashboardView = () => {
               value={dashboardForm.values["dashboard_title"]}
               onChange={dashboardForm.handleChange}
             />
-          </Grid>
+          </Grid> */}
           <GraphLayoutDropZoneComponent
             graphIDData={dashboardForm.values["graph_ids"]}
             setGraphIDData={(value) =>
               dashboardForm.setFieldValue("graph_ids", value)
             }
           />
+        </Grid>
+        <Grid
+          item
+          lg={3}
+          md={3}
+          sm={4}
+          className="w-full !border-r !border-white !border-opacity-10  !h-[calc(100vh-66px)] !overflow-y-auto"
+        >
+          <Grid sm={12} className="!top-0 !sticky !z-50">
+            <div
+              className="flex flex-row justify-between items-center p-3 !border-b !border-white !border-opacity-10"
+              style={{ background: theme.palette.background.paper }}
+            >
+              <span className="text-lg font-bold text-start">{`Add new dashboard`}</span>
+              <Button variant="contained" onClick={dashboardForm.handleSubmit}>
+                Save
+              </Button>
+            </div>
+            <div
+              className="flex flex-col justify-center items-start p-3 !border-b !border-white !border-opacity-10"
+              style={{ background: theme.palette.background.paper }}
+            >
+              <FieldComponent
+                name={"dashboard_title"}
+                type={LOCAL_CONSTANTS.DATA_TYPES.STRING}
+                value={dashboardForm.values["dashboard_title"]}
+                onChange={dashboardForm.handleChange}
+              />
+              <div className="mt-2"></div>
+              <FieldComponent
+                name={"dashboard_description"}
+                type={LOCAL_CONSTANTS.DATA_TYPES.STRING}
+                value={dashboardForm.values["dashboard_description"]}
+                onChange={dashboardForm.handleChange}
+              />
+            </div>
+          </Grid>
+          <Grid sm={12}>
+            <GraphsDnDList />
+          </Grid>
         </Grid>
       </Grid>
     </div>

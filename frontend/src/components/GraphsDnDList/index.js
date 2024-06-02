@@ -67,6 +67,7 @@ export const GraphsDnDList = ({}) => {
             sx={{
               marginTop: 1,
               marginBottom: index === graphs.length - 1 ? 1 : 0,
+              // minHeight: 800,
             }}
           >
             <ListItemButton
