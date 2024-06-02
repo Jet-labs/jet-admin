@@ -85,8 +85,8 @@ const create_user_table_query = `
 const create_graph_table_query = `CREATE TABLE IF NOT EXISTS public.tbl_pm_graphs
 (
     pm_graph_id serial NOT NULL,
-    title character varying COLLATE pg_catalog."default" NOT NULL,
-    description character varying COLLATE pg_catalog."default",
+    graph_title character varying COLLATE pg_catalog."default" NOT NULL,
+    graph_description character varying COLLATE pg_catalog."default",
     is_disabled boolean DEFAULT false,
     created_at timestamp(6) with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp(6) with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,

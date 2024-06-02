@@ -5,12 +5,10 @@ const {
   tableAuthorizationMiddleware,
 } = require("../middlewares/table.authorization.middleware");
 const { policyMiddleware } = require("../middlewares/policy.middleware");
+const { dashboardController } = require("../controllers/dashboard.controller");
 const {
-  dashboardLayoutController,
-} = require("../controllers/dashboardLayout.controller");
-const {
-  dashboardLayoutAuthorizationMiddleware,
-} = require("../middlewares/dashboardLayout.authorization.middleware");
+  dashboardAuthorizationMiddleware,
+} = require("../middlewares/dashboard.authorization.middleware");
 const router = express.Router();
 
 // get all data of table
@@ -18,29 +16,29 @@ router.get(
   "/",
   authMiddleware.authProvider,
   policyMiddleware.populateAuthorizationPolicies,
-  dashboardLayoutAuthorizationMiddleware.populateAuthorizedDashboardLayoutsForRead,
-  dashboardLayoutController.getAllDashboardLayouts
+  dashboardAuthorizationMiddleware.populateAuthorizedDashboardsForRead,
+  dashboardController.getAllDashboards
 );
 router.get(
   "/:id",
   authMiddleware.authProvider,
   policyMiddleware.populateAuthorizationPolicies,
-  dashboardLayoutAuthorizationMiddleware.populateAuthorizedDashboardLayoutsForRead,
-  dashboardLayoutController.getDashboardLayoutByID
+  dashboardAuthorizationMiddleware.populateAuthorizedDashboardsForRead,
+  dashboardController.getDashboardByID
 );
 router.post(
   "/",
   authMiddleware.authProvider,
   policyMiddleware.populateAuthorizationPolicies,
-  dashboardLayoutAuthorizationMiddleware.populateAuthorizationForDashboardLayoutAddition,
-  dashboardLayoutController.addDashboardLayout
+  dashboardAuthorizationMiddleware.populateAuthorizationForDashboardAddition,
+  dashboardController.addDashboard
 );
 router.put(
   "/",
   authMiddleware.authProvider,
   policyMiddleware.populateAuthorizationPolicies,
-  dashboardLayoutAuthorizationMiddleware.populateAuthorizedDashboardLayoutsForUpdate,
-  dashboardLayoutController.updateDashboardLayout
+  dashboardAuthorizationMiddleware.populateAuthorizedDashboardsForUpdate,
+  dashboardController.updateDashboard
 );
 
 module.exports = router;

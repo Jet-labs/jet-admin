@@ -8,15 +8,15 @@ class GraphService {
   /**
    *
    * @param {object} param0
-   * @param {String} param0.title
+   * @param {String} param0.graphTitle
    * @param {any} param0.graphOptions
    * @returns {any|null}
    */
-  static addGraph = async ({ title, graphOptions }) => {
+  static addGraph = async ({ graphTitle, graphOptions }) => {
     Logger.log("info", {
       message: "GraphService:addGraph:params",
       params: {
-        title,
+        graphTitle,
         graphOptions,
       },
     });
@@ -24,14 +24,14 @@ class GraphService {
       let newGraph = null;
       newGraph = await prisma.tbl_pm_graphs.create({
         data: {
-          title: String(title),
+          graph_title: String(graphTitle),
           graph_options: graphOptions,
         },
       });
       Logger.log("success", {
         message: "GraphService:addGraph:newGraph",
         params: {
-          title,
+          graphTitle,
           newGraph,
         },
       });
@@ -49,20 +49,20 @@ class GraphService {
    *
    * @param {object} param0
    * @param {Number} param0.graphID
-   * @param {String} param0.title
+   * @param {String} param0.graphTitle
    * @param {any} param0.graphOptions
    * @param {Boolean|Array<Number>} param0.authorizedGraphs
    * @returns {any|null}
    */
   static updateGraph = async ({
     graphID,
-    title,
+    graphTitle,
     graphOptions,
     authorizedGraphs,
   }) => {
     Logger.log("info", {
       message: "GraphService:updateGraph:params",
-      params: { graphID, title, graphOptions },
+      params: { graphID, graphTitle, graphOptions },
     });
     try {
       if (authorizedGraphs === true || authorizedGraphs.includes(graphID)) {
@@ -71,7 +71,7 @@ class GraphService {
             pm_graph_id: graphID,
           },
           data: {
-            title: String(title),
+            graph_title: String(graphTitle),
             graph_options: graphOptions,
           },
         });
@@ -223,6 +223,51 @@ class GraphService {
     } catch (error) {
       Logger.log("error", {
         message: "GraphService:getAllGraphs:catch-1",
+        params: { error },
+      });
+      throw error;
+    }
+  };
+
+  /**
+   *
+   * @param {object} param0
+   * @param {Number} param0.graphID
+   * @param {Boolean|Array<Number>} param0.authorizedGraphs
+   * @returns {any|null}
+   */
+  static deleteGraph = async ({ graphID, authorizedGraphs }) => {
+    Logger.log("info", {
+      message: "GraphService:deleteGraph:params",
+      params: {
+        graphID,
+      },
+    });
+    try {
+      if (authorizedGraphs === true || authorizedGraphs.includes(graphID)) {
+        const graph = await prisma.tbl_pm_graphs.delete({
+          where: {
+            pm_graph_id: graphID,
+          },
+        });
+        Logger.log("info", {
+          message: "GraphService:deleteGraph:graph",
+          params: {
+            graph,
+          },
+        });
+
+        return true;
+      } else {
+        Logger.log("error", {
+          message: "GraphService:deleteGraph:catch-2",
+          params: { error: constants.ERROR_CODES.PERMISSION_DENIED },
+        });
+        throw constants.ERROR_CODES.PERMISSION_DENIED;
+      }
+    } catch (error) {
+      Logger.log("error", {
+        message: "GraphService:deleteGraph:catch-1",
         params: { error },
       });
       throw error;

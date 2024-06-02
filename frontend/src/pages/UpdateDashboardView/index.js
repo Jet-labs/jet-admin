@@ -1,39 +1,57 @@
 import { Button, Grid, useTheme } from "@mui/material";
-import { useMutation } from "@tanstack/react-query";
-import React from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import React, { useEffect } from "react";
 
 import { useFormik } from "formik";
-import { addDashboardLayoutAPI } from "../../api/dashboardLayouts";
+import {
+  addDashboardAPI,
+  getDashboardByIDAPI,
+  updateDashboardAPI,
+} from "../../api/dashboards";
 import { FieldComponent } from "../../components/FieldComponent";
 import { GraphLayoutDropZoneComponent } from "../../components/GraphLayoutDropZoneComponent";
 import { GraphsDnDList } from "../../components/GraphsDnDList";
 import { LOCAL_CONSTANTS } from "../../constants";
 import { displayError, displaySuccess } from "../../utils/notification";
+import { useParams } from "react-router-dom";
 
-const AddDashboardLayoutView = () => {
+const UpdateDashboardView = () => {
+  const { id } = useParams();
   const theme = useTheme();
 
   const {
-    isPending: isAddingDashboardLayout,
-    isSuccess: isAddingDashboardLayoutSuccess,
-    isError: isAddingDashboardLayoutError,
-    error: addDashboardLayoutError,
-    mutate: addDashboardLayout,
+    isLoading: isLoadingDashboard,
+    data: dashboard,
+    error: loadDashboardError,
+    refetch: refetchDashboard,
+  } = useQuery({
+    queryKey: [`REACT_QUERY_KEY_DASHBOARD_LAYOUTS`, id],
+    queryFn: () => getDashboardByIDAPI({ dashboardID: id }),
+    retry: 1,
+  });
+
+  const {
+    isPending: isUpdatingDashboard,
+    isSuccess: isUpdatingDashboardSuccess,
+    isError: isUpdatingDashboardError,
+    error: updateDashboardError,
+    mutate: updateDashboard,
   } = useMutation({
     mutationFn: ({ data }) => {
-      return addDashboardLayoutAPI({ data });
+      return updateDashboardAPI({ data });
     },
     retry: false,
     onSuccess: () => {
-      displaySuccess("Added dashboard layout successfully");
+      displaySuccess("Updated dashboard layout successfully");
     },
     onError: (error) => {
       displayError(error);
     },
   });
-  const dashboardLayoutForm = useFormik({
+
+  const dashboardForm = useFormik({
     initialValues: {
-      dashboard_layout_title: "",
+      dashboard_title: "",
       graph_ids: [],
     },
     validateOnMount: false,
@@ -44,20 +62,35 @@ const AddDashboardLayoutView = () => {
       return errors;
     },
     onSubmit: (values) => {
-      const { dashboard_layout_title, ...dashboard_layout_options } = values;
-      addDashboardLayout({
-        data: { dashboard_layout_title, dashboard_layout_options },
+      const { dashboard_title, ...dashboard_options } = values;
+      updateDashboard({
+        data: {
+          pm_dashboard_id: id,
+          dashboard_title: dashboard_title,
+          dashboard_options,
+        },
       });
     },
   });
+
+  useEffect(() => {
+    if (dashboard) {
+      dashboardForm.setFieldValue("dashboard_title", dashboard.dashboard_title);
+      dashboardForm.setFieldValue(
+        "graph_ids",
+        dashboard.dashboard_options.graph_ids
+      );
+    }
+  }, [dashboard]);
   return (
     <div className="w-full h-full">
       <Grid container className="!h-full">
         <Grid
           item
+          xl={2}
           lg={3}
           md={3}
-          sm={4}
+          sm={3}
           className="w-full !border-r !border-white !border-opacity-10"
         >
           <Grid sm={12}>
@@ -65,11 +98,8 @@ const AddDashboardLayoutView = () => {
               className="flex flex-row justify-between items-center p-3 !border-b !border-white !border-opacity-10"
               style={{ background: theme.palette.background.paper }}
             >
-              <span className="text-lg font-bold text-start">{`Add new dashboard`}</span>
-              <Button
-                variant="contained"
-                onClick={dashboardLayoutForm.handleSubmit}
-              >
+              <span className="text-sm font-medium text-start">{`Update dashboard`}</span>
+              <Button variant="contained" onClick={dashboardForm.handleSubmit}>
                 Save
               </Button>
             </div>
@@ -81,9 +111,10 @@ const AddDashboardLayoutView = () => {
 
         <Grid
           item
+          xl={10}
           lg={9}
           md={9}
-          sm={8}
+          sm={9}
           className="w-full !overflow-y-auto"
           style={{ background: theme.palette.divider }}
         >
@@ -96,16 +127,16 @@ const AddDashboardLayoutView = () => {
             style={{ background: theme.palette.divider }}
           >
             <FieldComponent
-              name={"dashboard_layout_title"}
+              name={"dashboard_title"}
               type={LOCAL_CONSTANTS.DATA_TYPES.STRING}
-              value={dashboardLayoutForm.values["dashboard_layout_title"]}
-              onChange={dashboardLayoutForm.handleChange}
+              value={dashboardForm.values["dashboard_title"]}
+              onChange={dashboardForm.handleChange}
             />
           </Grid>
           <GraphLayoutDropZoneComponent
-            graphIDData={dashboardLayoutForm.values["graph_ids"]}
+            graphIDData={dashboardForm.values["graph_ids"]}
             setGraphIDData={(value) =>
-              dashboardLayoutForm.setFieldValue("graph_ids", value)
+              dashboardForm.setFieldValue("graph_ids", value)
             }
           />
         </Grid>
@@ -114,4 +145,4 @@ const AddDashboardLayoutView = () => {
   );
 };
 
-export default AddDashboardLayoutView;
+export default UpdateDashboardView;

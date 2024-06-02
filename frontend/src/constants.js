@@ -95,8 +95,8 @@ export const LOCAL_CONSTANTS = {
       path: (id) => `${id}`,
     },
     ALL_DASHBOARD_LAYOUTS: {
-      code: "/dashboard_layout/*",
-      path: () => "/dashboard_layout",
+      code: "/dashboard/*",
+      path: () => "/dashboard",
     },
     ADD_DASHBOARD_LAYOUT: {
       code: "add",
@@ -179,10 +179,10 @@ export const LOCAL_CONSTANTS = {
       getGraphDataByID: ({ id }) => `/admin_api/graphs/${id}/data`,
     },
     DASHBOARD_LAYOUT: {
-      getAllDashboardLayouts: () => `/admin_api/dashboard_layouts`,
-      getDashboardLayoutByID: ({ id }) => `/admin_api/dashboard_layouts/${id}`,
-      addDashboardLayout: () => `/admin_api/dashboard_layouts`,
-      updateDashboardLayout: () => `/admin_api/dashboard_layouts`,
+      getAllDashboards: () => `/admin_api/dashboards`,
+      getDashboardByID: ({ id }) => `/admin_api/dashboards/${id}`,
+      addDashboard: () => `/admin_api/dashboards`,
+      updateDashboard: () => `/admin_api/dashboards`,
     },
 
     CONSTANTS: {

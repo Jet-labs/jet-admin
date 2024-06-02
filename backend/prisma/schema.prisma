@@ -234,27 +234,27 @@ model tbl_pm_users {
 }
 
 model tbl_pm_graphs {
-  pm_graph_id    Int       @id @default(autoincrement())
-  title          String    @db.VarChar
-  description    String?   @db.VarChar
-  is_disabled    Boolean?  @default(false)
-  created_at     DateTime  @default(now()) @db.Timestamptz(6)
-  updated_at     DateTime  @default(now()) @db.Timestamptz(6)
-  disabled_at    DateTime? @db.Timestamptz(6)
-  disable_reason String?   @db.VarChar
-  graph_options  Json?
+  pm_graph_id       Int       @id @default(autoincrement())
+  graph_title       String    @db.VarChar
+  graph_description String?   @db.VarChar
+  is_disabled       Boolean?  @default(false)
+  created_at        DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime  @default(now()) @db.Timestamptz(6)
+  disabled_at       DateTime? @db.Timestamptz(6)
+  disable_reason    String?   @db.VarChar
+  graph_options     Json?
 }
 
-model tbl_pm_dashboard_layouts {
-  pm_dashboard_layout_id   Int       @id(map: "tbl_pm_dashboard_layout_pkey") @default(autoincrement())
-  title                    String    @db.VarChar
-  description              String?   @db.VarChar
-  is_disabled              Boolean?  @default(false)
-  created_at               DateTime  @default(now()) @db.Timestamptz(6)
-  updated_at               DateTime  @default(now()) @db.Timestamptz(6)
-  disabled_at              DateTime? @db.Timestamptz(6)
-  disable_reason           String?   @db.VarChar
-  dashboard_layout_options Json?
+model tbl_pm_dashboards {
+  pm_dashboard_id       Int       @id(map: "tbl_pm_dashboard_layout_pkey") @default(autoincrement())
+  dashboard_title       String    @db.VarChar
+  dashboard_description String?   @db.VarChar
+  is_disabled           Boolean?  @default(false)
+  created_at            DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at            DateTime  @default(now()) @db.Timestamptz(6)
+  disabled_at           DateTime? @db.Timestamptz(6)
+  disable_reason        String?   @db.VarChar
+  dashboard_options     Json?
 }
 
 enum mpaa_rating {

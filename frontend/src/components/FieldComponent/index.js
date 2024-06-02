@@ -130,7 +130,7 @@ export const FieldComponent = ({
             name={name}
             // placeholder={label}
             setCode={(value) => {
-              setFieldValue(name, value);
+              setFieldValue(name, value?String(value).replace(/\n/g, ''):value);
             }}
             onBlur={onBlur}
             code={value}
@@ -307,7 +307,10 @@ export const FieldComponent = ({
             name={name}
             // placeholder={label}
             setCode={(value) => {
-              setFieldValue(name, value);
+              setFieldValue(
+                name,
+                value ? String(value).replace(/\n/g, "") : value
+              );
             }}
             language={language ? language : "json"}
             onBlur={onBlur}
@@ -509,7 +512,10 @@ export const FieldComponent = ({
             name={name}
             // placeholder={label}
             setCode={(value) => {
-              setFieldValue(name, value);
+              setFieldValue(
+                name,
+                value ? String(value).replace(/\n/g, "") : value
+              );
             }}
             language={language ? language : "json"}
             onBlur={onBlur}

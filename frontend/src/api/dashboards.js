@@ -1,11 +1,11 @@
 import { LOCAL_CONSTANTS } from "../constants";
-import { DashboardLayout } from "../models/data/dashboardLayout";
+import { Dashboard } from "../models/data/dashboard";
 import axiosInstance from "../utils/axiosInstance";
 
-export const addDashboardLayoutAPI = async ({ data }) => {
+export const addDashboardAPI = async ({ data }) => {
   try {
     const response = await axiosInstance.post(
-      LOCAL_CONSTANTS.APIS.DASHBOARD_LAYOUT.addDashboardLayout(),
+      LOCAL_CONSTANTS.APIS.DASHBOARD_LAYOUT.addDashboard(),
       data
     );
     if (response.data && response.data.success == true) {
@@ -20,10 +20,10 @@ export const addDashboardLayoutAPI = async ({ data }) => {
   }
 };
 
-export const updateDashboardLayoutAPI = async ({ data }) => {
+export const updateDashboardAPI = async ({ data }) => {
   try {
     const response = await axiosInstance.put(
-      LOCAL_CONSTANTS.APIS.DASHBOARD_LAYOUT.updateDashboardLayout(),
+      LOCAL_CONSTANTS.APIS.DASHBOARD_LAYOUT.updateDashboard(),
       data
     );
 
@@ -40,15 +40,15 @@ export const updateDashboardLayoutAPI = async ({ data }) => {
   }
 };
 
-export const getDashboardLayoutByIDAPI = async ({ graphID }) => {
+export const getDashboardByIDAPI = async ({ dashboardID }) => {
   try {
     const response = await axiosInstance.get(
-      LOCAL_CONSTANTS.APIS.DASHBOARD_LAYOUT.getDashboardLayoutByID({
-        id: graphID,
+      LOCAL_CONSTANTS.APIS.DASHBOARD_LAYOUT.getDashboardByID({
+        id: dashboardID,
       })
     );
     if (response.data && response.data.success == true) {
-      return new DashboardLayout(response.data.dashboardLayout);
+      return new Dashboard(response.data.dashboard);
     } else if (response.data.error) {
       throw response.data.error;
     } else {
@@ -59,13 +59,13 @@ export const getDashboardLayoutByIDAPI = async ({ graphID }) => {
   }
 };
 
-export const getAllDashboardLayoutAPI = async () => {
+export const getAllDashboardAPI = async () => {
   try {
     const response = await axiosInstance.get(
-      LOCAL_CONSTANTS.APIS.DASHBOARD_LAYOUT.getAllDashboardLayouts()
+      LOCAL_CONSTANTS.APIS.DASHBOARD_LAYOUT.getAllDashboards()
     );
     if (response.data && response.data.success == true) {
-      return DashboardLayout.toList(response.data.dashboardLayouts);
+      return Dashboard.toList(response.data.dashboards);
     } else if (response.data.error) {
       throw response.data.error;
     } else {

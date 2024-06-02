@@ -83,7 +83,7 @@ const GraphView = () => {
         "legend_position",
         graphData.graph_options.legend_position
       );
-      graphForm.setFieldValue("graph_title", graphData.title);
+      graphForm.setFieldValue("graph_title", graphData.graph_title);
 
       graphForm.setFieldValue(
         "query_array",
@@ -100,7 +100,7 @@ const GraphView = () => {
       >
         <span className="text-lg font-bold text-start ">{`Update graph`}</span>
         {graphData && (
-          <span className="text-xs font-thin text-start text-slate-300">{`${graphData.title} | Graph ID : ${graphData.pm_graph_id}`}</span>
+          <span className="text-xs font-thin text-start text-slate-300">{`${graphData.graph_title} | Graph ID : ${graphData.pm_graph_id}`}</span>
         )}
       </div>
       <Grid container spacing={1} className="!px-3">

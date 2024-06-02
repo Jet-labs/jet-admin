@@ -16,8 +16,8 @@ expressApp.use(
 expressApp.use("/admin_api/tables", require("./modules/routes/table.route"));
 expressApp.use("/admin_api/graphs", require("./modules/routes/graph.route"));
 expressApp.use(
-  "/admin_api/dashboard_layouts",
-  require("./modules/routes/dashboardLayout.route")
+  "/admin_api/dashboards",
+  require("./modules/routes/dashboard.route")
 );
 
 expressApp.get("/", async (req, res) => {

@@ -99,7 +99,7 @@ export const GraphsDnDList = ({}) => {
                 sx={{
                   color: theme.palette.primary.contrastText,
                 }}
-                primary={graph.title}
+                primary={graph.graph_title}
                 primaryTypographyProps={{
                   sx: {
                     marginLeft: -2,

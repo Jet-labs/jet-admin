@@ -12,34 +12,33 @@ import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-import { getAllDashboardLayoutAPI } from "../../../api/dashboardLayouts";
+import { getAllDashboardAPI } from "../../../api/dashboards";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { useAuthState } from "../../../contexts/authContext";
 
-export const DashboardLayoutsList = ({ currentPageTitle }) => {
+export const DashboardsList = ({ currentPageTitle }) => {
   const theme = useTheme();
   const { pmUser } = useAuthState();
   const navigate = useNavigate();
-  const isAuthorizedToAddDashboardLayout = useMemo(() => {
+  const isAuthorizedToAddDashboard = useMemo(() => {
     return (
-      pmUser &&
-      pmUser.extractAuthorizationForDashboardLayoutAddFromPolicyObject()
+      pmUser && pmUser.extractAuthorizationForDashboardAddFromPolicyObject()
     );
   }, [pmUser]);
   const {
-    isLoading: isLoadingDashboardLayouts,
-    data: dashboardLayouts,
-    error: loadDashboardLayoutsError,
-    refetch: refetchDashboardLayouts,
+    isLoading: isLoadingDashboards,
+    data: dashboards,
+    error: loadDashboardsError,
+    refetch: refetchDashboards,
   } = useQuery({
     queryKey: [`REACT_QUERY_KEY_DASHBOARD_LAYOUTS`],
-    queryFn: () => getAllDashboardLayoutAPI(),
+    queryFn: () => getAllDashboardAPI(),
     cacheTime: 0,
     retry: 1,
     staleTime: Infinity,
   });
 
-  const _navigateToAddMoreDashboardLayout = () => {
+  const _navigateToAddMoreDashboard = () => {
     navigate(LOCAL_CONSTANTS.ROUTES.ADD_DASHBOARD_LAYOUT.path());
   };
   return (
@@ -60,10 +59,10 @@ export const DashboardLayoutsList = ({ currentPageTitle }) => {
           primary="Dashboard Layouts"
         />
       </ListItemButton>
-      {isAuthorizedToAddDashboardLayout && (
+      {isAuthorizedToAddDashboard && (
         <div className="!p-3 !w-full !pb-1.5">
           <Button
-            onClick={_navigateToAddMoreDashboardLayout}
+            onClick={_navigateToAddMoreDashboard}
             variant="contained"
             className="!w-full"
           >
@@ -72,17 +71,17 @@ export const DashboardLayoutsList = ({ currentPageTitle }) => {
         </div>
       )}
 
-      {dashboardLayouts?.map((dashboardLayout) => {
-        const key = `dashboard_layout_${dashboardLayout.pm_dashboard_layout_id}`;
+      {dashboards?.map((dashboard) => {
+        const key = `dashboard_${dashboard.pm_dashboard_id}`;
         return (
           <Link
             to={LOCAL_CONSTANTS.ROUTES.GRAPH_VIEW.path(
-              dashboardLayout.pm_dashboard_layout_id
+              dashboard.pm_dashboard_id
             )}
             key={key}
           >
             <ListItem
-              key={`_dashboard_layout_${dashboardLayout.pm_dashboard_layout_id}`}
+              key={`_dashboard_${dashboard.pm_dashboard_id}`}
               disablePadding
               className="!px-3 !py-1.5"
             >
@@ -109,7 +108,7 @@ export const DashboardLayoutsList = ({ currentPageTitle }) => {
                         ? theme.palette.primary.main
                         : theme.palette.primary.contrastText,
                   }}
-                  primary={dashboardLayout.title}
+                  primary={dashboard.dashboard_title}
                   primaryTypographyProps={{
                     sx: {
                       fontWeight: key == currentPageTitle ? "700" : "500",

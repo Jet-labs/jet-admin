@@ -2,19 +2,17 @@ import { Grid } from "@mui/material";
 import { lazy, useMemo } from "react";
 import { Outlet, Route, Routes } from "react-router-dom";
 import { LOCAL_CONSTANTS } from "../../../constants";
-import { DashboardLayoutsList } from "../../drawerLists/DashboardLayoutDrawerList";
-const AddDashboardLayoutView = lazy(() =>
-  import("../../../pages/AddDashboardLayoutView")
-);
-const UpdateDashboardLayoutView = lazy(() =>
-  import("../../../pages/UpdateDashboardLayoutView")
+import { DashboardsList } from "../../drawerLists/DashboardDrawerList";
+const AddDashboardView = lazy(() => import("../../../pages/AddDashboardView"));
+const UpdateDashboardView = lazy(() =>
+  import("../../../pages/UpdateDashboardView")
 );
 
 const DashboardLayout = () => {
   return (
     <Grid container>
       <Grid item xs={3} sm={3} md={3} lg={2} xl={2}>
-        <DashboardLayoutsList />
+        <DashboardsList />
       </Grid>
       <Grid
         xs={9}
@@ -34,11 +32,11 @@ const DashboardLayout = () => {
 
           <Route
             path={LOCAL_CONSTANTS.ROUTES.ADD_DASHBOARD_LAYOUT.code}
-            element={<AddDashboardLayoutView />}
+            element={<AddDashboardView />}
           />
           <Route
             path={LOCAL_CONSTANTS.ROUTES.DASHBOARD_LAYOUT_VIEW.code}
-            element={<UpdateDashboardLayoutView />}
+            element={<UpdateDashboardView />}
           />
         </Routes>
         <Outlet />

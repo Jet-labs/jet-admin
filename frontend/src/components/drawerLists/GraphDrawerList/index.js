@@ -128,7 +128,7 @@ export const GraphDrawerList = ({ setCurrentPageTitle, currentPageTitle }) => {
                         ? theme.palette.primary.main
                         : theme.palette.primary.contrastText,
                   }}
-                  primary={graph.title}
+                  primary={graph.graph_title}
                   primaryTypographyProps={{
                     sx: {
                       fontWeight: key == currentPageTitle ? "700" : "500",

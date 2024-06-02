@@ -1,8 +1,14 @@
 export class Graph {
-  constructor({ pm_graph_id, title, description, graph_options, dataset }) {
+  constructor({
+    pm_graph_id,
+    graph_title,
+    graph_description,
+    graph_options,
+    dataset,
+  }) {
     this.pm_graph_id = parseInt(pm_graph_id);
-    this.title = String(title);
-    this.description = String(description);
+    this.graph_title = String(graph_title);
+    this.graph_description = String(graph_description);
     this.graph_options =
       typeof graph_options === "object"
         ? graph_options

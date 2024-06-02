@@ -22,7 +22,7 @@ graphController.addGraph = async (req, res) => {
     });
 
     const newGraph = await GraphService.addGraph({
-      title: body.graph_title,
+      graphTitle: body.graph_title,
       graphOptions: body.graph_options,
     });
 
@@ -62,8 +62,8 @@ graphController.updateGraph = async (req, res) => {
     });
 
     const updatedGraph = await GraphService.updateGraph({
-      graphID: parseInt(body.graph_id),
-      title: body.graph_title,
+      graphID: parseInt(body.pm_graph_id),
+      graphTitle: body.graph_title,
       graphOptions: body.graph_options,
       authorizedGraphs: authorized_graphs,
     });
@@ -96,16 +96,16 @@ graphController.getGraphData = async (req, res) => {
   try {
     const { pmUser, state, params } = req;
     const pm_user_id = parseInt(pmUser.pm_user_id);
-    const graph_id = parseInt(params.id);
+    const pm_graph_id = parseInt(params.id);
     const authorized_graphs = state.authorized_graphs;
 
     Logger.log("info", {
       message: "graphController:getGraphData:params",
-      params: { pm_user_id, graph_id },
+      params: { pm_user_id, pm_graph_id },
     });
 
     const graph = await GraphService.getGraphData({
-      graphID: graph_id,
+      graphID: pm_graph_id,
       authorizedGraphs: authorized_graphs,
     });
 
@@ -160,6 +160,46 @@ graphController.getAllGraphs = async (req, res) => {
   } catch (error) {
     Logger.log("error", {
       message: "graphController:getAllGraphs:catch-1",
+      params: { error },
+    });
+    return res.json({ success: false, error: extractError(error) });
+  }
+};
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @returns
+ */
+graphController.deleteGraph = async (req, res) => {
+  try {
+    const { pmUser, state, params } = req;
+    const pm_user_id = parseInt(pmUser.pm_user_id);
+    const pm_graph_id = parseInt(params.id);
+    const authorized_graphs = state.authorized_graphs;
+
+    Logger.log("info", {
+      message: "graphController:deleteGraph:params",
+      params: { pm_user_id, pm_graph_id },
+    });
+
+    await GraphService.deleteGraph({
+      graphID: pm_graph_id,
+      authorizedGraphs: authorized_graphs,
+    });
+
+    Logger.log("success", {
+      message: "graphController:deleteGraph:success",
+      params: { pm_user_id },
+    });
+
+    return res.json({
+      success: true,
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "graphController:deleteGraph:catch-1",
       params: { error },
     });
     return res.json({ success: false, error: extractError(error) });

@@ -207,20 +207,13 @@ export class PMUser {
   };
   extractAuthorizedGraphsForReadFromPolicyObject = () => {
     const authorizeGraphIDs = [];
-    if (this.policy.dashboard_layouts.read) {
+    if (this.policy.dashboards.read) {
       return true;
-    } else if (
-      this.policy.dashboard_layouts &&
-      this.policy.dashboard_layouts.dashboard_layout_ids
-    ) {
-      Object.keys(this.policy.dashboard_layouts.dashboard_layout_ids).forEach(
-        (dashboardLayoutID) => {
-          if (
-            this.policy.dashboard_layouts.dashboard_layout_ids[
-              dashboardLayoutID
-            ].read
-          ) {
-            authorizeGraphIDs.push(parseInt(dashboardLayoutID));
+    } else if (this.policy.dashboards && this.policy.dashboards.dashboard_ids) {
+      Object.keys(this.policy.dashboards.dashboard_ids).forEach(
+        (dashboardID) => {
+          if (this.policy.dashboards.dashboard_ids[dashboardID].read) {
+            authorizeGraphIDs.push(parseInt(dashboardID));
           }
         }
       );
@@ -230,20 +223,13 @@ export class PMUser {
 
   extractAuthorizedGraphsForUpdateFromPolicyObject = () => {
     const authorizeGraphIDs = [];
-    if (this.policy.dashboard_layouts.edit) {
+    if (this.policy.dashboards.edit) {
       return true;
-    } else if (
-      this.policy.dashboard_layouts &&
-      this.policy.dashboard_layouts.dashboard_layout_ids
-    ) {
-      Object.keys(this.policy.dashboard_layouts.dashboard_layout_ids).forEach(
-        (dashboardLayoutID) => {
-          if (
-            this.policy.dashboard_layouts.dashboard_layout_ids[
-              dashboardLayoutID
-            ].edit
-          ) {
-            authorizeGraphIDs.push(parseInt(dashboardLayoutID));
+    } else if (this.policy.dashboards && this.policy.dashboards.dashboard_ids) {
+      Object.keys(this.policy.dashboards.dashboard_ids).forEach(
+        (dashboardID) => {
+          if (this.policy.dashboards.dashboard_ids[dashboardID].edit) {
+            authorizeGraphIDs.push(parseInt(dashboardID));
           }
         }
       );
@@ -252,61 +238,47 @@ export class PMUser {
   };
 
   extractAuthorizationForGraphAddFromPolicyObject = () => {
-    console.log(this.policy.dashboard_layouts);
-    if (this.policy.dashboard_layouts.add) {
+    console.log(this.policy.dashboards);
+    if (this.policy.dashboards.add) {
       return true;
     }
     return false;
   };
-  extractAuthorizedDashboardLayoutsForReadFromPolicyObject = () => {
-    const authorizeDashboardLayoutIDs = [];
-    if (this.policy.dashboard_layouts.read) {
+  extractAuthorizedDashboardsForReadFromPolicyObject = () => {
+    const authorizeDashboardIDs = [];
+    if (this.policy.dashboards.read) {
       return true;
-    } else if (
-      this.policy.dashboard_layouts &&
-      this.policy.dashboard_layouts.dashboard_layout_ids
-    ) {
-      Object.keys(this.policy.dashboard_layouts.dashboard_layout_ids).forEach(
-        (dashboardLayoutID) => {
-          if (
-            this.policy.dashboard_layouts.dashboard_layout_ids[
-              dashboardLayoutID
-            ].read
-          ) {
-            authorizeDashboardLayoutIDs.push(parseInt(dashboardLayoutID));
+    } else if (this.policy.dashboards && this.policy.dashboards.dashboard_ids) {
+      Object.keys(this.policy.dashboards.dashboard_ids).forEach(
+        (dashboardID) => {
+          if (this.policy.dashboards.dashboard_ids[dashboardID].read) {
+            authorizeDashboardIDs.push(parseInt(dashboardID));
           }
         }
       );
     }
-    return authorizeDashboardLayoutIDs;
+    return authorizeDashboardIDs;
   };
 
-  extractAuthorizedDashboardLayoutsForUpdateFromPolicyObject = () => {
-    const authorizeDashboardLayoutIDs = [];
-    if (this.policy.dashboard_layouts.edit) {
+  extractAuthorizedDashboardsForUpdateFromPolicyObject = () => {
+    const authorizeDashboardIDs = [];
+    if (this.policy.dashboards.edit) {
       return true;
-    } else if (
-      this.policy.dashboard_layouts &&
-      this.policy.dashboard_layouts.dashboard_layout_ids
-    ) {
-      Object.keys(this.policy.dashboard_layouts.dashboard_layout_ids).forEach(
-        (dashboardLayoutID) => {
-          if (
-            this.policy.dashboard_layouts.dashboard_layout_ids[
-              dashboardLayoutID
-            ].edit
-          ) {
-            authorizeDashboardLayoutIDs.push(parseInt(dashboardLayoutID));
+    } else if (this.policy.dashboards && this.policy.dashboards.dashboard_ids) {
+      Object.keys(this.policy.dashboards.dashboard_ids).forEach(
+        (dashboardID) => {
+          if (this.policy.dashboards.dashboard_ids[dashboardID].edit) {
+            authorizeDashboardIDs.push(parseInt(dashboardID));
           }
         }
       );
     }
-    return authorizeDashboardLayoutIDs;
+    return authorizeDashboardIDs;
   };
 
-  extractAuthorizationForDashboardLayoutAddFromPolicyObject = () => {
-    console.log(this.policy.dashboard_layouts);
-    if (this.policy.dashboard_layouts.add) {
+  extractAuthorizationForDashboardAddFromPolicyObject = () => {
+    console.log(this.policy.dashboards);
+    if (this.policy.dashboards.add) {
       return true;
     }
     return false;
