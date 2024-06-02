@@ -1,4 +1,3 @@
-import CloseIcon from "@mui/icons-material/Close";
 import {
   Drawer,
   Grid,
@@ -7,7 +6,7 @@ import {
   useTheme,
 } from "@mui/material";
 import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { FaTimes } from "react-icons/fa";
 import { MainDrawerList } from "../../drawerLists/MainDrawerList";
 import { Navbar } from "../../Navbar";
 
@@ -44,7 +43,7 @@ export const MainLayout = ({ children }) => {
         <div className="!w-full">
           <div className="flex flex-row justify-end items-center w-full">
             <IconButton onClick={_handleDrawerClose} edge="start">
-              <CloseIcon />
+              <FaTimes className="!text-sm" />
             </IconButton>
           </div>
 

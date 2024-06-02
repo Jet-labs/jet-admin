@@ -19,12 +19,9 @@ export const TableDrawerList = ({ authorizedTables, currentPageTitle }) => {
       className=" !h-[calc(100vh-66px)] !overflow-y-auto !overflow-x-hidden !border-r !border-white !border-opacity-10 w-full"
     >
       <ListItemButton>
-        <ListItemIcon>
-          <FaDatabase sx={{}} />
-        </ListItemIcon>
         <ListItemText
           primaryTypographyProps={{
-            sx: { marginLeft: -2 },
+            sx: { fontWeight: "600" },
           }}
           primary="Tables"
         />

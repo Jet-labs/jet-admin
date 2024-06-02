@@ -1,11 +1,4 @@
 import {
-  BarChart,
-  DataUsage,
-  SsidChart,
-  TableRows,
-  TrackChanges,
-} from "@mui/icons-material";
-import {
   Button,
   List,
   ListItem,
@@ -20,6 +13,9 @@ import { Link, useNavigate } from "react-router-dom";
 import { getAllGraphAPI } from "../../../api/graphs";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { useAuthState } from "../../../contexts/authContext";
+import { FaChartBar, FaChartLine, FaChartPie, FaPlus } from "react-icons/fa";
+
+import { BiRadar } from "react-icons/bi";
 
 export const GraphDrawerList = ({ setCurrentPageTitle, currentPageTitle }) => {
   const theme = useTheme();
@@ -52,12 +48,9 @@ export const GraphDrawerList = ({ setCurrentPageTitle, currentPageTitle }) => {
       className=" !h-[calc(100vh-66px)] !overflow-y-auto !overflow-x-hidden !border-r !border-white !border-opacity-10 w-full"
     >
       <ListItemButton>
-        <ListItemIcon>
-          <TableRows sx={{}} />
-        </ListItemIcon>
         <ListItemText
           primaryTypographyProps={{
-            sx: { marginLeft: -2 },
+            sx: { fontWeight: "600" },
           }}
           primary="Graphs"
         />
@@ -68,6 +61,7 @@ export const GraphDrawerList = ({ setCurrentPageTitle, currentPageTitle }) => {
             onClick={_navigateToAddMoreGraph}
             variant="contained"
             className="!w-full"
+            startIcon={<FaPlus className="!text-sm" />}
           >
             Add more graphs
           </Button>
@@ -106,19 +100,19 @@ export const GraphDrawerList = ({ setCurrentPageTitle, currentPageTitle }) => {
                 >
                   {graph.graph_options.graph_type ===
                   LOCAL_CONSTANTS.GRAPH_TYPES.BAR.value ? (
-                    <BarChart sx={{ fontSize: 16 }} />
+                    <FaChartBar className="!text-sm" />
                   ) : graph.graph_options.graph_type ===
                       LOCAL_CONSTANTS.GRAPH_TYPES.PIE.value ||
                     graph.graph_options.graph_type ===
                       LOCAL_CONSTANTS.GRAPH_TYPES.DOUGHNUT.value ||
                     graph.graph_options.graph_type ===
                       LOCAL_CONSTANTS.GRAPH_TYPES.POLAR_AREA.value ? (
-                    <DataUsage sx={{ fontSize: 16 }} />
+                    <FaChartPie className="!text-sm" />
                   ) : graph.graph_options.graph_type ===
                     LOCAL_CONSTANTS.GRAPH_TYPES.RADAR.value ? (
-                    <TrackChanges sx={{ fontSize: 16 }} />
+                    <BiRadar className="!text-sm" />
                   ) : (
-                    <SsidChart sx={{ fontSize: 16 }} />
+                    <FaChartLine className="!text-sm" />
                   )}
                 </ListItemIcon>
                 <ListItemText

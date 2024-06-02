@@ -1,5 +1,3 @@
-import { Logout, Phone } from "@mui/icons-material";
-import MenuIcon from "@mui/icons-material/Menu";
 import {
   AppBar,
   Avatar,
@@ -13,11 +11,11 @@ import {
   useTheme,
 } from "@mui/material";
 import { useState } from "react";
+import { BiLogInCircle, BiMenu } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
-import { useAuthActions, useAuthState } from "../../contexts/authContext";
-import { useConstants } from "../../contexts/constantsContext";
 import { LOCAL_CONSTANTS } from "../../constants";
+import { useAuthActions, useAuthState } from "../../contexts/authContext";
 
 export const Navbar = ({ children, handleDrawerOpen }) => {
   const navigate = useNavigate();
@@ -54,14 +52,10 @@ export const Navbar = ({ children, handleDrawerOpen }) => {
                 edge="start"
                 className="!mr-2"
               >
-                <MenuIcon />
+                <BiMenu className="!text-xl" />
               </IconButton>
             )}
             <img className="!h-11 !w-14" src={logo}></img>
-
-            {/* <span className="font-bold normal-case mx-2">
-                  {currentPageTitle}
-                </span> */}
             <span className="font-bold normal-case mx-3">
               {LOCAL_CONSTANTS.APP_NAME}
             </span>
@@ -118,7 +112,7 @@ export const Navbar = ({ children, handleDrawerOpen }) => {
           <Divider />
           <MenuItem onClick={signOut}>
             <ListItemIcon>
-              <Logout fontSize="small" />
+              <BiLogInCircle className="!text-sm" />
             </ListItemIcon>
             Logout
           </MenuItem>

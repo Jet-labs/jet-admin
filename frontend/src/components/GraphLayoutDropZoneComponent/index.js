@@ -1,7 +1,7 @@
 import { Grid, IconButton, useTheme } from "@mui/material";
-import { Close, Delete } from "@mui/icons-material";
 import React, { useState } from "react";
 import { GraphWidgetComponent } from "../GraphWidgetComponent";
+import { FaTimes } from "react-icons/fa";
 
 export const GraphLayoutDropZoneComponent = ({
   graphIDData,
@@ -83,7 +83,7 @@ export const GraphLayoutDropZoneComponent = ({
                     _handleDelete(index);
                   }}
                 >
-                  <Close fontSize="inherit" />
+                  <FaTimes className="!text-sm" />
                 </IconButton>
               </Grid>
               <GraphWidgetComponent id={graph.graphID} />

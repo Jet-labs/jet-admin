@@ -3,7 +3,6 @@ import { useQuery } from "@tanstack/react-query";
 import { LOCAL_CONSTANTS } from "../constants";
 import { fetchRemoteConstantsAPI } from "../api/constants";
 import { Loading } from "../pages/Loading";
-import { DynamicLoadingComponent } from "../components/DynamicLoadingComponent";
 const ConstantsContext = React.createContext(undefined);
 
 const ConstantsContextProvider = ({ children }) => {
@@ -31,14 +30,7 @@ const ConstantsContextProvider = ({ children }) => {
         dbModel,
       }}
     >
-      {dbModel ? (
-        children
-      ) : (
-        <DynamicLoadingComponent
-          textSet={["Loading constants..."]}
-          showIcons={false}
-        />
-      )}
+      {dbModel ? children : <Loading fullScreen={true} />}
     </ConstantsContext.Provider>
   );
 };

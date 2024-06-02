@@ -1,4 +1,4 @@
-import { Close, ExpandMore } from "@mui/icons-material";
+import { FaChevronDown, FaTimes } from "react-icons/fa";
 import {
   Button,
   Dialog,
@@ -84,7 +84,7 @@ export const DataGridSortComponent = ({
       <DialogTitle className=" !text-lg !flex flex-row justify-between items-center w-full">
         Sort
         <IconButton aria-label="close" onClick={handleCLoseSortMenu}>
-          <Close fontSize="small" />
+          <FaTimes className="!text-sm" />
         </IconButton>
       </DialogTitle>
       <DialogContent dividers>
@@ -94,7 +94,7 @@ export const DataGridSortComponent = ({
               name="field"
               onChange={_handleChangeSortField}
               value={sortField}
-              IconComponent={ExpandMore}
+              IconComponent={() => <FaChevronDown className="!text-sm" />}
               size="small"
               className=""
               fullWidth
@@ -118,7 +118,7 @@ export const DataGridSortComponent = ({
               name="operator"
               onChange={_handleChangeSortOrder}
               value={sortOrder}
-              IconComponent={ExpandMore}
+              IconComponent={() => <FaChevronDown className="!text-sm" />}
               size="small"
               className=""
               fullWidth

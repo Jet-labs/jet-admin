@@ -1,9 +1,9 @@
-import { Close } from "@mui/icons-material";
 import { Button, Grid, IconButton, useTheme } from "@mui/material";
 import React, { useState } from "react";
 import { FieldComponent } from "../FieldComponent";
 import { LOCAL_CONSTANTS } from "../../constants";
 import { ConfirmationDialog } from "../ConfirmationDialog";
+import { FaTimes } from "react-icons/fa";
 
 /**
  *
@@ -200,7 +200,7 @@ export const GraphBuilderForm = ({ graphForm, deleteGraph }) => {
                   className="!p-0"
                   onClick={() => _handleDeleteDataset(index)}
                 >
-                  <Close />
+                  <FaTimes className="!text-sm" />
                 </IconButton>
               </Grid>
               <Grid

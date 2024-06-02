@@ -89,7 +89,11 @@ const GraphView = () => {
     onSubmit: (values) => {
       const { graph_title, ...graph_options } = values;
       updateGraph({
-        data: { graph_id: graphData?.pm_graph_id, graph_title, graph_options },
+        data: {
+          pm_graph_id: graphData?.pm_graph_id,
+          graph_title,
+          graph_options,
+        },
       });
     },
   });

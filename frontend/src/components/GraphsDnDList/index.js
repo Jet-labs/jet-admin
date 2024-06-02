@@ -1,12 +1,6 @@
-import {
-  SsidChart,
-  BarChart,
-  DataUsage,
-  TableRows,
-  TrackChanges,
-  DragIndicator,
-} from "@mui/icons-material";
-import DataObjectIcon from "@mui/icons-material/DataObject";
+import { GrDrag } from "react-icons/gr";
+import { FaChartBar, FaChartLine, FaChartPie, FaPlus } from "react-icons/fa";
+
 import {
   Button,
   List,
@@ -23,6 +17,7 @@ import { LOCAL_CONSTANTS } from "../../constants";
 import { useAuthState } from "../../contexts/authContext";
 import { useMemo } from "react";
 import "./styles.css";
+import { BiRadar } from "react-icons/bi";
 export const GraphsDnDList = ({}) => {
   const theme = useTheme();
   const { pmUser } = useAuthState();
@@ -81,19 +76,19 @@ export const GraphsDnDList = ({}) => {
               >
                 {graph.graph_options.graph_type ===
                 LOCAL_CONSTANTS.GRAPH_TYPES.BAR.value ? (
-                  <BarChart sx={{ fontSize: 16 }} />
+                  <FaChartBar className="!text-sm" />
                 ) : graph.graph_options.graph_type ===
                     LOCAL_CONSTANTS.GRAPH_TYPES.PIE.value ||
                   graph.graph_options.graph_type ===
                     LOCAL_CONSTANTS.GRAPH_TYPES.DOUGHNUT.value ||
                   graph.graph_options.graph_type ===
                     LOCAL_CONSTANTS.GRAPH_TYPES.POLAR_AREA.value ? (
-                  <DataUsage sx={{ fontSize: 16 }} />
+                  <FaChartPie className="!text-sm" />
                 ) : graph.graph_options.graph_type ===
                   LOCAL_CONSTANTS.GRAPH_TYPES.RADAR.value ? (
-                  <TrackChanges sx={{ fontSize: 16 }} />
+                  <BiRadar className="!text-sm" />
                 ) : (
-                  <SsidChart sx={{ fontSize: 16 }} />
+                  <FaChartLine className="!text-sm" />
                 )}
               </ListItemIcon>
               <ListItemText
@@ -113,7 +108,7 @@ export const GraphsDnDList = ({}) => {
                 }}
                 className="draggable-graph-drag-icon-main"
               >
-                <DragIndicator sx={{ fontSize: 16 }} />
+                <GrDrag className="!text-sm" />
               </ListItemIcon>
             </ListItemButton>
           </ListItem>

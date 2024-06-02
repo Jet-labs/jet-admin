@@ -12,13 +12,8 @@ import {
   ListItem,
   TextField,
 } from "@mui/material";
-import {
-  Add,
-  CropSquareSharp,
-  FilterList,
-  Replay,
-  Search,
-} from "@mui/icons-material";
+
+
 import { DataGridFilterComponent } from "../DataGridFilterComponent";
 import {
   getRawQueryFromFilters,
@@ -29,9 +24,16 @@ import { AppliedFiltersList } from "../AppliedFilterList";
 import { RowAdditionForm } from "../RowAdditionForm";
 import { useAuthState } from "../../contexts/authContext";
 import { DataGridSortComponent } from "../DataGridSortComponent";
-import SortIcon from "@mui/icons-material/Sort";
-import CancelIcon from "@mui/icons-material/Cancel";
 import { LOCAL_CONSTANTS } from "../../constants";
+import {
+  FaSearch,
+  FaRedoAlt,
+  FaFilter,
+  FaPlus,
+  FaSort,
+  FaCross,
+  FaTimes,
+} from "react-icons/fa";
 export const DataGridActionComponent = ({
   setFilterQuery,
   setSortModel,
@@ -110,7 +112,7 @@ export const DataGridActionComponent = ({
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <Search />
+                <FaSearch className="!text-sm" />
               </InputAdornment>
             ),
           }}
@@ -132,7 +134,7 @@ export const DataGridActionComponent = ({
         <Button
           id="filter-menu-positioned-button"
           onClick={_handleOpenFilterMenu}
-          startIcon={<FilterList />}
+          startIcon={<FaFilter className="!text-sm" />}
           variant="outlined"
           size="medium"
         >
@@ -148,7 +150,7 @@ export const DataGridActionComponent = ({
             <Button
               id="filter-menu-positioned-button"
               onClick={_handleOpenSortMenu}
-              startIcon={<SortIcon />}
+              startIcon={<FaSort className="!text-sm" />}
               variant="outlined"
               size="medium"
             >
@@ -157,7 +159,7 @@ export const DataGridActionComponent = ({
             <Button
               id="filter-menu-positioned-button"
               onClick={() => setSortModel(null)}
-              endIcon={<CancelIcon />}
+              endIcon={<FaTimes className="!text-sm" />}
               variant="outlined"
               size="medium"
             ></Button>
@@ -166,7 +168,7 @@ export const DataGridActionComponent = ({
           <Button
             id="filter-menu-positioned-button"
             onClick={_handleOpenSortMenu}
-            startIcon={<SortIcon />}
+            startIcon={<FaSort className="!text-sm" />}
             variant="outlined"
             size="medium"
             className="!ml-2"
@@ -177,7 +179,7 @@ export const DataGridActionComponent = ({
 
         <Button
           onClick={reloadData}
-          startIcon={<Replay fontSize="large" />}
+          startIcon={<FaRedoAlt className="!text-sm" />}
           size="medium"
           variant="outlined"
           className="!ml-2"
@@ -186,7 +188,7 @@ export const DataGridActionComponent = ({
         </Button>
         <Button
           onClick={_handleNavigateRowAdditionForm}
-          startIcon={<Add fontSize="small" />}
+          startIcon={<FaPlus className="!text-sm" />}
           size="medium"
           variant="contained"
           className="!ml-2"

@@ -28,11 +28,21 @@ class DashboardService {
     });
     try {
       let newDashboard = null;
+      const _graphIDs = [];
+      if (
+        dashboardOptions.graph_ids &&
+        Array.isArray(dashboardOptions.graph_ids)
+      ) {
+        dashboardOptions.graph_ids.forEach((graph) => {
+          _graphIDs.push(graph.graphID);
+        });
+      }
       newDashboard = await prisma.tbl_pm_dashboards.create({
         data: {
           dashboard_title: String(dashboardTitle),
           dashboard_description: String(dashboardDescription),
           dashboard_options: dashboardOptions,
+          dashboard_graph_ids: _graphIDs,
         },
       });
       Logger.log("success", {
@@ -83,6 +93,15 @@ class DashboardService {
         authorizedDashboards === true ||
         authorizedDashboards.includes(dashboardID)
       ) {
+        const _graphIDs = [];
+        if (
+          dashboardOptions.graph_ids &&
+          Array.isArray(dashboardOptions.graph_ids)
+        ) {
+          dashboardOptions.graph_ids.forEach((graph)=>{
+            _graphIDs.push(graph.graphID)
+          })
+        }
         const updatedDashboard = await prisma.tbl_pm_dashboards.update({
           where: {
             pm_dashboard_id: dashboardID,
@@ -91,6 +110,7 @@ class DashboardService {
             dashboard_title: String(dashboardTitle),
             dashboard_description: String(dashboardDescription),
             dashboard_options: dashboardOptions,
+            dashboard_graph_ids: _graphIDs,
           },
         });
         Logger.log("success", {

@@ -1,19 +1,7 @@
-import CloseIcon from "@mui/icons-material/Close";
-import {
-  Drawer,
-  Grid,
-  IconButton,
-  useMediaQuery,
-  useTheme,
-} from "@mui/material";
-import { lazy, useMemo, useState } from "react";
-import { Outlet, Route, Routes, useNavigate } from "react-router-dom";
-import { useAuthState } from "../../../contexts/authContext";
-import { Navbar } from "../../Navbar";
-import { TableDrawerList } from "../../drawerLists/TableDrawerList";
+import { Grid } from "@mui/material";
+import { lazy } from "react";
+import { Outlet, Route, Routes } from "react-router-dom";
 import { LOCAL_CONSTANTS } from "../../../constants";
-import ProtectedRoute from "../../ProtectedRoute";
-import { Loading } from "../../../pages/Loading";
 import { GraphDrawerList } from "../../drawerLists/GraphDrawerList";
 // import TableView from "../../pages/TableView";
 

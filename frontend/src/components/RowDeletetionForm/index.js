@@ -1,14 +1,12 @@
 import { useMutation } from "@tanstack/react-query";
 
-import { Delete } from "@mui/icons-material";
 import { Button } from "@mui/material";
+import { useMemo, useState } from "react";
+import { IoTrash } from "react-icons/io5";
 import { deleteRowByIDAPI } from "../../api/delete";
 import { useAuthState } from "../../contexts/authContext";
-import { useConstants } from "../../contexts/constantsContext";
 import { displayError, displaySuccess } from "../../utils/notification";
 import { ConfirmationDialog } from "../ConfirmationDialog";
-import { useMemo, useState } from "react";
-
 export const RowDeletionForm = ({ tableName, id }) => {
   const { pmUser } = useAuthState();
   const [isDeleteRowConfirmationOpen, setIsDeleteRowConfirmationOpen] =
@@ -58,7 +56,7 @@ export const RowDeletionForm = ({ tableName, id }) => {
       <>
         <Button
           onClick={_handleOpenDeleteRowConfirmation}
-          startIcon={<Delete fontSize="large" />}
+          startIcon={<IoTrash className="!text-sm" />}
           size="medium"
           variant="outlined"
           className="!ml-2"

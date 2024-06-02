@@ -13,10 +13,10 @@ import { Loading } from "../Loading";
 
 import moment from "moment";
 import "react-data-grid/lib/styles.css";
+import { BiCalendar } from "react-icons/bi";
 import { DataGridActionComponent } from "../../components/DataGridActionComponent";
 import { ErrorComponent } from "../../components/ErrorComponent";
 import { RawDatagridStatistics } from "../../components/RawDataGridStatistics";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 
 const PolicyManagement = () => {
   const tableName = LOCAL_CONSTANTS.STRINGS.POLICY_OBJECT_TABLE_NAME;
@@ -78,7 +78,7 @@ const PolicyManagement = () => {
             size="small"
             variant="outlined"
             color={"secondary"}
-            icon={<CalendarMonthIcon />}
+            icon={<BiCalendar className="!text-sm" />}
             sx={{
               borderRadius: 1,
             }}
@@ -100,7 +100,7 @@ const PolicyManagement = () => {
             size="small"
             variant="outlined"
             color={"secondary"}
-            icon={<CalendarMonthIcon />}
+            icon={<BiCalendar className="!text-sm" />}
             sx={{
               borderRadius: 1,
             }}

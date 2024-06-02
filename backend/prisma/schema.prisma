@@ -255,6 +255,7 @@ model tbl_pm_dashboards {
   disabled_at           DateTime? @db.Timestamptz(6)
   disable_reason        String?   @db.VarChar
   dashboard_options     Json?
+  dashboard_graph_ids   Int[]
 }
 
 enum mpaa_rating {

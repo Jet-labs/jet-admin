@@ -1,38 +1,24 @@
-import { useDebounce } from "@uidotdev/usehooks";
-import { useEffect, useMemo, useState } from "react";
-import { useFormik, useFormikContext } from "formik";
 import {
   Button,
-  Chip,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  Divider,
   Grid,
   IconButton,
-  List,
-  ListItem,
-  Menu,
   MenuItem,
   Select,
-  TextField,
-  makeStyles,
 } from "@mui/material";
-import {
-  Close,
-  ExpandMore,
-  Filter,
-  FilterList,
-  Replay,
-} from "@mui/icons-material";
+import { useMemo, useState } from "react";
+
 import { LOCAL_CONSTANTS } from "../../constants";
 
-import { FieldComponent } from "../FieldComponent";
-import { useConstants } from "../../contexts/constantsContext";
-import { getFieldType, getAllTableFields } from "../../utils/tables";
-import { useAuthState } from "../../contexts/authContext";
 import moment from "moment";
+import { FaChevronDown, FaTimes } from "react-icons/fa";
+import { useAuthState } from "../../contexts/authContext";
+import { useConstants } from "../../contexts/constantsContext";
+import { getAllTableFields, getFieldType } from "../../utils/tables";
+import { FieldComponent } from "../FieldComponent";
 
 export const DataGridFilterComponent = ({
   tableName,
@@ -136,7 +122,7 @@ export const DataGridFilterComponent = ({
       <DialogTitle className=" !text-lg !flex flex-row justify-between items-center w-full">
         Filters
         <IconButton aria-label="close" onClick={handleCLoseFilterMenu}>
-          <Close fontSize="small" />
+          <FaTimes className="!text-sm" />
         </IconButton>
       </DialogTitle>
       {/* <Divider /> */}
@@ -147,7 +133,7 @@ export const DataGridFilterComponent = ({
               name="combinator"
               onChange={_handleChangeCombinator}
               value={combinator}
-              IconComponent={ExpandMore}
+              IconComponent={() => <FaChevronDown className="!text-sm" />}
               size="small"
               className=""
               fullWidth
@@ -173,7 +159,7 @@ export const DataGridFilterComponent = ({
               name="field"
               onChange={_handleChangeFilterField}
               value={filterField}
-              IconComponent={ExpandMore}
+              IconComponent={() => <FaChevronDown className="!text-sm" />}
               size="small"
               className=""
               fullWidth
@@ -197,7 +183,7 @@ export const DataGridFilterComponent = ({
                 name="operator"
                 onChange={_handleChangeFilterOperator}
                 value={filterOperator}
-                IconComponent={ExpandMore}
+                IconComponent={() => <FaChevronDown className="!text-sm" />}
                 size="small"
                 className=""
                 fullWidth

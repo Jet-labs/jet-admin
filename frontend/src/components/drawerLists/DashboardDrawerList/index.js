@@ -1,4 +1,3 @@
-import { SsidChart, TableRows } from "@mui/icons-material";
 import {
   Button,
   List,
@@ -8,6 +7,7 @@ import {
   ListItemText,
   useTheme,
 } from "@mui/material";
+
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -15,6 +15,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { getAllDashboardAPI } from "../../../api/dashboards";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { useAuthState } from "../../../contexts/authContext";
+import { FaChalkboardTeacher, FaPlus } from "react-icons/fa";
 
 export const DashboardsList = ({ currentPageTitle }) => {
   const theme = useTheme();
@@ -49,12 +50,12 @@ export const DashboardsList = ({ currentPageTitle }) => {
       className=" !h-[calc(100vh-66px)] !overflow-y-auto !overflow-x-hidden !border-r !border-white !border-opacity-10 w-full"
     >
       <ListItemButton>
-        <ListItemIcon>
+        {/* <ListItemIcon>
           <TableRows sx={{}} />
-        </ListItemIcon>
+        </ListItemIcon> */}
         <ListItemText
           primaryTypographyProps={{
-            sx: { marginLeft: -2 },
+            sx: { fontWeight: "600" },
           }}
           primary="Dashboard Layouts"
         />
@@ -65,6 +66,7 @@ export const DashboardsList = ({ currentPageTitle }) => {
             onClick={_navigateToAddMoreDashboard}
             variant="contained"
             className="!w-full"
+            startIcon={<FaPlus className="!text-sm" />}
           >
             Add more dashboards
           </Button>
@@ -99,7 +101,7 @@ export const DashboardsList = ({ currentPageTitle }) => {
                         : theme.palette.primary.contrastText,
                   }}
                 >
-                  <SsidChart sx={{ fontSize: 16 }} />
+                  <FaChalkboardTeacher className="!text-sm" />
                 </ListItemIcon>
                 <ListItemText
                   sx={{

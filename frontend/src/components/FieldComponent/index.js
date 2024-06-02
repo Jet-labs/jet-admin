@@ -1,5 +1,4 @@
 import styled from "@emotion/styled";
-import { ExpandMore } from "@mui/icons-material";
 import {
   Box,
   Chip,
@@ -20,6 +19,7 @@ import { isNull } from "lodash";
 import moment from "moment";
 import { LOCAL_CONSTANTS } from "../../constants";
 import { CodeEditor } from "../CodeEditorComponent";
+import { FaChevronDown } from "react-icons/fa";
 
 export const FieldComponent = ({
   type,
@@ -130,7 +130,10 @@ export const FieldComponent = ({
             name={name}
             // placeholder={label}
             setCode={(value) => {
-              setFieldValue(name, value?String(value).replace(/\n/g, ''):value);
+              setFieldValue(
+                name,
+                value ? String(value).replace(/\n/g, "") : value
+              );
             }}
             onBlur={onBlur}
             code={value}
@@ -242,7 +245,7 @@ export const FieldComponent = ({
             onBlur={onBlur}
             value={Boolean(value)}
             error={error}
-            IconComponent={ExpandMore}
+            IconComponent={() => <FaChevronDown className="!text-sm" />}
             className=" !w-full"
             required={required}
             disabled={readOnly}
@@ -338,7 +341,7 @@ export const FieldComponent = ({
             onChange={onChange}
             onBlur={onBlur}
             value={parseInt(value)}
-            IconComponent={ExpandMore}
+            IconComponent={() => <FaChevronDown className="!text-sm" />}
             size="small"
             className=""
             fullWidth
@@ -395,7 +398,7 @@ export const FieldComponent = ({
             onChange={onChange}
             onBlur={onBlur}
             value={parseInt(value)}
-            IconComponent={ExpandMore}
+            IconComponent={() => <FaChevronDown className="!text-sm" />}
             size="small"
             className=""
             fullWidth
@@ -452,7 +455,7 @@ export const FieldComponent = ({
             onChange={onChange}
             onBlur={onBlur}
             value={parseInt(value)}
-            IconComponent={ExpandMore}
+            IconComponent={() => <FaChevronDown className="!text-sm" />}
             size="small"
             className=""
             fullWidth

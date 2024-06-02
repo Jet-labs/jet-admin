@@ -2,22 +2,21 @@ import { useNavigate } from "react-router-dom";
 
 import { Chip, Pagination } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import { fetchAllRowsAPI } from "../../api/get";
 import { useAuthState } from "../../contexts/authContext";
 
 import { LOCAL_CONSTANTS } from "../../constants";
 import { useConstants } from "../../contexts/constantsContext";
 import { Loading } from "../Loading";
-import { getAllTableFields, getTableIDProperty } from "../../utils/tables";
 
-import "react-data-grid/lib/styles.css";
-import { DataGridActionComponent } from "../../components/DataGridActionComponent";
-import { RawDatagridStatistics } from "../../components/RawDataGridStatistics";
-import { ErrorComponent } from "../../components/ErrorComponent";
 import moment from "moment";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
+import "react-data-grid/lib/styles.css";
+import { BiCalendar } from "react-icons/bi";
+import { DataGridActionComponent } from "../../components/DataGridActionComponent";
+import { ErrorComponent } from "../../components/ErrorComponent";
+import { RawDatagridStatistics } from "../../components/RawDataGridStatistics";
 const AccountManagement = () => {
   const tableName = LOCAL_CONSTANTS.STRINGS.PM_USER_TABLE_NAME;
   const { dbModel } = useConstants();
@@ -93,7 +92,7 @@ const AccountManagement = () => {
             size="small"
             variant="outlined"
             color={"secondary"}
-            icon={<CalendarMonthIcon />}
+            icon={<BiCalendar className="!text-sm" />}
             sx={{
               borderRadius: 1,
             }}
@@ -115,7 +114,7 @@ const AccountManagement = () => {
             size="small"
             variant="outlined"
             color={"secondary"}
-            icon={<CalendarMonthIcon />}
+            icon={<BiCalendar className="!text-sm" />}
             sx={{
               borderRadius: 1,
             }}

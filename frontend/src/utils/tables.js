@@ -1,11 +1,9 @@
-import { AccessTime, Key } from "@mui/icons-material";
 import { Chip, ListItem } from "@mui/material";
 
-import moment from "moment";
+import { BiCalendar } from "react-icons/bi";
 import { LOCAL_CONSTANTS } from "../constants";
 import { Model } from "../models/data/model";
 import { jsonToReadable } from "./string";
-import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 /**
  *
  * @param {String} tableName
@@ -107,7 +105,7 @@ export const getFieldFormatting = ({ type, isList, isID, params }) => {
                 sx={{
                   borderRadius: 1,
                 }}
-                icon={<CalendarMonthIcon />}
+                icon={<BiCalendar className="!text-sm" />}
               />
             </ListItem>
           );
@@ -119,7 +117,7 @@ export const getFieldFormatting = ({ type, isList, isID, params }) => {
           size="small"
           variant="outlined"
           color={"secondary"}
-          icon={<CalendarMonthIcon />}
+          icon={<BiCalendar className="!text-sm" />}
           sx={{
             borderRadius: 1,
           }}

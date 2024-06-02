@@ -1,4 +1,3 @@
-import { Close } from "@mui/icons-material";
 import {
   Button,
   CircularProgress,
@@ -10,6 +9,7 @@ import {
   IconButton,
 } from "@mui/material";
 import warning_illustration from "../../assets/warning_illustration.svg";
+import { FaTimes } from "react-icons/fa";
 
 export const ConfirmationDialog = ({
   onDecline,
@@ -44,7 +44,7 @@ export const ConfirmationDialog = ({
           <DialogTitle className=" !text-lg !flex flex-row justify-between items-center w-full">
             {title}
             <IconButton aria-label="close" onClick={onDecline}>
-              <Close fontSize="small" />
+              <FaTimes className="!text-base" />
             </IconButton>
           </DialogTitle>
           <DialogContent dividers className="!py-3">
