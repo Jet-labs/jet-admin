@@ -152,6 +152,13 @@ export const LOCAL_CONSTANTS = {
       getSelf: () => "/admin_api/auth/me",
     },
     TABLE: {
+      getAllTables: () => `/admin_api/tables`,
+      getAuthorizedColumnsForRead: ({ tableName }) =>
+        `/admin_api/tables/${tableName}/read_columns`,
+      getAuthorizedColumnsForEdit: ({ tableName }) =>
+        `/admin_api/tables/${tableName}/edit_columns`,
+      getAuthorizedColumnsForAdd: ({ tableName }) =>
+        `/admin_api/tables/${tableName}/add_columns`,
       getTableRows: ({ tableName, page, filterQuery, sortModel }) =>
         `/admin_api/tables/${tableName}/?page=${page}&q=${JSON.stringify(
           filterQuery

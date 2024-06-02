@@ -262,44 +262,25 @@ export const getFieldWidth = (type) => {
 
 /**
  *
- * @param {Model[]} dbModel
- * @param {String} tableName
+ * @param {object[]} columns
  * @returns
  */
-export const getRequiredFields = (tableName, dbModel) => {
+export const getFormattedTableColumns = (columns) => {
   try {
-    const tableModel = getTableModelFromModel(tableName, dbModel);
-    return tableModel.fields
-      .filter((f) => f.isRequired && !f.relationName)
-      .map((f) => f.name);
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-/**
- *
- * @param {object[]} dbModel
- * @param {String} tableName
- * @returns
- */
-export const getAllTableFields = (dbModel, tableName) => {
-  try {
-    const tableModel = getTableModelFromModel(tableName, dbModel);
-    return tableModel.fields.map((field) => {
+    return columns.map((column) => {
       return {
-        field: field.name,
-        name: field.name,
-        key: field.name,
+        field: column.name,
+        name: column.name,
+        key: column.name,
         sortable: false,
-        headerName: String(field.name).toLocaleLowerCase(),
-        type: field.type,
-        width: getFieldWidth(field.type),
+        headerName: String(column.name).toLocaleLowerCase(),
+        type: column.type,
+        width: getFieldWidth(column.type),
         renderCell: (params) => {
           return getFieldFormatting({
-            type: field.type,
-            isID: field.isId,
-            isList: field.isList,
+            type: column.type,
+            isID: column.isId,
+            isList: column.isList,
             params,
           });
         },
@@ -310,70 +291,3 @@ export const getAllTableFields = (dbModel, tableName) => {
   }
 };
 
-/**
- *
- * @param {Model[]} dbModel
- * @param {String} tableName
- * @param {String} field
- * @returns
- */
-export const getFieldType = (dbModel, tableName, field) => {
-  try {
-    const tableModel = getTableModelFromModel(tableName, dbModel);
-    const fieldModel = getFieldModelFromModel(field, tableModel);
-    return fieldModel.type;
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-export const getRawQueryFromTextQuery = (dbModel, tableName, q) => {
-  try {
-    const tableModel = getTableModelFromModel(tableName, dbModel);
-
-    const queries = [];
-    tableModel.fields.forEach((field) => {
-      if (field.type == LOCAL_CONSTANTS.DATA_TYPES.STRING) {
-        queries.push({
-          [field.name]: {
-            contains: q,
-            mode: "insensitive",
-          },
-        });
-      }
-    });
-
-    return { OR: queries };
-  } catch (error) {
-    console.error(error);
-  }
-};
-
-export const getRawQueryFromFilters = (
-  dbModel,
-  tableName,
-  filters,
-  combinator
-) => {
-  try {
-    const tableModel = getTableModelFromModel(tableName, dbModel);
-    const queries = [];
-    filters.map((filter) => {
-      let query = {};
-      let o = {};
-      o[filter.operator] = filter.value;
-      const fieldModel = getFieldModelFromModel(filter.field, tableModel);
-      if (fieldModel.type == LOCAL_CONSTANTS.DATA_TYPES.STRING) {
-        o["mode"] = "insensitive";
-      }
-      query[filter.field] = o;
-      queries.push({ ...query });
-    });
-    const fq = {};
-    fq[combinator] = [...queries];
-    return fq;
-  } catch (error) {
-    console.error(error);
-    return null;
-  }
-};

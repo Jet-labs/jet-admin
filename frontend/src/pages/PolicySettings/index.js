@@ -24,7 +24,7 @@ const PolicySettings = () => {
     data: policyObjectData,
     error: loadPolicyObjectDataError,
   } = useQuery({
-    queryKey: [`REACT_QUERY_KEY_${String(tableName).toUpperCase()}`, id],
+    queryKey: [`REACT_QUERY_KEY_TABLES_${String(tableName).toUpperCase()}`, id],
     queryFn: () => fetchRowByIDAPI({ tableName, id }),
     cacheTime: 0,
     retry: 1,
@@ -46,7 +46,7 @@ const PolicySettings = () => {
     onSuccess: () => {
       displaySuccess("Updated policy successfully");
       queryClient.invalidateQueries([
-        `REACT_QUERY_KEY_${String(tableName).toUpperCase()}`,
+        `REACT_QUERY_KEY_TABLES_${String(tableName).toUpperCase()}`,
       ]);
     },
     onError: (error) => {

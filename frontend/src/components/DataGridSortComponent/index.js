@@ -1,4 +1,3 @@
-import { FaChevronDown, FaTimes } from "react-icons/fa";
 import {
   Button,
   Dialog,
@@ -11,11 +10,14 @@ import {
   Select,
 } from "@mui/material";
 import { useMemo, useState } from "react";
+import { FaChevronDown, FaTimes } from "react-icons/fa";
 import { LOCAL_CONSTANTS } from "../../constants";
 
+import { useQuery } from "@tanstack/react-query";
+import { getAuthorizedColumnsForRead } from "../../api/tables";
 import { useAuthState } from "../../contexts/authContext";
 import { useConstants } from "../../contexts/constantsContext";
-import { getAllTableFields } from "../../utils/tables";
+import { getFormattedTableColumns } from "../../utils/tables";
 
 export const DataGridSortComponent = ({
   tableName,
@@ -24,31 +26,34 @@ export const DataGridSortComponent = ({
   isSortMenuOpen,
   handleCLoseSortMenu,
 }) => {
-  const { dbModel } = useConstants();
   const { pmUser } = useAuthState();
 
   const [sortField, setSortField] = useState(sortModel ? sortModel.field : "");
   const [sortOrder, setSortOrder] = useState(sortModel ? sortModel.order : "");
 
-  const authorizedColumns = useMemo(() => {
-    if (pmUser && dbModel && tableName) {
-      const u = pmUser;
-      const c = u.extractAuthorizedColumnsForReadFromPolicyObject(tableName);
-      if (c === true) {
-        return getAllTableFields(dbModel, tableName);
-      } else if (c === false) {
-        return null;
-      } else {
-        const a = getAllTableFields(dbModel, tableName);
+  const {
+    isLoading: isLoadingReadColumns,
+    data: readColumns,
+    error: loadReadColumnsError,
+  } = useQuery({
+    queryKey: [
+      `REACT_QUERY_KEY_TABLES_${String(tableName).toUpperCase()}`,
+      `read_column`,
+    ],
+    queryFn: () => getAuthorizedColumnsForRead({ tableName }),
+    cacheTime: 0,
+    retry: 1,
+    staleTime: Infinity,
+  });
 
-        return a.filter((header) => {
-          return c.includes(header.field);
-        });
-      }
+  const authorizedColumns = useMemo(() => {
+    if (readColumns) {
+      const c = getFormattedTableColumns(readColumns);
+      return c;
     } else {
       return null;
     }
-  }, [pmUser, tableName, dbModel]);
+  }, [readColumns]);
 
   const _handleChangeSortField = (e) => {
     setSortField(e.target.value);

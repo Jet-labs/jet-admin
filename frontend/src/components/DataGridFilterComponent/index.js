@@ -13,11 +13,13 @@ import { useMemo, useState } from "react";
 
 import { LOCAL_CONSTANTS } from "../../constants";
 
+import { useQuery } from "@tanstack/react-query";
 import moment from "moment";
 import { FaChevronDown, FaTimes } from "react-icons/fa";
+import { getAuthorizedColumnsForRead } from "../../api/tables";
 import { useAuthState } from "../../contexts/authContext";
 import { useConstants } from "../../contexts/constantsContext";
-import { getAllTableFields, getFieldType } from "../../utils/tables";
+import { getFormattedTableColumns } from "../../utils/tables";
 import { FieldComponent } from "../FieldComponent";
 
 export const DataGridFilterComponent = ({
@@ -29,7 +31,6 @@ export const DataGridFilterComponent = ({
   combinator,
   setCombinator,
 }) => {
-  const { dbModel } = useConstants();
   const { pmUser } = useAuthState();
 
   const [filterField, setFilterField] = useState("");
@@ -40,31 +41,36 @@ export const DataGridFilterComponent = ({
     setCombinator(e.target.value);
   };
 
-  const authorizedColumns = useMemo(() => {
-    if (pmUser && dbModel && tableName) {
-      const u = pmUser;
-      const c = u.extractAuthorizedColumnsForReadFromPolicyObject(tableName);
-      if (c === true) {
-        return getAllTableFields(dbModel, tableName);
-      } else if (c === false) {
-        return null;
-      } else {
-        const a = getAllTableFields(dbModel, tableName);
+  const {
+    isLoading: isLoadingReadColumns,
+    data: readColumns,
+    error: loadReadColumnsError,
+  } = useQuery({
+    queryKey: [
+      `REACT_QUERY_KEY_TABLES_${String(tableName).toUpperCase()}`,
+      `read_column`,
+    ],
+    queryFn: () => getAuthorizedColumnsForRead({ tableName }),
+    cacheTime: 0,
+    retry: 1,
+    staleTime: Infinity,
+  });
 
-        return a.filter((header) => {
-          return c.includes(header.field);
-        });
-      }
+  const authorizedColumns = useMemo(() => {
+    if (readColumns) {
+      const c = getFormattedTableColumns(readColumns);
+      return c;
     } else {
       return null;
     }
-  }, [pmUser, tableName, dbModel]);
+  }, [readColumns]);
 
   const fieldType = useMemo(() => {
-    if (dbModel && tableName && filterField) {
-      return getFieldType(dbModel, tableName, filterField);
+    if (readColumns && filterField) {
+      return readColumns.find((fieldModel) => fieldModel.name === filterField)
+        .type;
     }
-  }, [dbModel, tableName, filterField]);
+  }, [readColumns, filterField]);
 
   const _handleChangeFilterField = (e) => {
     setFilterField(e.target.value);

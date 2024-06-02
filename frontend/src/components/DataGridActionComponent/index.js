@@ -1,39 +1,29 @@
-import { useDebounce } from "@uidotdev/usehooks";
-import { useNavigate } from "react-router-dom";
-import { useEffect, useMemo, useState } from "react";
-import { useFormik, useFormikContext } from "formik";
 import {
   Button,
   ButtonGroup,
-  Chip,
   Grid,
-  IconButton,
   InputAdornment,
-  ListItem,
   TextField,
 } from "@mui/material";
+import { useDebounce } from "@uidotdev/usehooks";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-
-import { DataGridFilterComponent } from "../DataGridFilterComponent";
+import { useQuery } from "@tanstack/react-query";
 import {
-  getRawQueryFromFilters,
-  getRawQueryFromTextQuery,
-} from "../../utils/tables";
-import { useConstants } from "../../contexts/constantsContext";
-import { AppliedFiltersList } from "../AppliedFilterList";
-import { RowAdditionForm } from "../RowAdditionForm";
-import { useAuthState } from "../../contexts/authContext";
-import { DataGridSortComponent } from "../DataGridSortComponent";
-import { LOCAL_CONSTANTS } from "../../constants";
-import {
-  FaSearch,
-  FaRedoAlt,
   FaFilter,
   FaPlus,
+  FaRedoAlt,
+  FaSearch,
   FaSort,
-  FaCross,
   FaTimes,
 } from "react-icons/fa";
+import { getAuthorizedColumnsForRead } from "../../api/tables";
+import { LOCAL_CONSTANTS } from "../../constants";
+import { useConstants } from "../../contexts/constantsContext";
+import { AppliedFiltersList } from "../AppliedFilterList";
+import { DataGridFilterComponent } from "../DataGridFilterComponent";
+import { DataGridSortComponent } from "../DataGridSortComponent";
 export const DataGridActionComponent = ({
   setFilterQuery,
   setSortModel,
@@ -48,27 +38,70 @@ export const DataGridActionComponent = ({
 
   const [filters, setFilters] = useState([]);
   const [combinator, setCombinator] = useState("AND");
-  const { dbModel } = useConstants();
 
   const navigate = useNavigate();
+  const {
+    isLoading: isLoadingReadColumns,
+    data: readColumns,
+    error: loadReadColumnsError,
+  } = useQuery({
+    queryKey: [
+      `REACT_QUERY_KEY_TABLES_${String(tableName).toUpperCase()}`,
+      `read_column`,
+    ],
+    queryFn: () => getAuthorizedColumnsForRead({ tableName }),
+    cacheTime: 0,
+    retry: 1,
+    staleTime: Infinity,
+  });
+
   useEffect(() => {
-    if (dbModel && tableName && combinator && filters && filters.length > 0) {
-      setFilterQuery?.(
-        getRawQueryFromFilters(dbModel, tableName, filters, combinator)
-      );
+    if (
+      readColumns &&
+      tableName &&
+      combinator &&
+      filters &&
+      filters.length > 0
+    ) {
+      const queries = [];
+      filters.map((filter) => {
+        let query = {};
+        let o = {};
+        o[filter.operator] = filter.value;
+        const columnModel = readColumns.find(
+          (columnModel) => columnModel.name === filter.field
+        );
+        if (columnModel.type == LOCAL_CONSTANTS.DATA_TYPES.STRING) {
+          o["mode"] = "insensitive";
+        }
+        query[filter.field] = o;
+        queries.push({ ...query });
+      });
+      const fq = {};
+      fq[combinator] = [...queries];
+      setFilterQuery?.(fq);
     } else if (
-      dbModel &&
+      readColumns &&
       tableName &&
       debouncedSearchTerm &&
       debouncedSearchTerm !== ""
     ) {
-      setFilterQuery?.(
-        getRawQueryFromTextQuery(dbModel, tableName, debouncedSearchTerm)
-      );
+      let queries = [];
+      const _query = readColumns.forEach((column) => {
+        if (column.type == LOCAL_CONSTANTS.DATA_TYPES.STRING) {
+          queries.push({
+            [column.name]: {
+              contains: debouncedSearchTerm,
+              mode: "insensitive",
+            },
+          });
+        }
+      });
+      setFilterQuery?.({ OR: _query });
     } else {
       setFilterQuery(null);
     }
-  }, [filters, debouncedSearchTerm, dbModel, tableName]);
+  }, [filters, debouncedSearchTerm, readColumns, tableName]);
 
   const _handleOpenFilterMenu = () => {
     setIsFilterMenuOpen(true);

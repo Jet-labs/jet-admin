@@ -20,7 +20,7 @@ import { RawDatagridStatistics } from "../../components/RawDataGridStatistics";
 
 const PolicyManagement = () => {
   const tableName = LOCAL_CONSTANTS.STRINGS.POLICY_OBJECT_TABLE_NAME;
-  const { dbModel } = useConstants();
+  
   const { pmUser } = useAuthState();
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
@@ -36,7 +36,7 @@ const PolicyManagement = () => {
     refetch: reloadAllPolicies,
   } = useQuery({
     queryKey: [
-      `REACT_QUERY_KEY_${String(tableName).toUpperCase()}`,
+      `REACT_QUERY_KEY_TABLES_${String(tableName).toUpperCase()}`,
       page,
       filterQuery,
       sortModel,

@@ -19,7 +19,7 @@ import { ErrorComponent } from "../../components/ErrorComponent";
 import { RawDatagridStatistics } from "../../components/RawDataGridStatistics";
 const AccountManagement = () => {
   const tableName = LOCAL_CONSTANTS.STRINGS.PM_USER_TABLE_NAME;
-  const { dbModel } = useConstants();
+  
   const { pmUser } = useAuthState();
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
@@ -35,7 +35,7 @@ const AccountManagement = () => {
     refetch: reloadAllAccounts,
   } = useQuery({
     queryKey: [
-      `REACT_QUERY_KEY_${String(tableName).toUpperCase()}`,
+      `REACT_QUERY_KEY_TABLES_${String(tableName).toUpperCase()}`,
       page,
       filterQuery,
       sortModel,

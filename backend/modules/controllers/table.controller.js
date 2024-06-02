@@ -1,10 +1,256 @@
-const { prisma } = require("../../config/prisma");
+const { prisma, dbModel } = require("../../config/prisma");
 const constants = require("../../constants");
 const { extractError } = require("../../utils/error.utils");
 const Logger = require("../../utils/logger");
+const { policyUtils } = require("../../utils/policy.utils");
 const { TableService } = require("../services/table.services");
 
 const tableController = {};
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @returns
+ */
+tableController.getAllTablesForRead = async (req, res) => {
+  try {
+    Logger.log("info", {
+      message: "tableController:getAllTablesForRead:init",
+    });
+    const { pmUser, state } = req;
+    const pm_user_id = parseInt(pmUser.pm_user_id);
+    const authorization_policy = state.authorization_policy;
+
+    Logger.log("info", {
+      message: "tableController:getAllTablesForRead:params",
+      params: {
+        pm_user_id,
+      },
+    });
+
+    const tables = dbModel.map((table) => {
+      return table.name;
+    });
+    let _authorizedTables = [];
+    if (authorization_policy && authorization_policy.tables) {
+      if (
+        authorization_policy.tables === true ||
+        authorization_policy.tables.read === true
+      ) {
+        _authorizedTables = tables;
+      } else {
+        Object.keys(authorization_policy.tables).map((tableName) => {
+          if (
+            authorization_policy.tables[tableName] === true ||
+            authorization_policy.tables[tableName].read === true
+          ) {
+            _authorizedTables.push(tableName);
+          }
+        });
+      }
+    }
+    Logger.log("info", {
+      message: "tableController:getAllTablesForRead:rows",
+      params: {
+        pm_user_id,
+        tables: _authorizedTables,
+      },
+    });
+    return res.json({
+      success: true,
+      tables: _authorizedTables,
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "tableController:getAllTablesForRead:catch-1",
+      params: { error },
+    });
+    return res.json({ success: false, error: extractError(error) });
+  }
+};
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @returns
+ */
+tableController.getAuthorizedColumnsForRead = async (req, res) => {
+  try {
+    Logger.log("info", {
+      message: "tableController:getAuthorizedColumnsForRead:init",
+    });
+    const { pmUser, state } = req;
+    const pm_user_id = pmUser.pm_user_id;
+    const { table_name } = req.params;
+    const authorized_columns =
+      policyUtils.extractAuthorizedColumnsForReadFromPolicyObject({
+        policyObject: state.authorization_policy,
+        tableName: table_name,
+      });
+    const authorized_include_columns =
+      policyUtils.extractAuthorizedIncludeColumnsForReadFromPolicyObject({
+        policyObject: state.authorization_policy,
+        tableName: table_name,
+      });
+    Logger.log("info", {
+      message: "tableController:getAuthorizedColumnsForRead:params",
+      params: {
+        pm_user_id,
+        table_name,
+        authorized_columns,
+        authorized_include_columns,
+      },
+    });
+    const _tableModel = dbModel.find(
+      (datamodel) => datamodel.name === table_name
+    );
+    const _allColumns = _tableModel.fields;
+    let _authorizedColumns = [];
+    if (authorized_columns === true) {
+      _authorizedColumns = _allColumns;
+    } else if (typeof authorized_columns === "object") {
+      _authorizedColumns = _allColumns.map((column) => {
+        if (
+          authorized_columns.includes(column.name) ||
+          authorized_include_columns.includes(column.name)
+        ) {
+          _authorizedColumns.push({ ...column });
+        }
+      });
+    }
+    Logger.log("info", {
+      message: "tableController:getAuthorizedColumnsForRead:params",
+      params: {
+        pm_user_id,
+        table_name,
+        _authorizedColumns,
+      },
+    });
+    return res.json({
+      success: true,
+      columns: _authorizedColumns,
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "tableController:getAuthorizedColumnsForRead:catch-1",
+      params: { error },
+    });
+    return res.json({ success: false, error: extractError(error) });
+  }
+};
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @returns
+ */
+tableController.getAuthorizedColumnsForUpdate = async (req, res) => {
+  try {
+    Logger.log("info", {
+      message: "tableController:getAuthorizedColumnsForUpdate:init",
+    });
+    const { pmUser, state } = req;
+    const pm_user_id = pmUser.pm_user_id;
+    const { table_name } = req.params;
+    const authorized_columns =
+      policyUtils.extractAuthorizedColumnsForEditFromPolicyObject({
+        policyObject: state.authorization_policy,
+        tableName: table_name,
+      });
+
+    Logger.log("info", {
+      message: "tableController:getAuthorizedColumnsForUpdate:params",
+      params: {
+        pm_user_id,
+        table_name,
+        authorized_columns,
+      },
+    });
+    const _tableModel = dbModel.find(
+      (datamodel) => datamodel.name === table_name
+    );
+    const _allColumns = _tableModel.fields;
+    let _authorizedColumns = [];
+    if (authorized_columns === true) {
+      _authorizedColumns = _allColumns;
+    } else if (typeof authorized_columns === "object") {
+      _authorizedColumns = _allColumns.map((column) => {
+        if (authorized_columns.includes(column.name)) {
+          _authorizedColumns.push({ ...column });
+        }
+      });
+    }
+    Logger.log("info", {
+      message: "tableController:getAuthorizedColumnsForUpdate:params",
+      params: {
+        pm_user_id,
+        table_name,
+        _authorizedColumns,
+      },
+    });
+    return res.json({
+      success: true,
+      columns: _authorizedColumns,
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "tableController:getAuthorizedColumnsForUpdate:catch-1",
+      params: { error },
+    });
+    return res.json({ success: false, error: extractError(error) });
+  }
+};
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @returns
+ */
+tableController.getAuthorizedColumnsForAdd = async (req, res) => {
+  try {
+    Logger.log("info", {
+      message: "tableController:getAuthorizedColumnsForAdd:init",
+    });
+    const { pmUser, state } = req;
+    const pm_user_id = pmUser.pm_user_id;
+    const { table_name } = req.params;
+
+    Logger.log("info", {
+      message: "tableController:getAuthorizedColumnsForAdd:params",
+      params: {
+        pm_user_id,
+        table_name,
+      },
+    });
+    const _tableModel = dbModel.find(
+      (datamodel) => datamodel.name === table_name
+    );
+    const _allColumns = _tableModel.fields;
+
+    Logger.log("info", {
+      message: "tableController:getAuthorizedColumnsForAdd:params",
+      params: {
+        pm_user_id,
+        table_name,
+        _allColumns,
+      },
+    });
+    return res.json({
+      success: true,
+      columns: _allColumns,
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "tableController:getAuthorizedColumnsForAdd:catch-1",
+      params: { error },
+    });
+    return res.json({ success: false, error: extractError(error) });
+  }
+};
 
 /**
  *

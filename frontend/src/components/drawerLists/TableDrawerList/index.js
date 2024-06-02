@@ -9,8 +9,23 @@ import {
 import { FaDatabase, FaTable } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { LOCAL_CONSTANTS } from "../../../constants";
-export const TableDrawerList = ({ authorizedTables, currentPageTitle }) => {
+import { getAllTables } from "../../../api/tables";
+import { useQuery } from "@tanstack/react-query";
+export const TableDrawerList = ({ currentPageTitle }) => {
   const theme = useTheme();
+  const {
+    isLoading: isLoadingTables,
+    data: tables,
+    error: loadTablesError,
+    refetch: refetchTables,
+  } = useQuery({
+    queryKey: [`REACT_QUERY_KEY_TABLES`],
+    queryFn: () => getAllTables(),
+    cacheTime: 0,
+    retry: 1,
+    staleTime: Infinity,
+  });
+
   return (
     <List
       sx={{}}
@@ -27,7 +42,7 @@ export const TableDrawerList = ({ authorizedTables, currentPageTitle }) => {
         />
         {/* {isTableListOpen ? <ExpandLess /> : <ExpandMore />} */}
       </ListItemButton>
-      {authorizedTables?.map((table) => {
+      {tables?.map((table) => {
         const key = `table_${table}`;
         return (
           <Link to={LOCAL_CONSTANTS.ROUTES.TABLE_VIEW.path(table)} key={key}>

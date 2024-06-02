@@ -89,19 +89,6 @@ export class PMUser {
     return authorized_columns;
   };
 
-  extractAuthorizedTables = () => {
-    try {
-      const tables = this.policy ? Object.keys(this.policy.tables) : [];
-
-      const authorizedTables = tables.filter((table) => {
-        return this.policy.tables[table] != false;
-      });
-      return authorizedTables;
-    } catch {
-      return [];
-    }
-  };
-
   extractAuthorizedActionEntities = () => {
     try {
       const entities = this.policy ? this.policy.actions : {};

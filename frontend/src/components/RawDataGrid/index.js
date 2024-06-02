@@ -1,27 +1,28 @@
 import { useNavigate } from "react-router-dom";
 
-import { Grid, LinearProgress, Pagination, useTheme } from "@mui/material";
+import { LinearProgress, Pagination, useTheme } from "@mui/material";
 import {
   DataGrid,
-  GridToolbar,
-  GridToolbarColumnsButton,
   GridToolbarContainer,
-  GridToolbarDensitySelector,
   GridToolbarExport,
 } from "@mui/x-data-grid";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { fetchAllRowsAPI } from "../../api/get";
 import { useAuthState } from "../../contexts/authContext";
 
+import "react-data-grid/lib/styles.css";
+import { getAuthorizedColumnsForRead } from "../../api/tables";
 import { LOCAL_CONSTANTS } from "../../constants";
 import { useConstants } from "../../contexts/constantsContext";
 import { Loading } from "../../pages/Loading";
-import { getAllTableFields, getTableIDProperty } from "../../utils/tables";
+import {
+  getFormattedTableColumns,
+  getTableIDProperty,
+} from "../../utils/tables";
 import { DataGridActionComponent } from "../DataGridActionComponent";
 import { ErrorComponent } from "../ErrorComponent";
 import { RawDatagridStatistics } from "../RawDataGridStatistics";
-import "react-data-grid/lib/styles.css";
 
 // import DataGrid from "react-data-grid";
 
@@ -50,7 +51,7 @@ export const RawDatagrid = ({
     refetch: reloadData,
   } = useQuery({
     queryKey: [
-      `REACT_QUERY_KEY_${String(tableName).toUpperCase()}`,
+      `REACT_QUERY_KEY_TABLES_${String(tableName).toUpperCase()}`,
       page,
       filterQuery,
       sortModel,
@@ -70,25 +71,29 @@ export const RawDatagrid = ({
     keepPreviousData: true,
   });
 
-  const authorizedColumns = useMemo(() => {
-    if (pmUser && dbModel && tableName && data) {
-      const u = pmUser;
-      const c = u.extractAuthorizedColumnsForReadFromPolicyObject(tableName);
-      if (c === true) {
-        return getAllTableFields(dbModel, tableName);
-      } else if (c === false) {
-        return null;
-      } else {
-        const a = getAllTableFields(dbModel, tableName);
+  const {
+    isLoading: isLoadingReadColumns,
+    data: readColumns,
+    error: loadReadColumnsError,
+  } = useQuery({
+    queryKey: [
+      `REACT_QUERY_KEY_TABLES_${String(tableName).toUpperCase()}`,
+      `read_column`,
+    ],
+    queryFn: () => getAuthorizedColumnsForRead({ tableName }),
+    cacheTime: 0,
+    retry: 1,
+    staleTime: Infinity,
+  });
 
-        return a.filter((header) => {
-          return c.includes(header.field);
-        });
-      }
+  const authorizedColumns = useMemo(() => {
+    if (readColumns) {
+      const c = getFormattedTableColumns(readColumns);
+      return c;
     } else {
       return null;
     }
-  }, [pmUser, tableName, dbModel, data]);
+  }, [readColumns]);
 
   const primaryColumns = useMemo(() => {
     if (dbModel) {

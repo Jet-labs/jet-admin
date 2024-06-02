@@ -9,6 +9,35 @@ const router = express.Router();
 
 // get all data of table
 router.get(
+  "/",
+  authMiddleware.authProvider,
+  policyMiddleware.populateAuthorizationPolicies,
+  tableController.getAllTablesForRead
+);
+
+router.get(
+  "/:table_name/read_columns",
+  authMiddleware.authProvider,
+  policyMiddleware.populateAuthorizationPolicies,
+  tableController.getAuthorizedColumnsForRead
+);
+
+router.get(
+  "/:table_name/edit_columns",
+  authMiddleware.authProvider,
+  policyMiddleware.populateAuthorizationPolicies,
+  tableController.getAuthorizedColumnsForUpdate
+);
+
+router.get(
+  "/:table_name/add_columns",
+  authMiddleware.authProvider,
+  policyMiddleware.populateAuthorizationPolicies,
+  tableAuthorizationMiddleware.authorizeRowAddition,
+  tableController.getAuthorizedColumnsForAdd
+);
+
+router.get(
   "/:table_name",
   authMiddleware.authProvider,
   // tableAuthorizationMiddleware.isAuthorized,
