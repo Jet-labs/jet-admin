@@ -13,10 +13,7 @@ import { useMemo, useState } from "react";
 import { FaChevronDown, FaTimes } from "react-icons/fa";
 import { LOCAL_CONSTANTS } from "../../constants";
 
-import { useQuery } from "@tanstack/react-query";
-import { getAuthorizedColumnsForRead } from "../../api/tables";
 import { useAuthState } from "../../contexts/authContext";
-import { useConstants } from "../../contexts/constantsContext";
 import { getFormattedTableColumns } from "../../utils/tables";
 
 export const DataGridSortComponent = ({
@@ -25,26 +22,12 @@ export const DataGridSortComponent = ({
   sortModel,
   isSortMenuOpen,
   handleCLoseSortMenu,
+  readColumns,
 }) => {
   const { pmUser } = useAuthState();
 
   const [sortField, setSortField] = useState(sortModel ? sortModel.field : "");
   const [sortOrder, setSortOrder] = useState(sortModel ? sortModel.order : "");
-
-  const {
-    isLoading: isLoadingReadColumns,
-    data: readColumns,
-    error: loadReadColumnsError,
-  } = useQuery({
-    queryKey: [
-      `REACT_QUERY_KEY_TABLES_${String(tableName).toUpperCase()}`,
-      `read_column`,
-    ],
-    queryFn: () => getAuthorizedColumnsForRead({ tableName }),
-    cacheTime: 0,
-    retry: 1,
-    staleTime: Infinity,
-  });
 
   const authorizedColumns = useMemo(() => {
     if (readColumns) {

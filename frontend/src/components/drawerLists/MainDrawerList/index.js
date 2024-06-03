@@ -237,8 +237,8 @@ export const MainDrawerList = ({ currentPageTitle }) => {
       }
       {
         <Link
-          to={LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.code}
-          key={LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.code}
+          to={LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.path()}
+          key={LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.path()}
         >
           <ListItem
             disablePadding

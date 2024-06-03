@@ -23,12 +23,7 @@ const GraphLayout = () => {
         className="!h-[calc(100vh-66px)] !overflow-y-auto"
       >
         <Routes>
-          {/* <Route
-            index
-            element={() => {
-              return <div>hello</div>;
-            }}
-          /> */}
+          <Route index element={<AddGraph />} />
 
           <Route
             path={LOCAL_CONSTANTS.ROUTES.GRAPH_VIEW.code}

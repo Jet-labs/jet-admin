@@ -224,7 +224,7 @@ export class PMUser {
     return authorizeGraphIDs;
   };
 
-  extractAuthorizationForGraphAddFromPolicyObject = () => {
+  extractAuthorizationForDashboardAddFromPolicyObject = () => {
     console.log(this.policy.dashboards);
     if (this.policy.dashboards.add) {
       return true;

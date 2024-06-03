@@ -229,8 +229,6 @@ export const DataGridActionComponent = ({
         >
           Add
         </Button>
-
-        {/* <RowAdditionForm tableName={tableName} /> */}
       </Grid>
       <AppliedFiltersList
         filters={filters}
@@ -245,6 +243,7 @@ export const DataGridActionComponent = ({
         filters={filters}
         combinator={combinator}
         setCombinator={setCombinator}
+        readColumns={readColumns}
       />
 
       <DataGridSortComponent
@@ -253,6 +252,7 @@ export const DataGridActionComponent = ({
         tableName={tableName}
         setSortModel={setSortModel}
         sortModel={sortModel}
+        readColumns={readColumns}
       />
     </Grid>
   );

@@ -13,12 +13,9 @@ import { useMemo, useState } from "react";
 
 import { LOCAL_CONSTANTS } from "../../constants";
 
-import { useQuery } from "@tanstack/react-query";
 import moment from "moment";
 import { FaChevronDown, FaTimes } from "react-icons/fa";
-import { getAuthorizedColumnsForRead } from "../../api/tables";
 import { useAuthState } from "../../contexts/authContext";
-import { useConstants } from "../../contexts/constantsContext";
 import { getFormattedTableColumns } from "../../utils/tables";
 import { FieldComponent } from "../FieldComponent";
 
@@ -30,6 +27,7 @@ export const DataGridFilterComponent = ({
   handleCLoseFilterMenu,
   combinator,
   setCombinator,
+  readColumns,
 }) => {
   const { pmUser } = useAuthState();
 
@@ -40,21 +38,6 @@ export const DataGridFilterComponent = ({
   const _handleChangeCombinator = (e) => {
     setCombinator(e.target.value);
   };
-
-  const {
-    isLoading: isLoadingReadColumns,
-    data: readColumns,
-    error: loadReadColumnsError,
-  } = useQuery({
-    queryKey: [
-      `REACT_QUERY_KEY_TABLES_${String(tableName).toUpperCase()}`,
-      `read_column`,
-    ],
-    queryFn: () => getAuthorizedColumnsForRead({ tableName }),
-    cacheTime: 0,
-    retry: 1,
-    staleTime: Infinity,
-  });
 
   const authorizedColumns = useMemo(() => {
     if (readColumns) {

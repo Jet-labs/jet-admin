@@ -1,4 +1,5 @@
 import {
+  IconButton,
   List,
   ListItem,
   ListItemButton,
@@ -6,13 +7,16 @@ import {
   ListItemText,
   useTheme,
 } from "@mui/material";
-import { FaDatabase, FaTable } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { FaDatabase, FaRedo, FaTable } from "react-icons/fa";
+import { Link, useParams } from "react-router-dom";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { getAllTables } from "../../../api/tables";
 import { useQuery } from "@tanstack/react-query";
-export const TableDrawerList = ({ currentPageTitle }) => {
+export const TableDrawerList = () => {
   const theme = useTheme();
+  const routeParam = useParams();
+  const currentPage = `table_${routeParam?.["*"]}`;
+
   const {
     isLoading: isLoadingTables,
     data: tables,
@@ -33,15 +37,12 @@ export const TableDrawerList = ({ currentPageTitle }) => {
       aria-labelledby="nested-list-subheader"
       className=" !h-[calc(100vh-66px)] !overflow-y-auto !overflow-x-hidden !border-r !border-white !border-opacity-10 w-full"
     >
-      <ListItemButton>
-        <ListItemText
-          primaryTypographyProps={{
-            sx: { fontWeight: "600" },
-          }}
-          primary="Tables"
-        />
-        {/* {isTableListOpen ? <ExpandLess /> : <ExpandMore />} */}
-      </ListItemButton>
+      <div className="!px-3.5 py-1 flex flex-row justify-between items-center w-full">
+        <span className="!font-semibold">{"Tables"}</span>
+        <IconButton onClick={refetchTables}>
+          <FaRedo className="!text-sm" />
+        </IconButton>
+      </div>
       {tables?.map((table) => {
         const key = `table_${table}`;
         return (
@@ -50,21 +51,22 @@ export const TableDrawerList = ({ currentPageTitle }) => {
               key={key}
               disablePadding
               className="!px-3 !py-1.5"
-              // sx={{
-              //   borderRight: key == currentPageTitle ? 3 : 0,
-              //   borderColor: theme.palette.primary.main,
-              // }}
+              sx={{}}
             >
               <ListItemButton
-                sx={{ background: theme.palette.background.default }}
-                selected={key == currentPageTitle}
+                sx={{
+                  background: theme.palette.background.default,
+                  border: key == currentPage ? 1 : 0,
+                  borderColor: theme.palette.primary.main,
+                }}
+                selected={key == currentPage}
                 className="!rounded"
               >
                 <ListItemIcon
                   className="!ml-1"
                   sx={{
                     color:
-                      key == currentPageTitle
+                      key == currentPage
                         ? theme.palette.primary.main
                         : theme.palette.primary.contrastText,
                   }}
@@ -74,14 +76,14 @@ export const TableDrawerList = ({ currentPageTitle }) => {
                 <ListItemText
                   sx={{
                     color:
-                      key == currentPageTitle
+                      key == currentPage
                         ? theme.palette.primary.main
                         : theme.palette.primary.contrastText,
                   }}
                   primary={table}
                   primaryTypographyProps={{
                     sx: {
-                      fontWeight: key == currentPageTitle ? "700" : "500",
+                      fontWeight: key == currentPage ? "700" : "500",
                       marginLeft: -2,
                     },
                   }}

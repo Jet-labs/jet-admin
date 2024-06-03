@@ -1,5 +1,6 @@
 import {
   Button,
+  IconButton,
   List,
   ListItem,
   ListItemButton,
@@ -10,15 +11,17 @@ import {
 
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 
 import { getAllDashboardAPI } from "../../../api/dashboards";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { useAuthState } from "../../../contexts/authContext";
-import { FaChalkboardTeacher, FaPlus } from "react-icons/fa";
+import { FaChalkboardTeacher, FaPlus, FaRedo } from "react-icons/fa";
 
-export const DashboardsList = ({ currentPageTitle }) => {
+export const DashboardsList = () => {
   const theme = useTheme();
+  const routeParam = useParams();
+  const currentPage = `dashboard_${routeParam?.["*"]}`;
   const { pmUser } = useAuthState();
   const navigate = useNavigate();
   const isAuthorizedToAddDashboard = useMemo(() => {
@@ -49,17 +52,12 @@ export const DashboardsList = ({ currentPageTitle }) => {
       aria-labelledby="nested-list-subheader"
       className=" !h-[calc(100vh-66px)] !overflow-y-auto !overflow-x-hidden !border-r !border-white !border-opacity-10 w-full"
     >
-      <ListItemButton>
-        {/* <ListItemIcon>
-          <TableRows sx={{}} />
-        </ListItemIcon> */}
-        <ListItemText
-          primaryTypographyProps={{
-            sx: { fontWeight: "600" },
-          }}
-          primary="Dashboard Layouts"
-        />
-      </ListItemButton>
+      <div className="!px-3.5 py-1 flex flex-row justify-between items-center w-full">
+        <span className="!font-semibold">{"Dashboard Layouts"}</span>
+        <IconButton onClick={refetchDashboards}>
+          <FaRedo className="!text-sm" />
+        </IconButton>
+      </div>
       {isAuthorizedToAddDashboard && (
         <div className="!p-3 !w-full !pb-1.5">
           <Button
@@ -88,15 +86,19 @@ export const DashboardsList = ({ currentPageTitle }) => {
               className="!px-3 !py-1.5"
             >
               <ListItemButton
-                sx={{ background: theme.palette.background.default }}
-                selected={key == currentPageTitle}
+                sx={{
+                  background: theme.palette.background.default,
+                  border: key == currentPage ? 1 : 0,
+                  borderColor: theme.palette.primary.main,
+                }}
+                selected={key == currentPage}
                 className="!rounded"
               >
                 <ListItemIcon
                   className="!ml-1"
                   sx={{
                     color:
-                      key == currentPageTitle
+                      key == currentPage
                         ? theme.palette.primary.main
                         : theme.palette.primary.contrastText,
                   }}
@@ -106,14 +108,14 @@ export const DashboardsList = ({ currentPageTitle }) => {
                 <ListItemText
                   sx={{
                     color:
-                      key == currentPageTitle
+                      key == currentPage
                         ? theme.palette.primary.main
                         : theme.palette.primary.contrastText,
                   }}
                   primary={dashboard.dashboard_title}
                   primaryTypographyProps={{
                     sx: {
-                      fontWeight: key == currentPageTitle ? "700" : "500",
+                      fontWeight: key == currentPage ? "700" : "500",
                       marginLeft: -2,
                     },
                   }}

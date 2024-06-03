@@ -1,5 +1,6 @@
 import {
   Button,
+  IconButton,
   List,
   ListItem,
   ListItemButton,
@@ -9,16 +10,25 @@ import {
 } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { getAllGraphAPI } from "../../../api/graphs";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { useAuthState } from "../../../contexts/authContext";
-import { FaChartBar, FaChartLine, FaChartPie, FaPlus } from "react-icons/fa";
+import {
+  FaChartBar,
+  FaChartLine,
+  FaChartPie,
+  FaPlus,
+  FaRedo,
+} from "react-icons/fa";
 
 import { BiRadar } from "react-icons/bi";
 
-export const GraphDrawerList = ({ setCurrentPageTitle, currentPageTitle }) => {
+export const GraphDrawerList = () => {
   const theme = useTheme();
+  const routeParam = useParams();
+  const currentPage = `graph_${routeParam?.["*"]}`;
+
   const { pmUser } = useAuthState();
   const navigate = useNavigate();
   const isAuthorizedToAddGraph = useMemo(() => {
@@ -47,14 +57,12 @@ export const GraphDrawerList = ({ setCurrentPageTitle, currentPageTitle }) => {
       aria-labelledby="nested-list-subheader"
       className=" !h-[calc(100vh-66px)] !overflow-y-auto !overflow-x-hidden !border-r !border-white !border-opacity-10 w-full"
     >
-      <ListItemButton>
-        <ListItemText
-          primaryTypographyProps={{
-            sx: { fontWeight: "600" },
-          }}
-          primary="Graphs"
-        />
-      </ListItemButton>
+      <div className="!px-3.5 py-1 flex flex-row justify-between items-center w-full">
+        <span className="!font-semibold">{"Graphs"}</span>
+        <IconButton onClick={refetchGraphs}>
+          <FaRedo className="!text-sm" />
+        </IconButton>
+      </div>
       {isAuthorizedToAddGraph && (
         <div className="!p-3 !w-full !pb-1.5">
           <Button
@@ -78,22 +86,23 @@ export const GraphDrawerList = ({ setCurrentPageTitle, currentPageTitle }) => {
             <ListItem
               key={`_graph_${graph.pm_graph_id}`}
               disablePadding
-              // sx={{
-              //   borderRight: key == currentPageTitle ? 3 : 0,
-              //   borderColor: theme.palette.primary.main,
-              // }}
+              sx={{}}
               className="!px-3 !py-1.5"
             >
               <ListItemButton
-                sx={{ background: theme.palette.background.default }}
-                selected={key == currentPageTitle}
+                sx={{
+                  background: theme.palette.background.default,
+                  border: key == currentPage ? 1 : 0,
+                  borderColor: theme.palette.primary.main,
+                }}
+                selected={key == currentPage}
                 className="!rounded"
               >
                 <ListItemIcon
                   className="!ml-1"
                   sx={{
                     color:
-                      key == currentPageTitle
+                      key == currentPage
                         ? theme.palette.primary.main
                         : theme.palette.primary.contrastText,
                   }}
@@ -118,14 +127,14 @@ export const GraphDrawerList = ({ setCurrentPageTitle, currentPageTitle }) => {
                 <ListItemText
                   sx={{
                     color:
-                      key == currentPageTitle
+                      key == currentPage
                         ? theme.palette.primary.main
                         : theme.palette.primary.contrastText,
                   }}
                   primary={graph.graph_title}
                   primaryTypographyProps={{
                     sx: {
-                      fontWeight: key == currentPageTitle ? "700" : "500",
+                      fontWeight: key == currentPage ? "700" : "500",
                       marginLeft: -2,
                     },
                   }}

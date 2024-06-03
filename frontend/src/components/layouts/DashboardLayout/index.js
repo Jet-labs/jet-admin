@@ -21,12 +21,7 @@ const DashboardLayout = () => {
         className="!h-[calc(100vh-66px)] !overflow-y-auto"
       >
         <Routes>
-          {/* <Route
-            index
-            element={() => {
-              return <div>hello</div>;
-            }}
-          /> */}
+          <Route index element={<AddDashboardView />} />
 
           <Route
             path={LOCAL_CONSTANTS.ROUTES.ADD_DASHBOARD_LAYOUT.code}
