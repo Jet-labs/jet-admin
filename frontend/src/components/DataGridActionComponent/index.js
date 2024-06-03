@@ -97,11 +97,12 @@ export const DataGridActionComponent = ({
           });
         }
       });
-      setFilterQuery?.({ OR: _query });
+      console.log({ queries });
+      setFilterQuery?.({ OR: queries });
     } else {
       setFilterQuery(null);
     }
-  }, [filters, debouncedSearchTerm, readColumns, tableName]);
+  }, [filters, debouncedSearchTerm, combinator, readColumns, tableName]);
 
   const _handleOpenFilterMenu = () => {
     setIsFilterMenuOpen(true);
