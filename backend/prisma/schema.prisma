@@ -258,6 +258,68 @@ model tbl_pm_dashboards {
   dashboard_graph_ids   Int[]
 }
 
+model tbl_pm_transformation_functions {
+  pm_transformation_function_id       Int                              @id(map: "tbl_pm_transformation_functions_pk") @default(autoincrement())
+  transformation_function_title       String                           @db.VarChar
+  transformation_function_description String?                          @db.VarChar
+  transformation_function_string      String                           @db.VarChar
+  transformation_function_arg_array   String[]                         @db.VarChar
+  is_disabled                         Boolean?                         @default(false)
+  created_at                          DateTime                         @default(now()) @db.Timestamptz(6)
+  updated_at                          DateTime                         @default(now()) @db.Timestamptz(6)
+  disabled_at                         DateTime?                        @db.Timestamptz(6)
+  disable_reason                      String?                          @db.VarChar
+  tbl_pm_field_map                    tbl_pm_field_map[]
+  tbl_pm_normalization_container      tbl_pm_normalization_container[]
+}
+
+model tbl_pm_field_map {
+  pm_field_map_id                 Int                              @id(map: "tbl_pm_field_map_pk") @default(autoincrement())
+  query_field                     String                           @db.VarChar
+  normalized_field                String                           @db.VarChar
+  transformation_function_id      Int?
+  created_at                      DateTime                         @default(now()) @db.Timestamptz(6)
+  updated_at                      DateTime                         @default(now()) @db.Timestamptz(6)
+  tbl_pm_transformation_functions tbl_pm_transformation_functions? @relation(fields: [transformation_function_id], references: [pm_transformation_function_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_tbl_field_map_tbl_function_function_id")
+}
+
+model tbl_pm_normalization_container {
+  pm_normalization_container_id   Int                              @unique(map: "tbl_pm_normalization_container_pkey") @default(autoincrement())
+  normalization_container_fields  String[]                         @db.VarChar
+  transformation_function_id      Int?
+  created_at                      DateTime                         @default(now()) @db.Timestamptz(6)
+  updated_at                      DateTime                         @default(now()) @db.Timestamptz(6)
+  tbl_pm_transformation_functions tbl_pm_transformation_functions? @relation(fields: [transformation_function_id], references: [pm_transformation_function_id], onDelete: NoAction, onUpdate: NoAction, map: "tbl_normalization_tbl_function_function_id")
+  tbl_pm_query                    tbl_pm_query[]
+}
+
+model tbl_pm_query {
+  pm_query_id                    Int                            @id(map: "tbl_pm_query_pk") @default(autoincrement())
+  query_title                    String                         @db.VarChar
+  query_description              String?                        @db.VarChar
+  query_mapper_id                Int
+  pm_table_name                  String                         @db.VarChar
+  query                          String                         @db.VarChar
+  normalization_container_id     Int
+  created_at                     DateTime                       @default(now()) @db.Timestamptz(6)
+  updated_at                     DateTime                       @default(now()) @db.Timestamptz(6)
+  disabled_at                    DateTime?                      @db.Timestamptz(6)
+  is_disabled                    Boolean?                       @default(false)
+  tbl_pm_query_mapper            tbl_pm_query_mapper            @relation(fields: [query_mapper_id], references: [pm_query_mapper_id], onDelete: NoAction, onUpdate: NoAction, map: "tbl_query_tbl_mapper_mapper_id")
+  tbl_pm_normalization_container tbl_pm_normalization_container @relation(fields: [normalization_container_id], references: [pm_normalization_container_id], onDelete: NoAction, onUpdate: NoAction, map: "tbl_query_tbl_normalization_normalization_id")
+}
+
+model tbl_pm_query_mapper {
+  pm_query_mapper_id    Int            @id(map: "tbl_pm_query_mapper_pk") @default(autoincrement())
+  query_field_map_array Int[]
+  pm_query_mapper_title String?        @db.VarChar
+  created_at            DateTime       @default(now()) @db.Timestamptz(6)
+  updated_at            DateTime       @default(now()) @db.Timestamptz(6)
+  disabled_at           DateTime?      @db.Timestamptz(6)
+  is_disabled           Boolean        @default(false)
+  tbl_pm_query          tbl_pm_query[]
+}
+
 enum mpaa_rating {
   G
   PG

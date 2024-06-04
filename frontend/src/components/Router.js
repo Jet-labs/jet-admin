@@ -40,8 +40,8 @@ const AppRouter = ({}) => {
             element={
               <ProtectedRoute
                 successComponent={() => (
-                  // <Navigate to={LOCAL_CONSTANTS.ROUTES.ALL_GRAPHS.code} />
-                  <GraphView />
+                  <Navigate to={LOCAL_CONSTANTS.ROUTES.ALL_GRAPHS.code} />
+                  // <GraphView />
                 )}
                 fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
                 loadingComponent={() => <Loading />}
