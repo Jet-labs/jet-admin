@@ -1,14 +1,13 @@
 import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { useFormik } from "formik";
-import { fetchRowByIDAPI } from "../../api/get";
+import { fetchRowByIDAPI } from "../../api/tables";
 
 import { Button, CircularProgress, Grid, Paper } from "@mui/material";
 import { useEffect, useMemo } from "react";
 import { Loading } from "../../pages/Loading";
 import { FieldComponent } from "../FieldComponent";
 
-import { updateRowAPI } from "../../api/put";
-import { getAuthorizedColumnsForEdit } from "../../api/tables";
+import { getAuthorizedColumnsForEdit, updateRowAPI } from "../../api/tables";
 import { LOCAL_CONSTANTS } from "../../constants";
 import { useConstants } from "../../contexts/constantsContext";
 import { displayError, displaySuccess } from "../../utils/notification";

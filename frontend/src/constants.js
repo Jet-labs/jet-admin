@@ -82,6 +82,32 @@ export const LOCAL_CONSTANTS = {
     HOME: "/",
     SIGNIN: "/signin",
 
+    ALL_DATASOURCES: {
+      code: "/data_sources/*",
+      path: () => "/data_sources",
+    },
+    ADD_DATASOURCE: {
+      code: "add",
+      path: () => "add",
+    },
+    DATASOURCE_VIEW: {
+      code: ":id",
+      path: (id) => `${id}`,
+    },
+
+    ALL_QUERIES: {
+      code: "/queries/*",
+      path: () => "/queries",
+    },
+    ADD_QUERY: {
+      code: "add",
+      path: () => "add",
+    },
+    QUERY_VIEW: {
+      code: ":id",
+      path: (id) => `${id}`,
+    },
+
     ALL_GRAPHS: {
       code: "/graphs/*",
       path: () => "/graphs",

@@ -289,24 +289,22 @@ model tbl_pm_normalization_container {
   transformation_function_id      Int?
   created_at                      DateTime                         @default(now()) @db.Timestamptz(6)
   updated_at                      DateTime                         @default(now()) @db.Timestamptz(6)
+  tbl_pm_data_sources             tbl_pm_data_sources[]
   tbl_pm_transformation_functions tbl_pm_transformation_functions? @relation(fields: [transformation_function_id], references: [pm_transformation_function_id], onDelete: NoAction, onUpdate: NoAction, map: "tbl_normalization_tbl_function_function_id")
-  tbl_pm_query                    tbl_pm_query[]
 }
 
 model tbl_pm_query {
-  pm_query_id                    Int                            @id(map: "tbl_pm_query_pk") @default(autoincrement())
-  query_title                    String                         @db.VarChar
-  query_description              String?                        @db.VarChar
-  query_mapper_id                Int
-  pm_table_name                  String                         @db.VarChar
-  query                          String                         @db.VarChar
-  normalization_container_id     Int
-  created_at                     DateTime                       @default(now()) @db.Timestamptz(6)
-  updated_at                     DateTime                       @default(now()) @db.Timestamptz(6)
-  disabled_at                    DateTime?                      @db.Timestamptz(6)
-  is_disabled                    Boolean?                       @default(false)
-  tbl_pm_query_mapper            tbl_pm_query_mapper            @relation(fields: [query_mapper_id], references: [pm_query_mapper_id], onDelete: NoAction, onUpdate: NoAction, map: "tbl_query_tbl_mapper_mapper_id")
-  tbl_pm_normalization_container tbl_pm_normalization_container @relation(fields: [normalization_container_id], references: [pm_normalization_container_id], onDelete: NoAction, onUpdate: NoAction, map: "tbl_query_tbl_normalization_normalization_id")
+  pm_query_id         Int                 @id(map: "tbl_pm_query_pk") @default(autoincrement())
+  query_title         String              @db.VarChar
+  query_description   String?             @db.VarChar
+  query_mapper_id     Int
+  pm_table_name       String              @db.VarChar
+  query               String              @db.VarChar
+  created_at          DateTime            @default(now()) @db.Timestamptz(6)
+  updated_at          DateTime            @default(now()) @db.Timestamptz(6)
+  disabled_at         DateTime?           @db.Timestamptz(6)
+  is_disabled         Boolean?            @default(false)
+  tbl_pm_query_mapper tbl_pm_query_mapper @relation(fields: [query_mapper_id], references: [pm_query_mapper_id], onDelete: NoAction, onUpdate: NoAction, map: "tbl_query_tbl_mapper_mapper_id")
 }
 
 model tbl_pm_query_mapper {
@@ -318,6 +316,18 @@ model tbl_pm_query_mapper {
   disabled_at           DateTime?      @db.Timestamptz(6)
   is_disabled           Boolean        @default(false)
   tbl_pm_query          tbl_pm_query[]
+}
+
+model tbl_pm_data_sources {
+  pm_data_source_id              Int                            @id(map: "tbl_pm_data_sources_pk") @default(autoincrement())
+  data_source_title              String                         @db.VarChar
+  query_ids                      Int[]
+  normalization_container_id     Int
+  created_at                     DateTime                       @default(now()) @db.Timestamptz(6)
+  updated_at                     DateTime                       @default(now()) @db.Timestamptz(6)
+  disabled_at                    DateTime?                      @db.Timestamptz(6)
+  is_disabled                    Boolean?                       @default(false)
+  tbl_pm_normalization_container tbl_pm_normalization_container @relation(fields: [normalization_container_id], references: [pm_normalization_container_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_tbl_data_source_tbl_normalization_normalization_id")
 }
 
 enum mpaa_rating {

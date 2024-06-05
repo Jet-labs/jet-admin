@@ -13,6 +13,7 @@ import {
   FaRegUser,
   FaUserLock,
 } from "react-icons/fa";
+import { MdDataObject } from "react-icons/md";
 import { VscDashboard } from "react-icons/vsc";
 import { Link } from "react-router-dom";
 import { LOCAL_CONSTANTS } from "../../../constants";
@@ -286,6 +287,60 @@ export const MainDrawerList = ({ currentPageTitle }) => {
                       : theme.palette.primary.contrastText,
                 }}
                 primary={"Dashboards"}
+              />
+            </ListItemButton>
+          </ListItem>
+        </Link>
+      }
+      {
+        <Link
+          to={LOCAL_CONSTANTS.ROUTES.ALL_DATASOURCES.path()}
+          key={LOCAL_CONSTANTS.ROUTES.ALL_DATASOURCES.path()}
+        >
+          <ListItem
+            disablePadding
+            selected={
+              LOCAL_CONSTANTS.ROUTES.ALL_DATASOURCES.code == currentPageTitle
+            }
+            sx={{
+              borderRight:
+                LOCAL_CONSTANTS.ROUTES.ALL_DATASOURCES.code == currentPageTitle
+                  ? 3
+                  : 0,
+              borderColor: theme.palette.primary.main,
+            }}
+          >
+            <ListItemButton>
+              <ListItemIcon
+                sx={{
+                  color:
+                    LOCAL_CONSTANTS.ROUTES.ALL_DATASOURCES.code ==
+                    currentPageTitle
+                      ? theme.palette.primary.main
+                      : theme.palette.primary.contrastText,
+                }}
+              >
+                <MdDataObject className="!text-sm" />
+              </ListItemIcon>
+              <ListItemText
+                primaryTypographyProps={{
+                  sx: {
+                    marginLeft: -2,
+                    fontWeight:
+                      LOCAL_CONSTANTS.ROUTES.ALL_DATASOURCES.code ==
+                      currentPageTitle
+                        ? "700"
+                        : "500",
+                  },
+                }}
+                sx={{
+                  color:
+                    LOCAL_CONSTANTS.ROUTES.ALL_DATASOURCES.code ==
+                    currentPageTitle
+                      ? theme.palette.primary.main
+                      : theme.palette.primary.contrastText,
+                }}
+                primary={"Data sources"}
               />
             </ListItemButton>
           </ListItem>

@@ -1,10 +1,10 @@
 import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { useFormik } from "formik";
-import { fetchAllRowsAPI, fetchRowByIDAPI } from "../../api/get";
+import { fetchAllRowsAPI, fetchRowByIDAPI } from "../../api/tables";
 
 import { Button, CircularProgress, Grid, Paper } from "@mui/material";
 
-import { updateRowAPI } from "../../api/put";
+import { updateRowAPI } from "../../api/tables";
 import { LOCAL_CONSTANTS } from "../../constants";
 import { displayError, displaySuccess } from "../../utils/notification";
 import { FieldComponent } from "../../components/FieldComponent";

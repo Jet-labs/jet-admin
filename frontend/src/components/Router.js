@@ -14,6 +14,8 @@ import { lazy } from "react";
 import GraphView from "../pages/GraphView";
 import SignIn from "../pages/SignIn";
 
+
+
 const PolicyManagement = lazy(() => import("../pages/PolicyManagement"));
 const PolicySettings = lazy(() => import("../pages/PolicySettings"));
 const AddPolicy = lazy(() => import("../pages/AddPolicy"));
@@ -23,7 +25,7 @@ const AddAccount = lazy(() => import("../pages/AddAccount"));
 const TableLayout = lazy(() => import("./layouts/TableLayout"));
 const GraphLayout = lazy(() => import("./layouts/GraphLayout"));
 const DashboardLayout = lazy(() => import("./layouts/DashboardLayout"));
-
+const DataSourceLayout = lazy(() => import("./layouts/DataSourceLayout"));
 /**
  *
  * @param {object} param0
@@ -74,6 +76,17 @@ const AppRouter = ({}) => {
             element={
               <ProtectedRoute
                 successComponent={DashboardLayout}
+                fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
+                loadingComponent={() => <Loading fullScreen />}
+              />
+            }
+          ></Route>
+
+          <Route
+            path={LOCAL_CONSTANTS.ROUTES.ALL_DATASOURCES.code}
+            element={
+              <ProtectedRoute
+                successComponent={DataSourceLayout}
                 fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
                 loadingComponent={() => <Loading fullScreen />}
               />

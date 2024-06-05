@@ -8,7 +8,7 @@ import {
 } from "@mui/x-data-grid";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { fetchAllRowsAPI } from "../../api/get";
+import { fetchAllRowsAPI } from "../../api/tables";
 import { useAuthState } from "../../contexts/authContext";
 
 import "react-data-grid/lib/styles.css";

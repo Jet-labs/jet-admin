@@ -1,18 +1,17 @@
 import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { useFormik } from "formik";
-import { fetchAllRowsAPI, fetchRowByIDAPI } from "../../api/get";
+import { fetchRowByIDAPI } from "../../api/tables";
 
 import { Button, CircularProgress, Grid, Paper } from "@mui/material";
 
-import { updateRowAPI } from "../../api/put";
-import { LOCAL_CONSTANTS } from "../../constants";
-import { displayError, displaySuccess } from "../../utils/notification";
+import { useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { updateRowAPI } from "../../api/tables";
 import { FieldComponent } from "../../components/FieldComponent";
 import { RowDeletionForm } from "../../components/RowDeletetionForm";
-import { ErrorComponent } from "../../components/ErrorComponent";
+import { LOCAL_CONSTANTS } from "../../constants";
+import { displayError, displaySuccess } from "../../utils/notification";
 import { Loading } from "../Loading";
-import { useEffect, useMemo } from "react";
-import { useParams } from "react-router-dom";
 
 const PolicySettings = () => {
   const tableName = LOCAL_CONSTANTS.STRINGS.POLICY_OBJECT_TABLE_NAME;

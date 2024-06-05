@@ -5,7 +5,7 @@ import { Chip, Pagination } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { fetchAllRowsAPI } from "../../api/get";
+import { fetchAllRowsAPI } from "../../api/tables";
 
 import { LOCAL_CONSTANTS } from "../../constants";
 import { useConstants } from "../../contexts/constantsContext";

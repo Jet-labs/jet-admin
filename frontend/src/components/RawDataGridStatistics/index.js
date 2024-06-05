@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { fetchTableStatsAPI } from "../../api/get";
+import { fetchTableStatsAPI } from "../../api/tables";
 import { useAuthState } from "../../contexts/authContext";
 
 import { Grid } from "@mui/material";

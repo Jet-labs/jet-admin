@@ -4,14 +4,6 @@ import { BiCalendar } from "react-icons/bi";
 import { LOCAL_CONSTANTS } from "../constants";
 import { Model } from "../models/data/model";
 import { jsonToReadable } from "./string";
-/**
- *
- * @param {String} tableName
- * @param {Model[]} dbModel
- * @returns
- */
-export const getTableModelFromModel = (tableName, dbModel) =>
-  dbModel.find((datamodel) => datamodel.name === tableName);
 
 /**
  *
