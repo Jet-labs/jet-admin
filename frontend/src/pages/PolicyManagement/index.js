@@ -124,6 +124,7 @@ const PolicyManagement = () => {
           tableName={tableName}
           setSortModel={setSortModel}
           sortModel={sortModel}
+          addRowNavigation={LOCAL_CONSTANTS.ROUTES.ADD_POLICY.path()}
         />
       </div>
       {isLoadingAllPolicies ? (

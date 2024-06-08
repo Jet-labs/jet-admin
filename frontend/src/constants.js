@@ -127,13 +127,14 @@ export const LOCAL_CONSTANTS = {
       code: ":table_name/:id",
       path: (table_name, id) => `${table_name}/${id}`,
     },
-    POLICY_MANAGEMENT: "/policy_editor",
+    POLICY_MANAGEMENT: { code: "/policy_editor", path: () => `/policy_editor` },
     POLICY_SETTINGS: {
       code: ":id",
       path: (id) => `${id}`,
     },
     ADD_POLICY: {
       code: "add",
+      path: (id) => `add`,
     },
     ACCOUNT_MANAGEMENT: "/account_management",
     ACCOUNT_SETTINGS: {
@@ -142,6 +143,7 @@ export const LOCAL_CONSTANTS = {
     },
     ADD_ACCOUNT: {
       code: "add",
+      path: (id) => `add`,
     },
     ACTIONS: {
       code: "actions/:entity",

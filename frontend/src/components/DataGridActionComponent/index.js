@@ -30,6 +30,7 @@ export const DataGridActionComponent = ({
   sortModel,
   reloadData,
   tableName,
+  addRowNavigation,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
@@ -118,7 +119,11 @@ export const DataGridActionComponent = ({
     setIsSortMenuOpen(false);
   };
   const _handleNavigateRowAdditionForm = () => {
-    navigate(LOCAL_CONSTANTS.ROUTES.ADD_ROW.path(tableName));
+    navigate(
+      addRowNavigation
+        ? addRowNavigation
+        : LOCAL_CONSTANTS.ROUTES.ADD_ROW.path(tableName)
+    );
   };
 
   const _handleDeleteFilter = (index) => {

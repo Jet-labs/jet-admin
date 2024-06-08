@@ -38,7 +38,9 @@ const AppRouter = ({}) => {
             element={
               <ProtectedRoute
                 successComponent={() => (
-                  <Navigate to={LOCAL_CONSTANTS.ROUTES.ALL_GRAPHS.code} />
+                  <Navigate
+                    to={LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.code}
+                  />
                   // <GraphView />
                 )}
                 fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
@@ -78,7 +80,7 @@ const AppRouter = ({}) => {
             }
           ></Route>
 
-          <Route path={LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT}>
+          <Route path={LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT.code}>
             <Route
               index
               element={

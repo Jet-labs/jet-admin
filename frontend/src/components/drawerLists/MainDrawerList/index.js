@@ -189,29 +189,20 @@ export const MainDrawerList = ({ currentPageTitle }) => {
 
       {
         <Link
-          to={LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT}
-          key={LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT}
+          to={LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT.path()}
+          key={LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT.path()}
         >
           <ListItem
             disablePadding
-            selected={
-              LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT == currentPageTitle
-            }
             sx={{
-              borderRight:
-                LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT == currentPageTitle
-                  ? 3
-                  : 0,
+              borderRight: 0,
               borderColor: theme.palette.primary.main,
             }}
           >
             <ListItemButton>
               <ListItemIcon
                 sx={{
-                  color:
-                    LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT == currentPageTitle
-                      ? theme.palette.primary.main
-                      : theme.palette.primary.contrastText,
+                  color: theme.palette.primary.contrastText,
                 }}
               >
                 <FaUserLock className="!text-sm" />
@@ -220,18 +211,11 @@ export const MainDrawerList = ({ currentPageTitle }) => {
                 primaryTypographyProps={{
                   sx: {
                     marginLeft: -2,
-                    fontWeight:
-                      LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT ==
-                      currentPageTitle
-                        ? "700"
-                        : "500",
+                    fontWeight: "500",
                   },
                 }}
                 sx={{
-                  color:
-                    LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT == currentPageTitle
-                      ? theme.palette.primary.main
-                      : theme.palette.primary.contrastText,
+                  color: theme.palette.primary.contrastText,
                 }}
                 primary={"Roles Management"}
               />
