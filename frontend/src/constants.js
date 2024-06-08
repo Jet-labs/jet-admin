@@ -82,32 +82,6 @@ export const LOCAL_CONSTANTS = {
     HOME: "/",
     SIGNIN: "/signin",
 
-    ALL_DATASOURCES: {
-      code: "/data_sources/*",
-      path: () => "/data_sources",
-    },
-    ADD_DATASOURCE: {
-      code: "add",
-      path: () => "add",
-    },
-    DATASOURCE_VIEW: {
-      code: ":id",
-      path: (id) => `${id}`,
-    },
-
-    ALL_QUERIES: {
-      code: "/queries/*",
-      path: () => "/queries",
-    },
-    ADD_QUERY: {
-      code: "add",
-      path: () => "add",
-    },
-    QUERY_VIEW: {
-      code: ":id",
-      path: (id) => `${id}`,
-    },
-
     ALL_GRAPHS: {
       code: "/graphs/*",
       path: () => "/graphs",
@@ -120,6 +94,7 @@ export const LOCAL_CONSTANTS = {
       code: ":id",
       path: (id) => `${id}`,
     },
+
     ALL_DASHBOARD_LAYOUTS: {
       code: "/dashboard/*",
       path: () => "/dashboard",
@@ -129,8 +104,12 @@ export const LOCAL_CONSTANTS = {
       path: () => "add",
     },
     DASHBOARD_LAYOUT_VIEW: {
-      code: ":id",
+      code: ":id/*",
       path: (id) => `${id}`,
+    },
+    DASHBOARD_EDIT_VIEW: {
+      code: "edit",
+      path: (id) => `edit`,
     },
     ALL_TABLES: {
       code: "/tables/*",

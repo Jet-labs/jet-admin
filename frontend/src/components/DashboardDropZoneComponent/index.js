@@ -3,10 +3,7 @@ import React, { useState } from "react";
 import { GraphWidgetComponent } from "../GraphWidgetComponent";
 import { FaTimes } from "react-icons/fa";
 
-export const GraphLayoutDropZoneComponent = ({
-  graphIDData,
-  setGraphIDData,
-}) => {
+export const DashboardDropZoneComponent = ({ graphIDData, setGraphIDData }) => {
   const theme = useTheme();
 
   const [isDraggableInDropZone, setIsDraggableInDropZone] = useState(false);
@@ -43,53 +40,45 @@ export const GraphLayoutDropZoneComponent = ({
   return (
     <div
       className="w-full h-full p-2"
-      style={{ background: theme.palette.divider }}
+      // style={{ background: theme.palette.divider }}
     >
       <Grid
         className="w-full h-full  !overflow-y-auto "
         container
-        style={
-          isDraggableInDropZone
-            ? {
-                background: theme.palette.divider,
-                borderRadius: 4,
-                borderWidth: 3,
-                borderStyle: "dotted",
-                borderColor: theme.palette.info.main,
-              }
-            : {
-                background: theme.palette.divider,
-                borderRadius: 4,
-                borderWidth: 2,
-                borderStyle: "dotted",
-                borderColor: theme.palette.info.dark,
-              }
-        }
         onDragEnter={_handleDragOverStart}
         onDragLeave={_handleDragOverEnd}
         onDragOver={_enableDropping}
         onDrop={_handleDrop}
         gridTemplateColumns={"auto auto auto"}
       >
-        {graphIDData?.map((graph, index) => {
-          return (
-            <Grid item xs={6} className="!p-1 !h-fit">
-              <Grid xs={12} className="!flex flex-row justify-end items-start">
-                <IconButton
-                  aria-label="delete"
-                  size="small"
-                  className="!p-0 !m-0 !pb-1"
-                  onClick={() => {
-                    _handleDelete(index);
-                  }}
+        {graphIDData && graphIDData.length > 0 ? (
+          graphIDData.map((graph, index) => {
+            return (
+              <Grid item xs={6} className="!p-1 !h-fit">
+                <Grid
+                  xs={12}
+                  className="!flex flex-row justify-end items-start"
                 >
-                  <FaTimes className="!text-sm" />
-                </IconButton>
+                  <IconButton
+                    aria-label="delete"
+                    size="small"
+                    className="!p-0 !m-0 !pb-1"
+                    onClick={() => {
+                      _handleDelete(index);
+                    }}
+                  >
+                    <FaTimes className="!text-sm" />
+                  </IconButton>
+                </Grid>
+                <GraphWidgetComponent id={graph.graphID} />
               </Grid>
-              <GraphWidgetComponent id={graph.graphID} />
-            </Grid>
-          );
-        })}
+            );
+          })
+        ) : (
+          <div className="!w-full !h-full flex flex-col justify-center items-center">
+            <span>No graphs added to this dashboard</span>
+          </div>
+        )}
       </Grid>
     </div>
   );

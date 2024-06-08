@@ -5,7 +5,7 @@ import React from "react";
 import { useFormik } from "formik";
 import { addDashboardAPI } from "../../api/dashboards";
 import { FieldComponent } from "../../components/FieldComponent";
-import { GraphLayoutDropZoneComponent } from "../../components/GraphLayoutDropZoneComponent";
+import { DashboardDropZoneComponent } from "../../components/DashboardDropZoneComponent";
 import { GraphsDnDList } from "../../components/GraphsDnDList";
 import { LOCAL_CONSTANTS } from "../../constants";
 import { displayError, displaySuccess } from "../../utils/notification";
@@ -61,7 +61,7 @@ const AddDashboardView = () => {
           className="w-full !h-[calc(100vh-66px)]"
           style={{ background: theme.palette.divider }}
         >
-          <GraphLayoutDropZoneComponent
+          <DashboardDropZoneComponent
             graphIDData={dashboardForm.values["graph_ids"]}
             setGraphIDData={(value) =>
               dashboardForm.setFieldValue("graph_ids", value)

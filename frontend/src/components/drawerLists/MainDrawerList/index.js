@@ -30,17 +30,19 @@ export const MainDrawerList = ({ currentPageTitle }) => {
     >
       {
         <Link
-          to={LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT}
-          key={LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT}
+          to={LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.path()}
+          key={LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.path()}
         >
           <ListItem
             disablePadding
             selected={
-              LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT == currentPageTitle
+              LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.code ==
+              currentPageTitle
             }
             sx={{
               borderRight:
-                LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT == currentPageTitle
+                LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.code ==
+                currentPageTitle
                   ? 3
                   : 0,
               borderColor: theme.palette.primary.main,
@@ -50,19 +52,20 @@ export const MainDrawerList = ({ currentPageTitle }) => {
               <ListItemIcon
                 sx={{
                   color:
-                    LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT == currentPageTitle
+                    LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.code ==
+                    currentPageTitle
                       ? theme.palette.primary.main
                       : theme.palette.primary.contrastText,
                 }}
               >
-                <FaUserLock className="!text-sm" />
+                <VscDashboard className="!text-sm" />
               </ListItemIcon>
               <ListItemText
                 primaryTypographyProps={{
                   sx: {
                     marginLeft: -2,
                     fontWeight:
-                      LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT ==
+                      LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.code ==
                       currentPageTitle
                         ? "700"
                         : "500",
@@ -70,65 +73,12 @@ export const MainDrawerList = ({ currentPageTitle }) => {
                 }}
                 sx={{
                   color:
-                    LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT == currentPageTitle
-                      ? theme.palette.primary.main
-                      : theme.palette.primary.contrastText,
-                }}
-                primary={"Roles Management"}
-              />
-            </ListItemButton>
-          </ListItem>
-        </Link>
-      }
-      {
-        <Link
-          to={LOCAL_CONSTANTS.ROUTES.ACCOUNT_MANAGEMENT}
-          key={LOCAL_CONSTANTS.ROUTES.ACCOUNT_MANAGEMENT}
-        >
-          <ListItem
-            disablePadding
-            selected={
-              LOCAL_CONSTANTS.ROUTES.ACCOUNT_MANAGEMENT == currentPageTitle
-            }
-            sx={{
-              borderRight:
-                LOCAL_CONSTANTS.ROUTES.ACCOUNT_MANAGEMENT == currentPageTitle
-                  ? 3
-                  : 0,
-              borderColor: theme.palette.primary.main,
-            }}
-          >
-            <ListItemButton>
-              <ListItemIcon
-                sx={{
-                  color:
-                    LOCAL_CONSTANTS.ROUTES.ACCOUNT_MANAGEMENT ==
+                    LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.code ==
                     currentPageTitle
                       ? theme.palette.primary.main
                       : theme.palette.primary.contrastText,
                 }}
-              >
-                <FaRegUser className="!text-sm" />
-              </ListItemIcon>
-              <ListItemText
-                primaryTypographyProps={{
-                  sx: {
-                    marginLeft: -2,
-                    fontWeight:
-                      LOCAL_CONSTANTS.ROUTES.ACCOUNT_MANAGEMENT ==
-                      currentPageTitle
-                        ? "700"
-                        : "500",
-                  },
-                }}
-                sx={{
-                  color:
-                    LOCAL_CONSTANTS.ROUTES.ACCOUNT_MANAGEMENT ==
-                    currentPageTitle
-                      ? theme.palette.primary.main
-                      : theme.palette.primary.contrastText,
-                }}
-                primary={"Accounts Management"}
+                primary={"Dashboards"}
               />
             </ListItemButton>
           </ListItem>
@@ -236,21 +186,20 @@ export const MainDrawerList = ({ currentPageTitle }) => {
           </ListItem>
         </Link>
       }
+
       {
         <Link
-          to={LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.path()}
-          key={LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.path()}
+          to={LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT}
+          key={LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT}
         >
           <ListItem
             disablePadding
             selected={
-              LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.code ==
-              currentPageTitle
+              LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT == currentPageTitle
             }
             sx={{
               borderRight:
-                LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.code ==
-                currentPageTitle
+                LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT == currentPageTitle
                   ? 3
                   : 0,
               borderColor: theme.palette.primary.main,
@@ -260,20 +209,19 @@ export const MainDrawerList = ({ currentPageTitle }) => {
               <ListItemIcon
                 sx={{
                   color:
-                    LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.code ==
-                    currentPageTitle
+                    LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT == currentPageTitle
                       ? theme.palette.primary.main
                       : theme.palette.primary.contrastText,
                 }}
               >
-                <VscDashboard className="!text-sm" />
+                <FaUserLock className="!text-sm" />
               </ListItemIcon>
               <ListItemText
                 primaryTypographyProps={{
                   sx: {
                     marginLeft: -2,
                     fontWeight:
-                      LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.code ==
+                      LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT ==
                       currentPageTitle
                         ? "700"
                         : "500",
@@ -281,12 +229,11 @@ export const MainDrawerList = ({ currentPageTitle }) => {
                 }}
                 sx={{
                   color:
-                    LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.code ==
-                    currentPageTitle
+                    LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT == currentPageTitle
                       ? theme.palette.primary.main
                       : theme.palette.primary.contrastText,
                 }}
-                primary={"Dashboards"}
+                primary={"Roles Management"}
               />
             </ListItemButton>
           </ListItem>
@@ -294,17 +241,17 @@ export const MainDrawerList = ({ currentPageTitle }) => {
       }
       {
         <Link
-          to={LOCAL_CONSTANTS.ROUTES.ALL_DATASOURCES.path()}
-          key={LOCAL_CONSTANTS.ROUTES.ALL_DATASOURCES.path()}
+          to={LOCAL_CONSTANTS.ROUTES.ACCOUNT_MANAGEMENT}
+          key={LOCAL_CONSTANTS.ROUTES.ACCOUNT_MANAGEMENT}
         >
           <ListItem
             disablePadding
             selected={
-              LOCAL_CONSTANTS.ROUTES.ALL_DATASOURCES.code == currentPageTitle
+              LOCAL_CONSTANTS.ROUTES.ACCOUNT_MANAGEMENT == currentPageTitle
             }
             sx={{
               borderRight:
-                LOCAL_CONSTANTS.ROUTES.ALL_DATASOURCES.code == currentPageTitle
+                LOCAL_CONSTANTS.ROUTES.ACCOUNT_MANAGEMENT == currentPageTitle
                   ? 3
                   : 0,
               borderColor: theme.palette.primary.main,
@@ -314,20 +261,20 @@ export const MainDrawerList = ({ currentPageTitle }) => {
               <ListItemIcon
                 sx={{
                   color:
-                    LOCAL_CONSTANTS.ROUTES.ALL_DATASOURCES.code ==
+                    LOCAL_CONSTANTS.ROUTES.ACCOUNT_MANAGEMENT ==
                     currentPageTitle
                       ? theme.palette.primary.main
                       : theme.palette.primary.contrastText,
                 }}
               >
-                <MdDataObject className="!text-sm" />
+                <FaRegUser className="!text-sm" />
               </ListItemIcon>
               <ListItemText
                 primaryTypographyProps={{
                   sx: {
                     marginLeft: -2,
                     fontWeight:
-                      LOCAL_CONSTANTS.ROUTES.ALL_DATASOURCES.code ==
+                      LOCAL_CONSTANTS.ROUTES.ACCOUNT_MANAGEMENT ==
                       currentPageTitle
                         ? "700"
                         : "500",
@@ -335,12 +282,12 @@ export const MainDrawerList = ({ currentPageTitle }) => {
                 }}
                 sx={{
                   color:
-                    LOCAL_CONSTANTS.ROUTES.ALL_DATASOURCES.code ==
+                    LOCAL_CONSTANTS.ROUTES.ACCOUNT_MANAGEMENT ==
                     currentPageTitle
                       ? theme.palette.primary.main
                       : theme.palette.primary.contrastText,
                 }}
-                primary={"Data sources"}
+                primary={"Accounts Management"}
               />
             </ListItemButton>
           </ListItem>
