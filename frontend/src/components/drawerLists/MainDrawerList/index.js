@@ -1,5 +1,4 @@
 import {
-  Grid,
   List,
   ListItem,
   ListItemButton,
@@ -13,7 +12,6 @@ import {
   FaRegUser,
   FaUserLock,
 } from "react-icons/fa";
-import { MdDataObject } from "react-icons/md";
 import { VscDashboard } from "react-icons/vsc";
 import { Link } from "react-router-dom";
 import { LOCAL_CONSTANTS } from "../../../constants";
@@ -35,27 +33,15 @@ export const MainDrawerList = ({ currentPageTitle }) => {
         >
           <ListItem
             disablePadding
-            selected={
-              LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.code ==
-              currentPageTitle
-            }
             sx={{
-              borderRight:
-                LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.code ==
-                currentPageTitle
-                  ? 3
-                  : 0,
               borderColor: theme.palette.primary.main,
             }}
           >
             <ListItemButton>
               <ListItemIcon
                 sx={{
-                  color:
-                    LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.code ==
-                    currentPageTitle
-                      ? theme.palette.primary.main
-                      : theme.palette.primary.contrastText,
+                  color: theme.palette.primary.contrastText,
+                  minWidth: 0,
                 }}
               >
                 <VscDashboard className="!text-sm" />
@@ -63,20 +49,12 @@ export const MainDrawerList = ({ currentPageTitle }) => {
               <ListItemText
                 primaryTypographyProps={{
                   sx: {
-                    marginLeft: -2,
-                    fontWeight:
-                      LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.code ==
-                      currentPageTitle
-                        ? "700"
-                        : "500",
+                    marginLeft: 2,
+                    fontSize: 12,
                   },
                 }}
                 sx={{
-                  color:
-                    LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.code ==
-                    currentPageTitle
-                      ? theme.palette.primary.main
-                      : theme.palette.primary.contrastText,
+                  color: theme.palette.primary.contrastText,
                 }}
                 primary={"Dashboards"}
               />
@@ -91,24 +69,15 @@ export const MainDrawerList = ({ currentPageTitle }) => {
         >
           <ListItem
             disablePadding
-            selected={
-              LOCAL_CONSTANTS.ROUTES.ALL_TABLES.code == currentPageTitle
-            }
             sx={{
-              borderRight:
-                LOCAL_CONSTANTS.ROUTES.ALL_TABLES.code == currentPageTitle
-                  ? 3
-                  : 0,
               borderColor: theme.palette.primary.main,
             }}
           >
             <ListItemButton>
               <ListItemIcon
                 sx={{
-                  color:
-                    LOCAL_CONSTANTS.ROUTES.ALL_TABLES.code == currentPageTitle
-                      ? theme.palette.primary.main
-                      : theme.palette.primary.contrastText,
+                  color: theme.palette.primary.contrastText,
+                  minWidth: 0,
                 }}
               >
                 <FaDatabase className="!text-sm" />
@@ -116,18 +85,12 @@ export const MainDrawerList = ({ currentPageTitle }) => {
               <ListItemText
                 primaryTypographyProps={{
                   sx: {
-                    marginLeft: -2,
-                    fontWeight:
-                      LOCAL_CONSTANTS.ROUTES.ALL_TABLES.code == currentPageTitle
-                        ? "700"
-                        : "500",
+                    marginLeft: 2,
+                    fontSize: 12,
                   },
                 }}
                 sx={{
-                  color:
-                    LOCAL_CONSTANTS.ROUTES.ALL_TABLES.code == currentPageTitle
-                      ? theme.palette.primary.main
-                      : theme.palette.primary.contrastText,
+                  color: theme.palette.primary.contrastText,
                 }}
                 primary={"Tables"}
               />
@@ -142,24 +105,15 @@ export const MainDrawerList = ({ currentPageTitle }) => {
         >
           <ListItem
             disablePadding
-            selected={
-              LOCAL_CONSTANTS.ROUTES.ALL_GRAPHS.code == currentPageTitle
-            }
             sx={{
-              borderRight:
-                LOCAL_CONSTANTS.ROUTES.ALL_GRAPHS.code == currentPageTitle
-                  ? 3
-                  : 0,
               borderColor: theme.palette.primary.main,
             }}
           >
             <ListItemButton>
               <ListItemIcon
                 sx={{
-                  color:
-                    LOCAL_CONSTANTS.ROUTES.ALL_GRAPHS.code == currentPageTitle
-                      ? theme.palette.primary.main
-                      : theme.palette.primary.contrastText,
+                  color: theme.palette.primary.contrastText,
+                  minWidth: 0,
                 }}
               >
                 <FaRegChartBar className="!text-sm" />
@@ -167,18 +121,12 @@ export const MainDrawerList = ({ currentPageTitle }) => {
               <ListItemText
                 primaryTypographyProps={{
                   sx: {
-                    marginLeft: -2,
-                    fontWeight:
-                      LOCAL_CONSTANTS.ROUTES.ALL_GRAPHS.code == currentPageTitle
-                        ? "700"
-                        : "500",
+                    marginLeft: 2,
+                    fontSize: 12,
                   },
                 }}
                 sx={{
-                  color:
-                    LOCAL_CONSTANTS.ROUTES.ALL_GRAPHS.code == currentPageTitle
-                      ? theme.palette.primary.main
-                      : theme.palette.primary.contrastText,
+                  color: theme.palette.primary.contrastText,
                 }}
                 primary={"Graphs"}
               />
@@ -203,6 +151,7 @@ export const MainDrawerList = ({ currentPageTitle }) => {
               <ListItemIcon
                 sx={{
                   color: theme.palette.primary.contrastText,
+                  minWidth: 0,
                 }}
               >
                 <FaUserLock className="!text-sm" />
@@ -210,14 +159,15 @@ export const MainDrawerList = ({ currentPageTitle }) => {
               <ListItemText
                 primaryTypographyProps={{
                   sx: {
-                    marginLeft: -2,
+                    marginLeft: 2,
+                    fontSize: 12,
                     fontWeight: "500",
                   },
                 }}
                 sx={{
                   color: theme.palette.primary.contrastText,
                 }}
-                primary={"Roles Management"}
+                primary={"Roles"}
               />
             </ListItemButton>
           </ListItem>
@@ -230,25 +180,15 @@ export const MainDrawerList = ({ currentPageTitle }) => {
         >
           <ListItem
             disablePadding
-            selected={
-              LOCAL_CONSTANTS.ROUTES.ACCOUNT_MANAGEMENT == currentPageTitle
-            }
             sx={{
-              borderRight:
-                LOCAL_CONSTANTS.ROUTES.ACCOUNT_MANAGEMENT == currentPageTitle
-                  ? 3
-                  : 0,
               borderColor: theme.palette.primary.main,
             }}
           >
             <ListItemButton>
               <ListItemIcon
                 sx={{
-                  color:
-                    LOCAL_CONSTANTS.ROUTES.ACCOUNT_MANAGEMENT ==
-                    currentPageTitle
-                      ? theme.palette.primary.main
-                      : theme.palette.primary.contrastText,
+                  color: theme.palette.primary.contrastText,
+                  minWidth: 0,
                 }}
               >
                 <FaRegUser className="!text-sm" />
@@ -256,22 +196,14 @@ export const MainDrawerList = ({ currentPageTitle }) => {
               <ListItemText
                 primaryTypographyProps={{
                   sx: {
-                    marginLeft: -2,
-                    fontWeight:
-                      LOCAL_CONSTANTS.ROUTES.ACCOUNT_MANAGEMENT ==
-                      currentPageTitle
-                        ? "700"
-                        : "500",
+                    marginLeft: 2,
+                    fontSize: 12,
                   },
                 }}
                 sx={{
-                  color:
-                    LOCAL_CONSTANTS.ROUTES.ACCOUNT_MANAGEMENT ==
-                    currentPageTitle
-                      ? theme.palette.primary.main
-                      : theme.palette.primary.contrastText,
+                  color: theme.palette.primary.contrastText,
                 }}
-                primary={"Accounts Management"}
+                primary={"Accounts"}
               />
             </ListItemButton>
           </ListItem>

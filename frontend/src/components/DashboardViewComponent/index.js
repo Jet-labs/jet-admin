@@ -1,7 +1,6 @@
-import { Grid, IconButton, useTheme } from "@mui/material";
-import React, { useState } from "react";
+import { Grid, useTheme } from "@mui/material";
+import React from "react";
 import { GraphWidgetComponent } from "../GraphWidgetComponent";
-import { FaTimes } from "react-icons/fa";
 
 export const DashboardViewComponent = ({ graphIDData }) => {
   const theme = useTheme();

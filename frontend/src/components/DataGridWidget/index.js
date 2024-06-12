@@ -11,6 +11,7 @@ import { useMemo, useState } from "react";
 import { fetchAllRowsAPI } from "../../api/tables";
 import { useAuthState } from "../../contexts/authContext";
 
+import "react-data-grid/lib/styles.css";
 import { getAuthorizedColumnsForRead } from "../../api/tables";
 import { LOCAL_CONSTANTS } from "../../constants";
 import { useConstants } from "../../contexts/constantsContext";
@@ -23,7 +24,9 @@ import { DataGridActionComponent } from "../DataGridActionComponent";
 import { ErrorComponent } from "../ErrorComponent";
 import { RawDataGridStatistics } from "../RawDataGridStatistics";
 
-export const RawDataGrid = ({
+// import DataGrid from "react-data-grid";
+
+export const DataGridWidget = ({
   tableName,
   onRowClick,
   showStats,
@@ -125,7 +128,7 @@ export const RawDataGrid = ({
 
   return (
     <div
-      className={`w-full h-full ${containerClass}   !overflow-y-auto !overflow-x-auto`}
+      className={`w-full h-full ${containerClass}   !overflow-y-auto !overflow-x-auto !border rounded !border-white !border-opacity-10`}
     >
       <div
         xs={12}
@@ -146,76 +149,70 @@ export const RawDataGrid = ({
           tableName={tableName}
           setSortModel={setSortModel}
           sortModel={sortModel}
-          allowAdd={true}
+          compact={true}
         />
-      </div>
-      <div item xs={12} className="!relative">
-        {isLoadingRows ? (
-          <Loading />
-        ) : data?.rows && pmUser && authorizedColumns && primaryColumns ? (
-          <div className="px-0">
-            <DataGrid
-              rows={data.rows}
-              loading={isLoadingRows || isFetchingAllRows}
-              className="!border-0 data-grid-custom-class"
-              columns={authorizedColumns}
-              initialState={{}}
-              editMode="row"
-              hideFooterPagination={true}
-              hideFooterSelectedRowCount={true}
-              checkboxSelection
-              disableRowSelectionOnClick
-              getRowId={getRowId}
-              hideFooter={true}
-              onRowClick={(param) => {
-                onRowClick
-                  ? onRowClick(param)
-                  : navigate(
-                      LOCAL_CONSTANTS.ROUTES.ROW_VIEW.path(
-                        tableName,
-                        JSON.stringify(selectByIDQueryBuilder(param.row))
-                      )
-                    );
-              }}
-              disableColumnFilter
-              sortingMode="server"
-              autoHeight={true}
-              getRowHeight={() => "auto"}
-              slots={{
-                toolbar: () => (
-                  <GridToolbarContainer className="!px-2.5 justify-end">
-                    <GridToolbarExport />
-                  </GridToolbarContainer>
-                ),
-                loadingOverlay: LinearProgress,
-              }}
-            />
-            <div
-              className="flex flex-row w-full justify-end pb-2 !sticky !bottom-0 !border-t !border-white !border-opacity-10"
-              style={{ background: theme.palette.background.paper }}
-            >
-              <Pagination
-                count={Boolean(data?.nextPage) ? page + 1 : page}
-                page={page}
-                onChange={(e, page) => {
-                  setPage(page);
-                }}
-                hideNextButton={!Boolean(data?.nextPage)}
-                variant="text"
-                shape="rounded"
-                className="!mt-2"
-                siblingCount={1}
-              />
-            </div>
-          </div>
-        ) : (
-          <div className="!w-full !p-4">
-            <ErrorComponent
-              error={loadRowsError || LOCAL_CONSTANTS.ERROR_CODES.SERVER_ERROR}
-            />
-          </div>
+
+        {data?.rows && pmUser && authorizedColumns && primaryColumns && (
+          <Pagination
+            count={Boolean(data?.nextPage) ? page + 1 : page}
+            page={page}
+            onChange={(e, page) => {
+              setPage(page);
+            }}
+            hideNextButton={!Boolean(data?.nextPage)}
+            variant="text"
+            shape="rounded"
+            siblingCount={1}
+          />
         )}
       </div>
+
+      {isLoadingRows ? (
+        <Loading />
+      ) : data?.rows && pmUser && authorizedColumns && primaryColumns ? (
+        <DataGrid
+          rows={data.rows}
+          loading={isLoadingRows || isFetchingAllRows}
+          className="!border-0 data-grid-custom-class !flex !flex-grow"
+          columns={authorizedColumns}
+          initialState={{}}
+          editMode="row"
+          hideFooterPagination={true}
+          hideFooterSelectedRowCount={true}
+          checkboxSelection
+          disableRowSelectionOnClick
+          getRowId={getRowId}
+          hideFooter={true}
+          onRowClick={(param) => {
+            onRowClick
+              ? onRowClick(param)
+              : navigate(
+                  LOCAL_CONSTANTS.ROUTES.ROW_VIEW.path(
+                    tableName,
+                    JSON.stringify(selectByIDQueryBuilder(param.row))
+                  )
+                );
+          }}
+          disableColumnFilter
+          sortingMode="server"
+          autoHeight={true}
+          getRowHeight={() => "auto"}
+          slots={{
+            toolbar: () => (
+              <GridToolbarContainer className="!px-2.5 justify-end">
+                <GridToolbarExport />
+              </GridToolbarContainer>
+            ),
+            loadingOverlay: LinearProgress,
+          }}
+        />
+      ) : (
+        <div className="!w-full !p-4">
+          <ErrorComponent
+            error={loadRowsError || LOCAL_CONSTANTS.ERROR_CODES.SERVER_ERROR}
+          />
+        </div>
+      )}
     </div>
   );
 };

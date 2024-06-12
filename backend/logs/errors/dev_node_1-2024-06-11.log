@@ -1,0 +1,4 @@
+[31merror[39m: dev_node_1: 11-06-2024 21:04:07: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 11-06-2024 21:04:07: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 11-06-2024 21:04:08: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 11-06-2024 21:04:08: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}

@@ -101,6 +101,7 @@ export const DashboardsList = () => {
                       key == currentPage
                         ? theme.palette.primary.main
                         : theme.palette.primary.contrastText,
+                    minWidth: 0,
                   }}
                 >
                   <FaChalkboardTeacher className="!text-sm" />
@@ -116,7 +117,8 @@ export const DashboardsList = () => {
                   primaryTypographyProps={{
                     sx: {
                       fontWeight: key == currentPage ? "700" : "500",
-                      marginLeft: -2,
+                      fontSize: 12,
+                      marginLeft: 2,
                     },
                   }}
                 />

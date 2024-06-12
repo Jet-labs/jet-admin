@@ -16,10 +16,10 @@ import "react-data-grid/lib/styles.css";
 import { BiCalendar } from "react-icons/bi";
 import { DataGridActionComponent } from "../../components/DataGridActionComponent";
 import { ErrorComponent } from "../../components/ErrorComponent";
-import { RawDatagridStatistics } from "../../components/RawDataGridStatistics";
+import { RawDataGridStatistics } from "../../components/RawDataGridStatistics";
 const AccountManagement = () => {
   const tableName = LOCAL_CONSTANTS.STRINGS.PM_USER_TABLE_NAME;
-  
+
   const { pmUser } = useAuthState();
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
@@ -126,7 +126,7 @@ const AccountManagement = () => {
   return (
     <div>
       <div className={`!w-full !p-4`}>
-        <RawDatagridStatistics
+        <RawDataGridStatistics
           tableName={tableName}
           altTableName={"Account management"}
           filterQuery={filterQuery}
@@ -139,6 +139,7 @@ const AccountManagement = () => {
           setSortModel={setSortModel}
           sortModel={sortModel}
           addRowNavigation={LOCAL_CONSTANTS.ROUTES.ADD_ACCOUNT.path()}
+          allowAdd={true}
         />
       </div>
       {isLoadingAllAccounts ? (

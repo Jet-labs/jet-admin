@@ -11,7 +11,7 @@ import { Loading } from "../../pages/Loading";
 import { displayError } from "../../utils/notification";
 import { ErrorComponent } from "../ErrorComponent";
 
-export const RawDatagridStatistics = ({
+export const RawDataGridStatistics = ({
   tableName,
   altTableName,
   filterQuery,

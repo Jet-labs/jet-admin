@@ -105,6 +105,7 @@ export const GraphDrawerList = () => {
                       key == currentPage
                         ? theme.palette.primary.main
                         : theme.palette.primary.contrastText,
+                    minWidth: 0,
                   }}
                 >
                   {graph.graph_options.graph_type ===
@@ -135,7 +136,8 @@ export const GraphDrawerList = () => {
                   primaryTypographyProps={{
                     sx: {
                       fontWeight: key == currentPage ? "700" : "500",
-                      marginLeft: -2,
+                      marginLeft: 2,
+                      fontSize: 12,
                     },
                   }}
                 />

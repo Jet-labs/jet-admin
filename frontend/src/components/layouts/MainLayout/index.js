@@ -26,7 +26,7 @@ export const MainLayout = ({ children }) => {
 
   const stickyDrawer = useMemo(() => {
     return (
-      <Grid item md={0} lg={2} xl={1.5}>
+      <Grid item md={0} lg={2} xl={1}>
         <MainDrawerList currentPageTitle={currentPageTitle} />
       </Grid>
     );
@@ -63,7 +63,7 @@ export const MainLayout = ({ children }) => {
       <Grid
         md={12}
         lg={10}
-        xl={10.5}
+        xl={11}
         className="!h-[calc(100vh-66px)] !overflow-y-auto"
       >
         {children}

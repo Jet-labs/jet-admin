@@ -16,11 +16,11 @@ import "react-data-grid/lib/styles.css";
 import { BiCalendar } from "react-icons/bi";
 import { DataGridActionComponent } from "../../components/DataGridActionComponent";
 import { ErrorComponent } from "../../components/ErrorComponent";
-import { RawDatagridStatistics } from "../../components/RawDataGridStatistics";
+import { RawDataGridStatistics } from "../../components/RawDataGridStatistics";
 
 const PolicyManagement = () => {
   const tableName = LOCAL_CONSTANTS.STRINGS.POLICY_OBJECT_TABLE_NAME;
-  
+
   const { pmUser } = useAuthState();
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
@@ -112,7 +112,7 @@ const PolicyManagement = () => {
   return (
     <div>
       <div className={`!w-full !p-4`}>
-        <RawDatagridStatistics
+        <RawDataGridStatistics
           tableName={tableName}
           altTableName={"Policy management"}
           filterQuery={filterQuery}

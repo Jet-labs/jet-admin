@@ -5,20 +5,20 @@
 
 /* width */
 ::-webkit-scrollbar {
-  width: 4px;
+  width: 6px;
   height: 8px;
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
   background: #121212;
-  border-radius: 4px;
+  /* border-radius: 4px; */
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  border-radius: 20px;
-  background-color: rgb(60, 59, 128);
+  /* border-radius: 20px; */
+  background-color: #4d4d5e7c;
   border: 1px solid #121212;
 }
 ::-webkit-scrollbar-corner {
@@ -26,7 +26,7 @@
 }
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #6562ff;
+  background: #6562ff67;
 }
 html {
   font-family: "Cabin", sans-serif;

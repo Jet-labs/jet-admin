@@ -31,6 +31,8 @@ export const DataGridActionComponent = ({
   reloadData,
   tableName,
   addRowNavigation,
+  compact,
+  allowAdd,
 }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
@@ -88,8 +90,12 @@ export const DataGridActionComponent = ({
       debouncedSearchTerm !== ""
     ) {
       let queries = [];
+      console.log({ readColumns });
       const _query = readColumns.forEach((column) => {
-        if (column.type == LOCAL_CONSTANTS.DATA_TYPES.STRING) {
+        if (
+          column.type == LOCAL_CONSTANTS.DATA_TYPES.STRING &&
+          !column.isList
+        ) {
           queries.push({
             [column.name]: {
               contains: debouncedSearchTerm,
@@ -139,7 +145,7 @@ export const DataGridActionComponent = ({
   };
   return (
     <Grid container className="py-2" rowSpacing={1}>
-      <Grid item xs={12} md={12} lg={6}>
+      <Grid item xs={12} md={12} lg={compact ? 12 : 6}>
         <TextField
           required
           fullWidth
@@ -167,7 +173,7 @@ export const DataGridActionComponent = ({
         item
         xs={12}
         md={12}
-        lg={6}
+        lg={compact ? 12 : 6}
         className="!flex !flex-row !justify-end !items-center"
       >
         <Button
@@ -225,15 +231,17 @@ export const DataGridActionComponent = ({
         >
           Reload
         </Button>
-        <Button
-          onClick={_handleNavigateRowAdditionForm}
-          startIcon={<FaPlus className="!text-sm" />}
-          size="medium"
-          variant="contained"
-          className="!ml-2"
-        >
-          Add
-        </Button>
+        {allowAdd && (
+          <Button
+            onClick={_handleNavigateRowAdditionForm}
+            startIcon={<FaPlus className="!text-sm" />}
+            size="medium"
+            variant="contained"
+            className="!ml-2"
+          >
+            Add
+          </Button>
+        )}
       </Grid>
       <AppliedFiltersList
         filters={filters}
