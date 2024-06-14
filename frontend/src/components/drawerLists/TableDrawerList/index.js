@@ -43,6 +43,7 @@ export const TableDrawerList = () => {
           <FaRedo className="!text-sm" />
         </IconButton>
       </div>
+      <div className="!mt-1"></div>
       {tables?.map((table) => {
         const key = `table_${table}`;
         return (

@@ -19,6 +19,10 @@ expressApp.use(
   "/admin_api/dashboards",
   require("./modules/routes/dashboard.route")
 );
+expressApp.use(
+  "/admin_api/data_sources",
+  require("./modules/routes/data_source.route")
+);
 
 expressApp.get("/", async (req, res) => {
   Logger.log("warning", {

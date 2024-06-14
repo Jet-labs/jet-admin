@@ -270,4 +270,49 @@ export class PMUser {
     }
     return false;
   };
+
+  extractAuthorizationForDataSourceAddFromPolicyObject = () => {
+    console.log(this.policy.data_sources);
+    if (this.policy.data_sources?.add) {
+      return true;
+    }
+    return false;
+  };
+  extractAuthorizedDataSourcesForReadFromPolicyObject = () => {
+    const authorizeDataSourceIDs = [];
+    if (this.policy.data_sources.read) {
+      return true;
+    } else if (
+      this.policy.data_sources &&
+      this.policy.data_sources.data_source_ids
+    ) {
+      Object.keys(this.policy.data_sources.data_source_ids).forEach(
+        (dataSourceID) => {
+          if (this.policy.data_sources.data_source_ids[dataSourceID].read) {
+            authorizeDataSourceIDs.push(parseInt(dataSourceID));
+          }
+        }
+      );
+    }
+    return authorizeDataSourceIDs;
+  };
+
+  extractAuthorizedDataSourcesForUpdateFromPolicyObject = () => {
+    const authorizeDataSourceIDs = [];
+    if (this.policy.data_sources.edit) {
+      return true;
+    } else if (
+      this.policy.data_sources &&
+      this.policy.data_sources.data_source_ids
+    ) {
+      Object.keys(this.policy.data_sources.data_source_ids).forEach(
+        (dataSourceID) => {
+          if (this.policy.data_sources.data_source_ids[dataSourceID].edit) {
+            authorizeDataSourceIDs.push(parseInt(dataSourceID));
+          }
+        }
+      );
+    }
+    return authorizeDataSourceIDs;
+  };
 }

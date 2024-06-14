@@ -15,7 +15,7 @@ import {
 import { VscDashboard } from "react-icons/vsc";
 import { Link } from "react-router-dom";
 import { LOCAL_CONSTANTS } from "../../../constants";
-
+import { GrConnect } from "react-icons/gr";
 export const MainDrawerList = ({ currentPageTitle }) => {
   const theme = useTheme();
 
@@ -93,6 +93,42 @@ export const MainDrawerList = ({ currentPageTitle }) => {
                   color: theme.palette.primary.contrastText,
                 }}
                 primary={"Tables"}
+              />
+            </ListItemButton>
+          </ListItem>
+        </Link>
+      }
+      {
+        <Link
+          to={LOCAL_CONSTANTS.ROUTES.ALL_DATA_SOURCES.path()}
+          key={LOCAL_CONSTANTS.ROUTES.ALL_DATA_SOURCES.path()}
+        >
+          <ListItem
+            disablePadding
+            sx={{
+              borderColor: theme.palette.primary.main,
+            }}
+          >
+            <ListItemButton>
+              <ListItemIcon
+                sx={{
+                  color: theme.palette.primary.contrastText,
+                  minWidth: 0,
+                }}
+              >
+                <GrConnect className="!text-sm" />
+              </ListItemIcon>
+              <ListItemText
+                primaryTypographyProps={{
+                  sx: {
+                    marginLeft: 2,
+                    fontSize: 12,
+                  },
+                }}
+                sx={{
+                  color: theme.palette.primary.contrastText,
+                }}
+                primary={"Data sources"}
               />
             </ListItemButton>
           </ListItem>

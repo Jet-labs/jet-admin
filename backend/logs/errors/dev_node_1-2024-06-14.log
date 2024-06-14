@@ -1,0 +1,136 @@
+[31merror[39m: dev_node_1: 14-06-2024 19:35:49: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-06-12T17:46:07.000Z"}}
+[31merror[39m: dev_node_1: 14-06-2024 19:35:49: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 14-06-2024 19:35:49: [31mAuthService:verifyRefreshToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-06-13T00:14:54.000Z"}}
+[31merror[39m: dev_node_1: 14-06-2024 19:35:49: [31mauthController:refreshAccessToken:catch-1[39m |====| {"error":{"code":"USER_REFRESH_TOKEN_EXPIRED","message":"User refresh token expired"}}
+[31merror[39m: dev_node_1: 14-06-2024 19:35:50: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-06-12T17:46:07.000Z"}}
+[31merror[39m: dev_node_1: 14-06-2024 19:35:50: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 14-06-2024 19:35:50: [31mAuthService:verifyRefreshToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-06-13T00:14:54.000Z"}}
+[31merror[39m: dev_node_1: 14-06-2024 19:35:50: [31mauthController:refreshAccessToken:catch-1[39m |====| {"error":{"code":"USER_REFRESH_TOKEN_EXPIRED","message":"User refresh token expired"}}
+[31merror[39m: dev_node_1: 14-06-2024 19:35:57: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 19:35:57: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 19:35:58: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 19:35:58: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 19:37:13: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 19:37:13: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 19:37:15: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 19:37:15: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 19:37:26: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 19:37:26: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 19:37:27: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 19:37:27: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 19:39:09: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 19:39:09: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 19:39:10: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 19:39:10: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 19:39:16: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 19:39:16: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 19:39:18: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 19:39:18: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 19:39:19: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 19:39:19: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 19:44:11: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 19:44:11: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 19:44:12: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 19:44:12: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:01:06: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-06-14T14:20:57.000Z"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:01:06: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:14:52: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:14:52: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:19:20: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-06-14T14:46:06.000Z"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:19:20: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:19:20: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-06-14T14:46:06.000Z"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:19:20: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:19:20: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:19:20: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:21:38: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:21:38: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:36:53: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-06-14T15:04:20.000Z"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:36:53: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:36:53: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-06-14T15:04:20.000Z"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:36:53: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:36:54: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:36:54: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:36:54: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:36:54: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:36:55: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:36:55: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:38:15: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:38:15: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:38:16: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:38:16: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:39:27: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:39:27: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:46:31: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:46:31: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:46:42: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:46:42: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:46:43: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:46:43: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:47:16: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:47:16: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:47:17: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:47:17: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:48:18: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:48:18: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:48:19: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:48:19: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:49:07: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:49:07: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:49:08: [31mDataSourceService:getAllDataSources:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 20:49:08: [31mdataSourceController:getAllDataSources:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 20:49:09: [31mDataSourceService:getAllDataSources:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 20:49:09: [31mdataSourceController:getAllDataSources:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 20:49:31: [31mDataSourceService:getAllDataSources:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 20:49:31: [31mdataSourceController:getAllDataSources:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 20:50:06: [31mDataSourceService:getAllDataSources:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 20:50:06: [31mdataSourceController:getAllDataSources:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 20:50:07: [31mDataSourceService:getAllDataSources:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 20:50:07: [31mdataSourceController:getAllDataSources:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 20:50:07: [31mDataSourceService:getAllDataSources:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 20:50:07: [31mdataSourceController:getAllDataSources:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 20:50:08: [31mDataSourceService:getAllDataSources:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 20:50:08: [31mdataSourceController:getAllDataSources:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 20:50:46: [31mDataSourceService:getAllDataSources:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 20:50:46: [31mdataSourceController:getAllDataSources:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 20:50:47: [31mDataSourceService:getAllDataSources:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 20:50:47: [31mdataSourceController:getAllDataSources:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 20:51:03: [31mDataSourceService:getAllDataSources:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 20:51:03: [31mdataSourceController:getAllDataSources:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 20:51:48: [31mDataSourceService:getAllDataSources:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 20:51:48: [31mdataSourceController:getAllDataSources:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 20:52:16: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-06-14T15:21:54.000Z"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:52:16: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:52:16: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-06-14T15:21:54.000Z"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:52:16: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:52:16: [31mDataSourceService:getAllDataSources:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 20:52:16: [31mdataSourceController:getAllDataSources:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 20:52:17: [31mDataSourceService:getAllDataSources:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 20:52:17: [31mdataSourceController:getAllDataSources:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 20:52:20: [31mDataSourceService:getAllDataSources:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 20:52:20: [31mdataSourceController:getAllDataSources:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 20:52:21: [31mDataSourceService:getAllDataSources:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 20:52:21: [31mdataSourceController:getAllDataSources:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 20:52:22: [31mDataSourceService:getAllDataSources:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 20:52:22: [31mdataSourceController:getAllDataSources:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 20:52:23: [31mDataSourceService:getAllDataSources:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 20:52:23: [31mdataSourceController:getAllDataSources:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 20:52:49: [31mDataSourceService:getAllDataSources:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 20:52:49: [31mdataSourceController:getAllDataSources:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 20:59:25: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:59:25: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:59:50: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 20:59:50: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 21:00:39: [31mGraphService:getGraphData:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 21:00:39: [31mgraphController:getGraphData:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 21:00:40: [31mGraphService:getGraphData:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 21:00:40: [31mgraphController:getGraphData:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 14-06-2024 21:01:34: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 21:01:34: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 21:01:35: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 21:01:35: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 21:05:18: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 21:05:18: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 21:05:19: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 21:05:19: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 14-06-2024 21:07:31: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-06-14T15:37:16.000Z"}}
+[31merror[39m: dev_node_1: 14-06-2024 21:07:31: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}

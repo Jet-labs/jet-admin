@@ -93,12 +93,12 @@ policyUtils.extractAuthorizedDashboardsForReadFromPolicyObject = ({
     return true;
   } else if (policyObject.dashboards && policyObject.dashboards.dashboard_ids) {
     Object.keys(policyObject.dashboards.dashboard_ids).forEach(
-      (dashboardID) => {
+      (dashboard_id) => {
         if (
-          policyObject.dashboards.dashboard_ids[dashboardID].read ||
-          policyObject.dashboards.dashboard_ids[dashboardID] === true
+          policyObject.dashboards.dashboard_ids[dashboard_id].read ||
+          policyObject.dashboards.dashboard_ids[dashboard_id] === true
         ) {
-          authorizeDashboardIDs.push(parseInt(dashboardID));
+          authorizeDashboardIDs.push(parseInt(dashboard_id));
         }
       }
     );
@@ -114,12 +114,12 @@ policyUtils.extractAuthorizedDashboardsForUpdateFromPolicyObject = ({
     return true;
   } else if (policyObject.dashboards && policyObject.dashboards.dashboard_ids) {
     Object.keys(policyObject.dashboards.dashboard_ids).forEach(
-      (dashboardID) => {
+      (dashboard_id) => {
         if (
-          policyObject.dashboards.dashboard_ids[dashboardID].edit ||
-          policyObject.dashboards.dashboard_ids[dashboardID] === true
+          policyObject.dashboards.dashboard_ids[dashboard_id].edit ||
+          policyObject.dashboards.dashboard_ids[dashboard_id] === true
         ) {
-          authorizeDashboardIDs.push(parseInt(dashboardID));
+          authorizeDashboardIDs.push(parseInt(dashboard_id));
         }
       }
     );
@@ -135,12 +135,12 @@ policyUtils.extractAuthorizedDashboardsForDeleteFromPolicyObject = ({
     return true;
   } else if (policyObject.dashboards && policyObject.dashboards.dashboard_ids) {
     Object.keys(policyObject.dashboards.dashboard_ids).forEach(
-      (dashboardID) => {
+      (dashboard_id) => {
         if (
-          policyObject.dashboards.dashboard_ids[dashboardID].delete ||
-          policyObject.dashboards.dashboard_ids[dashboardID] === true
+          policyObject.dashboards.dashboard_ids[dashboard_id].delete ||
+          policyObject.dashboards.dashboard_ids[dashboard_id] === true
         ) {
-          authorizeDashboardIDs.push(parseInt(dashboardID));
+          authorizeDashboardIDs.push(parseInt(dashboard_id));
         }
       }
     );
@@ -152,6 +152,87 @@ policyUtils.extractAuthorizationForDashboardAddFromPolicyObject = ({
   policyObject,
 }) => {
   if (policyObject.dashboards?.add) {
+    return true;
+  }
+  return false;
+};
+
+policyUtils.extractAuthorizedDataSourcesForReadFromPolicyObject = ({
+  policyObject,
+}) => {
+  const authorizeDataSourceIDs = [];
+  if (policyObject.data_sources?.read) {
+    return true;
+  } else if (
+    policyObject.data_sources &&
+    policyObject.data_sources.data_source_ids
+  ) {
+    Object.keys(policyObject.data_sources.data_source_ids).forEach(
+      (data_source_id) => {
+        if (
+          policyObject.data_sources.data_source_ids[data_source_id].read ||
+          policyObject.data_sources.data_source_ids[data_source_id] === true
+        ) {
+          authorizeDataSourceIDs.push(parseInt(data_source_id));
+        }
+      }
+    );
+  }
+  return authorizeDataSourceIDs;
+};
+
+policyUtils.extractAuthorizedDataSourcesForUpdateFromPolicyObject = ({
+  policyObject,
+}) => {
+  const authorizeDataSourceIDs = [];
+  if (policyObject.data_sources?.edit) {
+    return true;
+  } else if (
+    policyObject.data_sources &&
+    policyObject.data_sources.data_source_ids
+  ) {
+    Object.keys(policyObject.data_sources.data_source_ids).forEach(
+      (data_source_id) => {
+        if (
+          policyObject.data_sources.data_source_ids[data_source_id].edit ||
+          policyObject.data_sources.data_source_ids[data_source_id] === true
+        ) {
+          authorizeDataSourceIDs.push(parseInt(data_source_id));
+        }
+      }
+    );
+  }
+  return authorizeDataSourceIDs;
+};
+
+policyUtils.extractAuthorizedDataSourcesForDeleteFromPolicyObject = ({
+  policyObject,
+}) => {
+  const authorizeDataSourceIDs = [];
+  if (policyObject.data_sources?.delete) {
+    return true;
+  } else if (
+    policyObject.data_sources &&
+    policyObject.data_sources.data_source_ids
+  ) {
+    Object.keys(policyObject.data_sources.data_source_ids).forEach(
+      (data_source_id) => {
+        if (
+          policyObject.data_sources.data_source_ids[data_source_id].delete ||
+          policyObject.data_sources.data_source_ids[data_source_id] === true
+        ) {
+          authorizeDataSourceIDs.push(parseInt(data_source_id));
+        }
+      }
+    );
+  }
+  return authorizeDataSourceIDs;
+};
+
+policyUtils.extractAuthorizationForDataSourceAddFromPolicyObject = ({
+  policyObject,
+}) => {
+  if (policyObject.data_sources?.add) {
     return true;
   }
   return false;

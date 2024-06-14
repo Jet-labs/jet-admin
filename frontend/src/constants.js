@@ -82,6 +82,19 @@ export const LOCAL_CONSTANTS = {
     HOME: "/",
     SIGNIN: "/signin",
 
+    ALL_DATA_SOURCES: {
+      code: "/data_sources/*",
+      path: () => "/data_sources",
+    },
+    ADD_DATA_SOURCE: {
+      code: "add",
+      path: () => "add",
+    },
+    DATA_SOURCE_VIEW: {
+      code: ":id",
+      path: (id) => `${id}`,
+    },
+
     ALL_GRAPHS: {
       code: "/graphs/*",
       path: () => "/graphs",
@@ -199,6 +212,14 @@ export const LOCAL_CONSTANTS = {
       addDashboard: () => `/admin_api/dashboards`,
       updateDashboard: () => `/admin_api/dashboards`,
       deleteDashboardByID: ({ id }) => `/admin_api/dashboards/${id}`,
+    },
+
+    DATA_SOURCE: {
+      getAllDataSources: () => `/admin_api/data_sources`,
+      getDataSourceByID: ({ id }) => `/admin_api/data_sources/${id}`,
+      addDataSource: () => `/admin_api/data_sources`,
+      updateDataSource: () => `/admin_api/data_sources`,
+      deleteDataSourceByID: ({ id }) => `/admin_api/data_sources/${id}`,
     },
 
     CONSTANTS: {
@@ -339,5 +360,16 @@ export const LOCAL_CONSTANTS = {
     BOTTOM: "bottom",
     LEFT: "left",
     RIGHT: "right",
+  },
+
+  DATA_SOURCE_TYPES: {
+    REST_API: {
+      name: "Rest API",
+      value: "REST_API",
+    },
+    POSTGRE_QUERY: {
+      name: "Postgre query",
+      value: "POSTGRE_QUERY",
+    },
   },
 };

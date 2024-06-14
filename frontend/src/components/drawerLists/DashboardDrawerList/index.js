@@ -70,7 +70,7 @@ export const DashboardsList = () => {
           </Button>
         </div>
       )}
-
+      <div className="!mt-1"></div>
       {dashboards?.map((dashboard) => {
         const key = `dashboard_${dashboard.pm_dashboard_id}`;
         return (

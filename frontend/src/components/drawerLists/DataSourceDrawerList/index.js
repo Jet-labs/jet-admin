@@ -11,7 +11,6 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { getAllGraphAPI } from "../../../api/graphs";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { useAuthState } from "../../../contexts/authContext";
 import {
@@ -21,33 +20,37 @@ import {
   FaPlus,
   FaRedo,
 } from "react-icons/fa";
-
+import { DiPostgresql } from "react-icons/di";
+import { FaCloudSun } from "react-icons/fa6";
 import { BiRadar } from "react-icons/bi";
+import { getAllDataSourceAPI } from "../../../api/dataSources";
 
-export const GraphDrawerList = () => {
+export const DataSourceDrawerList = () => {
   const theme = useTheme();
   const routeParam = useParams();
-  const currentPage = `graph_${routeParam?.["*"]}`;
+  const currentPage = `data_source_${routeParam?.["*"]}`;
 
   const { pmUser } = useAuthState();
   const navigate = useNavigate();
-  const isAuthorizedToAddGraph = useMemo(() => {
-    return pmUser && pmUser.extractAuthorizationForGraphAddFromPolicyObject();
+  const isAuthorizedToAddDataSource = useMemo(() => {
+    return (
+      pmUser && pmUser.extractAuthorizationForDataSourceAddFromPolicyObject()
+    );
   }, [pmUser]);
   const {
-    isLoading: isLoadingGraphs,
-    data: graphs,
-    error: loadGraphsError,
-    refetch: refetchGraphs,
+    isLoading: isLoadingDataSources,
+    data: dataSources,
+    error: loadDataSourcesError,
+    refetch: refetchDataSources,
   } = useQuery({
-    queryKey: [`REACT_QUERY_KEY_GRAPH`],
-    queryFn: () => getAllGraphAPI(),
+    queryKey: [`REACT_QUERY_KEY_DATA_SOURCE`],
+    queryFn: () => getAllDataSourceAPI(),
     cacheTime: 0,
     retry: 1,
     staleTime: Infinity,
   });
 
-  const _navigateToAddMoreGraph = () => {
+  const _navigateToAddMoreDataSource = () => {
     navigate(LOCAL_CONSTANTS.ROUTES.ADD_GRAPH.path());
   };
   return (
@@ -58,33 +61,36 @@ export const GraphDrawerList = () => {
       className=" !h-[calc(100vh-66px)] !overflow-y-auto !overflow-x-hidden !border-r !border-white !border-opacity-10 w-full"
     >
       <div className="!px-3.5 py-1 flex flex-row justify-between items-center w-full">
-        <span className="!font-semibold">{"Graphs"}</span>
-        <IconButton onClick={refetchGraphs}>
+        <span className="!font-semibold">{"Data sources"}</span>
+        <IconButton onClick={refetchDataSources}>
           <FaRedo className="!text-sm" />
         </IconButton>
       </div>
-      {isAuthorizedToAddGraph && (
+      {isAuthorizedToAddDataSource && (
         <div className="!p-3 !w-full !pb-1.5">
           <Button
-            onClick={_navigateToAddMoreGraph}
+            onClick={_navigateToAddMoreDataSource}
             variant="contained"
             className="!w-full"
             startIcon={<FaPlus className="!text-sm" />}
           >
-            Add more graphs
+            Add data source
           </Button>
         </div>
       )}
       <div className="!mt-1"></div>
-      {graphs?.map((graph) => {
-        const key = `graph_${graph.pm_graph_id}`;
+
+      {dataSources?.map((dataSource) => {
+        const key = `data_source_${dataSource.pm_data_source_id}`;
         return (
           <Link
-            to={LOCAL_CONSTANTS.ROUTES.GRAPH_VIEW.path(graph.pm_graph_id)}
+            to={LOCAL_CONSTANTS.ROUTES.GRAPH_VIEW.path(
+              dataSource.pm_data_source_id
+            )}
             key={key}
           >
             <ListItem
-              key={`_graph_${graph.pm_graph_id}`}
+              key={`_data_source_${dataSource.pm_data_source_id}`}
               disablePadding
               sx={{}}
               className="!px-3 !py-1.5"
@@ -108,21 +114,11 @@ export const GraphDrawerList = () => {
                     minWidth: 0,
                   }}
                 >
-                  {graph.graph_options.graph_type ===
-                  LOCAL_CONSTANTS.GRAPH_TYPES.BAR.value ? (
-                    <FaChartBar className="!text-sm" />
-                  ) : graph.graph_options.graph_type ===
-                      LOCAL_CONSTANTS.GRAPH_TYPES.PIE.value ||
-                    graph.graph_options.graph_type ===
-                      LOCAL_CONSTANTS.GRAPH_TYPES.DOUGHNUT.value ||
-                    graph.graph_options.graph_type ===
-                      LOCAL_CONSTANTS.GRAPH_TYPES.POLAR_AREA.value ? (
-                    <FaChartPie className="!text-sm" />
-                  ) : graph.graph_options.graph_type ===
-                    LOCAL_CONSTANTS.GRAPH_TYPES.RADAR.value ? (
-                    <BiRadar className="!text-sm" />
+                  {dataSource.pm_data_source_type ==
+                  LOCAL_CONSTANTS.DATA_SOURCE_TYPES.POSTGRE_QUERY.value ? (
+                    <DiPostgresql className="!text-lg" />
                   ) : (
-                    <FaChartLine className="!text-sm" />
+                    <FaCloudSun className="!text-sm" />
                   )}
                 </ListItemIcon>
                 <ListItemText
@@ -132,7 +128,7 @@ export const GraphDrawerList = () => {
                         ? theme.palette.primary.main
                         : theme.palette.primary.contrastText,
                   }}
-                  primary={graph.graph_title}
+                  primary={dataSource.pm_data_source_title}
                   primaryTypographyProps={{
                     sx: {
                       fontWeight: key == currentPage ? "700" : "500",
