@@ -1,12 +1,52 @@
-import { useTheme } from "@emotion/react";
-import { FormControl, Grid, MenuItem, Select } from "@mui/material";
+import { FormControl, Grid, MenuItem, Select, useTheme } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { useFormik } from "formik";
-import React from "react";
+import React, { useCallback } from "react";
 import { addGraphAPI } from "../../api/graphs";
 import { LOCAL_CONSTANTS } from "../../constants";
 import { displayError, displaySuccess } from "../../utils/notification";
+import CodeMirror from "@uiw/react-codemirror";
+import { loadLanguage } from "@uiw/codemirror-extensions-langs";
+import { dracula } from "@uiw/codemirror-theme-dracula";
 
+const PGSQLQueryEditor = () => {
+  const theme = useTheme();
+  const pgsqlDataSourceForm = useFormik({
+    initialValues: {
+      query: "",
+    },
+    validateOnMount: false,
+    validateOnChange: false,
+    validate: (values) => {
+      const errors = {};
+
+      return errors;
+    },
+    onSubmit: (values) => {
+      console.log({ values });
+    },
+  });
+  const _handleOnChange = useCallback(
+    (value, viewUpdate) => {
+      pgsqlDataSourceForm.setFieldValue("query", value);
+    },
+    [pgsqlDataSourceForm]
+  );
+  return (
+    <CodeMirror
+      value={pgsqlDataSourceForm.values.query}
+      height="200px"
+      extensions={[loadLanguage("pgsql")]}
+      onChange={_handleOnChange}
+      theme={dracula}
+      style={{
+        borderWidth: 1,
+        borderColor: theme.palette.primary.main,
+        marginTop: 20,
+      }}
+    />
+  );
+};
 const AddDataSource = () => {
   const theme = useTheme();
   const {
@@ -31,7 +71,7 @@ const AddDataSource = () => {
     initialValues: {
       title: "Untitled",
       description: "",
-      data_source_type: "rest_api",
+      data_source_type: LOCAL_CONSTANTS.DATA_SOURCE_TYPES.POSTGRE_QUERY.value,
     },
     validateOnMount: false,
     validateOnChange: false,
@@ -56,7 +96,7 @@ const AddDataSource = () => {
 
       <Grid container spacing={1} className="!px-3">
         <Grid item lg={7} md={8} className="w-full">
-          <FormControl fullWidth size="small">
+          <FormControl fullWidth size="small" className="!mt-2">
             <span className="text-xs font-light  !lowercase mb-1">{`Data source type`}</span>
 
             <Select
@@ -65,8 +105,8 @@ const AddDataSource = () => {
               onBlur={dataSourceForm.handleBlur}
               name={"data_source_type"}
               required={true}
-              fullWidth
               size="small"
+              fullWidth={false}
             >
               {Object.keys(LOCAL_CONSTANTS.DATA_SOURCE_TYPES).map(
                 (dataSourceType) => {
@@ -80,6 +120,7 @@ const AddDataSource = () => {
             </Select>
             {/* {error && <span className="mt-2 text-red-500">{error}</span>} */}
           </FormControl>
+          <PGSQLQueryEditor />
         </Grid>
         <Grid item lg={5} md={4} className="w-full"></Grid>
       </Grid>
