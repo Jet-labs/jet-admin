@@ -173,6 +173,35 @@ class DataSourceService {
     }
   };
 
+  /**
+   *
+   * @param {object} param0
+   * @param {String} param0.query
+   * @returns {any|null}
+   */
+  static runPGQueryDataSource = async ({ query }) => {
+    Logger.log("info", {
+      message: "DataSourceService:runPGQueryDataSource:params",
+    });
+    try {
+      const result = await prisma.$queryRaw`${Prisma.raw(query)}`;
+
+      Logger.log("info", {
+        message: "DataSourceService:runPGQueryDataSource:data_source",
+        params: {
+          result: Array.isArray(query) ? { resultLength: query.length } : query,
+        },
+      });
+      return result;
+    } catch (error) {
+      Logger.log("error", {
+        message: "DataSourceService:runPGQueryDataSource:catch-1",
+        params: { error },
+      });
+      throw error;
+    }
+  };
+
   // /**
   //  *
   //  * @param {object} param0

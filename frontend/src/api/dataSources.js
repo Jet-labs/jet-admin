@@ -95,3 +95,21 @@ export const getAllDataSourceAPI = async () => {
     throw error;
   }
 };
+
+export const runPGQueryDataSourceAPI = async ({ query }) => {
+  try {
+    const response = await axiosInstance.post(
+      LOCAL_CONSTANTS.APIS.DATA_SOURCE.runPGQueryDataSource(),
+      { query }
+    );
+    if (response.data && response.data.success == true) {
+      return response.data.data;
+    } else if (response.data.error) {
+      throw response.data.error;
+    } else {
+      throw LOCAL_CONSTANTS.ERROR_CODES.SERVER_ERROR;
+    }
+  } catch (error) {
+    throw error;
+  }
+};

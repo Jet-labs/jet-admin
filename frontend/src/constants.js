@@ -216,6 +216,7 @@ export const LOCAL_CONSTANTS = {
 
     DATA_SOURCE: {
       getAllDataSources: () => `/admin_api/data_sources`,
+      runPGQueryDataSource: () => `/admin_api/data_sources/runner`,
       getDataSourceByID: ({ id }) => `/admin_api/data_sources/${id}`,
       addDataSource: () => `/admin_api/data_sources`,
       updateDataSource: () => `/admin_api/data_sources`,

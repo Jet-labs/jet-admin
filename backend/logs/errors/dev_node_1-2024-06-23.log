@@ -42,3 +42,11 @@
 [31merror[39m: dev_node_1: 23-06-2024 23:14:23: [31mgraphController:getGraphData:catch-1[39m |====| {"error":{}}
 [31merror[39m: dev_node_1: 23-06-2024 23:14:24: [31mGraphService:getGraphData:catch-1[39m |====| {"error":{}}
 [31merror[39m: dev_node_1: 23-06-2024 23:14:24: [31mgraphController:getGraphData:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 23-06-2024 23:16:07: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-06-23T17:45:50.000Z"}}
+[31merror[39m: dev_node_1: 23-06-2024 23:16:07: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 23-06-2024 23:16:07: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-06-23T17:45:50.000Z"}}
+[31merror[39m: dev_node_1: 23-06-2024 23:16:07: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 23-06-2024 23:16:07: [31mGraphService:getGraphData:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 23-06-2024 23:16:07: [31mgraphController:getGraphData:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 23-06-2024 23:16:08: [31mGraphService:getGraphData:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 23-06-2024 23:16:08: [31mgraphController:getGraphData:catch-1[39m |====| {"error":{}}

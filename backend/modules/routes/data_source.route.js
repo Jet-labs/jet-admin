@@ -21,6 +21,13 @@ router.get(
   dataSourceAuthorizationMiddleware.populateAuthorizedDataSourcesForRead,
   dataSourceController.getAllDataSources
 );
+router.post(
+  "/runner",
+  authMiddleware.authProvider,
+  policyMiddleware.populateAuthorizationPolicies,
+  // dataSourceAuthorizationMiddleware.populateAuthorizedDataSourcesForRead,
+  dataSourceController.runPGQueryDataSource
+);
 // router.get(
 //   "/:id",
 //   authMiddleware.authProvider,
