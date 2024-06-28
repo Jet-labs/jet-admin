@@ -71,14 +71,14 @@ export const customDarkTheme = {
     },
     divider: "rgb(50, 50, 77)",
     background: {
-      paper: "rgba(34, 34, 53, 1)",
+      paper: "#222235",
       default: "#181826",
     },
     action: {
       active: "#fff",
       hover: "rgba(50, 50, 77, 0.481)",
       hoverOpacity: 0.08,
-      selected: "rgba(34, 34, 53, 1)",
+      selected: "#222235",
       selectedOpacity: 0.16,
       disabled: "rgba(255, 255, 255, 0.3)",
       disabledBackground: "rgba(255, 255, 255, 0.12)",
