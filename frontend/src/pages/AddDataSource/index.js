@@ -57,7 +57,9 @@ const PGSQLQueryResponseTableTab = ({ json, dataSchema }) => {
           }}
         />
       ) : (
-        <div>No data</div>
+        <div className="!h-32 flex !flex-col !justify-center !items-center w-100">
+          <span>No data</span>
+        </div>
       )}
     </Box>
   );
@@ -74,7 +76,7 @@ const PGSQLQueryResponseJSONTab = ({ json }) => {
       style={{
         width: "100%",
       }}
-      className="no-code-mirror-border"
+      className="no-code-mirror-border !border !border-white !border-opacity-10"
     />
   );
 };
@@ -89,7 +91,7 @@ const PGSQLQueryResponseRAWTab = ({ json }) => {
       style={{
         width: "100%",
       }}
-      className="no-code-mirror-border"
+      className="no-code-mirror-border !border !border-white !border-opacity-10"
     />
   );
 };
@@ -104,7 +106,7 @@ const PGSQLQueryResponseSchemaTab = ({ dataSchema }) => {
       style={{
         width: "100%",
       }}
-      className="no-code-mirror-border"
+      className="no-code-mirror-border !border !border-white !border-opacity-10"
     />
   );
 };
@@ -243,8 +245,6 @@ const AddDataSource = () => {
       title: "Untitled",
       description: "",
       data_source_type: LOCAL_CONSTANTS.DATA_SOURCE_TYPES.POSTGRE_QUERY.value,
-      is_scheduled: false,
-      scheduled_cron: "",
     },
     validateOnMount: false,
     validateOnChange: false,
@@ -307,7 +307,7 @@ const AddDataSource = () => {
             />
             {/* {error && <span className="mt-2 text-red-500">{error}</span>} */}
           </FormControl>
-          <FormControl fullWidth size="small" className="!mt-2 !px-3">
+          {/* <FormControl fullWidth size="small" className="!mt-2 !px-3">
             <span className="text-xs font-light  !lowercase mb-1">{`Scheduler`}</span>
             <Cron
               onChange={(e, text) => {
@@ -318,7 +318,7 @@ const AddDataSource = () => {
               showResultText={true}
               showResultCron={true}
             />
-          </FormControl>
+          </FormControl> */}
           <div className="!flex flex-row justify-end items-center mt-10 w-100 px-3">
             <Button
               variant="contained"
