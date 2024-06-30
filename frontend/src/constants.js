@@ -82,15 +82,15 @@ export const LOCAL_CONSTANTS = {
     HOME: "/",
     SIGNIN: "/signin",
 
-    ALL_DATA_SOURCES: {
-      code: "/data_sources/*",
-      path: () => "/data_sources",
+    ALL_QUERIES: {
+      code: "/queries/*",
+      path: () => "/queries",
     },
-    ADD_DATA_SOURCE: {
+    ADD_QUERY: {
       code: "add",
       path: () => "add",
     },
-    DATA_SOURCE_VIEW: {
+    QUERY_VIEW: {
       code: ":id",
       path: (id) => `${id}`,
     },
@@ -214,13 +214,13 @@ export const LOCAL_CONSTANTS = {
       deleteDashboardByID: ({ id }) => `/admin_api/dashboards/${id}`,
     },
 
-    DATA_SOURCE: {
-      getAllDataSources: () => `/admin_api/data_sources`,
-      runPGQueryDataSource: () => `/admin_api/data_sources/runner`,
-      getDataSourceByID: ({ id }) => `/admin_api/data_sources/${id}`,
-      addDataSource: () => `/admin_api/data_sources`,
-      updateDataSource: () => `/admin_api/data_sources`,
-      deleteDataSourceByID: ({ id }) => `/admin_api/data_sources/${id}`,
+    QUERY: {
+      getAllQueries: () => `/admin_api/queries`,
+      runPGQuery: () => `/admin_api/queries/runner`,
+      getQueryByID: ({ id }) => `/admin_api/queries/${id}`,
+      addQuery: () => `/admin_api/queries`,
+      updateQuery: () => `/admin_api/queries`,
+      deleteQueryByID: ({ id }) => `/admin_api/queries/${id}`,
     },
 
     CONSTANTS: {
@@ -363,7 +363,7 @@ export const LOCAL_CONSTANTS = {
     RIGHT: "right",
   },
 
-  DATA_SOURCE_TYPES: {
+  DATA_SOURCE_QUERY_TYPE: {
     REST_API: {
       name: "Rest API",
       value: "REST_API",

@@ -100,8 +100,8 @@ export const MainDrawerList = ({ currentPageTitle }) => {
       }
       {
         <Link
-          to={LOCAL_CONSTANTS.ROUTES.ALL_DATA_SOURCES.path()}
-          key={LOCAL_CONSTANTS.ROUTES.ALL_DATA_SOURCES.path()}
+          to={LOCAL_CONSTANTS.ROUTES.ALL_QUERIES.path()}
+          key={LOCAL_CONSTANTS.ROUTES.ALL_QUERIES.path()}
         >
           <ListItem
             disablePadding

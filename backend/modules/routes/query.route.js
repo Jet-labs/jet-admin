@@ -5,12 +5,10 @@ const {
   tableAuthorizationMiddleware,
 } = require("../middlewares/table.authorization.middleware");
 const { policyMiddleware } = require("../middlewares/policy.middleware");
+const { queryController } = require("../controllers/query.controller");
 const {
-  dataSourceController,
-} = require("../controllers/data_source.controller");
-const {
-  dataSourceAuthorizationMiddleware,
-} = require("../middlewares/data_source.authorization.middleware");
+  queryAuthorizationMiddleware,
+} = require("../middlewares/query.authorization.middleware");
 const router = express.Router();
 
 // get all data of table
@@ -18,44 +16,44 @@ router.get(
   "/",
   authMiddleware.authProvider,
   policyMiddleware.populateAuthorizationPolicies,
-  dataSourceAuthorizationMiddleware.populateAuthorizedDataSourcesForRead,
-  dataSourceController.getAllDataSources
+  queryAuthorizationMiddleware.populateAuthorizedQueriesForRead,
+  queryController.getAllQueries
 );
 router.post(
   "/runner",
   authMiddleware.authProvider,
   policyMiddleware.populateAuthorizationPolicies,
-  // dataSourceAuthorizationMiddleware.populateAuthorizedDataSourcesForRead,
-  dataSourceController.runPGQueryDataSource
+  // queryAuthorizationMiddleware.populateAuthorizedQueriesForRead,
+  queryController.runPGQuery
 );
 // router.get(
 //   "/:id",
 //   authMiddleware.authProvider,
 //   policyMiddleware.populateAuthorizationPolicies,
-//   dataSourceAuthorizationMiddleware.populateAuthorizedDataSourcesForRead,
-//   dataSourceController.getDataSourceByID
+//   queryAuthorizationMiddleware.populateAuthorizedQueriesForRead,
+//   queryController.getQueryByID
 // );
 // router.post(
 //   "/",
 //   authMiddleware.authProvider,
 //   policyMiddleware.populateAuthorizationPolicies,
-//   dataSourceAuthorizationMiddleware.populateAuthorizationForDataSourceAddition,
-//   dataSourceController.addDataSource
+//   queryAuthorizationMiddleware.populateAuthorizationForQueryAddition,
+//   queryController.addQuery
 // );
 // router.put(
 //   "/",
 //   authMiddleware.authProvider,
 //   policyMiddleware.populateAuthorizationPolicies,
-//   dataSourceAuthorizationMiddleware.populateAuthorizedDataSourcesForUpdate,
-//   dataSourceController.updateDataSource
+//   queryAuthorizationMiddleware.populateAuthorizedQueriesForUpdate,
+//   queryController.updateQuery
 // );
 
 // router.delete(
 //   "/:id",
 //   authMiddleware.authProvider,
 //   policyMiddleware.populateAuthorizationPolicies,
-//   dataSourceAuthorizationMiddleware.populateAuthorizedDataSourcesForDelete,
-//   dataSourceController.deleteDataSource
+//   queryAuthorizationMiddleware.populateAuthorizedQueriesForDelete,
+//   queryController.deleteQuery
 // );
 
 module.exports = router;

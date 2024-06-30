@@ -1,12 +1,12 @@
 import { LOCAL_CONSTANTS } from "../constants";
-import { DataSource } from "../models/data/dataSource";
+import { Query } from "../models/data/query";
 
 import axiosInstance from "../utils/axiosInstance";
 
-export const addDataSourceAPI = async ({ data }) => {
+export const addQueryAPI = async ({ data }) => {
   try {
     const response = await axiosInstance.post(
-      LOCAL_CONSTANTS.APIS.DATA_SOURCE.addDataSource(),
+      LOCAL_CONSTANTS.APIS.QUERY.addQuery(),
       data
     );
     if (response.data && response.data.success == true) {
@@ -21,10 +21,10 @@ export const addDataSourceAPI = async ({ data }) => {
   }
 };
 
-export const updateDataSourceAPI = async ({ data }) => {
+export const updateQueryAPI = async ({ data }) => {
   try {
     const response = await axiosInstance.put(
-      LOCAL_CONSTANTS.APIS.DATA_SOURCE.updateDataSource(),
+      LOCAL_CONSTANTS.APIS.QUERY.updateQuery(),
       data
     );
 
@@ -41,15 +41,15 @@ export const updateDataSourceAPI = async ({ data }) => {
   }
 };
 
-export const getDataSourceByIDAPI = async ({ dataSourceID }) => {
+export const getQueryByIDAPI = async ({ queryID }) => {
   try {
     const response = await axiosInstance.get(
-      LOCAL_CONSTANTS.APIS.DATA_SOURCE.getDataSourceByID({
-        id: dataSourceID,
+      LOCAL_CONSTANTS.APIS.QUERY.getQueryByID({
+        id: queryID,
       })
     );
     if (response.data && response.data.success == true) {
-      return new DataSource(response.data.dataSource);
+      return new Query(response.data.query);
     } else if (response.data.error) {
       throw response.data.error;
     } else {
@@ -60,11 +60,11 @@ export const getDataSourceByIDAPI = async ({ dataSourceID }) => {
   }
 };
 
-export const deleteDataSourceByIDAPI = async ({ dataSourceID }) => {
+export const deleteQueryByIDAPI = async ({ queryID }) => {
   try {
     const response = await axiosInstance.delete(
-      LOCAL_CONSTANTS.APIS.DATA_SOURCE.deleteDataSourceByID({
-        id: dataSourceID,
+      LOCAL_CONSTANTS.APIS.QUERY.deleteQueryByID({
+        id: queryID,
       })
     );
     if (response.data && response.data.success == true) {
@@ -79,13 +79,13 @@ export const deleteDataSourceByIDAPI = async ({ dataSourceID }) => {
   }
 };
 
-export const getAllDataSourceAPI = async () => {
+export const getAllQueryAPI = async () => {
   try {
     const response = await axiosInstance.get(
-      LOCAL_CONSTANTS.APIS.DATA_SOURCE.getAllDataSources()
+      LOCAL_CONSTANTS.APIS.QUERY.getAllQueries()
     );
     if (response.data && response.data.success == true) {
-      return DataSource.toList(response.data.dataSources);
+      return Query.toList(response.data.queries);
     } else if (response.data.error) {
       throw response.data.error;
     } else {
@@ -96,10 +96,10 @@ export const getAllDataSourceAPI = async () => {
   }
 };
 
-export const runPGQueryDataSourceAPI = async ({ query }) => {
+export const runPGQueryAPI = async ({ query }) => {
   try {
     const response = await axiosInstance.post(
-      LOCAL_CONSTANTS.APIS.DATA_SOURCE.runPGQueryDataSource(),
+      LOCAL_CONSTANTS.APIS.QUERY.runPGQuery(),
       { query }
     );
     if (response.data && response.data.success == true) {

@@ -23,36 +23,35 @@ import {
 import { DiPostgresql } from "react-icons/di";
 import { FaCloudSun } from "react-icons/fa6";
 import { BiRadar } from "react-icons/bi";
-import { getAllDataSourceAPI } from "../../../api/dataSources";
+import { getAllQueryAPI } from "../../../api/queries";
 
-export const DataSourceDrawerList = () => {
+export const QueryDrawerList = () => {
   const theme = useTheme();
   const routeParam = useParams();
-  const currentPage = `data_source_${routeParam?.["*"]}`;
+  const currentPage = `query_${routeParam?.["*"]}`;
 
   const { pmUser } = useAuthState();
   const navigate = useNavigate();
-  const isAuthorizedToAddDataSource = useMemo(() => {
-    return (
-      pmUser && pmUser.extractAuthorizationForDataSourceAddFromPolicyObject()
-    );
+  const isAuthorizedToAddQuery = useMemo(() => {
+    return pmUser && pmUser.extractAuthorizationForQueryAddFromPolicyObject();
   }, [pmUser]);
   const {
-    isLoading: isLoadingDataSources,
-    data: dataSources,
-    error: loadDataSourcesError,
-    refetch: refetchDataSources,
+    isLoading: isLoadingQueries,
+    data: queries,
+    error: loadQueriesError,
+    refetch: refetchQueries,
   } = useQuery({
     queryKey: [`REACT_QUERY_KEY_DATA_SOURCE`],
-    queryFn: () => getAllDataSourceAPI(),
+    queryFn: () => getAllQueryAPI(),
     cacheTime: 0,
     retry: 1,
     staleTime: Infinity,
   });
 
-  const _navigateToAddMoreDataSource = () => {
+  const _navigateToAddMoreQuery = () => {
     navigate(LOCAL_CONSTANTS.ROUTES.ADD_GRAPH.path());
   };
+  console.log({ queries });
   return (
     <List
       sx={{}}
@@ -62,14 +61,14 @@ export const DataSourceDrawerList = () => {
     >
       <div className="!px-3.5 py-1 flex flex-row justify-between items-center w-full">
         <span className="!font-semibold">{"Data sources"}</span>
-        <IconButton onClick={refetchDataSources}>
+        <IconButton onClick={refetchQueries}>
           <FaRedo className="!text-sm" />
         </IconButton>
       </div>
-      {isAuthorizedToAddDataSource && (
+      {isAuthorizedToAddQuery && (
         <div className="!p-3 !w-full !pb-1.5">
           <Button
-            onClick={_navigateToAddMoreDataSource}
+            onClick={_navigateToAddMoreQuery}
             variant="contained"
             className="!w-full"
             startIcon={<FaPlus className="!text-sm" />}
@@ -80,17 +79,17 @@ export const DataSourceDrawerList = () => {
       )}
       <div className="!mt-1"></div>
 
-      {dataSources?.map((dataSource) => {
-        const key = `data_source_${dataSource.pm_data_source_id}`;
+      {queries?.map((masterQuery) => {
+        const key = `query_${masterQuery.pm_query_master_id}`;
         return (
           <Link
-            to={LOCAL_CONSTANTS.ROUTES.GRAPH_VIEW.path(
-              dataSource.pm_data_source_id
+            to={LOCAL_CONSTANTS.ROUTES.QUERY_VIEW.path(
+              masterQuery.pm_query_master_id
             )}
             key={key}
           >
             <ListItem
-              key={`_data_source_${dataSource.pm_data_source_id}`}
+              key={`_query_${masterQuery.pm_query_master_id}`}
               disablePadding
               sx={{}}
               className="!px-3 !py-1.5"
@@ -114,8 +113,8 @@ export const DataSourceDrawerList = () => {
                     minWidth: 0,
                   }}
                 >
-                  {dataSource.pm_data_source_type ==
-                  LOCAL_CONSTANTS.DATA_SOURCE_TYPES.POSTGRE_QUERY.value ? (
+                  {masterQuery.pm_query_type ==
+                  LOCAL_CONSTANTS.DATA_SOURCE_QUERY_TYPE.POSTGRE_QUERY.value ? (
                     <DiPostgresql className="!text-lg" />
                   ) : (
                     <FaCloudSun className="!text-sm" />
@@ -128,7 +127,7 @@ export const DataSourceDrawerList = () => {
                         ? theme.palette.primary.main
                         : theme.palette.primary.contrastText,
                   }}
-                  primary={dataSource.pm_data_source_title}
+                  primary={masterQuery.query?.getTitle()}
                   primaryTypographyProps={{
                     sx: {
                       fontWeight: key == currentPage ? "700" : "500",

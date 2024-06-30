@@ -82,6 +82,16 @@ const constants = {
     POLAR_AREA: { label: "Polar Area", value: "POLAR_AREA" },
     RADAR: { label: "Radar", value: "RADAR" },
   },
+  QUERY_TYPE: {
+    REST_API: {
+      name: "Rest API",
+      value: "REST_API",
+    },
+    POSTGRE_QUERY: {
+      name: "Postgre query",
+      value: "POSTGRE_QUERY",
+    },
+  },
 };
 
 module.exports = constants;

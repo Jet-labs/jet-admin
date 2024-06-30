@@ -157,82 +157,67 @@ policyUtils.extractAuthorizationForDashboardAddFromPolicyObject = ({
   return false;
 };
 
-policyUtils.extractAuthorizedDataSourcesForReadFromPolicyObject = ({
+policyUtils.extractAuthorizedQueriesForReadFromPolicyObject = ({
   policyObject,
 }) => {
-  const authorizeDataSourceIDs = [];
-  if (policyObject.data_sources?.read) {
+  const authorizeQueryIDs = [];
+  if (policyObject.queries?.read) {
     return true;
-  } else if (
-    policyObject.data_sources &&
-    policyObject.data_sources.data_source_ids
-  ) {
-    Object.keys(policyObject.data_sources.data_source_ids).forEach(
-      (data_source_id) => {
-        if (
-          policyObject.data_sources.data_source_ids[data_source_id].read ||
-          policyObject.data_sources.data_source_ids[data_source_id] === true
-        ) {
-          authorizeDataSourceIDs.push(parseInt(data_source_id));
-        }
+  } else if (policyObject.queries && policyObject.queries.query_ids) {
+    Object.keys(policyObject.queries.query_ids).forEach((query_id) => {
+      if (
+        policyObject.queries.query_ids[query_id].read ||
+        policyObject.queries.query_ids[query_id] === true
+      ) {
+        authorizeQueryIDs.push(parseInt(query_id));
       }
-    );
+    });
   }
-  return authorizeDataSourceIDs;
+  return authorizeQueryIDs;
 };
 
-policyUtils.extractAuthorizedDataSourcesForUpdateFromPolicyObject = ({
+policyUtils.extractAuthorizedQueriesForUpdateFromPolicyObject = ({
   policyObject,
 }) => {
-  const authorizeDataSourceIDs = [];
-  if (policyObject.data_sources?.edit) {
+  const authorizeQueryIDs = [];
+  if (policyObject.queries?.edit) {
     return true;
-  } else if (
-    policyObject.data_sources &&
-    policyObject.data_sources.data_source_ids
-  ) {
-    Object.keys(policyObject.data_sources.data_source_ids).forEach(
-      (data_source_id) => {
-        if (
-          policyObject.data_sources.data_source_ids[data_source_id].edit ||
-          policyObject.data_sources.data_source_ids[data_source_id] === true
-        ) {
-          authorizeDataSourceIDs.push(parseInt(data_source_id));
-        }
+  } else if (policyObject.queries && policyObject.queries.query_ids) {
+    Object.keys(policyObject.queries.query_ids).forEach((query_id) => {
+      if (
+        policyObject.queries.query_ids[query_id].edit ||
+        policyObject.queries.query_ids[query_id] === true
+      ) {
+        authorizeQueryIDs.push(parseInt(query_id));
       }
-    );
+    });
   }
-  return authorizeDataSourceIDs;
+  return authorizeQueryIDs;
 };
 
-policyUtils.extractAuthorizedDataSourcesForDeleteFromPolicyObject = ({
+policyUtils.extractAuthorizedQueriesForDeleteFromPolicyObject = ({
   policyObject,
 }) => {
-  const authorizeDataSourceIDs = [];
-  if (policyObject.data_sources?.delete) {
+  const authorizeQueryIDs = [];
+  if (policyObject.queries?.delete) {
     return true;
-  } else if (
-    policyObject.data_sources &&
-    policyObject.data_sources.data_source_ids
-  ) {
-    Object.keys(policyObject.data_sources.data_source_ids).forEach(
-      (data_source_id) => {
-        if (
-          policyObject.data_sources.data_source_ids[data_source_id].delete ||
-          policyObject.data_sources.data_source_ids[data_source_id] === true
-        ) {
-          authorizeDataSourceIDs.push(parseInt(data_source_id));
-        }
+  } else if (policyObject.queries && policyObject.queries.query_ids) {
+    Object.keys(policyObject.queries.query_ids).forEach((query_id) => {
+      if (
+        policyObject.queries.query_ids[query_id].delete ||
+        policyObject.queries.query_ids[query_id] === true
+      ) {
+        authorizeQueryIDs.push(parseInt(query_id));
       }
-    );
+    });
   }
-  return authorizeDataSourceIDs;
+  return authorizeQueryIDs;
 };
 
-policyUtils.extractAuthorizationForDataSourceAddFromPolicyObject = ({
+policyUtils.extractAuthorizationForQueryAddFromPolicyObject = ({
   policyObject,
 }) => {
-  if (policyObject.data_sources?.add) {
+  if (policyObject.queries?.add) {
     return true;
   }
   return false;

@@ -271,48 +271,38 @@ export class PMUser {
     return false;
   };
 
-  extractAuthorizationForDataSourceAddFromPolicyObject = () => {
-    console.log(this.policy.data_sources);
-    if (this.policy.data_sources?.add) {
+  extractAuthorizationForQueryAddFromPolicyObject = () => {
+    console.log(this.policy.queries);
+    if (this.policy.queries?.add) {
       return true;
     }
     return false;
   };
-  extractAuthorizedDataSourcesForReadFromPolicyObject = () => {
-    const authorizeDataSourceIDs = [];
-    if (this.policy.data_sources.read) {
+  extractAuthorizedQueriesForReadFromPolicyObject = () => {
+    const authorizeQueryIDs = [];
+    if (this.policy.queries.read) {
       return true;
-    } else if (
-      this.policy.data_sources &&
-      this.policy.data_sources.data_source_ids
-    ) {
-      Object.keys(this.policy.data_sources.data_source_ids).forEach(
-        (dataSourceID) => {
-          if (this.policy.data_sources.data_source_ids[dataSourceID].read) {
-            authorizeDataSourceIDs.push(parseInt(dataSourceID));
-          }
+    } else if (this.policy.queries && this.policy.queries.query_ids) {
+      Object.keys(this.policy.queries.query_ids).forEach((queryID) => {
+        if (this.policy.queries.query_ids[queryID].read) {
+          authorizeQueryIDs.push(parseInt(queryID));
         }
-      );
+      });
     }
-    return authorizeDataSourceIDs;
+    return authorizeQueryIDs;
   };
 
-  extractAuthorizedDataSourcesForUpdateFromPolicyObject = () => {
-    const authorizeDataSourceIDs = [];
-    if (this.policy.data_sources.edit) {
+  extractAuthorizedQueriesForUpdateFromPolicyObject = () => {
+    const authorizeQueryIDs = [];
+    if (this.policy.queries.edit) {
       return true;
-    } else if (
-      this.policy.data_sources &&
-      this.policy.data_sources.data_source_ids
-    ) {
-      Object.keys(this.policy.data_sources.data_source_ids).forEach(
-        (dataSourceID) => {
-          if (this.policy.data_sources.data_source_ids[dataSourceID].edit) {
-            authorizeDataSourceIDs.push(parseInt(dataSourceID));
-          }
+    } else if (this.policy.queries && this.policy.queries.query_ids) {
+      Object.keys(this.policy.queries.query_ids).forEach((queryID) => {
+        if (this.policy.queries.query_ids[queryID].edit) {
+          authorizeQueryIDs.push(parseInt(queryID));
         }
-      );
+      });
     }
-    return authorizeDataSourceIDs;
+    return authorizeQueryIDs;
   };
 }

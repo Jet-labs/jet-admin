@@ -22,7 +22,7 @@ const AddAccount = lazy(() => import("../pages/AddAccount"));
 const TableLayout = lazy(() => import("./layouts/TableLayout"));
 const GraphLayout = lazy(() => import("./layouts/GraphLayout"));
 const DashboardLayout = lazy(() => import("./layouts/DashboardLayout"));
-const DataSourceLayout = lazy(() => import("./layouts/DataSourceLayout"));
+const QueryLayout = lazy(() => import("./layouts/QueryLayout"));
 /**
  *
  * @param {object} param0
@@ -71,10 +71,10 @@ const AppRouter = ({}) => {
             }
           ></Route>
           <Route
-            path={LOCAL_CONSTANTS.ROUTES.ALL_DATA_SOURCES.code}
+            path={LOCAL_CONSTANTS.ROUTES.ALL_QUERIES.code}
             element={
               <ProtectedRoute
-                successComponent={DataSourceLayout}
+                successComponent={QueryLayout}
                 fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
                 loadingComponent={() => <Loading fullScreen />}
               />

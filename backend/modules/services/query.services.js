@@ -2,7 +2,7 @@ const { Prisma } = require("@prisma/client");
 const { prisma } = require("../../config/prisma");
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
-class DataSourceService {
+class QueryService {
   constructor() {}
 
   // /**
@@ -139,34 +139,71 @@ class DataSourceService {
   /**
    *
    * @param {object} param0
-   * @param {Boolean|Array<Number>} param0.authorizedDataSources
+   * @param {Boolean|Array<Number>} param0.authorizedQueries
    * @returns {any|null}
    */
-  static getAllDataSources = async ({ authorizedDataSources }) => {
+  static getAllQueries = async ({ authorizedQueries }) => {
     Logger.log("info", {
-      message: "DataSourceService:getAllDataSources:params",
+      message: "QueryService:getAllQueries:params",
     });
     try {
-      const dataSources = await prisma.tbl_pm_data_sources.findMany({
+      const masterQueries = await prisma.tbl_pm_queries_master.findMany({
         where:
-          authorizedDataSources === true
+          authorizedQueries === true
             ? {}
             : {
-                pm_data_source_id: {
-                  in: authorizedDataSources,
+                pm_query_master_id: {
+                  in: authorizedQueries,
                 },
               },
       });
       Logger.log("info", {
-        message: "DataSourceService:getAllDataSources:data_source",
+        message: "QueryService:getAllQueries:masterQueries",
         params: {
-          dataSourcesLength: dataSources?.length,
+          masterQueries,
+          authorizedQueries,
         },
       });
-      return dataSources;
+      const masterQueryPromises = masterQueries.map(async (masterQuery) => {
+        let query = null;
+        switch (masterQuery.pm_query_type) {
+          case constants.QUERY_TYPE.POSTGRE_QUERY.value: {
+            query = await prisma.tbl_pm_postgres_queries.findUnique({
+              where: {
+                pm_postgres_query_id: masterQuery.pm_query_id,
+              },
+            });
+            query = {
+              ...masterQuery,
+              query: { ...query, pm_query_type: masterQuery.pm_query_type },
+            };
+          }
+
+          default: {
+            query = await prisma.tbl_pm_postgres_queries.findUnique({
+              where: {
+                pm_postgres_query_id: masterQuery.pm_query_id,
+              },
+            });
+            query = {
+              ...masterQuery,
+              query: { ...query, pm_query_type: masterQuery.pm_query_type },
+            };
+          }
+        }
+        return query;
+      });
+      const allQueries = await Promise.all(masterQueryPromises);
+      Logger.log("info", {
+        message: "QueryService:getAllQueries:query",
+        params: {
+          querysLength: allQueries?.length,
+        },
+      });
+      return allQueries;
     } catch (error) {
       Logger.log("error", {
-        message: "DataSourceService:getAllDataSources:catch-1",
+        message: "QueryService:getAllQueries:catch-1",
         params: { error },
       });
       throw error;
@@ -179,15 +216,15 @@ class DataSourceService {
    * @param {String} param0.query
    * @returns {any|null}
    */
-  static runPGQueryDataSource = async ({ query }) => {
+  static runPGQuery = async ({ query }) => {
     Logger.log("info", {
-      message: "DataSourceService:runPGQueryDataSource:params",
+      message: "QueryService:runPGQuery:params",
     });
     try {
       const result = await prisma.$queryRaw`${Prisma.raw(query)}`;
 
       Logger.log("info", {
-        message: "DataSourceService:runPGQueryDataSource:data_source",
+        message: "QueryService:runPGQuery:query",
         params: {
           result: Array.isArray(query) ? { resultLength: query.length } : query,
         },
@@ -195,7 +232,7 @@ class DataSourceService {
       return result;
     } catch (error) {
       Logger.log("error", {
-        message: "DataSourceService:runPGQueryDataSource:catch-1",
+        message: "QueryService:runPGQuery:catch-1",
         params: { error },
       });
       throw error;
@@ -299,4 +336,4 @@ class DataSourceService {
   // };
 }
 
-module.exports = { DataSourceService };
+module.exports = { QueryService };
