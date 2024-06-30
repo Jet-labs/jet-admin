@@ -1,13 +1,13 @@
 import { Grid, useTheme } from "@mui/material";
 import React from "react";
 
-import { LineGraphComponent } from "../graphs/LineGraphComponent";
+import { LineGraphComponent } from "../GraphComponents/LineGraphComponent";
 import { LOCAL_CONSTANTS } from "../../constants";
-import { BarGraphComponent } from "../graphs/BarGraphComponent";
-import { PieGraphComponent } from "../graphs/PieChartComponent";
-import { DoughnutGraphComponent } from "../graphs/DoughnutChartComponent";
-import { PolarAreaGraphComponent } from "../graphs/PolarAreaChartComponent";
-import { RadarGraphComponent } from "../graphs/RadarChartComponent";
+import { BarGraphComponent } from "../GraphComponents/BarGraphComponent";
+import { PieGraphComponent } from "../GraphComponents/PieChartComponent";
+import { DoughnutGraphComponent } from "../GraphComponents/DoughnutChartComponent";
+import { PolarAreaGraphComponent } from "../GraphComponents/PolarAreaChartComponent";
+import { RadarGraphComponent } from "../GraphComponents/RadarChartComponent";
 
 export const GraphBuilderPreview = ({
   graphType,

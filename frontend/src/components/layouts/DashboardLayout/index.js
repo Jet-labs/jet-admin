@@ -2,7 +2,7 @@ import { Grid } from "@mui/material";
 import { lazy, useMemo } from "react";
 import { Outlet, Route, Routes } from "react-router-dom";
 import { LOCAL_CONSTANTS } from "../../../constants";
-import { DashboardsList } from "../../drawerLists/DashboardDrawerList";
+import { DashboardsList } from "../../DrawerLists/DashboardDrawerList";
 const AddDashboardView = lazy(() => import("../../../pages/AddDashboardView"));
 const DashboardView = lazy(() => import("../../../pages/DashboardView"));
 const DashEditboardView = lazy(() =>

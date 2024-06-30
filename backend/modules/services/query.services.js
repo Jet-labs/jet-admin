@@ -5,62 +5,54 @@ const Logger = require("../../utils/logger");
 class QueryService {
   constructor() {}
 
-  // /**
-  //  *
-  //  * @param {object} param0
-  //  * @param {String} param0.dashboardTitle
-  //  * @param {String} param0.dashboardDescription
-  //  * @param {any} param0.dashboardOptions
-  //  * @returns {any|null}
-  //  */
-  // static addDashboard = async ({
-  //   dashboardTitle,
-  //   dashboardDescription,
-  //   dashboardOptions,
-  // }) => {
-  //   Logger.log("info", {
-  //     message: "DashboardService:addDashboard:params",
-  //     params: {
-  //       dashboardTitle,
-  //       dashboardDescription,
-  //       dashboardOptions,
-  //     },
-  //   });
-  //   try {
-  //     let newDashboard = null;
-  //     const _graphIDs = [];
-  //     if (
-  //       dashboardOptions.graph_ids &&
-  //       Array.isArray(dashboardOptions.graph_ids)
-  //     ) {
-  //       dashboardOptions.graph_ids.forEach((graph) => {
-  //         _graphIDs.push(graph.graphID);
-  //       });
-  //     }
-  //     newDashboard = await prisma.tbl_pm_dashboards.create({
-  //       data: {
-  //         dashboard_title: String(dashboardTitle),
-  //         dashboard_description: String(dashboardDescription),
-  //         dashboard_options: dashboardOptions,
-  //         dashboard_graph_ids: _graphIDs,
-  //       },
-  //     });
-  //     Logger.log("success", {
-  //       message: "DashboardService:addDashboard:newDashboard",
-  //       params: {
-  //         dashboardTitle,
-  //         newDashboard,
-  //       },
-  //     });
-  //     return newDashboard;
-  //   } catch (error) {
-  //     Logger.log("error", {
-  //       message: "DashboardService:addDashboard:catch-1",
-  //       params: { error },
-  //     });
-  //     throw error;
-  //   }
-  // };
+  /**
+   *
+   * @param {object} param0
+   * @param {String} param0.queryTitle
+   * @param {String} param0.queryDescription
+   * @param {any} param0.query
+   * @returns {any|null}
+   */
+  static addPGQuery = async ({ queryTitle, queryDescription, query }) => {
+    Logger.log("info", {
+      message: "DashboardService:addPGQuery:params",
+      params: {
+        queryTitle,
+        queryDescription,
+        query,
+      },
+    });
+    try {
+      const newPGSQLQuery = await prisma.tbl_pm_postgres_queries.create({
+        data: {
+          pm_postgres_query: query,
+          pm_postgres_query_title: queryTitle,
+          pm_postgres_query_description: queryDescription,
+        },
+      });
+      const newMasterQuery = await prisma.tbl_pm_queries_master.create({
+        data: {
+          pm_query_id: newPGSQLQuery.pm_postgres_query_id,
+          pm_query_type: constants.QUERY_TYPE.POSTGRE_QUERY.value,
+        },
+      });
+
+      Logger.log("success", {
+        message: "DashboardService:addPGQuery:newMasterQuery",
+        params: {
+          newPGSQLQuery,
+          newMasterQuery,
+        },
+      });
+      return newMasterQuery;
+    } catch (error) {
+      Logger.log("error", {
+        message: "DashboardService:addPGQuery:catch-1",
+        params: { error },
+      });
+      throw error;
+    }
+  };
 
   // /**
   //  *
@@ -177,6 +169,7 @@ class QueryService {
               ...masterQuery,
               query: { ...query, pm_query_type: masterQuery.pm_query_type },
             };
+            break;
           }
 
           default: {
@@ -189,6 +182,7 @@ class QueryService {
               ...masterQuery,
               query: { ...query, pm_query_type: masterQuery.pm_query_type },
             };
+            break;
           }
         }
         return query;

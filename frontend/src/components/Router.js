@@ -19,10 +19,10 @@ const AddPolicy = lazy(() => import("../pages/AddPolicy"));
 const AccountManagement = lazy(() => import("../pages/AccountManagement"));
 const AccountSettings = lazy(() => import("../pages/AccountSettings"));
 const AddAccount = lazy(() => import("../pages/AddAccount"));
-const TableLayout = lazy(() => import("./layouts/TableLayout"));
-const GraphLayout = lazy(() => import("./layouts/GraphLayout"));
-const DashboardLayout = lazy(() => import("./layouts/DashboardLayout"));
-const QueryLayout = lazy(() => import("./layouts/QueryLayout"));
+const TableLayout = lazy(() => import("./Layouts/TableLayout"));
+const GraphLayout = lazy(() => import("./Layouts/GraphLayout"));
+const DashboardLayout = lazy(() => import("./Layouts/DashboardLayout"));
+const QueryLayout = lazy(() => import("./Layouts/QueryLayout"));
 /**
  *
  * @param {object} param0

@@ -51,6 +51,65 @@ queryController.getAllQueries = async (req, res) => {
  * @param {import("express").Response} res
  * @returns
  */
+queryController.addQuery = async (req, res) => {
+  try {
+    const { pmUser, state, body } = req;
+    const { title,
+      description,
+      query_type,
+      query, } = body;
+    const pm_user_id = parseInt(pmUser.pm_user_id);
+    
+
+    Logger.log("info", {
+      message: "queryController:addQuery:params",
+      params: { pm_user_id, query },
+    });
+
+    let newMasterQuery = null;
+    switch(query_type){
+      case constants.QUERY_TYPE.POSTGRE_QUERY.value:{
+        newMasterQuery = await QueryService.addPGQuery({
+          queryTitle:title,
+          queryDescription:description,
+          query,
+        });
+        break;
+      }
+      default:{
+        newMasterQuery = await QueryService.addPGQuery({
+          queryTitle: title,
+          queryDescription: description,
+          query,
+        });
+        break;
+      }
+    }
+  
+    Logger.log("success", {
+      message: "queryController:addQuery:success",
+      params: { pm_user_id, newMasterQuery },
+    });
+
+    return res.json({
+      success: true,
+      query: newMasterQuery,
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "queryController:addQuery:catch-1",
+      params: { error },
+    });
+    return res.json({ success: false, error: extractError(error) });
+  }
+};
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @returns
+ */
 queryController.runPGQuery = async (req, res) => {
   try {
     const { pmUser, state, body } = req;

@@ -7,7 +7,7 @@ import {
 } from "@mui/material";
 import { useMemo, useState } from "react";
 import { FaTimes } from "react-icons/fa";
-import { MainDrawerList } from "../../drawerLists/MainDrawerList";
+import { MainDrawerList } from "../../DrawerLists/MainDrawerList";
 import { Navbar } from "../../Navbar";
 
 export const MainLayout = ({ children }) => {

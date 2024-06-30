@@ -13,13 +13,7 @@ import { useMemo } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { useAuthState } from "../../../contexts/authContext";
-import {
-  FaChartBar,
-  FaChartLine,
-  FaChartPie,
-  FaPlus,
-  FaRedo,
-} from "react-icons/fa";
+import { FaPlus, FaRedo } from "react-icons/fa";
 import { DiPostgresql } from "react-icons/di";
 import { FaCloudSun } from "react-icons/fa6";
 import { BiRadar } from "react-icons/bi";
@@ -60,7 +54,7 @@ export const QueryDrawerList = () => {
       className=" !h-[calc(100vh-66px)] !overflow-y-auto !overflow-x-hidden !border-r !border-white !border-opacity-10 w-full"
     >
       <div className="!px-3.5 py-1 flex flex-row justify-between items-center w-full">
-        <span className="!font-semibold">{"Data sources"}</span>
+        <span className="!font-semibold">{"Queries"}</span>
         <IconButton onClick={refetchQueries}>
           <FaRedo className="!text-sm" />
         </IconButton>
@@ -73,7 +67,7 @@ export const QueryDrawerList = () => {
             className="!w-full"
             startIcon={<FaPlus className="!text-sm" />}
           >
-            Add data source
+            Add query
           </Button>
         </div>
       )}

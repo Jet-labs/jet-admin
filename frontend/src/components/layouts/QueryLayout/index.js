@@ -2,7 +2,7 @@ import { Grid } from "@mui/material";
 import { lazy } from "react";
 import { Outlet, Route, Routes } from "react-router-dom";
 import { LOCAL_CONSTANTS } from "../../../constants";
-import { QueryDrawerList } from "../../drawerLists/QueryDrawerList";
+import { QueryDrawerList } from "../../DrawerLists/QueryDrawerList";
 
 const AddQuery = lazy(() => import("../../../pages/AddQuery"));
 

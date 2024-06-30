@@ -19,9 +19,10 @@ import React, { useCallback, useMemo, useState } from "react";
 import DataGrid from "react-data-grid";
 import "react-data-grid/lib/styles.css";
 import jsonSchemaGenerator from "to-json-schema";
-import { runPGQueryAPI } from "../../api/queries";
-import { displayError, displaySuccess } from "../../utils/notification";
+import { addQueryAPI, runPGQueryAPI } from "../../../api/queries";
+import { displayError, displaySuccess } from "../../../utils/notification";
 import "./style.css";
+import { LOCAL_CONSTANTS } from "../../../constants";
 
 const PGSQLQueryResponseTableTab = ({ json, dataSchema }) => {
   const theme = useTheme();
@@ -108,7 +109,7 @@ const PGSQLQueryResponseSchemaTab = ({ dataSchema }) => {
   );
 };
 
-export const PGSQLQueryCreator = () => {
+export const PGSQLQueryBuilder = () => {
   const theme = useTheme();
   const [tab, setTab] = React.useState(0);
   const [dataSchema, setDataSchema] = useState();
@@ -116,6 +117,52 @@ export const PGSQLQueryCreator = () => {
   const _handleTabChange = (event, newTab) => {
     setTab(newTab);
   };
+
+  const {
+    isPending: isRunningPGQuery,
+    isSuccess: isRunningPGQuerySuccess,
+    isError: isRunningPGQueryError,
+    error: runPGQueryError,
+    mutate: runPGQuery,
+    data: pgQueryData,
+  } = useMutation({
+    mutationFn: ({ query }) => {
+      return runPGQueryAPI({ query });
+    },
+    retry: false,
+    onSuccess: (data) => {
+      setDataSchema(jsonSchemaGenerator(Array.isArray(data) ? data[0] : data));
+      displaySuccess("Query executed successfully");
+    },
+    onError: (error) => {
+      displayError(error);
+    },
+  });
+
+  const {
+    isPending: isAddingPGQuery,
+    isSuccess: isAddingPGQuerySuccess,
+    isError: isAddingPGQueryError,
+    error: addPGQueryError,
+    mutate: addPGQuery,
+  } = useMutation({
+    mutationFn: (pgsqlQuery) => {
+      return addQueryAPI({
+        data: {
+          ...pgsqlQuery,
+          query_type:
+            LOCAL_CONSTANTS.DATA_SOURCE_QUERY_TYPE.POSTGRE_QUERY.value,
+        },
+      });
+    },
+    retry: false,
+    onSuccess: (data) => {
+      displaySuccess("Query added successfully");
+    },
+    onError: (error) => {
+      displayError(error);
+    },
+  });
 
   const pgsqlQueryForm = useFormik({
     initialValues: {
@@ -141,40 +188,20 @@ export const PGSQLQueryCreator = () => {
     [pgsqlQueryForm]
   );
 
-  const {
-    isPending: isRunningPGQuery,
-    isSuccess: isRunningPGQuerySuccess,
-    isError: isRunningPGQueryError,
-    error: runPGQueryError,
-    mutate: runPGQuery,
-    data: pgQueryData,
-  } = useMutation({
-    mutationFn: ({ query }) => {
-      return runPGQueryAPI({ query });
-    },
-    retry: false,
-    onSuccess: (data) => {
-      setDataSchema(jsonSchemaGenerator(Array.isArray(data) ? data[0] : data));
-      displaySuccess("Query executed successfully");
-    },
-    onError: (error) => {
-      displayError(error);
-    },
-  });
-
   const _runQuery = () => {
     runPGQuery({ query: pgsqlQueryForm.values.query });
+  };
+  const _addQuery = () => {
+    addPGQuery({
+      title: pgsqlQueryForm.values.title,
+      description: pgsqlQueryForm.values.description,
+      query: pgsqlQueryForm.values.query,
+    });
   };
 
   return (
     <Grid container className="!h-max">
-      <Grid
-        item
-        sx={4}
-        md={4}
-        lg={4}
-        className="w-full !border-r !border-white !border-opacity-10 !h-full"
-      >
+      <Grid item sx={4} md={4} lg={4} className="w-full !h-full">
         <FormControl fullWidth size="small" className="!mt-2 !px-3">
           <span className="text-xs font-light  !lowercase mb-1">{`Title`}</span>
 
@@ -223,7 +250,7 @@ export const PGSQLQueryCreator = () => {
           <Button
             variant="contained"
             className="!ml-3"
-            // onClick={_runQuery}
+            onClick={_addQuery}
           >{`Save data source`}</Button>
         </div>
       </Grid>

@@ -33,13 +33,13 @@ router.post(
 //   queryAuthorizationMiddleware.populateAuthorizedQueriesForRead,
 //   queryController.getQueryByID
 // );
-// router.post(
-//   "/",
-//   authMiddleware.authProvider,
-//   policyMiddleware.populateAuthorizationPolicies,
-//   queryAuthorizationMiddleware.populateAuthorizationForQueryAddition,
-//   queryController.addQuery
-// );
+router.post(
+  "/",
+  authMiddleware.authProvider,
+  policyMiddleware.populateAuthorizationPolicies,
+  queryAuthorizationMiddleware.populateAuthorizationForQueryAddition,
+  queryController.addQuery
+);
 // router.put(
 //   "/",
 //   authMiddleware.authProvider,

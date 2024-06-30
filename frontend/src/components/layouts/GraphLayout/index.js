@@ -2,7 +2,7 @@ import { Grid } from "@mui/material";
 import { lazy } from "react";
 import { Outlet, Route, Routes } from "react-router-dom";
 import { LOCAL_CONSTANTS } from "../../../constants";
-import { GraphDrawerList } from "../../drawerLists/GraphDrawerList";
+import { GraphDrawerList } from "../../DrawerLists/GraphDrawerList";
 // import TableView from "../../pages/TableView";
 
 const GraphView = lazy(() => import("../../../pages/GraphView"));

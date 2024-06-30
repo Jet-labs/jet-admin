@@ -1,7 +1,7 @@
 import { FormControl, Grid, MenuItem, Select, useTheme } from "@mui/material";
 import React, { useCallback, useState } from "react";
 import "react-data-grid/lib/styles.css";
-import { PGSQLQueryCreator } from "../../components/PGSQLQueryCreator";
+import { PGSQLQueryBuilder } from "../../components/QueryBuilders/PGSQLQueryBuilder";
 import { LOCAL_CONSTANTS } from "../../constants";
 import "./style.css";
 
@@ -23,19 +23,13 @@ const AddQuery = () => {
         className="flex flex-col items-start justify-start p-3 px-6 !border-b !border-white !border-opacity-10"
         style={{ background: theme.palette.background.paper }}
       >
-        <span className="text-lg font-bold text-start mt-1">{`Add new data source`}</span>
+        <span className="text-lg font-bold text-start mt-1">{`Add new query`}</span>
       </div>
 
       <Grid container className="!h-full">
-        <Grid
-          item
-          sx={12}
-          md={12}
-          lg={12}
-          className="w-full !border-r !border-white !border-opacity-10 !h-full"
-        >
+        <Grid item sx={12} md={12} lg={12} className="w-full !h-full">
           <FormControl fullWidth size="small" className="!mt-2 !px-3">
-            <span className="text-xs font-light  !lowercase mb-1">{`Data source type`}</span>
+            <span className="text-xs font-light  !lowercase mb-1">{`Query type`}</span>
 
             <Select
               value={queryType}
@@ -59,7 +53,7 @@ const AddQuery = () => {
           </FormControl>
           {queryType ==
             LOCAL_CONSTANTS.DATA_SOURCE_QUERY_TYPE.POSTGRE_QUERY.value && (
-            <PGSQLQueryCreator />
+            <PGSQLQueryBuilder />
           )}
         </Grid>
       </Grid>

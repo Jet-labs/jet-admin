@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuthState } from "../contexts/authContext";
-import { MainLayout } from "./layouts/MainLayout";
+import { MainLayout } from "./Layouts/MainLayout";
 
 /**
  *

@@ -4,12 +4,12 @@ import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getGraphDataByIDAPI } from "../../api/graphs";
 import { LOCAL_CONSTANTS } from "../../constants";
-import { BarGraphComponent } from "../graphs/BarGraphComponent";
-import { DoughnutGraphComponent } from "../graphs/DoughnutChartComponent";
-import { LineGraphComponent } from "../graphs/LineGraphComponent";
-import { PieGraphComponent } from "../graphs/PieChartComponent";
-import { PolarAreaGraphComponent } from "../graphs/PolarAreaChartComponent";
-import { RadarGraphComponent } from "../graphs/RadarChartComponent";
+import { BarGraphComponent } from "../GraphComponents/BarGraphComponent";
+import { DoughnutGraphComponent } from "../GraphComponents/DoughnutChartComponent";
+import { LineGraphComponent } from "../GraphComponents/LineGraphComponent";
+import { PieGraphComponent } from "../GraphComponents/PieChartComponent";
+import { PolarAreaGraphComponent } from "../GraphComponents/PolarAreaChartComponent";
+import { RadarGraphComponent } from "../GraphComponents/RadarChartComponent";
 
 export const GraphWidgetComponent = ({ id }) => {
   const theme = useTheme();
