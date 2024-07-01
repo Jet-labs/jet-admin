@@ -6,20 +6,20 @@ const { httpServer } = require("./config/http.server");
 const Logger = require("./utils/logger");
 
 expressApp.use(cookieParser());
-expressApp.use("/admin_api/auth", require("./modules/routes/auth.route"));
+expressApp.use("/admin_api/auth", require("./modules/auth/auth.route"));
 
 expressApp.use(
   "/admin_api/constants",
   require("./modules/routes/constants.route")
 );
 
-expressApp.use("/admin_api/tables", require("./modules/routes/table.route"));
-expressApp.use("/admin_api/graphs", require("./modules/routes/graph.route"));
+expressApp.use("/admin_api/tables", require("./modules/table/table.route"));
+expressApp.use("/admin_api/graphs", require("./modules/graph/graph.route"));
 expressApp.use(
   "/admin_api/dashboards",
-  require("./modules/routes/dashboard.route")
+  require("./modules/dashboard/dashboard.route")
 );
-expressApp.use("/admin_api/queries", require("./modules/routes/query.route"));
+expressApp.use("/admin_api/queries", require("./modules/query/query.route"));
 
 expressApp.get("/", async (req, res) => {
   Logger.log("warning", {

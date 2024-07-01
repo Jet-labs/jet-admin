@@ -1,4 +1,3 @@
-const { Prisma } = require("@prisma/client");
 const { prisma } = require("../../config/prisma");
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
@@ -98,9 +97,9 @@ class DashboardService {
           dashboardOptions.graph_ids &&
           Array.isArray(dashboardOptions.graph_ids)
         ) {
-          dashboardOptions.graph_ids.forEach((graph)=>{
-            _graphIDs.push(graph.graphID)
-          })
+          dashboardOptions.graph_ids.forEach((graph) => {
+            _graphIDs.push(graph.graphID);
+          });
         }
         const updatedDashboard = await prisma.tbl_pm_dashboards.update({
           where: {

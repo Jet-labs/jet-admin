@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const authController = require("../controllers/auth.controller");
-const { authMiddleware } = require("../middlewares/auth.middleware");
+const authController = require("./auth.controller");
+const { authMiddleware } = require("./auth.middleware");
 //user routes
 
 //get user info : auth check

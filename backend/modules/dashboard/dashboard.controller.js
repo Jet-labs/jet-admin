@@ -1,8 +1,6 @@
-const { prisma } = require("../../config/prisma");
-const constants = require("../../constants");
 const { extractError } = require("../../utils/error.utils");
 const Logger = require("../../utils/logger");
-const { DashboardService } = require("../services/dashboard.services");
+const { DashboardService } = require("./dashboard.services");
 
 const dashboardController = {};
 

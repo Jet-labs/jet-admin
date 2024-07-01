@@ -1,9 +1,9 @@
 const express = require("express");
-const { authMiddleware } = require("../middlewares/auth.middleware");
-const tableController = require("../controllers/table.controller");
+const { authMiddleware } = require("../auth/auth.middleware");
+const tableController = require("./table.controller");
 const {
   tableAuthorizationMiddleware,
-} = require("../middlewares/table.authorization.middleware");
+} = require("./table.authorization.middleware");
 const { policyMiddleware } = require("../middlewares/policy.middleware");
 const router = express.Router();
 

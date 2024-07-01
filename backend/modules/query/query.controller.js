@@ -2,7 +2,7 @@ const { prisma } = require("../../config/prisma");
 const constants = require("../../constants");
 const { extractError } = require("../../utils/error.utils");
 const Logger = require("../../utils/logger");
-const { QueryService } = require("../services/query.services");
+const { QueryService } = require("./query.services");
 
 const queryController = {};
 
@@ -54,12 +54,8 @@ queryController.getAllQueries = async (req, res) => {
 queryController.addQuery = async (req, res) => {
   try {
     const { pmUser, state, body } = req;
-    const { title,
-      description,
-      query_type,
-      query, } = body;
+    const { title, description, query_type, query } = body;
     const pm_user_id = parseInt(pmUser.pm_user_id);
-    
 
     Logger.log("info", {
       message: "queryController:addQuery:params",
@@ -67,16 +63,16 @@ queryController.addQuery = async (req, res) => {
     });
 
     let newMasterQuery = null;
-    switch(query_type){
-      case constants.QUERY_TYPE.POSTGRE_QUERY.value:{
+    switch (query_type) {
+      case constants.QUERY_TYPE.POSTGRE_QUERY.value: {
         newMasterQuery = await QueryService.addPGQuery({
-          queryTitle:title,
-          queryDescription:description,
+          queryTitle: title,
+          queryDescription: description,
           query,
         });
         break;
       }
-      default:{
+      default: {
         newMasterQuery = await QueryService.addPGQuery({
           queryTitle: title,
           queryDescription: description,
@@ -85,7 +81,7 @@ queryController.addQuery = async (req, res) => {
         break;
       }
     }
-  
+
     Logger.log("success", {
       message: "queryController:addQuery:success",
       params: { pm_user_id, newMasterQuery },

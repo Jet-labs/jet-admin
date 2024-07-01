@@ -1,14 +1,10 @@
 const express = require("express");
-const { authMiddleware } = require("../middlewares/auth.middleware");
-const tableController = require("../controllers/table.controller");
-const {
-  tableAuthorizationMiddleware,
-} = require("../middlewares/table.authorization.middleware");
+const { authMiddleware } = require("../auth/auth.middleware");
 const { policyMiddleware } = require("../middlewares/policy.middleware");
-const { graphController } = require("../controllers/graph.controller");
+const { graphController } = require("./graph.controller");
 const {
   graphAuthorizationMiddleware,
-} = require("../middlewares/graph.authorization.middleware");
+} = require("./graph.authorization.middleware");
 const router = express.Router();
 
 // get all data of table
@@ -48,6 +44,5 @@ router.delete(
   graphAuthorizationMiddleware.populateAuthorizedGraphsForDelete,
   graphController.deleteGraph
 );
-
 
 module.exports = router;

@@ -1,9 +1,7 @@
 const constants = require("../../constants");
-const environmentVariables = require("../../environment");
 const { extractError } = require("../../utils/error.utils");
 const Logger = require("../../utils/logger");
-const { AuthService } = require("../services/auth.service");
-const { serialize } = require("cookie");
+const { AuthService } = require("./auth.service");
 
 const authController = {};
 /**

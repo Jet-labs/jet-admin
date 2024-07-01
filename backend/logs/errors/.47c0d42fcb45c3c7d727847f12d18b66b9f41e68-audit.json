@@ -19,6 +19,11 @@
             "date": 1719727211682,
             "name": "logs\\errors\\dev_node_1-2024-06-30.log",
             "hash": "a6cdd209f719df258739c653a1c9c3e51aa1bddd74db66f2bab8599147c26e5b"
+        },
+        {
+            "date": 1719852206173,
+            "name": "logs\\errors\\dev_node_1-2024-07-01.log",
+            "hash": "f39bc5ae16691edb22990fcafd155ef9ca9ac70b99b811645743e751bbf61bce"
         }
     ],
     "hashType": "sha256"

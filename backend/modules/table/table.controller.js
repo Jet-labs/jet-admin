@@ -3,7 +3,7 @@ const constants = require("../../constants");
 const { extractError } = require("../../utils/error.utils");
 const Logger = require("../../utils/logger");
 const { policyUtils } = require("../../utils/policy.utils");
-const { TableService } = require("../services/table.services");
+const { TableService } = require("./table.services");
 
 const tableController = {};
 

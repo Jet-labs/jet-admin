@@ -1,14 +1,10 @@
 const express = require("express");
-const { authMiddleware } = require("../middlewares/auth.middleware");
-const tableController = require("../controllers/table.controller");
-const {
-  tableAuthorizationMiddleware,
-} = require("../middlewares/table.authorization.middleware");
+const { authMiddleware } = require("../auth/auth.middleware");
 const { policyMiddleware } = require("../middlewares/policy.middleware");
-const { queryController } = require("../controllers/query.controller");
+const { queryController } = require("./query.controller");
 const {
   queryAuthorizationMiddleware,
-} = require("../middlewares/query.authorization.middleware");
+} = require("./query.authorization.middleware");
 const router = express.Router();
 
 // get all data of table

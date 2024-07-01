@@ -1,9 +1,6 @@
-const { prisma } = require("../../config/prisma");
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
-const jwt = require("jsonwebtoken");
-const environmentVariables = require("../../environment");
-const { AuthService } = require("../services/auth.service");
+const { AuthService } = require("./auth.service");
 const authMiddleware = {};
 
 /**
@@ -20,7 +17,7 @@ authMiddleware.authProvider = async function (req, res, next) {
   ) {
     try {
       let accessToken = req.headers.authorization.split("Bearer ")[1];
-      
+
       const pmUser = await AuthService.verifyAccessToken({ accessToken });
 
       Logger.log("success", {
