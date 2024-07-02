@@ -49,6 +49,7 @@ export const getQueryByIDAPI = async ({ queryID }) => {
       })
     );
     if (response.data && response.data.success == true) {
+      console.log(response.data.query);
       return new Query(response.data.query);
     } else if (response.data.error) {
       throw response.data.error;

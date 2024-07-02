@@ -140,46 +140,46 @@ queryController.runPGQuery = async (req, res) => {
   }
 };
 
-// /**
-//  *
-//  * @param {import("express").Request} req
-//  * @param {import("express").Response} res
-//  * @returns
-//  */
-// queryController.getQueryByID = async (req, res) => {
-//   try {
-//     const { pmUser, state, params } = req;
-//     const pm_query_id = parseInt(params.id);
-//     const pm_user_id = parseInt(pmUser.pm_user_id);
-//     const authorized_queries = state.authorized_queries;
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @returns
+ */
+queryController.getQueryByID = async (req, res) => {
+  try {
+    const { pmUser, state, params } = req;
+    const query_id = parseInt(params.id);
+    const pm_user_id = parseInt(pmUser.pm_user_id);
+    const authorized_queries = state.authorized_queries;
 
-//     Logger.log("info", {
-//       message: "queryController:getQueryByID:params",
-//       params: { pm_user_id, pm_query_id },
-//     });
+    Logger.log("info", {
+      message: "queryController:getQueryByID:params",
+      params: { pm_user_id, query_id },
+    });
 
-//     const query = await QueryService.getQueryByID({
-//       queryID: pm_query_id,
-//       authorizedQueries: authorized_queries,
-//     });
+    const query = await QueryService.getQueryByID({
+      queryID: query_id,
+      authorizedQueries: authorized_queries,
+    });
 
-//     Logger.log("success", {
-//       message: "queryController:getQueryByID:success",
-//       params: { pm_user_id, query },
-//     });
+    Logger.log("success", {
+      message: "queryController:getQueryByID:success",
+      params: { pm_user_id, query },
+    });
 
-//     return res.json({
-//       success: true,
-//       query: query,
-//     });
-//   } catch (error) {
-//     Logger.log("error", {
-//       message: "queryController:getQueryByID:catch-1",
-//       params: { error },
-//     });
-//     return res.json({ success: false, error: extractError(error) });
-//   }
-// };
+    return res.json({
+      success: true,
+      query: query,
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "queryController:getQueryByID:catch-1",
+      params: { error },
+    });
+    return res.json({ success: false, error: extractError(error) });
+  }
+};
 
 // /**
 //  *

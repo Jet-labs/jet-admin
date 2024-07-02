@@ -128,7 +128,7 @@ export const MainDrawerList = ({ currentPageTitle }) => {
                 sx={{
                   color: theme.palette.primary.contrastText,
                 }}
-                primary={"Data sources"}
+                primary={"Queries"}
               />
             </ListItemButton>
           </ListItem>

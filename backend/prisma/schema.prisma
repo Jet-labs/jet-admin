@@ -259,11 +259,9 @@ model tbl_pm_dashboards {
 }
 
 model tbl_pm_postgres_queries {
-  pm_postgres_query_id          Int      @id(map: "tbl_pm_postgres_queries_pk") @default(autoincrement())
-  pm_postgres_query             String   @db.VarChar
-  created_at                    DateTime @default(now()) @db.Timestamptz(6)
-  pm_postgres_query_title       String   @db.VarChar
-  pm_postgres_query_description String?  @db.VarChar
+  pm_postgres_query_id Int      @id(map: "tbl_pm_postgres_queries_pk") @default(autoincrement())
+  pm_postgres_query    String   @db.VarChar
+  created_at           DateTime @default(now()) @db.Timestamptz(6)
 }
 
 model tbl_pm_data_sources {
@@ -277,14 +275,16 @@ model tbl_pm_data_sources {
   is_disabled          Boolean?  @default(false)
 }
 
-model tbl_pm_queries_master {
-  pm_query_master_id Int       @id(map: "tbl_pm_queries_pk") @default(autoincrement())
-  pm_query_id        Int
-  pm_query_type      String?   @default("POSTGRE_QUERY") @db.VarChar
-  created_at         DateTime  @default(now()) @db.Timestamptz(6)
-  updated_at         DateTime  @default(now()) @db.Timestamptz(6)
-  disabled_at        DateTime? @db.Timestamptz(6)
-  is_disabled        Boolean?  @default(false)
+model tbl_pm_master_queries {
+  pm_master_query_id          Int       @id(map: "tbl_pm_queries_pk") @default(autoincrement())
+  pm_query_id                 Int
+  pm_query_type               String?   @default("POSTGRE_QUERY") @db.VarChar
+  created_at                  DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at                  DateTime  @default(now()) @db.Timestamptz(6)
+  disabled_at                 DateTime? @db.Timestamptz(6)
+  is_disabled                 Boolean?  @default(false)
+  pm_master_query_title       String    @default("Untitled") @db.VarChar
+  pm_master_query_description String?   @db.VarChar
 }
 
 enum mpaa_rating {

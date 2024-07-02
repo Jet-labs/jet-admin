@@ -5,7 +5,7 @@ import { LOCAL_CONSTANTS } from "../../../constants";
 import { QueryDrawerList } from "../../DrawerLists/QueryDrawerList";
 
 const AddQuery = lazy(() => import("../../../pages/AddQuery"));
-
+const UpdateQuery = lazy(() => import("../../../pages/UpdateQuery"));
 const QueryLayout = () => {
   return (
     <Grid container>
@@ -26,6 +26,10 @@ const QueryLayout = () => {
           <Route
             path={LOCAL_CONSTANTS.ROUTES.ADD_QUERY.code}
             element={<AddQuery />}
+          />
+          <Route
+            path={LOCAL_CONSTANTS.ROUTES.QUERY_VIEW.code}
+            element={<UpdateQuery />}
           />
         </Routes>
         <Outlet />

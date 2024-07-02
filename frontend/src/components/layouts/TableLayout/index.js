@@ -5,7 +5,7 @@ import { LOCAL_CONSTANTS } from "../../../constants";
 import { TableDrawerList } from "../../DrawerLists/TableDrawerList";
 // import TableView from "../../pages/TableView";
 
-const RowView = lazy(() => import("../../../pages/RowView"));
+const UpdateRow = lazy(() => import("../../../pages/UpdateRow"));
 const AddRow = lazy(() => import("../../../pages/AddRow"));
 const TableView = lazy(() => import("../../../pages/TableView"));
 
@@ -39,7 +39,7 @@ const TableLayout = () => {
             />
             <Route
               path={LOCAL_CONSTANTS.ROUTES.ROW_VIEW.code}
-              element={<RowView />}
+              element={<UpdateRow />}
             />
           </Route>
         </Routes>

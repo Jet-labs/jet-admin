@@ -35,7 +35,7 @@ export const QueryDrawerList = () => {
     error: loadQueriesError,
     refetch: refetchQueries,
   } = useQuery({
-    queryKey: [`REACT_QUERY_KEY_DATA_SOURCE`],
+    queryKey: [`REACT_QUERY_KEY_QUERIES`],
     queryFn: () => getAllQueryAPI(),
     cacheTime: 0,
     retry: 1,
@@ -74,16 +74,16 @@ export const QueryDrawerList = () => {
       <div className="!mt-1"></div>
 
       {queries?.map((masterQuery) => {
-        const key = `query_${masterQuery.pm_query_master_id}`;
+        const key = `query_${masterQuery.pm_master_query_id}`;
         return (
           <Link
             to={LOCAL_CONSTANTS.ROUTES.QUERY_VIEW.path(
-              masterQuery.pm_query_master_id
+              masterQuery.pm_master_query_id
             )}
             key={key}
           >
             <ListItem
-              key={`_query_${masterQuery.pm_query_master_id}`}
+              key={`_query_${masterQuery.pm_master_query_id}`}
               disablePadding
               sx={{}}
               className="!px-3 !py-1.5"
@@ -121,7 +121,7 @@ export const QueryDrawerList = () => {
                         ? theme.palette.primary.main
                         : theme.palette.primary.contrastText,
                   }}
-                  primary={masterQuery.query?.getTitle()}
+                  primary={masterQuery.pm_master_query_title}
                   primaryTypographyProps={{
                     sx: {
                       fontWeight: key == currentPage ? "700" : "500",

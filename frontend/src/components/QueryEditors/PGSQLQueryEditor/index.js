@@ -109,7 +109,7 @@ const PGSQLQueryResponseSchemaTab = ({ dataSchema }) => {
   );
 };
 
-export const PGSQLQueryBuilder = ({ value, handleChange }) => {
+export const PGSQLQueryEditor = ({ value, handleChange }) => {
   const theme = useTheme();
   const [tab, setTab] = React.useState(0);
   const [dataSchema, setDataSchema] = useState();
@@ -127,7 +127,7 @@ export const PGSQLQueryBuilder = ({ value, handleChange }) => {
     data: pgQueryData,
   } = useMutation({
     mutationFn: ({ query }) => {
-      return runPGQueryAPI({ query: query?.query });
+      return runPGQueryAPI({ query: query?.pm_postgres_query });
     },
     retry: false,
     onSuccess: (data) => {
@@ -144,14 +144,14 @@ export const PGSQLQueryBuilder = ({ value, handleChange }) => {
   };
 
   const _handleOnQueryChange = (value) => {
-    handleChange({ query: value });
+    handleChange({ pm_postgres_query: value });
   };
 
   return (
     <div className="!flex flex-col justify-start items-stretch w-100">
       <div className="px-3 w-100 ">
         <CodeMirror
-          value={value ? value.query : ""}
+          value={value ? value.pm_postgres_query : ""}
           height="200px"
           extensions={[loadLanguage("pgsql")]}
           onChange={_handleOnQueryChange}

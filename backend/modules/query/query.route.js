@@ -22,13 +22,13 @@ router.post(
   // queryAuthorizationMiddleware.populateAuthorizedQueriesForRead,
   queryController.runPGQuery
 );
-// router.get(
-//   "/:id",
-//   authMiddleware.authProvider,
-//   policyMiddleware.populateAuthorizationPolicies,
-//   queryAuthorizationMiddleware.populateAuthorizedQueriesForRead,
-//   queryController.getQueryByID
-// );
+router.get(
+  "/:id",
+  authMiddleware.authProvider,
+  policyMiddleware.populateAuthorizationPolicies,
+  queryAuthorizationMiddleware.populateAuthorizedQueriesForRead,
+  queryController.getQueryByID
+);
 router.post(
   "/",
   authMiddleware.authProvider,

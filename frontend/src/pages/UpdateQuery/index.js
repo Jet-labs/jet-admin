@@ -8,23 +8,42 @@ import {
   useTheme,
 } from "@mui/material";
 import { useFormik } from "formik";
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect } from "react";
 import "react-data-grid/lib/styles.css";
 import { PGSQLQueryBuilder } from "../../components/QueryBuilders/PGSQLQueryBuilder";
 import { LOCAL_CONSTANTS } from "../../constants";
 import "./style.css";
-import { addQueryAPI } from "../../api/queries";
-import { useMutation } from "@tanstack/react-query";
+import {
+  addQueryAPI,
+  getQueryByIDAPI,
+  updateQueryAPI,
+} from "../../api/queries";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { displayError, displaySuccess } from "../../utils/notification";
+import { useParams } from "react-router-dom";
+import { PGSQLQueryEditor } from "../../components/QueryEditors/PGSQLQueryEditor";
 
-const AddQuery = () => {
+const UpdateQuery = () => {
+  const { id } = useParams();
   const theme = useTheme();
+  const {
+    isLoading: isLoadingQueryData,
+    data: queryData,
+    error: loadQueryDataError,
+  } = useQuery({
+    queryKey: [`REACT_QUERY_KEY_QUERIES`, id],
+    queryFn: () => getQueryByIDAPI({ queryID: id }),
+    cacheTime: 0,
+    retry: 1,
+    staleTime: Infinity,
+  });
+
   const queryBuilderForm = useFormik({
     initialValues: {
       title: "Untitled",
       description: "",
       query_type: LOCAL_CONSTANTS.DATA_SOURCE_QUERY_TYPE.POSTGRE_QUERY.value,
-      query: {},
+      query: null,
     },
     validateOnMount: false,
     validateOnChange: false,
@@ -38,21 +57,33 @@ const AddQuery = () => {
     },
   });
 
+  useEffect(() => {
+    if (queryBuilderForm && queryData) {
+      queryBuilderForm.setFieldValue("title", queryData.pm_master_query_title);
+      queryBuilderForm.setFieldValue(
+        "description",
+        queryData.pm_master_query_description
+      );
+      queryBuilderForm.setFieldValue("query_type", queryData.pm_query_type);
+      queryBuilderForm.setFieldValue("query", queryData.query);
+    }
+  }, [queryData]);
+
   const {
-    isPending: isAddingPGQuery,
-    isSuccess: isAddingPGQuerySuccess,
-    isError: isAddingPGQueryError,
-    error: addPGQueryError,
-    mutate: addPGQuery,
+    isPending: isUpdatingQuery,
+    isSuccess: isUpdatingQuerySuccess,
+    isError: isUpdatingQueryError,
+    error: updateQueryError,
+    mutate: updateQuery,
   } = useMutation({
     mutationFn: (queryData) => {
-      return addQueryAPI({
+      return updateQueryAPI({
         data: queryData,
       });
     },
     retry: false,
     onSuccess: (data) => {
-      displaySuccess("Query added successfully");
+      displaySuccess("Query updated successfully");
     },
     onError: (error) => {
       displayError(error);
@@ -68,17 +99,18 @@ const AddQuery = () => {
     [queryBuilderForm]
   );
 
-  const _addQuery = () => {
-    addPGQuery(queryBuilderForm.values);
+  const _updateQuery = () => {
+    updateQuery(queryBuilderForm.values);
   };
 
+  console.log({ queryData });
   return (
     <div className="w-full !h-[calc(100vh-123px)]">
       <div
         className="flex flex-col items-start justify-start p-3 px-6 !border-b !border-white !border-opacity-10"
         style={{ background: theme.palette.background.paper }}
       >
-        <span className="text-lg font-bold text-start mt-1">{`Add new query`}</span>
+        <span className="text-lg font-bold text-start mt-1">{`Update query`}</span>
       </div>
 
       <Grid container className="!h-full">
@@ -144,8 +176,8 @@ const AddQuery = () => {
             <Button
               variant="contained"
               className="!ml-3"
-              onClick={_addQuery}
-            >{`Save data source`}</Button>
+              onClick={_updateQuery}
+            >{`Save query`}</Button>
           </div>
         </Grid>
         <Grid
@@ -157,7 +189,7 @@ const AddQuery = () => {
         >
           {queryBuilderForm.values.query_type ==
             LOCAL_CONSTANTS.DATA_SOURCE_QUERY_TYPE.POSTGRE_QUERY.value && (
-            <PGSQLQueryBuilder
+            <PGSQLQueryEditor
               value={queryBuilderForm.values.query}
               handleChange={_handleOnQueryChange}
             />
@@ -168,4 +200,4 @@ const AddQuery = () => {
   );
 };
 
-export default AddQuery;
+export default UpdateQuery;

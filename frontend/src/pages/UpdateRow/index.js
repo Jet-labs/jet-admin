@@ -6,9 +6,8 @@ import { RowUpdateForm } from "../../components/RowUpdateForm";
  * @param {object} param0
  * @returns
  */
-const RowView = ({}) => {
+const UpdateRow = ({}) => {
   const { table_name, id } = useParams();
-  console.log({ id });
   return (
     <div className="flex flex-col justify-start items-stretch w-full h-full">
       {table_name && id && <RowUpdateForm tableName={table_name} id={id} />}
@@ -16,4 +15,4 @@ const RowView = ({}) => {
   );
 };
 
-export default RowView;
+export default UpdateRow;
