@@ -10,12 +10,13 @@ import {
 
 import { LOCAL_CONSTANTS } from "../../constants";
 import { useFormik } from "formik";
-import { GraphBuilderForm } from "../../components/GraphBuilderForm";
-import { GraphBuilderPreview } from "../../components/GraphBuilderPreview";
+import { GraphBuilder } from "../../components/GraphBuilder";
+import { GraphComponentPreview } from "../../components/GraphComponentPreview";
 import { displayError, displaySuccess } from "../../utils/notification";
 import { useParams } from "react-router-dom";
+import { GraphEditor } from "../../components/GraphEditor";
 
-const GraphView = () => {
+const UpdateGraph = () => {
   const theme = useTheme();
   const { id } = useParams();
   const queryClient = useQueryClient();
@@ -132,7 +133,8 @@ const GraphView = () => {
       </div>
       <Grid container spacing={1} className="!px-3">
         <Grid item lg={5} md={4} className="w-full">
-          <GraphBuilderForm
+          <GraphEditor
+            graphID={id}
             isLoading={isUpdatingGraph}
             graphForm={graphForm}
             deleteGraph={deleteGraph}
@@ -140,7 +142,7 @@ const GraphView = () => {
         </Grid>
         {graphData && graphData.dataset && (
           <Grid item lg={7} md={8} className="w-full">
-            <GraphBuilderPreview
+            <GraphComponentPreview
               graphType={graphForm.values["graph_type"]}
               legendPosition={graphForm.values["legend_position"]}
               titleDisplayEnabled={graphForm.values["title_display_enabled"]}
@@ -154,4 +156,4 @@ const GraphView = () => {
   );
 };
 
-export default GraphView;
+export default UpdateGraph;

@@ -16,15 +16,12 @@ import { LOCAL_CONSTANTS } from "../../constants";
 import { displayError, displaySuccess } from "../../utils/notification";
 import { useParams } from "react-router-dom";
 import { ConfirmationDialog } from "../../components/ConfirmationDialog";
+import { DashboardDeletionForm } from "../../components/DashboardDeletionForm";
 
-const DashboardEditView = () => {
+const UpdateDashboard = () => {
   const { id } = useParams();
   const theme = useTheme();
   const queryClient = useQueryClient();
-  const [
-    isDeleteDashboardConfirmationOpen,
-    setIsDeleteDashboardConfirmationOpen,
-  ] = useState(false);
 
   const {
     isLoading: isLoadingDashboard,
@@ -50,26 +47,6 @@ const DashboardEditView = () => {
     retry: false,
     onSuccess: () => {
       displaySuccess("Updated dashboard layout successfully");
-      queryClient.invalidateQueries([`REACT_QUERY_KEY_DASHBOARD_LAYOUTS`]);
-    },
-    onError: (error) => {
-      displayError(error);
-    },
-  });
-
-  const {
-    isPending: isDeletingDashboard,
-    isSuccess: isDeletingDashboardSuccess,
-    isError: isDeletingDashboardError,
-    error: deleteDashboardError,
-    mutate: deleteDashboard,
-  } = useMutation({
-    mutationFn: () => {
-      return deleteDashboardByIDAPI({ dashboardID: id });
-    },
-    retry: false,
-    onSuccess: () => {
-      displaySuccess("Deleted dashboard layout successfully");
       queryClient.invalidateQueries([`REACT_QUERY_KEY_DASHBOARD_LAYOUTS`]);
     },
     onError: (error) => {
@@ -117,27 +94,8 @@ const DashboardEditView = () => {
     }
   }, [dashboard]);
 
-  const _handleOpenDeleteDashboardConfirmation = () => {
-    setIsDeleteDashboardConfirmationOpen(true);
-  };
-  const _handleDeclineDeleteDashboardConfirmation = () => {
-    setIsDeleteDashboardConfirmationOpen(false);
-  };
-
-  const _handleAcceptDeleteDashboardConfirmation = () => {
-    deleteDashboard();
-    setIsDeleteDashboardConfirmationOpen(false);
-  };
-
   return (
     <div className="w-full h-full">
-      <ConfirmationDialog
-        open={isDeleteDashboardConfirmationOpen}
-        onAccepted={_handleAcceptDeleteDashboardConfirmation}
-        onDecline={_handleDeclineDeleteDashboardConfirmation}
-        title={"Delete dashboard?"}
-        message={`Are you sure you want to delete dashboard : ${dashboard?.dashboard_title}`}
-      />
       <Grid container className="!h-full">
         <Grid
           item
@@ -160,6 +118,7 @@ const DashboardEditView = () => {
           md={3}
           sm={4}
           className="w-full !border-r !border-white !border-opacity-10 !h-[calc(100vh-66px)] !overflow-y-auto"
+          style={{ background: theme.palette.background.paper }}
         >
           <Grid sm={12} className="!top-0 !sticky !z-50">
             <div
@@ -167,7 +126,7 @@ const DashboardEditView = () => {
               style={{ background: theme.palette.background.paper }}
             >
               <FiSettings className="!text-base !font-semibold" />
-              <span className="text-sm font-semibold text-start ml-2">{`Update dashboard`}</span>
+              <span className="text-sm font-semibold text-start ml-2">{`Update dashboard : ${id}`}</span>
             </div>
             <div
               className="flex flex-col justify-center items-start p-3 !border-b !border-white !border-opacity-10"
@@ -188,19 +147,13 @@ const DashboardEditView = () => {
               />
               <div className="mt-3 w-full flex flex-row justify-end">
                 <Button
-                  color="error"
-                  variant="outlined"
-                  onClick={_handleOpenDeleteDashboardConfirmation}
-                >
-                  Delete
-                </Button>
-                <Button
                   variant="contained"
                   className="!ml-2"
                   onClick={dashboardForm.handleSubmit}
                 >
                   Save
                 </Button>
+                <DashboardDeletionForm dashboardID={id} />
               </div>
             </div>
           </Grid>
@@ -214,4 +167,4 @@ const DashboardEditView = () => {
   );
 };
 
-export default DashboardEditView;
+export default UpdateDashboard;

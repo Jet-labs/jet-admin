@@ -3,8 +3,8 @@ import { useMutation } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import React from "react";
 import { addGraphAPI } from "../../api/graphs";
-import { GraphBuilderForm } from "../../components/GraphBuilderForm";
-import { GraphBuilderPreview } from "../../components/GraphBuilderPreview";
+import { GraphBuilder } from "../../components/GraphBuilder";
+import { GraphComponentPreview } from "../../components/GraphComponentPreview";
 import { LOCAL_CONSTANTS } from "../../constants";
 import { displayError, displaySuccess } from "../../utils/notification";
 import { useTheme } from "@emotion/react";
@@ -62,10 +62,10 @@ const AddGraph = () => {
       </div>
       <Grid container spacing={1} className="!px-3">
         <Grid item lg={5} md={4} className="w-full">
-          <GraphBuilderForm isLoading={isAddingGraph} graphForm={graphForm} />
+          <GraphBuilder isLoading={isAddingGraph} graphForm={graphForm} />
         </Grid>
         <Grid item lg={7} md={8} className="w-full">
-          <GraphBuilderPreview
+          <GraphComponentPreview
             graphType={graphForm.values["graph_type"]}
             legendPosition={graphForm.values["legend_position"]}
             titleDisplayEnabled={graphForm.values["title_display_enabled"]}

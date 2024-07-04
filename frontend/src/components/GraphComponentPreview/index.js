@@ -9,7 +9,7 @@ import { DoughnutGraphComponent } from "../GraphComponents/DoughnutChartComponen
 import { PolarAreaGraphComponent } from "../GraphComponents/PolarAreaChartComponent";
 import { RadarGraphComponent } from "../GraphComponents/RadarChartComponent";
 
-export const GraphBuilderPreview = ({
+export const GraphComponentPreview = ({
   graphType,
   legendPosition,
   titleDisplayEnabled,

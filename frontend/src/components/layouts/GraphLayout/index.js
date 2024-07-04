@@ -5,7 +5,7 @@ import { LOCAL_CONSTANTS } from "../../../constants";
 import { GraphDrawerList } from "../../DrawerLists/GraphDrawerList";
 // import TableView from "../../pages/TableView";
 
-const GraphView = lazy(() => import("../../../pages/GraphView"));
+const UpdateGraph = lazy(() => import("../../../pages/UpdateGraph"));
 const AddGraph = lazy(() => import("../../../pages/AddGraph"));
 
 const GraphLayout = () => {
@@ -27,7 +27,7 @@ const GraphLayout = () => {
 
           <Route
             path={LOCAL_CONSTANTS.ROUTES.GRAPH_VIEW.code}
-            element={<GraphView />}
+            element={<UpdateGraph />}
           />
 
           <Route

@@ -5,9 +5,7 @@ import { LOCAL_CONSTANTS } from "../../../constants";
 import { DashboardsList } from "../../DrawerLists/DashboardDrawerList";
 const AddDashboardView = lazy(() => import("../../../pages/AddDashboardView"));
 const DashboardView = lazy(() => import("../../../pages/DashboardView"));
-const DashEditboardView = lazy(() =>
-  import("../../../pages/DashboardEditView")
-);
+const DashEditboardView = lazy(() => import("../../../pages/UpdateDashboard"));
 
 const DashboardLayout = () => {
   return (

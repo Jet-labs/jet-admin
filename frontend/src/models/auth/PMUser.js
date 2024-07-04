@@ -225,6 +225,7 @@ export class PMUser {
   };
 
   isAuthorizedToDeleteDashboard = (dashboardID) => {
+    console.log(this.policy.dashboards.dashboard_ids);
     let authorization = false;
     if (
       this.policy.dashboards &&
@@ -235,6 +236,7 @@ export class PMUser {
     ) {
       authorization = this.policy.dashboards.delete;
     } else if (this.policy.dashboards && this.policy.dashboards.dashboard_ids) {
+      console.log(this.policy.dashboards.dashboard_ids);
       if (this.policy.dashboards.dashboard_ids[dashboardID]) {
         authorization = Boolean(
           this.policy.dashboards.dashboard_ids[dashboardID].delete

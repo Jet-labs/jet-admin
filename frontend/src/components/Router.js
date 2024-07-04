@@ -42,7 +42,7 @@ const AppRouter = ({}) => {
                   <Navigate
                     to={LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.code}
                   />
-                  // <GraphView />
+                  // <UpdateGraph />
                 )}
                 fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
                 loadingComponent={() => <Loading />}
