@@ -199,8 +199,14 @@ policyUtils.extractAuthorizedQueriesForDeleteFromPolicyObject = ({
   policyObject,
 }) => {
   const authorizeQueryIDs = [];
-  if (policyObject.queries?.delete) {
-    return true;
+  if (
+    policyObject.queries &&
+    !(
+      policyObject.queries.delete === null ||
+      policyObject.queries.delete === undefined
+    )
+  ) {
+    return Boolean(policyObject.queries.delete);
   } else if (policyObject.queries && policyObject.queries.query_ids) {
     Object.keys(policyObject.queries.query_ids).forEach((query_id) => {
       if (

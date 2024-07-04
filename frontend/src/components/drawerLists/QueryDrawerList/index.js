@@ -27,7 +27,7 @@ export const QueryDrawerList = () => {
   const { pmUser } = useAuthState();
   const navigate = useNavigate();
   const isAuthorizedToAddQuery = useMemo(() => {
-    return pmUser && pmUser.extractAuthorizationForQueryAddFromPolicyObject();
+    return pmUser && pmUser.isAuthorizedToAddQuery;
   }, [pmUser]);
   const {
     isLoading: isLoadingQueries,
@@ -39,7 +39,7 @@ export const QueryDrawerList = () => {
     queryFn: () => getAllQueryAPI(),
     cacheTime: 0,
     retry: 1,
-    staleTime: Infinity,
+    staleTime: 0,
   });
 
   const _navigateToAddMoreQuery = () => {

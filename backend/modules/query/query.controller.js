@@ -62,25 +62,12 @@ queryController.addQuery = async (req, res) => {
       params: { pm_user_id, query },
     });
 
-    let newMasterQuery = null;
-    switch (query_type) {
-      case constants.QUERY_TYPE.POSTGRE_QUERY.value: {
-        newMasterQuery = await QueryService.addPGQuery({
-          queryTitle: title,
-          queryDescription: description,
-          query,
-        });
-        break;
-      }
-      default: {
-        newMasterQuery = await QueryService.addPGQuery({
-          queryTitle: title,
-          queryDescription: description,
-          query,
-        });
-        break;
-      }
-    }
+    let newMasterQuery = await QueryService.addQuery({
+      queryTitle: title,
+      queryType: query_type,
+      queryDescription: description,
+      query,
+    });
 
     Logger.log("success", {
       message: "queryController:addQuery:success",
@@ -94,6 +81,104 @@ queryController.addQuery = async (req, res) => {
   } catch (error) {
     Logger.log("error", {
       message: "queryController:addQuery:catch-1",
+      params: { error },
+    });
+    return res.json({ success: false, error: extractError(error) });
+  }
+};
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @returns
+ */
+queryController.duplicateQuery = async (req, res) => {
+  try {
+    const { pmUser, state, body } = req;
+    const { query_id } = body;
+    const pm_user_id = parseInt(pmUser.pm_user_id);
+
+    Logger.log("info", {
+      message: "queryController:duplicateQuery:params",
+      params: { pm_user_id, query_id },
+    });
+
+    let newDuplicateQuery = await QueryService.duplicateQuery({
+      queryID: parseInt(query_id),
+    });
+
+    Logger.log("success", {
+      message: "queryController:duplicateQuery:success",
+      params: { pm_user_id, newDuplicateQuery },
+    });
+
+    return res.json({
+      success: true,
+      query: newDuplicateQuery,
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "queryController:duplicateQuery:catch-1",
+      params: { error },
+    });
+    return res.json({ success: false, error: extractError(error) });
+  }
+};
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @returns
+ */
+queryController.updateQuery = async (req, res) => {
+  try {
+    const { pmUser, state, body } = req;
+    const { query_id, title, description, query_type, query } = body;
+    const pm_user_id = parseInt(pmUser.pm_user_id);
+    const authorized_queries = state.authorized_queries;
+
+    Logger.log("info", {
+      message: "queryController:updateQuery:params",
+      params: { pm_user_id, title, description, query_id, query },
+    });
+
+    let updatedMasterQuery = null;
+    switch (query_type) {
+      case constants.QUERY_TYPE.POSTGRE_QUERY.value: {
+        updatedMasterQuery = await QueryService.updatePGQuery({
+          queryID: parseInt(query_id),
+          queryTitle: title,
+          queryDescription: description,
+          query,
+          authorizedQueries: authorized_queries,
+        });
+        break;
+      }
+      default: {
+        updatedMasterQuery = await QueryService.updatePGQuery({
+          queryID: parseInt(query_id),
+          queryTitle: title,
+          queryDescription: description,
+          query,
+          authorizedQueries: authorized_queries,
+        });
+        break;
+      }
+    }
+
+    Logger.log("success", {
+      message: "queryController:updateQuery:success",
+      params: { pm_user_id, updatedMasterQuery },
+    });
+
+    return res.json({
+      success: true,
+      query: updatedMasterQuery,
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "queryController:updateQuery:catch-1",
       params: { error },
     });
     return res.json({ success: false, error: extractError(error) });
@@ -159,7 +244,7 @@ queryController.getQueryByID = async (req, res) => {
     });
 
     const query = await QueryService.getQueryByID({
-      queryID: query_id,
+      queryID: parseInt(query_id),
       authorizedQueries: authorized_queries,
     });
 
@@ -181,127 +266,44 @@ queryController.getQueryByID = async (req, res) => {
   }
 };
 
-// /**
-//  *
-//  * @param {import("express").Request} req
-//  * @param {import("express").Response} res
-//  * @returns
-//  */
-// queryController.addQuery = async (req, res) => {
-//   try {
-//     const { pmUser, state, body } = req;
-//     const pm_user_id = parseInt(pmUser.pm_user_id);
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @returns
+ */
+queryController.deleteQuery = async (req, res) => {
+  try {
+    const { pmUser, state, params } = req;
+    const query_id = parseInt(params.id);
+    const pm_user_id = parseInt(pmUser.pm_user_id);
+    const authorized_queries = state.authorized_queries;
 
-//     Logger.log("info", {
-//       message: "queryController:addQuery:params",
-//       params: { pm_user_id, body },
-//     });
+    Logger.log("info", {
+      message: "queryController:deleteQuery:params",
+      params: { pm_user_id, query_id },
+    });
 
-//     const query = await QueryService.addQuery({
-//       queryTitle: body.query_title,
-//       queryDescription: body.query_description,
-//       queryOptions: body.query_options,
-//     });
+    await QueryService.deleteQuery({
+      queryID: parseInt(query_id),
+      authorizedQueries: authorized_queries,
+    });
 
-//     Logger.log("success", {
-//       message: "queryController:addQuery:success",
-//       params: { pm_user_id, query },
-//     });
+    Logger.log("success", {
+      message: "queryController:deleteQuery:success",
+      params: { pm_user_id },
+    });
 
-//     return res.json({
-//       success: true,
-//       query,
-//     });
-//   } catch (error) {
-//     Logger.log("error", {
-//       message: "queryController:addQuery:catch-1",
-//       params: { error },
-//     });
-//     return res.json({ success: false, error: extractError(error) });
-//   }
-// };
-
-// /**
-//  *
-//  * @param {import("express").Request} req
-//  * @param {import("express").Response} res
-//  * @returns
-//  */
-// queryController.updateQuery = async (req, res) => {
-//   try {
-//     const { pmUser, state, body } = req;
-//     const pm_user_id = parseInt(pmUser.pm_user_id);
-//     const authorized_queries = state.authorized_queries;
-
-//     Logger.log("info", {
-//       message: "queryController:updateQuery:params",
-//       params: { pm_user_id, body },
-//     });
-
-//     const query = await QueryService.updateQuery({
-//       queryID: parseInt(body.pm_query_id),
-//       queryTitle: body.query_title,
-//       queryDescription: body.query_description,
-//       queryOptions: body.query_options,
-//       authorizedQueries: authorized_queries,
-//     });
-
-//     Logger.log("success", {
-//       message: "queryController:updateQuery:success",
-//       params: { pm_user_id, query },
-//     });
-
-//     return res.json({
-//       success: true,
-//       query,
-//     });
-//   } catch (error) {
-//     Logger.log("error", {
-//       message: "queryController:updateQuery:catch-1",
-//       params: { error },
-//     });
-//     return res.json({ success: false, error: extractError(error) });
-//   }
-// };
-
-// /**
-//  *
-//  * @param {import("express").Request} req
-//  * @param {import("express").Response} res
-//  * @returns
-//  */
-// queryController.deleteQuery = async (req, res) => {
-//   try {
-//     const { pmUser, state, params } = req;
-//     const pm_query_id = parseInt(params.id);
-//     const pm_user_id = parseInt(pmUser.pm_user_id);
-//     const authorized_queries = state.authorized_queries;
-
-//     Logger.log("info", {
-//       message: "queryController:deleteQuery:params",
-//       params: { pm_user_id, pm_query_id },
-//     });
-
-//     await QueryService.deleteQuery({
-//       queryID: pm_query_id,
-//       authorizedQueries: authorized_queries,
-//     });
-
-//     Logger.log("success", {
-//       message: "queryController:deleteQuery:success",
-//       params: { pm_user_id },
-//     });
-
-//     return res.json({
-//       success: true,
-//     });
-//   } catch (error) {
-//     Logger.log("error", {
-//       message: "queryController:deleteQuery:catch-1",
-//       params: { error },
-//     });
-//     return res.json({ success: false, error: extractError(error) });
-//   }
-// };
+    return res.json({
+      success: true,
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "queryController:deleteQuery:catch-1",
+      params: { error },
+    });
+    return res.json({ success: false, error: extractError(error) });
+  }
+};
 
 module.exports = { queryController };

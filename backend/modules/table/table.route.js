@@ -4,7 +4,7 @@ const tableController = require("./table.controller");
 const {
   tableAuthorizationMiddleware,
 } = require("./table.authorization.middleware");
-const { policyMiddleware } = require("../middlewares/policy.middleware");
+const { policyMiddleware } = require("../policies/policy.middleware");
 const router = express.Router();
 
 // get all data of table

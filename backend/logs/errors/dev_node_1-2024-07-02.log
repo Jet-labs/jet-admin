@@ -458,3 +458,9 @@
 [31merror[39m: dev_node_1: 02-07-2024 21:13:57: [31mqueryController:runPGQuery:catch-1[39m |====| {"error":{"name":"PrismaClientKnownRequestError","code":"P2010","clientVersion":"5.7.1","meta":{"code":"42601","message":"ERROR: syntax error at or near \"[\""}}}
 [31merror[39m: dev_node_1: 02-07-2024 21:17:40: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
 [31merror[39m: dev_node_1: 02-07-2024 21:17:40: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 02-07-2024 21:19:28: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 02-07-2024 21:19:28: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 02-07-2024 21:19:29: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 02-07-2024 21:19:29: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 02-07-2024 21:21:09: [31mQueryService:runPGQuery:catch-1[39m |====| {"error":{"name":"PrismaClientKnownRequestError","code":"P2010","clientVersion":"5.7.1","meta":{"code":"42601","message":"ERROR: syntax error at or near \"undefined\""}}}
+[31merror[39m: dev_node_1: 02-07-2024 21:21:09: [31mqueryController:runPGQuery:catch-1[39m |====| {"error":{"name":"PrismaClientKnownRequestError","code":"P2010","clientVersion":"5.7.1","meta":{"code":"42601","message":"ERROR: syntax error at or near \"undefined\""}}}

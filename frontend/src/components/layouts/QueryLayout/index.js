@@ -9,14 +9,14 @@ const UpdateQuery = lazy(() => import("../../../pages/UpdateQuery"));
 const QueryLayout = () => {
   return (
     <Grid container>
-      <Grid item xs={3} sm={3} md={3} lg={3} xl={2}>
+      <Grid item xs={3} sm={3} md={3} lg={2} xl={2}>
         <QueryDrawerList />
       </Grid>
       <Grid
         xs={9}
         sm={9}
         md={9}
-        lg={9}
+        lg={10}
         xl={10}
         className="!h-[calc(100vh-66px)] !overflow-y-auto"
       >

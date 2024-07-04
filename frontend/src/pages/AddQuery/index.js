@@ -14,11 +14,12 @@ import { PGSQLQueryBuilder } from "../../components/QueryBuilders/PGSQLQueryBuil
 import { LOCAL_CONSTANTS } from "../../constants";
 import "./style.css";
 import { addQueryAPI } from "../../api/queries";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { displayError, displaySuccess } from "../../utils/notification";
 
 const AddQuery = () => {
   const theme = useTheme();
+  const queryClient = useQueryClient();
   const queryBuilderForm = useFormik({
     initialValues: {
       title: "Untitled",
@@ -53,6 +54,7 @@ const AddQuery = () => {
     retry: false,
     onSuccess: (data) => {
       displaySuccess("Query added successfully");
+      queryClient.invalidateQueries(["REACT_QUERY_KEY_QUERIES"]);
     },
     onError: (error) => {
       displayError(error);
@@ -145,7 +147,7 @@ const AddQuery = () => {
               variant="contained"
               className="!ml-3"
               onClick={_addQuery}
-            >{`Save data source`}</Button>
+            >{`Save query`}</Button>
           </div>
         </Grid>
         <Grid

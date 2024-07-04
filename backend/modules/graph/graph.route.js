@@ -1,6 +1,6 @@
 const express = require("express");
 const { authMiddleware } = require("../auth/auth.middleware");
-const { policyMiddleware } = require("../middlewares/policy.middleware");
+const { policyMiddleware } = require("../policies/policy.middleware");
 const { graphController } = require("./graph.controller");
 const {
   graphAuthorizationMiddleware,

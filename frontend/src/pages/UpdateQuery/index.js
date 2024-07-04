@@ -18,14 +18,17 @@ import {
   getQueryByIDAPI,
   updateQueryAPI,
 } from "../../api/queries";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { displayError, displaySuccess } from "../../utils/notification";
 import { useParams } from "react-router-dom";
 import { PGSQLQueryEditor } from "../../components/QueryEditors/PGSQLQueryEditor";
+import { QueryDeletionForm } from "../../components/QueryDeletionForm";
+import { QueryDuplicateForm } from "../../components/QueryDuplicateForm";
 
 const UpdateQuery = () => {
   const { id } = useParams();
   const theme = useTheme();
+  const queryClient = useQueryClient();
   const {
     isLoading: isLoadingQueryData,
     data: queryData,
@@ -35,7 +38,7 @@ const UpdateQuery = () => {
     queryFn: () => getQueryByIDAPI({ queryID: id }),
     cacheTime: 0,
     retry: 1,
-    staleTime: Infinity,
+    staleTime: 0,
   });
 
   const queryBuilderForm = useFormik({
@@ -44,6 +47,7 @@ const UpdateQuery = () => {
       description: "",
       query_type: LOCAL_CONSTANTS.DATA_SOURCE_QUERY_TYPE.POSTGRE_QUERY.value,
       query: null,
+      query_id: parseInt(id),
     },
     validateOnMount: false,
     validateOnChange: false,
@@ -84,6 +88,7 @@ const UpdateQuery = () => {
     retry: false,
     onSuccess: (data) => {
       displaySuccess("Query updated successfully");
+      queryClient.invalidateQueries(["REACT_QUERY_KEY_QUERIES"]);
     },
     onError: (error) => {
       displayError(error);
@@ -178,6 +183,8 @@ const UpdateQuery = () => {
               className="!ml-3"
               onClick={_updateQuery}
             >{`Save query`}</Button>
+            <QueryDeletionForm queryID={id} />
+            <QueryDuplicateForm queryID={id} />
           </div>
         </Grid>
         <Grid

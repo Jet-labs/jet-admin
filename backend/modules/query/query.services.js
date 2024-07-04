@@ -25,7 +25,7 @@ class QueryService {
     try {
       const newPGSQLQuery = await prisma.tbl_pm_postgres_queries.create({
         data: {
-          pm_postgres_query: query,
+          pm_postgres_query: String(query.pm_postgres_query),
         },
       });
       const newMasterQuery = await prisma.tbl_pm_master_queries.create({
@@ -54,79 +54,149 @@ class QueryService {
     }
   };
 
-  // /**
-  //  *
-  //  * @param {object} param0
-  //  * @param {Number} param0.dashboardID
-  //  * @param {String} param0.dashboardTitle
-  //  * @param {String} param0.dashboardDescription
-  //  * @param {any} param0.dashboardOptions
-  //  * @param {Boolean|Array<Number>} param0.authorizedDashboards
-  //  * @returns {any|null}
-  //  */
-  // static updateDashboard = async ({
-  //   dashboardID,
-  //   dashboardTitle,
-  //   dashboardDescription,
-  //   dashboardOptions,
-  //   authorizedDashboards,
-  // }) => {
-  //   Logger.log("info", {
-  //     message: "DashboardService:updateDashboard:params",
-  //     params: {
-  //       dashboardID,
-  //       dashboardTitle,
-  //       dashboardDescription,
-  //       dashboardOptions,
-  //     },
-  //   });
-  //   try {
-  //     if (
-  //       authorizedDashboards === true ||
-  //       authorizedDashboards.includes(dashboardID)
-  //     ) {
-  //       const _graphIDs = [];
-  //       if (
-  //         dashboardOptions.graph_ids &&
-  //         Array.isArray(dashboardOptions.graph_ids)
-  //       ) {
-  //         dashboardOptions.graph_ids.forEach((graph)=>{
-  //           _graphIDs.push(graph.graphID)
-  //         })
-  //       }
-  //       const updatedDashboard = await prisma.tbl_pm_dashboards.update({
-  //         where: {
-  //           pm_dashboard_id: dashboardID,
-  //         },
-  //         data: {
-  //           dashboard_title: String(dashboardTitle),
-  //           dashboard_description: String(dashboardDescription),
-  //           dashboard_options: dashboardOptions,
-  //           dashboard_graph_ids: _graphIDs,
-  //         },
-  //       });
-  //       Logger.log("success", {
-  //         message: "DashboardService:updateDashboard:newDashboard",
-  //         params: {
-  //           updatedDashboard,
-  //         },
-  //       });
-  //       return updatedDashboard;
-  //     } else {
-  //       Logger.log("error", {
-  //         message: "DashboardService:updateDashboard:catch-2",
-  //         params: { error: constants.ERROR_CODES.PERMISSION_DENIED },
-  //       });
-  //       throw constants.ERROR_CODES.PERMISSION_DENIED;
-  //     }
-  //   } catch (error) {
-  //     Logger.log("error", {
-  //       message: "DashboardService:updateDashboard:catch-1",
-  //       params: { error },
-  //     });
-  //     throw error;
-  //   }
-  // };
+  /**
+   *
+   * @param {object} param0
+   * @param {String} param0.queryTitle
+   * @param {String} param0.queryType
+   * @param {String} param0.queryDescription
+   * @param {any} param0.query
+   * @returns {any|null}
+   */
+  static addQuery = async ({
+    queryTitle,
+    queryType,
+    queryDescription,
+    query,
+  }) => {
+    Logger.log("info", {
+      message: "DashboardService:addQuery:params",
+      params: {
+        queryTitle,
+        queryDescription,
+        queryType,
+        query,
+      },
+    });
+    try {
+      let newPGSQLQuery = null;
+      let newMasterQuery = null;
+      switch (queryType) {
+        case constants.QUERY_TYPE.POSTGRE_QUERY.value: {
+          newPGSQLQuery = await prisma.tbl_pm_postgres_queries.create({
+            data: {
+              pm_postgres_query: String(query.pm_postgres_query),
+            },
+          });
+          newMasterQuery = await prisma.tbl_pm_master_queries.create({
+            data: {
+              pm_query_id: newPGSQLQuery.pm_postgres_query_id,
+              pm_query_type: constants.QUERY_TYPE.POSTGRE_QUERY.value,
+              pm_master_query_title: queryTitle,
+              pm_master_query_description: queryDescription,
+            },
+          });
+          break;
+        }
+        default: {
+          newPGSQLQuery = await prisma.tbl_pm_postgres_queries.create({
+            data: {
+              pm_postgres_query: String(query.pm_postgres_query),
+            },
+          });
+          newMasterQuery = await prisma.tbl_pm_master_queries.create({
+            data: {
+              pm_query_id: newPGSQLQuery.pm_postgres_query_id,
+              pm_query_type: constants.QUERY_TYPE.POSTGRE_QUERY.value,
+              pm_master_query_title: queryTitle,
+              pm_master_query_description: queryDescription,
+            },
+          });
+          break;
+        }
+      }
+
+      Logger.log("success", {
+        message: "DashboardService:addQuery:newMasterQuery",
+        params: {
+          newPGSQLQuery,
+          newMasterQuery,
+        },
+      });
+      return newMasterQuery;
+    } catch (error) {
+      Logger.log("error", {
+        message: "DashboardService:addQuery:catch-1",
+        params: { error },
+      });
+      throw error;
+    }
+  };
+  /**
+   *
+   * @param {object} param0
+   * @param {Number} param0.queryID
+   * @param {String} param0.queryTitle
+   * @param {String} param0.queryDescription
+   * @param {any} param0.query
+   * @param {Boolean|Array<Number>} param0.authorizedQueries
+   * @returns {any|null}
+   */
+  static updatePGQuery = async ({
+    queryID,
+    queryTitle,
+    queryDescription,
+    query,
+    authorizedQueries,
+  }) => {
+    Logger.log("info", {
+      message: "DashboardService:updatePGQuery:params",
+      params: {
+        queryID,
+        queryTitle,
+        queryDescription,
+        query,
+      },
+    });
+    try {
+      if (authorizedQueries === true || authorizedQueries.includes(queryID)) {
+        const updatedMasterQuery = await prisma.tbl_pm_master_queries.update({
+          where: { pm_master_query_id: queryID },
+          data: {
+            pm_master_query_title: queryTitle,
+            pm_master_query_description: queryDescription,
+          },
+        });
+        const updatedPGSQLQuery = await prisma.tbl_pm_postgres_queries.update({
+          where: { pm_postgres_query_id: updatedMasterQuery.pm_query_id },
+          data: {
+            pm_postgres_query: String(query.pm_postgres_query),
+          },
+        });
+
+        Logger.log("success", {
+          message: "DashboardService:updatePGQuery:newMasterQuery",
+          params: {
+            updatedMasterQuery,
+            updatedPGSQLQuery,
+          },
+        });
+        return updatedMasterQuery;
+      } else {
+        Logger.log("error", {
+          message: "DashboardService:updatePGQuery:catch-2",
+          params: { error: constants.ERROR_CODES.PERMISSION_DENIED },
+        });
+        throw constants.ERROR_CODES.PERMISSION_DENIED;
+      }
+    } catch (error) {
+      Logger.log("error", {
+        message: "DashboardService:updatePGQuery:catch-1",
+        params: { error },
+      });
+      throw error;
+    }
+  };
 
   /**
    *
@@ -298,101 +368,99 @@ class QueryService {
     }
   };
 
-  // /**
-  //  *
-  //  * @param {object} param0
-  //  * @param {Number} param0.dashboardID
-  //  * @param {Boolean|Array<Number>} param0.authorizedDashboards
-  //  * @returns {any|null}
-  //  */
-  // static getDashboardByID = async ({ dashboardID, authorizedDashboards }) => {
-  //   Logger.log("info", {
-  //     message: "DashboardService:getDashboardByID:params",
-  //     params: {
-  //       dashboardID,
-  //       authorizedDashboards,
-  //     },
-  //   });
-  //   try {
-  //     if (
-  //       authorizedDashboards === true ||
-  //       authorizedDashboards.includes(dashboardID)
-  //     ) {
-  //       const dashboard = await prisma.tbl_pm_dashboards.findUnique({
-  //         where: {
-  //           pm_dashboard_id: dashboardID,
-  //         },
-  //       });
-  //       Logger.log("info", {
-  //         message: "DashboardService:getDashboardByID:dashboard",
-  //         params: {
-  //           dashboard,
-  //         },
-  //       });
-  //       return dashboard;
-  //     } else {
-  //       Logger.log("error", {
-  //         message: "DashboardService:getDashboardByID:catch-2",
-  //         params: { error: constants.ERROR_CODES.PERMISSION_DENIED },
-  //       });
-  //       throw constants.ERROR_CODES.PERMISSION_DENIED;
-  //     }
-  //   } catch (error) {
-  //     Logger.log("error", {
-  //       message: "DashboardService:getDashboardByID:catch-1",
-  //       params: { error },
-  //     });
-  //     throw error;
-  //   }
-  // };
+  /**
+   *
+   * @param {object} param0
+   * @param {Number} param0.queryID
+   * @param {Boolean|Array<Number>} param0.authorizedQueries
+   * @returns {any|null}
+   */
+  static deleteQuery = async ({ queryID, authorizedQueries }) => {
+    Logger.log("info", {
+      message: "DashboardService:deleteQuery:params",
+      params: {
+        queryID,
+      },
+    });
+    try {
+      if (authorizedQueries === true || authorizedQueries.includes(queryID)) {
+        const deletedMasterQuery = await prisma.tbl_pm_master_queries.delete({
+          where: { pm_master_query_id: queryID },
+        });
+        let deleteChildQuery = null;
+        switch (deletedMasterQuery.pm_query_type) {
+          case constants.QUERY_TYPE.POSTGRE_QUERY.value: {
+            const deleteChildQuery =
+              await prisma.tbl_pm_postgres_queries.delete({
+                where: { pm_postgres_query_id: deletedMasterQuery.pm_query_id },
+              });
+            break;
+          }
+          default: {
+            const deleteChildQuery =
+              await prisma.tbl_pm_postgres_queries.delete({
+                where: { pm_postgres_query_id: deletedMasterQuery.pm_query_id },
+              });
+            break;
+          }
+        }
 
-  // /**
-  //  *
-  //  * @param {object} param0
-  //  * @param {Number} param0.dashboardID
-  //  * @param {Boolean|Array<Number>} param0.authorizedDashboards
-  //  * @returns {any|null}
-  //  */
-  // static deleteDashboard = async ({ dashboardID, authorizedDashboards }) => {
-  //   Logger.log("info", {
-  //     message: "DashboardService:deleteDashboard:params",
-  //     params: {
-  //       dashboardID,
-  //       authorizedDashboards,
-  //     },
-  //   });
-  //   try {
-  //     if (
-  //       authorizedDashboards === true ||
-  //       authorizedDashboards.includes(dashboardID)
-  //     ) {
-  //       const dashboard = await prisma.tbl_pm_dashboards.delete({
-  //         where: {
-  //           pm_dashboard_id: dashboardID,
-  //         },
-  //       });
-  //       Logger.log("info", {
-  //         message: "DashboardService:deleteDashboard:dashboard",
-  //         params: {
-  //           dashboard,
-  //         },
-  //       });
-  //       return true;
-  //     } else {
-  //       Logger.log("error", {
-  //         message: "DashboardService:deleteDashboard:catch-2",
-  //         params: { error: constants.ERROR_CODES.PERMISSION_DENIED },
-  //       });
-  //       throw constants.ERROR_CODES.PERMISSION_DENIED;
-  //     }
-  //   } catch (error) {
-  //     Logger.log("error", {
-  //       message: "DashboardService:deleteDashboard:catch-1",
-  //       params: { error },
-  //     });
-  //     throw error;
-  //   }
-  // };
+        Logger.log("success", {
+          message: "DashboardService:deleteQuery:newMasterQuery",
+          params: {
+            deletedMasterQuery,
+            deleteChildQuery,
+          },
+        });
+        return true;
+      } else {
+        Logger.log("error", {
+          message: "DashboardService:deleteQuery:catch-2",
+          params: { error: constants.ERROR_CODES.PERMISSION_DENIED },
+        });
+        throw constants.ERROR_CODES.PERMISSION_DENIED;
+      }
+    } catch (error) {
+      Logger.log("error", {
+        message: "DashboardService:deleteQuery:catch-1",
+        params: { error },
+      });
+      throw error;
+    }
+  };
+
+  /**
+   *
+   * @param {object} param0
+   * @param {Number} param0.queryID
+   * @returns {any|null}
+   */
+  static duplicateQuery = async ({ queryID }) => {
+    Logger.log("info", {
+      message: "DashboardService:duplicateQuery:params",
+      params: {
+        queryID,
+      },
+    });
+    try {
+      const masterQuery = await this.getQueryByID({
+        queryID,
+        authorizedQueries: true,
+      });
+      return await this.addQuery({
+        query: masterQuery.query,
+        queryType: masterQuery.pm_query_type,
+        queryTitle: `${masterQuery.pm_master_query_title} copy`,
+        queryDescription: masterQuery.pm_master_query_description,
+      });
+    } catch (error) {
+      Logger.log("error", {
+        message: "DashboardService:duplicateQuery:catch-1",
+        params: { error },
+      });
+      throw error;
+    }
+  };
 }
 
 module.exports = { QueryService };

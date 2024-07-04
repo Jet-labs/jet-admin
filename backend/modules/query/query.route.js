@@ -1,6 +1,6 @@
 const express = require("express");
 const { authMiddleware } = require("../auth/auth.middleware");
-const { policyMiddleware } = require("../middlewares/policy.middleware");
+const { policyMiddleware } = require("../policies/policy.middleware");
 const { queryController } = require("./query.controller");
 const {
   queryAuthorizationMiddleware,
@@ -22,6 +22,13 @@ router.post(
   // queryAuthorizationMiddleware.populateAuthorizedQueriesForRead,
   queryController.runPGQuery
 );
+router.post(
+  "/duplicate",
+  authMiddleware.authProvider,
+  policyMiddleware.populateAuthorizationPolicies,
+  queryAuthorizationMiddleware.populateAuthorizationForQueryAddition,
+  queryController.duplicateQuery
+);
 router.get(
   "/:id",
   authMiddleware.authProvider,
@@ -36,20 +43,20 @@ router.post(
   queryAuthorizationMiddleware.populateAuthorizationForQueryAddition,
   queryController.addQuery
 );
-// router.put(
-//   "/",
-//   authMiddleware.authProvider,
-//   policyMiddleware.populateAuthorizationPolicies,
-//   queryAuthorizationMiddleware.populateAuthorizedQueriesForUpdate,
-//   queryController.updateQuery
-// );
+router.put(
+  "/",
+  authMiddleware.authProvider,
+  policyMiddleware.populateAuthorizationPolicies,
+  queryAuthorizationMiddleware.populateAuthorizedQueriesForUpdate,
+  queryController.updateQuery
+);
 
-// router.delete(
-//   "/:id",
-//   authMiddleware.authProvider,
-//   policyMiddleware.populateAuthorizationPolicies,
-//   queryAuthorizationMiddleware.populateAuthorizedQueriesForDelete,
-//   queryController.deleteQuery
-// );
+router.delete(
+  "/:id",
+  authMiddleware.authProvider,
+  policyMiddleware.populateAuthorizationPolicies,
+  queryAuthorizationMiddleware.populateAuthorizedQueriesForDelete,
+  queryController.deleteQuery
+);
 
 module.exports = router;

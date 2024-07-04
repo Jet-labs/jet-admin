@@ -40,6 +40,9 @@ export class PMUser {
     }
     return false;
   };
+
+  // tables
+
   extractAuthorizedColumnsForEditFromPolicyObject = (tableName) => {
     let authorized_columns;
 
@@ -89,40 +92,6 @@ export class PMUser {
     return authorized_columns;
   };
 
-  extractAuthorizedActionEntities = () => {
-    try {
-      const entities = this.policy ? this.policy.actions : {};
-      return entities;
-    } catch {
-      return {};
-    }
-  };
-
-  extractAuthorizedActions = (actionEntity) => {
-    try {
-      const entities = this.policy ? this.policy.actions : {};
-      if (
-        entities &&
-        entities[actionEntity] &&
-        entities[actionEntity].actions &&
-        entities[actionEntity].actions != false
-      ) {
-        const actions = Object.keys(entities[actionEntity].actions).map(
-          (action) => {
-            return entities[actionEntity].actions[action] == true
-              ? action
-              : null;
-          }
-        );
-        return actions;
-      } else {
-        return [];
-      }
-    } catch (error) {
-      return [];
-    }
-  };
-
   extractAuthorizationForRowAdditionFromPolicyObject = (tableName) => {
     let authorization;
 
@@ -156,6 +125,8 @@ export class PMUser {
     }
     return authorization;
   };
+
+  // graphs
 
   extractAuthorizedGraphsForReadFromPolicyObject = () => {
     const authorizeGraphIDs = [];
@@ -192,37 +163,26 @@ export class PMUser {
     }
     return false;
   };
-  extractAuthorizedGraphsForReadFromPolicyObject = () => {
-    const authorizeGraphIDs = [];
-    if (this.policy.dashboards.read) {
-      return true;
-    } else if (this.policy.dashboards && this.policy.dashboards.dashboard_ids) {
-      Object.keys(this.policy.dashboards.dashboard_ids).forEach(
-        (dashboardID) => {
-          if (this.policy.dashboards.dashboard_ids[dashboardID].read) {
-            authorizeGraphIDs.push(parseInt(dashboardID));
-          }
-        }
-      );
+
+  isAuthorizedToDeleteGraph = (graphID) => {
+    let authorization = false;
+    if (
+      this.policy.graphs &&
+      !(
+        this.policy.graphs.delete === null ||
+        this.policy.graphs.delete === undefined
+      )
+    ) {
+      authorization = this.policy.graphs.delete;
+    } else if (this.policy.graphs && this.policy.graphs.graph_ids) {
+      if (this.policy.graphs.graph_ids[graphID]) {
+        authorization = Boolean(this.policy.graphs.graph_ids[graphID].delete);
+      }
     }
-    return authorizeGraphIDs;
+    return authorization;
   };
 
-  extractAuthorizedGraphsForUpdateFromPolicyObject = () => {
-    const authorizeGraphIDs = [];
-    if (this.policy.dashboards.edit) {
-      return true;
-    } else if (this.policy.dashboards && this.policy.dashboards.dashboard_ids) {
-      Object.keys(this.policy.dashboards.dashboard_ids).forEach(
-        (dashboardID) => {
-          if (this.policy.dashboards.dashboard_ids[dashboardID].edit) {
-            authorizeGraphIDs.push(parseInt(dashboardID));
-          }
-        }
-      );
-    }
-    return authorizeGraphIDs;
-  };
+  // dashboards
 
   extractAuthorizationForDashboardAddFromPolicyObject = () => {
     console.log(this.policy.dashboards);
@@ -231,6 +191,7 @@ export class PMUser {
     }
     return false;
   };
+
   extractAuthorizedDashboardsForReadFromPolicyObject = () => {
     const authorizeDashboardIDs = [];
     if (this.policy.dashboards.read) {
@@ -263,21 +224,36 @@ export class PMUser {
     return authorizeDashboardIDs;
   };
 
-  extractAuthorizationForDashboardAddFromPolicyObject = () => {
-    console.log(this.policy.dashboards);
-    if (this.policy.dashboards.add) {
-      return true;
+  isAuthorizedToDeleteDashboard = (dashboardID) => {
+    let authorization = false;
+    if (
+      this.policy.dashboards &&
+      !(
+        this.policy.dashboards.delete === null ||
+        this.policy.dashboards.delete === undefined
+      )
+    ) {
+      authorization = this.policy.dashboards.delete;
+    } else if (this.policy.dashboards && this.policy.dashboards.dashboard_ids) {
+      if (this.policy.dashboards.dashboard_ids[dashboardID]) {
+        authorization = Boolean(
+          this.policy.dashboards.dashboard_ids[dashboardID].delete
+        );
+      }
     }
-    return false;
+    return authorization;
   };
 
-  extractAuthorizationForQueryAddFromPolicyObject = () => {
+  // queries
+
+  isAuthorizedToAddQuery = () => {
     console.log(this.policy.queries);
     if (this.policy.queries?.add) {
       return true;
     }
     return false;
   };
+
   extractAuthorizedQueriesForReadFromPolicyObject = () => {
     const authorizeQueryIDs = [];
     if (this.policy.queries.read) {
@@ -304,5 +280,25 @@ export class PMUser {
       });
     }
     return authorizeQueryIDs;
+  };
+
+  isAuthorizedToDeleteQuery = (queryID) => {
+    let authorization = false;
+    console.log(this.policy.queries);
+    if (
+      this.policy.queries &&
+      !(
+        this.policy.queries.delete === null ||
+        this.policy.queries.delete === undefined
+      )
+    ) {
+      authorization = this.policy.queries.delete;
+    } else if (this.policy.queries && this.policy.queries.query_ids) {
+      if (this.policy.queries.query_ids[queryID]) {
+        authorization = Boolean(this.policy.queries.query_ids[queryID].delete);
+      }
+    }
+    console.log({ authorization });
+    return authorization;
   };
 }

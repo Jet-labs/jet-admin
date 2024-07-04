@@ -10,7 +10,7 @@ expressApp.use("/admin_api/auth", require("./modules/auth/auth.route"));
 
 expressApp.use(
   "/admin_api/constants",
-  require("./modules/routes/constants.route")
+  require("./modules/constants/constants.route")
 );
 
 expressApp.use("/admin_api/tables", require("./modules/table/table.route"));
