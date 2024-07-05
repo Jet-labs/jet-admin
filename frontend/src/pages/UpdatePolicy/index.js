@@ -28,11 +28,6 @@ const TablePolicyEditor = ({ value, handleChange }) => {
   const { dbModel } = useConstants();
 
   return dbModel?.map((tableProperty) => {
-    console.log(
-      value[tableProperty.name],
-      tableProperty.name,
-      typeof value[tableProperty.name] == "boolean"
-    );
     if (
       value[tableProperty.name] != undefined &&
       value[tableProperty.name] != null
@@ -75,6 +70,9 @@ const TablePolicyEditor = ({ value, handleChange }) => {
             required={true}
             customMapping={null}
             language={"json"}
+            customLabel={
+              <span className="!font-bold !mb-1">{tableProperty.name}</span>
+            }
           />
         );
       }
@@ -110,7 +108,7 @@ const CRUDPermissionCheckboxGroup = ({ label, value, handleChange }) => {
             xl={2}
             className="!flex !justify-start !items-center !flex-row"
           >
-            <label>{_value}</label>
+            <label className="!capitalize">{_value}</label>
             <Checkbox
               checked={Boolean(value[_value])}
               onChange={(e) => {
@@ -158,6 +156,9 @@ const GUIPolicyEditor = ({ policy, handleOnPolicyChange }) => {
               required={true}
               customMapping={null}
               language={"json"}
+              customLabel={
+                <span className="!font-bold !mb-1">{capitalize(key)}</span>
+              }
             />
           );
         }

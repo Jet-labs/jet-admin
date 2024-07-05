@@ -15,7 +15,7 @@ import {
   StaticDateTimePicker,
 } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
-import { isNull } from "lodash";
+import { capitalize, isNull, lowerCase } from "lodash";
 import moment from "moment";
 import { LOCAL_CONSTANTS } from "../../constants";
 import { CodeEditor } from "../CodeEditorComponent";
@@ -38,6 +38,7 @@ export const FieldComponent = ({
   setFieldValue,
   showDefault,
   language,
+  customLabel,
 }) => {
   const theme = useTheme();
   const CustomDateTimePicker = styled(
@@ -47,9 +48,7 @@ export const FieldComponent = ({
       padding: "8.5px 14px",
     },
   }));
-  const label = name
-    ? String(name).charAt(0).toUpperCase() + String(name).slice(1)
-    : null;
+  const label = lowerCase(name);
   let component = null;
   switch (type) {
     case LOCAL_CONSTANTS.DATA_TYPES.STRING: {
@@ -59,9 +58,9 @@ export const FieldComponent = ({
           className="!flex !flex-col !justify-start !items-start"
           size="small"
         >
-          {label && (
-            <span className="text-xs font-light mb-1 !lowercase">{label}</span>
-          )}
+          {customLabel
+            ? customLabel
+            : label && <span className="text-xs font-light mb-1">{label}</span>}
           <TextField
             disabled={readOnly}
             required={required}
@@ -88,9 +87,9 @@ export const FieldComponent = ({
           className="!flex !flex-col !justify-start !items-start"
           size="small"
         >
-          {label && (
-            <span className="text-xs font-light mb-1 !lowercase">{label}</span>
-          )}
+          {customLabel
+            ? customLabel
+            : label && <span className="text-xs font-light mb-1">{label}</span>}
           <TextField
             disabled={readOnly}
             required={required}
@@ -117,9 +116,9 @@ export const FieldComponent = ({
           className="!flex !flex-col !justify-start !items-start"
           size="small"
         >
-          {label && (
-            <span className="text-xs font-light mb-1 !lowercase">{label}</span>
-          )}
+          {customLabel
+            ? customLabel
+            : label && <span className="text-xs font-light mb-1">{label}</span>}
           <CodeEditor
             disabled={readOnly}
             required={required}
@@ -147,9 +146,9 @@ export const FieldComponent = ({
     case LOCAL_CONSTANTS.DATA_TYPES.SINGLE_SELECT: {
       component = (
         <FormControl fullWidth size="small">
-          {label && (
-            <span className="text-xs font-light  !lowercase mb-1">{label}</span>
-          )}
+          {customLabel
+            ? customLabel
+            : label && <span className="text-xs font-light mb-1">{label}</span>}
 
           <Select
             id={name}
@@ -177,9 +176,9 @@ export const FieldComponent = ({
     case LOCAL_CONSTANTS.DATA_TYPES.MULTIPLE_SELECT: {
       component = (
         <FormControl fullWidth size="small">
-          {label && (
-            <span className="text-xs font-light  !lowercase mb-1">{label}</span>
-          )}
+          {customLabel
+            ? customLabel
+            : label && <span className="text-xs font-light mb-1">{label}</span>}
           <Select
             id={name}
             multiple
@@ -235,9 +234,9 @@ export const FieldComponent = ({
           className="!flex !flex-col !justify-start !items-start"
           size="small"
         >
-          {label && (
-            <span className="text-xs font-light  !lowercase mb-1">{label}</span>
-          )}
+          {customLabel
+            ? customLabel
+            : label && <span className="text-xs font-light mb-1">{label}</span>}
           <Select
             id={name}
             name={name}
@@ -276,7 +275,9 @@ export const FieldComponent = ({
           className="!flex !flex-col !justify-start !items-start !w-full"
           size="small"
         >
-          <span className="text-xs font-light  !lowercase mb-1">{label}</span>
+          {customLabel
+            ? customLabel
+            : label && <span className="text-xs font-light mb-1">{label}</span>}
           <LocalizationProvider dateAdapter={AdapterMoment}>
             <CustomDateTimePicker
               name={name}
@@ -297,9 +298,9 @@ export const FieldComponent = ({
     case LOCAL_CONSTANTS.DATA_TYPES.JSON: {
       component = (
         <FormControl fullWidth size="small">
-          {label && (
-            <span className="text-xs font-light  !lowercase mb-1">{label}</span>
-          )}
+          {customLabel
+            ? customLabel
+            : label && <span className="text-xs font-light mb-1">{label}</span>}
           <CodeEditor
             disabled={readOnly}
             required={required}
@@ -335,7 +336,9 @@ export const FieldComponent = ({
           className="!flex !flex-col !justify-start !items-start"
           size="small"
         >
-          <span className="text-xs font-light  !lowercase mb-1">{label}</span>
+          {customLabel
+            ? customLabel
+            : label && <span className="text-xs font-light mb-1">{label}</span>}
           <Select
             name={name}
             onChange={onChange}
@@ -365,7 +368,9 @@ export const FieldComponent = ({
           className="!flex !flex-col !justify-start !items-start"
           size="small"
         >
-          <span className="text-xs font-light  !lowercase mb-1">{label}</span>
+          {customLabel
+            ? customLabel
+            : label && <span className="text-xs font-light mb-1">{label}</span>}
           <TextField
             required={required}
             fullWidth
@@ -392,7 +397,9 @@ export const FieldComponent = ({
           className="!flex !flex-col !justify-start !items-start"
           size="small"
         >
-          <span className="text-xs font-light  !lowercase mb-1">{label}</span>
+          {customLabel
+            ? customLabel
+            : label && <span className="text-xs font-light mb-1">{label}</span>}
           <Select
             name={name}
             onChange={onChange}
@@ -422,7 +429,9 @@ export const FieldComponent = ({
           className="!flex !flex-col !justify-start !items-start"
           size="small"
         >
-          <span className="text-xs font-light  !lowercase mb-1">{label}</span>
+          {customLabel
+            ? customLabel
+            : label && <span className="text-xs font-light mb-1">{label}</span>}
           <TextField
             required={required}
             fullWidth
@@ -449,7 +458,9 @@ export const FieldComponent = ({
           className="!flex !flex-col !justify-start !items-start"
           size="small"
         >
-          <span className="text-xs font-light  !lowercase mb-1">{label}</span>
+          {customLabel
+            ? customLabel
+            : label && <span className="text-xs font-light mb-1">{label}</span>}
           <Select
             name={name}
             onChange={onChange}
@@ -479,7 +490,9 @@ export const FieldComponent = ({
           className="!flex !flex-col !justify-start !items-start"
           size="small"
         >
-          <span className="text-xs font-light  !lowercase mb-1">{label}</span>
+          {customLabel
+            ? customLabel
+            : label && <span className="text-xs font-light mb-1">{label}</span>}
           <TextField
             required={required}
             fullWidth
@@ -502,9 +515,9 @@ export const FieldComponent = ({
     default: {
       component = showDefault ? (
         <FormControl fullWidth size="small">
-          {label && (
-            <span className="text-xs font-light  !lowercase mb-1">{label}</span>
-          )}
+          {customLabel
+            ? customLabel
+            : label && <span className="text-xs font-light mb-1">{label}</span>}
           <CodeEditor
             disabled={readOnly}
             required={required}
