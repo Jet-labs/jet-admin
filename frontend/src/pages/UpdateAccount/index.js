@@ -14,7 +14,7 @@ import { Loading } from "../Loading";
 import { useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
 
-const AccountSettings = () => {
+const UpdateAccount = () => {
   const tableName = LOCAL_CONSTANTS.STRINGS.PM_USER_TABLE_NAME;
   const { id } = useParams();
   const queryClient = new QueryClient();
@@ -111,8 +111,7 @@ const AccountSettings = () => {
     }
   }, [policyObjectData]);
 
-  useEffect(() => {
-  }, [customPolicyObjectMapping]);
+  useEffect(() => {}, [customPolicyObjectMapping]);
 
   return !isLoadingPMUserData && !isLoadingPolicyObjectData && pmUserData ? (
     <div className="flex flex-col justify-start items-center w-full pb-5 p-2">
@@ -189,4 +188,4 @@ const AccountSettings = () => {
   );
 };
 
-export default AccountSettings;
+export default UpdateAccount;

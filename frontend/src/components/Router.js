@@ -13,11 +13,11 @@ import ProtectedRoute from "./ProtectedRoute";
 import { lazy } from "react";
 import SignIn from "../pages/SignIn";
 
-const PolicyManagement = lazy(() => import("../pages/PolicyManagement"));
-const PolicySettings = lazy(() => import("../pages/PolicySettings"));
+const AllPolicies = lazy(() => import("../pages/AllPolicies"));
+const UpdatePolicy = lazy(() => import("../pages/UpdatePolicy"));
 const AddPolicy = lazy(() => import("../pages/AddPolicy"));
-const AccountManagement = lazy(() => import("../pages/AccountManagement"));
-const AccountSettings = lazy(() => import("../pages/AccountSettings"));
+const AllAccounts = lazy(() => import("../pages/AllAccounts"));
+const UpdateAccount = lazy(() => import("../pages/UpdateAccount"));
 const AddAccount = lazy(() => import("../pages/AddAccount"));
 const TableLayout = lazy(() => import("./Layouts/TableLayout"));
 const GraphLayout = lazy(() => import("./Layouts/GraphLayout"));
@@ -96,7 +96,7 @@ const AppRouter = ({}) => {
               index
               element={
                 <ProtectedRoute
-                  successComponent={PolicyManagement}
+                  successComponent={AllPolicies}
                   fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
                   loadingComponent={() => <Loading fullScreen />}
                 />
@@ -106,7 +106,7 @@ const AppRouter = ({}) => {
               path={LOCAL_CONSTANTS.ROUTES.POLICY_SETTINGS.code}
               element={
                 <ProtectedRoute
-                  successComponent={PolicySettings}
+                  successComponent={UpdatePolicy}
                   fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
                   loadingComponent={() => <Loading fullScreen />}
                 />
@@ -129,7 +129,7 @@ const AppRouter = ({}) => {
               index
               element={
                 <ProtectedRoute
-                  successComponent={AccountManagement}
+                  successComponent={AllAccounts}
                   fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
                   loadingComponent={() => <Loading fullScreen />}
                 />
@@ -139,7 +139,7 @@ const AppRouter = ({}) => {
               path={LOCAL_CONSTANTS.ROUTES.ACCOUNT_SETTINGS.code}
               element={
                 <ProtectedRoute
-                  successComponent={AccountSettings}
+                  successComponent={UpdateAccount}
                   fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
                   loadingComponent={() => <Loading fullScreen />}
                 />

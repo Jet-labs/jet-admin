@@ -1,11 +1,11 @@
 import { useNavigate } from "react-router-dom";
+import { useAuthState } from "../../contexts/authContext";
 
 import { Chip, Pagination } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { fetchAllRowsAPI } from "../../api/tables";
-import { useAuthState } from "../../contexts/authContext";
 
 import { LOCAL_CONSTANTS } from "../../constants";
 import { useConstants } from "../../contexts/constantsContext";
@@ -17,8 +17,9 @@ import { BiCalendar } from "react-icons/bi";
 import { DataGridActionComponent } from "../../components/DataGridActionComponent";
 import { ErrorComponent } from "../../components/ErrorComponent";
 import { RawDataGridStatistics } from "../../components/RawDataGridStatistics";
-const AccountManagement = () => {
-  const tableName = LOCAL_CONSTANTS.STRINGS.PM_USER_TABLE_NAME;
+
+const AllPolicies = () => {
+  const tableName = LOCAL_CONSTANTS.STRINGS.POLICY_OBJECT_TABLE_NAME;
 
   const { pmUser } = useAuthState();
   const navigate = useNavigate();
@@ -26,13 +27,13 @@ const AccountManagement = () => {
   const [filterQuery, setFilterQuery] = useState(null);
   const [sortModel, setSortModel] = useState(null);
   const {
-    isLoading: isLoadingAllAccounts,
+    isLoading: isLoadingAllPolicies,
     data: data,
-    isError: isLoadAllAccountsError,
-    error: loadAllAccountsError,
-    isFetching: isFetchingAllAllAccounts,
-    isPreviousData: isPreviousAllAccountsData,
-    refetch: reloadAllAccounts,
+    isError: isLoadAllPoliciesError,
+    error: loadAllPoliciesError,
+    isFetching: isFetchingAllAllPolicies,
+    isPreviousData: isPreviousAllPoliciesData,
+    refetch: reloadAllPolicies,
   } = useQuery({
     queryKey: [
       `REACT_QUERY_KEY_TABLES_${String(tableName).toUpperCase()}`,
@@ -56,28 +57,13 @@ const AccountManagement = () => {
   });
 
   const getRowId = (row) => {
-    return row.pm_user_id;
+    return row.pm_policy_object_id;
   };
 
   const columns = [
-    { field: "pm_user_id", headerName: "User ID" },
-    { field: "username", headerName: "Username", width: 200 },
-    {
-      field: "tbl_pm_policy_objects",
-      headerName: "Role",
-      width: 200,
-      valueGetter: (value, row) => {
-        return value.value.title;
-      },
-      renderCell: (params) => (
-        <Chip
-          label={`${params.value}`}
-          size="small"
-          variant="outlined"
-          color={"info"}
-        />
-      ),
-    },
+    { field: "pm_policy_object_id", headerName: "User ID" },
+    { field: "title", headerName: "Title", width: 200 },
+    { field: "description", headerName: "Description", width: 200 },
     {
       field: "created_at",
       headerName: "Created at",
@@ -128,27 +114,26 @@ const AccountManagement = () => {
       <div className={`!w-full !p-4`}>
         <RawDataGridStatistics
           tableName={tableName}
-          altTableName={"Account management"}
+          altTableName={"Policy management"}
           filterQuery={filterQuery}
         />
         <DataGridActionComponent
           filterQuery={filterQuery}
           setFilterQuery={setFilterQuery}
-          reloadData={reloadAllAccounts}
+          reloadData={reloadAllPolicies}
           tableName={tableName}
           setSortModel={setSortModel}
           sortModel={sortModel}
-          addRowNavigation={LOCAL_CONSTANTS.ROUTES.ADD_ACCOUNT.path()}
-          allowAdd={true}
+          addRowNavigation={LOCAL_CONSTANTS.ROUTES.ADD_POLICY.path()}
         />
       </div>
-      {isLoadingAllAccounts ? (
+      {isLoadingAllPolicies ? (
         <Loading />
       ) : data?.rows && pmUser ? (
         <div className="px-4">
           <DataGrid
             rows={data.rows}
-            loading={isLoadingAllAccounts || isFetchingAllAllAccounts}
+            loading={isLoadingAllPolicies || isFetchingAllAllPolicies}
             columns={columns}
             initialState={{}}
             editMode="row"
@@ -160,9 +145,9 @@ const AccountManagement = () => {
             hideFooter={true}
             onRowClick={(param) => {
               navigate(
-                LOCAL_CONSTANTS.ROUTES.ACCOUNT_SETTINGS.path(
+                LOCAL_CONSTANTS.ROUTES.POLICY_SETTINGS.path(
                   JSON.stringify({
-                    pm_user_id: param.row.pm_user_id,
+                    pm_policy_object_id: param.row.pm_policy_object_id,
                   })
                 )
               );
@@ -192,7 +177,7 @@ const AccountManagement = () => {
         <div className="!w-full !p-4">
           <ErrorComponent
             error={
-              loadAllAccountsError || LOCAL_CONSTANTS.ERROR_CODES.SERVER_ERROR
+              loadAllPoliciesError || LOCAL_CONSTANTS.ERROR_CODES.SERVER_ERROR
             }
           />
         </div>
@@ -201,4 +186,4 @@ const AccountManagement = () => {
   );
 };
 
-export default AccountManagement;
+export default AllPolicies;
