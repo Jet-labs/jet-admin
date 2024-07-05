@@ -29,53 +29,67 @@ const TablePolicyEditor = ({ value, handleChange }) => {
 
   return dbModel?.map((tableProperty) => {
     if (
-      value[tableProperty.name] != undefined &&
-      value[tableProperty.name] != null
+      value[tableProperty.name] == undefined ||
+      value[tableProperty.name] == null
     ) {
-      if (typeof value[tableProperty.name] === "boolean") {
-        return (
-          <CRUDPermissionCheckboxGroup
-            label={capitalize(tableProperty.name)}
-            value={
-              value[tableProperty.name]
-                ? { add: true, edit: true, read: true, delete: true }
-                : { add: false, edit: false, read: false, delete: false }
-            }
-            handleChange={() => {}}
-          />
-        );
-      } else if (
-        containsOnly(
-          ["add", "edit", "read", "delete"],
-          Object.keys(value[tableProperty.name])
-        )
-      ) {
-        return (
-          <CRUDPermissionCheckboxGroup
-            label={capitalize(tableProperty.name)}
-            value={value[tableProperty.name]}
-            handleChange={() => {}}
-          />
-        );
-      } else {
-        return (
-          <FieldComponent
-            type={LOCAL_CONSTANTS.DATA_TYPES.JSON}
-            name={tableProperty.name}
-            value={value[tableProperty.name]}
-            // onChange={policyObjectUpdateForm.handleChange}
-            // setFieldValue={policyObjectUpdateForm.setFieldValue}
-            // helperText={policyObjectUpdateForm.errors["policy"]}
-            // error={Boolean(policyObjectUpdateForm.errors["policy"])}
-            required={true}
-            customMapping={null}
-            language={"json"}
-            customLabel={
-              <span className="!font-bold !mb-1">{tableProperty.name}</span>
-            }
-          />
-        );
-      }
+      return (
+        <CRUDPermissionCheckboxGroup
+          label={capitalize(tableProperty.name)}
+          value={
+            value[tableProperty.name]
+              ? { add: true, edit: true, read: true, delete: true }
+              : { add: false, edit: false, read: false, delete: false }
+          }
+          handleChange={() => {}}
+        />
+      );
+    } else if (
+      value[tableProperty.name] != undefined &&
+      value[tableProperty.name] != null &&
+      typeof value[tableProperty.name] === "boolean"
+    ) {
+      return (
+        <CRUDPermissionCheckboxGroup
+          label={capitalize(tableProperty.name)}
+          value={
+            value[tableProperty.name]
+              ? { add: true, edit: true, read: true, delete: true }
+              : { add: false, edit: false, read: false, delete: false }
+          }
+          handleChange={() => {}}
+        />
+      );
+    } else if (
+      containsOnly(
+        ["add", "edit", "read", "delete"],
+        Object.keys(value[tableProperty.name])
+      )
+    ) {
+      return (
+        <CRUDPermissionCheckboxGroup
+          label={capitalize(tableProperty.name)}
+          value={value[tableProperty.name]}
+          handleChange={() => {}}
+        />
+      );
+    } else {
+      return (
+        <FieldComponent
+          type={LOCAL_CONSTANTS.DATA_TYPES.JSON}
+          name={tableProperty.name}
+          value={value[tableProperty.name]}
+          // onChange={policyObjectUpdateForm.handleChange}
+          // setFieldValue={policyObjectUpdateForm.setFieldValue}
+          // helperText={policyObjectUpdateForm.errors["policy"]}
+          // error={Boolean(policyObjectUpdateForm.errors["policy"])}
+          required={true}
+          customMapping={null}
+          language={"json"}
+          customLabel={
+            <span className="!font-bold !mb-1">{tableProperty.name}</span>
+          }
+        />
+      );
     }
   });
 };
@@ -88,11 +102,11 @@ const CRUDPermissionCheckboxGroup = ({ label, value, handleChange }) => {
     <Grid container>
       <Grid
         item
-        xs={2}
-        sm={2}
-        md={2}
-        lg={2}
-        xl={2}
+        xs={4}
+        sm={4}
+        md={4}
+        lg={4}
+        xl={4}
         className="!flex !justify-start !items-center"
       >
         <span className="!font-bold">{label}</span>
