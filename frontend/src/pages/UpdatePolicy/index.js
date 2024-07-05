@@ -23,76 +23,122 @@ import { Loading } from "../Loading";
 import { containsOnly } from "../../utils/array";
 import { capitalize } from "lodash";
 import { useConstants } from "../../contexts/constantsContext";
-
+import { dracula } from "@uiw/codemirror-theme-dracula";
+import { loadLanguage } from "@uiw/codemirror-extensions-langs";
+import { useTheme } from "@emotion/react";
+import CodeMirror from "@uiw/react-codemirror";
 const TablePolicyEditor = ({ value, handleChange }) => {
   const { dbModel } = useConstants();
 
-  return dbModel?.map((tableProperty) => {
-    if (
-      value[tableProperty.name] == undefined ||
-      value[tableProperty.name] == null
-    ) {
-      return (
-        <CRUDPermissionCheckboxGroup
-          label={capitalize(tableProperty.name)}
-          value={
-            value[tableProperty.name]
-              ? { add: true, edit: true, read: true, delete: true }
-              : { add: false, edit: false, read: false, delete: false }
+  return (
+    <div className="!w-full mt-10">
+      <span className="!font-bold capitalize">Tables</span>
+      <div className="!w-full pl-8">
+        {dbModel?.map((tableProperty) => {
+          if (
+            value[tableProperty.name] == undefined ||
+            value[tableProperty.name] == null
+          ) {
+            return (
+              <CRUDPermissionCheckboxGroup
+                label={capitalize(tableProperty.name)}
+                value={
+                  value[tableProperty.name]
+                    ? { add: true, edit: true, read: true, delete: true }
+                    : { add: false, edit: false, read: false, delete: false }
+                }
+                handleChange={() => {}}
+              />
+            );
+          } else if (
+            value[tableProperty.name] != undefined &&
+            value[tableProperty.name] != null &&
+            typeof value[tableProperty.name] === "boolean"
+          ) {
+            return (
+              <CRUDPermissionCheckboxGroup
+                label={capitalize(tableProperty.name)}
+                value={
+                  value[tableProperty.name]
+                    ? { add: true, edit: true, read: true, delete: true }
+                    : { add: false, edit: false, read: false, delete: false }
+                }
+                handleChange={() => {}}
+              />
+            );
+          } else if (
+            containsOnly(
+              ["add", "edit", "read", "delete"],
+              Object.keys(value[tableProperty.name])
+            )
+          ) {
+            return (
+              <CRUDPermissionCheckboxGroup
+                label={capitalize(tableProperty.name)}
+                value={value[tableProperty.name]}
+                handleChange={() => {}}
+              />
+            );
+          } else {
+            return (
+              <FieldComponent
+                type={LOCAL_CONSTANTS.DATA_TYPES.JSON}
+                name={tableProperty.name}
+                value={value[tableProperty.name]}
+                // onChange={policyObjectUpdateForm.handleChange}
+                // setFieldValue={policyObjectUpdateForm.setFieldValue}
+                // helperText={policyObjectUpdateForm.errors["policy"]}
+                // error={Boolean(policyObjectUpdateForm.errors["policy"])}
+                required={true}
+                customMapping={null}
+                language={"json"}
+                customLabel={
+                  <span className="!mb-1">{tableProperty.name}</span>
+                }
+              />
+            );
           }
-          handleChange={() => {}}
-        />
-      );
-    } else if (
-      value[tableProperty.name] != undefined &&
-      value[tableProperty.name] != null &&
-      typeof value[tableProperty.name] === "boolean"
-    ) {
-      return (
-        <CRUDPermissionCheckboxGroup
-          label={capitalize(tableProperty.name)}
-          value={
-            value[tableProperty.name]
-              ? { add: true, edit: true, read: true, delete: true }
-              : { add: false, edit: false, read: false, delete: false }
-          }
-          handleChange={() => {}}
-        />
-      );
-    } else if (
-      containsOnly(
-        ["add", "edit", "read", "delete"],
-        Object.keys(value[tableProperty.name])
-      )
-    ) {
-      return (
-        <CRUDPermissionCheckboxGroup
-          label={capitalize(tableProperty.name)}
-          value={value[tableProperty.name]}
-          handleChange={() => {}}
-        />
-      );
-    } else {
-      return (
-        <FieldComponent
-          type={LOCAL_CONSTANTS.DATA_TYPES.JSON}
-          name={tableProperty.name}
-          value={value[tableProperty.name]}
-          // onChange={policyObjectUpdateForm.handleChange}
-          // setFieldValue={policyObjectUpdateForm.setFieldValue}
-          // helperText={policyObjectUpdateForm.errors["policy"]}
-          // error={Boolean(policyObjectUpdateForm.errors["policy"])}
-          required={true}
-          customMapping={null}
-          language={"json"}
-          customLabel={
-            <span className="!font-bold !mb-1">{tableProperty.name}</span>
-          }
-        />
-      );
-    }
-  });
+        })}
+      </div>
+    </div>
+  );
 };
+
+const GraphPolicyEditor = ({ value, handleChange }) => {
+  const theme = useTheme();
+  return containsOnly(["add", "edit", "read", "delete"], Object.keys(value)) ? (
+    <CRUDPermissionCheckboxGroup
+      label={capitalize("Graphs")}
+      value={value}
+      handleChange={handleChange}
+    />
+  ) : (
+    <div>
+      <span className="!font-bold">{capitalize("Graphs")}</span>
+      <CodeMirror
+        value={
+          typeof value === "object"
+            ? JSON.stringify(value, null, 2)
+            : typeof value === "string"
+            ? value
+            : ""
+        }
+        height="200px"
+        extensions={[loadLanguage("json")]}
+        onChange={(value) => handleChange(JSON.parse(value))}
+        theme={dracula}
+        style={{
+          borderWidth: 1,
+          borderColor: theme.palette.primary.main,
+          marginTop: 6,
+          borderRadius: 6,
+          width: "100%",
+        }}
+      />
+    </div>
+  );
+};
+
 const CRUDPermissionCheckboxGroup = ({ label, value, handleChange }) => {
   const _handleChange = (_value, checked) => {
     handleChange({ ...value, [_value]: checked });
@@ -136,7 +182,7 @@ const CRUDPermissionCheckboxGroup = ({ label, value, handleChange }) => {
     </Grid>
   );
 };
-const GUIPolicyEditor = ({ policy, handleOnPolicyChange }) => {
+const GUIPolicyEditor = ({ policy, handleChange }) => {
   const _policy = policy;
 
   return (
@@ -144,6 +190,15 @@ const GUIPolicyEditor = ({ policy, handleOnPolicyChange }) => {
       {Object.keys(_policy).map((key) => {
         if (key == "tables") {
           return <TablePolicyEditor value={_policy[key]} />;
+        } else if (key == "graphs") {
+          return (
+            <GraphPolicyEditor
+              value={_policy[key]}
+              handleChange={(value) => {
+                handleChange({ ...policy, graphs: value });
+              }}
+            />
+          );
         } else if (
           containsOnly(
             ["add", "edit", "read", "delete"],
@@ -362,7 +417,12 @@ const UpdatePolicy = () => {
               </Tabs>
             </Grid>
             {policyEditorTab === 0 ? (
-              <GUIPolicyEditor policy={policyObjectData.policy} />
+              <GUIPolicyEditor
+                policy={policyObjectData.policy}
+                handleChange={(value) => {
+                  policyObjectUpdateForm.setFieldValue("policy", value);
+                }}
+              />
             ) : (
               <Grid item xs={12} sm={12} md={12} lg={12} key={"policy"}>
                 <FieldComponent
