@@ -85,7 +85,7 @@ const AddQuery = () => {
 
       <Grid container className="!h-full">
         <Grid item sx={4} md={4} lg={4} className="w-full !h-full">
-          <FormControl fullWidth size="small" className="!mt-2 !px-3">
+          {/* <FormControl fullWidth size="small" className="!mt-2 !px-3">
             <span className="text-xs font-light  !lowercase mb-1">{`Query type`}</span>
 
             <Select
@@ -107,8 +107,7 @@ const AddQuery = () => {
                 }
               )}
             </Select>
-            {/* {error && <span className="mt-2 text-red-500">{error}</span>} */}
-          </FormControl>
+          </FormControl> */}
           <FormControl fullWidth size="small" className="!mt-2 !px-3">
             <span className="text-xs font-light  !lowercase mb-1">{`Title`}</span>
 

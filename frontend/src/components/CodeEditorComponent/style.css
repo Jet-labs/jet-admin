@@ -6,11 +6,11 @@
 }
 
 .cm-editor{
-    
+    background-color: #181826 !important;
     border-radius: 4px;
 }
 
 .cm-gutters{
-    
-    border-radius: 4px;
+    background-color: #181826 !important;
+    border-radius: 4px 0 0 4px;
 }
