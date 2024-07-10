@@ -18,11 +18,9 @@ import { LOCAL_CONSTANTS } from "../../constants";
 import { useAuthActions, useAuthState } from "../../contexts/authContext";
 
 export const Navbar = ({ children, handleDrawerOpen }) => {
-  const navigate = useNavigate();
   const [profileAnchor, setProfileAnchor] = useState(null);
   const { signOut } = useAuthActions();
   const { pmUser } = useAuthState();
-
   const theme = useTheme();
   const isSmallDevice = useMediaQuery(theme.breakpoints.down("lg"));
   const isProfileOpen = Boolean(profileAnchor);
@@ -37,13 +35,13 @@ export const Navbar = ({ children, handleDrawerOpen }) => {
   return (
     <AppBar
       position="sticky"
-      className="border-b-2 "
+      className="border-b-2"
       sx={{
-        borderColor: "rgb(123, 121, 255) ",
+        borderColor: theme.palette.primary.main,
       }}
       elevation={0}
     >
-      <Toolbar className="flex flex-row justify-between w-full">
+      <Toolbar className="flex flex-row justify-between w-full" variant="dense">
         <div className="!flex flex-row justify-start items-center">
           <div className="flex flex-row justify-start items-center">
             {isSmallDevice && (
@@ -55,8 +53,11 @@ export const Navbar = ({ children, handleDrawerOpen }) => {
                 <BiMenu className="!text-xl" />
               </IconButton>
             )}
-            <img className="!h-11 !w-14" src={logo}></img>
-            <span className="font-bold normal-case mx-3">
+            <img className="!h-8 !w-8" src={logo}></img>
+            <span
+              className="font-bold normal-case mx-3"
+              style={{ color: theme.palette.primary.contrastText }}
+            >
               {LOCAL_CONSTANTS.APP_NAME}
             </span>
           </div>
@@ -68,8 +69,12 @@ export const Navbar = ({ children, handleDrawerOpen }) => {
           aria-controls={isProfileOpen ? "account-menu" : undefined}
           aria-haspopup="true"
           aria-expanded={isProfileOpen ? "true" : undefined}
+          size="small"
         >
-          <Avatar></Avatar>
+          <Avatar
+            sx={{ width: 32, height: 32 }}
+            style={{ background: theme.palette.secondary.main }}
+          ></Avatar>
         </IconButton>
         <Menu
           anchorEl={profileAnchor}

@@ -50,7 +50,7 @@ export const DashboardsList = () => {
       sx={{}}
       component="nav"
       aria-labelledby="nested-list-subheader"
-      className=" !h-[calc(100vh-66px)] !overflow-y-auto !overflow-x-hidden !border-r !border-white !border-opacity-10 w-full"
+      className=" !h-[calc(100vh-48px)] !overflow-y-auto !overflow-x-hidden !border-r !border-white !border-opacity-10 w-full"
     >
       <div className="!px-3.5 py-1 flex flex-row justify-between items-center w-full">
         <span className="!font-semibold">{"Dashboard Layouts"}</span>

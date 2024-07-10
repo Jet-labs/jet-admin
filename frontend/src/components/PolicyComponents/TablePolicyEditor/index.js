@@ -37,7 +37,7 @@ export const TablePolicyEditor = ({ value, handleChange }) => {
   }, [value]);
   const [tab, setTab] = useState(isVisualEditorSufficient ? 0 : 1);
   const theme = useTheme();
-  const _handleOnTabChange = useCallback(() => {
+  const _handleOnTabChange = () => {
     if (tab === 1) {
       if (isVisualEditorSufficient) {
         setTab(0);
@@ -50,7 +50,7 @@ export const TablePolicyEditor = ({ value, handleChange }) => {
     } else if (tab === 0) {
       setTab(1);
     }
-  }, [isVisualEditorSufficient]);
+  };
   return (
     <div className="!flex flex-col justify-start items-stretch w-full mt-4">
       <span className="!font-bold pl-1 py-2">{capitalize("Tables")}</span>
@@ -96,7 +96,9 @@ export const TablePolicyEditor = ({ value, handleChange }) => {
                             delete: false,
                           }
                     }
-                    handleChange={() => {}}
+                    handleChange={(v) => {
+                      handleChange({ ...value, [tableProperty.name]: v });
+                    }}
                   />
                 );
               } else if (
@@ -136,27 +138,35 @@ export const TablePolicyEditor = ({ value, handleChange }) => {
                       <span className="capitalize">{tableProperty.name}</span>
                     }
                     value={value[tableProperty.name]}
-                    handleChange={(v) => {handleChange({ ...value, [tableProperty.name]: v });}}
+                    handleChange={(v) => {
+                      handleChange({ ...value, [tableProperty.name]: v });
+                    }}
                   />
                 );
               } else {
                 return (
-                  <FieldComponent
-                    type={LOCAL_CONSTANTS.DATA_TYPES.JSON}
-                    name={tableProperty.name}
-                    value={value[tableProperty.name]}
-                    // onChange={policyObjectUpdateForm.handleChange}
-                    setFieldValue={(v) => {
-                      handleChange({ ...value, [tableProperty.name]: v });
-                    }}
-                    // helperText={policyObjectUpdateForm.errors["policy"]}
-                    // error={Boolean(policyObjectUpdateForm.errors["policy"])}
-                    required={true}
-                    customMapping={null}
-                    language={"json"}
-                    customLabel={
-                      <span className="!mb-1">{tableProperty.name}</span>
+                  <CodeMirror
+                    value={
+                      typeof value[tableProperty.name] === "object"
+                        ? JSON.stringify(value[tableProperty.name], null, 2)
+                        : typeof value[tableProperty.name] === "string"
+                        ? value[tableProperty.name]
+                        : ""
                     }
+                    height="200px"
+                    extensions={[loadLanguage("json")]}
+                    onChange={(v) => {
+                      handleChange({
+                        ...value,
+                        [tableProperty.name]:
+                          typeof v === "object" ? v : JSON.parse(v),
+                      });
+                    }}
+                    theme={dracula}
+                    style={{
+                      borderWidth: 0,
+                      width: "100%",
+                    }}
                   />
                 );
               }

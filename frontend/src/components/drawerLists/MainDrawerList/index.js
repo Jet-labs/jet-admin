@@ -24,7 +24,7 @@ export const MainDrawerList = ({ currentPageTitle }) => {
       sx={{}}
       component="nav"
       aria-labelledby="nested-list-subheader"
-      className="!py-0 !h-[calc(100vh-66px)] !overflow-y-auto !overflow-x-hidden !border-r !border-white !border-opacity-10 w-full"
+      className="!py-0 !h-[calc(100vh-48px)] !overflow-y-auto !overflow-x-hidden !border-r !border-white !border-opacity-10 w-full"
     >
       {
         <Link

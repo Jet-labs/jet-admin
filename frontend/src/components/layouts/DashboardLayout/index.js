@@ -19,7 +19,7 @@ const DashboardLayout = () => {
         md={9}
         lg={10}
         xl={10}
-        className="!h-[calc(100vh-66px)] !overflow-y-auto"
+        className="!h-[calc(100vh-48px)] !overflow-y-auto"
       >
         <Routes>
           <Route index element={<AddDashboardView />} />

@@ -96,7 +96,7 @@ const UpdateDashboard = () => {
           lg={9}
           md={9}
           sm={8}
-          className="w-full !h-[calc(100vh-66px)]"
+          className="w-full !h-[calc(100vh-48px)]"
           // style={{ background: theme.palette.divider }}
         >
           <DashboardDropZoneComponent
@@ -111,7 +111,7 @@ const UpdateDashboard = () => {
           lg={3}
           md={3}
           sm={4}
-          className="w-full !border-r !border-white !border-opacity-10 !h-[calc(100vh-66px)] !overflow-y-auto"
+          className="w-full !border-r !border-white !border-opacity-10 !h-[calc(100vh-48px)] !overflow-y-auto"
           style={{ background: theme.palette.background.paper }}
         >
           <Grid sm={12} className="!top-0 !sticky !z-50">

@@ -64,7 +64,7 @@ export const MainLayout = ({ children }) => {
         md={12}
         lg={10.5}
         xl={11}
-        className="!h-[calc(100vh-66px)] !overflow-y-auto"
+        className="!h-[calc(100vh-48px)] !overflow-y-auto"
       >
         {children}
       </Grid>

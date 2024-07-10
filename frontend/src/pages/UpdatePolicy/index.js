@@ -83,6 +83,7 @@ const GUIPolicyEditor = ({ policy, handleChange, containerClass }) => {
     </Grid>
   );
 };
+
 const UpdatePolicy = () => {
   const { dbModel } = useConstants();
   console.log({ dbModel });

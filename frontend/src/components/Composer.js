@@ -5,9 +5,9 @@ import "react-toastify/dist/ReactToastify.css";
 import { AuthContextProvider } from "../contexts/authContext";
 import { SocketContextProvider } from "../contexts/socketContext";
 import { ConstantsContextProvider } from "../contexts/constantsContext";
-import { customDarkTheme } from "../theme";
+import { customDarkTheme, customLightTheme } from "../theme";
 
-const theme = createTheme(customDarkTheme);
+const theme = createTheme(customLightTheme);
 
 const queryClient = new QueryClient();
 function Composer({ children }) {
