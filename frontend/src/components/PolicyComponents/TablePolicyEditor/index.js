@@ -119,7 +119,9 @@ export const TablePolicyEditor = ({ value, handleChange }) => {
                             delete: false,
                           }
                     }
-                    handleChange={() => {}}
+                    handleChange={(v) => {
+                      handleChange({ ...value, [tableProperty.name]: v });
+                    }}
                   />
                 );
               } else if (
@@ -134,7 +136,7 @@ export const TablePolicyEditor = ({ value, handleChange }) => {
                       <span className="capitalize">{tableProperty.name}</span>
                     }
                     value={value[tableProperty.name]}
-                    handleChange={() => {}}
+                    handleChange={(v) => {handleChange({ ...value, [tableProperty.name]: v });}}
                   />
                 );
               } else {
@@ -144,7 +146,9 @@ export const TablePolicyEditor = ({ value, handleChange }) => {
                     name={tableProperty.name}
                     value={value[tableProperty.name]}
                     // onChange={policyObjectUpdateForm.handleChange}
-                    // setFieldValue={policyObjectUpdateForm.setFieldValue}
+                    setFieldValue={(v) => {
+                      handleChange({ ...value, [tableProperty.name]: v });
+                    }}
                     // helperText={policyObjectUpdateForm.errors["policy"]}
                     // error={Boolean(policyObjectUpdateForm.errors["policy"])}
                     required={true}
