@@ -5,11 +5,12 @@ import React from "react";
 import { useFormik } from "formik";
 import { addDashboardAPI } from "../../api/dashboards";
 import { FieldComponent } from "../../components/FieldComponent";
-import { DashboardDropZoneComponent } from "../../components/DashboardDropZoneComponent";
-import { GraphsDnDList } from "../../components/GraphsDnDList";
+
 import { LOCAL_CONSTANTS } from "../../constants";
 import { displayError, displaySuccess } from "../../utils/notification";
 import { FiPlus } from "react-icons/fi";
+import { DashboardDropZoneComponent } from "../../components/DashboardComponents/DashboardDropZoneComponent";
+import { GraphsDnDList } from "../../components/GraphComponents/GraphsDnDList";
 const AddDashboardView = () => {
   const theme = useTheme();
 

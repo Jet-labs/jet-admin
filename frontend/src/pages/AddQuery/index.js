@@ -10,7 +10,7 @@ import {
 import { useFormik } from "formik";
 import React, { useCallback } from "react";
 import "react-data-grid/lib/styles.css";
-import { PGSQLQueryBuilder } from "../../components/QueryBuilders/PGSQLQueryBuilder";
+import { PGSQLQueryBuilder } from "../../components/QueryComponents/QueryBuilders/PGSQLQueryBuilder";
 import { LOCAL_CONSTANTS } from "../../constants";
 import "./style.css";
 import { addQueryAPI } from "../../api/queries";
@@ -85,29 +85,6 @@ const AddQuery = () => {
 
       <Grid container className="!h-full">
         <Grid item sx={4} md={4} lg={4} className="w-full !h-full">
-          {/* <FormControl fullWidth size="small" className="!mt-2 !px-3">
-            <span className="text-xs font-light  !lowercase mb-1">{`Query type`}</span>
-
-            <Select
-              value={queryBuilderForm.values.query_type}
-              onChange={queryBuilderForm.handleChange}
-              onBlur={queryBuilderForm.handleBlur}
-              name={"query_type"}
-              required={true}
-              size="small"
-              fullWidth={false}
-            >
-              {Object.keys(LOCAL_CONSTANTS.DATA_SOURCE_QUERY_TYPE).map(
-                (queryType) => {
-                  const value =
-                    LOCAL_CONSTANTS.DATA_SOURCE_QUERY_TYPE[queryType].value;
-                  const name =
-                    LOCAL_CONSTANTS.DATA_SOURCE_QUERY_TYPE[queryType].name;
-                  return <MenuItem value={value}>{name}</MenuItem>;
-                }
-              )}
-            </Select>
-          </FormControl> */}
           <FormControl fullWidth size="small" className="!mt-2 !px-3">
             <span className="text-xs font-light  !lowercase mb-1">{`Title`}</span>
 

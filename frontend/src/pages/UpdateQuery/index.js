@@ -10,7 +10,6 @@ import {
 import { useFormik } from "formik";
 import React, { useCallback, useEffect } from "react";
 import "react-data-grid/lib/styles.css";
-import { PGSQLQueryBuilder } from "../../components/QueryBuilders/PGSQLQueryBuilder";
 import { LOCAL_CONSTANTS } from "../../constants";
 import "./style.css";
 import {
@@ -21,9 +20,9 @@ import {
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { displayError, displaySuccess } from "../../utils/notification";
 import { useParams } from "react-router-dom";
-import { PGSQLQueryEditor } from "../../components/QueryEditors/PGSQLQueryEditor";
-import { QueryDeletionForm } from "../../components/QueryDeletionForm";
-import { QueryDuplicateForm } from "../../components/QueryDuplicateForm";
+import { QueryDuplicateForm } from "../../components/QueryComponents/QueryDuplicateForm";
+import { QueryDeletionForm } from "../../components/QueryComponents/QueryDeletionForm";
+import { PGSQLQueryEditor } from "../../components/QueryComponents/QueryEditors/PGSQLQueryEditor";
 
 const UpdateQuery = () => {
   const { id } = useParams();
@@ -120,30 +119,6 @@ const UpdateQuery = () => {
 
       <Grid container className="!h-full">
         <Grid item sx={4} md={4} lg={4} className="w-full !h-full">
-          {/* <FormControl fullWidth size="small" className="!mt-2 !px-3">
-            <span className="text-xs font-light  !lowercase mb-1">{`Query type`}</span>
-
-            <Select
-              value={queryBuilderForm.values.query_type}
-              onChange={queryBuilderForm.handleChange}
-              onBlur={queryBuilderForm.handleBlur}
-              name={"query_type"}
-              required={true}
-              size="small"
-              fullWidth={false}
-            >
-              {Object.keys(LOCAL_CONSTANTS.DATA_SOURCE_QUERY_TYPE).map(
-                (queryType) => {
-                  const value =
-                    LOCAL_CONSTANTS.DATA_SOURCE_QUERY_TYPE[queryType].value;
-                  const name =
-                    LOCAL_CONSTANTS.DATA_SOURCE_QUERY_TYPE[queryType].name;
-                  return <MenuItem value={value}>{name}</MenuItem>;
-                }
-              )}
-            </Select>
-            
-          </FormControl> */}
           <FormControl fullWidth size="small" className="!mt-2 !px-3">
             <span className="text-xs font-light  !lowercase mb-1">{`Title`}</span>
 

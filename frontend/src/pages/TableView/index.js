@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { RawDataGrid } from "../../components/RawDataGrid";
+import { RawDataGrid } from "../../components/DataGridComponents/RawDataGrid";
 import "./styles.css";
 /**
  *

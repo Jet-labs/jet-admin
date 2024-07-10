@@ -4,15 +4,14 @@ import { fetchAllRowsAPI, fetchRowByIDAPI } from "../../api/tables";
 
 import { Button, CircularProgress, Grid, Paper } from "@mui/material";
 
-import { updateRowAPI } from "../../api/tables";
-import { LOCAL_CONSTANTS } from "../../constants";
-import { displayError, displaySuccess } from "../../utils/notification";
-import { FieldComponent } from "../../components/FieldComponent";
-import { RowDeletionForm } from "../../components/RowDeletetionForm";
-import { ErrorComponent } from "../../components/ErrorComponent";
-import { Loading } from "../Loading";
 import { useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
+import { updateRowAPI } from "../../api/tables";
+import { FieldComponent } from "../../components/FieldComponent";
+import { RowDeletionForm } from "../../components/DataGridComponents/RowDeletetionForm";
+import { LOCAL_CONSTANTS } from "../../constants";
+import { displayError, displaySuccess } from "../../utils/notification";
+import { Loading } from "../Loading";
 
 const UpdateAccount = () => {
   const tableName = LOCAL_CONSTANTS.STRINGS.PM_USER_TABLE_NAME;

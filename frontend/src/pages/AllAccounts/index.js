@@ -8,15 +8,14 @@ import { fetchAllRowsAPI } from "../../api/tables";
 import { useAuthState } from "../../contexts/authContext";
 
 import { LOCAL_CONSTANTS } from "../../constants";
-import { useConstants } from "../../contexts/constantsContext";
 import { Loading } from "../Loading";
 
 import moment from "moment";
 import "react-data-grid/lib/styles.css";
 import { BiCalendar } from "react-icons/bi";
-import { DataGridActionComponent } from "../../components/DataGridActionComponent";
+import { DataGridActionComponent } from "../../components/DataGridComponents/DataGridActionComponent";
 import { ErrorComponent } from "../../components/ErrorComponent";
-import { RawDataGridStatistics } from "../../components/RawDataGridStatistics";
+import { RawDataGridStatistics } from "../../components/DataGridComponents/RawDataGridStatistics";
 const AllAccounts = () => {
   const tableName = LOCAL_CONSTANTS.STRINGS.PM_USER_TABLE_NAME;
 

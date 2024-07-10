@@ -2,38 +2,21 @@ import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import { fetchRowByIDAPI } from "../../api/tables";
 
-import {
-  Button,
-  Checkbox,
-  Chip,
-  CircularProgress,
-  Divider,
-  Grid,
-  Paper,
-  Tab,
-  Tabs,
-  useTheme,
-} from "@mui/material";
+import { Button, CircularProgress, Grid, Paper } from "@mui/material";
 
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { updateRowAPI } from "../../api/tables";
 import { FieldComponent } from "../../components/FieldComponent";
-import { RowDeletionForm } from "../../components/RowDeletetionForm";
-import { LOCAL_CONSTANTS } from "../../constants";
-import { displayError, displaySuccess } from "../../utils/notification";
-import { Loading } from "../Loading";
-import { containsOnly } from "../../utils/array";
-import { capitalize } from "lodash";
-import { useConstants } from "../../contexts/constantsContext";
-import { dracula } from "@uiw/codemirror-theme-dracula";
-import { loadLanguage } from "@uiw/codemirror-extensions-langs";
-import CodeMirror from "@uiw/react-codemirror";
+import { DashboardPolicyEditor } from "../../components/PolicyComponents/DashboardPolicyEditor";
 import { GraphPolicyEditor } from "../../components/PolicyComponents/GraphPolicyEditor";
-import { CRUDPermissionCheckboxGroup } from "../../components/PolicyComponents/CRUDPermissionCheckboxGroup";
 import { QueryPolicyEditor } from "../../components/PolicyComponents/QueryPolicyEditor";
 import { TablePolicyEditor } from "../../components/PolicyComponents/TablePolicyEditor";
-import { DashboardPolicyEditor } from "../../components/PolicyComponents/DashboardPolicyEditor";
+import { RowDeletionForm } from "../../components/DataGridComponents/RowDeletetionForm";
+import { LOCAL_CONSTANTS } from "../../constants";
+import { useConstants } from "../../contexts/constantsContext";
+import { displayError, displaySuccess } from "../../utils/notification";
+import { Loading } from "../Loading";
 
 const GUIPolicyEditor = ({ policy, handleChange, containerClass }) => {
   return (

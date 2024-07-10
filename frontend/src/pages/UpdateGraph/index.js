@@ -2,19 +2,17 @@ import { Grid, useTheme } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useEffect } from "react";
 import {
-  addGraphAPI,
   deleteGraphByIDAPI,
   getGraphDataByIDAPI,
   updateGraphAPI,
 } from "../../api/graphs";
 
-import { LOCAL_CONSTANTS } from "../../constants";
 import { useFormik } from "formik";
-import { GraphBuilder } from "../../components/GraphBuilder";
-import { GraphComponentPreview } from "../../components/GraphComponentPreview";
-import { displayError, displaySuccess } from "../../utils/notification";
 import { useParams } from "react-router-dom";
-import { GraphEditor } from "../../components/GraphEditor";
+import { GraphComponentPreview } from "../../components/GraphComponents/GraphComponentPreview";
+import { GraphEditor } from "../../components/GraphComponents/GraphEditor";
+import { LOCAL_CONSTANTS } from "../../constants";
+import { displayError, displaySuccess } from "../../utils/notification";
 
 const UpdateGraph = () => {
   const theme = useTheme();

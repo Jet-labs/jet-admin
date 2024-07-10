@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import "./styles.css";
-import { RowUpdateForm } from "../../components/RowUpdateForm";
+import { RowUpdateForm } from "../../components/DataGridComponents/RowUpdateForm";
 /**
  *
  * @param {object} param0

@@ -1,22 +1,16 @@
 import { Button, Grid, useTheme } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import React, { useEffect, useState } from "react";
-import { FiSettings } from "react-icons/fi";
 import { useFormik } from "formik";
-import {
-  addDashboardAPI,
-  deleteDashboardByIDAPI,
-  getDashboardByIDAPI,
-  updateDashboardAPI,
-} from "../../api/dashboards";
+import React, { useEffect } from "react";
+import { FiSettings } from "react-icons/fi";
+import { useParams } from "react-router-dom";
+import { getDashboardByIDAPI, updateDashboardAPI } from "../../api/dashboards";
+import { DashboardDeletionForm } from "../../components/DashboardComponents/DashboardDeletionForm";
+import { DashboardDropZoneComponent } from "../../components/DashboardComponents/DashboardDropZoneComponent";
 import { FieldComponent } from "../../components/FieldComponent";
-import { DashboardDropZoneComponent } from "../../components/DashboardDropZoneComponent";
-import { GraphsDnDList } from "../../components/GraphsDnDList";
+import { GraphsDnDList } from "../../components/GraphComponents/GraphsDnDList";
 import { LOCAL_CONSTANTS } from "../../constants";
 import { displayError, displaySuccess } from "../../utils/notification";
-import { useParams } from "react-router-dom";
-import { ConfirmationDialog } from "../../components/ConfirmationDialog";
-import { DashboardDeletionForm } from "../../components/DashboardDeletionForm";
 
 const UpdateDashboard = () => {
   const { id } = useParams();

@@ -1,10 +1,10 @@
-import { Button, Grid, IconButton, useTheme } from "@mui/material";
+import { Button, useTheme } from "@mui/material";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useState } from "react";
+import { FiSettings } from "react-icons/fi";
 import { useNavigate, useParams } from "react-router-dom";
 import { getDashboardByIDAPI } from "../../api/dashboards";
-import { DashboardViewComponent } from "../../components/DashboardViewComponent";
-import { FiSettings } from "react-icons/fi";
+import { DashboardViewComponent } from "../../components/DashboardComponents/DashboardViewComponent";
 import { LOCAL_CONSTANTS } from "../../constants";
 const DashboardView = () => {
   const { id } = useParams();
