@@ -38,10 +38,15 @@ export const Navbar = ({ children, handleDrawerOpen }) => {
       className="border-b-2"
       sx={{
         borderColor: theme.palette.primary.main,
+        background: theme.palette.background.default,
       }}
       elevation={0}
     >
-      <Toolbar className="flex flex-row justify-between w-full" variant="dense">
+      <Toolbar
+        sx={{ background: theme.palette.background.default }}
+        className="flex flex-row justify-between w-full"
+        variant="dense"
+      >
         <div className="!flex flex-row justify-start items-center">
           <div className="flex flex-row justify-start items-center">
             {isSmallDevice && (
@@ -73,7 +78,7 @@ export const Navbar = ({ children, handleDrawerOpen }) => {
         >
           <Avatar
             sx={{ width: 32, height: 32 }}
-            style={{ background: theme.palette.secondary.main }}
+            style={{ background: theme.palette.primary.light }}
           ></Avatar>
         </IconButton>
         <Menu
@@ -99,10 +104,9 @@ export const Navbar = ({ children, handleDrawerOpen }) => {
                 height: 32,
                 ml: -0.5,
                 mr: 1,
-                background: "white",
               },
               "& .MuiMenu-list": {
-                background: theme.palette.primary.dark,
+                background: theme.palette.background.paper,
                 borderRadius: 2,
               },
             },
@@ -117,7 +121,10 @@ export const Navbar = ({ children, handleDrawerOpen }) => {
           <Divider />
           <MenuItem onClick={signOut}>
             <ListItemIcon>
-              <BiLogInCircle className="!text-sm" />
+              <BiLogInCircle
+                className="!text-sm"
+                style={{ color: theme.palette.text.primary }}
+              />
             </ListItemIcon>
             Logout
           </MenuItem>

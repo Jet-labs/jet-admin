@@ -1,7 +1,7 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useFormik } from "formik";
 
-import { Button, CircularProgress, Grid, Paper } from "@mui/material";
+import { Button, CircularProgress, Grid, Paper, useTheme } from "@mui/material";
 import { useMemo } from "react";
 import { addRowAPI, getAuthorizedColumnsForAdd } from "../../../api/tables";
 import { LOCAL_CONSTANTS } from "../../../constants";
@@ -11,6 +11,7 @@ import { ErrorComponent } from "../../ErrorComponent";
 import { FieldComponent } from "../../FieldComponent";
 
 export const RowAdditionForm = ({ tableName }) => {
+  const theme = useTheme();
   const {
     isLoading: isLoadingAddColumns,
     data: addColumns,
@@ -70,7 +71,10 @@ export const RowAdditionForm = ({ tableName }) => {
       <div className=" flex flex-row justify-between 2xl:w-3/5 xl:w-3/4 lg:w-2/3 md:w-full mt-3 ">
         <div className="flex flex-col items-start justify-start">
           <span className="text-lg font-bold text-start ">{`Add row`}</span>
-          <span className="text-xs font-thin text-start text-slate-300">{`Table : ${tableName}`}</span>
+          <span
+            style={{ color: theme.palette.text.secondary }}
+            className="text-xs font-thin text-start text-slate-300"
+          >{`Table : ${tableName}`}</span>
         </div>
 
         <div className="flex flex-row items-center justify-end w-min">
@@ -89,9 +93,13 @@ export const RowAdditionForm = ({ tableName }) => {
           </Button>
         </div>
       </div>
-      <Paper
-        className="px-4 mt-3 2xl:w-3/5 xl:w-3/4 lg:w-2/3 md:w-full pb-3"
-        variant="outlined"
+      <div
+        className="px-4 mt-3 w-full 2xl:w-3/5 xl:w-3/4 lg:w-2/3 md:w-full pb-3"
+        style={{
+          borderRadius: 4,
+          borderWidth: 1,
+          borderColor: theme.palette.divider,
+        }}
       >
         <form onSubmit={rowAdditionForm.handleSubmit}>
           <Grid
@@ -118,7 +126,7 @@ export const RowAdditionForm = ({ tableName }) => {
             })}
           </Grid>
         </form>
-      </Paper>
+      </div>
     </div>
   ) : (
     <div className="p-3">

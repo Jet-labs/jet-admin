@@ -60,7 +60,14 @@ export const FieldComponent = ({
         >
           {customLabel
             ? customLabel
-            : label && <span className="text-xs font-light mb-1">{label}</span>}
+            : label && (
+                <span
+                  className="text-xs font-light mb-1"
+                  style={{ color: theme.palette.text.secondary }}
+                >
+                  {label}
+                </span>
+              )}
           <TextField
             disabled={readOnly}
             required={required}
@@ -89,7 +96,14 @@ export const FieldComponent = ({
         >
           {customLabel
             ? customLabel
-            : label && <span className="text-xs font-light mb-1">{label}</span>}
+            : label && (
+                <span
+                  style={{ color: theme.palette.text.secondary }}
+                  className="text-xs font-light mb-1"
+                >
+                  {label}
+                </span>
+              )}
           <TextField
             disabled={readOnly}
             required={required}
@@ -118,7 +132,14 @@ export const FieldComponent = ({
         >
           {customLabel
             ? customLabel
-            : label && <span className="text-xs font-light mb-1">{label}</span>}
+            : label && (
+                <span
+                  style={{ color: theme.palette.text.secondary }}
+                  className="text-xs font-light mb-1"
+                >
+                  {label}
+                </span>
+              )}
           <CodeEditor
             disabled={readOnly}
             required={required}
@@ -145,7 +166,14 @@ export const FieldComponent = ({
         <FormControl fullWidth size="small">
           {customLabel
             ? customLabel
-            : label && <span className="text-xs font-light mb-1">{label}</span>}
+            : label && (
+                <span
+                  style={{ color: theme.palette.text.secondary }}
+                  className="text-xs font-light mb-1"
+                >
+                  {label}
+                </span>
+              )}
 
           <Select
             id={name}
@@ -175,7 +203,14 @@ export const FieldComponent = ({
         <FormControl fullWidth size="small">
           {customLabel
             ? customLabel
-            : label && <span className="text-xs font-light mb-1">{label}</span>}
+            : label && (
+                <span
+                  style={{ color: theme.palette.text.secondary }}
+                  className="text-xs font-light mb-1"
+                >
+                  {label}
+                </span>
+              )}
           <Select
             id={name}
             multiple
@@ -233,7 +268,14 @@ export const FieldComponent = ({
         >
           {customLabel
             ? customLabel
-            : label && <span className="text-xs font-light mb-1">{label}</span>}
+            : label && (
+                <span
+                  style={{ color: theme.palette.text.secondary }}
+                  className="text-xs font-light mb-1"
+                >
+                  {label}
+                </span>
+              )}
           <Select
             id={name}
             name={name}
@@ -274,7 +316,14 @@ export const FieldComponent = ({
         >
           {customLabel
             ? customLabel
-            : label && <span className="text-xs font-light mb-1">{label}</span>}
+            : label && (
+                <span
+                  style={{ color: theme.palette.text.secondary }}
+                  className="text-xs font-light mb-1"
+                >
+                  {label}
+                </span>
+              )}
           <LocalizationProvider dateAdapter={AdapterMoment}>
             <CustomDateTimePicker
               name={name}
@@ -297,7 +346,14 @@ export const FieldComponent = ({
         <FormControl fullWidth size="small">
           {customLabel
             ? customLabel
-            : label && <span className="text-xs font-light mb-1">{label}</span>}
+            : label && (
+                <span
+                  style={{ color: theme.palette.text.secondary }}
+                  className="text-xs font-light mb-1"
+                >
+                  {label}
+                </span>
+              )}
           <CodeEditor
             disabled={readOnly}
             required={required}
@@ -332,7 +388,14 @@ export const FieldComponent = ({
         >
           {customLabel
             ? customLabel
-            : label && <span className="text-xs font-light mb-1">{label}</span>}
+            : label && (
+                <span
+                  style={{ color: theme.palette.text.secondary }}
+                  className="text-xs font-light mb-1"
+                >
+                  {label}
+                </span>
+              )}
           <Select
             name={name}
             onChange={onChange}
@@ -364,7 +427,14 @@ export const FieldComponent = ({
         >
           {customLabel
             ? customLabel
-            : label && <span className="text-xs font-light mb-1">{label}</span>}
+            : label && (
+                <span
+                  style={{ color: theme.palette.text.secondary }}
+                  className="text-xs font-light mb-1"
+                >
+                  {label}
+                </span>
+              )}
           <TextField
             required={required}
             fullWidth
@@ -393,7 +463,14 @@ export const FieldComponent = ({
         >
           {customLabel
             ? customLabel
-            : label && <span className="text-xs font-light mb-1">{label}</span>}
+            : label && (
+                <span
+                  style={{ color: theme.palette.text.secondary }}
+                  className="text-xs font-light mb-1"
+                >
+                  {label}
+                </span>
+              )}
           <Select
             name={name}
             onChange={onChange}
@@ -425,7 +502,14 @@ export const FieldComponent = ({
         >
           {customLabel
             ? customLabel
-            : label && <span className="text-xs font-light mb-1">{label}</span>}
+            : label && (
+                <span
+                  style={{ color: theme.palette.text.secondary }}
+                  className="text-xs font-light mb-1"
+                >
+                  {label}
+                </span>
+              )}
           <TextField
             required={required}
             fullWidth
@@ -454,7 +538,14 @@ export const FieldComponent = ({
         >
           {customLabel
             ? customLabel
-            : label && <span className="text-xs font-light mb-1">{label}</span>}
+            : label && (
+                <span
+                  style={{ color: theme.palette.text.secondary }}
+                  className="text-xs font-light mb-1"
+                >
+                  {label}
+                </span>
+              )}
           <Select
             name={name}
             onChange={onChange}
@@ -486,7 +577,14 @@ export const FieldComponent = ({
         >
           {customLabel
             ? customLabel
-            : label && <span className="text-xs font-light mb-1">{label}</span>}
+            : label && (
+                <span
+                  style={{ color: theme.palette.text.secondary }}
+                  className="text-xs font-light mb-1"
+                >
+                  {label}
+                </span>
+              )}
           <TextField
             required={required}
             fullWidth
@@ -511,7 +609,14 @@ export const FieldComponent = ({
         <FormControl fullWidth size="small">
           {customLabel
             ? customLabel
-            : label && <span className="text-xs font-light mb-1">{label}</span>}
+            : label && (
+                <span
+                  style={{ color: theme.palette.text.secondary }}
+                  className="text-xs font-light mb-1"
+                >
+                  {label}
+                </span>
+              )}
           <CodeEditor
             disabled={readOnly}
             required={required}

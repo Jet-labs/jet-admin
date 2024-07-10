@@ -11,22 +11,23 @@
 
 /* Track */
 ::-webkit-scrollbar-track {
-  background: #121212;
+  background: #ffffff;
+  padding: 1;
   /* border-radius: 4px; */
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
   /* border-radius: 20px; */
-  background-color: #4d4d5e7c;
-  border: 1px solid #121212;
+  background-color: #cacaca;
+  border: 1px solid #cacaca;
 }
 ::-webkit-scrollbar-corner {
   background-color: #ddd;
 }
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #6562ff67;
+  background: #cacaca;
 }
 html {
   font-family: "Cabin", sans-serif;

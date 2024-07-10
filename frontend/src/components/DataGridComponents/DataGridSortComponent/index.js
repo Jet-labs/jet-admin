@@ -8,6 +8,7 @@ import {
   IconButton,
   MenuItem,
   Select,
+  useTheme,
 } from "@mui/material";
 import { useMemo, useState } from "react";
 import { FaChevronDown, FaTimes } from "react-icons/fa";
@@ -25,6 +26,7 @@ export const DataGridSortComponent = ({
   readColumns,
 }) => {
   const { pmUser } = useAuthState();
+  const theme = useTheme();
 
   const [sortField, setSortField] = useState(sortModel ? sortModel.field : "");
   const [sortOrder, setSortOrder] = useState(sortModel ? sortModel.order : "");
@@ -69,13 +71,25 @@ export const DataGridSortComponent = ({
       maxWidth="sm"
       fullWidth={true}
     >
-      <DialogTitle className=" !text-lg !flex flex-row justify-between items-center w-full">
+      <DialogTitle
+        style={{
+          background: theme.palette.background.default,
+          color: theme.palette.primary.contrastText,
+        }}
+        className=" !text-lg !flex flex-row justify-between items-center w-full"
+      >
         Sort
         <IconButton aria-label="close" onClick={handleCLoseSortMenu}>
           <FaTimes className="!text-sm" />
         </IconButton>
       </DialogTitle>
-      <DialogContent dividers>
+      <DialogContent
+        style={{
+          background: theme.palette.background.default,
+          color: theme.palette.primary.contrastText,
+        }}
+        dividers
+      >
         <Grid container spacing={2} className="!p-4">
           <Grid item xs={12} sm={6}>
             <Select
@@ -128,7 +142,12 @@ export const DataGridSortComponent = ({
           </Grid>
         </Grid>
       </DialogContent>
-      <DialogActions>
+      <DialogActions
+        style={{
+          background: theme.palette.background.default,
+          color: theme.palette.primary.contrastText,
+        }}
+      >
         <Button
           disableElevation
           variant="contained"

@@ -4,7 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchTableStatsAPI } from "../../../api/tables";
 import { useAuthState } from "../../../contexts/authContext";
 
-import { Grid } from "@mui/material";
+import { Grid, useTheme } from "@mui/material";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { useConstants } from "../../../contexts/constantsContext";
 import { Loading } from "../../../pages/Loading";
@@ -19,6 +19,7 @@ export const RawDataGridStatistics = ({
   const { pmUser } = useAuthState();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const theme = useTheme();
 
   const {
     isLoading: isLoadingData,
@@ -56,7 +57,10 @@ export const RawDataGridStatistics = ({
   ) : data?.statistics && pmUser ? (
     <Grid container columnSpacing={2} rowSpacing={1} className="!mb-4">
       <Grid item xs={12}>
-        <span className="!text-xl !font-bold">
+        <span
+          className="!text-xl !font-bold"
+          style={{ color: theme.palette.primary.contrastText }}
+        >
           {altTableName ? altTableName : `${tableName}`}
         </span>
       </Grid>

@@ -9,13 +9,15 @@ import { useMemo, useState } from "react";
 import { FaTimes } from "react-icons/fa";
 import { MainDrawerList } from "../../DrawerLists/MainDrawerList";
 import { Navbar } from "../../Navbar";
+import { useParams } from "react-router-dom";
 
 export const MainLayout = ({ children }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
   const [currentPageTitle, setCurrentPageTitle] = useState("Home");
   const theme = useTheme();
   const isSmallDevice = useMediaQuery(theme.breakpoints.down("lg"));
-
+  const routeParam = useParams();
+  console.log({ routeParam });
   const _handleDrawerOpen = () => {
     setIsDrawerOpen(true);
   };
@@ -26,7 +28,7 @@ export const MainLayout = ({ children }) => {
 
   const stickyDrawer = useMemo(() => {
     return (
-      <Grid item md={0} lg={1.5} xl={1}>
+      <Grid item md={0} lg={0.8} xl={0.8}>
         <MainDrawerList currentPageTitle={currentPageTitle} />
       </Grid>
     );
@@ -62,8 +64,8 @@ export const MainLayout = ({ children }) => {
 
       <Grid
         md={12}
-        lg={10.5}
-        xl={11}
+        lg={11.2}
+        xl={11.2}
         className="!h-[calc(100vh-48px)] !overflow-y-auto"
       >
         {children}

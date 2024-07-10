@@ -4,6 +4,7 @@ import {
   Grid,
   InputAdornment,
   TextField,
+  useTheme,
 } from "@mui/material";
 import { useDebounce } from "@uidotdev/usehooks";
 import { useEffect, useState } from "react";
@@ -34,6 +35,7 @@ export const DataGridActionComponent = ({
   compact,
   allowAdd,
 }) => {
+  const theme = useTheme();
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false);
@@ -157,7 +159,10 @@ export const DataGridActionComponent = ({
           InputProps={{
             startAdornment: (
               <InputAdornment position="start">
-                <FaSearch className="!text-sm" />
+                <FaSearch
+                  className="!text-sm"
+                  style={{ color: theme.palette.primary.main }}
+                />
               </InputAdornment>
             ),
           }}

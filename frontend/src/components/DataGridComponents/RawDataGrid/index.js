@@ -153,7 +153,7 @@ export const RawDataGrid = ({
         {isLoadingRows ? (
           <Loading />
         ) : data?.rows && pmUser && authorizedColumns && primaryColumns ? (
-          <div className="px-0">
+          <div className="px-4">
             <DataGrid
               rows={data.rows}
               loading={isLoadingRows || isFetchingAllRows}
@@ -191,8 +191,12 @@ export const RawDataGrid = ({
               }}
             />
             <div
-              className="flex flex-row w-full justify-end pb-2 !sticky !bottom-0 !border-t !border-white !border-opacity-10"
-              style={{ background: theme.palette.background.paper }}
+              className="flex flex-row w-full justify-end pb-2 !sticky !bottom-0"
+              style={{
+                background: theme.palette.background.default,
+                borderTopWidth: 1,
+                borderColor: theme.palette.divider,
+              }}
             >
               <Pagination
                 count={Boolean(data?.nextPage) ? page + 1 : page}

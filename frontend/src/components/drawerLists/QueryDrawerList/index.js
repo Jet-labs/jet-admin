@@ -48,19 +48,31 @@ export const QueryDrawerList = () => {
   console.log({ queries });
   return (
     <List
-      sx={{}}
+      style={{
+        borderRightWidth: 1,
+        borderColor: theme.palette.divider,
+        backgroundColor: theme.palette.background.default,
+      }}
       component="nav"
       aria-labelledby="nested-list-subheader"
-      className=" !h-[calc(100vh-48px)] !overflow-y-auto !overflow-x-hidden !border-r !border-white !border-opacity-10 w-full"
+      className=" !h-[calc(100vh-48px)] !overflow-y-auto !overflow-x-hidden w-full"
     >
       <div className="!px-3.5 py-1 flex flex-row justify-between items-center w-full">
-        <span className="!font-semibold">{"Queries"}</span>
+        <span
+          style={{ color: theme.palette.primary.main }}
+          className="!font-semibold"
+        >
+          {"Queries"}
+        </span>
         <IconButton onClick={refetchQueries}>
-          <FaRedo className="!text-sm" />
+          <FaRedo
+            style={{ color: theme.palette.primary.main }}
+            className="!text-sm"
+          />
         </IconButton>
       </div>
       {isAuthorizedToAddQuery && (
-        <div className="!p-3 !w-full !pb-1.5">
+        <div className="!px-3 !py-1.5 !w-full">
           <Button
             onClick={_navigateToAddMoreQuery}
             variant="contained"
@@ -90,7 +102,7 @@ export const QueryDrawerList = () => {
             >
               <ListItemButton
                 sx={{
-                  background: theme.palette.background.default,
+                  background: theme.palette.background.paper,
                   border: key == currentPage ? 1 : 0,
                   borderColor: theme.palette.primary.main,
                 }}

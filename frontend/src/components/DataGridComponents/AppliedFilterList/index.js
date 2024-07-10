@@ -1,7 +1,9 @@
-import { Chip, Grid, ListItem } from "@mui/material";
+import { Chip, Grid, ListItem, useTheme } from "@mui/material";
 import React from "react";
+import { FaChevronDown, FaTimes } from "react-icons/fa";
 
 export const AppliedFiltersList = ({ filters, handleDeleteFilter }) => {
+  const theme = useTheme();
   return filters && filters.length > 0 ? (
     <Grid
       item
@@ -17,8 +19,20 @@ export const AppliedFiltersList = ({ filters, handleDeleteFilter }) => {
               onDelete={() => {
                 handleDeleteFilter(index);
               }}
+              deleteIcon={
+                <FaTimes
+                  className="!text-sm"
+                  style={{ color: theme.palette.primary.contrastText }}
+                />
+              }
               variant="outlined"
-              className="!rounded-md !bg-[#373078] !border-[#7b79ff]"
+              className="!rounded"
+              style={{
+                background: theme.palette.background.paper,
+                borderWidth: 0,
+                color: theme.palette.primary.contrastText,
+                borderColor: theme.palette.primary.main,
+              }}
             />
           </ListItem>
         );

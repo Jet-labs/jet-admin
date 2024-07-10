@@ -288,9 +288,9 @@ export const customLightTheme = {
       white: "#fff",
     },
     primary: {
-      main: "#7b79ff",
-      light: "#dad6ff",
-      dark: "#373078",
+      main: "#4A6BFF",
+      light: "#B7C4FF",
+      dark: "#132C9C",
       contrastText: "#6a7585",
     },
     secondary: {
@@ -342,26 +342,26 @@ export const customLightTheme = {
     contrastThreshold: 3,
     tonalOffset: 0.2,
     text: {
-      primary: "#fff",
-      secondary: "rgba(255, 255, 255, 0.7)",
+      primary: "#6a7585",
+      secondary: "#6A7585A6",
       disabled: "rgba(255, 255, 255, 0.5)",
       icon: "rgba(255, 255, 255, 0.5)",
     },
-    divider: "#E6E6E6",
+    divider: "#CFCFCF",
     background: {
-      paper: "#ffffff",
-      default: "##f9fafc",
+      paper: "#e6e6e6",
+      default: "#ffffff",
     },
     action: {
-      active: "#fff",
-      hover: "rgba(50, 50, 77, 0.481)",
+      active: "#e6e6e6",
+      hover: "#E6E6E656",
       hoverOpacity: 0.08,
-      selected: "#222235",
+      selected: "#e6e6e6",
       selectedOpacity: 0.16,
       disabled: "rgba(255, 255, 255, 0.3)",
       disabledBackground: "rgba(255, 255, 255, 0.12)",
       disabledOpacity: 0.38,
-      focus: "rgba(255, 255, 255, 0.12)",
+      focus: "#e6e6e6",
       focusOpacity: 0.12,
       activatedOpacity: 0.24,
     },
@@ -369,15 +369,9 @@ export const customLightTheme = {
   components: {
     MuiList: {
       styleOverrides: {
-        // Name of the slot
         root: {
           fontSize: "0.75rem !important",
-          // Some CSS
-          background: "rgba(34, 34, 53, 1)",
-          // paddingTop: 10,
-          // paddingBottom: 10,
-          // paddingLeft: 16,
-          // paddingRight: 16,
+          background: "#f9fafc",
         },
       },
     },
@@ -385,28 +379,39 @@ export const customLightTheme = {
     MuiListItemButton: {
       defaultProps: {
         fontSize: "0.75rem !important",
-        // The props to change the default for.
-        disableRipple: true, // No more ripple, on the whole application 💣!
+        disableRipple: true,
+      },
+      styleOverrides: {
+        root: {
+          "&:hover": {
+            background: "#e6e6e6",
+          },
+        },
       },
     },
+
     MuiMenuItem: {
       styleOverrides: {
-        // Name of the slot
         root: {
           fontSize: "0.75rem !important",
           paddingTop: "4px !important",
           paddingBottom: "4px !important",
           paddingLeft: "10px !important",
           paddingRight: "10px !important",
+          color: "#6a7585",
+          "&:hover": {
+            background: "#e6e6e6",
+          },
         },
       },
     },
+
     MuiDialogTitle: {
       styleOverrides: {
         // Name of the slot
         root: {
           // Some CSS
-          background: "rgb(24, 24, 38)",
+          background: "#ffffff",
           paddingTop: 10,
           paddingBottom: 10,
           paddingLeft: 16,
@@ -414,12 +419,13 @@ export const customLightTheme = {
         },
       },
     },
+
     MuiDialogActions: {
       styleOverrides: {
         // Name of the slot
         root: {
           // Some CSS
-          background: "rgb(24, 24, 38)",
+          background: "#ffffff",
           paddingTop: 10,
           paddingBottom: 10,
           paddingLeft: 16,
@@ -427,12 +433,13 @@ export const customLightTheme = {
         },
       },
     },
+
     MuiDialogContent: {
       styleOverrides: {
         // Name of the slot
         root: {
           // Some CSS
-          background: "rgba(34, 34, 53, 1)",
+          background: "#ffffff",
           paddingTop: 10,
           paddingBottom: 10,
           paddingLeft: 16,
@@ -440,23 +447,24 @@ export const customLightTheme = {
         },
       },
     },
+
     MuiIconButton: {
       styleOverrides: {
         // Name of the slot
         root: {
           fontSize: "0.75rem !important",
+          color: "#6a7585",
         },
       },
       defaultProps: {
-        // The props to change the default for.
-        disableRipple: true, // No more ripple, on the whole application 💣!
+        disableRipple: true,
         elevation: 0,
         fontSize: "0.75rem !important",
       },
     },
+
     MuiButton: {
       styleOverrides: {
-        // Name of the slot
         root: {
           fontSize: "0.60rem !important",
           paddingTop: "4px !important",
@@ -464,21 +472,30 @@ export const customLightTheme = {
           paddingLeft: "8px !important",
           paddingRight: "8px !important",
           fontWeight: 600,
+          "&:hover": {
+            background: "#4A6BFF",
+          },
         },
         contained: {
-          border: "1px solid rgb(123, 121, 255)",
+          border: "1px solid #4A6BFF",
           fontWeight: 600,
+          color: "#ffffff",
+        },
+        outlined: {
+          borderWidth: 1,
+          "&:hover": {
+            background: "#00000000",
+          },
         },
       },
       defaultProps: {
-        // The props to change the default for.
-        disableRipple: true, // No more ripple, on the whole application 💣!
+        disableRipple: true,
         elevation: 0,
       },
     },
+
     MuiOutlinedInput: {
       styleOverrides: {
-        // Name of the slot
         root: {
           fontSize: "0.75rem !important",
           paddingTop: "3px !important",
@@ -487,17 +504,17 @@ export const customLightTheme = {
           paddingRight: "10px !important",
 
           "& fieldset": {
-            borderColor: "rgb(123, 121, 255,0.5)",
+            borderColor: "#CFCFCF",
           },
           "&:hover fieldset": {
-            borderColor: "rgb(123, 121, 255) !important",
+            borderColor: "#6a7585 !important",
           },
           "& .MuiIconButton-root": {
-            background: "rgba(255, 255, 255, 0)",
-
-            border: "0px solid rgb(50, 50, 77)",
+            background: "#00000000",
+            color: "#6a7585",
             fontSize: 10,
           },
+          color: "#6a7585",
         },
         input: {
           fontSize: "0.75rem !important",
@@ -526,25 +543,80 @@ export const customLightTheme = {
           paddingBottom: "3px !important",
           paddingLeft: "0px !important",
           paddingRight: "0px !important",
-
+          color: "#6a7585",
           height: "unset",
+        },
+        root: {
+          color: "#6a7585",
         },
       },
     },
+
+    MuiPaginationItem: {
+      styleOverrides: {
+        root: {
+          "&:hover": {
+            background: "#e6e6e6",
+          },
+          "& .Mui-selected": {
+            background: "#e6e6e6",
+            "&:hover": {
+              background: "#e6e6e6",
+            },
+          },
+        },
+      },
+    },
+
     MuiDataGrid: {
       styleOverrides: {
-        // Name of the slot
         root: {
-          // Some CSS
-          // background: "rgba(34, 34, 53, 1)",
-          borderRadius: 4,
+          background: "#ffffff",
 
-          border: "1px solid rgb(50, 50, 77)",
-          // fontSize: 10,
+          "& .MuiDataGrid-main": {
+            borderColor: "#e6e6e6",
+            borderWidth: 1,
+          },
+          "& .MuiDataGrid-withBorderColor": {
+            borderRadius: 0,
+            borderWidth: 0,
+            borderBottom: 0,
+          },
+          "& .MuiDataGrid-columnHeader": {
+            // background: "#e6e6e6",
+            background: "#ffffff",
+            borderColor: "#00000000",
+            outline: 0,
+            borderRadius: 0,
+            borderWidth: 0,
+            borderBottom: 0,
+            "&:focus-within": {
+              outline: "none !important",
+            },
+          },
+          "& .MuiDataGrid-columnHeaderTitle": {
+            color: "#6a7585",
+            border: 0,
+            borderBottom: 0,
+          },
+          "& .MuiCheckbox-root": {
+            color: "#6a7585",
+          },
+          "& .MuiDataGrid-cell": {
+            borderColor: "#00000000",
+            outline: "none",
+            "&:focus-within": {
+              outline: "none !important",
+            },
+          },
         },
         row: {
-          borderTop: "1px solid rgb(50, 50, 77)",
-          background: "rgba(34, 34, 53, 1)",
+          background: "#ffffff",
+          borderTopWidth: 1,
+          borderColor: "#e6e6e6",
+          "&:hover": {
+            background: "#e6e6e6",
+          },
         },
         virtualScroller: {
           overflowY: "auto !important",

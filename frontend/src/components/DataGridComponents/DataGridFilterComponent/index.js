@@ -8,6 +8,7 @@ import {
   IconButton,
   MenuItem,
   Select,
+  useTheme,
 } from "@mui/material";
 import { useMemo, useState } from "react";
 
@@ -30,6 +31,7 @@ export const DataGridFilterComponent = ({
   readColumns,
 }) => {
   const { pmUser } = useAuthState();
+  const theme = useTheme();
 
   const [filterField, setFilterField] = useState("");
   const [filterOperator, setFilterOperator] = useState("");
@@ -108,14 +110,26 @@ export const DataGridFilterComponent = ({
       maxWidth="sm"
       fullWidth={true}
     >
-      <DialogTitle className=" !text-lg !flex flex-row justify-between items-center w-full">
+      <DialogTitle
+        style={{
+          background: theme.palette.background.default,
+          color: theme.palette.primary.contrastText,
+        }}
+        className=" !text-lg !flex flex-row justify-between items-center w-full"
+      >
         Filters
         <IconButton aria-label="close" onClick={handleCLoseFilterMenu}>
           <FaTimes className="!text-sm" />
         </IconButton>
       </DialogTitle>
       {/* <Divider /> */}
-      <DialogContent dividers>
+      <DialogContent
+        dividers
+        style={{
+          background: theme.palette.background.default,
+          color: theme.palette.primary.contrastText,
+        }}
+      >
         <Grid container spacing={2}>
           <Grid item xs={12} sm={4}>
             <Select
@@ -207,7 +221,12 @@ export const DataGridFilterComponent = ({
           )}
         </Grid>
       </DialogContent>
-      <DialogActions>
+      <DialogActions
+        style={{
+          background: theme.palette.background.default,
+          color: theme.palette.primary.contrastText,
+        }}
+      >
         <Button
           disableElevation
           variant="contained"

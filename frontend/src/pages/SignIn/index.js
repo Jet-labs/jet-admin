@@ -127,8 +127,8 @@ const SignIn = ({}) => {
   return (
     <div className="signin_main">
       <AppBar position="sticky" className="!bg-transparent" elevation={0}>
-        <Toolbar>
-          <img src={logo} className="mr-2 !h-12 !w-14"></img>
+        <Toolbar className="!mt-2">
+          <img src={logo} className="mr-2 !h-10 !w-10"></img>
           <span className="font-bold text-lg flex-grow ">
             {LOCAL_CONSTANTS.APP_NAME}
           </span>

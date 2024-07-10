@@ -2,7 +2,7 @@ import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import { fetchRowByIDAPI } from "../../../api/tables";
 
-import { Button, CircularProgress, Grid, Paper } from "@mui/material";
+import { Button, CircularProgress, Grid, Paper, useTheme } from "@mui/material";
 import { useEffect, useMemo } from "react";
 import { Loading } from "../../../pages/Loading";
 import { FieldComponent } from "../../FieldComponent";
@@ -17,6 +17,7 @@ import { RowDeletionForm } from "../RowDeletetionForm";
 
 export const RowUpdateForm = ({ tableName, id }) => {
   const queryClient = new QueryClient();
+  const theme = useTheme();
   const {
     isLoading: isLoadingRowData,
     data: rowData,
@@ -104,7 +105,10 @@ export const RowUpdateForm = ({ tableName, id }) => {
         <div className="flex flex-col items-start justify-start">
           <span className="text-lg font-bold text-start ">{`Update row`}</span>
           {tableName && (
-            <span className="text-xs font-thin text-start text-slate-300">{`Table : ${tableName} | Entry ID : ${id}`}</span>
+            <span
+              style={{ color: theme.palette.text.secondary }}
+              className="text-xs font-thin text-start text-slate-300"
+            >{`Table : ${tableName} | Entry ID : ${id}`}</span>
           )}
         </div>
 
@@ -129,9 +133,13 @@ export const RowUpdateForm = ({ tableName, id }) => {
       {isLoadingRowData ? (
         <Loading />
       ) : (
-        <Paper
+        <div
           className="px-4 mt-3 w-full 2xl:w-3/5 xl:w-3/4 lg:w-2/3 md:w-full pb-3"
-          variant="outlined"
+          style={{
+            borderRadius: 4,
+            borderWidth: 1,
+            borderColor: theme.palette.divider,
+          }}
         >
           <form className="" onSubmit={rowUpdateForm.handleSubmit}>
             <Grid container rowSpacing={2} columnSpacing={3} className="!mt-2">
@@ -158,7 +166,7 @@ export const RowUpdateForm = ({ tableName, id }) => {
               })}
             </Grid>
           </form>
-        </Paper>
+        </div>
       )}
     </div>
   ) : !authorizedColumns || authorizedColumns.length == 0 ? (

@@ -32,15 +32,27 @@ export const TableDrawerList = () => {
 
   return (
     <List
-      sx={{}}
+      style={{
+        borderRightWidth: 1,
+        borderColor: theme.palette.divider,
+        backgroundColor: theme.palette.background.default,
+      }}
       component="nav"
       aria-labelledby="nested-list-subheader"
-      className=" !h-[calc(100vh-48px)] !overflow-y-auto !overflow-x-hidden !border-r !border-white !border-opacity-10 w-full"
+      className=" !h-[calc(100vh-48px)] !overflow-y-auto !overflow-x-hidden w-full"
     >
       <div className="!px-3.5 py-1 flex flex-row justify-between items-center w-full">
-        <span className="!font-semibold">{"Tables"}</span>
+        <span
+          style={{ color: theme.palette.primary.main }}
+          className="!font-semibold"
+        >
+          {"Tables"}
+        </span>
         <IconButton onClick={refetchTables}>
-          <FaRedo className="!text-sm" />
+          <FaRedo
+            style={{ color: theme.palette.primary.main }}
+            className="!text-sm"
+          />
         </IconButton>
       </div>
       <div className="!mt-1"></div>
@@ -56,7 +68,7 @@ export const TableDrawerList = () => {
             >
               <ListItemButton
                 sx={{
-                  background: theme.palette.background.default,
+                  background: theme.palette.background.paper,
                   border: key == currentPage ? 1 : 0,
                   borderColor: theme.palette.primary.main,
                 }}
