@@ -10,17 +10,18 @@ import { Loading } from "../../../pages/Loading";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { FieldComponent } from "../../FieldComponent";
-import { updateAccountAPI } from "../../../api/accounts";
+import { updatePMUserDataAPI } from "../../../api/accounts";
 import { AccountDeletionForm } from "../AccountDeletetionForm";
+import { AccountPasswordChangeForm } from "../AccountPasswordChangeForm";
 
 export const AccountUpdationForm = ({ id }) => {
   const theme = useTheme();
   const queryClient = new QueryClient();
 
   const {
-    isLoading: isLoadingAccountData,
+    isLoading: isLoadingPMUserData,
     data: pmUserData,
-    error: loadAccountDataError,
+    error: loadPMUserDataError,
   } = useQuery({
     queryKey: [
       `REACT_QUERY_KEY_TABLES_${String(
@@ -60,14 +61,14 @@ export const AccountUpdationForm = ({ id }) => {
   });
 
   const {
-    isPending: isUpdatingAccount,
-    isSuccess: isUpdateAccountSuccess,
-    isError: isUpdateAccountError,
-    error: updateAccountError,
-    mutate: updateAccount,
+    isPending: isUpdatingPMUserData,
+    isSuccess: isUpdatePMUserDataSuccess,
+    isError: isUpdatePMUserError,
+    error: updatePMUserDataError,
+    mutate: updatePMUserData,
   } = useMutation({
     mutationFn: ({ data }) => {
-      return updateAccountAPI({ data });
+      return updatePMUserDataAPI({ data });
     },
 
     retry: false,
@@ -94,7 +95,7 @@ export const AccountUpdationForm = ({ id }) => {
       return errors;
     },
     onSubmit: (values) => {
-      updateAccount({ data: values });
+      updatePMUserData({ data: values });
     },
   });
 
@@ -123,9 +124,9 @@ export const AccountUpdationForm = ({ id }) => {
     }
   }, [policyObjectData]);
 
-  return !isLoadingAccountData && !isLoadingPolicyObjectData && pmUserData ? (
+  return !isLoadingPMUserData && !isLoadingPolicyObjectData && pmUserData ? (
     <div className="flex flex-col justify-start items-center w-full pb-5 p-2">
-      <div className=" flex flex-row justify-between 2xl:w-3/5 xl:w-3/4 lg:w-2/3 md:w-full  mt-3 w-full ">
+      <div className=" flex flex-row justify-between 2xl:w-1/2 xl:w-1/2 lg:w-2/3 md:w-full w-full  mt-3 w-full ">
         <div className="flex flex-col items-start justify-start">
           <span className="text-lg font-bold text-start ">{`Account settings`}</span>
           <span
@@ -142,7 +143,7 @@ export const AccountUpdationForm = ({ id }) => {
             size="small"
             type="submit"
             startIcon={
-              isUpdatingAccount && (
+              isUpdatingPMUserData && (
                 <CircularProgress color="inherit" size={12} />
               )
             }
@@ -154,7 +155,7 @@ export const AccountUpdationForm = ({ id }) => {
         </div>
       </div>
       <div
-        className="p-4 pt-0 mt-3 w-full 2xl:w-3/5 xl:w-3/4 lg:w-2/3 md:w-full"
+        className="p-4 pt-0 mt-3 2xl:w-1/2 xl:w-1/2 lg:w-2/3 md:w-full w-full"
         style={{
           borderRadius: 4,
           borderWidth: 1,
@@ -233,6 +234,7 @@ export const AccountUpdationForm = ({ id }) => {
           </Grid>
         </form>
       </div>
+      {pmUserData && <AccountPasswordChangeForm pmUserData={pmUserData} />}
     </div>
   ) : (
     <Loading />

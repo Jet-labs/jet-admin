@@ -19,7 +19,7 @@ export const addAccountAPI = async ({ data }) => {
   }
 };
 
-export const updateAccountAPI = async ({ data }) => {
+export const updatePMUserDataAPI = async ({ data }) => {
   try {
     const response = await axiosInstance.put(
       LOCAL_CONSTANTS.APIS.ACCOUNT.updateAccount(),
@@ -39,7 +39,7 @@ export const updateAccountAPI = async ({ data }) => {
   }
 };
 
-export const updatePasswordAPI = async ({ data }) => {
+export const updatePMUserPasswordAPI = async ({ data }) => {
   try {
     const response = await axiosInstance.put(
       LOCAL_CONSTANTS.APIS.ACCOUNT.updatePassword(),
