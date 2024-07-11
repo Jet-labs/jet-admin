@@ -1,9 +1,9 @@
 import { useParams } from "react-router-dom";
-import { UpdateAccountForm } from "../../components/AccountComponents/UpdateAccountForm";
+import { AccountUpdationForm } from "../../components/AccountComponents/AccountUpdationForm";
 
 const UpdateAccount = () => {
   const { id } = useParams();
-  return <UpdateAccountForm id={id} />;
+  return <AccountUpdationForm id={id} />;
 };
 
 export default UpdateAccount;

@@ -403,6 +403,7 @@ class TableService {
         message: "TableService:deleteTableRowByID:checkedRow",
         params: { checkedRow },
       });
+      let row = null;
       if (!checkedRow) {
         Logger.log("error", {
           message: "TableService:deleteTableRowByID:catch-2",

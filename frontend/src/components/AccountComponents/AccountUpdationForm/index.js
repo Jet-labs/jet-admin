@@ -9,12 +9,11 @@ import { useEffect, useMemo } from "react";
 import { Loading } from "../../../pages/Loading";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { LOCAL_CONSTANTS } from "../../../constants";
-import { RowDeletionForm } from "../../DataGridComponents/RowDeletetionForm";
 import { FieldComponent } from "../../FieldComponent";
 import { updateAccountAPI } from "../../../api/accounts";
+import { AccountDeletionForm } from "../AccountDeletetionForm";
 
-export const UpdateAccountForm = ({ id }) => {
-  const tableName = LOCAL_CONSTANTS.STRINGS.PM_USER_TABLE_NAME;
+export const AccountUpdationForm = ({ id }) => {
   const theme = useTheme();
   const queryClient = new QueryClient();
 
@@ -136,7 +135,7 @@ export const UpdateAccountForm = ({ id }) => {
         </div>
 
         <div className="flex flex-row items-center justify-end w-min ">
-          <RowDeletionForm tableName={tableName} id={id} />
+          <AccountDeletionForm id={id} username={pmUserData.username} />
           <Button
             disableElevation
             variant="contained"
