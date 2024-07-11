@@ -1,25 +1,4 @@
-.cm-editor{
-    border-radius: 5px;
-}
 
-.cm-scroller{
-    border-radius: 5px;
-}
-
-.no-code-mirror-border{
-    .cm-editor{
-    border-radius: 0 !important;
-    background-color: #181826 !important;
-    
-}
-.cm-gutters{
-        background-color: #181826 !important;
-    }
-
-.cm-scroller{
-    border-radius: 0 !important;
-}
-}
 .rdg-cell{
    background-color: #181826 !important;
    /* border-left: 1px solid rgba(255, 255, 255, 0.1); */

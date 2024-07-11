@@ -2,90 +2,22 @@ import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import { fetchRowByIDAPI } from "../../api/tables";
 
-import { Button, CircularProgress, Grid, Paper } from "@mui/material";
+import { Button, CircularProgress, Grid, Paper, useTheme } from "@mui/material";
 
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { updateRowAPI } from "../../api/tables";
-import { FieldComponent } from "../../components/FieldComponent";
-import { DashboardPolicyEditor } from "../../components/PolicyComponents/DashboardPolicyEditor";
-import { GraphPolicyEditor } from "../../components/PolicyComponents/GraphPolicyEditor";
-import { QueryPolicyEditor } from "../../components/PolicyComponents/QueryPolicyEditor";
-import { TablePolicyEditor } from "../../components/PolicyComponents/TablePolicyEditor";
 import { RowDeletionForm } from "../../components/DataGridComponents/RowDeletetionForm";
+import { FieldComponent } from "../../components/FieldComponent";
+import { GUIPolicyEditor } from "../../components/PolicyComponents/GUIPolicyEditor";
 import { LOCAL_CONSTANTS } from "../../constants";
 import { useConstants } from "../../contexts/constantsContext";
 import { displayError, displaySuccess } from "../../utils/notification";
 import { Loading } from "../Loading";
 
-const GUIPolicyEditor = ({ policy, handleChange, containerClass }) => {
-  return (
-    <Grid
-      item
-      xs={12}
-      sm={12}
-      md={12}
-      lg={12}
-      key={"_policy"}
-      className={containerClass}
-    >
-      {policy &&
-        Object.keys(policy).map((key) => {
-          let component = null;
-          switch (key) {
-            case "tables": {
-              component = (
-                <TablePolicyEditor
-                  value={policy[key]}
-                  handleChange={(value) => {
-                    handleChange({ ...policy, [key]: value });
-                  }}
-                />
-              );
-              break;
-            }
-            case "graphs": {
-              component = (
-                <GraphPolicyEditor
-                  value={policy[key]}
-                  handleChange={(value) => {
-                    handleChange({ ...policy, [key]: value });
-                  }}
-                />
-              );
-              break;
-            }
-            case "queries": {
-              component = (
-                <QueryPolicyEditor
-                  value={policy[key]}
-                  handleChange={(value) => {
-                    handleChange({ ...policy, [key]: value });
-                  }}
-                />
-              );
-              break;
-            }
-            case "dashboards": {
-              component = (
-                <DashboardPolicyEditor
-                  value={policy[key]}
-                  handleChange={(value) => {
-                    handleChange({ ...policy, [key]: value });
-                  }}
-                />
-              );
-              break;
-            }
-          }
-          return component;
-        })}
-    </Grid>
-  );
-};
-
 const UpdatePolicy = () => {
   const { dbModel } = useConstants();
+  const theme = useTheme();
   console.log({ dbModel });
   const tableName = LOCAL_CONSTANTS.STRINGS.POLICY_OBJECT_TABLE_NAME;
   const { id } = useParams();
@@ -193,7 +125,14 @@ const UpdatePolicy = () => {
         className="!flex !flex-col justify-start items-stretch 2xl:w-3/5 xl:w-3/4 lg:w-2/3 md:w-full"
         onSubmit={policyObjectUpdateForm.handleSubmit}
       >
-        <Paper className="px-4 mt-3 w-full  pb-3" variant="outlined">
+        <div
+          className="p-4 mt-3 w-full pt-0"
+          style={{
+            borderRadius: 4,
+            borderWidth: 1,
+            borderColor: theme.palette.divider,
+          }}
+        >
           <Grid container rowSpacing={2} className="!mt-2">
             <Grid
               item
@@ -248,7 +187,7 @@ const UpdatePolicy = () => {
               />
             </Grid>
           </Grid>
-        </Paper>
+        </div>
         <GUIPolicyEditor
           policy={policyObjectUpdateForm.values["policy"]}
           handleChange={(value) => {

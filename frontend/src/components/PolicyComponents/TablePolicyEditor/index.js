@@ -10,7 +10,7 @@ import { displayError } from "../../../utils/notification";
 import { loadLanguage } from "@uiw/codemirror-extensions-langs";
 import { dracula } from "@uiw/codemirror-theme-dracula";
 import CodeMirror from "@uiw/react-codemirror";
-
+import { githubLight } from "@uiw/codemirror-theme-github";
 export const TablePolicyEditor = ({ value, handleChange }) => {
   const { dbModel } = useConstants();
   const isVisualEditorSufficient = useMemo(() => {
@@ -52,16 +52,19 @@ export const TablePolicyEditor = ({ value, handleChange }) => {
     }
   };
   return (
-    <div className="!flex flex-col justify-start items-stretch w-full mt-4">
-      <span className="!font-bold pl-1 py-2">{capitalize("Tables")}</span>
-
-      <div className="!flex flex-col justify-start items-stretch w-full !border rounded !border-white !border-opacity-10">
-        <Tabs
-          value={tab}
-          onChange={_handleOnTabChange}
-          className="!min-h-0"
-          style={{ background: theme.palette.background.paper }}
-        >
+    <div
+      className="!flex flex-col justify-start items-stretch w-full mt-4  border rounded"
+      style={{ borderColor: theme.palette.divider }}
+    >
+      <span
+        style={{ background: theme.palette.background.paper }}
+        className="!font-bold pl-1 py-2 rounded-t"
+      >
+        {capitalize("Tables")}
+      </span>
+      <Divider />
+      <div className="!flex flex-col justify-start items-stretch w-full ">
+        <Tabs value={tab} onChange={_handleOnTabChange} className="!min-h-0">
           <Tab
             label="Visual editor"
             className="!font-bold !capitalize !py-2 !px-3 !min-h-0"
@@ -185,7 +188,7 @@ export const TablePolicyEditor = ({ value, handleChange }) => {
               height="200px"
               extensions={[loadLanguage("json")]}
               onChange={(value) => handleChange(JSON.parse(value))}
-              theme={dracula}
+              theme={githubLight}
               style={{
                 borderWidth: 0,
                 width: "100%",

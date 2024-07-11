@@ -572,9 +572,9 @@ export const customLightTheme = {
       styleOverrides: {
         root: {
           background: "#ffffff",
-
+          borderWidth: 0,
           "& .MuiDataGrid-main": {
-            borderColor: "#e6e6e6",
+            borderColor: "#CFCFCF",
             borderWidth: 1,
           },
           "& .MuiDataGrid-withBorderColor": {
@@ -583,7 +583,6 @@ export const customLightTheme = {
             borderBottom: 0,
           },
           "& .MuiDataGrid-columnHeader": {
-            // background: "#e6e6e6",
             background: "#ffffff",
             borderColor: "#00000000",
             outline: 0,
@@ -613,7 +612,7 @@ export const customLightTheme = {
         row: {
           background: "#ffffff",
           borderTopWidth: 1,
-          borderColor: "#e6e6e6",
+          borderColor: "#CFCFCF",
           "&:hover": {
             background: "#e6e6e6",
           },
