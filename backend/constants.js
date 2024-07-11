@@ -50,6 +50,10 @@ const constants = {
       code: "INVALID_USER",
       message: "User not found",
     },
+    USERNAME_TAKEN: {
+      code: "USERNAME_TAKEN",
+      message: "Please use different username",
+    },
     INVALID_LOGIN: {
       code: "INVALID_LOGIN",
       message: "User login invalid",

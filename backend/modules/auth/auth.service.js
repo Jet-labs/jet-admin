@@ -1,27 +1,14 @@
 const { prisma } = require("../../config/prisma");
 const constants = require("../../constants");
-const crypto = require("crypto");
+
 const jwt = require("jsonwebtoken");
 const environmentVariables = require("../../environment");
 const Logger = require("../../utils/logger");
+const { comparePasswordWithHash } = require("../../utils/crypto.utils");
 const salt = "ed2b6072e463cbe7e5387de6bae69d55";
 
 class AuthService {
   constructor() {}
-
-  /**
-   *
-   * @param {object} param0
-   * @param {String} param0.password
-   * @param {String} param0.passwordHash
-   * @returns {String}
-   */
-  static comparePasswordWithHash = ({ password, passwordHash }) => {
-    const providedPasswordHash = crypto
-      .pbkdf2Sync(password, salt, 1000, 64, `sha512`)
-      .toString(`hex`);
-    return String(passwordHash) === String(providedPasswordHash);
-  };
 
   /**
    *
@@ -159,8 +146,9 @@ class AuthService {
         throw constants.ERROR_CODES.INVALID_USER;
       }
       if (
-        this.comparePasswordWithHash({
+        comparePasswordWithHash({
           password,
+          salt: pmUser.salt,
           passwordHash: pmUser.password_hash,
         })
       ) {

@@ -53,3 +53,11 @@
 [31merror[39m: dev_node_1: 11-07-2024 20:30:41: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
 [31merror[39m: dev_node_1: 11-07-2024 20:30:42: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
 [31merror[39m: dev_node_1: 11-07-2024 20:30:42: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 11-07-2024 20:41:16: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-07-11T15:10:39.000Z"}}
+[31merror[39m: dev_node_1: 11-07-2024 20:41:16: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 11-07-2024 20:41:31: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 11-07-2024 20:41:31: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 11-07-2024 20:41:32: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 11-07-2024 20:41:32: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 11-07-2024 20:57:49: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-07-11T15:26:16.000Z"}}
+[31merror[39m: dev_node_1: 11-07-2024 20:57:49: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
