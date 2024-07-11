@@ -358,7 +358,7 @@ export const customLightTheme = {
       hoverOpacity: 0.08,
       selected: "#e6e6e6",
       selectedOpacity: 0.16,
-      disabled: "rgba(255, 255, 255, 0.3)",
+      disabled: "#e6e6e6",
       disabledBackground: "rgba(255, 255, 255, 0.12)",
       disabledOpacity: 0.38,
       focus: "#e6e6e6",
@@ -514,6 +514,15 @@ export const customLightTheme = {
             color: "#6a7585",
             fontSize: 10,
           },
+          input: {
+            "&:-webkit-autofill": {
+              WebkitBoxShadow: "0 0 0 100px #fff inset",
+              WebkitTextFillColor: "#6a7585",
+
+              caretColor: "#6a7585",
+            },
+          },
+
           color: "#6a7585",
         },
         input: {

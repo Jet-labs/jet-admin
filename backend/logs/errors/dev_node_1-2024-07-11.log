@@ -61,3 +61,36 @@
 [31merror[39m: dev_node_1: 11-07-2024 20:41:32: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
 [31merror[39m: dev_node_1: 11-07-2024 20:57:49: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-07-11T15:26:16.000Z"}}
 [31merror[39m: dev_node_1: 11-07-2024 20:57:49: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 11-07-2024 21:54:46: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-07-11T15:42:49.000Z"}}
+[31merror[39m: dev_node_1: 11-07-2024 21:54:46: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 11-07-2024 21:54:46: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 11-07-2024 21:54:46: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 11-07-2024 21:55:19: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 11-07-2024 21:55:19: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 11-07-2024 21:59:45: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 11-07-2024 21:59:45: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 11-07-2024 22:08:28: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 11-07-2024 22:08:28: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 11-07-2024 22:08:29: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 11-07-2024 22:08:29: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 11-07-2024 22:09:41: [31mAuthService:loginUserWithUsernamePassword:catch-2[39m |====| {"error":{"code":"INVALID_LOGIN","message":"User login invalid"}}
+[31merror[39m: dev_node_1: 11-07-2024 22:09:41: [31mAuthService:loginUserWithUsernamePassword:catch-1[39m |====| {"error":{"code":"INVALID_LOGIN","message":"User login invalid"}}
+[31merror[39m: dev_node_1: 11-07-2024 22:09:41: [31mauthController:login:catch-1[39m |====| {"error":{"code":"INVALID_LOGIN","message":"User login invalid"}}
+[31merror[39m: dev_node_1: 11-07-2024 22:09:49: [31mAuthService:loginUserWithUsernamePassword:catch-2[39m |====| {"error":{"code":"INVALID_LOGIN","message":"User login invalid"}}
+[31merror[39m: dev_node_1: 11-07-2024 22:09:49: [31mAuthService:loginUserWithUsernamePassword:catch-1[39m |====| {"error":{"code":"INVALID_LOGIN","message":"User login invalid"}}
+[31merror[39m: dev_node_1: 11-07-2024 22:09:49: [31mauthController:login:catch-1[39m |====| {"error":{"code":"INVALID_LOGIN","message":"User login invalid"}}
+[31merror[39m: dev_node_1: 11-07-2024 22:09:51: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 11-07-2024 22:09:51: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 11-07-2024 22:09:52: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 11-07-2024 22:09:52: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 11-07-2024 22:23:55: [31mAccountService:updateAccount:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 11-07-2024 22:23:55: [31maccountController:updateAccount:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 11-07-2024 22:24:53: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-07-11T16:54:51.000Z"}}
+[31merror[39m: dev_node_1: 11-07-2024 22:24:53: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 11-07-2024 22:25:05: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 11-07-2024 22:25:05: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 11-07-2024 22:29:58: [31mAccountService:addAccount:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 11-07-2024 22:29:58: [31maccountController:addAccount:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 11-07-2024 22:30:35: [31mAccountService:addAccount:catch-2[39m |====| {"error":{"code":"USERNAME_TAKEN","message":"Please use different username"}}
+[31merror[39m: dev_node_1: 11-07-2024 22:30:35: [31mAccountService:addAccount:catch-1[39m |====| {"error":{"code":"USERNAME_TAKEN","message":"Please use different username"}}
+[31merror[39m: dev_node_1: 11-07-2024 22:30:35: [31maccountController:addAccount:catch-1[39m |====| {"error":{"code":"USERNAME_TAKEN","message":"Please use different username"}}

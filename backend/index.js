@@ -14,6 +14,10 @@ expressApp.use(
 );
 
 expressApp.use("/admin_api/tables", require("./modules/table/table.route"));
+expressApp.use(
+  "/admin_api/accounts",
+  require("./modules/accounts/account.route")
+);
 expressApp.use("/admin_api/graphs", require("./modules/graph/graph.route"));
 expressApp.use(
   "/admin_api/dashboards",

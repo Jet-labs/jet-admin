@@ -3,59 +3,80 @@ import { useFormik } from "formik";
 
 import { Button, CircularProgress, Grid, Paper, useTheme } from "@mui/material";
 import { useMemo } from "react";
-import { addRowAPI, getAuthorizedColumnsForAdd } from "../../../api/tables";
+import {
+  fetchAllRowsAPI,
+  getAuthorizedColumnsForAdd,
+} from "../../../api/tables";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { getFormattedTableColumns } from "../../../utils/tables";
 import { ErrorComponent } from "../../ErrorComponent";
 import { FieldComponent } from "../../FieldComponent";
+import { addAccountAPI } from "../../../api/accounts";
 
 export const AccountAdditionForm = ({ tableName }) => {
   const theme = useTheme();
+
   const {
-    isLoading: isLoadingAddColumns,
-    data: addColumns,
-    error: loadAddColumnsError,
+    isLoading: isLoadingPolicyObjectData,
+    data: policyObjectData,
+    error: loadPolicyObjectDataError,
   } = useQuery({
     queryKey: [
-      `REACT_QUERY_KEY_TABLES_${String(tableName).toUpperCase()}`,
-      `add_column`,
+      `REACT_QUERY_KEY_TABLES_${String(
+        LOCAL_CONSTANTS.STRINGS.POLICY_OBJECT_TABLE_NAME
+      ).toUpperCase()}`,
     ],
-    queryFn: () => getAuthorizedColumnsForAdd({ tableName }),
+    queryFn: () =>
+      fetchAllRowsAPI({
+        tableName: LOCAL_CONSTANTS.STRINGS.POLICY_OBJECT_TABLE_NAME,
+        filterQuery: {},
+        sortModel: {},
+      }),
     cacheTime: 0,
     retry: 1,
     staleTime: Infinity,
   });
 
-  const allColumns = useMemo(() => {
-    if (addColumns) {
-      const c = getFormattedTableColumns(addColumns);
-      return c;
+  const customPolicyObjectMapping = useMemo(() => {
+    const map = {};
+    if (policyObjectData && policyObjectData.rows) {
+      policyObjectData.rows.forEach((policyObject) => {
+        map[policyObject.pm_policy_object_id] = policyObject.title;
+      });
+      return map;
     } else {
       return null;
     }
-  }, [addColumns]);
+  }, [policyObjectData]);
 
   const {
-    isPending: isAddingRow,
-    isSuccess: isAddingRowSuccess,
-    isError: isAddingRowError,
-    error: addRowError,
-    mutate: addRow,
+    isPending: isAddingAccount,
+    isSuccess: isAddingAccountSuccess,
+    isError: isAddingAccountError,
+    error: addAccountError,
+    mutate: addAccount,
   } = useMutation({
-    mutationFn: ({ tableName, data }) => {
-      return addRowAPI({ tableName, data });
+    mutationFn: ({ data }) => {
+      return addAccountAPI({ data });
     },
     retry: false,
     onSuccess: () => {
-      displaySuccess("Added record successfully");
+      displaySuccess("Added account successfully");
     },
     onError: (error) => {
       displayError(error);
     },
   });
-  const rowAdditionForm = useFormik({
-    initialValues: {},
+  const accountAdditionForm = useFormik({
+    initialValues: {
+      username: "",
+      first_name: "",
+      last_name: "",
+      password: "",
+      pm_policy_object_id: "",
+      address1: "",
+    },
     validateOnMount: false,
     validateOnChange: false,
     validate: (values) => {
@@ -63,18 +84,14 @@ export const AccountAdditionForm = ({ tableName }) => {
       return errors;
     },
     onSubmit: (values) => {
-      addRow({ tableName, data: values });
+      addAccount({ data: values });
     },
   });
-  return allColumns && allColumns.length > 0 ? (
+  return (
     <div className="flex flex-col justify-start items-center w-full pb-5 p-2">
       <div className=" flex flex-row justify-between 2xl:w-3/5 xl:w-3/4 lg:w-2/3 md:w-full mt-3 ">
         <div className="flex flex-col items-start justify-start">
-          <span className="text-lg font-bold text-start ">{`Add row`}</span>
-          <span
-            style={{ color: theme.palette.text.secondary }}
-            className="text-xs font-thin text-start text-slate-300"
-          >{`Table : ${tableName}`}</span>
+          <span className="text-lg font-bold text-start ">{`Add account`}</span>
         </div>
 
         <div className="flex flex-row items-center justify-end w-min">
@@ -84,12 +101,12 @@ export const AccountAdditionForm = ({ tableName }) => {
             size="small"
             type="submit"
             startIcon={
-              isAddingRow && <CircularProgress color="inherit" size={12} />
+              isAddingAccount && <CircularProgress color="inherit" size={12} />
             }
             className="!ml-2"
-            onClick={rowAdditionForm.handleSubmit}
+            onClick={accountAdditionForm.handleSubmit}
           >
-            <span className="!w-max">Add record</span>
+            <span className="!w-max">Add account</span>
           </Button>
         </div>
       </div>
@@ -101,36 +118,111 @@ export const AccountAdditionForm = ({ tableName }) => {
           borderColor: theme.palette.divider,
         }}
       >
-        <form onSubmit={rowAdditionForm.handleSubmit}>
+        <form onSubmit={accountAdditionForm.handleSubmit}>
           <Grid
             container
             spacing={{ xs: 1, md: 2 }}
             columns={{ xs: 1, sm: 1, md: 2 }}
             className="!mt-2"
           >
-            {allColumns.map((column, index) => {
-              return (
-                <Grid item xs={12} sm={12} md={12} lg={12} key={index}>
-                  <FieldComponent
-                    type={column.type}
-                    name={column.field}
-                    value={rowAdditionForm.values[column.field]}
-                    onBlur={rowAdditionForm.handleBlur}
-                    onChange={rowAdditionForm.handleChange}
-                    helperText={rowAdditionForm.errors[column.field]}
-                    error={Boolean(rowAdditionForm.errors[column.field])}
-                    setFieldValue={rowAdditionForm.setFieldValue}
-                  />
-                </Grid>
-              );
-            })}
+            <Grid item xs={12} sm={12} md={12} lg={12} key={"username"}>
+              <FieldComponent
+                type={"String"}
+                name={"username"}
+                readOnly={false}
+                value={accountAdditionForm.values["username"]}
+                onBlur={accountAdditionForm.handleBlur}
+                onChange={accountAdditionForm.handleChange}
+                setFieldValue={accountAdditionForm.setFieldValue}
+                helperText={accountAdditionForm.errors["username"]}
+                error={Boolean(accountAdditionForm.errors["username"])}
+                required={true}
+                customMapping={null}
+              />
+            </Grid>
+            <Grid item xs={12} sm={12} md={12} lg={12} key={"first_name"}>
+              <FieldComponent
+                type={"String"}
+                name={"first_name"}
+                readOnly={false}
+                value={accountAdditionForm.values["first_name"]}
+                onBlur={accountAdditionForm.handleBlur}
+                onChange={accountAdditionForm.handleChange}
+                setFieldValue={accountAdditionForm.setFieldValue}
+                helperText={accountAdditionForm.errors["first_name"]}
+                error={Boolean(accountAdditionForm.errors["first_name"])}
+                required={false}
+                customMapping={null}
+              />
+            </Grid>
+            <Grid item xs={12} sm={12} md={12} lg={12} key={"last_name"}>
+              <FieldComponent
+                type={"String"}
+                name={"last_name"}
+                readOnly={false}
+                value={accountAdditionForm.values["last_name"]}
+                onBlur={accountAdditionForm.handleBlur}
+                onChange={accountAdditionForm.handleChange}
+                setFieldValue={accountAdditionForm.setFieldValue}
+                helperText={accountAdditionForm.errors["last_name"]}
+                error={Boolean(accountAdditionForm.errors["last_name"])}
+                required={false}
+                customMapping={null}
+              />
+            </Grid>
+            <Grid item xs={12} sm={12} md={12} lg={12} key={"address1"}>
+              <FieldComponent
+                type={"String"}
+                name={"address1"}
+                readOnly={false}
+                value={accountAdditionForm.values["address1"]}
+                onBlur={accountAdditionForm.handleBlur}
+                onChange={accountAdditionForm.handleChange}
+                setFieldValue={accountAdditionForm.setFieldValue}
+                helperText={accountAdditionForm.errors["address1"]}
+                error={Boolean(accountAdditionForm.errors["address1"])}
+                required={false}
+                customMapping={null}
+              />
+            </Grid>
+            <Grid
+              item
+              xs={12}
+              sm={12}
+              md={12}
+              lg={12}
+              key={"pm_policy_object_id"}
+            >
+              <FieldComponent
+                type={"Int"}
+                name={"pm_policy_object_id"}
+                value={accountAdditionForm.values["pm_policy_object_id"]}
+                onBlur={accountAdditionForm.handleBlur}
+                onChange={accountAdditionForm.handleChange}
+                setFieldValue={accountAdditionForm.setFieldValue}
+                helperText={accountAdditionForm.errors["pm_policy_object_id"]}
+                error={Boolean(
+                  accountAdditionForm.errors["pm_policy_object_id"]
+                )}
+                required={true}
+                customMapping={customPolicyObjectMapping}
+              />
+            </Grid>
+            <Grid item xs={12} sm={12} md={12} lg={12} key={"password"}>
+              <FieldComponent
+                type={"String"}
+                name={"password"}
+                value={accountAdditionForm.values["password"]}
+                onBlur={accountAdditionForm.handleBlur}
+                onChange={accountAdditionForm.handleChange}
+                helperText={accountAdditionForm.errors["password"]}
+                error={Boolean(accountAdditionForm.errors["password"])}
+                setFieldValue={accountAdditionForm.setFieldValue}
+              />
+            </Grid>
           </Grid>
         </form>
       </div>
-    </div>
-  ) : (
-    <div className="p-3">
-      <ErrorComponent error={LOCAL_CONSTANTS.ERROR_CODES.PERMISSION_DENIED} />
     </div>
   );
 };

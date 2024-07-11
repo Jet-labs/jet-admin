@@ -206,6 +206,11 @@ export const LOCAL_CONSTANTS = {
       getGraphDataByID: ({ id }) => `/admin_api/graphs/${id}/data`,
       deleteGraphByID: ({ id }) => `/admin_api/graphs/${id}`,
     },
+    ACCOUNT: {
+      addAccount: () => `/admin_api/accounts`,
+      updateAccount: () => `/admin_api/accounts`,
+      updatePassword: () => `/admin_api/accounts/password`,
+    },
     DASHBOARD_LAYOUT: {
       getAllDashboards: () => `/admin_api/dashboards`,
       getDashboardByID: ({ id }) => `/admin_api/dashboards/${id}`,

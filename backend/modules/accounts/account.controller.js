@@ -1,47 +1,8 @@
 const { extractError } = require("../../utils/error.utils");
 const Logger = require("../../utils/logger");
-const { DashboardService } = require("./dashboard.services");
+const { AccountService } = require("./account.services");
 
-const dashboardController = {};
-
-/**
- *
- * @param {import("express").Request} req
- * @param {import("express").Response} res
- * @returns
- */
-dashboardController.getAllDashboards = async (req, res) => {
-  try {
-    const { pmUser, state, params } = req;
-    const pm_user_id = parseInt(pmUser.pm_user_id);
-    const authorized_dashboards = state.authorized_dashboards;
-
-    Logger.log("info", {
-      message: "dashboardController:getAllDashboards:params",
-      params: { pm_user_id },
-    });
-
-    const dashboards = await DashboardService.getAllDashboards({
-      authorizedDashboards: authorized_dashboards,
-    });
-
-    Logger.log("success", {
-      message: "dashboardController:getAllDashboards:success",
-      params: { pm_user_id, dashboards },
-    });
-
-    return res.json({
-      success: true,
-      dashboards: dashboards,
-    });
-  } catch (error) {
-    Logger.log("error", {
-      message: "dashboardController:getAllDashboards:catch-1",
-      params: { error },
-    });
-    return res.json({ success: false, error: extractError(error) });
-  }
-};
+const accountController = {};
 
 /**
  *
@@ -49,75 +10,37 @@ dashboardController.getAllDashboards = async (req, res) => {
  * @param {import("express").Response} res
  * @returns
  */
-dashboardController.getDashboardByID = async (req, res) => {
-  try {
-    const { pmUser, state, params } = req;
-    const pm_dashboard_id = parseInt(params.id);
-    const pm_user_id = parseInt(pmUser.pm_user_id);
-    const authorized_dashboards = state.authorized_dashboards;
-
-    Logger.log("info", {
-      message: "dashboardController:getDashboardByID:params",
-      params: { pm_user_id, pm_dashboard_id },
-    });
-
-    const dashboard = await DashboardService.getDashboardByID({
-      dashboardID: pm_dashboard_id,
-      authorizedDashboards: authorized_dashboards,
-    });
-
-    Logger.log("success", {
-      message: "dashboardController:getDashboardByID:success",
-      params: { pm_user_id, dashboard },
-    });
-
-    return res.json({
-      success: true,
-      dashboard: dashboard,
-    });
-  } catch (error) {
-    Logger.log("error", {
-      message: "dashboardController:getDashboardByID:catch-1",
-      params: { error },
-    });
-    return res.json({ success: false, error: extractError(error) });
-  }
-};
-
-/**
- *
- * @param {import("express").Request} req
- * @param {import("express").Response} res
- * @returns
- */
-dashboardController.addDashboard = async (req, res) => {
+accountController.addAccount = async (req, res) => {
   try {
     const { pmUser, state, body } = req;
     const pm_user_id = parseInt(pmUser.pm_user_id);
 
     Logger.log("info", {
-      message: "dashboardController:addDashboard:params",
+      message: "accountController:addAccount:params",
       params: { pm_user_id, body },
     });
 
-    const dashboard = await DashboardService.addDashboard({
-      dashboardTitle: body.dashboard_title,
-      dashboardDescription: body.dashboard_description,
-      dashboardOptions: body.dashboard_options,
+    const account = await AccountService.addAccount({
+      firstName: body.first_name,
+      lastName: body.last_name,
+      password: body.password,
+      username: body.username,
+      policyID: body.pm_policy_object_id,
+      address1: body.address1,
     });
 
     Logger.log("success", {
-      message: "dashboardController:addDashboard:success",
-      params: { pm_user_id, dashboard },
+      message: "accountController:addAccount:success",
+      params: { pm_user_id, account },
     });
 
     return res.json({
       success: true,
-      dashboard,
+      account,
     });
   } catch (error) {
     Logger.log("error", {
-      message: "dashboardController:addDashboard:catch-1",
+      message: "accountController:addAccount:catch-1",
       params: { error },
     });
     return res.json({ success: false, error: extractError(error) });
@@ -130,37 +53,37 @@ dashboardController.addDashboard = async (req, res) => {
  * @param {import("express").Response} res
  * @returns
  */
-dashboardController.updateDashboard = async (req, res) => {
+accountController.updateAccount = async (req, res) => {
   try {
     const { pmUser, state, body } = req;
     const pm_user_id = parseInt(pmUser.pm_user_id);
-    const authorized_dashboards = state.authorized_dashboards;
+    const authorized_accounts = state.authorized_accounts;
 
     Logger.log("info", {
-      message: "dashboardController:updateDashboard:params",
+      message: "accountController:updateAccount:params",
       params: { pm_user_id, body },
     });
 
-    const dashboard = await DashboardService.updateDashboard({
-      dashboardID: parseInt(body.pm_dashboard_id),
-      dashboardTitle: body.dashboard_title,
-      dashboardDescription: body.dashboard_description,
-      dashboardOptions: body.dashboard_options,
-      authorizedDashboards: authorized_dashboards,
+    const account = await AccountService.updateAccount({
+      pmUserID: body.pm_user_id,
+      firstName: body.first_name,
+      lastName: body.last_name,
+      policyID: body.pm_policy_object_id,
+      address1: body.address1,
     });
 
     Logger.log("success", {
-      message: "dashboardController:updateDashboard:success",
-      params: { pm_user_id, dashboard },
+      message: "accountController:updateAccount:success",
+      params: { pm_user_id, account },
     });
 
     return res.json({
       success: true,
-      dashboard,
+      account,
     });
   } catch (error) {
     Logger.log("error", {
-      message: "dashboardController:updateDashboard:catch-1",
+      message: "accountController:updateAccount:catch-1",
       params: { error },
     });
     return res.json({ success: false, error: extractError(error) });
@@ -173,38 +96,38 @@ dashboardController.updateDashboard = async (req, res) => {
  * @param {import("express").Response} res
  * @returns
  */
-dashboardController.deleteDashboard = async (req, res) => {
+accountController.updatePassword = async (req, res) => {
   try {
-    const { pmUser, state, params } = req;
-    const pm_dashboard_id = parseInt(params.id);
+    const { pmUser, state, body } = req;
     const pm_user_id = parseInt(pmUser.pm_user_id);
-    const authorized_dashboards = state.authorized_dashboards;
+    const authorized_accounts = state.authorized_accounts;
 
     Logger.log("info", {
-      message: "dashboardController:deleteDashboard:params",
-      params: { pm_user_id, pm_dashboard_id },
+      message: "accountController:updatePassword:params",
+      params: { pm_user_id, body },
     });
 
-    await DashboardService.deleteDashboard({
-      dashboardID: pm_dashboard_id,
-      authorizedDashboards: authorized_dashboards,
+    const account = await AccountService.updatePassword({
+      pmUserID: body.pm_user_id,
+      password: body.password,
     });
 
     Logger.log("success", {
-      message: "dashboardController:deleteDashboard:success",
-      params: { pm_user_id },
+      message: "accountController:updatePassword:success",
+      params: { pm_user_id, account },
     });
 
     return res.json({
       success: true,
+      account,
     });
   } catch (error) {
     Logger.log("error", {
-      message: "dashboardController:deleteDashboard:catch-1",
+      message: "accountController:updatePassword:catch-1",
       params: { error },
     });
     return res.json({ success: false, error: extractError(error) });
   }
 };
 
-module.exports = { dashboardController };
+module.exports = { accountController };

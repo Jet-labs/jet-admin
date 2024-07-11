@@ -1,3 +1,4 @@
+import { AccountAdditionForm } from "../../components/AccountComponents/AccountAdditionForm";
 import { RowAdditionForm } from "../../components/DataGridComponents/RowAdditionForm";
 import { LOCAL_CONSTANTS } from "../../constants";
 /**
@@ -8,7 +9,7 @@ import { LOCAL_CONSTANTS } from "../../constants";
 const AddAccount = ({}) => {
   return (
     <div className="flex flex-col justify-start items-stretch w-full h-full">
-      <RowAdditionForm tableName={LOCAL_CONSTANTS.STRINGS.PM_USER_TABLE_NAME} />
+      <AccountAdditionForm />
     </div>
   );
 };

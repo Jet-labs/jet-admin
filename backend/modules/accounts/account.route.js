@@ -1,48 +1,35 @@
 const express = require("express");
 const { authMiddleware } = require("../auth/auth.middleware");
-const { policyMiddleware } = require("../policies/policy.middleware");
-const { dashboardController } = require("./dashboard.controller");
 const {
-  dashboardAuthorizationMiddleware,
-} = require("./dashboard.authorization.middleware");
+  accountAuthorizationMiddleware,
+} = require("./account.authorization.middleware");
+
+const { policyMiddleware } = require("../policies/policy.middleware");
+const { accountController } = require("./account.controller");
 const router = express.Router();
 
-// get all data of table
-router.get(
-  "/",
-  authMiddleware.authProvider,
-  policyMiddleware.populateAuthorizationPolicies,
-  dashboardAuthorizationMiddleware.populateAuthorizedDashboardsForRead,
-  dashboardController.getAllDashboards
-);
-router.get(
-  "/:id",
-  authMiddleware.authProvider,
-  policyMiddleware.populateAuthorizationPolicies,
-  dashboardAuthorizationMiddleware.populateAuthorizedDashboardsForRead,
-  dashboardController.getDashboardByID
-);
 router.post(
   "/",
   authMiddleware.authProvider,
   policyMiddleware.populateAuthorizationPolicies,
-  dashboardAuthorizationMiddleware.populateAuthorizationForDashboardAddition,
-  dashboardController.addDashboard
+  accountAuthorizationMiddleware.authorizeAccountAddition,
+  accountController.addAccount
+);
+router.put(
+  "/password",
+  authMiddleware.authProvider,
+  policyMiddleware.populateAuthorizationPolicies,
+  accountAuthorizationMiddleware.authorizeAccountUpdate,
+  accountController.updatePassword
 );
 router.put(
   "/",
   authMiddleware.authProvider,
   policyMiddleware.populateAuthorizationPolicies,
-  dashboardAuthorizationMiddleware.populateAuthorizedDashboardsForUpdate,
-  dashboardController.updateDashboard
+  accountAuthorizationMiddleware.authorizeAccountUpdate,
+  accountController.updateAccount
 );
 
-router.delete(
-  "/:id",
-  authMiddleware.authProvider,
-  policyMiddleware.populateAuthorizationPolicies,
-  dashboardAuthorizationMiddleware.populateAuthorizedDashboardsForDelete,
-  dashboardController.deleteDashboard
-);
+
 
 module.exports = router;

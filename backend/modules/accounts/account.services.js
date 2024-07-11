@@ -44,7 +44,7 @@ class AccountService {
       if (userWithUsername) {
         Logger.log("error", {
           message: "AccountService:addAccount:catch-2",
-          params: { error },
+          params: { error: constants.ERROR_CODES.USERNAME_TAKEN },
         });
         throw constants.ERROR_CODES.USERNAME_TAKEN;
       }
