@@ -20,7 +20,7 @@ router.post(
   authMiddleware.authProvider,
   policyMiddleware.populateAuthorizationPolicies,
   // queryAuthorizationMiddleware.populateAuthorizedQueriesForRead,
-  queryController.runPGQuery
+  queryController.runQuery
 );
 router.post(
   "/duplicate",

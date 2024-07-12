@@ -1,28 +1,16 @@
-import {
-  Button,
-  FormControl,
-  Grid,
-  MenuItem,
-  Select,
-  TextField,
-  useTheme,
-} from "@mui/material";
+import { Button, FormControl, Grid, TextField, useTheme } from "@mui/material";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import React, { useCallback, useEffect } from "react";
 import "react-data-grid/lib/styles.css";
-import { LOCAL_CONSTANTS } from "../../constants";
-import "./style.css";
-import {
-  addQueryAPI,
-  getQueryByIDAPI,
-  updateQueryAPI,
-} from "../../api/queries";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { displayError, displaySuccess } from "../../utils/notification";
 import { useParams } from "react-router-dom";
-import { QueryDuplicateForm } from "../../components/QueryComponents/QueryDuplicateForm";
+import { getQueryByIDAPI, updateQueryAPI } from "../../api/queries";
+import { PGSQLQueryBuilder } from "../../components/QueryComponents/QueryBuilders/PGSQLQueryBuilder";
 import { QueryDeletionForm } from "../../components/QueryComponents/QueryDeletionForm";
-import { PGSQLQueryEditor } from "../../components/QueryComponents/QueryEditors/PGSQLQueryEditor";
+import { QueryDuplicateForm } from "../../components/QueryComponents/QueryDuplicateForm";
+import { LOCAL_CONSTANTS } from "../../constants";
+import { displayError, displaySuccess } from "../../utils/notification";
+import "./style.css";
 
 const UpdateQuery = () => {
   const { id } = useParams();
@@ -42,11 +30,11 @@ const UpdateQuery = () => {
 
   const queryBuilderForm = useFormik({
     initialValues: {
-      title: "Untitled",
-      description: "",
-      query_type: LOCAL_CONSTANTS.DATA_SOURCE_QUERY_TYPE.POSTGRE_QUERY.value,
-      query: null,
-      query_id: parseInt(id),
+      pm_query_title: "Untitled",
+      pm_query_description: "",
+      pm_query_type: LOCAL_CONSTANTS.DATA_SOURCE_QUERY_TYPE.POSTGRE_QUERY.value,
+      pm_query: null,
+      pm_query_id: parseInt(id),
     },
     validateOnMount: false,
     validateOnChange: false,
@@ -55,20 +43,21 @@ const UpdateQuery = () => {
 
       return errors;
     },
-    onSubmit: (values) => {
-      console.log({ values });
-    },
+    onSubmit: (values) => {},
   });
 
   useEffect(() => {
     if (queryBuilderForm && queryData) {
-      queryBuilderForm.setFieldValue("title", queryData.pm_master_query_title);
       queryBuilderForm.setFieldValue(
-        "description",
-        queryData.pm_master_query_description
+        "pm_query_title",
+        queryData.pm_query_title
       );
-      queryBuilderForm.setFieldValue("query_type", queryData.pm_query_type);
-      queryBuilderForm.setFieldValue("query", queryData.query);
+      queryBuilderForm.setFieldValue(
+        "pm_query_description",
+        queryData.pm_query_description
+      );
+      queryBuilderForm.setFieldValue("pm_query_type", queryData.pm_query_type);
+      queryBuilderForm.setFieldValue("pm_query", queryData.pm_query);
     }
   }, [queryData]);
 
@@ -97,7 +86,7 @@ const UpdateQuery = () => {
   const _handleOnQueryChange = useCallback(
     (value) => {
       if (queryBuilderForm) {
-        queryBuilderForm.setFieldValue("query", value);
+        queryBuilderForm.setFieldValue("pm_query", value);
       }
     },
     [queryBuilderForm]
@@ -128,8 +117,8 @@ const UpdateQuery = () => {
               size="small"
               variant="outlined"
               type="text"
-              name={"title"}
-              value={queryBuilderForm.values.title}
+              name={"pm_query_title"}
+              value={queryBuilderForm.values.pm_query_title}
               onChange={queryBuilderForm.handleChange}
               onBlur={queryBuilderForm.handleBlur}
             />
@@ -144,8 +133,8 @@ const UpdateQuery = () => {
               size="small"
               variant="outlined"
               type="text"
-              name={"description"}
-              value={queryBuilderForm.values.description}
+              name={"pm_query_description"}
+              value={queryBuilderForm.values.pm_query_description}
               onChange={queryBuilderForm.handleChange}
               onBlur={queryBuilderForm.handleBlur}
             />
@@ -169,10 +158,10 @@ const UpdateQuery = () => {
           lg={8}
           className="w-full !h-full !border-l !border-white !border-opacity-10"
         >
-          {queryBuilderForm.values.query_type ==
+          {queryBuilderForm.values.pm_query_type ==
             LOCAL_CONSTANTS.DATA_SOURCE_QUERY_TYPE.POSTGRE_QUERY.value && (
-            <PGSQLQueryEditor
-              value={queryBuilderForm.values.query}
+            <PGSQLQueryBuilder
+              value={queryBuilderForm.values.pm_query}
               handleChange={_handleOnQueryChange}
             />
           )}

@@ -85,17 +85,15 @@ export const QueryDrawerList = () => {
       )}
       <div className="!mt-1"></div>
 
-      {queries?.map((masterQuery) => {
-        const key = `query_${masterQuery.pm_master_query_id}`;
+      {queries?.map((query) => {
+        const key = `query_${query.pm_query_id}`;
         return (
           <Link
-            to={LOCAL_CONSTANTS.ROUTES.QUERY_VIEW.path(
-              masterQuery.pm_master_query_id
-            )}
+            to={LOCAL_CONSTANTS.ROUTES.QUERY_VIEW.path(query.pm_query_id)}
             key={key}
           >
             <ListItem
-              key={`_query_${masterQuery.pm_master_query_id}`}
+              key={`_query_${query.pm_query_id}`}
               disablePadding
               sx={{}}
               className="!px-3 !py-1.5"
@@ -119,7 +117,7 @@ export const QueryDrawerList = () => {
                     minWidth: 0,
                   }}
                 >
-                  {masterQuery.pm_query_type ==
+                  {query.pm_query_type ==
                   LOCAL_CONSTANTS.DATA_SOURCE_QUERY_TYPE.POSTGRE_QUERY.value ? (
                     <DiPostgresql className="!text-lg" />
                   ) : (
@@ -133,7 +131,7 @@ export const QueryDrawerList = () => {
                         ? theme.palette.primary.main
                         : theme.palette.primary.contrastText,
                   }}
-                  primary={masterQuery.pm_master_query_title}
+                  primary={query.pm_query_title}
                   primaryTypographyProps={{
                     sx: {
                       fontWeight: key == currentPage ? "700" : "500",

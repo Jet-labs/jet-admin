@@ -183,7 +183,7 @@ export const RawDataGrid = ({
               getRowHeight={() => "auto"}
               slots={{
                 toolbar: () => (
-                  <GridToolbarContainer className="!px-2.5 justify-end">
+                  <GridToolbarContainer className="!py-2 !-px-4 justify-end">
                     <GridToolbarExport />
                   </GridToolbarContainer>
                 ),

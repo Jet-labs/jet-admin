@@ -487,6 +487,11 @@ export const customLightTheme = {
             background: "#00000000",
           },
         },
+        text: {
+          "&:hover": {
+            background: "#00000000",
+          },
+        },
       },
       defaultProps: {
         disableRipple: true,

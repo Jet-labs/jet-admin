@@ -54,29 +54,30 @@ queryController.getAllQueries = async (req, res) => {
 queryController.addQuery = async (req, res) => {
   try {
     const { pmUser, state, body } = req;
-    const { title, description, query_type, query } = body;
+    const { pm_query_title, pm_query_description, pm_query_type, pm_query } =
+      body;
     const pm_user_id = parseInt(pmUser.pm_user_id);
 
     Logger.log("info", {
       message: "queryController:addQuery:params",
-      params: { pm_user_id, query },
+      params: { pm_user_id, pm_query },
     });
 
-    let newMasterQuery = await QueryService.addQuery({
-      queryTitle: title,
-      queryType: query_type,
-      queryDescription: description,
-      query,
+    let newQuery = await QueryService.addQuery({
+      pmQueryTitle: pm_query_title,
+      pmQueryType: pm_query_type,
+      pmQueryDescription: pm_query_description,
+      pmQuery: pm_query,
     });
 
     Logger.log("success", {
       message: "queryController:addQuery:success",
-      params: { pm_user_id, newMasterQuery },
+      params: { pm_user_id, newQuery },
     });
 
     return res.json({
       success: true,
-      query: newMasterQuery,
+      query: newQuery,
     });
   } catch (error) {
     Logger.log("error", {
@@ -96,16 +97,16 @@ queryController.addQuery = async (req, res) => {
 queryController.duplicateQuery = async (req, res) => {
   try {
     const { pmUser, state, body } = req;
-    const { query_id } = body;
+    const { pm_query_id } = body;
     const pm_user_id = parseInt(pmUser.pm_user_id);
 
     Logger.log("info", {
       message: "queryController:duplicateQuery:params",
-      params: { pm_user_id, query_id },
+      params: { pm_user_id, pm_query_id },
     });
 
     let newDuplicateQuery = await QueryService.duplicateQuery({
-      queryID: parseInt(query_id),
+      pmQueryID: parseInt(pm_query_id),
     });
 
     Logger.log("success", {
@@ -134,47 +135,38 @@ queryController.duplicateQuery = async (req, res) => {
 queryController.updateQuery = async (req, res) => {
   try {
     const { pmUser, state, body } = req;
-    const { query_id, title, description, query_type, query } = body;
+    const { pm_query_id, pm_query_title, pm_query_description, pm_query } =
+      body;
     const pm_user_id = parseInt(pmUser.pm_user_id);
     const authorized_queries = state.authorized_queries;
 
     Logger.log("info", {
       message: "queryController:updateQuery:params",
-      params: { pm_user_id, title, description, query_id, query },
+      params: {
+        pm_user_id,
+        pm_query_title,
+        pm_query_description,
+        pm_query_id,
+        pm_query,
+      },
     });
 
-    let updatedMasterQuery = null;
-    switch (query_type) {
-      case constants.QUERY_TYPE.POSTGRE_QUERY.value: {
-        updatedMasterQuery = await QueryService.updatePGQuery({
-          queryID: parseInt(query_id),
-          queryTitle: title,
-          queryDescription: description,
-          query,
-          authorizedQueries: authorized_queries,
-        });
-        break;
-      }
-      default: {
-        updatedMasterQuery = await QueryService.updatePGQuery({
-          queryID: parseInt(query_id),
-          queryTitle: title,
-          queryDescription: description,
-          query,
-          authorizedQueries: authorized_queries,
-        });
-        break;
-      }
-    }
+    const updatedQuery = await QueryService.updateQuery({
+      pmQueryID: parseInt(pm_query_id),
+      pmQueryTitle: pm_query_title,
+      pmQueryDescription: pm_query_description,
+      pmQuery: pm_query,
+      authorizedQueries: authorized_queries,
+    });
 
     Logger.log("success", {
       message: "queryController:updateQuery:success",
-      params: { pm_user_id, updatedMasterQuery },
+      params: { pm_user_id, updatedQuery },
     });
 
     return res.json({
       success: true,
-      query: updatedMasterQuery,
+      query: updatedQuery,
     });
   } catch (error) {
     Logger.log("error", {
@@ -191,24 +183,24 @@ queryController.updateQuery = async (req, res) => {
  * @param {import("express").Response} res
  * @returns
  */
-queryController.runPGQuery = async (req, res) => {
+queryController.runQuery = async (req, res) => {
   try {
     const { pmUser, state, body } = req;
-    const { query } = body;
+    const { pm_query } = body;
     const pm_user_id = parseInt(pmUser.pm_user_id);
     const authorized_queries = state.authorized_queries;
 
     Logger.log("info", {
-      message: "queryController:runPGQuery:params",
-      params: { pm_user_id, query },
+      message: "queryController:runQuery:params",
+      params: { pm_user_id, pm_query },
     });
 
-    const data = await QueryService.runPGQuery({
-      query,
+    const data = await QueryService.runQuery({
+      pmQuery: pm_query,
     });
 
     Logger.log("success", {
-      message: "queryController:runPGQuery:success",
+      message: "queryController:runQuery:success",
       params: { pm_user_id, data },
     });
 
@@ -218,7 +210,7 @@ queryController.runPGQuery = async (req, res) => {
     });
   } catch (error) {
     Logger.log("error", {
-      message: "queryController:runPGQuery:catch-1",
+      message: "queryController:runQuery:catch-1",
       params: { error },
     });
     return res.json({ success: false, error: extractError(error) });
@@ -234,17 +226,17 @@ queryController.runPGQuery = async (req, res) => {
 queryController.getQueryByID = async (req, res) => {
   try {
     const { pmUser, state, params } = req;
-    const query_id = parseInt(params.id);
+    const pm_query_id = parseInt(params.id);
     const pm_user_id = parseInt(pmUser.pm_user_id);
     const authorized_queries = state.authorized_queries;
 
     Logger.log("info", {
       message: "queryController:getQueryByID:params",
-      params: { pm_user_id, query_id },
+      params: { pm_user_id, pm_query_id },
     });
 
     const query = await QueryService.getQueryByID({
-      queryID: parseInt(query_id),
+      pmQueryID: parseInt(pm_query_id),
       authorizedQueries: authorized_queries,
     });
 
@@ -275,17 +267,17 @@ queryController.getQueryByID = async (req, res) => {
 queryController.deleteQuery = async (req, res) => {
   try {
     const { pmUser, state, params } = req;
-    const query_id = parseInt(params.id);
+    const pm_query_id = parseInt(params.id);
     const pm_user_id = parseInt(pmUser.pm_user_id);
     const authorized_queries = state.authorized_queries;
 
     Logger.log("info", {
       message: "queryController:deleteQuery:params",
-      params: { pm_user_id, query_id },
+      params: { pm_user_id, pm_query_id },
     });
 
     await QueryService.deleteQuery({
-      queryID: parseInt(query_id),
+      pmQueryID: parseInt(pm_query_id),
       authorizedQueries: authorized_queries,
     });
 

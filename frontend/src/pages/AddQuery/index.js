@@ -22,10 +22,10 @@ const AddQuery = () => {
   const queryClient = useQueryClient();
   const queryBuilderForm = useFormik({
     initialValues: {
-      title: "Untitled",
-      description: "",
-      query_type: LOCAL_CONSTANTS.DATA_SOURCE_QUERY_TYPE.POSTGRE_QUERY.value,
-      query: {},
+      pm_query_title: "Untitled",
+      pm_query_description: "",
+      pm_query_type: LOCAL_CONSTANTS.DATA_SOURCE_QUERY_TYPE.POSTGRE_QUERY.value,
+      pm_query: {},
     },
     validateOnMount: false,
     validateOnChange: false,
@@ -64,7 +64,7 @@ const AddQuery = () => {
   const _handleOnQueryChange = useCallback(
     (value) => {
       if (queryBuilderForm) {
-        queryBuilderForm.setFieldValue("query", value);
+        queryBuilderForm.setFieldValue("pm_query", value);
       }
     },
     [queryBuilderForm]
@@ -94,8 +94,8 @@ const AddQuery = () => {
               size="small"
               variant="outlined"
               type="text"
-              name={"title"}
-              value={queryBuilderForm.values.title}
+              name={"pm_query_title"}
+              value={queryBuilderForm.values.pm_query_title}
               onChange={queryBuilderForm.handleChange}
               onBlur={queryBuilderForm.handleBlur}
             />
@@ -110,8 +110,8 @@ const AddQuery = () => {
               size="small"
               variant="outlined"
               type="text"
-              name={"description"}
-              value={queryBuilderForm.values.description}
+              name={"pm_query_description"}
+              value={queryBuilderForm.values.pm_query_description}
               onChange={queryBuilderForm.handleChange}
               onBlur={queryBuilderForm.handleBlur}
             />
@@ -133,10 +133,10 @@ const AddQuery = () => {
           lg={8}
           className="w-full !h-full !border-l !border-white !border-opacity-10"
         >
-          {queryBuilderForm.values.query_type ==
+          {queryBuilderForm.values.pm_query_type ==
             LOCAL_CONSTANTS.DATA_SOURCE_QUERY_TYPE.POSTGRE_QUERY.value && (
             <PGSQLQueryBuilder
-              value={queryBuilderForm.values.query}
+              value={queryBuilderForm.values.pm_query}
               handleChange={_handleOnQueryChange}
             />
           )}

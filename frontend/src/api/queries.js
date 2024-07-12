@@ -97,11 +97,11 @@ export const getAllQueryAPI = async () => {
   }
 };
 
-export const runPGQueryAPI = async ({ query }) => {
+export const runQueryAPI = async ({ pm_query }) => {
   try {
     const response = await axiosInstance.post(
-      LOCAL_CONSTANTS.APIS.QUERY.runPGQuery(),
-      { query }
+      LOCAL_CONSTANTS.APIS.QUERY.runQuery(),
+      { pm_query }
     );
     if (response.data && response.data.success == true) {
       return response.data.data;

@@ -8,122 +8,44 @@ class QueryService {
   /**
    *
    * @param {object} param0
-   * @param {String} param0.queryTitle
-   * @param {String} param0.queryDescription
-   * @param {any} param0.query
-   * @returns {any|null}
-   */
-  static addPGQuery = async ({ queryTitle, queryDescription, query }) => {
-    Logger.log("info", {
-      message: "DashboardService:addPGQuery:params",
-      params: {
-        queryTitle,
-        queryDescription,
-        query,
-      },
-    });
-    try {
-      const newPGSQLQuery = await prisma.tbl_pm_postgres_queries.create({
-        data: {
-          pm_postgres_query: String(query.pm_postgres_query),
-        },
-      });
-      const newMasterQuery = await prisma.tbl_pm_master_queries.create({
-        data: {
-          pm_query_id: newPGSQLQuery.pm_postgres_query_id,
-          pm_query_type: constants.QUERY_TYPE.POSTGRE_QUERY.value,
-          pm_master_query_title: queryTitle,
-          pm_master_query_description: queryDescription,
-        },
-      });
-
-      Logger.log("success", {
-        message: "DashboardService:addPGQuery:newMasterQuery",
-        params: {
-          newPGSQLQuery,
-          newMasterQuery,
-        },
-      });
-      return newMasterQuery;
-    } catch (error) {
-      Logger.log("error", {
-        message: "DashboardService:addPGQuery:catch-1",
-        params: { error },
-      });
-      throw error;
-    }
-  };
-
-  /**
-   *
-   * @param {object} param0
-   * @param {String} param0.queryTitle
-   * @param {String} param0.queryType
-   * @param {String} param0.queryDescription
-   * @param {any} param0.query
+   * @param {String} param0.pmQueryTitle
+   * @param {String} param0.pmQueryType
+   * @param {String} param0.pmQueryDescription
+   * @param {any} param0.pmQuery
    * @returns {any|null}
    */
   static addQuery = async ({
-    queryTitle,
-    queryType,
-    queryDescription,
-    query,
+    pmQueryTitle,
+    pmQueryType,
+    pmQueryDescription,
+    pmQuery,
   }) => {
     Logger.log("info", {
       message: "DashboardService:addQuery:params",
       params: {
-        queryTitle,
-        queryDescription,
-        queryType,
-        query,
+        pmQueryTitle,
+        pmQueryDescription,
+        pmQueryType,
+        pmQuery,
       },
     });
     try {
-      let newPGSQLQuery = null;
-      let newMasterQuery = null;
-      switch (queryType) {
-        case constants.QUERY_TYPE.POSTGRE_QUERY.value: {
-          newPGSQLQuery = await prisma.tbl_pm_postgres_queries.create({
-            data: {
-              pm_postgres_query: String(query.pm_postgres_query),
-            },
-          });
-          newMasterQuery = await prisma.tbl_pm_master_queries.create({
-            data: {
-              pm_query_id: newPGSQLQuery.pm_postgres_query_id,
-              pm_query_type: constants.QUERY_TYPE.POSTGRE_QUERY.value,
-              pm_master_query_title: queryTitle,
-              pm_master_query_description: queryDescription,
-            },
-          });
-          break;
-        }
-        default: {
-          newPGSQLQuery = await prisma.tbl_pm_postgres_queries.create({
-            data: {
-              pm_postgres_query: String(query.pm_postgres_query),
-            },
-          });
-          newMasterQuery = await prisma.tbl_pm_master_queries.create({
-            data: {
-              pm_query_id: newPGSQLQuery.pm_postgres_query_id,
-              pm_query_type: constants.QUERY_TYPE.POSTGRE_QUERY.value,
-              pm_master_query_title: queryTitle,
-              pm_master_query_description: queryDescription,
-            },
-          });
-          break;
-        }
-      }
-
-      Logger.log("success", {
-        message: "DashboardService:addQuery:newMasterQuery",
-        params: {
-          newPGSQLQuery,
-          newMasterQuery,
+      const newQuery = await prisma.tbl_pm_queries.create({
+        data: {
+          pm_query_type: pmQueryType,
+          pm_query_title: pmQueryTitle,
+          pm_query_description: pmQueryDescription,
+          pm_query: pmQuery,
         },
       });
-      return newMasterQuery;
+
+      Logger.log("success", {
+        message: "DashboardService:addQuery:newQuery",
+        params: {
+          newQuery,
+        },
+      });
+      return newQuery;
     } catch (error) {
       Logger.log("error", {
         message: "DashboardService:addQuery:catch-1",
@@ -135,63 +57,56 @@ class QueryService {
   /**
    *
    * @param {object} param0
-   * @param {Number} param0.queryID
-   * @param {String} param0.queryTitle
-   * @param {String} param0.queryDescription
-   * @param {any} param0.query
+   * @param {Number} param0.pmQueryID
+   * @param {String} param0.pmQueryTitle
+   * @param {String} param0.pmQueryDescription
+   * @param {any} param0.pmQuery
    * @param {Boolean|Array<Number>} param0.authorizedQueries
    * @returns {any|null}
    */
-  static updatePGQuery = async ({
-    queryID,
-    queryTitle,
-    queryDescription,
-    query,
+  static updateQuery = async ({
+    pmQueryID,
+    pmQueryTitle,
+    pmQueryDescription,
+    pmQuery,
     authorizedQueries,
   }) => {
     Logger.log("info", {
-      message: "DashboardService:updatePGQuery:params",
+      message: "DashboardService:updateQuery:params",
       params: {
-        queryID,
-        queryTitle,
-        queryDescription,
-        query,
+        pmQueryID,
+        pmQueryTitle,
+        pmQueryDescription,
+        pmQuery,
       },
     });
     try {
-      if (authorizedQueries === true || authorizedQueries.includes(queryID)) {
-        const updatedMasterQuery = await prisma.tbl_pm_master_queries.update({
-          where: { pm_master_query_id: queryID },
+      if (authorizedQueries === true || authorizedQueries.includes(pmQueryID)) {
+        const updatedQuery = await prisma.tbl_pm_queries.update({
+          where: { pm_query_id: pmQueryID },
           data: {
-            pm_master_query_title: queryTitle,
-            pm_master_query_description: queryDescription,
+            pm_query_title: pmQueryTitle,
+            pm_query_description: pmQueryDescription,
+            pm_query: pmQuery,
           },
         });
-        const updatedPGSQLQuery = await prisma.tbl_pm_postgres_queries.update({
-          where: { pm_postgres_query_id: updatedMasterQuery.pm_query_id },
-          data: {
-            pm_postgres_query: String(query.pm_postgres_query),
-          },
-        });
-
         Logger.log("success", {
-          message: "DashboardService:updatePGQuery:newMasterQuery",
+          message: "DashboardService:updateQuery:updatedQuery",
           params: {
-            updatedMasterQuery,
-            updatedPGSQLQuery,
+            updatedQuery,
           },
         });
-        return updatedMasterQuery;
+        return updatedQuery;
       } else {
         Logger.log("error", {
-          message: "DashboardService:updatePGQuery:catch-2",
+          message: "DashboardService:updateQuery:catch-2",
           params: { error: constants.ERROR_CODES.PERMISSION_DENIED },
         });
         throw constants.ERROR_CODES.PERMISSION_DENIED;
       }
     } catch (error) {
       Logger.log("error", {
-        message: "DashboardService:updatePGQuery:catch-1",
+        message: "DashboardService:updateQuery:catch-1",
         params: { error },
       });
       throw error;
@@ -209,62 +124,31 @@ class QueryService {
       message: "QueryService:getAllQueries:params",
     });
     try {
-      const masterQueries = await prisma.tbl_pm_master_queries.findMany({
+      const queries = await prisma.tbl_pm_queries.findMany({
         where:
           authorizedQueries === true
             ? {}
             : {
-                pm_master_query_id: {
+                pm_query_id: {
                   in: authorizedQueries,
                 },
               },
       });
       Logger.log("info", {
-        message: "QueryService:getAllQueries:masterQueries",
+        message: "QueryService:getAllQueries:queries",
         params: {
-          masterQueries,
+          queries,
           authorizedQueries,
         },
       });
-      const masterQueryPromises = masterQueries.map(async (masterQuery) => {
-        let query = null;
-        switch (masterQuery.pm_query_type) {
-          case constants.QUERY_TYPE.POSTGRE_QUERY.value: {
-            query = await prisma.tbl_pm_postgres_queries.findUnique({
-              where: {
-                pm_postgres_query_id: masterQuery.pm_query_id,
-              },
-            });
-            query = {
-              ...masterQuery,
-              query: { ...query, pm_query_type: masterQuery.pm_query_type },
-            };
-            break;
-          }
 
-          default: {
-            query = await prisma.tbl_pm_postgres_queries.findUnique({
-              where: {
-                pm_postgres_query_id: masterQuery.pm_query_id,
-              },
-            });
-            query = {
-              ...masterQuery,
-              query: { ...query, pm_query_type: masterQuery.pm_query_type },
-            };
-            break;
-          }
-        }
-        return query;
-      });
-      const allQueries = await Promise.all(masterQueryPromises);
       Logger.log("info", {
         message: "QueryService:getAllQueries:query",
         params: {
-          querysLength: allQueries?.length,
+          queriesLength: queries?.length,
         },
       });
-      return allQueries;
+      return queries;
     } catch (error) {
       Logger.log("error", {
         message: "QueryService:getAllQueries:catch-1",
@@ -277,59 +161,30 @@ class QueryService {
   /**
    *
    * @param {object} param0
-   * @param {Number} param0.queryID
+   * @param {Number} param0.pmQueryID
    * @param {Boolean|Array<Number>} param0.authorizedQueries
    * @returns {any|null}
    */
-  static getQueryByID = async ({ queryID, authorizedQueries }) => {
+  static getQueryByID = async ({ pmQueryID, authorizedQueries }) => {
     Logger.log("info", {
       message: "QueryService:getQueryByID:params",
     });
     try {
-      const masterQuery =
-        authorizedQueries === true || authorizedQueries.includes(queryID)
-          ? await prisma.tbl_pm_master_queries.findUnique({
-              where: { pm_master_query_id: queryID },
+      const query =
+        authorizedQueries === true || authorizedQueries.includes(pmQueryID)
+          ? await prisma.tbl_pm_queries.findUnique({
+              where: { pm_query_id: pmQueryID },
             })
           : null;
       Logger.log("info", {
-        message: "QueryService:getQueryByID:masterQuery",
+        message: "QueryService:getQueryByID:query",
         params: {
-          masterQuery,
+          query,
           authorizedQueries,
         },
       });
-      if (!masterQuery) {
-        return null;
-      }
-      let query;
-      switch (masterQuery.pm_query_type) {
-        case constants.QUERY_TYPE.POSTGRE_QUERY.value: {
-          query = await prisma.tbl_pm_postgres_queries.findUnique({
-            where: {
-              pm_postgres_query_id: masterQuery.pm_query_id,
-            },
-          });
-          break;
-        }
 
-        default: {
-          query = await prisma.tbl_pm_postgres_queries.findUnique({
-            where: {
-              pm_postgres_query_id: masterQuery.pm_query_id,
-            },
-          });
-          break;
-        }
-      }
-
-      Logger.log("info", {
-        message: "QueryService:getQueryByID:query",
-        params: {
-          masterQuery: { ...masterQuery, query },
-        },
-      });
-      return { ...masterQuery, query };
+      return query;
     } catch (error) {
       Logger.log("error", {
         message: "QueryService:getQueryByID:catch-1",
@@ -342,26 +197,27 @@ class QueryService {
   /**
    *
    * @param {object} param0
-   * @param {String} param0.query
+   * @param {String} param0.pmQuery
    * @returns {any|null}
    */
-  static runPGQuery = async ({ query }) => {
+  static runQuery = async ({ pmQuery }) => {
     Logger.log("info", {
-      message: "QueryService:runPGQuery:params",
+      message: "QueryService:runQuery:params",
     });
     try {
-      const result = await prisma.$queryRaw`${Prisma.raw(query)}`;
-
+      const result = await prisma.$queryRaw`${Prisma.raw(pmQuery.raw_query)}`;
       Logger.log("info", {
-        message: "QueryService:runPGQuery:query",
+        message: "QueryService:runQuery:query",
         params: {
-          result: Array.isArray(query) ? { resultLength: query.length } : query,
+          result: Array.isArray(result)
+            ? { resultLength: result.length }
+            : result,
         },
       });
       return result;
     } catch (error) {
       Logger.log("error", {
-        message: "QueryService:runPGQuery:catch-1",
+        message: "QueryService:runQuery:catch-1",
         params: { error },
       });
       throw error;
@@ -371,45 +227,27 @@ class QueryService {
   /**
    *
    * @param {object} param0
-   * @param {Number} param0.queryID
+   * @param {Number} param0.pmQueryID
    * @param {Boolean|Array<Number>} param0.authorizedQueries
    * @returns {any|null}
    */
-  static deleteQuery = async ({ queryID, authorizedQueries }) => {
+  static deleteQuery = async ({ pmQueryID, authorizedQueries }) => {
     Logger.log("info", {
       message: "DashboardService:deleteQuery:params",
       params: {
-        queryID,
+        pmQueryID,
       },
     });
     try {
-      if (authorizedQueries === true || authorizedQueries.includes(queryID)) {
-        const deletedMasterQuery = await prisma.tbl_pm_master_queries.delete({
-          where: { pm_master_query_id: queryID },
+      if (authorizedQueries === true || authorizedQueries.includes(pmQueryID)) {
+        const deletedQuery = await prisma.tbl_pm_queries.delete({
+          where: { pm_query_id: pmQueryID },
         });
-        let deleteChildQuery = null;
-        switch (deletedMasterQuery.pm_query_type) {
-          case constants.QUERY_TYPE.POSTGRE_QUERY.value: {
-            const deleteChildQuery =
-              await prisma.tbl_pm_postgres_queries.delete({
-                where: { pm_postgres_query_id: deletedMasterQuery.pm_query_id },
-              });
-            break;
-          }
-          default: {
-            const deleteChildQuery =
-              await prisma.tbl_pm_postgres_queries.delete({
-                where: { pm_postgres_query_id: deletedMasterQuery.pm_query_id },
-              });
-            break;
-          }
-        }
 
         Logger.log("success", {
-          message: "DashboardService:deleteQuery:newMasterQuery",
+          message: "DashboardService:deleteQuery:deletedQuery",
           params: {
-            deletedMasterQuery,
-            deleteChildQuery,
+            deletedQuery,
           },
         });
         return true;
@@ -432,26 +270,26 @@ class QueryService {
   /**
    *
    * @param {object} param0
-   * @param {Number} param0.queryID
+   * @param {Number} param0.pmQueryID
    * @returns {any|null}
    */
-  static duplicateQuery = async ({ queryID }) => {
+  static duplicateQuery = async ({ pmQueryID }) => {
     Logger.log("info", {
       message: "DashboardService:duplicateQuery:params",
       params: {
-        queryID,
+        pmQueryID,
       },
     });
     try {
-      const masterQuery = await this.getQueryByID({
-        queryID,
+      const query = await this.getQueryByID({
+        pmQueryID,
         authorizedQueries: true,
       });
       return await this.addQuery({
-        query: masterQuery.query,
-        queryType: masterQuery.pm_query_type,
-        queryTitle: `${masterQuery.pm_master_query_title} copy`,
-        queryDescription: masterQuery.pm_master_query_description,
+        pmQuery: query.pmQuery,
+        pmQueryType: query.pm_query_type,
+        pmQueryTitle: `${query.pm_query_title} copy`,
+        pmQueryDescription: query.pm_query_description,
       });
     } catch (error) {
       Logger.log("error", {

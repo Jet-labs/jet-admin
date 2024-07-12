@@ -1,113 +1,17 @@
-import {
-  Box,
-  Button,
-  Divider,
-  FormControl,
-  Grid,
-  Tab,
-  Tabs,
-  TextField,
-  useTheme,
-} from "@mui/material";
-import { capitalize } from "@rigu/js-toolkit";
+import { Button, Divider, Tab, Tabs, useTheme } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { loadLanguage } from "@uiw/codemirror-extensions-langs";
-import { dracula } from "@uiw/codemirror-theme-dracula";
+import { githubLight } from "@uiw/codemirror-theme-github";
 import CodeMirror from "@uiw/react-codemirror";
-import { useFormik } from "formik";
-import React, { useCallback, useMemo, useState } from "react";
-import DataGrid from "react-data-grid";
+import React, { useState } from "react";
 import "react-data-grid/lib/styles.css";
 import jsonSchemaGenerator from "to-json-schema";
-import { addQueryAPI, runPGQueryAPI } from "../../../../api/queries";
+import { runQueryAPI } from "../../../../api/queries";
 import { displayError, displaySuccess } from "../../../../utils/notification";
-import "./style.css";
-import { LOCAL_CONSTANTS } from "../../../../constants";
-
-const PGSQLQueryResponseTableTab = ({ json, dataSchema }) => {
-  const theme = useTheme();
-
-  const columns = useMemo(() => {
-    if (dataSchema && dataSchema.properties) {
-      return Object.keys(dataSchema.properties).map((key) => {
-        return { key, name: capitalize(key) };
-      });
-    }
-  }, [dataSchema]);
-
-  return (
-    <Box
-      sx={{ width: "100%" }}
-      className="!flex !flex-col !justify-center !items-stretch"
-    >
-      {json && Array.isArray(json) && json.length ? (
-        <DataGrid
-          rows={json.map((item, index) => {
-            return { _g_uuid: `_index_${index}`, ...item };
-          })}
-          columns={columns}
-          className="!w-100 !border !border-white !border-opacity-10"
-          rowKeyGetter={(row) => row._g_uuid}
-          defaultColumnOptions={{
-            sortable: false,
-            resizable: true,
-          }}
-        />
-      ) : (
-        <div className="!h-32 flex !flex-col !justify-center !items-center w-100">
-          <span>No data</span>
-        </div>
-      )}
-    </Box>
-  );
-};
-
-const PGSQLQueryResponseJSONTab = ({ json }) => {
-  const theme = useTheme();
-  return (
-    <CodeMirror
-      value={JSON.stringify(json, null, 2)}
-      height="400px"
-      extensions={[loadLanguage("json")]}
-      theme={dracula}
-      style={{
-        width: "100%",
-      }}
-      className="no-code-mirror-border !border !border-white !border-opacity-10"
-    />
-  );
-};
-
-const PGSQLQueryResponseRAWTab = ({ json }) => {
-  const theme = useTheme();
-  return (
-    <CodeMirror
-      value={JSON.stringify(json, null, 2)}
-      height="400px"
-      theme={dracula}
-      style={{
-        width: "100%",
-      }}
-      className="no-code-mirror-border !border !border-white !border-opacity-10"
-    />
-  );
-};
-
-const PGSQLQueryResponseSchemaTab = ({ dataSchema }) => {
-  const theme = useTheme();
-  return (
-    <CodeMirror
-      value={JSON.stringify(dataSchema, null, 2)}
-      height="400px"
-      theme={dracula}
-      extensions={[loadLanguage("json")]}
-      style={{
-        width: "100%",
-      }}
-      className="no-code-mirror-border !border !border-white !border-opacity-10"
-    />
-  );
-};
+import { PGSQLQueryResponseJSONTab } from "../../PQSQLQueryResponseJSONTab";
+import { PGSQLQueryResponseRAWTab } from "../../PQSQLQueryResponseRAWTab";
+import { PGSQLQueryResponseSchemaTab } from "../../PQSQLQueryResponseSchemaTab";
+import { PGSQLQueryResponseTableTab } from "../../PQSQLQueryResponseTableTab";
 
 export const PGSQLQueryBuilder = ({ value, handleChange }) => {
   const theme = useTheme();
@@ -126,8 +30,8 @@ export const PGSQLQueryBuilder = ({ value, handleChange }) => {
     mutate: runPGQuery,
     data: pgQueryData,
   } = useMutation({
-    mutationFn: ({ query }) => {
-      return runPGQueryAPI({ query: query?.query });
+    mutationFn: ({ raw_query }) => {
+      return runQueryAPI({ pm_query: { raw_query } });
     },
     retry: false,
     onSuccess: (data) => {
@@ -140,28 +44,27 @@ export const PGSQLQueryBuilder = ({ value, handleChange }) => {
   });
 
   const _runQuery = () => {
-    runPGQuery({ query: value });
+    runPGQuery({ raw_query: value?.raw_query });
   };
 
-  const _handleOnQueryChange = (value) => {
-    handleChange({ query: value });
+  const _handleOnRAWQueryChange = (value) => {
+    handleChange({ raw_query: value });
   };
 
   return (
-    <div className="!flex flex-col justify-start items-stretch w-100">
-      <div className="px-3 w-100 ">
+    <div className="!flex flex-col justify-start items-stretch w-100 px-3">
+      <div className="w-100 ">
         <CodeMirror
-          value={value ? value.query : ""}
+          value={value ? value.raw_query : ""}
           height="200px"
           extensions={[loadLanguage("pgsql")]}
-          onChange={_handleOnQueryChange}
-          theme={dracula}
+          onChange={_handleOnRAWQueryChange}
+          theme={githubLight}
           style={{
-            borderWidth: 1,
-            borderColor: theme.palette.primary.main,
             marginTop: 20,
-            borderRadius: 6,
             width: "100%",
+            borderWidth: 1,
+            borderColor: theme.palette.divider,
           }}
         />
         <div className="!flex flex-row justify-between items-center w-100 mt-3">
@@ -180,12 +83,14 @@ export const PGSQLQueryBuilder = ({ value, handleChange }) => {
         </div>
       </div>
 
-      <Divider style={{ width: "100%", marginTop: 10 }} />
       <Tabs
         value={tab}
         onChange={_handleTabChange}
         aria-label="basic tabs example"
-        className="!px-3"
+        style={{
+          background: theme.palette.background.paper,
+          marginTop: 20,
+        }}
       >
         <Tab label="Table" />
         <Tab label="JSON" />
@@ -193,7 +98,7 @@ export const PGSQLQueryBuilder = ({ value, handleChange }) => {
         <Tab label="Data Schema" />
       </Tabs>
       <Divider style={{ width: "100%" }} />
-      <div className="p-3 w-100 flex-grow h-full">
+      <div className="py-3 w-100 flex-grow h-full">
         {tab === 0 && (
           <PGSQLQueryResponseTableTab
             json={pgQueryData ? pgQueryData : ""}
