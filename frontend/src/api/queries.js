@@ -41,11 +41,11 @@ export const updateQueryAPI = async ({ data }) => {
   }
 };
 
-export const getQueryByIDAPI = async ({ queryID }) => {
+export const getQueryByIDAPI = async ({ pmQueryID }) => {
   try {
     const response = await axiosInstance.get(
       LOCAL_CONSTANTS.APIS.QUERY.getQueryByID({
-        id: queryID,
+        id: pmQueryID,
       })
     );
     if (response.data && response.data.success == true) {
@@ -61,11 +61,11 @@ export const getQueryByIDAPI = async ({ queryID }) => {
   }
 };
 
-export const deleteQueryByIDAPI = async ({ queryID }) => {
+export const deleteQueryByIDAPI = async ({ pmQueryID }) => {
   try {
     const response = await axiosInstance.delete(
       LOCAL_CONSTANTS.APIS.QUERY.deleteQueryByID({
-        id: queryID,
+        id: pmQueryID,
       })
     );
     if (response.data && response.data.success == true) {
@@ -115,11 +115,11 @@ export const runQueryAPI = async ({ pm_query }) => {
   }
 };
 
-export const duplicateQueryAPI = async ({ queryID }) => {
+export const duplicateQueryAPI = async ({ pmQueryID }) => {
   try {
     const response = await axiosInstance.post(
       LOCAL_CONSTANTS.APIS.QUERY.duplicateQuery(),
-      { query_id: queryID }
+      { pm_query_id: pmQueryID }
     );
     if (response.data && response.data.success == true) {
       return true;

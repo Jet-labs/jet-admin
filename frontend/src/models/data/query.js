@@ -15,6 +15,10 @@ export class Query {
     this.pm_query = this.getQueryClass({ pm_query_type, queryData: pm_query });
   }
   getQueryClass = ({ pm_query_type, queryData }) => {
+    console.log({ pm_query_type, queryData });
+    if(!queryData){
+      return null;
+    }
     switch (pm_query_type) {
       case LOCAL_CONSTANTS.DATA_SOURCE_QUERY_TYPE.POSTGRE_QUERY.value:
         return new PGSQLQuery(queryData);
@@ -29,6 +33,7 @@ export class Query {
     return this.pm_query_description;
   };
   static toList = (data) => {
+    
     if (Array.isArray(data)) {
       return data.map((item) => {
         return new Query(item);

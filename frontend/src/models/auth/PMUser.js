@@ -261,9 +261,9 @@ export class PMUser {
     if (this.policy.queries.read) {
       return true;
     } else if (this.policy.queries && this.policy.queries.query_ids) {
-      Object.keys(this.policy.queries.query_ids).forEach((queryID) => {
-        if (this.policy.queries.query_ids[queryID].read) {
-          authorizeQueryIDs.push(parseInt(queryID));
+      Object.keys(this.policy.queries.query_ids).forEach((pmQueryID) => {
+        if (this.policy.queries.query_ids[pmQueryID].read) {
+          authorizeQueryIDs.push(parseInt(pmQueryID));
         }
       });
     }
@@ -275,16 +275,16 @@ export class PMUser {
     if (this.policy.queries.edit) {
       return true;
     } else if (this.policy.queries && this.policy.queries.query_ids) {
-      Object.keys(this.policy.queries.query_ids).forEach((queryID) => {
-        if (this.policy.queries.query_ids[queryID].edit) {
-          authorizeQueryIDs.push(parseInt(queryID));
+      Object.keys(this.policy.queries.query_ids).forEach((pmQueryID) => {
+        if (this.policy.queries.query_ids[pmQueryID].edit) {
+          authorizeQueryIDs.push(parseInt(pmQueryID));
         }
       });
     }
     return authorizeQueryIDs;
   };
 
-  isAuthorizedToDeleteQuery = (queryID) => {
+  isAuthorizedToDeleteQuery = (pmQueryID) => {
     let authorization = false;
     console.log(this.policy.queries);
     if (
@@ -296,8 +296,10 @@ export class PMUser {
     ) {
       authorization = this.policy.queries.delete;
     } else if (this.policy.queries && this.policy.queries.query_ids) {
-      if (this.policy.queries.query_ids[queryID]) {
-        authorization = Boolean(this.policy.queries.query_ids[queryID].delete);
+      if (this.policy.queries.query_ids[pmQueryID]) {
+        authorization = Boolean(
+          this.policy.queries.query_ids[pmQueryID].delete
+        );
       }
     }
     console.log({ authorization });

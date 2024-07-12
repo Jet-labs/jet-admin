@@ -9,15 +9,13 @@ import { useMemo, useState } from "react";
 import { FaTimes } from "react-icons/fa";
 import { MainDrawerList } from "../../DrawerLists/MainDrawerList";
 import { Navbar } from "../../Navbar";
-import { useParams } from "react-router-dom";
 
 export const MainLayout = ({ children }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(true);
   const [currentPageTitle, setCurrentPageTitle] = useState("Home");
   const theme = useTheme();
   const isSmallDevice = useMediaQuery(theme.breakpoints.down("lg"));
-  const routeParam = useParams();
-  console.log({ routeParam });
+
   const _handleDrawerOpen = () => {
     setIsDrawerOpen(true);
   };

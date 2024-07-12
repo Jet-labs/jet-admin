@@ -45,7 +45,7 @@ export const QueryDrawerList = () => {
   const _navigateToAddMoreQuery = () => {
     navigate(LOCAL_CONSTANTS.ROUTES.ADD_GRAPH.path());
   };
-  console.log({ queries });
+
   return (
     <List
       style={{

@@ -6,7 +6,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { ConfirmationDialog } from "../../ConfirmationDialog";
 import { IoTrash } from "react-icons/io5";
-export const QueryDeletionForm = ({ queryID }) => {
+export const QueryDeletionForm = ({ pmQueryID }) => {
   const { pmUser } = useAuthState();
   const queryClient = useQueryClient();
   const [isDeleteQueryConfirmationOpen, setIsDeleteQueryConfirmationOpen] =
@@ -14,11 +14,11 @@ export const QueryDeletionForm = ({ queryID }) => {
 
   const deleteQueryAuthorization = useMemo(() => {
     if (pmUser) {
-      return pmUser.isAuthorizedToDeleteQuery(queryID);
+      return pmUser.isAuthorizedToDeleteQuery(pmQueryID);
     } else {
       return false;
     }
-  }, [pmUser, queryID]);
+  }, [pmUser, pmQueryID]);
 
   const {
     isPending: isDeletingRow,
@@ -27,7 +27,7 @@ export const QueryDeletionForm = ({ queryID }) => {
     error: deleteQueryError,
     mutate: deleteQuery,
   } = useMutation({
-    mutationFn: ({ queryID }) => deleteQueryByIDAPI({ queryID }),
+    mutationFn: ({ pmQueryID }) => deleteQueryByIDAPI({ pmQueryID }),
     retry: false,
     onSuccess: () => {
       displaySuccess("Deleted row successfully");
@@ -45,7 +45,7 @@ export const QueryDeletionForm = ({ queryID }) => {
   };
 
   const _handleDeleteQuery = () => {
-    deleteQuery({ queryID: queryID });
+    deleteQuery({ pmQueryID: pmQueryID });
   };
   return (
     deleteQueryAuthorization && (
@@ -65,7 +65,7 @@ export const QueryDeletionForm = ({ queryID }) => {
           onAccepted={_handleDeleteQuery}
           onDecline={_handleCloseDeleteQueryConfirmation}
           title={"Delete query?"}
-          message={`Are you sure you want to delete query id - ${queryID}`}
+          message={`Are you sure you want to delete query id - ${pmQueryID}`}
         />
       </>
     )

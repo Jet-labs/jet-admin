@@ -286,7 +286,7 @@ class QueryService {
         authorizedQueries: true,
       });
       return await this.addQuery({
-        pmQuery: query.pmQuery,
+        pmQuery: query.pm_query,
         pmQueryType: query.pm_query_type,
         pmQueryTitle: `${query.pm_query_title} copy`,
         pmQueryDescription: query.pm_query_description,

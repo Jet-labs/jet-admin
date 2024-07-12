@@ -22,7 +22,7 @@ const UpdateQuery = () => {
     error: loadQueryDataError,
   } = useQuery({
     queryKey: [`REACT_QUERY_KEY_QUERIES`, id],
-    queryFn: () => getQueryByIDAPI({ queryID: id }),
+    queryFn: () => getQueryByIDAPI({ pmQueryID: id }),
     cacheTime: 0,
     retry: 1,
     staleTime: 0,
@@ -147,8 +147,8 @@ const UpdateQuery = () => {
               className="!ml-3"
               onClick={_updateQuery}
             >{`Save query`}</Button>
-            <QueryDeletionForm queryID={id} />
-            <QueryDuplicateForm queryID={id} />
+            <QueryDeletionForm pmQueryID={id} />
+            <QueryDuplicateForm pmQueryID={id} />
           </div>
         </Grid>
         <Grid

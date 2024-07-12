@@ -7,7 +7,7 @@ import { displayError, displaySuccess } from "../../../utils/notification";
 import { ConfirmationDialog } from "../../ConfirmationDialog";
 import { IoTrash } from "react-icons/io5";
 import { FaCopy } from "react-icons/fa6";
-export const QueryDuplicateForm = ({ queryID }) => {
+export const QueryDuplicateForm = ({ pmQueryID }) => {
   const { pmUser } = useAuthState();
   const queryClient = useQueryClient();
   const [
@@ -26,7 +26,7 @@ export const QueryDuplicateForm = ({ queryID }) => {
     error: duplicateQueryError,
     mutate: duplicateQuery,
   } = useMutation({
-    mutationFn: ({ queryID }) => duplicateQueryAPI({ queryID }),
+    mutationFn: ({ pmQueryID }) => duplicateQueryAPI({ pmQueryID }),
     retry: false,
     onSuccess: () => {
       displaySuccess("Duplicated row successfully");
@@ -44,7 +44,7 @@ export const QueryDuplicateForm = ({ queryID }) => {
   };
 
   const _handleDuplicateQuery = () => {
-    duplicateQuery({ queryID: queryID });
+    duplicateQuery({ pmQueryID: pmQueryID });
   };
   return (
     isAuthorizedToAddQuery && (
@@ -64,7 +64,7 @@ export const QueryDuplicateForm = ({ queryID }) => {
           onAccepted={_handleDuplicateQuery}
           onDecline={_handleCloseDuplicateQueryConfirmation}
           title={"Duplicate query?"}
-          message={`Are you sure you want to duplicate query id - ${queryID}`}
+          message={`Are you sure you want to duplicate query id - ${pmQueryID}`}
         />
       </>
     )
