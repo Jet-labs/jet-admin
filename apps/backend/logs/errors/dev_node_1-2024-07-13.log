@@ -1,0 +1,43 @@
+[31merror[39m: dev_node_1: 13-07-2024 04:38:45: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-07-12T17:08:11.000Z"}}
+[31merror[39m: dev_node_1: 13-07-2024 04:38:45: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 13-07-2024 04:38:45: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 13-07-2024 04:38:45: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 13-07-2024 04:38:46: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 13-07-2024 04:38:46: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 13-07-2024 04:38:51: [31mQueryService:runQuery:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 13-07-2024 04:38:51: [31mqueryController:runQuery:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 13-07-2024 04:41:16: [31mQueryService:runQuery:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 13-07-2024 04:41:16: [31mqueryController:runQuery:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 13-07-2024 04:42:31: [31mQueryService:runQuery:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 13-07-2024 04:42:31: [31mqueryController:runQuery:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 13-07-2024 04:54:02: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-07-12T23:23:45.000Z"}}
+[31merror[39m: dev_node_1: 13-07-2024 04:54:02: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 13-07-2024 05:09:59: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-07-12T23:39:02.000Z"}}
+[31merror[39m: dev_node_1: 13-07-2024 05:09:59: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 13-07-2024 05:15:49: [31mAuthService:loginUserWithUsernamePassword:catch-2[39m |====| {"error":{"code":"INVALID_USER","message":"User not found"}}
+[31merror[39m: dev_node_1: 13-07-2024 05:15:49: [31mAuthService:loginUserWithUsernamePassword:catch-1[39m |====| {"error":{"code":"INVALID_USER","message":"User not found"}}
+[31merror[39m: dev_node_1: 13-07-2024 05:15:49: [31mauthController:login:catch-1[39m |====| {"error":{"code":"INVALID_USER","message":"User not found"}}
+[31merror[39m: dev_node_1: 13-07-2024 05:15:55: [31mAuthService:loginUserWithUsernamePassword:catch-2[39m |====| {"error":{"code":"INVALID_USER","message":"User not found"}}
+[31merror[39m: dev_node_1: 13-07-2024 05:15:55: [31mAuthService:loginUserWithUsernamePassword:catch-1[39m |====| {"error":{"code":"INVALID_USER","message":"User not found"}}
+[31merror[39m: dev_node_1: 13-07-2024 05:15:55: [31mauthController:login:catch-1[39m |====| {"error":{"code":"INVALID_USER","message":"User not found"}}
+[31merror[39m: dev_node_1: 13-07-2024 05:16:01: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 13-07-2024 05:16:01: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 13-07-2024 05:16:02: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 13-07-2024 05:16:02: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 13-07-2024 05:16:11: [31mAuthService:loginUserWithUsernamePassword:catch-2[39m |====| {"error":{"code":"INVALID_LOGIN","message":"User login invalid"}}
+[31merror[39m: dev_node_1: 13-07-2024 05:16:11: [31mAuthService:loginUserWithUsernamePassword:catch-1[39m |====| {"error":{"code":"INVALID_LOGIN","message":"User login invalid"}}
+[31merror[39m: dev_node_1: 13-07-2024 05:16:11: [31mauthController:login:catch-1[39m |====| {"error":{"code":"INVALID_LOGIN","message":"User login invalid"}}
+[31merror[39m: dev_node_1: 13-07-2024 05:16:15: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 13-07-2024 05:16:15: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 13-07-2024 05:16:16: [31mDashboardService:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 13-07-2024 05:16:16: [31mdashboardController:getDashboardByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 13-07-2024 05:16:21: [31mDashboardService:updateDashboard:catch-2[39m |====| {"error":{"code":"PERMISSION_DENIED","message":"Permission denied"}}
+[31merror[39m: dev_node_1: 13-07-2024 05:16:21: [31mDashboardService:updateDashboard:catch-1[39m |====| {"error":{"code":"PERMISSION_DENIED","message":"Permission denied"}}
+[31merror[39m: dev_node_1: 13-07-2024 05:16:21: [31mdashboardController:updateDashboard:catch-1[39m |====| {"error":{"code":"PERMISSION_DENIED","message":"Permission denied"}}
+[31merror[39m: dev_node_1: 13-07-2024 05:16:31: [31mDashboardService:updateQuery:catch-2[39m |====| {"error":{"code":"PERMISSION_DENIED","message":"Permission denied"}}
+[31merror[39m: dev_node_1: 13-07-2024 05:16:31: [31mDashboardService:updateQuery:catch-1[39m |====| {"error":{"code":"PERMISSION_DENIED","message":"Permission denied"}}
+[31merror[39m: dev_node_1: 13-07-2024 05:16:31: [31mqueryController:updateQuery:catch-1[39m |====| {"error":{"code":"PERMISSION_DENIED","message":"Permission denied"}}
+[31merror[39m: dev_node_1: 13-07-2024 05:16:34: [31mDashboardService:updateQuery:catch-2[39m |====| {"error":{"code":"PERMISSION_DENIED","message":"Permission denied"}}
+[31merror[39m: dev_node_1: 13-07-2024 05:16:34: [31mDashboardService:updateQuery:catch-1[39m |====| {"error":{"code":"PERMISSION_DENIED","message":"Permission denied"}}
+[31merror[39m: dev_node_1: 13-07-2024 05:16:34: [31mqueryController:updateQuery:catch-1[39m |====| {"error":{"code":"PERMISSION_DENIED","message":"Permission denied"}}
+[31merror[39m: dev_node_1: 13-07-2024 05:16:41: [31mgraphAuthorizationMiddleware:populateAuthorizationForGraphAddition:catch-2[39m |====| {"error":{"code":"PERMISSION_DENIED","message":"Permission denied"}}

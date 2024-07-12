@@ -1,0 +1,40 @@
+{
+  "graphs": {
+    "add": false,
+    "edit": false,
+    "read": true,
+    "delete": false
+  },
+  "tables": {
+    "tbl_pm_users": {
+      "add": false,
+      "edit": false,
+      "read": true,
+      "delete": false
+    },
+    "tbl_pm_policy_objects": {
+      "add": false,
+      "edit": false,
+      "read": true,
+      "delete": false
+    }
+  },
+  "actions": {
+    "add": false,
+    "edit": false,
+    "read": true,
+    "delete": false
+  },
+  "queries": {
+    "add": false,
+    "edit": false,
+    "read": true,
+    "delete": false
+  },
+  "dashboards": {
+    "add": false,
+    "edit": false,
+    "read": true,
+    "delete": false
+  }
+}
