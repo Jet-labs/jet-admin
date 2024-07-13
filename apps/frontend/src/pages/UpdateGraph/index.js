@@ -13,6 +13,7 @@ import { GraphComponentPreview } from "../../components/GraphComponents/GraphCom
 import { GraphEditor } from "../../components/GraphComponents/GraphEditor";
 import { LOCAL_CONSTANTS } from "../../constants";
 import { displayError, displaySuccess } from "../../utils/notification";
+import { GRAPH_PLUGINS_MAP } from "../../plugins/graphs";
 
 const UpdateGraph = () => {
   const theme = useTheme();
@@ -72,7 +73,7 @@ const UpdateGraph = () => {
 
   const graphForm = useFormik({
     initialValues: {
-      graph_type: LOCAL_CONSTANTS.GRAPH_TYPES.BAR.value,
+      graph_type: GRAPH_PLUGINS_MAP.BAR.value,
       title_display_enabled: true,
       legend_position: LOCAL_CONSTANTS.GRAPH_LEGEND_POSITION.TOP,
       graph_title: "",
@@ -121,12 +122,19 @@ const UpdateGraph = () => {
   return (
     <div className="w-full">
       <div
-        className="flex flex-col items-start justify-start p-3 px-6 !border-b !border-white !border-opacity-10"
-        style={{ background: theme.palette.background.paper }}
+        className="flex flex-col items-start justify-start p-3 px-6"
+        style={{
+          background: theme.palette.background.default,
+          borderBottomWidth: 1,
+          borderColor: theme.palette.divider,
+        }}
       >
         <span className="text-lg font-bold text-start ">{`Update graph`}</span>
         {graphData && (
-          <span className="text-xs font-thin text-start text-slate-300">{`${graphData.graph_title} | Graph ID : ${graphData.pm_graph_id}`}</span>
+          <span
+            className="text-xs font-thin text-start text-slate-300"
+            style={{ color: theme.palette.text.secondary }}
+          >{`${graphData.graph_title} | Graph ID : ${graphData.pm_graph_id}`}</span>
         )}
       </div>
       <Grid container spacing={1} className="!px-3">

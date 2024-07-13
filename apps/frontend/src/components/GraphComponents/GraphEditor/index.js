@@ -18,7 +18,8 @@ import { FaTimes } from "react-icons/fa";
 import { GraphDeletionForm } from "../GraphDeletionForm";
 import { useQuery } from "@tanstack/react-query";
 import { getAllQueryAPI } from "../../../api/queries";
-import { PLUGINS_MAP } from "../../../plugins";
+import { QUERY_PLUGINS_MAP } from "../../../plugins/queries";
+import { GRAPH_PLUGINS_MAP } from "../../../plugins/graphs";
 
 /**
  *
@@ -49,24 +50,13 @@ export const GraphEditor = ({ graphID, graphForm, deleteGraph }) => {
       { dataset_title: "", color: "#D84545", query: "" },
     ]);
   };
-
-  const _handleUpdateDatasetLabel = (index, value) => {
-    let updatedQueryArrayFieldValue = graphForm.values["query_array"];
-    updatedQueryArrayFieldValue[index].dataset_title = value;
-    graphForm.setFieldValue("query_array", updatedQueryArrayFieldValue);
-  };
   const _handleUpdateDatasetColor = (index, value) => {
     let updatedQueryArrayFieldValue = graphForm.values["query_array"];
     updatedQueryArrayFieldValue[index].color = value;
     updatedQueryArrayFieldValue[index].backgroundColor = `${value}80`;
     graphForm.setFieldValue("query_array", updatedQueryArrayFieldValue);
   };
-  const _handleUpdateDatasetFill = (index, value) => {
-    let updatedQueryArrayFieldValue = graphForm.values["query_array"];
-    updatedQueryArrayFieldValue[index].fill = value;
 
-    graphForm.setFieldValue("query_array", updatedQueryArrayFieldValue);
-  };
   const _handleUpdateDatasetXAxis = (index, value) => {
     let updatedQueryArrayFieldValue = graphForm.values["query_array"];
     updatedQueryArrayFieldValue[index].x_axis = value;
@@ -80,7 +70,7 @@ export const GraphEditor = ({ graphID, graphForm, deleteGraph }) => {
 
   const _handleUpdateDatasetQuery = (index, value) => {
     let updatedQueryArrayFieldValue = graphForm.values["query_array"];
-    updatedQueryArrayFieldValue[index].query = value;
+    updatedQueryArrayFieldValue[index].pm_query_id = value;
     graphForm.setFieldValue("query_array", updatedQueryArrayFieldValue);
   };
 
@@ -172,10 +162,10 @@ export const GraphEditor = ({ graphID, graphForm, deleteGraph }) => {
               size="small"
               fullWidth={false}
             >
-              {Object.keys(LOCAL_CONSTANTS.GRAPH_TYPES).map((e) => {
+              {Object.keys(GRAPH_PLUGINS_MAP).map((e) => {
                 return (
-                  <MenuItem value={LOCAL_CONSTANTS.GRAPH_TYPES[e].value}>
-                    {LOCAL_CONSTANTS.GRAPH_TYPES[e].label}
+                  <MenuItem value={GRAPH_PLUGINS_MAP[e].value}>
+                    {GRAPH_PLUGINS_MAP[e].label}
                   </MenuItem>
                 );
               })}
@@ -223,34 +213,7 @@ export const GraphEditor = ({ graphID, graphForm, deleteGraph }) => {
                   <FaTimes className="!text-sm" />
                 </IconButton>
               </Grid>
-              {/* <Grid
-                item
-                xs={12}
-                sm={12}
-                md={12}
-                lg={12}
-                key={`query_array_title-${index}`}
-              >
-                <span className="text-xs font-light  !capitalize mb-1">{`Data source : ${
-                  index + 1
-                }`}</span>
-                <FormControl fullWidth size="small" className="">
-                  <span className="text-xs font-light  !capitalize mb-1">{`Title`}</span>
-                  <TextField
-                    required={true}
-                    fullWidth
-                    size="small"
-                    variant="outlined"
-                    type="text"
-                    name={`query_array_title-${index}`}
-                    value={dataset.dataset_title}
-                    onChange={(e) => {
-                      _handleUpdateDatasetLabel(index, e.target.value);
-                    }}
-                    onBlur={graphForm.handleBlur}
-                  />
-                </FormControl>
-              </Grid> */}
+
               <Grid
                 item
                 xs={12}
@@ -264,7 +227,7 @@ export const GraphEditor = ({ graphID, graphForm, deleteGraph }) => {
 
                   <Select
                     name={`query_array_query-${index}`}
-                    value={dataset.query_id}
+                    value={dataset.pm_query_id}
                     onBlur={graphForm.handleBlur}
                     onChange={(e) => {
                       _handleUpdateDatasetQuery(index, e.target.value);
@@ -274,10 +237,11 @@ export const GraphEditor = ({ graphID, graphForm, deleteGraph }) => {
                     fullWidth={false}
                   >
                     {queries?.map((query) => {
+                      console.log({ query });
                       return (
                         <MenuItem value={query.pm_query_id}>
                           <div className="!flex flex-row justify-start items-center">
-                            {PLUGINS_MAP[query.pm_query_type].icon}
+                            {QUERY_PLUGINS_MAP[query.pm_query_type].icon}
                             <span className="ml-2">{query.pm_query_title}</span>
                           </div>
                         </MenuItem>
@@ -288,7 +252,7 @@ export const GraphEditor = ({ graphID, graphForm, deleteGraph }) => {
                 </FormControl>
               </Grid>
 
-              {LOCAL_CONSTANTS.GRAPH_TYPES[
+              {GRAPH_PLUGINS_MAP[
                 graphForm.values["graph_type"]
               ]?.fields?.includes("x_axis") && (
                 <Grid
@@ -299,25 +263,25 @@ export const GraphEditor = ({ graphID, graphForm, deleteGraph }) => {
                   lg={6}
                   key={`query_array_x-${index}`}
                 >
-                  <FieldComponent
-                    type={LOCAL_CONSTANTS.DATA_TYPES.STRING}
-                    name={`query_array_x-${index}`}
-                    value={dataset.x_axis}
-                    onBlur={graphForm.handleBlur}
-                    onChange={(e) => {
-                      _handleUpdateDatasetXAxis(index, e.target.value);
-                    }}
-                    setFieldValue={(name, value) => {
-                      _handleUpdateDatasetXAxis(
-                        parseInt(String(name).split("-")[1]),
-                        value
-                      );
-                    }}
-                    required={true}
-                  />
+                  <FormControl fullWidth size="small" className="">
+                    <span className="text-xs font-light  !capitalize mb-1">{`x-axis`}</span>
+                    <TextField
+                      required={true}
+                      fullWidth
+                      size="small"
+                      variant="outlined"
+                      type="text"
+                      name={`query_array_x-${index}`}
+                      value={dataset.x_axis}
+                      onBlur={graphForm.handleBlur}
+                      onChange={(e) => {
+                        _handleUpdateDatasetXAxis(index, e.target.value);
+                      }}
+                    />
+                  </FormControl>
                 </Grid>
               )}
-              {LOCAL_CONSTANTS.GRAPH_TYPES[
+              {GRAPH_PLUGINS_MAP[
                 graphForm.values["graph_type"]
               ]?.fields?.includes("y_axis") && (
                 <Grid
@@ -328,53 +292,22 @@ export const GraphEditor = ({ graphID, graphForm, deleteGraph }) => {
                   lg={6}
                   key={`query_array_y-${index}`}
                 >
-                  <FieldComponent
-                    type={LOCAL_CONSTANTS.DATA_TYPES.STRING}
-                    name={`query_array_y-${index}`}
-                    value={dataset.y_axis}
-                    onBlur={graphForm.handleBlur}
-                    onChange={(e) => {
-                      _handleUpdateDatasetYAxis(index, e.target.value);
-                    }}
-                    setFieldValue={(name, value) => {
-                      _handleUpdateDatasetYAxis(
-                        parseInt(String(name).split("-")[1]),
-                        value
-                      );
-                    }}
-                    required={true}
-                  />
-                </Grid>
-              )}
-
-              {LOCAL_CONSTANTS.GRAPH_TYPES[
-                graphForm.values["fill"]
-              ]?.fields?.includes("y_axis") && (
-                <Grid
-                  item
-                  xs={12}
-                  sm={12}
-                  md={12}
-                  lg={12}
-                  key={`query_array_fill-${index}`}
-                >
-                  <FieldComponent
-                    type={LOCAL_CONSTANTS.DATA_TYPES.BOOLEAN}
-                    name={`query_array_fill-${index}`}
-                    value={dataset.fill}
-                    onBlur={graphForm.handleBlur}
-                    onChange={(e) => {
-                      _handleUpdateDatasetFill(index, e.target.value);
-                    }}
-                    setFieldValue={(name, value) => {
-                      _handleUpdateDatasetFill(
-                        parseInt(String(name).split("-")[1]),
-                        value
-                      );
-                    }}
-                    required={true}
-                    customMapping={null}
-                  />
+                  <FormControl fullWidth size="small" className="">
+                    <span className="text-xs font-light  !capitalize mb-1">{`y-axis`}</span>
+                    <TextField
+                      required={true}
+                      fullWidth
+                      size="small"
+                      variant="outlined"
+                      type="text"
+                      name={`query_array_y-${index}`}
+                      value={dataset.y_axis}
+                      onBlur={graphForm.handleBlur}
+                      onChange={(e) => {
+                        _handleUpdateDatasetYAxis(index, e.target.value);
+                      }}
+                    />
+                  </FormControl>
                 </Grid>
               )}
 
@@ -401,34 +334,6 @@ export const GraphEditor = ({ graphID, graphForm, deleteGraph }) => {
                     );
                   }}
                   required={true}
-                  customMapping={null}
-                />
-              </Grid>
-
-              <Grid
-                item
-                xs={12}
-                sm={12}
-                md={12}
-                lg={12}
-                key={`query_array_query-${index}`}
-              >
-                <FieldComponent
-                  type={LOCAL_CONSTANTS.DATA_TYPES.CODE}
-                  name={`query_array_query-${index}`}
-                  value={dataset.query_id}
-                  onBlur={graphForm.handleBlur}
-                  onChange={(e) => {
-                    _handleUpdateDatasetQuery(index, e.target.value);
-                  }}
-                  setFieldValue={(name, value) => {
-                    _handleUpdateDatasetQuery(
-                      parseInt(String(name).split("-")[1]),
-                      value
-                    );
-                  }}
-                  required={true}
-                  language={"sql"}
                   customMapping={null}
                 />
               </Grid>

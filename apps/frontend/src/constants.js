@@ -332,51 +332,10 @@ export const LOCAL_CONSTANTS = {
 
   CUSTOM_INT_COLOR_MAPPINGS: {},
 
-  GRAPH_TYPES: {
-    CHART: { label: "Chart", value: "CHART" },
-    BAR: {
-      label: "Bar",
-      value: "BAR",
-      fields: ["x_axis", "y_axis", "index_axis"],
-    },
-    LINE: {
-      label: "Line",
-      value: "LINE",
-      fields: ["x_axis", "y_axis", "fill"],
-    },
-    PIE: { label: "Pie", value: "PIE", fields: ["x_axis", "y_axis"] },
-    DOUGHNUT: {
-      label: "Doughnut",
-      value: "DOUGHNUT",
-      fields: ["x_axis", "y_axis"],
-    },
-    POLAR_AREA: {
-      label: "Polar Area",
-      value: "POLAR_AREA",
-      fields: ["x_axis", "y_axis"],
-    },
-    RADAR: {
-      label: "Radar",
-      value: "RADAR",
-      fields: ["x_axis", "y_axis"],
-    },
-  },
-
   GRAPH_LEGEND_POSITION: {
     TOP: "top",
     BOTTOM: "bottom",
     LEFT: "left",
     RIGHT: "right",
-  },
-
-  DATA_SOURCE_QUERY_TYPE: {
-    REST_API: {
-      name: "Rest API",
-      value: "REST_API",
-    },
-    POSTGRE_QUERY: {
-      name: "Postgre query",
-      value: "POSTGRE_QUERY",
-    },
   },
 };

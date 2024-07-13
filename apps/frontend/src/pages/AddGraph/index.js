@@ -8,6 +8,7 @@ import { GraphComponentPreview } from "../../components/GraphComponents/GraphCom
 import { LOCAL_CONSTANTS } from "../../constants";
 import { displayError, displaySuccess } from "../../utils/notification";
 import { useTheme } from "@emotion/react";
+import { GRAPH_PLUGINS_MAP } from "../../plugins/graphs";
 
 const AddGraph = () => {
   const theme = useTheme();
@@ -31,7 +32,7 @@ const AddGraph = () => {
   });
   const graphForm = useFormik({
     initialValues: {
-      graph_type: LOCAL_CONSTANTS.GRAPH_TYPES.BAR.value,
+      graph_type: GRAPH_PLUGINS_MAP.BAR.value,
       title_display_enabled: true,
       legend_position: LOCAL_CONSTANTS.GRAPH_LEGEND_POSITION.TOP,
       graph_title: "",

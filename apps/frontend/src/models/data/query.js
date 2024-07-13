@@ -1,4 +1,5 @@
 import { LOCAL_CONSTANTS } from "../../constants";
+import { QUERY_PLUGINS_MAP } from "../../plugins/queries";
 
 export class Query {
   constructor({
@@ -16,11 +17,11 @@ export class Query {
   }
   getQueryClass = ({ pm_query_type, queryData }) => {
     console.log({ pm_query_type, queryData });
-    if(!queryData){
+    if (!queryData) {
       return null;
     }
     switch (pm_query_type) {
-      case LOCAL_CONSTANTS.DATA_SOURCE_QUERY_TYPE.POSTGRE_QUERY.value:
+      case QUERY_PLUGINS_MAP[pm_query_type].value:
         return new PGSQLQuery(queryData);
       default:
         return new PGSQLQuery(queryData);
@@ -33,7 +34,6 @@ export class Query {
     return this.pm_query_description;
   };
   static toList = (data) => {
-    
     if (Array.isArray(data)) {
       return data.map((item) => {
         return new Query(item);

@@ -1,4 +1,4 @@
-import { FaChartBar, FaChartLine, FaChartPie } from "react-icons/fa";
+import { FaChartLine } from "react-icons/fa";
 import { GrDrag } from "react-icons/gr";
 
 import {
@@ -10,11 +10,10 @@ import {
   useTheme,
 } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
-import { BiRadar } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
 import { getAllGraphAPI } from "../../../api/graphs";
-import { LOCAL_CONSTANTS } from "../../../constants";
 import { useAuthState } from "../../../contexts/authContext";
+import { GRAPH_PLUGINS_MAP } from "../../../plugins/graphs";
 import "./styles.css";
 export const GraphsDnDList = ({}) => {
   const theme = useTheme();
@@ -72,19 +71,8 @@ export const GraphsDnDList = ({}) => {
                   color: theme.palette.primary.contrastText,
                 }}
               >
-                {graph.graph_options.graph_type ===
-                LOCAL_CONSTANTS.GRAPH_TYPES.BAR.value ? (
-                  <FaChartBar className="!text-sm" />
-                ) : graph.graph_options.graph_type ===
-                    LOCAL_CONSTANTS.GRAPH_TYPES.PIE.value ||
-                  graph.graph_options.graph_type ===
-                    LOCAL_CONSTANTS.GRAPH_TYPES.DOUGHNUT.value ||
-                  graph.graph_options.graph_type ===
-                    LOCAL_CONSTANTS.GRAPH_TYPES.POLAR_AREA.value ? (
-                  <FaChartPie className="!text-sm" />
-                ) : graph.graph_options.graph_type ===
-                  LOCAL_CONSTANTS.GRAPH_TYPES.RADAR.value ? (
-                  <BiRadar className="!text-sm" />
+                {GRAPH_PLUGINS_MAP[graph.graph_options.graph_type] ? (
+                  GRAPH_PLUGINS_MAP[graph.graph_options.graph_type].icon
                 ) : (
                   <FaChartLine className="!text-sm" />
                 )}

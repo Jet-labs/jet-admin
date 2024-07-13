@@ -18,6 +18,7 @@ import { DiPostgresql } from "react-icons/di";
 import { FaCloudSun } from "react-icons/fa6";
 import { BiRadar } from "react-icons/bi";
 import { getAllQueryAPI } from "../../../api/queries";
+import { QUERY_PLUGINS_MAP } from "../../../plugins/queries";
 
 export const QueryDrawerList = () => {
   const theme = useTheme();
@@ -117,9 +118,8 @@ export const QueryDrawerList = () => {
                     minWidth: 0,
                   }}
                 >
-                  {query.pm_query_type ==
-                  LOCAL_CONSTANTS.DATA_SOURCE_QUERY_TYPE.POSTGRE_QUERY.value ? (
-                    <DiPostgresql className="!text-lg" />
+                  {QUERY_PLUGINS_MAP[query.pm_query_type] ? (
+                    QUERY_PLUGINS_MAP[query.pm_query_type].icon
                   ) : (
                     <FaCloudSun className="!text-sm" />
                   )}

@@ -2,6 +2,7 @@ const { Prisma } = require("@prisma/client");
 const { prisma } = require("../../config/prisma");
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
+const { getQueryObject } = require("../../plugins/queries");
 class GraphService {
   constructor() {}
 
@@ -141,9 +142,17 @@ class GraphService {
 
           const queryArray = Array.from(graph.graph_options.query_array);
           const results = queryArray.map(async (queryItem) => {
-            const result = await prisma.$queryRaw`${Prisma.raw(
-              queryItem.query
-            )}`;
+            const query = await prisma.tbl_pm_queries.findUnique({
+              where: {
+                pm_query_id: parseInt(queryItem.pm_query_id),
+              },
+            });
+            const queryModel = getQueryObject({
+              pmQueryType: query.pm_query_type,
+              pmQuery: query.pm_query,
+            });
+
+            const result = await queryModel.run();
 
             const _y = [];
             console.log({ queryItem });

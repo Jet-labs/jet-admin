@@ -519,6 +519,9 @@ export const customLightTheme = {
             color: "#6a7585",
             fontSize: 10,
           },
+          "& .MuiSvgIcon-root": {
+            color: "#6a7585",
+          },
           input: {
             "&:-webkit-autofill": {
               WebkitBoxShadow: "0 0 0 100px #fff inset",

@@ -23,6 +23,7 @@ import {
 } from "react-icons/fa";
 
 import { BiRadar } from "react-icons/bi";
+import { GRAPH_PLUGINS_MAP } from "../../../plugins/graphs";
 
 export const GraphDrawerList = () => {
   const theme = useTheme();
@@ -120,19 +121,8 @@ export const GraphDrawerList = () => {
                     minWidth: 0,
                   }}
                 >
-                  {graph.graph_options.graph_type ===
-                  LOCAL_CONSTANTS.GRAPH_TYPES.BAR.value ? (
-                    <FaChartBar className="!text-sm" />
-                  ) : graph.graph_options.graph_type ===
-                      LOCAL_CONSTANTS.GRAPH_TYPES.PIE.value ||
-                    graph.graph_options.graph_type ===
-                      LOCAL_CONSTANTS.GRAPH_TYPES.DOUGHNUT.value ||
-                    graph.graph_options.graph_type ===
-                      LOCAL_CONSTANTS.GRAPH_TYPES.POLAR_AREA.value ? (
-                    <FaChartPie className="!text-sm" />
-                  ) : graph.graph_options.graph_type ===
-                    LOCAL_CONSTANTS.GRAPH_TYPES.RADAR.value ? (
-                    <BiRadar className="!text-sm" />
+                  {GRAPH_PLUGINS_MAP[graph.graph_options.graph_type] ? (
+                    GRAPH_PLUGINS_MAP[graph.graph_options.graph_type].icon
                   ) : (
                     <FaChartLine className="!text-sm" />
                   )}

@@ -113,19 +113,19 @@ export const DashboardUpdateForm = ({ id }) => {
           md={3}
           sm={4}
           className="w-full !border-r !border-white !border-opacity-10 !h-[calc(100vh-48px)] !overflow-y-auto"
-          style={{ background: theme.palette.background.paper }}
+          style={{ background: theme.palette.background.default }}
         >
           <Grid sm={12} className="!top-0 !sticky !z-50">
             <div
               className="flex flex-row justify-start items-center p-3 !border-b !border-white !border-opacity-10"
-              style={{ background: theme.palette.background.paper }}
+              style={{ background: theme.palette.background.default }}
             >
               <FiSettings className="!text-base !font-semibold" />
               <span className="text-sm font-semibold text-start ml-2">{`Update dashboard : ${id}`}</span>
             </div>
             <div
               className="flex flex-col justify-center items-start p-3 !border-b !border-white !border-opacity-10"
-              style={{ background: theme.palette.background.paper }}
+              style={{ background: theme.palette.background.default }}
             >
               <FieldComponent
                 name={"dashboard_title"}

@@ -3,6 +3,7 @@ import React from "react";
 import { FaTimes } from "react-icons/fa";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { FieldComponent } from "../../FieldComponent";
+import { GRAPH_PLUGINS_MAP } from "../../../plugins/graphs";
 
 /**
  *
@@ -127,8 +128,11 @@ export const GraphBuilder = ({ graphForm }) => {
         <Grid item xs={12} sm={12} md={12} lg={12} key={"graph_type"}>
           <FieldComponent
             type={LOCAL_CONSTANTS.DATA_TYPES.SINGLE_SELECT}
-            selectOptions={Object.keys(LOCAL_CONSTANTS.GRAPH_TYPES).map((e) => {
-              return LOCAL_CONSTANTS.GRAPH_TYPES[e];
+            selectOptions={Object.keys(GRAPH_PLUGINS_MAP).map((e) => {
+              return {
+                value: GRAPH_PLUGINS_MAP[e].value,
+                label: GRAPH_PLUGINS_MAP[e].label,
+              };
             })}
             name={"graph_type"}
             value={graphForm.values["graph_type"]}
@@ -203,7 +207,7 @@ export const GraphBuilder = ({ graphForm }) => {
                 />
               </Grid>
 
-              {LOCAL_CONSTANTS.GRAPH_TYPES[
+              {GRAPH_PLUGINS_MAP[
                 graphForm.values["graph_type"]
               ]?.fields?.includes("x_axis") && (
                 <Grid
@@ -232,7 +236,7 @@ export const GraphBuilder = ({ graphForm }) => {
                   />
                 </Grid>
               )}
-              {LOCAL_CONSTANTS.GRAPH_TYPES[
+              {GRAPH_PLUGINS_MAP[
                 graphForm.values["graph_type"]
               ]?.fields?.includes("y_axis") && (
                 <Grid
@@ -262,9 +266,9 @@ export const GraphBuilder = ({ graphForm }) => {
                 </Grid>
               )}
 
-              {LOCAL_CONSTANTS.GRAPH_TYPES[
-                graphForm.values["fill"]
-              ]?.fields?.includes("y_axis") && (
+              {GRAPH_PLUGINS_MAP[graphForm.values["fill"]]?.fields?.includes(
+                "y_axis"
+              ) && (
                 <Grid
                   item
                   xs={12}

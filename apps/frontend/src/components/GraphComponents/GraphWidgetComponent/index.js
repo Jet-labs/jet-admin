@@ -3,13 +3,7 @@ import React from "react";
 
 import { useQuery } from "@tanstack/react-query";
 import { getGraphDataByIDAPI } from "../../../api/graphs";
-import { LOCAL_CONSTANTS } from "../../../constants";
-import { BarGraphComponent } from "../BarGraphComponent";
-import { DoughnutGraphComponent } from "../DoughnutChartComponent";
-import { LineGraphComponent } from "../LineGraphComponent";
-import { PieGraphComponent } from "../PieChartComponent";
-import { PolarAreaGraphComponent } from "../PolarAreaChartComponent";
-import { RadarGraphComponent } from "../RadarChartComponent";
+import { GRAPH_PLUGINS_MAP } from "../../../plugins/graphs";
 
 export const GraphWidgetComponent = ({ id }) => {
   const theme = useTheme();
@@ -40,54 +34,12 @@ export const GraphWidgetComponent = ({ id }) => {
         height: 400,
       }}
     >
-      {graphType === LOCAL_CONSTANTS.GRAPH_TYPES.LINE.value && (
-        <LineGraphComponent
-          legendPosition={legendPosition}
-          titleDisplayEnabled={titleDisplayEnabled}
-          graphTitle={graphTitle}
-          data={data}
-        />
-      )}
-      {graphType === LOCAL_CONSTANTS.GRAPH_TYPES.BAR.value && (
-        <BarGraphComponent
-          legendPosition={legendPosition}
-          titleDisplayEnabled={titleDisplayEnabled}
-          graphTitle={graphTitle}
-          data={data}
-        />
-      )}
-      {graphType === LOCAL_CONSTANTS.GRAPH_TYPES.PIE.value && (
-        <PieGraphComponent
-          legendPosition={legendPosition}
-          titleDisplayEnabled={titleDisplayEnabled}
-          graphTitle={graphTitle}
-          data={data}
-        />
-      )}
-      {graphType === LOCAL_CONSTANTS.GRAPH_TYPES.DOUGHNUT.value && (
-        <DoughnutGraphComponent
-          legendPosition={legendPosition}
-          titleDisplayEnabled={titleDisplayEnabled}
-          graphTitle={graphTitle}
-          data={data}
-        />
-      )}
-      {graphType === LOCAL_CONSTANTS.GRAPH_TYPES.POLAR_AREA.value && (
-        <PolarAreaGraphComponent
-          legendPosition={legendPosition}
-          titleDisplayEnabled={titleDisplayEnabled}
-          graphTitle={graphTitle}
-          data={data}
-        />
-      )}
-      {graphType === LOCAL_CONSTANTS.GRAPH_TYPES.RADAR.value && (
-        <RadarGraphComponent
-          legendPosition={legendPosition}
-          titleDisplayEnabled={titleDisplayEnabled}
-          graphTitle={graphTitle}
-          data={data}
-        />
-      )}
+      {GRAPH_PLUGINS_MAP[graphType].component({
+        legendPosition,
+        titleDisplayEnabled,
+        graphTitle,
+        data,
+      })}
     </div>
   );
 };

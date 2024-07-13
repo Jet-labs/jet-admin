@@ -12,8 +12,8 @@ import { useFormik } from "formik";
 import React, { useCallback } from "react";
 import "react-data-grid/lib/styles.css";
 import { addQueryAPI } from "../../../api/queries";
-import { PLUGINS_MAP } from "../../../plugins";
 import { displayError, displaySuccess } from "../../../utils/notification";
+import { QUERY_PLUGINS_MAP } from "../../../plugins/queries";
 
 export const QueryAdditionForm = () => {
   const theme = useTheme();
@@ -22,7 +22,7 @@ export const QueryAdditionForm = () => {
     initialValues: {
       pm_query_title: "Untitled",
       pm_query_description: "",
-      pm_query_type: PLUGINS_MAP.POSTGRE_QUERY.value,
+      pm_query_type: QUERY_PLUGINS_MAP.POSTGRE_QUERY.value,
       pm_query: {},
     },
     validateOnMount: false,
@@ -94,13 +94,13 @@ export const QueryAdditionForm = () => {
               size="small"
               fullWidth={false}
             >
-              {Object.keys(PLUGINS_MAP).map((queryType) => {
-                const value = PLUGINS_MAP[queryType].value;
-                const name = PLUGINS_MAP[queryType].name;
+              {Object.keys(QUERY_PLUGINS_MAP).map((queryType) => {
+                const value = QUERY_PLUGINS_MAP[queryType].value;
+                const name = QUERY_PLUGINS_MAP[queryType].name;
                 return (
                   <MenuItem value={value}>
                     <div className="!flex flex-row justify-start items-center">
-                      {PLUGINS_MAP[queryType].icon}
+                      {QUERY_PLUGINS_MAP[queryType].icon}
                       <span className="ml-2">{name}</span>
                     </div>
                   </MenuItem>
@@ -159,7 +159,7 @@ export const QueryAdditionForm = () => {
           lg={8}
           className="w-full !h-full !border-l !border-white !border-opacity-10"
         >
-          {PLUGINS_MAP[queryBuilderForm.values.pm_query_type].component({
+          {QUERY_PLUGINS_MAP[queryBuilderForm.values.pm_query_type].component({
             value: queryBuilderForm.values.pm_query,
             handleChange: _handleOnQueryChange,
           })}

@@ -2,7 +2,7 @@ const { Prisma } = require("@prisma/client");
 const { prisma } = require("../../config/prisma");
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
-const { getQueryObject } = require("../../plugins");
+const { getQueryObject } = require("../../plugins/queries");
 
 class QueryService {
   constructor() {}

@@ -185,6 +185,10 @@ queryController.updateQuery = async (req, res) => {
  */
 queryController.runQuery = async (req, res) => {
   try {
+    BigInt.prototype.toJSON = function () {
+      const int = Number.parseInt(this.toString());
+      return int ?? this.toString();
+    };
     const { pmUser, state, body } = req;
     const { pm_query_type, pm_query } = body;
     const pm_user_id = parseInt(pmUser.pm_user_id);
