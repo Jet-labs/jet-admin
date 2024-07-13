@@ -1,4 +1,6 @@
 import {
+  Alert,
+  AlertTitle,
   Button,
   FormControl,
   Grid,
@@ -13,11 +15,10 @@ import React, { useCallback, useEffect } from "react";
 import "react-data-grid/lib/styles.css";
 import { getQueryByIDAPI, updateQueryAPI } from "../../../api/queries";
 import { LOCAL_CONSTANTS } from "../../../constants";
-import { PGSQLQueryBuilder } from "../../../plugins/postgresql/components/PGSQLQueryBuilder";
+import { PLUGINS_MAP } from "../../../plugins";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { QueryDeletionForm } from "../QueryDeletionForm";
 import { QueryDuplicateForm } from "../QueryDuplicateForm";
-import { PLUGINS_MAP } from "../../../plugins";
 
 export const QueryUpdateForm = ({ id }) => {
   const theme = useTheme();
@@ -115,7 +116,7 @@ export const QueryUpdateForm = ({ id }) => {
       <Grid container className="!h-full">
         <Grid item sx={4} md={4} lg={4} className="w-full">
           <FormControl fullWidth size="small" className="!mt-2 !px-3">
-            <span className="text-xs font-light  !lowercase mb-1">{`Query type`}</span>
+            <span className="text-xs font-light  !capitalize mb-1">{`Query type`}</span>
 
             <Select
               value={queryBuilderForm.values.pm_query_type}
@@ -125,21 +126,40 @@ export const QueryUpdateForm = ({ id }) => {
               required={true}
               size="small"
               fullWidth={false}
+              readOnly={true}
             >
-              {Object.keys(LOCAL_CONSTANTS.DATA_SOURCE_QUERY_TYPE).map(
-                (queryType) => {
-                  const value =
-                    LOCAL_CONSTANTS.DATA_SOURCE_QUERY_TYPE[queryType].value;
-                  const name =
-                    LOCAL_CONSTANTS.DATA_SOURCE_QUERY_TYPE[queryType].name;
-                  return <MenuItem value={value}>{name}</MenuItem>;
-                }
-              )}
+              {Object.keys(PLUGINS_MAP).map((queryType) => {
+                const value = PLUGINS_MAP[queryType].value;
+                const name = PLUGINS_MAP[queryType].name;
+                return (
+                  <MenuItem value={value}>
+                    <div className="!flex flex-row justify-start items-center">
+                      {PLUGINS_MAP[queryType].icon}
+                      <span className="ml-2">{name}</span>
+                    </div>
+                  </MenuItem>
+                );
+              })}
             </Select>
             {/* {error && <span className="mt-2 text-red-500">{error}</span>} */}
           </FormControl>
+          <Alert
+            style={{
+              background: theme.palette.background.default,
+              color: theme.palette.info.main,
+              fontSize: 12,
+              paddingTop: 0,
+            }}
+            severity="info"
+            sx={{
+              "& .MuiAlert-icon": { fontSize: 16, marginRight: 1 },
+            }}
+          >
+            {`Query type cannot be updated`}
+          </Alert>
+
           <FormControl fullWidth size="small" className="!mt-2 !px-3">
-            <span className="text-xs font-light  !lowercase mb-1">{`Title`}</span>
+            <span className="text-xs font-light  !capitalize mb-1">{`Title`}</span>
 
             <TextField
               required={true}
@@ -155,7 +175,7 @@ export const QueryUpdateForm = ({ id }) => {
             {/* {error && <span className="mt-2 text-red-500">{error}</span>} */}
           </FormControl>
           <FormControl fullWidth size="small" className="!mt-2 !px-3">
-            <span className="text-xs font-light  !lowercase mb-1">{`Description`}</span>
+            <span className="text-xs font-light  !capitalize mb-1">{`Description`}</span>
 
             <TextField
               required={true}

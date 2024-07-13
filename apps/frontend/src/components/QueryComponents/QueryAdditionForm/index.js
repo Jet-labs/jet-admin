@@ -7,14 +7,13 @@ import {
   TextField,
   useTheme,
 } from "@mui/material";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import React, { useCallback } from "react";
 import "react-data-grid/lib/styles.css";
-import { PGSQLQueryBuilder } from "../../../plugins/postgresql/components/PGSQLQueryBuilder";
-import { LOCAL_CONSTANTS } from "../../../constants";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { displayError, displaySuccess } from "../../../utils/notification";
 import { addQueryAPI } from "../../../api/queries";
+import { PLUGINS_MAP } from "../../../plugins";
+import { displayError, displaySuccess } from "../../../utils/notification";
 
 export const QueryAdditionForm = () => {
   const theme = useTheme();
@@ -23,7 +22,7 @@ export const QueryAdditionForm = () => {
     initialValues: {
       pm_query_title: "Untitled",
       pm_query_description: "",
-      pm_query_type: LOCAL_CONSTANTS.DATA_SOURCE_QUERY_TYPE.POSTGRE_QUERY.value,
+      pm_query_type: PLUGINS_MAP.POSTGRE_QUERY.value,
       pm_query: {},
     },
     validateOnMount: false,
@@ -84,7 +83,7 @@ export const QueryAdditionForm = () => {
       <Grid container className="!h-full">
         <Grid item sx={4} md={4} lg={4} className="w-full">
           <FormControl fullWidth size="small" className="!mt-2 !px-3">
-            <span className="text-xs font-light  !lowercase mb-1">{`Query type`}</span>
+            <span className="text-xs font-light  !capitalize mb-1">{`Query type`}</span>
 
             <Select
               value={queryBuilderForm.values.pm_query_type}
@@ -95,20 +94,25 @@ export const QueryAdditionForm = () => {
               size="small"
               fullWidth={false}
             >
-              {Object.keys(LOCAL_CONSTANTS.DATA_SOURCE_QUERY_TYPE).map(
-                (queryType) => {
-                  const value =
-                    LOCAL_CONSTANTS.DATA_SOURCE_QUERY_TYPE[queryType].value;
-                  const name =
-                    LOCAL_CONSTANTS.DATA_SOURCE_QUERY_TYPE[queryType].name;
-                  return <MenuItem value={value}>{name}</MenuItem>;
-                }
-              )}
+              {Object.keys(PLUGINS_MAP).map((queryType) => {
+                const value = PLUGINS_MAP[queryType].value;
+                const name = PLUGINS_MAP[queryType].name;
+                return (
+                  <MenuItem value={value}>
+                    <div className="!flex flex-row justify-start items-center">
+                      {PLUGINS_MAP[queryType].icon}
+                      <span className="ml-2">{name}</span>
+                    </div>
+                  </MenuItem>
+                );
+              })}
             </Select>
+
             {/* {error && <span className="mt-2 text-red-500">{error}</span>} */}
           </FormControl>
+
           <FormControl fullWidth size="small" className="!mt-2 !px-3">
-            <span className="text-xs font-light  !lowercase mb-1">{`Title`}</span>
+            <span className="text-xs font-light  !capitalize mb-1">{`Title`}</span>
 
             <TextField
               required={true}
@@ -124,7 +128,7 @@ export const QueryAdditionForm = () => {
             {/* {error && <span className="mt-2 text-red-500">{error}</span>} */}
           </FormControl>
           <FormControl fullWidth size="small" className="!mt-2 !px-3">
-            <span className="text-xs font-light  !lowercase mb-1">{`Description`}</span>
+            <span className="text-xs font-light  !capitalize mb-1">{`Description`}</span>
 
             <TextField
               required={true}
@@ -155,13 +159,10 @@ export const QueryAdditionForm = () => {
           lg={8}
           className="w-full !h-full !border-l !border-white !border-opacity-10"
         >
-          {queryBuilderForm.values.pm_query_type ==
-            LOCAL_CONSTANTS.DATA_SOURCE_QUERY_TYPE.POSTGRE_QUERY.value && (
-            <PGSQLQueryBuilder
-              value={queryBuilderForm.values.pm_query}
-              handleChange={_handleOnQueryChange}
-            />
-          )}
+          {PLUGINS_MAP[queryBuilderForm.values.pm_query_type].component({
+            value: queryBuilderForm.values.pm_query,
+            handleChange: _handleOnQueryChange,
+          })}
         </Grid>
       </Grid>
     </div>

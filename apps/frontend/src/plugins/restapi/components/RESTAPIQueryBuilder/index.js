@@ -26,9 +26,9 @@ export const RESTAPIQueryBuilder = ({ value, handleChange }) => {
     isPending: isRunningPGQuery,
     isSuccess: isRunningPGQuerySuccess,
     isError: isRunningPGQueryError,
-    error: runPGQueryError,
-    mutate: runPGQuery,
-    data: pgQueryData,
+    error: runRESTAPIQueryError,
+    mutate: runRESTAPIQuery,
+    data: restAPIQueryData,
   } = useMutation({
     mutationFn: ({ raw_query }) => {
       return runQueryAPI({ pm_query: { raw_query } });
@@ -44,7 +44,7 @@ export const RESTAPIQueryBuilder = ({ value, handleChange }) => {
   });
 
   const _runQuery = () => {
-    runPGQuery({ raw_query: value?.raw_query });
+    runRESTAPIQuery({ raw_query: value?.raw_query });
   };
 
   const _handleOnRAWQueryChange = (value) => {
@@ -68,8 +68,8 @@ export const RESTAPIQueryBuilder = ({ value, handleChange }) => {
           }}
         />
         <div className="!flex flex-row justify-between items-center w-100 mt-3">
-          {pgQueryData && Array.isArray(pgQueryData) ? (
-            <span>{`Result : ${pgQueryData.length}`}</span>
+          {restAPIQueryData && Array.isArray(restAPIQueryData) ? (
+            <span>{`Result : ${restAPIQueryData.length}`}</span>
           ) : (
             <span></span>
           )}
@@ -101,15 +101,19 @@ export const RESTAPIQueryBuilder = ({ value, handleChange }) => {
       <div className="py-3 w-100 flex-grow h-full">
         {tab === 0 && (
           <RESTAPIQueryResponseTableTab
-            json={pgQueryData ? pgQueryData : ""}
+            json={restAPIQueryData ? restAPIQueryData : ""}
             dataSchema={dataSchema ? dataSchema : ""}
           />
         )}
         {tab === 1 && (
-          <RESTAPIQueryResponseJSONTab json={pgQueryData ? pgQueryData : ""} />
+          <RESTAPIQueryResponseJSONTab
+            json={restAPIQueryData ? restAPIQueryData : ""}
+          />
         )}
         {tab === 2 && (
-          <RESTAPIQueryResponseRAWTab json={pgQueryData ? pgQueryData : ""} />
+          <RESTAPIQueryResponseRAWTab
+            json={restAPIQueryData ? restAPIQueryData : ""}
+          />
         )}
         {tab === 3 && (
           <RESTAPIQueryResponseSchemaTab

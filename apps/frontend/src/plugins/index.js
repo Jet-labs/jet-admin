@@ -1,5 +1,7 @@
 import { PGSQLQueryBuilder } from "./postgresql/components/PGSQLQueryBuilder";
 import { RESTAPIQueryBuilder } from "./restapi/components/RESTAPIQueryBuilder";
+import { TbApi } from "react-icons/tb";
+import { SiPostgresql } from "react-icons/si";
 
 export const PLUGINS_MAP = {
   REST_API: {
@@ -8,6 +10,7 @@ export const PLUGINS_MAP = {
     component: ({ value, handleChange }) => (
       <RESTAPIQueryBuilder value={value} handleChange={handleChange} />
     ),
+    icon: <TbApi />,
   },
   POSTGRE_QUERY: {
     name: "Postgre query",
@@ -15,5 +18,6 @@ export const PLUGINS_MAP = {
     component: ({ value, handleChange }) => (
       <PGSQLQueryBuilder value={value} handleChange={handleChange} />
     ),
+    icon: <SiPostgresql />,
   },
 };
