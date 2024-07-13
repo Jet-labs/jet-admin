@@ -10,16 +10,14 @@ import {
   TextField,
   useTheme,
 } from "@mui/material";
-import React, { useState } from "react";
-import { FieldComponent } from "../../FieldComponent";
-import { LOCAL_CONSTANTS } from "../../../constants";
-import { ConfirmationDialog } from "../../ConfirmationDialog";
-import { FaTimes } from "react-icons/fa";
-import { GraphDeletionForm } from "../GraphDeletionForm";
 import { useQuery } from "@tanstack/react-query";
+import React from "react";
+import { FaTimes } from "react-icons/fa";
 import { getAllQueryAPI } from "../../../api/queries";
-import { QUERY_PLUGINS_MAP } from "../../../plugins/queries";
+import { LOCAL_CONSTANTS } from "../../../constants";
 import { GRAPH_PLUGINS_MAP } from "../../../plugins/graphs";
+import { QUERY_PLUGINS_MAP } from "../../../plugins/queries";
+import { FieldComponent } from "../../FieldComponent";
 
 /**
  *
@@ -27,7 +25,7 @@ import { GRAPH_PLUGINS_MAP } from "../../../plugins/graphs";
  * @param {import("formik").FormikConfig} param0.graphForm
  * @returns
  */
-export const GraphEditor = ({ graphID, graphForm, deleteGraph }) => {
+export const GraphEditor = ({ graphForm }) => {
   const theme = useTheme();
 
   const {
@@ -180,171 +178,176 @@ export const GraphEditor = ({ graphID, graphForm, deleteGraph }) => {
           </Button>
         </Grid>
 
-        {graphForm.values["query_array"]?.map((dataset, index) => {
-          return (
-            <Grid
-              className="!rounded  !mt-3 !ml-3.5 !pr-3 !py-3"
-              sx={{
-                background: theme.palette.action.selected,
-              }}
-              rowSpacing={2}
-              columnSpacing={2}
-              container
-              xs={12}
-              sm={12}
-              md={12}
-              lg={12}
-            >
+        {queries &&
+          queries.length > 0 &&
+          graphForm.values["query_array"]?.map((dataset, index) => {
+            return (
               <Grid
-                item
+                className="!rounded  !mt-3 !ml-3.5 !pr-3 !py-3"
+                sx={{
+                  background: theme.palette.background.default,
+                  borderRadius: 4,
+                  borderWidth: 1,
+                  borderColor: theme.palette.divider,
+                }}
+                rowSpacing={2}
+                columnSpacing={2}
+                container
                 xs={12}
                 sm={12}
                 md={12}
                 lg={12}
-                key={"query_array"}
-                className="!flex justify-end !-mt-3"
               >
-                <IconButton
-                  aria-label="delete"
-                  color="error"
-                  className="!p-0"
-                  onClick={() => _handleDeleteDataset(index)}
+                <Grid
+                  item
+                  xs={12}
+                  sm={12}
+                  md={12}
+                  lg={12}
+                  key={"query_array"}
+                  className="!flex justify-end !-mt-3"
                 >
-                  <FaTimes className="!text-sm" />
-                </IconButton>
-              </Grid>
-
-              <Grid
-                item
-                xs={12}
-                sm={12}
-                md={12}
-                lg={12}
-                key={`query_array_title-${index}`}
-              >
-                <FormControl fullWidth size="small" className="">
-                  <span className="text-xs font-light  !capitalize mb-1">{`Select query`}</span>
-
-                  <Select
-                    name={`query_array_query-${index}`}
-                    value={dataset.pm_query_id}
-                    onBlur={graphForm.handleBlur}
-                    onChange={(e) => {
-                      _handleUpdateDatasetQuery(index, e.target.value);
-                    }}
-                    required={true}
-                    size="small"
-                    fullWidth={false}
+                  <IconButton
+                    aria-label="delete"
+                    color="error"
+                    className="!p-0"
+                    onClick={() => _handleDeleteDataset(index)}
                   >
-                    {queries?.map((query) => {
-                      console.log({ query });
-                      return (
-                        <MenuItem value={query.pm_query_id}>
-                          <div className="!flex flex-row justify-start items-center">
-                            {QUERY_PLUGINS_MAP[query.pm_query_type].icon}
-                            <span className="ml-2">{query.pm_query_title}</span>
-                          </div>
-                        </MenuItem>
-                      );
-                    })}
-                  </Select>
-                  {/* {error && <span className="mt-2 text-red-500">{error}</span>} */}
-                </FormControl>
-              </Grid>
+                    <FaTimes className="!text-sm" />
+                  </IconButton>
+                </Grid>
 
-              {GRAPH_PLUGINS_MAP[
-                graphForm.values["graph_type"]
-              ]?.fields?.includes("x_axis") && (
                 <Grid
                   item
                   xs={12}
                   sm={12}
-                  md={6}
-                  lg={6}
-                  key={`query_array_x-${index}`}
+                  md={12}
+                  lg={12}
+                  key={`query_array_title-${index}`}
                 >
                   <FormControl fullWidth size="small" className="">
-                    <span className="text-xs font-light  !capitalize mb-1">{`x-axis`}</span>
+                    <span className="text-xs font-light  !capitalize mb-1">{`Select query`}</span>
+
+                    <Select
+                      name={`query_array_query-${index}`}
+                      value={parseInt(dataset.pm_query_id)}
+                      onBlur={graphForm.handleBlur}
+                      onChange={(e) => {
+                        _handleUpdateDatasetQuery(index, e.target.value);
+                      }}
+                      required={true}
+                      size="small"
+                      fullWidth={true}
+                    >
+                      {queries?.map((query) => {
+                        console.log({ query });
+                        return (
+                          <MenuItem value={query.pm_query_id}>
+                            <div className="!flex flex-row justify-start items-center">
+                              {QUERY_PLUGINS_MAP[query.pm_query_type].icon}
+                              <span className="ml-2">
+                                {query.pm_query_title}
+                              </span>
+                            </div>
+                          </MenuItem>
+                        );
+                      })}
+                    </Select>
+                    {/* {error && <span className="mt-2 text-red-500">{error}</span>} */}
+                  </FormControl>
+                </Grid>
+
+                {GRAPH_PLUGINS_MAP[
+                  graphForm.values["graph_type"]
+                ]?.fields?.includes("x_axis") && (
+                  <Grid
+                    item
+                    xs={6}
+                    sm={6}
+                    md={4}
+                    lg={4}
+                    key={`query_array_x-${index}`}
+                  >
+                    <FormControl fullWidth size="small" className="">
+                      <span className="text-xs font-light  !capitalize mb-1">{`x-axis`}</span>
+                      <TextField
+                        required={true}
+                        fullWidth
+                        size="small"
+                        variant="outlined"
+                        type="text"
+                        name={`query_array_x-${index}`}
+                        value={dataset.x_axis}
+                        onBlur={graphForm.handleBlur}
+                        onChange={(e) => {
+                          _handleUpdateDatasetXAxis(index, e.target.value);
+                        }}
+                      />
+                    </FormControl>
+                  </Grid>
+                )}
+                {GRAPH_PLUGINS_MAP[
+                  graphForm.values["graph_type"]
+                ]?.fields?.includes("y_axis") && (
+                  <Grid
+                    item
+                    xs={6}
+                    sm={6}
+                    md={4}
+                    lg={4}
+                    key={`query_array_y-${index}`}
+                  >
+                    <FormControl fullWidth size="small" className="">
+                      <span className="text-xs font-light  !capitalize mb-1">{`y-axis`}</span>
+                      <TextField
+                        required={true}
+                        fullWidth
+                        size="small"
+                        variant="outlined"
+                        type="text"
+                        name={`query_array_y-${index}`}
+                        value={dataset.y_axis}
+                        onBlur={graphForm.handleBlur}
+                        onChange={(e) => {
+                          _handleUpdateDatasetYAxis(index, e.target.value);
+                        }}
+                      />
+                    </FormControl>
+                  </Grid>
+                )}
+
+                <Grid
+                  item
+                  xs={12}
+                  sm={12}
+                  md={4}
+                  lg={4}
+                  key={`query_array_color-${index}`}
+                >
+                  <FormControl fullWidth size="small" className="">
+                    <span className="text-xs font-light  !capitalize mb-1">{`color`}</span>
                     <TextField
                       required={true}
                       fullWidth
                       size="small"
                       variant="outlined"
-                      type="text"
-                      name={`query_array_x-${index}`}
-                      value={dataset.x_axis}
+                      type="color"
+                      name={`query_array_color-${index}`}
+                      value={dataset.color}
                       onBlur={graphForm.handleBlur}
                       onChange={(e) => {
-                        _handleUpdateDatasetXAxis(index, e.target.value);
+                        _handleUpdateDatasetColor(index, e.target.value);
                       }}
                     />
                   </FormControl>
                 </Grid>
-              )}
-              {GRAPH_PLUGINS_MAP[
-                graphForm.values["graph_type"]
-              ]?.fields?.includes("y_axis") && (
-                <Grid
-                  item
-                  xs={12}
-                  sm={12}
-                  md={6}
-                  lg={6}
-                  key={`query_array_y-${index}`}
-                >
-                  <FormControl fullWidth size="small" className="">
-                    <span className="text-xs font-light  !capitalize mb-1">{`y-axis`}</span>
-                    <TextField
-                      required={true}
-                      fullWidth
-                      size="small"
-                      variant="outlined"
-                      type="text"
-                      name={`query_array_y-${index}`}
-                      value={dataset.y_axis}
-                      onBlur={graphForm.handleBlur}
-                      onChange={(e) => {
-                        _handleUpdateDatasetYAxis(index, e.target.value);
-                      }}
-                    />
-                  </FormControl>
-                </Grid>
-              )}
-
-              <Grid
-                item
-                xs={12}
-                sm={12}
-                md={12}
-                lg={12}
-                key={`query_array_color-${index}`}
-              >
-                <FieldComponent
-                  type={LOCAL_CONSTANTS.DATA_TYPES.COLOR}
-                  name={`query_array_color-${index}`}
-                  value={dataset.color}
-                  onBlur={graphForm.handleBlur}
-                  onChange={(e) => {
-                    _handleUpdateDatasetColor(index, e.target.value);
-                  }}
-                  setFieldValue={(name, value) => {
-                    _handleUpdateDatasetColor(
-                      parseInt(String(name).split("-")[1]),
-                      value
-                    );
-                  }}
-                  required={true}
-                  customMapping={null}
-                />
               </Grid>
-            </Grid>
-          );
-        })}
+            );
+          })}
         <Grid item xs={12} sm={12} md={12} lg={12} key={"submit"}>
           <Button variant="contained" onClick={_handleSubmit}>
             Submit
           </Button>
-          <GraphDeletionForm graphID={graphID} />
         </Grid>
       </Grid>
     </form>

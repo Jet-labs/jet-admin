@@ -16,7 +16,11 @@ export const GraphComponentPreview = ({
         container
         rowSpacing={2}
         className="rounded !p-3"
-        style={{ background: theme.palette.action.selected }}
+        style={{
+          background: theme.palette.background.paper,
+          borderColor: theme.palette.divider,
+          borderWidth: 1,
+        }}
       >
         {GRAPH_PLUGINS_MAP[graphType].component({
           legendPosition,
