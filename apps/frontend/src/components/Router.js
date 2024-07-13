@@ -40,7 +40,7 @@ const AppRouter = ({}) => {
               <ProtectedRoute
                 successComponent={() => (
                   <Navigate
-                    to={LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.code}
+                    to={LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.path()}
                   />
                   // <UpdateGraph />
                 )}

@@ -1,16 +1,14 @@
-import { useConstants } from "../../../contexts/constantsContext";
-import { LOCAL_CONSTANTS } from "../../../constants";
-import { containsOnly } from "../../../utils/array";
-import { CRUDPermissionCheckboxGroup } from "../CRUDPermissionCheckboxGroup";
-import { FieldComponent } from "../../FieldComponent";
-import { capitalize } from "lodash";
 import { Divider, Tab, Tabs, useTheme } from "@mui/material";
-import { useCallback, useMemo, useState } from "react";
-import { displayError } from "../../../utils/notification";
 import { loadLanguage } from "@uiw/codemirror-extensions-langs";
 import { dracula } from "@uiw/codemirror-theme-dracula";
-import CodeMirror from "@uiw/react-codemirror";
 import { githubLight } from "@uiw/codemirror-theme-github";
+import CodeMirror from "@uiw/react-codemirror";
+import { capitalize } from "lodash";
+import { useMemo, useState } from "react";
+import { useConstants } from "../../../../contexts/constantsContext";
+import { containsOnly } from "../../../../utils/array";
+import { displayError } from "../../../../utils/notification";
+import { CRUDPermissionCheckboxGroup } from "../CRUDPermissionCheckboxGroup";
 export const TablePolicyEditor = ({ value, handleChange }) => {
   const { dbModel } = useConstants();
   const isVisualEditorSufficient = useMemo(() => {

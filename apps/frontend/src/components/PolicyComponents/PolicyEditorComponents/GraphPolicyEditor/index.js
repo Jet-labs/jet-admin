@@ -1,14 +1,13 @@
 import { Divider, Tab, Tabs, useTheme } from "@mui/material";
 
 import { loadLanguage } from "@uiw/codemirror-extensions-langs";
-import { dracula } from "@uiw/codemirror-theme-dracula";
+import { githubLight } from "@uiw/codemirror-theme-github";
 import CodeMirror from "@uiw/react-codemirror";
 import { capitalize } from "lodash";
 import { useState } from "react";
-import { containsOnly } from "../../../utils/array";
-import { displayError } from "../../../utils/notification";
+import { containsOnly } from "../../../../utils/array";
+import { displayError } from "../../../../utils/notification";
 import { CRUDPermissionCheckboxGroup } from "../CRUDPermissionCheckboxGroup";
-import { githubLight } from "@uiw/codemirror-theme-github";
 export const GraphPolicyEditor = ({ value, handleChange }) => {
   const [tab, setTab] = useState(
     containsOnly(["add", "edit", "read", "delete"], Object.keys(value)) &&

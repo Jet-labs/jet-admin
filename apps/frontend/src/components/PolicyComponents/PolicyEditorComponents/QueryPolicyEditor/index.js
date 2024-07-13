@@ -5,8 +5,8 @@ import { githubLight } from "@uiw/codemirror-theme-github";
 import CodeMirror from "@uiw/react-codemirror";
 import { capitalize } from "lodash";
 import { useState } from "react";
-import { containsOnly } from "../../../utils/array";
-import { displayError } from "../../../utils/notification";
+import { containsOnly } from "../../../../utils/array";
+import { displayError } from "../../../../utils/notification";
 import { CRUDPermissionCheckboxGroup } from "../CRUDPermissionCheckboxGroup";
 import "./style.css";
 export const QueryPolicyEditor = ({ value, handleChange }) => {

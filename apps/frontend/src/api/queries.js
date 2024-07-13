@@ -106,6 +106,7 @@ export const runQueryAPI = async ({ pm_query }) => {
     if (response.data && response.data.success == true) {
       return response.data.data;
     } else if (response.data.error) {
+      console.log(response.data.error);
       throw response.data.error;
     } else {
       throw LOCAL_CONSTANTS.ERROR_CODES.SERVER_ERROR;

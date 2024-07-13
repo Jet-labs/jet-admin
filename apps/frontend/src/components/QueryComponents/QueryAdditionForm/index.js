@@ -82,7 +82,7 @@ export const QueryAdditionForm = () => {
       </div>
 
       <Grid container className="!h-full">
-        <Grid item sx={4} md={4} lg={4} className="w-full !h-full">
+        <Grid item sx={4} md={4} lg={4} className="w-full">
           <FormControl fullWidth size="small" className="!mt-2 !px-3">
             <span className="text-xs font-light  !lowercase mb-1">{`Query type`}</span>
 

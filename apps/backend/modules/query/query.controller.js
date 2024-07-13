@@ -212,7 +212,7 @@ queryController.runQuery = async (req, res) => {
   } catch (error) {
     Logger.log("error", {
       message: "queryController:runQuery:catch-1",
-      params: { error },
+      params: { error: error },
     });
     return res.json({ success: false, error: extractError(error) });
   }

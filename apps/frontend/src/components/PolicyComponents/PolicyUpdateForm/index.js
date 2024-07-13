@@ -4,7 +4,7 @@ import { useFormik } from "formik";
 
 import { useEffect, useState } from "react";
 import { FieldComponent } from "../../FieldComponent";
-import { GUIPolicyEditor } from "../GUIPolicyEditor";
+import { GUIPolicyEditor } from "../PolicyEditorComponents/GUIPolicyEditor";
 
 import { fetchRowByIDAPI, updateRowAPI } from "../../../api/tables";
 import { LOCAL_CONSTANTS } from "../../../constants";

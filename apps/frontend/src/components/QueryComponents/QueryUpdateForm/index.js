@@ -17,6 +17,7 @@ import { PGSQLQueryBuilder } from "../../../plugins/postgresql/components/PGSQLQ
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { QueryDeletionForm } from "../QueryDeletionForm";
 import { QueryDuplicateForm } from "../QueryDuplicateForm";
+import { PLUGINS_MAP } from "../../../plugins";
 
 export const QueryUpdateForm = ({ id }) => {
   const theme = useTheme();
@@ -112,7 +113,7 @@ export const QueryUpdateForm = ({ id }) => {
       </div>
 
       <Grid container className="!h-full">
-        <Grid item sx={4} md={4} lg={4} className="w-full !h-full">
+        <Grid item sx={4} md={4} lg={4} className="w-full">
           <FormControl fullWidth size="small" className="!mt-2 !px-3">
             <span className="text-xs font-light  !lowercase mb-1">{`Query type`}</span>
 
@@ -187,13 +188,10 @@ export const QueryUpdateForm = ({ id }) => {
           lg={8}
           className="w-full !h-full !border-l !border-white !border-opacity-10"
         >
-          {queryBuilderForm.values.pm_query_type ==
-            LOCAL_CONSTANTS.DATA_SOURCE_QUERY_TYPE.POSTGRE_QUERY.value && (
-            <PGSQLQueryBuilder
-              value={queryBuilderForm.values.pm_query}
-              handleChange={_handleOnQueryChange}
-            />
-          )}
+          {PLUGINS_MAP[queryBuilderForm.values.pm_query_type].component({
+            value: queryBuilderForm.values.pm_query,
+            handleChange: _handleOnQueryChange,
+          })}
         </Grid>
       </Grid>
     </div>

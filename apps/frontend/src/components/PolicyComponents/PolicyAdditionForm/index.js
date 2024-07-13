@@ -1,18 +1,16 @@
 import { Button, CircularProgress, Grid, useTheme } from "@mui/material";
-import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
+import { QueryClient, useMutation } from "@tanstack/react-query";
 import { useFormik } from "formik";
 
-import { useEffect, useState } from "react";
 import { FieldComponent } from "../../FieldComponent";
-import { GUIPolicyEditor } from "../GUIPolicyEditor";
 
-import { addRowAPI, fetchRowByIDAPI, updateRowAPI } from "../../../api/tables";
+import { addRowAPI } from "../../../api/tables";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { displayError, displaySuccess } from "../../../utils/notification";
 
-import { Loading } from "../../../pages/Loading";
-import { PolicyDeletionForm } from "../PolicyDeletionForm";
 import samplePolicy from "../../../sample_admin_policy.json";
+import { PolicyDeletionForm } from "../PolicyDeletionForm";
+import { GUIPolicyEditor } from "../PolicyEditorComponents/GUIPolicyEditor";
 export const PolicyAdditionForm = ({ id }) => {
   const theme = useTheme();
   const queryClient = new QueryClient();
