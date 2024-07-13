@@ -1,10 +1,24 @@
-import { Button, Grid, IconButton, useTheme } from "@mui/material";
+import {
+  Button,
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  Grid,
+  IconButton,
+  MenuItem,
+  Select,
+  TextField,
+  useTheme,
+} from "@mui/material";
 import React, { useState } from "react";
 import { FieldComponent } from "../../FieldComponent";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { ConfirmationDialog } from "../../ConfirmationDialog";
 import { FaTimes } from "react-icons/fa";
 import { GraphDeletionForm } from "../GraphDeletionForm";
+import { useQuery } from "@tanstack/react-query";
+import { getAllQueryAPI } from "../../../api/queries";
+import { PLUGINS_MAP } from "../../../plugins";
 
 /**
  *
@@ -14,6 +28,19 @@ import { GraphDeletionForm } from "../GraphDeletionForm";
  */
 export const GraphEditor = ({ graphID, graphForm, deleteGraph }) => {
   const theme = useTheme();
+
+  const {
+    isLoading: isLoadingQueries,
+    data: queries,
+    error: loadQueriesError,
+    refetch: refetchQueries,
+  } = useQuery({
+    queryKey: [`REACT_QUERY_KEY_QUERIES`],
+    queryFn: () => getAllQueryAPI(),
+    cacheTime: 0,
+    retry: 1,
+    staleTime: 0,
+  });
 
   const _handleAddDataset = () => {
     const newQueryArrayFieldValue = graphForm.values["query_array"];
@@ -76,73 +103,85 @@ export const GraphEditor = ({ graphID, graphForm, deleteGraph }) => {
         // style={{ background: theme.palette.action.selected }}
       >
         <Grid item xs={12} sm={12} md={12} lg={12} key={"graph_title"}>
-          <FieldComponent
-            type={LOCAL_CONSTANTS.DATA_TYPES.STRING}
-            name={"graph_title"}
-            value={graphForm.values["graph_title"]}
-            onBlur={graphForm.handleBlur}
+          <FormControl fullWidth size="small" className="">
+            <span className="text-xs font-light  !capitalize mb-1">{`Title`}</span>
+            <TextField
+              required={true}
+              fullWidth
+              size="small"
+              variant="outlined"
+              type="text"
+              name={"graph_title"}
+              value={graphForm.values.graph_title}
+              onChange={graphForm.handleChange}
+              onBlur={graphForm.handleBlur}
+            />
+          </FormControl>
+        </Grid>
+        <Grid
+          item
+          xs={12}
+          sm={12}
+          md={12}
+          lg={12}
+          key={"title_display_enabled"}
+        >
+          <FormControlLabel
+            control={
+              <Checkbox checked={graphForm.values.title_display_enabled} />
+            }
+            label="Title visible"
+            name="title_display_enabled"
             onChange={graphForm.handleChange}
-            setFieldValue={graphForm.setFieldValue}
-            helperText={graphForm.errors["graph_title"]}
-            error={Boolean(graphForm.errors["graph_title"])}
-            required={true}
+            onBlur={graphForm.handleBlur}
           />
         </Grid>
-        <Grid item xs={12} sm={12} md={6} lg={6} key={"title_display_enabled"}>
-          <FieldComponent
-            type={LOCAL_CONSTANTS.DATA_TYPES.BOOLEAN}
-            name={"title_display_enabled"}
-            value={graphForm.values["title_display_enabled"]}
-            onBlur={graphForm.handleBlur}
-            onChange={graphForm.handleChange}
-            setFieldValue={graphForm.setFieldValue}
-            helperText={graphForm.errors["title_display_enabled"]}
-            error={Boolean(graphForm.errors["title_display_enabled"])}
-            required={true}
-            customMapping={null}
-            language={"json"}
-          />
-        </Grid>
-        <Grid item xs={12} sm={12} md={6} lg={6} key={"legend_position"}>
-          <FieldComponent
-            type={LOCAL_CONSTANTS.DATA_TYPES.SINGLE_SELECT}
-            selectOptions={Object.keys(
-              LOCAL_CONSTANTS.GRAPH_LEGEND_POSITION
-            ).map((e) => {
-              return {
-                label: e,
-                value: LOCAL_CONSTANTS.GRAPH_LEGEND_POSITION[e],
-              };
-            })}
-            name={"legend_position"}
-            value={graphForm.values["legend_position"]}
-            onBlur={graphForm.handleBlur}
-            onChange={graphForm.handleChange}
-            setFieldValue={graphForm.setFieldValue}
-            helperText={graphForm.errors["legend_position"]}
-            error={Boolean(graphForm.errors["legend_position"])}
-            required={true}
-            customMapping={null}
-            language={"json"}
-          />
+        <Grid item xs={12} sm={12} md={12} lg={12} key={"legend_position"}>
+          <FormControl fullWidth size="small" className="">
+            <span className="text-xs font-light  !capitalize mb-1">{`Legend position`}</span>
+
+            <Select
+              value={graphForm.values.legend_position}
+              onChange={graphForm.handleChange}
+              onBlur={graphForm.handleBlur}
+              name={"legend_position"}
+              required={true}
+              size="small"
+              fullWidth={false}
+            >
+              {Object.keys(LOCAL_CONSTANTS.GRAPH_LEGEND_POSITION).map((e) => {
+                return (
+                  <MenuItem value={LOCAL_CONSTANTS.GRAPH_LEGEND_POSITION[e]}>
+                    {e}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
         </Grid>
         <Grid item xs={12} sm={12} md={12} lg={12} key={"graph_type"}>
-          <FieldComponent
-            type={LOCAL_CONSTANTS.DATA_TYPES.SINGLE_SELECT}
-            selectOptions={Object.keys(LOCAL_CONSTANTS.GRAPH_TYPES).map((e) => {
-              return LOCAL_CONSTANTS.GRAPH_TYPES[e];
-            })}
-            name={"graph_type"}
-            value={graphForm.values["graph_type"]}
-            onBlur={graphForm.handleBlur}
-            onChange={graphForm.handleChange}
-            setFieldValue={graphForm.setFieldValue}
-            helperText={graphForm.errors["graph_type"]}
-            error={Boolean(graphForm.errors["graph_type"])}
-            required={true}
-            customMapping={null}
-            language={"json"}
-          />
+          <FormControl fullWidth size="small" className="">
+            <span className="text-xs font-light  !capitalize mb-1">{`Graph type`}</span>
+
+            <Select
+              value={graphForm.values.graph_type}
+              onChange={graphForm.handleChange}
+              onBlur={graphForm.handleBlur}
+              name={"graph_type"}
+              required={true}
+              size="small"
+              fullWidth={false}
+            >
+              {Object.keys(LOCAL_CONSTANTS.GRAPH_TYPES).map((e) => {
+                return (
+                  <MenuItem value={LOCAL_CONSTANTS.GRAPH_TYPES[e].value}>
+                    {LOCAL_CONSTANTS.GRAPH_TYPES[e].label}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+            {/* {error && <span className="mt-2 text-red-500">{error}</span>} */}
+          </FormControl>
         </Grid>
 
         <Grid item xs={12} sm={12} md={12} lg={12} key={"query_array"}>
@@ -184,6 +223,34 @@ export const GraphEditor = ({ graphID, graphForm, deleteGraph }) => {
                   <FaTimes className="!text-sm" />
                 </IconButton>
               </Grid>
+              {/* <Grid
+                item
+                xs={12}
+                sm={12}
+                md={12}
+                lg={12}
+                key={`query_array_title-${index}`}
+              >
+                <span className="text-xs font-light  !capitalize mb-1">{`Data source : ${
+                  index + 1
+                }`}</span>
+                <FormControl fullWidth size="small" className="">
+                  <span className="text-xs font-light  !capitalize mb-1">{`Title`}</span>
+                  <TextField
+                    required={true}
+                    fullWidth
+                    size="small"
+                    variant="outlined"
+                    type="text"
+                    name={`query_array_title-${index}`}
+                    value={dataset.dataset_title}
+                    onChange={(e) => {
+                      _handleUpdateDatasetLabel(index, e.target.value);
+                    }}
+                    onBlur={graphForm.handleBlur}
+                  />
+                </FormControl>
+              </Grid> */}
               <Grid
                 item
                 xs={12}
@@ -192,17 +259,33 @@ export const GraphEditor = ({ graphID, graphForm, deleteGraph }) => {
                 lg={12}
                 key={`query_array_title-${index}`}
               >
-                <FieldComponent
-                  type={LOCAL_CONSTANTS.DATA_TYPES.STRING}
-                  name={`query_array_title-${index}`}
-                  value={dataset.dataset_title}
-                  onBlur={graphForm.handleBlur}
-                  onChange={(e) => {
-                    _handleUpdateDatasetLabel(index, e.target.value);
-                  }}
-                  required={true}
-                  customMapping={null}
-                />
+                <FormControl fullWidth size="small" className="">
+                  <span className="text-xs font-light  !capitalize mb-1">{`Select query`}</span>
+
+                  <Select
+                    name={`query_array_query-${index}`}
+                    value={dataset.query_id}
+                    onBlur={graphForm.handleBlur}
+                    onChange={(e) => {
+                      _handleUpdateDatasetQuery(index, e.target.value);
+                    }}
+                    required={true}
+                    size="small"
+                    fullWidth={false}
+                  >
+                    {queries?.map((query) => {
+                      return (
+                        <MenuItem value={query.pm_query_id}>
+                          <div className="!flex flex-row justify-start items-center">
+                            {PLUGINS_MAP[query.pm_query_type].icon}
+                            <span className="ml-2">{query.pm_query_title}</span>
+                          </div>
+                        </MenuItem>
+                      );
+                    })}
+                  </Select>
+                  {/* {error && <span className="mt-2 text-red-500">{error}</span>} */}
+                </FormControl>
               </Grid>
 
               {LOCAL_CONSTANTS.GRAPH_TYPES[
@@ -333,7 +416,7 @@ export const GraphEditor = ({ graphID, graphForm, deleteGraph }) => {
                 <FieldComponent
                   type={LOCAL_CONSTANTS.DATA_TYPES.CODE}
                   name={`query_array_query-${index}`}
-                  value={dataset.query}
+                  value={dataset.query_id}
                   onBlur={graphForm.handleBlur}
                   onChange={(e) => {
                     _handleUpdateDatasetQuery(index, e.target.value);

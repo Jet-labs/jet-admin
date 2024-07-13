@@ -105,3 +105,11 @@
 [31merror[39m: dev_node_1: 13-07-2024 11:56:53: [31mPostgreSQL:run:catch-1[39m |====| {"error":{"name":"PrismaClientKnownRequestError","code":"P2010","clientVersion":"5.7.1","meta":{"code":"42P01","message":"relation \"cit\" does not exist"}}}
 [31merror[39m: dev_node_1: 13-07-2024 11:56:53: [31mQueryService:runQuery:catch-1[39m |====| {"error":{"name":"PrismaClientKnownRequestError","code":"P2010","clientVersion":"5.7.1","meta":{"code":"42P01","message":"relation \"cit\" does not exist"}}}
 [31merror[39m: dev_node_1: 13-07-2024 11:56:53: [31mqueryController:runQuery:catch-1[39m |====| {"error":{"code":"DB_ERROR","message":"relation \"cit\" does not exist"}}
+[31merror[39m: dev_node_1: 13-07-2024 13:08:49: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-07-13T06:40:56.000Z"}}
+[31merror[39m: dev_node_1: 13-07-2024 13:08:49: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 13-07-2024 13:24:20: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-07-13T07:53:49.000Z"}}
+[31merror[39m: dev_node_1: 13-07-2024 13:24:20: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 13-07-2024 13:24:20: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-07-13T07:53:49.000Z"}}
+[31merror[39m: dev_node_1: 13-07-2024 13:24:20: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 13-07-2024 13:24:20: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-07-13T07:53:49.000Z"}}
+[31merror[39m: dev_node_1: 13-07-2024 13:24:20: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
