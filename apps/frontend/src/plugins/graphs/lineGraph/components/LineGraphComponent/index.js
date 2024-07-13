@@ -1,29 +1,33 @@
 import { useTheme } from "@mui/material";
 import {
-  BarElement,
   CategoryScale,
   Chart as ChartJS,
+  Filler,
   Legend,
   LinearScale,
+  LineElement,
+  PointElement,
   Title,
   Tooltip,
 } from "chart.js";
 import React, { useMemo } from "react";
-import { Bar } from "react-chartjs-2";
+import { Line } from "react-chartjs-2";
 
-import { faker } from "@faker-js/faker";
+import { da, faker } from "@faker-js/faker";
 import { LOCAL_CONSTANTS } from "../../../../../constants";
 
 ChartJS.register(
   CategoryScale,
   LinearScale,
-  BarElement,
+  PointElement,
+  LineElement,
   Title,
   Tooltip,
+  Filler,
   Legend
 );
 
-export class BarChartDataset {
+export class LineGraphDataset {
   /**
    *
    * @param {object} param0
@@ -39,12 +43,12 @@ export class BarChartDataset {
     this.backgroundColor = backgroundColor;
   }
 }
-export class BarChartData {
+export class LineGraphData {
   /**
    *
    * @param {object} param0
    * @param {Array<String>} param0.labels
-   * @param {Array<BarChartDataset>} param0.datasets
+   * @param {Array<LineGraphDataset>} param0.datasets
    */
   constructor({ labels, datasets }) {
     this.labels = labels;
@@ -72,7 +76,7 @@ const demoData = {
   ],
 };
 
-export const BarGraphComponent = ({
+export const LineGraphComponent = ({
   legendPosition,
   titleDisplayEnabled,
   graphTitle,
@@ -103,5 +107,5 @@ export const BarGraphComponent = ({
     };
   }, [legendPosition, titleDisplayEnabled, graphTitle]);
 
-  return <Bar options={options} data={data ? data : demoData} />;
+  return <Line options={options} data={data ? data : demoData} />;
 };

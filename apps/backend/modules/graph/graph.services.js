@@ -3,6 +3,7 @@ const { prisma } = require("../../config/prisma");
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
 const { getQueryObject } = require("../../plugins/queries");
+const { GRAPH_PLUGINS_MAP } = require("../../plugins/graphs");
 class GraphService {
   constructor() {}
 
@@ -126,65 +127,22 @@ class GraphService {
             graph,
           },
         });
-        let dataset = { labels: null, datasets: [] };
+        const graphModel = GRAPH_PLUGINS_MAP[
+          graph.graph_options.graph_type
+        ].getGraphModel({
+          pm_graph_id: graph.pm_graph_id,
+          graph_title: graph.graph_title,
+          graph_options: graph.graph_options,
+        });
 
-        if (
-          graph.graph_options.graph_type == constants.GRAPH_TYPES.LINE.value ||
-          graph.graph_options.graph_type == constants.GRAPH_TYPES.BAR.value ||
-          graph.graph_options.graph_type == constants.GRAPH_TYPES.PIE.value ||
-          graph.graph_options.graph_type ==
-            constants.GRAPH_TYPES.DOUGHNUT.value ||
-          graph.graph_options.graph_type ==
-            constants.GRAPH_TYPES.POLAR_AREA.value ||
-          graph.graph_options.graph_type == constants.GRAPH_TYPES.RADAR.value
-        ) {
-          let _labels = {};
-
-          const queryArray = Array.from(graph.graph_options.query_array);
-          const results = queryArray.map(async (queryItem) => {
-            const query = await prisma.tbl_pm_queries.findUnique({
-              where: {
-                pm_query_id: parseInt(queryItem.pm_query_id),
-              },
-            });
-            const queryModel = getQueryObject({
-              pmQueryType: query.pm_query_type,
-              pmQuery: query.pm_query,
-            });
-
-            const result = await queryModel.run();
-
-            const _y = [];
-            console.log({ queryItem });
-            result.forEach((_r) => {
-              _labels[_r[queryItem.x_axis]] = true;
-              _y.push(
-                typeof _r[queryItem.y_axis] === "bigint"
-                  ? Number(_r[queryItem.y_axis])
-                  : _r[queryItem.y_axis]
-              );
-            });
-
-            dataset.datasets.push({
-              label: queryItem.dataset_title,
-              borderColor: queryItem.color,
-              backgroundColor: `${queryItem.color}80`,
-              data: _y,
-            });
-          });
-          await Promise.all(results);
-          dataset.labels = Object.keys(_labels).map((key) => key);
-        }
+        const dataset = await graphModel.getProcessedData();
         Logger.log("success", {
-          message: "GraphService:getGraphData:dataset",
+          message: "GraphService:getGraphData:graph",
           params: {
-            graph,
             dataset,
           },
         });
-        graph.dataset = dataset;
-
-        return graph;
+        return { ...graph, dataset };
       } else {
         Logger.log("error", {
           message: "GraphService:getGraphData:catch-2",

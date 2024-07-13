@@ -1,20 +1,14 @@
 import { useTheme } from "@mui/material";
-import {
-  ArcElement,
-  Chart as ChartJS,
-  Legend,
-  RadialLinearScale,
-  Tooltip,
-} from "chart.js";
+import { ArcElement, Chart as ChartJS, Legend, Tooltip } from "chart.js";
 import React, { useMemo } from "react";
-import { PolarArea } from "react-chartjs-2";
+import { Pie } from "react-chartjs-2";
 
 import { faker } from "@faker-js/faker";
 import { LOCAL_CONSTANTS } from "../../../../../constants";
 
-ChartJS.register(RadialLinearScale, ArcElement, Tooltip, Legend);
+ChartJS.register(ArcElement, Tooltip, Legend);
 
-export class PolarAreaChartDataset {
+export class PieGraphDataset {
   /**
    *
    * @param {object} param0
@@ -30,12 +24,12 @@ export class PolarAreaChartDataset {
     this.backgroundColor = backgroundColor;
   }
 }
-export class PolarAreaChartData {
+export class PieGraphData {
   /**
    *
    * @param {object} param0
    * @param {Array<String>} param0.labels
-   * @param {Array<PolarAreaChartDataset>} param0.datasets
+   * @param {Array<PieGraphDataset>} param0.datasets
    */
   constructor({ labels, datasets }) {
     this.labels = labels;
@@ -63,7 +57,7 @@ const demoData = {
   ],
 };
 
-export const PolarAreaGraphComponent = ({
+export const PieGraphComponent = ({
   legendPosition,
   titleDisplayEnabled,
   graphTitle,
@@ -72,6 +66,7 @@ export const PolarAreaGraphComponent = ({
   const theme = useTheme();
   const options = useMemo(() => {
     return {
+      maintainAspectRatio: false,
       responsive: true,
       elements: {
         bar: {
@@ -94,5 +89,7 @@ export const PolarAreaGraphComponent = ({
     };
   }, [legendPosition, titleDisplayEnabled, graphTitle]);
 
-  return <PolarArea options={options} data={data ? data : demoData} />;
+  return (
+    <Pie options={options} height={"300 px"} data={data ? data : demoData} />
+  );
 };

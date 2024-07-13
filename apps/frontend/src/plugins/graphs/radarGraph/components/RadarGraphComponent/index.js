@@ -1,14 +1,20 @@
 import { useTheme } from "@mui/material";
-import { ArcElement, Chart as ChartJS, Legend, Tooltip } from "chart.js";
+import {
+  ArcElement,
+  Chart as ChartJS,
+  Legend,
+  RadialLinearScale,
+  Tooltip,
+} from "chart.js";
 import React, { useMemo } from "react";
-import { Doughnut } from "react-chartjs-2";
+import { Radar } from "react-chartjs-2";
 
 import { faker } from "@faker-js/faker";
 import { LOCAL_CONSTANTS } from "../../../../../constants";
 
-ChartJS.register(ArcElement, Tooltip, Legend);
+ChartJS.register(RadialLinearScale, ArcElement, Tooltip, Legend);
 
-export class DoughnutChartDataset {
+export class RadarGraphDataset {
   /**
    *
    * @param {object} param0
@@ -24,12 +30,12 @@ export class DoughnutChartDataset {
     this.backgroundColor = backgroundColor;
   }
 }
-export class DoughnutChartData {
+export class RadarGraphData {
   /**
    *
    * @param {object} param0
    * @param {Array<String>} param0.labels
-   * @param {Array<DoughnutChartDataset>} param0.datasets
+   * @param {Array<RadarGraphDataset>} param0.datasets
    */
   constructor({ labels, datasets }) {
     this.labels = labels;
@@ -57,7 +63,7 @@ const demoData = {
   ],
 };
 
-export const DoughnutGraphComponent = ({
+export const RadarGraphComponent = ({
   legendPosition,
   titleDisplayEnabled,
   graphTitle,
@@ -66,6 +72,7 @@ export const DoughnutGraphComponent = ({
   const theme = useTheme();
   const options = useMemo(() => {
     return {
+      maintainAspectRatio: false,
       responsive: true,
       elements: {
         bar: {
@@ -88,5 +95,7 @@ export const DoughnutGraphComponent = ({
     };
   }, [legendPosition, titleDisplayEnabled, graphTitle]);
 
-  return <Doughnut options={options} data={data ? data : demoData} />;
+  return (
+    <Radar options={options} height={"300 px"} data={data ? data : demoData} />
+  );
 };

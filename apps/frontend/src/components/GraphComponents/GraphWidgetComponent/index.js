@@ -34,7 +34,7 @@ export const GraphWidgetComponent = ({ id }) => {
         height: 400,
       }}
     >
-      {GRAPH_PLUGINS_MAP[graphType].component({
+      {GRAPH_PLUGINS_MAP[graphType]?.component({
         legendPosition,
         titleDisplayEnabled,
         graphTitle,

@@ -68,34 +68,6 @@ const constants = {
   SOCKET_EVENTS: {
     ON_USER_UPDATE: "ON_USER_UPDATE",
   },
-
-  GRAPH_TYPES: {
-    CHART: { label: "Chart", value: "CHART" },
-    BAR: {
-      label: "Bar",
-      value: "BAR",
-      fields: ["x_axis", "y_axis", "index_axis"],
-    },
-    LINE: {
-      label: "Line",
-      value: "LINE",
-      fields: ["x_axis", "y_axis", "fill"],
-    },
-    PIE: { label: "Pie", value: "PIE" },
-    DOUGHNUT: { label: "Doughnut", value: "DOUGHNUT" },
-    POLAR_AREA: { label: "Polar Area", value: "POLAR_AREA" },
-    RADAR: { label: "Radar", value: "RADAR" },
-  },
-  QUERY_TYPE: {
-    REST_API: {
-      name: "Rest API",
-      value: "REST_API",
-    },
-    POSTGRE_QUERY: {
-      name: "Postgre query",
-      value: "POSTGRE_QUERY",
-    },
-  },
 };
 
 module.exports = constants;

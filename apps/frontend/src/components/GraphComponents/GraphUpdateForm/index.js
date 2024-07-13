@@ -27,7 +27,7 @@ export const GraphUpdateForm = ({ id }) => {
     queryFn: () => getGraphDataByIDAPI({ graphID: id }),
     cacheTime: 0,
     retry: 1,
-    staleTime: Infinity,
+    staleTime: 0,
   });
   const {
     isPending: isUpdatingGraph,

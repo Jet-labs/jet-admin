@@ -1,51 +1,58 @@
-const { prisma } = require("../../config/prisma");
-const constants = require("../../constants");
-const Logger = require("../../utils/logger");
-const { getQueryObject } = require("../queries");
-const { PostgreSQL } = require("./postgresql/models");
+const { LineGraph } = require("../graphs/lineGraph");
+const { BarGraph } = require("./BarGraph");
+const { DoughnutGraph } = require("./doughnutGraph");
+const { PieGraph } = require("./PieGraph");
+const { PolarGraph } = require("./polarGraph");
+const { RadialGraph } = require("./radialGraph");
 
-/**
- *
- * @param {object} param0
- * @param {Number} param0.
- */
-const runGraphSource = async ({ pmQueryID }) => {
-  try {
-    const query = await prisma.tbl_pm_queries.findUnique({
-      where: {
-        pm_query_id: parseInt(pmQueryID),
-      },
-    });
-    const queryModel = getQueryObject({
-      pmQueryType: query.pm_query_type,
-      pmQuery: query.pm_query,
-    });
-    return await queryModel.run();
-  } catch (error) {
-    Logger.log("error", {
-      message: "runGraphSource:catch-1",
-      params: { error },
-    });
-  }
+const GRAPH_PLUGINS_MAP = {
+  BAR: {
+    label: "Bar",
+    value: "BAR",
+    getGraphModel: ({ pm_graph_id, graph_title, graph_options }) => {
+      return new BarGraph({ pm_graph_id, graph_title, graph_options });
+    },
+  },
+  LINE: {
+    label: "Line",
+    value: "LINE",
+    fields: ["x_axis", "y_axis", "fill"],
+    getGraphModel: ({ pm_graph_id, graph_title, graph_options }) => {
+      return new LineGraph({ pm_graph_id, graph_title, graph_options });
+    },
+  },
+  PIE: {
+    label: "Pie",
+    value: "PIE",
+    fields: ["x_axis", "y_axis"],
+    getGraphModel: ({ pm_graph_id, graph_title, graph_options }) => {
+      return new PieGraph({ pm_graph_id, graph_title, graph_options });
+    },
+  },
+  DOUGHNUT: {
+    label: "Doughnut",
+    value: "DOUGHNUT",
+    fields: ["x_axis", "y_axis"],
+    getGraphModel: ({ pm_graph_id, graph_title, graph_options }) => {
+      return new DoughnutGraph({ pm_graph_id, graph_title, graph_options });
+    },
+  },
+  POLAR_AREA: {
+    label: "Polar Area",
+    value: "POLAR_AREA",
+    fields: ["x_axis", "y_axis"],
+    getGraphModel: ({ pm_graph_id, graph_title, graph_options }) => {
+      return new PolarGraph({ pm_graph_id, graph_title, graph_options });
+    },
+  },
+  RADAR: {
+    label: "Radar",
+    value: "RADAR",
+    fields: ["x_axis", "y_axis"],
+    getGraphModel: ({ pm_graph_id, graph_title, graph_options }) => {
+      return new RadialGraph({ pm_graph_id, graph_title, graph_options });
+    },
+  },
 };
 
-/**
- *
- * @param {object} param0
- * @param {Array<Number>} param0.pmQueryIDs
- */
-const runAllGraphSources = async ({ pmQueryIDs }) => {
-  try {
-    const dataArrayPromise = pmQueryIDs.map((pmQueryID) => {
-      return runGraphSource({ pmQueryID });
-    });
-
-    return await Promise.all(dataArrayPromise);
-  } catch (error) {
-    Logger.log("error", {
-      message: "runAllGraphSources:catch-1",
-      params: { error },
-    });
-  }
-};
-module.exports = { runGraphSource, runAllGraphSources };
+module.exports = { GRAPH_PLUGINS_MAP };

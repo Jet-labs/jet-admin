@@ -1,5 +1,17 @@
-const constants = require("../../constants");
 const { PostgreSQL } = require("./postgresql/models");
+
+const QUERY_PLUGINS_MAP = {
+  REST_API: {
+    name: "Rest API",
+    value: "REST_API",
+    getQueryModel: ({ pmQuery }) => new PostgreSQL(pmQuery),
+  },
+  POSTGRE_QUERY: {
+    name: "Postgre query",
+    value: "POSTGRE_QUERY",
+    getQueryModel: ({ pmQuery }) => new PostgreSQL(pmQuery),
+  },
+};
 
 /**
  *
@@ -8,13 +20,6 @@ const { PostgreSQL } = require("./postgresql/models");
  * @param {object} param0.pmQuery
  */
 const getQueryObject = ({ pmQueryType, pmQuery }) => {
-  switch (pmQueryType) {
-    case constants.QUERY_TYPE.POSTGRE_QUERY.value: {
-      return new PostgreSQL(pmQuery);
-    }
-    default: {
-      return new PostgreSQL(pmQuery);
-    }
-  }
+  return QUERY_PLUGINS_MAP[pmQueryType].getQueryModel({ pmQuery });
 };
-module.exports = { getQueryObject };
+module.exports = { QUERY_PLUGINS_MAP, getQueryObject };

@@ -124,7 +124,7 @@ const AllAccounts = () => {
       },
     },
   ];
-  console.log({ rows: data.rows });
+
   return (
     <div>
       <div className={`!w-full !p-4`}>

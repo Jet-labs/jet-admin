@@ -199,3 +199,31 @@
 [31merror[39m: dev_node_1: 13-07-2024 22:34:23: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
 [31merror[39m: dev_node_1: 13-07-2024 22:34:23: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-07-13T17:04:22.000Z"}}
 [31merror[39m: dev_node_1: 13-07-2024 22:34:23: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 13-07-2024 22:54:50: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-07-13T17:19:23.000Z"}}
+[31merror[39m: dev_node_1: 13-07-2024 22:54:50: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 13-07-2024 23:13:24: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-07-13T17:39:50.000Z"}}
+[31merror[39m: dev_node_1: 13-07-2024 23:13:24: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 13-07-2024 23:13:24: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-07-13T17:39:50.000Z"}}
+[31merror[39m: dev_node_1: 13-07-2024 23:13:24: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 13-07-2024 23:42:49: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-07-13T17:58:24.000Z"}}
+[31merror[39m: dev_node_1: 13-07-2024 23:42:49: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 13-07-2024 23:42:49: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-07-13T17:58:24.000Z"}}
+[31merror[39m: dev_node_1: 13-07-2024 23:42:49: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 13-07-2024 23:42:52: [31mGraphService:getGraphData:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 13-07-2024 23:42:52: [31mgraphController:getGraphData:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 13-07-2024 23:42:53: [31mGraphService:getGraphData:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 13-07-2024 23:42:53: [31mgraphController:getGraphData:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 13-07-2024 23:42:55: [31mGraphService:getGraphData:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 13-07-2024 23:42:55: [31mgraphController:getGraphData:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 13-07-2024 23:44:17: [31mGraphService:getGraphData:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 13-07-2024 23:44:17: [31mgraphController:getGraphData:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 13-07-2024 23:44:17: [31mGraphService:getGraphData:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 13-07-2024 23:44:17: [31mgraphController:getGraphData:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 13-07-2024 23:44:18: [31mGraphService:getGraphData:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 13-07-2024 23:44:18: [31mgraphController:getGraphData:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 13-07-2024 23:44:19: [31mGraphService:getGraphData:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 13-07-2024 23:44:19: [31mgraphController:getGraphData:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 13-07-2024 23:44:20: [31mGraphService:getGraphData:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 13-07-2024 23:44:20: [31mgraphController:getGraphData:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 13-07-2024 23:44:21: [31mGraphService:getGraphData:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 13-07-2024 23:44:21: [31mgraphController:getGraphData:catch-1[39m |====| {"error":{}}

@@ -1,9 +1,9 @@
-import { BarGraphComponent } from "./barchart/components/BarGraphComponent";
-import { DoughnutGraphComponent } from "./doughnutchart/components/DoughnutChartComponent";
-import { LineGraphComponent } from "./linechart/components/LineGraphComponent";
-import { PieGraphComponent } from "./piechart/components/PieChartComponent";
-import { PolarAreaGraphComponent } from "./polarchart/components/PolarAreaChartComponent";
-import { RadarGraphComponent } from "./radarchart/components/RadarChartComponent";
+import { BarGraphComponent } from "./barGraph/components/BarGraphComponent";
+import { DoughnutGraphComponent } from "./doughnutGraph/components/DoughnutGraphComponent";
+import { LineGraphComponent } from "./lineGraph/components/LineGraphComponent";
+import { PieGraphComponent } from "./pieGraph/components/PieGraphComponent";
+import { PolarAreaGraphComponent } from "./polarGraph/components/PolarAreaGraphComponent";
+import { RadarGraphComponent } from "./radarGraph/components/RadarGraphComponent";
 import { TbApi } from "react-icons/tb";
 export const GRAPH_PLUGINS_MAP = {
   BAR: {
