@@ -1,5 +1,6 @@
 import {
   Button,
+  Chip,
   Divider,
   FormControl,
   Grid,
@@ -66,23 +67,35 @@ export const RESTAPIQueryBuilder = ({ value, handleChange }) => {
     runRESTAPIQuery({ raw_query: value?.raw_query });
   };
 
-  const _handleOnRESTAPIURLChange = (value) => {
-    handleChange({ url: value });
+  const _handleOnURLChange = (e) => {
+    handleChange({ ...value, url: e.target.value });
+  };
+  const _handleOnMethodChange = (e) => {
+    handleChange({ ...value, method: e.target.value });
   };
 
+  console.log({ value });
   return (
     <div className="!flex flex-col justify-start items-stretch w-100 px-3">
       <Grid container className="!w-full">
-        <Grid item sx={4} md={4} lg={4} className="w-full !pr-1">
+        <Grid item sx={3} md={3} lg={3} className="w-full !pr-1">
           <FormControl size="small" className="!mt-2 !w-full">
             <span className="text-xs font-light  !capitalize mb-1">{`Method`}</span>
-            <Select>
+            <Select
+              value={
+                value && String(value.method).trim().length > 0
+                  ? value.method
+                  : REST_API_METHODS.GET.value
+              }
+              onChange={_handleOnMethodChange}
+            >
               {Object.keys(REST_API_METHODS).map((methodValue) => {
                 return (
                   <MenuItem
                     value={REST_API_METHODS[methodValue].value}
                     className="!break-words !whitespace-pre-line"
                     key={methodValue}
+                    // style={{ background: REST_API_METHODS[methodValue].bg }}
                   >
                     {REST_API_METHODS[methodValue].name}
                   </MenuItem>
@@ -91,16 +104,34 @@ export const RESTAPIQueryBuilder = ({ value, handleChange }) => {
             </Select>
           </FormControl>
         </Grid>
-        <Grid item sx={8} md={8} lg={8} className="w-full !pl-1">
+        <Grid item sx={9} md={9} lg={9} className="w-full !pl-1">
           <FormControl size="small" className="!mt-2 !w-full">
             <span className="text-xs font-light  !capitalize mb-1">{`Rest API URL`}</span>
             <TextField
-              value={value ? value.url : ""}
+              value={
+                value && String(value.url).trim().length > 0 ? value.url : ""
+              }
               placeholder="https://mock.api/todo"
-              onChange={_handleOnRESTAPIURLChange}
+              onChange={_handleOnURLChange}
               fullWidth
             />
           </FormControl>
+        </Grid>
+        <Grid item sx={12} md={12} lg={12} className="w-full">
+          <Tabs
+            value={tab}
+            onChange={_handleTabChange}
+            aria-label="basic tabs example"
+            style={{
+              marginTop: 20,
+            }}
+          >
+            <Tab label="Headers" />
+            <Tab label="Params" />
+            <Tab label="Body" />
+            <Tab label="Data Schema" />
+          </Tabs>
+          <Divider />
         </Grid>
 
         <div className="!flex flex-row justify-between items-center w-100 mt-3">

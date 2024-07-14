@@ -2,6 +2,7 @@ const { Prisma } = require("@prisma/client");
 const { prisma } = require("../../../../config/prisma");
 const Logger = require("../../../../utils/logger");
 const { BaseQuery } = require("../../baseQuery/models");
+const { getQueryObject } = require("../..");
 
 class PostgreSQL extends BaseQuery {
   constructor({ raw_query }) {

@@ -151,3 +151,20 @@
 [31merror[39m: dev_node_1: 14-07-2024 19:57:22: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
 [31merror[39m: dev_node_1: 14-07-2024 19:57:22: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-07-14T14:22:55.000Z"}}
 [31merror[39m: dev_node_1: 14-07-2024 19:57:22: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 14-07-2024 20:13:16: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-07-14T14:42:22.000Z"}}
+[31merror[39m: dev_node_1: 14-07-2024 20:13:16: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 14-07-2024 20:13:16: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-07-14T14:42:22.000Z"}}
+[31merror[39m: dev_node_1: 14-07-2024 20:13:16: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 14-07-2024 20:29:32: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-07-14T14:58:16.000Z"}}
+[31merror[39m: dev_node_1: 14-07-2024 20:29:32: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 14-07-2024 20:29:32: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-07-14T14:58:16.000Z"}}
+[31merror[39m: dev_node_1: 14-07-2024 20:29:32: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 14-07-2024 20:40:41: [31mPostgreSQL:run:catch-1[39m |====| {"error":{"name":"PrismaClientKnownRequestError","code":"P2010","clientVersion":"5.7.1","meta":{"code":"42601","message":"ERROR: syntax error at or near \"{\""}}}
+[31merror[39m: dev_node_1: 14-07-2024 20:40:41: [31mQueryService:runQuery:catch-1[39m |====| {"error":{"name":"PrismaClientKnownRequestError","code":"P2010","clientVersion":"5.7.1","meta":{"code":"42601","message":"ERROR: syntax error at or near \"{\""}}}
+[31merror[39m: dev_node_1: 14-07-2024 20:40:41: [31mqueryController:runQuery:catch-1[39m |====| {"error":{"name":"PrismaClientKnownRequestError","code":"P2010","clientVersion":"5.7.1","meta":{"code":"42601","message":"ERROR: syntax error at or near \"{\""}}}
+[31merror[39m: dev_node_1: 14-07-2024 21:47:13: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-07-14T15:14:32.000Z"}}
+[31merror[39m: dev_node_1: 14-07-2024 21:47:13: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 14-07-2024 21:47:13: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-07-14T15:14:32.000Z"}}
+[31merror[39m: dev_node_1: 14-07-2024 21:47:13: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 14-07-2024 21:47:13: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-07-14T15:14:32.000Z"}}
+[31merror[39m: dev_node_1: 14-07-2024 21:47:13: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}

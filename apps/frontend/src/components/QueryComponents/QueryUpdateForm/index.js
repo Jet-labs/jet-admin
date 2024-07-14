@@ -106,10 +106,15 @@ export const QueryUpdateForm = ({ id }) => {
   return (
     <div className="w-full !h-[calc(100vh-123px)]">
       <div
-        className="flex flex-col items-start justify-start p-3 px-6 !border-b !border-white !border-opacity-10"
-        style={{ background: theme.palette.background.paper }}
+        className="flex flex-col items-start justify-start p-3 "
+        style={{
+          background: theme.palette.background.default,
+          borderBottomWidth: 1,
+          borderColor: theme.palette.divider,
+        }}
       >
-        <span className="text-lg font-bold text-start mt-1">{`Update query`}</span>
+        <span className="text-lg font-bold text-start">{`Update query`}</span>
+        <span className="text-xs font-medium text-start mt-1">{`Query id : ${id}`}</span>
       </div>
 
       <Grid container className="!h-full">
