@@ -8,7 +8,7 @@ import { useState } from "react";
 import { containsOnly } from "../../../../utils/array";
 import { displayError } from "../../../../utils/notification";
 import { CRUDPermissionCheckboxGroup } from "../CRUDPermissionCheckboxGroup";
-import "./style.css";
+
 export const QueryPolicyEditor = ({ value, handleChange }) => {
   const [tab, setTab] = useState(
     containsOnly(["add", "edit", "read", "delete"], Object.keys(value)) &&
@@ -83,9 +83,12 @@ export const QueryPolicyEditor = ({ value, handleChange }) => {
               extensions={[loadLanguage("json")]}
               onChange={(value) => handleChange(JSON.parse(value))}
               theme={githubLight}
+              className="codemirror-editor-rounded-bottom"
               style={{
                 borderWidth: 0,
                 width: "100%",
+                borderBottomRightRadius: 4,
+                borderBottomLeftRadius: 4,
               }}
             />
           </div>

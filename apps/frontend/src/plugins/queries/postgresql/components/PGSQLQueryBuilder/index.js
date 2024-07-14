@@ -15,6 +15,7 @@ import { PGSQLQueryResponseJSONTab } from "../PQSQLQueryResponseJSONTab";
 import { PGSQLQueryResponseRAWTab } from "../PQSQLQueryResponseRAWTab";
 import { PGSQLQueryResponseSchemaTab } from "../PQSQLQueryResponseSchemaTab";
 import { PGSQLQueryResponseTableTab } from "../PQSQLQueryResponseTableTab";
+import { QUERY_PLUGINS_MAP } from "../../..";
 
 export const PGSQLQueryBuilder = ({ value, handleChange }) => {
   const theme = useTheme();
@@ -34,7 +35,10 @@ export const PGSQLQueryBuilder = ({ value, handleChange }) => {
     data: pgQueryData,
   } = useMutation({
     mutationFn: ({ raw_query }) => {
-      return runQueryAPI({ pm_query: { raw_query } });
+      return runQueryAPI({
+        pm_query_type: QUERY_PLUGINS_MAP.POSTGRE_QUERY.value,
+        pm_query: { raw_query },
+      });
     },
     retry: false,
     onSuccess: (data) => {

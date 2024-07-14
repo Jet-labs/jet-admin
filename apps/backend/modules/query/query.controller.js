@@ -196,7 +196,7 @@ queryController.runQuery = async (req, res) => {
 
     Logger.log("info", {
       message: "queryController:runQuery:params",
-      params: { pm_user_id, pm_query },
+      params: { pm_user_id, pm_query, pm_query_type },
     });
 
     const data = await QueryService.runQuery({

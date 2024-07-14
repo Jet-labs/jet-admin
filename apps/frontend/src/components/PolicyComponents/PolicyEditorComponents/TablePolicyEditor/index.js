@@ -1,6 +1,5 @@
 import { Divider, Tab, Tabs, useTheme } from "@mui/material";
 import { loadLanguage } from "@uiw/codemirror-extensions-langs";
-import { dracula } from "@uiw/codemirror-theme-dracula";
 import { githubLight } from "@uiw/codemirror-theme-github";
 import CodeMirror from "@uiw/react-codemirror";
 import { capitalize } from "lodash";
@@ -163,10 +162,13 @@ export const TablePolicyEditor = ({ value, handleChange }) => {
                           typeof v === "object" ? v : JSON.parse(v),
                       });
                     }}
-                    theme={dracula}
+                    theme={githubLight}
+                    className="codemirror-editor-rounded-bottom"
                     style={{
                       borderWidth: 0,
                       width: "100%",
+                      borderBottomRightRadius: 4,
+                      borderBottomLeftRadius: 4,
                     }}
                   />
                 );
@@ -187,9 +189,12 @@ export const TablePolicyEditor = ({ value, handleChange }) => {
               extensions={[loadLanguage("json")]}
               onChange={(value) => handleChange(JSON.parse(value))}
               theme={githubLight}
+              className="codemirror-editor-rounded-bottom"
               style={{
                 borderWidth: 0,
                 width: "100%",
+                borderBottomRightRadius: 4,
+                borderBottomLeftRadius: 4,
               }}
             />
           </div>

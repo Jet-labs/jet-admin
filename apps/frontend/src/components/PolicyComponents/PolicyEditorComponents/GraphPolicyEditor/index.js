@@ -82,9 +82,12 @@ export const GraphPolicyEditor = ({ value, handleChange }) => {
               extensions={[loadLanguage("json")]}
               onChange={(value) => handleChange(JSON.parse(value))}
               theme={githubLight}
+              className="codemirror-editor-rounded-bottom"
               style={{
                 borderWidth: 0,
                 width: "100%",
+                borderBottomRightRadius: 4,
+                borderBottomLeftRadius: 4,
               }}
             />
           </div>

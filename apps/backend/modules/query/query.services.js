@@ -206,6 +206,7 @@ class QueryService {
   static runQuery = async ({ pmQuery, pmQueryType }) => {
     Logger.log("info", {
       message: "QueryService:runQuery:params",
+      params: { pmQuery, pmQueryType },
     });
     try {
       const queryModel = getQueryObject({ pmQueryType, pmQuery });

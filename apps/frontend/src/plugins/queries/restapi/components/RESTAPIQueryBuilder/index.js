@@ -15,6 +15,7 @@ import { RESTAPIQueryResponseJSONTab } from "../RESTAPIQueryResponseJSONTab";
 import { RESTAPIQueryResponseRAWTab } from "../RESTAPIQueryResponseRAWTab";
 import { RESTAPIQueryResponseSchemaTab } from "../RESTAPIQueryResponseSchemaTab";
 import { RESTAPIQueryResponseTableTab } from "../RESTAPIQueryResponseTableTab";
+import { QUERY_PLUGINS_MAP } from "../../..";
 
 export const RESTAPIQueryBuilder = ({ value, handleChange }) => {
   const theme = useTheme();
@@ -34,7 +35,10 @@ export const RESTAPIQueryBuilder = ({ value, handleChange }) => {
     data: restAPIQueryData,
   } = useMutation({
     mutationFn: ({ raw_query }) => {
-      return runQueryAPI({ pm_query: { raw_query } });
+      return runQueryAPI({
+        pm_query_type: QUERY_PLUGINS_MAP.REST_API.value,
+        pm_query: { raw_query },
+      });
     },
     retry: false,
     onSuccess: (data) => {
