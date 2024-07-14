@@ -461,7 +461,7 @@ class TableService {
       const deletedRows =
         authorized_rows === false
           ? null
-          : await prisma[table_name].delete({
+          : await prisma[table_name].deleteMany({
               where:
                 authorized_rows === true
                   ? {

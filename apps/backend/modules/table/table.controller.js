@@ -571,7 +571,8 @@ tableController.deleteRowByMultipleIDs = async (req, res) => {
   try {
     const { pmUser, state } = req;
     const pm_user_id = parseInt(pmUser.pm_user_id);
-    const { table_name, query } = req.body;
+    const { table_name } = req.params;
+    const { query } = req.body;
     const authorized_rows = state?.authorized_rows;
 
     Logger.log("info", {
@@ -581,7 +582,7 @@ tableController.deleteRowByMultipleIDs = async (req, res) => {
 
     await TableService.deleteTableRowByMultipleIDs({
       table_name,
-      query: JSON.parse(query),
+      query: query,
       authorized_rows,
     });
 

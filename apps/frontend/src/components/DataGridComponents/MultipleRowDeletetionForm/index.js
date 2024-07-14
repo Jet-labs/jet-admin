@@ -3,17 +3,17 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@mui/material";
 import { useMemo, useState } from "react";
 import { IoTrash } from "react-icons/io5";
-import { deleteRowByIDAPI } from "../../../api/tables";
+import {
+  deleteRowByIDAPI,
+  deleteRowByMultipleIDsAPI,
+} from "../../../api/tables";
 import { useAuthState } from "../../../contexts/authContext";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { ConfirmationDialog } from "../../ConfirmationDialog";
-import { useNavigate } from "react-router-dom";
-export const RowDeletionForm = ({ tableName, id }) => {
+export const MultipleRowsDeletionForm = ({ tableName, ids }) => {
   const { pmUser } = useAuthState();
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
-
-  const [isDeleteRowConfirmationOpen, setIsDeleteRowConfirmationOpen] =
+  const [isDeleteRowsConfirmationOpen, setIsDeleteRowsConfirmationOpen] =
     useState(false);
 
   const deleteRowAuthorization = useMemo(() => {
@@ -30,18 +30,18 @@ export const RowDeletionForm = ({ tableName, id }) => {
     }
   }, [pmUser, tableName]);
   const {
-    isPending: isDeletingRow,
-    isSuccess: isDeleteRowSuccess,
-    isError: isDeleteRowError,
-    error: deleteRowError,
-    mutate: deleteRow,
+    isPending: isDeletingRows,
+    isSuccess: isDeleteRowsSuccess,
+    isError: isDeleteRowsError,
+    error: deleteRowsError,
+    mutate: deleteRows,
   } = useMutation({
-    mutationFn: ({ tableName, id }) => deleteRowByIDAPI({ tableName, id }),
+    mutationFn: ({ tableName, ids }) =>
+      deleteRowByMultipleIDsAPI({ tableName, ids }),
     retry: false,
     onSuccess: () => {
-      displaySuccess("Deleted row successfully");
-      setIsDeleteRowConfirmationOpen(false);
-      navigate(-1);
+      displaySuccess("Deleted rows successfully");
+      setIsDeleteRowsConfirmationOpen(false);
       queryClient.invalidateQueries([
         `REACT_QUERY_KEY_TABLES_${String(tableName).toUpperCase()}`,
       ]);
@@ -50,35 +50,35 @@ export const RowDeletionForm = ({ tableName, id }) => {
       displayError(error);
     },
   });
-  const _handleOpenDeleteRowConfirmation = () => {
-    setIsDeleteRowConfirmationOpen(true);
+  const _handleOpenDeleteRowsConfirmation = () => {
+    setIsDeleteRowsConfirmationOpen(true);
   };
-  const _handleCloseDeleteRowConfirmation = () => {
-    setIsDeleteRowConfirmationOpen(false);
+  const _handleCloseDeleteRowsConfirmation = () => {
+    setIsDeleteRowsConfirmationOpen(false);
   };
 
-  const _handleDeleteRow = () => {
-    deleteRow({ tableName, id });
+  const _handleDeleteRows = () => {
+    deleteRows({ tableName, ids });
   };
   return (
     deleteRowAuthorization && (
       <>
         <Button
-          onClick={_handleOpenDeleteRowConfirmation}
+          onClick={_handleOpenDeleteRowsConfirmation}
           startIcon={<IoTrash className="!text-sm" />}
           size="medium"
           variant="outlined"
           className="!ml-2"
           color="error"
         >
-          Delete
+          Delete selected rows
         </Button>
         <ConfirmationDialog
-          open={isDeleteRowConfirmationOpen}
-          onAccepted={_handleDeleteRow}
-          onDecline={_handleCloseDeleteRowConfirmation}
-          title={"Delete row?"}
-          message={`Are you sure you want to delete row id - ${id}`}
+          open={isDeleteRowsConfirmationOpen}
+          onAccepted={_handleDeleteRows}
+          onDecline={_handleCloseDeleteRowsConfirmation}
+          title={"Delete rows?"}
+          message={`Are you sure you want to delete multiple rows`}
         />
       </>
     )

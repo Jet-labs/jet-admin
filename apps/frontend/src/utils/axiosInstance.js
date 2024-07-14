@@ -13,7 +13,7 @@ axiosInstance.interceptors.request.use(
       LOCAL_CONSTANTS.STRINGS.ACCESS_TOKEN_LOCAL_STORAGE
     );
     config.headers.authorization = `Bearer ${accessToken}`;
-
+    console.log({ config });
     return config;
   },
   (error) => {

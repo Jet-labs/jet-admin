@@ -1,13 +1,13 @@
 import { useNavigate } from "react-router-dom";
 
-import { LinearProgress, Pagination, useTheme } from "@mui/material";
+import { Button, LinearProgress, Pagination, useTheme } from "@mui/material";
 import {
   DataGrid,
   GridToolbarContainer,
   GridToolbarExport,
 } from "@mui/x-data-grid";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { fetchAllRowsAPI } from "../../../api/tables";
 import { useAuthState } from "../../../contexts/authContext";
 
@@ -22,6 +22,7 @@ import {
 import { DataGridActionComponent } from "../DataGridActionComponent";
 import { ErrorComponent } from "../../ErrorComponent";
 import { RawDataGridStatistics } from "../RawDataGridStatistics";
+import { MultipleRowsDeletionForm } from "../MultipleRowDeletetionForm";
 
 export const RawDataGrid = ({
   tableName,
@@ -37,9 +38,7 @@ export const RawDataGrid = ({
   const [filterQuery, setFilterQuery] = useState(null);
   const [sortModel, setSortModel] = useState(null);
   const theme = useTheme();
-  const [multipleSelectedRowsQuery, setMultipleSelectedRowsQuery] = useState(
-    []
-  );
+  const [multipleSelectedQuery, setMultipleSelectedQuery] = useState(null);
 
   const {
     isLoading: isLoadingRows,
@@ -101,22 +100,6 @@ export const RawDataGrid = ({
     }
   }, [tableName, dbModel]);
 
-  // const getRowId = (row) => {
-  //   if (primaryColumns.length > 1) {
-  //     let id = ``;
-  //     for (let i = 0; i < primaryColumns.length; i++) {
-  //       id =
-  //         i == primaryColumns.length - 1
-  //           ? id.concat(`${String(row[primaryColumns[i]])}`)
-  //           : id.concat(`${String(row[primaryColumns[i]])}__`);
-  //     }
-
-  //     return id;
-  //   } else {
-  //     return row[primaryColumns[0]];
-  //   }
-  // };
-
   const getRowId = (row) => {
     let _query = {};
     let _queryName = primaryColumns.join("_");
@@ -137,21 +120,37 @@ export const RawDataGrid = ({
     return primaryColumns.length > 1 ? { [_queryName]: _query } : _query;
   };
 
-  const multipleSelectedRowsQueryBuilder = (rowSelectionModel) => {
-    let _queryName = primaryColumns.join("_");
-    const multipleSelectedRowsQuery = rowSelectionModel?.map((rowID) => {
-      const _rowID = JSON.parse(rowID);
+  const _handleMultipleSelectedRowsQueryBuilder = useCallback(
+    (rowSelectionModel) => {
+      let _queryName = primaryColumns.join("_");
+      if (rowSelectionModel.length == 0) {
+        setMultipleSelectedQuery(null);
+      } else {
+        const multipleSelectedRowsQuery = rowSelectionModel.map((rowID) => {
+          const _rowID = JSON.parse(rowID);
 
-      return primaryColumns.length > 1
-        ? _rowID[_queryName]
-        : _rowID[primaryColumns[0]];
-    });
-    const finalQuery =
-      primaryColumns.length > 1
-        ? { [_queryName]: { in: multipleSelectedRowsQuery } }
-        : { [primaryColumns[0]]: { in: multipleSelectedRowsQuery } };
-    setMultipleSelectedRowsQuery(finalQuery);
-  };
+          return primaryColumns.length > 1
+            ? _rowID[_queryName]
+            : _rowID[primaryColumns[0]];
+        });
+        const finalQuery =
+          primaryColumns.length > 1
+            ? { [_queryName]: { in: multipleSelectedRowsQuery } }
+            : { [primaryColumns[0]]: { in: multipleSelectedRowsQuery } };
+        setMultipleSelectedQuery(finalQuery);
+      }
+    },
+    [primaryColumns, setMultipleSelectedQuery]
+  );
+
+  const _renderMultipleDeleteButton = useMemo(() => {
+    return (
+      <MultipleRowsDeletionForm
+        tableName={tableName}
+        ids={multipleSelectedQuery}
+      />
+    );
+  }, [tableName, multipleSelectedQuery]);
 
   return (
     <div
@@ -213,13 +212,15 @@ export const RawDataGrid = ({
               getRowHeight={() => "auto"}
               slots={{
                 toolbar: () => (
-                  <GridToolbarContainer className="!py-2 !-px-4 justify-end">
-                    <GridToolbarExport />
+                  <GridToolbarContainer className="!py-2 !-pr-5 justify-end">
+                    {_renderMultipleDeleteButton}
                   </GridToolbarContainer>
                 ),
                 loadingOverlay: LinearProgress,
               }}
-              onRowSelectionModelChange={multipleSelectedRowsQueryBuilder}
+              onRowSelectionModelChange={
+                _handleMultipleSelectedRowsQueryBuilder
+              }
             />
             <div
               className="flex flex-row w-full justify-end pb-2 !sticky !bottom-0"
