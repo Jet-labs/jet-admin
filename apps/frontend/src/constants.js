@@ -133,12 +133,12 @@ export const LOCAL_CONSTANTS = {
       path: (table_name) => `${table_name}`,
     },
     ADD_ROW: {
-      code: ":table_name/add",
-      path: (table_name) => `${table_name}/add`,
+      code: "add",
+      path: (table_name) => `add`,
     },
     ROW_VIEW: {
-      code: ":table_name/:id",
-      path: (table_name, id) => `${table_name}/${id}`,
+      code: ":id",
+      path: (table_name, id) => `${id}`,
     },
     POLICY_MANAGEMENT: { code: "/policy_editor", path: () => `/policy_editor` },
     POLICY_SETTINGS: {

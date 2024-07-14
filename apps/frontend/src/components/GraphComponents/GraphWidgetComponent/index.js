@@ -20,7 +20,7 @@ export const GraphWidgetComponent = ({ id }) => {
     retry: 1,
     staleTime: Infinity,
   });
-  const graphType = graphData?.graph_options.graph_type;
+  const graphType = graphData?.graph_options?.graph_type;
   const graphTitle = graphData?.graph_title;
   const legendPosition = graphData?.graph_options.legend_position;
   const titleDisplayEnabled = graphData?.graph_options.title_display_enabled;

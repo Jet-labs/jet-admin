@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 
 import { Button, CircularProgress, Grid, Paper, useTheme } from "@mui/material";
@@ -12,6 +12,7 @@ import { FieldComponent } from "../../FieldComponent";
 
 export const RowAdditionForm = ({ tableName }) => {
   const theme = useTheme();
+  const queryClient = useQueryClient();
   const {
     isLoading: isLoadingAddColumns,
     data: addColumns,
@@ -49,6 +50,9 @@ export const RowAdditionForm = ({ tableName }) => {
     retry: false,
     onSuccess: () => {
       displaySuccess("Added record successfully");
+      queryClient.invalidateQueries([
+        `REACT_QUERY_KEY_TABLES_${String(tableName).toUpperCase()}`,
+      ]);
     },
     onError: (error) => {
       displayError(error);

@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { Button } from "@mui/material";
 import { useMemo, useState } from "react";
@@ -8,8 +8,11 @@ import { useAuthState } from "../../../contexts/authContext";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { ConfirmationDialog } from "../../ConfirmationDialog";
 import { LOCAL_CONSTANTS } from "../../../constants";
+import { useNavigate } from "react-router-dom";
 export const AccountDeletionForm = ({ id, username }) => {
   const { pmUser } = useAuthState();
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [isDeleteAccountConfirmationOpen, setIsDeleteAccountConfirmationOpen] =
     useState(false);
 
@@ -43,6 +46,13 @@ export const AccountDeletionForm = ({ id, username }) => {
     retry: false,
     onSuccess: () => {
       displaySuccess("Deleted row successfully");
+      queryClient.invalidateQueries([
+        `REACT_QUERY_KEY_TABLES_${String(
+          LOCAL_CONSTANTS.STRINGS.PM_USER_TABLE_NAME
+        ).toUpperCase()}`,
+      ]);
+      navigate(-1);
+      setIsDeleteAccountConfirmationOpen(false);
     },
     onError: (error) => {
       displayError(error);

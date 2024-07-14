@@ -89,9 +89,12 @@ export const GraphDrawerList = () => {
         </div>
       )}
       <div className="!mt-1"></div>
-      {graphs && graphs.length > 0
+      {graphs && graphs.length > 0 && false
         ? graphs.map((graph) => {
             const key = `graph_${graph.pm_graph_id}`;
+            const graphPlugin = graph.graph_options?.graph_type
+              ? GRAPH_PLUGINS_MAP[graph.graph_options?.graph_type]
+              : null;
             return (
               <Link
                 to={LOCAL_CONSTANTS.ROUTES.GRAPH_VIEW.path(graph.pm_graph_id)}
@@ -122,8 +125,8 @@ export const GraphDrawerList = () => {
                         minWidth: 0,
                       }}
                     >
-                      {GRAPH_PLUGINS_MAP[graph.graph_options.graph_type] ? (
-                        GRAPH_PLUGINS_MAP[graph.graph_options.graph_type].icon
+                      {graphPlugin ? (
+                        graphPlugin.icon
                       ) : (
                         <FaChartLine className="!text-sm" />
                       )}

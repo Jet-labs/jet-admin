@@ -52,6 +52,9 @@ export const GraphsDnDList = ({}) => {
       {graphs && graphs.length > 0 ? (
         graphs.map((graph, index) => {
           const key = `graph_${graph.pm_graph_id}`;
+          const graphPlugin = graph.graph_options?.graph_type
+            ? GRAPH_PLUGINS_MAP[graph.graph_options?.graph_type]
+            : null;
           return (
             <ListItem
               key={`graph_${graph.pm_graph_id}`}
@@ -81,8 +84,8 @@ export const GraphsDnDList = ({}) => {
                     color: theme.palette.primary.contrastText,
                   }}
                 >
-                  {GRAPH_PLUGINS_MAP[graph.graph_options.graph_type] ? (
-                    GRAPH_PLUGINS_MAP[graph.graph_options.graph_type].icon
+                  {graphPlugin ? (
+                    graphPlugin.icon
                   ) : (
                     <FaChartLine className="!text-sm" />
                   )}
