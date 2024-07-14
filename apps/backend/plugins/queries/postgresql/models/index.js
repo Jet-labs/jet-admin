@@ -1,38 +1,30 @@
 const { Prisma } = require("@prisma/client");
 const { prisma } = require("../../../../config/prisma");
 const Logger = require("../../../../utils/logger");
-const { BaseQuery } = require("../../baseQuery/models");
-const { getQueryObject } = require("../..");
 
-class PostgreSQL extends BaseQuery {
-  constructor({ raw_query }) {
-    super({ raw_query });
-    this.raw_query = raw_query;
-  }
-
-  run = async () => {
+const runPostgreSQLQuery = async ({ options }) => {
+  Logger.log("info", {
+    message: "PostgreSQL:run:params",
+    params: { options },
+  });
+  try {
+    const result = await prisma.$queryRaw`${Prisma.raw(options.query)}`;
     Logger.log("info", {
-      message: "PostgreSQL:run:params",
+      message: "PostgreSQL:run:query",
+      params: {
+        result: Array.isArray(result)
+          ? { resultLength: result.length }
+          : result,
+      },
     });
-    try {
-      const result = await prisma.$queryRaw`${Prisma.raw(this.raw_query)}`;
-      Logger.log("info", {
-        message: "PostgreSQL:run:query",
-        params: {
-          result: Array.isArray(result)
-            ? { resultLength: result.length }
-            : result,
-        },
-      });
-      return result;
-    } catch (error) {
-      Logger.log("error", {
-        message: "PostgreSQL:run:catch-1",
-        params: { error },
-      });
-      throw error;
-    }
-  };
-}
+    return { pm_query_id: options.pm_query_id, result };
+  } catch (error) {
+    Logger.log("error", {
+      message: "PostgreSQL:run:catch-1",
+      params: { error },
+    });
+    throw error;
+  }
+};
 
-module.exports = { PostgreSQL };
+module.exports = { runPostgreSQLQuery };

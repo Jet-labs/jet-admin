@@ -68,6 +68,9 @@ const constants = {
   SOCKET_EVENTS: {
     ON_USER_UPDATE: "ON_USER_UPDATE",
   },
+  VARIABLE_DETECTION_REGEX: /{{(.*?)}}/g,
+  PM_QUERY_DETECTION_REGEX: /\[pm_query_id:\d+\]/g,
+  PM_QUERY_EXTRACTION_REGEX: /\[pm_query_id:(\d+)\]/,
 };
 
 module.exports = constants;

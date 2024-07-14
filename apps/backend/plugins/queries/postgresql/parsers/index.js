@@ -1,54 +1,113 @@
 const jsep = require("jsep");
+const constants = require("../../../../constants");
+const { prisma } = require("../../../../config/prisma");
+const Logger = require("../../../../utils/logger");
+const { PostgreSQL, runPostgreSQLQuery } = require("../models");
+const { evaluateAST } = require("../../../../utils/parser.util");
 
-// Define context
-const context = {
-  pmq_21: {
-    level2: () => ({
-      level3: (arg) => `Function level3 called with: ${arg}`,
-    }),
-  },
-  pmq_43: {
-    levelB: "someValue",
-  },
-};
+/**
+ *
+ * @param {object} param0
+ * @param {String} param0.rawQuery
+ * @returns
+ */
+const getProcessedPostgreSQLQuery = async ({ rawQuery }) => {
+  try {
+    Logger.log("info", {
+      message: "PostgreSQLQuery:getProcessedQuery:init",
+      params: { rawQuery },
+    });
+    const extractedPmQueryIDs = [];
 
-// Evaluate the AST
-const evaluateAST = (ast, context) => {
-  const traverse = (node, context) => {
-    if (node.type === "MemberExpression") {
-      return traverse(node.object, context)[node.property.name];
-    } else if (node.type === "CallExpression") {
-      return traverse(node.callee, context).apply(
-        null,
-        node.arguments.map((arg) => traverse(arg, context))
-      );
-    } else if (node.type === "Identifier") {
-      return context[node.name];
-    }
-  };
-  return traverse(ast, context);
-};
+    const variableMatches = rawQuery.match(constants.VARIABLE_DETECTION_REGEX);
 
-const apiUrlTemplate =
-  "https://api.example.com/users/{{[pm_query_id:21].level2().level3([pm_query_id:43].levelB)}}";
+    const replacements = await Promise.all(
+      variableMatches.map(async (match) => {
+        const variableWithReplacedQueryID = String(match)
+          .slice(2, -2)
+          .replace(constants.PM_QUERY_DETECTION_REGEX, (pmQueryIDString) => {
+            const pmQueryID = pmQueryIDString.match(
+              constants.PM_QUERY_EXTRACTION_REGEX
+            )[1];
+            extractedPmQueryIDs.push(parseInt(pmQueryID));
+            return `pmq_${pmQueryID}`;
+          });
+        const extractedPmQuerys = await prisma.tbl_pm_queries.findMany({
+          where: {
+            pm_query_id: { in: extractedPmQueryIDs },
+          },
+        });
 
-const queryIDs = [];
-const processedURL = apiUrlTemplate.replace(
-  /{{(.*?)}}/g,
-  (_, variableString) => {
-    console.log({ variableString });
-    const variableWithReplacedQueryID = String(variableString).replace(
-      /\[pm_query_id:\d+\]/g,
-      (pmQueryIDString) => {
-        const pmQueryID = pmQueryIDString.match(/\[pm_query_id:(\d+)\]/)[1];
-        queryIDs.push(pmQueryID);
-        return `pmq_${pmQueryID}`;
+        const evaluationContext = {};
+
+        const extractedPmQuerysPromises = extractedPmQuerys.map(
+          async (pmQuery) => {
+            return await runPostgreSQLQuery({
+              options: {
+                query: pmQuery.pm_query.raw_query,
+                pm_query_id: pmQuery.pm_query_id,
+              },
+            });
+          }
+        );
+
+        const resolvedPmQuerys = await Promise.all(extractedPmQuerysPromises);
+
+        resolvedPmQuerys.forEach((r) => {
+          evaluationContext[`pmq_${r.pm_query_id}`] = r.result;
+        });
+
+        Logger.log("info", {
+          message:
+            "PostgreSQLQuery:getProcessedQuery:variableWithReplacedQueryID",
+          params: { variableWithReplacedQueryID, evaluationContext },
+        });
+
+        const ast = jsep(variableWithReplacedQueryID);
+
+        const result = evaluateAST(ast, evaluationContext);
+
+        Logger.log("info", {
+          message: "PostgreSQLQuery:getProcessedQuery:result",
+          params: { result },
+        });
+
+        return { match, result };
+      })
+    );
+    Logger.log("info", {
+      message: "PostgreSQLQuery:getProcessedQuery:replacements",
+      params: { rawQuery: rawQuery, replacements },
+    });
+    const replacementMap = {};
+    replacements.forEach((v) => {
+      replacementMap[v.match] = v.result;
+    });
+    Logger.log("info", {
+      message: "PostgreSQLQuery:getProcessedQuery:replacementMap",
+      params: { rawQuery: rawQuery, replacementMap },
+    });
+    const processedPostgreSQLQuery = rawQuery.replace(
+      constants.VARIABLE_DETECTION_REGEX,
+      (_, variableString) => {
+        console.log({ variableString });
+        return replacementMap[`{{${variableString}}}`];
       }
     );
-    console.log({ variableWithReplacedQueryID });
-    const ast = jsep(variableWithReplacedQueryID);
-    const result = evaluateAST(ast, context);
-    return result;
+
+    Logger.log("success", {
+      message: "PostgreSQLQuery:getProcessedQuery:success",
+      params: { rawQuery: rawQuery, processedPostgreSQLQuery },
+    });
+    return processedPostgreSQLQuery;
+  } catch (error) {
+    Logger.log("error", {
+      message: "PostgreSQLQuery:getProcessedQuery:catch-1",
+      params: { rawQuery: rawQuery, error },
+    });
+    return rawQuery;
   }
-);
-console.log(processedURL);
+};
+
+module.exports = { getProcessedPostgreSQLQuery };
+

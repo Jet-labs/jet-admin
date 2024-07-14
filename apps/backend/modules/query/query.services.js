@@ -3,6 +3,12 @@ const { prisma } = require("../../config/prisma");
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
 const { getQueryObject } = require("../../plugins/queries");
+const {
+  getProcessedPostgreSQLQuery,
+} = require("../../plugins/queries/postgresql/parsers");
+const {
+  runPostgreSQLQuery,
+} = require("../../plugins/queries/postgresql/models");
 
 class QueryService {
   constructor() {}
@@ -209,8 +215,16 @@ class QueryService {
       params: { pmQuery, pmQueryType },
     });
     try {
-      const queryModel = getQueryObject({ pmQueryType, pmQuery });
-      const result = await queryModel.run();
+      const _query = await getProcessedPostgreSQLQuery({
+        rawQuery: pmQuery.raw_query,
+      });
+      Logger.log("info", {
+        message: "QueryService:runQuery:_query",
+        params: {
+          _query,
+        },
+      });
+      const result = await runPostgreSQLQuery({ options: { query: _query } });
       Logger.log("info", {
         message: "QueryService:runQuery:query",
         params: {
