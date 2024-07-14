@@ -80,6 +80,15 @@ router.put(
 );
 
 router.post(
+  "/:table_name/delete",
+  authMiddleware.authProvider,
+  // tableAuthorizationMiddleware.isAuthorized,
+  policyMiddleware.populateAuthorizationPolicies,
+  tableAuthorizationMiddleware.authorizeRowDeletion,
+  tableController.deleteRowByMultipleIDs
+);
+
+router.post(
   "/:table_name",
   authMiddleware.authProvider,
   // tableAuthorizationMiddleware.isAuthorized,
@@ -87,6 +96,8 @@ router.post(
   tableAuthorizationMiddleware.authorizeRowAddition,
   tableController.addRowByID
 );
+
+
 
 router.delete(
   "/:table_name/:query",

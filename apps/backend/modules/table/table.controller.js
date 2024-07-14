@@ -567,6 +567,47 @@ tableController.deleteRowByID = async (req, res) => {
  * @param {import("express").Response} res
  * @returns
  */
+tableController.deleteRowByMultipleIDs = async (req, res) => {
+  try {
+    const { pmUser, state } = req;
+    const pm_user_id = parseInt(pmUser.pm_user_id);
+    const { table_name, query } = req.body;
+    const authorized_rows = state?.authorized_rows;
+
+    Logger.log("info", {
+      message: "tableController:deleteRowByMultipleIDs:params",
+      params: { pm_user_id, table_name, query, authorized_rows },
+    });
+
+    await TableService.deleteTableRowByMultipleIDs({
+      table_name,
+      query: JSON.parse(query),
+      authorized_rows,
+    });
+
+    Logger.log("success", {
+      message: "tableController:deleteRowByMultipleIDs:success",
+      params: { pm_user_id, table_name, query },
+    });
+
+    return res.json({
+      success: true,
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "tableController:deleteRowByMultipleIDs:catch-1",
+      params: { error },
+    });
+    return res.json({ success: false, error: extractError(error) });
+  }
+};
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @returns
+ */
 tableController.downloadData = async () => {
   Logger.log("info", { message: "tableController:downloadData:start" });
   try {

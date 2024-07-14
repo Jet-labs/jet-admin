@@ -435,6 +435,52 @@ class TableService {
       throw error;
     }
   };
+
+  /**
+   *
+   * @param {object} param0
+   * @param {String} param0.table_name
+   * @param {any} param0.query
+   * @param {Array<any>} param0.authorized_rows
+   * @returns {any|null}
+   */
+  static deleteTableRowByMultipleIDs = async ({
+    table_name,
+    query,
+    authorized_rows,
+  }) => {
+    Logger.log("info", {
+      message: "TableService:deleteTableRowByMultipleIDs:params",
+      params: {
+        table_name,
+        query,
+        authorized_rows,
+      },
+    });
+    try {
+      const deletedRows =
+        authorized_rows === false
+          ? null
+          : await prisma[table_name].delete({
+              where:
+                authorized_rows === true
+                  ? {
+                      ...query,
+                    }
+                  : { AND: [authorized_rows, { ...query }] },
+            });
+      Logger.log("success", {
+        message: "TableService:deleteTableRowByMultipleIDs:deleted",
+      });
+      return deletedRows;
+    } catch (error) {
+      Logger.log("error", {
+        message: "TableService:deleteTableRowByMultipleIDs:catch-1",
+        params: { error },
+      });
+      throw error;
+    }
+  };
 }
 
 module.exports = { TableService };

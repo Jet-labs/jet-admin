@@ -194,6 +194,8 @@ export const LOCAL_CONSTANTS = {
         `/admin_api/tables/${tableName}/${id}`,
       deleteTableRowByID: ({ tableName, id }) =>
         `/admin_api/tables/${tableName}/${id}`,
+      deleteTableRowByMultipleIDs: ({ tableName }) =>
+        `/admin_api/tables/${tableName}/delete`,
     },
 
     ACTION: {

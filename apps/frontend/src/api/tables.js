@@ -215,3 +215,23 @@ export const deleteRowByIDAPI = async ({ tableName, id }) => {
     throw error;
   }
 };
+
+export const deleteRowByMultipleIDsAPI = async ({ tableName, ids }) => {
+  try {
+    const response = await axiosInstance.post(
+      LOCAL_CONSTANTS.APIS.TABLE.deleteTableRowByMultipleIDs({
+        tableName,
+      }),
+      { query: ids }
+    );
+    if (response.data && response.data.success == true) {
+      return true;
+    } else if (response.data.error) {
+      throw response.data.error;
+    } else {
+      throw LOCAL_CONSTANTS.ERROR_CODES.SERVER_ERROR;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
