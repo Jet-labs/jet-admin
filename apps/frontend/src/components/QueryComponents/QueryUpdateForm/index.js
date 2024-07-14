@@ -103,7 +103,6 @@ export const QueryUpdateForm = ({ id }) => {
     updateQuery(queryBuilderForm.values);
   };
 
-  console.log({ queryData });
   return (
     <div className="w-full !h-[calc(100vh-123px)]">
       <div

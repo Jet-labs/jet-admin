@@ -17,7 +17,9 @@ export const PGSQLQueryResponseJSONTab = ({ json }) => {
         width: "100%",
         borderWidth: 1,
         borderColor: theme.palette.divider,
+        borderRadius: 4,
       }}
+      className="codemirror-editor-rounded"
     />
   );
 };

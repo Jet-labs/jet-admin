@@ -51,6 +51,7 @@ export const GraphDrawerList = () => {
   const _navigateToAddMoreGraph = () => {
     navigate(LOCAL_CONSTANTS.ROUTES.ADD_GRAPH.path());
   };
+ 
   return (
     <List
       style={{
@@ -89,7 +90,7 @@ export const GraphDrawerList = () => {
         </div>
       )}
       <div className="!mt-1"></div>
-      {graphs && graphs.length > 0 && false
+      {graphs && graphs.length > 0
         ? graphs.map((graph) => {
             const key = `graph_${graph.pm_graph_id}`;
             const graphPlugin = graph.graph_options?.graph_type

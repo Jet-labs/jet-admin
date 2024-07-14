@@ -72,7 +72,9 @@ export const PGSQLQueryBuilder = ({ value, handleChange }) => {
             width: "100%",
             borderWidth: 1,
             borderColor: theme.palette.divider,
+            borderRadius: 4,
           }}
+          className="codemirror-editor-rounded"
         />
         <div className="!flex flex-row justify-between items-center w-100 mt-3">
           {pgQueryData && Array.isArray(pgQueryData) ? (

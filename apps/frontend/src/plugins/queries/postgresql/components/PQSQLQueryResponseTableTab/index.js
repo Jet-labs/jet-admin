@@ -26,7 +26,7 @@ export const PGSQLQueryResponseTableTab = ({ json, dataSchema }) => {
             return { _g_uuid: `_index_${index}`, ...item };
           })}
           columns={columns}
-          className="!w-100 rdg-light"
+          className="!w-100 rdg-light !rounded"
           style={{ borderColor: theme.palette.divider, borderWidth: 1 }}
           rowKeyGetter={(row) => row._g_uuid}
           defaultColumnOptions={{
@@ -36,11 +36,12 @@ export const PGSQLQueryResponseTableTab = ({ json, dataSchema }) => {
         />
       ) : (
         <div
-          className="!h-32 flex !flex-col !justify-center !items-center w-100"
+          className="!h-32 flex !flex-col !justify-center !items-center w-100 "
           style={{
             width: "100%",
             borderWidth: 1,
             borderColor: theme.palette.divider,
+            borderRadius: 4,
           }}
         >
           <span>No data</span>

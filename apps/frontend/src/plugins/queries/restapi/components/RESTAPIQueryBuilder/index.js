@@ -1,4 +1,15 @@
-import { Button, Divider, Tab, Tabs, useTheme } from "@mui/material";
+import {
+  Button,
+  Divider,
+  FormControl,
+  Grid,
+  MenuItem,
+  Select,
+  Tab,
+  Tabs,
+  TextField,
+  useTheme,
+} from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { loadLanguage } from "@uiw/codemirror-extensions-langs";
 import { githubLight } from "@uiw/codemirror-theme-github";
@@ -16,6 +27,7 @@ import { RESTAPIQueryResponseRAWTab } from "../RESTAPIQueryResponseRAWTab";
 import { RESTAPIQueryResponseSchemaTab } from "../RESTAPIQueryResponseSchemaTab";
 import { RESTAPIQueryResponseTableTab } from "../RESTAPIQueryResponseTableTab";
 import { QUERY_PLUGINS_MAP } from "../../..";
+import { REST_API_METHODS } from "../../constants";
 
 export const RESTAPIQueryBuilder = ({ value, handleChange }) => {
   const theme = useTheme();
@@ -54,26 +66,43 @@ export const RESTAPIQueryBuilder = ({ value, handleChange }) => {
     runRESTAPIQuery({ raw_query: value?.raw_query });
   };
 
-  const _handleOnRAWQueryChange = (value) => {
-    handleChange({ raw_query: value });
+  const _handleOnRESTAPIURLChange = (value) => {
+    handleChange({ url: value });
   };
 
   return (
     <div className="!flex flex-col justify-start items-stretch w-100 px-3">
-      <div className="w-100 ">
-        <CodeMirror
-          value={value ? value.raw_query : ""}
-          height="200px"
-          extensions={[loadLanguage("pgsql")]}
-          onChange={_handleOnRAWQueryChange}
-          theme={githubLight}
-          style={{
-            marginTop: 20,
-            width: "100%",
-            borderWidth: 1,
-            borderColor: theme.palette.divider,
-          }}
-        />
+      <Grid container className="!w-full">
+        <Grid item sx={4} md={4} lg={4} className="w-full !pr-1">
+          <FormControl size="small" className="!mt-2 !w-full">
+            <span className="text-xs font-light  !capitalize mb-1">{`Method`}</span>
+            <Select>
+              {Object.keys(REST_API_METHODS).map((methodValue) => {
+                return (
+                  <MenuItem
+                    value={REST_API_METHODS[methodValue].value}
+                    className="!break-words !whitespace-pre-line"
+                    key={methodValue}
+                  >
+                    {REST_API_METHODS[methodValue].name}
+                  </MenuItem>
+                );
+              })}
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid item sx={8} md={8} lg={8} className="w-full !pl-1">
+          <FormControl size="small" className="!mt-2 !w-full">
+            <span className="text-xs font-light  !capitalize mb-1">{`Rest API URL`}</span>
+            <TextField
+              value={value ? value.url : ""}
+              placeholder="https://mock.api/todo"
+              onChange={_handleOnRESTAPIURLChange}
+              fullWidth
+            />
+          </FormControl>
+        </Grid>
+
         <div className="!flex flex-row justify-between items-center w-100 mt-3">
           {restAPIQueryData && Array.isArray(restAPIQueryData) ? (
             <span>{`Result : ${restAPIQueryData.length}`}</span>
@@ -88,7 +117,7 @@ export const RESTAPIQueryBuilder = ({ value, handleChange }) => {
             >{`Test query`}</Button>
           </div>
         </div>
-      </div>
+      </Grid>
 
       <Tabs
         value={tab}
