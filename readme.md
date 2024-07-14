@@ -52,6 +52,17 @@ Getting Started
 
 To get started with the project, follow the instructions in the `frontend/README.md` and `backend/README.md` files to set up the frontend and backend components respectively.
 
+Road Map
+--------
+New features
+- [ ] Bulk Delete
+- [ ] Javascript based query
+- [ ] Rest API based query
+- [ ] Data Definition Language (DDL) : Create, Alter, Drop, Truncate
+- [ ] Javascript based actions
+- [ ] GUI action builder
+- [ ] GUI form builder to connect to actions
+
 Contributing
 ------------
 
