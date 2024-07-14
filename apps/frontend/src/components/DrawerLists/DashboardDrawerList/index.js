@@ -83,63 +83,65 @@ export const DashboardsList = () => {
         </div>
       )}
       <div className="!mt-1"></div>
-      {dashboards?.map((dashboard) => {
-        const key = `dashboard_${dashboard.pm_dashboard_id}`;
-        return (
-          <Link
-            to={LOCAL_CONSTANTS.ROUTES.GRAPH_VIEW.path(
-              dashboard.pm_dashboard_id
-            )}
-            key={key}
-          >
-            <ListItem
-              key={`_dashboard_${dashboard.pm_dashboard_id}`}
-              disablePadding
-              className="!px-3 !py-1.5"
-            >
-              <ListItemButton
-                sx={{
-                  background: theme.palette.background.paper,
-                  border: key == currentPage ? 1 : 0,
-                  borderColor: theme.palette.primary.main,
-                }}
-                selected={key == currentPage}
-                className="!rounded"
+      {dashboards && dashboards.length > 0
+        ? dashboards.map((dashboard) => {
+            const key = `dashboard_${dashboard.pm_dashboard_id}`;
+            return (
+              <Link
+                to={LOCAL_CONSTANTS.ROUTES.GRAPH_VIEW.path(
+                  dashboard.pm_dashboard_id
+                )}
+                key={key}
               >
-                <ListItemIcon
-                  className="!ml-1"
-                  sx={{
-                    color:
-                      key == currentPage
-                        ? theme.palette.primary.main
-                        : theme.palette.primary.contrastText,
-                    minWidth: 0,
-                  }}
+                <ListItem
+                  key={`_dashboard_${dashboard.pm_dashboard_id}`}
+                  disablePadding
+                  className="!px-3 !py-1.5"
                 >
-                  <FaChalkboardTeacher className="!text-sm" />
-                </ListItemIcon>
-                <ListItemText
-                  sx={{
-                    color:
-                      key == currentPage
-                        ? theme.palette.primary.main
-                        : theme.palette.primary.contrastText,
-                  }}
-                  primary={dashboard.dashboard_title}
-                  primaryTypographyProps={{
-                    sx: {
-                      fontWeight: key == currentPage ? "700" : "500",
-                      fontSize: 12,
-                      marginLeft: 2,
-                    },
-                  }}
-                />
-              </ListItemButton>
-            </ListItem>
-            {/* <Divider className="!mx-4" /> */}
-          </Link>
-        );
-      })}
+                  <ListItemButton
+                    sx={{
+                      background: theme.palette.background.paper,
+                      border: key == currentPage ? 1 : 0,
+                      borderColor: theme.palette.primary.main,
+                    }}
+                    selected={key == currentPage}
+                    className="!rounded"
+                  >
+                    <ListItemIcon
+                      className="!ml-1"
+                      sx={{
+                        color:
+                          key == currentPage
+                            ? theme.palette.primary.main
+                            : theme.palette.primary.contrastText,
+                        minWidth: 0,
+                      }}
+                    >
+                      <FaChalkboardTeacher className="!text-sm" />
+                    </ListItemIcon>
+                    <ListItemText
+                      sx={{
+                        color:
+                          key == currentPage
+                            ? theme.palette.primary.main
+                            : theme.palette.primary.contrastText,
+                      }}
+                      primary={dashboard.dashboard_title}
+                      primaryTypographyProps={{
+                        sx: {
+                          fontWeight: key == currentPage ? "700" : "500",
+                          fontSize: 12,
+                          marginLeft: 2,
+                        },
+                      }}
+                    />
+                  </ListItemButton>
+                </ListItem>
+                {/* <Divider className="!mx-4" /> */}
+              </Link>
+            );
+          })
+        : null}
     </List>
   );
 };

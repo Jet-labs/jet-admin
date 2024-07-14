@@ -6,11 +6,14 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { ConfirmationDialog } from "../../ConfirmationDialog";
 import { IoTrash } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
+import { LOCAL_CONSTANTS } from "../../../constants";
 export const QueryDeletionForm = ({ pmQueryID }) => {
   const { pmUser } = useAuthState();
   const queryClient = useQueryClient();
   const [isDeleteQueryConfirmationOpen, setIsDeleteQueryConfirmationOpen] =
     useState(false);
+  const navigate = useNavigate();
 
   const deleteQueryAuthorization = useMemo(() => {
     if (pmUser) {
@@ -30,8 +33,10 @@ export const QueryDeletionForm = ({ pmQueryID }) => {
     mutationFn: ({ pmQueryID }) => deleteQueryByIDAPI({ pmQueryID }),
     retry: false,
     onSuccess: () => {
-      displaySuccess("Deleted row successfully");
+      displaySuccess("Deleted query successfully");
       queryClient.invalidateQueries(["REACT_QUERY_KEY_QUERIES"]);
+      navigate(LOCAL_CONSTANTS.ROUTES.ALL_QUERIES.path());
+      setIsDeleteQueryConfirmationOpen(false);
     },
     onError: (error) => {
       displayError(error);

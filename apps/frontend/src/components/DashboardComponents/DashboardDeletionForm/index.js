@@ -7,9 +7,12 @@ import { displayError, displaySuccess } from "../../../utils/notification";
 import { ConfirmationDialog } from "../../ConfirmationDialog";
 import { IoTrash } from "react-icons/io5";
 import { deleteDashboardByIDAPI } from "../../../api/dashboards";
+import { useNavigate } from "react-router-dom";
+import { LOCAL_CONSTANTS } from "../../../constants";
 export const DashboardDeletionForm = ({ dashboardID }) => {
   const { pmUser } = useAuthState();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [
     isDeleteDashboardConfirmationOpen,
     setIsDeleteDashboardConfirmationOpen,
@@ -37,6 +40,8 @@ export const DashboardDeletionForm = ({ dashboardID }) => {
     onSuccess: () => {
       displaySuccess("Deleted dashboard layout successfully");
       queryClient.invalidateQueries([`REACT_QUERY_KEY_GRAPH`]);
+      setIsDeleteDashboardConfirmationOpen(false);
+      navigate(LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.path());
     },
     onError: (error) => {
       displayError(error);

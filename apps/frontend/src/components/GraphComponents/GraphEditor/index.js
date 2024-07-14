@@ -22,6 +22,7 @@ import { GRAPH_PLUGINS_MAP } from "../../../plugins/graphs";
 import { QUERY_PLUGINS_MAP } from "../../../plugins/queries";
 import { FieldComponent } from "../../FieldComponent";
 import { Link } from "react-router-dom";
+import { GraphDeletionForm } from "../GraphDeletionForm";
 
 /**
  *
@@ -29,7 +30,7 @@ import { Link } from "react-router-dom";
  * @param {import("formik").FormikConfig} param0.graphForm
  * @returns
  */
-export const GraphEditor = ({ graphForm }) => {
+export const GraphEditor = ({ graphID, graphForm }) => {
   const theme = useTheme();
 
   const {
@@ -400,6 +401,9 @@ export const GraphEditor = ({ graphForm }) => {
           <Button variant="contained" onClick={_handleSubmit}>
             Submit
           </Button>
+          {(graphID != null || graphID != undefined) && (
+            <GraphDeletionForm graphID={graphID} />
+          )}
         </Grid>
       </Grid>
     </form>

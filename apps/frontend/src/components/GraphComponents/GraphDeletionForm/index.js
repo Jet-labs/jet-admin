@@ -7,8 +7,11 @@ import { displayError, displaySuccess } from "../../../utils/notification";
 import { ConfirmationDialog } from "../../ConfirmationDialog";
 import { IoTrash } from "react-icons/io5";
 import { deleteGraphByIDAPI } from "../../../api/graphs";
+import { useNavigate } from "react-router-dom";
+import { LOCAL_CONSTANTS } from "../../../constants";
 export const GraphDeletionForm = ({ graphID }) => {
   const { pmUser } = useAuthState();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isDeleteGraphConfirmationOpen, setIsDeleteGraphConfirmationOpen] =
     useState(false);
@@ -34,6 +37,8 @@ export const GraphDeletionForm = ({ graphID }) => {
     retry: false,
     onSuccess: () => {
       displaySuccess("Deleted graph layout successfully");
+      setIsDeleteGraphConfirmationOpen(false);
+      navigate(LOCAL_CONSTANTS.ROUTES.ALL_GRAPHS.path());
       queryClient.invalidateQueries([`REACT_QUERY_KEY_GRAPH`]);
     },
     onError: (error) => {

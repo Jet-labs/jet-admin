@@ -63,7 +63,7 @@ export const deleteGraphByIDAPI = async ({ graphID }) => {
       LOCAL_CONSTANTS.APIS.GRAPH.deleteGraphByID({ id: graphID })
     );
     if (response.data && response.data.success == true) {
-      return new Graph(response.data.graph);
+      return true;
     } else if (response.data.error) {
       throw response.data.error;
     } else {

@@ -1,5 +1,5 @@
 import { Button, Grid, useTheme } from "@mui/material";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React from "react";
 
 import { useFormik } from "formik";
@@ -15,6 +15,7 @@ import { addDashboardAPI } from "../../../api/dashboards";
 
 export const DashboardAdditionForm = () => {
   const theme = useTheme();
+  const queryClient = useQueryClient();
   const {
     isPending: isAddingDashboard,
     isSuccess: isAddingDashboardSuccess,
@@ -28,6 +29,7 @@ export const DashboardAdditionForm = () => {
     retry: false,
     onSuccess: () => {
       displaySuccess("Added dashboard successfully");
+      queryClient.invalidateQueries([`REACT_QUERY_KEY_GRAPH`]);
     },
     onError: (error) => {
       displayError(error);

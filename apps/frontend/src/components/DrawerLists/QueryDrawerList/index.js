@@ -86,106 +86,67 @@ export const QueryDrawerList = () => {
       )}
       <div className="!mt-1"></div>
 
-      {queries ? (
-        queries.map((query) => {
-          const key = `query_${query.pm_query_id}`;
-          return (
-            <Link
-              to={LOCAL_CONSTANTS.ROUTES.QUERY_VIEW.path(query.pm_query_id)}
-              key={key}
-            >
-              <ListItem
-                key={`_query_${query.pm_query_id}`}
-                disablePadding
-                sx={{}}
-                className="!px-3 !py-1.5"
+      {queries && queries.length > 0
+        ? queries.map((query) => {
+            const key = `query_${query.pm_query_id}`;
+            return (
+              <Link
+                to={LOCAL_CONSTANTS.ROUTES.QUERY_VIEW.path(query.pm_query_id)}
+                key={key}
               >
-                <ListItemButton
-                  sx={{
-                    background: theme.palette.background.paper,
-                    border: key == currentPage ? 1 : 0,
-                    borderColor: theme.palette.primary.main,
-                  }}
-                  selected={key == currentPage}
-                  className="!rounded"
+                <ListItem
+                  key={`_query_${query.pm_query_id}`}
+                  disablePadding
+                  sx={{}}
+                  className="!px-3 !py-1.5"
                 >
-                  <ListItemIcon
-                    className="!ml-1"
+                  <ListItemButton
                     sx={{
-                      color:
-                        key == currentPage
-                          ? theme.palette.primary.main
-                          : theme.palette.primary.contrastText,
-                      minWidth: 0,
+                      background: theme.palette.background.paper,
+                      border: key == currentPage ? 1 : 0,
+                      borderColor: theme.palette.primary.main,
                     }}
+                    selected={key == currentPage}
+                    className="!rounded"
                   >
-                    {QUERY_PLUGINS_MAP[query.pm_query_type] ? (
-                      QUERY_PLUGINS_MAP[query.pm_query_type].icon
-                    ) : (
-                      <FaCloudSun className="!text-sm" />
-                    )}
-                  </ListItemIcon>
-                  <ListItemText
-                    sx={{
-                      color:
-                        key == currentPage
-                          ? theme.palette.primary.main
-                          : theme.palette.primary.contrastText,
-                    }}
-                    primary={query.pm_query_title}
-                    primaryTypographyProps={{
-                      sx: {
-                        fontWeight: key == currentPage ? "700" : "500",
-                        marginLeft: 2,
-                        fontSize: 12,
-                      },
-                    }}
-                  />
-                </ListItemButton>
-              </ListItem>
-            </Link>
-          );
-        })
-      ) : (
-        <Link to={`${LOCAL_CONSTANTS.ROUTES.ADD_QUERY.path()}`}>
-          <ListItem
-            key={`_query_-1`}
-            disablePadding
-            sx={{}}
-            className="!px-3 !py-1.5"
-          >
-            <ListItemButton
-              sx={{
-                background: theme.palette.background.default,
-                border: `1px dotted`,
-                borderColor: theme.palette.info.main,
-                borderWidth: 2,
-                marginTop: 1,
-              }}
-              className="!rounded  !flex !flex-row !justify-between !items-center !w-full"
-            >
-              <ListItemIcon
-                sx={{
-                  color: theme.palette.primary.contrastText,
-                }}
-              >
-                <FaPlus className="!text-sm" />
-              </ListItemIcon>
-              <ListItemText
-                sx={{
-                  color: theme.palette.primary.contrastText,
-                }}
-                primary={`No queries found`}
-                primaryTypographyProps={{
-                  sx: {
-                    marginLeft: -2,
-                  },
-                }}
-              />
-            </ListItemButton>
-          </ListItem>
-        </Link>
-      )}
+                    <ListItemIcon
+                      className="!ml-1"
+                      sx={{
+                        color:
+                          key == currentPage
+                            ? theme.palette.primary.main
+                            : theme.palette.primary.contrastText,
+                        minWidth: 0,
+                      }}
+                    >
+                      {QUERY_PLUGINS_MAP[query.pm_query_type] ? (
+                        QUERY_PLUGINS_MAP[query.pm_query_type].icon
+                      ) : (
+                        <FaCloudSun className="!text-sm" />
+                      )}
+                    </ListItemIcon>
+                    <ListItemText
+                      sx={{
+                        color:
+                          key == currentPage
+                            ? theme.palette.primary.main
+                            : theme.palette.primary.contrastText,
+                      }}
+                      primary={query.pm_query_title}
+                      primaryTypographyProps={{
+                        sx: {
+                          fontWeight: key == currentPage ? "700" : "500",
+                          marginLeft: 2,
+                          fontSize: 12,
+                        },
+                      }}
+                    />
+                  </ListItemButton>
+                </ListItem>
+              </Link>
+            );
+          })
+        : null}
     </List>
   );
 };

@@ -1,5 +1,5 @@
 import { Grid } from "@mui/material";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import React from "react";
 import { addGraphAPI } from "../../../api/graphs";
@@ -12,6 +12,7 @@ import { GraphEditor } from "../GraphEditor";
 
 export const GraphAdditionForm = () => {
   const theme = useTheme();
+  const queryClient = useQueryClient();
   const {
     isPending: isAddingGraph,
     isSuccess: isAddingGraphSuccess,
@@ -25,6 +26,7 @@ export const GraphAdditionForm = () => {
     retry: false,
     onSuccess: () => {
       displaySuccess("Added graph successfully");
+      queryClient.invalidateQueries([`REACT_QUERY_KEY_GRAPH`]);
     },
     onError: (error) => {
       displayError(error);

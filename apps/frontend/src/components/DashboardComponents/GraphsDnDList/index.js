@@ -49,7 +49,7 @@ export const GraphsDnDList = ({}) => {
         className="!text-xs !font-medium !py-1 !px-0"
         style={{ background: theme.palette.background.default }}
       >{`Drag and drop graphs`}</ListSubheader>
-      {graphs ? (
+      {graphs && graphs.length > 0 ? (
         graphs.map((graph, index) => {
           const key = `graph_${graph.pm_graph_id}`;
           return (
@@ -57,10 +57,6 @@ export const GraphsDnDList = ({}) => {
               key={`graph_${graph.pm_graph_id}`}
               id={`graph_${graph.pm_graph_id}`}
               disablePadding
-              // sx={{
-              //   borderRight: 0,
-              //   borderColor: theme.palette.primary.main,
-              // }}
               draggable
               onDragStart={_handleDragStart}
               className="draggable-graph-item"
