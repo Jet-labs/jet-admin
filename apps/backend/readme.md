@@ -9,8 +9,41 @@ Installation
 To install the backend dependencies, run the following command in the terminal:
 
 `npm install`
-
 This will install all the required dependencies listed in the `package.json` file.
+
+Add value of below variables in `development.env` & `production.env` file.
+
+`DATABASE_URL="postgresql://_____________"`
+`JWT_ACCESS_TOKEN_SECRET =""`
+`JWT_REFRESH_TOKEN_SECRET =""`
+
+Add the same `DATABASE_URL` variable in `package.json` file of backend project
+
+Now run below command to pull database schema from your existing database entered above.
+
+For windows : `npm run prisma-pull-db-dev-w`
+For linux : `npm run prisma-pull-db-dev`
+
+If a schema file is made in `/schema` folder then it means that database is connected.
+
+Now lets run an initial script to setup some more tables in your database.
+
+For windows : `npm run db-setup-w`
+For linux : `npm run db-setup`
+
+This will create required tables and records in your connected databse starting with `tbl_pm` prefix
+
+The project uses Prisma ORM as a database connection layer for which we need to generate types of our imported table schema.
+
+For windows : `npx prisma generate`
+For linux : `npx prisma generate`
+
+You can view the database records in prisma studio with below command
+
+For windows : `npm run prisma-studio-dev-w`
+For linux : `npm run prisma-studio-dev`
+
+
 
 Scripts
 -------
@@ -34,26 +67,8 @@ The following npm scripts are available for managing the backend:
 Dependencies
 ------------
 
-The backend relies on the following dependencies:
-
--   Express: Fast, unopinionated, minimalist web framework for Node.js.
--   Prisma: Next-generation ORM for Node.js and TypeScript.
--   Axios: Promise-based HTTP client for the browser and Node.js.
--   Bcrypt: Library to help you hash passwords.
--   Dotenv: Loads environment variables from a `.env` file.
--   JWT (jsonwebtoken): JSON Web Token implementation.
--   Socket.io: Real-time bidirectional event-based communication.
--   Winston: Logging library for Node.js.
--   PM2: Production process manager for Node.js applications.
-
 For a complete list of dependencies and their versions, refer to the `package.json` file.
 
-Development Dependencies
-------------------------
-
--   Nodemon: Utility that monitors for changes and automatically restarts the server.
--   Prisma CLI: Command-line interface for Prisma schema migrations.
--   Prisma JSON Schema Generator: Generates JSON schema from Prisma schema.
 
 License
 -------

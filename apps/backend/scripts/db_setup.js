@@ -82,20 +82,45 @@ const create_user_table_query = `
 )
 `;
 
-const create_graph_table_query = `CREATE TABLE IF NOT EXISTS public.tbl_pm_graphs
-(
-    pm_graph_id serial NOT NULL,
-    graph_title character varying COLLATE pg_catalog."default" NOT NULL,
-    graph_description character varying COLLATE pg_catalog."default",
-    is_disabled boolean DEFAULT false,
-    created_at timestamp(6) with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at timestamp(6) with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    disabled_at timestamp(6) with time zone,
-    disable_reason character varying COLLATE pg_catalog."default",
-    graph_options jsonb,
-    CONSTRAINT tbl_pm_graphs_pkey PRIMARY KEY (pm_graph_id)
+const create_graph_table_query = `CREATE TABLE public.tbl_pm_graphs (
+	pm_graph_id serial4 NOT NULL,
+	graph_title varchar NOT NULL,
+	graph_description varchar NULL,
+	is_disabled bool DEFAULT false NULL,
+	created_at timestamptz(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	updated_at timestamptz(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	disabled_at timestamptz(6) NULL,
+	disable_reason varchar NULL,
+	graph_options jsonb NULL,
+	CONSTRAINT tbl_pm_graphs_pkey PRIMARY KEY (pm_graph_id)
 );`;
 
+const create_query_table_query = `CREATE TABLE public.tbl_pm_queries (
+	pm_query_id serial4 NOT NULL,
+	pm_query_type varchar DEFAULT 'POSTGRE_QUERY'::character varying NULL,
+	created_at timestamptz(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	updated_at timestamptz(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	disabled_at timestamptz(6) NULL,
+	is_disabled bool DEFAULT false NULL,
+	pm_query_title varchar DEFAULT 'Untitled'::character varying NOT NULL,
+	pm_query_description varchar NULL,
+	pm_query json NULL,
+	CONSTRAINT tbl_pm_queries_pk PRIMARY KEY (pm_query_id)
+);`;
+
+const create_dashboard_table_query = `CREATE TABLE public.tbl_pm_dashboards (
+	pm_dashboard_id int4 DEFAULT nextval('tbl_pm_dashboard_layouts_pm_dashboard_layout_id_seq'::regclass) NOT NULL,
+	dashboard_title varchar NOT NULL,
+	dashboard_description varchar NULL,
+	is_disabled bool DEFAULT false NULL,
+	created_at timestamptz(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	updated_at timestamptz(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	disabled_at timestamptz(6) NULL,
+	disable_reason varchar NULL,
+	dashboard_options jsonb NULL,
+	dashboard_graph_ids _int4 NULL,
+	CONSTRAINT tbl_pm_dashboard_layout_pkey PRIMARY KEY (pm_dashboard_id)
+);`;
 const super_admin_policy_query = `
       INSERT INTO tbl_pm_policy_objects(title, description, is_disabled, policy)
       VALUES($1, $2, $3, $4)
@@ -139,6 +164,8 @@ async function setup_database() {
     await client.query(create_policy_table_query);
     await client.query(create_user_table_query);
     await client.query(create_graph_table_query);
+    await client.query(create_query_table_query);
+    await client.query(create_dashboard_table_query);
     await client.query("COMMIT");
 
     Logger.log("success", {
