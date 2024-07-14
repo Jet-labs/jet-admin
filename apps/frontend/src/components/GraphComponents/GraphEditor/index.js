@@ -5,6 +5,9 @@ import {
   FormControlLabel,
   Grid,
   IconButton,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
   MenuItem,
   Select,
   TextField,
@@ -12,12 +15,13 @@ import {
 } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
-import { FaTimes } from "react-icons/fa";
+import { FaPlus, FaTimes } from "react-icons/fa";
 import { getAllQueryAPI } from "../../../api/queries";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { GRAPH_PLUGINS_MAP } from "../../../plugins/graphs";
 import { QUERY_PLUGINS_MAP } from "../../../plugins/queries";
 import { FieldComponent } from "../../FieldComponent";
+import { Link } from "react-router-dom";
 
 /**
  *
@@ -178,8 +182,7 @@ export const GraphEditor = ({ graphForm }) => {
           </Button>
         </Grid>
 
-        {queries &&
-          queries.length > 0 &&
+        {queries && queries.length && false > 0 ? (
           graphForm.values["query_array"]?.map((dataset, index) => {
             return (
               <Grid
@@ -343,7 +346,56 @@ export const GraphEditor = ({ graphForm }) => {
                 </Grid>
               </Grid>
             );
-          })}
+          })
+        ) : (
+          <Grid
+            className="!rounded  !mt-3 !ml-3.5 !pr-3 !py-3"
+            sx={{
+              background: theme.palette.background.default,
+            }}
+            rowSpacing={2}
+            columnSpacing={2}
+            container
+            xs={12}
+            sm={12}
+            md={12}
+            lg={12}
+          >
+            <Link
+              to={`../../${LOCAL_CONSTANTS.ROUTES.ALL_QUERIES.path()}/${LOCAL_CONSTANTS.ROUTES.ADD_QUERY.path()}`}
+            >
+              <ListItemButton
+                sx={{
+                  background: theme.palette.background.default,
+                  border: `1px dotted`,
+                  borderColor: theme.palette.info.main,
+                  borderWidth: 2,
+                  marginTop: 1,
+                }}
+                className="!rounded  !flex !flex-row !justify-between !items-center !w-full"
+              >
+                <ListItemIcon
+                  sx={{
+                    color: theme.palette.primary.contrastText,
+                  }}
+                >
+                  <FaPlus className="!text-sm" />
+                </ListItemIcon>
+                <ListItemText
+                  sx={{
+                    color: theme.palette.primary.contrastText,
+                  }}
+                  primary={`No queries found. Configure queries to add them as datasets of graph`}
+                  primaryTypographyProps={{
+                    sx: {
+                      marginLeft: -2,
+                    },
+                  }}
+                />
+              </ListItemButton>
+            </Link>
+          </Grid>
+        )}
         <Grid item xs={12} sm={12} md={12} lg={12} key={"submit"}>
           <Button variant="contained" onClick={_handleSubmit}>
             Submit

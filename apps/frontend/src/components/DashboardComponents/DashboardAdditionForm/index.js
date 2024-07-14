@@ -75,19 +75,24 @@ export const DashboardAdditionForm = () => {
           lg={3}
           md={3}
           sm={4}
-          className="w-full !border-r !border-white !border-opacity-10  !h-[calc(100vh-48px)] !overflow-y-auto"
+          className="w-full !h-[calc(100vh-48px)] !overflow-y-auto"
+          style={{
+            background: theme.palette.background.default,
+            borderLeftWidth: 1,
+            borderColor: theme.palette.divider,
+          }}
         >
           <Grid sm={12} className="!top-0 !sticky !z-50">
             <div
-              className="flex flex-row justify-start items-center p-3 !border-b !border-white !border-opacity-10"
-              style={{ background: theme.palette.background.paper }}
+              className="flex flex-row justify-start items-center p-3"
+              style={{ background: theme.palette.background.default }}
             >
               <FiPlus className="!text-base !font-semibold" />
               <span className="text-sm font-semibold text-start ml-2">{`Add new dashboard`}</span>
             </div>
             <div
-              className="flex flex-col justify-center items-start p-3 !border-b !border-white !border-opacity-10"
-              style={{ background: theme.palette.background.paper }}
+              className="flex flex-col justify-center items-start p-3"
+              style={{ background: theme.palette.background.default }}
             >
               <FieldComponent
                 name={"dashboard_title"}

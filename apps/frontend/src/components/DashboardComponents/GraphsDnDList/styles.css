@@ -1,4 +1,4 @@
-.draggable-graph-item.dragging {
+.draggable-graph-item:dragging {
   opacity: 1 !important;
   border: 1px solid red !important
 }
