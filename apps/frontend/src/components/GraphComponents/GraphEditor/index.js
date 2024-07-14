@@ -182,7 +182,7 @@ export const GraphEditor = ({ graphForm }) => {
           </Button>
         </Grid>
 
-        {queries && queries.length && false > 0 ? (
+        {queries && queries.length > 0 ? (
           graphForm.values["query_array"]?.map((dataset, index) => {
             return (
               <Grid
