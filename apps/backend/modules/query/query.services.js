@@ -234,7 +234,7 @@ class QueryService {
             : result,
         },
       });
-      return result;
+      return result.result;
     } catch (error) {
       Logger.log("error", {
         message: "QueryService:runQuery:catch-1",

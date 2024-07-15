@@ -30,7 +30,7 @@ import { RESTAPIQueryResponseTableTab } from "../RESTAPIQueryResponseTableTab";
 import { QUERY_PLUGINS_MAP } from "../../..";
 import { REST_API_METHODS } from "../../constants";
 
-export const RESTAPIQueryBuilder = ({ value, handleChange }) => {
+export const RESTAPIQueryBuilder = ({ pmQueryID, value, handleChange }) => {
   const theme = useTheme();
   const [tab, setTab] = React.useState(0);
   const [dataSchema, setDataSchema] = useState();

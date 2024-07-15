@@ -1,7 +1,19 @@
+const Logger = require("../../utils/logger");
 const { PostgreSQL } = require("./postgresql/models");
 const { getProcessedPostgreSQLQuery } = require("./postgresql/parsers");
 
 const QUERY_PLUGINS_MAP = {
+  POSTGRE_QUERY: {
+    name: "Postgre query",
+    value: "POSTGRE_QUERY",
+    getQueryModel: ({ pmQuery }) => new PostgreSQL(pmQuery),
+    getEvaluatedQuery: async ({ pmQuery }) => {
+      const r = await getProcessedPostgreSQLQuery({
+        rawQuery: pmQuery.raw_query,
+      });
+      return { ...pmQuery, ...r };
+    },
+  },
   REST_API: {
     name: "Rest API",
     value: "REST_API",
@@ -11,16 +23,6 @@ const QUERY_PLUGINS_MAP = {
         rawQuery: pmQuery.raw_query,
       });
       return { ...pmQuery, ...r };
-    },
-  },
-  POSTGRE_QUERY: {
-    name: "Postgre query",
-    value: "POSTGRE_QUERY",
-    getQueryModel: ({ pmQuery }) => new PostgreSQL(pmQuery),
-    getEvaluatedQuery: async ({ pmQuery }) => {
-      return await getProcessedPostgreSQLQuery({
-        rawQuery: pmQuery.raw_query,
-      });
     },
   },
 };

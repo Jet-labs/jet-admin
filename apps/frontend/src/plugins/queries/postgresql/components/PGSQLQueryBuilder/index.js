@@ -17,7 +17,7 @@ import { PGSQLQueryResponseSchemaTab } from "../PQSQLQueryResponseSchemaTab";
 import { PGSQLQueryResponseTableTab } from "../PQSQLQueryResponseTableTab";
 import { QUERY_PLUGINS_MAP } from "../../..";
 
-export const PGSQLQueryBuilder = ({ value, handleChange }) => {
+export const PGSQLQueryBuilder = ({ pmQueryID, value, handleChange }) => {
   const theme = useTheme();
   const [tab, setTab] = React.useState(0);
   const [dataSchema, setDataSchema] = useState();
@@ -34,10 +34,10 @@ export const PGSQLQueryBuilder = ({ value, handleChange }) => {
     mutate: runPGQuery,
     data: pgQueryData,
   } = useMutation({
-    mutationFn: ({ raw_query }) => {
+    mutationFn: ({ raw_query, pm_query_id }) => {
       return runQueryAPI({
         pm_query_type: QUERY_PLUGINS_MAP.POSTGRE_QUERY.value,
-        pm_query: { raw_query },
+        pm_query: { raw_query, pm_query_id },
       });
     },
     retry: false,
@@ -51,7 +51,10 @@ export const PGSQLQueryBuilder = ({ value, handleChange }) => {
   });
 
   const _runQuery = () => {
-    runPGQuery({ raw_query: value?.raw_query });
+    runPGQuery({
+      raw_query: value?.raw_query,
+      pm_query_id: pmQueryID,
+    });
   };
 
   const _handleOnRAWQueryChange = (value) => {

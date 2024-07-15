@@ -213,6 +213,7 @@ export const QueryUpdateForm = ({ id }) => {
           className="w-full !h-full !border-l !border-white !border-opacity-10"
         >
           {QUERY_PLUGINS_MAP[queryBuilderForm.values.pm_query_type].component({
+            pmQueryID: id,
             value: queryBuilderForm.values.pm_query,
             handleChange: _handleOnQueryChange,
           })}

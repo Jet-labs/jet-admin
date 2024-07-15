@@ -7,16 +7,24 @@ export const QUERY_PLUGINS_MAP = {
   REST_API: {
     name: "Rest API",
     value: "REST_API",
-    component: ({ value, handleChange }) => (
-      <RESTAPIQueryBuilder value={value} handleChange={handleChange} />
+    component: ({ pmQueryID, value, handleChange }) => (
+      <RESTAPIQueryBuilder
+        pmQueryID={pmQueryID}
+        value={value}
+        handleChange={handleChange}
+      />
     ),
     icon: <TbApi />,
   },
   POSTGRE_QUERY: {
     name: "Postgre query",
     value: "POSTGRE_QUERY",
-    component: ({ value, handleChange }) => (
-      <PGSQLQueryBuilder value={value} handleChange={handleChange} />
+    component: ({ pmQueryID, value, handleChange }) => (
+      <PGSQLQueryBuilder
+        pmQueryID={pmQueryID}
+        value={value}
+        handleChange={handleChange}
+      />
     ),
     icon: <SiPostgresql />,
   },
