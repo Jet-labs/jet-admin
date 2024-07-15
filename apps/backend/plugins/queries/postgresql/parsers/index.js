@@ -99,15 +99,14 @@ const getProcessedPostgreSQLQuery = async ({ rawQuery }) => {
       message: "PostgreSQLQuery:getProcessedQuery:success",
       params: { rawQuery: rawQuery, processedPostgreSQLQuery },
     });
-    return processedPostgreSQLQuery;
+    return { raw_query: processedPostgreSQLQuery };
   } catch (error) {
     Logger.log("error", {
       message: "PostgreSQLQuery:getProcessedQuery:catch-1",
       params: { rawQuery: rawQuery, error },
     });
-    return rawQuery;
+    return { raw_query: rawQuery };
   }
 };
 
 module.exports = { getProcessedPostgreSQLQuery };
-
