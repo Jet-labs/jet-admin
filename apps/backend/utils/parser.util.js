@@ -1,3 +1,5 @@
+const constants = require("../constants");
+
 const evaluateAST = (ast, context) => {
   const traverse = (node, context) => {
     switch (node.type) {
@@ -22,4 +24,34 @@ const evaluateAST = (ast, context) => {
   return traverse(ast, context);
 };
 
-module.exports = { evaluateAST };
+/**
+ *
+ * @param {String} query
+ */
+const extractVariablesFromQuery = (query) => {
+  return query.match(constants.VARIABLE_DETECTION_REGEX);
+};
+
+/**
+ *
+ * @param {String} matchedVariable
+ * @returns
+ */
+const replaceVariableNameWithQueryID = (matchedVariable) => {
+  let pmQueryID = null;
+  const variableWithReplacedQueryID = matchedVariable
+    .slice(2, -2)
+    .replace(constants.PM_QUERY_DETECTION_REGEX, (pmQueryIDString) => {
+      const _pmQueryID = pmQueryIDString.match(
+        constants.PM_QUERY_EXTRACTION_REGEX
+      )[1];
+      pmQueryID = parseInt(_pmQueryID);
+      return `pmq_${_pmQueryID}`;
+    });
+  return { variableWithReplacedQueryID, pmQueryID };
+};
+module.exports = {
+  evaluateAST,
+  extractVariablesFromQuery,
+  replaceVariableNameWithQueryID,
+};

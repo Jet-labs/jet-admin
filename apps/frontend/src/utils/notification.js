@@ -11,7 +11,7 @@ export const displayError = (error) => {
     pauseOnHover: true,
     draggable: false,
     progress: undefined,
-    theme: "dark",
+    theme: "light",
   });
 };
 
@@ -24,7 +24,7 @@ export const displaySuccess = (message) => {
     pauseOnHover: true,
     draggable: false,
     progress: undefined,
-    theme: "dark",
+    theme: "light",
   });
 };
 

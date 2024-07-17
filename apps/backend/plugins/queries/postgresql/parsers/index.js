@@ -3,7 +3,11 @@ const constants = require("../../../../constants");
 const { prisma } = require("../../../../config/prisma");
 const Logger = require("../../../../utils/logger");
 const { PostgreSQL, runPostgreSQLQuery } = require("../models");
-const { evaluateAST } = require("../../../../utils/parser.util");
+const {
+  evaluateAST,
+  extractVariablesFromQuery,
+  replaceVariableNameWithQueryID,
+} = require("../../../../utils/parser.util");
 
 /**
  *
@@ -19,27 +23,19 @@ const getProcessedPostgreSQLQuery = async ({ rawQuery }) => {
     });
     const extractedPmQueryIDs = [];
 
-    const variableMatches = rawQuery.match(constants.VARIABLE_DETECTION_REGEX);
+    const variableMatches = extractVariablesFromQuery(rawQuery);
 
     const replacements = await Promise.all(
       variableMatches.map(async (match) => {
-        const variableWithReplacedQueryID = String(match)
-          .slice(2, -2)
-          .replace(constants.PM_QUERY_DETECTION_REGEX, (pmQueryIDString) => {
-            const pmQueryID = pmQueryIDString.match(
-              constants.PM_QUERY_EXTRACTION_REGEX
-            )[1];
-            extractedPmQueryIDs.push(parseInt(pmQueryID));
-            return `pmq_${pmQueryID}`;
-          });
+        const { variableWithReplacedQueryID, pmQueryID } =
+          replaceVariableNameWithQueryID(match);
+        extractedPmQueryIDs.push(parseInt(pmQueryID));
         const extractedPmQuerys = await prisma.tbl_pm_queries.findMany({
           where: {
             pm_query_id: { in: extractedPmQueryIDs },
           },
         });
-
         const evaluationContext = {};
-
         const extractedPmQuerysPromises = extractedPmQuerys.map(
           async (pmQuery) => {
             return await runPostgreSQLQuery({

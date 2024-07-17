@@ -1,6 +1,5 @@
 import {
   Button,
-  Chip,
   Divider,
   FormControl,
   Grid,
@@ -12,31 +11,30 @@ import {
   useTheme,
 } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
-import { loadLanguage } from "@uiw/codemirror-extensions-langs";
-import { githubLight } from "@uiw/codemirror-theme-github";
-import CodeMirror from "@uiw/react-codemirror";
 import React, { useState } from "react";
 import "react-data-grid/lib/styles.css";
 import jsonSchemaGenerator from "to-json-schema";
+import { QUERY_PLUGINS_MAP } from "../../..";
 import { runQueryAPI } from "../../../../../api/queries";
 import {
   displayError,
   displaySuccess,
 } from "../../../../../utils/notification";
+import { REST_API_METHODS } from "../../constants";
 import { RESTAPIQueryResponseJSONTab } from "../RESTAPIQueryResponseJSONTab";
 import { RESTAPIQueryResponseRAWTab } from "../RESTAPIQueryResponseRAWTab";
 import { RESTAPIQueryResponseSchemaTab } from "../RESTAPIQueryResponseSchemaTab";
-import { RESTAPIQueryResponseTableTab } from "../RESTAPIQueryResponseTableTab";
-import { QUERY_PLUGINS_MAP } from "../../..";
-import { REST_API_METHODS } from "../../constants";
 
 export const RESTAPIQueryBuilder = ({ pmQueryID, value, handleChange }) => {
   const theme = useTheme();
-  const [tab, setTab] = React.useState(0);
-  const [dataSchema, setDataSchema] = useState();
+  const [requestTab, setRequestTab] = React.useState(0);
+  const [responseTab, setResponseTab] = React.useState(0);
 
-  const _handleTabChange = (event, newTab) => {
-    setTab(newTab);
+  const _handleRequestTabChange = (event, newTab) => {
+    setRequestTab(newTab);
+  };
+  const _handleResponseTabChange = (event, newTab) => {
+    setResponseTab(newTab);
   };
 
   const {
@@ -47,15 +45,14 @@ export const RESTAPIQueryBuilder = ({ pmQueryID, value, handleChange }) => {
     mutate: runRESTAPIQuery,
     data: restAPIQueryData,
   } = useMutation({
-    mutationFn: ({ raw_query }) => {
+    mutationFn: ({ raw_query, pm_query_id }) => {
       return runQueryAPI({
         pm_query_type: QUERY_PLUGINS_MAP.REST_API.value,
-        pm_query: { raw_query },
+        pm_query: { raw_query, pm_query_id },
       });
     },
     retry: false,
     onSuccess: (data) => {
-      setDataSchema(jsonSchemaGenerator(Array.isArray(data) ? data[0] : data));
       displaySuccess("Query executed successfully");
     },
     onError: (error) => {
@@ -64,7 +61,7 @@ export const RESTAPIQueryBuilder = ({ pmQueryID, value, handleChange }) => {
   });
 
   const _runQuery = () => {
-    runRESTAPIQuery({ raw_query: value?.raw_query });
+    runRESTAPIQuery({ raw_query: value?.raw_query, pm_query_id: pmQueryID });
   };
 
   const _handleOnURLChange = (e) => {
@@ -74,7 +71,6 @@ export const RESTAPIQueryBuilder = ({ pmQueryID, value, handleChange }) => {
     handleChange({ ...value, method: e.target.value });
   };
 
-  console.log({ value });
   return (
     <div className="!flex flex-col justify-start items-stretch w-100 px-3">
       <Grid container className="!w-full">
@@ -119,9 +115,8 @@ export const RESTAPIQueryBuilder = ({ pmQueryID, value, handleChange }) => {
         </Grid>
         <Grid item sx={12} md={12} lg={12} className="w-full">
           <Tabs
-            value={tab}
-            onChange={_handleTabChange}
-            aria-label="basic tabs example"
+            value={requestTab}
+            onChange={_handleRequestTabChange}
             style={{
               marginTop: 20,
             }}
@@ -151,40 +146,38 @@ export const RESTAPIQueryBuilder = ({ pmQueryID, value, handleChange }) => {
       </Grid>
 
       <Tabs
-        value={tab}
-        onChange={_handleTabChange}
-        aria-label="basic tabs example"
+        value={responseTab}
+        onChange={_handleResponseTabChange}
         style={{
           background: theme.palette.background.paper,
           marginTop: 20,
         }}
       >
-        <Tab label="Table" />
         <Tab label="JSON" />
         <Tab label="Raw" />
         <Tab label="Data Schema" />
+        <Tab label="Headers" />
       </Tabs>
       <Divider style={{ width: "100%" }} />
       <div className="py-3 w-100 flex-grow h-full">
-        {tab === 0 && (
-          <RESTAPIQueryResponseTableTab
-            json={restAPIQueryData ? restAPIQueryData : ""}
-            dataSchema={dataSchema ? dataSchema : ""}
-          />
-        )}
-        {tab === 1 && (
+        {responseTab === 0 && (
           <RESTAPIQueryResponseJSONTab
-            json={restAPIQueryData ? restAPIQueryData : ""}
+            data={restAPIQueryData ? restAPIQueryData : ""}
           />
         )}
-        {tab === 2 && (
+        {responseTab === 1 && (
           <RESTAPIQueryResponseRAWTab
-            json={restAPIQueryData ? restAPIQueryData : ""}
+            data={restAPIQueryData ? restAPIQueryData : ""}
           />
         )}
-        {tab === 3 && (
+        {responseTab === 2 && (
+          <RESTAPIQueryResponseRAWTab
+            data={restAPIQueryData ? restAPIQueryData : ""}
+          />
+        )}
+        {responseTab === 3 && (
           <RESTAPIQueryResponseSchemaTab
-            dataSchema={dataSchema ? dataSchema : ""}
+            data={restAPIQueryData ? restAPIQueryData : ""}
           />
         )}
       </div>

@@ -1,26 +1,23 @@
 import { Button, Divider, Tab, Tabs, useTheme } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
-import { loadLanguage } from "@uiw/codemirror-extensions-langs";
-import { githubLight } from "@uiw/codemirror-theme-github";
-import CodeMirror from "@uiw/react-codemirror";
-import React, { useState } from "react";
+import React from "react";
 import "react-data-grid/lib/styles.css";
-import jsonSchemaGenerator from "to-json-schema";
+
+import { QUERY_PLUGINS_MAP } from "../../..";
 import { runQueryAPI } from "../../../../../api/queries";
 import {
   displayError,
   displaySuccess,
 } from "../../../../../utils/notification";
-import { PGSQLQueryResponseJSONTab } from "../PQSQLQueryResponseJSONTab";
-import { PGSQLQueryResponseRAWTab } from "../PQSQLQueryResponseRAWTab";
-import { PGSQLQueryResponseSchemaTab } from "../PQSQLQueryResponseSchemaTab";
-import { PGSQLQueryResponseTableTab } from "../PQSQLQueryResponseTableTab";
-import { QUERY_PLUGINS_MAP } from "../../..";
+import { PGSQLQueryEditor } from "../PGSQLQueryEditor";
+import { PGSQLQueryResponseJSONTab } from "../PGSQLQueryResponseJSONTab";
+import { PGSQLQueryResponseRAWTab } from "../PGSQLQueryResponseRAWTab";
+import { PGSQLQueryResponseSchemaTab } from "../PGSQLQueryResponseSchemaTab";
+import { PGSQLQueryResponseTableTab } from "../PGSQLQueryResponseTableTab";
 
 export const PGSQLQueryBuilder = ({ pmQueryID, value, handleChange }) => {
   const theme = useTheme();
   const [tab, setTab] = React.useState(0);
-  const [dataSchema, setDataSchema] = useState();
 
   const _handleTabChange = (event, newTab) => {
     setTab(newTab);
@@ -42,7 +39,6 @@ export const PGSQLQueryBuilder = ({ pmQueryID, value, handleChange }) => {
     },
     retry: false,
     onSuccess: (data) => {
-      setDataSchema(jsonSchemaGenerator(Array.isArray(data) ? data[0] : data));
       displaySuccess("Query executed successfully");
     },
     onError: (error) => {
@@ -57,28 +53,10 @@ export const PGSQLQueryBuilder = ({ pmQueryID, value, handleChange }) => {
     });
   };
 
-  const _handleOnRAWQueryChange = (value) => {
-    handleChange({ raw_query: value });
-  };
-
   return (
     <div className="!flex flex-col justify-start items-stretch w-100 px-3">
       <div className="w-100 ">
-        <CodeMirror
-          value={value ? value.raw_query : ""}
-          height="200px"
-          extensions={[loadLanguage("pgsql")]}
-          onChange={_handleOnRAWQueryChange}
-          theme={githubLight}
-          style={{
-            marginTop: 20,
-            width: "100%",
-            borderWidth: 1,
-            borderColor: theme.palette.divider,
-            borderRadius: 4,
-          }}
-          className="codemirror-editor-rounded"
-        />
+        <PGSQLQueryEditor value={value} handleChange={handleChange} />
         <div className="!flex flex-row justify-between items-center w-100 mt-3">
           {pgQueryData && Array.isArray(pgQueryData) ? (
             <span>{`Result : ${pgQueryData.length}`}</span>
@@ -98,7 +76,6 @@ export const PGSQLQueryBuilder = ({ pmQueryID, value, handleChange }) => {
       <Tabs
         value={tab}
         onChange={_handleTabChange}
-        aria-label="basic tabs example"
         style={{
           background: theme.palette.background.paper,
           marginTop: 20,
@@ -112,22 +89,15 @@ export const PGSQLQueryBuilder = ({ pmQueryID, value, handleChange }) => {
       <Divider style={{ width: "100%" }} />
       <div className="py-3 w-100 flex-grow h-full">
         {tab === 0 && (
-          <PGSQLQueryResponseTableTab
-            json={pgQueryData ? pgQueryData : ""}
-            dataSchema={dataSchema ? dataSchema : ""}
-          />
+          <PGSQLQueryResponseTableTab data={pgQueryData ? pgQueryData : ""} />
         )}
         {tab === 1 && (
-          <PGSQLQueryResponseJSONTab json={pgQueryData ? pgQueryData : ""} />
+          <PGSQLQueryResponseJSONTab data={pgQueryData ? pgQueryData : ""} />
         )}
         {tab === 2 && (
-          <PGSQLQueryResponseRAWTab json={pgQueryData ? pgQueryData : ""} />
+          <PGSQLQueryResponseRAWTab data={pgQueryData ? pgQueryData : ""} />
         )}
-        {tab === 3 && (
-          <PGSQLQueryResponseSchemaTab
-            dataSchema={dataSchema ? dataSchema : ""}
-          />
-        )}
+        {tab === 3 && <PGSQLQueryResponseSchemaTab data={pgQueryData} />}
       </div>
     </div>
   );

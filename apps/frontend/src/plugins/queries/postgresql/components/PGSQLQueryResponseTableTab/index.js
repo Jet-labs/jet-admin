@@ -3,10 +3,10 @@ import { capitalize } from "@rigu/js-toolkit";
 import React, { useMemo } from "react";
 import DataGrid from "react-data-grid";
 import "react-data-grid/lib/styles.css";
-
-export const PGSQLQueryResponseTableTab = ({ json, dataSchema }) => {
+import jsonSchemaGenerator from "to-json-schema";
+export const PGSQLQueryResponseTableTab = ({ data }) => {
   const theme = useTheme();
-
+  const dataSchema = jsonSchemaGenerator(Array.isArray(data) ? data[0] : data);
   const columns = useMemo(() => {
     if (dataSchema && dataSchema.properties) {
       return Object.keys(dataSchema.properties).map((key) => {
@@ -20,9 +20,9 @@ export const PGSQLQueryResponseTableTab = ({ json, dataSchema }) => {
       sx={{ width: "100%" }}
       className="!flex !flex-col !justify-center !items-stretch"
     >
-      {json && Array.isArray(json) && json.length ? (
+      {data && Array.isArray(data) && data.length ? (
         <DataGrid
-          rows={json.map((item, index) => {
+          rows={data.map((item, index) => {
             return { _g_uuid: `_index_${index}`, ...item };
           })}
           columns={columns}

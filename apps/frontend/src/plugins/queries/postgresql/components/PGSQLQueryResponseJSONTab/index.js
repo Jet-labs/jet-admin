@@ -1,15 +1,17 @@
 import { useTheme } from "@mui/material";
+import { loadLanguage } from "@uiw/codemirror-extensions-langs";
 import { githubLight } from "@uiw/codemirror-theme-github";
 import CodeMirror from "@uiw/react-codemirror";
-import React from "react";
+import { default as React } from "react";
 import "react-data-grid/lib/styles.css";
 
-export const RESTAPIQueryResponseRAWTab = ({ data }) => {
+export const PGSQLQueryResponseJSONTab = ({ data }) => {
   const theme = useTheme();
   return (
     <CodeMirror
       value={JSON.stringify(data, null, 2)}
       height="400px"
+      extensions={[loadLanguage("json")]}
       theme={githubLight}
       style={{
         width: "100%",

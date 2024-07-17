@@ -5,11 +5,11 @@ import CodeMirror from "@uiw/react-codemirror";
 import { default as React } from "react";
 import "react-data-grid/lib/styles.css";
 
-export const RESTAPIQueryResponseJSONTab = ({ json }) => {
+export const RESTAPIQueryResponseJSONTab = ({ data }) => {
   const theme = useTheme();
   return (
     <CodeMirror
-      value={JSON.stringify(json, null, 2)}
+      value={JSON.stringify(data, null, 2)}
       height="400px"
       extensions={[loadLanguage("json")]}
       theme={githubLight}

@@ -4,9 +4,10 @@ import { githubLight } from "@uiw/codemirror-theme-github";
 import CodeMirror from "@uiw/react-codemirror";
 import React from "react";
 import "react-data-grid/lib/styles.css";
-
-export const RESTAPIQueryResponseSchemaTab = ({ dataSchema }) => {
+import jsonSchemaGenerator from "to-json-schema";
+export const RESTAPIQueryResponseSchemaTab = ({ data }) => {
   const theme = useTheme();
+  const dataSchema = jsonSchemaGenerator(data);
   return (
     <CodeMirror
       value={JSON.stringify(dataSchema, null, 2)}
