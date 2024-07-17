@@ -1,6 +1,6 @@
 const { prisma } = require("../../../config/prisma");
 const Logger = require("../../../utils/logger");
-const { getQueryObject } = require("../../queries");
+const { getQueryObject, runQuery } = require("../../queries");
 const { BaseGraph } = require("../baseGraph");
 
 class BarGraph extends BaseGraph {
@@ -16,13 +16,14 @@ class BarGraph extends BaseGraph {
     try {
       Logger.log("info", {
         message: "BarGraph:transformData:init",
+        params: { results },
       });
       let dataset = { labels: null, datasets: [] };
       let _labels = {};
 
       results.map(async (result) => {
         const _y = [];
-        result.result.forEach((_r) => {
+        result.result.result.forEach((_r) => {
           _labels[_r[result.x_axis]] = true;
           _y.push(
             typeof _r[result.y_axis] === "bigint"
@@ -62,11 +63,13 @@ class BarGraph extends BaseGraph {
               pm_query_id: parseInt(queryItem.pm_query_id),
             },
           });
-          const queryModel = getQueryObject({
+          const result = await runQuery({
+            pmQueryID: query.pm_query_id,
             pmQueryType: query.pm_query_type,
             pmQuery: query.pm_query,
           });
-          return { ...queryItem, result: await queryModel.run() };
+
+          return { ...queryItem, result };
         });
         const results = await Promise.all(resultPromises);
         Logger.log("info", {

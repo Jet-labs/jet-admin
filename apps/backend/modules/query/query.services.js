@@ -1,8 +1,7 @@
-const { Prisma } = require("@prisma/client");
 const { prisma } = require("../../config/prisma");
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
-const { getQueryObject, getEvaluatedQuery } = require("../../plugins/queries");
+const { runQuery: _runQuery } = require("../../plugins/queries/index");
 
 class QueryService {
   constructor() {}
@@ -199,32 +198,18 @@ class QueryService {
   /**
    *
    * @param {object} param0
+   * @param {Number} param0.pmQueryID
    * @param {JSON} param0.pmQuery
    * @param {String} param0.pmQueryType
    * @returns {any|null}
    */
-  static runQuery = async ({ pmQuery, pmQueryType }) => {
+  static runQuery = async ({ pmQueryID, pmQuery, pmQueryType }) => {
     Logger.log("info", {
       message: "QueryService:runQuery:params",
       params: { pmQuery, pmQueryType },
     });
     try {
-      const evaluatedQuery = await getEvaluatedQuery({
-        pmQueryType,
-        pmQuery,
-      });
-      Logger.log("info", {
-        message: "QueryService:runQuery:evaluatedQuery",
-        params: {
-          evaluatedQuery,
-        },
-      });
-
-      const queryModel = getQueryObject({
-        pmQueryType,
-        pmQuery: evaluatedQuery,
-      });
-      const result = await queryModel.run();
+      const { result } = await _runQuery({ pmQueryID, pmQuery, pmQueryType });
 
       Logger.log("info", {
         message: "QueryService:runQuery:query",
@@ -234,7 +219,7 @@ class QueryService {
             : result,
         },
       });
-      return result.result;
+      return result;
     } catch (error) {
       Logger.log("error", {
         message: "QueryService:runQuery:catch-1",

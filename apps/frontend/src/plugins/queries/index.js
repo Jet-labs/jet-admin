@@ -2,8 +2,8 @@ import { PGSQLQueryBuilder } from "./postgresql/components/PGSQLQueryBuilder";
 import { RESTAPIQueryBuilder } from "./restapi/components/RESTAPIQueryBuilder";
 import { TbApi } from "react-icons/tb";
 import { SiPostgresql } from "react-icons/si";
-import { VariableQueryBuilder } from "./variables/components/VariableQueryBuilder";
-
+import { VariableQueryBuilder } from "./variable/components/VariableQueryBuilder";
+import { VscSymbolVariable } from "react-icons/vsc";
 export const QUERY_PLUGINS_MAP = {
   REST_API: {
     name: "Rest API",
@@ -39,6 +39,6 @@ export const QUERY_PLUGINS_MAP = {
         handleChange={handleChange}
       />
     ),
-    icon: <SiPostgresql />,
+    icon: <VscSymbolVariable />,
   },
 };

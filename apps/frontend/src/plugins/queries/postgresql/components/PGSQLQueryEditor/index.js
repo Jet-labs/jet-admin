@@ -109,36 +109,12 @@ export const PGSQLQueryEditor = ({ value, handleChange }) => {
         const word = context.matchBefore(/\{\{\w*/);
         if (word && word.from !== word.to) {
           const variableName = word.text.slice(2); // Remove leading {{
-          console.log({ variableName });
           const variable = sqlSuggestions.find((suggestion) =>
             suggestion.label.startsWith(variableName)
           );
-          console.log({ variable });
-          if (variable) {
-            const nestedSuggestions = getNestedSuggestions(
-              context,
-              sqlSuggestions,
-              word.from + 2
-            );
-            if (nestedSuggestions) {
-              return nestedSuggestions;
-            }
-            const options = [
-              ...(variable.properties || []),
-              ...(variable.functions || []),
-            ].map((suggestion) => ({
-              label: suggestion.label,
-              type: suggestion.type,
-            }));
-            return {
-              from: word.from + 2, // +2 to skip the opening {{
-              options: options,
-            };
-          }
-        } else {
-          const rootWord = context.matchBefore(/\{\{\w*/);
-          if (rootWord && rootWord.from !== rootWord.to) {
-            const variableName = rootWord.text.slice(2); // Remove leading {{
+
+          // Show root-level suggestions if variable is not matched
+          if (!variable) {
             const options = sqlSuggestions
               .filter((suggestion) => suggestion.label.startsWith(variableName))
               .map((suggestion) => ({
@@ -146,10 +122,32 @@ export const PGSQLQueryEditor = ({ value, handleChange }) => {
                 type: suggestion.type,
               }));
             return {
-              from: rootWord.from + 2, // +2 to skip the opening {{
+              from: word.from + 2, // +2 to skip the opening {{
               options: options,
             };
           }
+
+          // Show matched variable's properties and functions
+          const nestedSuggestions = getNestedSuggestions(
+            context,
+            sqlSuggestions,
+            word.from + 2
+          );
+          if (nestedSuggestions) {
+            return nestedSuggestions;
+          }
+
+          const options = [
+            ...(variable.properties || []),
+            ...(variable.functions || []),
+          ].map((suggestion) => ({
+            label: suggestion.label,
+            type: suggestion.type,
+          }));
+          return {
+            from: word.from + 2, // +2 to skip the opening {{
+            options: options,
+          };
         }
         return null;
       },

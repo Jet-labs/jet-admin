@@ -71,6 +71,7 @@ export const GraphUpdateForm = ({ id }) => {
 
   const graphForm = useFormik({
     initialValues: {
+      pm_graph_id: id,
       graph_type: GRAPH_PLUGINS_MAP.BAR.value,
       title_display_enabled: true,
       legend_position: LOCAL_CONSTANTS.GRAPH_LEGEND_POSITION.TOP,
