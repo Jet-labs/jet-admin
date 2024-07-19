@@ -7,7 +7,7 @@ import "react-data-grid/lib/styles.css";
 import jsonSchemaGenerator from "to-json-schema";
 export const PGSQLQueryResponseSchemaTab = ({ data }) => {
   const theme = useTheme();
-  const dataSchema = jsonSchemaGenerator(data);
+  const dataSchema = jsonSchemaGenerator(data ? data : {});
   return (
     <CodeMirror
       value={JSON.stringify(dataSchema, null, 2)}

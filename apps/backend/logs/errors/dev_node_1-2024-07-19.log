@@ -80,3 +80,7 @@
 [31merror[39m: dev_node_1: 19-07-2024 21:35:06: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
 [31merror[39m: dev_node_1: 19-07-2024 21:37:55: [31mGraphService:getGraphData:catch-1[39m |====| {"error":{}}
 [31merror[39m: dev_node_1: 19-07-2024 21:37:55: [31mgraphController:getGraphData:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 19-07-2024 22:06:02: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-07-19T16:20:06.000Z"}}
+[31merror[39m: dev_node_1: 19-07-2024 22:06:02: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 19-07-2024 22:13:56: [31mGraphService:getGraphData:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 19-07-2024 22:13:56: [31mgraphController:getGraphData:catch-1[39m |====| {"error":{}}
