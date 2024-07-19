@@ -1,13 +1,45 @@
 const jsep = require("jsep");
-const constants = require("../../../constants");
-const { prisma } = require("../../../config/prisma");
-const Logger = require("../../../utils/logger");
+const constants = require("../../constants");
+const { prisma } = require("../../config/prisma");
+const Logger = require("../../utils/logger");
 const {
   evaluateAST,
   extractVariablesFromQuery,
   replaceVariableNameWithQueryID,
-} = require("../../../utils/parser.util");
+} = require("../../utils/parser.util");
 const { Prisma } = require("@prisma/client");
+
+/**
+ *
+ * @param {object} param0
+ * @param {Number} param0.pmQueryID
+ * @param {JSON} param0.pmQuery
+ * @param {String} param0.pmQueryType
+ * @returns {any|null}
+ */
+const runQuery = async ({ pmQueryID, pmQuery, pmQueryType }) => {
+  try {
+    const { processedQuery } = await getProcessedPostgreSQLQuery({
+      rawQuery: pmQuery.raw_query,
+    });
+
+    Logger.log("info", {
+      message: "runQuery:processedQuery",
+      params: {
+        processedQuery,
+      },
+    });
+    return await runPostgreSQLEvaluatedQuery({
+      options: { processedQuery, pmQueryType, pmQueryID },
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "runQuery:catch-1",
+      params: { error },
+    });
+    return { pmQueryID, result: null };
+  }
+};
 /**
  *
  * @param {object} param0
@@ -38,26 +70,15 @@ const getProcessedPostgreSQLQuery = async ({ rawQuery }) => {
             const evaluationContext = {};
             const extractedPmQuerysPromises = extractedPmQuerys.map(
               async (pmQueryObject) => {
-                switch (pmQueryObject.pm_query_type) {
-                  case "POSTGRE_QUERY": {
-                    const evaluatedQuery = await getProcessedPostgreSQLQuery({
-                      rawQuery: pmQueryObject.pm_query.raw_query,
-                    });
-                    const result = await runPostgreSQLEvaluatedQuery({
-                      options: evaluatedQuery,
-                    });
-                    return { ...result, pmQueryID: pmQueryObject.pm_query_id };
-                  }
-                  default: {
-                    const evaluatedQuery = await getProcessedPostgreSQLQuery({
-                      rawQuery: pmQueryObject.pm_query.raw_query,
-                    });
-                    const result = await runPostgreSQLEvaluatedQuery({
-                      options: evaluatedQuery,
-                    });
-                    return { ...result, pmQueryID: pmQueryObject.pm_query_id };
-                  }
-                }
+                const evaluatedQuery = await getProcessedPostgreSQLQuery({
+                  rawQuery: pmQueryObject.pm_query.raw_query,
+                });
+                return await runPostgreSQLEvaluatedQuery({
+                  options: {
+                    pmQueryID: pmQueryObject.pm_query_id,
+                    ...evaluatedQuery,
+                  },
+                });
               }
             );
 
@@ -65,6 +86,10 @@ const getProcessedPostgreSQLQuery = async ({ rawQuery }) => {
               extractedPmQuerysPromises
             );
 
+            Logger.log("info", {
+              message: "getProcessedPostgreSQLQuery:resolvedPmQuerys",
+              params: { resolvedPmQuerys },
+            });
             resolvedPmQuerys.forEach((r) => {
               evaluationContext[`pmq_${r.pmQueryID}`] = r.result;
             });
@@ -148,4 +173,8 @@ const runPostgreSQLEvaluatedQuery = async ({ options }) => {
   }
 };
 
-module.exports = { getProcessedPostgreSQLQuery, runPostgreSQLEvaluatedQuery };
+module.exports = {
+  getProcessedPostgreSQLQuery,
+  runPostgreSQLEvaluatedQuery,
+  runQuery,
+};

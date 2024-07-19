@@ -1,6 +1,6 @@
 const { prisma } = require("../../../config/prisma");
 const Logger = require("../../../utils/logger");
-const { getQueryObject, runQuery } = require("../../queries");
+const { runQuery } = require("../../queries");
 const { BaseGraph } = require("../baseGraph");
 
 class BarGraph extends BaseGraph {
