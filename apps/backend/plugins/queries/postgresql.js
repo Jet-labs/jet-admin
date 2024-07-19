@@ -5,7 +5,7 @@ const Logger = require("../../utils/logger");
 const {
   evaluateAST,
   extractVariablesFromQuery,
-  replaceVariableNameWithQueryID,
+  replaceQueryIDStringWithQueryID,
 } = require("../../utils/parser.util");
 const { Prisma } = require("@prisma/client");
 
@@ -59,8 +59,8 @@ const getProcessedPostgreSQLQuery = async ({ rawQuery }) => {
     const replacements = variableMatches
       ? await Promise.all(
           variableMatches.map(async (match) => {
-            const { variableWithReplacedQueryID, pmQueryID } =
-              replaceVariableNameWithQueryID(match);
+            const { queryIDStringWithReplacedQueryID, pmQueryID } =
+              replaceQueryIDStringWithQueryID(match);
             extractedPmQueryIDs.push(parseInt(pmQueryID));
             const extractedPmQuerys = await prisma.tbl_pm_queries.findMany({
               where: {
@@ -96,11 +96,11 @@ const getProcessedPostgreSQLQuery = async ({ rawQuery }) => {
 
             Logger.log("info", {
               message:
-                "getProcessedPostgreSQLQuery:variableWithReplacedQueryID",
-              params: { variableWithReplacedQueryID, evaluationContext },
+                "getProcessedPostgreSQLQuery:queryIDStringWithReplacedQueryID",
+              params: { queryIDStringWithReplacedQueryID, evaluationContext },
             });
 
-            const ast = jsep(variableWithReplacedQueryID);
+            const ast = jsep(queryIDStringWithReplacedQueryID);
 
             const result = evaluateAST(ast, evaluationContext);
 

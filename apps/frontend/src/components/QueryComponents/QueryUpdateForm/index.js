@@ -120,49 +120,6 @@ export const QueryUpdateForm = ({ id }) => {
       <Grid container className="!h-full">
         <Grid item sx={4} md={4} lg={4} className="w-full">
           <FormControl fullWidth size="small" className="!mt-2 !px-3">
-            <span className="text-xs font-light  !capitalize mb-1">{`Query type`}</span>
-
-            <Select
-              value={queryBuilderForm.values.pm_query_type}
-              onChange={queryBuilderForm.handleChange}
-              onBlur={queryBuilderForm.handleBlur}
-              name={"pm_query_type"}
-              required={true}
-              size="small"
-              fullWidth={false}
-              readOnly={true}
-            >
-              {Object.keys(QUERY_PLUGINS_MAP).map((queryType) => {
-                const value = QUERY_PLUGINS_MAP[queryType].value;
-                const name = QUERY_PLUGINS_MAP[queryType].name;
-                return (
-                  <MenuItem value={value}>
-                    <div className="!flex flex-row justify-start items-center">
-                      {QUERY_PLUGINS_MAP[queryType].icon}
-                      <span className="ml-2">{name}</span>
-                    </div>
-                  </MenuItem>
-                );
-              })}
-            </Select>
-            {/* {error && <span className="mt-2 text-red-500">{error}</span>} */}
-          </FormControl>
-          <Alert
-            style={{
-              background: theme.palette.background.default,
-              color: theme.palette.info.main,
-              fontSize: 12,
-              paddingTop: 0,
-            }}
-            severity="info"
-            sx={{
-              "& .MuiAlert-icon": { fontSize: 16, marginRight: 1 },
-            }}
-          >
-            {`Query type cannot be updated`}
-          </Alert>
-
-          <FormControl fullWidth size="small" className="!mt-2 !px-3">
             <span className="text-xs font-light  !capitalize mb-1">{`Title`}</span>
 
             <TextField

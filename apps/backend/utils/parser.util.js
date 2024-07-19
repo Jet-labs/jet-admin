@@ -1,4 +1,5 @@
 const constants = require("../constants");
+const Logger = require("./logger");
 
 const evaluateAST = (ast, context) => {
   const traverse = (node, context) => {
@@ -37,9 +38,9 @@ const extractVariablesFromQuery = (query) => {
  * @param {String} matchedVariable
  * @returns
  */
-const replaceVariableNameWithQueryID = (matchedVariable) => {
+const replaceQueryIDStringWithQueryID = (matchedVariable) => {
   let pmQueryID = null;
-  const variableWithReplacedQueryID = matchedVariable
+  const queryIDStringWithReplacedQueryID = matchedVariable
     .slice(2, -2)
     .replace(constants.PM_QUERY_DETECTION_REGEX, (pmQueryIDString) => {
       const _pmQueryID = pmQueryIDString.match(
@@ -48,10 +49,14 @@ const replaceVariableNameWithQueryID = (matchedVariable) => {
       pmQueryID = parseInt(_pmQueryID);
       return `pmq_${_pmQueryID}`;
     });
-  return { variableWithReplacedQueryID, pmQueryID };
+  Logger.log("warning", {
+    message: "replaceQueryIDStringWithQueryID",
+    params: { queryIDStringWithReplacedQueryID },
+  });
+  return { queryIDStringWithReplacedQueryID, pmQueryID };
 };
 module.exports = {
   evaluateAST,
   extractVariablesFromQuery,
-  replaceVariableNameWithQueryID,
+  replaceQueryIDStringWithQueryID,
 };
