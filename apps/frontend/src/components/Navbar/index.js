@@ -65,6 +65,15 @@ export const Navbar = ({ children, handleDrawerOpen }) => {
             >
               {LOCAL_CONSTANTS.APP_NAME}
             </span>
+            <span
+              className="font-bold normal-case mx-3 "
+              style={{
+                color: theme.palette.primary.contrastText,
+                fontSize: 10,
+              }}
+            >
+              Version : {LOCAL_CONSTANTS.APP_VERSION}
+            </span>
           </div>
         </div>
 

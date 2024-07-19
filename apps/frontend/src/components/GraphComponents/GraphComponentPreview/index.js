@@ -17,7 +17,7 @@ export const GraphComponentPreview = ({
         rowSpacing={2}
         className="rounded !p-3"
         style={{
-          background: theme.palette.background.paper,
+          background: theme.palette.background.secondary,
           borderColor: theme.palette.divider,
           borderWidth: 1,
         }}

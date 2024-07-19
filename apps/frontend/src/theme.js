@@ -351,6 +351,7 @@ export const customLightTheme = {
     background: {
       paper: "#e6e6e6",
       default: "#ffffff",
+      secondary: "#EEEEEE",
     },
     action: {
       active: "#e6e6e6",

@@ -30,7 +30,7 @@ export const GraphWidgetComponent = ({ id }) => {
     <div
       className="rounded !p-3 !w-full"
       style={{
-        background: theme.palette.action.selected,
+        background: theme.palette.background.paper,
         height: 400,
       }}
     >
