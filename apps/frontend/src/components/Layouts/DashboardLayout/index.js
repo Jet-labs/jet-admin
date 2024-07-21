@@ -5,7 +5,7 @@ import { LOCAL_CONSTANTS } from "../../../constants";
 import { DashboardsList } from "../../DrawerLists/DashboardDrawerList";
 const AddDashboardView = lazy(() => import("../../../pages/AddDashboardView"));
 const DashboardView = lazy(() => import("../../../pages/DashboardView"));
-const DashEditboardView = lazy(() => import("../../../pages/UpdateDashboard"));
+const DashboardEditView = lazy(() => import("../../../pages/UpdateDashboard"));
 
 const DashboardLayout = () => {
   return (
@@ -32,7 +32,7 @@ const DashboardLayout = () => {
             <Route index element={<DashboardView />} />
             <Route
               path={LOCAL_CONSTANTS.ROUTES.DASHBOARD_EDIT_VIEW.code}
-              element={<DashEditboardView />}
+              element={<DashboardEditView />}
             />
           </Route>
         </Routes>

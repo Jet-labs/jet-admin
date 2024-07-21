@@ -79,64 +79,80 @@ const create_user_table_query = `
  CREATE TABLE IF NOT EXISTS public.tbl_pm_users
 (
     pm_user_id serial NOT NULL,
-    first_name character varying,
-    last_name character varying,
-    address1 character varying,
+    first_name character varying",
+    last_name character varying",
+    address1 character varying",
     pm_policy_object_id integer,
     is_disabled boolean DEFAULT false,
     created_at timestamp(6) with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp(6) with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
     disabled_at timestamp(6) with time zone,
-    disable_reason character varying,
-    username character varying,
-    password_hash character varying,
-    salt character varying,
+    disable_reason character varying",
+    username character varying",
+    password_hash character varying",
+    salt character varying",
     CONSTRAINT tbl_pm_users_pkey PRIMARY KEY (pm_user_id),
     CONSTRAINT fk_tbl_pm_users_tbl_pm_policy_object_pm_policy_onject_id FOREIGN KEY (pm_policy_object_id)
         REFERENCES public.tbl_pm_policy_objects (pm_policy_object_id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
-)
-`;
-
-const create_graph_table_query = `CREATE TABLE public.tbl_pm_graphs (
-	pm_graph_id serial NOT NULL,
-	graph_title varchar NOT NULL,
-	graph_description varchar NULL,
-	is_disabled bool DEFAULT false NULL,
-	created_at timestamptz(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
-	updated_at timestamptz(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
-	disabled_at timestamptz(6) NULL,
-	disable_reason varchar NULL,
-	graph_options jsonb NULL,
-	CONSTRAINT tbl_pm_graphs_pkey PRIMARY KEY (pm_graph_id)
 );`;
 
-const create_query_table_query = `CREATE TABLE public.tbl_pm_queries (
-	pm_query_id serial NOT NULL,
-	pm_query_type varchar DEFAULT 'POSTGRE_QUERY'::character varying NULL,
-	created_at timestamptz(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
-	updated_at timestamptz(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
-	disabled_at timestamptz(6) NULL,
-	is_disabled bool DEFAULT false NULL,
-	pm_query_title varchar DEFAULT 'Untitled'::character varying NOT NULL,
-	pm_query_description varchar NULL,
-	pm_query json NULL,
-	CONSTRAINT tbl_pm_queries_pk PRIMARY KEY (pm_query_id)
+const create_graph_table_query = `CREATE TABLE IF NOT EXISTS public.tbl_pm_graphs
+(
+    pm_graph_id serial NOT NULL,
+    graph_title character varying NOT NULL,
+    graph_description character varying,
+    is_disabled boolean DEFAULT false,
+    created_at timestamp(6) with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp(6) with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    disabled_at timestamp(6) with time zone,
+    disable_reason character varying,
+    graph_options jsonb,
+    CONSTRAINT tbl_pm_graphs_pkey PRIMARY KEY (pm_graph_id)
 );`;
 
-const create_dashboard_table_query = `CREATE TABLE public.tbl_pm_dashboards (
-	pm_dashboard_id serial NOT NULL,
-	dashboard_title varchar NOT NULL,
-	dashboard_description varchar NULL,
-	is_disabled bool DEFAULT false NULL,
-	created_at timestamptz(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
-	updated_at timestamptz(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
-	disabled_at timestamptz(6) NULL,
-	disable_reason varchar NULL,
-	dashboard_options jsonb NULL,
-	dashboard_graph_ids _int4 NULL,
-	CONSTRAINT tbl_pm_dashboard_layout_pkey PRIMARY KEY (pm_dashboard_id)
+const create_query_table_query = `CREATE TABLE IF NOT EXISTS tbl_pm_queries
+(
+    pm_query_id serial NOT NULL,
+    pm_query_type character varying DEFAULT 'POSTGRE_QUERY'::character varying,
+    created_at timestamp(6) with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp(6) with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    disabled_at timestamp(6) with time zone,
+    is_disabled boolean DEFAULT false,
+    pm_query_title character varying NOT NULL DEFAULT 'Untitled'::character varying,
+    pm_query_description character varying,
+    pm_query json,
+    run_on_load boolean,
+    CONSTRAINT tbl_pm_queries_pk PRIMARY KEY (pm_query_id)
+)`;
+
+const create_dashboard_table_query = `CREATE TABLE IF NOT EXISTS tbl_pm_dashboards
+(
+    pm_dashboard_id serial NOT NULL,
+    dashboard_title character varying NOT NULL,
+    dashboard_description character varying,
+    is_disabled boolean DEFAULT false,
+    created_at timestamp(6) with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp(6) with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    disabled_at timestamp(6) with time zone,
+    disable_reason character varying,
+    dashboard_options jsonb,
+    dashboard_graph_ids integer[],
+    CONSTRAINT tbl_pm_dashboard_layout_pkey PRIMARY KEY (pm_dashboard_id)
+);`;
+
+const create_jobs_table_query = `CREATE TABLE IF NOT EXISTS public.tbl_pm_jobs
+(
+    pm_job_id serial NOT NULL,
+    pm_job_title character varying NOT NULL,
+    pm_query_id integer NOT NULL,
+	  pm_job_schedule varchar NOT NULL,
+    created_at timestamp(6) with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp(6) with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    disabled_at timestamp(6) with time zone,
+    is_disabled boolean DEFAULT false,
+    CONSTRAINT tbl_pm_jobs_pk PRIMARY KEY (pm_job_id)
 );`;
 
 const super_admin_policy_query = `
@@ -186,6 +202,7 @@ async function setup_database() {
     await client.query(create_graph_table_query);
     await client.query(create_query_table_query);
     await client.query(create_dashboard_table_query);
+    await client.query(create_jobs_table_query);
     await client.query("COMMIT");
 
     Logger.log("success", {

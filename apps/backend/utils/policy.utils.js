@@ -383,4 +383,71 @@ policyUtils.extractAuthorizedForRowDeletionFromPolicyObject = ({
   }
   return authorization;
 };
+
+policyUtils.extractAuthorizedJobsForReadFromPolicyObject = ({
+  policyObject,
+}) => {
+  const authorizeJobIDs = [];
+  if (policyObject.jobs?.read) {
+    return true;
+  } else if (policyObject.jobs && policyObject.jobs.job_ids) {
+    Object.keys(policyObject.jobs.job_ids).forEach((job_id) => {
+      if (
+        policyObject.jobs.job_ids[job_id].read ||
+        policyObject.jobs.job_ids[job_id] === true
+      ) {
+        authorizeJobIDs.push(parseInt(job_id));
+      }
+    });
+  }
+  return authorizeJobIDs;
+};
+
+policyUtils.extractAuthorizedJobsForUpdateFromPolicyObject = ({
+  policyObject,
+}) => {
+  const authorizeJobIDs = [];
+  if (policyObject.jobs?.edit) {
+    return true;
+  } else if (policyObject.jobs && policyObject.jobs.job_ids) {
+    Object.keys(policyObject.jobs.job_ids).forEach((job_id) => {
+      if (
+        policyObject.jobs.job_ids[job_id].edit ||
+        policyObject.jobs.job_ids[job_id] === true
+      ) {
+        authorizeJobIDs.push(parseInt(job_id));
+      }
+    });
+  }
+  return authorizeJobIDs;
+};
+
+policyUtils.extractAuthorizedJobsForDeleteFromPolicyObject = ({
+  policyObject,
+}) => {
+  const authorizeJobIDs = [];
+  if (policyObject.jobs?.delete) {
+    return true;
+  } else if (policyObject.jobs && policyObject.jobs.job_ids) {
+    Object.keys(policyObject.jobs.job_ids).forEach((job_id) => {
+      if (
+        policyObject.jobs.job_ids[job_id].delete ||
+        policyObject.jobs.job_ids[job_id] === true
+      ) {
+        authorizeJobIDs.push(parseInt(job_id));
+      }
+    });
+  }
+  return authorizeJobIDs;
+};
+
+policyUtils.extractAuthorizationForJobAddFromPolicyObject = ({
+  policyObject,
+}) => {
+  if (policyObject.jobs?.add) {
+    return true;
+  }
+  return false;
+};
+
 module.exports = { policyUtils };

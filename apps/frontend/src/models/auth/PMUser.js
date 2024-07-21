@@ -300,4 +300,60 @@ export class PMUser {
     console.log({ authorization });
     return authorization;
   };
+
+  // jobs
+
+  isAuthorizedToAddJob = () => {
+    if (this.policy?.jobs?.add) {
+      return true;
+    }
+    return false;
+  };
+
+  extractAuthorizedJobsForReadFromPolicyObject = () => {
+    const authorizeJobIDs = [];
+    if (this.policy?.jobs?.read) {
+      return true;
+    } else if (this.policy.jobs && this.policy.jobs.job_ids) {
+      Object.keys(this.policy.jobs.job_ids).forEach((pmJobID) => {
+        if (this.policy.jobs.job_ids[pmJobID].read) {
+          authorizeJobIDs.push(parseInt(pmJobID));
+        }
+      });
+    }
+    return authorizeJobIDs;
+  };
+
+  extractAuthorizedJobsForUpdateFromPolicyObject = () => {
+    const authorizeJobIDs = [];
+    if (this.policy?.jobs?.edit) {
+      return true;
+    } else if (this.policy.jobs && this.policy.jobs.job_ids) {
+      Object.keys(this.policy.jobs.job_ids).forEach((pmJobID) => {
+        if (this.policy.jobs.job_ids[pmJobID].edit) {
+          authorizeJobIDs.push(parseInt(pmJobID));
+        }
+      });
+    }
+    return authorizeJobIDs;
+  };
+
+  isAuthorizedToDeleteJob = (pmJobID) => {
+    let authorization = false;
+    if (
+      this.policy.jobs &&
+      !(
+        this.policy.jobs.delete === null ||
+        this.policy.jobs.delete === undefined
+      )
+    ) {
+      authorization = this.policy.jobs.delete;
+    } else if (this.policy.jobs && this.policy.jobs.job_ids) {
+      if (this.policy.jobs.job_ids[pmJobID]) {
+        authorization = Boolean(this.policy.jobs.job_ids[pmJobID].delete);
+      }
+    }
+    console.log({ authorization });
+    return authorization;
+  };
 }

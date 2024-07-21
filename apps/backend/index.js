@@ -25,6 +25,8 @@ expressApp.use(
 );
 expressApp.use("/admin_api/queries", require("./modules/query/query.route"));
 
+expressApp.use("/admin_api/jobs", require("./modules/job/job.route"));
+
 expressApp.get("/", async (req, res) => {
   Logger.log("warning", {
     message: "wrong api call",

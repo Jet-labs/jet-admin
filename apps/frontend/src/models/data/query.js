@@ -8,12 +8,22 @@ export class Query {
     pm_query_type,
     pm_query_title,
     pm_query_description,
+    is_disabled,
+    created_at,
+    updated_at,
+    disabled_at,
+    disable_reason,
   }) {
     this.pm_query_id = parseInt(pm_query_id);
     this.pm_query_type = pm_query_type;
     this.pm_query_title = String(pm_query_title);
     this.pm_query_description = String(pm_query_description);
     this.pm_query = this.getQueryClass({ pm_query_type, queryData: pm_query });
+    this.is_disabled = is_disabled;
+    this.created_at = created_at;
+    this.updated_at = updated_at;
+    this.disabled_at = disabled_at;
+    this.disable_reason = disable_reason;
   }
   getQueryClass = ({ pm_query_type, queryData }) => {
     console.log({ pm_query_type, queryData });

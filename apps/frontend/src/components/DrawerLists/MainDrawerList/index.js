@@ -16,6 +16,7 @@ import { VscDashboard } from "react-icons/vsc";
 import { Link, useLocation, useParams } from "react-router-dom";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { GrConnect } from "react-icons/gr";
+import { RiCalendarScheduleFill } from "react-icons/ri";
 const drawerList = [
   {
     text: "Dashboards",
@@ -31,6 +32,11 @@ const drawerList = [
     text: "Queries",
     icon: <GrConnect size={24} className="!text-sm" />,
     to: LOCAL_CONSTANTS.ROUTES.ALL_QUERIES.path(),
+  },
+  {
+    text: "Jobs",
+    icon: <RiCalendarScheduleFill size={24} className="!text-sm" />,
+    to: LOCAL_CONSTANTS.ROUTES.ALL_JOBS.path(),
   },
   {
     text: "Graphs",

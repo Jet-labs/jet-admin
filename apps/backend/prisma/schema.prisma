@@ -279,6 +279,18 @@ model tbl_pm_queries {
   pm_query_title       String    @default("Untitled") @db.VarChar
   pm_query_description String?   @db.VarChar
   pm_query             Json?     @db.Json
+  run_on_load          Boolean?
+}
+
+model tbl_pm_jobs {
+  pm_job_id       Int       @id(map: "tbl_pm_jobs_pk") @default(autoincrement())
+  pm_job_title    String    @db.VarChar
+  pm_query_id     Int
+  pm_job_schedule String    @db.VarChar
+  created_at      DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at      DateTime  @default(now()) @db.Timestamptz(6)
+  disabled_at     DateTime? @db.Timestamptz(6)
+  is_disabled     Boolean?  @default(false)
 }
 
 enum mpaa_rating {

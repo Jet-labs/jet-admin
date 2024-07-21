@@ -81,6 +81,19 @@ export const LOCAL_CONSTANTS = {
     HOME: "/",
     SIGNIN: "/signin",
 
+    ALL_JOBS: {
+      code: "/jobs/*",
+      path: () => "/jobs",
+    },
+    ADD_JOB: {
+      code: "add",
+      path: () => "add",
+    },
+    JOB_VIEW: {
+      code: ":id",
+      path: (id) => `${id}`,
+    },
+
     ALL_QUERIES: {
       code: "/queries/*",
       path: () => "/queries",
@@ -218,6 +231,14 @@ export const LOCAL_CONSTANTS = {
       addDashboard: () => `/admin_api/dashboards`,
       updateDashboard: () => `/admin_api/dashboards`,
       deleteDashboardByID: ({ id }) => `/admin_api/dashboards/${id}`,
+    },
+
+    JOB: {
+      getAllJobs: () => `/admin_api/jobs`,
+      getJobByID: ({ id }) => `/admin_api/jobs/${id}`,
+      addJob: () => `/admin_api/jobs`,
+      updateJob: () => `/admin_api/jobs`,
+      deleteJobByID: ({ id }) => `/admin_api/jobs/${id}`,
     },
 
     QUERY: {

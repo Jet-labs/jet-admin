@@ -23,6 +23,7 @@ const TableLayout = lazy(() => import("./Layouts/TableLayout"));
 const GraphLayout = lazy(() => import("./Layouts/GraphLayout"));
 const DashboardLayout = lazy(() => import("./Layouts/DashboardLayout"));
 const QueryLayout = lazy(() => import("./Layouts/QueryLayout"));
+const JobLayout = lazy(() => import("./Layouts/JobLayout"));
 /**
  *
  * @param {object} param0
@@ -75,6 +76,16 @@ const AppRouter = ({}) => {
             element={
               <ProtectedRoute
                 successComponent={QueryLayout}
+                fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
+                loadingComponent={() => <Loading fullScreen />}
+              />
+            }
+          ></Route>
+          <Route
+            path={LOCAL_CONSTANTS.ROUTES.ALL_JOBS.code}
+            element={
+              <ProtectedRoute
+                successComponent={JobLayout}
                 fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
                 loadingComponent={() => <Loading fullScreen />}
               />
