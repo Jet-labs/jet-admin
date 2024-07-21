@@ -8,7 +8,7 @@ import {
   ListItemText,
   useTheme,
 } from "@mui/material";
-
+import { FaHistory } from "react-icons/fa";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -42,6 +42,9 @@ export const JobsList = () => {
 
   const _navigateToAddMoreJob = () => {
     navigate(LOCAL_CONSTANTS.ROUTES.ADD_JOB.path());
+  };
+  const _navigateToJobHistory = () => {
+    navigate(LOCAL_CONSTANTS.ROUTES.JOB_HISTORY.path());
   };
   return (
     <List
@@ -77,6 +80,14 @@ export const JobsList = () => {
             startIcon={<FaPlus className="!text-sm" />}
           >
             Add more jobs
+          </Button>
+          <Button
+            onClick={_navigateToJobHistory}
+            variant="outlined"
+            className="!w-full  !mt-3"
+            startIcon={<FaHistory className="!text-sm" />}
+          >
+            View job history
           </Button>
         </div>
       )}

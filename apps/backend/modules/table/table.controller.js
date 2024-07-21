@@ -314,7 +314,7 @@ tableController.getAllRows = async (req, res) => {
       message: "tableController:getAllRows:rows",
       params: {
         pm_user_id,
-        rowsLength: rows.length,
+        rowsLength: rows?.length,
       },
     });
     return res.json({

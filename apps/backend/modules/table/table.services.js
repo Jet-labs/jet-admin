@@ -99,7 +99,7 @@ class TableService {
       Logger.log("success", {
         message: "TableService:getTableRows:rows",
         params: {
-          rowsLength: rows.length,
+          rowsLength: rows?.length,
         },
       });
       return rows;
