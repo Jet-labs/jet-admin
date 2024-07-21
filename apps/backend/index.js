@@ -4,6 +4,7 @@ const constants = require("./constants");
 const { expressApp } = require("./config/express.app");
 const { httpServer } = require("./config/http.server");
 const Logger = require("./utils/logger");
+const { CustomCronJobScheduler } = require("./jobs/cron.jobs");
 
 expressApp.use(cookieParser());
 expressApp.use("/admin_api/auth", require("./modules/auth/auth.route"));
@@ -45,6 +46,7 @@ httpServer.listen(port, () => {
     message: "server started listening",
     params: { port },
   });
+  CustomCronJobScheduler.scheduleAllCustomJobs();
 });
 
 

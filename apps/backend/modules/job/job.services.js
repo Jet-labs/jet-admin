@@ -1,5 +1,6 @@
 const { prisma } = require("../../config/prisma");
 const constants = require("../../constants");
+const { CustomCronJobScheduler } = require("../../jobs/cron.jobs");
 const Logger = require("../../utils/logger");
 class JobService {
   constructor() {}
@@ -37,6 +38,7 @@ class JobService {
           newJob,
         },
       });
+      CustomCronJobScheduler.scheduleCustomJobOnChange(newJob);
       return newJob;
     } catch (error) {
       Logger.log("error", {
@@ -91,6 +93,7 @@ class JobService {
             updatedJob,
           },
         });
+        CustomCronJobScheduler.scheduleCustomJobOnChange(updatedJob);
         return updatedJob;
       } else {
         Logger.log("error", {
@@ -218,6 +221,7 @@ class JobService {
             job,
           },
         });
+        CustomCronJobScheduler.deleteScheduledCustomJob(pmJobID);
         return true;
       } else {
         Logger.log("error", {
