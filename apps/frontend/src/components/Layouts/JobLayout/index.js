@@ -4,7 +4,7 @@ import { Outlet, Route, Routes } from "react-router-dom";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { JobsList } from "../../DrawerLists/JobDrawerList";
 const AddJob = lazy(() => import("../../../pages/AddJob"));
-// const UpdateJob = lazy(() => import("../../../pages/UpdateJob"));
+const UpdateJob = lazy(() => import("../../../pages/UpdateJob"));
 
 const JobLayout = () => {
   return (
@@ -27,10 +27,10 @@ const JobLayout = () => {
             path={LOCAL_CONSTANTS.ROUTES.ADD_JOB.code}
             element={<AddJob />}
           />
-          {/* <Route
+          <Route
             path={LOCAL_CONSTANTS.ROUTES.JOB_VIEW.code}
             element={<UpdateJob />}
-          /> */}
+          />
         </Routes>
         <Outlet />
       </Grid>

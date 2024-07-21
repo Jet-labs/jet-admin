@@ -62,7 +62,7 @@ jobController.getJobByID = async (req, res) => {
     });
 
     const job = await JobService.getJobByID({
-      jobID: pm_job_id,
+      pmJobID: pm_job_id,
       authorizedJobs: authorized_jobs,
     });
 
@@ -101,9 +101,9 @@ jobController.addJob = async (req, res) => {
     });
 
     const job = await JobService.addJob({
-      jobTitle: body.job_title,
-      jobDescription: body.job_description,
-      jobOptions: body.job_options,
+      pmJobTitle: body.pm_job_title,
+      pmQueryID: body.pm_query_id,
+      pmJobSchedule: body.pm_job_schedule,
     });
 
     Logger.log("success", {
@@ -142,10 +142,10 @@ jobController.updateJob = async (req, res) => {
     });
 
     const job = await JobService.updateJob({
-      jobID: parseInt(body.pm_job_id),
-      jobTitle: body.job_title,
-      jobDescription: body.job_description,
-      jobOptions: body.job_options,
+      pmJobID: parseInt(body.pm_job_id),
+      pmJobTitle: body.pm_job_title,
+      pmQueryID: body.pm_query_id,
+      pmJobSchedule: body.pm_job_schedule,
       authorizedJobs: authorized_jobs,
     });
 
@@ -186,7 +186,7 @@ jobController.deleteJob = async (req, res) => {
     });
 
     await JobService.deleteJob({
-      jobID: pm_job_id,
+      pmJobID: pm_job_id,
       authorizedJobs: authorized_jobs,
     });
 

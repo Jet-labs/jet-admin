@@ -63,7 +63,10 @@ export const CronJobScheduler = ({
         <Cron
           key={key ? key : "cron-job-scheduler"}
           value={value}
-          setValue={handleChange}
+          setValue={(v) => {
+            console.log({ v, value });
+            handleChange(v);
+          }}
           onError={onError ? onError : null}
           disabled={disabled}
           readOnly={readOnly}

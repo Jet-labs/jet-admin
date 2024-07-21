@@ -40,11 +40,11 @@ export const updateJobAPI = async ({ data }) => {
   }
 };
 
-export const getJobByIDAPI = async ({ jobID }) => {
+export const getJobByIDAPI = async ({ pmJobID }) => {
   try {
     const response = await axiosInstance.get(
       LOCAL_CONSTANTS.APIS.JOB.getJobByID({
-        id: jobID,
+        id: pmJobID,
       })
     );
     if (response.data && response.data.success == true) {

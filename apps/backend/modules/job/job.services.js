@@ -7,40 +7,33 @@ class JobService {
   /**
    *
    * @param {object} param0
-   * @param {String} param0.jobTitle
-   * @param {String} param0.jobDescription
-   * @param {any} param0.jobOptions
+   * @param {String} param0.pmJobTitle
+   * @param {String} param0.pmJobSchedule
+   * @param {Number} param0.pmQueryID
    * @returns {any|null}
    */
-  static addJob = async ({ jobTitle, jobDescription, jobOptions }) => {
+  static addJob = async ({ pmJobTitle, pmQueryID, pmJobSchedule }) => {
     Logger.log("info", {
       message: "JobService:addJob:params",
       params: {
-        jobTitle,
-        jobDescription,
-        jobOptions,
+        pmJobTitle,
+        pmQueryID,
+        pmJobSchedule,
       },
     });
     try {
       let newJob = null;
-      const _graphIDs = [];
-      if (jobOptions.graph_ids && Array.isArray(jobOptions.graph_ids)) {
-        jobOptions.graph_ids.forEach((graph) => {
-          _graphIDs.push(graph.graphID);
-        });
-      }
+
       newJob = await prisma.tbl_pm_jobs.create({
         data: {
-          job_title: String(jobTitle),
-          job_description: String(jobDescription),
-          job_options: jobOptions,
-          job_graph_ids: _graphIDs,
+          pm_job_title: String(pmJobTitle),
+          pm_query_id: parseInt(pmQueryID),
+          pm_job_schedule: String(pmJobSchedule),
         },
       });
       Logger.log("success", {
         message: "JobService:addJob:newJob",
         params: {
-          jobTitle,
           newJob,
         },
       });
@@ -57,7 +50,7 @@ class JobService {
   /**
    *
    * @param {object} param0
-   * @param {Number} param0.jobID
+   * @param {Number} param0.pmJobID
    * @param {String} param0.jobTitle
    * @param {String} param0.jobDescription
    * @param {any} param0.jobOptions
@@ -65,38 +58,31 @@ class JobService {
    * @returns {any|null}
    */
   static updateJob = async ({
-    jobID,
-    jobTitle,
-    jobDescription,
-    jobOptions,
+    pmJobID,
+    pmJobTitle,
+    pmQueryID,
+    pmJobSchedule,
     authorizedJobs,
   }) => {
     Logger.log("info", {
       message: "JobService:updateJob:params",
       params: {
-        jobID,
-        jobTitle,
-        jobDescription,
-        jobOptions,
+        pmJobID,
+        pmJobTitle,
+        pmQueryID,
+        pmJobSchedule,
       },
     });
     try {
-      if (authorizedJobs === true || authorizedJobs.includes(jobID)) {
-        const _graphIDs = [];
-        if (jobOptions.graph_ids && Array.isArray(jobOptions.graph_ids)) {
-          jobOptions.graph_ids.forEach((graph) => {
-            _graphIDs.push(graph.graphID);
-          });
-        }
+      if (authorizedJobs === true || authorizedJobs.includes(pmJobID)) {
         const updatedJob = await prisma.tbl_pm_jobs.update({
           where: {
-            pm_job_id: jobID,
+            pm_job_id: pmJobID,
           },
           data: {
-            job_title: String(jobTitle),
-            job_description: String(jobDescription),
-            job_options: jobOptions,
-            job_graph_ids: _graphIDs,
+            pm_job_title: String(pmJobTitle),
+            pm_query_id: parseInt(pmQueryID),
+            pm_job_schedule: String(pmJobSchedule),
           },
         });
         Logger.log("success", {
@@ -162,23 +148,23 @@ class JobService {
   /**
    *
    * @param {object} param0
-   * @param {Number} param0.jobID
+   * @param {Number} param0.pmJobID
    * @param {Boolean|Array<Number>} param0.authorizedJobs
    * @returns {any|null}
    */
-  static getJobByID = async ({ jobID, authorizedJobs }) => {
+  static getJobByID = async ({ pmJobID, authorizedJobs }) => {
     Logger.log("info", {
       message: "JobService:getJobByID:params",
       params: {
-        jobID,
+        pmJobID,
         authorizedJobs,
       },
     });
     try {
-      if (authorizedJobs === true || authorizedJobs.includes(jobID)) {
+      if (authorizedJobs === true || authorizedJobs.includes(pmJobID)) {
         const job = await prisma.tbl_pm_jobs.findUnique({
           where: {
-            pm_job_id: jobID,
+            pm_job_id: pmJobID,
           },
         });
         Logger.log("info", {
@@ -207,23 +193,23 @@ class JobService {
   /**
    *
    * @param {object} param0
-   * @param {Number} param0.jobID
+   * @param {Number} param0.pmJobID
    * @param {Boolean|Array<Number>} param0.authorizedJobs
    * @returns {any|null}
    */
-  static deleteJob = async ({ jobID, authorizedJobs }) => {
+  static deleteJob = async ({ pmJobID, authorizedJobs }) => {
     Logger.log("info", {
       message: "JobService:deleteJob:params",
       params: {
-        jobID,
+        pmJobID,
         authorizedJobs,
       },
     });
     try {
-      if (authorizedJobs === true || authorizedJobs.includes(jobID)) {
+      if (authorizedJobs === true || authorizedJobs.includes(pmJobID)) {
         const job = await prisma.tbl_pm_jobs.delete({
           where: {
-            pm_job_id: jobID,
+            pm_job_id: pmJobID,
           },
         });
         Logger.log("info", {
