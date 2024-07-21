@@ -29,7 +29,7 @@ queryController.getAllQueries = async (req, res) => {
 
     Logger.log("success", {
       message: "queryController:getAllQueries:success",
-      params: { pm_user_id, queries },
+      params: { pm_user_id, queriesLength: queries?.length },
     });
 
     return res.json({

@@ -10,6 +10,45 @@ class CustomCronJobScheduler {
    *
    * @param {import("@prisma/client").tbl_pm_jobs & {tbl_pm_queries:import("@prisma/client").tbl_pm_queries}} pmJob
    */
+  static runner = async (pmJob) => {
+    const result = {};
+
+    try {
+      const runResult = runQuery({
+        pmQueryID: pmJob.tbl_pm_queries.pm_query_id,
+        pmQuery: pmJob.tbl_pm_queries.pm_query,
+        pmQueryType: pmJob.tbl_pm_queries.pm_query_type,
+      });
+      result.success = true;
+      result.result = runResult;
+      Logger.log("success", {
+        message: "CustomCronJobScheduler:runner:success",
+        params: { pmJobID: pmJob.pm_job_id },
+      });
+    } catch (err) {
+      Logger.log("error", {
+        message: "CustomCronJobScheduler:runner:catch-1",
+        params: { pmJobID: pmJob.pm_job_id, error: err },
+      });
+      result.success = false;
+      result.error = err;
+    }
+
+    await prisma.tbl_pm_job_history.create({
+      data: {
+        pm_job_id: pmJob.pm_job_id,
+        history_result: JSON.stringify(result),
+      },
+    });
+    Logger.log("info", {
+      message: "CustomCronJobScheduler:runner:history created",
+      params: { pmJobID: pmJob.pm_job_id },
+    });
+  };
+  /**
+   *
+   * @param {import("@prisma/client").tbl_pm_jobs & {tbl_pm_queries:import("@prisma/client").tbl_pm_queries}} pmJob
+   */
   static scheduleCustomJobOnChange = async (pmJob) => {
     try {
       Logger.log("info", {
@@ -37,41 +76,10 @@ class CustomCronJobScheduler {
       }
       const job = cron.schedule(
         pmJob.pm_job_schedule,
-        async () => {
-          const result = {};
-          try {
-            const runResult = runQuery({
-              pmQueryID: pmJob.tbl_pm_queries.pm_query_id,
-              pmQuery: pmJob.tbl_pm_queries.pm_query,
-              pmQueryType: pmJob.tbl_pm_queries.pm_query_type,
-            });
-            result.success = true;
-            result.result = runResult;
-            Logger.log("success", {
-              message: "CustomCronJobScheduler:runner:success",
-              params: { pmJobID: pmJob.pm_job_id },
-            });
-          } catch (err) {
-            Logger.log("error", {
-              message: "CustomCronJobScheduler:runner:catch-1",
-              params: { pmJobID: pmJob.pm_job_id, error: err },
-            });
-            result.success = false;
-            result.error = err;
-          }
-
-          await prisma.tbl_pm_job_history.create({
-            data: {
-              pm_job_id: pmJob.pm_job_id,
-              history_result: JSON.stringify(result),
-            },
-          });
-          Logger.log("info", {
-            message: "CustomCronJobScheduler:runner:history created",
-            params: { pmJobID: pmJob.pm_job_id },
-          });
-        },
-        { name: `${pmJob.pm_job_id}` }
+        () => this.runner(pmJob),
+        {
+          name: `${pmJob.pm_job_id}`,
+        }
       );
       global.scheduled_custom_jobs[pmJob.pm_job_id] = job;
       Logger.log("success", {
@@ -132,7 +140,11 @@ class CustomCronJobScheduler {
         where: {
           is_disabled: false,
         },
+        include: {
+          tbl_pm_queries: true,
+        },
       });
+
       const allPmJobsSchedulePromise = allPmJobs.map((pmJob) => {
         return this.scheduleCustomJobOnChange(pmJob);
       });

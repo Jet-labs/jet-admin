@@ -135,18 +135,11 @@ class QueryService {
                 },
               },
       });
-      Logger.log("info", {
+      Logger.log("success", {
         message: "QueryService:getAllQueries:queries",
         params: {
-          queries,
-          authorizedQueries,
-        },
-      });
-
-      Logger.log("info", {
-        message: "QueryService:getAllQueries:query",
-        params: {
           queriesLength: queries?.length,
+          authorizedQueries,
         },
       });
       return queries;

@@ -31,6 +31,9 @@ class JobService {
           pm_query_id: parseInt(pmQueryID),
           pm_job_schedule: String(pmJobSchedule),
         },
+        include: {
+          tbl_pm_queries: true,
+        },
       });
       Logger.log("success", {
         message: "JobService:addJob:newJob",
@@ -86,6 +89,9 @@ class JobService {
             pm_query_id: parseInt(pmQueryID),
             pm_job_schedule: String(pmJobSchedule),
           },
+          include:{
+            tbl_pm_queries:true
+          }
         });
         Logger.log("success", {
           message: "JobService:updateJob:newJob",
