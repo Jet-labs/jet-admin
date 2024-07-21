@@ -464,6 +464,16 @@ export const customLightTheme = {
       },
     },
 
+    MuiSwitch: {
+      styleOverrides: {
+        root: {
+          "& .MuiSwitch-track": {
+            backgroundColor: "#6a7585",
+          },
+        },
+      },
+    },
+
     MuiButton: {
       styleOverrides: {
         root: {

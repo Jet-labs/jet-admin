@@ -3,7 +3,7 @@ import { lazy, useMemo } from "react";
 import { Outlet, Route, Routes } from "react-router-dom";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { JobsList } from "../../DrawerLists/JobDrawerList";
-// const AddJob = lazy(() => import("../../../pages/AddJob"));
+const AddJob = lazy(() => import("../../../pages/AddJob"));
 // const UpdateJob = lazy(() => import("../../../pages/UpdateJob"));
 
 const JobLayout = () => {
@@ -20,18 +20,18 @@ const JobLayout = () => {
         xl={10}
         className="!h-[calc(100vh-48px)] !overflow-y-auto"
       >
-        {/* <Routes>
+        <Routes>
           <Route index element={<AddJob />} />
 
           <Route
             path={LOCAL_CONSTANTS.ROUTES.ADD_JOB.code}
             element={<AddJob />}
           />
-          <Route
+          {/* <Route
             path={LOCAL_CONSTANTS.ROUTES.JOB_VIEW.code}
             element={<UpdateJob />}
-          />
-        </Routes> */}
+          /> */}
+        </Routes>
         <Outlet />
       </Grid>
     </Grid>
