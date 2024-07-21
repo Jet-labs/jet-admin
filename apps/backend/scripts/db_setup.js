@@ -25,6 +25,24 @@ const create_super_admin_policy = () => {
       message: "create_super_admin_policy:policy created",
       params: { policy },
     });
+    policy.graphs = {
+      add: true,
+      edit: true,
+      read: true,
+      delete: true,
+    };
+    policy.queries = {
+      add: true,
+      edit: true,
+      read: true,
+      delete: true,
+    };
+    policy.dashboards = {
+      add: true,
+      edit: true,
+      read: true,
+      delete: true,
+    };
     return policy;
   } catch (error) {
     Logger.log("error", {
@@ -33,7 +51,6 @@ const create_super_admin_policy = () => {
     });
   }
 };
-
 
 // Configure the connection to your PostgreSQL database
 const pool = new Pool({
@@ -83,7 +100,7 @@ const create_user_table_query = `
 `;
 
 const create_graph_table_query = `CREATE TABLE public.tbl_pm_graphs (
-	pm_graph_id serial4 NOT NULL,
+	pm_graph_id serial NOT NULL,
 	graph_title varchar NOT NULL,
 	graph_description varchar NULL,
 	is_disabled bool DEFAULT false NULL,
@@ -96,7 +113,7 @@ const create_graph_table_query = `CREATE TABLE public.tbl_pm_graphs (
 );`;
 
 const create_query_table_query = `CREATE TABLE public.tbl_pm_queries (
-	pm_query_id serial4 NOT NULL,
+	pm_query_id serial NOT NULL,
 	pm_query_type varchar DEFAULT 'POSTGRE_QUERY'::character varying NULL,
 	created_at timestamptz(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	updated_at timestamptz(6) DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -109,7 +126,7 @@ const create_query_table_query = `CREATE TABLE public.tbl_pm_queries (
 );`;
 
 const create_dashboard_table_query = `CREATE TABLE public.tbl_pm_dashboards (
-	pm_dashboard_id int4 DEFAULT nextval('tbl_pm_dashboard_layouts_pm_dashboard_layout_id_seq'::regclass) NOT NULL,
+	pm_dashboard_id serial NOT NULL,
 	dashboard_title varchar NOT NULL,
 	dashboard_description varchar NULL,
 	is_disabled bool DEFAULT false NULL,
@@ -121,11 +138,13 @@ const create_dashboard_table_query = `CREATE TABLE public.tbl_pm_dashboards (
 	dashboard_graph_ids _int4 NULL,
 	CONSTRAINT tbl_pm_dashboard_layout_pkey PRIMARY KEY (pm_dashboard_id)
 );`;
+
 const super_admin_policy_query = `
       INSERT INTO tbl_pm_policy_objects(title, description, is_disabled, policy)
       VALUES($1, $2, $3, $4)
       RETURNING pm_policy_object_id;
     `;
+
 const super_user_query_text = `
       INSERT INTO public.tbl_pm_users(
         first_name, last_name, address1, pm_policy_object_id, 
@@ -134,6 +153,7 @@ const super_user_query_text = `
       VALUES($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING pm_user_id;
     `;
+
 const create_trigger_query = `
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$

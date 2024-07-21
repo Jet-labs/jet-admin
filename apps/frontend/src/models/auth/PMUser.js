@@ -130,7 +130,7 @@ export class PMUser {
 
   extractAuthorizedGraphsForReadFromPolicyObject = () => {
     const authorizeGraphIDs = [];
-    if (this.policy.graphs.read) {
+    if (this.policy?.graphs?.read) {
       return true;
     } else if (this.policy.graphs && this.policy.graphs.graph_ids) {
       Object.keys(this.policy.graphs.graph_ids).forEach((graphID) => {
@@ -144,7 +144,7 @@ export class PMUser {
 
   extractAuthorizedGraphsForUpdateFromPolicyObject = () => {
     const authorizeGraphIDs = [];
-    if (this.policy.graphs.edit) {
+    if (this.policy?.graphs?.edit) {
       return true;
     } else if (this.policy.graphs && this.policy.graphs.graph_ids) {
       Object.keys(this.policy.graphs.graph_ids).forEach((graphID) => {
@@ -157,8 +157,7 @@ export class PMUser {
   };
 
   extractAuthorizationForGraphAddFromPolicyObject = () => {
-    console.log(this.policy.graphs);
-    if (this.policy.graphs.add) {
+    if (this.policy?.graphs?.add) {
       return true;
     }
     return false;
@@ -185,8 +184,7 @@ export class PMUser {
   // dashboards
 
   extractAuthorizationForDashboardAddFromPolicyObject = () => {
-    console.log(this.policy.dashboards);
-    if (this.policy.dashboards.add) {
+    if (this.policy?.dashboards?.add) {
       return true;
     }
     return false;
@@ -194,7 +192,7 @@ export class PMUser {
 
   extractAuthorizedDashboardsForReadFromPolicyObject = () => {
     const authorizeDashboardIDs = [];
-    if (this.policy.dashboards.read) {
+    if (this.policy?.dashboards?.read) {
       return true;
     } else if (this.policy.dashboards && this.policy.dashboards.dashboard_ids) {
       Object.keys(this.policy.dashboards.dashboard_ids).forEach(
@@ -210,7 +208,7 @@ export class PMUser {
 
   extractAuthorizedDashboardsForUpdateFromPolicyObject = () => {
     const authorizeDashboardIDs = [];
-    if (this.policy.dashboards.edit) {
+    if (this.policy?.dashboards?.edit) {
       return true;
     } else if (this.policy.dashboards && this.policy.dashboards.dashboard_ids) {
       Object.keys(this.policy.dashboards.dashboard_ids).forEach(
@@ -225,7 +223,6 @@ export class PMUser {
   };
 
   isAuthorizedToDeleteDashboard = (dashboardID) => {
-    console.log(this.policy.dashboards.dashboard_ids);
     let authorization = false;
     if (
       this.policy.dashboards &&
@@ -249,8 +246,7 @@ export class PMUser {
   // queries
 
   isAuthorizedToAddQuery = () => {
-    console.log(this.policy.queries);
-    if (this.policy.queries?.add) {
+    if (this.policy?.queries?.add) {
       return true;
     }
     return false;
@@ -258,7 +254,7 @@ export class PMUser {
 
   extractAuthorizedQueriesForReadFromPolicyObject = () => {
     const authorizeQueryIDs = [];
-    if (this.policy.queries.read) {
+    if (this.policy?.queries?.read) {
       return true;
     } else if (this.policy.queries && this.policy.queries.query_ids) {
       Object.keys(this.policy.queries.query_ids).forEach((pmQueryID) => {
@@ -272,7 +268,7 @@ export class PMUser {
 
   extractAuthorizedQueriesForUpdateFromPolicyObject = () => {
     const authorizeQueryIDs = [];
-    if (this.policy.queries.edit) {
+    if (this.policy?.queries?.edit) {
       return true;
     } else if (this.policy.queries && this.policy.queries.query_ids) {
       Object.keys(this.policy.queries.query_ids).forEach((pmQueryID) => {
@@ -286,7 +282,6 @@ export class PMUser {
 
   isAuthorizedToDeleteQuery = (pmQueryID) => {
     let authorization = false;
-    console.log(this.policy.queries);
     if (
       this.policy.queries &&
       !(
