@@ -16,6 +16,9 @@ export const CodeEditor = ({
   code,
   setCode,
   language = "json",
+  height = "200px",
+  outlined = true,
+  transparent = false,
 }) => {
   const theme = useTheme();
   // const {} = useCodeMirror();
@@ -26,7 +29,7 @@ export const CodeEditor = ({
       readOnly={readOnly || disabled}
       ref={ref}
       value={code}
-      height="200px"
+      height={height}
       width="100%"
       maxWidth="1000px"
       extensions={[langMap[language]]}
@@ -37,9 +40,9 @@ export const CodeEditor = ({
         indentOnInput: true,
       }}
       style={{
-        borderWidth: 1,
+        borderWidth: outlined ? 1 : 0,
         borderColor: theme.palette.divider,
-        borderRadius: 4,
+        borderRadius: outlined ? 4 : 0,
       }}
       className="codemirror-editor-rounded"
       indentWithTab={true}

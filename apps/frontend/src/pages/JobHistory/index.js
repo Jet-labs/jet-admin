@@ -9,13 +9,14 @@ import { useAuthState } from "../../contexts/authContext";
 
 import { LOCAL_CONSTANTS } from "../../constants";
 import { Loading } from "../Loading";
-
+import { parse, stringify, toJSON, fromJSON } from "flatted";
 import moment from "moment";
 import "react-data-grid/lib/styles.css";
 import { BiCalendar } from "react-icons/bi";
 import { DataGridActionComponent } from "../../components/DataGridComponents/DataGridActionComponent";
 import { ErrorComponent } from "../../components/ErrorComponent";
 import { RawDataGridStatistics } from "../../components/DataGridComponents/RawDataGridStatistics";
+import { CodeEditor } from "../../components/CodeEditorComponent";
 const JobHistory = () => {
   const tableName = LOCAL_CONSTANTS.STRINGS.JOB_HISTORY_TABLE_NAME;
 
@@ -55,29 +56,13 @@ const JobHistory = () => {
   });
 
   const getRowId = (row) => {
-    return row.pm_user_id;
+    return row.pm_job_history_id;
   };
 
   const columns = [
-    { field: "pm_job_history_id", headerName: "User ID" },
-    { field: "pm_job_id", headerName: "Username", width: 200 },
+    { field: "pm_job_history_id", headerName: "ID" },
+    { field: "pm_job_id", headerName: "Job ID", width: 200 },
 
-    {
-      field: "history_result",
-      headerName: "Result/Error",
-      width: 200,
-      valueGetter: (value, row) => {
-        return JSON.stringify(value);
-      },
-      renderCell: (params) => (
-        <Chip
-          label={`${params.value}`}
-          size="small"
-          variant="outlined"
-          color={"info"}
-        />
-      ),
-    },
     {
       field: "created_at",
       headerName: "Created at",
@@ -101,26 +86,21 @@ const JobHistory = () => {
       },
     },
     {
-      field: "updated_at",
-      headerName: "Updated at",
-      width: 300,
+      field: "history_result",
+      headerName: "Result/Error",
+      width: 400,
       valueGetter: (value, row) => {
-        return moment(value).format("dddd, MMMM Do YYYY, h:mm:ss a");
+        return JSON.stringify(value.row.history_result, null, 2);
       },
-      renderCell: (params) => {
-        return (
-          <Chip
-            label={`${params.value}`}
-            size="small"
-            variant="outlined"
-            color={"secondary"}
-            icon={<BiCalendar className="!text-sm" />}
-            sx={{
-              borderRadius: 1,
-            }}
-          />
-        );
-      },
+      renderCell: (params) => (
+        <CodeEditor
+          outlined={false}
+          readOnly={true}
+          code={`${params.value}`}
+          language="json"
+          height="100px"
+        />
+      ),
     },
   ];
 

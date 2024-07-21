@@ -216,6 +216,12 @@ class JobService {
     });
     try {
       if (authorizedJobs === true || authorizedJobs.includes(pmJobID)) {
+        await CustomCronJobScheduler.deleteScheduledCustomJob(pmJobID);
+        const deletedJobHistory = await prisma.tbl_pm_job_history.deleteMany({
+          where: {
+            pm_job_id: pmJobID,
+          },
+        });
         const job = await prisma.tbl_pm_jobs.delete({
           where: {
             pm_job_id: pmJobID,
@@ -227,7 +233,7 @@ class JobService {
             job,
           },
         });
-        CustomCronJobScheduler.deleteScheduledCustomJob(pmJobID);
+        
         return true;
       } else {
         Logger.log("error", {

@@ -20,7 +20,9 @@ class CustomCronJobScheduler {
         pmQueryType: pmJob.tbl_pm_queries.pm_query_type,
       });
       result.success = true;
-      result.result = runResult;
+      result.result = Array.isArray(runResult)
+        ? { resultLength: runResult.length }
+        : { result: runResult };
       Logger.log("success", {
         message: "CustomCronJobScheduler:runner:success",
         params: { pmJobID: pmJob.pm_job_id },
@@ -37,7 +39,7 @@ class CustomCronJobScheduler {
     await prisma.tbl_pm_job_history.create({
       data: {
         pm_job_id: pmJob.pm_job_id,
-        history_result: JSON.stringify(result),
+        history_result: result,
       },
     });
     Logger.log("info", {

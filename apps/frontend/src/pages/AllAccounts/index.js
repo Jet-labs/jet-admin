@@ -65,10 +65,11 @@ const AllAccounts = () => {
     { field: "last_name", headerName: "Last name", width: 200 },
     {
       field: "tbl_pm_policy_objects",
-      headerName: "Role",
+      headerName: "Role ID",
       width: 200,
       valueGetter: (value, row) => {
-        return value?.value?.title;
+        console.log({ value, row });
+        return value?.row?.pm_policy_object_id;
       },
       renderCell: (params) => (
         <Chip
