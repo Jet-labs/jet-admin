@@ -74,6 +74,7 @@ export const LOCAL_CONSTANTS = {
     PM_USER_TABLE_NAME: "tbl_pm_users",
     POLICY_OBJECT_TABLE_NAME: "tbl_pm_policy_objects",
     UNTITLED_CHART_TITLE: "Untitled chart",
+    JOB_HISTORY_TABLE_NAME: "tbl_pm_job_history",
   },
 
   // routes
@@ -88,6 +89,10 @@ export const LOCAL_CONSTANTS = {
     ADD_JOB: {
       code: "add",
       path: () => "add",
+    },
+    JOB_HISTORY: {
+      code: "history",
+      path: () => "history",
     },
     JOB_VIEW: {
       code: ":id",

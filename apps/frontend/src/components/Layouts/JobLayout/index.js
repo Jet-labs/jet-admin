@@ -5,7 +5,7 @@ import { LOCAL_CONSTANTS } from "../../../constants";
 import { JobsList } from "../../DrawerLists/JobDrawerList";
 const AddJob = lazy(() => import("../../../pages/AddJob"));
 const UpdateJob = lazy(() => import("../../../pages/UpdateJob"));
-
+const JobHistory = lazy(() => import("../../../pages/JobHistory"));
 const JobLayout = () => {
   return (
     <Grid container>
@@ -26,6 +26,10 @@ const JobLayout = () => {
           <Route
             path={LOCAL_CONSTANTS.ROUTES.ADD_JOB.code}
             element={<AddJob />}
+          />
+          <Route
+            path={LOCAL_CONSTANTS.ROUTES.JOB_HISTORY.code}
+            element={<JobHistory />}
           />
           <Route
             path={LOCAL_CONSTANTS.ROUTES.JOB_VIEW.code}

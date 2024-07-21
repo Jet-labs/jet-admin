@@ -1,0 +1,7 @@
+.rdg-cell {
+   outline: none !important;
+}
+.data-grid-custom-class{
+   .MuiDataGrid-virtualScroller{
+   }
+}

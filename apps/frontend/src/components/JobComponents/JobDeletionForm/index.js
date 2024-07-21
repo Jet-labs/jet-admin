@@ -1,62 +1,62 @@
 import { Button } from "@mui/material";
 import { useAuthState } from "../../../contexts/authContext";
 import { useMemo, useState } from "react";
-import { deleteQueryByIDAPI } from "../../../api/queries";
+import { deleteJobByIDAPI } from "../../../api/jobs";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { ConfirmationDialog } from "../../ConfirmationDialog";
 import { IoTrash } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { LOCAL_CONSTANTS } from "../../../constants";
-export const JobDeletionForm = ({ pmQueryID }) => {
+export const JobDeletionForm = ({ pmJobID }) => {
   const { pmUser } = useAuthState();
   const queryClient = useQueryClient();
-  const [isDeleteQueryConfirmationOpen, setIsDeleteQueryConfirmationOpen] =
+  const [isDeleteJobConfirmationOpen, setIsDeleteJobConfirmationOpen] =
     useState(false);
   const navigate = useNavigate();
 
-  const deleteQueryAuthorization = useMemo(() => {
+  const deleteJobAuthorization = useMemo(() => {
     if (pmUser) {
-      return pmUser.isAuthorizedToDeleteQuery(pmQueryID);
+      return pmUser.isAuthorizedToDeleteJob(pmJobID);
     } else {
       return false;
     }
-  }, [pmUser, pmQueryID]);
+  }, [pmUser, pmJobID]);
 
   const {
     isPending: isDeletingRow,
-    isSuccess: isDeleteQuerySuccess,
-    isError: isDeleteQueryError,
-    error: deleteQueryError,
-    mutate: deleteQuery,
+    isSuccess: isDeleteJobSuccess,
+    isError: isDeleteJobError,
+    error: deleteJobError,
+    mutate: deleteJob,
   } = useMutation({
-    mutationFn: ({ pmQueryID }) => deleteQueryByIDAPI({ pmQueryID }),
+    mutationFn: ({ pmJobID }) => deleteJobByIDAPI({ pmJobID }),
     retry: false,
     onSuccess: () => {
-      displaySuccess("Deleted query successfully");
-      queryClient.invalidateQueries(["REACT_QUERY_KEY_QUERIES"]);
-      navigate(LOCAL_CONSTANTS.ROUTES.ALL_QUERIES.path());
-      setIsDeleteQueryConfirmationOpen(false);
+      displaySuccess("Deleted job successfully");
+      queryClient.invalidateQueries(["REACT_QUERY_KEY_JOBS"]);
+      navigate(LOCAL_CONSTANTS.ROUTES.ALL_JOBS.path());
+      setIsDeleteJobConfirmationOpen(false);
     },
     onError: (error) => {
       displayError(error);
     },
   });
-  const _handleOpenDeleteQueryConfirmation = () => {
-    setIsDeleteQueryConfirmationOpen(true);
+  const _handleOpenDeleteJobConfirmation = () => {
+    setIsDeleteJobConfirmationOpen(true);
   };
-  const _handleCloseDeleteQueryConfirmation = () => {
-    setIsDeleteQueryConfirmationOpen(false);
+  const _handleCloseDeleteJobConfirmation = () => {
+    setIsDeleteJobConfirmationOpen(false);
   };
 
-  const _handleDeleteQuery = () => {
-    deleteQuery({ pmQueryID: pmQueryID });
+  const _handleDeleteJob = () => {
+    deleteJob({ pmJobID: pmJobID });
   };
   return (
-    deleteQueryAuthorization && (
+    deleteJobAuthorization && (
       <>
         <Button
-          onClick={_handleOpenDeleteQueryConfirmation}
+          onClick={_handleOpenDeleteJobConfirmation}
           startIcon={<IoTrash className="!text-sm" />}
           size="medium"
           variant="outlined"
@@ -66,11 +66,11 @@ export const JobDeletionForm = ({ pmQueryID }) => {
           Delete
         </Button>
         <ConfirmationDialog
-          open={isDeleteQueryConfirmationOpen}
-          onAccepted={_handleDeleteQuery}
-          onDecline={_handleCloseDeleteQueryConfirmation}
-          title={"Delete query?"}
-          message={`Are you sure you want to delete query id - ${pmQueryID}`}
+          open={isDeleteJobConfirmationOpen}
+          onAccepted={_handleDeleteJob}
+          onDecline={_handleCloseDeleteJobConfirmation}
+          title={"Delete job?"}
+          message={`Are you sure you want to delete job id - ${pmJobID}`}
         />
       </>
     )

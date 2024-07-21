@@ -283,14 +283,26 @@ model tbl_pm_queries {
 }
 
 model tbl_pm_jobs {
-  pm_job_id       Int       @id(map: "tbl_pm_jobs_pk") @default(autoincrement())
-  pm_job_title    String    @db.VarChar
-  pm_query_id     Int
-  pm_job_schedule String    @db.VarChar
-  created_at      DateTime  @default(now()) @db.Timestamptz(6)
-  updated_at      DateTime  @default(now()) @db.Timestamptz(6)
-  disabled_at     DateTime? @db.Timestamptz(6)
-  is_disabled     Boolean?  @default(false)
+  pm_job_id          Int                  @id(map: "tbl_pm_jobs_pk") @default(autoincrement())
+  pm_job_title       String               @db.VarChar
+  pm_query_id        Int
+  pm_job_schedule    String               @db.VarChar
+  created_at         DateTime             @default(now()) @db.Timestamptz(6)
+  updated_at         DateTime             @default(now()) @db.Timestamptz(6)
+  disabled_at        DateTime?            @db.Timestamptz(6)
+  is_disabled        Boolean?             @default(false)
+  tbl_pm_job_history tbl_pm_job_history[]
+}
+
+model tbl_pm_job_history {
+  pm_job_history_id Int         @id(map: "tbl_pm_job_histors_pk") @default(autoincrement())
+  history_result    Json?       @db.Json
+  created_at        DateTime    @default(now()) @db.Timestamptz(6)
+  updated_at        DateTime    @default(now()) @db.Timestamptz(6)
+  disabled_at       DateTime?   @db.Timestamptz(6)
+  is_disabled       Boolean?    @default(false)
+  pm_job_id         Int
+  tbl_pm_jobs       tbl_pm_jobs @relation(fields: [pm_job_id], references: [pm_job_id], onDelete: NoAction, onUpdate: NoAction, map: "tbl_pm_job_history_tbl_pm_jobs_fk")
 }
 
 enum mpaa_rating {

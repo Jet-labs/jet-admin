@@ -59,11 +59,11 @@ export const getJobByIDAPI = async ({ pmJobID }) => {
   }
 };
 
-export const deleteJobByIDAPI = async ({ jobID }) => {
+export const deleteJobByIDAPI = async ({ pmJobID }) => {
   try {
     const response = await axiosInstance.delete(
       LOCAL_CONSTANTS.APIS.JOB.deleteJobByID({
-        id: jobID,
+        id: pmJobID,
       })
     );
     if (response.data && response.data.success == true) {

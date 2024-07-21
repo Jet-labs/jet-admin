@@ -16,6 +16,7 @@ import { getAllQueryAPI } from "../../../api/queries";
 import { QUERY_PLUGINS_MAP } from "../../../plugins/queries";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { CronJobScheduler } from "../CronJobScheduler";
+import { JobDeletionForm } from "../JobDeletionForm";
 
 export const JobUpdateForm = ({ id }) => {
   const theme = useTheme();
@@ -105,10 +106,15 @@ export const JobUpdateForm = ({ id }) => {
   return (
     <div className="w-full !h-[calc(100vh-123px)]">
       <div
-        className="flex flex-col items-start justify-start p-3 px-6"
-        style={{ background: theme.palette.background.paper }}
+        className="flex flex-col items-start justify-start p-3 "
+        style={{
+          background: theme.palette.background.default,
+          borderBottomWidth: 1,
+          borderColor: theme.palette.divider,
+        }}
       >
-        <span className="text-lg font-bold text-start mt-1">{`Add new job`}</span>
+        <span className="text-lg font-bold text-start">{`Update job`}</span>
+        <span className="text-xs font-medium text-start mt-1">{`Job id : ${id}`}</span>
       </div>
 
       <Grid container className="!h-full">
@@ -155,6 +161,7 @@ export const JobUpdateForm = ({ id }) => {
           </FormControl>
 
           <div className="!flex flex-row justify-end items-center mt-10 w-100 px-3">
+            <JobDeletionForm pmJobID={id} />
             <Button
               variant="contained"
               className="!ml-3"
