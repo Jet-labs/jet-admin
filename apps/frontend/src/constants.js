@@ -66,8 +66,7 @@ const HttpStatusCode = {
 export const LOCAL_CONSTANTS = {
   SERVER_HOST: "http://127.0.0.1:8090",
   APP_NAME: "Jet admin",
-  APP_VERSION: "1.0.0",
-  APP_VERSION_RELEASE: 1,
+  APP_VERSION: "1.0.1",
 
   STRINGS: {
     ACCESS_TOKEN_LOCAL_STORAGE: "access_token",
