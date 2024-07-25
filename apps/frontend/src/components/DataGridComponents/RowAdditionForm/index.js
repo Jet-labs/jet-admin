@@ -10,7 +10,7 @@ import { getFormattedTableColumns } from "../../../utils/tables";
 import { ErrorComponent } from "../../ErrorComponent";
 import { FieldComponent } from "../../FieldComponent";
 
-export const RowAdditionForm = ({ tableName }) => {
+export const RowAdditionForm = ({ tableName, customTitle }) => {
   const theme = useTheme();
   const queryClient = useQueryClient();
   const {
@@ -74,7 +74,9 @@ export const RowAdditionForm = ({ tableName }) => {
     <div className="flex flex-col justify-start items-center w-full pb-5 p-2">
       <div className=" flex flex-row justify-between 2xl:w-3/5 xl:w-3/4 lg:w-2/3 md:w-full mt-3 ">
         <div className="flex flex-col items-start justify-start">
-          <span className="text-lg font-bold text-start ">{`Add row`}</span>
+          <span className="text-lg font-bold text-start ">
+            {customTitle ? customTitle : `Add row`}
+          </span>
           <span
             style={{ color: theme.palette.text.secondary }}
             className="text-xs font-thin text-start text-slate-300"

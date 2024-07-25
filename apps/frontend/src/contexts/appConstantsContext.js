@@ -61,6 +61,16 @@ const AppConstantsContextProvider = ({ children }) => {
     }
   }, [internalAppConstants]);
 
+  const processedInternalAppConstantsIDMap = useMemo(() => {
+    if (internalAppConstants && Array.isArray(internalAppConstants)) {
+      const _t = {};
+      internalAppConstants.forEach((_i) => {
+        _t[_i.pm_app_constant_title] = _i.pm_app_constant_id;
+      });
+      return _t;
+    }
+  }, [internalAppConstants]);
+
   console.log({
     processedInternalAppConstants,
     internalAppConstants,
@@ -74,6 +84,7 @@ const AppConstantsContextProvider = ({ children }) => {
         internalAppConstants: processedInternalAppConstants,
         isFetchingAllAppConstants,
         isLoadingAllAppConstants,
+        processedInternalAppConstantsIDMap,
       }}
     >
       <AppConstantsActionContext.Provider

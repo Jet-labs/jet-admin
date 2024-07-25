@@ -26,6 +26,7 @@ const QueryLayout = lazy(() => import("./Layouts/QueryLayout"));
 const JobLayout = lazy(() => import("./Layouts/JobLayout"));
 const AllAppConstants = lazy(() => import("../pages/AllAppConstants"));
 const UpdateAppConstant = lazy(() => import("../pages/UpdateAppConstant"));
+const AddAppConstant = lazy(() => import("../pages/AddAppConstant"));
 /**
  *
  * @param {object} param0
@@ -120,6 +121,16 @@ const AppRouter = ({}) => {
               element={
                 <ProtectedRoute
                   successComponent={UpdateAppConstant}
+                  fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
+                  loadingComponent={() => <Loading fullScreen />}
+                />
+              }
+            ></Route>
+            <Route
+              path={LOCAL_CONSTANTS.ROUTES.ADD_APP_CONSTANT.code}
+              element={
+                <ProtectedRoute
+                  successComponent={AddAppConstant}
                   fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
                   loadingComponent={() => <Loading fullScreen />}
                 />
