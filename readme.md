@@ -9,7 +9,7 @@ Overview
 This project aims to provide users with a user-friendly interface to manage their PostgreSQL databases & create dashbaords. This project consists of a frontend and a backend component for managing PostgreSQL databases through a web interface.
 
 
-https://github.com/ragsav/JetAdmin/assets/45696355/71a6ecaa-df93-4ea2-9b28-b740521886b6
+https://github.com/user-attachments/assets/7b387e54-6cf8-4257-9ce9-4c85bd8a3868
 
 
 Features
@@ -50,18 +50,8 @@ Features
 Getting Started
 ---------------
 
-To get started with the project, follow the instructions in the `frontend/README.md` and `backend/README.md` files to set up the frontend and backend components respectively.
+To get started with the project, follow the instructions in the `apps/frontend/README.md` and `apps/backend/README.md` files to set up the frontend and backend components respectively.
 
-Road Map
---------
-New features
-- [ ] Bulk Delete
-- [ ] Javascript based query
-- [ ] Rest API based query
-- [ ] Data Definition Language (DDL) : Create, Alter, Drop, Truncate
-- [ ] Javascript based actions
-- [ ] GUI action builder
-- [ ] GUI form builder to connect to actions
 
 Contributing
 ------------
