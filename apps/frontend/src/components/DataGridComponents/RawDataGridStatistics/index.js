@@ -6,9 +6,7 @@ import { useAuthState } from "../../../contexts/authContext";
 
 import { Grid, useTheme } from "@mui/material";
 import { LOCAL_CONSTANTS } from "../../../constants";
-import { useConstants } from "../../../contexts/constantsContext";
 import { Loading } from "../../../pages/Loading";
-import { displayError } from "../../../utils/notification";
 import { ErrorComponent } from "../../ErrorComponent";
 
 export const RawDataGridStatistics = ({

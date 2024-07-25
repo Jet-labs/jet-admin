@@ -4,12 +4,12 @@ import { githubLight } from "@uiw/codemirror-theme-github";
 import CodeMirror from "@uiw/react-codemirror";
 import { capitalize } from "lodash";
 import { useMemo, useState } from "react";
-import { useConstants } from "../../../../contexts/constantsContext";
+import { useAppConstants } from "../../../../contexts/appConstantsContext";
 import { containsOnly } from "../../../../utils/array";
 import { displayError } from "../../../../utils/notification";
 import { CRUDPermissionCheckboxGroup } from "../CRUDPermissionCheckboxGroup";
 export const TablePolicyEditor = ({ value, handleChange }) => {
-  const { dbModel } = useConstants();
+  const { dbModel } = useAppConstants();
   const isVisualEditorSufficient = useMemo(() => {
     let res = true;
     if (value) {

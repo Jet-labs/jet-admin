@@ -17,6 +17,7 @@ import { Link, useLocation, useParams } from "react-router-dom";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { GrConnect } from "react-icons/gr";
 import { RiCalendarScheduleFill } from "react-icons/ri";
+import { VscSymbolVariable } from "react-icons/vsc";
 const drawerList = [
   {
     text: "Dashboards",
@@ -42,6 +43,11 @@ const drawerList = [
     text: "Graphs",
     icon: <FaRegChartBar size={24} className="!text-sm" />,
     to: LOCAL_CONSTANTS.ROUTES.ALL_GRAPHS.path(),
+  },
+  {
+    text: "Constants",
+    icon: <VscSymbolVariable size={24} className="!text-sm" />,
+    to: LOCAL_CONSTANTS.ROUTES.ACCOUNT_MANAGEMENT,
   },
   {
     text: "Policies",
@@ -96,6 +102,7 @@ export const MainDrawerList = ({ currentPageTitle }) => {
                   primaryTypographyProps={{
                     sx: {
                       fontSize: 10,
+                      fontWeight: "600",
                     },
                   }}
                   sx={{

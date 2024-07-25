@@ -10,8 +10,8 @@ expressApp.use(cookieParser());
 expressApp.use("/admin_api/auth", require("./modules/auth/auth.route"));
 
 expressApp.use(
-  "/admin_api/constants",
-  require("./modules/constants/constants.route")
+  "/admin_api/app_constants",
+  require("./modules/appConstants/appConstants.route")
 );
 
 expressApp.use("/admin_api/tables", require("./modules/table/table.route"));

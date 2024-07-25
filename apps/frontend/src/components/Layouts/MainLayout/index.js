@@ -26,7 +26,7 @@ export const MainLayout = ({ children }) => {
 
   const stickyDrawer = useMemo(() => {
     return (
-      <Grid item md={0} lg={0.8} xl={0.8}>
+      <Grid item xs={1.4} sm={1} md={0.8} lg={0.8} xl={0.8}>
         <MainDrawerList currentPageTitle={currentPageTitle} />
       </Grid>
     );
@@ -58,12 +58,14 @@ export const MainLayout = ({ children }) => {
       <Grid item xs={12} md={12}>
         <Navbar handleDrawerOpen={_handleDrawerOpen} />
       </Grid>
-      {isSmallDevice ? floatingDrawer : stickyDrawer}
-
+      {/* {isSmallDevice ? floatingDrawer : stickyDrawer} */}
+      {stickyDrawer}
       <Grid
-        md={12}
+        md={11.2}
         lg={11.2}
         xl={11.2}
+        xs={10.6}
+        sm={11}
         className="!h-[calc(100vh-48px)] !overflow-y-auto"
       >
         {children}

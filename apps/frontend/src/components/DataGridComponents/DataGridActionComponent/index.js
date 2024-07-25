@@ -21,7 +21,6 @@ import {
 } from "react-icons/fa";
 import { getAuthorizedColumnsForRead } from "../../../api/tables";
 import { LOCAL_CONSTANTS } from "../../../constants";
-import { useConstants } from "../../../contexts/constantsContext";
 import { AppliedFiltersList } from "../AppliedFilterList";
 import { DataGridFilterComponent } from "../DataGridFilterComponent";
 import { DataGridSortComponent } from "../DataGridSortComponent";

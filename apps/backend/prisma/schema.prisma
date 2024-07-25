@@ -307,6 +307,17 @@ model tbl_pm_job_history {
   tbl_pm_jobs       tbl_pm_jobs @relation(fields: [pm_job_id], references: [pm_job_id], onDelete: NoAction, onUpdate: NoAction, map: "tbl_pm_job_history_tbl_pm_jobs_fk")
 }
 
+model tbl_pm_app_constants {
+  pm_app_constant_id    Int       @id(map: "tbl_pm_app_constants_pk") @default(autoincrement())
+  pm_app_constant_title String    @db.VarChar
+  pm_app_constant_value Json      @db.Json
+  created_at            DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at            DateTime  @default(now()) @db.Timestamptz(6)
+  disabled_at           DateTime? @db.Timestamptz(6)
+  is_disabled           Boolean?  @default(false)
+  is_internal           Boolean?
+}
+
 enum mpaa_rating {
   G
   PG

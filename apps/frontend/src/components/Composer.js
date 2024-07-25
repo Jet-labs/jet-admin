@@ -4,7 +4,7 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AuthContextProvider } from "../contexts/authContext";
 import { SocketContextProvider } from "../contexts/socketContext";
-import { ConstantsContextProvider } from "../contexts/constantsContext";
+import { AppConstantsContextProvider } from "../contexts/appConstantsContext";
 import { customDarkTheme, customLightTheme } from "../theme";
 
 const theme = createTheme(customLightTheme);
@@ -13,7 +13,7 @@ const queryClient = new QueryClient();
 function Composer({ children }) {
   return (
     <QueryClientProvider client={queryClient}>
-      <ConstantsContextProvider>
+      <AppConstantsContextProvider>
         <SocketContextProvider>
           <AuthContextProvider>
             <ThemeProvider theme={theme}>
@@ -22,7 +22,7 @@ function Composer({ children }) {
             </ThemeProvider>
           </AuthContextProvider>
         </SocketContextProvider>
-      </ConstantsContextProvider>
+      </AppConstantsContextProvider>
       <ToastContainer />
     </QueryClientProvider>
   );

@@ -66,7 +66,7 @@ const HttpStatusCode = {
 export const LOCAL_CONSTANTS = {
   SERVER_HOST: "http://127.0.0.1:8090",
   APP_NAME: "Jet admin",
-  APP_VERSION: "1.0.1",
+  APP_VERSION: "1.0.11",
 
   STRINGS: {
     ACCESS_TOKEN_LOCAL_STORAGE: "access_token",
@@ -81,6 +81,19 @@ export const LOCAL_CONSTANTS = {
   ROUTES: {
     HOME: "/",
     SIGNIN: "/signin",
+
+    ALL_APP_CONSTANTS: {
+      code: "/app_constants/*",
+      path: () => "/app_constants",
+    },
+    ADD_APP_CONSTANT: {
+      code: "add",
+      path: () => "add",
+    },
+    APP_CONSTANT_VIEW: {
+      code: ":id",
+      path: (id) => `${id}`,
+    },
 
     ALL_JOBS: {
       code: "/jobs/*",
@@ -256,8 +269,13 @@ export const LOCAL_CONSTANTS = {
       deleteQueryByID: ({ id }) => `/admin_api/queries/${id}`,
     },
 
-    CONSTANTS: {
-      fetchRemoteConstants: () => `/admin_api/constants/admin/`,
+    APP_CONSTANTS: {
+      getDBModelAppConstant: () => `/admin_api/app_constants/db_model/`,
+      getAllAppConstants: () => `/admin_api/app_constants`,
+      getAppConstantByID: ({ id }) => `/admin_api/app_constants/${id}`,
+      addAppConstant: () => `/admin_api/app_constants`,
+      updateAppConstant: () => `/admin_api/app_constants`,
+      deleteAppConstantByID: ({ id }) => `/admin_api/app_constants/${id}`,
     },
   },
 
@@ -356,6 +374,14 @@ export const LOCAL_CONSTANTS = {
   },
 
   CUSTOM_INT_MAPPINGS: {},
+
+  // CUSTOM_INT_MAPPINGS: {
+  //   [table_name]: {
+  //     [field_name]: {
+  //       [int]: [value],
+  //     },
+  //   },
+  // }
 
   CUSTOM_INT_COLOR_MAPPINGS: {},
 

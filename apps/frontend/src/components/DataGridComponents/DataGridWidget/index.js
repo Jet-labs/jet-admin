@@ -14,7 +14,7 @@ import { useAuthState } from "../../../contexts/authContext";
 import "react-data-grid/lib/styles.css";
 import { getAuthorizedColumnsForRead } from "../../../api/tables";
 import { LOCAL_CONSTANTS } from "../../../constants";
-import { useConstants } from "../../../contexts/constantsContext";
+import { useAppConstants } from "../../../contexts/appConstantsContext";
 import { Loading } from "../../../pages/Loading";
 import {
   getFormattedTableColumns,
@@ -32,7 +32,7 @@ export const DataGridWidget = ({
   showStats,
   containerClass,
 }) => {
-  const { dbModel } = useConstants();
+  const { dbModel } = useAppConstants();
   const { pmUser } = useAuthState();
   const queryClient = useQueryClient();
   const navigate = useNavigate();

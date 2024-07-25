@@ -523,8 +523,12 @@ export const customLightTheme = {
             borderColor: "#CFCFCF",
           },
           "&:hover fieldset": {
-            borderColor: "#6a7585 !important",
+            borderColor: "#CFCFCF",
           },
+          "&:hover": {
+            backgroundColor: "#F5F5F5",
+          },
+
           "& .MuiIconButton-root": {
             background: "#00000000",
             color: "#6a7585",

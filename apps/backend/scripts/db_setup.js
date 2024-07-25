@@ -155,6 +155,19 @@ const create_jobs_table_query = `CREATE TABLE IF NOT EXISTS public.tbl_pm_jobs
     CONSTRAINT tbl_pm_jobs_pk PRIMARY KEY (pm_job_id)
 );`;
 
+const create_app_constants_table_query = `CREATE TABLE IF NOT EXISTS public.tbl_pm_app_constants
+(
+    pm_app_constant_id serial NOT NULL,
+    pm_app_constant_title character varying NOT NULL,
+    pm_app_constant_value json NOT NULL,
+    created_at timestamp(6) with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp(6) with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    disabled_at timestamp(6) with time zone,
+    is_disabled boolean DEFAULT false,
+    is_internal boolean DEFAULT false,
+    CONSTRAINT tbl_pm_app_constants_pk PRIMARY KEY (pm_app_constant_id)
+);`;
+
 const super_admin_policy_query = `
       INSERT INTO tbl_pm_policy_objects(title, description, is_disabled, policy)
       VALUES($1, $2, $3, $4)
@@ -203,6 +216,7 @@ async function setup_database() {
     await client.query(create_query_table_query);
     await client.query(create_dashboard_table_query);
     await client.query(create_jobs_table_query);
+    await client.query(create_app_constants_table_query);
     await client.query("COMMIT");
 
     Logger.log("success", {
