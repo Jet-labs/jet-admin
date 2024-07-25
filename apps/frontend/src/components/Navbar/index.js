@@ -1,6 +1,7 @@
 import {
   AppBar,
   Avatar,
+  Button,
   Divider,
   IconButton,
   ListItemIcon,
@@ -16,8 +17,14 @@ import { useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
 import { LOCAL_CONSTANTS } from "../../constants";
 import { useAuthActions, useAuthState } from "../../contexts/authContext";
+import { useThemeActions, useThemeValue } from "../../contexts/themeContext";
+import { MdDarkMode } from "react-icons/md";
+import { IoSunnySharp } from "react-icons/io5";
+import { capitalize, upperCase } from "lodash";
 
 export const Navbar = ({ children, handleDrawerOpen }) => {
+  const { themeType } = useThemeValue();
+  const { toggleTheme, setThemeType } = useThemeActions();
   const [profileAnchor, setProfileAnchor] = useState(null);
   const { signOut } = useAuthActions();
   const { pmUser } = useAuthState();
@@ -77,19 +84,39 @@ export const Navbar = ({ children, handleDrawerOpen }) => {
           </div>
         </div>
 
-        <IconButton
-          className="!p-0"
-          onClick={_handleProfileClick}
-          aria-controls={isProfileOpen ? "account-menu" : undefined}
-          aria-haspopup="true"
-          aria-expanded={isProfileOpen ? "true" : undefined}
-          size="small"
-        >
-          <Avatar
-            sx={{ width: 32, height: 32 }}
-            style={{ background: theme.palette.primary.light }}
-          ></Avatar>
-        </IconButton>
+        <div className="!flex-row justify-end items-center">
+          <Button
+            variant="outlined"
+            className={`!p-0 !mr-3 !rounded-3xl !capitalize ${
+              themeType === "dark" ? "!border-amber-500 !text-amber-500" : ""
+            }`}
+            onClick={toggleTheme}
+            size="small"
+            startIcon={
+              themeType === "dark" ? (
+                <IoSunnySharp className="!text-xl"></IoSunnySharp>
+              ) : (
+                <MdDarkMode className="!text-xl"></MdDarkMode>
+              )
+            }
+          >
+            {themeType === "dark" ? "Light theme" : "Dark theme"}
+          </Button>
+          <IconButton
+            className="!p-0"
+            onClick={_handleProfileClick}
+            aria-controls={isProfileOpen ? "account-menu" : undefined}
+            aria-haspopup="true"
+            aria-expanded={isProfileOpen ? "true" : undefined}
+            size="small"
+          >
+            <Avatar
+              sx={{ width: 32, height: 32 }}
+              style={{ background: theme.palette.primary.light }}
+            ></Avatar>
+          </IconButton>
+        </div>
+
         <Menu
           anchorEl={profileAnchor}
           id="account-menu"

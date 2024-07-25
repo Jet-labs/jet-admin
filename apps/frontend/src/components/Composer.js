@@ -1,13 +1,11 @@
-import { CssBaseline, ThemeProvider, createTheme } from "@mui/material";
+import { CssBaseline } from "@mui/material";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { AppConstantsContextProvider } from "../contexts/appConstantsContext";
 import { AuthContextProvider } from "../contexts/authContext";
 import { SocketContextProvider } from "../contexts/socketContext";
-import { AppConstantsContextProvider } from "../contexts/appConstantsContext";
-import { customDarkTheme, customLightTheme } from "../theme";
-
-const theme = createTheme(customLightTheme);
+import { ThemeContextProvider } from "../contexts/themeContext";
 
 const queryClient = new QueryClient();
 function Composer({ children }) {
@@ -16,10 +14,10 @@ function Composer({ children }) {
       <AppConstantsContextProvider>
         <SocketContextProvider>
           <AuthContextProvider>
-            <ThemeProvider theme={theme}>
+            <ThemeContextProvider>
               <CssBaseline />
               {children}
-            </ThemeProvider>
+            </ThemeContextProvider>
           </AuthContextProvider>
         </SocketContextProvider>
       </AppConstantsContextProvider>

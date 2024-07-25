@@ -10,16 +10,16 @@ export const customDarkTheme = {
       white: "#fff",
     },
     primary: {
-      main: "#7b79ff",
-      light: "#dad6ff",
-      dark: "#373078",
+      main: "#4A6BFF",
+      light: "#B7C4FF",
+      dark: "#132C9C",
       contrastText: "#6a7585",
     },
     secondary: {
-      main: "#ce93d8",
-      light: "#f3e5f5",
-      dark: "#ab47bc",
-      contrastText: "rgba(0, 0, 0, 0.87)",
+      main: "#A7A6FF",
+      light: "#dad6ff",
+      dark: "#231C68",
+      contrastText: "#6a7585",
     },
     error: {
       main: "#f44336",
@@ -64,26 +64,27 @@ export const customDarkTheme = {
     contrastThreshold: 3,
     tonalOffset: 0.2,
     text: {
-      primary: "#fff",
-      secondary: "rgba(255, 255, 255, 0.7)",
-      disabled: "rgba(255, 255, 255, 0.5)",
-      icon: "rgba(255, 255, 255, 0.5)",
+      primary: "#CFCFCF",
+      secondary: "#F3F3F3",
+      disabled: "#F3F3F3",
+      icon: "#F3F3F3",
     },
-    divider: "#E6E6E6",
+    divider: "#444444",
     background: {
-      paper: "#ffffff",
-      default: "##f9fafc",
+      paper: "#333333",
+      default: "#1B1B1B",
+      secondary: "#131313",
     },
     action: {
-      active: "#fff",
-      hover: "rgba(50, 50, 77, 0.481)",
+      active: "#e6e6e6",
+      hover: "#E6E6E656",
       hoverOpacity: 0.08,
-      selected: "#222235",
+      selected: "#e6e6e6",
       selectedOpacity: 0.16,
-      disabled: "rgba(255, 255, 255, 0.3)",
+      disabled: "#e6e6e6",
       disabledBackground: "rgba(255, 255, 255, 0.12)",
       disabledOpacity: 0.38,
-      focus: "rgba(255, 255, 255, 0.12)",
+      focus: "#e6e6e6",
       focusOpacity: 0.12,
       activatedOpacity: 0.24,
     },
@@ -91,15 +92,9 @@ export const customDarkTheme = {
   components: {
     MuiList: {
       styleOverrides: {
-        // Name of the slot
         root: {
           fontSize: "0.75rem !important",
-          // Some CSS
-          background: "rgba(34, 34, 53, 1)",
-          // paddingTop: 10,
-          // paddingBottom: 10,
-          // paddingLeft: 16,
-          // paddingRight: 16,
+          background: "#f9fafc",
         },
       },
     },
@@ -107,28 +102,39 @@ export const customDarkTheme = {
     MuiListItemButton: {
       defaultProps: {
         fontSize: "0.75rem !important",
-        // The props to change the default for.
-        disableRipple: true, // No more ripple, on the whole application 💣!
+        disableRipple: true,
+      },
+      styleOverrides: {
+        root: {
+          "&:hover": {
+            background: "#e6e6e6",
+          },
+        },
       },
     },
+
     MuiMenuItem: {
       styleOverrides: {
-        // Name of the slot
         root: {
           fontSize: "0.75rem !important",
           paddingTop: "4px !important",
           paddingBottom: "4px !important",
           paddingLeft: "10px !important",
           paddingRight: "10px !important",
+          color: "#6a7585",
+          "&:hover": {
+            background: "#e6e6e6",
+          },
         },
       },
     },
+
     MuiDialogTitle: {
       styleOverrides: {
         // Name of the slot
         root: {
           // Some CSS
-          background: "rgb(24, 24, 38)",
+          background: "#ffffff",
           paddingTop: 10,
           paddingBottom: 10,
           paddingLeft: 16,
@@ -136,12 +142,13 @@ export const customDarkTheme = {
         },
       },
     },
+
     MuiDialogActions: {
       styleOverrides: {
         // Name of the slot
         root: {
           // Some CSS
-          background: "rgb(24, 24, 38)",
+          background: "#ffffff",
           paddingTop: 10,
           paddingBottom: 10,
           paddingLeft: 16,
@@ -149,12 +156,13 @@ export const customDarkTheme = {
         },
       },
     },
+
     MuiDialogContent: {
       styleOverrides: {
         // Name of the slot
         root: {
           // Some CSS
-          background: "rgba(34, 34, 53, 1)",
+          background: "#ffffff",
           paddingTop: 10,
           paddingBottom: 10,
           paddingLeft: 16,
@@ -162,23 +170,34 @@ export const customDarkTheme = {
         },
       },
     },
+
     MuiIconButton: {
       styleOverrides: {
         // Name of the slot
         root: {
           fontSize: "0.75rem !important",
+          color: "#6a7585",
         },
       },
       defaultProps: {
-        // The props to change the default for.
-        disableRipple: true, // No more ripple, on the whole application 💣!
+        disableRipple: true,
         elevation: 0,
         fontSize: "0.75rem !important",
       },
     },
+
+    MuiSwitch: {
+      styleOverrides: {
+        root: {
+          "& .MuiSwitch-track": {
+            backgroundColor: "#6a7585",
+          },
+        },
+      },
+    },
+
     MuiButton: {
       styleOverrides: {
-        // Name of the slot
         root: {
           fontSize: "0.60rem !important",
           paddingTop: "4px !important",
@@ -186,21 +205,35 @@ export const customDarkTheme = {
           paddingLeft: "8px !important",
           paddingRight: "8px !important",
           fontWeight: 600,
+          "&:hover": {
+            background: "#4A6BFF",
+          },
         },
         contained: {
-          border: "1px solid rgb(123, 121, 255)",
+          border: "1px solid #4A6BFF",
           fontWeight: 600,
+          color: "#ffffff",
+        },
+        outlined: {
+          borderWidth: 1,
+          "&:hover": {
+            background: "#00000000",
+          },
+        },
+        text: {
+          "&:hover": {
+            background: "#00000000",
+          },
         },
       },
       defaultProps: {
-        // The props to change the default for.
-        disableRipple: true, // No more ripple, on the whole application 💣!
+        disableRipple: true,
         elevation: 0,
       },
     },
+
     MuiOutlinedInput: {
       styleOverrides: {
-        // Name of the slot
         root: {
           fontSize: "0.75rem !important",
           paddingTop: "3px !important",
@@ -209,17 +242,33 @@ export const customDarkTheme = {
           paddingRight: "10px !important",
 
           "& fieldset": {
-            borderColor: "rgb(123, 121, 255,0.5)",
+            borderColor: "#CFCFCF",
           },
           "&:hover fieldset": {
-            borderColor: "rgb(123, 121, 255) !important",
+            borderColor: "#CFCFCF",
           },
-          "& .MuiIconButton-root": {
-            background: "rgba(255, 255, 255, 0)",
+          "&:hover": {
+            backgroundColor: "#F5F5F5",
+          },
 
-            border: "0px solid rgb(50, 50, 77)",
+          "& .MuiIconButton-root": {
+            background: "#00000000",
+            color: "#6a7585",
             fontSize: 10,
           },
+          "& .MuiSvgIcon-root": {
+            color: "#6a7585",
+          },
+          input: {
+            "&:-webkit-autofill": {
+              WebkitBoxShadow: "0 0 0 100px #fff inset",
+              WebkitTextFillColor: "#6a7585",
+
+              caretColor: "#6a7585",
+            },
+          },
+
+          color: "#6a7585",
         },
         input: {
           fontSize: "0.75rem !important",
@@ -248,25 +297,79 @@ export const customDarkTheme = {
           paddingBottom: "3px !important",
           paddingLeft: "0px !important",
           paddingRight: "0px !important",
-
+          color: "#6a7585",
           height: "unset",
+        },
+        root: {
+          color: "#6a7585",
         },
       },
     },
+
+    MuiPaginationItem: {
+      styleOverrides: {
+        root: {
+          "&:hover": {
+            background: "#33333300",
+          },
+          "& .Mui-selected": {
+            background: "#33333300",
+            "&:hover": {
+              background: "#33333300",
+            },
+          },
+        },
+      },
+    },
+
     MuiDataGrid: {
       styleOverrides: {
-        // Name of the slot
         root: {
-          // Some CSS
-          // background: "rgba(34, 34, 53, 1)",
-          borderRadius: 4,
-
-          border: "1px solid rgb(50, 50, 77)",
-          // fontSize: 10,
+          background: "#33333300",
+          borderWidth: 0,
+          "& .MuiDataGrid-main": {
+            borderColor: "#444444",
+            borderWidth: 1,
+          },
+          "& .MuiDataGrid-withBorderColor": {
+            borderRadius: 0,
+            borderWidth: 0,
+            borderBottom: 0,
+          },
+          "& .MuiDataGrid-columnHeader": {
+            background: "#333333",
+            borderColor: "#00000000",
+            outline: 0,
+            borderRadius: 0,
+            borderWidth: 0,
+            borderBottom: 0,
+            "&:focus-within": {
+              outline: "none !important",
+            },
+          },
+          "& .MuiDataGrid-columnHeaderTitle": {
+            color: "#DADADA",
+            border: 0,
+            borderBottom: 0,
+          },
+          "& .MuiCheckbox-root": {
+            color: "#DADADA",
+          },
+          "& .MuiDataGrid-cell": {
+            borderColor: "#00000000",
+            outline: "none",
+            "&:focus-within": {
+              outline: "none !important",
+            },
+          },
         },
         row: {
-          borderTop: "1px solid rgb(50, 50, 77)",
-          background: "rgba(34, 34, 53, 1)",
+          background: "#222222",
+          borderTopWidth: 1,
+          borderColor: "#444444",
+          "&:hover": {
+            background: "#444444",
+          },
         },
         virtualScroller: {
           overflowY: "auto !important",
@@ -657,3 +760,4 @@ export const customLightTheme = {
   },
 };
 
+export default { ...customDarkTheme };

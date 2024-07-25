@@ -41,7 +41,7 @@ export const DashboardDropZoneComponent = ({ graphIDData, setGraphIDData }) => {
   return (
     <div
       className="w-full h-full p-2"
-      // style={{ background: theme.palette.divider }}
+      style={{ background: theme.palette.background.paper }}
     >
       <Grid
         className="w-full h-full  !overflow-y-auto "

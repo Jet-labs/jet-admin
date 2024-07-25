@@ -113,12 +113,14 @@ export const getFieldFormatting = ({
         <Chip
           label={`${params.value}`}
           size="small"
-          variant="outlined"
+          variant="filled"
+          className="!bg-slate-200 !text-slate-800 !h-min !py-0.5 !border !border-slate-500 !rounded"
+          sx={{
+            maxHeight: null,
+          }}
           color={"secondary"}
           icon={<BiCalendar className="!text-sm" />}
-          sx={{
-            borderRadius: 1,
-          }}
+          
         />
       );
       break;
@@ -131,32 +133,42 @@ export const getFieldFormatting = ({
       f = isList ? (
         params.value.map((data) => {
           const _d = customIntMapping?.[data] ? customIntMapping[data] : data;
+          const _class = customIntMapping?.[data]
+            ? "!bg-slate-200 !text-slate-800 !h-min !pt-0.5 !border !border-slate-500 !rounded"
+            : "";
           return (
             <ListItem key={data}>
               <Chip
                 label={`${_d}`}
                 size="small"
-                variant="outlined"
-                color={"info"}
+                variant="filled"
+                className={_class}
+                sx={{
+                  maxHeight: null,
+                }}
               />
             </ListItem>
           );
         })
       ) : (
-        <Chip
-          label={`${
-            customIntMapping?.[params.value]
-              ? customIntMapping[params.value]
-              : params.value
-          }`}
-          size="small"
-          variant="outlined"
-          color={"info"}
-          sx={{
-            borderRadius: 1,
-          }}
-        />
-      );
+        ()=>{
+          const _d = customIntMapping?.[value] ? customIntMapping[value] : value;
+          const _class = customIntMapping?.[value]
+            ? "!bg-slate-200 !text-slate-800 !h-min !pt-0.5 !border !border-slate-500 !rounded"
+            : "!rounded !bg-transparent";
+          return (
+            <Chip
+              label={`${_d}`}
+              size="small"
+              variant="filled"
+              className={_class}
+              sx={{
+                maxHeight: null,
+              }}
+            />
+          );
+        }
+      )();
       break;
     }
 
