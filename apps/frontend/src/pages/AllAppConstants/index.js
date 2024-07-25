@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import { Chip, Pagination } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
-import { fetchAllRowsAPI } from "../../api/tables";
+import { useMemo, useState } from "react";
+import { fetchAllRowsAPI, getAuthorizedColumnsForRead } from "../../api/tables";
 import { useAuthState } from "../../contexts/authContext";
 
 import { LOCAL_CONSTANTS } from "../../constants";
@@ -16,14 +16,20 @@ import { BiCalendar } from "react-icons/bi";
 import { DataGridActionComponent } from "../../components/DataGridComponents/DataGridActionComponent";
 import { ErrorComponent } from "../../components/ErrorComponent";
 import { RawDataGridStatistics } from "../../components/DataGridComponents/RawDataGridStatistics";
+import {
+  getFieldFormatting,
+  getFormattedTableColumns,
+} from "../../utils/tables";
+import { useAppConstants } from "../../contexts/appConstantsContext";
 const AllAppConstants = () => {
-  const tableName = LOCAL_CONSTANTS.STRINGS.PM_USER_TABLE_NAME;
+  const tableName = LOCAL_CONSTANTS.STRINGS.APP_CONSTANTS_TABLE_NAME;
 
   const { pmUser } = useAuthState();
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [filterQuery, setFilterQuery] = useState(null);
   const [sortModel, setSortModel] = useState(null);
+  const { dbModel, internalAppConstants } = useAppConstants();
   const {
     isLoading: isLoadingAllAppConstants,
     data: data,
@@ -55,31 +61,59 @@ const AllAppConstants = () => {
   });
 
   const getRowId = (row) => {
-    return row.pm_user_id;
+    return row.pm_app_constant_id;
   };
 
+  const {
+    isLoading: isLoadingReadColumns,
+    data: readColumns,
+    error: loadReadColumnsError,
+  } = useQuery({
+    queryKey: [
+      `REACT_QUERY_KEY_TABLES_${String(tableName).toUpperCase()}`,
+      `read_column`,
+    ],
+    queryFn: () => getAuthorizedColumnsForRead({ tableName }),
+    cacheTime: 0,
+    retry: 1,
+    staleTime: Infinity,
+  });
+
+  const authorizedColumns = useMemo(() => {
+    console.log({ iiiinternalAppConstants: internalAppConstants });
+    if (readColumns) {
+      const c = getFormattedTableColumns(
+        readColumns,
+        internalAppConstants?.CUSTOM_INT_VIEW_MAPPING?.[tableName]
+      );
+      return c;
+    } else {
+      return null;
+    }
+  }, [readColumns, internalAppConstants]);
+
   const columns = [
-    { field: "pm_user_id", headerName: "User ID" },
-    { field: "username", headerName: "Username", width: 200 },
-    { field: "first_name", headerName: "First name", width: 200 },
-    { field: "last_name", headerName: "Last name", width: 200 },
+    { field: "pm_app_constant_id", headerName: "ID" },
+    { field: "pm_app_constant_title", headerName: "Name", width: 300 },
+
     {
-      field: "tbl_pm_policy_objects",
-      headerName: "Role ID",
+      field: "pm_app_constant_value",
+      headerName: "Value",
       width: 200,
       valueGetter: (value, row) => {
         console.log({ value, row });
-        return value?.row?.pm_policy_object_id;
+        return value?.row?.pm_app_constant_value;
       },
-      renderCell: (params) => (
-        <Chip
-          label={`${params.value}`}
-          size="small"
-          variant="outlined"
-          color={"info"}
-        />
-      ),
+      renderCell: (params) => {
+        return getFieldFormatting({
+          type: "code",
+          isID: false,
+          isList: false,
+          params,
+        });
+      },
     },
+    { field: "is_internal", headerName: "Internal usage", width: 200 },
     {
       field: "created_at",
       headerName: "Created at",
@@ -131,7 +165,7 @@ const AllAppConstants = () => {
       <div className={`!w-full !p-4`}>
         <RawDataGridStatistics
           tableName={tableName}
-          altTableName={"AppConstant management"}
+          altTableName={"App constant management"}
           filterQuery={filterQuery}
         />
         <DataGridActionComponent
@@ -152,7 +186,7 @@ const AllAppConstants = () => {
           <DataGrid
             rows={data.rows}
             loading={isLoadingAllAppConstants || isFetchingAllAllAppConstants}
-            columns={columns}
+            columns={authorizedColumns}
             initialState={{}}
             editMode="row"
             hideFooterPagination={true}
@@ -165,7 +199,7 @@ const AllAppConstants = () => {
               navigate(
                 LOCAL_CONSTANTS.ROUTES.APP_CONSTANT_VIEW.path(
                   JSON.stringify({
-                    pm_user_id: param.row.pm_user_id,
+                    pm_app_constant_id: param.row.pm_app_constant_id,
                   })
                 )
               );

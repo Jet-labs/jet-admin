@@ -49,6 +49,45 @@ appConstantController.getAllAppConstants = async (req, res) => {
  * @param {import("express").Response} res
  * @returns
  */
+appConstantController.getAllInternalAppConstants = async (req, res) => {
+  try {
+    const { pmUser, state, params } = req;
+    const pm_user_id = parseInt(pmUser.pm_user_id);
+    const authorized_app_constants = state.authorized_app_constants;
+
+    Logger.log("info", {
+      message: "appConstantController:getAllInternalAppConstants:params",
+      params: { pm_user_id },
+    });
+
+    const appConstants = await AppConstantService.getAllInternalAppConstants({
+      authorizedAppConstants: authorized_app_constants,
+    });
+
+    Logger.log("success", {
+      message: "appConstantController:getAllInternalAppConstants:success",
+      params: { pm_user_id, appConstants },
+    });
+
+    return res.json({
+      success: true,
+      appConstants: appConstants,
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "appConstantController:getAllInternalAppConstants:catch-1",
+      params: { error },
+    });
+    return res.json({ success: false, error: extractError(error) });
+  }
+};
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @returns
+ */
 appConstantController.getAppConstantByID = async (req, res) => {
   try {
     const { pmUser, state, params } = req;

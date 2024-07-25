@@ -16,6 +16,14 @@ router.get("/db_model", async (req, res) => {
 });
 
 router.get(
+  "/internal",
+  authMiddleware.authProvider,
+  policyMiddleware.populateAuthorizationPolicies,
+  // dashboardAuthorizationMiddleware.populateAuthorizedDashboardsForRead,
+  appConstantController.getAllInternalAppConstants
+);
+
+router.get(
   "/",
   authMiddleware.authProvider,
   policyMiddleware.populateAuthorizationPolicies,

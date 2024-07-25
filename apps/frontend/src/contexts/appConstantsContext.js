@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { LOCAL_CONSTANTS } from "../constants";
 import {
   getAllAppConstantAPI,
+  getAllInternalAppConstantAPI,
   getDBModelAppConstantAPI,
 } from "../api/appConstants";
 import { Loading } from "../pages/Loading";
@@ -24,9 +25,10 @@ const AppConstantsContextProvider = ({ children }) => {
   });
 
   const {
-    isLoading: isLoadingAppConstants,
+    isLoading: isLoadingAllAppConstants,
     data: appConstants,
     error: appConstantsError,
+    isFetching: isFetchingAllAppConstants,
     refetch: reloadAllAppConstants,
   } = useQuery({
     queryKey: ["app_constants"],
@@ -36,16 +38,48 @@ const AppConstantsContextProvider = ({ children }) => {
     staleTime: 0,
   });
 
+  const {
+    isLoading: isLoadinginternalAppConstants,
+    data: internalAppConstants,
+    error: internalAppConstantsError,
+    refetch: reloadAllInternalAppConstants,
+  } = useQuery({
+    queryKey: ["internal_app_constants"],
+    queryFn: getAllInternalAppConstantAPI,
+    cacheTime: 0,
+    retry: 3,
+    staleTime: 0,
+  });
+
+  const processedInternalAppConstants = useMemo(() => {
+    if (internalAppConstants && Array.isArray(internalAppConstants)) {
+      const _t = {};
+      internalAppConstants.forEach((_i) => {
+        _t[_i.pm_app_constant_title] = _i.pm_app_constant_value;
+      });
+      return _t;
+    }
+  }, [internalAppConstants]);
+
+  console.log({
+    processedInternalAppConstants,
+    internalAppConstants,
+    appConstants,
+  });
   return (
     <AppConstantsValueContext.Provider
       value={{
         dbModel: dbModelData?.db_model,
         appConstants,
+        internalAppConstants: processedInternalAppConstants,
+        isFetchingAllAppConstants,
+        isLoadingAllAppConstants,
       }}
     >
       <AppConstantsActionContext.Provider
         value={{
           reloadAllAppConstants,
+          reloadAllInternalAppConstants,
         }}
       >
         {dbModelData?.db_model ? children : <Loading fullScreen={true} />}

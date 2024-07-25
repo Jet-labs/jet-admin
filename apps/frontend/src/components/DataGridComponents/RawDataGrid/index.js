@@ -30,7 +30,7 @@ export const RawDataGrid = ({
   showStats,
   containerClass,
 }) => {
-  const { dbModel } = useAppConstants();
+  const { dbModel, internalAppConstants } = useAppConstants();
   const { pmUser } = useAuthState();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -86,13 +86,17 @@ export const RawDataGrid = ({
   });
 
   const authorizedColumns = useMemo(() => {
+    console.log({ iiiinternalAppConstants: internalAppConstants });
     if (readColumns) {
-      const c = getFormattedTableColumns(readColumns);
+      const c = getFormattedTableColumns(
+        readColumns,
+        internalAppConstants?.CUSTOM_INT_VIEW_MAPPING?.[tableName]
+      );
       return c;
     } else {
       return null;
     }
-  }, [readColumns]);
+  }, [readColumns, internalAppConstants]);
 
   const primaryColumns = useMemo(() => {
     if (dbModel) {

@@ -111,3 +111,20 @@ export const getAllAppConstantAPI = async () => {
     throw error;
   }
 };
+
+export const getAllInternalAppConstantAPI = async () => {
+  try {
+    const response = await axiosInstance.get(
+      LOCAL_CONSTANTS.APIS.APP_CONSTANTS.getAllInternalAppConstants()
+    );
+    if (response.data && response.data.success == true) {
+      return AppConstant.toList(response.data.appConstants);
+    } else if (response.data.error) {
+      throw response.data.error;
+    } else {
+      throw LOCAL_CONSTANTS.ERROR_CODES.SERVER_ERROR;
+    }
+  } catch (error) {
+    throw error;
+  }
+};

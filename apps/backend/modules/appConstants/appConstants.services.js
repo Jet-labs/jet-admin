@@ -9,14 +9,20 @@ class AppConstantService {
    * @param {object} param0
    * @param {String} param0.appConstantTitle
    * @param {object} param0.appConstantValue
+   * @param {Boolean} param0.isInternal
    * @returns {any|null}
    */
-  static addAppConstant = async ({ appConstantTitle, appConstantValue }) => {
+  static addAppConstant = async ({
+    appConstantTitle,
+    appConstantValue,
+    isInternal,
+  }) => {
     Logger.log("info", {
       message: "AppConstantService:addAppConstant:params",
       params: {
         appConstantTitle,
         appConstantValue,
+        isInternal,
       },
     });
     try {
@@ -26,6 +32,7 @@ class AppConstantService {
         data: {
           pm_app_constant_title: String(appConstantTitle),
           pm_app_constant_value: appConstantValue,
+          is_internal: Boolean(isInternal),
         },
       });
       Logger.log("success", {
@@ -51,6 +58,7 @@ class AppConstantService {
    * @param {object} param0
    * @param {Number} param0.appConstantID
    * @param {String} param0.appConstantTitle
+   * @param {Boolean} param0.isInternal
    * @param {any} param0.appConstantValue
    * @param {Boolean|Array<Number>} param0.authorizedAppConstants
    * @returns {any|null}
@@ -59,6 +67,7 @@ class AppConstantService {
     appConstantID,
     appConstantTitle,
     appConstantValue,
+    isInternal,
     authorizedAppConstants,
   }) => {
     Logger.log("info", {
@@ -67,6 +76,7 @@ class AppConstantService {
         appConstantID,
         appConstantTitle,
         appConstantValue,
+        isInternal,
       },
     });
     try {
@@ -81,6 +91,7 @@ class AppConstantService {
           data: {
             pm_app_constant_title: String(appConstantTitle),
             pm_app_constant_value: appConstantValue,
+            is_internal: Boolean(isInternal),
           },
         });
         Logger.log("success", {
@@ -137,6 +148,44 @@ class AppConstantService {
     } catch (error) {
       Logger.log("error", {
         message: "AppConstantService:getAllAppConstants:catch-1",
+        params: { error },
+      });
+      throw error;
+    }
+  };
+
+  /**
+   *
+   * @param {object} param0
+   * @param {Boolean|Array<Number>} param0.authorizedAppConstants
+   * @returns {any|null}
+   */
+  static getAllInternalAppConstants = async ({ authorizedAppConstants }) => {
+    Logger.log("info", {
+      message: "AppConstantService:getAllInternalAppConstants:params",
+    });
+    try {
+      const appConstants = await prisma.tbl_pm_app_constants.findMany({
+        where:
+          authorizedAppConstants === true
+            ? {}
+            : {
+                pm_app_constant_id: {
+                  in: authorizedAppConstants,
+                },
+                is_internal: true,
+              },
+      });
+      Logger.log("info", {
+        message: "AppConstantService:getAllInternalAppConstants:appConstants",
+        params: {
+          appConstantsLength: appConstants?.length,
+        },
+      });
+      return appConstants;
+    } catch (error) {
+      Logger.log("error", {
+        message: "AppConstantService:getAllInternalAppConstants:catch-1",
         params: { error },
       });
       throw error;

@@ -309,7 +309,7 @@ model tbl_pm_job_history {
 
 model tbl_pm_app_constants {
   pm_app_constant_id    Int       @id(map: "tbl_pm_app_constants_pk") @default(autoincrement())
-  pm_app_constant_title String    @db.VarChar
+  pm_app_constant_title String    @unique(map: "unique_app_constants_title") @db.VarChar
   pm_app_constant_value Json      @db.Json
   created_at            DateTime  @default(now()) @db.Timestamptz(6)
   updated_at            DateTime  @default(now()) @db.Timestamptz(6)

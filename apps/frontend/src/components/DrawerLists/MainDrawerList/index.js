@@ -47,7 +47,7 @@ const drawerList = [
   {
     text: "Constants",
     icon: <VscSymbolVariable size={24} className="!text-sm" />,
-    to: LOCAL_CONSTANTS.ROUTES.ACCOUNT_MANAGEMENT,
+    to: LOCAL_CONSTANTS.ROUTES.ALL_APP_CONSTANTS.path(),
   },
   {
     text: "Policies",

@@ -165,7 +165,8 @@ const create_app_constants_table_query = `CREATE TABLE IF NOT EXISTS public.tbl_
     disabled_at timestamp(6) with time zone,
     is_disabled boolean DEFAULT false,
     is_internal boolean DEFAULT false,
-    CONSTRAINT tbl_pm_app_constants_pk PRIMARY KEY (pm_app_constant_id)
+    CONSTRAINT tbl_pm_app_constants_pk PRIMARY KEY (pm_app_constant_id),
+    CONSTRAINT unique_app_constants_title UNIQUE (pm_app_constant_title)
 );`;
 
 const super_admin_policy_query = `

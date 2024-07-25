@@ -24,6 +24,8 @@ const GraphLayout = lazy(() => import("./Layouts/GraphLayout"));
 const DashboardLayout = lazy(() => import("./Layouts/DashboardLayout"));
 const QueryLayout = lazy(() => import("./Layouts/QueryLayout"));
 const JobLayout = lazy(() => import("./Layouts/JobLayout"));
+const AllAppConstants = lazy(() => import("../pages/AllAppConstants"));
+const UpdateAppConstant = lazy(() => import("../pages/UpdateAppConstant"));
 /**
  *
  * @param {object} param0
@@ -71,6 +73,7 @@ const AppRouter = ({}) => {
               />
             }
           ></Route>
+
           <Route
             path={LOCAL_CONSTANTS.ROUTES.ALL_QUERIES.code}
             element={
@@ -101,6 +104,28 @@ const AppRouter = ({}) => {
               />
             }
           ></Route>
+          <Route path={LOCAL_CONSTANTS.ROUTES.ALL_APP_CONSTANTS.code}>
+            <Route
+              index
+              element={
+                <ProtectedRoute
+                  successComponent={AllAppConstants}
+                  fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
+                  loadingComponent={() => <Loading fullScreen />}
+                />
+              }
+            ></Route>
+            <Route
+              path={LOCAL_CONSTANTS.ROUTES.APP_CONSTANT_VIEW.code}
+              element={
+                <ProtectedRoute
+                  successComponent={UpdateAppConstant}
+                  fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
+                  loadingComponent={() => <Loading fullScreen />}
+                />
+              }
+            ></Route>
+          </Route>
 
           <Route path={LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT.code}>
             <Route

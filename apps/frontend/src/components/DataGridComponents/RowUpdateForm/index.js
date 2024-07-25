@@ -13,9 +13,11 @@ import { displayError, displaySuccess } from "../../../utils/notification";
 import { getFormattedTableColumns } from "../../../utils/tables";
 import { ErrorComponent } from "../../ErrorComponent";
 import { RowDeletionForm } from "../RowDeletetionForm";
+import { useAppConstants } from "../../../contexts/appConstantsContext";
 
-export const RowUpdateForm = ({ tableName, id }) => {
+export const RowUpdateForm = ({ customTitle, tableName, id }) => {
   const queryClient = new QueryClient();
+  const { internalAppConstants } = useAppConstants();
   const theme = useTheme();
   const {
     isLoading: isLoadingRowData,
@@ -102,7 +104,9 @@ export const RowUpdateForm = ({ tableName, id }) => {
     <div className="flex flex-col justify-start items-center w-full pb-5 p-2">
       <div className=" flex flex-row justify-between 2xl:w-3/5 xl:w-3/4 lg:w-2/3 md:w-full  mt-3 w-full ">
         <div className="flex flex-col items-start justify-start">
-          <span className="text-lg font-bold text-start ">{`Update row`}</span>
+          <span className="text-lg font-bold text-start ">
+            {customTitle ? customTitle : `Update row`}
+          </span>
           {tableName && (
             <span
               style={{ color: theme.palette.text.secondary }}
@@ -155,9 +159,9 @@ export const RowUpdateForm = ({ tableName, id }) => {
                       helperText={rowUpdateForm.errors[column.field]}
                       error={Boolean(rowUpdateForm.errors[column.field])}
                       customMapping={
-                        LOCAL_CONSTANTS.CUSTOM_INT_MAPPINGS[tableName]?.[
-                          column.field
-                        ]
+                        internalAppConstants?.CUSTOM_INT_EDIT_MAPPING?.[
+                          tableName
+                        ]?.[column.field]
                       }
                     />
                   </Grid>

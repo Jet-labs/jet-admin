@@ -41,7 +41,13 @@ export const getRandomColor = () => {
   return color;
 };
 
-export const getFieldFormatting = ({ type, isList, isID, params }) => {
+export const getFieldFormatting = ({
+  type,
+  isList,
+  isID,
+  params,
+  customIntMapping,
+}) => {
   let f = params.value;
 
   switch (type) {
@@ -124,10 +130,11 @@ export const getFieldFormatting = ({ type, isList, isID, params }) => {
       }
       f = isList ? (
         params.value.map((data) => {
+          const _d = customIntMapping?.[data] ? customIntMapping[data] : data;
           return (
             <ListItem key={data}>
               <Chip
-                label={`${data}`}
+                label={`${_d}`}
                 size="small"
                 variant="outlined"
                 color={"info"}
@@ -137,7 +144,11 @@ export const getFieldFormatting = ({ type, isList, isID, params }) => {
         })
       ) : (
         <Chip
-          label={`${params.value}`}
+          label={`${
+            customIntMapping?.[params.value]
+              ? customIntMapping[params.value]
+              : params.value
+          }`}
           size="small"
           variant="outlined"
           color={"info"}
@@ -148,32 +159,6 @@ export const getFieldFormatting = ({ type, isList, isID, params }) => {
       );
       break;
     }
-    // if (appConstants.CUSTOM_INT_MAPPINGS[tableName]?.[params.field]) {
-    //   f = (
-    //     <Chip
-    //       sx={{
-    //         backgroundColor: appConstants.CUSTOM_INT_COLOR_MAPPINGS[
-    //           tableName
-    //         ]?.[params.field]?.[params.value]
-    //           ? `${
-    //               appConstants.CUSTOM_INT_COLOR_MAPPINGS[tableName][
-    //                 params.field
-    //               ][params.value]
-    //             }`
-    //           : "#62ff00",
-    //       }}
-    //       className={"!lowercase !text-black !font-bold"}
-    //       label={`${
-    //         appConstants.CUSTOM_INT_MAPPINGS[tableName][params.field][
-    //           params.value
-    //         ]
-    //       }`}
-    //       size="small"
-    //     ></Chip>
-    //   );
-    // } else {
-    //   f = params.value;
-    // }
 
     case LOCAL_CONSTANTS.DATA_TYPES.DECIMAL: {
       let value = params.value;
@@ -257,7 +242,8 @@ export const getFieldWidth = (type) => {
  * @param {object[]} columns
  * @returns
  */
-export const getFormattedTableColumns = (columns) => {
+export const getFormattedTableColumns = (columns, customIntMappings) => {
+  console.log({ customIntMappings });
   try {
     return columns.map((column) => {
       return {
@@ -274,6 +260,7 @@ export const getFormattedTableColumns = (columns) => {
             isID: column.isId,
             isList: column.isList,
             params,
+            customIntMapping: customIntMappings?.[column.name],
           });
         },
       };

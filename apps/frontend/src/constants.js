@@ -75,6 +75,7 @@ export const LOCAL_CONSTANTS = {
     POLICY_OBJECT_TABLE_NAME: "tbl_pm_policy_objects",
     UNTITLED_CHART_TITLE: "Untitled chart",
     JOB_HISTORY_TABLE_NAME: "tbl_pm_job_history",
+    APP_CONSTANTS_TABLE_NAME: "tbl_pm_app_constants",
   },
 
   // routes
@@ -271,6 +272,7 @@ export const LOCAL_CONSTANTS = {
 
     APP_CONSTANTS: {
       getDBModelAppConstant: () => `/admin_api/app_constants/db_model/`,
+      getAllInternalAppConstants: () => `/admin_api/app_constants/internal`,
       getAllAppConstants: () => `/admin_api/app_constants`,
       getAppConstantByID: ({ id }) => `/admin_api/app_constants/${id}`,
       addAppConstant: () => `/admin_api/app_constants`,

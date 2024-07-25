@@ -1,18 +1,13 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useFormik } from "formik";
 
-import { Button, CircularProgress, Grid, Paper, useTheme } from "@mui/material";
+import { Button, CircularProgress, Grid, useTheme } from "@mui/material";
 import { useMemo } from "react";
-import {
-  fetchAllRowsAPI,
-  getAuthorizedColumnsForAdd,
-} from "../../../api/tables";
+import { addAccountAPI } from "../../../api/accounts";
+import { fetchAllRowsAPI } from "../../../api/tables";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { displayError, displaySuccess } from "../../../utils/notification";
-import { getFormattedTableColumns } from "../../../utils/tables";
-import { ErrorComponent } from "../../ErrorComponent";
 import { FieldComponent } from "../../FieldComponent";
-import { addAccountAPI } from "../../../api/accounts";
 
 export const AccountAdditionForm = ({ tableName }) => {
   const theme = useTheme();
