@@ -143,7 +143,7 @@ export const customDarkTheme = {
         // Name of the slot
         root: {
           // Some CSS
-          background: "#ffffff",
+          background: "#333333",
           paddingTop: 10,
           paddingBottom: 10,
           paddingLeft: 16,
@@ -171,7 +171,7 @@ export const customDarkTheme = {
         // Name of the slot
         root: {
           // Some CSS
-          background: "#ffffff",
+          background: "#333333",
           paddingTop: 10,
           paddingBottom: 10,
           paddingLeft: 16,

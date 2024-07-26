@@ -104,6 +104,18 @@ export const LineGraphComponent = ({
             : LOCAL_CONSTANTS.STRINGS.UNTITLED_CHART_TITLE,
         },
       },
+      // scales: {
+      //   yAxes: {
+      //     grid: {
+      //       color: theme.palette.divider,
+      //     },
+      //   },
+      //   xAxes: {
+      //     grid: {
+      //       color: theme.palette.divider,
+      //     },
+      //   },
+      // },
     };
   }, [legendPosition, titleDisplayEnabled, graphTitle]);
 
