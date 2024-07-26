@@ -47,11 +47,28 @@ Features
     - [x] Prisma based RBAC for tables
     - [x] Record based RBAC for queries, graphs & dashbaords
 
-Getting Started
----------------
 
-To get started with the project, follow the instructions in the `apps/frontend/README.md` and `apps/backend/README.md` files to set up the frontend and backend components respectively.
+Topics
+------
+- Setup : To get started with the project, follow the instructions in the `apps/frontend/README.md` and `apps/backend/README.md` files to set up the frontend and backend components respectively.
+- Tables
+- Queries : Postgres queries can be saved as variables which when used will be executed in run-time. Output can be checked by testing the query. [Using query variables](#using-query-variables)!
+- Graphs
+- Jobs
+- App constants
+- Policies
+- Accounts
 
+Using query variables
+---------------------
+- [x] Inside another query: Query values can be used in run time inside another query by utilizing below syntax
+    - ```
+      select * from city where city_id={{[pm_query_id:21][0].city_id]}};
+      ```
+    - `{{}}` is used to utilize the variable
+    - `[]` is used to define the `pm_query_id` of desired query
+      
+- [ ] Inside app constants : Currently this functionality is not available
 
 Contributing
 ------------

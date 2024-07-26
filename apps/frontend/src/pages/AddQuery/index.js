@@ -1,9 +1,10 @@
 import React from "react";
 
-import { JobAdditionForm } from "../../components/JobComponents/JobAdditionForm";
+
+import { QueryAdditionForm } from "../../components/QueryComponents/QueryAdditionForm";
 
 const AddJob = () => {
-  return <JobAdditionForm />;
+  return <QueryAdditionForm />;
 };
 
 export default AddJob;

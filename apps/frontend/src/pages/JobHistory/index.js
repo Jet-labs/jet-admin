@@ -88,7 +88,7 @@ const JobHistory = () => {
     {
       field: "history_result",
       headerName: "Result/Error",
-      width: 400,
+      minWidth: 300,
       valueGetter: (value, row) => {
         return JSON.stringify(value.row.history_result, null, 2);
       },

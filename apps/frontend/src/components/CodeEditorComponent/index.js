@@ -4,7 +4,9 @@ import { javascript } from "@codemirror/lang-javascript";
 import { json } from "@codemirror/lang-json";
 import { sql } from "@codemirror/lang-sql";
 import { githubLight } from "@uiw/codemirror-theme-github";
+import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import { useTheme } from "@mui/material";
+import { useThemeValue } from "../../contexts/themeContext";
 const langMap = {
   javascript: javascript(),
   json: json(),
@@ -23,6 +25,7 @@ export const CodeEditor = ({
   const theme = useTheme();
   // const {} = useCodeMirror();
   const ref = useRef();
+  const { themeType } = useThemeValue();
   // ref?.current?.indentLine(1);
   return (
     <CodeMirror
@@ -34,7 +37,7 @@ export const CodeEditor = ({
       maxWidth="1000px"
       extensions={[langMap[language]]}
       onChange={setCode}
-      theme={githubLight}
+      theme={themeType == "dark" ? vscodeDark : githubLight}
       basicSetup={{
         closeBrackets: true,
         indentOnInput: true,

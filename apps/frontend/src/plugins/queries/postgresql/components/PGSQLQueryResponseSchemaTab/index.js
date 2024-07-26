@@ -1,18 +1,21 @@
 import { useTheme } from "@mui/material";
 import { loadLanguage } from "@uiw/codemirror-extensions-langs";
 import { githubLight } from "@uiw/codemirror-theme-github";
+import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import CodeMirror from "@uiw/react-codemirror";
 import React from "react";
 import "react-data-grid/lib/styles.css";
 import jsonSchemaGenerator from "to-json-schema";
+import { useThemeValue } from "../../../../../contexts/themeContext";
 export const PGSQLQueryResponseSchemaTab = ({ data }) => {
   const theme = useTheme();
+  const { themeType } = useThemeValue();
   const dataSchema = jsonSchemaGenerator(data ? data : {});
   return (
     <CodeMirror
       value={JSON.stringify(dataSchema, null, 2)}
       height="400px"
-      theme={githubLight}
+      theme={themeType == "dark" ? vscodeDark : githubLight}
       extensions={[loadLanguage("json")]}
       style={{
         width: "100%",

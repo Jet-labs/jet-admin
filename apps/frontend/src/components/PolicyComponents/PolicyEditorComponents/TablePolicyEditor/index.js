@@ -1,6 +1,7 @@
 import { Divider, Tab, Tabs, useTheme } from "@mui/material";
 import { loadLanguage } from "@uiw/codemirror-extensions-langs";
 import { githubLight } from "@uiw/codemirror-theme-github";
+import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import CodeMirror from "@uiw/react-codemirror";
 import { capitalize } from "lodash";
 import { useMemo, useState } from "react";
@@ -8,7 +9,9 @@ import { useAppConstants } from "../../../../contexts/appConstantsContext";
 import { containsOnly } from "../../../../utils/array";
 import { displayError } from "../../../../utils/notification";
 import { CRUDPermissionCheckboxGroup } from "../CRUDPermissionCheckboxGroup";
+import { useThemeValue } from "../../../../contexts/themeContext";
 export const TablePolicyEditor = ({ value, handleChange }) => {
+  const { themeType } = useThemeValue();
   const { dbModel } = useAppConstants();
   const isVisualEditorSufficient = useMemo(() => {
     let res = true;
@@ -162,7 +165,7 @@ export const TablePolicyEditor = ({ value, handleChange }) => {
                           typeof v === "object" ? v : JSON.parse(v),
                       });
                     }}
-                    theme={githubLight}
+                    theme={themeType == "dark" ? vscodeDark : githubLight}
                     className="codemirror-editor-rounded-bottom"
                     style={{
                       borderWidth: 0,
@@ -188,7 +191,7 @@ export const TablePolicyEditor = ({ value, handleChange }) => {
               height="200px"
               extensions={[loadLanguage("json")]}
               onChange={(value) => handleChange(JSON.parse(value))}
-              theme={githubLight}
+              theme={themeType == "dark" ? vscodeDark : githubLight}
               className="codemirror-editor-rounded-bottom"
               style={{
                 borderWidth: 0,

@@ -1,14 +1,17 @@
 import { useTheme } from "@mui/material";
 import { loadLanguage } from "@uiw/codemirror-extensions-langs";
 import { githubLight } from "@uiw/codemirror-theme-github";
+import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import CodeMirror from "@uiw/react-codemirror";
 import React from "react";
 import "react-data-grid/lib/styles.css";
 
 import { autocompletion } from "@codemirror/autocomplete";
+import { useThemeValue } from "../../../../../contexts/themeContext";
 
 export const PGSQLQueryEditor = ({ value, handleChange }) => {
   const theme = useTheme();
+  const { themeType } = useThemeValue();
 
   const _handleOnRAWQueryChange = (value) => {
     handleChange({ raw_query: value });
@@ -160,7 +163,7 @@ export const PGSQLQueryEditor = ({ value, handleChange }) => {
       height="200px"
       extensions={[loadLanguage("pgsql"), customAutocomplete]}
       onChange={_handleOnRAWQueryChange}
-      theme={githubLight}
+      theme={themeType == "dark" ? vscodeDark : githubLight}
       style={{
         marginTop: 20,
         width: "100%",

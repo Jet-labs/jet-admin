@@ -2,14 +2,17 @@ import { Divider, Tab, Tabs, useTheme } from "@mui/material";
 
 import { loadLanguage } from "@uiw/codemirror-extensions-langs";
 import { githubLight } from "@uiw/codemirror-theme-github";
+import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import CodeMirror from "@uiw/react-codemirror";
 import { capitalize } from "lodash";
 import { useState } from "react";
 import { containsOnly } from "../../../../utils/array";
 import { displayError } from "../../../../utils/notification";
 import { CRUDPermissionCheckboxGroup } from "../CRUDPermissionCheckboxGroup";
+import { useThemeValue } from "../../../../contexts/themeContext";
 
 export const QueryPolicyEditor = ({ value, handleChange }) => {
+  const { themeType } = useThemeValue();
   const [tab, setTab] = useState(
     containsOnly(["add", "edit", "read", "delete"], Object.keys(value)) &&
       Object.keys(value).every((k) => typeof value[k] === "boolean")
@@ -82,7 +85,7 @@ export const QueryPolicyEditor = ({ value, handleChange }) => {
               height="200px"
               extensions={[loadLanguage("json")]}
               onChange={(value) => handleChange(JSON.parse(value))}
-              theme={githubLight}
+              theme={themeType == "dark" ? vscodeDark : githubLight}
               className="codemirror-editor-rounded-bottom"
               style={{
                 borderWidth: 0,

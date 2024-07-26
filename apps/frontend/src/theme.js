@@ -10,10 +10,10 @@ export const customDarkTheme = {
       white: "#fff",
     },
     primary: {
-      main: "#4A6BFF",
+      main: "#637EF8",
       light: "#B7C4FF",
       dark: "#132C9C",
-      contrastText: "#6a7585",
+      contrastText: "#DBDBDB",
     },
     secondary: {
       main: "#A7A6FF",
@@ -76,15 +76,15 @@ export const customDarkTheme = {
       secondary: "#131313",
     },
     action: {
-      active: "#e6e6e6",
-      hover: "#E6E6E656",
+      active: "#6B6B6B",
+      hover: "#88888862",
       hoverOpacity: 0.08,
-      selected: "#e6e6e6",
+      selected: "#88888862",
       selectedOpacity: 0.16,
       disabled: "#e6e6e6",
       disabledBackground: "rgba(255, 255, 255, 0.12)",
       disabledOpacity: 0.38,
-      focus: "#e6e6e6",
+      focus: "#333333",
       focusOpacity: 0.12,
       activatedOpacity: 0.24,
     },
@@ -94,7 +94,16 @@ export const customDarkTheme = {
       styleOverrides: {
         root: {
           fontSize: "0.75rem !important",
-          background: "#f9fafc",
+          background: "#333333",
+        },
+      },
+    },
+    MuiGrid: {
+      styleOverrides: {
+        root: {
+          "& .ant-select": {
+            background: "#333333 !important",
+          },
         },
       },
     },
@@ -107,7 +116,7 @@ export const customDarkTheme = {
       styleOverrides: {
         root: {
           "&:hover": {
-            background: "#e6e6e6",
+            background: "#88888862",
           },
         },
       },
@@ -121,9 +130,9 @@ export const customDarkTheme = {
           paddingBottom: "4px !important",
           paddingLeft: "10px !important",
           paddingRight: "10px !important",
-          color: "#6a7585",
+          color: "#CFCFCF",
           "&:hover": {
-            background: "#e6e6e6",
+            background: "#88888862",
           },
         },
       },
@@ -148,7 +157,7 @@ export const customDarkTheme = {
         // Name of the slot
         root: {
           // Some CSS
-          background: "#ffffff",
+          background: "#333333",
           paddingTop: 10,
           paddingBottom: 10,
           paddingLeft: 16,
@@ -206,11 +215,11 @@ export const customDarkTheme = {
           paddingRight: "8px !important",
           fontWeight: 600,
           "&:hover": {
-            background: "#4A6BFF",
+            background: "#637EF8",
           },
         },
         contained: {
-          border: "1px solid #4A6BFF",
+          border: "1px solid #637EF8",
           fontWeight: 600,
           color: "#ffffff",
         },
@@ -242,33 +251,33 @@ export const customDarkTheme = {
           paddingRight: "10px !important",
 
           "& fieldset": {
-            borderColor: "#CFCFCF",
+            borderColor: "#444444",
           },
           "&:hover fieldset": {
-            borderColor: "#CFCFCF",
+            borderColor: "#444444",
           },
           "&:hover": {
-            backgroundColor: "#F5F5F5",
+            backgroundColor: "#44444448",
           },
 
           "& .MuiIconButton-root": {
             background: "#00000000",
-            color: "#6a7585",
+            color: "#CFCFCF",
             fontSize: 10,
           },
           "& .MuiSvgIcon-root": {
-            color: "#6a7585",
+            color: "#CFCFCF",
           },
           input: {
             "&:-webkit-autofill": {
               WebkitBoxShadow: "0 0 0 100px #fff inset",
-              WebkitTextFillColor: "#6a7585",
+              WebkitTextFillColor: "#CFCFCF",
 
-              caretColor: "#6a7585",
+              caretColor: "#CFCFCF",
             },
           },
 
-          color: "#6a7585",
+          color: "#CFCFCF",
         },
         input: {
           fontSize: "0.75rem !important",
@@ -297,11 +306,11 @@ export const customDarkTheme = {
           paddingBottom: "3px !important",
           paddingLeft: "0px !important",
           paddingRight: "0px !important",
-          color: "#6a7585",
+          color: "#CFCFCF",
           height: "unset",
         },
         root: {
-          color: "#6a7585",
+          color: "#CFCFCF",
         },
       },
     },
@@ -325,11 +334,13 @@ export const customDarkTheme = {
     MuiDataGrid: {
       styleOverrides: {
         root: {
-          background: "#33333300",
+          background: "#1B1B1B",
           borderWidth: 0,
+
           "& .MuiDataGrid-main": {
             borderColor: "#444444",
             borderWidth: 1,
+            borderRadius: 4,
           },
           "& .MuiDataGrid-withBorderColor": {
             borderRadius: 0,
@@ -337,15 +348,15 @@ export const customDarkTheme = {
             borderBottom: 0,
           },
           "& .MuiDataGrid-columnHeader": {
-            background: "#333333",
-            borderColor: "#00000000",
+            background: "#1B1B1B",
+            borderColor: "#444444",
             outline: 0,
             borderRadius: 0,
-            borderWidth: 0,
-            borderBottom: 0,
+            borderBottomWidth: 1,
             "&:focus-within": {
               outline: "none !important",
             },
+            width: "100%",
           },
           "& .MuiDataGrid-columnHeaderTitle": {
             color: "#DADADA",

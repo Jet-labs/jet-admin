@@ -4,8 +4,10 @@ import React, { useMemo } from "react";
 import DataGrid from "react-data-grid";
 import "react-data-grid/lib/styles.css";
 import jsonSchemaGenerator from "to-json-schema";
+import { useThemeValue } from "../../../../../contexts/themeContext";
 export const PGSQLQueryResponseTableTab = ({ data }) => {
   const theme = useTheme();
+  const { themeType } = useThemeValue();
   const dataSchema = jsonSchemaGenerator(Array.isArray(data) ? data[0] : data);
   const columns = useMemo(() => {
     if (dataSchema && dataSchema.properties) {
@@ -26,7 +28,9 @@ export const PGSQLQueryResponseTableTab = ({ data }) => {
             return { _g_uuid: `_index_${index}`, ...item };
           })}
           columns={columns}
-          className="!w-100 rdg-light !rounded"
+          className={`!w-100 !rounded ${
+            themeType === "dark" ? "" : "rdg-light "
+          }`}
           style={{ borderColor: theme.palette.divider, borderWidth: 1 }}
           rowKeyGetter={(row) => row._g_uuid}
           defaultColumnOptions={{

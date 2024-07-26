@@ -85,7 +85,7 @@ export const MainDrawerList = ({ currentPageTitle }) => {
                 sx={{
                   borderColor: theme.palette.primary.main,
                   backgroundColor: isCurrentPage
-                    ? theme.palette.background.paper
+                    ? theme.palette.action.selected
                     : theme.palette.background.default,
                 }}
                 className="!rounded !flex !flex-col !justify-center !items-center"
