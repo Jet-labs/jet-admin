@@ -13,6 +13,7 @@ import ProtectedRoute from "./ProtectedRoute";
 import { lazy } from "react";
 import SignIn from "../pages/SignIn";
 
+
 const AllPolicies = lazy(() => import("../pages/AllPolicies"));
 const UpdatePolicy = lazy(() => import("../pages/UpdatePolicy"));
 const AddPolicy = lazy(() => import("../pages/AddPolicy"));
@@ -24,6 +25,7 @@ const GraphLayout = lazy(() => import("./Layouts/GraphLayout"));
 const DashboardLayout = lazy(() => import("./Layouts/DashboardLayout"));
 const QueryLayout = lazy(() => import("./Layouts/QueryLayout"));
 const JobLayout = lazy(() => import("./Layouts/JobLayout"));
+const AppConstantLayout = lazy(() => import("./Layouts/AppConstantLayout"));
 const AllAppConstants = lazy(() => import("../pages/AllAppConstants"));
 const UpdateAppConstant = lazy(() => import("../pages/UpdateAppConstant"));
 const AddAppConstant = lazy(() => import("../pages/AddAppConstant"));
@@ -85,6 +87,7 @@ const AppRouter = ({}) => {
               />
             }
           ></Route>
+
           <Route
             path={LOCAL_CONSTANTS.ROUTES.ALL_JOBS.code}
             element={
@@ -105,7 +108,17 @@ const AppRouter = ({}) => {
               />
             }
           ></Route>
-          <Route path={LOCAL_CONSTANTS.ROUTES.ALL_APP_CONSTANTS.code}>
+          <Route
+            path={LOCAL_CONSTANTS.ROUTES.ALL_APP_CONSTANTS.code}
+            element={
+              <ProtectedRoute
+                successComponent={AppConstantLayout}
+                fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
+                loadingComponent={() => <Loading fullScreen />}
+              />
+            }
+          ></Route>
+          {/* <Route path={LOCAL_CONSTANTS.ROUTES.ALL_APP_CONSTANTS.code}>
             <Route
               index
               element={
@@ -136,7 +149,7 @@ const AppRouter = ({}) => {
                 />
               }
             ></Route>
-          </Route>
+          </Route> */}
 
           <Route path={LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT.code}>
             <Route

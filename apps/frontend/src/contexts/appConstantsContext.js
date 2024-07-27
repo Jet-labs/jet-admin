@@ -31,7 +31,7 @@ const AppConstantsContextProvider = ({ children }) => {
     isFetching: isFetchingAllAppConstants,
     refetch: reloadAllAppConstants,
   } = useQuery({
-    queryKey: ["app_constants"],
+    queryKey: ["REACT_QUERY_KEY_APP_CONSTANTS"],
     queryFn: getAllAppConstantAPI,
     cacheTime: 0,
     retry: 3,

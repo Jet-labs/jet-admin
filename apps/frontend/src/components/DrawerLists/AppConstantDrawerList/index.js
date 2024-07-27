@@ -8,44 +8,32 @@ import {
   ListItemText,
   useTheme,
 } from "@mui/material";
-import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { LOCAL_CONSTANTS } from "../../../constants";
-import { useAuthState } from "../../../contexts/authContext";
-import { FaPlus, FaRedo } from "react-icons/fa";
-import { DiPostgresql } from "react-icons/di";
-import { FaCloudSun } from "react-icons/fa6";
-import { BiRadar } from "react-icons/bi";
-import { getAllQueryAPI } from "../../../api/queries";
-import { QUERY_PLUGINS_MAP } from "../../../plugins/queries";
 
-export const QueryDrawerList = () => {
+import { FaChalkboardTeacher, FaPlus, FaRedo } from "react-icons/fa";
+import { LOCAL_CONSTANTS } from "../../../constants";
+import {
+  useAppConstantActions,
+  useAppConstants,
+} from "../../../contexts/appConstantsContext";
+import { useAuthState } from "../../../contexts/authContext";
+
+export const AppConstantsList = () => {
   const theme = useTheme();
   const routeParam = useParams();
-  const currentPage = `query_${routeParam?.["*"]}`;
-
+  const currentPage = `app_constant_${routeParam?.["*"]}`;
   const { pmUser } = useAuthState();
   const navigate = useNavigate();
-  const isAuthorizedToAddQuery = useMemo(() => {
-    return pmUser && pmUser.isAuthorizedToAddQuery();
+  const { appConstants } = useAppConstants();
+  const { reloadAllAppConstants } = useAppConstantActions();
+  const isAuthorizedToAddAppConstant = useMemo(() => {
+    return pmUser && pmUser.isAuthorizedToAddAppConstant();
   }, [pmUser]);
 
-  const {
-    isLoading: isLoadingQueries,
-    data: queries,
-    error: loadQueriesError,
-    refetch: refetchQueries,
-  } = useQuery({
-    queryKey: [`REACT_QUERY_KEY_QUERIES`],
-    queryFn: () => getAllQueryAPI(),
-    cacheTime: 0,
-    retry: 1,
-    staleTime: 0,
-  });
-
-  const _navigateToAddMoreQuery = () => {
-    navigate(LOCAL_CONSTANTS.ROUTES.ADD_GRAPH.path());
+  console.log({ appConstants });
+  const _navigateToAddMoreAppConstant = () => {
+    navigate(LOCAL_CONSTANTS.ROUTES.APP_CONSTANT_VIEW.path());
   };
 
   return (
@@ -61,44 +49,44 @@ export const QueryDrawerList = () => {
     >
       <div className="!px-3.5 py-1 flex flex-row justify-between items-center w-full">
         <span
-          style={{ color: theme.palette.primary.main }}
           className="!font-semibold"
+          style={{ color: theme.palette.primary.main }}
         >
-          {"Queries"}
+          {"App constants"}
         </span>
-        <IconButton onClick={refetchQueries}>
+        <IconButton onClick={reloadAllAppConstants}>
           <FaRedo
             style={{ color: theme.palette.primary.main }}
             className="!text-sm"
           />
         </IconButton>
       </div>
-      {isAuthorizedToAddQuery && (
+      {isAuthorizedToAddAppConstant && (
         <div className="!px-3 !py-1.5 !w-full">
           <Button
-            onClick={_navigateToAddMoreQuery}
+            onClick={_navigateToAddMoreAppConstant}
             variant="contained"
             className="!w-full"
             startIcon={<FaPlus className="!text-sm" />}
           >
-            Add query
+            Add more constants
           </Button>
         </div>
       )}
       <div className="!mt-1"></div>
-
-      {queries && queries.length > 0
-        ? queries.map((query) => {
-            const key = `query_${query.pm_query_id}`;
+      {appConstants && appConstants.length > 0
+        ? appConstants.map((appConstant) => {
+            const key = `app_constant_${appConstant.pm_app_constant_id}`;
             return (
               <Link
-                to={LOCAL_CONSTANTS.ROUTES.QUERY_VIEW.path(query.pm_query_id)}
+                to={LOCAL_CONSTANTS.ROUTES.GRAPH_VIEW.path(
+                  appConstant.pm_app_constant_id
+                )}
                 key={key}
               >
                 <ListItem
-                  key={`_query_${query.pm_query_id}`}
+                  key={`_app_constant_${appConstant.pm_app_constant_id}`}
                   disablePadding
-                  sx={{}}
                   className="!px-3 !py-1.5"
                 >
                   <ListItemButton
@@ -120,11 +108,7 @@ export const QueryDrawerList = () => {
                         minWidth: 0,
                       }}
                     >
-                      {QUERY_PLUGINS_MAP[query.pm_query_type] ? (
-                        QUERY_PLUGINS_MAP[query.pm_query_type].icon
-                      ) : (
-                        <FaCloudSun className="!text-sm" />
-                      )}
+                      <FaChalkboardTeacher className="!text-sm" />
                     </ListItemIcon>
                     <ListItemText
                       sx={{
@@ -133,17 +117,18 @@ export const QueryDrawerList = () => {
                             ? theme.palette.primary.main
                             : theme.palette.primary.contrastText,
                       }}
-                      primary={query.pm_query_title}
+                      primary={appConstant.pm_app_constant_title}
                       primaryTypographyProps={{
                         sx: {
                           fontWeight: key == currentPage ? "700" : "500",
-                          marginLeft: 2,
                           fontSize: 12,
+                          marginLeft: 2,
                         },
                       }}
                     />
                   </ListItemButton>
                 </ListItem>
+                {/* <Divider className="!mx-4" /> */}
               </Link>
             );
           })

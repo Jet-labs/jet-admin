@@ -2,6 +2,7 @@ import { useParams } from "react-router-dom";
 import "./styles.css";
 import { RowAdditionForm } from "../../components/DataGridComponents/RowAdditionForm";
 import { LOCAL_CONSTANTS } from "../../constants";
+import { AppConstantAdditionForm } from "../../components/AppConstantComponents/AppConstantAdditionForm";
 /**
  *
  * @param {object} param0
@@ -10,10 +11,7 @@ import { LOCAL_CONSTANTS } from "../../constants";
 const AddAppConstant = () => {
   return (
     <div className="flex flex-col justify-start items-stretch w-full h-full">
-      <RowAdditionForm
-        tableName={LOCAL_CONSTANTS.STRINGS.APP_CONSTANTS_TABLE_NAME}
-        customTitle={`Add app constant`}
-      />
+      <AppConstantAdditionForm />
     </div>
   );
 };

@@ -356,4 +356,79 @@ export class PMUser {
     console.log({ authorization });
     return authorization;
   };
+
+  // app_constants
+
+  isAuthorizedToAddAppConstant = () => {
+    if (this.policy?.app_constants?.add) {
+      return true;
+    }
+    return false;
+  };
+
+  extractAuthorizedAppConstantsForReadFromPolicyObject = () => {
+    const authorizeAppConstantIDs = [];
+    if (this.policy?.app_constants?.read) {
+      return true;
+    } else if (
+      this.policy.app_constants &&
+      this.policy.app_constants.app_constant_ids
+    ) {
+      Object.keys(this.policy.app_constants.app_constant_ids).forEach(
+        (pmAppConstantID) => {
+          if (
+            this.policy.app_constants.app_constant_ids[pmAppConstantID].read
+          ) {
+            authorizeAppConstantIDs.push(parseInt(pmAppConstantID));
+          }
+        }
+      );
+    }
+    return authorizeAppConstantIDs;
+  };
+
+  extractAuthorizedAppConstantsForUpdateFromPolicyObject = () => {
+    const authorizeAppConstantIDs = [];
+    if (this.policy?.app_constants?.edit) {
+      return true;
+    } else if (
+      this.policy.app_constants &&
+      this.policy.app_constants.app_constant_ids
+    ) {
+      Object.keys(this.policy.app_constants.app_constant_ids).forEach(
+        (pmAppConstantID) => {
+          if (
+            this.policy.app_constants.app_constant_ids[pmAppConstantID].edit
+          ) {
+            authorizeAppConstantIDs.push(parseInt(pmAppConstantID));
+          }
+        }
+      );
+    }
+    return authorizeAppConstantIDs;
+  };
+
+  isAuthorizedToDeleteAppConstant = (pmAppConstantID) => {
+    let authorization = false;
+    if (
+      this.policy.app_constants &&
+      !(
+        this.policy.app_constants.delete === null ||
+        this.policy.app_constants.delete === undefined
+      )
+    ) {
+      authorization = this.policy.app_constants.delete;
+    } else if (
+      this.policy.app_constants &&
+      this.policy.app_constants.app_constant_ids
+    ) {
+      if (this.policy.app_constants.app_constant_ids[pmAppConstantID]) {
+        authorization = Boolean(
+          this.policy.app_constants.app_constant_ids[pmAppConstantID].delete
+        );
+      }
+    }
+    console.log({ authorization });
+    return authorization;
+  };
 }

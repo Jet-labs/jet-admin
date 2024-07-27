@@ -30,6 +30,10 @@ const AllAppConstants = () => {
   const [filterQuery, setFilterQuery] = useState(null);
   const [sortModel, setSortModel] = useState(null);
   const { dbModel, internalAppConstants } = useAppConstants();
+  const isAuthorizedToAddAppConstant = useMemo(() => {
+    return pmUser && pmUser.isAuthorizedToAddAppConstant();
+  }, [pmUser]);
+
   const {
     isLoading: isLoadingAllAppConstants,
     data: data,
@@ -176,7 +180,7 @@ const AllAppConstants = () => {
           setSortModel={setSortModel}
           sortModel={sortModel}
           addRowNavigation={LOCAL_CONSTANTS.ROUTES.ADD_APP_CONSTANT.path()}
-          allowAdd={true}
+          allowAdd={isAuthorizedToAddAppConstant}
         />
       </div>
       {isLoadingAllAppConstants ? (

@@ -1,6 +1,9 @@
 import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { useFormik } from "formik";
-import { fetchRowByIDAPI } from "../../../api/tables";
+import {
+  fetchRowByIDAPI,
+  getAuthorizedColumnsForRead,
+} from "../../../api/tables";
 
 import { Button, CircularProgress, Grid, useTheme } from "@mui/material";
 import { useEffect, useMemo } from "react";
@@ -40,7 +43,7 @@ export const RowUpdateForm = ({ customTitle, tableName, id }) => {
       `REACT_QUERY_KEY_TABLES_${String(tableName).toUpperCase()}`,
       `edit_column`,
     ],
-    queryFn: () => getAuthorizedColumnsForEdit({ tableName }),
+    queryFn: () => getAuthorizedColumnsForRead({ tableName }),
     cacheTime: 0,
     retry: 1,
     staleTime: Infinity,
