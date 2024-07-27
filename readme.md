@@ -18,7 +18,7 @@ https://github.com/user-attachments/assets/7b387e54-6cf8-4257-9ce9-4c85bd8a3868
   - [x] Update
   - [x] Delete
   - [x] Select
-  - [ ] Bulk Delete
+  - [x] Bulk Delete
 - **Data Definition Language (DDL)**
   - [ ] Create, Alter, Drop, Truncate
 

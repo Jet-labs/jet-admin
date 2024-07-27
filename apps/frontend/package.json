@@ -59,6 +59,7 @@
     "react-json-editor-ajrm": "^2.5.14",
     "react-markdown": "^9.0.1",
     "react-querybuilder": "^7.4.1",
+    "react-resizable-panels": "^2.0.22",
     "react-responsive-carousel": "^3.2.23",
     "react-router-dom": "^6.4.2",
     "react-scripts": "5.0.1",

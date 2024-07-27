@@ -11,12 +11,11 @@ import {
 
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
+import { FaChalkboardTeacher, FaPlus, FaRedo } from "react-icons/fa";
 import { Link, useNavigate, useParams } from "react-router-dom";
-
 import { getAllDashboardAPI } from "../../../api/dashboards";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { useAuthState } from "../../../contexts/authContext";
-import { FaChalkboardTeacher, FaPlus, FaRedo } from "react-icons/fa";
 
 export const DashboardsList = () => {
   const theme = useTheme();

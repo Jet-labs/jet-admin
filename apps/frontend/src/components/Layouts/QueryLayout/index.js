@@ -3,23 +3,22 @@ import { lazy } from "react";
 import { Outlet, Route, Routes } from "react-router-dom";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { QueryDrawerList } from "../../DrawerLists/QueryDrawerList";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "../../Resizables";
 
 const AddQuery = lazy(() => import("../../../pages/AddQuery"));
 const UpdateQuery = lazy(() => import("../../../pages/UpdateQuery"));
 const QueryLayout = () => {
   return (
-    <Grid container>
-      <Grid item xs={3} sm={3} md={3} lg={2} xl={2}>
+    <ResizablePanelGroup direction="horizontal" autoSaveId="query-panel-sizes">
+      <ResizablePanel defaultSize={20}>
         <QueryDrawerList />
-      </Grid>
-      <Grid
-        xs={9}
-        sm={9}
-        md={9}
-        lg={10}
-        xl={10}
-        className="!h-[calc(100vh-48px)] !overflow-y-auto"
-      >
+      </ResizablePanel>
+      <ResizableHandle withHandle={true} />
+      <ResizablePanel defaultSize={80}>
         <Routes>
           <Route index element={<AddQuery />} />
 
@@ -33,8 +32,8 @@ const QueryLayout = () => {
           />
         </Routes>
         <Outlet />
-      </Grid>
-    </Grid>
+      </ResizablePanel>
+    </ResizablePanelGroup>
   );
 };
 export default QueryLayout;

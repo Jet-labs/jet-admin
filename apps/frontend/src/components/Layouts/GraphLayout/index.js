@@ -3,6 +3,11 @@ import { lazy } from "react";
 import { Outlet, Route, Routes } from "react-router-dom";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { GraphDrawerList } from "../../DrawerLists/GraphDrawerList";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "../../Resizables";
 // import TableView from "../../pages/TableView";
 
 const UpdateGraph = lazy(() => import("../../../pages/UpdateGraph"));
@@ -10,18 +15,12 @@ const AddGraph = lazy(() => import("../../../pages/AddGraph"));
 
 const GraphLayout = () => {
   return (
-    <Grid container>
-      <Grid item xs={3} sm={3} md={3} lg={3} xl={2}>
+    <ResizablePanelGroup direction="horizontal" autoSaveId="graph-panel-sizes">
+      <ResizablePanel defaultSize={20}>
         <GraphDrawerList />
-      </Grid>
-      <Grid
-        xs={9}
-        sm={9}
-        md={9}
-        lg={9}
-        xl={10}
-        className="!h-[calc(100vh-48px)] !overflow-y-auto"
-      >
+      </ResizablePanel>
+      <ResizableHandle withHandle={true} />
+      <ResizablePanel defaultSize={80}>
         <Routes>
           <Route index element={<AddGraph />} />
 
@@ -36,8 +35,8 @@ const GraphLayout = () => {
           />
         </Routes>
         <Outlet />
-      </Grid>
-    </Grid>
+      </ResizablePanel>
+    </ResizablePanelGroup>
   );
 };
 export default GraphLayout;

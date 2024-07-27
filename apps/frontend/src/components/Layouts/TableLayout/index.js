@@ -3,6 +3,11 @@ import { lazy } from "react";
 import { Outlet, Route, Routes } from "react-router-dom";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { TableDrawerList } from "../../DrawerLists/TableDrawerList";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "../../Resizables";
 // import TableView from "../../pages/TableView";
 
 const UpdateRow = lazy(() => import("../../../pages/UpdateRow"));
@@ -11,19 +16,12 @@ const TableView = lazy(() => import("../../../pages/TableView"));
 
 const TableLayout = () => {
   return (
-    <Grid container>
-      <Grid item xs={3} sm={3} md={3} lg={3} xl={2}>
+    <ResizablePanelGroup direction="horizontal" autoSaveId="table-panel-sizes">
+      <ResizablePanel defaultSize={20}>
         <TableDrawerList />
-      </Grid>
-      <Grid
-        item
-        xs={9}
-        sm={9}
-        md={9}
-        lg={9}
-        xl={10}
-        className="!h-[calc(100vh-48px)] !overflow-y-auto"
-      >
+      </ResizablePanel>
+      <ResizableHandle withHandle={true} />
+      <ResizablePanel defaultSize={80}>
         <Routes>
           {/* <Route
             index
@@ -44,8 +42,8 @@ const TableLayout = () => {
           </Route>
         </Routes>
         <Outlet />
-      </Grid>
-    </Grid>
+      </ResizablePanel>
+    </ResizablePanelGroup>
   );
 };
 export default TableLayout;
