@@ -450,4 +450,85 @@ policyUtils.extractAuthorizationForJobAddFromPolicyObject = ({
   return false;
 };
 
+policyUtils.extractAuthorizedAppConstantsForReadFromPolicyObject = ({
+  policyObject,
+}) => {
+  const authorizeAppConstantIDs = [];
+  if (policyObject.app_constants?.read) {
+    return true;
+  } else if (
+    policyObject.app_constants &&
+    policyObject.app_constants.app_constant_ids
+  ) {
+    Object.keys(policyObject.app_constants.app_constant_ids).forEach(
+      (app_constant_id) => {
+        if (
+          policyObject.app_constants.app_constant_ids[app_constant_id].read ||
+          policyObject.app_constants.app_constant_ids[app_constant_id] === true
+        ) {
+          authorizeAppConstantIDs.push(parseInt(app_constant_id));
+        }
+      }
+    );
+  }
+  return authorizeAppConstantIDs;
+};
+
+policyUtils.extractAuthorizedAppConstantsForUpdateFromPolicyObject = ({
+  policyObject,
+}) => {
+  const authorizeAppConstantIDs = [];
+  if (policyObject.app_constants?.edit) {
+    return true;
+  } else if (
+    policyObject.app_constants &&
+    policyObject.app_constants.app_constant_ids
+  ) {
+    Object.keys(policyObject.app_constants.app_constant_ids).forEach(
+      (app_constant_id) => {
+        if (
+          policyObject.app_constants.app_constant_ids[app_constant_id].edit ||
+          policyObject.app_constants.app_constant_ids[app_constant_id] === true
+        ) {
+          authorizeAppConstantIDs.push(parseInt(app_constant_id));
+        }
+      }
+    );
+  }
+  return authorizeAppConstantIDs;
+};
+
+policyUtils.extractAuthorizedAppConstantsForDeleteFromPolicyObject = ({
+  policyObject,
+}) => {
+  const authorizeAppConstantIDs = [];
+  if (policyObject.app_constants?.delete) {
+    return true;
+  } else if (
+    policyObject.app_constants &&
+    policyObject.app_constants.app_constant_ids
+  ) {
+    Object.keys(policyObject.app_constants.app_constant_ids).forEach(
+      (app_constant_id) => {
+        if (
+          policyObject.app_constants.app_constant_ids[app_constant_id].delete ||
+          policyObject.app_constants.app_constant_ids[app_constant_id] === true
+        ) {
+          authorizeAppConstantIDs.push(parseInt(app_constant_id));
+        }
+      }
+    );
+  }
+  return authorizeAppConstantIDs;
+};
+
+policyUtils.extractAuthorizationForAppConstantAddFromPolicyObject = ({
+  policyObject,
+}) => {
+  if (policyObject.app_constants?.add) {
+    return true;
+  }
+  return false;
+};
+
 module.exports = { policyUtils };

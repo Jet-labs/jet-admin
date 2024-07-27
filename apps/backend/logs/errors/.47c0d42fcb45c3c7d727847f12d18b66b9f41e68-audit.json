@@ -94,6 +94,16 @@
             "date": 1722085727307,
             "name": "logs\\errors\\dev_node_1-2024-07-27.log.14",
             "hash": "d5ae52e242eb97b656d888e6750c4d1b12a06a8e2d059d7eba595680f042b1bf"
+        },
+        {
+            "date": 1722091564229,
+            "name": "logs\\errors\\dev_node_1-2024-07-27.log.15",
+            "hash": "20b4e6c73956b246f5c669a2a50031bce53591b8a284464b48cb3587d25a0f4c"
+        },
+        {
+            "date": 1722091577261,
+            "name": "logs\\errors\\dev_node_1-2024-07-27.log.16",
+            "hash": "d90680078431f77cb0576d6ce5a5bec5f52c34c96259dd1aa2f337f141cbf6f6"
         }
     ],
     "hashType": "sha256"

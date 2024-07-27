@@ -18,7 +18,7 @@ appConstantController.getAllAppConstants = async (req, res) => {
 
     Logger.log("info", {
       message: "appConstantController:getAllAppConstants:params",
-      params: { pm_user_id },
+      params: { pm_user_id, authorized_app_constants },
     });
 
     const appConstants = await AppConstantService.getAllAppConstants({

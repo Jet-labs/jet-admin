@@ -2,7 +2,7 @@ const constants = require("../../constants");
 const Logger = require("../../utils/logger");
 const { policyUtils } = require("../../utils/policy.utils");
 
-const dashboardAuthorizationMiddleware = {};
+const appConstantAuthorizationMiddleware = {};
 
 /**
  *
@@ -11,144 +11,7 @@ const dashboardAuthorizationMiddleware = {};
  * @param {import("express").NextFunction} next
  * @returns
  */
-dashboardAuthorizationMiddleware.populateAuthorizedDashboardsForRead = async (
-  req,
-  res,
-  next
-) => {
-  try {
-    const { pmUser, state } = req;
-    const authorization_policy = state?.authorization_policy;
-    const pm_user_id = parseInt(pmUser.pm_user_id);
-    Logger.log("info", {
-      message:
-        "dashboardAuthorizationMiddleware:populateAuthorizedDashboardsForRead:params",
-      params: { pm_user_id },
-    });
-    let authorized_dashboards =
-      policyUtils.extractAuthorizedDashboardsForReadFromPolicyObject({
-        policyObject: authorization_policy,
-      });
-
-    req.state = { ...req.state, authorized_dashboards };
-    Logger.log("success", {
-      message:
-        "dashboardAuthorizationMiddleware:populateAuthorizedDashboardsForRead:success",
-      params: { pm_user_id, authorized_dashboards },
-    });
-    return next();
-  } catch (error) {
-    Logger.log("error", {
-      message:
-        "dashboardAuthorizationMiddleware:populateAuthorizedDashboardsForRead:catch-1",
-      params: { error },
-    });
-    return res.json({
-      success: false,
-      error: constants.ERROR_CODES.SERVER_ERROR,
-    });
-  }
-};
-/**
- *
- * @param {import("express").Request} req
- * @param {import("express").Response} res
- * @param {import("express").NextFunction} next
- * @returns
- */
-dashboardAuthorizationMiddleware.populateAuthorizedDashboardsForUpdate = async (
-  req,
-  res,
-  next
-) => {
-  try {
-    const { pmUser, state } = req;
-    const authorization_policy = state?.authorization_policy;
-    const pm_user_id = parseInt(pmUser.pm_user_id);
-    Logger.log("info", {
-      message:
-        "dashboardAuthorizationMiddleware:populateAuthorizedDashboardsForUpdate:params",
-      params: { pm_user_id },
-    });
-    let authorized_dashboards =
-      policyUtils.extractAuthorizedDashboardsForUpdateFromPolicyObject({
-        policyObject: authorization_policy,
-      });
-
-    req.state = { ...req.state, authorized_dashboards };
-    Logger.log("success", {
-      message:
-        "dashboardAuthorizationMiddleware:populateAuthorizedDashboardsForUpdate:success",
-      params: { pm_user_id, authorized_dashboards },
-    });
-    return next();
-  } catch (error) {
-    Logger.log("error", {
-      message:
-        "dashboardAuthorizationMiddleware:populateAuthorizedDashboardsForUpdate:catch-1",
-      params: { error },
-    });
-    return res.json({
-      success: false,
-      error: constants.ERROR_CODES.SERVER_ERROR,
-    });
-  }
-};
-
-/**
- *
- * @param {import("express").Request} req
- * @param {import("express").Response} res
- * @param {import("express").NextFunction} next
- * @returns
- */
-dashboardAuthorizationMiddleware.populateAuthorizedDashboardsForDelete = async (
-  req,
-  res,
-  next
-) => {
-  try {
-    const { pmUser, state } = req;
-    const authorization_policy = state?.authorization_policy;
-    const pm_user_id = parseInt(pmUser.pm_user_id);
-    Logger.log("info", {
-      message:
-        "dashboardAuthorizationMiddleware:populateAuthorizedDashboardsForDelete:params",
-      params: { pm_user_id },
-    });
-    let authorized_dashboards =
-      policyUtils.extractAuthorizedDashboardsForDeleteFromPolicyObject({
-        policyObject: authorization_policy,
-      });
-
-    req.state = { ...req.state, authorized_dashboards };
-    Logger.log("success", {
-      message:
-        "dashboardAuthorizationMiddleware:populateAuthorizedDashboardsForDelete:success",
-      params: { pm_user_id, authorized_dashboards },
-    });
-    return next();
-  } catch (error) {
-    Logger.log("error", {
-      message:
-        "dashboardAuthorizationMiddleware:populateAuthorizedDashboardsForDelete:catch-1",
-      params: { error },
-    });
-    return res.json({
-      success: false,
-      error: constants.ERROR_CODES.SERVER_ERROR,
-    });
-  }
-};
-
-/**
- *
- * @param {import("express").Request} req
- * @param {import("express").Response} res
- * @param {import("express").NextFunction} next
- * @returns
- */
-dashboardAuthorizationMiddleware.populateAuthorizationForDashboardAddition =
+appConstantAuthorizationMiddleware.populateAuthorizedAppConstantsForRead =
   async (req, res, next) => {
     try {
       const { pmUser, state } = req;
@@ -156,18 +19,146 @@ dashboardAuthorizationMiddleware.populateAuthorizationForDashboardAddition =
       const pm_user_id = parseInt(pmUser.pm_user_id);
       Logger.log("info", {
         message:
-          "dashboardAuthorizationMiddleware:populateAuthorizationForDashboardAddition:params",
+          "appConstantAuthorizationMiddleware:populateAuthorizedAppConstantsForRead:params",
+        params: { pm_user_id },
+      });
+      let authorized_app_constants =
+        policyUtils.extractAuthorizedAppConstantsForReadFromPolicyObject({
+          policyObject: authorization_policy,
+        });
+
+      req.state = { ...req.state, authorized_app_constants };
+      Logger.log("success", {
+        message:
+          "appConstantAuthorizationMiddleware:populateAuthorizedAppConstantsForRead:success",
+        params: { pm_user_id, authorized_app_constants },
+      });
+      return next();
+    } catch (error) {
+      Logger.log("error", {
+        message:
+          "appConstantAuthorizationMiddleware:populateAuthorizedAppConstantsForRead:catch-1",
+        params: { error },
+      });
+      return res.json({
+        success: false,
+        error: constants.ERROR_CODES.SERVER_ERROR,
+      });
+    }
+  };
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @param {import("express").NextFunction} next
+ * @returns
+ */
+appConstantAuthorizationMiddleware.populateAuthorizedAppConstantsForUpdate =
+  async (req, res, next) => {
+    try {
+      const { pmUser, state } = req;
+      const authorization_policy = state?.authorization_policy;
+      const pm_user_id = parseInt(pmUser.pm_user_id);
+      Logger.log("info", {
+        message:
+          "appConstantAuthorizationMiddleware:populateAuthorizedAppConstantsForUpdate:params",
+        params: { pm_user_id },
+      });
+      let authorized_app_constants =
+        policyUtils.extractAuthorizedAppConstantsForUpdateFromPolicyObject({
+          policyObject: authorization_policy,
+        });
+
+      req.state = { ...req.state, authorized_app_constants };
+      Logger.log("success", {
+        message:
+          "appConstantAuthorizationMiddleware:populateAuthorizedAppConstantsForUpdate:success",
+        params: { pm_user_id, authorized_app_constants },
+      });
+      return next();
+    } catch (error) {
+      Logger.log("error", {
+        message:
+          "appConstantAuthorizationMiddleware:populateAuthorizedAppConstantsForUpdate:catch-1",
+        params: { error },
+      });
+      return res.json({
+        success: false,
+        error: constants.ERROR_CODES.SERVER_ERROR,
+      });
+    }
+  };
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @param {import("express").NextFunction} next
+ * @returns
+ */
+appConstantAuthorizationMiddleware.populateAuthorizedAppConstantsForDelete =
+  async (req, res, next) => {
+    try {
+      const { pmUser, state } = req;
+      const authorization_policy = state?.authorization_policy;
+      const pm_user_id = parseInt(pmUser.pm_user_id);
+      Logger.log("info", {
+        message:
+          "appConstantAuthorizationMiddleware:populateAuthorizedAppConstantsForDelete:params",
+        params: { pm_user_id },
+      });
+      let authorized_app_constants =
+        policyUtils.extractAuthorizedAppConstantsForDeleteFromPolicyObject({
+          policyObject: authorization_policy,
+        });
+
+      req.state = { ...req.state, authorized_app_constants };
+      Logger.log("success", {
+        message:
+          "appConstantAuthorizationMiddleware:populateAuthorizedAppConstantsForDelete:success",
+        params: { pm_user_id, authorized_app_constants },
+      });
+      return next();
+    } catch (error) {
+      Logger.log("error", {
+        message:
+          "appConstantAuthorizationMiddleware:populateAuthorizedAppConstantsForDelete:catch-1",
+        params: { error },
+      });
+      return res.json({
+        success: false,
+        error: constants.ERROR_CODES.SERVER_ERROR,
+      });
+    }
+  };
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @param {import("express").NextFunction} next
+ * @returns
+ */
+appConstantAuthorizationMiddleware.populateAuthorizationForAppConstantAddition =
+  async (req, res, next) => {
+    try {
+      const { pmUser, state } = req;
+      const authorization_policy = state?.authorization_policy;
+      const pm_user_id = parseInt(pmUser.pm_user_id);
+      Logger.log("info", {
+        message:
+          "appConstantAuthorizationMiddleware:populateAuthorizationForAppConstantAddition:params",
         params: { pm_user_id },
       });
       let authorizationToAdd =
-        policyUtils.extractAuthorizationForDashboardAddFromPolicyObject({
+        policyUtils.extractAuthorizationForAppConstantAddFromPolicyObject({
           policyObject: authorization_policy,
         });
 
       if (!authorizationToAdd) {
         Logger.log("error", {
           message:
-            "dashboardAuthorizationMiddleware:populateAuthorizationForDashboardAddition:catch-2",
+            "appConstantAuthorizationMiddleware:populateAuthorizationForAppConstantAddition:catch-2",
           params: { error: constants.ERROR_CODES.PERMISSION_DENIED },
         });
         return res.json({
@@ -178,14 +169,14 @@ dashboardAuthorizationMiddleware.populateAuthorizationForDashboardAddition =
       req.state = { ...req.state, authorizationToAdd };
       Logger.log("success", {
         message:
-          "dashboardAuthorizationMiddleware:populateAuthorizationForDashboardAddition:success",
+          "appConstantAuthorizationMiddleware:populateAuthorizationForAppConstantAddition:success",
         params: { pm_user_id, authorizationToAdd },
       });
       return next();
     } catch (error) {
       Logger.log("error", {
         message:
-          "dashboardAuthorizationMiddleware:populateAuthorizationForDashboardAddition:catch-1",
+          "appConstantAuthorizationMiddleware:populateAuthorizationForAppConstantAddition:catch-1",
         params: { error },
       });
       return res.json({
@@ -195,4 +186,4 @@ dashboardAuthorizationMiddleware.populateAuthorizationForDashboardAddition =
     }
   };
 
-module.exports = { dashboardAuthorizationMiddleware };
+module.exports = { appConstantAuthorizationMiddleware };
