@@ -88,6 +88,9 @@ export const RawDataGrid = ({
   const authorizedColumns = useMemo(() => {
     console.log({ iiiinternalAppConstants: internalAppConstants });
     if (readColumns) {
+      console.log({
+        internalAppConstants: internalAppConstants?.CUSTOM_INT_VIEW_MAPPING,
+      });
       const c = getFormattedTableColumns(
         readColumns,
         internalAppConstants?.CUSTOM_INT_VIEW_MAPPING?.[tableName]

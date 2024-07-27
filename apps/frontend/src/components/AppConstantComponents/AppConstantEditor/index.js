@@ -1,10 +1,23 @@
-import { Grid, TextField, useTheme } from "@mui/material";
+import {
+  Checkbox,
+  FormControl,
+  FormControlLabel,
+  Grid,
+  TextField,
+  useTheme,
+} from "@mui/material";
 import "react-js-cron/dist/styles.css";
 import { CodeEditor } from "../../CodeEditorComponent";
-export const AppConstantEditor = ({ appConstantID, appConstantForm }) => {
+export const AppConstantEditor = ({ appConstantForm }) => {
   const theme = useTheme();
   const _handleUpdateAppConstantValue = (value) => {
-    appConstantForm?.setFieldValue("pm_app_constant_value", value);
+    appConstantForm?.setFieldValue(
+      "pm_app_constant_value",
+      typeof value === "string" ? JSON.parse(value) : value
+    );
+  };
+  const _handleUpdateAppConstantInternal = (value) => {
+    appConstantForm?.setFieldValue("is_internal", value.target.checked);
   };
   return (
     <Grid container className="!w-full" style={{}}>
@@ -24,11 +37,29 @@ export const AppConstantEditor = ({ appConstantID, appConstantForm }) => {
       </Grid>
 
       <Grid item sx={12} md={12} lg={12} className="!p-3">
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={appConstantForm.values.is_internal}
+              onChange={_handleUpdateAppConstantInternal}
+            />
+          }
+          label="Internal"
+        />
+      </Grid>
+
+      <Grid item sx={12} md={12} lg={12} className="!p-3">
         <CodeEditor
           code={
             appConstantForm?.values?.pm_app_constant_value
-              ? appConstantForm.values.pm_app_constant_value
-              : {}
+              ? typeof appConstantForm.values.pm_app_constant_value === "object"
+                ? JSON.stringify(
+                    appConstantForm.values.pm_app_constant_value,
+                    null,
+                    2
+                  )
+                : appConstantForm.values.pm_app_constant_value
+              : JSON.stringify({})
           }
           setCode={_handleUpdateAppConstantValue}
           height="600px"

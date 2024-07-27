@@ -1,7 +1,6 @@
 import { useParams } from "react-router-dom";
+import { AppConstantUpdateForm } from "../../components/AppConstantComponents/AppConstantUpdateForm";
 import "./styles.css";
-import { RowUpdateForm } from "../../components/DataGridComponents/RowUpdateForm";
-import { LOCAL_CONSTANTS } from "../../constants";
 /**
  *
  * @param {object} param0
@@ -11,13 +10,7 @@ const UpdateAppConstant = ({}) => {
   const { id } = useParams();
   return (
     <div className="flex flex-col justify-start items-stretch w-full h-full">
-      {id && (
-        <RowUpdateForm
-          tableName={LOCAL_CONSTANTS.STRINGS.APP_CONSTANTS_TABLE_NAME}
-          customTitle={`Update App Constant`}
-          id={id}
-        />
-      )}
+      {id && <AppConstantUpdateForm id={id} />}
     </div>
   );
 };

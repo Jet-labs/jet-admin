@@ -180,9 +180,10 @@ appConstantController.updateAppConstant = async (req, res) => {
     });
 
     const appConstant = await AppConstantService.updateAppConstant({
-      appConstantID: parseInt(body.pm_app_constants_id),
-      appConstantTitle: body.app_constants_title,
-      appConstantValue: body.app_constant_value,
+      appConstantID: parseInt(body.pm_app_constant_id),
+      appConstantTitle: body.pm_app_constant_title,
+      appConstantValue: body.pm_app_constant_value,
+      isInternal: body.is_internal,
       authorizedAppConstants: authorized_app_constants,
     });
 
@@ -213,17 +214,17 @@ appConstantController.updateAppConstant = async (req, res) => {
 appConstantController.deleteAppConstant = async (req, res) => {
   try {
     const { pmUser, state, params } = req;
-    const pm_app_constants_id = parseInt(params.id);
+    const pm_app_constant_id = parseInt(params.id);
     const pm_user_id = parseInt(pmUser.pm_user_id);
     const authorized_app_constants = state.authorized_app_constants;
 
     Logger.log("info", {
       message: "appConstantController:deleteAppConstant:params",
-      params: { pm_user_id, pm_app_constants_id },
+      params: { pm_user_id, pm_app_constant_id },
     });
 
     await AppConstantService.deleteAppConstant({
-      appConstantID: pm_app_constants_id,
+      appConstantID: pm_app_constant_id,
       authorizedAppConstants: authorized_app_constants,
     });
 

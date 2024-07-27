@@ -25,6 +25,7 @@ export const AppConstantUpdateForm = ({ id }) => {
     retry: 1,
     staleTime: 0,
   });
+  console.log({ appConstantData });
   const appConstantForm = useFormik({
     initialValues: {
       pm_app_constant_title: "Untitled",
@@ -83,6 +84,7 @@ export const AppConstantUpdateForm = ({ id }) => {
   });
 
   const _updateAppConstant = () => {
+    console.log(appConstantForm.values);
     updateAppConstant(appConstantForm.values);
   };
 
