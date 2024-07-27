@@ -140,8 +140,9 @@ appConstantController.addAppConstant = async (req, res) => {
     });
 
     const appConstant = await AppConstantService.addAppConstant({
-      appConstantTitle: body.app_constant_title,
-      appConstantValue: body.app_constant_value,
+      appConstantTitle: body.pm_app_constant_title,
+      appConstantValue: body.pm_app_constant_value,
+      isInternal: body.is_internal,
     });
 
     Logger.log("success", {

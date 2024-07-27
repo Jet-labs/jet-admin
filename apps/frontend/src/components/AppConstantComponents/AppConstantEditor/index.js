@@ -62,7 +62,7 @@ export const AppConstantEditor = ({ appConstantForm }) => {
               : JSON.stringify({})
           }
           setCode={_handleUpdateAppConstantValue}
-          height="600px"
+          height="400px"
         />
       </Grid>
     </Grid>

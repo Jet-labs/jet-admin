@@ -66,23 +66,33 @@ export const AppConstantAdditionForm = () => {
   return (
     <div className="w-full !h-[calc(100vh-123px)]">
       <div
-        className="flex flex-col items-start justify-start p-3 px-6"
-        style={{ background: theme.palette.background.paper }}
+        className="flex flex-col items-center justify-start p-3 px-6 w-full"
+        style={{
+          background: theme.palette.background.paper,
+          borderBottomWidth: 1,
+          borderColor: theme.palette.divider,
+        }}
       >
-        <span className="text-lg font-bold text-start mt-1">{`Add new app constant`}</span>
-      </div>
-
-      <Grid item sx={4} md={4} lg={4} className="w-full">
-        <AppConstantEditor appConstantForm={appConstantForm} />
-
-        <div className="!flex flex-row justify-end items-center mt-10 w-100 px-3">
-          <Button
-            variant="contained"
-            className="!ml-3"
-            onClick={_addAppConstant}
-          >{`Save app constant`}</Button>
+        <div className="flex flex-row justify-between 2xl:w-3/5 xl:w-3/4 lg:w-2/3 md:w-full w-full">
+          <span className="text-lg font-bold text-start mt-1 ">{`Add new app constant`}</span>
         </div>
-      </Grid>
+      </div>
+      <div
+        className="flex flex-col items-center justify-start w-full"
+        // style={{ background: theme.palette.background.paper }}
+      >
+        <div className="flex flex-col justify-start items-center 2xl:w-3/5 xl:w-3/4 lg:w-2/3 md:w-full w-full">
+          <AppConstantEditor appConstantForm={appConstantForm} />
+
+          <div className="!flex flex-row justify-end items-start mt-10 w-full px-3">
+            <Button
+              variant="contained"
+              className="!ml-3"
+              onClick={_addAppConstant}
+            >{`Save app constant`}</Button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };

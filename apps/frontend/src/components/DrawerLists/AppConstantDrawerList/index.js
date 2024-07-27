@@ -31,9 +31,9 @@ export const AppConstantsList = () => {
     return pmUser && pmUser.isAuthorizedToAddAppConstant();
   }, [pmUser]);
 
-  console.log({ appConstants });
+  
   const _navigateToAddMoreAppConstant = () => {
-    navigate(LOCAL_CONSTANTS.ROUTES.APP_CONSTANT_VIEW.path());
+    navigate(LOCAL_CONSTANTS.ROUTES.ADD_APP_CONSTANT.path());
   };
 
   return (
