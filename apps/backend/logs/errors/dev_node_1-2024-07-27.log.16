@@ -2412,3 +2412,9 @@
 [31merror[39m: dev_node_1: 27-07-2024 20:52:51: [31mappConstantController:getAppConstantByID:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
 [31merror[39m: dev_node_1: 27-07-2024 20:53:06: [31mAppConstantService:addAppConstant:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
 [31merror[39m: dev_node_1: 27-07-2024 20:53:06: [31mappConstantController:addAppConstant:catch-1[39m |====| {"error":{"name":"PrismaClientValidationError","clientVersion":"5.7.1"}}
+[31merror[39m: dev_node_1: 27-07-2024 21:02:26: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-07-27T15:32:22.000Z"}}
+[31merror[39m: dev_node_1: 27-07-2024 21:02:26: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 27-07-2024 21:02:26: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-07-27T15:32:22.000Z"}}
+[31merror[39m: dev_node_1: 27-07-2024 21:02:26: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 27-07-2024 21:02:26: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-07-27T15:32:22.000Z"}}
+[31merror[39m: dev_node_1: 27-07-2024 21:02:26: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}

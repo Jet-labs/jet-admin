@@ -4,6 +4,8 @@ import { DashboardPolicyEditor } from "../DashboardPolicyEditor";
 import { GraphPolicyEditor } from "../GraphPolicyEditor";
 import { QueryPolicyEditor } from "../QueryPolicyEditor";
 import { TablePolicyEditor } from "../TablePolicyEditor";
+import { JobPolicyEditor } from "../JobPolicyEditor";
+import { AppConstantPolicyEditor } from "../AppConstantPolicyEditor";
 
 export const GUIPolicyEditor = ({ policy, handleChange, containerClass }) => {
   return (
@@ -56,6 +58,28 @@ export const GUIPolicyEditor = ({ policy, handleChange, containerClass }) => {
             case "dashboards": {
               component = (
                 <DashboardPolicyEditor
+                  value={policy[key]}
+                  handleChange={(value) => {
+                    handleChange({ ...policy, [key]: value });
+                  }}
+                />
+              );
+              break;
+            }
+            case "jobs": {
+              component = (
+                <JobPolicyEditor
+                  value={policy[key]}
+                  handleChange={(value) => {
+                    handleChange({ ...policy, [key]: value });
+                  }}
+                />
+              );
+              break;
+            }
+            case "app_constants": {
+              component = (
+                <AppConstantPolicyEditor
                   value={policy[key]}
                   handleChange={(value) => {
                     handleChange({ ...policy, [key]: value });

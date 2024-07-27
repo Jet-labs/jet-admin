@@ -33,12 +33,12 @@ export const AppConstantDeletionForm = ({ pmAppConstantID }) => {
     mutate: deleteAppConstant,
   } = useMutation({
     mutationFn: ({ pmAppConstantID }) =>
-      deleteAppConstantByIDAPI({ pmAppConstantID }),
+      deleteAppConstantByIDAPI({ appConstantID: pmAppConstantID }),
     retry: false,
     onSuccess: () => {
       displaySuccess("Deleted app constant successfully");
       queryClient.invalidateQueries(["REACT_QUERY_KEY_JOBS"]);
-      navigate(LOCAL_CONSTANTS.ROUTES.ALL_JOBS.path());
+      navigate(LOCAL_CONSTANTS.ROUTES.ALL_APP_CONSTANTS.path());
       setIsDeleteAppConstantConfirmationOpen(false);
     },
     onError: (error) => {
