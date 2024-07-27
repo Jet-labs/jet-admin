@@ -37,7 +37,7 @@ export const GRAPH_PLUGINS_MAP = {
   PIE: {
     label: "Pie",
     value: "PIE",
-    fields: ["x_axis", "y_axis"],
+    fields: ["label", "value"],
     component: ({ legendPosition, titleDisplayEnabled, graphTitle, data }) => (
       <PieGraphComponent
         legendPosition={legendPosition}
@@ -51,7 +51,7 @@ export const GRAPH_PLUGINS_MAP = {
   DOUGHNUT: {
     label: "Doughnut",
     value: "DOUGHNUT",
-    fields: ["x_axis", "y_axis"],
+    fields: ["label", "value"],
     component: ({ legendPosition, titleDisplayEnabled, graphTitle, data }) => (
       <DoughnutGraphComponent
         legendPosition={legendPosition}
@@ -65,7 +65,7 @@ export const GRAPH_PLUGINS_MAP = {
   POLAR_AREA: {
     label: "Polar Area",
     value: "POLAR_AREA",
-    fields: ["x_axis", "y_axis"],
+    fields: ["label", "value"],
     component: ({ legendPosition, titleDisplayEnabled, graphTitle, data }) => (
       <PolarAreaGraphComponent
         legendPosition={legendPosition}
@@ -79,7 +79,7 @@ export const GRAPH_PLUGINS_MAP = {
   RADAR: {
     label: "Radar",
     value: "RADAR",
-    fields: ["x_axis", "y_axis"],
+    fields: ["label", "value"],
     component: ({ legendPosition, titleDisplayEnabled, graphTitle, data }) => (
       <RadarGraphComponent
         legendPosition={legendPosition}

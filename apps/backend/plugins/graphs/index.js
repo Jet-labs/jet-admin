@@ -24,7 +24,7 @@ const GRAPH_PLUGINS_MAP = {
   PIE: {
     label: "Pie",
     value: "PIE",
-    fields: ["x_axis", "y_axis"],
+    fields: ["label", "value"],
     getGraphModel: ({ pm_graph_id, graph_title, graph_options }) => {
       return new PieGraph({ pm_graph_id, graph_title, graph_options });
     },
@@ -32,7 +32,7 @@ const GRAPH_PLUGINS_MAP = {
   DOUGHNUT: {
     label: "Doughnut",
     value: "DOUGHNUT",
-    fields: ["x_axis", "y_axis"],
+    fields: ["label", "value"],
     getGraphModel: ({ pm_graph_id, graph_title, graph_options }) => {
       return new DoughnutGraph({ pm_graph_id, graph_title, graph_options });
     },
@@ -40,7 +40,7 @@ const GRAPH_PLUGINS_MAP = {
   POLAR_AREA: {
     label: "Polar Area",
     value: "POLAR_AREA",
-    fields: ["x_axis", "y_axis"],
+    fields: ["label", "value"],
     getGraphModel: ({ pm_graph_id, graph_title, graph_options }) => {
       return new PolarGraph({ pm_graph_id, graph_title, graph_options });
     },
@@ -48,7 +48,7 @@ const GRAPH_PLUGINS_MAP = {
   RADAR: {
     label: "Radar",
     value: "RADAR",
-    fields: ["x_axis", "y_axis"],
+    fields: ["label", "value"],
     getGraphModel: ({ pm_graph_id, graph_title, graph_options }) => {
       return new RadialGraph({ pm_graph_id, graph_title, graph_options });
     },

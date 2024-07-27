@@ -23,11 +23,11 @@ class PieGraph extends BaseGraph {
       results.map(async (result) => {
         const _y = [];
         result.result.result.forEach((_r) => {
-          _labels[_r[result.x_axis]] = true;
+          _labels[_r[result.label]] = true;
           _y.push(
-            typeof _r[result.y_axis] === "bigint"
-              ? Number(_r[result.y_axis])
-              : _r[result.y_axis]
+            typeof _r[result.value] === "bigint"
+              ? Number(_r[result.value])
+              : _r[result.value]
           );
         });
         dataset.datasets.push({
@@ -67,7 +67,6 @@ class PieGraph extends BaseGraph {
             pmQueryType: query.pm_query_type,
             pmQuery: query.pm_query,
           });
-
           return { ...queryItem, result };
         });
         const results = await Promise.all(resultPromises);

@@ -43,6 +43,18 @@ const create_super_admin_policy = () => {
       read: true,
       delete: true,
     };
+    policy.jobs = {
+      add: true,
+      edit: true,
+      read: true,
+      delete: true,
+    };
+    policy.app_constants = {
+      add: true,
+      edit: true,
+      read: true,
+      delete: true,
+    };
     return policy;
   } catch (error) {
     Logger.log("error", {
@@ -52,6 +64,69 @@ const create_super_admin_policy = () => {
   }
 };
 
+const create_read_admin_policy = () => {
+  try {
+    Logger.log("info", {
+      message: "create_read_admin_policy:starting...",
+    });
+    const policy = {
+      actions: {},
+      tables: {
+        tbl_pm_policy_objects: true,
+        tbl_pm_users: true,
+      },
+    };
+    const name_array = dbModel.map((t) => t.name);
+    name_array.forEach((t) => {
+      policy.tables[t] = {
+        add: false,
+        edit: false,
+        read: true,
+        delete: false,
+      };
+    });
+    Logger.log("success", {
+      message: "create_read_admin_policy:policy created",
+      params: { policy },
+    });
+    policy.graphs = {
+      add: false,
+      edit: false,
+      read: false,
+      delete: false,
+    };
+    policy.queries = {
+      add: false,
+      edit: false,
+      read: false,
+      delete: false,
+    };
+    policy.dashboards = {
+      add: false,
+      edit: false,
+      read: false,
+      delete: false,
+    };
+    policy.jobs = {
+      add: false,
+      edit: false,
+      read: false,
+      delete: false,
+    };
+    policy.app_constants = {
+      add: false,
+      edit: false,
+      read: false,
+      delete: false,
+    };
+    return policy;
+  } catch (error) {
+    Logger.log("error", {
+      message: "create_read_admin_policy:catch-1",
+      params: { error },
+    });
+  }
+};
 // Configure the connection to your PostgreSQL database
 const pool = new Pool({
   connectionString: environment.DATABASE_URL,
@@ -184,6 +259,12 @@ const super_user_query_text = `
       RETURNING pm_user_id;
     `;
 
+const custom_int_mapping_query = `
+      INSERT INTO tbl_pm_app_constants(pm_app_constant_title, pm_app_constant_value, is_internal)
+      VALUES($1, $2, $3)
+      RETURNING pm_app_constant_id;
+    `;
+
 const create_trigger_query = `
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
@@ -253,23 +334,39 @@ async function setup_database() {
       message: "setup_database:super admin user creation started...",
     });
     await client.query("BEGIN");
-    const { rows: super_user_db_entry } = await client.query(
-      super_user_query_text,
-      [
-        "Super",
-        "Admin",
-        "",
-        super_admin_policy_db_entry[0].pm_policy_object_id,
-        false, // is_disabled
-        "superadmin",
-        // password:password
-        "908e080381907685d00035f9e7e971d1cf5cd8fb4c20509d3169413c324fa42332476565ecac675ff397c432455505ded05dc6fb8265eae617f2bd2131d7c1b1",
-        "ed2b6072e463cbe7e5387de6bae69d55",
-      ]
-    );
+    await client.query(super_user_query_text, [
+      "Super",
+      "Admin",
+      "",
+      super_admin_policy_db_entry[0].pm_policy_object_id,
+      false, // is_disabled
+      "superadmin",
+      // password:password
+      "908e080381907685d00035f9e7e971d1cf5cd8fb4c20509d3169413c324fa42332476565ecac675ff397c432455505ded05dc6fb8265eae617f2bd2131d7c1b1",
+      "ed2b6072e463cbe7e5387de6bae69d55",
+    ]);
     await client.query("COMMIT");
     Logger.log("success", {
       message: "setup_database:super admin user creation completed!",
+    });
+
+    Logger.log("info", {
+      message: "setup_database:app constants creation started...",
+    });
+    await client.query("BEGIN");
+    await client.query(create_app_constants_table_query, [
+      "CUSTOM_INT_VIEW_MAPPING",
+      {},
+      true,
+    ]);
+    await client.query(create_app_constants_table_query, [
+      "CUSTOM_INT_EDIT_MAPPING",
+      {},
+      true,
+    ]);
+    await client.query("COMMIT");
+    Logger.log("success", {
+      message: "setup_database:app constants creation completed!",
     });
 
     // create triggers in database

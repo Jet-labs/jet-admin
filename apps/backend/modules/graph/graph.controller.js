@@ -109,7 +109,7 @@ graphController.getGraphData = async (req, res) => {
 
     Logger.log("success", {
       message: "graphController:getGraphData:success",
-      params: { pm_user_id, graph },
+      params: { pm_user_id, graphID: graph.pm_graph_id },
     });
 
     return res.json({
