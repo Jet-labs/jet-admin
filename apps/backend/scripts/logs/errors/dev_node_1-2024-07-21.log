@@ -1,2 +1,0 @@
-[31merror[39m: dev_node_1: 21-07-2024 11:50:52: [31msetup_database:database setup failed![39m |====| {"error":{"length":137,"name":"error","severity":"ERROR","code":"42P01","position":"79","file":"regproc.c","line":"911","routine":"regclassin"}}
-[31merror[39m: dev_node_1: 21-07-2024 11:52:12: [31msetup_database:database setup failed![39m |====| {"error":{"length":137,"name":"error","severity":"ERROR","code":"42P01","position":"79","file":"regproc.c","line":"911","routine":"regclassin"}}

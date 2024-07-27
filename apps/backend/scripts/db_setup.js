@@ -92,31 +92,31 @@ const create_read_admin_policy = () => {
     policy.graphs = {
       add: false,
       edit: false,
-      read: false,
+      read: true,
       delete: false,
     };
     policy.queries = {
       add: false,
       edit: false,
-      read: false,
+      read: true,
       delete: false,
     };
     policy.dashboards = {
       add: false,
       edit: false,
-      read: false,
+      read: true,
       delete: false,
     };
     policy.jobs = {
       add: false,
       edit: false,
-      read: false,
+      read: true,
       delete: false,
     };
     policy.app_constants = {
       add: false,
       edit: false,
-      read: false,
+      read: true,
       delete: false,
     };
     return policy;
@@ -154,18 +154,18 @@ const create_user_table_query = `
  CREATE TABLE IF NOT EXISTS public.tbl_pm_users
 (
     pm_user_id serial NOT NULL,
-    first_name character varying",
-    last_name character varying",
-    address1 character varying",
+    first_name character varying,
+    last_name character varying,
+    address1 character varying,
     pm_policy_object_id integer,
     is_disabled boolean DEFAULT false,
     created_at timestamp(6) with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp(6) with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
     disabled_at timestamp(6) with time zone,
-    disable_reason character varying",
-    username character varying",
-    password_hash character varying",
-    salt character varying",
+    disable_reason character varying,
+    username character varying,
+    password_hash character varying,
+    salt character varying,
     CONSTRAINT tbl_pm_users_pkey PRIMARY KEY (pm_user_id),
     CONSTRAINT fk_tbl_pm_users_tbl_pm_policy_object_pm_policy_onject_id FOREIGN KEY (pm_policy_object_id)
         REFERENCES public.tbl_pm_policy_objects (pm_policy_object_id) MATCH SIMPLE
@@ -244,7 +244,7 @@ const create_app_constants_table_query = `CREATE TABLE IF NOT EXISTS public.tbl_
     CONSTRAINT unique_app_constants_title UNIQUE (pm_app_constant_title)
 );`;
 
-const super_admin_policy_query = `
+const create_policy_query = `
       INSERT INTO tbl_pm_policy_objects(title, description, is_disabled, policy)
       VALUES($1, $2, $3, $4)
       RETURNING pm_policy_object_id;
@@ -307,6 +307,7 @@ async function setup_database() {
 
     // calculate the super_admin policy
     const super_admin_policy = create_super_admin_policy();
+    const read_only_policy = create_read_admin_policy();
 
     // create super admin policy in database
     Logger.log("info", {
@@ -315,7 +316,7 @@ async function setup_database() {
 
     await client.query("BEGIN");
     const { rows: super_admin_policy_db_entry } = await client.query(
-      super_admin_policy_query,
+      create_policy_query,
       [
         "super_admin",
         "This policy grants super admin privileges.",
@@ -323,6 +324,12 @@ async function setup_database() {
         super_admin_policy,
       ]
     );
+    await client.query(create_policy_query, [
+      "read_only",
+      "This policy grants read privileges.",
+      false,
+      read_only_policy,
+    ]);
     await client.query("COMMIT");
     Logger.log("success", {
       message: "setup_database:super admin policy creation completed!",
@@ -354,12 +361,12 @@ async function setup_database() {
       message: "setup_database:app constants creation started...",
     });
     await client.query("BEGIN");
-    await client.query(create_app_constants_table_query, [
+    await client.query(custom_int_mapping_query, [
       "CUSTOM_INT_VIEW_MAPPING",
       {},
       true,
     ]);
-    await client.query(create_app_constants_table_query, [
+    await client.query(custom_int_mapping_query, [
       "CUSTOM_INT_EDIT_MAPPING",
       {},
       true,

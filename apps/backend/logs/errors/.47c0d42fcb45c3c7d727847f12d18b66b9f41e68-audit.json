@@ -24,6 +24,76 @@
             "date": 1722057429023,
             "name": "logs\\errors\\dev_node_1-2024-07-27.log",
             "hash": "6bd9eadec0fe9e5553142a7b2e524142ca83f4cd288083f654a77c4df7b16605"
+        },
+        {
+            "date": 1722085574306,
+            "name": "logs\\errors\\dev_node_1-2024-07-27.log.1",
+            "hash": "27a5a9d02070e5d6acc987cb33c3219c101ccb47928b288be095e65e06934658"
+        },
+        {
+            "date": 1722085586622,
+            "name": "logs\\errors\\dev_node_1-2024-07-27.log.2",
+            "hash": "141bfeb54d0577604317ff096f2c02897e9432afc855ffa6b2422adbbfdb2e61"
+        },
+        {
+            "date": 1722085598866,
+            "name": "logs\\errors\\dev_node_1-2024-07-27.log.3",
+            "hash": "be3a9380c80669020936a2abf82db3e5ff678a6f0d79919fba8b97e3c22ed75b"
+        },
+        {
+            "date": 1722085611705,
+            "name": "logs\\errors\\dev_node_1-2024-07-27.log.4",
+            "hash": "174ac973906752d147e9987e511f455257b15f9a5eb26e6ffbc66d05b4b65340"
+        },
+        {
+            "date": 1722085623582,
+            "name": "logs\\errors\\dev_node_1-2024-07-27.log.5",
+            "hash": "5eaf48ac5160bbec12bfee5d392645d78fe59ffa899a9d0b618c6ff5ac319bf1"
+        },
+        {
+            "date": 1722085635346,
+            "name": "logs\\errors\\dev_node_1-2024-07-27.log.6",
+            "hash": "258f942363adfc76a1db21885a31e972038363b84c04792e049705eea77a557b"
+        },
+        {
+            "date": 1722085646691,
+            "name": "logs\\errors\\dev_node_1-2024-07-27.log.7",
+            "hash": "5e248034af1337edcb8e8eac49a2b3dc0eae7917a30014da3309f725ec39cff7"
+        },
+        {
+            "date": 1722085658240,
+            "name": "logs\\errors\\dev_node_1-2024-07-27.log.8",
+            "hash": "700260942fb11e50402122828c9da48caaa9ffcfdbd39596d4f6e051a7ed78e8"
+        },
+        {
+            "date": 1722085671521,
+            "name": "logs\\errors\\dev_node_1-2024-07-27.log.9",
+            "hash": "7d66bc68f52276747a1c754d870b713dcd9252c090ba84e0197a714ac288be42"
+        },
+        {
+            "date": 1722085683170,
+            "name": "logs\\errors\\dev_node_1-2024-07-27.log.10",
+            "hash": "81a7666fa71be98f428021dcc55f51ba5d96ee17061e630abee3c52ba31d23fa"
+        },
+        {
+            "date": 1722085693875,
+            "name": "logs\\errors\\dev_node_1-2024-07-27.log.11",
+            "hash": "75e242485b242c8bbe84ae0be574c928d3385221668c88335e85fb2f4e28c86a"
+        },
+        {
+            "date": 1722085704453,
+            "name": "logs\\errors\\dev_node_1-2024-07-27.log.12",
+            "hash": "057ce32bdb5c6696405dd23f9fa14eaad8120120d5b6ddaa0b2b9b132c2b452d"
+        },
+        {
+            "date": 1722085715673,
+            "name": "logs\\errors\\dev_node_1-2024-07-27.log.13",
+            "hash": "bbe5a945b97f0f4c9da21ae6b073f03d4b34915e94e2f506a655738a402c0dc4"
+        },
+        {
+            "date": 1722085727307,
+            "name": "logs\\errors\\dev_node_1-2024-07-27.log.14",
+            "hash": "d5ae52e242eb97b656d888e6750c4d1b12a06a8e2d059d7eba595680f042b1bf"
         }
     ],
     "hashType": "sha256"

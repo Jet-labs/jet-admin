@@ -1,1 +1,36 @@
-{"super_admin_policy":{"actions":{},"tables":{"tbl_pm_policy_objects":true,"tbl_pm_users":true,"actor":true,"address":true,"category":true,"city":true,"country":true,"customer":true,"film":true,"film_actor":true,"film_category":true,"inventory":true,"language":true,"payment":true,"rental":true,"staff":true,"store":true,"tbl_pm_graphs":true,"tbl_pm_dashboards":true,"tbl_pm_data_sources":true,"tbl_pm_queries":true},"graphs":{"add":true,"edit":true,"read":true,"delete":true},"queries":{"add":true,"edit":true,"read":true,"delete":true},"dashboards":{"add":true,"edit":true,"read":true,"delete":true}}}
+{
+  "super_admin_policy": {
+    "actions": {},
+    "tables": {
+      "tbl_pm_policy_objects": true,
+      "tbl_pm_users": true,
+      "actor": true,
+      "address": true,
+      "category": true,
+      "city": true,
+      "country": true,
+      "customer": true,
+      "film": true,
+      "film_actor": true,
+      "film_category": true,
+      "inventory": true,
+      "language": true,
+      "payment": true,
+      "rental": true,
+      "staff": true,
+      "store": true,
+      "tbl_pm_graphs": true,
+      "tbl_pm_dashboards": true,
+      "tbl_pm_data_sources": true,
+      "tbl_pm_queries": true,
+      "tbl_pm_jobs": true,
+      "tbl_pm_job_history": true,
+      "tbl_pm_app_constants": true
+    },
+    "graphs": { "add": true, "edit": true, "read": true, "delete": true },
+    "queries": { "add": true, "edit": true, "read": true, "delete": true },
+    "dashboards": { "add": true, "edit": true, "read": true, "delete": true },
+    "jobs": { "add": true, "edit": true, "read": true, "delete": true },
+    "app_constants": { "add": true, "edit": true, "read": true, "delete": true }
+  }
+}
