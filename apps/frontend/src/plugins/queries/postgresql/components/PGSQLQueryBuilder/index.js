@@ -14,6 +14,11 @@ import { PGSQLQueryResponseJSONTab } from "../PGSQLQueryResponseJSONTab";
 import { PGSQLQueryResponseRAWTab } from "../PGSQLQueryResponseRAWTab";
 import { PGSQLQueryResponseSchemaTab } from "../PGSQLQueryResponseSchemaTab";
 import { PGSQLQueryResponseTableTab } from "../PGSQLQueryResponseTableTab";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "../../../../../components/Resizables";
 
 export const PGSQLQueryBuilder = ({ pmQueryID, value, handleChange }) => {
   const theme = useTheme();
@@ -54,51 +59,63 @@ export const PGSQLQueryBuilder = ({ pmQueryID, value, handleChange }) => {
   };
 
   return (
-    <div className="!flex flex-col justify-start items-stretch w-100 px-3">
-      <div className="w-100 ">
-        <PGSQLQueryEditor value={value} handleChange={handleChange} />
-        <div className="!flex flex-row justify-between items-center w-100 mt-3">
-          {pgQueryData && Array.isArray(pgQueryData) ? (
-            <span>{`Result : ${pgQueryData.length}`}</span>
-          ) : (
-            <span></span>
-          )}
-          <div className="!flex flex-row justify-start items-center">
-            <Button
-              variant="outlined"
-              className="!ml-3"
-              onClick={_runQuery}
-            >{`Test query`}</Button>
+    <ResizablePanelGroup
+      direction="vertical"
+      autoSaveId="pg-query-builder-form-panel-sizes"
+      className="!flex flex-col justify-start items-stretch w-100 "
+    >
+      <ResizablePanel defaultSize={40} className="px-3">
+        <div className="w-100 ">
+          <PGSQLQueryEditor value={value} handleChange={handleChange} />
+          <div className="!flex flex-row justify-between items-center w-100 mt-3">
+            {pgQueryData && Array.isArray(pgQueryData) ? (
+              <span>{`Result : ${pgQueryData.length}`}</span>
+            ) : (
+              <span></span>
+            )}
+            <div className="!flex flex-row justify-start items-center">
+              <Button
+                variant="outlined"
+                className="!ml-3"
+                onClick={_runQuery}
+              >{`Test query`}</Button>
+            </div>
           </div>
         </div>
-      </div>
-
-      <Tabs
-        value={tab}
-        onChange={_handleTabChange}
-        style={{
-          background: theme.palette.background.paper,
-          marginTop: 20,
-        }}
+      </ResizablePanel>
+      <ResizableHandle withHandle={true} />
+      <ResizablePanel
+        defaultSize={60}
+        style={{ borderTopWidth: 1, borderColor: theme.palette.divider }}
+        className="px-3"
       >
-        <Tab label="Table" />
-        <Tab label="JSON" />
-        <Tab label="Raw" />
-        <Tab label="Data Schema" />
-      </Tabs>
-      <Divider style={{ width: "100%" }} />
-      <div className="py-3 w-100 flex-grow h-full">
-        {tab === 0 && (
-          <PGSQLQueryResponseTableTab data={pgQueryData ? pgQueryData : ""} />
-        )}
-        {tab === 1 && (
-          <PGSQLQueryResponseJSONTab data={pgQueryData ? pgQueryData : ""} />
-        )}
-        {tab === 2 && (
-          <PGSQLQueryResponseRAWTab data={pgQueryData ? pgQueryData : ""} />
-        )}
-        {tab === 3 && <PGSQLQueryResponseSchemaTab data={pgQueryData} />}
-      </div>
-    </div>
+        <Tabs
+          value={tab}
+          onChange={_handleTabChange}
+          style={{
+            background: theme.palette.background.paper,
+            marginTop: 20,
+          }}
+        >
+          <Tab label="Table" />
+          <Tab label="JSON" />
+          <Tab label="Raw" />
+          <Tab label="Data Schema" />
+        </Tabs>
+        <Divider style={{ width: "100%" }} />
+        <div className="py-3 w-100 flex-grow h-full">
+          {tab === 0 && (
+            <PGSQLQueryResponseTableTab data={pgQueryData ? pgQueryData : ""} />
+          )}
+          {tab === 1 && (
+            <PGSQLQueryResponseJSONTab data={pgQueryData ? pgQueryData : ""} />
+          )}
+          {tab === 2 && (
+            <PGSQLQueryResponseRAWTab data={pgQueryData ? pgQueryData : ""} />
+          )}
+          {tab === 3 && <PGSQLQueryResponseSchemaTab data={pgQueryData} />}
+        </div>
+      </ResizablePanel>
+    </ResizablePanelGroup>
   );
 };

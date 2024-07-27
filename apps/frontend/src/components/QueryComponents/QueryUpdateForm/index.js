@@ -21,6 +21,11 @@ import { QueryDeletionForm } from "../QueryDeletionForm";
 import { QueryDuplicateForm } from "../QueryDuplicateForm";
 import { Tip } from "../../Tip";
 import { query_variable_usage_tip } from "../../../assets/tips";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "../../Resizables";
 
 export const QueryUpdateForm = ({ id }) => {
   const theme = useTheme();
@@ -119,8 +124,16 @@ export const QueryUpdateForm = ({ id }) => {
         <span className="text-xs font-medium text-start mt-1">{`Query id : ${id}`}</span>
       </div>
 
-      <Grid container className="!h-full">
-        <Grid item sx={4} md={4} lg={4} className="w-full">
+      <ResizablePanelGroup
+        direction="horizontal"
+        autoSaveId="query-update-form-panel-sizes"
+        className="!h-full"
+      >
+        <ResizablePanel
+          defaultSize={40}
+          className="w-full"
+          style={{ borderRightWidth: 1, borderColor: theme.palette.divider }}
+        >
           <FormControl fullWidth size="small" className="!mt-2 !px-3">
             <span className="text-xs font-light  !capitalize mb-1">{`Title`}</span>
 
@@ -166,21 +179,16 @@ export const QueryUpdateForm = ({ id }) => {
           <div className="!mt-10 px-3">
             <Tip tip={query_variable_usage_tip}></Tip>
           </div>
-        </Grid>
-        <Grid
-          item
-          sx={8}
-          md={8}
-          lg={8}
-          className="w-full !h-full !border-l !border-white !border-opacity-10"
-        >
+        </ResizablePanel>
+        <ResizableHandle withHandle={true} />
+        <ResizablePanel defaultSize={40} className="w-full !h-full">
           {QUERY_PLUGINS_MAP[queryBuilderForm.values.pm_query_type].component({
             pmQueryID: id,
             value: queryBuilderForm.values.pm_query,
             handleChange: _handleOnQueryChange,
           })}
-        </Grid>
-      </Grid>
+        </ResizablePanel>
+      </ResizablePanelGroup>
     </div>
   );
 };

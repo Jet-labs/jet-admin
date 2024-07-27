@@ -15,7 +15,10 @@ const UpdateAppConstant = lazy(() =>
 
 const AppConstantLayout = () => {
   return (
-    <ResizablePanelGroup direction="horizontal" autoSaveId="job-panel-sizes">
+    <ResizablePanelGroup
+      direction="horizontal"
+      autoSaveId="app=constants-panel-sizes"
+    >
       <ResizablePanel defaultSize={20}>
         <AppConstantsList />
       </ResizablePanel>

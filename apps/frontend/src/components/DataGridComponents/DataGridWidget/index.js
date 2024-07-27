@@ -128,7 +128,7 @@ export const DataGridWidget = ({
 
   return (
     <div
-      className={`w-full h-full ${containerClass}   !overflow-y-auto !overflow-x-auto !border rounded !border-white !border-opacity-10`}
+      className={`w-full h-full ${containerClass}   !overflow-y-auto !overflow-x-auto`}
     >
       <div
         xs={12}

@@ -12,6 +12,11 @@ import { FiPlus } from "react-icons/fi";
 import { DashboardDropZoneComponent } from "../DashboardDropZoneComponent";
 import { GraphsDnDList } from "../GraphsDnDList";
 import { addDashboardAPI } from "../../../api/dashboards";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "../../Resizables";
 
 export const DashboardAdditionForm = () => {
   const theme = useTheme();
@@ -56,13 +61,13 @@ export const DashboardAdditionForm = () => {
   });
   return (
     <div className="w-full h-full">
-      <Grid container className="!h-full">
-        <Grid
-          item
-          lg={9}
-          md={9}
-          sm={8}
-          className="w-full !h-[calc(100vh-48px)]"
+      <ResizablePanelGroup
+        className={"!h-full"}
+        direction="horizontal"
+        autoSaveId="dashboard-widget-panel-sizes"
+      >
+        <ResizablePanel
+          defaultSize={70}
           style={{ background: theme.palette.divider }}
         >
           <DashboardDropZoneComponent
@@ -71,12 +76,10 @@ export const DashboardAdditionForm = () => {
               dashboardForm.setFieldValue("graph_ids", value)
             }
           />
-        </Grid>
-        <Grid
-          item
-          lg={3}
-          md={3}
-          sm={4}
+        </ResizablePanel>
+        <ResizableHandle withHandle={true} />
+        <ResizablePanel
+          defaultSize={30}
           className="w-full !h-[calc(100vh-48px)] !overflow-y-auto"
           style={{
             background: theme.palette.background.default,
@@ -122,8 +125,8 @@ export const DashboardAdditionForm = () => {
           <Grid sm={12}>
             <GraphsDnDList />
           </Grid>
-        </Grid>
-      </Grid>
+        </ResizablePanel>
+      </ResizablePanelGroup>
     </div>
   );
 };
