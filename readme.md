@@ -1,16 +1,18 @@
-# Jet Admin
+# <img src="https://github.com/user-attachments/assets/e23c1d53-93ad-401f-9a19-6b4c2f8c16e5" width="100" /> 
+# **Jet Admin** 
 
+----------
 Welcome to Jet Admin, a web-based PostgreSQL tables manager and admin dashboard for your operations! Edit data, build graphs, and create dashboards using queries.
 
-## Overview
-
+## **Overview**
+-----------
 This project aims to provide users with a user-friendly interface to manage their PostgreSQL databases and create dashboards. The project consists of a frontend and a backend component for managing PostgreSQL databases through a web interface.
 
-![Jet Admin](https://github.com/user-attachments/assets/7b387e54-6cf8-4257-9ce9-4c85bd8a3868)
+https://github.com/user-attachments/assets/7b387e54-6cf8-4257-9ce9-4c85bd8a3868
 
-## Features
-
-### Database Management
+## **Features**
+----------
+#### Database Management
 - **Data Manipulation Language**
   - [x] Insert
   - [x] Update
@@ -20,7 +22,7 @@ This project aims to provide users with a user-friendly interface to manage thei
 - **Data Definition Language (DDL)**
   - [ ] Create, Alter, Drop, Truncate
 
-### Queries
+#### Queries
 - **PostgreSQL Queries**
   - [x] Create query
   - [x] Edit query
@@ -30,7 +32,7 @@ This project aims to provide users with a user-friendly interface to manage thei
 - **Javascript-based Query**
 - **Rest API-based Query**
 
-### Graphs
+#### Graphs
 - [x] Line graph
 - [x] Bar graph
 - [x] Pie graph
@@ -38,86 +40,101 @@ This project aims to provide users with a user-friendly interface to manage thei
 - [x] Doughnut graph
 - [x] Polar graph
 
-### Authentication
+#### Authentication
 - [x] JWT-based local user authentication
 
-### Authorization
+#### Authorization
 - [x] JSON-based policy editor
 - [x] GUI-based policy editor
 - [x] Fine-grained RBAC
 - [x] Prisma-based RBAC for tables
 - [x] Record-based RBAC for queries, graphs, and dashboards
 
-## Topics
-
+## **Topics**
+---------
 - **Setup:** To get started with the project, follow the instructions in the [Frontend Setup](#frontend-setup) and [Backend Setup](#backend-setup) sections to set up the frontend and backend components respectively.
-- **Tables**
-- **Queries:** Postgres queries can be saved as variables which when used will be executed in run-time. Output can be checked by testing the query. [Using query variables](#using-query-variables)!
-- **Graphs**
-- **Jobs**
-- **App Constants**
-- **Policies**
-- **Accounts**
+- [**Tables**](#tables)
+- [**Queries:**](#queries)
+- [**Graphs**](#graphs)
+- [**Scheduled Jobs**](#scheduled-jobs)
+- [**App Constants**](#app_constants)
+- [**Policies**](#policies)
+- [**Accounts**](#accounts)
 
-### Using Query Variables
 
-- **Inside Another Query:** Query values can be used in run-time inside another query by utilizing the syntax below:
-  ```sql
-  select * from city where city_id={{[pm_query_id:21][0].city_id]};
-  ```
-    - `{{}}` is used to utilize the variable
-    - `[]` is used to define the `pm_query_id` of desired query
-      
-- [ ] Inside app constants : Currently this functionality is not available
-
-### Backend setup
-
+## **Backend setup**
+-----------------
 This is the backend component of the project. It includes various scripts and dependencies for building and running the backend server.
 
-Installation
-------------
+1. **Install Dependencies:**
+   * Navigate to your project's root directory in your terminal.
+   * Run the following command to install required packages:
+     ```bash
+     npm install
+     ```
 
-To install the backend dependencies, run the following command in the terminal:
+2. **Environment Setup:**
+   * Create or edit `.env` files:
+     * Create `development.env` and `production.env` files in your project's root directory.
+     * Add the following environment variables to both files, replacing placeholder values with your actual credentials:
+       ```
+       DATABASE_URL="postgresql://your_database_url"
+       JWT_ACCESS_TOKEN_SECRET="your_secret_key"
+       JWT_REFRESH_TOKEN_SECRET="your_secret_key"
+       ```
+   * Add the `DATABASE_URL` value to the `package.json` file under the `env` object.
 
-`npm install`
-This will install all the required dependencies listed in the `package.json` file.
+3. **Pull Database Schema:**
+   * Run the appropriate command based on your operating system:
+     * **Windows:**
+       ```bash
+       npm run prisma-pull-db-dev-w
+       ```
+     * **Linux:**
+       ```bash
+       npm run prisma-pull-db-dev
+       ```
+   * A `schema` folder will be created if the database connection is successful.
 
-Add value of below variables in `development.env` & `production.env` file.
+4. **Initial Database Setup:**
+   * Create necessary tables and records:
+     * **Windows:**
+       ```bash
+       npm run db-setup-w
+       ```
+     * **Linux:**
+       ```bash
+       npm run db-setup
+       ```
 
-`DATABASE_URL="postgresql://_____________"`
-`JWT_ACCESS_TOKEN_SECRET =""`
-`JWT_REFRESH_TOKEN_SECRET =""`
+5. **Generate Prisma Client:**
+   * Generate TypeScript types for your database models:
+     ```bash
+     npx prisma generate
+     ```
 
-Add the same `DATABASE_URL` variable in `package.json` file of backend project
+6. **Start Prisma Studio (Optional):**
+   * View and manage your database visually:
+     * **Windows:**
+       ```bash
+       npm run prisma-studio-dev-w
+       ```
+     * **Linux:**
+       ```bash
+       npm run prisma-studio-dev
+       ```
 
-Now run below command to pull database schema from your existing database entered above.
+**Note:** Replace the placeholder values in the `.env` files with your actual database URL and secret keys.
+ 
+**Additional Considerations:**
+* Consider using a `.gitignore` file to prevent sensitive information like secret keys from being committed to version control.
+* For production environments, use environment variables or a secrets manager to securely store sensitive information.
 
-For windows : `npm run prisma-pull-db-dev-w`
-For linux : `npm run prisma-pull-db-dev`
-
-If a schema file is made in `/schema` folder then it means that database is connected.
-
-Now lets run an initial script to setup some more tables in your database.
-
-For windows : `npm run db-setup-w`
-For linux : `npm run db-setup`
-
-This will create required tables and records in your connected databse starting with `tbl_pm` prefix
-
-The project uses Prisma ORM as a database connection layer for which we need to generate types of our imported table schema.
-
-For windows : `npx prisma generate`
-For linux : `npx prisma generate`
-
-You can view the database records in prisma studio with below command
-
-For windows : `npm run prisma-studio-dev-w`
-For linux : `npm run prisma-studio-dev`
+By following these steps, you should have a working backend environment ready for development.
 
 
+##### **Scripts**
 
-Scripts
--------
 
 The following npm scripts are available for managing the backend:
 
@@ -136,12 +153,11 @@ The following npm scripts are available for managing the backend:
 -   prisma-migrate-dev: Applies database migrations in development environment using Prisma.
 
 
-### Frontend setup
-
+## **Frontend setup**
+-----------------
 This is the frontend component of the project build in React JS. It includes various dependencies and scripts for building and running the frontend application for Jet Admin.
 
-Installation
-------------
+##### **Installation**
 
 To install the frontend dependencies, run the following command in the terminal:
 
@@ -149,8 +165,7 @@ To install the frontend dependencies, run the following command in the terminal:
 
 This will install all the required dependencies listed in the `package.json` file.
 
-Scripts
--------
+##### **Scripts**
 
 The following npm scripts are available for managing the frontend:
 
@@ -159,9 +174,7 @@ The following npm scripts are available for managing the frontend:
 -   deploy: Alias for `build`. Used for deploying the application.
 -   test: Runs the test suite using `react-scripts`.
 
-Folder structure
-----------------
-### Folder Structure
+##### **Folder Structure**
 
 ```
 |-- src
@@ -177,17 +190,81 @@ Folder structure
     |-- utils
 ```
 
-Dependencies
+## **Queries**
+-------------------------
+Postgres queries can be saved as variables which when used will be executed in run-time. Output can be checked by testing the query
+
+![query](https://github.com/user-attachments/assets/6f1b4bd8-2fce-4ded-90d2-4ae0f68cf2d2)
+
+#### **Using queries variables**
+
+- **Inside Another Query:** Query values can be used in run-time inside another query by utilizing the syntax below:
+  ```sql
+  select * from city where city_id={{[pm_query_id:21][0].city_id]};
+  ```
+    - `{{}}` is used to utilize the variable
+    - `[]` is used to define the `pm_query_id` of desired query
+      
+- [ ] Inside app constants : Currently this functionality is not available
+
+## **Graphs**
+-------------
+Saved queries are be used as data source for support graphs by defining label, values, x-axis, y-axis etc. 
+
+![graphs](https://github.com/user-attachments/assets/9d5101ff-8004-47ca-8eb7-9b637662b16a)
+
+Below are the supported graph types
+- [x] Line graph
+- [x] Bar graph
+- [x] Pie graph
+- [x] Radial graph
+- [x] Doughnut graph
+- [x] Polar graph
+
+
+## **Scheduled Jobs**
+-------------------------
+These are background jobs scheduled with cron expressions to execute predefined Query objects.
+
+![jobs](https://github.com/user-attachments/assets/3ee35a22-6e09-4ebd-be72-171c1d309756)
+
+##### **Cron Syntax Quick Reference**
+
+| Schedule | Cron Expression | Description |
+|---|---|---|
+| Daily at Midnight | `0 0 * * *` | Runs the command every day at midnight (12:00 AM). |
+| Every Hour | `0 * * * *` | Runs the command at the beginning of every hour. |
+| Monday at 3 PM | `0 15 * * 1` | Runs the command every Monday at 3:00 PM. |
+| Every 15 Minutes | `*/15 * * * *` | Runs the command every 15 minutes.  |
+| First Day of Every Month at 5 AM | `0 5 1 * *` | Runs the command on the 1st of every month at 5:00 AM. |
+| Every Weekday at 9 AM | `0 9 * * 1-5` | Runs the command every weekday (Monday to Friday) at 9:00 AM. |
+| Every 5 Minutes from 9 AM to 5 PM | `*/5 9-17 * * *` | Runs the command every 5 minutes between 9:00 AM and 5:00 PM. |
+| On the 15th of Each Month at Noon | `0 12 15 * *` | Runs the command on the 15th of every month at noon (12:00 PM). |
+
+##### **Fields**
+- **Minute**: `0-59`
+- **Hour**: `0-23`
+- **Day**: `1-31`
+- **Month**: `1-12`
+- **Day of Week**: `0-7` (0 & 7 are Sunday)
+
+##### **Special Characters**
+- **`*`**: Every
+- **`,`**: Multiple
+- **`-`**: Range
+- **`/`**: Increment
+
+## **Dependencies**
 ------------
 
 For a complete list of dependencies and their versions, refer to the `package.json` file of different apps.
 
-Contributing
+## **Contributing**
 ------------
 
 Contributions are welcome! If you have ideas for new features, improvements, or bug fixes, feel free to open an issue or submit a pull request.
 
-License
+## **License**
 -------
 
 This project is licensed under the MIT License.
