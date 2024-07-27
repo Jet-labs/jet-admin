@@ -19,6 +19,8 @@ import { QUERY_PLUGINS_MAP } from "../../../plugins/queries";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { QueryDeletionForm } from "../QueryDeletionForm";
 import { QueryDuplicateForm } from "../QueryDuplicateForm";
+import { Tip } from "../../Tip";
+import { query_variable_usage_tip } from "../../../assets/tips";
 
 export const QueryUpdateForm = ({ id }) => {
   const theme = useTheme();
@@ -160,6 +162,9 @@ export const QueryUpdateForm = ({ id }) => {
             >{`Save query`}</Button>
             <QueryDeletionForm pmQueryID={id} />
             <QueryDuplicateForm pmQueryID={id} />
+          </div>
+          <div className="!mt-10 px-3">
+            <Tip tip={query_variable_usage_tip}></Tip>
           </div>
         </Grid>
         <Grid

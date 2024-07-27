@@ -9,7 +9,7 @@ module.exports = {
       },
     },
   },
-  plugins: [],
+  plugins: [require("@tailwindcss/typography")],
   theme: {
     fontFamily: {
       sans: ["Karla", "sans-serif"],

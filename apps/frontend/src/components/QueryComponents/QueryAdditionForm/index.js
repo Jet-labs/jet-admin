@@ -14,6 +14,8 @@ import "react-data-grid/lib/styles.css";
 import { addQueryAPI } from "../../../api/queries";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { QUERY_PLUGINS_MAP } from "../../../plugins/queries";
+import { Tip } from "../../Tip";
+import { query_variable_usage_tip } from "../../../assets/tips";
 
 export const QueryAdditionForm = () => {
   const theme = useTheme();
@@ -115,12 +117,15 @@ export const QueryAdditionForm = () => {
             {/* {error && <span className="mt-2 text-red-500">{error}</span>} */}
           </FormControl>
 
-          <div className="!flex flex-row justify-end items-center mt-10 w-100 px-3">
+          <div className="!flex flex-row justify-end items-center mt-10 w-full px-3">
             <Button
               variant="contained"
               className="!ml-3"
               onClick={_addQuery}
             >{`Save query`}</Button>
+          </div>
+          <div className="!mt-10 px-3">
+            <Tip tip={query_variable_usage_tip}></Tip>
           </div>
         </Grid>
         <Grid

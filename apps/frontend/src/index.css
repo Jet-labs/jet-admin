@@ -2,7 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-
+.markdown > * {
+  all: revert;
+}
 /* width */
 ::-webkit-scrollbar {
   width: 6px;
