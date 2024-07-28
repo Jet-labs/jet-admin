@@ -1,0 +1,16 @@
+.custom-markdown {
+  table {
+    border-collapse: collapse;
+  }
+
+  th ,
+  td {
+    padding: 6px 13px;
+    text-align: start !important;
+
+  }
+
+  p {
+    line-height: 1.5;
+  }
+}

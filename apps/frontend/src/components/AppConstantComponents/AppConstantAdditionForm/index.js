@@ -15,6 +15,8 @@ import { addAppConstantAPI } from "../../../api/appConstants";
 import { QUERY_PLUGINS_MAP } from "../../../plugins/queries";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { AppConstantEditor } from "../AppConstantEditor";
+import { app_constant_usage_tip } from "../../../assets/tips";
+import { Tip } from "../../Tip";
 
 export const AppConstantAdditionForm = () => {
   const theme = useTheme();
@@ -64,7 +66,7 @@ export const AppConstantAdditionForm = () => {
   };
 
   return (
-    <div className="w-full !h-[calc(100vh-123px)]">
+    <div className="w-full !h-[calc(100vh-50px)] overflow-y-scroll">
       <div
         className="flex flex-col items-start justify-start p-3 px-6 w-full"
         style={{
@@ -91,7 +93,9 @@ export const AppConstantAdditionForm = () => {
             >{`Save app constant`}</Button>
           </div>
         </Grid>
-        <Grid item xl={6} lg={6} md={0} sm={0} xs={0}></Grid>
+        <Grid item xl={6} lg={6} md={0} sm={0} xs={0} className="!p-3">
+          <Tip tip={app_constant_usage_tip}></Tip>
+        </Grid>
       </Grid>
     </div>
   );

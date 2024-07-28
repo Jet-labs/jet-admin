@@ -38,6 +38,7 @@ export const customDarkTheme = {
       light: "#4fc3f7",
       dark: "#0288d1",
       contrastText: "rgba(0, 0, 0, 0.87)",
+      border: "#1E2D44",
     },
     success: {
       main: "#66bb6a",
@@ -74,6 +75,7 @@ export const customDarkTheme = {
       paper: "#333333",
       default: "#1B1B1B",
       secondary: "#131313",
+      info: "#14223852",
     },
     action: {
       active: "#6B6B6B",
@@ -430,6 +432,7 @@ export const customLightTheme = {
       light: "#4fc3f7",
       dark: "#0288d1",
       contrastText: "rgba(0, 0, 0, 0.87)",
+      border: "#C6DAFF",
     },
     success: {
       main: "#66bb6a",
@@ -466,6 +469,7 @@ export const customLightTheme = {
       paper: "#e6e6e6",
       default: "#ffffff",
       secondary: "#EEEEEE",
+      info: "#EDF2FA",
     },
     action: {
       active: "#e6e6e6",

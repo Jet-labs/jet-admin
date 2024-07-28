@@ -371,6 +371,11 @@ async function setup_database() {
       {},
       true,
     ]);
+    await client.query(custom_int_mapping_query, [
+      "APP_NAME",
+      { value: "Jet Admin" },
+      true,
+    ]);
     await client.query("COMMIT");
     Logger.log("success", {
       message: "setup_database:app constants creation completed!",

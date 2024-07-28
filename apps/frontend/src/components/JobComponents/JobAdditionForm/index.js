@@ -16,6 +16,8 @@ import { displayError, displaySuccess } from "../../../utils/notification";
 import { QUERY_PLUGINS_MAP } from "../../../plugins/queries";
 import { addJobAPI } from "../../../api/jobs";
 import { CronJobScheduler } from "../CronJobScheduler";
+import { Tip } from "../../Tip";
+import { cron_job_usage_tip } from "../../../assets/tips";
 
 export const JobAdditionForm = () => {
   const theme = useTheme();
@@ -82,7 +84,7 @@ export const JobAdditionForm = () => {
     [jobBuilderForm]
   );
   return (
-    <div className="w-full !h-[calc(100vh-123px)]">
+    <div className="w-full !h-[calc(100vh-50px)] overflow-y-scroll">
       <div
         className="flex flex-col items-start justify-start p-3 px-6"
         style={{ background: theme.palette.background.paper }}
@@ -91,7 +93,7 @@ export const JobAdditionForm = () => {
       </div>
 
       <Grid container className="!h-full">
-        <Grid item sx={4} md={4} lg={4} className="w-full">
+        <Grid item sx={6} md={6} lg={6} className="w-full">
           <FormControl fullWidth size="small" className="!mt-2 !px-3">
             <span className="text-xs font-light  !capitalize mb-1">{`Title`}</span>
 
@@ -141,8 +143,11 @@ export const JobAdditionForm = () => {
               onClick={_addJob}
             >{`Save job`}</Button>
           </div>
+          <div className="!mt-10 px-3 pb-3">
+            <Tip tip={cron_job_usage_tip}></Tip>
+          </div>
         </Grid>
-        <Grid item sx={8} md={8} lg={8} className="w-full !h-full !p-2">
+        <Grid item sx={6} md={6} lg={6} className="w-full !h-full !p-2">
           <span className="text-xs font-light  !capitalize mb-1">{`Schedule the job`}</span>
           <CronJobScheduler
             value={jobBuilderForm.values.pm_job_schedule}

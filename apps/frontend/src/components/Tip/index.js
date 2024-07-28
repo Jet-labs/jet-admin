@@ -10,18 +10,19 @@ import {
 } from "react-syntax-highlighter/dist/esm/styles/prism";
 import { useThemeValue } from "../../contexts/themeContext";
 import { MdTipsAndUpdates } from "react-icons/md";
+import "./styles.css";
 export const Tip = ({ tip }) => {
   const theme = useTheme();
   const { themeType } = useThemeValue();
   return (
     <div
       style={{
-        borderColor: theme.palette.divider,
-        borderWidth: 0,
+        borderColor: theme.palette.info.border,
+        borderWidth: 1,
         borderRadius: 4,
-        background: theme.palette.info.light + `20`,
+        background: theme.palette.background.info,
       }}
-      className="!p-2"
+      className="!p-4"
     >
       <div className="!flex !flex-row !justify-start !items-center  !mb-2">
         <MdTipsAndUpdates
@@ -39,27 +40,31 @@ export const Tip = ({ tip }) => {
       <Markdown
         remarkPlugins={[remarkGfm]}
         options={{}}
-        class="prose lg:prose-xl !text-sm !text-wrap"
+        className={`!text-sm !text-wrap  ${
+          themeType === "dark"
+            ? `dark:prose prose-pre:!bg-[#1b1b1b] prose-code:!text-[#91aeff] !text-slate-400 prose-strong:!text-slate-200`
+            : `!prose prose-pre:!bg-[#e6e6e6] prose-code:!text-[${theme.palette.primary.main}] prose-code:!text-[#0f2663]`
+        } `}
         children={tip}
-        components={{
-          code(props) {
-            const { children, className, node, ...rest } = props;
-            const match = /language-(\w+)/.exec(className || "");
-            return match ? (
-              <SyntaxHighlighter
-                {...rest}
-                PreTag="div"
-                children={String(children).replace(/\n$/, "")}
-                language={match[1]}
-                style={themeType === "dark" ? materialDark : materialLight}
-              />
-            ) : (
-              <code {...rest} className={className}>
-                {children}
-              </code>
-            );
-          },
-        }}
+        // components={{
+        //   code(props) {
+        //     const { children, className, node, ...rest } = props;
+        //     const match = /language-(\w+)/.exec(className || "");
+        //     return match ? (
+        //       <SyntaxHighlighter
+        //         {...rest}
+        //         PreTag="div"
+        //         children={String(children).replace(/\n$/, "")}
+        //         language={match[1]}
+        //         style={themeType === "dark" ? materialDark : materialLight}
+        //       />
+        //     ) : (
+        //       <code {...rest} className={className}>
+        //         {children}
+        //       </code>
+        //     );
+        //   },
+        // }}
       ></Markdown>
     </div>
   );

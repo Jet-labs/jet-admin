@@ -57,7 +57,7 @@ https://github.com/user-attachments/assets/7b387e54-6cf8-4257-9ce9-4c85bd8a3868
 - [**Queries:**](#queries)
 - [**Graphs**](#graphs)
 - [**Scheduled Jobs**](#scheduled-jobs)
-- [**App Constants**](#app_constants)
+- [**App Constants**](#app-constants)
 - [**Policies**](#policies)
 - [**Accounts**](#accounts)
 
@@ -262,7 +262,8 @@ Internal app constants are used for declaring constants utlized by Jet Admin whi
 
 Below are the some app constants
 - [x] CUSTOM_INT_VIEW_MAPPING : Used to render custom mapping for integer values of table column while viewing. Syntax of `CUSTOM_INT_VIEW_MAPPING` is:
-    ```json
+      
+    ```
     {
         table_name: {
             column_name: {
@@ -275,13 +276,13 @@ Below are the some app constants
     }
     ```
     For example
-    ```json
+    ```
     {
-        restaurant_menu: {
-            item_id: {
-                1:"Tea",
-                23:"Coffee",
-                34:"Hot chocholate",
+        "restaurant_menu": {
+            "item_id": {
+                "1":"Tea",
+                "23":"Coffee",
+                "34":"Hot chocholate",
                 ...
             }
         }
@@ -289,9 +290,9 @@ Below are the some app constants
     ```
 - [x] CUSTOM_INT_EDIT_MAPPING : Used to render custom mapping for integer values of table column while editing a row. Syntax of `CUSTOM_INT_EDIT_MAPPING` is same as `CUSTOM_INT_VIEW_MAPPING`.
 - [x] APP_NAME : Used to declare custom application name:
-    ```json
+    ```
     {
-        value:"Super food store admin"
+        "value":"Super food store admin"
     }
     ```
 

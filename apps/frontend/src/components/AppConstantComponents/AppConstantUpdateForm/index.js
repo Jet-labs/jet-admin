@@ -10,6 +10,8 @@ import {
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { AppConstantEditor } from "../AppConstantEditor";
 import { AppConstantDeletionForm } from "../AppConstantDeletionForm";
+import { Tip } from "../../Tip";
+import { app_constant_usage_tip } from "../../../assets/tips";
 
 export const AppConstantUpdateForm = ({ id }) => {
   const theme = useTheme();
@@ -89,7 +91,7 @@ export const AppConstantUpdateForm = ({ id }) => {
   };
 
   return (
-    <div className="w-full !h-[calc(100vh-123px)]">
+    <div className="w-full !h-[calc(100vh-50px)] overflow-y-scroll">
       <div
         className="flex flex-col items-start justify-start p-3 px-6 w-full"
         style={{
@@ -118,6 +120,9 @@ export const AppConstantUpdateForm = ({ id }) => {
               onClick={_updateAppConstant}
             >{`Save app constant`}</Button>
           </div>
+        </Grid>
+        <Grid item xl={6} lg={6} md={0} sm={0} xs={0} className="!p-3">
+          <Tip tip={app_constant_usage_tip}></Tip>
         </Grid>
       </Grid>
     </div>
