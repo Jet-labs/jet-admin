@@ -198,14 +198,18 @@ Postgres queries can be saved as variables which when used will be executed in r
 
 #### **Using queries variables**
 
-- **Inside Another Query:** Query values can be used in run-time inside another query by utilizing the syntax below:
+- **Referencing queries inside other queries:** Query values can be used in run-time inside another query by utilizing the syntax below:
   ```sql
   select * from city where city_id={{[pm_query_id:21][0].city_id]};
   ```
     - `{{}}` is used to utilize the variable
     - `[]` is used to define the `pm_query_id` of desired query
       
-- [ ] Inside app constants : Currently this functionality is not available
+- **Using app constants inside query** (Beta stage!)
+  ```sql
+  select * from city where city_id={{[pm_query_id:22][[pm_query_id:35][0].city_id].city_id}}
+  or city_id={{[pm_app_constant_id:4].value}};
+  ```
 
 ## **Graphs**
 -------------
