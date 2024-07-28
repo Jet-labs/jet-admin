@@ -210,8 +210,8 @@ export const LOCAL_CONSTANTS = {
         `/admin_api/tables/${tableName}/edit_columns`,
       getAuthorizedColumnsForAdd: ({ tableName }) =>
         `/admin_api/tables/${tableName}/add_columns`,
-      getTableRows: ({ tableName, page, filterQuery, sortModel }) =>
-        `/admin_api/tables/${tableName}/?page=${page}&q=${JSON.stringify(
+      getTableRows: ({ tableName, page, pageSize, filterQuery, sortModel }) =>
+        `/admin_api/tables/${tableName}/?page=${page}&page_size=${pageSize}&q=${JSON.stringify(
           filterQuery
         )}&sort=${JSON.stringify(sortModel)}`,
       getTableStats: ({ tableName, filterQuery }) =>

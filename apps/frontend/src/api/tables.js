@@ -78,6 +78,7 @@ export const getAuthorizedColumnsForAdd = async ({ tableName }) => {
 export const fetchAllRowsAPI = async ({
   tableName,
   page = 1,
+  pageSize = 20,
   filterQuery,
   sortModel,
 }) => {
@@ -86,6 +87,7 @@ export const fetchAllRowsAPI = async ({
       LOCAL_CONSTANTS.APIS.TABLE.getTableRows({
         tableName,
         page,
+        pageSize,
         filterQuery,
         sortModel,
       })

@@ -1,6 +1,15 @@
 import { useNavigate } from "react-router-dom";
 
-import { Button, LinearProgress, Pagination, useTheme } from "@mui/material";
+import {
+  Button,
+  FormControl,
+  InputLabel,
+  LinearProgress,
+  MenuItem,
+  Pagination,
+  Select,
+  useTheme,
+} from "@mui/material";
 import {
   DataGrid,
   GridToolbarContainer,
@@ -39,6 +48,7 @@ export const RawDataGrid = ({
   const [sortModel, setSortModel] = useState(null);
   const theme = useTheme();
   const [multipleSelectedQuery, setMultipleSelectedQuery] = useState(null);
+  const [pageSize, setPageSize] = useState(20);
 
   const {
     isLoading: isLoadingRows,
@@ -52,6 +62,7 @@ export const RawDataGrid = ({
     queryKey: [
       `REACT_QUERY_KEY_TABLES_${String(tableName).toUpperCase()}`,
       page,
+      pageSize,
       filterQuery,
       sortModel,
     ],
@@ -59,6 +70,7 @@ export const RawDataGrid = ({
       fetchAllRowsAPI({
         tableName,
         page,
+        pageSize,
         filterQuery: filterQuery,
         sortModel: sortModel,
       }),
@@ -150,6 +162,9 @@ export const RawDataGrid = ({
     [primaryColumns, setMultipleSelectedQuery]
   );
 
+  const _handleOnPageSizeChange = (e) => {
+    setPageSize(parseInt(e.target.value));
+  };
   const _renderMultipleDeleteButton = useMemo(() => {
     return (
       <MultipleRowsDeletionForm
@@ -230,13 +245,35 @@ export const RawDataGrid = ({
               }
             />
             <div
-              className="flex flex-row w-full justify-end pb-2 !sticky !bottom-0"
+              className="flex flex-row w-full justify-end pb-2 !sticky !bottom-0 items-center pt-2"
               style={{
                 background: theme.palette.background.default,
                 borderTopWidth: 1,
                 borderColor: theme.palette.divider,
               }}
             >
+              <InputLabel id="demo-simple-select-label" className="!mr-2">
+                Page size
+              </InputLabel>
+              <Select
+                size="small"
+                labelId="demo-simple-select-label"
+                value={pageSize}
+                variant="standard"
+                label={"Page size"}
+                onChange={_handleOnPageSizeChange}
+              >
+                {[20, 50, 100].map((size) => (
+                  <MenuItem
+                    value={size}
+                    className="!break-words !whitespace-pre-line"
+                    key={`page_size_${size}`}
+                  >
+                    {`${size}     `}
+                  </MenuItem>
+                ))}
+              </Select>
+
               <Pagination
                 count={Boolean(data?.nextPage) ? page + 1 : page}
                 page={page}
@@ -246,7 +283,6 @@ export const RawDataGrid = ({
                 hideNextButton={!Boolean(data?.nextPage)}
                 variant="text"
                 shape="rounded"
-                className="!mt-2"
                 siblingCount={1}
               />
             </div>

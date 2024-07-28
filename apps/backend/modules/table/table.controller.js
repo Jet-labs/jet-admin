@@ -269,15 +269,14 @@ tableController.getAllRows = async (req, res) => {
     const authorized_include_columns = state?.authorized_include_columns;
     const pm_user_id = parseInt(pmUser.pm_user_id);
     const { table_name } = req.params;
-    const { page, q, sort } = req.query;
+    const { page, page_size, q, sort } = req.query;
     let qJSON = q && q !== "" ? JSON.parse(q) : null;
     let sortJSON = sort && sort !== "" ? JSON.parse(sort) : null;
 
     let skip = 0;
-    let take = constants.ROW_PAGE_SIZE;
+    let take = page_size ? parseInt(page_size) : constants.ROW_PAGE_SIZE;
     if (parseInt(page) >= 0) {
-      skip = (parseInt(page) - 1) * constants.ROW_PAGE_SIZE;
-      take = constants.ROW_PAGE_SIZE;
+      skip = (parseInt(page) - 1) * take;
     } else {
       skip = undefined;
       take = undefined;
@@ -287,6 +286,7 @@ tableController.getAllRows = async (req, res) => {
       params: {
         pm_user_id,
         page,
+        page_size,
         q,
         sort,
         qJSON,
@@ -320,8 +320,7 @@ tableController.getAllRows = async (req, res) => {
     return res.json({
       success: true,
       rows,
-      nextPage:
-        rows?.length < constants.ROW_PAGE_SIZE ? null : parseInt(page) + 1,
+      nextPage: rows?.length < take ? null : parseInt(page) + 1,
     });
   } catch (error) {
     Logger.log("error", {
