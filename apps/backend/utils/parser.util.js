@@ -39,24 +39,55 @@ const extractVariablesFromQuery = (query) => {
  * @returns
  */
 const replaceQueryIDStringWithQueryID = (matchedVariable) => {
-  let pmQueryID = null;
+  let pmQueryIDs = [];
   const queryIDStringWithReplacedQueryID = matchedVariable
     .slice(2, -2)
     .replace(constants.PM_QUERY_DETECTION_REGEX, (pmQueryIDString) => {
       const _pmQueryID = pmQueryIDString.match(
         constants.PM_QUERY_EXTRACTION_REGEX
       )[1];
-      pmQueryID = parseInt(_pmQueryID);
-      return `pmq_${_pmQueryID}`;
+      if (!isNaN(_pmQueryID)) {
+        pmQueryIDs.push(parseInt(_pmQueryID));
+      }
+      return isNaN(_pmQueryID) ? null : `pmq_${_pmQueryID}`;
     });
   Logger.log("warning", {
     message: "replaceQueryIDStringWithQueryID",
     params: { queryIDStringWithReplacedQueryID },
   });
-  return { queryIDStringWithReplacedQueryID, pmQueryID };
+  return { queryIDStringWithReplacedQueryID, pmQueryIDs };
+};
+
+/**
+ *
+ * @param {String} matchedVariable
+ * @returns
+ */
+const replaceAppConstantIDStringWithAppConstantID = (matchedVariable) => {
+  let pmAppConstantIDs = [];
+  const appConstantIDStringWithReplacedAppConstantID = matchedVariable
+    .slice(2, -2)
+    .replace(
+      constants.PM_APP_CONSTANT_DETECTION_REGEX,
+      (pmAppConstantIDString) => {
+        const _pmAppConstantID = pmAppConstantIDString.match(
+          constants.PM_APP_CONSTANT_EXTRACTION_REGEX
+        )[1];
+        if (!isNaN(_pmAppConstantID)) {
+          pmAppConstantIDs.push(parseInt(_pmAppConstantID));
+        }
+        return isNaN(_pmAppConstantID) ? null : `pmac_${_pmAppConstantID}`;
+      }
+    );
+  Logger.log("warning", {
+    message: "replaceAppConstantStringWithAppConstant",
+    params: { appConstantIDStringWithReplacedAppConstantID },
+  });
+  return { appConstantIDStringWithReplacedAppConstantID, pmAppConstantIDs };
 };
 module.exports = {
   evaluateAST,
   extractVariablesFromQuery,
   replaceQueryIDStringWithQueryID,
+  replaceAppConstantIDStringWithAppConstantID,
 };

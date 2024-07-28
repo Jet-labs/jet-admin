@@ -206,7 +206,7 @@ queryController.runQuery = async (req, res) => {
 
     Logger.log("success", {
       message: "queryController:runQuery:success",
-      params: { pm_user_id, data },
+      params: { pm_user_id },
     });
 
     return res.json({

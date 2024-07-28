@@ -71,6 +71,9 @@ const constants = {
   VARIABLE_DETECTION_REGEX: /{{(.*?)}}/g,
   PM_QUERY_DETECTION_REGEX: /\[pm_query_id:\d+\]/g,
   PM_QUERY_EXTRACTION_REGEX: /\[pm_query_id:(\d+)\]/,
+
+  PM_APP_CONSTANT_DETECTION_REGEX: /\[pm_app_constant_id:\d+\]/g,
+  PM_APP_CONSTANT_EXTRACTION_REGEX: /\[pm_app_constant_id:(\d+)\]/,
 };
 
 module.exports = constants;

@@ -6,6 +6,7 @@ const {
   evaluateAST,
   extractVariablesFromQuery,
   replaceQueryIDStringWithQueryID,
+  replaceAppConstantIDStringWithAppConstantID,
 } = require("../../utils/parser.util");
 const { Prisma } = require("@prisma/client");
 
@@ -52,20 +53,61 @@ const getProcessedPostgreSQLQuery = async ({ rawQuery }) => {
       message: "getProcessedPostgreSQLQuery:init",
       params: { rawQuery },
     });
-    const extractedPmQueryIDs = [];
 
+    // variables can be {{[pm_query_id:20].value}} or {{[pm_app_constant_id:20].value}}
     const variableMatches = extractVariablesFromQuery(rawQuery);
 
     const replacements = variableMatches
       ? await Promise.all(
           variableMatches.map(async (match) => {
-            const { queryIDStringWithReplacedQueryID, pmQueryID } =
+            //extract and replace pm_query_id
+            const { queryIDStringWithReplacedQueryID, pmQueryIDs } =
               replaceQueryIDStringWithQueryID(match);
-            extractedPmQueryIDs.push(parseInt(pmQueryID));
-            const extractedPmQuerys = await prisma.tbl_pm_queries.findMany({
-              where: {
-                pm_query_id: { in: extractedPmQueryIDs },
+
+            const {
+              appConstantIDStringWithReplacedAppConstantID:
+                completeReplacedMatch,
+              pmAppConstantIDs,
+            } = replaceAppConstantIDStringWithAppConstantID(
+              `{{${queryIDStringWithReplacedQueryID}}}`
+            );
+
+            Logger.log("info", {
+              message: "getProcessedPostgreSQLQuery:replaced",
+              params: {
+                match,
+                queryIDStringWithReplacedQueryID,
+                appConstantIDStringWithReplacedAppConstantID:
+                  completeReplacedMatch,
+                pmQueryIDs,
+                pmAppConstantIDs,
               },
+            });
+
+            // database values of pm_query_id
+            const extractedPmQuerys =
+              pmQueryIDs && pmQueryIDs.length > 0
+                ? await prisma.tbl_pm_queries.findMany({
+                    where: {
+                      pm_query_id: { in: pmQueryIDs },
+                      is_disabled: false,
+                    },
+                  })
+                : [];
+            // database values of pm_query_id
+            const extractedPmAppConstants =
+              pmAppConstantIDs && pmAppConstantIDs.length > 0
+                ? await prisma.tbl_pm_app_constants.findMany({
+                    where: {
+                      pm_app_constant_id: { in: pmAppConstantIDs },
+                      is_disabled: false,
+                    },
+                  })
+                : [];
+
+            Logger.log("info", {
+              message: "getProcessedPostgreSQLQuery:extractedValues",
+              params: { extractedPmQuerys, extractedPmAppConstants },
             });
             const evaluationContext = {};
             const extractedPmQuerysPromises = extractedPmQuerys.map(
@@ -88,25 +130,30 @@ const getProcessedPostgreSQLQuery = async ({ rawQuery }) => {
 
             Logger.log("info", {
               message: "getProcessedPostgreSQLQuery:resolvedPmQuerys",
-              params: { resolvedPmQuerys },
+              params: { resolvedPmQuerysLength: resolvedPmQuerys.length },
             });
             resolvedPmQuerys.forEach((r) => {
               evaluationContext[`pmq_${r.pmQueryID}`] = r.result;
             });
-
-            Logger.log("info", {
-              message:
-                "getProcessedPostgreSQLQuery:queryIDStringWithReplacedQueryID",
-              params: { queryIDStringWithReplacedQueryID, evaluationContext },
+            extractedPmAppConstants.forEach((r) => {
+              evaluationContext[`pmac_${r.pm_app_constant_id}`] =
+                r.pm_app_constant_value;
             });
 
-            const ast = jsep(queryIDStringWithReplacedQueryID);
+            Logger.log("info", {
+              message: "getProcessedPostgreSQLQuery:completeReplacedMatch",
+              params: {
+                completeReplacedMatch,
+              },
+            });
+
+            const ast = jsep(completeReplacedMatch);
 
             const result = evaluateAST(ast, evaluationContext);
 
             Logger.log("info", {
               message: "getProcessedPostgreSQLQuery:result",
-              params: { result },
+              params: { result, ast },
             });
 
             return { match, result };

@@ -62,6 +62,7 @@ export const QueryUpdateForm = ({ id }) => {
 
   useEffect(() => {
     if (queryBuilderForm && queryData) {
+      queryBuilderForm.setFieldValue("pm_query_id", queryData.pm_query_id);
       queryBuilderForm.setFieldValue(
         "pm_query_title",
         queryData.pm_query_title
