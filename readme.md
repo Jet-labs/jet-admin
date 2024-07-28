@@ -254,6 +254,48 @@ These are background jobs scheduled with cron expressions to execute predefined 
 - **`-`**: Range
 - **`/`**: Increment
 
+## **App constants**
+-------------
+App constants are constants which contain JSON values and can be used for various purposes. There are two type of app constants, Internal and Global.
+
+Internal app constants are used for declaring constants utlized by Jet Admin while Global app constants can be used in Query objects.
+
+Below are the some app constants
+- [x] CUSTOM_INT_VIEW_MAPPING : Used to render custom mapping for integer values of table column while viewing. Syntax of `CUSTOM_INT_VIEW_MAPPING` is:
+    ```json
+    {
+        table_name: {
+            column_name: {
+                int_value1:label1,
+                int_value2:label2,
+                int_value3:label3,
+                ...
+            }
+        }
+    }
+    ```
+    For example
+    ```json
+    {
+        restaurant_menu: {
+            item_id: {
+                1:"Tea",
+                23:"Coffee",
+                34:"Hot chocholate",
+                ...
+            }
+        }
+    }
+    ```
+- [x] CUSTOM_INT_EDIT_MAPPING : Used to render custom mapping for integer values of table column while editing a row. Syntax of `CUSTOM_INT_EDIT_MAPPING` is same as `CUSTOM_INT_VIEW_MAPPING`.
+- [x] APP_NAME : Used to declare custom application name:
+    ```json
+    {
+        value:"Super food store admin"
+    }
+    ```
+
+
 ## **Dependencies**
 ------------
 
