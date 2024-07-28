@@ -1,4 +1,4 @@
-import { Button, Divider, Tab, Tabs, useTheme } from "@mui/material";
+import { Alert, Button, Divider, Tab, Tabs, useTheme } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import React from "react";
 import "react-data-grid/lib/styles.css";
@@ -67,12 +67,27 @@ export const PGSQLQueryBuilder = ({ pmQueryID, value, handleChange }) => {
       <ResizablePanel defaultSize={40} className="px-3">
         <div className="w-100 ">
           <PGSQLQueryEditor value={value} handleChange={handleChange} />
+          <Alert
+            sx={{
+              background: theme.palette.background.info,
+              color: theme.palette.info.main,
+
+              "& .MuiAlert-message": {
+                marginTop: 0.2,
+              },
+            }}
+            severity="info"
+            className="!py-0 !mt-3 !text-xs"
+          >
+            {`Query objects are intended to allow only data manupulation and data fetching queries`}
+          </Alert>
           <div className="!flex flex-row justify-between items-center w-100 mt-3">
             {pgQueryData && Array.isArray(pgQueryData) ? (
               <span>{`Result : ${pgQueryData.length}`}</span>
             ) : (
               <span></span>
             )}
+
             <div className="!flex flex-row justify-start items-center">
               <Button
                 variant="outlined"

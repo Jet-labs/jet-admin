@@ -1,26 +1,18 @@
-import {
-  Button,
-  FormControl,
-  Grid,
-  MenuItem,
-  Select,
-  TextField,
-  useTheme,
-} from "@mui/material";
+import { Button, FormControl, TextField, useTheme } from "@mui/material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import React, { useCallback } from "react";
 import "react-data-grid/lib/styles.css";
 import { addQueryAPI } from "../../../api/queries";
-import { displayError, displaySuccess } from "../../../utils/notification";
-import { QUERY_PLUGINS_MAP } from "../../../plugins/queries";
-import { Tip } from "../../Tip";
 import { query_variable_usage_tip } from "../../../assets/tips";
+import { QUERY_PLUGINS_MAP } from "../../../plugins/queries";
+import { displayError, displaySuccess } from "../../../utils/notification";
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "../../Resizables";
+import { Tip } from "../../Tip";
 
 export const QueryAdditionForm = () => {
   const theme = useTheme();

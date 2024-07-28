@@ -62,6 +62,10 @@ const constants = {
       code: "INVALID_REQUEST",
       message: "Invalid request",
     },
+    NOT_A_DML_DQL_QUERY: {
+      code: "NOT_A_DML_DQL_QUERY",
+      message: "Only data manupulation and data fetching queries are allowed",
+    },
   },
 
   // events

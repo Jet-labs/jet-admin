@@ -9,6 +9,7 @@ const {
   replaceAppConstantIDStringWithAppConstantID,
 } = require("../../utils/parser.util");
 const { Prisma } = require("@prisma/client");
+const { isDMLQuery, isDQLQuery } = require("../../utils/validation.util");
 
 /**
  *
@@ -20,25 +21,33 @@ const { Prisma } = require("@prisma/client");
  */
 const runQuery = async ({ pmQueryID, pmQuery, pmQueryType }) => {
   try {
-    const { processedQuery } = await getProcessedPostgreSQLQuery({
-      rawQuery: pmQuery.raw_query,
-    });
+    if (isDMLQuery(pmQuery.raw_query) || isDQLQuery(pmQuery.raw_query)) {
+      const { processedQuery } = await getProcessedPostgreSQLQuery({
+        rawQuery: pmQuery.raw_query,
+      });
 
-    Logger.log("info", {
-      message: "runQuery:processedQuery",
-      params: {
-        processedQuery,
-      },
-    });
-    return await runPostgreSQLEvaluatedQuery({
-      options: { processedQuery, pmQueryType, pmQueryID },
-    });
+      Logger.log("info", {
+        message: "runQuery:processedQuery",
+        params: {
+          processedQuery,
+        },
+      });
+      return await runPostgreSQLEvaluatedQuery({
+        options: { processedQuery, pmQueryType, pmQueryID },
+      });
+    } else {
+      Logger.log("error", {
+        message: "runQuery:catch-1",
+        params: { error: constants.ERROR_CODES.NOT_A_DML_DQL_QUERY },
+      });
+      throw constants.ERROR_CODES.NOT_A_DML_DQL_QUERY;
+    }
   } catch (error) {
     Logger.log("error", {
       message: "runQuery:catch-1",
       params: { error },
     });
-    return { pmQueryID, result: null };
+    throw error;
   }
 };
 /**
@@ -199,18 +208,29 @@ const runPostgreSQLEvaluatedQuery = async ({ options }) => {
     params: { options },
   });
   try {
-    const result = await prisma.$queryRaw`${Prisma.raw(
-      options.processedQuery
-    )}`;
-    Logger.log("info", {
-      message: "PostgreSQL:runPostgreSQLEvaluatedQuery:query",
-      params: {
-        result: Array.isArray(result)
-          ? { resultLength: result.length }
-          : result,
-      },
-    });
-    return { ...options, result };
+    if (
+      isDMLQuery(options.processedQuery) ||
+      isDQLQuery(options.processedQuery)
+    ) {
+      const result = await prisma.$queryRaw`${Prisma.raw(
+        options.processedQuery
+      )}`;
+      Logger.log("info", {
+        message: "PostgreSQL:runPostgreSQLEvaluatedQuery:query",
+        params: {
+          result: Array.isArray(result)
+            ? { resultLength: result.length }
+            : result,
+        },
+      });
+      return { ...options, result };
+    } else {
+      Logger.log("error", {
+        message: "PostgreSQL:runPostgreSQLEvaluatedQuery:catch-1",
+        params: { error: constants.ERROR_CODES.NOT_A_DML_DQL_QUERY },
+      });
+      throw constants.ERROR_CODES.NOT_A_DML_DQL_QUERY;
+    }
   } catch (error) {
     Logger.log("error", {
       message: "PostgreSQL:runPostgreSQLEvaluatedQuery:catch-1",
