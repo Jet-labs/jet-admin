@@ -392,6 +392,7 @@ const TableSchemaEditorContextProvider = ({ children }) => {
         enums,
         tables,
         relationships,
+        selectedElement,
       }}
     >
       <TableSchemaEditorActionsContext.Provider
@@ -413,6 +414,7 @@ const TableSchemaEditorContextProvider = ({ children }) => {
           setRelationships,
           addRelationship,
           deleteRelationship,
+          setSelectedElement,
         }}
       >
         {children}
