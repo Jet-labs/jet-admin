@@ -1,8 +1,12 @@
-# <img src="https://github.com/user-attachments/assets/e23c1d53-93ad-401f-9a19-6b4c2f8c16e5" width="100" /> 
+<a href="https://www.producthunt.com/posts/jet-admin-3?embed=true&utm_source=badge-featured&utm_medium=badge&utm_souce=badge-jet&#0045;admin&#0045;3" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=474841&theme=light" alt="Jet&#0032;Admin - PostgreSQL&#0032;tables&#0032;manager&#0032;and&#0032;admin&#0032;dashboard | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
+
+![jet-admin](https://github.com/user-attachments/assets/48cb286e-05ee-4d28-a9c5-90c58693eeab)
+
 # **Jet Admin** 
 
 ----------
 Welcome to Jet Admin, a web-based PostgreSQL tables manager and admin dashboard for your operations! Edit data, build graphs, and create dashboards using queries.
+
 
 ## **Overview**
 -----------
@@ -198,18 +202,14 @@ Postgres queries can be saved as variables which when used will be executed in r
 
 #### **Using queries variables**
 
-- **Referencing queries inside other queries:** Query values can be used in run-time inside another query by utilizing the syntax below:
+- **Inside Another Query:** Query values can be used in run-time inside another query by utilizing the syntax below:
   ```sql
   select * from city where city_id={{[pm_query_id:21][0].city_id]};
   ```
     - `{{}}` is used to utilize the variable
     - `[]` is used to define the `pm_query_id` of desired query
       
-- **Using app constants inside query** (Beta stage!)
-  ```sql
-  select * from city where city_id={{[pm_query_id:22][[pm_query_id:35][0].city_id].city_id}}
-  or city_id={{[pm_app_constant_id:4].value}};
-  ```
+- [ ] Inside app constants : Currently this functionality is not available
 
 ## **Graphs**
 -------------

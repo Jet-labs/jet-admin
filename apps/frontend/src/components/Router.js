@@ -26,9 +26,7 @@ const DashboardLayout = lazy(() => import("./Layouts/DashboardLayout"));
 const QueryLayout = lazy(() => import("./Layouts/QueryLayout"));
 const JobLayout = lazy(() => import("./Layouts/JobLayout"));
 const AppConstantLayout = lazy(() => import("./Layouts/AppConstantLayout"));
-const AllAppConstants = lazy(() => import("../pages/AllAppConstants"));
-const UpdateAppConstant = lazy(() => import("../pages/UpdateAppConstant"));
-const AddAppConstant = lazy(() => import("../pages/AddAppConstant"));
+
 /**
  *
  * @param {object} param0

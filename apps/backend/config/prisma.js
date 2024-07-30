@@ -1,4 +1,5 @@
 const { PrismaClient, Prisma } = require("@prisma/client");
+
 // const vehicleSocketController = require("../modules/socket/controllers/machine.socket.controller");
 const Logger = require("../utils/logger");
 const prisma = new PrismaClient();

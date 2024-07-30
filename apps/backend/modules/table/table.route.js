@@ -5,9 +5,24 @@ const {
   tableAuthorizationMiddleware,
 } = require("./table.authorization.middleware");
 const { policyMiddleware } = require("../policies/policy.middleware");
+const { dbModel } = require("../../config/prisma");
+const { formatSchema } = require("@prisma/internals");
+const { jsonToPrismaSchema } = require("../../utils/prisma");
+const {
+  dmmfModelsdeserializer,
+} = require("../../utils/prisma-utils/prisma-dmmf-extended/util/parser");
 const router = express.Router();
 
 // get all data of table
+// router.get("/test", async (req, res) => {
+//   const t = dmmfModelsdeserializer(dbModel);
+//   // console.log({ t });
+//   // const formattedSchema = {
+//   //   schema: formatSchema({ schemas: [t] }),
+//   // };
+//   res.send(t);
+// });
+
 router.get(
   "/",
   authMiddleware.authProvider,
@@ -97,8 +112,6 @@ router.post(
   tableController.addRowByID
 );
 
-
-
 router.delete(
   "/:table_name/:query",
   authMiddleware.authProvider,
@@ -107,5 +120,7 @@ router.delete(
   tableAuthorizationMiddleware.authorizeRowDeletion,
   tableController.deleteRowByID
 );
+
+
 
 module.exports = router;

@@ -13,6 +13,9 @@ import {
 const UpdateRow = lazy(() => import("../../../pages/UpdateRow"));
 const AddRow = lazy(() => import("../../../pages/AddRow"));
 const TableView = lazy(() => import("../../../pages/TableView"));
+const UpdateTableSchema = lazy(() =>
+  import("../../../pages/UpdateTableSchema")
+);
 
 const TableLayout = () => {
   return (
@@ -23,12 +26,10 @@ const TableLayout = () => {
       <ResizableHandle withHandle={true} />
       <ResizablePanel defaultSize={80}>
         <Routes>
-          {/* <Route
-            index
-            element={() => {
-              return <div>hello</div>;
-            }}
-          /> */}
+          <Route
+            path={LOCAL_CONSTANTS.ROUTES.ADD_TABLE.code}
+            element={<UpdateTableSchema />}
+          />
           <Route path={LOCAL_CONSTANTS.ROUTES.TABLE_VIEW.code}>
             <Route index element={<TableView />} />
             <Route

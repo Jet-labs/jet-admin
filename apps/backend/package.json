@@ -25,7 +25,8 @@
   "license": "ISC",
   "dependencies": {
     "@prisma/client": "^5.1.1",
-    "@prisma/internals": "^5.3.1",
+    "@prisma/engine-core": "^4.13.0",
+    "@prisma/internals": "^5.17.0",
     "@slack/web-api": "^6.9.0",
     "axios": "^1.4.0",
     "bcrypt": "^5.1.1",

@@ -1,4 +1,5 @@
 import {
+  Button,
   IconButton,
   List,
   ListItem,
@@ -7,16 +8,22 @@ import {
   ListItemText,
   useTheme,
 } from "@mui/material";
-import { FaDatabase, FaRedo, FaTable } from "react-icons/fa";
-import { Link, useParams } from "react-router-dom";
+import { FaDatabase, FaPlus, FaRedo, FaTable } from "react-icons/fa";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { getAllTables } from "../../../api/tables";
 import { useQuery } from "@tanstack/react-query";
+import { useAuthState } from "../../../contexts/authContext";
+import { useMemo } from "react";
 export const TableDrawerList = () => {
   const theme = useTheme();
+  const { pmUser } = useAuthState();
   const routeParam = useParams();
+  const navigate = useNavigate();
   const currentPage = `table_${routeParam?.["*"]}`;
-
+  const isAuthorizedToAddTable = useMemo(() => {
+    return true;
+  }, [pmUser]);
   const {
     isLoading: isLoadingTables,
     data: tables,
@@ -29,6 +36,10 @@ export const TableDrawerList = () => {
     retry: 1,
     staleTime: Infinity,
   });
+
+  const _navigateToAddMoreTable = () => {
+    navigate(LOCAL_CONSTANTS.ROUTES.ADD_TABLE.path());
+  };
 
   return (
     <List
@@ -55,6 +66,18 @@ export const TableDrawerList = () => {
           />
         </IconButton>
       </div>
+      {isAuthorizedToAddTable && (
+        <div className="!px-3 !py-1.5 !w-full">
+          <Button
+            onClick={_navigateToAddMoreTable}
+            variant="contained"
+            className="!w-full"
+            startIcon={<FaPlus className="!text-sm" />}
+          >
+            Add table
+          </Button>
+        </div>
+      )}
       <div className="!mt-1"></div>
       {tables?.map((table) => {
         const key = `table_${table}`;
