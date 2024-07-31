@@ -60,7 +60,7 @@ export const GraphsDnDList = ({}) => {
               key={`graph_${graph.pm_graph_id}`}
               id={`graph_${graph.pm_graph_id}`}
               disablePadding
-              draggable
+              draggable={true}
               onDragStart={_handleDragStart}
               className="draggable-graph-item"
               sx={{

@@ -44,6 +44,7 @@ export const DashboardAdditionForm = () => {
     initialValues: {
       dashboard_title: "",
       graph_ids: [],
+      layout: [],
     },
     validateOnMount: false,
     validateOnChange: false,
@@ -75,6 +76,10 @@ export const DashboardAdditionForm = () => {
             setGraphIDData={(value) =>
               dashboardForm.setFieldValue("graph_ids", value)
             }
+            layout={dashboardForm.values["layout"]}
+            setLayout={(value) => {
+              dashboardForm.setFieldValue("layout", value);
+            }}
           />
         </ResizablePanel>
         <ResizableHandle withHandle={true} />

@@ -3,9 +3,21 @@ import React, { useState } from "react";
 
 import { FaTimes } from "react-icons/fa";
 import { GraphWidgetComponent } from "../../GraphComponents/GraphWidgetComponent";
+import { Responsive, WidthProvider } from "react-grid-layout";
+import "react-grid-layout/css/styles.css";
+import "react-resizable/css/styles.css";
+const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
-export const DashboardDropZoneComponent = ({ graphIDData, setGraphIDData }) => {
+export const DashboardDropZoneComponent = ({
+  graphIDData,
+  setGraphIDData,
+  layout,
+  setLayout,
+}) => {
   const theme = useTheme();
+  const [layouts, setLayouts] = useState({
+    lg: layout,
+  });
 
   const [isDraggableInDropZone, setIsDraggableInDropZone] = useState(false);
   const _enableDropping = (e) => {
@@ -37,13 +49,103 @@ export const DashboardDropZoneComponent = ({ graphIDData, setGraphIDData }) => {
 
     setGraphIDData(_graphIDData);
   };
-
+  const onLayoutChange = (layout, layouts) => {
+    console.log({ layout, layouts });
+    setLayouts({ ...layouts });
+  };
+  const onDrop = (layout, layoutItem, _ev) => {
+    alert(
+      `Element parameters:\n${JSON.stringify(
+        layoutItem,
+        ["x", "y", "w", "h"],
+        2
+      )}`
+    );
+  };
+  const compactType = "verticle";
   return (
     <div
       className="w-full h-full p-2"
       style={{ background: theme.palette.background.paper }}
     >
-      <Grid
+      <ResponsiveReactGridLayout
+        // {...props}
+        style={{ background: "#f0f0f0" }}
+        layouts={layouts}
+        measureBeforeMount={false}
+        compactType={compactType}
+        preventCollision={!compactType}
+        onLayoutChange={onLayoutChange}
+        // onBreakpointChange={onBreakpointChange}
+        onDrop={onDrop}
+        isDroppable
+      >
+        {graphIDData.map((graph, index) => {
+          return (
+            <div
+              className="!p-1 !h-fit !rounded"
+              key={graph}
+              style={{ background: theme.palette.background.default }}
+            >
+              <div className="!flex-row justify-end !items-center !w-full">
+                <IconButton
+                  aria-label="delete"
+                  size="small"
+                  className="!p-0 !m-0 !pb-1"
+                  onClick={() => {
+                    _handleDelete(index);
+                  }}
+                >
+                  <FaTimes className="!text-sm" />
+                </IconButton>
+              </div>
+              <div className="!flex-row justify-center !items-center !w-full">
+                <GraphWidgetComponent id={graph} />
+              </div>
+            </div>
+          );
+        })}
+      </ResponsiveReactGridLayout>
+      {/* <GridLayout
+        className="layout"
+        layout={layout}
+        cols={12}
+        rowHeight={30}
+        width={1200}
+        onLayoutChange={setLayout}
+        isDroppable={true}
+        onDrop={(layout, layoutItem) => {
+          console.log({ layout, layoutItem });
+        }}
+        preventCollision={true}
+      >
+        {graphIDData.map((graph, index) => {
+          return (
+            <div
+              className="!p-1 !h-fit !rounded"
+              key={graph}
+              style={{ background: theme.palette.background.default }}
+            >
+              <div className="!flex-row justify-end !items-center !w-full">
+                <IconButton
+                  aria-label="delete"
+                  size="small"
+                  className="!p-0 !m-0 !pb-1"
+                  onClick={() => {
+                    _handleDelete(index);
+                  }}
+                >
+                  <FaTimes className="!text-sm" />
+                </IconButton>
+              </div>
+              <div className="!flex-row justify-center !items-center !w-full">
+                <GraphWidgetComponent id={graph} />
+              </div>
+            </div>
+          );
+        })}
+      </GridLayout> */}
+      {/* <Grid
         className="w-full h-full  !overflow-y-auto "
         container
         onDragEnter={_handleDragOverStart}
@@ -80,7 +182,7 @@ export const DashboardDropZoneComponent = ({ graphIDData, setGraphIDData }) => {
             <span>No graphs added to this dashboard</span>
           </div>
         )}
-      </Grid>
+      </Grid> */}
     </div>
   );
 };

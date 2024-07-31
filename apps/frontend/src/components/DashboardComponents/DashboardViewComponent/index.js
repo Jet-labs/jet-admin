@@ -1,31 +1,29 @@
 import { Grid, useTheme } from "@mui/material";
 import React from "react";
 import { GraphWidgetComponent } from "../../GraphComponents/GraphWidgetComponent";
-
-export const DashboardViewComponent = ({ graphIDData }) => {
+import GridLayout from "react-grid-layout";
+export const DashboardViewComponent = ({ graphIDData, layout }) => {
   const theme = useTheme();
   console.log("here", graphIDData);
   return (
     <div className="w-full h-full p-2">
-      <Grid
-        className="w-full h-full"
-        container
-        gridTemplateColumns={"auto auto auto"}
+      <GridLayout
+        className="layout"
+        layout={layout}
+        cols={12}
+        rowHeight={30}
+        width={1200}
       >
-        {graphIDData && graphIDData.length > 0 ? (
-          graphIDData.map((graph, index) => {
-            return (
-              <Grid item xs={6} className="!p-1 !h-fit">
+        {graphIDData.map((graph, index) => {
+          return (
+            <div className="!p-1 !h-fit !bg-black" key={graph}>
+              <div className="!flex-row justify-center !items-center !w-full">
                 <GraphWidgetComponent id={graph.graphID} />
-              </Grid>
-            );
-          })
-        ) : (
-          <div className="!w-full !h-full flex flex-col justify-center items-center">
-            <span>No graphs added to this dashboard</span>
-          </div>
-        )}
-      </Grid>
+              </div>
+            </div>
+          );
+        })}
+      </GridLayout>
     </div>
   );
 };

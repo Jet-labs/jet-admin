@@ -58,6 +58,7 @@ export const DashboardUpdateForm = ({ id }) => {
     initialValues: {
       dashboard_title: "",
       graph_ids: [],
+      layout: [],
     },
     validateOnMount: false,
     validateOnChange: false,
@@ -91,8 +92,11 @@ export const DashboardUpdateForm = ({ id }) => {
         "graph_ids",
         dashboard.dashboard_options.graph_ids
       );
+      dashboardForm.setFieldValue("layout", dashboard.dashboard_options.layout);
     }
   }, [dashboard]);
+
+  console.log({ values: dashboardForm.values });
 
   return (
     <div className="w-full h-full">
@@ -108,9 +112,13 @@ export const DashboardUpdateForm = ({ id }) => {
         >
           <DashboardDropZoneComponent
             graphIDData={dashboardForm.values["graph_ids"]}
+            layout={dashboardForm.values["layout"]}
             setGraphIDData={(value) =>
               dashboardForm.setFieldValue("graph_ids", value)
             }
+            setLayout={(value) => {
+              dashboardForm.setFieldValue("layout", value);
+            }}
           />
         </ResizablePanel>
         <ResizableHandle withHandle={true} />
