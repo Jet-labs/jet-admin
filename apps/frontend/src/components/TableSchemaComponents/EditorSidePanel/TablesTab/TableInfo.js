@@ -8,22 +8,33 @@ import {
   Popover,
 } from "@douyinfe/semi-ui";
 import { IconDeleteStroked } from "@douyinfe/semi-icons";
-import { useDiagram, useUndoRedo } from "../../../hooks";
-import ColorPalette from "../../ColorPicker";
-import TableField from "./TableField";
-import IndexDetails from "./IndexDetails";
+
+import { TableField } from "./TableField";
+import { IndexDetails } from "./IndexDetails";
 import { useTranslation } from "react-i18next";
 import { LOCAL_CONSTANTS } from "../../../../constants";
 import { useTheme } from "@mui/material";
+import {
+  useTableSchemaEditorActions,
+  useTableSchemaEditorState,
+} from "../../../../contexts/tableSchemaEditorContext";
+import { ColorPickerComponent } from "../../../ColorPickerComponent";
 
-export default function TableInfo({ data }) {
+export const TableInfo = ({ data }) => {
   const { t } = useTranslation();
   const theme = useTheme();
 
   const [indexActiveKey, setIndexActiveKey] = useState("");
-  const { deleteTable, updateTable, updateField, setRelationships } =
-    useDiagram();
-  const { setUndoStack, setRedoStack } = useUndoRedo();
+  // const { deleteTable, updateTable, updateField, setRelationships } =
+  //   useTableSchemaEditorState();
+  const {
+    deleteTable,
+    updateTable,
+    updateField,
+    setRelationships,
+    setUndoStack,
+    setRedoStack,
+  } = useTableSchemaEditorActions();
   const [editField, setEditField] = useState({});
   const [drag, setDrag] = useState({
     draggingElementIndex: null,
@@ -218,7 +229,7 @@ export default function TableInfo({ data }) {
           <Popover
             content={
               <div className="popover-theme">
-                <ColorPalette
+                <ColorPickerComponent
                   currentColor={data.color}
                   onClearColor={() => {
                     setUndoStack((prev) => [
@@ -354,4 +365,4 @@ export default function TableInfo({ data }) {
       </div>
     </div>
   );
-}
+};

@@ -1,15 +1,18 @@
 import { Collapse, Button } from "@douyinfe/semi-ui";
 import { IconPlus } from "@douyinfe/semi-icons";
-import { useSelect, useDiagram } from "../../../hooks";
-import { ObjectType } from "../../../data/constants";
-import SearchBar from "./SearchBar";
-import Empty from "../Empty";
-import TableInfo from "./TableInfo";
+import { SearchBar } from "./SearchBar";
+import { Empty } from "../Empty";
+import { TableInfo } from "./TableInfo";
 import { useTranslation } from "react-i18next";
+import {
+  useTableSchemaEditorActions,
+  useTableSchemaEditorState,
+} from "../../../../contexts/tableSchemaEditorContext";
+import { LOCAL_CONSTANTS } from "../../../../constants";
 
-export default function TablesTab() {
-  const { tables, addTable } = useDiagram();
-  const { selectedElement, setSelectedElement } = useSelect();
+export const TablesTab = () => {
+  const { tables, selectedElement } = useTableSchemaEditorState();
+  const { addTable, setSelectedElement } = useTableSchemaEditorActions();
   const { t } = useTranslation();
 
   return (
@@ -27,7 +30,9 @@ export default function TablesTab() {
       ) : (
         <Collapse
           activeKey={
-            selectedElement.open && selectedElement.element === ObjectType.TABLE
+            selectedElement.open &&
+            selectedElement.element ===
+              LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.TABLE
               ? `${selectedElement.id}`
               : ""
           }
@@ -38,7 +43,7 @@ export default function TablesTab() {
               ...prev,
               open: true,
               id: parseInt(k),
-              element: ObjectType.TABLE,
+              element: LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.TABLE,
             }))
           }
           accordion
@@ -68,4 +73,4 @@ export default function TablesTab() {
       )}
     </>
   );
-}
+};

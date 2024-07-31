@@ -1,28 +1,29 @@
 import { useRef } from "react";
-import { Cardinality, ObjectType, Tab } from "../../data/constants";
-import { calcPath } from "../../utils/calcPath";
-import { useDiagram, useSettings, useLayout, useSelect } from "../../hooks";
+import { LOCAL_CONSTANTS } from "../../../constants";
+import { calcPath } from "../utils/calcPath";
+import {
+  useTableSchemaEditorActions,
+  useTableSchemaEditorState,
+} from "../../../contexts/tableSchemaEditorContext";
 
-export default function Relationship({ data }) {
-  const { settings } = useSettings();
-  const { tables } = useDiagram();
-  const { layout } = useLayout();
-  const { selectedElement, setSelectedElement } = useSelect();
+export const Relationship = ({ data }) => {
+  const { selectedElement, tables } = useTableSchemaEditorState();
+  const { setSelectedElement } = useTableSchemaEditorActions();
   const pathRef = useRef();
 
   let cardinalityStart = "1";
   let cardinalityEnd = "1";
 
   switch (data.cardinality) {
-    case Cardinality.MANY_TO_ONE:
+    case LOCAL_CONSTANTS.POSTGRE_SQL_CARDINALITY.MANY_TO_ONE:
       cardinalityStart = "n";
       cardinalityEnd = "1";
       break;
-    case Cardinality.ONE_TO_MANY:
+    case LOCAL_CONSTANTS.POSTGRE_SQL_CARDINALITY.ONE_TO_MANY:
       cardinalityStart = "1";
       cardinalityEnd = "n";
       break;
-    case Cardinality.ONE_TO_ONE:
+    case LOCAL_CONSTANTS.POSTGRE_SQL_CARDINALITY.ONE_TO_ONE:
       cardinalityStart = "1";
       cardinalityEnd = "1";
       break;
@@ -43,33 +44,28 @@ export default function Relationship({ data }) {
     cardinalityStartX = point1.x;
     cardinalityStartY = point1.y;
     const point2 = pathRef.current.getPointAtLength(
-      pathLength - cardinalityOffset,
+      pathLength - cardinalityOffset
     );
     cardinalityEndX = point2.x;
     cardinalityEndY = point2.y;
   }
 
   const edit = () => {
-    if (!layout.sidebar) {
-      setSelectedElement((prev) => ({
-        ...prev,
-        element: ObjectType.RELATIONSHIP,
-        id: data.id,
-        open: true,
-      }));
-    } else {
-      setSelectedElement((prev) => ({
-        ...prev,
-        currentTab: Tab.RELATIONSHIPS,
-        element: ObjectType.RELATIONSHIP,
-        id: data.id,
-        open: true,
-      }));
-      if (selectedElement.currentTab !== Tab.RELATIONSHIPS) return;
-      document
-        .getElementById(`scroll_ref_${data.id}`)
-        .scrollIntoView({ behavior: "smooth" });
-    }
+    setSelectedElement((prev) => ({
+      ...prev,
+      currentTab: LOCAL_CONSTANTS.TABLE_EDITOR_ACTIONS.RELATIONSHIPS,
+      element: LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.RELATIONSHIP,
+      id: data.id,
+      open: true,
+    }));
+    if (
+      selectedElement.currentTab !==
+      LOCAL_CONSTANTS.TABLE_EDITOR_ACTIONS.RELATIONSHIPS
+    )
+      return;
+    document
+      .getElementById(`scroll_ref_${data.id}`)
+      .scrollIntoView({ behavior: "smooth" });
   };
 
   return (
@@ -88,7 +84,7 @@ export default function Relationship({ data }) {
               y: tables[data.endTableId].y,
             },
           },
-          settings.tableWidth,
+          LOCAL_CONSTANTS.TABLE_EDITOR_TABLE_WIDTH
         )}
         stroke="gray"
         className="group-hover:stroke-sky-700"
@@ -96,7 +92,7 @@ export default function Relationship({ data }) {
         strokeWidth={2}
         cursor="pointer"
       />
-      {pathRef.current && settings.showCardinality && (
+      {pathRef.current && true && (
         <>
           <circle
             cx={cardinalityStartX}
@@ -136,4 +132,4 @@ export default function Relationship({ data }) {
       )}
     </g>
   );
-}
+};

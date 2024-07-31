@@ -1,14 +1,18 @@
 import { useState } from "react";
 import { Button, Input, TagInput } from "@douyinfe/semi-ui";
 import { IconDeleteStroked } from "@douyinfe/semi-icons";
-import { useEnums, useUndoRedo } from "../../../hooks";
-import { Action, ObjectType } from "../../../data/constants";
 import { useTranslation } from "react-i18next";
+import {
+  useTableSchemaEditorActions,
+  useTableSchemaEditorState,
+} from "../../../../contexts/tableSchemaEditorContext";
+import { LOCAL_CONSTANTS } from "../../../../constants";
 
-export default function EnumDetails({ data, i }) {
+export const EnumDetails = ({ data, i }) => {
   const { t } = useTranslation();
-  const { deleteEnum, updateEnum } = useEnums();
-  const { setUndoStack, setRedoStack } = useUndoRedo();
+  const { deleteEnum } = useTableSchemaEditorState();
+  const { setUndoStack, setRedoStack, updateEnum } =
+    useTableSchemaEditorActions();
   const [editField, setEditField] = useState({});
 
   return (
@@ -26,8 +30,8 @@ export default function EnumDetails({ data, i }) {
             setUndoStack((prev) => [
               ...prev,
               {
-                action: Action.EDIT,
-                element: ObjectType.ENUM,
+                action: LOCAL_CONSTANTS.TABLE_EDITOR_ACTIONS.EDIT,
+                element: LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.ENUM,
                 id: i,
                 undo: editField,
                 redo: { name: e.target.value },
@@ -56,8 +60,8 @@ export default function EnumDetails({ data, i }) {
           setUndoStack((prev) => [
             ...prev,
             {
-              action: Action.EDIT,
-              element: ObjectType.ENUM,
+              action: LOCAL_CONSTANTS.TABLE_EDITOR_ACTIONS.EDIT,
+              element: LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.ENUM,
               id: i,
               undo: editField,
               redo: { values: data.values },
@@ -80,4 +84,4 @@ export default function EnumDetails({ data, i }) {
       </Button>
     </>
   );
-}
+};

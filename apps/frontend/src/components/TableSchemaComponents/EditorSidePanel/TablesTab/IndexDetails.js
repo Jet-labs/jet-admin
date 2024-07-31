@@ -1,14 +1,18 @@
-import { Action, ObjectType } from "../../../data/constants";
 import { Input, Button, Popover, Checkbox, Select } from "@douyinfe/semi-ui";
 import { IconMore, IconDeleteStroked } from "@douyinfe/semi-icons";
-import { useDiagram, useUndoRedo } from "../../../hooks";
 import { useTranslation } from "react-i18next";
 import { useState } from "react";
+import { LOCAL_CONSTANTS } from "../../../../constants";
+import {
+  useTableSchemaEditorActions,
+  useTableSchemaEditorState,
+} from "../../../../contexts/tableSchemaEditorContext";
 
-export default function IndexDetails({ data, fields, iid, tid }) {
+export const IndexDetails = ({ data, fields, iid, tid }) => {
   const { t } = useTranslation();
-  const { tables, updateTable } = useDiagram();
-  const { setUndoStack, setRedoStack } = useUndoRedo();
+  const { tables } = useTableSchemaEditorState();
+  const { setUndoStack, setRedoStack, updateTable } =
+    useTableSchemaEditorActions();
   const [editField, setEditField] = useState({});
 
   return (
@@ -24,8 +28,8 @@ export default function IndexDetails({ data, fields, iid, tid }) {
           setUndoStack((prev) => [
             ...prev,
             {
-              action: Action.EDIT,
-              element: ObjectType.TABLE,
+              action: LOCAL_CONSTANTS.TABLE_EDITOR_ACTIONS.EDIT,
+              element: LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.TABLE,
               component: "index",
               tid: tid,
               iid: iid,
@@ -49,7 +53,7 @@ export default function IndexDetails({ data, fields, iid, tid }) {
                     ...index,
                     fields: [...value],
                   }
-                : index,
+                : index
             ),
           });
         }}
@@ -75,7 +79,7 @@ export default function IndexDetails({ data, fields, iid, tid }) {
                           ...index,
                           name: value,
                         }
-                      : index,
+                      : index
                   ),
                 })
               }
@@ -84,8 +88,8 @@ export default function IndexDetails({ data, fields, iid, tid }) {
                 setUndoStack((prev) => [
                   ...prev,
                   {
-                    action: Action.EDIT,
-                    element: ObjectType.TABLE,
+                    action: LOCAL_CONSTANTS.TABLE_EDITOR_ACTIONS.EDIT,
+                    element: LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.TABLE,
                     component: "index",
                     tid: tid,
                     iid: iid,
@@ -109,8 +113,8 @@ export default function IndexDetails({ data, fields, iid, tid }) {
                   setUndoStack((prev) => [
                     ...prev,
                     {
-                      action: Action.EDIT,
-                      element: ObjectType.TABLE,
+                      action: LOCAL_CONSTANTS.TABLE_EDITOR_ACTIONS.EDIT,
+                      element: LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.TABLE,
                       component: "index",
                       tid: tid,
                       iid: iid,
@@ -137,7 +141,7 @@ export default function IndexDetails({ data, fields, iid, tid }) {
                             [checkedValues.target.value]:
                               checkedValues.target.checked,
                           }
-                        : index,
+                        : index
                     ),
                   });
                 }}
@@ -151,8 +155,8 @@ export default function IndexDetails({ data, fields, iid, tid }) {
                 setUndoStack((prev) => [
                   ...prev,
                   {
-                    action: Action.EDIT,
-                    element: ObjectType.TABLE,
+                    action: LOCAL_CONSTANTS.TABLE_EDITOR_ACTIONS.EDIT,
+                    element: LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.TABLE,
                     component: "index_delete",
                     tid: tid,
                     data: data,
@@ -189,4 +193,4 @@ export default function IndexDetails({ data, fields, iid, tid }) {
       </Popover>
     </div>
   );
-}
+};

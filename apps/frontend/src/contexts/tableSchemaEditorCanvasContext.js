@@ -1,4 +1,10 @@
-import { createContext, useCallback, useMemo, useRef, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useEventListener, useResizeObserver } from "usehooks-ts";
 import { useTableSchemaEditorTransformState } from "./tableSchemaEditorTransformContext";
 

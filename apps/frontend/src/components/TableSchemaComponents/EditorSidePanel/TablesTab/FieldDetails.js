@@ -7,18 +7,22 @@ import {
   InputNumber,
   Checkbox,
 } from "@douyinfe/semi-ui";
-import { Action, ObjectType } from "../../../data/constants";
 import { IconDeleteStroked } from "@douyinfe/semi-icons";
-import { useDiagram, useUndoRedo } from "../../../hooks";
 import { useTranslation } from "react-i18next";
-import { dbToTypes } from "../../../data/datatypes";
-import { databases } from "../../../data/databases";
-
-export default function FieldDetails({ data, tid, index }) {
+import {
+  useTableSchemaEditorActions,
+  useTableSchemaEditorState,
+} from "../../../../contexts/tableSchemaEditorContext";
+import { LOCAL_CONSTANTS } from "../../../../constants";
+const dbToTypes = new Proxy(LOCAL_CONSTANTS.POSTGRE_SQL_TYPES_BASE, {
+  get: (target, prop) => (prop in target ? target[prop] : false),
+});
+export const FieldDetails = ({ data, tid, index }) => {
   const { t } = useTranslation();
-  const { tables, database } = useDiagram();
-  const { setUndoStack, setRedoStack } = useUndoRedo();
-  const { updateField, deleteField } = useDiagram();
+  const { tables } = useTableSchemaEditorState();
+
+  const { updateField, deleteField, setUndoStack, setRedoStack } =
+    useTableSchemaEditorActions();
   const [editField, setEditField] = useState({});
 
   return (
@@ -28,7 +32,7 @@ export default function FieldDetails({ data, tid, index }) {
         className="my-2"
         placeholder={t("default_value")}
         value={data.default}
-        disabled={dbToTypes[database][data.type].noDefault || data.increment}
+        disabled={dbToTypes[data.type].noDefault || data.increment}
         onChange={(value) => updateField(tid, index, { default: value })}
         onFocus={(e) => setEditField({ default: e.target.value })}
         onBlur={(e) => {
@@ -36,8 +40,8 @@ export default function FieldDetails({ data, tid, index }) {
           setUndoStack((prev) => [
             ...prev,
             {
-              action: Action.EDIT,
-              element: ObjectType.TABLE,
+              action: LOCAL_CONSTANTS.TABLE_EDITOR_ACTIONS.EDIT,
+              element: LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.TABLE,
               component: "field",
               tid: tid,
               fid: index,
@@ -76,8 +80,8 @@ export default function FieldDetails({ data, tid, index }) {
               setUndoStack((prev) => [
                 ...prev,
                 {
-                  action: Action.EDIT,
-                  element: ObjectType.TABLE,
+                  action: LOCAL_CONSTANTS.TABLE_EDITOR_ACTIONS.EDIT,
+                  element: LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.TABLE,
                   component: "field",
                   tid: tid,
                   fid: index,
@@ -94,7 +98,7 @@ export default function FieldDetails({ data, tid, index }) {
           />
         </>
       )}
-      {dbToTypes[database][data.type].isSized && (
+      {dbToTypes[data.type].isSized && (
         <>
           <div className="font-semibold">{t("size")}</div>
           <InputNumber
@@ -108,8 +112,8 @@ export default function FieldDetails({ data, tid, index }) {
               setUndoStack((prev) => [
                 ...prev,
                 {
-                  action: Action.EDIT,
-                  element: ObjectType.TABLE,
+                  action: LOCAL_CONSTANTS.TABLE_EDITOR_ACTIONS.EDIT,
+                  element: LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.TABLE,
                   component: "field",
                   tid: tid,
                   fid: index,
@@ -126,7 +130,7 @@ export default function FieldDetails({ data, tid, index }) {
           />
         </>
       )}
-      {dbToTypes[database][data.type].hasPrecision && (
+      {dbToTypes[data.type].hasPrecision && (
         <>
           <div className="font-semibold">{t("precision")}</div>
           <Input
@@ -145,8 +149,8 @@ export default function FieldDetails({ data, tid, index }) {
               setUndoStack((prev) => [
                 ...prev,
                 {
-                  action: Action.EDIT,
-                  element: ObjectType.TABLE,
+                  action: LOCAL_CONSTANTS.TABLE_EDITOR_ACTIONS.EDIT,
+                  element: LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.TABLE,
                   component: "field",
                   tid: tid,
                   fid: index,
@@ -163,7 +167,7 @@ export default function FieldDetails({ data, tid, index }) {
           />
         </>
       )}
-      {dbToTypes[database][data.type].hasCheck && (
+      {dbToTypes[data.type].hasCheck && (
         <>
           <div className="font-semibold">{t("check")}</div>
           <Input
@@ -178,8 +182,8 @@ export default function FieldDetails({ data, tid, index }) {
               setUndoStack((prev) => [
                 ...prev,
                 {
-                  action: Action.EDIT,
-                  element: ObjectType.TABLE,
+                  action: LOCAL_CONSTANTS.TABLE_EDITOR_ACTIONS.EDIT,
+                  element: LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.TABLE,
                   component: "field",
                   tid: tid,
                   fid: index,
@@ -206,8 +210,8 @@ export default function FieldDetails({ data, tid, index }) {
             setUndoStack((prev) => [
               ...prev,
               {
-                action: Action.EDIT,
-                element: ObjectType.TABLE,
+                action: LOCAL_CONSTANTS.TABLE_EDITOR_ACTIONS.EDIT,
+                element: LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.TABLE,
                 component: "field",
                 tid: tid,
                 fid: index,
@@ -231,15 +235,13 @@ export default function FieldDetails({ data, tid, index }) {
         <Checkbox
           value="increment"
           checked={data.increment}
-          disabled={
-            !dbToTypes[database][data.type].canIncrement || data.isArray
-          }
+          disabled={!dbToTypes[data.type].canIncrement || data.isArray}
           onChange={(checkedValues) => {
             setUndoStack((prev) => [
               ...prev,
               {
-                action: Action.EDIT,
-                element: ObjectType.TABLE,
+                action: LOCAL_CONSTANTS.TABLE_EDITOR_ACTIONS.EDIT,
+                element: LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.TABLE,
                 component: "field",
                 tid: tid,
                 fid: index,
@@ -263,42 +265,41 @@ export default function FieldDetails({ data, tid, index }) {
           }}
         />
       </div>
-      {databases[database].hasArrays && (
-        <div className="flex justify-between items-center my-3">
-          <div className="font-medium">{t("declare_array")}</div>
-          <Checkbox
-            value="isArray"
-            checked={data.isArray}
-            onChange={(checkedValues) => {
-              setUndoStack((prev) => [
-                ...prev,
-                {
-                  action: Action.EDIT,
-                  element: ObjectType.TABLE,
-                  component: "field",
-                  tid: tid,
-                  fid: index,
-                  undo: {
-                    [checkedValues.target.value]: !checkedValues.target.checked,
-                  },
-                  redo: {
-                    [checkedValues.target.value]: checkedValues.target.checked,
-                  },
-                  message: t("edit_table", {
-                    tableName: tables[tid].name,
-                    extra: "[field]",
-                  }),
+      <div className="flex justify-between items-center my-3">
+        <div className="font-medium">{t("declare_array")}</div>
+        <Checkbox
+          value="isArray"
+          checked={data.isArray}
+          onChange={(checkedValues) => {
+            setUndoStack((prev) => [
+              ...prev,
+              {
+                action: LOCAL_CONSTANTS.TABLE_EDITOR_ACTIONS.EDIT,
+                element: LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.TABLE,
+                component: "field",
+                tid: tid,
+                fid: index,
+                undo: {
+                  [checkedValues.target.value]: !checkedValues.target.checked,
                 },
-              ]);
-              setRedoStack([]);
-              updateField(tid, index, {
-                isArray: checkedValues.target.checked,
-                increment: data.isArray ? data.increment : false,
-              });
-            }}
-          />
-        </div>
-      )}
+                redo: {
+                  [checkedValues.target.value]: checkedValues.target.checked,
+                },
+                message: t("edit_table", {
+                  tableName: tables[tid].name,
+                  extra: "[field]",
+                }),
+              },
+            ]);
+            setRedoStack([]);
+            updateField(tid, index, {
+              isArray: checkedValues.target.checked,
+              increment: data.isArray ? data.increment : false,
+            });
+          }}
+        />
+      </div>
+
       <div className="font-semibold">{t("comment")}</div>
       <TextArea
         className="my-2"
@@ -313,8 +314,8 @@ export default function FieldDetails({ data, tid, index }) {
           setUndoStack((prev) => [
             ...prev,
             {
-              action: Action.EDIT,
-              element: ObjectType.TABLE,
+              action: LOCAL_CONSTANTS.TABLE_EDITOR_ACTIONS.EDIT,
+              element: LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.TABLE,
               component: "field",
               tid: tid,
               fid: index,
@@ -339,4 +340,4 @@ export default function FieldDetails({ data, tid, index }) {
       </Button>
     </div>
   );
-}
+};

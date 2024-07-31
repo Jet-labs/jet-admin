@@ -1,19 +1,22 @@
-import { Action, ObjectType } from "../../../data/constants";
 import { Row, Col, Input, Button, Popover, Select } from "@douyinfe/semi-ui";
 import { IconMore, IconKeyStroked } from "@douyinfe/semi-icons";
-import { useEnums, useDiagram, useTypes, useUndoRedo } from "../../../hooks";
 import { useState } from "react";
-import FieldDetails from "./FieldDetails";
+import { FieldDetails } from "./FieldDetails";
 import { useTranslation } from "react-i18next";
-import { dbToTypes } from "../../../data/datatypes";
-
-export default function TableField({ data, tid, index }) {
-  const { updateField } = useDiagram();
-  const { types } = useTypes();
-  const { enums } = useEnums();
-  const { tables, database } = useDiagram();
+import { LOCAL_CONSTANTS } from "../../../../constants";
+import {
+  useTableSchemaEditorActions,
+  useTableSchemaEditorState,
+} from "../../../../contexts/tableSchemaEditorContext";
+const dbToTypes = new Proxy(LOCAL_CONSTANTS.POSTGRE_SQL_TYPES_BASE, {
+  get: (target, prop) => (prop in target ? target[prop] : false),
+});
+export const TableField = ({ data, tid, index }) => {
+  const { types, enums, tables } = useTableSchemaEditorState();
+  const { updateField, setUndoStack, setRedoStack } =
+    useTableSchemaEditorActions();
   const { t } = useTranslation();
-  const { setUndoStack, setRedoStack } = useUndoRedo();
+
   const [editField, setEditField] = useState({});
 
   return (
@@ -31,8 +34,8 @@ export default function TableField({ data, tid, index }) {
             setUndoStack((prev) => [
               ...prev,
               {
-                action: Action.EDIT,
-                element: ObjectType.TABLE,
+                action: LOCAL_CONSTANTS.TABLE_EDITOR_ACTIONS.EDIT,
+                element: LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.TABLE,
                 component: "field",
                 tid: tid,
                 fid: index,
@@ -52,7 +55,7 @@ export default function TableField({ data, tid, index }) {
         <Select
           className="w-full"
           optionList={[
-            ...Object.keys(dbToTypes[database]).map((value) => ({
+            ...Object.keys(dbToTypes).map((value) => ({
               label: value,
               value: value,
             })),
@@ -74,8 +77,8 @@ export default function TableField({ data, tid, index }) {
             setUndoStack((prev) => [
               ...prev,
               {
-                action: Action.EDIT,
-                element: ObjectType.TABLE,
+                action: LOCAL_CONSTANTS.TABLE_EDITOR_ACTIONS.EDIT,
+                element: LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.TABLE,
                 component: "field",
                 tid: tid,
                 fid: index,
@@ -88,8 +91,7 @@ export default function TableField({ data, tid, index }) {
               },
             ]);
             setRedoStack([]);
-            const incr =
-              data.increment && !!dbToTypes[database][value].canIncrement;
+            const incr = data.increment && !!dbToTypes[value].canIncrement;
 
             if (value === "ENUM" || value === "SET") {
               updateField(tid, index, {
@@ -99,15 +101,15 @@ export default function TableField({ data, tid, index }) {
                 increment: incr,
               });
             } else if (
-              dbToTypes[database][value].isSized ||
-              dbToTypes[database][value].hasPrecision
+              dbToTypes[value].isSized ||
+              dbToTypes[value].hasPrecision
             ) {
               updateField(tid, index, {
                 type: value,
-                size: dbToTypes[database][value].defaultSize,
+                size: dbToTypes[value].defaultSize,
                 increment: incr,
               });
-            } else if (!dbToTypes[database][value].hasDefault || incr) {
+            } else if (!dbToTypes[value].hasDefault || incr) {
               updateField(tid, index, {
                 type: value,
                 increment: incr,
@@ -115,7 +117,7 @@ export default function TableField({ data, tid, index }) {
                 size: "",
                 values: [],
               });
-            } else if (dbToTypes[database][value].hasCheck) {
+            } else if (dbToTypes[value].hasCheck) {
               updateField(tid, index, {
                 type: value,
                 check: "",
@@ -141,8 +143,8 @@ export default function TableField({ data, tid, index }) {
             setUndoStack((prev) => [
               ...prev,
               {
-                action: Action.EDIT,
-                element: ObjectType.TABLE,
+                action: LOCAL_CONSTANTS.TABLE_EDITOR_ACTIONS.EDIT,
+                element: LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.TABLE,
                 component: "field",
                 tid: tid,
                 fid: index,
@@ -170,8 +172,8 @@ export default function TableField({ data, tid, index }) {
             setUndoStack((prev) => [
               ...prev,
               {
-                action: Action.EDIT,
-                element: ObjectType.TABLE,
+                action: LOCAL_CONSTANTS.TABLE_EDITOR_ACTIONS.EDIT,
+                element: LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.TABLE,
                 component: "field",
                 tid: tid,
                 fid: index,
@@ -205,4 +207,4 @@ export default function TableField({ data, tid, index }) {
       </Col>
     </Row>
   );
-}
+};

@@ -1,13 +1,17 @@
 import { Button, Collapse } from "@douyinfe/semi-ui";
-import { useEnums } from "../../../hooks";
 import { IconPlus } from "@douyinfe/semi-icons";
 import { useTranslation } from "react-i18next";
-import SearchBar from "./SearchBar";
-import EnumDetails from "./EnumDetails";
-import Empty from "../Empty";
+import { SearchBar } from "./SearchBar";
+import { EnumDetails } from "./EnumDetails";
+import { Empty } from "../Empty";
+import {
+  useTableSchemaEditorActions,
+  useTableSchemaEditorState,
+} from "../../../../contexts/tableSchemaEditorContext";
 
-export default function EnumsTab() {
-  const { enums, addEnum } = useEnums();
+export const EnumsTab = () => {
+  const { enums } = useTableSchemaEditorState();
+  const { addEnum } = useTableSchemaEditorActions();
   const { t } = useTranslation();
 
   return (
@@ -42,4 +46,4 @@ export default function EnumsTab() {
       )}
     </div>
   );
-}
+};

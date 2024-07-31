@@ -6,6 +6,9 @@ import {
   useTableSchemaEditorState,
 } from "../../../contexts/tableSchemaEditorContext";
 import { useTableSchemaEditorTransformState } from "../../../contexts/tableSchemaEditorTransformContext";
+import { SidePanel } from "../EditorSidePanel/SidePanel";
+import { TableSchemaEditorCanvasContextProvider } from "../../../contexts/tableSchemaEditorCanvasContext";
+import { Canvas } from "../Canvas";
 
 export const TableSchemaEditor = ({ schema }) => {
   const theme = useTheme();
@@ -81,7 +84,29 @@ export const TableSchemaEditor = ({ schema }) => {
         <Tab label="GUI builder" />
         <Tab label="SQL" />
       </Tabs>
-      {JSON.stringify(dbModel)}
+      <div
+        className="flex h-full overflow-y-auto"
+        // onPointerUp={(e) => e.isPrimary && setResize(false)}
+        // onPointerLeave={(e) => e.isPrimary && setResize(false)}
+        // onPointerMove={(e) => e.isPrimary && handleResize(e)}
+        onPointerDown={(e) => {
+          // Required for onPointerLeave to trigger when a touch pointer leaves
+          // https://stackoverflow.com/a/70976017/1137077
+          e.target.releasePointerCapture(e.pointerId);
+        }}
+      >
+        <SidePanel width={500} />
+        <div className="relative w-full h-full overflow-hidden">
+          <TableSchemaEditorCanvasContextProvider className="h-full w-full">
+            <Canvas />
+          </TableSchemaEditorCanvasContextProvider>
+          {/* {!(layout.sidebar || layout.toolbar || layout.header) && (
+            <div className="fixed right-5 bottom-4">
+              <FloatingControls />
+            </div>
+          )} */}
+        </div>
+      </div>
     </div>
   );
 };

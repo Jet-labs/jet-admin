@@ -1,50 +1,45 @@
 import { Tabs, TabPane } from "@douyinfe/semi-ui";
-import { Tab } from "../../data/constants";
-import { useLayout, useSelect, useDiagram } from "../../hooks";
-import RelationshipsTab from "./RelationshipsTab/RelationshipsTab";
-import TypesTab from "./TypesTab/TypesTab";
-import Issues from "./Issues";
-import AreasTab from "./AreasTab/AreasTab";
-import NotesTab from "./NotesTab/NotesTab";
-import TablesTab from "./TablesTab/TablesTab";
+import { RelationshipsTab } from "./RelationshipsTab/RelationshipsTab";
+// import { TypesTab } from "./TypesTab/TypesTab";
+
+import { TablesTab } from "./TablesTab/TablesTab";
 import { useTranslation } from "react-i18next";
 import { useMemo } from "react";
-import { databases } from "../../data/databases";
-import EnumsTab from "./EnumsTab/EnumsTab";
+import { EnumsTab } from "./EnumsTab/EnumsTab";
+import {
+  useTableSchemaEditorActions,
+  useTableSchemaEditorState,
+} from "../../../contexts/tableSchemaEditorContext";
+import { LOCAL_CONSTANTS } from "../../../constants";
 
-export default function SidePanel({ width, resize, setResize }) {
-  const { layout } = useLayout();
-  const { selectedElement, setSelectedElement } = useSelect();
-  const { database } = useDiagram();
+export const SidePanel = ({ width, resize, setResize }) => {
+  const { selectedElement, database } = useTableSchemaEditorState();
+  const { setSelectedElement } = useTableSchemaEditorActions();
   const { t } = useTranslation();
 
   const tabList = useMemo(() => {
     const tabs = [
-      { tab: t("tables"), itemKey: Tab.TABLES, component: <TablesTab /> },
+      {
+        tab: t("tables"),
+        itemKey: LOCAL_CONSTANTS.TABLE_EDITOR_TABS.TABLES,
+        component: <TablesTab />,
+      },
       {
         tab: t("relationships"),
-        itemKey: Tab.RELATIONSHIPS,
+        itemKey: LOCAL_CONSTANTS.TABLE_EDITOR_TABS.RELATIONSHIPS,
         component: <RelationshipsTab />,
       },
-      { tab: t("subject_areas"), itemKey: Tab.AREAS, component: <AreasTab /> },
-      { tab: t("notes"), itemKey: Tab.NOTES, component: <NotesTab /> },
-    ];
-
-    if (databases[database].hasTypes) {
-      tabs.push({
-        tab: t("types"),
-        itemKey: Tab.TYPES,
-        component: <TypesTab />,
-      });
-    }
-
-    if (databases[database].hasEnums) {
-      tabs.push({
+      // {
+      //   tab: t("types"),
+      //   itemKey: LOCAL_CONSTANTS.TABLE_EDITOR_TABS.TYPES,
+      //   component: <TypesTab />,
+      // },
+      {
         tab: t("enums"),
-        itemKey: Tab.ENUMS,
+        itemKey: LOCAL_CONSTANTS.TABLE_EDITOR_TABS.ENUMS,
         component: <EnumsTab />,
-      });
-    }
+      },
+    ];
 
     return tabs;
   }, [t, database]);
@@ -73,11 +68,11 @@ export default function SidePanel({ width, resize, setResize }) {
               ))}
           </Tabs>
         </div>
-        {layout.issues && (
+        {/* {layout.issues && (
           <div className="mt-auto border-t-2 border-color shadow-inner">
             <Issues />
           </div>
-        )}
+        )} */}
       </div>
       <div
         className={`flex justify-center items-center p-1 h-auto hover-2 cursor-col-resize ${
@@ -89,4 +84,4 @@ export default function SidePanel({ width, resize, setResize }) {
       </div>
     </div>
   );
-}
+};

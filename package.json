@@ -10,5 +10,9 @@
     "dev": "start cmd /k \"cd apps/backend && npm run dev-w\" && start cmd /k \"cd apps/frontend && npm start\" && start cmd /k \"docker start -i postgresql-container\""
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "@douyinfe/semi-illustrations": "^2.63.1",
+    "usehooks-ts": "^3.1.0"
+  }
 }

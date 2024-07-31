@@ -1,14 +1,17 @@
 import { Collapse } from "@douyinfe/semi-ui";
-import { useSelect, useDiagram } from "../../../hooks";
-import Empty from "../Empty";
-import SearchBar from "./SearchBar";
-import RelationshipInfo from "./RelationshipInfo";
-import { ObjectType } from "../../../data/constants";
+import { Empty } from "../Empty";
+import { SearchBar } from "./SearchBar";
+import { RelationshipInfo } from "./RelationshipInfo";
 import { useTranslation } from "react-i18next";
+import { LOCAL_CONSTANTS } from "../../../../constants";
+import {
+  useTableSchemaEditorActions,
+  useTableSchemaEditorState,
+} from "../../../../contexts/tableSchemaEditorContext";
 
-export default function RelationshipsTab() {
-  const { relationships } = useDiagram();
-  const { selectedElement, setSelectedElement } = useSelect();
+export const RelationshipsTab = () => {
+  const { relationships, selectedElement } = useTableSchemaEditorState();
+  const { setSelectedElement } = useTableSchemaEditorActions();
   const { t } = useTranslation();
 
   return (
@@ -17,7 +20,8 @@ export default function RelationshipsTab() {
       <Collapse
         activeKey={
           selectedElement.open &&
-          selectedElement.element === ObjectType.RELATIONSHIP
+          selectedElement.element ===
+            LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.RELATIONSHIP
             ? `${selectedElement.id}`
             : ""
         }
@@ -28,7 +32,7 @@ export default function RelationshipsTab() {
             ...prev,
             open: true,
             id: parseInt(k),
-            element: ObjectType.RELATIONSHIP,
+            element: LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.RELATIONSHIP,
           }))
         }
         accordion
@@ -44,4 +48,4 @@ export default function RelationshipsTab() {
       </Collapse>
     </>
   );
-}
+};

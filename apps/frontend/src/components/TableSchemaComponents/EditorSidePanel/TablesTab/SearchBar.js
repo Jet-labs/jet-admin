@@ -1,12 +1,12 @@
 import { useMemo } from "react";
-import { useSelect } from "../../../hooks";
 import { TreeSelect } from "@douyinfe/semi-ui";
 import { IconSearch } from "@douyinfe/semi-icons";
-import { ObjectType } from "../../../data/constants";
 import { useTranslation } from "react-i18next";
+import { useTableSchemaEditorActions } from "../../../../contexts/tableSchemaEditorContext";
+import { LOCAL_CONSTANTS } from "../../../../constants";
 
-export default function SearchBar({ tables }) {
-  const { setSelectedElement } = useSelect();
+export const SearchBar = ({ tables }) => {
+  const { setSelectedElement } = useTableSchemaEditorActions();
   const { t } = useTranslation();
 
   const treeData = useMemo(() => {
@@ -46,7 +46,7 @@ export default function SearchBar({ tables }) {
           ...prev,
           id: tableId,
           open: true,
-          element: ObjectType.TABLE,
+          element: LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.TABLE,
         }));
         document
           .getElementById(`scroll_table_${tableId}`)
@@ -62,4 +62,4 @@ export default function SearchBar({ tables }) {
       className="w-full"
     />
   );
-}
+};

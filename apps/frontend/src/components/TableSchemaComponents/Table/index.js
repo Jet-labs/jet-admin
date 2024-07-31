@@ -8,7 +8,7 @@ import {
   IconKeyStroked,
 } from "@douyinfe/semi-icons";
 import { Popover, Tag, Button, SideSheet } from "@douyinfe/semi-ui";
-import TableInfo from "../EditorSidePanel/TablesTab/TableInfo";
+import { TableInfo } from "../EditorSidePanel/TablesTab/TableInfo";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import {
   useTableSchemaEditorActions,
@@ -208,7 +208,7 @@ export const Table = (props) => {
                     )}
                     <p>
                       <strong>{"default_value"}: </strong>
-                      {e.default === "" ? t("not_set") : e.default}
+                      {e.default === "" ? "not_set" : e.default}
                     </p>
                     <p>
                       <strong>{"comment"}: </strong>

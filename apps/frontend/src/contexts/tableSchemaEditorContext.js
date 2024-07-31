@@ -393,6 +393,8 @@ const TableSchemaEditorContextProvider = ({ children }) => {
         tables,
         relationships,
         selectedElement,
+        undoStack,
+        redoStack,
       }}
     >
       <TableSchemaEditorActionsContext.Provider
@@ -415,6 +417,8 @@ const TableSchemaEditorContextProvider = ({ children }) => {
           addRelationship,
           deleteRelationship,
           setSelectedElement,
+          setUndoStack,
+          setRedoStack,
         }}
       >
         {children}

@@ -1,3 +1,5 @@
+import { strHasQuotes } from "./utils/schemaBuilder";
+
 const HttpStatusCode = {
   Continue: 100,
   SwitchingProtocols: 101,
@@ -63,6 +65,10 @@ const HttpStatusCode = {
   NotExtended: 510,
   NetworkAuthenticationRequired: 511,
 };
+const intRegex = /^-?\d*$/;
+const doubleRegex = /^-?\d*.?\d+$/;
+const binaryRegex = /^[01]+$/;
+
 export const LOCAL_CONSTANTS = {
   SERVER_HOST: "http://127.0.0.1:8090",
   APP_NAME: "Jet admin",
@@ -593,6 +599,7 @@ export const LOCAL_CONSTANTS = {
       prisma_type: "String",
     },
   },
+
   TABLE_FILTERS: {
     equals: "equals",
     not: "not",
@@ -603,6 +610,422 @@ export const LOCAL_CONSTANTS = {
     contains: "contains",
     startsWith: "startsWith",
     endsWith: "endsWith",
+  },
+
+  POSTGRE_SQL_CARDINALITY: {
+    ONE_TO_ONE: "one_to_one",
+    ONE_TO_MANY: "one_to_many",
+    MANY_TO_ONE: "many_to_one",
+  },
+  POSTGRE_SQL_CONSTRAINTS: {
+    NONE: "No action",
+    RESTRICT: "Restrict",
+    CASCADE: "Cascade",
+    SET_NULL: "Set null",
+    SET_DEFAULT: "Set default",
+  },
+  POSTGRE_SQL_TYPES_BASE: {
+    SMALLINT: {
+      type: "SMALLINT",
+      checkDefault: (field) => {
+        return intRegex.test(field.default);
+      },
+      hasCheck: true,
+      isSized: false,
+      hasPrecision: false,
+      canIncrement: true,
+    },
+    INTEGER: {
+      type: "INTEGER",
+      checkDefault: (field) => {
+        return intRegex.test(field.default);
+      },
+      hasCheck: true,
+      isSized: false,
+      hasPrecision: false,
+      canIncrement: true,
+    },
+    BIGINT: {
+      type: "BIGINT",
+      checkDefault: (field) => {
+        return intRegex.test(field.default);
+      },
+      hasCheck: true,
+      isSized: false,
+      hasPrecision: false,
+      canIncrement: true,
+    },
+    DECIMAL: {
+      type: "DECIMAL",
+      checkDefault: (field) => {
+        return doubleRegex.test(field.default);
+      },
+      hasCheck: true,
+      isSized: false,
+      hasPrecision: true,
+    },
+    NUMERIC: {
+      type: "NUMERIC",
+      checkDefault: (field) => {
+        return doubleRegex.test(field.default);
+      },
+      hasCheck: true,
+      isSized: false,
+      hasPrecision: true,
+    },
+    REAL: {
+      type: "REAL",
+      checkDefault: (field) => {
+        return doubleRegex.test(field.default);
+      },
+      hasCheck: true,
+      isSized: false,
+      hasPrecision: true,
+    },
+    "DOUBLE PRECISION": {
+      type: "DOUBLE PRECISION",
+      checkDefault: (field) => {
+        return doubleRegex.test(field.default);
+      },
+      hasCheck: true,
+      isSized: false,
+      hasPrecision: true,
+    },
+    SMALLSERIAL: {
+      type: "SMALLSERIAL",
+      checkDefault: (field) => {
+        return intRegex.test(field.default);
+      },
+      hasCheck: true,
+      isSized: false,
+      hasPrecision: false,
+    },
+    SERIAL: {
+      type: "SERIAL",
+      checkDefault: (field) => {
+        return intRegex.test(field.default);
+      },
+      hasCheck: true,
+      isSized: false,
+      hasPrecision: false,
+    },
+    BIGSERIAL: {
+      type: "BIGSERIAL",
+      checkDefault: (field) => {
+        return intRegex.test(field.default);
+      },
+      hasCheck: true,
+      isSized: false,
+      hasPrecision: false,
+    },
+    MONEY: {
+      type: "MONEY",
+      checkDefault: (field) => {
+        return doubleRegex.test(field.default);
+      },
+      hasCheck: true,
+      isSized: false,
+      hasPrecision: true,
+    },
+    CHAR: {
+      type: "CHAR",
+      checkDefault: (field) => {
+        if (strHasQuotes(field.default)) {
+          return field.default.length - 2 <= field.size;
+        }
+        return field.default.length <= field.size;
+      },
+      hasCheck: true,
+      isSized: true,
+      hasPrecision: false,
+      defaultSize: 1,
+      hasQuotes: true,
+    },
+    VARCHAR: {
+      type: "VARCHAR",
+      checkDefault: (field) => {
+        if (strHasQuotes(field.default)) {
+          return field.default.length - 2 <= field.size;
+        }
+        return field.default.length <= field.size;
+      },
+      hasCheck: true,
+      isSized: true,
+      hasPrecision: false,
+      defaultSize: 255,
+      hasQuotes: true,
+    },
+    TEXT: {
+      type: "TEXT",
+      checkDefault: (field) => {
+        if (strHasQuotes(field.default)) {
+          return field.default.length - 2 <= field.size;
+        }
+        return field.default.length <= field.size;
+      },
+      hasCheck: true,
+      isSized: true,
+      hasPrecision: false,
+      defaultSize: 65535,
+      hasQuotes: true,
+    },
+    BYTEA: {
+      type: "BYTEA",
+      checkDefault: (field) => {
+        return /^[0-9a-fA-F]*$/.test(field.default);
+      },
+      hasCheck: false,
+      isSized: false,
+      hasPrecision: false,
+      defaultSize: null,
+      hasQuotes: true,
+    },
+    DATE: {
+      type: "DATE",
+      checkDefault: (field) => {
+        return /^\d{4}-\d{2}-\d{2}$/.test(field.default);
+      },
+      hasCheck: false,
+      isSized: false,
+      hasPrecision: false,
+      hasQuotes: true,
+    },
+    TIME: {
+      type: "TIME",
+      checkDefault: (field) => {
+        return /^(?:[01]?\d|2[0-3]):[0-5]?\d:[0-5]?\d$/.test(field.default);
+      },
+      hasCheck: false,
+      isSized: false,
+      hasPrecision: false,
+      hasQuotes: true,
+    },
+    TIMESTAMP: {
+      type: "TIMESTAMP",
+      checkDefault: (field) => {
+        if (field.default.toUpperCase() === "CURRENT_TIMESTAMP") {
+          return true;
+        }
+        if (!/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/.test(field.default)) {
+          return false;
+        }
+        const content = field.default.split(" ");
+        const date = content[0].split("-");
+        return parseInt(date[0]) >= 1970 && parseInt(date[0]) <= 2038;
+      },
+      hasCheck: false,
+      isSized: false,
+      hasPrecision: false,
+      hasQuotes: true,
+    },
+    TIMESTAMPTZ: {
+      type: "TIMESTAMPTZ",
+      checkDefault: (field) => {
+        if (field.default.toUpperCase() === "CURRENT_TIMESTAMP") {
+          return true;
+        }
+        return /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}([+-]\d{2}:\d{2})?$/.test(
+          field.default
+        );
+      },
+      hasCheck: false,
+      isSized: false,
+      hasPrecision: false,
+      hasQuotes: true,
+    },
+    INTERVAL: {
+      type: "INTERVAL",
+      checkDefault: (field) => /^['"\d\s\\-]+$/.test(field.default),
+      hasCheck: false,
+      isSized: false,
+      hasPrecision: false,
+      hasQuotes: true,
+    },
+    BOOLEAN: {
+      type: "BOOLEAN",
+      checkDefault: (field) => /^(true|false)$/i.test(field.default),
+      hasCheck: false,
+      isSized: false,
+      hasPrecision: false,
+      hasQuotes: false,
+    },
+    POINT: {
+      type: "POINT",
+      checkDefault: (field) => /^\(\d+,\d+\)$/.test(field.default),
+      hasCheck: false,
+      isSized: false,
+      hasPrecision: false,
+      hasQuotes: false,
+    },
+    LINE: {
+      type: "LINE",
+      checkDefault: (field) =>
+        /^(\(\d+,\d+\),)+\(\d+,\d+\)$/.test(field.default),
+      hasCheck: false,
+      isSized: false,
+      hasPrecision: false,
+      hasQuotes: false,
+    },
+    LSEG: {
+      type: "LSEG",
+      checkDefault: (field) =>
+        /^(\(\d+,\d+\),)+\(\d+,\d+\)$/.test(field.default),
+      hasCheck: false,
+      isSized: false,
+      hasPrecision: false,
+      hasQuotes: false,
+    },
+    BOX: {
+      type: "BOX",
+      checkDefault: (field) =>
+        /^\(\d+(\.\d+)?,\d+(\.\d+)?\),\(\d+(\.\d+)?,\d+(\.\d+)?\)$/.test(
+          field.default
+        ),
+      hasCheck: false,
+      isSized: false,
+      hasPrecision: false,
+      hasQuotes: true,
+    },
+    PATH: {
+      type: "PATH",
+      checkDefault: (field) =>
+        /^\((\d+(\.\d+)?,\d+(\.\d+)?(,\d+(\.\d+)?,\d+(\.\d+)?)*?)\)$/.test(
+          field.default
+        ),
+      hasCheck: false,
+      isSized: false,
+      hasPrecision: false,
+      hasQuotes: true,
+    },
+    POLYGON: {
+      type: "POLYGON",
+      checkDefault: (field) =>
+        /^\((\d+(\.\d+)?,\d+(\.\d+)?(,\d+(\.\d+)?,\d+(\.\d+)?)*?)\)$/.test(
+          field.default
+        ),
+      hasCheck: false,
+      isSized: false,
+      hasPrecision: false,
+      hasQuotes: true,
+    },
+    CIRCLE: {
+      type: "CIRCLE",
+      checkDefault: (field) =>
+        /^<\(\d+(\.\d+)?,\d+(\.\d+)?\),\d+(\.\d+)?\\>$/.test(field.default),
+      hasCheck: false,
+      isSized: false,
+      hasPrecision: false,
+      hasQuotes: true,
+    },
+    CIDR: {
+      type: "CIDR",
+      checkDefault: (field) =>
+        /^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$/.test(field.default),
+      hasCheck: false,
+      isSized: false,
+      hasPrecision: false,
+      hasQuotes: true,
+    },
+    INET: {
+      type: "INET",
+      checkDefault: (field) =>
+        /^(\d{1,3}\.){3}\d{1,3}(\/\d{1,2})?$/.test(field.default),
+      hasCheck: false,
+      isSized: false,
+      hasPrecision: false,
+      hasQuotes: true,
+    },
+    MACADDR: {
+      type: "MACADDR",
+      checkDefault: (field) =>
+        /^([A-Fa-f0-9]{2}:){5}[A-Fa-f0-9]{2}$/.test(field.default),
+      hasCheck: false,
+      isSized: false,
+      hasPrecision: false,
+      hasQuotes: true,
+    },
+    MACADDR8: {
+      type: "MACADDR8",
+      checkDefault: (field) =>
+        /^([A-Fa-f0-9]{2}:){7}[A-Fa-f0-9]{2}$/.test(field.default),
+      hasCheck: false,
+      isSized: false,
+      hasPrecision: false,
+      hasQuotes: true,
+    },
+    BIT: {
+      type: "BIT",
+      checkDefault: (field) => /^[01]{1,}$/.test(field.default),
+      hasCheck: true,
+      isSized: true,
+      hasPrecision: false,
+      defaultSize: 1,
+      hasQuotes: false,
+    },
+    VARBIT: {
+      type: "VARBIT",
+      checkDefault: (field) => /^[01]*$/.test(field.default),
+      hasCheck: true,
+      isSized: true,
+      hasPrecision: false,
+      defaultSize: 1,
+      hasQuotes: false,
+    },
+    TSVECTOR: {
+      type: "TSVECTOR",
+      checkDefault: (field) => /^[A-Za-z0-9: ]*$/.test(field.default),
+      hasCheck: false,
+      isSized: false,
+      hasPrecision: false,
+      hasQuotes: false,
+    },
+    TSQUERY: {
+      type: "TSQUERY",
+      checkDefault: (field) => /^[A-Za-z0-9: &|!()]*$/.test(field.default),
+      hasCheck: false,
+      isSized: false,
+      hasPrecision: false,
+      hasQuotes: false,
+    },
+    JSON: {
+      type: "JSON",
+      checkDefault: (field) => true,
+      hasCheck: false,
+      isSized: false,
+      hasPrecision: false,
+      hasQuotes: true,
+      noDefault: true,
+    },
+    JSONB: {
+      type: "JSONB",
+      checkDefault: (field) => true,
+      hasCheck: false,
+      isSized: false,
+      hasPrecision: false,
+      hasQuotes: true,
+      noDefault: true,
+    },
+    UUID: {
+      type: "UUID",
+      checkDefault: (field) =>
+        /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/.test(
+          field.default
+        ),
+      hasCheck: false,
+      isSized: false,
+      hasPrecision: false,
+      hasQuotes: true,
+      noDefault: true,
+    },
+    XML: {
+      type: "XML",
+      checkDefault: (field) => true,
+      hasCheck: false,
+      isSized: false,
+      hasPrecision: false,
+      hasQuotes: true,
+      noDefault: true,
+    },
   },
 
   TABLE_COLUMN_SORT: {

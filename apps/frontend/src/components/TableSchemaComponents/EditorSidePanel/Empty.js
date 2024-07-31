@@ -4,7 +4,7 @@ import {
 } from "@douyinfe/semi-illustrations";
 import { Empty as SemiUIEmpty } from "@douyinfe/semi-ui";
 
-export default function Empty({ title, text }) {
+export const Empty = ({ title, text }) => {
   return (
     <div className="select-none mt-2">
       <SemiUIEmpty
@@ -17,4 +17,4 @@ export default function Empty({ title, text }) {
       />
     </div>
   );
-}
+};

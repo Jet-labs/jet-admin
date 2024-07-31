@@ -1,49 +1,47 @@
 import { useRef, useState } from "react";
-import {
-  Action,
-  Cardinality,
-  Constraint,
-  ObjectType,
-} from "../../data/constants";
+
 import { Toast } from "@douyinfe/semi-ui";
-import Table from "../Table";
-import Area from "./Area";
-import Relationship from "../Relationship";
-import Note from "./Note";
-import {
-  useCanvas,
-  useSettings,
-  useTransform,
-  useDiagram,
-  useUndoRedo,
-  useSelect,
-  useAreas,
-  useNotes,
-  useLayout,
-} from "../../hooks";
+import { Table } from "../Table";
+
+import { Relationship } from "../Relationship";
+
 import { useTranslation } from "react-i18next";
 import { useEventListener } from "usehooks-ts";
+import { LOCAL_CONSTANTS } from "../../../constants";
+import {
+  useTableSchemaEditorActions,
+  useTableSchemaEditorState,
+} from "../../../contexts/tableSchemaEditorContext";
+import {
+  useTableSchemaEditorTransformActions,
+  useTableSchemaEditorTransformState,
+} from "../../../contexts/tableSchemaEditorTransformContext";
+import { useTableSchemaEditorCanvasState } from "../../../contexts/tableSchemaEditorCanvasContext";
 
-export default function Canvas() {
+export const Canvas = () => {
   const { t } = useTranslation();
-
   const canvasRef = useRef(null);
-  const canvasContextValue = useCanvas();
+  const canvasContextValue = useTableSchemaEditorCanvasState();
   const {
     canvas: { viewBox },
     pointer,
   } = canvasContextValue;
 
-  const { tables, updateTable, relationships, addRelationship } = useDiagram();
-  const { areas, updateArea } = useAreas();
-  const { notes, updateNote } = useNotes();
-  const { layout } = useLayout();
-  const { settings } = useSettings();
-  const { setUndoStack, setRedoStack } = useUndoRedo();
-  const { transform, setTransform } = useTransform();
-  const { selectedElement, setSelectedElement } = useSelect();
+  const { selectedElement, tables, relationships } =
+    useTableSchemaEditorState();
+  const {
+    updateTable,
+    addRelationship,
+    setUndoStack,
+    setRedoStack,
+    setSelectedElement,
+  } = useTableSchemaEditorActions();
+
+  const { transform } = useTableSchemaEditorTransformState();
+  const { setTransform } = useTableSchemaEditorTransformActions();
+
   const [dragging, setDragging] = useState({
-    element: ObjectType.NONE,
+    element: LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.NONE,
     id: -1,
     prevX: 0,
     prevY: 0,
@@ -69,7 +67,7 @@ export default function Canvas() {
     panStart: { x: 0, y: 0 },
     cursorStart: { x: 0, y: 0 },
   });
-  const [areaResize, setAreaResize] = useState({ id: -1, dir: "none" });
+
   const [initCoords, setInitCoords] = useState({
     x: 0,
     y: 0,
@@ -82,12 +80,12 @@ export default function Canvas() {
   /**
    * @param {PointerEvent} e
    * @param {*} id
-   * @param {ObjectType[keyof ObjectType]} type
+   *
    */
   const handlePointerDownOnElement = (e, id, type) => {
     if (!e.isPrimary) return;
 
-    if (type === ObjectType.TABLE) {
+    if (type === LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.TABLE) {
       const table = tables.find((t) => t.id === id);
       setGrabOffset({
         x: table.x - pointer.spaces.diagram.x,
@@ -98,30 +96,6 @@ export default function Canvas() {
         id: id,
         prevX: table.x,
         prevY: table.y,
-      });
-    } else if (type === ObjectType.AREA) {
-      const area = areas.find((t) => t.id === id);
-      setGrabOffset({
-        x: area.x - pointer.spaces.diagram.x,
-        y: area.y - pointer.spaces.diagram.y,
-      });
-      setDragging({
-        element: type,
-        id: id,
-        prevX: area.x,
-        prevY: area.y,
-      });
-    } else if (type === ObjectType.NOTE) {
-      const note = notes.find((t) => t.id === id);
-      setGrabOffset({
-        x: note.x - pointer.spaces.diagram.x,
-        y: note.y - pointer.spaces.diagram.y,
-      });
-      setDragging({
-        element: type,
-        id: id,
-        prevX: note.x,
-        prevY: note.y,
       });
     }
     setSelectedElement((prev) => ({
@@ -146,12 +120,11 @@ export default function Canvas() {
       });
     } else if (
       panning.isPanning &&
-      dragging.element === ObjectType.NONE &&
-      areaResize.id === -1
+      dragging.element === LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.NONE
     ) {
-      if (!settings.panning) {
-        return;
-      }
+      // if (!settings.panning) {
+      //   return;
+      // }
       setTransform((prev) => ({
         ...prev,
         pan: {
@@ -163,60 +136,14 @@ export default function Canvas() {
             (panning.cursorStart.y - pointer.spaces.screen.y) / transform.zoom,
         },
       }));
-    } else if (dragging.element === ObjectType.TABLE && dragging.id >= 0) {
+    } else if (
+      dragging.element === LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.TABLE &&
+      dragging.id >= 0
+    ) {
       updateTable(dragging.id, {
         x: pointer.spaces.diagram.x + grabOffset.x,
         y: pointer.spaces.diagram.y + grabOffset.y,
       });
-    } else if (
-      dragging.element === ObjectType.AREA &&
-      dragging.id >= 0 &&
-      areaResize.id === -1
-    ) {
-      updateArea(dragging.id, {
-        x: pointer.spaces.diagram.x + grabOffset.x,
-        y: pointer.spaces.diagram.y + grabOffset.y,
-      });
-    } else if (dragging.element === ObjectType.NOTE && dragging.id >= 0) {
-      updateNote(dragging.id, {
-        x: pointer.spaces.diagram.x + grabOffset.x,
-        y: pointer.spaces.diagram.y + grabOffset.y,
-      });
-    } else if (areaResize.id !== -1) {
-      if (areaResize.dir === "none") return;
-      let newDims = { ...initCoords };
-      delete newDims.pointerX;
-      delete newDims.pointerY;
-      setPanning((old) => ({ ...old, isPanning: false }));
-
-      switch (areaResize.dir) {
-        case "br":
-          newDims.width = pointer.spaces.diagram.x - initCoords.x;
-          newDims.height = pointer.spaces.diagram.y - initCoords.y;
-          break;
-        case "tl":
-          newDims.x = pointer.spaces.diagram.x;
-          newDims.y = pointer.spaces.diagram.y;
-          newDims.width =
-            initCoords.x + initCoords.width - pointer.spaces.diagram.x;
-          newDims.height =
-            initCoords.y + initCoords.height - pointer.spaces.diagram.y;
-          break;
-        case "tr":
-          newDims.y = pointer.spaces.diagram.y;
-          newDims.width = pointer.spaces.diagram.x - initCoords.x;
-          newDims.height =
-            initCoords.y + initCoords.height - pointer.spaces.diagram.y;
-          break;
-        case "bl":
-          newDims.x = pointer.spaces.diagram.x;
-          newDims.width =
-            initCoords.x + initCoords.width - pointer.spaces.diagram.x;
-          newDims.height = pointer.spaces.diagram.y - initCoords.y;
-          break;
-      }
-
-      updateArea(areaResize.id, { ...newDims });
     }
   };
 
@@ -228,9 +155,9 @@ export default function Canvas() {
 
     // don't pan if the sidesheet for editing a table is open
     if (
-      selectedElement.element === ObjectType.TABLE &&
-      selectedElement.open &&
-      !layout.sidebar
+      selectedElement.element ===
+        LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.TABLE &&
+      selectedElement.open
     )
       return;
 
@@ -246,20 +173,10 @@ export default function Canvas() {
 
   const coordsDidUpdate = (element) => {
     switch (element) {
-      case ObjectType.TABLE:
+      case LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.TABLE:
         return !(
           dragging.prevX === tables[dragging.id].x &&
           dragging.prevY === tables[dragging.id].y
-        );
-      case ObjectType.AREA:
-        return !(
-          dragging.prevX === areas[dragging.id].x &&
-          dragging.prevY === areas[dragging.id].y
-        );
-      case ObjectType.NOTE:
-        return !(
-          dragging.prevX === notes[dragging.id].x &&
-          dragging.prevY === notes[dragging.id].y
         );
       default:
         return false;
@@ -267,12 +184,7 @@ export default function Canvas() {
   };
 
   const didResize = (id) => {
-    return !(
-      areas[id].x === initCoords.x &&
-      areas[id].y === initCoords.y &&
-      areas[id].width === initCoords.width &&
-      areas[id].height === initCoords.height
-    );
+    return;
   };
 
   const didPan = () =>
@@ -280,23 +192,11 @@ export default function Canvas() {
 
   const getMovedElementDetails = () => {
     switch (dragging.element) {
-      case ObjectType.TABLE:
+      case LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.TABLE:
         return {
           name: tables[dragging.id].name,
           x: Math.round(tables[dragging.id].x),
           y: Math.round(tables[dragging.id].y),
-        };
-      case ObjectType.AREA:
-        return {
-          name: areas[dragging.id].name,
-          x: Math.round(areas[dragging.id].x),
-          y: Math.round(areas[dragging.id].y),
-        };
-      case ObjectType.NOTE:
-        return {
-          name: notes[dragging.id].title,
-          x: Math.round(notes[dragging.id].x),
-          y: Math.round(notes[dragging.id].y),
         };
       default:
         return false;
@@ -314,7 +214,7 @@ export default function Canvas() {
       setUndoStack((prev) => [
         ...prev,
         {
-          action: Action.MOVE,
+          action: LOCAL_CONSTANTS.TABLE_EDITOR_ACTIONS.MOVE,
           element: dragging.element,
           x: dragging.prevX,
           y: dragging.prevY,
@@ -329,12 +229,17 @@ export default function Canvas() {
       ]);
       setRedoStack([]);
     }
-    setDragging({ element: ObjectType.NONE, id: -1, prevX: 0, prevY: 0 });
+    setDragging({
+      element: LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.NONE,
+      id: -1,
+      prevX: 0,
+      prevY: 0,
+    });
     if (panning.isPanning && didPan()) {
       setUndoStack((prev) => [
         ...prev,
         {
-          action: Action.PAN,
+          action: LOCAL_CONSTANTS.TABLE_EDITOR_ACTIONS.PAN,
           undo: { x: panning.x, y: panning.y },
           redo: transform.pan,
           message: t("move_element", {
@@ -346,7 +251,7 @@ export default function Canvas() {
       setRedoStack([]);
       setSelectedElement((prev) => ({
         ...prev,
-        element: ObjectType.NONE,
+        element: LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.NONE,
         id: -1,
         open: false,
       }));
@@ -355,30 +260,6 @@ export default function Canvas() {
     pointer.setStyle("default");
     if (linking) handleLinking();
     setLinking(false);
-    if (areaResize.id !== -1 && didResize(areaResize.id)) {
-      setUndoStack((prev) => [
-        ...prev,
-        {
-          action: Action.EDIT,
-          element: ObjectType.AREA,
-          aid: areaResize.id,
-          undo: {
-            ...areas[areaResize.id],
-            x: initCoords.x,
-            y: initCoords.y,
-            width: initCoords.width,
-            height: initCoords.height,
-          },
-          redo: areas[areaResize.id],
-          message: t("edit_area", {
-            areaName: areas[areaResize.id].name,
-            extra: "[resize]",
-          }),
-        },
-      ]);
-      setRedoStack([]);
-    }
-    setAreaResize({ id: -1, dir: "none" });
     setInitCoords({
       x: 0,
       y: 0,
@@ -391,7 +272,12 @@ export default function Canvas() {
 
   const handleGripField = () => {
     setPanning((old) => ({ ...old, isPanning: false }));
-    setDragging({ element: ObjectType.NONE, id: -1, prevX: 0, prevY: 0 });
+    setDragging({
+      element: LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.NONE,
+      id: -1,
+      prevX: 0,
+      prevY: 0,
+    });
     setLinking(true);
   };
 
@@ -415,9 +301,9 @@ export default function Canvas() {
       ...linkingLine,
       endTableId: hoveredTable.tableId,
       endFieldId: hoveredTable.field,
-      cardinality: Cardinality.ONE_TO_ONE,
-      updateConstraint: Constraint.NONE,
-      deleteConstraint: Constraint.NONE,
+      cardinality: LOCAL_CONSTANTS.POSTGRE_SQL_CARDINALITY.ONE_TO_ONE,
+      updateConstraint: LOCAL_CONSTANTS.POSTGRE_SQL_CONSTRAINTS.NONE,
+      deleteConstraint: LOCAL_CONSTANTS.POSTGRE_SQL_CONSTRAINTS.NONE,
       name: `${tables[linkingLine.startTableId].name}_${
         tables[linkingLine.startTableId].fields[linkingLine.startFieldId].name
       }_fk`,
@@ -488,36 +374,35 @@ export default function Canvas() {
           backgroundColor: theme === "dark" ? "rgba(22, 22, 26, 1)" : "white",
         }}
       >
-        {settings.showGrid && (
-          <svg className="absolute w-full h-full">
-            <defs>
-              <pattern
-                id="pattern-circles"
-                x="0"
-                y="0"
-                width="24"
-                height="24"
-                patternUnits="userSpaceOnUse"
-                patternContentUnits="userSpaceOnUse"
-              >
-                <circle
-                  id="pattern-circle"
-                  cx="4"
-                  cy="4"
-                  r="0.85"
-                  fill="rgb(99, 152, 191)"
-                ></circle>
-              </pattern>
-            </defs>
-            <rect
+        <svg className="absolute w-full h-full">
+          <defs>
+            <pattern
+              id="pattern-circles"
               x="0"
               y="0"
-              width="100%"
-              height="100%"
-              fill="url(#pattern-circles)"
-            ></rect>
-          </svg>
-        )}
+              width="24"
+              height="24"
+              patternUnits="userSpaceOnUse"
+              patternContentUnits="userSpaceOnUse"
+            >
+              <circle
+                id="pattern-circle"
+                cx="4"
+                cy="4"
+                r="0.85"
+                fill="rgb(99, 152, 191)"
+              ></circle>
+            </pattern>
+          </defs>
+          <rect
+            x="0"
+            y="0"
+            width="100%"
+            height="100%"
+            fill="url(#pattern-circles)"
+          ></rect>
+        </svg>
+
         <svg
           ref={canvasRef}
           onPointerMove={handlePointerMove}
@@ -526,17 +411,6 @@ export default function Canvas() {
           className="absolute w-full h-full touch-none"
           viewBox={`${viewBox.left} ${viewBox.top} ${viewBox.width} ${viewBox.height}`}
         >
-          {areas.map((a) => (
-            <Area
-              key={a.id}
-              data={a}
-              onPointerDown={(e) =>
-                handlePointerDownOnElement(e, a.id, ObjectType.AREA)
-              }
-              setResize={setAreaResize}
-              setInitCoords={setInitCoords}
-            />
-          ))}
           {relationships.map((e, i) => (
             <Relationship key={i} data={e} />
           ))}
@@ -548,7 +422,11 @@ export default function Canvas() {
               handleGripField={handleGripField}
               setLinkingLine={setLinkingLine}
               onPointerDown={(e) =>
-                handlePointerDownOnElement(e, table.id, ObjectType.TABLE)
+                handlePointerDownOnElement(
+                  e,
+                  table.id,
+                  LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.TABLE
+                )
               }
             />
           ))}
@@ -560,18 +438,9 @@ export default function Canvas() {
               className="pointer-events-none touch-none"
             />
           )}
-          {notes.map((n) => (
-            <Note
-              key={n.id}
-              data={n}
-              onPointerDown={(e) =>
-                handlePointerDownOnElement(e, n.id, ObjectType.NOTE)
-              }
-            />
-          ))}
         </svg>
       </div>
-      {settings.showDebugCoordinates && (
+      {false && (
         <div className="fixed flex flex-col flex-wrap gap-6 bg-[rgba(var(--semi-grey-1),var(--tw-bg-opacity))]/40 border border-color bottom-4 right-4 p-4 rounded-xl backdrop-blur-sm pointer-events-none select-none">
           <table className="table-auto grow">
             <thead>
@@ -643,4 +512,4 @@ export default function Canvas() {
       )}
     </div>
   );
-}
+};

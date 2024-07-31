@@ -12,38 +12,36 @@ import {
   IconLoopTextStroked,
   IconMore,
 } from "@douyinfe/semi-icons";
-import {
-  Cardinality,
-  Constraint,
-  Action,
-  ObjectType,
-} from "../../../data/constants";
-import { useDiagram, useUndoRedo } from "../../../hooks";
-import i18n from "../../../i18n/i18n";
 import { useTranslation } from "react-i18next";
+import { LOCAL_CONSTANTS } from "../../../../constants";
+import {
+  useTableSchemaEditorActions,
+  useTableSchemaEditorState,
+} from "../../../../contexts/tableSchemaEditorContext";
 
 const columns = [
   {
-    title: i18n.t("primary"),
+    title: "primary",
     dataIndex: "primary",
   },
   {
-    title: i18n.t("foreign"),
+    title: "foreign",
     dataIndex: "foreign",
   },
 ];
 
-export default function RelationshipInfo({ data }) {
-  const { setUndoStack, setRedoStack } = useUndoRedo();
-  const { tables, setRelationships, deleteRelationship } = useDiagram();
+export const RelationshipInfo = ({ data }) => {
+  const { tables } = useTableSchemaEditorState();
+  const { setRelationships, deleteRelationship, setUndoStack, setRedoStack } =
+    useTableSchemaEditorActions();
   const { t } = useTranslation();
 
   const swapKeys = () => {
     setUndoStack((prev) => [
       ...prev,
       {
-        action: Action.EDIT,
-        element: ObjectType.RELATIONSHIP,
+        action: LOCAL_CONSTANTS.TABLE_EDITOR_ACTIONS.EDIT,
+        element: LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.RELATIONSHIP,
         rid: data.id,
         undo: {
           startTableId: data.startTableId,
@@ -77,8 +75,8 @@ export default function RelationshipInfo({ data }) {
               endTableId: e.startTableId,
               endFieldId: e.startFieldId,
             }
-          : e,
-      ),
+          : e
+      )
     );
   };
 
@@ -86,8 +84,8 @@ export default function RelationshipInfo({ data }) {
     setUndoStack((prev) => [
       ...prev,
       {
-        action: Action.EDIT,
-        element: ObjectType.RELATIONSHIP,
+        action: LOCAL_CONSTANTS.TABLE_EDITOR_ACTIONS.EDIT,
+        element: LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.RELATIONSHIP,
         rid: data.id,
         undo: { cardinality: data.cardinality },
         redo: { cardinality: value },
@@ -99,9 +97,7 @@ export default function RelationshipInfo({ data }) {
     ]);
     setRedoStack([]);
     setRelationships((prev) =>
-      prev.map((e, idx) =>
-        idx === data.id ? { ...e, cardinality: value } : e,
-      ),
+      prev.map((e, idx) => (idx === data.id ? { ...e, cardinality: value } : e))
     );
   };
 
@@ -110,8 +106,8 @@ export default function RelationshipInfo({ data }) {
     setUndoStack((prev) => [
       ...prev,
       {
-        action: Action.EDIT,
-        element: ObjectType.RELATIONSHIP,
+        action: LOCAL_CONSTANTS.TABLE_EDITOR_ACTIONS.EDIT,
+        element: LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.RELATIONSHIP,
         rid: data.id,
         undo: { [undoKey]: data[undoKey] },
         redo: { [undoKey]: value },
@@ -123,7 +119,7 @@ export default function RelationshipInfo({ data }) {
     ]);
     setRedoStack([]);
     setRelationships((prev) =>
-      prev.map((e, idx) => (idx === data.id ? { ...e, [undoKey]: value } : e)),
+      prev.map((e, idx) => (idx === data.id ? { ...e, [undoKey]: value } : e))
     );
   };
 
@@ -189,7 +185,9 @@ export default function RelationshipInfo({ data }) {
         </div>
         <div className="font-semibold my-1">{t("cardinality")}:</div>
         <Select
-          optionList={Object.values(Cardinality).map((v) => ({
+          optionList={Object.values(
+            LOCAL_CONSTANTS.POSTGRE_SQL_CARDINALITY
+          ).map((v) => ({
             label: v,
             value: v,
           }))}
@@ -201,7 +199,9 @@ export default function RelationshipInfo({ data }) {
           <Col span={12}>
             <div className="font-semibold">{t("on_update")}: </div>
             <Select
-              optionList={Object.values(Constraint).map((v) => ({
+              optionList={Object.values(
+                LOCAL_CONSTANTS.POSTGRE_SQL_CONSTRAINTS
+              ).map((v) => ({
                 label: v,
                 value: v,
               }))}
@@ -213,7 +213,9 @@ export default function RelationshipInfo({ data }) {
           <Col span={12}>
             <div className="font-semibold">{t("on_delete")}: </div>
             <Select
-              optionList={Object.values(Constraint).map((v) => ({
+              optionList={Object.values(
+                LOCAL_CONSTANTS.POSTGRE_SQL_CONSTRAINTS
+              ).map((v) => ({
                 label: v,
                 value: v,
               }))}
@@ -234,4 +236,4 @@ export default function RelationshipInfo({ data }) {
       </Collapse.Panel>
     </div>
   );
-}
+};

@@ -1,23 +1,26 @@
 import { useState } from "react";
-import { useSelect, useDiagram } from "../../../hooks";
 import { AutoComplete } from "@douyinfe/semi-ui";
 import { IconSearch } from "@douyinfe/semi-icons";
-import { ObjectType } from "../../../data/constants";
 import { useTranslation } from "react-i18next";
+import { LOCAL_CONSTANTS } from "../../../../constants";
+import {
+  useTableSchemaEditorActions,
+  useTableSchemaEditorState,
+} from "../../../../contexts/tableSchemaEditorContext";
 
-export default function SearchBar() {
-  const { relationships } = useDiagram();
+export const SearchBar = () => {
   const [searchText, setSearchText] = useState("");
-  const { setSelectedElement } = useSelect();
+  const { relationships } = useTableSchemaEditorState();
+  const { setSelectedElement } = useTableSchemaEditorActions();
   const { t } = useTranslation();
 
   const [filteredResult, setFilteredResult] = useState(
-    relationships.map((t) => t.name),
+    relationships.map((t) => t.name)
   );
 
   const handleStringSearch = (value) => {
     setFilteredResult(
-      relationships.map((t) => t.name).filter((i) => i.includes(value)),
+      relationships.map((t) => t.name).filter((i) => i.includes(value))
     );
   };
 
@@ -37,7 +40,7 @@ export default function SearchBar() {
           ...prev,
           id: id,
           open: true,
-          element: ObjectType.RELATIONSHIP,
+          element: LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.RELATIONSHIP,
         }));
         document
           .getElementById(`scroll_ref_${id}`)
@@ -46,4 +49,4 @@ export default function SearchBar() {
       className="w-full"
     />
   );
-}
+};

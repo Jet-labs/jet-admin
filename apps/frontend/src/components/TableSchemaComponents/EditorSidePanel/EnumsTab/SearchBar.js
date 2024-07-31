@@ -1,21 +1,22 @@
 import { useState } from "react";
 import { AutoComplete } from "@douyinfe/semi-ui";
 import { IconSearch } from "@douyinfe/semi-icons";
-import { useEnums } from "../../../hooks";
-import { useTranslation } from "react-i18next";
 
-export default function SearchBar() {
-  const { enums } = useEnums();
+import { useTranslation } from "react-i18next";
+import { useTableSchemaEditorState } from "../../../../contexts/tableSchemaEditorContext";
+
+export const SearchBar = () => {
+  const { enums } = useTableSchemaEditorState();
   const [value, setValue] = useState("");
   const { t } = useTranslation();
 
   const [filteredResult, setFilteredResult] = useState(
-    enums.map((e) => e.name),
+    enums.map((e) => e.name)
   );
 
   const handleStringSearch = (value) => {
     setFilteredResult(
-      enums.map((e) => e.name).filter((i) => i.includes(value)),
+      enums.map((e) => e.name).filter((i) => i.includes(value))
     );
   };
 
@@ -38,4 +39,4 @@ export default function SearchBar() {
       className="w-full"
     />
   );
-}
+};
