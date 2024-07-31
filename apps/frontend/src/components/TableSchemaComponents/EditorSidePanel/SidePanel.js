@@ -1,7 +1,5 @@
 import { Tabs, TabPane } from "@douyinfe/semi-ui";
 import { RelationshipsTab } from "./RelationshipsTab/RelationshipsTab";
-// import { TypesTab } from "./TypesTab/TypesTab";
-
 import { TablesTab } from "./TablesTab/TablesTab";
 import { useTranslation } from "react-i18next";
 import { useMemo } from "react";
@@ -12,7 +10,7 @@ import {
 } from "../../../contexts/tableSchemaEditorContext";
 import { LOCAL_CONSTANTS } from "../../../constants";
 
-export const SidePanel = ({ width, resize, setResize }) => {
+export const SidePanel = () => {
   const { selectedElement, database } = useTableSchemaEditorState();
   const { setSelectedElement } = useTableSchemaEditorActions();
   const { t } = useTranslation();
@@ -29,11 +27,6 @@ export const SidePanel = ({ width, resize, setResize }) => {
         itemKey: LOCAL_CONSTANTS.TABLE_EDITOR_TABS.RELATIONSHIPS,
         component: <RelationshipsTab />,
       },
-      // {
-      //   tab: t("types"),
-      //   itemKey: LOCAL_CONSTANTS.TABLE_EDITOR_TABS.TYPES,
-      //   component: <TypesTab />,
-      // },
       {
         tab: t("enums"),
         itemKey: LOCAL_CONSTANTS.TABLE_EDITOR_TABS.ENUMS,
@@ -46,10 +39,7 @@ export const SidePanel = ({ width, resize, setResize }) => {
 
   return (
     <div className="flex h-full">
-      <div
-        className="flex flex-col h-full relative border-r border-color"
-        style={{ width: `${width}px` }}
-      >
+      <div className="flex flex-col h-full relative border-r border-color w-full">
         <div className="h-full flex-1 overflow-y-auto">
           <Tabs
             type="card"
@@ -73,14 +63,6 @@ export const SidePanel = ({ width, resize, setResize }) => {
             <Issues />
           </div>
         )} */}
-      </div>
-      <div
-        className={`flex justify-center items-center p-1 h-auto hover-2 cursor-col-resize ${
-          resize && "bg-semi-grey-2"
-        }`}
-        onPointerDown={(e) => e.isPrimary && setResize(true)}
-      >
-        <div className="w-1 border-x border-color h-1/6" />
       </div>
     </div>
   );

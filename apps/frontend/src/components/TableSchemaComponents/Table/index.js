@@ -19,6 +19,7 @@ import { useTheme } from "@mui/material";
 export const Table = (props) => {
   const [hoveredField, setHoveredField] = useState(-1);
   const { themeType } = useTheme();
+  const theme = useTheme();
   const {
     tableData,
     onPointerDown,
@@ -63,18 +64,15 @@ export const Table = (props) => {
       >
         <div
           onDoubleClick={openEditor}
+          style={{ background: theme.palette.background.default }}
           className={`border-2 hover:border-dashed hover:border-blue-500
                select-none rounded-lg w-full ${
-                 themeType === "light"
-                   ? "bg-zinc-100 text-zinc-800"
-                   : "bg-zinc-800 text-zinc-200"
-               } ${
-            selectedElement.id === tableData.id &&
-            selectedElement.element ===
-              LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.TABLE
-              ? "border-solid border-blue-500"
-              : "border-zinc-500"
-          }`}
+                 selectedElement.id === tableData.id &&
+                 selectedElement.element ===
+                   LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.TABLE
+                   ? "border-solid border-blue-500"
+                   : "border-zinc-500"
+               }`}
         >
           <div
             className="h-[10px] w-full rounded-t-md"
@@ -225,7 +223,7 @@ export const Table = (props) => {
           })}
         </div>
       </foreignObject>
-      <SideSheet
+      {/* <SideSheet
         title={"edit"}
         size="small"
         visible={
@@ -245,7 +243,7 @@ export const Table = (props) => {
         <div className="sidesheet-theme">
           <TableInfo data={tableData} />
         </div>
-      </SideSheet>
+      </SideSheet> */}
     </>
   );
 

@@ -157,8 +157,8 @@ const TableSchemaEditorContextProvider = ({ children }) => {
         {
           id: prev.length,
           name: `table_${prev.length}`,
-          x: transform.pan.x,
-          y: transform.pan.y,
+          x: transform.pan.x - LOCAL_CONSTANTS.TABLE_EDITOR_TABLE_WIDTH / 2,
+          y: transform.pan.y - 100,
           fields: [
             {
               name: "id",

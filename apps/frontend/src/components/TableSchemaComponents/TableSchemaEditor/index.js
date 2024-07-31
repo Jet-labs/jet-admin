@@ -9,6 +9,11 @@ import { useTableSchemaEditorTransformState } from "../../../contexts/tableSchem
 import { SidePanel } from "../EditorSidePanel/SidePanel";
 import { TableSchemaEditorCanvasContextProvider } from "../../../contexts/tableSchemaEditorCanvasContext";
 import { Canvas } from "../Canvas";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "../../Resizables";
 
 export const TableSchemaEditor = ({ schema }) => {
   const theme = useTheme();
@@ -27,7 +32,8 @@ export const TableSchemaEditor = ({ schema }) => {
   } = useTableSchemaEditorActions();
 
   // const { saveState, setSaveState } = useSaveState();
-  const { transform, setTransform } = useTableSchemaEditorTransformState();
+  const { transform, setTableSchemaEditorTransform } =
+    useTableSchemaEditorTransformState();
 
   const save = useCallback(async () => {
     const schema = {
@@ -48,12 +54,15 @@ export const TableSchemaEditor = ({ schema }) => {
       const tableSchema = JSON.parse(tableSchemaString);
       setTables(tableSchema.tables);
       setRelationships(tableSchema.references);
-      setTransform({ pan: tableSchema.pan, zoom: tableSchema.zoom });
+      setTableSchemaEditorTransform({
+        pan: tableSchema.pan,
+        zoom: tableSchema.zoom,
+      });
       setTypes(tableSchema.types ?? []);
       setEnums(tableSchema.enums ?? []);
     }
   }, [
-    setTransform,
+    setTableSchemaEditorTransform,
     setRedoStack,
     setUndoStack,
     setRelationships,
@@ -66,14 +75,14 @@ export const TableSchemaEditor = ({ schema }) => {
     setTab(newTab);
   };
   return (
-    <div className="w-full">
+    <div className="w-full h-full">
       <div
         className="flex flex-col items-start justify-start p-3 px-6"
         style={{ background: theme.palette.background.paper }}
       >
         <span className="text-lg font-bold text-start mt-1">{`Add new table`}</span>
       </div>
-      <Tabs
+      {/* <Tabs
         value={tab}
         onChange={_handleTabChange}
         style={{
@@ -83,30 +92,27 @@ export const TableSchemaEditor = ({ schema }) => {
         <Tab label="Prisma Schema builder" />
         <Tab label="GUI builder" />
         <Tab label="SQL" />
-      </Tabs>
-      <div
-        className="flex h-full overflow-y-auto"
-        // onPointerUp={(e) => e.isPrimary && setResize(false)}
-        // onPointerLeave={(e) => e.isPrimary && setResize(false)}
-        // onPointerMove={(e) => e.isPrimary && handleResize(e)}
+      </Tabs> */}
+      <ResizablePanelGroup
+        direction="horizontal"
+        className="!flex !flex-grow !overflow-y-auto !relative"
+        autoSaveId="table-schema-gui-builder-panel-sizes"
         onPointerDown={(e) => {
           // Required for onPointerLeave to trigger when a touch pointer leaves
           // https://stackoverflow.com/a/70976017/1137077
           e.target.releasePointerCapture(e.pointerId);
         }}
       >
-        <SidePanel width={500} />
-        <div className="relative w-full h-full overflow-hidden">
-          <TableSchemaEditorCanvasContextProvider className="h-full w-full">
+        <ResizablePanel defaultSize={30}>
+          <SidePanel />
+        </ResizablePanel>
+        <ResizableHandle withHandle={true} />
+        <ResizablePanel defaultSize={70}>
+          <TableSchemaEditorCanvasContextProvider className="h-full w-full relative">
             <Canvas />
           </TableSchemaEditorCanvasContextProvider>
-          {/* {!(layout.sidebar || layout.toolbar || layout.header) && (
-            <div className="fixed right-5 bottom-4">
-              <FloatingControls />
-            </div>
-          )} */}
-        </div>
-      </div>
+        </ResizablePanel>
+      </ResizablePanelGroup>
     </div>
   );
 };

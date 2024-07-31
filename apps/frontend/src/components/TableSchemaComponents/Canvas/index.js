@@ -17,6 +17,8 @@ import {
   useTableSchemaEditorTransformState,
 } from "../../../contexts/tableSchemaEditorTransformContext";
 import { useTableSchemaEditorCanvasState } from "../../../contexts/tableSchemaEditorCanvasContext";
+import { useThemeValue } from "../../../contexts/themeContext";
+import { useTheme } from "@mui/material";
 
 export const Canvas = () => {
   const { t } = useTranslation();
@@ -38,7 +40,8 @@ export const Canvas = () => {
   } = useTableSchemaEditorActions();
 
   const { transform } = useTableSchemaEditorTransformState();
-  const { setTransform } = useTableSchemaEditorTransformActions();
+  const { setTableSchemaEditorTransform } =
+    useTableSchemaEditorTransformActions();
 
   const [dragging, setDragging] = useState({
     element: LOCAL_CONSTANTS.TABLE_EDITOR_OBJECT_TYPES.NONE,
@@ -125,7 +128,7 @@ export const Canvas = () => {
       // if (!settings.panning) {
       //   return;
       // }
-      setTransform((prev) => ({
+      setTableSchemaEditorTransform((prev) => ({
         ...prev,
         pan: {
           x:
@@ -181,10 +184,6 @@ export const Canvas = () => {
       default:
         return false;
     }
-  };
-
-  const didResize = (id) => {
-    return;
   };
 
   const didPan = () =>
@@ -326,7 +325,7 @@ export const Canvas = () => {
         // How "eager" the viewport is to
         // center the cursor's coordinates
         const eagernessFactor = 0.05;
-        setTransform((prev) => ({
+        setTableSchemaEditorTransform((prev) => ({
           pan: {
             x:
               prev.pan.x -
@@ -342,7 +341,7 @@ export const Canvas = () => {
           zoom: e.deltaY <= 0 ? prev.zoom * 1.05 : prev.zoom / 1.05,
         }));
       } else if (e.shiftKey) {
-        setTransform((prev) => ({
+        setTableSchemaEditorTransform((prev) => ({
           ...prev,
           pan: {
             ...prev.pan,
@@ -350,7 +349,7 @@ export const Canvas = () => {
           },
         }));
       } else {
-        setTransform((prev) => ({
+        setTableSchemaEditorTransform((prev) => ({
           ...prev,
           pan: {
             x: prev.pan.x + e.deltaX / prev.zoom,
@@ -362,8 +361,7 @@ export const Canvas = () => {
     canvasRef,
     { passive: false }
   );
-
-  const theme = localStorage.getItem("theme");
+  const theme = useTheme();
 
   return (
     <div className="flex-grow h-full touch-none" id="canvas">
@@ -371,7 +369,7 @@ export const Canvas = () => {
         className="w-full h-full"
         style={{
           cursor: pointer.style,
-          backgroundColor: theme === "dark" ? "rgba(22, 22, 26, 1)" : "white",
+          backgroundColor: theme.palette.background.default,
         }}
       >
         <svg className="absolute w-full h-full">
