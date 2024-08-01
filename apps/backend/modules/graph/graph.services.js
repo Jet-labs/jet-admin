@@ -137,9 +137,6 @@ class GraphService {
         const dataset = await graphModel.getProcessedData();
         Logger.log("success", {
           message: "GraphService:getGraphData:graph",
-          params: {
-            dataset,
-          },
         });
         return { ...graph, dataset };
       } else {

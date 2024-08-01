@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getGraphDataByIDAPI } from "../../../api/graphs";
 import { GRAPH_PLUGINS_MAP } from "../../../plugins/graphs";
 
-export const GraphWidgetComponent = ({ id }) => {
+export const GraphWidgetComponent = ({ id, width, height }) => {
   const theme = useTheme();
 
   const {
@@ -28,10 +28,12 @@ export const GraphWidgetComponent = ({ id }) => {
 
   return (
     <div
-      className="rounded !p-3 !w-full"
+      className="rounded"
       style={{
-        background: theme.palette.background.secondary,
-        height: 400,
+        background: theme.palette.background.paper,
+        // height: 400,
+        width: width,
+        height: height,
       }}
     >
       {GRAPH_PLUGINS_MAP[graphType]?.component({

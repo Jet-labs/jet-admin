@@ -34,7 +34,7 @@ export const DashboardAdditionForm = () => {
     retry: false,
     onSuccess: () => {
       displaySuccess("Added dashboard successfully");
-      queryClient.invalidateQueries([`REACT_QUERY_KEY_GRAPH`]);
+      queryClient.invalidateQueries([`REACT_QUERY_KEY_DASHBOARD_LAYOUTS`]);
     },
     onError: (error) => {
       displayError(error);
@@ -43,8 +43,8 @@ export const DashboardAdditionForm = () => {
   const dashboardForm = useFormik({
     initialValues: {
       dashboard_title: "",
-      graph_ids: [],
-      layout: [],
+      widgets: [],
+      layouts: [],
     },
     validateOnMount: false,
     validateOnChange: false,
@@ -72,13 +72,13 @@ export const DashboardAdditionForm = () => {
           style={{ background: theme.palette.divider }}
         >
           <DashboardDropZoneComponent
-            graphIDData={dashboardForm.values["graph_ids"]}
-            setGraphIDData={(value) =>
-              dashboardForm.setFieldValue("graph_ids", value)
+            widgets={dashboardForm.values["widgets"]}
+            setWidgets={(value) =>
+              dashboardForm.setFieldValue("widgets", value)
             }
-            layout={dashboardForm.values["layout"]}
-            setLayout={(value) => {
-              dashboardForm.setFieldValue("layout", value);
+            layouts={dashboardForm.values["layouts"]}
+            setLayouts={(value) => {
+              dashboardForm.setFieldValue("layouts", value);
             }}
           />
         </ResizablePanel>

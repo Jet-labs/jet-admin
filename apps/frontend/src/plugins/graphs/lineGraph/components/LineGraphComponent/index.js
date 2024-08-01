@@ -85,7 +85,7 @@ export const LineGraphComponent = ({
   const theme = useTheme();
   const options = useMemo(() => {
     return {
-      responsive: true,
+      maintainAspectRatio: false,
       elements: {
         bar: {
           borderWidth: 2,
@@ -119,5 +119,5 @@ export const LineGraphComponent = ({
     };
   }, [legendPosition, titleDisplayEnabled, graphTitle]);
 
-  return <Line options={options} data={data ? data : demoData} />;
+  return <Line redraw={true} options={options} data={data ? data : demoData} />;
 };

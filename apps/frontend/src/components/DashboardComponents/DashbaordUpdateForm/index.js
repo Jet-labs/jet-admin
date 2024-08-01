@@ -57,8 +57,8 @@ export const DashboardUpdateForm = ({ id }) => {
   const dashboardForm = useFormik({
     initialValues: {
       dashboard_title: "",
-      graph_ids: [],
-      layout: [],
+      widgets: [],
+      layouts: [],
     },
     validateOnMount: false,
     validateOnChange: false,
@@ -89,10 +89,13 @@ export const DashboardUpdateForm = ({ id }) => {
         dashboard.dashboard_description
       );
       dashboardForm.setFieldValue(
-        "graph_ids",
-        dashboard.dashboard_options.graph_ids
+        "widgets",
+        dashboard.dashboard_options.widgets
       );
-      dashboardForm.setFieldValue("layout", dashboard.dashboard_options.layout);
+      dashboardForm.setFieldValue(
+        "layouts",
+        dashboard.dashboard_options.layouts
+      );
     }
   }, [dashboard]);
 
@@ -111,13 +114,13 @@ export const DashboardUpdateForm = ({ id }) => {
           // style={{ background: theme.palette.divider }}
         >
           <DashboardDropZoneComponent
-            graphIDData={dashboardForm.values["graph_ids"]}
-            layout={dashboardForm.values["layout"]}
-            setGraphIDData={(value) =>
-              dashboardForm.setFieldValue("graph_ids", value)
+            widgets={dashboardForm.values["widgets"]}
+            setWidgets={(value) =>
+              dashboardForm.setFieldValue("widgets", value)
             }
-            setLayout={(value) => {
-              dashboardForm.setFieldValue("layout", value);
+            layouts={dashboardForm.values["layouts"]}
+            setLayouts={(value) => {
+              dashboardForm.setFieldValue("layouts", value);
             }}
           />
         </ResizablePanel>

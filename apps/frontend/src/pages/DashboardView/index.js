@@ -53,9 +53,9 @@ const DashboardView = () => {
       )}
       {dashboard && (
         <DashboardViewComponent
-          graphIDData={
+          widgets={
             dashboard.dashboard_options
-              ? dashboard.dashboard_options.graph_ids
+              ? dashboard.dashboard_options.widgets
               : null
           }
         />

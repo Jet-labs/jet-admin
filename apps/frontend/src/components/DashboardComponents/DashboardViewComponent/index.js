@@ -2,9 +2,9 @@ import { Grid, useTheme } from "@mui/material";
 import React from "react";
 import { GraphWidgetComponent } from "../../GraphComponents/GraphWidgetComponent";
 import GridLayout from "react-grid-layout";
-export const DashboardViewComponent = ({ graphIDData, layout }) => {
+export const DashboardViewComponent = ({ widgets, layout }) => {
   const theme = useTheme();
-  console.log("here", graphIDData);
+
   return (
     <div className="w-full h-full p-2">
       <GridLayout
@@ -14,11 +14,15 @@ export const DashboardViewComponent = ({ graphIDData, layout }) => {
         rowHeight={30}
         width={1200}
       >
-        {graphIDData.map((graph, index) => {
+        {widgets.map((widget, index) => {
+          const widget_type = String(widget).split("_")[0];
+          const widget_id = parseInt(String(widget).split("_")[1]);
           return (
-            <div className="!p-1 !h-fit !bg-black" key={graph}>
+            <div className="!p-1 !h-fit !bg-black" key={widget}>
               <div className="!flex-row justify-center !items-center !w-full">
-                <GraphWidgetComponent id={graph.graphID} />
+                {widget_type === "graph" && (
+                  <GraphWidgetComponent id={widget_id} />
+                )}
               </div>
             </div>
           );
