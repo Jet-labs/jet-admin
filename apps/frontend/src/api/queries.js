@@ -116,6 +116,24 @@ export const runQueryAPI = async ({ pm_query_type, pm_query }) => {
   }
 };
 
+export const runQueryByIDAPI = async ({ pm_query_id }) => {
+  try {
+    const response = await axiosInstance.get(
+      LOCAL_CONSTANTS.APIS.QUERY.runQueryByID({ id: pm_query_id })
+    );
+    if (response.data && response.data.success == true) {
+      return response.data.data;
+    } else if (response.data.error) {
+      console.log(response.data.error);
+      throw response.data.error;
+    } else {
+      throw LOCAL_CONSTANTS.ERROR_CODES.SERVER_ERROR;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const duplicateQueryAPI = async ({ pmQueryID }) => {
   try {
     const response = await axiosInstance.post(

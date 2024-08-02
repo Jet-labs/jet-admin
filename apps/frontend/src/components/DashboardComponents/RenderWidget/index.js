@@ -7,6 +7,7 @@ import "react-resizable/css/styles.css";
 import { useComponentSize } from "../../../hooks/use-component-size";
 import { GraphWidgetComponent } from "../../GraphComponents/GraphWidgetComponent";
 import "./styles.css";
+import { QueryWidgetComponent } from "../../QueryComponents/QueryWidgetComponent";
 
 export const RenderWidget = ({
   widget,
@@ -79,6 +80,13 @@ export const RenderWidget = ({
       >
         {widget_type === "graph" && (
           <GraphWidgetComponent
+            id={widget_id}
+            height={size.height}
+            width={size.width}
+          />
+        )}
+        {widget_type === "query" && (
+          <QueryWidgetComponent
             id={widget_id}
             height={size.height}
             width={size.width}

@@ -30,6 +30,13 @@ router.post(
   queryController.duplicateQuery
 );
 router.get(
+  "/:id/runner",
+  authMiddleware.authProvider,
+  policyMiddleware.populateAuthorizationPolicies,
+  queryAuthorizationMiddleware.populateAuthorizedQueriesForRead,
+  queryController.runQueryByID
+);
+router.get(
   "/:id",
   authMiddleware.authProvider,
   policyMiddleware.populateAuthorizationPolicies,

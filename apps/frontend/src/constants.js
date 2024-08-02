@@ -273,6 +273,7 @@ export const LOCAL_CONSTANTS = {
     QUERY: {
       getAllQueries: () => `/admin_api/queries`,
       runQuery: () => `/admin_api/queries/runner`,
+      runQueryByID: ({ id }) => `/admin_api/queries/${id}/runner`,
       getQueryByID: ({ id }) => `/admin_api/queries/${id}`,
       addQuery: () => `/admin_api/queries`,
       duplicateQuery: () => `/admin_api/queries/duplicate`,

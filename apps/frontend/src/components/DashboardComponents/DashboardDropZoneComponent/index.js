@@ -65,6 +65,7 @@ export const DashboardDropZoneComponent = ({
         compactType={compactType}
         preventCollision={!compactType}
         onLayoutChange={onLayoutChange}
+        resizeHandles={["ne", "se", "nw", "sw"]}
         // onBreakpointChange={onBreakpointChange}
         onDrop={onDrop}
         isDroppable

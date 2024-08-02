@@ -23,6 +23,7 @@ export const DashboardViewComponent = ({ widgets, layouts }) => {
         preventCollision={!compactType}
         isDraggable={false}
         isResizable={false}
+        resizeHandles={[]}
       >
         {widgets.map((widget, index) => {
           return (
