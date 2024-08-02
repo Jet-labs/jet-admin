@@ -214,6 +214,7 @@ export const LOCAL_CONSTANTS = {
     },
     TABLE: {
       getAllTables: () => `/admin_api/tables`,
+      runSchemaQuery: () => `/admin_api/tables`,
       getAuthorizedColumnsForRead: ({ tableName }) =>
         `/admin_api/tables/${tableName}/read_columns`,
       getAuthorizedColumnsForEdit: ({ tableName }) =>

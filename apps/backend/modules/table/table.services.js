@@ -1,3 +1,4 @@
+const { Prisma } = require("@prisma/client");
 const { prisma } = require("../../config/prisma");
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
@@ -112,6 +113,37 @@ class TableService {
     }
   };
 
+  /**
+   *
+   * @param {object} param0
+   * @param {JSON} param0.schemaQuery
+   * @returns {any|null}
+   */
+  static runSchemaQuery = async ({ schemaQuery }) => {
+    Logger.log("info", {
+      message: "TableService:runSchemaQuery:params",
+      params: { schemaQuery },
+    });
+    try {
+      const result = await prisma.$queryRaw`${Prisma.raw(
+        schemaQuery.raw_query
+      )}`;
+
+      Logger.log("info", {
+        message: "TableService:runSchemaQuery:query",
+        params: {
+          result,
+        },
+      });
+      return result;
+    } catch (error) {
+      Logger.log("error", {
+        message: "TableService:runSchemaQuery:catch-1",
+        params: { error },
+      });
+      throw error;
+    }
+  };
   /**
    *
    * @param {object} param0

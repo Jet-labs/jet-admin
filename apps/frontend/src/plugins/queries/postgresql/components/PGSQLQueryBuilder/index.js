@@ -62,7 +62,7 @@ export const PGSQLQueryBuilder = ({ pmQueryID, value, handleChange }) => {
     <ResizablePanelGroup
       direction="vertical"
       autoSaveId="pg-query-builder-form-panel-sizes"
-      className="!flex flex-col justify-start items-stretch w-100 "
+      className="!flex flex-col justify-start items-stretch w-100"
     >
       <ResizablePanel defaultSize={40} className="px-3">
         <div className="w-100 ">
