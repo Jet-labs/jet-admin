@@ -35,7 +35,7 @@ const DashboardView = () => {
     <div className="w-full h-full flex flex-col justify-start items-stretch">
       {dashboard && (
         <div
-          className="w-full flex flex-row justify-between items-center px-4 py-2 pb-0 flex-shrink"
+          className="w-full flex flex-row justify-between items-center px-4 py-2 flex-shrink"
           style={{ background: theme.palette.background.default }}
         >
           <span
@@ -56,6 +56,11 @@ const DashboardView = () => {
           widgets={
             dashboard.dashboard_options
               ? dashboard.dashboard_options.widgets
+              : null
+          }
+          layouts={
+            dashboard.dashboard_options
+              ? dashboard.dashboard_options.layouts
               : null
           }
         />

@@ -17,6 +17,7 @@ import { useAuthState } from "../../../contexts/authContext";
 import { GRAPH_PLUGINS_MAP } from "../../../plugins/graphs";
 import "./styles.css";
 import { LOCAL_CONSTANTS } from "../../../constants";
+
 export const GraphsDnDList = ({}) => {
   const theme = useTheme();
   const { pmUser } = useAuthState();
@@ -36,7 +37,7 @@ export const GraphsDnDList = ({}) => {
   });
 
   const _handleDragStart = (e) => {
-    e.dataTransfer.setData("text", e.currentTarget.id);
+    e.dataTransfer.setData("widget", `${e.currentTarget.id}-${Date.now()}`);
   };
 
   return (
@@ -57,8 +58,8 @@ export const GraphsDnDList = ({}) => {
             : null;
           return (
             <ListItem
-              key={`graph_${graph.pm_graph_id}`}
-              id={`graph_${graph.pm_graph_id}`}
+              key={key}
+              id={key}
               disablePadding
               draggable={true}
               onDragStart={_handleDragStart}

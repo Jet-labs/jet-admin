@@ -1,33 +1,37 @@
 import { Grid, useTheme } from "@mui/material";
 import React from "react";
-import { GraphWidgetComponent } from "../../GraphComponents/GraphWidgetComponent";
-import GridLayout from "react-grid-layout";
-export const DashboardViewComponent = ({ widgets, layout }) => {
+import { Responsive, WidthProvider } from "react-grid-layout";
+import "react-grid-layout/css/styles.css";
+import "react-resizable/css/styles.css";
+import { RenderWidget } from "../RenderWidget";
+const ResponsiveReactGridLayout = WidthProvider(Responsive);
+export const DashboardViewComponent = ({ widgets, layouts }) => {
   const theme = useTheme();
-
+  const compactType = "verticle";
   return (
-    <div className="w-full h-full p-2">
-      <GridLayout
-        className="layout"
-        layout={layout}
-        cols={12}
-        rowHeight={30}
-        width={1200}
+    <div
+      className="w-full h-full p-2 overflow-y-scroll pb-10"
+      style={{ background: theme.palette.background.paper }}
+    >
+      <ResponsiveReactGridLayout
+        style={{ background: "transparent", minHeight: 300 }}
+        layouts={layouts}
+        // measureBeforeMount={false}
+        cols={{ lg: 5, md: 4, sm: 3, xs: 2, xxs: 1 }}
+        rowHeight={300}
+        compactType={compactType}
+        preventCollision={!compactType}
+        isDraggable={false}
+        isResizable={false}
       >
         {widgets.map((widget, index) => {
-          const widget_type = String(widget).split("_")[0];
-          const widget_id = parseInt(String(widget).split("_")[1]);
           return (
-            <div className="!p-1 !h-fit !bg-black" key={widget}>
-              <div className="!flex-row justify-center !items-center !w-full">
-                {widget_type === "graph" && (
-                  <GraphWidgetComponent id={widget_id} />
-                )}
-              </div>
+            <div key={widget} className="">
+              <RenderWidget responsive={false} widget={widget} index={index} />
             </div>
           );
         })}
-      </GridLayout>
+      </ResponsiveReactGridLayout>
     </div>
   );
 };
