@@ -1,5 +1,5 @@
 import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { customDarkTheme, customLightTheme } from "../theme";
 const ThemeValueContext = React.createContext(undefined);
 const ThemeActionContext = React.createContext(undefined);
@@ -9,12 +9,17 @@ const themeMap = {
   dark: customDarkTheme,
 };
 const ThemeContextProvider = ({ children }) => {
-  const [themeType, setThemeType] = useState("light");
+  const [themeType, setThemeType] = useState(
+    localStorage.getItem("jet-theme") ?? "light"
+  );
+
   const toggleTheme = () => {
     if (themeType === "light") {
       setThemeType("dark");
+      localStorage.setItem("jet-theme", "dark");
     } else {
       setThemeType("light");
+      localStorage.setItem("jet-theme", "light");
     }
   };
 

@@ -61,7 +61,7 @@ export const PGSQLSchemaBuilder = ({}) => {
   return (
     <ResizablePanelGroup
       direction="vertical"
-      autoSaveId="pg-query-builder-form-panel-sizes"
+      autoSaveId="pg-schema-query-builder-form-panel-sizes"
       className="!flex flex-col justify-start items-stretch w-100"
     >
       <ResizablePanel defaultSize={40} className="px-3">
