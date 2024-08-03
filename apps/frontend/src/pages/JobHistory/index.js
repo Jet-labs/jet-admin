@@ -68,7 +68,7 @@ const JobHistory = () => {
       headerName: "Created at",
       width: 300,
       valueGetter: (value, row) => {
-        return moment(value).format("dddd, MMMM Do YYYY, h:mm:ss a");
+        return moment(value.value).format("dddd, MMMM Do YYYY, h:mm:ss a");
       },
       renderCell: (params) => {
         return (
@@ -105,7 +105,7 @@ const JobHistory = () => {
   ];
 
   return (
-    <div>
+    <div className="flex flex-col justify-start items-stretch w-full h-full !overflow-y-auto !overflow-x-auto">
       <div className={`!w-full !p-4`}>
         <RawDataGridStatistics
           tableName={tableName}

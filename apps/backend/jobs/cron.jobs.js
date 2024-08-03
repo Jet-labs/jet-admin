@@ -40,7 +40,6 @@ class CustomCronJobScheduler {
       data: {
         pm_job_id: pmJob.pm_job_id,
         history_result: result,
-        created_at: Date.now(),
       },
     });
     Logger.log("info", {
