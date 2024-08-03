@@ -69,8 +69,9 @@ export const PieGraphComponent = ({
       maintainAspectRatio: false,
       responsive: true,
       elements: {
-        bar: {
+        pie: {
           borderWidth: 2,
+          padding: 20,
         },
       },
       plugins: {
@@ -89,7 +90,5 @@ export const PieGraphComponent = ({
     };
   }, [legendPosition, titleDisplayEnabled, graphTitle]);
 
-  return (
-    <Pie options={options} height={"300 px"} data={data ? data : demoData} />
-  );
+  return <Pie options={options} data={data ? data : demoData} />;
 };

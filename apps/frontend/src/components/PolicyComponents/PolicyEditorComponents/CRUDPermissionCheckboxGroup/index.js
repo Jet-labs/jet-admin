@@ -1,10 +1,24 @@
 import { Checkbox, Grid } from "@mui/material";
 
-export const CRUDPermissionCheckboxGroup = ({ label, value, handleChange }) => {
+export const CRUDPermissionCheckboxGroup = ({
+  label,
+  value,
+  handleChange,
+  permissionKeys,
+}) => {
   const _handleChange = (_value, checked) => {
     handleChange({ ...value, [_value]: checked });
   };
 
+  const _permissionKeys = permissionKeys
+    ? permissionKeys
+    : Object.keys({
+        add: false,
+        edit: false,
+        delete: false,
+        read: false,
+        ...value,
+      });
   return (
     <Grid container>
       {label && (
@@ -20,13 +34,7 @@ export const CRUDPermissionCheckboxGroup = ({ label, value, handleChange }) => {
           {label}
         </Grid>
       )}
-      {Object.keys({
-        add: false,
-        edit: false,
-        delete: false,
-        read: false,
-        ...value,
-      }).map((_value) => {
+      {_permissionKeys?.map((_value) => {
         return (
           <Grid
             item

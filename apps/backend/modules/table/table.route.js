@@ -30,13 +30,6 @@ router.get(
   tableController.getAllTablesForRead
 );
 
-// TODO : add schema level authorization
-router.put(
-  "/",
-  authMiddleware.authProvider,
-  policyMiddleware.populateAuthorizationPolicies,
-  tableController.runSchemaQuery
-);
 
 router.get(
   "/:table_name/read_columns",

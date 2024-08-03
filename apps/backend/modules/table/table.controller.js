@@ -7,48 +7,6 @@ const { TableService } = require("./table.services");
 
 const tableController = {};
 
-/**
- *
- * @param {import("express").Request} req
- * @param {import("express").Response} res
- * @returns
- */
-tableController.runSchemaQuery = async (req, res) => {
-  try {
-    Logger.log("info", {
-      message: "tableController:runSchemaQuery:init",
-    });
-    const { pmUser, state, body } = req;
-    const pm_user_id = parseInt(pmUser.pm_user_id);
-    const authorization_policy = state.authorization_policy;
-
-    Logger.log("info", {
-      message: "tableController:runSchemaQuery:params",
-      params: {
-        pm_user_id,
-      },
-    });
-    const result = await TableService.runSchemaQuery({
-      schemaQuery: body.schema_query,
-    });
-    Logger.log("info", {
-      message: "tableController:runSchemaQuery:rows",
-      params: {
-        pm_user_id,
-      },
-    });
-    return res.json({
-      success: true,
-      result,
-    });
-  } catch (error) {
-    Logger.log("error", {
-      message: "tableController:runSchemaQuery:catch-1",
-      params: { error },
-    });
-    return res.json({ success: false, error: extractError(error) });
-  }
-};
 
 /**
  *

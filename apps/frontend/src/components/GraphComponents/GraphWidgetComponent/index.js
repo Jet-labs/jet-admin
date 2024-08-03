@@ -28,7 +28,7 @@ export const GraphWidgetComponent = ({ id, width, height }) => {
 
   return (
     <div
-      className="rounded"
+      className="rounded !p-4"
       style={{
         background: theme.palette.background.default,
         // height: 400,

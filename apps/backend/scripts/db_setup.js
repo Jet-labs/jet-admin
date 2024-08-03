@@ -55,6 +55,10 @@ const create_super_admin_policy = () => {
       read: true,
       delete: true,
     };
+    policy.schemas = {
+      edit: true,
+      read: true,
+    };
     return policy;
   } catch (error) {
     Logger.log("error", {
@@ -118,6 +122,10 @@ const create_read_admin_policy = () => {
       edit: false,
       read: true,
       delete: false,
+    };
+    policy.schemas = {
+      edit: false,
+      read: true,
     };
     return policy;
   } catch (error) {

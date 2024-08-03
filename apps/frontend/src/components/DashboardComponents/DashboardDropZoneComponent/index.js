@@ -6,6 +6,7 @@ import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import "./styles.css";
 import { RenderWidget } from "../RenderWidget";
+import { cloneDeep } from "lodash";
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
 export const DashboardDropZoneComponent = ({
@@ -38,20 +39,26 @@ export const DashboardDropZoneComponent = ({
     const widget = _ev.dataTransfer.getData("widget");
     const widget_type = String(widget).split("_")[0];
     const widget_id = parseInt(String(widget).split("_")[1]);
-    console.log(`Data retrieved: ${widget_id}`);
-    console.log({ layout, layoutItem, widget_id, layouts });
     const _widgets = [...widgets, widget];
     setWidgets(_widgets);
-    const _layouts = layouts;
-
+    const _layouts = cloneDeep(layouts);
+    let element = null;
     Object.keys(layouts).forEach((breakpoint, index) => {
       console.log({ br: breakpoint, b: _layouts[breakpoint] });
-      _layouts[breakpoint].push?.({ ...layoutItem, i: widget });
+      const _index = _layouts[breakpoint].findIndex(
+        (item) => item.i === "__dropping-elem__"
+      );
+
+      if (_index !== -1) {
+        element = { ..._layouts[breakpoint][_index] };
+        _layouts[breakpoint].splice(_index, 1);
+      }
+      _layouts[breakpoint].push({ ...element, i: widget });
     });
-    console.log({ _layouts });
-    setLayouts({ ..._layouts });
+
+    setLayouts(_layouts);
   };
-  const compactType = "verticle";
+  // const compactType = "verticle";
   return (
     <div
       className="w-full h-full p-2 min-h-full overflow-y-scroll"
@@ -62,8 +69,8 @@ export const DashboardDropZoneComponent = ({
         style={{ background: "transparent", minHeight: 300 }}
         layouts={layouts}
         measureBeforeMount={false}
-        compactType={compactType}
-        preventCollision={!compactType}
+        // compactType={compactType}
+        // preventCollision={!compactType}
         onLayoutChange={onLayoutChange}
         resizeHandles={["ne", "se", "nw", "sw"]}
         // onBreakpointChange={onBreakpointChange}

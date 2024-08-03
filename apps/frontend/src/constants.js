@@ -212,9 +212,10 @@ export const LOCAL_CONSTANTS = {
       refreshAccessToken: () => `/admin_api/auth/refresh_access_token`,
       getSelf: () => "/admin_api/auth/me",
     },
+    SCHEMA: { runSchemaQuery: () => `/admin_api/schemas` },
     TABLE: {
       getAllTables: () => `/admin_api/tables`,
-      runSchemaQuery: () => `/admin_api/tables`,
+
       getAuthorizedColumnsForRead: ({ tableName }) =>
         `/admin_api/tables/${tableName}/read_columns`,
       getAuthorizedColumnsForEdit: ({ tableName }) =>

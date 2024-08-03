@@ -88,8 +88,8 @@ export const RenderWidget = ({
         {widget_type === "query" && (
           <QueryWidgetComponent
             id={widget_id}
-            height={size.height}
-            width={size.width}
+            height={size?.height}
+            width={size?.width}
           />
         )}
       </div>

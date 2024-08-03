@@ -14,6 +14,7 @@ expressApp.use(
   require("./modules/appConstants/appConstants.route")
 );
 
+expressApp.use("/admin_api/schemas", require("./modules/schema/schema.route"));
 expressApp.use("/admin_api/tables", require("./modules/table/table.route"));
 expressApp.use(
   "/admin_api/accounts",

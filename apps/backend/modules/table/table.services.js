@@ -116,37 +116,6 @@ class TableService {
   /**
    *
    * @param {object} param0
-   * @param {JSON} param0.schemaQuery
-   * @returns {any|null}
-   */
-  static runSchemaQuery = async ({ schemaQuery }) => {
-    Logger.log("info", {
-      message: "TableService:runSchemaQuery:params",
-      params: { schemaQuery },
-    });
-    try {
-      const result = await prisma.$queryRaw`${Prisma.raw(
-        schemaQuery.raw_query
-      )}`;
-
-      Logger.log("info", {
-        message: "TableService:runSchemaQuery:query",
-        params: {
-          result,
-        },
-      });
-      return result;
-    } catch (error) {
-      Logger.log("error", {
-        message: "TableService:runSchemaQuery:catch-1",
-        params: { error },
-      });
-      throw error;
-    }
-  };
-  /**
-   *
-   * @param {object} param0
    * @param {String} param0.table_name
    * @param {Array<any>} param0.authorized_rows
    * @param {JSON} param0.qJSON

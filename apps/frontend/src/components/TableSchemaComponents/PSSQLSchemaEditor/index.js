@@ -7,7 +7,7 @@ import CodeMirror from "@uiw/react-codemirror";
 import { default as React, useState } from "react";
 import "react-data-grid/lib/styles.css";
 
-import { runSchemaQueryAPI } from "../../../api/tables";
+import { runSchemaQueryAPI } from "../../../api/schemas";
 
 import {
   ResizableHandle,

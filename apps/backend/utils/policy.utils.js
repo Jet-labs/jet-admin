@@ -531,4 +531,42 @@ policyUtils.extractAuthorizationForAppConstantAddFromPolicyObject = ({
   return false;
 };
 
+policyUtils.extractAuthorizedSchemasForReadFromPolicyObject = ({
+  policyObject,
+}) => {
+  const authorizeSchemaIDs = [];
+  if (policyObject.schemas?.read) {
+    return true;
+  } else if (policyObject.schemas && policyObject.schemas.schema_ids) {
+    Object.keys(policyObject.schemas.schema_ids).forEach((schema_id) => {
+      if (
+        policyObject.schemas.schema_ids[schema_id].read ||
+        policyObject.schemas.schema_ids[schema_id] === true
+      ) {
+        authorizeSchemaIDs.push(parseInt(schema_id));
+      }
+    });
+  }
+  return authorizeSchemaIDs;
+};
+
+policyUtils.extractAuthorizedSchemasForUpdateFromPolicyObject = ({
+  policyObject,
+}) => {
+  const authorizeSchemaIDs = [];
+  if (policyObject.schemas?.edit) {
+    return true;
+  } else if (policyObject.schemas && policyObject.schemas.schema_ids) {
+    Object.keys(policyObject.schemas.schema_ids).forEach((schema_id) => {
+      if (
+        policyObject.schemas.schema_ids[schema_id].edit ||
+        policyObject.schemas.schema_ids[schema_id] === true
+      ) {
+        authorizeSchemaIDs.push(parseInt(schema_id));
+      }
+    });
+  }
+  return authorizeSchemaIDs;
+};
+
 module.exports = { policyUtils };
