@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import { BiLogInCircle, BiMenu } from "react-icons/bi";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
 import { LOCAL_CONSTANTS } from "../../constants";
 import { useAuthActions, useAuthState } from "../../contexts/authContext";
@@ -76,36 +76,31 @@ export const Navbar = ({ children, handleDrawerOpen }) => {
                 ? internalAppConstants.APP_NAME.value
                 : LOCAL_CONSTANTS.APP_NAME}
             </span>
-            <span
-              className="font-bold normal-case mx-3 "
-              style={{
-                color: theme.palette.primary.contrastText,
-                fontSize: 10,
-              }}
-            >
-              Version : {LOCAL_CONSTANTS.APP_VERSION}
-            </span>
           </div>
         </div>
 
         <div className="!flex-row justify-end items-center">
-          <Button
+          <a
+            href={LOCAL_CONSTANTS.DOC_LINK}
+            target="_blank"
+            className="!text-sm !font-semibold !mr-3"
+          >
+            Docs
+          </a>
+          <IconButton
             variant="outlined"
             className={`!p-0 !mr-3 !rounded-3xl !capitalize ${
               themeType === "dark" ? "!border-amber-500 !text-amber-500" : ""
             }`}
             onClick={toggleTheme}
             size="small"
-            startIcon={
-              themeType === "dark" ? (
-                <IoSunnySharp className="!text-xl"></IoSunnySharp>
-              ) : (
-                <MdDarkMode className="!text-xl"></MdDarkMode>
-              )
-            }
           >
-            {themeType === "dark" ? "Light theme" : "Dark theme"}
-          </Button>
+            {themeType === "dark" ? (
+              <IoSunnySharp className="!text-xl"></IoSunnySharp>
+            ) : (
+              <MdDarkMode className="!text-xl"></MdDarkMode>
+            )}
+          </IconButton>
           <IconButton
             className="!p-0"
             onClick={_handleProfileClick}

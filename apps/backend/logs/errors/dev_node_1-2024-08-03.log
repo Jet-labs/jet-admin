@@ -63,3 +63,66 @@
 [31merror[39m: dev_node_1: 03-08-2024 16:25:54: [31mschemaController:runSchemaQuery:catch-1[39m |====| {"error":{"code":"PERMISSION_DENIED","message":"Permission denied"}}
 [31merror[39m: dev_node_1: 03-08-2024 16:31:39: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-08-03T11:01:28.000Z"}}
 [31merror[39m: dev_node_1: 03-08-2024 16:31:39: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 03-08-2024 16:47:05: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-08-03T11:16:39.000Z"}}
+[31merror[39m: dev_node_1: 03-08-2024 16:47:05: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 03-08-2024 16:47:05: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-08-03T11:16:39.000Z"}}
+[31merror[39m: dev_node_1: 03-08-2024 16:47:05: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 03-08-2024 16:47:05: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-08-03T11:16:39.000Z"}}
+[31merror[39m: dev_node_1: 03-08-2024 16:47:05: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 03-08-2024 16:47:05: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-08-03T11:16:39.000Z"}}
+[31merror[39m: dev_node_1: 03-08-2024 16:47:05: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 03-08-2024 16:47:05: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-08-03T11:16:39.000Z"}}
+[31merror[39m: dev_node_1: 03-08-2024 16:47:05: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 03-08-2024 17:29:51: [31mwriteToSQlFile:catch-1[39m |====| {"error":{"code":"ERR_INVALID_ARG_TYPE"}}
+[31merror[39m: dev_node_1: 03-08-2024 17:29:58: [31mwriteToSQlFile:catch-1[39m |====| {"error":{"code":"ERR_INVALID_ARG_TYPE"}}
+[31merror[39m: dev_node_1: 03-08-2024 17:30:21: [31mwriteToSQlFile:catch-1[39m |====| {"error":{"code":"ERR_INVALID_ARG_TYPE"}}
+[31merror[39m: dev_node_1: 03-08-2024 17:31:02: [31mwriteToSQlFile:catch-1[39m |====| {"error":{"code":"ERR_INVALID_ARG_TYPE"}}
+[31merror[39m: dev_node_1: 03-08-2024 17:31:17: [31mwriteToSQlFile:catch-1[39m |====| {"error":{"code":"ERR_INVALID_ARG_TYPE"}}
+[31merror[39m: dev_node_1: 03-08-2024 17:31:28: [31mwriteToSQlFile:catch-1[39m |====| {"error":{"code":"ERR_INVALID_ARG_TYPE"}}
+[31merror[39m: dev_node_1: 03-08-2024 17:32:24: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-08-03T11:32:05.000Z"}}
+[31merror[39m: dev_node_1: 03-08-2024 17:32:24: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 03-08-2024 17:32:24: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-08-03T11:32:05.000Z"}}
+[31merror[39m: dev_node_1: 03-08-2024 17:32:24: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 03-08-2024 17:32:24: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-08-03T11:32:05.000Z"}}
+[31merror[39m: dev_node_1: 03-08-2024 17:32:24: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 03-08-2024 17:34:54: [31mwriteToSQlFile:catch-1[39m |====| {"error":{"code":"ERR_INVALID_ARG_TYPE"}}
+[31merror[39m: dev_node_1: 03-08-2024 17:34:54: [31mschemaController:getSchema:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 03-08-2024 17:35:49: [31mwriteToSQlFile:catch-1[39m |====| {"error":{"code":"ERR_INVALID_ARG_TYPE"}}
+[31merror[39m: dev_node_1: 03-08-2024 17:35:49: [31mschemaController:getSchema:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 03-08-2024 17:36:01: [31mwriteToSQlFile:catch-1[39m |====| {"error":{"code":"ERR_INVALID_ARG_TYPE"}}
+[31merror[39m: dev_node_1: 03-08-2024 17:36:01: [31mschemaController:getSchema:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 03-08-2024 17:36:03: [31mwriteToSQlFile:catch-1[39m |====| {"error":{"code":"ERR_INVALID_ARG_TYPE"}}
+[31merror[39m: dev_node_1: 03-08-2024 17:36:03: [31mschemaController:getSchema:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 03-08-2024 17:36:07: [31mwriteToSQlFile:catch-1[39m |====| {"error":{"code":"ERR_INVALID_ARG_TYPE"}}
+[31merror[39m: dev_node_1: 03-08-2024 17:36:07: [31mschemaController:getSchema:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 03-08-2024 17:36:23: [31mwriteToSQlFile:catch-1[39m |====| {"error":{"code":"ERR_INVALID_ARG_TYPE"}}
+[31merror[39m: dev_node_1: 03-08-2024 17:36:23: [31mschemaController:getSchema:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 03-08-2024 17:36:58: [31mwriteToSQlFile:catch-1[39m |====| {"error":{"code":"ERR_INVALID_ARG_TYPE"}}
+[31merror[39m: dev_node_1: 03-08-2024 17:36:58: [31mschemaController:getSchema:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 03-08-2024 17:37:01: [31mwriteToSQlFile:catch-1[39m |====| {"error":{"code":"ERR_INVALID_ARG_TYPE"}}
+[31merror[39m: dev_node_1: 03-08-2024 17:37:01: [31mschemaController:getSchema:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 03-08-2024 17:37:38: [31mwriteToSQlFile:catch-1[39m |====| {"error":{"code":"ERR_INVALID_ARG_TYPE"}}
+[31merror[39m: dev_node_1: 03-08-2024 17:37:38: [31mschemaController:getSchema:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 03-08-2024 17:37:47: [31mwriteToSQlFile:catch-1[39m |====| {"error":{"code":"ERR_INVALID_ARG_TYPE"}}
+[31merror[39m: dev_node_1: 03-08-2024 17:37:47: [31mschemaController:getSchema:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 03-08-2024 17:37:58: [31mwriteToSQlFile:catch-1[39m |====| {"error":{"code":"ERR_INVALID_ARG_TYPE"}}
+[31merror[39m: dev_node_1: 03-08-2024 17:37:58: [31mschemaController:getSchema:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 03-08-2024 17:38:46: [31mschemaController:getSchema:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 03-08-2024 17:38:53: [31mschemaController:getSchema:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 03-08-2024 17:38:55: [31mschemaController:getSchema:catch-1[39m |====| {"error":{}}
+[31merror[39m: dev_node_1: 03-08-2024 17:47:31: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-08-03T12:17:24.000Z"}}
+[31merror[39m: dev_node_1: 03-08-2024 17:47:31: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 03-08-2024 17:47:31: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-08-03T12:17:24.000Z"}}
+[31merror[39m: dev_node_1: 03-08-2024 17:47:31: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 03-08-2024 17:47:31: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-08-03T12:17:24.000Z"}}
+[31merror[39m: dev_node_1: 03-08-2024 17:47:31: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 03-08-2024 17:47:31: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-08-03T12:17:24.000Z"}}
+[31merror[39m: dev_node_1: 03-08-2024 17:47:31: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 03-08-2024 18:03:14: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-08-03T12:32:31.000Z"}}
+[31merror[39m: dev_node_1: 03-08-2024 18:03:14: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 03-08-2024 18:03:14: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-08-03T12:32:31.000Z"}}
+[31merror[39m: dev_node_1: 03-08-2024 18:03:14: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 03-08-2024 18:03:14: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-08-03T12:32:31.000Z"}}
+[31merror[39m: dev_node_1: 03-08-2024 18:03:14: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}
+[31merror[39m: dev_node_1: 03-08-2024 18:03:14: [31mAuthService:verifyAccessToken:catch-1[39m |====| {"error":{"name":"TokenExpiredError","message":"jwt expired","expiredAt":"2024-08-03T12:32:31.000Z"}}
+[31merror[39m: dev_node_1: 03-08-2024 18:03:14: [31mauthMiddleware:catch-2[39m |====| {"error":{"code":"USER_AUTH_TOKEN_EXPIRED","message":"User auth token expired"}}

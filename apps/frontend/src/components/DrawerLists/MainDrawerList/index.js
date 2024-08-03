@@ -119,6 +119,15 @@ export const MainDrawerList = ({ currentPageTitle }) => {
           </Link>
         );
       })}
+      <span
+        className="font-bold normal-case absolute bottom-0 py-2 px-0 text-center w-full"
+        style={{
+          color: theme.palette.primary.contrastText,
+          fontSize: 10,
+        }}
+      >
+        Version : {LOCAL_CONSTANTS.APP_VERSION}
+      </span>
     </List>
   );
 };

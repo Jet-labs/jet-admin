@@ -3,14 +3,17 @@ import CodeMirror, { useCodeMirror } from "@uiw/react-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
 import { json } from "@codemirror/lang-json";
 import { sql } from "@codemirror/lang-sql";
+
 import { githubLight } from "@uiw/codemirror-theme-github";
 import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import { useTheme } from "@mui/material";
 import { useThemeValue } from "../../contexts/themeContext";
+import { loadLanguage } from "@uiw/codemirror-extensions-langs";
 const langMap = {
   javascript: javascript(),
   json: json(),
   sql: sql(),
+  pgsql: loadLanguage("pgsql"),
 };
 export const CodeEditor = ({
   readOnly,
@@ -21,6 +24,7 @@ export const CodeEditor = ({
   height = "200px",
   outlined = true,
   transparent = false,
+  rounded = true,
 }) => {
   const theme = useTheme();
   // const {} = useCodeMirror();
@@ -47,7 +51,7 @@ export const CodeEditor = ({
         borderColor: theme.palette.divider,
         borderRadius: outlined ? 4 : 0,
       }}
-      className="codemirror-editor-rounded"
+      className={rounded ? "codemirror-editor-rounded" : ""}
       indentWithTab={true}
     />
   );

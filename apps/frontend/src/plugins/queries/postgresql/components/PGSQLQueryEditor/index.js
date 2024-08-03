@@ -161,7 +161,7 @@ export const PGSQLQueryEditor = ({ value, handleChange }) => {
     <CodeMirror
       value={value ? value.raw_query : ""}
       height="200px"
-      extensions={[loadLanguage("pgsql"), customAutocomplete]}
+      extensions={[loadLanguage("pgsql")]}
       onChange={_handleOnRAWQueryChange}
       theme={themeType == "dark" ? vscodeDark : githubLight}
       style={{

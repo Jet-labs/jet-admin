@@ -69,10 +69,12 @@ const intRegex = /^-?\d*$/;
 const doubleRegex = /^-?\d*.?\d+$/;
 const binaryRegex = /^[01]+$/;
 
+
 export const LOCAL_CONSTANTS = {
   SERVER_HOST: "http://127.0.0.1:8090",
   APP_NAME: "Jet admin",
   APP_VERSION: "1.0.12",
+  DOC_LINK: "https://jet-labs.github.io/documentation/",
 
   STRINGS: {
     ACCESS_TOKEN_LOCAL_STORAGE: "access_token",
@@ -212,7 +214,10 @@ export const LOCAL_CONSTANTS = {
       refreshAccessToken: () => `/admin_api/auth/refresh_access_token`,
       getSelf: () => "/admin_api/auth/me",
     },
-    SCHEMA: { runSchemaQuery: () => `/admin_api/schemas` },
+    SCHEMA: {
+      getSchema: () => `/admin_api/schemas`,
+      runSchemaQuery: () => `/admin_api/schemas`,
+    },
     TABLE: {
       getAllTables: () => `/admin_api/tables`,
 

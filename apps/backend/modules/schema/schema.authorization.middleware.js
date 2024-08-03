@@ -30,6 +30,7 @@ schemaAuthorizationMiddleware.populateAuthorizedSchemasForRead = async (
         policyObject: authorization_policy,
       });
 
+
     req.state = { ...req.state, authorized_schemas };
     Logger.log("success", {
       message:

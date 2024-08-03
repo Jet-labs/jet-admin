@@ -8,13 +8,13 @@ const {
 const router = express.Router();
 
 // get all data of table
-// router.get(
-//   "/",
-//   authMiddleware.authProvider,
-//   policyMiddleware.populateAuthorizationPolicies,
-//   schemaAuthorizationMiddleware.populateAuthorizedSchemasForRead,
-//   schemaController.ge
-// );
+router.get(
+  "/",
+  authMiddleware.authProvider,
+  policyMiddleware.populateAuthorizationPolicies,
+  schemaAuthorizationMiddleware.populateAuthorizedSchemasForRead,
+  schemaController.getSchema
+);
 router.put(
   "/",
   authMiddleware.authProvider,

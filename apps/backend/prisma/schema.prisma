@@ -26,6 +26,7 @@ model address {
   postal_code String?
   phone       String
   last_update DateTime   @default(now()) @db.Timestamptz(6)
+  address_3   String?    @map("address 3") @db.VarChar(6)
   city        city       @relation(fields: [city_id], references: [city_id])
   customer    customer[]
   staff       staff[]
