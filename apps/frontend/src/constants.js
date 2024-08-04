@@ -1052,9 +1052,4 @@ export const LOCAL_CONSTANTS = {
     RIGHT: "right",
   },
 
-  TABLE_SCHEMA_STATISTICS: {
-    TABLE_INFO: {
-      name: "TABLE_INFO",
-    },
-  },
 };

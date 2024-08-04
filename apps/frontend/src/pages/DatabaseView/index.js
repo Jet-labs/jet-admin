@@ -1,11 +1,10 @@
-import { useParams } from "react-router-dom";
-import { RawDataGrid } from "../../components/DataGridComponents/RawDataGrid";
-import "./styles.css";
-import { getSchemaStatisticsAPI } from "../../api/schemas";
+import { Divider, Grid, useTheme } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
-import { SimpleTableComponent } from "../../components/DataGridComponents/SimpleTableComponent";
-import { LOCAL_CONSTANTS } from "../../constants";
-import { Divider, useTheme } from "@mui/material";
+import { getSchemaStatisticsAPI } from "../../api/schemas";
+
+import "./styles.css";
+import { TableWidgetComponent } from "../../components/Widgets/TableWidgetComponent";
+import { capitalize } from "@rigu/js-toolkit";
 /**
  *
  * @param {object} param0
@@ -33,13 +32,23 @@ const DatabaseView = ({}) => {
         </span>
       </div>
       <Divider className="!w-full" />
-      {schemaStatisticsData?.map((result, index) => {
-        return (
-          result.result_type === "array" && (
-            <SimpleTableComponent data={result.result} border={false} />
-          )
-        );
-      })}
+      <Grid container className="!w-full !overflow-y-scroll">
+        {schemaStatisticsData?.map((result, index) => {
+          return (
+            result.result_type === "array" && (
+              <Grid xs={12} sm={12} md={6} className="!p-2">
+                <TableWidgetComponent
+                  title={String(result.name)
+                    .split("_")
+                    .map((v, _) => capitalize(v))
+                    .join(" ")}
+                  data={result.result}
+                />
+              </Grid>
+            )
+          );
+        })}
+      </Grid>
     </div>
   );
 };

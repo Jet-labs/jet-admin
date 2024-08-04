@@ -5,9 +5,10 @@ import "react-grid-layout/css/styles.css";
 import { FaTimes } from "react-icons/fa";
 import "react-resizable/css/styles.css";
 import { useComponentSize } from "../../../hooks/use-component-size";
-import { GraphWidgetComponent } from "../../GraphComponents/GraphWidgetComponent";
+import { GraphWidgetComponent } from "../../Widgets/GraphWidgetComponent";
 import "./styles.css";
-import { QueryWidgetComponent } from "../../QueryComponents/QueryWidgetComponent";
+import { QueryWidgetComponent } from "../../Widgets/QueryWidgetComponent";
+
 
 export const RenderWidget = ({
   widget,

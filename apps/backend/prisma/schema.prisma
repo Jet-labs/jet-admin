@@ -319,6 +319,24 @@ model tbl_pm_app_constants {
   is_internal           Boolean?
 }
 
+model session_history {
+  id               Int       @id @default(autoincrement())
+  captured_at      DateTime? @default(now()) @db.Timestamptz(6)
+  pid              Int?
+  username         String?
+  database_name    String?
+  client_address   String?   @db.Inet
+  application_name String?
+  state            String?
+  wait_event_type  String?
+  wait_event       String?
+  backend_start    DateTime? @db.Timestamptz(6)
+  xact_start       DateTime? @db.Timestamptz(6)
+  query_start      DateTime? @db.Timestamptz(6)
+  state_change     DateTime? @db.Timestamptz(6)
+  query            String?
+}
+
 enum mpaa_rating {
   G
   PG

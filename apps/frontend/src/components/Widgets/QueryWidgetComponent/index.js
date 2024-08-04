@@ -15,7 +15,7 @@ import DataGrid from "react-data-grid";
 import "react-data-grid/lib/styles.css";
 import { useThemeValue } from "../../../contexts/themeContext";
 import { capitalize } from "@rigu/js-toolkit";
-import { SimpleTableComponent } from "../../DataGridComponents/SimpleTableComponent";
+import { SimpleTableComponent } from "../SimpleTableComponent";
 export const QueryWidgetComponent = ({ id, width, height }) => {
   const theme = useTheme();
   const { themeType } = useThemeValue();

@@ -16,14 +16,16 @@ const ThemeContextProvider = ({ children }) => {
   const toggleTheme = () => {
     if (themeType === "light") {
       setThemeType("dark");
-      _changeGlobalCSSProperties("dark")
       localStorage.setItem("jet-theme", "dark");
     } else {
       setThemeType("light");
-      _changeGlobalCSSProperties("light");
       localStorage.setItem("jet-theme", "light");
     }
   };
+
+  useEffect(() => {
+    _changeGlobalCSSProperties(themeType);
+  }, [themeType]);
   
 
   
