@@ -15,13 +15,20 @@ export const GRAPH_PLUGINS_MAP = {
   BAR: {
     label: "Bar",
     value: "BAR",
-    fields: ["label", "x_axis", "y_axis", "index_axis"],
-    component: ({ legendPosition, titleDisplayEnabled, graphTitle, data }) => (
+    fields: ["dataset_title", "x_axis", "y_axis", "index_axis"],
+    component: ({
+      legendPosition,
+      titleDisplayEnabled,
+      graphTitle,
+      data,
+      refetchInterval,
+    }) => (
       <BarGraphComponent
         legendPosition={legendPosition}
         titleDisplayEnabled={titleDisplayEnabled}
         graphTitle={graphTitle}
         data={data}
+        refetchInterval={refetchInterval}
       />
     ),
     icon: <FaChartBar />,
@@ -29,13 +36,20 @@ export const GRAPH_PLUGINS_MAP = {
   LINE: {
     label: "Line",
     value: "LINE",
-    fields: ["label", "x_axis", "y_axis", "fill"],
-    component: ({ legendPosition, titleDisplayEnabled, graphTitle, data }) => (
+    fields: ["dataset_title", "x_axis", "y_axis", "fill"],
+    component: ({
+      legendPosition,
+      titleDisplayEnabled,
+      graphTitle,
+      data,
+      refetchInterval,
+    }) => (
       <LineGraphComponent
         legendPosition={legendPosition}
         titleDisplayEnabled={titleDisplayEnabled}
         graphTitle={graphTitle}
         data={data}
+        refetchInterval={refetchInterval}
       />
     ),
     icon: <FaChartLine />,
@@ -43,13 +57,20 @@ export const GRAPH_PLUGINS_MAP = {
   PIE: {
     label: "Pie",
     value: "PIE",
-    fields: ["label", "value"],
-    component: ({ legendPosition, titleDisplayEnabled, graphTitle, data }) => (
+    fields: ["dataset_title", "label", "value"],
+    component: ({
+      legendPosition,
+      titleDisplayEnabled,
+      graphTitle,
+      data,
+      refetchInterval,
+    }) => (
       <PieGraphComponent
         legendPosition={legendPosition}
         titleDisplayEnabled={titleDisplayEnabled}
         graphTitle={graphTitle}
         data={data}
+        refetchInterval={refetchInterval}
       />
     ),
     icon: <FaChartPie />,
@@ -57,13 +78,20 @@ export const GRAPH_PLUGINS_MAP = {
   DOUGHNUT: {
     label: "Doughnut",
     value: "DOUGHNUT",
-    fields: ["label", "value"],
-    component: ({ legendPosition, titleDisplayEnabled, graphTitle, data }) => (
+    fields: ["dataset_title", "label", "value"],
+    component: ({
+      legendPosition,
+      titleDisplayEnabled,
+      graphTitle,
+      data,
+      refetchInterval,
+    }) => (
       <DoughnutGraphComponent
         legendPosition={legendPosition}
         titleDisplayEnabled={titleDisplayEnabled}
         graphTitle={graphTitle}
         data={data}
+        refetchInterval={refetchInterval}
       />
     ),
     icon: <BiSolidDoughnutChart />,
@@ -71,13 +99,20 @@ export const GRAPH_PLUGINS_MAP = {
   POLAR_AREA: {
     label: "Polar Area",
     value: "POLAR_AREA",
-    fields: ["label", "value"],
-    component: ({ legendPosition, titleDisplayEnabled, graphTitle, data }) => (
+    fields: ["dataset_title", "label", "value"],
+    component: ({
+      legendPosition,
+      titleDisplayEnabled,
+      graphTitle,
+      data,
+      refetchInterval,
+    }) => (
       <PolarAreaGraphComponent
         legendPosition={legendPosition}
         titleDisplayEnabled={titleDisplayEnabled}
         graphTitle={graphTitle}
         data={data}
+        refetchInterval={refetchInterval}
       />
     ),
     icon: <PiChartPolar />,
@@ -85,13 +120,20 @@ export const GRAPH_PLUGINS_MAP = {
   RADAR: {
     label: "Radar",
     value: "RADAR",
-    fields: ["label", "value"],
-    component: ({ legendPosition, titleDisplayEnabled, graphTitle, data }) => (
+    fields: ["dataset_title", "label", "value"],
+    component: ({
+      legendPosition,
+      titleDisplayEnabled,
+      graphTitle,
+      data,
+      refetchInterval,
+    }) => (
       <RadarGraphComponent
         legendPosition={legendPosition}
         titleDisplayEnabled={titleDisplayEnabled}
         graphTitle={graphTitle}
         data={data}
+        refetchInterval={refetchInterval}
       />
     ),
     icon: <BiRadar />,

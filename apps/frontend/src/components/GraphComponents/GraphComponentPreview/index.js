@@ -8,6 +8,7 @@ export const GraphComponentPreview = ({
   titleDisplayEnabled,
   graphTitle,
   data,
+  refetchInterval,
 }) => {
   const theme = useTheme();
   return (

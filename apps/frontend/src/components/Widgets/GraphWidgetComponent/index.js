@@ -21,7 +21,7 @@ export const GraphWidgetComponent = ({ id, width, height }) => {
     staleTime: Infinity,
   });
 
-  console.log({ graph });
+
 
   const {
     isLoading: isLoadingGraphData,
@@ -34,12 +34,14 @@ export const GraphWidgetComponent = ({ id, width, height }) => {
     cacheTime: 0,
     retry: 1,
     staleTime: Infinity,
+    refetchInterval: graph?.graph_options?.refetch_interval * 1000,
   });
   const graphType = graphData?.graph_options?.graph_type;
   const graphTitle = graphData?.graph_title;
   const legendPosition = graphData?.graph_options.legend_position;
   const titleDisplayEnabled = graphData?.graph_options.title_display_enabled;
   const data = graphData?.dataset;
+  const refetchInterval = graph?.graph_options?.refetch_interval * 1000;
 
   return (
     <div
@@ -56,6 +58,7 @@ export const GraphWidgetComponent = ({ id, width, height }) => {
         titleDisplayEnabled,
         graphTitle,
         data,
+        refetchInterval,
       })}
     </div>
   );

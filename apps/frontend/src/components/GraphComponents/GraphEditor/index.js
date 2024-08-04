@@ -77,6 +77,12 @@ export const GraphEditor = ({ graphID, graphForm }) => {
     graphForm.setFieldValue("query_array", updatedQueryArrayFieldValue);
   };
 
+  const _handleUpdateDatasetTitle = (index, value) => {
+    let updatedQueryArrayFieldValue = graphForm.values["query_array"];
+    updatedQueryArrayFieldValue[index].dataset_title = value;
+    graphForm.setFieldValue("query_array", updatedQueryArrayFieldValue);
+  };
+
   const _handleUpdateDatasetValueAxis = (index, value) => {
     let updatedQueryArrayFieldValue = graphForm.values["query_array"];
     updatedQueryArrayFieldValue[index].value = value;
@@ -257,7 +263,36 @@ export const GraphEditor = ({ graphID, graphForm }) => {
                   lg={12}
                   key={`query_array_title-${index}`}
                 >
-                  <FormControl fullWidth size="small" className="">
+                  {GRAPH_PLUGINS_MAP[
+                    graphForm.values["graph_type"]
+                  ]?.fields?.includes("dataset_title") && (
+                    <Grid
+                      item
+                      xs={12}
+                      sm={12}
+                      md={12}
+                      lg={12}
+                      key={`query_array_dataset_title-${index}`}
+                    >
+                      <FormControl fullWidth size="small" className="">
+                        <span className="text-xs font-light  !capitalize mb-1">{`Dataset title`}</span>
+                        <TextField
+                          required={true}
+                          fullWidth
+                          size="small"
+                          variant="outlined"
+                          type="text"
+                          name={`query_array_x-${index}`}
+                          value={dataset.dataset_title}
+                          onBlur={graphForm.handleBlur}
+                          onChange={(e) => {
+                            _handleUpdateDatasetTitle(index, e.target.value);
+                          }}
+                        />
+                      </FormControl>
+                    </Grid>
+                  )}
+                  <FormControl fullWidth size="small" className="!mt-3">
                     <span className="text-xs font-light  !capitalize mb-1">{`Select query`}</span>
 
                     <Select
@@ -318,6 +353,7 @@ export const GraphEditor = ({ graphID, graphForm }) => {
                     </FormControl>
                   </Grid>
                 )}
+
                 {GRAPH_PLUGINS_MAP[
                   graphForm.values["graph_type"]
                 ]?.fields?.includes("x_axis") && (

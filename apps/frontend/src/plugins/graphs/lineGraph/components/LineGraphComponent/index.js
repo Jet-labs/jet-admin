@@ -15,7 +15,7 @@ import { Line } from "react-chartjs-2";
 
 import { da, faker } from "@faker-js/faker";
 import { LOCAL_CONSTANTS } from "../../../../../constants";
-
+import { IoMdInformationCircleOutline } from "react-icons/io";
 ChartJS.register(
   CategoryScale,
   LinearScale,
