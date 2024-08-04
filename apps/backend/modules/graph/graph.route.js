@@ -37,6 +37,14 @@ router.get(
   graphController.getGraphData
 );
 
+router.get(
+  "/:id",
+  authMiddleware.authProvider,
+  policyMiddleware.populateAuthorizationPolicies,
+  graphAuthorizationMiddleware.populateAuthorizedGraphsForRead,
+  graphController.getGraphByID
+);
+
 router.delete(
   "/:id",
   authMiddleware.authProvider,

@@ -40,6 +40,23 @@ export const updateGraphAPI = async ({ data }) => {
   }
 };
 
+export const getGraphByIDAPI = async ({ graphID }) => {
+  try {
+    const response = await axiosInstance.get(
+      LOCAL_CONSTANTS.APIS.GRAPH.getGraphByID({ id: graphID })
+    );
+    if (response.data && response.data.success == true) {
+      return new Graph(response.data.graph);
+    } else if (response.data.error) {
+      throw response.data.error;
+    } else {
+      throw LOCAL_CONSTANTS.ERROR_CODES.SERVER_ERROR;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const getGraphDataByIDAPI = async ({ graphID }) => {
   try {
     const response = await axiosInstance.get(

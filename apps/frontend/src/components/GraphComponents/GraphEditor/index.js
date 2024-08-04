@@ -188,6 +188,22 @@ export const GraphEditor = ({ graphID, graphForm }) => {
             {/* {error && <span className="mt-2 text-red-500">{error}</span>} */}
           </FormControl>
         </Grid>
+        <Grid item xs={12} sm={12} md={12} lg={12} key={"refetch_interval"}>
+          <FormControl fullWidth size="small" className="">
+            <span className="text-xs font-light  !capitalize mb-1">{`Refetch interval (in seconds)`}</span>
+            <TextField
+              required={true}
+              fullWidth
+              size="small"
+              variant="outlined"
+              type="number"
+              name={"refetch_interval"}
+              value={graphForm.values.refetch_interval}
+              onChange={graphForm.handleChange}
+              onBlur={graphForm.handleBlur}
+            />
+          </FormControl>
+        </Grid>
 
         <Grid item xs={12} sm={12} md={12} lg={12} key={"query_array"}>
           <Button variant="contained" onClick={_handleAddDataset}>
@@ -275,6 +291,35 @@ export const GraphEditor = ({ graphID, graphForm }) => {
 
                 {GRAPH_PLUGINS_MAP[
                   graphForm.values["graph_type"]
+                ]?.fields?.includes("label") && (
+                  <Grid
+                    item
+                    xs={6}
+                    sm={6}
+                    md={4}
+                    lg={4}
+                    key={`query_array_label-${index}`}
+                  >
+                    <FormControl fullWidth size="small" className="">
+                      <span className="text-xs font-light  !capitalize mb-1">{`label`}</span>
+                      <TextField
+                        required={true}
+                        fullWidth
+                        size="small"
+                        variant="outlined"
+                        type="text"
+                        name={`query_array_label-${index}`}
+                        value={dataset.label}
+                        onBlur={graphForm.handleBlur}
+                        onChange={(e) => {
+                          _handleUpdateDatasetLabelAxis(index, e.target.value);
+                        }}
+                      />
+                    </FormControl>
+                  </Grid>
+                )}
+                {GRAPH_PLUGINS_MAP[
+                  graphForm.values["graph_type"]
                 ]?.fields?.includes("x_axis") && (
                   <Grid
                     item
@@ -326,36 +371,6 @@ export const GraphEditor = ({ graphID, graphForm }) => {
                         onBlur={graphForm.handleBlur}
                         onChange={(e) => {
                           _handleUpdateDatasetYAxis(index, e.target.value);
-                        }}
-                      />
-                    </FormControl>
-                  </Grid>
-                )}
-
-                {GRAPH_PLUGINS_MAP[
-                  graphForm.values["graph_type"]
-                ]?.fields?.includes("label") && (
-                  <Grid
-                    item
-                    xs={6}
-                    sm={6}
-                    md={4}
-                    lg={4}
-                    key={`query_array_label-${index}`}
-                  >
-                    <FormControl fullWidth size="small" className="">
-                      <span className="text-xs font-light  !capitalize mb-1">{`label`}</span>
-                      <TextField
-                        required={true}
-                        fullWidth
-                        size="small"
-                        variant="outlined"
-                        type="text"
-                        name={`query_array_label-${index}`}
-                        value={dataset.label}
-                        onBlur={graphForm.handleBlur}
-                        onChange={(e) => {
-                          _handleUpdateDatasetLabelAxis(index, e.target.value);
                         }}
                       />
                     </FormControl>

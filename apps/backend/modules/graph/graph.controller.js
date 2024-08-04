@@ -90,6 +90,47 @@ graphController.updateGraph = async (req, res) => {
  * @param {import("express").Response} res
  * @returns
  */
+graphController.getGraphByID = async (req, res) => {
+  try {
+    const { pmUser, state, params } = req;
+    const pm_user_id = parseInt(pmUser.pm_user_id);
+    const pm_graph_id = parseInt(params.id);
+    const authorized_graphs = state.authorized_graphs;
+
+    Logger.log("info", {
+      message: "graphController:getGraphByID:params",
+      params: { pm_user_id, pm_graph_id },
+    });
+
+    const graph = await GraphService.getGraphByID({
+      graphID: pm_graph_id,
+      authorizedGraphs: authorized_graphs,
+    });
+
+    Logger.log("success", {
+      message: "graphController:getGraphByID:success",
+      params: { pm_user_id, graphID: graph.pm_graph_id },
+    });
+
+    return res.json({
+      success: true,
+      graph: graph,
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "graphController:getGraphByID:catch-1",
+      params: { error },
+    });
+    return res.json({ success: false, error: extractError(error) });
+  }
+};
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @returns
+ */
 graphController.getGraphData = async (req, res) => {
   try {
     const { pmUser, state, params } = req;

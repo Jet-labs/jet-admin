@@ -254,6 +254,7 @@ export const LOCAL_CONSTANTS = {
       getAllGraphs: () => `/admin_api/graphs`,
       addGraph: () => `/admin_api/graphs`,
       updateGraph: () => `/admin_api/graphs`,
+      getGraphByID: ({ id }) => `/admin_api/graphs/${id}`,
       getGraphDataByID: ({ id }) => `/admin_api/graphs/${id}/data`,
       deleteGraphByID: ({ id }) => `/admin_api/graphs/${id}`,
     },
@@ -1051,5 +1052,4 @@ export const LOCAL_CONSTANTS = {
     LEFT: "left",
     RIGHT: "right",
   },
-
 };

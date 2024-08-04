@@ -106,6 +106,51 @@ class GraphService {
    * @param {Boolean|Array<Number>} param0.authorizedGraphs
    * @returns {any|null}
    */
+  static getGraphByID = async ({ graphID, authorizedGraphs }) => {
+    Logger.log("info", {
+      message: "GraphService:getGraphByID:params",
+      params: {
+        graphID,
+      },
+    });
+    try {
+      if (authorizedGraphs === true || authorizedGraphs.includes(graphID)) {
+        const graph = await prisma.tbl_pm_graphs.findUnique({
+          where: {
+            pm_graph_id: graphID,
+          },
+        });
+        Logger.log("info", {
+          message: "GraphService:getGraphByID:graph",
+          params: {
+            graph,
+          },
+        });
+
+        return graph;
+      } else {
+        Logger.log("error", {
+          message: "GraphService:getGraphByID:catch-2",
+          params: { error: constants.ERROR_CODES.PERMISSION_DENIED },
+        });
+        throw constants.ERROR_CODES.PERMISSION_DENIED;
+      }
+    } catch (error) {
+      Logger.log("error", {
+        message: "GraphService:getGraphByID:catch-1",
+        params: { error },
+      });
+      throw error;
+    }
+  };
+
+  /**
+   *
+   * @param {object} param0
+   * @param {Number} param0.graphID
+   * @param {Boolean|Array<Number>} param0.authorizedGraphs
+   * @returns {any|null}
+   */
   static getGraphData = async ({ graphID, authorizedGraphs }) => {
     Logger.log("info", {
       message: "GraphService:getGraphData:params",

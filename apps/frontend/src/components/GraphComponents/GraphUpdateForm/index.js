@@ -115,11 +115,15 @@ export const GraphUpdateForm = ({ id }) => {
         "query_array",
         graphData.graph_options.query_array
       );
+      graphForm.setFieldValue(
+        "refetch_interval",
+        graphData.graph_options.refetch_interval
+      );
     }
   }, [graphData]);
 
   return (
-    <div className="w-full">
+    <div className="w-full h-full overflow-y-scroll">
       <div
         className="flex flex-col items-start justify-start p-3 px-6"
         style={{

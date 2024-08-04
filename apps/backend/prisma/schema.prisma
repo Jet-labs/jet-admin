@@ -337,6 +337,15 @@ model session_history {
   query            String?
 }
 
+model transaction_history {
+  id            Int       @id @default(autoincrement())
+  captured_at   DateTime? @default(now()) @db.Timestamptz(6)
+  database_name String?
+  transactions  BigInt?
+  commits       BigInt?
+  rollbacks     BigInt?
+}
+
 enum mpaa_rating {
   G
   PG

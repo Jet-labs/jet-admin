@@ -14,7 +14,7 @@ const isDQLQuery = (query) => {
   const trimmedQuery = query.trim().toUpperCase();
 
   // Define a list of DQL keywords
-  const dqlKeywords = ["SELECT", "SHOW", "DESCRIBE", "EXPLAIN"];
+  const dqlKeywords = ["SELECT", "WITH", "SHOW", "DESCRIBE", "EXPLAIN"];
 
   // Check if the query starts with any of the DQL keywords
   return dqlKeywords.some((keyword) => trimmedQuery.startsWith(keyword));

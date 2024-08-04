@@ -38,8 +38,7 @@ export const GraphAdditionForm = () => {
       title_display_enabled: true,
       legend_position: LOCAL_CONSTANTS.GRAPH_LEGEND_POSITION.TOP,
       graph_title: "",
-      x_axis: "",
-      y_axis: "",
+      refetch_interval: 5,
       query_array: [{ dataset_title: "", query: "" }],
     },
     validateOnMount: false,
@@ -56,7 +55,7 @@ export const GraphAdditionForm = () => {
   });
 
   return (
-    <div className="w-full">
+    <div className="w-full h-full overflow-y-scroll">
       <div
         className="flex flex-col items-start justify-start p-3 px-6"
         style={{ background: theme.palette.background.paper }}

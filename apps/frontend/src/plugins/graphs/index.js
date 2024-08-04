@@ -15,7 +15,7 @@ export const GRAPH_PLUGINS_MAP = {
   BAR: {
     label: "Bar",
     value: "BAR",
-    fields: ["x_axis", "y_axis", "index_axis"],
+    fields: ["label", "x_axis", "y_axis", "index_axis"],
     component: ({ legendPosition, titleDisplayEnabled, graphTitle, data }) => (
       <BarGraphComponent
         legendPosition={legendPosition}
@@ -29,7 +29,7 @@ export const GRAPH_PLUGINS_MAP = {
   LINE: {
     label: "Line",
     value: "LINE",
-    fields: ["x_axis", "y_axis", "fill"],
+    fields: ["label", "x_axis", "y_axis", "fill"],
     component: ({ legendPosition, titleDisplayEnabled, graphTitle, data }) => (
       <LineGraphComponent
         legendPosition={legendPosition}

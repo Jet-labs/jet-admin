@@ -2,11 +2,26 @@ import { useTheme } from "@mui/material";
 import React from "react";
 
 import { useQuery } from "@tanstack/react-query";
-import { getGraphDataByIDAPI } from "../../../api/graphs";
+import { getGraphByIDAPI, getGraphDataByIDAPI } from "../../../api/graphs";
 import { GRAPH_PLUGINS_MAP } from "../../../plugins/graphs";
 
 export const GraphWidgetComponent = ({ id, width, height }) => {
   const theme = useTheme();
+
+  const {
+    isLoading: isLoadingGraph,
+    data: graph,
+    error: loadGraphError,
+    refetch: refetchGraph,
+  } = useQuery({
+    queryKey: [`REACT_QUERY_KEY_GRAPH`, id],
+    queryFn: () => getGraphByIDAPI({ graphID: id }),
+    cacheTime: 0,
+    retry: 1,
+    staleTime: Infinity,
+  });
+
+  console.log({ graph });
 
   const {
     isLoading: isLoadingGraphData,
@@ -14,7 +29,7 @@ export const GraphWidgetComponent = ({ id, width, height }) => {
     error: loadGraphDataError,
     refetch: refetchGraphData,
   } = useQuery({
-    queryKey: [`REACT_QUERY_KEY_GRAPH`, id],
+    queryKey: [`REACT_QUERY_KEY_GRAPH_DATA`, id],
     queryFn: () => getGraphDataByIDAPI({ graphID: id }),
     cacheTime: 0,
     retry: 1,
