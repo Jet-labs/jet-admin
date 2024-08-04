@@ -43,6 +43,36 @@ class SchemaService {
       throw error;
     }
   };
+
+  /**
+   *
+   * @param {object} param0
+   * @param {JSON} param0.statisticParameter
+   * @returns {any|null}
+   */
+  static getDatabaseStatistics = async ({ statisticParameter }) => {
+    Logger.log("info", {
+      message: "SchemaService:getDatabaseStatistics:params",
+      params: { statisticParameter },
+    });
+    try {
+      const result = await prisma.$queryRaw`${Prisma.raw(
+        statisticParameter.raw_query
+      )}`;
+
+      Logger.log("info", {
+        message: "SchemaService:getDatabaseStatistics:query",
+        params: { result },
+      });
+      return result;
+    } catch (error) {
+      Logger.log("error", {
+        message: "SchemaService:getDatabaseStatistics:catch-1",
+        params: { error },
+      });
+      throw error;
+    }
+  };
 }
 
 module.exports = { SchemaService };

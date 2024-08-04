@@ -73,7 +73,7 @@ const binaryRegex = /^[01]+$/;
 export const LOCAL_CONSTANTS = {
   SERVER_HOST: "http://127.0.0.1:8090",
   APP_NAME: "Jet admin",
-  APP_VERSION: "1.0.12",
+  APP_VERSION: "1.0.13",
   DOC_LINK: "https://jet-labs.github.io/documentation/",
 
   STRINGS: {
@@ -217,6 +217,7 @@ export const LOCAL_CONSTANTS = {
     SCHEMA: {
       getSchema: () => `/admin_api/schemas`,
       runSchemaQuery: () => `/admin_api/schemas`,
+      getSchemaStatistics: () => `/admin_api/schemas/statistics`,
     },
     TABLE: {
       getAllTables: () => `/admin_api/tables`,

@@ -66,7 +66,7 @@ export const DashboardDropZoneComponent = ({
     >
       <ResponsiveReactGridLayout
         // {...props}
-        style={{ background: "transparent", minHeight: 300 }}
+        style={{ background: "transparent", minHeight: "100%" }}
         layouts={layouts}
         measureBeforeMount={false}
         // compactType={compactType}

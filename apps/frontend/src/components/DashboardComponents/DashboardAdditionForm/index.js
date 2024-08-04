@@ -10,7 +10,7 @@ import { LOCAL_CONSTANTS } from "../../../constants";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { FiPlus } from "react-icons/fi";
 import { DashboardDropZoneComponent } from "../DashboardDropZoneComponent";
-import { GraphsDnDList } from "../GraphsDnDList";
+import { WidgetsDnDList } from "../WidgetsDnDList";
 import { addDashboardAPI } from "../../../api/dashboards";
 import {
   ResizableHandle,
@@ -128,7 +128,7 @@ export const DashboardAdditionForm = () => {
             </div>
           </Grid>
           <Grid sm={12}>
-            <GraphsDnDList />
+            <WidgetsDnDList />
           </Grid>
         </ResizablePanel>
       </ResizablePanelGroup>

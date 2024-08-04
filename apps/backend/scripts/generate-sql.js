@@ -10,12 +10,20 @@ const execCommand = () => {
   return new Promise((resolve, reject) => {
     exec(command, (error, stdout, stderr) => {
       if (error) {
-        reject(`error: ${error.message}`);
-        return;
+        Logger.log("success", {
+          message: "execCommand:exec:catch-1",
+          params: { error },
+        });
+        // reject(`error: ${error.message}`);
+        // return;
       }
       if (stderr) {
-        reject(`stderr: ${stderr}`);
-        return;
+        // reject(`stderr: ${stderr}`);
+        // return;
+        Logger.log("success", {
+          message: "execCommand:exec:catch-2",
+          params: { error: stderr },
+        });
       }
       resolve(stdout);
     });

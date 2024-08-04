@@ -9,12 +9,21 @@ const router = express.Router();
 
 // get all data of table
 router.get(
+  "/statistics",
+  authMiddleware.authProvider,
+  policyMiddleware.populateAuthorizationPolicies,
+  schemaAuthorizationMiddleware.populateAuthorizedSchemasForRead,
+  schemaController.getDatabaseStatistics
+);
+
+router.get(
   "/",
   authMiddleware.authProvider,
   policyMiddleware.populateAuthorizationPolicies,
   schemaAuthorizationMiddleware.populateAuthorizedSchemasForRead,
   schemaController.getSchema
 );
+
 router.put(
   "/",
   authMiddleware.authProvider,

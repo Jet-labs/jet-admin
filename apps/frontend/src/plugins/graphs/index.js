@@ -5,6 +5,12 @@ import { PieGraphComponent } from "./pieGraph/components/PieGraphComponent";
 import { PolarAreaGraphComponent } from "./polarGraph/components/PolarAreaGraphComponent";
 import { RadarGraphComponent } from "./radarGraph/components/RadarGraphComponent";
 import { TbApi } from "react-icons/tb";
+import { FaChartBar } from "react-icons/fa";
+import { FaChartLine } from "react-icons/fa6";
+import { FaChartPie } from "react-icons/fa";
+import { BiSolidDoughnutChart } from "react-icons/bi";
+import { PiChartPolar } from "react-icons/pi";
+import { BiRadar } from "react-icons/bi";
 export const GRAPH_PLUGINS_MAP = {
   BAR: {
     label: "Bar",
@@ -18,7 +24,7 @@ export const GRAPH_PLUGINS_MAP = {
         data={data}
       />
     ),
-    icon: <TbApi />,
+    icon: <FaChartBar />,
   },
   LINE: {
     label: "Line",
@@ -32,7 +38,7 @@ export const GRAPH_PLUGINS_MAP = {
         data={data}
       />
     ),
-    icon: <TbApi />,
+    icon: <FaChartLine />,
   },
   PIE: {
     label: "Pie",
@@ -46,7 +52,7 @@ export const GRAPH_PLUGINS_MAP = {
         data={data}
       />
     ),
-    icon: <TbApi />,
+    icon: <FaChartPie />,
   },
   DOUGHNUT: {
     label: "Doughnut",
@@ -60,7 +66,7 @@ export const GRAPH_PLUGINS_MAP = {
         data={data}
       />
     ),
-    icon: <TbApi />,
+    icon: <BiSolidDoughnutChart />,
   },
   POLAR_AREA: {
     label: "Polar Area",
@@ -74,7 +80,7 @@ export const GRAPH_PLUGINS_MAP = {
         data={data}
       />
     ),
-    icon: <TbApi />,
+    icon: <PiChartPolar />,
   },
   RADAR: {
     label: "Radar",
@@ -88,6 +94,6 @@ export const GRAPH_PLUGINS_MAP = {
         data={data}
       />
     ),
-    icon: <TbApi />,
+    icon: <BiRadar />,
   },
 };

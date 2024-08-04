@@ -63,13 +63,13 @@ Below are the some app constants
 export const cron_job_usage_tip = `
 ##### **Cron Syntax Quick Reference**
 
-| Schedule | Cron Expression | Description |
-|---|---|---|
-| Daily at Midnight | \`0 0 * * *\` | Runs the command every day at midnight (12:00 AM). |
-| Every Hour | \`0 * * * *\` | Runs the command at the beginning of every hour. |
-| Monday at 3 PM | \`0 15 * * 1\` | Runs the command every Monday at 3:00 PM. |
-| Every 15 Minutes | \`*/15 * * * *\` | Runs the command every 15 minutes.  |
-| First Day of Every Month at 5 AM | \`0 5 1 * *\` | Runs the command on the 1st of every month at 5:00 AM. |
+
+| Schedule | Cron Expression |
+|---|---|
+| Monday at 3 PM | \`0 15 * * 1\` |
+| Every 15 Minutes | \`*/15 * * * *\` |
+| First Day of Every Month at 5 AM | \`0 5 1 * *\` |
+
 
 ##### **Fields**
 - **Minute**: \`0-59\`

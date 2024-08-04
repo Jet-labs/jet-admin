@@ -19,6 +19,24 @@ export const getSchemaAPI = async () => {
   }
 };
 
+export const getSchemaStatisticsAPI = async () => {
+  try {
+    const response = await axiosInstance.get(
+      LOCAL_CONSTANTS.APIS.SCHEMA.getSchemaStatistics()
+    );
+    if (response.data && response.data.success == true) {
+      console.log({ response: response.data.schemaStatistics });
+      return response.data.schemaStatistics;
+    } else if (response.data.error) {
+      throw response.data.error;
+    } else {
+      throw LOCAL_CONSTANTS.ERROR_CODES.SERVER_ERROR;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const runSchemaQueryAPI = async ({ schemaQuery }) => {
   try {
     const response = await axiosInstance.put(

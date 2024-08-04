@@ -10,7 +10,7 @@ import {
 import { DashboardDeletionForm } from "../../../components/DashboardComponents/DashboardDeletionForm";
 import { DashboardDropZoneComponent } from "../../../components/DashboardComponents/DashboardDropZoneComponent";
 import { FieldComponent } from "../../../components/FieldComponent";
-import { GraphsDnDList } from "../../../components/DashboardComponents/GraphsDnDList";
+import { WidgetsDnDList } from "../../../components/DashboardComponents/WidgetsDnDList";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import {
@@ -169,7 +169,7 @@ export const DashboardUpdateForm = ({ id }) => {
           </Grid>
 
           <Grid sm={12}>
-            <GraphsDnDList />
+            <WidgetsDnDList />
           </Grid>
         </ResizablePanel>
       </ResizablePanelGroup>
