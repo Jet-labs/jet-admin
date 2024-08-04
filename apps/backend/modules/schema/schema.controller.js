@@ -2,6 +2,9 @@ const constants = require("../../constants");
 const { generateSQlFromPrismaSchema } = require("../../scripts/generate-sql");
 const { extractError } = require("../../utils/error.utils");
 const Logger = require("../../utils/logger");
+const {
+  SCHEMA_INFO_CONSTANTS,
+} = require("../../utils/postgres-utils/info-constants");
 const { SchemaService } = require("./schema.services");
 
 const schemaController = {};
@@ -94,7 +97,7 @@ FROM pg_stat_user_tables;`,
     });
     if (authorized_schemas === true) {
       const schemaStatistics = await SchemaService.getDatabaseStatistics({
-        statisticParameter: schemaStatisticsConstant["table-level-statistics"],
+        statisticParameter: SCHEMA_INFO_CONSTANTS.TABLE_INFO,
       });
       Logger.log("success", {
         message: "schemaController:getDatabaseStatistics:success",
