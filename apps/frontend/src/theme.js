@@ -90,6 +90,12 @@ export const customDarkTheme = {
       focusOpacity: 0.12,
       activatedOpacity: 0.24,
     },
+    scroll: {
+      trackBackground: "#1B1B1B",
+      thumbBackground: "#333",
+      thumbCorner: "#ddd",
+      thumbHoverBackground: "#6B6B6B",
+    },
   },
   components: {
     MuiList: {
@@ -470,6 +476,12 @@ export const customLightTheme = {
       default: "#ffffff",
       secondary: "#EEEEEE",
       info: "#EDF2FA",
+    },
+    scroll: {
+      trackBackground: "#ffffff",
+      thumbBackground: "#cacaca",
+      thumbCorner: "#ddd",
+      thumbHoverBackground: "#cacaca",
     },
     action: {
       active: "#e6e6e6",

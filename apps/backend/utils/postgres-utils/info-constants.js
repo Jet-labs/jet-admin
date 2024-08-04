@@ -1,5 +1,6 @@
 const SCHEMA_INFO_CONSTANTS = {
   TABLE_INFO: {
+    result_type: "array",
     raw_query: `WITH primary_keys AS (
     SELECT
         conrelid AS table_id,

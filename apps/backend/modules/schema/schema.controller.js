@@ -90,14 +90,11 @@ schemaController.getDatabaseStatistics = async (req, res) => {
       },
     });
     if (authorized_schemas === true) {
-      const schemaStatistics = await SchemaService.getDatabaseStatistics({
-        statisticParameter: SCHEMA_INFO_CONSTANTS.TABLE_INFO,
-      });
+      const schemaStatistics = await SchemaService.getDatabaseStatistics();
       Logger.log("success", {
         message: "schemaController:getDatabaseStatistics:success",
         params: {
           pm_user_id,
-          schemaStatistics,
         },
       });
       return res.json({

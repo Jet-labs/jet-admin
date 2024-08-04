@@ -8,6 +8,12 @@ body{
 .markdown > * {
   all: revert;
 }
+:root {
+  --scrollbar-track-bg: #ffffff;
+  --scrollbar-thumb-bg: #cacaca;
+  --scrollbar-thumb-corner: #ddd;
+  --scrollbar-thumb-hover-bg: #cacaca;
+}
 /* width */
 ::-webkit-scrollbar {
   width: 6px;
@@ -16,7 +22,7 @@ body{
 
 /* Track */
 ::-webkit-scrollbar-track {
-  background: #ffffff;
+  background: var(--scrollbar-track-bg);
   padding: 1;
   /* border-radius: 4px; */
 }
@@ -24,15 +30,15 @@ body{
 /* Handle */
 ::-webkit-scrollbar-thumb {
   /* border-radius: 20px; */
-  background-color: #cacaca;
-  border: 1px solid #cacaca;
+  background-color: var(--scrollbar-thumb-bg);
+  border: 1px solid var(--scrollbar-thumb-bg);
 }
 ::-webkit-scrollbar-corner {
-  background-color: #ddd;
+  background-color: var(--scrollbar-thumb-corner)
 }
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #cacaca;
+  background: var(--scrollbar-thumb-hover-bg)
 }
 html {
   font-family: "Cabin", sans-serif;
@@ -42,10 +48,7 @@ html {
   font-family: "Manrope", sans-serif;
 
   height: -webkit-fill-available;
-  display: block;
-  background-color: #fff;
-
-  
+  display: block;  
 }
 body {
   margin: 0;

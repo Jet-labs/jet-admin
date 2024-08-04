@@ -16,10 +16,38 @@ const ThemeContextProvider = ({ children }) => {
   const toggleTheme = () => {
     if (themeType === "light") {
       setThemeType("dark");
+      _changeGlobalCSSProperties("dark")
       localStorage.setItem("jet-theme", "dark");
     } else {
       setThemeType("light");
+      _changeGlobalCSSProperties("light");
       localStorage.setItem("jet-theme", "light");
+    }
+  };
+  
+
+  
+
+  const _changeGlobalCSSProperties = (theme) => {
+    try {
+      document.body.style.setProperty(
+        "--scrollbar-track-bg",
+        themeMap[theme].palette.scroll.trackBackground
+      );
+      document.body.style.setProperty(
+        "--scrollbar-thumb-bg",
+        themeMap[theme].palette.scroll.thumbBackground
+      );
+      document.body.style.setProperty(
+        "--scrollbar-thumb-corner",
+        themeMap[theme].palette.scroll.thumbCorner
+      );
+      document.body.style.setProperty(
+        "--scrollbar-thumb-hover-bg",
+        themeMap[theme].palette.scroll.thumbHoverBackground
+      );
+    } catch (error) {
+      console.log({ error });
     }
   };
 
