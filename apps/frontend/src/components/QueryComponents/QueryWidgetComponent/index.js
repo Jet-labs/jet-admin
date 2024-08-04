@@ -1,16 +1,21 @@
-import { Box, useTheme } from "@mui/material";
+import { Box, Divider, useTheme } from "@mui/material";
 import React, { useMemo } from "react";
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { getGraphDataByIDAPI } from "../../../api/graphs";
 import { GRAPH_PLUGINS_MAP } from "../../../plugins/graphs";
-import { runQueryAPI, runQueryByIDAPI } from "../../../api/queries";
+import {
+  getQueryByIDAPI,
+  runQueryAPI,
+  runQueryByIDAPI,
+} from "../../../api/queries";
 import { QUERY_PLUGINS_MAP } from "../../../plugins/queries";
 import jsonSchemaGenerator from "to-json-schema";
 import DataGrid from "react-data-grid";
 import "react-data-grid/lib/styles.css";
 import { useThemeValue } from "../../../contexts/themeContext";
 import { capitalize } from "@rigu/js-toolkit";
+import { SimpleTableComponent } from "../../DataGridComponents/SimpleTableComponent";
 export const QueryWidgetComponent = ({ id, width, height }) => {
   const theme = useTheme();
   const { themeType } = useThemeValue();
@@ -26,6 +31,25 @@ export const QueryWidgetComponent = ({ id, width, height }) => {
     queryFn: () => {
       return runQueryByIDAPI({
         pm_query_id: id,
+      });
+    },
+    retry: false,
+    cacheTime: 0,
+    retry: 1,
+    staleTime: 0,
+  });
+  const {
+    isPending: isFetchingQuery,
+    isLoading: isFetchingQuerySuccess,
+    isError: isFetchingQueryError,
+    error: fetchQueryError,
+    data: query,
+    refetch: refetchQuery,
+  } = useQuery({
+    queryKey: [`REACT_QUERY_KEY_QUERIES`, id],
+    queryFn: () => {
+      return getQueryByIDAPI({
+        pmQueryID: id,
       });
     },
     retry: false,
@@ -53,40 +77,19 @@ export const QueryWidgetComponent = ({ id, width, height }) => {
         height: height,
       }}
     >
-      <Box
-        sx={{ width: "100%" }}
-        className="!flex !flex-col !h-full !w-full !justify-center !items-stretch"
+      <div
+        style={{ height: 30 }}
+        className="flex flex-row justify-start items-center w-full px-1"
       >
-        {queryData && Array.isArray(queryData) && queryData.length ? (
-          <DataGrid
-            rows={queryData.map((item, index) => {
-              return { _g_uuid: `_index_${index}`, ...item };
-            })}
-            columns={columns}
-            className={`!w-100 !rounded ${
-              themeType === "dark" ? "" : "rdg-light "
-            }`}
-            // style={{ borderColor: theme.palette.divider, borderWidth: 1 }}
-            rowKeyGetter={(row) => row._g_uuid}
-            defaultColumnOptions={{
-              sortable: false,
-              resizable: true,
-            }}
-          />
-        ) : (
-          <div
-            className="!h-32 flex !flex-col !justify-center !items-center w-100 "
-            style={{
-              width: "100%",
-              borderWidth: 1,
-              borderColor: theme.palette.divider,
-              borderRadius: 4,
-            }}
-          >
-            <span>No data</span>
-          </div>
-        )}
-      </Box>
+        <span className="!text-sm !font-semibold">{query?.pm_query_title}</span>
+      </div>
+      <Divider />
+
+      <SimpleTableComponent
+        data={queryData}
+        border={false}
+        height={height - 31}
+      />
     </div>
   );
 };

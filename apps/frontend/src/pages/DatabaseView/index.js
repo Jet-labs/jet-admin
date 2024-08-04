@@ -3,6 +3,7 @@ import { RawDataGrid } from "../../components/DataGridComponents/RawDataGrid";
 import "./styles.css";
 import { getSchemaStatisticsAPI } from "../../api/schemas";
 import { useQuery } from "@tanstack/react-query";
+import { SimpleTableComponent } from "../../components/DataGridComponents/SimpleTableComponent";
 /**
  *
  * @param {object} param0
@@ -22,7 +23,8 @@ const DatabaseView = ({}) => {
   });
   return (
     <div className="flex flex-col justify-center items-center w-full h-full">
-      <span>Navigate to tables</span>
+      {/* <span>{JSON.stringify(schemaStatisticsData)}</span> */}
+      <SimpleTableComponent data={schemaStatisticsData} />
     </div>
   );
 };

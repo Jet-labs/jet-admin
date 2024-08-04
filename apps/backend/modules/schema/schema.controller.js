@@ -79,12 +79,6 @@ schemaController.getDatabaseStatistics = async (req, res) => {
       message: "schemaController:getDatabaseStatistics:init",
     });
 
-    const schemaStatisticsConstant = {
-      "table-level-statistics": {
-        raw_query: `SELECT relname, seq_scan, seq_tup_read, idx_scan, idx_tup_fetch, n_tup_ins, n_tup_upd, n_tup_del, n_tup_hot_upd, n_live_tup, n_dead_tup, n_mod_since_analyze, last_vacuum, last_autovacuum, last_analyze, last_autoanalyze 
-FROM pg_stat_user_tables;`,
-      },
-    };
     const { pmUser, state, body } = req;
     const pm_user_id = parseInt(pmUser.pm_user_id);
     const authorized_schemas = state.authorized_schemas;
