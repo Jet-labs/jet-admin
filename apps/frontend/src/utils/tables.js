@@ -266,15 +266,15 @@ export const getFormattedTableColumns = (columns, customIntMappings) => {
         headerName: String(column.name).toLocaleLowerCase(),
         type: column.type,
         width: getFieldWidth(column.type),
-        renderCell: (params) => {
-          return getFieldFormatting({
-            type: column.type,
-            isID: column.isId,
-            isList: column.isList,
-            params,
-            customIntMapping: customIntMappings?.[column.name],
-          });
-        },
+        // renderCell: (params) => {
+        //   return getFieldFormatting({
+        //     type: column.type,
+        //     isID: column.isId,
+        //     isList: column.isList,
+        //     params,
+        //     customIntMapping: customIntMappings?.[column.name],
+        //   });
+        // },
       };
     });
   } catch (error) {
