@@ -1,6 +1,6 @@
 apps/backend/node_modules
 apps/frontend/node_modules
-
+apps/backend/logs
 node_modules
 
 
