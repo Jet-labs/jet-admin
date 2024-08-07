@@ -42,29 +42,10 @@ export const Tip = ({ tip }) => {
         options={{}}
         className={`!text-sm !text-wrap  ${
           themeType === "dark"
-            ? `dark:prose prose-pre:!bg-[#1b1b1b] prose-code:!text-[#91aeff] !text-slate-400 prose-strong:!text-slate-200`
-            : `!prose prose-pre:!bg-[#e6e6e6] prose-code:!text-[${theme.palette.primary.main}] prose-code:!text-[#0f2663]`
+            ? `dark:prose prose-pre:!bg-[#1b1b1b] prose-code:!text-[#91aeff] !text-slate-400 prose-strong:!text-slate-200  prose-th:!text-slate-50 prose-th:!text-start`
+            : `!prose prose-pre:!bg-[#e6e6e6] prose-code:!text-[${theme.palette.primary.main}] prose-code:!text-[#0f2663] prose-th:text-start prose-th:!font-bold`
         } `}
         children={tip}
-        // components={{
-        //   code(props) {
-        //     const { children, className, node, ...rest } = props;
-        //     const match = /language-(\w+)/.exec(className || "");
-        //     return match ? (
-        //       <SyntaxHighlighter
-        //         {...rest}
-        //         PreTag="div"
-        //         children={String(children).replace(/\n$/, "")}
-        //         language={match[1]}
-        //         style={themeType === "dark" ? materialDark : materialLight}
-        //       />
-        //     ) : (
-        //       <code {...rest} className={className}>
-        //         {children}
-        //       </code>
-        //     );
-        //   },
-        // }}
       ></Markdown>
     </div>
   );
