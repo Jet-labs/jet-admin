@@ -1,11 +1,11 @@
 import { LOCAL_CONSTANTS } from "../constants";
-import { Account } from "../models/data/account";
 import axiosInstance from "../utils/axiosInstance";
+import { Policy } from "../models/data/policy";
 
-export const addAccountAPI = async ({ data }) => {
+export const addPolicyAPI = async ({ data }) => {
   try {
     const response = await axiosInstance.post(
-      LOCAL_CONSTANTS.APIS.ACCOUNT.addAccount(),
+      LOCAL_CONSTANTS.APIS.POLICIES.addPolicy(),
       data
     );
     if (response.data && response.data.success == true) {
@@ -20,29 +20,10 @@ export const addAccountAPI = async ({ data }) => {
   }
 };
 
-export const updatePMUserDataAPI = async ({ data }) => {
+export const updatePolicyAPI = async ({ data }) => {
   try {
     const response = await axiosInstance.put(
-      LOCAL_CONSTANTS.APIS.ACCOUNT.updateAccount(),
-      data
-    );
-    if (response.data && response.data.success == true) {
-      return true;
-    } else if (response.data && response.data.error) {
-      throw response.data.error;
-    } else {
-      throw LOCAL_CONSTANTS.ERROR_CODES.SERVER_ERROR;
-    }
-  } catch (error) {
-    console.log({ error });
-    throw error;
-  }
-};
-
-export const updatePMUserPasswordAPI = async ({ data }) => {
-  try {
-    const response = await axiosInstance.put(
-      LOCAL_CONSTANTS.APIS.ACCOUNT.updatePassword(),
+      LOCAL_CONSTANTS.APIS.POLICIES.updatePolicy(),
       data
     );
 
@@ -59,35 +40,15 @@ export const updatePMUserPasswordAPI = async ({ data }) => {
   }
 };
 
-export const updateAccountAPI = async ({ data }) => {
-  try {
-    const response = await axiosInstance.put(
-      LOCAL_CONSTANTS.APIS.ACCOUNT.updateAccount(),
-      data
-    );
-
-    if (response.data && response.data.success == true) {
-      return true;
-    } else if (response.data && response.data.error) {
-      throw response.data.error;
-    } else {
-      throw LOCAL_CONSTANTS.ERROR_CODES.SERVER_ERROR;
-    }
-  } catch (error) {
-    console.log({ error });
-    throw error;
-  }
-};
-
-export const getAccountByIDAPI = async ({ pmAccountID }) => {
+export const getPolicyByIDAPI = async ({ pmPolicyObjectID }) => {
   try {
     const response = await axiosInstance.get(
-      LOCAL_CONSTANTS.APIS.ACCOUNT.getAccountByID({
-        id: pmAccountID,
+      LOCAL_CONSTANTS.APIS.POLICIES.getPolicyByID({
+        id: pmPolicyObjectID,
       })
     );
     if (response.data && response.data.success == true) {
-      return new Account(response.data.account);
+      return new Policy(response.data.policy);
     } else if (response.data.error) {
       throw response.data.error;
     } else {
@@ -98,11 +59,11 @@ export const getAccountByIDAPI = async ({ pmAccountID }) => {
   }
 };
 
-export const deleteAccountByIDAPI = async ({ pmAccountID }) => {
+export const deletePolicyByIDAPI = async ({ pmPolicyObjectID }) => {
   try {
     const response = await axiosInstance.delete(
-      LOCAL_CONSTANTS.APIS.ACCOUNT.deleteAccountByID({
-        id: pmAccountID,
+      LOCAL_CONSTANTS.APIS.POLICIES.deletePolicyByID({
+        id: pmPolicyObjectID,
       })
     );
     if (response.data && response.data.success == true) {
@@ -117,15 +78,15 @@ export const deleteAccountByIDAPI = async ({ pmAccountID }) => {
   }
 };
 
-export const getAllAccountsAPI = async () => {
+export const getAllPoliciesAPI = async () => {
   try {
     const response = await axiosInstance.get(
-      LOCAL_CONSTANTS.APIS.ACCOUNT.getAllAccounts()
+      LOCAL_CONSTANTS.APIS.POLICIES.getAllPolicies()
     );
     if (response.data && response.data.success == true) {
-      const accounts = Account.toList(response.data.accounts);
-      console.log({ accounts });
-      return accounts;
+      const policies = Policy.toList(response.data.policies);
+      console.log({ policies });
+      return policies;
     } else if (response.data.error) {
       throw response.data.error;
     } else {

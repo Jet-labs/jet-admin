@@ -569,4 +569,136 @@ policyUtils.extractAuthorizedSchemasForUpdateFromPolicyObject = ({
   return authorizeSchemaIDs;
 };
 
+policyUtils.extractAuthorizedPoliciesForReadFromPolicyObject = ({
+  policyObject,
+}) => {
+  const authorizePolicyIDs = [];
+  if (policyObject.policies?.read) {
+    return true;
+  } else if (policyObject.policies && policyObject.policies.policy_ids) {
+    Object.keys(policyObject.policies.policy_ids).forEach((policy_id) => {
+      if (
+        policyObject.policies.policy_ids[policy_id].read ||
+        policyObject.policies.policy_ids[policy_id] === true
+      ) {
+        authorizePolicyIDs.push(parseInt(policy_id));
+      }
+    });
+  }
+  return authorizePolicyIDs;
+};
+
+policyUtils.extractAuthorizedPoliciesForUpdateFromPolicyObject = ({
+  policyObject,
+}) => {
+  const authorizePolicyIDs = [];
+  if (policyObject.policies?.edit) {
+    return true;
+  } else if (policyObject.policies && policyObject.policies.policy_ids) {
+    Object.keys(policyObject.policies.policy_ids).forEach((policy_id) => {
+      if (
+        policyObject.policies.policy_ids[policy_id].edit ||
+        policyObject.policies.policy_ids[policy_id] === true
+      ) {
+        authorizePolicyIDs.push(parseInt(policy_id));
+      }
+    });
+  }
+  return authorizePolicyIDs;
+};
+
+policyUtils.extractAuthorizedPoliciesForDeleteFromPolicyObject = ({
+  policyObject,
+}) => {
+  const authorizePolicyIDs = [];
+  if (policyObject.policies?.delete) {
+    return true;
+  } else if (policyObject.policies && policyObject.policies.policy_ids) {
+    Object.keys(policyObject.policies.policy_ids).forEach((policy_id) => {
+      if (
+        policyObject.policies.policy_ids[policy_id].delete ||
+        policyObject.policies.policy_ids[policy_id] === true
+      ) {
+        authorizePolicyIDs.push(parseInt(policy_id));
+      }
+    });
+  }
+  return authorizePolicyIDs;
+};
+
+policyUtils.extractAuthorizationForPolicyAddFromPolicyObject = ({
+  policyObject,
+}) => {
+  if (policyObject.policies?.add) {
+    return true;
+  }
+  return false;
+};
+
+policyUtils.extractAuthorizedAccountsForReadFromPolicyObject = ({
+  policyObject,
+}) => {
+  const authorizeAccountIDs = [];
+  if (policyObject.accounts?.read) {
+    return true;
+  } else if (policyObject.accounts && policyObject.accounts.account_ids) {
+    Object.keys(policyObject.accounts.policy_ids).forEach((account_id) => {
+      if (
+        policyObject.accounts.policy_ids[account_id].read ||
+        policyObject.accounts.policy_ids[account_id] === true
+      ) {
+        authorizeAccountIDs.push(parseInt(account_id));
+      }
+    });
+  }
+  return authorizeAccountIDs;
+};
+
+policyUtils.extractAuthorizedAccountsForUpdateFromPolicyObject = ({
+  policyObject,
+}) => {
+  const authorizeAccountIDs = [];
+  if (policyObject.accounts?.edit) {
+    return true;
+  } else if (policyObject.accounts && policyObject.accounts.policy_ids) {
+    Object.keys(policyObject.accounts.policy_ids).forEach((account_id) => {
+      if (
+        policyObject.accounts.policy_ids[account_id].edit ||
+        policyObject.accounts.policy_ids[account_id] === true
+      ) {
+        authorizeAccountIDs.push(parseInt(account_id));
+      }
+    });
+  }
+  return authorizeAccountIDs;
+};
+
+policyUtils.extractAuthorizedAccountsForDeleteFromPolicyObject = ({
+  policyObject,
+}) => {
+  const authorizeAccountIDs = [];
+  if (policyObject.accounts?.delete) {
+    return true;
+  } else if (policyObject.accounts && policyObject.accounts.policy_ids) {
+    Object.keys(policyObject.accounts.policy_ids).forEach((account_id) => {
+      if (
+        policyObject.accounts.policy_ids[account_id].delete ||
+        policyObject.accounts.policy_ids[account_id] === true
+      ) {
+        authorizeAccountIDs.push(parseInt(account_id));
+      }
+    });
+  }
+  return authorizeAccountIDs;
+};
+
+policyUtils.extractAuthorizationForAccountAddFromPolicyObject = ({
+  policyObject,
+}) => {
+  if (policyObject.accounts?.add) {
+    return true;
+  }
+  return false;
+};
+
 module.exports = { policyUtils };

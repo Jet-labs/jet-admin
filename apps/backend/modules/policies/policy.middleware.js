@@ -21,8 +21,8 @@ policyMiddleware.populateAuthorizationPolicies = async (req, res, next) => {
         pm_user_id,
       },
     });
-    const authorization_policy = pmUser?.tbl_pm_policy_objects?.policy
-      ? pmUser.tbl_pm_policy_objects.policy
+    const authorization_policy = pmUser?.policy
+      ? JSON.parse(pmUser.policy)
       : constants.DUMMY_PERMISSION;
     Logger.log("info", {
       message:

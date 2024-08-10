@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useAuthState } from "../../contexts/authContext";
 
-import { Chip, Pagination } from "@mui/material";
+import { Button, Chip, Grid, Pagination } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
@@ -16,6 +16,8 @@ import { BiCalendar } from "react-icons/bi";
 import { DataGridActionComponent } from "../../components/DataGridComponents/DataGridActionComponent";
 import { ErrorComponent } from "../../components/ErrorComponent";
 import { RawDataGridStatistics } from "../../components/DataGridComponents/RawDataGridStatistics";
+import { getAllPoliciesAPI } from "../../api/policy";
+import { FaPlus, FaRedoAlt } from "react-icons/fa";
 
 const AllPolicies = () => {
   const { pmUser } = useAuthState();
@@ -32,21 +34,8 @@ const AllPolicies = () => {
     isPreviousData: isPreviousAllPoliciesData,
     refetch: reloadAllPolicies,
   } = useQuery({
-    queryKey: [
-      `REACT_QUERY_KEY_TABLES_${String(
-        LOCAL_CONSTANTS.STRINGS.POLICY_OBJECT_TABLE_NAME
-      ).toUpperCase()}`,
-      page,
-      filterQuery,
-      sortModel,
-    ],
-    queryFn: () =>
-      fetchAllRowsAPI({
-        tableName: LOCAL_CONSTANTS.STRINGS.POLICY_OBJECT_TABLE_NAME,
-        page,
-        filterQuery: filterQuery,
-        sortModel: sortModel,
-      }),
+    queryKey: [`REACT_QUERY_KEY_POLICIES`],
+    queryFn: () => getAllPoliciesAPI(),
 
     enabled: Boolean(pmUser),
     cacheTime: 0,
@@ -56,30 +45,18 @@ const AllPolicies = () => {
   });
 
   const getRowId = (row) => {
-    return row.pm_policy_object_id;
+    return row.pmPolicyObjectID;
   };
 
-  const addPolicyAuthorization = useMemo(() => {
-    if (pmUser && pmUser) {
-      const u = pmUser;
-      const c = u.extractAuthorizationForRowAdditionFromPolicyObject(
-        LOCAL_CONSTANTS.STRINGS.POLICY_OBJECT_TABLE_NAME
-      );
-      if (!c) {
-        return false;
-      } else {
-        return true;
-      }
-    } else {
-      return false;
-    }
+  const isAuthorizedToAddPolicy = useMemo(() => {
+    return pmUser && pmUser.isAuthorizedToAddPolicy();
   }, [pmUser]);
+
   const columns = [
-    { field: "pm_policy_object_id", headerName: "User ID" },
-    { field: "title", headerName: "Title", width: 200 },
-    { field: "description", headerName: "Description", width: 200 },
+    { field: "pmPolicyObjectID", headerName: "Policy ID" },
+    { field: "pmPolicyObjectTitle", headerName: "Title", width: 200 },
     {
-      field: "created_at",
+      field: "createdAt",
       headerName: "Created at",
       width: 300,
       valueGetter: (value, row) => {
@@ -100,54 +77,47 @@ const AllPolicies = () => {
         );
       },
     },
-    {
-      field: "updated_at",
-      headerName: "Updated at",
-      width: 300,
-      valueGetter: (value, row) => {
-        return moment(value).format("dddd, MMMM Do YYYY, h:mm:ss a");
-      },
-      renderCell: (params) => {
-        return (
-          <Chip
-            label={`${params.value}`}
-            size="small"
-            variant="outlined"
-            color={"secondary"}
-            icon={<BiCalendar className="!text-sm" />}
-            sx={{
-              borderRadius: 1,
-            }}
-          />
-        );
-      },
-    },
   ];
+  const _handleNavigatePolicyAdditionForm = () => {
+    navigate(LOCAL_CONSTANTS.ROUTES.ADD_POLICY.path());
+  };
   return (
     <div>
-      <div className={`!w-full !p-4`}>
-        <RawDataGridStatistics
-          tableName={LOCAL_CONSTANTS.STRINGS.POLICY_OBJECT_TABLE_NAME}
-          altTableName={"Policy management"}
-          filterQuery={filterQuery}
-        />
-        <DataGridActionComponent
-          filterQuery={filterQuery}
-          setFilterQuery={setFilterQuery}
-          reloadData={reloadAllPolicies}
-          tableName={LOCAL_CONSTANTS.STRINGS.POLICY_OBJECT_TABLE_NAME}
-          setSortModel={setSortModel}
-          sortModel={sortModel}
-          addRowNavigation={LOCAL_CONSTANTS.ROUTES.ADD_POLICY.path()}
-          allowAdd={addPolicyAuthorization}
-        />
-      </div>
       {isLoadingAllPolicies ? (
         <Loading />
-      ) : data?.rows && pmUser ? (
+      ) : data && pmUser ? (
         <div className="px-4">
+          <Grid
+            item
+            xs={12}
+            md={12}
+            lg={12}
+            className="!flex !flex-row !justify-end !items-center !w-full !py-3"
+          >
+            <Button
+              onClick={reloadAllPolicies}
+              startIcon={<FaRedoAlt className="!text-sm" />}
+              size="medium"
+              variant="outlined"
+              className="!ml-2"
+            >
+              Reload
+            </Button>
+            {isAuthorizedToAddPolicy && (
+              <Button
+                onClick={_handleNavigatePolicyAdditionForm}
+                startIcon={<FaPlus className="!text-sm" />}
+                size="medium"
+                variant="contained"
+                className="!ml-2"
+              >
+                Add
+              </Button>
+            )}
+          </Grid>
+
           <DataGrid
-            rows={data.rows}
+            rows={data}
             loading={isLoadingAllPolicies || isFetchingAllAllPolicies}
             columns={columns}
             initialState={{}}
@@ -161,9 +131,7 @@ const AllPolicies = () => {
             onRowClick={(param) => {
               navigate(
                 LOCAL_CONSTANTS.ROUTES.POLICY_SETTINGS.path(
-                  JSON.stringify({
-                    pm_policy_object_id: param.row.pm_policy_object_id,
-                  })
+                  param.row.pmPolicyObjectID
                 )
               );
             }}

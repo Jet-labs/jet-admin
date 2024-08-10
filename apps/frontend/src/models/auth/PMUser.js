@@ -11,6 +11,7 @@ export class PMUser {
     updated_at,
     disabled_at,
     disable_reason,
+    policy,
     tbl_pm_policy_objects,
   }) {
     this.pm_user_id = pm_user_id;
@@ -27,7 +28,7 @@ export class PMUser {
     this.is_profile_complete = this.first_name && this.email && this.address1;
 
     this.tbl_pm_policy_objects = tbl_pm_policy_objects;
-    this.policy = tbl_pm_policy_objects ? tbl_pm_policy_objects.policy : null;
+    this.policy = JSON.parse(policy);
   }
 
   isPolicyEditor = () => {
@@ -425,6 +426,119 @@ export class PMUser {
       if (this.policy.app_constants.app_constant_ids[pmAppConstantID]) {
         authorization = Boolean(
           this.policy.app_constants.app_constant_ids[pmAppConstantID].delete
+        );
+      }
+    }
+    console.log({ authorization });
+    return authorization;
+  };
+
+  isAuthorizedToAddPolicy = () => {
+    if (this.policy?.policies?.add) {
+      return true;
+    }
+    return false;
+  };
+
+  extractAuthorizedPolicysForReadFromPolicyObject = () => {
+    const authorizePolicyIDs = [];
+    if (this.policy?.policies?.read) {
+      return true;
+    } else if (this.policy.policies && this.policy.policies.policy_ids) {
+      Object.keys(this.policy.policies.policy_ids).forEach((pmPolicyID) => {
+        if (this.policy.policies.policy_ids[pmPolicyID].read) {
+          authorizePolicyIDs.push(parseInt(pmPolicyID));
+        }
+      });
+    }
+    return authorizePolicyIDs;
+  };
+
+  extractAuthorizedPolicysForUpdateFromPolicyObject = () => {
+    const authorizePolicyIDs = [];
+    if (this.policy?.policies?.edit) {
+      return true;
+    } else if (this.policy.policies && this.policy.policies.policy_ids) {
+      Object.keys(this.policy.policies.policy_ids).forEach((pmPolicyID) => {
+        if (this.policy.policies.policy_ids[pmPolicyID].edit) {
+          authorizePolicyIDs.push(parseInt(pmPolicyID));
+        }
+      });
+    }
+    return authorizePolicyIDs;
+  };
+
+  isAuthorizedToDeletePolicy = (pmPolicyID) => {
+    let authorization = false;
+    if (
+      this.policy.policies &&
+      !(
+        this.policy.policies.delete === null ||
+        this.policy.policies.delete === undefined
+      )
+    ) {
+      authorization = this.policy.policies.delete;
+    } else if (this.policy.policies && this.policy.policies.policy_ids) {
+      if (this.policy.policies.policy_ids[pmPolicyID]) {
+        authorization = Boolean(
+          this.policy.policies.policy_ids[pmPolicyID].delete
+        );
+      }
+    }
+    console.log({ authorization });
+    return authorization;
+  };
+
+  isAuthorizedToAddAccount = () => {
+    console.log({ this: this.policy });
+    if (this.policy?.accounts?.add) {
+      return true;
+    }
+    return false;
+  };
+
+  extractAuthorizedAccountsForReadFromAccountObject = () => {
+    const authorizeAccountIDs = [];
+    if (this.policy?.accounts?.read) {
+      return true;
+    } else if (this.policy.accounts && this.policy.accounts.accounts_ids) {
+      Object.keys(this.policy.accounts.accounts_ids).forEach((pmAccountID) => {
+        if (this.policy.accounts.accounts_ids[pmAccountID].read) {
+          authorizeAccountIDs.push(parseInt(pmAccountID));
+        }
+      });
+    }
+    return authorizeAccountIDs;
+  };
+
+  extractAuthorizedAccountsForUpdateFromAccountObject = () => {
+    const authorizeAccountIDs = [];
+    if (this.policy?.accounts?.edit) {
+      return true;
+    } else if (this.policy.account && this.policy.account.account_ids) {
+      Object.keys(this.policy.account.account_ids).forEach((pmAccountID) => {
+        if (this.policy.account.account_ids[pmAccountID].edit) {
+          authorizeAccountIDs.push(parseInt(pmAccountID));
+        }
+      });
+    }
+    return authorizeAccountIDs;
+  };
+
+  isAuthorizedToDeleteAccount = (pmAccountID) => {
+    let authorization = false;
+    if (
+      this.policy.account &&
+      !(
+        this.policy.account.delete === null ||
+        this.policy.account.delete === undefined
+      )
+    ) {
+      authorization = this.policy.account.delete;
+    } else if (this.policy.account && this.policy.account.account_ids) {
+      if (this.policy.account.account_ids[pmAccountID]) {
+        authorization = Boolean(
+          this.policy.account.account_ids[pmAccountID].delete
         );
       }
     }

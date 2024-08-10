@@ -7,6 +7,8 @@ import { TablePolicyEditor } from "../TablePolicyEditor";
 import { JobPolicyEditor } from "../JobPolicyEditor";
 import { AppConstantPolicyEditor } from "../AppConstantPolicyEditor";
 import { SchemaPolicyEditor } from "../SchemaPolicyEditor";
+import { PolicyObjectPolicyEditor } from "../PolicyObjectPolicyEditor";
+import { AccountPolicyEditor } from "../AccountPolicyEditor";
 
 export const GUIPolicyEditor = ({ policy, handleChange, containerClass }) => {
   return (
@@ -92,6 +94,28 @@ export const GUIPolicyEditor = ({ policy, handleChange, containerClass }) => {
             case "app_constants": {
               component = (
                 <AppConstantPolicyEditor
+                  value={policy[key]}
+                  handleChange={(value) => {
+                    handleChange({ ...policy, [key]: value });
+                  }}
+                />
+              );
+              break;
+            }
+            case "policies": {
+              component = (
+                <PolicyObjectPolicyEditor
+                  value={policy[key]}
+                  handleChange={(value) => {
+                    handleChange({ ...policy, [key]: value });
+                  }}
+                />
+              );
+              break;
+            }
+            case "accounts": {
+              component = (
+                <AccountPolicyEditor
                   value={policy[key]}
                   handleChange={(value) => {
                     handleChange({ ...policy, [key]: value });

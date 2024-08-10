@@ -1,11 +1,10 @@
-const { prisma } = require("../../config/prisma");
 const constants = require("../../constants");
 
 const jwt = require("jsonwebtoken");
 const environmentVariables = require("../../environment");
 const Logger = require("../../utils/logger");
 const { comparePasswordWithHash } = require("../../utils/crypto.utils");
-const salt = "ed2b6072e463cbe7e5387de6bae69d55";
+const { auth_db } = require("../../config/sqlite.db");
 
 class AuthService {
   constructor() {}
@@ -60,12 +59,11 @@ class AuthService {
         message: "AuthService:verifyAccessToken:pm_user_id",
         params: { pm_user_id: payload.pm_user_id },
       });
-      const pmUser = await prisma.tbl_pm_users.findUnique({
-        where: { pm_user_id: payload.pm_user_id, is_disabled: false },
-        include: {
-          tbl_pm_policy_objects: true,
-        },
-      });
+      const pmUser = auth_db
+        .prepare(
+          `SELECT u.*, p.* FROM tbl_pm_users u LEFT JOIN tbl_pm_policy_objects p ON u.pm_policy_object_id = p.pm_policy_object_id WHERE u.pm_user_id = ? AND u.is_disabled = false`
+        )
+        .get(payload.pm_user_id);
       if (!pmUser) {
         Logger.log("error", {
           message: "AuthService:verifyAccessToken:catch-2",
@@ -75,7 +73,7 @@ class AuthService {
       } else {
         Logger.log("success", {
           message: "AuthService:verifyAccessToken:success",
-          params: { pm_user_id: payload.pm_user_id },
+          params: { pm_user_id: payload.pm_user_id, pmUser },
         });
         return pmUser;
       }
@@ -129,11 +127,11 @@ class AuthService {
           username,
         },
       });
-      const pmUser = await prisma.tbl_pm_users.findFirst({
-        where: {
-          username: String(username).trim(),
-        },
-      });
+
+      const pmUser = auth_db
+        .prepare(`SELECT * FROM tbl_pm_users WHERE TRIM(username) = ? LIMIT 1`)
+        .get(username.trim());
+
       Logger.log("info", {
         message: "AuthService:loginUserWithUsernamePassword:pmUser",
         params: { pmUser },

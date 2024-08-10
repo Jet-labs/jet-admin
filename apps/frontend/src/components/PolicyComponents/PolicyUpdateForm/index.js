@@ -12,6 +12,7 @@ import { displayError, displaySuccess } from "../../../utils/notification";
 
 import { Loading } from "../../../pages/Loading";
 import { PolicyDeletionForm } from "../PolicyDeletionForm";
+import { getPolicyByIDAPI, updatePolicyAPI } from "../../../api/policy";
 
 export const PolicyUpdateForm = ({ id }) => {
   const theme = useTheme();
@@ -22,16 +23,10 @@ export const PolicyUpdateForm = ({ id }) => {
     data: policyObjectData,
     error: loadPolicyObjectDataError,
   } = useQuery({
-    queryKey: [
-      `REACT_QUERY_KEY_TABLES_${String(
-        LOCAL_CONSTANTS.STRINGS.POLICY_OBJECT_TABLE_NAME
-      ).toUpperCase()}`,
-      id,
-    ],
+    queryKey: [`REACT_QUERY_KEY_POLICIES`, id],
     queryFn: () =>
-      fetchRowByIDAPI({
-        tableName: LOCAL_CONSTANTS.STRINGS.POLICY_OBJECT_TABLE_NAME,
-        id,
+      getPolicyByIDAPI({
+        pmPolicyObjectID: id,
       }),
     cacheTime: 0,
     retry: 1,
@@ -45,10 +40,8 @@ export const PolicyUpdateForm = ({ id }) => {
     error: updatePolicyObjectError,
     mutate: updateRow,
   } = useMutation({
-    mutationFn: ({ id, data }) => {
-      return updateRowAPI({
-        tableName: LOCAL_CONSTANTS.STRINGS.POLICY_OBJECT_TABLE_NAME,
-        id,
+    mutationFn: ({ data }) => {
+      return updatePolicyAPI({
         data,
       });
     },
@@ -56,11 +49,7 @@ export const PolicyUpdateForm = ({ id }) => {
     retry: false,
     onSuccess: () => {
       displaySuccess("Updated policy successfully");
-      queryClient.invalidateQueries([
-        `REACT_QUERY_KEY_TABLES_${String(
-          LOCAL_CONSTANTS.STRINGS.POLICY_OBJECT_TABLE_NAME
-        ).toUpperCase()}`,
-      ]);
+      queryClient.invalidateQueries([`REACT_QUERY_KEY_POLICIES`]);
     },
     onError: (error) => {
       displayError(error);
@@ -83,16 +72,19 @@ export const PolicyUpdateForm = ({ id }) => {
 
   useEffect(() => {
     if (policyObjectData) {
-      policyObjectUpdateForm.setFieldValue("title", policyObjectData.title);
+      policyObjectUpdateForm.setFieldValue("pm_policy_object_id", id);
       policyObjectUpdateForm.setFieldValue(
-        "pm_policy_object_id",
-        policyObjectData.pm_policy_object_id
+        "pm_policy_object_title",
+        policyObjectData.pmPolicyObjectTitle
       );
       policyObjectUpdateForm.setFieldValue(
         "is_disabled",
-        policyObjectData.is_disabled
+        policyObjectData.isDisabled
       );
-      policyObjectUpdateForm.setFieldValue("policy", policyObjectData.policy);
+      policyObjectUpdateForm.setFieldValue(
+        "pm_policy_object",
+        policyObjectData.pmPolicyObject
+      );
     }
   }, [policyObjectData]);
 
@@ -162,16 +154,27 @@ export const PolicyUpdateForm = ({ id }) => {
                 required={true}
               />
             </Grid>
-            <Grid item xs={12} sm={12} md={12} lg={12} key={"title"}>
+            <Grid
+              item
+              xs={12}
+              sm={12}
+              md={12}
+              lg={12}
+              key={"pm_policy_object_title"}
+            >
               <FieldComponent
                 type={LOCAL_CONSTANTS.DATA_TYPES.STRING}
-                name={"title"}
-                value={policyObjectUpdateForm.values["title"]}
+                name={"pm_policy_object_title"}
+                value={policyObjectUpdateForm.values["pm_policy_object_title"]}
                 onBlur={policyObjectUpdateForm.handleBlur}
                 onChange={policyObjectUpdateForm.handleChange}
                 setFieldValue={policyObjectUpdateForm.setFieldValue}
-                helperText={policyObjectUpdateForm.errors["title"]}
-                error={Boolean(policyObjectUpdateForm.errors["title"])}
+                helperText={
+                  policyObjectUpdateForm.errors["pm_policy_object_title"]
+                }
+                error={Boolean(
+                  policyObjectUpdateForm.errors["pm_policy_object_title"]
+                )}
                 required={true}
                 customMapping={null}
               />
@@ -193,9 +196,9 @@ export const PolicyUpdateForm = ({ id }) => {
           </Grid>
         </div>
         <GUIPolicyEditor
-          policy={policyObjectUpdateForm.values["policy"]}
+          policy={policyObjectUpdateForm.values["pm_policy_object"]}
           handleChange={(value) => {
-            policyObjectUpdateForm.setFieldValue("policy", value);
+            policyObjectUpdateForm.setFieldValue("pm_policy_object", value);
           }}
           containerClass="!mt-4"
         />

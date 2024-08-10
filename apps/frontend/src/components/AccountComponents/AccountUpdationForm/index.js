@@ -10,9 +10,10 @@ import { Loading } from "../../../pages/Loading";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { FieldComponent } from "../../FieldComponent";
-import { updatePMUserDataAPI } from "../../../api/accounts";
+import { getAccountByIDAPI, updatePMUserDataAPI } from "../../../api/accounts";
 import { AccountDeletionForm } from "../AccountDeletetionForm";
 import { AccountPasswordChangeForm } from "../AccountPasswordChangeForm";
+import { getAllPoliciesAPI } from "../../../api/policy";
 
 export const AccountUpdationForm = ({ id }) => {
   const theme = useTheme();
@@ -23,16 +24,10 @@ export const AccountUpdationForm = ({ id }) => {
     data: pmUserData,
     error: loadPMUserDataError,
   } = useQuery({
-    queryKey: [
-      `REACT_QUERY_KEY_TABLES_${String(
-        LOCAL_CONSTANTS.STRINGS.PM_USER_TABLE_NAME
-      ).toUpperCase()}`,
-      id,
-    ],
+    queryKey: [`REACT_QUERY_KEY_ACCOUNTS`, id],
     queryFn: () =>
-      fetchRowByIDAPI({
-        tableName: LOCAL_CONSTANTS.STRINGS.PM_USER_TABLE_NAME,
-        id,
+      getAccountByIDAPI({
+        pmAccountID: id,
       }),
     cacheTime: 0,
     retry: 1,
@@ -44,17 +39,8 @@ export const AccountUpdationForm = ({ id }) => {
     data: policyObjectData,
     error: loadPolicyObjectDataError,
   } = useQuery({
-    queryKey: [
-      `REACT_QUERY_KEY_TABLES_${String(
-        LOCAL_CONSTANTS.STRINGS.POLICY_OBJECT_TABLE_NAME
-      ).toUpperCase()}`,
-    ],
-    queryFn: () =>
-      fetchAllRowsAPI({
-        tableName: LOCAL_CONSTANTS.STRINGS.POLICY_OBJECT_TABLE_NAME,
-        filterQuery: {},
-        sortModel: {},
-      }),
+    queryKey: [`REACT_QUERY_KEY_POLICIES`],
+    queryFn: () => getAllPoliciesAPI(),
     cacheTime: 0,
     retry: 1,
     staleTime: Infinity,
@@ -74,11 +60,7 @@ export const AccountUpdationForm = ({ id }) => {
     retry: false,
     onSuccess: () => {
       displaySuccess("Updated user successfully");
-      queryClient.invalidateQueries([
-        `REACT_QUERY_KEY_TABLES_${String(
-          LOCAL_CONSTANTS.STRINGS.PM_USER_TABLE_NAME
-        ).toUpperCase()}`,
-      ]);
+      queryClient.invalidateQueries([`REACT_QUERY_KEY_ACCOUNTS`]);
     },
     onError: (error) => {
       displayError(error);
@@ -114,9 +96,9 @@ export const AccountUpdationForm = ({ id }) => {
 
   const customPolicyObjectMapping = useMemo(() => {
     const map = {};
-    if (policyObjectData && policyObjectData.rows) {
-      policyObjectData.rows.forEach((policyObject) => {
-        map[policyObject.pm_policy_object_id] = policyObject.title;
+    if (policyObjectData) {
+      policyObjectData.forEach((policyObject) => {
+        map[policyObject.pmPolicyObjectID] = policyObject.pmPolicyObjectTitle;
       });
       return map;
     } else {
@@ -126,7 +108,7 @@ export const AccountUpdationForm = ({ id }) => {
 
   return !isLoadingPMUserData && !isLoadingPolicyObjectData && pmUserData ? (
     <div className="flex flex-col justify-start items-center w-full pb-5 p-2">
-      <div className=" flex flex-row justify-between 2xl:w-1/2 xl:w-1/2 lg:w-2/3 md:w-full w-full  mt-3 w-full ">
+      <div className=" flex flex-row justify-between 2xl:w-1/2 xl:w-1/2 lg:w-2/3 md:w-full w-full  mt-3">
         <div className="flex flex-col items-start justify-start">
           <span className="text-lg font-bold text-start ">{`Account settings`}</span>
           <span

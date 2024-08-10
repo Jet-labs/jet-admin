@@ -4,14 +4,13 @@ import { useFormik } from "formik";
 
 import { FieldComponent } from "../../FieldComponent";
 
-import { addRowAPI } from "../../../api/tables";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { displayError, displaySuccess } from "../../../utils/notification";
 
 import samplePolicy from "../../../sample_admin_policy.json";
-import { PolicyDeletionForm } from "../PolicyDeletionForm";
 import { GUIPolicyEditor } from "../PolicyEditorComponents/GUIPolicyEditor";
-export const PolicyAdditionForm = ({ id }) => {
+import { addPolicyAPI } from "../../../api/policy";
+export const PolicyAdditionForm = () => {
   const theme = useTheme();
   const queryClient = new QueryClient();
 
@@ -23,9 +22,7 @@ export const PolicyAdditionForm = ({ id }) => {
     mutate: addRow,
   } = useMutation({
     mutationFn: ({ data }) => {
-      return addRowAPI({
-        tableName: LOCAL_CONSTANTS.STRINGS.POLICY_OBJECT_TABLE_NAME,
-
+      return addPolicyAPI({
         data,
       });
     },
@@ -33,11 +30,7 @@ export const PolicyAdditionForm = ({ id }) => {
     retry: false,
     onSuccess: () => {
       displaySuccess("Added policy successfully");
-      queryClient.invalidateQueries([
-        `REACT_QUERY_KEY_TABLES_${String(
-          LOCAL_CONSTANTS.STRINGS.POLICY_OBJECT_TABLE_NAME
-        ).toUpperCase()}`,
-      ]);
+      queryClient.invalidateQueries([`REACT_QUERY_KEY_POLICIES`]);
     },
     onError: (error) => {
       displayError(error);
@@ -46,10 +39,9 @@ export const PolicyAdditionForm = ({ id }) => {
 
   const policyObjectAdditionForm = useFormik({
     initialValues: {
-      title: "",
-      pm_policy_object_id: "",
+      pm_policy_object_title: "",
+      pm_policy_object: samplePolicy,
       is_disabled: false,
-      policy: samplePolicy,
     },
     validateOnMount: false,
     validateOnChange: false,
@@ -71,7 +63,6 @@ export const PolicyAdditionForm = ({ id }) => {
         </div>
 
         <div className="flex flex-row items-center justify-end w-min ">
-          <PolicyDeletionForm id={id} />
           <Button
             disableElevation
             variant="contained"
@@ -85,7 +76,7 @@ export const PolicyAdditionForm = ({ id }) => {
             className="!ml-2"
             onClick={policyObjectAdditionForm.submitForm}
           >
-            Add policy
+            Add
           </Button>
         </div>
       </div>
@@ -108,34 +99,23 @@ export const PolicyAdditionForm = ({ id }) => {
               sm={12}
               md={12}
               lg={12}
-              key={"pm_policy_object_id"}
+              key={"pm_policy_object_title"}
             >
               <FieldComponent
-                type={LOCAL_CONSTANTS.DATA_TYPES.INT}
-                name={"pm_policy_object_id"}
-                value={policyObjectAdditionForm.values["pm_policy_object_id"]}
+                type={LOCAL_CONSTANTS.DATA_TYPES.STRING}
+                name={"pm_policy_object_title"}
+                value={
+                  policyObjectAdditionForm.values["pm_policy_object_title"]
+                }
                 onBlur={policyObjectAdditionForm.handleBlur}
                 onChange={policyObjectAdditionForm.handleChange}
                 setFieldValue={policyObjectAdditionForm.setFieldValue}
                 helperText={
-                  policyObjectAdditionForm.errors["pm_policy_object_id"]
+                  policyObjectAdditionForm.errors["pm_policy_object_title"]
                 }
                 error={Boolean(
-                  policyObjectAdditionForm.errors["pm_policy_object_id"]
+                  policyObjectAdditionForm.errors["pm_policy_object_title"]
                 )}
-                required={true}
-              />
-            </Grid>
-            <Grid item xs={12} sm={12} md={12} lg={12} key={"title"}>
-              <FieldComponent
-                type={LOCAL_CONSTANTS.DATA_TYPES.STRING}
-                name={"title"}
-                value={policyObjectAdditionForm.values["title"]}
-                onBlur={policyObjectAdditionForm.handleBlur}
-                onChange={policyObjectAdditionForm.handleChange}
-                setFieldValue={policyObjectAdditionForm.setFieldValue}
-                helperText={policyObjectAdditionForm.errors["title"]}
-                error={Boolean(policyObjectAdditionForm.errors["title"])}
                 required={true}
                 customMapping={null}
               />
@@ -157,9 +137,9 @@ export const PolicyAdditionForm = ({ id }) => {
           </Grid>
         </div>
         <GUIPolicyEditor
-          policy={policyObjectAdditionForm.values["policy"]}
+          policy={policyObjectAdditionForm.values["pm_policy_object"]}
           handleChange={(value) => {
-            policyObjectAdditionForm.setFieldValue("policy", value);
+            policyObjectAdditionForm.setFieldValue("pm_policy_object", value);
           }}
           containerClass="!mt-4"
         />

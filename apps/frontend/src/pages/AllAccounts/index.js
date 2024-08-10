@@ -1,9 +1,9 @@
 import { useNavigate } from "react-router-dom";
 
-import { Chip, Pagination } from "@mui/material";
+import { Button, Chip, Grid, Pagination } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { fetchAllRowsAPI } from "../../api/tables";
 import { useAuthState } from "../../contexts/authContext";
 
@@ -16,14 +16,19 @@ import { BiCalendar } from "react-icons/bi";
 import { DataGridActionComponent } from "../../components/DataGridComponents/DataGridActionComponent";
 import { ErrorComponent } from "../../components/ErrorComponent";
 import { RawDataGridStatistics } from "../../components/DataGridComponents/RawDataGridStatistics";
+import { getAllAccountsAPI } from "../../api/accounts";
+import { FaPlus, FaRedoAlt } from "react-icons/fa";
 const AllAccounts = () => {
-  const tableName = LOCAL_CONSTANTS.STRINGS.PM_USER_TABLE_NAME;
-
   const { pmUser } = useAuthState();
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [filterQuery, setFilterQuery] = useState(null);
   const [sortModel, setSortModel] = useState(null);
+
+  const isAuthorizedToAddAccount = useMemo(() => {
+    return pmUser && pmUser.isAuthorizedToAddAccount();
+  }, [pmUser]);
+
   const {
     isLoading: isLoadingAllAccounts,
     data: data,
@@ -33,19 +38,8 @@ const AllAccounts = () => {
     isPreviousData: isPreviousAllAccountsData,
     refetch: reloadAllAccounts,
   } = useQuery({
-    queryKey: [
-      `REACT_QUERY_KEY_TABLES_${String(tableName).toUpperCase()}`,
-      page,
-      filterQuery,
-      sortModel,
-    ],
-    queryFn: () =>
-      fetchAllRowsAPI({
-        tableName,
-        page,
-        filterQuery: filterQuery,
-        sortModel: sortModel,
-      }),
+    queryKey: [`REACT_QUERY_KEY_ACCOUNTS`],
+    queryFn: () => getAllAccountsAPI(),
 
     enabled: Boolean(pmUser),
     cacheTime: 0,
@@ -126,31 +120,45 @@ const AllAccounts = () => {
     },
   ];
 
+  const _handleNavigateAccountAdditionForm = () => {
+    navigate(LOCAL_CONSTANTS.ROUTES.ADD_ACCOUNT.path());
+  };
   return (
     <div>
-      <div className={`!w-full !p-4`}>
-        <RawDataGridStatistics
-          tableName={tableName}
-          altTableName={"Account management"}
-          filterQuery={filterQuery}
-        />
-        <DataGridActionComponent
-          filterQuery={filterQuery}
-          setFilterQuery={setFilterQuery}
-          reloadData={reloadAllAccounts}
-          tableName={tableName}
-          setSortModel={setSortModel}
-          sortModel={sortModel}
-          addRowNavigation={LOCAL_CONSTANTS.ROUTES.ADD_ACCOUNT.path()}
-          allowAdd={true}
-        />
-      </div>
       {isLoadingAllAccounts ? (
         <Loading />
-      ) : data?.rows && pmUser ? (
+      ) : data && pmUser ? (
         <div className="px-4">
+          <Grid
+            item
+            xs={12}
+            md={12}
+            lg={12}
+            className="!flex !flex-row !justify-end !items-center !w-full !py-3"
+          >
+            <Button
+              onClick={reloadAllAccounts}
+              startIcon={<FaRedoAlt className="!text-sm" />}
+              size="medium"
+              variant="outlined"
+              className="!ml-2"
+            >
+              Reload
+            </Button>
+            {isAuthorizedToAddAccount && (
+              <Button
+                onClick={_handleNavigateAccountAdditionForm}
+                startIcon={<FaPlus className="!text-sm" />}
+                size="medium"
+                variant="contained"
+                className="!ml-2"
+              >
+                Add
+              </Button>
+            )}
+          </Grid>
           <DataGrid
-            rows={data.rows}
+            rows={data}
             loading={isLoadingAllAccounts || isFetchingAllAllAccounts}
             columns={columns}
             initialState={{}}
@@ -164,9 +172,7 @@ const AllAccounts = () => {
             onRowClick={(param) => {
               navigate(
                 LOCAL_CONSTANTS.ROUTES.ACCOUNT_SETTINGS.path(
-                  JSON.stringify({
-                    pm_user_id: param.row.pm_user_id,
-                  })
+                  param.row.pm_user_id
                 )
               );
             }}

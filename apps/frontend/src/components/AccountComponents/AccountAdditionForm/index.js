@@ -8,6 +8,7 @@ import { fetchAllRowsAPI } from "../../../api/tables";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { FieldComponent } from "../../FieldComponent";
+import { getAllPoliciesAPI } from "../../../api/policy";
 
 export const AccountAdditionForm = ({ tableName }) => {
   const theme = useTheme();
@@ -17,17 +18,8 @@ export const AccountAdditionForm = ({ tableName }) => {
     data: policyObjectData,
     error: loadPolicyObjectDataError,
   } = useQuery({
-    queryKey: [
-      `REACT_QUERY_KEY_TABLES_${String(
-        LOCAL_CONSTANTS.STRINGS.POLICY_OBJECT_TABLE_NAME
-      ).toUpperCase()}`,
-    ],
-    queryFn: () =>
-      fetchAllRowsAPI({
-        tableName: LOCAL_CONSTANTS.STRINGS.POLICY_OBJECT_TABLE_NAME,
-        filterQuery: {},
-        sortModel: {},
-      }),
+    queryKey: [`REACT_QUERY_KEY_POLICIES`],
+    queryFn: () => getAllPoliciesAPI(),
     cacheTime: 0,
     retry: 1,
     staleTime: Infinity,
@@ -35,9 +27,9 @@ export const AccountAdditionForm = ({ tableName }) => {
 
   const customPolicyObjectMapping = useMemo(() => {
     const map = {};
-    if (policyObjectData && policyObjectData.rows) {
-      policyObjectData.rows.forEach((policyObject) => {
-        map[policyObject.pm_policy_object_id] = policyObject.title;
+    if (policyObjectData) {
+      policyObjectData.forEach((policyObject) => {
+        map[policyObject.pmPolicyObjectID] = policyObject.pmPolicyObjectTitle;
       });
       return map;
     } else {

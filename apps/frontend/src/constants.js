@@ -183,7 +183,7 @@ export const LOCAL_CONSTANTS = {
       code: ":id",
       path: (table_name, id) => `${id}`,
     },
-    POLICY_MANAGEMENT: { code: "/policy_editor", path: () => `/policy_editor` },
+    POLICY_MANAGEMENT: { code: "/policies", path: () => `/policies` },
     POLICY_SETTINGS: {
       code: ":id",
       path: (id) => `${id}`,
@@ -259,9 +259,13 @@ export const LOCAL_CONSTANTS = {
       deleteGraphByID: ({ id }) => `/admin_api/graphs/${id}`,
     },
     ACCOUNT: {
+      updatePassword: () => `/admin_api/accounts/password`,
+
+      getAllAccounts: () => `/admin_api/accounts`,
+      getAccountByID: ({ id }) => `/admin_api/accounts/${id}`,
       addAccount: () => `/admin_api/accounts`,
       updateAccount: () => `/admin_api/accounts`,
-      updatePassword: () => `/admin_api/accounts/password`,
+      deleteAccountByID: ({ id }) => `/admin_api/accounts/${id}`,
     },
     DASHBOARD_LAYOUT: {
       getAllDashboards: () => `/admin_api/dashboards`,
@@ -298,6 +302,13 @@ export const LOCAL_CONSTANTS = {
       addAppConstant: () => `/admin_api/app_constants`,
       updateAppConstant: () => `/admin_api/app_constants`,
       deleteAppConstantByID: ({ id }) => `/admin_api/app_constants/${id}`,
+    },
+    POLICIES: {
+      getAllPolicies: () => `/admin_api/policies`,
+      getPolicyByID: ({ id }) => `/admin_api/policies/${id}`,
+      addPolicy: () => `/admin_api/policies`,
+      updatePolicy: () => `/admin_api/policies`,
+      deletePolicyByID: ({ id }) => `/admin_api/policies/${id}`,
     },
   },
 

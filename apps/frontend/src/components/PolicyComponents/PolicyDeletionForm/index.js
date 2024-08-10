@@ -9,6 +9,7 @@ import { displayError, displaySuccess } from "../../../utils/notification";
 import { ConfirmationDialog } from "../../ConfirmationDialog";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { useNavigate } from "react-router-dom";
+import { deletePolicyByIDAPI } from "../../../api/policy";
 export const PolicyDeletionForm = ({ id }) => {
   const { pmUser } = useAuthState();
   const queryClient = useQueryClient();
@@ -39,18 +40,13 @@ export const PolicyDeletionForm = ({ id }) => {
     mutate: deleteRow,
   } = useMutation({
     mutationFn: ({ id }) =>
-      deleteRowByIDAPI({
-        tableName: LOCAL_CONSTANTS.STRINGS.POLICY_OBJECT_TABLE_NAME,
-        id,
+      deletePolicyByIDAPI({
+        pmPolicyObjectID: id,
       }),
     retry: false,
     onSuccess: () => {
       displaySuccess("Deleted row successfully");
-      queryClient.invalidateQueries([
-        `REACT_QUERY_KEY_TABLES_${String(
-          LOCAL_CONSTANTS.STRINGS.POLICY_OBJECT_TABLE_NAME
-        ).toUpperCase()}`,
-      ]);
+      queryClient.invalidateQueries([`REACT_QUERY_KEY_POLICIES`]);
       navigate(-1);
       setIsDeleteRowConfirmationOpen(false);
     },

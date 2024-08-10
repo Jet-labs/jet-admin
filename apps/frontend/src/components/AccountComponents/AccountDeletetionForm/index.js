@@ -9,6 +9,7 @@ import { displayError, displaySuccess } from "../../../utils/notification";
 import { ConfirmationDialog } from "../../ConfirmationDialog";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { useNavigate } from "react-router-dom";
+import { deleteAccountByIDAPI } from "../../../api/accounts";
 export const AccountDeletionForm = ({ id, username }) => {
   const { pmUser } = useAuthState();
   const queryClient = useQueryClient();
@@ -17,20 +18,12 @@ export const AccountDeletionForm = ({ id, username }) => {
     useState(false);
 
   const deleteAccountAuthorization = useMemo(() => {
-    if (pmUser && pmUser) {
-      const u = pmUser;
-      const c = u.extractAuthorizationForRowDeletionFromPolicyObject(
-        LOCAL_CONSTANTS.STRINGS.PM_USER_TABLE_NAME
-      );
-      if (!c) {
-        return false;
-      } else {
-        return true;
-      }
+    if (pmUser) {
+      return pmUser.isAuthorizedToDeleteAppConstant(id);
     } else {
       return false;
     }
-  }, [pmUser]);
+  }, [pmUser, id]);
   const {
     isPending: isDeletingAccount,
     isSuccess: isDeleteAccountSuccess,
@@ -39,18 +32,13 @@ export const AccountDeletionForm = ({ id, username }) => {
     mutate: deleteAccount,
   } = useMutation({
     mutationFn: ({ id }) =>
-      deleteRowByIDAPI({
-        tableName: LOCAL_CONSTANTS.STRINGS.PM_USER_TABLE_NAME,
-        id,
+      deleteAccountByIDAPI({
+        pmAccountID: id,
       }),
     retry: false,
     onSuccess: () => {
-      displaySuccess("Deleted row successfully");
-      queryClient.invalidateQueries([
-        `REACT_QUERY_KEY_TABLES_${String(
-          LOCAL_CONSTANTS.STRINGS.PM_USER_TABLE_NAME
-        ).toUpperCase()}`,
-      ]);
+      displaySuccess("Deleted account successfully");
+      queryClient.invalidateQueries([`REACT_QUERY_KEY_ACCOUNTS`]);
       navigate(-1);
       setIsDeleteAccountConfirmationOpen(false);
     },

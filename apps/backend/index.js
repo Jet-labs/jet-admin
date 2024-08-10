@@ -20,6 +20,10 @@ expressApp.use(
   "/admin_api/accounts",
   require("./modules/accounts/account.route")
 );
+expressApp.use(
+  "/admin_api/policies",
+  require("./modules/policies/policy.route")
+);
 expressApp.use("/admin_api/graphs", require("./modules/graph/graph.route"));
 expressApp.use(
   "/admin_api/dashboards",
