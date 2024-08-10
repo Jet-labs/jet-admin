@@ -16,7 +16,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { getAllDashboardAPI } from "../../../api/dashboards";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { useAuthState } from "../../../contexts/authContext";
-
+import { MdSpaceDashboard } from "react-icons/md";
 export const DashboardsList = () => {
   const theme = useTheme();
   const routeParam = useParams();
@@ -116,7 +116,7 @@ export const DashboardsList = () => {
                         minWidth: 0,
                       }}
                     >
-                      <FaChalkboardTeacher className="!text-sm" />
+                      <MdSpaceDashboard className="!text-lg" />
                     </ListItemIcon>
                     <ListItemText
                       sx={{

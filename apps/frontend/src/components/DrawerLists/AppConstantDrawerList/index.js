@@ -18,6 +18,8 @@ import {
   useAppConstants,
 } from "../../../contexts/appConstantsContext";
 import { useAuthState } from "../../../contexts/authContext";
+import { HiMiniVariable } from "react-icons/hi2";
+import { VscSymbolVariable } from "react-icons/vsc";
 
 export const AppConstantsList = () => {
   const theme = useTheme();
@@ -31,7 +33,6 @@ export const AppConstantsList = () => {
     return pmUser && pmUser.isAuthorizedToAddAppConstant();
   }, [pmUser]);
 
-  
   const _navigateToAddMoreAppConstant = () => {
     navigate(LOCAL_CONSTANTS.ROUTES.ADD_APP_CONSTANT.path());
   };
@@ -108,7 +109,7 @@ export const AppConstantsList = () => {
                         minWidth: 0,
                       }}
                     >
-                      <FaChalkboardTeacher className="!text-sm" />
+                      <VscSymbolVariable className="!text-lg" />
                     </ListItemIcon>
                     <ListItemText
                       sx={{

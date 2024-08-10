@@ -129,7 +129,7 @@ export const GraphDrawerList = () => {
                       {graphPlugin ? (
                         graphPlugin.icon
                       ) : (
-                        <FaChartLine className="!text-sm" />
+                        <FaChartLine className="!text-lg" />
                       )}
                     </ListItemIcon>
                     <ListItemText

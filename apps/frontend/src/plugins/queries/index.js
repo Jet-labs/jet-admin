@@ -11,6 +11,7 @@ export const QUERY_PLUGINS_MAP = {
         handleChange={handleChange}
       />
     ),
-    icon: <SiPostgresql />,
+    icon: <SiPostgresql className="!text-lg" />,
+    iconLarge: <SiPostgresql className="!text-4xl" />,
   },
 };

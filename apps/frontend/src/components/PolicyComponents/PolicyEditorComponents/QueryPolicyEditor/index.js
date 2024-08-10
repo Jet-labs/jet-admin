@@ -46,7 +46,7 @@ export const QueryPolicyEditor = ({ value, handleChange }) => {
     >
       <span
         style={{ background: theme.palette.background.paper }}
-        className="!font-bold pl-1 py-2 rounded-t"
+        className="!font-bold pl-2 py-2 rounded-t"
       >
         {capitalize("Queries")}
       </span>

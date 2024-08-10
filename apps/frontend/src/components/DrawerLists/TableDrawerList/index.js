@@ -107,7 +107,7 @@ export const TableDrawerList = () => {
                         : theme.palette.primary.contrastText,
                   }}
                 >
-                  <FaTable sx={{}} />
+                  <FaTable className="!text-lg" />
                 </ListItemIcon>
                 <ListItemText
                   sx={{

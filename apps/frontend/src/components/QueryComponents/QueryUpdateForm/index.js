@@ -114,17 +114,20 @@ export const QueryUpdateForm = ({ id }) => {
   return (
     <div className="w-full !h-[calc(100vh-100px)]">
       <div
-        className="flex flex-col items-start justify-start p-3 "
+        className="flex flex-row justify-start items-center w-full px-3"
         style={{
           background: theme.palette.background.default,
           borderBottomWidth: 1,
           borderColor: theme.palette.divider,
         }}
       >
-        <span className="text-lg font-bold text-start">
-          {LOCAL_CONSTANTS.STRINGS.QUERY_UPDATE_PAGE_TITLE}
-        </span>
-        <span className="text-xs font-medium text-start mt-1">{`Query id : ${id}`}</span>
+        {QUERY_PLUGINS_MAP[queryBuilderForm.values.pm_query_type].iconLarge}
+        <div className="flex flex-col items-start justify-start p-3 px-4">
+          <span className="text-lg font-bold text-start">
+            {LOCAL_CONSTANTS.STRINGS.QUERY_UPDATE_PAGE_TITLE}
+          </span>
+          <span className="text-xs font-medium text-start mt-1">{`Query id : ${id}`}</span>
+        </div>
       </div>
 
       <ResizablePanelGroup

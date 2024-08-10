@@ -96,7 +96,9 @@ export const MainDrawerList = ({ currentPageTitle }) => {
               >
                 <ListItemIcon
                   sx={{
-                    color: theme.palette.primary.contrastText,
+                    color: isCurrentPage
+                      ? theme.palette.primary.main
+                      : theme.palette.primary.contrastText,
                   }}
                   className="!flex !flex-col !justify-center !items-center"
                 >
@@ -110,7 +112,9 @@ export const MainDrawerList = ({ currentPageTitle }) => {
                     },
                   }}
                   sx={{
-                    color: theme.palette.primary.contrastText,
+                    color: isCurrentPage
+                      ? theme.palette.primary.main
+                      : theme.palette.primary.contrastText,
                   }}
                   style={{
                     margin: 0,

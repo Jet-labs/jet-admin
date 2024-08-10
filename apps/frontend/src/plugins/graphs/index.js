@@ -31,7 +31,7 @@ export const GRAPH_PLUGINS_MAP = {
         refetchInterval={refetchInterval}
       />
     ),
-    icon: <FaChartBar />,
+    icon: <FaChartBar className="!text-lg" />,
   },
   LINE: {
     label: "Line",
@@ -52,7 +52,7 @@ export const GRAPH_PLUGINS_MAP = {
         refetchInterval={refetchInterval}
       />
     ),
-    icon: <FaChartLine />,
+    icon: <FaChartLine className="!text-lg" />,
   },
   PIE: {
     label: "Pie",
@@ -73,7 +73,7 @@ export const GRAPH_PLUGINS_MAP = {
         refetchInterval={refetchInterval}
       />
     ),
-    icon: <FaChartPie />,
+    icon: <FaChartPie className="!text-lg" />,
   },
   DOUGHNUT: {
     label: "Doughnut",
@@ -94,7 +94,7 @@ export const GRAPH_PLUGINS_MAP = {
         refetchInterval={refetchInterval}
       />
     ),
-    icon: <BiSolidDoughnutChart />,
+    icon: <BiSolidDoughnutChart className="!text-lg" />,
   },
   POLAR_AREA: {
     label: "Polar Area",
@@ -115,7 +115,7 @@ export const GRAPH_PLUGINS_MAP = {
         refetchInterval={refetchInterval}
       />
     ),
-    icon: <PiChartPolar />,
+    icon: <PiChartPolar className="!text-lg" />,
   },
   RADAR: {
     label: "Radar",
@@ -136,6 +136,6 @@ export const GRAPH_PLUGINS_MAP = {
         refetchInterval={refetchInterval}
       />
     ),
-    icon: <BiRadar />,
+    icon: <BiRadar className="!text-lg" />,
   },
 };

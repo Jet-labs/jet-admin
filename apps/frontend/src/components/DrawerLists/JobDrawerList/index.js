@@ -17,6 +17,7 @@ import { getAllJobAPI } from "../../../api/jobs";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { useAuthState } from "../../../contexts/authContext";
 import { FaChalkboardTeacher, FaPlus, FaRedo } from "react-icons/fa";
+import { MdOutlineSchedule } from "react-icons/md";
 
 export const JobsList = () => {
   const theme = useTheme();
@@ -124,7 +125,7 @@ export const JobsList = () => {
                         minWidth: 0,
                       }}
                     >
-                      <FaChalkboardTeacher className="!text-sm" />
+                      <MdOutlineSchedule className="!text-lg" />
                     </ListItemIcon>
                     <ListItemText
                       sx={{

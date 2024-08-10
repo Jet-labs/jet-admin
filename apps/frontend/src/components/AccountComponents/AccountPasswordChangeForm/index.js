@@ -2,7 +2,14 @@ import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import { fetchRowByIDAPI } from "../../../api/tables";
 
-import { Button, CircularProgress, Grid, useTheme } from "@mui/material";
+import {
+  Button,
+  CircularProgress,
+  FormControl,
+  Grid,
+  TextField,
+  useTheme,
+} from "@mui/material";
 
 import { useEffect } from "react";
 
@@ -102,36 +109,62 @@ export const AccountPasswordChangeForm = ({ pmUserData }) => {
         <form className="" onSubmit={pmUserPasswordUpdateForm.handleSubmit}>
           <Grid container rowSpacing={2} columnSpacing={3} className="!mt-2">
             <Grid item xs={12} sm={12} md={12} lg={12} key={"password"}>
-              <FieldComponent
-                type={"String"}
-                name={"password"}
-                readOnly={false}
-                value={pmUserPasswordUpdateForm.values["password"]}
-                onBlur={pmUserPasswordUpdateForm.handleBlur}
-                onChange={pmUserPasswordUpdateForm.handleChange}
-                setFieldValue={pmUserPasswordUpdateForm.setFieldValue}
-                helperText={pmUserPasswordUpdateForm.errors["password"]}
-                error={Boolean(pmUserPasswordUpdateForm.errors["password"])}
-                required={false}
-                customMapping={null}
-              />
+              <FormControl
+                fullWidth
+                className="!flex !flex-col !justify-start !items-start"
+                size="small"
+              >
+                <span
+                  className="text-xs font-light mb-1"
+                  style={{ color: theme.palette.text.secondary }}
+                >
+                  {"Password"}
+                </span>
+                <TextField
+                  required={true}
+                  fullWidth
+                  size="small"
+                  variant="outlined"
+                  type="password"
+                  name={"password"}
+                  value={pmUserPasswordUpdateForm.values["password"]}
+                  onBlur={pmUserPasswordUpdateForm.handleBlur}
+                  onChange={pmUserPasswordUpdateForm.handleChange}
+                  helperText={pmUserPasswordUpdateForm.errors["password"]}
+                  error={Boolean(pmUserPasswordUpdateForm.errors["password"])}
+                />
+              </FormControl>
             </Grid>
             <Grid item xs={12} sm={12} md={12} lg={12} key={"confirm_password"}>
-              <FieldComponent
-                type={"String"}
-                name={"confirm_password"}
-                readOnly={false}
-                value={pmUserPasswordUpdateForm.values["confirm_password"]}
-                onBlur={pmUserPasswordUpdateForm.handleBlur}
-                onChange={pmUserPasswordUpdateForm.handleChange}
-                setFieldValue={pmUserPasswordUpdateForm.setFieldValue}
-                helperText={pmUserPasswordUpdateForm.errors["confirm_password"]}
-                error={Boolean(
-                  pmUserPasswordUpdateForm.errors["confirm_password"]
-                )}
-                required={false}
-                customMapping={null}
-              />
+              <FormControl
+                fullWidth
+                className="!flex !flex-col !justify-start !items-start"
+                size="small"
+              >
+                <span
+                  className="text-xs font-light mb-1"
+                  style={{ color: theme.palette.text.secondary }}
+                >
+                  {"Confirm password"}
+                </span>
+                <TextField
+                  required={true}
+                  fullWidth
+                  size="small"
+                  variant="outlined"
+                  type="password"
+                  name={"confirm_password"}
+                  value={pmUserPasswordUpdateForm.values["confirm_password"]}
+                  onBlur={pmUserPasswordUpdateForm.handleBlur}
+                  onChange={pmUserPasswordUpdateForm.handleChange}
+                  helperText={
+                    pmUserPasswordUpdateForm.errors["confirm_password"]
+                  }
+                  error={Boolean(
+                    pmUserPasswordUpdateForm.errors["confirm_password"]
+                  )}
+                />
+              </FormControl>
             </Grid>
           </Grid>
         </form>
