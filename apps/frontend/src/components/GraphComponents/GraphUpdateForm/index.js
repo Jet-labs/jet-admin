@@ -23,7 +23,7 @@ export const GraphUpdateForm = ({ id }) => {
     error: loadGraphDataError,
     refetch: refetchGraphData,
   } = useQuery({
-    queryKey: [`REACT_QUERY_KEY_GRAPH`, id],
+    queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.GRAPHS, id],
     queryFn: () => getGraphDataByIDAPI({ graphID: id }),
     cacheTime: 0,
     retry: 1,
@@ -41,28 +41,8 @@ export const GraphUpdateForm = ({ id }) => {
     },
     retry: false,
     onSuccess: () => {
-      displaySuccess("Updated graph successfully");
-      queryClient.invalidateQueries([`REACT_QUERY_KEY_GRAPH`]);
-    },
-    onError: (error) => {
-      displayError(error);
-    },
-  });
-
-  const {
-    isPending: isDeletingGraph,
-    isSuccess: isDeletingGraphSuccess,
-    isError: isDeletingGraphError,
-    error: deleteGraphError,
-    mutate: deleteGraph,
-  } = useMutation({
-    mutationFn: () => {
-      return deleteGraphByIDAPI({ graphID: id });
-    },
-    retry: false,
-    onSuccess: () => {
-      displaySuccess("Deleted graph layout successfully");
-      queryClient.invalidateQueries([`REACT_QUERY_KEY_GRAPH`]);
+      displaySuccess(LOCAL_CONSTANTS.STRINGS.GRAPH_UPDATED_SUCCESS);
+      queryClient.invalidateQueries([LOCAL_CONSTANTS.REACT_QUERY_KEYS.GRAPHS]);
     },
     onError: (error) => {
       displayError(error);
@@ -132,7 +112,9 @@ export const GraphUpdateForm = ({ id }) => {
           borderColor: theme.palette.divider,
         }}
       >
-        <span className="text-lg font-bold text-start ">{`Update graph`}</span>
+        <span className="text-lg font-bold text-start ">
+          {LOCAL_CONSTANTS.STRINGS.GRAPH_UPDATE_PAGE_TITLE}
+        </span>
         {graphData && (
           <span
             className="text-xs font-thin text-start text-slate-300"
@@ -142,12 +124,7 @@ export const GraphUpdateForm = ({ id }) => {
       </div>
       <Grid container spacing={1} className="!px-3">
         <Grid item lg={5} md={4} className="w-full">
-          <GraphEditor
-            graphID={id}
-            isLoading={isUpdatingGraph}
-            graphForm={graphForm}
-            deleteGraph={deleteGraph}
-          />
+          <GraphEditor graphID={id} graphForm={graphForm} />
         </Grid>
         {graphData && graphData.dataset && (
           <Grid item lg={7} md={8} className="w-full">

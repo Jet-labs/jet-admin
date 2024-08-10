@@ -38,8 +38,10 @@ export const DashboardDeletionForm = ({ dashboardID }) => {
     },
     retry: false,
     onSuccess: () => {
-      displaySuccess("Deleted dashboard layout successfully");
-      queryClient.invalidateQueries([`REACT_QUERY_KEY_GRAPH`]);
+      displaySuccess(LOCAL_CONSTANTS.STRINGS.DASHBOARD_DELETED_SUCCESS);
+      queryClient.invalidateQueries([
+        LOCAL_CONSTANTS.REACT_QUERY_KEYS.DASHBOARDS,
+      ]);
       setIsDeleteDashboardConfirmationOpen(false);
       navigate(LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.path());
     },
@@ -68,14 +70,14 @@ export const DashboardDeletionForm = ({ dashboardID }) => {
           className="!ml-2"
           color="error"
         >
-          Delete
+          {LOCAL_CONSTANTS.STRINGS.DELETE_BUTTON_TEXT}
         </Button>
         <ConfirmationDialog
           open={isDeleteDashboardConfirmationOpen}
           onAccepted={_handleDeleteDashboard}
           onDecline={_handleCloseDeleteDashboardConfirmation}
-          title={"Delete dashboard?"}
-          message={`Are you sure you want to delete dashboard id - ${dashboardID}`}
+          title={LOCAL_CONSTANTS.STRINGS.DASHBOARD_DELETION_CONFIRMATION_TITLE}
+          message={`${LOCAL_CONSTANTS.STRINGS.DASHBOARD_DELETION_CONFIRMATION_BODY} - ${dashboardID}`}
         />
       </>
     )

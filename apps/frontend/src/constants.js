@@ -84,6 +84,83 @@ export const LOCAL_CONSTANTS = {
     UNTITLED_CHART_TITLE: "Untitled chart",
     JOB_HISTORY_TABLE_NAME: "tbl_pm_job_history",
     APP_CONSTANTS_TABLE_NAME: "tbl_pm_app_constants",
+    DELETE_BUTTON_TEXT: "Delete",
+    UPDATE_BUTTON_TEXT: "Update",
+    ADD_BUTTON_TEXT: "Add",
+    DUPLICATE_BUTTON_TEXT: "Duplicate",
+
+    // accounts
+    ACCOUNT_ADDITION_SUCCESS: "Account added!",
+    ACCOUNT_UPDATED_SUCCESS: "Account updated!",
+    ACCOUNT_DELETED_SUCCESS: "Account deleted!",
+    ACCOUNT_PASSWORD_UPDATED_SUCCESS: "Password updated!",
+    ACCOUNT_ADDITION_PAGE_TITLE: "Add account",
+    ACCOUNT_DELETION_CONFIRMATION_TITLE: "Delete account?",
+    ACCOUNT_DELETION_CONFIRMATION_BODY:
+      "Are you sure you want to delete account",
+    ACCOUNT_PASSWORD_UPDATE_PAGE_TITLE: "Account password change",
+    ACCOUNT_PASSWORD_UPDATE_BUTTON_TEXT: "Set password",
+    ACCOUNT_UPDATE_PAGE_TITLE: "Account settings",
+
+    POLICY_ADDITION_SUCCESS: "Policy added!",
+    POLICY_UPDATED_SUCCESS: "Policy updated!",
+    POLICY_DELETED_SUCCESS: "Policy deleted!",
+    POLICY_ADDITION_PAGE_TITLE: "Add new policy",
+    POLICY_DELETION_CONFIRMATION_TITLE: "Delete policy?",
+    POLICY_DELETION_CONFIRMATION_BODY: "Are you sure you want to delete policy",
+    POLICY_UPDATE_PAGE_TITLE: "Update policy",
+
+    ROW_ADDITION_SUCCESS: "Row added!",
+    ROW_UPDATED_SUCCESS: "Row updated!",
+    ROW_DELETED_SUCCESS: "Row deleted!",
+
+    QUERY_ADDITION_SUCCESS: "Query added!",
+    QUERY_UPDATED_SUCCESS: "Query updated!",
+    QUERY_DELETED_SUCCESS: "Query deleted!",
+    QUERY_ADDITION_PAGE_TITLE: "Add new query",
+    QUERY_DELETION_CONFIRMATION_TITLE: "Delete query?",
+    QUERY_DELETION_CONFIRMATION_BODY: "Are you sure you want to delete query",
+    QUERY_UPDATE_PAGE_TITLE: "Update query",
+    QUERY_DUPLICATE_CONFIRMATION_TITLE: "Duplicate query?",
+    QUERY_DUPLICATE_CONFIRMATION_BODY:
+      "Are you sure you want to duplicate query",
+
+    // jobs
+    JOB_ADDITION_SUCCESS: "Job added!",
+    JOB_UPDATED_SUCCESS: "Job updated!",
+    JOB_DELETED_SUCCESS: "Job deleted!",
+    JOB_ADDITION_PAGE_TITLE: "Add new job",
+    JOB_DELETION_CONFIRMATION_TITLE: "Delete job?",
+    JOB_DELETION_CONFIRMATION_BODY: "Are you sure you want to delete job",
+    JOB_UPDATE_PAGE_TITLE: "Update job",
+    // graphs
+
+    GRAPH_ADDITION_SUCCESS: "Graph added!",
+    GRAPH_UPDATED_SUCCESS: "Graph updated!",
+    GRAPH_DELETED_SUCCESS: "Graph deleted!",
+    GRAPH_ADDITION_PAGE_TITLE: "Add new graph",
+    GRAPH_DELETION_CONFIRMATION_TITLE: "Delete graph?",
+    GRAPH_DELETION_CONFIRMATION_BODY: "Are you sure you want to delete graph",
+    GRAPH_UPDATE_PAGE_TITLE: "Update graph",
+
+    // app constants
+    APP_CONSTANT_ADDITION_SUCCESS: "App constant added!",
+    APP_CONSTANT_UPDATED_SUCCESS: "App constant updated!",
+    APP_CONSTANT_DELETED_SUCCESS: "App constant deleted!",
+    APP_CONSTANT_ADDITION_PAGE_TITLE: "Add new app constant",
+    APP_CONSTANT_DELETION_CONFIRMATION_TITLE: "Delete app constant?",
+    APP_CONSTANT_DELETION_CONFIRMATION_BODY:
+      "Are you sure you want to delete app constant",
+    APP_CONSTANT_UPDATE_PAGE_TITLE: "Update app constant",
+
+    DASHBOARD_ADDITION_SUCCESS: "Dashboard added!",
+    DASHBOARD_UPDATED_SUCCESS: "Dashboard updated!",
+    DASHBOARD_DELETED_SUCCESS: "Dashboard deleted!",
+    DASHBOARD_ADDITION_PAGE_TITLE: "Add new dashboard",
+    DASHBOARD_DELETION_CONFIRMATION_TITLE: "Delete dashboard?",
+    DASHBOARD_DELETION_CONFIRMATION_BODY:
+      "Are you sure you want to delete dashboard",
+    DASHBOARD_UPDATE_PAGE_TITLE: "Update dashboard",
   },
 
   // routes
@@ -335,6 +412,11 @@ export const LOCAL_CONSTANTS = {
       http_error_code: HttpStatusCode.Conflict,
     },
 
+    PASSWORD_DOES_NOT_MATCH: {
+      code: "PASSWORD_DOES_NOT_MATCH",
+      message: "Password does not match",
+    },
+
     INVALID_CREDENTIALS: {
       code: "INVALID_CREDENTIALS",
       message: "User credentials are not correct",
@@ -365,6 +447,16 @@ export const LOCAL_CONSTANTS = {
   REACT_QUERY_KEYS: {
     DB_USER: "DB_USER",
     CONSTANTS: "CONSTANTS",
+    TABLES: "REACT_QUERY_KEY_TABLES",
+    TABLE_ID: (tableName) =>
+      `REACT_QUERY_KEY_TABLES_${String(tableName).toUpperCase()}`,
+    QUERIES: `REACT_QUERY_KEY_QUERIES`,
+    APP_CONSTANTS: `REACT_QUERY_KEY_APP_CONSTANTS`,
+    GRAPHS: `REACT_QUERY_KEY_GRAPHS`,
+    JOBS: `REACT_QUERY_KEY_JOBS`,
+    DASHBOARDS: `REACT_QUERY_KEY_DASHBOARDS`,
+    POLICIES: `REACT_QUERY_KEY_POLICIES`,
+    ACCOUNTS: `REACT_QUERY_KEY_ACCOUNTS`,
   },
 
   // events

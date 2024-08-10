@@ -35,7 +35,7 @@ export const QueryUpdateForm = ({ id }) => {
     data: queryData,
     error: loadQueryDataError,
   } = useQuery({
-    queryKey: [`REACT_QUERY_KEY_QUERIES`, id],
+    queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.QUERIES, id],
     queryFn: () => getQueryByIDAPI({ pmQueryID: id }),
     cacheTime: 0,
     retry: 1,
@@ -90,8 +90,8 @@ export const QueryUpdateForm = ({ id }) => {
     },
     retry: false,
     onSuccess: (data) => {
-      displaySuccess("Query updated successfully");
-      queryClient.invalidateQueries(["REACT_QUERY_KEY_QUERIES"]);
+      displaySuccess(LOCAL_CONSTANTS.STRINGS.QUERY_UPDATED_SUCCESS);
+      queryClient.invalidateQueries([LOCAL_CONSTANTS.REACT_QUERY_KEYS.QUERIES]);
     },
     onError: (error) => {
       displayError(error);
@@ -121,7 +121,9 @@ export const QueryUpdateForm = ({ id }) => {
           borderColor: theme.palette.divider,
         }}
       >
-        <span className="text-lg font-bold text-start">{`Update query`}</span>
+        <span className="text-lg font-bold text-start">
+          {LOCAL_CONSTANTS.STRINGS.QUERY_UPDATE_PAGE_TITLE}
+        </span>
         <span className="text-xs font-medium text-start mt-1">{`Query id : ${id}`}</span>
       </div>
 
@@ -173,7 +175,9 @@ export const QueryUpdateForm = ({ id }) => {
               variant="contained"
               className="!ml-3"
               onClick={_updateQuery}
-            >{`Save query`}</Button>
+            >
+              {LOCAL_CONSTANTS.STRINGS.UPDATE_BUTTON_TEXT}
+            </Button>
             <QueryDeletionForm pmQueryID={id} />
             <QueryDuplicateForm pmQueryID={id} />
           </div>

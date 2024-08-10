@@ -1,22 +1,14 @@
-import {
-  Button,
-  FormControl,
-  Grid,
-  MenuItem,
-  Select,
-  TextField,
-  useTheme,
-} from "@mui/material";
+import { Button, Grid, useTheme } from "@mui/material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import React from "react";
 import "react-data-grid/lib/styles.css";
 import { addAppConstantAPI } from "../../../api/appConstants";
-import { QUERY_PLUGINS_MAP } from "../../../plugins/queries";
-import { displayError, displaySuccess } from "../../../utils/notification";
-import { AppConstantEditor } from "../AppConstantEditor";
 import { app_constant_usage_tip } from "../../../assets/tips";
+import { displayError, displaySuccess } from "../../../utils/notification";
 import { Tip } from "../../Tip";
+import { AppConstantEditor } from "../AppConstantEditor";
+import { LOCAL_CONSTANTS } from "../../../constants";
 
 export const AppConstantAdditionForm = () => {
   const theme = useTheme();
@@ -53,8 +45,10 @@ export const AppConstantAdditionForm = () => {
     },
     retry: false,
     onSuccess: (data) => {
-      displaySuccess("App constant added successfully");
-      queryClient.invalidateQueries(["REACT_QUERY_KEY_APP_CONSTANTS"]);
+      displaySuccess(LOCAL_CONSTANTS.STRINGS.APP_CONSTANT_ADDITION_SUCCESS);
+      queryClient.invalidateQueries([
+        LOCAL_CONSTANTS.REACT_QUERY_KEYS.APP_CONSTANTS,
+      ]);
     },
     onError: (error) => {
       displayError(error);
@@ -75,13 +69,11 @@ export const AppConstantAdditionForm = () => {
           borderColor: theme.palette.divider,
         }}
       >
-        <span className="text-lg font-bold text-start mt-1 ">{`Add new app constant`}</span>
+        <span className="text-lg font-bold text-start mt-1 ">
+          {LOCAL_CONSTANTS.STRINGS.APP_CONSTANT_ADDITION_PAGE_TITLE}
+        </span>
       </div>
-      <Grid
-        container
-
-        // style={{ background: theme.palette.background.paper }}
-      >
+      <Grid container>
         <Grid item xl={6} lg={6} md={12} sm={12} xs={12}>
           <AppConstantEditor appConstantForm={appConstantForm} />
 
@@ -90,7 +82,9 @@ export const AppConstantAdditionForm = () => {
               variant="contained"
               className="!ml-3"
               onClick={_addAppConstant}
-            >{`Save app constant`}</Button>
+            >
+              {LOCAL_CONSTANTS.STRINGS.ADD_BUTTON_TEXT}
+            </Button>
           </div>
         </Grid>
         <Grid item xl={6} lg={6} md={0} sm={0} xs={0} className="!p-3">

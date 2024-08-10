@@ -7,6 +7,7 @@ import { displayError, displaySuccess } from "../../../utils/notification";
 import { ConfirmationDialog } from "../../ConfirmationDialog";
 import { IoTrash } from "react-icons/io5";
 import { FaCopy } from "react-icons/fa6";
+import { LOCAL_CONSTANTS } from "../../../constants";
 export const QueryDuplicateForm = ({ pmQueryID }) => {
   const { pmUser } = useAuthState();
   const queryClient = useQueryClient();
@@ -29,8 +30,8 @@ export const QueryDuplicateForm = ({ pmQueryID }) => {
     mutationFn: ({ pmQueryID }) => duplicateQueryAPI({ pmQueryID }),
     retry: false,
     onSuccess: () => {
-      displaySuccess("Duplicated row successfully");
-      queryClient.invalidateQueries(["REACT_QUERY_KEY_QUERIES"]);
+      displaySuccess(LOCAL_CONSTANTS.STRINGS.QUERY_ADDITION_SUCCESS);
+      queryClient.invalidateQueries([LOCAL_CONSTANTS.REACT_QUERY_KEYS.QUERIES]);
     },
     onError: (error) => {
       displayError(error);
@@ -57,14 +58,14 @@ export const QueryDuplicateForm = ({ pmQueryID }) => {
           className="!ml-2"
           color="primary"
         >
-          Duplicate
+          {LOCAL_CONSTANTS.STRINGS.DUPLICATE_BUTTON_TEXT}
         </Button>
         <ConfirmationDialog
           open={isDuplicateQueryConfirmationOpen}
           onAccepted={_handleDuplicateQuery}
           onDecline={_handleCloseDuplicateQueryConfirmation}
-          title={"Duplicate query?"}
-          message={`Are you sure you want to duplicate query id - ${pmQueryID}`}
+          title={LOCAL_CONSTANTS.STRINGS.QUERY_DUPLICATE_CONFIRMATION_TITLE}
+          message={`${LOCAL_CONSTANTS.STRINGS.QUERY_DUPLICATE_CONFIRMATION_BODY} - ${pmQueryID}`}
         />
       </>
     )

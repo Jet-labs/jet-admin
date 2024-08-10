@@ -33,8 +33,8 @@ export const JobDeletionForm = ({ pmJobID }) => {
     mutationFn: ({ pmJobID }) => deleteJobByIDAPI({ pmJobID }),
     retry: false,
     onSuccess: () => {
-      displaySuccess("Deleted job successfully");
-      queryClient.invalidateQueries(["REACT_QUERY_KEY_JOBS"]);
+      displaySuccess(LOCAL_CONSTANTS.STRINGS.JOB_DELETED_SUCCESS);
+      queryClient.invalidateQueries([LOCAL_CONSTANTS.REACT_QUERY_KEYS.JOBS]);
       navigate(LOCAL_CONSTANTS.ROUTES.ALL_JOBS.path());
       setIsDeleteJobConfirmationOpen(false);
     },
@@ -63,14 +63,14 @@ export const JobDeletionForm = ({ pmJobID }) => {
           className="!ml-2"
           color="error"
         >
-          Delete
+          {LOCAL_CONSTANTS.STRINGS.DELETE_BUTTON_TEXT}
         </Button>
         <ConfirmationDialog
           open={isDeleteJobConfirmationOpen}
           onAccepted={_handleDeleteJob}
           onDecline={_handleCloseDeleteJobConfirmation}
-          title={"Delete job?"}
-          message={`Are you sure you want to delete job id - ${pmJobID}`}
+          title={LOCAL_CONSTANTS.STRINGS.JOB_DELETION_CONFIRMATION_TITLE}
+          message={`${LOCAL_CONSTANTS.STRINGS.JOB_DELETION_CONFIRMATION_BODY} - ${pmJobID}`}
         />
       </>
     )

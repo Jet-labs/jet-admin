@@ -12,6 +12,7 @@ import { AppConstantEditor } from "../AppConstantEditor";
 import { AppConstantDeletionForm } from "../AppConstantDeletionForm";
 import { Tip } from "../../Tip";
 import { app_constant_usage_tip } from "../../../assets/tips";
+import { LOCAL_CONSTANTS } from "../../../constants";
 
 export const AppConstantUpdateForm = ({ id }) => {
   const theme = useTheme();
@@ -21,7 +22,7 @@ export const AppConstantUpdateForm = ({ id }) => {
     data: appConstantData,
     error: loadAppConstantDataError,
   } = useQuery({
-    queryKey: [`REACT_QUERY_KEY_APP_CONSTANTS`, id],
+    queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.APP_CONSTANTS, id],
     queryFn: () => getAppConstantByIDAPI({ appConstantID: id }),
     cacheTime: 0,
     retry: 1,
@@ -77,8 +78,10 @@ export const AppConstantUpdateForm = ({ id }) => {
     },
     retry: false,
     onSuccess: (data) => {
-      displaySuccess("AppConstant updated successfully");
-      queryClient.invalidateQueries(["REACT_QUERY_KEY_JOBS"]);
+      displaySuccess(LOCAL_CONSTANTS.STRINGS.APP_CONSTANT_UPDATED_SUCCESS);
+      queryClient.invalidateQueries([
+        LOCAL_CONSTANTS.REACT_QUERY_KEYS.APP_CONSTANTS,
+      ]);
     },
     onError: (error) => {
       displayError(error);
@@ -100,7 +103,9 @@ export const AppConstantUpdateForm = ({ id }) => {
           borderColor: theme.palette.divider,
         }}
       >
-        <span className="text-lg font-bold text-start">{`Update app constant`}</span>
+        <span className="text-lg font-bold text-start">
+          {LOCAL_CONSTANTS.STRINGS.APP_CONSTANT_UPDATE_PAGE_TITLE}
+        </span>
         <span className="text-xs font-medium text-start mt-1">{`AppConstant id : ${id}`}</span>
       </div>
 
@@ -118,7 +123,9 @@ export const AppConstantUpdateForm = ({ id }) => {
               variant="contained"
               className="!ml-3"
               onClick={_updateAppConstant}
-            >{`Save app constant`}</Button>
+            >
+              {LOCAL_CONSTANTS.STRINGS.UPDATE_BUTTON_TEXT}
+            </Button>
           </div>
         </Grid>
         <Grid item xl={6} lg={6} md={0} sm={0} xs={0} className="!p-3">

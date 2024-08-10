@@ -13,6 +13,7 @@ import {
   ResizablePanelGroup,
 } from "../../Resizables";
 import { Tip } from "../../Tip";
+import { LOCAL_CONSTANTS } from "../../../constants";
 
 export const QueryAdditionForm = () => {
   const theme = useTheme();
@@ -49,8 +50,8 @@ export const QueryAdditionForm = () => {
     },
     retry: false,
     onSuccess: (data) => {
-      displaySuccess("Query added successfully");
-      queryClient.invalidateQueries(["REACT_QUERY_KEY_QUERIES"]);
+      displaySuccess(LOCAL_CONSTANTS.STRINGS.QUERY_ADDITION_SUCCESS);
+      queryClient.invalidateQueries([LOCAL_CONSTANTS.REACT_QUERY_KEYS.QUERIES]);
     },
     onError: (error) => {
       displayError(error);
@@ -76,7 +77,9 @@ export const QueryAdditionForm = () => {
         className="flex flex-col items-start justify-start p-3 px-6"
         style={{ background: theme.palette.background.paper }}
       >
-        <span className="text-lg font-bold text-start mt-1">{`Add new query`}</span>
+        <span className="text-lg font-bold text-start mt-1">
+          {LOCAL_CONSTANTS.STRINGS.QUERY_ADDITION_PAGE_TITLE}
+        </span>
       </div>
 
       <ResizablePanelGroup
@@ -123,11 +126,9 @@ export const QueryAdditionForm = () => {
           </FormControl>
 
           <div className="!flex flex-row justify-end items-center mt-10 w-full px-3">
-            <Button
-              variant="contained"
-              className="!ml-3"
-              onClick={_addQuery}
-            >{`Save query`}</Button>
+            <Button variant="contained" className="!ml-3" onClick={_addQuery}>
+              {LOCAL_CONSTANTS.STRINGS.ADD_BUTTON_TEXT}
+            </Button>
           </div>
           <div className="!mt-10 px-3">
             <Tip tip={query_variable_usage_tip}></Tip>

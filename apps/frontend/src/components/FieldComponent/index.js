@@ -380,7 +380,6 @@ export const FieldComponent = ({
       break;
     }
     case LOCAL_CONSTANTS.DATA_TYPES.INT: {
-      console.log({ customMapping });
       component = customMapping ? (
         <FormControl
           fullWidth

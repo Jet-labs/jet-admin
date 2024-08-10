@@ -39,7 +39,7 @@ export const GraphEditor = ({ graphID, graphForm }) => {
     error: loadQueriesError,
     refetch: refetchQueries,
   } = useQuery({
-    queryKey: [`REACT_QUERY_KEY_QUERIES`],
+    queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.QUERIES],
     queryFn: () => getAllQueryAPI(),
     cacheTime: 0,
     retry: 1,
@@ -522,7 +522,7 @@ export const GraphEditor = ({ graphID, graphForm }) => {
         )}
         <Grid item xs={12} sm={12} md={12} lg={12} key={"submit"}>
           <Button variant="contained" onClick={_handleSubmit}>
-            Submit
+            {LOCAL_CONSTANTS.STRINGS.ADD_BUTTON_TEXT}
           </Button>
           {(graphID != null || graphID != undefined) && (
             <GraphDeletionForm graphID={graphID} />

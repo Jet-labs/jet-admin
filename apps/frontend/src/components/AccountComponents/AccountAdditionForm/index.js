@@ -1,24 +1,24 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 
 import { Button, CircularProgress, Grid, useTheme } from "@mui/material";
 import { useMemo } from "react";
 import { addAccountAPI } from "../../../api/accounts";
-import { fetchAllRowsAPI } from "../../../api/tables";
+import { getAllPoliciesAPI } from "../../../api/policy";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { FieldComponent } from "../../FieldComponent";
-import { getAllPoliciesAPI } from "../../../api/policy";
 
 export const AccountAdditionForm = ({ tableName }) => {
   const theme = useTheme();
+  const queryClient = useQueryClient();
 
   const {
     isLoading: isLoadingPolicyObjectData,
     data: policyObjectData,
     error: loadPolicyObjectDataError,
   } = useQuery({
-    queryKey: [`REACT_QUERY_KEY_POLICIES`],
+    queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.POLICIES],
     queryFn: () => getAllPoliciesAPI(),
     cacheTime: 0,
     retry: 1,
@@ -49,7 +49,10 @@ export const AccountAdditionForm = ({ tableName }) => {
     },
     retry: false,
     onSuccess: () => {
-      displaySuccess("Added account successfully");
+      displaySuccess(LOCAL_CONSTANTS.STRINGS.ACCOUNT_ADDITION_SUCCESS);
+      queryClient.invalidateQueries([
+        LOCAL_CONSTANTS.REACT_QUERY_KEYS.ACCOUNTS,
+      ]);
     },
     onError: (error) => {
       displayError(error);
@@ -78,7 +81,9 @@ export const AccountAdditionForm = ({ tableName }) => {
     <div className="flex flex-col justify-start items-center w-full pb-5 p-2">
       <div className=" flex flex-row justify-between 2xl:w-1/2 xl:w-1/2 lg:w-2/3 md:w-full w-full mt-3 ">
         <div className="flex flex-col items-start justify-start">
-          <span className="text-lg font-bold text-start ">{`Add account`}</span>
+          <span className="text-lg font-bold text-start ">
+            {LOCAL_CONSTANTS.STRINGS.ACCOUNT_ADDITION_PAGE_TITLE}
+          </span>
         </div>
 
         <div className="flex flex-row items-center justify-end w-min">
@@ -93,7 +98,9 @@ export const AccountAdditionForm = ({ tableName }) => {
             className="!ml-2"
             onClick={accountAdditionForm.handleSubmit}
           >
-            <span className="!w-max">Add account</span>
+            <span className="!w-max">
+              {LOCAL_CONSTANTS.STRINGS.ADD_BUTTON_TEXT}
+            </span>
           </Button>
         </div>
       </div>

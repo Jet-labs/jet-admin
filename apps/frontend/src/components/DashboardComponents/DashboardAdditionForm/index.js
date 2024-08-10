@@ -33,8 +33,10 @@ export const DashboardAdditionForm = () => {
     },
     retry: false,
     onSuccess: () => {
-      displaySuccess("Added dashboard successfully");
-      queryClient.invalidateQueries([`REACT_QUERY_KEY_DASHBOARD_LAYOUTS`]);
+      displaySuccess(LOCAL_CONSTANTS.STRINGS.DASHBOARD_ADDITION_SUCCESS);
+      queryClient.invalidateQueries([
+        LOCAL_CONSTANTS.REACT_QUERY_KEYS.DASHBOARDS,
+      ]);
     },
     onError: (error) => {
       displayError(error);
@@ -98,7 +100,9 @@ export const DashboardAdditionForm = () => {
               style={{ background: theme.palette.background.default }}
             >
               <FiPlus className="!text-base !font-semibold" />
-              <span className="text-sm font-semibold text-start ml-2">{`Add new dashboard`}</span>
+              <span className="text-sm font-semibold text-start ml-2">
+                {LOCAL_CONSTANTS.STRINGS.DASHBOARD_ADDITION_PAGE_TITLE}
+              </span>
             </div>
             <div
               className="flex flex-col justify-center items-start p-3"
@@ -122,7 +126,7 @@ export const DashboardAdditionForm = () => {
                   variant="contained"
                   onClick={dashboardForm.handleSubmit}
                 >
-                  Save
+                  {LOCAL_CONSTANTS.STRINGS.ADD_BUTTON_TEXT}
                 </Button>
               </div>
             </div>

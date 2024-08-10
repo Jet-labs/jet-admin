@@ -18,6 +18,7 @@ import { addJobAPI } from "../../../api/jobs";
 import { CronJobScheduler } from "../CronJobScheduler";
 import { Tip } from "../../Tip";
 import { cron_job_usage_tip } from "../../../assets/tips";
+import { LOCAL_CONSTANTS } from "../../../constants";
 
 export const JobAdditionForm = () => {
   const theme = useTheme();
@@ -28,7 +29,7 @@ export const JobAdditionForm = () => {
     error: loadQueriesError,
     refetch: refetchQueries,
   } = useQuery({
-    queryKey: [`REACT_QUERY_KEY_QUERIES`],
+    queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.QUERIES],
     queryFn: () => getAllQueryAPI(),
     cacheTime: 0,
     retry: 1,
@@ -65,8 +66,8 @@ export const JobAdditionForm = () => {
     },
     retry: false,
     onSuccess: (data) => {
-      displaySuccess("Job added successfully");
-      queryClient.invalidateQueries(["REACT_QUERY_KEY_JOBS"]);
+      displaySuccess(LOCAL_CONSTANTS.STRINGS.JOB_ADDITION_SUCCESS);
+      queryClient.invalidateQueries([LOCAL_CONSTANTS.REACT_QUERY_KEYS.JOBS]);
     },
     onError: (error) => {
       displayError(error);
@@ -89,7 +90,9 @@ export const JobAdditionForm = () => {
         className="flex flex-col items-start justify-start p-3 px-6"
         style={{ background: theme.palette.background.paper }}
       >
-        <span className="text-lg font-bold text-start mt-1">{`Add new job`}</span>
+        <span className="text-lg font-bold text-start mt-1">
+          {LOCAL_CONSTANTS.STRINGS.JOB_ADDITION_PAGE_TITLE}
+        </span>
       </div>
 
       <Grid container className="!h-full">
@@ -137,11 +140,9 @@ export const JobAdditionForm = () => {
           </FormControl>
 
           <div className="!flex flex-row justify-end items-center mt-10 w-100 px-3">
-            <Button
-              variant="contained"
-              className="!ml-3"
-              onClick={_addJob}
-            >{`Save job`}</Button>
+            <Button variant="contained" className="!ml-3" onClick={_addJob}>
+              {LOCAL_CONSTANTS.STRINGS.ADD_BUTTON_TEXT}
+            </Button>
           </div>
           <div className="!mt-10 px-3 pb-3">
             <Tip tip={cron_job_usage_tip}></Tip>

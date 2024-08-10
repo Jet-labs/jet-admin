@@ -23,7 +23,7 @@ export const PolicyUpdateForm = ({ id }) => {
     data: policyObjectData,
     error: loadPolicyObjectDataError,
   } = useQuery({
-    queryKey: [`REACT_QUERY_KEY_POLICIES`, id],
+    queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.POLICIES, id],
     queryFn: () =>
       getPolicyByIDAPI({
         pmPolicyObjectID: id,
@@ -48,8 +48,10 @@ export const PolicyUpdateForm = ({ id }) => {
 
     retry: false,
     onSuccess: () => {
-      displaySuccess("Updated policy successfully");
-      queryClient.invalidateQueries([`REACT_QUERY_KEY_POLICIES`]);
+      displaySuccess(LOCAL_CONSTANTS.STRINGS.POLICY_UPDATED_SUCCESS);
+      queryClient.invalidateQueries([
+        LOCAL_CONSTANTS.REACT_QUERY_KEYS.POLICIES,
+      ]);
     },
     onError: (error) => {
       displayError(error);
@@ -94,7 +96,9 @@ export const PolicyUpdateForm = ({ id }) => {
     <div className="flex flex-col justify-start items-center w-full pb-5 p-2">
       <div className=" flex flex-row justify-between 2xl:w-3/5 xl:w-3/4 lg:w-2/3 md:w-full  mt-3 w-full ">
         <div className="flex flex-col items-start justify-start">
-          <span className="text-lg font-bold text-start ">{`Policy settings`}</span>
+          <span className="text-lg font-bold text-start ">
+            {LOCAL_CONSTANTS.STRINGS.POLICY_UPDATE_PAGE_TITLE}
+          </span>
           <span className="text-xs font-thin text-start text-slate-300">{`Account settings | Username : ${policyObjectData.title}`}</span>
         </div>
 
@@ -113,7 +117,7 @@ export const PolicyUpdateForm = ({ id }) => {
             className="!ml-2"
             onClick={policyObjectUpdateForm.submitForm}
           >
-            Update
+            {LOCAL_CONSTANTS.STRINGS.UPDATE_BUTTON_TEXT}
           </Button>
         </div>
       </div>

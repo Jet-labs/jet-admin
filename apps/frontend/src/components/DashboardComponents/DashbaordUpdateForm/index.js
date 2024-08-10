@@ -29,7 +29,7 @@ export const DashboardUpdateForm = ({ id }) => {
     error: loadDashboardError,
     refetch: refetchDashboard,
   } = useQuery({
-    queryKey: [`REACT_QUERY_KEY_DASHBOARD_LAYOUTS`, id],
+    queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.DASHBOARDS, id],
     queryFn: () => getDashboardByIDAPI({ dashboardID: id }),
     retry: 1,
   });
@@ -46,8 +46,10 @@ export const DashboardUpdateForm = ({ id }) => {
     },
     retry: false,
     onSuccess: () => {
-      displaySuccess("Updated dashboard layout successfully");
-      queryClient.invalidateQueries([`REACT_QUERY_KEY_DASHBOARD_LAYOUTS`]);
+      displaySuccess(LOCAL_CONSTANTS.STRINGS.DASHBOARD_UPDATED_SUCCESS);
+      queryClient.invalidateQueries([
+        LOCAL_CONSTANTS.REACT_QUERY_KEYS.DASHBOARDS,
+      ]);
     },
     onError: (error) => {
       displayError(error);
@@ -98,8 +100,6 @@ export const DashboardUpdateForm = ({ id }) => {
       );
     }
   }, [dashboard]);
-
-  console.log({ values: dashboardForm.values });
 
   return (
     <div className="w-full h-full">
@@ -161,7 +161,7 @@ export const DashboardUpdateForm = ({ id }) => {
                   className="!ml-2"
                   onClick={dashboardForm.handleSubmit}
                 >
-                  Save
+                  {LOCAL_CONSTANTS.STRINGS.UPDATE_BUTTON_TEXT}
                 </Button>
                 <DashboardDeletionForm dashboardID={id} />
               </div>

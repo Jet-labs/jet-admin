@@ -36,8 +36,10 @@ export const AppConstantDeletionForm = ({ pmAppConstantID }) => {
       deleteAppConstantByIDAPI({ appConstantID: pmAppConstantID }),
     retry: false,
     onSuccess: () => {
-      displaySuccess("Deleted app constant successfully");
-      queryClient.invalidateQueries(["REACT_QUERY_KEY_JOBS"]);
+      displaySuccess(LOCAL_CONSTANTS.STRINGS.APP_CONSTANT_DELETED_SUCCESS);
+      queryClient.invalidateQueries([
+        LOCAL_CONSTANTS.REACT_QUERY_KEYS.APP_CONSTANTS,
+      ]);
       navigate(LOCAL_CONSTANTS.ROUTES.ALL_APP_CONSTANTS.path());
       setIsDeleteAppConstantConfirmationOpen(false);
     },
@@ -66,14 +68,16 @@ export const AppConstantDeletionForm = ({ pmAppConstantID }) => {
           className="!ml-2"
           color="error"
         >
-          Delete
+          {LOCAL_CONSTANTS.STRINGS.DELETE_BUTTON_TEXT}
         </Button>
         <ConfirmationDialog
           open={isDeleteAppConstantConfirmationOpen}
           onAccepted={_handleDeleteAppConstant}
           onDecline={_handleCloseDeleteAppConstantConfirmation}
-          title={"Delete app constant?"}
-          message={`Are you sure you want to delete app constant id - ${pmAppConstantID}`}
+          title={
+            LOCAL_CONSTANTS.STRINGS.APP_CONSTANT_DELETION_CONFIRMATION_TITLE
+          }
+          message={`${LOCAL_CONSTANTS.STRINGS.APP_CONSTANT_DELETION_CONFIRMATION_BODY} - ${pmAppConstantID}`}
         />
       </>
     )

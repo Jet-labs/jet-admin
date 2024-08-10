@@ -17,8 +17,10 @@ export const ActionItem = ({
   const formDataQueries = useQueries({
     queries: Object.keys(actionFormData.fields).map((field) => {
       if (
-        (actionFormData.fields[field].type === "SINGLE_SELECT" ||
-          actionFormData.fields[field].type === "MULTIPLE_SELECT") &&
+        (actionFormData.fields[field].type ===
+          LOCAL_CONSTANTS.DATA_TYPES.SINGLE_SELECT ||
+          actionFormData.fields[field].type ===
+            LOCAL_CONSTANTS.DATA_TYPES.MULTIPLE_SELECT) &&
         actionFormData.fields[field].options.method === "dynamic"
       )
         return {

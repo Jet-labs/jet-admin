@@ -17,8 +17,6 @@ import { FieldComponent } from "../../FieldComponent";
 
 export const AccountPasswordChangeForm = ({ pmUserData }) => {
   const theme = useTheme();
-  const queryClient = new QueryClient();
-
   const {
     isPending: isUpdatingPMUserPassword,
     isSuccess: isUpdatePMUserPasswordSuccess,
@@ -32,12 +30,7 @@ export const AccountPasswordChangeForm = ({ pmUserData }) => {
 
     retry: false,
     onSuccess: () => {
-      displaySuccess("Updated account password successfully");
-      queryClient.invalidateQueries([
-        `REACT_QUERY_KEY_TABLES_${String(
-          LOCAL_CONSTANTS.STRINGS.PM_USER_TABLE_NAME
-        ).toUpperCase()}`,
-      ]);
+      displaySuccess(LOCAL_CONSTANTS.STRINGS.ACCOUNT_PASSWORD_UPDATED_SUCCESS);
     },
     onError: (error) => {
       displayError(error);
@@ -51,7 +44,8 @@ export const AccountPasswordChangeForm = ({ pmUserData }) => {
     validate: (values) => {
       const errors = {};
       if (values["password"] != values["confirm_password"]) {
-        errors["password"] = "Password does not match";
+        errors["password"] =
+          LOCAL_CONSTANTS.ERROR_CODES.PASSWORD_DOES_NOT_MATCH.message;
       }
       return errors;
     },
@@ -75,7 +69,9 @@ export const AccountPasswordChangeForm = ({ pmUserData }) => {
     <div className="flex flex-col justify-start items-center w-full pb-5 mt-10">
       <div className=" flex flex-row justify-between 2xl:w-1/2 xl:w-1/2 lg:w-2/3 md:w-full w-full  mt-3">
         <div className="flex flex-col items-start justify-start">
-          <span className="!text-base font-bold text-start ">{`Account password change`}</span>
+          <span className="!text-base font-bold text-start ">
+            {LOCAL_CONSTANTS.STRINGS.ACCOUNT_PASSWORD_UPDATE_PAGE_TITLE}
+          </span>
         </div>
         <div className="flex flex-row items-center justify-end w-min ">
           <Button
@@ -91,7 +87,7 @@ export const AccountPasswordChangeForm = ({ pmUserData }) => {
             className="!ml-2 !w-max"
             onClick={pmUserPasswordUpdateForm.submitForm}
           >
-            Set password
+            {LOCAL_CONSTANTS.STRINGS.ACCOUNT_PASSWORD_UPDATE_BUTTON_TEXT}
           </Button>
         </div>
       </div>

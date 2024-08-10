@@ -25,8 +25,8 @@ export const GraphAdditionForm = () => {
     },
     retry: false,
     onSuccess: () => {
-      displaySuccess("Added graph successfully");
-      queryClient.invalidateQueries([`REACT_QUERY_KEY_GRAPH`]);
+      displaySuccess(LOCAL_CONSTANTS.STRINGS.GRAPH_ADDITION_SUCCESS);
+      queryClient.invalidateQueries([LOCAL_CONSTANTS.REACT_QUERY_KEYS.GRAPHS]);
     },
     onError: (error) => {
       displayError(error);
@@ -60,7 +60,9 @@ export const GraphAdditionForm = () => {
         className="flex flex-col items-start justify-start p-3 px-6"
         style={{ background: theme.palette.background.paper }}
       >
-        <span className="text-lg font-bold text-start mt-1">{`Add new graph`}</span>
+        <span className="text-lg font-bold text-start mt-1">
+          {LOCAL_CONSTANTS.STRINGS.GRAPH_ADDITION_PAGE_TITLE}
+        </span>
       </div>
       <Grid container spacing={1} className="!px-3">
         <Grid item lg={5} md={4} className="w-full">

@@ -36,10 +36,10 @@ export const GraphDeletionForm = ({ graphID }) => {
     },
     retry: false,
     onSuccess: () => {
-      displaySuccess("Deleted graph layout successfully");
+      displaySuccess(LOCAL_CONSTANTS.STRINGS.GRAPH_DELETED_SUCCESS);
       setIsDeleteGraphConfirmationOpen(false);
       navigate(LOCAL_CONSTANTS.ROUTES.ALL_GRAPHS.path());
-      queryClient.invalidateQueries([`REACT_QUERY_KEY_GRAPH`]);
+      queryClient.invalidateQueries([LOCAL_CONSTANTS.REACT_QUERY_KEYS.GRAPHS]);
     },
     onError: (error) => {
       displayError(error);
@@ -66,14 +66,14 @@ export const GraphDeletionForm = ({ graphID }) => {
           className="!ml-2"
           color="error"
         >
-          Delete
+          {LOCAL_CONSTANTS.STRINGS.DELETE_BUTTON_TEXT}
         </Button>
         <ConfirmationDialog
           open={isDeleteGraphConfirmationOpen}
           onAccepted={_handleDeleteGraph}
           onDecline={_handleCloseDeleteGraphConfirmation}
-          title={"Delete graph?"}
-          message={`Are you sure you want to delete graph id - ${graphID}`}
+          title={LOCAL_CONSTANTS.STRINGS.GRAPH_DELETION_CONFIRMATION_TITLE}
+          message={`${LOCAL_CONSTANTS.STRINGS.GRAPH_DELETION_CONFIRMATION_BODY} - ${graphID}`}
         />
       </>
     )

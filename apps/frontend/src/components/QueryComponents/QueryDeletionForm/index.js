@@ -33,8 +33,8 @@ export const QueryDeletionForm = ({ pmQueryID }) => {
     mutationFn: ({ pmQueryID }) => deleteQueryByIDAPI({ pmQueryID }),
     retry: false,
     onSuccess: () => {
-      displaySuccess("Deleted query successfully");
-      queryClient.invalidateQueries(["REACT_QUERY_KEY_QUERIES"]);
+      displaySuccess(LOCAL_CONSTANTS.STRINGS.QUERY_DELETED_SUCCESS);
+      queryClient.invalidateQueries([LOCAL_CONSTANTS.REACT_QUERY_KEYS.QUERIES]);
       navigate(LOCAL_CONSTANTS.ROUTES.ALL_QUERIES.path());
       setIsDeleteQueryConfirmationOpen(false);
     },
@@ -63,14 +63,14 @@ export const QueryDeletionForm = ({ pmQueryID }) => {
           className="!ml-2"
           color="error"
         >
-          Delete
+          {LOCAL_CONSTANTS.STRINGS.DELETE_BUTTON_TEXT}
         </Button>
         <ConfirmationDialog
           open={isDeleteQueryConfirmationOpen}
           onAccepted={_handleDeleteQuery}
           onDecline={_handleCloseDeleteQueryConfirmation}
-          title={"Delete query?"}
-          message={`Are you sure you want to delete query id - ${pmQueryID}`}
+          title={LOCAL_CONSTANTS.STRINGS.QUERY_DELETION_CONFIRMATION_TITLE}
+          message={`${LOCAL_CONSTANTS.STRINGS.QUERY_DELETION_CONFIRMATION_BODY} - ${pmQueryID}`}
         />
       </>
     )

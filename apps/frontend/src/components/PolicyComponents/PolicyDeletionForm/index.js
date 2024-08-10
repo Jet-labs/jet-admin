@@ -45,8 +45,10 @@ export const PolicyDeletionForm = ({ id }) => {
       }),
     retry: false,
     onSuccess: () => {
-      displaySuccess("Deleted row successfully");
-      queryClient.invalidateQueries([`REACT_QUERY_KEY_POLICIES`]);
+      displaySuccess(LOCAL_CONSTANTS.STRINGS.POLICY_DELETED_SUCCESS);
+      queryClient.invalidateQueries([
+        LOCAL_CONSTANTS.REACT_QUERY_KEYS.POLICIES,
+      ]);
       navigate(-1);
       setIsDeleteRowConfirmationOpen(false);
     },
@@ -75,14 +77,14 @@ export const PolicyDeletionForm = ({ id }) => {
           className="!ml-2"
           color="error"
         >
-          Delete
+          {LOCAL_CONSTANTS.STRINGS.DELETE_BUTTON_TEXT}
         </Button>
         <ConfirmationDialog
           open={isDeleteRowConfirmationOpen}
           onAccepted={_handleDeleteRow}
           onDecline={_handleCloseDeleteRowConfirmation}
-          title={"Delete row?"}
-          message={`Are you sure you want to delete row id - ${id}`}
+          title={LOCAL_CONSTANTS.STRINGS.POLICY_DELETION_CONFIRMATION_TITLE}
+          message={`${LOCAL_CONSTANTS.STRINGS.POLICY_DELETION_CONFIRMATION_BODY} - ${id}`}
         />
       </>
     )

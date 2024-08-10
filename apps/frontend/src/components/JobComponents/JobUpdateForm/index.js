@@ -17,6 +17,7 @@ import { QUERY_PLUGINS_MAP } from "../../../plugins/queries";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { CronJobScheduler } from "../CronJobScheduler";
 import { JobDeletionForm } from "../JobDeletionForm";
+import { LOCAL_CONSTANTS } from "../../../constants";
 
 export const JobUpdateForm = ({ id }) => {
   const theme = useTheme();
@@ -26,7 +27,7 @@ export const JobUpdateForm = ({ id }) => {
     data: jobData,
     error: loadJobDataError,
   } = useQuery({
-    queryKey: [`REACT_QUERY_KEY_JOBS`, id],
+    queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.JOBS, id],
     queryFn: () => getJobByIDAPI({ pmJobID: id }),
     cacheTime: 0,
     retry: 1,
@@ -39,7 +40,7 @@ export const JobUpdateForm = ({ id }) => {
     error: loadQueriesError,
     refetch: refetchQueries,
   } = useQuery({
-    queryKey: [`REACT_QUERY_KEY_QUERIES`],
+    queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.QUERIES],
     queryFn: () => getAllQueryAPI(),
     cacheTime: 0,
     retry: 1,
@@ -85,8 +86,8 @@ export const JobUpdateForm = ({ id }) => {
     },
     retry: false,
     onSuccess: (data) => {
-      displaySuccess("Job updated successfully");
-      queryClient.invalidateQueries(["REACT_QUERY_KEY_JOBS"]);
+      displaySuccess(LOCAL_CONSTANTS.STRINGS.JOB_UPDATED_SUCCESS);
+      queryClient.invalidateQueries([LOCAL_CONSTANTS.REACT_QUERY_KEYS.JOBS]);
     },
     onError: (error) => {
       displayError(error);
@@ -113,7 +114,9 @@ export const JobUpdateForm = ({ id }) => {
           borderColor: theme.palette.divider,
         }}
       >
-        <span className="text-lg font-bold text-start">{`Update job`}</span>
+        <span className="text-lg font-bold text-start">
+          {LOCAL_CONSTANTS.STRINGS.JOB_UPDATE_PAGE_TITLE}
+        </span>
         <span className="text-xs font-medium text-start mt-1">{`Job id : ${id}`}</span>
       </div>
 
@@ -162,11 +165,9 @@ export const JobUpdateForm = ({ id }) => {
 
           <div className="!flex flex-row justify-end items-center mt-10 w-100 px-3">
             <JobDeletionForm pmJobID={id} />
-            <Button
-              variant="contained"
-              className="!ml-3"
-              onClick={_updateJob}
-            >{`Save job`}</Button>
+            <Button variant="contained" className="!ml-3" onClick={_updateJob}>
+              {LOCAL_CONSTANTS.STRINGS.UPDATE_BUTTON_TEXT}
+            </Button>
           </div>
         </Grid>
         <Grid item sx={8} md={8} lg={8} className="w-full !h-full !p-2">

@@ -24,7 +24,7 @@ export const AccountUpdationForm = ({ id }) => {
     data: pmUserData,
     error: loadPMUserDataError,
   } = useQuery({
-    queryKey: [`REACT_QUERY_KEY_ACCOUNTS`, id],
+    queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.ACCOUNTS, id],
     queryFn: () =>
       getAccountByIDAPI({
         pmAccountID: id,
@@ -39,7 +39,7 @@ export const AccountUpdationForm = ({ id }) => {
     data: policyObjectData,
     error: loadPolicyObjectDataError,
   } = useQuery({
-    queryKey: [`REACT_QUERY_KEY_POLICIES`],
+    queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.POLICIES],
     queryFn: () => getAllPoliciesAPI(),
     cacheTime: 0,
     retry: 1,
@@ -59,8 +59,10 @@ export const AccountUpdationForm = ({ id }) => {
 
     retry: false,
     onSuccess: () => {
-      displaySuccess("Updated user successfully");
-      queryClient.invalidateQueries([`REACT_QUERY_KEY_ACCOUNTS`]);
+      displaySuccess(LOCAL_CONSTANTS.STRINGS.ACCOUNT_UPDATED_SUCCESS);
+      queryClient.invalidateQueries([
+        LOCAL_CONSTANTS.REACT_QUERY_KEYS.ACCOUNTS,
+      ]);
     },
     onError: (error) => {
       displayError(error);
@@ -110,7 +112,9 @@ export const AccountUpdationForm = ({ id }) => {
     <div className="flex flex-col justify-start items-center w-full pb-5 p-2">
       <div className=" flex flex-row justify-between 2xl:w-1/2 xl:w-1/2 lg:w-2/3 md:w-full w-full  mt-3">
         <div className="flex flex-col items-start justify-start">
-          <span className="text-lg font-bold text-start ">{`Account settings`}</span>
+          <span className="text-lg font-bold text-start ">
+            {LOCAL_CONSTANTS.STRINGS.ACCOUNT_UPDATE_PAGE_TITLE}
+          </span>
           <span
             className="text-xs font-thin text-start "
             style={{ color: theme.palette.text.secondary }}
@@ -132,7 +136,7 @@ export const AccountUpdationForm = ({ id }) => {
             className="!ml-2"
             onClick={accountUpdateForm.submitForm}
           >
-            Update
+            {LOCAL_CONSTANTS.STRINGS.UPDATE_BUTTON_TEXT}
           </Button>
         </div>
       </div>

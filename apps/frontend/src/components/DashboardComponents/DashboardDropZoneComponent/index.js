@@ -17,13 +17,6 @@ export const DashboardDropZoneComponent = ({
 }) => {
   const theme = useTheme();
 
-  const [isDraggableInDropZone, setIsDraggableInDropZone] = useState(false);
-  const _enableDropping = (e) => {
-    e.preventDefault();
-  };
-  const _handleDragOverStart = () => setIsDraggableInDropZone(true);
-  const _handleDragOverEnd = () => setIsDraggableInDropZone(false);
-
   const _handleDelete = (index) => {
     console.log({ index });
     const _widgets = [...widgets];

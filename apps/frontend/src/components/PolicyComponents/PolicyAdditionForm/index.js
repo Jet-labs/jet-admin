@@ -29,8 +29,10 @@ export const PolicyAdditionForm = () => {
 
     retry: false,
     onSuccess: () => {
-      displaySuccess("Added policy successfully");
-      queryClient.invalidateQueries([`REACT_QUERY_KEY_POLICIES`]);
+      displaySuccess(LOCAL_CONSTANTS.STRINGS.POLICY_ADDITION_SUCCESS);
+      queryClient.invalidateQueries([
+        LOCAL_CONSTANTS.REACT_QUERY_KEYS.POLICIES,
+      ]);
     },
     onError: (error) => {
       displayError(error);
@@ -59,7 +61,9 @@ export const PolicyAdditionForm = () => {
     <div className="flex flex-col justify-start items-center w-full pb-5 p-2">
       <div className=" flex flex-row justify-between 2xl:w-3/5 xl:w-3/4 lg:w-2/3 md:w-full  mt-3 w-full ">
         <div className="flex flex-col items-start justify-start">
-          <span className="text-lg font-bold text-start ">{`Add policy`}</span>
+          <span className="text-lg font-bold text-start ">
+            {LOCAL_CONSTANTS.STRINGS.POLICY_ADDITION_PAGE_TITLE}
+          </span>
         </div>
 
         <div className="flex flex-row items-center justify-end w-min ">
@@ -76,7 +80,7 @@ export const PolicyAdditionForm = () => {
             className="!ml-2"
             onClick={policyObjectAdditionForm.submitForm}
           >
-            Add
+            {LOCAL_CONSTANTS.STRINGS.ADD_BUTTON_TEXT}
           </Button>
         </div>
       </div>
