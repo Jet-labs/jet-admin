@@ -28,7 +28,7 @@ const APIContextProvider = ({ children }) => {
     // enabled: true,
     // retry: 0,
     // cacheTime: Infinity,
-    // staleTime: Infinity,
+    // staleTime: 0,
     onSuccess: (data) => {
       setPMUser(data);
     },

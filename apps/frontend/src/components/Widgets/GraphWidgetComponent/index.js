@@ -18,10 +18,8 @@ export const GraphWidgetComponent = ({ id, width, height }) => {
     queryFn: () => getGraphByIDAPI({ graphID: id }),
     cacheTime: 0,
     retry: 1,
-    staleTime: Infinity,
+    staleTime: 0,
   });
-
-
 
   const {
     isLoading: isLoadingGraphData,
@@ -33,7 +31,7 @@ export const GraphWidgetComponent = ({ id, width, height }) => {
     queryFn: () => getGraphDataByIDAPI({ graphID: id }),
     cacheTime: 0,
     retry: 1,
-    staleTime: Infinity,
+    staleTime: 0,
     refetchInterval: graph?.graph_options?.refetch_interval * 1000,
   });
   const graphType = graphData?.graph_options?.graph_type;

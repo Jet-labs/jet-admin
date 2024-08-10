@@ -31,7 +31,7 @@ export const RowUpdateForm = ({ customTitle, tableName, id }) => {
     queryFn: () => fetchRowByIDAPI({ tableName, id }),
     cacheTime: 0,
     retry: 1,
-    staleTime: Infinity,
+    staleTime: 0,
   });
 
   const {
@@ -46,7 +46,7 @@ export const RowUpdateForm = ({ customTitle, tableName, id }) => {
     queryFn: () => getAuthorizedColumnsForRead({ tableName }),
     cacheTime: 0,
     retry: 1,
-    staleTime: Infinity,
+    staleTime: 0,
   });
 
   const authorizedColumns = useMemo(() => {

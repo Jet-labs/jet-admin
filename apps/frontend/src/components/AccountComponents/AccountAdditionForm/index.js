@@ -22,7 +22,7 @@ export const AccountAdditionForm = ({ tableName }) => {
     queryFn: () => getAllPoliciesAPI(),
     cacheTime: 0,
     retry: 1,
-    staleTime: Infinity,
+    staleTime: 0,
   });
 
   const customPolicyObjectMapping = useMemo(() => {

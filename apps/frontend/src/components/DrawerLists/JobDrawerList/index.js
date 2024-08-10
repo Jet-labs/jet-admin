@@ -37,7 +37,7 @@ export const JobsList = () => {
     queryFn: () => getAllJobAPI(),
     cacheTime: 0,
     retry: 1,
-    staleTime: Infinity,
+    staleTime: 0,
   });
 
   const _navigateToAddMoreJob = () => {

@@ -40,7 +40,7 @@ const AllPolicies = () => {
     enabled: Boolean(pmUser),
     cacheTime: 0,
     retry: 0,
-    staleTime: Infinity,
+    staleTime: 0,
     keepPreviousData: true,
   });
 

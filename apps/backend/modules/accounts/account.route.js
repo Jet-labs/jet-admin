@@ -27,7 +27,7 @@ router.put(
   "/",
   authMiddleware.authProvider,
   policyMiddleware.populateAuthorizationPolicies,
-  accountAuthorizationMiddleware.authorizedAccountsForRead,
+  accountAuthorizationMiddleware.authorizeAccountUpdate,
   accountController.updateAccount
 );
 router.get(

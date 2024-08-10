@@ -67,7 +67,7 @@ export const DataGridWidget = ({
     enabled: Boolean(pmUser),
     cacheTime: 0,
     retry: 0,
-    staleTime: Infinity,
+    staleTime: 0,
     keepPreviousData: true,
   });
 
@@ -83,7 +83,7 @@ export const DataGridWidget = ({
     queryFn: () => getAuthorizedColumnsForRead({ tableName }),
     cacheTime: 0,
     retry: 1,
-    staleTime: Infinity,
+    staleTime: 0,
   });
 
   const authorizedColumns = useMemo(() => {

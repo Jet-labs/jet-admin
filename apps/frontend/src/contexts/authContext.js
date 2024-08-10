@@ -69,6 +69,9 @@ const AuthContextProvider = ({ children }) => {
       await localStorage.removeItem(
         LOCAL_CONSTANTS.STRINGS.ACCESS_TOKEN_LOCAL_STORAGE
       );
+      await localStorage.removeItem(
+        LOCAL_CONSTANTS.STRINGS.REFRESH_TOKEN_LOCAL_STORAGE
+      );
       window.location.reload();
     } catch (error) {
       setSignOutState({ isLoading: false, success: false, error });

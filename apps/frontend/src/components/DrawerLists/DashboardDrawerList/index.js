@@ -38,7 +38,7 @@ export const DashboardsList = () => {
     queryFn: () => getAllDashboardAPI(),
     cacheTime: 0,
     retry: 1,
-    staleTime: Infinity,
+    staleTime: 0,
   });
 
   const _navigateToAddMoreDashboard = () => {

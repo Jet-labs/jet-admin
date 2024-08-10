@@ -30,7 +30,7 @@ export const PolicyUpdateForm = ({ id }) => {
       }),
     cacheTime: 0,
     retry: 1,
-    staleTime: Infinity,
+    staleTime: 0,
   });
 
   const {

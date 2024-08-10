@@ -56,7 +56,7 @@ export const DataGridActionComponent = ({
     queryFn: () => getAuthorizedColumnsForRead({ tableName }),
     cacheTime: 0,
     retry: 1,
-    staleTime: Infinity,
+    staleTime: 0,
   });
 
   useEffect(() => {

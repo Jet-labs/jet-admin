@@ -74,7 +74,7 @@ accountController.getAccountByID = async (req, res) => {
       (Array.isArray(authorized_accounts) && authorized_accounts.length == 0)
     ) {
       Logger.log("error", {
-        message: "accountController:getAllAccounts:catch-1",
+        message: "accountController:getAccountByID:catch-1",
         params: { error: constants.ERROR_CODES.PERMISSION_DENIED },
       });
       return res.json({
@@ -166,7 +166,7 @@ accountController.updateAccount = async (req, res) => {
       (Array.isArray(authorized_accounts) && authorized_accounts.length == 0)
     ) {
       Logger.log("error", {
-        message: "accountController:getAllAccounts:catch-1",
+        message: "accountController:updateAccount:catch-1",
         params: { error: constants.ERROR_CODES.PERMISSION_DENIED },
       });
       return res.json({
@@ -223,7 +223,7 @@ accountController.updatePassword = async (req, res) => {
       (Array.isArray(authorized_accounts) && authorized_accounts.length == 0)
     ) {
       Logger.log("error", {
-        message: "accountController:getAllAccounts:catch-1",
+        message: "accountController:updatePassword:catch-1",
         params: { error: constants.ERROR_CODES.PERMISSION_DENIED },
       });
       return res.json({
@@ -276,7 +276,7 @@ accountController.deleteAccount = async (req, res) => {
       (Array.isArray(authorized_accounts) && authorized_accounts.length == 0)
     ) {
       Logger.log("error", {
-        message: "accountController:getAllAccounts:catch-1",
+        message: "accountController:deleteAccount:catch-1",
         params: { error: constants.ERROR_CODES.PERMISSION_DENIED },
       });
       return res.json({

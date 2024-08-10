@@ -25,7 +25,7 @@ export const RowAdditionForm = ({ tableName, customTitle }) => {
     queryFn: () => getAuthorizedColumnsForAdd({ tableName }),
     cacheTime: 0,
     retry: 1,
-    staleTime: Infinity,
+    staleTime: 0,
   });
 
   const allColumns = useMemo(() => {
