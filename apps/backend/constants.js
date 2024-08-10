@@ -5,15 +5,13 @@ const constants = {
   // strings
   STRINGS: {
     REFRESH_TOKEN_COOKIE_STRING: "refreshToken",
-    PM_USER_TABLE: "tbl_pm_users",
-    PM_POLICY_OBJECTS_TABLE: "tbl_pm_policy_objects",
   },
 
   // thresholds
 
   // defaults
   ACCESS_TOKEN_TIMEOUT: 900, // in sec
-  REFRESH_TOKEN_TIMEOUT: 864000, // in sec
+  REFRESH_TOKEN_TIMEOUT: "10h",
 
   ROW_PAGE_SIZE: 100,
 
@@ -72,6 +70,7 @@ const constants = {
   SOCKET_EVENTS: {
     ON_USER_UPDATE: "ON_USER_UPDATE",
   },
+
   VARIABLE_DETECTION_REGEX: /{{(.*?)}}/g,
   PM_QUERY_DETECTION_REGEX: /\[pm_query_id:\d+\]/g,
   PM_QUERY_EXTRACTION_REGEX: /\[pm_query_id:(\d+)\]/,

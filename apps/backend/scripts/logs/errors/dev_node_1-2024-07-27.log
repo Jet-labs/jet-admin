@@ -1,5 +1,0 @@
-[31merror[39m: dev_node_1: 27-07-2024 18:29:46: [31msetup_database:database setup failed![39m |====| {"error":{"length":115,"name":"error","severity":"ERROR","code":"42P07","file":"heap.c","line":"1146","routine":"heap_create_with_catalog"}}
-[31merror[39m: dev_node_1: 27-07-2024 18:31:15: [31msetup_database:database setup failed![39m |====| {"error":{"length":125,"name":"error","severity":"ERROR","code":"42601","position":"116","file":"scan.l","line":"1241","routine":"scanner_yyerror"}}
-[31merror[39m: dev_node_1: 27-07-2024 18:32:59: [31msetup_database:database setup failed![39m |====| {"error":{"length":137,"name":"error","severity":"ERROR","code":"08P01","file":"postgres.c","line":"1715","routine":"exec_bind_message"}}
-[31merror[39m: dev_node_1: 27-07-2024 18:35:42: [31msetup_database:database setup failed![39m |====| {"error":{}}
-[31merror[39m: dev_node_1: 27-07-2024 18:36:45: [31msetup_database:database setup failed![39m |====| {"error":{}}

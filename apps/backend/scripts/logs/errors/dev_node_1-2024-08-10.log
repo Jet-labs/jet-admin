@@ -1,0 +1,6 @@
+[31merror[39m: dev_node_1: 10-08-2024 19:16:46: [31mlog level error[39m |====| {"s":"setup","message":"setup_auth_database:auth setup complete"}
+[31merror[39m: dev_node_1: 10-08-2024 19:17:57: [31msetup_auth_database:auth database setup failed![39m |====| {"error":{"code":"SQLITE_ERROR"}}
+[31merror[39m: dev_node_1: 10-08-2024 19:20:55: [31msetup_auth_database:auth database setup failed![39m |====| {"error":{"code":"SQLITE_ERROR"}}
+[31merror[39m: dev_node_1: 10-08-2024 19:22:41: [31msetup_auth_database:auth database setup failed![39m |====| {"error":{"code":"SQLITE_ERROR"}}
+[31merror[39m: dev_node_1: 10-08-2024 19:48:57: [31msetup_auth_database:auth database setup failed![39m |====| {"error":{"code":"SQLITE_ERROR"}}
+[31merror[39m: dev_node_1: 10-08-2024 19:54:14: [31msetup_auth_database:auth database setup failed![39m |====| {"error":{"code":"SQLITE_ERROR"}}

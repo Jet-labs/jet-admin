@@ -204,36 +204,6 @@ model store {
   address          address     @relation(fields: [address_id], references: [address_id])
 }
 
-model tbl_pm_policy_objects {
-  pm_policy_object_id Int            @id @default(autoincrement())
-  title               String         @db.VarChar
-  description         String?        @db.VarChar
-  is_disabled         Boolean?       @default(false)
-  created_at          DateTime       @default(now()) @db.Timestamptz(6)
-  updated_at          DateTime       @default(now()) @db.Timestamptz(6)
-  disabled_at         DateTime?      @db.Timestamptz(6)
-  disable_reason      String?        @db.VarChar
-  policy              Json?
-  tbl_pm_users        tbl_pm_users[]
-}
-
-model tbl_pm_users {
-  pm_user_id            Int                    @id @default(autoincrement())
-  first_name            String?                @db.VarChar
-  last_name             String?                @db.VarChar
-  address1              String?                @db.VarChar
-  pm_policy_object_id   Int?
-  is_disabled           Boolean?               @default(false)
-  created_at            DateTime               @default(now()) @db.Timestamptz(6)
-  updated_at            DateTime               @default(now()) @db.Timestamptz(6)
-  disabled_at           DateTime?              @db.Timestamptz(6)
-  disable_reason        String?                @db.VarChar
-  username              String?                @db.VarChar
-  password_hash         String?                @db.VarChar
-  salt                  String?                @db.VarChar
-  tbl_pm_policy_objects tbl_pm_policy_objects? @relation(fields: [pm_policy_object_id], references: [pm_policy_object_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_tbl_pm_users_tbl_pm_policy_object_pm_policy_onject_id")
-}
-
 model tbl_pm_graphs {
   pm_graph_id       Int       @id @default(autoincrement())
   graph_title       String    @db.VarChar

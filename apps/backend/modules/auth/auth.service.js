@@ -37,7 +37,7 @@ class AuthService {
       { pm_user_id },
       environmentVariables.JWT_REFRESH_TOKEN_SECRET,
       {
-        expiresIn: "10h",
+        expiresIn: constants.REFRESH_TOKEN_TIMEOUT,
       }
     );
     return refreshToken;
