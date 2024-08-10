@@ -1,4 +1,5 @@
 import {
+  Alert,
   Checkbox,
   FormControl,
   FormControlLabel,
@@ -36,7 +37,24 @@ export const AppConstantEditor = ({ appConstantForm }) => {
         />
       </Grid>
 
-      <Grid item sx={12} md={12} lg={12} className="!p-3">
+      <Grid item sx={12} md={12} lg={12} className="!px-3">
+        {" "}
+        <Alert
+          sx={{
+            background: theme.palette.background.info,
+            color: theme.palette.info.main,
+
+            "& .MuiAlert-message": {
+              marginTop: 0.2,
+            },
+          }}
+          severity="info"
+          className="!py-0 !text-xs"
+        >
+          {`Internal app constants should not be deleted`}
+        </Alert>
+      </Grid>
+      <Grid item sx={12} md={12} lg={12} className="!px-3">
         <FormControlLabel
           control={
             <Checkbox
@@ -47,7 +65,6 @@ export const AppConstantEditor = ({ appConstantForm }) => {
           label="Internal"
         />
       </Grid>
-
       <Grid item sx={12} md={12} lg={12} className="!p-3">
         <CodeEditor
           code={

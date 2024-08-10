@@ -223,7 +223,7 @@ export const GraphEditor = ({ graphID, graphForm }) => {
               <Grid
                 className="!rounded  !mt-3 !ml-3.5 !pr-3 !py-3"
                 sx={{
-                  background: theme.palette.background.default,
+                  background: theme.palette.background.secondary,
                   borderRadius: 4,
                   borderWidth: 1,
                   borderColor: theme.palette.divider,

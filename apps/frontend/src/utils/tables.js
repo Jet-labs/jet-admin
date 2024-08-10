@@ -1,4 +1,4 @@
-import { Chip, ListItem } from "@mui/material";
+import { Chip, List, ListItem } from "@mui/material";
 
 import { BiCalendar } from "react-icons/bi";
 import { LOCAL_CONSTANTS } from "../constants";
@@ -114,13 +114,12 @@ export const getFieldFormatting = ({
           label={`${params.value}`}
           size="small"
           variant="filled"
-          className="!bg-slate-200 !text-slate-800 !h-min !py-0.5 !border !border-slate-500 !rounded"
+          className=" !h-min !py-0.5 !border !border-slate-500 !rounded"
           sx={{
             maxHeight: null,
           }}
-          color={"secondary"}
-          icon={<BiCalendar className="!text-sm" />}
-          
+          color={"default"}
+          icon={<BiCalendar className="!text-sm !text-current" />}
         />
       );
       break;
@@ -131,28 +130,32 @@ export const getFieldFormatting = ({
         value = JSON.stringify(params.value);
       }
       f = isList ? (
-        params.value.map((data) => {
-          const _d = customIntMapping?.[data] ? customIntMapping[data] : data;
-          const _class = customIntMapping?.[data]
-            ? "!bg-slate-200 !text-slate-800 !h-min !pt-0.5 !border !border-slate-500 !rounded"
-            : "";
-          return (
-            <ListItem key={data}>
-              <Chip
-                label={`${_d}`}
-                size="small"
-                variant="filled"
-                className={_class}
-                sx={{
-                  maxHeight: null,
-                }}
-              />
-            </ListItem>
-          );
-        })
+        <List sx={{ width: "100%", maxWidth: 360, bgcolor: "transparent" }}>
+          {params.value.map((data) => {
+            const _d = customIntMapping?.[data] ? customIntMapping[data] : data;
+            const _class = customIntMapping?.[data]
+              ? "!bg-slate-200 !text-slate-800 !h-min !pt-0.5 !border !border-slate-500 !rounded"
+              : "";
+            return (
+              <ListItem key={data} className="!flex-wrap">
+                <Chip
+                  label={`${_d}`}
+                  size="small"
+                  variant="filled"
+                  className={_class}
+                  sx={{
+                    maxHeight: null,
+                  }}
+                />
+              </ListItem>
+            );
+          })}
+        </List>
       ) : (
-        ()=>{
-          const _d = customIntMapping?.[value] ? customIntMapping[value] : value;
+        (() => {
+          const _d = customIntMapping?.[value]
+            ? customIntMapping[value]
+            : value;
           const _class = customIntMapping?.[value]
             ? "!bg-slate-200 !text-slate-800 !h-min !pt-0.5 !border !border-slate-500 !rounded"
             : "!rounded !bg-transparent";
@@ -167,8 +170,8 @@ export const getFieldFormatting = ({
               }}
             />
           );
-        }
-      )();
+        })()
+      );
       break;
     }
 
@@ -265,6 +268,7 @@ export const getFormattedTableColumns = (columns, customIntMappings) => {
         sortable: false,
         headerName: String(column.name).toLocaleLowerCase(),
         type: column.type,
+        isList: column.isList,
         width: getFieldWidth(column.type),
         renderCell: (params) => {
           return getFieldFormatting({
@@ -281,4 +285,3 @@ export const getFormattedTableColumns = (columns, customIntMappings) => {
     console.error(error);
   }
 };
-

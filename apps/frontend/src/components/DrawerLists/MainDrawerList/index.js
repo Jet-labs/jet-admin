@@ -18,10 +18,14 @@ import { LOCAL_CONSTANTS } from "../../../constants";
 import { GrConnect } from "react-icons/gr";
 import { RiCalendarScheduleFill } from "react-icons/ri";
 import { VscSymbolVariable } from "react-icons/vsc";
+import { MdPolicy } from "react-icons/md";
+import { HiVariable } from "react-icons/hi";
+import { RiDashboard2Fill } from "react-icons/ri";
+import { FaCircleUser } from "react-icons/fa6";
 const drawerList = [
   {
     text: "Dashboards",
-    icon: <VscDashboard size={32} className="!text-sm" />,
+    icon: <RiDashboard2Fill size={32} className="!text-sm" />,
     to: LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.path(),
   },
   {
@@ -46,17 +50,17 @@ const drawerList = [
   },
   {
     text: "Constants",
-    icon: <VscSymbolVariable size={24} className="!text-sm" />,
+    icon: <HiVariable size={24} className="!text-sm" />,
     to: LOCAL_CONSTANTS.ROUTES.ALL_APP_CONSTANTS.path(),
   },
   {
     text: "Policies",
-    icon: <FaUserLock size={24} className="!text-sm" />,
+    icon: <MdPolicy size={24} className="!text-sm" />,
     to: LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT.path(),
   },
   {
     text: "Accounts",
-    icon: <FaRegUser size={24} className="!text-sm" />,
+    icon: <FaCircleUser size={24} className="!text-sm" />,
     to: LOCAL_CONSTANTS.ROUTES.ACCOUNT_MANAGEMENT,
   },
 ];

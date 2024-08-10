@@ -104,7 +104,7 @@ export const RowUpdateForm = ({ customTitle, tableName, id }) => {
   });
 
   return authorizedColumns?.length > 0 ? (
-    <div className="flex flex-col justify-start items-center w-full pb-5 p-2">
+    <div className="flex flex-col justify-start items-center w-full pb-5 p-2 overflow-y-scroll">
       <div className=" flex flex-row justify-between 2xl:w-3/5 xl:w-3/4 lg:w-2/3 md:w-full  mt-3 w-full ">
         <div className="flex flex-col items-start justify-start">
           <span className="text-lg font-bold text-start ">
@@ -155,6 +155,7 @@ export const RowUpdateForm = ({ customTitle, tableName, id }) => {
                     <FieldComponent
                       type={column.type}
                       name={column.field}
+                      isList={column.isList}
                       value={rowUpdateForm.values[column.field]}
                       onBlur={rowUpdateForm.handleBlur}
                       onChange={rowUpdateForm.handleChange}

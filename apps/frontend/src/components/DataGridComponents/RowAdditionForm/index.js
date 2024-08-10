@@ -126,6 +126,7 @@ export const RowAdditionForm = ({ tableName, customTitle }) => {
                     helperText={rowAdditionForm.errors[column.field]}
                     error={Boolean(rowAdditionForm.errors[column.field])}
                     setFieldValue={rowAdditionForm.setFieldValue}
+                    isList={column.isList}
                   />
                 </Grid>
               );

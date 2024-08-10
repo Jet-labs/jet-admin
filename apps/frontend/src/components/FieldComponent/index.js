@@ -20,6 +20,7 @@ import moment from "moment";
 import { LOCAL_CONSTANTS } from "../../constants";
 import { CodeEditor } from "../CodeEditorComponent";
 import { FaChevronDown } from "react-icons/fa";
+import { ArrayInput } from "../ArrayInputComponent";
 
 export const FieldComponent = ({
   type,
@@ -380,7 +381,29 @@ export const FieldComponent = ({
       break;
     }
     case LOCAL_CONSTANTS.DATA_TYPES.INT: {
-      component = customMapping ? (
+      component = isList ? (
+        <FormControl
+          fullWidth
+          className="!flex !flex-col !justify-start !items-start"
+          size="small"
+        >
+          {customLabel
+            ? customLabel
+            : label && (
+                <span
+                  style={{ color: theme.palette.text.secondary }}
+                  className="text-xs font-light mb-1"
+                >
+                  {label}
+                </span>
+              )}
+          <ArrayInput
+            value={value}
+            onChange={(value) => setFieldValue(name, value)}
+            type="number"
+          />
+        </FormControl>
+      ) : customMapping ? (
         <FormControl
           fullWidth
           className="!flex !flex-col !justify-start !items-start"
