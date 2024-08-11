@@ -1,3 +1,5 @@
+import { color } from "@uiw/react-codemirror";
+
 export const customDarkTheme = {
   typography: {
     fontFamily: "Roboto, Helvetica, Arial, sans-serif",
@@ -105,6 +107,10 @@ export const customDarkTheme = {
         },
         tooltip: {
           background: "#131313 !important",
+          color: "#C4C5C7",
+          fontSize: 12,
+          borderColor: "#444444",
+          borderWidth: 1,
         },
       },
     },
@@ -508,6 +514,20 @@ export const customLightTheme = {
     },
   },
   components: {
+    MuiTooltip: {
+      styleOverrides: {
+        root: {
+          background: "#EEEEEE !important",
+        },
+        tooltip: {
+          background: "#EEEEEE !important",
+          color: "#273E5E",
+          fontSize: 12,
+          borderColor: "#CFCFCF",
+          borderWidth: 1,
+        },
+      },
+    },
     MuiList: {
       styleOverrides: {
         root: {

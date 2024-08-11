@@ -61,9 +61,15 @@ body {
   -moz-osx-font-smoothing: grayscale;
   height: -webkit-fill-available;
   display: block;
-  
-}
 
+}
+  .react-json-view{
+  background-color: transparent !important;
+  
+  span{
+    color: unset !important;
+  }
+}
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
