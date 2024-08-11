@@ -1,10 +1,10 @@
-import { Chip, List, ListItem } from "@mui/material";
+import { Box, Chip, List, ListItem, Paper, Tooltip } from "@mui/material";
 
 import { BiCalendar } from "react-icons/bi";
 import { LOCAL_CONSTANTS } from "../constants";
 import { Model } from "../models/data/model";
 import { jsonToReadable } from "./string";
-
+import ReactJson from "react-json-view";
 /**
  *
  * @param {String} field
@@ -130,14 +130,14 @@ export const getFieldFormatting = ({
         value = JSON.stringify(params.value);
       }
       f = isList ? (
-        <List sx={{ width: "100%", maxWidth: 360, bgcolor: "transparent" }}>
+        <div className="flex flex-row justify-start items-start w-full !flex-wrap h-auto flex-grow">
           {params.value.map((data) => {
             const _d = customIntMapping?.[data] ? customIntMapping[data] : data;
             const _class = customIntMapping?.[data]
               ? "!bg-slate-200 !text-slate-800 !h-min !pt-0.5 !border !border-slate-500 !rounded"
-              : "";
+              : "!rounded-sm";
             return (
-              <ListItem key={data} className="!flex-wrap">
+              <div key={data} className="p-0.5 w-min">
                 <Chip
                   label={`${_d}`}
                   size="small"
@@ -147,10 +147,10 @@ export const getFieldFormatting = ({
                     maxHeight: null,
                   }}
                 />
-              </ListItem>
+              </div>
             );
           })}
-        </List>
+        </div>
       ) : (
         (() => {
           const _d = customIntMapping?.[value]
@@ -200,16 +200,46 @@ export const getFieldFormatting = ({
       break;
     }
     case LOCAL_CONSTANTS.DATA_TYPES.JSON:
-      var m = params.value ? jsonToReadable(params.value) : null;
-      f = m ? (
-        <div className="h-auto p-2">
-          <ul>
-            {m.map((k) => {
-              return <li>{k}</li>;
-            })}
-          </ul>
+      // var m = params.value ? p : null;
+      f = (
+        <div className="p-2">
+          <Tooltip
+            placement="right"
+            className="!p-0"
+            sx={{ background: "background.secondary" }}
+            title={
+              <Box
+                sx={{ bgcolor: "background.secondary" }}
+                className="!max-h-32 !overflow-y-auto rounded"
+              >
+                <ReactJson
+                  src={params.value}
+                  theme={
+                    localStorage.getItem(
+                      LOCAL_CONSTANTS.STRINGS.THEME_LOCAL_STORAGE_STRING
+                    ) === "dark"
+                      ? "google"
+                      : "ashes"
+                  }
+                />
+              </Box>
+            }
+          >
+            <div className="!max-h-32 !overflow-hidden rounded">
+              <ReactJson
+                src={params.value}
+                theme={
+                  localStorage.getItem(
+                    LOCAL_CONSTANTS.STRINGS.THEME_LOCAL_STORAGE_STRING
+                  ) === "dark"
+                    ? "google"
+                    : "ashes"
+                }
+              />
+            </div>
+          </Tooltip>
         </div>
-      ) : null;
+      );
 
       break;
     default: {

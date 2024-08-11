@@ -21,3 +21,16 @@
 .codemirror-editor-rounded-bottom .cm-gutters {
   border-bottom-left-radius: 4px !important;
 }
+
+.react-json-view-bg{
+  .react-json-view{
+    background-color: "red" !important;
+  }
+}
+.react-json-view{
+  background-color: transparent !important;
+  
+  span{
+    color: unset !important;
+  }
+}

@@ -77,6 +77,7 @@ export const LOCAL_CONSTANTS = {
   DOC_LINK: "https://jet-labs.github.io/documentation/",
 
   STRINGS: {
+    THEME_LOCAL_STORAGE_STRING: "jet-theme",
     ACCESS_TOKEN_LOCAL_STORAGE: "access_token",
     REFRESH_TOKEN_LOCAL_STORAGE: "refresh_token",
     PM_USER_TABLE_NAME: "tbl_pm_users",

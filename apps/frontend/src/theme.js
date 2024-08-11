@@ -98,6 +98,16 @@ export const customDarkTheme = {
     },
   },
   components: {
+    MuiTooltip: {
+      styleOverrides: {
+        root: {
+          background: "#131313 !important",
+        },
+        tooltip: {
+          background: "#131313 !important",
+        },
+      },
+    },
     MuiList: {
       styleOverrides: {
         root: {
