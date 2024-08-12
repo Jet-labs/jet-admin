@@ -1,0 +1,9 @@
+.monaco-editor{
+    border-radius: 4px !important;
+}
+
+.monaco-editor .margin {
+    
+    border-top-left-radius: 3px !important;
+    border-bottom-left-radius: 3px !important;
+}

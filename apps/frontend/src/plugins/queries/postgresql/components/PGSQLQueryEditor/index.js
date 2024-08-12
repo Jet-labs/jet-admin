@@ -1,177 +1,91 @@
-import { useTheme } from "@mui/material";
-import { loadLanguage } from "@uiw/codemirror-extensions-langs";
-import { githubLight } from "@uiw/codemirror-theme-github";
-import { vscodeDark } from "@uiw/codemirror-theme-vscode";
-import CodeMirror from "@uiw/react-codemirror";
-import React from "react";
-import "react-data-grid/lib/styles.css";
-
-import { autocompletion } from "@codemirror/autocomplete";
+import React, { useEffect, useRef, useMemo } from "react";
+import Editor from "@monaco-editor/react";
+import { useAppConstants } from "../../../../../contexts/appConstantsContext";
 import { useThemeValue } from "../../../../../contexts/themeContext";
-
+import { DEFAULT_PG_KEYWORDS } from "../../../../../utils/pgKeywords";
+import { useTheme } from "@mui/material";
+import "./styles.css";
 export const PGSQLQueryEditor = ({ value, handleChange }) => {
-  const theme = useTheme();
+  const { dbModel } = useAppConstants();
   const { themeType } = useThemeValue();
+  const theme = useTheme();
 
-  const _handleOnRAWQueryChange = (value) => {
-    handleChange({ raw_query: value });
-  };
+  const handleEditorWillMount = (monaco) => {
+    // Register custom completion provider
+    monaco.languages.registerCompletionItemProvider("pgsql", {
+      provideCompletionItems: (model, position) => {
+        const wordInfo = model.getWordUntilPosition(position);
+        const range = {
+          startLineNumber: position.lineNumber,
+          endLineNumber: position.lineNumber,
+          startColumn: wordInfo.startColumn,
+          endColumn: wordInfo.endColumn,
+        };
 
-  const sqlSuggestions = [
-    {
-      label: "variable1",
-      type: "variable",
-      properties: [
-        {
-          label: "property1",
-          type: "property",
-          properties: [
-            { label: "subProperty1", type: "property" },
-            { label: "subProperty2", type: "property" },
-          ],
-          functions: [
-            { label: "function1", type: "function" },
-            { label: "function2", type: "function" },
-          ],
-        },
-        { label: "property2", type: "property" },
-      ],
-      functions: [
-        { label: "function1", type: "function" },
-        { label: "function2", type: "function" },
-      ],
-    },
-    {
-      label: "variable2",
-      type: "variable",
-      properties: [
-        {
-          label: "propertyA",
-          type: "property",
-          properties: [
-            { label: "subPropertyA1", type: "property" },
-            { label: "subPropertyA2", type: "property" },
-          ],
-          functions: [
-            { label: "functionA1", type: "function" },
-            { label: "functionA2", type: "function" },
-          ],
-        },
-        { label: "propertyB", type: "property" },
-      ],
-      functions: [
-        { label: "functionA", type: "function" },
-        { label: "functionB", type: "function" },
-      ],
-    },
-    // Add more variables with nested properties and functions
-  ];
+        const modelSuggestions = dbModel?.map((model) => ({
+          label: model.name,
+          kind: monaco.languages.CompletionItemKind.Variable,
+          documentation: `Table ${model.name}`,
+          insertText: model.name,
+          range: range,
+        }));
 
-  const getNestedSuggestions = (context, suggestions, fromIndex) => {
-    const word = context.matchBefore(/\.\w*/);
-    if (word && word.from !== word.to) {
-      const nestedWord = word.text.slice(1); // Remove leading dot
-      const path = context.state.sliceDoc(fromIndex, word.from).split(".");
+        const fieldSuggestions = dbModel?.flatMap((model) =>
+          model.fields.map((field) => ({
+            label: `${model.name}.${field.name}`,
+            kind: monaco.languages.CompletionItemKind[
+              field.kind === "object" ? "Class" : "Property"
+            ],
+            documentation: `Field in model ${model.name}`,
+            insertText: `${model.name}.${field.name}`,
+            range: range,
+          }))
+        );
 
-      let currentLevel = suggestions.find(
-        (suggestion) => suggestion.label === path[0]
-      );
-
-      for (let i = 1; i < path.length; i++) {
-        if (currentLevel && currentLevel.properties) {
-          currentLevel = currentLevel.properties.find(
-            (p) => p.label === path[i]
-          );
-        } else {
-          return null;
-        }
-      }
-
-      if (currentLevel) {
-        const options = [
-          ...(currentLevel.properties || []),
-          ...(currentLevel.functions || []),
-        ].filter((suggestion) => suggestion.label.startsWith(nestedWord));
+        const pgSuggestions = DEFAULT_PG_KEYWORDS.map((key) => ({
+          label: key,
+          kind: monaco.languages.CompletionItemKind.Keyword,
+          insertText: key,
+          range: range,
+        }));
 
         return {
-          from: word.from + 1, // +1 to skip the leading dot
-          options: options.map((suggestion) => ({
-            label: suggestion.label,
-            type: suggestion.type,
-          })),
+          suggestions: [
+            ...pgSuggestions,
+            ...modelSuggestions,
+            ...fieldSuggestions,
+          ],
         };
-      }
-    }
-    return null;
+      },
+    });
   };
 
-  // Autocomplete logic
-  const customAutocomplete = autocompletion({
-    override: [
-      (context) => {
-        const word = context.matchBefore(/\{\{\w*/);
-        if (word && word.from !== word.to) {
-          const variableName = word.text.slice(2); // Remove leading {{
-          const variable = sqlSuggestions.find((suggestion) =>
-            suggestion.label.startsWith(variableName)
-          );
-
-          // Show root-level suggestions if variable is not matched
-          if (!variable) {
-            const options = sqlSuggestions
-              .filter((suggestion) => suggestion.label.startsWith(variableName))
-              .map((suggestion) => ({
-                label: suggestion.label,
-                type: suggestion.type,
-              }));
-            return {
-              from: word.from + 2, // +2 to skip the opening {{
-              options: options,
-            };
-          }
-
-          // Show matched variable's properties and functions
-          const nestedSuggestions = getNestedSuggestions(
-            context,
-            sqlSuggestions,
-            word.from + 2
-          );
-          if (nestedSuggestions) {
-            return nestedSuggestions;
-          }
-
-          const options = [
-            ...(variable.properties || []),
-            ...(variable.functions || []),
-          ].map((suggestion) => ({
-            label: suggestion.label,
-            type: suggestion.type,
-          }));
-          return {
-            from: word.from + 2, // +2 to skip the opening {{
-            options: options,
-          };
-        }
-        return null;
-      },
-    ],
-  });
+  const handleEditorChange = (newValue) => {
+    handleChange({ raw_query: newValue });
+  };
 
   return (
-    <CodeMirror
-      value={value ? value.raw_query : ""}
-      height="200px"
-      extensions={[loadLanguage("pgsql")]}
-      onChange={_handleOnRAWQueryChange}
-      theme={themeType == "dark" ? vscodeDark : githubLight}
+    <div
+      className="!mt-3"
       style={{
-        marginTop: 20,
-        width: "100%",
-        borderWidth: 1,
-        borderColor: theme.palette.divider,
         borderRadius: 4,
+        borderColor: theme.palette.divider,
+        borderWidth: 1,
       }}
-      className="codemirror-editor-rounded"
-    />
+    >
+      <Editor
+        height="200px"
+        defaultLanguage="pgsql"
+        // defaultValue={value ? value.raw_query : ""}
+        theme={themeType === "dark" ? "vs-dark" : "vs-light"}
+        beforeMount={handleEditorWillMount} // Register custom suggestions before the editor mounts
+        onChange={handleEditorChange}
+        value={value ? value.raw_query : ""}
+        options={{
+          automaticLayout: true,
+          minimap: { enabled: false },
+        }}
+      />
+    </div>
   );
 };

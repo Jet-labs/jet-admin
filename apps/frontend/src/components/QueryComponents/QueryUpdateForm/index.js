@@ -116,7 +116,7 @@ export const QueryUpdateForm = ({ id }) => {
       <div
         className="flex flex-row justify-start items-center w-full px-3"
         style={{
-          background: theme.palette.background.default,
+          background: theme.palette.background.paper,
           borderBottomWidth: 1,
           borderColor: theme.palette.divider,
         }}

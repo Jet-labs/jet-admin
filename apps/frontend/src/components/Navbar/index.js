@@ -141,7 +141,7 @@ export const Navbar = ({ children, handleDrawerOpen }) => {
                 mr: 1,
               },
               "& .MuiMenu-list": {
-                background: theme.palette.background.paper,
+                background: theme.palette.background.secondary,
                 borderRadius: 2,
               },
             },
