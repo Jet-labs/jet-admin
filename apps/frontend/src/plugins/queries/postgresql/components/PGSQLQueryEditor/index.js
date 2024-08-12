@@ -58,6 +58,56 @@ export const PGSQLQueryEditor = ({ value, handleChange }) => {
         };
       },
     });
+
+    monaco.languages.registerHoverProvider("pgsql", {
+      provideHover: function (model, position) {
+        const word = model.getWordAtPosition(position);
+
+        if (word) {
+          // Here you can add more complex logic to provide hover information
+          const table = dbModel?.find((m) => m.name === word.word);
+          const field = dbModel?.flatMap((m) =>
+            m.fields.filter((f) => f.name === word.word)
+          )[0];
+
+          let hoverMessage = null;
+
+          if (table) {
+            const _c = table?.fields?.map((f) => {
+              return { value: `${f.name}: ${f.type}` };
+            });
+            hoverMessage = {
+              contents: [
+                { value: `**Table**: ${table.name}` },
+                { value: `**Fields**` },
+                ..._c,
+              ],
+            };
+            // } else if (field) {
+            //   hoverMessage = {
+            //     contents: [
+            //       { value: `**Field**: ${field.name}` },
+            //       { value: `Type: ${field.type}` }, // If modelName is part of field data
+            //     ],
+            //   };
+          }
+
+          if (hoverMessage) {
+            return {
+              range: new monaco.Range(
+                position.lineNumber,
+                word.startColumn,
+                position.lineNumber,
+                word.endColumn
+              ),
+              contents: hoverMessage.contents,
+            };
+          }
+        }
+
+        return null;
+      },
+    });
   };
 
   const handleEditorChange = (newValue) => {

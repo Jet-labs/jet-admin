@@ -23,7 +23,11 @@ export const getFieldModelFromModel = (field, tableModel) =>
 export const getTableIDProperty = (tableName, dbModel) => {
   const prismaModel = dbModel.find((m) => m.name === tableName);
   let tableIDs = [];
-  if (prismaModel.primaryKey && prismaModel.primaryKey.fields?.length > 0) {
+  if (
+    prismaModel &&
+    prismaModel.primaryKey &&
+    prismaModel.primaryKey.fields?.length > 0
+  ) {
     tableIDs = prismaModel.primaryKey.fields;
   } else {
     const idField = prismaModel?.fields.find((f) => f.isId);

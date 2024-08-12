@@ -94,7 +94,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "react-scripts --max_old_space_size=4096 build",
     "postbuild": "rimraf build/**/*.map",
     "deploy": "npm run build",
     "eject": "react-scripts eject",
