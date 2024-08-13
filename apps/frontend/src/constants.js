@@ -125,6 +125,10 @@ export const LOCAL_CONSTANTS = {
     QUERY_DUPLICATE_CONFIRMATION_TITLE: "Duplicate query?",
     QUERY_DUPLICATE_CONFIRMATION_BODY:
       "Are you sure you want to duplicate query",
+    QUERY_TEST_BUTTON: "Test query",
+
+    PG_QUERY_ARG_FORM_TITLE: "Arguments",
+    PG_QUERY_ARG_FORM_BODY: "Fill the value of arguments",
 
     // jobs
     JOB_ADDITION_SUCCESS: "Job added!",

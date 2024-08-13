@@ -97,11 +97,15 @@ export const getAllQueryAPI = async () => {
   }
 };
 
-export const runQueryAPI = async ({ pm_query_type, pm_query }) => {
+export const runQueryAPI = async ({
+  pm_query_type,
+  pm_query,
+  pm_query_arg_values,
+}) => {
   try {
     const response = await axiosInstance.post(
       LOCAL_CONSTANTS.APIS.QUERY.runQuery(),
-      { pm_query_type, pm_query }
+      { pm_query_type, pm_query, pm_query_arg_values }
     );
     if (response.data && response.data.success == true) {
       return response.data.data;

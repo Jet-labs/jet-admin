@@ -4,11 +4,12 @@ export const QUERY_PLUGINS_MAP = {
   POSTGRE_QUERY: {
     name: "Postgre query",
     value: "POSTGRE_QUERY",
-    component: ({ pmQueryID, value, handleChange }) => (
+    component: ({ pmQueryID, args, value, handleChange }) => (
       <PGSQLQueryBuilder
         pmQueryID={pmQueryID}
         value={value}
         handleChange={handleChange}
+        args={args}
       />
     ),
     icon: <SiPostgresql className="!text-lg" />,

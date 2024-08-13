@@ -8,6 +8,7 @@ export class Query {
     pm_query_type,
     pm_query_title,
     pm_query_description,
+    pm_query_args,
     is_disabled,
     created_at,
     updated_at,
@@ -19,6 +20,7 @@ export class Query {
     this.pm_query_title = String(pm_query_title);
     this.pm_query_description = String(pm_query_description);
     this.pm_query = this.getQueryClass({ pm_query_type, queryData: pm_query });
+    this.pm_query_args = pm_query_args;
     this.is_disabled = is_disabled;
     this.created_at = created_at;
     this.updated_at = updated_at;

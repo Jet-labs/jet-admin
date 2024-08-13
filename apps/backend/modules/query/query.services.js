@@ -1,7 +1,7 @@
 const { prisma } = require("../../config/prisma");
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
-const { runQuery: _runQuery } = require("../../plugins/queries/index");
+const { runQuery } = require("../../plugins/queries/index");
 
 class QueryService {
   constructor() {}
@@ -13,6 +13,7 @@ class QueryService {
    * @param {String} param0.pmQueryType
    * @param {String} param0.pmQueryDescription
    * @param {JSON} param0.pmQuery
+   * @param {Array} param0.pmQueryArgs
    * @returns {any|null}
    */
   static addQuery = async ({
@@ -20,6 +21,7 @@ class QueryService {
     pmQueryType,
     pmQueryDescription,
     pmQuery,
+    pmQueryArgs,
   }) => {
     Logger.log("info", {
       message: "DashboardService:addQuery:params",
@@ -28,6 +30,7 @@ class QueryService {
         pmQueryDescription,
         pmQueryType,
         pmQuery,
+        pmQueryArgs,
       },
     });
     try {
@@ -37,6 +40,7 @@ class QueryService {
           pm_query_title: pmQueryTitle,
           pm_query_description: pmQueryDescription,
           pm_query: pmQuery,
+          pm_query_args: pmQueryArgs,
         },
       });
 
@@ -62,6 +66,7 @@ class QueryService {
    * @param {String} param0.pmQueryTitle
    * @param {String} param0.pmQueryDescription
    * @param {JSON} param0.pmQuery
+   * @param {Array} param0.pmQueryArgs
    * @param {Boolean|Array<Number>} param0.authorizedQueries
    * @returns {any|null}
    */
@@ -70,6 +75,7 @@ class QueryService {
     pmQueryTitle,
     pmQueryDescription,
     pmQuery,
+    pmQueryArgs,
     authorizedQueries,
   }) => {
     Logger.log("info", {
@@ -79,6 +85,7 @@ class QueryService {
         pmQueryTitle,
         pmQueryDescription,
         pmQuery,
+        pmQueryArgs,
       },
     });
     try {
@@ -89,6 +96,7 @@ class QueryService {
             pm_query_title: pmQueryTitle,
             pm_query_description: pmQueryDescription,
             pm_query: pmQuery,
+            pm_query_args: pmQueryArgs,
           },
         });
         Logger.log("success", {
@@ -196,16 +204,26 @@ class QueryService {
    * @param {String} param0.pmQueryType
    * @returns {any|null}
    */
-  static runQuery = async ({ pmQueryID, pmQuery, pmQueryType }) => {
+  static queryRunner = async ({
+    pmQueryID,
+    pmQuery,
+    pmQueryType,
+    pmQueryArgValues,
+  }) => {
     Logger.log("info", {
-      message: "QueryService:runQuery:params",
-      params: { pmQuery, pmQueryType },
+      message: "QueryService:queryRunner:params",
+      params: { pmQuery, pmQueryType, pmQueryArgValues },
     });
     try {
-      const { result } = await _runQuery({ pmQueryID, pmQuery, pmQueryType });
+      const { result } = await runQuery({
+        pmQueryID,
+        pmQuery,
+        pmQueryType,
+        pmQueryArgValues,
+      });
 
       Logger.log("info", {
-        message: "QueryService:runQuery:query",
+        message: "QueryService:queryRunner:query",
         params: {
           result: Array.isArray(result)
             ? { resultLength: result.length }
@@ -215,7 +233,7 @@ class QueryService {
       return result;
     } catch (error) {
       Logger.log("error", {
-        message: "QueryService:runQuery:catch-1",
+        message: "QueryService:queryRunner:catch-1",
         params: { error },
       });
       throw error;
@@ -288,6 +306,7 @@ class QueryService {
         pmQueryType: query.pm_query_type,
         pmQueryTitle: `${query.pm_query_title} copy`,
         pmQueryDescription: query.pm_query_description,
+        pmQueryArgs: query.pm_query_args,
       });
     } catch (error) {
       Logger.log("error", {

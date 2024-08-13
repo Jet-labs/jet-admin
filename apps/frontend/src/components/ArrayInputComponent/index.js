@@ -116,7 +116,7 @@ export const ArrayInput = ({ value, onChange, type }) => {
   return (
     <Grid
       container
-      className="!w-full !rounded !flex-grow"
+      className="!w-full !rounded !flex-grow -mx-1"
 
       // style={{ borderColor: theme.palette.divider, borderWidth: 1 }}
     >

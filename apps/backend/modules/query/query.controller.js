@@ -54,8 +54,13 @@ queryController.getAllQueries = async (req, res) => {
 queryController.addQuery = async (req, res) => {
   try {
     const { pmUser, state, body } = req;
-    const { pm_query_title, pm_query_description, pm_query_type, pm_query } =
-      body;
+    const {
+      pm_query_title,
+      pm_query_description,
+      pm_query_type,
+      pm_query,
+      pm_query_args,
+    } = body;
     const pm_user_id = parseInt(pmUser.pm_user_id);
 
     Logger.log("info", {
@@ -68,6 +73,7 @@ queryController.addQuery = async (req, res) => {
       pmQueryType: pm_query_type,
       pmQueryDescription: pm_query_description,
       pmQuery: pm_query,
+      pmQueryArgs: pm_query_args,
     });
 
     Logger.log("success", {
@@ -135,8 +141,13 @@ queryController.duplicateQuery = async (req, res) => {
 queryController.updateQuery = async (req, res) => {
   try {
     const { pmUser, state, body } = req;
-    const { pm_query_id, pm_query_title, pm_query_description, pm_query } =
-      body;
+    const {
+      pm_query_id,
+      pm_query_title,
+      pm_query_description,
+      pm_query,
+      pm_query_args,
+    } = body;
     const pm_user_id = parseInt(pmUser.pm_user_id);
     const authorized_queries = state.authorized_queries;
 
@@ -148,6 +159,7 @@ queryController.updateQuery = async (req, res) => {
         pm_query_description,
         pm_query_id,
         pm_query,
+        pm_query_args,
       },
     });
 
@@ -157,6 +169,7 @@ queryController.updateQuery = async (req, res) => {
       pmQueryDescription: pm_query_description,
       pmQuery: pm_query,
       authorizedQueries: authorized_queries,
+      pmQueryArgs: pm_query_args,
     });
 
     Logger.log("success", {
@@ -183,29 +196,30 @@ queryController.updateQuery = async (req, res) => {
  * @param {import("express").Response} res
  * @returns
  */
-queryController.runQuery = async (req, res) => {
+queryController.queryRunner = async (req, res) => {
   try {
     BigInt.prototype.toJSON = function () {
       const int = Number.parseInt(this.toString());
       return int ?? this.toString();
     };
     const { pmUser, state, body } = req;
-    const { pm_query_type, pm_query } = body;
+    const { pm_query_type, pm_query, pm_query_arg_values } = body;
     const pm_user_id = parseInt(pmUser.pm_user_id);
     const authorized_queries = state.authorized_queries;
 
     Logger.log("info", {
-      message: "queryController:runQuery:params",
-      params: { pm_user_id, pm_query, pm_query_type },
+      message: "queryController:queryRunner:params",
+      params: { pm_user_id, pm_query, pm_query_type, pm_query_arg_values },
     });
 
-    const data = await QueryService.runQuery({
+    const data = await QueryService.queryRunner({
       pmQuery: pm_query,
       pmQueryType: pm_query_type,
+      pmQueryArgValues: pm_query_arg_values,
     });
 
     Logger.log("success", {
-      message: "queryController:runQuery:success",
+      message: "queryController:queryRunner:success",
       params: { pm_user_id },
     });
 
@@ -215,7 +229,7 @@ queryController.runQuery = async (req, res) => {
     });
   } catch (error) {
     Logger.log("error", {
-      message: "queryController:runQuery:catch-1",
+      message: "queryController:queryRunner:catch-1",
       params: { error: error },
     });
     return res.json({ success: false, error: extractError(error) });

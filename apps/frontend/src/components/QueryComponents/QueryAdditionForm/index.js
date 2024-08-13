@@ -14,6 +14,7 @@ import {
 } from "../../Resizables";
 import { Tip } from "../../Tip";
 import { LOCAL_CONSTANTS } from "../../../constants";
+import { ArrayInput } from "../../ArrayInputComponent";
 
 export const QueryAdditionForm = () => {
   const theme = useTheme();
@@ -24,6 +25,7 @@ export const QueryAdditionForm = () => {
       pm_query_description: "",
       pm_query_type: QUERY_PLUGINS_MAP.POSTGRE_QUERY.value,
       pm_query: {},
+      pm_query_args: [],
     },
     validateOnMount: false,
     validateOnChange: false,
@@ -124,6 +126,16 @@ export const QueryAdditionForm = () => {
             />
             {/* {error && <span className="mt-2 text-red-500">{error}</span>} */}
           </FormControl>
+          <FormControl fullWidth size="small" className="!mt-2 !px-3">
+            <span className="text-xs font-light  !capitalize mb-1">{`Arguments`}</span>
+            <ArrayInput
+              value={queryBuilderForm.values.pm_query_args}
+              onChange={(value) => {
+                queryBuilderForm.setFieldValue("pm_query_args", value);
+              }}
+              type={"text"}
+            />
+          </FormControl>
 
           <div className="!flex flex-row justify-end items-center mt-10 w-full px-3">
             <Button variant="contained" className="!ml-3" onClick={_addQuery}>
@@ -139,6 +151,7 @@ export const QueryAdditionForm = () => {
           {QUERY_PLUGINS_MAP[queryBuilderForm.values.pm_query_type].component({
             value: queryBuilderForm.values.pm_query,
             handleChange: _handleOnQueryChange,
+            args: queryBuilderForm.values.pm_query_args,
           })}
         </ResizablePanel>
       </ResizablePanelGroup>

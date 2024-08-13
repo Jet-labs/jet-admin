@@ -17,19 +17,27 @@ const { isDMLQuery, isDQLQuery } = require("../../utils/validation.util");
  * @param {Number} param0.pmQueryID
  * @param {JSON} param0.pmQuery
  * @param {String} param0.pmQueryType
+ * @param {JSON} param0.pmQueryArgValues
  * @returns {any|null}
  */
-const runQuery = async ({ pmQueryID, pmQuery, pmQueryType }) => {
+const runQuery = async ({
+  pmQueryID,
+  pmQuery,
+  pmQueryType,
+  pmQueryArgValues,
+}) => {
   try {
     if (isDMLQuery(pmQuery.raw_query) || isDQLQuery(pmQuery.raw_query)) {
       const { processedQuery } = await getProcessedPostgreSQLQuery({
         rawQuery: pmQuery.raw_query,
+        pmQueryArgValues,
       });
 
       Logger.log("info", {
         message: "runQuery:processedQuery",
         params: {
           processedQuery,
+          pmQueryArgValues,
         },
       });
       return await runPostgreSQLEvaluatedQuery({
@@ -56,7 +64,7 @@ const runQuery = async ({ pmQueryID, pmQuery, pmQueryType }) => {
  * @param {String} param0.rawQuery
  * @returns
  */
-const getProcessedPostgreSQLQuery = async ({ rawQuery }) => {
+const getProcessedPostgreSQLQuery = async ({ rawQuery, pmQueryArgValues }) => {
   try {
     Logger.log("info", {
       message: "getProcessedPostgreSQLQuery:init",
@@ -116,9 +124,13 @@ const getProcessedPostgreSQLQuery = async ({ rawQuery }) => {
 
             Logger.log("info", {
               message: "getProcessedPostgreSQLQuery:extractedValues",
-              params: { extractedPmQuerys, extractedPmAppConstants },
+              params: {
+                extractedPmQuerys,
+                extractedPmAppConstants,
+                pmQueryArgValues,
+              },
             });
-            const evaluationContext = {};
+            const evaluationContext = { ...pmQueryArgValues };
             const extractedPmQuerysPromises = extractedPmQuerys.map(
               async (pmQueryObject) => {
                 const evaluatedQuery = await getProcessedPostgreSQLQuery({
