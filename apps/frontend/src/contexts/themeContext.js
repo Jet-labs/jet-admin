@@ -53,6 +53,10 @@ const ThemeContextProvider = ({ children }) => {
         "--scrollbar-thumb-hover-bg",
         themeMap[theme].palette.scroll.thumbHoverBackground
       );
+      // document.body.style.setProperty(
+      //   "--toastify-color-light",
+      //   themeMap[theme].palette.background.paper
+      // );
     } catch (error) {
       console.log({ error });
     }

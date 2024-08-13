@@ -1,5 +1,6 @@
 import { toast } from "react-toastify";
 import { extractError } from "./error";
+import { LOCAL_CONSTANTS } from "../constants";
 
 export const displayError = (error) => {
   const extError = extractError(error);
@@ -11,7 +12,9 @@ export const displayError = (error) => {
     pauseOnHover: true,
     draggable: false,
     progress: undefined,
-    theme: "light",
+    theme: localStorage.getItem(
+      LOCAL_CONSTANTS.STRINGS.THEME_LOCAL_STORAGE_STRING
+    ),
   });
 };
 
@@ -24,7 +27,9 @@ export const displaySuccess = (message) => {
     pauseOnHover: true,
     draggable: false,
     progress: undefined,
-    theme: "light",
+    theme: localStorage.getItem(
+      LOCAL_CONSTANTS.STRINGS.THEME_LOCAL_STORAGE_STRING
+    ),
   });
 };
 
@@ -37,6 +42,8 @@ export const displayInfo = (message) => {
     pauseOnHover: true,
     draggable: false,
     progress: undefined,
-    theme: "light",
+    theme: localStorage.getItem(
+      LOCAL_CONSTANTS.STRINGS.THEME_LOCAL_STORAGE_STRING
+    ),
   });
 };
