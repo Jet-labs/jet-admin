@@ -16,6 +16,7 @@ import "react-data-grid/lib/styles.css";
 import { useThemeValue } from "../../../contexts/themeContext";
 import { capitalize } from "@rigu/js-toolkit";
 import { SimpleTableComponent } from "../SimpleTableComponent";
+import { LOCAL_CONSTANTS } from "../../../constants";
 export const QueryWidgetComponent = ({ id, width, height }) => {
   const theme = useTheme();
   const { themeType } = useThemeValue();
@@ -46,7 +47,7 @@ export const QueryWidgetComponent = ({ id, width, height }) => {
     data: query,
     refetch: refetchQuery,
   } = useQuery({
-    queryKey: [`REACT_QUERY_KEY_QUERIES`, id],
+    queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.QUERIES, id],
     queryFn: () => {
       return getQueryByIDAPI({
         pmQueryID: id,

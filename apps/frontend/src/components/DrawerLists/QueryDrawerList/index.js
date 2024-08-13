@@ -37,7 +37,7 @@ export const QueryDrawerList = () => {
     error: loadQueriesError,
     refetch: refetchQueries,
   } = useQuery({
-    queryKey: [`REACT_QUERY_KEY_QUERIES`],
+    queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.QUERIES],
     queryFn: () => getAllQueryAPI(),
     cacheTime: 0,
     retry: 1,

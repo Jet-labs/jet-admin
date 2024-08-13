@@ -6,11 +6,47 @@ import { DEFAULT_PG_KEYWORDS } from "../../../../../utils/pgKeywords";
 import { useTheme } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { getAllQueryAPI } from "../../../../../api/queries";
+import { languages } from "monaco-editor";
+import { getQueryObjectSuggestions } from "../../../../../utils/editorAutocomplete/queryObjects";
+import { LOCAL_CONSTANTS } from "../../../../../constants";
+import { getAppConstantObjectSuggestions } from "../../../../../utils/editorAutocomplete/appConstantObjects";
 
+/**
+ *
+ * @param {Array} dbModel
+ * @returns
+ */
+const getModelSuggestions = (dbModel, range) => {
+  if (dbModel) {
+    const suggestions = dbModel.map((model) => ({
+      label: model.name,
+      kind: languages.CompletionItemKind.Variable,
+      documentation: `Table ${model.name}`,
+      insertText: `${model.name}.`,
+      range: range,
+      command: {
+        id: "editor.action.triggerSuggest",
+      },
+    }));
+    return suggestions;
+  } else {
+    return [];
+  }
+};
+
+const getPostgreSQLSuggestions = (range) => {
+  return DEFAULT_PG_KEYWORDS.map((key) => ({
+    label: key,
+    kind: languages.CompletionItemKind.Keyword,
+    insertText: key,
+    range: range,
+  }));
+};
 export const PGSQLQueryEditor = ({ value, handleChange }) => {
   const { dbModel } = useAppConstants();
   const { themeType } = useThemeValue();
   const theme = useTheme();
+  const { appConstants } = useAppConstants();
 
   const {
     isLoading: isLoadingQueries,
@@ -18,7 +54,7 @@ export const PGSQLQueryEditor = ({ value, handleChange }) => {
     error: loadQueriesError,
     refetch: refetchQueries,
   } = useQuery({
-    queryKey: [`REACT_QUERY_KEY_QUERIES`],
+    queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.QUERIES],
     queryFn: () => getAllQueryAPI(),
     cacheTime: 0,
     retry: 1,
@@ -44,63 +80,23 @@ export const PGSQLQueryEditor = ({ value, handleChange }) => {
         };
 
         let suggestions = [];
-
         // Check if the cursor is inside {{ }}
         const isInsideBraces =
           textBeforeCursor.includes("{{") && !textBeforeCursor.includes("}}");
 
         if (isInsideBraces && queries) {
           // Provide suggestions specific to the context inside {{ }}
-
-          queries.forEach((query) => {
-            suggestions.push({
-              label: query.pm_query_title,
-              kind: monaco.languages.CompletionItemKind.Variable,
-              documentation: `Query title : ${query.pm_query_title} \nQuery : ${query.pm_query?.raw_query}`,
-              insertText: `[pm_query_id:${query.pm_query_id}]`, // Insert model name followed by a dot
-              range: range,
-            });
-            suggestions.push({
-              label: `[pm_query_id:${query.pm_query_id}]`,
-              kind: monaco.languages.CompletionItemKind.Variable,
-              documentation: `Query title : ${query.pm_query_title} \nQuery : ${query.pm_query?.raw_query}`,
-              insertText: `[pm_query_id:${query.pm_query_id}]`, // Insert model name followed by a dot
-              range: range,
-            });
-            if (query.pm_query.raw_query) {
-              suggestions.push({
-                label: query.pm_query.raw_query,
-                kind: monaco.languages.CompletionItemKind.Variable,
-                documentation: `Query title : ${query.pm_query_title} \nQuery : ${query.pm_query?.raw_query}`,
-                insertText: `[pm_query_id:${query.pm_query_id}]`, // Insert model name followed by a dot
-                range: range,
-              });
-            }
-          });
+          suggestions = [
+            ...getQueryObjectSuggestions(queries, range),
+            ...getAppConstantObjectSuggestions(appConstants, range),
+          ];
         } else {
           // Model suggestions with nested field suggestions
-          const modelSuggestions = dbModel?.map((model) => ({
-            label: model.name,
-            kind: monaco.languages.CompletionItemKind.Variable,
-            documentation: `Table ${model.name}`,
-            insertText: `${model.name}.`, // Insert model name followed by a dot
-            range: range,
-            command: {
-              id: "editor.action.triggerSuggest", // Trigger field suggestions after inserting model name
-            },
-          }));
-
+          const modelSuggestions = getModelSuggestions(dbModel, range);
           // General PostgreSQL suggestions
-          const pgSuggestions = DEFAULT_PG_KEYWORDS.map((key) => ({
-            label: key,
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: key,
-            range: range,
-          }));
-
+          const pgSuggestions = getPostgreSQLSuggestions(range);
           suggestions = [...pgSuggestions, ...modelSuggestions];
         }
-
         return { suggestions };
       },
     });
