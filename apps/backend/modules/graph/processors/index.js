@@ -1,4 +1,4 @@
-const { LineGraph } = require("../graphs/lineGraph");
+const { LineGraph } = require("./lineGraph");
 const { BarGraph } = require("./BarGraph");
 const { DoughnutGraph } = require("./doughnutGraph");
 const { PieGraph } = require("./PieGraph");

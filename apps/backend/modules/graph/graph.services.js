@@ -2,7 +2,8 @@ const { Prisma } = require("@prisma/client");
 const { prisma } = require("../../config/prisma");
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
-const { GRAPH_PLUGINS_MAP } = require("../../plugins/graphs");
+const { GRAPH_PLUGINS_MAP } = require("./processors");
+
 class GraphService {
   constructor() {}
 

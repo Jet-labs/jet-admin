@@ -1,7 +1,8 @@
 const cron = require("node-cron");
 const Logger = require("../utils/logger");
-const { runQuery } = require("../plugins/queries");
+
 const { prisma } = require("../config/prisma");
+const { runQuery } = require("../modules/query/processors/postgresql");
 
 class CustomCronJobScheduler {
   constructor() {}
@@ -18,6 +19,7 @@ class CustomCronJobScheduler {
         pmQueryID: pmJob.tbl_pm_queries.pm_query_id,
         pmQuery: pmJob.tbl_pm_queries.pm_query,
         pmQueryType: pmJob.tbl_pm_queries.pm_query_type,
+        pmQueryArgValues: pmJob.tbl_pm_queries.pm_query_args,
       });
       result.success = true;
       result.result = Array.isArray(runResult)

@@ -1,6 +1,6 @@
-const { prisma } = require("../../../config/prisma");
-const Logger = require("../../../utils/logger");
-const { runQuery } = require("../../queries");
+const { prisma } = require("../../../../config/prisma");
+const Logger = require("../../../../utils/logger");
+const { runQuery } = require("../../../query/processors/postgresql");
 const { BaseGraph } = require("../baseGraph");
 
 class PieGraph extends BaseGraph {

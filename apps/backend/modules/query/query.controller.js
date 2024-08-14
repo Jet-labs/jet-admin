@@ -262,26 +262,24 @@ queryController.runQueryByID = async (req, res) => {
       pmQueryID: parseInt(pm_query_id),
       authorizedQueries: authorized_queries,
     });
-Logger.log("success", {
-  message: "queryController:runQueryByID:query",
-  params: { query },
-});
-    const data = await QueryService.runQuery({
+    Logger.log("success", {
+      message: "queryController:runQueryByID:query",
+      params: { query },
+    });
+    const data = await QueryService.queryRunner({
       pmQuery: query.pm_query,
       pmQueryType: query.pm_query_type,
     });
 
     Logger.log("success", {
       message: "queryController:runQueryByID:success",
-      params: { pm_user_id,pm_query_id },
+      params: { pm_user_id, pm_query_id },
     });
 
     return res.json({
       success: true,
       data: data,
     });
-
-    
   } catch (error) {
     Logger.log("error", {
       message: "queryController:runQueryByID:catch-1",

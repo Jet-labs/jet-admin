@@ -1,9 +1,9 @@
-const { prisma } = require("../../../config/prisma");
-const Logger = require("../../../utils/logger");
-const { runQuery } = require("../../queries");
+const { prisma } = require("../../../../config/prisma");
+const Logger = require("../../../../utils/logger");
+const { runQuery } = require("../../../query/processors/postgresql");
 const { BaseGraph } = require("../baseGraph");
 
-class DoughnutGraph extends BaseGraph {
+class PolarGraph extends BaseGraph {
   constructor({ pm_graph_id, graph_title, graph_options }) {
     super({ pm_graph_id, graph_title, graph_options });
   }
@@ -15,7 +15,7 @@ class DoughnutGraph extends BaseGraph {
   transformData = ({ results }) => {
     try {
       Logger.log("info", {
-        message: "DoughnutGraph:transformData:init",
+        message: "PolarGraph:transformData:init",
       });
       let dataset = { labels: null, datasets: [] };
       let _labels = {};
@@ -41,7 +41,7 @@ class DoughnutGraph extends BaseGraph {
       return dataset;
     } catch (error) {
       Logger.log("info", {
-        message: "DoughnutGraph:transformData:catch-1",
+        message: "PolarGraph:transformData:catch-1",
         params: {
           error,
         },
@@ -52,7 +52,7 @@ class DoughnutGraph extends BaseGraph {
     try {
       {
         Logger.log("info", {
-          message: "DoughnutGraph:runQueries:init",
+          message: "PolarGraph:runQueries:init",
         });
         const queryArray = Array.from(this.graph_options.query_array);
 
@@ -72,7 +72,7 @@ class DoughnutGraph extends BaseGraph {
         });
         const results = await Promise.all(resultPromises);
         Logger.log("info", {
-          message: "DoughnutGraph:runQueries:results",
+          message: "PolarGraph:runQueries:results",
           params: {
             resultsLength: results?.length,
           },
@@ -81,7 +81,7 @@ class DoughnutGraph extends BaseGraph {
       }
     } catch (error) {
       Logger.log("info", {
-        message: "DoughnutGraph:runQueries:catch-1",
+        message: "PolarGraph:runQueries:catch-1",
         params: {
           error,
         },
@@ -97,4 +97,4 @@ class DoughnutGraph extends BaseGraph {
     } catch (error) {}
   };
 }
-module.exports = { DoughnutGraph };
+module.exports = { PolarGraph };

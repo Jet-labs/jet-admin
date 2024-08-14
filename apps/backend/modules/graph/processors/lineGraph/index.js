@@ -1,9 +1,9 @@
-const { prisma } = require("../../../config/prisma");
-const Logger = require("../../../utils/logger");
-const { runQuery } = require("../../queries");
+const { prisma } = require("../../../../config/prisma");
+const Logger = require("../../../../utils/logger");
+const { runQuery } = require("../../../query/processors/postgresql");
 const { BaseGraph } = require("../baseGraph");
 
-class BarGraph extends BaseGraph {
+class LineGraph extends BaseGraph {
   constructor({ pm_graph_id, graph_title, graph_options }) {
     super({ pm_graph_id, graph_title, graph_options });
   }
@@ -15,8 +15,7 @@ class BarGraph extends BaseGraph {
   transformData = ({ results }) => {
     try {
       Logger.log("info", {
-        message: "BarGraph:transformData:init",
-        params: { results },
+        message: "LineGraph:transformData:init",
       });
       let dataset = { labels: null, datasets: [] };
       let _labels = {};
@@ -42,7 +41,7 @@ class BarGraph extends BaseGraph {
       return dataset;
     } catch (error) {
       Logger.log("info", {
-        message: "BarGraph:transformData:catch-1",
+        message: "LineGraph:transformData:catch-1",
         params: {
           error,
         },
@@ -53,7 +52,7 @@ class BarGraph extends BaseGraph {
     try {
       {
         Logger.log("info", {
-          message: "BarGraph:runQueries:init",
+          message: "LineGraph:runQueries:init",
         });
         const queryArray = Array.from(this.graph_options.query_array);
 
@@ -73,7 +72,7 @@ class BarGraph extends BaseGraph {
         });
         const results = await Promise.all(resultPromises);
         Logger.log("info", {
-          message: "BarGraph:runQueries:results",
+          message: "LineGraph:runQueries:results",
           params: {
             resultsLength: results?.length,
           },
@@ -82,7 +81,7 @@ class BarGraph extends BaseGraph {
       }
     } catch (error) {
       Logger.log("info", {
-        message: "BarGraph:runQueries:catch-1",
+        message: "LineGraph:runQueries:catch-1",
         params: {
           error,
         },
@@ -98,4 +97,4 @@ class BarGraph extends BaseGraph {
     } catch (error) {}
   };
 }
-module.exports = { BarGraph };
+module.exports = { LineGraph };

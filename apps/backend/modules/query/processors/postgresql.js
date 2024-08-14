@@ -1,15 +1,15 @@
 const jsep = require("jsep");
-const constants = require("../../constants");
-const { prisma } = require("../../config/prisma");
-const Logger = require("../../utils/logger");
+const constants = require("../../../constants");
+const { prisma } = require("../../../config/prisma");
+const Logger = require("../../../utils/logger");
 const {
   evaluateAST,
   extractVariablesFromQuery,
   replaceQueryIDStringWithQueryID,
   replaceAppConstantIDStringWithAppConstantID,
-} = require("../../utils/parser.util");
+} = require("../../../utils/parser.util");
 const { Prisma } = require("@prisma/client");
-const { isDMLQuery, isDQLQuery } = require("../../utils/validation.util");
+const { isDMLQuery, isDQLQuery } = require("../../../utils/validation.util");
 
 /**
  *

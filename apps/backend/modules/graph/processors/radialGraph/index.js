@@ -1,9 +1,9 @@
-const { prisma } = require("../../../config/prisma");
-const Logger = require("../../../utils/logger");
-const { runQuery } = require("../../queries");
+const { prisma } = require("../../../../config/prisma");
+const Logger = require("../../../../utils/logger");
+const { runQuery } = require("../../../query/processors/postgresql");
 const { BaseGraph } = require("../baseGraph");
 
-class LineGraph extends BaseGraph {
+class RadialGraph extends BaseGraph {
   constructor({ pm_graph_id, graph_title, graph_options }) {
     super({ pm_graph_id, graph_title, graph_options });
   }
@@ -15,7 +15,7 @@ class LineGraph extends BaseGraph {
   transformData = ({ results }) => {
     try {
       Logger.log("info", {
-        message: "LineGraph:transformData:init",
+        message: "RadialGraph:transformData:init",
       });
       let dataset = { labels: null, datasets: [] };
       let _labels = {};
@@ -23,11 +23,11 @@ class LineGraph extends BaseGraph {
       results.map(async (result) => {
         const _y = [];
         result.result.result.forEach((_r) => {
-          _labels[_r[result.x_axis]] = true;
+          _labels[_r[result.value]] = true;
           _y.push(
-            typeof _r[result.y_axis] === "bigint"
-              ? Number(_r[result.y_axis])
-              : _r[result.y_axis]
+            typeof _r[result.label] === "bigint"
+              ? Number(_r[result.label])
+              : _r[result.label]
           );
         });
         dataset.datasets.push({
@@ -41,7 +41,7 @@ class LineGraph extends BaseGraph {
       return dataset;
     } catch (error) {
       Logger.log("info", {
-        message: "LineGraph:transformData:catch-1",
+        message: "RadialGraph:transformData:catch-1",
         params: {
           error,
         },
@@ -52,7 +52,7 @@ class LineGraph extends BaseGraph {
     try {
       {
         Logger.log("info", {
-          message: "LineGraph:runQueries:init",
+          message: "RadialGraph:runQueries:init",
         });
         const queryArray = Array.from(this.graph_options.query_array);
 
@@ -72,7 +72,7 @@ class LineGraph extends BaseGraph {
         });
         const results = await Promise.all(resultPromises);
         Logger.log("info", {
-          message: "LineGraph:runQueries:results",
+          message: "RadialGraph:runQueries:results",
           params: {
             resultsLength: results?.length,
           },
@@ -81,7 +81,7 @@ class LineGraph extends BaseGraph {
       }
     } catch (error) {
       Logger.log("info", {
-        message: "LineGraph:runQueries:catch-1",
+        message: "RadialGraph:runQueries:catch-1",
         params: {
           error,
         },
@@ -97,4 +97,4 @@ class LineGraph extends BaseGraph {
     } catch (error) {}
   };
 }
-module.exports = { LineGraph };
+module.exports = { RadialGraph };
