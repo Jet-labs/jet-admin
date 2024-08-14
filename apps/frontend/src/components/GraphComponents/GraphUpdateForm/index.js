@@ -1,18 +1,15 @@
 import { Grid, useTheme } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useEffect } from "react";
-import {
-  deleteGraphByIDAPI,
-  getGraphDataByIDAPI,
-  updateGraphAPI,
-} from "../../../api/graphs";
+import { getGraphDataByIDAPI, updateGraphAPI } from "../../../api/graphs";
 
 import { useFormik } from "formik";
-import { GraphComponentPreview } from "../GraphComponentPreview";
-import { GraphEditor } from "../GraphEditor";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { displayError, displaySuccess } from "../../../utils/notification";
-import { GRAPH_PLUGINS_MAP } from "../../../plugins/graphs";
+import { GraphComponentPreview } from "../GraphComponentPreview";
+import { GraphEditor } from "../GraphEditor";
+import { GRAPH_PLUGINS_MAP } from "../GraphTypes";
+
 
 export const GraphUpdateForm = ({ id }) => {
   const theme = useTheme();

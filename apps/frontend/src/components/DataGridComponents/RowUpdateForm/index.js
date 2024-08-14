@@ -27,7 +27,7 @@ export const RowUpdateForm = ({ customTitle, tableName, id }) => {
     data: rowData,
     error: loadRowDataError,
   } = useQuery({
-    queryKey: [`REACT_QUERY_KEY_TABLES_${String(tableName).toUpperCase()}`, id],
+    queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLE_ID(tableName), , id],
     queryFn: () => fetchRowByIDAPI({ tableName, id }),
     cacheTime: 0,
     retry: 1,
@@ -40,7 +40,8 @@ export const RowUpdateForm = ({ customTitle, tableName, id }) => {
     error: loadEditColumnsError,
   } = useQuery({
     queryKey: [
-      `REACT_QUERY_KEY_TABLES_${String(tableName).toUpperCase()}`,
+      LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLE_ID(tableName),
+
       `edit_column`,
     ],
     queryFn: () => getAuthorizedColumnsForRead({ tableName }),
@@ -79,9 +80,9 @@ export const RowUpdateForm = ({ customTitle, tableName, id }) => {
 
     retry: false,
     onSuccess: () => {
-      displaySuccess("Updated row successfully");
+      displaySuccess(LOCAL_CONSTANTS.STRINGS.ROW_UPDATED_SUCCESS);
       queryClient.invalidateQueries([
-        `REACT_QUERY_KEY_TABLES_${String(tableName).toUpperCase()}`,
+        LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLE_ID(tableName),
       ]);
     },
     onError: (error) => {

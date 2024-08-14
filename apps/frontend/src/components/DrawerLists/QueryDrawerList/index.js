@@ -10,15 +10,12 @@ import {
 } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
+import { FaPlus, FaRedo } from "react-icons/fa";
+import { SiPostgresql } from "react-icons/si";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { getAllQueryAPI } from "../../../api/queries";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { useAuthState } from "../../../contexts/authContext";
-import { FaPlus, FaRedo } from "react-icons/fa";
-import { DiPostgresql } from "react-icons/di";
-import { FaCloudSun } from "react-icons/fa6";
-import { BiRadar } from "react-icons/bi";
-import { getAllQueryAPI } from "../../../api/queries";
-import { QUERY_PLUGINS_MAP } from "../../../plugins/queries";
 
 export const QueryDrawerList = () => {
   const theme = useTheme();
@@ -120,11 +117,7 @@ export const QueryDrawerList = () => {
                         minWidth: 0,
                       }}
                     >
-                      {QUERY_PLUGINS_MAP[query.pm_query_type] ? (
-                        QUERY_PLUGINS_MAP[query.pm_query_type].icon
-                      ) : (
-                        <FaCloudSun className="!text-sm" />
-                      )}
+                      <SiPostgresql className="!text-lg" />
                     </ListItemIcon>
                     <ListItemText
                       sx={{

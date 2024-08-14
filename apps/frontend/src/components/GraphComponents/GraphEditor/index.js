@@ -16,13 +16,12 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import { FaPlus, FaTimes } from "react-icons/fa";
+import { SiPostgresql } from "react-icons/si";
+import { Link } from "react-router-dom";
 import { getAllQueryAPI } from "../../../api/queries";
 import { LOCAL_CONSTANTS } from "../../../constants";
-import { GRAPH_PLUGINS_MAP } from "../../../plugins/graphs";
-import { QUERY_PLUGINS_MAP } from "../../../plugins/queries";
-import { FieldComponent } from "../../FieldComponent";
-import { Link } from "react-router-dom";
 import { GraphDeletionForm } from "../GraphDeletionForm";
+import { GRAPH_PLUGINS_MAP } from "../GraphTypes";
 
 /**
  *
@@ -311,7 +310,7 @@ export const GraphEditor = ({ graphID, graphForm }) => {
                         return (
                           <MenuItem value={query.pm_query_id}>
                             <div className="!flex flex-row justify-start items-center">
-                              {QUERY_PLUGINS_MAP[query.pm_query_type].icon}
+                              <SiPostgresql className="!text-lg" />
                               <span className="ml-2">
                                 {query.pm_query_title}
                               </span>

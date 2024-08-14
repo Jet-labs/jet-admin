@@ -10,6 +10,7 @@ import {
 import { useAuthState } from "../../../contexts/authContext";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { ConfirmationDialog } from "../../ConfirmationDialog";
+import { LOCAL_CONSTANTS } from "../../../constants";
 export const MultipleRowsDeletionForm = ({ tableName, ids }) => {
   const { pmUser } = useAuthState();
   const queryClient = useQueryClient();
@@ -40,10 +41,10 @@ export const MultipleRowsDeletionForm = ({ tableName, ids }) => {
       deleteRowByMultipleIDsAPI({ tableName, ids }),
     retry: false,
     onSuccess: () => {
-      displaySuccess("Deleted rows successfully");
+      displaySuccess(LOCAL_CONSTANTS.STRINGS.ROW_DELETED_SUCCESS);
       setIsDeleteRowsConfirmationOpen(false);
       queryClient.invalidateQueries([
-        `REACT_QUERY_KEY_TABLES_${String(tableName).toUpperCase()}`,
+        LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLE_ID(tableName),
       ]);
     },
     onError: (error) => {

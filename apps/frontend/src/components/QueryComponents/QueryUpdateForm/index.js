@@ -1,32 +1,23 @@
-import {
-  Alert,
-  AlertTitle,
-  Button,
-  FormControl,
-  Grid,
-  MenuItem,
-  Select,
-  TextField,
-  useTheme,
-} from "@mui/material";
+import { Button, FormControl, TextField, useTheme } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import React, { useCallback, useEffect } from "react";
 import "react-data-grid/lib/styles.css";
+import { SiPostgresql } from "react-icons/si";
 import { getQueryByIDAPI, updateQueryAPI } from "../../../api/queries";
-import { LOCAL_CONSTANTS } from "../../../constants";
-import { QUERY_PLUGINS_MAP } from "../../../plugins/queries";
-import { displayError, displaySuccess } from "../../../utils/notification";
-import { QueryDeletionForm } from "../QueryDeletionForm";
-import { QueryDuplicateForm } from "../QueryDuplicateForm";
-import { Tip } from "../../Tip";
 import { query_variable_usage_tip } from "../../../assets/tips";
+import { LOCAL_CONSTANTS } from "../../../constants";
+import { PGSQLQueryBuilder } from "../QueryBuilderComponents/PGSQLQueryBuilder";
+import { displayError, displaySuccess } from "../../../utils/notification";
+import { ArrayInput } from "../../ArrayInputComponent";
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "../../Resizables";
-import { ArrayInput } from "../../ArrayInputComponent";
+import { Tip } from "../../Tip";
+import { QueryDeletionForm } from "../QueryDeletionForm";
+import { QueryDuplicateForm } from "../QueryDuplicateForm";
 
 export const QueryUpdateForm = ({ id }) => {
   const theme = useTheme();
@@ -47,7 +38,7 @@ export const QueryUpdateForm = ({ id }) => {
     initialValues: {
       pm_query_title: "Untitled",
       pm_query_description: "",
-      pm_query_type: QUERY_PLUGINS_MAP.POSTGRE_QUERY.value,
+      pm_query_type: "POSTGRE_QUERY",
       pm_query: null,
       pm_query_id: parseInt(id),
       pm_query_args: [],
@@ -124,7 +115,7 @@ export const QueryUpdateForm = ({ id }) => {
           borderColor: theme.palette.divider,
         }}
       >
-        {QUERY_PLUGINS_MAP[queryBuilderForm.values.pm_query_type].iconLarge}
+        <SiPostgresql className="!text-4xl" />
         <div className="flex flex-col items-start justify-start p-3 px-4">
           <span className="text-lg font-bold text-start">
             {LOCAL_CONSTANTS.STRINGS.QUERY_UPDATE_PAGE_TITLE}
@@ -203,12 +194,12 @@ export const QueryUpdateForm = ({ id }) => {
         </ResizablePanel>
         <ResizableHandle withHandle={true} />
         <ResizablePanel defaultSize={40} className="w-full !h-full">
-          {QUERY_PLUGINS_MAP[queryBuilderForm.values.pm_query_type].component({
-            pmQueryID: id,
-            value: queryBuilderForm.values.pm_query,
-            handleChange: _handleOnQueryChange,
-            args: queryBuilderForm.values.pm_query_args,
-          })}
+          <PGSQLQueryBuilder
+            pmQueryID={id}
+            value={queryBuilderForm.values.pm_query}
+            handleChange={_handleOnQueryChange}
+            args={queryBuilderForm.values.pm_query_args}
+          />
         </ResizablePanel>
       </ResizablePanelGroup>
     </div>

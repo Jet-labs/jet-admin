@@ -1,6 +1,7 @@
 import { Grid, useTheme } from "@mui/material";
 import React from "react";
-import { GRAPH_PLUGINS_MAP } from "../../../plugins/graphs";
+import { GRAPH_PLUGINS_MAP } from "../GraphTypes";
+
 
 export const GraphComponentPreview = ({
   graphType,

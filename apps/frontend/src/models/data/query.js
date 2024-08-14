@@ -1,6 +1,3 @@
-import { LOCAL_CONSTANTS } from "../../constants";
-import { QUERY_PLUGINS_MAP } from "../../plugins/queries";
-
 export class Query {
   constructor({
     pm_query_id,
@@ -32,12 +29,7 @@ export class Query {
     if (!queryData) {
       return null;
     }
-    switch (pm_query_type) {
-      case QUERY_PLUGINS_MAP[pm_query_type].value:
-        return new PGSQLQuery(queryData);
-      default:
-        return new PGSQLQuery(queryData);
-    }
+    return new PGSQLQuery(queryData);
   };
   getTitle = () => {
     return this.pm_query_title;

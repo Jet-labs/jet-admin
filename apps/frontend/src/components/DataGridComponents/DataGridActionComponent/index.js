@@ -50,7 +50,7 @@ export const DataGridActionComponent = ({
     error: loadReadColumnsError,
   } = useQuery({
     queryKey: [
-      `REACT_QUERY_KEY_TABLES_${String(tableName).toUpperCase()}`,
+      LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLE_ID(tableName),
       `read_column`,
     ],
     queryFn: () => getAuthorizedColumnsForRead({ tableName }),

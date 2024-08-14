@@ -7,8 +7,8 @@ import { GraphComponentPreview } from "../GraphComponentPreview";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { useTheme } from "@emotion/react";
-import { GRAPH_PLUGINS_MAP } from "../../../plugins/graphs";
 import { GraphEditor } from "../GraphEditor";
+import { GRAPH_PLUGINS_MAP } from "../GraphTypes";
 
 export const GraphAdditionForm = () => {
   const theme = useTheme();

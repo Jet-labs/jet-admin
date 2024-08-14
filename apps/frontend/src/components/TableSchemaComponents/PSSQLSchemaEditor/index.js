@@ -9,17 +9,18 @@ import "react-data-grid/lib/styles.css";
 
 import { getSchemaAPI, runSchemaQueryAPI } from "../../../api/schemas";
 
+import { displayError, displaySuccess } from "../../../utils/notification";
+import { PGSQLQueryResponseRAWTab } from "../../QueryComponents/QueryBuilderComponents/PGSQLQueryResponseRAWTab";
+import { PGSQLQueryResponseSchemaTab } from "../../QueryComponents/QueryBuilderComponents/PGSQLQueryResponseSchemaTab";
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "../../Resizables";
-import { displayError, displaySuccess } from "../../../utils/notification";
-import { PGSQLQueryResponseSchemaTab } from "../../../plugins/queries/postgresql/components/PGSQLQueryResponseSchemaTab";
-import { PGSQLQueryResponseRAWTab } from "../../../plugins/queries/postgresql/components/PGSQLQueryResponseRAWTab";
-import { PGSQLQueryResponseJSONTab } from "../../../plugins/queries/postgresql/components/PGSQLQueryResponseJSONTab";
+
 import { useThemeValue } from "../../../contexts/themeContext";
 import { CodeEditor } from "../../CodeEditorComponent";
+import { PGSQLQueryResponseJSONTab } from "../../QueryComponents/QueryBuilderComponents/PGSQLQueryResponseJSONTab";
 
 export const PGSQLSchemaBuilder = ({}) => {
   const theme = useTheme();

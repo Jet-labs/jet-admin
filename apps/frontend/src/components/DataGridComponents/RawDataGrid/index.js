@@ -60,7 +60,7 @@ export const RawDataGrid = ({
     refetch: reloadData,
   } = useQuery({
     queryKey: [
-      `REACT_QUERY_KEY_TABLES_${String(tableName).toUpperCase()}`,
+      LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLE_ID(tableName),
       page,
       pageSize,
       filterQuery,
@@ -88,7 +88,7 @@ export const RawDataGrid = ({
     error: loadReadColumnsError,
   } = useQuery({
     queryKey: [
-      `REACT_QUERY_KEY_TABLES_${String(tableName).toUpperCase()}`,
+      LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLE_ID(tableName),
       `read_column`,
     ],
     queryFn: () => getAuthorizedColumnsForRead({ tableName }),

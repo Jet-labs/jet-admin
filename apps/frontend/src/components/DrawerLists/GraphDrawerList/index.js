@@ -10,20 +10,12 @@ import {
 } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
+import { FaChartLine, FaPlus, FaRedo } from "react-icons/fa";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { getAllGraphAPI } from "../../../api/graphs";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { useAuthState } from "../../../contexts/authContext";
-import {
-  FaChartBar,
-  FaChartLine,
-  FaChartPie,
-  FaPlus,
-  FaRedo,
-} from "react-icons/fa";
-
-import { BiRadar } from "react-icons/bi";
-import { GRAPH_PLUGINS_MAP } from "../../../plugins/graphs";
+import { GRAPH_PLUGINS_MAP } from "../../GraphComponents/GraphTypes";
 
 export const GraphDrawerList = () => {
   const theme = useTheme();

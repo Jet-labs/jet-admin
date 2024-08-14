@@ -1,4 +1,4 @@
-import { FaPlus, FaChartLine } from "react-icons/fa";
+import { FaChartLine, FaPlus } from "react-icons/fa";
 import { GrDrag } from "react-icons/gr";
 
 import {
@@ -11,14 +11,14 @@ import {
   useTheme,
 } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
+import { SiPostgresql } from "react-icons/si";
 import { Link, useNavigate } from "react-router-dom";
 import { getAllGraphAPI } from "../../../api/graphs";
-import { useAuthState } from "../../../contexts/authContext";
-import { GRAPH_PLUGINS_MAP } from "../../../plugins/graphs";
-import "./styles.css";
-import { LOCAL_CONSTANTS } from "../../../constants";
 import { getAllQueryAPI } from "../../../api/queries";
-import { QUERY_PLUGINS_MAP } from "../../../plugins/queries";
+import { LOCAL_CONSTANTS } from "../../../constants";
+import { useAuthState } from "../../../contexts/authContext";
+import "./styles.css";
+import { GRAPH_PLUGINS_MAP } from "../../GraphComponents/GraphTypes";
 
 export const WidgetsDnDList = ({}) => {
   const theme = useTheme();
@@ -144,9 +144,7 @@ export const WidgetsDnDList = ({}) => {
         queries.length > 0 &&
         queries.map((query, index) => {
           const key = `query_${query.pm_query_id}`;
-          const queryPlugin = query.pm_query_type
-            ? QUERY_PLUGINS_MAP[query.pm_query_type]
-            : null;
+
           return (
             <ListItem
               key={key}
@@ -176,11 +174,7 @@ export const WidgetsDnDList = ({}) => {
                     color: theme.palette.primary.contrastText,
                   }}
                 >
-                  {queryPlugin ? (
-                    queryPlugin.icon
-                  ) : (
-                    <FaChartLine className="!text-sm" />
-                  )}
+                  <SiPostgresql className="!text-lg" />
                 </ListItemIcon>
                 <ListItemText
                   sx={{

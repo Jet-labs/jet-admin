@@ -3,7 +3,8 @@ import React from "react";
 
 import { useQuery } from "@tanstack/react-query";
 import { getGraphByIDAPI, getGraphDataByIDAPI } from "../../../api/graphs";
-import { GRAPH_PLUGINS_MAP } from "../../../plugins/graphs";
+import { GRAPH_PLUGINS_MAP } from "../../GraphComponents/GraphTypes";
+
 
 export const GraphWidgetComponent = ({ id, width, height }) => {
   const theme = useTheme();

@@ -28,7 +28,7 @@ export const RawDataGridStatistics = ({
     isPreviousData: isPreviousDataData,
   } = useQuery({
     queryKey: [
-      `REACT_QUERY_KEY_TABLES_${String(tableName).toUpperCase()}_STATS`,
+      `${LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLE_ID(tableName)}_STATS`,
       filterQuery,
     ],
     queryFn: () =>
@@ -46,7 +46,7 @@ export const RawDataGridStatistics = ({
 
   const _handleReloadData = () => {
     queryClient.invalidateQueries([
-      `REACT_QUERY_KEY_TABLES_${String(tableName).toUpperCase()}_STATS`,
+      `${LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLE_ID(tableName)}_STATS`,
     ]);
   };
 

@@ -19,7 +19,7 @@ export const RowAdditionForm = ({ tableName, customTitle }) => {
     error: loadAddColumnsError,
   } = useQuery({
     queryKey: [
-      `REACT_QUERY_KEY_TABLES_${String(tableName).toUpperCase()}`,
+      LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLE_ID(tableName),
       `add_column`,
     ],
     queryFn: () => getAuthorizedColumnsForAdd({ tableName }),
@@ -49,9 +49,9 @@ export const RowAdditionForm = ({ tableName, customTitle }) => {
     },
     retry: false,
     onSuccess: () => {
-      displaySuccess("Added record successfully");
+      displaySuccess(LOCAL_CONSTANTS.STRINGS.ROW_ADDITION_SUCCESS);
       queryClient.invalidateQueries([
-        `REACT_QUERY_KEY_TABLES_${String(tableName).toUpperCase()}`,
+        LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLE_ID(tableName),
       ]);
     },
     onError: (error) => {

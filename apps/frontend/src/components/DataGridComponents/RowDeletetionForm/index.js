@@ -8,6 +8,7 @@ import { useAuthState } from "../../../contexts/authContext";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { ConfirmationDialog } from "../../ConfirmationDialog";
 import { useNavigate } from "react-router-dom";
+import { LOCAL_CONSTANTS } from "../../../constants";
 export const RowDeletionForm = ({ tableName, id }) => {
   const { pmUser } = useAuthState();
   const queryClient = useQueryClient();
@@ -39,11 +40,11 @@ export const RowDeletionForm = ({ tableName, id }) => {
     mutationFn: ({ tableName, id }) => deleteRowByIDAPI({ tableName, id }),
     retry: false,
     onSuccess: () => {
-      displaySuccess("Deleted row successfully");
+      displaySuccess(LOCAL_CONSTANTS.STRINGS.ROW_DELETED_SUCCESS);
       setIsDeleteRowConfirmationOpen(false);
       navigate(-1);
       queryClient.invalidateQueries([
-        `REACT_QUERY_KEY_TABLES_${String(tableName).toUpperCase()}`,
+        LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLE_ID(tableName),
       ]);
     },
     onError: (error) => {

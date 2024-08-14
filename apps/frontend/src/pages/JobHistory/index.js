@@ -35,7 +35,7 @@ const JobHistory = () => {
     refetch: reloadJobHistory,
   } = useQuery({
     queryKey: [
-      `REACT_QUERY_KEY_TABLES_${String(tableName).toUpperCase()}`,
+      LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLE_ID(tableName),
       page,
       filterQuery,
       sortModel,

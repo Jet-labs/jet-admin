@@ -142,6 +142,24 @@ export const getFieldFormatting = ({
               : "!rounded-sm";
             return (
               <div key={data} className="p-0.5 w-min">
+                {customIntMapping && customIntMapping[value] ? (
+                <Tooltip
+                  placement="right"
+                  className="!p-0"
+                  sx={{ background: "background.secondary" }}
+                  title={value}
+                >
+                  <Chip
+                    label={`${_d}`}
+                    size="small"
+                    variant="filled"
+                    className={_class}
+                    sx={{
+                      maxHeight: null,
+                    }}
+                  />
+                </Tooltip>
+                ) : (
                 <Chip
                   label={`${_d}`}
                   size="small"
@@ -151,6 +169,7 @@ export const getFieldFormatting = ({
                     maxHeight: null,
                   }}
                 />
+                )}
               </div>
             );
           })}
@@ -163,7 +182,24 @@ export const getFieldFormatting = ({
           const _class = customIntMapping?.[value]
             ? "!bg-slate-200 !text-slate-800 !h-min !pt-0.5 !border !border-slate-500 !rounded"
             : "!rounded !bg-transparent";
-          return (
+          return customIntMapping && customIntMapping[value] ? (
+            <Tooltip
+              placement="right"
+              className="!p-0"
+              sx={{ background: "background.secondary" }}
+              title={value}
+            >
+              <Chip
+                label={`${_d}`}
+                size="small"
+                variant="filled"
+                className={_class}
+                sx={{
+                  maxHeight: null,
+                }}
+              />
+            </Tooltip>
+          ) : (
             <Chip
               label={`${_d}`}
               size="small"
@@ -174,6 +210,7 @@ export const getFieldFormatting = ({
               }}
             />
           );
+          
         })()
       );
       break;

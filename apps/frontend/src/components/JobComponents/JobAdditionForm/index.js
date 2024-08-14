@@ -11,14 +11,14 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import React, { useCallback } from "react";
 import "react-data-grid/lib/styles.css";
-import { getAllQueryAPI } from "../../../api/queries";
-import { displayError, displaySuccess } from "../../../utils/notification";
-import { QUERY_PLUGINS_MAP } from "../../../plugins/queries";
+import { SiPostgresql } from "react-icons/si";
 import { addJobAPI } from "../../../api/jobs";
-import { CronJobScheduler } from "../CronJobScheduler";
-import { Tip } from "../../Tip";
+import { getAllQueryAPI } from "../../../api/queries";
 import { cron_job_usage_tip } from "../../../assets/tips";
 import { LOCAL_CONSTANTS } from "../../../constants";
+import { displayError, displaySuccess } from "../../../utils/notification";
+import { Tip } from "../../Tip";
+import { CronJobScheduler } from "../CronJobScheduler";
 
 export const JobAdditionForm = () => {
   const theme = useTheme();
@@ -130,7 +130,7 @@ export const JobAdditionForm = () => {
                 return (
                   <MenuItem value={query.pm_query_id}>
                     <div className="!flex flex-row justify-start items-center">
-                      {QUERY_PLUGINS_MAP[query.pm_query_type].icon}
+                      <SiPostgresql className="!text-lg" />
                       <span className="ml-2">{query.pm_query_title}</span>
                     </div>
                   </MenuItem>

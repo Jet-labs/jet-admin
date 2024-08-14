@@ -5,16 +5,16 @@ import React, { useCallback } from "react";
 import "react-data-grid/lib/styles.css";
 import { addQueryAPI } from "../../../api/queries";
 import { query_variable_usage_tip } from "../../../assets/tips";
-import { QUERY_PLUGINS_MAP } from "../../../plugins/queries";
+import { LOCAL_CONSTANTS } from "../../../constants";
 import { displayError, displaySuccess } from "../../../utils/notification";
+import { ArrayInput } from "../../ArrayInputComponent";
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "../../Resizables";
 import { Tip } from "../../Tip";
-import { LOCAL_CONSTANTS } from "../../../constants";
-import { ArrayInput } from "../../ArrayInputComponent";
+import { PGSQLQueryBuilder } from "../QueryBuilderComponents/PGSQLQueryBuilder";
 
 export const QueryAdditionForm = () => {
   const theme = useTheme();
@@ -23,7 +23,7 @@ export const QueryAdditionForm = () => {
     initialValues: {
       pm_query_title: "Untitled",
       pm_query_description: "",
-      pm_query_type: QUERY_PLUGINS_MAP.POSTGRE_QUERY.value,
+      pm_query_type: "POSTGRE_QUERY",
       pm_query: {},
       pm_query_args: [],
     },
@@ -148,11 +148,11 @@ export const QueryAdditionForm = () => {
         </ResizablePanel>
         <ResizableHandle withHandle={true} />
         <ResizablePanel defaultSize={60} className="w-full !h-full">
-          {QUERY_PLUGINS_MAP[queryBuilderForm.values.pm_query_type].component({
-            value: queryBuilderForm.values.pm_query,
-            handleChange: _handleOnQueryChange,
-            args: queryBuilderForm.values.pm_query_args,
-          })}
+          <PGSQLQueryBuilder
+            value={queryBuilderForm.values.pm_query}
+            handleChange={_handleOnQueryChange}
+            args={queryBuilderForm.values.pm_query_args}
+          />
         </ResizablePanel>
       </ResizablePanelGroup>
     </div>
