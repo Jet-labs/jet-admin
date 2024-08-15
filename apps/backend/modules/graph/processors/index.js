@@ -1,9 +1,10 @@
 const { LineGraph } = require("./lineGraph");
-const { BarGraph } = require("./BarGraph");
+const { BarGraph } = require("./barGraph");
 const { DoughnutGraph } = require("./doughnutGraph");
 const { PieGraph } = require("./PieGraph");
 const { PolarGraph } = require("./polarGraph");
 const { RadialGraph } = require("./radialGraph");
+const { ScatterGraph } = require("./scatterGraph");
 
 const GRAPH_PLUGINS_MAP = {
   BAR: {
@@ -51,6 +52,14 @@ const GRAPH_PLUGINS_MAP = {
     fields: ["label", "value"],
     getGraphModel: ({ pm_graph_id, graph_title, graph_options }) => {
       return new RadialGraph({ pm_graph_id, graph_title, graph_options });
+    },
+  },
+  SCATTER: {
+    label: "Scatter",
+    value: "SCATTER",
+    fields: ["x_axis", "label", "y_axis", "fill"],
+    getGraphModel: ({ pm_graph_id, graph_title, graph_options }) => {
+      return new ScatterGraph({ pm_graph_id, graph_title, graph_options });
     },
   },
 };

@@ -520,7 +520,7 @@ export const GraphEditor = ({ graphID, graphForm }) => {
         )}
         <Grid item xs={12} sm={12} md={12} lg={12} key={"submit"}>
           <Button variant="contained" onClick={_handleSubmit}>
-            {LOCAL_CONSTANTS.STRINGS.ADD_BUTTON_TEXT}
+            {LOCAL_CONSTANTS.STRINGS.SUBMIT_BUTTON_TEXT}
           </Button>
           {(graphID != null || graphID != undefined) && (
             <GraphDeletionForm graphID={graphID} />

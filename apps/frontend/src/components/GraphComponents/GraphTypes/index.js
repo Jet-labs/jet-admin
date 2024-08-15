@@ -10,6 +10,7 @@ import { FaChartPie } from "react-icons/fa";
 import { BiSolidDoughnutChart } from "react-icons/bi";
 import { PiChartPolar } from "react-icons/pi";
 import { BiRadar } from "react-icons/bi";
+import { ScatterGraphComponent } from "./ScatterGraphComponent";
 export const GRAPH_PLUGINS_MAP = {
   BAR: {
     label: "Bar",
@@ -136,5 +137,26 @@ export const GRAPH_PLUGINS_MAP = {
       />
     ),
     icon: <BiRadar className="!text-lg" />,
+  },
+  SCATTER: {
+    label: "Scatter",
+    value: "SCATTER",
+    fields: ["dataset_title", "label", "x_axis", "y_axis", "fill"],
+    component: ({
+      legendPosition,
+      titleDisplayEnabled,
+      graphTitle,
+      data,
+      refetchInterval,
+    }) => (
+      <ScatterGraphComponent
+        legendPosition={legendPosition}
+        titleDisplayEnabled={titleDisplayEnabled}
+        graphTitle={graphTitle}
+        data={data}
+        refetchInterval={refetchInterval}
+      />
+    ),
+    icon: <FaChartLine className="!text-lg" />,
   },
 };

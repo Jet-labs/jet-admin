@@ -26,6 +26,7 @@ export const DashboardDropZoneComponent = ({
     setLayouts({ ...layouts });
   };
 
+
   const onDrop = (layout, layoutItem, _ev) => {
     const widget = _ev.dataTransfer.getData("widget");
     const widget_type = String(widget).split("_")[0];
@@ -34,16 +35,23 @@ export const DashboardDropZoneComponent = ({
     setWidgets(_widgets);
     const _layouts = cloneDeep(layouts);
     let element = null;
-    Object.keys(layouts).forEach((breakpoint, index) => {
-      const _index = _layouts[breakpoint].findIndex(
+    let breakpoint = null;
+    Object.keys(layouts).forEach((_breakpoint, index) => {
+      const _index = _layouts[_breakpoint].findIndex(
         (item) => item.i === "__dropping-elem__"
       );
-
       if (_index !== -1) {
-        element = { ..._layouts[breakpoint][_index] };
-        _layouts[breakpoint].splice(_index, 1);
+        breakpoint = _breakpoint;
+        element = { ..._layouts[_breakpoint][_index] };
+        _layouts[_breakpoint].splice(_index, 1);
+        _layouts[_breakpoint].push({ ...element, i: widget });
       }
-      _layouts[breakpoint].push({ ...element, i: widget });
+    });
+
+    Object.keys(layouts).forEach((_breakpoint, index) => {
+      if (breakpoint != _breakpoint) {
+        _layouts[_breakpoint].push({ ...element, i: widget });
+      }
     });
 
     setLayouts(_layouts);
@@ -59,6 +67,7 @@ export const DashboardDropZoneComponent = ({
         style={{ background: "transparent", minHeight: "100%" }}
         layouts={layouts}
         measureBeforeMount={false}
+        breakpoints={{ lg: 1000, md: 996, sm: 768, xs: 480, xxs: 0 }}
         // compactType={compactType}
         // preventCollision={!compactType}
         onLayoutChange={onLayoutChange}

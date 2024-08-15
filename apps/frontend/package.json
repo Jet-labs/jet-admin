@@ -73,7 +73,7 @@
     "react-syntax-highlighter": "^15.5.0",
     "react-toastify": "^9.1.1",
     "react18-input-otp": "^1.1.0",
-    "recharts": "^2.9.2",
+    "recharts": "^2.12.7",
     "remark-gfm": "^4.0.0",
     "socket.io-client": "^4.5.3",
     "to-json-schema": "^0.2.5",

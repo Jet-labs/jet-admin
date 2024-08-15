@@ -87,6 +87,7 @@ export const LOCAL_CONSTANTS = {
     APP_CONSTANTS_TABLE_NAME: "tbl_pm_app_constants",
     DELETE_BUTTON_TEXT: "Delete",
     UPDATE_BUTTON_TEXT: "Update",
+    SUBMIT_BUTTON_TEXT: "Submit",
     ADD_BUTTON_TEXT: "Add",
     DUPLICATE_BUTTON_TEXT: "Duplicate",
     EXPORT_BUTTON_TEXT: "Export",
