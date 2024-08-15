@@ -15,6 +15,7 @@ export const MultipleRowsDeletionForm = ({
   tableName,
   filterQuery,
   selectedRowIDs,
+  isAllRowSelectChecked,
 }) => {
   const { pmUser } = useAuthState();
   const queryClient = useQueryClient();
@@ -42,7 +43,10 @@ export const MultipleRowsDeletionForm = ({
     mutate: deleteRows,
   } = useMutation({
     mutationFn: ({ tableName, selectedRowIDs }) =>
-      deleteRowByMultipleIDsAPI({ tableName, selectedRowIDs }),
+      deleteRowByMultipleIDsAPI({
+        tableName,
+        selectedRowIDs: isAllRowSelectChecked ? filterQuery : selectedRowIDs,
+      }),
     retry: false,
     onSuccess: () => {
       displaySuccess(LOCAL_CONSTANTS.STRINGS.ROW_DELETED_SUCCESS);

@@ -182,9 +182,10 @@ export const RawDataGrid = ({
         tableName={tableName}
         selectedRowIDs={multipleSelectedQuery}
         filterQuery={filterQuery}
+        isAllRowSelectChecked={isAllRowSelectChecked}
       />
     );
-  }, [tableName, filterQuery, multipleSelectedQuery]);
+  }, [tableName, filterQuery, isAllRowSelectChecked, multipleSelectedQuery]);
 
   const _renderSelectAllRowsCheckbox = useMemo(() => {
     return (
