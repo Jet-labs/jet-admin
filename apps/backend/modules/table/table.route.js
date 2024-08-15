@@ -89,6 +89,15 @@ router.post(
 );
 
 router.post(
+  "/:table_name/export",
+  authMiddleware.authProvider,
+  // tableAuthorizationMiddleware.isAuthorized,
+  policyMiddleware.populateAuthorizationPolicies,
+  tableAuthorizationMiddleware.populateAuthorizedRowsForRead,
+  tableController.exportRowByMultipleIDs
+);
+
+router.post(
   "/:table_name",
   authMiddleware.authProvider,
   // tableAuthorizationMiddleware.isAuthorized,

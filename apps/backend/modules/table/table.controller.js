@@ -4,9 +4,10 @@ const { extractError } = require("../../utils/error.utils");
 const Logger = require("../../utils/logger");
 const { policyUtils } = require("../../utils/policy.utils");
 const { TableService } = require("./table.services");
+const { createObjectCsvStringifier } = require("csv-writer");
+const ExcelJS = require("exceljs");
 
 const tableController = {};
-
 
 /**
  *
@@ -597,6 +598,82 @@ tableController.deleteRowByMultipleIDs = async (req, res) => {
   } catch (error) {
     Logger.log("error", {
       message: "tableController:deleteRowByMultipleIDs:catch-1",
+      params: { error },
+    });
+    return res.json({ success: false, error: extractError(error) });
+  }
+};
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @returns
+ */
+tableController.exportRowByMultipleIDs = async (req, res) => {
+  try {
+    const { pmUser, state } = req;
+    const pm_user_id = parseInt(pmUser.pm_user_id);
+    const { table_name } = req.params;
+    const { query, format } = req.body;
+    const authorized_rows = state?.authorized_rows;
+
+    Logger.log("info", {
+      message: "tableController:exportRowByMultipleIDs:params",
+      params: { pm_user_id, table_name, query, authorized_rows },
+    });
+
+    const rows = await TableService.exportTableRowByMultipleIDs({
+      table_name,
+      query: query,
+      authorized_rows,
+    });
+    console.log({ rows });
+
+    if (format === "csv") {
+      res.setHeader("Content-Disposition", 'attachment; filename="data.csv"');
+      res.setHeader("Content-Type", "text/csv");
+
+      const csvStringifier = createObjectCsvStringifier({
+        header: Object.keys(rows[0] || {}).map((key) => ({
+          id: key,
+          title: key,
+        })),
+      });
+
+      res.write(csvStringifier.getHeaderString());
+      res.write(csvStringifier.stringifyRecords(rows));
+      res.end();
+      return;
+    } else if (format === "xlsx") {
+      res.setHeader("Content-Disposition", 'attachment; filename="data.xlsx"');
+      res.setHeader(
+        "Content-Type",
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      );
+
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet("Data");
+
+      worksheet.columns = Object.keys(rows[0] || {}).map((key) => ({
+        header: key,
+        key,
+      }));
+
+      rows.forEach((row) => {
+        worksheet.addRow(row);
+      });
+
+      workbook.xlsx.write(res).then(() => res.end());
+      return;
+    } else {
+      res.setHeader("Content-Disposition", 'attachment; filename="data.json"');
+      res.setHeader("Content-Type", "application/json");
+      return res.send(JSON.stringify(rows, null, 2));
+    }
+  } catch (error) {
+    Logger.log("error", {
+      message: "tableController:exportRowByMultipleIDs:catch-1",
       params: { error },
     });
     return res.json({ success: false, error: extractError(error) });
