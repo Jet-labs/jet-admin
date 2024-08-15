@@ -56,6 +56,7 @@ const create_query_table_query = `CREATE TABLE IF NOT EXISTS tbl_pm_queries
     pm_query_description character varying,
     pm_query json,
     run_on_load boolean,
+    pm_query_metadata json NULL,
     CONSTRAINT tbl_pm_queries_pk PRIMARY KEY (pm_query_id)
 )`;
 

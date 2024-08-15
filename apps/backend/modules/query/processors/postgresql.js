@@ -10,7 +10,7 @@ const {
 } = require("../../../utils/parser.util");
 const { Prisma } = require("@prisma/client");
 const { isDMLQuery, isDQLQuery } = require("../../../utils/validation.util");
-
+const jsonSchemaGenerator = require("json-schema-generator");
 /**
  *
  * @param {object} param0
@@ -26,6 +26,10 @@ const runQuery = async ({
   pmQueryType,
   pmQueryArgValues,
 }) => {
+  BigInt.prototype.toJSON = function () {
+    const int = Number.parseInt(this.toString());
+    return int ?? this.toString();
+  };
   try {
     if (isDMLQuery(pmQuery.raw_query) || isDQLQuery(pmQuery.raw_query)) {
       const { processedQuery } = await getProcessedPostgreSQLQuery({
@@ -40,9 +44,22 @@ const runQuery = async ({
           pmQueryArgValues,
         },
       });
-      return await runPostgreSQLEvaluatedQuery({
+      const result = await runPostgreSQLEvaluatedQuery({
         options: { processedQuery, pmQueryType, pmQueryID },
       });
+      if (pmQueryID) {
+        const resultSchema = jsonSchemaGenerator(
+          JSON.parse(JSON.stringify(result.result))
+        );
+
+        await prisma.tbl_pm_queries.update({
+          where: {
+            pm_query_id: parseInt(pmQueryID),
+          },
+          data: { pm_query_metadata: resultSchema },
+        });
+      }
+      return result;
     } else {
       Logger.log("error", {
         message: "runQuery:catch-1",

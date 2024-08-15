@@ -1,6 +1,6 @@
 import { Button } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { runQueryAPI } from "../../../../api/queries";
 import { LOCAL_CONSTANTS } from "../../../../constants";
 import { displayError, displaySuccess } from "../../../../utils/notification";
@@ -11,6 +11,7 @@ export const PGSQLQueryTestForm = ({
   value,
   setQueryRunResult,
   args,
+  runQueryOnRender,
 }) => {
   const [isArgsFormOpen, setIsArgsFormOpen] = useState(false);
   const {
@@ -23,6 +24,7 @@ export const PGSQLQueryTestForm = ({
   } = useMutation({
     mutationFn: ({ raw_query, pm_query_arg_values }) => {
       return runQueryAPI({
+        pm_query_id: pmQueryID,
         pm_query_type: "POSTGRE_QUERY",
         pm_query: { raw_query },
         pm_query_arg_values,
@@ -65,6 +67,11 @@ export const PGSQLQueryTestForm = ({
       pm_query_arg_values: argValues,
     });
   };
+  useEffect(() => {
+    if (runQueryOnRender == true) {
+      _runQuery();
+    }
+  }, [runQueryOnRender]);
 
   return (
     <>

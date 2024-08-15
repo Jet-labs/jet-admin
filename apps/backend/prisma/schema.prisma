@@ -241,6 +241,7 @@ model tbl_pm_queries {
   pm_query             Json?         @db.Json
   run_on_load          Boolean?
   pm_query_args        String[]      @db.VarChar
+  pm_query_metadata    Json?         @db.Json
   tbl_pm_jobs          tbl_pm_jobs[]
 }
 

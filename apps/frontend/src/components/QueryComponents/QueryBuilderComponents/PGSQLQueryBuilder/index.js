@@ -13,7 +13,13 @@ import {
   ResizablePanelGroup,
 } from "../../../Resizables";
 
-export const PGSQLQueryBuilder = ({ pmQueryID, value, handleChange, args }) => {
+export const PGSQLQueryBuilder = ({
+  pmQueryID,
+  value,
+  handleChange,
+  args,
+  runQueryOnRender = false,
+}) => {
   const theme = useTheme();
   const [tab, setTab] = React.useState(0);
   const [queryRunResult, setQueryRunResult] = useState();
@@ -58,6 +64,7 @@ export const PGSQLQueryBuilder = ({ pmQueryID, value, handleChange, args }) => {
                 pmQueryID={pmQueryID}
                 value={value}
                 args={args}
+                runQueryOnRender={runQueryOnRender}
               />
             </div>
           </div>

@@ -203,7 +203,7 @@ queryController.queryRunner = async (req, res) => {
       return int ?? this.toString();
     };
     const { pmUser, state, body } = req;
-    const { pm_query_type, pm_query, pm_query_arg_values } = body;
+    const { pm_query_id, pm_query_type, pm_query, pm_query_arg_values } = body;
     const pm_user_id = parseInt(pmUser.pm_user_id);
     const authorized_queries = state.authorized_queries;
 
@@ -213,6 +213,7 @@ queryController.queryRunner = async (req, res) => {
     });
 
     const data = await QueryService.queryRunner({
+      pmQueryID: pm_query_id,
       pmQuery: pm_query,
       pmQueryType: pm_query_type,
       pmQueryArgValues: pm_query_arg_values,
