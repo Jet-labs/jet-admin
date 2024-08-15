@@ -1,5 +1,6 @@
 import { LOCAL_CONSTANTS } from "../constants";
 import axiosInstance from "../utils/axiosInstance";
+import { triggerDownload } from "../utils/downloads";
 
 export const getAllTables = async () => {
   try {
@@ -240,3 +241,43 @@ export const deleteRowByMultipleIDsAPI = async ({
     throw error;
   }
 };
+
+export const exportRowByMultipleIDsAPI = async ({
+  tableName,
+  selectedRowIDs,
+  format,
+}) => {
+  try {
+    const response = await axiosInstance.post(
+      LOCAL_CONSTANTS.APIS.TABLE.exportTableRowByMultipleIDs({
+        tableName,
+      }),
+      { query: selectedRowIDs, format },
+      { responseType: "blob" }
+    );
+    if (response && response.data) {
+      let blob;
+      if (format === "json") {
+        // Create a FileReader to read the Blob as text
+        const reader = new FileReader();
+        reader.onloadend = function () {
+          const jsonText = reader.result;
+          blob = new Blob([jsonText], { type: "application/json" });
+          triggerDownload(blob, `data.${format}`);
+        };
+        reader.readAsText(response.data);
+      } else {
+        blob = new Blob([response.data]);
+        triggerDownload(blob, `data.${format}`);
+      }
+      return true;
+    } else if (response.data.error) {
+      throw response.data.error;
+    } else {
+      throw LOCAL_CONSTANTS.ERROR_CODES.SERVER_ERROR;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+

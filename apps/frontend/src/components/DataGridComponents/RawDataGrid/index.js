@@ -33,6 +33,7 @@ import { DataGridActionComponent } from "../DataGridActionComponent";
 import { ErrorComponent } from "../../ErrorComponent";
 import { RawDataGridStatistics } from "../RawDataGridStatistics";
 import { MultipleRowsDeletionForm } from "../MultipleRowDeletetionForm";
+import { DataExportFormComponent } from "../DataExportFormComponent";
 
 export const RawDataGrid = ({
   tableName,
@@ -178,12 +179,27 @@ export const RawDataGrid = ({
 
   const _renderMultipleDeleteButton = useMemo(() => {
     return (
-      <MultipleRowsDeletionForm
-        tableName={tableName}
-        selectedRowIDs={multipleSelectedQuery}
-        filterQuery={filterQuery}
-        isAllRowSelectChecked={isAllRowSelectChecked}
-      />
+      multipleSelectedQuery && (
+        <MultipleRowsDeletionForm
+          tableName={tableName}
+          selectedRowIDs={multipleSelectedQuery}
+          filterQuery={filterQuery}
+          isAllRowSelectChecked={isAllRowSelectChecked}
+        />
+      )
+    );
+  }, [tableName, filterQuery, isAllRowSelectChecked, multipleSelectedQuery]);
+
+  const _renderExportButton = useMemo(() => {
+    return (
+      multipleSelectedQuery && (
+        <DataExportFormComponent
+          tableName={tableName}
+          selectedRowIDs={multipleSelectedQuery}
+          filterQuery={filterQuery}
+          isAllRowSelectChecked={isAllRowSelectChecked}
+        />
+      )
     );
   }, [tableName, filterQuery, isAllRowSelectChecked, multipleSelectedQuery]);
 
@@ -269,9 +285,13 @@ export const RawDataGrid = ({
               getRowHeight={() => "auto"}
               slots={{
                 toolbar: () => (
-                  <GridToolbarContainer className="!py-2 !-pr-5 justify-end">
-                    {_renderSelectAllRowsCheckbox}
-                    {_renderMultipleDeleteButton}
+                  <GridToolbarContainer className="!py-2 !-pr-5 justify-between">
+                    <div>{_renderSelectAllRowsCheckbox}</div>
+
+                    <div className="!flex-row justify-end">
+                      {_renderExportButton}
+                      {_renderMultipleDeleteButton}
+                    </div>
                   </GridToolbarContainer>
                 ),
                 loadingOverlay: LinearProgress,

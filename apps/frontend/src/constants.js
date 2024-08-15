@@ -112,10 +112,14 @@ export const LOCAL_CONSTANTS = {
     POLICY_DELETION_CONFIRMATION_BODY: "Are you sure you want to delete policy",
     POLICY_UPDATE_PAGE_TITLE: "Update policy",
 
+    // rows
     ROW_ADDITION_SUCCESS: "Row added!",
     ROW_UPDATED_SUCCESS: "Row updated!",
     ROW_DELETED_SUCCESS: "Row deleted!",
     ROW_MULTIPLE_DELETE_BUTTON: "Delete selected rows",
+    ROW_EXPORT_CONFIRMATION_TITLE: "Export data",
+    ROW_EXPORT_CONFIRMATION_BODY: "Select the format to export",
+    ROW_SELECTION_BUTTON: (rowCount) => `Select all ${rowCount} rows`,
 
     QUERY_ADDITION_SUCCESS: "Query added!",
     QUERY_UPDATED_SUCCESS: "Query updated!",
@@ -329,6 +333,8 @@ export const LOCAL_CONSTANTS = {
         `/admin_api/tables/${tableName}/${id}`,
       deleteTableRowByMultipleIDs: ({ tableName }) =>
         `/admin_api/tables/${tableName}/delete`,
+      exportTableRowByMultipleIDs: ({ tableName }) =>
+        `/admin_api/tables/${tableName}/export`,
     },
 
     ACTION: {
