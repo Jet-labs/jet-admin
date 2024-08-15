@@ -27,7 +27,6 @@ export const GraphPolicyEditor = ({ value, handleChange }) => {
       ) {
         setTab(0);
       } else {
-        console.log(value);
         displayError({
           message:
             "JSON based policy detected. Please remove it to use visual editor",

@@ -57,9 +57,7 @@ const ThemeContextProvider = ({ children }) => {
       //   "--toastify-color-light",
       //   themeMap[theme].palette.background.paper
       // );
-    } catch (error) {
-      console.log({ error });
-    }
+    } catch (error) {}
   };
 
   const theme = createTheme(themeMap[themeType]);

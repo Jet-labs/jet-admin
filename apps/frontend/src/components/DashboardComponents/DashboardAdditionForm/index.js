@@ -46,7 +46,7 @@ export const DashboardAdditionForm = () => {
     initialValues: {
       dashboard_title: "",
       widgets: [],
-      layouts: [],
+      layouts: {},
     },
     validateOnMount: false,
     validateOnChange: false,
@@ -94,7 +94,7 @@ export const DashboardAdditionForm = () => {
             borderColor: theme.palette.divider,
           }}
         >
-          <Grid sm={12} className="!top-0 !sticky !z-50">
+          <Grid item sm={12} className="!top-0 !sticky !z-50">
             <div
               className="flex flex-row justify-start items-center p-3"
               style={{ background: theme.palette.background.default }}
@@ -131,7 +131,7 @@ export const DashboardAdditionForm = () => {
               </div>
             </div>
           </Grid>
-          <Grid sm={12}>
+          <Grid item sm={12}>
             <WidgetsDnDList />
           </Grid>
         </ResizablePanel>

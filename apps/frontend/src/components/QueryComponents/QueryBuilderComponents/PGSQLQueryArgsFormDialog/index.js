@@ -31,9 +31,7 @@ export const PGSQLQueryArgsFormDialog = ({
       const errors = {};
       return errors;
     },
-    onSubmit: (values) => {
-      console.log({ values });
-    },
+    onSubmit: (values) => {},
   });
 
   useEffect(() => {
@@ -43,8 +41,6 @@ export const PGSQLQueryArgsFormDialog = ({
       });
     }
   }, [args]);
-
-  console.log(argsForm);
   return (
     <Dialog
       open={open}

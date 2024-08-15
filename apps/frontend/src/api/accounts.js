@@ -34,7 +34,6 @@ export const updatePMUserDataAPI = async ({ data }) => {
       throw LOCAL_CONSTANTS.ERROR_CODES.SERVER_ERROR;
     }
   } catch (error) {
-    console.log({ error });
     throw error;
   }
 };
@@ -54,7 +53,6 @@ export const updatePMUserPasswordAPI = async ({ data }) => {
       throw LOCAL_CONSTANTS.ERROR_CODES.SERVER_ERROR;
     }
   } catch (error) {
-    console.log({ error });
     throw error;
   }
 };
@@ -74,7 +72,6 @@ export const updateAccountAPI = async ({ data }) => {
       throw LOCAL_CONSTANTS.ERROR_CODES.SERVER_ERROR;
     }
   } catch (error) {
-    console.log({ error });
     throw error;
   }
 };
@@ -124,7 +121,6 @@ export const getAllAccountsAPI = async () => {
     );
     if (response.data && response.data.success == true) {
       const accounts = Account.toList(response.data.accounts);
-      console.log({ accounts });
       return accounts;
     } else if (response.data.error) {
       throw response.data.error;
@@ -132,7 +128,6 @@ export const getAllAccountsAPI = async () => {
       throw LOCAL_CONSTANTS.ERROR_CODES.SERVER_ERROR;
     }
   } catch (error) {
-    console.log({ error });
     throw error;
   }
 };

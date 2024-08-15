@@ -27,7 +27,6 @@ export const loginAPI = async ({ username, password }) => {
       throw LOCAL_CONSTANTS.ERROR_CODES.SERVER_ERROR;
     }
   } catch (error) {
-    console.log(error);
     throw error;
   }
 };
@@ -50,7 +49,6 @@ export const refreshAccessToken = async () => {
       throw LOCAL_CONSTANTS.ERROR_CODES.USER_REFRESH_TOKEN_EXPIRED;
     }
   } catch (error) {
-    console.log(error);
     throw error;
   }
 };
@@ -68,7 +66,6 @@ export const fetchDBUserAPI = async () => {
       throw LOCAL_CONSTANTS.ERROR_CODES.SERVER_ERROR;
     }
   } catch (error) {
-    console.log(error);
     throw error;
   }
 };

@@ -306,7 +306,6 @@ export const GraphEditor = ({ graphID, graphForm }) => {
                       fullWidth={true}
                     >
                       {queries?.map((query) => {
-                        console.log({ query });
                         return (
                           <MenuItem value={query.pm_query_id}>
                             <div className="!flex flex-row justify-start items-center">

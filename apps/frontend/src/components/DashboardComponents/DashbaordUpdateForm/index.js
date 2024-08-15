@@ -60,7 +60,7 @@ export const DashboardUpdateForm = ({ id }) => {
     initialValues: {
       dashboard_title: "",
       widgets: [],
-      layouts: [],
+      layouts: {},
     },
     validateOnMount: false,
     validateOnChange: false,

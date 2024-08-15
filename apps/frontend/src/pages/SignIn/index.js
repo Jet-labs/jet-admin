@@ -26,7 +26,7 @@ const LoginForm = ({}) => {
         Please enter details to begin.
       </span>
       <Formik
-        initialValues={{ username: "local_admin", password: "password" }}
+        initialValues={{ username: "super_admin", password: "1234" }}
         validate={(values) => {
           const errors = {};
           if (!values.username) {
@@ -62,7 +62,7 @@ const LoginForm = ({}) => {
           >
             <TextField
               label={errors.username ? errors.username : "Username"}
-              placeholder="Enter your phone here"
+              placeholder="Enter username"
               type={"tel"}
               name="username"
               onChange={handleChange}
@@ -74,9 +74,9 @@ const LoginForm = ({}) => {
             />
             <TextField
               label={errors.password ? errors.password : "Password"}
-              placeholder="Enter your phone here"
+              placeholder="Enter password"
               className="!mt-5"
-              type={"text"}
+              type={"password"}
               name="password"
               onChange={handleChange}
               onBlur={handleBlur}

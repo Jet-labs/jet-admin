@@ -62,7 +62,6 @@ const AllAccounts = () => {
       headerName: "Role ID",
       width: 200,
       valueGetter: (value, row) => {
-        console.log({ value, row });
         return value?.row?.pm_policy_object_id;
       },
       renderCell: (params) => (

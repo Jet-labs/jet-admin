@@ -71,7 +71,7 @@ export const PGSQLSchemaBuilder = ({}) => {
     });
   };
 
-  // console.log({ schemaData });
+
   return (
     <ResizablePanelGroup
       direction="horizontal"

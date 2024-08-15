@@ -24,7 +24,6 @@ const AppConstantsContextProvider = ({ children }) => {
     staleTime: 0,
   });
 
-  console.log({ dbModelData });
   const {
     isLoading: isLoadingAllAppConstants,
     data: appConstants,
@@ -71,12 +70,6 @@ const AppConstantsContextProvider = ({ children }) => {
       return _t;
     }
   }, [internalAppConstants]);
-
-  console.log({
-    processedInternalAppConstants,
-    internalAppConstants,
-    appConstants,
-  });
   return (
     <AppConstantsValueContext.Provider
       value={{

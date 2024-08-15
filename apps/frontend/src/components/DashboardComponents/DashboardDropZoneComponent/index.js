@@ -18,14 +18,12 @@ export const DashboardDropZoneComponent = ({
   const theme = useTheme();
 
   const _handleDelete = (index) => {
-    console.log({ index });
     const _widgets = [...widgets];
     _widgets.splice(index, 1);
     setWidgets(_widgets);
   };
   const onLayoutChange = (layout, layouts) => {
     setLayouts({ ...layouts });
-    console.log({ layouts });
   };
 
   const onDrop = (layout, layoutItem, _ev) => {
@@ -37,7 +35,6 @@ export const DashboardDropZoneComponent = ({
     const _layouts = cloneDeep(layouts);
     let element = null;
     Object.keys(layouts).forEach((breakpoint, index) => {
-      console.log({ br: breakpoint, b: _layouts[breakpoint] });
       const _index = _layouts[breakpoint].findIndex(
         (item) => item.i === "__dropping-elem__"
       );
@@ -51,7 +48,7 @@ export const DashboardDropZoneComponent = ({
 
     setLayouts(_layouts);
   };
-  // const compactType = "verticle";
+
   return (
     <div
       className="w-full h-full p-2 min-h-full overflow-y-scroll"

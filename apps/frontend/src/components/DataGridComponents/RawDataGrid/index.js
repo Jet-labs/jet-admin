@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 
 import {
   Button,
+  Checkbox,
   FormControl,
   InputLabel,
   LinearProgress,
@@ -16,7 +17,7 @@ import {
   GridToolbarExport,
 } from "@mui/x-data-grid";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { fetchAllRowsAPI } from "../../../api/tables";
 import { useAuthState } from "../../../contexts/authContext";
 
@@ -49,6 +50,10 @@ export const RawDataGrid = ({
   const theme = useTheme();
   const [multipleSelectedQuery, setMultipleSelectedQuery] = useState(null);
   const [pageSize, setPageSize] = useState(20);
+  const [isSelectAllRowCheckBoxEnabled, setIsSelectAllRowCheckBoxEnabled] =
+    useState(false);
+  const [isAllRowSelectChecked, setIsAllRowSelectChecked] = useState(false);
+  const [rowCount, setRowCount] = useState();
 
   const {
     isLoading: isLoadingRows,
@@ -98,11 +103,7 @@ export const RawDataGrid = ({
   });
 
   const authorizedColumns = useMemo(() => {
-    console.log({ iiiinternalAppConstants: internalAppConstants });
     if (readColumns) {
-      console.log({
-        internalAppConstants: internalAppConstants?.CUSTOM_INT_VIEW_MAPPING,
-      });
       const c = getFormattedTableColumns(
         readColumns,
         internalAppConstants?.CUSTOM_INT_VIEW_MAPPING?.[tableName]
@@ -119,18 +120,19 @@ export const RawDataGrid = ({
     }
   }, [tableName, dbModel]);
 
-  const getRowId = (row) => {
+  const _getRowId = (row) => {
     let _query = {};
     let _queryName = primaryColumns.join("_");
     for (let i = 0; i < primaryColumns.length; i++) {
       _query[primaryColumns[i]] = row[primaryColumns[i]];
     }
+
     return primaryColumns.length > 1
       ? JSON.stringify({ [_queryName]: _query })
       : JSON.stringify(_query);
   };
 
-  const selectByIDQueryBuilder = (row) => {
+  const _selectByIDQueryBuilder = (row) => {
     let _query = {};
     let _queryName = primaryColumns.join("_");
     for (let i = 0; i < primaryColumns.length; i++) {
@@ -144,6 +146,8 @@ export const RawDataGrid = ({
       let _queryName = primaryColumns.join("_");
       if (rowSelectionModel.length == 0) {
         setMultipleSelectedQuery(null);
+        setIsSelectAllRowCheckBoxEnabled(false);
+        _handleToggleAllRowSelectCheckbox(false);
       } else {
         const multipleSelectedRowsQuery = rowSelectionModel.map((rowID) => {
           const _rowID = JSON.parse(rowID);
@@ -156,7 +160,9 @@ export const RawDataGrid = ({
           primaryColumns.length > 1
             ? { [_queryName]: { in: multipleSelectedRowsQuery } }
             : { [primaryColumns[0]]: { in: multipleSelectedRowsQuery } };
+
         setMultipleSelectedQuery(finalQuery);
+        setIsSelectAllRowCheckBoxEnabled(true);
       }
     },
     [primaryColumns, setMultipleSelectedQuery]
@@ -165,14 +171,41 @@ export const RawDataGrid = ({
   const _handleOnPageSizeChange = (e) => {
     setPageSize(parseInt(e.target.value));
   };
+
+  const _handleToggleAllRowSelectCheckbox = (v) => {
+    setIsAllRowSelectChecked(v);
+  };
+
   const _renderMultipleDeleteButton = useMemo(() => {
     return (
       <MultipleRowsDeletionForm
         tableName={tableName}
-        ids={multipleSelectedQuery}
+        selectedRowIDs={multipleSelectedQuery}
+        filterQuery={filterQuery}
       />
     );
-  }, [tableName, multipleSelectedQuery]);
+  }, [tableName, filterQuery, multipleSelectedQuery]);
+
+  const _renderSelectAllRowsCheckbox = useMemo(() => {
+    return (
+      isSelectAllRowCheckBoxEnabled && (
+        <FormControl className="!flex-row !justify-start !items-center">
+          <span>{`Select all ${rowCount} rows`}</span>
+          <Checkbox
+            checked={isAllRowSelectChecked}
+            onChange={(_, checked) => {
+              _handleToggleAllRowSelectCheckbox(checked);
+            }}
+          />
+        </FormControl>
+      )
+    );
+  }, [
+    _handleToggleAllRowSelectCheckbox,
+    isSelectAllRowCheckBoxEnabled,
+    rowCount,
+    isAllRowSelectChecked,
+  ]);
 
   return (
     <div
@@ -188,6 +221,7 @@ export const RawDataGrid = ({
           <RawDataGridStatistics
             tableName={tableName}
             filterQuery={filterQuery}
+            setRowCount={setRowCount}
           />
         )}
         <DataGridActionComponent
@@ -216,7 +250,7 @@ export const RawDataGrid = ({
               hideFooterSelectedRowCount={true}
               checkboxSelection
               disableRowSelectionOnClick
-              getRowId={getRowId}
+              getRowId={_getRowId}
               hideFooter={true}
               onRowClick={(param) => {
                 onRowClick
@@ -224,7 +258,7 @@ export const RawDataGrid = ({
                   : navigate(
                       LOCAL_CONSTANTS.ROUTES.ROW_VIEW.path(
                         tableName,
-                        JSON.stringify(selectByIDQueryBuilder(param.row))
+                        JSON.stringify(_selectByIDQueryBuilder(param.row))
                       )
                     );
               }}
@@ -235,6 +269,7 @@ export const RawDataGrid = ({
               slots={{
                 toolbar: () => (
                   <GridToolbarContainer className="!py-2 !-pr-5 justify-end">
+                    {_renderSelectAllRowsCheckbox}
                     {_renderMultipleDeleteButton}
                   </GridToolbarContainer>
                 ),

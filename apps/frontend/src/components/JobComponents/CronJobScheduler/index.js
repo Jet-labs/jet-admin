@@ -64,7 +64,6 @@ export const CronJobScheduler = ({
           key={key ? key : "cron-job-scheduler"}
           value={value}
           setValue={(v) => {
-            console.log({ v, value });
             handleChange(v);
           }}
           onError={onError ? onError : null}

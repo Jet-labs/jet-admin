@@ -66,6 +66,7 @@ export const MainLayout = ({ children }) => {
         xl={11.2}
         xs={10.6}
         sm={11}
+        item
         className="!h-[calc(100vh-48px)] !overflow-y-auto"
       >
         {children}

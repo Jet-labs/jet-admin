@@ -147,10 +147,11 @@ export const RawDataGrid = ({
     return (
       <MultipleRowsDeletionForm
         tableName={tableName}
-        ids={multipleSelectedQuery}
+        filterQuery={filterQuery}
+        selectedRowIDs={multipleSelectedQuery}
       />
     );
-  }, [tableName, multipleSelectedQuery]);
+  }, [tableName, filterQuery, multipleSelectedQuery]);
 
   return (
     <div

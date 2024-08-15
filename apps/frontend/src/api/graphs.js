@@ -26,7 +26,6 @@ export const updateGraphAPI = async ({ data }) => {
       LOCAL_CONSTANTS.APIS.GRAPH.updateGraph(),
       data
     );
-    console.log({response})
     if (response.data && response.data.success == true) {
       return true;
     } else if (response.data && response.data.error) {
@@ -35,7 +34,6 @@ export const updateGraphAPI = async ({ data }) => {
       throw LOCAL_CONSTANTS.ERROR_CODES.SERVER_ERROR;
     }
   } catch (error) {
-    console.log({ error });
     throw error;
   }
 };

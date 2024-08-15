@@ -59,7 +59,6 @@ export const PGSQLQueryTestForm = ({
 
   const _handleOnArgFormCompleted = (argValues) => {
     setIsArgsFormOpen(false);
-    console.log({ argValues });
     runPGQuery({
       raw_query: value?.raw_query,
       pm_query_id: pmQueryID,

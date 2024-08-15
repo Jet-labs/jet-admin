@@ -26,9 +26,7 @@ export const AppConstantAdditionForm = () => {
       const errors = {};
       return errors;
     },
-    onSubmit: (values) => {
-      console.log({ values });
-    },
+    onSubmit: (values) => {},
   });
 
   const {

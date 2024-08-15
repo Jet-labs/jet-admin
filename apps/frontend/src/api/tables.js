@@ -218,13 +218,16 @@ export const deleteRowByIDAPI = async ({ tableName, id }) => {
   }
 };
 
-export const deleteRowByMultipleIDsAPI = async ({ tableName, ids }) => {
+export const deleteRowByMultipleIDsAPI = async ({
+  tableName,
+  selectedRowIDs,
+}) => {
   try {
     const response = await axiosInstance.post(
       LOCAL_CONSTANTS.APIS.TABLE.deleteTableRowByMultipleIDs({
         tableName,
       }),
-      { query: ids }
+      { query: selectedRowIDs }
     );
     if (response.data && response.data.success == true) {
       return true;

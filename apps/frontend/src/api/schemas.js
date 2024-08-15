@@ -7,7 +7,6 @@ export const getSchemaAPI = async () => {
       LOCAL_CONSTANTS.APIS.SCHEMA.getSchema()
     );
     if (response.data && response.data.success == true) {
-      console.log({ response: response.data.schema });
       return response.data.schema;
     } else if (response.data.error) {
       throw response.data.error;
@@ -25,7 +24,6 @@ export const getSchemaStatisticsAPI = async () => {
       LOCAL_CONSTANTS.APIS.SCHEMA.getSchemaStatistics()
     );
     if (response.data && response.data.success == true) {
-      console.log({ response: response.data.schemaStatistics });
       return response.data.schemaStatistics;
     } else if (response.data.error) {
       throw response.data.error;
@@ -44,7 +42,6 @@ export const runSchemaQueryAPI = async ({ schemaQuery }) => {
       { schema_query: schemaQuery }
     );
     if (response.data && response.data.success == true) {
-      console.log({ response: response.data.result });
       return response.data.result;
     } else if (response.data.error) {
       throw response.data.error;

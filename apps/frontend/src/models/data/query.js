@@ -25,7 +25,6 @@ export class Query {
     this.disable_reason = disable_reason;
   }
   getQueryClass = ({ pm_query_type, queryData }) => {
-    console.log({ pm_query_type, queryData });
     if (!queryData) {
       return null;
     }

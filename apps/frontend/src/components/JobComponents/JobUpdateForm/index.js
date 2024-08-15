@@ -59,7 +59,7 @@ export const JobUpdateForm = ({ id }) => {
       return errors;
     },
     onSubmit: (values) => {
-      console.log({ values });
+
     },
   });
 

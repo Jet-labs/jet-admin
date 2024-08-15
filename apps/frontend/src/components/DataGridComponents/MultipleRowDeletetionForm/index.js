@@ -11,7 +11,11 @@ import { useAuthState } from "../../../contexts/authContext";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { ConfirmationDialog } from "../../ConfirmationDialog";
 import { LOCAL_CONSTANTS } from "../../../constants";
-export const MultipleRowsDeletionForm = ({ tableName, ids }) => {
+export const MultipleRowsDeletionForm = ({
+  tableName,
+  filterQuery,
+  selectedRowIDs,
+}) => {
   const { pmUser } = useAuthState();
   const queryClient = useQueryClient();
   const [isDeleteRowsConfirmationOpen, setIsDeleteRowsConfirmationOpen] =
@@ -37,8 +41,8 @@ export const MultipleRowsDeletionForm = ({ tableName, ids }) => {
     error: deleteRowsError,
     mutate: deleteRows,
   } = useMutation({
-    mutationFn: ({ tableName, ids }) =>
-      deleteRowByMultipleIDsAPI({ tableName, ids }),
+    mutationFn: ({ tableName, selectedRowIDs }) =>
+      deleteRowByMultipleIDsAPI({ tableName, selectedRowIDs }),
     retry: false,
     onSuccess: () => {
       displaySuccess(LOCAL_CONSTANTS.STRINGS.ROW_DELETED_SUCCESS);
@@ -59,7 +63,7 @@ export const MultipleRowsDeletionForm = ({ tableName, ids }) => {
   };
 
   const _handleDeleteRows = () => {
-    deleteRows({ tableName, ids });
+    deleteRows({ tableName, selectedRowIDs });
   };
   return (
     deleteRowAuthorization && (
@@ -72,7 +76,7 @@ export const MultipleRowsDeletionForm = ({ tableName, ids }) => {
           className="!ml-2"
           color="error"
         >
-          Delete selected rows
+          {LOCAL_CONSTANTS.STRINGS.ROW_MULTIPLE_DELETE_BUTTON}
         </Button>
         <ConfirmationDialog
           open={isDeleteRowsConfirmationOpen}

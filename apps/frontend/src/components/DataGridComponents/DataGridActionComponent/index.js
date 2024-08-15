@@ -91,7 +91,6 @@ export const DataGridActionComponent = ({
       debouncedSearchTerm !== ""
     ) {
       let queries = [];
-      console.log({ readColumns });
       const _query = readColumns.forEach((column) => {
         if (
           column.type == LOCAL_CONSTANTS.DATA_TYPES.STRING &&
@@ -105,7 +104,6 @@ export const DataGridActionComponent = ({
           });
         }
       });
-      console.log({ queries });
       setFilterQuery?.({ OR: queries });
     } else {
       setFilterQuery(null);

@@ -8,11 +8,13 @@ import { Grid, useTheme } from "@mui/material";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { Loading } from "../../../pages/Loading";
 import { ErrorComponent } from "../../ErrorComponent";
+import { useEffect } from "react";
 
 export const RawDataGridStatistics = ({
   tableName,
   altTableName,
   filterQuery,
+  setRowCount,
 }) => {
   const { pmUser } = useAuthState();
   const queryClient = useQueryClient();
@@ -43,6 +45,12 @@ export const RawDataGridStatistics = ({
     staleTime: 0,
     keepPreviousData: true,
   });
+
+  useEffect(() => {
+    if (data && data.statistics && setRowCount) {
+      setRowCount(data.statistics.rowCount);
+    }
+  }, [data]);
 
   const _handleReloadData = () => {
     queryClient.invalidateQueries([

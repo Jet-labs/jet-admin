@@ -89,6 +89,7 @@ export const LOCAL_CONSTANTS = {
     UPDATE_BUTTON_TEXT: "Update",
     ADD_BUTTON_TEXT: "Add",
     DUPLICATE_BUTTON_TEXT: "Duplicate",
+    EXPORT_BUTTON_TEXT: "Export",
 
     // accounts
     ACCOUNT_ADDITION_SUCCESS: "Account added!",
@@ -114,6 +115,7 @@ export const LOCAL_CONSTANTS = {
     ROW_ADDITION_SUCCESS: "Row added!",
     ROW_UPDATED_SUCCESS: "Row updated!",
     ROW_DELETED_SUCCESS: "Row deleted!",
+    ROW_MULTIPLE_DELETE_BUTTON: "Delete selected rows",
 
     QUERY_ADDITION_SUCCESS: "Query added!",
     QUERY_UPDATED_SUCCESS: "Query updated!",

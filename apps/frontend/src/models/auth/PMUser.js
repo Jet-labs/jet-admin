@@ -234,7 +234,6 @@ export class PMUser {
     ) {
       authorization = this.policy.dashboards.delete;
     } else if (this.policy.dashboards && this.policy.dashboards.dashboard_ids) {
-      console.log(this.policy.dashboards.dashboard_ids);
       if (this.policy.dashboards.dashboard_ids[dashboardID]) {
         authorization = Boolean(
           this.policy.dashboards.dashboard_ids[dashboardID].delete
@@ -298,7 +297,6 @@ export class PMUser {
         );
       }
     }
-    console.log({ authorization });
     return authorization;
   };
 
@@ -354,7 +352,6 @@ export class PMUser {
         authorization = Boolean(this.policy.jobs.job_ids[pmJobID].delete);
       }
     }
-    console.log({ authorization });
     return authorization;
   };
 
@@ -429,7 +426,6 @@ export class PMUser {
         );
       }
     }
-    console.log({ authorization });
     return authorization;
   };
 
@@ -485,12 +481,10 @@ export class PMUser {
         );
       }
     }
-    console.log({ authorization });
     return authorization;
   };
 
   isAuthorizedToAddAccount = () => {
-    console.log({ this: this.policy });
     if (this.policy?.accounts?.add) {
       return true;
     }
@@ -542,7 +536,6 @@ export class PMUser {
         );
       }
     }
-    console.log({ authorization });
     return authorization;
   };
 }

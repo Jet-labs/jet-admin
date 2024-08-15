@@ -86,7 +86,6 @@ const AllAppConstants = () => {
   });
 
   const authorizedColumns = useMemo(() => {
-    console.log({ iiiinternalAppConstants: internalAppConstants });
     if (readColumns) {
       const c = getFormattedTableColumns(
         readColumns,
@@ -107,7 +106,6 @@ const AllAppConstants = () => {
       headerName: "Value",
       width: 200,
       valueGetter: (value, row) => {
-        console.log({ value, row });
         return value?.row?.pm_app_constant_value;
       },
       renderCell: (params) => {

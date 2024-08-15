@@ -35,7 +35,6 @@ export const updatePolicyAPI = async ({ data }) => {
       throw LOCAL_CONSTANTS.ERROR_CODES.SERVER_ERROR;
     }
   } catch (error) {
-    console.log({ error });
     throw error;
   }
 };
@@ -85,7 +84,6 @@ export const getAllPoliciesAPI = async () => {
     );
     if (response.data && response.data.success == true) {
       const policies = Policy.toList(response.data.policies);
-      console.log({ policies });
       return policies;
     } else if (response.data.error) {
       throw response.data.error;
@@ -93,7 +91,6 @@ export const getAllPoliciesAPI = async () => {
       throw LOCAL_CONSTANTS.ERROR_CODES.SERVER_ERROR;
     }
   } catch (error) {
-    console.log({ error });
     throw error;
   }
 };

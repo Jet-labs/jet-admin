@@ -13,7 +13,6 @@ axiosInstance.interceptors.request.use(
       LOCAL_CONSTANTS.STRINGS.ACCESS_TOKEN_LOCAL_STORAGE
     );
     config.headers.authorization = `Bearer ${accessToken}`;
-    console.log({ config });
     return config;
   },
   (error) => {
@@ -24,7 +23,6 @@ axiosInstance.interceptors.request.use(
 // Response interceptor for API calls
 axiosInstance.interceptors.response.use(
   async (response) => {
-    console.log({ response });
     if (
       response &&
       response.data &&

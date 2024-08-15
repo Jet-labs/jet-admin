@@ -329,7 +329,6 @@ export const getFieldWidth = (type) => {
  * @returns
  */
 export const getFormattedTableColumns = (columns, customIntMappings) => {
-  console.log({ customIntMappings });
   try {
     return columns.map((column) => {
       return {
@@ -352,7 +351,5 @@ export const getFormattedTableColumns = (columns, customIntMappings) => {
         },
       };
     });
-  } catch (error) {
-    console.error(error);
-  }
+  } catch (error) {}
 };

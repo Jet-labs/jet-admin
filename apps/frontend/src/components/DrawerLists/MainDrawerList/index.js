@@ -67,7 +67,6 @@ const drawerList = [
 export const MainDrawerList = ({ currentPageTitle }) => {
   const theme = useTheme();
   const location = useLocation();
-  // console.log({ routeParam });
 
   return (
     <List

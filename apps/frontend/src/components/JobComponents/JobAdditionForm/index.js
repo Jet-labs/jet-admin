@@ -47,9 +47,7 @@ export const JobAdditionForm = () => {
       const errors = {};
       return errors;
     },
-    onSubmit: (values) => {
-      console.log({ values });
-    },
+    onSubmit: (values) => {},
   });
 
   const {
@@ -126,7 +124,6 @@ export const JobAdditionForm = () => {
               fullWidth={true}
             >
               {queries?.map((query) => {
-                console.log({ query });
                 return (
                   <MenuItem value={query.pm_query_id}>
                     <div className="!flex flex-row justify-start items-center">

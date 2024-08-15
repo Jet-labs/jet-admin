@@ -76,7 +76,6 @@ export const GraphUpdateForm = ({ id }) => {
 
   useEffect(() => {
     if (graphData) {
-      console.log({ graphData });
       graphForm.setFieldValue("graph_type", graphData.graph_options.graph_type);
       graphForm.setFieldValue(
         "title_display_enabled",

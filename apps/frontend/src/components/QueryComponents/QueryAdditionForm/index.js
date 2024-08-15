@@ -34,7 +34,7 @@ export const QueryAdditionForm = () => {
       return errors;
     },
     onSubmit: (values) => {
-      console.log({ values });
+
     },
   });
 

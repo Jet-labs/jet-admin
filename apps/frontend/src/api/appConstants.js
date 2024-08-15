@@ -52,7 +52,6 @@ export const updateAppConstantAPI = async ({ data }) => {
       throw LOCAL_CONSTANTS.ERROR_CODES.SERVER_ERROR;
     }
   } catch (error) {
-    console.log({ error });
     throw error;
   }
 };

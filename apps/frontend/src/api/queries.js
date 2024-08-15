@@ -36,7 +36,6 @@ export const updateQueryAPI = async ({ data }) => {
       throw LOCAL_CONSTANTS.ERROR_CODES.SERVER_ERROR;
     }
   } catch (error) {
-    console.log({ error });
     throw error;
   }
 };
@@ -49,7 +48,6 @@ export const getQueryByIDAPI = async ({ pmQueryID }) => {
       })
     );
     if (response.data && response.data.success == true) {
-      console.log(response.data.query);
       return new Query(response.data.query);
     } else if (response.data.error) {
       throw response.data.error;
@@ -110,7 +108,6 @@ export const runQueryAPI = async ({
     if (response.data && response.data.success == true) {
       return response.data.data;
     } else if (response.data.error) {
-      console.log(response.data.error);
       throw response.data.error;
     } else {
       throw LOCAL_CONSTANTS.ERROR_CODES.SERVER_ERROR;
@@ -128,7 +125,6 @@ export const runQueryByIDAPI = async ({ pm_query_id }) => {
     if (response.data && response.data.success == true) {
       return response.data.data;
     } else if (response.data.error) {
-      console.log(response.data.error);
       throw response.data.error;
     } else {
       throw LOCAL_CONSTANTS.ERROR_CODES.SERVER_ERROR;
