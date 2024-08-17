@@ -1,7 +1,7 @@
 import { lazy } from "react";
-import { Outlet, Route, Routes } from "react-router-dom";
+import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 import { LOCAL_CONSTANTS } from "../../../constants";
-import { DashboardsList } from "../../DrawerLists/DashboardDrawerList";
+import { DashboardsDrawerList } from "../../DrawerLists/DashboardDrawerList";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -10,20 +10,37 @@ import {
 const AddDashboardView = lazy(() => import("../../../pages/AddDashboardView"));
 const DashboardView = lazy(() => import("../../../pages/DashboardView"));
 const DashboardEditView = lazy(() => import("../../../pages/UpdateDashboard"));
-
+const AddTrigger = lazy(() => import("../../../pages/AddTrigger"));
 const DashboardLayout = () => {
+  const pinnedDashboardID = parseInt(
+    localStorage.getItem(LOCAL_CONSTANTS.STRINGS.DEFAULT_DASHBOARD_ID_STORAGE)
+  );
   return (
     <ResizablePanelGroup
       direction="horizontal"
       autoSaveId="dashboard-panel-sizes"
     >
       <ResizablePanel defaultSize={20}>
-        <DashboardsList />
+        <DashboardsDrawerList />
       </ResizablePanel>
       <ResizableHandle withHandle={true} />
       <ResizablePanel defaultSize={80}>
         <Routes>
-          <Route index element={<AddDashboardView />} />
+          <Route
+            index
+            element={
+              isNaN(pinnedDashboardID) ? (
+                <AddDashboardView />
+              ) : (
+                // <Navigate
+                //   to={LOCAL_CONSTANTS.ROUTES.DASHBOARD_LAYOUT_VIEW.path(
+                //     pinnedDashboardID
+                //   )}
+                // />
+                <AddTrigger />
+              )
+            }
+          />
 
           <Route
             path={LOCAL_CONSTANTS.ROUTES.ADD_DASHBOARD_LAYOUT.code}

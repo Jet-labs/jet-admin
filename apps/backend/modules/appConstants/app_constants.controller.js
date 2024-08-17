@@ -1,6 +1,6 @@
 const { extractError } = require("../../utils/error.utils");
 const Logger = require("../../utils/logger");
-const { AppConstantService } = require("./appConstants.services");
+const { AppConstantService } = require("./app_constants.services");
 
 const appConstantController = {};
 

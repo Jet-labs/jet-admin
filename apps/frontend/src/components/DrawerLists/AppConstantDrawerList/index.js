@@ -21,7 +21,7 @@ import { useAuthState } from "../../../contexts/authContext";
 import { HiMiniVariable } from "react-icons/hi2";
 import { VscSymbolVariable } from "react-icons/vsc";
 
-export const AppConstantsList = () => {
+export const AppConstantsDrawerList = () => {
   const theme = useTheme();
   const routeParam = useParams();
   const currentPage = `app_constant_${routeParam?.["*"]}`;

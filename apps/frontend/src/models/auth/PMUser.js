@@ -491,7 +491,7 @@ export class PMUser {
     return false;
   };
 
-  extractAuthorizedAccountsForReadFromAccountObject = () => {
+  extractAuthorizedAccountsForReadFromPolicyObject = () => {
     const authorizeAccountIDs = [];
     if (this.policy?.accounts?.read) {
       return true;
@@ -505,7 +505,7 @@ export class PMUser {
     return authorizeAccountIDs;
   };
 
-  extractAuthorizedAccountsForUpdateFromAccountObject = () => {
+  extractAuthorizedAccountsForUpdateFromPolicyObject = () => {
     const authorizeAccountIDs = [];
     if (this.policy?.accounts?.edit) {
       return true;
@@ -537,5 +537,24 @@ export class PMUser {
       }
     }
     return authorization;
+  };
+
+  isAuthorizedToAddTrigger = () => {
+    if (this.policy?.triggers?.add) {
+      return true;
+    }
+    return false;
+  };
+  isAuthorizedToReadAccount = () => {
+    if (this.policy?.triggers?.read) {
+      return true;
+    }
+    return false;
+  };
+  isAuthorizedToDeleteAccount = () => {
+    if (this.policy?.triggers?.delete) {
+      return true;
+    }
+    return false;
   };
 }

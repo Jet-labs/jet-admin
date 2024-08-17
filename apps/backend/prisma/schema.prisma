@@ -307,6 +307,22 @@ model transaction_history {
   rollbacks     BigInt?
 }
 
+model tbl_pm_triggers {
+  pm_trigger_id          Int       @id @default(autoincrement())
+  pm_trigger_title       String    @db.VarChar
+  pm_trigger_description String?   @db.VarChar
+  is_disabled            Boolean?  @default(false)
+  created_at             DateTime  @default(now()) @db.Timestamptz(6)
+  updated_at             DateTime  @default(now()) @db.Timestamptz(6)
+  disabled_at            DateTime? @db.Timestamptz(6)
+  disable_reason         String?   @db.VarChar
+  pm_trigger_options     Json?
+}
+
+model tbl_pm_trigger_channels {
+  pm_trigger_channel_name String @unique(map: "tbl_pm_trigger_channels_pm_trigger_channel_idx") @db.VarChar
+}
+
 enum mpaa_rating {
   G
   PG

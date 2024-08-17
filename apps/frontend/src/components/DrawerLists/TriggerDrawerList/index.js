@@ -8,42 +8,45 @@ import {
   ListItemText,
   useTheme,
 } from "@mui/material";
-
-import { useQuery } from "@tanstack/react-query";
 import { useMemo } from "react";
-import { FaChalkboardTeacher, FaPlus, FaRedo } from "react-icons/fa";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { getAllDashboardAPI } from "../../../api/dashboards";
+
+import { FaChalkboardTeacher, FaPlus, FaRedo } from "react-icons/fa";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { useAuthState } from "../../../contexts/authContext";
-import { MdSpaceDashboard } from "react-icons/md";
-export const DashboardsDrawerList = () => {
+import { HiMiniVariable } from "react-icons/hi2";
+import { VscSymbolVariable } from "react-icons/vsc";
+import { getAllTriggerAPI } from "../../../api/triggers";
+import { useQuery } from "@tanstack/react-query";
+import { GrTrigger } from "react-icons/gr";
+export const TriggersDrawerList = () => {
   const theme = useTheme();
   const routeParam = useParams();
-  const currentPage = `dashboard_${routeParam?.["*"]}`;
+  const currentPage = `${routeParam?.["*"]}`;
   const { pmUser } = useAuthState();
   const navigate = useNavigate();
-  const isAuthorizedToAddDashboard = useMemo(() => {
-    return (
-      pmUser && pmUser.extractAuthorizationForDashboardAddFromPolicyObject()
-    );
+
+  const isAuthorizedToAddTrigger = useMemo(() => {
+    return pmUser && pmUser.isAuthorizedToAddTrigger();
   }, [pmUser]);
+
   const {
-    isLoading: isLoadingDashboards,
-    data: dashboards,
-    error: loadDashboardsError,
-    refetch: refetchDashboards,
+    isLoading: isLoadingTriggers,
+    data: triggers,
+    error: loadTriggersError,
+    refetch: refetchTriggers,
   } = useQuery({
-    queryKey: [`REACT_QUERY_KEY_DASHBOARD_LAYOUTS`],
-    queryFn: () => getAllDashboardAPI(),
+    queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.TRIGGERS],
+    queryFn: () => getAllTriggerAPI(),
     cacheTime: 0,
     retry: 1,
     staleTime: 0,
   });
 
-  const _navigateToAddMoreDashboard = () => {
-    navigate(LOCAL_CONSTANTS.ROUTES.ADD_DASHBOARD_LAYOUT.path());
+  const _navigateToAddMoreTrigger = () => {
+    navigate(LOCAL_CONSTANTS.ROUTES.ADD_APP_CONSTANT.path());
   };
+
   return (
     <List
       style={{
@@ -60,43 +63,34 @@ export const DashboardsDrawerList = () => {
           className="!font-semibold"
           style={{ color: theme.palette.primary.main }}
         >
-          {"Dashboard Layouts"}
+          {"Triggers"}
         </span>
-        <IconButton onClick={refetchDashboards}>
+        <IconButton onClick={refetchTriggers}>
           <FaRedo
             style={{ color: theme.palette.primary.main }}
             className="!text-sm"
           />
         </IconButton>
       </div>
-      {isAuthorizedToAddDashboard && (
+      {isAuthorizedToAddTrigger && (
         <div className="!px-3 !py-1.5 !w-full">
           <Button
-            onClick={_navigateToAddMoreDashboard}
+            onClick={_navigateToAddMoreTrigger}
             variant="contained"
             className="!w-full"
             startIcon={<FaPlus className="!text-sm" />}
           >
-            Add more dashboards
+            {LOCAL_CONSTANTS.STRINGS.TRIGGER_ADDITION_PAGE_TITLE}
           </Button>
         </div>
       )}
       <div className="!mt-1"></div>
-      {dashboards && dashboards.length > 0
-        ? dashboards.map((dashboard) => {
-            const key = `dashboard_${dashboard.pm_dashboard_id}`;
+      {triggers && triggers.length > 0
+        ? triggers.map((trigger) => {
+            const key = `${trigger.pm_trigger_table_name}-${trigger.pm_trigger_name}`;
             return (
-              <Link
-                to={LOCAL_CONSTANTS.ROUTES.GRAPH_VIEW.path(
-                  dashboard.pm_dashboard_id
-                )}
-                key={key}
-              >
-                <ListItem
-                  key={`_dashboard_${dashboard.pm_dashboard_id}`}
-                  disablePadding
-                  className="!px-3 !py-1.5"
-                >
+              <Link to={LOCAL_CONSTANTS.ROUTES.GRAPH_VIEW.path(key)} key={key}>
+                <ListItem disablePadding className="!px-3 !py-1.5">
                   <ListItemButton
                     sx={{
                       background: theme.palette.background.paper,
@@ -116,7 +110,7 @@ export const DashboardsDrawerList = () => {
                         minWidth: 0,
                       }}
                     >
-                      <MdSpaceDashboard className="!text-lg" />
+                      <GrTrigger className="!text-lg" />
                     </ListItemIcon>
                     <ListItemText
                       sx={{
@@ -125,7 +119,7 @@ export const DashboardsDrawerList = () => {
                             ? theme.palette.primary.main
                             : theme.palette.primary.contrastText,
                       }}
-                      primary={dashboard.dashboard_title}
+                      primary={key}
                       primaryTypographyProps={{
                         sx: {
                           fontWeight: key == currentPage ? "700" : "500",

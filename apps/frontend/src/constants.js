@@ -80,6 +80,7 @@ export const LOCAL_CONSTANTS = {
     THEME_LOCAL_STORAGE_STRING: "jet-theme",
     ACCESS_TOKEN_LOCAL_STORAGE: "access_token",
     REFRESH_TOKEN_LOCAL_STORAGE: "refresh_token",
+    DEFAULT_DASHBOARD_ID_STORAGE: "default_dashboard_id",
     PM_USER_TABLE_NAME: "tbl_pm_users",
     POLICY_OBJECT_TABLE_NAME: "tbl_pm_policy_objects",
     UNTITLED_CHART_TITLE: "Untitled chart",
@@ -155,6 +156,14 @@ export const LOCAL_CONSTANTS = {
     GRAPH_DELETION_CONFIRMATION_BODY: "Are you sure you want to delete graph",
     GRAPH_UPDATE_PAGE_TITLE: "Update graph",
 
+    //triggers
+    TRIGGER_ADDITION_SUCCESS: "Trigger added!",
+    TRIGGER_DELETED_SUCCESS: "Trigger deleted!",
+    TRIGGER_ADDITION_PAGE_TITLE: "Add new trigger",
+    TRIGGER_DELETION_CONFIRMATION_TITLE: "Delete trigger?",
+    TRIGGER_DELETION_CONFIRMATION_BODY:
+      "Are you sure you want to delete trigger",
+
     // app constants
     APP_CONSTANT_ADDITION_SUCCESS: "App constant added!",
     APP_CONSTANT_UPDATED_SUCCESS: "App constant updated!",
@@ -179,6 +188,19 @@ export const LOCAL_CONSTANTS = {
   ROUTES: {
     HOME: "/",
     SIGNIN: "/signin",
+
+    ALL_TRIGGERS: {
+      code: "/triggers/*",
+      path: () => "/triggers",
+    },
+    ADD_TRIGGER: {
+      code: "add",
+      path: () => "add",
+    },
+    TRIGGER_VIEW: {
+      code: ":id",
+      path: (id) => `${id}`,
+    },
 
     ALL_APP_CONSTANTS: {
       code: "/app_constants/*",
@@ -349,6 +371,12 @@ export const LOCAL_CONSTANTS = {
       getGraphDataByID: ({ id }) => `/admin_api/graphs/${id}/data`,
       deleteGraphByID: ({ id }) => `/admin_api/graphs/${id}`,
     },
+    TRIGGER: {
+      getAllTriggers: () => `/admin_api/triggers`,
+      addTrigger: () => `/admin_api/triggers`,
+      getTriggerByID: ({ id }) => `/admin_api/triggers/${id}`,
+      deleteTriggerByID: ({ id }) => `/admin_api/triggers/${id}`,
+    },
     ACCOUNT: {
       updatePassword: () => `/admin_api/accounts/password`,
 
@@ -460,6 +488,7 @@ export const LOCAL_CONSTANTS = {
   // keys
   REACT_QUERY_KEYS: {
     DB_USER: "DB_USER",
+    TRIGGERS: "TRIGGERS",
     CONSTANTS: "CONSTANTS",
     TABLES: "REACT_QUERY_KEY_TABLES",
     TABLE_ID: (tableName) =>

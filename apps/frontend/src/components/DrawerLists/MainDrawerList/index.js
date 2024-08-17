@@ -22,6 +22,8 @@ import { MdPolicy } from "react-icons/md";
 import { HiVariable } from "react-icons/hi";
 import { RiDashboard2Fill } from "react-icons/ri";
 import { FaCircleUser } from "react-icons/fa6";
+
+import { VscGithubAction } from "react-icons/vsc";
 const drawerList = [
   {
     text: "Dashboards",
@@ -52,6 +54,11 @@ const drawerList = [
     text: "Constants",
     icon: <HiVariable size={24} className="!text-sm" />,
     to: LOCAL_CONSTANTS.ROUTES.ALL_APP_CONSTANTS.path(),
+  },
+  {
+    text: "DB Triggers",
+    icon: <VscGithubAction size={24} className="!text-sm" />,
+    to: LOCAL_CONSTANTS.ROUTES.ALL_TRIGGERS.path(),
   },
   {
     text: "Policies",

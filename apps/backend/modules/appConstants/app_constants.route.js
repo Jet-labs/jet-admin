@@ -2,10 +2,10 @@ const express = require("express");
 const { dbModel } = require("../../config/prisma");
 const { authMiddleware } = require("../auth/auth.middleware");
 const { policyMiddleware } = require("../policies/policy.middleware");
-const { appConstantController } = require("./appConstants.controller");
+const { appConstantController } = require("./app_constants.controller");
 const {
   appConstantAuthorizationMiddleware,
-} = require("./appConstants.authorization.middleware");
+} = require("./app_constants.authorization.middleware");
 const router = express.Router();
 
 // get all data of table

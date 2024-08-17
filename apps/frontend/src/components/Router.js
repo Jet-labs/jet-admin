@@ -26,6 +26,7 @@ const DashboardLayout = lazy(() => import("./Layouts/DashboardLayout"));
 const QueryLayout = lazy(() => import("./Layouts/QueryLayout"));
 const JobLayout = lazy(() => import("./Layouts/JobLayout"));
 const AppConstantLayout = lazy(() => import("./Layouts/AppConstantLayout"));
+const TriggerLayout = lazy(() => import("./Layouts/TriggerLayout"));
 
 /**
  *
@@ -111,6 +112,16 @@ const AppRouter = ({}) => {
             element={
               <ProtectedRoute
                 successComponent={AppConstantLayout}
+                fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
+                loadingComponent={() => <Loading fullScreen />}
+              />
+            }
+          ></Route>
+          <Route
+            path={LOCAL_CONSTANTS.ROUTES.ALL_TRIGGERS.code}
+            element={
+              <ProtectedRoute
+                successComponent={TriggerLayout}
                 fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
                 loadingComponent={() => <Loading fullScreen />}
               />

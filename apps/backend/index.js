@@ -5,13 +5,14 @@ const { expressApp } = require("./config/express.app");
 const { httpServer } = require("./config/http.server");
 const Logger = require("./utils/logger");
 const { CustomCronJobScheduler } = require("./jobs/cron.jobs");
+const { pgPool } = require("./config/pg");
 
 expressApp.use(cookieParser());
 expressApp.use("/admin_api/auth", require("./modules/auth/auth.route"));
 
 expressApp.use(
   "/admin_api/app_constants",
-  require("./modules/appConstants/appConstants.route")
+  require("./modules/appConstants/app_constants.route")
 );
 
 expressApp.use("/admin_api/schemas", require("./modules/schema/schema.route"));
@@ -32,6 +33,16 @@ expressApp.use(
 expressApp.use("/admin_api/queries", require("./modules/query/query.route"));
 
 expressApp.use("/admin_api/jobs", require("./modules/job/job.route"));
+
+expressApp.use(
+  "/admin_api/trigger_channels",
+  require("./modules/triggersChannels/trigger_channel.route")
+);
+
+expressApp.use(
+  "/admin_api/triggers",
+  require("./modules/triggers/trigger.route")
+);
 
 expressApp.get("/", async (req, res) => {
   Logger.log("warning", {

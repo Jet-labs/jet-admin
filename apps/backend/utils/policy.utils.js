@@ -701,4 +701,41 @@ policyUtils.extractAuthorizationForAccountAddFromPolicyObject = ({
   return false;
 };
 
+
+policyUtils.extractAuthorizedTriggersForReadFromPolicyObject = ({
+  policyObject,
+}) => {
+  return Boolean(policyObject.triggers?.read);
+};
+
+policyUtils.extractAuthorizedTriggersForAddFromPolicyObject = ({
+  policyObject,
+}) => {
+  return Boolean(policyObject.triggers?.edit);
+};
+policyUtils.extractAuthorizedTriggersForDeleteFromPolicyObject = ({
+  policyObject,
+}) => {
+  return Boolean(policyObject.triggers?.delete);
+};
+
+policyUtils.extractAuthorizedTriggerChannelsForReadFromPolicyObject = ({
+  policyObject,
+}) => {
+  return Boolean(policyObject.triggers?.read);
+};
+
+policyUtils.extractAuthorizedTriggerChannelsForAddFromPolicyObject = ({
+  policyObject,
+}) => {
+  return Boolean(policyObject.triggers?.edit);
+};
+policyUtils.extractAuthorizedTriggerChannelsForDeleteFromPolicyObject = ({
+  policyObject,
+}) => {
+  return Boolean(policyObject.triggers?.delete);
+};
+
+
+
 module.exports = { policyUtils };
