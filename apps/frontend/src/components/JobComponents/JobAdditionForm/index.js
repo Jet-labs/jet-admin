@@ -94,7 +94,7 @@ export const JobAdditionForm = () => {
       </div>
 
       <Grid container className="!h-full">
-        <Grid item sx={6} md={6} lg={6} className="w-full">
+        <Grid item sx={12} md={12} lg={6} className="w-full">
           <FormControl fullWidth size="small" className="!mt-2 !px-3">
             <span className="text-xs font-light  !capitalize mb-1">{`Title`}</span>
 
@@ -136,21 +136,18 @@ export const JobAdditionForm = () => {
             </Select>
           </FormControl>
 
-          <div className="!flex flex-row justify-end items-center mt-10 w-100 px-3">
+          <div className="!mt-2 px-3 pb-3">
+            <span className="text-xs font-light  !capitalize mb-1">{`Schedule the job`}</span>
+            <CronJobScheduler
+              value={jobBuilderForm.values.pm_job_schedule}
+              handleChange={_handleOnScheduleChange}
+            />
+          </div>
+          <div className="!flex flex-row justify-end items-center mt-5 w-100 px-3">
             <Button variant="contained" className="!ml-3" onClick={_addJob}>
               {LOCAL_CONSTANTS.STRINGS.ADD_BUTTON_TEXT}
             </Button>
           </div>
-          <div className="!mt-10 px-3 pb-3">
-            <Tip tip={cron_job_usage_tip}></Tip>
-          </div>
-        </Grid>
-        <Grid item sx={6} md={6} lg={6} className="w-full !h-full !p-2">
-          <span className="text-xs font-light  !capitalize mb-1">{`Schedule the job`}</span>
-          <CronJobScheduler
-            value={jobBuilderForm.values.pm_job_schedule}
-            handleChange={_handleOnScheduleChange}
-          />
         </Grid>
       </Grid>
     </div>
