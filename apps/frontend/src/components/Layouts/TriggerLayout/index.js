@@ -10,9 +10,7 @@ import {
 } from "../../Resizables";
 import { TriggersDrawerList } from "../../DrawerLists/TriggerDrawerList";
 const AddTrigger = lazy(() => import("../../../pages/AddTrigger"));
-// const UpdateAppConstant = lazy(() =>
-//   import("../../../pages/UpdateAppConstant")
-// );
+const TriggerInfoView = lazy(() => import("../../../pages/TriggerInfoView"));
 
 const TriggerLayout = () => {
   return (
@@ -34,10 +32,10 @@ const TriggerLayout = () => {
             element={<AddTrigger />}
           />
 
-          {/* <Route
-            path={LOCAL_CONSTANTS.ROUTES.APP_CONSTANT_VIEW.code}
-            element={<UpdateAppConstant />}
-          /> */}
+          <Route
+            path={LOCAL_CONSTANTS.ROUTES.TRIGGER_VIEW.code}
+            element={<TriggerInfoView />}
+          />
         </Routes>
         <Outlet />
       </ResizablePanel>

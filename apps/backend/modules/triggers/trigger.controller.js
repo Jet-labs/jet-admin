@@ -21,11 +21,11 @@ triggerController.getAllTriggers = async (req, res) => {
     const triggers = await TriggerService.getAllTriggers();
     Logger.log("success", {
       message: "triggerController:getAllTriggers:success",
-      params: { pm_user_id, triggersLength: triggers.rows.length },
+      params: { pm_user_id, triggersLength: triggers.length },
     });
     return res.json({
       success: true,
-      triggers: triggers.rows,
+      triggers: triggers,
     });
   } catch (error) {
     Logger.log("error", {
@@ -45,15 +45,18 @@ triggerController.getAllTriggers = async (req, res) => {
 triggerController.getTriggerByID = async (req, res) => {
   try {
     const { pmUser, state, params } = req;
-    const pm_trigger_id = parseInt(params.id);
+    const triggerNameWithTableName = params.id;
     const pm_user_id = parseInt(pmUser.pm_user_id);
     Logger.log("info", {
       message: "triggerController:getTriggerByID:params",
-      params: { pm_user_id, pm_trigger_id },
+      params: { pm_user_id, triggerNameWithTableName },
     });
-
+    const triggerNameWithTableNameSplit = String(
+      triggerNameWithTableName
+    ).split("-");
     const trigger = await TriggerService.getTriggerByID({
-      triggerID: pm_trigger_id,
+      pmTriggerName: triggerNameWithTableNameSplit[1],
+      pmTriggerTableName: triggerNameWithTableNameSplit[0],
     });
     Logger.log("success", {
       message: "triggerController:getTriggerByID:success",

@@ -32,12 +32,12 @@ const DashboardLayout = () => {
               isNaN(pinnedDashboardID) ? (
                 <AddDashboardView />
               ) : (
-                // <Navigate
-                //   to={LOCAL_CONSTANTS.ROUTES.DASHBOARD_LAYOUT_VIEW.path(
-                //     pinnedDashboardID
-                //   )}
-                // />
-                <AddTrigger />
+                <Navigate
+                  to={LOCAL_CONSTANTS.ROUTES.DASHBOARD_LAYOUT_VIEW.path(
+                    pinnedDashboardID
+                  )}
+                />
+                // <AddTrigger />
               )
             }
           />

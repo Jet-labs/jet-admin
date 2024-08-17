@@ -160,6 +160,7 @@ export const LOCAL_CONSTANTS = {
     TRIGGER_ADDITION_SUCCESS: "Trigger added!",
     TRIGGER_DELETED_SUCCESS: "Trigger deleted!",
     TRIGGER_ADDITION_PAGE_TITLE: "Add new trigger",
+    TRIGGER_INFO_PAGE_TITLE: "Trigger information",
     TRIGGER_DELETION_CONFIRMATION_TITLE: "Delete trigger?",
     TRIGGER_DELETION_CONFIRMATION_BODY:
       "Are you sure you want to delete trigger",

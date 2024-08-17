@@ -6,6 +6,7 @@ const Logger = require("../../utils/logger");
 const {
   generateCreateTriggerQuery,
   getAllTriggersFromDBQuery,
+  getTriggerByName,
 } = require("../../utils/triggers");
 const { pgPool } = require("../../config/pg");
 // Configure the connection to your PostgreSQL database
@@ -97,10 +98,39 @@ class TriggerService {
       Logger.log("info", {
         message: "TriggerService:getAllTriggers:trigger",
         params: {
-          triggersLength: triggers?.length,
+          triggersLength: triggers?.rows?.length,
         },
       });
-      return triggers;
+      client.release();
+      return triggers.rows.map((row) => {
+        // Extract channel name and condition from the trigger definition if necessary
+        const {
+          schema_name,
+          table_name,
+          trigger_name,
+          timing,
+          events,
+          trigger_args,
+          trigger_definition,
+        } = row;
+
+        const triggerArgs =
+          typeof trigger_args === "string" ? trigger_args.split("\u0000") : [];
+        const channelName = triggerArgs.length > 1 ? triggerArgs[1] : null;
+
+        const conditionMatch = trigger_definition.match(/WHEN \((.*)\)/);
+        const condition = conditionMatch ? conditionMatch[1] : null;
+
+        return {
+          // schemaName: schema_name,
+          pm_trigger_table_name: table_name,
+          pm_trigger_name: trigger_name,
+          pm_trigger_timing: timing,
+          pm_trigger_events: events.filter((event) => event !== "UNKNOWN"), // Filter out unknown events
+          pm_trigger_channel_name: channelName, // Assuming channel name is second argument
+          pm_trigger_condition: condition,
+        };
+      });
     } catch (error) {
       Logger.log("error", {
         message: "TriggerService:getAllTriggers:catch-1",
@@ -113,42 +143,54 @@ class TriggerService {
   /**
    *
    * @param {object} param0
-   * @param {Number} param0.triggerID
-   * @param {Boolean|Array<Number>} param0.authorizedTriggers
+   * @param {String} param0.pmTriggerName
+   * @param {String} param0.pmTriggerTableName
    * @returns {any|null}
    */
-  static getTriggerByID = async ({ triggerID, authorizedTriggers }) => {
+  static getTriggerByID = async ({ pmTriggerName, pmTriggerTableName }) => {
     Logger.log("info", {
       message: "TriggerService:getTriggerByID:params",
       params: {
-        triggerID,
-        authorizedTriggers,
+        pmTriggerName,
+        pmTriggerTableName,
       },
     });
     try {
-      if (
-        authorizedTriggers === true ||
-        authorizedTriggers.includes(triggerID)
-      ) {
-        const trigger = await prisma.tbl_pm_triggers.findUnique({
-          where: {
-            pm_trigger_id: triggerID,
-          },
-        });
-        Logger.log("info", {
-          message: "TriggerService:getTriggerByID:trigger",
-          params: {
-            trigger,
-          },
-        });
-        return trigger;
-      } else {
-        Logger.log("error", {
-          message: "TriggerService:getTriggerByID:catch-2",
-          params: { error: constants.ERROR_CODES.PERMISSION_DENIED },
-        });
-        throw constants.ERROR_CODES.PERMISSION_DENIED;
-      }
+      const client = await pgPool.connect();
+      await client.query("BEGIN");
+      const result = await client.query(getTriggerByName(), [
+        pmTriggerName,
+        pmTriggerTableName,
+      ]);
+      await client.query("COMMIT");
+      client.release();
+      return result.rows.map((row) => {
+        const {
+          schema_name,
+          table_name,
+          trigger_name,
+          timing,
+          events,
+          trigger_args,
+          trigger_definition,
+        } = row;
+
+        const triggerArgs =
+          typeof trigger_args === "string" ? trigger_args.split("\u0000") : [];
+        const channelName = triggerArgs.length > 1 ? triggerArgs[1] : null;
+
+        const conditionMatch = trigger_definition.match(/WHEN \((.*)\)/);
+        const condition = conditionMatch ? conditionMatch[1] : null;
+
+        return {
+          pm_trigger_table_name: table_name,
+          pm_trigger_name: trigger_name,
+          pm_trigger_timing: timing,
+          pm_trigger_events: events.filter((event) => event !== "UNKNOWN"), // Filter out unknown events
+          pm_trigger_channel_name: channelName, // Assuming channel name is second argument
+          pm_trigger_condition: condition,
+        };
+      })[0]; // Return only the first match (should be only one)
     } catch (error) {
       Logger.log("error", {
         message: "TriggerService:getTriggerByID:catch-1",
