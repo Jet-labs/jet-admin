@@ -3,7 +3,7 @@ const constants = require("../../constants");
 const jwt = require("jsonwebtoken");
 const environmentVariables = require("../../environment");
 const Logger = require("../../utils/logger");
-const { comparePasswordWithHash } = require("../../utils/crypto.utils");
+const { comparePasswordWithHash } = require("../../utils/crypto");
 const { auth_db } = require("../../config/sqlite.db");
 
 class AuthService {

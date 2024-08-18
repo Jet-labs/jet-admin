@@ -1,4 +1,4 @@
-const { extractError } = require("../../utils/error.utils");
+const { extractError } = require("../../utils/error");
 const Logger = require("../../utils/logger");
 const { GraphService } = require("./graph.services");
 const graphController = {};

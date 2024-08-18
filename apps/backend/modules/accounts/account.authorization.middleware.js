@@ -1,6 +1,8 @@
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
-const { policyUtils } = require("../../utils/policy.utils");
+const {
+  policyUtils,
+} = require("../../utils/policy-utils/policy-authorization");
 
 const accountAuthorizationMiddleware = {};
 
@@ -26,10 +28,9 @@ accountAuthorizationMiddleware.authorizedAccountsForRead = async (
         "accountAuthorizationMiddleware:authorizedAccountsForRead:params",
       params: { pm_user_id },
     });
-    let authorized_accounts =
-      policyUtils.extractAuthorizedAccountsForReadFromPolicyObject({
-        policyObject: authorization_policy,
-      });
+    let authorized_accounts = policyUtils.extractAccountReadAuthorization({
+      policyObject: authorization_policy,
+    });
 
     req.state = { ...req.state, authorized_accounts };
     Logger.log("success", {
@@ -72,10 +73,9 @@ accountAuthorizationMiddleware.authorizeAccountUpdate = async (
       message: "accountAuthorizationMiddleware:authorizeAccountUpdate:params",
       params: { pm_user_id, query },
     });
-    let authorized_accounts =
-      policyUtils.extractAuthorizedAccountsForUpdateFromPolicyObject({
-        policyObject: authorization_policy,
-      });
+    let authorized_accounts = policyUtils.extractAccountEditAuthorization({
+      policyObject: authorization_policy,
+    });
 
     if (authorized_accounts === false) {
       Logger.log("error", {
@@ -128,10 +128,9 @@ accountAuthorizationMiddleware.authorizeAccountAddition = async (
       message: "accountAuthorizationMiddleware:authorizeAccountAddition:params",
       params: { pm_user_id },
     });
-    let authorization =
-      policyUtils.extractAuthorizationForAccountAddFromPolicyObject({
-        policyObject: authorization_policy,
-      });
+    let authorization = policyUtils.extractAccountAdditionAuthorization({
+      policyObject: authorization_policy,
+    });
 
     if (!authorization) {
       Logger.log("error", {
@@ -185,10 +184,9 @@ accountAuthorizationMiddleware.authorizeAccountDeletion = async (
       message: "accountAuthorizationMiddleware:authorizeAccountDeletion:params",
       params: { pm_user_id, query },
     });
-    let authorized_accounts =
-      policyUtils.extractAuthorizedAccountsForDeleteFromPolicyObject({
-        policyObject: authorization_policy,
-      });
+    let authorized_accounts = policyUtils.extractAccountDeleteAuthorization({
+      policyObject: authorization_policy,
+    });
     if (!authorized_accounts) {
       Logger.log("error", {
         message:

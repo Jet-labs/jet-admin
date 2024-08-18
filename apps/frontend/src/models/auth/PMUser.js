@@ -129,7 +129,7 @@ export class PMUser {
 
   // graphs
 
-  extractAuthorizedGraphsForReadFromPolicyObject = () => {
+  extractGraphReadAuthorization = () => {
     const authorizeGraphIDs = [];
     if (this.policy?.graphs?.read) {
       return true;
@@ -143,7 +143,7 @@ export class PMUser {
     return authorizeGraphIDs;
   };
 
-  extractAuthorizedGraphsForUpdateFromPolicyObject = () => {
+  extractGraphEditAuthorization = () => {
     const authorizeGraphIDs = [];
     if (this.policy?.graphs?.edit) {
       return true;
@@ -157,7 +157,7 @@ export class PMUser {
     return authorizeGraphIDs;
   };
 
-  extractAuthorizationForGraphAddFromPolicyObject = () => {
+  extractGraphAdditionAuthorization = () => {
     if (this.policy?.graphs?.add) {
       return true;
     }
@@ -184,14 +184,14 @@ export class PMUser {
 
   // dashboards
 
-  extractAuthorizationForDashboardAddFromPolicyObject = () => {
+  extractDashboardAdditionAuthorization = () => {
     if (this.policy?.dashboards?.add) {
       return true;
     }
     return false;
   };
 
-  extractAuthorizedDashboardsForReadFromPolicyObject = () => {
+  extractDashboardReadAuthorization = () => {
     const authorizeDashboardIDs = [];
     if (this.policy?.dashboards?.read) {
       return true;
@@ -207,7 +207,7 @@ export class PMUser {
     return authorizeDashboardIDs;
   };
 
-  extractAuthorizedDashboardsForUpdateFromPolicyObject = () => {
+  extractDashboardEditAuthorization = () => {
     const authorizeDashboardIDs = [];
     if (this.policy?.dashboards?.edit) {
       return true;
@@ -252,7 +252,7 @@ export class PMUser {
     return false;
   };
 
-  extractAuthorizedQueriesForReadFromPolicyObject = () => {
+  extractQueryReadAuthorization = () => {
     const authorizeQueryIDs = [];
     if (this.policy?.queries?.read) {
       return true;
@@ -266,7 +266,7 @@ export class PMUser {
     return authorizeQueryIDs;
   };
 
-  extractAuthorizedQueriesForUpdateFromPolicyObject = () => {
+  extractQueryEditAuthorization = () => {
     const authorizeQueryIDs = [];
     if (this.policy?.queries?.edit) {
       return true;
@@ -309,7 +309,7 @@ export class PMUser {
     return false;
   };
 
-  extractAuthorizedJobsForReadFromPolicyObject = () => {
+  extractJobReadAuthorization = () => {
     const authorizeJobIDs = [];
     if (this.policy?.jobs?.read) {
       return true;
@@ -323,7 +323,7 @@ export class PMUser {
     return authorizeJobIDs;
   };
 
-  extractAuthorizedJobsForUpdateFromPolicyObject = () => {
+  extractJobEditAuthorization = () => {
     const authorizeJobIDs = [];
     if (this.policy?.jobs?.edit) {
       return true;
@@ -364,7 +364,7 @@ export class PMUser {
     return false;
   };
 
-  extractAuthorizedAppConstantsForReadFromPolicyObject = () => {
+  extractAppConstantReadAuthorization = () => {
     const authorizeAppConstantIDs = [];
     if (this.policy?.app_constants?.read) {
       return true;
@@ -385,7 +385,7 @@ export class PMUser {
     return authorizeAppConstantIDs;
   };
 
-  extractAuthorizedAppConstantsForUpdateFromPolicyObject = () => {
+  extractAppConstantEditAuthorization = () => {
     const authorizeAppConstantIDs = [];
     if (this.policy?.app_constants?.edit) {
       return true;
@@ -491,7 +491,7 @@ export class PMUser {
     return false;
   };
 
-  extractAuthorizedAccountsForReadFromPolicyObject = () => {
+  extractAccountReadAuthorization = () => {
     const authorizeAccountIDs = [];
     if (this.policy?.accounts?.read) {
       return true;
@@ -505,7 +505,7 @@ export class PMUser {
     return authorizeAccountIDs;
   };
 
-  extractAuthorizedAccountsForUpdateFromPolicyObject = () => {
+  extractAccountEditAuthorization = () => {
     const authorizeAccountIDs = [];
     if (this.policy?.accounts?.edit) {
       return true;

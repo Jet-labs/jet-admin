@@ -1,6 +1,8 @@
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
-const { policyUtils } = require("../../utils/policy.utils");
+const {
+  policyUtils,
+} = require("../../utils/policy-utils/policy-authorization");
 
 const jobAuthorizationMiddleware = {};
 
@@ -25,10 +27,9 @@ jobAuthorizationMiddleware.populateAuthorizedJobsForRead = async (
         "jobAuthorizationMiddleware:populateAuthorizedJobsForRead:params",
       params: { pm_user_id },
     });
-    let authorized_jobs =
-      policyUtils.extractAuthorizedJobsForReadFromPolicyObject({
-        policyObject: authorization_policy,
-      });
+    let authorized_jobs = policyUtils.extractJobReadAuthorization({
+      policyObject: authorization_policy,
+    });
 
     req.state = { ...req.state, authorized_jobs };
     Logger.log("success", {
@@ -70,10 +71,9 @@ jobAuthorizationMiddleware.populateAuthorizedJobsForUpdate = async (
         "jobAuthorizationMiddleware:populateAuthorizedJobsForUpdate:params",
       params: { pm_user_id },
     });
-    let authorized_jobs =
-      policyUtils.extractAuthorizedJobsForUpdateFromPolicyObject({
-        policyObject: authorization_policy,
-      });
+    let authorized_jobs = policyUtils.extractJobEditAuthorization({
+      policyObject: authorization_policy,
+    });
 
     req.state = { ...req.state, authorized_jobs };
     Logger.log("success", {
@@ -116,10 +116,9 @@ jobAuthorizationMiddleware.populateAuthorizedJobsForDelete = async (
         "jobAuthorizationMiddleware:populateAuthorizedJobsForDelete:params",
       params: { pm_user_id },
     });
-    let authorized_jobs =
-      policyUtils.extractAuthorizedJobsForDeleteFromPolicyObject({
-        policyObject: authorization_policy,
-      });
+    let authorized_jobs = policyUtils.extractJobDeleteAuthorization({
+      policyObject: authorization_policy,
+    });
 
     req.state = { ...req.state, authorized_jobs };
     Logger.log("success", {
@@ -162,10 +161,9 @@ jobAuthorizationMiddleware.populateAuthorizationForJobAddition = async (
         "jobAuthorizationMiddleware:populateAuthorizationForJobAddition:params",
       params: { pm_user_id },
     });
-    let authorizationToAdd =
-      policyUtils.extractAuthorizationForJobAddFromPolicyObject({
-        policyObject: authorization_policy,
-      });
+    let authorizationToAdd = policyUtils.extractJobAdditionAuthorization({
+      policyObject: authorization_policy,
+    });
 
     if (!authorizationToAdd) {
       Logger.log("error", {

@@ -1,27 +1,16 @@
-const Logger = require("./logger");
+const Logger = require("../logger");
 
-const policyUtils = {};
+const policyAuthorizations = {};
 
-policyUtils.extractAuthorizationForActions = ({
-  policyObject,
-  actionEntity,
-  actionCommand,
-}) => {
-  if (
-    policyObject.actions &&
-    policyObject.actions[actionEntity] &&
-    policyObject.actions[actionEntity].actions &&
-    policyObject.actions[actionEntity].actions[actionCommand] &&
-    policyObject.actions[actionEntity].actions[actionCommand] == true
-  ) {
+// graph authorizations
+policyAuthorizations.extractGraphAdditionAuthorization = ({ policyObject }) => {
+  if (policyObject.graphs.add) {
     return true;
   }
   return false;
 };
 
-policyUtils.extractAuthorizedGraphsForReadFromPolicyObject = ({
-  policyObject,
-}) => {
+policyAuthorizations.extractGraphReadAuthorization = ({ policyObject }) => {
   const authorizeGraphIDs = [];
   if (policyObject.graphs.read) {
     return true;
@@ -38,9 +27,7 @@ policyUtils.extractAuthorizedGraphsForReadFromPolicyObject = ({
   return authorizeGraphIDs;
 };
 
-policyUtils.extractAuthorizedGraphsForUpdateFromPolicyObject = ({
-  policyObject,
-}) => {
+policyAuthorizations.extractGraphEditAuthorization = ({ policyObject }) => {
   const authorizeGraphIDs = [];
   if (policyObject.graphs.edit) {
     return true;
@@ -57,9 +44,7 @@ policyUtils.extractAuthorizedGraphsForUpdateFromPolicyObject = ({
   return authorizeGraphIDs;
 };
 
-policyUtils.extractAuthorizedGraphsForDeleteFromPolicyObject = ({
-  policyObject,
-}) => {
+policyAuthorizations.extractGraphDeleteAuthorization = ({ policyObject }) => {
   const authorizeGraphIDs = [];
   if (policyObject.graphs.delete) {
     return true;
@@ -76,18 +61,17 @@ policyUtils.extractAuthorizedGraphsForDeleteFromPolicyObject = ({
   return authorizeGraphIDs;
 };
 
-policyUtils.extractAuthorizationForGraphAddFromPolicyObject = ({
+// dashboard authorizations
+policyAuthorizations.extractDashboardAdditionAuthorization = ({
   policyObject,
 }) => {
-  if (policyObject.graphs.add) {
+  if (policyObject.dashboards?.add) {
     return true;
   }
   return false;
 };
 
-policyUtils.extractAuthorizedDashboardsForReadFromPolicyObject = ({
-  policyObject,
-}) => {
+policyAuthorizations.extractDashboardReadAuthorization = ({ policyObject }) => {
   const authorizeDashboardIDs = [];
   if (policyObject.dashboards?.read) {
     return true;
@@ -106,9 +90,7 @@ policyUtils.extractAuthorizedDashboardsForReadFromPolicyObject = ({
   return authorizeDashboardIDs;
 };
 
-policyUtils.extractAuthorizedDashboardsForUpdateFromPolicyObject = ({
-  policyObject,
-}) => {
+policyAuthorizations.extractDashboardEditAuthorization = ({ policyObject }) => {
   const authorizeDashboardIDs = [];
   if (policyObject.dashboards?.edit) {
     return true;
@@ -127,7 +109,7 @@ policyUtils.extractAuthorizedDashboardsForUpdateFromPolicyObject = ({
   return authorizeDashboardIDs;
 };
 
-policyUtils.extractAuthorizedDashboardsForDeleteFromPolicyObject = ({
+policyAuthorizations.extractDashboardDeleteAuthorization = ({
   policyObject,
 }) => {
   const authorizeDashboardIDs = [];
@@ -148,18 +130,15 @@ policyUtils.extractAuthorizedDashboardsForDeleteFromPolicyObject = ({
   return authorizeDashboardIDs;
 };
 
-policyUtils.extractAuthorizationForDashboardAddFromPolicyObject = ({
-  policyObject,
-}) => {
-  if (policyObject.dashboards?.add) {
+// query authorizations
+policyAuthorizations.extractQueryAdditionAuthorization = ({ policyObject }) => {
+  if (policyObject.queries?.add) {
     return true;
   }
   return false;
 };
 
-policyUtils.extractAuthorizedQueriesForReadFromPolicyObject = ({
-  policyObject,
-}) => {
+policyAuthorizations.extractQueryReadAuthorization = ({ policyObject }) => {
   const authorizeQueryIDs = [];
   if (policyObject.queries?.read) {
     return true;
@@ -176,9 +155,7 @@ policyUtils.extractAuthorizedQueriesForReadFromPolicyObject = ({
   return authorizeQueryIDs;
 };
 
-policyUtils.extractAuthorizedQueriesForUpdateFromPolicyObject = ({
-  policyObject,
-}) => {
+policyAuthorizations.extractQueryEditAuthorization = ({ policyObject }) => {
   const authorizeQueryIDs = [];
   if (policyObject.queries?.edit) {
     return true;
@@ -195,9 +172,7 @@ policyUtils.extractAuthorizedQueriesForUpdateFromPolicyObject = ({
   return authorizeQueryIDs;
 };
 
-policyUtils.extractAuthorizedQueriesForDeleteFromPolicyObject = ({
-  policyObject,
-}) => {
+policyAuthorizations.extractQueryDeleteAuthorization = ({ policyObject }) => {
   const authorizeQueryIDs = [];
   if (
     policyObject.queries &&
@@ -220,16 +195,8 @@ policyUtils.extractAuthorizedQueriesForDeleteFromPolicyObject = ({
   return authorizeQueryIDs;
 };
 
-policyUtils.extractAuthorizationForQueryAddFromPolicyObject = ({
-  policyObject,
-}) => {
-  if (policyObject.queries?.add) {
-    return true;
-  }
-  return false;
-};
-
-policyUtils.extractAuthorizedRowsForEditFromPolicyObject = ({
+// table authorizations
+policyAuthorizations.extractAuthorizedRowsForEditFromPolicyObject = ({
   policyObject,
   tableName,
 }) => {
@@ -254,7 +221,7 @@ policyUtils.extractAuthorizedRowsForEditFromPolicyObject = ({
   return authorized_rows;
 };
 
-policyUtils.extractAuthorizedColumnsForEditFromPolicyObject = ({
+policyAuthorizations.extractAuthorizedColumnsForEditFromPolicyObject = ({
   policyObject,
   tableName,
 }) => {
@@ -279,7 +246,7 @@ policyUtils.extractAuthorizedColumnsForEditFromPolicyObject = ({
   return authorized_columns;
 };
 
-policyUtils.extractAuthorizedRowsForReadFromPolicyObject = ({
+policyAuthorizations.extractAuthorizedRowsForReadFromPolicyObject = ({
   policyObject,
   tableName,
 }) => {
@@ -304,7 +271,7 @@ policyUtils.extractAuthorizedRowsForReadFromPolicyObject = ({
   return authorized_rows;
 };
 
-policyUtils.extractAuthorizedColumnsForReadFromPolicyObject = ({
+policyAuthorizations.extractAuthorizedColumnsForReadFromPolicyObject = ({
   policyObject,
   tableName,
 }) => {
@@ -329,7 +296,7 @@ policyUtils.extractAuthorizedColumnsForReadFromPolicyObject = ({
   return authorized_columns;
 };
 
-policyUtils.extractAuthorizedIncludeColumnsForReadFromPolicyObject = ({
+policyAuthorizations.extractAuthorizedIncludeColumnsForReadFromPolicyObject = ({
   policyObject,
   tableName,
 }) => {
@@ -346,7 +313,7 @@ policyUtils.extractAuthorizedIncludeColumnsForReadFromPolicyObject = ({
   return authorized_include_columns;
 };
 
-policyUtils.extractAuthorizedForRowAdditionFromPolicyObject = ({
+policyAuthorizations.extractAuthorizedForRowAdditionFromPolicyObject = ({
   policyObject,
   tableName,
 }) => {
@@ -365,7 +332,7 @@ policyUtils.extractAuthorizedForRowAdditionFromPolicyObject = ({
   return authorization;
 };
 
-policyUtils.extractAuthorizedForRowDeletionFromPolicyObject = ({
+policyAuthorizations.extractAuthorizedForRowDeletionFromPolicyObject = ({
   policyObject,
   tableName,
 }) => {
@@ -384,9 +351,15 @@ policyUtils.extractAuthorizedForRowDeletionFromPolicyObject = ({
   return authorization;
 };
 
-policyUtils.extractAuthorizedJobsForReadFromPolicyObject = ({
-  policyObject,
-}) => {
+// job authorizations
+policyAuthorizations.extractJobAdditionAuthorization = ({ policyObject }) => {
+  if (policyObject.jobs?.add) {
+    return true;
+  }
+  return false;
+};
+
+policyAuthorizations.extractJobReadAuthorization = ({ policyObject }) => {
   const authorizeJobIDs = [];
   if (policyObject.jobs?.read) {
     return true;
@@ -403,9 +376,7 @@ policyUtils.extractAuthorizedJobsForReadFromPolicyObject = ({
   return authorizeJobIDs;
 };
 
-policyUtils.extractAuthorizedJobsForUpdateFromPolicyObject = ({
-  policyObject,
-}) => {
+policyAuthorizations.extractJobEditAuthorization = ({ policyObject }) => {
   const authorizeJobIDs = [];
   if (policyObject.jobs?.edit) {
     return true;
@@ -422,9 +393,7 @@ policyUtils.extractAuthorizedJobsForUpdateFromPolicyObject = ({
   return authorizeJobIDs;
 };
 
-policyUtils.extractAuthorizedJobsForDeleteFromPolicyObject = ({
-  policyObject,
-}) => {
+policyAuthorizations.extractJobDeleteAuthorization = ({ policyObject }) => {
   const authorizeJobIDs = [];
   if (policyObject.jobs?.delete) {
     return true;
@@ -441,16 +410,17 @@ policyUtils.extractAuthorizedJobsForDeleteFromPolicyObject = ({
   return authorizeJobIDs;
 };
 
-policyUtils.extractAuthorizationForJobAddFromPolicyObject = ({
+// app constants authorizations
+policyAuthorizations.extractAppConstantAdditionAuthorization = ({
   policyObject,
 }) => {
-  if (policyObject.jobs?.add) {
+  if (policyObject.app_constants?.add) {
     return true;
   }
   return false;
 };
 
-policyUtils.extractAuthorizedAppConstantsForReadFromPolicyObject = ({
+policyAuthorizations.extractAppConstantReadAuthorization = ({
   policyObject,
 }) => {
   const authorizeAppConstantIDs = [];
@@ -474,7 +444,7 @@ policyUtils.extractAuthorizedAppConstantsForReadFromPolicyObject = ({
   return authorizeAppConstantIDs;
 };
 
-policyUtils.extractAuthorizedAppConstantsForUpdateFromPolicyObject = ({
+policyAuthorizations.extractAppConstantEditAuthorization = ({
   policyObject,
 }) => {
   const authorizeAppConstantIDs = [];
@@ -498,7 +468,7 @@ policyUtils.extractAuthorizedAppConstantsForUpdateFromPolicyObject = ({
   return authorizeAppConstantIDs;
 };
 
-policyUtils.extractAuthorizedAppConstantsForDeleteFromPolicyObject = ({
+policyAuthorizations.extractAppConstantDeleteAuthorization = ({
   policyObject,
 }) => {
   const authorizeAppConstantIDs = [];
@@ -522,18 +492,8 @@ policyUtils.extractAuthorizedAppConstantsForDeleteFromPolicyObject = ({
   return authorizeAppConstantIDs;
 };
 
-policyUtils.extractAuthorizationForAppConstantAddFromPolicyObject = ({
-  policyObject,
-}) => {
-  if (policyObject.app_constants?.add) {
-    return true;
-  }
-  return false;
-};
-
-policyUtils.extractAuthorizedSchemasForReadFromPolicyObject = ({
-  policyObject,
-}) => {
+// schema authorizations
+policyAuthorizations.extractSchemaReadAuthorization = ({ policyObject }) => {
   const authorizeSchemaIDs = [];
   if (policyObject.schemas?.read) {
     return true;
@@ -550,9 +510,7 @@ policyUtils.extractAuthorizedSchemasForReadFromPolicyObject = ({
   return authorizeSchemaIDs;
 };
 
-policyUtils.extractAuthorizedSchemasForUpdateFromPolicyObject = ({
-  policyObject,
-}) => {
+policyAuthorizations.extractSchemaEditAuthorization = ({ policyObject }) => {
   const authorizeSchemaIDs = [];
   if (policyObject.schemas?.edit) {
     return true;
@@ -569,9 +527,17 @@ policyUtils.extractAuthorizedSchemasForUpdateFromPolicyObject = ({
   return authorizeSchemaIDs;
 };
 
-policyUtils.extractAuthorizedPoliciesForReadFromPolicyObject = ({
+// policy authorizations
+policyAuthorizations.extractPolicyAdditionAuthorization = ({
   policyObject,
 }) => {
+  if (policyObject.policies?.add) {
+    return true;
+  }
+  return false;
+};
+
+policyAuthorizations.extractPolicyReadAuthorization = ({ policyObject }) => {
   const authorizePolicyIDs = [];
   if (policyObject.policies?.read) {
     return true;
@@ -588,9 +554,7 @@ policyUtils.extractAuthorizedPoliciesForReadFromPolicyObject = ({
   return authorizePolicyIDs;
 };
 
-policyUtils.extractAuthorizedPoliciesForUpdateFromPolicyObject = ({
-  policyObject,
-}) => {
+policyAuthorizations.extractPolicyEditAuthorization = ({ policyObject }) => {
   const authorizePolicyIDs = [];
   if (policyObject.policies?.edit) {
     return true;
@@ -607,9 +571,7 @@ policyUtils.extractAuthorizedPoliciesForUpdateFromPolicyObject = ({
   return authorizePolicyIDs;
 };
 
-policyUtils.extractAuthorizedPoliciesForDeleteFromPolicyObject = ({
-  policyObject,
-}) => {
+policyAuthorizations.extractPolicyDeleteAuthorization = ({ policyObject }) => {
   const authorizePolicyIDs = [];
   if (policyObject.policies?.delete) {
     return true;
@@ -626,18 +588,17 @@ policyUtils.extractAuthorizedPoliciesForDeleteFromPolicyObject = ({
   return authorizePolicyIDs;
 };
 
-policyUtils.extractAuthorizationForPolicyAddFromPolicyObject = ({
+// account authorizations
+policyAuthorizations.extractAccountAdditionAuthorization = ({
   policyObject,
 }) => {
-  if (policyObject.policies?.add) {
+  if (policyObject.accounts?.add) {
     return true;
   }
   return false;
 };
 
-policyUtils.extractAuthorizedAccountsForReadFromPolicyObject = ({
-  policyObject,
-}) => {
+policyAuthorizations.extractAccountReadAuthorization = ({ policyObject }) => {
   const authorizeAccountIDs = [];
   if (policyObject.accounts?.read) {
     return true;
@@ -654,9 +615,7 @@ policyUtils.extractAuthorizedAccountsForReadFromPolicyObject = ({
   return authorizeAccountIDs;
 };
 
-policyUtils.extractAuthorizedAccountsForUpdateFromPolicyObject = ({
-  policyObject,
-}) => {
+policyAuthorizations.extractAccountEditAuthorization = ({ policyObject }) => {
   const authorizeAccountIDs = [];
   if (policyObject.accounts?.edit) {
     return true;
@@ -673,9 +632,7 @@ policyUtils.extractAuthorizedAccountsForUpdateFromPolicyObject = ({
   return authorizeAccountIDs;
 };
 
-policyUtils.extractAuthorizedAccountsForDeleteFromPolicyObject = ({
-  policyObject,
-}) => {
+policyAuthorizations.extractAccountDeleteAuthorization = ({ policyObject }) => {
   const authorizeAccountIDs = [];
   if (policyObject.accounts?.delete) {
     return true;
@@ -692,50 +649,19 @@ policyUtils.extractAuthorizedAccountsForDeleteFromPolicyObject = ({
   return authorizeAccountIDs;
 };
 
-policyUtils.extractAuthorizationForAccountAddFromPolicyObject = ({
-  policyObject,
-}) => {
-  if (policyObject.accounts?.add) {
-    return true;
-  }
-  return false;
-};
-
-
-policyUtils.extractAuthorizedTriggersForReadFromPolicyObject = ({
-  policyObject,
-}) => {
-  return Boolean(policyObject.triggers?.read);
-};
-
-policyUtils.extractAuthorizedTriggersForAddFromPolicyObject = ({
+// trigger authorizations
+policyAuthorizations.extractTriggerAdditionAuthorization = ({
   policyObject,
 }) => {
   return Boolean(policyObject.triggers?.edit);
 };
-policyUtils.extractAuthorizedTriggersForDeleteFromPolicyObject = ({
-  policyObject,
-}) => {
-  return Boolean(policyObject.triggers?.delete);
-};
 
-policyUtils.extractAuthorizedTriggerChannelsForReadFromPolicyObject = ({
-  policyObject,
-}) => {
+policyAuthorizations.extractTriggerReadAuthorization = ({ policyObject }) => {
   return Boolean(policyObject.triggers?.read);
 };
 
-policyUtils.extractAuthorizedTriggerChannelsForAddFromPolicyObject = ({
-  policyObject,
-}) => {
-  return Boolean(policyObject.triggers?.edit);
-};
-policyUtils.extractAuthorizedTriggerChannelsForDeleteFromPolicyObject = ({
-  policyObject,
-}) => {
+policyAuthorizations.extractTriggerDeleteAuthorization = ({ policyObject }) => {
   return Boolean(policyObject.triggers?.delete);
 };
 
-
-
-module.exports = { policyUtils };
+module.exports = { policyAuthorizations };

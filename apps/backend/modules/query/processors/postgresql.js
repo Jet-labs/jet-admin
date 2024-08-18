@@ -7,9 +7,12 @@ const {
   extractVariablesFromQuery,
   replaceQueryIDStringWithQueryID,
   replaceAppConstantIDStringWithAppConstantID,
-} = require("../../../utils/parser.util");
+} = require("../../../utils/query-utils/variable-parser");
 const { Prisma } = require("@prisma/client");
-const { isDMLQuery, isDQLQuery } = require("../../../utils/validation.util");
+const {
+  isDMLQuery,
+  isDQLQuery,
+} = require("../../../utils/postgres-utils/query-validation");
 const jsonSchemaGenerator = require("json-schema-generator");
 /**
  *

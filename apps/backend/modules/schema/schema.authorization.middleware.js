@@ -1,6 +1,8 @@
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
-const { policyUtils } = require("../../utils/policy.utils");
+const {
+  policyUtils,
+} = require("../../utils/policy-utils/policy-authorization");
 
 const schemaAuthorizationMiddleware = {};
 
@@ -25,11 +27,9 @@ schemaAuthorizationMiddleware.populateAuthorizedSchemasForRead = async (
         "schemaAuthorizationMiddleware:populateAuthorizedSchemasForRead:params",
       params: { pm_user_id },
     });
-    let authorized_schemas =
-      policyUtils.extractAuthorizedSchemasForReadFromPolicyObject({
-        policyObject: authorization_policy,
-      });
-
+    let authorized_schemas = policyUtils.extractSchemaReadAuthorization({
+      policyObject: authorization_policy,
+    });
 
     req.state = { ...req.state, authorized_schemas };
     Logger.log("success", {
@@ -71,10 +71,9 @@ schemaAuthorizationMiddleware.populateAuthorizedSchemasForUpdate = async (
         "schemaAuthorizationMiddleware:populateAuthorizedSchemasForUpdate:params",
       params: { pm_user_id },
     });
-    let authorized_schemas =
-      policyUtils.extractAuthorizedSchemasForUpdateFromPolicyObject({
-        policyObject: authorization_policy,
-      });
+    let authorized_schemas = policyUtils.extractSchemaEditAuthorization({
+      policyObject: authorization_policy,
+    });
 
     req.state = { ...req.state, authorized_schemas };
     Logger.log("success", {

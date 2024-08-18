@@ -25,7 +25,7 @@ export const GraphDrawerList = () => {
   const { pmUser } = useAuthState();
   const navigate = useNavigate();
   const isAuthorizedToAddGraph = useMemo(() => {
-    return pmUser && pmUser.extractAuthorizationForGraphAddFromPolicyObject();
+    return pmUser && pmUser.extractGraphAdditionAuthorization();
   }, [pmUser]);
   const {
     isLoading: isLoadingGraphs,

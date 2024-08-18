@@ -1,5 +1,5 @@
 const constants = require("../../constants");
-const { extractError } = require("../../utils/error.utils");
+const { extractError } = require("../../utils/error");
 const Logger = require("../../utils/logger");
 const { AccountService } = require("./account.services");
 

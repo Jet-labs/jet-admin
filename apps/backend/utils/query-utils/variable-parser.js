@@ -1,5 +1,5 @@
-const constants = require("../constants");
-const Logger = require("./logger");
+const constants = require("../../constants");
+const Logger = require("../logger");
 
 const evaluateAST = (ast, context) => {
   const traverse = (node, context) => {
@@ -85,6 +85,7 @@ const replaceAppConstantIDStringWithAppConstantID = (matchedVariable) => {
   });
   return { appConstantIDStringWithReplacedAppConstantID, pmAppConstantIDs };
 };
+
 module.exports = {
   evaluateAST,
   extractVariablesFromQuery,

@@ -1,8 +1,10 @@
 const { prisma, dbModel } = require("../../config/prisma");
 const constants = require("../../constants");
-const { extractError } = require("../../utils/error.utils");
+const { extractError } = require("../../utils/error");
 const Logger = require("../../utils/logger");
-const { policyUtils } = require("../../utils/policy.utils");
+const {
+  policyUtils,
+} = require("../../utils/policy-utils/policy-authorization");
 const { TableService } = require("./table.services");
 const { createObjectCsvStringifier } = require("csv-writer");
 const ExcelJS = require("exceljs");

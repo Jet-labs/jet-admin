@@ -24,9 +24,7 @@ export const DashboardsDrawerList = () => {
   const { pmUser } = useAuthState();
   const navigate = useNavigate();
   const isAuthorizedToAddDashboard = useMemo(() => {
-    return (
-      pmUser && pmUser.extractAuthorizationForDashboardAddFromPolicyObject()
-    );
+    return pmUser && pmUser.extractDashboardAdditionAuthorization();
   }, [pmUser]);
   const {
     isLoading: isLoadingDashboards,

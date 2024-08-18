@@ -4,7 +4,7 @@ const constants = require("../../constants");
 const Logger = require("../../utils/logger");
 const {
   SCHEMA_INFO_CONSTANTS,
-} = require("../../utils/postgres-utils/info-constants");
+} = require("../../utils/postgres-utils/db-info-queries");
 class SchemaService {
   constructor() {}
 

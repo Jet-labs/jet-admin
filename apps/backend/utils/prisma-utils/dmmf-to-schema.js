@@ -4,7 +4,7 @@ const {
   dmmfEnumsDeserializer,
   dmmfModelsdeserializer,
   generatorsDeserializer,
-} = require("./util/parser");
+} = require("./util/dmmf-parser");
 
 export const dmmfToSchema = async ({
   dmmf: { models, enums },

@@ -1,6 +1,8 @@
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
-const { policyUtils } = require("../../utils/policy.utils");
+const {
+  policyUtils,
+} = require("../../utils/policy-utils/policy-authorization");
 
 const dashboardAuthorizationMiddleware = {};
 
@@ -25,10 +27,9 @@ dashboardAuthorizationMiddleware.populateAuthorizedDashboardsForRead = async (
         "dashboardAuthorizationMiddleware:populateAuthorizedDashboardsForRead:params",
       params: { pm_user_id },
     });
-    let authorized_dashboards =
-      policyUtils.extractAuthorizedDashboardsForReadFromPolicyObject({
-        policyObject: authorization_policy,
-      });
+    let authorized_dashboards = policyUtils.extractDashboardReadAuthorization({
+      policyObject: authorization_policy,
+    });
 
     req.state = { ...req.state, authorized_dashboards };
     Logger.log("success", {
@@ -70,10 +71,9 @@ dashboardAuthorizationMiddleware.populateAuthorizedDashboardsForUpdate = async (
         "dashboardAuthorizationMiddleware:populateAuthorizedDashboardsForUpdate:params",
       params: { pm_user_id },
     });
-    let authorized_dashboards =
-      policyUtils.extractAuthorizedDashboardsForUpdateFromPolicyObject({
-        policyObject: authorization_policy,
-      });
+    let authorized_dashboards = policyUtils.extractDashboardEditAuthorization({
+      policyObject: authorization_policy,
+    });
 
     req.state = { ...req.state, authorized_dashboards };
     Logger.log("success", {
@@ -116,10 +116,11 @@ dashboardAuthorizationMiddleware.populateAuthorizedDashboardsForDelete = async (
         "dashboardAuthorizationMiddleware:populateAuthorizedDashboardsForDelete:params",
       params: { pm_user_id },
     });
-    let authorized_dashboards =
-      policyUtils.extractAuthorizedDashboardsForDeleteFromPolicyObject({
+    let authorized_dashboards = policyUtils.extractDashboardDeleteAuthorization(
+      {
         policyObject: authorization_policy,
-      });
+      }
+    );
 
     req.state = { ...req.state, authorized_dashboards };
     Logger.log("success", {
@@ -160,7 +161,7 @@ dashboardAuthorizationMiddleware.populateAuthorizationForDashboardAddition =
         params: { pm_user_id },
       });
       let authorizationToAdd =
-        policyUtils.extractAuthorizationForDashboardAddFromPolicyObject({
+        policyUtils.extractDashboardAdditionAuthorization({
           policyObject: authorization_policy,
         });
 

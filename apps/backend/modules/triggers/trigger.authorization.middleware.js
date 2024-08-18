@@ -1,6 +1,8 @@
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
-const { policyUtils } = require("../../utils/policy.utils");
+const {
+  policyUtils,
+} = require("../../utils/policy-utils/policy-authorization");
 
 const triggerAuthorizationMiddleware = {};
 
@@ -26,7 +28,7 @@ triggerAuthorizationMiddleware.populateAuthorizedTriggersForRead = async (
       params: { pm_user_id },
     });
     if (
-      policyUtils.extractAuthorizedTriggersForReadFromPolicyObject({
+      policyUtils.extractTriggerReadAuthorization({
         policyObject: authorization_policy,
       })
     ) {
@@ -82,7 +84,7 @@ triggerAuthorizationMiddleware.populateAuthorizedTriggersForAdd = async (
       params: { pm_user_id },
     });
     if (
-      policyUtils.extractAuthorizedTriggersForAddFromPolicyObject({
+      policyUtils.extractTriggerAdditionAuthorization({
         policyObject: authorization_policy,
       })
     ) {
@@ -138,7 +140,7 @@ triggerAuthorizationMiddleware.populateAuthorizedTriggersForDelete = async (
       params: { pm_user_id },
     });
     if (
-      policyUtils.extractAuthorizedTriggersForDeleteFromPolicyObject({
+      policyUtils.extractTriggerDeleteAuthorization({
         policyObject: authorization_policy,
       })
     ) {

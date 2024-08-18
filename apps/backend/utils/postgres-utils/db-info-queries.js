@@ -35,15 +35,6 @@ LEFT JOIN primary_keys ON table_info.table_id = primary_keys.table_id;
 
 `,
   },
-  //   TABLE_SIZE: {
-  //     result_type: "array",
-  //     raw_query: `SELECT
-  //     table_schema || '.' || table_name AS table_full_name,
-  //     pg_size_pretty(pg_total_relation_size(table_schema || '.' || table_name)) AS total_size
-  // FROM information_schema.tables
-  // WHERE table_type = 'BASE TABLE'
-  // ORDER BY pg_total_relation_size(table_schema || '.' || table_name) DESC;`,
-  //   },
   TABLE_STATS: {
     raw_query: `SELECT 
     schemaname, 

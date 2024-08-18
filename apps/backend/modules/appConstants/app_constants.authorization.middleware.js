@@ -1,6 +1,8 @@
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
-const { policyUtils } = require("../../utils/policy.utils");
+const {
+  policyUtils,
+} = require("../../utils/policy-utils/policy-authorization");
 
 const appConstantAuthorizationMiddleware = {};
 
@@ -23,7 +25,7 @@ appConstantAuthorizationMiddleware.populateAuthorizedAppConstantsForRead =
         params: { pm_user_id },
       });
       let authorized_app_constants =
-        policyUtils.extractAuthorizedAppConstantsForReadFromPolicyObject({
+        policyUtils.extractAppConstantReadAuthorization({
           policyObject: authorization_policy,
         });
 
@@ -65,7 +67,7 @@ appConstantAuthorizationMiddleware.populateAuthorizedAppConstantsForUpdate =
         params: { pm_user_id },
       });
       let authorized_app_constants =
-        policyUtils.extractAuthorizedAppConstantsForUpdateFromPolicyObject({
+        policyUtils.extractAppConstantEditAuthorization({
           policyObject: authorization_policy,
         });
 
@@ -108,7 +110,7 @@ appConstantAuthorizationMiddleware.populateAuthorizedAppConstantsForDelete =
         params: { pm_user_id },
       });
       let authorized_app_constants =
-        policyUtils.extractAuthorizedAppConstantsForDeleteFromPolicyObject({
+        policyUtils.extractAppConstantDeleteAuthorization({
           policyObject: authorization_policy,
         });
 
@@ -151,7 +153,7 @@ appConstantAuthorizationMiddleware.populateAuthorizationForAppConstantAddition =
         params: { pm_user_id },
       });
       let authorizationToAdd =
-        policyUtils.extractAuthorizationForAppConstantAddFromPolicyObject({
+        policyUtils.extractAppConstantAdditionAuthorization({
           policyObject: authorization_policy,
         });
 

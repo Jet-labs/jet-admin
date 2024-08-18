@@ -7,7 +7,7 @@ const {
   generateCreateTriggerQuery,
   getAllTriggersFromDBQuery,
   getTriggerByName,
-} = require("../../utils/triggers");
+} = require("../../utils/postgres-utils/triggers-queries");
 const { pgPool } = require("../../config/pg");
 // Configure the connection to your PostgreSQL database
 
