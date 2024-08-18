@@ -645,7 +645,7 @@ policyAuthorizations.extractTriggerDeleteAuthorization = ({ policyObject }) => {
 
 // trigger authorizations
 policyAuthorizations.extractTriggerAddAuthorization = ({ policyObject }) => {
-  return Boolean(policyObject.triggers?.edit);
+  return Boolean(policyObject.triggers?.add);
 };
 
 policyAuthorizations.extractTriggerReadAuthorization = ({ policyObject }) => {

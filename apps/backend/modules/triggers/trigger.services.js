@@ -14,6 +14,17 @@ const { pgPool } = require("../../config/pg");
 class TriggerService {
   constructor() {}
 
+  static setupTriggerNotificationChannel = async () => {
+    const client = await pgPool.connect();
+    client.query("LISTEN help_channel");
+    client.on("notification", async (msg) => {
+      const payload = JSON.parse(msg.payload);
+      console.log("Received notification:", payload);
+      // Execute your Node.js code here based on the notification
+      // For example, you might want to trigger an external API call, log data, etc.
+    });
+  };
+
   /**
    *
    * @param {object} param0
@@ -65,7 +76,7 @@ class TriggerService {
       Logger.log("success", {
         message: "TriggerService:addTrigger:newTrigger",
         params: {
-          triggerTitle,
+          pmTriggerName,
           newTrigger,
         },
       });

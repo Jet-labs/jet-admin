@@ -102,7 +102,7 @@ export const AppConstantUpdateForm = ({ id }) => {
         <span className="text-lg font-bold text-start">
           {LOCAL_CONSTANTS.STRINGS.APP_CONSTANT_UPDATE_PAGE_TITLE}
         </span>
-        <span className="text-xs font-medium text-start mt-1">{`AppConstant id : ${id}`}</span>
+        <span className="text-xs font-medium text-start mt-1">{`App constant id : ${id}`}</span>
       </div>
 
       <Grid

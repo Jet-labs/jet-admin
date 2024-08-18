@@ -23,17 +23,14 @@ const generateCreateTriggerQuery = ({
   pmTriggerChannelName,
   pmTriggerMethod,
   pmTriggerCondition,
-}) => `CREATE TRIGGER ${pmTriggerName}
-${pmTriggerTiming} ${pmTriggerEvents.join(" OR ")} ON ${
-  schemaName ? schemaName + "." : "public."
-}${pmTriggerTableName}
-${pmTriggerCondition ? `WHEN (${pmTriggerCondition})` : ""}
-${pmTriggerMethod} //FOR EACH ROW
-EXECUTE FUNCTION pm_trigger_notify_event(
-    '${pmTriggerEvents.join(", ")}',
-    '${pmTriggerChannelName}'
-);
-`;
+}) =>
+  `CREATE TRIGGER ${pmTriggerName} ${pmTriggerTiming} ${pmTriggerEvents.join(
+    " OR "
+  )} ON ${schemaName ? schemaName + "." : "public."}${pmTriggerTableName} ${
+    pmTriggerCondition ? `WHEN (${pmTriggerCondition})` : ""
+  } ${pmTriggerMethod} EXECUTE FUNCTION pm_trigger_notify_event('${pmTriggerEvents.join(
+    ", "
+  )}','${pmTriggerChannelName}');`;
 /**
  *
  * @returns

@@ -9,6 +9,7 @@ import { AppConstantPolicyEditor } from "../AppConstantPolicyEditor";
 import { SchemaPolicyEditor } from "../SchemaPolicyEditor";
 import { PolicyObjectPolicyEditor } from "../PolicyObjectPolicyEditor";
 import { AccountPolicyEditor } from "../AccountPolicyEditor";
+import { TriggerPolicyEditor } from "../TriggerPolicyEditor";
 
 export const GUIPolicyEditor = ({ policy, handleChange, containerClass }) => {
   return (
@@ -116,6 +117,17 @@ export const GUIPolicyEditor = ({ policy, handleChange, containerClass }) => {
             case "accounts": {
               component = (
                 <AccountPolicyEditor
+                  value={policy[key]}
+                  handleChange={(value) => {
+                    handleChange({ ...policy, [key]: value });
+                  }}
+                />
+              );
+              break;
+            }
+            case "triggers": {
+              component = (
+                <TriggerPolicyEditor
                   value={policy[key]}
                   handleChange={(value) => {
                     handleChange({ ...policy, [key]: value });

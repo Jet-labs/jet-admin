@@ -8,10 +8,12 @@ import { getAllPoliciesAPI } from "../../../api/policy";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { FieldComponent } from "../../FieldComponent";
+import { useNavigate } from "react-router-dom";
 
 export const AccountAdditionForm = ({ tableName }) => {
   const theme = useTheme();
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const {
     isLoading: isLoadingPolicyObjectData,
@@ -53,6 +55,7 @@ export const AccountAdditionForm = ({ tableName }) => {
       queryClient.invalidateQueries([
         LOCAL_CONSTANTS.REACT_QUERY_KEYS.ACCOUNTS,
       ]);
+      navigate(-1);
     },
     onError: (error) => {
       displayError(error);

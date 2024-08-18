@@ -3,7 +3,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Button } from "@mui/material";
 import { useMemo, useState } from "react";
 import { IoTrash } from "react-icons/io5";
-import { deleteRowByIDAPI } from "../../../api/tables";
 import { useAuthState } from "../../../contexts/authContext";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { ConfirmationDialog } from "../../ConfirmationDialog";
