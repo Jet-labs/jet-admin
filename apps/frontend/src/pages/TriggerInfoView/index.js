@@ -74,6 +74,16 @@ const TriggerInfoView = () => {
               {trigger.pm_trigger_channel_name}
             </span>
           )}
+          {trigger.pm_trigger_function_name && (
+            <span className="text-xs font-thin  text-start mt-3">
+              Function name
+            </span>
+          )}
+          {trigger.pm_trigger_function_name && (
+            <span className="text-base font-semibold text-start mt-1">
+              {trigger.pm_trigger_function_name}
+            </span>
+          )}
         </div>
       )}
     </div>

@@ -6,6 +6,8 @@ export class Trigger {
     pm_trigger_events,
     pm_trigger_channel_name,
     pm_trigger_condition,
+    pm_trigger_function_name,
+    pm_trigger_function_args,
   }) {
     this.pm_trigger_name = pm_trigger_name;
     this.pm_trigger_table_name = pm_trigger_table_name;
@@ -14,6 +16,8 @@ export class Trigger {
     this.pm_trigger_events = pm_trigger_events;
     this.pm_trigger_channel_name = pm_trigger_channel_name;
     this.pm_trigger_condition = pm_trigger_condition;
+    this.pm_trigger_function_name = pm_trigger_function_name;
+    this.pm_trigger_function_args = pm_trigger_function_args;
   }
   static toList = (data) => {
     if (Array.isArray(data)) {

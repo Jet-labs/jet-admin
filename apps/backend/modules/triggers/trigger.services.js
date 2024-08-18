@@ -9,6 +9,9 @@ const {
   getTriggerByName,
 } = require("../../utils/postgres-utils/triggers-queries");
 const { pgPool } = require("../../config/pg");
+const {
+  parseTriggerDefinition,
+} = require("../../utils/postgres-utils/parsers");
 // Configure the connection to your PostgreSQL database
 
 class TriggerService {
@@ -113,33 +116,25 @@ class TriggerService {
         },
       });
       client.release();
-      return triggers.rows.map((row) => {
+      return triggers.rows.map((trigger) => {
         // Extract channel name and condition from the trigger definition if necessary
-        const {
-          schema_name,
-          table_name,
-          trigger_name,
-          timing,
-          events,
-          trigger_args,
-          trigger_definition,
-        } = row;
 
-        const triggerArgs =
-          typeof trigger_args === "string" ? trigger_args.split("\u0000") : [];
-        const channelName = triggerArgs.length > 1 ? triggerArgs[1] : null;
-
-        const conditionMatch = trigger_definition.match(/WHEN \((.*)\)/);
-        const condition = conditionMatch ? conditionMatch[1] : null;
+        const parsedTriggerDefinition = parseTriggerDefinition(
+          trigger.trigger_definition
+        );
 
         return {
           // schemaName: schema_name,
-          pm_trigger_table_name: table_name,
-          pm_trigger_name: trigger_name,
-          pm_trigger_timing: timing,
-          pm_trigger_events: events.filter((event) => event !== "UNKNOWN"), // Filter out unknown events
-          pm_trigger_channel_name: channelName, // Assuming channel name is second argument
-          pm_trigger_condition: condition,
+          pm_trigger_table_name: parsedTriggerDefinition.trigger_table_name,
+          pm_trigger_name: parsedTriggerDefinition.trigger_name,
+          pm_trigger_timing: parsedTriggerDefinition.trigger_timing,
+          pm_trigger_events: parsedTriggerDefinition.trigger_events, // Filter out unknown events
+          pm_trigger_channel_name: parsedTriggerDefinition.trigger_channel, // Assuming channel name is second argument
+          pm_trigger_condition: parsedTriggerDefinition.trigger_condition,
+          pm_trigger_function_name:
+            parsedTriggerDefinition.trigger_function_name,
+          pm_trigger_function_args:
+            parsedTriggerDefinition.trigger_function_args,
         };
       });
     } catch (error) {
@@ -175,33 +170,22 @@ class TriggerService {
       ]);
       await client.query("COMMIT");
       client.release();
-      return result.rows.map((row) => {
-        const {
-          schema_name,
-          table_name,
-          trigger_name,
-          timing,
-          events,
-          trigger_args,
-          trigger_definition,
-        } = row;
+      const parsedTriggerDefinition = parseTriggerDefinition(
+        result.rows[0].trigger_definition
+      );
 
-        const triggerArgs =
-          typeof trigger_args === "string" ? trigger_args.split("\u0000") : [];
-        const channelName = triggerArgs.length > 1 ? triggerArgs[1] : null;
-
-        const conditionMatch = trigger_definition.match(/WHEN \((.*)\)/);
-        const condition = conditionMatch ? conditionMatch[1] : null;
-
-        return {
-          pm_trigger_table_name: table_name,
-          pm_trigger_name: trigger_name,
-          pm_trigger_timing: timing,
-          pm_trigger_events: events.filter((event) => event !== "UNKNOWN"), // Filter out unknown events
-          pm_trigger_channel_name: channelName, // Assuming channel name is second argument
-          pm_trigger_condition: condition,
-        };
-      })[0]; // Return only the first match (should be only one)
+      return {
+        // schemaName: schema_name,
+        pm_trigger_table_name: parsedTriggerDefinition.trigger_table_name,
+        pm_trigger_name: parsedTriggerDefinition.trigger_name,
+        pm_trigger_timing: parsedTriggerDefinition.trigger_timing,
+        pm_trigger_events: parsedTriggerDefinition.trigger_events, // Filter out unknown events
+        pm_trigger_channel_name: parsedTriggerDefinition.trigger_function_name, // Assuming channel name is second argument
+        pm_trigger_condition: parsedTriggerDefinition.trigger_condition,
+        pm_trigger_function_name: parsedTriggerDefinition.trigger_function_name,
+        pm_trigger_function_args: parsedTriggerDefinition.trigger_function_args,
+        pm_trigger_channel_name: parsedTriggerDefinition.trigger_channel,
+      };
     } catch (error) {
       Logger.log("error", {
         message: "TriggerService:getTriggerByID:catch-1",
