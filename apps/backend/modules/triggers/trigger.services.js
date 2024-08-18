@@ -7,6 +7,7 @@ const {
   generateCreateTriggerQuery,
   getAllTriggersFromDBQuery,
   getTriggerByName,
+  deleteTriggerByName,
 } = require("../../utils/postgres-utils/triggers-queries");
 const { pgPool } = require("../../config/pg");
 const {
@@ -198,42 +199,30 @@ class TriggerService {
   /**
    *
    * @param {object} param0
-   * @param {Number} param0.triggerID
-   * @param {Boolean|Array<Number>} param0.authorizedTriggers
+   * @param {String} param0.pmTriggerName
+   * @param {String} param0.pmTriggerTableName
    * @returns {any|null}
    */
-  static deleteTrigger = async ({ triggerID, authorizedTriggers }) => {
+  static deleteTrigger = async ({ pmTriggerName, pmTriggerTableName }) => {
     Logger.log("info", {
       message: "TriggerService:deleteTrigger:params",
       params: {
-        triggerID,
-        authorizedTriggers,
+        pmTriggerName,
+        pmTriggerTableName,
       },
     });
     try {
-      if (
-        authorizedTriggers === true ||
-        authorizedTriggers.includes(triggerID)
-      ) {
-        const trigger = await prisma.tbl_pm_triggers.delete({
-          where: {
-            pm_trigger_id: triggerID,
-          },
-        });
-        Logger.log("info", {
-          message: "TriggerService:deleteTrigger:trigger",
-          params: {
-            trigger,
-          },
-        });
-        return true;
-      } else {
-        Logger.log("error", {
-          message: "TriggerService:deleteTrigger:catch-2",
-          params: { error: constants.ERROR_CODES.PERMISSION_DENIED },
-        });
-        throw constants.ERROR_CODES.PERMISSION_DENIED;
-      }
+      const client = await pgPool.connect();
+      await client.query("BEGIN");
+      const result = await client.query(
+        deleteTriggerByName({
+          triggerName: pmTriggerName,
+          tableName: pmTriggerTableName,
+        })
+      );
+      await client.query("COMMIT");
+      client.release();
+      return result;
     } catch (error) {
       Logger.log("error", {
         message: "TriggerService:deleteTrigger:catch-1",

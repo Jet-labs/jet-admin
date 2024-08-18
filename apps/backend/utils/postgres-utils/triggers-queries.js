@@ -102,7 +102,7 @@ WHERE
 
 const deleteTriggerByName = ({ triggerName, tableName, schema }) => {
   return `DROP TRIGGER IF EXISTS ${triggerName} ON ${
-    schema || public
+    schema || "public"
   }.${tableName};
 `;
 };

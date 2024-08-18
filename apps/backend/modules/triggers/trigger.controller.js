@@ -128,25 +128,23 @@ triggerController.addTrigger = async (req, res) => {
 triggerController.deleteTrigger = async (req, res) => {
   try {
     const { pmUser, state, params } = req;
-    const pm_trigger_id = parseInt(params.id);
+    const triggerNameWithTableName = params.id;
     const pm_user_id = parseInt(pmUser.pm_user_id);
-    const authorized_triggers = state.authorized_triggers;
-
     Logger.log("info", {
       message: "triggerController:deleteTrigger:params",
-      params: { pm_user_id, pm_trigger_id },
+      params: { pm_user_id, triggerNameWithTableName },
     });
-
-    await TriggerService.deleteTrigger({
-      triggerID: pm_trigger_id,
-      authorizedTriggers: authorized_triggers,
+    const triggerNameWithTableNameSplit = String(
+      triggerNameWithTableName
+    ).split("-");
+    const trigger = await TriggerService.deleteTrigger({
+      pmTriggerName: triggerNameWithTableNameSplit[1],
+      pmTriggerTableName: triggerNameWithTableNameSplit[0],
     });
-
     Logger.log("success", {
       message: "triggerController:deleteTrigger:success",
       params: { pm_user_id },
     });
-
     return res.json({
       success: true,
     });
