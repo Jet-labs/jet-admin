@@ -1,6 +1,6 @@
 const { extractError } = require("../../utils/error");
 const Logger = require("../../utils/logger");
-const { TriggerChannelService } = require("./trigger_channel.services");
+const { TriggerChannelService } = require("./trigger-channel.services");
 
 const triggerChannelController = {};
 

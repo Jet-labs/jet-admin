@@ -1,10 +1,10 @@
 const express = require("express");
 const { authMiddleware } = require("../auth/auth.middleware");
 const { policyMiddleware } = require("../policies/policy.middleware");
-const { triggerChannelController } = require("./trigger_channel.controller");
+const { triggerChannelController } = require("./trigger-channel.controller");
 const {
   triggerChannelAuthorizationMiddleware,
-} = require("./trigger_channel.authorization.middleware");
+} = require("./trigger-channel.authorization.middleware");
 const router = express.Router();
 
 // get all data of table

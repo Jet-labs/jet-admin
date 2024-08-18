@@ -13,7 +13,7 @@ expressApp.use("/admin_api/auth", require("./modules/auth/auth.route"));
 
 expressApp.use(
   "/admin_api/app_constants",
-  require("./modules/appConstants/app_constants.route")
+  require("./modules/app-constants/app-constants.route")
 );
 
 expressApp.use("/admin_api/schemas", require("./modules/schema/schema.route"));
@@ -37,7 +37,7 @@ expressApp.use("/admin_api/jobs", require("./modules/job/job.route"));
 
 expressApp.use(
   "/admin_api/trigger_channels",
-  require("./modules/triggersChannels/trigger_channel.route")
+  require("./modules/trigger-channels/trigger-channel.route")
 );
 
 expressApp.use(
