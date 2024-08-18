@@ -115,6 +115,10 @@ export const RawDataGrid = ({
     }
   }, [readColumns, internalAppConstants]);
 
+  const rowAddAuthorization = useMemo(() => {
+    return pmUser && pmUser.extractRowAddAuthorization(tableName);
+  }, [pmUser, tableName]);
+
   const primaryColumns = useMemo(() => {
     if (dbModel) {
       return getTableIDProperty(tableName, dbModel);
@@ -248,7 +252,7 @@ export const RawDataGrid = ({
           tableName={tableName}
           setSortModel={setSortModel}
           sortModel={sortModel}
-          allowAdd={true}
+          allowAdd={rowAddAuthorization}
         />
       </div>
       <div item xs={12} className="!relative">

@@ -29,8 +29,8 @@ export const AppConstantsDrawerList = () => {
   const navigate = useNavigate();
   const { appConstants } = useAppConstants();
   const { reloadAllAppConstants } = useAppConstantActions();
-  const isAuthorizedToAddAppConstant = useMemo(() => {
-    return pmUser && pmUser.isAuthorizedToAddAppConstant();
+  const appConstantAddAuthorization = useMemo(() => {
+    return pmUser && pmUser.extractAppConstantAddAuthorization();
   }, [pmUser]);
 
   const _navigateToAddMoreAppConstant = () => {
@@ -62,7 +62,7 @@ export const AppConstantsDrawerList = () => {
           />
         </IconButton>
       </div>
-      {isAuthorizedToAddAppConstant && (
+      {appConstantAddAuthorization && (
         <div className="!px-3 !py-1.5 !w-full">
           <Button
             onClick={_navigateToAddMoreAppConstant}

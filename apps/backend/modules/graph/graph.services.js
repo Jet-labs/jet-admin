@@ -50,27 +50,27 @@ class GraphService {
   /**
    *
    * @param {object} param0
-   * @param {Number} param0.graphID
+   * @param {Number} param0.pmGraphID
    * @param {String} param0.graphTitle
    * @param {any} param0.graphOptions
    * @param {Boolean|Array<Number>} param0.authorizedGraphs
    * @returns {any|null}
    */
   static updateGraph = async ({
-    graphID,
+    pmGraphID,
     graphTitle,
     graphOptions,
     authorizedGraphs,
   }) => {
     Logger.log("info", {
       message: "GraphService:updateGraph:params",
-      params: { graphID, graphTitle, graphOptions },
+      params: { pmGraphID, graphTitle, graphOptions },
     });
     try {
-      if (authorizedGraphs === true || authorizedGraphs.includes(graphID)) {
+      if (authorizedGraphs === true || authorizedGraphs.includes(pmGraphID)) {
         const updatedGraph = await prisma.tbl_pm_graphs.update({
           where: {
-            pm_graph_id: graphID,
+            pm_graph_id: pmGraphID,
           },
           data: {
             graph_title: String(graphTitle),
@@ -103,22 +103,22 @@ class GraphService {
   /**
    *
    * @param {object} param0
-   * @param {Number} param0.graphID
+   * @param {Number} param0.pmGraphID
    * @param {Boolean|Array<Number>} param0.authorizedGraphs
    * @returns {any|null}
    */
-  static getGraphByID = async ({ graphID, authorizedGraphs }) => {
+  static getGraphByID = async ({ pmGraphID, authorizedGraphs }) => {
     Logger.log("info", {
       message: "GraphService:getGraphByID:params",
       params: {
-        graphID,
+        pmGraphID,
       },
     });
     try {
-      if (authorizedGraphs === true || authorizedGraphs.includes(graphID)) {
+      if (authorizedGraphs === true || authorizedGraphs.includes(pmGraphID)) {
         const graph = await prisma.tbl_pm_graphs.findUnique({
           where: {
-            pm_graph_id: graphID,
+            pm_graph_id: pmGraphID,
           },
         });
         Logger.log("info", {
@@ -148,22 +148,22 @@ class GraphService {
   /**
    *
    * @param {object} param0
-   * @param {Number} param0.graphID
+   * @param {Number} param0.pmGraphID
    * @param {Boolean|Array<Number>} param0.authorizedGraphs
    * @returns {any|null}
    */
-  static getGraphData = async ({ graphID, authorizedGraphs }) => {
+  static getGraphData = async ({ pmGraphID, authorizedGraphs }) => {
     Logger.log("info", {
       message: "GraphService:getGraphData:params",
       params: {
-        graphID,
+        pmGraphID,
       },
     });
     try {
-      if (authorizedGraphs === true || authorizedGraphs.includes(graphID)) {
+      if (authorizedGraphs === true || authorizedGraphs.includes(pmGraphID)) {
         const graph = await prisma.tbl_pm_graphs.findUnique({
           where: {
-            pm_graph_id: graphID,
+            pm_graph_id: pmGraphID,
           },
         });
         Logger.log("info", {
@@ -241,22 +241,22 @@ class GraphService {
   /**
    *
    * @param {object} param0
-   * @param {Number} param0.graphID
+   * @param {Number} param0.pmGraphID
    * @param {Boolean|Array<Number>} param0.authorizedGraphs
    * @returns {any|null}
    */
-  static deleteGraph = async ({ graphID, authorizedGraphs }) => {
+  static deleteGraph = async ({ pmGraphID, authorizedGraphs }) => {
     Logger.log("info", {
       message: "GraphService:deleteGraph:params",
       params: {
-        graphID,
+        pmGraphID,
       },
     });
     try {
-      if (authorizedGraphs === true || authorizedGraphs.includes(graphID)) {
+      if (authorizedGraphs === true || authorizedGraphs.includes(pmGraphID)) {
         const graph = await prisma.tbl_pm_graphs.delete({
           where: {
-            pm_graph_id: graphID,
+            pm_graph_id: pmGraphID,
           },
         });
         Logger.log("info", {

@@ -73,8 +73,8 @@
               throw (console.log({ error: n }), n);
             }
           },
-          h = async (e) => {
-            let { appConstantID: t } = e;
+          (h = async (e) => {
+            let { pmAppConstantID: t } = e;
             try {
               const e = await a.A.get(
                 o.a.APIS.APP_CONSTANTS.getAppConstantByID({ id: t })
@@ -85,19 +85,21 @@
             } catch (n) {
               throw n;
             }
-          },
-          d = async (e) => {
-            let { appConstantID: t } = e;
-            try {
-              const e = await a.A.delete(
-                o.a.APIS.APP_CONSTANTS.deleteAppConstantByID({ id: t })
-              );
-              if (e.data && 1 == e.data.success) return !0;
-              throw e.data.error ? e.data.error : o.a.ERROR_CODES.SERVER_ERROR;
-            } catch (n) {
-              throw n;
-            }
-          },
+          }),
+            (d = async (e) => {
+              let { pmAppConstantID: t } = e;
+              try {
+                const e = await a.A.delete(
+                  o.a.APIS.APP_CONSTANTS.deleteAppConstantByID({ id: t })
+                );
+                if (e.data && 1 == e.data.success) return !0;
+                throw e.data.error
+                  ? e.data.error
+                  : o.a.ERROR_CODES.SERVER_ERROR;
+              } catch (n) {
+                throw n;
+              }
+            });,
           f = async () => {
             try {
               const e = await a.A.get(
@@ -149,7 +151,7 @@
               !!this.policy &&
               !!this.policy.edit_policy_object &&
               !0 === this.policy.edit_policy_object),
-              (this.extractAuthorizedColumnsForEditFromPolicyObject = (e) => {
+              (this.extractColumnEditAuthorization = (e) => {
                 let t;
                 return this.policy
                   ? ((t =
@@ -166,7 +168,7 @@
                     t)
                   : [];
               }),
-              (this.extractAuthorizedColumnsForReadFromPolicyObject = (e) => {
+              (this.extractColumnReadAuthorization = (e) => {
                 let t;
                 return this.policy
                   ? ((t =
@@ -183,9 +185,7 @@
                     t)
                   : [];
               }),
-              (this.extractAuthorizationForRowAdditionFromPolicyObject = (
-                e
-              ) => {
+              (this.extractRowAddAuthorization = (e) => {
                 let t;
                 return this.policy
                   ? ((t =
@@ -196,9 +196,7 @@
                     t)
                   : [];
               }),
-              (this.extractAuthorizationForRowDeletionFromPolicyObject = (
-                e
-              ) => {
+              (this.extractRowDeleteAuthorization = (e) => {
                 let t;
                 return this.policy
                   ? ((t =
@@ -327,7 +325,7 @@
                   n)
                 );
               }),
-              (this.isAuthorizedToDeleteDashboard = (e) => {
+              (this.extractDashboardDeleteAuthorization = (e) => {
                 let t = !1;
                 return (
                   this.policy.dashboards &&
@@ -344,7 +342,7 @@
                   t
                 );
               }),
-              (this.isAuthorizedToAddQuery = () => {
+              (this.extractQueryAddAuthorization = () => {
                 var e, t;
                 return !(
                   null === (e = this.policy) ||
@@ -394,7 +392,7 @@
                   n)
                 );
               }),
-              (this.isAuthorizedToDeleteQuery = (e) => {
+              (this.extractQueryDeleteAuthorization = (e) => {
                 let t = !1;
                 return (
                   this.policy.queries &&
@@ -409,7 +407,7 @@
                   t
                 );
               }),
-              (this.isAuthorizedToAddJob = () => {
+              (this.extractJobAddAuthorization = () => {
                 var e, t;
                 return !(
                   null === (e = this.policy) ||
@@ -457,7 +455,7 @@
                   n)
                 );
               }),
-              (this.isAuthorizedToDeleteJob = (e) => {
+              (this.extractJobDeleteAuthorization = (e) => {
                 let t = !1;
                 return (
                   this.policy.jobs &&
@@ -472,7 +470,7 @@
                   t
                 );
               }),
-              (this.isAuthorizedToAddAppConstant = () => {
+              (this.extractAppConstantAddAuthorization = () => {
                 var e, t;
                 return !(
                   null === (e = this.policy) ||
@@ -526,7 +524,7 @@
                   n)
                 );
               }),
-              (this.isAuthorizedToDeleteAppConstant = (e) => {
+              (this.extractAppConstantDeletionAuthorization = (e) => {
                 let t = !1;
                 return (
                   this.policy.app_constants &&
@@ -543,7 +541,7 @@
                   t
                 );
               }),
-              (this.isAuthorizedToAddPolicy = () => {
+              (this.extractPolicyAddAuthorization = () => {
                 var e, t;
                 return !(
                   null === (e = this.policy) ||
@@ -597,7 +595,7 @@
                   n)
                 );
               }),
-              (this.isAuthorizedToDeletePolicy = (e) => {
+              (this.extractPolicyDeleteAuthorization = (e) => {
                 let t = !1;
                 return (
                   this.policy.policies &&
@@ -612,7 +610,7 @@
                   t
                 );
               }),
-              (this.isAuthorizedToAddAccount = () => {
+              (this.extractAccountAddAuthorization = () => {
                 var e, t;
                 return (
                   console.log({ this: this.policy }),
@@ -670,7 +668,7 @@
                     n)
                   );
                 }),
-              (this.isAuthorizedToDeleteAccount = (e) => {
+              (this.extractTriggerDeleteAuthorization = (e) => {
                 let t = !1;
                 return (
                   this.policy.account &&

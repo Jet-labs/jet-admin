@@ -38,10 +38,10 @@ export const updateGraphAPI = async ({ data }) => {
   }
 };
 
-export const getGraphByIDAPI = async ({ graphID }) => {
+export const getGraphByIDAPI = async ({ pmGraphID }) => {
   try {
     const response = await axiosInstance.get(
-      LOCAL_CONSTANTS.APIS.GRAPH.getGraphByID({ id: graphID })
+      LOCAL_CONSTANTS.APIS.GRAPH.getGraphByID({ id: pmGraphID })
     );
     if (response.data && response.data.success == true) {
       return new Graph(response.data.graph);
@@ -55,10 +55,10 @@ export const getGraphByIDAPI = async ({ graphID }) => {
   }
 };
 
-export const getGraphDataByIDAPI = async ({ graphID }) => {
+export const getGraphDataByIDAPI = async ({ pmGraphID }) => {
   try {
     const response = await axiosInstance.get(
-      LOCAL_CONSTANTS.APIS.GRAPH.getGraphDataByID({ id: graphID })
+      LOCAL_CONSTANTS.APIS.GRAPH.getGraphDataByID({ id: pmGraphID })
     );
     if (response.data && response.data.success == true) {
       return new Graph(response.data.graph);
@@ -72,10 +72,10 @@ export const getGraphDataByIDAPI = async ({ graphID }) => {
   }
 };
 
-export const deleteGraphByIDAPI = async ({ graphID }) => {
+export const deleteGraphByIDAPI = async ({ pmGraphID }) => {
   try {
     const response = await axiosInstance.delete(
-      LOCAL_CONSTANTS.APIS.GRAPH.deleteGraphByID({ id: graphID })
+      LOCAL_CONSTANTS.APIS.GRAPH.deleteGraphByID({ id: pmGraphID })
     );
     if (response.data && response.data.success == true) {
       return true;

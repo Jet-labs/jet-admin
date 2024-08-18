@@ -56,11 +56,11 @@ export const updateAppConstantAPI = async ({ data }) => {
   }
 };
 
-export const getAppConstantByIDAPI = async ({ appConstantID }) => {
+export const getAppConstantByIDAPI = async ({ pmAppConstantID }) => {
   try {
     const response = await axiosInstance.get(
       LOCAL_CONSTANTS.APIS.APP_CONSTANTS.getAppConstantByID({
-        id: appConstantID,
+        id: pmAppConstantID,
       })
     );
     if (response.data && response.data.success == true) {
@@ -75,11 +75,11 @@ export const getAppConstantByIDAPI = async ({ appConstantID }) => {
   }
 };
 
-export const deleteAppConstantByIDAPI = async ({ appConstantID }) => {
+export const deleteAppConstantByIDAPI = async ({ pmAppConstantID }) => {
   try {
     const response = await axiosInstance.delete(
       LOCAL_CONSTANTS.APIS.APP_CONSTANTS.deleteAppConstantByID({
-        id: appConstantID,
+        id: pmAppConstantID,
       })
     );
     if (response.data && response.data.success == true) {

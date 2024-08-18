@@ -8,7 +8,7 @@ import { ConfirmationDialog } from "../../ConfirmationDialog";
 import { IoTrash } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { LOCAL_CONSTANTS } from "../../../constants";
-export const AppConstantDeletionForm = ({ pmAppConstantID }) => {
+export const AppConstantDeletionForm = ({ id }) => {
   const { pmUser } = useAuthState();
   const queryClient = useQueryClient();
   const [
@@ -17,13 +17,13 @@ export const AppConstantDeletionForm = ({ pmAppConstantID }) => {
   ] = useState(false);
   const navigate = useNavigate();
 
-  const deleteAppConstantAuthorization = useMemo(() => {
+  const appConstantDeleteAuthorization = useMemo(() => {
     if (pmUser) {
-      return pmUser.isAuthorizedToDeleteAppConstant(pmAppConstantID);
+      return pmUser.extractAppConstantDeletionAuthorization(id);
     } else {
       return false;
     }
-  }, [pmUser, pmAppConstantID]);
+  }, [pmUser, id]);
 
   const {
     isPending: isDeletingRow,
@@ -32,8 +32,7 @@ export const AppConstantDeletionForm = ({ pmAppConstantID }) => {
     error: deleteAppConstantError,
     mutate: deleteAppConstant,
   } = useMutation({
-    mutationFn: ({ pmAppConstantID }) =>
-      deleteAppConstantByIDAPI({ appConstantID: pmAppConstantID }),
+    mutationFn: ({ id }) => deleteAppConstantByIDAPI({ pmAppConstantID: id }),
     retry: false,
     onSuccess: () => {
       displaySuccess(LOCAL_CONSTANTS.STRINGS.APP_CONSTANT_DELETED_SUCCESS);
@@ -55,10 +54,10 @@ export const AppConstantDeletionForm = ({ pmAppConstantID }) => {
   };
 
   const _handleDeleteAppConstant = () => {
-    deleteAppConstant({ pmAppConstantID: pmAppConstantID });
+    deleteAppConstant({ id });
   };
   return (
-    deleteAppConstantAuthorization && (
+    appConstantDeleteAuthorization && (
       <>
         <Button
           onClick={_handleOpenDeleteAppConstantConfirmation}
@@ -77,7 +76,7 @@ export const AppConstantDeletionForm = ({ pmAppConstantID }) => {
           title={
             LOCAL_CONSTANTS.STRINGS.APP_CONSTANT_DELETION_CONFIRMATION_TITLE
           }
-          message={`${LOCAL_CONSTANTS.STRINGS.APP_CONSTANT_DELETION_CONFIRMATION_BODY} - ${pmAppConstantID}`}
+          message={`${LOCAL_CONSTANTS.STRINGS.APP_CONSTANT_DELETION_CONFIRMATION_BODY} - ${id}`}
         />
       </>
     )

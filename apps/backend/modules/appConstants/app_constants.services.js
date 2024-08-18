@@ -56,7 +56,7 @@ class AppConstantService {
   /**
    *
    * @param {object} param0
-   * @param {Number} param0.appConstantID
+   * @param {Number} param0.pmAppConstantID
    * @param {String} param0.appConstantTitle
    * @param {Boolean} param0.isInternal
    * @param {any} param0.appConstantValue
@@ -64,7 +64,7 @@ class AppConstantService {
    * @returns {any|null}
    */
   static updateAppConstant = async ({
-    appConstantID,
+    pmAppConstantID,
     appConstantTitle,
     appConstantValue,
     isInternal,
@@ -73,7 +73,7 @@ class AppConstantService {
     Logger.log("info", {
       message: "AppConstantService:updateAppConstant:params",
       params: {
-        appConstantID,
+        pmAppConstantID,
         appConstantTitle,
         appConstantValue,
         isInternal,
@@ -82,11 +82,11 @@ class AppConstantService {
     try {
       if (
         authorizedAppConstants === true ||
-        authorizedAppConstants.includes(appConstantID)
+        authorizedAppConstants.includes(pmAppConstantID)
       ) {
         const updatedAppConstant = await prisma.tbl_pm_app_constants.update({
           where: {
-            pm_app_constant_id: appConstantID,
+            pm_app_constant_id: pmAppConstantID,
           },
           data: {
             pm_app_constant_title: String(appConstantTitle),
@@ -195,29 +195,29 @@ class AppConstantService {
   /**
    *
    * @param {object} param0
-   * @param {Number} param0.appConstantID
+   * @param {Number} param0.pmAppConstantID
    * @param {Boolean|Array<Number>} param0.authorizedAppConstants
    * @returns {any|null}
    */
   static getAppConstantByID = async ({
-    appConstantID,
+    pmAppConstantID,
     authorizedAppConstants,
   }) => {
     Logger.log("info", {
       message: "AppConstantService:getAppConstantByID:params",
       params: {
-        appConstantID,
+        pmAppConstantID,
         authorizedAppConstants,
       },
     });
     try {
       if (
         authorizedAppConstants === true ||
-        authorizedAppConstants.includes(appConstantID)
+        authorizedAppConstants.includes(pmAppConstantID)
       ) {
         const appConstant = await prisma.tbl_pm_app_constants.findUnique({
           where: {
-            pm_app_constant_id: appConstantID,
+            pm_app_constant_id: pmAppConstantID,
           },
         });
         Logger.log("info", {
@@ -246,29 +246,29 @@ class AppConstantService {
   /**
    *
    * @param {object} param0
-   * @param {Number} param0.appConstantID
+   * @param {Number} param0.pmAppConstantID
    * @param {Boolean|Array<Number>} param0.authorizedAppConstants
    * @returns {any|null}
    */
   static deleteAppConstant = async ({
-    appConstantID,
+    pmAppConstantID,
     authorizedAppConstants,
   }) => {
     Logger.log("info", {
       message: "AppConstantService:deleteAppConstant:params",
       params: {
-        appConstantID,
+        pmAppConstantID,
         authorizedAppConstants,
       },
     });
     try {
       if (
         authorizedAppConstants === true ||
-        authorizedAppConstants.includes(appConstantID)
+        authorizedAppConstants.includes(pmAppConstantID)
       ) {
         const appConstant = await prisma.tbl_pm_app_constants.delete({
           where: {
-            pm_app_constant_id: appConstantID,
+            pm_app_constant_id: pmAppConstantID,
           },
         });
         Logger.log("info", {

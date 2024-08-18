@@ -127,38 +127,6 @@ const AppRouter = ({}) => {
               />
             }
           ></Route>
-          {/* <Route path={LOCAL_CONSTANTS.ROUTES.ALL_APP_CONSTANTS.code}>
-            <Route
-              index
-              element={
-                <ProtectedRoute
-                  successComponent={AllAppConstants}
-                  fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
-                  loadingComponent={() => <Loading fullScreen />}
-                />
-              }
-            ></Route>
-            <Route
-              path={LOCAL_CONSTANTS.ROUTES.APP_CONSTANT_VIEW.code}
-              element={
-                <ProtectedRoute
-                  successComponent={UpdateAppConstant}
-                  fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
-                  loadingComponent={() => <Loading fullScreen />}
-                />
-              }
-            ></Route>
-            <Route
-              path={LOCAL_CONSTANTS.ROUTES.ADD_APP_CONSTANT.code}
-              element={
-                <ProtectedRoute
-                  successComponent={AddAppConstant}
-                  fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
-                  loadingComponent={() => <Loading fullScreen />}
-                />
-              }
-            ></Route>
-          </Route> */}
 
           <Route path={LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT.code}>
             <Route

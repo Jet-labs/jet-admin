@@ -22,10 +22,10 @@ export const MultipleRowsDeletionForm = ({
   const [isDeleteRowsConfirmationOpen, setIsDeleteRowsConfirmationOpen] =
     useState(false);
 
-  const deleteRowAuthorization = useMemo(() => {
+  const rowDeleteAuthorization = useMemo(() => {
     if (pmUser && pmUser && tableName) {
       const u = pmUser;
-      const c = u.extractAuthorizationForRowDeletionFromPolicyObject(tableName);
+      const c = u.extractRowDeleteAuthorization(tableName);
       if (!c) {
         return false;
       } else {
@@ -70,7 +70,7 @@ export const MultipleRowsDeletionForm = ({
     deleteRows({ tableName, selectedRowIDs });
   };
   return (
-    deleteRowAuthorization && (
+    rowDeleteAuthorization && (
       <>
         <Button
           onClick={_handleOpenDeleteRowsConfirmation}

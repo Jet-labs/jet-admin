@@ -1,7 +1,7 @@
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
 const {
-  policyUtils,
+  policyAuthorizations,
 } = require("../../utils/policy-utils/policy-authorization");
 
 const queryAuthorizationMiddleware = {};
@@ -27,9 +27,11 @@ queryAuthorizationMiddleware.populateAuthorizedQueriesForRead = async (
         "queryAuthorizationMiddleware:populateAuthorizedQueriesForRead:params",
       params: { pm_user_id },
     });
-    let authorized_queries = policyUtils.extractQueryReadAuthorization({
-      policyObject: authorization_policy,
-    });
+    let authorized_queries = policyAuthorizations.extractQueryReadAuthorization(
+      {
+        policyObject: authorization_policy,
+      }
+    );
 
     req.state = { ...req.state, authorized_queries };
     Logger.log("success", {
@@ -71,9 +73,11 @@ queryAuthorizationMiddleware.populateAuthorizedQueriesForUpdate = async (
         "queryAuthorizationMiddleware:populateAuthorizedQueriesForUpdate:params",
       params: { pm_user_id },
     });
-    let authorized_queries = policyUtils.extractQueryEditAuthorization({
-      policyObject: authorization_policy,
-    });
+    let authorized_queries = policyAuthorizations.extractQueryEditAuthorization(
+      {
+        policyObject: authorization_policy,
+      }
+    );
 
     req.state = { ...req.state, authorized_queries };
     Logger.log("success", {
@@ -116,9 +120,10 @@ queryAuthorizationMiddleware.populateAuthorizedQueriesForDelete = async (
         "queryAuthorizationMiddleware:populateAuthorizedQueriesForDelete:params",
       params: { pm_user_id },
     });
-    let authorized_queries = policyUtils.extractQueryDeleteAuthorization({
-      policyObject: authorization_policy,
-    });
+    let authorized_queries =
+      policyAuthorizations.extractQueryDeleteAuthorization({
+        policyObject: authorization_policy,
+      });
 
     req.state = { ...req.state, authorized_queries };
     Logger.log("success", {
@@ -161,7 +166,7 @@ queryAuthorizationMiddleware.populateAuthorizationForQueryAddition = async (
         "queryAuthorizationMiddleware:populateAuthorizationForQueryAddition:params",
       params: { pm_user_id },
     });
-    let authorizationToAdd = policyUtils.extractQueryAdditionAuthorization({
+    let authorizationToAdd = policyAuthorizations.extractQueryAddAuthorization({
       policyObject: authorization_policy,
     });
 

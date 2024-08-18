@@ -16,7 +16,7 @@ export const GraphWidgetComponent = ({ id, width, height }) => {
     refetch: refetchGraph,
   } = useQuery({
     queryKey: [`REACT_QUERY_KEY_GRAPH`, id],
-    queryFn: () => getGraphByIDAPI({ graphID: id }),
+    queryFn: () => getGraphByIDAPI({ pmGraphID: id }),
     cacheTime: 0,
     retry: 1,
     staleTime: 0,
@@ -29,7 +29,7 @@ export const GraphWidgetComponent = ({ id, width, height }) => {
     refetch: refetchGraphData,
   } = useQuery({
     queryKey: [`REACT_QUERY_KEY_GRAPH_DATA`, id],
-    queryFn: () => getGraphDataByIDAPI({ graphID: id }),
+    queryFn: () => getGraphDataByIDAPI({ pmGraphID: id }),
     cacheTime: 0,
     retry: 1,
     staleTime: 0,

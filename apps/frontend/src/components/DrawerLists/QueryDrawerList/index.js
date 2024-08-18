@@ -24,8 +24,8 @@ export const QueryDrawerList = () => {
 
   const { pmUser } = useAuthState();
   const navigate = useNavigate();
-  const isAuthorizedToAddQuery = useMemo(() => {
-    return pmUser && pmUser.isAuthorizedToAddQuery();
+  const queryAddAuthorization = useMemo(() => {
+    return pmUser && pmUser.extractQueryAddAuthorization();
   }, [pmUser]);
 
   const {
@@ -70,7 +70,7 @@ export const QueryDrawerList = () => {
           />
         </IconButton>
       </div>
-      {isAuthorizedToAddQuery && (
+      {queryAddAuthorization && (
         <div className="!px-3 !py-1.5 !w-full">
           <Button
             onClick={_navigateToAddMoreQuery}

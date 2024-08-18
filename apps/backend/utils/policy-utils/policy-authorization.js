@@ -3,7 +3,7 @@ const Logger = require("../logger");
 const policyAuthorizations = {};
 
 // graph authorizations
-policyAuthorizations.extractGraphAdditionAuthorization = ({ policyObject }) => {
+policyAuthorizations.extractGraphAddAuthorization = ({ policyObject }) => {
   if (policyObject.graphs.add) {
     return true;
   }
@@ -15,12 +15,12 @@ policyAuthorizations.extractGraphReadAuthorization = ({ policyObject }) => {
   if (policyObject.graphs.read) {
     return true;
   } else if (policyObject.graphs && policyObject.graphs.graph_ids) {
-    Object.keys(policyObject.graphs.graph_ids).forEach((graphID) => {
+    Object.keys(policyObject.graphs.graph_ids).forEach((pmGraphID) => {
       if (
-        policyObject.graphs.graph_ids[graphID].read ||
-        policyObject.graphs.graph_ids[graphID] === true
+        policyObject.graphs.graph_ids[pmGraphID].read ||
+        policyObject.graphs.graph_ids[pmGraphID] === true
       ) {
-        authorizeGraphIDs.push(parseInt(graphID));
+        authorizeGraphIDs.push(parseInt(pmGraphID));
       }
     });
   }
@@ -32,12 +32,12 @@ policyAuthorizations.extractGraphEditAuthorization = ({ policyObject }) => {
   if (policyObject.graphs.edit) {
     return true;
   } else if (policyObject.graphs && policyObject.graphs.graph_ids) {
-    Object.keys(policyObject.graphs.graph_ids).forEach((graphID) => {
+    Object.keys(policyObject.graphs.graph_ids).forEach((pmGraphID) => {
       if (
-        policyObject.graphs.graph_ids[graphID].edit ||
-        policyObject.graphs.graph_ids[graphID] === true
+        policyObject.graphs.graph_ids[pmGraphID].edit ||
+        policyObject.graphs.graph_ids[pmGraphID] === true
       ) {
-        authorizeGraphIDs.push(parseInt(graphID));
+        authorizeGraphIDs.push(parseInt(pmGraphID));
       }
     });
   }
@@ -49,12 +49,12 @@ policyAuthorizations.extractGraphDeleteAuthorization = ({ policyObject }) => {
   if (policyObject.graphs.delete) {
     return true;
   } else if (policyObject.graphs && policyObject.graphs.graph_ids) {
-    Object.keys(policyObject.graphs.graph_ids).forEach((graphID) => {
+    Object.keys(policyObject.graphs.graph_ids).forEach((pmGraphID) => {
       if (
-        policyObject.graphs.graph_ids[graphID].delete ||
-        policyObject.graphs.graph_ids[graphID] === true
+        policyObject.graphs.graph_ids[pmGraphID].delete ||
+        policyObject.graphs.graph_ids[pmGraphID] === true
       ) {
-        authorizeGraphIDs.push(parseInt(graphID));
+        authorizeGraphIDs.push(parseInt(pmGraphID));
       }
     });
   }
@@ -62,9 +62,7 @@ policyAuthorizations.extractGraphDeleteAuthorization = ({ policyObject }) => {
 };
 
 // dashboard authorizations
-policyAuthorizations.extractDashboardAdditionAuthorization = ({
-  policyObject,
-}) => {
+policyAuthorizations.extractDashboardAddAuthorization = ({ policyObject }) => {
   if (policyObject.dashboards?.add) {
     return true;
   }
@@ -131,7 +129,7 @@ policyAuthorizations.extractDashboardDeleteAuthorization = ({
 };
 
 // query authorizations
-policyAuthorizations.extractQueryAdditionAuthorization = ({ policyObject }) => {
+policyAuthorizations.extractQueryAddAuthorization = ({ policyObject }) => {
   if (policyObject.queries?.add) {
     return true;
   }
@@ -196,57 +194,26 @@ policyAuthorizations.extractQueryDeleteAuthorization = ({ policyObject }) => {
 };
 
 // table authorizations
-policyAuthorizations.extractAuthorizedRowsForEditFromPolicyObject = ({
+policyAuthorizations.extractRowAddAuthorization = ({
   policyObject,
   tableName,
 }) => {
-  let authorized_rows;
+  let authorization;
   if (!policyObject.tables[tableName]) {
-    authorized_rows = false;
+    authorization = false;
   } else if (policyObject.tables[tableName] === true) {
-    authorized_rows = true;
-  } else if (!policyObject.tables[tableName].edit) {
-    authorized_rows = false;
-  } else if (policyObject.tables[tableName].edit === true) {
-    authorized_rows = true;
-  } else if (!policyObject.tables[tableName].edit.rows) {
-    authorized_rows = false;
-  } else if (policyObject.tables[tableName].edit.rows === true) {
-    authorized_rows = true;
-  } else if (typeof policyObject.tables[tableName].edit.rows == "object") {
-    authorized_rows = policyObject.tables[tableName].edit.rows;
+    authorization = true;
+  } else if (!policyObject.tables[tableName].add) {
+    authorization = false;
+  } else if (policyObject.tables[tableName].add === true) {
+    authorization = true;
   } else {
-    authorized_rows = false;
+    authorization = false;
   }
-  return authorized_rows;
+  return authorization;
 };
 
-policyAuthorizations.extractAuthorizedColumnsForEditFromPolicyObject = ({
-  policyObject,
-  tableName,
-}) => {
-  let authorized_columns;
-  if (!policyObject.tables[tableName]) {
-    authorized_columns = false;
-  } else if (policyObject.tables[tableName] === true) {
-    authorized_columns = true;
-  } else if (!policyObject.tables[tableName].edit) {
-    authorized_columns = false;
-  } else if (policyObject.tables[tableName].edit === true) {
-    authorized_columns = true;
-  } else if (!policyObject.tables[tableName].edit.columns) {
-    authorized_columns = false;
-  } else if (policyObject.tables[tableName].edit.columns === true) {
-    authorized_columns = true;
-  } else if (Array.isArray(policyObject.tables[tableName].edit.columns)) {
-    authorized_columns = policyObject.tables[tableName].edit.columns;
-  } else {
-    authorized_columns = false;
-  }
-  return authorized_columns;
-};
-
-policyAuthorizations.extractAuthorizedRowsForReadFromPolicyObject = ({
+policyAuthorizations.extractRowReadAuthorization = ({
   policyObject,
   tableName,
 }) => {
@@ -271,7 +238,7 @@ policyAuthorizations.extractAuthorizedRowsForReadFromPolicyObject = ({
   return authorized_rows;
 };
 
-policyAuthorizations.extractAuthorizedColumnsForReadFromPolicyObject = ({
+policyAuthorizations.extractColumnReadAuthorization = ({
   policyObject,
   tableName,
 }) => {
@@ -296,7 +263,7 @@ policyAuthorizations.extractAuthorizedColumnsForReadFromPolicyObject = ({
   return authorized_columns;
 };
 
-policyAuthorizations.extractAuthorizedIncludeColumnsForReadFromPolicyObject = ({
+policyAuthorizations.extractIncludeColumnReadAuthorization = ({
   policyObject,
   tableName,
 }) => {
@@ -313,26 +280,57 @@ policyAuthorizations.extractAuthorizedIncludeColumnsForReadFromPolicyObject = ({
   return authorized_include_columns;
 };
 
-policyAuthorizations.extractAuthorizedForRowAdditionFromPolicyObject = ({
+policyAuthorizations.extractRowEditAuthorization = ({
   policyObject,
   tableName,
 }) => {
-  let authorization;
+  let authorized_rows;
   if (!policyObject.tables[tableName]) {
-    authorization = false;
+    authorized_rows = false;
   } else if (policyObject.tables[tableName] === true) {
-    authorization = true;
-  } else if (!policyObject.tables[tableName].add) {
-    authorization = false;
-  } else if (policyObject.tables[tableName].add === true) {
-    authorization = true;
+    authorized_rows = true;
+  } else if (!policyObject.tables[tableName].edit) {
+    authorized_rows = false;
+  } else if (policyObject.tables[tableName].edit === true) {
+    authorized_rows = true;
+  } else if (!policyObject.tables[tableName].edit.rows) {
+    authorized_rows = false;
+  } else if (policyObject.tables[tableName].edit.rows === true) {
+    authorized_rows = true;
+  } else if (typeof policyObject.tables[tableName].edit.rows == "object") {
+    authorized_rows = policyObject.tables[tableName].edit.rows;
   } else {
-    authorization = false;
+    authorized_rows = false;
   }
-  return authorization;
+  return authorized_rows;
 };
 
-policyAuthorizations.extractAuthorizedForRowDeletionFromPolicyObject = ({
+policyAuthorizations.extractColumnEditAuthorization = ({
+  policyObject,
+  tableName,
+}) => {
+  let authorized_columns;
+  if (!policyObject.tables[tableName]) {
+    authorized_columns = false;
+  } else if (policyObject.tables[tableName] === true) {
+    authorized_columns = true;
+  } else if (!policyObject.tables[tableName].edit) {
+    authorized_columns = false;
+  } else if (policyObject.tables[tableName].edit === true) {
+    authorized_columns = true;
+  } else if (!policyObject.tables[tableName].edit.columns) {
+    authorized_columns = false;
+  } else if (policyObject.tables[tableName].edit.columns === true) {
+    authorized_columns = true;
+  } else if (Array.isArray(policyObject.tables[tableName].edit.columns)) {
+    authorized_columns = policyObject.tables[tableName].edit.columns;
+  } else {
+    authorized_columns = false;
+  }
+  return authorized_columns;
+};
+
+policyAuthorizations.extractRowDeleteAuthorization = ({
   policyObject,
   tableName,
 }) => {
@@ -352,7 +350,7 @@ policyAuthorizations.extractAuthorizedForRowDeletionFromPolicyObject = ({
 };
 
 // job authorizations
-policyAuthorizations.extractJobAdditionAuthorization = ({ policyObject }) => {
+policyAuthorizations.extractJobAddAuthorization = ({ policyObject }) => {
   if (policyObject.jobs?.add) {
     return true;
   }
@@ -411,7 +409,7 @@ policyAuthorizations.extractJobDeleteAuthorization = ({ policyObject }) => {
 };
 
 // app constants authorizations
-policyAuthorizations.extractAppConstantAdditionAuthorization = ({
+policyAuthorizations.extractAppConstantAddAuthorization = ({
   policyObject,
 }) => {
   if (policyObject.app_constants?.add) {
@@ -528,9 +526,7 @@ policyAuthorizations.extractSchemaEditAuthorization = ({ policyObject }) => {
 };
 
 // policy authorizations
-policyAuthorizations.extractPolicyAdditionAuthorization = ({
-  policyObject,
-}) => {
+policyAuthorizations.extractPolicyAddAuthorization = ({ policyObject }) => {
   if (policyObject.policies?.add) {
     return true;
   }
@@ -589,9 +585,7 @@ policyAuthorizations.extractPolicyDeleteAuthorization = ({ policyObject }) => {
 };
 
 // account authorizations
-policyAuthorizations.extractAccountAdditionAuthorization = ({
-  policyObject,
-}) => {
+policyAuthorizations.extractAccountAddAuthorization = ({ policyObject }) => {
   if (policyObject.accounts?.add) {
     return true;
   }
@@ -632,7 +626,7 @@ policyAuthorizations.extractAccountEditAuthorization = ({ policyObject }) => {
   return authorizeAccountIDs;
 };
 
-policyAuthorizations.extractAccountDeleteAuthorization = ({ policyObject }) => {
+policyAuthorizations.extractTriggerDeleteAuthorization = ({ policyObject }) => {
   const authorizeAccountIDs = [];
   if (policyObject.accounts?.delete) {
     return true;
@@ -650,9 +644,7 @@ policyAuthorizations.extractAccountDeleteAuthorization = ({ policyObject }) => {
 };
 
 // trigger authorizations
-policyAuthorizations.extractTriggerAdditionAuthorization = ({
-  policyObject,
-}) => {
+policyAuthorizations.extractTriggerAddAuthorization = ({ policyObject }) => {
   return Boolean(policyObject.triggers?.edit);
 };
 

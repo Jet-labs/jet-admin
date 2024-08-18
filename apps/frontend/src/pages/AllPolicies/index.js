@@ -48,8 +48,8 @@ const AllPolicies = () => {
     return row.pmPolicyObjectID;
   };
 
-  const isAuthorizedToAddPolicy = useMemo(() => {
-    return pmUser && pmUser.isAuthorizedToAddPolicy();
+  const policyAddAuthorization = useMemo(() => {
+    return pmUser && pmUser.extractPolicyAddAuthorization();
   }, [pmUser]);
 
   const columns = [
@@ -103,7 +103,7 @@ const AllPolicies = () => {
             >
               Reload
             </Button>
-            {isAuthorizedToAddPolicy && (
+            {policyAddAuthorization && (
               <Button
                 onClick={_handleNavigatePolicyAdditionForm}
                 startIcon={<FaPlus className="!text-sm" />}

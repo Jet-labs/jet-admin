@@ -17,12 +17,10 @@ export const PolicyDeletionForm = ({ id }) => {
   const [isDeleteRowConfirmationOpen, setIsDeleteRowConfirmationOpen] =
     useState(false);
 
-  const deleteRowAuthorization = useMemo(() => {
+  const policyDeleteAuthorization = useMemo(() => {
     if (pmUser && pmUser) {
       const u = pmUser;
-      const c = u.extractAuthorizationForRowDeletionFromPolicyObject(
-        LOCAL_CONSTANTS.STRINGS.POLICY_OBJECT_TABLE_NAME
-      );
+      const c = u.extractPolicyDeleteAuthorization();
       if (!c) {
         return false;
       } else {
@@ -67,7 +65,7 @@ export const PolicyDeletionForm = ({ id }) => {
     deleteRow({ id });
   };
   return (
-    deleteRowAuthorization && (
+    policyDeleteAuthorization && (
       <>
         <Button
           onClick={_handleOpenDeleteRowConfirmation}

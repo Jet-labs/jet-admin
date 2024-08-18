@@ -23,8 +23,8 @@ export const DashboardsDrawerList = () => {
   const currentPage = `dashboard_${routeParam?.["*"]}`;
   const { pmUser } = useAuthState();
   const navigate = useNavigate();
-  const isAuthorizedToAddDashboard = useMemo(() => {
-    return pmUser && pmUser.extractDashboardAdditionAuthorization();
+  const dashboardAddAuthorization = useMemo(() => {
+    return pmUser && pmUser.extractDashboardAddAuthorization();
   }, [pmUser]);
   const {
     isLoading: isLoadingDashboards,
@@ -67,7 +67,7 @@ export const DashboardsDrawerList = () => {
           />
         </IconButton>
       </div>
-      {isAuthorizedToAddDashboard && (
+      {dashboardAddAuthorization && (
         <div className="!px-3 !py-1.5 !w-full">
           <Button
             onClick={_navigateToAddMoreDashboard}

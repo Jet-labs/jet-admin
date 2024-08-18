@@ -171,7 +171,7 @@ export const JobUpdateForm = ({ id }) => {
             />
           </div>
           <div className="!flex flex-row justify-end items-center mt-5 w-100 px-3">
-            <JobDeletionForm pmJobID={id} />
+            <JobDeletionForm id={id} />
             <Button variant="contained" className="!ml-3" onClick={_updateJob}>
               {LOCAL_CONSTANTS.STRINGS.UPDATE_BUTTON_TEXT}
             </Button>

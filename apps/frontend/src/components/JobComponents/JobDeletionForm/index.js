@@ -8,20 +8,20 @@ import { ConfirmationDialog } from "../../ConfirmationDialog";
 import { IoTrash } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { LOCAL_CONSTANTS } from "../../../constants";
-export const JobDeletionForm = ({ pmJobID }) => {
+export const JobDeletionForm = ({ id }) => {
   const { pmUser } = useAuthState();
   const queryClient = useQueryClient();
   const [isDeleteJobConfirmationOpen, setIsDeleteJobConfirmationOpen] =
     useState(false);
   const navigate = useNavigate();
 
-  const deleteJobAuthorization = useMemo(() => {
+  const jobDeleteAuthorization = useMemo(() => {
     if (pmUser) {
-      return pmUser.isAuthorizedToDeleteJob(pmJobID);
+      return pmUser.extractJobDeleteAuthorization(id);
     } else {
       return false;
     }
-  }, [pmUser, pmJobID]);
+  }, [pmUser, id]);
 
   const {
     isPending: isDeletingRow,
@@ -30,7 +30,7 @@ export const JobDeletionForm = ({ pmJobID }) => {
     error: deleteJobError,
     mutate: deleteJob,
   } = useMutation({
-    mutationFn: ({ pmJobID }) => deleteJobByIDAPI({ pmJobID }),
+    mutationFn: ({ id }) => deleteJobByIDAPI({ pmJobID: id }),
     retry: false,
     onSuccess: () => {
       displaySuccess(LOCAL_CONSTANTS.STRINGS.JOB_DELETED_SUCCESS);
@@ -50,10 +50,10 @@ export const JobDeletionForm = ({ pmJobID }) => {
   };
 
   const _handleDeleteJob = () => {
-    deleteJob({ pmJobID: pmJobID });
+    deleteJob({ id });
   };
   return (
-    deleteJobAuthorization && (
+    jobDeleteAuthorization && (
       <>
         <Button
           onClick={_handleOpenDeleteJobConfirmation}
@@ -70,7 +70,7 @@ export const JobDeletionForm = ({ pmJobID }) => {
           onAccepted={_handleDeleteJob}
           onDecline={_handleCloseDeleteJobConfirmation}
           title={LOCAL_CONSTANTS.STRINGS.JOB_DELETION_CONFIRMATION_TITLE}
-          message={`${LOCAL_CONSTANTS.STRINGS.JOB_DELETION_CONFIRMATION_BODY} - ${pmJobID}`}
+          message={`${LOCAL_CONSTANTS.STRINGS.JOB_DELETION_CONFIRMATION_BODY} - ${id}`}
         />
       </>
     )

@@ -9,7 +9,7 @@ import { IoTrash } from "react-icons/io5";
 import { deleteDashboardByIDAPI } from "../../../api/dashboards";
 import { useNavigate } from "react-router-dom";
 import { LOCAL_CONSTANTS } from "../../../constants";
-export const DashboardDeletionForm = ({ dashboardID }) => {
+export const DashboardDeletionForm = ({ id }) => {
   const { pmUser } = useAuthState();
   const queryClient = useQueryClient();
   const navigate = useNavigate();
@@ -18,13 +18,13 @@ export const DashboardDeletionForm = ({ dashboardID }) => {
     setIsDeleteDashboardConfirmationOpen,
   ] = useState(false);
 
-  const deleteDashboardAuthorization = useMemo(() => {
+  const dashboardDeleteAuthorization = useMemo(() => {
     if (pmUser) {
-      return pmUser.isAuthorizedToDeleteDashboard(dashboardID);
+      return pmUser.extractDashboardDeleteAuthorization(id);
     } else {
       return false;
     }
-  }, [pmUser, dashboardID]);
+  }, [pmUser, id]);
 
   const {
     isPending: isDeletingDashboard,
@@ -33,8 +33,8 @@ export const DashboardDeletionForm = ({ dashboardID }) => {
     error: deleteDashboardError,
     mutate: deleteDashboard,
   } = useMutation({
-    mutationFn: () => {
-      return deleteDashboardByIDAPI({ dashboardID: dashboardID });
+    mutationFn: ({ id }) => {
+      return deleteDashboardByIDAPI({ pmDashboardID: id });
     },
     retry: false,
     onSuccess: () => {
@@ -57,10 +57,10 @@ export const DashboardDeletionForm = ({ dashboardID }) => {
   };
 
   const _handleDeleteDashboard = () => {
-    deleteDashboard({ dashboardID: dashboardID });
+    deleteDashboard({ id });
   };
   return (
-    deleteDashboardAuthorization && (
+    dashboardDeleteAuthorization && (
       <>
         <Button
           onClick={_handleOpenDeleteDashboardConfirmation}
@@ -77,7 +77,7 @@ export const DashboardDeletionForm = ({ dashboardID }) => {
           onAccepted={_handleDeleteDashboard}
           onDecline={_handleCloseDeleteDashboardConfirmation}
           title={LOCAL_CONSTANTS.STRINGS.DASHBOARD_DELETION_CONFIRMATION_TITLE}
-          message={`${LOCAL_CONSTANTS.STRINGS.DASHBOARD_DELETION_CONFIRMATION_BODY} - ${dashboardID}`}
+          message={`${LOCAL_CONSTANTS.STRINGS.DASHBOARD_DELETION_CONFIRMATION_BODY} - ${id}`}
         />
       </>
     )

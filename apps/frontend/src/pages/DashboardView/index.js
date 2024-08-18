@@ -43,7 +43,7 @@ const DashboardView = () => {
     refetch: refetchDashboard,
   } = useQuery({
     queryKey: [`REACT_QUERY_KEY_DASHBOARD_LAYOUTS`, id],
-    queryFn: () => getDashboardByIDAPI({ dashboardID: id }),
+    queryFn: () => getDashboardByIDAPI({ pmDashboardID: id }),
     retry: 1,
   });
 

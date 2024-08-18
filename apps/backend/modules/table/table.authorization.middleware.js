@@ -1,7 +1,7 @@
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
 const {
-  policyUtils,
+  policyAuthorizations,
 } = require("../../utils/policy-utils/policy-authorization");
 
 const tableAuthorizationMiddleware = {};
@@ -27,11 +27,10 @@ tableAuthorizationMiddleware.populateAuthorizedRowsForRead = async (
       message: "tableAuthorizationMiddleware:populateAuthorizedRows:params",
       params: { pm_user_id, table_name },
     });
-    let authorized_rows =
-      policyUtils.extractAuthorizedRowsForReadFromPolicyObject({
-        policyObject: authorization_policy,
-        tableName: table_name,
-      });
+    let authorized_rows = policyAuthorizations.extractRowReadAuthorization({
+      policyObject: authorization_policy,
+      tableName: table_name,
+    });
 
     req.state = { ...req.state, authorized_rows };
     Logger.log("success", {
@@ -73,7 +72,7 @@ tableAuthorizationMiddleware.populateAuthorizedColumnsForRead = async (
       params: { pm_user_id },
     });
     let authorized_columns =
-      policyUtils.extractAuthorizedColumnsForReadFromPolicyObject({
+      policyAuthorizations.extractColumnReadAuthorization({
         policyObject: authorization_policy,
         tableName: table_name,
       });
@@ -119,7 +118,7 @@ tableAuthorizationMiddleware.populateAuthorizedIncludeColumnsForRead = async (
       params: { pm_user_id },
     });
     let authorized_include_columns =
-      policyUtils.extractAuthorizedIncludeColumnsForReadFromPolicyObject({
+      policyAuthorizations.extractIncludeColumnReadAuthorization({
         policyObject: authorization_policy,
         tableName: table_name,
       });
@@ -161,11 +160,10 @@ tableAuthorizationMiddleware.authorizeRowUpdate = async (req, res, next) => {
       message: "tableAuthorizationMiddleware:authorizeRowUpdate:params",
       params: { pm_user_id, table_name, query },
     });
-    let authorized_rows =
-      policyUtils.extractAuthorizedRowsForEditFromPolicyObject({
-        policyObject: authorization_policy,
-        tableName: table_name,
-      });
+    let authorized_rows = policyAuthorizations.extractRowEditAuthorization({
+      policyObject: authorization_policy,
+      tableName: table_name,
+    });
 
     if (authorized_rows === false) {
       Logger.log("error", {
@@ -215,7 +213,7 @@ tableAuthorizationMiddleware.authorizeColumnUpdate = async (req, res, next) => {
     });
 
     let authorized_columns =
-      policyUtils.extractAuthorizedColumnsForEditFromPolicyObject({
+      policyAuthorizations.extractColumnEditAuthorization({
         policyObject: authorization_policy,
         tableName: table_name,
       });
@@ -274,11 +272,10 @@ tableAuthorizationMiddleware.authorizeRowAddition = async (req, res, next) => {
       message: "tableAuthorizationMiddleware:authorizeRowAddition:params",
       params: { pm_user_id, table_name },
     });
-    let authorization =
-      policyUtils.extractAuthorizedForRowAdditionFromPolicyObject({
-        policyObject: authorization_policy,
-        tableName: table_name,
-      });
+    let authorization = policyAuthorizations.extractRowAddAuthorization({
+      policyObject: authorization_policy,
+      tableName: table_name,
+    });
 
     if (!authorization) {
       Logger.log("error", {
@@ -325,11 +322,10 @@ tableAuthorizationMiddleware.authorizeRowDeletion = async (req, res, next) => {
       message: "tableAuthorizationMiddleware:authorizeRowDeletion:params",
       params: { pm_user_id, table_name, query },
     });
-    let authorized_rows =
-      policyUtils.extractAuthorizedForRowDeletionFromPolicyObject({
-        policyObject: authorization_policy,
-        tableName: table_name,
-      });
+    let authorized_rows = policyAuthorizations.extractRowDeleteAuthorization({
+      policyObject: authorization_policy,
+      tableName: table_name,
+    });
 
     if (!authorized_rows) {
       Logger.log("error", {

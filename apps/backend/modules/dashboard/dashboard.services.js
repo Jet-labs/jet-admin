@@ -27,7 +27,7 @@ class DashboardService {
     });
     try {
       let newDashboard = null;
-      
+
       newDashboard = await prisma.tbl_pm_dashboards.create({
         data: {
           dashboard_title: String(dashboardTitle),
@@ -55,7 +55,7 @@ class DashboardService {
   /**
    *
    * @param {object} param0
-   * @param {Number} param0.dashboardID
+   * @param {Number} param0.pmDashboardID
    * @param {String} param0.dashboardTitle
    * @param {String} param0.dashboardDescription
    * @param {any} param0.dashboardOptions
@@ -63,7 +63,7 @@ class DashboardService {
    * @returns {any|null}
    */
   static updateDashboard = async ({
-    dashboardID,
+    pmDashboardID,
     dashboardTitle,
     dashboardDescription,
     dashboardOptions,
@@ -72,7 +72,7 @@ class DashboardService {
     Logger.log("info", {
       message: "DashboardService:updateDashboard:params",
       params: {
-        dashboardID,
+        pmDashboardID,
         dashboardTitle,
         dashboardDescription,
         dashboardOptions,
@@ -81,17 +81,16 @@ class DashboardService {
     try {
       if (
         authorizedDashboards === true ||
-        authorizedDashboards.includes(dashboardID)
+        authorizedDashboards.includes(pmDashboardID)
       ) {
         const updatedDashboard = await prisma.tbl_pm_dashboards.update({
           where: {
-            pm_dashboard_id: dashboardID,
+            pm_dashboard_id: pmDashboardID,
           },
           data: {
             dashboard_title: String(dashboardTitle),
             dashboard_description: String(dashboardDescription),
             dashboard_options: dashboardOptions,
-            
           },
         });
         Logger.log("success", {
@@ -157,26 +156,26 @@ class DashboardService {
   /**
    *
    * @param {object} param0
-   * @param {Number} param0.dashboardID
+   * @param {Number} param0.pmDashboardID
    * @param {Boolean|Array<Number>} param0.authorizedDashboards
    * @returns {any|null}
    */
-  static getDashboardByID = async ({ dashboardID, authorizedDashboards }) => {
+  static getDashboardByID = async ({ pmDashboardID, authorizedDashboards }) => {
     Logger.log("info", {
       message: "DashboardService:getDashboardByID:params",
       params: {
-        dashboardID,
+        pmDashboardID,
         authorizedDashboards,
       },
     });
     try {
       if (
         authorizedDashboards === true ||
-        authorizedDashboards.includes(dashboardID)
+        authorizedDashboards.includes(pmDashboardID)
       ) {
         const dashboard = await prisma.tbl_pm_dashboards.findUnique({
           where: {
-            pm_dashboard_id: dashboardID,
+            pm_dashboard_id: pmDashboardID,
           },
         });
         Logger.log("info", {
@@ -205,26 +204,26 @@ class DashboardService {
   /**
    *
    * @param {object} param0
-   * @param {Number} param0.dashboardID
+   * @param {Number} param0.pmDashboardID
    * @param {Boolean|Array<Number>} param0.authorizedDashboards
    * @returns {any|null}
    */
-  static deleteDashboard = async ({ dashboardID, authorizedDashboards }) => {
+  static deleteDashboard = async ({ pmDashboardID, authorizedDashboards }) => {
     Logger.log("info", {
       message: "DashboardService:deleteDashboard:params",
       params: {
-        dashboardID,
+        pmDashboardID,
         authorizedDashboards,
       },
     });
     try {
       if (
         authorizedDashboards === true ||
-        authorizedDashboards.includes(dashboardID)
+        authorizedDashboards.includes(pmDashboardID)
       ) {
         const dashboard = await prisma.tbl_pm_dashboards.delete({
           where: {
-            pm_dashboard_id: dashboardID,
+            pm_dashboard_id: pmDashboardID,
           },
         });
         Logger.log("info", {

@@ -8,20 +8,20 @@ import { ConfirmationDialog } from "../../ConfirmationDialog";
 import { IoTrash } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { LOCAL_CONSTANTS } from "../../../constants";
-export const QueryDeletionForm = ({ pmQueryID }) => {
+export const QueryDeletionForm = ({ id }) => {
   const { pmUser } = useAuthState();
   const queryClient = useQueryClient();
   const [isDeleteQueryConfirmationOpen, setIsDeleteQueryConfirmationOpen] =
     useState(false);
   const navigate = useNavigate();
 
-  const deleteQueryAuthorization = useMemo(() => {
+  const queryDeleteAuthorization = useMemo(() => {
     if (pmUser) {
-      return pmUser.isAuthorizedToDeleteQuery(pmQueryID);
+      return pmUser.extractQueryDeleteAuthorization(id);
     } else {
       return false;
     }
-  }, [pmUser, pmQueryID]);
+  }, [pmUser, id]);
 
   const {
     isPending: isDeletingRow,
@@ -30,7 +30,7 @@ export const QueryDeletionForm = ({ pmQueryID }) => {
     error: deleteQueryError,
     mutate: deleteQuery,
   } = useMutation({
-    mutationFn: ({ pmQueryID }) => deleteQueryByIDAPI({ pmQueryID }),
+    mutationFn: ({ id }) => deleteQueryByIDAPI({ pmQueryID: id }),
     retry: false,
     onSuccess: () => {
       displaySuccess(LOCAL_CONSTANTS.STRINGS.QUERY_DELETED_SUCCESS);
@@ -50,10 +50,10 @@ export const QueryDeletionForm = ({ pmQueryID }) => {
   };
 
   const _handleDeleteQuery = () => {
-    deleteQuery({ pmQueryID: pmQueryID });
+    deleteQuery({ id });
   };
   return (
-    deleteQueryAuthorization && (
+    queryDeleteAuthorization && (
       <>
         <Button
           onClick={_handleOpenDeleteQueryConfirmation}
@@ -70,7 +70,7 @@ export const QueryDeletionForm = ({ pmQueryID }) => {
           onAccepted={_handleDeleteQuery}
           onDecline={_handleCloseDeleteQueryConfirmation}
           title={LOCAL_CONSTANTS.STRINGS.QUERY_DELETION_CONFIRMATION_TITLE}
-          message={`${LOCAL_CONSTANTS.STRINGS.QUERY_DELETION_CONFIRMATION_BODY} - ${pmQueryID}`}
+          message={`${LOCAL_CONSTANTS.STRINGS.QUERY_DELETION_CONFIRMATION_BODY} - ${id}`}
         />
       </>
     )

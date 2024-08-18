@@ -3,7 +3,7 @@ const constants = require("../../constants");
 const { extractError } = require("../../utils/error");
 const Logger = require("../../utils/logger");
 const {
-  policyUtils,
+  policyAuthorizations,
 } = require("../../utils/policy-utils/policy-authorization");
 const { TableService } = require("./table.services");
 const { createObjectCsvStringifier } = require("csv-writer");
@@ -89,12 +89,12 @@ tableController.getAuthorizedColumnsForRead = async (req, res) => {
     const pm_user_id = pmUser.pm_user_id;
     const { table_name } = req.params;
     const authorized_columns =
-      policyUtils.extractAuthorizedColumnsForReadFromPolicyObject({
+      policyAuthorizations.extractColumnReadAuthorization({
         policyObject: state.authorization_policy,
         tableName: table_name,
       });
     const authorized_include_columns =
-      policyUtils.extractAuthorizedIncludeColumnsForReadFromPolicyObject({
+      policyAuthorizations.extractIncludeColumnReadAuthorization({
         policyObject: state.authorization_policy,
         tableName: table_name,
       });
@@ -160,7 +160,7 @@ tableController.getAuthorizedColumnsForUpdate = async (req, res) => {
     const pm_user_id = pmUser.pm_user_id;
     const { table_name } = req.params;
     const authorized_columns =
-      policyUtils.extractAuthorizedColumnsForEditFromPolicyObject({
+      policyAuthorizations.extractColumnEditAuthorization({
         policyObject: state.authorization_policy,
         tableName: table_name,
       });

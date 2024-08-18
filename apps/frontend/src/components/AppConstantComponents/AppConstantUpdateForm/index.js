@@ -23,7 +23,7 @@ export const AppConstantUpdateForm = ({ id }) => {
     error: loadAppConstantDataError,
   } = useQuery({
     queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.APP_CONSTANTS, id],
-    queryFn: () => getAppConstantByIDAPI({ appConstantID: id }),
+    queryFn: () => getAppConstantByIDAPI({ pmAppConstantID: id }),
     cacheTime: 0,
     retry: 1,
     staleTime: 0,
@@ -114,7 +114,7 @@ export const AppConstantUpdateForm = ({ id }) => {
           <AppConstantEditor appConstantForm={appConstantForm} />
 
           <div className="!flex flex-row justify-end items-center mt-10 w-full px-3">
-            <AppConstantDeletionForm pmAppConstantID={id} />
+            <AppConstantDeletionForm id={id} />
             <Button
               variant="contained"
               className="!ml-3"

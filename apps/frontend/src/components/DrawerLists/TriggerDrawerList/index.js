@@ -26,8 +26,8 @@ export const TriggersDrawerList = () => {
   const { pmUser } = useAuthState();
   const navigate = useNavigate();
 
-  const isAuthorizedToAddTrigger = useMemo(() => {
-    return pmUser && pmUser.isAuthorizedToAddTrigger();
+  const extractTriggerAddAuthorization = useMemo(() => {
+    return pmUser && pmUser.extractTriggerAddAuthorization();
   }, [pmUser]);
 
   const {
@@ -72,7 +72,7 @@ export const TriggersDrawerList = () => {
           />
         </IconButton>
       </div>
-      {isAuthorizedToAddTrigger && (
+      {extractTriggerAddAuthorization && (
         <div className="!px-3 !py-1.5 !w-full">
           <Button
             onClick={_navigateToAddMoreTrigger}

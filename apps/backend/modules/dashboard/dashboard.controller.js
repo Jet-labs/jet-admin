@@ -62,7 +62,7 @@ dashboardController.getDashboardByID = async (req, res) => {
     });
 
     const dashboard = await DashboardService.getDashboardByID({
-      dashboardID: pm_dashboard_id,
+      pmDashboardID: pm_dashboard_id,
       authorizedDashboards: authorized_dashboards,
     });
 
@@ -142,7 +142,7 @@ dashboardController.updateDashboard = async (req, res) => {
     });
 
     const dashboard = await DashboardService.updateDashboard({
-      dashboardID: parseInt(body.pm_dashboard_id),
+      pmDashboardID: parseInt(body.pm_dashboard_id),
       dashboardTitle: body.dashboard_title,
       dashboardDescription: body.dashboard_description,
       dashboardOptions: body.dashboard_options,
@@ -186,7 +186,7 @@ dashboardController.deleteDashboard = async (req, res) => {
     });
 
     await DashboardService.deleteDashboard({
-      dashboardID: pm_dashboard_id,
+      pmDashboardID: pm_dashboard_id,
       authorizedDashboards: authorized_dashboards,
     });
 

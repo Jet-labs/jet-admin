@@ -21,7 +21,7 @@ export const GraphUpdateForm = ({ id }) => {
     refetch: refetchGraphData,
   } = useQuery({
     queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.GRAPHS, id],
-    queryFn: () => getGraphDataByIDAPI({ graphID: id }),
+    queryFn: () => getGraphDataByIDAPI({ pmGraphID: id }),
     cacheTime: 0,
     retry: 1,
     staleTime: 0,
@@ -120,7 +120,7 @@ export const GraphUpdateForm = ({ id }) => {
       </div>
       <Grid container spacing={1} className="!px-3">
         <Grid item lg={5} md={4} className="w-full">
-          <GraphEditor graphID={id} graphForm={graphForm} />
+          <GraphEditor pmGraphID={id} graphForm={graphForm} />
         </Grid>
         {graphData && graphData.dataset && (
           <Grid item lg={7} md={8} className="w-full">

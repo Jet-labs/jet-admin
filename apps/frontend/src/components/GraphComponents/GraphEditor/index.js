@@ -36,7 +36,7 @@ import ReactJson from "react-json-view";
  * @param {import("formik").FormikConfig} param0.graphForm
  * @returns
  */
-export const GraphEditor = ({ graphID, graphForm }) => {
+export const GraphEditor = ({ pmGraphID, graphForm }) => {
   const theme = useTheme();
   const [isQueryTestingDialogOpen, setIsQueryTestingDialogOpen] =
     useState(false);
@@ -575,8 +575,8 @@ export const GraphEditor = ({ graphID, graphForm }) => {
           <Button variant="contained" onClick={_handleSubmit}>
             {LOCAL_CONSTANTS.STRINGS.SUBMIT_BUTTON_TEXT}
           </Button>
-          {(graphID != null || graphID != undefined) && (
-            <GraphDeletionForm graphID={graphID} />
+          {(pmGraphID != null || pmGraphID != undefined) && (
+            <GraphDeletionForm id={pmGraphID} />
           )}
         </Grid>
       </Grid>

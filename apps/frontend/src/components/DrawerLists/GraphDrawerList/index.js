@@ -24,8 +24,8 @@ export const GraphDrawerList = () => {
 
   const { pmUser } = useAuthState();
   const navigate = useNavigate();
-  const isAuthorizedToAddGraph = useMemo(() => {
-    return pmUser && pmUser.extractGraphAdditionAuthorization();
+  const graphAddAuthorization = useMemo(() => {
+    return pmUser && pmUser.extractGraphAddAuthorization();
   }, [pmUser]);
   const {
     isLoading: isLoadingGraphs,
@@ -43,7 +43,7 @@ export const GraphDrawerList = () => {
   const _navigateToAddMoreGraph = () => {
     navigate(LOCAL_CONSTANTS.ROUTES.ADD_GRAPH.path());
   };
- 
+
   return (
     <List
       style={{
@@ -69,7 +69,7 @@ export const GraphDrawerList = () => {
           />
         </IconButton>
       </div>
-      {isAuthorizedToAddGraph && (
+      {graphAddAuthorization && (
         <div className="!px-3 !py-1.5 !w-full">
           <Button
             onClick={_navigateToAddMoreGraph}

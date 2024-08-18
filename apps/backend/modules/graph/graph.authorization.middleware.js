@@ -1,7 +1,7 @@
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
 const {
-  policyUtils,
+  policyAuthorizations,
 } = require("../../utils/policy-utils/policy-authorization");
 
 const graphAuthorizationMiddleware = {};
@@ -27,7 +27,7 @@ graphAuthorizationMiddleware.populateAuthorizedGraphsForRead = async (
         "graphAuthorizationMiddleware:populateAuthorizedGraphsForRead:params",
       params: { pm_user_id },
     });
-    let authorized_graphs = policyUtils.extractGraphReadAuthorization({
+    let authorized_graphs = policyAuthorizations.extractGraphReadAuthorization({
       policyObject: authorization_policy,
     });
 
@@ -71,7 +71,7 @@ graphAuthorizationMiddleware.populateAuthorizedGraphsForUpdate = async (
         "graphAuthorizationMiddleware:populateAuthorizedGraphsForUpdate:params",
       params: { pm_user_id },
     });
-    let authorized_graphs = policyUtils.extractGraphEditAuthorization({
+    let authorized_graphs = policyAuthorizations.extractGraphEditAuthorization({
       policyObject: authorization_policy,
     });
 
@@ -116,9 +116,10 @@ graphAuthorizationMiddleware.populateAuthorizedGraphsForDelete = async (
         "graphAuthorizationMiddleware:populateAuthorizedGraphsForDelete:params",
       params: { pm_user_id },
     });
-    let authorized_graphs = policyUtils.extractGraphDeleteAuthorization({
-      policyObject: authorization_policy,
-    });
+    let authorized_graphs =
+      policyAuthorizations.extractGraphDeleteAuthorization({
+        policyObject: authorization_policy,
+      });
 
     req.state = { ...req.state, authorized_graphs };
     Logger.log("success", {
@@ -161,7 +162,7 @@ graphAuthorizationMiddleware.populateAuthorizationForGraphAddition = async (
         "graphAuthorizationMiddleware:populateAuthorizationForGraphAddition:params",
       params: { pm_user_id },
     });
-    let authorizationToAdd = policyUtils.extractGraphAdditionAuthorization({
+    let authorizationToAdd = policyAuthorizations.extractGraphAddAuthorization({
       policyObject: authorization_policy,
     });
 

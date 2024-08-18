@@ -8,7 +8,7 @@ import { ConfirmationDialog } from "../../ConfirmationDialog";
 import { IoTrash } from "react-icons/io5";
 import { FaCopy } from "react-icons/fa6";
 import { LOCAL_CONSTANTS } from "../../../constants";
-export const QueryDuplicateForm = ({ pmQueryID }) => {
+export const QueryDuplicateForm = ({ id }) => {
   const { pmUser } = useAuthState();
   const queryClient = useQueryClient();
   const [
@@ -16,8 +16,8 @@ export const QueryDuplicateForm = ({ pmQueryID }) => {
     setIsDuplicateQueryConfirmationOpen,
   ] = useState(false);
 
-  const isAuthorizedToAddQuery = useMemo(() => {
-    return pmUser && pmUser.isAuthorizedToAddQuery;
+  const queryAddAuthorization = useMemo(() => {
+    return pmUser && pmUser.extractQueryAddAuthorization();
   }, [pmUser]);
 
   const {
@@ -27,7 +27,7 @@ export const QueryDuplicateForm = ({ pmQueryID }) => {
     error: duplicateQueryError,
     mutate: duplicateQuery,
   } = useMutation({
-    mutationFn: ({ pmQueryID }) => duplicateQueryAPI({ pmQueryID }),
+    mutationFn: ({ id }) => duplicateQueryAPI({ pmQueryID: id }),
     retry: false,
     onSuccess: () => {
       displaySuccess(LOCAL_CONSTANTS.STRINGS.QUERY_ADDITION_SUCCESS);
@@ -45,10 +45,10 @@ export const QueryDuplicateForm = ({ pmQueryID }) => {
   };
 
   const _handleDuplicateQuery = () => {
-    duplicateQuery({ pmQueryID: pmQueryID });
+    duplicateQuery({ id });
   };
   return (
-    isAuthorizedToAddQuery && (
+    queryAddAuthorization && (
       <>
         <Button
           onClick={_handleOpenDuplicateQueryConfirmation}
@@ -65,7 +65,7 @@ export const QueryDuplicateForm = ({ pmQueryID }) => {
           onAccepted={_handleDuplicateQuery}
           onDecline={_handleCloseDuplicateQueryConfirmation}
           title={LOCAL_CONSTANTS.STRINGS.QUERY_DUPLICATE_CONFIRMATION_TITLE}
-          message={`${LOCAL_CONSTANTS.STRINGS.QUERY_DUPLICATE_CONFIRMATION_BODY} - ${pmQueryID}`}
+          message={`${LOCAL_CONSTANTS.STRINGS.QUERY_DUPLICATE_CONFIRMATION_BODY} - ${id}`}
         />
       </>
     )

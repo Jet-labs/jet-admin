@@ -60,7 +60,7 @@ graphController.updateGraph = async (req, res) => {
     });
 
     const updatedGraph = await GraphService.updateGraph({
-      graphID: parseInt(body.pm_graph_id),
+      pmGraphID: parseInt(body.pm_graph_id),
       graphTitle: body.graph_title,
       graphOptions: body.graph_options,
       authorizedGraphs: authorized_graphs,
@@ -103,13 +103,13 @@ graphController.getGraphByID = async (req, res) => {
     });
 
     const graph = await GraphService.getGraphByID({
-      graphID: pm_graph_id,
+      pmGraphID: pm_graph_id,
       authorizedGraphs: authorized_graphs,
     });
 
     Logger.log("success", {
       message: "graphController:getGraphByID:success",
-      params: { pm_user_id, graphID: graph.pm_graph_id },
+      params: { pm_user_id, pmGraphID: graph.pm_graph_id },
     });
 
     return res.json({
@@ -144,13 +144,13 @@ graphController.getGraphData = async (req, res) => {
     });
 
     const graph = await GraphService.getGraphData({
-      graphID: pm_graph_id,
+      pmGraphID: pm_graph_id,
       authorizedGraphs: authorized_graphs,
     });
 
     Logger.log("success", {
       message: "graphController:getGraphData:success",
-      params: { pm_user_id, graphID: graph.pm_graph_id },
+      params: { pm_user_id, pmGraphID: graph.pm_graph_id },
     });
 
     return res.json({
@@ -224,7 +224,7 @@ graphController.deleteGraph = async (req, res) => {
     });
 
     await GraphService.deleteGraph({
-      graphID: pm_graph_id,
+      pmGraphID: pm_graph_id,
       authorizedGraphs: authorized_graphs,
     });
 

@@ -9,20 +9,20 @@ import { IoTrash } from "react-icons/io5";
 import { deleteGraphByIDAPI } from "../../../api/graphs";
 import { useNavigate } from "react-router-dom";
 import { LOCAL_CONSTANTS } from "../../../constants";
-export const GraphDeletionForm = ({ graphID }) => {
+export const GraphDeletionForm = ({ id }) => {
   const { pmUser } = useAuthState();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [isDeleteGraphConfirmationOpen, setIsDeleteGraphConfirmationOpen] =
     useState(false);
 
-  const deleteGraphAuthorization = useMemo(() => {
+  const graphDeleteAuthorization = useMemo(() => {
     if (pmUser) {
-      return pmUser.isAuthorizedToDeleteGraph(graphID);
+      return pmUser.extractGraphDeleteAuthorization(id);
     } else {
       return false;
     }
-  }, [pmUser, graphID]);
+  }, [pmUser, id]);
 
   const {
     isPending: isDeletingGraph,
@@ -31,8 +31,8 @@ export const GraphDeletionForm = ({ graphID }) => {
     error: deleteGraphError,
     mutate: deleteGraph,
   } = useMutation({
-    mutationFn: () => {
-      return deleteGraphByIDAPI({ graphID: graphID });
+    mutationFn: ({ id }) => {
+      return deleteGraphByIDAPI({ pmGraphID: id });
     },
     retry: false,
     onSuccess: () => {
@@ -53,10 +53,10 @@ export const GraphDeletionForm = ({ graphID }) => {
   };
 
   const _handleDeleteGraph = () => {
-    deleteGraph({ graphID: graphID });
+    deleteGraph({ id });
   };
   return (
-    deleteGraphAuthorization && (
+    graphDeleteAuthorization && (
       <>
         <Button
           onClick={_handleOpenDeleteGraphConfirmation}
@@ -73,7 +73,7 @@ export const GraphDeletionForm = ({ graphID }) => {
           onAccepted={_handleDeleteGraph}
           onDecline={_handleCloseDeleteGraphConfirmation}
           title={LOCAL_CONSTANTS.STRINGS.GRAPH_DELETION_CONFIRMATION_TITLE}
-          message={`${LOCAL_CONSTANTS.STRINGS.GRAPH_DELETION_CONFIRMATION_BODY} - ${graphID}`}
+          message={`${LOCAL_CONSTANTS.STRINGS.GRAPH_DELETION_CONFIRMATION_BODY} - ${id}`}
         />
       </>
     )

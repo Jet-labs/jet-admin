@@ -1,7 +1,7 @@
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
 const {
-  policyUtils,
+  policyAuthorizations,
 } = require("../../utils/policy-utils/policy-authorization");
 
 const jobAuthorizationMiddleware = {};
@@ -27,7 +27,7 @@ jobAuthorizationMiddleware.populateAuthorizedJobsForRead = async (
         "jobAuthorizationMiddleware:populateAuthorizedJobsForRead:params",
       params: { pm_user_id },
     });
-    let authorized_jobs = policyUtils.extractJobReadAuthorization({
+    let authorized_jobs = policyAuthorizations.extractJobReadAuthorization({
       policyObject: authorization_policy,
     });
 
@@ -71,7 +71,7 @@ jobAuthorizationMiddleware.populateAuthorizedJobsForUpdate = async (
         "jobAuthorizationMiddleware:populateAuthorizedJobsForUpdate:params",
       params: { pm_user_id },
     });
-    let authorized_jobs = policyUtils.extractJobEditAuthorization({
+    let authorized_jobs = policyAuthorizations.extractJobEditAuthorization({
       policyObject: authorization_policy,
     });
 
@@ -116,7 +116,7 @@ jobAuthorizationMiddleware.populateAuthorizedJobsForDelete = async (
         "jobAuthorizationMiddleware:populateAuthorizedJobsForDelete:params",
       params: { pm_user_id },
     });
-    let authorized_jobs = policyUtils.extractJobDeleteAuthorization({
+    let authorized_jobs = policyAuthorizations.extractJobDeleteAuthorization({
       policyObject: authorization_policy,
     });
 
@@ -161,7 +161,7 @@ jobAuthorizationMiddleware.populateAuthorizationForJobAddition = async (
         "jobAuthorizationMiddleware:populateAuthorizationForJobAddition:params",
       params: { pm_user_id },
     });
-    let authorizationToAdd = policyUtils.extractJobAdditionAuthorization({
+    let authorizationToAdd = policyAuthorizations.extractJobAddAuthorization({
       policyObject: authorization_policy,
     });
 

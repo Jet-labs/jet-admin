@@ -16,9 +16,9 @@ export const AccountDeletionForm = ({ id, username }) => {
   const [isDeleteAccountConfirmationOpen, setIsDeleteAccountConfirmationOpen] =
     useState(false);
 
-  const deleteAccountAuthorization = useMemo(() => {
+  const accountDeleteAuthorization = useMemo(() => {
     if (pmUser) {
-      return pmUser.isAuthorizedToDeleteAppConstant(id);
+      return pmUser.extractAccountDeleteAuthorization(id);
     } else {
       return false;
     }
@@ -58,7 +58,7 @@ export const AccountDeletionForm = ({ id, username }) => {
     deleteAccount({ id });
   };
   return (
-    deleteAccountAuthorization && (
+    accountDeleteAuthorization && (
       <>
         <Button
           onClick={_handleOpenDeleteAccountConfirmation}

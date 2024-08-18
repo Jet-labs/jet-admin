@@ -25,8 +25,8 @@ const AllAccounts = () => {
   const [filterQuery, setFilterQuery] = useState(null);
   const [sortModel, setSortModel] = useState(null);
 
-  const isAuthorizedToAddAccount = useMemo(() => {
-    return pmUser && pmUser.isAuthorizedToAddAccount();
+  const accountAddAuthorization = useMemo(() => {
+    return pmUser && pmUser.extractAccountAddAuthorization();
   }, [pmUser]);
 
   const {
@@ -144,7 +144,7 @@ const AllAccounts = () => {
             >
               Reload
             </Button>
-            {isAuthorizedToAddAccount && (
+            {accountAddAuthorization && (
               <Button
                 onClick={_handleNavigateAccountAdditionForm}
                 startIcon={<FaPlus className="!text-sm" />}

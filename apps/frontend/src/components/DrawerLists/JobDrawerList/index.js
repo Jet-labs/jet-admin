@@ -25,8 +25,8 @@ export const JobsList = () => {
   const currentPage = `job_${routeParam?.["*"]}`;
   const { pmUser } = useAuthState();
   const navigate = useNavigate();
-  const isAuthorizedToAddJob = useMemo(() => {
-    return pmUser && pmUser.isAuthorizedToAddJob();
+  const jobAddAuthorization = useMemo(() => {
+    return pmUser && pmUser.extractJobAddAuthorization();
   }, [pmUser]);
   const {
     isLoading: isLoadingJobs,
@@ -72,7 +72,7 @@ export const JobsList = () => {
           />
         </IconButton>
       </div>
-      {isAuthorizedToAddJob && (
+      {jobAddAuthorization && (
         <div className="!px-3 !py-1.5 !w-full">
           <Button
             onClick={_navigateToAddMoreJob}

@@ -30,7 +30,7 @@ export const DashboardUpdateForm = ({ id }) => {
     refetch: refetchDashboard,
   } = useQuery({
     queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.DASHBOARDS, id],
-    queryFn: () => getDashboardByIDAPI({ dashboardID: id }),
+    queryFn: () => getDashboardByIDAPI({ pmDashboardID: id }),
     retry: 1,
   });
 
@@ -163,7 +163,7 @@ export const DashboardUpdateForm = ({ id }) => {
                 >
                   {LOCAL_CONSTANTS.STRINGS.UPDATE_BUTTON_TEXT}
                 </Button>
-                <DashboardDeletionForm dashboardID={id} />
+                <DashboardDeletionForm id={id} />
               </div>
             </div>
           </Grid>

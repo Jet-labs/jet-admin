@@ -1,7 +1,7 @@
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
 const {
-  policyUtils,
+  policyAuthorizations,
 } = require("../../utils/policy-utils/policy-authorization");
 
 const policyMiddleware = {};
@@ -77,9 +77,10 @@ policyAuthorizationMiddleware.authorizedPoliciesForRead = async (
       message: "policyAuthorizationMiddleware:authorizedPoliciesForRead:params",
       params: { pm_user_id },
     });
-    let authorized_policies = policyUtils.extractPolicyReadAuthorization({
-      policyObject: authorization_policy,
-    });
+    let authorized_policies =
+      policyAuthorizations.extractPolicyReadAuthorization({
+        policyObject: authorization_policy,
+      });
 
     req.state = { ...req.state, authorized_policies };
     Logger.log("success", {
@@ -122,9 +123,10 @@ policyAuthorizationMiddleware.authorizePolicyUpdate = async (
       message: "policyAuthorizationMiddleware:authorizePolicyUpdate:params",
       params: { pm_user_id, query },
     });
-    let authorized_policies = policyUtils.extractPolicyEditAuthorization({
-      policyObject: authorization_policy,
-    });
+    let authorized_policies =
+      policyAuthorizations.extractPolicyEditAuthorization({
+        policyObject: authorization_policy,
+      });
 
     if (authorized_policies === false) {
       Logger.log("error", {
@@ -175,7 +177,7 @@ policyAuthorizationMiddleware.authorizePolicyAddition = async (
       message: "policyAuthorizationMiddleware:authorizePolicyAddition:params",
       params: { pm_user_id },
     });
-    let authorization = policyUtils.extractPolicyAdditionAuthorization({
+    let authorization = policyAuthorizations.extractPolicyAddAuthorization({
       policyObject: authorization_policy,
     });
 
@@ -230,9 +232,10 @@ policyAuthorizationMiddleware.authorizePolicyDeletion = async (
       message: "policyAuthorizationMiddleware:authorizePolicyDeletion:params",
       params: { pm_user_id, query },
     });
-    let authorized_policies = policyUtils.extractPolicyDeleteAuthorization({
-      policyObject: authorization_policy,
-    });
+    let authorized_policies =
+      policyAuthorizations.extractPolicyDeleteAuthorization({
+        policyObject: authorization_policy,
+      });
     if (!authorized_policies) {
       Logger.log("error", {
         message:

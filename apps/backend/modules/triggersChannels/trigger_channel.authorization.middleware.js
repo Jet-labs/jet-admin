@@ -1,7 +1,7 @@
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
 const {
-  policyUtils,
+  policyAuthorizations,
 } = require("../../utils/policy-utils/policy-authorization");
 
 const triggerChannelAuthorizationMiddleware = {};
@@ -25,7 +25,7 @@ triggerChannelAuthorizationMiddleware.populateAuthorizedTriggerChannelsForRead =
         params: { pm_user_id },
       });
       if (
-        policyUtils.extractTriggerReadAuthorization({
+        policyAuthorizations.extractTriggerReadAuthorization({
           policyObject: authorization_policy,
         })
       ) {
@@ -78,7 +78,7 @@ triggerChannelAuthorizationMiddleware.populateAuthorizedTriggerChannelsForAdd =
         params: { pm_user_id },
       });
       if (
-        policyUtils.extractTriggerAdditionAuthorization({
+        policyAuthorizations.extractTriggerAddAuthorization({
           policyObject: authorization_policy,
         })
       ) {
@@ -131,7 +131,7 @@ triggerChannelAuthorizationMiddleware.populateAuthorizedTriggerChannelsForDelete
         params: { pm_user_id },
       });
       if (
-        policyUtils.extractTriggerDeleteAuthorization({
+        policyAuthorizations.extractTriggerDeleteAuthorization({
           policyObject: authorization_policy,
         })
       ) {

@@ -39,11 +39,11 @@ export const updateDashboardAPI = async ({ data }) => {
   }
 };
 
-export const getDashboardByIDAPI = async ({ dashboardID }) => {
+export const getDashboardByIDAPI = async ({ pmDashboardID }) => {
   try {
     const response = await axiosInstance.get(
       LOCAL_CONSTANTS.APIS.DASHBOARD_LAYOUT.getDashboardByID({
-        id: dashboardID,
+        id: pmDashboardID,
       })
     );
     if (response.data && response.data.success == true) {
@@ -58,11 +58,11 @@ export const getDashboardByIDAPI = async ({ dashboardID }) => {
   }
 };
 
-export const deleteDashboardByIDAPI = async ({ dashboardID }) => {
+export const deleteDashboardByIDAPI = async ({ pmDashboardID }) => {
   try {
     const response = await axiosInstance.delete(
       LOCAL_CONSTANTS.APIS.DASHBOARD_LAYOUT.deleteDashboardByID({
-        id: dashboardID,
+        id: pmDashboardID,
       })
     );
     if (response.data && response.data.success == true) {
