@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const environmentVariables = require("../../environment");
 const Logger = require("../../utils/logger");
 const { comparePasswordWithHash } = require("../../utils/crypto.util");
-const { auth_db } = require("../../db/sqlite");
+const { sqlite_db } = require("../../db/sqlite");
 
 class AuthService {
   constructor() {}
@@ -59,7 +59,7 @@ class AuthService {
         message: "AuthService:verifyAccessToken:pm_user_id",
         params: { pm_user_id: payload.pm_user_id },
       });
-      const pmUser = auth_db
+      const pmUser = sqlite_db
         .prepare(
           `SELECT u.*, p.* FROM tbl_pm_users u LEFT JOIN tbl_pm_policy_objects p ON u.pm_policy_object_id = p.pm_policy_object_id WHERE u.pm_user_id = ? AND u.is_disabled = false`
         )
@@ -128,7 +128,7 @@ class AuthService {
         },
       });
 
-      const pmUser = auth_db
+      const pmUser = sqlite_db
         .prepare(`SELECT * FROM tbl_pm_users WHERE TRIM(username) = ? LIMIT 1`)
         .get(username.trim());
 

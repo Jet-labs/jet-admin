@@ -1,6 +1,9 @@
-const { prisma } = require("../../db/prisma");
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
+const {
+  dashboardQueryUtils,
+} = require("../../utils/postgres-utils/dashboard-queries");
+const { sqlite_db } = require("../../db/sqlite");
 class DashboardService {
   constructor() {}
 
@@ -26,23 +29,24 @@ class DashboardService {
       },
     });
     try {
-      let newDashboard = null;
+      const newDashboardQuery = sqlite_db.prepare(
+        dashboardQueryUtils.addDashboard()
+      );
+      const result = newDashboardQuery.run(
+        String(dashboardTitle),
+        String(dashboardDescription),
+        JSON.stringify(dashboardOptions)
+      );
 
-      newDashboard = await prisma.tbl_pm_dashboards.create({
-        data: {
-          dashboard_title: String(dashboardTitle),
-          dashboard_description: String(dashboardDescription),
-          dashboard_options: dashboardOptions,
-        },
-      });
+      console.log({ result });
+
       Logger.log("success", {
         message: "DashboardService:addDashboard:newDashboard",
         params: {
           dashboardTitle,
-          newDashboard,
         },
       });
-      return newDashboard;
+      return true;
     } catch (error) {
       Logger.log("error", {
         message: "DashboardService:addDashboard:catch-1",
@@ -83,23 +87,21 @@ class DashboardService {
         authorizedDashboards === true ||
         authorizedDashboards.includes(pmDashboardID)
       ) {
-        const updatedDashboard = await prisma.tbl_pm_dashboards.update({
-          where: {
-            pm_dashboard_id: pmDashboardID,
-          },
-          data: {
-            dashboard_title: String(dashboardTitle),
-            dashboard_description: String(dashboardDescription),
-            dashboard_options: dashboardOptions,
-          },
-        });
+        const updateDashboardQuery = sqlite_db.prepare(
+          dashboardQueryUtils.updateDashboard()
+        );
+
+        // Execute the update
+        updateDashboardQuery.run(
+          String(dashboardTitle),
+          String(dashboardDescription),
+          JSON.stringify(dashboardOptions),
+          pmDashboardID
+        );
         Logger.log("success", {
-          message: "DashboardService:updateDashboard:newDashboard",
-          params: {
-            updatedDashboard,
-          },
+          message: "DashboardService:updateDashboard:success",
         });
-        return updatedDashboard;
+        return true;
       } else {
         Logger.log("error", {
           message: "DashboardService:updateDashboard:catch-2",
@@ -127,16 +129,20 @@ class DashboardService {
       message: "DashboardService:getAllDashboards:params",
     });
     try {
-      const dashboards = await prisma.tbl_pm_dashboards.findMany({
-        where:
-          authorizedDashboards === true
-            ? {}
-            : {
-                pm_dashboard_id: {
-                  in: authorizedDashboards,
-                },
-              },
-      });
+      let dashboards;
+      if (authorizedDashboards === true) {
+        // Fetch all dashboards if authorizedDashboards is true
+        const getAllDashboardsQuery = sqlite_db.prepare(
+          dashboardQueryUtils.getAllDashboards()
+        );
+        dashboards = getAllDashboardsQuery.all();
+      } else {
+        // Fetch dashboards where pm_dashboard_id is in the authorizedDashboards array
+        const getAllDashboardsQuery = sqlite_db.prepare(
+          dashboardQueryUtils.getAllDashboards(authorizedDashboards)
+        );
+        dashboards = getAllDashboardsQuery.all(...authorizedDashboards);
+      }
       Logger.log("info", {
         message: "DashboardService:getAllDashboards:dashboard",
         params: {
@@ -173,11 +179,10 @@ class DashboardService {
         authorizedDashboards === true ||
         authorizedDashboards.includes(pmDashboardID)
       ) {
-        const dashboard = await prisma.tbl_pm_dashboards.findUnique({
-          where: {
-            pm_dashboard_id: pmDashboardID,
-          },
-        });
+        const getDashboardByIDQuery = sqlite_db.prepare(
+          dashboardQueryUtils.getDashboardByID()
+        );
+        const dashboard = getDashboardByIDQuery.get(pmDashboardID);
         Logger.log("info", {
           message: "DashboardService:getDashboardByID:dashboard",
           params: {
@@ -221,16 +226,13 @@ class DashboardService {
         authorizedDashboards === true ||
         authorizedDashboards.includes(pmDashboardID)
       ) {
-        const dashboard = await prisma.tbl_pm_dashboards.delete({
-          where: {
-            pm_dashboard_id: pmDashboardID,
-          },
-        });
-        Logger.log("info", {
-          message: "DashboardService:deleteDashboard:dashboard",
-          params: {
-            dashboard,
-          },
+        const deleteDashboardQuery = sqlite_db.prepare(
+          dashboardQueryUtils.deleteDashboard()
+        );
+        // Execute the delete
+        deleteDashboardQuery.run(pmDashboardID);
+        Logger.log("success", {
+          message: "DashboardService:deleteDashboard:success",
         });
         return true;
       } else {

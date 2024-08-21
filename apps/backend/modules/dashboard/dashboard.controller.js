@@ -101,9 +101,9 @@ dashboardController.addDashboard = async (req, res) => {
     });
 
     const dashboard = await DashboardService.addDashboard({
-      dashboardTitle: body.dashboard_title,
-      dashboardDescription: body.dashboard_description,
-      dashboardOptions: body.dashboard_options,
+      dashboardTitle: body.pm_dashboard_title,
+      dashboardDescription: body.pm_dashboard_description,
+      dashboardOptions: body.pm_dashboard_options,
     });
 
     Logger.log("success", {
@@ -143,9 +143,9 @@ dashboardController.updateDashboard = async (req, res) => {
 
     const dashboard = await DashboardService.updateDashboard({
       pmDashboardID: parseInt(body.pm_dashboard_id),
-      dashboardTitle: body.dashboard_title,
-      dashboardDescription: body.dashboard_description,
-      dashboardOptions: body.dashboard_options,
+      dashboardTitle: body.pm_dashboard_title,
+      dashboardDescription: body.pm_dashboard_description,
+      dashboardOptions: body.pm_dashboard_options,
       authorizedDashboards: authorized_dashboards,
     });
 

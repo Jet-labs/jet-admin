@@ -1,4 +1,4 @@
-const { auth_db } = require("../../db/sqlite");
+const { sqlite_db } = require("../../db/sqlite");
 const constants = require("../../constants");
 const { generateSaltAndPasswordHash } = require("../../utils/crypto.util");
 const Logger = require("../../utils/logger");
@@ -35,7 +35,7 @@ class AccountService {
       },
     });
     try {
-      const userWithUsername = auth_db
+      const userWithUsername = sqlite_db
         .prepare(`SELECT * FROM tbl_pm_users WHERE TRIM(username) = ? LIMIT 1`)
         .get(username.trim());
       if (userWithUsername) {
@@ -49,7 +49,7 @@ class AccountService {
         password: String(password),
       });
 
-      const stmt = auth_db.prepare(`INSERT INTO tbl_pm_users (
+      const stmt = sqlite_db.prepare(`INSERT INTO tbl_pm_users (
       first_name, last_name, address1, salt, password_hash, pm_policy_object_id, username, created_at, updated_at) VALUES (
       ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)`);
 
@@ -103,7 +103,7 @@ class AccountService {
       },
     });
     try {
-      const stmt = auth_db.prepare(`UPDATE tbl_pm_users SET
+      const stmt = sqlite_db.prepare(`UPDATE tbl_pm_users SET
       first_name = ?,
       last_name = ?,
       address1 = ?,
@@ -159,7 +159,7 @@ class AccountService {
         password: String(password),
       });
 
-      const stmt = auth_db.prepare(`UPDATE tbl_pm_users
+      const stmt = sqlite_db.prepare(`UPDATE tbl_pm_users
       SET
       salt = ?,
       password_hash = ?,
@@ -193,7 +193,7 @@ class AccountService {
       message: "PolicyService:getAllAccounts:init",
     });
     try {
-      const stmt = auth_db.prepare(`
+      const stmt = sqlite_db.prepare(`
         SELECT *
         FROM tbl_pm_users
       `);
@@ -230,7 +230,7 @@ class AccountService {
     });
 
     try {
-      const stmt = auth_db.prepare(`
+      const stmt = sqlite_db.prepare(`
       SELECT *
       FROM tbl_pm_users
       WHERE pm_user_id = ?
@@ -279,7 +279,7 @@ class AccountService {
       },
     });
     try {
-      const stmt = auth_db.prepare(`
+      const stmt = sqlite_db.prepare(`
           DELETE FROM tbl_pm_users
           WHERE pm_user_id = ?
         `);

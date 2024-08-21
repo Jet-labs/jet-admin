@@ -36,11 +36,6 @@ expressApp.use("/admin_api/queries", require("./modules/query/query.route"));
 expressApp.use("/admin_api/jobs", require("./modules/job/job.route"));
 
 expressApp.use(
-  "/admin_api/trigger_channels",
-  require("./modules/trigger-channels/trigger-channel.route")
-);
-
-expressApp.use(
   "/admin_api/triggers",
   require("./modules/triggers/trigger.route")
 );

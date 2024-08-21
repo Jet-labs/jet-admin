@@ -196,7 +196,12 @@ const TriggerAdditionForm = () => {
             renderValue={(selected) => (
               <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
                 {selected.map((value) => (
-                  <Chip size="small" key={value} label={value} />
+                  <Chip
+                    className="!rounded"
+                    size="small"
+                    key={value}
+                    label={value}
+                  />
                 ))}
               </Box>
             )}

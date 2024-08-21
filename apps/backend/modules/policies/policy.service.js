@@ -1,4 +1,4 @@
-const { auth_db } = require("../../db/sqlite");
+const { sqlite_db } = require("../../db/sqlite");
 
 const Logger = require("../../utils/logger");
 class PolicyService {
@@ -14,7 +14,7 @@ class PolicyService {
       message: "PolicyService:getAllPolicies:init",
     });
     try {
-      const stmt = auth_db.prepare(`
+      const stmt = sqlite_db.prepare(`
         SELECT *
         FROM tbl_pm_policy_objects
       `);
@@ -51,7 +51,7 @@ class PolicyService {
     });
 
     try {
-      const stmt = auth_db.prepare(`
+      const stmt = sqlite_db.prepare(`
       SELECT *
       FROM tbl_pm_policy_objects
       WHERE pm_policy_object_id = ?
@@ -101,7 +101,7 @@ class PolicyService {
       },
     });
     try {
-      const stmt = auth_db.prepare(`
+      const stmt = sqlite_db.prepare(`
       INSERT INTO tbl_pm_policy_objects (
       title, policy, created_at, updated_at
       ) VALUES (
@@ -156,7 +156,7 @@ class PolicyService {
       },
     });
     try {
-      const stmt = auth_db.prepare(`
+      const stmt = sqlite_db.prepare(`
       UPDATE tbl_pm_policy_objects
       SET
         title = COALESCE(?, title),
@@ -205,7 +205,7 @@ class PolicyService {
       },
     });
     try {
-      const stmt = auth_db.prepare(`
+      const stmt = sqlite_db.prepare(`
           DELETE FROM tbl_pm_policy_objects
           WHERE pm_policy_object_id = ?
         `);

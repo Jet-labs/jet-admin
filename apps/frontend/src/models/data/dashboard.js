@@ -1,9 +1,9 @@
 export class Dashboard {
   constructor({
     pm_dashboard_id,
-    dashboard_title,
-    dashboard_description,
-    dashboard_options,
+    pm_dashboard_title,
+    pm_dashboard_description,
+    pm_dashboard_options,
     is_disabled,
     created_at,
     updated_at,
@@ -11,12 +11,12 @@ export class Dashboard {
     disable_reason,
   }) {
     this.pm_dashboard_id = parseInt(pm_dashboard_id);
-    this.dashboard_title = String(dashboard_title);
-    this.dashboard_description = String(dashboard_description);
-    this.dashboard_options =
-      typeof dashboard_options === "object"
-        ? dashboard_options
-        : JSON.parse(dashboard_options);
+    this.pm_dashboard_title = String(pm_dashboard_title);
+    this.pm_dashboard_description = String(pm_dashboard_description);
+    this.pm_dashboard_options =
+      typeof pm_dashboard_options === "object"
+        ? pm_dashboard_options
+        : JSON.parse(pm_dashboard_options);
     this.is_disabled = is_disabled;
     this.created_at = created_at;
     this.updated_at = updated_at;

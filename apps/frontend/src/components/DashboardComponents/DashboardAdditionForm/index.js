@@ -44,7 +44,7 @@ export const DashboardAdditionForm = () => {
   });
   const dashboardForm = useFormik({
     initialValues: {
-      dashboard_title: "",
+      pm_dashboard_title: "",
       widgets: [],
       layouts: {},
     },
@@ -56,9 +56,9 @@ export const DashboardAdditionForm = () => {
       return errors;
     },
     onSubmit: (values) => {
-      const { dashboard_title, ...dashboard_options } = values;
+      const { pm_dashboard_title, ...pm_dashboard_options } = values;
       addDashboard({
-        data: { dashboard_title, dashboard_options },
+        data: { pm_dashboard_title, pm_dashboard_options },
       });
     },
   });
@@ -109,16 +109,16 @@ export const DashboardAdditionForm = () => {
               style={{ background: theme.palette.background.default }}
             >
               <FieldComponent
-                name={"dashboard_title"}
+                name={"pm_dashboard_title"}
                 type={LOCAL_CONSTANTS.DATA_TYPES.STRING}
-                value={dashboardForm.values["dashboard_title"]}
+                value={dashboardForm.values["pm_dashboard_title"]}
                 onChange={dashboardForm.handleChange}
               />
               <div className="mt-2"></div>
               <FieldComponent
-                name={"dashboard_description"}
+                name={"pm_dashboard_description"}
                 type={LOCAL_CONSTANTS.DATA_TYPES.STRING}
-                value={dashboardForm.values["dashboard_description"]}
+                value={dashboardForm.values["pm_dashboard_description"]}
                 onChange={dashboardForm.handleChange}
               />
               <div className="mt-3 w-full flex flex-row justify-end">

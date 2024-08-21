@@ -1,7 +1,7 @@
 const Logger = require("../utils/logger");
 const { dbModel } = require("../config/prisma");
 const fs = require("fs");
-const auth_db = require("better-sqlite3")("../../../auth_db.db");
+const sqlite_db = require("better-sqlite3")("../../../sqlite_db.db");
 const create_super_admin_policy = () => {
   try {
     Logger.log("info", {
@@ -217,8 +217,8 @@ const setup_auth_database = () => {
     Logger.log("info", {
       message: "setup_auth_database:begin",
     });
-    auth_db.exec(create_user_table_query);
-    auth_db.exec(create_policy_table_query);
+    sqlite_db.exec(create_user_table_query);
+    sqlite_db.exec(create_policy_table_query);
 
     Logger.log("success", {
       message: "setup_auth_database:tables created",
@@ -229,7 +229,7 @@ const setup_auth_database = () => {
     const super_admin_policy = create_super_admin_policy();
     const read_only_policy = create_read_admin_policy();
 
-    const policyStmt = auth_db.prepare(`
+    const policyStmt = sqlite_db.prepare(`
       INSERT INTO tbl_pm_policy_objects (title, policy)
       VALUES (?, ?)
     `);
@@ -244,7 +244,7 @@ const setup_auth_database = () => {
     Logger.log("info", {
       message: "setup_auth_database:super admin user creation started...",
     });
-    const userStmt = auth_db.prepare(`
+    const userStmt = sqlite_db.prepare(`
       INSERT INTO tbl_pm_users (first_name, pm_policy_object_id, username, password_hash, salt)
       VALUES (?, ?, ?, ?, ?)
     `);
@@ -264,10 +264,10 @@ const setup_auth_database = () => {
     });
 
     // Execute the trigger creation query for tbl_pm_policy_objects
-    auth_db.exec(create_policy_trigger_query);
+    sqlite_db.exec(create_policy_trigger_query);
 
     // Execute the trigger creation query for tbl_pm_users
-    auth_db.exec(create_user_trigger_query);
+    sqlite_db.exec(create_user_trigger_query);
 
     const setup_object = {
       super_admin_policy: super_admin_policy,

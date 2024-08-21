@@ -82,7 +82,7 @@ const DashboardView = () => {
               className="!text-lg font-bold"
               style={{ color: theme.palette.primary.main }}
             >
-              {dashboard.dashboard_title}
+              {dashboard.pm_dashboard_title}
             </span>
             <IconButton onClick={_handleToggleDashboardPin}>
               {isPinned ? (
@@ -109,13 +109,13 @@ const DashboardView = () => {
       {dashboard && (
         <DashboardViewComponent
           widgets={
-            dashboard.dashboard_options
-              ? dashboard.dashboard_options.widgets
+            dashboard.pm_dashboard_options
+              ? dashboard.pm_dashboard_options.widgets
               : null
           }
           layouts={
-            dashboard.dashboard_options
-              ? dashboard.dashboard_options.layouts
+            dashboard.pm_dashboard_options
+              ? dashboard.pm_dashboard_options.layouts
               : null
           }
         />

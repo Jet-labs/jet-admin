@@ -123,7 +123,7 @@ export const DashboardsDrawerList = () => {
                             ? theme.palette.primary.main
                             : theme.palette.primary.contrastText,
                       }}
-                      primary={dashboard.dashboard_title}
+                      primary={dashboard.pm_dashboard_title}
                       primaryTypographyProps={{
                         sx: {
                           fontWeight: key == currentPage ? "700" : "500",

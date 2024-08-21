@@ -58,7 +58,7 @@ export const DashboardUpdateForm = ({ id }) => {
 
   const dashboardForm = useFormik({
     initialValues: {
-      dashboard_title: "",
+      pm_dashboard_title: "",
       widgets: [],
       layouts: {},
     },
@@ -70,14 +70,17 @@ export const DashboardUpdateForm = ({ id }) => {
       return errors;
     },
     onSubmit: (values) => {
-      const { dashboard_title, dashboard_description, ...dashboard_options } =
-        values;
+      const {
+        pm_dashboard_title,
+        pm_dashboard_description,
+        ...pm_dashboard_options
+      } = values;
       updateDashboard({
         data: {
           pm_dashboard_id: id,
-          dashboard_title: dashboard_title,
-          dashboard_description: dashboard_description,
-          dashboard_options,
+          pm_dashboard_title: pm_dashboard_title,
+          pm_dashboard_description: pm_dashboard_description,
+          pm_dashboard_options,
         },
       });
     },
@@ -85,18 +88,21 @@ export const DashboardUpdateForm = ({ id }) => {
 
   useEffect(() => {
     if (dashboard) {
-      dashboardForm.setFieldValue("dashboard_title", dashboard.dashboard_title);
       dashboardForm.setFieldValue(
-        "dashboard_description",
-        dashboard.dashboard_description
+        "pm_dashboard_title",
+        dashboard.pm_dashboard_title
+      );
+      dashboardForm.setFieldValue(
+        "pm_dashboard_description",
+        dashboard.pm_dashboard_description
       );
       dashboardForm.setFieldValue(
         "widgets",
-        dashboard.dashboard_options.widgets
+        dashboard.pm_dashboard_options.widgets
       );
       dashboardForm.setFieldValue(
         "layouts",
-        dashboard.dashboard_options.layouts
+        dashboard.pm_dashboard_options.layouts
       );
     }
   }, [dashboard]);
@@ -143,16 +149,16 @@ export const DashboardUpdateForm = ({ id }) => {
               style={{ background: theme.palette.background.default }}
             >
               <FieldComponent
-                name={"dashboard_title"}
+                name={"pm_dashboard_title"}
                 type={LOCAL_CONSTANTS.DATA_TYPES.STRING}
-                value={dashboardForm.values["dashboard_title"]}
+                value={dashboardForm.values["pm_dashboard_title"]}
                 onChange={dashboardForm.handleChange}
               />
               <div className="mt-2"></div>
               <FieldComponent
-                name={"dashboard_description"}
+                name={"pm_dashboard_description"}
                 type={LOCAL_CONSTANTS.DATA_TYPES.STRING}
-                value={dashboardForm.values["dashboard_description"]}
+                value={dashboardForm.values["pm_dashboard_description"]}
                 onChange={dashboardForm.handleChange}
               />
               <div className="mt-3 w-full flex flex-row justify-end">
