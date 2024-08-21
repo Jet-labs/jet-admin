@@ -1,6 +1,6 @@
 const express = require("express");
 const cors = require("cors");
-const { morganMiddleware } = require("./morgan");
+const { morganMiddleware } = require("./morgan.config");
 
 var whitelist = [
   "http://localhost:3000",

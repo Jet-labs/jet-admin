@@ -1,5 +1,5 @@
 const express = require("express");
-const { dbModel } = require("../../config/prisma");
+const { dbModel } = require("../../db/prisma");
 const { authMiddleware } = require("../auth/auth.middleware");
 const { policyMiddleware } = require("../policies/policy.middleware");
 const { appConstantController } = require("./app-constants.controller");

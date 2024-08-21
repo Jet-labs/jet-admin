@@ -1,7 +1,7 @@
 const cron = require("node-cron");
 const Logger = require("../utils/logger");
 
-const { prisma } = require("../config/prisma");
+const { prisma } = require("../db/prisma");
 const { runQuery } = require("../modules/query/processors/postgresql");
 
 class CustomCronJobScheduler {

@@ -1,11 +1,11 @@
 const environment = require("./environment");
 const cookieParser = require("cookie-parser");
 const constants = require("./constants");
-const { expressApp } = require("./config/express.app");
-const { httpServer } = require("./config/http.server");
+const { expressApp } = require("./config/express-app.config");
+const { httpServer } = require("./config/http-server.config");
 const Logger = require("./utils/logger");
 const { CustomCronJobScheduler } = require("./jobs/cron.jobs");
-const { pgPool } = require("./config/pg");
+const { pgPool } = require("./db/pg");
 const { TriggerService } = require("./modules/triggers/trigger.services");
 
 expressApp.use(cookieParser());
@@ -63,7 +63,7 @@ httpServer.listen(port, () => {
     message: "server started listening",
     params: { port },
   });
-  TriggerService.setupTriggerNotificationChannel();
+  TriggerService.registerAllTriggerNotificationChannelsOnStartup();
   CustomCronJobScheduler.scheduleAllCustomJobs();
 });
 

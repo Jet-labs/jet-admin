@@ -1,4 +1,4 @@
-const { prisma } = require("../../../../config/prisma");
+const { prisma } = require("../../../../db/prisma");
 const Logger = require("../../../../utils/logger");
 const { runQuery } = require("../../../query/processors/postgresql");
 const { BaseGraph } = require("../baseGraph");

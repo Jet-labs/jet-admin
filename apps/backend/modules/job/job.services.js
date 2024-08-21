@@ -1,4 +1,4 @@
-const { prisma } = require("../../config/prisma");
+const { prisma } = require("../../db/prisma");
 const constants = require("../../constants");
 const { CustomCronJobScheduler } = require("../../jobs/cron.jobs");
 const Logger = require("../../utils/logger");
@@ -89,9 +89,9 @@ class JobService {
             pm_query_id: parseInt(pmQueryID),
             pm_job_schedule: String(pmJobSchedule),
           },
-          include:{
-            tbl_pm_queries:true
-          }
+          include: {
+            tbl_pm_queries: true,
+          },
         });
         Logger.log("success", {
           message: "JobService:updateJob:newJob",
@@ -233,7 +233,7 @@ class JobService {
             job,
           },
         });
-        
+
         return true;
       } else {
         Logger.log("error", {

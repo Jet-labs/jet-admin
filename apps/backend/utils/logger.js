@@ -1,5 +1,4 @@
-const { winstonLogger } = require("../config/winston");
-
+const { winstonLogger } = require("../config/winston.config");
 
 const logLevels = Object.freeze({
   info: "info",

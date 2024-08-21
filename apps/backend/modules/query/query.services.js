@@ -1,8 +1,7 @@
-const { prisma } = require("../../config/prisma");
+const { prisma } = require("../../db/prisma");
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
 const { runQuery } = require("./processors/postgresql");
-
 
 class QueryService {
   constructor() {}

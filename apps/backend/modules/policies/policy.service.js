@@ -1,4 +1,4 @@
-const { auth_db } = require("../../config/sqlite.db");
+const { auth_db } = require("../../db/sqlite");
 
 const Logger = require("../../utils/logger");
 class PolicyService {

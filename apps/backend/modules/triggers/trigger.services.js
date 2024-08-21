@@ -1,4 +1,4 @@
-const { prisma } = require("../../config/prisma");
+const { prisma } = require("../../db/prisma");
 const environment = require("../../environment");
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
@@ -9,7 +9,7 @@ const {
   getTriggerByName,
   deleteTriggerByName,
 } = require("../../utils/postgres-utils/triggers-queries");
-const { pgPool } = require("../../config/pg");
+const { pgPool } = require("../../db/pg");
 const {
   parseTriggerDefinition,
 } = require("../../utils/postgres-utils/parsers");
@@ -18,15 +18,76 @@ const {
 class TriggerService {
   constructor() {}
 
-  static setupTriggerNotificationChannel = async () => {
+  static registerTriggerNotificationChannel = async ({
+    pmTriggerChannelName,
+  }) => {
     const client = await pgPool.connect();
-    client.query("LISTEN help_channel");
+    Logger.log("info", {
+      message: "TriggerService:registerTriggerNotificationChannel:params",
+      params: { pmTriggerChannelName },
+    });
+    await client.query(`LISTEN ${pmTriggerChannelName}`);
     client.on("notification", async (msg) => {
       const payload = JSON.parse(msg.payload);
       console.log("Received notification:", payload);
       // Execute your Node.js code here based on the notification
       // For example, you might want to trigger an external API call, log data, etc.
     });
+    Logger.log("success", {
+      message: "TriggerService:registerTriggerNotificationChannel:success",
+      params: { pmTriggerChannelName },
+    });
+  };
+
+  static unregisterTriggerNotificationChannel = async ({
+    pmTriggerChannelName,
+  }) => {
+    const client = await pgPool.connect();
+    Logger.log("info", {
+      message: "TriggerService:unregisterTriggerNotificationChannel:params",
+      params: { pmTriggerChannelName },
+    });
+    await client.query(`UNLISTEN ${pmTriggerChannelName}`);
+    Logger.log("success", {
+      message: "TriggerService:unregisterTriggerNotificationChannel:success",
+      params: { pmTriggerChannelName },
+    });
+  };
+
+  static registerAllTriggerNotificationChannelsOnStartup = async () => {
+    try {
+      Logger.log("info", {
+        message:
+          "TriggerService:registerAllTriggerNotificationChannelsOnStartup:init",
+      });
+      const triggers = await this.getAllTriggers();
+      const triggerSetupPromises = triggers
+        .filter((trigger) => {
+          if (
+            trigger.pm_trigger_channel_name != undefined ||
+            trigger.pm_trigger_channel_name != null
+          ) {
+            return true;
+          }
+          return false;
+        })
+        .map((trigger) => {
+          return this.registerTriggerNotificationChannel({
+            pmTriggerChannelName: trigger.pm_trigger_channel_name,
+          });
+        });
+      await Promise.all(triggerSetupPromises);
+      Logger.log("success", {
+        message:
+          "TriggerService:registerAllTriggerNotificationChannelsOnStartup:success",
+      });
+    } catch (error) {
+      Logger.log("error", {
+        message:
+          "TriggerService:registerAllTriggerNotificationChannelsOnStartup:catch-1",
+        params: { error },
+      });
+    }
   };
 
   /**
@@ -84,7 +145,12 @@ class TriggerService {
           newTrigger,
         },
       });
+      // setup trigger
+      await this.registerTriggerNotificationChannel({
+        pmTriggerChannelName: pmTriggerChannelName,
+      });
       client.release();
+
       return newTrigger;
     } catch (error) {
       Logger.log("error", {
@@ -220,7 +286,15 @@ class TriggerService {
           tableName: pmTriggerTableName,
         })
       );
+      const parsedTriggerDefinition = parseTriggerDefinition(
+        result.rows[0].trigger_definition
+      );
+      console.log({ parsedTriggerDefinition });
       await client.query("COMMIT");
+      // unregister trigger
+      await this.unregisterTriggerNotificationChannel({
+        pmTriggerChannelName: parsedTriggerDefinition.trigger_channel,
+      });
       client.release();
       return result;
     } catch (error) {

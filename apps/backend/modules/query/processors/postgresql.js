@@ -1,6 +1,6 @@
 const jsep = require("jsep");
 const constants = require("../../../constants");
-const { prisma } = require("../../../config/prisma");
+const { prisma } = require("../../../db/prisma");
 const Logger = require("../../../utils/logger");
 const {
   evaluateAST,

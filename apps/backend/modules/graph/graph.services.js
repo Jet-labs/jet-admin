@@ -1,5 +1,5 @@
 const { Prisma } = require("@prisma/client");
-const { prisma } = require("../../config/prisma");
+const { prisma } = require("../../db/prisma");
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
 const { GRAPH_PLUGINS_MAP } = require("./processors");

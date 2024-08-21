@@ -1,6 +1,6 @@
 const constants = require("../../constants");
 const { generateSQlFromPrismaSchema } = require("../../scripts/generate-sql");
-const { extractError } = require("../../utils/error");
+const { extractError } = require("../../utils/error.util");
 const Logger = require("../../utils/logger");
 const { SchemaService } = require("./schema.services");
 

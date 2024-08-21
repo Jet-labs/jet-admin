@@ -1,6 +1,6 @@
-const { auth_db } = require("../../config/sqlite.db");
+const { auth_db } = require("../../db/sqlite");
 const constants = require("../../constants");
-const { generateSaltAndPasswordHash } = require("../../utils/crypto");
+const { generateSaltAndPasswordHash } = require("../../utils/crypto.util");
 const Logger = require("../../utils/logger");
 class AccountService {
   constructor() {}

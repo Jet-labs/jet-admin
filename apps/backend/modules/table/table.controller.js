@@ -1,6 +1,6 @@
-const { prisma, dbModel } = require("../../config/prisma");
+const { prisma, dbModel } = require("../../db/prisma");
 const constants = require("../../constants");
-const { extractError } = require("../../utils/error");
+const { extractError } = require("../../utils/error.util");
 const Logger = require("../../utils/logger");
 const {
   policyAuthorizations,
@@ -681,6 +681,5 @@ tableController.exportRowByMultipleIDs = async (req, res) => {
     return res.json({ success: false, error: extractError(error) });
   }
 };
-
 
 module.exports = tableController;
