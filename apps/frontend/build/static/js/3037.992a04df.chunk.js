@@ -18,9 +18,9 @@
         constructor(e) {
           let {
             pm_graph_id: a,
-            graph_title: t,
+            pm_graph_title: t,
             graph_description: r,
-            graph_options: l,
+            pm_graph_options: l,
             dataset: i,
             is_disabled: n,
             created_at: o,
@@ -29,9 +29,9 @@
             disable_reason: p,
           } = e;
           (this.pm_graph_id = parseInt(a)),
-            (this.graph_title = String(t)),
+            (this.pm_graph_title = String(t)),
             (this.graph_description = String(r)),
-            (this.graph_options = "object" === typeof l ? l : JSON.parse(l)),
+            (this.pm_graph_options = "object" === typeof l ? l : JSON.parse(l)),
             (this.dataset = i),
             (this.is_disabled = n),
             (this.created_at = o),
@@ -200,11 +200,11 @@
                   var r, l;
                   const n = "graph_".concat(a.pm_graph_id),
                     o =
-                      null !== (r = a.graph_options) &&
+                      null !== (r = a.pm_graph_options) &&
                       void 0 !== r &&
                       r.graph_type
                         ? R.z[
-                            null === (l = a.graph_options) || void 0 === l
+                            null === (l = a.pm_graph_options) || void 0 === l
                               ? void 0
                               : l.graph_type
                           ]
@@ -250,7 +250,7 @@
                                       ? e.palette.primary.main
                                       : e.palette.primary.contrastText,
                                 },
-                                primary: a.graph_title,
+                                primary: a.pm_graph_title,
                                 primaryTypographyProps: {
                                   sx: {
                                     fontWeight: n == t ? "700" : "500",

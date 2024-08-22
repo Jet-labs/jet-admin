@@ -72,8 +72,8 @@ export const WidgetsDnDList = ({}) => {
         graphs.length > 0 &&
         graphs.map((graph, index) => {
           const key = `graph_${graph.pm_graph_id}`;
-          const graphPlugin = graph.graph_options?.graph_type
-            ? GRAPH_PLUGINS_MAP[graph.graph_options?.graph_type]
+          const graphPlugin = graph.pm_graph_options?.graph_type
+            ? GRAPH_PLUGINS_MAP[graph.pm_graph_options?.graph_type]
             : null;
           return (
             <ListItem
@@ -114,7 +114,7 @@ export const WidgetsDnDList = ({}) => {
                   sx={{
                     color: theme.palette.primary.contrastText,
                   }}
-                  primary={graph.graph_title}
+                  primary={graph.pm_graph_title}
                   primaryTypographyProps={{
                     sx: {
                       marginLeft: -2,

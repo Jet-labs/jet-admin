@@ -7,7 +7,7 @@ export const GraphComponentPreview = ({
   graphType,
   legendPosition,
   titleDisplayEnabled,
-  graphTitle,
+  pmGraphTitle,
   data,
   refetchInterval,
 }) => {
@@ -27,7 +27,7 @@ export const GraphComponentPreview = ({
         {GRAPH_PLUGINS_MAP[graphType].component({
           legendPosition,
           titleDisplayEnabled,
-          graphTitle,
+          pmGraphTitle,
           data,
         })}
       </Grid>

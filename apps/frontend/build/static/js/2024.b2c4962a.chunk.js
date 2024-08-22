@@ -62,20 +62,20 @@
                 graph_type: y.z.BAR.value,
                 title_display_enabled: !0,
                 legend_position: g.a.GRAPH_LEGEND_POSITION.TOP,
-                graph_title: "",
+                pm_graph_title: "",
                 query_array: [{ dataset_title: "", query: "" }],
               },
               validateOnMount: !1,
               validateOnChange: !1,
               validate: (e) => ({}),
               onSubmit: (e) => {
-                const { graph_title: t, ...a } = e;
+                const { pm_graph_title: t, ...a } = e;
                 b({
                   data: {
                     pm_graph_id:
                       null === f || void 0 === f ? void 0 : f.pm_graph_id,
-                    graph_title: t,
-                    graph_options: a,
+                    pm_graph_title: t,
+                    pm_graph_options: a,
                   },
                 });
               },
@@ -84,20 +84,20 @@
             (0, l.useEffect)(() => {
               f &&
                 (console.log({ graphData: f }),
-                P.setFieldValue("graph_type", f.graph_options.graph_type),
+                P.setFieldValue("graph_type", f.pm_graph_options.graph_type),
                 P.setFieldValue(
                   "title_display_enabled",
-                  f.graph_options.title_display_enabled
+                  f.pm_graph_options.title_display_enabled
                 ),
                 P.setFieldValue(
                   "legend_position",
-                  f.graph_options.legend_position
+                  f.pm_graph_options.legend_position
                 ),
-                P.setFieldValue("graph_title", f.graph_title),
-                P.setFieldValue("query_array", f.graph_options.query_array),
+                P.setFieldValue("pm_graph_title", f.pm_graph_title),
+                P.setFieldValue("query_array", f.pm_graph_options.query_array),
                 P.setFieldValue(
                   "refetch_interval",
-                  f.graph_options.refetch_interval
+                  f.pm_graph_options.refetch_interval
                 ));
             }, [f]),
             (0, m.jsxs)("div", {
@@ -121,7 +121,7 @@
                           "text-xs font-thin text-start text-slate-300",
                         style: { color: a.palette.text.secondary },
                         children: ""
-                          .concat(f.graph_title, " | Graph ID : ")
+                          .concat(f.pm_graph_title, " | Graph ID : ")
                           .concat(f.pm_graph_id),
                       }),
                   ],
@@ -149,7 +149,7 @@
                           graphType: P.values.graph_type,
                           legendPosition: P.values.legend_position,
                           titleDisplayEnabled: P.values.title_display_enabled,
-                          graphTitle: P.values.graph_title,
+                          pmGraphTitle: P.values.pm_graph_title,
                           data: f.dataset,
                         }),
                       }),

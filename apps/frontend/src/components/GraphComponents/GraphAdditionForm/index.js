@@ -37,7 +37,7 @@ export const GraphAdditionForm = () => {
       graph_type: GRAPH_PLUGINS_MAP.BAR.value,
       title_display_enabled: true,
       legend_position: LOCAL_CONSTANTS.GRAPH_LEGEND_POSITION.TOP,
-      graph_title: "",
+      pm_graph_title: "",
       refetch_interval: 5,
       query_array: [{ dataset_title: "", query: "" }],
     },
@@ -49,8 +49,8 @@ export const GraphAdditionForm = () => {
       return errors;
     },
     onSubmit: (values) => {
-      const { graph_title, ...graph_options } = values;
-      addGraph({ data: { graph_title, graph_options } });
+      const { pm_graph_title, ...pm_graph_options } = values;
+      addGraph({ data: { pm_graph_title, pm_graph_options } });
     },
   });
 
@@ -73,7 +73,7 @@ export const GraphAdditionForm = () => {
             graphType={graphForm.values["graph_type"]}
             legendPosition={graphForm.values["legend_position"]}
             titleDisplayEnabled={graphForm.values["title_display_enabled"]}
-            graphTitle={graphForm.values["graph_title"]}
+            pmGraphTitle={graphForm.values["pm_graph_title"]}
           />
         </Grid>
       </Grid>

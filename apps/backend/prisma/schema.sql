@@ -215,7 +215,7 @@ CREATE TABLE "tbl_pm_users" (
 -- CreateTable
 CREATE TABLE "tbl_pm_graphs" (
     "pm_graph_id" SERIAL NOT NULL,
-    "graph_title" VARCHAR NOT NULL,
+    "pm_graph_title" VARCHAR NOT NULL,
     "graph_description" VARCHAR,
     "is_disabled" BOOLEAN DEFAULT false,
     "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,

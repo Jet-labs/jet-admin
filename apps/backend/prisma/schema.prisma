@@ -204,82 +204,6 @@ model store {
   address          address     @relation(fields: [address_id], references: [address_id])
 }
 
-model tbl_pm_graphs {
-  pm_graph_id       Int       @id @default(autoincrement())
-  graph_title       String    @db.VarChar
-  graph_description String?   @db.VarChar
-  is_disabled       Boolean?  @default(false)
-  created_at        DateTime  @default(now()) @db.Timestamptz(6)
-  updated_at        DateTime  @default(now()) @db.Timestamptz(6)
-  disabled_at       DateTime? @db.Timestamptz(6)
-  disable_reason    String?   @db.VarChar
-  graph_options     Json?
-}
-
-model tbl_pm_dashboards {
-  pm_dashboard_id       Int       @id(map: "tbl_pm_dashboard_layout_pkey") @default(autoincrement())
-  dashboard_title       String    @db.VarChar
-  dashboard_description String?   @db.VarChar
-  is_disabled           Boolean?  @default(false)
-  created_at            DateTime  @default(now()) @db.Timestamptz(6)
-  updated_at            DateTime  @default(now()) @db.Timestamptz(6)
-  disabled_at           DateTime? @db.Timestamptz(6)
-  disable_reason        String?   @db.VarChar
-  dashboard_options     Json?
-  dashboard_graph_ids   Int[]
-}
-
-model tbl_pm_queries {
-  pm_query_id          Int           @id(map: "tbl_pm_queries_pk") @default(autoincrement())
-  pm_query_type        String?       @default("POSTGRE_QUERY") @db.VarChar
-  created_at           DateTime      @default(now()) @db.Timestamptz(6)
-  updated_at           DateTime      @default(now()) @db.Timestamptz(6)
-  disabled_at          DateTime?     @db.Timestamptz(6)
-  is_disabled          Boolean?      @default(false)
-  pm_query_title       String        @default("Untitled") @db.VarChar
-  pm_query_description String?       @db.VarChar
-  pm_query             Json?         @db.Json
-  run_on_load          Boolean?
-  pm_query_args        String[]      @db.VarChar
-  pm_query_metadata    Json?         @db.Json
-  tbl_pm_jobs          tbl_pm_jobs[]
-}
-
-model tbl_pm_jobs {
-  pm_job_id          Int                  @id(map: "tbl_pm_jobs_pk") @default(autoincrement())
-  pm_job_title       String               @db.VarChar
-  pm_query_id        Int
-  pm_job_schedule    String               @db.VarChar
-  created_at         DateTime             @default(now()) @db.Timestamptz(6)
-  updated_at         DateTime             @default(now()) @db.Timestamptz(6)
-  disabled_at        DateTime?            @db.Timestamptz(6)
-  is_disabled        Boolean?             @default(false)
-  tbl_pm_job_history tbl_pm_job_history[]
-  tbl_pm_queries     tbl_pm_queries       @relation(fields: [pm_query_id], references: [pm_query_id], onDelete: NoAction, onUpdate: NoAction, map: "tbl_pm_jobs_tbl_pm_queries_fk")
-}
-
-model tbl_pm_job_history {
-  pm_job_history_id Int         @id(map: "tbl_pm_job_histors_pk") @default(autoincrement())
-  history_result    Json?       @db.Json
-  created_at        DateTime    @default(now()) @db.Timestamptz(6)
-  updated_at        DateTime    @default(now()) @db.Timestamptz(6)
-  disabled_at       DateTime?   @db.Timestamptz(6)
-  is_disabled       Boolean?    @default(false)
-  pm_job_id         Int
-  tbl_pm_jobs       tbl_pm_jobs @relation(fields: [pm_job_id], references: [pm_job_id], onDelete: NoAction, onUpdate: NoAction, map: "tbl_pm_job_history_tbl_pm_jobs_fk")
-}
-
-model tbl_pm_app_constants {
-  pm_app_constant_id    Int       @id(map: "tbl_pm_app_constants_pk") @default(autoincrement())
-  pm_app_constant_title String    @unique(map: "unique_app_constants_title") @db.VarChar
-  pm_app_constant_value Json      @db.Json
-  created_at            DateTime  @default(now()) @db.Timestamptz(6)
-  updated_at            DateTime  @default(now()) @db.Timestamptz(6)
-  disabled_at           DateTime? @db.Timestamptz(6)
-  is_disabled           Boolean?  @default(false)
-  is_internal           Boolean?
-}
-
 model session_history {
   id               Int       @id @default(autoincrement())
   captured_at      DateTime? @default(now()) @db.Timestamptz(6)
@@ -305,22 +229,6 @@ model transaction_history {
   transactions  BigInt?
   commits       BigInt?
   rollbacks     BigInt?
-}
-
-model tbl_pm_triggers {
-  pm_trigger_id          Int       @id @default(autoincrement())
-  pm_trigger_title       String    @db.VarChar
-  pm_trigger_description String?   @db.VarChar
-  is_disabled            Boolean?  @default(false)
-  created_at             DateTime  @default(now()) @db.Timestamptz(6)
-  updated_at             DateTime  @default(now()) @db.Timestamptz(6)
-  disabled_at            DateTime? @db.Timestamptz(6)
-  disable_reason         String?   @db.VarChar
-  pm_trigger_options     Json?
-}
-
-model tbl_pm_trigger_channels {
-  pm_trigger_channel_name String @unique(map: "tbl_pm_trigger_channels_pm_trigger_channel_idx") @db.VarChar
 }
 
 enum mpaa_rating {

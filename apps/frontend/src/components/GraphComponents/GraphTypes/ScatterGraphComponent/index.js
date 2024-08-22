@@ -68,7 +68,7 @@ const demoData = new ScatterGraphData({
 export const ScatterGraphComponent = ({
   legendPosition,
   titleDisplayEnabled,
-  graphTitle,
+  pmGraphTitle,
   data,
 }) => {
   const theme = useTheme();
@@ -81,11 +81,11 @@ export const ScatterGraphComponent = ({
         },
         title: {
           display: !!titleDisplayEnabled,
-          text: graphTitle || LOCAL_CONSTANTS.STRINGS.UNTITLED_CHART_TITLE,
+          text: pmGraphTitle || LOCAL_CONSTANTS.STRINGS.UNTITLED_CHART_TITLE,
         },
       },
     };
-  }, [legendPosition, titleDisplayEnabled, graphTitle]);
+  }, [legendPosition, titleDisplayEnabled, pmGraphTitle]);
 
   return <Scatter redraw={true} options={options} data={data || demoData} />;
 };

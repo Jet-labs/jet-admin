@@ -818,7 +818,7 @@
           graphType: l,
           legendPosition: a,
           titleDisplayEnabled: i,
-          graphTitle: o,
+          pmGraphTitle: o,
           data: c,
           refetchInterval: d,
         } = e;
@@ -837,7 +837,7 @@
             children: r.z[l].component({
               legendPosition: a,
               titleDisplayEnabled: i,
-              graphTitle: o,
+              pmGraphTitle: o,
               data: c,
             }),
           }),
@@ -984,15 +984,15 @@
                           size: "small",
                           variant: "outlined",
                           type: "text",
-                          name: "graph_title",
-                          value: j.values.graph_title,
+                          name: "pm_graph_title",
+                          value: j.values.pm_graph_title,
                           onChange: j.handleChange,
                           onBlur: j.handleBlur,
                         }),
                       ],
                     }),
                   },
-                  "graph_title"
+                  "pm_graph_title"
                 ),
                 (0, W.jsx)(
                   t.Ay,

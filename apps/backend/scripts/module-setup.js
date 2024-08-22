@@ -33,14 +33,14 @@ const setupConfigProvider = () => {
 const create_graph_table_query = `CREATE TABLE IF NOT EXISTS public.tbl_pm_graphs
 (
     pm_graph_id serial NOT NULL,
-    graph_title character varying NOT NULL,
+    pm_graph_title character varying NOT NULL,
     graph_description character varying,
     is_disabled boolean DEFAULT false,
     created_at timestamp(6) with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp(6) with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
     disabled_at timestamp(6) with time zone,
     disable_reason character varying,
-    graph_options jsonb,
+    pm_graph_options jsonb,
     CONSTRAINT tbl_pm_graphs_pkey PRIMARY KEY (pm_graph_id)
 );`;
 

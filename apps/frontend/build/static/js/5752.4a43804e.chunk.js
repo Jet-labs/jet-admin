@@ -18,9 +18,9 @@
         constructor(e) {
           let {
             pm_graph_id: a,
-            graph_title: t,
+            pm_graph_title: t,
             graph_description: r,
-            graph_options: l,
+            pm_graph_options: l,
             dataset: i,
             is_disabled: s,
             created_at: o,
@@ -29,9 +29,9 @@
             disable_reason: p,
           } = e;
           (this.pm_graph_id = parseInt(a)),
-            (this.graph_title = String(t)),
+            (this.pm_graph_title = String(t)),
             (this.graph_description = String(r)),
-            (this.graph_options = "object" === typeof l ? l : JSON.parse(l)),
+            (this.pm_graph_options = "object" === typeof l ? l : JSON.parse(l)),
             (this.dataset = i),
             (this.is_disabled = s),
             (this.created_at = o),
@@ -152,7 +152,7 @@
               1e3 *
               (null === b ||
               void 0 === b ||
-              null === (a = b.graph_options) ||
+              null === (a = b.pm_graph_options) ||
               void 0 === a
                 ? void 0
                 : a.refetch_interval),
@@ -160,25 +160,25 @@
           v =
             null === R ||
             void 0 === R ||
-            null === (t = R.graph_options) ||
+            null === (t = R.pm_graph_options) ||
             void 0 === t
               ? void 0
               : t.graph_type,
-          A = null === R || void 0 === R ? void 0 : R.graph_title,
+          A = null === R || void 0 === R ? void 0 : R.pm_graph_title,
           x =
             null === R || void 0 === R
               ? void 0
-              : R.graph_options.legend_position,
+              : R.pm_graph_options.legend_position,
           I =
             null === R || void 0 === R
               ? void 0
-              : R.graph_options.title_display_enabled,
+              : R.pm_graph_options.title_display_enabled,
           D = null === R || void 0 === R ? void 0 : R.dataset,
           P =
             1e3 *
             (null === b ||
             void 0 === b ||
-            null === (l = b.graph_options) ||
+            null === (l = b.pm_graph_options) ||
             void 0 === l
               ? void 0
               : l.refetch_interval);

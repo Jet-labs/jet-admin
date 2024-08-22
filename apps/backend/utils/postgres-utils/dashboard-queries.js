@@ -12,8 +12,9 @@ dashboardQueryUtils.getAllDashboards = (authorizedDashboards) => {
     return `SELECT * FROM tbl_pm_dashboards`;
   } else {
     // Fetch dashboards where pm_dashboard_id is in the authorizedDashboards array
-    const placeholders = authorizedDashboards.map(() => "?").join(", ");
-    return `SELECT * FROM tbl_pm_dashboards WHERE pm_dashboard_id IN (${placeholders})`;
+    return `SELECT * FROM tbl_pm_dashboards WHERE pm_dashboard_id IN (${authorizedDashboards
+      .map(() => "?")
+      .join(", ")})`;
   }
 };
 dashboardQueryUtils.getDashboardByID = () =>

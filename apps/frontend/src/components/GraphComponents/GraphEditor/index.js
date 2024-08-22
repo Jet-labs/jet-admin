@@ -131,7 +131,7 @@ export const GraphEditor = ({ pmGraphID, graphForm }) => {
         className="rounded !p-3"
         // style={{ background: theme.palette.action.selected }}
       >
-        <Grid item xs={12} sm={12} md={12} lg={12} key={"graph_title"}>
+        <Grid item xs={12} sm={12} md={12} lg={12} key={"pm_graph_title"}>
           <FormControl fullWidth size="small" className="">
             <span className="text-xs font-light  !capitalize mb-1">{`Title`}</span>
             <TextField
@@ -140,8 +140,8 @@ export const GraphEditor = ({ pmGraphID, graphForm }) => {
               size="small"
               variant="outlined"
               type="text"
-              name={"graph_title"}
-              value={graphForm.values.graph_title}
+              name={"pm_graph_title"}
+              value={graphForm.values.pm_graph_title}
               onChange={graphForm.handleChange}
               onBlur={graphForm.handleBlur}
             />

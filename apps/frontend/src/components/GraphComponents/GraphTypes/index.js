@@ -19,14 +19,14 @@ export const GRAPH_PLUGINS_MAP = {
     component: ({
       legendPosition,
       titleDisplayEnabled,
-      graphTitle,
+      pmGraphTitle,
       data,
       refetchInterval,
     }) => (
       <BarGraphComponent
         legendPosition={legendPosition}
         titleDisplayEnabled={titleDisplayEnabled}
-        graphTitle={graphTitle}
+        pmGraphTitle={pmGraphTitle}
         data={data}
         refetchInterval={refetchInterval}
       />
@@ -40,14 +40,14 @@ export const GRAPH_PLUGINS_MAP = {
     component: ({
       legendPosition,
       titleDisplayEnabled,
-      graphTitle,
+      pmGraphTitle,
       data,
       refetchInterval,
     }) => (
       <LineGraphComponent
         legendPosition={legendPosition}
         titleDisplayEnabled={titleDisplayEnabled}
-        graphTitle={graphTitle}
+        pmGraphTitle={pmGraphTitle}
         data={data}
         refetchInterval={refetchInterval}
       />
@@ -61,14 +61,14 @@ export const GRAPH_PLUGINS_MAP = {
     component: ({
       legendPosition,
       titleDisplayEnabled,
-      graphTitle,
+      pmGraphTitle,
       data,
       refetchInterval,
     }) => (
       <PieGraphComponent
         legendPosition={legendPosition}
         titleDisplayEnabled={titleDisplayEnabled}
-        graphTitle={graphTitle}
+        pmGraphTitle={pmGraphTitle}
         data={data}
         refetchInterval={refetchInterval}
       />
@@ -82,14 +82,14 @@ export const GRAPH_PLUGINS_MAP = {
     component: ({
       legendPosition,
       titleDisplayEnabled,
-      graphTitle,
+      pmGraphTitle,
       data,
       refetchInterval,
     }) => (
       <DoughnutGraphComponent
         legendPosition={legendPosition}
         titleDisplayEnabled={titleDisplayEnabled}
-        graphTitle={graphTitle}
+        pmGraphTitle={pmGraphTitle}
         data={data}
         refetchInterval={refetchInterval}
       />
@@ -103,14 +103,14 @@ export const GRAPH_PLUGINS_MAP = {
     component: ({
       legendPosition,
       titleDisplayEnabled,
-      graphTitle,
+      pmGraphTitle,
       data,
       refetchInterval,
     }) => (
       <PolarAreaGraphComponent
         legendPosition={legendPosition}
         titleDisplayEnabled={titleDisplayEnabled}
-        graphTitle={graphTitle}
+        pmGraphTitle={pmGraphTitle}
         data={data}
         refetchInterval={refetchInterval}
       />
@@ -124,14 +124,14 @@ export const GRAPH_PLUGINS_MAP = {
     component: ({
       legendPosition,
       titleDisplayEnabled,
-      graphTitle,
+      pmGraphTitle,
       data,
       refetchInterval,
     }) => (
       <RadarGraphComponent
         legendPosition={legendPosition}
         titleDisplayEnabled={titleDisplayEnabled}
-        graphTitle={graphTitle}
+        pmGraphTitle={pmGraphTitle}
         data={data}
         refetchInterval={refetchInterval}
       />
@@ -145,14 +145,14 @@ export const GRAPH_PLUGINS_MAP = {
     component: ({
       legendPosition,
       titleDisplayEnabled,
-      graphTitle,
+      pmGraphTitle,
       data,
       refetchInterval,
     }) => (
       <ScatterGraphComponent
         legendPosition={legendPosition}
         titleDisplayEnabled={titleDisplayEnabled}
-        graphTitle={graphTitle}
+        pmGraphTitle={pmGraphTitle}
         data={data}
         refetchInterval={refetchInterval}
       />

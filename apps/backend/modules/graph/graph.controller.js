@@ -20,8 +20,8 @@ graphController.addGraph = async (req, res) => {
     });
 
     const newGraph = await GraphService.addGraph({
-      graphTitle: body.graph_title,
-      graphOptions: body.graph_options,
+      pmGraphTitle: body.pm_graph_title,
+      pmGraphOptions: body.pm_graph_options,
     });
 
     Logger.log("success", {
@@ -61,8 +61,8 @@ graphController.updateGraph = async (req, res) => {
 
     const updatedGraph = await GraphService.updateGraph({
       pmGraphID: parseInt(body.pm_graph_id),
-      graphTitle: body.graph_title,
-      graphOptions: body.graph_options,
+      pmGraphTitle: body.pm_graph_title,
+      pmGraphOptions: body.pm_graph_options,
       authorizedGraphs: authorized_graphs,
     });
 

@@ -60,7 +60,7 @@ const demoData = {
 export const DoughnutGraphComponent = ({
   legendPosition,
   titleDisplayEnabled,
-  graphTitle,
+  pmGraphTitle,
   data,
 }) => {
   const theme = useTheme();
@@ -80,13 +80,13 @@ export const DoughnutGraphComponent = ({
         },
         title: {
           display: Boolean(titleDisplayEnabled),
-          text: graphTitle
-            ? graphTitle
+          text: pmGraphTitle
+            ? pmGraphTitle
             : LOCAL_CONSTANTS.STRINGS.UNTITLED_CHART_TITLE,
         },
       },
     };
-  }, [legendPosition, titleDisplayEnabled, graphTitle]);
+  }, [legendPosition, titleDisplayEnabled, pmGraphTitle]);
 
   return <Doughnut options={options} data={data ? data : demoData} />;
 };

@@ -85,8 +85,8 @@ export const GraphDrawerList = () => {
       {graphs && graphs.length > 0
         ? graphs.map((graph) => {
             const key = `graph_${graph.pm_graph_id}`;
-            const graphPlugin = graph.graph_options?.graph_type
-              ? GRAPH_PLUGINS_MAP[graph.graph_options?.graph_type]
+            const graphPlugin = graph.pm_graph_options?.graph_type
+              ? GRAPH_PLUGINS_MAP[graph.pm_graph_options?.graph_type]
               : null;
             return (
               <Link
@@ -131,7 +131,7 @@ export const GraphDrawerList = () => {
                             ? theme.palette.primary.main
                             : theme.palette.primary.contrastText,
                       }}
-                      primary={graph.graph_title}
+                      primary={graph.pm_graph_title}
                       primaryTypographyProps={{
                         sx: {
                           fontWeight: key == currentPage ? "700" : "500",

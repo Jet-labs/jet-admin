@@ -78,7 +78,7 @@ const demoData = {
 export const LineGraphComponent = ({
   legendPosition,
   titleDisplayEnabled,
-  graphTitle,
+  pmGraphTitle,
   data,
 }) => {
   const theme = useTheme();
@@ -98,8 +98,8 @@ export const LineGraphComponent = ({
         },
         title: {
           display: Boolean(titleDisplayEnabled),
-          text: graphTitle
-            ? graphTitle
+          text: pmGraphTitle
+            ? pmGraphTitle
             : LOCAL_CONSTANTS.STRINGS.UNTITLED_CHART_TITLE,
         },
       },
@@ -116,7 +116,7 @@ export const LineGraphComponent = ({
       //   },
       // },
     };
-  }, [legendPosition, titleDisplayEnabled, graphTitle]);
+  }, [legendPosition, titleDisplayEnabled, pmGraphTitle]);
 
   return <Line redraw={true} options={options} data={data ? data : demoData} />;
 };

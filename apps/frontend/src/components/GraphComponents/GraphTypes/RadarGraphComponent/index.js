@@ -66,7 +66,7 @@ const demoData = {
 export const RadarGraphComponent = ({
   legendPosition,
   titleDisplayEnabled,
-  graphTitle,
+  pmGraphTitle,
   data,
 }) => {
   const theme = useTheme();
@@ -87,13 +87,13 @@ export const RadarGraphComponent = ({
         },
         title: {
           display: Boolean(titleDisplayEnabled),
-          text: graphTitle
-            ? graphTitle
+          text: pmGraphTitle
+            ? pmGraphTitle
             : LOCAL_CONSTANTS.STRINGS.UNTITLED_CHART_TITLE,
         },
       },
     };
-  }, [legendPosition, titleDisplayEnabled, graphTitle]);
+  }, [legendPosition, titleDisplayEnabled, pmGraphTitle]);
 
   return (
     <Radar options={options} height={"300 px"} data={data ? data : demoData} />

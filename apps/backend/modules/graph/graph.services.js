@@ -1,8 +1,8 @@
-const { Prisma } = require("@prisma/client");
-const { prisma } = require("../../db/prisma");
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
 const { GRAPH_PLUGINS_MAP } = require("./processors");
+const { graphQueryUtils } = require("../../utils/postgres-utils/graph-queries");
+const { sqlite_db } = require("../../db/sqlite");
 
 class GraphService {
   constructor() {}
@@ -10,34 +10,28 @@ class GraphService {
   /**
    *
    * @param {object} param0
-   * @param {String} param0.graphTitle
-   * @param {any} param0.graphOptions
+   * @param {String} param0.pmGraphTitle
+   * @param {any} param0.pmGraphOptions
    * @returns {any|null}
    */
-  static addGraph = async ({ graphTitle, graphOptions }) => {
+  static addGraph = async ({ pmGraphTitle, pmGraphOptions }) => {
     Logger.log("info", {
       message: "GraphService:addGraph:params",
       params: {
-        graphTitle,
-        graphOptions,
+        pmGraphTitle,
+        pmGraphOptions,
       },
     });
     try {
-      let newGraph = null;
-      newGraph = await prisma.tbl_pm_graphs.create({
-        data: {
-          graph_title: String(graphTitle),
-          graph_options: graphOptions,
-        },
-      });
+      const addGraphQuery = sqlite_db.prepare(graphQueryUtils.addGraph());
+      addGraphQuery.run(String(pmGraphTitle), JSON.stringify(pmGraphOptions));
       Logger.log("success", {
-        message: "GraphService:addGraph:newGraph",
+        message: "GraphService:addGraph:success",
         params: {
-          graphTitle,
-          newGraph,
+          pmGraphTitle,
         },
       });
-      return newGraph;
+      return true;
     } catch (error) {
       Logger.log("error", {
         message: "GraphService:addGraph:catch-1",
@@ -51,39 +45,35 @@ class GraphService {
    *
    * @param {object} param0
    * @param {Number} param0.pmGraphID
-   * @param {String} param0.graphTitle
-   * @param {any} param0.graphOptions
+   * @param {String} param0.pmGraphTitle
+   * @param {any} param0.pmGraphOptions
    * @param {Boolean|Array<Number>} param0.authorizedGraphs
    * @returns {any|null}
    */
   static updateGraph = async ({
     pmGraphID,
-    graphTitle,
-    graphOptions,
+    pmGraphTitle,
+    pmGraphOptions,
     authorizedGraphs,
   }) => {
     Logger.log("info", {
       message: "GraphService:updateGraph:params",
-      params: { pmGraphID, graphTitle, graphOptions },
+      params: { pmGraphID, pmGraphTitle, pmGraphOptions },
     });
     try {
       if (authorizedGraphs === true || authorizedGraphs.includes(pmGraphID)) {
-        const updatedGraph = await prisma.tbl_pm_graphs.update({
-          where: {
-            pm_graph_id: pmGraphID,
-          },
-          data: {
-            graph_title: String(graphTitle),
-            graph_options: graphOptions,
-          },
-        });
+        const updateGraphQuery = sqlite_db.prepare(
+          graphQueryUtils.updateGraph()
+        );
+        updateGraphQuery.run(
+          String(pmGraphTitle),
+          JSON.stringify(pmGraphOptions),
+          pmGraphID
+        );
         Logger.log("success", {
-          message: "GraphService:updateGraph:newGraph",
-          params: {
-            updatedGraph,
-          },
+          message: "GraphService:updateGraph:success",
         });
-        return updatedGraph;
+        return true;
       } else {
         Logger.log("error", {
           message: "GraphService:updateGraph:catch-2",
@@ -116,18 +106,16 @@ class GraphService {
     });
     try {
       if (authorizedGraphs === true || authorizedGraphs.includes(pmGraphID)) {
-        const graph = await prisma.tbl_pm_graphs.findUnique({
-          where: {
-            pm_graph_id: pmGraphID,
-          },
-        });
+        const getGraphByIDQuery = sqlite_db.prepare(
+          graphQueryUtils.getGraphByID()
+        );
+        const graph = getGraphByIDQuery.get(pmGraphID);
         Logger.log("info", {
           message: "GraphService:getGraphByID:graph",
           params: {
             graph,
           },
         });
-
         return graph;
       } else {
         Logger.log("error", {
@@ -161,11 +149,10 @@ class GraphService {
     });
     try {
       if (authorizedGraphs === true || authorizedGraphs.includes(pmGraphID)) {
-        const graph = await prisma.tbl_pm_graphs.findUnique({
-          where: {
-            pm_graph_id: pmGraphID,
-          },
-        });
+        const getGraphByIDQuery = sqlite_db.prepare(
+          graphQueryUtils.getGraphByID()
+        );
+        const graph = getGraphByIDQuery.get(pmGraphID);
         Logger.log("info", {
           message: "GraphService:getGraphData:graph",
           params: {
@@ -173,11 +160,11 @@ class GraphService {
           },
         });
         const graphModel = GRAPH_PLUGINS_MAP[
-          graph.graph_options.graph_type
+          JSON.parse(graph.pm_graph_options).graph_type
         ].getGraphModel({
           pm_graph_id: graph.pm_graph_id,
-          graph_title: graph.graph_title,
-          graph_options: graph.graph_options,
+          pm_graph_title: graph.pm_graph_title,
+          pm_graph_options: JSON.parse(graph.pm_graph_options),
         });
 
         const dataset = await graphModel.getProcessedData();
@@ -212,16 +199,20 @@ class GraphService {
       message: "GraphService:getAllGraphs:params",
     });
     try {
-      const graphs = await prisma.tbl_pm_graphs.findMany({
-        where:
-          authorizedGraphs === true
-            ? {}
-            : {
-                pm_graph_id: {
-                  in: authorizedGraphs,
-                },
-              },
-      });
+      let graphs;
+      if (authorizedGraphs === true) {
+        // Fetch all graphs if authorizedGraphs is true
+        const getAllGraphsQuery = sqlite_db.prepare(
+          graphQueryUtils.getAllGraphs()
+        );
+        graphs = getAllGraphsQuery.all();
+      } else {
+        // Fetch graphs where pm_graph_id is in the authorizedGraphs array
+        const getAllGraphsQuery = sqlite_db.prepare(
+          graphQueryUtils.getAllGraphs(authorizedGraphs)
+        );
+        graphs = getAllGraphsQuery.all(...authorizedGraphs);
+      }
       Logger.log("info", {
         message: "GraphService:getAllGraphs:graph",
         params: {
@@ -254,18 +245,17 @@ class GraphService {
     });
     try {
       if (authorizedGraphs === true || authorizedGraphs.includes(pmGraphID)) {
-        const graph = await prisma.tbl_pm_graphs.delete({
-          where: {
-            pm_graph_id: pmGraphID,
-          },
-        });
+        const deleteGraphQuery = sqlite_db.prepare(
+          graphQueryUtils.deleteGraph()
+        );
+        // Execute the delete
+        deleteGraphQuery.run(pmGraphID);
         Logger.log("info", {
           message: "GraphService:deleteGraph:graph",
           params: {
             graph,
           },
         });
-
         return true;
       } else {
         Logger.log("error", {

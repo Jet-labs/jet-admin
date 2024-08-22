@@ -33,14 +33,14 @@ export const GraphWidgetComponent = ({ id, width, height }) => {
     cacheTime: 0,
     retry: 1,
     staleTime: 0,
-    refetchInterval: graph?.graph_options?.refetch_interval * 1000,
+    refetchInterval: graph?.pm_graph_options?.refetch_interval * 1000,
   });
-  const graphType = graphData?.graph_options?.graph_type;
-  const graphTitle = graphData?.graph_title;
-  const legendPosition = graphData?.graph_options.legend_position;
-  const titleDisplayEnabled = graphData?.graph_options.title_display_enabled;
+  const graphType = graphData?.pm_graph_options?.graph_type;
+  const pmGraphTitle = graphData?.pm_graph_title;
+  const legendPosition = graphData?.pm_graph_options.legend_position;
+  const titleDisplayEnabled = graphData?.pm_graph_options.title_display_enabled;
   const data = graphData?.dataset;
-  const refetchInterval = graph?.graph_options?.refetch_interval * 1000;
+  const refetchInterval = graph?.pm_graph_options?.refetch_interval * 1000;
 
   return (
     <div
@@ -55,7 +55,7 @@ export const GraphWidgetComponent = ({ id, width, height }) => {
       {GRAPH_PLUGINS_MAP[graphType]?.component({
         legendPosition,
         titleDisplayEnabled,
-        graphTitle,
+        pmGraphTitle,
         data,
         refetchInterval,
       })}

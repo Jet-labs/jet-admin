@@ -60,7 +60,7 @@ const demoData = {
 export const PieGraphComponent = ({
   legendPosition,
   titleDisplayEnabled,
-  graphTitle,
+  pmGraphTitle,
   data,
 }) => {
   const theme = useTheme();
@@ -82,13 +82,13 @@ export const PieGraphComponent = ({
         },
         title: {
           display: Boolean(titleDisplayEnabled),
-          text: graphTitle
-            ? graphTitle
+          text: pmGraphTitle
+            ? pmGraphTitle
             : LOCAL_CONSTANTS.STRINGS.UNTITLED_CHART_TITLE,
         },
       },
     };
-  }, [legendPosition, titleDisplayEnabled, graphTitle]);
+  }, [legendPosition, titleDisplayEnabled, pmGraphTitle]);
 
   return <Pie options={options} data={data ? data : demoData} />;
 };

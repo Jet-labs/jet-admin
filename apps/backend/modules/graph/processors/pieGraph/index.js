@@ -4,8 +4,8 @@ const { runQuery } = require("../../../query/processors/postgresql");
 const { BaseGraph } = require("../baseGraph");
 
 class PieGraph extends BaseGraph {
-  constructor({ pm_graph_id, graph_title, graph_options }) {
-    super({ pm_graph_id, graph_title, graph_options });
+  constructor({ pm_graph_id, pm_graph_title, pm_graph_options }) {
+    super({ pm_graph_id, pm_graph_title, pm_graph_options });
   }
   /**
    *
@@ -54,7 +54,7 @@ class PieGraph extends BaseGraph {
         Logger.log("info", {
           message: "PieGraph:runQueries:init",
         });
-        const queryArray = Array.from(this.graph_options.query_array);
+        const queryArray = Array.from(this.pm_graph_options.query_array);
 
         const resultPromises = queryArray.map(async (queryItem) => {
           const query = await prisma.tbl_pm_queries.findUnique({

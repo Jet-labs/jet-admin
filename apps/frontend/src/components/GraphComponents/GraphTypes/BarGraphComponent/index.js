@@ -75,7 +75,7 @@ const demoData = {
 export const BarGraphComponent = ({
   legendPosition,
   titleDisplayEnabled,
-  graphTitle,
+  pmGraphTitle,
   data,
 }) => {
   const theme = useTheme();
@@ -95,13 +95,13 @@ export const BarGraphComponent = ({
         },
         title: {
           display: Boolean(titleDisplayEnabled),
-          text: graphTitle
-            ? graphTitle
+          text: pmGraphTitle
+            ? pmGraphTitle
             : LOCAL_CONSTANTS.STRINGS.UNTITLED_CHART_TITLE,
         },
       },
     };
-  }, [legendPosition, titleDisplayEnabled, graphTitle]);
+  }, [legendPosition, titleDisplayEnabled, pmGraphTitle]);
 
   return <Bar options={options} data={data ? data : demoData} />;
 };

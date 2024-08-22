@@ -52,7 +52,7 @@ export const GraphUpdateForm = ({ id }) => {
       graph_type: GRAPH_PLUGINS_MAP.BAR.value,
       title_display_enabled: true,
       legend_position: LOCAL_CONSTANTS.GRAPH_LEGEND_POSITION.TOP,
-      graph_title: "",
+      pm_graph_title: "",
       query_array: [{ dataset_title: "", query: "" }],
     },
     validateOnMount: false,
@@ -63,12 +63,12 @@ export const GraphUpdateForm = ({ id }) => {
       return errors;
     },
     onSubmit: (values) => {
-      const { graph_title, ...graph_options } = values;
+      const { pm_graph_title, ...pm_graph_options } = values;
       updateGraph({
         data: {
           pm_graph_id: graphData?.pm_graph_id,
-          graph_title,
-          graph_options,
+          pm_graph_title,
+          pm_graph_options,
         },
       });
     },
@@ -76,24 +76,27 @@ export const GraphUpdateForm = ({ id }) => {
 
   useEffect(() => {
     if (graphData) {
-      graphForm.setFieldValue("graph_type", graphData.graph_options.graph_type);
+      graphForm.setFieldValue(
+        "graph_type",
+        graphData.pm_graph_options.graph_type
+      );
       graphForm.setFieldValue(
         "title_display_enabled",
-        graphData.graph_options.title_display_enabled
+        graphData.pm_graph_options.title_display_enabled
       );
       graphForm.setFieldValue(
         "legend_position",
-        graphData.graph_options.legend_position
+        graphData.pm_graph_options.legend_position
       );
-      graphForm.setFieldValue("graph_title", graphData.graph_title);
+      graphForm.setFieldValue("pm_graph_title", graphData.pm_graph_title);
 
       graphForm.setFieldValue(
         "query_array",
-        graphData.graph_options.query_array
+        graphData.pm_graph_options.query_array
       );
       graphForm.setFieldValue(
         "refetch_interval",
-        graphData.graph_options.refetch_interval
+        graphData.pm_graph_options.refetch_interval
       );
     }
   }, [graphData]);
@@ -115,7 +118,7 @@ export const GraphUpdateForm = ({ id }) => {
           <span
             className="text-xs font-thin text-start text-slate-300"
             style={{ color: theme.palette.text.secondary }}
-          >{`${graphData.graph_title} | Graph ID : ${graphData.pm_graph_id}`}</span>
+          >{`${graphData.pm_graph_title} | Graph ID : ${graphData.pm_graph_id}`}</span>
         )}
       </div>
       <Grid container spacing={1} className="!px-3">
@@ -128,7 +131,7 @@ export const GraphUpdateForm = ({ id }) => {
               graphType={graphForm.values["graph_type"]}
               legendPosition={graphForm.values["legend_position"]}
               titleDisplayEnabled={graphForm.values["title_display_enabled"]}
-              graphTitle={graphForm.values["graph_title"]}
+              pmGraphTitle={graphForm.values["pm_graph_title"]}
               data={graphData.dataset}
             />
           </Grid>
