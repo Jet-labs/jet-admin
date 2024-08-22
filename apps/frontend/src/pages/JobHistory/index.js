@@ -17,9 +17,9 @@ import { DataGridActionComponent } from "../../components/DataGridComponents/Dat
 import { ErrorComponent } from "../../components/ErrorComponent";
 import { RawDataGridStatistics } from "../../components/DataGridComponents/RawDataGridStatistics";
 import { CodeEditor } from "../../components/CodeEditorComponent";
+import { getJobHistoryAPI } from "../../api/jobs";
+import { getFieldFormatting } from "../../utils/tables";
 const JobHistory = () => {
-  const tableName = LOCAL_CONSTANTS.STRINGS.JOB_HISTORY_TABLE_NAME;
-
   const { pmUser } = useAuthState();
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
@@ -34,18 +34,11 @@ const JobHistory = () => {
     isPreviousData: isPreviousJobHistoryData,
     refetch: reloadJobHistory,
   } = useQuery({
-    queryKey: [
-      LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLE_ID(tableName),
-      page,
-      filterQuery,
-      sortModel,
-    ],
+    queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.JOB_HISTORY, page],
     queryFn: () =>
-      fetchAllRowsAPI({
-        tableName,
+      getJobHistoryAPI({
         page,
-        filterQuery: filterQuery,
-        sortModel: sortModel,
+        pageSize: 20,
       }),
 
     enabled: Boolean(pmUser),
@@ -90,51 +83,37 @@ const JobHistory = () => {
       headerName: "Result/Error",
       minWidth: 300,
       valueGetter: (value, row) => {
-        return JSON.stringify(value.row.pm_history_result, null, 2);
+        console.log({ value, row });
+        return JSON.parse(value.row.pm_history_result);
       },
-      renderCell: (params) => (
-        <CodeEditor
-          outlined={false}
-          readOnly={true}
-          code={`${params.value}`}
-          language="json"
-          height="100px"
-        />
-      ),
+      renderCell: (params) => {
+        return getFieldFormatting({
+          type: LOCAL_CONSTANTS.DATA_TYPES.JSON,
+          isID: false,
+          isList: false,
+          params,
+        });
+      },
     },
   ];
 
+  // console.log({})
+
   return (
     <div className="flex flex-col justify-start items-stretch w-full h-full !overflow-y-auto !overflow-x-auto">
-      <div className={`!w-full !p-4`}>
-        <RawDataGridStatistics
-          tableName={tableName}
-          altTableName={"Jobs history"}
-          filterQuery={filterQuery}
-        />
-        <DataGridActionComponent
-          filterQuery={filterQuery}
-          setFilterQuery={setFilterQuery}
-          reloadData={reloadJobHistory}
-          tableName={tableName}
-          setSortModel={setSortModel}
-          sortModel={sortModel}
-          allowAdd={false}
-        />
-      </div>
       {isLoadingJobHistory ? (
         <Loading />
-      ) : data?.rows && pmUser ? (
-        <div className="px-4">
+      ) : data?.jobHistory && pmUser ? (
+        <div className="px-4 pt-4 pb-2">
           <DataGrid
-            rows={data.rows}
+            rows={data.jobHistory}
             loading={isLoadingJobHistory || isFetchingAllJobHistory}
             columns={columns}
             initialState={{}}
             editMode="row"
             hideFooterPagination={true}
             hideFooterSelectedRowCount={true}
-            checkboxSelection
+            checkboxSelection={false}
             disableRowSelectionOnClick
             getRowId={getRowId}
             hideFooter={true}

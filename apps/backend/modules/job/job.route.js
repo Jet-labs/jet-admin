@@ -16,6 +16,13 @@ router.get(
   jobController.getAllJobs
 );
 router.get(
+  "/history",
+  authMiddleware.authProvider,
+  policyMiddleware.populateAuthorizationPolicies,
+  jobAuthorizationMiddleware.populateAuthorizedJobsForRead,
+  jobController.getJobHistory
+);
+router.get(
   "/:id",
   authMiddleware.authProvider,
   policyMiddleware.populateAuthorizationPolicies,

@@ -397,6 +397,8 @@ export const LOCAL_CONSTANTS = {
 
     JOB: {
       getAllJobs: () => `/admin_api/jobs`,
+      getJobHistory: ({ page, pageSize }) =>
+        `/admin_api/jobs/history/?page=${page}&page_size=${pageSize}`,
       getJobByID: ({ id }) => `/admin_api/jobs/${id}`,
       addJob: () => `/admin_api/jobs`,
       updateJob: () => `/admin_api/jobs`,
@@ -498,6 +500,7 @@ export const LOCAL_CONSTANTS = {
     APP_CONSTANTS: `REACT_QUERY_KEY_APP_CONSTANTS`,
     GRAPHS: `REACT_QUERY_KEY_GRAPHS`,
     JOBS: `REACT_QUERY_KEY_JOBS`,
+    JOB_HISTORY: `REACT_QUERY_KEY_JOB_HISTORY`,
     DASHBOARDS: `REACT_QUERY_KEY_DASHBOARDS`,
     POLICIES: `REACT_QUERY_KEY_POLICIES`,
     ACCOUNTS: `REACT_QUERY_KEY_ACCOUNTS`,

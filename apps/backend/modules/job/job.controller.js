@@ -1,5 +1,7 @@
+const constants = require("../../constants");
 const { extractError } = require("../../utils/error.util");
 const Logger = require("../../utils/logger");
+const { JobHistoryService } = require("./job-history.services");
 const { JobService } = require("./job.services");
 
 const jobController = {};
@@ -43,6 +45,56 @@ jobController.getAllJobs = async (req, res) => {
   }
 };
 
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @returns
+ */
+jobController.getJobHistory = async (req, res) => {
+  try {
+    const { pmUser, state, params } = req;
+    const pm_user_id = parseInt(pmUser.pm_user_id);
+    const authorized_jobs = state.authorized_jobs;
+    const { page, page_size } = req.query;
+    let skip = 0;
+    let take = page_size ? parseInt(page_size) : constants.ROW_PAGE_SIZE;
+    if (parseInt(page) >= 0) {
+      skip = (parseInt(page) - 1) * take;
+    } else {
+      skip = undefined;
+      take = undefined;
+    }
+
+    Logger.log("info", {
+      message: "jobController:getJobHistory:params",
+      params: { pm_user_id },
+    });
+
+    const jobHistory = await JobHistoryService.getJobHistory({
+      authorizedJobs: authorized_jobs,
+      skip,
+      take,
+    });
+
+    Logger.log("success", {
+      message: "jobController:getJobHistory:success",
+      params: { pm_user_id, jobHistoryLength: jobHistory.length },
+    });
+
+    return res.json({
+      success: true,
+      jobHistory,
+      nextPage: jobHistory?.length < take ? null : parseInt(page) + 1,
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "jobController:getJobHistory:catch-1",
+      params: { error },
+    });
+    return res.json({ success: false, error: extractError(error) });
+  }
+};
 /**
  *
  * @param {import("express").Request} req

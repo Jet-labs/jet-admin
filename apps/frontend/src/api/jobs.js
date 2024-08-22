@@ -93,3 +93,27 @@ export const getAllJobAPI = async () => {
     throw error;
   }
 };
+
+export const getJobHistoryAPI = async ({ page = 1, pageSize = 20 }) => {
+  try {
+    const response = await axiosInstance.get(
+      LOCAL_CONSTANTS.APIS.JOB.getJobHistory({ page, pageSize })
+    );
+    if (response.data && response.data.success == true) {
+      if (response.data.jobHistory && Array.isArray(response.data.jobHistory)) {
+        return {
+          jobHistory: response.data.jobHistory,
+          nextPage: response.data.nextPage,
+        };
+      } else {
+        return { jobHistory: [], nextPage: null };
+      }
+    } else if (response.data.error) {
+      throw response.data.error;
+    } else {
+      throw LOCAL_CONSTANTS.ERROR_CODES.SERVER_ERROR;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
