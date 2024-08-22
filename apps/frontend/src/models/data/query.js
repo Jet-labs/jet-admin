@@ -21,15 +21,17 @@ export class Query {
       pm_query_type,
       queryData: typeof pm_query === "object" ? pm_query : JSON.parse(pm_query),
     });
-    this.pm_query_args =
-      typeof pm_query_args === "object"
+    this.pm_query_args = pm_query_args
+      ? typeof pm_query_args === "object"
         ? pm_query_args
-        : JSON.parse(pm_query_args);
+        : JSON.parse(pm_query_args)
+      : null;
 
-    this.pm_query_metadata =
-      typeof pm_query_metadata === "object"
+    this.pm_query_metadata = pm_query_metadata
+      ? typeof pm_query_metadata === "object"
         ? pm_query_metadata
-        : JSON.parse(pm_query_metadata);
+        : JSON.parse(pm_query_metadata)
+      : null;
     this.is_disabled = is_disabled;
     this.created_at = created_at;
     this.updated_at = updated_at;

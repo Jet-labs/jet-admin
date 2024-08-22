@@ -25,7 +25,7 @@ class QueryService {
     pmQueryArgs,
   }) => {
     Logger.log("info", {
-      message: "DashboardService:addQuery:params",
+      message: "QueryService:addQuery:params",
       params: {
         pmQueryTitle,
         pmQueryDescription,
@@ -47,12 +47,12 @@ class QueryService {
       );
 
       Logger.log("success", {
-        message: "DashboardService:addQuery:success",
+        message: "QueryService:addQuery:success",
       });
       return true;
     } catch (error) {
       Logger.log("error", {
-        message: "DashboardService:addQuery:catch-1",
+        message: "QueryService:addQuery:catch-1",
         params: { error },
       });
       throw error;
@@ -80,7 +80,7 @@ class QueryService {
     authorizedQueries,
   }) => {
     Logger.log("info", {
-      message: "DashboardService:updateQuery:params",
+      message: "QueryService:updateQuery:params",
       params: {
         pmQueryID,
         pmQueryTitle,
@@ -100,24 +100,24 @@ class QueryService {
           pmQueryTitle,
           pmQueryDescription,
           JSON.stringify(pmQuery), // Store JSON as TEXT
-          JSON.stringify(pmQueryArgs), // Store JSON as TEXT
-          JSON.stringify(pmQueryMetadata), // Store JSON as TEXT
+          pmQueryArgs?JSON.stringify(pmQueryArgs):null, // Store JSON as TEXT
+          pmQueryMetadata ? JSON.stringify(pmQueryMetadata) :null, // Store JSON as TEXT
           pmQueryID
         );
         Logger.log("success", {
-          message: "DashboardService:updateQuery:success",
+          message: "QueryService:updateQuery:success",
         });
         return true;
       } else {
         Logger.log("error", {
-          message: "DashboardService:updateQuery:catch-2",
+          message: "QueryService:updateQuery:catch-2",
           params: { error: constants.ERROR_CODES.PERMISSION_DENIED },
         });
         throw constants.ERROR_CODES.PERMISSION_DENIED;
       }
     } catch (error) {
       Logger.log("error", {
-        message: "DashboardService:updateQuery:catch-1",
+        message: "QueryService:updateQuery:catch-1",
         params: { error },
       });
       throw error;
@@ -259,7 +259,7 @@ class QueryService {
    */
   static deleteQuery = async ({ pmQueryID, authorizedQueries }) => {
     Logger.log("info", {
-      message: "DashboardService:deleteQuery:params",
+      message: "QueryService:deleteQuery:params",
       params: {
         pmQueryID,
       },
@@ -273,22 +273,19 @@ class QueryService {
         deleteQueryQuery.run(pmQueryID);
 
         Logger.log("success", {
-          message: "DashboardService:deleteQuery:deletedQuery",
-          params: {
-            deletedQuery,
-          },
+          message: "QueryService:deleteQuery:success"
         });
         return true;
       } else {
         Logger.log("error", {
-          message: "DashboardService:deleteQuery:catch-2",
+          message: "QueryService:deleteQuery:catch-2",
           params: { error: constants.ERROR_CODES.PERMISSION_DENIED },
         });
         throw constants.ERROR_CODES.PERMISSION_DENIED;
       }
     } catch (error) {
       Logger.log("error", {
-        message: "DashboardService:deleteQuery:catch-1",
+        message: "QueryService:deleteQuery:catch-1",
         params: { error },
       });
       throw error;
@@ -303,7 +300,7 @@ class QueryService {
    */
   static duplicateQuery = async ({ pmQueryID }) => {
     Logger.log("info", {
-      message: "DashboardService:duplicateQuery:params",
+      message: "QueryService:duplicateQuery:params",
       params: {
         pmQueryID,
       },
@@ -322,7 +319,7 @@ class QueryService {
       });
     } catch (error) {
       Logger.log("error", {
-        message: "DashboardService:duplicateQuery:catch-1",
+        message: "QueryService:duplicateQuery:catch-1",
         params: { error },
       });
       throw error;

@@ -268,7 +268,7 @@ queryController.runQueryByID = async (req, res) => {
       params: { query },
     });
     const data = await QueryService.queryRunner({
-      pmQuery: query.pm_query,
+      pmQuery: JSON.parse(query.pm_query),
       pmQueryType: query.pm_query_type,
     });
 

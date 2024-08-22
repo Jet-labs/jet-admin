@@ -31,7 +31,7 @@ queryQueryUtils.updateQuery = () =>
     pm_query_title = ?,
     pm_query_description = ?,
     pm_query = ?,
-    pm_query_args = ?
+    pm_query_args = ?,
     pm_query_metadata = ?
   WHERE pm_query_id = ?`;
 
