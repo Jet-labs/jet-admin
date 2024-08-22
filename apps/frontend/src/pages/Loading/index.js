@@ -7,8 +7,8 @@ export const Loading = ({ fullScreen = false, adjust = true }) => {
         fullScreen
           ? "loading_main_full_screen"
           : adjust
-          ? "w-full h-full justify-center items-center flex-grow"
-          : "w-full h-full justify-center items-center"
+          ? "flex w-full h-full justify-center items-center"
+          : "flex w-full h-full justify-center items-center"
       }
     >
       <CircularProgress />

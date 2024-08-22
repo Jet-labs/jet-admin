@@ -228,7 +228,9 @@ export const RawDataGrid = ({
     isAllRowSelectChecked,
   ]);
 
-  return (
+  return isLoadingRows ? (
+    <Loading />
+  ) : (
     <div
       className={`w-full h-full ${containerClass}   !overflow-y-auto !overflow-x-auto`}
     >
@@ -255,106 +257,100 @@ export const RawDataGrid = ({
           allowAdd={rowAddAuthorization}
         />
       </div>
-      <div item xs={12} className="!relative">
-        {isLoadingRows ? (
-          <Loading />
-        ) : data?.rows && pmUser && authorizedColumns && primaryColumns ? (
-          <div className="px-4">
-            <DataGrid
-              rows={data.rows}
-              loading={isLoadingRows || isFetchingAllRows}
-              className="!border-0 data-grid-custom-class"
-              columns={authorizedColumns}
-              initialState={{}}
-              editMode="row"
-              hideFooterPagination={true}
-              hideFooterSelectedRowCount={true}
-              checkboxSelection
-              disableRowSelectionOnClick
-              getRowId={_getRowId}
-              hideFooter={true}
-              onRowClick={(param) => {
-                onRowClick
-                  ? onRowClick(param)
-                  : navigate(
-                      LOCAL_CONSTANTS.ROUTES.ROW_VIEW.path(
-                        tableName,
-                        JSON.stringify(_selectByIDQueryBuilder(param.row))
-                      )
-                    );
-              }}
-              disableColumnFilter
-              sortingMode="server"
-              autoHeight={true}
-              getRowHeight={() => "auto"}
-              slots={{
-                toolbar: () => (
-                  <GridToolbarContainer className="!py-2 !-pr-5 justify-between">
-                    <div>{_renderSelectAllRowsCheckbox}</div>
+      {data?.rows && pmUser && authorizedColumns && primaryColumns ? (
+        <div className="px-4">
+          <DataGrid
+            rows={data.rows}
+            loading={isLoadingRows || isFetchingAllRows}
+            className="!border-0 data-grid-custom-class"
+            columns={authorizedColumns}
+            initialState={{}}
+            editMode="row"
+            hideFooterPagination={true}
+            hideFooterSelectedRowCount={true}
+            checkboxSelection
+            disableRowSelectionOnClick
+            getRowId={_getRowId}
+            hideFooter={true}
+            onRowClick={(param) => {
+              onRowClick
+                ? onRowClick(param)
+                : navigate(
+                    LOCAL_CONSTANTS.ROUTES.ROW_VIEW.path(
+                      tableName,
+                      JSON.stringify(_selectByIDQueryBuilder(param.row))
+                    )
+                  );
+            }}
+            disableColumnFilter
+            sortingMode="server"
+            autoHeight={true}
+            getRowHeight={() => "auto"}
+            slots={{
+              toolbar: () => (
+                <GridToolbarContainer className="!py-2 !-pr-5 justify-between">
+                  <div>{_renderSelectAllRowsCheckbox}</div>
 
-                    <div className="!flex-row justify-end">
-                      {_renderExportButton}
-                      {_renderMultipleDeleteButton}
-                    </div>
-                  </GridToolbarContainer>
-                ),
-                loadingOverlay: LinearProgress,
-              }}
-              onRowSelectionModelChange={
-                _handleMultipleSelectedRowsQueryBuilder
-              }
-            />
-            <div
-              className="flex flex-row w-full justify-end pb-2 !sticky !bottom-0 items-center pt-2"
-              style={{
-                background: theme.palette.background.default,
-                borderTopWidth: 1,
-                borderColor: theme.palette.divider,
-              }}
+                  <div className="!flex-row justify-end">
+                    {_renderExportButton}
+                    {_renderMultipleDeleteButton}
+                  </div>
+                </GridToolbarContainer>
+              ),
+              loadingOverlay: LinearProgress,
+            }}
+            onRowSelectionModelChange={_handleMultipleSelectedRowsQueryBuilder}
+          />
+          <div
+            className="flex flex-row w-full justify-end pb-2 !sticky !bottom-0 items-center pt-2"
+            style={{
+              background: theme.palette.background.default,
+              borderTopWidth: 1,
+              borderColor: theme.palette.divider,
+            }}
+          >
+            <InputLabel id="demo-simple-select-label" className="!mr-2">
+              Page size
+            </InputLabel>
+            <Select
+              size="small"
+              labelId="demo-simple-select-label"
+              value={pageSize}
+              variant="standard"
+              label={"Page size"}
+              onChange={_handleOnPageSizeChange}
             >
-              <InputLabel id="demo-simple-select-label" className="!mr-2">
-                Page size
-              </InputLabel>
-              <Select
-                size="small"
-                labelId="demo-simple-select-label"
-                value={pageSize}
-                variant="standard"
-                label={"Page size"}
-                onChange={_handleOnPageSizeChange}
-              >
-                {[20, 50, 100].map((size) => (
-                  <MenuItem
-                    value={size}
-                    className="!break-words !whitespace-pre-line"
-                    key={`page_size_${size}`}
-                  >
-                    {`${size}     `}
-                  </MenuItem>
-                ))}
-              </Select>
+              {[20, 50, 100].map((size) => (
+                <MenuItem
+                  value={size}
+                  className="!break-words !whitespace-pre-line"
+                  key={`page_size_${size}`}
+                >
+                  {`${size}     `}
+                </MenuItem>
+              ))}
+            </Select>
 
-              <Pagination
-                count={Boolean(data?.nextPage) ? page + 1 : page}
-                page={page}
-                onChange={(e, page) => {
-                  setPage(page);
-                }}
-                hideNextButton={!Boolean(data?.nextPage)}
-                variant="text"
-                shape="rounded"
-                siblingCount={1}
-              />
-            </div>
-          </div>
-        ) : (
-          <div className="!w-full !p-4">
-            <ErrorComponent
-              error={loadRowsError || LOCAL_CONSTANTS.ERROR_CODES.SERVER_ERROR}
+            <Pagination
+              count={Boolean(data?.nextPage) ? page + 1 : page}
+              page={page}
+              onChange={(e, page) => {
+                setPage(page);
+              }}
+              hideNextButton={!Boolean(data?.nextPage)}
+              variant="text"
+              shape="rounded"
+              siblingCount={1}
             />
           </div>
-        )}
-      </div>
+        </div>
+      ) : (
+        <div className="!w-full !p-4">
+          <ErrorComponent
+            error={loadRowsError || LOCAL_CONSTANTS.ERROR_CODES.SERVER_ERROR}
+          />
+        </div>
+      )}
     </div>
   );
 };

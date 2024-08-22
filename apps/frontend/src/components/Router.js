@@ -28,6 +28,12 @@ const JobLayout = lazy(() => import("./Layouts/JobLayout"));
 const AppConstantLayout = lazy(() => import("./Layouts/AppConstantLayout"));
 const TriggerLayout = lazy(() => import("./Layouts/TriggerLayout"));
 
+// const TableLayout = lazy(() => {
+//   return new Promise((resolve) => {
+//     setTimeout(() => resolve(import("./Layouts/TableLayout")), 3000000);
+//   });
+// });
+
 /**
  *
  * @param {object} param0
@@ -35,7 +41,7 @@ const TriggerLayout = lazy(() => import("./Layouts/TriggerLayout"));
  */
 const AppRouter = ({}) => {
   return (
-    <Suspense fallback={<Loading />}>
+    <Suspense fallback={<Loading fullScreen />}>
       <Router>
         <Routes>
           <Route
