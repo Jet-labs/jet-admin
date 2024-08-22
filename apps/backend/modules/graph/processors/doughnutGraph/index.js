@@ -1,6 +1,7 @@
 const { prisma } = require("../../../../db/prisma");
 const Logger = require("../../../../utils/logger");
 const { runQuery } = require("../../../query/processors/postgresql");
+const { QueryService } = require("../../../query/query.services");
 const { BaseGraph } = require("../baseGraph");
 
 class DoughnutGraph extends BaseGraph {
@@ -55,17 +56,19 @@ class DoughnutGraph extends BaseGraph {
           message: "DoughnutGraph:runQueries:init",
         });
         const queryArray = Array.from(this.pm_graph_options.query_array);
-
+        Logger.log("info", {
+          message: "DoughnutGraph:runQueries:queries",
+          params: { queryArray },
+        });
         const resultPromises = queryArray.map(async (queryItem) => {
-          const query = await prisma.tbl_pm_queries.findUnique({
-            where: {
-              pm_query_id: parseInt(queryItem.pm_query_id),
-            },
+          const query = await QueryService.getQueryByID({
+            pmQueryID: queryItem.pm_query_id,
+            authorizedQueries: true,
           });
           const result = await runQuery({
             pmQueryID: query.pm_query_id,
             pmQueryType: query.pm_query_type,
-            pmQuery: query.pm_query,
+            pmQuery: JSON.parse(query.pm_query),
           });
 
           return { ...queryItem, result };

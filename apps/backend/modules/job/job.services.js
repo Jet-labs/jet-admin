@@ -87,7 +87,7 @@ class JobService {
           pmJobTitle,
           parseInt(pmQueryID),
           pmJobSchedule,
-          false, // Update the is_disabled field as needed
+          0, // Update the is_disabled field as needed
           pmJobID
         );
         const updatedJob = this.getJobByID({
@@ -181,7 +181,7 @@ class JobService {
         const getQueryByIDQuery = sqlite_db.prepare(
           queryQueryUtils.getQueryByID()
         );
-        const relatedQuery = getQueryByIDQuery.get(parseInt(pmQueryID));
+        const relatedQuery = getQueryByIDQuery.get(parseInt(job.pm_query_id));
 
         // Combine the job and related query into the result
         const result = {
@@ -233,10 +233,7 @@ class JobService {
         // Execute the delete
         deleteJobQuery.run(pmJobID);
         Logger.log("info", {
-          message: "JobService:deleteJob:job",
-          params: {
-            job,
-          },
+          message: "JobService:deleteJob:success",
         });
         return true;
       } else {

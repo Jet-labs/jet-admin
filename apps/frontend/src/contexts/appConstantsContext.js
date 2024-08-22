@@ -70,6 +70,7 @@ const AppConstantsContextProvider = ({ children }) => {
       return _t;
     }
   }, [internalAppConstants]);
+  console.log({ processedInternalAppConstants });
   return (
     <AppConstantsValueContext.Provider
       value={{

@@ -14,10 +14,11 @@ export class Graph {
     this.pm_graph_id = parseInt(pm_graph_id);
     this.pm_graph_title = String(pm_graph_title);
     this.graph_description = String(graph_description);
-    this.pm_graph_options =
-      typeof pm_graph_options === "object"
+    this.pm_graph_options = pm_graph_options
+      ? typeof pm_graph_options === "object"
         ? pm_graph_options
-        : JSON.parse(pm_graph_options);
+        : JSON.parse(pm_graph_options)
+      : null;
     this.dataset = dataset;
     this.is_disabled = is_disabled;
     this.created_at = created_at;

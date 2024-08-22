@@ -66,6 +66,7 @@ class QueryService {
    * @param {String} param0.pmQueryDescription
    * @param {JSON} param0.pmQuery
    * @param {Array} param0.pmQueryArgs
+   * @param {Object} param0.pmQueryMetadata
    * @param {Boolean|Array<Number>} param0.authorizedQueries
    * @returns {any|null}
    */
@@ -75,6 +76,7 @@ class QueryService {
     pmQueryDescription,
     pmQuery,
     pmQueryArgs,
+    pmQueryMetadata,
     authorizedQueries,
   }) => {
     Logger.log("info", {
@@ -85,6 +87,7 @@ class QueryService {
         pmQueryDescription,
         pmQuery,
         pmQueryArgs,
+        pmQueryMetadata,
       },
     });
     try {
@@ -98,6 +101,7 @@ class QueryService {
           pmQueryDescription,
           JSON.stringify(pmQuery), // Store JSON as TEXT
           JSON.stringify(pmQueryArgs), // Store JSON as TEXT
+          JSON.stringify(pmQueryMetadata), // Store JSON as TEXT
           pmQueryID
         );
         Logger.log("success", {

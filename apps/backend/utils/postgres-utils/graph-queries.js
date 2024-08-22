@@ -13,8 +13,8 @@ graphQueryUtils.getAllGraphs = (authorizedGraphs) => {
   } else {
     // Fetch graphs where pm_graph_id is in the authorizedGraphs array
     return `SELECT * FROM tbl_pm_graphs WHERE pm_graph_id IN (${authorizedGraphs
-      .map(() => "?")
-      .join(", ")})`;
+      ?.map(() => "?")
+      ?.join(", ")})`;
   }
 };
 graphQueryUtils.getGraphByID = () =>

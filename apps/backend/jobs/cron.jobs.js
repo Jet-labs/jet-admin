@@ -1,27 +1,29 @@
 const cron = require("node-cron");
 const Logger = require("../utils/logger");
-
-const { prisma } = require("../db/prisma");
 const { runQuery } = require("../modules/query/processors/postgresql");
-const { JobService } = require("../modules/job/job.services");
 const { JobHistoryService } = require("../modules/job/job-history.services");
+const { QueryService } = require("../modules/query/query.services");
+const { sqlite_db } = require("../db/sqlite");
+const { jobQueryUtils } = require("../utils/postgres-utils/job-queries");
 
 class CustomCronJobScheduler {
   constructor() {}
 
-  /**
-   *
-   * @param {import("@prisma/client").tbl_pm_jobs & {tbl_pm_queries:import("@prisma/client").tbl_pm_queries}} pmJob
-   */
   static runner = async (pmJob) => {
     const result = {};
+    const pmQuery = await QueryService.getQueryByID({
+      pmQueryID: pmJob.pm_query_id,
+      authorizedQueries: true,
+    });
 
     try {
       const runResult = runQuery({
-        pmQueryID: pmJob.tbl_pm_queries.pm_query_id,
-        pmQuery: pmJob.tbl_pm_queries.pm_query,
-        pmQueryType: pmJob.tbl_pm_queries.pm_query_type,
-        pmQueryArgValues: pmJob.tbl_pm_queries.pm_query_args,
+        pmQueryID: pmQuery.pm_query_id,
+        pmQuery: pmQuery.pm_query ? JSON.parse(pmQuery.pm_query) : null,
+        pmQueryType: pmQuery.pm_query_type,
+        pmQueryArgValues: pmQuery.pm_query_args
+          ? JSON.parse(pmQuery.pm_query_args)
+          : null,
       });
       result.success = true;
       result.result = Array.isArray(runResult)
@@ -42,17 +44,14 @@ class CustomCronJobScheduler {
 
     await JobHistoryService.addJobHistory({
       pmJobID: pmJob.pm_job_id,
-      historyResult: result,
+      pmHistoryResult: result,
     });
     Logger.log("info", {
       message: "CustomCronJobScheduler:runner:history created",
       params: { pmJobID: pmJob.pm_job_id },
     });
   };
-  /**
-   *
-   * @param {import("@prisma/client").tbl_pm_jobs & {tbl_pm_queries:import("@prisma/client").tbl_pm_queries}} pmJob
-   */
+
   static scheduleCustomJobOnChange = async (pmJob) => {
     try {
       Logger.log("info", {
@@ -99,10 +98,6 @@ class CustomCronJobScheduler {
     }
   };
 
-  /**
-   *
-   * @param {import("@prisma/client").tbl_pm_jobs & {tbl_pm_queries:import("@prisma/client").tbl_pm_queries}} pmJob
-   */
   static deleteScheduledCustomJob = async (pmJobID) => {
     try {
       Logger.log("info", {
@@ -140,15 +135,8 @@ class CustomCronJobScheduler {
       Logger.log("info", {
         message: "CustomCronJobScheduler:scheduleAllCustomJobs:init",
       });
-      const allPmJobs = await prisma.tbl_pm_jobs.findMany({
-        where: {
-          is_disabled: false,
-        },
-        include: {
-          tbl_pm_queries: true,
-        },
-      });
-
+      const getAllJobsQuery = sqlite_db.prepare(jobQueryUtils.getAllJobs());
+      const allPmJobs = getAllJobsQuery.all();
       const allPmJobsSchedulePromise = allPmJobs.map((pmJob) => {
         return this.scheduleCustomJobOnChange(pmJob);
       });

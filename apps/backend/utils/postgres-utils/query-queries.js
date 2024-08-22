@@ -19,8 +19,8 @@ queryQueryUtils.getAllQueries = (authorizedQueries) => {
   } else {
     // Fetch queries where pm_query_id is in the authorizedQueries array
     return `SELECT * FROM tbl_pm_queries WHERE pm_query_id IN (${authorizedQueries
-      .map(() => "?")
-      .join(", ")})`;
+      ?.map(() => "?")
+      ?.join(", ")})`;
   }
 };
 queryQueryUtils.getQueryByID = () =>
@@ -32,7 +32,11 @@ queryQueryUtils.updateQuery = () =>
     pm_query_description = ?,
     pm_query = ?,
     pm_query_args = ?
+    pm_query_metadata = ?
   WHERE pm_query_id = ?`;
+
+queryQueryUtils.updateQueryMetadata = () =>
+  `UPDATE tbl_pm_queries SET pm_query_metadata = ? WHERE pm_query_id = ?`;
 
 queryQueryUtils.deleteQuery = () =>
   `DELETE FROM tbl_pm_queries WHERE pm_query_id = ?`;

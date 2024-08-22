@@ -14,6 +14,10 @@ const {
   isDQLQuery,
 } = require("../../../utils/postgres-utils/query-validation");
 const jsonSchemaGenerator = require("json-schema-generator");
+const { sqlite_db } = require("../../../db/sqlite");
+const {
+  queryQueryUtils,
+} = require("../../../utils/postgres-utils/query-queries");
 /**
  *
  * @param {object} param0
@@ -54,13 +58,14 @@ const runQuery = async ({
         const resultSchema = jsonSchemaGenerator(
           JSON.parse(JSON.stringify(result.result))
         );
-
-        await prisma.tbl_pm_queries.update({
-          where: {
-            pm_query_id: parseInt(pmQueryID),
-          },
-          data: { pm_query_metadata: resultSchema },
-        });
+        const updatedQueryQuery = sqlite_db.prepare(
+          queryQueryUtils.updateQueryMetadata()
+        );
+        // Execute the update
+        updatedQueryQuery.run(
+          JSON.stringify(resultSchema), // Store JSON as TEXT
+          pmQueryID
+        );
       }
       return result;
     } else {

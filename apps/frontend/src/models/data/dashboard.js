@@ -13,10 +13,11 @@ export class Dashboard {
     this.pm_dashboard_id = parseInt(pm_dashboard_id);
     this.pm_dashboard_title = String(pm_dashboard_title);
     this.pm_dashboard_description = String(pm_dashboard_description);
-    this.pm_dashboard_options =
-      typeof pm_dashboard_options === "object"
+    this.pm_dashboard_options = pm_dashboard_options
+      ? typeof pm_dashboard_options === "object"
         ? pm_dashboard_options
-        : JSON.parse(pm_dashboard_options);
+        : JSON.parse(pm_dashboard_options)
+      : null;
     this.is_disabled = is_disabled;
     this.created_at = created_at;
     this.updated_at = updated_at;

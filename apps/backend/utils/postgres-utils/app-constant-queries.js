@@ -1,7 +1,13 @@
 const appConstantQueryUtils = {};
 
 appConstantQueryUtils.addAppConstant = () =>
-  `INSERT INTO tbl_pm_app_constants (pm_app_constant_title, pm_app_constant_value, is_internal) VALUES (?, ?, ?)`;
+  `
+  INSERT INTO tbl_pm_app_constants (
+    pm_app_constant_title,
+    pm_app_constant_value,
+    is_internal
+  ) VALUES (?, ?, ?)
+`;
 
 appConstantQueryUtils.getAllAppConstants = (authorizedAppConstants) => {
   if (
@@ -23,12 +29,12 @@ appConstantQueryUtils.getAllInternalAppConstants = (authorizedAppConstants) => {
     authorizedAppConstants === null ||
     authorizedAppConstants === undefined
   ) {
-    return `SELECT * FROM tbl_pm_app_constants WHERE is_internal = ?`;
+    return `SELECT * FROM tbl_pm_app_constants WHERE is_internal = true`;
   } else {
     // Fetch app_constants where pm_app_constant_id is in the authorizedAppConstants array
     return `SELECT * FROM tbl_pm_app_constants WHERE pm_app_constant_id IN (${authorizedAppConstants
-      .map(() => "?")
-      .join(", ")}) AND is_internal = ?`;
+      ?.map(() => "?")
+      ?.join(", ")}) AND is_internal = true`;
   }
 };
 appConstantQueryUtils.getAppConstantByID = () =>

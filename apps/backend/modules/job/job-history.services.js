@@ -9,16 +9,16 @@ class JobHistoryService {
   /**
    *
    * @param {object} param0
-   * @param {Object} param0.historyResult
+   * @param {Object} param0.pmHistoryResult
    * @param {Number} param0.pmJobID
    * @returns {any|null}
    */
-  static addJobHistory = async ({ pmJobID, historyResult }) => {
+  static addJobHistory = async ({ pmJobID, pmHistoryResult }) => {
     Logger.log("info", {
       message: "JobHistoryService:addJobHistory:params",
       params: {
         pmJobID,
-        historyResult,
+        pmHistoryResult,
       },
     });
     try {
@@ -26,7 +26,7 @@ class JobHistoryService {
         jobHistoryQueryUtils.addJobHistory()
       );
       // Execute the insert
-      addJobHistoryQuery.run(JSON.stringify(historyResult), pmJobID);
+      addJobHistoryQuery.run(JSON.stringify(pmHistoryResult), pmJobID);
       Logger.log("success", {
         message: "JobHistoryService:addJobHistory:success",
       });

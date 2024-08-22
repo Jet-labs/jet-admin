@@ -38,8 +38,6 @@ class DashboardService {
         JSON.stringify(dashboardOptions)
       );
 
-      console.log({ result });
-
       Logger.log("success", {
         message: "DashboardService:addDashboard:newDashboard",
         params: {

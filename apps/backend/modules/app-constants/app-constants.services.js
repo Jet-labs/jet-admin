@@ -24,19 +24,20 @@ class AppConstantService {
     Logger.log("info", {
       message: "AppConstantService:addAppConstant:params",
       params: {
-        pmAppConstantTitle,
-        pmAppConstantValue,
-        isInternal,
+        pmAppConstantTitle: String(pmAppConstantTitle),
+        pmAppConstantValue: JSON.stringify(pmAppConstantValue),
+        isInternal: Boolean(isInternal),
       },
     });
     try {
       const addAppConstantQuery = sqlite_db.prepare(
         appConstantQueryUtils.addAppConstant()
       );
+
       addAppConstantQuery.run(
         String(pmAppConstantTitle),
-        JSON.stringify(pmAppConstantValue),
-        Boolean(isInternal)
+        JSON.stringify(pmAppConstantValue), // Ensure this is a string
+        Boolean(isInternal) ? 1 : 0
       );
 
       Logger.log("success", {
@@ -96,7 +97,7 @@ class AppConstantService {
         updateAppConstantQuery.run(
           String(pmAppConstantTitle),
           JSON.stringify(pmAppConstantValue),
-          Boolean(isInternal),
+          Boolean(isInternal) ? 1 : 0,
           pmAppConstantID
         );
         Logger.log("success", {
@@ -172,12 +173,16 @@ class AppConstantService {
     });
     try {
       let appConstants;
-      if (authorizedAppConstants === true) {
+      if (
+        authorizedAppConstants === true ||
+        authorizedAppConstants === null ||
+        authorizedAppConstants === undefined
+      ) {
         // Fetch all appConstants if authorizedAppConstants is true
         const getAllAppConstantsQuery = sqlite_db.prepare(
           appConstantQueryUtils.getAllInternalAppConstants()
         );
-        appConstants = getAllAppConstantsQuery.all(true);
+        appConstants = getAllAppConstantsQuery.all();
       } else {
         // Fetch appConstants where pm_app_constant_id is in the authorizedAppConstants array
         const getAllAppConstantsQuery = sqlite_db.prepare(
@@ -185,10 +190,7 @@ class AppConstantService {
             authorizedAppConstants
           )
         );
-        appConstants = getAllAppConstantsQuery.all(
-          ...authorizedAppConstants,
-          true
-        );
+        appConstants = getAllAppConstantsQuery.all(...authorizedAppConstants);
       }
       Logger.log("info", {
         message: "AppConstantService:getAllInternalAppConstants:appConstants",

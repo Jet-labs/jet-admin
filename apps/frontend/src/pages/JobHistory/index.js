@@ -86,11 +86,11 @@ const JobHistory = () => {
       },
     },
     {
-      field: "history_result",
+      field: "pm_history_result",
       headerName: "Result/Error",
       minWidth: 300,
       valueGetter: (value, row) => {
-        return JSON.stringify(value.row.history_result, null, 2);
+        return JSON.stringify(value.row.pm_history_result, null, 2);
       },
       renderCell: (params) => (
         <CodeEditor
