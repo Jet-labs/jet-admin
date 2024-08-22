@@ -140,8 +140,8 @@ appConstantController.addAppConstant = async (req, res) => {
     });
 
     const appConstant = await AppConstantService.addAppConstant({
-      appConstantTitle: body.pm_app_constant_title,
-      appConstantValue: body.pm_app_constant_value,
+      pmAppConstantTitle: body.pm_app_constant_title,
+      pmAppConstantValue: body.pm_app_constant_value,
       isInternal: body.is_internal,
     });
 
@@ -182,8 +182,8 @@ appConstantController.updateAppConstant = async (req, res) => {
 
     const appConstant = await AppConstantService.updateAppConstant({
       pmAppConstantID: parseInt(body.pm_app_constant_id),
-      appConstantTitle: body.pm_app_constant_title,
-      appConstantValue: body.pm_app_constant_value,
+      pmAppConstantTitle: body.pm_app_constant_title,
+      pmAppConstantValue: body.pm_app_constant_value,
       isInternal: body.is_internal,
       authorizedAppConstants: authorized_app_constants,
     });

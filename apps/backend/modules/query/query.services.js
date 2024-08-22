@@ -1,7 +1,8 @@
-const { prisma } = require("../../db/prisma");
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
 const { runQuery } = require("./processors/postgresql");
+const { sqlite_db } = require("../../db/sqlite");
+const { queryQueryUtils } = require("../../utils/postgres-utils/query-queries");
 
 class QueryService {
   constructor() {}
@@ -34,23 +35,21 @@ class QueryService {
       },
     });
     try {
-      const newQuery = await prisma.tbl_pm_queries.create({
-        data: {
-          pm_query_type: pmQueryType,
-          pm_query_title: pmQueryTitle,
-          pm_query_description: pmQueryDescription,
-          pm_query: pmQuery,
-          pm_query_args: pmQueryArgs,
-        },
-      });
+      const addQueryQuery = sqlite_db.prepare(queryQueryUtils.addQuery());
+
+      // Execute the insert
+      addQueryQuery.run(
+        pmQueryType,
+        pmQueryTitle,
+        pmQueryDescription,
+        JSON.stringify(pmQuery), // Store JSON as TEXT
+        JSON.stringify(pmQueryArgs) // Store JSON as TEXT
+      );
 
       Logger.log("success", {
-        message: "DashboardService:addQuery:newQuery",
-        params: {
-          newQuery,
-        },
+        message: "DashboardService:addQuery:success",
       });
-      return newQuery;
+      return true;
     } catch (error) {
       Logger.log("error", {
         message: "DashboardService:addQuery:catch-1",
@@ -90,22 +89,21 @@ class QueryService {
     });
     try {
       if (authorizedQueries === true || authorizedQueries.includes(pmQueryID)) {
-        const updatedQuery = await prisma.tbl_pm_queries.update({
-          where: { pm_query_id: pmQueryID },
-          data: {
-            pm_query_title: pmQueryTitle,
-            pm_query_description: pmQueryDescription,
-            pm_query: pmQuery,
-            pm_query_args: pmQueryArgs,
-          },
-        });
+        const updatedQueryQuery = sqlite_db.prepare(
+          queryQueryUtils.updateQuery()
+        );
+        // Execute the update
+        updatedQueryQuery.run(
+          pmQueryTitle,
+          pmQueryDescription,
+          JSON.stringify(pmQuery), // Store JSON as TEXT
+          JSON.stringify(pmQueryArgs), // Store JSON as TEXT
+          pmQueryID
+        );
         Logger.log("success", {
-          message: "DashboardService:updateQuery:updatedQuery",
-          params: {
-            updatedQuery,
-          },
+          message: "DashboardService:updateQuery:success",
         });
-        return updatedQuery;
+        return true;
       } else {
         Logger.log("error", {
           message: "DashboardService:updateQuery:catch-2",
@@ -133,16 +131,20 @@ class QueryService {
       message: "QueryService:getAllQueries:params",
     });
     try {
-      const queries = await prisma.tbl_pm_queries.findMany({
-        where:
-          authorizedQueries === true
-            ? {}
-            : {
-                pm_query_id: {
-                  in: authorizedQueries,
-                },
-              },
-      });
+      let queries;
+      if (authorizedQueries === true) {
+        // Fetch all queries if authorizedQueries is true
+        const getAllQueriesQuery = sqlite_db.prepare(
+          queryQueryUtils.getAllQueries()
+        );
+        queries = getAllQueriesQuery.all();
+      } else {
+        // Fetch queries where pm_query_id is in the authorizedQueries array
+        const getAllQueriesQuery = sqlite_db.prepare(
+          queryQueryUtils.getAllQueries(authorizedQueries)
+        );
+        queries = getAllQueriesQuery.all(...authorizedQueries);
+      }
       Logger.log("success", {
         message: "QueryService:getAllQueries:queries",
         params: {
@@ -172,21 +174,25 @@ class QueryService {
       message: "QueryService:getQueryByID:params",
     });
     try {
-      const query =
-        authorizedQueries === true || authorizedQueries.includes(pmQueryID)
-          ? await prisma.tbl_pm_queries.findUnique({
-              where: { pm_query_id: pmQueryID },
-            })
-          : null;
-      Logger.log("info", {
-        message: "QueryService:getQueryByID:query",
-        params: {
-          query,
-          authorizedQueries,
-        },
-      });
-
-      return query;
+      if (authorizedQueries === true || authorizedQueries.includes(pmQueryID)) {
+        const getQueryByIDQuery = sqlite_db.prepare(
+          queryQueryUtils.getQueryByID()
+        );
+        const query = getQueryByIDQuery.get(pmQueryID);
+        Logger.log("info", {
+          message: "QueryService:getQueryByID:query",
+          params: {
+            query,
+          },
+        });
+        return query;
+      } else {
+        Logger.log("error", {
+          message: "QueryService:getQueryByID:catch-2",
+          params: { error: constants.ERROR_CODES.PERMISSION_DENIED },
+        });
+        throw constants.ERROR_CODES.PERMISSION_DENIED;
+      }
     } catch (error) {
       Logger.log("error", {
         message: "QueryService:getQueryByID:catch-1",
@@ -256,9 +262,11 @@ class QueryService {
     });
     try {
       if (authorizedQueries === true || authorizedQueries.includes(pmQueryID)) {
-        const deletedQuery = await prisma.tbl_pm_queries.delete({
-          where: { pm_query_id: pmQueryID },
-        });
+        const deleteQueryQuery = sqlite_db.prepare(
+          queryQueryUtils.deleteQuery()
+        );
+        // Execute the delete
+        deleteQueryQuery.run(pmQueryID);
 
         Logger.log("success", {
           message: "DashboardService:deleteQuery:deletedQuery",

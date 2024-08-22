@@ -1,49 +1,52 @@
 const { prisma } = require("../../db/prisma");
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
+const { sqlite_db } = require("../../db/sqlite");
+const {
+  appConstantQueryUtils,
+} = require("../../utils/postgres-utils/app-constant-queries");
 class AppConstantService {
   constructor() {}
 
   /**
    *
    * @param {object} param0
-   * @param {String} param0.appConstantTitle
-   * @param {object} param0.appConstantValue
+   * @param {String} param0.pmAppConstantTitle
+   * @param {object} param0.pmAppConstantValue
    * @param {Boolean} param0.isInternal
    * @returns {any|null}
    */
   static addAppConstant = async ({
-    appConstantTitle,
-    appConstantValue,
+    pmAppConstantTitle,
+    pmAppConstantValue,
     isInternal,
   }) => {
     Logger.log("info", {
       message: "AppConstantService:addAppConstant:params",
       params: {
-        appConstantTitle,
-        appConstantValue,
+        pmAppConstantTitle,
+        pmAppConstantValue,
         isInternal,
       },
     });
     try {
-      let newAppConstant = null;
+      const addAppConstantQuery = sqlite_db.prepare(
+        appConstantQueryUtils.addAppConstant()
+      );
+      addAppConstantQuery.run(
+        String(pmAppConstantTitle),
+        JSON.stringify(pmAppConstantValue),
+        Boolean(isInternal)
+      );
 
-      newAppConstant = await prisma.tbl_pm_app_constants.create({
-        data: {
-          pm_app_constant_title: String(appConstantTitle),
-          pm_app_constant_value: appConstantValue,
-          is_internal: Boolean(isInternal),
-        },
-      });
       Logger.log("success", {
-        message: "AppConstantService:addAppConstant:newAppConstant",
+        message: "AppConstantService:addAppConstant:success",
         params: {
-          appConstantTitle,
-          appConstantValue,
-          newAppConstant,
+          pmAppConstantTitle,
+          pmAppConstantValue,
         },
       });
-      return newAppConstant;
+      return true;
     } catch (error) {
       Logger.log("error", {
         message: "AppConstantService:addAppConstant:catch-1",
@@ -57,16 +60,16 @@ class AppConstantService {
    *
    * @param {object} param0
    * @param {Number} param0.pmAppConstantID
-   * @param {String} param0.appConstantTitle
+   * @param {String} param0.pmAppConstantTitle
    * @param {Boolean} param0.isInternal
-   * @param {any} param0.appConstantValue
+   * @param {any} param0.pmAppConstantValue
    * @param {Boolean|Array<Number>} param0.authorizedAppConstants
    * @returns {any|null}
    */
   static updateAppConstant = async ({
     pmAppConstantID,
-    appConstantTitle,
-    appConstantValue,
+    pmAppConstantTitle,
+    pmAppConstantValue,
     isInternal,
     authorizedAppConstants,
   }) => {
@@ -74,8 +77,8 @@ class AppConstantService {
       message: "AppConstantService:updateAppConstant:params",
       params: {
         pmAppConstantID,
-        appConstantTitle,
-        appConstantValue,
+        pmAppConstantTitle,
+        pmAppConstantValue,
         isInternal,
       },
     });
@@ -84,23 +87,22 @@ class AppConstantService {
         authorizedAppConstants === true ||
         authorizedAppConstants.includes(pmAppConstantID)
       ) {
-        const updatedAppConstant = await prisma.tbl_pm_app_constants.update({
-          where: {
-            pm_app_constant_id: pmAppConstantID,
-          },
-          data: {
-            pm_app_constant_title: String(appConstantTitle),
-            pm_app_constant_value: appConstantValue,
-            is_internal: Boolean(isInternal),
-          },
-        });
+        // Prepare the SQL statement to update an app constant
+        const updateAppConstantQuery = sqlite_db.prepare(
+          appConstantQueryUtils.updateAppConstant()
+        );
+
+        // Execute the update
+        updateAppConstantQuery.run(
+          String(pmAppConstantTitle),
+          JSON.stringify(pmAppConstantValue),
+          Boolean(isInternal),
+          pmAppConstantID
+        );
         Logger.log("success", {
-          message: "AppConstantService:updateAppConstant:updatedAppConstant",
-          params: {
-            updatedAppConstant,
-          },
+          message: "AppConstantService:updateAppConstant:success",
         });
-        return updatedAppConstant;
+        return true;
       } else {
         Logger.log("error", {
           message: "AppConstantService:updateAppConstant:catch-2",
@@ -128,16 +130,20 @@ class AppConstantService {
       message: "AppConstantService:getAllAppConstants:params",
     });
     try {
-      const appConstants = await prisma.tbl_pm_app_constants.findMany({
-        where:
-          authorizedAppConstants === true
-            ? {}
-            : {
-                pm_app_constant_id: {
-                  in: authorizedAppConstants,
-                },
-              },
-      });
+      let appConstants;
+      if (authorizedAppConstants === true) {
+        // Fetch all appConstants if authorizedAppConstants is true
+        const getAllAppConstantsQuery = sqlite_db.prepare(
+          appConstantQueryUtils.getAllAppConstants()
+        );
+        appConstants = getAllAppConstantsQuery.all();
+      } else {
+        // Fetch appConstants where pm_app_constant_id is in the authorizedAppConstants array
+        const getAllAppConstantsQuery = sqlite_db.prepare(
+          appConstantQueryUtils.getAllAppConstants(authorizedAppConstants)
+        );
+        appConstants = getAllAppConstantsQuery.all(...authorizedAppConstants);
+      }
       Logger.log("info", {
         message: "AppConstantService:getAllAppConstants:appConstants",
         params: {
@@ -165,17 +171,25 @@ class AppConstantService {
       message: "AppConstantService:getAllInternalAppConstants:params",
     });
     try {
-      const appConstants = await prisma.tbl_pm_app_constants.findMany({
-        where:
-          authorizedAppConstants === true
-            ? {}
-            : {
-                pm_app_constant_id: {
-                  in: authorizedAppConstants,
-                },
-                is_internal: true,
-              },
-      });
+      let appConstants;
+      if (authorizedAppConstants === true) {
+        // Fetch all appConstants if authorizedAppConstants is true
+        const getAllAppConstantsQuery = sqlite_db.prepare(
+          appConstantQueryUtils.getAllInternalAppConstants()
+        );
+        appConstants = getAllAppConstantsQuery.all(true);
+      } else {
+        // Fetch appConstants where pm_app_constant_id is in the authorizedAppConstants array
+        const getAllAppConstantsQuery = sqlite_db.prepare(
+          appConstantQueryUtils.getAllInternalAppConstants(
+            authorizedAppConstants
+          )
+        );
+        appConstants = getAllAppConstantsQuery.all(
+          ...authorizedAppConstants,
+          true
+        );
+      }
       Logger.log("info", {
         message: "AppConstantService:getAllInternalAppConstants:appConstants",
         params: {
@@ -215,11 +229,10 @@ class AppConstantService {
         authorizedAppConstants === true ||
         authorizedAppConstants.includes(pmAppConstantID)
       ) {
-        const appConstant = await prisma.tbl_pm_app_constants.findUnique({
-          where: {
-            pm_app_constant_id: pmAppConstantID,
-          },
-        });
+        const getAppConstantByIDQuery = sqlite_db.prepare(
+          appConstantQueryUtils.getAppConstantByID()
+        );
+        const appConstant = getAppConstantByIDQuery.get(pmAppConstantID);
         Logger.log("info", {
           message: "AppConstantService:getAppConstantByID:appConstant",
           params: {
@@ -266,16 +279,13 @@ class AppConstantService {
         authorizedAppConstants === true ||
         authorizedAppConstants.includes(pmAppConstantID)
       ) {
-        const appConstant = await prisma.tbl_pm_app_constants.delete({
-          where: {
-            pm_app_constant_id: pmAppConstantID,
-          },
-        });
+        const deleteAppConstantQuery = sqlite_db.prepare(
+          appConstantQueryUtils.deleteAppConstant()
+        );
+        // Execute the delete
+        deleteAppConstantQuery.run(pmAppConstantID);
         Logger.log("info", {
-          message: "AppConstantService:deleteAppConstant:appConstant",
-          params: {
-            appConstant,
-          },
+          message: "AppConstantService:deleteAppConstant:success",
         });
         return true;
       } else {

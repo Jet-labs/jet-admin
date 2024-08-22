@@ -3,6 +3,8 @@ const Logger = require("../utils/logger");
 
 const { prisma } = require("../db/prisma");
 const { runQuery } = require("../modules/query/processors/postgresql");
+const { JobService } = require("../modules/job/job.services");
+const { JobHistoryService } = require("../modules/job/job-history.services");
 
 class CustomCronJobScheduler {
   constructor() {}
@@ -38,11 +40,9 @@ class CustomCronJobScheduler {
       result.error = err;
     }
 
-    await prisma.tbl_pm_job_history.create({
-      data: {
-        pm_job_id: pmJob.pm_job_id,
-        history_result: result,
-      },
+    await JobHistoryService.addJobHistory({
+      pmJobID: pmJob.pm_job_id,
+      historyResult: result,
     });
     Logger.log("info", {
       message: "CustomCronJobScheduler:runner:history created",
