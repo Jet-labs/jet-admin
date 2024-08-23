@@ -334,16 +334,14 @@ export const LOCAL_CONSTANTS = {
     TABLE: {
       getAllTables: () => `/admin_api/tables`,
 
-      getAuthorizedColumnsForRead: ({ tableName }) =>
-        `/admin_api/tables/${tableName}/read_columns`,
-      getAuthorizedColumnsForEdit: ({ tableName }) =>
-        `/admin_api/tables/${tableName}/edit_columns`,
-      getAuthorizedColumnsForAdd: ({ tableName }) =>
-        `/admin_api/tables/${tableName}/add_columns`,
-      getTableRows: ({ tableName, page, pageSize, filterQuery, sortModel }) =>
+      getTableColumns: ({ tableName }) =>
+        `/admin_api/tables/${tableName}/columns`,
+      getTablePrimaryKey: ({ tableName }) =>
+        `/admin_api/tables/${tableName}/pkey`,
+      getTableRows: ({ tableName, page, pageSize, filterQuery, order }) =>
         `/admin_api/tables/${tableName}/?page=${page}&page_size=${pageSize}&q=${JSON.stringify(
           filterQuery
-        )}&sort=${JSON.stringify(sortModel)}`,
+        )}&order=${JSON.stringify(order)}`,
       getTableStats: ({ tableName, filterQuery }) =>
         `/admin_api/tables/${tableName}/stats/?q=${JSON.stringify(
           filterQuery
@@ -496,6 +494,10 @@ export const LOCAL_CONSTANTS = {
     TABLES: "REACT_QUERY_KEY_TABLES",
     TABLE_ID: (tableName) =>
       `REACT_QUERY_KEY_TABLES_${String(tableName).toUpperCase()}`,
+    TABLE_ID_COLUMNS: (tableName) =>
+      `REACT_QUERY_KEY_TABLE_COLUMNS_${String(tableName).toUpperCase()}`,
+    TABLE_ID_PRIMARY_KEY: (tableName) =>
+      `REACT_QUERY_KEY_TABLE_PRIMARY_KEY_${String(tableName).toUpperCase()}`,
     QUERIES: `REACT_QUERY_KEY_QUERIES`,
     APP_CONSTANTS: `REACT_QUERY_KEY_APP_CONSTANTS`,
     GRAPHS: `REACT_QUERY_KEY_GRAPHS`,
@@ -593,184 +595,199 @@ export const LOCAL_CONSTANTS = {
     boolean: {
       value: "Boolean value (TRUE, FALSE, or NULL)",
       js_type: "boolean",
-      prisma_type: "Boolean",
+      normalizedType: "Boolean",
     },
     smallint: {
       value: "Small integer (-32,768 to 32,767)",
       js_type: "number",
-      prisma_type: "Int",
+      normalizedType: "Int",
     },
     integer: {
       value: "Integer (-2,147,483,648 to 2,147,483,647)",
       js_type: "number",
-      prisma_type: "Int",
+      normalizedType: "Int",
     },
     bigint: {
       value:
         "Large integer (-9,223,372,036,854,775,808 to 9,223,372,036,854,775,807)",
       js_type: "bigint",
-      prisma_type: "BigInt",
+      normalizedType: "BigInt",
     },
     decimal: {
       value: "Exact numeric of variable precision and scale",
       js_type: "number",
-      prisma_type: "Decimal",
+      normalizedType: "Decimal",
     },
     numeric: {
       value: "Exact numeric of variable precision and scale",
       js_type: "number",
-      prisma_type: "Decimal",
+      normalizedType: "Decimal",
     },
     real: {
       value:
         "Single-precision floating-point number (approximately ±1.18 x 10^-38 to ±3.4 x 10^38)",
       js_type: "number",
-      prisma_type: "Float",
+      normalizedType: "Float",
     },
     "double precision": {
       value:
         "Double-precision floating-point number (approximately ±2.23 x 10^-308 to ±1.8 x 10^308)",
       js_type: "number",
-      prisma_type: "Float",
+      normalizedType: "Float",
     },
     serial: {
       value: "Auto-incrementing integer (typically used for primary keys)",
       js_type: "number",
-      prisma_type: "Int",
+      normalizedType: "Int",
     },
     bigserial: {
       value: "Auto-incrementing big integer (typically used for primary keys)",
       js_type: "bigint",
-      prisma_type: "BigInt",
+      normalizedType: "BigInt",
     },
     money: {
       value: "Currency amounts with a fixed decimal point",
       js_type: "number",
-      prisma_type: "Decimal",
+      normalizedType: "Decimal",
     },
     "char(n)": {
       value: "Fixed-length character string with length n",
       js_type: "string",
-      prisma_type: "String",
+      normalizedType: "String",
     },
     "varchar(n)": {
       value: "Variable-length character string with maximum length n",
       js_type: "string",
-      prisma_type: "String",
+      normalizedType: "String",
     },
     text: {
       value: "Variable-length character string with no maximum length",
       js_type: "string",
-      prisma_type: "String",
+      normalizedType: "String",
     },
     bytea: {
       value: "Binary data (byte array)",
       js_type: "Uint8Array",
-      prisma_type: "Bytes",
+      normalizedType: "Bytes",
     },
     date: {
       value: "Calendar date (YYYY-MM-DD)",
       js_type: "Date",
-      prisma_type: "DateTime",
+      normalizedType: "DateTime",
     },
     time: {
       value: "Time of day without time zone (HH:MM:SS)",
       js_type: "string",
-      prisma_type: "DateTime",
+      normalizedType: "DateTime",
     },
     "time with time zone": {
       value: "Time of day with time zone (HH:MM:SS+/-TZ)",
       js_type: "string",
-      prisma_type: "DateTime",
+      normalizedType: "DateTime",
     },
     timestamp: {
       value: "Date and time without time zone (YYYY-MM-DD HH:MM:SS)",
       js_type: "Date",
-      prisma_type: "DateTime",
+      normalizedType: "DateTime",
     },
     "timestamp with time zone": {
       value: "Date and time with time zone (YYYY-MM-DD HH:MM:SS+/-TZ)",
       js_type: "Date",
-      prisma_type: "DateTime",
+      normalizedType: "DateTime",
     },
     interval: {
       value: "Time span (e.g., '1 year 2 months 3 days')",
       js_type: "string",
-      prisma_type: "String",
+      normalizedType: "String",
     },
     uuid: {
       value: "Universally unique identifier (128-bit number)",
       js_type: "string",
-      prisma_type: "String",
+      normalizedType: "String",
     },
     json: {
       value: "JSON data (text format)",
       js_type: "object",
-      prisma_type: "Json",
+      normalizedType: "Json",
     },
     jsonb: {
       value: "Binary JSON data (more efficient storage and querying)",
       js_type: "object",
-      prisma_type: "Json",
+      normalizedType: "Json",
     },
-    xml: { value: "XML data", js_type: "string", prisma_type: "String" },
+    xml: { value: "XML data", js_type: "string", normalizedType: "String" },
     array: {
       value: "Array of values (e.g., integer[], text[])",
       js_type: "Array",
-      prisma_type: "String",
+      normalizedType: "String",
     },
     hstore: {
       value: "Key-value pairs (used for storing sets of key-value pairs)",
       js_type: "object",
-      prisma_type: "Json",
+      normalizedType: "Json",
     },
     point: {
       value: "Geometric point (x, y)",
       js_type: "string",
-      prisma_type: "String",
+      normalizedType: "String",
     },
-    line: { value: "Geometric line", js_type: "string", prisma_type: "String" },
+    line: {
+      value: "Geometric line",
+      js_type: "string",
+      normalizedType: "String",
+    },
     lseg: {
       value: "Geometric line segment",
       js_type: "string",
-      prisma_type: "String",
+      normalizedType: "String",
     },
-    box: { value: "Geometric box", js_type: "string", prisma_type: "String" },
-    path: { value: "Geometric path", js_type: "string", prisma_type: "String" },
+    box: {
+      value: "Geometric box",
+      js_type: "string",
+      normalizedType: "String",
+    },
+    path: {
+      value: "Geometric path",
+      js_type: "string",
+      normalizedType: "String",
+    },
     polygon: {
       value: "Geometric polygon",
       js_type: "string",
-      prisma_type: "String",
+      normalizedType: "String",
     },
     circle: {
       value: "Geometric circle",
       js_type: "string",
-      prisma_type: "String",
+      normalizedType: "String",
     },
     cidr: {
       value: "CIDR notation for IP addresses",
       js_type: "string",
-      prisma_type: "String",
+      normalizedType: "String",
     },
-    inet: { value: "IP address", js_type: "string", prisma_type: "String" },
-    macaddr: { value: "MAC address", js_type: "string", prisma_type: "String" },
+    inet: { value: "IP address", js_type: "string", normalizedType: "String" },
+    macaddr: {
+      value: "MAC address",
+      js_type: "string",
+      normalizedType: "String",
+    },
     network: {
       value: "Network address",
       js_type: "string",
-      prisma_type: "String",
+      normalizedType: "String",
     },
   },
 
   TABLE_FILTERS: {
-    equals: "equals",
-    not: "not",
-    lt: "lt",
-    lte: "lte",
-    gt: "gt",
-    gte: "gte",
-    contains: "contains",
-    startsWith: "startsWith",
-    endsWith: "endsWith",
+    "=": (a, b) => `${a} = ${b}`,
+    "!=": (a, b) => `${a} != ${b}`,
+    "<": (a, b) => `${a} < ${b}`,
+    "<=": (a, b) => `${a} <= ${b}`,
+    ">": (a, b) => `${a} > ${b}`,
+    ">=": (a, b) => `${a} >= ${b}`,
+    LIKE: (a, b) => `${a} LIKE '%${b}%'`,
+    ILIKE: (a, b) => `${a} ILIKE '%${b}%'`,
   },
 
   POSTGRE_SQL_CARDINALITY: {

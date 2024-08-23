@@ -3,7 +3,7 @@ import { useFormik } from "formik";
 
 import { Button, CircularProgress, Grid, Paper, useTheme } from "@mui/material";
 import { useMemo } from "react";
-import { addRowAPI, getAuthorizedColumnsForAdd } from "../../../api/tables";
+import { addRowAPI, getTableColumns } from "../../../api/tables";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { getFormattedTableColumns } from "../../../utils/tables";
@@ -15,27 +15,27 @@ export const RowAdditionForm = ({ tableName, customTitle }) => {
   const queryClient = useQueryClient();
   const {
     isLoading: isLoadingAddColumns,
-    data: addColumns,
+    data: tableColumns,
     error: loadAddColumnsError,
   } = useQuery({
     queryKey: [
       LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLE_ID(tableName),
       `add_column`,
     ],
-    queryFn: () => getAuthorizedColumnsForAdd({ tableName }),
+    queryFn: () => getTableColumns({ tableName }),
     cacheTime: 0,
     retry: 1,
     staleTime: 0,
   });
 
-  const allColumns = useMemo(() => {
-    if (addColumns) {
-      const c = getFormattedTableColumns(addColumns);
+  const columns = useMemo(() => {
+    if (tableColumns) {
+      const c = getFormattedTableColumns(tableColumns);
       return c;
     } else {
       return null;
     }
-  }, [addColumns]);
+  }, [tableColumns]);
 
   const {
     isPending: isAddingRow,
@@ -70,7 +70,7 @@ export const RowAdditionForm = ({ tableName, customTitle }) => {
       addRow({ tableName, data: values });
     },
   });
-  return allColumns && allColumns.length > 0 ? (
+  return columns && columns.length > 0 ? (
     <div className="flex flex-col justify-start items-center w-full pb-5 p-2">
       <div className=" flex flex-row justify-between 2xl:w-3/5 xl:w-3/4 lg:w-2/3 md:w-full mt-3 ">
         <div className="flex flex-col items-start justify-start">
@@ -95,7 +95,9 @@ export const RowAdditionForm = ({ tableName, customTitle }) => {
             className="!ml-2"
             onClick={rowAdditionForm.handleSubmit}
           >
-            <span className="!w-max">Add record</span>
+            <span className="!w-max">
+              {LOCAL_CONSTANTS.STRINGS.ADD_BUTTON_TEXT}
+            </span>
           </Button>
         </div>
       </div>
@@ -114,7 +116,7 @@ export const RowAdditionForm = ({ tableName, customTitle }) => {
             columns={{ xs: 1, sm: 1, md: 2 }}
             className="!mt-2"
           >
-            {allColumns.map((column, index) => {
+            {columns.map((column, index) => {
               return (
                 <Grid item xs={12} sm={12} md={12} lg={12} key={index}>
                   <FieldComponent

@@ -1,3 +1,5 @@
+const constants = require("../../constants");
+
 const parseTriggerDefinition = (triggerDefinition) => {
   // Extract trigger name
   const triggerNameMatch = triggerDefinition.match(/CREATE TRIGGER (\w+)/);
@@ -60,5 +62,37 @@ const parseTriggerDefinition = (triggerDefinition) => {
       : null, // Specific parsing for the channel
   };
 };
+const generateFilterQuery = (filterModel) => {
+  if (typeof filterModel !== "object" || filterModel === null) {
+    throw new Error("Invalid filterModel format.");
+  }
 
-module.exports = { parseTriggerDefinition };
+  const operator = Object.keys(filterModel)[0];
+  const value = filterModel[operator];
+
+  switch (operator) {
+    case "AND":
+      return "(" + value.map(generateFilterQuery).join(" AND ") + ")";
+    case "OR":
+      return "(" + value.map(generateFilterQuery).join(" OR ") + ")";
+    case "NOT":
+      return "NOT (" + generateFilterQuery(value) + ")";
+    default:
+      // Here, assume the operator is a field name with some filterModel
+      const field = operator;
+      const filterModelKey = Object.keys(value)[0];
+      const filterModelValue = value[filterModelKey];
+      const query = constants.TABLE_FILTERS[
+        String(filterModelKey).toUpperCase()
+      ](field, filterModelValue);
+      return query;
+  }
+};
+const generateOrderByQuery = (sortModel) => {
+  return `${sortModel.field} ${sortModel.order}`;
+};
+module.exports = {
+  parseTriggerDefinition,
+  generateOrderByQuery,
+  generateFilterQuery,
+};

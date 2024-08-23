@@ -28,9 +28,8 @@ export const DataGridFilterComponent = ({
   handleCLoseFilterMenu,
   combinator,
   setCombinator,
-  readColumns,
+  tableColumns,
 }) => {
-  const { pmUser } = useAuthState();
   const theme = useTheme();
 
   const [filterField, setFilterField] = useState("");
@@ -41,21 +40,21 @@ export const DataGridFilterComponent = ({
     setCombinator(e.target.value);
   };
 
-  const authorizedColumns = useMemo(() => {
-    if (readColumns) {
-      const c = getFormattedTableColumns(readColumns);
+  const columns = useMemo(() => {
+    if (tableColumns) {
+      const c = getFormattedTableColumns(tableColumns);
       return c;
     } else {
       return null;
     }
-  }, [readColumns]);
+  }, [tableColumns]);
 
   const fieldType = useMemo(() => {
-    if (readColumns && filterField) {
-      return readColumns.find((fieldModel) => fieldModel.name === filterField)
+    if (tableColumns && filterField) {
+      return tableColumns.find((fieldModel) => fieldModel.name === filterField)
         .type;
     }
-  }, [readColumns, filterField]);
+  }, [tableColumns, filterField]);
 
   const _handleChangeFilterField = (e) => {
     setFilterField(e.target.value);
@@ -96,6 +95,7 @@ export const DataGridFilterComponent = ({
         operator: filterOperator,
         value: filterValue,
       };
+      console.log({ setFilter: [...filters, { ..._filter }] });
       setFilters([...filters, { ..._filter }]);
     }
   };
@@ -167,7 +167,7 @@ export const DataGridFilterComponent = ({
               className=""
               fullWidth
             >
-              {authorizedColumns?.map((column, index) => {
+              {columns?.map((column, index) => {
                 return (
                   <MenuItem
                     value={column.field}

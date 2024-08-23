@@ -73,7 +73,7 @@ class AuthService {
       } else {
         Logger.log("success", {
           message: "AuthService:verifyAccessToken:success",
-          params: { pm_user_id: payload.pm_user_id, pmUser },
+          params: { pm_user_id: payload.pm_user_id },
         });
         return pmUser;
       }

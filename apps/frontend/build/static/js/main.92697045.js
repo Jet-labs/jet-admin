@@ -961,7 +961,7 @@
               },
               TABLE: {
                 getAllTables: () => "/admin_api/tables",
-                getAuthorizedColumnsForRead: (e) => {
+                getTableColumns: (e) => {
                   let { tableName: t } = e;
                   return "/admin_api/tables/".concat(t, "/read_columns");
                 },

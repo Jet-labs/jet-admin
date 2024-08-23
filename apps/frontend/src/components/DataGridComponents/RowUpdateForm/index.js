@@ -1,16 +1,13 @@
 import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { useFormik } from "formik";
-import {
-  fetchRowByIDAPI,
-  getAuthorizedColumnsForRead,
-} from "../../../api/tables";
+import { fetchRowByIDAPI, getTableColumns } from "../../../api/tables";
 
 import { Button, CircularProgress, Grid, useTheme } from "@mui/material";
 import { useEffect, useMemo } from "react";
 import { Loading } from "../../../pages/Loading";
 import { FieldComponent } from "../../FieldComponent";
 
-import { getAuthorizedColumnsForEdit, updateRowAPI } from "../../../api/tables";
+import { updateRowAPI } from "../../../api/tables";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { getFormattedTableColumns } from "../../../utils/tables";
@@ -36,36 +33,32 @@ export const RowUpdateForm = ({ customTitle, tableName, id }) => {
 
   const {
     isLoading: isLoadingEditColumns,
-    data: editColumns,
+    data: tableColumns,
     error: loadEditColumnsError,
   } = useQuery({
-    queryKey: [
-      LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLE_ID(tableName),
-
-      `edit_column`,
-    ],
-    queryFn: () => getAuthorizedColumnsForRead({ tableName }),
+    queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLE_ID_COLUMNS(tableName)],
+    queryFn: () => getTableColumns({ tableName }),
     cacheTime: 0,
     retry: 1,
     staleTime: 0,
   });
 
-  const authorizedColumns = useMemo(() => {
-    if (editColumns) {
-      const c = getFormattedTableColumns(editColumns);
+  const columns = useMemo(() => {
+    if (tableColumns) {
+      const c = getFormattedTableColumns(tableColumns);
       return c;
     } else {
       return null;
     }
-  }, [editColumns]);
+  }, [tableColumns]);
 
   useEffect(() => {
-    if (rowData && authorizedColumns) {
-      authorizedColumns.forEach((column) => {
+    if (rowData && columns) {
+      columns.forEach((column) => {
         rowUpdateForm.setFieldValue(`${column.field}`, rowData[column.field]);
       });
     }
-  }, [rowData, authorizedColumns]);
+  }, [rowData, columns]);
 
   const {
     isPending: isUpdatingRow,
@@ -104,7 +97,7 @@ export const RowUpdateForm = ({ customTitle, tableName, id }) => {
     },
   });
 
-  return authorizedColumns?.length > 0 ? (
+  return columns?.length > 0 ? (
     <div className="flex flex-col justify-start items-center w-full pb-5 p-2 overflow-y-scroll">
       <div className=" flex flex-row justify-between 2xl:w-3/5 xl:w-3/4 lg:w-2/3 md:w-full  mt-3 w-full ">
         <div className="flex flex-col items-start justify-start">
@@ -132,7 +125,7 @@ export const RowUpdateForm = ({ customTitle, tableName, id }) => {
             className="!ml-2"
             onClick={rowUpdateForm.submitForm}
           >
-            Update
+            {LOCAL_CONSTANTS.STRINGS.UPDATE_BUTTON_TEXT}
           </Button>
         </div>
       </div>
@@ -150,7 +143,7 @@ export const RowUpdateForm = ({ customTitle, tableName, id }) => {
         >
           <form className="" onSubmit={rowUpdateForm.handleSubmit}>
             <Grid container rowSpacing={2} columnSpacing={3} className="!mt-2">
-              {authorizedColumns.map((column, index) => {
+              {columns.map((column, index) => {
                 return (
                   <Grid item xs={12} sm={12} md={12} lg={12} key={index}>
                     <FieldComponent
@@ -177,7 +170,7 @@ export const RowUpdateForm = ({ customTitle, tableName, id }) => {
         </div>
       )}
     </div>
-  ) : !authorizedColumns || authorizedColumns.length == 0 ? (
+  ) : !columns || columns.length == 0 ? (
     <div className="!w-full !p-4">
       <ErrorComponent error={LOCAL_CONSTANTS.ERROR_CODES.PERMISSION_DENIED} />
     </div>

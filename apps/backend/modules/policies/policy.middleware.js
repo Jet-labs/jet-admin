@@ -30,7 +30,7 @@ policyMiddleware.populateAuthorizationPolicies = async (req, res, next) => {
     Logger.log("info", {
       message:
         "tableAuthorizationMiddleware:populateAuthorizationPolicies:policy",
-      params: { pm_user_id, policy_object: authorization_policy },
+      params: { pm_user_id },
     });
     req.state = {
       ...req.state,

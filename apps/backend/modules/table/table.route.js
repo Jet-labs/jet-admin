@@ -11,30 +11,21 @@ router.get(
   "/",
   authMiddleware.authProvider,
   policyMiddleware.populateAuthorizationPolicies,
-  tableController.getAllTablesForRead
-);
-
-
-router.get(
-  "/:table_name/read_columns",
-  authMiddleware.authProvider,
-  policyMiddleware.populateAuthorizationPolicies,
-  tableController.getAuthorizedColumnsForRead
+  tableController.getTables
 );
 
 router.get(
-  "/:table_name/edit_columns",
+  "/:table_name/columns",
   authMiddleware.authProvider,
   policyMiddleware.populateAuthorizationPolicies,
-  tableController.getAuthorizedColumnsForUpdate
+  tableController.getTableColumns
 );
 
 router.get(
-  "/:table_name/add_columns",
+  "/:table_name/pkey",
   authMiddleware.authProvider,
   policyMiddleware.populateAuthorizationPolicies,
-  tableAuthorizationMiddleware.authorizeRowAddition,
-  tableController.getAuthorizedColumnsForAdd
+  tableController.getTablePrimaryKey
 );
 
 router.get(
@@ -42,9 +33,7 @@ router.get(
   authMiddleware.authProvider,
   // tableAuthorizationMiddleware.isAuthorized,
   policyMiddleware.populateAuthorizationPolicies,
-  tableAuthorizationMiddleware.populateAuthorizedRowsForRead,
-  tableAuthorizationMiddleware.populateAuthorizedColumnsForRead,
-  tableAuthorizationMiddleware.populateAuthorizedIncludeColumnsForRead,
+  tableAuthorizationMiddleware.authorizeRowRead,
   tableController.getAllRows
 );
 
@@ -53,8 +42,7 @@ router.get(
   authMiddleware.authProvider,
   // tableAuthorizationMiddleware.isAuthorized,
   policyMiddleware.populateAuthorizationPolicies,
-  tableAuthorizationMiddleware.populateAuthorizedRowsForRead,
-  tableAuthorizationMiddleware.populateAuthorizedColumnsForRead,
+  tableAuthorizationMiddleware.authorizeRowRead,
   tableController.getTableStatistics
 );
 
@@ -63,9 +51,7 @@ router.get(
   authMiddleware.authProvider,
   // tableAuthorizationMiddleware.isAuthorized,
   policyMiddleware.populateAuthorizationPolicies,
-  tableAuthorizationMiddleware.populateAuthorizedRowsForRead,
-  tableAuthorizationMiddleware.populateAuthorizedColumnsForRead,
-  tableAuthorizationMiddleware.populateAuthorizedIncludeColumnsForRead,
+  tableAuthorizationMiddleware.authorizeRowRead,
   tableController.getRowByID
 );
 
@@ -75,7 +61,6 @@ router.put(
   // tableAuthorizationMiddleware.isAuthorized,
   policyMiddleware.populateAuthorizationPolicies,
   tableAuthorizationMiddleware.authorizeRowUpdate,
-  tableAuthorizationMiddleware.authorizeColumnUpdate,
   tableController.updateRowByID
 );
 
@@ -93,7 +78,7 @@ router.post(
   authMiddleware.authProvider,
   // tableAuthorizationMiddleware.isAuthorized,
   policyMiddleware.populateAuthorizationPolicies,
-  tableAuthorizationMiddleware.populateAuthorizedRowsForRead,
+  tableAuthorizationMiddleware.authorizeRowRead,
   tableController.exportRowByMultipleIDs
 );
 

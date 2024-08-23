@@ -24,6 +24,8 @@ const AppConstantsContextProvider = ({ children }) => {
     staleTime: 0,
   });
 
+  console.log({ dbModelData });
+
   const {
     isLoading: isLoadingAllAppConstants,
     data: appConstants,

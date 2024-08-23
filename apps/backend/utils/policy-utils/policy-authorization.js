@@ -226,58 +226,15 @@ policyAuthorizations.extractRowReadAuthorization = ({
     authorized_rows = false;
   } else if (policyObject.tables[tableName].read === true) {
     authorized_rows = true;
-  } else if (!policyObject.tables[tableName].read.rows) {
-    authorized_rows = false;
-  } else if (policyObject.tables[tableName].read.rows === true) {
-    authorized_rows = true;
-  } else if (typeof policyObject.tables[tableName].read.rows == "object") {
-    authorized_rows = policyObject.tables[tableName].read.rows;
+  } else if (
+    typeof policyObject.tables[tableName].read == "object" ||
+    typeof policyObject.tables[tableName].read == "string"
+  ) {
+    authorized_rows = policyObject.tables[tableName].read;
   } else {
     authorized_rows = false;
   }
   return authorized_rows;
-};
-
-policyAuthorizations.extractColumnReadAuthorization = ({
-  policyObject,
-  tableName,
-}) => {
-  let authorized_columns;
-  if (!policyObject.tables[tableName]) {
-    authorized_columns = false;
-  } else if (policyObject.tables[tableName] === true) {
-    authorized_columns = true;
-  } else if (!policyObject.tables[tableName].read) {
-    authorized_columns = false;
-  } else if (policyObject.tables[tableName].read === true) {
-    authorized_columns = true;
-  } else if (!policyObject.tables[tableName].read.columns) {
-    authorized_columns = false;
-  } else if (policyObject.tables[tableName].read.columns === true) {
-    authorized_columns = true;
-  } else if (Array.isArray(policyObject.tables[tableName].read.columns)) {
-    authorized_columns = policyObject.tables[tableName].read.columns;
-  } else {
-    authorized_columns = false;
-  }
-  return authorized_columns;
-};
-
-policyAuthorizations.extractIncludeColumnReadAuthorization = ({
-  policyObject,
-  tableName,
-}) => {
-  let authorized_include_columns;
-  if (
-    policyObject?.tables?.[tableName]?.read?.include &&
-    typeof policyObject.tables[tableName].read.include == "object"
-  ) {
-    authorized_include_columns = policyObject.tables[tableName].read.include;
-  } else {
-    authorized_include_columns = false;
-  }
-
-  return authorized_include_columns;
 };
 
 policyAuthorizations.extractRowEditAuthorization = ({
@@ -293,42 +250,17 @@ policyAuthorizations.extractRowEditAuthorization = ({
     authorized_rows = false;
   } else if (policyObject.tables[tableName].edit === true) {
     authorized_rows = true;
-  } else if (!policyObject.tables[tableName].edit.rows) {
-    authorized_rows = false;
-  } else if (policyObject.tables[tableName].edit.rows === true) {
-    authorized_rows = true;
-  } else if (typeof policyObject.tables[tableName].edit.rows == "object") {
-    authorized_rows = policyObject.tables[tableName].edit.rows;
+  } else if (
+    typeof policyObject.tables[tableName].edit == "object" ||
+    typeof policyObject.tables[tableName].edit == "string"
+  ) {
+    authorized_rows = policyObject.tables[tableName].edit;
   } else {
     authorized_rows = false;
   }
   return authorized_rows;
 };
 
-policyAuthorizations.extractColumnEditAuthorization = ({
-  policyObject,
-  tableName,
-}) => {
-  let authorized_columns;
-  if (!policyObject.tables[tableName]) {
-    authorized_columns = false;
-  } else if (policyObject.tables[tableName] === true) {
-    authorized_columns = true;
-  } else if (!policyObject.tables[tableName].edit) {
-    authorized_columns = false;
-  } else if (policyObject.tables[tableName].edit === true) {
-    authorized_columns = true;
-  } else if (!policyObject.tables[tableName].edit.columns) {
-    authorized_columns = false;
-  } else if (policyObject.tables[tableName].edit.columns === true) {
-    authorized_columns = true;
-  } else if (Array.isArray(policyObject.tables[tableName].edit.columns)) {
-    authorized_columns = policyObject.tables[tableName].edit.columns;
-  } else {
-    authorized_columns = false;
-  }
-  return authorized_columns;
-};
 
 policyAuthorizations.extractRowDeleteAuthorization = ({
   policyObject,

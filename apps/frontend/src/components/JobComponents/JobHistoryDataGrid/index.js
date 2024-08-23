@@ -11,7 +11,7 @@ import { useCallback, useMemo, useState } from "react";
 import { fetchAllRowsAPI } from "../../../api/tables";
 import { useAuthState } from "../../../contexts/authContext";
 
-import { getAuthorizedColumnsForRead } from "../../../api/tables";
+import { getTableColumns } from "../../../api/tables";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { useAppConstants } from "../../../contexts/appConstantsContext";
 import { Loading } from "../../../pages/Loading";
@@ -79,7 +79,7 @@ export const RawDataGrid = ({
       LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLE_ID(tableName),
       `read_column`,
     ],
-    queryFn: () => getAuthorizedColumnsForRead({ tableName }),
+    queryFn: () => getTableColumns({ tableName }),
     cacheTime: 0,
     retry: 1,
     staleTime: 0,

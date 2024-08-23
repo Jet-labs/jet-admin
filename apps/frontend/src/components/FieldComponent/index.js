@@ -51,7 +51,10 @@ export const FieldComponent = ({
   }));
   const label = lowerCase(name);
   let component = null;
-  switch (type) {
+  const convertedType = LOCAL_CONSTANTS.POSTGRE_SQL_DATA_TYPES[type]
+    ? LOCAL_CONSTANTS.POSTGRE_SQL_DATA_TYPES[type].normalizedType
+    : LOCAL_CONSTANTS.DATA_TYPES.JSON;
+  switch (convertedType) {
     case LOCAL_CONSTANTS.DATA_TYPES.STRING: {
       component = (
         <FormControl

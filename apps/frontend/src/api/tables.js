@@ -1,6 +1,10 @@
 import { LOCAL_CONSTANTS } from "../constants";
 import axiosInstance from "../utils/axiosInstance";
 import { triggerDownload } from "../utils/downloads";
+import {
+  generateFilterQuery,
+  generateOrderByQuery,
+} from "../utils/postgresUtils/tables";
 
 export const getAllTables = async () => {
   try {
@@ -19,10 +23,10 @@ export const getAllTables = async () => {
   }
 };
 
-export const getAuthorizedColumnsForRead = async ({ tableName }) => {
+export const getTableColumns = async ({ tableName }) => {
   try {
     const response = await axiosInstance.get(
-      LOCAL_CONSTANTS.APIS.TABLE.getAuthorizedColumnsForRead({
+      LOCAL_CONSTANTS.APIS.TABLE.getTableColumns({
         tableName,
       })
     );
@@ -38,34 +42,15 @@ export const getAuthorizedColumnsForRead = async ({ tableName }) => {
   }
 };
 
-export const getAuthorizedColumnsForEdit = async ({ tableName }) => {
+export const getTablePrimaryKey = async ({ tableName }) => {
   try {
     const response = await axiosInstance.get(
-      LOCAL_CONSTANTS.APIS.TABLE.getAuthorizedColumnsForEdit({
+      LOCAL_CONSTANTS.APIS.TABLE.getTablePrimaryKey({
         tableName,
       })
     );
     if (response.data && response.data.success == true) {
-      return Array.from(response.data.columns);
-    } else if (response.data.error) {
-      throw response.data.error;
-    } else {
-      throw LOCAL_CONSTANTS.ERROR_CODES.SERVER_ERROR;
-    }
-  } catch (error) {
-    throw error;
-  }
-};
-
-export const getAuthorizedColumnsForAdd = async ({ tableName }) => {
-  try {
-    const response = await axiosInstance.get(
-      LOCAL_CONSTANTS.APIS.TABLE.getAuthorizedColumnsForAdd({
-        tableName,
-      })
-    );
-    if (response.data && response.data.success == true) {
-      return Array.from(response.data.columns);
+      return Array.from(response.data.primaryKey);
     } else if (response.data.error) {
       throw response.data.error;
     } else {
@@ -89,8 +74,8 @@ export const fetchAllRowsAPI = async ({
         tableName,
         page,
         pageSize,
-        filterQuery,
-        sortModel,
+        filterQuery: filterQuery,
+        order: sortModel,
       })
     );
     if (response.data && response.data.success == true) {

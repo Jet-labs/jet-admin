@@ -19,96 +19,43 @@ import {
   FaSort,
   FaTimes,
 } from "react-icons/fa";
-import { getAuthorizedColumnsForRead } from "../../../api/tables";
+import { getTableColumns } from "../../../api/tables";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { AppliedFiltersList } from "../AppliedFilterList";
 import { DataGridFilterComponent } from "../DataGridFilterComponent";
 import { DataGridSortComponent } from "../DataGridSortComponent";
 export const DataGridActionComponent = ({
-  setFilterQuery,
   setSortModel,
+  setSearchTerm,
+  searchTerm,
+  filters,
+  setFilters,
+  combinator,
+  setCombinator,
   sortModel,
   reloadData,
   tableName,
   addRowNavigation,
   compact,
   allowAdd,
+  handleDeleteFilter,
 }) => {
   const theme = useTheme();
-  const [searchTerm, setSearchTerm] = useState("");
-  const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const [isFilterMenuOpen, setIsFilterMenuOpen] = useState(false);
   const [isSortMenuOpen, setIsSortMenuOpen] = useState(false);
 
-  const [filters, setFilters] = useState([]);
-  const [combinator, setCombinator] = useState("AND");
-
   const navigate = useNavigate();
   const {
-    isLoading: isLoadingReadColumns,
-    data: readColumns,
-    error: loadReadColumnsError,
+    isLoading: isLoadingTableColumns,
+    data: tableColumns,
+    error: loadTableColumnsError,
   } = useQuery({
-    queryKey: [
-      LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLE_ID(tableName),
-      `read_column`,
-    ],
-    queryFn: () => getAuthorizedColumnsForRead({ tableName }),
+    queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLE_ID_COLUMNS(tableName)],
+    queryFn: () => getTableColumns({ tableName }),
     cacheTime: 0,
     retry: 1,
     staleTime: 0,
   });
-
-  useEffect(() => {
-    if (
-      readColumns &&
-      tableName &&
-      combinator &&
-      filters &&
-      filters.length > 0
-    ) {
-      const queries = [];
-      filters.map((filter) => {
-        let query = {};
-        let o = {};
-        o[filter.operator] = filter.value;
-        const columnModel = readColumns.find(
-          (columnModel) => columnModel.name === filter.field
-        );
-        if (columnModel.type == LOCAL_CONSTANTS.DATA_TYPES.STRING) {
-          o["mode"] = "insensitive";
-        }
-        query[filter.field] = o;
-        queries.push({ ...query });
-      });
-      const fq = {};
-      fq[combinator] = [...queries];
-      setFilterQuery?.(fq);
-    } else if (
-      readColumns &&
-      tableName &&
-      debouncedSearchTerm &&
-      debouncedSearchTerm !== ""
-    ) {
-      let queries = [];
-      const _query = readColumns.forEach((column) => {
-        if (
-          column.type == LOCAL_CONSTANTS.DATA_TYPES.STRING &&
-          !column.isList
-        ) {
-          queries.push({
-            [column.name]: {
-              contains: debouncedSearchTerm,
-              mode: "insensitive",
-            },
-          });
-        }
-      });
-      setFilterQuery?.({ OR: queries });
-    } else {
-      setFilterQuery(null);
-    }
-  }, [filters, debouncedSearchTerm, combinator, readColumns, tableName]);
 
   const _handleOpenFilterMenu = () => {
     setIsFilterMenuOpen(true);
@@ -131,17 +78,6 @@ export const DataGridActionComponent = ({
     );
   };
 
-  const _handleDeleteFilter = (index) => {
-    if (index > -1) {
-      const _f = [...filters];
-      _f.splice(index, 1);
-      setFilters(_f);
-    }
-  };
-
-  const _handleDeleteSortModel = () => {
-    setSortModel(null);
-  };
   return (
     <Grid container className="py-2" rowSpacing={1}>
       <Grid item xs={12} md={12} lg={compact ? 12 : 6}>
@@ -247,7 +183,7 @@ export const DataGridActionComponent = ({
       </Grid>
       <AppliedFiltersList
         filters={filters}
-        handleDeleteFilter={_handleDeleteFilter}
+        handleDeleteFilter={handleDeleteFilter}
       />
 
       <DataGridFilterComponent
@@ -258,7 +194,7 @@ export const DataGridActionComponent = ({
         filters={filters}
         combinator={combinator}
         setCombinator={setCombinator}
-        readColumns={readColumns}
+        tableColumns={tableColumns}
       />
 
       <DataGridSortComponent
@@ -267,7 +203,7 @@ export const DataGridActionComponent = ({
         tableName={tableName}
         setSortModel={setSortModel}
         sortModel={sortModel}
-        readColumns={readColumns}
+        tableColumns={tableColumns}
       />
     </Grid>
   );

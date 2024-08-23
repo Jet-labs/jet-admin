@@ -77,6 +77,17 @@ const constants = {
 
   PM_APP_CONSTANT_DETECTION_REGEX: /\[pm_app_constant_id:\d+\]/g,
   PM_APP_CONSTANT_EXTRACTION_REGEX: /\[pm_app_constant_id:(\d+)\]/,
+
+  TABLE_FILTERS: {
+    "=": (a, b) => `${a} = ${b}`,
+    "!=": (a, b) => `${a} != ${b}`,
+    "<": (a, b) => `${a} < ${b}`,
+    "<=": (a, b) => `${a} <= ${b}`,
+    ">": (a, b) => `${a} > ${b}`,
+    ">=": (a, b) => `${a} >= ${b}`,
+    LIKE: (a, b) => `${a} LIKE '%${b}%'`,
+    ILIKE: (a, b) => `${a} ILIKE '%${b}%'`,
+  },
 };
 
 module.exports = constants;

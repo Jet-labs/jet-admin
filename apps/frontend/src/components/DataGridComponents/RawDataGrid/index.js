@@ -18,10 +18,10 @@ import {
 } from "@mui/x-data-grid";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { fetchAllRowsAPI } from "../../../api/tables";
+import { fetchAllRowsAPI, getTablePrimaryKey } from "../../../api/tables";
 import { useAuthState } from "../../../contexts/authContext";
 
-import { getAuthorizedColumnsForRead } from "../../../api/tables";
+import { getTableColumns } from "../../../api/tables";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { useAppConstants } from "../../../contexts/appConstantsContext";
 import { Loading } from "../../../pages/Loading";
@@ -34,6 +34,8 @@ import { ErrorComponent } from "../../ErrorComponent";
 import { RawDataGridStatistics } from "../RawDataGridStatistics";
 import { MultipleRowsDeletionForm } from "../MultipleRowDeletetionForm";
 import { DataExportFormComponent } from "../DataExportFormComponent";
+import { combinePrimaryKeyToWhereClause } from "../../../utils/postgresUtils/tables";
+import { useDebounce } from "@uidotdev/usehooks";
 
 export const RawDataGrid = ({
   tableName,
@@ -47,6 +49,10 @@ export const RawDataGrid = ({
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [filterQuery, setFilterQuery] = useState(null);
+  const [filters, setFilters] = useState([]);
+  const [combinator, setCombinator] = useState("AND");
+  const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const [sortModel, setSortModel] = useState(null);
   const theme = useTheme();
   const [multipleSelectedQuery, setMultipleSelectedQuery] = useState(null);
@@ -89,88 +95,114 @@ export const RawDataGrid = ({
   });
 
   const {
-    isLoading: isLoadingReadColumns,
-    data: readColumns,
-    error: loadReadColumnsError,
+    isLoading: isLoadingTableColumns,
+    data: tableColumns,
+    error: loadTableColumnsError,
   } = useQuery({
-    queryKey: [
-      LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLE_ID(tableName),
-      `read_column`,
-    ],
-    queryFn: () => getAuthorizedColumnsForRead({ tableName }),
+    queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLE_ID_COLUMNS(tableName)],
+    queryFn: () => getTableColumns({ tableName }),
     cacheTime: 0,
     retry: 1,
     staleTime: 0,
   });
 
-  const authorizedColumns = useMemo(() => {
-    if (readColumns) {
+  const {
+    isLoading: isLoadingTablePrimaryKey,
+    data: tablePrimaryKey,
+    error: loadTablePrimaryKeyError,
+  } = useQuery({
+    queryKey: [
+      LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLE_ID_PRIMARY_KEY(tableName),
+    ],
+    queryFn: () => getTablePrimaryKey({ tableName }),
+    cacheTime: 0,
+    retry: 1,
+    staleTime: 0,
+  });
+
+  useEffect(() => {
+    if (
+      tableColumns &&
+      tableName &&
+      combinator &&
+      filters &&
+      filters.length > 0
+    ) {
+      const queries = [];
+      filters.map((filter) => {
+        let query = {};
+        let o = {};
+        o[filter.operator] = filter.value;
+        query[filter.field] = o;
+        queries.push({ ...query });
+      });
+      const fq = {};
+      fq[combinator] = [...queries];
+      setFilterQuery?.(fq);
+    } else if (
+      tableColumns &&
+      tableName &&
+      debouncedSearchTerm &&
+      debouncedSearchTerm !== ""
+    ) {
+      let queries = [];
+      tableColumns.forEach((column) => {
+        if (
+          LOCAL_CONSTANTS.POSTGRE_SQL_DATA_TYPES[column.type] &&
+          LOCAL_CONSTANTS.POSTGRE_SQL_DATA_TYPES[column.type].normalizedType ==
+            LOCAL_CONSTANTS.DATA_TYPES.STRING
+        ) {
+          queries.push({
+            [column.name]: {
+              ilike: debouncedSearchTerm,
+            },
+          });
+        }
+      });
+      console.log({ queries });
+      setFilterQuery?.({ OR: queries });
+    } else {
+      setFilterQuery(null);
+    }
+  }, [filters, debouncedSearchTerm, combinator, tableColumns, tableName]);
+
+  const columns = useMemo(() => {
+    if (tableColumns) {
       const c = getFormattedTableColumns(
-        readColumns,
+        tableColumns,
         internalAppConstants?.CUSTOM_INT_VIEW_MAPPING?.[tableName]
       );
       return c;
     } else {
       return null;
     }
-  }, [readColumns, internalAppConstants]);
+  }, [tableColumns, internalAppConstants]);
 
   const rowAddAuthorization = useMemo(() => {
     return pmUser && pmUser.extractRowAddAuthorization(tableName);
   }, [pmUser, tableName]);
 
-  const primaryColumns = useMemo(() => {
-    if (dbModel) {
-      return getTableIDProperty(tableName, dbModel);
-    }
-  }, [tableName, dbModel]);
-
-  const _getRowId = (row) => {
-    let _query = {};
-    let _queryName = primaryColumns.join("_");
-    for (let i = 0; i < primaryColumns.length; i++) {
-      _query[primaryColumns[i]] = row[primaryColumns[i]];
-    }
-
-    return primaryColumns.length > 1
-      ? JSON.stringify({ [_queryName]: _query })
-      : JSON.stringify(_query);
-  };
-
-  const _selectByIDQueryBuilder = (row) => {
-    let _query = {};
-    let _queryName = primaryColumns.join("_");
-    for (let i = 0; i < primaryColumns.length; i++) {
-      _query[primaryColumns[i]] = row[primaryColumns[i]];
-    }
-    return primaryColumns.length > 1 ? { [_queryName]: _query } : _query;
-  };
+  const _selectByIDQueryBuilder = useCallback(
+    (row) => {
+      if (tablePrimaryKey) {
+        return { query: combinePrimaryKeyToWhereClause(tablePrimaryKey, row) };
+      }
+    },
+    [tablePrimaryKey]
+  );
 
   const _handleMultipleSelectedRowsQueryBuilder = useCallback(
     (rowSelectionModel) => {
-      let _queryName = primaryColumns.join("_");
       if (rowSelectionModel.length == 0) {
         setMultipleSelectedQuery(null);
         setIsSelectAllRowCheckBoxEnabled(false);
         _handleToggleAllRowSelectCheckbox(false);
       } else {
-        const multipleSelectedRowsQuery = rowSelectionModel.map((rowID) => {
-          const _rowID = JSON.parse(rowID);
-
-          return primaryColumns.length > 1
-            ? _rowID[_queryName]
-            : _rowID[primaryColumns[0]];
-        });
-        const finalQuery =
-          primaryColumns.length > 1
-            ? { [_queryName]: { in: multipleSelectedRowsQuery } }
-            : { [primaryColumns[0]]: { in: multipleSelectedRowsQuery } };
-
-        setMultipleSelectedQuery(finalQuery);
+        setMultipleSelectedQuery(rowSelectionModel.join(" AND "));
         setIsSelectAllRowCheckBoxEnabled(true);
       }
     },
-    [primaryColumns, setMultipleSelectedQuery]
+    [setMultipleSelectedQuery]
   );
 
   const _handleOnPageSizeChange = (e) => {
@@ -179,6 +211,14 @@ export const RawDataGrid = ({
 
   const _handleToggleAllRowSelectCheckbox = (v) => {
     setIsAllRowSelectChecked(v);
+  };
+
+  const _handleDeleteFilter = (index) => {
+    if (index > -1) {
+      const _f = [...filters];
+      _f.splice(index, 1);
+      setFilters(_f);
+    }
   };
 
   const _renderMultipleDeleteButton = useMemo(() => {
@@ -228,7 +268,7 @@ export const RawDataGrid = ({
     isAllRowSelectChecked,
   ]);
 
-  return isLoadingRows ? (
+  return isLoadingRows || isLoadingTableColumns || isLoadingTablePrimaryKey ? (
     <Loading />
   ) : (
     <div
@@ -240,7 +280,7 @@ export const RawDataGrid = ({
         className={`!w-full !p-4 !h-fit`}
         style={{ background: theme.palette.background.default }}
       >
-        {showStats && (
+        {showStats && false && (
           <RawDataGridStatistics
             tableName={tableName}
             filterQuery={filterQuery}
@@ -255,22 +295,33 @@ export const RawDataGrid = ({
           setSortModel={setSortModel}
           sortModel={sortModel}
           allowAdd={rowAddAuthorization}
+          handleDeleteFilter={_handleDeleteFilter}
+          combinator={combinator}
+          setCombinator={setCombinator}
+          filters={filters}
+          setFilters={setFilters}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
         />
       </div>
-      {data?.rows && pmUser && authorizedColumns && primaryColumns ? (
+      {data?.rows && columns && tablePrimaryKey ? (
         <div className="px-4">
           <DataGrid
             rows={data.rows}
             loading={isLoadingRows || isFetchingAllRows}
             className="!border-0 data-grid-custom-class"
-            columns={authorizedColumns}
+            columns={columns}
             initialState={{}}
             editMode="row"
             hideFooterPagination={true}
             hideFooterSelectedRowCount={true}
             checkboxSelection
             disableRowSelectionOnClick
-            getRowId={_getRowId}
+            getRowId={(row) => {
+              if (tablePrimaryKey) {
+                return combinePrimaryKeyToWhereClause(tablePrimaryKey, row);
+              }
+            }}
             hideFooter={true}
             onRowClick={(param) => {
               onRowClick

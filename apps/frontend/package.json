@@ -36,6 +36,7 @@
     "@uiw/codemirror-themes-all": "^4.22.2",
     "@uiw/react-codemirror": "^4.22.2",
     "axios": "^1.1.2",
+    "buffer": "^6.0.3",
     "chart.js": "^4.4.3",
     "dayjs": "^1.11.10",
     "faker": "^6.6.6",

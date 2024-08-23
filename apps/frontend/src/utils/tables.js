@@ -53,96 +53,98 @@ export const getFieldFormatting = ({
   customIntMapping,
 }) => {
   let f = params.value;
-
-  switch (type) {
-    case LOCAL_CONSTANTS.DATA_TYPES.STRING:
-      let value = params.value;
-      if (isList) {
-        value = JSON.stringify(params.value);
-      }
-      f = (
-        <span className="!text-justify break-all text-ellipsis whitespace-pre-wrap">
-          {value}
-        </span>
-      );
-      break;
-    case LOCAL_CONSTANTS.DATA_TYPES.BOOLEAN: {
-      let value = params.value;
-      if (isList) {
-        value = JSON.stringify(params.value);
-      }
-      f = isList ? (
-        params.value.map((data) => {
-          return (
-            <ListItem key={data}>
-              <Chip
-                label={`${Boolean(data)}`}
-                size="small"
-                variant="outlined"
-                color={Boolean(data) ? "success" : "error"}
-              />
-            </ListItem>
-          );
-        })
-      ) : (
-        <Chip
-          label={`${Boolean(params.value)}`}
-          size="small"
-          variant="outlined"
-          color={Boolean(params.value) ? "success" : "error"}
-        />
-      );
-      break;
+const convertedType = LOCAL_CONSTANTS.POSTGRE_SQL_DATA_TYPES[type]
+  ? LOCAL_CONSTANTS.POSTGRE_SQL_DATA_TYPES[type].normalizedType
+  : LOCAL_CONSTANTS.DATA_TYPES.JSON;
+switch (convertedType) {
+  case LOCAL_CONSTANTS.DATA_TYPES.STRING:
+    let value = params.value;
+    if (isList) {
+      value = JSON.stringify(params.value);
     }
-    case LOCAL_CONSTANTS.DATA_TYPES.DATETIME: {
-      if (isList) {
-        params.value.map((data) => {
-          return (
-            <ListItem key={data}>
-              <Chip
-                label={`${data}`}
-                size="small"
-                variant="outlined"
-                color={"secondary"}
-                sx={{
-                  borderRadius: 1,
-                }}
-                icon={<BiCalendar className="!text-sm" />}
-              />
-            </ListItem>
-          );
-        });
-      }
-      f = (
-        <Chip
-          label={`${params.value}`}
-          size="small"
-          variant="filled"
-          className=" !h-min !py-0.5 !border !border-slate-500 !rounded"
-          sx={{
-            maxHeight: null,
-          }}
-          color={"default"}
-          icon={<BiCalendar className="!text-sm !text-current" />}
-        />
-      );
-      break;
+    f = (
+      <span className="!text-justify break-all text-ellipsis whitespace-pre-wrap">
+        {value}
+      </span>
+    );
+    break;
+  case LOCAL_CONSTANTS.DATA_TYPES.BOOLEAN: {
+    let value = params.value;
+    if (isList) {
+      value = JSON.stringify(params.value);
     }
-    case LOCAL_CONSTANTS.DATA_TYPES.INT: {
-      let value = params.value;
-      if (isList) {
-        value = JSON.stringify(params.value);
-      }
-      f = isList ? (
-        <div className="flex flex-row justify-start items-start w-full !flex-wrap h-auto flex-grow">
-          {params.value.map((data) => {
-            const _d = customIntMapping?.[data] ? customIntMapping[data] : data;
-            const _class = customIntMapping?.[data]
-              ? "!bg-slate-200 !text-slate-800 !h-min !pt-0.5 !border !border-slate-500 !rounded"
-              : "!rounded-sm";
-            return (
-              <div key={data} className="p-0.5 w-min">
-                {customIntMapping && customIntMapping[value] ? (
+    f = isList ? (
+      params.value.map((data) => {
+        return (
+          <ListItem key={data}>
+            <Chip
+              label={`${Boolean(data)}`}
+              size="small"
+              variant="outlined"
+              color={Boolean(data) ? "success" : "error"}
+            />
+          </ListItem>
+        );
+      })
+    ) : (
+      <Chip
+        label={`${Boolean(params.value)}`}
+        size="small"
+        variant="outlined"
+        color={Boolean(params.value) ? "success" : "error"}
+      />
+    );
+    break;
+  }
+  case LOCAL_CONSTANTS.DATA_TYPES.DATETIME: {
+    if (isList) {
+      params.value.map((data) => {
+        return (
+          <ListItem key={data}>
+            <Chip
+              label={`${data}`}
+              size="small"
+              variant="outlined"
+              color={"secondary"}
+              sx={{
+                borderRadius: 1,
+              }}
+              icon={<BiCalendar className="!text-sm" />}
+            />
+          </ListItem>
+        );
+      });
+    }
+    f = (
+      <Chip
+        label={`${params.value}`}
+        size="small"
+        variant="filled"
+        className=" !h-min !py-0.5 !border !border-slate-500 !rounded"
+        sx={{
+          maxHeight: null,
+        }}
+        color={"default"}
+        icon={<BiCalendar className="!text-sm !text-current" />}
+      />
+    );
+    break;
+  }
+  case LOCAL_CONSTANTS.DATA_TYPES.INT: {
+    let value = params.value;
+    if (isList) {
+      value = JSON.stringify(params.value);
+    }
+    f = isList ? (
+      <div className="flex flex-row justify-start items-start w-full !flex-wrap h-auto flex-grow">
+        {params.value.map((data) => {
+          const _d = customIntMapping?.[data] ? customIntMapping[data] : data;
+          const _class = customIntMapping?.[data]
+            ? "!bg-slate-200 !text-slate-800 !h-min !pt-0.5 !border !border-slate-500 !rounded"
+            : "!rounded-sm";
+          return (
+            <div key={data} className="p-0.5 w-min">
+              {customIntMapping && customIntMapping[value] ? (
                 <Tooltip
                   placement="right"
                   className="!p-0"
@@ -159,7 +161,7 @@ export const getFieldFormatting = ({
                     }}
                   />
                 </Tooltip>
-                ) : (
+              ) : (
                 <Chip
                   label={`${_d}`}
                   size="small"
@@ -169,37 +171,24 @@ export const getFieldFormatting = ({
                     maxHeight: null,
                   }}
                 />
-                )}
-              </div>
-            );
-          })}
-        </div>
-      ) : (
-        (() => {
-          const _d = customIntMapping?.[value]
-            ? customIntMapping[value]
-            : value;
-          const _class = customIntMapping?.[value]
-            ? "!bg-slate-200 !text-slate-800 !h-min !pt-0.5 !border !border-slate-500 !rounded"
-            : "!rounded !bg-transparent";
-          return customIntMapping && customIntMapping[value] ? (
-            <Tooltip
-              placement="right"
-              className="!p-0"
-              sx={{ background: "background.secondary" }}
-              title={value}
-            >
-              <Chip
-                label={`${_d}`}
-                size="small"
-                variant="filled"
-                className={_class}
-                sx={{
-                  maxHeight: null,
-                }}
-              />
-            </Tooltip>
-          ) : (
+              )}
+            </div>
+          );
+        })}
+      </div>
+    ) : (
+      (() => {
+        const _d = customIntMapping?.[value] ? customIntMapping[value] : value;
+        const _class = customIntMapping?.[value]
+          ? "!bg-slate-200 !text-slate-800 !h-min !pt-0.5 !border !border-slate-500 !rounded"
+          : "!rounded !bg-transparent";
+        return customIntMapping && customIntMapping[value] ? (
+          <Tooltip
+            placement="right"
+            className="!p-0"
+            sx={{ background: "background.secondary" }}
+            title={value}
+          >
             <Chip
               label={`${_d}`}
               size="small"
@@ -209,64 +198,60 @@ export const getFieldFormatting = ({
                 maxHeight: null,
               }}
             />
-          );
-          
-        })()
-      );
-      break;
-    }
+          </Tooltip>
+        ) : (
+          <Chip
+            label={`${_d}`}
+            size="small"
+            variant="filled"
+            className={_class}
+            sx={{
+              maxHeight: null,
+            }}
+          />
+        );
+      })()
+    );
+    break;
+  }
 
-    case LOCAL_CONSTANTS.DATA_TYPES.DECIMAL: {
-      let value = params.value;
-      if (isList) {
-        value = JSON.stringify(params.value);
-      }
-      f = (
-        <span className="!text-justify break-all text-ellipsis whitespace-pre-wrap">
-          {value}
-        </span>
-      );
-      break;
+  case LOCAL_CONSTANTS.DATA_TYPES.DECIMAL: {
+    let value = params.value;
+    if (isList) {
+      value = JSON.stringify(params.value);
     }
-    case LOCAL_CONSTANTS.DATA_TYPES.FLOAT: {
-      let value = params.value;
-      if (isList) {
-        value = JSON.stringify(params.value);
-      }
-      f = (
-        <span className="!text-justify break-all text-ellipsis whitespace-pre-wrap">
-          {value}
-        </span>
-      );
-      break;
+    f = (
+      <span className="!text-justify break-all text-ellipsis whitespace-pre-wrap">
+        {value}
+      </span>
+    );
+    break;
+  }
+  case LOCAL_CONSTANTS.DATA_TYPES.FLOAT: {
+    let value = params.value;
+    if (isList) {
+      value = JSON.stringify(params.value);
     }
-    case LOCAL_CONSTANTS.DATA_TYPES.JSON:
-      // var m = params.value ? p : null;
-      f = (
-        <div className="p-2">
-          <Tooltip
-            placement="right"
-            className="!p-0"
-            sx={{ background: "background.secondary" }}
-            title={
-              <Box
-                sx={{ bgcolor: "background.secondary" }}
-                className="!max-h-32 !overflow-y-auto rounded"
-              >
-                <ReactJson
-                  src={params.value}
-                  theme={
-                    localStorage.getItem(
-                      LOCAL_CONSTANTS.STRINGS.THEME_LOCAL_STORAGE_STRING
-                    ) === "dark"
-                      ? "google"
-                      : "ashes"
-                  }
-                />
-              </Box>
-            }
-          >
-            <div className="!max-h-32 !overflow-hidden rounded">
+    f = (
+      <span className="!text-justify break-all text-ellipsis whitespace-pre-wrap">
+        {value}
+      </span>
+    );
+    break;
+  }
+  case LOCAL_CONSTANTS.DATA_TYPES.JSON:
+    // var m = params.value ? p : null;
+    f = (
+      <div className="p-2">
+        <Tooltip
+          placement="right"
+          className="!p-0"
+          sx={{ background: "background.secondary" }}
+          title={
+            <Box
+              sx={{ bgcolor: "background.secondary" }}
+              className="!max-h-32 !overflow-y-auto rounded"
+            >
               <ReactJson
                 src={params.value}
                 theme={
@@ -277,25 +262,39 @@ export const getFieldFormatting = ({
                     : "ashes"
                 }
               />
-            </div>
-          </Tooltip>
-        </div>
-      );
+            </Box>
+          }
+        >
+          <div className="!max-h-32 !overflow-hidden rounded">
+            <ReactJson
+              src={params.value}
+              theme={
+                localStorage.getItem(
+                  LOCAL_CONSTANTS.STRINGS.THEME_LOCAL_STORAGE_STRING
+                ) === "dark"
+                  ? "google"
+                  : "ashes"
+              }
+            />
+          </div>
+        </Tooltip>
+      </div>
+    );
 
-      break;
-    default: {
-      let value = params.value;
-      if (isList) {
-        value = JSON.stringify(params.value);
-      }
-      f = (
-        <span className="!text-justify break-all text-ellipsis whitespace-pre-wrap">
-          {JSON.stringify(value)}
-        </span>
-      );
-      break;
+    break;
+  default: {
+    let value = params.value;
+    if (isList) {
+      value = JSON.stringify(params.value);
     }
+    f = (
+      <span className="!text-justify break-all text-ellipsis whitespace-pre-wrap">
+        {JSON.stringify(value)}
+      </span>
+    );
+    break;
   }
+}
   return f;
 };
 

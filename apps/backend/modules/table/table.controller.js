@@ -8,6 +8,10 @@ const {
 const { TableService } = require("./table.services");
 const { createObjectCsvStringifier } = require("csv-writer");
 const ExcelJS = require("exceljs");
+const {
+  generateFilterQuery,
+  generateOrderByQuery,
+} = require("../../utils/postgres-utils/parsers");
 
 const tableController = {};
 
@@ -17,17 +21,17 @@ const tableController = {};
  * @param {import("express").Response} res
  * @returns
  */
-tableController.getAllTablesForRead = async (req, res) => {
+tableController.getTables = async (req, res) => {
   try {
     Logger.log("info", {
-      message: "tableController:getAllTablesForRead:init",
+      message: "tableController:getTables:init",
     });
     const { pmUser, state } = req;
     const pm_user_id = parseInt(pmUser.pm_user_id);
     const authorization_policy = state.authorization_policy;
 
     Logger.log("info", {
-      message: "tableController:getAllTablesForRead:params",
+      message: "tableController:getTables:params",
       params: {
         pm_user_id,
       },
@@ -47,7 +51,7 @@ tableController.getAllTablesForRead = async (req, res) => {
         Object.keys(authorization_policy.tables).map((tableName) => {
           if (
             authorization_policy.tables[tableName] === true ||
-            authorization_policy.tables[tableName].read === true
+            authorization_policy.tables[tableName].read
           ) {
             _authorizedTables.push(tableName);
           }
@@ -55,7 +59,7 @@ tableController.getAllTablesForRead = async (req, res) => {
       }
     }
     Logger.log("info", {
-      message: "tableController:getAllTablesForRead:rows",
+      message: "tableController:getTables:rows",
       params: {
         pm_user_id,
         tables: _authorizedTables,
@@ -67,7 +71,7 @@ tableController.getAllTablesForRead = async (req, res) => {
     });
   } catch (error) {
     Logger.log("error", {
-      message: "tableController:getAllTablesForRead:catch-1",
+      message: "tableController:getTables:catch-1",
       params: { error },
     });
     return res.json({ success: false, error: extractError(error) });
@@ -80,65 +84,32 @@ tableController.getAllTablesForRead = async (req, res) => {
  * @param {import("express").Response} res
  * @returns
  */
-tableController.getAuthorizedColumnsForRead = async (req, res) => {
+tableController.getTableColumns = async (req, res) => {
   try {
     Logger.log("info", {
-      message: "tableController:getAuthorizedColumnsForRead:init",
+      message: "tableController:getTableColumns:init",
     });
     const { pmUser, state } = req;
     const pm_user_id = pmUser.pm_user_id;
     const { table_name } = req.params;
-    const authorized_columns =
-      policyAuthorizations.extractColumnReadAuthorization({
-        policyObject: state.authorization_policy,
-        tableName: table_name,
-      });
-    const authorized_include_columns =
-      policyAuthorizations.extractIncludeColumnReadAuthorization({
-        policyObject: state.authorization_policy,
-        tableName: table_name,
-      });
-    Logger.log("info", {
-      message: "tableController:getAuthorizedColumnsForRead:params",
-      params: {
-        pm_user_id,
-        table_name,
-        authorized_columns,
-        authorized_include_columns,
-      },
+    const columns = await TableService.getTableColumns({
+      tableName: table_name,
     });
-    const _tableModel = dbModel.find(
-      (datamodel) => datamodel.name === table_name
-    );
-    const _allColumns = _tableModel.fields;
-    let _authorizedColumns = [];
-    if (authorized_columns === true) {
-      _authorizedColumns = _allColumns;
-    } else if (typeof authorized_columns === "object") {
-      _authorizedColumns = _allColumns.map((column) => {
-        if (
-          authorized_columns.includes(column.name) ||
-          authorized_include_columns.includes(column.name)
-        ) {
-          _authorizedColumns.push({ ...column });
-        }
-      });
-    }
     Logger.log("info", {
-      message: "tableController:getAuthorizedColumnsForRead:params",
+      message: "tableController:getTableColumns:params",
       params: {
         pm_user_id,
         table_name,
-        _authorizedColumns,
+        columns,
       },
     });
     return res.json({
       success: true,
-      columns: _authorizedColumns,
+      columns,
     });
   } catch (error) {
     Logger.log("error", {
-      message: "tableController:getAuthorizedColumnsForRead:catch-1",
+      message: "tableController:getTableColumns:catch-1",
       params: { error },
     });
     return res.json({ success: false, error: extractError(error) });
@@ -151,184 +122,32 @@ tableController.getAuthorizedColumnsForRead = async (req, res) => {
  * @param {import("express").Response} res
  * @returns
  */
-tableController.getAuthorizedColumnsForUpdate = async (req, res) => {
+tableController.getTablePrimaryKey = async (req, res) => {
   try {
     Logger.log("info", {
-      message: "tableController:getAuthorizedColumnsForUpdate:init",
+      message: "tableController:getTablePrimaryKey:init",
     });
     const { pmUser, state } = req;
     const pm_user_id = pmUser.pm_user_id;
     const { table_name } = req.params;
-    const authorized_columns =
-      policyAuthorizations.extractColumnEditAuthorization({
-        policyObject: state.authorization_policy,
-        tableName: table_name,
-      });
-
-    Logger.log("info", {
-      message: "tableController:getAuthorizedColumnsForUpdate:params",
-      params: {
-        pm_user_id,
-        table_name,
-        authorized_columns,
-      },
+    const primaryKey = await TableService.getTablePrimaryKey({
+      tableName: table_name,
     });
-    const _tableModel = dbModel.find(
-      (datamodel) => datamodel.name === table_name
-    );
-    const _allColumns = _tableModel.fields;
-    let _authorizedColumns = [];
-    if (authorized_columns === true) {
-      _authorizedColumns = _allColumns;
-    } else if (typeof authorized_columns === "object") {
-      _authorizedColumns = _allColumns.map((column) => {
-        if (authorized_columns.includes(column.name)) {
-          _authorizedColumns.push({ ...column });
-        }
-      });
-    }
     Logger.log("info", {
-      message: "tableController:getAuthorizedColumnsForUpdate:params",
+      message: "tableController:getTablePrimaryKey:params",
       params: {
         pm_user_id,
         table_name,
-        _authorizedColumns,
+        primaryKey,
       },
     });
     return res.json({
       success: true,
-      columns: _authorizedColumns,
+      primaryKey,
     });
   } catch (error) {
     Logger.log("error", {
-      message: "tableController:getAuthorizedColumnsForUpdate:catch-1",
-      params: { error },
-    });
-    return res.json({ success: false, error: extractError(error) });
-  }
-};
-
-/**
- *
- * @param {import("express").Request} req
- * @param {import("express").Response} res
- * @returns
- */
-tableController.getAuthorizedColumnsForAdd = async (req, res) => {
-  try {
-    Logger.log("info", {
-      message: "tableController:getAuthorizedColumnsForAdd:init",
-    });
-    const { pmUser, state } = req;
-    const pm_user_id = pmUser.pm_user_id;
-    const { table_name } = req.params;
-
-    Logger.log("info", {
-      message: "tableController:getAuthorizedColumnsForAdd:params",
-      params: {
-        pm_user_id,
-        table_name,
-      },
-    });
-    const _tableModel = dbModel.find(
-      (datamodel) => datamodel.name === table_name
-    );
-    const _allColumns = _tableModel.fields;
-
-    Logger.log("info", {
-      message: "tableController:getAuthorizedColumnsForAdd:params",
-      params: {
-        pm_user_id,
-        table_name,
-        _allColumns,
-      },
-    });
-    return res.json({
-      success: true,
-      columns: _allColumns,
-    });
-  } catch (error) {
-    Logger.log("error", {
-      message: "tableController:getAuthorizedColumnsForAdd:catch-1",
-      params: { error },
-    });
-    return res.json({ success: false, error: extractError(error) });
-  }
-};
-
-/**
- *
- * @param {import("express").Request} req
- * @param {import("express").Response} res
- * @returns
- */
-tableController.getAllRows = async (req, res) => {
-  try {
-    Logger.log("info", {
-      message: "tableController:getAllRows:init",
-    });
-    const { pmUser, state } = req;
-    const authorized_rows = state?.authorized_rows;
-    const authorized_columns = state?.authorized_columns;
-    const authorized_include_columns = state?.authorized_include_columns;
-    const pm_user_id = parseInt(pmUser.pm_user_id);
-    const { table_name } = req.params;
-    const { page, page_size, q, sort } = req.query;
-    let qJSON = q && q !== "" ? JSON.parse(q) : null;
-    let sortJSON = sort && sort !== "" ? JSON.parse(sort) : null;
-
-    let skip = 0;
-    let take = page_size ? parseInt(page_size) : constants.ROW_PAGE_SIZE;
-    if (parseInt(page) >= 0) {
-      skip = (parseInt(page) - 1) * take;
-    } else {
-      skip = undefined;
-      take = undefined;
-    }
-    Logger.log("info", {
-      message: "tableController:getAllRows:params",
-      params: {
-        pm_user_id,
-        page,
-        page_size,
-        q,
-        sort,
-        qJSON,
-        sortJSON,
-        table_name,
-        authorized_rows,
-        authorized_columns,
-        authorized_include_columns,
-        skip,
-        take,
-      },
-    });
-
-    const rows = await TableService.getTableRows({
-      table_name,
-      authorized_rows,
-      authorized_columns,
-      authorized_include_columns,
-      qJSON,
-      sortJSON,
-      skip,
-      take,
-    });
-    Logger.log("info", {
-      message: "tableController:getAllRows:rows",
-      params: {
-        pm_user_id,
-        rowsLength: rows?.length,
-      },
-    });
-    return res.json({
-      success: true,
-      rows,
-      nextPage: rows?.length < take ? null : parseInt(page) + 1,
-    });
-  } catch (error) {
-    Logger.log("error", {
-      message: "tableController:getAllRows:catch-1",
+      message: "tableController:getTablePrimaryKey:catch-1",
       params: { error },
     });
     return res.json({ success: false, error: extractError(error) });
@@ -403,14 +222,125 @@ tableController.getTableStatistics = async (req, res) => {
  * @param {import("express").Response} res
  * @returns
  */
+tableController.addRowByID = async (req, res) => {
+  try {
+    const { pmUser, state, body } = req;
+    const pm_user_id = parseInt(pmUser.pm_user_id);
+    const { table_name } = req.params;
+
+    Logger.log("info", {
+      message: "tableController:addRowByID:params",
+      params: { pm_user_id, table_name, body },
+    });
+
+    const addedRow = await TableService.addTableRow({ table_name, data: body });
+
+    Logger.log("success", {
+      message: "tableController:addRowByID:success",
+      params: { pm_user_id, addedRow },
+    });
+
+    return res.json({
+      success: true,
+      row: addedRow,
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "tableController:addRowByID:catch-1",
+      params: { error },
+    });
+    return res.json({ success: false, error: extractError(error) });
+  }
+};
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @returns
+ */
+tableController.getAllRows = async (req, res) => {
+  try {
+    Logger.log("info", {
+      message: "tableController:getAllRows:init",
+    });
+    const { pmUser, state } = req;
+    const authorized_rows = state?.authorized_rows;
+    const pm_user_id = parseInt(pmUser.pm_user_id);
+    const { table_name } = req.params;
+    const { page, page_size, q, order } = req.query;
+    console.log({ q, order });
+    let filter = q && q !== "" && q!="null" ? generateFilterQuery(JSON.parse(q)) : null;
+    let orderBy =
+      order && order !== "" && order != "null"
+        ? generateOrderByQuery(JSON.parse(order))
+        : null;
+    let skip = 0;
+    let take = page_size ? parseInt(page_size) : constants.ROW_PAGE_SIZE;
+    if (parseInt(page) >= 0) {
+      skip = (parseInt(page) - 1) * take;
+    } else {
+      skip = undefined;
+      take = undefined;
+    }
+    Logger.log("info", {
+      message: "tableController:getAllRows:params",
+      params: {
+        pm_user_id,
+        page,
+        page_size,
+        q,
+        order,
+        filter,
+        orderBy,
+        table_name,
+        authorized_rows,
+        skip,
+        take,
+      },
+    });
+
+    const rows = await TableService.getTableRows({
+      tableName: table_name,
+      authorizedRows: authorized_rows,
+      filter,
+      orderBy,
+      skip,
+      take,
+    });
+    Logger.log("info", {
+      message: "tableController:getAllRows:rows",
+      params: {
+        pm_user_id,
+        rowsLength: rows?.length,
+      },
+    });
+    return res.json({
+      success: true,
+      rows,
+      nextPage: rows?.length < take ? null : parseInt(page) + 1,
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "tableController:getAllRows:catch-1",
+      params: { error },
+    });
+    return res.json({ success: false, error: extractError(error) });
+  }
+};
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @returns
+ */
 tableController.getRowByID = async (req, res) => {
   try {
     const { pmUser, state } = req;
     const pm_user_id = parseInt(pmUser.pm_user_id);
     const { table_name, query } = req.params;
     const authorized_rows = state?.authorized_rows;
-    const authorized_columns = state?.authorized_columns;
-    const authorized_include_columns = state?.authorized_include_columns;
 
     Logger.log("info", {
       message: "tableController:getRowByID:params",
@@ -419,10 +349,8 @@ tableController.getRowByID = async (req, res) => {
 
     const row = await TableService.getTableRowByID({
       table_name,
-      query: JSON.parse(query),
+      query: JSON.parse(query).query,
       authorized_rows,
-      authorized_columns,
-      authorized_include_columns,
     });
     Logger.log("success", {
       message: "tableController:getRowByID:params",
@@ -480,43 +408,6 @@ tableController.updateRowByID = async (req, res) => {
   } catch (error) {
     Logger.log("error", {
       message: "tableController:updateRowByID:catch-1",
-      params: { error },
-    });
-    return res.json({ success: false, error: extractError(error) });
-  }
-};
-
-/**
- *
- * @param {import("express").Request} req
- * @param {import("express").Response} res
- * @returns
- */
-tableController.addRowByID = async (req, res) => {
-  try {
-    const { pmUser, state, body } = req;
-    const pm_user_id = parseInt(pmUser.pm_user_id);
-    const { table_name } = req.params;
-
-    Logger.log("info", {
-      message: "tableController:addRowByID:params",
-      params: { pm_user_id, table_name, body },
-    });
-
-    const addedRow = await TableService.addTableRow({ table_name, data: body });
-
-    Logger.log("success", {
-      message: "tableController:addRowByID:success",
-      params: { pm_user_id, addedRow },
-    });
-
-    return res.json({
-      success: true,
-      row: addedRow,
-    });
-  } catch (error) {
-    Logger.log("error", {
-      message: "tableController:addRowByID:catch-1",
       params: { error },
     });
     return res.json({ success: false, error: extractError(error) });

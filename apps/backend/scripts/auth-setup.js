@@ -64,6 +64,11 @@ const create_super_admin_policy = () => {
       read: true,
       delete: true,
     };
+    policy.triggers = {
+      add: true,
+      read: true,
+      delete: true,
+    };
     policy.schemas = {
       edit: true,
       read: true,
@@ -141,6 +146,11 @@ const create_read_admin_policy = () => {
     policy.policies = {
       add: false,
       edit: false,
+      read: true,
+      delete: false,
+    };
+    policy.triggers = {
+      add: false,
       read: true,
       delete: false,
     };

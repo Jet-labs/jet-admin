@@ -149,7 +149,7 @@
           let { tableName: a } = e;
           try {
             const e = await r.A.get(
-              s.a.APIS.TABLE.getAuthorizedColumnsForRead({ tableName: a })
+              s.a.APIS.TABLE.getTableColumns({ tableName: a })
             );
             if (e.data && 1 == e.data.success)
               return Array.from(e.data.columns);

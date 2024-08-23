@@ -23,7 +23,7 @@ export const DataGridSortComponent = ({
   sortModel,
   isSortMenuOpen,
   handleCLoseSortMenu,
-  readColumns,
+  tableColumns,
 }) => {
   const { pmUser } = useAuthState();
   const theme = useTheme();
@@ -31,14 +31,14 @@ export const DataGridSortComponent = ({
   const [sortField, setSortField] = useState(sortModel ? sortModel.field : "");
   const [sortOrder, setSortOrder] = useState(sortModel ? sortModel.order : "");
 
-  const authorizedColumns = useMemo(() => {
-    if (readColumns) {
-      const c = getFormattedTableColumns(readColumns);
+  const columns = useMemo(() => {
+    if (tableColumns) {
+      const c = getFormattedTableColumns(tableColumns);
       return c;
     } else {
       return null;
     }
-  }, [readColumns]);
+  }, [tableColumns]);
 
   const _handleChangeSortField = (e) => {
     setSortField(e.target.value);
@@ -101,7 +101,7 @@ export const DataGridSortComponent = ({
               className=""
               fullWidth
             >
-              {authorizedColumns?.map((column, index) => {
+              {columns?.map((column, index) => {
                 return (
                   <MenuItem
                     value={column.field}
