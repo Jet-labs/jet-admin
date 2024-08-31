@@ -529,6 +529,7 @@ export const LOCAL_CONSTANTS = {
     SINGLE_SELECT: "SINGLE_SELECT",
     MULTIPLE_SELECT: "MULTIPLE_SELECT",
   },
+
   PRISMA_DATA_TYPES: {
     STRING: { name: "String", value: "String" },
     DATETIME: { name: "DateTime", value: "DateTime" },
@@ -556,6 +557,7 @@ export const LOCAL_CONSTANTS = {
     "#ffe159",
     "#ff9159",
   ],
+
   TABLE_EDITOR_NOTE_THEME: [
     "#ffdfd9",
     "#fcf7ac",
@@ -563,6 +565,7 @@ export const LOCAL_CONSTANTS = {
     "#c7d2ff",
     "#e7c7ff",
   ],
+
   TABLE_EDITOR_ACTIONS: {
     ADD: 0,
     MOVE: 1,
@@ -570,6 +573,7 @@ export const LOCAL_CONSTANTS = {
     EDIT: 3,
     PAN: 4,
   },
+
   TABLE_EDITOR_OBJECT_TYPES: {
     NONE: 0,
     TABLE: 1,
@@ -579,6 +583,7 @@ export const LOCAL_CONSTANTS = {
     TYPE: 5,
     ENUM: 6,
   },
+
   TABLE_EDITOR_TABS: {
     TABLES: "1",
     RELATIONSHIPS: "2",
@@ -587,198 +592,245 @@ export const LOCAL_CONSTANTS = {
     TYPES: "5",
     ENUMS: "6",
   },
+
   TABLE_EDITOR_TABLE_HEADER_HEIGHT: 50,
   TABLE_EDITOR_TABLE_WIDTH: 200,
   TABLE_EDITOR_TABLE_FIELD_HEIGHT: 36,
   TABLE_EDITOR_TABLE_COLOR_STRIP_HEIGHT: 7,
+
   POSTGRE_SQL_DATA_TYPES: {
-    boolean: {
+    bool: {
+      name: "bool",
       value: "Boolean value (TRUE, FALSE, or NULL)",
       js_type: "boolean",
       normalizedType: "Boolean",
     },
-    smallint: {
+    int2: {
+      name: "int2",
       value: "Small integer (-32,768 to 32,767)",
       js_type: "number",
       normalizedType: "Int",
     },
-    integer: {
+    int4: {
+      name: "int4",
       value: "Integer (-2,147,483,648 to 2,147,483,647)",
       js_type: "number",
       normalizedType: "Int",
     },
-    bigint: {
+    int8: {
+      name: "int8",
       value:
         "Large integer (-9,223,372,036,854,775,808 to 9,223,372,036,854,775,807)",
       js_type: "bigint",
       normalizedType: "BigInt",
     },
-    decimal: {
-      value: "Exact numeric of variable precision and scale",
-      js_type: "number",
-      normalizedType: "Decimal",
-    },
     numeric: {
+      name: "numeric",
       value: "Exact numeric of variable precision and scale",
       js_type: "number",
       normalizedType: "Decimal",
     },
-    real: {
+    float4: {
+      name: "float4",
       value:
         "Single-precision floating-point number (approximately ±1.18 x 10^-38 to ±3.4 x 10^38)",
       js_type: "number",
       normalizedType: "Float",
     },
-    "double precision": {
+    float8: {
+      name: "float8",
       value:
         "Double-precision floating-point number (approximately ±2.23 x 10^-308 to ±1.8 x 10^308)",
       js_type: "number",
       normalizedType: "Float",
     },
     serial: {
+      name: "serial",
       value: "Auto-incrementing integer (typically used for primary keys)",
       js_type: "number",
       normalizedType: "Int",
     },
     bigserial: {
+      name: "bigserial",
       value: "Auto-incrementing big integer (typically used for primary keys)",
       js_type: "bigint",
       normalizedType: "BigInt",
     },
     money: {
+      name: "money",
       value: "Currency amounts with a fixed decimal point",
       js_type: "number",
       normalizedType: "Decimal",
     },
-    "char(n)": {
+    bpchar: {
+      name: "bpchar",
       value: "Fixed-length character string with length n",
       js_type: "string",
       normalizedType: "String",
     },
-    "varchar(n)": {
+    varchar: {
+      name: "varchar",
       value: "Variable-length character string with maximum length n",
       js_type: "string",
       normalizedType: "String",
     },
     text: {
+      name: "text",
       value: "Variable-length character string with no maximum length",
       js_type: "string",
       normalizedType: "String",
     },
+    _text: {
+      name: "_text",
+      value: "Array of values (e.g., text[])",
+      js_type: "array",
+      normalizedType: "String",
+    },
     bytea: {
+      name: "bytea",
       value: "Binary data (byte array)",
       js_type: "Uint8Array",
       normalizedType: "Bytes",
     },
     date: {
+      name: "date",
       value: "Calendar date (YYYY-MM-DD)",
       js_type: "Date",
       normalizedType: "DateTime",
     },
     time: {
+      name: "time",
       value: "Time of day without time zone (HH:MM:SS)",
       js_type: "string",
       normalizedType: "DateTime",
     },
-    "time with time zone": {
+    timetz: {
+      name: "timetz",
       value: "Time of day with time zone (HH:MM:SS+/-TZ)",
       js_type: "string",
       normalizedType: "DateTime",
     },
     timestamp: {
+      name: "timestamp",
       value: "Date and time without time zone (YYYY-MM-DD HH:MM:SS)",
       js_type: "Date",
       normalizedType: "DateTime",
     },
-    "timestamp with time zone": {
+    timestamptz: {
+      name: "timestamptz",
       value: "Date and time with time zone (YYYY-MM-DD HH:MM:SS+/-TZ)",
       js_type: "Date",
       normalizedType: "DateTime",
     },
     interval: {
+      name: "interval",
       value: "Time span (e.g., '1 year 2 months 3 days')",
       js_type: "string",
       normalizedType: "String",
     },
     uuid: {
+      name: "uuid",
       value: "Universally unique identifier (128-bit number)",
       js_type: "string",
       normalizedType: "String",
     },
     json: {
+      name: "json",
       value: "JSON data (text format)",
       js_type: "object",
       normalizedType: "Json",
     },
     jsonb: {
+      name: "jsonb",
       value: "Binary JSON data (more efficient storage and querying)",
       js_type: "object",
       normalizedType: "Json",
     },
-    xml: { value: "XML data", js_type: "string", normalizedType: "String" },
-    array: {
+    xml: {
+      name: "xml",
+      value: "XML data",
+      js_type: "string",
+      normalizedType: "String",
+    },
+    _array: {
+      name: "array",
       value: "Array of values (e.g., integer[], text[])",
       js_type: "Array",
       normalizedType: "String",
     },
     hstore: {
+      name: "hstore",
       value: "Key-value pairs (used for storing sets of key-value pairs)",
       js_type: "object",
       normalizedType: "Json",
     },
     point: {
+      name: "point",
       value: "Geometric point (x, y)",
       js_type: "string",
       normalizedType: "String",
     },
     line: {
+      name: "line",
       value: "Geometric line",
       js_type: "string",
       normalizedType: "String",
     },
     lseg: {
+      name: "lseg",
       value: "Geometric line segment",
       js_type: "string",
       normalizedType: "String",
     },
     box: {
+      name: "box",
       value: "Geometric box",
       js_type: "string",
       normalizedType: "String",
     },
     path: {
+      name: "path",
       value: "Geometric path",
       js_type: "string",
       normalizedType: "String",
     },
     polygon: {
+      name: "polygon",
       value: "Geometric polygon",
       js_type: "string",
       normalizedType: "String",
     },
     circle: {
+      name: "circle",
       value: "Geometric circle",
       js_type: "string",
       normalizedType: "String",
     },
     cidr: {
+      name: "cidr",
       value: "CIDR notation for IP addresses",
       js_type: "string",
       normalizedType: "String",
     },
-    inet: { value: "IP address", js_type: "string", normalizedType: "String" },
+    inet: {
+      name: "inet",
+      value: "IP address",
+      js_type: "string",
+      normalizedType: "String",
+    },
     macaddr: {
+      name: "macaddr",
       value: "MAC address",
       js_type: "string",
       normalizedType: "String",
     },
     network: {
+      name: "network",
       value: "Network address",
       js_type: "string",
       normalizedType: "String",
     },
   },
-
   TABLE_FILTERS: {
     "=": (a, b) => `${a} = ${b}`,
     "!=": (a, b) => `${a} != ${b}`,
@@ -789,7 +841,6 @@ export const LOCAL_CONSTANTS = {
     LIKE: (a, b) => `${a} LIKE '%${b}%'`,
     ILIKE: (a, b) => `${a} ILIKE '%${b}%'`,
   },
-
   POSTGRE_SQL_CARDINALITY: {
     ONE_TO_ONE: "one_to_one",
     ONE_TO_MANY: "one_to_many",

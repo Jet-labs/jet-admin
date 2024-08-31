@@ -6,7 +6,10 @@ import { useMemo } from "react";
 import { addRowAPI, getTableColumns } from "../../../api/tables";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { displayError, displaySuccess } from "../../../utils/notification";
-import { getFormattedTableColumns } from "../../../utils/tables";
+import {
+  getFormattedTableColumns,
+  processTableFieldValuesBeforeSubmit,
+} from "../../../utils/tables";
 import { ErrorComponent } from "../../ErrorComponent";
 import { FieldComponent } from "../../FieldComponent";
 
@@ -18,24 +21,12 @@ export const RowAdditionForm = ({ tableName, customTitle }) => {
     data: tableColumns,
     error: loadAddColumnsError,
   } = useQuery({
-    queryKey: [
-      LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLE_ID(tableName),
-      `add_column`,
-    ],
+    queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLE_ID_COLUMNS(tableName)],
     queryFn: () => getTableColumns({ tableName }),
     cacheTime: 0,
     retry: 1,
     staleTime: 0,
   });
-
-  const columns = useMemo(() => {
-    if (tableColumns) {
-      const c = getFormattedTableColumns(tableColumns);
-      return c;
-    } else {
-      return null;
-    }
-  }, [tableColumns]);
 
   const {
     isPending: isAddingRow,
@@ -67,10 +58,16 @@ export const RowAdditionForm = ({ tableName, customTitle }) => {
       return errors;
     },
     onSubmit: (values) => {
-      addRow({ tableName, data: values });
+      addRow({
+        tableName,
+        data: processTableFieldValuesBeforeSubmit({
+          columns: tableColumns,
+          values,
+        }),
+      });
     },
   });
-  return columns && columns.length > 0 ? (
+  return tableColumns && tableColumns.length > 0 ? (
     <div className="flex flex-col justify-start items-center w-full pb-5 p-2">
       <div className=" flex flex-row justify-between 2xl:w-3/5 xl:w-3/4 lg:w-2/3 md:w-full mt-3 ">
         <div className="flex flex-col items-start justify-start">
@@ -116,17 +113,17 @@ export const RowAdditionForm = ({ tableName, customTitle }) => {
             columns={{ xs: 1, sm: 1, md: 2 }}
             className="!mt-2"
           >
-            {columns.map((column, index) => {
+            {tableColumns.map((column, index) => {
               return (
                 <Grid item xs={12} sm={12} md={12} lg={12} key={index}>
                   <FieldComponent
                     type={column.type}
-                    name={column.field}
-                    value={rowAdditionForm.values[column.field]}
+                    name={column.name}
+                    value={rowAdditionForm.values[column.name]}
                     onBlur={rowAdditionForm.handleBlur}
                     onChange={rowAdditionForm.handleChange}
-                    helperText={rowAdditionForm.errors[column.field]}
-                    error={Boolean(rowAdditionForm.errors[column.field])}
+                    helperText={rowAdditionForm.errors[column.name]}
+                    error={Boolean(rowAdditionForm.errors[column.name])}
                     setFieldValue={rowAdditionForm.setFieldValue}
                     isList={column.isList}
                   />

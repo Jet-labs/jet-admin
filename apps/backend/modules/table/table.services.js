@@ -9,6 +9,55 @@ class TableService {
   /**
    *
    * @param {object} param0
+   * @param {object} param0.authorizationPolicy
+   * @param {object} param0.schema
+   * @returns {Array<any>|null}
+   */
+  static getAuthorizedTables = async ({ authorizationPolicy, schema }) => {
+    Logger.log("info", {
+      message: "TableService:getAuthorizedTables:init",
+    });
+    try {
+      console.log(tableQueryUtils.getAllTables(schema));
+      const res = await pgPool.query(tableQueryUtils.getAllTables(schema));
+      const tables = res.rows.map((row) => row.table_name);
+      let authorizedTables = [];
+      if (authorizationPolicy && authorizationPolicy.tables) {
+        if (
+          authorizationPolicy.tables === true ||
+          authorizationPolicy.tables.read === true
+        ) {
+          authorizedTables = tables;
+        } else {
+          Object.keys(authorizationPolicy.tables).map((tableName) => {
+            if (
+              authorizationPolicy.tables[tableName] === true ||
+              authorizationPolicy.tables[tableName].read
+            ) {
+              authorizedTables.push(tableName);
+            }
+          });
+        }
+      }
+      Logger.log("success", {
+        message: "TableService:getAuthorizedTables:authorizedTables",
+        params: {
+          authorizedTables,
+        },
+      });
+      return authorizedTables;
+    } catch (error) {
+      Logger.log("error", {
+        message: "TableService:getAuthorizedTables:catch-1",
+        params: { error },
+      });
+      throw error;
+    }
+  };
+
+  /**
+   *
+   * @param {object} param0
    * @param {String} param0.tableName
    * @returns {Array<any>|null}
    */
@@ -123,44 +172,6 @@ class TableService {
         );
         rows = res.rows;
       }
-
-      // rows =
-      //   authorized_rows === false
-      //     ? null
-      //     : qJSON
-      //     ? await prisma[table_name].findMany({
-      //         where:
-      //           authorized_rows === true
-      //             ? qJSON
-      //             : {
-      //                 AND: [{ ...qJSON }, authorized_rows],
-      //               },
-      //         skip: skip,
-      //         take: take,
-      //         orderBy: sortJSON
-      //           ? { [sortJSON.field]: sortJSON.order }
-      //           : undefined,
-      //         select: authorized_columns == true ? null : columns,
-      //         include: columns
-      //           ? null
-      //           : authorized_include_columns
-      //           ? authorized_include_columns
-      //           : null,
-      //       })
-      //     : await prisma[table_name].findMany({
-      //         where: authorized_rows === true ? {} : authorized_rows,
-      //         skip: skip,
-      //         take: take,
-      //         orderBy: sortJSON
-      //           ? { [sortJSON.field]: sortJSON.order }
-      //           : undefined,
-      //         select: authorized_columns == true ? null : columns,
-      //         include: columns
-      //           ? null
-      //           : authorized_include_columns
-      //           ? authorized_include_columns
-      //           : null,
-      //       });
       Logger.log("success", {
         message: "TableService:getTableRows:rows",
         params: {
@@ -180,46 +191,37 @@ class TableService {
   /**
    *
    * @param {object} param0
-   * @param {String} param0.table_name
-   * @param {Array<any>} param0.authorized_rows
-   * @param {JSON} param0.qJSON
+   * @param {String} param0.tableName
+   * @param {Array<any>} param0.authorizedRows
+   * @param {String} param0.filter
    * @returns {object}
    */
-  static getTableStatistics = async ({
-    table_name,
-    authorized_rows,
-    qJSON,
-  }) => {
+  static getTableStatistics = async ({ tableName, authorizedRows, filter }) => {
     Logger.log("info", {
       message: "TableService:getTableStatistics:params",
       params: {
-        table_name,
-        authorized_rows,
-        qJSON,
+        tableName,
+        authorizedRows,
+        filter,
       },
     });
     try {
       let rowCount = 0;
-
-      rowCount =
-        authorized_rows === false
-          ? null
-          : qJSON
-          ? await prisma[table_name].count({
-              where:
-                authorized_rows === true
-                  ? qJSON
-                  : {
-                      AND: [{ ...qJSON }, authorized_rows],
-                    },
-            })
-          : await prisma[table_name].count({
-              where: authorized_rows === true ? {} : authorized_rows,
-            });
+      if (!authorizedRows) {
+        rowCount = 0;
+      } else {
+        const res = await pgPool.query(
+          tableQueryUtils.getRowCount({
+            tableName,
+            authorizedRows,
+            filter,
+          })
+        );
+        rowCount = res.rows[0].count;
+      }
       Logger.log("success", {
-        message: "TableService:getTableStatistics:rowCount",
+        message: "TableService:getTableStatistics:rows",
         params: {
-          table_name,
           rowCount,
         },
       });
@@ -236,35 +238,40 @@ class TableService {
   /**
    *
    * @param {object} param0
-   * @param {String} param0.table_name
+   * @param {String} param0.tableName
    * @param {any} param0.query
-   * @param {Array<any>} param0.authorized_rows
+   * @param {Array<any>} param0.authorizedRows
    * @returns {any|null}
    */
-  static getTableRowByID = async ({ table_name, query, authorized_rows }) => {
+  static getTableRowByID = async ({ tableName, query, authorizedRows }) => {
     Logger.log("info", {
       message: "TableService:getTableRowByID:params",
       params: {
-        table_name,
+        tableName,
         query,
-        authorized_rows,
+        authorizedRows,
       },
     });
     try {
       let row = null;
-      if (!authorized_rows) {
+      if (!authorizedRows) {
         row = null;
+      } else if (typeof authorizedRows == "boolean" && authorizedRows == true) {
+        const res = await pgPool.query(
+          tableQueryUtils.getRowByID(tableName, query)
+        );
+        row = res.rows[0];
       } else {
         const res = await pgPool.query(
-          tableQueryUtils.getRowByID(table_name, query)
+          tableQueryUtils.getRowByID(tableName, query, authorizedRows)
         );
         row = res.rows[0];
       }
       Logger.log("success", {
         message: "TableService:getTableRowByID:success",
         params: {
-          table_name,
-          authorized_rows,
+          tableName,
+          authorizedRows,
           query,
         },
       });
@@ -281,75 +288,40 @@ class TableService {
   /**
    *
    * @param {object} param0
-   * @param {String} param0.table_name
+   * @param {String} param0.tableName
    * @param {any} param0.query
    * @param {any} param0.data
-   * @param {Array<any>} param0.authorized_rows
-   * @param {Array<String>} param0.authorized_columns
+   * @param {Array<any>} param0.authorizedRows
    * @returns {any|null}
    */
   static updateTableRowByID = async ({
-    table_name,
+    tableName,
     query,
     data,
-    authorized_rows,
-    authorized_columns,
+    authorizedRows,
   }) => {
     Logger.log("info", {
       message: "TableService:updateTableRowByID:params",
       params: {
-        table_name,
+        tableName,
         query,
         data,
-        authorized_rows,
-        authorized_columns,
+        authorizedRows,
       },
     });
     try {
-      let row = null;
-
-      const checkedRow =
-        authorized_rows === false
-          ? null
-          : await prisma[table_name].findUnique({
-              where:
-                authorized_rows === true
-                  ? {
-                      ...query,
-                    }
-                  : {
-                      ...query,
-                      ...authorized_rows,
-                    },
-            });
-      Logger.log("info", {
-        message: "TableService:updateTableRowByID:checkedRow",
-        params: { checkedRow },
-      });
-      if (!checkedRow) {
-        Logger.log("error", {
-          message: "TableService:updateTableRowByID:catch-2",
-          params: { error: constants.ERROR_CODES.PERMISSION_DENIED },
-        });
-        throw constants.ERROR_CODES.PERMISSION_DENIED;
+      if (!authorizedRows) {
+        row = null;
+      } else if (typeof authorizedRows == "boolean" && authorizedRows == true) {
+        await pgPool.query(
+          tableQueryUtils.updateRowByID(tableName, data, query)
+        );
       } else {
-        row = await prisma[table_name].update({
-          where:
-            authorized_rows === true
-              ? {
-                  ...query,
-                }
-              : { AND: [authorized_rows, { ...query }] },
-          data: {
-            ...data,
-          },
-        });
-        Logger.log("success", {
-          message: "TableService:updateTableRowByID:catch-2",
-          params: { row },
-        });
-        return row;
+        await pgPool.query(
+          tableQueryUtils.updateRowByID(tableName, data, query, authorizedRows)
+        );
       }
+      return true;
     } catch (error) {
       Logger.log("error", {
         message: "TableService:updateTableRowByID:catch-1",
@@ -362,32 +334,24 @@ class TableService {
   /**
    *
    * @param {object} param0
-   * @param {String} param0.table_name
+   * @param {String} param0.tableName
    * @param {any} param0.data
    * @returns {any|null}
    */
-  static addTableRow = async ({ table_name, data }) => {
+  static addTableRow = async ({ tableName, data }) => {
     Logger.log("info", {
       message: "TableService:addTableRow:params",
       params: {
-        table_name,
+        tableName,
         data,
       },
     });
     try {
-      let row = null;
-      row = await prisma[table_name].create({
-        data: {
-          ...data,
-        },
-      });
+      await pgPool.query(tableQueryUtils.addRow(tableName, data));
       Logger.log("success", {
-        message: "TableService:addTableRow:row",
-        params: {
-          row,
-        },
+        message: "TableService:addTableRow:success",
       });
-      return row;
+      return true;
     } catch (error) {
       Logger.log("error", {
         message: "TableService:addTableRow:catch-1",
@@ -400,67 +364,38 @@ class TableService {
   /**
    *
    * @param {object} param0
-   * @param {String} param0.table_name
+   * @param {String} param0.tableName
    * @param {any} param0.query
-   * @param {Array<any>} param0.authorized_rows
+   * @param {Array<any>} param0.authorizedRows
    * @returns {any|null}
    */
-  static deleteTableRowByID = async ({
-    table_name,
-    query,
-    authorized_rows,
-  }) => {
+  static deleteTableRowByID = async ({ tableName, query, authorizedRows }) => {
     Logger.log("info", {
       message: "TableService:deleteTableRowByID:params",
       params: {
-        table_name,
+        tableName,
         query,
-        authorized_rows,
+        authorizedRows,
       },
     });
     try {
-      const checkedRow =
-        authorized_rows === false
-          ? null
-          : await prisma[table_name].findUnique({
-              where:
-                authorized_rows === true
-                  ? {
-                      ...query,
-                    }
-                  : {
-                      ...query,
-                      ...authorized_rows,
-                    },
-            });
-      Logger.log("info", {
-        message: "TableService:deleteTableRowByID:checkedRow",
-        params: { checkedRow },
-      });
-      let row = null;
-      if (!checkedRow) {
-        Logger.log("error", {
-          message: "TableService:deleteTableRowByID:catch-2",
-          params: { error: constants.ERROR_CODES.PERMISSION_DENIED },
-        });
-        throw constants.ERROR_CODES.PERMISSION_DENIED;
+      if (!authorizedRows) {
+      } else if (typeof authorizedRows == "boolean" && authorizedRows == true) {
+        await pgPool.query(tableQueryUtils.deleteRows(tableName, query));
       } else {
-        row =
-          authorized_rows === false
-            ? null
-            : await prisma[table_name].delete({
-                where:
-                  authorized_rows === true
-                    ? {
-                        ...query,
-                      }
-                    : { AND: [authorized_rows, { ...query }] },
-              });
-        Logger.log("success", {
-          message: "TableService:deleteTableRowByID:deleted",
-        });
+        await pgPool.query(
+          tableQueryUtils.deleteRows(tableName, query, authorizedRows)
+        );
       }
-      return row;
+      Logger.log("success", {
+        message: "TableService:deleteTableRowByID:success",
+        params: {
+          tableName,
+          query,
+          authorizedRows,
+        },
+      });
+      return true;
     } catch (error) {
       Logger.log("error", {
         message: "TableService:deleteTableRowByID:catch-1",
@@ -473,40 +408,37 @@ class TableService {
   /**
    *
    * @param {object} param0
-   * @param {String} param0.table_name
+   * @param {String} param0.tableName
    * @param {any} param0.query
-   * @param {Array<any>} param0.authorized_rows
+   * @param {Array<any>} param0.authorizedRows
    * @returns {any|null}
    */
   static deleteTableRowByMultipleIDs = async ({
-    table_name,
+    tableName,
     query,
-    authorized_rows,
+    authorizedRows,
   }) => {
     Logger.log("info", {
       message: "TableService:deleteTableRowByMultipleIDs:params",
       params: {
-        table_name,
+        tableName,
         query,
-        authorized_rows,
+        authorizedRows,
       },
     });
     try {
-      const deletedRows =
-        authorized_rows === false
-          ? null
-          : await prisma[table_name].deleteMany({
-              where:
-                authorized_rows === true
-                  ? {
-                      ...query,
-                    }
-                  : { AND: [authorized_rows, { ...query }] },
-            });
+      if (!authorizedRows) {
+      } else if (typeof authorizedRows == "boolean" && authorizedRows == true) {
+        await pgPool.query(tableQueryUtils.deleteRows(tableName, query));
+      } else {
+        await pgPool.query(
+          tableQueryUtils.deleteRows(tableName, query, authorizedRows)
+        );
+      }
       Logger.log("success", {
-        message: "TableService:deleteTableRowByMultipleIDs:deleted",
+        message: "TableService:deleteTableRowByMultipleIDs:success",
       });
-      return deletedRows;
+      return true;
     } catch (error) {
       Logger.log("error", {
         message: "TableService:deleteTableRowByMultipleIDs:catch-1",
@@ -519,36 +451,39 @@ class TableService {
   /**
    *
    * @param {object} param0
-   * @param {String} param0.table_name
+   * @param {String} param0.tableName
    * @param {any} param0.query
-   * @param {Array<any>} param0.authorized_rows
+   * @param {Array<any>} param0.authorizedRows
    * @returns {any|null}
    */
   static exportTableRowByMultipleIDs = async ({
-    table_name,
+    tableName,
     query,
-    authorized_rows,
+    authorizedRows,
   }) => {
     Logger.log("info", {
       message: "TableService:exportTableRowByMultipleIDs:params",
       params: {
-        table_name,
+        tableName,
         query,
-        authorized_rows,
+        authorizedRows,
       },
     });
     try {
-      const rows =
-        authorized_rows === false
-          ? null
-          : await prisma[table_name].findMany({
-              where:
-                authorized_rows === true
-                  ? {
-                      ...query,
-                    }
-                  : { AND: [authorized_rows, { ...query }] },
-            });
+      let rows = null;
+      if (!authorizedRows) {
+        rows = null;
+      } else if (typeof authorizedRows == "boolean" && authorizedRows == true) {
+        const res = await pgPool.query(
+          tableQueryUtils.getRowsByQuery(tableName, query)
+        );
+        rows = res.rows;
+      } else {
+        const res = await pgPool.query(
+          tableQueryUtils.getRowsByQuery(tableName, query, authorizedRows)
+        );
+        rows = res.rows;
+      }
       Logger.log("success", {
         message: "TableService:exportTableRowByMultipleIDs:deleted",
       });

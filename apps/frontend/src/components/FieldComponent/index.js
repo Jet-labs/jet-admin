@@ -332,8 +332,11 @@ export const FieldComponent = ({
             <CustomDateTimePicker
               name={name}
               // placeholder={label}
-              onChange={onChange}
-              onBlur={onBlur}
+              onChange={(value) => {
+                console.log({ tr: moment(value).toDate() });
+                setFieldValue(name, moment(value).toDate().toISOString());
+              }}
+              // onBlur={onBlur}
               value={value ? moment(new Date(value)) : null}
               helperText={helperText}
               error={error}

@@ -3,17 +3,17 @@ import { useFormik } from "formik";
 import { fetchRowByIDAPI, getTableColumns } from "../../../api/tables";
 
 import { Button, CircularProgress, Grid, useTheme } from "@mui/material";
-import { useEffect, useMemo } from "react";
+import { useEffect } from "react";
 import { Loading } from "../../../pages/Loading";
 import { FieldComponent } from "../../FieldComponent";
 
 import { updateRowAPI } from "../../../api/tables";
 import { LOCAL_CONSTANTS } from "../../../constants";
+import { useAppConstants } from "../../../contexts/appConstantsContext";
 import { displayError, displaySuccess } from "../../../utils/notification";
-import { getFormattedTableColumns } from "../../../utils/tables";
+import { processTableFieldValuesBeforeSubmit } from "../../../utils/tables";
 import { ErrorComponent } from "../../ErrorComponent";
 import { RowDeletionForm } from "../RowDeletetionForm";
-import { useAppConstants } from "../../../contexts/appConstantsContext";
 
 export const RowUpdateForm = ({ customTitle, tableName, id }) => {
   const queryClient = new QueryClient();
@@ -43,22 +43,13 @@ export const RowUpdateForm = ({ customTitle, tableName, id }) => {
     staleTime: 0,
   });
 
-  const columns = useMemo(() => {
-    if (tableColumns) {
-      const c = getFormattedTableColumns(tableColumns);
-      return c;
-    } else {
-      return null;
-    }
-  }, [tableColumns]);
-
   useEffect(() => {
-    if (rowData && columns) {
-      columns.forEach((column) => {
-        rowUpdateForm.setFieldValue(`${column.field}`, rowData[column.field]);
+    if (rowData && tableColumns) {
+      tableColumns.forEach((column) => {
+        rowUpdateForm.setFieldValue(`${column.name}`, rowData[column.name]);
       });
     }
-  }, [rowData, columns]);
+  }, [rowData, tableColumns]);
 
   const {
     isPending: isUpdatingRow,
@@ -89,20 +80,28 @@ export const RowUpdateForm = ({ customTitle, tableName, id }) => {
     validateOnChange: false,
     validate: (values) => {
       const errors = {};
-
       return errors;
     },
     onSubmit: (values) => {
-      updateRow({ tableName, id, data: values });
+      updateRow({
+        tableName,
+        id,
+        data: processTableFieldValuesBeforeSubmit({
+          columns: tableColumns,
+          values,
+        }),
+      });
     },
   });
 
-  return columns?.length > 0 ? (
+  return tableColumns?.length > 0 ? (
     <div className="flex flex-col justify-start items-center w-full pb-5 p-2 overflow-y-scroll">
       <div className=" flex flex-row justify-between 2xl:w-3/5 xl:w-3/4 lg:w-2/3 md:w-full  mt-3 w-full ">
         <div className="flex flex-col items-start justify-start">
           <span className="text-lg font-bold text-start ">
-            {customTitle ? customTitle : `Update row`}
+            {customTitle
+              ? customTitle
+              : LOCAL_CONSTANTS.STRINGS.UPDATE_BUTTON_TEXT}
           </span>
           {tableName && (
             <span
@@ -129,7 +128,6 @@ export const RowUpdateForm = ({ customTitle, tableName, id }) => {
           </Button>
         </div>
       </div>
-      {/* <Divider className="!w-full" /> */}
       {isLoadingRowData ? (
         <Loading />
       ) : (
@@ -143,23 +141,23 @@ export const RowUpdateForm = ({ customTitle, tableName, id }) => {
         >
           <form className="" onSubmit={rowUpdateForm.handleSubmit}>
             <Grid container rowSpacing={2} columnSpacing={3} className="!mt-2">
-              {columns.map((column, index) => {
+              {tableColumns.map((column, index) => {
                 return (
                   <Grid item xs={12} sm={12} md={12} lg={12} key={index}>
                     <FieldComponent
                       type={column.type}
-                      name={column.field}
+                      name={column.name}
                       isList={column.isList}
-                      value={rowUpdateForm.values[column.field]}
+                      value={rowUpdateForm.values[column.name]}
                       onBlur={rowUpdateForm.handleBlur}
                       onChange={rowUpdateForm.handleChange}
                       setFieldValue={rowUpdateForm.setFieldValue}
-                      helperText={rowUpdateForm.errors[column.field]}
-                      error={Boolean(rowUpdateForm.errors[column.field])}
+                      helperText={rowUpdateForm.errors[column.name]}
+                      error={Boolean(rowUpdateForm.errors[column.name])}
                       customMapping={
                         internalAppConstants?.CUSTOM_INT_EDIT_MAPPING?.[
                           tableName
-                        ]?.[column.field]
+                        ]?.[column.name]
                       }
                     />
                   </Grid>
@@ -170,7 +168,7 @@ export const RowUpdateForm = ({ customTitle, tableName, id }) => {
         </div>
       )}
     </div>
-  ) : !columns || columns.length == 0 ? (
+  ) : !tableColumns || tableColumns.length == 0 ? (
     <div className="!w-full !p-4">
       <ErrorComponent error={LOCAL_CONSTANTS.ERROR_CODES.PERMISSION_DENIED} />
     </div>

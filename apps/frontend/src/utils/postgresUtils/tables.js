@@ -12,7 +12,7 @@ export const combinePrimaryKeyToWhereClause = (tablePrimaryKey, keyValues) => {
           : keyValues[key]
       }`;
     } else {
-      throw new Error(`Key ${key} not found in keyValues object.`);
+      console.warn(`Key ${key} not found in keyValues object.`);
     }
   });
 

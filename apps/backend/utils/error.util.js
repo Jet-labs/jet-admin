@@ -5,6 +5,8 @@ const extractError = (error) => {
     return { code: "DB_ERROR", message: error.meta.message };
   } else if (error && error.code && error.message) {
     return error;
+  } else if(error.error){
+    return JSON.stringify(error.error)
   } else {
     return constants.ERROR_CODES.SERVER_ERROR;
   }

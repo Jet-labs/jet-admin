@@ -159,7 +159,6 @@ export const RawDataGrid = ({
           });
         }
       });
-      console.log({ queries });
       setFilterQuery?.({ OR: queries });
     } else {
       setFilterQuery(null);
@@ -167,7 +166,7 @@ export const RawDataGrid = ({
   }, [filters, debouncedSearchTerm, combinator, tableColumns, tableName]);
 
   const columns = useMemo(() => {
-    if (tableColumns) {
+    if (tableColumns && tableName) {
       const c = getFormattedTableColumns(
         tableColumns,
         internalAppConstants?.CUSTOM_INT_VIEW_MAPPING?.[tableName]
@@ -176,7 +175,7 @@ export const RawDataGrid = ({
     } else {
       return null;
     }
-  }, [tableColumns, internalAppConstants]);
+  }, [tableName, tableColumns, internalAppConstants]);
 
   const rowAddAuthorization = useMemo(() => {
     return pmUser && pmUser.extractRowAddAuthorization(tableName);
@@ -186,6 +185,15 @@ export const RawDataGrid = ({
     (row) => {
       if (tablePrimaryKey) {
         return { query: combinePrimaryKeyToWhereClause(tablePrimaryKey, row) };
+      }
+    },
+    [tablePrimaryKey]
+  );
+
+  const _getRowID = useCallback(
+    (row) => {
+      if (tablePrimaryKey) {
+        return combinePrimaryKeyToWhereClause(tablePrimaryKey, row);
       }
     },
     [tablePrimaryKey]
@@ -280,7 +288,7 @@ export const RawDataGrid = ({
         className={`!w-full !p-4 !h-fit`}
         style={{ background: theme.palette.background.default }}
       >
-        {showStats && false && (
+        {showStats && (
           <RawDataGridStatistics
             tableName={tableName}
             filterQuery={filterQuery}
@@ -317,11 +325,7 @@ export const RawDataGrid = ({
             hideFooterSelectedRowCount={true}
             checkboxSelection
             disableRowSelectionOnClick
-            getRowId={(row) => {
-              if (tablePrimaryKey) {
-                return combinePrimaryKeyToWhereClause(tablePrimaryKey, row);
-              }
-            }}
+            getRowId={_getRowID}
             hideFooter={true}
             onRowClick={(param) => {
               onRowClick

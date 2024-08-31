@@ -1,10 +1,6 @@
-const { prisma, dbModel } = require("../../db/prisma");
 const constants = require("../../constants");
 const { extractError } = require("../../utils/error.util");
 const Logger = require("../../utils/logger");
-const {
-  policyAuthorizations,
-} = require("../../utils/policy-utils/policy-authorization");
 const { TableService } = require("./table.services");
 const { createObjectCsvStringifier } = require("csv-writer");
 const ExcelJS = require("exceljs");
@@ -28,46 +24,21 @@ tableController.getTables = async (req, res) => {
     });
     const { pmUser, state } = req;
     const pm_user_id = parseInt(pmUser.pm_user_id);
-    const authorization_policy = state.authorization_policy;
-
-    Logger.log("info", {
-      message: "tableController:getTables:params",
-      params: {
-        pm_user_id,
-      },
+    const authorizationPolicy = state.authorization_policy;
+    const authorizedTables = await TableService.getAuthorizedTables({
+      authorizationPolicy,
+      schema: "public",
     });
-
-    const tables = dbModel.map((table) => {
-      return table.name;
-    });
-    let _authorizedTables = [];
-    if (authorization_policy && authorization_policy.tables) {
-      if (
-        authorization_policy.tables === true ||
-        authorization_policy.tables.read === true
-      ) {
-        _authorizedTables = tables;
-      } else {
-        Object.keys(authorization_policy.tables).map((tableName) => {
-          if (
-            authorization_policy.tables[tableName] === true ||
-            authorization_policy.tables[tableName].read
-          ) {
-            _authorizedTables.push(tableName);
-          }
-        });
-      }
-    }
     Logger.log("info", {
       message: "tableController:getTables:rows",
       params: {
         pm_user_id,
-        tables: _authorizedTables,
+        authorizedTables,
       },
     });
     return res.json({
       success: true,
-      tables: _authorizedTables,
+      tables: authorizedTables,
     });
   } catch (error) {
     Logger.log("error", {
@@ -171,14 +142,15 @@ tableController.getTableStatistics = async (req, res) => {
     const pm_user_id = parseInt(pmUser.pm_user_id);
     const { table_name } = req.params;
     const { q } = req.query;
-    let qJSON = q && q !== "" ? JSON.parse(q) : null;
+    let filter =
+      q && q !== "" && q != "null" ? generateFilterQuery(JSON.parse(q)) : null;
 
     Logger.log("info", {
       message: "tableController:getTableStatistics:params",
       params: {
         pm_user_id,
         q,
-        qJSON,
+        filter,
         table_name,
         authorized_rows,
         authorized_columns,
@@ -186,9 +158,9 @@ tableController.getTableStatistics = async (req, res) => {
     });
 
     const { rowCount } = await TableService.getTableStatistics({
-      table_name,
-      authorized_rows,
-      qJSON,
+      tableName: table_name,
+      authorizedRows: authorized_rows,
+      filter,
     });
 
     Logger.log("info", {
@@ -227,22 +199,17 @@ tableController.addRowByID = async (req, res) => {
     const { pmUser, state, body } = req;
     const pm_user_id = parseInt(pmUser.pm_user_id);
     const { table_name } = req.params;
-
     Logger.log("info", {
       message: "tableController:addRowByID:params",
       params: { pm_user_id, table_name, body },
     });
-
-    const addedRow = await TableService.addTableRow({ table_name, data: body });
-
+    await TableService.addTableRow({ tableName: table_name, data: body });
     Logger.log("success", {
       message: "tableController:addRowByID:success",
-      params: { pm_user_id, addedRow },
+      params: { pm_user_id },
     });
-
     return res.json({
       success: true,
-      row: addedRow,
     });
   } catch (error) {
     Logger.log("error", {
@@ -269,8 +236,8 @@ tableController.getAllRows = async (req, res) => {
     const pm_user_id = parseInt(pmUser.pm_user_id);
     const { table_name } = req.params;
     const { page, page_size, q, order } = req.query;
-    console.log({ q, order });
-    let filter = q && q !== "" && q!="null" ? generateFilterQuery(JSON.parse(q)) : null;
+    let filter =
+      q && q !== "" && q != "null" ? generateFilterQuery(JSON.parse(q)) : null;
     let orderBy =
       order && order !== "" && order != "null"
         ? generateOrderByQuery(JSON.parse(order))
@@ -340,17 +307,15 @@ tableController.getRowByID = async (req, res) => {
     const { pmUser, state } = req;
     const pm_user_id = parseInt(pmUser.pm_user_id);
     const { table_name, query } = req.params;
-    const authorized_rows = state?.authorized_rows;
-
+    const authorizedRows = state?.authorized_rows;
     Logger.log("info", {
       message: "tableController:getRowByID:params",
       params: { pm_user_id, table_name, query },
     });
-
     const row = await TableService.getTableRowByID({
-      table_name,
+      tableName: table_name,
       query: JSON.parse(query).query,
-      authorized_rows,
+      authorizedRows,
     });
     Logger.log("success", {
       message: "tableController:getRowByID:params",
@@ -380,36 +345,30 @@ tableController.updateRowByID = async (req, res) => {
     const { pmUser, state, body } = req;
     const pm_user_id = parseInt(pmUser.pm_user_id);
     const { table_name, query } = req.params;
-    const authorized_rows = state?.authorized_rows;
-    const authorized_columns = state?.authorized_columns;
-
+    const authorizedRows = state?.authorized_rows;
     Logger.log("info", {
       message: "tableController:updateRowByID:params",
-      params: { pm_user_id, table_name, query, body },
+      params: { pm_user_id, table_name, query, body, authorizedRows },
     });
-
-    const updatedRow = await TableService.updateTableRowByID({
-      table_name,
-      query: JSON.parse(query),
+    await TableService.updateTableRowByID({
+      tableName: table_name,
+      query: JSON.parse(query).query,
       data: body,
-      authorized_rows,
-      authorized_columns,
+      authorizedRows,
     });
-
-    Logger.log("info", {
-      message: "tableController:updateRowByID:updatedRow",
-      params: { pm_user_id, updatedRow },
+    Logger.log("success", {
+      message: "tableController:updateRowByID:success",
+      params: { pm_user_id },
     });
-
     return res.json({
       success: true,
-      row: updatedRow,
     });
   } catch (error) {
     Logger.log("error", {
       message: "tableController:updateRowByID:catch-1",
       params: { error },
     });
+
     return res.json({ success: false, error: extractError(error) });
   }
 };
@@ -433,9 +392,9 @@ tableController.deleteRowByID = async (req, res) => {
     });
 
     await TableService.deleteTableRowByID({
-      table_name,
-      query: JSON.parse(query),
-      authorized_rows,
+      tableName: table_name,
+      query: JSON.parse(query).query,
+      authorizedRows: authorized_rows,
     });
 
     Logger.log("success", {
@@ -475,9 +434,9 @@ tableController.deleteRowByMultipleIDs = async (req, res) => {
     });
 
     await TableService.deleteTableRowByMultipleIDs({
-      table_name,
-      query: query,
-      authorized_rows,
+      tableName: table_name,
+      query: JSON.parse(query).query,
+      authorizedRows: authorized_rows,
     });
 
     Logger.log("success", {
@@ -517,9 +476,9 @@ tableController.exportRowByMultipleIDs = async (req, res) => {
     });
 
     const rows = await TableService.exportTableRowByMultipleIDs({
-      table_name,
+      tableName: table_name,
       query: query,
-      authorized_rows,
+      authorizedRows: authorized_rows,
     });
     console.log({ rows });
 

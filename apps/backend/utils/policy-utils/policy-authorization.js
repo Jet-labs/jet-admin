@@ -261,7 +261,6 @@ policyAuthorizations.extractRowEditAuthorization = ({
   return authorized_rows;
 };
 
-
 policyAuthorizations.extractRowDeleteAuthorization = ({
   policyObject,
   tableName,
