@@ -11,6 +11,7 @@ import { useAuthState } from "../../../contexts/authContext";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { ConfirmationDialog } from "../../ConfirmationDialog";
 import { LOCAL_CONSTANTS } from "../../../constants";
+import { generateFilterQuery } from "../../../utils/postgresUtils/tables";
 export const MultipleRowsDeletionForm = ({
   tableName,
   filterQuery,
@@ -45,7 +46,9 @@ export const MultipleRowsDeletionForm = ({
     mutationFn: ({ tableName, selectedRowIDs }) =>
       deleteRowByMultipleIDsAPI({
         tableName,
-        selectedRowIDs: isAllRowSelectChecked ? filterQuery : selectedRowIDs,
+        selectedRowIDs: isAllRowSelectChecked
+          ? generateFilterQuery(filterQuery)
+          : selectedRowIDs,
       }),
     retry: false,
     onSuccess: () => {

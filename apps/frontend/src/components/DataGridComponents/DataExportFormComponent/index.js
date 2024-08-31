@@ -9,6 +9,7 @@ import { displayError, displaySuccess } from "../../../utils/notification";
 import { ConfirmationDialog } from "../../ConfirmationDialog";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { DataExportConfirmationDialog } from "../DataExportConfirmationDialog";
+import { generateFilterQuery } from "../../../utils/postgresUtils/tables";
 export const DataExportFormComponent = ({
   tableName,
   filterQuery,
@@ -31,7 +32,9 @@ export const DataExportFormComponent = ({
       exportRowByMultipleIDsAPI({
         tableName,
         format,
-        selectedRowIDs: isAllRowSelectChecked ? filterQuery : selectedRowIDs,
+        selectedRowIDs: isAllRowSelectChecked
+          ? generateFilterQuery(filterQuery)
+          : selectedRowIDs,
       }),
     retry: false,
     onSuccess: () => {
@@ -44,6 +47,11 @@ export const DataExportFormComponent = ({
     onError: (error) => {
       displayError(error);
     },
+  });
+  console.log({
+    selectedRowIDs: isAllRowSelectChecked
+      ? generateFilterQuery(filterQuery)
+      : selectedRowIDs,
   });
   const _handleOpenExportRowsConfirmation = () => {
     setIsExportRowsConfirmationOpen(true);

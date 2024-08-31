@@ -485,7 +485,7 @@ class TableService {
         rows = res.rows;
       }
       Logger.log("success", {
-        message: "TableService:exportTableRowByMultipleIDs:deleted",
+        message: "TableService:exportTableRowByMultipleIDs:success",
       });
       return rows;
     } catch (error) {

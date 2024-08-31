@@ -1,10 +1,6 @@
 import { LOCAL_CONSTANTS } from "../constants";
 import axiosInstance from "../utils/axiosInstance";
 import { triggerDownload } from "../utils/downloads";
-import {
-  generateFilterQuery,
-  generateOrderByQuery,
-} from "../utils/postgresUtils/tables";
 
 export const getAllTables = async () => {
   try {
@@ -74,7 +70,7 @@ export const fetchAllRowsAPI = async ({
         tableName,
         page,
         pageSize,
-        filterQuery: filterQuery,
+        filterQuery,
         order: sortModel,
       })
     );
@@ -102,7 +98,6 @@ export const fetchTableStatsAPI = async ({ tableName, filterQuery }) => {
     const response = await axiosInstance.get(
       LOCAL_CONSTANTS.APIS.TABLE.getTableStats({
         tableName,
-
         filterQuery,
       })
     );

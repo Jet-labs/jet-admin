@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
 import {
-  Button,
   Checkbox,
   FormControl,
   InputLabel,
@@ -11,31 +10,28 @@ import {
   Select,
   useTheme,
 } from "@mui/material";
-import {
-  DataGrid,
-  GridToolbarContainer,
-  GridToolbarExport,
-} from "@mui/x-data-grid";
+import { DataGrid, GridToolbarContainer } from "@mui/x-data-grid";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { fetchAllRowsAPI, getTablePrimaryKey } from "../../../api/tables";
 import { useAuthState } from "../../../contexts/authContext";
 
+import { useDebounce } from "@uidotdev/usehooks";
 import { getTableColumns } from "../../../api/tables";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { useAppConstants } from "../../../contexts/appConstantsContext";
 import { Loading } from "../../../pages/Loading";
 import {
-  getFormattedTableColumns,
-  getTableIDProperty,
-} from "../../../utils/tables";
-import { DataGridActionComponent } from "../DataGridActionComponent";
+  combinePrimaryKeyToWhereClause,
+  generateFilterQuery,
+  generateOrderByQuery,
+} from "../../../utils/postgresUtils/tables";
+import { getFormattedTableColumns } from "../../../utils/tables";
 import { ErrorComponent } from "../../ErrorComponent";
-import { RawDataGridStatistics } from "../RawDataGridStatistics";
-import { MultipleRowsDeletionForm } from "../MultipleRowDeletetionForm";
 import { DataExportFormComponent } from "../DataExportFormComponent";
-import { combinePrimaryKeyToWhereClause } from "../../../utils/postgresUtils/tables";
-import { useDebounce } from "@uidotdev/usehooks";
+import { DataGridActionComponent } from "../DataGridActionComponent";
+import { MultipleRowsDeletionForm } from "../MultipleRowDeletetionForm";
+import { RawDataGridStatistics } from "../RawDataGridStatistics";
 
 export const RawDataGrid = ({
   tableName,
@@ -83,8 +79,8 @@ export const RawDataGrid = ({
         tableName,
         page,
         pageSize,
-        filterQuery: filterQuery,
-        sortModel: sortModel,
+        filterQuery: generateFilterQuery(filterQuery),
+        sortModel: sortModel ? generateOrderByQuery(sortModel) : null,
       }),
 
     enabled: Boolean(pmUser),
@@ -206,7 +202,7 @@ export const RawDataGrid = ({
         setIsSelectAllRowCheckBoxEnabled(false);
         _handleToggleAllRowSelectCheckbox(false);
       } else {
-        setMultipleSelectedQuery(rowSelectionModel.join(" AND "));
+        setMultipleSelectedQuery(rowSelectionModel.join(" OR "));
         setIsSelectAllRowCheckBoxEnabled(true);
       }
     },

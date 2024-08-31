@@ -9,6 +9,7 @@ import { LOCAL_CONSTANTS } from "../../../constants";
 import { Loading } from "../../../pages/Loading";
 import { ErrorComponent } from "../../ErrorComponent";
 import { useEffect } from "react";
+import { generateFilterQuery } from "../../../utils/postgresUtils/tables";
 
 export const RawDataGridStatistics = ({
   tableName,
@@ -36,7 +37,7 @@ export const RawDataGridStatistics = ({
     queryFn: () =>
       fetchTableStatsAPI({
         tableName,
-        filterQuery: filterQuery,
+        filterQuery: generateFilterQuery(filterQuery),
       }),
 
     enabled: Boolean(pmUser),

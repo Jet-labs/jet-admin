@@ -339,11 +339,11 @@ export const LOCAL_CONSTANTS = {
       getTablePrimaryKey: ({ tableName }) =>
         `/admin_api/tables/${tableName}/pkey`,
       getTableRows: ({ tableName, page, pageSize, filterQuery, order }) =>
-        `/admin_api/tables/${tableName}/?page=${page}&page_size=${pageSize}&q=${JSON.stringify(
+        `/admin_api/tables/${tableName}/?page=${page}&page_size=${pageSize}&q=${encodeURIComponent(
           filterQuery
-        )}&order=${JSON.stringify(order)}`,
+        )}&order=${encodeURIComponent(order)}`,
       getTableStats: ({ tableName, filterQuery }) =>
-        `/admin_api/tables/${tableName}/stats/?q=${JSON.stringify(
+        `/admin_api/tables/${tableName}/stats/?q=${encodeURIComponent(
           filterQuery
         )}`,
       getTableRowByID: ({ tableName, id }) =>

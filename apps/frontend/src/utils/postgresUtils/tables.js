@@ -20,13 +20,11 @@ export const combinePrimaryKeyToWhereClause = (tablePrimaryKey, keyValues) => {
   return `${conditions.join(" AND ")}`;
 };
 
-export const generateOrderByQuery = (sortModel) => {
-  return `${sortModel.field} ${sortModel.order}`;
-};
-
 export const generateFilterQuery = (filterModel) => {
+  if (!filterModel) return null;
   if (typeof filterModel !== "object" || filterModel === null) {
-    throw new Error("Invalid filterModel format.");
+    console.warn("Invalid filterModel format.");
+    return null;
   }
 
   const operator = Object.keys(filterModel)[0];
@@ -47,6 +45,10 @@ export const generateFilterQuery = (filterModel) => {
       const query = LOCAL_CONSTANTS.TABLE_FILTERS[
         String(filterModelKey).toUpperCase()
       ](field, filterModelValue);
-      return Buffer.from(query).toString("base64");
+      return query;
   }
+};
+
+export const generateOrderByQuery = (sortModel) => {
+  return `${sortModel.field} ${sortModel.order}`;
 };

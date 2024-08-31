@@ -38,10 +38,17 @@ tableQueryUtils.getRowByID = (tableName, query, authorizedRows) =>
   `SELECT * FROM ${tableName} WHERE ${query} ${
     authorizedRows ? `AND ${authorizedRows}` : ""
   };`;
-tableQueryUtils.getRowsByQuery = (tableName, query, authorizedRows) =>
-  `SELECT * FROM ${tableName} WHERE ${query} ${
-    authorizedRows ? `AND ${authorizedRows}` : ""
-  };`;
+tableQueryUtils.getRowsByQuery = (tableName, query, authorizedRows) => {
+  if (query) {
+    return `SELECT * FROM ${tableName} WHERE ${query} ${
+      authorizedRows ? `AND ${authorizedRows}` : ""
+    };`;
+  } else {
+    return `SELECT * FROM ${tableName} ${
+      authorizedRows ? `WHERE ${authorizedRows}` : ""
+    };`;
+  }
+};
 
 tableQueryUtils.getRows = ({
   tableName,

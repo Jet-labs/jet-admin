@@ -4,10 +4,7 @@ const Logger = require("../../utils/logger");
 const { TableService } = require("./table.services");
 const { createObjectCsvStringifier } = require("csv-writer");
 const ExcelJS = require("exceljs");
-const {
-  generateFilterQuery,
-  generateOrderByQuery,
-} = require("../../utils/postgres-utils/parsers");
+const { generateOrderByQuery } = require("../../utils/postgres-utils/parsers");
 
 const tableController = {};
 
@@ -142,8 +139,8 @@ tableController.getTableStatistics = async (req, res) => {
     const pm_user_id = parseInt(pmUser.pm_user_id);
     const { table_name } = req.params;
     const { q } = req.query;
-    let filter =
-      q && q !== "" && q != "null" ? generateFilterQuery(JSON.parse(q)) : null;
+    console.log({ q: String(q) });
+    let filter = q && q !== "" && q != "null" ? String(q) : null;
 
     Logger.log("info", {
       message: "tableController:getTableStatistics:params",
@@ -236,12 +233,9 @@ tableController.getAllRows = async (req, res) => {
     const pm_user_id = parseInt(pmUser.pm_user_id);
     const { table_name } = req.params;
     const { page, page_size, q, order } = req.query;
-    let filter =
-      q && q !== "" && q != "null" ? generateFilterQuery(JSON.parse(q)) : null;
+    let filter = q && q !== "" && q != "null" ? String(q) : null;
     let orderBy =
-      order && order !== "" && order != "null"
-        ? generateOrderByQuery(JSON.parse(order))
-        : null;
+      order && order !== "" && order != "null" ? String(order) : null;
     let skip = 0;
     let take = page_size ? parseInt(page_size) : constants.ROW_PAGE_SIZE;
     if (parseInt(page) >= 0) {
@@ -435,7 +429,7 @@ tableController.deleteRowByMultipleIDs = async (req, res) => {
 
     await TableService.deleteTableRowByMultipleIDs({
       tableName: table_name,
-      query: JSON.parse(query).query,
+      query: query,
       authorizedRows: authorized_rows,
     });
 
