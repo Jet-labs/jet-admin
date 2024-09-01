@@ -1,31 +1,13 @@
-import React, { useEffect, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { LOCAL_CONSTANTS } from "../constants";
+import React, { useMemo } from "react";
 import {
   getAllAppConstantAPI,
   getAllInternalAppConstantAPI,
-  getDBModelAppConstantAPI,
 } from "../api/appConstants";
-import { Loading } from "../pages/Loading";
 const AppConstantsValueContext = React.createContext(undefined);
 const AppConstantsActionContext = React.createContext(undefined);
 
 const AppConstantsContextProvider = ({ children }) => {
-  // // react-query for db users
-  const {
-    isLoading: isLoadingDBModel,
-    data: dbModelData,
-    error: dbModelError,
-  } = useQuery({
-    queryKey: ["app_constants_db_model"],
-    queryFn: getDBModelAppConstantAPI,
-    cacheTime: 0,
-    retry: 3,
-    staleTime: 0,
-  });
-
-  console.log({ dbModelData });
-
   const {
     isLoading: isLoadingAllAppConstants,
     data: appConstants,
@@ -76,7 +58,6 @@ const AppConstantsContextProvider = ({ children }) => {
   return (
     <AppConstantsValueContext.Provider
       value={{
-        dbModel: dbModelData?.db_model,
         appConstants,
         internalAppConstants: processedInternalAppConstants,
         isFetchingAllAppConstants,
@@ -90,7 +71,7 @@ const AppConstantsContextProvider = ({ children }) => {
           reloadAllInternalAppConstants,
         }}
       >
-        {dbModelData?.db_model ? children : <Loading fullScreen={true} />}
+        {children}
       </AppConstantsActionContext.Provider>
     </AppConstantsValueContext.Provider>
   );
@@ -114,4 +95,4 @@ const useAppConstantActions = () => {
   return context;
 };
 
-export { AppConstantsContextProvider, useAppConstants, useAppConstantActions };
+export { AppConstantsContextProvider, useAppConstantActions, useAppConstants };

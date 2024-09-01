@@ -1,7 +1,6 @@
-const { prisma } = require("../../db/prisma");
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
-const { sqlite_db } = require("../../db/sqlite");
+const { sqliteDB } = require("../../db/sqlite");
 const {
   appConstantQueryUtils,
 } = require("../../utils/postgres-utils/app-constant-queries");
@@ -30,7 +29,7 @@ class AppConstantService {
       },
     });
     try {
-      const addAppConstantQuery = sqlite_db.prepare(
+      const addAppConstantQuery = sqliteDB.prepare(
         appConstantQueryUtils.addAppConstant()
       );
 
@@ -89,7 +88,7 @@ class AppConstantService {
         authorizedAppConstants.includes(pmAppConstantID)
       ) {
         // Prepare the SQL statement to update an app constant
-        const updateAppConstantQuery = sqlite_db.prepare(
+        const updateAppConstantQuery = sqliteDB.prepare(
           appConstantQueryUtils.updateAppConstant()
         );
 
@@ -134,13 +133,13 @@ class AppConstantService {
       let appConstants;
       if (authorizedAppConstants === true) {
         // Fetch all appConstants if authorizedAppConstants is true
-        const getAllAppConstantsQuery = sqlite_db.prepare(
+        const getAllAppConstantsQuery = sqliteDB.prepare(
           appConstantQueryUtils.getAllAppConstants()
         );
         appConstants = getAllAppConstantsQuery.all();
       } else {
         // Fetch appConstants where pm_app_constant_id is in the authorizedAppConstants array
-        const getAllAppConstantsQuery = sqlite_db.prepare(
+        const getAllAppConstantsQuery = sqliteDB.prepare(
           appConstantQueryUtils.getAllAppConstants(authorizedAppConstants)
         );
         appConstants = getAllAppConstantsQuery.all(...authorizedAppConstants);
@@ -179,13 +178,13 @@ class AppConstantService {
         authorizedAppConstants === undefined
       ) {
         // Fetch all appConstants if authorizedAppConstants is true
-        const getAllAppConstantsQuery = sqlite_db.prepare(
+        const getAllAppConstantsQuery = sqliteDB.prepare(
           appConstantQueryUtils.getAllInternalAppConstants()
         );
         appConstants = getAllAppConstantsQuery.all();
       } else {
         // Fetch appConstants where pm_app_constant_id is in the authorizedAppConstants array
-        const getAllAppConstantsQuery = sqlite_db.prepare(
+        const getAllAppConstantsQuery = sqliteDB.prepare(
           appConstantQueryUtils.getAllInternalAppConstants(
             authorizedAppConstants
           )
@@ -231,7 +230,7 @@ class AppConstantService {
         authorizedAppConstants === true ||
         authorizedAppConstants.includes(pmAppConstantID)
       ) {
-        const getAppConstantByIDQuery = sqlite_db.prepare(
+        const getAppConstantByIDQuery = sqliteDB.prepare(
           appConstantQueryUtils.getAppConstantByID()
         );
         const appConstant = getAppConstantByIDQuery.get(pmAppConstantID);
@@ -281,7 +280,7 @@ class AppConstantService {
         authorizedAppConstants === true ||
         authorizedAppConstants.includes(pmAppConstantID)
       ) {
-        const deleteAppConstantQuery = sqlite_db.prepare(
+        const deleteAppConstantQuery = sqliteDB.prepare(
           appConstantQueryUtils.deleteAppConstant()
         );
         // Execute the delete

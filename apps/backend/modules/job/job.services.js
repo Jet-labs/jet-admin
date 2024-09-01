@@ -1,7 +1,7 @@
 const constants = require("../../constants");
 const { CustomCronJobScheduler } = require("../../jobs/cron.jobs");
 const Logger = require("../../utils/logger");
-const { sqlite_db } = require("../../db/sqlite");
+const { sqliteDB } = require("../../db/sqlite");
 const { jobQueryUtils } = require("../../utils/postgres-utils/job-queries");
 const { queryQueryUtils } = require("../../utils/postgres-utils/query-queries");
 class JobService {
@@ -25,7 +25,7 @@ class JobService {
       },
     });
     try {
-      const addJobQuery = sqlite_db.prepare(jobQueryUtils.addJob());
+      const addJobQuery = sqliteDB.prepare(jobQueryUtils.addJob());
       // Execute the insert
       const addJobQueryResult = addJobQuery.run(
         pmJobTitle,
@@ -80,7 +80,7 @@ class JobService {
     });
     try {
       if (authorizedJobs === true || authorizedJobs.includes(pmJobID)) {
-        const updatedJobQuery = sqlite_db.prepare(jobQueryUtils.updateJob());
+        const updatedJobQuery = sqliteDB.prepare(jobQueryUtils.updateJob());
 
         // Execute the update
         updatedJobQuery.run(
@@ -132,11 +132,11 @@ class JobService {
       let jobs;
       if (authorizedJobs === true) {
         // Fetch all jobs if authorizedJobs is true
-        const getAllJobsQuery = sqlite_db.prepare(jobQueryUtils.getAllJobs());
+        const getAllJobsQuery = sqliteDB.prepare(jobQueryUtils.getAllJobs());
         jobs = getAllJobsQuery.all();
       } else {
         // Fetch jobs where pm_job_id is in the authorizedJobs array
-        const getAllJobsQuery = sqlite_db.prepare(
+        const getAllJobsQuery = sqliteDB.prepare(
           jobQueryUtils.getAllJobs(authorizedJobs)
         );
         jobs = getAllJobsQuery.all(...authorizedJobs);
@@ -174,11 +174,11 @@ class JobService {
     });
     try {
       if (authorizedJobs === true || authorizedJobs.includes(pmJobID)) {
-        const getJobByIDQuery = sqlite_db.prepare(jobQueryUtils.getJobByID());
+        const getJobByIDQuery = sqliteDB.prepare(jobQueryUtils.getJobByID());
         const job = getJobByIDQuery.get(pmJobID);
 
         // Retrieve related query
-        const getQueryByIDQuery = sqlite_db.prepare(
+        const getQueryByIDQuery = sqliteDB.prepare(
           queryQueryUtils.getQueryByID()
         );
         const relatedQuery = getQueryByIDQuery.get(parseInt(job.pm_query_id));
@@ -229,7 +229,7 @@ class JobService {
     try {
       if (authorizedJobs === true || authorizedJobs.includes(pmJobID)) {
         await CustomCronJobScheduler.deleteScheduledCustomJob(pmJobID);
-        const deleteJobQuery = sqlite_db.prepare(jobQueryUtils.deleteJob());
+        const deleteJobQuery = sqliteDB.prepare(jobQueryUtils.deleteJob());
         // Execute the delete
         deleteJobQuery.run(pmJobID);
         Logger.log("info", {

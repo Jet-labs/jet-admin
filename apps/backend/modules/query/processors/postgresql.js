@@ -1,6 +1,5 @@
 const jsep = require("jsep");
 const constants = require("../../../constants");
-const { prisma } = require("../../../db/prisma");
 const Logger = require("../../../utils/logger");
 const {
   evaluateAST,
@@ -8,16 +7,19 @@ const {
   replaceQueryIDStringWithQueryID,
   replaceAppConstantIDStringWithAppConstantID,
 } = require("../../../utils/query-utils/variable-parser");
-const { Prisma } = require("@prisma/client");
 const {
   isDMLQuery,
   isDQLQuery,
 } = require("../../../utils/postgres-utils/query-validation");
 const jsonSchemaGenerator = require("json-schema-generator");
-const { sqlite_db } = require("../../../db/sqlite");
+const { sqliteDB } = require("../../../db/sqlite");
 const {
   queryQueryUtils,
 } = require("../../../utils/postgres-utils/query-queries");
+const { pgPool } = require("../../../db/pg");
+const {
+  appConstantQueryUtils,
+} = require("../../../utils/postgres-utils/app-constant-queries");
 /**
  *
  * @param {object} param0
@@ -58,7 +60,7 @@ const runQuery = async ({
         const resultSchema = jsonSchemaGenerator(
           JSON.parse(JSON.stringify(result.result))
         );
-        const updatedQueryQuery = sqlite_db.prepare(
+        const updatedQueryQuery = sqliteDB.prepare(
           queryQueryUtils.updateQueryMetadata()
         );
         // Execute the update
@@ -127,24 +129,20 @@ const getProcessedPostgreSQLQuery = async ({ rawQuery, pmQueryArgValues }) => {
             });
 
             // database values of pm_query_id
+            const getAllQueriesQuery = sqliteDB.prepare(
+              queryQueryUtils.getAllQueries(pmQueryIDs)
+            );
+            const getAllAppConstantsQuery = sqliteDB.prepare(
+              appConstantQueryUtils.getAllAppConstants(pmAppConstantIDs)
+            );
             const extractedPmQuerys =
               pmQueryIDs && pmQueryIDs.length > 0
-                ? await prisma.tbl_pm_queries.findMany({
-                    where: {
-                      pm_query_id: { in: pmQueryIDs },
-                      is_disabled: false,
-                    },
-                  })
+                ? getAllQueriesQuery.all(...pmQueryIDs)
                 : [];
             // database values of pm_query_id
             const extractedPmAppConstants =
               pmAppConstantIDs && pmAppConstantIDs.length > 0
-                ? await prisma.tbl_pm_app_constants.findMany({
-                    where: {
-                      pm_app_constant_id: { in: pmAppConstantIDs },
-                      is_disabled: false,
-                    },
-                  })
+                ? getAllAppConstantsQuery.all(...pmAppConstantIDs)
                 : [];
 
             Logger.log("info", {
@@ -159,7 +157,7 @@ const getProcessedPostgreSQLQuery = async ({ rawQuery, pmQueryArgValues }) => {
             const extractedPmQuerysPromises = extractedPmQuerys.map(
               async (pmQueryObject) => {
                 const evaluatedQuery = await getProcessedPostgreSQLQuery({
-                  rawQuery: pmQueryObject.pm_query.raw_query,
+                  rawQuery: JSON.parse(pmQueryObject.pm_query).raw_query,
                 });
                 return await runPostgreSQLEvaluatedQuery({
                   options: {
@@ -182,8 +180,9 @@ const getProcessedPostgreSQLQuery = async ({ rawQuery, pmQueryArgValues }) => {
               evaluationContext[`pmq_${r.pmQueryID}`] = r.result;
             });
             extractedPmAppConstants.forEach((r) => {
-              evaluationContext[`pmac_${r.pm_app_constant_id}`] =
-                r.pm_app_constant_value;
+              evaluationContext[`pmac_${r.pm_app_constant_id}`] = JSON.parse(
+                r.pm_app_constant_value
+              );
             });
 
             Logger.log("info", {
@@ -249,9 +248,8 @@ const runPostgreSQLEvaluatedQuery = async ({ options }) => {
       isDMLQuery(options.processedQuery) ||
       isDQLQuery(options.processedQuery)
     ) {
-      const result = await prisma.$queryRaw`${Prisma.raw(
-        options.processedQuery
-      )}`;
+      const res = await pgPool.query(options.processedQuery);
+      const result = res.rows;
       Logger.log("info", {
         message: "PostgreSQL:runPostgreSQLEvaluatedQuery:query",
         params: {

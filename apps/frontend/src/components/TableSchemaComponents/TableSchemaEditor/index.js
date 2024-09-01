@@ -1,23 +1,21 @@
-import { Tab, Tabs, useTheme } from "@mui/material";
+import { useTheme } from "@mui/material";
 import { useCallback, useState } from "react";
-import { useAppConstants } from "../../../contexts/appConstantsContext";
+import { TableSchemaEditorCanvasContextProvider } from "../../../contexts/tableSchemaEditorCanvasContext";
 import {
   useTableSchemaEditorActions,
   useTableSchemaEditorState,
 } from "../../../contexts/tableSchemaEditorContext";
 import { useTableSchemaEditorTransformState } from "../../../contexts/tableSchemaEditorTransformContext";
-import { SidePanel } from "../EditorSidePanel/SidePanel";
-import { TableSchemaEditorCanvasContextProvider } from "../../../contexts/tableSchemaEditorCanvasContext";
-import { Canvas } from "../Canvas";
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "../../Resizables";
+import { Canvas } from "../Canvas";
+import { SidePanel } from "../EditorSidePanel/SidePanel";
 
 export const TableSchemaEditor = ({ schema }) => {
   const theme = useTheme();
-  const { dbModel } = useAppConstants();
   const [tab, setTab] = useState(0);
   const { types, enums, tables, relationships, undoStack, redoStack } =
     useTableSchemaEditorState();

@@ -8,16 +8,6 @@ const {
 } = require("./app-constants.authorization.middleware");
 const router = express.Router();
 
-// get all data of table
-router.get("/db_model", async (req, res) => {
-  return res.json({
-    success: true,
-    constants: {
-      db_model: dbModel,
-    },
-  });
-});
-
 router.get(
   "/internal",
   authMiddleware.authProvider,

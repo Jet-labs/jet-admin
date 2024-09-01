@@ -1,9 +1,33 @@
 const tableQueryUtils = {};
 
+
 tableQueryUtils.getAllTables = (schema) =>
   `SELECT table_name FROM information_schema.tables WHERE table_schema = '${
     schema ? schema : "public"
   }';`;
+tableQueryUtils.getAllTableColumns = (schema) => `SELECT json_build_object(
+    'tableName', cols.table_name,
+    'name', column_name,
+    'isRequired', (is_nullable = 'NO'),
+    'isList', data_type='ARRAY',
+    'isUnique', (SELECT COUNT(*) FROM information_schema.table_constraints tc
+                 JOIN information_schema.constraint_column_usage ccu
+                 ON ccu.constraint_name = tc.constraint_name
+                 WHERE tc.table_name = cols.table_name
+                 AND ccu.column_name = cols.column_name
+                 AND tc.constraint_type = 'UNIQUE') > 0,
+    'isId', (SELECT COUNT(*) FROM information_schema.table_constraints tc
+             JOIN information_schema.constraint_column_usage ccu
+             ON ccu.constraint_name = tc.constraint_name
+             WHERE tc.table_name = cols.table_name
+             AND ccu.column_name = cols.column_name
+             AND tc.constraint_type = 'PRIMARY KEY') > 0,
+	'defaultValue', cols.column_default,
+    'type', udt_name
+  ) AS column_schema
+  FROM information_schema.columns cols
+  WHERE table_schema = '${schema ? schema : "public"}'
+  ORDER BY cols.table_name, cols.ordinal_position;`;
 tableQueryUtils.getTableColumns = () => `SELECT json_build_object(
     'name', column_name,
     'isRequired', (is_nullable = 'NO'),

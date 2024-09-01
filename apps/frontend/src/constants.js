@@ -333,6 +333,7 @@ export const LOCAL_CONSTANTS = {
     },
     TABLE: {
       getAllTables: () => `/admin_api/tables`,
+      getAllTableColumns: () => `/admin_api/tables/columns`,
 
       getTableColumns: ({ tableName }) =>
         `/admin_api/tables/${tableName}/columns`,
@@ -415,7 +416,6 @@ export const LOCAL_CONSTANTS = {
     },
 
     APP_CONSTANTS: {
-      getDBModelAppConstant: () => `/admin_api/app_constants/db_model/`,
       getAllInternalAppConstants: () => `/admin_api/app_constants/internal`,
       getAllAppConstants: () => `/admin_api/app_constants`,
       getAppConstantByID: ({ id }) => `/admin_api/app_constants/${id}`,
@@ -492,6 +492,7 @@ export const LOCAL_CONSTANTS = {
     TRIGGERS: "TRIGGERS",
     CONSTANTS: "CONSTANTS",
     TABLES: "REACT_QUERY_KEY_TABLES",
+    TABLE_COLUMNS: `REACT_QUERY_KEY_TABLE_COLUMNS`,
     TABLE_ID: (tableName) =>
       `REACT_QUERY_KEY_TABLES_${String(tableName).toUpperCase()}`,
     TABLE_ID_COLUMNS: (tableName) =>

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import Editor from "@monaco-editor/react";
 import { useAppConstants } from "../../../../contexts/appConstantsContext";
 import { useThemeValue } from "../../../../contexts/themeContext";
@@ -10,19 +10,20 @@ import { languages } from "monaco-editor";
 import { getQueryObjectSuggestions } from "../../../../utils/editorAutocomplete/queryObjects";
 import { LOCAL_CONSTANTS } from "../../../../constants";
 import { getAppConstantObjectSuggestions } from "../../../../utils/editorAutocomplete/appConstantObjects";
+import { getAllTableColumns, getAllTables } from "../../../../api/tables";
 
 /**
  *
- * @param {Array} dbModel
+ * @param {Array} tables
  * @returns
  */
-const getModelSuggestions = (dbModel, range) => {
-  if (dbModel) {
-    const suggestions = dbModel.map((model) => ({
-      label: model.name,
+const getModelSuggestions = (tables, range) => {
+  if (tables) {
+    const suggestions = tables.map((table) => ({
+      label: table,
       kind: languages.CompletionItemKind.Variable,
-      documentation: `Table ${model.name}`,
-      insertText: `${model.name}.`,
+      documentation: `Table ${table}`,
+      insertText: `${table}.`,
       range: range,
       command: {
         id: "editor.action.triggerSuggest",
@@ -34,6 +35,29 @@ const getModelSuggestions = (dbModel, range) => {
   }
 };
 
+/**
+ *
+ * @param {Array} tableColumns
+ * @returns
+ */
+const getFieldSuggestions = (tableColumns, modelName, range) => {
+  const currentModelFields = modelName
+    ? tableColumns?.filter((column) => column.tableName == modelName)
+    : tableColumns;
+  console.log({ currentModelFields });
+  if (currentModelFields) {
+    return currentModelFields.map((column) => ({
+      label: column.name,
+      kind: languages.CompletionItemKind.Property,
+      documentation: `Field in model ${column.name}`,
+      insertText: column.name,
+      range: range,
+    }));
+  }
+
+  return [];
+};
+
 const getPostgreSQLSuggestions = (range) => {
   return DEFAULT_PG_KEYWORDS.map((key) => ({
     label: key,
@@ -43,7 +67,6 @@ const getPostgreSQLSuggestions = (range) => {
   }));
 };
 export const PGSQLQueryEditor = ({ value, handleChange }) => {
-  const { dbModel } = useAppConstants();
   const { themeType } = useThemeValue();
   const theme = useTheme();
   const { appConstants } = useAppConstants();
@@ -61,126 +84,124 @@ export const PGSQLQueryEditor = ({ value, handleChange }) => {
     staleTime: 0,
   });
 
-  const handleEditorWillMount = (monaco) => {
-    monaco.languages.registerCompletionItemProvider("pgsql", {
-      provideCompletionItems: (model, position) => {
-        const wordInfo = model.getWordUntilPosition(position);
-        const textBeforeCursor = model.getValueInRange({
-          startLineNumber: position.lineNumber,
-          startColumn: 1,
-          endLineNumber: position.lineNumber,
-          endColumn: wordInfo.endColumn,
-        });
+  const {
+    isLoading: isLoadingTables,
+    data: tables,
+    error: loadTablesError,
+    refetch: refetchTables,
+  } = useQuery({
+    queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLES],
+    queryFn: () => getAllTables(),
+    cacheTime: 0,
+    retry: 1,
+    staleTime: 0,
+  });
+  const {
+    isLoading: isLoadingTableColumns,
+    data: tableColumns,
+    error: loadTableColumnsError,
+    refetch: refetchTableColumns,
+  } = useQuery({
+    queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLE_COLUMNS],
+    queryFn: () => getAllTableColumns(),
+    cacheTime: 0,
+    retry: 1,
+    staleTime: 0,
+  });
+  console.log({ tableColumns });
 
-        const range = {
-          startLineNumber: position.lineNumber,
-          endLineNumber: position.lineNumber,
-          startColumn: wordInfo.startColumn,
-          endColumn: wordInfo.endColumn,
-        };
+  const handleEditorWillMount = useCallback(
+    (monaco) => {
+      // Register model suggestions separately
+      monaco.languages.registerCompletionItemProvider("pgsql", {
+        provideCompletionItems: (model, position) => {
+          const wordInfo = model.getWordUntilPosition(position);
+          const textBeforeCursor = model.getValueInRange({
+            startLineNumber: position.lineNumber,
+            startColumn: 1,
+            endLineNumber: position.lineNumber,
+            endColumn: wordInfo.endColumn,
+          });
 
-        let suggestions = [];
-        // Check if the cursor is inside {{ }}
-        const isInsideBraces =
-          textBeforeCursor.includes("{{") && !textBeforeCursor.includes("}}");
-
-        if (isInsideBraces && queries) {
-          // Provide suggestions specific to the context inside {{ }}
-          suggestions = [
-            ...getQueryObjectSuggestions(queries, range),
-            ...getAppConstantObjectSuggestions(appConstants, range),
-          ];
-        } else {
-          // Model suggestions with nested field suggestions
-          const modelSuggestions = getModelSuggestions(dbModel, range);
-          // General PostgreSQL suggestions
-          const pgSuggestions = getPostgreSQLSuggestions(range);
-          suggestions = [...pgSuggestions, ...modelSuggestions];
-        }
-        return { suggestions };
-      },
-    });
-
-    // Register field suggestions separately
-    monaco.languages.registerCompletionItemProvider("pgsql", {
-      provideCompletionItems: (model, position) => {
-        const textUntilPosition = model.getValueInRange({
-          startLineNumber: position.lineNumber,
-          startColumn: 1,
-          endLineNumber: position.lineNumber,
-          endColumn: position.column,
-        });
-
-        const range = {
-          startLineNumber: position.lineNumber,
-          endLineNumber: position.lineNumber,
-          startColumn: position.column,
-          endColumn: position.column,
-        };
-
-        const modelName = textUntilPosition.split(".")[0];
-        const currentModel = dbModel?.find((m) => m.name === modelName);
-
-        if (currentModel) {
-          return {
-            suggestions: currentModel.fields.map((field) => ({
-              label: field.name,
-              kind: monaco.languages.CompletionItemKind[
-                field.kind === "object" ? "Class" : "Property"
-              ],
-              documentation: `Field in model ${currentModel.name}`,
-              insertText: field.name,
-              range: range,
-            })),
+          const range = {
+            startLineNumber: position.lineNumber,
+            endLineNumber: position.lineNumber,
+            startColumn: wordInfo.startColumn,
+            endColumn: wordInfo.endColumn,
           };
-        }
 
-        return { suggestions: [] };
-      },
-    });
+          let suggestions = [];
+          // Check if the cursor is inside {{ }}
+          const isInsideBraces =
+            textBeforeCursor.includes("{{") && !textBeforeCursor.includes("}}");
 
-    monaco.languages.registerHoverProvider("pgsql", {
-      provideHover: function (model, position) {
-        const word = model.getWordAtPosition(position);
+          if (isInsideBraces && queries) {
+            // Provide suggestions specific to the context inside {{ }}
+            suggestions = [
+              ...getQueryObjectSuggestions(queries, range),
+              ...getAppConstantObjectSuggestions(appConstants, range),
+            ];
+          } else {
+            // Model suggestions with nested field suggestions
+            const modelSuggestions = getModelSuggestions(tables, range);
+            const fieldSuggestions = getFieldSuggestions(
+              tableColumns,
+              null,
+              range
+            );
+            console.log({ fieldSuggestions });
+            // General PostgreSQL suggestions
+            const pgSuggestions = getPostgreSQLSuggestions(range);
+            suggestions = [
+              ...pgSuggestions,
+              ...modelSuggestions,
+              ...fieldSuggestions,
+            ];
+          }
+          return { suggestions };
+        },
+      });
 
-        if (word) {
-          const table = dbModel?.find((m) => m.name === word.word);
-          const field = dbModel?.flatMap((m) =>
-            m.fields.filter((f) => f.name === word.word)
-          )[0];
+      monaco.languages.registerHoverProvider("pgsql", {
+        provideHover: function (model, position) {
+          const word = model.getWordAtPosition(position);
 
-          let hoverMessage = null;
+          if (word) {
+            const table = tables?.find((m) => m === word.word);
+            let hoverMessage = null;
 
-          if (table) {
-            const fields = table?.fields?.map((f) => {
-              return { value: `${f.name}: ${f.type}` };
-            });
-            hoverMessage = {
-              contents: [
-                { value: `**Table**: ${table.name}` },
-                { value: `**Fields**` },
-                ...fields,
-              ],
-            };
+            if (table) {
+              const fields = table?.fields?.map((f) => {
+                return { value: `${f.name}: ${f.type}` };
+              });
+              hoverMessage = {
+                contents: [
+                  { value: `**Table**: ${table.name}` },
+                  { value: `**Fields**` },
+                  ...fields,
+                ],
+              };
+            }
+
+            if (hoverMessage) {
+              return {
+                range: new monaco.Range(
+                  position.lineNumber,
+                  word.startColumn,
+                  position.lineNumber,
+                  word.endColumn
+                ),
+                contents: hoverMessage.contents,
+              };
+            }
           }
 
-          if (hoverMessage) {
-            return {
-              range: new monaco.Range(
-                position.lineNumber,
-                word.startColumn,
-                position.lineNumber,
-                word.endColumn
-              ),
-              contents: hoverMessage.contents,
-            };
-          }
-        }
-
-        return null;
-      },
-    });
-  };
+          return null;
+        },
+      });
+    },
+    [tables, tableColumns]
+  );
 
   const handleEditorChange = (newValue) => {
     handleChange({ raw_query: newValue });

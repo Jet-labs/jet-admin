@@ -2,22 +2,7 @@ import axios from "axios";
 import { LOCAL_CONSTANTS } from "../constants";
 import { AppConstant } from "../models/data/appConstant";
 import axiosInstance from "../utils/axiosInstance";
-export const getDBModelAppConstantAPI = async () => {
-  try {
-    const url =
-      LOCAL_CONSTANTS.SERVER_HOST +
-      LOCAL_CONSTANTS.APIS.APP_CONSTANTS.getDBModelAppConstant();
 
-    const response = await axios.get(url);
-    if (response.data && response.data.success === true) {
-      return response.data.constants;
-    } else {
-      return null;
-    }
-  } catch (error) {
-    throw error;
-  }
-};
 
 export const addAppConstantAPI = async ({ data }) => {
   try {

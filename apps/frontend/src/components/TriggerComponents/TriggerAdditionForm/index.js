@@ -7,20 +7,18 @@ import {
   OutlinedInput,
   Select,
   TextField,
-  useTheme,
 } from "@mui/material";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
-import { useMemo } from "react";
 
+import { getAllTables } from "../../../api/tables";
+import { addTriggerAPI } from "../../../api/triggers";
+import { LOCAL_CONSTANTS } from "../../../constants";
 import {
   TRIGGER_EVENT,
   TRIGGER_FIRE_METHOD,
   TRIGGER_IMPACT_TIMING,
 } from "../../../utils/editorAutocomplete/pgKeywords";
-import { useAppConstants } from "../../../contexts/appConstantsContext";
-import { addTriggerAPI } from "../../../api/triggers";
-import { LOCAL_CONSTANTS } from "../../../constants";
 import { displayError, displaySuccess } from "../../../utils/notification";
 
 const ITEM_HEIGHT = 48;
@@ -35,8 +33,20 @@ const MenuProps = {
 };
 
 const TriggerAdditionForm = () => {
-  const { dbModel } = useAppConstants();
   const queryClient = useQueryClient();
+
+  const {
+    isLoading: isLoadingTables,
+    data: tables,
+    error: loadTablesError,
+    refetch: refetchTables,
+  } = useQuery({
+    queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLES],
+    queryFn: () => getAllTables(),
+    cacheTime: 0,
+    retry: 1,
+    staleTime: 0,
+  });
 
   const {
     isPending: isAddingTrigger,
@@ -98,6 +108,7 @@ const TriggerAdditionForm = () => {
       return errors;
     },
   });
+
   return (
     <div className="flex flex-col justify-start items-center w-full pb-5 p-2">
       <div className=" flex flex-row justify-between 2xl:w-3/5 xl:w-3/4 lg:w-2/3 md:w-full  mt-3 w-full ">
@@ -154,8 +165,8 @@ const TriggerAdditionForm = () => {
             onBlur={triggerBuilderForm.handleBlur}
             error={triggerBuilderForm.errors.pm_trigger_table_name}
           >
-            {dbModel?.map((model) => {
-              return <MenuItem value={model.name}>{model.name}</MenuItem>;
+            {tables?.map((table) => {
+              return <MenuItem value={table}>{table}</MenuItem>;
             })}
           </Select>
         </FormControl>

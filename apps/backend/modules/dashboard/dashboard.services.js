@@ -3,7 +3,7 @@ const Logger = require("../../utils/logger");
 const {
   dashboardQueryUtils,
 } = require("../../utils/postgres-utils/dashboard-queries");
-const { sqlite_db } = require("../../db/sqlite");
+const { sqliteDB } = require("../../db/sqlite");
 class DashboardService {
   constructor() {}
 
@@ -29,7 +29,7 @@ class DashboardService {
       },
     });
     try {
-      const newDashboardQuery = sqlite_db.prepare(
+      const newDashboardQuery = sqliteDB.prepare(
         dashboardQueryUtils.addDashboard()
       );
       const result = newDashboardQuery.run(
@@ -85,7 +85,7 @@ class DashboardService {
         authorizedDashboards === true ||
         authorizedDashboards.includes(pmDashboardID)
       ) {
-        const updateDashboardQuery = sqlite_db.prepare(
+        const updateDashboardQuery = sqliteDB.prepare(
           dashboardQueryUtils.updateDashboard()
         );
 
@@ -130,13 +130,13 @@ class DashboardService {
       let dashboards;
       if (authorizedDashboards === true) {
         // Fetch all dashboards if authorizedDashboards is true
-        const getAllDashboardsQuery = sqlite_db.prepare(
+        const getAllDashboardsQuery = sqliteDB.prepare(
           dashboardQueryUtils.getAllDashboards()
         );
         dashboards = getAllDashboardsQuery.all();
       } else {
         // Fetch dashboards where pm_dashboard_id is in the authorizedDashboards array
-        const getAllDashboardsQuery = sqlite_db.prepare(
+        const getAllDashboardsQuery = sqliteDB.prepare(
           dashboardQueryUtils.getAllDashboards(authorizedDashboards)
         );
         dashboards = getAllDashboardsQuery.all(...authorizedDashboards);
@@ -177,7 +177,7 @@ class DashboardService {
         authorizedDashboards === true ||
         authorizedDashboards.includes(pmDashboardID)
       ) {
-        const getDashboardByIDQuery = sqlite_db.prepare(
+        const getDashboardByIDQuery = sqliteDB.prepare(
           dashboardQueryUtils.getDashboardByID()
         );
         const dashboard = getDashboardByIDQuery.get(pmDashboardID);
@@ -224,7 +224,7 @@ class DashboardService {
         authorizedDashboards === true ||
         authorizedDashboards.includes(pmDashboardID)
       ) {
-        const deleteDashboardQuery = sqlite_db.prepare(
+        const deleteDashboardQuery = sqliteDB.prepare(
           dashboardQueryUtils.deleteDashboard()
         );
         // Execute the delete

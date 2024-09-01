@@ -52,6 +52,44 @@ tableController.getTables = async (req, res) => {
  * @param {import("express").Response} res
  * @returns
  */
+tableController.getAllTableColumns = async (req, res) => {
+  try {
+    Logger.log("info", {
+      message: "tableController:getTableColumns:init",
+    });
+    const { pmUser, state } = req;
+    const pm_user_id = parseInt(pmUser.pm_user_id);
+    const authorizationPolicy = state.authorization_policy;
+    const authorizedTableColumns = await TableService.getAuthorizedTableColumns({
+      authorizationPolicy,
+      schema: "public",
+    });
+    Logger.log("info", {
+      message: "tableController:getTableColumns:rows",
+      params: {
+        pm_user_id,
+        authorizedTableColumns,
+      },
+    });
+    return res.json({
+      success: true,
+      allColumns: authorizedTableColumns,
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "tableController:getTableColumns:catch-1",
+      params: { error },
+    });
+    return res.json({ success: false, error: extractError(error) });
+  }
+};
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @returns
+ */
 tableController.getTableColumns = async (req, res) => {
   try {
     Logger.log("info", {

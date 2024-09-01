@@ -30,7 +30,7 @@ export const TableDrawerList = () => {
     error: loadTablesError,
     refetch: refetchTables,
   } = useQuery({
-    queryKey: [`REACT_QUERY_KEY_TABLES`],
+    queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLES],
     queryFn: () => getAllTables(),
     cacheTime: 0,
     retry: 1,

@@ -2,6 +2,23 @@ import { LOCAL_CONSTANTS } from "../constants";
 import axiosInstance from "../utils/axiosInstance";
 import { triggerDownload } from "../utils/downloads";
 
+export const getAllTableColumns = async () => {
+  try {
+    const response = await axiosInstance.get(
+      LOCAL_CONSTANTS.APIS.TABLE.getAllTableColumns()
+    );
+    if (response.data && response.data.success == true) {
+      return response.data.allColumns;
+    } else if (response.data.error) {
+      throw response.data.error;
+    } else {
+      throw LOCAL_CONSTANTS.ERROR_CODES.SERVER_ERROR;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const getAllTables = async () => {
   try {
     const response = await axiosInstance.get(

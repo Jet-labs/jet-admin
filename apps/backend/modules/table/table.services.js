@@ -1,5 +1,3 @@
-const { prisma } = require("../../db/prisma");
-const constants = require("../../constants");
 const Logger = require("../../utils/logger");
 const { pgPool } = require("../../db/pg");
 const { tableQueryUtils } = require("../../utils/postgres-utils/table-queries");
@@ -13,12 +11,62 @@ class TableService {
    * @param {object} param0.schema
    * @returns {Array<any>|null}
    */
+  static getAuthorizedTableColumns = async ({
+    authorizationPolicy,
+    schema,
+  }) => {
+    Logger.log("info", {
+      message: "TableService:getAuthorizedTableColumns:init",
+    });
+    try {
+      const res = await pgPool.query(
+        tableQueryUtils.getAllTableColumns(schema)
+      );
+      const columns = res.rows;
+
+      let authorizedTableColumns = [];
+      if (authorizationPolicy && authorizationPolicy.tables) {
+        if (
+          authorizationPolicy.tables === true ||
+          authorizationPolicy.tables.read === true
+        ) {
+          authorizedTableColumns = columns;
+        } else {
+          authorizedTableColumns = columns
+            .map((column) => column.column_schema)
+            .filter((column) => {
+              return (
+                authorizationPolicy.tables[column.tableName] &&
+                (authorizationPolicy.tables[column.tableName] === true ||
+                  authorizationPolicy.tables[column.tableName].read)
+              );
+            });
+        }
+      }
+      Logger.log("success", {
+        message: "TableService:getAuthorizedTableColumns:success",
+      });
+      return authorizedTableColumns;
+    } catch (error) {
+      Logger.log("error", {
+        message: "TableService:getAuthorizedTableColumns:catch-1",
+        params: { error },
+      });
+      throw error;
+    }
+  };
+  /**
+   *
+   * @param {object} param0
+   * @param {object} param0.authorizationPolicy
+   * @param {object} param0.schema
+   * @returns {Array<any>|null}
+   */
   static getAuthorizedTables = async ({ authorizationPolicy, schema }) => {
     Logger.log("info", {
       message: "TableService:getAuthorizedTables:init",
     });
     try {
-      console.log(tableQueryUtils.getAllTables(schema));
       const res = await pgPool.query(tableQueryUtils.getAllTables(schema));
       const tables = res.rows.map((row) => row.table_name);
       let authorizedTables = [];

@@ -1,18 +1,31 @@
 import { Divider, Tab, Tabs, useTheme } from "@mui/material";
+import { useQuery } from "@tanstack/react-query";
 import { loadLanguage } from "@uiw/codemirror-extensions-langs";
 import { githubLight } from "@uiw/codemirror-theme-github";
 import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import CodeMirror from "@uiw/react-codemirror";
 import { capitalize } from "lodash";
 import { useMemo, useState } from "react";
-import { useAppConstants } from "../../../../contexts/appConstantsContext";
+import { getAllTables } from "../../../../api/tables";
+import { LOCAL_CONSTANTS } from "../../../../constants";
+import { useThemeValue } from "../../../../contexts/themeContext";
 import { containsOnly } from "../../../../utils/array";
 import { displayError } from "../../../../utils/notification";
 import { CRUDPermissionCheckboxGroup } from "../CRUDPermissionCheckboxGroup";
-import { useThemeValue } from "../../../../contexts/themeContext";
 export const TablePolicyEditor = ({ value, handleChange }) => {
   const { themeType } = useThemeValue();
-  const { dbModel } = useAppConstants();
+  const {
+    isLoading: isLoadingTables,
+    data: tables,
+    error: loadTablesError,
+    refetch: refetchTables,
+  } = useQuery({
+    queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLES],
+    queryFn: () => getAllTables(),
+    cacheTime: 0,
+    retry: 1,
+    staleTime: 0,
+  });
   const isVisualEditorSufficient = useMemo(() => {
     let res = true;
     if (value) {
@@ -79,18 +92,13 @@ export const TablePolicyEditor = ({ value, handleChange }) => {
         <Divider />
         {tab === 0 ? (
           <div className="!flex flex-col justify-start items-stretch w-full p-3">
-            {dbModel?.map((tableProperty) => {
-              if (
-                value[tableProperty.name] == undefined ||
-                value[tableProperty.name] == null
-              ) {
+            {tables?.map((table) => {
+              if (value[table] == undefined || value[table] == null) {
                 return (
                   <CRUDPermissionCheckboxGroup
-                    label={
-                      <span className="capitalize">{tableProperty.name}</span>
-                    }
+                    label={<span className="capitalize">{table}</span>}
                     value={
-                      value[tableProperty.name]
+                      value[table]
                         ? { add: true, edit: true, read: true, delete: true }
                         : {
                             add: false,
@@ -100,22 +108,20 @@ export const TablePolicyEditor = ({ value, handleChange }) => {
                           }
                     }
                     handleChange={(v) => {
-                      handleChange({ ...value, [tableProperty.name]: v });
+                      handleChange({ ...value, [table]: v });
                     }}
                   />
                 );
               } else if (
-                value[tableProperty.name] != undefined &&
-                value[tableProperty.name] != null &&
-                typeof value[tableProperty.name] === "boolean"
+                value[table] != undefined &&
+                value[table] != null &&
+                typeof value[table] === "boolean"
               ) {
                 return (
                   <CRUDPermissionCheckboxGroup
-                    label={
-                      <span className="capitalize">{tableProperty.name}</span>
-                    }
+                    label={<span className="capitalize">{table}</span>}
                     value={
-                      value[tableProperty.name]
+                      value[table]
                         ? { add: true, edit: true, read: true, delete: true }
                         : {
                             add: false,
@@ -125,24 +131,22 @@ export const TablePolicyEditor = ({ value, handleChange }) => {
                           }
                     }
                     handleChange={(v) => {
-                      handleChange({ ...value, [tableProperty.name]: v });
+                      handleChange({ ...value, [table]: v });
                     }}
                   />
                 );
               } else if (
                 containsOnly(
                   ["add", "edit", "read", "delete"],
-                  Object.keys(value[tableProperty.name])
+                  Object.keys(value[table])
                 )
               ) {
                 return (
                   <CRUDPermissionCheckboxGroup
-                    label={
-                      <span className="capitalize">{tableProperty.name}</span>
-                    }
-                    value={value[tableProperty.name]}
+                    label={<span className="capitalize">{table}</span>}
+                    value={value[table]}
                     handleChange={(v) => {
-                      handleChange({ ...value, [tableProperty.name]: v });
+                      handleChange({ ...value, [table]: v });
                     }}
                   />
                 );
@@ -150,10 +154,10 @@ export const TablePolicyEditor = ({ value, handleChange }) => {
                 return (
                   <CodeMirror
                     value={
-                      typeof value[tableProperty.name] === "object"
-                        ? JSON.stringify(value[tableProperty.name], null, 2)
-                        : typeof value[tableProperty.name] === "string"
-                        ? value[tableProperty.name]
+                      typeof value[table] === "object"
+                        ? JSON.stringify(value[table], null, 2)
+                        : typeof value[table] === "string"
+                        ? value[table]
                         : ""
                     }
                     height="200px"
@@ -161,8 +165,7 @@ export const TablePolicyEditor = ({ value, handleChange }) => {
                     onChange={(v) => {
                       handleChange({
                         ...value,
-                        [tableProperty.name]:
-                          typeof v === "object" ? v : JSON.parse(v),
+                        [table]: typeof v === "object" ? v : JSON.parse(v),
                       });
                     }}
                     theme={themeType == "dark" ? vscodeDark : githubLight}

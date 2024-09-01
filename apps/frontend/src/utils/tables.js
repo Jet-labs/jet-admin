@@ -77,27 +77,6 @@ export const getFieldModelFromModel = (field, tableModel) => {
   return tableModel.fields.find((fieldModel) => fieldModel.name === field);
 };
 
-/**
- *
- * @param {String} tableName
- * @param {Model[]} dbModel
- * @returns
- */
-export const getTableIDProperty = (tableName, dbModel) => {
-  const prismaModel = dbModel.find((m) => m.name === tableName);
-  let tableIDs = [];
-  if (
-    prismaModel &&
-    prismaModel.primaryKey &&
-    prismaModel.primaryKey.fields?.length > 0
-  ) {
-    tableIDs = prismaModel.primaryKey.fields;
-  } else {
-    const idField = prismaModel?.fields.find((f) => f.isId);
-    tableIDs = [idField.name];
-  }
-  return tableIDs;
-};
 
 export const getRandomColor = () => {
   var letters = "0123456789ABCDEF";

@@ -1,5 +1,5 @@
 const Logger = require("../../utils/logger");
-const { sqlite_db } = require("../../db/sqlite");
+const { sqliteDB } = require("../../db/sqlite");
 const {
   jobHistoryQueryUtils,
 } = require("../../utils/postgres-utils/job-history-queries");
@@ -22,7 +22,7 @@ class JobHistoryService {
       },
     });
     try {
-      const addJobHistoryQuery = sqlite_db.prepare(
+      const addJobHistoryQuery = sqliteDB.prepare(
         jobHistoryQueryUtils.addJobHistory()
       );
       // Execute the insert
@@ -56,13 +56,13 @@ class JobHistoryService {
       let jobHistory;
       if (authorizedJobs === true) {
         // Fetch all jobHistory if authorizedJobs is true
-        const getJobHistoryQuery = sqlite_db.prepare(
+        const getJobHistoryQuery = sqliteDB.prepare(
           jobHistoryQueryUtils.getJobHistory(authorizedJobs, take, skip)
         );
         jobHistory = getJobHistoryQuery.all();
       } else {
         // Fetch jobHistory where pm_job_id is in the authorizedJobs array
-        const getJobHistoryQuery = sqlite_db.prepare(
+        const getJobHistoryQuery = sqliteDB.prepare(
           jobHistoryQueryUtils.getJobHistory(authorizedJobs, take, skip)
         );
         jobHistory = getJobHistoryQuery.all(...authorizedJobs);

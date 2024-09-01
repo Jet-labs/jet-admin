@@ -3,7 +3,7 @@ const Logger = require("../utils/logger");
 const { runQuery } = require("../modules/query/processors/postgresql");
 const { JobHistoryService } = require("../modules/job/job-history.services");
 const { QueryService } = require("../modules/query/query.services");
-const { sqlite_db } = require("../db/sqlite");
+const { sqliteDB } = require("../db/sqlite");
 const { jobQueryUtils } = require("../utils/postgres-utils/job-queries");
 
 class CustomCronJobScheduler {
@@ -135,7 +135,7 @@ class CustomCronJobScheduler {
       Logger.log("info", {
         message: "CustomCronJobScheduler:scheduleAllCustomJobs:init",
       });
-      const getAllJobsQuery = sqlite_db.prepare(jobQueryUtils.getAllJobs());
+      const getAllJobsQuery = sqliteDB.prepare(jobQueryUtils.getAllJobs());
       const allPmJobs = getAllJobsQuery.all();
       const allPmJobsSchedulePromise = allPmJobs.map((pmJob) => {
         return this.scheduleCustomJobOnChange(pmJob);

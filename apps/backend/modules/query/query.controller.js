@@ -1,5 +1,3 @@
-const { prisma } = require("../../db/prisma");
-const constants = require("../../constants");
 const { extractError } = require("../../utils/error.util");
 const Logger = require("../../utils/logger");
 const { QueryService } = require("./query.services");

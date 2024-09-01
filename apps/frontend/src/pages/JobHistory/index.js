@@ -4,21 +4,16 @@ import { Chip, Pagination } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { fetchAllRowsAPI } from "../../api/tables";
 import { useAuthState } from "../../contexts/authContext";
 
-import { LOCAL_CONSTANTS } from "../../constants";
-import { Loading } from "../Loading";
-import { parse, stringify, toJSON, fromJSON } from "flatted";
 import moment from "moment";
 import "react-data-grid/lib/styles.css";
 import { BiCalendar } from "react-icons/bi";
-import { DataGridActionComponent } from "../../components/DataGridComponents/DataGridActionComponent";
-import { ErrorComponent } from "../../components/ErrorComponent";
-import { RawDataGridStatistics } from "../../components/DataGridComponents/RawDataGridStatistics";
-import { CodeEditor } from "../../components/CodeEditorComponent";
 import { getJobHistoryAPI } from "../../api/jobs";
+import { ErrorComponent } from "../../components/ErrorComponent";
+import { LOCAL_CONSTANTS } from "../../constants";
 import { getFieldFormatting } from "../../utils/tables";
+import { Loading } from "../Loading";
 const JobHistory = () => {
   const { pmUser } = useAuthState();
   const navigate = useNavigate();

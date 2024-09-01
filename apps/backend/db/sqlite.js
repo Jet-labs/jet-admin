@@ -1,3 +1,3 @@
-const sqlite_db = require("better-sqlite3")("../../sqlite_db.db");
+const sqliteDB = require("better-sqlite3")("../../sqlite-db.db");
 
-module.exports = { sqlite_db };
+module.exports = { sqliteDB };

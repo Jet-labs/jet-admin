@@ -2,7 +2,7 @@ const constants = require("../../constants");
 const Logger = require("../../utils/logger");
 const { GRAPH_PLUGINS_MAP } = require("./processors");
 const { graphQueryUtils } = require("../../utils/postgres-utils/graph-queries");
-const { sqlite_db } = require("../../db/sqlite");
+const { sqliteDB } = require("../../db/sqlite");
 
 class GraphService {
   constructor() {}
@@ -23,7 +23,7 @@ class GraphService {
       },
     });
     try {
-      const addGraphQuery = sqlite_db.prepare(graphQueryUtils.addGraph());
+      const addGraphQuery = sqliteDB.prepare(graphQueryUtils.addGraph());
       addGraphQuery.run(String(pmGraphTitle), JSON.stringify(pmGraphOptions));
       Logger.log("success", {
         message: "GraphService:addGraph:success",
@@ -62,7 +62,7 @@ class GraphService {
     });
     try {
       if (authorizedGraphs === true || authorizedGraphs.includes(pmGraphID)) {
-        const updateGraphQuery = sqlite_db.prepare(
+        const updateGraphQuery = sqliteDB.prepare(
           graphQueryUtils.updateGraph()
         );
         updateGraphQuery.run(
@@ -106,7 +106,7 @@ class GraphService {
     });
     try {
       if (authorizedGraphs === true || authorizedGraphs.includes(pmGraphID)) {
-        const getGraphByIDQuery = sqlite_db.prepare(
+        const getGraphByIDQuery = sqliteDB.prepare(
           graphQueryUtils.getGraphByID()
         );
         const graph = getGraphByIDQuery.get(pmGraphID);
@@ -149,7 +149,7 @@ class GraphService {
     });
     try {
       if (authorizedGraphs === true || authorizedGraphs.includes(pmGraphID)) {
-        const getGraphByIDQuery = sqlite_db.prepare(
+        const getGraphByIDQuery = sqliteDB.prepare(
           graphQueryUtils.getGraphByID()
         );
         const graph = getGraphByIDQuery.get(pmGraphID);
@@ -202,13 +202,13 @@ class GraphService {
       let graphs;
       if (authorizedGraphs === true) {
         // Fetch all graphs if authorizedGraphs is true
-        const getAllGraphsQuery = sqlite_db.prepare(
+        const getAllGraphsQuery = sqliteDB.prepare(
           graphQueryUtils.getAllGraphs()
         );
         graphs = getAllGraphsQuery.all();
       } else {
         // Fetch graphs where pm_graph_id is in the authorizedGraphs array
-        const getAllGraphsQuery = sqlite_db.prepare(
+        const getAllGraphsQuery = sqliteDB.prepare(
           graphQueryUtils.getAllGraphs(authorizedGraphs)
         );
         graphs = getAllGraphsQuery.all(...authorizedGraphs);
@@ -245,7 +245,7 @@ class GraphService {
     });
     try {
       if (authorizedGraphs === true || authorizedGraphs.includes(pmGraphID)) {
-        const deleteGraphQuery = sqlite_db.prepare(
+        const deleteGraphQuery = sqliteDB.prepare(
           graphQueryUtils.deleteGraph()
         );
         // Execute the delete

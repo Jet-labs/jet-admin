@@ -39,9 +39,8 @@ export const RawDataGrid = ({
   showStats,
   containerClass,
 }) => {
-  const { dbModel, internalAppConstants } = useAppConstants();
+  const { internalAppConstants } = useAppConstants();
   const { pmUser } = useAuthState();
-  const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [filterQuery, setFilterQuery] = useState(null);

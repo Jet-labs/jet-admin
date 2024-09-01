@@ -1,7 +1,7 @@
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
 const { runQuery } = require("./processors/postgresql");
-const { sqlite_db } = require("../../db/sqlite");
+const { sqliteDB } = require("../../db/sqlite");
 const { queryQueryUtils } = require("../../utils/postgres-utils/query-queries");
 
 class QueryService {
@@ -35,7 +35,7 @@ class QueryService {
       },
     });
     try {
-      const addQueryQuery = sqlite_db.prepare(queryQueryUtils.addQuery());
+      const addQueryQuery = sqliteDB.prepare(queryQueryUtils.addQuery());
 
       // Execute the insert
       addQueryQuery.run(
@@ -92,7 +92,7 @@ class QueryService {
     });
     try {
       if (authorizedQueries === true || authorizedQueries.includes(pmQueryID)) {
-        const updatedQueryQuery = sqlite_db.prepare(
+        const updatedQueryQuery = sqliteDB.prepare(
           queryQueryUtils.updateQuery()
         );
         // Execute the update
@@ -100,8 +100,8 @@ class QueryService {
           pmQueryTitle,
           pmQueryDescription,
           JSON.stringify(pmQuery), // Store JSON as TEXT
-          pmQueryArgs?JSON.stringify(pmQueryArgs):null, // Store JSON as TEXT
-          pmQueryMetadata ? JSON.stringify(pmQueryMetadata) :null, // Store JSON as TEXT
+          pmQueryArgs ? JSON.stringify(pmQueryArgs) : null, // Store JSON as TEXT
+          pmQueryMetadata ? JSON.stringify(pmQueryMetadata) : null, // Store JSON as TEXT
           pmQueryID
         );
         Logger.log("success", {
@@ -138,13 +138,13 @@ class QueryService {
       let queries;
       if (authorizedQueries === true) {
         // Fetch all queries if authorizedQueries is true
-        const getAllQueriesQuery = sqlite_db.prepare(
+        const getAllQueriesQuery = sqliteDB.prepare(
           queryQueryUtils.getAllQueries()
         );
         queries = getAllQueriesQuery.all();
       } else {
         // Fetch queries where pm_query_id is in the authorizedQueries array
-        const getAllQueriesQuery = sqlite_db.prepare(
+        const getAllQueriesQuery = sqliteDB.prepare(
           queryQueryUtils.getAllQueries(authorizedQueries)
         );
         queries = getAllQueriesQuery.all(...authorizedQueries);
@@ -179,7 +179,7 @@ class QueryService {
     });
     try {
       if (authorizedQueries === true || authorizedQueries.includes(pmQueryID)) {
-        const getQueryByIDQuery = sqlite_db.prepare(
+        const getQueryByIDQuery = sqliteDB.prepare(
           queryQueryUtils.getQueryByID()
         );
         const query = getQueryByIDQuery.get(pmQueryID);
@@ -266,14 +266,14 @@ class QueryService {
     });
     try {
       if (authorizedQueries === true || authorizedQueries.includes(pmQueryID)) {
-        const deleteQueryQuery = sqlite_db.prepare(
+        const deleteQueryQuery = sqliteDB.prepare(
           queryQueryUtils.deleteQuery()
         );
         // Execute the delete
         deleteQueryQuery.run(pmQueryID);
 
         Logger.log("success", {
-          message: "QueryService:deleteQuery:success"
+          message: "QueryService:deleteQuery:success",
         });
         return true;
       } else {

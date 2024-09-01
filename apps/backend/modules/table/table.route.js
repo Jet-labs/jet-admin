@@ -15,6 +15,13 @@ router.get(
 );
 
 router.get(
+  "/columns",
+  authMiddleware.authProvider,
+  policyMiddleware.populateAuthorizationPolicies,
+  tableController.getAllTableColumns
+);
+
+router.get(
   "/:table_name/columns",
   authMiddleware.authProvider,
   policyMiddleware.populateAuthorizationPolicies,
