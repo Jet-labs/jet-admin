@@ -41,6 +41,10 @@ export const TableDrawerList = () => {
     navigate(LOCAL_CONSTANTS.ROUTES.ADD_TABLE.path());
   };
 
+  const _navigateToSQLEditor = () => {
+    navigate(LOCAL_CONSTANTS.ROUTES.SQL_EDITOR.path());
+  };
+
   return (
     <List
       style={{
@@ -74,10 +78,20 @@ export const TableDrawerList = () => {
             className="!w-full"
             startIcon={<FaPlus className="!text-sm" />}
           >
-            Add table
+            {LOCAL_CONSTANTS.STRINGS.TABLE_ADD_BUTTON_TEXT}
           </Button>
         </div>
       )}
+      <div className="!px-3 !py-1.5 !w-full">
+        <Button
+          onClick={_navigateToSQLEditor}
+          variant="contained"
+          className="!w-full"
+          startIcon={<FaPlus className="!text-sm" />}
+        >
+          {LOCAL_CONSTANTS.STRINGS.SQL_EDITOR_NAVIGATE_BUTTON_TEXT}
+        </Button>
+      </div>
       <div className="!mt-1"></div>
       {tables?.map((table) => {
         const key = `table_${table}`;

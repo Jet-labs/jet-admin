@@ -88,8 +88,12 @@ export const DataGridFilterComponent = ({
   };
 
   const _handleAddFilter = (e) => {
-    e.preventDefault();
-    if (filterField && filterOperator && filterValue) {
+    
+    if (
+      filterField &&
+      filterOperator &&
+      !(filterValue === null || filterValue === undefined)
+    ) {
       const _filter = {
         field: filterField,
         operator: filterOperator,

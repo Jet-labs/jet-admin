@@ -183,12 +183,20 @@ export const LOCAL_CONSTANTS = {
     DASHBOARD_DELETION_CONFIRMATION_BODY:
       "Are you sure you want to delete dashboard",
     DASHBOARD_UPDATE_PAGE_TITLE: "Update dashboard",
+
+    //tables
+    TABLE_ADD_BUTTON_TEXT: "Add table",
+
+    //SQL
+    SQL_EDITOR_NAVIGATE_BUTTON_TEXT: "Open SQL editor",
   },
 
   // routes
   ROUTES: {
     HOME: "/",
     SIGNIN: "/signin",
+
+    SQL_EDITOR: { code: "sql_editor", path: () => "sql_editor" },
 
     ALL_TRIGGERS: {
       code: "/triggers/*",

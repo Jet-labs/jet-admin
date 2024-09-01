@@ -8,6 +8,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "../../Resizables";
+
 // import TableView from "../../pages/TableView";
 
 const UpdateRow = lazy(() => import("../../../pages/UpdateRow"));
@@ -17,6 +18,7 @@ const TableView = lazy(() => import("../../../pages/TableView"));
 const UpdateTableSchema = lazy(() =>
   import("../../../pages/UpdateTableSchema")
 );
+const SQLEditor = lazy(() => import("../../../pages/SQLEditor"));
 
 const TableLayout = () => {
   return (
@@ -28,6 +30,10 @@ const TableLayout = () => {
       <ResizablePanel defaultSize={80}>
         <Routes>
           <Route index element={<DatabaseView />} />
+          <Route
+            path={LOCAL_CONSTANTS.ROUTES.SQL_EDITOR.code}
+            element={<SQLEditor />}
+          />
           <Route
             path={LOCAL_CONSTANTS.ROUTES.ADD_TABLE.code}
             element={<UpdateTableSchema />}
