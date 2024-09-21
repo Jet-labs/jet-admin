@@ -4,7 +4,7 @@ export class Policy {
     this.pmPolicyObjectTitle = String(title);
     this.pmPolicyObject = JSON.parse(policy);
     this.createdAt = new Date(created_at);
-    this.isDisabled = new Boolean(is_disabled);
+    this.isDisabled = is_disabled;
   }
   static toList = (data) => {
     if (Array.isArray(data)) {

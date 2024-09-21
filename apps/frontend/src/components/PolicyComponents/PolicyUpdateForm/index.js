@@ -90,6 +90,8 @@ export const PolicyUpdateForm = ({ id }) => {
     }
   }, [policyObjectData]);
 
+  console.log({ policyObjectData });
+
   return !isLoadingPolicyObjectData &&
     !isLoadingPolicyObjectData &&
     policyObjectData ? (
@@ -143,7 +145,7 @@ export const PolicyUpdateForm = ({ id }) => {
               key={"pm_policy_object_id"}
             >
               <FieldComponent
-                type={LOCAL_CONSTANTS.DATA_TYPES.INT}
+                type={LOCAL_CONSTANTS.POSTGRE_SQL_DATA_TYPES.int4.name}
                 name={"pm_policy_object_id"}
                 value={policyObjectUpdateForm.values["pm_policy_object_id"]}
                 onBlur={policyObjectUpdateForm.handleBlur}
@@ -167,7 +169,7 @@ export const PolicyUpdateForm = ({ id }) => {
               key={"pm_policy_object_title"}
             >
               <FieldComponent
-                type={LOCAL_CONSTANTS.DATA_TYPES.STRING}
+                type={LOCAL_CONSTANTS.POSTGRE_SQL_DATA_TYPES.text.name}
                 name={"pm_policy_object_title"}
                 value={policyObjectUpdateForm.values["pm_policy_object_title"]}
                 onBlur={policyObjectUpdateForm.handleBlur}
@@ -185,7 +187,7 @@ export const PolicyUpdateForm = ({ id }) => {
             </Grid>
             <Grid item xs={12} sm={12} md={12} lg={12} key={"is_disabled"}>
               <FieldComponent
-                type={LOCAL_CONSTANTS.DATA_TYPES.BOOLEAN}
+                type={LOCAL_CONSTANTS.POSTGRE_SQL_DATA_TYPES.bool.name}
                 name={"is_disabled"}
                 value={policyObjectUpdateForm.values["is_disabled"]}
                 onBlur={policyObjectUpdateForm.handleBlur}

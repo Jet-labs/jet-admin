@@ -150,14 +150,14 @@ export const DashboardUpdateForm = ({ id }) => {
             >
               <FieldComponent
                 name={"pm_dashboard_title"}
-                type={LOCAL_CONSTANTS.DATA_TYPES.STRING}
+                type={LOCAL_CONSTANTS.POSTGRE_SQL_DATA_TYPES.text.name}
                 value={dashboardForm.values["pm_dashboard_title"]}
                 onChange={dashboardForm.handleChange}
               />
               <div className="mt-2"></div>
               <FieldComponent
                 name={"pm_dashboard_description"}
-                type={LOCAL_CONSTANTS.DATA_TYPES.STRING}
+                type={LOCAL_CONSTANTS.POSTGRE_SQL_DATA_TYPES.text.name}
                 value={dashboardForm.values["pm_dashboard_description"]}
                 onChange={dashboardForm.handleChange}
               />

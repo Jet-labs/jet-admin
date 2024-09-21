@@ -96,6 +96,8 @@ export const AccountUpdationForm = ({ id }) => {
     }
   }, [pmUserData]);
 
+  console.log({ pmUserData });
+
   const customPolicyObjectMapping = useMemo(() => {
     const map = {};
     if (policyObjectData) {
@@ -152,7 +154,7 @@ export const AccountUpdationForm = ({ id }) => {
           <Grid container rowSpacing={2} columnSpacing={3} className="!mt-2">
             <Grid item xs={12} sm={12} md={12} lg={12} key={"first_name"}>
               <FieldComponent
-                type={"String"}
+                type={LOCAL_CONSTANTS.POSTGRE_SQL_DATA_TYPES.text.name}
                 name={"first_name"}
                 readOnly={false}
                 value={accountUpdateForm.values["first_name"]}
@@ -167,7 +169,7 @@ export const AccountUpdationForm = ({ id }) => {
             </Grid>
             <Grid item xs={12} sm={12} md={12} lg={12} key={"last_name"}>
               <FieldComponent
-                type={"String"}
+                type={LOCAL_CONSTANTS.POSTGRE_SQL_DATA_TYPES.text.name}
                 name={"last_name"}
                 readOnly={false}
                 value={accountUpdateForm.values["last_name"]}
@@ -182,7 +184,7 @@ export const AccountUpdationForm = ({ id }) => {
             </Grid>
             <Grid item xs={12} sm={12} md={12} lg={12} key={"address1"}>
               <FieldComponent
-                type={"String"}
+                type={LOCAL_CONSTANTS.POSTGRE_SQL_DATA_TYPES.text.name}
                 name={"address1"}
                 readOnly={false}
                 value={accountUpdateForm.values["address1"]}
@@ -205,7 +207,7 @@ export const AccountUpdationForm = ({ id }) => {
               key={"pm_policy_object_id"}
             >
               <FieldComponent
-                type={"Int"}
+                type={LOCAL_CONSTANTS.POSTGRE_SQL_DATA_TYPES.int4.name}
                 name={"pm_policy_object_id"}
                 value={accountUpdateForm.values["pm_policy_object_id"]}
                 onBlur={accountUpdateForm.handleBlur}

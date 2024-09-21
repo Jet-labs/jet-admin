@@ -15,12 +15,12 @@ import {
   StaticDateTimePicker,
 } from "@mui/x-date-pickers";
 import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
-import { capitalize, isNull, lowerCase } from "lodash";
+import { isNull, lowerCase } from "lodash";
 import moment from "moment";
-import { LOCAL_CONSTANTS } from "../../constants";
-import { CodeEditor } from "../CodeEditorComponent";
 import { FaChevronDown } from "react-icons/fa";
+import { LOCAL_CONSTANTS } from "../../constants";
 import { ArrayInput } from "../ArrayInputComponent";
+import { CodeEditor } from "../CodeEditorComponent";
 
 export const FieldComponent = ({
   type,
@@ -246,7 +246,6 @@ export const FieldComponent = ({
                 ))}
               </Box>
             )}
-            // MenuProps={MenuProps}
           >
             {selectOptions?.map((row) => {
               return (
@@ -283,7 +282,11 @@ export const FieldComponent = ({
           <Select
             id={name}
             name={name}
-            onChange={onChange}
+            onChange={
+              typeof value === "number"
+                ? (e) => setFieldValue(name, e.target.value == true ? 1 : 0)
+                : onChange
+            }
             onBlur={onBlur}
             value={Boolean(value)}
             error={error}
