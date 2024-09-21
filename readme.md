@@ -7,12 +7,13 @@
 ----------
 Welcome to Jet Admin, a web-based PostgreSQL tables manager and admin dashboard for your operations! Edit data, build graphs, and create dashboards using queries.
 
+![cover](https://github.com/user-attachments/assets/c6b822d6-90a7-4ac2-8294-8766e684c055)
 
 ## **Overview**
 -----------
 This project aims to provide users with a user-friendly interface to manage their PostgreSQL databases and create dashboards. The project consists of a frontend and a backend component for managing PostgreSQL databases through a web interface.
 
-https://github.com/user-attachments/assets/7b387e54-6cf8-4257-9ce9-4c85bd8a3868
+
 
 ## **Documentation**
 Checkout out documentation website [https://jet-labs.github.io/documentation]
