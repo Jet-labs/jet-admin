@@ -1,15 +1,13 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { Button } from "@mui/material";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { IoTrash } from "react-icons/io5";
 import { exportRowByMultipleIDsAPI } from "../../../api/tables";
-import { useAuthState } from "../../../contexts/authContext";
-import { displayError, displaySuccess } from "../../../utils/notification";
-import { ConfirmationDialog } from "../../ConfirmationDialog";
 import { LOCAL_CONSTANTS } from "../../../constants";
+import { useAuthState } from "../../../contexts/authContext";
+import { displayError } from "../../../utils/notification";
 import { DataExportConfirmationDialog } from "../DataExportConfirmationDialog";
-import { generateFilterQuery } from "../../../utils/postgresUtils/tables";
 export const DataExportFormComponent = ({
   tableName,
   filterQuery,
@@ -32,9 +30,7 @@ export const DataExportFormComponent = ({
       exportRowByMultipleIDsAPI({
         tableName,
         format,
-        selectedRowIDs: isAllRowSelectChecked
-          ? generateFilterQuery(filterQuery)
-          : selectedRowIDs,
+        selectedRowIDs: isAllRowSelectChecked ? filterQuery : selectedRowIDs,
       }),
     retry: false,
     onSuccess: () => {
@@ -48,11 +44,7 @@ export const DataExportFormComponent = ({
       displayError(error);
     },
   });
-  console.log({
-    selectedRowIDs: isAllRowSelectChecked
-      ? generateFilterQuery(filterQuery)
-      : selectedRowIDs,
-  });
+
   const _handleOpenExportRowsConfirmation = () => {
     setIsExportRowsConfirmationOpen(true);
   };

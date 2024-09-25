@@ -23,7 +23,6 @@ import { useAppConstants } from "../../../contexts/appConstantsContext";
 import { Loading } from "../../../pages/Loading";
 import {
   combinePrimaryKeyToWhereClause,
-  generateFilterQuery,
   generateOrderByQuery,
 } from "../../../utils/postgresUtils/tables";
 import { getFormattedTableColumns } from "../../../utils/tables";
@@ -78,7 +77,7 @@ export const JobHistoryComponent = ({
         tableName,
         page,
         pageSize,
-        filterQuery: generateFilterQuery(filterQuery),
+        filterQuery: filterQuery,
         sortModel: sortModel ? generateOrderByQuery(sortModel) : null,
       }),
 

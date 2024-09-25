@@ -23,7 +23,6 @@ import { useAppConstants } from "../../../contexts/appConstantsContext";
 import { Loading } from "../../../pages/Loading";
 import {
   combinePrimaryKeyToWhereClause,
-  generateFilterQuery,
   generateOrderByQuery,
 } from "../../../utils/postgresUtils/tables";
 import { getFormattedTableColumns } from "../../../utils/tables";
@@ -78,7 +77,7 @@ export const RawDataGrid = ({
         tableName,
         page,
         pageSize,
-        filterQuery: generateFilterQuery(filterQuery),
+        filterQuery: filterQuery,
         sortModel: sortModel ? generateOrderByQuery(sortModel) : null,
       }),
 
@@ -159,6 +158,8 @@ export const RawDataGrid = ({
       setFilterQuery(null);
     }
   }, [filters, debouncedSearchTerm, combinator, tableColumns, tableName]);
+
+  console.log({ filterQuery });
 
   const columns = useMemo(() => {
     if (tableColumns && tableName) {

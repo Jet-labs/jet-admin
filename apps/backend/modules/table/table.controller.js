@@ -5,6 +5,7 @@ const { TableService } = require("./table.services");
 const { createObjectCsvStringifier } = require("csv-writer");
 const ExcelJS = require("exceljs");
 const { generateOrderByQuery } = require("../../utils/postgres-utils/parsers");
+const { generateFilterQuery } = require("../../utils/string.util");
 
 const tableController = {};
 
@@ -60,10 +61,12 @@ tableController.getAllTableColumns = async (req, res) => {
     const { pmUser, state } = req;
     const pm_user_id = parseInt(pmUser.pm_user_id);
     const authorizationPolicy = state.authorization_policy;
-    const authorizedTableColumns = await TableService.getAuthorizedTableColumns({
-      authorizationPolicy,
-      schema: "public",
-    });
+    const authorizedTableColumns = await TableService.getAuthorizedTableColumns(
+      {
+        authorizationPolicy,
+        schema: "public",
+      }
+    );
     Logger.log("info", {
       message: "tableController:getTableColumns:rows",
       params: {
@@ -177,8 +180,8 @@ tableController.getTableStatistics = async (req, res) => {
     const pm_user_id = parseInt(pmUser.pm_user_id);
     const { table_name } = req.params;
     const { q } = req.query;
-    console.log({ q: String(q) });
-    let filter = q && q !== "" && q != "null" ? String(q) : null;
+    let filter =
+      q && q !== "" && q != "null" ? generateFilterQuery(JSON.parse(q)) : null;
 
     Logger.log("info", {
       message: "tableController:getTableStatistics:params",
@@ -271,7 +274,9 @@ tableController.getAllRows = async (req, res) => {
     const pm_user_id = parseInt(pmUser.pm_user_id);
     const { table_name } = req.params;
     const { page, page_size, q, order } = req.query;
-    let filter = q && q !== "" && q != "null" ? String(q) : null;
+
+    let filter =
+      q && q !== "" && q != "null" ? generateFilterQuery(JSON.parse(q)) : null;
     let orderBy =
       order && order !== "" && order != "null" ? String(order) : null;
     let skip = 0;
@@ -512,7 +517,11 @@ tableController.exportRowByMultipleIDs = async (req, res) => {
       query: query,
       authorizedRows: authorized_rows,
     });
-    console.log({ rows });
+
+    Logger.log("warning", {
+      message: "tableController:exportRowByMultipleIDs:rows",
+      params: { rows },
+    });
 
     if (format === "csv") {
       res.setHeader("Content-Disposition", 'attachment; filename="data.csv"');
