@@ -2,8 +2,7 @@ const morgan = require("morgan");
 const { winstonLogger } = require("./winston.config");
 
 const stream = {
-  // Use the http severity
-  write: (message) => winstonLogger.http(message),
+  write: (message) => winstonLogger.warning(message),
 };
 
 const skip = () => {

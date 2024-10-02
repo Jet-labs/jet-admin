@@ -8,19 +8,15 @@ const environment = require("../environment");
 // winston.add(new winston.transports.Syslog());
 const appLogLevels = {
   levels: {
-    revert: 0,
     error: 2,
     warning: 3,
     success: 4,
-    http: 5,
-    info: 6,
+    info: 5,
   },
   colors: {
-    revert: "yellow",
     error: "red",
     warning: "yellow",
     success: "green",
-    http: "magenta",
     info: "cyan",
   },
 };
@@ -55,15 +51,15 @@ const winstonLogger = winston.createLogger({
     )
   ),
   transports: [
-    // new winston.transports.Syslog({
-    //   level: "info",
-    // }),
+    new winston.transports.Syslog({
+      level: environment.SYSLOG_LEVEL,
+    }),
     new winston.transports.Console(),
     new winston.transports.DailyRotateFile({
-      filename: `logs/errors/${constants.BACKEND_NODE_ID}-%DATE%.log`,
-      level: "error",
-      maxSize: "1m",
-      maxFiles: "5d",
+      filename: `logs/${constants.BACKEND_NODE_ID}-%DATE%.log`,
+      level: environment.LOG_LEVEL,
+      maxSize: `${environment.LOG_FILE_SIZE}m`,
+      maxFiles: `${environment.LOG_RETENTION}d`,
     }),
     new SlackHook({
       webhookUrl: environment.SLACK_ERROR_NOTIFICATION_HOOK,
@@ -72,10 +68,5 @@ const winstonLogger = winston.createLogger({
   ],
 });
 
-// winstonLogger.stream = {
-//     write: function (message, encoding) {
-//         winstonLogger.http(message);
-//     }
-// };
 
 module.exports = { winstonLogger };
