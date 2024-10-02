@@ -2,10 +2,10 @@ const winston = require("winston");
 require("winston-daily-rotate-file");
 require("winston-syslog").Syslog;
 const SlackHook = require("winston-slack-webhook-transport");
-const constants = require("../constants");
 const environment = require("../environment");
-// winston.add(new winston.transports.Syslog(options));
-// winston.add(new winston.transports.Syslog());
+
+const NODE_ID =
+  environment.NODE_ENV === "development" ? "dev_node_1" : "prod_node_1";
 const appLogLevels = {
   levels: {
     error: 2,
@@ -39,7 +39,7 @@ const winstonLogger = winston.createLogger({
       all: true,
     }),
     winston.format.label({
-      label: constants.BACKEND_NODE_ID,
+      label: NODE_ID,
     }),
     winston.format.timestamp({
       format: "DD-MM-YYYY HH:mm:ss",
@@ -59,7 +59,7 @@ const winstonLogger = winston.createLogger({
     }),
     new winston.transports.Console(),
     new winston.transports.DailyRotateFile({
-      filename: `logs/${constants.BACKEND_NODE_ID}-%DATE%.log`,
+      filename: `logs/${NODE_ID}-%DATE%.log`,
       level: environment.LOG_LEVEL,
       maxSize: `${environment.LOG_FILE_SIZE}m`,
       maxFiles: `${environment.LOG_RETENTION}d`,
