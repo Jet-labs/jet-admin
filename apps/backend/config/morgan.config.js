@@ -2,7 +2,7 @@ const morgan = require("morgan");
 const { winstonLogger } = require("./winston.config");
 
 const stream = {
-  write: (message) => winstonLogger.warning(message),
+  write: (message) => winstonLogger.info(message),
 };
 
 const skip = () => {

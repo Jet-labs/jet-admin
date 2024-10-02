@@ -53,6 +53,9 @@ const winstonLogger = winston.createLogger({
   transports: [
     new winston.transports.Syslog({
       level: environment.SYSLOG_LEVEL,
+      host: environment.SYSLOG_HOST,
+      port: environment.SYSLOG_PORT,
+      protocol: environment.SYSLOG_PROTOCOL,
     }),
     new winston.transports.Console(),
     new winston.transports.DailyRotateFile({
