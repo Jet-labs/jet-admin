@@ -1,7 +1,5 @@
 <a href="https://www.producthunt.com/posts/jet-admin-3?embed=true&utm_source=badge-featured&utm_medium=badge&utm_souce=badge-jet&#0045;admin&#0045;3" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=474841&theme=light" alt="Jet&#0032;Admin - PostgreSQL&#0032;tables&#0032;manager&#0032;and&#0032;admin&#0032;dashboard | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
 
-![jet-admin](https://github.com/user-attachments/assets/48cb286e-05ee-4d28-a9c5-90c58693eeab)
-
 # **Jet Admin** 
 
 ----------
