@@ -3,6 +3,7 @@ import {
   Button,
   Chip,
   FormControl,
+  Grid,
   MenuItem,
   OutlinedInput,
   Select,
@@ -20,6 +21,7 @@ import {
   TRIGGER_IMPACT_TIMING,
 } from "../../../utils/editorAutocomplete/pgKeywords";
 import { displayError, displaySuccess } from "../../../utils/notification";
+import theme from "../../../theme";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -110,181 +112,186 @@ const TriggerAdditionForm = () => {
   });
 
   return (
-    <div className="flex flex-col justify-start items-center w-full pb-5 p-2">
-      <div className=" flex flex-row justify-between 2xl:w-3/5 xl:w-3/4 lg:w-2/3 md:w-full  mt-3 w-full ">
-        <div className="flex flex-col items-start justify-start">
-          <span className="text-lg font-bold text-start ">
-            {LOCAL_CONSTANTS.STRINGS.TRIGGER_ADDITION_PAGE_TITLE}
-          </span>
-        </div>
-
-        <div className="flex flex-row items-center justify-end w-min ">
-          <Button
-            disableElevation
-            variant="contained"
-            size="small"
-            type="submit"
-            className="!ml-2"
-            onClick={triggerBuilderForm.submitForm}
-          >
-            {LOCAL_CONSTANTS.STRINGS.ADD_BUTTON_TEXT}
-          </Button>
-        </div>
-      </div>
-      <form
-        className="!flex !flex-col justify-start items-stretch 2xl:w-3/5 xl:w-3/4 lg:w-2/3 md:w-full"
-        onSubmit={triggerBuilderForm.handleSubmit}
+    <div className="w-full !h-[calc(100vh-100px)]">
+      <div
+        className="flex flex-col items-start justify-start p-3 px-6"
+        style={{ background: theme.palette.background.paper }}
       >
-        <FormControl fullWidth size="small" className="!mt-3">
-          <span className="text-xs font-light  !capitalize mb-1">{`Name`}</span>
-          <TextField
-            required={true}
-            fullWidth
-            size="small"
-            variant="outlined"
-            type="text"
-            name={"pm_trigger_name"}
-            value={triggerBuilderForm.values.pm_trigger_name}
-            onChange={triggerBuilderForm.handleChange}
-            onBlur={triggerBuilderForm.handleBlur}
-            error={triggerBuilderForm.errors.pm_trigger_name}
-          />
-          {/* {error && <span className="mt-2 text-red-500">{error}</span>} */}
-        </FormControl>
-        <FormControl fullWidth size="small" className="!mt-3">
-          <span className="text-xs font-light  !capitalize mb-1">{`Table name`}</span>
-          <Select
-            required={true}
-            fullWidth
-            size="small"
-            variant="outlined"
-            type="text"
-            name={"pm_trigger_table_name"}
-            value={triggerBuilderForm.values.pm_trigger_table_name}
-            onChange={triggerBuilderForm.handleChange}
-            onBlur={triggerBuilderForm.handleBlur}
-            error={triggerBuilderForm.errors.pm_trigger_table_name}
+        <span className="text-lg font-bold text-start mt-1">
+          {LOCAL_CONSTANTS.STRINGS.TRIGGER_ADDITION_PAGE_TITLE}
+        </span>
+      </div>
+      <Grid container>
+        <Grid item xl={6} lg={6} md={12} sm={12} xs={12}>
+          <form
+            className="!flex !flex-col justify-start items-stretch w-full p-3"
+            onSubmit={triggerBuilderForm.handleSubmit}
           >
-            {tables?.map((table) => {
-              return <MenuItem value={table}>{table}</MenuItem>;
-            })}
-          </Select>
-        </FormControl>
-        <FormControl fullWidth size="small" className="!mt-3">
-          <span className="text-xs font-light  !capitalize mb-1">{`Trigger timing`}</span>
-          <Select
-            required={true}
-            fullWidth
-            size="small"
-            variant="outlined"
-            type="text"
-            name={"pm_trigger_timing"}
-            value={triggerBuilderForm.values.pm_trigger_timing}
-            onChange={triggerBuilderForm.handleChange}
-            onBlur={triggerBuilderForm.handleBlur}
-            error={triggerBuilderForm.errors.pm_trigger_timing}
-          >
-            {Object.keys(TRIGGER_IMPACT_TIMING).map((key) => {
-              return (
-                <MenuItem value={TRIGGER_IMPACT_TIMING[key]}>
-                  {TRIGGER_IMPACT_TIMING[key]}
-                </MenuItem>
-              );
-            })}
-          </Select>
-        </FormControl>
-        <FormControl fullWidth size="small" className="!mt-3">
-          <span className="text-xs font-light  !capitalize mb-1">{`Trigger events`}</span>
-          <Select
-            id={"pm_trigger_events"}
-            multiple
-            value={triggerBuilderForm.values.pm_trigger_events}
-            onChange={triggerBuilderForm.handleChange}
-            onBlur={triggerBuilderForm.handleBlur}
-            name="pm_trigger_events"
-            input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
-            error={triggerBuilderForm.errors.pm_trigger_events}
-            renderValue={(selected) => (
-              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
-                {selected.map((value) => (
-                  <Chip
-                    className="!rounded"
-                    size="small"
-                    key={value}
-                    label={value}
-                  />
-                ))}
-              </Box>
-            )}
-            MenuProps={MenuProps}
-          >
-            {Object.keys(TRIGGER_EVENT).map((key) => (
-              <MenuItem
-                key={key}
-                value={TRIGGER_EVENT[key]}
-                // style={getStyles(name, personName, theme)}
+            <FormControl fullWidth size="small" className="!mt-3">
+              <span className="text-xs font-light  !capitalize mb-1">{`Name`}</span>
+              <TextField
+                required={true}
+                fullWidth
+                size="small"
+                variant="outlined"
+                type="text"
+                name={"pm_trigger_name"}
+                value={triggerBuilderForm.values.pm_trigger_name}
+                onChange={triggerBuilderForm.handleChange}
+                onBlur={triggerBuilderForm.handleBlur}
+                error={triggerBuilderForm.errors.pm_trigger_name}
+              />
+              {/* {error && <span className="mt-2 text-red-500">{error}</span>} */}
+            </FormControl>
+            <FormControl fullWidth size="small" className="!mt-3">
+              <span className="text-xs font-light  !capitalize mb-1">{`Table name`}</span>
+              <Select
+                required={true}
+                fullWidth
+                size="small"
+                variant="outlined"
+                type="text"
+                name={"pm_trigger_table_name"}
+                value={triggerBuilderForm.values.pm_trigger_table_name}
+                onChange={triggerBuilderForm.handleChange}
+                onBlur={triggerBuilderForm.handleBlur}
+                error={triggerBuilderForm.errors.pm_trigger_table_name}
               >
-                {TRIGGER_EVENT[key]}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        <FormControl fullWidth size="small" className="!mt-3">
-          <span className="text-xs font-light  !capitalize mb-1">{`Trigger method`}</span>
-          <Select
-            required={true}
-            fullWidth
-            size="small"
-            variant="outlined"
-            type="text"
-            name={"pm_trigger_method"}
-            value={triggerBuilderForm.values.pm_trigger_method}
-            onChange={triggerBuilderForm.handleChange}
-            onBlur={triggerBuilderForm.handleBlur}
-            error={triggerBuilderForm.errors.pm_trigger_method}
-          >
-            {Object.keys(TRIGGER_FIRE_METHOD).map((key) => {
-              return (
-                <MenuItem value={TRIGGER_FIRE_METHOD[key]}>
-                  {TRIGGER_FIRE_METHOD[key]}
-                </MenuItem>
-              );
-            })}
-          </Select>
-        </FormControl>
-        <FormControl fullWidth size="small" className="!mt-3">
-          <span className="text-xs font-light  !capitalize mb-1">{`Trigger condition`}</span>
-          <TextField
-            required={false}
-            fullWidth
-            size="small"
-            variant="outlined"
-            type="text"
-            name={"pm_trigger_condition"}
-            value={triggerBuilderForm.values.pm_trigger_condition}
-            onChange={triggerBuilderForm.handleChange}
-            onBlur={triggerBuilderForm.handleBlur}
-            error={triggerBuilderForm.errors.pm_trigger_condition}
-          />
-          {/* {error && <span className="mt-2 text-red-500">{error}</span>} */}
-        </FormControl>
-        <FormControl fullWidth size="small" className="!mt-3">
-          <span className="text-xs font-light  !capitalize mb-1">{`Notification channel`}</span>
-          <TextField
-            required={true}
-            fullWidth
-            size="small"
-            variant="outlined"
-            type="text"
-            name={"pm_trigger_channel_name"}
-            value={triggerBuilderForm.values.pm_trigger_channel_name}
-            onChange={triggerBuilderForm.handleChange}
-            onBlur={triggerBuilderForm.handleBlur}
-            error={triggerBuilderForm.errors.pm_trigger_channel_name}
-          />
-          {/* {error && <span className="mt-2 text-red-500">{error}</span>} */}
-        </FormControl>
-      </form>
+                {tables?.map((table) => {
+                  return <MenuItem value={table}>{table}</MenuItem>;
+                })}
+              </Select>
+            </FormControl>
+            <FormControl fullWidth size="small" className="!mt-3">
+              <span className="text-xs font-light  !capitalize mb-1">{`Trigger timing`}</span>
+              <Select
+                required={true}
+                fullWidth
+                size="small"
+                variant="outlined"
+                type="text"
+                name={"pm_trigger_timing"}
+                value={triggerBuilderForm.values.pm_trigger_timing}
+                onChange={triggerBuilderForm.handleChange}
+                onBlur={triggerBuilderForm.handleBlur}
+                error={triggerBuilderForm.errors.pm_trigger_timing}
+              >
+                {Object.keys(TRIGGER_IMPACT_TIMING).map((key) => {
+                  return (
+                    <MenuItem value={TRIGGER_IMPACT_TIMING[key]}>
+                      {TRIGGER_IMPACT_TIMING[key]}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            </FormControl>
+            <FormControl fullWidth size="small" className="!mt-3">
+              <span className="text-xs font-light  !capitalize mb-1">{`Trigger events`}</span>
+              <Select
+                id={"pm_trigger_events"}
+                multiple
+                value={triggerBuilderForm.values.pm_trigger_events}
+                onChange={triggerBuilderForm.handleChange}
+                onBlur={triggerBuilderForm.handleBlur}
+                name="pm_trigger_events"
+                input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
+                error={triggerBuilderForm.errors.pm_trigger_events}
+                renderValue={(selected) => (
+                  <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                    {selected.map((value) => (
+                      <Chip
+                        className="!rounded"
+                        size="small"
+                        key={value}
+                        label={value}
+                      />
+                    ))}
+                  </Box>
+                )}
+                MenuProps={MenuProps}
+              >
+                {Object.keys(TRIGGER_EVENT).map((key) => (
+                  <MenuItem
+                    key={key}
+                    value={TRIGGER_EVENT[key]}
+                    // style={getStyles(name, personName, theme)}
+                  >
+                    {TRIGGER_EVENT[key]}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl fullWidth size="small" className="!mt-3">
+              <span className="text-xs font-light  !capitalize mb-1">{`Trigger method`}</span>
+              <Select
+                required={true}
+                fullWidth
+                size="small"
+                variant="outlined"
+                type="text"
+                name={"pm_trigger_method"}
+                value={triggerBuilderForm.values.pm_trigger_method}
+                onChange={triggerBuilderForm.handleChange}
+                onBlur={triggerBuilderForm.handleBlur}
+                error={triggerBuilderForm.errors.pm_trigger_method}
+              >
+                {Object.keys(TRIGGER_FIRE_METHOD).map((key) => {
+                  return (
+                    <MenuItem value={TRIGGER_FIRE_METHOD[key]}>
+                      {TRIGGER_FIRE_METHOD[key]}
+                    </MenuItem>
+                  );
+                })}
+              </Select>
+            </FormControl>
+            <FormControl fullWidth size="small" className="!mt-3">
+              <span className="text-xs font-light  !capitalize mb-1">{`Trigger condition`}</span>
+              <TextField
+                required={false}
+                fullWidth
+                size="small"
+                variant="outlined"
+                type="text"
+                name={"pm_trigger_condition"}
+                value={triggerBuilderForm.values.pm_trigger_condition}
+                onChange={triggerBuilderForm.handleChange}
+                onBlur={triggerBuilderForm.handleBlur}
+                error={triggerBuilderForm.errors.pm_trigger_condition}
+              />
+              {/* {error && <span className="mt-2 text-red-500">{error}</span>} */}
+            </FormControl>
+            <FormControl fullWidth size="small" className="!mt-3">
+              <span className="text-xs font-light  !capitalize mb-1">{`Notification channel`}</span>
+              <TextField
+                required={true}
+                fullWidth
+                size="small"
+                variant="outlined"
+                type="text"
+                name={"pm_trigger_channel_name"}
+                value={triggerBuilderForm.values.pm_trigger_channel_name}
+                onChange={triggerBuilderForm.handleChange}
+                onBlur={triggerBuilderForm.handleBlur}
+                error={triggerBuilderForm.errors.pm_trigger_channel_name}
+              />
+              {/* {error && <span className="mt-2 text-red-500">{error}</span>} */}
+            </FormControl>
+            <div className="flex flex-row items-center justify-end w-full mt-10">
+              <Button
+                disableElevation
+                variant="contained"
+                size="small"
+                type="submit"
+                className="!ml-2"
+                onClick={triggerBuilderForm.submitForm}
+              >
+                {LOCAL_CONSTANTS.STRINGS.ADD_BUTTON_TEXT}
+              </Button>
+            </div>
+          </form>
+        </Grid>
+        <Grid item xl={6} lg={6} md={0} sm={0} xs={0} className="!p-3"></Grid>
+      </Grid>
     </div>
   );
 };

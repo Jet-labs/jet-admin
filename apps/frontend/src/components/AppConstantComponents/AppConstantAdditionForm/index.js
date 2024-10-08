@@ -85,9 +85,7 @@ export const AppConstantAdditionForm = () => {
             </Button>
           </div>
         </Grid>
-        <Grid item xl={6} lg={6} md={0} sm={0} xs={0} className="!p-3">
-          <Tip tip={app_constant_usage_tip}></Tip>
-        </Grid>
+        <Grid item xl={6} lg={6} md={0} sm={0} xs={0} className="!p-3"></Grid>
       </Grid>
     </div>
   );

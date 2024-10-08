@@ -20,7 +20,6 @@ const TriggerViewComponent = ({ id }) => {
     retry: 1,
     staleTime: 0,
   });
-  const rows = trigger ? Object.entries(trigger) : null;
   return (
     <div className="w-full !h-[calc(100vh-50px)] overflow-y-scroll">
       <div
@@ -36,7 +35,7 @@ const TriggerViewComponent = ({ id }) => {
         </span>
       </div>
       {trigger && (
-        <div className="flex flex-col items-start justify-start p-3 px-6 w-full">
+        <div className="flex flex-col items-start justify-start p-3 w-full">
           <span className="text-xs font-thin  text-start mt-1">Name</span>
           <span className="text-base font-semibold text-start mt-1">
             {trigger.pm_trigger_name}

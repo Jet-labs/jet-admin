@@ -142,9 +142,6 @@ export const QueryAdditionForm = () => {
               {LOCAL_CONSTANTS.STRINGS.ADD_BUTTON_TEXT}
             </Button>
           </div>
-          <div className="!mt-10 px-3">
-            <Tip tip={query_variable_usage_tip}></Tip>
-          </div>
         </ResizablePanel>
         <ResizableHandle withHandle={true} />
         <ResizablePanel defaultSize={60} className="w-full !h-full">

@@ -188,9 +188,6 @@ export const QueryUpdateForm = ({ id }) => {
             <QueryDeletionForm id={id} />
             <QueryDuplicateForm id={id} />
           </div>
-          <div className="!mt-10 px-3">
-            <Tip tip={query_variable_usage_tip}></Tip>
-          </div>
         </ResizablePanel>
         <ResizableHandle withHandle={true} />
         <ResizablePanel defaultSize={40} className="w-full !h-full">
