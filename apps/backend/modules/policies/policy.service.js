@@ -154,7 +154,7 @@ class PolicyService {
       });
       const newPolicy = await this.addPolicy({
         pmPolicyObjectTitle: `${policy.title} copy`,
-        pmPolcyObject: policy.policy,
+        pmPolcyObject: JSON.parse(policy.policy),
       });
       Logger.log("success", {
         message: "PolicyService:duplicatePolicy:newPolicy",
