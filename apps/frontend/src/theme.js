@@ -126,7 +126,17 @@ export const customDarkTheme = {
       styleOverrides: {
         root: {
           "& .ant-select": {
+            background: "#00000000 !important",
+          },
+          "& .ant-select-selector": {
             background: "#333333 !important",
+            color: "#fff",
+            borderColor: "#444444 !important",
+            // paddingBlock: 0,
+          },
+          "& .ant-select-arrow": {
+            background: "#333333 !important",
+            color: "#fff",
           },
         },
       },
