@@ -1,18 +1,16 @@
 import React, { Suspense } from "react";
 import {
+  createBrowserRouter,
   Navigate,
-  Route,
-  BrowserRouter as Router,
-  Routes,
+  RouterProvider,
 } from "react-router-dom";
 import { LOCAL_CONSTANTS } from "../constants";
 
-import { Loading } from "../pages/Loading";
-import ProtectedRoute from "./ProtectedRoute";
-
 import { lazy } from "react";
 import SignIn from "../pages/SignIn";
-
+import { ProtectedLayout } from "./Layouts/ProtectedLayout";
+import { RootLayout } from "./Layouts/RootLayout";
+import { Loading } from "../pages/Loading";
 
 const AllPolicies = lazy(() => import("../pages/AllPolicies"));
 const UpdatePolicy = lazy(() => import("../pages/UpdatePolicy"));
@@ -28,187 +26,92 @@ const JobLayout = lazy(() => import("./Layouts/JobLayout"));
 const AppConstantLayout = lazy(() => import("./Layouts/AppConstantLayout"));
 const TriggerLayout = lazy(() => import("./Layouts/TriggerLayout"));
 
-// const TableLayout = lazy(() => {
-//   return new Promise((resolve) => {
-//     setTimeout(() => resolve(import("./Layouts/TableLayout")), 3000000);
-//   });
-// });
+const router = createBrowserRouter([
+  {
+    element: <RootLayout />,
+    children: [
+      { path: LOCAL_CONSTANTS.ROUTES.SIGNIN, element: <SignIn /> },
+      {
+        element: <ProtectedLayout />,
+        children: [
+          {
+            index: true,
+            element: (
+              <Navigate
+                to={LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.path()}
+                replace
+              />
+            ),
+          },
+          {
+            path: LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.code,
+            element: <DashboardLayout />,
+          },
+          {
+            path: LOCAL_CONSTANTS.ROUTES.ALL_TABLES.code,
+            element: <TableLayout />,
+          },
+          {
+            path: LOCAL_CONSTANTS.ROUTES.ALL_QUERIES.code,
+            element: <QueryLayout />,
+          },
+          {
+            path: LOCAL_CONSTANTS.ROUTES.ALL_JOBS.code,
+            element: <JobLayout />,
+          },
+          {
+            path: LOCAL_CONSTANTS.ROUTES.ALL_GRAPHS.code,
+            element: <GraphLayout />,
+          },
+          {
+            path: LOCAL_CONSTANTS.ROUTES.ALL_APP_CONSTANTS.code,
+            element: <AppConstantLayout />,
+          },
+          {
+            path: LOCAL_CONSTANTS.ROUTES.ALL_TRIGGERS.code,
+            element: <TriggerLayout />,
+          },
+          {
+            path: LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT.code,
+            children: [
+              { index: true, element: <AllPolicies /> },
+              {
+                path: LOCAL_CONSTANTS.ROUTES.POLICY_SETTINGS.code,
+                element: <UpdatePolicy />,
+              },
+              {
+                path: LOCAL_CONSTANTS.ROUTES.ADD_POLICY.code,
+                element: <AddPolicy />,
+              },
+            ],
+          },
+          {
+            path: LOCAL_CONSTANTS.ROUTES.ACCOUNT_MANAGEMENT,
+            children: [
+              { index: true, element: <AllAccounts /> },
+              {
+                path: LOCAL_CONSTANTS.ROUTES.ACCOUNT_SETTINGS.code,
+                element: <UpdateAccount />,
+              },
+              {
+                path: LOCAL_CONSTANTS.ROUTES.ADD_ACCOUNT.code,
+                element: <AddAccount />,
+              },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+]);
 
-/**
- *
- * @param {object} param0
- * @returns
- */
-const AppRouter = ({}) => {
+const AppRouter = () => {
   return (
     <Suspense fallback={<Loading fullScreen />}>
-      <Router>
-        <Routes>
-          <Route
-            exact={true}
-            path={LOCAL_CONSTANTS.ROUTES.HOME}
-            element={
-              <ProtectedRoute
-                successComponent={() => (
-                  <Navigate
-                    to={LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.path()}
-                  />
-                  // <UpdateGraph />
-                )}
-                fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
-                loadingComponent={() => <Loading />}
-              />
-            }
-          />
-
-          <Route
-            path={LOCAL_CONSTANTS.ROUTES.ALL_TABLES.code}
-            element={
-              <ProtectedRoute
-                successComponent={TableLayout}
-                fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
-                loadingComponent={() => <Loading fullScreen />}
-              />
-            }
-          ></Route>
-          <Route
-            path={LOCAL_CONSTANTS.ROUTES.ALL_GRAPHS.code}
-            element={
-              <ProtectedRoute
-                successComponent={GraphLayout}
-                fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
-                loadingComponent={() => <Loading fullScreen />}
-              />
-            }
-          ></Route>
-
-          <Route
-            path={LOCAL_CONSTANTS.ROUTES.ALL_QUERIES.code}
-            element={
-              <ProtectedRoute
-                successComponent={QueryLayout}
-                fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
-                loadingComponent={() => <Loading fullScreen />}
-              />
-            }
-          ></Route>
-
-          <Route
-            path={LOCAL_CONSTANTS.ROUTES.ALL_JOBS.code}
-            element={
-              <ProtectedRoute
-                successComponent={JobLayout}
-                fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
-                loadingComponent={() => <Loading fullScreen />}
-              />
-            }
-          ></Route>
-          <Route
-            path={LOCAL_CONSTANTS.ROUTES.ALL_DASHBOARD_LAYOUTS.code}
-            element={
-              <ProtectedRoute
-                successComponent={DashboardLayout}
-                fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
-                loadingComponent={() => <Loading fullScreen />}
-              />
-            }
-          ></Route>
-          <Route
-            path={LOCAL_CONSTANTS.ROUTES.ALL_APP_CONSTANTS.code}
-            element={
-              <ProtectedRoute
-                successComponent={AppConstantLayout}
-                fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
-                loadingComponent={() => <Loading fullScreen />}
-              />
-            }
-          ></Route>
-          <Route
-            path={LOCAL_CONSTANTS.ROUTES.ALL_TRIGGERS.code}
-            element={
-              <ProtectedRoute
-                successComponent={TriggerLayout}
-                fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
-                loadingComponent={() => <Loading fullScreen />}
-              />
-            }
-          ></Route>
-
-          <Route path={LOCAL_CONSTANTS.ROUTES.POLICY_MANAGEMENT.code}>
-            <Route
-              index
-              element={
-                <ProtectedRoute
-                  successComponent={AllPolicies}
-                  fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
-                  loadingComponent={() => <Loading fullScreen />}
-                />
-              }
-            />
-            <Route
-              path={LOCAL_CONSTANTS.ROUTES.POLICY_SETTINGS.code}
-              element={
-                <ProtectedRoute
-                  successComponent={UpdatePolicy}
-                  fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
-                  loadingComponent={() => <Loading fullScreen />}
-                />
-              }
-            />
-            <Route
-              path={LOCAL_CONSTANTS.ROUTES.ADD_POLICY.code}
-              element={
-                <ProtectedRoute
-                  successComponent={AddPolicy}
-                  fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
-                  loadingComponent={() => <Loading fullScreen />}
-                />
-              }
-            />
-          </Route>
-
-          <Route path={LOCAL_CONSTANTS.ROUTES.ACCOUNT_MANAGEMENT}>
-            <Route
-              index
-              element={
-                <ProtectedRoute
-                  successComponent={AllAccounts}
-                  fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
-                  loadingComponent={() => <Loading fullScreen />}
-                />
-              }
-            />
-            <Route
-              path={LOCAL_CONSTANTS.ROUTES.ACCOUNT_SETTINGS.code}
-              element={
-                <ProtectedRoute
-                  successComponent={UpdateAccount}
-                  fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
-                  loadingComponent={() => <Loading fullScreen />}
-                />
-              }
-            />
-            <Route
-              path={LOCAL_CONSTANTS.ROUTES.ADD_ACCOUNT.code}
-              element={
-                <ProtectedRoute
-                  successComponent={AddAccount}
-                  fallbackPath={LOCAL_CONSTANTS.ROUTES.SIGNIN}
-                  loadingComponent={() => <Loading fullScreen />}
-                />
-              }
-            />
-          </Route>
-
-          <Route
-            exact={true}
-            path={LOCAL_CONSTANTS.ROUTES.SIGNIN}
-            element={<SignIn />}
-          />
-        </Routes>
-      </Router>
+      <RouterProvider router={router} />
     </Suspense>
   );
 };
+
 
 export default AppRouter;

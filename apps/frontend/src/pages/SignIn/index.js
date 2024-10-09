@@ -15,7 +15,7 @@ import { useAuthActions, useAuthState } from "../../contexts/authContext";
 import "./styles.css";
 
 const LoginForm = ({}) => {
-  const { isLogingIn, loginError } = useAuthState();
+  const { isLoggingIn, loginError } = useAuthState();
   const { login } = useAuthActions();
   return (
     <div className="flex flex-col items-start p-4 mt-20 lg:w-1/3 md:w-1/2  w-full">
@@ -92,7 +92,7 @@ const LoginForm = ({}) => {
               size="small"
               type="submit"
               startIcon={
-                isLogingIn && <CircularProgress color="inherit" size={12} />
+                isLoggingIn && <CircularProgress color="inherit" size={12} />
               }
               className="!mt-4"
               fullWidth

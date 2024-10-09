@@ -1,32 +1,18 @@
-import React, { useEffect, useState } from "react";
-import { QueryClient, useQuery } from "@tanstack/react-query";
-import { useMutation } from "@tanstack/react-query";
-import {
-  d,
-  fetchDBUserAPI,
-  loginAPI,
-  loginWithEmailPasswordAPI,
-  logoutAPI,
-} from "../api/auth";
+import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
+import React, { useState } from "react";
+import { fetchDBUserAPI, loginAPI } from "../api/auth";
 import { LOCAL_CONSTANTS } from "../constants";
 import { displayError, displaySuccess } from "../utils/notification";
-
 
 const AuthStateContext = React.createContext(undefined);
 const AuthActionsContext = React.createContext(undefined);
 
 const AuthContextProvider = ({ children }) => {
-  const queryClient = new QueryClient();
-
-  
-  
   const [signOutState, setSignOutState] = useState({
     isLoading: false,
     success: false,
     error: null,
   });
-
-  // // react-query for db users
   const {
     isFetching: isLoadingDBUser,
     data: pmUser,
@@ -39,13 +25,10 @@ const AuthContextProvider = ({ children }) => {
     queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.DB_USER],
     queryFn: () => fetchDBUserAPI(),
     retry: false,
-    enabled: Boolean(
-      localStorage.getItem(LOCAL_CONSTANTS.STRINGS.ACCESS_TOKEN_LOCAL_STORAGE)
-    ),
   });
 
   const {
-    isPending: isLogingIn,
+    isPending: isLoggingIn,
     isSuccess: isLoginSuccess,
     error: loginError,
     mutate: login,
@@ -81,7 +64,7 @@ const AuthContextProvider = ({ children }) => {
   return (
     <AuthStateContext.Provider
       value={{
-        isLogingIn,
+        isLoggingIn,
         isLoginSuccess,
         loginError,
         pmUser,

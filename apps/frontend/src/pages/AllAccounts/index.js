@@ -4,7 +4,6 @@ import { Button, Chip, Grid, Pagination } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useQuery } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
-import { fetchAllRowsAPI } from "../../api/tables";
 import { useAuthState } from "../../contexts/authContext";
 
 import { LOCAL_CONSTANTS } from "../../constants";
@@ -13,11 +12,9 @@ import { Loading } from "../Loading";
 import moment from "moment";
 import "react-data-grid/lib/styles.css";
 import { BiCalendar } from "react-icons/bi";
-import { DataGridActionComponent } from "../../components/DataGridComponents/DataGridActionComponent";
-import { ErrorComponent } from "../../components/ErrorComponent";
-import { RawDataGridStatistics } from "../../components/DataGridComponents/RawDataGridStatistics";
-import { getAllAccountsAPI } from "../../api/accounts";
 import { FaPlus, FaRedoAlt } from "react-icons/fa";
+import { getAllAccountsAPI } from "../../api/accounts";
+import { ErrorComponent } from "../../components/ErrorComponent";
 const AllAccounts = () => {
   const { pmUser } = useAuthState();
   const navigate = useNavigate();

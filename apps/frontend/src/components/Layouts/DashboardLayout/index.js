@@ -10,7 +10,7 @@ import {
 const AddDashboardView = lazy(() => import("../../../pages/AddDashboardView"));
 const DashboardView = lazy(() => import("../../../pages/DashboardView"));
 const DashboardEditView = lazy(() => import("../../../pages/UpdateDashboard"));
-const AddTrigger = lazy(() => import("../../../pages/AddTrigger"));
+
 const DashboardLayout = () => {
   const pinnedDashboardID = parseInt(
     localStorage.getItem(LOCAL_CONSTANTS.STRINGS.DEFAULT_DASHBOARD_ID_STORAGE)
