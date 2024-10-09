@@ -30,6 +30,13 @@ router.post(
   policyAuthorizationMiddleware.authorizePolicyAddition,
   policyController.addPolicy
 );
+router.post(
+  "/duplicate",
+  authMiddleware.authProvider,
+  policyMiddleware.populateAuthorizationPolicies,
+  policyAuthorizationMiddleware.authorizePolicyAddition,
+  policyController.duplicatePolicy
+);
 router.put(
   "/",
   authMiddleware.authProvider,

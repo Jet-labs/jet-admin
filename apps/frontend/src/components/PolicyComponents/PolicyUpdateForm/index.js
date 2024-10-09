@@ -13,6 +13,7 @@ import { displayError, displaySuccess } from "../../../utils/notification";
 import { Loading } from "../../../pages/Loading";
 import { PolicyDeletionForm } from "../PolicyDeletionForm";
 import { getPolicyByIDAPI, updatePolicyAPI } from "../../../api/policy";
+import { PolicyDuplicateForm } from "../PolicyDuplicateForm";
 
 export const PolicyUpdateForm = ({ id }) => {
   const theme = useTheme();
@@ -101,11 +102,11 @@ export const PolicyUpdateForm = ({ id }) => {
           <span className="text-lg font-bold text-start ">
             {LOCAL_CONSTANTS.STRINGS.POLICY_UPDATE_PAGE_TITLE}
           </span>
-          <span className="text-xs font-thin text-start text-slate-300">{`Account settings | Username : ${policyObjectData.title}`}</span>
         </div>
 
         <div className="flex flex-row items-center justify-end w-min ">
           <PolicyDeletionForm id={id} />
+          <PolicyDuplicateForm id={id} />
           <Button
             disableElevation
             variant="contained"

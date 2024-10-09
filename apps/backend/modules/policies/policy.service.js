@@ -131,6 +131,48 @@ class PolicyService {
   };
 
   /**
+   * Fetches a policy from the database by its ID.
+   *
+   * @param {object} param0 - The options object.
+   * @param {number} param0.pmPolicyObjectID - The ID of the policy to fetch.
+   * @returns {any|null} The policy object if found, or null if not found or an error occurs.
+   */
+  static duplicatePolicy = async ({ pmPolicyObjectID }) => {
+    Logger.log("info", {
+      message: "PolicyService:duplicatePolicy:params",
+      params: {
+        pmPolicyObjectID,
+      },
+    });
+    try {
+      const policy = await this.getPolicyByID({ pmPolicyObjectID });
+      Logger.log("info", {
+        message: "PolicyService:duplicatePolicy:policy",
+        params: {
+          policy,
+        },
+      });
+      const newPolicy = await this.addPolicy({
+        pmPolicyObjectTitle: `${policy.title} copy`,
+        pmPolcyObject: policy.policy,
+      });
+      Logger.log("success", {
+        message: "PolicyService:duplicatePolicy:newPolicy",
+        params: {
+          newPolicy,
+        },
+      });
+      return newPolicy;
+    } catch (error) {
+      Logger.log("error", {
+        message: "PolicyService:duplicatePolicy:catch-1",
+        params: { error },
+      });
+      throw error;
+    }
+  };
+
+  /**
    *
    * @param {object} param0
    * @param {Number} param0.pmPolicyObjectID

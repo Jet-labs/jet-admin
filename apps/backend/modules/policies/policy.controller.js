@@ -109,6 +109,45 @@ policyController.getPolicyByID = async (req, res) => {
  * @param {import("express").Response} res
  * @returns
  */
+policyController.duplicatePolicy = async (req, res) => {
+  try {
+    const { pmUser, state, body } = req;
+    const pm_policy_object_id = parseInt(body.pm_policy_object_id);
+    const pm_user_id = parseInt(pmUser.pm_user_id);
+    const authorized_policies = state.authorized_policies;
+    Logger.log("info", {
+      message: "policyController:duplicatePolicy:params",
+      params: { pm_user_id, pm_policy_object_id },
+    });
+    
+    const newPolicy = await PolicyService.duplicatePolicy({
+      pmPolicyObjectID: pm_policy_object_id,
+    });
+
+    Logger.log("success", {
+      message: "policyController:duplicatePolicy:success",
+      params: { pm_user_id, newPolicy },
+    });
+
+    return res.json({
+      success: true,
+      policy: newPolicy,
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "policyController:duplicatePolicy:catch-1",
+      params: { error },
+    });
+    return res.json({ success: false, error: extractError(error) });
+  }
+};
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @returns
+ */
 policyController.addPolicy = async (req, res) => {
   try {
     const { pmUser, state, body } = req;

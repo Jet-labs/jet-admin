@@ -1,13 +1,12 @@
 import { Button } from "@mui/material";
-import { useAuthState } from "../../../contexts/authContext";
-import { useMemo, useState } from "react";
-import { duplicateQueryAPI } from "../../../api/queries";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMemo, useState } from "react";
+import { FaCopy } from "react-icons/fa6";
+import { duplicateQueryAPI } from "../../../api/queries";
+import { LOCAL_CONSTANTS } from "../../../constants";
+import { useAuthState } from "../../../contexts/authContext";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { ConfirmationDialog } from "../../ConfirmationDialog";
-import { IoTrash } from "react-icons/io5";
-import { FaCopy } from "react-icons/fa6";
-import { LOCAL_CONSTANTS } from "../../../constants";
 export const QueryDuplicateForm = ({ id }) => {
   const { pmUser } = useAuthState();
   const queryClient = useQueryClient();

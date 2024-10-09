@@ -113,6 +113,9 @@ export const LOCAL_CONSTANTS = {
     POLICY_DELETION_CONFIRMATION_TITLE: "Delete policy?",
     POLICY_DELETION_CONFIRMATION_BODY: "Are you sure you want to delete policy",
     POLICY_UPDATE_PAGE_TITLE: "Update policy",
+    POLICY_DUPLICATE_CONFIRMATION_TITLE: "Duplicate policy?",
+    POLICY_DUPLICATE_CONFIRMATION_BODY:
+      "Are you sure you want to duplicate policy",
 
     // rows
     ROW_ADDITION_SUCCESS: "Row added!",
@@ -436,6 +439,7 @@ export const LOCAL_CONSTANTS = {
       getPolicyByID: ({ id }) => `/admin_api/policies/${id}`,
       addPolicy: () => `/admin_api/policies`,
       updatePolicy: () => `/admin_api/policies`,
+      duplicatePolicy: () => `/admin_api/policies/duplicate`,
       deletePolicyByID: ({ id }) => `/admin_api/policies/${id}`,
     },
   },

@@ -20,6 +20,24 @@ export const addPolicyAPI = async ({ data }) => {
   }
 };
 
+export const duplicatePolicyAPI = async ({ pmPolicyObjectID }) => {
+  try {
+    const response = await axiosInstance.post(
+      LOCAL_CONSTANTS.APIS.POLICIES.duplicatePolicy(),
+      { pm_policy_object_id: pmPolicyObjectID }
+    );
+    if (response.data && response.data.success == true) {
+      return true;
+    } else if (response.data && response.data.error) {
+      throw response.data.error;
+    } else {
+      throw LOCAL_CONSTANTS.ERROR_CODES.SERVER_ERROR;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const updatePolicyAPI = async ({ data }) => {
   try {
     const response = await axiosInstance.put(
