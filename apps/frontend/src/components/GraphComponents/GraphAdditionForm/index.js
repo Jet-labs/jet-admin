@@ -1,4 +1,4 @@
-import { Grid } from "@mui/material";
+import { Button, Grid } from "@mui/material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import React from "react";
@@ -54,17 +54,36 @@ export const GraphAdditionForm = () => {
     },
   });
 
+  const _handleSubmit = () => {
+    graphForm.handleSubmit();
+  };
+
   return (
     <div className="w-full h-full overflow-y-scroll">
       <div
-        className="flex flex-col items-start justify-start p-3 px-6"
-        style={{ background: theme.palette.background.paper }}
+        className="flex flex-row items-center justify-between p-3 px-6"
+        style={{
+          background: theme.palette.background.paper,
+          borderBottomWidth: 1,
+          borderColor: theme.palette.divider,
+        }}
       >
-        <span className="text-lg font-bold text-start mt-1">
-          {LOCAL_CONSTANTS.STRINGS.GRAPH_ADDITION_PAGE_TITLE}
-        </span>
+        <div className="flex flex-col items-start justify-start">
+          <span className="text-lg font-bold text-start ">
+            {LOCAL_CONSTANTS.STRINGS.GRAPH_ADDITION_PAGE_TITLE}
+          </span>
+        </div>
+        <div>
+          <Button
+            variant="contained"
+            onClick={_handleSubmit}
+            disabled={isAddingGraph}
+          >
+            {LOCAL_CONSTANTS.STRINGS.SUBMIT_BUTTON_TEXT}
+          </Button>
+        </div>
       </div>
-      <Grid container spacing={1} className="!px-3">
+      <Grid container spacing={1} className="!pl-3 pr-6">
         <Grid item lg={5} md={4} className="w-full">
           <GraphEditor graphForm={graphForm} />
         </Grid>

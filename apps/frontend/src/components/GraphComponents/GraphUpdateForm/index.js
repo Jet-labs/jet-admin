@@ -1,4 +1,4 @@
-import { Grid, useTheme } from "@mui/material";
+import { Button, Grid, useTheme } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useEffect } from "react";
 import { getGraphDataByIDAPI, updateGraphAPI } from "../../../api/graphs";
@@ -9,7 +9,7 @@ import { displayError, displaySuccess } from "../../../utils/notification";
 import { GraphComponentPreview } from "../GraphComponentPreview";
 import { GraphEditor } from "../GraphEditor";
 import { GRAPH_PLUGINS_MAP } from "../GraphTypes";
-
+import { GraphDeletionForm } from "../GraphDeletionForm";
 
 export const GraphUpdateForm = ({ id }) => {
   const theme = useTheme();
@@ -101,27 +101,43 @@ export const GraphUpdateForm = ({ id }) => {
     }
   }, [graphData]);
 
+  const _handleSubmit = () => {
+    graphForm.handleSubmit();
+  };
+
   return (
     <div className="w-full h-full overflow-y-scroll">
       <div
-        className="flex flex-col items-start justify-start p-3 px-6"
+        className="flex flex-row items-center justify-between p-3 px-6"
         style={{
-          background: theme.palette.background.default,
+          background: theme.palette.background.paper,
           borderBottomWidth: 1,
           borderColor: theme.palette.divider,
         }}
       >
-        <span className="text-lg font-bold text-start ">
-          {LOCAL_CONSTANTS.STRINGS.GRAPH_UPDATE_PAGE_TITLE}
-        </span>
-        {graphData && (
-          <span
-            className="text-xs font-thin text-start text-slate-300"
-            style={{ color: theme.palette.text.secondary }}
-          >{`${graphData.pm_graph_title} | Graph ID : ${graphData.pm_graph_id}`}</span>
-        )}
+        <div className="flex flex-col items-start justify-start">
+          <span className="text-lg font-bold text-start ">
+            {LOCAL_CONSTANTS.STRINGS.GRAPH_UPDATE_PAGE_TITLE}
+          </span>
+          {graphData && (
+            <span
+              className="text-xs font-thin text-start text-slate-300"
+              style={{ color: theme.palette.text.secondary }}
+            >{`${graphData.pm_graph_title} | Graph ID : ${graphData.pm_graph_id}`}</span>
+          )}
+        </div>
+        <div>
+          <Button
+            variant="contained"
+            onClick={_handleSubmit}
+            disabled={isUpdatingGraph}
+          >
+            {LOCAL_CONSTANTS.STRINGS.SUBMIT_BUTTON_TEXT}
+          </Button>
+          {(id != null || id != undefined) && <GraphDeletionForm id={id} />}
+        </div>
       </div>
-      <Grid container spacing={1} className="!px-3">
+      <Grid container spacing={1} className="!pl-3 pr-6">
         <Grid item lg={5} md={4} className="w-full">
           <GraphEditor pmGraphID={id} graphForm={graphForm} />
         </Grid>

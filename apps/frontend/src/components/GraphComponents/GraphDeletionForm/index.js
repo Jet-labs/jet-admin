@@ -65,6 +65,7 @@ export const GraphDeletionForm = ({ id }) => {
           variant="outlined"
           className="!ml-2"
           color="error"
+          disabled={isDeletingGraph}
         >
           {LOCAL_CONSTANTS.STRINGS.DELETE_BUTTON_TEXT}
         </Button>

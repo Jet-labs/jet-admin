@@ -12,6 +12,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "../../../Resizables";
+import { LOCAL_CONSTANTS } from "../../../../constants";
 
 export const PGSQLQueryBuilder = ({
   pmQueryID,
@@ -49,7 +50,7 @@ export const PGSQLQueryBuilder = ({
             severity="info"
             className="!py-0 !mt-3 !text-xs"
           >
-            {`Query objects are intended to allow only data manupulation and data fetching queries`}
+            {LOCAL_CONSTANTS.STRINGS.QUERY_BUILDER_ALERT_TEXT}
           </Alert>
           <div className="!flex flex-row justify-between items-center w-100 mt-3">
             {queryRunResult && Array.isArray(queryRunResult) ? (

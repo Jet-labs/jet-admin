@@ -13,22 +13,19 @@ import {
   MenuItem,
   Select,
   TextField,
-  Tooltip,
   useTheme,
 } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { FaPlus, FaTimes } from "react-icons/fa";
 import { SiPostgresql } from "react-icons/si";
+import ReactJson from "react-json-view";
 import { Link } from "react-router-dom";
 import { getAllQueryAPI } from "../../../api/queries";
 import { LOCAL_CONSTANTS } from "../../../constants";
-import { GraphDeletionForm } from "../GraphDeletionForm";
-import { GRAPH_PLUGINS_MAP } from "../GraphTypes";
-import { QueryTestingDialog } from "../../QueryComponents/QueryTestingDialog";
-import { PGSQLQueryBuilder } from "../../QueryComponents/QueryBuilderComponents/PGSQLQueryBuilder";
 import { CollapseComponent } from "../../CollapseComponent";
-import ReactJson from "react-json-view";
+import { PGSQLQueryBuilder } from "../../QueryComponents/QueryBuilderComponents/PGSQLQueryBuilder";
+import { GRAPH_PLUGINS_MAP } from "../GraphTypes";
 
 /**
  *
@@ -113,10 +110,6 @@ export const GraphEditor = ({ pmGraphID, graphForm }) => {
     let updatedQueryArrayFieldValue = graphForm.values["query_array"];
     updatedQueryArrayFieldValue.splice(index, 1);
     graphForm.setFieldValue("query_array", updatedQueryArrayFieldValue);
-  };
-
-  const _handleSubmit = () => {
-    graphForm.handleSubmit();
   };
 
   const _handleCloseQueryTestingPanel = () => {
@@ -229,12 +222,6 @@ export const GraphEditor = ({ pmGraphID, graphForm }) => {
           </FormControl>
         </Grid>
 
-        <Grid item xs={12} sm={12} md={12} lg={12} key={"query_array"}>
-          <Button variant="contained" onClick={_handleAddDataset}>
-            Add dataset
-          </Button>
-        </Grid>
-
         {queries && queries.length > 0 ? (
           graphForm.values["query_array"]?.map((dataset, index) => {
             return (
@@ -343,7 +330,7 @@ export const GraphEditor = ({ pmGraphID, graphForm }) => {
                         e.preventDefault();
                         setIsQueryTestingDialogOpen(true);
                       }}
-                      className="text-xs font-light"
+                      className="!text-xs font-light"
                       sx={{
                         padding: "0px !important",
                         textTransform: "capitalize",
@@ -572,12 +559,9 @@ export const GraphEditor = ({ pmGraphID, graphForm }) => {
           </Grid>
         )}
         <Grid item xs={12} sm={12} md={12} lg={12} key={"submit"}>
-          <Button variant="contained" onClick={_handleSubmit}>
-            {LOCAL_CONSTANTS.STRINGS.SUBMIT_BUTTON_TEXT}
+          <Button variant="contained" onClick={_handleAddDataset}>
+            Add dataset
           </Button>
-          {(pmGraphID != null || pmGraphID != undefined) && (
-            <GraphDeletionForm id={pmGraphID} />
-          )}
         </Grid>
       </Grid>
     </form>

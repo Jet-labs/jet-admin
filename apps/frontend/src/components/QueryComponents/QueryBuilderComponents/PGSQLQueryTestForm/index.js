@@ -33,7 +33,7 @@ export const PGSQLQueryTestForm = ({
     retry: false,
     onSuccess: (data) => {
       setQueryRunResult(data);
-      displaySuccess("Query executed successfully");
+      displaySuccess(LOCAL_CONSTANTS.STRINGS.QUERY_TEST_SUCCESS);
     },
     onError: (error) => {
       displayError(error);

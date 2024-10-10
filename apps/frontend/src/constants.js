@@ -192,6 +192,11 @@ export const LOCAL_CONSTANTS = {
 
     //SQL
     SQL_EDITOR_NAVIGATE_BUTTON_TEXT: "Open SQL editor",
+
+    //query
+    QUERY_BUILDER_ALERT_TEXT:
+      "Query objects are intended to allow only data manupulation and data fetching queries",
+    QUERY_TEST_SUCCESS: "Query executed successfully",
   },
 
   // routes

@@ -73,6 +73,7 @@ export const PGSQLQueryArgsFormDialog = ({
                     name={arg}
                     onChange={argsForm.handleChange}
                     onBlur={argsForm.handleBlur}
+                    autoComplete="off"
                   />
                 </FormControl>
               );
