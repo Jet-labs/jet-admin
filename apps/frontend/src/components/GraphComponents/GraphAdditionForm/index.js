@@ -83,10 +83,7 @@ export const GraphAdditionForm = () => {
           </Button>
         </div>
       </div>
-      <Grid container spacing={1} className="!pl-3 pr-6">
-        <Grid item lg={5} md={4} className="w-full">
-          <GraphEditor graphForm={graphForm} />
-        </Grid>
+      <Grid container spacing={1} className="!px-3">
         <Grid item lg={7} md={8} className="w-full">
           <GraphComponentPreview
             graphType={graphForm.values["graph_type"]}
@@ -94,6 +91,9 @@ export const GraphAdditionForm = () => {
             titleDisplayEnabled={graphForm.values["title_display_enabled"]}
             pmGraphTitle={graphForm.values["pm_graph_title"]}
           />
+        </Grid>
+        <Grid item lg={5} md={4} className="w-full">
+          <GraphEditor graphForm={graphForm} />
         </Grid>
       </Grid>
     </div>

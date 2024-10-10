@@ -13,7 +13,7 @@ export const GraphComponentPreview = ({
 }) => {
   const theme = useTheme();
   return (
-    <div className="!pt-10  !sticky !top-0 !z-50">
+    <div className="!pt-8  !sticky !top-0 !z-50">
       <Grid
         container
         rowSpacing={2}

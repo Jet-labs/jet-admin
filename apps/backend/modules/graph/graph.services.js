@@ -253,7 +253,7 @@ class GraphService {
         Logger.log("info", {
           message: "GraphService:deleteGraph:graph",
           params: {
-            graph,
+            pmGraphID,
           },
         });
         return true;

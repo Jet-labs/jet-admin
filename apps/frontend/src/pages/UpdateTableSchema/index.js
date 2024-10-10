@@ -1,14 +1,6 @@
 import { Tab, Tabs, useTheme } from "@mui/material";
-import { TableSchemaEditor } from "../../components/TableSchemaComponents/TableSchemaEditor";
-import { TableSchemaEditorContextProvider } from "../../contexts/tableSchemaEditorContext";
-import { TableSchemaEditorTransformContextProvider } from "../../contexts/tableSchemaEditorTransformContext";
 import { useState } from "react";
 import { PGSQLSchemaBuilder } from "../../components/TableSchemaComponents/PSSQLSchemaEditor";
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "../../components/Resizables";
 
 const UpdateTableSchema = () => {
   const [tab, setTab] = useState(0);
@@ -49,12 +41,6 @@ const UpdateTableSchema = () => {
         />
       </Tabs>
       {tab === 0 ? <PGSQLSchemaBuilder /> : null}
-
-      {/* <TableSchemaEditorTransformContextProvider>
-        <TableSchemaEditorContextProvider>
-          <TableSchemaEditor />
-        </TableSchemaEditorContextProvider>
-      </TableSchemaEditorTransformContextProvider> */}
     </div>
   );
 };

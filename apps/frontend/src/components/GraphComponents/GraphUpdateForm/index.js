@@ -137,12 +137,9 @@ export const GraphUpdateForm = ({ id }) => {
           {(id != null || id != undefined) && <GraphDeletionForm id={id} />}
         </div>
       </div>
-      <Grid container spacing={1} className="!pl-3 pr-6">
-        <Grid item lg={5} md={4} className="w-full">
-          <GraphEditor pmGraphID={id} graphForm={graphForm} />
-        </Grid>
+      <Grid container spacing={1} className="!px-3">
         {graphData && graphData.dataset && (
-          <Grid item lg={7} md={8} className="w-full">
+          <Grid item lg={7} md={8} className="w-full ">
             <GraphComponentPreview
               graphType={graphForm.values["graph_type"]}
               legendPosition={graphForm.values["legend_position"]}
@@ -152,6 +149,9 @@ export const GraphUpdateForm = ({ id }) => {
             />
           </Grid>
         )}
+        <Grid item lg={5} md={4} className="w-full">
+          <GraphEditor pmGraphID={id} graphForm={graphForm} />
+        </Grid>
       </Grid>
     </div>
   );

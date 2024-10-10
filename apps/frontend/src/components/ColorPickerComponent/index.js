@@ -3,6 +3,7 @@ import { IconCheckboxTick } from "@douyinfe/semi-icons";
 
 import { useTranslation } from "react-i18next";
 import { LOCAL_CONSTANTS } from "../../constants";
+import { TextField } from "@mui/material";
 
 export const ColorPickerComponent = ({
   currentColor,
@@ -12,20 +13,26 @@ export const ColorPickerComponent = ({
   const { t } = useTranslation();
   return (
     <div>
-      <div className="flex justify-between items-center p-2">
-        <div className="font-medium">{t("theme")}</div>
-        <Button type="tertiary" size="small" onClick={onClearColor}>
-          {t("clear")}
-        </Button>
+      <div className="flex justify-between items-center">
+        <TextField
+          fullWidth
+          size="medium"
+          variant="outlined"
+          type="color"
+          value={currentColor}
+          onChange={(e) => {
+            onPickColor(e.target.value);
+          }}
+        />
       </div>
-      <hr />
+
       <div className="py-3 space-y-3">
-        <div className="flex flex-wrap w-72 gap-y-2">
+        <div className="flex flex-wrap w-full gap-y-2">
           {LOCAL_CONSTANTS.TABLE_EDITOR_TABLE_THEME.map((c) => (
             <button
               key={c}
               style={{ backgroundColor: c }}
-              className="w-10 h-10 rounded-full mx-1"
+              className="w-6 h-6 rounded mx-1"
               onClick={() => onPickColor(c)}
             >
               <IconCheckboxTick

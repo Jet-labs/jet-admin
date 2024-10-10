@@ -26,6 +26,7 @@ import { LOCAL_CONSTANTS } from "../../../constants";
 import { CollapseComponent } from "../../CollapseComponent";
 import { PGSQLQueryBuilder } from "../../QueryComponents/QueryBuilderComponents/PGSQLQueryBuilder";
 import { GRAPH_PLUGINS_MAP } from "../GraphTypes";
+import { ColorPickerComponent } from "../../ColorPickerComponent";
 
 /**
  *
@@ -117,11 +118,11 @@ export const GraphEditor = ({ pmGraphID, graphForm }) => {
   };
 
   return (
-    <form onSubmit={graphForm.handleSubmit} className="!pt-3">
+    <form onSubmit={graphForm.handleSubmit} className="!pt-1">
       <Grid
         container
         spacing={2}
-        className="rounded !p-3"
+        className="rounded !p-3 !pr-0"
         // style={{ background: theme.palette.action.selected }}
       >
         <Grid item xs={12} sm={12} md={12} lg={12} key={"pm_graph_title"}>
@@ -492,17 +493,11 @@ export const GraphEditor = ({ pmGraphID, graphForm }) => {
                 </Grid>
                 <FormControl fullWidth size="small" className="!mt-2">
                   <span className="text-xs font-light  !capitalize mb-1">{`color`}</span>
-                  <TextField
-                    required={true}
-                    fullWidth
-                    size="small"
-                    variant="outlined"
-                    type="color"
-                    name={`query_array_color-${index}`}
-                    value={dataset.color}
-                    onBlur={graphForm.handleBlur}
-                    onChange={(e) => {
-                      _handleUpdateDatasetColor(index, e.target.value);
+
+                  <ColorPickerComponent
+                    currentColor={dataset.color}
+                    onPickColor={(c) => {
+                      _handleUpdateDatasetColor(index, c);
                     }}
                   />
                 </FormControl>
