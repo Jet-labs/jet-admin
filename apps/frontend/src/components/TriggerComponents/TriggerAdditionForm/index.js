@@ -8,6 +8,7 @@ import {
   OutlinedInput,
   Select,
   TextField,
+  useTheme,
 } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
@@ -21,7 +22,6 @@ import {
   TRIGGER_IMPACT_TIMING,
 } from "../../../utils/editorAutocomplete/pgKeywords";
 import { displayError, displaySuccess } from "../../../utils/notification";
-import theme from "../../../theme";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -35,6 +35,7 @@ const MenuProps = {
 };
 
 const TriggerAdditionForm = () => {
+  const theme = useTheme();
   const queryClient = useQueryClient();
 
   const {
