@@ -36,7 +36,7 @@ export const GraphDrawerList = () => {
     queryKey: [`REACT_QUERY_KEY_GRAPH`],
     queryFn: () => getAllGraphAPI(),
     cacheTime: 0,
-    retry: 1,
+    retry: 0,
     staleTime: 0,
   });
 

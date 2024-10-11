@@ -99,6 +99,8 @@ triggerController.addTrigger = async (req, res) => {
       pmTriggerChannelName: body.pm_trigger_channel_name,
       pmTriggerMethod: body.pm_trigger_method,
       pmTriggerCondition: body.pm_trigger_condition,
+      pmTriggerFunctionName: body.pm_trigger_function_name,
+      pmTriggerFunctionArgs: body.pm_trigger_function_args,
     });
 
     Logger.log("success", {
@@ -113,7 +115,7 @@ triggerController.addTrigger = async (req, res) => {
   } catch (error) {
     Logger.log("error", {
       message: "triggerController:addTrigger:catch-1",
-      params: { error },
+      params: { error: extractError(error) },
     });
     return res.json({ success: false, error: extractError(error) });
   }

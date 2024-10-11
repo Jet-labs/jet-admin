@@ -27,7 +27,7 @@ export const RowUpdateForm = ({ customTitle, tableName, id }) => {
     queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLE_ID(tableName), , id],
     queryFn: () => fetchRowByIDAPI({ tableName, id }),
     cacheTime: 0,
-    retry: 1,
+    retry: 0,
     staleTime: 0,
   });
 
@@ -39,7 +39,7 @@ export const RowUpdateForm = ({ customTitle, tableName, id }) => {
     queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLE_ID_COLUMNS(tableName)],
     queryFn: () => getTableColumns({ tableName }),
     cacheTime: 0,
-    retry: 1,
+    retry: 0,
     staleTime: 0,
   });
 

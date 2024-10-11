@@ -37,7 +37,7 @@ export const JobsList = () => {
     queryKey: [`REACT_QUERY_KEY_JOBS`],
     queryFn: () => getAllJobAPI(),
     cacheTime: 0,
-    retry: 1,
+    retry: 0,
     staleTime: 0,
   });
 

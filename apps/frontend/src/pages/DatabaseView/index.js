@@ -21,7 +21,7 @@ const DatabaseView = ({}) => {
     queryKey: [`REACT_QUERY_KEY_DATABASE_STATISTICS`],
     queryFn: () => getSchemaStatisticsAPI(),
     cacheTime: 0,
-    retry: 1,
+    retry: 0,
   });
 
   return (

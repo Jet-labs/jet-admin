@@ -53,7 +53,7 @@ export const DataGridActionComponent = ({
     queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLE_ID_COLUMNS(tableName)],
     queryFn: () => getTableColumns({ tableName }),
     cacheTime: 0,
-    retry: 1,
+    retry: 0,
     staleTime: 0,
   });
 

@@ -31,7 +31,7 @@ export const DashboardUpdateForm = ({ id }) => {
   } = useQuery({
     queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.DASHBOARDS, id],
     queryFn: () => getDashboardByIDAPI({ pmDashboardID: id }),
-    retry: 1,
+    retry: 0,
   });
 
   const {

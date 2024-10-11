@@ -1,10 +1,11 @@
 const Logger = require("../../utils/logger");
 
 const {
-  generateCreateTriggerQuery,
+  generateCreateNotificationTriggerQuery,
   getAllTriggersFromDBQuery,
   getTriggerByName,
   deleteTriggerByName,
+  generateCreateTriggerQuery,
 } = require("../../utils/postgres-utils/triggers-queries");
 const { pgPool } = require("../../db/pg");
 const {
@@ -97,6 +98,8 @@ class TriggerService {
    * @param {String} param0.pmTriggerChannelName
    * @param {String} param0.pmTriggerMethod
    * @param {String} param0.pmTriggerCondition
+   * @param {String} param0.pmTriggerFunctionName
+   * @param {String} param0.pmTriggerFunctionArgs
    * @returns {any|null}
    */
   static addTrigger = async ({
@@ -107,6 +110,8 @@ class TriggerService {
     pmTriggerChannelName,
     pmTriggerMethod,
     pmTriggerCondition,
+    pmTriggerFunctionName,
+    pmTriggerFunctionArgs,
   }) => {
     Logger.log("info", {
       message: "TriggerService:addTrigger:params",
@@ -123,17 +128,33 @@ class TriggerService {
     try {
       const client = await pgPool.connect();
       await client.query("BEGIN");
-      const newTrigger = await client.query(
-        generateCreateTriggerQuery({
-          pmTriggerName,
-          pmTriggerTableName,
-          pmTriggerTiming,
-          pmTriggerEvents,
-          pmTriggerChannelName,
-          pmTriggerMethod,
-          pmTriggerCondition,
-        })
-      );
+      let newTrigger;
+      if (pmTriggerFunctionName) {
+        newTrigger = await client.query(
+          generateCreateTriggerQuery({
+            pmTriggerName,
+            pmTriggerTableName,
+            pmTriggerTiming,
+            pmTriggerEvents,
+            pmTriggerFunctionName,
+            pmTriggerFunctionArgs,
+            pmTriggerMethod,
+            pmTriggerCondition,
+          })
+        );
+      } else {
+        newTrigger = await client.query(
+          generateCreateNotificationTriggerQuery({
+            pmTriggerName,
+            pmTriggerTableName,
+            pmTriggerTiming,
+            pmTriggerEvents,
+            pmTriggerChannelName,
+            pmTriggerMethod,
+            pmTriggerCondition,
+          })
+        );
+      }
       await client.query("COMMIT");
       Logger.log("success", {
         message: "TriggerService:addTrigger:newTrigger",

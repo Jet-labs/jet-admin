@@ -1,4 +1,4 @@
-export const generateCreateTriggerQuery = ({
+export const generateCreateNotificationTriggerQuery = ({
   schema_name,
   pm_trigger_name,
   pm_trigger_table_name,

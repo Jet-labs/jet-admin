@@ -28,7 +28,7 @@ export const QueryWidgetComponent = ({ id, width, height }) => {
     },
     retry: false,
     cacheTime: 0,
-    retry: 1,
+    retry: 0,
     staleTime: 0,
   });
   const {
@@ -47,7 +47,7 @@ export const QueryWidgetComponent = ({ id, width, height }) => {
     },
     retry: false,
     cacheTime: 0,
-    retry: 1,
+    retry: 0,
     staleTime: 0,
   });
   const dataSchema = queryData

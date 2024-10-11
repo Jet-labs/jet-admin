@@ -44,7 +44,7 @@ const DashboardView = () => {
   } = useQuery({
     queryKey: [`REACT_QUERY_KEY_DASHBOARD_LAYOUTS`, id],
     queryFn: () => getDashboardByIDAPI({ pmDashboardID: id }),
-    retry: 1,
+    retry: 0,
   });
 
   const _handleNavigateToEditScreen = () => {

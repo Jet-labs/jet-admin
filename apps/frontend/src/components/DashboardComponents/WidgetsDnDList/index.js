@@ -34,7 +34,7 @@ export const WidgetsDnDList = ({}) => {
     queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.GRAPHS],
     queryFn: () => getAllGraphAPI(),
     cacheTime: 0,
-    retry: 1,
+    retry: 0,
     staleTime: 0,
   });
 
@@ -47,7 +47,7 @@ export const WidgetsDnDList = ({}) => {
     queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.QUERIES],
     queryFn: () => getAllQueryAPI(),
     cacheTime: 0,
-    retry: 1,
+    retry: 0,
     staleTime: 0,
   });
 

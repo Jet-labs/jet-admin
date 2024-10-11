@@ -2,7 +2,7 @@ import { LOCAL_CONSTANTS } from "../constants";
 import { Trigger } from "../models/data/trigger";
 import axiosInstance from "../utils/axiosInstance";
 
-export const addTriggerAPI = async ({ data }) => {
+export const addNotificationTriggerAPI = async ({ data }) => {
   try {
     const response = await axiosInstance.post(
       LOCAL_CONSTANTS.APIS.TRIGGER.addTrigger(),

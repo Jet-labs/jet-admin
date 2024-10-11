@@ -30,7 +30,7 @@ export const QueryUpdateForm = ({ id }) => {
     queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.QUERIES, id],
     queryFn: () => getQueryByIDAPI({ pmQueryID: id }),
     cacheTime: 0,
-    retry: 1,
+    retry: 0,
     staleTime: 0,
   });
 

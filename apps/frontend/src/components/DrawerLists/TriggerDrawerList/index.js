@@ -39,7 +39,7 @@ export const TriggersDrawerList = () => {
     queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.TRIGGERS],
     queryFn: () => getAllTriggerAPI(),
     cacheTime: 0,
-    retry: 1,
+    retry: 0,
     staleTime: 0,
   });
 

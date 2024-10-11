@@ -35,7 +35,7 @@ export const DashboardsDrawerList = () => {
     queryKey: [`REACT_QUERY_KEY_DASHBOARD_LAYOUTS`],
     queryFn: () => getAllDashboardAPI(),
     cacheTime: 0,
-    retry: 1,
+    retry: 0,
     staleTime: 0,
   });
 

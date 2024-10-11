@@ -17,7 +17,7 @@ const TriggerViewComponent = ({ id }) => {
         pmTriggerID: id,
       }),
     cacheTime: 0,
-    retry: 1,
+    retry: 0,
     staleTime: 0,
   });
   return (

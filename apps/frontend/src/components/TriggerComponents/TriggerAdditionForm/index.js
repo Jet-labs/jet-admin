@@ -14,7 +14,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 
 import { getAllTables } from "../../../api/tables";
-import { addTriggerAPI } from "../../../api/triggers";
+import { addNotificationTriggerAPI } from "../../../api/triggers";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import {
   TRIGGER_EVENT,
@@ -22,6 +22,7 @@ import {
   TRIGGER_IMPACT_TIMING,
 } from "../../../utils/editorAutocomplete/pgKeywords";
 import { displayError, displaySuccess } from "../../../utils/notification";
+import { ArrayInput } from "../../ArrayInputComponent";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -47,7 +48,7 @@ const TriggerAdditionForm = () => {
     queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLES],
     queryFn: () => getAllTables(),
     cacheTime: 0,
-    retry: 1,
+    retry: 0,
     staleTime: 0,
   });
 
@@ -59,7 +60,7 @@ const TriggerAdditionForm = () => {
     mutate: addTrigger,
   } = useMutation({
     mutationFn: (data) => {
-      return addTriggerAPI({
+      return addNotificationTriggerAPI({
         data: data,
       });
     },
@@ -84,6 +85,8 @@ const TriggerAdditionForm = () => {
       pm_trigger_method: TRIGGER_FIRE_METHOD.FOR_EACH_STATEMENT,
       pm_trigger_condition: "",
       pm_trigger_channel_name: "",
+      pm_trigger_function_name: "",
+      pm_trigger_function_args: [],
     },
     onSubmit: (values) => {
       addTrigger(values);
@@ -91,22 +94,33 @@ const TriggerAdditionForm = () => {
     validate: (values) => {
       const errors = {};
       if (String(values.pm_trigger_name).trim() == "") {
-        errors.pm_trigger_name = "Required";
+        errors.pm_trigger_name =
+          LOCAL_CONSTANTS.STRINGS.FIELD_REQUIRED_ERROR_TEXT;
       }
       if (String(values.pm_trigger_table_name).trim() == "") {
-        errors.pm_trigger_table_name = "Required";
+        errors.pm_trigger_table_name =
+          LOCAL_CONSTANTS.STRINGS.FIELD_REQUIRED_ERROR_TEXT;
       }
       if (String(values.pm_trigger_timing).trim() == "") {
-        errors.pm_trigger_timing = "Required";
+        errors.pm_trigger_timing =
+          LOCAL_CONSTANTS.STRINGS.FIELD_REQUIRED_ERROR_TEXT;
       }
       if (String(values.pm_trigger_events).trim() == "") {
-        errors.pm_trigger_events = "Required";
+        errors.pm_trigger_events =
+          LOCAL_CONSTANTS.STRINGS.FIELD_REQUIRED_ERROR_TEXT;
       }
       if (String(values.pm_trigger_method).trim() == "") {
-        errors.pm_trigger_method = "Required";
+        errors.pm_trigger_method =
+          LOCAL_CONSTANTS.STRINGS.FIELD_REQUIRED_ERROR_TEXT;
       }
-      if (String(values.pm_trigger_channel_name).trim() == "") {
-        errors.pm_trigger_channel_name = "Required";
+      if (
+        String(values.pm_trigger_channel_name).trim() == "" &&
+        String(values.pm_trigger_function_name).trim() == ""
+      ) {
+        errors.pm_trigger_channel_name =
+          LOCAL_CONSTANTS.STRINGS.TRIGGER_EDITOR_FORM_FUNCTION_CHANNEL_ERROR_TEXT;
+        errors.pm_trigger_function_name =
+          LOCAL_CONSTANTS.STRINGS.TRIGGER_EDITOR_FORM_FUNCTION_CHANNEL_ERROR_TEXT;
       }
       return errors;
     },
@@ -264,7 +278,6 @@ const TriggerAdditionForm = () => {
             <FormControl fullWidth size="small" className="!mt-3">
               <span className="text-xs font-light  !capitalize mb-1">{`Notification channel`}</span>
               <TextField
-                required={true}
                 fullWidth
                 size="small"
                 variant="outlined"
@@ -276,6 +289,34 @@ const TriggerAdditionForm = () => {
                 error={triggerBuilderForm.errors.pm_trigger_channel_name}
               />
               {/* {error && <span className="mt-2 text-red-500">{error}</span>} */}
+            </FormControl>
+            <FormControl fullWidth size="small" className="!mt-3">
+              <span className="text-xs font-light  !capitalize mb-1">{`Function name (This has to be created prior)`}</span>
+              <TextField
+                fullWidth
+                size="small"
+                variant="outlined"
+                type="text"
+                name={"pm_trigger_function_name"}
+                value={triggerBuilderForm.values.pm_trigger_function_name}
+                onChange={triggerBuilderForm.handleChange}
+                onBlur={triggerBuilderForm.handleBlur}
+                error={triggerBuilderForm.errors.pm_trigger_function_name}
+              />
+              {/* {error && <span className="mt-2 text-red-500">{error}</span>} */}
+            </FormControl>
+            <FormControl fullWidth size="small" className="!mt-2">
+              <span className="text-xs font-light  !capitalize mb-1">{`Function arguments`}</span>
+              <ArrayInput
+                value={triggerBuilderForm.values.pm_trigger_function_args}
+                onChange={(value) => {
+                  triggerBuilderForm.setFieldValue(
+                    "pm_trigger_function_args",
+                    value
+                  );
+                }}
+                type={"text"}
+              />
             </FormControl>
             <div className="flex flex-row items-center justify-end w-full mt-10">
               <Button

@@ -23,7 +23,7 @@ export const GraphUpdateForm = ({ id }) => {
     queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.GRAPHS, id],
     queryFn: () => getGraphDataByIDAPI({ pmGraphID: id }),
     cacheTime: 0,
-    retry: 1,
+    retry: 0,
     staleTime: 0,
   });
   const {

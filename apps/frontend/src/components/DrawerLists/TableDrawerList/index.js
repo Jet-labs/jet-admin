@@ -33,7 +33,7 @@ export const TableDrawerList = () => {
     queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLES],
     queryFn: () => getAllTables(),
     cacheTime: 0,
-    retry: 1,
+    retry: 0,
     staleTime: 0,
   });
 

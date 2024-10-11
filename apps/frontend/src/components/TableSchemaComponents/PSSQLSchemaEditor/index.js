@@ -40,7 +40,7 @@ export const PGSQLSchemaBuilder = ({}) => {
     queryKey: [`REACT_QUERY_KEY_TABLE_SCHEMA`],
     queryFn: () => getSchemaAPI(),
     cacheTime: 0,
-    retry: 1,
+    retry: 0,
   });
 
   const {

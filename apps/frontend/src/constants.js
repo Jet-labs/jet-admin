@@ -92,6 +92,7 @@ export const LOCAL_CONSTANTS = {
     ADD_BUTTON_TEXT: "Add",
     DUPLICATE_BUTTON_TEXT: "Duplicate",
     EXPORT_BUTTON_TEXT: "Export",
+    FIELD_REQUIRED_ERROR_TEXT: "Input required",
 
     // accounts
     ACCOUNT_ADDITION_SUCCESS: "Account added!",
@@ -197,6 +198,10 @@ export const LOCAL_CONSTANTS = {
     QUERY_BUILDER_ALERT_TEXT:
       "Query objects are intended to allow only data manupulation and data fetching queries",
     QUERY_TEST_SUCCESS: "Query executed successfully",
+
+    //triggers
+    TRIGGER_EDITOR_FORM_FUNCTION_CHANNEL_ERROR_TEXT:
+      "One out of notification channel name or function name is required",
   },
 
   // routes

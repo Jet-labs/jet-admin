@@ -20,6 +20,25 @@ const generateCreateTriggerQuery = ({
   pmTriggerTableName,
   pmTriggerTiming,
   pmTriggerEvents,
+  pmTriggerFunctionName,
+  pmTriggerFunctionArgs,
+  pmTriggerMethod,
+  pmTriggerCondition,
+}) =>
+  `CREATE TRIGGER ${pmTriggerName} ${pmTriggerTiming} ${pmTriggerEvents.join(
+    " OR "
+  )} ON ${schemaName ? schemaName + "." : "public."}${pmTriggerTableName} ${
+    pmTriggerCondition ? `WHEN (${pmTriggerCondition})` : ""
+  } ${pmTriggerMethod} EXECUTE FUNCTION ${pmTriggerFunctionName}('${pmTriggerFunctionArgs.join(
+    ", "
+  )}');`;
+
+const generateCreateNotificationTriggerQuery = ({
+  schemaName,
+  pmTriggerName,
+  pmTriggerTableName,
+  pmTriggerTiming,
+  pmTriggerEvents,
   pmTriggerChannelName,
   pmTriggerMethod,
   pmTriggerCondition,
@@ -109,9 +128,10 @@ const deleteTriggerByName = ({ triggerName, tableName, schema }) => {
 
 module.exports = {
   replaceTriggerNameInQuery,
-  generateCreateTriggerQuery,
+  generateCreateNotificationTriggerQuery,
   generateCreateChannelQuery,
   getAllTriggersFromDBQuery,
   getTriggerByName,
   deleteTriggerByName,
+  generateCreateTriggerQuery,
 };

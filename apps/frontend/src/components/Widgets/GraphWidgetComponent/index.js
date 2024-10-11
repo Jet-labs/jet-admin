@@ -18,7 +18,7 @@ export const GraphWidgetComponent = ({ id, width, height }) => {
     queryKey: [`REACT_QUERY_KEY_GRAPH`, id],
     queryFn: () => getGraphByIDAPI({ pmGraphID: id }),
     cacheTime: 0,
-    retry: 1,
+    retry: 0,
     staleTime: 0,
   });
 
@@ -31,7 +31,7 @@ export const GraphWidgetComponent = ({ id, width, height }) => {
     queryKey: [`REACT_QUERY_KEY_GRAPH_DATA`, id],
     queryFn: () => getGraphDataByIDAPI({ pmGraphID: id }),
     cacheTime: 0,
-    retry: 1,
+    retry: 0,
     staleTime: 0,
     refetchInterval: graph?.pm_graph_options?.refetch_interval * 1000,
   });

@@ -80,7 +80,7 @@ export const PGSQLQueryEditor = ({ value, handleChange }) => {
     queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.QUERIES],
     queryFn: () => getAllQueryAPI(),
     cacheTime: 0,
-    retry: 1,
+    retry: 0,
     staleTime: 0,
   });
 
@@ -93,7 +93,7 @@ export const PGSQLQueryEditor = ({ value, handleChange }) => {
     queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLES],
     queryFn: () => getAllTables(),
     cacheTime: 0,
-    retry: 1,
+    retry: 0,
     staleTime: 0,
   });
   const {
@@ -105,7 +105,7 @@ export const PGSQLQueryEditor = ({ value, handleChange }) => {
     queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLE_COLUMNS],
     queryFn: () => getAllTableColumns(),
     cacheTime: 0,
-    retry: 1,
+    retry: 0,
     staleTime: 0,
   });
   console.log({ tableColumns });

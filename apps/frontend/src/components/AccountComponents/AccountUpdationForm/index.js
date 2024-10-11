@@ -30,7 +30,7 @@ export const AccountUpdationForm = ({ id }) => {
         pmAccountID: id,
       }),
     cacheTime: 0,
-    retry: 1,
+    retry: 0,
     staleTime: 0,
   });
 
@@ -42,7 +42,7 @@ export const AccountUpdationForm = ({ id }) => {
     queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.POLICIES],
     queryFn: () => getAllPoliciesAPI(),
     cacheTime: 0,
-    retry: 1,
+    retry: 0,
     staleTime: 0,
   });
 

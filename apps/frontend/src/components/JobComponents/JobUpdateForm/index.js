@@ -30,7 +30,7 @@ export const JobUpdateForm = ({ id }) => {
     queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.JOBS, id],
     queryFn: () => getJobByIDAPI({ pmJobID: id }),
     cacheTime: 0,
-    retry: 1,
+    retry: 0,
     staleTime: 0,
   });
 
@@ -43,7 +43,7 @@ export const JobUpdateForm = ({ id }) => {
     queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.QUERIES],
     queryFn: () => getAllQueryAPI(),
     cacheTime: 0,
-    retry: 1,
+    retry: 0,
     staleTime: 0,
   });
   const jobBuilderForm = useFormik({
