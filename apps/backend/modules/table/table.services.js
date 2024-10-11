@@ -472,6 +472,7 @@ class TableService {
         tableName,
         query,
         authorizedRows,
+        t: tableQueryUtils.deleteRows(tableName, query),
       },
     });
     try {

@@ -4,8 +4,7 @@ const Logger = require("../../utils/logger");
 const { TableService } = require("./table.services");
 const { createObjectCsvStringifier } = require("csv-writer");
 const ExcelJS = require("exceljs");
-const { generateOrderByQuery } = require("../../utils/postgres-utils/parsers");
-const { generateFilterQuery } = require("../../utils/string.util");
+const { generateFilterQuery } = require("../../utils/postgres-utils/parsers");
 
 const tableController = {};
 
@@ -467,12 +466,20 @@ tableController.deleteRowByMultipleIDs = async (req, res) => {
 
     Logger.log("info", {
       message: "tableController:deleteRowByMultipleIDs:params",
-      params: { pm_user_id, table_name, query, authorized_rows },
+      params: {
+        pm_user_id,
+        table_name,
+        query,
+        authorized_rows,
+      },
     });
 
     await TableService.deleteTableRowByMultipleIDs({
       tableName: table_name,
-      query: query,
+      query:
+        query && query !== "" && query != "null"
+          ? generateFilterQuery(query)
+          : null,
       authorizedRows: authorized_rows,
     });
 
@@ -509,12 +516,20 @@ tableController.exportRowByMultipleIDs = async (req, res) => {
 
     Logger.log("info", {
       message: "tableController:exportRowByMultipleIDs:params",
-      params: { pm_user_id, table_name, query, authorized_rows },
+      params: {
+        pm_user_id,
+        table_name,
+        query,
+        authorized_rows,
+      },
     });
 
     const rows = await TableService.exportTableRowByMultipleIDs({
       tableName: table_name,
-      query: query,
+      query:
+        query && query !== "" && query != "null"
+          ? generateFilterQuery(query)
+          : null,
       authorizedRows: authorized_rows,
     });
 
