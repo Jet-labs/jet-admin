@@ -60,7 +60,7 @@ export const AppConstantAdditionForm = () => {
   return (
     <div className="w-full !h-[calc(100vh-50px)] overflow-y-scroll">
       <div
-        className="flex flex-col items-start justify-start p-3 px-6 w-full"
+        className="flex flex-col items-start justify-start p-3 px-3 w-full"
         style={{
           background: theme.palette.background.paper,
           borderBottomWidth: 1,

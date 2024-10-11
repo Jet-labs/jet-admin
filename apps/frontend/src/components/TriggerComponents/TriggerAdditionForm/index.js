@@ -1,4 +1,5 @@
 import {
+  Alert,
   Box,
   Button,
   Chip,
@@ -130,7 +131,7 @@ const TriggerAdditionForm = () => {
   return (
     <div className="w-full !h-[calc(100vh-100px)]">
       <div
-        className="flex flex-col items-start justify-start p-3 px-6"
+        className="flex flex-col items-start justify-start p-3"
         style={{ background: theme.palette.background.paper }}
       >
         <span className="text-lg font-bold text-start mt-1">
@@ -276,6 +277,23 @@ const TriggerAdditionForm = () => {
               />
               {/* {error && <span className="mt-2 text-red-500">{error}</span>} */}
             </FormControl>
+            <Alert
+              sx={{
+                background: theme.palette.background.info,
+                color: theme.palette.info.main,
+
+                "& .MuiAlert-message": {
+                  marginTop: 0.2,
+                },
+              }}
+              severity="info"
+              className="!py-0 !mt-3 !text-xs"
+            >
+              {
+                LOCAL_CONSTANTS.STRINGS
+                  .TRIGGER_EDITOR_FORM_FUNCTION_CHANNEL_RECOMMENDATION
+              }
+            </Alert>
             <FormControl fullWidth size="small" className="!mt-3">
               <span className="text-xs font-light  !capitalize mb-1">{`Notification channel`}</span>
               <TextField

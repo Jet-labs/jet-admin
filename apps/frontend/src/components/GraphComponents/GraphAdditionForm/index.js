@@ -61,7 +61,7 @@ export const GraphAdditionForm = () => {
   return (
     <div className="w-full h-full overflow-y-scroll">
       <div
-        className="flex flex-row items-center justify-between p-3 px-6"
+        className="flex flex-row items-center justify-between p-3"
         style={{
           background: theme.palette.background.paper,
           borderBottomWidth: 1,

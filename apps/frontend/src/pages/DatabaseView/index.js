@@ -26,7 +26,7 @@ const DatabaseView = ({}) => {
 
   return (
     <div className="flex flex-col justify-start items-center w-full h-full">
-      <div className="flex flex-row items-center justify-start w-full p-2">
+      <div className="flex flex-row items-center justify-start w-full p-3">
         <span className="text-lg font-bold text-start ">
           {`Database statistics`}
         </span>
@@ -36,7 +36,7 @@ const DatabaseView = ({}) => {
         {schemaStatisticsData?.map((result, index) => {
           return (
             result.result_type === "array" && (
-              <Grid xs={12} sm={12} md={6} className="!p-2">
+              <Grid xs={12} sm={12} md={6} className="!p-3">
                 <TableWidgetComponent
                   title={String(result.name)
                     .split("_")

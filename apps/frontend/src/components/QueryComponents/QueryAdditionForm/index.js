@@ -76,7 +76,7 @@ export const QueryAdditionForm = () => {
   return (
     <div className="w-full !h-[calc(100vh-100px)]">
       <div
-        className="flex flex-col items-start justify-start p-3 px-6"
+        className="flex flex-col items-start justify-start p-3"
         style={{ background: theme.palette.background.paper }}
       >
         <span className="text-lg font-bold text-start mt-1">

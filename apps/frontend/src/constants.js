@@ -202,6 +202,8 @@ export const LOCAL_CONSTANTS = {
     //triggers
     TRIGGER_EDITOR_FORM_FUNCTION_CHANNEL_ERROR_TEXT:
       "One out of notification channel name or function name is required",
+    TRIGGER_EDITOR_FORM_FUNCTION_CHANNEL_RECOMMENDATION:
+      "User has to supply either a function name and its arguments. The function should be created earlier or user can provide a channel name on which users can recieve notifications whenever trigger fires. If user provide function then a trigger using supplied function will be created",
   },
 
   // routes
