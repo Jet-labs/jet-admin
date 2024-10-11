@@ -89,6 +89,7 @@ const TriggerAdditionForm = () => {
       pm_trigger_function_args: [],
     },
     onSubmit: (values) => {
+      console.log("called twice");
       addTrigger(values);
     },
     validate: (values) => {
@@ -305,7 +306,7 @@ const TriggerAdditionForm = () => {
               />
               {/* {error && <span className="mt-2 text-red-500">{error}</span>} */}
             </FormControl>
-            <FormControl fullWidth size="small" className="!mt-2">
+            <div fullWidth size="small" className="!mt-2">
               <span className="text-xs font-light  !capitalize mb-1">{`Function arguments`}</span>
               <ArrayInput
                 value={triggerBuilderForm.values.pm_trigger_function_args}
@@ -317,7 +318,7 @@ const TriggerAdditionForm = () => {
                 }}
                 type={"text"}
               />
-            </FormControl>
+            </div>
             <div className="flex flex-row items-center justify-end w-full mt-10">
               <Button
                 disableElevation
@@ -325,7 +326,6 @@ const TriggerAdditionForm = () => {
                 size="small"
                 type="submit"
                 className="!ml-2"
-                onClick={triggerBuilderForm.submitForm}
               >
                 {LOCAL_CONSTANTS.STRINGS.ADD_BUTTON_TEXT}
               </Button>
