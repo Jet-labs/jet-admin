@@ -478,7 +478,9 @@ tableController.deleteRowByMultipleIDs = async (req, res) => {
       tableName: table_name,
       query:
         query && query !== "" && query != "null"
-          ? generateFilterQuery(query)
+          ? typeof query === "object"
+            ? generateFilterQuery(query)
+            : query
           : null,
       authorizedRows: authorized_rows,
     });
@@ -528,7 +530,9 @@ tableController.exportRowByMultipleIDs = async (req, res) => {
       tableName: table_name,
       query:
         query && query !== "" && query != "null"
-          ? generateFilterQuery(query)
+          ? typeof query === "object"
+            ? generateFilterQuery(query)
+            : query
           : null,
       authorizedRows: authorized_rows,
     });
