@@ -281,13 +281,18 @@ export const TableColumnBuilder = ({ tableForm }) => {
         );
       })}
       <Button variant="outlined" className="!mt-3" onClick={_handleAddColumn}>
-        <FaPlus />
+        <FaPlus className="!mr-1" />
         {LOCAL_CONSTANTS.STRINGS.TABLE_COLUMN_ADDITION_PAGE_TITLE}
       </Button>
     </Grid>
   );
 };
-const ForeignKeyRenderer = ({ tableForm, tables, index }) => {
+const ForeignKeyRenderer = ({
+  tableForm,
+  tables,
+  index,
+  handleDeleteForeignKeyCostraint,
+}) => {
   const theme = useTheme();
   const {
     isLoading: isLoadingTableColumns,
@@ -315,7 +320,7 @@ const ForeignKeyRenderer = ({ tableForm, tables, index }) => {
       }`}
       style={{ borderColor: theme.palette.divider }}
     >
-      <Grid container className="!p-3">
+      <Grid container className="!p-3" columnSpacing={2}>
         <Grid item xl={12} lg={12} md={12} sm={12} xs={12}>
           <FormControl fullWidth size="small" className="!mt-0">
             <span className="text-xs font-light  !capitalize mb-1">{`Columns`}</span>
@@ -428,6 +433,60 @@ const ForeignKeyRenderer = ({ tableForm, tables, index }) => {
             </Select>
           </FormControl>
         </Grid>
+        <Grid item xl={6} lg={6} md={6} sm={6} xs={6}>
+          <FormControl fullWidth size="small" className="!mt-3">
+            <span className="text-xs font-light  !capitalize mb-1">{`On delete`}</span>
+            <Select
+              required={true}
+              fullWidth
+              size="small"
+              variant="outlined"
+              type="text"
+              placeholder="Data type"
+              name={`constraints.foreign_keys[${index}].on_delete`}
+              value={
+                tableForm.values["constraints"]["foreign_keys"][index].on_delete
+              }
+              onChange={tableForm.handleChange}
+              onBlur={tableForm.handleBlur}
+              error={
+                tableForm.errors?.["constraints"]?.["foreign_keys"]?.[index]
+                  .on_delete
+              }
+            >
+              {["NO ACTION", "RESTRICT", "CASCADE"]?.map((action) => {
+                return <MenuItem value={action}>{action}</MenuItem>;
+              })}
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid item xl={6} lg={6} md={6} sm={6} xs={6}>
+          <FormControl fullWidth size="small" className="!mt-3">
+            <span className="text-xs font-light  !capitalize mb-1">{`On update`}</span>
+            <Select
+              required={true}
+              fullWidth
+              size="small"
+              variant="outlined"
+              type="text"
+              placeholder="Data type"
+              name={`constraints.foreign_keys[${index}].on_update`}
+              value={
+                tableForm.values["constraints"]["foreign_keys"][index].on_update
+              }
+              onChange={tableForm.handleChange}
+              onBlur={tableForm.handleBlur}
+              error={
+                tableForm.errors?.["constraints"]?.["foreign_keys"]?.[index]
+                  .on_update
+              }
+            >
+              {["NO ACTION", "RESTRICT", "CASCADE"]?.map((action) => {
+                return <MenuItem value={action}>{action}</MenuItem>;
+              })}
+            </Select>
+          </FormControl>
+        </Grid>
       </Grid>
       <div
         className=" rounded-e"
@@ -435,7 +494,7 @@ const ForeignKeyRenderer = ({ tableForm, tables, index }) => {
       >
         <IconButton
           size="small"
-          // onClick={() => _handleDeleteCostraint(index)}
+          onClick={() => handleDeleteForeignKeyCostraint(index)}
         >
           <MdDeleteOutline className="!text-xl !text-red-700"></MdDeleteOutline>
         </IconButton>
@@ -445,14 +504,23 @@ const ForeignKeyRenderer = ({ tableForm, tables, index }) => {
 };
 export const TableConstraintBuilder = ({ tables, tableForm }) => {
   const theme = useTheme();
-  // const _handleAddCostraint = () => {
-  //   tableForm.setFieldValue("columns", [...tableForm.values.columns, {}]);
-  // };
-  // const _handleDeleteCostraint = (index) => {
-  //   const _d = structuredClone(tableForm.values.columns);
-  //   _d.splice(index, 1);
-  //   tableForm.setFieldValue("columns", [..._d]);
-  // };
+  const _handleAddForeignKeyCostraint = () => {
+    tableForm.setFieldValue("constraints.foreign_keys", [
+      ...tableForm.values["constraints"]["foreign_keys"],
+      {
+        columns: [],
+        ref_table: "",
+        ref_columns: [],
+        on_delete: "",
+        on_update: "",
+      },
+    ]);
+  };
+  const _handleDeleteForeignKeyCostraint = (index) => {
+    const _d = structuredClone(tableForm.values["constraints"]["foreign_keys"]);
+    _d.splice(index, 1);
+    tableForm.setFieldValue("constraints.foreign_keys", [..._d]);
+  };
 
   return (
     <Grid container className="!p-3">
@@ -575,17 +643,18 @@ export const TableConstraintBuilder = ({ tables, tableForm }) => {
             index={index}
             tables={tables}
             tableForm={tableForm}
+            handleDeleteForeignKeyCostraint={_handleDeleteForeignKeyCostraint}
           />
         );
       })}
-      {/* <Button
+      <Button
         variant="outlined"
         className="!mt-3"
-        onClick={_handleAddCostraint}
+        onClick={_handleAddForeignKeyCostraint}
       >
-        <FaPlus />
-        {LOCAL_CONSTANTS.STRINGS.TABLE_COLUMN_ADDITION_PAGE_TITLE}
-      </Button> */}
+        <FaPlus className="!mr-1" />
+        {LOCAL_CONSTANTS.STRINGS.TABLE_FOREIGN_KEY_ADDITION_PAGE_TITLE}
+      </Button>
     </Grid>
   );
 };
@@ -679,7 +748,7 @@ export const TableAdditionForm = () => {
     setTab(newTab);
   };
   return (
-    <div className="w-full h-full overflow-y-scroll">
+    <div className="w-full h-full overflow-y-auto">
       <div
         className="flex flex-row items-center justify-between p-3"
         style={{

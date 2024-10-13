@@ -21,7 +21,7 @@ const TriggerViewComponent = ({ id }) => {
     staleTime: 0,
   });
   return (
-    <div className="w-full !h-[calc(100vh-50px)] overflow-y-scroll">
+    <div className="w-full !h-[calc(100vh-50px)] overflow-y-auto">
       <div
         className="flex flex-col items-start justify-start p-3"
         style={{

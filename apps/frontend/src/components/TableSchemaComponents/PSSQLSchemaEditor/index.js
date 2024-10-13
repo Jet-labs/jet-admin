@@ -161,7 +161,7 @@ export const PGSQLSchemaBuilder = ({}) => {
         </ResizablePanelGroup>
       </ResizablePanel>
       <ResizableHandle withHandle={true} />
-      <ResizablePanel defaultSize={50} className="!overflow-y-scroll">
+      <ResizablePanel defaultSize={50} className="!overflow-y-auto">
         <div className="!w-full !p-1 !pt-2 !px-3">
           <span className="!font-semibold !text-sm">Exising schema</span>
         </div>

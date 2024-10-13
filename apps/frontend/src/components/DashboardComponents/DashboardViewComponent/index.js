@@ -10,7 +10,7 @@ export const DashboardViewComponent = ({ widgets, layouts }) => {
   const compactType = "verticle";
   return (
     <div
-      className="w-full h-full p-2 overflow-y-scroll pb-10"
+      className="w-full h-full p-2 overflow-y-auto pb-10"
       style={{ background: theme.palette.background.paper }}
     >
       <ResponsiveReactGridLayout

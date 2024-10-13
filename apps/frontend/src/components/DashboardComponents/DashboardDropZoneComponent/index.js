@@ -59,7 +59,7 @@ export const DashboardDropZoneComponent = ({
 
   return (
     <div
-      className="w-full h-full p-2 min-h-full overflow-y-scroll"
+      className="w-full h-full p-2 min-h-full overflow-y-auto"
       style={{ background: theme.palette.background.paper }}
     >
       <ResponsiveReactGridLayout

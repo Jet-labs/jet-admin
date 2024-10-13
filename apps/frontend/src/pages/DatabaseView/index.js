@@ -32,7 +32,7 @@ const DatabaseView = ({}) => {
         </span>
       </div>
       <Divider className="!w-full" />
-      <Grid container className="!w-full !overflow-y-scroll">
+      <Grid container className="!w-full !overflow-y-auto">
         {schemaStatisticsData?.map((result, index) => {
           return (
             result.result_type === "array" && (
