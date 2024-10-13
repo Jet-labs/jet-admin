@@ -34,7 +34,7 @@ export const QueryUpdateForm = ({ id }) => {
     staleTime: 0,
   });
 
-  const queryBuilderForm = useFormik({
+  const queryUpdateForm = useFormik({
     initialValues: {
       pm_query_title: "Untitled",
       pm_query_description: "",
@@ -50,23 +50,22 @@ export const QueryUpdateForm = ({ id }) => {
 
       return errors;
     },
-    onSubmit: (values) => {},
+    onSubmit: (values) => {
+      updateQuery(values);
+    },
   });
 
   useEffect(() => {
-    if (queryBuilderForm && queryData) {
-      queryBuilderForm.setFieldValue("pm_query_id", queryData.pm_query_id);
-      queryBuilderForm.setFieldValue(
-        "pm_query_title",
-        queryData.pm_query_title
-      );
-      queryBuilderForm.setFieldValue(
+    if (queryUpdateForm && queryData) {
+      queryUpdateForm.setFieldValue("pm_query_id", queryData.pm_query_id);
+      queryUpdateForm.setFieldValue("pm_query_title", queryData.pm_query_title);
+      queryUpdateForm.setFieldValue(
         "pm_query_description",
         queryData.pm_query_description
       );
-      queryBuilderForm.setFieldValue("pm_query_type", queryData.pm_query_type);
-      queryBuilderForm.setFieldValue("pm_query", queryData.pm_query);
-      queryBuilderForm.setFieldValue("pm_query_args", queryData.pm_query_args);
+      queryUpdateForm.setFieldValue("pm_query_type", queryData.pm_query_type);
+      queryUpdateForm.setFieldValue("pm_query", queryData.pm_query);
+      queryUpdateForm.setFieldValue("pm_query_args", queryData.pm_query_args);
     }
   }, [queryData]);
 
@@ -94,16 +93,12 @@ export const QueryUpdateForm = ({ id }) => {
 
   const _handleOnQueryChange = useCallback(
     (value) => {
-      if (queryBuilderForm) {
-        queryBuilderForm.setFieldValue("pm_query", value);
+      if (queryUpdateForm) {
+        queryUpdateForm.setFieldValue("pm_query", value);
       }
     },
-    [queryBuilderForm]
+    [queryUpdateForm]
   );
-
-  const _updateQuery = () => {
-    updateQuery(queryBuilderForm.values);
-  };
 
   return (
     <div className="w-full !h-[calc(100vh-100px)]">
@@ -125,7 +120,11 @@ export const QueryUpdateForm = ({ id }) => {
           </div>
         </div>
         <div className="!flex flex-row justify-end items-center">
-          <Button variant="contained" className="!ml-3" onClick={_updateQuery}>
+          <Button
+            variant="contained"
+            className="!ml-3"
+            onClick={queryUpdateForm.handleSubmit}
+          >
             {LOCAL_CONSTANTS.STRINGS.UPDATE_BUTTON_TEXT}
           </Button>
           <QueryDeletionForm id={id} />
@@ -153,9 +152,9 @@ export const QueryUpdateForm = ({ id }) => {
               variant="outlined"
               type="text"
               name={"pm_query_title"}
-              value={queryBuilderForm.values.pm_query_title}
-              onChange={queryBuilderForm.handleChange}
-              onBlur={queryBuilderForm.handleBlur}
+              value={queryUpdateForm.values.pm_query_title}
+              onChange={queryUpdateForm.handleChange}
+              onBlur={queryUpdateForm.handleBlur}
             />
             {/* {error && <span className="mt-2 text-red-500">{error}</span>} */}
           </FormControl>
@@ -169,18 +168,18 @@ export const QueryUpdateForm = ({ id }) => {
               variant="outlined"
               type="text"
               name={"pm_query_description"}
-              value={queryBuilderForm.values.pm_query_description}
-              onChange={queryBuilderForm.handleChange}
-              onBlur={queryBuilderForm.handleBlur}
+              value={queryUpdateForm.values.pm_query_description}
+              onChange={queryUpdateForm.handleChange}
+              onBlur={queryUpdateForm.handleBlur}
             />
             {/* {error && <span className="mt-2 text-red-500">{error}</span>} */}
           </FormControl>
           <FormControl fullWidth size="small" className="!mt-2 !px-3">
             <span className="text-xs font-light  !capitalize mb-1">{`Arguments`}</span>
             <ArrayInput
-              value={queryBuilderForm.values.pm_query_args}
+              value={queryUpdateForm.values.pm_query_args}
               onChange={(value) => {
-                queryBuilderForm.setFieldValue("pm_query_args", value);
+                queryUpdateForm.setFieldValue("pm_query_args", value);
               }}
               type={"text"}
             />
@@ -190,9 +189,9 @@ export const QueryUpdateForm = ({ id }) => {
         <ResizablePanel defaultSize={40} className="w-full !h-full">
           <PGSQLQueryBuilder
             pmQueryID={id}
-            value={queryBuilderForm.values.pm_query}
+            value={queryUpdateForm.values.pm_query}
             handleChange={_handleOnQueryChange}
-            args={queryBuilderForm.values.pm_query_args}
+            args={queryUpdateForm.values.pm_query_args}
           />
         </ResizablePanel>
       </ResizablePanelGroup>

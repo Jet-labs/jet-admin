@@ -35,7 +35,7 @@ export const JobAdditionForm = () => {
     retry: 0,
     staleTime: 0,
   });
-  const jobBuilderForm = useFormik({
+  const jobAdditionForm = useFormik({
     initialValues: {
       pm_job_title: "Untitled",
       pm_query_id: "",
@@ -47,7 +47,9 @@ export const JobAdditionForm = () => {
       const errors = {};
       return errors;
     },
-    onSubmit: (values) => {},
+    onSubmit: (values) => {
+      addJob(values);
+    },
   });
 
   const {
@@ -72,15 +74,11 @@ export const JobAdditionForm = () => {
     },
   });
 
-  const _addJob = () => {
-    addJob(jobBuilderForm.values);
-  };
-
   const _handleOnScheduleChange = useCallback(
     (value) => {
-      jobBuilderForm?.setFieldValue("pm_job_schedule", value);
+      jobAdditionForm?.setFieldValue("pm_job_schedule", value);
     },
-    [jobBuilderForm]
+    [jobAdditionForm]
   );
   return (
     <div className="w-full !h-[calc(100vh-100px)]">
@@ -96,7 +94,11 @@ export const JobAdditionForm = () => {
           {LOCAL_CONSTANTS.STRINGS.JOB_ADDITION_PAGE_TITLE}
         </span>
         <div className="!flex flex-row justify-end items-center">
-          <Button variant="contained" className="!ml-3" onClick={_addJob}>
+          <Button
+            variant="contained"
+            className="!ml-3"
+            onClick={jobAdditionForm.handleSubmit}
+          >
             {LOCAL_CONSTANTS.STRINGS.ADD_BUTTON_TEXT}
           </Button>
         </div>
@@ -114,9 +116,9 @@ export const JobAdditionForm = () => {
               variant="outlined"
               type="text"
               name={"pm_job_title"}
-              value={jobBuilderForm.values.pm_job_title}
-              onChange={jobBuilderForm.handleChange}
-              onBlur={jobBuilderForm.handleBlur}
+              value={jobAdditionForm.values.pm_job_title}
+              onChange={jobAdditionForm.handleChange}
+              onBlur={jobAdditionForm.handleBlur}
             />
             {/* {error && <span className="mt-2 text-red-500">{error}</span>} */}
           </FormControl>
@@ -125,9 +127,9 @@ export const JobAdditionForm = () => {
 
             <Select
               name={`pm_query_id`}
-              value={jobBuilderForm.values.pm_query_id}
-              onBlur={jobBuilderForm.handleBlur}
-              onChange={jobBuilderForm.handleChange}
+              value={jobAdditionForm.values.pm_query_id}
+              onBlur={jobAdditionForm.handleBlur}
+              onChange={jobAdditionForm.handleChange}
               required={true}
               size="small"
               fullWidth={true}
@@ -148,7 +150,7 @@ export const JobAdditionForm = () => {
           <div className="!mt-2 px-3 pb-3">
             <span className="text-xs font-light  !capitalize mb-1">{`Schedule the job`}</span>
             <CronJobScheduler
-              value={jobBuilderForm.values.pm_job_schedule}
+              value={jobAdditionForm.values.pm_job_schedule}
               handleChange={_handleOnScheduleChange}
             />
           </div>

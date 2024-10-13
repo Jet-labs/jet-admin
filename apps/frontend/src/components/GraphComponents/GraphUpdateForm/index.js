@@ -101,9 +101,6 @@ export const GraphUpdateForm = ({ id }) => {
     }
   }, [graphData]);
 
-  const _handleSubmit = () => {
-    graphUpdateForm.handleSubmit();
-  };
 
   return (
     <div className="w-full h-full overflow-y-scroll">
@@ -129,7 +126,7 @@ export const GraphUpdateForm = ({ id }) => {
         <div>
           <Button
             variant="contained"
-            onClick={_handleSubmit}
+            onClick={graphUpdateForm.handleSubmit}
             disabled={isUpdatingGraph}
           >
             {LOCAL_CONSTANTS.STRINGS.SUBMIT_BUTTON_TEXT}

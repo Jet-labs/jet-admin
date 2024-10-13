@@ -54,10 +54,6 @@ export const GraphAdditionForm = () => {
     },
   });
 
-  const _handleSubmit = () => {
-    graphAdditionForm.handleSubmit();
-  };
-
   return (
     <div className="w-full h-full overflow-y-scroll">
       <div
@@ -76,7 +72,7 @@ export const GraphAdditionForm = () => {
         <div>
           <Button
             variant="contained"
-            onClick={_handleSubmit}
+            onClick={graphAdditionForm.handleSubmit}
             disabled={isAddingGraph}
           >
             {LOCAL_CONSTANTS.STRINGS.SUBMIT_BUTTON_TEXT}

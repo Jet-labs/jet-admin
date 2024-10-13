@@ -1,4 +1,4 @@
-import { Button, Grid, useTheme } from "@mui/material";
+import { Button, FormControl, Grid, TextField, useTheme } from "@mui/material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React from "react";
 
@@ -21,6 +21,7 @@ import {
 export const DashboardAdditionForm = () => {
   const theme = useTheme();
   const queryClient = useQueryClient();
+
   const {
     isPending: isAddingDashboard,
     isSuccess: isAddingDashboardSuccess,
@@ -42,7 +43,8 @@ export const DashboardAdditionForm = () => {
       displayError(error);
     },
   });
-  const dashboardForm = useFormik({
+
+  const dashboardAdditionForm = useFormik({
     initialValues: {
       pm_dashboard_title: "",
       widgets: [],
@@ -62,6 +64,7 @@ export const DashboardAdditionForm = () => {
       });
     },
   });
+
   return (
     <div className="w-full h-full">
       <ResizablePanelGroup
@@ -74,13 +77,13 @@ export const DashboardAdditionForm = () => {
           style={{ background: theme.palette.divider }}
         >
           <DashboardDropZoneComponent
-            widgets={dashboardForm.values["widgets"]}
+            widgets={dashboardAdditionForm.values["widgets"]}
             setWidgets={(value) =>
-              dashboardForm.setFieldValue("widgets", value)
+              dashboardAdditionForm.setFieldValue("widgets", value)
             }
-            layouts={dashboardForm.values["layouts"]}
+            layouts={dashboardAdditionForm.values["layouts"]}
             setLayouts={(value) => {
-              dashboardForm.setFieldValue("layouts", value);
+              dashboardAdditionForm.setFieldValue("layouts", value);
             }}
           />
         </ResizablePanel>
@@ -99,8 +102,7 @@ export const DashboardAdditionForm = () => {
               className="flex flex-row justify-start items-center p-3"
               style={{ background: theme.palette.background.default }}
             >
-              <FiPlus className="!text-base !font-semibold" />
-              <span className="text-sm font-semibold text-start ml-2">
+              <span className="text-sm font-semibold text-start">
                 {LOCAL_CONSTANTS.STRINGS.DASHBOARD_ADDITION_PAGE_TITLE}
               </span>
             </div>
@@ -108,23 +110,45 @@ export const DashboardAdditionForm = () => {
               className="flex flex-col justify-center items-start p-3"
               style={{ background: theme.palette.background.default }}
             >
-              <FieldComponent
-                name={"pm_dashboard_title"}
-                type={LOCAL_CONSTANTS.DATA_TYPES.STRING}
-                value={dashboardForm.values["pm_dashboard_title"]}
-                onChange={dashboardForm.handleChange}
-              />
-              <div className="mt-2"></div>
-              <FieldComponent
-                name={"pm_dashboard_description"}
-                type={LOCAL_CONSTANTS.DATA_TYPES.STRING}
-                value={dashboardForm.values["pm_dashboard_description"]}
-                onChange={dashboardForm.handleChange}
-              />
+              <FormControl fullWidth size="small" className="">
+                <span className="text-xs font-light  !capitalize mb-1">{`Dashboard title`}</span>
+                <TextField
+                  required={true}
+                  fullWidth
+                  size="small"
+                  variant="outlined"
+                  type="text"
+                  name={"pm_dashboard_title"}
+                  value={dashboardAdditionForm.values["pm_dashboard_title"]}
+                  onChange={dashboardAdditionForm.handleChange}
+                  onBlur={dashboardAdditionForm.handleBlur}
+                  error={dashboardAdditionForm.errors["pm_dashboard_title"]}
+                />
+              </FormControl>
+              <FormControl fullWidth size="small" className="!mt-3">
+                <span className="text-xs font-light  !capitalize mb-1">{`Description`}</span>
+                <TextField
+                  required={true}
+                  fullWidth
+                  size="small"
+                  variant="outlined"
+                  type="text"
+                  name={"pm_dashboard_description"}
+                  value={
+                    dashboardAdditionForm.values["pm_dashboard_description"]
+                  }
+                  onChange={dashboardAdditionForm.handleChange}
+                  onBlur={dashboardAdditionForm.handleBlur}
+                  error={
+                    dashboardAdditionForm.errors["pm_dashboard_description"]
+                  }
+                />
+              </FormControl>
+
               <div className="mt-3 w-full flex flex-row justify-end">
                 <Button
                   variant="contained"
-                  onClick={dashboardForm.handleSubmit}
+                  onClick={dashboardAdditionForm.handleSubmit}
                 >
                   {LOCAL_CONSTANTS.STRINGS.ADD_BUTTON_TEXT}
                 </Button>

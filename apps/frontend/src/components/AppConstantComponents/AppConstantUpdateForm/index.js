@@ -28,7 +28,7 @@ export const AppConstantUpdateForm = ({ id }) => {
     retry: 0,
     staleTime: 0,
   });
-  const appConstantForm = useFormik({
+  const appConstantUpdateForm = useFormik({
     initialValues: {
       pm_app_constant_title: "Untitled",
       pm_app_constant_value: JSON.stringify({}),
@@ -40,21 +40,26 @@ export const AppConstantUpdateForm = ({ id }) => {
       const errors = {};
       return errors;
     },
-    onSubmit: (values) => {},
+    onSubmit: (values) => {
+      updateAppConstant(values);
+    },
   });
 
   useEffect(() => {
-    if (appConstantForm && appConstantData) {
-      appConstantForm.setFieldValue(
+    if (appConstantUpdateForm && appConstantData) {
+      appConstantUpdateForm.setFieldValue(
         "pm_app_constant_id",
         appConstantData.pm_app_constant_id
       );
-      appConstantForm.setFieldValue(
+      appConstantUpdateForm.setFieldValue(
         "pm_app_constant_title",
         appConstantData.pm_app_constant_title
       );
-      appConstantForm.setFieldValue("is_internal", appConstantData.is_internal);
-      appConstantForm.setFieldValue(
+      appConstantUpdateForm.setFieldValue(
+        "is_internal",
+        appConstantData.is_internal
+      );
+      appConstantUpdateForm.setFieldValue(
         "pm_app_constant_value",
         appConstantData.pm_app_constant_value
       );
@@ -86,7 +91,7 @@ export const AppConstantUpdateForm = ({ id }) => {
   });
 
   const _updateAppConstant = () => {
-    updateAppConstant(appConstantForm.values);
+    updateAppConstant(appConstantUpdateForm.values);
   };
 
   return (
@@ -111,7 +116,7 @@ export const AppConstantUpdateForm = ({ id }) => {
           <Button
             variant="contained"
             className="!ml-3"
-            onClick={_updateAppConstant}
+            onClick={appConstantUpdateForm.handleSubmit}
           >
             {LOCAL_CONSTANTS.STRINGS.UPDATE_BUTTON_TEXT}
           </Button>
@@ -124,7 +129,7 @@ export const AppConstantUpdateForm = ({ id }) => {
         // style={{ background: theme.palette.background.paper }}
       >
         <Grid item xl={6} lg={6} md={12} sm={12} xs={12}>
-          <AppConstantEditor appConstantForm={appConstantForm} />
+          <AppConstantEditor appConstantForm={appConstantUpdateForm} />
         </Grid>
         <Grid item xl={6} lg={6} md={0} sm={0} xs={0} className="!p-3"></Grid>
       </Grid>

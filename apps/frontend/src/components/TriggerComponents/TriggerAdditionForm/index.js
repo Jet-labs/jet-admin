@@ -90,7 +90,6 @@ const TriggerAdditionForm = () => {
       pm_trigger_function_args: [],
     },
     onSubmit: (values) => {
-      console.log("called twice");
       addTrigger(values);
     },
     validate: (values) => {
@@ -148,6 +147,7 @@ const TriggerAdditionForm = () => {
             size="small"
             type="submit"
             className="!ml-2"
+            onClick={triggerBuilderForm.handleSubmit}
           >
             {LOCAL_CONSTANTS.STRINGS.ADD_BUTTON_TEXT}
           </Button>
@@ -155,10 +155,7 @@ const TriggerAdditionForm = () => {
       </div>
       <Grid container>
         <Grid item xl={6} lg={6} md={12} sm={12} xs={12}>
-          <form
-            className="!flex !flex-col justify-start items-stretch w-full p-3"
-            onSubmit={triggerBuilderForm.handleSubmit}
-          >
+          <form className="!flex !flex-col justify-start items-stretch w-full p-3">
             <FormControl fullWidth size="small" className="!mt-3">
               <span className="text-xs font-light  !capitalize mb-1">{`Name`}</span>
               <TextField

@@ -12,7 +12,7 @@ export const AppConstantAdditionForm = () => {
   const theme = useTheme();
   const queryClient = useQueryClient();
 
-  const appConstantForm = useFormik({
+  const appConstantAdditionForm = useFormik({
     initialValues: {
       pm_app_constant_title:
         LOCAL_CONSTANTS.STRINGS.FORM_FIELD_PLACEHOLDER_UNTITLED,
@@ -25,7 +25,9 @@ export const AppConstantAdditionForm = () => {
       const errors = {};
       return errors;
     },
-    onSubmit: (values) => {},
+    onSubmit: (values) => {
+      addAppConstant(values);
+    },
   });
 
   const {
@@ -52,10 +54,6 @@ export const AppConstantAdditionForm = () => {
     },
   });
 
-  const _addAppConstant = () => {
-    addAppConstant(appConstantForm.values);
-  };
-
   return (
     <div className="w-full !h-[calc(100vh-50px)]">
       <div
@@ -73,7 +71,7 @@ export const AppConstantAdditionForm = () => {
           <Button
             variant="contained"
             className="!ml-3"
-            onClick={_addAppConstant}
+            onClick={appConstantAdditionForm.handleSubmit}
           >
             {LOCAL_CONSTANTS.STRINGS.ADD_BUTTON_TEXT}
           </Button>
@@ -81,7 +79,7 @@ export const AppConstantAdditionForm = () => {
       </div>
       <Grid container>
         <Grid item xl={6} lg={6} md={12} sm={12} xs={12}>
-          <AppConstantEditor appConstantForm={appConstantForm} />
+          <AppConstantEditor appConstantForm={appConstantAdditionForm} />
         </Grid>
         <Grid item xl={6} lg={6} md={0} sm={0} xs={0} className="!p-3"></Grid>
       </Grid>

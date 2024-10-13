@@ -1,4 +1,4 @@
-import { Button, Grid, useTheme } from "@mui/material";
+import { Button, FormControl, Grid, TextField, useTheme } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import React, { useEffect } from "react";
@@ -56,7 +56,7 @@ export const DashboardUpdateForm = ({ id }) => {
     },
   });
 
-  const dashboardForm = useFormik({
+  const dashboardUpdateForm = useFormik({
     initialValues: {
       pm_dashboard_title: "",
       widgets: [],
@@ -88,19 +88,19 @@ export const DashboardUpdateForm = ({ id }) => {
 
   useEffect(() => {
     if (dashboard) {
-      dashboardForm.setFieldValue(
+      dashboardUpdateForm.setFieldValue(
         "pm_dashboard_title",
         dashboard.pm_dashboard_title
       );
-      dashboardForm.setFieldValue(
+      dashboardUpdateForm.setFieldValue(
         "pm_dashboard_description",
         dashboard.pm_dashboard_description
       );
-      dashboardForm.setFieldValue(
+      dashboardUpdateForm.setFieldValue(
         "widgets",
         dashboard.pm_dashboard_options.widgets
       );
-      dashboardForm.setFieldValue(
+      dashboardUpdateForm.setFieldValue(
         "layouts",
         dashboard.pm_dashboard_options.layouts
       );
@@ -120,13 +120,13 @@ export const DashboardUpdateForm = ({ id }) => {
           // style={{ background: theme.palette.divider }}
         >
           <DashboardDropZoneComponent
-            widgets={dashboardForm.values["widgets"]}
+            widgets={dashboardUpdateForm.values["widgets"]}
             setWidgets={(value) =>
-              dashboardForm.setFieldValue("widgets", value)
+              dashboardUpdateForm.setFieldValue("widgets", value)
             }
-            layouts={dashboardForm.values["layouts"]}
+            layouts={dashboardUpdateForm.values["layouts"]}
             setLayouts={(value) => {
-              dashboardForm.setFieldValue("layouts", value);
+              dashboardUpdateForm.setFieldValue("layouts", value);
             }}
           />
         </ResizablePanel>
@@ -148,24 +148,41 @@ export const DashboardUpdateForm = ({ id }) => {
               className="flex flex-col justify-center items-start p-3 "
               style={{ background: theme.palette.background.default }}
             >
-              <FieldComponent
-                name={"pm_dashboard_title"}
-                type={LOCAL_CONSTANTS.POSTGRE_SQL_DATA_TYPES.text.name}
-                value={dashboardForm.values["pm_dashboard_title"]}
-                onChange={dashboardForm.handleChange}
-              />
-              <div className="mt-2"></div>
-              <FieldComponent
-                name={"pm_dashboard_description"}
-                type={LOCAL_CONSTANTS.POSTGRE_SQL_DATA_TYPES.text.name}
-                value={dashboardForm.values["pm_dashboard_description"]}
-                onChange={dashboardForm.handleChange}
-              />
+              <FormControl fullWidth size="small" className="">
+                <span className="text-xs font-light  !capitalize mb-1">{`Dashboard title`}</span>
+                <TextField
+                  required={true}
+                  fullWidth
+                  size="small"
+                  variant="outlined"
+                  type="text"
+                  name={"pm_dashboard_title"}
+                  value={dashboardUpdateForm.values["pm_dashboard_title"]}
+                  onChange={dashboardUpdateForm.handleChange}
+                  onBlur={dashboardUpdateForm.handleBlur}
+                  error={dashboardUpdateForm.errors["pm_dashboard_title"]}
+                />
+              </FormControl>
+              <FormControl fullWidth size="small" className="!mt-3">
+                <span className="text-xs font-light  !capitalize mb-1">{`Description`}</span>
+                <TextField
+                  required={true}
+                  fullWidth
+                  size="small"
+                  variant="outlined"
+                  type="text"
+                  name={"pm_dashboard_description"}
+                  value={dashboardUpdateForm.values["pm_dashboard_description"]}
+                  onChange={dashboardUpdateForm.handleChange}
+                  onBlur={dashboardUpdateForm.handleBlur}
+                  error={dashboardUpdateForm.errors["pm_dashboard_description"]}
+                />
+              </FormControl>
               <div className="mt-3 w-full flex flex-row justify-end">
                 <Button
                   variant="contained"
                   className="!ml-2"
-                  onClick={dashboardForm.handleSubmit}
+                  onClick={dashboardUpdateForm.handleSubmit}
                 >
                   {LOCAL_CONSTANTS.STRINGS.UPDATE_BUTTON_TEXT}
                 </Button>

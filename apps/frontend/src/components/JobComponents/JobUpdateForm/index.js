@@ -46,7 +46,8 @@ export const JobUpdateForm = ({ id }) => {
     retry: 0,
     staleTime: 0,
   });
-  const jobBuilderForm = useFormik({
+  
+  const jobUpdateForm = useFormik({
     initialValues: {
       pm_job_title: "Untitled",
       pm_query_id: "",
@@ -59,16 +60,16 @@ export const JobUpdateForm = ({ id }) => {
       return errors;
     },
     onSubmit: (values) => {
-
+      updateJob(values);
     },
   });
 
   useEffect(() => {
-    if (jobBuilderForm && jobData) {
-      jobBuilderForm.setFieldValue("pm_job_id", jobData.pm_job_id);
-      jobBuilderForm.setFieldValue("pm_job_title", jobData.pm_job_title);
-      jobBuilderForm.setFieldValue("pm_query_id", jobData.pm_query_id);
-      jobBuilderForm.setFieldValue("pm_job_schedule", jobData.pm_job_schedule);
+    if (jobUpdateForm && jobData) {
+      jobUpdateForm.setFieldValue("pm_job_id", jobData.pm_job_id);
+      jobUpdateForm.setFieldValue("pm_job_title", jobData.pm_job_title);
+      jobUpdateForm.setFieldValue("pm_query_id", jobData.pm_query_id);
+      jobUpdateForm.setFieldValue("pm_job_schedule", jobData.pm_job_schedule);
     }
   }, [jobData]);
 
@@ -94,15 +95,11 @@ export const JobUpdateForm = ({ id }) => {
     },
   });
 
-  const _updateJob = () => {
-    updateJob(jobBuilderForm.values);
-  };
-
   const _handleOnScheduleChange = useCallback(
     (value) => {
-      jobBuilderForm?.setFieldValue("pm_job_schedule", value);
+      jobUpdateForm?.setFieldValue("pm_job_schedule", value);
     },
-    [jobBuilderForm]
+    [jobUpdateForm]
   );
   return (
     <div className="w-full !h-[calc(100vh-100px)]">
@@ -122,7 +119,11 @@ export const JobUpdateForm = ({ id }) => {
         </div>
         <div className="!flex flex-row justify-end items-center">
           <JobDeletionForm id={id} />
-          <Button variant="contained" className="!ml-3" onClick={_updateJob}>
+          <Button
+            variant="contained"
+            className="!ml-3"
+            onClick={jobUpdateForm.handleSubmit}
+          >
             {LOCAL_CONSTANTS.STRINGS.UPDATE_BUTTON_TEXT}
           </Button>
         </div>
@@ -140,9 +141,9 @@ export const JobUpdateForm = ({ id }) => {
               variant="outlined"
               type="text"
               name={"pm_job_title"}
-              value={jobBuilderForm.values.pm_job_title}
-              onChange={jobBuilderForm.handleChange}
-              onBlur={jobBuilderForm.handleBlur}
+              value={jobUpdateForm.values.pm_job_title}
+              onChange={jobUpdateForm.handleChange}
+              onBlur={jobUpdateForm.handleBlur}
             />
             {/* {error && <span className="mt-2 text-red-500">{error}</span>} */}
           </FormControl>
@@ -151,9 +152,9 @@ export const JobUpdateForm = ({ id }) => {
 
             <Select
               name={`pm_query_id`}
-              value={jobBuilderForm.values.pm_query_id}
-              onBlur={jobBuilderForm.handleBlur}
-              onChange={jobBuilderForm.handleChange}
+              value={jobUpdateForm.values.pm_query_id}
+              onBlur={jobUpdateForm.handleBlur}
+              onChange={jobUpdateForm.handleChange}
               required={true}
               size="small"
               fullWidth={true}
@@ -174,7 +175,7 @@ export const JobUpdateForm = ({ id }) => {
           <div className="!mt-2 px-3 pb-3">
             <span className="text-xs font-light  !capitalize mb-1">{`Schedule the job`}</span>
             <CronJobScheduler
-              value={jobBuilderForm.values.pm_job_schedule}
+              value={jobUpdateForm.values.pm_job_schedule}
               handleChange={_handleOnScheduleChange}
             />
           </div>

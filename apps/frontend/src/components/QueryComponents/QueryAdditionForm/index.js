@@ -4,7 +4,6 @@ import { useFormik } from "formik";
 import React, { useCallback } from "react";
 import "react-data-grid/lib/styles.css";
 import { addQueryAPI } from "../../../api/queries";
-import { query_variable_usage_tip } from "../../../assets/tips";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { ArrayInput } from "../../ArrayInputComponent";
@@ -13,13 +12,12 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "../../Resizables";
-import { Tip } from "../../Tip";
 import { PGSQLQueryBuilder } from "../QueryBuilderComponents/PGSQLQueryBuilder";
 
 export const QueryAdditionForm = () => {
   const theme = useTheme();
   const queryClient = useQueryClient();
-  const queryBuilderForm = useFormik({
+  const queryAdditionForm = useFormik({
     initialValues: {
       pm_query_title: "Untitled",
       pm_query_description: "",
@@ -34,7 +32,7 @@ export const QueryAdditionForm = () => {
       return errors;
     },
     onSubmit: (values) => {
-
+      addPGQuery(values);
     },
   });
 
@@ -62,16 +60,12 @@ export const QueryAdditionForm = () => {
 
   const _handleOnQueryChange = useCallback(
     (value) => {
-      if (queryBuilderForm) {
-        queryBuilderForm.setFieldValue("pm_query", value);
+      if (queryAdditionForm) {
+        queryAdditionForm.setFieldValue("pm_query", value);
       }
     },
-    [queryBuilderForm]
+    [queryAdditionForm]
   );
-
-  const _addQuery = () => {
-    addPGQuery(queryBuilderForm.values);
-  };
 
   return (
     <div className="w-full !h-[calc(100vh-100px)]">
@@ -87,7 +81,11 @@ export const QueryAdditionForm = () => {
           {LOCAL_CONSTANTS.STRINGS.QUERY_ADDITION_PAGE_TITLE}
         </span>
         <div className="!flex flex-row justify-end items-center">
-          <Button variant="contained" className="!ml-3" onClick={_addQuery}>
+          <Button
+            variant="contained"
+            className="!ml-3"
+            onClick={queryAdditionForm.handleSubmit}
+          >
             {LOCAL_CONSTANTS.STRINGS.ADD_BUTTON_TEXT}
           </Button>
         </div>
@@ -113,9 +111,9 @@ export const QueryAdditionForm = () => {
               variant="outlined"
               type="text"
               name={"pm_query_title"}
-              value={queryBuilderForm.values.pm_query_title}
-              onChange={queryBuilderForm.handleChange}
-              onBlur={queryBuilderForm.handleBlur}
+              value={queryAdditionForm.values.pm_query_title}
+              onChange={queryAdditionForm.handleChange}
+              onBlur={queryAdditionForm.handleBlur}
             />
             {/* {error && <span className="mt-2 text-red-500">{error}</span>} */}
           </FormControl>
@@ -129,18 +127,18 @@ export const QueryAdditionForm = () => {
               variant="outlined"
               type="text"
               name={"pm_query_description"}
-              value={queryBuilderForm.values.pm_query_description}
-              onChange={queryBuilderForm.handleChange}
-              onBlur={queryBuilderForm.handleBlur}
+              value={queryAdditionForm.values.pm_query_description}
+              onChange={queryAdditionForm.handleChange}
+              onBlur={queryAdditionForm.handleBlur}
             />
             {/* {error && <span className="mt-2 text-red-500">{error}</span>} */}
           </FormControl>
           <FormControl fullWidth size="small" className="!mt-2 !px-3">
             <span className="text-xs font-light  !capitalize mb-1">{`Arguments`}</span>
             <ArrayInput
-              value={queryBuilderForm.values.pm_query_args}
+              value={queryAdditionForm.values.pm_query_args}
               onChange={(value) => {
-                queryBuilderForm.setFieldValue("pm_query_args", value);
+                queryAdditionForm.setFieldValue("pm_query_args", value);
               }}
               type={"text"}
             />
@@ -149,9 +147,9 @@ export const QueryAdditionForm = () => {
         <ResizableHandle withHandle={true} />
         <ResizablePanel defaultSize={60} className="w-full !h-full">
           <PGSQLQueryBuilder
-            value={queryBuilderForm.values.pm_query}
+            value={queryAdditionForm.values.pm_query}
             handleChange={_handleOnQueryChange}
-            args={queryBuilderForm.values.pm_query_args}
+            args={queryAdditionForm.values.pm_query_args}
           />
         </ResizablePanel>
       </ResizablePanelGroup>
