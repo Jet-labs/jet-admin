@@ -16,6 +16,7 @@ const AddRow = lazy(() => import("../../../pages/AddRow"));
 const DatabaseView = lazy(() => import("../../../pages/DatabaseView"));
 const TableView = lazy(() => import("../../../pages/TableView"));
 const SQLEditor = lazy(() => import("../../../pages/SQLEditor"));
+const AddTable = lazy(() => import("../../../pages/AddTable"));
 
 const TableLayout = () => {
   return (
@@ -30,6 +31,10 @@ const TableLayout = () => {
           <Route
             path={LOCAL_CONSTANTS.ROUTES.SQL_EDITOR.code}
             element={<SQLEditor />}
+          />
+          <Route
+            path={LOCAL_CONSTANTS.ROUTES.ADD_TABLE.code}
+            element={<AddTable />}
           />
 
           <Route path={LOCAL_CONSTANTS.ROUTES.TABLE_VIEW.code}>

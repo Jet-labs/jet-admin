@@ -107,17 +107,25 @@ export const JobUpdateForm = ({ id }) => {
   return (
     <div className="w-full !h-[calc(100vh-100px)]">
       <div
-        className="flex flex-col items-start justify-start p-3 "
+        className="flex flex-row items-center justify-between p-3 "
         style={{
           background: theme.palette.background.default,
           borderBottomWidth: 1,
           borderColor: theme.palette.divider,
         }}
       >
-        <span className="text-lg font-bold text-start">
-          {LOCAL_CONSTANTS.STRINGS.JOB_UPDATE_PAGE_TITLE}
-        </span>
-        <span className="text-xs font-medium text-start mt-1">{`Job id : ${id}`}</span>
+        <div className="flex flex-col items-start justify-start ">
+          <span className="text-lg font-bold text-start">
+            {LOCAL_CONSTANTS.STRINGS.JOB_UPDATE_PAGE_TITLE}
+          </span>
+          <span className="text-xs font-medium text-start mt-1">{`Job id : ${id}`}</span>
+        </div>
+        <div className="!flex flex-row justify-end items-center">
+          <JobDeletionForm id={id} />
+          <Button variant="contained" className="!ml-3" onClick={_updateJob}>
+            {LOCAL_CONSTANTS.STRINGS.UPDATE_BUTTON_TEXT}
+          </Button>
+        </div>
       </div>
 
       <Grid container className="!h-full">
@@ -169,12 +177,6 @@ export const JobUpdateForm = ({ id }) => {
               value={jobBuilderForm.values.pm_job_schedule}
               handleChange={_handleOnScheduleChange}
             />
-          </div>
-          <div className="!flex flex-row justify-end items-center mt-5 w-100 px-3">
-            <JobDeletionForm id={id} />
-            <Button variant="contained" className="!ml-3" onClick={_updateJob}>
-              {LOCAL_CONSTANTS.STRINGS.UPDATE_BUTTON_TEXT}
-            </Button>
           </div>
         </Grid>
       </Grid>

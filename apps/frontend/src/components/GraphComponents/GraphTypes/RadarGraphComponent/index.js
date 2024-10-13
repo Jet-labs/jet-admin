@@ -89,7 +89,7 @@ export const RadarGraphComponent = ({
           display: Boolean(titleDisplayEnabled),
           text: pmGraphTitle
             ? pmGraphTitle
-            : LOCAL_CONSTANTS.STRINGS.UNTITLED_CHART_TITLE,
+            : LOCAL_CONSTANTS.STRINGS.FORM_FIELD_PLACEHOLDER_UNTITLED,
         },
       },
     };

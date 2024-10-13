@@ -19,11 +19,15 @@ const LoginForm = ({}) => {
   const { login } = useAuthActions();
   return (
     <div className="flex flex-col items-start p-4 mt-20 lg:w-1/3 md:w-1/2  w-full">
-      <span className="font font-bold text-3xl w-4/5 mb-2 text-start">
-        Sign In
-      </span>
+      <div className="flex flex-row items-center mb-4">
+        <img src={logo} className="mr-2 -ml-1 !h-10 !w-10"></img>
+        <span className="font-bold text-lg flex-grow ">
+          {LOCAL_CONSTANTS.APP_NAME}
+        </span>
+      </div>
+
       <span className="!font-thin text-justify text-sm w-full mb-2 mt-2">
-        Please enter details to begin.
+        {LOCAL_CONSTANTS.STRINGS.SIGN_IN_PAGE_TITLE}
       </span>
       <Formik
         initialValues={{ username: "super_admin", password: "1234" }}
@@ -126,15 +130,6 @@ const SignIn = ({}) => {
 
   return (
     <div className="signin_main">
-      <AppBar position="sticky" className="!bg-transparent" elevation={0}>
-        <Toolbar className="!mt-2">
-          <img src={logo} className="mr-2 !h-10 !w-10"></img>
-          <span className="font-bold text-lg flex-grow ">
-            {LOCAL_CONSTANTS.APP_NAME}
-          </span>
-        </Toolbar>
-      </AppBar>
-
       <LoginForm />
       <div id="recaptcha-container"></div>
     </div>

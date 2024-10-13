@@ -83,17 +83,23 @@ export const LOCAL_CONSTANTS = {
     DEFAULT_DASHBOARD_ID_STORAGE: "default_dashboard_id",
     PM_USER_TABLE_NAME: "tbl_pm_users",
     POLICY_OBJECT_TABLE_NAME: "tbl_pm_policy_objects",
-    UNTITLED_CHART_TITLE: "Untitled chart",
     JOB_HISTORY_TABLE_NAME: "tbl_pm_job_history",
     APP_CONSTANTS_TABLE_NAME: "tbl_pm_app_constants",
     DELETE_BUTTON_TEXT: "Delete",
     UPDATE_BUTTON_TEXT: "Update",
     SUBMIT_BUTTON_TEXT: "Submit",
+    CONFIRM_BUTTON_TEXT: "Confirm",
     ADD_BUTTON_TEXT: "Add",
     DUPLICATE_BUTTON_TEXT: "Duplicate",
     EXPORT_BUTTON_TEXT: "Export",
     FIELD_REQUIRED_ERROR_TEXT: "Input required",
+    FORM_FIELD_PLACEHOLDER_UNTITLED: "Untitled",
+    HIDE_CONTENT_BUTTON_TEXT: "Hide content",
+    SHOW_CONTENT_BUTTON_TEXT: "Show content",
+    DROPPING_ELEMENT_TAG: "__dropping-elem__",
 
+    //signin
+    SIGN_IN_PAGE_TITLE: "Please enter details to sign in",
     // accounts
     ACCOUNT_ADDITION_SUCCESS: "Account added!",
     ACCOUNT_UPDATED_SUCCESS: "Account updated!",
@@ -106,7 +112,11 @@ export const LOCAL_CONSTANTS = {
     ACCOUNT_PASSWORD_UPDATE_PAGE_TITLE: "Account password change",
     ACCOUNT_PASSWORD_UPDATE_BUTTON_TEXT: "Set password",
     ACCOUNT_UPDATE_PAGE_TITLE: "Account settings",
+    ACCOUNT_PASSWORD_RESET_FORM_PASSWORD_FIELD_LABEL: "Password",
+    ACCOUNT_PASSWORD_RESET_FORM_CONFIRM_PASSWORD_FIELD_LABEL:
+      "Confirm password",
 
+    //policy
     POLICY_ADDITION_SUCCESS: "Policy added!",
     POLICY_UPDATED_SUCCESS: "Policy updated!",
     POLICY_DELETED_SUCCESS: "Policy deleted!",
@@ -150,8 +160,8 @@ export const LOCAL_CONSTANTS = {
     JOB_DELETION_CONFIRMATION_TITLE: "Delete job?",
     JOB_DELETION_CONFIRMATION_BODY: "Are you sure you want to delete job",
     JOB_UPDATE_PAGE_TITLE: "Update job",
-    // graphs
 
+    // graphs
     GRAPH_ADDITION_SUCCESS: "Graph added!",
     GRAPH_UPDATED_SUCCESS: "Graph updated!",
     GRAPH_DELETED_SUCCESS: "Graph deleted!",
@@ -178,7 +188,11 @@ export const LOCAL_CONSTANTS = {
     APP_CONSTANT_DELETION_CONFIRMATION_BODY:
       "Are you sure you want to delete app constant",
     APP_CONSTANT_UPDATE_PAGE_TITLE: "Update app constant",
+    APP_CONSTANT_INTERNAL_CONSTANTS_RECOMMENDATION:
+      "Internal app constants should not be deleted",
+    APP_CONSTANT_FORM_INTERNAL_FIELD_LABEL: "Internal",
 
+    //dashboards
     DASHBOARD_ADDITION_SUCCESS: "Dashboard added!",
     DASHBOARD_UPDATED_SUCCESS: "Dashboard updated!",
     DASHBOARD_DELETED_SUCCESS: "Dashboard deleted!",
@@ -190,6 +204,7 @@ export const LOCAL_CONSTANTS = {
 
     //tables
     TABLE_ADD_BUTTON_TEXT: "Add table",
+    TABLE_ADDITION_PAGE_TITLE: "Add table",
 
     //SQL
     SQL_EDITOR_NAVIGATE_BUTTON_TEXT: "Open SQL editor",

@@ -2,6 +2,7 @@ import Button from "@mui/material/Button";
 import Collapse from "@mui/material/Collapse";
 import React, { useState } from "react";
 import { BiChevronDown, BiChevronUp } from "react-icons/bi";
+import { LOCAL_CONSTANTS } from "../../constants";
 
 export const CollapseComponent = ({
   showButtonText,
@@ -35,8 +36,8 @@ export const CollapseComponent = ({
         onClick={handleToggle}
       >
         {isOpen
-          ? hideButtonText || "Hide Content"
-          : showButtonText || "Show Content"}
+          ? hideButtonText || LOCAL_CONSTANTS.STRINGS.HIDE_CONTENT_BUTTON_TEXT
+          : showButtonText || LOCAL_CONSTANTS.STRINGS.SHOW_CONTENT_BUTTON_TEXT}
       </Button>
 
       <Collapse in={isOpen}>{content()}</Collapse>

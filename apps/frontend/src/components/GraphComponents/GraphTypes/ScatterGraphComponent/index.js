@@ -81,7 +81,9 @@ export const ScatterGraphComponent = ({
         },
         title: {
           display: !!titleDisplayEnabled,
-          text: pmGraphTitle || LOCAL_CONSTANTS.STRINGS.UNTITLED_CHART_TITLE,
+          text:
+            pmGraphTitle ||
+            LOCAL_CONSTANTS.STRINGS.FORM_FIELD_PLACEHOLDER_UNTITLED,
         },
       },
     };

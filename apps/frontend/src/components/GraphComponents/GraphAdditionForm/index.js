@@ -32,7 +32,7 @@ export const GraphAdditionForm = () => {
       displayError(error);
     },
   });
-  const graphForm = useFormik({
+  const graphAdditionForm = useFormik({
     initialValues: {
       graph_type: GRAPH_PLUGINS_MAP.BAR.value,
       title_display_enabled: true,
@@ -55,7 +55,7 @@ export const GraphAdditionForm = () => {
   });
 
   const _handleSubmit = () => {
-    graphForm.handleSubmit();
+    graphAdditionForm.handleSubmit();
   };
 
   return (
@@ -86,14 +86,16 @@ export const GraphAdditionForm = () => {
       <Grid container spacing={1} className="!px-3">
         <Grid item lg={7} md={8} className="w-full">
           <GraphComponentPreview
-            graphType={graphForm.values["graph_type"]}
-            legendPosition={graphForm.values["legend_position"]}
-            titleDisplayEnabled={graphForm.values["title_display_enabled"]}
-            pmGraphTitle={graphForm.values["pm_graph_title"]}
+            graphType={graphAdditionForm.values["graph_type"]}
+            legendPosition={graphAdditionForm.values["legend_position"]}
+            titleDisplayEnabled={
+              graphAdditionForm.values["title_display_enabled"]
+            }
+            pmGraphTitle={graphAdditionForm.values["pm_graph_title"]}
           />
         </Grid>
         <Grid item lg={5} md={4} className="w-full">
-          <GraphEditor graphForm={graphForm} />
+          <GraphEditor graphForm={graphAdditionForm} />
         </Grid>
       </Grid>
     </div>

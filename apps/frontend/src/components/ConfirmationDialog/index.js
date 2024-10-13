@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import warning_illustration from "../../assets/warning_illustration.svg";
 import { FaTimes } from "react-icons/fa";
+import { LOCAL_CONSTANTS } from "../../constants";
 
 export const ConfirmationDialog = ({
   onDecline,
@@ -31,7 +32,7 @@ export const ConfirmationDialog = ({
       aria-describedby="alert-dialog-description"
     >
       {isLoading ? (
-        <DialogContent className="!p-2 !flex !flex-row !justify-start !items-center !p-4">
+        <DialogContent className="!flex !flex-row !justify-start !items-center !p-4">
           {loadingText && (
             <span className="text-base font-semibold text-slate-700">
               {loadingText}
@@ -63,7 +64,9 @@ export const ConfirmationDialog = ({
               size="small"
               onClick={onAccepted}
             >
-              {confirmText ? confirmText : "Confirm"}
+              {confirmText
+                ? confirmText
+                : LOCAL_CONSTANTS.STRINGS.CONFIRM_BUTTON_TEXT}
             </Button>
           </DialogActions>
         </>

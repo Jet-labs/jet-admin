@@ -1,14 +1,14 @@
-import React, { useRef } from "react";
-import CodeMirror, { useCodeMirror } from "@uiw/react-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
 import { json } from "@codemirror/lang-json";
 import { sql } from "@codemirror/lang-sql";
+import CodeMirror from "@uiw/react-codemirror";
+import React, { useRef } from "react";
 
+import { useTheme } from "@mui/material";
+import { loadLanguage } from "@uiw/codemirror-extensions-langs";
 import { githubLight } from "@uiw/codemirror-theme-github";
 import { vscodeDark } from "@uiw/codemirror-theme-vscode";
-import { useTheme } from "@mui/material";
 import { useThemeValue } from "../../contexts/themeContext";
-import { loadLanguage } from "@uiw/codemirror-extensions-langs";
 const langMap = {
   javascript: javascript(),
   json: json(),

@@ -1,7 +1,4 @@
 const constants = {
-  BACKEND_NODE_ID:
-    process.env.NODE_ENV === "development" ? "dev_node_1" : "prod_node_1",
-
   // strings
   STRINGS: {
     REFRESH_TOKEN_COOKIE_STRING: "refreshToken",
@@ -10,9 +7,6 @@ const constants = {
   // thresholds
 
   // defaults
-  ACCESS_TOKEN_TIMEOUT: 900, // in sec
-  REFRESH_TOKEN_TIMEOUT: "10h",
-
   ROW_PAGE_SIZE: 100,
 
   DUMMY_PERMISSION: {
@@ -24,6 +18,10 @@ const constants = {
 
   // error codes
   ERROR_CODES: {
+    NOT_ALLOWED_BY_CORS: {
+      code: "NOT_ALLOWED_BY_CORS",
+      message: "Not allowed by CORS",
+    },
     PERMISSION_DENIED: {
       code: "PERMISSION_DENIED",
       message: "Permission denied",

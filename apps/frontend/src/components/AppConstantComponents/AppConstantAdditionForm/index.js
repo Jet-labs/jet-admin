@@ -4,11 +4,9 @@ import { useFormik } from "formik";
 import React from "react";
 import "react-data-grid/lib/styles.css";
 import { addAppConstantAPI } from "../../../api/appConstants";
-import { app_constant_usage_tip } from "../../../assets/tips";
-import { displayError, displaySuccess } from "../../../utils/notification";
-import { Tip } from "../../Tip";
-import { AppConstantEditor } from "../AppConstantEditor";
 import { LOCAL_CONSTANTS } from "../../../constants";
+import { displayError, displaySuccess } from "../../../utils/notification";
+import { AppConstantEditor } from "../AppConstantEditor";
 
 export const AppConstantAdditionForm = () => {
   const theme = useTheme();
@@ -16,7 +14,8 @@ export const AppConstantAdditionForm = () => {
 
   const appConstantForm = useFormik({
     initialValues: {
-      pm_app_constant_title: "Untitled",
+      pm_app_constant_title:
+        LOCAL_CONSTANTS.STRINGS.FORM_FIELD_PLACEHOLDER_UNTITLED,
       pm_app_constant_value: JSON.stringify({}),
       is_internal: false,
     },

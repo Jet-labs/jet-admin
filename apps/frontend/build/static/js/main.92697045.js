@@ -829,7 +829,7 @@
               REFRESH_TOKEN_LOCAL_STORAGE: "refresh_token",
               PM_USER_TABLE_NAME: "tbl_pm_users",
               POLICY_OBJECT_TABLE_NAME: "tbl_pm_policy_objects",
-              UNTITLED_CHART_TITLE: "Untitled chart",
+              FORM_FIELD_PLACEHOLDER_UNTITLED: "Untitled chart",
               JOB_HISTORY_TABLE_NAME: "tbl_pm_job_history",
               APP_CONSTANTS_TABLE_NAME: "tbl_pm_app_constants",
               DELETE_BUTTON_TEXT: "Delete",

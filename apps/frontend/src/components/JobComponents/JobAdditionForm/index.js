@@ -83,14 +83,19 @@ export const JobAdditionForm = () => {
     [jobBuilderForm]
   );
   return (
-    <div className="w-full !h-[calc(100vh-50px)] overflow-y-scroll">
+    <div className="w-full !h-[calc(100vh-100px)]">
       <div
-        className="flex flex-col items-start justify-start p-3"
+        className="flex flex-row items-center justify-between p-3"
         style={{ background: theme.palette.background.paper }}
       >
         <span className="text-lg font-bold text-start mt-1">
           {LOCAL_CONSTANTS.STRINGS.JOB_ADDITION_PAGE_TITLE}
         </span>
+        <div className="!flex flex-row justify-end items-center">
+          <Button variant="contained" className="!ml-3" onClick={_addJob}>
+            {LOCAL_CONSTANTS.STRINGS.ADD_BUTTON_TEXT}
+          </Button>
+        </div>
       </div>
 
       <Grid container className="!h-full">
@@ -142,11 +147,6 @@ export const JobAdditionForm = () => {
               value={jobBuilderForm.values.pm_job_schedule}
               handleChange={_handleOnScheduleChange}
             />
-          </div>
-          <div className="!flex flex-row justify-end items-center mt-5 w-100 px-3">
-            <Button variant="contained" className="!ml-3" onClick={_addJob}>
-              {LOCAL_CONSTANTS.STRINGS.ADD_BUTTON_TEXT}
-            </Button>
           </div>
         </Grid>
       </Grid>

@@ -46,7 +46,7 @@ export const GraphUpdateForm = ({ id }) => {
     },
   });
 
-  const graphForm = useFormik({
+  const graphUpdateForm = useFormik({
     initialValues: {
       pm_graph_id: id,
       graph_type: GRAPH_PLUGINS_MAP.BAR.value,
@@ -76,25 +76,25 @@ export const GraphUpdateForm = ({ id }) => {
 
   useEffect(() => {
     if (graphData) {
-      graphForm.setFieldValue(
+      graphUpdateForm.setFieldValue(
         "graph_type",
         graphData.pm_graph_options.graph_type
       );
-      graphForm.setFieldValue(
+      graphUpdateForm.setFieldValue(
         "title_display_enabled",
         graphData.pm_graph_options.title_display_enabled
       );
-      graphForm.setFieldValue(
+      graphUpdateForm.setFieldValue(
         "legend_position",
         graphData.pm_graph_options.legend_position
       );
-      graphForm.setFieldValue("pm_graph_title", graphData.pm_graph_title);
+      graphUpdateForm.setFieldValue("pm_graph_title", graphData.pm_graph_title);
 
-      graphForm.setFieldValue(
+      graphUpdateForm.setFieldValue(
         "query_array",
         graphData.pm_graph_options.query_array
       );
-      graphForm.setFieldValue(
+      graphUpdateForm.setFieldValue(
         "refetch_interval",
         graphData.pm_graph_options.refetch_interval
       );
@@ -102,7 +102,7 @@ export const GraphUpdateForm = ({ id }) => {
   }, [graphData]);
 
   const _handleSubmit = () => {
-    graphForm.handleSubmit();
+    graphUpdateForm.handleSubmit();
   };
 
   return (
@@ -141,16 +141,18 @@ export const GraphUpdateForm = ({ id }) => {
         {graphData && graphData.dataset && (
           <Grid item lg={7} md={8} className="w-full ">
             <GraphComponentPreview
-              graphType={graphForm.values["graph_type"]}
-              legendPosition={graphForm.values["legend_position"]}
-              titleDisplayEnabled={graphForm.values["title_display_enabled"]}
-              pmGraphTitle={graphForm.values["pm_graph_title"]}
+              graphType={graphUpdateForm.values["graph_type"]}
+              legendPosition={graphUpdateForm.values["legend_position"]}
+              titleDisplayEnabled={
+                graphUpdateForm.values["title_display_enabled"]
+              }
+              pmGraphTitle={graphUpdateForm.values["pm_graph_title"]}
               data={graphData.dataset}
             />
           </Grid>
         )}
         <Grid item lg={5} md={4} className="w-full">
-          <GraphEditor pmGraphID={id} graphForm={graphForm} />
+          <GraphEditor pmGraphID={id} graphForm={graphUpdateForm} />
         </Grid>
       </Grid>
     </div>

@@ -1,6 +1,5 @@
-import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useFormik } from "formik";
-import { fetchRowByIDAPI } from "../../../api/tables";
 
 import {
   Button,
@@ -13,14 +12,10 @@ import {
 
 import { useEffect } from "react";
 
-import {
-  updatePMUserPasswordAPI,
-  updatePMUserDataAPI,
-} from "../../../api/accounts";
+import { updatePMUserPasswordAPI } from "../../../api/accounts";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { Loading } from "../../../pages/Loading";
 import { displayError, displaySuccess } from "../../../utils/notification";
-import { FieldComponent } from "../../FieldComponent";
 
 export const AccountPasswordChangeForm = ({ pmUserData }) => {
   const theme = useTheme();
@@ -118,7 +113,10 @@ export const AccountPasswordChangeForm = ({ pmUserData }) => {
                   className="text-xs font-light mb-1"
                   style={{ color: theme.palette.text.secondary }}
                 >
-                  {"Password"}
+                  {
+                    LOCAL_CONSTANTS.STRINGS
+                      .ACCOUNT_PASSWORD_RESET_FORM_PASSWORD_FIELD_LABEL
+                  }
                 </span>
                 <TextField
                   required={true}
@@ -145,7 +143,10 @@ export const AccountPasswordChangeForm = ({ pmUserData }) => {
                   className="text-xs font-light mb-1"
                   style={{ color: theme.palette.text.secondary }}
                 >
-                  {"Confirm password"}
+                  {
+                    LOCAL_CONSTANTS.STRINGS
+                      .ACCOUNT_PASSWORD_RESET_FORM_CONFIRM_PASSWORD_FIELD_LABEL
+                  }
                 </span>
                 <TextField
                   required={true}

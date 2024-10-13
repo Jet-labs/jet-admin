@@ -76,12 +76,17 @@ export const QueryAdditionForm = () => {
   return (
     <div className="w-full !h-[calc(100vh-100px)]">
       <div
-        className="flex flex-col items-start justify-start p-3"
+        className="flex flex-row items-center justify-between p-3"
         style={{ background: theme.palette.background.paper }}
       >
         <span className="text-lg font-bold text-start mt-1">
           {LOCAL_CONSTANTS.STRINGS.QUERY_ADDITION_PAGE_TITLE}
         </span>
+        <div className="!flex flex-row justify-end items-center">
+          <Button variant="contained" className="!ml-3" onClick={_addQuery}>
+            {LOCAL_CONSTANTS.STRINGS.ADD_BUTTON_TEXT}
+          </Button>
+        </div>
       </div>
 
       <ResizablePanelGroup
@@ -136,12 +141,6 @@ export const QueryAdditionForm = () => {
               type={"text"}
             />
           </FormControl>
-
-          <div className="!flex flex-row justify-end items-center mt-10 w-full px-3">
-            <Button variant="contained" className="!ml-3" onClick={_addQuery}>
-              {LOCAL_CONSTANTS.STRINGS.ADD_BUTTON_TEXT}
-            </Button>
-          </div>
         </ResizablePanel>
         <ResizableHandle withHandle={true} />
         <ResizablePanel defaultSize={60} className="w-full !h-full">

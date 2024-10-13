@@ -1,7 +1,6 @@
 import {
   Alert,
   Checkbox,
-  FormControl,
   FormControlLabel,
   Grid,
   TextField,
@@ -9,6 +8,7 @@ import {
 } from "@mui/material";
 import "react-js-cron/dist/styles.css";
 import { CodeEditor } from "../../CodeEditorComponent";
+import { LOCAL_CONSTANTS } from "../../../constants";
 export const AppConstantEditor = ({ appConstantForm }) => {
   const theme = useTheme();
   const _handleUpdateAppConstantValue = (value) => {
@@ -51,7 +51,10 @@ export const AppConstantEditor = ({ appConstantForm }) => {
           severity="info"
           className="!py-0 !text-xs"
         >
-          {`Internal app constants should not be deleted`}
+          {
+            LOCAL_CONSTANTS.STRINGS
+              .APP_CONSTANT_INTERNAL_CONSTANTS_RECOMMENDATION
+          }
         </Alert>
       </Grid>
       <Grid item sx={12} md={12} lg={12} className="!px-3">
@@ -62,7 +65,7 @@ export const AppConstantEditor = ({ appConstantForm }) => {
               onChange={_handleUpdateAppConstantInternal}
             />
           }
-          label="Internal"
+          label={LOCAL_CONSTANTS.STRINGS.APP_CONSTANT_FORM_INTERNAL_FIELD_LABEL}
         />
       </Grid>
       <Grid item sx={12} md={12} lg={12} className="!p-3">

@@ -20,7 +20,7 @@ class AuthService {
       { pm_user_id },
       environmentVariables.JWT_ACCESS_TOKEN_SECRET,
       {
-        expiresIn: constants.ACCESS_TOKEN_TIMEOUT,
+        expiresIn: environmentVariables.ACCESS_TOKEN_TIMEOUT,
       }
     );
     return accessToken;
@@ -37,7 +37,7 @@ class AuthService {
       { pm_user_id },
       environmentVariables.JWT_REFRESH_TOKEN_SECRET,
       {
-        expiresIn: constants.REFRESH_TOKEN_TIMEOUT,
+        expiresIn: environmentVariables.REFRESH_TOKEN_TIMEOUT,
       }
     );
     return refreshToken;
