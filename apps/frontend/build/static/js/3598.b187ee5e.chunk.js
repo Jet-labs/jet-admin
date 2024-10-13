@@ -1156,7 +1156,7 @@
             showStats: l,
             containerClass: s,
           } = e;
-          const { dbModel: o, internalAppConstants: c } = (0, le.O0)(),
+          const { dbModel: o, internalAppVariables: c } = (0, le.O0)(),
             { pmUser: d } = (0, re.hD)(),
             u = ((0, ee.jE)(), (0, r.Zp)()),
             [m, p] = (0, i.useState)(1),
@@ -1210,10 +1210,10 @@
               staleTime: 0,
             }),
             D = (0, i.useMemo)(() => {
-              if ((console.log({ iiiinternalAppConstants: c }), M)) {
+              if ((console.log({ iiiinternalAppVariables: c }), M)) {
                 var e;
                 console.log({
-                  internalAppConstants:
+                  internalAppVariables:
                     null === c || void 0 === c
                       ? void 0
                       : c.CUSTOM_INT_VIEW_MAPPING,

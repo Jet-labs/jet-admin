@@ -97,7 +97,7 @@
       const S = (e) => {
           let { customTitle: t, tableName: l, id: a } = e;
           const E = new s.E(),
-            { internalAppConstants: b } = (0, _.O0)(),
+            { internalAppVariables: b } = (0, _.O0)(),
             w = (0, c.A)(),
             {
               isLoading: y,

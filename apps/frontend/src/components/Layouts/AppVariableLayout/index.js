@@ -2,39 +2,39 @@ import { Grid } from "@mui/material";
 import { lazy, useMemo } from "react";
 import { Outlet, Route, Routes } from "react-router-dom";
 import { LOCAL_CONSTANTS } from "../../../constants";
-import { AppConstantsDrawerList } from "../../DrawerLists/AppConstantDrawerList";
+import { AppVariablesDrawerList } from "../../DrawerLists/AppVariableDrawerList";
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "../../Resizables";
-const AddAppConstant = lazy(() => import("../../../pages/AddAppConstant"));
-const UpdateAppConstant = lazy(() =>
-  import("../../../pages/UpdateAppConstant")
+const AddAppVariable = lazy(() => import("../../../pages/AddAppVariable"));
+const UpdateAppVariable = lazy(() =>
+  import("../../../pages/UpdateAppVariable")
 );
 
-const AppConstantLayout = () => {
+const AppVariableLayout = () => {
   return (
     <ResizablePanelGroup
       direction="horizontal"
       autoSaveId="app=constants-panel-sizes"
     >
       <ResizablePanel defaultSize={20}>
-        <AppConstantsDrawerList />
+        <AppVariablesDrawerList />
       </ResizablePanel>
       <ResizableHandle withHandle={true} />
       <ResizablePanel defaultSize={80}>
         <Routes>
-          <Route index element={<AddAppConstant />} />
+          <Route index element={<AddAppVariable />} />
 
           <Route
-            path={LOCAL_CONSTANTS.ROUTES.ADD_APP_CONSTANT.code}
-            element={<AddAppConstant />}
+            path={LOCAL_CONSTANTS.ROUTES.ADD_APP_VARIABLES.code}
+            element={<AddAppVariable />}
           />
 
           <Route
-            path={LOCAL_CONSTANTS.ROUTES.APP_CONSTANT_VIEW.code}
-            element={<UpdateAppConstant />}
+            path={LOCAL_CONSTANTS.ROUTES.APP_VARIABLES_VIEW.code}
+            element={<UpdateAppVariable />}
           />
         </Routes>
         <Outlet />
@@ -42,4 +42,4 @@ const AppConstantLayout = () => {
     </ResizablePanelGroup>
   );
 };
-export default AppConstantLayout;
+export default AppVariableLayout;

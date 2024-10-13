@@ -46,7 +46,7 @@ const create_super_admin_policy = () => {
       read: true,
       delete: true,
     };
-    policy.app_constants = {
+    policy.app_variables = {
       add: true,
       edit: true,
       read: true,
@@ -131,7 +131,7 @@ const create_read_admin_policy = () => {
       read: true,
       delete: false,
     };
-    policy.app_constants = {
+    policy.app_variables = {
       add: false,
       edit: false,
       read: true,

@@ -2,7 +2,7 @@ import { Grid } from "@mui/material";
 import { lazy, useMemo } from "react";
 import { Outlet, Route, Routes } from "react-router-dom";
 import { LOCAL_CONSTANTS } from "../../../constants";
-// import { AppConstantsDrawerList } from "../../DrawerLists/AppConstantDrawerList";
+// import { AppVariablesDrawerList } from "../../DrawerLists/AppVariableDrawerList";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -19,7 +19,7 @@ const TriggerLayout = () => {
       autoSaveId="app=constants-panel-sizes"
     >
       <ResizablePanel defaultSize={20}>
-        {/* <AppConstantsDrawerList /> */}
+        {/* <AppVariablesDrawerList /> */}
         <TriggersDrawerList />
       </ResizablePanel>
       <ResizableHandle withHandle={true} />

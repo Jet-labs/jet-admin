@@ -162,9 +162,9 @@
     11779: (e, t, a) => {
       a.d(t, { BZ: () => n, Tk: () => r, U6: () => s });
       const s =
-          "\n## **Using queries variables**\n---------------------------\n\\\n**Referencing queries inside other queries:** Query values can be used in run-time inside another query by utilizing the syntax below:\n```sql\nselect * from city where city_id={{[pm_query_id:21][0].city_id]};\n```\n  - `{{}}` is used to utilize the variable\n  - `[]` is used to define the `pm_query_id` of desired query\n\n**Using app constants inside query** (Beta stage!)\n```sql\nselect * from city where city_id={{[pm_query_id:22][[pm_query_id:35][0].city_id].city_id}}\nor city_id={{[pm_app_constant_id:4].value}};\n```\n",
+          "\n## **Using queries variables**\n---------------------------\n\\\n**Referencing queries inside other queries:** Query values can be used in run-time inside another query by utilizing the syntax below:\n```sql\nselect * from city where city_id={{[pm_query_id:21][0].city_id]};\n```\n  - `{{}}` is used to utilize the variable\n  - `[]` is used to define the `pm_query_id` of desired query\n\n**Using app variables inside query** (Beta stage!)\n```sql\nselect * from city where city_id={{[pm_query_id:22][[pm_query_id:35][0].city_id].city_id}}\nor city_id={{[pm_app_variable_id:4].value}};\n```\n",
         n =
-          '\n## **App constants**\n-------------\nApp constants are constants which contain JSON values and can be used for various purposes. There are two type of app constants, Internal and Global.\n\nInternal app constants are used for declaring constants utlized by Jet Admin while Global app constants can be used in Query objects.\n\nBelow are the some app constants\n- [x] CUSTOM_INT_VIEW_MAPPING : Used to render custom mapping for integer values of table column while viewing. Syntax of `CUSTOM_INT_VIEW_MAPPING` is:\n      \n    ```json\n    {\n        table_name: {\n            column_name: {\n                int_value1:label1,\n                int_value2:label2,\n                int_value3:label3,\n                ...\n            }\n        }\n    }\n    ```\n    For example\n    ```json\n    {\n        "restaurant_menu": {\n            "item_id": {\n                "1":"Tea",\n                "23":"Coffee",\n                "34":"Hot chocholate",\n                ...\n            }\n        }\n    }\n    ```\n- [x] CUSTOM_INT_EDIT_MAPPING : Used to render custom mapping for integer values of table column while editing a row. Syntax of `CUSTOM_INT_EDIT_MAPPING` is same as `CUSTOM_INT_VIEW_MAPPING`.\n- [x] APP_NAME : Used to declare custom application name:\n    ```json\n    {\n        "value":"Super food store admin"\n    }\n    ```\n',
+          '\n## **App variables**\n-------------\nApp variables are constants which contain JSON values and can be used for various purposes. There are two type of app variables, Internal and Global.\n\nInternal app variables are used for declaring constants utlized by Jet Admin while Global app variables can be used in Query objects.\n\nBelow are the some app variables\n- [x] CUSTOM_INT_VIEW_MAPPING : Used to render custom mapping for integer values of table column while viewing. Syntax of `CUSTOM_INT_VIEW_MAPPING` is:\n      \n    ```json\n    {\n        table_name: {\n            column_name: {\n                int_value1:label1,\n                int_value2:label2,\n                int_value3:label3,\n                ...\n            }\n        }\n    }\n    ```\n    For example\n    ```json\n    {\n        "restaurant_menu": {\n            "item_id": {\n                "1":"Tea",\n                "23":"Coffee",\n                "34":"Hot chocholate",\n                ...\n            }\n        }\n    }\n    ```\n- [x] CUSTOM_INT_EDIT_MAPPING : Used to render custom mapping for integer values of table column while editing a row. Syntax of `CUSTOM_INT_EDIT_MAPPING` is same as `CUSTOM_INT_VIEW_MAPPING`.\n- [x] APP_NAME : Used to declare custom application name:\n    ```json\n    {\n        "value":"Super food store admin"\n    }\n    ```\n',
         r =
           "\n##### **Cron Syntax Quick Reference**\n\n\n| Schedule | Cron Expression |\n|---|---|\n| Monday at 3 PM | `0 15 * * 1` |\n| Every 15 Minutes | `*/15 * * * *` |\n| First Day of Every Month at 5 AM | `0 5 1 * *` |\n\n\n##### **Fields**\n- **Minute**: `0-59`\n- **Hour**: `0-23`\n- **Day**: `1-31`\n- **Month**: `1-12`\n- **Day of Week**: `0-7` (0 & 7 are Sunday)\n\n##### **Special Characters**\n- **`*`**: Every\n- **`,`**: Multiple\n- **`-`**: Range\n- **`/`**: Increment\n";
     },
@@ -180,7 +180,7 @@
         c = a(70579);
       const u = (e) => {
         var t;
-        let { appConstantForm: a } = e;
+        let { appVariableForm: a } = e;
         const u = (0, s.A)();
         return (0, c.jsxs)(n.Ay, {
           container: !0,
@@ -204,8 +204,8 @@
                   size: "small",
                   variant: "outlined",
                   type: "text",
-                  name: "pm_app_constant_title",
-                  value: a.values.pm_app_constant_title,
+                  name: "pm_app_variable_title",
+                  value: a.values.pm_app_variable_title,
                   onChange: a.handleChange,
                   onBlur: a.handleBlur,
                 }),
@@ -227,7 +227,7 @@
                   },
                   severity: "info",
                   className: "!py-0 !text-xs",
-                  children: "Internal app constants should not be deleted",
+                  children: "Internal app variables should not be deleted",
                 }),
               ],
             }),
@@ -261,16 +261,16 @@
                   void 0 !== a &&
                   null !== (t = a.values) &&
                   void 0 !== t &&
-                  t.pm_app_constant_value
-                    ? "object" === typeof a.values.pm_app_constant_value
-                      ? JSON.stringify(a.values.pm_app_constant_value, null, 2)
-                      : a.values.pm_app_constant_value
+                  t.pm_app_variable_value
+                    ? "object" === typeof a.values.pm_app_variable_value
+                      ? JSON.stringify(a.values.pm_app_variable_value, null, 2)
+                      : a.values.pm_app_variable_value
                     : JSON.stringify({}),
                 setCode: (e) => {
                   null === a ||
                     void 0 === a ||
                     a.setFieldValue(
-                      "pm_app_constant_value",
+                      "pm_app_variable_value",
                       "string" === typeof e ? JSON.parse(e) : e
                     );
                 },
@@ -524,8 +524,8 @@
             t = (0, i.jE)(),
             a = (0, d.Wx)({
               initialValues: {
-                pm_app_constant_title: "Untitled",
-                pm_app_constant_value: JSON.stringify({}),
+                pm_app_variable_title: "Untitled",
+                pm_app_variable_value: JSON.stringify({}),
                 is_internal: !1,
               },
               validateOnMount: !1,
@@ -545,8 +545,8 @@
               mutationFn: (e) => (0, c.dO)({ data: e }),
               retry: !1,
               onSuccess: (e) => {
-                (0, m.qq)(s.a.STRINGS.APP_CONSTANT_ADDITION_SUCCESS),
-                  t.invalidateQueries([s.a.REACT_QUERY_KEYS.APP_CONSTANTS]);
+                (0, m.qq)(s.a.STRINGS.APP_VARIABLES_ADDITION_SUCCESS),
+                  t.invalidateQueries([s.a.REACT_QUERY_KEYS.APP_VARIABLESS]);
               },
               onError: (e) => {
                 (0, m.jx)(e);
@@ -565,7 +565,7 @@
                 },
                 children: (0, h.jsx)("span", {
                   className: "text-lg font-bold text-start mt-1 ",
-                  children: s.a.STRINGS.APP_CONSTANT_ADDITION_PAGE_TITLE,
+                  children: s.a.STRINGS.APP_VARIABLES_ADDITION_PAGE_TITLE,
                 }),
               }),
               (0, h.jsxs)(r.Ay, {
@@ -579,7 +579,7 @@
                     sm: 12,
                     xs: 12,
                     children: [
-                      (0, h.jsx)(x.n, { appConstantForm: a }),
+                      (0, h.jsx)(x.n, { appVariableForm: a }),
                       (0, h.jsx)("div", {
                         className:
                           "!flex flex-row justify-end items-start mt-10 w-full px-3",

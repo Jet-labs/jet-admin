@@ -14,27 +14,27 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { FaChalkboardTeacher, FaPlus, FaRedo } from "react-icons/fa";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import {
-  useAppConstantActions,
-  useAppConstants,
-} from "../../../contexts/appConstantsContext";
+  useAppVariableActions,
+  useAppVariables,
+} from "../../../contexts/appVariablesContext";
 import { useAuthState } from "../../../contexts/authContext";
 import { HiMiniVariable } from "react-icons/hi2";
 import { VscSymbolVariable } from "react-icons/vsc";
 
-export const AppConstantsDrawerList = () => {
+export const AppVariablesDrawerList = () => {
   const theme = useTheme();
   const routeParam = useParams();
-  const currentPage = `app_constant_${routeParam?.["*"]}`;
+  const currentPage = `app_variable_${routeParam?.["*"]}`;
   const { pmUser } = useAuthState();
   const navigate = useNavigate();
-  const { appConstants } = useAppConstants();
-  const { reloadAllAppConstants } = useAppConstantActions();
-  const appConstantAddAuthorization = useMemo(() => {
-    return pmUser && pmUser.extractAppConstantAddAuthorization();
+  const { appVariables } = useAppVariables();
+  const { reloadAllAppVariables } = useAppVariableActions();
+  const appVariableAddAuthorization = useMemo(() => {
+    return pmUser && pmUser.extractAppVariableAddAuthorization();
   }, [pmUser]);
 
-  const _navigateToAddMoreAppConstant = () => {
-    navigate(LOCAL_CONSTANTS.ROUTES.ADD_APP_CONSTANT.path());
+  const _navigateToAddMoreAppVariable = () => {
+    navigate(LOCAL_CONSTANTS.ROUTES.ADD_APP_VARIABLES.path());
   };
 
   return (
@@ -53,19 +53,19 @@ export const AppConstantsDrawerList = () => {
           className="!font-semibold"
           style={{ color: theme.palette.primary.main }}
         >
-          {"App constants"}
+          {"App variables"}
         </span>
-        <IconButton onClick={reloadAllAppConstants}>
+        <IconButton onClick={reloadAllAppVariables}>
           <FaRedo
             style={{ color: theme.palette.primary.main }}
             className="!text-sm"
           />
         </IconButton>
       </div>
-      {appConstantAddAuthorization && (
+      {appVariableAddAuthorization && (
         <div className="!px-3 !py-1.5 !w-full">
           <Button
-            onClick={_navigateToAddMoreAppConstant}
+            onClick={_navigateToAddMoreAppVariable}
             variant="contained"
             className="!w-full"
             startIcon={<FaPlus className="!text-sm" />}
@@ -75,18 +75,18 @@ export const AppConstantsDrawerList = () => {
         </div>
       )}
       <div className="!mt-1"></div>
-      {appConstants && appConstants.length > 0
-        ? appConstants.map((appConstant) => {
-            const key = `app_constant_${appConstant.pm_app_constant_id}`;
+      {appVariables && appVariables.length > 0
+        ? appVariables.map((appVariable) => {
+            const key = `app_variable_${appVariable.pm_app_variable_id}`;
             return (
               <Link
                 to={LOCAL_CONSTANTS.ROUTES.GRAPH_VIEW.path(
-                  appConstant.pm_app_constant_id
+                  appVariable.pm_app_variable_id
                 )}
                 key={key}
               >
                 <ListItem
-                  key={`_app_constant_${appConstant.pm_app_constant_id}`}
+                  key={`_app_variable_${appVariable.pm_app_variable_id}`}
                   disablePadding
                   className="!px-3 !py-1.5"
                 >
@@ -118,7 +118,7 @@ export const AppConstantsDrawerList = () => {
                             ? theme.palette.primary.main
                             : theme.palette.primary.contrastText,
                       }}
-                      primary={appConstant.pm_app_constant_title}
+                      primary={appVariable.pm_app_variable_title}
                       primaryTypographyProps={{
                         sx: {
                           fontWeight: key == currentPage ? "700" : "500",

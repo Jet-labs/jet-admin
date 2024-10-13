@@ -3,20 +3,20 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import React from "react";
 import "react-data-grid/lib/styles.css";
-import { addAppConstantAPI } from "../../../api/appConstants";
+import { addAppVariableAPI } from "../../../api/appVariables";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { displayError, displaySuccess } from "../../../utils/notification";
-import { AppConstantEditor } from "../AppConstantEditor";
+import { AppVariableEditor } from "../AppVariableEditor";
 
-export const AppConstantAdditionForm = () => {
+export const AppVariableAdditionForm = () => {
   const theme = useTheme();
   const queryClient = useQueryClient();
 
-  const appConstantAdditionForm = useFormik({
+  const appVariableAdditionForm = useFormik({
     initialValues: {
-      pm_app_constant_title:
+      pm_app_variable_title:
         LOCAL_CONSTANTS.STRINGS.FORM_FIELD_PLACEHOLDER_UNTITLED,
-      pm_app_constant_value: JSON.stringify({}),
+      pm_app_variable_value: JSON.stringify({}),
       is_internal: false,
     },
     validateOnMount: false,
@@ -26,27 +26,27 @@ export const AppConstantAdditionForm = () => {
       return errors;
     },
     onSubmit: (values) => {
-      addAppConstant(values);
+      addAppVariable(values);
     },
   });
 
   const {
-    isPending: isAddingAppConstant,
-    isSuccess: isAddingAppConstantSuccess,
-    isError: isAddingAppConstantError,
-    error: addAppConstantError,
-    mutate: addAppConstant,
+    isPending: isAddingAppVariable,
+    isSuccess: isAddingAppVariableSuccess,
+    isError: isAddingAppVariableError,
+    error: addAppVariableError,
+    mutate: addAppVariable,
   } = useMutation({
-    mutationFn: (appConstantData) => {
-      return addAppConstantAPI({
-        data: appConstantData,
+    mutationFn: (appVariableData) => {
+      return addAppVariableAPI({
+        data: appVariableData,
       });
     },
     retry: false,
     onSuccess: (data) => {
-      displaySuccess(LOCAL_CONSTANTS.STRINGS.APP_CONSTANT_ADDITION_SUCCESS);
+      displaySuccess(LOCAL_CONSTANTS.STRINGS.APP_VARIABLES_ADDITION_SUCCESS);
       queryClient.invalidateQueries([
-        LOCAL_CONSTANTS.REACT_QUERY_KEYS.APP_CONSTANTS,
+        LOCAL_CONSTANTS.REACT_QUERY_KEYS.APP_VARIABLESS,
       ]);
     },
     onError: (error) => {
@@ -65,13 +65,13 @@ export const AppConstantAdditionForm = () => {
         }}
       >
         <span className="text-lg font-bold text-start mt-1 ">
-          {LOCAL_CONSTANTS.STRINGS.APP_CONSTANT_ADDITION_PAGE_TITLE}
+          {LOCAL_CONSTANTS.STRINGS.APP_VARIABLES_ADDITION_PAGE_TITLE}
         </span>
         <div className="!flex flex-row justify-end items-center">
           <Button
             variant="contained"
             className="!ml-3"
-            onClick={appConstantAdditionForm.handleSubmit}
+            onClick={appVariableAdditionForm.handleSubmit}
           >
             {LOCAL_CONSTANTS.STRINGS.ADD_BUTTON_TEXT}
           </Button>
@@ -79,7 +79,7 @@ export const AppConstantAdditionForm = () => {
       </div>
       <Grid container>
         <Grid item xl={6} lg={6} md={12} sm={12} xs={12}>
-          <AppConstantEditor appConstantForm={appConstantAdditionForm} />
+          <AppVariableEditor appVariableForm={appVariableAdditionForm} />
         </Grid>
         <Grid item xl={6} lg={6} md={0} sm={0} xs={0} className="!p-3"></Grid>
       </Grid>

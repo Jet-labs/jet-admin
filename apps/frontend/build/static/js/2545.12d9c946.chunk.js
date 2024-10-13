@@ -871,7 +871,7 @@
             ],
           });
         },
-        w = (e) => {
+        (w = (e) => {
           let { value: t, handleChange: a } = e;
           const { themeType: s } = (0, f.i7)(),
             [b, g] = (0, u.useState)(
@@ -889,7 +889,7 @@
               (0, x.jsx)("span", {
                 style: { background: R.palette.background.paper },
                 className: "!font-bold pl-2 py-2 rounded-t",
-                children: (0, m.capitalize)("App constants"),
+                children: (0, m.capitalize)("App variables"),
               }),
               (0, x.jsx)(r.A, {}),
               (0, x.jsxs)("div", {
@@ -960,372 +960,411 @@
               }),
             ],
           });
-        },
-        S = (e) => {
-          let { value: t, handleChange: a } = e;
-          const { themeType: s } = (0, f.i7)(),
-            [b, g] = (0, u.useState)(
-              y(["edit", "read"], Object.keys(t)) &&
-                Object.keys(t).every((e) => "boolean" === typeof t[e])
-                ? 0
-                : 1
-            ),
-            R = (0, l.A)();
-          return (0, x.jsxs)("div", {
-            className:
-              "!flex flex-col justify-start items-stretch w-full mt-4  border rounded",
-            style: { borderColor: R.palette.divider },
-            children: [
-              (0, x.jsx)("span", {
-                style: { background: R.palette.background.paper },
-                className: "!font-bold pl-2 py-2 rounded-t",
-                children: (0, m.capitalize)("Schemas"),
-              }),
-              (0, x.jsx)(r.A, {}),
-              (0, x.jsxs)("div", {
-                className: "!flex flex-col justify-start items-stretch w-full ",
-                children: [
-                  (0, x.jsxs)(d.A, {
-                    value: b,
-                    onChange: () => {
-                      1 === b
-                        ? y(["edit", "read"], Object.keys(t)) &&
-                          Object.keys(t).every((e) => "boolean" == typeof t[e])
-                          ? g(0)
-                          : (console.log(t),
-                            (0, p.jx)({
-                              message:
-                                "JSON based policy detected. Please remove it to use visual editor",
-                            }))
-                        : 0 === b && g(1);
-                    },
-                    className: "!min-h-0",
-                    children: [
-                      (0, x.jsx)(o.A, {
-                        label: "Visual editor",
-                        className:
-                          "!font-bold !capitalize !py-2 !px-3 !min-h-0",
-                        sx: { borderWidth: 1, minHeight: null, minWidth: null },
-                      }),
-                      (0, x.jsx)(o.A, {
-                        label: "Advance editor",
-                        className:
-                          "!font-bold !capitalize !py-2 !px-3 !min-h-0",
-                        sx: { borderWidth: 1, minHeight: null, minWidth: null },
-                      }),
-                    ],
-                  }),
-                  (0, x.jsx)(r.A, {}),
-                  0 === b
-                    ? (0, x.jsx)("div", {
-                        className: "py-2 px-4 ",
-                        children: (0, x.jsx)(j, {
-                          value: t,
-                          handleChange: a,
-                          permissionKeys: ["edit", "read"],
-                        }),
-                      })
-                    : (0, x.jsx)("div", {
-                        className: "p-0",
-                        children: (0, x.jsx)(h.Ay, {
-                          value:
-                            "object" === typeof t
-                              ? JSON.stringify(t, null, 2)
-                              : "string" === typeof t
-                              ? t
-                              : "",
-                          height: "200px",
-                          extensions: [(0, i.rI)("json")],
-                          onChange: (e) => a(JSON.parse(e)),
-                          theme: "dark" == s ? c.Ts : n.al,
-                          className: "codemirror-editor-rounded-bottom",
-                          style: {
-                            borderWidth: 0,
-                            width: "100%",
-                            borderBottomRightRadius: 4,
-                            borderBottomLeftRadius: 4,
-                          },
-                        }),
-                      }),
-                ],
-              }),
-            ],
-          });
-        },
-        E = (e) => {
-          let { value: t, handleChange: a } = e;
-          const { themeType: s } = (0, f.i7)(),
-            [b, g] = (0, u.useState)(
-              y(["add", "edit", "read", "delete"], Object.keys(t)) &&
-                Object.keys(t).every((e) => "boolean" === typeof t[e])
-                ? 0
-                : 1
-            ),
-            R = (0, l.A)();
-          return (0, x.jsxs)("div", {
-            className:
-              "!flex flex-col justify-start items-stretch w-full mt-4  border rounded",
-            style: { borderColor: R.palette.divider },
-            children: [
-              (0, x.jsx)("span", {
-                style: { background: R.palette.background.paper },
-                className: "!font-bold pl-2 py-2 rounded-t",
-                children: (0, m.capitalize)("Policies"),
-              }),
-              (0, x.jsx)(r.A, {}),
-              (0, x.jsxs)("div", {
-                className: "!flex flex-col justify-start items-stretch w-full ",
-                children: [
-                  (0, x.jsxs)(d.A, {
-                    value: b,
-                    onChange: () => {
-                      1 === b
-                        ? y(
-                            ["add", "edit", "read", "delete"],
-                            Object.keys(t)
-                          ) &&
-                          Object.keys(t).every((e) => "boolean" == typeof t[e])
-                          ? g(0)
-                          : (console.log(t),
-                            (0, p.jx)({
-                              message:
-                                "JSON based policy detected. Please remove it to use visual editor",
-                            }))
-                        : 0 === b && g(1);
-                    },
-                    className: "!min-h-0",
-                    children: [
-                      (0, x.jsx)(o.A, {
-                        label: "Visual editor",
-                        className:
-                          "!font-bold !capitalize !py-2 !px-3 !min-h-0",
-                        sx: { borderWidth: 1, minHeight: null, minWidth: null },
-                      }),
-                      (0, x.jsx)(o.A, {
-                        label: "Advance editor",
-                        className:
-                          "!font-bold !capitalize !py-2 !px-3 !min-h-0",
-                        sx: { borderWidth: 1, minHeight: null, minWidth: null },
-                      }),
-                    ],
-                  }),
-                  (0, x.jsx)(r.A, {}),
-                  0 === b
-                    ? (0, x.jsx)("div", {
-                        className: "py-2 px-4 ",
-                        children: (0, x.jsx)(j, { value: t, handleChange: a }),
-                      })
-                    : (0, x.jsx)("div", {
-                        className: "p-0",
-                        children: (0, x.jsx)(h.Ay, {
-                          value:
-                            "object" === typeof t
-                              ? JSON.stringify(t, null, 2)
-                              : "string" === typeof t
-                              ? t
-                              : "",
-                          height: "200px",
-                          extensions: [(0, i.rI)("json")],
-                          onChange: (e) => a(JSON.parse(e)),
-                          theme: "dark" == s ? c.Ts : n.al,
-                          className: "codemirror-editor-rounded-bottom",
-                          style: {
-                            borderWidth: 0,
-                            width: "100%",
-                            borderBottomRightRadius: 4,
-                            borderBottomLeftRadius: 4,
-                          },
-                        }),
-                      }),
-                ],
-              }),
-            ],
-          });
-        },
-        C = (e) => {
-          let { value: t, handleChange: a } = e;
-          const { themeType: s } = (0, f.i7)(),
-            [b, g] = (0, u.useState)(
-              y(["add", "edit", "read", "delete"], Object.keys(t)) &&
-                Object.keys(t).every((e) => "boolean" === typeof t[e])
-                ? 0
-                : 1
-            ),
-            R = (0, l.A)();
-          return (0, x.jsxs)("div", {
-            className:
-              "!flex flex-col justify-start items-stretch w-full mt-4  border rounded",
-            style: { borderColor: R.palette.divider },
-            children: [
-              (0, x.jsx)("span", {
-                style: { background: R.palette.background.paper },
-                className: "!font-bold pl-2 py-2 rounded-t",
-                children: (0, m.capitalize)("Accounts"),
-              }),
-              (0, x.jsx)(r.A, {}),
-              (0, x.jsxs)("div", {
-                className: "!flex flex-col justify-start items-stretch w-full ",
-                children: [
-                  (0, x.jsxs)(d.A, {
-                    value: b,
-                    onChange: () => {
-                      1 === b
-                        ? y(
-                            ["add", "edit", "read", "delete"],
-                            Object.keys(t)
-                          ) &&
-                          Object.keys(t).every((e) => "boolean" == typeof t[e])
-                          ? g(0)
-                          : (console.log(t),
-                            (0, p.jx)({
-                              message:
-                                "JSON based policy detected. Please remove it to use visual editor",
-                            }))
-                        : 0 === b && g(1);
-                    },
-                    className: "!min-h-0",
-                    children: [
-                      (0, x.jsx)(o.A, {
-                        label: "Visual editor",
-                        className:
-                          "!font-bold !capitalize !py-2 !px-3 !min-h-0",
-                        sx: { borderWidth: 1, minHeight: null, minWidth: null },
-                      }),
-                      (0, x.jsx)(o.A, {
-                        label: "Advance editor",
-                        className:
-                          "!font-bold !capitalize !py-2 !px-3 !min-h-0",
-                        sx: { borderWidth: 1, minHeight: null, minWidth: null },
-                      }),
-                    ],
-                  }),
-                  (0, x.jsx)(r.A, {}),
-                  0 === b
-                    ? (0, x.jsx)("div", {
-                        className: "py-2 px-4 ",
-                        children: (0, x.jsx)(j, { value: t, handleChange: a }),
-                      })
-                    : (0, x.jsx)("div", {
-                        className: "p-0",
-                        children: (0, x.jsx)(h.Ay, {
-                          value:
-                            "object" === typeof t
-                              ? JSON.stringify(t, null, 2)
-                              : "string" === typeof t
-                              ? t
-                              : "",
-                          height: "200px",
-                          extensions: [(0, i.rI)("json")],
-                          onChange: (e) => a(JSON.parse(e)),
-                          theme: "dark" == s ? c.Ts : n.al,
-                          className: "codemirror-editor-rounded-bottom",
-                          style: {
-                            borderWidth: 0,
-                            width: "100%",
-                            borderBottomRightRadius: 4,
-                            borderBottomLeftRadius: 4,
-                          },
-                        }),
-                      }),
-                ],
-              }),
-            ],
-          });
-        },
-        k = (e) => {
-          let { policy: t, handleChange: a, containerClass: l } = e;
-          return (0, x.jsx)(
-            s.Ay,
-            {
-              item: !0,
-              xs: 12,
-              sm: 12,
-              md: 12,
-              lg: 12,
-              className: l,
-              children:
-                t &&
-                Object.keys(t).map((e) => {
-                  let s = null;
-                  switch (e) {
-                    case "tables":
-                      s = (0, x.jsx)(A, {
-                        value: t[e],
-                        handleChange: (s) => {
-                          a({ ...t, [e]: s });
-                        },
-                      });
-                      break;
-                    case "graphs":
-                      s = (0, x.jsx)(R, {
-                        value: t[e],
-                        handleChange: (s) => {
-                          a({ ...t, [e]: s });
-                        },
-                      });
-                      break;
-                    case "queries":
-                      s = (0, x.jsx)(v, {
-                        value: t[e],
-                        handleChange: (s) => {
-                          a({ ...t, [e]: s });
-                        },
-                      });
-                      break;
-                    case "dashboards":
-                      s = (0, x.jsx)(g, {
-                        value: t[e],
-                        handleChange: (s) => {
-                          a({ ...t, [e]: s });
-                        },
-                      });
-                      break;
-                    case "jobs":
-                      s = (0, x.jsx)(O, {
-                        value: t[e],
-                        handleChange: (s) => {
-                          a({ ...t, [e]: s });
-                        },
-                      });
-                      break;
-                    case "schemas":
-                      s = (0, x.jsx)(S, {
-                        value: t[e],
-                        handleChange: (s) => {
-                          a({ ...t, [e]: s });
-                        },
-                      });
-                      break;
-                    case "app_constants":
-                      s = (0, x.jsx)(w, {
-                        value: t[e],
-                        handleChange: (s) => {
-                          a({ ...t, [e]: s });
-                        },
-                      });
-                      break;
-                    case "policies":
-                      s = (0, x.jsx)(E, {
-                        value: t[e],
-                        handleChange: (s) => {
-                          a({ ...t, [e]: s });
-                        },
-                      });
-                      break;
-                    case "accounts":
-                      s = (0, x.jsx)(C, {
-                        value: t[e],
-                        handleChange: (s) => {
-                          a({ ...t, [e]: s });
-                        },
-                      });
-                  }
-                  return s;
+        }),
+          (S = (e) => {
+            let { value: t, handleChange: a } = e;
+            const { themeType: s } = (0, f.i7)(),
+              [b, g] = (0, u.useState)(
+                y(["edit", "read"], Object.keys(t)) &&
+                  Object.keys(t).every((e) => "boolean" === typeof t[e])
+                  ? 0
+                  : 1
+              ),
+              R = (0, l.A)();
+            return (0, x.jsxs)("div", {
+              className:
+                "!flex flex-col justify-start items-stretch w-full mt-4  border rounded",
+              style: { borderColor: R.palette.divider },
+              children: [
+                (0, x.jsx)("span", {
+                  style: { background: R.palette.background.paper },
+                  className: "!font-bold pl-2 py-2 rounded-t",
+                  children: (0, m.capitalize)("Schemas"),
                 }),
-            },
-            "_policy"
-          );
-        };
+                (0, x.jsx)(r.A, {}),
+                (0, x.jsxs)("div", {
+                  className:
+                    "!flex flex-col justify-start items-stretch w-full ",
+                  children: [
+                    (0, x.jsxs)(d.A, {
+                      value: b,
+                      onChange: () => {
+                        1 === b
+                          ? y(["edit", "read"], Object.keys(t)) &&
+                            Object.keys(t).every(
+                              (e) => "boolean" == typeof t[e]
+                            )
+                            ? g(0)
+                            : (console.log(t),
+                              (0, p.jx)({
+                                message:
+                                  "JSON based policy detected. Please remove it to use visual editor",
+                              }))
+                          : 0 === b && g(1);
+                      },
+                      className: "!min-h-0",
+                      children: [
+                        (0, x.jsx)(o.A, {
+                          label: "Visual editor",
+                          className:
+                            "!font-bold !capitalize !py-2 !px-3 !min-h-0",
+                          sx: {
+                            borderWidth: 1,
+                            minHeight: null,
+                            minWidth: null,
+                          },
+                        }),
+                        (0, x.jsx)(o.A, {
+                          label: "Advance editor",
+                          className:
+                            "!font-bold !capitalize !py-2 !px-3 !min-h-0",
+                          sx: {
+                            borderWidth: 1,
+                            minHeight: null,
+                            minWidth: null,
+                          },
+                        }),
+                      ],
+                    }),
+                    (0, x.jsx)(r.A, {}),
+                    0 === b
+                      ? (0, x.jsx)("div", {
+                          className: "py-2 px-4 ",
+                          children: (0, x.jsx)(j, {
+                            value: t,
+                            handleChange: a,
+                            permissionKeys: ["edit", "read"],
+                          }),
+                        })
+                      : (0, x.jsx)("div", {
+                          className: "p-0",
+                          children: (0, x.jsx)(h.Ay, {
+                            value:
+                              "object" === typeof t
+                                ? JSON.stringify(t, null, 2)
+                                : "string" === typeof t
+                                ? t
+                                : "",
+                            height: "200px",
+                            extensions: [(0, i.rI)("json")],
+                            onChange: (e) => a(JSON.parse(e)),
+                            theme: "dark" == s ? c.Ts : n.al,
+                            className: "codemirror-editor-rounded-bottom",
+                            style: {
+                              borderWidth: 0,
+                              width: "100%",
+                              borderBottomRightRadius: 4,
+                              borderBottomLeftRadius: 4,
+                            },
+                          }),
+                        }),
+                  ],
+                }),
+              ],
+            });
+          }),
+          (E = (e) => {
+            let { value: t, handleChange: a } = e;
+            const { themeType: s } = (0, f.i7)(),
+              [b, g] = (0, u.useState)(
+                y(["add", "edit", "read", "delete"], Object.keys(t)) &&
+                  Object.keys(t).every((e) => "boolean" === typeof t[e])
+                  ? 0
+                  : 1
+              ),
+              R = (0, l.A)();
+            return (0, x.jsxs)("div", {
+              className:
+                "!flex flex-col justify-start items-stretch w-full mt-4  border rounded",
+              style: { borderColor: R.palette.divider },
+              children: [
+                (0, x.jsx)("span", {
+                  style: { background: R.palette.background.paper },
+                  className: "!font-bold pl-2 py-2 rounded-t",
+                  children: (0, m.capitalize)("Policies"),
+                }),
+                (0, x.jsx)(r.A, {}),
+                (0, x.jsxs)("div", {
+                  className:
+                    "!flex flex-col justify-start items-stretch w-full ",
+                  children: [
+                    (0, x.jsxs)(d.A, {
+                      value: b,
+                      onChange: () => {
+                        1 === b
+                          ? y(
+                              ["add", "edit", "read", "delete"],
+                              Object.keys(t)
+                            ) &&
+                            Object.keys(t).every(
+                              (e) => "boolean" == typeof t[e]
+                            )
+                            ? g(0)
+                            : (console.log(t),
+                              (0, p.jx)({
+                                message:
+                                  "JSON based policy detected. Please remove it to use visual editor",
+                              }))
+                          : 0 === b && g(1);
+                      },
+                      className: "!min-h-0",
+                      children: [
+                        (0, x.jsx)(o.A, {
+                          label: "Visual editor",
+                          className:
+                            "!font-bold !capitalize !py-2 !px-3 !min-h-0",
+                          sx: {
+                            borderWidth: 1,
+                            minHeight: null,
+                            minWidth: null,
+                          },
+                        }),
+                        (0, x.jsx)(o.A, {
+                          label: "Advance editor",
+                          className:
+                            "!font-bold !capitalize !py-2 !px-3 !min-h-0",
+                          sx: {
+                            borderWidth: 1,
+                            minHeight: null,
+                            minWidth: null,
+                          },
+                        }),
+                      ],
+                    }),
+                    (0, x.jsx)(r.A, {}),
+                    0 === b
+                      ? (0, x.jsx)("div", {
+                          className: "py-2 px-4 ",
+                          children: (0, x.jsx)(j, {
+                            value: t,
+                            handleChange: a,
+                          }),
+                        })
+                      : (0, x.jsx)("div", {
+                          className: "p-0",
+                          children: (0, x.jsx)(h.Ay, {
+                            value:
+                              "object" === typeof t
+                                ? JSON.stringify(t, null, 2)
+                                : "string" === typeof t
+                                ? t
+                                : "",
+                            height: "200px",
+                            extensions: [(0, i.rI)("json")],
+                            onChange: (e) => a(JSON.parse(e)),
+                            theme: "dark" == s ? c.Ts : n.al,
+                            className: "codemirror-editor-rounded-bottom",
+                            style: {
+                              borderWidth: 0,
+                              width: "100%",
+                              borderBottomRightRadius: 4,
+                              borderBottomLeftRadius: 4,
+                            },
+                          }),
+                        }),
+                  ],
+                }),
+              ],
+            });
+          }),
+          (C = (e) => {
+            let { value: t, handleChange: a } = e;
+            const { themeType: s } = (0, f.i7)(),
+              [b, g] = (0, u.useState)(
+                y(["add", "edit", "read", "delete"], Object.keys(t)) &&
+                  Object.keys(t).every((e) => "boolean" === typeof t[e])
+                  ? 0
+                  : 1
+              ),
+              R = (0, l.A)();
+            return (0, x.jsxs)("div", {
+              className:
+                "!flex flex-col justify-start items-stretch w-full mt-4  border rounded",
+              style: { borderColor: R.palette.divider },
+              children: [
+                (0, x.jsx)("span", {
+                  style: { background: R.palette.background.paper },
+                  className: "!font-bold pl-2 py-2 rounded-t",
+                  children: (0, m.capitalize)("Accounts"),
+                }),
+                (0, x.jsx)(r.A, {}),
+                (0, x.jsxs)("div", {
+                  className:
+                    "!flex flex-col justify-start items-stretch w-full ",
+                  children: [
+                    (0, x.jsxs)(d.A, {
+                      value: b,
+                      onChange: () => {
+                        1 === b
+                          ? y(
+                              ["add", "edit", "read", "delete"],
+                              Object.keys(t)
+                            ) &&
+                            Object.keys(t).every(
+                              (e) => "boolean" == typeof t[e]
+                            )
+                            ? g(0)
+                            : (console.log(t),
+                              (0, p.jx)({
+                                message:
+                                  "JSON based policy detected. Please remove it to use visual editor",
+                              }))
+                          : 0 === b && g(1);
+                      },
+                      className: "!min-h-0",
+                      children: [
+                        (0, x.jsx)(o.A, {
+                          label: "Visual editor",
+                          className:
+                            "!font-bold !capitalize !py-2 !px-3 !min-h-0",
+                          sx: {
+                            borderWidth: 1,
+                            minHeight: null,
+                            minWidth: null,
+                          },
+                        }),
+                        (0, x.jsx)(o.A, {
+                          label: "Advance editor",
+                          className:
+                            "!font-bold !capitalize !py-2 !px-3 !min-h-0",
+                          sx: {
+                            borderWidth: 1,
+                            minHeight: null,
+                            minWidth: null,
+                          },
+                        }),
+                      ],
+                    }),
+                    (0, x.jsx)(r.A, {}),
+                    0 === b
+                      ? (0, x.jsx)("div", {
+                          className: "py-2 px-4 ",
+                          children: (0, x.jsx)(j, {
+                            value: t,
+                            handleChange: a,
+                          }),
+                        })
+                      : (0, x.jsx)("div", {
+                          className: "p-0",
+                          children: (0, x.jsx)(h.Ay, {
+                            value:
+                              "object" === typeof t
+                                ? JSON.stringify(t, null, 2)
+                                : "string" === typeof t
+                                ? t
+                                : "",
+                            height: "200px",
+                            extensions: [(0, i.rI)("json")],
+                            onChange: (e) => a(JSON.parse(e)),
+                            theme: "dark" == s ? c.Ts : n.al,
+                            className: "codemirror-editor-rounded-bottom",
+                            style: {
+                              borderWidth: 0,
+                              width: "100%",
+                              borderBottomRightRadius: 4,
+                              borderBottomLeftRadius: 4,
+                            },
+                          }),
+                        }),
+                  ],
+                }),
+              ],
+            });
+          }),
+          (k = (e) => {
+            let { policy: t, handleChange: a, containerClass: l } = e;
+            return (0, x.jsx)(
+              s.Ay,
+              {
+                item: !0,
+                xs: 12,
+                sm: 12,
+                md: 12,
+                lg: 12,
+                className: l,
+                children:
+                  t &&
+                  Object.keys(t).map((e) => {
+                    let s = null;
+                    switch (e) {
+                      case "tables":
+                        s = (0, x.jsx)(A, {
+                          value: t[e],
+                          handleChange: (s) => {
+                            a({ ...t, [e]: s });
+                          },
+                        });
+                        break;
+                      case "graphs":
+                        s = (0, x.jsx)(R, {
+                          value: t[e],
+                          handleChange: (s) => {
+                            a({ ...t, [e]: s });
+                          },
+                        });
+                        break;
+                      case "queries":
+                        s = (0, x.jsx)(v, {
+                          value: t[e],
+                          handleChange: (s) => {
+                            a({ ...t, [e]: s });
+                          },
+                        });
+                        break;
+                      case "dashboards":
+                        s = (0, x.jsx)(g, {
+                          value: t[e],
+                          handleChange: (s) => {
+                            a({ ...t, [e]: s });
+                          },
+                        });
+                        break;
+                      case "jobs":
+                        s = (0, x.jsx)(O, {
+                          value: t[e],
+                          handleChange: (s) => {
+                            a({ ...t, [e]: s });
+                          },
+                        });
+                        break;
+                      case "schemas":
+                        s = (0, x.jsx)(S, {
+                          value: t[e],
+                          handleChange: (s) => {
+                            a({ ...t, [e]: s });
+                          },
+                        });
+                        break;
+                      case "app_variables":
+                        s = (0, x.jsx)(w, {
+                          value: t[e],
+                          handleChange: (s) => {
+                            a({ ...t, [e]: s });
+                          },
+                        });
+                        break;
+                      case "policies":
+                        s = (0, x.jsx)(E, {
+                          value: t[e],
+                          handleChange: (s) => {
+                            a({ ...t, [e]: s });
+                          },
+                        });
+                        break;
+                      case "accounts":
+                        s = (0, x.jsx)(C, {
+                          value: t[e],
+                          handleChange: (s) => {
+                            a({ ...t, [e]: s });
+                          },
+                        });
+                    }
+                    return s;
+                  }),
+              },
+              "_policy"
+            );
+          });;
     },
   },
 ]);

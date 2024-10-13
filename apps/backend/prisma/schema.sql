@@ -301,17 +301,17 @@ CREATE TABLE "tbl_pm_job_history" (
 );
 
 -- CreateTable
-CREATE TABLE "tbl_pm_app_constants" (
-    "pm_app_constant_id" SERIAL NOT NULL,
-    "pm_app_constant_title" VARCHAR NOT NULL,
-    "pm_app_constant_value" JSON NOT NULL,
+CREATE TABLE "tbl_pm_app_variables" (
+    "pm_app_variable_id" SERIAL NOT NULL,
+    "pm_app_variable_title" VARCHAR NOT NULL,
+    "pm_app_variable_value" JSON NOT NULL,
     "created_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "disabled_at" TIMESTAMPTZ(6),
     "is_disabled" BOOLEAN DEFAULT false,
     "is_internal" BOOLEAN,
 
-    CONSTRAINT "tbl_pm_app_constants_pk" PRIMARY KEY ("pm_app_constant_id")
+    CONSTRAINT "tbl_pm_app_variables_pk" PRIMARY KEY ("pm_app_variable_id")
 );
 
 -- CreateIndex
@@ -360,7 +360,7 @@ CREATE UNIQUE INDEX "idx_unq_rental_rental_date_inventory_id_customer_id" ON "re
 CREATE UNIQUE INDEX "idx_unq_manager_staff_id" ON "store"("manager_staff_id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "unique_app_constants_title" ON "tbl_pm_app_constants"("pm_app_constant_title");
+CREATE UNIQUE INDEX "unique_app_variables_title" ON "tbl_pm_app_variables"("pm_app_variable_title");
 
 -- AddForeignKey
 ALTER TABLE "address" ADD CONSTRAINT "address_city_id_fkey" FOREIGN KEY ("city_id") REFERENCES "city"("city_id") ON DELETE RESTRICT ON UPDATE CASCADE;

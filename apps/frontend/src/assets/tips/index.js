@@ -9,21 +9,21 @@ select * from city where city_id={{[pm_query_id:21][0].city_id]};
   - \`{{}}\` is used to utilize the variable
   - \`[]\` is used to define the \`pm_query_id\` of desired query
 
-**Using app constants inside query** (Beta stage!)
+**Using app variables inside query** (Beta stage!)
 \`\`\`sql
 select * from city where city_id={{[pm_query_id:22][[pm_query_id:35][0].city_id].city_id}}
-or city_id={{[pm_app_constant_id:4].value}};
+or city_id={{[pm_app_variable_id:4].value}};
 \`\`\`
 `;
 
-export const app_constant_usage_tip = `
-## **App constants**
+export const app_variable_usage_tip = `
+## **App variables**
 -------------
-App constants are constants which contain JSON values and can be used for various purposes. There are two type of app constants, Internal and Global.
+App variables are constants which contain JSON values and can be used for various purposes. There are two type of app variables, Internal and Global.
 
-Internal app constants are used for declaring constants utlized by Jet Admin while Global app constants can be used in Query objects.
+Internal app variables are used for declaring constants utlized by Jet Admin while Global app variables can be used in Query objects.
 
-Below are the some app constants
+Below are the some app variables
 - [x] CUSTOM_INT_VIEW_MAPPING : Used to render custom mapping for integer values of table column while viewing. Syntax of \`CUSTOM_INT_VIEW_MAPPING\` is:
       
     \`\`\`json

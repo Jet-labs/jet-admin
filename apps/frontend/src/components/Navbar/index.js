@@ -21,7 +21,7 @@ import { useThemeActions, useThemeValue } from "../../contexts/themeContext";
 import { MdDarkMode } from "react-icons/md";
 import { IoSunnySharp } from "react-icons/io5";
 import { capitalize, upperCase } from "lodash";
-import { useAppConstants } from "../../contexts/appConstantsContext";
+import { useAppVariables } from "../../contexts/appVariablesContext";
 
 export const Navbar = ({ children, handleDrawerOpen }) => {
   const { themeType } = useThemeValue();
@@ -32,7 +32,7 @@ export const Navbar = ({ children, handleDrawerOpen }) => {
   const theme = useTheme();
   const isSmallDevice = useMediaQuery(theme.breakpoints.down("lg"));
   const isProfileOpen = Boolean(profileAnchor);
-  const { internalAppConstants } = useAppConstants();
+  const { internalAppVariables } = useAppVariables();
 
   const _handleProfileClick = (e) => {
     setProfileAnchor(e.currentTarget);
@@ -72,8 +72,8 @@ export const Navbar = ({ children, handleDrawerOpen }) => {
               className="font-bold normal-case mx-3"
               style={{ color: theme.palette.primary.contrastText }}
             >
-              {internalAppConstants?.APP_NAME
-                ? internalAppConstants.APP_NAME.value
+              {internalAppVariables?.APP_NAME
+                ? internalAppVariables.APP_NAME.value
                 : LOCAL_CONSTANTS.APP_NAME}
             </span>
           </div>

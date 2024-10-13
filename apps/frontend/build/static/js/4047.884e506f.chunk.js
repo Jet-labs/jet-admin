@@ -25,15 +25,15 @@
       const g = () => {
         const e = (0, n.A)(),
           a = (0, r.g)(),
-          t = "app_constant_".concat(
+          t = "app_variable_".concat(
             null === a || void 0 === a ? void 0 : a["*"]
           ),
           { pmUser: g } = (0, j.hD)(),
           y = (0, r.Zp)(),
-          { appConstants: _ } = (0, h.O0)(),
-          { reloadAllAppConstants: A } = (0, h.wI)(),
+          { appVariables: _ } = (0, h.O0)(),
+          { reloadAllAppVariables: A } = (0, h.wI)(),
           N = (0, l.useMemo)(
-            () => g && g.extractAppConstantAddAuthorization(),
+            () => g && g.extractAppVariableAddAuthorization(),
             [g]
           );
         return (0, b.jsxs)(i.A, {
@@ -54,7 +54,7 @@
                 (0, b.jsx)("span", {
                   className: "!font-semibold",
                   style: { color: e.palette.primary.main },
-                  children: "App constants",
+                  children: "App variables",
                 }),
                 (0, b.jsx)(o.A, {
                   onClick: A,
@@ -70,7 +70,7 @@
                 className: "!px-3 !py-1.5 !w-full",
                 children: (0, b.jsx)(c.A, {
                   onClick: () => {
-                    y(s.a.ROUTES.ADD_APP_CONSTANT.path());
+                    y(s.a.ROUTES.ADD_APP_VARIABLES.path());
                   },
                   variant: "contained",
                   className: "!w-full",
@@ -78,67 +78,67 @@
                   children: "Add more constants",
                 }),
               }),
-            (0, b.jsx)("div", { className: "!mt-1" }),
-            _ && _.length > 0
-              ? _.map((a) => {
-                  const l = "app_constant_".concat(a.pm_app_constant_id);
-                  return (0, b.jsx)(
-                    u.N_,
-                    {
-                      to: s.a.ROUTES.GRAPH_VIEW.path(a.pm_app_constant_id),
-                      children: (0, b.jsx)(
-                        d.Ay,
-                        {
-                          disablePadding: !0,
-                          className: "!px-3 !py-1.5",
-                          children: (0, b.jsxs)(p.A, {
-                            sx: {
-                              background: e.palette.background.paper,
-                              border: l == t ? 1 : 0,
-                              borderColor: e.palette.primary.main,
-                            },
-                            selected: l == t,
-                            className: "!rounded",
-                            children: [
-                              (0, b.jsx)(m.A, {
-                                className: "!ml-1",
-                                sx: {
-                                  color:
-                                    l == t
-                                      ? e.palette.primary.main
-                                      : e.palette.primary.contrastText,
-                                  minWidth: 0,
-                                },
-                                children: (0, b.jsx)(v.dPB, {
-                                  className: "!text-lg",
-                                }),
-                              }),
-                              (0, b.jsx)(x.A, {
-                                sx: {
-                                  color:
-                                    l == t
-                                      ? e.palette.primary.main
-                                      : e.palette.primary.contrastText,
-                                },
-                                primary: a.pm_app_constant_title,
-                                primaryTypographyProps: {
+              (0, b.jsx)("div", { className: "!mt-1" }),
+              _ && _.length > 0
+                ? _.map((a) => {
+                    const l = "app_variable_".concat(a.pm_app_variable_id);
+                    return (0, b.jsx)(
+                      u.N_,
+                      {
+                        to: s.a.ROUTES.GRAPH_VIEW.path(a.pm_app_variable_id),
+                        children: (0, b.jsx)(
+                          d.Ay,
+                          {
+                            disablePadding: !0,
+                            className: "!px-3 !py-1.5",
+                            children: (0, b.jsxs)(p.A, {
+                              sx: {
+                                background: e.palette.background.paper,
+                                border: l == t ? 1 : 0,
+                                borderColor: e.palette.primary.main,
+                              },
+                              selected: l == t,
+                              className: "!rounded",
+                              children: [
+                                (0, b.jsx)(m.A, {
+                                  className: "!ml-1",
                                   sx: {
-                                    fontWeight: l == t ? "700" : "500",
-                                    fontSize: 12,
-                                    marginLeft: 2,
+                                    color:
+                                      l == t
+                                        ? e.palette.primary.main
+                                        : e.palette.primary.contrastText,
+                                    minWidth: 0,
                                   },
-                                },
-                              }),
-                            ],
-                          }),
-                        },
-                        "_app_constant_".concat(a.pm_app_constant_id)
-                      ),
-                    },
-                    l
-                  );
-                })
-              : null,
+                                  children: (0, b.jsx)(v.dPB, {
+                                    className: "!text-lg",
+                                  }),
+                                }),
+                                (0, b.jsx)(x.A, {
+                                  sx: {
+                                    color:
+                                      l == t
+                                        ? e.palette.primary.main
+                                        : e.palette.primary.contrastText,
+                                  },
+                                  primary: a.pm_app_variable_title,
+                                  primaryTypographyProps: {
+                                    sx: {
+                                      fontWeight: l == t ? "700" : "500",
+                                      fontSize: 12,
+                                      marginLeft: 2,
+                                    },
+                                  },
+                                }),
+                              ],
+                            }),
+                          },
+                          "_app_variable_".concat(a.pm_app_variable_id)
+                        ),
+                      },
+                      l
+                    );
+                  })
+                : null;,
           ],
         });
       };
@@ -188,11 +188,11 @@
                         element: (0, b.jsx)(_, {}),
                       }),
                       (0, b.jsx)(r.qh, {
-                        path: s.a.ROUTES.ADD_APP_CONSTANT.code,
+                        path: s.a.ROUTES.ADD_APP_VARIABLES.code,
                         element: (0, b.jsx)(_, {}),
                       }),
                       (0, b.jsx)(r.qh, {
-                        path: s.a.ROUTES.APP_CONSTANT_VIEW.code,
+                        path: s.a.ROUTES.APP_VARIABLES_VIEW.code,
                         element: (0, b.jsx)(A, {}),
                       }),
                     ],

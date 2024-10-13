@@ -1,6 +1,6 @@
 import React, { useCallback } from "react";
 import Editor from "@monaco-editor/react";
-import { useAppConstants } from "../../../../contexts/appConstantsContext";
+import { useAppVariables } from "../../../../contexts/appVariablesContext";
 import { useThemeValue } from "../../../../contexts/themeContext";
 import { DEFAULT_PG_KEYWORDS } from "../../../../utils/editorAutocomplete/pgKeywords";
 import { useTheme } from "@mui/material";
@@ -9,7 +9,7 @@ import { getAllQueryAPI } from "../../../../api/queries";
 import { languages } from "monaco-editor";
 import { getQueryObjectSuggestions } from "../../../../utils/editorAutocomplete/queryObjects";
 import { LOCAL_CONSTANTS } from "../../../../constants";
-import { getAppConstantObjectSuggestions } from "../../../../utils/editorAutocomplete/appConstantObjects";
+import { getAppVariableObjectSuggestions } from "../../../../utils/editorAutocomplete/appVariableObjects";
 import { getAllTableColumns, getAllTables } from "../../../../api/tables";
 
 /**
@@ -69,7 +69,7 @@ const getPostgreSQLSuggestions = (range) => {
 export const PGSQLQueryEditor = ({ value, handleChange }) => {
   const { themeType } = useThemeValue();
   const theme = useTheme();
-  const { appConstants } = useAppConstants();
+  const { appVariables } = useAppVariables();
 
   const {
     isLoading: isLoadingQueries,
@@ -139,7 +139,7 @@ export const PGSQLQueryEditor = ({ value, handleChange }) => {
             // Provide suggestions specific to the context inside {{ }}
             suggestions = [
               ...getQueryObjectSuggestions(queries, range),
-              ...getAppConstantObjectSuggestions(appConstants, range),
+              ...getAppVariableObjectSuggestions(appVariables, range),
             ];
           } else {
             // Model suggestions with nested field suggestions

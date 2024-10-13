@@ -334,8 +334,8 @@ const constants = {
   PM_QUERY_DETECTION_REGEX: /\[pm_query_id:\d+\]/g,
   PM_QUERY_EXTRACTION_REGEX: /\[pm_query_id:(\d+)\]/,
 
-  PM_APP_CONSTANT_DETECTION_REGEX: /\[pm_app_constant_id:\d+\]/g,
-  PM_APP_CONSTANT_EXTRACTION_REGEX: /\[pm_app_constant_id:(\d+)\]/,
+  PM_APP_VARIABLES_DETECTION_REGEX: /\[pm_app_variable_id:\d+\]/g,
+  PM_APP_VARIABLES_EXTRACTION_REGEX: /\[pm_app_variable_id:(\d+)\]/,
 
   TABLE_FILTERS: {
     "=": (a, b) => `${a} = ${b}`,

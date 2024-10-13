@@ -1,18 +1,18 @@
 import { useParams } from "react-router-dom";
-import { AppConstantUpdateForm } from "../../components/AppConstantComponents/AppConstantUpdateForm";
+import { AppVariableUpdateForm } from "../../components/AppVariableComponents/AppVariableUpdateForm";
 import "./styles.css";
 /**
  *
  * @param {object} param0
  * @returns
  */
-const UpdateAppConstant = ({}) => {
+const UpdateAppVariable = ({}) => {
   const { id } = useParams();
   return (
     <div className="flex flex-col justify-start items-stretch w-full h-full">
-      {id && <AppConstantUpdateForm id={id} />}
+      {id && <AppVariableUpdateForm id={id} />}
     </div>
   );
 };
 
-export default UpdateAppConstant;
+export default UpdateAppVariable;

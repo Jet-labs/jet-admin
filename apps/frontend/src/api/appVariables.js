@@ -1,13 +1,12 @@
 import axios from "axios";
 import { LOCAL_CONSTANTS } from "../constants";
-import { AppConstant } from "../models/data/appConstant";
+import { AppVariable } from "../models/data/appVariable";
 import axiosInstance from "../utils/axiosInstance";
 
-
-export const addAppConstantAPI = async ({ data }) => {
+export const addAppVariableAPI = async ({ data }) => {
   try {
     const response = await axiosInstance.post(
-      LOCAL_CONSTANTS.APIS.APP_CONSTANTS.addAppConstant(),
+      LOCAL_CONSTANTS.APIS.APP_VARIABLESS.addAppVariable(),
       data
     );
     if (response.data && response.data.success == true) {
@@ -22,10 +21,10 @@ export const addAppConstantAPI = async ({ data }) => {
   }
 };
 
-export const updateAppConstantAPI = async ({ data }) => {
+export const updateAppVariableAPI = async ({ data }) => {
   try {
     const response = await axiosInstance.put(
-      LOCAL_CONSTANTS.APIS.APP_CONSTANTS.updateAppConstant(),
+      LOCAL_CONSTANTS.APIS.APP_VARIABLESS.updateAppVariable(),
       data
     );
 
@@ -41,15 +40,15 @@ export const updateAppConstantAPI = async ({ data }) => {
   }
 };
 
-export const getAppConstantByIDAPI = async ({ pmAppConstantID }) => {
+export const getAppVariableByIDAPI = async ({ pmAppVariableID }) => {
   try {
     const response = await axiosInstance.get(
-      LOCAL_CONSTANTS.APIS.APP_CONSTANTS.getAppConstantByID({
-        id: pmAppConstantID,
+      LOCAL_CONSTANTS.APIS.APP_VARIABLESS.getAppVariableByID({
+        id: pmAppVariableID,
       })
     );
     if (response.data && response.data.success == true) {
-      return new AppConstant(response.data.appConstant);
+      return new AppVariable(response.data.appVariable);
     } else if (response.data.error) {
       throw response.data.error;
     } else {
@@ -60,11 +59,11 @@ export const getAppConstantByIDAPI = async ({ pmAppConstantID }) => {
   }
 };
 
-export const deleteAppConstantByIDAPI = async ({ pmAppConstantID }) => {
+export const deleteAppVariableByIDAPI = async ({ pmAppVariableID }) => {
   try {
     const response = await axiosInstance.delete(
-      LOCAL_CONSTANTS.APIS.APP_CONSTANTS.deleteAppConstantByID({
-        id: pmAppConstantID,
+      LOCAL_CONSTANTS.APIS.APP_VARIABLESS.deleteAppVariableByID({
+        id: pmAppVariableID,
       })
     );
     if (response.data && response.data.success == true) {
@@ -79,13 +78,13 @@ export const deleteAppConstantByIDAPI = async ({ pmAppConstantID }) => {
   }
 };
 
-export const getAllAppConstantAPI = async () => {
+export const getAllAppVariableAPI = async () => {
   try {
     const response = await axiosInstance.get(
-      LOCAL_CONSTANTS.APIS.APP_CONSTANTS.getAllAppConstants()
+      LOCAL_CONSTANTS.APIS.APP_VARIABLESS.getAllAppVariables()
     );
     if (response.data && response.data.success == true) {
-      return AppConstant.toList(response.data.appConstants);
+      return AppVariable.toList(response.data.appVariables);
     } else if (response.data.error) {
       throw response.data.error;
     } else {
@@ -96,13 +95,13 @@ export const getAllAppConstantAPI = async () => {
   }
 };
 
-export const getAllInternalAppConstantAPI = async () => {
+export const getAllInternalAppVariableAPI = async () => {
   try {
     const response = await axiosInstance.get(
-      LOCAL_CONSTANTS.APIS.APP_CONSTANTS.getAllInternalAppConstants()
+      LOCAL_CONSTANTS.APIS.APP_VARIABLESS.getAllInternalAppVariables()
     );
     if (response.data && response.data.success == true) {
-      return AppConstant.toList(response.data.appConstants);
+      return AppVariable.toList(response.data.appVariables);
     } else if (response.data.error) {
       throw response.data.error;
     } else {

@@ -1200,7 +1200,7 @@
           i = (0, s.Zp)(),
           [o, c] = (0, m.useState)(!1),
           u = (0, m.useMemo)(
-            () => !!r && r.extractAppConstantDeletionAuthorization(a),
+            () => !!r && r.extractAppVariableDeletionAuthorization(a),
             [r, a]
           ),
           {

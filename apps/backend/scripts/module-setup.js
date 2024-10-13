@@ -14,19 +14,19 @@ const setupConfigProvider = () => {
     if (setupConfig.modules && Array.isArray(setupConfig.modules)) {
       _modules = [...setupConfig.modules];
       if (setupConfig.modules.includes("dashboard")) {
-        _modules.push(["query", "graph", "app_constant"]);
+        _modules.push(["query", "graph", "app_variable"]);
       } else if (setupConfig.modules.includes("graph")) {
-        _modules.push(["query", "app_constant"]);
+        _modules.push(["query", "app_variable"]);
       } else if (setupConfig.modules.includes("query")) {
-        _modules.push(["app_constant"]);
+        _modules.push(["app_variable"]);
       } else if (setupConfig.modules.includes("job")) {
-        _modules.push(["query", "app_constant"]);
+        _modules.push(["query", "app_variable"]);
       }
     }
     _modules.filter((item, index) => _modules.indexOf(item) === index);
     return { ...setupConfig, modules: _modules };
   } else {
-    return { modules: ["query", "graph", "dashboard", "app_constant", "job"] };
+    return { modules: ["query", "graph", "dashboard", "app_variable", "job"] };
   }
 };
 
@@ -100,24 +100,24 @@ const create_jobs_history_table_query = `CREATE TABLE IF NOT EXISTS public.tbl_p
 	CONSTRAINT tbl_pm_job_history_tbl_pm_jobs_fk FOREIGN KEY (pm_job_id) REFERENCES public.tbl_pm_jobs(pm_job_id)
 );`;
 
-const create_app_constants_table_query = `CREATE TABLE IF NOT EXISTS public.tbl_pm_app_constants
+const create_app_variables_table_query = `CREATE TABLE IF NOT EXISTS public.tbl_pm_app_variables
 (
-    pm_app_constant_id serial NOT NULL,
-    pm_app_constant_title character varying NOT NULL,
-    pm_app_constant_value json NOT NULL,
+    pm_app_variable_id serial NOT NULL,
+    pm_app_variable_title character varying NOT NULL,
+    pm_app_variable_value json NOT NULL,
     created_at timestamp(6) with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp(6) with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
     disabled_at timestamp(6) with time zone,
     is_disabled boolean DEFAULT false,
     is_internal boolean DEFAULT false,
-    CONSTRAINT tbl_pm_app_constants_pk PRIMARY KEY (pm_app_constant_id),
-    CONSTRAINT unique_app_constants_title UNIQUE (pm_app_constant_title)
+    CONSTRAINT tbl_pm_app_variables_pk PRIMARY KEY (pm_app_variable_id),
+    CONSTRAINT unique_app_variables_title UNIQUE (pm_app_variable_title)
 );`;
 
 const custom_int_mapping_query = `
-      INSERT INTO tbl_pm_app_constants(pm_app_constant_title, pm_app_constant_value, is_internal)
+      INSERT INTO tbl_pm_app_variables(pm_app_variable_title, pm_app_variable_value, is_internal)
       VALUES($1, $2, $3)
-      RETURNING pm_app_constant_id;
+      RETURNING pm_app_variable_id;
     `;
 
 const create_module_trigger_query = `
@@ -162,8 +162,8 @@ async function setup_module_database() {
       await client.query(create_jobs_table_query);
       await client.query(create_jobs_history_table_query);
     }
-    if (_setupConfig.modules.includes("app_constant"))
-      await client.query(create_app_constants_table_query);
+    if (_setupConfig.modules.includes("app_variable"))
+      await client.query(create_app_variables_table_query);
     await client.query("COMMIT");
 
     Logger.log("success", {
@@ -171,7 +171,7 @@ async function setup_module_database() {
     });
 
     Logger.log("info", {
-      message: "setup_module_database:app constants creation started...",
+      message: "setup_module_database:app variables creation started...",
     });
     await client.query("BEGIN");
     await client.query(custom_int_mapping_query, [
@@ -191,7 +191,7 @@ async function setup_module_database() {
     ]);
     await client.query("COMMIT");
     Logger.log("success", {
-      message: "setup_module_database:app constants creation completed!",
+      message: "setup_module_database:app variables creation completed!",
     });
 
     // create triggers in database

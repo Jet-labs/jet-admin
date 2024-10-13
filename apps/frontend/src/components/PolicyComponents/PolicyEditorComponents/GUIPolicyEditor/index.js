@@ -5,7 +5,7 @@ import { GraphPolicyEditor } from "../GraphPolicyEditor";
 import { QueryPolicyEditor } from "../QueryPolicyEditor";
 import { TablePolicyEditor } from "../TablePolicyEditor";
 import { JobPolicyEditor } from "../JobPolicyEditor";
-import { AppConstantPolicyEditor } from "../AppConstantPolicyEditor";
+import { AppVariablePolicyEditor } from "../AppVariablePolicyEditor";
 import { SchemaPolicyEditor } from "../SchemaPolicyEditor";
 import { PolicyObjectPolicyEditor } from "../PolicyObjectPolicyEditor";
 import { AccountPolicyEditor } from "../AccountPolicyEditor";
@@ -92,9 +92,9 @@ export const GUIPolicyEditor = ({ policy, handleChange, containerClass }) => {
               );
               break;
             }
-            case "app_constants": {
+            case "app_variables": {
               component = (
-                <AppConstantPolicyEditor
+                <AppVariablePolicyEditor
                   value={policy[key]}
                   handleChange={(value) => {
                     handleChange({ ...policy, [key]: value });

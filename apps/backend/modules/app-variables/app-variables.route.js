@@ -2,10 +2,10 @@ const express = require("express");
 const { dbModel } = require("../../db/prisma");
 const { authMiddleware } = require("../auth/auth.middleware");
 const { policyMiddleware } = require("../policies/policy.middleware");
-const { appConstantController } = require("./app-constants.controller");
+const { appVariableController } = require("./app-variables.controller");
 const {
-  appConstantAuthorizationMiddleware,
-} = require("./app-constants.authorization.middleware");
+  appVariableAuthorizationMiddleware,
+} = require("./app-variables.authorization.middleware");
 const router = express.Router();
 
 router.get(
@@ -13,44 +13,44 @@ router.get(
   authMiddleware.authProvider,
   policyMiddleware.populateAuthorizationPolicies,
   // dashboardAuthorizationMiddleware.populateAuthorizedDashboardsForRead,
-  appConstantController.getAllInternalAppConstants
+  appVariableController.getAllInternalAppVariables
 );
 
 router.get(
   "/",
   authMiddleware.authProvider,
   policyMiddleware.populateAuthorizationPolicies,
-  appConstantAuthorizationMiddleware.populateAuthorizedAppConstantsForRead,
-  appConstantController.getAllAppConstants
+  appVariableAuthorizationMiddleware.populateAuthorizedAppVariablesForRead,
+  appVariableController.getAllAppVariables
 );
 router.get(
   "/:id",
   authMiddleware.authProvider,
   policyMiddleware.populateAuthorizationPolicies,
-  appConstantAuthorizationMiddleware.populateAuthorizedAppConstantsForRead,
-  appConstantController.getAppConstantByID
+  appVariableAuthorizationMiddleware.populateAuthorizedAppVariablesForRead,
+  appVariableController.getAppVariableByID
 );
 router.post(
   "/",
   authMiddleware.authProvider,
   policyMiddleware.populateAuthorizationPolicies,
-  appConstantAuthorizationMiddleware.populateAuthorizationForAppConstantAddition,
-  appConstantController.addAppConstant
+  appVariableAuthorizationMiddleware.populateAuthorizationForAppVariableAddition,
+  appVariableController.addAppVariable
 );
 router.put(
   "/",
   authMiddleware.authProvider,
   policyMiddleware.populateAuthorizationPolicies,
-  appConstantAuthorizationMiddleware.populateAuthorizedAppConstantsForUpdate,
-  appConstantController.updateAppConstant
+  appVariableAuthorizationMiddleware.populateAuthorizedAppVariablesForUpdate,
+  appVariableController.updateAppVariable
 );
 
 router.delete(
   "/:id",
   authMiddleware.authProvider,
   policyMiddleware.populateAuthorizationPolicies,
-  appConstantAuthorizationMiddleware.populateAuthorizedAppConstantsForDelete,
-  appConstantController.deleteAppConstant
+  appVariableAuthorizationMiddleware.populateAuthorizedAppVariablesForDelete,
+  appVariableController.deleteAppVariable
 );
 
 module.exports = router;

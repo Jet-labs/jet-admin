@@ -23,7 +23,7 @@ const GraphLayout = lazy(() => import("./Layouts/GraphLayout"));
 const DashboardLayout = lazy(() => import("./Layouts/DashboardLayout"));
 const QueryLayout = lazy(() => import("./Layouts/QueryLayout"));
 const JobLayout = lazy(() => import("./Layouts/JobLayout"));
-const AppConstantLayout = lazy(() => import("./Layouts/AppConstantLayout"));
+const AppVariableLayout = lazy(() => import("./Layouts/AppVariableLayout"));
 const TriggerLayout = lazy(() => import("./Layouts/TriggerLayout"));
 
 const router = createBrowserRouter([
@@ -64,8 +64,8 @@ const router = createBrowserRouter([
             element: <GraphLayout />,
           },
           {
-            path: LOCAL_CONSTANTS.ROUTES.ALL_APP_CONSTANTS.code,
-            element: <AppConstantLayout />,
+            path: LOCAL_CONSTANTS.ROUTES.ALL_APP_VARIABLES.code,
+            element: <AppVariableLayout />,
           },
           {
             path: LOCAL_CONSTANTS.ROUTES.ALL_TRIGGERS.code,

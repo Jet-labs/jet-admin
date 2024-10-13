@@ -7,4 +7,4 @@
     - `{{}}` is used to utilize the variable
     - `[]` is used to define the `pm_query_id` of desired query
       
-- [ ] Inside app constants : Currently this functionality is not available
+- [ ] Inside app variables : Currently this functionality is not available

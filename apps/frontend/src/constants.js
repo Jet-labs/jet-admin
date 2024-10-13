@@ -84,7 +84,7 @@ export const LOCAL_CONSTANTS = {
     PM_USER_TABLE_NAME: "tbl_pm_users",
     POLICY_OBJECT_TABLE_NAME: "tbl_pm_policy_objects",
     JOB_HISTORY_TABLE_NAME: "tbl_pm_job_history",
-    APP_CONSTANTS_TABLE_NAME: "tbl_pm_app_constants",
+    APP_VARIABLESS_TABLE_NAME: "tbl_pm_app_variables",
     DELETE_BUTTON_TEXT: "Delete",
     UPDATE_BUTTON_TEXT: "Update",
     SUBMIT_BUTTON_TEXT: "Submit",
@@ -179,18 +179,18 @@ export const LOCAL_CONSTANTS = {
     TRIGGER_DELETION_CONFIRMATION_BODY:
       "Are you sure you want to delete trigger",
 
-    // app constants
-    APP_CONSTANT_ADDITION_SUCCESS: "App constant added!",
-    APP_CONSTANT_UPDATED_SUCCESS: "App constant updated!",
-    APP_CONSTANT_DELETED_SUCCESS: "App constant deleted!",
-    APP_CONSTANT_ADDITION_PAGE_TITLE: "Add new app constant",
-    APP_CONSTANT_DELETION_CONFIRMATION_TITLE: "Delete app constant?",
-    APP_CONSTANT_DELETION_CONFIRMATION_BODY:
-      "Are you sure you want to delete app constant",
-    APP_CONSTANT_UPDATE_PAGE_TITLE: "Update app constant",
-    APP_CONSTANT_INTERNAL_CONSTANTS_RECOMMENDATION:
-      "Internal app constants should not be deleted",
-    APP_CONSTANT_FORM_INTERNAL_FIELD_LABEL: "Internal",
+    // app variables
+    APP_VARIABLES_ADDITION_SUCCESS: "App variable added!",
+    APP_VARIABLES_UPDATED_SUCCESS: "App variable updated!",
+    APP_VARIABLES_DELETED_SUCCESS: "App variable deleted!",
+    APP_VARIABLES_ADDITION_PAGE_TITLE: "Add new app variable",
+    APP_VARIABLES_DELETION_CONFIRMATION_TITLE: "Delete app variable?",
+    APP_VARIABLES_DELETION_CONFIRMATION_BODY:
+      "Are you sure you want to delete app variable",
+    APP_VARIABLES_UPDATE_PAGE_TITLE: "Update app variable",
+    APP_VARIABLES_INTERNAL_CONSTANTS_RECOMMENDATION:
+      "Internal app variables should not be deleted",
+    APP_VARIABLES_FORM_INTERNAL_FIELD_LABEL: "Internal",
 
     //dashboards
     DASHBOARD_ADDITION_SUCCESS: "Dashboard added!",
@@ -243,15 +243,15 @@ export const LOCAL_CONSTANTS = {
       path: (id) => `${id}`,
     },
 
-    ALL_APP_CONSTANTS: {
-      code: "/app_constants/*",
-      path: () => "/app_constants",
+    ALL_APP_VARIABLES: {
+      code: "/app_variables/*",
+      path: () => "/app_variables",
     },
-    ADD_APP_CONSTANT: {
+    ADD_APP_VARIABLES: {
       code: "add",
       path: () => "add",
     },
-    APP_CONSTANT_VIEW: {
+    APP_VARIABLES_VIEW: {
       code: ":id",
       path: (id) => `${id}`,
     },
@@ -455,13 +455,13 @@ export const LOCAL_CONSTANTS = {
       deleteQueryByID: ({ id }) => `/admin_api/queries/${id}`,
     },
 
-    APP_CONSTANTS: {
-      getAllInternalAppConstants: () => `/admin_api/app_constants/internal`,
-      getAllAppConstants: () => `/admin_api/app_constants`,
-      getAppConstantByID: ({ id }) => `/admin_api/app_constants/${id}`,
-      addAppConstant: () => `/admin_api/app_constants`,
-      updateAppConstant: () => `/admin_api/app_constants`,
-      deleteAppConstantByID: ({ id }) => `/admin_api/app_constants/${id}`,
+    APP_VARIABLESS: {
+      getAllInternalAppVariables: () => `/admin_api/app_variables/internal`,
+      getAllAppVariables: () => `/admin_api/app_variables`,
+      getAppVariableByID: ({ id }) => `/admin_api/app_variables/${id}`,
+      addAppVariable: () => `/admin_api/app_variables`,
+      updateAppVariable: () => `/admin_api/app_variables`,
+      deleteAppVariableByID: ({ id }) => `/admin_api/app_variables/${id}`,
     },
     POLICIES: {
       getAllPolicies: () => `/admin_api/policies`,
@@ -541,7 +541,7 @@ export const LOCAL_CONSTANTS = {
     TABLE_ID_PRIMARY_KEY: (tableName) =>
       `REACT_QUERY_KEY_TABLE_PRIMARY_KEY_${String(tableName).toUpperCase()}`,
     QUERIES: `REACT_QUERY_KEY_QUERIES`,
-    APP_CONSTANTS: `REACT_QUERY_KEY_APP_CONSTANTS`,
+    APP_VARIABLESS: `REACT_QUERY_KEY_APP_VARIABLESS`,
     GRAPHS: `REACT_QUERY_KEY_GRAPHS`,
     JOBS: `REACT_QUERY_KEY_JOBS`,
     JOB_HISTORY: `REACT_QUERY_KEY_JOB_HISTORY`,

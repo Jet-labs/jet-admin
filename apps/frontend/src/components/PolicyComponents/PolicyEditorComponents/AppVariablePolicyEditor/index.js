@@ -11,7 +11,7 @@ import { displayError } from "../../../../utils/notification";
 import { CRUDPermissionCheckboxGroup } from "../CRUDPermissionCheckboxGroup";
 import { useThemeValue } from "../../../../contexts/themeContext";
 
-export const AppConstantPolicyEditor = ({ value, handleChange }) => {
+export const AppVariablePolicyEditor = ({ value, handleChange }) => {
   const { themeType } = useThemeValue();
   const [tab, setTab] = useState(
     containsOnly(["add", "edit", "read", "delete"], Object.keys(value)) &&
@@ -47,7 +47,7 @@ export const AppConstantPolicyEditor = ({ value, handleChange }) => {
         style={{ background: theme.palette.background.paper }}
         className="!font-bold pl-2 py-2 rounded-t"
       >
-        {capitalize("App constants")}
+        {capitalize("App variables")}
       </span>
       <Divider />
       <div className="!flex flex-col justify-start items-stretch w-full ">

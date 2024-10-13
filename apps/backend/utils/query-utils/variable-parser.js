@@ -63,32 +63,32 @@ const replaceQueryIDStringWithQueryID = (matchedVariable) => {
  * @param {String} matchedVariable
  * @returns
  */
-const replaceAppConstantIDStringWithAppConstantID = (matchedVariable) => {
-  let pmAppConstantIDs = [];
-  const appConstantIDStringWithReplacedAppConstantID = matchedVariable
+const replaceAppVariableIDStringWithAppVariableID = (matchedVariable) => {
+  let pmAppVariableIDs = [];
+  const appVariableIDStringWithReplacedAppVariableID = matchedVariable
     .slice(2, -2)
     .replace(
-      constants.PM_APP_CONSTANT_DETECTION_REGEX,
-      (pmAppConstantIDString) => {
-        const _pmAppConstantID = pmAppConstantIDString.match(
-          constants.PM_APP_CONSTANT_EXTRACTION_REGEX
+      constants.PM_APP_VARIABLES_DETECTION_REGEX,
+      (pmAppVariableIDString) => {
+        const _pmAppVariableID = pmAppVariableIDString.match(
+          constants.PM_APP_VARIABLES_EXTRACTION_REGEX
         )[1];
-        if (!isNaN(_pmAppConstantID)) {
-          pmAppConstantIDs.push(parseInt(_pmAppConstantID));
+        if (!isNaN(_pmAppVariableID)) {
+          pmAppVariableIDs.push(parseInt(_pmAppVariableID));
         }
-        return isNaN(_pmAppConstantID) ? null : `pmac_${_pmAppConstantID}`;
+        return isNaN(_pmAppVariableID) ? null : `pmac_${_pmAppVariableID}`;
       }
     );
   Logger.log("warning", {
-    message: "replaceAppConstantStringWithAppConstant",
-    params: { appConstantIDStringWithReplacedAppConstantID },
+    message: "replaceAppVariableStringWithAppVariable",
+    params: { appVariableIDStringWithReplacedAppVariableID },
   });
-  return { appConstantIDStringWithReplacedAppConstantID, pmAppConstantIDs };
+  return { appVariableIDStringWithReplacedAppVariableID, pmAppVariableIDs };
 };
 
 module.exports = {
   evaluateAST,
   extractVariablesFromQuery,
   replaceQueryIDStringWithQueryID,
-  replaceAppConstantIDStringWithAppConstantID,
+  replaceAppVariableIDStringWithAppVariableID,
 };

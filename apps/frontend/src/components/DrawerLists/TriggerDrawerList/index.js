@@ -44,7 +44,7 @@ export const TriggersDrawerList = () => {
   });
 
   const _navigateToAddMoreTrigger = () => {
-    navigate(LOCAL_CONSTANTS.ROUTES.ADD_APP_CONSTANT.path());
+    navigate(LOCAL_CONSTANTS.ROUTES.ADD_APP_VARIABLES.path());
   };
 
   return (

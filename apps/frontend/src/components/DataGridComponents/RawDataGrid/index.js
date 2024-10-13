@@ -19,7 +19,7 @@ import { useAuthState } from "../../../contexts/authContext";
 import { useDebounce } from "@uidotdev/usehooks";
 import { getTableColumns } from "../../../api/tables";
 import { LOCAL_CONSTANTS } from "../../../constants";
-import { useAppConstants } from "../../../contexts/appConstantsContext";
+import { useAppVariables } from "../../../contexts/appVariablesContext";
 import { Loading } from "../../../pages/Loading";
 import {
   combinePrimaryKeyToWhereClause,
@@ -38,7 +38,7 @@ export const RawDataGrid = ({
   showStats,
   containerClass,
 }) => {
-  const { internalAppConstants } = useAppConstants();
+  const { internalAppVariables } = useAppVariables();
   const { pmUser } = useAuthState();
   const navigate = useNavigate();
   const [page, setPage] = useState(1);
@@ -165,13 +165,13 @@ export const RawDataGrid = ({
     if (tableColumns && tableName) {
       const c = getFormattedTableColumns(
         tableColumns,
-        internalAppConstants?.CUSTOM_INT_VIEW_MAPPING?.[tableName]
+        internalAppVariables?.CUSTOM_INT_VIEW_MAPPING?.[tableName]
       );
       return c;
     } else {
       return null;
     }
-  }, [tableName, tableColumns, internalAppConstants]);
+  }, [tableName, tableColumns, internalAppVariables]);
 
   const rowAddAuthorization = useMemo(() => {
     return pmUser && pmUser.extractRowAddAuthorization(tableName);

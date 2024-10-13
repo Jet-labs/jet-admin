@@ -6,9 +6,9 @@
     11779: (e, t, n) => {
       n.d(t, { BZ: () => s, Tk: () => l, U6: () => a });
       const a =
-          "\n## **Using queries variables**\n---------------------------\n\\\n**Referencing queries inside other queries:** Query values can be used in run-time inside another query by utilizing the syntax below:\n```sql\nselect * from city where city_id={{[pm_query_id:21][0].city_id]};\n```\n  - `{{}}` is used to utilize the variable\n  - `[]` is used to define the `pm_query_id` of desired query\n\n**Using app constants inside query** (Beta stage!)\n```sql\nselect * from city where city_id={{[pm_query_id:22][[pm_query_id:35][0].city_id].city_id}}\nor city_id={{[pm_app_constant_id:4].value}};\n```\n",
+          "\n## **Using queries variables**\n---------------------------\n\\\n**Referencing queries inside other queries:** Query values can be used in run-time inside another query by utilizing the syntax below:\n```sql\nselect * from city where city_id={{[pm_query_id:21][0].city_id]};\n```\n  - `{{}}` is used to utilize the variable\n  - `[]` is used to define the `pm_query_id` of desired query\n\n**Using app variables inside query** (Beta stage!)\n```sql\nselect * from city where city_id={{[pm_query_id:22][[pm_query_id:35][0].city_id].city_id}}\nor city_id={{[pm_app_variable_id:4].value}};\n```\n",
         s =
-          '\n## **App constants**\n-------------\nApp constants are constants which contain JSON values and can be used for various purposes. There are two type of app constants, Internal and Global.\n\nInternal app constants are used for declaring constants utlized by Jet Admin while Global app constants can be used in Query objects.\n\nBelow are the some app constants\n- [x] CUSTOM_INT_VIEW_MAPPING : Used to render custom mapping for integer values of table column while viewing. Syntax of `CUSTOM_INT_VIEW_MAPPING` is:\n      \n    ```json\n    {\n        table_name: {\n            column_name: {\n                int_value1:label1,\n                int_value2:label2,\n                int_value3:label3,\n                ...\n            }\n        }\n    }\n    ```\n    For example\n    ```json\n    {\n        "restaurant_menu": {\n            "item_id": {\n                "1":"Tea",\n                "23":"Coffee",\n                "34":"Hot chocholate",\n                ...\n            }\n        }\n    }\n    ```\n- [x] CUSTOM_INT_EDIT_MAPPING : Used to render custom mapping for integer values of table column while editing a row. Syntax of `CUSTOM_INT_EDIT_MAPPING` is same as `CUSTOM_INT_VIEW_MAPPING`.\n- [x] APP_NAME : Used to declare custom application name:\n    ```json\n    {\n        "value":"Super food store admin"\n    }\n    ```\n',
+          '\n## **App variables**\n-------------\nApp variables are constants which contain JSON values and can be used for various purposes. There are two type of app variables, Internal and Global.\n\nInternal app variables are used for declaring constants utlized by Jet Admin while Global app variables can be used in Query objects.\n\nBelow are the some app variables\n- [x] CUSTOM_INT_VIEW_MAPPING : Used to render custom mapping for integer values of table column while viewing. Syntax of `CUSTOM_INT_VIEW_MAPPING` is:\n      \n    ```json\n    {\n        table_name: {\n            column_name: {\n                int_value1:label1,\n                int_value2:label2,\n                int_value3:label3,\n                ...\n            }\n        }\n    }\n    ```\n    For example\n    ```json\n    {\n        "restaurant_menu": {\n            "item_id": {\n                "1":"Tea",\n                "23":"Coffee",\n                "34":"Hot chocholate",\n                ...\n            }\n        }\n    }\n    ```\n- [x] CUSTOM_INT_EDIT_MAPPING : Used to render custom mapping for integer values of table column while editing a row. Syntax of `CUSTOM_INT_EDIT_MAPPING` is same as `CUSTOM_INT_VIEW_MAPPING`.\n- [x] APP_NAME : Used to declare custom application name:\n    ```json\n    {\n        "value":"Super food store admin"\n    }\n    ```\n',
         l =
           "\n##### **Cron Syntax Quick Reference**\n\n\n| Schedule | Cron Expression |\n|---|---|\n| Monday at 3 PM | `0 15 * * 1` |\n| Every 15 Minutes | `*/15 * * * *` |\n| First Day of Every Month at 5 AM | `0 5 1 * *` |\n\n\n##### **Fields**\n- **Minute**: `0-59`\n- **Hour**: `0-23`\n- **Day**: `1-31`\n- **Month**: `1-12`\n- **Day of Week**: `0-7` (0 & 7 are Sunday)\n\n##### **Special Characters**\n- **`*`**: Every\n- **`,`**: Multiple\n- **`-`**: Range\n- **`/`**: Increment\n";
     },
@@ -24,7 +24,7 @@
         d = n(70579);
       const p = (e) => {
         var t;
-        let { appConstantForm: n } = e;
+        let { appVariableForm: n } = e;
         const p = (0, a.A)();
         return (0, d.jsxs)(s.Ay, {
           container: !0,
@@ -48,8 +48,8 @@
                   size: "small",
                   variant: "outlined",
                   type: "text",
-                  name: "pm_app_constant_title",
-                  value: n.values.pm_app_constant_title,
+                  name: "pm_app_variable_title",
+                  value: n.values.pm_app_variable_title,
                   onChange: n.handleChange,
                   onBlur: n.handleBlur,
                 }),
@@ -71,7 +71,7 @@
                   },
                   severity: "info",
                   className: "!py-0 !text-xs",
-                  children: "Internal app constants should not be deleted",
+                  children: "Internal app variables should not be deleted",
                 }),
               ],
             }),
@@ -105,16 +105,16 @@
                   void 0 !== n &&
                   null !== (t = n.values) &&
                   void 0 !== t &&
-                  t.pm_app_constant_value
-                    ? "object" === typeof n.values.pm_app_constant_value
-                      ? JSON.stringify(n.values.pm_app_constant_value, null, 2)
-                      : n.values.pm_app_constant_value
+                  t.pm_app_variable_value
+                    ? "object" === typeof n.values.pm_app_variable_value
+                      ? JSON.stringify(n.values.pm_app_variable_value, null, 2)
+                      : n.values.pm_app_variable_value
                     : JSON.stringify({}),
                 setCode: (e) => {
                   null === n ||
                     void 0 === n ||
                     n.setFieldValue(
-                      "pm_app_constant_value",
+                      "pm_app_variable_value",
                       "string" === typeof e ? JSON.parse(e) : e
                     );
                 },
@@ -254,13 +254,13 @@
         T = n(88739),
         N = n(70579);
       const f = (e) => {
-        let { pmAppConstantID: t } = e;
+        let { pmAppVariableID: t } = e;
         const { pmUser: n } = (0, x.hD)(),
           s = (0, o.jE)(),
           [l, i] = (0, p.useState)(!1),
           d = (0, a.Zp)(),
           _ = (0, p.useMemo)(
-            () => !!n && n.extractAppConstantDeletionAuthorization(t),
+            () => !!n && n.extractAppVariableDeletionAuthorization(t),
             [n, t]
           ),
           {
@@ -271,14 +271,14 @@
             mutate: S,
           } = (0, c.n)({
             mutationFn: (e) => {
-              let { pmAppConstantID: t } = e;
-              return (0, u.Jx)({ pmAppConstantID: t });
+              let { pmAppVariableID: t } = e;
+              return (0, u.Jx)({ pmAppVariableID: t });
             },
             retry: !1,
             onSuccess: () => {
-              (0, m.qq)(T.a.STRINGS.APP_CONSTANT_DELETED_SUCCESS),
-                s.invalidateQueries([T.a.REACT_QUERY_KEYS.APP_CONSTANTS]),
-                d(T.a.ROUTES.ALL_APP_CONSTANTS.path()),
+              (0, m.qq)(T.a.STRINGS.APP_VARIABLES_DELETED_SUCCESS),
+                s.invalidateQueries([T.a.REACT_QUERY_KEYS.APP_VARIABLESS]),
+                d(T.a.ROUTES.ALL_APP_VARIABLES.path()),
                 i(!1);
             },
             onError: (e) => {
@@ -303,15 +303,15 @@
               (0, N.jsx)(h.K, {
                 open: l,
                 onAccepted: () => {
-                  S({ pmAppConstantID: t });
+                  S({ pmAppVariableID: t });
                 },
                 onDecline: () => {
                   i(!1);
                 },
-                title: T.a.STRINGS.APP_CONSTANT_DELETION_CONFIRMATION_TITLE,
+                title: T.a.STRINGS.APP_VARIABLES_DELETION_CONFIRMATION_TITLE,
                 message: ""
                   .concat(
-                    T.a.STRINGS.APP_CONSTANT_DELETION_CONFIRMATION_BODY,
+                    T.a.STRINGS.APP_VARIABLES_DELETION_CONFIRMATION_BODY,
                     " - "
                   )
                   .concat(t),
@@ -331,17 +331,17 @@
               data: h,
               error: A,
             } = (0, i.I)({
-              queryKey: [T.a.REACT_QUERY_KEYS.APP_CONSTANTS, t],
-              queryFn: () => (0, u.yL)({ pmAppConstantID: t }),
+              queryKey: [T.a.REACT_QUERY_KEYS.APP_VARIABLESS, t],
+              queryFn: () => (0, u.yL)({ pmAppVariableID: t }),
               cacheTime: 0,
               retry: 1,
               staleTime: 0,
             });
-          console.log({ appConstantData: h });
+          console.log({ appVariableData: h });
           const g = (0, d.Wx)({
             initialValues: {
-              pm_app_constant_title: "Untitled",
-              pm_app_constant_value: JSON.stringify({}),
+              pm_app_variable_title: "Untitled",
+              pm_app_variable_value: JSON.stringify({}),
               is_internal: !1,
             },
             validateOnMount: !1,
@@ -354,12 +354,12 @@
           (0, p.useEffect)(() => {
             g &&
               h &&
-              (g.setFieldValue("pm_app_constant_id", h.pm_app_constant_id),
-              g.setFieldValue("pm_app_constant_title", h.pm_app_constant_title),
+              (g.setFieldValue("pm_app_variable_id", h.pm_app_variable_id),
+              g.setFieldValue("pm_app_variable_title", h.pm_app_variable_title),
               g.setFieldValue("is_internal", h.is_internal),
               g.setFieldValue(
-                "pm_app_constant_value",
-                h.pm_app_constant_value
+                "pm_app_variable_value",
+                h.pm_app_variable_value
               ));
           }, [h]);
           const {
@@ -372,8 +372,8 @@
             mutationFn: (e) => (0, u.P$)({ data: e }),
             retry: !1,
             onSuccess: (e) => {
-              (0, m.qq)(T.a.STRINGS.APP_CONSTANT_UPDATED_SUCCESS),
-                a.invalidateQueries([T.a.REACT_QUERY_KEYS.APP_CONSTANTS]);
+              (0, m.qq)(T.a.STRINGS.APP_VARIABLES_UPDATED_SUCCESS),
+                a.invalidateQueries([T.a.REACT_QUERY_KEYS.APP_VARIABLESS]);
             },
             onError: (e) => {
               (0, m.jx)(e);
@@ -393,11 +393,11 @@
                 children: [
                   (0, N.jsx)("span", {
                     className: "text-lg font-bold text-start",
-                    children: T.a.STRINGS.APP_CONSTANT_UPDATE_PAGE_TITLE,
+                    children: T.a.STRINGS.APP_VARIABLES_UPDATE_PAGE_TITLE,
                   }),
                   (0, N.jsx)("span", {
                     className: "text-xs font-medium text-start mt-1",
-                    children: "AppConstant id : ".concat(t),
+                    children: "AppVariable id : ".concat(t),
                   }),
                 ],
               }),
@@ -412,12 +412,12 @@
                     sm: 12,
                     xs: 12,
                     children: [
-                      (0, N.jsx)(_.n, { appConstantForm: g }),
+                      (0, N.jsx)(_.n, { appVariableForm: g }),
                       (0, N.jsxs)("div", {
                         className:
                           "!flex flex-row justify-end items-center mt-10 w-full px-3",
                         children: [
-                          (0, N.jsx)(f, { pmAppConstantID: t }),
+                          (0, N.jsx)(f, { pmAppVariableID: t }),
                           (0, N.jsx)(r.A, {
                             variant: "contained",
                             className: "!ml-3",

@@ -323,70 +323,70 @@ export class PMUser {
     return authorization;
   };
 
-  // app_constants
-  extractAppConstantAddAuthorization = () => {
-    if (this.policy?.app_constants?.add) {
+  // app_variables
+  extractAppVariableAddAuthorization = () => {
+    if (this.policy?.app_variables?.add) {
       return true;
     }
     return false;
   };
-  extractAppConstantReadAuthorization = () => {
-    const authorizeAppConstantIDs = [];
-    if (this.policy?.app_constants?.read) {
+  extractAppVariableReadAuthorization = () => {
+    const authorizeAppVariableIDs = [];
+    if (this.policy?.app_variables?.read) {
       return true;
     } else if (
-      this.policy.app_constants &&
-      this.policy.app_constants.app_constant_ids
+      this.policy.app_variables &&
+      this.policy.app_variables.app_variable_ids
     ) {
-      Object.keys(this.policy.app_constants.app_constant_ids).forEach(
-        (pmAppConstantID) => {
+      Object.keys(this.policy.app_variables.app_variable_ids).forEach(
+        (pmAppVariableID) => {
           if (
-            this.policy.app_constants.app_constant_ids[pmAppConstantID].read
+            this.policy.app_variables.app_variable_ids[pmAppVariableID].read
           ) {
-            authorizeAppConstantIDs.push(parseInt(pmAppConstantID));
+            authorizeAppVariableIDs.push(parseInt(pmAppVariableID));
           }
         }
       );
     }
-    return authorizeAppConstantIDs;
+    return authorizeAppVariableIDs;
   };
-  extractAppConstantEditAuthorization = () => {
-    const authorizeAppConstantIDs = [];
-    if (this.policy?.app_constants?.edit) {
+  extractAppVariableEditAuthorization = () => {
+    const authorizeAppVariableIDs = [];
+    if (this.policy?.app_variables?.edit) {
       return true;
     } else if (
-      this.policy.app_constants &&
-      this.policy.app_constants.app_constant_ids
+      this.policy.app_variables &&
+      this.policy.app_variables.app_variable_ids
     ) {
-      Object.keys(this.policy.app_constants.app_constant_ids).forEach(
-        (pmAppConstantID) => {
+      Object.keys(this.policy.app_variables.app_variable_ids).forEach(
+        (pmAppVariableID) => {
           if (
-            this.policy.app_constants.app_constant_ids[pmAppConstantID].edit
+            this.policy.app_variables.app_variable_ids[pmAppVariableID].edit
           ) {
-            authorizeAppConstantIDs.push(parseInt(pmAppConstantID));
+            authorizeAppVariableIDs.push(parseInt(pmAppVariableID));
           }
         }
       );
     }
-    return authorizeAppConstantIDs;
+    return authorizeAppVariableIDs;
   };
-  extractAppConstantDeletionAuthorization = (pmAppConstantID) => {
+  extractAppVariableDeletionAuthorization = (pmAppVariableID) => {
     let authorization = false;
     if (
-      this.policy.app_constants &&
+      this.policy.app_variables &&
       !(
-        this.policy.app_constants.delete === null ||
-        this.policy.app_constants.delete === undefined
+        this.policy.app_variables.delete === null ||
+        this.policy.app_variables.delete === undefined
       )
     ) {
-      authorization = this.policy.app_constants.delete;
+      authorization = this.policy.app_variables.delete;
     } else if (
-      this.policy.app_constants &&
-      this.policy.app_constants.app_constant_ids
+      this.policy.app_variables &&
+      this.policy.app_variables.app_variable_ids
     ) {
-      if (this.policy.app_constants.app_constant_ids[pmAppConstantID]) {
+      if (this.policy.app_variables.app_variable_ids[pmAppVariableID]) {
         authorization = Boolean(
-          this.policy.app_constants.app_constant_ids[pmAppConstantID].delete
+          this.policy.app_variables.app_variable_ids[pmAppVariableID].delete
         );
       }
     }

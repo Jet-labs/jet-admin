@@ -9,7 +9,7 @@ import { FieldComponent } from "../../FieldComponent";
 
 import { updateRowAPI } from "../../../api/tables";
 import { LOCAL_CONSTANTS } from "../../../constants";
-import { useAppConstants } from "../../../contexts/appConstantsContext";
+import { useAppVariables } from "../../../contexts/appVariablesContext";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { processTableFieldValuesBeforeSubmit } from "../../../utils/tables";
 import { ErrorComponent } from "../../ErrorComponent";
@@ -17,7 +17,7 @@ import { RowDeletionForm } from "../RowDeletetionForm";
 
 export const RowUpdateForm = ({ customTitle, tableName, id }) => {
   const queryClient = new QueryClient();
-  const { internalAppConstants } = useAppConstants();
+  const { internalAppVariables } = useAppVariables();
   const theme = useTheme();
   const {
     isLoading: isLoadingRowData,
@@ -155,7 +155,7 @@ export const RowUpdateForm = ({ customTitle, tableName, id }) => {
                       helperText={rowUpdateForm.errors[column.name]}
                       error={Boolean(rowUpdateForm.errors[column.name])}
                       customMapping={
-                        internalAppConstants?.CUSTOM_INT_EDIT_MAPPING?.[
+                        internalAppVariables?.CUSTOM_INT_EDIT_MAPPING?.[
                           tableName
                         ]?.[column.name]
                       }

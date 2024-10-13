@@ -51,12 +51,12 @@ const drawerList = [
     to: LOCAL_CONSTANTS.ROUTES.ALL_GRAPHS.path(),
   },
   {
-    text: "Constants",
+    text: "Variables",
     icon: <HiVariable size={24} className="!text-sm" />,
-    to: LOCAL_CONSTANTS.ROUTES.ALL_APP_CONSTANTS.path(),
+    to: LOCAL_CONSTANTS.ROUTES.ALL_APP_VARIABLES.path(),
   },
   {
-    text: "DB Triggers",
+    text: "Triggers",
     icon: <VscGithubAction size={24} className="!text-sm" />,
     to: LOCAL_CONSTANTS.ROUTES.ALL_TRIGGERS.path(),
   },

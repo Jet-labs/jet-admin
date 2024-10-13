@@ -12,8 +12,8 @@ expressApp.use(cookieParser());
 expressApp.use("/admin_api/auth", require("./modules/auth/auth.route"));
 
 expressApp.use(
-  "/admin_api/app_constants",
-  require("./modules/app-constants/app-constants.route")
+  "/admin_api/app_variables",
+  require("./modules/app-variables/app-variables.route")
 );
 
 expressApp.use("/admin_api/schemas", require("./modules/schema/schema.route"));

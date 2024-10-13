@@ -5,7 +5,7 @@ const {
   evaluateAST,
   extractVariablesFromQuery,
   replaceQueryIDStringWithQueryID,
-  replaceAppConstantIDStringWithAppConstantID,
+  replaceAppVariableIDStringWithAppVariableID,
 } = require("../../../utils/query-utils/variable-parser");
 const {
   isDMLQuery,
@@ -18,8 +18,8 @@ const {
 } = require("../../../utils/postgres-utils/query-queries");
 const { pgPool } = require("../../../db/pg");
 const {
-  appConstantQueryUtils,
-} = require("../../../utils/postgres-utils/app-constant-queries");
+  appVariableQueryUtils,
+} = require("../../../utils/postgres-utils/app-variable-queries");
 /**
  *
  * @param {object} param0
@@ -98,7 +98,7 @@ const getProcessedPostgreSQLQuery = async ({ rawQuery, pmQueryArgValues }) => {
       params: { rawQuery },
     });
 
-    // variables can be {{[pm_query_id:20].value}} or {{[pm_app_constant_id:20].value}}
+    // variables can be {{[pm_query_id:20].value}} or {{[pm_app_variable_id:20].value}}
     const variableMatches = extractVariablesFromQuery(rawQuery);
 
     const replacements = variableMatches
@@ -109,10 +109,10 @@ const getProcessedPostgreSQLQuery = async ({ rawQuery, pmQueryArgValues }) => {
               replaceQueryIDStringWithQueryID(match);
 
             const {
-              appConstantIDStringWithReplacedAppConstantID:
+              appVariableIDStringWithReplacedAppVariableID:
                 completeReplacedMatch,
-              pmAppConstantIDs,
-            } = replaceAppConstantIDStringWithAppConstantID(
+              pmAppVariableIDs,
+            } = replaceAppVariableIDStringWithAppVariableID(
               `{{${queryIDStringWithReplacedQueryID}}}`
             );
 
@@ -121,10 +121,10 @@ const getProcessedPostgreSQLQuery = async ({ rawQuery, pmQueryArgValues }) => {
               params: {
                 match,
                 queryIDStringWithReplacedQueryID,
-                appConstantIDStringWithReplacedAppConstantID:
+                appVariableIDStringWithReplacedAppVariableID:
                   completeReplacedMatch,
                 pmQueryIDs,
-                pmAppConstantIDs,
+                pmAppVariableIDs,
               },
             });
 
@@ -132,24 +132,24 @@ const getProcessedPostgreSQLQuery = async ({ rawQuery, pmQueryArgValues }) => {
             const getAllQueriesQuery = sqliteDB.prepare(
               queryQueryUtils.getAllQueries(pmQueryIDs)
             );
-            const getAllAppConstantsQuery = sqliteDB.prepare(
-              appConstantQueryUtils.getAllAppConstants(pmAppConstantIDs)
+            const getAllAppVariablesQuery = sqliteDB.prepare(
+              appVariableQueryUtils.getAllAppVariables(pmAppVariableIDs)
             );
             const extractedPmQuerys =
               pmQueryIDs && pmQueryIDs.length > 0
                 ? getAllQueriesQuery.all(...pmQueryIDs)
                 : [];
             // database values of pm_query_id
-            const extractedPmAppConstants =
-              pmAppConstantIDs && pmAppConstantIDs.length > 0
-                ? getAllAppConstantsQuery.all(...pmAppConstantIDs)
+            const extractedPmAppVariables =
+              pmAppVariableIDs && pmAppVariableIDs.length > 0
+                ? getAllAppVariablesQuery.all(...pmAppVariableIDs)
                 : [];
 
             Logger.log("info", {
               message: "getProcessedPostgreSQLQuery:extractedValues",
               params: {
                 extractedPmQuerys,
-                extractedPmAppConstants,
+                extractedPmAppVariables,
                 pmQueryArgValues,
               },
             });
@@ -179,9 +179,9 @@ const getProcessedPostgreSQLQuery = async ({ rawQuery, pmQueryArgValues }) => {
             resolvedPmQuerys.forEach((r) => {
               evaluationContext[`pmq_${r.pmQueryID}`] = r.result;
             });
-            extractedPmAppConstants.forEach((r) => {
-              evaluationContext[`pmac_${r.pm_app_constant_id}`] = JSON.parse(
-                r.pm_app_constant_value
+            extractedPmAppVariables.forEach((r) => {
+              evaluationContext[`pmac_${r.pm_app_variable_id}`] = JSON.parse(
+                r.pm_app_variable_value
               );
             });
 

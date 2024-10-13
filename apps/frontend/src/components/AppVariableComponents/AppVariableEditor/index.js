@@ -9,16 +9,16 @@ import {
 import "react-js-cron/dist/styles.css";
 import { CodeEditor } from "../../CodeEditorComponent";
 import { LOCAL_CONSTANTS } from "../../../constants";
-export const AppConstantEditor = ({ appConstantForm }) => {
+export const AppVariableEditor = ({ appVariableForm }) => {
   const theme = useTheme();
-  const _handleUpdateAppConstantValue = (value) => {
-    appConstantForm?.setFieldValue(
-      "pm_app_constant_value",
+  const _handleUpdateAppVariableValue = (value) => {
+    appVariableForm?.setFieldValue(
+      "pm_app_variable_value",
       typeof value === "string" ? JSON.parse(value) : value
     );
   };
-  const _handleUpdateAppConstantInternal = (value) => {
-    appConstantForm?.setFieldValue("is_internal", value.target.checked);
+  const _handleUpdateAppVariableInternal = (value) => {
+    appVariableForm?.setFieldValue("is_internal", value.target.checked);
   };
   return (
     <Grid container className="!w-full" style={{}}>
@@ -30,10 +30,10 @@ export const AppConstantEditor = ({ appConstantForm }) => {
           size="small"
           variant="outlined"
           type="text"
-          name={"pm_app_constant_title"}
-          value={appConstantForm.values.pm_app_constant_title}
-          onChange={appConstantForm.handleChange}
-          onBlur={appConstantForm.handleBlur}
+          name={"pm_app_variable_title"}
+          value={appVariableForm.values.pm_app_variable_title}
+          onChange={appVariableForm.handleChange}
+          onBlur={appVariableForm.handleBlur}
         />
       </Grid>
 
@@ -53,7 +53,7 @@ export const AppConstantEditor = ({ appConstantForm }) => {
         >
           {
             LOCAL_CONSTANTS.STRINGS
-              .APP_CONSTANT_INTERNAL_CONSTANTS_RECOMMENDATION
+              .APP_VARIABLES_INTERNAL_CONSTANTS_RECOMMENDATION
           }
         </Alert>
       </Grid>
@@ -61,27 +61,29 @@ export const AppConstantEditor = ({ appConstantForm }) => {
         <FormControlLabel
           control={
             <Checkbox
-              checked={appConstantForm.values.is_internal}
-              onChange={_handleUpdateAppConstantInternal}
+              checked={appVariableForm.values.is_internal}
+              onChange={_handleUpdateAppVariableInternal}
             />
           }
-          label={LOCAL_CONSTANTS.STRINGS.APP_CONSTANT_FORM_INTERNAL_FIELD_LABEL}
+          label={
+            LOCAL_CONSTANTS.STRINGS.APP_VARIABLES_FORM_INTERNAL_FIELD_LABEL
+          }
         />
       </Grid>
       <Grid item sx={12} md={12} lg={12} className="!p-3">
         <CodeEditor
           code={
-            appConstantForm?.values?.pm_app_constant_value
-              ? typeof appConstantForm.values.pm_app_constant_value === "object"
+            appVariableForm?.values?.pm_app_variable_value
+              ? typeof appVariableForm.values.pm_app_variable_value === "object"
                 ? JSON.stringify(
-                    appConstantForm.values.pm_app_constant_value,
+                    appVariableForm.values.pm_app_variable_value,
                     null,
                     2
                   )
-                : appConstantForm.values.pm_app_constant_value
+                : appVariableForm.values.pm_app_variable_value
               : JSON.stringify({})
           }
-          setCode={_handleUpdateAppConstantValue}
+          setCode={_handleUpdateAppVariableValue}
           height="400px"
         />
       </Grid>

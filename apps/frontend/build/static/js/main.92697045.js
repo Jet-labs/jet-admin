@@ -18,14 +18,14 @@
         class s {
           constructor(e) {
             let {
-              pm_app_constant_id: t,
-              pm_app_constant_title: n,
-              pm_app_constant_value: r,
+              pm_app_variable_id: t,
+              pm_app_variable_title: n,
+              pm_app_variable_value: r,
               is_internal: i,
             } = e;
-            (this.pm_app_constant_id = t),
-              (this.pm_app_constant_title = n),
-              (this.pm_app_constant_value = r),
+            (this.pm_app_variable_id = t),
+              (this.pm_app_variable_title = n),
+              (this.pm_app_variable_value = r),
               (this.is_internal = i);
           }
         }
@@ -38,7 +38,7 @@
             try {
               const e =
                   o.a.SERVER_HOST +
-                  o.a.APIS.APP_CONSTANTS.getDBModelAppConstant(),
+                  o.a.APIS.APP_VARIABLESS.getDBModelAppVariable(),
                 t = await i.A.get(e);
               return t.data && !0 === t.data.success ? t.data.constants : null;
             } catch (e) {
@@ -49,7 +49,7 @@
             let { data: t } = e;
             try {
               const e = await a.A.post(
-                o.a.APIS.APP_CONSTANTS.addAppConstant(),
+                o.a.APIS.APP_VARIABLESS.addAppVariable(),
                 t
               );
               if (e.data && 1 == e.data.success) return !0;
@@ -62,7 +62,7 @@
             let { data: t } = e;
             try {
               const e = await a.A.put(
-                o.a.APIS.APP_CONSTANTS.updateAppConstant(),
+                o.a.APIS.APP_VARIABLESS.updateAppVariable(),
                 t
               );
               if (e.data && 1 == e.data.success) return !0;
@@ -74,23 +74,23 @@
             }
           },
           (h = async (e) => {
-            let { pmAppConstantID: t } = e;
+            let { pmAppVariableID: t } = e;
             try {
               const e = await a.A.get(
-                o.a.APIS.APP_CONSTANTS.getAppConstantByID({ id: t })
+                o.a.APIS.APP_VARIABLESS.getAppVariableByID({ id: t })
               );
               if (e.data && 1 == e.data.success)
-                return new s(e.data.appConstant);
+                return new s(e.data.appVariable);
               throw e.data.error ? e.data.error : o.a.ERROR_CODES.SERVER_ERROR;
             } catch (n) {
               throw n;
             }
           }),
             (d = async (e) => {
-              let { pmAppConstantID: t } = e;
+              let { pmAppVariableID: t } = e;
               try {
                 const e = await a.A.delete(
-                  o.a.APIS.APP_CONSTANTS.deleteAppConstantByID({ id: t })
+                  o.a.APIS.APP_VARIABLESS.deleteAppVariableByID({ id: t })
                 );
                 if (e.data && 1 == e.data.success) return !0;
                 throw e.data.error
@@ -103,10 +103,10 @@
           f = async () => {
             try {
               const e = await a.A.get(
-                o.a.APIS.APP_CONSTANTS.getAllAppConstants()
+                o.a.APIS.APP_VARIABLESS.getAllAppVariables()
               );
               if (e.data && 1 == e.data.success)
-                return s.toList(e.data.appConstants);
+                return s.toList(e.data.appVariables);
               throw e.data.error ? e.data.error : o.a.ERROR_CODES.SERVER_ERROR;
             } catch (e) {
               throw e;
@@ -115,10 +115,10 @@
           p = async () => {
             try {
               const e = await a.A.get(
-                o.a.APIS.APP_CONSTANTS.getAllInternalAppConstants()
+                o.a.APIS.APP_VARIABLESS.getAllInternalAppVariables()
               );
               if (e.data && 1 == e.data.success)
-                return s.toList(e.data.appConstants);
+                return s.toList(e.data.appVariables);
               throw e.data.error ? e.data.error : o.a.ERROR_CODES.SERVER_ERROR;
             } catch (e) {
               throw e;
@@ -470,72 +470,72 @@
                   t
                 );
               }),
-              (this.extractAppConstantAddAuthorization = () => {
+              (this.extractAppVariableAddAuthorization = () => {
                 var e, t;
                 return !(
                   null === (e = this.policy) ||
                   void 0 === e ||
-                  null === (t = e.app_constants) ||
+                  null === (t = e.app_variables) ||
                   void 0 === t ||
                   !t.add
                 );
               }),
-              (this.extractAppConstantReadAuthorization = () => {
+              (this.extractAppVariableReadAuthorization = () => {
                 var e, t;
                 const n = [];
                 return (
                   !(
                     null === (e = this.policy) ||
                     void 0 === e ||
-                    null === (t = e.app_constants) ||
+                    null === (t = e.app_variables) ||
                     void 0 === t ||
                     !t.read
                   ) ||
-                  (this.policy.app_constants &&
-                    this.policy.app_constants.app_constant_ids &&
+                  (this.policy.app_variables &&
+                    this.policy.app_variables.app_variable_ids &&
                     Object.keys(
-                      this.policy.app_constants.app_constant_ids
+                      this.policy.app_variables.app_variable_ids
                     ).forEach((e) => {
-                      this.policy.app_constants.app_constant_ids[e].read &&
+                      this.policy.app_variables.app_variable_ids[e].read &&
                         n.push(parseInt(e));
                     }),
                   n)
                 );
               }),
-              (this.extractAppConstantEditAuthorization = () => {
+              (this.extractAppVariableEditAuthorization = () => {
                 var e, t;
                 const n = [];
                 return (
                   !(
                     null === (e = this.policy) ||
                     void 0 === e ||
-                    null === (t = e.app_constants) ||
+                    null === (t = e.app_variables) ||
                     void 0 === t ||
                     !t.edit
                   ) ||
-                  (this.policy.app_constants &&
-                    this.policy.app_constants.app_constant_ids &&
+                  (this.policy.app_variables &&
+                    this.policy.app_variables.app_variable_ids &&
                     Object.keys(
-                      this.policy.app_constants.app_constant_ids
+                      this.policy.app_variables.app_variable_ids
                     ).forEach((e) => {
-                      this.policy.app_constants.app_constant_ids[e].edit &&
+                      this.policy.app_variables.app_variable_ids[e].edit &&
                         n.push(parseInt(e));
                     }),
                   n)
                 );
               }),
-              (this.extractAppConstantDeletionAuthorization = (e) => {
+              (this.extractAppVariableDeletionAuthorization = (e) => {
                 let t = !1;
                 return (
-                  this.policy.app_constants &&
-                  null !== this.policy.app_constants.delete &&
-                  void 0 !== this.policy.app_constants.delete
-                    ? (t = this.policy.app_constants.delete)
-                    : this.policy.app_constants &&
-                      this.policy.app_constants.app_constant_ids &&
-                      this.policy.app_constants.app_constant_ids[e] &&
+                  this.policy.app_variables &&
+                  null !== this.policy.app_variables.delete &&
+                  void 0 !== this.policy.app_variables.delete
+                    ? (t = this.policy.app_variables.delete)
+                    : this.policy.app_variables &&
+                      this.policy.app_variables.app_variable_ids &&
+                      this.policy.app_variables.app_variable_ids[e] &&
                       (t = Boolean(
-                        this.policy.app_constants.app_constant_ids[e].delete
+                        this.policy.app_variables.app_variable_ids[e].delete
                       )),
                   console.log({ authorization: t }),
                   t
@@ -831,7 +831,7 @@
               POLICY_OBJECT_TABLE_NAME: "tbl_pm_policy_objects",
               FORM_FIELD_PLACEHOLDER_UNTITLED: "Untitled chart",
               JOB_HISTORY_TABLE_NAME: "tbl_pm_job_history",
-              APP_CONSTANTS_TABLE_NAME: "tbl_pm_app_constants",
+              APP_VARIABLESS_TABLE_NAME: "tbl_pm_app_variables",
               DELETE_BUTTON_TEXT: "Delete",
               UPDATE_BUTTON_TEXT: "Update",
               ADD_BUTTON_TEXT: "Add",
@@ -885,14 +885,14 @@
               GRAPH_DELETION_CONFIRMATION_BODY:
                 "Are you sure you want to delete graph",
               GRAPH_UPDATE_PAGE_TITLE: "Update graph",
-              APP_CONSTANT_ADDITION_SUCCESS: "App constant added!",
-              APP_CONSTANT_UPDATED_SUCCESS: "App constant updated!",
-              APP_CONSTANT_DELETED_SUCCESS: "App constant deleted!",
-              APP_CONSTANT_ADDITION_PAGE_TITLE: "Add new app constant",
-              APP_CONSTANT_DELETION_CONFIRMATION_TITLE: "Delete app constant?",
-              APP_CONSTANT_DELETION_CONFIRMATION_BODY:
-                "Are you sure you want to delete app constant",
-              APP_CONSTANT_UPDATE_PAGE_TITLE: "Update app constant",
+              APP_VARIABLES_ADDITION_SUCCESS: "App variable added!",
+              APP_VARIABLES_UPDATED_SUCCESS: "App variable updated!",
+              APP_VARIABLES_DELETED_SUCCESS: "App variable deleted!",
+              APP_VARIABLES_ADDITION_PAGE_TITLE: "Add new app variable",
+              APP_VARIABLES_DELETION_CONFIRMATION_TITLE: "Delete app variable?",
+              APP_VARIABLES_DELETION_CONFIRMATION_BODY:
+                "Are you sure you want to delete app variable",
+              APP_VARIABLES_UPDATE_PAGE_TITLE: "Update app variable",
               DASHBOARD_ADDITION_SUCCESS: "Dashboard added!",
               DASHBOARD_UPDATED_SUCCESS: "Dashboard updated!",
               DASHBOARD_DELETED_SUCCESS: "Dashboard deleted!",
@@ -905,12 +905,12 @@
             ROUTES: {
               HOME: "/",
               SIGNIN: "/signin",
-              ALL_APP_CONSTANTS: {
-                code: "/app_constants/*",
-                path: () => "/app_constants",
+              ALL_APP_VARIABLES: {
+                code: "/app_variables/*",
+                path: () => "/app_variables",
               },
-              ADD_APP_CONSTANT: { code: "add", path: () => "add" },
-              APP_CONSTANT_VIEW: { code: ":id", path: (e) => "".concat(e) },
+              ADD_APP_VARIABLES: { code: "add", path: () => "add" },
+              APP_VARIABLES_VIEW: { code: ":id", path: (e) => "".concat(e) },
               ALL_JOBS: { code: "/jobs/*", path: () => "/jobs" },
               ADD_JOB: { code: "add", path: () => "add" },
               JOB_HISTORY: { code: "history", path: () => "history" },
@@ -1097,21 +1097,21 @@
                   return "/admin_api/queries/".concat(t);
                 },
               },
-              APP_CONSTANTS: {
-                getDBModelAppConstant: () =>
-                  "/admin_api/app_constants/db_model/",
-                getAllInternalAppConstants: () =>
-                  "/admin_api/app_constants/internal",
-                getAllAppConstants: () => "/admin_api/app_constants",
-                getAppConstantByID: (e) => {
+              APP_VARIABLESS: {
+                getDBModelAppVariable: () =>
+                  "/admin_api/app_variables/db_model/",
+                getAllInternalAppVariables: () =>
+                  "/admin_api/app_variables/internal",
+                getAllAppVariables: () => "/admin_api/app_variables",
+                getAppVariableByID: (e) => {
                   let { id: t } = e;
-                  return "/admin_api/app_constants/".concat(t);
+                  return "/admin_api/app_variables/".concat(t);
                 },
-                addAppConstant: () => "/admin_api/app_constants",
-                updateAppConstant: () => "/admin_api/app_constants",
-                deleteAppConstantByID: (e) => {
+                addAppVariable: () => "/admin_api/app_variables",
+                updateAppVariable: () => "/admin_api/app_variables",
+                deleteAppVariableByID: (e) => {
                   let { id: t } = e;
-                  return "/admin_api/app_constants/".concat(t);
+                  return "/admin_api/app_variables/".concat(t);
                 },
               },
               POLICIES: {
@@ -1185,7 +1185,7 @@
               TABLE_ID: (e) =>
                 "REACT_QUERY_KEY_TABLES_".concat(String(e).toUpperCase()),
               QUERIES: "REACT_QUERY_KEY_QUERIES",
-              APP_CONSTANTS: "REACT_QUERY_KEY_APP_CONSTANTS",
+              APP_VARIABLESS: "REACT_QUERY_KEY_APP_VARIABLESS",
               GRAPHS: "REACT_QUERY_KEY_GRAPHS",
               JOBS: "REACT_QUERY_KEY_JOBS",
               DASHBOARDS: "REACT_QUERY_KEY_DASHBOARDS",
@@ -1885,7 +1885,7 @@
               data: u,
               error: h,
             } = (0, i.I)({
-              queryKey: ["app_constants_db_model"],
+              queryKey: ["app_variables_db_model"],
               queryFn: o.NX,
               cacheTime: 0,
               retry: 3,
@@ -1899,7 +1899,7 @@
                 isFetching: m,
                 refetch: g,
               } = (0, i.I)({
-                queryKey: ["REACT_QUERY_KEY_APP_CONSTANTS"],
+                queryKey: ["REACT_QUERY_KEY_APP_VARIABLESS"],
                 queryFn: o.xB,
                 cacheTime: 0,
                 retry: 3,
@@ -1911,7 +1911,7 @@
                 error: b,
                 refetch: w,
               } = (0, i.I)({
-                queryKey: ["internal_app_constants"],
+                queryKey: ["internal_app_variables"],
                 queryFn: o.ub,
                 cacheTime: 0,
                 retry: 3,
@@ -1922,7 +1922,7 @@
                   const e = {};
                   return (
                     y.forEach((t) => {
-                      e[t.pm_app_constant_title] = t.pm_app_constant_value;
+                      e[t.pm_app_variable_title] = t.pm_app_variable_value;
                     }),
                     e
                   );
@@ -1933,7 +1933,7 @@
                   const e = {};
                   return (
                     y.forEach((t) => {
-                      e[t.pm_app_constant_title] = t.pm_app_constant_id;
+                      e[t.pm_app_variable_title] = t.pm_app_variable_id;
                     }),
                     e
                   );
@@ -1941,23 +1941,23 @@
               }, [y]);
             return (
               console.log({
-                processedInternalAppConstants: A,
-                internalAppConstants: y,
-                appConstants: f,
+                processedInternalAppVariables: A,
+                internalAppVariables: y,
+                appVariables: f,
               }),
               (0, a.jsx)(l.Provider, {
                 value: {
                   dbModel: null === u || void 0 === u ? void 0 : u.db_model,
-                  appConstants: f,
-                  internalAppConstants: A,
-                  isFetchingAllAppConstants: m,
-                  isLoadingAllAppConstants: d,
-                  processedInternalAppConstantsIDMap: x,
+                  appVariables: f,
+                  internalAppVariables: A,
+                  isFetchingAllAppVariables: m,
+                  isLoadingAllAppVariables: d,
+                  processedInternalAppVariablesIDMap: x,
                 },
                 children: (0, a.jsx)(c.Provider, {
                   value: {
-                    reloadAllAppConstants: g,
-                    reloadAllInternalAppConstants: w,
+                    reloadAllAppVariables: g,
+                    reloadAllInternalAppVariables: w,
                   },
                   children:
                     null !== u && void 0 !== u && u.db_model
@@ -1969,12 +1969,12 @@
           },
           h = () => {
             const e = r.useContext(l);
-            if (void 0 === e) throw new Error("useAppConstants error");
+            if (void 0 === e) throw new Error("useAppVariables error");
             return e;
           },
           d = () => {
             const e = r.useContext(c);
-            if (void 0 === e) throw new Error("useAppConstantActions error");
+            if (void 0 === e) throw new Error("useAppVariableActions error");
             return e;
           };
       },
@@ -68281,7 +68281,7 @@
           {
             text: "Constants",
             icon: (0, De.jsx)(It, { size: 24, className: "!text-sm" }),
-            to: Ne.a.ROUTES.ALL_APP_CONSTANTS.path(),
+            to: Ne.a.ROUTES.ALL_APP_VARIABLES.path(),
           },
           {
             text: "Policies",
@@ -68751,7 +68751,7 @@
             f = (0, Ve.A)(),
             p = (0, qe.A)(f.breakpoints.down("lg")),
             m = Boolean(a),
-            { internalAppConstants: g } = (0, l.O0)(),
+            { internalAppVariables: g } = (0, l.O0)(),
             v = () => {
               u(null);
             };
@@ -69270,7 +69270,7 @@
                     }),
                   }),
                   (0, De.jsx)(We.qh, {
-                    path: Ne.a.ROUTES.ALL_APP_CONSTANTS.code,
+                    path: Ne.a.ROUTES.ALL_APP_VARIABLES.code,
                     element: (0, De.jsx)(cn, {
                       successComponent: On,
                       fallbackPath: Ne.a.ROUTES.SIGNIN,

@@ -4,7 +4,7 @@ const {
   policyAuthorizations,
 } = require("../../utils/policy-utils/policy-authorization");
 
-const appConstantAuthorizationMiddleware = {};
+const appVariableAuthorizationMiddleware = {};
 
 /**
  *
@@ -13,7 +13,7 @@ const appConstantAuthorizationMiddleware = {};
  * @param {import("express").NextFunction} next
  * @returns
  */
-appConstantAuthorizationMiddleware.populateAuthorizedAppConstantsForRead =
+appVariableAuthorizationMiddleware.populateAuthorizedAppVariablesForRead =
   async (req, res, next) => {
     try {
       const { pmUser, state } = req;
@@ -21,25 +21,25 @@ appConstantAuthorizationMiddleware.populateAuthorizedAppConstantsForRead =
       const pm_user_id = parseInt(pmUser.pm_user_id);
       Logger.log("info", {
         message:
-          "appConstantAuthorizationMiddleware:populateAuthorizedAppConstantsForRead:params",
+          "appVariableAuthorizationMiddleware:populateAuthorizedAppVariablesForRead:params",
         params: { pm_user_id },
       });
-      let authorized_app_constants =
-        policyAuthorizations.extractAppConstantReadAuthorization({
+      let authorized_app_variables =
+        policyAuthorizations.extractAppVariableReadAuthorization({
           policyObject: authorization_policy,
         });
 
-      req.state = { ...req.state, authorized_app_constants };
+      req.state = { ...req.state, authorized_app_variables };
       Logger.log("success", {
         message:
-          "appConstantAuthorizationMiddleware:populateAuthorizedAppConstantsForRead:success",
-        params: { pm_user_id, authorized_app_constants },
+          "appVariableAuthorizationMiddleware:populateAuthorizedAppVariablesForRead:success",
+        params: { pm_user_id, authorized_app_variables },
       });
       return next();
     } catch (error) {
       Logger.log("error", {
         message:
-          "appConstantAuthorizationMiddleware:populateAuthorizedAppConstantsForRead:catch-1",
+          "appVariableAuthorizationMiddleware:populateAuthorizedAppVariablesForRead:catch-1",
         params: { error },
       });
       return res.json({
@@ -55,7 +55,7 @@ appConstantAuthorizationMiddleware.populateAuthorizedAppConstantsForRead =
  * @param {import("express").NextFunction} next
  * @returns
  */
-appConstantAuthorizationMiddleware.populateAuthorizedAppConstantsForUpdate =
+appVariableAuthorizationMiddleware.populateAuthorizedAppVariablesForUpdate =
   async (req, res, next) => {
     try {
       const { pmUser, state } = req;
@@ -63,68 +63,25 @@ appConstantAuthorizationMiddleware.populateAuthorizedAppConstantsForUpdate =
       const pm_user_id = parseInt(pmUser.pm_user_id);
       Logger.log("info", {
         message:
-          "appConstantAuthorizationMiddleware:populateAuthorizedAppConstantsForUpdate:params",
+          "appVariableAuthorizationMiddleware:populateAuthorizedAppVariablesForUpdate:params",
         params: { pm_user_id },
       });
-      let authorized_app_constants =
-        policyAuthorizations.extractAppConstantEditAuthorization({
+      let authorized_app_variables =
+        policyAuthorizations.extractAppVariableEditAuthorization({
           policyObject: authorization_policy,
         });
 
-      req.state = { ...req.state, authorized_app_constants };
+      req.state = { ...req.state, authorized_app_variables };
       Logger.log("success", {
         message:
-          "appConstantAuthorizationMiddleware:populateAuthorizedAppConstantsForUpdate:success",
-        params: { pm_user_id, authorized_app_constants },
+          "appVariableAuthorizationMiddleware:populateAuthorizedAppVariablesForUpdate:success",
+        params: { pm_user_id, authorized_app_variables },
       });
       return next();
     } catch (error) {
       Logger.log("error", {
         message:
-          "appConstantAuthorizationMiddleware:populateAuthorizedAppConstantsForUpdate:catch-1",
-        params: { error },
-      });
-      return res.json({
-        success: false,
-        error: constants.ERROR_CODES.SERVER_ERROR,
-      });
-    }
-  };
-
-/**
- *
- * @param {import("express").Request} req
- * @param {import("express").Response} res
- * @param {import("express").NextFunction} next
- * @returns
- */
-appConstantAuthorizationMiddleware.populateAuthorizedAppConstantsForDelete =
-  async (req, res, next) => {
-    try {
-      const { pmUser, state } = req;
-      const authorization_policy = state?.authorization_policy;
-      const pm_user_id = parseInt(pmUser.pm_user_id);
-      Logger.log("info", {
-        message:
-          "appConstantAuthorizationMiddleware:populateAuthorizedAppConstantsForDelete:params",
-        params: { pm_user_id },
-      });
-      let authorized_app_constants =
-        policyAuthorizations.extractAppConstantDeleteAuthorization({
-          policyObject: authorization_policy,
-        });
-
-      req.state = { ...req.state, authorized_app_constants };
-      Logger.log("success", {
-        message:
-          "appConstantAuthorizationMiddleware:populateAuthorizedAppConstantsForDelete:success",
-        params: { pm_user_id, authorized_app_constants },
-      });
-      return next();
-    } catch (error) {
-      Logger.log("error", {
-        message:
-          "appConstantAuthorizationMiddleware:populateAuthorizedAppConstantsForDelete:catch-1",
+          "appVariableAuthorizationMiddleware:populateAuthorizedAppVariablesForUpdate:catch-1",
         params: { error },
       });
       return res.json({
@@ -141,7 +98,7 @@ appConstantAuthorizationMiddleware.populateAuthorizedAppConstantsForDelete =
  * @param {import("express").NextFunction} next
  * @returns
  */
-appConstantAuthorizationMiddleware.populateAuthorizationForAppConstantAddition =
+appVariableAuthorizationMiddleware.populateAuthorizedAppVariablesForDelete =
   async (req, res, next) => {
     try {
       const { pmUser, state } = req;
@@ -149,18 +106,61 @@ appConstantAuthorizationMiddleware.populateAuthorizationForAppConstantAddition =
       const pm_user_id = parseInt(pmUser.pm_user_id);
       Logger.log("info", {
         message:
-          "appConstantAuthorizationMiddleware:populateAuthorizationForAppConstantAddition:params",
+          "appVariableAuthorizationMiddleware:populateAuthorizedAppVariablesForDelete:params",
+        params: { pm_user_id },
+      });
+      let authorized_app_variables =
+        policyAuthorizations.extractAppVariableDeleteAuthorization({
+          policyObject: authorization_policy,
+        });
+
+      req.state = { ...req.state, authorized_app_variables };
+      Logger.log("success", {
+        message:
+          "appVariableAuthorizationMiddleware:populateAuthorizedAppVariablesForDelete:success",
+        params: { pm_user_id, authorized_app_variables },
+      });
+      return next();
+    } catch (error) {
+      Logger.log("error", {
+        message:
+          "appVariableAuthorizationMiddleware:populateAuthorizedAppVariablesForDelete:catch-1",
+        params: { error },
+      });
+      return res.json({
+        success: false,
+        error: constants.ERROR_CODES.SERVER_ERROR,
+      });
+    }
+  };
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @param {import("express").NextFunction} next
+ * @returns
+ */
+appVariableAuthorizationMiddleware.populateAuthorizationForAppVariableAddition =
+  async (req, res, next) => {
+    try {
+      const { pmUser, state } = req;
+      const authorization_policy = state?.authorization_policy;
+      const pm_user_id = parseInt(pmUser.pm_user_id);
+      Logger.log("info", {
+        message:
+          "appVariableAuthorizationMiddleware:populateAuthorizationForAppVariableAddition:params",
         params: { pm_user_id },
       });
       let authorizationToAdd =
-        policyAuthorizations.extractAppConstantAddAuthorization({
+        policyAuthorizations.extractAppVariableAddAuthorization({
           policyObject: authorization_policy,
         });
 
       if (!authorizationToAdd) {
         Logger.log("error", {
           message:
-            "appConstantAuthorizationMiddleware:populateAuthorizationForAppConstantAddition:catch-2",
+            "appVariableAuthorizationMiddleware:populateAuthorizationForAppVariableAddition:catch-2",
           params: { error: constants.ERROR_CODES.PERMISSION_DENIED },
         });
         return res.json({
@@ -171,14 +171,14 @@ appConstantAuthorizationMiddleware.populateAuthorizationForAppConstantAddition =
       req.state = { ...req.state, authorizationToAdd };
       Logger.log("success", {
         message:
-          "appConstantAuthorizationMiddleware:populateAuthorizationForAppConstantAddition:success",
+          "appVariableAuthorizationMiddleware:populateAuthorizationForAppVariableAddition:success",
         params: { pm_user_id, authorizationToAdd },
       });
       return next();
     } catch (error) {
       Logger.log("error", {
         message:
-          "appConstantAuthorizationMiddleware:populateAuthorizationForAppConstantAddition:catch-1",
+          "appVariableAuthorizationMiddleware:populateAuthorizationForAppVariableAddition:catch-1",
         params: { error },
       });
       return res.json({
@@ -188,4 +188,4 @@ appConstantAuthorizationMiddleware.populateAuthorizationForAppConstantAddition =
     }
   };
 
-module.exports = { appConstantAuthorizationMiddleware };
+module.exports = { appVariableAuthorizationMiddleware };
