@@ -16,6 +16,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { getAllQueryAPI } from "../../../api/queries";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { useAuthState } from "../../../contexts/authContext";
+import { EmptyComponent } from "../../EmptyComponent";
 
 export const QueryDrawerList = () => {
   const theme = useTheme();
@@ -84,63 +85,65 @@ export const QueryDrawerList = () => {
       )}
       <div className="!mt-1"></div>
 
-      {queries && queries.length > 0
-        ? queries.map((query) => {
-            const key = `query_${query.pm_query_id}`;
-            return (
-              <Link
-                to={LOCAL_CONSTANTS.ROUTES.QUERY_VIEW.path(query.pm_query_id)}
-                key={key}
+      {queries && queries.length > 0 ? (
+        queries.map((query) => {
+          const key = `query_${query.pm_query_id}`;
+          return (
+            <Link
+              to={LOCAL_CONSTANTS.ROUTES.QUERY_VIEW.path(query.pm_query_id)}
+              key={key}
+            >
+              <ListItem
+                key={`_query_${query.pm_query_id}`}
+                disablePadding
+                sx={{}}
+                className="!px-3 !py-1.5"
               >
-                <ListItem
-                  key={`_query_${query.pm_query_id}`}
-                  disablePadding
-                  sx={{}}
-                  className="!px-3 !py-1.5"
+                <ListItemButton
+                  sx={{
+                    background: theme.palette.background.paper,
+                    border: key == currentPage ? 1 : 0,
+                    borderColor: theme.palette.primary.main,
+                  }}
+                  selected={key == currentPage}
+                  className="!rounded"
                 >
-                  <ListItemButton
+                  <ListItemIcon
+                    className="!ml-1"
                     sx={{
-                      background: theme.palette.background.paper,
-                      border: key == currentPage ? 1 : 0,
-                      borderColor: theme.palette.primary.main,
+                      color:
+                        key == currentPage
+                          ? theme.palette.primary.main
+                          : theme.palette.primary.contrastText,
+                      minWidth: 0,
                     }}
-                    selected={key == currentPage}
-                    className="!rounded"
                   >
-                    <ListItemIcon
-                      className="!ml-1"
-                      sx={{
-                        color:
-                          key == currentPage
-                            ? theme.palette.primary.main
-                            : theme.palette.primary.contrastText,
-                        minWidth: 0,
-                      }}
-                    >
-                      <SiPostgresql className="!text-lg" />
-                    </ListItemIcon>
-                    <ListItemText
-                      sx={{
-                        color:
-                          key == currentPage
-                            ? theme.palette.primary.main
-                            : theme.palette.primary.contrastText,
-                      }}
-                      primary={query.pm_query_title}
-                      primaryTypographyProps={{
-                        sx: {
-                          fontWeight: key == currentPage ? "700" : "500",
-                          marginLeft: 2,
-                          fontSize: 12,
-                        },
-                      }}
-                    />
-                  </ListItemButton>
-                </ListItem>
-              </Link>
-            );
-          })
-        : null}
+                    <SiPostgresql className="!text-lg" />
+                  </ListItemIcon>
+                  <ListItemText
+                    sx={{
+                      color:
+                        key == currentPage
+                          ? theme.palette.primary.main
+                          : theme.palette.primary.contrastText,
+                    }}
+                    primary={query.pm_query_title}
+                    primaryTypographyProps={{
+                      sx: {
+                        fontWeight: key == currentPage ? "700" : "500",
+                        marginLeft: 2,
+                        fontSize: 12,
+                      },
+                    }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            </Link>
+          );
+        })
+      ) : (
+        <EmptyComponent />
+      )}
     </List>
   );
 };

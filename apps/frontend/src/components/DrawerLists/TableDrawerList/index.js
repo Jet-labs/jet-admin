@@ -15,6 +15,7 @@ import { getAllTables } from "../../../api/tables";
 import { useQuery } from "@tanstack/react-query";
 import { useAuthState } from "../../../contexts/authContext";
 import { useMemo } from "react";
+import { EmptyComponent } from "../../EmptyComponent";
 export const TableDrawerList = () => {
   const theme = useTheme();
   const { pmUser } = useAuthState();
@@ -93,57 +94,61 @@ export const TableDrawerList = () => {
         </Button>
       </div>
       <div className="!mt-1"></div>
-      {tables?.map((table) => {
-        const key = `table_${table}`;
-        return (
-          <Link to={LOCAL_CONSTANTS.ROUTES.TABLE_VIEW.path(table)} key={key}>
-            <ListItem
-              key={key}
-              disablePadding
-              className="!px-3 !py-1.5"
-              sx={{}}
-            >
-              <ListItemButton
-                sx={{
-                  background: theme.palette.background.paper,
-                  border: key == currentPage ? 1 : 0,
-                  borderColor: theme.palette.primary.main,
-                }}
-                selected={key == currentPage}
-                className="!rounded"
+      {tables && tables.length > 0 ? (
+        tables.map((table) => {
+          const key = `table_${table}`;
+          return (
+            <Link to={LOCAL_CONSTANTS.ROUTES.TABLE_VIEW.path(table)} key={key}>
+              <ListItem
+                key={key}
+                disablePadding
+                className="!px-3 !py-1.5"
+                sx={{}}
               >
-                <ListItemIcon
-                  className="!ml-1"
+                <ListItemButton
                   sx={{
-                    color:
-                      key == currentPage
-                        ? theme.palette.primary.main
-                        : theme.palette.primary.contrastText,
+                    background: theme.palette.background.paper,
+                    border: key == currentPage ? 1 : 0,
+                    borderColor: theme.palette.primary.main,
                   }}
+                  selected={key == currentPage}
+                  className="!rounded"
                 >
-                  <FaTable className="!text-lg" />
-                </ListItemIcon>
-                <ListItemText
-                  sx={{
-                    color:
-                      key == currentPage
-                        ? theme.palette.primary.main
-                        : theme.palette.primary.contrastText,
-                  }}
-                  primary={table}
-                  primaryTypographyProps={{
-                    sx: {
-                      fontWeight: key == currentPage ? "700" : "500",
-                      marginLeft: -2,
-                    },
-                  }}
-                />
-              </ListItemButton>
-            </ListItem>
-            {/* <Divider className="!mx-4" /> */}
-          </Link>
-        );
-      })}
+                  <ListItemIcon
+                    className="!ml-1"
+                    sx={{
+                      color:
+                        key == currentPage
+                          ? theme.palette.primary.main
+                          : theme.palette.primary.contrastText,
+                    }}
+                  >
+                    <FaTable className="!text-lg" />
+                  </ListItemIcon>
+                  <ListItemText
+                    sx={{
+                      color:
+                        key == currentPage
+                          ? theme.palette.primary.main
+                          : theme.palette.primary.contrastText,
+                    }}
+                    primary={table}
+                    primaryTypographyProps={{
+                      sx: {
+                        fontWeight: key == currentPage ? "700" : "500",
+                        marginLeft: -2,
+                      },
+                    }}
+                  />
+                </ListItemButton>
+              </ListItem>
+              {/* <Divider className="!mx-4" /> */}
+            </Link>
+          );
+        })
+      ) : (
+        <EmptyComponent />
+      )}
     </List>
   );
 };

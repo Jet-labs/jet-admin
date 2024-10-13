@@ -16,6 +16,7 @@ import { getAllGraphAPI } from "../../../api/graphs";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { useAuthState } from "../../../contexts/authContext";
 import { GRAPH_PLUGINS_MAP } from "../../GraphComponents/GraphTypes";
+import { EmptyComponent } from "../../EmptyComponent";
 
 export const GraphDrawerList = () => {
   const theme = useTheme();
@@ -82,70 +83,72 @@ export const GraphDrawerList = () => {
         </div>
       )}
       <div className="!mt-1"></div>
-      {graphs && graphs.length > 0
-        ? graphs.map((graph) => {
-            const key = `graph_${graph.pm_graph_id}`;
-            const graphPlugin = graph.pm_graph_options?.graph_type
-              ? GRAPH_PLUGINS_MAP[graph.pm_graph_options?.graph_type]
-              : null;
-            return (
-              <Link
-                to={LOCAL_CONSTANTS.ROUTES.GRAPH_VIEW.path(graph.pm_graph_id)}
-                key={key}
+      {graphs && graphs.length > 0 ? (
+        graphs.map((graph) => {
+          const key = `graph_${graph.pm_graph_id}`;
+          const graphPlugin = graph.pm_graph_options?.graph_type
+            ? GRAPH_PLUGINS_MAP[graph.pm_graph_options?.graph_type]
+            : null;
+          return (
+            <Link
+              to={LOCAL_CONSTANTS.ROUTES.GRAPH_VIEW.path(graph.pm_graph_id)}
+              key={key}
+            >
+              <ListItem
+                key={`_graph_${graph.pm_graph_id}`}
+                disablePadding
+                sx={{}}
+                className="!px-3 !py-1.5"
               >
-                <ListItem
-                  key={`_graph_${graph.pm_graph_id}`}
-                  disablePadding
-                  sx={{}}
-                  className="!px-3 !py-1.5"
+                <ListItemButton
+                  sx={{
+                    background: theme.palette.background.paper,
+                    border: key == currentPage ? 1 : 0,
+                    borderColor: theme.palette.primary.main,
+                  }}
+                  selected={key == currentPage}
+                  className="!rounded"
                 >
-                  <ListItemButton
+                  <ListItemIcon
+                    className="!ml-1"
                     sx={{
-                      background: theme.palette.background.paper,
-                      border: key == currentPage ? 1 : 0,
-                      borderColor: theme.palette.primary.main,
+                      color:
+                        key == currentPage
+                          ? theme.palette.primary.main
+                          : theme.palette.primary.contrastText,
+                      minWidth: 0,
                     }}
-                    selected={key == currentPage}
-                    className="!rounded"
                   >
-                    <ListItemIcon
-                      className="!ml-1"
-                      sx={{
-                        color:
-                          key == currentPage
-                            ? theme.palette.primary.main
-                            : theme.palette.primary.contrastText,
-                        minWidth: 0,
-                      }}
-                    >
-                      {graphPlugin ? (
-                        graphPlugin.icon
-                      ) : (
-                        <FaChartLine className="!text-lg" />
-                      )}
-                    </ListItemIcon>
-                    <ListItemText
-                      sx={{
-                        color:
-                          key == currentPage
-                            ? theme.palette.primary.main
-                            : theme.palette.primary.contrastText,
-                      }}
-                      primary={graph.pm_graph_title}
-                      primaryTypographyProps={{
-                        sx: {
-                          fontWeight: key == currentPage ? "700" : "500",
-                          marginLeft: 2,
-                          fontSize: 12,
-                        },
-                      }}
-                    />
-                  </ListItemButton>
-                </ListItem>
-              </Link>
-            );
-          })
-        : null}
+                    {graphPlugin ? (
+                      graphPlugin.icon
+                    ) : (
+                      <FaChartLine className="!text-lg" />
+                    )}
+                  </ListItemIcon>
+                  <ListItemText
+                    sx={{
+                      color:
+                        key == currentPage
+                          ? theme.palette.primary.main
+                          : theme.palette.primary.contrastText,
+                    }}
+                    primary={graph.pm_graph_title}
+                    primaryTypographyProps={{
+                      sx: {
+                        fontWeight: key == currentPage ? "700" : "500",
+                        marginLeft: 2,
+                        fontSize: 12,
+                      },
+                    }}
+                  />
+                </ListItemButton>
+              </ListItem>
+            </Link>
+          );
+        })
+      ) : (
+        <EmptyComponent />
+      )}
     </List>
   );
 };

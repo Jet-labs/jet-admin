@@ -147,7 +147,7 @@ class AppVariableService {
       Logger.log("info", {
         message: "AppVariableService:getAllAppVariables:appVariables",
         params: {
-          appVariablesLength: appVariables?.length,
+          appVariablesLength: appVariables,
         },
       });
       return appVariables;

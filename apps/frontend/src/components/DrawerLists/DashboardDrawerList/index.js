@@ -17,6 +17,7 @@ import { getAllDashboardAPI } from "../../../api/dashboards";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { useAuthState } from "../../../contexts/authContext";
 import { MdSpaceDashboard } from "react-icons/md";
+import { EmptyComponent } from "../../EmptyComponent";
 export const DashboardsDrawerList = () => {
   const theme = useTheme();
   const routeParam = useParams();
@@ -80,65 +81,67 @@ export const DashboardsDrawerList = () => {
         </div>
       )}
       <div className="!mt-1"></div>
-      {dashboards && dashboards.length > 0
-        ? dashboards.map((dashboard) => {
-            const key = `dashboard_${dashboard.pm_dashboard_id}`;
-            return (
-              <Link
-                to={LOCAL_CONSTANTS.ROUTES.GRAPH_VIEW.path(
-                  dashboard.pm_dashboard_id
-                )}
-                key={key}
+      {dashboards && dashboards.length > 0 ? (
+        dashboards.map((dashboard) => {
+          const key = `dashboard_${dashboard.pm_dashboard_id}`;
+          return (
+            <Link
+              to={LOCAL_CONSTANTS.ROUTES.GRAPH_VIEW.path(
+                dashboard.pm_dashboard_id
+              )}
+              key={key}
+            >
+              <ListItem
+                key={`_dashboard_${dashboard.pm_dashboard_id}`}
+                disablePadding
+                className="!px-3 !py-1.5"
               >
-                <ListItem
-                  key={`_dashboard_${dashboard.pm_dashboard_id}`}
-                  disablePadding
-                  className="!px-3 !py-1.5"
+                <ListItemButton
+                  sx={{
+                    background: theme.palette.background.paper,
+                    border: key == currentPage ? 1 : 0,
+                    borderColor: theme.palette.primary.main,
+                  }}
+                  selected={key == currentPage}
+                  className="!rounded"
                 >
-                  <ListItemButton
+                  <ListItemIcon
+                    className="!ml-1"
                     sx={{
-                      background: theme.palette.background.paper,
-                      border: key == currentPage ? 1 : 0,
-                      borderColor: theme.palette.primary.main,
+                      color:
+                        key == currentPage
+                          ? theme.palette.primary.main
+                          : theme.palette.primary.contrastText,
+                      minWidth: 0,
                     }}
-                    selected={key == currentPage}
-                    className="!rounded"
                   >
-                    <ListItemIcon
-                      className="!ml-1"
-                      sx={{
-                        color:
-                          key == currentPage
-                            ? theme.palette.primary.main
-                            : theme.palette.primary.contrastText,
-                        minWidth: 0,
-                      }}
-                    >
-                      <MdSpaceDashboard className="!text-lg" />
-                    </ListItemIcon>
-                    <ListItemText
-                      sx={{
-                        color:
-                          key == currentPage
-                            ? theme.palette.primary.main
-                            : theme.palette.primary.contrastText,
-                      }}
-                      primary={dashboard.pm_dashboard_title}
-                      primaryTypographyProps={{
-                        sx: {
-                          fontWeight: key == currentPage ? "700" : "500",
-                          fontSize: 12,
-                          marginLeft: 2,
-                        },
-                      }}
-                    />
-                  </ListItemButton>
-                </ListItem>
-                {/* <Divider className="!mx-4" /> */}
-              </Link>
-            );
-          })
-        : null}
+                    <MdSpaceDashboard className="!text-lg" />
+                  </ListItemIcon>
+                  <ListItemText
+                    sx={{
+                      color:
+                        key == currentPage
+                          ? theme.palette.primary.main
+                          : theme.palette.primary.contrastText,
+                    }}
+                    primary={dashboard.pm_dashboard_title}
+                    primaryTypographyProps={{
+                      sx: {
+                        fontWeight: key == currentPage ? "700" : "500",
+                        fontSize: 12,
+                        marginLeft: 2,
+                      },
+                    }}
+                  />
+                </ListItemButton>
+              </ListItem>
+              {/* <Divider className="!mx-4" /> */}
+            </Link>
+          );
+        })
+      ) : (
+        <EmptyComponent />
+      )}
     </List>
   );
 };

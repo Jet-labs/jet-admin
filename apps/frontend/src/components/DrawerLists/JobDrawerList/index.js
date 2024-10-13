@@ -18,6 +18,7 @@ import { LOCAL_CONSTANTS } from "../../../constants";
 import { useAuthState } from "../../../contexts/authContext";
 import { FaChalkboardTeacher, FaPlus, FaRedo } from "react-icons/fa";
 import { MdOutlineSchedule } from "react-icons/md";
+import { EmptyComponent } from "../../EmptyComponent";
 
 export const JobsList = () => {
   const theme = useTheme();
@@ -93,63 +94,65 @@ export const JobsList = () => {
         </div>
       )}
       <div className="!mt-1"></div>
-      {jobs && jobs.length > 0
-        ? jobs.map((job) => {
-            const key = `job_${job.pm_job_id}`;
-            return (
-              <Link
-                to={LOCAL_CONSTANTS.ROUTES.GRAPH_VIEW.path(job.pm_job_id)}
-                key={key}
+      {jobs && jobs.length > 0 ? (
+        jobs.map((job) => {
+          const key = `job_${job.pm_job_id}`;
+          return (
+            <Link
+              to={LOCAL_CONSTANTS.ROUTES.GRAPH_VIEW.path(job.pm_job_id)}
+              key={key}
+            >
+              <ListItem
+                key={`_job_${job.pm_job_id}`}
+                disablePadding
+                className="!px-3 !py-1.5"
               >
-                <ListItem
-                  key={`_job_${job.pm_job_id}`}
-                  disablePadding
-                  className="!px-3 !py-1.5"
+                <ListItemButton
+                  sx={{
+                    background: theme.palette.background.paper,
+                    border: key == currentPage ? 1 : 0,
+                    borderColor: theme.palette.primary.main,
+                  }}
+                  selected={key == currentPage}
+                  className="!rounded"
                 >
-                  <ListItemButton
+                  <ListItemIcon
+                    className="!ml-1"
                     sx={{
-                      background: theme.palette.background.paper,
-                      border: key == currentPage ? 1 : 0,
-                      borderColor: theme.palette.primary.main,
+                      color:
+                        key == currentPage
+                          ? theme.palette.primary.main
+                          : theme.palette.primary.contrastText,
+                      minWidth: 0,
                     }}
-                    selected={key == currentPage}
-                    className="!rounded"
                   >
-                    <ListItemIcon
-                      className="!ml-1"
-                      sx={{
-                        color:
-                          key == currentPage
-                            ? theme.palette.primary.main
-                            : theme.palette.primary.contrastText,
-                        minWidth: 0,
-                      }}
-                    >
-                      <MdOutlineSchedule className="!text-lg" />
-                    </ListItemIcon>
-                    <ListItemText
-                      sx={{
-                        color:
-                          key == currentPage
-                            ? theme.palette.primary.main
-                            : theme.palette.primary.contrastText,
-                      }}
-                      primary={job.pm_job_title}
-                      primaryTypographyProps={{
-                        sx: {
-                          fontWeight: key == currentPage ? "700" : "500",
-                          fontSize: 12,
-                          marginLeft: 2,
-                        },
-                      }}
-                    />
-                  </ListItemButton>
-                </ListItem>
-                {/* <Divider className="!mx-4" /> */}
-              </Link>
-            );
-          })
-        : null}
+                    <MdOutlineSchedule className="!text-lg" />
+                  </ListItemIcon>
+                  <ListItemText
+                    sx={{
+                      color:
+                        key == currentPage
+                          ? theme.palette.primary.main
+                          : theme.palette.primary.contrastText,
+                    }}
+                    primary={job.pm_job_title}
+                    primaryTypographyProps={{
+                      sx: {
+                        fontWeight: key == currentPage ? "700" : "500",
+                        fontSize: 12,
+                        marginLeft: 2,
+                      },
+                    }}
+                  />
+                </ListItemButton>
+              </ListItem>
+              {/* <Divider className="!mx-4" /> */}
+            </Link>
+          );
+        })
+      ) : (
+        <EmptyComponent />
+      )}
     </List>
   );
 };

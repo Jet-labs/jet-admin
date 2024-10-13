@@ -20,6 +20,7 @@ import {
 import { useAuthState } from "../../../contexts/authContext";
 import { HiMiniVariable } from "react-icons/hi2";
 import { VscSymbolVariable } from "react-icons/vsc";
+import { EmptyComponent } from "../../EmptyComponent";
 
 export const AppVariablesDrawerList = () => {
   const theme = useTheme();
@@ -75,65 +76,67 @@ export const AppVariablesDrawerList = () => {
         </div>
       )}
       <div className="!mt-1"></div>
-      {appVariables && appVariables.length > 0
-        ? appVariables.map((appVariable) => {
-            const key = `app_variable_${appVariable.pm_app_variable_id}`;
-            return (
-              <Link
-                to={LOCAL_CONSTANTS.ROUTES.GRAPH_VIEW.path(
-                  appVariable.pm_app_variable_id
-                )}
-                key={key}
+      {appVariables && appVariables.length > 0 ? (
+        appVariables.map((appVariable) => {
+          const key = `app_variable_${appVariable.pm_app_variable_id}`;
+          return (
+            <Link
+              to={LOCAL_CONSTANTS.ROUTES.GRAPH_VIEW.path(
+                appVariable.pm_app_variable_id
+              )}
+              key={key}
+            >
+              <ListItem
+                key={`_app_variable_${appVariable.pm_app_variable_id}`}
+                disablePadding
+                className="!px-3 !py-1.5"
               >
-                <ListItem
-                  key={`_app_variable_${appVariable.pm_app_variable_id}`}
-                  disablePadding
-                  className="!px-3 !py-1.5"
+                <ListItemButton
+                  sx={{
+                    background: theme.palette.background.paper,
+                    border: key == currentPage ? 1 : 0,
+                    borderColor: theme.palette.primary.main,
+                  }}
+                  selected={key == currentPage}
+                  className="!rounded"
                 >
-                  <ListItemButton
+                  <ListItemIcon
+                    className="!ml-1"
                     sx={{
-                      background: theme.palette.background.paper,
-                      border: key == currentPage ? 1 : 0,
-                      borderColor: theme.palette.primary.main,
+                      color:
+                        key == currentPage
+                          ? theme.palette.primary.main
+                          : theme.palette.primary.contrastText,
+                      minWidth: 0,
                     }}
-                    selected={key == currentPage}
-                    className="!rounded"
                   >
-                    <ListItemIcon
-                      className="!ml-1"
-                      sx={{
-                        color:
-                          key == currentPage
-                            ? theme.palette.primary.main
-                            : theme.palette.primary.contrastText,
-                        minWidth: 0,
-                      }}
-                    >
-                      <VscSymbolVariable className="!text-lg" />
-                    </ListItemIcon>
-                    <ListItemText
-                      sx={{
-                        color:
-                          key == currentPage
-                            ? theme.palette.primary.main
-                            : theme.palette.primary.contrastText,
-                      }}
-                      primary={appVariable.pm_app_variable_title}
-                      primaryTypographyProps={{
-                        sx: {
-                          fontWeight: key == currentPage ? "700" : "500",
-                          fontSize: 12,
-                          marginLeft: 2,
-                        },
-                      }}
-                    />
-                  </ListItemButton>
-                </ListItem>
-                {/* <Divider className="!mx-4" /> */}
-              </Link>
-            );
-          })
-        : null}
+                    <VscSymbolVariable className="!text-lg" />
+                  </ListItemIcon>
+                  <ListItemText
+                    sx={{
+                      color:
+                        key == currentPage
+                          ? theme.palette.primary.main
+                          : theme.palette.primary.contrastText,
+                    }}
+                    primary={appVariable.pm_app_variable_title}
+                    primaryTypographyProps={{
+                      sx: {
+                        fontWeight: key == currentPage ? "700" : "500",
+                        fontSize: 12,
+                        marginLeft: 2,
+                      },
+                    }}
+                  />
+                </ListItemButton>
+              </ListItem>
+              {/* <Divider className="!mx-4" /> */}
+            </Link>
+          );
+        })
+      ) : (
+        <EmptyComponent />
+      )}
     </List>
   );
 };

@@ -19,6 +19,7 @@ import { VscSymbolVariable } from "react-icons/vsc";
 import { getAllTriggerAPI } from "../../../api/triggers";
 import { useQuery } from "@tanstack/react-query";
 import { GrTrigger } from "react-icons/gr";
+import { EmptyComponent } from "../../EmptyComponent";
 export const TriggersDrawerList = () => {
   const theme = useTheme();
   const routeParam = useParams();
@@ -85,56 +86,58 @@ export const TriggersDrawerList = () => {
         </div>
       )}
       <div className="!mt-1"></div>
-      {triggers && triggers.length > 0
-        ? triggers.map((trigger) => {
-            const key = `${trigger.pm_trigger_table_name}-${trigger.pm_trigger_name}`;
-            return (
-              <Link to={LOCAL_CONSTANTS.ROUTES.GRAPH_VIEW.path(key)} key={key}>
-                <ListItem disablePadding className="!px-3 !py-1.5">
-                  <ListItemButton
+      {triggers && triggers.length > 0 ? (
+        triggers.map((trigger) => {
+          const key = `${trigger.pm_trigger_table_name}-${trigger.pm_trigger_name}`;
+          return (
+            <Link to={LOCAL_CONSTANTS.ROUTES.GRAPH_VIEW.path(key)} key={key}>
+              <ListItem disablePadding className="!px-3 !py-1.5">
+                <ListItemButton
+                  sx={{
+                    background: theme.palette.background.paper,
+                    border: key == currentPage ? 1 : 0,
+                    borderColor: theme.palette.primary.main,
+                  }}
+                  selected={key == currentPage}
+                  className="!rounded"
+                >
+                  <ListItemIcon
+                    className="!ml-1"
                     sx={{
-                      background: theme.palette.background.paper,
-                      border: key == currentPage ? 1 : 0,
-                      borderColor: theme.palette.primary.main,
+                      color:
+                        key == currentPage
+                          ? theme.palette.primary.main
+                          : theme.palette.primary.contrastText,
+                      minWidth: 0,
                     }}
-                    selected={key == currentPage}
-                    className="!rounded"
                   >
-                    <ListItemIcon
-                      className="!ml-1"
-                      sx={{
-                        color:
-                          key == currentPage
-                            ? theme.palette.primary.main
-                            : theme.palette.primary.contrastText,
-                        minWidth: 0,
-                      }}
-                    >
-                      <GrTrigger className="!text-lg" />
-                    </ListItemIcon>
-                    <ListItemText
-                      sx={{
-                        color:
-                          key == currentPage
-                            ? theme.palette.primary.main
-                            : theme.palette.primary.contrastText,
-                      }}
-                      primary={key}
-                      primaryTypographyProps={{
-                        sx: {
-                          fontWeight: key == currentPage ? "700" : "500",
-                          fontSize: 12,
-                          marginLeft: 2,
-                        },
-                      }}
-                    />
-                  </ListItemButton>
-                </ListItem>
-                {/* <Divider className="!mx-4" /> */}
-              </Link>
-            );
-          })
-        : null}
+                    <GrTrigger className="!text-lg" />
+                  </ListItemIcon>
+                  <ListItemText
+                    sx={{
+                      color:
+                        key == currentPage
+                          ? theme.palette.primary.main
+                          : theme.palette.primary.contrastText,
+                    }}
+                    primary={key}
+                    primaryTypographyProps={{
+                      sx: {
+                        fontWeight: key == currentPage ? "700" : "500",
+                        fontSize: 12,
+                        marginLeft: 2,
+                      },
+                    }}
+                  />
+                </ListItemButton>
+              </ListItem>
+              {/* <Divider className="!mx-4" /> */}
+            </Link>
+          );
+        })
+      ) : (
+        <EmptyComponent />
+      )}
     </List>
   );
 };
