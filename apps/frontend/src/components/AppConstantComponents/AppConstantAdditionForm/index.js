@@ -57,9 +57,9 @@ export const AppConstantAdditionForm = () => {
   };
 
   return (
-    <div className="w-full !h-[calc(100vh-50px)] overflow-y-scroll">
+    <div className="w-full !h-[calc(100vh-50px)]">
       <div
-        className="flex flex-col items-start justify-start p-3 px-3 w-full"
+        className="flex flex-row items-center justify-between p-3 px-3 w-full"
         style={{
           background: theme.palette.background.paper,
           borderBottomWidth: 1,
@@ -69,20 +69,19 @@ export const AppConstantAdditionForm = () => {
         <span className="text-lg font-bold text-start mt-1 ">
           {LOCAL_CONSTANTS.STRINGS.APP_CONSTANT_ADDITION_PAGE_TITLE}
         </span>
+        <div className="!flex flex-row justify-end items-center">
+          <Button
+            variant="contained"
+            className="!ml-3"
+            onClick={_addAppConstant}
+          >
+            {LOCAL_CONSTANTS.STRINGS.ADD_BUTTON_TEXT}
+          </Button>
+        </div>
       </div>
       <Grid container>
         <Grid item xl={6} lg={6} md={12} sm={12} xs={12}>
           <AppConstantEditor appConstantForm={appConstantForm} />
-
-          <div className="!flex flex-row justify-end items-start mt-10 w-full px-3">
-            <Button
-              variant="contained"
-              className="!ml-3"
-              onClick={_addAppConstant}
-            >
-              {LOCAL_CONSTANTS.STRINGS.ADD_BUTTON_TEXT}
-            </Button>
-          </div>
         </Grid>
         <Grid item xl={6} lg={6} md={0} sm={0} xs={0} className="!p-3"></Grid>
       </Grid>

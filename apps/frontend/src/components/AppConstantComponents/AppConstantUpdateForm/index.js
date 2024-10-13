@@ -90,19 +90,32 @@ export const AppConstantUpdateForm = ({ id }) => {
   };
 
   return (
-    <div className="w-full !h-[calc(100vh-50px)] overflow-y-scroll">
+    <div className="w-full !h-[calc(100vh-100px)]">
       <div
-        className="flex flex-col items-start justify-start p-3 w-full"
+        className="flex flex-row items-center justify-between p-3 w-full"
         style={{
           background: theme.palette.background.paper,
           borderBottomWidth: 1,
           borderColor: theme.palette.divider,
         }}
       >
-        <span className="text-lg font-bold text-start">
-          {LOCAL_CONSTANTS.STRINGS.APP_CONSTANT_UPDATE_PAGE_TITLE}
-        </span>
-        <span className="text-xs font-medium text-start mt-1">{`App constant id : ${id}`}</span>
+        <div className="flex flex-col items-start justify-start">
+          <span className="text-lg font-bold text-start">
+            {LOCAL_CONSTANTS.STRINGS.APP_CONSTANT_UPDATE_PAGE_TITLE}
+          </span>
+          <span className="text-xs font-medium text-start mt-1">{`App constant id : ${id}`}</span>
+        </div>
+
+        <div className="!flex flex-row justify-end items-center">
+          <AppConstantDeletionForm id={id} />
+          <Button
+            variant="contained"
+            className="!ml-3"
+            onClick={_updateAppConstant}
+          >
+            {LOCAL_CONSTANTS.STRINGS.UPDATE_BUTTON_TEXT}
+          </Button>
+        </div>
       </div>
 
       <Grid
@@ -112,17 +125,6 @@ export const AppConstantUpdateForm = ({ id }) => {
       >
         <Grid item xl={6} lg={6} md={12} sm={12} xs={12}>
           <AppConstantEditor appConstantForm={appConstantForm} />
-
-          <div className="!flex flex-row justify-end items-center mt-10 w-full px-3">
-            <AppConstantDeletionForm id={id} />
-            <Button
-              variant="contained"
-              className="!ml-3"
-              onClick={_updateAppConstant}
-            >
-              {LOCAL_CONSTANTS.STRINGS.UPDATE_BUTTON_TEXT}
-            </Button>
-          </div>
         </Grid>
         <Grid item xl={6} lg={6} md={0} sm={0} xs={0} className="!p-3"></Grid>
       </Grid>

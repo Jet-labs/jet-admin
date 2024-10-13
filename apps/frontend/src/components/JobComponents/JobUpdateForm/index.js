@@ -109,7 +109,7 @@ export const JobUpdateForm = ({ id }) => {
       <div
         className="flex flex-row items-center justify-between p-3 "
         style={{
-          background: theme.palette.background.default,
+          background: theme.palette.background.paper,
           borderBottomWidth: 1,
           borderColor: theme.palette.divider,
         }}

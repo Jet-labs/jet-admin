@@ -77,7 +77,11 @@ export const QueryAdditionForm = () => {
     <div className="w-full !h-[calc(100vh-100px)]">
       <div
         className="flex flex-row items-center justify-between p-3"
-        style={{ background: theme.palette.background.paper }}
+        style={{
+          background: theme.palette.background.paper,
+          borderBottomWidth: 1,
+          borderColor: theme.palette.divider,
+        }}
       >
         <span className="text-lg font-bold text-start mt-1">
           {LOCAL_CONSTANTS.STRINGS.QUERY_ADDITION_PAGE_TITLE}

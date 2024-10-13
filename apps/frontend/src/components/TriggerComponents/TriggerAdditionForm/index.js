@@ -131,12 +131,27 @@ const TriggerAdditionForm = () => {
   return (
     <div className="w-full !h-[calc(100vh-100px)]">
       <div
-        className="flex flex-col items-start justify-start p-3"
-        style={{ background: theme.palette.background.paper }}
+        className="flex flex-row items-center justify-between p-3"
+        style={{
+          background: theme.palette.background.paper,
+          borderBottomWidth: 1,
+          borderColor: theme.palette.divider,
+        }}
       >
         <span className="text-lg font-bold text-start mt-1">
           {LOCAL_CONSTANTS.STRINGS.TRIGGER_ADDITION_PAGE_TITLE}
         </span>
+        <div className="flex flex-row items-center justify-end">
+          <Button
+            disableElevation
+            variant="contained"
+            size="small"
+            type="submit"
+            className="!ml-2"
+          >
+            {LOCAL_CONSTANTS.STRINGS.ADD_BUTTON_TEXT}
+          </Button>
+        </div>
       </div>
       <Grid container>
         <Grid item xl={6} lg={6} md={12} sm={12} xs={12}>
@@ -336,17 +351,6 @@ const TriggerAdditionForm = () => {
                 }}
                 type={"text"}
               />
-            </div>
-            <div className="flex flex-row items-center justify-end w-full mt-10">
-              <Button
-                disableElevation
-                variant="contained"
-                size="small"
-                type="submit"
-                className="!ml-2"
-              >
-                {LOCAL_CONSTANTS.STRINGS.ADD_BUTTON_TEXT}
-              </Button>
             </div>
           </form>
         </Grid>
