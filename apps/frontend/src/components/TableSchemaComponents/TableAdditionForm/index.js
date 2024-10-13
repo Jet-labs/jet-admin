@@ -18,9 +18,11 @@ import {
   TextField,
   useTheme,
 } from "@mui/material";
-import { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
+import { useQuery } from "@tanstack/react-query";
+import { getAllTables, getTableColumns } from "../../../api/tables";
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -285,7 +287,163 @@ export const TableColumnBuilder = ({ tableForm }) => {
     </Grid>
   );
 };
-export const TableConstraintBuilder = ({ tableForm }) => {
+const ForeignKeyRenderer = ({ tableForm, tables, index }) => {
+  const theme = useTheme();
+  const {
+    isLoading: isLoadingTableColumns,
+    data: tableColumns,
+    error: loadTableColumnsError,
+  } = useQuery({
+    queryKey: [
+      LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLE_ID_COLUMNS(
+        tableForm.values["constraints"]["foreign_keys"][index]?.ref_table
+      ),
+    ],
+    queryFn: () =>
+      getTableColumns({
+        tableName:
+          tableForm.values["constraints"]["foreign_keys"][index]?.ref_table,
+      }),
+    cacheTime: 0,
+    retry: 0,
+    staleTime: 0,
+  });
+  return (
+    <div
+      className={`flex flex-row justify-start border rounded  w-full !ml-0 ${
+        index === 0 ? "!mt-1" : "!mt-3"
+      }`}
+      style={{ borderColor: theme.palette.divider }}
+    >
+      <Grid container className="!p-3">
+        <Grid item xl={12} lg={12} md={12} sm={12} xs={12}>
+          <FormControl fullWidth size="small" className="!mt-0">
+            <span className="text-xs font-light  !capitalize mb-1">{`Columns`}</span>
+            <Select
+              multiple
+              value={
+                tableForm.values["constraints"]["foreign_keys"][index].columns
+              }
+              onChange={tableForm.handleChange}
+              onBlur={tableForm.handleBlur}
+              name={`constraints.foreign_keys[${index}].columns`}
+              input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
+              error={
+                tableForm.errors?.["constraints"]?.["foreign_keys"]?.[index]
+                  .columns
+              }
+              renderValue={(selected) => (
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                  {selected.map((value) => (
+                    <Chip
+                      className="!rounded"
+                      size="small"
+                      key={value}
+                      label={value}
+                    />
+                  ))}
+                </Box>
+              )}
+              MenuProps={MenuProps}
+            >
+              {tableForm.values.columns?.map((column) => (
+                <MenuItem
+                  key={column.column_name}
+                  value={column.column_name}
+                  // style={getStyles(name, personName, theme)}
+                >
+                  {column.column_name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid item xl={12} lg={12} md={12} sm={12} xs={12}>
+          <FormControl fullWidth size="small" className="!mt-3">
+            <span className="text-xs font-light  !capitalize mb-1">{`Reference table`}</span>
+            <Select
+              required={true}
+              fullWidth
+              size="small"
+              variant="outlined"
+              type="text"
+              placeholder="Data type"
+              name={`constraints.foreign_keys[${index}].ref_table`}
+              value={
+                tableForm.values["constraints"]["foreign_keys"][index].ref_table
+              }
+              onChange={tableForm.handleChange}
+              onBlur={tableForm.handleBlur}
+              error={
+                tableForm.errors?.["constraints"]?.["foreign_keys"]?.[index]
+                  .ref_table
+              }
+            >
+              {tables?.map((table) => {
+                return <MenuItem value={table}>{table}</MenuItem>;
+              })}
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid item xl={12} lg={12} md={12} sm={12} xs={12}>
+          <FormControl fullWidth size="small" className="!mt-3">
+            <span className="text-xs font-light  !capitalize mb-1">{`Reference columns`}</span>
+            <Select
+              multiple
+              value={
+                tableForm.values["constraints"]["foreign_keys"][index]
+                  .ref_columns
+              }
+              onChange={tableForm.handleChange}
+              onBlur={tableForm.handleBlur}
+              name={`constraints.foreign_keys[${index}].ref_columns`}
+              input={<OutlinedInput id="select-multiple-chip" label="Chip" />}
+              error={
+                tableForm.errors?.["constraints"]?.["foreign_keys"]?.[index]
+                  .ref_columns
+              }
+              renderValue={(selected) => (
+                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                  {selected.map((value) => (
+                    <Chip
+                      className="!rounded"
+                      size="small"
+                      key={value}
+                      label={value}
+                    />
+                  ))}
+                </Box>
+              )}
+              MenuProps={MenuProps}
+            >
+              {tableColumns?.map((column) => (
+                <MenuItem
+                  key={column.name}
+                  value={column.name}
+                  // style={getStyles(name, personName, theme)}
+                >
+                  {column.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Grid>
+      </Grid>
+      <div
+        className=" rounded-e"
+        style={{ background: theme.palette.background.paper }}
+      >
+        <IconButton
+          size="small"
+          // onClick={() => _handleDeleteCostraint(index)}
+        >
+          <MdDeleteOutline className="!text-xl !text-red-700"></MdDeleteOutline>
+        </IconButton>
+      </div>
+    </div>
+  );
+};
+export const TableConstraintBuilder = ({ tables, tableForm }) => {
   const theme = useTheme();
   // const _handleAddCostraint = () => {
   //   tableForm.setFieldValue("columns", [...tableForm.values.columns, {}]);
@@ -410,81 +568,16 @@ export const TableConstraintBuilder = ({ tableForm }) => {
           {/* {error && <span className="mt-2 text-red-500">{error}</span>} */}
         </FormControl>
       </Grid>
-
-      {tableForm.values["constraints"]["foreign_keys"].map(
-        (foreignConstraint, index) => {
-          return (
-            <div
-              className={`flex flex-row justify-start border rounded  w-full !ml-0 ${
-                index === 0 ? "!mt-1" : "!mt-3"
-              }`}
-              style={{ borderColor: theme.palette.divider }}
-            >
-              <Grid container className="!p-3">
-                <Grid item xl={12} lg={12} md={12} sm={12} xs={12}>
-                  <FormControl fullWidth size="small" className="!mt-3">
-                    <span className="text-xs font-light  !capitalize mb-1">{`Columns`}</span>
-                    <Select
-                      multiple
-                      value={
-                        tableForm.values["constraints"]["foreign_keys"][index]
-                          .columns
-                      }
-                      onChange={tableForm.handleChange}
-                      onBlur={tableForm.handleBlur}
-                      name={`constraints.foreign_keys[${index}].columns`}
-                      input={
-                        <OutlinedInput id="select-multiple-chip" label="Chip" />
-                      }
-                      error={
-                        tableForm.errors?.["constraints"]?.["foreign_keys"]?.[
-                          index
-                        ].columns
-                      }
-                      renderValue={(selected) => (
-                        <Box
-                          sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}
-                        >
-                          {selected.map((value) => (
-                            <Chip
-                              className="!rounded"
-                              size="small"
-                              key={value}
-                              label={value}
-                            />
-                          ))}
-                        </Box>
-                      )}
-                      MenuProps={MenuProps}
-                    >
-                      {tableForm.values.columns?.map((column) => (
-                        <MenuItem
-                          key={column.column_name}
-                          value={column.column_name}
-                          // style={getStyles(name, personName, theme)}
-                        >
-                          {column.column_name}
-                        </MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-              </Grid>
-              <div
-                className=" rounded-e"
-                style={{ background: theme.palette.background.paper }}
-              >
-                <IconButton
-                  size="small"
-                  // onClick={() => _handleDeleteCostraint(index)}
-                >
-                  <MdDeleteOutline className="!text-xl !text-red-700"></MdDeleteOutline>
-                </IconButton>
-              </div>
-            </div>
-          );
-        }
-      )}
+      <span className="text-xs font-light  !capitalize mt-3">{`Foreign keys`}</span>
+      {tableForm.values["constraints"]["foreign_keys"].map((_, index) => {
+        return (
+          <ForeignKeyRenderer
+            index={index}
+            tables={tables}
+            tableForm={tableForm}
+          />
+        );
+      })}
       {/* <Button
         variant="outlined"
         className="!mt-3"
@@ -499,6 +592,19 @@ export const TableConstraintBuilder = ({ tableForm }) => {
 export const TableAdditionForm = () => {
   const theme = useTheme();
   const [tab, setTab] = useState(0);
+
+  const {
+    isLoading: isLoadingTables,
+    data: tables,
+    error: loadTablesError,
+    refetch: refetchTables,
+  } = useQuery({
+    queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLES],
+    queryFn: () => getAllTables(),
+    cacheTime: 0,
+    retry: 0,
+    staleTime: 0,
+  });
 
   const tableAdditionForm = useFormik({
     initialValues: {
@@ -622,7 +728,12 @@ export const TableAdditionForm = () => {
           <TableGeneralDetailsBuilder tableForm={tableAdditionForm} />
         )}
         {tab === 1 && <TableColumnBuilder tableForm={tableAdditionForm} />}
-        {tab === 2 && <TableConstraintBuilder tableForm={tableAdditionForm} />}
+        {tab === 2 && (
+          <TableConstraintBuilder
+            tables={tables}
+            tableForm={tableAdditionForm}
+          />
+        )}
       </Grid>
     </div>
   );
