@@ -205,6 +205,7 @@ export const LOCAL_CONSTANTS = {
     //tables
     TABLE_ADD_BUTTON_TEXT: "Add table",
     TABLE_ADDITION_PAGE_TITLE: "Add table",
+    TABLE_COLUMN_ADDITION_PAGE_TITLE: "Add column",
 
     //SQL
     SQL_EDITOR_NAVIGATE_BUTTON_TEXT: "Open SQL editor",
