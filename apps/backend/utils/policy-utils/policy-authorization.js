@@ -197,7 +197,10 @@ policyAuthorizations.extractQueryDeleteAuthorization = ({ policyObject }) => {
 
 policyAuthorizations.extractTableAddAuthorization = ({ policyObject }) => {
   let authorization = false;
-  if ((policyObject.tables === true || policyObject.tables.add) === true) {
+  if (
+    (policyObject.schemas?.tables === true ||
+      policyObject.schemas?.tables.add) === true
+  ) {
     authorization = true;
   }
   return authorization;

@@ -1,6 +1,6 @@
 import { QueryClient, useMutation, useQuery } from "@tanstack/react-query";
 import { useFormik } from "formik";
-import { fetchRowByIDAPI, getTableColumns } from "../../../api/tables";
+import { fetchRowByIDAPI, getTableInfo } from "../../../api/tables";
 
 import { Button, CircularProgress, Grid, useTheme } from "@mui/material";
 import { useEffect } from "react";
@@ -33,11 +33,11 @@ export const RowUpdateForm = ({ customTitle, tableName, id }) => {
 
   const {
     isLoading: isLoadingEditColumns,
-    data: tableColumns,
+    data: { columns: tableColumns },
     error: loadEditColumnsError,
   } = useQuery({
     queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLE_ID_COLUMNS(tableName)],
-    queryFn: () => getTableColumns({ tableName }),
+    queryFn: () => getTableInfo({ tableName }),
     cacheTime: 0,
     retry: 0,
     staleTime: 0,

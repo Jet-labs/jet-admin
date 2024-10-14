@@ -17,7 +17,7 @@ import { fetchAllRowsAPI, getTablePrimaryKey } from "../../../api/tables";
 import { useAuthState } from "../../../contexts/authContext";
 
 import { useDebounce } from "@uidotdev/usehooks";
-import { getTableColumns } from "../../../api/tables";
+import { getTableInfo } from "../../../api/tables";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { useAppVariables } from "../../../contexts/appVariablesContext";
 import { Loading } from "../../../pages/Loading";
@@ -89,16 +89,18 @@ export const JobHistoryComponent = ({
   });
 
   const {
-    isLoading: isLoadingTableColumns,
-    data: tableColumns,
-    error: loadTableColumnsError,
+    isLoading: isLoadingTableInfo,
+    data: tableInfo,
+    error: loadTableInfoError,
   } = useQuery({
     queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLE_ID_COLUMNS(tableName)],
-    queryFn: () => getTableColumns({ tableName }),
+    queryFn: () => getTableInfo({ tableName }),
     cacheTime: 0,
     retry: 0,
     staleTime: 0,
   });
+
+  const tableColumns = tableInfo?.columns;
 
   const {
     isLoading: isLoadingTablePrimaryKey,
@@ -270,7 +272,7 @@ export const JobHistoryComponent = ({
     isAllRowSelectChecked,
   ]);
 
-  return isLoadingRows || isLoadingTableColumns || isLoadingTablePrimaryKey ? (
+  return isLoadingRows || isLoadingTableInfo || isLoadingTablePrimaryKey ? (
     <Loading />
   ) : (
     <div

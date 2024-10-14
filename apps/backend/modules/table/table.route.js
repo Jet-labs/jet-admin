@@ -30,10 +30,10 @@ router.get(
 );
 
 router.get(
-  "/:table_name/columns",
+  "/:table_name/info",
   authMiddleware.authProvider,
   policyMiddleware.populateAuthorizationPolicies,
-  tableController.getTableColumns
+  tableController.getTableInfo
 );
 
 router.get(

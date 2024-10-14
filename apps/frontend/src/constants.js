@@ -379,8 +379,7 @@ export const LOCAL_CONSTANTS = {
       getAllTables: () => `/admin_api/tables`,
       getAllTableColumns: () => `/admin_api/tables/columns`,
 
-      getTableColumns: ({ tableName }) =>
-        `/admin_api/tables/${tableName}/columns`,
+      getTableInfo: ({ tableName }) => `/admin_api/tables/${tableName}/info`,
       getTablePrimaryKey: ({ tableName }) =>
         `/admin_api/tables/${tableName}/pkey`,
       getTableRows: ({ tableName, page, pageSize, filterQuery, order }) =>

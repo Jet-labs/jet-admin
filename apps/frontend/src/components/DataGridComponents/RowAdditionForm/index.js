@@ -3,7 +3,7 @@ import { useFormik } from "formik";
 
 import { Button, CircularProgress, Grid, Paper, useTheme } from "@mui/material";
 import { useMemo } from "react";
-import { addRowAPI, getTableColumns } from "../../../api/tables";
+import { addRowAPI, getTableInfo } from "../../../api/tables";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import {
@@ -16,17 +16,20 @@ import { FieldComponent } from "../../FieldComponent";
 export const RowAdditionForm = ({ tableName, customTitle }) => {
   const theme = useTheme();
   const queryClient = useQueryClient();
+
   const {
-    isLoading: isLoadingAddColumns,
-    data: tableColumns,
-    error: loadAddColumnsError,
+    isLoading: isLoadingTableInfo,
+    data: tableInfo,
+    error: loadTableInfoError,
   } = useQuery({
     queryKey: [LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLE_ID_COLUMNS(tableName)],
-    queryFn: () => getTableColumns({ tableName }),
+    queryFn: () => getTableInfo({ tableName }),
     cacheTime: 0,
     retry: 0,
     staleTime: 0,
   });
+
+  const tableColumns = tableInfo?.columns;
 
   const {
     isPending: isAddingRow,

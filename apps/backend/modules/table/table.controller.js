@@ -91,7 +91,7 @@ tableController.addTable = async (req, res) => {
 tableController.getAllTableColumns = async (req, res) => {
   try {
     Logger.log("info", {
-      message: "tableController:getTableColumns:init",
+      message: "tableController:getAllTableColumns:init",
     });
     const { pmUser, state } = req;
     const pm_user_id = parseInt(pmUser.pm_user_id);
@@ -103,7 +103,7 @@ tableController.getAllTableColumns = async (req, res) => {
       }
     );
     Logger.log("info", {
-      message: "tableController:getTableColumns:rows",
+      message: "tableController:getAllTableColumns:rows",
       params: {
         pm_user_id,
         authorizedTableColumns,
@@ -115,7 +115,7 @@ tableController.getAllTableColumns = async (req, res) => {
     });
   } catch (error) {
     Logger.log("error", {
-      message: "tableController:getTableColumns:catch-1",
+      message: "tableController:getAllTableColumns:catch-1",
       params: { error },
     });
     return res.json({ success: false, error: extractError(error) });
@@ -128,32 +128,34 @@ tableController.getAllTableColumns = async (req, res) => {
  * @param {import("express").Response} res
  * @returns
  */
-tableController.getTableColumns = async (req, res) => {
+tableController.getTableInfo = async (req, res) => {
   try {
     Logger.log("info", {
-      message: "tableController:getTableColumns:init",
+      message: "tableController:getTableInfo:init",
     });
     const { pmUser, state } = req;
     const pm_user_id = pmUser.pm_user_id;
     const { table_name } = req.params;
-    const columns = await TableService.getTableColumns({
+    const { columns, constraints } = await TableService.getTableInfo({
       tableName: table_name,
     });
     Logger.log("info", {
-      message: "tableController:getTableColumns:params",
+      message: "tableController:getTableInfo:params",
       params: {
         pm_user_id,
         table_name,
         columns,
+        constraints,
       },
     });
     return res.json({
       success: true,
       columns,
+      constraints,
     });
   } catch (error) {
     Logger.log("error", {
-      message: "tableController:getTableColumns:catch-1",
+      message: "tableController:getTableInfo:catch-1",
       params: { error },
     });
     return res.json({ success: false, error: extractError(error) });

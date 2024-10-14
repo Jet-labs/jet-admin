@@ -38,6 +38,8 @@ export const TableDrawerList = () => {
     staleTime: 0,
   });
 
+  console.log({ tables });
+
   const _navigateToAddMoreTable = () => {
     navigate(LOCAL_CONSTANTS.ROUTES.ADD_TABLE.path());
   };

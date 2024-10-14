@@ -54,15 +54,19 @@ export const getAllTables = async () => {
   }
 };
 
-export const getTableColumns = async ({ tableName }) => {
+export const getTableInfo = async ({ tableName }) => {
   try {
     const response = await axiosInstance.get(
-      LOCAL_CONSTANTS.APIS.TABLE.getTableColumns({
+      LOCAL_CONSTANTS.APIS.TABLE.getTableInfo({
         tableName,
       })
     );
     if (response.data && response.data.success == true) {
-      return Array.from(response.data.columns);
+      console.log({ constraints: response.data.constraints });
+      return {
+        columns: Array.from(response.data.columns),
+        constraints: Array.from(response.data.columns),
+      };
     } else if (response.data.error) {
       throw response.data.error;
     } else {

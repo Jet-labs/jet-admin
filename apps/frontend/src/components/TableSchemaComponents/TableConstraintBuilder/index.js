@@ -15,7 +15,7 @@ import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import { FaPlus } from "react-icons/fa";
 import { MdDeleteOutline } from "react-icons/md";
-import { getTableColumns } from "../../../api/tables";
+import { getTableInfo } from "../../../api/tables";
 import { LOCAL_CONSTANTS } from "../../../constants";
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -36,9 +36,9 @@ const ForeignKeyRenderer = ({
 }) => {
   const theme = useTheme();
   const {
-    isLoading: isLoadingTableColumns,
-    data: tableColumns,
-    error: loadTableColumnsError,
+    isLoading: isLoadingTableInfo,
+    data: tableInfo,
+    error: loadTableInfoError,
   } = useQuery({
     queryKey: [
       LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLE_ID_COLUMNS(
@@ -46,7 +46,7 @@ const ForeignKeyRenderer = ({
       ),
     ],
     queryFn: () =>
-      getTableColumns({
+      getTableInfo({
         tableName:
           tableForm.values["constraints"]["foreign_keys"][index]?.ref_table,
       }),
@@ -54,6 +54,8 @@ const ForeignKeyRenderer = ({
     retry: 0,
     staleTime: 0,
   });
+  const tableColumns = tableInfo?.columns;
+
   return (
     <div
       className={`flex flex-row justify-start border rounded  w-full !ml-0 ${
@@ -380,7 +382,10 @@ export const TableConstraintBuilder = ({ tables, tableForm }) => {
           {/* {error && <span className="mt-2 text-red-500">{error}</span>} */}
         </FormControl>
       </Grid>
-      <span className="text-xs font-light  !capitalize mt-3">{`Foreign keys`}</span>
+      {tableForm.values["constraints"]["foreign_keys"] &&
+        tableForm.values["constraints"]["foreign_keys"].length > 0 && (
+          <span className="text-xs font-light  !capitalize mt-3">{`Foreign keys`}</span>
+        )}
       {tableForm.values["constraints"]["foreign_keys"].map((_, index) => {
         return (
           <ForeignKeyRenderer

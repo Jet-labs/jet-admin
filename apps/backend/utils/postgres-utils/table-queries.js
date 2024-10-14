@@ -146,6 +146,7 @@ tableQueryUtils.getAllTables = (schema) =>
   `SELECT table_name FROM information_schema.tables WHERE table_schema = '${
     schema ? schema : "public"
   }';`;
+
 tableQueryUtils.getAllTableColumns = (schema) => `SELECT json_build_object(
     'tableName', cols.table_name,
     'name', column_name,
@@ -169,6 +170,7 @@ tableQueryUtils.getAllTableColumns = (schema) => `SELECT json_build_object(
   FROM information_schema.columns cols
   WHERE table_schema = '${schema ? schema : "public"}'
   ORDER BY cols.table_name, cols.ordinal_position;`;
+  
 tableQueryUtils.getTableColumns = () => `SELECT json_build_object(
     'name', column_name,
     'isRequired', (is_nullable = 'NO'),
@@ -190,6 +192,36 @@ tableQueryUtils.getTableColumns = () => `SELECT json_build_object(
 ) AS column_schema
 FROM information_schema.columns cols
 WHERE table_name = $1;`;
+
+tableQueryUtils.getTableConstraints = () => `
+SELECT json_build_object(
+    'constraintName', tc.constraint_name,
+    'constraintType', tc.constraint_type,
+    'columns', (
+        SELECT json_agg(kcu.column_name)
+        FROM information_schema.key_column_usage kcu
+        WHERE kcu.constraint_name = tc.constraint_name
+        AND kcu.table_name = tc.table_name
+    ),
+    'foreignTable', (
+        SELECT ccu.table_name
+        FROM information_schema.constraint_column_usage ccu
+        WHERE ccu.constraint_name = tc.constraint_name
+    ),
+    'foreignColumn', (
+        SELECT json_agg(ccu.column_name)
+        FROM information_schema.constraint_column_usage ccu
+        WHERE ccu.constraint_name = tc.constraint_name
+    ),
+    'checkExpression', (
+        SELECT check_clause 
+        FROM information_schema.check_constraints cc
+        WHERE cc.constraint_name = tc.constraint_name
+    )
+) AS constraint_schema
+FROM information_schema.table_constraints tc
+WHERE tc.table_name = $1;
+`;
 
 tableQueryUtils.getTablePrimaryKey = () => `SELECT kcu.column_name
 FROM information_schema.table_constraints tc

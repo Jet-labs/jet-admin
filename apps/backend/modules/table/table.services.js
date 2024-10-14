@@ -148,29 +148,39 @@ class TableService {
    * @param {String} param0.tableName
    * @returns {Array<any>|null}
    */
-  static getTableColumns = async ({ tableName }) => {
+  static getTableInfo = async ({ tableName }) => {
     Logger.log("info", {
-      message: "TableService:getTableColumns:params",
+      message: "TableService:getTableInfo:params",
       params: {
         tableName,
       },
     });
     try {
-      const res = await pgPool.query(tableQueryUtils.getTableColumns(), [
-        tableName,
-      ]);
-      const columns = res.rows.map((row) => row.column_schema);
+      const columnResult = await pgPool.query(
+        tableQueryUtils.getTableColumns(),
+        [tableName]
+      );
+      const columns = columnResult.rows.map((row) => row.column_schema);
+
+      const constraintResult = await pgPool.query(
+        tableQueryUtils.getTableConstraints(),
+        [tableName]
+      );
+      const constraints = constraintResult.rows.map(
+        (row) => row.constraint_schema
+      );
 
       Logger.log("success", {
-        message: "TableService:getTableColumns:columns",
+        message: "TableService:getTableInfo:columns",
         params: {
           columns,
+          constraints,
         },
       });
-      return columns;
+      return { columns, constraints };
     } catch (error) {
       Logger.log("error", {
-        message: "TableService:getTableColumns:catch-1",
+        message: "TableService:getTableInfo:catch-1",
         params: { error },
       });
       throw error;
