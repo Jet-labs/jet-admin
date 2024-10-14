@@ -207,6 +207,9 @@ export const LOCAL_CONSTANTS = {
     TABLE_ADDITION_PAGE_TITLE: "Add table",
     TABLE_COLUMN_ADDITION_PAGE_TITLE: "Add column",
     TABLE_FOREIGN_KEY_ADDITION_PAGE_TITLE: "Add foreign key",
+    TABLE_ADDITION_SUCCESS: "Table added!",
+    TABLE_UPDATED_SUCCESS: "Table updated!",
+    TABLE_DELETED_SUCCESS: "Table deleted!",
 
     //SQL
     SQL_EDITOR_NAVIGATE_BUTTON_TEXT: "Open SQL editor",

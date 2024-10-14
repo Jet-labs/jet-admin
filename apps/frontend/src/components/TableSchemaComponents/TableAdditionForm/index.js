@@ -1,13 +1,14 @@
 import { Button, Divider, Grid, Tab, Tabs, useTheme } from "@mui/material";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
-import { getAllTables } from "../../../api/tables";
+import { addTableAPI, getAllTables } from "../../../api/tables";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { TableConstraintBuilder } from "../TableConstraintBuilder";
 import { TableColumnBuilder } from "../TableColumnBuilder";
 import { TableGeneralDetailsBuilder } from "../TableGeneralDetailsBuilder";
 import { generatePostgresCreateTableSQL } from "../../../utils/postgresUtils/tables";
+import { displayError, displaySuccess } from "../../../utils/notification";
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {
@@ -22,7 +23,29 @@ const MenuProps = {
 export const TableAdditionForm = () => {
   const theme = useTheme();
   const [tab, setTab] = useState(0);
+  const queryClient = useQueryClient();
 
+  const {
+    isPending: isAddingTable,
+    isSuccess: isAddingTableSuccess,
+    isError: isAddingTableError,
+    error: addTableError,
+    mutate: addTable,
+  } = useMutation({
+    mutationFn: (data) => {
+      return addTableAPI({
+        data: data,
+      });
+    },
+    retry: false,
+    onSuccess: (data) => {
+      displaySuccess(LOCAL_CONSTANTS.STRINGS.TABLE_ADDITION_SUCCESS);
+      queryClient.invalidateQueries([LOCAL_CONSTANTS.REACT_QUERY_KEYS.TABLES]);
+    },
+    onError: (error) => {
+      displayError(error);
+    },
+  });
   const {
     isLoading: isLoadingTables,
     data: tables,
@@ -103,6 +126,9 @@ export const TableAdditionForm = () => {
       // On Commit options for temporary tables
       on_commit: "", // 'PRESERVE ROWS', 'DELETE ROWS', 'DROP'
     },
+    onSubmit: (values) => {
+      addTable(values);
+    },
   });
 
   const _handleTabChange = (event, newTab) => {
@@ -132,8 +158,8 @@ export const TableAdditionForm = () => {
         <div>
           <Button
             variant="contained"
-            // onClick={_handleSubmit}
-            // disabled={isUpdatingGraph}
+            onClick={tableAdditionForm.handleSubmit}
+            disabled={isAddingTable}
           >
             {LOCAL_CONSTANTS.STRINGS.SUBMIT_BUTTON_TEXT}
           </Button>

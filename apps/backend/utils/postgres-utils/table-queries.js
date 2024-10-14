@@ -1,3 +1,5 @@
+const Logger = require("../logger");
+
 const tableQueryUtils = {};
 
 tableQueryUtils.generatePostgresCreateTableSQL = (tableData) => {
@@ -42,7 +44,11 @@ tableQueryUtils.generatePostgresCreateTableSQL = (tableData) => {
   // Start column definitions
   let columnDefinitions = columns
     .map((column) => {
-      let colSQL = `"${column.column_name}" ${column.data_type}`;
+      Logger.log("warning", {
+        message: "t",
+        params: { t: typeof column.column_name, m: column.column_name },
+      });
+      let colSQL = column.column_name + " " + column.data_type;
 
       // Add constraints for the column
       if (column.not_null) colSQL += " NOT NULL";

@@ -15,6 +15,13 @@ class TableService {
       message: "TableService:addTable:init",
     });
     try {
+      Logger.log("warning", {
+        message: "test",
+        params: {
+          d: tableData,
+          t: tableQueryUtils.generatePostgresCreateTableSQL(tableData),
+        },
+      });
       const res = await pgPool.query(
         tableQueryUtils.generatePostgresCreateTableSQL(tableData)
       );
