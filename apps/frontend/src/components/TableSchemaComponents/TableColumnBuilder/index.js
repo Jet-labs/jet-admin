@@ -49,7 +49,7 @@ export const TableColumnBuilder = ({ tableForm }) => {
     tableForm.setFieldValue("columns", [..._d]);
   };
   return (
-    <Grid container className="!p-3">
+    <Grid container xl={6} lg={6} md={12} sm={12} xs={12} className="!p-3">
       {tableForm.values["columns"].map((columns, index) => {
         return (
           <div
@@ -107,7 +107,7 @@ export const TableColumnBuilder = ({ tableForm }) => {
                         return (
                           <MenuItem
                             value={
-                              LOCAL_CONSTANTS.POSTGRE_SQL_DATA_TYPES[type].value
+                              LOCAL_CONSTANTS.POSTGRE_SQL_DATA_TYPES[type].name
                             }
                           >
                             {LOCAL_CONSTANTS.POSTGRE_SQL_DATA_TYPES[type].name}
@@ -222,7 +222,7 @@ export const TableColumnBuilder = ({ tableForm }) => {
                       }}
                     />
                   }
-                  label={"Create table if not exists"}
+                  label={"Not NULL"}
                 />
               </Grid>
             </Grid>

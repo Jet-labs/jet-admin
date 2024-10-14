@@ -52,6 +52,42 @@ tableController.getTables = async (req, res) => {
  * @param {import("express").Response} res
  * @returns
  */
+tableController.addTable = async (req, res) => {
+  try {
+    Logger.log("info", {
+      message: "tableController:addTable:init",
+    });
+    const { pmUser, body } = req;
+    const pm_user_id = parseInt(pmUser.pm_user_id);
+    const newTable = await TableService.addTable({
+      tableData: body
+    });
+    Logger.log("info", {
+      message: "tableController:addTable:rows",
+      params: {
+        pm_user_id,
+        newTable,
+      },
+    });
+    return res.json({
+      success: true,
+      table: newTable,
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "tableController:addTable:catch-1",
+      params: { error },
+    });
+    return res.json({ success: false, error: extractError(error) });
+  }
+};
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @returns
+ */
 tableController.getAllTableColumns = async (req, res) => {
   try {
     Logger.log("info", {

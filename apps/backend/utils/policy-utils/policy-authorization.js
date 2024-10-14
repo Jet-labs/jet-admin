@@ -194,6 +194,15 @@ policyAuthorizations.extractQueryDeleteAuthorization = ({ policyObject }) => {
 };
 
 // table authorizations
+
+policyAuthorizations.extractTableAddAuthorization = ({ policyObject }) => {
+  let authorization = false;
+  if ((policyObject.tables === true || policyObject.tables.add) === true) {
+    authorization = true;
+  }
+  return authorization;
+};
+
 policyAuthorizations.extractRowAddAuthorization = ({
   policyObject,
   tableName,

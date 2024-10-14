@@ -7,6 +7,38 @@ class TableService {
   /**
    *
    * @param {object} param0
+   * @param {object} param0.tableData
+   * @returns {Array<any>|null}
+   */
+  static addTable = async ({ tableData }) => {
+    Logger.log("info", {
+      message: "TableService:addTable:init",
+    });
+    try {
+      const res = await pgPool.query(
+        tableQueryUtils.generatePostgresCreateTableSQL(tableData)
+      );
+      const table = res.rows[0];
+      Logger.log("success", {
+        message: "TableService:addTable:authorizedTables",
+        params: {
+          res,
+          table,
+        },
+      });
+      return table;
+    } catch (error) {
+      Logger.log("error", {
+        message: "TableService:addTable:catch-1",
+        params: { error },
+      });
+      throw error;
+    }
+  };
+
+  /**
+   *
+   * @param {object} param0
    * @param {object} param0.authorizationPolicy
    * @param {object} param0.schema
    * @returns {Array<any>|null}

@@ -1,5 +1,140 @@
 const tableQueryUtils = {};
 
+tableQueryUtils.generatePostgresCreateTableSQL = (tableData) => {
+  const {
+    table_name,
+    if_not_exists,
+    temporary,
+    unlogged,
+    global,
+    local,
+    of_type,
+    columns,
+    constraints,
+    partition_by,
+    partitions,
+    inherits,
+    storage_options,
+    on_commit,
+  } = tableData;
+
+  // Initialize the table creation statement
+  let sql = "CREATE";
+
+  // Add modifiers for temporary/unlogged tables
+  if (temporary) sql += " TEMPORARY";
+  if (unlogged) sql += " UNLOGGED";
+  if (global) sql += " GLOBAL";
+  if (local) sql += " LOCAL";
+
+  // Add table keyword
+  sql += " TABLE";
+
+  // Add "IF NOT EXISTS" if the option is checked
+  if (if_not_exists) sql += " IF NOT EXISTS";
+
+  // Add table name
+  sql += ` ${table_name}`;
+
+  // Add "OF type_name" if provided
+  if (of_type) sql += ` OF ${of_type}`;
+
+  // Start column definitions
+  let columnDefinitions = columns
+    .map((column) => {
+      let colSQL = `"${column.column_name}" ${column.data_type}`;
+
+      // Add constraints for the column
+      if (column.not_null) colSQL += " NOT NULL";
+      if (column.unique) colSQL += " UNIQUE";
+      if (column.primary_key) colSQL += " PRIMARY KEY";
+      if (column.default) colSQL += ` DEFAULT ${column.default}`;
+      if (column.collation) colSQL += ` COLLATE ${column.collation}`;
+      if (column.check) colSQL += ` CHECK(${column.check})`;
+
+      // Add storage option
+      if (column.storage && column.storage !== "DEFAULT")
+        colSQL += ` STORAGE ${column.storage}`;
+
+      return colSQL;
+    })
+    .join(", ");
+
+  sql += ` (${columnDefinitions}`;
+
+  // Add table constraints
+  if (constraints.primary_key.length) {
+    sql += `, PRIMARY KEY (${constraints.primary_key.join(", ")})`;
+  }
+  if (constraints.unique.length) {
+    constraints.unique.forEach((uniqueColumns) => {
+      sql += `, UNIQUE (${uniqueColumns.join(", ")})`;
+    });
+  }
+  if (constraints.check) {
+    sql += `, CHECK (${constraints.check})`;
+  }
+  if (constraints.foreign_keys.length) {
+    constraints.foreign_keys.forEach((fk) => {
+      sql += `, FOREIGN KEY (${fk.columns.join(", ")}) REFERENCES ${
+        fk.ref_table
+      }(${fk.ref_columns.join(", ")})`;
+
+      // Add ON DELETE and ON UPDATE actions if provided
+      if (fk.on_delete) sql += ` ON DELETE ${fk.on_delete}`;
+      if (fk.on_update) sql += ` ON UPDATE ${fk.on_update}`;
+    });
+  }
+
+  sql += `)`;
+
+  // Add partitioning if provided
+  if (partition_by) {
+    sql += ` PARTITION BY ${partition_by}`;
+    if (partitions.length) {
+      sql += " (";
+      sql += partitions
+        .map(
+          (partition) =>
+            `${partition.column} ${
+              partition.expression ? `USING (${partition.expression})` : ""
+            }${partition.opclass ? ` ${partition.opclass}` : ""}${
+              partition.collation ? ` COLLATE ${partition.collation}` : ""
+            }`
+        )
+        .join(", ");
+      sql += ")";
+    }
+  }
+
+  // Add inheritance if provided
+  if (inherits.length) {
+    sql += ` INHERITS (${inherits.join(", ")})`;
+  }
+
+  // Add storage options
+  if (storage_options.tablespace) {
+    sql += ` TABLESPACE ${storage_options.tablespace}`;
+  }
+  if (storage_options.storage_parameters.length) {
+    sql += ` WITH (${storage_options.storage_parameters.join(", ")})`;
+  }
+
+  // Add WITHOUT OIDS if selected
+  if (storage_options.without_oids) {
+    sql += " WITHOUT OIDS";
+  }
+
+  // Add ON COMMIT options for temporary tables
+  if (on_commit) {
+    sql += ` ON COMMIT ${on_commit}`;
+  }
+
+  // End the SQL statement with a semicolon
+  sql += ";";
+
+  return sql;
+};
 
 tableQueryUtils.getAllTables = (schema) =>
   `SELECT table_name FROM information_schema.tables WHERE table_schema = '${

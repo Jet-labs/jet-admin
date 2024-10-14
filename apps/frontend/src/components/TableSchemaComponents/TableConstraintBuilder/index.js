@@ -59,7 +59,10 @@ const ForeignKeyRenderer = ({
       className={`flex flex-row justify-start border rounded  w-full !ml-0 ${
         index === 0 ? "!mt-1" : "!mt-3"
       }`}
-      style={{ borderColor: theme.palette.divider }}
+      style={{
+        borderColor: theme.palette.divider,
+        backgroundColor: `${theme.palette.background.paper}30`,
+      }}
     >
       <Grid container className="!p-3" columnSpacing={2}>
         <Grid item xl={12} lg={12} md={12} sm={12} xs={12}>
@@ -264,7 +267,7 @@ export const TableConstraintBuilder = ({ tables, tableForm }) => {
   };
 
   return (
-    <Grid container className="!p-3">
+    <Grid container className="!p-3" xl={6} lg={6} md={12} sm={12} xs={12}>
       <Grid item xl={12} lg={12} md={12} sm={12} xs={12}>
         <FormControl fullWidth size="small" className="!mt-3">
           <span className="text-xs font-light  !capitalize mb-1">{`Primary keys`}</span>

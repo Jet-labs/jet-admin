@@ -14,6 +14,14 @@ router.get(
   tableController.getTables
 );
 
+router.post(
+  "/",
+  authMiddleware.authProvider,
+  policyMiddleware.populateAuthorizationPolicies,
+  tableAuthorizationMiddleware.authorizeTableAddition,
+  tableController.addTable
+);
+
 router.get(
   "/columns",
   authMiddleware.authProvider,

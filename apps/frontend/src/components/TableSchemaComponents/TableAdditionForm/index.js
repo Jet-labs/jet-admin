@@ -1,12 +1,13 @@
 import { Button, Divider, Grid, Tab, Tabs, useTheme } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { useFormik } from "formik";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { getAllTables } from "../../../api/tables";
 import { LOCAL_CONSTANTS } from "../../../constants";
 import { TableConstraintBuilder } from "../TableConstraintBuilder";
 import { TableColumnBuilder } from "../TableColumnBuilder";
 import { TableGeneralDetailsBuilder } from "../TableGeneralDetailsBuilder";
+import { generatePostgresCreateTableSQL } from "../../../utils/postgresUtils/tables";
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
 const MenuProps = {

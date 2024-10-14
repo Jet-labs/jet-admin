@@ -2,6 +2,24 @@ import { LOCAL_CONSTANTS } from "../constants";
 import axiosInstance from "../utils/axiosInstance";
 import { triggerDownload } from "../utils/downloads";
 
+export const addTableAPI = async ({ data }) => {
+  try {
+    const response = await axiosInstance.post(
+      LOCAL_CONSTANTS.APIS.TABLE.addTable(),
+      data
+    );
+    if (response.data && response.data.success == true) {
+      return true;
+    } else if (response.data.error) {
+      throw response.data.error;
+    } else {
+      throw LOCAL_CONSTANTS.ERROR_CODES.SERVER_ERROR;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const getAllTableColumns = async () => {
   try {
     const response = await axiosInstance.get(
@@ -155,6 +173,7 @@ export const fetchRowByIDAPI = async ({ tableName, id }) => {
     throw error;
   }
 };
+
 export const updateRowAPI = async ({ tableName, id, data }) => {
   try {
     const response = await axiosInstance.put(

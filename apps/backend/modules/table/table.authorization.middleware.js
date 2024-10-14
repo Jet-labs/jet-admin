@@ -13,6 +13,54 @@ const tableAuthorizationMiddleware = {};
  * @param {import("express").NextFunction} next
  * @returns
  */
+tableAuthorizationMiddleware.authorizeTableAddition = async (req, res, next) => {
+  try {
+    const { pmUser, state } = req;
+    const authorization_policy = state?.authorization_policy;
+    const pm_user_id = parseInt(pmUser.pm_user_id);
+    Logger.log("info", {
+      message: "tableAuthorizationMiddleware:authorizeTableAddition:params",
+      params: { pm_user_id },
+    });
+    let authorization = policyAuthorizations.extractTableAddAuthorization({
+      policyObject: authorization_policy,
+    });
+
+    if (!authorization) {
+      Logger.log("error", {
+        message: "tableAuthorizationMiddleware:authorizeTableAddition:catch-2",
+        params: { error: constants.ERROR_CODES.PERMISSION_DENIED },
+      });
+      return res.json({
+        success: false,
+        error: constants.ERROR_CODES.PERMISSION_DENIED,
+      });
+    } else {
+      Logger.log("success", {
+        message: "tableAuthorizationMiddleware:authorizeTableAddition:success",
+        params: { pm_user_id },
+      });
+      return next();
+    }
+  } catch (error) {
+    Logger.log("error", {
+      message: "tableAuthorizationMiddleware:authorizeTableAddition:catch-1",
+      params: { error },
+    });
+    return res.json({
+      success: false,
+      error: constants.ERROR_CODES.SERVER_ERROR,
+    });
+  }
+};
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @param {import("express").NextFunction} next
+ * @returns
+ */
 tableAuthorizationMiddleware.authorizeRowRead = async (req, res, next) => {
   try {
     const { pmUser, state } = req;
@@ -20,7 +68,7 @@ tableAuthorizationMiddleware.authorizeRowRead = async (req, res, next) => {
     const { table_name } = req.params;
     const pm_user_id = parseInt(pmUser.pm_user_id);
     Logger.log("info", {
-      message: "tableAuthorizationMiddleware:populateAuthorizedRows:params",
+      message: "tableAuthorizationMiddleware:authorizeRowRead:params",
       params: { pm_user_id, table_name },
     });
     let authorized_rows = policyAuthorizations.extractRowReadAuthorization({
@@ -30,13 +78,13 @@ tableAuthorizationMiddleware.authorizeRowRead = async (req, res, next) => {
 
     req.state = { ...req.state, authorized_rows };
     Logger.log("success", {
-      message: "tableAuthorizationMiddleware:populateAuthorizedRows:success",
+      message: "tableAuthorizationMiddleware:authorizeRowRead:success",
       params: { pm_user_id, table_name, authorized_rows },
     });
     return next();
   } catch (error) {
     Logger.log("error", {
-      message: "tableAuthorizationMiddleware:populateAuthorizedRows:catch-1",
+      message: "tableAuthorizationMiddleware:authorizeRowRead:catch-1",
       params: { error },
     });
     return res.json({

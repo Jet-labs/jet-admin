@@ -372,6 +372,7 @@ export const LOCAL_CONSTANTS = {
       getSchemaStatistics: () => `/admin_api/schemas/statistics`,
     },
     TABLE: {
+      addTable: () => `/admin_api/tables`,
       getAllTables: () => `/admin_api/tables`,
       getAllTableColumns: () => `/admin_api/tables/columns`,
 
