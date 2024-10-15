@@ -12,6 +12,7 @@ import { useThemeValue } from "../../../../contexts/themeContext";
 import { containsOnly } from "../../../../utils/array";
 import { displayError } from "../../../../utils/notification";
 import { CRUDPermissionCheckboxGroup } from "../CRUDPermissionCheckboxGroup";
+import { FaDatabase } from "react-icons/fa";
 export const TablePolicyEditor = ({ value, handleChange }) => {
   const { themeType } = useThemeValue();
   const {
@@ -71,8 +72,9 @@ export const TablePolicyEditor = ({ value, handleChange }) => {
     >
       <span
         style={{ background: theme.palette.background.paper }}
-        className="!font-bold pl-2 py-2 rounded-t"
+        className="!font-bold pl-2 py-2 rounded-t flex flex-row justify-start items-center"
       >
+        <FaDatabase size={18} className="!text-xs mr-2" />
         {capitalize("Tables")}
       </span>
       <Divider />

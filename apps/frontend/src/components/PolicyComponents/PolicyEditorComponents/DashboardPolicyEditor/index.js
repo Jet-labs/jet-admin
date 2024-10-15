@@ -10,6 +10,7 @@ import { containsOnly } from "../../../../utils/array";
 import { displayError } from "../../../../utils/notification";
 import { CRUDPermissionCheckboxGroup } from "../CRUDPermissionCheckboxGroup";
 import { useThemeValue } from "../../../../contexts/themeContext";
+import { RiDashboard2Fill } from "react-icons/ri";
 export const DashboardPolicyEditor = ({ value, handleChange }) => {
   const { themeType } = useThemeValue();
   const [tab, setTab] = useState(
@@ -44,8 +45,9 @@ export const DashboardPolicyEditor = ({ value, handleChange }) => {
     >
       <span
         style={{ background: theme.palette.background.paper }}
-        className="!font-bold pl-2 py-2 rounded-t"
+        className="!font-bold pl-2 py-2 rounded-t flex flex-row justify-start items-center"
       >
+        <RiDashboard2Fill size={18} className="!text-xs mr-2" />
         {capitalize("Dashboards")}
       </span>
       <Divider />

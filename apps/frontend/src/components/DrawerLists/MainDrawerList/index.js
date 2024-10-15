@@ -98,7 +98,7 @@ export const MainDrawerList = ({ currentPageTitle }) => {
                     ? theme.palette.action.selected
                     : theme.palette.background.default,
                 }}
-                className="!rounded !flex !flex-col !justify-center !items-center"
+                className="!rounded !flex !border !flex-col !justify-center !items-center"
               >
                 <ListItemIcon
                   sx={{

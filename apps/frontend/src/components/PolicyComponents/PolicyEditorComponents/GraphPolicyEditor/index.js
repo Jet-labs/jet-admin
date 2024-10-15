@@ -10,6 +10,7 @@ import { containsOnly } from "../../../../utils/array";
 import { displayError } from "../../../../utils/notification";
 import { CRUDPermissionCheckboxGroup } from "../CRUDPermissionCheckboxGroup";
 import { useThemeValue } from "../../../../contexts/themeContext";
+import { FaRegChartBar } from "react-icons/fa";
 export const GraphPolicyEditor = ({ value, handleChange }) => {
   const { themeType } = useThemeValue();
   const [tab, setTab] = useState(
@@ -44,8 +45,9 @@ export const GraphPolicyEditor = ({ value, handleChange }) => {
     >
       <span
         style={{ background: theme.palette.background.paper }}
-        className="!font-bold pl-2 py-2 rounded-t"
+        className="!font-bold pl-2 py-2 rounded-t flex flex-row justify-start items-center"
       >
+        <FaRegChartBar size={18} className="!text-xs mr-2" />
         {capitalize("Graphs")}
       </span>
       <Divider />

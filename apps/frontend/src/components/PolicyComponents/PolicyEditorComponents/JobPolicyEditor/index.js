@@ -10,6 +10,7 @@ import { containsOnly } from "../../../../utils/array";
 import { displayError } from "../../../../utils/notification";
 import { CRUDPermissionCheckboxGroup } from "../CRUDPermissionCheckboxGroup";
 import { useThemeValue } from "../../../../contexts/themeContext";
+import { RiCalendarScheduleFill } from "react-icons/ri";
 
 export const JobPolicyEditor = ({ value, handleChange }) => {
   const { themeType } = useThemeValue();
@@ -45,8 +46,9 @@ export const JobPolicyEditor = ({ value, handleChange }) => {
     >
       <span
         style={{ background: theme.palette.background.paper }}
-        className="!font-bold pl-2 py-2 rounded-t"
+        className="!font-bold pl-2 py-2 rounded-t flex flex-row justify-start items-center"
       >
+        <RiCalendarScheduleFill size={18} className="!text-xs mr-2" />
         {capitalize("Jobs")}
       </span>
       <Divider />
