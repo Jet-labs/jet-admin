@@ -27,9 +27,11 @@ class TriggerService {
     await client.query(`LISTEN ${pmTriggerChannelName}`);
     client.on("notification", async (msg) => {
       const payload = JSON.parse(msg.payload);
-      console.log("Received notification:", payload);
-      // Execute your Node.js code here based on the notification
-      // For example, you might want to trigger an external API call, log data, etc.
+      Logger.log("info", {
+        message:
+          "TriggerService:registerTriggerNotificationChannel:received notification",
+        params: { payload },
+      });
     });
     Logger.log("success", {
       message: "TriggerService:registerTriggerNotificationChannel:success",

@@ -118,6 +118,7 @@ export const MainDrawerList = ({ currentPageTitle }) => {
                     },
                   }}
                   sx={{
+                    display: { xs: "none", lg: "block" },
                     color: isCurrentPage
                       ? theme.palette.primary.main
                       : theme.palette.primary.contrastText,
@@ -127,6 +128,7 @@ export const MainDrawerList = ({ currentPageTitle }) => {
                     marginTop: 4,
                   }}
                   primary={item.text}
+                  // className="!hidden !md:block"
                 />
               </ListItemButton>
             </ListItem>
@@ -140,7 +142,7 @@ export const MainDrawerList = ({ currentPageTitle }) => {
           fontSize: 10,
         }}
       >
-        Version : {LOCAL_CONSTANTS.APP_VERSION}
+        Version {LOCAL_CONSTANTS.APP_VERSION}
       </span>
     </List>
   );
