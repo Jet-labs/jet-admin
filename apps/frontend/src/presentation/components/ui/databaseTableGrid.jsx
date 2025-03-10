@@ -32,6 +32,7 @@ import {
   MdOutlineDensityLarge,
   MdOutlineDensityMedium,
   MdOutlineDensitySmall,
+  MdOutlineRefresh,
 } from "react-icons/md";
 import { DatabaseTableRowsExportForm } from "./databaseTableRowsExportForm";
 import { DatabaseTableRowsDeletionForm } from "./databaseTableRowsDeletionForm";
@@ -855,6 +856,16 @@ export const DatabaseTableGrid = ({
               >
                 <FaPlus className="mr-2 h-4 w-4" />
                 {CONSTANTS.STRINGS.DATABASE_TABLE_VIEW_ADD_FILTER}
+              </button>
+              <button
+                onClick={reloadDatabaseTableRows}
+                className="!outline-none !hover:outline-none flex items-center rounded bg-[#646cff]/10 px-1 py-1 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50"
+              >
+                <MdOutlineRefresh
+                  className={`h-5 w-5 ${
+                    isFetchingDatabaseTableRows ? "animate-spin" : ""
+                  }`}
+                />
               </button>
             </div>
           </div>
