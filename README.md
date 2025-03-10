@@ -1,9 +1,9 @@
 <a href="https://www.producthunt.com/posts/jet-admin-3?embed=true&utm_source=badge-featured&utm_medium=badge&utm_souce=badge-jet&#0045;admin&#0045;3" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=474841&theme=light" alt="Jet&#0032;Admin - PostgreSQL&#0032;tables&#0032;manager&#0032;and&#0032;admin&#0032;dashboard | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
 
-# **Jet Spark** 
+# **Jet Admin** 
 
 ----------
-Welcome to Jet Spark, a web-based PostgreSQL tables manager and admin dashboard for your operations! Edit data, build graphs, and create dashboards using queries.
+Welcome to Jet Admin, a web-based PostgreSQL tables manager and admin dashboard for your operations! Edit data, build graphs, and create dashboards using queries.
 
 ![cover](https://github.com/user-attachments/assets/c6b822d6-90a7-4ac2-8294-8766e684c055)
 
