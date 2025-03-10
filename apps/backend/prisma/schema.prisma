@@ -1,0 +1,176 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model tblTenants {
+  tenantID                    Int                           @id @default(autoincrement())
+  creatorID                   Int?
+  isDisabled                  Boolean?                      @default(false)
+  createdAt                   DateTime?                     @default(now()) @db.Timestamptz(6)
+  updatedAt                   DateTime?                     @default(now()) @db.Timestamptz(6)
+  disabledAt                  DateTime?                     @db.Timestamptz(6)
+  disableReason               String?                       @db.VarChar
+  tenantDBURL                 String?                       @db.VarChar
+  tenantLogoURL               String?                       @db.VarChar
+  tenantName                  String?                       @db.VarChar
+  tblDatabaseCharts           tblDatabaseCharts[]
+  tblDatabaseDashboards       tblDatabaseDashboards[]
+  tblDatabaseQueries          tblDatabaseQueries[]
+  tblRoles                    tblRoles[]
+  tblUsers                    tblUsers?                     @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fktblTenantstblUsersCreatorID")
+  tblUsersTenantsRelationship tblUsersTenantsRelationship[]
+}
+
+model tblUsers {
+  userID                      Int                           @id @default(autoincrement())
+  firebaseID                  String                        @db.VarChar(128)
+  phoneNumber                 String?                       @db.VarChar
+  firstName                   String?                       @db.VarChar
+  lastName                    String?                       @db.VarChar
+  address1                    String?                       @db.VarChar
+  address2                    String?                       @db.VarChar
+  email                       String                        @db.VarChar
+  isDisabled                  Boolean?                      @default(false)
+  createdAt                   DateTime?                     @default(now()) @db.Timestamptz(6)
+  updatedAt                   DateTime?                     @default(now()) @db.Timestamptz(6)
+  disabledAt                  DateTime?                     @db.Timestamptz(6)
+  disableReason               String?                       @db.VarChar
+  lastSeen                    DateTime?                     @db.Timestamptz(6)
+  tblDatabaseCharts           tblDatabaseCharts[]
+  tblDatabaseDashboards       tblDatabaseDashboards[]
+  tblDatabaseQueries          tblDatabaseQueries[]
+  tblTenants                  tblTenants[]
+  tblUsersTenantsRelationship tblUsersTenantsRelationship[]
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model tblUsersTenantsRelationship {
+  tenantID                  Int
+  userID                    Int
+  createdAt                 DateTime                    @default(now()) @db.Timestamptz(6)
+  updatedAt                 DateTime                    @default(now()) @db.Timestamptz(6)
+  role                      String                      @default("MEMBER") @db.VarChar
+  tblUserTenantRoleMappings tblUserTenantRoleMappings[]
+  tblTenants                tblTenants                  @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTenantIDTenantID")
+  tblUsers                  tblUsers                    @relation(fields: [userID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkUserIDUserID")
+
+  @@id([tenantID, userID], map: "pktblUsersTenantsRelationship")
+  @@unique([tenantID, userID], map: "uniquetblUsersTenantsRelationship")
+}
+
+model tblDatabaseQueries {
+  databaseQueryID               Int                             @id(map: "pktblDatabaseQueries") @default(autoincrement())
+  tenantID                      Int
+  createdAt                     DateTime                        @default(now()) @db.Timestamptz(6)
+  updatedAt                     DateTime                        @default(now()) @db.Timestamptz(6)
+  disabledAt                    DateTime?                       @db.Timestamptz(6)
+  isDisabled                    Boolean?                        @default(false)
+  databaseQueryTitle            String                          @default("Untitled") @db.VarChar
+  databaseQueryDescription      String?                         @db.VarChar
+  databaseQuery                 Json?                           @db.Json
+  runOnLoad                     Boolean?
+  databaseQueryResultSchema     Json?                           @db.Json
+  creatorID                     Int?
+  tblDatabaseChartQueryMappings tblDatabaseChartQueryMappings[]
+  tblUsers                      tblUsers?                       @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDatabaseQueriesCreatorID")
+  tblTenants                    tblTenants                      @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTenantIDTenantID")
+}
+
+model tblPermissions {
+  permissionID              Int                         @id(map: "tblPermission_pkey") @default(autoincrement())
+  permissionName            String                      @db.VarChar
+  permissionDescription     String?                     @db.VarChar
+  tblRolePermissionMappings tblRolePermissionMappings[]
+}
+
+model tblRolePermissionMappings {
+  roleID         Int
+  permissionID   Int
+  tblPermissions tblPermissions @relation(fields: [permissionID], references: [permissionID], onDelete: NoAction, onUpdate: NoAction, map: "fktblRolePermissionMappingsPermission")
+  tblRoles       tblRoles       @relation(fields: [roleID], references: [roleID], onDelete: NoAction, onUpdate: NoAction, map: "fktblRolePermissionMappingsRole")
+
+  @@id([roleID, permissionID])
+}
+
+model tblRoles {
+  roleID                    Int                         @id(map: "tblroles_pkey") @default(autoincrement())
+  roleName                  String                      @db.VarChar
+  roleDescription           String?                     @db.VarChar
+  tenantID                  Int?
+  tblRolePermissionMappings tblRolePermissionMappings[]
+  tblTenants                tblTenants?                 @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fktblRolesTenantIDTblTenantsTenantID")
+  tblUserTenantRoleMappings tblUserTenantRoleMappings[]
+}
+
+model tblUserTenantRoleMappings {
+  userID                      Int
+  tenantID                    Int
+  roleID                      Int
+  tblRoles                    tblRoles                    @relation(fields: [roleID], references: [roleID], onUpdate: NoAction, map: "fkUserTenantRoleRole")
+  tblUsersTenantsRelationship tblUsersTenantsRelationship @relation(fields: [tenantID, userID], references: [tenantID, userID], onDelete: Cascade, onUpdate: NoAction, map: "fkUserTenantRoleUserTenant")
+
+  @@id([userID, tenantID, roleID])
+}
+
+model tblDatabaseChartQueryMappings {
+  databaseChartID    Int
+  databaseQueryID    Int
+  parameters         Json?
+  title              String?
+  executionOrder     Int?
+  datasetFields      Json?
+  argsMap            Json?
+  tblDatabaseCharts  tblDatabaseCharts  @relation(fields: [databaseChartID], references: [databaseChartID], onDelete: Cascade, onUpdate: NoAction)
+  tblDatabaseQueries tblDatabaseQueries @relation(fields: [databaseQueryID], references: [databaseQueryID], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([databaseChartID, databaseQueryID])
+}
+
+model tblDatabaseCharts {
+  databaseChartID                   Int                                 @id @default(autoincrement())
+  databaseChartName                 String
+  databaseChartDescription          String?
+  databaseChartType                 String
+  databaseChartConfig               Json
+  databaseChartMultiQueryConfig     Json?
+  createdAt                         DateTime?                           @default(now()) @db.Timestamptz(6)
+  updatedAt                         DateTime?                           @default(now()) @db.Timestamptz(6)
+  tenantID                          Int
+  creatorID                         Int?
+  refreshInterval                   Int?
+  tblDatabaseChartQueryMappings     tblDatabaseChartQueryMappings[]
+  tblUsers                          tblUsers?                           @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDatabaseChartsCreatorID")
+  tblTenants                        tblTenants                          @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDatabaseChartsTenantIDTenantID")
+  tblDatabaseDashboardChartMappings tblDatabaseDashboardChartMappings[]
+}
+
+model tblDatabaseDashboardChartMappings {
+  databaseChartID       Int
+  databaseDashboardID   Int
+  parameters            Json?
+  title                 String                @db.VarChar
+  tblDatabaseCharts     tblDatabaseCharts     @relation(fields: [databaseChartID], references: [databaseChartID], onDelete: NoAction, onUpdate: NoAction)
+  tblDatabaseDashboards tblDatabaseDashboards @relation(fields: [databaseDashboardID], references: [databaseDashboardID], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([databaseChartID, databaseDashboardID], map: "pkTblDatabaseDashboardChartMappings")
+}
+
+model tblDatabaseDashboards {
+  databaseDashboardID               Int                                 @id @default(autoincrement())
+  databaseDashboardDescription      String?                             @db.VarChar
+  tenantID                          Int
+  createdAt                         DateTime?                           @default(now()) @db.Timestamptz(6)
+  updatedAt                         DateTime?                           @default(now()) @db.Timestamptz(6)
+  creatorID                         Int?
+  databaseDashboardConfig           Json?
+  databaseDashboardName             String                              @db.VarChar
+  tblDatabaseDashboardChartMappings tblDatabaseDashboardChartMappings[]
+  tblUsers                          tblUsers?                           @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDatabaseDashboardCreatorID")
+  tblTenants                        tblTenants                          @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDatabaseDashboardsTenantIDTenantID")
+}
