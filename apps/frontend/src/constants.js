@@ -27,12 +27,14 @@ export const CONSTANTS = {
     DATABASE_TABLE_VIEW_CHANGES_DELETE_ROWS_DIALOG_DESCRIPTION:
       "Are you sure you want to delete the selected table rows?.This action cannot be undone.",
     DATABASE_TABLE_VIEW_CHANGES_DELETED_SUCCESS: "Rows deleted successfully!",
-    DATABASE_TABLE_VIEW_CHANGES_DELETED_SUCCESS: "Rows deleted successfully!",
+    DATABASE_TABLE_VIEW_CHANGES_EXPORTED_SUCCESS: "Rows exported successfully!",
     DATABASE_TABLE_VIEW_CHANGES_SAVED_SUCCESS: "Changes saved successfully!",
     DATABASE_TABLE_VIEW_ADD_FILTER: "Add filter",
     DATABASE_TABLE_VIEW_ADD_ROW: "Add row",
     ROW_EXPORT_CONFIRMATION_TITLE: "Export rows",
     ROW_EXPORT_CONFIRMATION_BODY: "Select row export format",
+    ROW_EXPORT_CONFIRMATION_CANCEL_BUTTON: "Cancel",
+    ROW_EXPORT_CONFIRMATION_BUTTON: "Export rows",
     EXPORT_BUTTON_TEXT: "Export data",
     MAIN_DRAWER_DATABASE_SCHEMA_TITLE: "Database Schemas",
     MAIN_DRAWER_DATABASE_DASHBOARDS_TITLE: "Dashboards",
@@ -783,6 +785,12 @@ export const CONSTANTS = {
         databaseTableName,
       }) =>
         `/api/v1/tenants/${tenantID}/database/schemas/${databaseSchemaName}/tables/${databaseTableName}/rows/delete`,
+      databaseTableBulkRowExportAPI: ({
+        tenantID,
+        databaseSchemaName,
+        databaseTableName,
+      }) =>
+        `/api/v1/tenants/${tenantID}/database/schemas/${databaseSchemaName}/tables/${databaseTableName}/rows/export`,
 
       getAllDatabaseTriggersAPI: (tenantID, databaseSchemaName) =>
         `/api/v1/tenants/${tenantID}/database/schemas/${databaseSchemaName}/triggers`,

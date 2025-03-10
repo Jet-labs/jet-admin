@@ -2,7 +2,7 @@ import axios from "axios";
 import { firebaseAuth } from "../../config/firebase";
 import { CONSTANTS } from "../../constants";
 import { DatabaseTable } from "../models/databaseTable";
-
+import { triggerDownload } from "../../utils/axios";
 
 export const getAllDatabaseTablesAPI = async ({
   tenantID,
@@ -130,14 +130,11 @@ export const deleteDatabaseTableByNameAPI = async ({
       );
     const bearerToken = await firebaseAuth.currentUser.getIdToken();
     if (bearerToken) {
-      const response = await axios.delete(
-        url,
-        {
-          headers: {
-            authorization: `Bearer ${bearerToken}`,
-          },
-        }
-      );
+      const response = await axios.delete(url, {
+        headers: {
+          authorization: `Bearer ${bearerToken}`,
+        },
+      });
       if (response.data && response.data.success === true) {
         return true;
       } else if (response.data.error) {
@@ -404,3 +401,59 @@ export const databaseTableBulkRowDeletionAPI = async ({
   }
 };
 
+export const databaseTableBulkRowExportAPI = async ({
+  tenantID,
+  databaseSchemaName,
+  databaseTableName,
+  query,
+  exportFormat,
+}) => {
+  try {
+    const url =
+      CONSTANTS.SERVER_HOST +
+      CONSTANTS.APIS.DATABASE.databaseTableBulkRowExportAPI({
+        tenantID,
+        databaseSchemaName,
+        databaseTableName,
+      });
+    const bearerToken = await firebaseAuth.currentUser.getIdToken();
+    if (bearerToken) {
+      const response = await axios.patch(
+        url,
+        { query, exportFormat },
+        {
+          responseType: "blob",
+          headers: {
+            authorization: `Bearer ${bearerToken}`,
+          },
+        }
+      );
+
+      if (response.data) {
+        let blob;
+        if (exportFormat === "json") {
+          // Create a FileReader to read the Blob as text
+          const reader = new FileReader();
+          reader.onloadend = function () {
+            const jsonText = reader.result;
+            blob = new Blob([jsonText], { type: "application/json" });
+            triggerDownload(blob, `data.${exportFormat}`);
+          };
+          reader.readAsText(response.data);
+        } else {
+          blob = new Blob([response.data]);
+          triggerDownload(blob, `data.${exportFormat}`);
+        }
+        return true;
+      } else if (response.data.error) {
+        throw response.data.error;
+      } else {
+        throw CONSTANTS.ERROR_CODES.SERVER_ERROR;
+      }
+    } else {
+      throw CONSTANTS.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND;
+    }
+  } catch (error) {
+    throw error;
+  }
+};

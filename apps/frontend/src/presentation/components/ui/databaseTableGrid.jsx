@@ -33,7 +33,8 @@ import {
   MdOutlineDensityMedium,
   MdOutlineDensitySmall,
 } from "react-icons/md";
-import { RiLineHeight } from "react-icons/ri";
+import { DatabaseTableRowsExportForm } from "./databaseTableRowsExportForm";
+import { DatabaseTableRowsDeletionForm } from "./databaseTableRowsDeletionForm";
 /**
  * Returns width for different field types
  */
@@ -480,30 +481,6 @@ export const DatabaseTableGrid = ({
     },
   });
 
-  const {
-    mutate: bulkDeleteDatabaseTableRows,
-    isPending: isBulkDeletingDatabaseTableRows,
-    error: bulkDeleteDatabaseTableRowsError,
-  } = useMutation({
-    mutationFn: () =>
-      databaseTableBulkRowDeletionAPI({
-        tenantID,
-        databaseSchemaName,
-        databaseTableName,
-        query: isAllRowSelectChecked ? filterQuery : multipleSelectedQuery,
-      }),
-    retry: false,
-    onSuccess: () => {
-      displaySuccess(
-        CONSTANTS.STRINGS.DATABASE_TABLE_VIEW_CHANGES_DELETED_SUCCESS
-      );
-      reloadDatabaseTableRows();
-    },
-    onError: (error) => {
-      displayError(error);
-    },
-  });
-
   const databaseTableColumns = databaseTable?.databaseTableColumns;
   const databaseTableConstraints = databaseTable?.databaseTableConstraints;
   const databaseTablePrimaryKey = databaseTable?.primaryKey;
@@ -698,19 +675,6 @@ export const DatabaseTableGrid = ({
         return { query: key, data };
       }),
     });
-  };
-
-  const _handleBulkDeleteDatabaseTableRows = async () => {
-    await showConfirmation({
-      title:
-        CONSTANTS.STRINGS.DATABASE_TABLE_VIEW_CHANGES_DELETE_ROWS_DIALOG_TITLE,
-      message:
-        CONSTANTS.STRINGS
-          .DATABASE_TABLE_VIEW_CHANGES_DELETE_ROWS_DIALOG_DESCRIPTION,
-      confirmText: "Delete",
-      cancelText: "Cancel",
-    });
-    bulkDeleteDatabaseTableRows();
   };
 
   const _handleDataGridRowUpdate = (updatedRow, originalRow) => {
@@ -977,32 +941,33 @@ export const DatabaseTableGrid = ({
                 Select all {databaseTableStatistics.databaseTableRowCount} rows
               </span>
             </div>
-            <button
-              onClick={_handleBulkDeleteDatabaseTableRows}
-              disabled={isBulkDeletingDatabaseTableRows} // Disable button during loading
-              className={`!outline-none !hover:outline-none flex items-center rounded px-2 py-0.5 text-xs ${
-                isBulkDeletingDatabaseTableRows
-                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  : "!outline-none !hover:outline-none flex items-center rounded bg-white px-2 py-0.5 text-xs text-[#ff6e64] border border-[#ff6e64] hover:bg-[#ffebe9] hover:border-[#ff6e64]"
-              }`}
-            >
-              {isBulkDeletingDatabaseTableRows ? (
-                <>
-                  Deleting selected rows...
-                  <CircularProgress
-                    size={16}
-                    color="inherit"
-                    className="!ml-2"
-                  />
-                </>
-              ) : (
-                `Delete ${
-                  isAllRowSelectChecked
-                    ? databaseTableStatistics?.databaseTableRowCount
-                    : _rowSelectionModel?.length
-                } ${_rowSelectionModel?.length == 1 ? "row" : "rows"}`
-              )}
-            </button>
+            <div className="flex flex-row justify-end items-center">
+              <DatabaseTableRowsExportForm
+                tenantID={tenantID}
+                databaseSchemaName={databaseSchemaName}
+                databaseTableName={databaseTableName}
+                filterQuery={filterQuery}
+                isAllRowSelectChecked={isAllRowSelectChecked}
+                databaseTableRowCount={
+                  databaseTableStatistics?.databaseTableRowCount
+                }
+                rowSelectionModel={_rowSelectionModel}
+                multipleSelectedQuery={multipleSelectedQuery}
+              />
+              <DatabaseTableRowsDeletionForm
+                tenantID={tenantID}
+                databaseSchemaName={databaseSchemaName}
+                databaseTableName={databaseTableName}
+                filterQuery={filterQuery}
+                isAllRowSelectChecked={isAllRowSelectChecked}
+                databaseTableRowCount={
+                  databaseTableStatistics?.databaseTableRowCount
+                }
+                rowSelectionModel={_rowSelectionModel}
+                multipleSelectedQuery={multipleSelectedQuery}
+                reloadDatabaseTableRows={reloadDatabaseTableRows}
+              />
+            </div>
           </div>
         )}
         <DatabaseTableColumnFilter
