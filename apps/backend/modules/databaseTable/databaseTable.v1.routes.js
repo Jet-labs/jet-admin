@@ -48,6 +48,11 @@ router.patch(
   authMiddleware.checkUserPermissions(["tenant:database:table:row:delete"]),
   databaseTableController.databaseTableBulkRowDelete
 );
+router.patch(
+  "/:databaseTableName/rows/export",
+  authMiddleware.checkUserPermissions(["tenant:database:table:row:export"]),
+  databaseTableController.databaseTableBulkRowExport
+);
 router.get(
   "/:databaseTableName/statistics",
   authMiddleware.checkUserPermissions(["tenant:database:table:stats"]),

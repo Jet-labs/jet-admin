@@ -31,7 +31,6 @@ const parseDatabaseTableGetRowsQueryParams = (query) => {
   return { filter, orderBy, skip, take };
 };
 
-
 /**
  * Retrieves all database tables in a schema.
  * @param {import("express").Request} req
@@ -421,7 +420,7 @@ databaseTableController.databaseTableBulkRowDelete = async (req, res) => {
         userID: user.userID,
         databaseSchemaName,
         databaseTableName,
-        query
+        query,
       },
     });
 
@@ -440,17 +439,106 @@ databaseTableController.databaseTableBulkRowDelete = async (req, res) => {
         userID: user.userID,
         databaseSchemaName,
         databaseTableName,
-        query
+        query,
       },
     });
 
     return expressUtils.sendResponse(res, true, {
       message: "Bulk row delete completed successfully.",
-      
     });
   } catch (error) {
     Logger.log("error", {
       message: "databaseTableController:databaseTableBulkRowDelete:catch-1",
+      params: {
+        userID: req.user?.userID,
+        databaseSchemaName: req.params?.databaseSchemaName,
+        databaseTableName: req.params?.databaseTableName,
+        error,
+      },
+    });
+    return expressUtils.sendResponse(res, false, {}, error);
+  }
+};
+
+/**
+ * Performs bulk row updates in a single transaction.
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+databaseTableController.databaseTableBulkRowExport = async (req, res) => {
+  try {
+    const { user, dbPool } = req;
+    const { databaseSchemaName, databaseTableName } = req.params;
+    const { query, exportFormat } = req.body;
+    // Validate required parameters
+    if (
+      !databaseSchemaName ||
+      typeof databaseSchemaName !== "string" ||
+      !databaseTableName ||
+      typeof databaseTableName !== "string"
+    ) {
+      throw new Error("Invalid or missing parameters.");
+    }
+
+    Logger.log("info", {
+      message: "databaseTableController:databaseTableBulkRowExport:params",
+      params: {
+        userID: user.userID,
+        databaseSchemaName,
+        databaseTableName,
+        query,
+        exportFormat,
+      },
+    });
+
+    // Perform the bulk row update
+    const exportedData = await databaseTableService.databaseTableBulkRowExport({
+      userID: parseInt(user.userID),
+      dbPool,
+      databaseSchemaName,
+      databaseTableName,
+      query,
+      exportFormat,
+    });
+
+    Logger.log("success", {
+      message: "databaseTableController:databaseTableBulkRowExport:success",
+      params: {
+        userID: user.userID,
+        databaseSchemaName,
+        databaseTableName,
+        query,
+      },
+    });
+
+    // Set response headers based on the export format
+    let contentType, fileName;
+    switch (exportFormat) {
+      case "json":
+        contentType = "application/json";
+        fileName = "export.json";
+        break;
+      case "csv":
+        contentType = "text/csv";
+        fileName = "export.csv";
+        break;
+      case "xlsx":
+        contentType =
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
+        fileName = "export.xlsx";
+        break;
+      default:
+        throw new Error(`Unsupported export format: ${exportFormat}`);
+    }
+
+    // Send the response
+    res.setHeader("Content-Type", contentType);
+    res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
+    return res.send(exportedData);
+
+  } catch (error) {
+    Logger.log("error", {
+      message: "databaseTableController:databaseTableBulkRowExport:catch-1",
       params: {
         userID: req.user?.userID,
         databaseSchemaName: req.params?.databaseSchemaName,

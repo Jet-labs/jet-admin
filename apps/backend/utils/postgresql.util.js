@@ -489,6 +489,35 @@ postgreSQLQueryUtil.databaseTableBulkRowDelete = ({
   }
 };
 
+postgreSQLQueryUtil.databaseTableBulkRowExport = ({
+  databaseSchemaName = "public", // Default schema is 'public'
+  databaseTableName,
+  query, // Optional: If not provided, export all rows
+}) => {
+  // Validate required inputs
+  if (!databaseTableName) {
+    throw new Error("Missing required parameter: databaseTableName.");
+  }
+
+  // Sanitize schema and table names to prevent SQL injection
+  const sanitizedSchemaName = sanitizeIdentifier(databaseSchemaName);
+  const sanitizedTableName = sanitizeIdentifier(databaseTableName);
+
+  // Construct the DELETE query
+  if (query) {
+    // Export rows based on the provided query
+    return `
+      SELECT * FROM "${sanitizedSchemaName}"."${sanitizedTableName}"
+      WHERE ${query};
+    `;
+  } else {
+    // Export all rows if no query is provided
+    return `
+      SELECT * FROM "${sanitizedSchemaName}"."${sanitizedTableName}";
+    `;
+  }
+};
+
 // Helper function to sanitize identifiers (schema/table names)
 function sanitizeIdentifier(identifier) {
   if (!/^[\w\d_]+$/.test(identifier)) {

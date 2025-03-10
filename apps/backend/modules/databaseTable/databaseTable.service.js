@@ -6,6 +6,8 @@ const {
 const { DatabaseTableConstraint } = require("./models/databaseTableContraint");
 const { DatabaseTableColumn } = require("./models/databaseTableColumn");
 const { DatabaseTable } = require("./models/databaseTable");
+const { Parser } = require("json2csv");
+const ExcelJS = require("exceljs");
 const databaseTableService = {};
 
 /**
@@ -566,6 +568,105 @@ databaseTableService.databaseTableBulkRowDelete = async ({
 };
 
 /**
+ * Performs bulk row updates in a single transaction.
+ * @param {object} param0
+ * @param {number} param0.userID
+ * @param {object} param0.dbPool
+ * @param {string} param0.databaseSchemaName
+ * @param {string} param0.databaseTableName
+ * @param {string} param0.query
+ * @param {string} param0.exportFormat
+ * @returns {Promise<boolean>}
+ */
+databaseTableService.databaseTableBulkRowExport = async ({
+  userID,
+  dbPool,
+  databaseSchemaName,
+  databaseTableName,
+  query,
+  exportFormat,
+}) => {
+  Logger.log("info", {
+    message: "databaseTableService:databaseTableBulkRowExport:params",
+    params: {
+      userID,
+      databaseSchemaName,
+      databaseTableName,
+      query,
+      exportFormat,
+    },
+  });
+
+  try {
+    const exportedRows =
+      await TenantAwarePostgreSQLPoolManager.withDatabaseClient(
+        dbPool,
+        async (client) => {
+          return await client.query(
+            postgreSQLQueryUtil.databaseTableBulkRowExport({
+              databaseSchemaName,
+              databaseTableName,
+              query,
+            })
+          );
+        }
+      );
+    Logger.log("success", {
+      message: "databaseTableService:databaseTableBulkRowExport:success",
+      params: {
+        userID,
+        databaseSchemaName,
+        databaseTableName,
+        query,
+        exportFormat,
+      },
+    });
+    // Transform the data based on the export format
+    switch (exportFormat) {
+      case "json":
+        return JSON.stringify(exportedRows.rows, null, 2); // Pretty-print JSON
+
+      case "csv":
+        const json2csvParser = new Parser();
+        return json2csvParser.parse(exportedRows.rows);
+
+      case "xlsx":
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet("Exported Data");
+
+        // Add headers
+        if (exportedRows.rows.length > 0) {
+          const headers = Object.keys(exportedRows.rows[0]);
+          worksheet.addRow(headers);
+
+          // Add rows
+          exportedRows.rows.forEach((row) => {
+            worksheet.addRow(Object.values(row));
+          });
+        }
+
+        // Write to buffer
+        const buffer = await workbook.xlsx.writeBuffer();
+        return buffer;
+
+      default:
+        throw new Error(`Unsupported export format: ${exportFormat}`);
+    }
+  } catch (error) {
+    Logger.log("error", {
+      message: "databaseTableService:databaseTableBulkRowExport:failure",
+      params: {
+        userID,
+        databaseSchemaName,
+        databaseTableName,
+        error: error.message,
+      },
+    });
+    throw error;
+  }
+};
+
+/**
  * Creates a new table.
  * @param {object} param0
  * @param {number} param0.userID
@@ -787,5 +888,7 @@ databaseTableService.deleteDatabaseTable = async ({
     throw error;
   }
 };
+
+
 
 module.exports = { databaseTableService };
