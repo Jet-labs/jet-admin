@@ -464,6 +464,7 @@ databaseChartService.getDatabaseChartDataUsingDatabaseChart = async ({
           databaseChart,
           queryResults,
         });
+        console.log({ processedData: JSON.stringify(processedData) });
         break;
       default:
         processedData = databaseChartProcessor.processBarChartQueryResults({

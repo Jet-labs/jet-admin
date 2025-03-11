@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Draggable } from "react-beautiful-dnd";
 import { IoClose } from "react-icons/io5";
 import { CONSTANTS } from "../../../constants";
@@ -7,7 +7,10 @@ import { GrDrag } from "react-icons/gr";
 import ReactJson from "react-json-view";
 import { CollapseComponent } from "./collapseComponent";
 import { Box } from "@mui/material";
-import { SketchPicker } from "react-color";
+import { DatabaseChartDatasetAdvancedOptions } from "./databaseChartDatasetAdvancedOptions";
+import { IoIosColorFilter } from "react-icons/io";
+import { BiSitemap } from "react-icons/bi";
+import { DatabaseChartDatasetFieldMapping } from "./databaseChartDatasetFieldMapping";
 /**
  * @param {object} param0
  * @param {number} param0.index
@@ -20,11 +23,12 @@ import { SketchPicker } from "react-color";
 export const DatabaseChartDatasetField = ({
   index,
   chartForm,
-  isQueryTestingDialogOpen,
   setSelectedQueryForTesting,
   databaseQueries,
   datasetFields,
 }) => {
+  const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
+  const [showFieldMappingOptions, setShowFieldMappingOptions] = useState(false);
   const _handleDeleteDataset = () => {
     let updatedQueryArrayFieldValue = [...chartForm.values.databaseQueries];
     updatedQueryArrayFieldValue.splice(index, 1);
@@ -54,6 +58,7 @@ export const DatabaseChartDatasetField = ({
   }, [databaseQueries, chartForm.values.databaseQueries, index]);
 
   const _handleTestQuery = useCallback(() => {
+    console.log("query testins", selectedQuery);
     setSelectedQueryForTesting(selectedQuery);
   }, [selectedQuery, setSelectedQueryForTesting]);
 
@@ -83,12 +88,6 @@ export const DatabaseChartDatasetField = ({
         >
           {/* Dataset Title */}
           <div>
-            <label
-              htmlFor={`databaseQueries[${index}].title`}
-              className="block mb-1 text-xs font-normal text-slate-500"
-            >
-              {CONSTANTS.STRINGS.CHART_EDITOR_FORM_DATASET_TITLE_LABEL}
-            </label>
             <input
               type="text"
               name={`databaseQueries[${index}].title`}
@@ -100,6 +99,9 @@ export const DatabaseChartDatasetField = ({
               onChange={chartForm.handleChange}
               onBlur={chartForm.handleBlur}
               value={chartForm.values.databaseQueries[index].title || ""}
+              placeholder={
+                CONSTANTS.STRINGS.CHART_EDITOR_FORM_DATASET_TITLE_LABEL
+              }
             />
             {hasTitleError && (
               <p className="mt-1 text-xs text-red-500">
@@ -109,12 +111,6 @@ export const DatabaseChartDatasetField = ({
           </div>
           {/* Query Selection */}
           <div>
-            <label
-              htmlFor={`databaseQueries[${index}].databaseQueryID`}
-              className="block mb-1 text-xs font-normal text-slate-500"
-            >
-              {CONSTANTS.STRINGS.CHART_EDITOR_FORM_DATASET_QUERY_LABEL}
-            </label>
             <select
               name={`databaseQueries[${index}].databaseQueryID`}
               id={`databaseQueries[${index}].databaseQueryID`}
@@ -134,7 +130,9 @@ export const DatabaseChartDatasetField = ({
                 hasQueryIdError ? "border-red-300" : "border-slate-300"
               } text-slate-700 rounded focus:outline-none focus:border-slate-400 block w-full py-1 px-1.5`}
             >
-              <option value="">Select query dataset</option>
+              <option value="" disabled selected>
+                Select query dataset
+              </option>
               {databaseQueries?.map((databaseQuery) => (
                 <option
                   key={`database_query_item_${databaseQuery.databaseQueryID}`}
@@ -150,29 +148,49 @@ export const DatabaseChartDatasetField = ({
               </p>
             )}
           </div>
-
-          <div>
-            <label
-              htmlFor={`databaseQueries[${index}].color`}
-              className="block mb-1 text-xs font-normal text-slate-500"
+          <div className="grid grid-cols-3 gap-1">
+            <button
+              type="button"
+              onClick={() => setShowFieldMappingOptions(true)}
+              disabled={!selectedQuery}
+              className=" disabled:text-slate-400 disabled:cursor-not-allowed disabled:hover:text-slate-400 disabled:hover:border-slate-300 disabled:hover:bg-transparent focus:outline-none text-xs font-normal hover:text-[#646cff] text-slate-700 flex flex-col gap-1 justify-start items-center bg-slate-100 hover:bg-[#646cff]/10   py-1 px-2 rounded border hover:border-[#646cff] border-slate-300 transition-colors w-fit"
             >
-              {CONSTANTS.STRINGS.CHART_EDITOR_FORM_DATASET_COLOR_LABEL}
-            </label>
-            <input
-              type="color"
-              name={`databaseQueries[${index}].parameters.color`}
-              id={`databaseQueries[${index}].parameters.color`}
-              className={`placeholder:text-slate-400 w-full text-xs bg-slate-50 border ${
-                hasTitleError ? "border-red-300" : "border-slate-300"
-              } text-slate-700 rounded  block py-1 px-1.5 focus:outline-none focus:border-slate-400`}
-              required={true}
-              onChange={chartForm.handleChange}
-              onBlur={chartForm.handleBlur}
-              value={
-                chartForm.values.databaseQueries[index].parameters.color || ""
-              }
-            />
+              <BiSitemap className=" text-2xl" />
+
+              {CONSTANTS.STRINGS.CHART_EDITOR_FORM_DATASET_FIELD_MAPPINGS_LABEL}
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowAdvancedOptions(true)}
+              className="focus:outline-none text-xs font-normal hover:text-[#646cff] text-slate-700 flex flex-col gap-1 justify-start items-center bg-slate-100 hover:bg-[#646cff]/10   py-1 px-2 rounded border hover:border-[#646cff] border-slate-300 transition-colors w-fit"
+            >
+              <IoIosColorFilter className=" text-2xl" />
+              {CONSTANTS.STRINGS.CHART_EDITOR_FORM_DATASET_UI_CONFIG_LABEL}
+            </button>
           </div>
+
+          <DatabaseChartDatasetAdvancedOptions
+            open={showAdvancedOptions}
+            onClose={() => setShowAdvancedOptions(false)}
+            datasetIndex={index}
+            chartForm={chartForm}
+            initialValues={chartForm.values.databaseQueries[index]?.parameters}
+            parentChartType={chartForm.values.databaseChartType}
+          />
+          <DatabaseChartDatasetFieldMapping
+            open={showFieldMappingOptions}
+            onClose={() => setShowFieldMappingOptions(false)}
+            datasetIndex={index}
+            chartForm={chartForm}
+            initialValues={{
+              datasetFields:
+                chartForm.values.databaseQueries[index]?.datasetFields,
+              argsMap: chartForm.values.databaseQueries[index]?.argsMap,
+            }}
+            selectedQuery={selectedQuery}
+            datasetFields={datasetFields}
+          />
+
           {selectedQuery && selectedQuery.databaseQueryResultSchema && (
             <CollapseComponent
               showButtonText={"Query result metadata"}
@@ -364,4 +382,3 @@ export const DatabaseChartDatasetField = ({
     </Draggable>
   );
 };
-

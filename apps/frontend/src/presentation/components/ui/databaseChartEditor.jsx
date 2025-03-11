@@ -5,10 +5,9 @@ import { CONSTANTS } from "../../../constants";
 import { useDatabaseChartsState } from "../../../logic/contexts/databaseChartsContext";
 import { DatabaseChartDatasetField } from "./databaseChartDatasetField";
 import { DATABASE_CHARTS_CONFIG_MAP } from "./graphTypes";
+import { DatabaseQueryTestingPanel } from "./databaseQueryTestingPanel";
 
-export const DatabaseChartEditor = ({
-  databaseChartEditorForm,
-}) => {
+export const DatabaseChartEditor = ({ databaseChartEditorForm }) => {
   const {
     databaseQueries,
     isLoadingDatabaseQueries,
@@ -62,6 +61,10 @@ export const DatabaseChartEditor = ({
 
   return (
     <>
+      <DatabaseQueryTestingPanel
+        selectedQueryForTesting={selectedQueryForTesting}
+        setSelectedQueryForTesting={setSelectedQueryForTesting}
+      />
       <div>
         <label
           for="databaseChartName"

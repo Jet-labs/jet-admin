@@ -29,6 +29,7 @@
     "@uiw/codemirror-theme-vscode": "^4.23.7",
     "@uiw/react-codemirror": "^4.23.7",
     "axios": "^1.7.7",
+    "chartjs-plugin-autocolors": "^0.3.1",
     "firebase": "^11.0.1",
     "formik": "^2.4.6",
     "lodash": "^4.17.21",

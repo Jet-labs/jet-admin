@@ -246,7 +246,7 @@ export const DATABASE_CHARTS_CONFIG_MAP = {
     icon: <FaChartLine className="!text-lg" />,
   },
   BUBBLE: {
-    label: "Scatter",
+    label: "Bubble",
     value: CONSTANTS.DATABASE_CHART_TYPES.BUBBLE_CHART.value,
     datasetFields: ["xAxis", "yAxis", "radius"],
     chartFields: {

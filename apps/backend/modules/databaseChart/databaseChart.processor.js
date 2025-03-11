@@ -46,7 +46,7 @@ databaseChartProcessor.processBarChartQueryResults = ({
     return {
       label: mapping.title,
       data: sortedLabels.map((x) => dataMap.get(x) ?? 0),
-      backgroundColor: mapping.parameters?.color || "#007bff",
+      backgroundColor: mapping.parameters?.backgroundColor || "#007bff",
     };
   });
 

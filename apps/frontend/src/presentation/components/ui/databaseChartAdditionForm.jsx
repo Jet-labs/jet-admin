@@ -27,7 +27,8 @@ const initialValues = {
       title: "",
       databaseQueryID: null,
       parameters: {
-        color: "#D84545",
+        backgroundColor: "#D84545",
+        borderWidth: 1,
       },
       argsMap: {},
       datasetFields: {
@@ -68,7 +69,6 @@ const validationSchema = Yup.object().shape({
 
 export const DatabaseChartAdditionForm = ({ tenantID, databaseSchemaName }) => {
   const queryClient = useQueryClient();
-  const [selectedQueryForTesting, setSelectedQueryForTesting] = useState(false);
   const [databaseChartFetchedData, setDatabaseChartFetchedData] =
     useState(null);
 
@@ -132,7 +132,9 @@ export const DatabaseChartAdditionForm = ({ tenantID, databaseSchemaName }) => {
     },
   });
 
-  console.log({ addDatabaseChartForm: addDatabaseChartForm.values });
+  console.log({
+    addDatabaseChartForm: addDatabaseChartForm.values,
+  });
 
   const _handleFetchDatabaseChartData = useCallback(() => {
     if (addDatabaseChartForm && addDatabaseChartForm.values) {
@@ -145,10 +147,7 @@ export const DatabaseChartAdditionForm = ({ tenantID, databaseSchemaName }) => {
       <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl text-start w-full p-3">
         {CONSTANTS.STRINGS.ADD_CHART_FORM_TITLE}
       </h1>
-      <DatabaseQueryTestingPanel
-        selectedQueryForTesting={selectedQueryForTesting}
-        setSelectedQueryForTesting={setSelectedQueryForTesting}
-      />
+
       <ResizablePanelGroup
         direction="horizontal"
         autoSaveId={
