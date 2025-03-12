@@ -15,6 +15,7 @@ export const DatabaseChartPreview = ({
   isRefreshingData,
   refreshData,
 }) => {
+  console.log({ databaseChartType });
   return (
     <div className="h-full w-full flex flex-col">
       <div className="w-full flex flex-row justify-end items-center bg-slate-100 border-b border-b-slate-200 p-2">

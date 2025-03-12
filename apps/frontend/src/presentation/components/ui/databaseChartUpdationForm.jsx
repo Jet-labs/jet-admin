@@ -171,7 +171,7 @@ export const DatabaseChartUpdationForm = ({ tenantID, databaseChartID }) => {
       );
       updateDatabaseChartForm.setFieldValue(
         "databaseChartType",
-        databaseChart.databaseChartType || DATABASE_CHARTS_CONFIG_MAP.BAR.value
+        databaseChart.databaseChartType || DATABASE_CHARTS_CONFIG_MAP.bar.value
       );
       updateDatabaseChartForm.setFieldValue(
         "databaseChartDescription",

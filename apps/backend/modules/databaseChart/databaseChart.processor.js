@@ -44,9 +44,9 @@ databaseChartProcessor.processBarChartQueryResults = ({
     const dataMap = new Map(result.map((row) => [row[xAxis], row[yAxis]]));
 
     return {
+      ...mapping.parameters,
       label: mapping.title,
       data: sortedLabels.map((x) => dataMap.get(x) ?? 0),
-      backgroundColor: mapping.parameters?.backgroundColor || "#007bff",
     };
   });
 
@@ -94,9 +94,9 @@ databaseChartProcessor.processLineChartQueryResults = ({
     const dataMap = new Map(result.map((row) => [row[xAxis], row[yAxis]]));
 
     return {
+      ...mapping.parameters,
       label: mapping.title,
       data: sortedLabels.map((x) => dataMap.get(x) ?? 0),
-      backgroundColor: mapping.parameters?.color || "#007bff",
     };
   });
 

@@ -112,31 +112,31 @@ const constants = {
   DATABASE_CHART_TYPES: {
     BAR_CHART: {
       name: "Bar Chart",
-      value: "BAR",
+      value: "bar",
     },
     LINE_CHART: {
       name: "Line Chart",
-      value: "LINE",
+      value: "line",
     },
     PIE_CHART: {
       name: "Pie Chart",
-      value: "PIE",
+      value: "pie",
     },
     DONUT_CHART: {
       name: "Donut Chart",
-      value: "DONUT",
+      value: "donut",
     },
     SCATTER_CHART: {
       name: "Scatter Chart",
-      value: "SCATTER",
+      value: "scatter",
     },
     RADAR_CHART: {
       name: "Radar Chart",
-      value: "RADAR",
+      value: "radar",
     },
     RADIAL_CHART: {
       name: "Radial Bar Chart",
-      value: "RADIAL",
+      value: "radial",
     },
   },
 };

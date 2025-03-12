@@ -15,7 +15,7 @@ import { CONSTANTS } from "../../../../constants";
 import { BubbleChartComponent } from "./bubbleChartComponent";
 export const ALL_DATABASE_FIELDS = {};
 export const DATABASE_CHARTS_CONFIG_MAP = {
-  BAR: {
+  bar: {
     label: "Bar",
     value: CONSTANTS.DATABASE_CHART_TYPES.BAR_CHART.value,
     datasetFields: ["xAxis", "yAxis"],
@@ -53,7 +53,7 @@ export const DATABASE_CHARTS_CONFIG_MAP = {
     ),
     icon: <FaChartBar className="!text-lg" />,
   },
-  LINE: {
+  line: {
     label: "Line",
     value: CONSTANTS.DATABASE_CHART_TYPES.LINE_CHART.value,
     datasetFields: ["xAxis", "yAxis"],
@@ -85,7 +85,7 @@ export const DATABASE_CHARTS_CONFIG_MAP = {
     ),
     icon: <FaChartLine className="!text-lg" />,
   },
-  PIE: {
+  pie: {
     label: "Pie",
     value: CONSTANTS.DATABASE_CHART_TYPES.PIE_CHART.value,
     datasetFields: ["label", "value"],
@@ -117,7 +117,7 @@ export const DATABASE_CHARTS_CONFIG_MAP = {
     ),
     icon: <FaChartPie className="!text-lg" />,
   },
-  DONUT: {
+  donut: {
     label: "Donut",
     value: CONSTANTS.DATABASE_CHART_TYPES.DONUT_CHART.value,
     datasetFields: ["label", "value"],
@@ -149,7 +149,7 @@ export const DATABASE_CHARTS_CONFIG_MAP = {
     ),
     icon: <BiSolidDoughnutChart className="!text-lg" />,
   },
-  RADIAL: {
+  radial: {
     label: "Radial",
     value: CONSTANTS.DATABASE_CHART_TYPES.RADIAL_CHART.value,
     datasetFields: ["label", "value"],
@@ -181,7 +181,7 @@ export const DATABASE_CHARTS_CONFIG_MAP = {
     ),
     icon: <PiChartPolar className="!text-lg" />,
   },
-  RADAR: {
+  radar: {
     label: "Radar",
     value: CONSTANTS.DATABASE_CHART_TYPES.RADAR_CHART.value,
     datasetFields: ["label", "value"],
@@ -213,7 +213,7 @@ export const DATABASE_CHARTS_CONFIG_MAP = {
     ),
     icon: <BiRadar className="!text-lg" />,
   },
-  SCATTER: {
+  scatter: {
     label: "Scatter",
     value: CONSTANTS.DATABASE_CHART_TYPES.SCATTER_CHART.value,
     datasetFields: ["xAxis", "yAxis"],
@@ -245,7 +245,7 @@ export const DATABASE_CHARTS_CONFIG_MAP = {
     ),
     icon: <FaChartLine className="!text-lg" />,
   },
-  BUBBLE: {
+  bubble: {
     label: "Bubble",
     value: CONSTANTS.DATABASE_CHART_TYPES.BUBBLE_CHART.value,
     datasetFields: ["xAxis", "yAxis", "radius"],
