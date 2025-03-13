@@ -145,9 +145,9 @@ databaseChartProcessor.processPieChartQueryResults = ({
     const dataMap = new Map(result.map((row) => [row[label], row[value]]));
 
     return {
+      ...mapping.parameters,
       label: mapping.title,
       data: sortedLabels.map((x) => dataMap.get(x) ?? 0),
-      backgroundColor: mapping.parameters?.color || "#007bff",
     };
   });
 
@@ -162,7 +162,7 @@ databaseChartProcessor.processPieChartQueryResults = ({
  * @param {Array<Object>} params.queryResults - Array of query results from execution
  * @returns {Object} Chart.js compatible data structure with labels and datasets
  */
-databaseChartProcessor.processDonutChartQueryResults = ({
+databaseChartProcessor.processDoughnutChartQueryResults = ({
   databaseChart,
   queryResults,
 }) => {
@@ -196,9 +196,9 @@ databaseChartProcessor.processDonutChartQueryResults = ({
     const dataMap = new Map(result.map((row) => [row[label], row[value]]));
 
     return {
+      ...mapping.parameters,
       label: mapping.title,
       data: sortedLabels.map((x) => dataMap.get(x) ?? 0),
-      backgroundColor: mapping.parameters?.color || "#007bff",
     };
   });
 
@@ -228,15 +228,14 @@ databaseChartProcessor.processScatterChartQueryResults = ({
     }));
 
     return {
+      ...mapping.parameters,
       label: mapping.title,
       data: data,
-      backgroundColor: mapping.parameters?.color || "#007bff",
+
       // Preserve other dataset properties if needed
       // pointRadius: mapping.parameters?.pointRadius || 3,
     };
   });
-
-  console.log({ datasets });
   return { datasets };
 };
 
@@ -282,9 +281,9 @@ databaseChartProcessor.processRadialChartQueryResults = ({
     const dataMap = new Map(result.map((row) => [row[label], row[value]]));
 
     return {
+      ...mapping.parameters,
       label: mapping.title,
       data: sortedLabels.map((x) => dataMap.get(x) ?? 0),
-      backgroundColor: mapping.parameters?.color || "#007bff",
     };
   });
 
@@ -333,9 +332,9 @@ databaseChartProcessor.processRadarChartQueryResults = ({
     const dataMap = new Map(result.map((row) => [row[label], row[value]]));
 
     return {
+      ...mapping.parameters,
       label: mapping.title,
       data: sortedLabels.map((x) => dataMap.get(x) ?? 0),
-      backgroundColor: mapping.parameters?.color || "#007bff",
     };
   });
 

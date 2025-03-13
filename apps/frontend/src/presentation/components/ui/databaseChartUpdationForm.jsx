@@ -33,6 +33,7 @@ const initialValues = {
       databaseQueryID: null,
       parameters: {
         color: "#D84545",
+        type: CONSTANTS.DATABASE_CHART_TYPES.BAR_CHART.value,
       },
       argsMap: {},
       datasetFields: {

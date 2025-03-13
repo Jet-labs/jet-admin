@@ -282,11 +282,13 @@ databaseChartService.getDatabaseChartDataByID = async ({
           queryResults,
         });
         break;
-      case constants.DATABASE_CHART_TYPES.DONUT_CHART.value:
-        processedData = databaseChartProcessor.processDonutChartQueryResults({
-          databaseChart,
-          queryResults,
-        });
+      case constants.DATABASE_CHART_TYPES.DOUGHNUT_CHART.value:
+        processedData = databaseChartProcessor.processDoughnutChartQueryResults(
+          {
+            databaseChart,
+            queryResults,
+          }
+        );
         break;
       case constants.DATABASE_CHART_TYPES.PIE_CHART.value:
         processedData = databaseChartProcessor.processPieChartQueryResults({
@@ -435,11 +437,13 @@ databaseChartService.getDatabaseChartDataUsingDatabaseChart = async ({
           queryResults,
         });
         break;
-      case constants.DATABASE_CHART_TYPES.DONUT_CHART.value:
-        processedData = databaseChartProcessor.processDonutChartQueryResults({
-          databaseChart,
-          queryResults,
-        });
+      case constants.DATABASE_CHART_TYPES.DOUGHNUT_CHART.value:
+        processedData = databaseChartProcessor.processDoughnutChartQueryResults(
+          {
+            databaseChart,
+            queryResults,
+          }
+        );
         break;
       case constants.DATABASE_CHART_TYPES.PIE_CHART.value:
         processedData = databaseChartProcessor.processPieChartQueryResults({

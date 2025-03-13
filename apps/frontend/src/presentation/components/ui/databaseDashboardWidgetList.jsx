@@ -21,7 +21,7 @@ export const DatabaseDashboardWidgetList = ({}) => {
         return <FaChartLine className="text-slate-700 mr-3 !text-xl" />;
       case CONSTANTS.DATABASE_CHART_TYPES.PIE_CHART.value:
         return <FaChartPie className="text-slate-700 mr-3 !text-xl" />;
-      case CONSTANTS.DATABASE_CHART_TYPES.DONUT_CHART.value:
+      case CONSTANTS.DATABASE_CHART_TYPES.DOUGHNUT_CHART.value:
         return (
           <BiSolidDoughnutChart className="text-slate-700 mr-3 !text-xl" />
         );

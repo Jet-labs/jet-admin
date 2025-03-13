@@ -4,13 +4,12 @@ import { IoClose } from "react-icons/io5";
 import { CONSTANTS } from "../../../constants";
 import { DatabaseQuery } from "../../../data/models/databaseQuery";
 import { GrDrag } from "react-icons/gr";
-import ReactJson from "react-json-view";
-import { CollapseComponent } from "./collapseComponent";
-import { Box } from "@mui/material";
+
 import { DatabaseChartDatasetAdvancedOptions } from "./databaseChartDatasetAdvancedOptions";
 import { IoIosColorFilter } from "react-icons/io";
 import { BiSitemap } from "react-icons/bi";
 import { DatabaseChartDatasetFieldMapping } from "./databaseChartDatasetFieldMapping";
+import { DatabaseChartDatasetArguments } from "./databaseChartDatasetArguments";
 /**
  * @param {object} param0
  * @param {number} param0.index
@@ -29,6 +28,7 @@ export const DatabaseChartDatasetField = ({
 }) => {
   const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
   const [showFieldMappingOptions, setShowFieldMappingOptions] = useState(false);
+  const [showArgumentsOptions, setShowArgumentsOptions] = useState(false);
   const _handleDeleteDataset = () => {
     let updatedQueryArrayFieldValue = [...chartForm.values.databaseQueries];
     updatedQueryArrayFieldValue.splice(index, 1);
@@ -151,9 +151,19 @@ export const DatabaseChartDatasetField = ({
           <div className="grid grid-cols-3 gap-1">
             <button
               type="button"
+              onClick={() => setShowArgumentsOptions(true)}
+              disabled={!selectedQuery?.databaseQuery?.args?.length}
+              className=" disabled:text-slate-400 disabled:cursor-not-allowed disabled:hover:text-slate-400 disabled:hover:border-slate-300 disabled:hover:bg-transparent focus:outline-none text-xs font-normal hover:text-[#646cff] text-slate-700 flex flex-col gap-1 justify-start items-center bg-slate-100 hover:bg-[#646cff]/10   py-1 px-2 rounded border hover:border-[#646cff] border-slate-300 transition-colors w-full"
+            >
+              <BiSitemap className=" text-2xl" />
+
+              {CONSTANTS.STRINGS.CHART_EDITOR_FORM_DATASET_ARGUMENTS_LABEL}
+            </button>
+            <button
+              type="button"
               onClick={() => setShowFieldMappingOptions(true)}
               disabled={!selectedQuery}
-              className=" disabled:text-slate-400 disabled:cursor-not-allowed disabled:hover:text-slate-400 disabled:hover:border-slate-300 disabled:hover:bg-transparent focus:outline-none text-xs font-normal hover:text-[#646cff] text-slate-700 flex flex-col gap-1 justify-start items-center bg-slate-100 hover:bg-[#646cff]/10   py-1 px-2 rounded border hover:border-[#646cff] border-slate-300 transition-colors w-fit"
+              className=" disabled:text-slate-400 disabled:cursor-not-allowed disabled:hover:text-slate-400 disabled:hover:border-slate-300 disabled:hover:bg-transparent focus:outline-none text-xs font-normal hover:text-[#646cff] text-slate-700 flex flex-col gap-1 justify-start items-center bg-slate-100 hover:bg-[#646cff]/10   py-1 px-2 rounded border hover:border-[#646cff] border-slate-300 transition-colors w-full"
             >
               <BiSitemap className=" text-2xl" />
 
@@ -162,7 +172,7 @@ export const DatabaseChartDatasetField = ({
             <button
               type="button"
               onClick={() => setShowAdvancedOptions(true)}
-              className="focus:outline-none text-xs font-normal hover:text-[#646cff] text-slate-700 flex flex-col gap-1 justify-start items-center bg-slate-100 hover:bg-[#646cff]/10   py-1 px-2 rounded border hover:border-[#646cff] border-slate-300 transition-colors w-fit"
+              className="focus:outline-none text-xs font-normal hover:text-[#646cff] text-slate-700 flex flex-col gap-1 justify-start items-center bg-slate-100 hover:bg-[#646cff]/10   py-1 px-2 rounded border hover:border-[#646cff] border-slate-300 transition-colors w-full"
             >
               <IoIosColorFilter className=" text-2xl" />
               {CONSTANTS.STRINGS.CHART_EDITOR_FORM_DATASET_UI_CONFIG_LABEL}
@@ -190,167 +200,17 @@ export const DatabaseChartDatasetField = ({
             selectedQuery={selectedQuery}
             datasetFields={datasetFields}
           />
+          <DatabaseChartDatasetArguments
+            open={showArgumentsOptions}
+            onClose={() => setShowArgumentsOptions(false)}
+            datasetIndex={index}
+            chartForm={chartForm}
+            initialValues={{
+              argsMap: chartForm.values.databaseQueries[index]?.argsMap,
+            }}
+            selectedQuery={selectedQuery}
+          />
 
-          {selectedQuery && selectedQuery.databaseQueryResultSchema && (
-            <CollapseComponent
-              showButtonText={"Query result metadata"}
-              hideButtonText={"Hide"}
-              containerClass={"mt-2"}
-              content={() => (
-                <Box
-                  sx={{ bgcolor: "background.secondary" }}
-                  className="!max-h-32 !overflow-y-auto"
-                >
-                  <ReactJson
-                    src={selectedQuery.databaseQueryResultSchema}
-                    theme={"ashes"}
-                  />
-                </Box>
-              )}
-            />
-          )}
-          {/* Query Arguments */}
-          {selectedQuery?.databaseQuery?.args?.length > 0 && (
-            <div>
-              <label className="block mb-2 text-xs font-normal text-slate-500">
-                {CONSTANTS.STRINGS.CHART_EDITOR_FORM_DATASET_ARGUMENTS_LABEL}
-              </label>
-              <div className="space-y-2">
-                {selectedQuery.databaseQuery.args.map((arg, argIndex) => {
-                  const argName = arg.replace(/[{}]/g, "");
-                  return (
-                    <div key={`arg-${index}-${argIndex}`}>
-                      <input
-                        type="text"
-                        id={`arg-${index}-${argName}`}
-                        className="placeholder:text-slate-400 text-xs w-full bg-slate-50 border border-slate-300 text-slate-700 rounded focus:outline-none focus:border-slate-400 block px-2.5 py-1.5"
-                        placeholder={`Value for ${argName}`}
-                        value={
-                          chartForm.values.databaseQueries[index].argsMap?.[
-                            argName
-                          ] || ""
-                        }
-                        onChange={(e) =>
-                          _handleUpdateDatasetQueryArgs(argName, e.target.value)
-                        }
-                        onBlur={chartForm.handleBlur}
-                      />
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-          <div className="grid grid-cols-2 gap-2">
-            {datasetFields?.includes("xAxis") && (
-              <div>
-                <label
-                  htmlFor={`databaseQueries[${index}].datasetFields.xAxis`}
-                  className="block mb-1 text-xs font-normal text-slate-500"
-                >
-                  {
-                    CONSTANTS.STRINGS
-                      .CHART_EDITOR_FORM_DATASET_FIELD_X_AXIS_LABEL
-                  }
-                </label>
-                <input
-                  type="text"
-                  name={`databaseQueries[${index}].datasetFields.xAxis`}
-                  id={`databaseQueries[${index}].datasetFields.xAxis`}
-                  className={`placeholder:text-slate-400 w-full text-xs bg-slate-50 border ${
-                    hasTitleError ? "border-red-300" : "border-slate-300"
-                  } text-slate-700 rounded  block py-1 px-1.5 focus:outline-none focus:border-slate-400`}
-                  required={true}
-                  onChange={chartForm.handleChange}
-                  onBlur={chartForm.handleBlur}
-                  value={
-                    chartForm.values.databaseQueries[index].datasetFields?.xAxis
-                  }
-                />
-              </div>
-            )}
-            {datasetFields?.includes("yAxis") && (
-              <div>
-                <label
-                  htmlFor={`databaseQueries[${index}].datasetFields.yAxis`}
-                  className="block mb-1 text-xs font-normal text-slate-500"
-                >
-                  {
-                    CONSTANTS.STRINGS
-                      .CHART_EDITOR_FORM_DATASET_FIELD_Y_AXIS_LABEL
-                  }
-                </label>
-                <input
-                  type="text"
-                  name={`databaseQueries[${index}].datasetFields.yAxis`}
-                  id={`databaseQueries[${index}].datasetFields.yAxis`}
-                  className={`placeholder:text-slate-400 w-full text-xs bg-slate-50 border ${
-                    hasTitleError ? "border-red-300" : "border-slate-300"
-                  } text-slate-700 rounded  block py-1 px-1.5 focus:outline-none focus:border-slate-400`}
-                  required={true}
-                  onChange={chartForm.handleChange}
-                  onBlur={chartForm.handleBlur}
-                  value={
-                    chartForm.values.databaseQueries[index].datasetFields?.yAxis
-                  }
-                />
-              </div>
-            )}
-            {datasetFields?.includes("label") && (
-              <div>
-                <label
-                  htmlFor={`databaseQueries[${index}].datasetFields.label`}
-                  className="block mb-1 text-xs font-normal text-slate-500"
-                >
-                  {
-                    CONSTANTS.STRINGS
-                      .CHART_EDITOR_FORM_DATASET_FIELD_LABEL_LABEL
-                  }
-                </label>
-                <input
-                  type="text"
-                  name={`databaseQueries[${index}].datasetFields.label`}
-                  id={`databaseQueries[${index}].datasetFields.label`}
-                  className={`placeholder:text-slate-400 w-full text-xs bg-slate-50 border ${
-                    hasTitleError ? "border-red-300" : "border-slate-300"
-                  } text-slate-700 rounded  block py-1 px-1.5 focus:outline-none focus:border-slate-400`}
-                  required={true}
-                  onChange={chartForm.handleChange}
-                  onBlur={chartForm.handleBlur}
-                  value={
-                    chartForm.values.databaseQueries[index].datasetFields?.label
-                  }
-                />
-              </div>
-            )}
-            {datasetFields?.includes("value") && (
-              <div>
-                <label
-                  htmlFor={`databaseQueries[${index}].datasetFields.value`}
-                  className="block mb-1 text-xs font-normal text-slate-500"
-                >
-                  {
-                    CONSTANTS.STRINGS
-                      .CHART_EDITOR_FORM_DATASET_FIELD_VALUE_LABEL
-                  }
-                </label>
-                <input
-                  type="text"
-                  name={`databaseQueries[${index}].datasetFields.value`}
-                  id={`databaseQueries[${index}].datasetFields.value`}
-                  className={`placeholder:text-slate-400 w-full text-xs bg-slate-50 border ${
-                    hasTitleError ? "border-red-300" : "border-slate-300"
-                  } text-slate-700 rounded  block py-1 px-1.5 focus:outline-none focus:border-slate-400`}
-                  required={true}
-                  onChange={chartForm.handleChange}
-                  onBlur={chartForm.handleBlur}
-                  value={
-                    chartForm.values.databaseQueries[index].datasetFields?.value
-                  }
-                />
-              </div>
-            )}
-          </div>
           <div className="flex flex-row justify-between items-center gap-2">
             <div
               {...provided.dragHandleProps}

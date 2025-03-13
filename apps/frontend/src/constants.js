@@ -480,9 +480,9 @@ export const CONSTANTS = {
     CHART_EDITOR_FORM_DATASET_QUERY_LABEL: "Dataset query",
     CHART_EDITOR_FORM_DATASET_UI_CONFIG_LABEL: "UI options",
     CHART_EDITOR_FORM_DATASET_FIELD_MAPPINGS_LABEL: "Mappings",
+    CHART_EDITOR_FORM_DATASET_ARGUMENTS_LABEL: "Arguments",
     CHART_EDITOR_FORM_DATASET_COLOR_LABEL: "Dataset color",
     CHART_EDITOR_FORM_DATASET_BORDER_WIDTH_LABEL: "Border width",
-    CHART_EDITOR_FORM_DATASET_ARGUMENTS_LABEL: "Query arguments",
     CHART_EDITOR_FORM_DATASET_FIELD_X_AXIS_LABEL: "X axis",
     CHART_EDITOR_FORM_DATASET_FIELD_Y_AXIS_LABEL: "Y axis",
     CHART_EDITOR_FORM_DATASET_FIELD_LABEL_LABEL: "Label",
@@ -536,6 +536,10 @@ export const CONSTANTS = {
     CHART_DATASET_FIELD_MAPPING_TITLE: "Dataset field options",
     CHART_DATASET_FIELD_MAPPING_CONFIRM: "Save changes",
     CHART_DATASET_FIELD_MAPPING_CANCEL: "Discard",
+
+    CHART_DATASET_ARGUMENTS_TITLE: "Dataset field options",
+    CHART_DATASET_ARGUMENTS_CONFIRM: "Save changes",
+    CHART_DATASET_ARGUMENTS_CANCEL: "Discard",
   },
 
   LOCAL_STORAGE_KEYS: {
@@ -1295,9 +1299,9 @@ export const CONSTANTS = {
       name: "Pie Chart",
       value: "pie",
     },
-    DONUT_CHART: {
-      name: "Donut Chart",
-      value: "donut",
+    DOUGHNUT_CHART: {
+      name: "Doughnut Chart",
+      value: "doughnut",
     },
     SCATTER_CHART: {
       name: "Scatter Chart",

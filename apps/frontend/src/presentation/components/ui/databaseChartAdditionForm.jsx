@@ -29,6 +29,7 @@ const initialValues = {
       parameters: {
         backgroundColor: "#D84545",
         borderWidth: 1,
+        type: CONSTANTS.DATABASE_CHART_TYPES.BAR_CHART.value,
       },
       argsMap: {},
       datasetFields: {

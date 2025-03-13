@@ -117,9 +117,9 @@ export const DATABASE_CHARTS_CONFIG_MAP = {
     ),
     icon: <FaChartPie className="!text-lg" />,
   },
-  donut: {
-    label: "Donut",
-    value: CONSTANTS.DATABASE_CHART_TYPES.DONUT_CHART.value,
+  doughnut: {
+    label: "Doughnut",
+    value: CONSTANTS.DATABASE_CHART_TYPES.DOUGHNUT_CHART.value,
     datasetFields: ["label", "value"],
     chartFields: {
       required: [

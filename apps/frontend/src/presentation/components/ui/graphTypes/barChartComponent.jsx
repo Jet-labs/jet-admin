@@ -9,11 +9,10 @@ import {
   Tooltip,
 } from "chart.js";
 import React, { useMemo } from "react";
-import { Bar } from "react-chartjs-2";
+import { Bar, Chart } from "react-chartjs-2";
 
 import { faker } from "@faker-js/faker";
 import { CONSTANTS } from "../../../../constants";
-
 
 ChartJS.register(
   CategoryScale,
@@ -52,8 +51,6 @@ export class BarGraphData {
     this.datasets = datasets;
   }
 }
-
-
 
 const labels = ["January", "February", "March", "April", "May", "June", "July"];
 

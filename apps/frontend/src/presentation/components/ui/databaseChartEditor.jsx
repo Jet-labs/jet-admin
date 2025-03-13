@@ -24,6 +24,7 @@ export const DatabaseChartEditor = ({ databaseChartEditorForm }) => {
         title: "",
         databaseQueryID: "",
         parameters: {
+          type: CONSTANTS.DATABASE_CHART_TYPES.BAR_CHART.value,
           color: "#D84545",
         },
         argsMap: {},
@@ -59,6 +60,10 @@ export const DatabaseChartEditor = ({ databaseChartEditorForm }) => {
     [databaseChartEditorForm, databaseChartEditorForm.values]
   );
 
+  console.log(
+    databaseChartEditorForm.values.databaseQueries,
+    databaseChartEditorForm.values.databaseChartType
+  );
   return (
     <>
       <DatabaseQueryTestingPanel
@@ -303,7 +308,9 @@ export const DatabaseChartEditor = ({ databaseChartEditorForm }) => {
                     databaseQueries={databaseQueries}
                     datasetFields={
                       DATABASE_CHARTS_CONFIG_MAP[
-                        databaseChartEditorForm.values.databaseChartType
+                        databaseChartEditorForm.values?.databaseQueries?.[index]
+                          ?.parameters?.type ||
+                          databaseChartEditorForm.values.databaseChartType
                       ].datasetFields
                     }
                     selectedQueryForTesting={selectedQueryForTesting}

@@ -23,7 +23,7 @@ export const DatabaseChartDatasetAdvancedOptions = ({
   const datasetAdvancedOptionsForm = useFormik({
     initialValues: {
       // Core dataset properties
-      type:parentChartType,
+      type: parentChartType,
       xAxisID: "x",
       yAxisID: "y",
       hidden: false,
@@ -69,7 +69,7 @@ export const DatabaseChartDatasetAdvancedOptions = ({
               borderRadius: 0,
             };
           case CONSTANTS.DATABASE_CHART_TYPES.PIE_CHART.value:
-          case CONSTANTS.DATABASE_CHART_TYPES.DONUT_CHART.value:
+          case CONSTANTS.DATABASE_CHART_TYPES.DOUGHNUT_CHART.value:
             return {
               rotation: 0,
               circumference: 360,
@@ -185,9 +185,11 @@ export const DatabaseChartDatasetAdvancedOptions = ({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
-      <DialogTitle>{CONSTANTS.STRINGS.CHART_DATASET_ADV_TITLE}</DialogTitle>
-      <DialogContent>
-        <div className="grid grid-cols-2 gap-4 p-4">
+      <DialogTitle className="!p-4 !pb-0">
+        {CONSTANTS.STRINGS.CHART_DATASET_ADV_TITLE}
+      </DialogTitle>
+      <DialogContent className="!p-4">
+        <div className="grid grid-cols-2 gap-4">
           {/* Common fields */}
           <div className="col-span-2">
             <label className="block mb-2 text-xs font-normal text-slate-500">
@@ -195,7 +197,9 @@ export const DatabaseChartDatasetAdvancedOptions = ({
             </label>
             <select
               value={datasetAdvancedOptionsForm.values.type}
-              onChange={(e) => datasetAdvancedOptionsForm.setFieldValue("type", e.target.value)}
+              onChange={(e) =>
+                datasetAdvancedOptionsForm.setFieldValue("type", e.target.value)
+              }
               className={`placeholder:text-slate-400 text-xs bg-slate-50 border border-slate-300 text-slate-700 rounded focus:outline-none focus:border-slate-400 block w-full py-1 px-1.5`}
             >
               {Object.values(DATABASE_CHARTS_CONFIG_MAP).map((config) => (
@@ -270,7 +274,7 @@ export const DatabaseChartDatasetAdvancedOptions = ({
           {_renderTypeSpecificFields(datasetAdvancedOptionsForm.values.type)}
         </div>
       </DialogContent>
-      <DialogActions className="">
+      <DialogActions className="!p-4">
         <button
           onClick={onClose}
           type="button"
@@ -282,7 +286,7 @@ export const DatabaseChartDatasetAdvancedOptions = ({
         <button
           type="button"
           onClick={datasetAdvancedOptionsForm.handleSubmit}
-          className={`px-2.5 py-1.5 text-white text-sm bg-red-500 rounded hover:bg-red-600 hover:outline-none hover:border-0 border-0 outline-none `}
+          className={`px-2.5 py-1.5 text-white text-sm bg-[#646cff] rounded hover:outline-none hover:border-0 border-0 outline-none `}
         >
           {CONSTANTS.STRINGS.CHART_DATASET_ADV_CONFIRM}
         </button>

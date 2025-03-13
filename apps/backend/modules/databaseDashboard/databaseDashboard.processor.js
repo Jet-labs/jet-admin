@@ -162,7 +162,7 @@ databaseChartProcessor.processPieChartQueryResults = ({
  * @param {Array<Object>} params.queryResults - Array of query results from execution
  * @returns {Object} Chart.js compatible data structure with labels and datasets
  */
-databaseChartProcessor.processDonutChartQueryResults = ({
+databaseChartProcessor.processDoughnutChartQueryResults = ({
   databaseChart,
   queryResults,
 }) => {
