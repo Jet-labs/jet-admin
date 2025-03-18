@@ -91,7 +91,7 @@ FROM (
                     )
                 ))
                 FROM information_schema.tables t
-                WHERE t.table_schema = s.schema_name
+                WHERE t.table_schema = s.schema_name AND t.table_type = 'BASE TABLE' -- Filter for base tables only
             ),
             'views', (
                 SELECT jsonb_agg(table_name)
@@ -195,7 +195,7 @@ FROM (
             )
         ) AS result
     FROM information_schema.tables t
-    WHERE t.table_schema = '${databaseSchemaName}'
+    WHERE t.table_schema = '${databaseSchemaName}' AND t.table_type = 'BASE TABLE'
 ) subquery;
 `;
 

@@ -1,7 +1,7 @@
 import { CircularProgress } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import * as Yup from "yup";
 import { CONSTANTS } from "../../../constants";
 import {
@@ -16,7 +16,7 @@ import { displaySuccess } from "../../../utils/notification";
 import { DatabaseChartEditor } from "./databaseChartEditor";
 import { DatabaseChartPreview } from "./databaseChartPreview";
 import { DatabaseQueryTestingPanel } from "./databaseQueryTestingPanel";
-import { DATABASE_CHARTS_CONFIG_MAP } from "./graphTypes";
+import { DATABASE_CHARTS_CONFIG_MAP } from "./chartTypes";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -76,6 +76,8 @@ export const DatabaseChartUpdationForm = ({ tenantID, databaseChartID }) => {
   const queryClient = useQueryClient();
   const { showConfirmation } = useGlobalUI();
   const [selectedQueryForTesting, setSelectedQueryForTesting] = useState(false);
+  const [databaseChartFetchedData, setDatabaseChartFetchedData] =
+    useState(null);
 
   const {
     isLoading: isLoadingDatabaseChart,
@@ -126,12 +128,12 @@ export const DatabaseChartUpdationForm = ({ tenantID, databaseChartID }) => {
   });
 
   const {
-    isLoading: isLoadingDatabaseChartData,
-    data: databaseChartData,
-    error: loadDatabaseChartDataError,
-    isFetching: isFetchingDatabaseChartData,
-    isRefetching: isRefetechingDatabaseChartData,
-    refetch: refetchDatabaseChartData,
+    isLoading: isLoadingDatabaseChartDataByID,
+    data: databaseChartDataByID,
+    error: loadDatabaseChartDataByIDError,
+    isFetching: isFetchingDatabaseChartDataByID,
+    isRefetching: isRefetechingDatabaseChartDataByID,
+    refetch: refetchDatabaseChartDataByID,
   } = useQuery({
     queryKey: [
       CONSTANTS.REACT_QUERY_KEYS.DATABASE_CHARTS(tenantID),
@@ -146,8 +148,30 @@ export const DatabaseChartUpdationForm = ({ tenantID, databaseChartID }) => {
     refetchOnWindowFocus: false,
   });
 
+  const {
+    isPending: isFetchingDatabaseChartData,
+    isSuccess: isFetchingDatabaseChartDataSuccess,
+    isError: isFetchingDatabaseChartDataError,
+    error: fetchDatabaseChartDataError,
+    mutate: fetchDatabaseChartData,
+  } = useMutation({
+    mutationFn: (data) => {
+      return getDatabaseChartDataUsingChartAPI({
+        tenantID,
+        databaseChartData: data,
+      });
+    },
+    retry: false,
+    onSuccess: (data) => {
+      setDatabaseChartFetchedData(data?.data);
+    },
+    onError: (error) => {
+      displayError(error);
+    },
+  });
+
   const updateDatabaseChartForm = useFormik({
-    initialValues: initialValues,
+    initialValues: { ...initialValues, databaseChartID },
     validationSchema,
     validateOnMount: false,
     validateOnChange: false,
@@ -163,29 +187,24 @@ export const DatabaseChartUpdationForm = ({ tenantID, databaseChartID }) => {
     },
   });
 
+  const _handleFetchDatabaseChartData = useCallback(() => {
+    if (updateDatabaseChartForm && updateDatabaseChartForm.values) {
+      fetchDatabaseChartData(updateDatabaseChartForm.values);
+    }
+  }, [updateDatabaseChartForm]);
+
   useEffect(() => {
-    if (databaseChart) {
-      // Update Formik form values with the fetched databaseQuery data
-      updateDatabaseChartForm.setFieldValue(
-        "databaseChartName",
-        databaseChart.databaseChartName || CONSTANTS.STRINGS.UNTITLED
-      );
-      updateDatabaseChartForm.setFieldValue(
-        "databaseChartType",
-        databaseChart.databaseChartType || DATABASE_CHARTS_CONFIG_MAP.bar.value
-      );
-      updateDatabaseChartForm.setFieldValue(
-        "databaseChartDescription",
-        databaseChart.databaseChartDescription || ""
-      );
-      updateDatabaseChartForm.setFieldValue(
-        "databaseQueries",
-        databaseChart.databaseQueries || []
-      );
-      updateDatabaseChartForm.setFieldValue(
-        "databaseChartConfig",
-        databaseChart.databaseChartConfig || {}
-      );
+    if (databaseChart && databaseChart.databaseChartID) {
+      updateDatabaseChartForm.setValues({
+        databaseChartName:
+          databaseChart.databaseChartName || CONSTANTS.STRINGS.UNTITLED,
+        databaseChartType:
+          databaseChart.databaseChartType ||
+          DATABASE_CHARTS_CONFIG_MAP.bar.value,
+        databaseChartDescription: databaseChart.databaseChartDescription || "",
+        databaseQueries: databaseChart.databaseQueries || [],
+        databaseChartConfig: databaseChart.databaseChartConfig || {},
+      });
     }
   }, [databaseChart]);
 
@@ -247,7 +266,10 @@ export const DatabaseChartUpdationForm = ({ tenantID, databaseChartID }) => {
         </ResizablePanel>
         <ResizableHandle withHandle={true} />
         <ResizablePanel defaultSize={80}>
-          {databaseChartData ? (
+          {(databaseChartFetchedData ||
+            (databaseChartDataByID && databaseChartDataByID.data)) &&
+          databaseChart.databaseChartType ==
+            updateDatabaseChartForm?.values.databaseChartType ? (
             <DatabaseChartPreview
               key={databaseChart?.databaseChartID}
               databaseChartName={
@@ -277,9 +299,13 @@ export const DatabaseChartUpdationForm = ({ tenantID, databaseChartID }) => {
               indexAxis={
                 updateDatabaseChartForm.values.databaseChartConfig.indexAxis
               }
-              refreshData={refetchDatabaseChartData}
+              refreshData={_handleFetchDatabaseChartData}
               isRefreshingData={isFetchingDatabaseChartData}
-              data={databaseChartData.data}
+              data={
+                databaseChartFetchedData
+                  ? databaseChartFetchedData
+                  : databaseChartDataByID?.data
+              }
             />
           ) : isFetchingDatabaseChartData ? (
             <div className="h-full w-full flex justify-center items-center">

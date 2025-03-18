@@ -4,7 +4,7 @@ import { FaPlus } from "react-icons/fa";
 import { CONSTANTS } from "../../../constants";
 import { useDatabaseChartsState } from "../../../logic/contexts/databaseChartsContext";
 import { DatabaseChartDatasetField } from "./databaseChartDatasetField";
-import { DATABASE_CHARTS_CONFIG_MAP } from "./graphTypes";
+import { DATABASE_CHARTS_CONFIG_MAP } from "./chartTypes";
 import { DatabaseQueryTestingPanel } from "./databaseQueryTestingPanel";
 
 export const DatabaseChartEditor = ({ databaseChartEditorForm }) => {
@@ -14,7 +14,6 @@ export const DatabaseChartEditor = ({ databaseChartEditorForm }) => {
     isFetchingDatabaseQueries,
   } = useDatabaseChartsState();
 
-  console.log({ databaseChartEditorForm: databaseChartEditorForm });
   const [selectedQueryForTesting, setSelectedQueryForTesting] = useState(false);
 
   const _handleAddDataset = useCallback(() => {
@@ -60,10 +59,6 @@ export const DatabaseChartEditor = ({ databaseChartEditorForm }) => {
     [databaseChartEditorForm, databaseChartEditorForm.values]
   );
 
-  console.log(
-    databaseChartEditorForm.values.databaseQueries,
-    databaseChartEditorForm.values.databaseChartType
-  );
   return (
     <>
       <DatabaseQueryTestingPanel

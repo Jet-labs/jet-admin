@@ -64,7 +64,7 @@ export const DATABASE_CHARTS_CONFIG_MAP = {
         "titleDisplayEnabled",
         "refetchInterval",
       ],
-      optional: [],
+      optional: ["xStacked", "yStacked", "indexAxis"],
     },
     component: ({
       databaseChartName,

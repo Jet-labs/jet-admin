@@ -62,8 +62,8 @@ export const PieChartComponent = ({
   titleDisplayEnabled,
   databaseChartName,
   data,
+  legendDisplayEnabled,
 }) => {
-  const theme = useTheme();
   const options = useMemo(() => {
     return {
       maintainAspectRatio: false,
@@ -75,16 +75,16 @@ export const PieChartComponent = ({
         },
       },
       plugins: {
-        legend: {
-          position: legendPosition
-            ? legendPosition
-            : CONSTANTS.DATABASE_CHART_LEGEND_POSITION.TOP,
-        },
+        legend: Boolean(legendDisplayEnabled)
+          ? {
+              position: legendPosition
+                ? legendPosition
+                : CONSTANTS.DATABASE_CHART_LEGEND_POSITION.TOP,
+            }
+          : false,
         title: {
           display: Boolean(titleDisplayEnabled),
-          text: databaseChartName
-            ? databaseChartName
-            : CONSTANTS.STRINGS.FORM_FIELD_PLACEHOLDER_UNTITLED,
+          text: databaseChartName ? databaseChartName : "",
         },
       },
     };

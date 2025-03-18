@@ -8,7 +8,7 @@ import {
   getDatabaseChartDataByIDAPI,
   getDatabaseChartDataUsingChartAPI,
 } from "../../../data/apis/databaseChart";
-import { DATABASE_CHARTS_CONFIG_MAP } from "./graphTypes";
+import { DATABASE_CHARTS_CONFIG_MAP } from "./chartTypes";
 
 export const DatabaseDashboardChartWidget = ({
   tenantID,

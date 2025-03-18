@@ -88,7 +88,6 @@ export const BarChartComponent = ({
   xStacked,
   yStacked,
 }) => {
-  const theme = useTheme();
   const options = useMemo(() => {
     return {
       responsive: true,
@@ -131,5 +130,6 @@ export const BarChartComponent = ({
     indexAxis,
   ]);
 
+  console.log({data})
   return <Bar options={options} data={data ? data : demoData} />;
 };

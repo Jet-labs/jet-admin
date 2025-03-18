@@ -13,7 +13,7 @@ import { displaySuccess } from "../../../utils/notification";
 import { DatabaseChartEditor } from "./databaseChartEditor";
 import { DatabaseChartPreview } from "./databaseChartPreview";
 import { DatabaseQueryTestingPanel } from "./databaseQueryTestingPanel";
-import { DATABASE_CHARTS_CONFIG_MAP } from "./graphTypes";
+import { DATABASE_CHARTS_CONFIG_MAP } from "./chartTypes";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -68,7 +68,7 @@ const validationSchema = Yup.object().shape({
     .min(1, "At least 1 query required"),
 });
 
-export const DatabaseChartAdditionForm = ({ tenantID, databaseSchemaName }) => {
+export const DatabaseChartAdditionForm = ({ tenantID }) => {
   const queryClient = useQueryClient();
   const [databaseChartFetchedData, setDatabaseChartFetchedData] =
     useState(null);
@@ -83,7 +83,6 @@ export const DatabaseChartAdditionForm = ({ tenantID, databaseSchemaName }) => {
     mutationFn: (data) => {
       return createDatabaseChartAPI({
         tenantID,
-        databaseSchemaName,
         databaseChartData: data,
       });
     },
@@ -109,13 +108,11 @@ export const DatabaseChartAdditionForm = ({ tenantID, databaseSchemaName }) => {
     mutationFn: (data) => {
       return getDatabaseChartDataUsingChartAPI({
         tenantID,
-        databaseSchemaName,
         databaseChartData: data,
       });
     },
     retry: false,
     onSuccess: (data) => {
-      console.log({ data });
       setDatabaseChartFetchedData(data?.data);
     },
     onError: (error) => {
@@ -131,10 +128,6 @@ export const DatabaseChartAdditionForm = ({ tenantID, databaseSchemaName }) => {
     onSubmit: (values) => {
       addDatabaseChart(values);
     },
-  });
-
-  console.log({
-    addDatabaseChartForm: addDatabaseChartForm.values,
   });
 
   const _handleFetchDatabaseChartData = useCallback(() => {

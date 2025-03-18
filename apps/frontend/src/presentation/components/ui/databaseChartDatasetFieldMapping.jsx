@@ -54,7 +54,7 @@ export const DatabaseChartDatasetFieldMapping = ({
       </DialogTitle>
       <DialogContent className="!p-4 gap-2 flex flex-col justify-start items-stretch">
         <div className="rounded border border-slate-200">
-          {selectedQuery && selectedQuery.databaseQueryResultSchema && (
+          {selectedQuery && selectedQuery.databaseQueryResultSchema && false ? (
             <CollapseComponent
               showButtonText={"Query result metadata"}
               hideButtonText={"Hide"}
@@ -71,6 +71,10 @@ export const DatabaseChartDatasetFieldMapping = ({
                 </Box>
               )}
             />
+          ) : (
+            <span className=" text-red-500 font-normal text-xs p-2">
+              {CONSTANTS.STRINGS.CHART_DATASET_FIELD_MAPPING_NO_META}
+            </span>
           )}
         </div>
 

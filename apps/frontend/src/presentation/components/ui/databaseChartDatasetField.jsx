@@ -58,7 +58,6 @@ export const DatabaseChartDatasetField = ({
   }, [databaseQueries, chartForm.values.databaseQueries, index]);
 
   const _handleTestQuery = useCallback(() => {
-    console.log("query testins", selectedQuery);
     setSelectedQueryForTesting(selectedQuery);
   }, [selectedQuery, setSelectedQueryForTesting]);
 
@@ -71,7 +70,6 @@ export const DatabaseChartDatasetField = ({
     chartForm.touched.databaseQueries?.[index]?.title &&
     chartForm.errors.databaseQueries?.[index]?.title;
 
-  console.log(selectedQuery);
   return (
     <Draggable
       draggableId={`query-${index}`}
