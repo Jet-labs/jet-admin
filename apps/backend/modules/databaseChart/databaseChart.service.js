@@ -282,14 +282,7 @@ databaseChartService.getDatabaseChartDataByID = async ({
           queryResults,
         });
         break;
-      case constants.DATABASE_CHART_TYPES.DOUGHNUT_CHART.value:
-        processedData = databaseChartProcessor.processDoughnutChartQueryResults(
-          {
-            databaseChart,
-            queryResults,
-          }
-        );
-        break;
+
       case constants.DATABASE_CHART_TYPES.PIE_CHART.value:
         processedData = databaseChartProcessor.processPieChartQueryResults({
           databaseChart,
@@ -310,6 +303,12 @@ databaseChartService.getDatabaseChartDataByID = async ({
         break;
       case constants.DATABASE_CHART_TYPES.SCATTER_CHART.value:
         processedData = databaseChartProcessor.processScatterChartQueryResults({
+          databaseChart,
+          queryResults,
+        });
+        break;
+      case constants.DATABASE_CHART_TYPES.BUBBLE_CHART.value:
+        processedData = databaseChartProcessor.processBubbleChartQueryResults({
           databaseChart,
           queryResults,
         });
@@ -437,14 +436,6 @@ databaseChartService.getDatabaseChartDataUsingDatabaseChart = async ({
           queryResults,
         });
         break;
-      case constants.DATABASE_CHART_TYPES.DOUGHNUT_CHART.value:
-        processedData = databaseChartProcessor.processDoughnutChartQueryResults(
-          {
-            databaseChart,
-            queryResults,
-          }
-        );
-        break;
       case constants.DATABASE_CHART_TYPES.PIE_CHART.value:
         processedData = databaseChartProcessor.processPieChartQueryResults({
           databaseChart,
@@ -468,7 +459,12 @@ databaseChartService.getDatabaseChartDataUsingDatabaseChart = async ({
           databaseChart,
           queryResults,
         });
-        console.log({ processedData: JSON.stringify(processedData) });
+        break;
+      case constants.DATABASE_CHART_TYPES.BUBBLE_CHART.value:
+        processedData = databaseChartProcessor.processBubbleChartQueryResults({
+          databaseChart,
+          queryResults,
+        });
         break;
       default:
         processedData = databaseChartProcessor.processBarChartQueryResults({

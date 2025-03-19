@@ -1,4 +1,3 @@
-import { useTheme } from "@mui/material";
 import {
   ArcElement,
   Chart as ChartJS,
@@ -6,42 +5,13 @@ import {
   RadialLinearScale,
   Tooltip,
 } from "chart.js";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { Radar } from "react-chartjs-2";
 
 import { faker } from "@faker-js/faker";
 import { CONSTANTS } from "../../../../constants";
 
 ChartJS.register(RadialLinearScale, ArcElement, Tooltip, Legend);
-
-export class RadarGraphDataset {
-  /**
-   *
-   * @param {object} param0
-   * @param {String} param0.label
-   * @param {Array<Number>} param0.data
-   * @param {String} param0.borderColor
-   * @param {String} param0.backgroundColor
-   */
-  constructor({ label, data, borderColor, backgroundColor }) {
-    this.label = label;
-    this.data = data;
-    this.borderColor = borderColor;
-    this.backgroundColor = backgroundColor;
-  }
-}
-export class RadarGraphData {
-  /**
-   *
-   * @param {object} param0
-   * @param {Array<String>} param0.labels
-   * @param {Array<RadarGraphDataset>} param0.datasets
-   */
-  constructor({ labels, datasets }) {
-    this.labels = labels;
-    this.datasets = datasets;
-  }
-}
 
 const labels = ["January", "February", "March", "April", "May", "June", "July"];
 
@@ -68,8 +38,10 @@ export const RadarChartComponent = ({
   titleDisplayEnabled,
   databaseChartName,
   data,
+  legendDisplayEnabled,
+  onChartInit,
 }) => {
-  const theme = useTheme();
+  const chartRef = useRef();
   const options = useMemo(() => {
     return {
       maintainAspectRatio: false,
@@ -80,22 +52,37 @@ export const RadarChartComponent = ({
         },
       },
       plugins: {
-        legend: {
-          position: legendPosition
-            ? legendPosition
-            : CONSTANTS.DATABASE_CHART_LEGEND_POSITION.TOP,
-        },
+        legend: Boolean(legendDisplayEnabled)
+          ? {
+              position: legendPosition
+                ? legendPosition
+                : CONSTANTS.DATABASE_CHART_LEGEND_POSITION.TOP,
+            }
+          : false,
         title: {
           display: Boolean(titleDisplayEnabled),
-          text: databaseChartName
-            ? databaseChartName
-            : CONSTANTS.STRINGS.FORM_FIELD_PLACEHOLDER_UNTITLED,
+          text: databaseChartName ? databaseChartName : "",
         },
       },
     };
-  }, [legendPosition, titleDisplayEnabled, databaseChartName]);
+  }, [
+    legendDisplayEnabled,
+    legendPosition,
+    titleDisplayEnabled,
+    databaseChartName,
+  ]);
 
+  useEffect(() => {
+    if (chartRef && chartRef.current) {
+      onChartInit?.(chartRef);
+    }
+  }, [chartRef]);
   return (
-    <Radar options={options} height={"300 px"} data={data ? data : demoData} />
+    <Radar
+      ref={chartRef}
+      options={options}
+      height={"300 px"}
+      data={data ? data : demoData}
+    />
   );
 };

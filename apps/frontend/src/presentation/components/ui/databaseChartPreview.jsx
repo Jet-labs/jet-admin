@@ -12,6 +12,7 @@ export const DatabaseChartPreview = ({
   xStacked,
   yStacked,
   indexAxis,
+  isFetchingData,
   isRefreshingData,
   refreshData,
 }) => {
@@ -30,19 +31,25 @@ export const DatabaseChartPreview = ({
           )}
         </button>
       </div>
-      <div className="w-full flex-1 p-3">
-        {DATABASE_CHARTS_CONFIG_MAP[databaseChartType].component({
-          databaseChartName,
-          legendDisplayEnabled,
-          titleDisplayEnabled,
-          legendPosition,
-          databaseChartType,
-          data,
-          xStacked,
-          yStacked,
-          indexAxis,
-        })}
-      </div>
+      {isFetchingData ? (
+        <div className="w-full h-full flex flex-col justify-center items-center">
+          <CircularProgress />
+        </div>
+      ) : (
+        <div className="w-full flex-1 p-3">
+          {DATABASE_CHARTS_CONFIG_MAP[databaseChartType].component({
+            databaseChartName,
+            legendDisplayEnabled,
+            titleDisplayEnabled,
+            legendPosition,
+            databaseChartType,
+            data,
+            xStacked,
+            yStacked,
+            indexAxis,
+          })}
+        </div>
+      )}
     </div>
   );
 };

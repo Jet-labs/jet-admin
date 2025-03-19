@@ -8,7 +8,7 @@ import {
   Title,
   Tooltip,
 } from "chart.js";
-import React, { useMemo } from "react";
+import React, { useMemo, useRef, useEffect } from "react";
 import { Scatter } from "react-chartjs-2";
 
 import { faker } from "@faker-js/faker";
@@ -23,28 +23,12 @@ ChartJS.register(
   Legend
 );
 
-export class ScatterGraphDataset {
-  constructor({ label, data, borderColor, backgroundColor }) {
-    this.label = label;
-    this.data = data;
-    this.borderColor = borderColor;
-    this.backgroundColor = backgroundColor;
-  }
-}
-
-export class ScatterGraphData {
-  constructor({ labels, datasets }) {
-    this.labels = labels;
-    this.datasets = datasets;
-  }
-}
-
 const labels = ["January", "February", "March", "April", "May", "June", "July"];
 
-const demoData = new ScatterGraphData({
+const demoData = {
   labels,
   datasets: [
-    new ScatterGraphDataset({
+    {
       label: "Dataset 1",
       data: labels.map(() => ({
         x: faker.number.int({ min: -1000, max: 1000 }),
@@ -52,8 +36,8 @@ const demoData = new ScatterGraphData({
       })),
       borderColor: "rgb(255, 99, 132)",
       backgroundColor: "rgba(255, 99, 132, 0.5)",
-    }),
-    new ScatterGraphDataset({
+    },
+    {
       label: "Dataset 2",
       data: labels.map(() => ({
         x: faker.number.int({ min: -1000, max: 1000 }),
@@ -61,33 +45,54 @@ const demoData = new ScatterGraphData({
       })),
       borderColor: "rgb(53, 162, 235)",
       backgroundColor: "rgba(53, 162, 235, 0.5)",
-    }),
+    },
   ],
-});
+};
 
 export const ScatterChartComponent = ({
   legendPosition,
   titleDisplayEnabled,
   databaseChartName,
   data,
+  legendDisplayEnabled,
+  onChartInit,
 }) => {
-  const theme = useTheme();
+  const chartRef = useRef();
   const options = useMemo(() => {
     return {
       maintainAspectRatio: false,
       plugins: {
-        legend: {
-          position: legendPosition || CONSTANTS.DATABASE_CHART_LEGEND_POSITION.TOP,
-        },
+        legend: Boolean(legendDisplayEnabled)
+          ? {
+              position: legendPosition
+                ? legendPosition
+                : CONSTANTS.DATABASE_CHART_LEGEND_POSITION.TOP,
+            }
+          : false,
         title: {
-          display: !!titleDisplayEnabled,
-          text:
-            databaseChartName ||
-            CONSTANTS.STRINGS.FORM_FIELD_PLACEHOLDER_UNTITLED,
+          display: Boolean(titleDisplayEnabled),
+          text: databaseChartName ? databaseChartName : "",
         },
       },
     };
-  }, [legendPosition, titleDisplayEnabled, databaseChartName]);
+  }, [
+    legendDisplayEnabled,
+    legendPosition,
+    titleDisplayEnabled,
+    databaseChartName,
+  ]);
 
-  return <Scatter redraw={true} options={options} data={data || demoData} />;
+  useEffect(() => {
+    if (chartRef && chartRef.current) {
+      onChartInit?.(chartRef);
+    }
+  }, [chartRef]);
+  return (
+    <Scatter
+      ref={chartRef}
+      redraw={true}
+      options={options}
+      data={data || demoData}
+    />
+  );
 };

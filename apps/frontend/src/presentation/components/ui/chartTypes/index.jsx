@@ -1,5 +1,4 @@
 import { BarChartComponent } from "./barChartComponent";
-import { DoughnutChartComponent } from "./doughnutChartComponent";
 import { LineChartComponent } from "./lineChartComponent";
 import { PieChartComponent } from "./pieChartComponent";
 import { PolarAreaChartComponent } from "./polarAreaChartComponent";
@@ -7,7 +6,6 @@ import { RadarChartComponent } from "./radarChartComponent";
 import { FaChartBar } from "react-icons/fa";
 import { FaChartLine } from "react-icons/fa6";
 import { FaChartPie } from "react-icons/fa";
-import { BiSolidDoughnutChart } from "react-icons/bi";
 import { PiChartPolar } from "react-icons/pi";
 import { BiRadar } from "react-icons/bi";
 import { ScatterChartComponent } from "./scatterChartComponent";
@@ -116,38 +114,6 @@ export const DATABASE_CHARTS_CONFIG_MAP = {
       />
     ),
     icon: <FaChartPie className="!text-lg" />,
-  },
-  doughnut: {
-    label: "Doughnut",
-    value: CONSTANTS.DATABASE_CHART_TYPES.DOUGHNUT_CHART.value,
-    datasetFields: ["label", "value"],
-    chartFields: {
-      required: [
-        "data",
-        "legendPosition",
-        "titleDisplayEnabled",
-        "refetchInterval",
-      ],
-      optional: [],
-    },
-    component: ({
-      databaseChartName,
-      legendDisplayEnabled = true,
-      legendPosition,
-      titleDisplayEnabled = true,
-      data,
-      refetchInterval,
-    }) => (
-      <DoughnutChartComponent
-        legendPosition={legendPosition}
-        legendDisplayEnabled={legendDisplayEnabled}
-        titleDisplayEnabled={titleDisplayEnabled}
-        databaseChartName={databaseChartName}
-        data={data}
-        refetchInterval={refetchInterval}
-      />
-    ),
-    icon: <BiSolidDoughnutChart className="!text-lg" />,
   },
   radial: {
     label: "Radial",

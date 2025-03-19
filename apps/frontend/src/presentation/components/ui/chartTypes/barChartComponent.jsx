@@ -1,4 +1,3 @@
-import { useTheme } from "@mui/material";
 import {
   BarElement,
   CategoryScale,
@@ -8,8 +7,8 @@ import {
   Title,
   Tooltip,
 } from "chart.js";
-import React, { useMemo } from "react";
-import { Bar, Chart } from "react-chartjs-2";
+import React, { useEffect, useMemo, useRef } from "react";
+import { Bar } from "react-chartjs-2";
 
 import { faker } from "@faker-js/faker";
 import { CONSTANTS } from "../../../../constants";
@@ -22,35 +21,6 @@ ChartJS.register(
   Tooltip,
   Legend
 );
-
-export class BarGraphDataset {
-  /**
-   *
-   * @param {object} param0
-   * @param {String} param0.label
-   * @param {Array<Number>} param0.data
-   * @param {String} param0.borderColor
-   * @param {String} param0.backgroundColor
-   */
-  constructor({ label, data, borderColor, backgroundColor }) {
-    this.label = label;
-    this.data = data;
-    this.borderColor = borderColor;
-    this.backgroundColor = backgroundColor;
-  }
-}
-export class BarGraphData {
-  /**
-   *
-   * @param {object} param0
-   * @param {Array<String>} param0.labels
-   * @param {Array<BarGraphDataset>} param0.datasets
-   */
-  constructor({ labels, datasets }) {
-    this.labels = labels;
-    this.datasets = datasets;
-  }
-}
 
 const labels = ["January", "February", "March", "April", "May", "June", "July"];
 
@@ -87,7 +57,9 @@ export const BarChartComponent = ({
   indexAxis,
   xStacked,
   yStacked,
+  onChartInit,
 }) => {
+  const chartRef = useRef();
   const options = useMemo(() => {
     return {
       responsive: true,
@@ -130,6 +102,10 @@ export const BarChartComponent = ({
     indexAxis,
   ]);
 
-  console.log({data})
-  return <Bar options={options} data={data ? data : demoData} />;
+  useEffect(() => {
+    if (chartRef && chartRef.current) {
+      onChartInit?.(chartRef);
+    }
+  }, [chartRef]);
+  return <Bar ref={chartRef} options={options} data={data ? data : demoData} />;
 };

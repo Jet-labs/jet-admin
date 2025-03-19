@@ -122,13 +122,13 @@ const constants = {
       name: "Pie Chart",
       value: "pie",
     },
-    DOUGHNUT_CHART: {
-      name: "Doughnut Chart",
-      value: "doughnut",
-    },
     SCATTER_CHART: {
       name: "Scatter Chart",
       value: "scatter",
+    },
+    BUBBLE_CHART: {
+      name: "Bubble Chart",
+      value: "bubble",
     },
     RADAR_CHART: {
       name: "Radar Chart",

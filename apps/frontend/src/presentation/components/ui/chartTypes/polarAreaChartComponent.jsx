@@ -1,4 +1,3 @@
-import { useTheme } from "@mui/material";
 import {
   ArcElement,
   Chart as ChartJS,
@@ -6,42 +5,13 @@ import {
   RadialLinearScale,
   Tooltip,
 } from "chart.js";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { PolarArea } from "react-chartjs-2";
 
 import { faker } from "@faker-js/faker";
 import { CONSTANTS } from "../../../../constants";
 
 ChartJS.register(RadialLinearScale, ArcElement, Tooltip, Legend);
-
-export class PolarAreaGraphDataset {
-  /**
-   *
-   * @param {object} param0
-   * @param {String} param0.label
-   * @param {Array<Number>} param0.data
-   * @param {String} param0.borderColor
-   * @param {String} param0.backgroundColor
-   */
-  constructor({ label, data, borderColor, backgroundColor }) {
-    this.label = label;
-    this.data = data;
-    this.borderColor = borderColor;
-    this.backgroundColor = backgroundColor;
-  }
-}
-export class PolarAreaGraphData {
-  /**
-   *
-   * @param {object} param0
-   * @param {Array<String>} param0.labels
-   * @param {Array<PolarAreaGraphDataset>} param0.datasets
-   */
-  constructor({ labels, datasets }) {
-    this.labels = labels;
-    this.datasets = datasets;
-  }
-}
 
 const labels = ["January", "February", "March", "April", "May", "June", "July"];
 
@@ -68,8 +38,10 @@ export const PolarAreaChartComponent = ({
   titleDisplayEnabled,
   databaseChartName,
   data,
+  legendDisplayEnabled,
+  onChartInit,
 }) => {
-  const theme = useTheme();
+  const chartRef = useRef();
   const options = useMemo(() => {
     return {
       responsive: true,
@@ -92,7 +64,19 @@ export const PolarAreaChartComponent = ({
         },
       },
     };
-  }, [legendPosition, titleDisplayEnabled, databaseChartName]);
+  }, [
+    legendDisplayEnabled,
+    legendPosition,
+    titleDisplayEnabled,
+    databaseChartName,
+  ]);
 
-  return <PolarArea options={options} data={data ? data : demoData} />;
+  useEffect(() => {
+    if (chartRef && chartRef.current) {
+      onChartInit?.(chartRef);
+    }
+  }, [chartRef]);
+  return (
+    <PolarArea ref={chartRef} options={options} data={data ? data : demoData} />
+  );
 };

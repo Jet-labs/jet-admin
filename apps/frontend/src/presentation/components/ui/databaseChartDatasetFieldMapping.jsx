@@ -23,6 +23,7 @@ export const DatabaseChartDatasetFieldMapping = ({
         yAxis: "",
         label: "",
         value: "",
+        radius: "",
       },
       ...initialValues,
     },
@@ -156,6 +157,26 @@ export const DatabaseChartDatasetFieldMapping = ({
                 onChange={datasetFieldMappingForm.handleChange}
                 onBlur={datasetFieldMappingForm.handleBlur}
                 value={datasetFieldMappingForm.values.datasetFields.value}
+              />
+            </div>
+          )}
+          {datasetFields?.includes("radius") && (
+            <div>
+              <label
+                htmlFor={`datasetFields.radius`}
+                className="block mb-1 text-xs font-normal text-slate-500"
+              >
+                {CONSTANTS.STRINGS.CHART_EDITOR_FORM_DATASET_FIELD_RADIUS_LABEL}
+              </label>
+              <input
+                type="text"
+                name={`datasetFields.radius`}
+                id={`datasetFields.radius`}
+                className={`placeholder:text-slate-400 w-full text-xs bg-slate-50 border border-slate-300 text-slate-700 rounded  block py-1 px-1.5 focus:outline-none focus:border-slate-400`}
+                required={true}
+                onChange={datasetFieldMappingForm.handleChange}
+                onBlur={datasetFieldMappingForm.handleBlur}
+                value={datasetFieldMappingForm.values.datasetFields.radius}
               />
             </div>
           )}

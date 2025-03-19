@@ -1,5 +1,5 @@
-import { FaPlus } from "react-icons/fa";
-import { TbBrandGoogleBigQuery } from "react-icons/tb";
+import { FaChartBar, FaChartLine, FaChartPie, FaPlus } from "react-icons/fa";
+import { TbBrandGoogleBigQuery, TbChartScatter } from "react-icons/tb";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../../constants";
 import { NoEntityUI } from "../../ui/noEntityUI";
@@ -7,18 +7,77 @@ import {
   useDatabaseChartsActions,
   useDatabaseChartsState,
 } from "../../../../logic/contexts/databaseChartsContext";
+import { AiOutlineRadarChart } from "react-icons/ai";
+import { PiChartPolar } from "react-icons/pi";
 export const DatabaseChartDrawerList = ({}) => {
-  const {
-    isLoadingDatabaseCharts,
-    databaseCharts,
-    isFetchingDatabaseCharts,
-  } = useDatabaseChartsState();
+  const { isLoadingDatabaseCharts, databaseCharts, isFetchingDatabaseCharts } =
+    useDatabaseChartsState();
   const { refetchDatabaseCharts } = useDatabaseChartsActions();
   const routeParam = useParams();
   const { tenantID } = useParams();
   const navigate = useNavigate();
   const _navigateToAddMoreChart = () => {
     navigate(CONSTANTS.ROUTES.ADD_DATABASE_CHART.path(tenantID));
+  };
+  const _renderChartIcon = (databaseChartType, isActive) => {
+    switch (databaseChartType) {
+      case CONSTANTS.DATABASE_CHART_TYPES.BAR_CHART.value:
+        return (
+          <FaChartBar
+            className={`${
+              isActive ? "text-[#646cff] " : "text-slate-600"
+            } mr-3 !text-base`}
+          />
+        );
+      case CONSTANTS.DATABASE_CHART_TYPES.LINE_CHART.value:
+        return (
+          <FaChartLine
+            className={`${
+              isActive ? "text-[#646cff] " : "text-slate-600"
+            } mr-3 !text-base`}
+          />
+        );
+      case CONSTANTS.DATABASE_CHART_TYPES.PIE_CHART.value:
+        return (
+          <FaChartPie
+            className={`${
+              isActive ? "text-[#646cff] " : "text-slate-600"
+            } mr-3 !text-base`}
+          />
+        );
+      case CONSTANTS.DATABASE_CHART_TYPES.SCATTER_CHART.value:
+        return (
+          <TbChartScatter
+            className={`${
+              isActive ? "text-[#646cff] " : "text-slate-600"
+            } mr-3 !text-base`}
+          />
+        );
+      case CONSTANTS.DATABASE_CHART_TYPES.RADAR_CHART.value:
+        return (
+          <AiOutlineRadarChart
+            className={`${
+              isActive ? "text-[#646cff] " : "text-slate-600"
+            } mr-3 !text-base`}
+          />
+        );
+      case CONSTANTS.DATABASE_CHART_TYPES.RADIAL_CHART.value:
+        return (
+          <PiChartPolar
+            className={`${
+              isActive ? "text-[#646cff] " : "text-slate-600"
+            } mr-3 !text-base`}
+          />
+        );
+      default:
+        return (
+          <FaChartBar
+            className={`${
+              isActive ? "text-[#646cff] " : "text-slate-600"
+            } mr-3 !text-base`}
+          />
+        );
+    }
   };
   return (
     <div className=" bg-white   h-[calc(100vh-48px)] overflow-hidden p-2 w-full">
@@ -61,11 +120,10 @@ export const DatabaseChartDrawerList = ({}) => {
                   }`}
                 >
                   <div className="!w-[16px]">
-                    <TbBrandGoogleBigQuery
-                      className={`w-[16px] h-[16px] ${
-                        isActive ? "text-primary" : "text-slate-600"
-                      }`}
-                    />
+                    {_renderChartIcon(
+                      databaseChart.databaseChartType,
+                      isActive
+                    )}
                   </div>
 
                   <span

@@ -487,6 +487,7 @@ export const CONSTANTS = {
     CHART_EDITOR_FORM_DATASET_FIELD_Y_AXIS_LABEL: "Y axis",
     CHART_EDITOR_FORM_DATASET_FIELD_LABEL_LABEL: "Label",
     CHART_EDITOR_FORM_DATASET_FIELD_VALUE_LABEL: "Value",
+    CHART_EDITOR_FORM_DATASET_FIELD_RADIUS_LABEL: "Radius",
 
     DELETE_CHART_DELETION_SUCCESS: "Chart deleted successfully!",
     DELETE_CHART_DIALOG_TITLE: "Delete chart",
@@ -1401,10 +1402,6 @@ export const CONSTANTS = {
     PIE_CHART: {
       name: "Pie Chart",
       value: "pie",
-    },
-    DOUGHNUT_CHART: {
-      name: "Doughnut Chart",
-      value: "doughnut",
     },
     SCATTER_CHART: {
       name: "Scatter Chart",

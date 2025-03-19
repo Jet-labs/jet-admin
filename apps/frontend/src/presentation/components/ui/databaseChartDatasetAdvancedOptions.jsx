@@ -77,7 +77,6 @@ export const DatabaseChartDatasetAdvancedOptions = ({
               minBarLength: 0,
             };
           case CONSTANTS.DATABASE_CHART_TYPES.PIE_CHART.value:
-          case CONSTANTS.DATABASE_CHART_TYPES.DOUGHNUT_CHART.value:
             return {
               rotation: 0,
               circumference: 360,
@@ -624,7 +623,6 @@ export const DatabaseChartDatasetAdvancedOptions = ({
           </>
         );
       case CONSTANTS.DATABASE_CHART_TYPES.PIE_CHART.value:
-      case CONSTANTS.DATABASE_CHART_TYPES.DOUGHNUT_CHART.value:
         return (
           <>
             {/* Pie/Doughnut-specific controls */}

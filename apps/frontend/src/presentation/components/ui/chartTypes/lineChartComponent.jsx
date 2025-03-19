@@ -1,4 +1,4 @@
-import { useTheme } from "@mui/material";
+import { faker } from "@faker-js/faker";
 import {
   CategoryScale,
   Chart as ChartJS,
@@ -10,9 +10,8 @@ import {
   Title,
   Tooltip,
 } from "chart.js";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { Line } from "react-chartjs-2";
-import { faker } from "@faker-js/faker";
 import { CONSTANTS } from "../../../../constants";
 
 ChartJS.register(
@@ -26,47 +25,12 @@ ChartJS.register(
   Legend
 );
 
-export class LineGraphDataset {
-  constructor({
-    label,
-    data,
-    borderColor,
-    backgroundColor,
-    fill = false,
-    tension = 0.4,
-    pointRadius = 3,
-    pointHoverRadius = 5,
-    borderDash = [],
-    borderWidth = 2,
-    stepped = false,
-  }) {
-    this.label = label;
-    this.data = data;
-    this.borderColor = borderColor;
-    this.backgroundColor = backgroundColor;
-    this.fill = fill;
-    this.tension = tension;
-    this.pointRadius = pointRadius;
-    this.pointHoverRadius = pointHoverRadius;
-    this.borderDash = borderDash;
-    this.borderWidth = borderWidth;
-    this.stepped = stepped;
-  }
-}
-
-export class LineGraphData {
-  constructor({ labels, datasets }) {
-    this.labels = labels;
-    this.datasets = datasets;
-  }
-}
-
 const labels = ["January", "February", "March", "April", "May", "June", "July"];
 
 const demoData = {
   labels,
   datasets: [
-    new LineGraphDataset({
+    {
       label: "Dataset 1",
       data: labels.map(() => faker.number.int({ min: -1000, max: 1000 })),
       borderColor: "rgb(255, 99, 132)",
@@ -74,14 +38,14 @@ const demoData = {
       stepped: true,
       borderDash: [5, 15],
       borderWidth: 2,
-    }),
-    new LineGraphDataset({
+    },
+    {
       label: "Dataset 2",
       data: labels.map(() => faker.number.int({ min: -1000, max: 1000 })),
       borderColor: "rgb(53, 162, 235)",
       backgroundColor: "rgba(53, 162, 235, 0.5)",
       fill: true,
-    }),
+    },
   ],
 };
 
@@ -94,8 +58,9 @@ export const LineChartComponent = ({
   indexAxis,
   xStacked,
   yStacked,
+  onChartInit,
 }) => {
-  const theme = useTheme();
+  const chartRef = useRef();
 
   const options = useMemo(() => {
     return {
@@ -138,6 +103,17 @@ export const LineChartComponent = ({
     yStacked,
     indexAxis,
   ]);
-console.log({data})
-  return <Line redraw={true} options={options} data={data || demoData} />;
+  useEffect(() => {
+    if (chartRef && chartRef.current) {
+      onChartInit?.(chartRef);
+    }
+  }, [chartRef]);
+  return (
+    <Line
+      ref={chartRef}
+      redraw={true}
+      options={options}
+      data={data || demoData}
+    />
+  );
 };

@@ -300,7 +300,10 @@ export const DatabaseChartUpdationForm = ({ tenantID, databaseChartID }) => {
                 updateDatabaseChartForm.values.databaseChartConfig.indexAxis
               }
               refreshData={_handleFetchDatabaseChartData}
-              isRefreshingData={isFetchingDatabaseChartData}
+              isFetchingData={
+                isFetchingDatabaseChartData || isFetchingDatabaseChartDataByID
+              }
+              isRefreshingData={isRefetechingDatabaseChartDataByID}
               data={
                 databaseChartFetchedData
                   ? databaseChartFetchedData

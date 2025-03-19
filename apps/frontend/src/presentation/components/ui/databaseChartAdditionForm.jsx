@@ -200,6 +200,7 @@ export const DatabaseChartAdditionForm = ({ tenantID }) => {
               addDatabaseChartForm.values.databaseChartConfig.indexAxis
             }
             refreshData={_handleFetchDatabaseChartData}
+            isFetchingData={isFetchingDatabaseChartData}
             isRefreshingData={isFetchingDatabaseChartData}
             data={databaseChartFetchedData}
           />

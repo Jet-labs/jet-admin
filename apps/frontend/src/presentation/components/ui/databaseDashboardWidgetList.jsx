@@ -4,7 +4,6 @@ import { CONSTANTS } from "../../../constants";
 import { useDatabaseDashboardsState } from "../../../logic/contexts/databaseDashboardsContext";
 import { NoEntityUI } from "./noEntityUI";
 import { AiOutlineRadarChart } from "react-icons/ai";
-import { BiSolidDoughnutChart } from "react-icons/bi";
 import { TbChartScatter } from "react-icons/tb";
 import { PiChartPolar } from "react-icons/pi";
 
@@ -21,10 +20,6 @@ export const DatabaseDashboardWidgetList = ({}) => {
         return <FaChartLine className="text-slate-700 mr-3 !text-xl" />;
       case CONSTANTS.DATABASE_CHART_TYPES.PIE_CHART.value:
         return <FaChartPie className="text-slate-700 mr-3 !text-xl" />;
-      case CONSTANTS.DATABASE_CHART_TYPES.DOUGHNUT_CHART.value:
-        return (
-          <BiSolidDoughnutChart className="text-slate-700 mr-3 !text-xl" />
-        );
       case CONSTANTS.DATABASE_CHART_TYPES.SCATTER_CHART.value:
         return <TbChartScatter className="text-slate-700 mr-3 !text-xl" />;
       case CONSTANTS.DATABASE_CHART_TYPES.RADAR_CHART.value:
