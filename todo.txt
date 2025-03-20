@@ -1,0 +1,2 @@
+improve the errors of signin signup for firebase
+change debounce hoook

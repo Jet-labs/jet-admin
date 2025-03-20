@@ -1,0 +1,10 @@
+apps/backend/node_modules
+apps/backend/firebase-key.json
+apps/backend/production.env
+apps/backend/development.env
+apps/backend/logs
+
+apps/frontend/node_modules
+apps/frontend/.env
+
+node_modules

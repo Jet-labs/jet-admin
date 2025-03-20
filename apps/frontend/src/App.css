@@ -1,0 +1,59 @@
+.codemirror-editor-rounded .cm-editor {
+  border-radius: 4px !important;
+}
+
+.codemirror-editor-rounded .cm-gutters {
+  border-top-left-radius: 4px !important;
+  border-bottom-left-radius: 4px !important;
+}
+
+.codemirror-editor-rounded-bottom .cm-editor {
+  border-bottom-left-radius: 4px !important;
+  border-bottom-right-radius: 4px !important;
+}
+
+.codemirror-editor-rounded-bottom .cm-gutters {
+  border-bottom-left-radius: 4px !important;
+}
+
+/* data-grid.css */
+.rdg {
+  --border-color: #e5e7eb !important;
+}
+
+/* Cell borders */
+.rdg-cell {
+  border-right: 1px solid var(--border-color) !important;
+  border-bottom: 1px solid var(--border-color) !important;
+    background-color: #fff !important;
+    color: black;
+}
+
+/* Header borders */
+.rdg-header-row .rdg-cell {
+  border-bottom: 2px solid #d1d5db !important;
+  background-color: #f8fafc !important;
+}
+
+/* Row borders */
+.rdg-row:not(:last-child) .rdg-cell {
+  border-bottom: 1px solid var(--border-color) !important;
+}
+
+/* Remove right border for last cell */
+.rdg-cell:last-child {
+  border-right: none !important;
+}
+
+
+.MuiDataGrid-cell--editing {
+  background-color: #e3f2fd !important;
+}
+.changed-cell {
+  background-color: #ffe7a4 !important;
+  position: relative;
+}
+
+.react-grid-item.react-grid-placeholder { background: #646cff !important; }
+
+

@@ -1,0 +1,1444 @@
+export const CONSTANTS = {
+  APP_NAME: "Jet Admin",
+  // SERVER_HOST: import.meta.env.PROD
+  //   ? "https://api.jetforms.live"
+  //   : "https://8090-idx-jet-restaurant-admin-1736926042490.cluster-fu5knmr55rd44vy7k7pxk74ams.cloudworkstations.dev",
+  SERVER_HOST: "http://localhost:8090",
+  SUPABASE: {
+    TENANT_ASSET_DIRECTORY: "tenant-assets",
+    TENANT_LOGO_DIRECTORY: "logos",
+  },
+
+  ROLES: {
+    PRIMARY: {
+      ADMIN: { name: "Admin", value: "ADMIN" },
+      MEMBER: { name: "Member", value: "MEMBER" },
+    },
+  },
+
+  STRINGS: {
+    DASHBOARD_DROPPING_ELEMENT_TAG: "__dropping-elem__",
+    HIDE_QUERY_META_CONTENT_BUTTON_TEXT: "Hide metadata",
+    SHOW_QUERY_META_CONTENT_BUTTON_TEXT: "Show metadata",
+    DATABASE_TABLE_VIEW_CHANGES_UPDATED_SUCCESS:
+      "Changes updated successfully!",
+    DATABASE_TABLE_VIEW_CHANGES_DELETE_ROWS_BUTTON: "Delete selected rows",
+    DATABASE_TABLE_VIEW_CHANGES_DELETE_ROWS_DIALOG_TITLE: "Delete table rows",
+    DATABASE_TABLE_VIEW_CHANGES_DELETE_ROWS_DIALOG_DESCRIPTION:
+      "Are you sure you want to delete the selected table rows?.This action cannot be undone.",
+    DATABASE_TABLE_VIEW_CHANGES_DELETED_SUCCESS: "Rows deleted successfully!",
+    DATABASE_TABLE_VIEW_CHANGES_EXPORTED_SUCCESS: "Rows exported successfully!",
+    DATABASE_TABLE_VIEW_CHANGES_SAVED_SUCCESS: "Changes saved successfully!",
+    DATABASE_TABLE_VIEW_ADD_FILTER: "Add filter",
+    DATABASE_TABLE_VIEW_ADD_ROW: "Add row",
+    ROW_EXPORT_CONFIRMATION_TITLE: "Export rows",
+    ROW_EXPORT_CONFIRMATION_BODY: "Select row export format",
+    ROW_EXPORT_CONFIRMATION_CANCEL_BUTTON: "Cancel",
+    ROW_EXPORT_CONFIRMATION_BUTTON: "Export rows",
+    EXPORT_BUTTON_TEXT: "Export data",
+    MAIN_DRAWER_DATABASE_SCHEMA_TITLE: "Database Schemas",
+    MAIN_DRAWER_DATABASE_DASHBOARDS_TITLE: "Dashboards",
+    MAIN_DRAWER_DATABASE_CHARTS_TITLE: "Charts",
+    MAIN_DRAWER_DATABASE_QUERIES_TITLE: "Database queries",
+    MAIN_DRAWER_ADD_DATABASE_SCHEMA_BUTTON: "Add schema",
+    MAIN_DRAWER_USER_MANAGEMENT_TITLE: "User management",
+    NO_TENANT_CREATED_TILL_NOW: "Please create a tenant",
+    NO_PERMISSION_TO_VIEW_TENANT_TITLE: "Permission denied!",
+    NO_PERMISSION_TO_VIEW_TENANT_DESCRIPTION:
+      "You do not have permissions to view the tenant details",
+    SIGN_IN_FORM_TITLE: "Sign in to your account",
+    SIGN_IN_FORM_EMAIL_FIELD_LABEL: "Email",
+    SIGN_IN_FORM_EMAIL_FIELD_PLACEHOLDER: "yourname@org.com",
+    SIGN_IN_FORM_PASSWORD_FIELD_LABEL: "Password",
+    SIGN_IN_FORM_PASSWORD_FIELD_PLACEHOLDER: "",
+    SIGN_IN_FORM_SUBMIT_BUTTON: "Sign in",
+    SIGN_IN_FORM_GOOGLE_SIGN_IN_LABEL: "Sign in with Google",
+    SIGN_IN_FORM_TO_SIGN_UP_MESSAGE: "Don’t have an account yet?",
+
+    SIGN_UP_FORM_TITLE: "Sign up using email",
+    SIGN_UP_FORM_EMAIL_FIELD_LABEL: "Email",
+    SIGN_UP_FORM_EMAIL_FIELD_PLACEHOLDER: "yourname@org.com",
+    SIGN_UP_FORM_PASSWORD_FIELD_LABEL: "Password",
+    SIGN_UP_FORM_PASSWORD_FIELD_PLACEHOLDER: "",
+    SIGN_UP_FORM_CONFIRM_PASSWORD_FIELD_LABEL: "Confirm password",
+    SIGN_UP_FORM_CONFIRM_PASSWORD_FIELD_PLACEHOLDER: "",
+    SIGN_UP_FORM_TO_SIGN_IN_MESSAGE: "Already have an account yet?",
+    SIGN_UP_FORM_SUBMIT_BUTTON: "Sign up",
+
+    ADD_TENANT_FORM_TITLE: "Add tenant",
+    ADD_TENANT_FORM_NAME_FIELD_LABEL: "Tenant name",
+    ADD_TENANT_FORM_NAME_FIELD_PLACEHOLDER: "Your tenant's name",
+    ADD_TENANT_FORM_LOGO_FIELD_LABEL: "Logo",
+    ADD_TENANT_FORM_SUBMIT_BUTTON: "Submit",
+    ADD_TENANT_SUCCESS_TOAST: "Tenant added successfully!",
+    ADD_TENANT_LOGO_UPLOAD_SUCCESS_TOAST: "Logo uploaded successfully!",
+    ADD_TENANT_LOGO_UPLOAD_ERROR_MESSAGE: "Logo upload error!",
+    ADD_TENANT_LOGO_UPLOAD_ERROR_TOAST: "Logo uploaded error!",
+
+    UPDATE_TENANT_FORM_TITLE: "Edit tenant",
+    UPDATE_TENANT_FORM_NAME_FIELD_LABEL: "Tenant name",
+    UPDATE_TENANT_FORM_DB_FIELD_LABEL: "Database URL",
+    UPDATE_TENANT_FORM_NAME_FIELD_PLACEHOLDER: "Your restaurant's name",
+    UPDATE_TENANT_FORM_DB_FIELD_PLACEHOLDER: "Your PostgreSQL database URL",
+    UPDATE_TENANT_FORM_LOGO_FIELD_LABEL: "Logo",
+    UPDATE_TENANT_FORM_SUBMIT_BUTTON: "Submit",
+    UPDATE_TENANT_SUCCESS_TOAST: "Tenant updated successfully!",
+    UPDATE_TENANT_LOGO_UPLOAD_SUCCESS_TOAST: "Logo uploaded successfully!",
+    UPDATE_TENANT_LOGO_UPLOAD_ERROR_MESSAGE: "Logo uploaded error!",
+    UPDATE_TENANT_LOGO_UPLOAD_ERROR_TOAST: "Logo uploaded error!",
+    UPDATE_TENANT_MEMBERS_TITLE: "Tenant members",
+    UPDATE_TENANT_CREATOR_TITLE: "Tenant creator",
+    UPDATE_TENANT_ADD_MEMBERS_BUTTON: "Add member",
+
+    UPDATE_TENANT_MEMBER_ACTION_REMOVE: "Remove",
+    UPDATE_TENANT_MEMBER_ACTION_PROMOTE: "Promote to owner",
+
+    TENANT_EDITOR_FORM_NAME_FIELD_LABEL: "Tenant name",
+    TENANT_EDITOR_FORM_NAME_FIELD_PLACEHOLDER: "Your tenant's name",
+    TENANT_EDITOR_FORM_LOGO_FIELD_LABEL: "Logo",
+    TENANT_EDITOR_FORM_DB_FIELD_LABEL: "Database URL",
+    TENANT_EDITOR_FORM_DB_FIELD_PLACEHOLDER: "Your PostgreSQL database URL",
+    TENANT_EDITOR_FORM_DB_URL_TEST: "Test connection",
+    TENANT_EDITOR_DB_URL_TEST_SUCCESS_TOAST: "DB connection successfull!",
+    TENANT_EDITOR_DB_URL_TEST_FAILED_TOAST: "DB connection failed!",
+    TENANT_EDITOR_LOGO_UPLOAD_SUCCESS_TOAST: "Logo uploaded successfully!",
+    TENANT_EDITOR_LOGO_UPLOAD_ERROR_MESSAGE: "Logo upload error!",
+    TENANT_EDITOR_LOGO_UPLOAD_ERROR_TOAST: "Logo uploaded error!",
+
+    TENANT_SELECTION_DROPDOWN_NO_TENANT_SELECTED: "Select tenant",
+    TENANT_SELECTION_DROPDOWN_ADD_TENANT: "Add tenant",
+
+    ADD_MEMBER_TO_TENANT_DIALOG_TITLE: "Add member to current tenant",
+    ADD_MEMBER_TO_TENANT_DIALOG_DESCRIPTION:
+      "The user must register first in order to be added to tenant.",
+    ADD_MEMBER_TO_TENANT_DIALOG_FORM_MEMBER_EMAIL_LABEL: "Member email",
+    ADD_MEMBER_TO_TENANT_DIALOG_FORM_MEMBER_EMAIL_PLACEHOLDER:
+      "member@someorg.com",
+    ADD_MEMBER_TO_TENANT_DIALOG_FORM_SUBMIT_BUTTON: "Add",
+    ADD_MEMBER_TO_TENANT_SUCCESS_TOAST: "Member added successfully!",
+
+    MEMBER_ACTION_MENU_REMOVE_MEMBER_DIALOG_TITLE: "Remove member from tenant?",
+    MEMBER_ACTION_MENU_REMOVE_MEMBER_DIALOG_DESCRIPTION:
+      "Are you sure you want to remove member from tenant?.This action cannot be undone.",
+
+    MEMBER_ACTION_MENU_PROMOTE_MEMBER_DIALOG_TITLE: "Promote to owner?",
+    MEMBER_ACTION_MENU_PROMOTE_MEMBER_DIALOG_DESCRIPTION:
+      "Are you sure you want to promote the member to owner?.This action cannot be undone.",
+    MEMBER_ACTION_MEMBER_PROMOTED_SUCCESS_TOAST:
+      "Member promoted successfully!",
+    MEMBER_ACTION_MEMBER_REMOVED_SUCCESS_TOAST: "Member removed successfully!",
+
+    ADD_SCHEMA_FORM_TITLE: "Add schema",
+    ADD_SCHEMA_FORM_NAME_FIELD_LABEL: "Schema name",
+    ADD_SCHEMA_FORM_NAME_FIELD_PLACEHOLDER: "Your schema's name",
+    ADD_SCHEMA_FORM_SUBMIT_BUTTON: "Submit",
+    ADD_SCHEMA_SUCCESS_TOAST: "Schema added successfully!",
+
+    ADD_TABLE_FORM_TITLE: "Add table",
+    ADD_TABLE_FORM_NAME_FIELD_LABEL: "Table name",
+    ADD_TABLE_FORM_NAME_FIELD_PLACEHOLDER: "Your table's name",
+    ADD_TABLE_FORM_IF_NOT_EXIST_FIELD_LABEL: "Create table only if not exists",
+    ADD_TABLE_FORM_COLUMN_NAME_LABEL: "Column name",
+    ADD_TABLE_FORM_COLUMN_NAME_PLACEHOLDER: "Enter column name",
+    ADD_TABLE_FORM_COLUMN_TYPE_LABEL: "Data type",
+    ADD_TABLE_FORM_COLUMN_TYPE_PLACEHOLDER: "Select data type",
+    ADD_TABLE_FORM_COLUMN_DEFAULT_LABEL: "Default",
+    ADD_TABLE_FORM_COLUMN_DEFAULT_PLACEHOLDER:
+      "Enter the default value expression",
+    ADD_TABLE_FORM_COLUMN_CHECK_LABEL: "Checks",
+    ADD_TABLE_FORM_COLUMN_CHECK_PLACEHOLDER: "Enter the check expression",
+    ADD_TABLE_FORM_COLUMN_UNIQUE_CHECK_LABEL: "Unique",
+    ADD_TABLE_FORM_COLUMN_PRIMARY_CHECK_LABEL: "Primary",
+    ADD_TABLE_FORM_COLUMN_NOT_NULL_CHECK_LABEL: "Not null",
+    ADD_TABLE_FORM_NOT_NULL_LABEL: "NOT NULL",
+    ADD_TABLE_FORM_UNIQUE_LABEL: "UNIQUE",
+    ADD_TABLE_FORM_PRIMARY_KEY_LABEL: "Primary Key",
+    ADD_TABLE_FORM_PRIMARY_KEY_PLACEHOLDER: "Select primary key columns",
+    ADD_TABLE_FORM_FOREIGN_KEY_LABEL: "Foreign Keys",
+    ADD_TABLE_FORM_FOREIGN_KEY_NAME_LABEL: "Foreign key name (optional)",
+    ADD_TABLE_FORM_FOREIGN_KEY_SCHEMA_LABEL: "Select schema",
+    ADD_TABLE_FORM_FOREIGN_KEY_COLUMN_LABEL: "Select columns",
+    ADD_TABLE_FORM_FOREIGN_KEY_SELECTED_COLUMN_LABEL: "Selected columns",
+    ADD_TABLE_FORM_FOREIGN_KEY_REFERENCE_TABLE_PLACEHOLDER:
+      "Select reference table",
+    ADD_TABLE_FORM_FOREIGN_KEY_REFERENCE_COLUMN_PLACEHOLDER: "Reference column",
+    ADD_TABLE_FORM_FOREIGN_KEY_REFERENCE_COLUMN_LABEL: "Select ref columns",
+    ADD_TABLE_FORM_FOREIGN_KEY_ON_DELETE_LABEL: "On delete",
+    ADD_TABLE_FORM_FOREIGN_KEY_ON_UPDATE_LABEL: "On update",
+    ADD_TABLE_FORM_ADD_COLUMN_TITLE: "Columns",
+    ADD_TABLE_FORM_ADD_COLUMN_BUTTON: "Add column",
+    ADD_TABLE_FORM_REMOVE_COLUMN_BUTTON: "Remove",
+    ADD_TABLE_FORM_ADD_FOREIGN_KEY_BUTTON: "Add foreign Key",
+    ADD_TABLE_FORM_ADD_FOREIGN_KEY_TITLE: "Foreign keys",
+    ADD_TABLE_FORM_REMOVE_FOREIGN_KEY_BUTTON: "Remove",
+    ADD_TABLE_FORM_SUBMIT_BUTTON: "Save table",
+    ADD_TABLE_SUCCESS_TOAST: "Table added successfully!",
+    ADD_TABLE_BUTTON_TEXT: "Add table",
+
+    UPDATE_TABLE_FORM_TITLE: "Update table",
+    UPDATE_TABLE_FORM_NAME_FIELD_LABEL: "Table name",
+    UPDATE_TABLE_FORM_NAME_FIELD_PLACEHOLDER: "Your table's name",
+    UPDATE_TABLE_FORM_IF_NOT_EXIST_FIELD_LABEL:
+      "Create table only if not exists",
+    UPDATE_TABLE_FORM_COLUMN_NAME_LABEL: "Column name",
+    UPDATE_TABLE_FORM_COLUMN_NAME_PLACEHOLDER: "Enter column name",
+    UPDATE_TABLE_FORM_COLUMN_TYPE_LABEL: "Data type",
+    UPDATE_TABLE_FORM_COLUMN_TYPE_PLACEHOLDER: "Select data type",
+    UPDATE_TABLE_FORM_COLUMN_DEFAULT_LABEL: "Default",
+    UPDATE_TABLE_FORM_COLUMN_DEFAULT_PLACEHOLDER:
+      "Enter the default value expression",
+    UPDATE_TABLE_FORM_COLUMN_CHECK_LABEL: "Checks",
+    UPDATE_TABLE_FORM_COLUMN_CHECK_PLACEHOLDER: "Enter the check expression",
+    UPDATE_TABLE_FORM_COLUMN_UNIQUE_CHECK_LABEL: "Unique",
+    UPDATE_TABLE_FORM_COLUMN_PRIMARY_CHECK_LABEL: "Primary",
+    UPDATE_TABLE_FORM_COLUMN_NOT_NULL_CHECK_LABEL: "Not null",
+    UPDATE_TABLE_FORM_NOT_NULL_LABEL: "NOT NULL",
+    UPDATE_TABLE_FORM_UNIQUE_LABEL: "UNIQUE",
+    UPDATE_TABLE_FORM_PRIMARY_KEY_LABEL: "Primary Key",
+    UPDATE_TABLE_FORM_PRIMARY_KEY_PLACEHOLDER: "Select primary key columns",
+    UPDATE_TABLE_FORM_FOREIGN_KEY_LABEL: "Foreign Keys",
+    UPDATE_TABLE_FORM_FOREIGN_KEY_NAME_LABEL: "Foreign key name (optional)",
+    UPDATE_TABLE_FORM_FOREIGN_KEY_SCHEMA_LABEL: "Select schema",
+    UPDATE_TABLE_FORM_FOREIGN_KEY_COLUMN_LABEL: "Select columns",
+    UPDATE_TABLE_FORM_FOREIGN_KEY_SELECTED_COLUMN_LABEL: "Selected columns",
+    UPDATE_TABLE_FORM_FOREIGN_KEY_REFERENCE_TABLE_PLACEHOLDER:
+      "Select reference table",
+    UPDATE_TABLE_FORM_FOREIGN_KEY_REFERENCE_COLUMN_PLACEHOLDER:
+      "Reference column",
+    UPDATE_TABLE_FORM_FOREIGN_KEY_REFERENCE_COLUMN_LABEL: "Select ref columns",
+    UPDATE_TABLE_FORM_FOREIGN_KEY_ON_DELETE_LABEL: "On delete",
+    UPDATE_TABLE_FORM_FOREIGN_KEY_ON_UPDATE_LABEL: "On update",
+    UPDATE_TABLE_FORM_ADD_COLUMN_TITLE: "Columns",
+    UPDATE_TABLE_FORM_ADD_COLUMN_BUTTON: "Add column",
+    UPDATE_TABLE_FORM_REMOVE_COLUMN_BUTTON: "Remove",
+    UPDATE_TABLE_FORM_ADD_FOREIGN_KEY_BUTTON: "Add foreign Key",
+    UPDATE_TABLE_FORM_ADD_FOREIGN_KEY_TITLE: "Foreign keys",
+    UPDATE_TABLE_FORM_REMOVE_FOREIGN_KEY_BUTTON: "Remove",
+    UPDATE_TABLE_FORM_SUBMIT_BUTTON: "Save table",
+    UPDATE_TABLE_SUCCESS_TOAST: "Table updated successfully!",
+    UPDATE_TABLE_BUTTON_TEXT: "Update table",
+
+    TABLE_EDITOR_FORM_NAME_FIELD_LABEL: "Table name",
+    TABLE_EDITOR_FORM_NAME_FIELD_PLACEHOLDER: "Your table's name",
+    TABLE_EDITOR_FORM_IF_NOT_EXIST_FIELD_LABEL:
+      "Create table only if not exists",
+    TABLE_EDITOR_FORM_COLUMN_NAME_LABEL: "Column name",
+    TABLE_EDITOR_FORM_COLUMN_NAME_PLACEHOLDER: "Enter column name",
+    TABLE_EDITOR_FORM_COLUMN_TYPE_LABEL: "Data type",
+    TABLE_EDITOR_FORM_COLUMN_TYPE_PLACEHOLDER: "Select data type",
+    TABLE_EDITOR_FORM_COLUMN_DEFAULT_LABEL: "Default",
+    TABLE_EDITOR_FORM_COLUMN_DEFAULT_PLACEHOLDER:
+      "Enter the default value expression",
+    TABLE_EDITOR_FORM_COLUMN_CHECK_LABEL: "Checks",
+    TABLE_EDITOR_FORM_COLUMN_CHECK_PLACEHOLDER: "Enter the check expression",
+    TABLE_EDITOR_FORM_COLUMN_UNIQUE_CHECK_LABEL: "Unique",
+    TABLE_EDITOR_FORM_COLUMN_PRIMARY_CHECK_LABEL: "Primary",
+    TABLE_EDITOR_FORM_COLUMN_NOT_NULL_CHECK_LABEL: "Not null",
+    TABLE_EDITOR_FORM_NOT_NULL_LABEL: "NOT NULL",
+    TABLE_EDITOR_FORM_UNIQUE_LABEL: "UNIQUE",
+    TABLE_EDITOR_FORM_PRIMARY_KEY_LABEL: "Primary Key",
+    TABLE_EDITOR_FORM_PRIMARY_KEY_PLACEHOLDER: "Select primary key columns",
+    TABLE_EDITOR_FORM_FOREIGN_KEY_LABEL: "Foreign Keys",
+    TABLE_EDITOR_FORM_FOREIGN_KEY_NAME_LABEL: "Foreign key name (optional)",
+    TABLE_EDITOR_FORM_FOREIGN_KEY_SCHEMA_LABEL: "Select schema",
+    TABLE_EDITOR_FORM_FOREIGN_KEY_COLUMN_LABEL: "Select columns",
+    TABLE_EDITOR_FORM_FOREIGN_KEY_SELECTED_COLUMN_LABEL: "Selected columns",
+    TABLE_EDITOR_FORM_FOREIGN_KEY_REFERENCE_TABLE_PLACEHOLDER:
+      "Select reference table",
+    TABLE_EDITOR_FORM_FOREIGN_KEY_REFERENCE_COLUMN_PLACEHOLDER:
+      "Reference column",
+    TABLE_EDITOR_FORM_FOREIGN_KEY_REFERENCE_COLUMN_LABEL: "Select ref columns",
+    TABLE_EDITOR_FORM_FOREIGN_KEY_ON_DELETE_LABEL: "On delete",
+    TABLE_EDITOR_FORM_FOREIGN_KEY_ON_UPDATE_LABEL: "On update",
+    TABLE_EDITOR_FORM_ADD_COLUMN_TITLE: "Columns",
+    TABLE_EDITOR_FORM_ADD_COLUMN_BUTTON: "Add column",
+    TABLE_EDITOR_FORM_REMOVE_COLUMN_BUTTON: "Remove",
+    TABLE_EDITOR_FORM_ADD_FOREIGN_KEY_BUTTON: "Add foreign Key",
+    TABLE_EDITOR_FORM_ADD_FOREIGN_KEY_TITLE: "Foreign keys",
+    TABLE_EDITOR_FORM_REMOVE_FOREIGN_KEY_BUTTON: "Remove",
+
+    DATABASE_TABLE_DELETION_SUCCESS: "Table deleted successfully!",
+    DATABASE_TABLE_DELETION_DIALOG_TITLE: "Delete table?",
+    DATABASE_TABLE_DELETION_DIALOG_MESSAGE:
+      "Are you sure you want to delete this table? This action cannot be undone.",
+
+    TABLE_DRAWER_LIST_NO_TABLE: "No tables found",
+    TRIGGER_DRAWER_LIST_NO_TRIGGER: "No triggers found",
+    QUERY_DRAWER_LIST_NO_QUERY: "No queries found",
+    CHART_DRAWER_LIST_NO_CHART: "No charts found",
+    DASHBOARD_DRAWER_LIST_NO_DASHBOARD: "No dashboards found",
+
+    ADD_TRIGGER_BUTTON_TEXT: "Add trigger",
+
+    TABLE_DRAWER_LIST_TITLE: "Tables",
+    TRIGGER_DRAWER_LIST_TITLE: "Triggers",
+    UNTITLED: "Untitled",
+
+    ADD_TRIGGER_FORM_TITLE: "Create trigger",
+    ADD_TRIGGER_FORM_SUBMIT: "Save trigger",
+
+    // Labels
+    ADD_TRIGGER_FORM_TRIGGER_NAME_LABEL: "Trigger Name",
+    ADD_TRIGGER_FORM_TABLE_NAME_LABEL: "Table Name",
+    ADD_TRIGGER_FORM_FUNCTION_NAME_LABEL: "Function Name",
+    ADD_TRIGGER_FORM_TIMING_LABEL: "Timing",
+    ADD_TRIGGER_FORM_EVENTS_LABEL: "Events",
+    ADD_TRIGGER_FORM_FOR_EACH_LABEL: "For Each",
+    ADD_TRIGGER_FORM_WHEN_CONDITION_LABEL: "WHEN Condition (optional)",
+    ADD_TRIGGER_FORM_REF_OLD_LABEL: "REFERENCING OLD (optional)",
+    ADD_TRIGGER_FORM_REF_NEW_LABEL: "REFERENCING NEW (optional)",
+    ADD_TRIGGER_FORM_DEFERRABLE_LABEL: "DEFERRABLE",
+    ADD_TRIGGER_FORM_INITIALLY_DEFERRED_LABEL: "INITIALLY DEFERRED",
+
+    // Placeholders
+    ADD_TRIGGER_FORM_TRIGGER_NAME_PLACEHOLDER: "Enter trigger name",
+    ADD_TRIGGER_FORM_TABLE_NAME_PLACEHOLDER: "Select table",
+    ADD_TRIGGER_FORM_TIMING_PLACEHOLDER: "Timing",
+    ADD_TRIGGER_FORM_FOR_EACH_PLACEHOLDER: "",
+    ADD_TRIGGER_FORM_FUNCTION_NAME_PLACEHOLDER: "Enter function name",
+    ADD_TRIGGER_FORM_WHEN_CONDITION_PLACEHOLDER: "e.g., NEW.column_name > 100",
+
+    // Validation Messages
+    ADD_TRIGGER_FORM_VALIDATION_REQUIRED: "This field is required",
+    ADD_TRIGGER_FORM_VALIDATION_EVENTS_REQUIRED:
+      "At least one event must be selected",
+
+    ADD_TRIGGER_FORM_TRIGGER_CREATED: "Trigger created successfully",
+
+    TRIGGER_VIEW_TITLE: "Trigger details",
+    TRIGGER_VIEW_TRIGGER_NAME: "Trigger name",
+    TRIGGER_VIEW_TABLE_NAME: "Table name",
+    TRIGGER_VIEW_TRIGGER_TIMING: "Trigger timing",
+    TRIGGER_VIEW_FOR_EACH: "For each",
+    TRIGGER_VIEW_TRIGGER_EVENTS: "Trigger events",
+    TRIGGER_VIEW_FUNCTION_NAME: "Function name",
+    TRIGGER_VIEW_WHEN_CONDITION: "When condition",
+    TRIGGER_VIEW_REFERENCING_OLD: "Referencing old",
+    TRIGGER_VIEW_REFERENCING_NEW: "Referencing new",
+    TRIGGER_VIEW_DEFERRABLE: "Deferrable",
+    TRIGGER_VIEW_INITIALLY_DEFERRED: "Initially deferred",
+    TRIGGER_VIEW_DELETE_BUTTON: "Delete trigger",
+    TRIGGER_VIEW_DELETE_DIALOG_TITLE: "Delete trigger",
+    TRIGGER_VIEW_DELETE_DIALOG_MESSAGE:
+      "Are you sure you want to delete this item? This action cannot be undone.",
+    TRIGGER_VIEW_DELETE_SUCCESS: "Trigger deleted successfully",
+
+    ADD_QUERY_BUTTON_TEXT: "Add query",
+
+    ADD_CHART_BUTTON_TEXT: "Add chart",
+
+    // Labels
+    ADD_QUERY_FORM_TITLE: "Add query",
+    ADD_QUERY_FORM_QUERY_ADDITION_SUCCESS: "Query added successfully!",
+    ADD_QUERY_FORM_QUERY_TESTING_SUCCESS: "Query run successfully!",
+    ADD_QUERY_FORM_SUBMIT_BUTTON: "Add query",
+    ADD_QUERY_FORM_TEST_BUTTON: "Test query",
+    ADD_QUERY_FORM_NAME_FIELD_LABEL: "Query name",
+    ADD_QUERY_FORM_NAME_FIELD_PLACEHOLDER: "Your query's name",
+    ADD_QUERY_FORM_DESCRIPTION_FIELD_LABEL: "Description",
+    ADD_QUERY_FORM_DESCRIPTION_FIELD_PLACEHOLDER:
+      "Your query description (optional)",
+    ADD_QUERY_FORM_PARAMS_FIELD_LABEL: "Query params",
+    ADD_QUERY_FORM_RUN_ON_LOAD_FIELD_LABEL: "Run on load",
+
+    UPDATE_QUERY_FORM_TITLE: "Update query",
+    UPDATE_QUERY_FORM_QUERY_UPDATION_SUCCESS: "Query updated successfully!",
+
+    UPDATE_QUERY_FORM_QUERY_TESTING_SUCCESS: "Query run successfully!",
+    UPDATE_QUERY_FORM_SUBMIT_BUTTON: "Update query",
+    UPDATE_QUERY_FORM_TEST_BUTTON: "Test query",
+    UPDATE_QUERY_FORM_NAME_FIELD_LABEL: "Query name",
+    UPDATE_QUERY_FORM_NAME_FIELD_PLACEHOLDER: "Your query's name",
+    UPDATE_QUERY_FORM_DESCRIPTION_FIELD_LABEL: "Description",
+    UPDATE_QUERY_FORM_DESCRIPTION_FIELD_PLACEHOLDER:
+      "Your query description (optional)",
+    UPDATE_QUERY_FORM_PARAMS_FIELD_LABEL: "Query params",
+    UPDATE_QUERY_FORM_RUN_ON_LOAD_FIELD_LABEL: "Run on load",
+    UPDATE_QUERY_FORM_UPDATE_DIALOG_TITLE: "Update query",
+    UPDATE_QUERY_FORM_UPDATE_DIALOG_MESSAGE:
+      "Are you sure you want to update this item? This action cannot be undone.",
+
+    TEST_QUERY_FORM_TEST_BUTTON: "Test query",
+    TEST_QUERY_FORM_QUERY_TESTING_SUCCESS: "Query run successfully!",
+
+    DELETE_QUERY_DELETION_SUCCESS: "Query deleted successfully!",
+    DELETE_QUERY_DIALOG_TITLE: "Delete query",
+    DELETE_QUERY_DIALOG_MESSAGE:
+      "Are you sure you want to delete this item? This action cannot be undone.",
+
+    DATABASE_QUERY_ARGS_FORM_TITLE: "Query arguments",
+    DATABASE_QUERY_ARGS_FORM_DESCRIPTION: "Enter the query arguments",
+    DATABASE_QUERY_ARGS_FORM_CONFIRM_BUTTON: "Confirm",
+
+    DATABASE_TABLES_STATS_TITLE: "Database Stats",
+    DATABASE_TABLES_STATS_TOTAL_TABLES_LABEL: "Total Tables",
+    DATABASE_TABLES_STATS_TOTAL_COLUMNS_LABEL: "Total Columns",
+    DATABASE_TABLES_STATS_TABLES_WITH_PRIMARY_KEYS_LABEL:
+      "Tables with Primary Keys",
+    DATABASE_TABLES_STATS_TOTAL_CONSTRAINTS_LABEL: "Total Constraints",
+
+    UPDATE_TENANT_USER_BY_ID_FORM_TITLE: "Update user",
+    UPDATE_TENANT_USER_BY_ID_EMAIL_LABEL: "Email",
+    UPDATE_TENANT_USER_BY_ID_PROFILE_TITLE: "Profile",
+    UPDATE_TENANT_USER_BY_ID_ASSIGNED_ROLES_TITLE: "Assigned roles",
+    UPDATE_TENANT_USER_BY_ID_MANAGE_ROLES: "Manage roles",
+    UPDATE_TENANT_USER_BY_ID_REMOVE_ROLE_DIALOG_TITLE: "Remove role?",
+    UPDATE_TENANT_USER_BY_ID_REMOVE_ROLE_DIALOG_MESSAGE:
+      "Are you sure you want to remove this role from user? This action cannot be undone.",
+    UPDATE_TENANT_USER_BY_ID_NO_ROLES: "No roles assigned to user",
+    UPDATE_TENANT_USER_BY_ID_USER_ADMIN_NO_ROLES: "User is tenant admin",
+    UPDATE_TENANT_USER_BY_ID_USER_ROLES_UPDATED_SUCCESSFULLY:
+      "Roles updated succedssfully",
+    UPDATE_TENANT_USER_BY_ID_REMOVE_USER_FROM_TENANT: "Remove user from tenant",
+    UPDATE_TENANT_USER_BY_ID_REMOVE_USER_FROM_TENANT_SUCCESS:
+      "User removed successfully",
+    UPDATE_TENANT_USER_BY_ID_REMOVE_USER_DIALOG_TITLE: "Remove user?",
+    UPDATE_TENANT_USER_BY_ID_REMOVE_USER_DIALOG_MESSAGE:
+      "Are you sure you want to remove user from tenant? This action cannot be undone.",
+    TENANT_ROLE_SELECTION_TITLE: "User roles",
+    TENANT_ROLE_SELECTION_MEMBERSHIP_LABEL: "Tenant admin",
+    TENANT_ROLE_SELECTION_MEMBERSHIP_INFO:
+      "Making a user tenant admin removes are the roles assigned to user.",
+    TENANT_ROLE_SELECTION_SELECT_ROLES_LABEL: "Select roles",
+    TENANT_PERMISSION_SELECTION_LABEL: "Select permissions",
+    TENANT_ROLE_SELECTION_SELECTED_ROLES_TITLE: "Selected roles",
+    TENANT_ROLE_SELECTION_CANCEL: "Cancel",
+    TENANT_ROLE_SELECTION_SUBMIT: "Update roles",
+
+    TENANT_USER_MANAGEMENT_TITLE: "User management",
+    TENANT_USER_MANAGEMENT_ADD_MEMBER_BUTTON: "Add member",
+
+    TENANT_ROLE_MANAGEMENT_TITLE: "Role management",
+    TENANT_ROLE_MANAGEMENT_ADD_ROLE_BUTTON: "Add role",
+
+    TENANT_ROLE_ADDITION_TITLE: "Add role",
+    TENANT_ROLE_ADDITION_FORM_ROLE_NAME_FIELD_LABEL: "Role name",
+    TENANT_ROLE_ADDITION_FORM_ROLE_NAME_FIELD_PLACEHOLDER: "Role name",
+
+    TENANT_ROLE_ADDITION_FORM_ROLE_DESCRIPTION_FIELD_LABEL: "Role description",
+    TENANT_ROLE_ADDITION_FORM_ROLE_DESCRIPTION_FIELD_PLACEHOLDER:
+      "Role description",
+
+    TENANT_ROLE_ADDITION_FORM_ROLE_PERMISSIONS_FIELD_LABEL:
+      "Select permissions",
+
+    TENANT_ROLE_ADDITION_FORM_SUBMIT_BUTTON: "Add role",
+    TENANT_ROLE_ADDITION_SUCCESS_TOAST: "Role added successfully",
+
+    TENANT_ROLE_UPDATION_TITLE: "Update role",
+    TENANT_ROLE_UPDATION_FORM_ROLE_NAME_FIELD_LABEL: "Role name",
+    TENANT_ROLE_UPDATION_FORM_ROLE_NAME_FIELD_PLACEHOLDER: "Role name",
+
+    TENANT_ROLE_UPDATION_FORM_ROLE_DESCRIPTION_FIELD_LABEL: "Role description",
+    TENANT_ROLE_UPDATION_FORM_ROLE_DESCRIPTION_FIELD_PLACEHOLDER:
+      "Role description",
+
+    TENANT_ROLE_UPDATION_FORM_ROLE_PERMISSIONS_FIELD_LABEL:
+      "Select permissions",
+
+    TENANT_ROLE_UPDATION_FORM_SUBMIT_BUTTON: "Update role",
+    TENANT_ROLE_UPDATION_SUCCESS_TOAST: "Role added successfully",
+
+    TENANT_ROLE_DELETION_SUCCESS: "Role deleted successfully!",
+    TENANT_ROLE_DELETION_DIALOG_TITLE: "Delete role?",
+    TENANT_ROLE_DELETION_DIALOG_MESSAGE:
+      "Are you sure you want to delete this role? This action cannot be undone.",
+
+    ADD_CHART_FORM_TITLE: "Add chart",
+    ADD_CHART_FORM_CHART_ADDITION_SUCCESS: "Chart added successfully!",
+    ADD_CHART_FORM_CHART_TESTING_SUCCESS: "Chart run successfully!",
+    ADD_CHART_FORM_SUBMIT_BUTTON: "Add chart",
+
+    UPDATE_CHART_FORM_TITLE: "Update chart",
+    UPDATE_CHART_FORM_CHART_UPDATION_SUCCESS: "Chart updated successfully!",
+    UPDATE_CHART_FORM_CHART_TESTING_SUCCESS: "Chart run successfully!",
+    UPDATE_CHART_FORM_SUBMIT_BUTTON: "Update chart",
+
+    UPDATE_CHART_FORM_UPDATE_DIALOG_TITLE: "Update chart",
+    UPDATE_CHART_FORM_UPDATE_DIALOG_MESSAGE:
+      "Are you sure you want to update this item? This action cannot be undone.",
+
+    CHART_EDITOR_FORM_NAME_FIELD_LABEL: "Chart name",
+    CHART_EDITOR_FORM_NAME_FIELD_PLACEHOLDER: "Your chart's name",
+    CHART_EDITOR_FORM_TYPE_FIELD_LABEL: "Chart type",
+    CHART_EDITOR_FORM_TITLE_ENABLED_FIELD_LABEL: "Title enabled",
+    CHART_EDITOR_FORM_LEGEND_ENABLED_FIELD_LABEL: "Legend enabled",
+    CHART_EDITOR_FORM_LEGEND_POSITION_FIELD_LABEL: "Legend position",
+    CHART_EDITOR_FORM_X_STACKED_FIELD_LABEL: "X stacked",
+    CHART_EDITOR_FORM_Y_STACKED_FIELD_LABEL: "Y stacked",
+    CHART_EDITOR_FORM_INDEX_AXIS_LABEL: "Index axis",
+    CHART_EDITOR_FORM_REFRESH_INTERVAL_LABEL: "Refresh interval",
+
+    CHART_EDITOR_FORM_TYPE_FIELD_LABEL: "Chart type",
+    CHART_EDITOR_FORM_DATASET_FIELD_LABEL: "Datasets",
+    CHART_EDITOR_FORM_ADD_DATASET_BUTTON: "Add dataset",
+
+    CHART_EDITOR_FORM_DESCRIPTION_FIELD_LABEL: "Chart description",
+    CHART_EDITOR_FORM_DESCRIPTION_FIELD_PLACEHOLDER: "Your chart's description",
+
+    CHART_EDITOR_FORM_DATASET_TITLE_LABEL: "Dataset title",
+    CHART_EDITOR_FORM_DATASET_QUERY_LABEL: "Dataset query",
+    CHART_EDITOR_FORM_DATASET_UI_CONFIG_LABEL: "UI options",
+    CHART_EDITOR_FORM_DATASET_FIELD_MAPPINGS_LABEL: "Mappings",
+    CHART_EDITOR_FORM_DATASET_ARGUMENTS_LABEL: "Arguments",
+    CHART_EDITOR_FORM_DATASET_COLOR_LABEL: "Dataset color",
+    CHART_EDITOR_FORM_DATASET_BORDER_WIDTH_LABEL: "Border width",
+    CHART_EDITOR_FORM_DATASET_FIELD_X_AXIS_LABEL: "X axis",
+    CHART_EDITOR_FORM_DATASET_FIELD_Y_AXIS_LABEL: "Y axis",
+    CHART_EDITOR_FORM_DATASET_FIELD_LABEL_LABEL: "Label",
+    CHART_EDITOR_FORM_DATASET_FIELD_VALUE_LABEL: "Value",
+    CHART_EDITOR_FORM_DATASET_FIELD_RADIUS_LABEL: "Radius",
+
+    DELETE_CHART_DELETION_SUCCESS: "Chart deleted successfully!",
+    DELETE_CHART_DIALOG_TITLE: "Delete chart",
+    DELETE_CHART_DIALOG_MESSAGE:
+      "Are you sure you want to delete this item? This action cannot be undone.",
+
+    DASHBOARD_WIDGET_LIST_TITLE: "Widgets",
+    DASHBOARD_WIDGET_LIST_CHARTS_TITLE: "Charts",
+    DASHBOARD_WIDGET_LIST_QUERIES_TITLE: "Queries",
+
+    ADD_DASHBOARD_BUTTON_TEXT: "Add dashboard",
+    ADD_DASHBOARD_FORM_TITLE: "Add dashboard",
+    ADD_DASHBOARD_FORM_DASHBOARD_ADDITION_SUCCESS:
+      "Dashboard added successfully!",
+
+    UPDATE_DASHBOARD_BUTTON_TEXT: "Update dashboard",
+    UPDATE_DASHBOARD_FORM_TITLE: "Update dashboard",
+    UPDATE_DASHBOARD_FORM_DASHBOARD_UPDATION_SUCCESS:
+      "Dashboard updated successfully!",
+    UPDATE_DASHBOARD_FORM_UPDATE_DIALOG_TITLE: "Update dashboard",
+    UPDATE_DASHBOARD_FORM_UPDATE_DIALOG_MESSAGE:
+      "Are you sure you want to update this item? This action cannot be undone.",
+
+    DELETE_DASHBOARD_DELETION_SUCCESS: "Dashboard deleted successfully!",
+    DELETE_DASHBOARD_DIALOG_TITLE: "Delete dashboard",
+    DELETE_DASHBOARD_DIALOG_MESSAGE:
+      "Are you sure you want to delete this item? This action cannot be undone.",
+
+    DASHBOARD_EDITOR_FORM_NAME_FIELD_LABEL: "Dashboard name",
+    DASHBOARD_EDITOR_FORM_NAME_FIELD_PLACEHOLDER: "Your dashboard's name",
+    DASHBOARD_EDITOR_FORM_DESCRIPTION_FIELD_LABEL: "Description",
+    DASHBOARD_EDITOR_FORM_DESCRIPTION_FIELD_PLACEHOLDER:
+      "Descripton (Optional)",
+    CHART_DATASET_ADV_TITLE: "Dataset Configuration",
+    CHART_DATASET_ADV_CONFIRM: "Save changes",
+    CHART_DATASET_ADV_CANCEL: "Discard",
+    CHART_DATASET_ADV_DATASET_TYPE_LABEL: "Chart type override",
+    CHART_DATASET_ADV_DATASET_BACKGROUND_COLOR_LABEL: "Background color",
+    CHART_DATASET_ADV_DATASET_BORDER_COLOR_LABEL: "Border color",
+    CHART_DATASET_ADV_DATASET_BORDER_WIDTH_LABEL: "Border width",
+    CHART_DATASET_ADV_DATASET_BORDER_DASH_LABEL: "Border dash",
+    CHART_DATASET_ADV_DATASET_LINE_TENSION_LABEL: "Line tension",
+    CHART_DATASET_ADV_DATASET_LINE_STEPPED_LABEL: "Line stepped",
+    CHART_DATASET_ADV_DATASET_BAR_THICKNESS_LABEL: "Bar thickness",
+    CHART_DATASET_ADV_DATASET_BORDER_SKIPPED_LABEL: "Border skipped",
+    CHART_DATASET_ADV_DATASET_GROUPED_LABEL: "Grouped",
+    CHART_DATASET_ADV_DATASET_MAX_BAR_THICKNESS_LABEL: "Max bar thickness",
+    CHART_DATASET_ADV_DATASET_BASE_LABEL: "Base",
+    CHART_DATASET_ADV_DATASET_BAR_PERCENTAGE_LABEL: "Bar percentage",
+    CHART_DATASET_ADV_DATASET_CATEGORY_PERCENTAGE_LABEL: "Category percentage",
+    CHART_DATASET_ADV_DATASET_BORDER_RADIUS_LABEL: "Border radius",
+
+    CHART_DATASET_ADV_DATASET_TYPE_LABEL: "Chart type override",
+    CHART_DATASET_ADV_DATASET_X_AXIS_ID_LABEL: "X-axis ID",
+    CHART_DATASET_ADV_DATASET_Y_AXIS_ID_LABEL: "Y-axis ID",
+    CHART_DATASET_ADV_DATASET_HIDDEN_LABEL: "Hidden",
+    CHART_DATASET_ADV_DATASET_ORDER_LABEL: "Order",
+    CHART_DATASET_ADV_DATASET_CLIP_LABEL: "Clip",
+    CHART_DATASET_ADV_DATASET_BACKGROUND_COLOR_LABEL: "Background color",
+    CHART_DATASET_ADV_DATASET_BORDER_COLOR_LABEL: "Border color",
+    CHART_DATASET_ADV_DATASET_BORDER_WIDTH_LABEL: "Border width",
+    CHART_DATASET_ADV_DATASET_BORDER_DASH_LABEL: "Border dash",
+    CHART_DATASET_ADV_DATASET_BORDER_DASH_OFFSET_LABEL: "Border dash offset",
+    CHART_DATASET_ADV_DATASET_BORDER_RADIUS_LABEL: "Border radius",
+    CHART_DATASET_ADV_DATASET_HOVER_BACKGROUND_COLOR_LABEL:
+      "Hover background color",
+    CHART_DATASET_ADV_DATASET_HOVER_BORDER_COLOR_LABEL: "Hover border color",
+    CHART_DATASET_ADV_DATASET_HOVER_BORDER_WIDTH_LABEL: "Hover border width",
+    CHART_DATASET_ADV_DATASET_LINE_TENSION_LABEL: "Line tension",
+    CHART_DATASET_ADV_DATASET_LINE_STEPPED_LABEL: "Line stepped",
+    CHART_DATASET_ADV_DATASET_POINT_RADIUS_LABEL: "Point radius",
+    CHART_DATASET_ADV_DATASET_POINT_STYLE_LABEL: "Point style",
+    CHART_DATASET_ADV_DATASET_POINT_BACKGROUND_COLOR_LABEL:
+      "Point background color",
+    CHART_DATASET_ADV_DATASET_POINT_BORDER_COLOR_LABEL: "Point border color",
+    CHART_DATASET_ADV_DATASET_POINT_BORDER_WIDTH_LABEL: "Point border width",
+    CHART_DATASET_ADV_DATASET_POINT_HIT_RADIUS_LABEL: "Point hit radius",
+    CHART_DATASET_ADV_DATASET_POINT_HOVER_RADIUS_LABEL: "Point hover radius",
+    CHART_DATASET_ADV_DATASET_POINT_HOVER_BACKGROUND_COLOR_LABEL:
+      "Point hover background color",
+    CHART_DATASET_ADV_DATASET_POINT_HOVER_BORDER_COLOR_LABEL:
+      "Point hover border color",
+    CHART_DATASET_ADV_DATASET_POINT_HOVER_BORDER_WIDTH_LABEL:
+      "Point hover border width",
+    CHART_DATASET_ADV_DATASET_FILL_LABEL: "Fill",
+    CHART_DATASET_ADV_DATASET_BAR_THICKNESS_LABEL: "Bar thickness",
+    CHART_DATASET_ADV_DATASET_MAX_BAR_THICKNESS_LABEL: "Max bar thickness",
+    CHART_DATASET_ADV_DATASET_BORDER_SKIPPED_LABEL: "Border skipped",
+    CHART_DATASET_ADV_DATASET_CATEGORY_PERCENTAGE_LABEL: "Category percentage",
+    CHART_DATASET_ADV_DATASET_BAR_PERCENTAGE_LABEL: "Bar percentage",
+    CHART_DATASET_ADV_DATASET_GROUPED_LABEL: "Grouped",
+    CHART_DATASET_ADV_DATASET_INDEX_AXIS_LABEL: "Index axis",
+    CHART_DATASET_ADV_DATASET_STACK_LABEL: "Stack",
+    CHART_DATASET_ADV_DATASET_BASE_LABEL: "Base",
+    CHART_DATASET_ADV_DATASET_ROTATION_LABEL: "Rotation",
+    CHART_DATASET_ADV_DATASET_CIRCUMFERENCE_LABEL: "Circumference",
+    CHART_DATASET_ADV_DATASET_CUTOUT_LABEL: "Cutout",
+    CHART_DATASET_ADV_DATASET_OFFSET_LABEL: "Offset",
+    CHART_DATASET_ADV_DATASET_SPACING_LABEL: "Spacing",
+    CHART_DATASET_ADV_DATASET_HOVER_OFFSET_LABEL: "Hover offset",
+    CHART_DATASET_ADV_DATASET_WEIGHT_LABEL: "Weight",
+    CHART_DATASET_ADV_DATASET_HIT_RADIUS_LABEL: "Hit radius",
+    CHART_DATASET_ADV_DATASET_HOVER_RADIUS_LABEL: "Hover radius",
+    CHART_DATASET_ADV_DATASET_RADIUS_LABEL: "Radius",
+    CHART_DATASET_ADV_DATASET_POINT_RADIUS_LABEL: "Point Radius",
+    CHART_DATASET_ADV_DATASET_POINT_STYLE_LABEL: "Point Style",
+    CHART_DATASET_ADV_DATASET_POINT_BACKGROUND_COLOR_LABEL:
+      "Point Background Color",
+    CHART_DATASET_ADV_DATASET_POINT_BORDER_COLOR_LABEL: "Point Border Color",
+    CHART_DATASET_ADV_DATASET_POINT_BORDER_WIDTH_LABEL: "Point Border Width",
+    CHART_DATASET_ADV_DATASET_POINT_HIT_RADIUS_LABEL: "Point Hit Radius",
+    CHART_DATASET_ADV_DATASET_POINT_HOVER_RADIUS_LABEL: "Point Hover Radius",
+    CHART_DATASET_ADV_DATASET_POINT_HOVER_BACKGROUND_COLOR_LABEL:
+      "Point Hover Background Color",
+    CHART_DATASET_ADV_DATASET_POINT_HOVER_BORDER_COLOR_LABEL:
+      "Point Hover Border Color",
+    CHART_DATASET_ADV_DATASET_POINT_HOVER_BORDER_WIDTH_LABEL:
+      "Point Hover Border Width",
+    CHART_DATASET_ADV_DATASET_FILL_LABEL: "Fill",
+    CHART_DATASET_ADV_DATASET_BAR_THICKNESS_LABEL: "Bar Thickness",
+    CHART_DATASET_ADV_DATASET_HOVER_BORDER_RADIUS_LABEL: "Hover Border Radius",
+    CHART_DATASET_ADV_DATASET_INDEX_AXIS_LABEL: "Index Axis",
+    CHART_DATASET_ADV_DATASET_STACK_LABEL: "Stack",
+    CHART_DATASET_ADV_DATASET_ROTATION_LABEL: "Rotation",
+    CHART_DATASET_ADV_DATASET_CIRCUMFERENCE_LABEL: "Circumference",
+    CHART_DATASET_ADV_DATASET_CUTOUT_LABEL: "Cutout",
+    CHART_DATASET_ADV_DATASET_OFFSET_LABEL: "Offset",
+    CHART_DATASET_ADV_DATASET_SPACING_LABEL: "Spacing",
+    CHART_DATASET_ADV_DATASET_HOVER_OFFSET_LABEL: "Hover Offset",
+    CHART_DATASET_ADV_DATASET_WEIGHT_LABEL: "Weight",
+    CHART_DATASET_ADV_DATASET_HIT_RADIUS_LABEL: "Hit Radius",
+    CHART_DATASET_ADV_DATASET_HOVER_RADIUS_LABEL: "Hover Radius",
+    CHART_DATASET_ADV_DATASET_RADIUS_LABEL: "Radius",
+    CHART_DATASET_ADV_DATASET_POINT_ROTATION_LABEL: "Point Rotation",
+    CHART_DATASET_ADV_DATASET_SHOW_LINE_LABEL: "Show Line",
+    CHART_DATASET_ADV_DATASET_SPAN_GAPS_LABEL: "Span Gaps",
+    CHART_DATASET_ADV_DATASET_BORDER_CAP_STYLE_LABEL: "Border Cap Style",
+    CHART_DATASET_ADV_DATASET_BORDER_JOIN_STYLE_LABEL: "Border Join Style",
+
+    // New constant for Bar Chart
+    CHART_DATASET_ADV_DATASET_MIN_BAR_LENGTH_LABEL: "Minimum Bar Length",
+
+    // New constants for Pie/Doughnut Chart
+    CHART_DATASET_ADV_DATASET_BORDER_ALIGN_LABEL: "Border Align",
+    CHART_DATASET_ADV_DATASET_BORDER_WIDTH_LABEL: "Border Width",
+    CHART_DATASET_ADV_DATASET_HOVER_BORDER_WIDTH_LABEL: "Hover Border Width",
+    CHART_DATASET_ADV_DATASET_HOVER_BORDER_COLOR_LABEL: "Hover Border Color",
+
+    CHART_DATASET_FIELD_MAPPING_TITLE: "Dataset field options",
+    CHART_DATASET_FIELD_MAPPING_NO_META: "Dataset metadata not available",
+    CHART_DATASET_FIELD_MAPPING_CONFIRM: "Save changes",
+    CHART_DATASET_FIELD_MAPPING_CANCEL: "Discard",
+
+    CHART_DATASET_ARGUMENTS_TITLE: "Dataset field options",
+    CHART_DATASET_ARGUMENTS_CONFIRM: "Save changes",
+    CHART_DATASET_ARGUMENTS_CANCEL: "Discard",
+
+    ACCOUNT_PAGE_TITLE: "Accounts",
+    ACCOUNT_PAGE_USER_EMAIL_TITLE: "Email",
+    ACCOUNT_PAGE_USER_PROFILE_TITLE: "Profile",
+    ACCOUNT_PAGE_LOGOUT_BUTTON: "Logout",
+    ACCOUNT_PAGE_LOGOUT_CONFIRMATION_TITLE: "Logout",
+    ACCOUNT_PAGE_LOGOUT_CONFIRMATION_MESSAGE:
+      "Are you sure you want to logout?",
+    ACCOUNT_PAGE_LOGOUT_SUCCESS: "Logged out successfully",
+    ACCOUNT_PAGE_PASSWORD_RESET_LINK_CONFIRMATION_TITLE: "Reset password",
+    ACCOUNT_PAGE_PASSWORD_RESET_LINK_CONFIRMATION_MESSAGE:
+      "A password reset link will be sent to your registered email.",
+    ACCOUNT_PAGE_PASSWORD_RESET_LINK_SENT_SUCCESS:
+      "Password reset link sent successfully ",
+  },
+
+  LOCAL_STORAGE_KEYS: {
+    TENANT: "TENANT",
+  },
+
+  ROUTES: {
+    SIGN_UP: {
+      code: "/sign-up/*",
+      path: () => "/sign-up",
+    },
+    SIGN_IN: {
+      code: "/sign-in/*",
+      path: () => "/sign-in",
+    },
+    HOME: {
+      code: "/",
+      path: () => "/",
+    },
+    VIEW_TENANT: {
+      code: "/tenants/:tenantID/",
+      path: (tenantID) => `/tenants/${tenantID}/`,
+    },
+    ADD_TENANT: {
+      code: "/tenants/add",
+      path: () => "/tenants/add",
+    },
+    UPDATE_TENANT: {
+      code: "/tenants/:tenantID/settings",
+      path: (tenantID) => `/tenants/${tenantID}/settings`,
+    },
+    ADD_SCHEMA: {
+      code: "/tenants/:tenantID/schemas/add",
+      path: (tenantID) => `/tenants/${tenantID}/schemas/add`,
+    },
+    VIEW_SCHEMA: {
+      code: "/tenants/:tenantID/schemas/:databaseSchemaName",
+      path: (tenantID, databaseSchemaName) =>
+        `/tenants/${tenantID}/schemas/${databaseSchemaName}`,
+    },
+    ADD_DATABASE_TABLE: {
+      code: "/tenants/:tenantID/schemas/:databaseSchemaName/tables/add",
+      path: (tenantID, databaseSchemaName) =>
+        `/tenants/${tenantID}/schemas/${databaseSchemaName}/tables/add`,
+    },
+    VIEW_DATABASE_TABLES: {
+      code: "/tenants/:tenantID/schemas/:databaseSchemaName/tables",
+      path: (tenantID, databaseSchemaName) =>
+        `/tenants/${tenantID}/schemas/${databaseSchemaName}/tables`,
+    },
+    VIEW_DATABASE_TABLE_BY_NAME: {
+      code: "/tenants/:tenantID/schemas/:databaseSchemaName/tables/:databaseTableName",
+      path: (tenantID, databaseSchemaName, databaseTableName) =>
+        `/tenants/${tenantID}/schemas/${databaseSchemaName}/tables/${databaseTableName}`,
+    },
+
+    UPDATE_DATABASE_TABLE_BY_NAME: {
+      code: "/tenants/:tenantID/schemas/:databaseSchemaName/tables/:databaseTableName/update",
+      path: (tenantID, databaseSchemaName, databaseTableName) =>
+        `/tenants/${tenantID}/schemas/${databaseSchemaName}/tables/${databaseTableName}/update`,
+    },
+
+    ADD_DATABASE_TRIGGER: {
+      code: "/tenants/:tenantID/schemas/:databaseSchemaName/triggers/add",
+      path: (tenantID, databaseSchemaName) =>
+        `/tenants/${tenantID}/schemas/${databaseSchemaName}/triggers/add`,
+    },
+    VIEW_DATABASE_TRIGGERS: {
+      code: "/tenants/:tenantID/schemas/:databaseSchemaName/triggers",
+      path: (tenantID, databaseSchemaName) =>
+        `/tenants/${tenantID}/schemas/${databaseSchemaName}/triggers`,
+    },
+    VIEW_DATABASE_TRIGGER_BY_NAME: {
+      code: "/tenants/:tenantID/schemas/:databaseSchemaName/triggers/:databaseTableName/:databaseTriggerName",
+      path: (
+        tenantID,
+        databaseSchemaName,
+        databaseTableName,
+        databaseTriggerName
+      ) =>
+        `/tenants/${tenantID}/schemas/${databaseSchemaName}/triggers/${databaseTableName}/${databaseTriggerName}`,
+    },
+
+    ADD_DATABASE_QUERY: {
+      code: "/tenants/:tenantID/queries/add",
+      path: (tenantID) => `/tenants/${tenantID}/queries/add`,
+    },
+    VIEW_DATABASE_QUERIES: {
+      code: "/tenants/:tenantID/queries",
+      path: (tenantID) => `/tenants/${tenantID}/queries`,
+    },
+    UPDATE_DATABASE_QUERY_BY_ID: {
+      code: "/tenants/:tenantID/queries/:databaseQueryID",
+      path: (tenantID, databaseQueryID) =>
+        `/tenants/${tenantID}/queries/${databaseQueryID}`,
+    },
+
+    ADD_DATABASE_CHART: {
+      code: "/tenants/:tenantID/charts/add",
+      path: (tenantID) => `/tenants/${tenantID}/charts/add`,
+    },
+    VIEW_DATABASE_CHARTS: {
+      code: "/tenants/:tenantID/charts",
+      path: (tenantID) => `/tenants/${tenantID}/charts`,
+    },
+    UPDATE_DATABASE_CHART_BY_ID: {
+      code: "/tenants/:tenantID/charts/:databaseChartID",
+      path: (tenantID, databaseChartID) =>
+        `/tenants/${tenantID}/charts/${databaseChartID}`,
+    },
+
+    ADD_DATABASE_DASHBOARD: {
+      code: "/tenants/:tenantID/dashboards/add",
+      path: (tenantID) => `/tenants/${tenantID}/dashboards/add`,
+    },
+    VIEW_DATABASE_DASHBOARDS: {
+      code: "/tenants/:tenantID/dashboards",
+      path: (tenantID) => `/tenants/${tenantID}/dashboards`,
+    },
+    UPDATE_DATABASE_DASHBOARD_BY_ID: {
+      code: "/tenants/:tenantID/dashboards/:databaseDashboardID",
+      path: (tenantID, databaseDashboardID) =>
+        `/tenants/${tenantID}/dashboards/${databaseDashboardID}`,
+    },
+
+    VIEW_TENANT_USERS: {
+      code: "/tenants/:tenantID/users/",
+      path: (tenantID) => `/tenants/${tenantID}/users`,
+    },
+    UPDATE_TENANT_USER_BY_ID: {
+      code: "/tenants/:tenantID/users/:tenantUserID",
+      path: (tenantID, tenantUserID) =>
+        `/tenants/${tenantID}/users/${tenantUserID}`,
+    },
+    VIEW_TENANT_ROLES: {
+      code: "/tenants/:tenantID/roles/",
+      path: (tenantID) => `/tenants/${tenantID}/roles`,
+    },
+    ADD_TENANT_ROLE: {
+      code: "/tenants/:tenantID/roles/add",
+      path: (tenantID) => `/tenants/${tenantID}/roles/add`,
+    },
+    UPDATE_TENANT_ROLE_BY_ID: {
+      code: "/tenants/:tenantID/roles/:tenantRoleID",
+      path: (tenantID, tenantRoleID) =>
+        `/tenants/${tenantID}/roles/${tenantRoleID}`,
+    },
+
+    ACCOUNT: {
+      code: "/account",
+      path: () => "/account",
+    },
+    CONTACT: {
+      code: "/contact-us",
+      path: () => "/contact-us",
+    },
+
+    LEGAL: {
+      code: "/terms",
+      path: () => "/terms",
+    },
+  },
+
+  APIS: {
+    AUTH: {
+      getUserInfoAPI: () => "/api/v1/auth",
+      regenerateAPIKey: () => "/api/auth/api_key",
+    },
+    TENANT: {
+      getUserTenantByIDAPI: (tenantID) => `/api/v1/tenants/${tenantID}`,
+      testTenantDatabaseConnectionAPI: () => `/api/v1/tenants/dbtest`,
+      getAllUserTenantsAPI: () => "/api/v1/tenants",
+      createNewTenantAPI: () => "/api/v1/tenants",
+      updateTenantAPI: (tenantID) => `/api/v1/tenants/${tenantID}`,
+      getAllTenantUsersAPI: (tenantID) => `/api/v1/tenants/${tenantID}/users`,
+    },
+    TENANT_ROLE: {
+      getAllTenantRolesAPI: (tenantID) => `/api/v1/tenants/${tenantID}/roles`,
+      getAllTenantPermissionsAPI: (tenantID) =>
+        `/api/v1/tenants/${tenantID}/roles/permissions`,
+      addTenantRoleAPI: (tenantID) => `/api/v1/tenants/${tenantID}/roles`,
+      getTenantRoleByIDAPI: (tenantID, tenantRoleID) =>
+        `/api/v1/tenants/${tenantID}/roles/${tenantRoleID}`,
+      updateTenantRoleByIDAPI: (tenantID, tenantRoleID) =>
+        `/api/v1/tenants/${tenantID}/roles/${tenantRoleID}`,
+      deleteTenantRoleByIDAPI: (tenantID, tenantRoleID) =>
+        `/api/v1/tenants/${tenantID}/roles/${tenantRoleID}`,
+    },
+    USER_MANAGEMENT: {
+      getAllTenantUsersAPI: (tenantID, page, pageSize) =>
+        `/api/v1/tenants/${tenantID}/users?page=${page}&pageSize=${pageSize}`,
+      addUserToTenantAPI: (tenantID) => `/api/v1/tenants/${tenantID}/users`,
+      getTenantUserByIDAPI: (tenantID, tenantUserID) =>
+        `/api/v1/tenants/${tenantID}/users/${tenantUserID}`,
+      updateTenantUserByIDAPI: (tenantID, tenantUserID) =>
+        `/api/v1/tenants/${tenantID}/users/${tenantUserID}`,
+      updateTenantUserRolesByIDAPI: (tenantID, tenantUserID) =>
+        `/api/v1/tenants/${tenantID}/users/${tenantUserID}/roles`,
+      removeTenantUserByIDAPI: (tenantID, tenantUserID) =>
+        `/api/v1/tenants/${tenantID}/users/${tenantUserID}`,
+    },
+    DATABASE: {
+      getDatabaseMetadataAPI: (tenantID) =>
+        `/api/v1/tenants/${tenantID}/database/metadata`,
+      createDatabaseSchemaAPI: (tenantID) =>
+        `/api/v1/tenants/${tenantID}/database/schemas`,
+      getAllDatabaseTablesAPI: (tenantID, databaseSchemaName) =>
+        `/api/v1/tenants/${tenantID}/database/schemas/${databaseSchemaName}/tables`,
+      createDatabaseTableAPI: (tenantID, databaseSchemaName) =>
+        `/api/v1/tenants/${tenantID}/database/schemas/${databaseSchemaName}/tables`,
+      getDatabaseTableByNameAPI: (
+        tenantID,
+        databaseSchemaName,
+        databaseTableName
+      ) =>
+        `/api/v1/tenants/${tenantID}/database/schemas/${databaseSchemaName}/tables/${databaseTableName}`,
+      updateDatabaseTableByNameAPI: (
+        tenantID,
+        databaseSchemaName,
+        databaseTableName
+      ) =>
+        `/api/v1/tenants/${tenantID}/database/schemas/${databaseSchemaName}/tables/${databaseTableName}`,
+      deleteDatabaseTableByNameAPI: (
+        tenantID,
+        databaseSchemaName,
+        databaseTableName
+      ) =>
+        `/api/v1/tenants/${tenantID}/database/schemas/${databaseSchemaName}/tables/${databaseTableName}`,
+      getDatabaseTableRowsAPI: ({
+        tenantID,
+        databaseSchemaName,
+        databaseTableName,
+        page,
+        pageSize,
+        filterQuery,
+        databaseTableColumnSortModel,
+      }) =>
+        `/api/v1/tenants/${tenantID}/database/schemas/${databaseSchemaName}/tables/${databaseTableName}/rows?page=${page}&pageSize=${pageSize}&q=${JSON.stringify(
+          filterQuery
+        )}&order=${encodeURIComponent(databaseTableColumnSortModel)}`,
+
+      getDatabaseTableStatisticsAPI: ({
+        tenantID,
+        databaseSchemaName,
+        databaseTableName,
+        filterQuery,
+      }) =>
+        `/api/v1/tenants/${tenantID}/database/schemas/${databaseSchemaName}/tables/${databaseTableName}/statistics?q=${JSON.stringify(
+          filterQuery
+        )}`,
+      databaseTableBulkRowAdditionAPI: ({
+        tenantID,
+        databaseSchemaName,
+        databaseTableName,
+      }) =>
+        `/api/v1/tenants/${tenantID}/database/schemas/${databaseSchemaName}/tables/${databaseTableName}/rows`,
+      databaseTableBulkRowUpdationAPI: ({
+        tenantID,
+        databaseSchemaName,
+        databaseTableName,
+      }) =>
+        `/api/v1/tenants/${tenantID}/database/schemas/${databaseSchemaName}/tables/${databaseTableName}/rows`,
+      databaseTableBulkRowDeletionAPI: ({
+        tenantID,
+        databaseSchemaName,
+        databaseTableName,
+      }) =>
+        `/api/v1/tenants/${tenantID}/database/schemas/${databaseSchemaName}/tables/${databaseTableName}/rows/delete`,
+      databaseTableBulkRowExportAPI: ({
+        tenantID,
+        databaseSchemaName,
+        databaseTableName,
+      }) =>
+        `/api/v1/tenants/${tenantID}/database/schemas/${databaseSchemaName}/tables/${databaseTableName}/rows/export`,
+
+      getAllDatabaseTriggersAPI: (tenantID, databaseSchemaName) =>
+        `/api/v1/tenants/${tenantID}/database/schemas/${databaseSchemaName}/triggers`,
+      createDatabaseTriggerAPI: (tenantID, databaseSchemaName) =>
+        `/api/v1/tenants/${tenantID}/database/schemas/${databaseSchemaName}/triggers`,
+      getDatabaseTriggerByNameAPI: (
+        tenantID,
+        databaseSchemaName,
+        databaseTableName,
+        databaseTriggerName
+      ) =>
+        `/api/v1/tenants/${tenantID}/database/schemas/${databaseSchemaName}/triggers/${databaseTableName}/${databaseTriggerName}`,
+
+      deleteDatabaseTriggerByNameAPI: (
+        tenantID,
+        databaseSchemaName,
+        databaseTableName,
+        databaseTriggerName
+      ) =>
+        `/api/v1/tenants/${tenantID}/database/schemas/${databaseSchemaName}/triggers/${databaseTableName}/${databaseTriggerName}`,
+
+      getAllDatabaseQueriesAPI: (tenantID) =>
+        `/api/v1/tenants/${tenantID}/database/queries/`,
+
+      createDatabaseQueryAPI: (tenantID) =>
+        `/api/v1/tenants/${tenantID}/database/queries/`,
+
+      testDatabaseQueryAPI: (tenantID) =>
+        `/api/v1/tenants/${tenantID}/database/queries/queryTest`,
+      getDatabaseQueryByID: (tenantID, databaseQueryID) =>
+        `/api/v1/tenants/${tenantID}/database/queries/${databaseQueryID}`,
+      testDatabaseQueryByIDAPI: (tenantID, databaseQueryID) =>
+        `/api/v1/tenants/${tenantID}/database/queries/${databaseQueryID}/queryTest`,
+      updateDatabaseQueryByID: (tenantID, databaseQueryID) =>
+        `/api/v1/tenants/${tenantID}/database/queries/${databaseQueryID}`,
+      deleteDatabaseQueryByID: (tenantID, databaseQueryID) =>
+        `/api/v1/tenants/${tenantID}/database/queries/${databaseQueryID}`,
+
+      getAllDatabaseChartsAPI: (tenantID) =>
+        `/api/v1/tenants/${tenantID}/database/charts/`,
+
+      createDatabaseChartAPI: (tenantID) =>
+        `/api/v1/tenants/${tenantID}/database/charts/`,
+      getDatabaseChartByIDAPI: (tenantID, databaseChartID) =>
+        `/api/v1/tenants/${tenantID}/database/charts/${databaseChartID}`,
+      updateDatabaseChartByIDAPI: (tenantID, databaseChartID) =>
+        `/api/v1/tenants/${tenantID}/database/charts/${databaseChartID}`,
+      getDatabaseChartDataByIDAPI: (tenantID, databaseChartID) =>
+        `/api/v1/tenants/${tenantID}/database/charts/${databaseChartID}/data`,
+      getDatabaseChartDataUsingChartAPI: (tenantID, databaseChartID) =>
+        `/api/v1/tenants/${tenantID}/database/charts/${databaseChartID}/data`,
+      deleteDatabaseChartByID: (tenantID, databaseChartID) =>
+        `/api/v1/tenants/${tenantID}/database/charts/${databaseChartID}`,
+
+      getAllDatabaseDashboardsAPI: (tenantID) =>
+        `/api/v1/tenants/${tenantID}/database/dashboards/`,
+      createDatabaseDashboardAPI: (tenantID) =>
+        `/api/v1/tenants/${tenantID}/database/dashboards/`,
+      getDatabaseDashboardByIDAPI: (tenantID, databaseDashboardID) =>
+        `/api/v1/tenants/${tenantID}/database/dashboards/${databaseDashboardID}`,
+      updateDatabaseDashboardByIDAPI: (tenantID, databaseDashboardID) =>
+        `/api/v1/tenants/${tenantID}/database/dashboards/${databaseDashboardID}`,
+      deleteDatabaseDashboardByID: (tenantID, databaseDashboardID) =>
+        `/api/v1/tenants/${tenantID}/database/dashboards/${databaseDashboardID}`,
+    },
+  },
+
+  ERROR_CODES: {
+    CANNOT_EDIT_ROW_WHILE_ADDING: {
+      code: "CANNOT_EDIT_ROW_WHILE_ADDING",
+      message: "Cannot edit other rows while adding row",
+    },
+    PERMISSION_DENIED: {
+      code: "PERMISSION_DENIED",
+      message: "Permission denied",
+    },
+    SERVER_ERROR: {
+      code: "SERVER_ERROR",
+      message: "Server error",
+    },
+    INVALID_USER: {
+      code: "INVALID_USER",
+      message: "User not found",
+    },
+    USER_ALREADY_EXISTS: {
+      code: "USER_ALREADY_EXISTS",
+      message: "User already exists, please login instead",
+    },
+
+    PASSWORD_DOES_NOT_MATCH: {
+      code: "PASSWORD_DOES_NOT_MATCH",
+      message: "Password does not match",
+    },
+
+    INVALID_CREDENTIALS: {
+      code: "INVALID_CREDENTIALS",
+      message: "User credentials are not correct",
+    },
+    INVALID_REQUEST: {
+      code: "INVALID_REQUEST",
+      message: "Invalid request",
+    },
+    USER_AUTH_TOKEN_EXPIRED: {
+      code: "USER_AUTH_TOKEN_EXPIRED",
+      message: "User auth token expired",
+    },
+    USER_REFRESH_TOKEN_EXPIRED: {
+      code: "USER_REFRESH_TOKEN_EXPIRED",
+      message: "User refresh token expired",
+    },
+    USER_AUTH_TOKEN_NOT_FOUND: {
+      code: "USER_AUTH_TOKEN_NOT_FOUND",
+      message: "User auth token not found",
+    },
+  },
+
+  REACT_QUERY_KEYS: {
+    DB_USER: "DB_USER",
+    TENANTS: "TENANTS",
+    TENANT_USERS: (tenantID) => `${tenantID}-TENANT_USERS`,
+    TENANT_ROLES: (tenantID) => `${tenantID}-TENANT_ROLES`,
+    TENANT_PERMISSIONS: (tenantID) => `${tenantID}-TENANT_PERMISSIONS`,
+    DATABASE_METADATA: (tenantID) => `${tenantID}-DATABASE_METADATA`,
+    DATABASE_TABLES: (tenantID, databaseSchemaName) =>
+      `${tenantID}-${databaseSchemaName}-DATABASE_TABLES`,
+
+    DATABASE_TABLES_META: (tenantID, databaseSchemaName, databaseTableName) =>
+      `${tenantID}-${databaseSchemaName}-DATABASE_TABLES-${databaseTableName}-META`,
+    DATABASE_TABLES_STATISTICS: (
+      tenantID,
+      databaseSchemaName,
+      databaseTableName
+    ) =>
+      `${tenantID}-${databaseSchemaName}-DATABASE_TABLES-${databaseTableName}-STATISTICS`,
+    DATABASE_TABLES_ROWS: (tenantID, databaseSchemaName, databaseTableName) =>
+      `${tenantID}-${databaseSchemaName}-DATABASE_TABLES-${databaseTableName}-ROWS`,
+
+    DATABASE_TRIGGERS: (tenantID, databaseSchemaName) =>
+      `${tenantID}-${databaseSchemaName}-DATABASE_TRIGGERS`,
+    DATABASE_TRIGGER_BY_NAME: (
+      tenantID,
+      databaseSchemaName,
+      databaseTableName,
+      databaseTriggerName
+    ) =>
+      `${tenantID}-${databaseSchemaName}-${databaseTableName}-DATABASE_TRIGGERS-${databaseTriggerName}`,
+
+    DATABASE_QUERIES: (tenantID) => `${tenantID}-DATABASE_QUERIES`,
+
+    DATABASE_QUERIES_CHECK: (tenantID) => `${tenantID}-DATABASE_QUERIES_CHECK`,
+
+    DATABASE_CHARTS: (tenantID) => `${tenantID}-DATABASE_CHARTS`,
+
+    DATABASE_DASHBOARDS: (tenantID) => `${tenantID}-DATABASE_DASHBOARDS`,
+
+    CUSTOMER_PLAN: "CUSTOMER_PLAN",
+    FORMS: "FORMS",
+    FORM_SUBMISSIONS: "FORM_SUBMISSIONS",
+  },
+
+  DATA_TYPES: {
+    STRING: "String",
+    COLOR: "Color",
+    CODE: "Code",
+    BOOLEAN: "Boolean",
+    INT: "Int",
+    BIGINT: "BigInt",
+    FLOAT: "Float",
+    DECIMAL: "Decimal",
+    DATETIME: "DateTime",
+    JSON: "Json",
+    BYTES: "Bytes",
+    SINGLE_SELECT: "SINGLE_SELECT",
+    MULTIPLE_SELECT: "MULTIPLE_SELECT",
+  },
+
+  JS_DATA_TYPES: {
+    STRING: "string",
+    BOOLEAN: "boolean",
+    NUMBER: "number",
+    BIGINT: "bigint",
+    DATE: "date",
+    OBJECT: "object",
+  },
+
+  POSTGRE_SQL_DATA_TYPES: {
+    bool: {
+      name: "bool",
+      value: "Boolean value (TRUE, FALSE, or NULL)",
+      js_type: "boolean",
+      normalizedType: "Boolean",
+    },
+    int2: {
+      name: "int2",
+      value: "Small integer (-32,768 to 32,767)",
+      js_type: "number",
+      normalizedType: "Int",
+    },
+    int4: {
+      name: "int4",
+      value: "Integer (-2,147,483,648 to 2,147,483,647)",
+      js_type: "number",
+      normalizedType: "Int",
+    },
+    int8: {
+      name: "int8",
+      value:
+        "Large integer (-9,223,372,036,854,775,808 to 9,223,372,036,854,775,807)",
+      js_type: "bigint",
+      normalizedType: "BigInt",
+    },
+    numeric: {
+      name: "numeric",
+      value: "Exact numeric of variable precision and scale",
+      js_type: "number",
+      normalizedType: "Decimal",
+    },
+    float4: {
+      name: "float4",
+      value:
+        "Single-precision floating-point number (approximately ±1.18 x 10^-38 to ±3.4 x 10^38)",
+      js_type: "number",
+      normalizedType: "Float",
+    },
+    float8: {
+      name: "float8",
+      value:
+        "Double-precision floating-point number (approximately ±2.23 x 10^-308 to ±1.8 x 10^308)",
+      js_type: "number",
+      normalizedType: "Float",
+    },
+    serial: {
+      name: "serial",
+      value: "Auto-incrementing integer (typically used for primary keys)",
+      js_type: "number",
+      normalizedType: "Int",
+    },
+    bigserial: {
+      name: "bigserial",
+      value: "Auto-incrementing big integer (typically used for primary keys)",
+      js_type: "bigint",
+      normalizedType: "BigInt",
+    },
+    money: {
+      name: "money",
+      value: "Currency amounts with a fixed decimal point",
+      js_type: "number",
+      normalizedType: "Decimal",
+    },
+    bpchar: {
+      name: "bpchar",
+      value: "Fixed-length character string with length n",
+      js_type: "string",
+      normalizedType: "String",
+    },
+    varchar: {
+      name: "varchar",
+      value: "Variable-length character string with maximum length n",
+      js_type: "string",
+      normalizedType: "String",
+    },
+    text: {
+      name: "text",
+      value: "Variable-length character string with no maximum length",
+      js_type: "string",
+      normalizedType: "String",
+    },
+    _text: {
+      name: "_text",
+      value: "Array of values (e.g., text[])",
+      js_type: "array",
+      normalizedType: "String",
+    },
+    bytea: {
+      name: "bytea",
+      value: "Binary data (byte array)",
+      js_type: "Uint8Array",
+      normalizedType: "Bytes",
+    },
+    date: {
+      name: "date",
+      value: "Calendar date (YYYY-MM-DD)",
+      js_type: "date",
+      normalizedType: "DateTime",
+    },
+    time: {
+      name: "time",
+      value: "Time of day without time zone (HH:MM:SS)",
+      js_type: "string",
+      normalizedType: "DateTime",
+    },
+    timetz: {
+      name: "timetz",
+      value: "Time of day with time zone (HH:MM:SS+/-TZ)",
+      js_type: "string",
+      normalizedType: "DateTime",
+    },
+    timestamp: {
+      name: "timestamp",
+      value: "Date and time without time zone (YYYY-MM-DD HH:MM:SS)",
+      js_type: "date",
+      normalizedType: "DateTime",
+    },
+    timestamptz: {
+      name: "timestamptz",
+      value: "Date and time with time zone (YYYY-MM-DD HH:MM:SS+/-TZ)",
+      js_type: "date",
+      normalizedType: "DateTime",
+    },
+    interval: {
+      name: "interval",
+      value: "Time span (e.g., '1 year 2 months 3 days')",
+      js_type: "string",
+      normalizedType: "String",
+    },
+    uuid: {
+      name: "uuid",
+      value: "Universally unique identifier (128-bit number)",
+      js_type: "string",
+      normalizedType: "String",
+    },
+    json: {
+      name: "json",
+      value: "JSON data (text format)",
+      js_type: "object",
+      normalizedType: "Json",
+    },
+    jsonb: {
+      name: "jsonb",
+      value: "Binary JSON data (more efficient storage and querying)",
+      js_type: "object",
+      normalizedType: "Json",
+    },
+    xml: {
+      name: "xml",
+      value: "XML data",
+      js_type: "string",
+      normalizedType: "String",
+    },
+    _array: {
+      name: "array",
+      value: "Array of values (e.g., integer[], text[])",
+      js_type: "Array",
+      normalizedType: "String",
+    },
+    hstore: {
+      name: "hstore",
+      value: "Key-value pairs (used for storing sets of key-value pairs)",
+      js_type: "object",
+      normalizedType: "Json",
+    },
+    point: {
+      name: "point",
+      value: "Geometric point (x, y)",
+      js_type: "string",
+      normalizedType: "String",
+    },
+    line: {
+      name: "line",
+      value: "Geometric line",
+      js_type: "string",
+      normalizedType: "String",
+    },
+    lseg: {
+      name: "lseg",
+      value: "Geometric line segment",
+      js_type: "string",
+      normalizedType: "String",
+    },
+    box: {
+      name: "box",
+      value: "Geometric box",
+      js_type: "string",
+      normalizedType: "String",
+    },
+    path: {
+      name: "path",
+      value: "Geometric path",
+      js_type: "string",
+      normalizedType: "String",
+    },
+    polygon: {
+      name: "polygon",
+      value: "Geometric polygon",
+      js_type: "string",
+      normalizedType: "String",
+    },
+    circle: {
+      name: "circle",
+      value: "Geometric circle",
+      js_type: "string",
+      normalizedType: "String",
+    },
+    cidr: {
+      name: "cidr",
+      value: "CIDR notation for IP addresses",
+      js_type: "string",
+      normalizedType: "String",
+    },
+    inet: {
+      name: "inet",
+      value: "IP address",
+      js_type: "string",
+      normalizedType: "String",
+    },
+    macaddr: {
+      name: "macaddr",
+      value: "MAC address",
+      js_type: "string",
+      normalizedType: "String",
+    },
+    network: {
+      name: "network",
+      value: "Network address",
+      js_type: "string",
+      normalizedType: "String",
+    },
+  },
+
+  TABLE_FILTERS: {
+    "=": (a, b) => `${a} = ${b}`,
+    "!=": (a, b) => `${a} != ${b}`,
+    "<": (a, b) => `${a} < ${b}`,
+    "<=": (a, b) => `${a} <= ${b}`,
+    ">": (a, b) => `${a} > ${b}`,
+    ">=": (a, b) => `${a} >= ${b}`,
+    LIKE: (a, b) => `${a} LIKE '%${b}%'`,
+    ILIKE: (a, b) => `${a} ILIKE '%${b}%'`,
+  },
+
+  TABLE_COLUMN_SORT: {
+    asc: "asc",
+    desc: "desc",
+    none: "none",
+  },
+
+  TABLE_FOREIGN_KEY_ACTIONS: [
+    "NO ACTION",
+    "RESTRICT",
+    "CASCADE",
+    "SET NULL",
+    "SET DEFAULT",
+  ],
+
+  RESIZABLE_PANEL_KEYS: {
+    QUERY_ADDITION_FORM_RESULT_SEPARATION:
+      "QUERY_ADDITION_FORM_RESULT_SEPARATION",
+    QUERY_ADDITION_FORM_QUERY_EDITOR_SEPARATION:
+      "QUERY_ADDITION_FORM_QUERY_EDITOR_SEPARATION",
+    DATABASE_TRIGGER_LAYOUT_SEPARATION: "DATABASE_TRIGGER_LAYOUT_SEPARATION",
+    DATABASE_TABLE_LAYOUT_SEPARATION: "DATABASE_TABLE_LAYOUT_SEPARATION",
+    DATABASE_QUERY_LAYOUT_SEPARATION: "DATABASE_QUERY_LAYOUT_SEPARATION",
+    DATABASE_CHART_LAYOUT_SEPARATION: "DATABASE_CHART_LAYOUT_SEPARATION",
+    DATABASE_DASHBOARD_LAYOUT_SEPARATION:
+      "DATABASE_DASHBOARD_LAYOUT_SEPARATION",
+    CHART_ADDITION_FORM_RESULT_SEPARATION:
+      "CHART_ADDITION_FORM_RESULT_SEPARATION",
+    CHART_UPDATION_FORM_RESULT_SEPARATION:
+      "CHART_UPDATION_FORM_RESULT_SEPARATION",
+    QUERY_TESTING_FORM_QUERY_SEPARATION: "QUERY_TESTING_FORM_QUERY_SEPARATION",
+    DASHBOARD_ADDITION_FORM_RESULT_SEPARATION:
+      "DASHBOARD_ADDITION_FORM_RESULT_SEPARATION",
+    DASHBOARD_UPDATION_FORM_RESULT_SEPARATION:
+      "DASHBOARD_UPDATION_FORM_RESULT_SEPARATION",
+  },
+
+  PG_TRIGGER_FORM_TIMING_OPTIONS: ["BEFORE", "AFTER", "INSTEAD OF"],
+
+  PG_TRIGGER_FORM_EVENT_OPTIONS: ["INSERT", "UPDATE", "DELETE", "TRUNCATE"],
+
+  PG_TRIGGER_FORM_FOR_EACH_OPTIONS: ["ROW", "STATEMENT"],
+
+  DATABASE_CHART_TYPES: {
+    BAR_CHART: {
+      name: "Bar Chart",
+      value: "bar",
+    },
+    LINE_CHART: {
+      name: "Line Chart",
+      value: "line",
+    },
+    PIE_CHART: {
+      name: "Pie Chart",
+      value: "pie",
+    },
+    SCATTER_CHART: {
+      name: "Scatter Chart",
+      value: "scatter",
+    },
+    BUBBLE_CHART: {
+      name: "Bubble Chart",
+      value: "bubble",
+    },
+    RADAR_CHART: {
+      name: "Radar Chart",
+      value: "radar",
+    },
+    RADIAL_CHART: {
+      name: "Radial Bar Chart",
+      value: "radial",
+    },
+  },
+
+  DATABASE_CHART_LEGEND_POSITION: {
+    TOP: "top",
+    BOTTOM: "bottom",
+    LEFT: "left",
+    RIGHT: "right",
+  },
+};

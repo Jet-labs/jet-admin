@@ -1,0 +1,17 @@
+{
+  "name": "jet-restaurant-admin",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start:f": "cd apps/frontend && npm run dev",
+    "start:b": "cd apps/backend && npm run dev-w",
+    "start:all": "concurrently \"npm run start:frontend\" \"npm run start:backend\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}
