@@ -29,28 +29,16 @@ export const DATABASE_CHARTS_CONFIG_MAP = {
       optional: ["xStacked", "yStacked", "indexAxis"],
     },
     component: ({
-      databaseChartName,
-      legendDisplayEnabled = true,
-      legendPosition,
-      titleDisplayEnabled = true,
       data,
       refetchInterval,
-      xStacked = true,
-      yStacked = true,
-      indexAxis = "y",
       onChartInit,
+      databaseChartConfig,
     }) => (
       <BarChartComponent
-        legendPosition={legendPosition}
-        legendDisplayEnabled={legendDisplayEnabled}
-        titleDisplayEnabled={titleDisplayEnabled}
-        databaseChartName={databaseChartName}
         data={data}
         refetchInterval={refetchInterval}
-        xStacked={xStacked}
-        yStacked={yStacked}
-        indexAxis={indexAxis}
         onChartInit={onChartInit}
+        databaseChartConfig={databaseChartConfig}
       />
     ),
     icon: <FaChartBar className="!text-lg" />,
@@ -69,22 +57,16 @@ export const DATABASE_CHARTS_CONFIG_MAP = {
       optional: ["xStacked", "yStacked", "indexAxis"],
     },
     component: ({
-      databaseChartName,
-      legendDisplayEnabled = true,
-      legendPosition,
-      titleDisplayEnabled = true,
       data,
       refetchInterval,
       onChartInit,
+      databaseChartConfig,
     }) => (
       <LineChartComponent
-        legendPosition={legendPosition}
-        legendDisplayEnabled={legendDisplayEnabled}
-        titleDisplayEnabled={titleDisplayEnabled}
-        databaseChartName={databaseChartName}
         data={data}
         refetchInterval={refetchInterval}
         onChartInit={onChartInit}
+        databaseChartConfig={databaseChartConfig}
       />
     ),
     icon: <FaChartLine className="!text-lg" />,
@@ -103,22 +85,16 @@ export const DATABASE_CHARTS_CONFIG_MAP = {
       optional: [],
     },
     component: ({
-      databaseChartName,
-      legendDisplayEnabled = true,
-      legendPosition,
-      titleDisplayEnabled = true,
       data,
       refetchInterval,
       onChartInit,
+      databaseChartConfig,
     }) => (
       <PieChartComponent
-        legendPosition={legendPosition}
-        legendDisplayEnabled={legendDisplayEnabled}
-        titleDisplayEnabled={titleDisplayEnabled}
-        databaseChartName={databaseChartName}
         data={data}
         refetchInterval={refetchInterval}
         onChartInit={onChartInit}
+        databaseChartConfig={databaseChartConfig}
       />
     ),
     icon: <FaChartPie className="!text-lg" />,
@@ -137,22 +113,16 @@ export const DATABASE_CHARTS_CONFIG_MAP = {
       optional: [],
     },
     component: ({
-      databaseChartName,
-      legendDisplayEnabled = true,
-      legendPosition,
-      titleDisplayEnabled = true,
       data,
       refetchInterval,
       onChartInit,
+      databaseChartConfig,
     }) => (
       <PolarAreaChartComponent
-        legendPosition={legendPosition}
-        legendDisplayEnabled={legendDisplayEnabled}
-        titleDisplayEnabled={titleDisplayEnabled}
-        databaseChartName={databaseChartName}
         data={data}
         refetchInterval={refetchInterval}
         onChartInit={onChartInit}
+        databaseChartConfig={databaseChartConfig}
       />
     ),
     icon: <PiChartPolar className="!text-lg" />,
@@ -171,22 +141,16 @@ export const DATABASE_CHARTS_CONFIG_MAP = {
       optional: [],
     },
     component: ({
-      databaseChartName,
-      legendDisplayEnabled = true,
-      legendPosition,
-      titleDisplayEnabled = true,
       data,
       refetchInterval,
       onChartInit,
+      databaseChartConfig,
     }) => (
       <RadarChartComponent
-        legendPosition={legendPosition}
-        legendDisplayEnabled={legendDisplayEnabled}
-        titleDisplayEnabled={titleDisplayEnabled}
-        databaseChartName={databaseChartName}
         data={data}
         refetchInterval={refetchInterval}
         onChartInit={onChartInit}
+        databaseChartConfig={databaseChartConfig}
       />
     ),
     icon: <BiRadar className="!text-lg" />,
@@ -205,22 +169,16 @@ export const DATABASE_CHARTS_CONFIG_MAP = {
       optional: [],
     },
     component: ({
-      databaseChartName,
-      legendDisplayEnabled = true,
-      legendPosition,
-      titleDisplayEnabled = true,
       data,
       refetchInterval,
       onChartInit,
+      databaseChartConfig,
     }) => (
       <ScatterChartComponent
-        legendPosition={legendPosition}
-        legendDisplayEnabled={legendDisplayEnabled}
-        titleDisplayEnabled={titleDisplayEnabled}
-        databaseChartName={databaseChartName}
         data={data}
         refetchInterval={refetchInterval}
         onChartInit={onChartInit}
+        databaseChartConfig={databaseChartConfig}
       />
     ),
     icon: <FaChartLine className="!text-lg" />,
@@ -239,22 +197,16 @@ export const DATABASE_CHARTS_CONFIG_MAP = {
       optional: [],
     },
     component: ({
-      databaseChartName,
-      legendDisplayEnabled = true,
-      legendPosition,
-      titleDisplayEnabled = true,
       data,
       refetchInterval,
       onChartInit,
+      databaseChartConfig,
     }) => (
       <BubbleChartComponent
-        legendPosition={legendPosition}
-        legendDisplayEnabled={legendDisplayEnabled}
-        titleDisplayEnabled={titleDisplayEnabled}
-        databaseChartName={databaseChartName}
         data={data}
         refetchInterval={refetchInterval}
         onChartInit={onChartInit}
+        databaseChartConfig={databaseChartConfig}
       />
     ),
     icon: <FaChartLine className="!text-lg" />,

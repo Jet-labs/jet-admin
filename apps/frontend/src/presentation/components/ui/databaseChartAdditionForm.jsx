@@ -36,13 +36,30 @@ const initialValues = {
     },
   ],
   databaseChartConfig: {
-    legendPosition: CONSTANTS.DATABASE_CHART_LEGEND_POSITION.TOP,
-    titleDisplayEnabled: true,
-    legendDisplayEnabled: true,
-    refetchInterval: 5,
-    xStacked: true,
-    yStacked: true,
-    indexAxis: "y",
+    responsive: true,
+    maintainAspectRatio: true,
+    backgroundColor: "rgba(255, 255, 255, 0)",
+    color: "#666",
+    plugins: {
+      title: {
+        display: false,
+        text: "Chart Title",
+        position: "top",
+        font: { size: 16, color: "#333" },
+      },
+      legend: {
+        display: true,
+        position: "top",
+        labels: { font: { size: 12, color: "#666" } },
+      },
+      customCanvasBackgroundColor: {
+        backgroundColor: "lightGreen",
+      },
+    },
+    scales: {
+      x: { display: true, title: { display: false, text: "X Axis" } },
+      y: { display: true, title: { display: false, text: "Y Axis" } },
+    },
   },
 };
 
@@ -133,6 +150,7 @@ export const DatabaseChartAdditionForm = ({ tenantID }) => {
     }
   }, [addDatabaseChartForm]);
 
+  console.log({ addDatabaseChartForm: addDatabaseChartForm?.values });
   return (
     <div className="w-full flex flex-col justify-start items-center h-full">
       <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl text-start w-full p-3">
@@ -148,7 +166,7 @@ export const DatabaseChartAdditionForm = ({ tenantID }) => {
       >
         <ResizablePanel defaultSize={20}>
           <form
-            class="w-full h-full p-2 flex flex-col justify-start items-stretch gap-2"
+            class="w-full h-full p-2 flex flex-col justify-start items-stretch gap-2 overflow-y-scroll"
             onSubmit={addDatabaseChartForm.handleSubmit}
           >
             {addDatabaseChartForm && (
@@ -180,21 +198,8 @@ export const DatabaseChartAdditionForm = ({ tenantID }) => {
           <DatabaseChartPreview
             databaseChartName={addDatabaseChartForm.values.databaseChartName}
             databaseChartType={addDatabaseChartForm.values.databaseChartType}
-            legendDisplayEnabled={
+            databaseChartConfig={
               addDatabaseChartForm.values.databaseChartConfig
-                .legendDisplayEnabled
-            }
-            titleDisplayEnabled={
-              addDatabaseChartForm.values.databaseChartConfig
-                .titleDisplayEnabled
-            }
-            legendPosition={
-              addDatabaseChartForm.values.databaseChartConfig.legendPosition
-            }
-            xStacked={addDatabaseChartForm.values.databaseChartConfig.xStacked}
-            yStacked={addDatabaseChartForm.values.databaseChartConfig.yStacked}
-            indexAxis={
-              addDatabaseChartForm.values.databaseChartConfig.indexAxis
             }
             refreshData={_handleFetchDatabaseChartData}
             isFetchingData={isFetchingDatabaseChartData}

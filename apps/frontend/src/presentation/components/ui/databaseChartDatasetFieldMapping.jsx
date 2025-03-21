@@ -53,7 +53,7 @@ export const DatabaseChartDatasetFieldMapping = ({
       <DialogTitle className="!p-4 !pb-0">
         {CONSTANTS.STRINGS.CHART_DATASET_FIELD_MAPPING_TITLE}
       </DialogTitle>
-      <DialogContent className="!p-4 gap-2 flex flex-col justify-start items-stretch">
+      <DialogContent className="!p-4 !space-y-4">
         <div className="rounded border border-slate-200">
           {selectedQuery && selectedQuery.databaseQueryResultSchema && false ? (
             <CollapseComponent

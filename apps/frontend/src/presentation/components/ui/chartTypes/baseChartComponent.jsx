@@ -6,55 +6,36 @@ import { getDemoData } from "./chartConfig";
 
 export const BaseChartComponent = ({
   type,
-  legendPosition,
-  titleDisplayEnabled = true,
-  databaseChartName,
   data,
-  legendDisplayEnabled = true,
-  indexAxis = "x",
-  xStacked = false,
-  yStacked = false,
   onChartInit,
+  databaseChartConfig,
 }) => {
   const chartRef = useRef(null);
 
+  const plugin = {
+    id: "customCanvasBackgroundColor",
+    beforeDraw: (chart, args, options) => {
+      const { ctx } = chart;
+      ctx.save();
+      ctx.globalCompositeOperation = "destination-over";
+      ctx.fillStyle = options.backgroundColor || "#99ffff";
+      ctx.fillRect(0, 0, chart.width, chart.height);
+      ctx.restore();
+    },
+  };
   const options = useMemo(() => {
     return {
-      responsive: true,
-      indexAxis,
-      scales: {
-        x: { stacked: xStacked },
-        y: { stacked: yStacked },
-      },
-      plugins: {
-        legend: legendDisplayEnabled
-          ? {
-              position:
-                legendPosition || CONSTANTS.DATABASE_CHART_LEGEND_POSITION.TOP,
-            }
-          : false,
-        title: {
-          display: Boolean(titleDisplayEnabled),
-          text: databaseChartName || "",
-        },
-      },
+      ...databaseChartConfig,
     };
-  }, [
-    legendPosition,
-    titleDisplayEnabled,
-    databaseChartName,
-    legendDisplayEnabled,
-    indexAxis,
-    xStacked,
-    yStacked,
-  ]);
+  }, [databaseChartConfig]);
 
   useEffect(() => {
     if (chartRef.current) {
-        console.log(chartRef.current)
       onChartInit?.(chartRef);
     }
   }, [onChartInit]);
+
+  console.log({ options });
 
   return (
     <ChartWrapper
@@ -62,6 +43,7 @@ export const BaseChartComponent = ({
       type={type}
       data={data || getDemoData(type)}
       options={options}
+      plugins={[plugin]}
     />
   );
 };

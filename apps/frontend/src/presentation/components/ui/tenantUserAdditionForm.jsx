@@ -61,16 +61,16 @@ export const TenantUserAdditionForm = ({ tenantID, open, onClose }) => {
       aria-describedby="alert-dialog-description"
     >
       <>
-        <DialogTitle className="!p-3 !py-2 !text-sm !flex flex-row justify-between items-center w-full !font-semibold">
+        <DialogTitle className="!p-4 !pb-0 ">
           {CONSTANTS.STRINGS.ADD_MEMBER_TO_TENANT_DIALOG_TITLE}
-          <IconButton aria-label="close" onClick={onClose} className="!ml-3">
-            <CloseIcon className="!text-base !text-slate-600" />
-          </IconButton>
         </DialogTitle>
-        <DialogContent className="!px-3 !pb-3">
+        <DialogContent className="!p-4 !space-y-4">
+          <span className="text-sm font-normal text-gray-600">
+            {CONSTANTS.STRINGS.ADD_MEMBER_TO_TENANT_DIALOG_DESCRIPTION}
+          </span>
           <form
             class="space-y-4 md:space-y-6"
-            onSubmit={addUserToTenantForm.handleSubmit}
+            // onSubmit={addUserToTenantForm.handleSubmit}
           >
             <div>
               <label
@@ -97,27 +97,24 @@ export const TenantUserAdditionForm = ({ tenantID, open, onClose }) => {
                 value={addUserToTenantForm.values.tenantUserEmail}
               />
             </div>
-            <div className="flex flex-row justify-end">
-              <button
-                type="submit"
-                disabled={isAddingMemberToTenant}
-                class="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-blue-700 rounded hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 "
-              >
-                {isAddingMemberToTenant && (
-                  <CircularProgress
-                    className="!text-sm !mr-3"
-                    size={20}
-                    color="white"
-                  />
-                )}
-                {
-                  CONSTANTS.STRINGS
-                    .ADD_MEMBER_TO_TENANT_DIALOG_FORM_SUBMIT_BUTTON
-                }
-              </button>
-            </div>
           </form>
         </DialogContent>
+        <DialogActions className="!p-4">
+          <button
+            onClick={onClose}
+            type="button"
+            className={`px-2.5 py-1.5 text-sm !text-slate-600 border-0 hover:border-0 !border-slate-300 bg-slate-200 hover:!bg-slate-300 rounded  hover:outline-none  outline-none `}
+          >
+            {CONSTANTS.STRINGS.ADD_MEMBER_TO_TENANT_DIALOG_FORM_CANCEL_BUTTON}
+          </button>
+
+          <button
+            onClick={addUserToTenantForm.handleSubmit}
+            className={`px-2.5 py-1.5 text-white text-sm bg-[#646cff] rounded hover:outline-none hover:border-0 border-0 outline-none `}
+          >
+            {CONSTANTS.STRINGS.ADD_MEMBER_TO_TENANT_DIALOG_FORM_SUBMIT_BUTTON}
+          </button>
+        </DialogActions>
       </>
     </Dialog>
   );

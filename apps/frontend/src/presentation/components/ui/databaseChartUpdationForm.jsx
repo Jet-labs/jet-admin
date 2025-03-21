@@ -268,7 +268,7 @@ export const DatabaseChartUpdationForm = ({ tenantID, databaseChartID }) => {
         <ResizablePanel defaultSize={80}>
           {(databaseChartFetchedData ||
             (databaseChartDataByID && databaseChartDataByID.data)) &&
-          databaseChart.databaseChartType ==
+          databaseChart?.databaseChartType ==
             updateDatabaseChartForm?.values.databaseChartType ? (
             <DatabaseChartPreview
               key={databaseChart?.databaseChartID}

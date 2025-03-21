@@ -876,7 +876,7 @@ export const DatabaseChartDatasetAdvancedOptions = ({
       <DialogTitle className="!p-4 !pb-0">
         {CONSTANTS.STRINGS.CHART_DATASET_ADV_TITLE}
       </DialogTitle>
-      <DialogContent className="!p-4">
+      <DialogContent className="!p-4 !space-y-4">
         <div className="grid grid-cols-3 gap-4">
           {/* Common fields */}
           <div className="col-span-2">

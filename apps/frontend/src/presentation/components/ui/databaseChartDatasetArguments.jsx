@@ -41,7 +41,7 @@ export const DatabaseChartDatasetArguments = ({
         <DialogTitle className="!p-4 !pb-0">
           {CONSTANTS.STRINGS.CHART_DATASET_ARGUMENTS_TITLE}
         </DialogTitle>
-        <DialogContent className="!p-4">
+        <DialogContent className="!p-4 !space-y-4">
           {selectedQuery?.databaseQuery?.args?.length > 0 && (
             <div>
               <label className="block mb-2 text-xs font-normal text-slate-500">

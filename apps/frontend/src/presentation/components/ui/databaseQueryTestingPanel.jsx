@@ -14,7 +14,7 @@ export const DatabaseQueryTestingPanel = ({
   const _handleClose = () => {
     setSelectedQueryForTesting(null);
   };
-  console.log({selectedQueryForTesting})
+
   return (
     <>
       <div

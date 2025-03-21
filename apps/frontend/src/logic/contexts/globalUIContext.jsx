@@ -88,15 +88,15 @@ export const GlobalUIProvider = ({ children }) => {
         fullWidth
         maxWidth="xs"
       >
-        <DialogTitle className="font-semibold text-slate-700 !text-lg">
+        <DialogTitle className="font-semibold text-slate-700 !text-lg !p-4 !pb-0">
           {dialogState.title}
         </DialogTitle>
 
-        <DialogContent>
+        <DialogContent className="!p-4">
           <p className="text-slate-600 !text-sm">{dialogState.message}</p>
         </DialogContent>
 
-        <DialogActions className="p-4">
+        <DialogActions className="!p-4">
           <button
             onClick={handleReject}
             disabled={dialogState.isLoading}

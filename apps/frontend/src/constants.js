@@ -108,7 +108,7 @@ export const CONSTANTS = {
     TENANT_SELECTION_DROPDOWN_NO_TENANT_SELECTED: "Select tenant",
     TENANT_SELECTION_DROPDOWN_ADD_TENANT: "Add tenant",
 
-    ADD_MEMBER_TO_TENANT_DIALOG_TITLE: "Add member to current tenant",
+    ADD_MEMBER_TO_TENANT_DIALOG_TITLE: "Add member",
     ADD_MEMBER_TO_TENANT_DIALOG_DESCRIPTION:
       "The user must register first in order to be added to tenant.",
     ADD_MEMBER_TO_TENANT_DIALOG_FORM_MEMBER_EMAIL_LABEL: "Member email",
@@ -116,6 +116,7 @@ export const CONSTANTS = {
       "member@someorg.com",
     ADD_MEMBER_TO_TENANT_DIALOG_FORM_SUBMIT_BUTTON: "Add",
     ADD_MEMBER_TO_TENANT_SUCCESS_TOAST: "Member added successfully!",
+    ADD_MEMBER_TO_TENANT_DIALOG_FORM_CANCEL_BUTTON: "Cancel",
 
     MEMBER_ACTION_MENU_REMOVE_MEMBER_DIALOG_TITLE: "Remove member from tenant?",
     MEMBER_ACTION_MENU_REMOVE_MEMBER_DIALOG_DESCRIPTION:
@@ -461,6 +462,7 @@ export const CONSTANTS = {
     CHART_EDITOR_FORM_NAME_FIELD_LABEL: "Chart name",
     CHART_EDITOR_FORM_NAME_FIELD_PLACEHOLDER: "Your chart's name",
     CHART_EDITOR_FORM_TYPE_FIELD_LABEL: "Chart type",
+    CHART_EDITOR_FORM_ADVANCED_BUTTON: "Advanced config",
     CHART_EDITOR_FORM_TITLE_ENABLED_FIELD_LABEL: "Title enabled",
     CHART_EDITOR_FORM_LEGEND_ENABLED_FIELD_LABEL: "Legend enabled",
     CHART_EDITOR_FORM_LEGEND_POSITION_FIELD_LABEL: "Legend position",
@@ -515,6 +517,9 @@ export const CONSTANTS = {
     DELETE_DASHBOARD_DIALOG_TITLE: "Delete dashboard",
     DELETE_DASHBOARD_DIALOG_MESSAGE:
       "Are you sure you want to delete this item? This action cannot be undone.",
+
+    CHART_ADV_OPTIONS_CONFIRM: "Save changes",
+    CHART_ADV_OPTIONS_CANCEL: "Discard",
 
     DASHBOARD_EDITOR_FORM_NAME_FIELD_LABEL: "Dashboard name",
     DASHBOARD_EDITOR_FORM_NAME_FIELD_PLACEHOLDER: "Your dashboard's name",
@@ -644,6 +649,12 @@ export const CONSTANTS = {
     CHART_DATASET_ARGUMENTS_TITLE: "Dataset field options",
     CHART_DATASET_ARGUMENTS_CONFIRM: "Save changes",
     CHART_DATASET_ARGUMENTS_CANCEL: "Discard",
+
+    CHART_DATASET_CHART_DOWNLOAD_FORM_TITLE: "Select Image Quality",
+    CHART_DATASET_CHART_DOWNLOAD_FORM_DESCRIPTION:
+      "Choose the quality of the image you want to download. Higher quality results in larger file sizes.",
+    CHART_DATASET_CHART_DOWNLOAD_FORM_CONFIRM: "Download",
+    CHART_DATASET_CHART_DOWNLOAD_FORM_CANCEL: "Cancel",
 
     ACCOUNT_PAGE_TITLE: "Accounts",
     ACCOUNT_PAGE_USER_EMAIL_TITLE: "Email",

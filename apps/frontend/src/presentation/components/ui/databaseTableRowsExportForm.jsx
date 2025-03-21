@@ -92,11 +92,11 @@ export const DatabaseTableRowsExportForm = ({
         fullWidth
         maxWidth="xs"
       >
-        <DialogTitle className="flex justify-between items-center text-lg">
+        <DialogTitle className="flex justify-between items-center text-lg !p-4 !pb-0">
           {CONSTANTS.STRINGS.ROW_EXPORT_CONFIRMATION_TITLE}
         </DialogTitle>
 
-        <DialogContent className="py-3">
+        <DialogContent className="!p-4">
           <div className="space-y-4">
             <label className="block text-sm font-medium text-gray-700">
               {CONSTANTS.STRINGS.ROW_EXPORT_CONFIRMATION_BODY}
