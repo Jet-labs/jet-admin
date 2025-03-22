@@ -40,6 +40,84 @@ authService.getUserFromFirebaseID = async ({ firebaseID }) => {
 /**
  * 
  * @param {object} param0 
+ * @param {Number} param0.userID
+ * @param {Number} param0.tenantID
+ * @returns 
+ */
+authService.getUserConfig = async ({ userID,tenantID }) => {
+  try {
+    Logger.log("info", {
+      message: "authService:getUserConfig:params",
+      params: { userID, tenantID },
+    });
+    const userConfig = await prisma.tblUserTenantConfigMap.findUnique({
+      where: {
+        userID_tenantID:{
+          userID:parseInt(userID),
+          tenantID:parseInt(tenantID)
+        },
+      },
+    });
+    Logger.log("success", {
+      message: "authService:getUserConfig:userConfig",
+      params: { userConfig },
+    });
+    return userConfig.config;
+  } catch (error) {
+    Logger.log("error", {
+      message: "authService:getUserConfig:catch1",
+      params: { error },
+    });
+    throw error;
+  }
+};
+
+/**
+ * 
+ * @param {object} param0 
+ * @param {Number} param0.userID
+ * @param {Number} param0.tenantID
+ * @param {JSON} param0.config
+ * @returns 
+ */
+authService.updateUserConfig = async ({ userID,tenantID,config }) => {
+  try {
+    Logger.log("info", {
+      message: "authService:updateUserConfig:params",
+      params: { userID, tenantID,config },
+    });
+    await prisma.tblUserTenantConfigMap.upsert({
+      where: {
+        userID_tenantID:{
+          userID:parseInt(userID),
+          tenantID:parseInt(tenantID)
+        },
+      },
+      create:{
+        userID:parseInt(userID),
+        tenantID:parseInt(tenantID),
+        config
+      },
+      update:{
+        config
+      }
+    });
+    Logger.log("success", {
+      message: "authService:updateUserConfig:success",
+      
+    });
+    return true;
+  } catch (error) {
+    Logger.log("error", {
+      message: "authService:updateUserConfig:catch1",
+      params: { error },
+    });
+    throw error;
+  }
+};
+/**
+ * 
+ * @param {object} param0 
  * @param {String} param0.email
  * @returns 
  */
@@ -326,4 +404,6 @@ authService.checkPermissions = (
     );
   }
 };
+
+
 module.exports = { authService };

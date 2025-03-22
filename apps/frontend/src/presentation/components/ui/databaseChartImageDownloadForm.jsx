@@ -67,12 +67,14 @@ export const DatabaseChartDownloadForm = ({
   
 
   const processedPreview = useMemo(() => {
-    return previewData
-      ? previewData
-      : chartRef?.current
-      ? chartRef.current.toBase64Image("image/jpeg", parseFloat("1.0"))
-      : null;
-    return},[chartRef,previewData]) 
+    console.log(chartRef);
+    if (previewData) return previewData;
+    if (chartRef?.current) {
+      const base64Image = chartRef?.current?.toBase64Image("image/jpeg", 1.0);
+      console.log(base64Image);
+      return base64Image;
+    }
+  }, [chartRef, chartRef.current, previewData]); 
 
   return (
     <>

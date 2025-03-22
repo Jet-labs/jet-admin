@@ -76,7 +76,6 @@ export const DatabaseDashboardQueryWidget = ({
           flex: 1,
           minWidth: 150,
           renderCell: (params) => {
-            console.log(params);
             return (
               <div className="text-sm whitespace-pre-wrap py-2">
                 {params.value?.toString() || "-"}

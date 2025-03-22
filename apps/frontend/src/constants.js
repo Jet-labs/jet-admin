@@ -835,6 +835,8 @@ export const CONSTANTS = {
   APIS: {
     AUTH: {
       getUserInfoAPI: () => "/api/v1/auth",
+      getUserConfigAPI: (tenantID) => `/api/v1/auth/config/${tenantID}`,
+      updateUserConfigAPI: (tenantID) => `/api/v1/auth/config/${tenantID}`,
       regenerateAPIKey: () => "/api/auth/api_key",
     },
     TENANT: {
@@ -1059,8 +1061,10 @@ export const CONSTANTS = {
     },
   },
 
+  USER_CONFIG_KEYS: { DEFAULT_DASHBOARD_ID: "DEFAULT_DASHBOARD_ID" },
   REACT_QUERY_KEYS: {
     DB_USER: "DB_USER",
+    DB_USER_CONFIG: "DB_USER_CONFIG",
     TENANTS: "TENANTS",
     TENANT_USERS: (tenantID) => `${tenantID}-TENANT_USERS`,
     TENANT_ROLES: (tenantID) => `${tenantID}-TENANT_ROLES`,

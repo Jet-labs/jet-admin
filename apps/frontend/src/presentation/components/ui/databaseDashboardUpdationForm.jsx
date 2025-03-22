@@ -12,13 +12,29 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "./resizable";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useGlobalUI } from "../../../logic/contexts/globalUIContext";
 import { DatabaseDashboardDeletionForm } from "./databaseDashboardDeletionForm";
+import {
+  useAuthActions,
+  useAuthState,
+} from "../../../logic/contexts/authContext";
+import { LuPin, LuPinOff } from "react-icons/lu";
+import {
+  RiPushpin2Fill,
+  RiPushpinFill,
+  RiUnpinFill,
+  RiUnpinLine,
+} from "react-icons/ri";
 
-export const DatabaseDashboardUpdationForm = ({ tenantID,databaseDashboardID }) => {
+export const DatabaseDashboardUpdationForm = ({
+  tenantID,
+  databaseDashboardID,
+}) => {
   const queryClient = useQueryClient();
-  const {showConfirmation} = useGlobalUI();
+  const { showConfirmation } = useGlobalUI();
+  const { updateUserConfigKey } = useAuthActions();
+  const { userConfig, isUpdatingUserConfig } = useAuthState();
 
   const {
     isLoading: isLoadingDatabaseDashboard,
@@ -39,7 +55,6 @@ export const DatabaseDashboardUpdationForm = ({ tenantID,databaseDashboardID }) 
       }),
     refetchOnWindowFocus: false,
   });
-
 
   const {
     isPending: isUpdatingDatabaseDashboard,
@@ -85,7 +100,7 @@ export const DatabaseDashboardUpdationForm = ({ tenantID,databaseDashboardID }) 
 
       return errors;
     },
-    onSubmit: async(values) => {
+    onSubmit: async (values) => {
       await showConfirmation({
         title: CONSTANTS.STRINGS.UPDATE_DASHBOARD_FORM_UPDATE_DIALOG_TITLE,
         message: CONSTANTS.STRINGS.UPDATE_DASHBOARD_FORM_UPDATE_DIALOG_MESSAGE,
@@ -97,29 +112,70 @@ export const DatabaseDashboardUpdationForm = ({ tenantID,databaseDashboardID }) 
     },
   });
 
-    useEffect(() => {
-      if (databaseDashboard) {
-        // Update Formik form values with the fetched databaseQuery data
-        dashboardUpdationForm.setFieldValue(
-          "databaseDashboardName",
-          databaseDashboard.databaseDashboardName || CONSTANTS.STRINGS.UNTITLED
-        );
-        dashboardUpdationForm.setFieldValue(
-          "databaseDashboardDescription",
-          databaseDashboard.databaseDashboardDescription || ""
-        );
-        dashboardUpdationForm.setFieldValue(
-          "databaseDashboardConfig",
-          databaseDashboard.databaseDashboardConfig || {}
-        );
-      }
-    }, [databaseDashboard]);
+  useEffect(() => {
+    if (databaseDashboard) {
+      // Update Formik form values with the fetched databaseQuery data
+      dashboardUpdationForm.setFieldValue(
+        "databaseDashboardName",
+        databaseDashboard.databaseDashboardName || CONSTANTS.STRINGS.UNTITLED
+      );
+      dashboardUpdationForm.setFieldValue(
+        "databaseDashboardDescription",
+        databaseDashboard.databaseDashboardDescription || ""
+      );
+      dashboardUpdationForm.setFieldValue(
+        "databaseDashboardConfig",
+        databaseDashboard.databaseDashboardConfig || {}
+      );
+    }
+  }, [databaseDashboard]);
 
+  const isDashboardPinned =
+    userConfig &&
+    databaseDashboard &&
+    parseInt(userConfig[CONSTANTS.USER_CONFIG_KEYS.DEFAULT_DASHBOARD_ID]) ===
+      databaseDashboard.databaseDashboardID;
+  const _handleTogglePinDashboard = useCallback(() => {
+    if (databaseDashboard) {
+      updateUserConfigKey({
+        tenantID,
+        key: CONSTANTS.USER_CONFIG_KEYS.DEFAULT_DASHBOARD_ID,
+        value: isDashboardPinned ? null : databaseDashboard.databaseDashboardID,
+      });
+    }
+  }, [userConfig, isDashboardPinned, databaseDashboard, updateUserConfigKey]);
   return (
     <div className="w-full flex flex-col justify-start items-center h-full">
-      <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl text-start w-full p-3">
-        {CONSTANTS.STRINGS.UPDATE_DASHBOARD_FORM_TITLE}
-      </h1>
+      <div className="flex flex-row justify-between items-center w-full">
+        <div className="w-full px-3 py-2 border-b border-gray-200 flex flex-col justify-center items-start">
+          <h1 className="text-lg font-bold leading-tight tracking-tight text-slate-700">
+            {CONSTANTS.STRINGS.UPDATE_DASHBOARD_FORM_TITLE}
+          </h1>
+
+          {databaseDashboard && (
+            <span className="text-xs text-[#646cff] mt-2">{`Dashboard ID: ${databaseDashboard.databaseDashboardID} `}</span>
+          )}
+        </div>
+        <button
+          onClick={_handleTogglePinDashboard}
+          className="p-0 m-0 mx-3 px-2  bg-[#646cff]/10 py-1 rounded-full text-[#646cff] border-0 focus:border-0 focus:outline-none focus:ring-0 inline-flex items-center"
+        >
+          {isUpdatingUserConfig ? (
+            <CircularProgress size={20} className="!text-[#646cff]" />
+          ) : isDashboardPinned ? (
+            <>
+              <RiUnpinFill className="text-sm" />
+              <span className="text-xs ml-1">Unpin</span>
+            </>
+          ) : (
+            <>
+              <RiPushpinFill className="text-sm" />
+              <span className="text-xs ml-1">Pin</span>
+            </>
+          )}
+        </button>
+      </div>
+
       <ResizablePanelGroup
         direction="horizontal"
         autoSaveId={

@@ -53,7 +53,7 @@ const initialValues = {
         labels: { font: { size: 12, color: "#666" } },
       },
       customCanvasBackgroundColor: {
-        backgroundColor: "lightGreen",
+        backgroundColor: "#fff",
       },
     },
     scales: {
@@ -166,7 +166,7 @@ export const DatabaseChartAdditionForm = ({ tenantID }) => {
       >
         <ResizablePanel defaultSize={20}>
           <form
-            class="w-full h-full p-2 flex flex-col justify-start items-stretch gap-2 overflow-y-scroll"
+            class="w-full h-full p-2 flex flex-col justify-start items-stretch gap-2 overflow-y-auto"
             onSubmit={addDatabaseChartForm.handleSubmit}
           >
             {addDatabaseChartForm && (

@@ -70,7 +70,7 @@ export const getDemoData = (type) => {
       return {
         labels,
         datasets: [
-          { ...commonDatasetProps, fill: true },
+          { ...commonDatasetProps, fill: false },
           {
             ...commonDatasetProps,
             label: "Dataset 2",

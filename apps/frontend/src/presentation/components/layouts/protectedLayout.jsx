@@ -1,5 +1,11 @@
 import React, { useEffect } from "react";
-import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
+import {
+  Link,
+  Outlet,
+  useLocation,
+  useNavigate,
+  useParams,
+} from "react-router-dom";
 import logo from "../../../assets/logo.png";
 
 import {
@@ -12,10 +18,17 @@ import { UserAvatar } from "../ui/userAvatar";
 import { CONSTANTS } from "../../../constants";
 export const ProtectedLayout = () => {
   const { firebaseUserState } = useAuthState();
-  const { signOut } = useAuthActions();
+  const { tenantID } = useParams();
+  const { signOut, getUserConfig } = useAuthActions();
   const location = useLocation();
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (tenantID && firebaseUserState && firebaseUserState.user) {
+      getUserConfig({ tenantID });
+    }
+  }, [tenantID, getUserConfig, firebaseUserState]);
   useEffect(() => {
     if (
       firebaseUserState &&

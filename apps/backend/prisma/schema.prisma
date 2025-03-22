@@ -24,6 +24,7 @@ model tblTenants {
   tblDatabaseQueries          tblDatabaseQueries[]
   tblRoles                    tblRoles[]
   tblUsers                    tblUsers?                     @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fktblTenantstblUsersCreatorID")
+  tblUserTenantConfigMap      tblUserTenantConfigMap[]
   tblUsersTenantsRelationship tblUsersTenantsRelationship[]
 }
 
@@ -46,6 +47,7 @@ model tblUsers {
   tblDatabaseDashboards       tblDatabaseDashboards[]
   tblDatabaseQueries          tblDatabaseQueries[]
   tblTenants                  tblTenants[]
+  tblUserTenantConfigMap      tblUserTenantConfigMap[]
   tblUsersTenantsRelationship tblUsersTenantsRelationship[]
 }
 
@@ -173,4 +175,14 @@ model tblDatabaseDashboards {
   tblDatabaseDashboardChartMappings tblDatabaseDashboardChartMappings[]
   tblUsers                          tblUsers?                           @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDatabaseDashboardCreatorID")
   tblTenants                        tblTenants                          @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDatabaseDashboardsTenantIDTenantID")
+}
+
+model tblUserTenantConfigMap {
+  userID     Int
+  tenantID   Int
+  config     Json?
+  tblTenants tblTenants @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTenantIDTenantID")
+  tblUsers   tblUsers   @relation(fields: [userID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkUserIDUserID")
+
+  @@id([userID, tenantID])
 }

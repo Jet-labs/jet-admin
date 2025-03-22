@@ -8,6 +8,8 @@ import {
   useDatabaseDashboardsState,
 } from "../../../../logic/contexts/databaseDashboardsContext";
 import { MdOutlineSpaceDashboard } from "react-icons/md";
+import { useAuthState } from "../../../../logic/contexts/authContext";
+import { RiPushpinFill } from "react-icons/ri";
 export const DatabaseDashboardDrawerList = ({}) => {
   const {
     isLoadingDatabaseDashboards,
@@ -16,6 +18,7 @@ export const DatabaseDashboardDrawerList = ({}) => {
   } = useDatabaseDashboardsState();
   const { refetchDatabaseDashboards } = useDatabaseDashboardsActions();
   const routeParam = useParams();
+  const { userConfig } = useAuthState();
   const { tenantID } = useParams();
   const navigate = useNavigate();
   const _navigateToAddMoreDashboard = () => {
@@ -48,6 +51,12 @@ export const DatabaseDashboardDrawerList = ({}) => {
               routeParam?.databaseDashboardID ==
               databaseDashboard.databaseDashboardID;
 
+            const isDashboardPinned =
+              userConfig &&
+              databaseDashboard &&
+              parseInt(
+                userConfig[CONSTANTS.USER_CONFIG_KEYS.DEFAULT_DASHBOARD_ID]
+              ) === databaseDashboard.databaseDashboardID;
             return (
               <Link
                 to={CONSTANTS.ROUTES.UPDATE_DATABASE_DASHBOARD_BY_ID.path(
@@ -78,6 +87,9 @@ export const DatabaseDashboardDrawerList = ({}) => {
                     {/* {StringUtils.truncateName(databaseDashboard.databaseDashboardName, 15)} */}
                     {`${databaseDashboard.databaseDashboardName}`}
                   </span>
+                  <div>
+                    {isDashboardPinned && <RiPushpinFill className="text-sm" />}
+                  </div>
                 </div>
               </Link>
             );

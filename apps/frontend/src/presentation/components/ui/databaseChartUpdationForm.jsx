@@ -32,7 +32,8 @@ const initialValues = {
       title: "",
       databaseQueryID: null,
       parameters: {
-        color: "#D84545",
+        backgroundColor: "#D84545",
+        borderWidth: 1,
         type: CONSTANTS.DATABASE_CHART_TYPES.BAR_CHART.value,
       },
       argsMap: {},
@@ -43,13 +44,30 @@ const initialValues = {
     },
   ],
   databaseChartConfig: {
-    legendPosition: CONSTANTS.DATABASE_CHART_LEGEND_POSITION.TOP,
-    titleDisplayEnabled: true,
-    legendDisplayEnabled: true,
-    refetchInterval: 5,
-    xStacked: true,
-    yStacked: true,
-    indexAxis: "y",
+    responsive: true,
+    maintainAspectRatio: true,
+    backgroundColor: "rgba(255, 255, 255, 0)",
+    color: "#666",
+    plugins: {
+      title: {
+        display: false,
+        text: "Chart Title",
+        position: "top",
+        font: { size: 16, color: "#333" },
+      },
+      legend: {
+        display: true,
+        position: "top",
+        labels: { font: { size: 12, color: "#666" } },
+      },
+      customCanvasBackgroundColor: {
+        backgroundColor: "#fff",
+      },
+    },
+    scales: {
+      x: { display: true, title: { display: false, text: "X Axis" } },
+      y: { display: true, title: { display: false, text: "Y Axis" } },
+    },
   },
 };
 
@@ -232,7 +250,7 @@ export const DatabaseChartUpdationForm = ({ tenantID, databaseChartID }) => {
       >
         <ResizablePanel defaultSize={20}>
           <form
-            class="w-full h-full p-2 flex flex-col justify-start items-stretch gap-2"
+            class="w-full h-full p-2 flex flex-col justify-start items-stretch gap-2 overflow-y-auto"
             onSubmit={updateDatabaseChartForm.handleSubmit}
           >
             {updateDatabaseChartForm && (
@@ -278,26 +296,8 @@ export const DatabaseChartUpdationForm = ({ tenantID, databaseChartID }) => {
               databaseChartType={
                 updateDatabaseChartForm.values.databaseChartType
               }
-              legendDisplayEnabled={
+              databaseChartConfig={
                 updateDatabaseChartForm.values.databaseChartConfig
-                  .legendDisplayEnabled
-              }
-              titleDisplayEnabled={
-                updateDatabaseChartForm.values.databaseChartConfig
-                  .titleDisplayEnabled
-              }
-              legendPosition={
-                updateDatabaseChartForm.values.databaseChartConfig
-                  .legendPosition
-              }
-              xStacked={
-                updateDatabaseChartForm.values.databaseChartConfig.xStacked
-              }
-              yStacked={
-                updateDatabaseChartForm.values.databaseChartConfig.yStacked
-              }
-              indexAxis={
-                updateDatabaseChartForm.values.databaseChartConfig.indexAxis
               }
               refreshData={_handleFetchDatabaseChartData}
               isFetchingData={

@@ -18,7 +18,7 @@ export const BaseChartComponent = ({
       const { ctx } = chart;
       ctx.save();
       ctx.globalCompositeOperation = "destination-over";
-      ctx.fillStyle = options.backgroundColor || "#99ffff";
+      ctx.fillStyle = options.backgroundColor || "#fff";
       ctx.fillRect(0, 0, chart.width, chart.height);
       ctx.restore();
     },
@@ -34,8 +34,6 @@ export const BaseChartComponent = ({
       onChartInit?.(chartRef);
     }
   }, [onChartInit]);
-
-  console.log({ options });
 
   return (
     <ChartWrapper

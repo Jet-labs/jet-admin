@@ -123,7 +123,7 @@ export const DatabaseChartEditor = ({ databaseChartEditorForm }) => {
           <CollapseComponent
             showButtonText={CONSTANTS.STRINGS.CHART_EDITOR_FORM_ADVANCED_BUTTON}
             hideButtonText={"Hide"}
-            containerClass={"p-1"}
+            containerClass={"p-0"}
             content={() => (
               <DatabaseChartAdvancedOptions
                 chartForm={databaseChartEditorForm}

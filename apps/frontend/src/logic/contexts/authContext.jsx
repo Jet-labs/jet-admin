@@ -1,4 +1,4 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
@@ -6,16 +6,24 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
 } from "firebase/auth";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { CONSTANTS } from "../../constants";
-import { getUserInfoAPI } from "../../data/apis/auth";
+import {
+  getUserConfigAPI,
+  getUserInfoAPI,
+  updateUserConfigAPI,
+} from "../../data/apis/auth";
 import { firebaseAuth } from "../../config/firebase";
+import { useParams } from "react-router-dom";
+import { set } from "lodash";
 
 const AuthStateContext = React.createContext(undefined);
 const AuthActionsContext = React.createContext(undefined);
 
 const AuthContextProvider = ({ children }) => {
   const queryClient = useQueryClient();
+  const [userConfig, setUserConfig] = useState();
+  // const { tenantID } = useParams();
 
   const [firebaseUserState, setFirebaseUserState] = useState({
     isLoading: true,
@@ -56,6 +64,46 @@ const AuthContextProvider = ({ children }) => {
     cacheTime: Infinity,
     retry: 3,
     staleTime: Infinity,
+  });
+
+  const {
+    isPending: isFetchingUserConfig,
+    isSuccess: isFetchingUserConfigSuccess,
+    isError: isFetchingUserConfigError,
+    error: getUserConfigError,
+    mutate: getUserConfig,
+  } = useMutation({
+    mutationKey: [CONSTANTS.REACT_QUERY_KEYS.DB_USER_CONFIG],
+    mutationFn: async ({ tenantID }) => {
+      return await getUserConfigAPI({
+        tenantID,
+      });
+    },
+    retry: false,
+    onSuccess: (data) => {
+      setUserConfig(data);
+    },
+    onError: (error) => {},
+  });
+
+  const {
+    isPending: isUpdatingUserConfig,
+    isSuccess: isUpdatingUserConfigSuccess,
+    isError: isUpdatingUserConfigError,
+    error: updateUserConfigError,
+    mutate: updateUserConfig,
+  } = useMutation({
+    mutationFn: ({ tenantID, config }) => {
+      return updateUserConfigAPI({
+        tenantID,
+        config,
+      });
+    },
+    retry: false,
+    onSuccess: (tenantID) => {
+      getUserConfig({ tenantID: tenantID });
+    },
+    onError: (error) => {},
   });
 
   // effect for setting up firebase auth listener
@@ -138,6 +186,17 @@ const AuthContextProvider = ({ children }) => {
     }
   };
 
+  const updateUserConfigKey = useCallback(
+    ({ tenantID, key, value }) => {
+      console.log("updateUserConfigKey", tenantID, key, value);
+      updateUserConfig({
+        tenantID,
+        config: { ...userConfig, [key]: value },
+      });
+    },
+    [userConfig, updateUserConfig]
+  );
+
   return (
     <AuthStateContext.Provider
       value={{
@@ -149,6 +208,9 @@ const AuthContextProvider = ({ children }) => {
         signUpState,
         signOutState,
         passwordResetState,
+        userConfig,
+        isFetchingUserConfig,
+        isUpdatingUserConfig,
       }}
     >
       <AuthActionsContext.Provider
@@ -158,6 +220,9 @@ const AuthContextProvider = ({ children }) => {
           emailSignUp,
           resetPassword,
           signOut,
+          getUserConfig,
+          updateUserConfig,
+          updateUserConfigKey,
         }}
       >
         {children}
