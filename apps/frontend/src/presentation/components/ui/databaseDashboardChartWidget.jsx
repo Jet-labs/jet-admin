@@ -59,17 +59,9 @@ export const DatabaseDashboardChartWidget = ({
       {databaseChart &&
         DATABASE_CHARTS_CONFIG_MAP[databaseChart.databaseChartType]?.component({
           databaseChartName: databaseChart.databaseChartName,
-          legendDisplayEnabled:
-            databaseChart.databaseChartConfig.legendDisplayEnabled,
-          legendPosition: databaseChart.databaseChartConfig.legendPosition,
-
-          titleDisplayEnabled:
-            databaseChart.databaseChartConfig.titleDisplayEnabled,
+          databaseChartConfig: databaseChart.databaseChartConfig,
           data: databaseChartData?.data,
           refetchInterval: databaseChart.databaseChartConfig.refetchInterval,
-          xStacked: databaseChart.databaseChartConfig.xStacked,
-          yStacked: databaseChart.databaseChartConfig.yStacked,
-          indexAxis: databaseChart.databaseChartConfig.indexAxis,
         })}
     </div>
   );

@@ -1,28 +1,28 @@
 import { CircularProgress } from "@mui/material";
-import { useRef } from "react";
+import { useCallback, useRef } from "react";
 import { FiRefreshCcw } from "react-icons/fi";
 import { DATABASE_CHARTS_CONFIG_MAP } from "./chartTypes";
 import { DatabaseChartDownloadForm } from "./databaseChartImageDownloadForm";
+import { CONSTANTS } from "../../../constants";
 export const DatabaseChartPreview = ({
   databaseChartName,
   databaseChartType,
-  legendPosition,
-  legendDisplayEnabled,
-  titleDisplayEnabled,
   data,
   refetchInterval,
-  xStacked,
-  yStacked,
-  indexAxis,
   isFetchingData,
   isRefreshingData,
   refreshData,
   databaseChartConfig,
 }) => {
   const chartRef = useRef();
-  const _handleOnChartInit = (ref) => {
-    chartRef.current = ref.current;
-  };
+  const _handleOnChartInit = useCallback(
+    (ref) => {
+      if (chartRef) {
+        chartRef.current = ref.current;
+      }
+    },
+    [chartRef]
+  );
   return (
     <div className="h-full w-full flex flex-col">
       <div className="w-full flex flex-row justify-end items-center bg-slate-100 border-b border-b-slate-200 p-2 gap-2">
@@ -44,27 +44,29 @@ export const DatabaseChartPreview = ({
           )}
         </button>
       </div>
-      {isFetchingData ? (
+      {isFetchingData || isRefreshingData ? (
         <div className="w-full h-full flex flex-col justify-center items-center">
-          <CircularProgress />
+          <CircularProgress className=" !text-[#646cff]" />
         </div>
       ) : (
         <div className="h-full w-full p-3">
-          {DATABASE_CHARTS_CONFIG_MAP[databaseChartType].component({
-            databaseChartName,
-            legendDisplayEnabled,
-            titleDisplayEnabled,
-            legendPosition,
-            databaseChartType,
-            data,
-            xStacked,
-            yStacked,
-            indexAxis,
-            onChartInit: _handleOnChartInit,
-            refetchInterval,
-            refreshData,
-            databaseChartConfig,
-          })}
+          {DATABASE_CHARTS_CONFIG_MAP[databaseChartType] ? (
+            DATABASE_CHARTS_CONFIG_MAP[databaseChartType].component({
+              databaseChartName,
+              databaseChartType,
+              data,
+              onChartInit: _handleOnChartInit,
+              refetchInterval,
+              refreshData,
+              databaseChartConfig,
+            })
+          ) : (
+            <div className="h-full w-full p-3 flex justify-center items-center">
+              <span className="text-red-500 text-xs">
+                {CONSTANTS.STRINGS.CHART_TYPE_INVALID_ERROR}
+              </span>
+            </div>
+          )}
         </div>
       )}
     </div>

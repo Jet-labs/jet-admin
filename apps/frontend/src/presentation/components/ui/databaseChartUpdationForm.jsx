@@ -147,6 +147,7 @@ export const DatabaseChartUpdationForm = ({ tenantID, databaseChartID }) => {
 
   const {
     isLoading: isLoadingDatabaseChartDataByID,
+    isPending: isPendingFetchingDatabaseChartDataByID,
     data: databaseChartDataByID,
     error: loadDatabaseChartDataByIDError,
     isFetching: isFetchingDatabaseChartDataByID,
@@ -284,10 +285,8 @@ export const DatabaseChartUpdationForm = ({ tenantID, databaseChartID }) => {
         </ResizablePanel>
         <ResizableHandle withHandle={true} />
         <ResizablePanel defaultSize={80}>
-          {(databaseChartFetchedData ||
-            (databaseChartDataByID && databaseChartDataByID.data)) &&
-          databaseChart?.databaseChartType ==
-            updateDatabaseChartForm?.values.databaseChartType ? (
+          {databaseChart?.databaseChartType ==
+          updateDatabaseChartForm?.values.databaseChartType ? (
             <DatabaseChartPreview
               key={databaseChart?.databaseChartID}
               databaseChartName={
@@ -301,7 +300,10 @@ export const DatabaseChartUpdationForm = ({ tenantID, databaseChartID }) => {
               }
               refreshData={_handleFetchDatabaseChartData}
               isFetchingData={
-                isFetchingDatabaseChartData || isFetchingDatabaseChartDataByID
+                isFetchingDatabaseChartData ||
+                isFetchingDatabaseChartDataByID ||
+                isLoadingDatabaseChartDataByID ||
+                isPendingFetchingDatabaseChartDataByID
               }
               isRefreshingData={isRefetechingDatabaseChartDataByID}
               data={

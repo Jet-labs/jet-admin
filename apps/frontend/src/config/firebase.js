@@ -4,13 +4,13 @@ import { getMessaging } from "firebase/messaging";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyC36hc0GR2vNqYpEbbd15g1_hfHeToPFOo",
-  authDomain: "jet-restaurant-admin.firebaseapp.com",
-  projectId: "jet-restaurant-admin",
-  storageBucket: "jet-restaurant-admin.firebasestorage.app",
-  messagingSenderId: "359329245037",
-  appId: "1:359329245037:web:8358d7675f5f7576b69c64",
-  measurementId: "G-WGNEJR5SNN",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
 const firebaseApp = initializeApp(firebaseConfig);

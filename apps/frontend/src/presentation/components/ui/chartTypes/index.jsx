@@ -19,15 +19,6 @@ export const DATABASE_CHARTS_CONFIG_MAP = {
     label: "Bar",
     value: CONSTANTS.DATABASE_CHART_TYPES.BAR_CHART.value,
     datasetFields: ["xAxis", "yAxis"],
-    chartFields: {
-      required: [
-        "data",
-        "legendPosition",
-        "titleDisplayEnabled",
-        "refetchInterval",
-      ],
-      optional: ["xStacked", "yStacked", "indexAxis"],
-    },
     component: ({
       data,
       refetchInterval,
@@ -47,15 +38,6 @@ export const DATABASE_CHARTS_CONFIG_MAP = {
     label: "Line",
     value: CONSTANTS.DATABASE_CHART_TYPES.LINE_CHART.value,
     datasetFields: ["xAxis", "yAxis"],
-    chartFields: {
-      required: [
-        "data",
-        "legendPosition",
-        "titleDisplayEnabled",
-        "refetchInterval",
-      ],
-      optional: ["xStacked", "yStacked", "indexAxis"],
-    },
     component: ({
       data,
       refetchInterval,
@@ -75,15 +57,6 @@ export const DATABASE_CHARTS_CONFIG_MAP = {
     label: "Pie",
     value: CONSTANTS.DATABASE_CHART_TYPES.PIE_CHART.value,
     datasetFields: ["label", "value"],
-    chartFields: {
-      required: [
-        "data",
-        "legendPosition",
-        "titleDisplayEnabled",
-        "refetchInterval",
-      ],
-      optional: [],
-    },
     component: ({
       data,
       refetchInterval,
@@ -103,15 +76,6 @@ export const DATABASE_CHARTS_CONFIG_MAP = {
     label: "Radial",
     value: CONSTANTS.DATABASE_CHART_TYPES.RADIAL_CHART.value,
     datasetFields: ["label", "value"],
-    chartFields: {
-      required: [
-        "data",
-        "legendPosition",
-        "titleDisplayEnabled",
-        "refetchInterval",
-      ],
-      optional: [],
-    },
     component: ({
       data,
       refetchInterval,
@@ -131,15 +95,6 @@ export const DATABASE_CHARTS_CONFIG_MAP = {
     label: "Radar",
     value: CONSTANTS.DATABASE_CHART_TYPES.RADAR_CHART.value,
     datasetFields: ["label", "value"],
-    chartFields: {
-      required: [
-        "data",
-        "legendPosition",
-        "titleDisplayEnabled",
-        "refetchInterval",
-      ],
-      optional: [],
-    },
     component: ({
       data,
       refetchInterval,
@@ -159,15 +114,6 @@ export const DATABASE_CHARTS_CONFIG_MAP = {
     label: "Scatter",
     value: CONSTANTS.DATABASE_CHART_TYPES.SCATTER_CHART.value,
     datasetFields: ["xAxis", "yAxis"],
-    chartFields: {
-      required: [
-        "data",
-        "legendPosition",
-        "titleDisplayEnabled",
-        "refetchInterval",
-      ],
-      optional: [],
-    },
     component: ({
       data,
       refetchInterval,
@@ -187,15 +133,6 @@ export const DATABASE_CHARTS_CONFIG_MAP = {
     label: "Bubble",
     value: CONSTANTS.DATABASE_CHART_TYPES.BUBBLE_CHART.value,
     datasetFields: ["xAxis", "yAxis", "radius"],
-    chartFields: {
-      required: [
-        "data",
-        "legendPosition",
-        "titleDisplayEnabled",
-        "refetchInterval",
-      ],
-      optional: [],
-    },
     component: ({
       data,
       refetchInterval,

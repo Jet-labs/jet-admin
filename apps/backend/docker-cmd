@@ -1,0 +1,10 @@
+# For local development with built-in Postgres
+docker run -p 8090:8090 \
+  -e NODE_ENV=development \
+  -e SEED_DATABASE=true \
+  -e DATABASE_URL="postgresql://user:pass@localhost:5432/mydb" \
+  -e JWT_ACCESS_TOKEN_SECRET="your-secret" \
+  your-image-name
+
+# For production with cloud database
+docker run -p 8090:8090 -e NODE_ENV=production -e DATABASE_URL="postgresql://raghav227996399:qo9rgmetwNz1@ep-floral-rice-a1hsh5op-pooler.ap-southeast-1.aws.neon.tech/customer_db?sslmode=require" -e JWT_ACCESS_TOKEN_SECRET="prod-secret" image_name

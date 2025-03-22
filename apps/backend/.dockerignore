@@ -1,0 +1,8 @@
+node_modules
+.env
+*.env
+Dockerfile
+docker-compose.yml
+.git
+production.env
+development.env

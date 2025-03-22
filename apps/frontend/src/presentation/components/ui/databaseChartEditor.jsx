@@ -48,20 +48,6 @@ export const DatabaseChartEditor = ({ databaseChartEditorForm }) => {
     databaseChartEditorForm.setFieldValue("databaseQueries", items);
   };
 
-  const _checkIfFieldInConfig = useCallback(
-    (field) => {
-      return (
-        DATABASE_CHARTS_CONFIG_MAP[
-          databaseChartEditorForm.values.databaseChartType
-        ].chartFields.required.includes(field) ||
-        DATABASE_CHARTS_CONFIG_MAP[
-          databaseChartEditorForm.values.databaseChartType
-        ].chartFields.optional.includes(field)
-      );
-    },
-    [databaseChartEditorForm, databaseChartEditorForm.values]
-  );
-
   return (
     <>
       <DatabaseQueryTestingPanel
@@ -187,23 +173,30 @@ export const DatabaseChartEditor = ({ databaseChartEditorForm }) => {
               className="space-y-2 h-full overflow-y-auto"
             >
               {databaseChartEditorForm.values.databaseQueries?.map(
-                (query, index) => (
-                  <DatabaseChartDatasetField
-                    key={query.tempId} // Unique key from tempId
-                    index={index}
-                    chartForm={databaseChartEditorForm}
-                    databaseQueries={databaseQueries}
-                    datasetFields={
-                      DATABASE_CHARTS_CONFIG_MAP[
-                        databaseChartEditorForm.values?.databaseQueries?.[index]
-                          ?.parameters?.type ||
-                          databaseChartEditorForm.values.databaseChartType
-                      ].datasetFields
-                    }
-                    selectedQueryForTesting={selectedQueryForTesting}
-                    setSelectedQueryForTesting={setSelectedQueryForTesting}
-                  />
-                )
+                (query, index) => {
+                  return DATABASE_CHARTS_CONFIG_MAP[
+                    databaseChartEditorForm.values?.databaseQueries?.[index]
+                      ?.parameters?.type ||
+                      databaseChartEditorForm.values.databaseChartType
+                  ] ? (
+                    <DatabaseChartDatasetField
+                      key={query.tempId} // Unique key from tempId
+                      index={index}
+                      chartForm={databaseChartEditorForm}
+                      databaseQueries={databaseQueries}
+                      datasetFields={
+                        DATABASE_CHARTS_CONFIG_MAP[
+                          databaseChartEditorForm.values?.databaseQueries?.[
+                            index
+                          ]?.parameters?.type ||
+                            databaseChartEditorForm.values.databaseChartType
+                        ].datasetFields
+                      }
+                      selectedQueryForTesting={selectedQueryForTesting}
+                      setSelectedQueryForTesting={setSelectedQueryForTesting}
+                    />
+                  ) : null;
+                }
               )}
               {provided.placeholder}
             </div>

@@ -59,6 +59,10 @@ const UpdateDatabaseChartPage = lazy(() =>
   import("../../pages/updateDatabaseChartPage")
 );
 
+const ViewDatabaseDashboardPage = lazy(() =>
+  import("../../pages/viewDatabaseDashboardPage")
+);
+
 const AddDatabaseDashboardPage = lazy(() =>
   import("../../pages/addDatabaseDashboardPage")
 );
@@ -199,7 +203,7 @@ const router = createBrowserRouter([
             children: [
               {
                 path: CONSTANTS.ROUTES.VIEW_DATABASE_DASHBOARDS.code,
-                element: <DatabaseDashboardAdditionForm />,
+                element: <ViewDatabaseDashboardPage />,
               },
               {
                 path: CONSTANTS.ROUTES.ADD_DATABASE_DASHBOARD.code,

@@ -14,29 +14,42 @@ export const DatabaseDashboardRenderWidget = ({
   index,
   handleDelete,
   responsive = true,
+  editable = true,
 }) => {
   const theme = useTheme();
   const widgetType = String(widget).split("_")[0];
   const widgetID = String(widget).split("_")[1].split("-")[0];
   const [ref, size] = useComponentSize();
   const [isMouseHover, setIsMouseHover] = useState(false);
-  
+
   return (
     <div
       className={`!p-0.5 !h-full !w-full flex-grow relative ${
         isMouseHover ? "bg-[#646cff]" : "bg-transparent"
       }`}
-      onMouseEnter={() => {
-        setIsMouseHover(true);
-      }}
-      onMouseLeave={() => {
-        setIsMouseHover(false);
-      }}
-      onClick={(e) => {
-        e.stopPropagation();
-      }}
+      onMouseEnter={
+        editable
+          ? () => {
+              setIsMouseHover(true);
+            }
+          : null
+      }
+      onMouseLeave={
+        editable
+          ? () => {
+              setIsMouseHover(false);
+            }
+          : null
+      }
+      onClick={
+        editable
+          ? (e) => {
+              e.stopPropagation();
+            }
+          : null
+      }
     >
-      {handleDelete && isMouseHover && responsive && (
+      {handleDelete && isMouseHover && responsive && editable && (
         <div
           className="!flex-row justify-end !items-center !w-full absolute top-0 left-0 z-50"
           style={{}}
