@@ -13,8 +13,11 @@ export const DatabaseTextWidget = ({
     }
   }, [onWidgetInit]);
   return (
-    <span ref={widgetRef} className={databaseWidgetConfig.className}>
-      {data}
+    <span
+      ref={widgetRef}
+      className={`text-slate-700 ${databaseWidgetConfig.className}`}
+    >
+      {JSON.stringify(data)}
     </span>
   );
 };

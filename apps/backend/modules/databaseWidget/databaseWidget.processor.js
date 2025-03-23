@@ -14,43 +14,25 @@ databaseWidgetProcessor.processTextWidgetQueryResults = ({
   databaseWidget,
   queryResults,
 }) => {
-  // Collect all x-axis values
-  const xValues = new Set();
+  const dataset = [];
+
   databaseWidget.databaseQueries.forEach((mapping, index) => {
     const result = queryResults[index]?.result || [];
-    const xField = mapping.datasetFields?.xAxis;
-    if (xField) {
-      result.forEach((row) => xValues.add(row[xField]));
+    const textField = mapping.datasetFields?.text;
+    if (textField) {
+      // for text widget, 1 value of result is considered
+      dataset.push({ ...mapping.parameters, text: result[0][textField] });
     }
   });
 
-  Logger.log("info", {
-    message: "databaseWidgetProcessor:processBarWidgetQueryResults:xValues",
+  Logger.log("success", {
+    message: "databaseWidgetProcessor:processTextWidgetQueryResults:textValues",
     params: {
-      xValues: Array.from(xValues),
+      dataset,
     },
   });
 
-  // Sort labels
-  const sortedLabels = [...xValues].sort((a, b) => {
-    if (typeof a === "number" && typeof b === "number") return a - b;
-    return a.toString().localeCompare(b.toString());
-  });
-
-  // Build datasets
-  const datasets = databaseWidget.databaseQueries.map((mapping, index) => {
-    const result = queryResults[index]?.result || [];
-    const { xAxis, yAxis } = mapping.datasetFields;
-    const dataMap = new Map(result.map((row) => [row[xAxis], row[yAxis]]));
-
-    return {
-      ...mapping.parameters,
-      label: mapping.title,
-      data: sortedLabels.map((x) => dataMap.get(x) ?? 0),
-    };
-  });
-
-  return { labels: sortedLabels, datasets };
+  return dataset;
 };
 
 

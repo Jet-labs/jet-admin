@@ -16,6 +16,7 @@ import {
 } from "../ui/resizable";
 import { DatabaseQueryResponseView } from "../databaseQueryComponents/databaseQueryResponseView";
 import { DatabaseWidgetEditor } from "./databaseWidgetEditor";
+import { DatabaseWidgetPreview } from "./databaseWidgetPreview";
 const initialValues = {
   databaseWidgetName: "",
   databaseWidgetType: CONSTANTS.DATABASE_WIDGET_TYPES.TEXT_WIDGET.value,
@@ -191,8 +192,7 @@ export const DatabaseWidgetAdditionForm = ({ tenantID }) => {
         </ResizablePanel>
         <ResizableHandle withHandle={true} />
         <ResizablePanel defaultSize={80}>
-          
-          {/* <DatabaseWidgetPreview
+          <DatabaseWidgetPreview
             databaseWidgetName={addDatabaseWidgetForm.values.databaseWidgetName}
             databaseWidgetType={addDatabaseWidgetForm.values.databaseWidgetType}
             databaseWidgetConfig={
@@ -202,7 +202,7 @@ export const DatabaseWidgetAdditionForm = ({ tenantID }) => {
             isFetchingData={isFetchingDatabaseWidgetData}
             isRefreshingData={isFetchingDatabaseWidgetData}
             data={databaseWidgetFetchedData}
-          /> */}
+          />
         </ResizablePanel>
       </ResizablePanelGroup>
     </div>

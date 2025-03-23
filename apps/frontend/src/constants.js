@@ -675,6 +675,7 @@ export const CONSTANTS = {
     CHART_DATASET_CHART_DOWNLOAD_FORM_CANCEL: "Cancel",
 
     CHART_TYPE_INVALID_ERROR: "Invalid chart type",
+    WIDGET_TYPE_INVALID_ERROR: "Invalid widget type",
 
     ACCOUNT_PAGE_TITLE: "Accounts",
     ACCOUNT_PAGE_USER_EMAIL_TITLE: "Email",
