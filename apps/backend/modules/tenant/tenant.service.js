@@ -412,8 +412,8 @@ tenantService.checkIfUserIsAdmin = async ({ userID, tenantID }) => {
       });
 
     Logger.log("success", {
-      message: "tenantService:checkIfUserIsAdmin:tenantsLength",
-      params: { owner: userTenantRelationship.tblUsers },
+      message: "tenantService:checkIfUserIsAdmin:userTenantRelationship",
+      params: { userTenantRelationship: userTenantRelationship },
     });
     if (userTenantRelationship) {
       return true;

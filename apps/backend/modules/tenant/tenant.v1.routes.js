@@ -38,17 +38,9 @@ router.use(
 );
 
 // Nested user management routes
-router.use(
-  "/:tenantID/users",
-  tenantMiddleware.checkIfUserIsAdmin,
-  userManagementRouter
-);
+router.use("/:tenantID/users", userManagementRouter);
 
 // Nested user management routes
-router.use(
-  "/:tenantID/roles",
-  tenantMiddleware.checkIfUserIsAdmin,
-  tenantRoleRouter
-);
+router.use("/:tenantID/roles", tenantRoleRouter);
 
 module.exports = router;
