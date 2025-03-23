@@ -1,5 +1,5 @@
 import React from "react";
-import { DatabaseTableAdditionForm } from "../../components/ui/databaseTableAdditionForm";
+import { DatabaseTableAdditionForm } from "../../components/databaseTableComponents/databaseTableAdditionForm";
 import { useParams } from "react-router-dom";
 
 const AddDatabaseTablePage = () => {

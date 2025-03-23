@@ -2,7 +2,7 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 import { useAuthState } from "../../../logic/contexts/authContext";
-import { DatabaseDashboardViewer } from "../../components/ui/databaseDashboardViewer";
+import { DatabaseDashboardViewer } from "../../components/databaseDashboardComponents/databaseDashboardViewer";
 
 const ViewDatabaseDashboardPage = () => {
   const { tenantID } = useParams();

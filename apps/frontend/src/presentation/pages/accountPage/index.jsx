@@ -1,18 +1,18 @@
 import {
+  FaCalendarAlt,
+  FaEnvelope,
+  FaKey,
   FaSignOutAlt,
   FaUserCircle,
-  FaKey,
-  FaEnvelope,
-  FaCalendarAlt,
 } from "react-icons/fa";
 import { CONSTANTS } from "../../../constants";
-import { useGlobalUI } from "../../../logic/contexts/globalUIContext";
 import {
   useAuthActions,
   useAuthState,
 } from "../../../logic/contexts/authContext";
+import { useGlobalUI } from "../../../logic/contexts/globalUIContext";
 import { displaySuccess } from "../../../utils/notification";
-import { CircularProgress } from "@mui/material";
+import { AccountNotificationList } from "../../components/accountComponents/accountNotificationList";
 
 const AccountPage = () => {
   const { user, firebaseUserState } = useAuthState();
@@ -110,6 +110,7 @@ const AccountPage = () => {
                   {CONSTANTS.STRINGS.ACCOUNT_PAGE_LOGOUT_BUTTON || "Sign Out"}
                 </button>
               </div>
+              <AccountNotificationList />
             </>
           )}
         </div>

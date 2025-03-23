@@ -11,13 +11,9 @@ import { UserManagementLayout } from "../layouts/userManagementLayout";
 import { RoleManagementLayout } from "../layouts/roleManagementLayout";
 import { DatabaseChartLayout } from "../layouts/databaseChartLayout";
 import { DatabaseDashboardLayout } from "../layouts/databaseDashboardLayout";
-import { DatabaseDashboardWidgetList } from "../ui/databaseDashboardWidgetList";
-import { DatabaseDashboardAdditionForm } from "../ui/databaseDashboardAdditionForm";
 
 const SignInPage = lazy(() => import("../../pages/signInPage"));
 const SignUpPage = lazy(() => import("../../pages/signUpPage"));
-// const AccountPage = lazy(() => import("../../pages/accountPage"));
-// const ContactUsPage = lazy(() => import("../../pages/contactPage"));
 const HomePage = lazy(() => import("../../pages/homePage"));
 const AccountPage = lazy(() => import("../../pages/accountPage"));
 const AddTenantPage = lazy(() => import("../../pages/addTenantPage"));

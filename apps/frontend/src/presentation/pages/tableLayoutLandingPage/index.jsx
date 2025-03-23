@@ -1,6 +1,6 @@
 import React from "react";
 import { useDatabaseTablesState } from "../../../logic/contexts/databaseTablesContext";
-import { DatabaseTableStats } from "../../components/ui/databaseTablesStats";
+import { DatabaseTableStats } from "../../components/databaseTableComponents/databaseTablesStats";
 
 const TableLayoutLandingPage = ({}) => {
   const { databaseTables } = useDatabaseTablesState();

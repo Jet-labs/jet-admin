@@ -1,7 +1,7 @@
 import { MdOutlinePersonAddAlt } from "react-icons/md";
 import { Link, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
-import { TenantRolesList } from "../../components/ui/tenantRolesList";
+import { TenantRolesList } from "../../components/tenantRolesComponents/tenantRolesList";
 const RoleManagementPage = () => {
   const { tenantID } = useParams();
 

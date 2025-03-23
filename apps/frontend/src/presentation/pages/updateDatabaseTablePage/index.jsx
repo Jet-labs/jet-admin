@@ -1,6 +1,6 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import { DatabaseTableUpdationForm } from "../../components/ui/databaseTableUpdationForm";
+import { DatabaseTableUpdationForm } from "../../components/databaseTableComponents/databaseTableUpdationForm";
 
 const UpdateDatabaseTablePage = () => {
   const { tenantID, databaseSchemaName, databaseTableName } = useParams();

@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { TriggerView } from "../../components/ui/triggerView";
+import { DatabaseTriggerView } from "../../components/databaseTriggerComponents/databaseTriggerView";
 
 /**
  *
@@ -17,7 +17,7 @@ const ViewDatabaseTriggerPage = ({}) => {
   return (
     <div className="flex w-full h-full flex-col justify-start items-center overflow-y-auto">
       {databaseTriggerName && (
-        <TriggerView
+        <DatabaseTriggerView
           key={`trigger_${tenantID}.${databaseSchemaName}.${databaseTriggerName}`}
           tenantID={tenantID}
           databaseSchemaName={databaseSchemaName}

@@ -1,5 +1,5 @@
 import React from "react";
-import { DatabaseDashboardAdditionForm } from "../../components/ui/databaseDashboardAdditionForm";
+import { DatabaseDashboardAdditionForm } from "../../components/databaseDashboardComponents/databaseDashboardAdditionForm";
 import { useParams } from "react-router-dom";
 
 const AddDatabaseDashboardPage = () => {

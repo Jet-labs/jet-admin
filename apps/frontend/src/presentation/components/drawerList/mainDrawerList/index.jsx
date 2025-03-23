@@ -1,27 +1,23 @@
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import SettingsIcon from "@mui/icons-material/Settings";
+import { capitalize } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { FaPlus, FaUsers } from "react-icons/fa6";
+import { BsServer } from "react-icons/bs";
+import { FaChartPie, FaUserCog } from "react-icons/fa";
+import { FaPlus } from "react-icons/fa6";
+import { FiUsers } from "react-icons/fi";
+import { MdOutlineLockPerson, MdOutlineSchema } from "react-icons/md";
+import { RiDashboardFill } from "react-icons/ri";
+import { SiQuantconnect } from "react-icons/si";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../../constants";
 import { getDatabaseMetadataAPI } from "../../../../data/apis/database";
 import { useAuthState } from "../../../../logic/contexts/authContext";
 import { useTenantState } from "../../../../logic/contexts/tenantContext";
 import { NoEntityUI } from "../../ui/noEntityUI";
-import { TenantSelectionDropdown } from "../../ui/tenantSelectionDropdown";
-import { MdOutlineLockPerson } from "react-icons/md";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import { capitalize } from "@mui/material";
-import { AiOutlineDatabase } from "react-icons/ai";
-import { MdOutlineSchema } from "react-icons/md";
-import { FiUsers } from "react-icons/fi";
-import { BsServer } from "react-icons/bs";
-import { FaChartPie, FaRegChartBar, FaUserCog } from "react-icons/fa";
-import { TbUsers } from "react-icons/tb";
-import { GrConnect } from "react-icons/gr";
-import { SiQuantconnect } from "react-icons/si";
-import { RiDashboardFill } from "react-icons/ri";
+import { TenantSelectionDropdown } from "../../tenantComponents/tenantSelectionDropdown";
 const defaultMenuItemExpandedState = {
   databaseSchema: false,
   userManagement: false,

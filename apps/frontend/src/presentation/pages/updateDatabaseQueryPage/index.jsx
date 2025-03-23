@@ -1,6 +1,6 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import { DatabaseQueryUpdationForm } from "../../components/ui/databaseQueryUpdationForm";
+import { DatabaseQueryUpdationForm } from "../../components/databaseQueryComponents/databaseQueryUpdationForm";
 
 
 

@@ -1,6 +1,5 @@
-import { useLocation, useParams, useSearchParams } from "react-router-dom";
-import { DatabaseTableGrid } from "../../components/ui/databaseTableGrid";
-import { useMemo } from "react";
+import { useParams, useSearchParams } from "react-router-dom";
+import { DatabaseTableGrid } from "../../components/databaseTableComponents/databaseTableGrid";
 
 /**
  *

@@ -2,6 +2,9 @@ const constants = {
   // strings
   STRINGS: {
     REFRESH_TOKEN_COOKIE_STRING: "refreshToken",
+    USER_TENANT_ADDITION_NOTIFICATION_TITLE: "Tenant addition notification",
+    USER_TENANT_ADDITION_NOTIFICATION_DESCRIPTION:
+      "You have been added to a new tenant",
   },
 
   // thresholds

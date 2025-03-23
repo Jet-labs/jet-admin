@@ -24,6 +24,7 @@ model tblTenants {
   tblDatabaseQueries          tblDatabaseQueries[]
   tblRoles                    tblRoles[]
   tblUsers                    tblUsers?                     @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fktblTenantstblUsersCreatorID")
+  tblUserNotifications        tblUserNotifications[]
   tblUserTenantConfigMap      tblUserTenantConfigMap[]
   tblUsersTenantsRelationship tblUsersTenantsRelationship[]
 }
@@ -47,6 +48,7 @@ model tblUsers {
   tblDatabaseDashboards       tblDatabaseDashboards[]
   tblDatabaseQueries          tblDatabaseQueries[]
   tblTenants                  tblTenants[]
+  tblUserNotifications        tblUserNotifications[]
   tblUserTenantConfigMap      tblUserTenantConfigMap[]
   tblUsersTenantsRelationship tblUsersTenantsRelationship[]
 }
@@ -185,4 +187,18 @@ model tblUserTenantConfigMap {
   tblUsers   tblUsers   @relation(fields: [userID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkUserIDUserID")
 
   @@id([userID, tenantID])
+}
+
+model tblUserNotifications {
+  notificationID Int         @id @default(autoincrement())
+  userID         Int
+  tenantID       Int?
+  title          String      @db.VarChar
+  description    String?     @db.VarChar
+  actionType     String?     @db.VarChar
+  action         String?     @db.VarChar
+  actionText     String?     @db.VarChar
+  notifierID     String      @db.VarChar
+  tblTenants     tblTenants? @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblUserNotificationsTenantID")
+  tblUsers       tblUsers    @relation(fields: [userID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblUserNotificationsUserIDUserID")
 }

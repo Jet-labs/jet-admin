@@ -1,4 +1,4 @@
-import { TenantAdditionForm } from "../../components/ui/tenantAdditionForm";
+import { TenantAdditionForm } from "../../components/tenantComponents/tenantAdditionForm";
 const AddTenantPage = () => {
   return <TenantAdditionForm />;
 };

@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { TenantUserAdditionForm } from "../../components/ui/tenantUserAdditionForm";
-import { TenantUsersList } from "../../components/ui/tenantUsersList";
+import { TenantUserAdditionForm } from "../../components/tenantUsersComponents/tenantUserAdditionForm";
+import { TenantUsersList } from "../../components/tenantUsersComponents/tenantUsersList";
 import { CONSTANTS } from "../../../constants";
 import { MdOutlinePersonAddAlt } from "react-icons/md";
 import { useParams } from "react-router-dom";

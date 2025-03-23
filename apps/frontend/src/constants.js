@@ -671,6 +671,7 @@ export const CONSTANTS = {
       "A password reset link will be sent to your registered email.",
     ACCOUNT_PAGE_PASSWORD_RESET_LINK_SENT_SUCCESS:
       "Password reset link sent successfully ",
+    USER_NOTIFICATIONS_TITLE: "Notifications",
   },
 
   LOCAL_STORAGE_KEYS: {
