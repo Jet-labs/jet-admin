@@ -13,8 +13,8 @@ const constants = {
   ROW_PAGE_SIZE: 100,
 
   SAMPLE_PLAN: {
-    maxTenantCount: 3,
-    maxMembersPerTenant: 2,
+    maxTenantCount: Infinity,
+    maxMembersPerTenant: Infinity,
   },
   ROLES: {
     PRIMARY: {
