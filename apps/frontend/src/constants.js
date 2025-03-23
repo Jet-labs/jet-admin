@@ -454,6 +454,11 @@ export const CONSTANTS = {
     ADD_CHART_FORM_CHART_TESTING_SUCCESS: "Chart run successfully!",
     ADD_CHART_FORM_SUBMIT_BUTTON: "Add chart",
 
+    ADD_WIDGET_FORM_TITLE: "Add widget",
+    ADD_WIDGET_FORM_WIDGET_ADDITION_SUCCESS: "Widget added successfully!",
+    ADD_WIDGET_FORM_WIDGET_TESTING_SUCCESS: "Widget run successfully!",
+    ADD_WIDGET_FORM_SUBMIT_BUTTON: "Add widget",
+
     UPDATE_CHART_FORM_TITLE: "Update chart",
     UPDATE_CHART_FORM_CHART_UPDATION_SUCCESS: "Chart updated successfully!",
     UPDATE_CHART_FORM_CHART_TESTING_SUCCESS: "Chart run successfully!",
@@ -654,6 +659,15 @@ export const CONSTANTS = {
     CHART_DATASET_ARGUMENTS_CONFIRM: "Save changes",
     CHART_DATASET_ARGUMENTS_CANCEL: "Discard",
 
+    WIDGET_DATASET_FIELD_MAPPING_TITLE: "Dataset field options",
+    WIDGET_DATASET_FIELD_MAPPING_NO_META: "Dataset metadata not available",
+    WIDGET_DATASET_FIELD_MAPPING_CONFIRM: "Save changes",
+    WIDGET_DATASET_FIELD_MAPPING_CANCEL: "Discard",
+
+    WIDGET_DATASET_ARGUMENTS_TITLE: "Dataset field options",
+    WIDGET_DATASET_ARGUMENTS_CONFIRM: "Save changes",
+    WIDGET_DATASET_ARGUMENTS_CANCEL: "Discard",
+
     CHART_DATASET_CHART_DOWNLOAD_FORM_TITLE: "Select Image Quality",
     CHART_DATASET_CHART_DOWNLOAD_FORM_DESCRIPTION:
       "Choose the quality of the image you want to download. Higher quality results in larger file sizes.",
@@ -676,6 +690,39 @@ export const CONSTANTS = {
     ACCOUNT_PAGE_PASSWORD_RESET_LINK_SENT_SUCCESS:
       "Password reset link sent successfully ",
     USER_NOTIFICATIONS_TITLE: "Notifications",
+
+    WIDGET_EDITOR_FORM_NAME_FIELD_LABEL: "Widget name",
+    WIDGET_EDITOR_FORM_NAME_FIELD_PLACEHOLDER: "Your widget's name",
+    WIDGET_EDITOR_FORM_TYPE_FIELD_LABEL: "Widget type",
+    WIDGET_EDITOR_FORM_ADVANCED_BUTTON: "Advanced config",
+    WIDGET_EDITOR_FORM_TITLE_ENABLED_FIELD_LABEL: "Title enabled",
+    WIDGET_EDITOR_FORM_LEGEND_ENABLED_FIELD_LABEL: "Legend enabled",
+    WIDGET_EDITOR_FORM_LEGEND_POSITION_FIELD_LABEL: "Legend position",
+    WIDGET_EDITOR_FORM_X_STACKED_FIELD_LABEL: "X stacked",
+    WIDGET_EDITOR_FORM_Y_STACKED_FIELD_LABEL: "Y stacked",
+    WIDGET_EDITOR_FORM_INDEX_AXIS_LABEL: "Index axis",
+    WIDGET_EDITOR_FORM_REFRESH_INTERVAL_LABEL: "Refresh interval",
+
+    WIDGET_EDITOR_FORM_TYPE_FIELD_LABEL: "Widget type",
+    WIDGET_EDITOR_FORM_DATASET_FIELD_LABEL: "Datasets",
+    WIDGET_EDITOR_FORM_ADD_DATASET_BUTTON: "Add dataset",
+
+    WIDGET_EDITOR_FORM_DESCRIPTION_FIELD_LABEL: "Widget description",
+    WIDGET_EDITOR_FORM_DESCRIPTION_FIELD_PLACEHOLDER:
+      "Your widget's description",
+
+    WIDGET_EDITOR_FORM_DATASET_TITLE_LABEL: "Dataset title",
+    WIDGET_EDITOR_FORM_DATASET_QUERY_LABEL: "Dataset query",
+    WIDGET_EDITOR_FORM_DATASET_UI_CONFIG_LABEL: "UI options",
+    WIDGET_EDITOR_FORM_DATASET_FIELD_MAPPINGS_LABEL: "Mappings",
+    WIDGET_EDITOR_FORM_DATASET_ARGUMENTS_LABEL: "Arguments",
+    WIDGET_EDITOR_FORM_DATASET_COLOR_LABEL: "Dataset color",
+    WIDGET_EDITOR_FORM_DATASET_BORDER_WIDTH_LABEL: "Border width",
+    WIDGET_EDITOR_FORM_DATASET_FIELD_TEXT_LABEL: "Text content",
+    WIDGET_EDITOR_FORM_DATASET_FIELD_Y_AXIS_LABEL: "Y axis",
+    WIDGET_EDITOR_FORM_DATASET_FIELD_LABEL_LABEL: "Label",
+    WIDGET_EDITOR_FORM_DATASET_FIELD_VALUE_LABEL: "Value",
+    WIDGET_EDITOR_FORM_DATASET_FIELD_RADIUS_LABEL: "Radius",
   },
 
   LOCAL_STORAGE_KEYS: {
@@ -1021,7 +1068,7 @@ export const CONSTANTS = {
         `/api/v1/tenants/${tenantID}/database/charts/${databaseChartID}`,
 
       getAllDatabaseWidgetsAPI: (tenantID) =>
-        `/api/v1/tenants/${tenantID}/database/charts/`,
+        `/api/v1/tenants/${tenantID}/database/widgets/`,
 
       createDatabaseWidgetAPI: (tenantID) =>
         `/api/v1/tenants/${tenantID}/database/widgets/`,

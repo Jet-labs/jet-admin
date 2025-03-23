@@ -60,6 +60,10 @@ const ViewDatabaseDashboardPage = lazy(() =>
   import("../../pages/viewDatabaseDashboardPage")
 );
 
+const AddDatabaseWidgetPage = lazy(() =>
+  import("../../pages/addDatabaseWidgetPage")
+);
+
 const AddDatabaseDashboardPage = lazy(() =>
   import("../../pages/addDatabaseDashboardPage")
 );
@@ -200,9 +204,7 @@ const router = createBrowserRouter([
             children: [
               {
                 path: CONSTANTS.ROUTES.VIEW_DATABASE_WIDGETS.code,
-                element: () => {
-                  return <div>placeholder page</div>;
-                },
+                element: <AddDatabaseWidgetPage />,
               },
               {
                 path: CONSTANTS.ROUTES.ADD_DATABASE_WIDGET.code,

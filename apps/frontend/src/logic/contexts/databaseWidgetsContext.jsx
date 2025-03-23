@@ -9,7 +9,7 @@ import { getAllDatabaseWidgetsAPI } from "../../data/apis/databaseWidget";
 const DatabaseWidgetsStateContext = React.createContext(undefined);
 const DatabaseWidgetsActionsContext = React.createContext(undefined);
 const DatabaseWidgetsContextProvider = ({ children }) => {
-  const { tenantID, databaseSchemaName } = useParams();
+  const { tenantID } = useParams();
   const {
     isLoading: isLoadingDatabaseWidgets,
     data: databaseWidgets,
@@ -18,10 +18,8 @@ const DatabaseWidgetsContextProvider = ({ children }) => {
     isRefetching: isRefetechingDatabaseWidgets,
     refetch: refetchDatabaseWidgets,
   } = useQuery({
-    queryKey: [
-      CONSTANTS.REACT_QUERY_KEYS.DATABASE_WIDGETS(tenantID, databaseSchemaName),
-    ],
-    queryFn: () => getAllDatabaseWidgetsAPI({ tenantID, databaseSchemaName }),
+    queryKey: [CONSTANTS.REACT_QUERY_KEYS.DATABASE_WIDGETS(tenantID)],
+    queryFn: () => getAllDatabaseWidgetsAPI({ tenantID }),
     refetchOnWindowFocus: false,
   });
   const {
@@ -32,12 +30,13 @@ const DatabaseWidgetsContextProvider = ({ children }) => {
     isRefetching: isRefetechingDatabaseQueries,
     refetch: refetchDatabaseQueries,
   } = useQuery({
-    queryKey: [
-      CONSTANTS.REACT_QUERY_KEYS.DATABASE_QUERIES(tenantID, databaseSchemaName),
-    ],
-    queryFn: () => getAllDatabaseQueriesAPI({ tenantID, databaseSchemaName }),
+    queryKey: [CONSTANTS.REACT_QUERY_KEYS.DATABASE_QUERIES(tenantID)],
+    queryFn: () => getAllDatabaseQueriesAPI({ tenantID }),
     refetchOnWindowFocus: false,
   });
+
+  console.log({ databaseQueries });
+
   return (
     <DatabaseWidgetsStateContext.Provider
       value={{
