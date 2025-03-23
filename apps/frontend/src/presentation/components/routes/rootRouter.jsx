@@ -11,6 +11,7 @@ import { UserManagementLayout } from "../layouts/userManagementLayout";
 import { RoleManagementLayout } from "../layouts/roleManagementLayout";
 import { DatabaseChartLayout } from "../layouts/databaseChartLayout";
 import { DatabaseDashboardLayout } from "../layouts/databaseDashboardLayout";
+import { DatabaseWidgetLayout } from "../layouts/databaseWidgetLayout";
 
 const SignInPage = lazy(() => import("../../pages/signInPage"));
 const SignUpPage = lazy(() => import("../../pages/signUpPage"));
@@ -190,6 +191,25 @@ const router = createBrowserRouter([
               },
               {
                 path: CONSTANTS.ROUTES.UPDATE_DATABASE_CHART_BY_ID.code,
+                element: <UpdateDatabaseChartPage />,
+              },
+            ],
+          },
+          {
+            element: <DatabaseWidgetLayout />,
+            children: [
+              {
+                path: CONSTANTS.ROUTES.VIEW_DATABASE_WIDGETS.code,
+                element: () => {
+                  return <div>placeholder page</div>;
+                },
+              },
+              {
+                path: CONSTANTS.ROUTES.ADD_DATABASE_WIDGET.code,
+                element: <AddDatabaseChartPage />,
+              },
+              {
+                path: CONSTANTS.ROUTES.UPDATE_DATABASE_WIDGET_BY_ID.code,
                 element: <UpdateDatabaseChartPage />,
               },
             ],

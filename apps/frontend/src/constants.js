@@ -39,6 +39,7 @@ export const CONSTANTS = {
     MAIN_DRAWER_DATABASE_SCHEMA_TITLE: "Database Schemas",
     MAIN_DRAWER_DATABASE_DASHBOARDS_TITLE: "Dashboards",
     MAIN_DRAWER_DATABASE_CHARTS_TITLE: "Charts",
+    MAIN_DRAWER_DATABASE_WIDGETS_TITLE: "Widgets",
     MAIN_DRAWER_DATABASE_QUERIES_TITLE: "Database queries",
     MAIN_DRAWER_ADD_DATABASE_SCHEMA_BUTTON: "Add schema",
     MAIN_DRAWER_USER_MANAGEMENT_TITLE: "User management",
@@ -267,6 +268,7 @@ export const CONSTANTS = {
     TRIGGER_DRAWER_LIST_NO_TRIGGER: "No triggers found",
     QUERY_DRAWER_LIST_NO_QUERY: "No queries found",
     CHART_DRAWER_LIST_NO_CHART: "No charts found",
+    WIDGET_DRAWER_LIST_NO_WIDGET: "No widgets found",
     DASHBOARD_DRAWER_LIST_NO_DASHBOARD: "No dashboards found",
 
     ADD_TRIGGER_BUTTON_TEXT: "Add trigger",
@@ -327,6 +329,8 @@ export const CONSTANTS = {
     ADD_QUERY_BUTTON_TEXT: "Add query",
 
     ADD_CHART_BUTTON_TEXT: "Add chart",
+
+    ADD_WIDGET_BUTTON_TEXT: "Add widget",
 
     // Labels
     ADD_QUERY_FORM_TITLE: "Add query",
@@ -783,6 +787,20 @@ export const CONSTANTS = {
         `/tenants/${tenantID}/charts/${databaseChartID}`,
     },
 
+    ADD_DATABASE_WIDGET: {
+      code: "/tenants/:tenantID/widgets/add",
+      path: (tenantID) => `/tenants/${tenantID}/widgets/add`,
+    },
+    VIEW_DATABASE_WIDGETS: {
+      code: "/tenants/:tenantID/widgets",
+      path: (tenantID) => `/tenants/${tenantID}/widgets`,
+    },
+    UPDATE_DATABASE_WIDGET_BY_ID: {
+      code: "/tenants/:tenantID/widgets/:databaseWidgetID",
+      path: (tenantID, databaseWidgetID) =>
+        `/tenants/${tenantID}/widgets/${databaseWidgetID}`,
+    },
+
     ADD_DATABASE_DASHBOARD: {
       code: "/tenants/:tenantID/dashboards/add",
       path: (tenantID) => `/tenants/${tenantID}/dashboards/add`,
@@ -1002,6 +1020,22 @@ export const CONSTANTS = {
       deleteDatabaseChartByID: (tenantID, databaseChartID) =>
         `/api/v1/tenants/${tenantID}/database/charts/${databaseChartID}`,
 
+      getAllDatabaseWidgetsAPI: (tenantID) =>
+        `/api/v1/tenants/${tenantID}/database/charts/`,
+
+      createDatabaseWidgetAPI: (tenantID) =>
+        `/api/v1/tenants/${tenantID}/database/widgets/`,
+      getDatabaseWidgetByIDAPI: (tenantID, databaseWidgetID) =>
+        `/api/v1/tenants/${tenantID}/database/widgets/${databaseWidgetID}`,
+      updateDatabaseWidgetByIDAPI: (tenantID, databaseWidgetID) =>
+        `/api/v1/tenants/${tenantID}/database/widgets/${databaseWidgetID}`,
+      getDatabaseWidgetDataByIDAPI: (tenantID, databaseWidgetID) =>
+        `/api/v1/tenants/${tenantID}/database/widgets/${databaseWidgetID}/data`,
+      getDatabaseWidgetDataUsingWidgetAPI: (tenantID, databaseWidgetID) =>
+        `/api/v1/tenants/${tenantID}/database/widgets/${databaseWidgetID}/data`,
+      deleteDatabaseWidgetByID: (tenantID, databaseWidgetID) =>
+        `/api/v1/tenants/${tenantID}/database/widgets/${databaseWidgetID}`,
+
       getAllDatabaseDashboardsAPI: (tenantID) =>
         `/api/v1/tenants/${tenantID}/database/dashboards/`,
       createDatabaseDashboardAPI: (tenantID) =>
@@ -1102,6 +1136,8 @@ export const CONSTANTS = {
     DATABASE_QUERIES_CHECK: (tenantID) => `${tenantID}-DATABASE_QUERIES_CHECK`,
 
     DATABASE_CHARTS: (tenantID) => `${tenantID}-DATABASE_CHARTS`,
+
+    DATABASE_WIDGETS: (tenantID) => `${tenantID}-DATABASE_WIDGETS`,
 
     DATABASE_DASHBOARDS: (tenantID) => `${tenantID}-DATABASE_DASHBOARDS`,
 
@@ -1403,12 +1439,18 @@ export const CONSTANTS = {
     DATABASE_TABLE_LAYOUT_SEPARATION: "DATABASE_TABLE_LAYOUT_SEPARATION",
     DATABASE_QUERY_LAYOUT_SEPARATION: "DATABASE_QUERY_LAYOUT_SEPARATION",
     DATABASE_CHART_LAYOUT_SEPARATION: "DATABASE_CHART_LAYOUT_SEPARATION",
+    DATABASE_WIDGET_LAYOUT_SEPARATION: "DATABASE_WIDGET_LAYOUT_SEPARATION",
     DATABASE_DASHBOARD_LAYOUT_SEPARATION:
       "DATABASE_DASHBOARD_LAYOUT_SEPARATION",
     CHART_ADDITION_FORM_RESULT_SEPARATION:
       "CHART_ADDITION_FORM_RESULT_SEPARATION",
     CHART_UPDATION_FORM_RESULT_SEPARATION:
       "CHART_UPDATION_FORM_RESULT_SEPARATION",
+
+    WIDGET_ADDITION_FORM_RESULT_SEPARATION:
+      "WIDGET_ADDITION_FORM_RESULT_SEPARATION",
+    WIDGET_UPDATION_FORM_RESULT_SEPARATION:
+      "WIDGET_UPDATION_FORM_RESULT_SEPARATION",
     QUERY_TESTING_FORM_QUERY_SEPARATION: "QUERY_TESTING_FORM_QUERY_SEPARATION",
     DASHBOARD_ADDITION_FORM_RESULT_SEPARATION:
       "DASHBOARD_ADDITION_FORM_RESULT_SEPARATION",
@@ -1450,6 +1492,13 @@ export const CONSTANTS = {
     RADIAL_CHART: {
       name: "Radial Bar Chart",
       value: "radial",
+    },
+  },
+
+  DATABASE_WIDGET_TYPES: {
+    TEXT_WIDGET: {
+      name: "Text widget",
+      value: "text",
     },
   },
 
