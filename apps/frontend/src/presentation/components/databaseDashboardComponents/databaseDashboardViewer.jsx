@@ -71,7 +71,7 @@ export const DatabaseDashboardViewer = ({
             onBreakpointChange={onBreakpointChange}
             resizeHandles={["ne", "se", "nw", "sw"]}
             cols={{ lg: 4, md: 3, sm: 2, xs: 2, xxs: 1 }}
-            rowHeight={250}
+            rowHeight={64}
           >
             {databaseDashboard?.databaseDashboardConfig?.widgets.map(
               (widget, index) => (

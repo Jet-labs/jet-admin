@@ -108,7 +108,7 @@ bg-[size:10px_10px]"
         onDrop={onDrop}
         isDroppable
         cols={{ lg: 4, md: 3, sm: 2, xs: 2, xxs: 1 }}
-        rowHeight={250}
+        rowHeight={64}
       >
         {widgets.map((widget, index) => (
           <div key={widget}>
