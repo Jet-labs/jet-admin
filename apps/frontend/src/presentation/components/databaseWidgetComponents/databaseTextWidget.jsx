@@ -27,7 +27,7 @@ export const DatabaseTextWidget = ({
       style={widgetStyle}
       className={`${widgetTailwindCss}`}
     >
-      {data && data[0] && data[0].text ? data[0].text : "Invalid data"}
+      {data && data.text ? data.text : "Invalid data"}
     </span>
   );
 };

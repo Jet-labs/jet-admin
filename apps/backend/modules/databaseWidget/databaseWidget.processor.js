@@ -1,3 +1,4 @@
+const { text } = require("express");
 const Logger = require("../../utils/logger");
 
 const databaseWidgetProcessor = {};
@@ -15,6 +16,7 @@ databaseWidgetProcessor.processTextWidgetQueryResults = ({
   queryResults,
 }) => {
   const dataset = [];
+  let consolidatedText = "";
 
   databaseWidget.databaseQueries.forEach((mapping, index) => {
     const result = queryResults[index]?.result || [];
@@ -22,6 +24,7 @@ databaseWidgetProcessor.processTextWidgetQueryResults = ({
     if (textField) {
       // for text widget, 1 value of result is considered
       dataset.push({ ...mapping.parameters, text: result[0][textField] });
+      consolidatedText += result[0][textField];
     }
   });
 
@@ -32,8 +35,7 @@ databaseWidgetProcessor.processTextWidgetQueryResults = ({
     },
   });
 
-  return dataset;
+  return { dataset, text: consolidatedText };
 };
-
 
 module.exports = { databaseWidgetProcessor };

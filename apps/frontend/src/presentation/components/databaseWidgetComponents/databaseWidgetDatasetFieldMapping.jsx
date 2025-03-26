@@ -19,11 +19,7 @@ export const DatabaseWidgetDatasetFieldMapping = ({
     initialValues: {
       argsMap: {},
       datasetFields: {
-        xAxis: "",
-        yAxis: "",
-        label: "",
-        value: "",
-        radius: "",
+        text: "",
       },
       ...initialValues,
     },
@@ -40,13 +36,6 @@ export const DatabaseWidgetDatasetFieldMapping = ({
       onClose();
     },
   });
-
-  const _handleUpdateDatasetQueryArgs = useCallback((arg, value) => {
-    datasetFieldMappingForm.setFieldValue(`argsMap`, {
-      ...datasetFieldMappingForm.values.argsMap,
-      [arg]: value,
-    });
-  }, []);
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
@@ -97,92 +86,6 @@ export const DatabaseWidgetDatasetFieldMapping = ({
                 onChange={datasetFieldMappingForm.handleChange}
                 onBlur={datasetFieldMappingForm.handleBlur}
                 value={datasetFieldMappingForm.values.datasetFields.text}
-              />
-            </div>
-          )}
-          {datasetFields?.includes("yAxis") && (
-            <div>
-              <label
-                htmlFor={`datasetFields.yAxis`}
-                className="block mb-1 text-xs font-normal text-slate-500"
-              >
-                {
-                  CONSTANTS.STRINGS
-                    .WIDGET_EDITOR_FORM_DATASET_FIELD_Y_AXIS_LABEL
-                }
-              </label>
-              <input
-                type="text"
-                name={`datasetFields.yAxis`}
-                id={`datasetFields.yAxis`}
-                className={`placeholder:text-slate-400 w-full text-xs bg-slate-50 border border-slate-300 text-slate-700 rounded  block py-1 px-1.5 focus:outline-none focus:border-slate-400`}
-                required={true}
-                onChange={datasetFieldMappingForm.handleChange}
-                onBlur={datasetFieldMappingForm.handleBlur}
-                value={datasetFieldMappingForm.values.datasetFields.yAxis}
-              />
-            </div>
-          )}
-          {datasetFields?.includes("label") && (
-            <div>
-              <label
-                htmlFor={`datasetFields.label`}
-                className="block mb-1 text-xs font-normal text-slate-500"
-              >
-                {CONSTANTS.STRINGS.WIDGET_EDITOR_FORM_DATASET_FIELD_LABEL_LABEL}
-              </label>
-              <input
-                type="text"
-                name={`datasetFields.label`}
-                id={`datasetFields.label`}
-                className={`placeholder:text-slate-400 w-full text-xs bg-slate-50 border border-slate-300 text-slate-700 rounded  block py-1 px-1.5 focus:outline-none focus:border-slate-400`}
-                required={true}
-                onChange={datasetFieldMappingForm.handleChange}
-                onBlur={datasetFieldMappingForm.handleBlur}
-                value={datasetFieldMappingForm.values.datasetFields.label}
-              />
-            </div>
-          )}
-          {datasetFields?.includes("value") && (
-            <div>
-              <label
-                htmlFor={`datasetFields.value`}
-                className="block mb-1 text-xs font-normal text-slate-500"
-              >
-                {CONSTANTS.STRINGS.WIDGET_EDITOR_FORM_DATASET_FIELD_VALUE_LABEL}
-              </label>
-              <input
-                type="text"
-                name={`datasetFields.value`}
-                id={`datasetFields.value`}
-                className={`placeholder:text-slate-400 w-full text-xs bg-slate-50 border border-slate-300 text-slate-700 rounded  block py-1 px-1.5 focus:outline-none focus:border-slate-400`}
-                required={true}
-                onChange={datasetFieldMappingForm.handleChange}
-                onBlur={datasetFieldMappingForm.handleBlur}
-                value={datasetFieldMappingForm.values.datasetFields.value}
-              />
-            </div>
-          )}
-          {datasetFields?.includes("radius") && (
-            <div>
-              <label
-                htmlFor={`datasetFields.radius`}
-                className="block mb-1 text-xs font-normal text-slate-500"
-              >
-                {
-                  CONSTANTS.STRINGS
-                    .WIDGET_EDITOR_FORM_DATASET_FIELD_RADIUS_LABEL
-                }
-              </label>
-              <input
-                type="text"
-                name={`datasetFields.radius`}
-                id={`datasetFields.radius`}
-                className={`placeholder:text-slate-400 w-full text-xs bg-slate-50 border border-slate-300 text-slate-700 rounded  block py-1 px-1.5 focus:outline-none focus:border-slate-400`}
-                required={true}
-                onChange={datasetFieldMappingForm.handleChange}
-                onBlur={datasetFieldMappingForm.handleBlur}
-                value={datasetFieldMappingForm.values.datasetFields.radius}
               />
             </div>
           )}

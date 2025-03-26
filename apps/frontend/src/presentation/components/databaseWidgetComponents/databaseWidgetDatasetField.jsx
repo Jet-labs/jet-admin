@@ -35,16 +35,6 @@ export const DatabaseWidgetDatasetField = ({
     widgetForm.setFieldValue("databaseQueries", updatedQueryArrayFieldValue);
   };
 
-  const _handleUpdateDatasetQueryArgs = useCallback(
-    (arg, value) => {
-      widgetForm.setFieldValue(`databaseQueries[${index}].argsMap`, {
-        ...widgetForm.values.databaseQueries[index].argsMap,
-        [arg]: value,
-      });
-    },
-    [index, widgetForm]
-  );
-
   const selectedQuery = useMemo(() => {
     return databaseQueries
       ? databaseQueries.find(

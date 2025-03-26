@@ -41,12 +41,6 @@ export const DatabaseChartDatasetFieldMapping = ({
     },
   });
 
-  const _handleUpdateDatasetQueryArgs = useCallback((arg, value) => {
-    datasetFieldMappingForm.setFieldValue(`argsMap`, {
-      ...datasetFieldMappingForm.values.argsMap,
-      [arg]: value,
-    });
-  }, []);
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">

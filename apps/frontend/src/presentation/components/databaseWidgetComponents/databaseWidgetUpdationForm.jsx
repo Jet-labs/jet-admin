@@ -31,6 +31,7 @@ const initialValues = {
       databaseQueryID: null,
       parameters: {},
       argsMap: {},
+      valueType: "static",
       datasetFields: {
         xAxis: "",
         yAxis: "",

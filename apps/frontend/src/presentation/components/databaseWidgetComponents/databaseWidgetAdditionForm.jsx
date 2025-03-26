@@ -24,6 +24,7 @@ const initialValues = {
     {
       title: "",
       databaseQueryID: null,
+      valueType: "static",
       parameters: {},
       argsMap: {},
       datasetFields: {

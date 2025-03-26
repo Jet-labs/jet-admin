@@ -106,9 +106,11 @@ bg-[size:10px_10px]"
         onLayoutChange={onLayoutChange}
         resizeHandles={["ne", "se", "nw", "sw"]}
         onDrop={onDrop}
+        margin={[8, 8]}
         isDroppable
-        cols={{ lg: 4, md: 3, sm: 2, xs: 2, xxs: 1 }}
+        cols={{ lg: 40, md: 30, sm: 20, xs: 20, xxs: 10 }}
         rowHeight={16}
+        allowOverlap={true}
       >
         {widgets.map((widget, index) => (
           <div key={widget}>

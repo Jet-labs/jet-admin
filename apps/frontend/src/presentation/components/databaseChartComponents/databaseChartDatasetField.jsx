@@ -35,15 +35,6 @@ export const DatabaseChartDatasetField = ({
     chartForm.setFieldValue("databaseQueries", updatedQueryArrayFieldValue);
   };
 
-  const _handleUpdateDatasetQueryArgs = useCallback(
-    (arg, value) => {
-      chartForm.setFieldValue(`databaseQueries[${index}].argsMap`, {
-        ...chartForm.values.databaseQueries[index].argsMap,
-        [arg]: value,
-      });
-    },
-    [index, chartForm]
-  );
 
   const selectedQuery = useMemo(() => {
     return databaseQueries
