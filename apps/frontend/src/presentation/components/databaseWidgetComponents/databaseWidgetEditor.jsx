@@ -9,6 +9,8 @@ import { DatabaseQueryTestingPanel } from "../databaseQueryComponents/databaseQu
 // import { DatabaseWidgetAdvancedOptions } from "./databaseWidgetAdvancedOptions";
 import { DatabaseWidgetDatasetField } from "./databaseWidgetDatasetField";
 import { DATABASE_WIDGETS_CONFIG_MAP } from "./widgetConfig";
+import { CollapseComponent } from "../ui/collapseComponent";
+import { DatabaseWidgetAdvancedOptions } from "./databaseWidgetAdvancedOptions";
 
 export const DatabaseWidgetEditor = ({ databaseWidgetEditorForm }) => {
   const {
@@ -17,7 +19,7 @@ export const DatabaseWidgetEditor = ({ databaseWidgetEditorForm }) => {
     isFetchingDatabaseQueries,
   } = useDatabaseWidgetsState();
 
-  console.log(databaseQueries )
+  console.log(databaseQueries);
 
   const [selectedQueryForTesting, setSelectedQueryForTesting] = useState(false);
   const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
@@ -109,10 +111,12 @@ export const DatabaseWidgetEditor = ({ databaseWidgetEditorForm }) => {
         </div>
       </div>
 
-      {/* {databaseWidgetEditorForm && databaseWidgetEditorForm.values && (
+      {databaseWidgetEditorForm && databaseWidgetEditorForm.values && (
         <div className="flex flex-col justify-start items-stretch gap-2 p-2 rounded bg-slate-100">
           <CollapseComponent
-            showButtonText={CONSTANTS.STRINGS.WIDGET_EDITOR_FORM_ADVANCED_BUTTON}
+            showButtonText={
+              CONSTANTS.STRINGS.WIDGET_EDITOR_FORM_ADVANCED_BUTTON
+            }
             hideButtonText={"Hide"}
             containerClass={"p-0"}
             content={() => (
@@ -128,7 +132,7 @@ export const DatabaseWidgetEditor = ({ databaseWidgetEditorForm }) => {
             )}
           />
         </div>
-      )} */}
+      )}
       <div className="flex flex-col justify-start items-stretch gap-2 p-2 rounded bg-slate-100">
         <div>
           <label
@@ -149,7 +153,8 @@ export const DatabaseWidgetEditor = ({ databaseWidgetEditorForm }) => {
             onChange={databaseWidgetEditorForm.handleChange}
             onBlur={databaseWidgetEditorForm.handleBlur}
             value={
-              databaseWidgetEditorForm.values.databaseWidgetConfig.refetchInterval
+              databaseWidgetEditorForm.values.databaseWidgetConfig
+                .refetchInterval
             }
           />
         </div>
@@ -179,7 +184,6 @@ export const DatabaseWidgetEditor = ({ databaseWidgetEditorForm }) => {
             >
               {databaseWidgetEditorForm.values.databaseQueries?.map(
                 (query, index) => {
-                  
                   return DATABASE_WIDGETS_CONFIG_MAP[
                     databaseWidgetEditorForm.values.databaseWidgetType
                   ] ? (

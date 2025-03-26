@@ -49,9 +49,8 @@ export const DatabaseDashboardTextWidget = ({
 
   return (
     <div
-      className="rounded !p-4 bg-white"
+      className="flex flex-col items-center justify-center overflow-hidden"
       style={{
-        // height: 400,
         width: width,
         height: height,
       }}

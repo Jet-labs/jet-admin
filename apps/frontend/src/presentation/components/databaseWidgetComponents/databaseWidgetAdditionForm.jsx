@@ -24,10 +24,7 @@ const initialValues = {
     {
       title: "",
       databaseQueryID: null,
-      parameters: {
-        backgroundColor: "#D84545",
-        borderWidth: 1,
-      },
+      parameters: {},
       argsMap: {},
       datasetFields: {
         xAxis: "",
@@ -36,30 +33,10 @@ const initialValues = {
     },
   ],
   databaseWidgetConfig: {
-    responsive: true,
-    maintainAspectRatio: true,
-    backgroundColor: "rgba(255, 255, 255, 0)",
-    color: "#666",
-    plugins: {
-      title: {
-        display: false,
-        text: "Widget Title",
-        position: "top",
-        font: { size: 16, color: "#333" },
-      },
-      legend: {
-        display: true,
-        position: "top",
-        labels: { font: { size: 12, color: "#666" } },
-      },
-      customCanvasBackgroundColor: {
-        backgroundColor: "#fff",
-      },
-    },
-    scales: {
-      x: { display: true, title: { display: false, text: "X Axis" } },
-      y: { display: true, title: { display: false, text: "Y Axis" } },
-    },
+    containerCss: {},
+    widgetCss: {},
+    containerTailwindCss: "",
+    widgetTailwindCss: "text-slate-700",
   },
 };
 

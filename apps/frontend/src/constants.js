@@ -459,6 +459,11 @@ export const CONSTANTS = {
     ADD_WIDGET_FORM_WIDGET_TESTING_SUCCESS: "Widget run successfully!",
     ADD_WIDGET_FORM_SUBMIT_BUTTON: "Add widget",
 
+    UPDATE_WIDGET_FORM_TITLE: "Update widget",
+    UPDATE_WIDGET_FORM_WIDGET_UPDATION_SUCCESS: "Widget updated successfully!",
+    UPDATE_WIDGET_FORM_WIDGET_TESTING_SUCCESS: "Widget run successfully!",
+    UPDATE_WIDGET_FORM_SUBMIT_BUTTON: "Update widget",
+
     UPDATE_CHART_FORM_TITLE: "Update chart",
     UPDATE_CHART_FORM_CHART_UPDATION_SUCCESS: "Chart updated successfully!",
     UPDATE_CHART_FORM_CHART_TESTING_SUCCESS: "Chart run successfully!",
@@ -503,6 +508,11 @@ export const CONSTANTS = {
     DELETE_CHART_DELETION_SUCCESS: "Chart deleted successfully!",
     DELETE_CHART_DIALOG_TITLE: "Delete chart",
     DELETE_CHART_DIALOG_MESSAGE:
+      "Are you sure you want to delete this item? This action cannot be undone.",
+
+    DELETE_WIDGET_DELETION_SUCCESS: "Widget deleted successfully!",
+    DELETE_WIDGET_DIALOG_TITLE: "Delete widget",
+    DELETE_WIDGET_DIALOG_MESSAGE:
       "Are you sure you want to delete this item? This action cannot be undone.",
 
     DASHBOARD_WIDGET_LIST_TITLE: "Widgets",

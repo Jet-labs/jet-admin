@@ -7,17 +7,27 @@ export const DatabaseTextWidget = ({
   databaseWidgetConfig,
 }) => {
   const widgetRef = useRef(null);
+  
   useEffect(() => {
     if (widgetRef.current) {
       onWidgetInit?.(widgetRef);
     }
   }, [onWidgetInit]);
+
+  // Extract CSS configurations
+  const { widgetCss = {}, widgetTailwindCss = "" } = databaseWidgetConfig || {};
+
+  const widgetStyle = {
+    ...widgetCss,
+  };
+
   return (
     <span
       ref={widgetRef}
-      className={`text-slate-700 ${databaseWidgetConfig.className}`}
+      style={widgetStyle}
+      className={`${widgetTailwindCss}`}
     >
-      {JSON.stringify(data)}
+      {data && data[0] && data[0].text ? data[0].text : "Invalid data"}
     </span>
   );
 };

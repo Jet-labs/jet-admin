@@ -64,6 +64,10 @@ const AddDatabaseWidgetPage = lazy(() =>
   import("../../pages/addDatabaseWidgetPage")
 );
 
+const UpdateDatabaseWidgetPage = lazy(() =>
+  import("../../pages/updateDatabaseWidgetPage")
+);
+
 const AddDatabaseDashboardPage = lazy(() =>
   import("../../pages/addDatabaseDashboardPage")
 );
@@ -208,11 +212,11 @@ const router = createBrowserRouter([
               },
               {
                 path: CONSTANTS.ROUTES.ADD_DATABASE_WIDGET.code,
-                element: <AddDatabaseChartPage />,
+                element: <AddDatabaseWidgetPage />,
               },
               {
                 path: CONSTANTS.ROUTES.UPDATE_DATABASE_WIDGET_BY_ID.code,
-                element: <UpdateDatabaseChartPage />,
+                element: <UpdateDatabaseWidgetPage />,
               },
             ],
           },
