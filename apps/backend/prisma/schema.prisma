@@ -21,6 +21,7 @@ model tblTenants {
   tenantName                  String?                       @db.VarChar
   tblDatabaseCharts           tblDatabaseCharts[]
   tblDatabaseDashboards       tblDatabaseDashboards[]
+  tblDatabaseNotifications    tblDatabaseNotifications[]
   tblDatabaseQueries          tblDatabaseQueries[]
   tblDatabaseWidgets          tblDatabaseWidgets[]
   tblRoles                    tblRoles[]
@@ -234,4 +235,12 @@ model tblDatabaseWidgets {
   tblDatabaseWidgetQueryMappings tblDatabaseWidgetQueryMappings[]
   tblUsers                       tblUsers?                        @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDatabaseWidgetsCreatorID")
   tblTenants                     tblTenants                       @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDatabaseWidgetsTenantIDTenantID")
+}
+
+model tblDatabaseNotifications {
+  databaseNotificationID   Int        @id @default(autoincrement())
+  createdAt                DateTime   @default(now()) @db.Timestamptz(6)
+  databaseNotificationName String     @db.VarChar
+  tenantID                 Int
+  tblTenants               tblTenants @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDatabaseNotificationsTenantID")
 }

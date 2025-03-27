@@ -1,0 +1,299 @@
+---
+sidebar_position: 4
+---
+
+# Frontend Architecture
+
+This document provides a comprehensive overview of the frontend architecture, explaining the project structure, design patterns, and key components.
+
+## Architecture Overview
+
+The frontend follows a clean, domain-driven architecture with clear separation of concerns across multiple layers:
+
+1. **Data Layer**: Handles API communication and data modeling
+2. **Logic Layer**: Contains business logic and state management
+3. **Presentation Layer**: Manages UI components and pages
+4. **Utility Layer**: Provides shared helper functions
+
+This layered approach improves maintainability, testability, and scalability of the application.
+
+## Project Structure
+
+```
+apps/frontend/
+└── src/
+    ├── App.jsx                # Main application component
+    ├── main.jsx               # Application entry point
+    ├── constants.js           # Application constants
+    ├── assets/                # Static resources
+    ├── config/                # Configuration files
+    │   ├── firebase.js        # Firebase configuration
+    │   └── supabase.js        # Supabase configuration
+    ├── data/                  # Data layer
+    │   ├── apis/              # API services
+    │   └── models/            # Data models
+    ├── logic/                 # Business logic
+    │   ├── contexts/          # React context providers
+    │   └── hooks/             # Custom React hooks
+    ├── presentation/          # UI layer
+    │   ├── components/        # Reusable UI components
+    │   └── pages/             # Application pages
+    └── utils/                 # Utility functions
+```
+
+## Data Layer
+
+The data layer handles all communication with external services and defines data structures.
+
+### API Services (`data/apis/`)
+
+API services encapsulate all backend communication, organized by domain:
+
+| API Module | Purpose |
+|------------|---------|
+| `auth.js` | Authentication operations |
+| `database.js` | Core database operations |
+| `databaseChart.js` | Chart management |
+| `databaseDashboard.js` | Dashboard management |
+| `databaseQuery.js` | Query operations |
+| `databaseTable.js` | Table management |
+| `databaseTrigger.js` | Trigger operations |
+| `tenant.js` | Tenant management |
+| `tenantRole.js` | Role management |
+| `userManagement.js` | User administration |
+
+Each API module follows a consistent pattern:
+
+```javascript
+// Example API module pattern
+import { apiClient } from '../../utils/axios';
+
+export const SomeEntityAPI = {
+  getAll: async (params) => {
+    return apiClient.get('/endpoint', { params });
+  },
+  
+  getById: async (id) => {
+    return apiClient.get(`/endpoint/${id}`);
+  },
+  
+  create: async (data) => {
+    return apiClient.post('/endpoint', data);
+  },
+  
+  update: async (id, data) => {
+    return apiClient.put(`/endpoint/${id}`, data);
+  },
+  
+  delete: async (id) => {
+    return apiClient.delete(`/endpoint/${id}`);
+  }
+};
+```
+
+### Data Models (`data/models/`)
+
+Data models define the structure and relationships of entities used throughout the application:
+
+- `databaseChart.js` - Chart data structure
+- `databaseDashboard.js` - Dashboard configuration
+- `databaseMetadata.js` - Database metadata
+- `databaseQuery.js` - Query structure
+- `databaseSchema.js` - Schema definition
+- `databaseTable.js` - Table structure
+- `databaseTableColumn.js` - Table column definition
+- `databaseTableContraint.js` - Table constraints
+- `databaseTrigger.js` - Trigger definition
+- `tenant.js` - Tenant information
+- `tenantPermission.js` - Permission structure
+- `tenantRole.js` - Role definition
+- `tenantUser.js` - User within tenant
+- `user.js` - User profile
+
+Models typically include type definitions and utility methods for data validation and transformation.
+
+## Logic Layer
+
+The logic layer contains business logic and state management.
+
+### Context Providers (`logic/contexts/`)
+
+The application uses React Context for state management, with specialized contexts for different domains:
+
+| Context | Purpose |
+|---------|---------|
+| `authContext.jsx` | User authentication state |
+| `databaseChartsContext.jsx` | Chart state management |
+| `databaseDashboardsContext.jsx` | Dashboard state management |
+| `databaseQueriesContext.jsx` | Query state management |
+| `databaseTablesContext.jsx` | Table state management |
+| `databaseTriggersContext.jsx` | Trigger state management |
+| `globalUIContext.jsx` | Application-wide UI state |
+| `roleManagementContext.jsx` | Role management |
+| `tenantContext.jsx` | Current tenant state |
+| `userManagementContext.jsx` | User management |
+
+Each context follows a similar pattern:
+
+```jsx
+// Example context pattern
+import React, { createContext, useContext, useState } from 'react';
+import { SomeEntityAPI } from '../../data/apis/someEntity';
+
+const SomeEntityContext = createContext();
+
+export const useSomeEntity = () => useContext(SomeEntityContext);
+
+export const SomeEntityProvider = ({ children }) => {
+  const [entities, setEntities] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+
+  const fetchEntities = async () => {
+    setLoading(true);
+    try {
+      const response = await SomeEntityAPI.getAll();
+      setEntities(response.data);
+      setError(null);
+    } catch (err) {
+      setError(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Additional CRUD operations...
+
+  const value = {
+    entities,
+    loading,
+    error,
+    fetchEntities,
+    // Other methods...
+  };
+
+  return (
+    <SomeEntityContext.Provider value={value}>
+      {children}
+    </SomeEntityContext.Provider>
+  );
+};
+```
+
+### Custom Hooks (`logic/hooks/`)
+
+Custom hooks encapsulate reusable logic:
+
+- `useComponentSize.jsx` - Tracks component dimensions
+- `useFirebaseUpload.jsx` - Handles file uploads to Firebase
+- `useSupabseUpload.jsx` - Handles file uploads to Supabase
+
+## Presentation Layer
+
+The presentation layer contains all UI components organized by purpose.
+
+### Components (`presentation/components/`)
+
+Components are organized into categories:
+
+- `composer/` - Components for building complex UIs
+- `drawerList/` - Navigation drawer components
+- `layouts/` - Page layout components
+- `routes/` - Routing components
+- `ui/` - Basic UI elements
+
+### Pages (`presentation/pages/`)
+
+Each page represents a distinct view in the application:
+
+- `accountPage/` - User account management
+- `addDatabaseChartPage/` - Chart creation interface
+- `addDatabaseDashboardPage/` - Dashboard creation
+- `addDatabaseQueryPage/` - Query creation
+- `addDatabaseTablePage/` - Table creation
+- `addDatabaseTriggerPage/` - Trigger creation
+
+## Utility Layer
+
+The utility layer provides shared helper functions:
+
+- `axios.js` - API client configuration with interceptors
+- `error.js` - Error handling utilities
+- `notification.js` - Toast notification helpers
+- `postgre.js` - PostgreSQL-specific utilities
+- `string.js` - String manipulation helpers
+
+## Authentication & Authorization
+
+The application supports dual authentication methods:
+
+1. **Firebase Authentication**
+   - Configuration in `config/firebase.js`
+   - Used for user authentication and management
+
+The `authContext.jsx` manages the authentication state and provides:
+- User authentication status
+- Login/logout methods
+- Role-based access control
+
+## State Management
+
+The application uses a context-based state management approach instead of a global state store:
+
+1. **UI State**:
+   - Managed through `globalUIContext.jsx`
+   - Controls theme, sidebar state, modal visibility, etc.
+
+2. **Domain State**:
+   - Each domain has its dedicated context
+   - Provides domain-specific CRUD operations
+
+3. **Authentication State**:
+   - Managed through `authContext.jsx`
+   - Holds user information and authentication status
+
+4. **Tenant State**:
+   - Managed through `tenantContext.jsx`
+   - Controls current tenant information and settings
+
+This context-based approach allows for:
+- Modular state management
+- Localized state updates
+- Reduced prop drilling
+- Component-specific optimization
+
+## Technology Stack
+
+The architecture leverages several key technologies:
+
+1. **UI Framework**: Material UI (v6)
+2. **State Management**: React Context API + React Query
+3. **Form Handling**: Formik + Yup
+4. **Data Fetching**: Axios + TanStack Query
+5. **Styling**: Tailwind CSS + Emotion
+6. **Code Editing**: CodeMirror + Monaco Editor
+7. **Visualization**: React ChartJS
+
+## Design Patterns
+
+The architecture implements several design patterns:
+
+1. **Provider Pattern**:
+   - Used in context providers to share state
+   - Follows React's composition model
+
+2. **Repository Pattern**:
+   - API services abstract data access
+   - Centralizes data fetching logic
+
+3. **Adapter Pattern**:
+   - Utility functions adapt external libraries
+   - Creates consistent interfaces
+
+4. **Container/Presentation Pattern**:
+   - Separates logic from UI
+   - Improves component reusability
+
+5. **Custom Hook Pattern**:
+   - Extracts reusable logic
+   - Simplifies component implementation

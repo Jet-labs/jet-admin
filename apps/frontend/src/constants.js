@@ -40,6 +40,7 @@ export const CONSTANTS = {
     MAIN_DRAWER_DATABASE_DASHBOARDS_TITLE: "Dashboards",
     MAIN_DRAWER_DATABASE_CHARTS_TITLE: "Charts",
     MAIN_DRAWER_DATABASE_WIDGETS_TITLE: "Widgets",
+    MAIN_DRAWER_DATABASE_NOTIFICATIONS_TITLE: "Notifications",
     MAIN_DRAWER_DATABASE_QUERIES_TITLE: "Database queries",
     MAIN_DRAWER_ADD_DATABASE_SCHEMA_BUTTON: "Add schema",
     MAIN_DRAWER_USER_MANAGEMENT_TITLE: "User management",
@@ -267,6 +268,7 @@ export const CONSTANTS = {
     TABLE_DRAWER_LIST_NO_TABLE: "No tables found",
     TRIGGER_DRAWER_LIST_NO_TRIGGER: "No triggers found",
     QUERY_DRAWER_LIST_NO_QUERY: "No queries found",
+    NOTIFICATION_DRAWER_LIST_NO_NOTIFICATION: "No notifications found",
     CHART_DRAWER_LIST_NO_CHART: "No charts found",
     WIDGET_DRAWER_LIST_NO_WIDGET: "No widgets found",
     DASHBOARD_DRAWER_LIST_NO_DASHBOARD: "No dashboards found",
@@ -292,6 +294,7 @@ export const CONSTANTS = {
     ADD_TRIGGER_FORM_REF_NEW_LABEL: "REFERENCING NEW (optional)",
     ADD_TRIGGER_FORM_DEFERRABLE_LABEL: "DEFERRABLE",
     ADD_TRIGGER_FORM_INITIALLY_DEFERRED_LABEL: "INITIALLY DEFERRED",
+    ADD_TRIGGER_FORM_NOTIFICATION_CHANNEL_LABEL: "Notification channel",
 
     // Placeholders
     ADD_TRIGGER_FORM_TRIGGER_NAME_PLACEHOLDER: "Enter trigger name",
@@ -735,6 +738,35 @@ export const CONSTANTS = {
     WIDGET_EDITOR_FORM_DATASET_FIELD_LABEL_LABEL: "Label",
     WIDGET_EDITOR_FORM_DATASET_FIELD_VALUE_LABEL: "Value",
     WIDGET_EDITOR_FORM_DATASET_FIELD_RADIUS_LABEL: "Radius",
+    ADD_NOTIFICATION_BUTTON_TEXT: "Add Notification",
+    ADD_NOTIFICATION_FORM_TITLE: "Create New Notification",
+    NOTIFICATION_ADDED_SUCCESS: "Notification created successfully",
+    NOTIFICATION_DELETED_SUCCESS: "Notification deleted successfully",
+
+    ADD_NOTIFICATION_FORM_TITLE: "Create notification",
+    ADD_NOTIFICATION_FORM_SUBMIT: "Save notification",
+    ADD_NOTIFICATION_FORM_NOTIFICATION_CREATED:
+      "Notification created successfully",
+    NOTIFICATION_EDITOR_FORM_NAME_FIELD_LABEL: "Notification name",
+    NOTIFICATION_EDITOR_FORM_NAME_FIELD_PLACEHOLDER: "Your notification's name",
+
+    DELETE_NOTIFICATION_DELETION_SUCCESS: "Notification deleted successfully!",
+    DELETE_NOTIFICATION_DIALOG_TITLE: "Delete notification",
+    DELETE_NOTIFICATION_DIALOG_MESSAGE:
+      "Are you sure you want to delete this item? This action cannot be undone.",
+
+    UPDATE_NOTIFICATION_FORM_TITLE: "Update notification",
+    UPDATE_NOTIFICATION_FORM_NOTIFICATION_UPDATION_SUCCESS:
+      "Notification updated successfully!",
+
+    UPDATE_NOTIFICATION_FORM_NOTIFICATION_TESTING_SUCCESS:
+      "Notification run successfully!",
+    UPDATE_NOTIFICATION_FORM_SUBMIT_BUTTON: "Update notification",
+    UPDATE_NOTIFICATION_FORM_NAME_FIELD_LABEL: "Notification name",
+    UPDATE_NOTIFICATION_FORM_NAME_FIELD_PLACEHOLDER: "Your notification's name",
+    UPDATE_NOTIFICATION_FORM_UPDATE_DIALOG_TITLE: "Update notification",
+    UPDATE_NOTIFICATION_FORM_UPDATE_DIALOG_MESSAGE:
+      "Are you sure you want to update this item? This action cannot be undone.",
   },
 
   LOCAL_STORAGE_KEYS: {
@@ -909,6 +941,19 @@ export const CONSTANTS = {
     LEGAL: {
       code: "/terms",
       path: () => "/terms",
+    },
+    VIEW_DATABASE_NOTIFICATIONS: {
+      code: "/tenants/:tenantID/notifications",
+      path: (tenantID) => `/tenants/${tenantID}/notifications`,
+    },
+    ADD_DATABASE_NOTIFICATION: {
+      code: "/tenants/:tenantID/notifications/add",
+      path: (tenantID) => `/tenants/${tenantID}/notifications/add`,
+    },
+    UPDATE_DATABASE_NOTIFICATION_BY_ID: {
+      code: "/tenants/:tenantID/notifications/:databaseNotificationID",
+      path: (tenantID, databaseNotificationID) =>
+        `/tenants/${tenantID}/notifications/${databaseNotificationID}`,
     },
   },
 
@@ -1105,6 +1150,16 @@ export const CONSTANTS = {
         `/api/v1/tenants/${tenantID}/database/dashboards/${databaseDashboardID}`,
       deleteDatabaseDashboardByID: (tenantID, databaseDashboardID) =>
         `/api/v1/tenants/${tenantID}/database/dashboards/${databaseDashboardID}`,
+      getAllDatabaseNotificationsAPI: (tenantID) =>
+        `/api/v1/tenants/${tenantID}/database/notifications`,
+      getDatabaseNotificationByIDAPI: (tenantID, databaseNotificationID) =>
+        `/api/v1/tenants/${tenantID}/database/notifications/${databaseNotificationID}`,
+      createDatabaseNotificationAPI: (tenantID) =>
+        `/api/v1/tenants/${tenantID}/database/notifications`,
+      deleteDatabaseNotificationByIDAPI: (tenantID, databaseNotificationID) =>
+        `/api/v1/tenants/${tenantID}/database/notifications/${databaseNotificationID}`,
+      updateDatabaseNotificationByID: (tenantID, databaseNotificationID) =>
+        `/api/v1/tenants/${tenantID}/database/notifications/${databaseNotificationID}`,
     },
   },
 
@@ -1203,6 +1258,8 @@ export const CONSTANTS = {
     CUSTOMER_PLAN: "CUSTOMER_PLAN",
     FORMS: "FORMS",
     FORM_SUBMISSIONS: "FORM_SUBMISSIONS",
+    DATABASE_NOTIFICATIONS: (tenantID) => `${tenantID}-DATABASE_NOTIFICATIONS`,
+    DATABASE_NOTIFICATION_DETAILS: "DATABASE_NOTIFICATION_DETAILS",
   },
 
   DATA_TYPES: {
@@ -1515,6 +1572,8 @@ export const CONSTANTS = {
       "DASHBOARD_ADDITION_FORM_RESULT_SEPARATION",
     DASHBOARD_UPDATION_FORM_RESULT_SEPARATION:
       "DASHBOARD_UPDATION_FORM_RESULT_SEPARATION",
+    DATABASE_NOTIFICATION_LAYOUT_SEPARATION:
+      "DATABASE_NOTIFICATION_LAYOUT_SEPARATION",
   },
 
   PG_TRIGGER_FORM_TIMING_OPTIONS: ["BEFORE", "AFTER", "INSTEAD OF"],

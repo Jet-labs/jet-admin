@@ -12,6 +12,7 @@ import { RoleManagementLayout } from "../layouts/roleManagementLayout";
 import { DatabaseChartLayout } from "../layouts/databaseChartLayout";
 import { DatabaseDashboardLayout } from "../layouts/databaseDashboardLayout";
 import { DatabaseWidgetLayout } from "../layouts/databaseWidgetLayout";
+import { DatabaseNotificationLayout } from "../layouts/databaseNotificationLayout";
 
 const SignInPage = lazy(() => import("../../pages/signInPage"));
 const SignUpPage = lazy(() => import("../../pages/signUpPage"));
@@ -84,6 +85,14 @@ const RoleManagementPage = lazy(() => import("../../pages/roleManagementPage"));
 const AddTenantRolePage = lazy(() => import("../../pages/addTenantRolePage"));
 const UpdateTenantRolePage = lazy(() =>
   import("../../pages/updateTenantRolePage")
+);
+
+const AddDatabaseNotificationPage = lazy(() =>
+  import("../../pages/addDatabaseNotificationPage")
+);
+
+const UpdateDatabaseNotificationPage = lazy(() =>
+  import("../../pages/updateDatabaseNotificationPage")
 );
 
 const router = createBrowserRouter([
@@ -217,6 +226,23 @@ const router = createBrowserRouter([
               {
                 path: CONSTANTS.ROUTES.UPDATE_DATABASE_WIDGET_BY_ID.code,
                 element: <UpdateDatabaseWidgetPage />,
+              },
+            ],
+          },
+          {
+            element: <DatabaseNotificationLayout />,
+            children: [
+              {
+                path: CONSTANTS.ROUTES.VIEW_DATABASE_NOTIFICATIONS.code,
+                element: <AddDatabaseNotificationPage />,
+              },
+              {
+                path: CONSTANTS.ROUTES.ADD_DATABASE_NOTIFICATION.code,
+                element: <AddDatabaseNotificationPage />,
+              },
+              {
+                path: CONSTANTS.ROUTES.UPDATE_DATABASE_NOTIFICATION_BY_ID.code,
+                element: <UpdateDatabaseNotificationPage />,
               },
             ],
           },
