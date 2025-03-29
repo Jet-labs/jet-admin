@@ -4,7 +4,7 @@
 
 Welcome to Jet Admin, a comprehensive web-based PostgreSQL management and visualization platform. Edit data, build graphs, and create dashboards using queries.
 
-![cover](https://github.com/user-attachments/assets/c6b822d6-90a7-4ac2-8294-8766e684c055)
+![mackup_final](https://github.com/user-attachments/assets/ed50a792-470e-4701-9a65-e71f07830c36)
 
 ## Overview
 
