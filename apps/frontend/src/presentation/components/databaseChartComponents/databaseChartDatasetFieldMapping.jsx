@@ -5,6 +5,7 @@ import { CONSTANTS } from "../../../constants";
 import ReactJson from "react-json-view";
 import { CollapseComponent } from "../ui/collapseComponent";
 import { Box } from "@mui/material";
+import { formValidations } from "../../../utils/formValidation";
 
 export const DatabaseChartDatasetFieldMapping = ({
   open,
@@ -28,6 +29,8 @@ export const DatabaseChartDatasetFieldMapping = ({
       ...initialValues,
     },
     enableReinitialize: true,
+    validationSchema:
+      formValidations.datasetFieldMappingFormValidationSchema(datasetFields),
     onSubmit: (values) => {
       chartForm.setFieldValue(
         `databaseQueries[${datasetIndex}].datasetFields`,
@@ -40,7 +43,6 @@ export const DatabaseChartDatasetFieldMapping = ({
       onClose();
     },
   });
-
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">

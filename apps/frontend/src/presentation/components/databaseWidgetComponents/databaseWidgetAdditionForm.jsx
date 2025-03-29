@@ -2,19 +2,18 @@ import { CircularProgress } from "@mui/material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import { useCallback, useState } from "react";
-import * as Yup from "yup";
 import { CONSTANTS } from "../../../constants";
 import {
-    createDatabaseWidgetAPI,
-    getDatabaseWidgetDataUsingWidgetAPI,
+  createDatabaseWidgetAPI,
+  getDatabaseWidgetDataUsingWidgetAPI,
 } from "../../../data/apis/databaseWidget";
+import { formValidations } from "../../../utils/formValidation";
 import { displaySuccess } from "../../../utils/notification";
 import {
-    ResizableHandle,
-    ResizablePanel,
-    ResizablePanelGroup,
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
 } from "../ui/resizable";
-import { DatabaseQueryResponseView } from "../databaseQueryComponents/databaseQueryResponseView";
 import { DatabaseWidgetEditor } from "./databaseWidgetEditor";
 import { DatabaseWidgetPreview } from "./databaseWidgetPreview";
 const initialValues = {
@@ -40,25 +39,6 @@ const initialValues = {
     widgetTailwindCss: "text-slate-700",
   },
 };
-
-// Comprehensive Validation Schema
-const validationSchema = Yup.object().shape({
-  databaseWidgetName: Yup.string().required("Widget name is required"),
-  databaseWidgetType: Yup.string().required("Widget type is required"),
-  queries: Yup.array()
-    .of(
-      Yup.object().shape({
-        databaseQueryID: Yup.string().required("Query is required"),
-        title: Yup.string()
-          .required("Alias is required")
-          .test("unique-alias", "Alias must be unique", function (value) {
-            const aliases = this.parent.map((q) => q.title);
-            return aliases.filter((a) => a === value).length === 1;
-          }),
-      })
-    )
-    .min(1, "At least 1 query required"),
-});
 
 export const DatabaseWidgetAdditionForm = ({ tenantID }) => {
   const queryClient = useQueryClient();
@@ -114,7 +94,7 @@ export const DatabaseWidgetAdditionForm = ({ tenantID }) => {
 
   const addDatabaseWidgetForm = useFormik({
     initialValues: initialValues,
-    validationSchema,
+    validationSchema: formValidations.addDatabaseWidgetFormValidationSchema,
     validateOnMount: false,
     validateOnChange: false,
     onSubmit: (values) => {
@@ -128,7 +108,6 @@ export const DatabaseWidgetAdditionForm = ({ tenantID }) => {
     }
   }, [addDatabaseWidgetForm]);
 
-  console.log({ addDatabaseWidgetForm: addDatabaseWidgetForm?.values });
   return (
     <div className="w-full flex flex-col justify-start items-center h-full">
       <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl text-start w-full p-3">

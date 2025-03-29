@@ -20,6 +20,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "../ui/resizable";
+import { formValidations } from "../../../utils/formValidation";
 
 export const DatabaseQueryUpdationForm = ({ tenantID, databaseQueryID }) => {
   const queryClient = useQueryClient();
@@ -90,10 +91,7 @@ export const DatabaseQueryUpdationForm = ({ tenantID, databaseQueryID }) => {
     },
     validateOnMount: false,
     validateOnChange: false,
-    validate: (values) => {
-      const errors = {};
-      return errors;
-    },
+    validationSchema: formValidations.queryUpdationFormValidationSchema,
     onSubmit: async (values) => {
       await showConfirmation({
         title: CONSTANTS.STRINGS.UPDATE_QUERY_FORM_UPDATE_DIALOG_TITLE,

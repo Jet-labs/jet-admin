@@ -6,30 +6,9 @@ import { CONSTANTS } from "../../../constants";
 
 import { createDatabaseTableAPI } from "../../../data/apis/databaseTable";
 
-import * as Yup from "yup";
+import { formValidations } from "../../../utils/formValidation";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { DatabaseTableEditor } from "./databaseTableEditor";
-
-const tableAdditionFormValidationSchema = Yup.object().shape({
-  databaseTableName: Yup.string().required("Table name is required"),
-  databaseTableColumns: Yup.array().of(
-    Yup.object().shape({
-      databaseTableColumnName: Yup.string().required("Column name is required"),
-      databaseTableColumnType: Yup.string().required("Data type is required"),
-    })
-  ),
-  databaseTableConstraints: Yup.object().shape({
-    foreignKeys: Yup.array().of(
-      Yup.object().shape({
-        referencedTable: Yup.string().required("Reference table is required"),
-        referencedColumns: Yup.array().min(
-          1,
-          "At least one reference column required"
-        ),
-      })
-    ),
-  }),
-});
 
 export const DatabaseTableAdditionForm = ({ tenantID, databaseSchemaName }) => {
   const queryClient = useQueryClient();
@@ -103,7 +82,7 @@ export const DatabaseTableAdditionForm = ({ tenantID, databaseSchemaName }) => {
         exclude: "", // Exclude constraint expression
       },
     },
-    validationSchema: tableAdditionFormValidationSchema,
+    validationSchema: formValidations.tableAdditionFormValidationSchema,
     onSubmit: (values) => {
       addTable(values);
     },

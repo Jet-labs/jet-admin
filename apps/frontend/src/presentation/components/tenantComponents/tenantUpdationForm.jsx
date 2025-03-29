@@ -15,8 +15,8 @@ import { useTenantActions } from "../../../logic/contexts/tenantContext";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { TenantUserAdditionForm } from "../tenantUsersComponents/tenantUserAdditionForm";
 import { TenantEditor } from "./tenantEditor";
-export const TenantUpdationForm = ({tenantID}) => {
-  
+import { formValidations } from "../../../utils/formValidation";
+export const TenantUpdationForm = ({ tenantID }) => {
   const queryClient = useQueryClient();
   const { saveTenantLocally } = useTenantActions();
   const [isAddTenantUserDialogOpen, setIsAddTenantUserDialogOpen] =
@@ -59,15 +59,7 @@ export const TenantUpdationForm = ({tenantID}) => {
       tenantName: tenant ? tenant.tenantName : "",
       tenantLogoURL: tenant ? tenant.tenantLogoURL : "",
     },
-    validate: ({ tenantName, tenantLogoURL }) => {
-      const errors = {};
-      if (!tenantName || String(tenantName).trim().length == 0) {
-        errors.tenantName = "Tenant name is required";
-      }
-      if (!tenantLogoURL || String(tenantLogoURL).trim().length == 0) {
-        errors.tenantLogoURL = "Tenant logo is required";
-      }
-    },
+    validationSchema: formValidations.updateTenantFormValidationSchema,
     onSubmit: ({ tenantID, tenantName, tenantLogoURL, tenantDBURL }) => {
       updateTenant({ tenantID, tenantName, tenantLogoURL, tenantDBURL });
     },
@@ -81,8 +73,6 @@ export const TenantUpdationForm = ({tenantID}) => {
       updateTenantForm.setFieldValue("tenantDBURL", tenant.tenantDBURL);
     }
   }, [tenant]);
-
- 
 
   const _handleOpenAddTenantUserDialog = () => {
     setIsAddTenantUserDialogOpen(true);

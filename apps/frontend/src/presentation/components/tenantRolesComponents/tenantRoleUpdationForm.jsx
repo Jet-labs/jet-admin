@@ -12,6 +12,7 @@ import {
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { TenantRoleDeletionForm } from "./tenantRoleDeletionForm";
 import { TenantPermissionSelectionInput } from "./tenantPermissionSelectionInput";
+import { formValidations } from "../../../utils/formValidation";
 
 export const TenantRoleUpdationForm = () => {
   const { tenantID, tenantRoleID } = useParams();
@@ -65,15 +66,7 @@ export const TenantRoleUpdationForm = () => {
       roleDescription: "",
       permissionIDs: [],
     },
-    validate: ({ roleName, roleDescription }) => {
-      const errors = {};
-      if (!roleName || String(roleName).trim().length == 0) {
-        errors.roleName = "Tenant name is required";
-      }
-      if (!roleDescription || String(roleDescription).trim().length == 0) {
-        errors.roleDescription = "Tenant logo is required";
-      }
-    },
+    validationSchema: formValidations.updateTenantRoleFormValidationSchema,
     onSubmit: ({ roleName, roleDescription, permissionIDs }) => {
       updateTenantRoleByID({ roleName, roleDescription, permissionIDs });
     },

@@ -13,8 +13,12 @@ import { displayError, displaySuccess } from "../../../utils/notification";
 import { DatabaseNotificationDeletionForm } from "./databaseNotificationDeletionForm";
 
 import { DatabaseNotificationEditor } from "./databaseNotificationEditor";
+import { formValidations } from "../../../utils/formValidation";
 
-export const DatabaseNotificationUpdationForm = ({ tenantID, databaseNotificationID }) => {
+export const DatabaseNotificationUpdationForm = ({
+  tenantID,
+  databaseNotificationID,
+}) => {
   const queryClient = useQueryClient();
   const { showConfirmation } = useGlobalUI();
 
@@ -66,20 +70,19 @@ export const DatabaseNotificationUpdationForm = ({ tenantID, databaseNotificatio
     },
   });
 
-  const queryUpdationForm = useFormik({
+  const databaseNotificationUpdationForm = useFormik({
     initialValues: {
       databaseNotificationName: "",
     },
     validateOnMount: false,
     validateOnChange: false,
-    validate: (values) => {
-      const errors = {};
-      return errors;
-    },
+    validationSchema:
+      formValidations.databaseNotificationUpdationFormValidationSchema,
     onSubmit: async (values) => {
       await showConfirmation({
         title: CONSTANTS.STRINGS.UPDATE_NOTIFICATION_FORM_UPDATE_DIALOG_TITLE,
-        message: CONSTANTS.STRINGS.UPDATE_NOTIFICATION_FORM_UPDATE_DIALOG_MESSAGE,
+        message:
+          CONSTANTS.STRINGS.UPDATE_NOTIFICATION_FORM_UPDATE_DIALOG_MESSAGE,
         confirmText: "Update",
         cancelText: "Cancel",
         confirmButtonClass: "!bg-[#646cff]",
@@ -92,7 +95,7 @@ export const DatabaseNotificationUpdationForm = ({ tenantID, databaseNotificatio
   useEffect(() => {
     if (databaseNotification) {
       // Update Formik form values with the fetched databaseNotification data
-      queryUpdationForm.setFieldValue(
+      databaseNotificationUpdationForm.setFieldValue(
         "databaseNotificationName",
         databaseNotification.databaseNotificationName ||
           CONSTANTS.STRINGS.UNTITLED
@@ -119,10 +122,10 @@ export const DatabaseNotificationUpdationForm = ({ tenantID, databaseNotificatio
       ) : (
         <form
           class="space-y-3 md:space-y-4 mt-5 p-3"
-          onSubmit={queryUpdationForm.handleSubmit}
+          onSubmit={databaseNotificationUpdationForm.handleSubmit}
         >
           <DatabaseNotificationEditor
-            databaseNotificationEditorForm={queryUpdationForm}
+            databaseNotificationEditorForm={databaseNotificationUpdationForm}
           />
           <div className="w-full flex flex-row justify-end">
             <DatabaseNotificationDeletionForm

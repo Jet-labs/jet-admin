@@ -12,6 +12,7 @@ import {
 import { DatabaseDashboardDropzone } from "./databaseDashboardDropzone";
 import { DatabaseDashboardEditor } from "./databaseDashboardEditor";
 import { DatabaseDashboardWidgetList } from "./databaseDashboardWidgetList";
+import { formValidations } from "../../../utils/formValidation";
 
 export const DatabaseDashboardAdditionForm = ({ tenantID }) => {
   const queryClient = useQueryClient();
@@ -53,11 +54,7 @@ export const DatabaseDashboardAdditionForm = ({ tenantID }) => {
     },
     validateOnMount: false,
     validateOnChange: false,
-    validate: (values) => {
-      const errors = {};
-
-      return errors;
-    },
+    validationSchema: formValidations.addDashboardFormValidationSchema,
     onSubmit: (values) => {
       addDatabaseDashboard(values);
     },

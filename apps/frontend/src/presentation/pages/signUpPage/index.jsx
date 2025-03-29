@@ -8,6 +8,7 @@ import {
 import { useFormik } from "formik";
 import { Spinner } from "../../components/ui/spinner";
 import logo from "../../../assets/logo.png";
+import { formValidations } from "../../../utils/formValidation";
 const SignInPage = () => {
   const { firebaseUserState, signUpState } = useAuthState();
   const { googleSignIn, emailSignUp } = useAuthActions();
@@ -19,20 +20,7 @@ const SignInPage = () => {
       password: "",
       confirmPassword: "",
     },
-    validate: ({ email, password, confirmPassword }) => {
-      const errors = {};
-      if (!email || String(email).trim().length == 0) {
-        errors.email = "Email is required";
-      }
-      if (!password || String(password).trim().length == 0) {
-        errors.password = "Password is required";
-      }
-      if (password != confirmPassword) {
-        errors.confirmPassword = "Password do not match is required";
-        errors.password = "Password do not match is required";
-      }
-      return errors;
-    },
+    validationSchema: formValidations.emailSignUpFormValidationSchema,
     onSubmit: ({ email, password }) => {
       emailSignUp(email, password);
     },

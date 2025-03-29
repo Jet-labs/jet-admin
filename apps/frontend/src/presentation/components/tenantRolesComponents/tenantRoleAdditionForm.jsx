@@ -10,7 +10,7 @@ import { useCallback } from "react";
 import { addTenantRoleAPI } from "../../../data/apis/tenantRole";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { TenantPermissionSelectionInput } from "./tenantPermissionSelectionInput";
-
+import { formValidations } from "../../../utils/formValidation";
 
 export const TenantRoleAdditionForm = () => {
   const { tenantID } = useParams();
@@ -45,20 +45,11 @@ export const TenantRoleAdditionForm = () => {
       roleDescription: "",
       permissionIDs: [],
     },
-    validate: ({ roleName, roleDescription }) => {
-      const errors = {};
-      if (!roleName || String(roleName).trim().length == 0) {
-        errors.roleName = "Tenant name is required";
-      }
-      if (!roleDescription || String(roleDescription).trim().length == 0) {
-        errors.roleDescription = "Tenant logo is required";
-      }
-    },
+    validationSchema: formValidations.addTenantRoleFormValidationSchema,
     onSubmit: ({ roleName, roleDescription, permissionIDs }) => {
       addTenantRole({ roleName, roleDescription, permissionIDs });
     },
   });
-
 
   const _handleOnRolePermissionsSelectionChange = useCallback(
     (event) => {
@@ -141,7 +132,7 @@ export const TenantRoleAdditionForm = () => {
               value={addTenantRoleForm.values.permissionIDs}
               onChange={_handleOnRolePermissionsSelectionChange}
             />
-            
+
             <div className="flex flex-row justify-end items-center w-full">
               <button
                 type="submit"

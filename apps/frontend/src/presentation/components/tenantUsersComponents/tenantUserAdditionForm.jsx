@@ -15,6 +15,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { CONSTANTS } from "../../../constants";
 import { addUserToTenantAPI } from "../../../data/apis/userManagement";
+import { formValidations } from "../../../utils/formValidation";
 
 export const TenantUserAdditionForm = ({ tenantID, open, onClose }) => {
   const queryClient = useQueryClient();
@@ -43,12 +44,7 @@ export const TenantUserAdditionForm = ({ tenantID, open, onClose }) => {
       tenantID: tenantID,
       tenantUserEmail: "",
     },
-    validate: ({ tenantUserEmail }) => {
-      const errors = {};
-      if (!tenantUserEmail || String(tenantUserEmail).trim().length == 0) {
-        errors.tenantUserEmail = "Tenant name is required";
-      }
-    },
+    validationSchema: formValidations.addUserToTenantFormValidationSchema,
     onSubmit: ({ tenantID, tenantUserEmail }) => {
       addUserToTenant({ tenantID, tenantUserEmail });
     },
@@ -114,7 +110,11 @@ export const TenantUserAdditionForm = ({ tenantID, open, onClose }) => {
             disabled={isAddingMemberToTenant}
             className={`px-2.5 py-1.5 text-white text-sm bg-[#646cff] rounded hover:outline-none hover:border-0 border-0 outline-none flex flex-row items-center justify-center`}
           >
-            {isAddingMemberToTenant?<CircularProgress className="!text-white" size={19}/>:CONSTANTS.STRINGS.ADD_MEMBER_TO_TENANT_DIALOG_FORM_SUBMIT_BUTTON}
+            {isAddingMemberToTenant ? (
+              <CircularProgress className="!text-white" size={19} />
+            ) : (
+              CONSTANTS.STRINGS.ADD_MEMBER_TO_TENANT_DIALOG_FORM_SUBMIT_BUTTON
+            )}
           </button>
         </DialogActions>
       </>
