@@ -20,7 +20,10 @@ const triggerValidationSchema = Yup.object().shape({
   forEach: Yup.string().required("For each option is required"),
 });
 
-export const DatabaseTriggerCreationForm = ({ tenantID, databaseSchemaName }) => {
+export const DatabaseTriggerAdditionForm = ({
+  tenantID,
+  databaseSchemaName,
+}) => {
   const queryClient = useQueryClient();
   const {
     isLoading: isLoadingDatabaseTables,

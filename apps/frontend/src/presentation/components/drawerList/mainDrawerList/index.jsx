@@ -8,7 +8,12 @@ import { BsServer } from "react-icons/bs";
 import { FaChartPie, FaUserCog } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa6";
 import { FiUsers } from "react-icons/fi";
-import { MdOutlineLockPerson, MdOutlineSchema } from "react-icons/md";
+import {
+  MdNotifications,
+  MdOutlineLockPerson,
+  MdOutlineSchema,
+  MdWidgets,
+} from "react-icons/md";
 import { RiDashboardFill } from "react-icons/ri";
 import { SiQuantconnect } from "react-icons/si";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
@@ -244,6 +249,32 @@ export const MainDrawerList = ({ currentPageTitle }) => {
               </span>
             </Link>
             <Link
+              to={CONSTANTS.ROUTES.VIEW_DATABASE_WIDGETS.path(tenantID)}
+              key={CONSTANTS.ROUTES.VIEW_DATABASE_WIDGETS.path(tenantID)}
+              class={`flex items-center ${
+                decodeURIComponent(location.pathname).includes(
+                  CONSTANTS.ROUTES.VIEW_DATABASE_WIDGETS.path(tenantID)
+                )
+                  ? "bg-[#eaebff]"
+                  : "bg-slate-100"
+              } rounded mb-2 w-full p-2 text-slate-700 transition duration-75 group bg-slate-200  hover:bg-slate-100  flex-row !justify-start mt-2 `}
+            >
+              <MdWidgets className="!w-5 !h-5 !text-slate-600" />
+              <span
+                className={`font-semibold text-sm ml-2 ${
+                  decodeURIComponent(location.pathname).includes(
+                    CONSTANTS.ROUTES.VIEW_DATABASE_WIDGETS.path(tenantID)
+                  )
+                    ? "!text-[#646cff]"
+                    : "!text-slate-700"
+                }`}
+              >
+                {capitalize(
+                  CONSTANTS.STRINGS.MAIN_DRAWER_DATABASE_WIDGETS_TITLE
+                )}
+              </span>
+            </Link>
+            <Link
               to={CONSTANTS.ROUTES.VIEW_DATABASE_QUERIES.path(tenantID)}
               key={CONSTANTS.ROUTES.VIEW_DATABASE_QUERIES.path(tenantID)}
               class={`flex items-center ${
@@ -269,6 +300,33 @@ export const MainDrawerList = ({ currentPageTitle }) => {
                 )}
               </span>
             </Link>
+
+            {/* <Link
+              to={CONSTANTS.ROUTES.VIEW_DATABASE_NOTIFICATIONS.path(tenantID)}
+              key={CONSTANTS.ROUTES.VIEW_DATABASE_NOTIFICATIONS.path(tenantID)}
+              class={`flex items-center ${
+                decodeURIComponent(location.pathname).includes(
+                  CONSTANTS.ROUTES.VIEW_DATABASE_NOTIFICATIONS.path(tenantID)
+                )
+                  ? "bg-[#eaebff]"
+                  : "bg-slate-100"
+              } rounded mb-2 w-full p-2 text-slate-700 transition duration-75 group bg-slate-200  hover:bg-slate-100  flex-row !justify-start mt-2 `}
+            >
+              <MdNotifications className="!w-5 !h-5 !text-slate-600" />
+              <span
+                className={`font-semibold text-sm ml-2 ${
+                  decodeURIComponent(location.pathname).includes(
+                    CONSTANTS.ROUTES.VIEW_DATABASE_NOTIFICATIONS.path(tenantID)
+                  )
+                    ? "!text-[#646cff]"
+                    : "!text-slate-700"
+                }`}
+              >
+                {capitalize(
+                  CONSTANTS.STRINGS.MAIN_DRAWER_DATABASE_NOTIFICATIONS_TITLE
+                )}
+              </span>
+            </Link> */}
 
             <button
               type="button"

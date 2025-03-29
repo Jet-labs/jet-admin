@@ -142,6 +142,12 @@ const constants = {
       value: "radial",
     },
   },
+  DATABASE_WIDGET_TYPES: {
+    TEXT_WIDGET: {
+      name: "Text widget",
+      value: "text",
+    },
+  },
 };
 
 module.exports = constants;

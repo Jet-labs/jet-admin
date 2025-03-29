@@ -6,9 +6,12 @@ import { NoEntityUI } from "../ui/noEntityUI";
 import { AiOutlineRadarChart } from "react-icons/ai";
 import { TbChartScatter } from "react-icons/tb";
 import { PiChartPolar } from "react-icons/pi";
+import { MdOutlineTextFields } from "react-icons/md";
+import { SiGooglebigquery } from "react-icons/si";
 
 export const DatabaseDashboardWidgetList = ({}) => {
-  const { databaseCharts, databaseQueries } = useDatabaseDashboardsState();
+  const { databaseCharts, databaseQueries, databaseWidgets } =
+    useDatabaseDashboardsState();
   const _handleDragStart = (e) => {
     e.dataTransfer.setData("widget", `${e.currentTarget.id}-${Date.now()}`);
   };
@@ -28,6 +31,14 @@ export const DatabaseDashboardWidgetList = ({}) => {
         return <PiChartPolar className="text-slate-700 mr-3 !text-xl" />;
       default:
         return <FaChartBar className="text-slate-700 mr-3 !text-xl" />;
+    }
+  };
+  const _renderWidgetIcon = (databaseWidgetType) => {
+    switch (databaseWidgetType) {
+      case CONSTANTS.DATABASE_WIDGET_TYPES.TEXT_WIDGET.value:
+        return <MdOutlineTextFields className="text-slate-700 mr-3 !text-xl" />;
+      default:
+        return <MdOutlineTextFields className="text-slate-700 mr-3 !text-xl" />;
     }
   };
 
@@ -75,10 +86,41 @@ export const DatabaseDashboardWidgetList = ({}) => {
                 onDragStart={_handleDragStart}
                 className="bg-slate-200 flex flex-row justify-start p-2 rounded items-center cursor-grab"
               >
-                <div>{_renderChartIcon(databaseQuery.databaseQueryType)}</div>
+                <div>
+                  <SiGooglebigquery className="text-slate-700 mr-3 !text-xl" />
+                </div>
 
                 <span className="text-xs text-slate-700 font-medium">
                   {databaseQuery.databaseQueryTitle}
+                </span>
+              </div>
+            );
+          })
+        ) : (
+          <NoEntityUI message={CONSTANTS.STRINGS.QUERY_DRAWER_LIST_NO_QUERY} />
+        )}
+      </div>
+      <span className="text-[#646cff] font-semibold text-sm">
+        {CONSTANTS.STRINGS.DASHBOARD_WIDGET_LIST_WIDGETS_TITLE}
+      </span>
+      <div className="flex flex-col justify-start items-stretch w-full gap-2 ">
+        {databaseWidgets?.length > 0 ? (
+          databaseWidgets.map((databaseWidget) => {
+            const key = `text_${databaseWidget.databaseWidgetID}`;
+            return (
+              <div
+                draggable
+                key={key}
+                id={key}
+                onDragStart={_handleDragStart}
+                className="bg-slate-200 flex flex-row justify-start p-2 rounded items-center cursor-grab"
+              >
+                <div>
+                  {_renderWidgetIcon(databaseWidget.databaseWidgetType)}
+                </div>
+
+                <span className="text-xs text-slate-700 font-medium">
+                  {databaseWidget.databaseWidgetName}
                 </span>
               </div>
             );

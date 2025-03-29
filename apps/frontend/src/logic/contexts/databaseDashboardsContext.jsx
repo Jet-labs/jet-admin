@@ -7,6 +7,7 @@ import { CONSTANTS } from "../../constants";
 import { getAllDatabaseQueriesAPI } from "../../data/apis/databaseQuery";
 import { getAllDatabaseChartsAPI } from "../../data/apis/databaseChart";
 import { getAllDatabaseDashboardsAPI } from "../../data/apis/databaseDashboard";
+import { getAllDatabaseWidgetsAPI } from "../../data/apis/databaseWidget";
 const DatabaseDashboardsStateContext = React.createContext(undefined);
 const DatabaseDashboardsActionsContext = React.createContext(undefined);
 const DatabaseDashboardsContextProvider = ({ children }) => {
@@ -36,6 +37,18 @@ const DatabaseDashboardsContextProvider = ({ children }) => {
     refetchOnWindowFocus: false,
   });
   const {
+    isLoading: isLoadingDatabaseWidgets,
+    data: databaseWidgets,
+    error: loadDatabaseWidgetsError,
+    isFetching: isFetchingDatabaseWidgets,
+    isRefetching: isRefetechingDatabaseWidgets,
+    refetch: refetchDatabaseWidgets,
+  } = useQuery({
+    queryKey: [CONSTANTS.REACT_QUERY_KEYS.DATABASE_WIDGETS(tenantID)],
+    queryFn: () => getAllDatabaseWidgetsAPI({ tenantID }),
+    refetchOnWindowFocus: false,
+  });
+  const {
     isLoading: isLoadingDatabaseQueries,
     data: databaseQueries,
     error: loadDatabaseQueriesError,
@@ -43,9 +56,7 @@ const DatabaseDashboardsContextProvider = ({ children }) => {
     isRefetching: isRefetechingDatabaseQueries,
     refetch: refetchDatabaseQueries,
   } = useQuery({
-    queryKey: [
-      CONSTANTS.REACT_QUERY_KEYS.DATABASE_QUERIES(tenantID),
-    ],
+    queryKey: [CONSTANTS.REACT_QUERY_KEYS.DATABASE_QUERIES(tenantID)],
     queryFn: () => getAllDatabaseQueriesAPI({ tenantID }),
     refetchOnWindowFocus: false,
   });
@@ -63,10 +74,19 @@ const DatabaseDashboardsContextProvider = ({ children }) => {
         databaseCharts,
         isLoadingDatabaseCharts,
         isFetchingDatabaseCharts,
+
+        databaseWidgets,
+        isLoadingDatabaseWidgets,
+        isFetchingDatabaseWidgets,
       }}
     >
       <DatabaseDashboardsActionsContext.Provider
-        value={{ refetchDatabaseDashboards, refetchDatabaseQueries,refetchDatabaseCharts }}
+        value={{
+          refetchDatabaseDashboards,
+          refetchDatabaseQueries,
+          refetchDatabaseCharts,
+          refetchDatabaseWidgets,
+        }}
       >
         {children}
       </DatabaseDashboardsActionsContext.Provider>

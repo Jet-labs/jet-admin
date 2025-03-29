@@ -1,0 +1,92 @@
+---
+sidebar_position: 5
+---
+
+# Charts
+
+Visualize query results using Chart.js-based components with flexible dataset mapping and parameter support.
+
+:::tip
+Test queries with parameters in side panel before chart creation
+:::
+
+## Supported Chart Types
+
+### 1. Bar Chart
+- **Description**: Compare categorical data with rectangular bars
+- **Use Case**: Monthly sales comparison across regions
+- **Dataset Fields**: `xAxis`, `yAxis`
+
+### 2. Line Chart
+- **Description**: Display trends over time/intervals
+- **Use Case**: Website traffic monitoring by hour
+- **Dataset Fields**: `xAxis`, `yAxis`
+
+### 3. Pie Chart
+- **Description**: Show proportional relationships
+- **Use Case**: Market share distribution
+- **Dataset Fields**: `label`, `value`
+
+### 4. Polar Area Chart
+- **Description**: Radial view for multivariate comparisons
+- **Use Case**: Skill assessment radar chart
+- **Dataset Fields**: `label`, `value`
+
+### 5. Radar Chart
+- **Description**: Multivariate data in spiderweb format
+- **Use Case**: Product feature comparison
+- **Dataset Fields**: `label`, `value`
+
+### 6. Scatter Chart
+- **Description**: Plot relationships between variables
+- **Use Case**: Height vs Weight correlation
+- **Dataset Fields**: `xAxis`, `yAxis`
+
+### 7. Bubble Chart
+- **Description**: 3D data visualization (X/Y + size)
+- **Use Case**: Sales vs Profit with deal size
+- **Dataset Fields**: `xAxis`, `yAxis`, `radius`
+
+## Dataset Configuration
+
+### Query Binding
+
+1. **Select Saved Query**: Choose from pre-configured queries
+
+![Chart](/img/chart-dataset-query-selection.png)
+
+2. **Parameter Handling**: Enter parameter values when using parameterized queries
+
+![Chart](/img/chart-dataset-parameters.png)
+
+3. **Multiple Datasets**: Display multiple datasets to render multi-chart
+
+![Chart](/img/chart-multiple-dataset.png)
+
+### Field Mapping
+
+Each chart type requires fields to render chart (e.g. x axis, y axis, labels, etc.). These values are mapped from the outputs of selected queries.
+
+| **Chart Type** | **Required Fields** | **Optional Fields** |
+|----------------|---------------------|---------------------|
+| Bar/Line       | xAxis, yAxis        | -                   |
+| Pie/Radial     | label, value        | -                   |
+| Radar/Polar    | label, value        | -                   |
+| Scatter        | xAxis, yAxis        | -                   |
+| Bubble         | xAxis, yAxis, radius| -                   |
+
+### Chart UI Configuration
+
+Leverage Chart.js based options to modify chart UI
+
+![Chart](/img/chart-ui-config.png)
+
+### Dataset UI Configuration
+
+Chart.js based dataset UI options
+
+![Chart](/img/chart-dataset-ui-config.png)
+
+:::note
+Refer to [Chart.js Documentation](https://www.chartjs.org/docs/latest/) for advanced configuration options.
+:::

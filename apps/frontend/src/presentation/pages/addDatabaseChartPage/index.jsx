@@ -5,8 +5,8 @@ import { useParams } from "react-router-dom";
 
 
 const AddDatabaseChartPage = () => {
-    const { tenantID, databaseSchemaName } = useParams();
-  return <DatabaseChartAdditionForm tenantID={tenantID}  databaseSchemaName={databaseSchemaName}/>;
+    const { tenantID } = useParams();
+    return <DatabaseChartAdditionForm tenantID={tenantID} />;
 };
 
 export default AddDatabaseChartPage;

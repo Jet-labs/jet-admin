@@ -1,0 +1,20 @@
+---
+sidebar_position: 4
+---
+# Queries
+-------------------------
+Postgres queries can be saved as variables which when used will be executed in run-time. Output can be checked by testing the query
+
+![Query](/img/query.png)
+
+#### **Using queries variables**
+
+
+  ```sql
+  select * from city where city_id=${arg1} or city_id=${arg2};
+  ```  
+The query variables are defined in the query test section.
+
+
+![Query](/img/query-variables.png)
+  

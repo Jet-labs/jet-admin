@@ -323,7 +323,7 @@ databaseChartService.getDatabaseChartDataByID = async ({
 
     return {
       databaseChartID: databaseChart.databaseChartID,
-      chartName: databaseChart.databaseChartName,
+      databaseChartName: databaseChart.databaseChartName,
       lastUpdated: databaseChart.updatedAt,
       data: processedData,
     };
@@ -475,7 +475,7 @@ databaseChartService.getDatabaseChartDataUsingDatabaseChart = async ({
     }
 
     return {
-      chartName: databaseChart.databaseChartName,
+      databaseChartName: databaseChart.databaseChartName,
       lastUpdated: databaseChart.updatedAt,
       data: processedData,
     };
@@ -492,49 +492,6 @@ databaseChartService.getDatabaseChartDataUsingDatabaseChart = async ({
   }
 };
 
-/**
- * Processes raw query results into Chart.js compatible format.
- * @param {Object} params
- * @param {number} params.userID - ID of the requesting user
- * @param {Object} params.databaseChart - Database chart configuration object
- * @param {Array<Object>} params.queryResults - Array of query results from execution
- * @returns {Object} Chart.js compatible data structure with labels and datasets
- */
-databaseChartService.processBarChartQueryResults = ({
-  databaseChart,
-  queryResults,
-}) => {
-  // Collect all x-axis values
-  const xValues = new Set();
-  databaseChart.databaseQueries.forEach((mapping, index) => {
-    const result = queryResults[index]?.result || [];
-    const xField = mapping.datasetFields?.xAxis;
-    if (xField) {
-      result.forEach((row) => xValues.add(row[xField]));
-    }
-  });
-
-  // Sort labels
-  const sortedLabels = [...xValues].sort((a, b) => {
-    if (typeof a === "number" && typeof b === "number") return a - b;
-    return a.toString().localeCompare(b.toString());
-  });
-
-  // Build datasets
-  const datasets = databaseChart.databaseQueries.map((mapping, index) => {
-    const result = queryResults[index]?.result || [];
-    const { xAxis, yAxis } = mapping.datasetFields;
-    const dataMap = new Map(result.map((row) => [row[xAxis], row[yAxis]]));
-
-    return {
-      label: mapping.title,
-      data: sortedLabels.map((x) => dataMap.get(x) ?? 0),
-      backgroundColor: mapping.parameters?.color || "#007bff",
-    };
-  });
-
-  return { labels: sortedLabels, datasets };
-};
 
 /**
  * Updates an existing database chart and its associated query mappings.

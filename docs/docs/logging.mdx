@@ -1,0 +1,30 @@
+---
+sidebar_position: 8
+---
+# Logging
+-------------------------
+ALl the backend logs can be logged to below logging options with simple config
+
+#### **Local log storage**
+
+Edit the below configuration in ```development.env``` or ```production.env``` files for locally storing logs in server:
+```bash
+LOG_RETENTION = 7
+LOG_LEVEL = "info"
+LOG_FILE_SIZE = 1
+```
+- ```LOG_RETENTION``` defines the days to store the logs.
+- ```LOG_LEVEL``` supports ```error, warning, success, info```
+- ```LOG_FILE_SIZE``` defines the size in MB of each log file.
+
+#### **Syslog**
+
+Edit the below configuration in ```development.env``` or ```production.env``` files for sending logs to remote syslog server:
+```bash
+SYSLOG_HOST = 127.0.0.1
+SYSLOG_PORT = 514
+SYSLOG_PROTOCOL = udp4
+SYSLOG_LEVEL = "warning"
+```
+- ```SYSLOG_PROTOCOL``` supports ```tcp4, udp4```
+- ```SYSLOG_LEVEL``` supports ```error, warning, success, info```

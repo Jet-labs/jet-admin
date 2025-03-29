@@ -21,7 +21,9 @@ model tblTenants {
   tenantName                  String?                       @db.VarChar
   tblDatabaseCharts           tblDatabaseCharts[]
   tblDatabaseDashboards       tblDatabaseDashboards[]
+  tblDatabaseNotifications    tblDatabaseNotifications[]
   tblDatabaseQueries          tblDatabaseQueries[]
+  tblDatabaseWidgets          tblDatabaseWidgets[]
   tblRoles                    tblRoles[]
   tblUsers                    tblUsers?                     @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fktblTenantstblUsersCreatorID")
   tblUserNotifications        tblUserNotifications[]
@@ -47,6 +49,7 @@ model tblUsers {
   tblDatabaseCharts           tblDatabaseCharts[]
   tblDatabaseDashboards       tblDatabaseDashboards[]
   tblDatabaseQueries          tblDatabaseQueries[]
+  tblDatabaseWidgets          tblDatabaseWidgets[]
   tblTenants                  tblTenants[]
   tblUserNotifications        tblUserNotifications[]
   tblUserTenantConfigMap      tblUserTenantConfigMap[]
@@ -69,21 +72,22 @@ model tblUsersTenantsRelationship {
 }
 
 model tblDatabaseQueries {
-  databaseQueryID               Int                             @id(map: "pktblDatabaseQueries") @default(autoincrement())
-  tenantID                      Int
-  createdAt                     DateTime                        @default(now()) @db.Timestamptz(6)
-  updatedAt                     DateTime                        @default(now()) @db.Timestamptz(6)
-  disabledAt                    DateTime?                       @db.Timestamptz(6)
-  isDisabled                    Boolean?                        @default(false)
-  databaseQueryTitle            String                          @default("Untitled") @db.VarChar
-  databaseQueryDescription      String?                         @db.VarChar
-  databaseQuery                 Json?                           @db.Json
-  runOnLoad                     Boolean?
-  databaseQueryResultSchema     Json?                           @db.Json
-  creatorID                     Int?
-  tblDatabaseChartQueryMappings tblDatabaseChartQueryMappings[]
-  tblUsers                      tblUsers?                       @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDatabaseQueriesCreatorID")
-  tblTenants                    tblTenants                      @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTenantIDTenantID")
+  databaseQueryID                Int                              @id(map: "pktblDatabaseQueries") @default(autoincrement())
+  tenantID                       Int
+  createdAt                      DateTime                         @default(now()) @db.Timestamptz(6)
+  updatedAt                      DateTime                         @default(now()) @db.Timestamptz(6)
+  disabledAt                     DateTime?                        @db.Timestamptz(6)
+  isDisabled                     Boolean?                         @default(false)
+  databaseQueryTitle             String                           @default("Untitled") @db.VarChar
+  databaseQueryDescription       String?                          @db.VarChar
+  databaseQuery                  Json?                            @db.Json
+  runOnLoad                      Boolean?
+  databaseQueryResultSchema      Json?                            @db.Json
+  creatorID                      Int?
+  tblDatabaseChartQueryMappings  tblDatabaseChartQueryMappings[]
+  tblUsers                       tblUsers?                        @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDatabaseQueriesCreatorID")
+  tblTenants                     tblTenants                       @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTenantIDTenantID")
+  tblDatabaseWidgetQueryMappings tblDatabaseWidgetQueryMappings[]
 }
 
 model tblPermissions {
@@ -201,4 +205,42 @@ model tblUserNotifications {
   notifierID     String      @db.VarChar
   tblTenants     tblTenants? @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblUserNotificationsTenantID")
   tblUsers       tblUsers    @relation(fields: [userID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblUserNotificationsUserIDUserID")
+}
+
+model tblDatabaseWidgetQueryMappings {
+  databaseWidgetID   Int
+  databaseQueryID    Int
+  parameters         Json?
+  title              String?            @db.VarChar
+  executionOrder     Int?
+  datasetFields      Json?
+  argsMap            Json?
+  tblDatabaseQueries tblDatabaseQueries @relation(fields: [databaseQueryID], references: [databaseQueryID], onDelete: Cascade, onUpdate: NoAction, map: "fk_tblDatabaseWidgetQueryMappings_tblDatabaseQueries")
+  tblDatabaseWidgets tblDatabaseWidgets @relation(fields: [databaseWidgetID], references: [databaseWidgetID], onDelete: Cascade, onUpdate: NoAction, map: "fk_tblDatabaseWidgetQueryMappings_tblDatabaseWidgets")
+
+  @@id([databaseWidgetID, databaseQueryID])
+}
+
+model tblDatabaseWidgets {
+  databaseWidgetID               Int                              @id @default(autoincrement())
+  databaseWidgetName             String                           @db.VarChar
+  databaseWidgetDescription      String?                          @db.VarChar
+  databaseWidgetType             String                           @db.VarChar
+  databaseWidgetConfig           Json
+  createdAt                      DateTime?                        @default(now()) @db.Timestamptz(6)
+  updatedAt                      DateTime?                        @default(now()) @db.Timestamptz(6)
+  tenantID                       Int
+  creatorID                      Int?
+  refreshInterval                Int?
+  tblDatabaseWidgetQueryMappings tblDatabaseWidgetQueryMappings[]
+  tblUsers                       tblUsers?                        @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDatabaseWidgetsCreatorID")
+  tblTenants                     tblTenants                       @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDatabaseWidgetsTenantIDTenantID")
+}
+
+model tblDatabaseNotifications {
+  databaseNotificationID   Int        @id @default(autoincrement())
+  createdAt                DateTime   @default(now()) @db.Timestamptz(6)
+  databaseNotificationName String     @db.VarChar
+  tenantID                 Int
+  tblTenants               tblTenants @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDatabaseNotificationsTenantID")
 }

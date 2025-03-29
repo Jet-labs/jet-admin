@@ -7,6 +7,7 @@ import {
   useDatabaseQueriesActions,
   useDatabaseQueriesState,
 } from "../../../../logic/contexts/databaseQueriesContext";
+import { SiGooglebigquery } from "react-icons/si";
 export const DatabaseQueryDrawerList = ({}) => {
   const {
     isLoadingDatabaseQueries,
@@ -61,7 +62,7 @@ export const DatabaseQueryDrawerList = ({}) => {
                   }`}
                 >
                   <div className="!w-[16px]">
-                    <TbBrandGoogleBigQuery
+                    <SiGooglebigquery
                       className={`w-[16px] h-[16px] ${
                         isActive ? "text-primary" : "text-slate-600"
                       }`}

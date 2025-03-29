@@ -39,6 +39,8 @@ export const CONSTANTS = {
     MAIN_DRAWER_DATABASE_SCHEMA_TITLE: "Database Schemas",
     MAIN_DRAWER_DATABASE_DASHBOARDS_TITLE: "Dashboards",
     MAIN_DRAWER_DATABASE_CHARTS_TITLE: "Charts",
+    MAIN_DRAWER_DATABASE_WIDGETS_TITLE: "Widgets",
+    MAIN_DRAWER_DATABASE_NOTIFICATIONS_TITLE: "Notifications",
     MAIN_DRAWER_DATABASE_QUERIES_TITLE: "Database queries",
     MAIN_DRAWER_ADD_DATABASE_SCHEMA_BUTTON: "Add schema",
     MAIN_DRAWER_USER_MANAGEMENT_TITLE: "User management",
@@ -266,7 +268,9 @@ export const CONSTANTS = {
     TABLE_DRAWER_LIST_NO_TABLE: "No tables found",
     TRIGGER_DRAWER_LIST_NO_TRIGGER: "No triggers found",
     QUERY_DRAWER_LIST_NO_QUERY: "No queries found",
+    NOTIFICATION_DRAWER_LIST_NO_NOTIFICATION: "No notifications found",
     CHART_DRAWER_LIST_NO_CHART: "No charts found",
+    WIDGET_DRAWER_LIST_NO_WIDGET: "No widgets found",
     DASHBOARD_DRAWER_LIST_NO_DASHBOARD: "No dashboards found",
 
     ADD_TRIGGER_BUTTON_TEXT: "Add trigger",
@@ -290,6 +294,7 @@ export const CONSTANTS = {
     ADD_TRIGGER_FORM_REF_NEW_LABEL: "REFERENCING NEW (optional)",
     ADD_TRIGGER_FORM_DEFERRABLE_LABEL: "DEFERRABLE",
     ADD_TRIGGER_FORM_INITIALLY_DEFERRED_LABEL: "INITIALLY DEFERRED",
+    ADD_TRIGGER_FORM_NOTIFICATION_CHANNEL_LABEL: "Notification channel",
 
     // Placeholders
     ADD_TRIGGER_FORM_TRIGGER_NAME_PLACEHOLDER: "Enter trigger name",
@@ -327,6 +332,8 @@ export const CONSTANTS = {
     ADD_QUERY_BUTTON_TEXT: "Add query",
 
     ADD_CHART_BUTTON_TEXT: "Add chart",
+
+    ADD_WIDGET_BUTTON_TEXT: "Add widget",
 
     // Labels
     ADD_QUERY_FORM_TITLE: "Add query",
@@ -450,6 +457,16 @@ export const CONSTANTS = {
     ADD_CHART_FORM_CHART_TESTING_SUCCESS: "Chart run successfully!",
     ADD_CHART_FORM_SUBMIT_BUTTON: "Add chart",
 
+    ADD_WIDGET_FORM_TITLE: "Add widget",
+    ADD_WIDGET_FORM_WIDGET_ADDITION_SUCCESS: "Widget added successfully!",
+    ADD_WIDGET_FORM_WIDGET_TESTING_SUCCESS: "Widget run successfully!",
+    ADD_WIDGET_FORM_SUBMIT_BUTTON: "Add widget",
+
+    UPDATE_WIDGET_FORM_TITLE: "Update widget",
+    UPDATE_WIDGET_FORM_WIDGET_UPDATION_SUCCESS: "Widget updated successfully!",
+    UPDATE_WIDGET_FORM_WIDGET_TESTING_SUCCESS: "Widget run successfully!",
+    UPDATE_WIDGET_FORM_SUBMIT_BUTTON: "Update widget",
+
     UPDATE_CHART_FORM_TITLE: "Update chart",
     UPDATE_CHART_FORM_CHART_UPDATION_SUCCESS: "Chart updated successfully!",
     UPDATE_CHART_FORM_CHART_TESTING_SUCCESS: "Chart run successfully!",
@@ -496,8 +513,14 @@ export const CONSTANTS = {
     DELETE_CHART_DIALOG_MESSAGE:
       "Are you sure you want to delete this item? This action cannot be undone.",
 
+    DELETE_WIDGET_DELETION_SUCCESS: "Widget deleted successfully!",
+    DELETE_WIDGET_DIALOG_TITLE: "Delete widget",
+    DELETE_WIDGET_DIALOG_MESSAGE:
+      "Are you sure you want to delete this item? This action cannot be undone.",
+
     DASHBOARD_WIDGET_LIST_TITLE: "Widgets",
     DASHBOARD_WIDGET_LIST_CHARTS_TITLE: "Charts",
+    DASHBOARD_WIDGET_LIST_WIDGETS_TITLE: "Widgets",
     DASHBOARD_WIDGET_LIST_QUERIES_TITLE: "Queries",
 
     ADD_DASHBOARD_BUTTON_TEXT: "Add dashboard",
@@ -650,6 +673,15 @@ export const CONSTANTS = {
     CHART_DATASET_ARGUMENTS_CONFIRM: "Save changes",
     CHART_DATASET_ARGUMENTS_CANCEL: "Discard",
 
+    WIDGET_DATASET_FIELD_MAPPING_TITLE: "Dataset field options",
+    WIDGET_DATASET_FIELD_MAPPING_NO_META: "Dataset metadata not available",
+    WIDGET_DATASET_FIELD_MAPPING_CONFIRM: "Save changes",
+    WIDGET_DATASET_FIELD_MAPPING_CANCEL: "Discard",
+
+    WIDGET_DATASET_ARGUMENTS_TITLE: "Dataset field options",
+    WIDGET_DATASET_ARGUMENTS_CONFIRM: "Save changes",
+    WIDGET_DATASET_ARGUMENTS_CANCEL: "Discard",
+
     CHART_DATASET_CHART_DOWNLOAD_FORM_TITLE: "Select Image Quality",
     CHART_DATASET_CHART_DOWNLOAD_FORM_DESCRIPTION:
       "Choose the quality of the image you want to download. Higher quality results in larger file sizes.",
@@ -657,6 +689,7 @@ export const CONSTANTS = {
     CHART_DATASET_CHART_DOWNLOAD_FORM_CANCEL: "Cancel",
 
     CHART_TYPE_INVALID_ERROR: "Invalid chart type",
+    WIDGET_TYPE_INVALID_ERROR: "Invalid widget type",
 
     ACCOUNT_PAGE_TITLE: "Accounts",
     ACCOUNT_PAGE_USER_EMAIL_TITLE: "Email",
@@ -672,6 +705,68 @@ export const CONSTANTS = {
     ACCOUNT_PAGE_PASSWORD_RESET_LINK_SENT_SUCCESS:
       "Password reset link sent successfully ",
     USER_NOTIFICATIONS_TITLE: "Notifications",
+
+    WIDGET_EDITOR_FORM_NAME_FIELD_LABEL: "Widget name",
+    WIDGET_EDITOR_FORM_NAME_FIELD_PLACEHOLDER: "Your widget's name",
+    WIDGET_EDITOR_FORM_TYPE_FIELD_LABEL: "Widget type",
+    WIDGET_EDITOR_FORM_ADVANCED_BUTTON: "Advanced config",
+    WIDGET_EDITOR_FORM_TITLE_ENABLED_FIELD_LABEL: "Title enabled",
+    WIDGET_EDITOR_FORM_LEGEND_ENABLED_FIELD_LABEL: "Legend enabled",
+    WIDGET_EDITOR_FORM_LEGEND_POSITION_FIELD_LABEL: "Legend position",
+    WIDGET_EDITOR_FORM_X_STACKED_FIELD_LABEL: "X stacked",
+    WIDGET_EDITOR_FORM_Y_STACKED_FIELD_LABEL: "Y stacked",
+    WIDGET_EDITOR_FORM_INDEX_AXIS_LABEL: "Index axis",
+    WIDGET_EDITOR_FORM_REFRESH_INTERVAL_LABEL: "Refresh interval",
+
+    WIDGET_EDITOR_FORM_TYPE_FIELD_LABEL: "Widget type",
+    WIDGET_EDITOR_FORM_DATASET_FIELD_LABEL: "Datasets",
+    WIDGET_EDITOR_FORM_ADD_DATASET_BUTTON: "Add dataset",
+
+    WIDGET_EDITOR_FORM_DESCRIPTION_FIELD_LABEL: "Widget description",
+    WIDGET_EDITOR_FORM_DESCRIPTION_FIELD_PLACEHOLDER:
+      "Your widget's description",
+
+    WIDGET_EDITOR_FORM_DATASET_TITLE_LABEL: "Dataset title",
+    WIDGET_EDITOR_FORM_DATASET_QUERY_LABEL: "Dataset query",
+    WIDGET_EDITOR_FORM_DATASET_UI_CONFIG_LABEL: "UI options",
+    WIDGET_EDITOR_FORM_DATASET_FIELD_MAPPINGS_LABEL: "Mappings",
+    WIDGET_EDITOR_FORM_DATASET_ARGUMENTS_LABEL: "Arguments",
+    WIDGET_EDITOR_FORM_DATASET_COLOR_LABEL: "Dataset color",
+    WIDGET_EDITOR_FORM_DATASET_BORDER_WIDTH_LABEL: "Border width",
+    WIDGET_EDITOR_FORM_DATASET_FIELD_TEXT_LABEL: "Text content",
+    WIDGET_EDITOR_FORM_DATASET_FIELD_Y_AXIS_LABEL: "Y axis",
+    WIDGET_EDITOR_FORM_DATASET_FIELD_LABEL_LABEL: "Label",
+    WIDGET_EDITOR_FORM_DATASET_FIELD_VALUE_LABEL: "Value",
+    WIDGET_EDITOR_FORM_DATASET_FIELD_RADIUS_LABEL: "Radius",
+    ADD_NOTIFICATION_BUTTON_TEXT: "Add Notification",
+    ADD_NOTIFICATION_FORM_TITLE: "Create New Notification",
+    NOTIFICATION_ADDED_SUCCESS: "Notification created successfully",
+    NOTIFICATION_DELETED_SUCCESS: "Notification deleted successfully",
+
+    ADD_NOTIFICATION_FORM_TITLE: "Create notification",
+    ADD_NOTIFICATION_FORM_SUBMIT: "Save notification",
+    ADD_NOTIFICATION_FORM_NOTIFICATION_CREATED:
+      "Notification created successfully",
+    NOTIFICATION_EDITOR_FORM_NAME_FIELD_LABEL: "Notification name",
+    NOTIFICATION_EDITOR_FORM_NAME_FIELD_PLACEHOLDER: "Your notification's name",
+
+    DELETE_NOTIFICATION_DELETION_SUCCESS: "Notification deleted successfully!",
+    DELETE_NOTIFICATION_DIALOG_TITLE: "Delete notification",
+    DELETE_NOTIFICATION_DIALOG_MESSAGE:
+      "Are you sure you want to delete this item? This action cannot be undone.",
+
+    UPDATE_NOTIFICATION_FORM_TITLE: "Update notification",
+    UPDATE_NOTIFICATION_FORM_NOTIFICATION_UPDATION_SUCCESS:
+      "Notification updated successfully!",
+
+    UPDATE_NOTIFICATION_FORM_NOTIFICATION_TESTING_SUCCESS:
+      "Notification run successfully!",
+    UPDATE_NOTIFICATION_FORM_SUBMIT_BUTTON: "Update notification",
+    UPDATE_NOTIFICATION_FORM_NAME_FIELD_LABEL: "Notification name",
+    UPDATE_NOTIFICATION_FORM_NAME_FIELD_PLACEHOLDER: "Your notification's name",
+    UPDATE_NOTIFICATION_FORM_UPDATE_DIALOG_TITLE: "Update notification",
+    UPDATE_NOTIFICATION_FORM_UPDATE_DIALOG_MESSAGE:
+      "Are you sure you want to update this item? This action cannot be undone.",
   },
 
   LOCAL_STORAGE_KEYS: {
@@ -783,6 +878,20 @@ export const CONSTANTS = {
         `/tenants/${tenantID}/charts/${databaseChartID}`,
     },
 
+    ADD_DATABASE_WIDGET: {
+      code: "/tenants/:tenantID/widgets/add",
+      path: (tenantID) => `/tenants/${tenantID}/widgets/add`,
+    },
+    VIEW_DATABASE_WIDGETS: {
+      code: "/tenants/:tenantID/widgets",
+      path: (tenantID) => `/tenants/${tenantID}/widgets`,
+    },
+    UPDATE_DATABASE_WIDGET_BY_ID: {
+      code: "/tenants/:tenantID/widgets/:databaseWidgetID",
+      path: (tenantID, databaseWidgetID) =>
+        `/tenants/${tenantID}/widgets/${databaseWidgetID}`,
+    },
+
     ADD_DATABASE_DASHBOARD: {
       code: "/tenants/:tenantID/dashboards/add",
       path: (tenantID) => `/tenants/${tenantID}/dashboards/add`,
@@ -832,6 +941,19 @@ export const CONSTANTS = {
     LEGAL: {
       code: "/terms",
       path: () => "/terms",
+    },
+    VIEW_DATABASE_NOTIFICATIONS: {
+      code: "/tenants/:tenantID/notifications",
+      path: (tenantID) => `/tenants/${tenantID}/notifications`,
+    },
+    ADD_DATABASE_NOTIFICATION: {
+      code: "/tenants/:tenantID/notifications/add",
+      path: (tenantID) => `/tenants/${tenantID}/notifications/add`,
+    },
+    UPDATE_DATABASE_NOTIFICATION_BY_ID: {
+      code: "/tenants/:tenantID/notifications/:databaseNotificationID",
+      path: (tenantID, databaseNotificationID) =>
+        `/tenants/${tenantID}/notifications/${databaseNotificationID}`,
     },
   },
 
@@ -1002,6 +1124,22 @@ export const CONSTANTS = {
       deleteDatabaseChartByID: (tenantID, databaseChartID) =>
         `/api/v1/tenants/${tenantID}/database/charts/${databaseChartID}`,
 
+      getAllDatabaseWidgetsAPI: (tenantID) =>
+        `/api/v1/tenants/${tenantID}/database/widgets/`,
+
+      createDatabaseWidgetAPI: (tenantID) =>
+        `/api/v1/tenants/${tenantID}/database/widgets/`,
+      getDatabaseWidgetByIDAPI: (tenantID, databaseWidgetID) =>
+        `/api/v1/tenants/${tenantID}/database/widgets/${databaseWidgetID}`,
+      updateDatabaseWidgetByIDAPI: (tenantID, databaseWidgetID) =>
+        `/api/v1/tenants/${tenantID}/database/widgets/${databaseWidgetID}`,
+      getDatabaseWidgetDataByIDAPI: (tenantID, databaseWidgetID) =>
+        `/api/v1/tenants/${tenantID}/database/widgets/${databaseWidgetID}/data`,
+      getDatabaseWidgetDataUsingWidgetAPI: (tenantID, databaseWidgetID) =>
+        `/api/v1/tenants/${tenantID}/database/widgets/${databaseWidgetID}/data`,
+      deleteDatabaseWidgetByID: (tenantID, databaseWidgetID) =>
+        `/api/v1/tenants/${tenantID}/database/widgets/${databaseWidgetID}`,
+
       getAllDatabaseDashboardsAPI: (tenantID) =>
         `/api/v1/tenants/${tenantID}/database/dashboards/`,
       createDatabaseDashboardAPI: (tenantID) =>
@@ -1012,6 +1150,16 @@ export const CONSTANTS = {
         `/api/v1/tenants/${tenantID}/database/dashboards/${databaseDashboardID}`,
       deleteDatabaseDashboardByID: (tenantID, databaseDashboardID) =>
         `/api/v1/tenants/${tenantID}/database/dashboards/${databaseDashboardID}`,
+      getAllDatabaseNotificationsAPI: (tenantID) =>
+        `/api/v1/tenants/${tenantID}/database/notifications`,
+      getDatabaseNotificationByIDAPI: (tenantID, databaseNotificationID) =>
+        `/api/v1/tenants/${tenantID}/database/notifications/${databaseNotificationID}`,
+      createDatabaseNotificationAPI: (tenantID) =>
+        `/api/v1/tenants/${tenantID}/database/notifications`,
+      deleteDatabaseNotificationByIDAPI: (tenantID, databaseNotificationID) =>
+        `/api/v1/tenants/${tenantID}/database/notifications/${databaseNotificationID}`,
+      updateDatabaseNotificationByID: (tenantID, databaseNotificationID) =>
+        `/api/v1/tenants/${tenantID}/database/notifications/${databaseNotificationID}`,
     },
   },
 
@@ -1103,11 +1251,15 @@ export const CONSTANTS = {
 
     DATABASE_CHARTS: (tenantID) => `${tenantID}-DATABASE_CHARTS`,
 
+    DATABASE_WIDGETS: (tenantID) => `${tenantID}-DATABASE_WIDGETS`,
+
     DATABASE_DASHBOARDS: (tenantID) => `${tenantID}-DATABASE_DASHBOARDS`,
 
     CUSTOMER_PLAN: "CUSTOMER_PLAN",
     FORMS: "FORMS",
     FORM_SUBMISSIONS: "FORM_SUBMISSIONS",
+    DATABASE_NOTIFICATIONS: (tenantID) => `${tenantID}-DATABASE_NOTIFICATIONS`,
+    DATABASE_NOTIFICATION_DETAILS: "DATABASE_NOTIFICATION_DETAILS",
   },
 
   DATA_TYPES: {
@@ -1403,17 +1555,25 @@ export const CONSTANTS = {
     DATABASE_TABLE_LAYOUT_SEPARATION: "DATABASE_TABLE_LAYOUT_SEPARATION",
     DATABASE_QUERY_LAYOUT_SEPARATION: "DATABASE_QUERY_LAYOUT_SEPARATION",
     DATABASE_CHART_LAYOUT_SEPARATION: "DATABASE_CHART_LAYOUT_SEPARATION",
+    DATABASE_WIDGET_LAYOUT_SEPARATION: "DATABASE_WIDGET_LAYOUT_SEPARATION",
     DATABASE_DASHBOARD_LAYOUT_SEPARATION:
       "DATABASE_DASHBOARD_LAYOUT_SEPARATION",
     CHART_ADDITION_FORM_RESULT_SEPARATION:
       "CHART_ADDITION_FORM_RESULT_SEPARATION",
     CHART_UPDATION_FORM_RESULT_SEPARATION:
       "CHART_UPDATION_FORM_RESULT_SEPARATION",
+
+    WIDGET_ADDITION_FORM_RESULT_SEPARATION:
+      "WIDGET_ADDITION_FORM_RESULT_SEPARATION",
+    WIDGET_UPDATION_FORM_RESULT_SEPARATION:
+      "WIDGET_UPDATION_FORM_RESULT_SEPARATION",
     QUERY_TESTING_FORM_QUERY_SEPARATION: "QUERY_TESTING_FORM_QUERY_SEPARATION",
     DASHBOARD_ADDITION_FORM_RESULT_SEPARATION:
       "DASHBOARD_ADDITION_FORM_RESULT_SEPARATION",
     DASHBOARD_UPDATION_FORM_RESULT_SEPARATION:
       "DASHBOARD_UPDATION_FORM_RESULT_SEPARATION",
+    DATABASE_NOTIFICATION_LAYOUT_SEPARATION:
+      "DATABASE_NOTIFICATION_LAYOUT_SEPARATION",
   },
 
   PG_TRIGGER_FORM_TIMING_OPTIONS: ["BEFORE", "AFTER", "INSTEAD OF"],
@@ -1450,6 +1610,13 @@ export const CONSTANTS = {
     RADIAL_CHART: {
       name: "Radial Bar Chart",
       value: "radial",
+    },
+  },
+
+  DATABASE_WIDGET_TYPES: {
+    TEXT_WIDGET: {
+      name: "Text widget",
+      value: "text",
     },
   },
 

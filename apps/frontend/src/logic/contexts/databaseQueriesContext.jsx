@@ -8,7 +8,7 @@ import { getAllDatabaseQueriesAPI } from "../../data/apis/databaseQuery";
 const DatabaseQueriesStateContext = React.createContext(undefined);
 const DatabaseQueriesActionsContext = React.createContext(undefined);
 const DatabaseQueriesContextProvider = ({ children }) => {
-  const { tenantID, databaseSchemaName } = useParams();
+  const { tenantID } = useParams();
   const {
     isLoading: isLoadingDatabaseQueries,
     data: databaseQueries,
@@ -17,10 +17,8 @@ const DatabaseQueriesContextProvider = ({ children }) => {
     isRefetching: isRefetechingDatabaseQueries,
     refetch: refetchDatabaseQueries,
   } = useQuery({
-    queryKey: [
-      CONSTANTS.REACT_QUERY_KEYS.DATABASE_QUERIES(tenantID, databaseSchemaName),
-    ],
-    queryFn: () => getAllDatabaseQueriesAPI({ tenantID, databaseSchemaName }),
+    queryKey: [CONSTANTS.REACT_QUERY_KEYS.DATABASE_QUERIES(tenantID)],
+    queryFn: () => getAllDatabaseQueriesAPI({ tenantID }),
     refetchOnWindowFocus: false,
   });
   return (

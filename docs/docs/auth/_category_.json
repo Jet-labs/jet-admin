@@ -1,0 +1,8 @@
+{
+  "label": "Auth",
+  "position": 8,
+  "link": {
+    "type": "generated-index",
+    "description": "10 minutes to learn authentication & authorization"
+  }
+}

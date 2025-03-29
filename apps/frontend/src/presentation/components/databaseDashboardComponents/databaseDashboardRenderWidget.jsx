@@ -7,6 +7,7 @@ import "react-resizable/css/styles.css";
 import { useComponentSize } from "../../../logic/hooks/useComponentSize";
 import { DatabaseDashboardChartWidget } from "../widgetTypes/databaseDashboardChartWidget";
 import { DatabaseDashboardQueryWidget } from "../widgetTypes/databaseDashboardQueryWidget";
+import { DatabaseDashboardTextWidget } from "../widgetTypes/databaseDashboardTextWidget";
 
 export const DatabaseDashboardRenderWidget = ({
   widget,
@@ -24,7 +25,7 @@ export const DatabaseDashboardRenderWidget = ({
 
   return (
     <div
-      className={`!p-0.5 !h-full !w-full flex-grow relative ${
+      className={`!h-full !w-full flex-grow relative ${
         isMouseHover ? "bg-[#646cff]" : "bg-transparent"
       }`}
       onMouseEnter={
@@ -85,6 +86,14 @@ export const DatabaseDashboardRenderWidget = ({
         {widgetType == "query" && (
           <DatabaseDashboardQueryWidget
             databaseQueryID={widgetID}
+            tenantID={tenantID}
+            height={size.height}
+            width={size.width}
+          />
+        )}
+        {widgetType == "text" && (
+          <DatabaseDashboardTextWidget
+            databaseWidgetID={widgetID}
             tenantID={tenantID}
             height={size.height}
             width={size.width}
