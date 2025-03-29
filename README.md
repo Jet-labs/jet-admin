@@ -1,27 +1,77 @@
 <a href="https://www.producthunt.com/posts/jet-admin-3?embed=true&utm_source=badge-featured&utm_medium=badge&utm_souce=badge-jet&#0045;admin&#0045;3" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=474841&theme=light" alt="Jet&#0032;Admin - PostgreSQL&#0032;tables&#0032;manager&#0032;and&#0032;admin&#0032;dashboard | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
 
-# **Jet Admin** 
+# **Jet Admin**
 
-----------
-Welcome to Jet Admin, a web-based PostgreSQL tables manager and admin dashboard for your operations! Edit data, build graphs, and create dashboards using queries.
+Welcome to Jet Admin, a comprehensive web-based PostgreSQL management and visualization platform. Edit data, build graphs, and create dashboards using queries.
 
 ![cover](https://github.com/user-attachments/assets/c6b822d6-90a7-4ac2-8294-8766e684c055)
 
-## **Overview**
------------
-This project aims to provide users with a user-friendly interface to manage their PostgreSQL databases and create dashboards. The project consists of a frontend and a backend component for managing PostgreSQL databases through a web interface.
+## Overview
 
+Jet Admin combines robust database management capabilities with powerful visualization tools, making it ideal for both developers and operations teams. The project consists of a React-based frontend and a Node.js backend for managing PostgreSQL databases through an intuitive web interface.
 
+## Core Features
 
-## **Documentation**
-Checkout out documentation website [https://jet-labs.github.io/documentation]
+- **Database Management**
+  - Full DML support (Insert, Update, Delete, Select)
+  - Bulk operations (Delete, Update, Insert)
+  - DDL operations (Create, Alter, Drop)
 
-## **Contributing**
-------------
+- **Query Management**
+  - PostgreSQL query creation and execution
+  - JavaScript-based queries
+  - REST API-based queries
 
-Contributions are welcome! If you have ideas for new features, improvements, or bug fixes, feel free to open an issue or submit a pull request.
+- **Visualization**
+  - Multiple chart types (Line, Bar, Pie, Radar, etc.)
+  - Drag-and-drop dashboard creation
+  - Real-time data updates
 
-## **License**
--------
+- **Security**
+  - Firebase Authentication
+  - Role-based access control
+  - Multi-tenant support
+  - Granular permissions system
+
+## Quick Start
+
+### Frontend Setup
+```bash
+cd apps/frontend
+npm install
+npm run dev
+```
+
+### Backend Setup
+```bash
+cd apps/backend
+npm install
+npx prisma migrate dev
+npm run dev
+```
+
+For detailed setup instructions, refer to:
+- [Frontend Setup Guide](https://jet-labs.github.io/jet-admin/docs/setup/setup-frontend)
+- [Backend Setup Guide](https://jet-labs.github.io/jet-admin/docs/setup/setup-backend)
+
+## Documentation
+
+Visit our [documentation website](https://jet-labs.github.io/jet-admin/) for:
+- Detailed setup guides
+- Architecture overview
+- Feature documentation
+- API references
+- Best practices
+
+## Contributing
+
+Contributions are welcome! If you have ideas for new features, improvements, or bug fixes, feel free to:
+1. Fork the repository
+2. Create a feature branch
+3. Submit a pull request
+
+Please review our contribution guidelines before submitting changes.
+
+## License
 
 This project is licensed under the MIT License.
