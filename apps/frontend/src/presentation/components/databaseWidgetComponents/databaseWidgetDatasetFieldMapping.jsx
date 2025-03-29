@@ -5,6 +5,7 @@ import { CONSTANTS } from "../../../constants";
 import ReactJson from "react-json-view";
 import { CollapseComponent } from "../ui/collapseComponent";
 import { Box } from "@mui/material";
+import { formValidations } from "../../../utils/formValidation";
 
 export const DatabaseWidgetDatasetFieldMapping = ({
   open,
@@ -23,6 +24,8 @@ export const DatabaseWidgetDatasetFieldMapping = ({
       },
       ...initialValues,
     },
+    validationSchema:
+      formValidations.datasetFieldMappingFormValidationSchema(datasetFields),
     enableReinitialize: true,
     onSubmit: (values) => {
       widgetForm.setFieldValue(

@@ -2,23 +2,11 @@ import { CircularProgress } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import React from "react";
-import * as Yup from "yup";
 import { CONSTANTS } from "../../../constants";
 import { getAllDatabaseTablesAPI } from "../../../data/apis/databaseTable";
-import { displayError, displaySuccess } from "../../../utils/notification";
-
 import { createDatabaseTriggerAPI } from "../../../data/apis/databaseTrigger";
-
-const triggerValidationSchema = Yup.object().shape({
-  databaseTriggerName: Yup.string().required("Trigger name is required"),
-  databaseTableName: Yup.string().required("Table name is required"),
-  triggerFunctionName: Yup.string().required("Function name is required"),
-  triggerEvents: Yup.array()
-    .min(1, "At least one event must be selected")
-    .required("Trigger events are required"),
-  triggerTiming: Yup.string().required("Trigger timing is required"),
-  forEach: Yup.string().required("For each option is required"),
-});
+import { formValidations } from "../../../utils/formValidation";
+import { displayError, displaySuccess } from "../../../utils/notification";
 
 export const DatabaseTriggerAdditionForm = ({
   tenantID,
@@ -82,7 +70,7 @@ export const DatabaseTriggerAdditionForm = ({
       deferrable: false,
       initiallyDeferred: false,
     },
-    validationSchema: triggerValidationSchema,
+    validationSchema: formValidations.triggerAdditionFormValidationSchema,
     onSubmit: async (data) => {
       addTrigger(data);
     },

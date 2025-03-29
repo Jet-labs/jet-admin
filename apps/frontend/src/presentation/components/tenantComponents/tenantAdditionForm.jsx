@@ -7,10 +7,10 @@ import { displayError, displaySuccess } from "../../../utils/notification";
 
 import { useTenantActions } from "../../../logic/contexts/tenantContext";
 import { TenantEditor } from "./tenantEditor";
+import { formValidations } from "../../../utils/formValidation";
 export const TenantAdditionForm = () => {
   const queryClient = useQueryClient();
   const { saveTenantLocally, saveTenantLocallyAndReload } = useTenantActions();
-
 
   const {
     isPending: isCreatingNewTenant,
@@ -37,15 +37,7 @@ export const TenantAdditionForm = () => {
       tenantName: "",
       tenantLogoURL: "",
     },
-    validate: ({ tenantName, tenantLogoURL }) => {
-      const errors = {};
-      if (!tenantName || String(tenantName).trim().length == 0) {
-        errors.tenantName = "Tenant name is required";
-      }
-      if (!tenantLogoURL || String(tenantLogoURL).trim().length == 0) {
-        errors.tenantLogoURL = "Tenant logo is required";
-      }
-    },
+    validationSchema: formValidations.addTenantFormValidationSchema,
     onSubmit: ({ tenantName, tenantLogoURL }) => {
       createNewTenant({ tenantName, tenantLogoURL });
     },
@@ -62,7 +54,7 @@ export const TenantAdditionForm = () => {
             class="space-y-4 md:space-y-6"
             onSubmit={addTenantForm.handleSubmit}
           >
-            <TenantEditor tenantEditorForm={addTenantForm}/>
+            <TenantEditor tenantEditorForm={addTenantForm} />
 
             <button
               type="submit"

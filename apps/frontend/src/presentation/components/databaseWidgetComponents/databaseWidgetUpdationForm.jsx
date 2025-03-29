@@ -2,26 +2,24 @@ import { CircularProgress } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import { useCallback, useEffect, useState } from "react";
-import * as Yup from "yup";
 import { CONSTANTS } from "../../../constants";
 import {
-  createDatabaseWidgetAPI,
   getDatabaseWidgetByIDAPI,
   getDatabaseWidgetDataByIDAPI,
   getDatabaseWidgetDataUsingWidgetAPI,
   updateDatabaseWidgetByIDAPI,
 } from "../../../data/apis/databaseWidget";
+import { formValidations } from "../../../utils/formValidation";
 import { displaySuccess } from "../../../utils/notification";
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "../ui/resizable";
-import { DatabaseQueryResponseView } from "../databaseQueryComponents/databaseQueryResponseView";
+import { DatabaseWidgetDeletionForm } from "./databaseWidgetDeletionForm";
 import { DatabaseWidgetEditor } from "./databaseWidgetEditor";
 import { DatabaseWidgetPreview } from "./databaseWidgetPreview";
 import { DATABASE_WIDGETS_CONFIG_MAP } from "./widgetConfig";
-import { DatabaseWidgetDeletionForm } from "./databaseWidgetDeletionForm";
 const initialValues = {
   databaseWidgetName: "",
   databaseWidgetType: CONSTANTS.DATABASE_WIDGET_TYPES.TEXT_WIDGET.value,
@@ -45,25 +43,6 @@ const initialValues = {
     widgetTailwindCss: "text-slate-700",
   },
 };
-
-// Comprehensive Validation Schema
-const validationSchema = Yup.object().shape({
-  databaseWidgetName: Yup.string().required("Widget name is required"),
-  databaseWidgetType: Yup.string().required("Widget type is required"),
-  queries: Yup.array()
-    .of(
-      Yup.object().shape({
-        databaseQueryID: Yup.string().required("Query is required"),
-        title: Yup.string()
-          .required("Alias is required")
-          .test("unique-alias", "Alias must be unique", function (value) {
-            const aliases = this.parent.map((q) => q.title);
-            return aliases.filter((a) => a === value).length === 1;
-          }),
-      })
-    )
-    .min(1, "At least 1 query required"),
-});
 
 export const DatabaseWidgetUpdationForm = ({ tenantID, databaseWidgetID }) => {
   const queryClient = useQueryClient();
@@ -118,28 +97,27 @@ export const DatabaseWidgetUpdationForm = ({ tenantID, databaseWidgetID }) => {
     },
   });
 
-
   const {
-      isLoading: isLoadingDatabaseWidgetDataByID,
-      isPending: isPendingFetchingDatabaseWidgetDataByID,
-      data: databaseWidgetDataByID,
-      error: loadDatabaseWidgetDataByIDError,
-      isFetching: isFetchingDatabaseWidgetDataByID,
-      isRefetching: isRefetechingDatabaseWidgetDataByID,
-      refetch: refetchDatabaseWidgetDataByID,
-    } = useQuery({
-      queryKey: [
-        CONSTANTS.REACT_QUERY_KEYS.DATABASE_WIDGETS(tenantID),
+    isLoading: isLoadingDatabaseWidgetDataByID,
+    isPending: isPendingFetchingDatabaseWidgetDataByID,
+    data: databaseWidgetDataByID,
+    error: loadDatabaseWidgetDataByIDError,
+    isFetching: isFetchingDatabaseWidgetDataByID,
+    isRefetching: isRefetechingDatabaseWidgetDataByID,
+    refetch: refetchDatabaseWidgetDataByID,
+  } = useQuery({
+    queryKey: [
+      CONSTANTS.REACT_QUERY_KEYS.DATABASE_WIDGETS(tenantID),
+      databaseWidgetID,
+      "data",
+    ],
+    queryFn: () =>
+      getDatabaseWidgetDataByIDAPI({
+        tenantID,
         databaseWidgetID,
-        "data",
-      ],
-      queryFn: () =>
-        getDatabaseWidgetDataByIDAPI({
-          tenantID,
-          databaseWidgetID,
-        }),
-      refetchOnWindowFocus: false,
-    });
+      }),
+    refetchOnWindowFocus: false,
+  });
 
   const {
     isPending: isFetchingDatabaseWidgetData,
@@ -165,7 +143,7 @@ export const DatabaseWidgetUpdationForm = ({ tenantID, databaseWidgetID }) => {
 
   const updateDatabaseWidgetForm = useFormik({
     initialValues: initialValues,
-    validationSchema,
+    validationSchema: formValidations.updateDatabaseWidgetFormValidationSchema,
     validateOnMount: false,
     validateOnChange: false,
     onSubmit: (values) => {
@@ -263,9 +241,10 @@ export const DatabaseWidgetUpdationForm = ({ tenantID, databaseWidgetID }) => {
             }
             isRefreshingData={isRefetechingDatabaseWidgetDataByID}
             data={
-                databaseWidgetFetchedData
-                  ? databaseWidgetFetchedData
-                  : databaseWidgetDataByID?.data  }
+              databaseWidgetFetchedData
+                ? databaseWidgetFetchedData
+                : databaseWidgetDataByID?.data
+            }
           />
         </ResizablePanel>
       </ResizablePanelGroup>

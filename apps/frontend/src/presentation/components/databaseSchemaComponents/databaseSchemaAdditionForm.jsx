@@ -4,6 +4,7 @@ import { useFormik } from "formik";
 import { CONSTANTS } from "../../../constants";
 import { createDatabaseSchemaAPI } from "../../../data/apis/database";
 import { displayError, displaySuccess } from "../../../utils/notification";
+import { formValidations } from "../../../utils/formValidation";
 
 export const DatabaseSchemaAdditionForm = ({ tenantID }) => {
   const queryClient = useQueryClient();
@@ -36,15 +37,7 @@ export const DatabaseSchemaAdditionForm = ({ tenantID }) => {
     initialValues: {
       databaseSchemaName: "",
     },
-    validate: ({ databaseSchemaName }) => {
-      const errors = {};
-      if (
-        !databaseSchemaName ||
-        String(databaseSchemaName).trim().length == 0
-      ) {
-        errors.databaseSchemaName = "Schema name is required";
-      }
-    },
+    validationSchema: formValidations.addSchemaFormValidationSchema,
     onSubmit: ({ databaseSchemaName }) => {
       createNewDatabaseSchema({ databaseSchemaName });
     },

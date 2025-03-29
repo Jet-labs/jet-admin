@@ -9,6 +9,7 @@ import {
   useAuthActions,
   useAuthState,
 } from "../../../logic/contexts/authContext";
+import { formValidations } from "../../../utils/formValidation";
 const SignInPage = () => {
   const { firebaseUserState, signInState } = useAuthState();
   const { googleSignIn, emailSignIn } = useAuthActions();
@@ -19,15 +20,7 @@ const SignInPage = () => {
       email: "",
       password: "",
     },
-    validate: ({ email, password }) => {
-      const errors = {};
-      if (!email || String(email).trim().length == 0) {
-        errors.email = "Email is required";
-      }
-      if (!password || String(password).trim().length == 0) {
-        errors.password = "Password is required";
-      }
-    },
+    validationSchema: formValidations.emailSignInFormValidationSchema,
     onSubmit: ({ email, password }) => {
       emailSignIn(email, password);
     },

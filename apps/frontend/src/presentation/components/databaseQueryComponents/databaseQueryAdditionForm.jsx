@@ -18,6 +18,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "../ui/resizable";
+import { formValidations } from "../../../utils/formValidation";
 
 export const DatabaseQueryAdditionForm = ({ tenantID }) => {
   const queryClient = useQueryClient();
@@ -64,10 +65,7 @@ export const DatabaseQueryAdditionForm = ({ tenantID }) => {
     },
     validateOnMount: false,
     validateOnChange: false,
-    validate: (values) => {
-      const errors = {};
-      return errors;
-    },
+    validationSchema: formValidations.queryAdditionFormValidationSchema,
     onSubmit: (values) => {
       addDatabaseQuery(values);
     },

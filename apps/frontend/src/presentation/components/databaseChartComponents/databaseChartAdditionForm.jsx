@@ -2,20 +2,20 @@ import { CircularProgress } from "@mui/material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import { useCallback, useState } from "react";
-import * as Yup from "yup";
 import { CONSTANTS } from "../../../constants";
 import {
   createDatabaseChartAPI,
   getDatabaseChartDataUsingChartAPI,
 } from "../../../data/apis/databaseChart";
+import { formValidations } from "../../../utils/formValidation";
 import { displaySuccess } from "../../../utils/notification";
-import { DatabaseChartEditor } from "./databaseChartEditor";
-import { DatabaseChartPreview } from "./databaseChartPreview";
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "../ui/resizable";
+import { DatabaseChartEditor } from "./databaseChartEditor";
+import { DatabaseChartPreview } from "./databaseChartPreview";
 const initialValues = {
   databaseChartName: "",
   databaseChartType: CONSTANTS.DATABASE_CHART_TYPES.BAR_CHART.value,
@@ -62,25 +62,6 @@ const initialValues = {
     },
   },
 };
-
-// Comprehensive Validation Schema
-const validationSchema = Yup.object().shape({
-  databaseChartName: Yup.string().required("Chart name is required"),
-  databaseChartType: Yup.string().required("Chart type is required"),
-  queries: Yup.array()
-    .of(
-      Yup.object().shape({
-        databaseQueryID: Yup.string().required("Query is required"),
-        title: Yup.string()
-          .required("Alias is required")
-          .test("unique-alias", "Alias must be unique", function (value) {
-            const aliases = this.parent.map((q) => q.title);
-            return aliases.filter((a) => a === value).length === 1;
-          }),
-      })
-    )
-    .min(1, "At least 1 query required"),
-});
 
 export const DatabaseChartAdditionForm = ({ tenantID }) => {
   const queryClient = useQueryClient();
@@ -136,7 +117,7 @@ export const DatabaseChartAdditionForm = ({ tenantID }) => {
 
   const addDatabaseChartForm = useFormik({
     initialValues: initialValues,
-    validationSchema,
+    validationSchema: formValidations.addDatabaseChartFormValidationSchema,
     validateOnMount: false,
     validateOnChange: false,
     onSubmit: (values) => {

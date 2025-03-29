@@ -7,6 +7,7 @@ import {
 import { useFormik } from "formik";
 import { CONSTANTS } from "../../../constants";
 import { DATABASE_CHARTS_CONFIG_MAP } from "../chartTypes";
+import { formValidations } from "../../../utils/formValidation";
 
 export const DatabaseChartDatasetAdvancedOptions = ({
   open,
@@ -105,6 +106,8 @@ export const DatabaseChartDatasetAdvancedOptions = ({
       })(),
       ...initialValues,
     },
+    validationSchema:
+      formValidations.datasetAdvancedOptionsFormValidationSchema,
     enableReinitialize: true,
     onSubmit: (values) => {
       chartForm.setFieldValue(

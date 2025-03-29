@@ -2,20 +2,19 @@ import { CircularProgress } from "@mui/material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import React from "react";
-import * as Yup from "yup";
 import { CONSTANTS } from "../../../constants";
 import { displayError, displaySuccess } from "../../../utils/notification";
 
 import { createDatabaseNotificationAPI } from "../../../data/apis/databaseNotification";
+import { formValidations } from "../../../utils/formValidation";
 import { DatabaseNotificationEditor } from "./databaseNotificationEditor";
 
-const databaseNotificationValidationSchema = Yup.object().shape({
-  databaseNotificationName: Yup.string().required("Notification name is required"),
-});
-
-export const DatabaseNotificationAdditionForm = ({ tenantID, databaseSchemaName }) => {
+export const DatabaseNotificationAdditionForm = ({
+  tenantID,
+  databaseSchemaName,
+}) => {
   const queryClient = useQueryClient();
-  
+
   const {
     isPending: isAddingDatabaseNotification,
     isSuccess: isAddingDatabaseNotificationSuccess,
@@ -36,9 +35,7 @@ export const DatabaseNotificationAdditionForm = ({ tenantID, databaseSchemaName 
         CONSTANTS.STRINGS.ADD_NOTIFICATION_FORM_NOTIFICATION_CREATED
       );
       queryClient.invalidateQueries([
-        CONSTANTS.REACT_QUERY_KEYS.DATABASE_NOTIFICATIONS(
-          tenantID,
-        ),
+        CONSTANTS.REACT_QUERY_KEYS.DATABASE_NOTIFICATIONS(tenantID),
       ]);
     },
     onError: (error) => {
@@ -49,12 +46,12 @@ export const DatabaseNotificationAdditionForm = ({ tenantID, databaseSchemaName 
     initialValues: {
       databaseNotificationName: "",
     },
-    validationSchema: databaseNotificationValidationSchema,
+    validationSchema:
+      formValidations.databaseNotificationAdditionFormValidationSchema,
     onSubmit: async (data) => {
       addNotification(data);
     },
   });
-
 
   return (
     <section className="max-w-3xl w-full">

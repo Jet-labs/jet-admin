@@ -7,6 +7,7 @@ import {
 import { useFormik } from "formik";
 import { useEffect } from "react";
 import { CONSTANTS } from "../../../constants";
+import { formValidations } from "../../../utils/formValidation";
 
 export const DatabaseQueryArgsForm = ({
   onDecline,
@@ -14,24 +15,22 @@ export const DatabaseQueryArgsForm = ({
   open,
   args,
 }) => {
-  const argsForm = useFormik({
+  const databaseQueryArgsForm = useFormik({
     initialValues: args.reduce((acc, arg) => {
       acc[arg] = "";
       return acc;
     }, {}),
     validateOnMount: false,
     validateOnChange: false,
-    validate: (values) => {
-      const errors = {};
-      return errors;
-    },
+    validationSchema:
+      formValidations.databaseQueryArgsFormValidationSchema(args),
     onSubmit: (values) => {},
   });
 
   useEffect(() => {
-    if (argsForm && args) {
+    if (databaseQueryArgsForm && args) {
       args.forEach((arg) => {
-        argsForm.setFieldValue(arg, "");
+        databaseQueryArgsForm.setFieldValue(arg, "");
       });
     }
   }, [args]);
@@ -65,9 +64,9 @@ export const DatabaseQueryArgsForm = ({
               <input
                 id={arg}
                 name={arg}
-                value={argsForm.values[arg]}
-                onChange={argsForm.handleChange}
-                onBlur={argsForm.handleBlur}
+                value={databaseQueryArgsForm.values[arg]}
+                onChange={databaseQueryArgsForm.handleChange}
+                onBlur={databaseQueryArgsForm.handleBlur}
                 autoComplete="off"
                 className="w-full rounded border p-2.5 text-sm text-gray-900 focus:border-[#646cff] focus:ring-2 focus:ring-[#646cff]/50 bg-white outline-none"
               />
@@ -86,10 +85,10 @@ export const DatabaseQueryArgsForm = ({
 
         <button
           type="button"
-          onClick={() => onAccepted(argsForm.values)}
-          disabled={args.some((arg) => !argsForm.values[arg])}
+          onClick={() => onAccepted(databaseQueryArgsForm.values)}
+          disabled={args.some((arg) => !databaseQueryArgsForm.values[arg])}
           className={`px-2.5 py-1.5 text-white text-sm bg-[#646cff] rounded hover:outline-none hover:border-0 border-0 outline-none ${
-            args.some((arg) => !argsForm.values[arg])
+            args.some((arg) => !databaseQueryArgsForm.values[arg])
               ? "opacity-50 cursor-not-allowed"
               : ""
           }`}

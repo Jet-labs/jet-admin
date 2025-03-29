@@ -23,6 +23,7 @@ import { DatabaseDashboardDeletionForm } from "./databaseDashboardDeletionForm";
 import { DatabaseDashboardDropzone } from "./databaseDashboardDropzone";
 import { DatabaseDashboardEditor } from "./databaseDashboardEditor";
 import { DatabaseDashboardWidgetList } from "./databaseDashboardWidgetList";
+import { formValidations } from "../../../utils/formValidation";
 
 export const DatabaseDashboardUpdationForm = ({
   tenantID,
@@ -92,11 +93,7 @@ export const DatabaseDashboardUpdationForm = ({
     },
     validateOnMount: false,
     validateOnChange: false,
-    validate: (values) => {
-      const errors = {};
-
-      return errors;
-    },
+    validationSchema: formValidations.updateDashboardFormValidationSchema,
     onSubmit: async (values) => {
       await showConfirmation({
         title: CONSTANTS.STRINGS.UPDATE_DASHBOARD_FORM_UPDATE_DIALOG_TITLE,
