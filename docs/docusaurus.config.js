@@ -6,7 +6,7 @@
 import tailwindPlugin from "./plugins/tailwind-config.cjs";
 import { themes as prismThemes } from "prism-react-renderer";
 const organizationName = "jet-labs";
-const projectName = "jet-admin-docs";
+const projectName = "jet-admin";
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: "Jet Admin",

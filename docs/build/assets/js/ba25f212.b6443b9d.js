@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkjet_docs=self.webpackChunkjet_docs||[]).push([[5242],{2301:e=>{e.exports=JSON.parse('{"metadata":{"permalink":"/jet-admin/blog","page":1,"postsPerPage":10,"totalPages":1,"totalCount":4,"blogDescription":"Blog","blogTitle":"Blog"}}')}}]);
