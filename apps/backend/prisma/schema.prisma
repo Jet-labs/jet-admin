@@ -19,6 +19,7 @@ model tblTenants {
   tenantDBURL                 String?                       @db.VarChar
   tenantLogoURL               String?                       @db.VarChar
   tenantName                  String?                       @db.VarChar
+  tblAPIKeys                  tblAPIKeys[]
   tblDatabaseCharts           tblDatabaseCharts[]
   tblDatabaseDashboards       tblDatabaseDashboards[]
   tblDatabaseNotifications    tblDatabaseNotifications[]
@@ -46,6 +47,7 @@ model tblUsers {
   disabledAt                  DateTime?                     @db.Timestamptz(6)
   disableReason               String?                       @db.VarChar
   lastSeen                    DateTime?                     @db.Timestamptz(6)
+  tblAPIKeys                  tblAPIKeys[]
   tblDatabaseCharts           tblDatabaseCharts[]
   tblDatabaseDashboards       tblDatabaseDashboards[]
   tblDatabaseQueries          tblDatabaseQueries[]
@@ -111,6 +113,7 @@ model tblRoles {
   roleName                  String                      @db.VarChar
   roleDescription           String?                     @db.VarChar
   tenantID                  Int?
+  tblAPIKeyRoleMappings     tblAPIKeyRoleMappings[]
   tblRolePermissionMappings tblRolePermissionMappings[]
   tblTenants                tblTenants?                 @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fktblRolesTenantIDTblTenantsTenantID")
   tblUserTenantRoleMappings tblUserTenantRoleMappings[]
@@ -243,4 +246,26 @@ model tblDatabaseNotifications {
   databaseNotificationName String     @db.VarChar
   tenantID                 Int
   tblTenants               tblTenants @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDatabaseNotificationsTenantID")
+}
+
+model tblAPIKeys {
+  apiKeyID              Int                     @id @default(autoincrement())
+  tenantID              Int
+  apiKey                String                  @db.VarChar
+  apiKeyName            String                  @db.VarChar
+  createdAt             DateTime                @default(now()) @db.Timestamptz(6)
+  isDisabled            Boolean
+  creatorID             Int
+  tblAPIKeyRoleMappings tblAPIKeyRoleMappings[]
+  tblUsers              tblUsers                @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblAPIKeysCreatorID")
+  tblTenants            tblTenants              @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblAPIKeysTenantID")
+}
+
+model tblAPIKeyRoleMappings {
+  apiKeyID   Int
+  roleID     Int
+  tblAPIKeys tblAPIKeys @relation(fields: [apiKeyID], references: [apiKeyID], onDelete: Cascade, onUpdate: NoAction)
+  tblRoles   tblRoles   @relation(fields: [roleID], references: [roleID], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([apiKeyID, roleID])
 }

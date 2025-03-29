@@ -5,7 +5,7 @@ import { capitalize } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { BsServer } from "react-icons/bs";
-import { FaChartPie, FaUserCog } from "react-icons/fa";
+import { FaChartPie, FaKey, FaUserCog } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa6";
 import { FiUsers } from "react-icons/fi";
 import {
@@ -327,6 +327,31 @@ export const MainDrawerList = ({ currentPageTitle }) => {
                 )}
               </span>
             </Link> */}
+
+            <Link
+              to={CONSTANTS.ROUTES.VIEW_API_KEYS.path(tenantID)}
+              key={CONSTANTS.ROUTES.VIEW_API_KEYS.path(tenantID)}
+              class={`flex items-center ${
+                decodeURIComponent(location.pathname).includes(
+                  CONSTANTS.ROUTES.VIEW_API_KEYS.path(tenantID)
+                )
+                  ? "bg-[#eaebff]"
+                  : "bg-slate-100"
+              } rounded mb-2 w-full p-2 text-slate-700 transition duration-75 group bg-slate-200  hover:bg-slate-100  flex-row !justify-start mt-2 `}
+            >
+              <FaKey className="!w-5 !h-5 !text-slate-600" />
+              <span
+                className={`font-semibold text-sm ml-2 ${
+                  decodeURIComponent(location.pathname).includes(
+                    CONSTANTS.ROUTES.VIEW_API_KEYS.path(tenantID)
+                  )
+                    ? "!text-[#646cff]"
+                    : "!text-slate-700"
+                }`}
+              >
+                {capitalize(CONSTANTS.STRINGS.MAIN_DRAWER_API_KEYS_TITLE)}
+              </span>
+            </Link>
 
             <button
               type="button"

@@ -50,6 +50,43 @@ authMiddleware.authProvider = async function (req, res, next) {
       });
       return res.json({ error: constants.ERROR_CODES.USER_AUTH_TOKEN_EXPIRED });
     }
+  } else if (
+    req.headers.authorization &&
+    req.headers.authorization.startsWith("api_key ")
+  ) {
+    try {
+      let apiKey = req.headers.authorization.split("api_key ")[1];
+      const apiKeyData = await prisma.tblAPIKeys.findFirst({
+        where: {
+          apiKey,
+          isDisabled: false,
+        },
+        include:{
+          tblUsers:true
+        }
+      });
+      
+      Logger.log("info", {
+        message: "authMiddleware:authProvider:params",
+        params: { creatorID:apiKeyData?.creatorID },
+      });
+      if (!apiKeyData?.creatorID) {
+        throw constants.ERROR_CODES.INVALID_API_KEY;
+      } else {
+        Logger.log("success", {
+          message: "authMiddleware:authProvider:success",
+          params: { creatorID: apiKeyData?.creatorID },
+        });
+        req.user = apiKeyData.tblUsers;
+        return next();
+      }
+    } catch (error) {
+      Logger.log("error", {
+        message: "authMiddleware:authProvider:catch-2",
+        params: { error },
+      });
+      return res.json({ error: constants.ERROR_CODES.USER_AUTH_TOKEN_EXPIRED });
+    }
   } else {
     Logger.log("error", {
       message: "authMiddleware:authProvider:catch-1",
