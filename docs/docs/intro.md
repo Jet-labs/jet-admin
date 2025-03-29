@@ -4,13 +4,13 @@ sidebar_position: 1
 
 # Jet Admin
 
-Let's discover **Jet Admin in less than 10 minutes**.
+Welcome to Jet Admin, a powerful web-based PostgreSQL management and visualization platform.
 
-### Intro
+## Overview
 
-Welcome to Jet Admin, a web-based PostgreSQL tables manager and admin dashboard for your operations! Edit data, build charts, and create dashboards using queries.
+Jet Admin is a comprehensive solution for managing PostgreSQL databases through an intuitive web interface. It combines robust database management capabilities with powerful visualization tools, making it ideal for both developers and operations teams.
 
-### Features
+## Core Features
 
 #### Database Management
 - **Data Manipulation Language**
@@ -19,8 +19,13 @@ Welcome to Jet Admin, a web-based PostgreSQL tables manager and admin dashboard 
   - [x] Delete
   - [x] Select
   - [x] Bulk Delete
+  - [x] Bulk Update
+  - [x] Bulk Insert
 - **Data Definition Language (DDL)**
-  - [ ] Create, Alter, Drop, Truncate
+  - [x] Create
+  - [x] Alter
+  - [x] Drop
+  - [ ] Truncate
 
 #### Queries
 - **PostgreSQL Queries**
@@ -28,7 +33,7 @@ Welcome to Jet Admin, a web-based PostgreSQL tables manager and admin dashboard 
   - [x] Edit query
   - [x] Delete query
   - [x] Run query
-  - [x] Duplicate query
+  - [ ] Duplicate query
 - **Javascript-based Query**
 - **Rest API-based Query**
 
@@ -39,23 +44,42 @@ Welcome to Jet Admin, a web-based PostgreSQL tables manager and admin dashboard 
 - [x] Radial chart
 - [x] Doughnut chart
 - [x] Polar chart
+- [x] Radar chart (new)
+- [x] Scatter chart (new)
+- [x] Bubble chart (new)
 
 #### Authentication
-- [x] JWT-based local user authentication
+- [x] Firebase Authentication
+  - [x] Google Authentication
+  - [x] Email Authentication
+  - [ ] Phone Authentication
+  - [ ] Facebook Authentication
+  - [ ] Twitter Authentication
+  - [ ] Github Authentication
+  - [ ] Apple Authentication
+  - [ ] Microsoft Authentication
+- [ ] JWT-based authentication
 
 #### Authorization
-- [x] JSON-based policy editor
-- [x] GUI-based policy editor
-- [x] Fine-grained RBAC
-- [x] Prisma-based RBAC for tables
-- [x] Record-based RBAC for queries, charts, and dashboards
+- [x] Global roles
+- [x] Tenant specific roles
+- [x] Permissions (per API)
+- [x] Map permissions to roles
+- [x] Map roles to users
+- [ ] Asset level permissions
 
 ### Topics to cover
 
 - **Setup:** To get started with the project, follow the instructions in the [Frontend Setup](#frontend-setup) and [Backend Setup](#backend-setup) sections to set up the frontend and backend components respectively.
+- [**Concepts**](#concepts)
+- [**Database Schemas**](#schemas)
 - [**Tables**](#tables)
 - [**Queries**](#queries)
 - [**Charts**](#charts)
-- [**Policies**](#policies)
+- [**Widgets**](#widgets)
+- [**Dashboards**](#dashboards)
 - [**Accounts**](#accounts)
+- [**Authentication**](#authentication)
+- [**Authorization**](#authorization)
+- [**Scheduling (coming soon)**](#scheduling)
 

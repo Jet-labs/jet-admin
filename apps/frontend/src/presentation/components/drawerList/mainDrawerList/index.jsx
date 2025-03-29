@@ -301,7 +301,7 @@ export const MainDrawerList = ({ currentPageTitle }) => {
               </span>
             </Link>
 
-            <Link
+            {/* <Link
               to={CONSTANTS.ROUTES.VIEW_DATABASE_NOTIFICATIONS.path(tenantID)}
               key={CONSTANTS.ROUTES.VIEW_DATABASE_NOTIFICATIONS.path(tenantID)}
               class={`flex items-center ${
@@ -326,7 +326,7 @@ export const MainDrawerList = ({ currentPageTitle }) => {
                   CONSTANTS.STRINGS.MAIN_DRAWER_DATABASE_NOTIFICATIONS_TITLE
                 )}
               </span>
-            </Link>
+            </Link> */}
 
             <button
               type="button"
