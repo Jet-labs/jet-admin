@@ -41,6 +41,7 @@ export const CONSTANTS = {
     MAIN_DRAWER_DATABASE_CHARTS_TITLE: "Charts",
     MAIN_DRAWER_DATABASE_WIDGETS_TITLE: "Widgets",
     MAIN_DRAWER_DATABASE_NOTIFICATIONS_TITLE: "Notifications",
+    MAIN_DRAWER_API_KEYS_TITLE: "API Keys",
     MAIN_DRAWER_DATABASE_QUERIES_TITLE: "Database queries",
     MAIN_DRAWER_ADD_DATABASE_SCHEMA_BUTTON: "Add schema",
     MAIN_DRAWER_USER_MANAGEMENT_TITLE: "User management",
@@ -269,6 +270,7 @@ export const CONSTANTS = {
     TRIGGER_DRAWER_LIST_NO_TRIGGER: "No triggers found",
     QUERY_DRAWER_LIST_NO_QUERY: "No queries found",
     NOTIFICATION_DRAWER_LIST_NO_NOTIFICATION: "No notifications found",
+    API_KEY_DRAWER_LIST_NO_API_KEY: "No API Keys found",
     CHART_DRAWER_LIST_NO_CHART: "No charts found",
     WIDGET_DRAWER_LIST_NO_WIDGET: "No widgets found",
     DASHBOARD_DRAWER_LIST_NO_DASHBOARD: "No dashboards found",
@@ -738,6 +740,7 @@ export const CONSTANTS = {
     WIDGET_EDITOR_FORM_DATASET_FIELD_LABEL_LABEL: "Label",
     WIDGET_EDITOR_FORM_DATASET_FIELD_VALUE_LABEL: "Value",
     WIDGET_EDITOR_FORM_DATASET_FIELD_RADIUS_LABEL: "Radius",
+
     ADD_NOTIFICATION_BUTTON_TEXT: "Add Notification",
     ADD_NOTIFICATION_FORM_TITLE: "Create New Notification",
     NOTIFICATION_ADDED_SUCCESS: "Notification created successfully",
@@ -767,6 +770,44 @@ export const CONSTANTS = {
     UPDATE_NOTIFICATION_FORM_UPDATE_DIALOG_TITLE: "Update notification",
     UPDATE_NOTIFICATION_FORM_UPDATE_DIALOG_MESSAGE:
       "Are you sure you want to update this item? This action cannot be undone.",
+
+    ADD_API_KEY_BUTTON_TEXT: "Add API Key",
+    ADD_API_KEY_FORM_TITLE: "Create New API Key",
+    API_KEY_ADDED_SUCCESS: "API Key created successfully",
+    API_KEY_DELETED_SUCCESS: "API Key deleted successfully",
+
+    ADD_API_KEY_FORM_TITLE: "Create API key",
+    ADD_API_KEY_FORM_SUBMIT: "Save API key",
+    ADD_API_KEY_FORM_API_KEY_CREATED: "API Key created successfully",
+    API_KEY_EDITOR_FORM_NAME_FIELD_LABEL: "API Key name",
+    API_KEY_EDITOR_FORM_NAME_FIELD_PLACEHOLDER: "Your API key's name",
+
+    DELETE_API_KEY_DELETION_SUCCESS: "API Key deleted successfully!",
+    DELETE_API_KEY_DIALOG_TITLE: "Delete API key",
+    DELETE_API_KEY_DIALOG_MESSAGE:
+      "Are you sure you want to delete this item? This action cannot be undone.",
+
+    UPDATE_API_KEY_FORM_TITLE: "Update API key",
+    UPDATE_API_KEY_FORM_API_KEY_UPDATION_SUCCESS:
+      "API Key updated successfully!",
+
+    UPDATE_API_KEY_FORM_API_KEY_TESTING_SUCCESS: "API Key run successfully!",
+    UPDATE_API_KEY_FORM_SUBMIT_BUTTON: "Update API key",
+    UPDATE_API_KEY_FORM_NAME_FIELD_LABEL: "API Key name",
+    UPDATE_API_KEY_FORM_NAME_FIELD_PLACEHOLDER: "Your API key's name",
+    UPDATE_API_KEY_FORM_UPDATE_DIALOG_TITLE: "Update API key",
+    UPDATE_API_KEY_FORM_UPDATE_DIALOG_MESSAGE:
+      "Are you sure you want to update this item? This action cannot be undone.",
+
+    UPDATE_TENANT_API_KEY_BY_ID_ASSIGNED_ROLES_TITLE: "Assigned roles",
+    UPDATE_TENANT_API_KEY_BY_ID_MANAGE_ROLES: "Manage roles",
+
+    API_KEY_ROLE_SELECTION_SELECT_ROLES_LABEL: "Select roles",
+    API_KEY_ROLE_SELECTION_TITLE: "API Key roles",
+    API_KEY_PERMISSION_SELECTION_LABEL: "Select permissions",
+    API_KEY_ROLE_SELECTION_SELECTED_ROLES_TITLE: "Selected roles",
+    API_KEY_ROLE_SELECTION_CANCEL: "Cancel",
+    API_KEY_ROLE_SELECTION_SUBMIT: "Update roles",
   },
 
   LOCAL_STORAGE_KEYS: {
@@ -955,6 +996,19 @@ export const CONSTANTS = {
       path: (tenantID, databaseNotificationID) =>
         `/tenants/${tenantID}/notifications/${databaseNotificationID}`,
     },
+
+    VIEW_API_KEYS: {
+      code: "/tenants/:tenantID/apikeys",
+      path: (tenantID) => `/tenants/${tenantID}/apikeys`,
+    },
+    ADD_API_KEY: {
+      code: "/tenants/:tenantID/apikeys/add",
+      path: (tenantID) => `/tenants/${tenantID}/apikeys/add`,
+    },
+    UPDATE_API_KEY_BY_ID: {
+      code: "/tenants/:tenantID/apikeys/:apiKeyID",
+      path: (tenantID, apiKeyID) => `/tenants/${tenantID}/apikeys/${apiKeyID}`,
+    },
   },
 
   APIS: {
@@ -996,6 +1050,19 @@ export const CONSTANTS = {
         `/api/v1/tenants/${tenantID}/users/${tenantUserID}/roles`,
       removeTenantUserByIDAPI: (tenantID, tenantUserID) =>
         `/api/v1/tenants/${tenantID}/users/${tenantUserID}`,
+    },
+    API_KEY: {
+      getAllAPIKeysAPI: (tenantID, page, pageSize) =>
+        `/api/v1/tenants/${tenantID}/apikeys?page=${page}&pageSize=${pageSize}`,
+      createAPIKeyAPI: (tenantID) => `/api/v1/tenants/${tenantID}/apikeys/`,
+      getAPIKeyByIDAPI: (tenantID, apiKeyID) =>
+        `/api/v1/tenants/${tenantID}/apikeys/${apiKeyID}`,
+      updateAPIKeyByIDAPI: (tenantID, apiKeyID) =>
+        `/api/v1/tenants/${tenantID}/apikeys/${apiKeyID}`,
+      updateAPIKeyRolesByIDAPI: (tenantID, apiKeyID) =>
+        `/api/v1/tenants/${tenantID}/apikeys/${apiKeyID}/roles`,
+      deleteAPIKeyByIDAPI: (tenantID, apiKeyID) =>
+        `/api/v1/tenants/${tenantID}/apikeys/${apiKeyID}`,
     },
     DATABASE: {
       getDatabaseMetadataAPI: (tenantID) =>
@@ -1259,6 +1326,7 @@ export const CONSTANTS = {
     FORMS: "FORMS",
     FORM_SUBMISSIONS: "FORM_SUBMISSIONS",
     DATABASE_NOTIFICATIONS: (tenantID) => `${tenantID}-DATABASE_NOTIFICATIONS`,
+    DATABASE_API_KEYS: (tenantID) => `${tenantID}-DATABASE_API_KEYS`,
     DATABASE_NOTIFICATION_DETAILS: "DATABASE_NOTIFICATION_DETAILS",
   },
 
@@ -1574,6 +1642,7 @@ export const CONSTANTS = {
       "DASHBOARD_UPDATION_FORM_RESULT_SEPARATION",
     DATABASE_NOTIFICATION_LAYOUT_SEPARATION:
       "DATABASE_NOTIFICATION_LAYOUT_SEPARATION",
+    DATABASE_API_KEY_LAYOUT_SEPARATION: "DATABASE_API_KEY_LAYOUT_SEPARATION",
   },
 
   PG_TRIGGER_FORM_TIMING_OPTIONS: ["BEFORE", "AFTER", "INSTEAD OF"],

@@ -7,13 +7,14 @@ import { TenantRoleSelectionInput } from "./tenantRoleSelectionInput";
 export const TenantRoleSelectionDialog = ({
   tenantID,
   isUserTenantAdmin,
-  initialSelectedTenantRoles,
+  initialSelectedTenantRoles = [],
   isTenantRoleSelectDialogOpen,
   handleCloseTenantRoleSelectDialog,
   handleSubmitTenantRoleSelectDialog,
+  isAdminSelectionEnabled = true,
 }) => {
   const [selectedTenantRoleIDs, setSelectedTenantRoleIDs] = useState(
-    initialSelectedTenantRoles ? initialSelectedTenantRoles : []
+    initialSelectedTenantRoles
   );
 
   const [userTenantRelationship, setUserTenantRelationship] = useState(
@@ -43,30 +44,32 @@ export const TenantRoleSelectionDialog = ({
         {/* Content */}
         <div className="p-4 space-y-4">
           <div className="grid grid-cols-1 gap-2">
-            <div className="w-full flex flex-col bg-slate-200 justify-start items-start gap-2 p-2 border-slate-200 rounded">
-              <div className="w-full flex flex-row justify-start items-center gap-2">
-                <Checkbox
-                  checked={
-                    userTenantRelationship ==
-                    CONSTANTS.ROLES.PRIMARY.ADMIN.value
-                  }
-                  onChange={(_, checked) => {
-                    setUserTenantRelationship(
-                      checked
-                        ? CONSTANTS.ROLES.PRIMARY.ADMIN.value
-                        : CONSTANTS.ROLES.PRIMARY.MEMBER.value
-                    );
-                  }}
-                  className="!p-0 text-[#646cff] hover:bg-[#646cff]/10 focus:outline-none focus:ring-2 focus:ring-[#646cff]/50"
-                />
-                <span className="text-sm font-medium mr-2 text-slate-700">
-                  {CONSTANTS.STRINGS.TENANT_ROLE_SELECTION_MEMBERSHIP_LABEL}
+            {isAdminSelectionEnabled && (
+              <div className="w-full flex flex-col bg-slate-200 justify-start items-start gap-2 p-2 border-slate-200 rounded">
+                <div className="w-full flex flex-row justify-start items-center gap-2">
+                  <Checkbox
+                    checked={
+                      userTenantRelationship ==
+                      CONSTANTS.ROLES.PRIMARY.ADMIN.value
+                    }
+                    onChange={(_, checked) => {
+                      setUserTenantRelationship(
+                        checked
+                          ? CONSTANTS.ROLES.PRIMARY.ADMIN.value
+                          : CONSTANTS.ROLES.PRIMARY.MEMBER.value
+                      );
+                    }}
+                    className="!p-0 text-[#646cff] hover:bg-[#646cff]/10 focus:outline-none focus:ring-2 focus:ring-[#646cff]/50"
+                  />
+                  <span className="text-sm font-medium mr-2 text-slate-700">
+                    {CONSTANTS.STRINGS.TENANT_ROLE_SELECTION_MEMBERSHIP_LABEL}
+                  </span>
+                </div>
+                <span className="text-xs font-normal text-slate-700">
+                  {CONSTANTS.STRINGS.TENANT_ROLE_SELECTION_MEMBERSHIP_INFO}
                 </span>
               </div>
-              <span className="text-xs font-normal text-slate-700">
-                {CONSTANTS.STRINGS.TENANT_ROLE_SELECTION_MEMBERSHIP_INFO}
-              </span>
-            </div>
+            )}
             {userTenantRelationship == CONSTANTS.ROLES.PRIMARY.MEMBER.value && (
               <TenantRoleSelectionInput
                 tenantID={tenantID}

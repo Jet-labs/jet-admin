@@ -69,6 +69,10 @@ const constants = {
       code: "SERVER_ERROR",
       message: "Server error",
     },
+    INVALID_API_KEY: {
+      code: "INVALID_API_KEY",
+      message: "Invalid or Inactive API key",
+    },
     USER_AUTH_TOKEN_EXPIRED: {
       code: "USER_AUTH_TOKEN_EXPIRED",
       message: "User auth token expired",

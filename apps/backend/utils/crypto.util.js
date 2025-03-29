@@ -43,8 +43,13 @@ const generateSaltAndPasswordHash = ({ password }) => {
   return { salt, passwordHash };
 };
 
+const generateAPIKey = () => {
+  return crypto.randomBytes(32).toString("hex");
+};
+
 module.exports = {
   generateRandomString,
   comparePasswordWithHash,
   generateSaltAndPasswordHash,
+  generateAPIKey,
 };

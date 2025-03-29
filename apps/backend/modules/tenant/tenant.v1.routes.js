@@ -7,6 +7,7 @@ const { databaseMiddleware } = require("../database/database.middleware");
 const databaseRouter = require("../database/database.v1.routes");
 const userManagementRouter = require("../userManagement/userManagement.v1.route");
 const tenantRoleRouter = require("../tenantRole/tenantRole.v1.route");
+const tenantAPIKeyRouter = require("../apiKey/apiKey.v1.routes");
 
 // Apply common middleware at the router level
 router.use(authMiddleware.authProvider);
@@ -42,5 +43,8 @@ router.use("/:tenantID/users", userManagementRouter);
 
 // Nested user management routes
 router.use("/:tenantID/roles", tenantRoleRouter);
+
+// Nested APIKey routes
+router.use("/:tenantID/apikeys", tenantAPIKeyRouter);
 
 module.exports = router;

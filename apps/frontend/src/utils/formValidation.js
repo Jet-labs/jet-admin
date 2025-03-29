@@ -1,4 +1,5 @@
 import * as Yup from "yup";
+import { CONSTANTS } from "../constants";
 export const formValidations = {};
 
 formValidations.emailSignUpFormValidationSchema = Yup.object().shape({
@@ -148,6 +149,14 @@ formValidations.databaseNotificationUpdationFormValidationSchema =
       "Notification name is required"
     ),
   });
+
+formValidations.apiKeyAdditionFormValidationSchema = Yup.object().shape({
+  apiKeyName: Yup.string().required("API key name is required"),
+});
+
+formValidations.apiKeyUpdationFormValidationSchema = Yup.object().shape({
+  apiKeyName: Yup.string().required("API key name is required"),
+});
 
 formValidations.databaseQueryArgsFormValidationSchema = (args) =>
   Yup.object().shape(

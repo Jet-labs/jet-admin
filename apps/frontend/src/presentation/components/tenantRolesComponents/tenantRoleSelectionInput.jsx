@@ -27,6 +27,7 @@ export const TenantRoleSelectionInput = ({
   selectedTenantRoleIDs,
   setSelectedTenantRoleIDs,
 }) => {
+  console.log({ selectedTenantRoleIDs });
   const {
     isLoading: isLoadingTenantRoles,
     isFetching: isFetchingTenantRoles,

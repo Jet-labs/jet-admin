@@ -13,7 +13,7 @@ import { DatabaseChartLayout } from "../layouts/databaseChartLayout";
 import { DatabaseDashboardLayout } from "../layouts/databaseDashboardLayout";
 import { DatabaseWidgetLayout } from "../layouts/databaseWidgetLayout";
 import { DatabaseNotificationLayout } from "../layouts/databaseNotificationLayout";
-
+import { APIKeyLayout } from "../layouts/apiKeyLayout";
 const SignInPage = lazy(() => import("../../pages/signInPage"));
 const SignUpPage = lazy(() => import("../../pages/signUpPage"));
 const HomePage = lazy(() => import("../../pages/homePage"));
@@ -94,6 +94,10 @@ const AddDatabaseNotificationPage = lazy(() =>
 const UpdateDatabaseNotificationPage = lazy(() =>
   import("../../pages/updateDatabaseNotificationPage")
 );
+
+const AddAPIKeyPage = lazy(() => import("../../pages/addAPIKeyPage"));
+
+const UpdateAPIKeyPage = lazy(() => import("../../pages/updateAPIKeyPage"));
 
 const router = createBrowserRouter([
   {
@@ -243,6 +247,23 @@ const router = createBrowserRouter([
               {
                 path: CONSTANTS.ROUTES.UPDATE_DATABASE_NOTIFICATION_BY_ID.code,
                 element: <UpdateDatabaseNotificationPage />,
+              },
+            ],
+          },
+          {
+            element: <APIKeyLayout />,
+            children: [
+              {
+                path: CONSTANTS.ROUTES.VIEW_API_KEYS.code,
+                element: <AddAPIKeyPage />,
+              },
+              {
+                path: CONSTANTS.ROUTES.ADD_API_KEY.code,
+                element: <AddAPIKeyPage />,
+              },
+              {
+                path: CONSTANTS.ROUTES.UPDATE_API_KEY_BY_ID.code,
+                element: <UpdateAPIKeyPage />,
               },
             ],
           },
