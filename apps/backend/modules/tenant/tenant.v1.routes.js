@@ -17,6 +17,7 @@ router.get("/", tenantController.getAllUserTenants);
 router.get(
   "/:tenantID",
   authMiddleware.checkUserPermissions(["tenant:read"]),
+  databaseMiddleware.poolProvider,
   tenantController.getUserTenantByID
 );
 router.post(

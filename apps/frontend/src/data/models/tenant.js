@@ -1,3 +1,5 @@
+import { DatabaseMetadata } from "./databaseMetadata";
+import { TenantRole } from "./tenantRole";
 import { User } from "./user";
 
 export class Tenant {
@@ -10,6 +12,12 @@ export class Tenant {
     createdAt,
     roles,
     tblUsers,
+    tenantRolesCount,
+    tenantDatabaseSchemasCount,
+    tenantDatabaseTablesCount,
+    tenantChartCount,
+    tenantDashboardCount,
+    tenantDatabaseQueryCount,
   }) {
     this.tenantID = tenantID;
     this.tenantName = tenantName;
@@ -19,6 +27,12 @@ export class Tenant {
     this.createdAt = createdAt;
     this.roles = roles;
     this.creator = tblUsers ? new User(tblUsers) : null;
+    this.tenantRolesCount = tenantRolesCount;
+    this.tenantDatabaseSchemasCount = tenantDatabaseSchemasCount;
+    this.tenantDatabaseTablesCount = tenantDatabaseTablesCount;
+    this.tenantChartCount = tenantChartCount;
+    this.tenantDashboardCount = tenantDashboardCount;
+    this.tenantDatabaseQueryCount = tenantDatabaseQueryCount;
   }
   static toList = (data) => {
     if (Array.isArray(data)) {

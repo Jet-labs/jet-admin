@@ -45,6 +45,44 @@ databaseService.getDatabaseMetadata = async ({ userID, dbPool }) => {
 };
 
 /**
+ * Retrieves database metadata.
+ * @param {object} param0
+ * @param {Number} param0.userID
+ * @param {object} param0.dbPool
+ * @returns {Promise<object>}
+ */
+databaseService.getDatabaseMetadataForTenant = async ({ userID, dbPool }) => {
+  Logger.log("info", {
+    message: "databaseService:getDatabaseMetadataForTenant:params",
+    params: { userID },
+  });
+
+  try {
+    const result = await TenantAwarePostgreSQLPoolManager.withDatabaseClient(
+      dbPool,
+      async (client) => {
+        return await client.query(
+          postgreSQLQueryUtil.getDatabaseMetadataForTenantQuery()
+        );
+      }
+    );
+
+    Logger.log("success", {
+      message: "databaseService:getDatabaseMetadataForTenant:result",
+      params: { userID },
+    });
+
+    return result.rows[0];
+  } catch (error) {
+    Logger.log("error", {
+      message: "databaseService:getDatabaseMetadataForTenant:catch1",
+      params: { userID, error: error.message },
+    });
+    throw error;
+  }
+};
+
+/**
  * Creates a new database schema.
  * @param {object} param0
  * @param {Number} param0.userID

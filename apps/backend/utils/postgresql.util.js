@@ -120,6 +120,46 @@ FROM (
 `;
 };
 
+postgreSQLQueryUtil.getDatabaseMetadataForTenantQuery = () => {
+  return `SELECT jsonb_agg(result) AS metadata
+FROM (
+    SELECT
+        jsonb_build_object(
+            'databaseSchemaName', schema_name,
+            'tables', (
+                SELECT jsonb_agg(jsonb_build_object(
+                    'databaseTableName', table_name
+                ))
+                FROM information_schema.tables t
+                WHERE t.table_schema = s.schema_name AND t.table_type = 'BASE TABLE' -- Filter for base tables only
+            ),
+            'views', (
+                SELECT jsonb_agg(table_name)
+                FROM information_schema.views v
+                WHERE v.table_schema = s.schema_name
+            ),
+            'enums', (
+                SELECT jsonb_agg(jsonb_build_object(
+                    'enum_name', e.enum_name,
+                    'values', e.enum_values
+                ))
+                FROM (
+                    SELECT t.typname AS enum_name,
+                           array_agg(e.enumlabel ORDER BY e.enumsortorder) AS enum_values
+                    FROM pg_type t
+                    JOIN pg_enum e ON t.oid = e.enumtypid
+                    JOIN pg_namespace n ON n.oid = t.typnamespace
+                    WHERE n.nspname = s.schema_name
+                    GROUP BY t.typname
+                ) e
+            )
+        ) AS result
+    FROM information_schema.schemata s
+    WHERE s.schema_name NOT IN ('pg_catalog', 'information_schema')
+) subquery;
+`;
+};
+
 postgreSQLQueryUtil.getDatabaseTableColumnsQuery = ({
   databaseSchemaName = "public",
   databaseTableName,

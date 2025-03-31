@@ -13,7 +13,7 @@ const RoleManagementPage = () => {
         </h1>
         <Link
           to={CONSTANTS.ROUTES.ADD_TENANT_ROLE.path(tenantID)}
-          className="w-fit py-1 px-2 text-sm flex flex-row items-center font-medium text-slate-600 focus:outline-none bg-white rounded border border-gray-200 hover:bg-gray-100 hover:text-[#646cffaf] focus:z-10 focus:ring-4 focus:ring-gray-100 hover:border-[#646cffaf]"
+          className="flex flex-row items-center justify-center rounded bg-[#646cff]/10 px-3 py-1.5 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50 w-fit outline-none focus:outline-none"
         >
           <MdOutlinePersonAddAlt className="!text-base !me-2" />
           {CONSTANTS.STRINGS.TENANT_ROLE_MANAGEMENT_ADD_ROLE_BUTTON}
