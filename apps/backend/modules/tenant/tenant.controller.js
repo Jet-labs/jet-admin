@@ -12,7 +12,7 @@ const tenantController = {};
  */
 tenantController.getUserTenantByID = async (req, res) => {
   try {
-    const { user } = req;
+    const { user, dbPool } = req;
     const { tenantID } = req.params;
     Logger.log("info", {
       message: "tenantController:getUserTenantByID:params",
@@ -21,10 +21,11 @@ tenantController.getUserTenantByID = async (req, res) => {
     const tenant = await tenantService.getUserTenantByID({
       userID: parseInt(user.userID),
       tenantID: parseInt(tenantID),
+      dbPool,
     });
     Logger.log("success", {
       message: "tenantController:getUserTenantByID:tenant",
-      params: { tenant },
+      params: { tenant: tenant.tenantID },
     });
     return expressUtils.sendResponse(res, true, { tenant });
   } catch (error) {

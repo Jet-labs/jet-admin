@@ -17,6 +17,7 @@ export const CONSTANTS = {
   },
 
   STRINGS: {
+    NO_DATABASE_URL: "Please add database URL in the tenant settings",
     DASHBOARD_DROPPING_ELEMENT_TAG: "__dropping-elem__",
     HIDE_QUERY_META_CONTENT_BUTTON_TEXT: "Hide metadata",
     SHOW_QUERY_META_CONTENT_BUTTON_TEXT: "Show metadata",
@@ -808,6 +809,9 @@ export const CONSTANTS = {
     API_KEY_ROLE_SELECTION_SELECTED_ROLES_TITLE: "Selected roles",
     API_KEY_ROLE_SELECTION_CANCEL: "Cancel",
     API_KEY_ROLE_SELECTION_SUBMIT: "Update roles",
+
+    TENANTS_STATS_TITLE: "Tenant Stats",
+    TENANTS_STATS_ADD_TENANT_BUTTON: "Add tenant",
   },
 
   LOCAL_STORAGE_KEYS: {

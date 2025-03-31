@@ -170,7 +170,7 @@ formValidations.datasetArgumentsFormValidationSchema = (args) => {
   const argsMapSchema = {};
 
   // Dynamically create validation rules for each argument
-  args.forEach((arg) => {
+  args?.forEach((arg) => {
     const argName = arg.replace(/[{}]/g, ""); // Remove curly braces if present
     argsMapSchema[argName] = Yup.string()
       .required(`Value for ${argName} is required`)

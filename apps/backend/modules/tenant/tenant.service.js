@@ -6,6 +6,20 @@ const {
 const constants = require("../../constants");
 const environmentVariables = require("../../environment");
 const Logger = require("../../utils/logger");
+const { tenantRoleService } = require("../tenantRole/tenantRole.service");
+const { databaseService } = require("../database/database.service");
+const {
+  databaseTableService,
+} = require("../databaseTable/databaseTable.service");
+const {
+  databaseChartService,
+} = require("../databaseChart/databaseChart.service");
+const {
+  databaseDashboardService,
+} = require("../databaseDashboard/databaseDashboard.service");
+const {
+  databaseQueryService,
+} = require("../databaseQuery/databaseQuery.service");
 
 const tenantService = {};
 
@@ -16,7 +30,7 @@ const tenantService = {};
  * @param {Number} param0.tenantID
  * @returns
  */
-tenantService.getUserTenantByID = async ({ userID, tenantID }) => {
+tenantService.getUserTenantByID = async ({ userID, tenantID, dbPool }) => {
   try {
     Logger.log("info", {
       message: "tenantService:getUserTenantByID:params",
@@ -46,10 +60,43 @@ tenantService.getUserTenantByID = async ({ userID, tenantID }) => {
           tblUsers: true,
         },
       });
+    const tenantRoles = await tenantRoleService.getAllTenantRoles({
+      userID: parseInt(userID),
+      tenantID: parseInt(tenantID),
+    });
+    const tenantDatabaseMetadata =
+      await databaseService.getDatabaseMetadataForTenant({
+        userID: parseInt(userID),
+        dbPool,
+      });
+    const tenantCharts = await databaseChartService.getAllDatabaseCharts({
+      userID: parseInt(userID),
+      tenantID: parseInt(tenantID),
+    });
+    const tenantDashboards =
+      await databaseDashboardService.getAllDatabaseDashboards({
+        userID: parseInt(userID),
+        tenantID: parseInt(tenantID),
+      });
+    const tenantDatabaseQueries =
+      await databaseQueryService.getAllDatabaseQueries({
+        userID: parseInt(userID),
+        tenantID: parseInt(tenantID),
+      });
+
     const tenant = {
       ...userTenantRelationships.tblTenants,
       roles: userTenantRelationships,
       relationships: allRelationshipsOfTenant,
+      tenantRolesCount: tenantRoles?.length || 0,
+      tenantDatabaseSchemasCount: tenantDatabaseMetadata?.metadata?.length || 0,
+      tenantDatabaseTablesCount:
+        tenantDatabaseMetadata?.metadata
+          ?.map((schema) => (schema.tables ? schema.tables.length : 0))
+          .reduce((acc, curr) => acc + curr, 0) || 0,
+      tenantChartCount: tenantCharts?.length || 0,
+      tenantDashboardCount: tenantDashboards?.length || 0,
+      tenantDatabaseQueryCount: tenantDatabaseQueries?.length || 0,
     };
     Logger.log("success", {
       message: "tenantService:getUserTenantByID:tenant",
