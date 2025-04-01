@@ -71,6 +71,17 @@ const getFieldFormatting = ({
       : "inline-flex items-center  text-blue-600 ";
 
   const foreignKeyReferenceLink = () => {
+    console.log({
+      t: {
+        field: foreignKeyReference?.[0]?.referencedColumns[0],
+        operator: "=",
+        value: PostgreSQLUtils.processFilterValueAccordingToFieldType({
+          type: CONSTANTS.POSTGRE_SQL_DATA_TYPES[type].js_type,
+          value: cellValue,
+        }),
+        fieldType: type,
+      },
+    });
     return `${CONSTANTS.ROUTES.VIEW_DATABASE_TABLE_BY_NAME.path(
       tenantID,
       databaseSchemaName,
@@ -81,7 +92,7 @@ const getFieldFormatting = ({
           field: foreignKeyReference?.[0]?.referencedColumns[0],
           operator: "=",
           value: PostgreSQLUtils.processFilterValueAccordingToFieldType({
-            type: type,
+            type: CONSTANTS.POSTGRE_SQL_DATA_TYPES[type].js_type,
             value: cellValue,
           }),
           fieldType: type,
@@ -260,7 +271,7 @@ const getFormattedTableColumns = ({
         name: column.databaseTableColumnName,
         key: column.databaseTableColumnName,
         sortable: true,
-        headerName: String(column.databaseTableColumnName).toLocaleLowerCase(),
+        headerName: String(column.databaseTableColumnName),
         type: convertedType,
         editable: !column.isID,
         dbType: column.databaseTableColumnType,
@@ -373,6 +384,8 @@ export const DatabaseTableGrid = ({
       }),
     refetchOnWindowFocus: false,
   });
+
+  console.log({ databaseTableColumnFilters, initialFilterQuery });
 
   const {
     isLoading: isLoadingDatabaseTableRows,

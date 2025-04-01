@@ -1,6 +1,6 @@
 const dotenv = require("dotenv");
 const path = require("path");
-const p = path.resolve(__dirname, `${process.env.NODE_ENV}.env`);
+const p = path.resolve(__dirname, `.env`);
 console.log("setting path for environment...", p);
 console.log("setting up environment variables...");
 dotenv.config({

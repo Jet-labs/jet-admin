@@ -65,6 +65,8 @@ export const TenantUpdationForm = ({ tenantID }) => {
     },
   });
 
+  console.log({ updateTenantForm });
+
   useEffect(() => {
     if (tenant) {
       updateTenantForm.setFieldValue("tenantID", tenant.tenantID);

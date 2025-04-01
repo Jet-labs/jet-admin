@@ -32,7 +32,7 @@ formValidations.addTenantFormValidationSchema = Yup.object().shape({
     .required("Tenant logo URL is required")
     .url("Must be a valid URL")
     .trim(),
-  tenantDBURL: Yup.string().url("Must be a valid URL"),
+  tenantDBURL: Yup.string("Must be a valid URL"),
 });
 
 formValidations.updateTenantFormValidationSchema = Yup.object().shape({
@@ -42,7 +42,7 @@ formValidations.updateTenantFormValidationSchema = Yup.object().shape({
     .required("Tenant logo URL is required")
     .url("Must be a valid URL")
     .trim(),
-  tenantDBURL: Yup.string().url("Must be a valid URL"),
+  tenantDBURL: Yup.string("Must be a valid URL"),
 });
 
 formValidations.addUserToTenantFormValidationSchema = Yup.object().shape({
