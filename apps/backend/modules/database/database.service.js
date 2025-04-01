@@ -125,6 +125,41 @@ databaseService.createDatabaseSchema = async ({
   }
 };
 
+/**
+ * Executes a raw SQL query.
+ * @param {object} param0
+ * @param {Number} param0.userID
+ * @param {object} param0.dbPool
+ * @param {String} param0.sqlQuery
+ * @returns {Promise<object>}
+ */
+databaseService.executeRawSQLQuery = async ({ userID, dbPool, sqlQuery }) => {
+  Logger.log("info", {
+    message: "databaseService:executeRawSQLQuery:params",
+    params: { userID, sqlQuery },
+  });
 
+  try {
+    const result = await TenantAwarePostgreSQLPoolManager.withDatabaseClient(
+      dbPool,
+      async (client) => {
+        return await client.query(sqlQuery);
+      }
+    );
+
+    Logger.log("success", {
+      message: "databaseService:executeRawSQLQuery:success",
+      params: { userID, rowCount: result.rowCount },
+    });
+
+    return result;
+  } catch (error) {
+    Logger.log("error", {
+      message: "databaseService:executeRawSQLQuery:catch1",
+      params: { userID, error: error.message },
+    });
+    throw error;
+  }
+};
 
 module.exports = { databaseService };

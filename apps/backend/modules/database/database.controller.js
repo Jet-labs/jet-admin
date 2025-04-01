@@ -78,4 +78,48 @@ databaseController.createDatabaseSchema = async (req, res) => {
   }
 };
 
+/**
+ * Executes a raw SQL query.
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+databaseController.executeRawSQLQuery = async (req, res) => {
+  try {
+    const { user, dbPool } = req;
+    const { sqlQuery } = req.body;
+    
+    Logger.log("info", {
+      message: "databaseController:executeRawSQLQuery:params",
+      params: { userID: user.userID, sqlQuery },
+    });
+
+    if (!sqlQuery || typeof sqlQuery !== 'string') {
+      return expressUtils.sendResponse(res, false, {}, "Invalid SQL query provided");
+    }
+
+    const result = await databaseService.executeRawSQLQuery({
+      userID: parseInt(user.userID),
+      dbPool,
+      sqlQuery,
+    });
+
+    Logger.log("success", {
+      message: "databaseController:executeRawSQLQuery:success",
+      params: { userID: user.userID, rowCount: result.rowCount },
+    });
+
+    return expressUtils.sendResponse(res, true, { 
+      result: result.rows,
+      rowCount: result.rowCount,
+      message: "SQL query executed successfully."
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "databaseController:executeRawSQLQuery:catch-1",
+      params: { userID: req.user?.userID, error },
+    });
+    return expressUtils.sendResponse(res, false, {}, error);
+  }
+};
+
 module.exports = { databaseController };

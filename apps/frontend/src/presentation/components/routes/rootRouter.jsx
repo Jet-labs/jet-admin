@@ -110,6 +110,8 @@ const AddAPIKeyPage = lazy(() => import("../../pages/addAPIKeyPage"));
 
 const UpdateAPIKeyPage = lazy(() => import("../../pages/updateAPIKeyPage"));
 
+const RawSqlQueryPage = lazy(() => import("../../pages/rawSqlQueryPage"));
+
 const router = createBrowserRouter([
   {
     element: <RootLayout />,
@@ -293,6 +295,10 @@ const router = createBrowserRouter([
                 element: <UpdateDatabaseDashboardPage />,
               },
             ],
+          },
+          {
+            path: CONSTANTS.ROUTES.RAW_SQL_QUERY.code,
+            element: <RawSqlQueryPage />,
           },
           {
             element: <UserManagementLayout />,

@@ -64,4 +64,37 @@ export const createDatabaseSchemaAPI = async ({
   }
 };
 
+export const executeRawSQLQueryAPI = async ({ tenantID, sqlQuery }) => {
+  try {
+    const url = `${
+      CONSTANTS.SERVER_HOST
+    }${CONSTANTS.APIS.DATABASE.executeRawSQLQueryAPI(tenantID)}`;
+    const bearerToken = await firebaseAuth.currentUser.getIdToken();
+
+    if (!bearerToken) {
+      throw CONSTANTS.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND;
+    }
+
+    const response = await axios.post(
+      url,
+      { sqlQuery },
+      {
+        headers: {
+          authorization: `Bearer ${bearerToken}`,
+        },
+      }
+    );
+
+    if (response.data && response.data.success === true) {
+      return response.data.result;
+    } else if (response.data.error) {
+      throw response.data.error;
+    } else {
+      throw CONSTANTS.ERROR_CODES.SERVER_ERROR;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
 
