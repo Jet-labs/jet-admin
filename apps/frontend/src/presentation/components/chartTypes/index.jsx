@@ -19,6 +19,7 @@ export const DATABASE_CHARTS_CONFIG_MAP = {
     label: "Bar",
     value: CONSTANTS.DATABASE_CHART_TYPES.BAR_CHART.value,
     datasetFields: ["xAxis", "yAxis"],
+    description: "Compare categorical data with rectangular bars",
     component: ({
       data,
       refetchInterval,
@@ -38,6 +39,7 @@ export const DATABASE_CHARTS_CONFIG_MAP = {
     label: "Line",
     value: CONSTANTS.DATABASE_CHART_TYPES.LINE_CHART.value,
     datasetFields: ["xAxis", "yAxis"],
+    description: "Display trends over time/intervals",
     component: ({
       data,
       refetchInterval,
@@ -57,6 +59,7 @@ export const DATABASE_CHARTS_CONFIG_MAP = {
     label: "Pie",
     value: CONSTANTS.DATABASE_CHART_TYPES.PIE_CHART.value,
     datasetFields: ["label", "value"],
+    description: "Show proportional relationships",
     component: ({
       data,
       refetchInterval,
@@ -76,6 +79,7 @@ export const DATABASE_CHARTS_CONFIG_MAP = {
     label: "Radial",
     value: CONSTANTS.DATABASE_CHART_TYPES.RADIAL_CHART.value,
     datasetFields: ["label", "value"],
+    description: "Display data in a circular gauge format",
     component: ({
       data,
       refetchInterval,
@@ -95,6 +99,7 @@ export const DATABASE_CHARTS_CONFIG_MAP = {
     label: "Radar",
     value: CONSTANTS.DATABASE_CHART_TYPES.RADAR_CHART.value,
     datasetFields: ["label", "value"],
+    description: "Compare multiple variables in a radial display",
     component: ({
       data,
       refetchInterval,
@@ -114,6 +119,7 @@ export const DATABASE_CHARTS_CONFIG_MAP = {
     label: "Scatter",
     value: CONSTANTS.DATABASE_CHART_TYPES.SCATTER_CHART.value,
     datasetFields: ["xAxis", "yAxis"],
+    description: "Plot individual data points on a graph",
     component: ({
       data,
       refetchInterval,
@@ -133,6 +139,7 @@ export const DATABASE_CHARTS_CONFIG_MAP = {
     label: "Bubble",
     value: CONSTANTS.DATABASE_CHART_TYPES.BUBBLE_CHART.value,
     datasetFields: ["xAxis", "yAxis", "radius"],
+    description: "Display three dimensions of data with size-varying points",
     component: ({
       data,
       refetchInterval,

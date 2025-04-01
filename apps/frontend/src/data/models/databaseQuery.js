@@ -12,6 +12,8 @@ export class DatabaseQuery {
     databaseQueryResultSchema,
     runOnLoad,
     tblDatabaseChartQueryMappings,
+    linkedDatabaseChartCount,
+    linkedDatabaseWidgetCount,
   }) {
     this.databaseQueryID = databaseQueryID;
     this.createdAt = createdAt;
@@ -25,6 +27,8 @@ export class DatabaseQuery {
     this.databaseQueryResultSchema = databaseQueryResultSchema;
     this.databaseQuery = databaseQuery;
     this.tblDatabaseChartQueryMappings = tblDatabaseChartQueryMappings;
+    this.linkedDatabaseChartCount = linkedDatabaseChartCount || 0;
+    this.linkedDatabaseWidgetCount = linkedDatabaseWidgetCount || 0;
   }
   static toList(data) {
     if (Array.isArray(data)) {

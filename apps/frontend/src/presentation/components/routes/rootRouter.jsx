@@ -52,12 +52,20 @@ const UpdateDatabaseQueryPage = lazy(() =>
   import("../../pages/updateDatabaseQueryPage")
 );
 
+const DatabaseQueryLayoutLandingPage = lazy(() =>
+  import("../../pages/databaseQueryLayoutLandingPage")
+);
+
 const AddDatabaseChartPage = lazy(() =>
   import("../../pages/addDatabaseChartPage")
 );
 
 const UpdateDatabaseChartPage = lazy(() =>
   import("../../pages/updateDatabaseChartPage")
+);
+
+const DatabaseChartLayoutLandingPage = lazy(() =>
+  import("../../pages/databaseChartLayoutLandingPage")
 );
 
 const ViewDatabaseDashboardPage = lazy(() =>
@@ -189,9 +197,7 @@ const router = createBrowserRouter([
             children: [
               {
                 path: CONSTANTS.ROUTES.VIEW_DATABASE_QUERIES.code,
-                element: () => {
-                  return <div>placeholder page</div>;
-                },
+                element: <DatabaseQueryLayoutLandingPage />,
               },
               {
                 path: CONSTANTS.ROUTES.ADD_DATABASE_QUERY.code,
@@ -208,9 +214,7 @@ const router = createBrowserRouter([
             children: [
               {
                 path: CONSTANTS.ROUTES.VIEW_DATABASE_CHARTS.code,
-                element: () => {
-                  return <div>placeholder page</div>;
-                },
+                element: <DatabaseChartLayoutLandingPage />,
               },
               {
                 path: CONSTANTS.ROUTES.ADD_DATABASE_CHART.code,

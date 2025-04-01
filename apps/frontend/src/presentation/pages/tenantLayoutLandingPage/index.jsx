@@ -2,25 +2,24 @@ import { CircularProgress } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import moment from "moment";
 import React from "react";
+import { BsServer } from "react-icons/bs";
 import {
+  FaChartPie,
   FaDatabase,
   FaKey,
   FaStoreAlt,
   FaUsers,
   FaUsersCog,
 } from "react-icons/fa";
-import { FiUsers } from "react-icons/fi";
-import { BsServer } from "react-icons/bs";
-import { MdOutlineSchema, MdWidgets, MdOutlineDashboard, MdSchema } from "react-icons/md";
-import { SiQuantconnect } from "react-icons/si";
+import { MdSchema } from "react-icons/md";
 import { RiDashboardFill } from "react-icons/ri";
-import { FaChartPie } from "react-icons/fa";
+import { SiQuantconnect } from "react-icons/si";
 import { useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 import { getUserTenantByIDAPI } from "../../../data/apis/tenant";
-import { NoEntityUI } from "../../components/ui/noEntityUI";
 import { TenantLogo } from "../../components/tenantComponents/tenantLogo";
 import CodeBlock from "../../components/ui/codeBlock";
+import { NoEntityUI } from "../../components/ui/noEntityUI";
 
 const TenantLayoutLandingPage = () => {
   const { tenantID } = useParams();
