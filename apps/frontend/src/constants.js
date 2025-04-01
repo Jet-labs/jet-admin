@@ -526,6 +526,10 @@ export const CONSTANTS = {
     DASHBOARD_WIDGET_LIST_WIDGETS_TITLE: "Widgets",
     DASHBOARD_WIDGET_LIST_QUERIES_TITLE: "Queries",
 
+    DASHBOARD_VIEWER_NO_PINNED_DASHBOARD_TITLE: "No pinned dashboard",
+    DASHBOARD_VIEWER_NO_PINNED_DASHBOARD_DESCRIPTION:
+      "Pin a dashboard to quickly access it from this page.",
+
     ADD_DASHBOARD_BUTTON_TEXT: "Add dashboard",
     ADD_DASHBOARD_FORM_TITLE: "Add dashboard",
     ADD_DASHBOARD_FORM_DASHBOARD_ADDITION_SUCCESS:
@@ -812,6 +816,9 @@ export const CONSTANTS = {
 
     TENANTS_STATS_TITLE: "Tenant Stats",
     TENANTS_STATS_ADD_TENANT_BUTTON: "Add tenant",
+
+    DATABASE_CHARTS_STATS_TITLE: "Charts Stats",
+    DATABASE_QUERIES_STATS_TITLE: "Queries Stats",
   },
 
   LOCAL_STORAGE_KEYS: {

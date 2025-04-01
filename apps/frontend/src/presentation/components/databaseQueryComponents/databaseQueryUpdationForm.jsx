@@ -142,12 +142,21 @@ export const DatabaseQueryUpdationForm = ({ tenantID, databaseQueryID }) => {
           <span className="text-xs text-[#646cff] mt-2">{`Query ID: ${
             databaseQuery.databaseQueryID
           } | ${
-            databaseQuery.tblDatabaseChartQueryMappings &&
-            `Used in ${databaseQuery.tblDatabaseChartQueryMappings?.length} ${
-              databaseQuery.tblDatabaseChartQueryMappings?.length > 1
-                ? "charts"
-                : "chart"
-            }`
+            databaseQuery.linkedDatabaseChartCount > 0
+              ? `Used in ${databaseQuery.linkedDatabaseChartCount} ${
+                  databaseQuery.linkedDatabaseChartCount > 1
+                    ? "charts"
+                    : "chart"
+                } `
+              : `Not used in any chart`
+          } | ${
+            databaseQuery.linkedDatabaseWidgetCount > 0
+              ? `Used in ${databaseQuery.linkedDatabaseWidgetCount} ${
+                  databaseQuery.linkedDatabaseWidgetCount > 1
+                    ? "widgets"
+                    : "widget"
+                } `
+              : `Not used in any widget`
           }`}</span>
         )}
       </div>

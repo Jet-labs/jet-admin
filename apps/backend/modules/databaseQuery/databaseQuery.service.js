@@ -14,10 +14,7 @@ const databaseQueryService = {};
  * @param {number} param0.tenantID
  * @returns {Promise<Array<object>>}
  */
-databaseQueryService.getAllDatabaseQueries = async ({
-  userID,
-  tenantID,
-}) => {
+databaseQueryService.getAllDatabaseQueries = async ({ userID, tenantID }) => {
   Logger.log("info", {
     message: "databaseQueryService:getAllDatabaseQueries:params",
     params: {
@@ -31,15 +28,32 @@ databaseQueryService.getAllDatabaseQueries = async ({
       where: {
         tenantID: parseInt(tenantID),
       },
+      include: {
+        _count: {
+          select: {
+            tblDatabaseChartQueryMappings: true,
+            tblDatabaseWidgetQueryMappings: true,
+          },
+        },
+      },
     });
+
+    // Transform the result to include counts in a more accessible format
+    const transformedQueries = databaseQueries.map((query) => ({
+      ...query,
+      linkedDatabaseChartCount: query._count.tblDatabaseChartQueryMappings,
+      linkedDatabaseWidgetCount: query._count.tblDatabaseWidgetQueryMappings,
+      _count: undefined, // Remove the _count property
+    }));
+
     Logger.log("success", {
       message: "databaseQueryService:getAllDatabaseQueries:success",
       params: {
         userID,
-        databaseQueries,
+        databaseQueries: transformedQueries,
       },
     });
-    return databaseQueries;
+    return transformedQueries;
   } catch (error) {
     Logger.log("error", {
       message: "databaseQueryService:getAllDatabaseQueries:failure",
@@ -331,11 +345,12 @@ databaseQueryService.runMultipleDatabaseQueries = async ({
 };
 
 /**
- *
+ * Get database query by ID
  * @param {object} param0
  * @param {number} param0.userID
- * @param {string} param0.databaseQueryID
- * @returns {Promise<Array<object>>}
+ * @param {number} param0.tenantID
+ * @param {number} param0.databaseQueryID
+ * @returns {Promise<object>}
  */
 databaseQueryService.getDatabaseQueryByID = async ({
   userID,
@@ -358,17 +373,37 @@ databaseQueryService.getDatabaseQueryByID = async ({
         databaseQueryID: parseInt(databaseQueryID),
       },
       include: {
-        tblDatabaseChartQueryMappings: true,
+        _count: {
+          select: {
+            tblDatabaseChartQueryMappings: true,
+            tblDatabaseWidgetQueryMappings: true,
+          },
+        },
       },
     });
+
+    if (!databaseQuery) {
+      throw new Error(`Database query with ID ${databaseQueryID} not found`);
+    }
+
+    // Transform the result to include counts in a more accessible format
+    const transformedQuery = {
+      ...databaseQuery,
+      linkedDatabaseChartCount:
+        databaseQuery._count.tblDatabaseChartQueryMappings,
+      linkedDatabaseWidgetCount:
+        databaseQuery._count.tblDatabaseWidgetQueryMappings,
+      _count: undefined, // Remove the _count property
+    };
+
     Logger.log("success", {
       message: "databaseQueryService:getDatabaseQueryByID:success",
       params: {
         userID,
-        databaseQuery,
+        databaseQuery: transformedQuery,
       },
     });
-    return databaseQuery;
+    return transformedQuery;
   } catch (error) {
     Logger.log("error", {
       message: "databaseQueryService:getDatabaseQueryByID:failure",
