@@ -23,6 +23,7 @@ import { useAuthState } from "../../../../logic/contexts/authContext";
 import { useTenantState } from "../../../../logic/contexts/tenantContext";
 import { NoEntityUI } from "../../ui/noEntityUI";
 import { TenantSelectionDropdown } from "../../tenantComponents/tenantSelectionDropdown";
+import { BiLogoPostgresql } from "react-icons/bi";
 const defaultMenuItemExpandedState = {
   databaseSchema: false,
   userManagement: false,
@@ -207,7 +208,15 @@ export const MainDrawerList = ({ currentPageTitle }) => {
                   : "bg-slate-100"
               } rounded mb-2 w-full p-2 text-slate-700 transition duration-75 group bg-slate-200  hover:bg-slate-100  flex-row !justify-start mt-2 `}
             >
-              <RiDashboardFill className="!w-5 !h-5 !text-slate-600" />
+              <RiDashboardFill
+                className={`!w-5 !h-5 ${
+                  decodeURIComponent(location.pathname).includes(
+                    CONSTANTS.ROUTES.VIEW_DATABASE_DASHBOARDS.path(tenantID)
+                  )
+                    ? "!text-[#646cff]"
+                    : "!text-slate-700"
+                }`}
+              />
               <span
                 className={`font-semibold text-sm ml-2 ${
                   decodeURIComponent(location.pathname).includes(
@@ -233,7 +242,15 @@ export const MainDrawerList = ({ currentPageTitle }) => {
                   : "bg-slate-100"
               } rounded mb-2 w-full p-2 text-slate-700 transition duration-75 group bg-slate-200  hover:bg-slate-100  flex-row !justify-start mt-2 `}
             >
-              <FaChartPie className="!w-5 !h-5 !text-slate-600" />
+              <FaChartPie
+                className={`!w-5 !h-5 ${
+                  decodeURIComponent(location.pathname).includes(
+                    CONSTANTS.ROUTES.VIEW_DATABASE_CHARTS.path(tenantID)
+                  )
+                    ? "!text-[#646cff]"
+                    : "!text-slate-700"
+                }`}
+              />
               <span
                 className={`font-semibold text-sm ml-2 ${
                   decodeURIComponent(location.pathname).includes(
@@ -259,7 +276,15 @@ export const MainDrawerList = ({ currentPageTitle }) => {
                   : "bg-slate-100"
               } rounded mb-2 w-full p-2 text-slate-700 transition duration-75 group bg-slate-200  hover:bg-slate-100  flex-row !justify-start mt-2 `}
             >
-              <MdWidgets className="!w-5 !h-5 !text-slate-600" />
+              <MdWidgets
+                className={`!w-5 !h-5 ${
+                  decodeURIComponent(location.pathname).includes(
+                    CONSTANTS.ROUTES.VIEW_DATABASE_WIDGETS.path(tenantID)
+                  )
+                    ? "!text-[#646cff]"
+                    : "!text-slate-700"
+                }`}
+              />
               <span
                 className={`font-semibold text-sm ml-2 ${
                   decodeURIComponent(location.pathname).includes(
@@ -285,7 +310,15 @@ export const MainDrawerList = ({ currentPageTitle }) => {
                   : "bg-slate-100"
               } rounded mb-2 w-full p-2 text-slate-700 transition duration-75 group bg-slate-200  hover:bg-slate-100  flex-row !justify-start mt-2 `}
             >
-              <SiQuantconnect className="!w-5 !h-5 !text-slate-600" />
+              <SiQuantconnect
+                className={`!w-5 !h-5 ${
+                  decodeURIComponent(location.pathname).includes(
+                    CONSTANTS.ROUTES.VIEW_DATABASE_QUERIES.path(tenantID)
+                  )
+                    ? "!text-[#646cff]"
+                    : "!text-slate-700"
+                }`}
+              />
               <span
                 className={`font-semibold text-sm ml-2 ${
                   decodeURIComponent(location.pathname).includes(
@@ -339,7 +372,15 @@ export const MainDrawerList = ({ currentPageTitle }) => {
                   : "bg-slate-100"
               } rounded mb-2 w-full p-2 text-slate-700 transition duration-75 group bg-slate-200  hover:bg-slate-100  flex-row !justify-start mt-2 `}
             >
-              <FaKey className="!w-5 !h-5 !text-slate-600" />
+              <FaKey
+                className={`!w-5 !h-5 ${
+                  decodeURIComponent(location.pathname).includes(
+                    CONSTANTS.ROUTES.VIEW_API_KEYS.path(tenantID)
+                  )
+                    ? "!text-[#646cff]"
+                    : "!text-slate-700"
+                }`}
+              />
               <span
                 className={`font-semibold text-sm ml-2 ${
                   decodeURIComponent(location.pathname).includes(
@@ -350,6 +391,39 @@ export const MainDrawerList = ({ currentPageTitle }) => {
                 }`}
               >
                 {capitalize(CONSTANTS.STRINGS.MAIN_DRAWER_API_KEYS_TITLE)}
+              </span>
+            </Link>
+
+            <Link
+              to={CONSTANTS.ROUTES.RAW_SQL_QUERY.path(tenantID)}
+              key={CONSTANTS.ROUTES.RAW_SQL_QUERY.path(tenantID)}
+              class={`flex items-center ${
+                decodeURIComponent(location.pathname).includes(
+                  CONSTANTS.ROUTES.RAW_SQL_QUERY.path(tenantID)
+                )
+                  ? "bg-[#eaebff]"
+                  : "bg-slate-100"
+              } rounded mb-2 w-full p-2 text-slate-700 transition duration-75 group bg-slate-200  hover:bg-slate-100  flex-row !justify-start mt-2 `}
+            >
+              <BiLogoPostgresql
+                className={`!w-5 !h-5 ${
+                  decodeURIComponent(location.pathname).includes(
+                    CONSTANTS.ROUTES.RAW_SQL_QUERY.path(tenantID)
+                  )
+                    ? "!text-[#646cff]"
+                    : "!text-slate-700"
+                }`}
+              />
+              <span
+                className={`font-semibold text-sm ml-2 ${
+                  decodeURIComponent(location.pathname).includes(
+                    CONSTANTS.ROUTES.RAW_SQL_QUERY.path(tenantID)
+                  )
+                    ? "!text-[#646cff]"
+                    : "!text-slate-700"
+                }`}
+              >
+                {capitalize(CONSTANTS.STRINGS.MAIN_DRAWER_SQL_EDITOR_TITLE)}
               </span>
             </Link>
 

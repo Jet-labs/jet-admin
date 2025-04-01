@@ -43,6 +43,7 @@ export const CONSTANTS = {
     MAIN_DRAWER_DATABASE_WIDGETS_TITLE: "Widgets",
     MAIN_DRAWER_DATABASE_NOTIFICATIONS_TITLE: "Notifications",
     MAIN_DRAWER_API_KEYS_TITLE: "API Keys",
+    MAIN_DRAWER_SQL_EDITOR_TITLE: "PG SQL Editor",
     MAIN_DRAWER_DATABASE_QUERIES_TITLE: "Database queries",
     MAIN_DRAWER_ADD_DATABASE_SCHEMA_BUTTON: "Add schema",
     MAIN_DRAWER_USER_MANAGEMENT_TITLE: "User management",
@@ -819,6 +820,17 @@ export const CONSTANTS = {
 
     DATABASE_CHARTS_STATS_TITLE: "Charts Stats",
     DATABASE_QUERIES_STATS_TITLE: "Queries Stats",
+    QUERY_EXECUTED_SUCCESSFULLY: "Query executed successfully",
+    RAW_QUERY_EXCECUTOR_TITLE: "Raw SQL Query Executor",
+    RAW_QUERY_EXCECUTOR_DESCRIPTION:
+      "Execute raw SQL queries against your database",
+    RAW_QUERY_EXCECUTOR_QUERY_LABEL: "SQL query",
+    RAW_QUERY_EXCECUTOR_EXECUTE_BUTTON: "Execute",
+    RAW_QUERY_EXCECUTOR_CLEAR_BUTTON: "Clear",
+    RAW_QUERY_EXCECUTOR_PLACEHOLDER: "Enter your SQL query here",
+    RAW_QUERY_EXCECUTOR_RESULT_TITLE: "Query result",
+    RAW_QUERY_EXCECUTOR_RESULT_PLACEHOLDER: "No results to display",
+    RAW_QUERY_EXCECUTOR_RESULT_PLACEHOLDER_ERROR: "Error executing query",
   },
 
   LOCAL_STORAGE_KEYS: {
@@ -858,6 +870,10 @@ export const CONSTANTS = {
       code: "/tenants/:tenantID/schemas/:databaseSchemaName",
       path: (tenantID, databaseSchemaName) =>
         `/tenants/${tenantID}/schemas/${databaseSchemaName}`,
+    },
+    RAW_SQL_QUERY: {
+      code: "/tenants/:tenantID/raw-sql-query",
+      path: (tenantID) => `/tenants/${tenantID}/raw-sql-query`,
     },
     ADD_DATABASE_TABLE: {
       code: "/tenants/:tenantID/schemas/:databaseSchemaName/tables/add",
@@ -1078,6 +1094,8 @@ export const CONSTANTS = {
     DATABASE: {
       getDatabaseMetadataAPI: (tenantID) =>
         `/api/v1/tenants/${tenantID}/database/metadata`,
+      executeRawSQLQueryAPI: (tenantID) =>
+        `/api/v1/tenants/${tenantID}/database/execute-raw-sql`,
       createDatabaseSchemaAPI: (tenantID) =>
         `/api/v1/tenants/${tenantID}/database/schemas`,
       getAllDatabaseTablesAPI: (tenantID, databaseSchemaName) =>
