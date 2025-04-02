@@ -1,3 +1,6 @@
+const {
+  tenantAwarePostgreSQLPoolManager,
+} = require("../../config/tenant-aware-pgpool-manager.config");
 const constants = require("../../constants");
 const { expressUtils } = require("../../utils/express.utils");
 const Logger = require("../../utils/logger");
@@ -58,8 +61,6 @@ tenantMiddleware.checkIfUserIsAdmin = async (req, res, next) => {
   }
 };
 
-
-
 /**
  *
  * @param {import("express").Request} req
@@ -106,6 +107,52 @@ tenantMiddleware.checkTenantCreationLimit = async function (req, res, next) {
     });
     return res.json({
       error,
+    });
+  }
+};
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @param {import("express").NextFunction} next
+ * @returns
+ */
+tenantMiddleware.poolProvider = async (req, res, next) => {
+  try {
+    const { user } = req;
+    const { tenantID } = req.params;
+    Logger.log("info", {
+      message: "tenantMiddleware:poolProvider:params",
+      params: { userID: user.userID, tenantID },
+    });
+
+    if (!tenantID) {
+      Logger.log("error", {
+        message: "tenantMiddleware:poolProvider:catch-2",
+        params: {
+          userID: user.userID,
+          tenantID,
+          error: constants.ERROR_CODES.INVALID_TENANT,
+        },
+      });
+      return res.json({
+        error: constants.ERROR_CODES.INVALID_TENANT,
+      });
+    }
+    req.dbPool = await tenantAwarePostgreSQLPoolManager.getPool(tenantID);
+    Logger.log("success", {
+      message: "tenantMiddleware:poolProvider:dbPool",
+      params: { userID: user.userID, tenantID },
+    });
+    next();
+  } catch (error) {
+    Logger.log("error", {
+      message: "tenantMiddleware:poolProvider:catch-1",
+      params: { error },
+    });
+    return res.json({
+      error: constants.ERROR_CODES.SERVER_ERROR,
     });
   }
 };

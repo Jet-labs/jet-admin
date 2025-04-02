@@ -1188,64 +1188,64 @@ export const CONSTANTS = {
         `/api/v1/tenants/${tenantID}/database/schemas/${databaseSchemaName}/triggers/${databaseTableName}/${databaseTriggerName}`,
 
       getAllDatabaseQueriesAPI: (tenantID) =>
-        `/api/v1/tenants/${tenantID}/database/queries/`,
+        `/api/v1/tenants/${tenantID}/queries/`,
 
       createDatabaseQueryAPI: (tenantID) =>
-        `/api/v1/tenants/${tenantID}/database/queries/`,
+        `/api/v1/tenants/${tenantID}/queries/`,
 
       testDatabaseQueryAPI: (tenantID) =>
-        `/api/v1/tenants/${tenantID}/database/queries/queryTest`,
+        `/api/v1/tenants/${tenantID}/queries/queryTest`,
       getDatabaseQueryByID: (tenantID, databaseQueryID) =>
-        `/api/v1/tenants/${tenantID}/database/queries/${databaseQueryID}`,
+        `/api/v1/tenants/${tenantID}/queries/${databaseQueryID}`,
       testDatabaseQueryByIDAPI: (tenantID, databaseQueryID) =>
-        `/api/v1/tenants/${tenantID}/database/queries/${databaseQueryID}/queryTest`,
+        `/api/v1/tenants/${tenantID}/queries/${databaseQueryID}/queryTest`,
       updateDatabaseQueryByID: (tenantID, databaseQueryID) =>
-        `/api/v1/tenants/${tenantID}/database/queries/${databaseQueryID}`,
+        `/api/v1/tenants/${tenantID}/queries/${databaseQueryID}`,
       deleteDatabaseQueryByID: (tenantID, databaseQueryID) =>
-        `/api/v1/tenants/${tenantID}/database/queries/${databaseQueryID}`,
+        `/api/v1/tenants/${tenantID}/queries/${databaseQueryID}`,
 
       getAllDatabaseChartsAPI: (tenantID) =>
-        `/api/v1/tenants/${tenantID}/database/charts/`,
+        `/api/v1/tenants/${tenantID}/charts/`,
 
       createDatabaseChartAPI: (tenantID) =>
-        `/api/v1/tenants/${tenantID}/database/charts/`,
+        `/api/v1/tenants/${tenantID}/charts/`,
       getDatabaseChartByIDAPI: (tenantID, databaseChartID) =>
-        `/api/v1/tenants/${tenantID}/database/charts/${databaseChartID}`,
+        `/api/v1/tenants/${tenantID}/charts/${databaseChartID}`,
       updateDatabaseChartByIDAPI: (tenantID, databaseChartID) =>
-        `/api/v1/tenants/${tenantID}/database/charts/${databaseChartID}`,
+        `/api/v1/tenants/${tenantID}/charts/${databaseChartID}`,
       getDatabaseChartDataByIDAPI: (tenantID, databaseChartID) =>
-        `/api/v1/tenants/${tenantID}/database/charts/${databaseChartID}/data`,
+        `/api/v1/tenants/${tenantID}/charts/${databaseChartID}/data`,
       getDatabaseChartDataUsingChartAPI: (tenantID, databaseChartID) =>
-        `/api/v1/tenants/${tenantID}/database/charts/${databaseChartID}/data`,
+        `/api/v1/tenants/${tenantID}/charts/${databaseChartID}/data`,
       deleteDatabaseChartByID: (tenantID, databaseChartID) =>
-        `/api/v1/tenants/${tenantID}/database/charts/${databaseChartID}`,
+        `/api/v1/tenants/${tenantID}/charts/${databaseChartID}`,
 
       getAllDatabaseWidgetsAPI: (tenantID) =>
-        `/api/v1/tenants/${tenantID}/database/widgets/`,
+        `/api/v1/tenants/${tenantID}/widgets/`,
 
       createDatabaseWidgetAPI: (tenantID) =>
-        `/api/v1/tenants/${tenantID}/database/widgets/`,
+        `/api/v1/tenants/${tenantID}/widgets/`,
       getDatabaseWidgetByIDAPI: (tenantID, databaseWidgetID) =>
-        `/api/v1/tenants/${tenantID}/database/widgets/${databaseWidgetID}`,
+        `/api/v1/tenants/${tenantID}/widgets/${databaseWidgetID}`,
       updateDatabaseWidgetByIDAPI: (tenantID, databaseWidgetID) =>
-        `/api/v1/tenants/${tenantID}/database/widgets/${databaseWidgetID}`,
+        `/api/v1/tenants/${tenantID}/widgets/${databaseWidgetID}`,
       getDatabaseWidgetDataByIDAPI: (tenantID, databaseWidgetID) =>
-        `/api/v1/tenants/${tenantID}/database/widgets/${databaseWidgetID}/data`,
+        `/api/v1/tenants/${tenantID}/widgets/${databaseWidgetID}/data`,
       getDatabaseWidgetDataUsingWidgetAPI: (tenantID, databaseWidgetID) =>
-        `/api/v1/tenants/${tenantID}/database/widgets/${databaseWidgetID}/data`,
+        `/api/v1/tenants/${tenantID}/widgets/${databaseWidgetID}/data`,
       deleteDatabaseWidgetByID: (tenantID, databaseWidgetID) =>
-        `/api/v1/tenants/${tenantID}/database/widgets/${databaseWidgetID}`,
+        `/api/v1/tenants/${tenantID}/widgets/${databaseWidgetID}`,
 
       getAllDatabaseDashboardsAPI: (tenantID) =>
-        `/api/v1/tenants/${tenantID}/database/dashboards/`,
+        `/api/v1/tenants/${tenantID}/dashboards/`,
       createDatabaseDashboardAPI: (tenantID) =>
-        `/api/v1/tenants/${tenantID}/database/dashboards/`,
+        `/api/v1/tenants/${tenantID}/dashboards/`,
       getDatabaseDashboardByIDAPI: (tenantID, databaseDashboardID) =>
-        `/api/v1/tenants/${tenantID}/database/dashboards/${databaseDashboardID}`,
+        `/api/v1/tenants/${tenantID}/dashboards/${databaseDashboardID}`,
       updateDatabaseDashboardByIDAPI: (tenantID, databaseDashboardID) =>
-        `/api/v1/tenants/${tenantID}/database/dashboards/${databaseDashboardID}`,
+        `/api/v1/tenants/${tenantID}/dashboards/${databaseDashboardID}`,
       deleteDatabaseDashboardByID: (tenantID, databaseDashboardID) =>
-        `/api/v1/tenants/${tenantID}/database/dashboards/${databaseDashboardID}`,
+        `/api/v1/tenants/${tenantID}/dashboards/${databaseDashboardID}`,
       getAllDatabaseNotificationsAPI: (tenantID) =>
         `/api/v1/tenants/${tenantID}/database/notifications`,
       getDatabaseNotificationByIDAPI: (tenantID, databaseNotificationID) =>
