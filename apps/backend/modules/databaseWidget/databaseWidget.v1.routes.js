@@ -7,40 +7,40 @@ const { authMiddleware } = require("../auth/auth.middleware");
 
 router.get(
   "/",
-  authMiddleware.checkUserPermissions(["tenant:database:widget:list"]),
+  authMiddleware.checkUserPermissions(["tenant:widget:list"]),
   databaseWidgetController.getAllDatabaseWidgets
 );
 router.post(
   "/",
-  authMiddleware.checkUserPermissions(["tenant:database:widget:create"]),
+  authMiddleware.checkUserPermissions(["tenant:widget:create"]),
   databaseWidgetController.createDatabaseWidget
 );
 
 router.get(
   "/:databaseWidgetID",
-  authMiddleware.checkUserPermissions(["tenant:database:widget:read"]),
+  authMiddleware.checkUserPermissions(["tenant:widget:read"]),
   databaseWidgetController.getDatabaseWidgetByID
 );
 
 router.get(
   "/:databaseWidgetID/data",
-  authMiddleware.checkUserPermissions(["tenant:database:widget:test"]),
+  authMiddleware.checkUserPermissions(["tenant:widget:test"]),
   databaseWidgetController.getDatabaseWidgetDataByID
 );
 
 router.post(
   "/:databaseWidgetID/data",
-  authMiddleware.checkUserPermissions(["tenant:database:widget:test"]),
+  authMiddleware.checkUserPermissions(["tenant:widget:test"]),
   databaseWidgetController.getDatabaseWidgetDataUsingDatabaseWidget
 );
 router.patch(
   "/:databaseWidgetID",
-  authMiddleware.checkUserPermissions(["tenant:database:widget:update"]),
+  authMiddleware.checkUserPermissions(["tenant:widget:update"]),
   databaseWidgetController.updateDatabaseWidgetByID
 );
 router.delete(
   "/:databaseWidgetID",
-  authMiddleware.checkUserPermissions(["tenant:database:widget:delete"]),
+  authMiddleware.checkUserPermissions(["tenant:widget:delete"]),
   databaseWidgetController.deleteDatabaseWidgetByID
 );
 

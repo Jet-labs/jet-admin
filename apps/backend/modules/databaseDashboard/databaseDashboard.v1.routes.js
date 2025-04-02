@@ -7,30 +7,30 @@ const { authMiddleware } = require("../auth/auth.middleware");
 
 router.get(
   "/",
-  authMiddleware.checkUserPermissions(["tenant:database:dashboard:list"]),
+  authMiddleware.checkUserPermissions(["tenant:dashboard:list"]),
   databaseDashboardController.getAllDatabaseDashboards
 );
 router.post(
   "/",
-  authMiddleware.checkUserPermissions(["tenant:database:dashboard:create"]),
+  authMiddleware.checkUserPermissions(["tenant:dashboard:create"]),
   databaseDashboardController.createDatabaseDashboard
 );
 
 router.get(
   "/:databaseDashboardID",
-  authMiddleware.checkUserPermissions(["tenant:database:dashboard:read"]),
+  authMiddleware.checkUserPermissions(["tenant:dashboard:read"]),
   databaseDashboardController.getDatabaseDashboardByID
 );
 
 router.patch(
   "/:databaseDashboardID",
-  authMiddleware.checkUserPermissions(["tenant:database:dashboard:update"]),
+  authMiddleware.checkUserPermissions(["tenant:dashboard:update"]),
   databaseDashboardController.updateDatabaseDashboardByID
 );
 
 router.delete(
   "/:databaseDashboardID",
-  authMiddleware.checkUserPermissions(["tenant:database:dashboard:delete"]),
+  authMiddleware.checkUserPermissions(["tenant:dashboard:delete"]),
   databaseDashboardController.deleteDatabaseDashboardByID
 );
 

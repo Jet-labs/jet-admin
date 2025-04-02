@@ -7,40 +7,40 @@ const { authMiddleware } = require("../auth/auth.middleware");
 
 router.get(
   "/",
-  authMiddleware.checkUserPermissions(["tenant:database:chart:list"]),
+  authMiddleware.checkUserPermissions(["tenant:chart:list"]),
   databaseChartController.getAllDatabaseCharts
 );
 router.post(
   "/",
-  authMiddleware.checkUserPermissions(["tenant:database:chart:create"]),
+  authMiddleware.checkUserPermissions(["tenant:chart:create"]),
   databaseChartController.createDatabaseChart
 );
 
 router.get(
   "/:databaseChartID",
-  authMiddleware.checkUserPermissions(["tenant:database:chart:read"]),
+  authMiddleware.checkUserPermissions(["tenant:chart:read"]),
   databaseChartController.getDatabaseChartByID
 );
 
 router.get(
   "/:databaseChartID/data",
-  authMiddleware.checkUserPermissions(["tenant:database:chart:test"]),
+  authMiddleware.checkUserPermissions(["tenant:chart:test"]),
   databaseChartController.getDatabaseChartDataByID
 );
 
 router.post(
   "/:databaseChartID/data",
-  authMiddleware.checkUserPermissions(["tenant:database:chart:test"]),
+  authMiddleware.checkUserPermissions(["tenant:chart:test"]),
   databaseChartController.getDatabaseChartDataUsingDatabaseChart
 );
 router.patch(
   "/:databaseChartID",
-  authMiddleware.checkUserPermissions(["tenant:database:chart:update"]),
+  authMiddleware.checkUserPermissions(["tenant:chart:update"]),
   databaseChartController.updateDatabaseChartByID
 );
 router.delete(
   "/:databaseChartID",
-  authMiddleware.checkUserPermissions(["tenant:database:chart:delete"]),
+  authMiddleware.checkUserPermissions(["tenant:chart:delete"]),
   databaseChartController.deleteDatabaseChartByID
 );
 
