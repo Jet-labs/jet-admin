@@ -28,7 +28,7 @@ const initialValues = {
         borderWidth: 1,
         type: CONSTANTS.DATABASE_CHART_TYPES.BAR_CHART.value,
       },
-      argsMap: {},
+      databaseQueryArgValues: {},
       datasetFields: {
         xAxis: "",
         yAxis: "",
@@ -173,9 +173,6 @@ export const DatabaseChartAdditionForm = ({ tenantID }) => {
         </ResizablePanel>
         <ResizableHandle withHandle={true} />
         <ResizablePanel defaultSize={80}>
-          {/* <DatabaseQueryResponseView
-            databaseQueryTestResult={databaseQueryTestResult}
-          /> */}
           <DatabaseChartPreview
             databaseChartName={addDatabaseChartForm.values.databaseChartName}
             databaseChartType={addDatabaseChartForm.values.databaseChartType}

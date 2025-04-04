@@ -9,7 +9,7 @@ import { DatabaseQueryArgsForm } from "./databaseQueryArgsForm";
 export const DatabaseQueryTestingForm = ({
   tenantID,
   databaseQueryID,
-  databaseQuery,
+  databaseQueryString,
   databaseQueryArgs,
   setDatabaseQueryTestResult,
 }) => {
@@ -23,11 +23,11 @@ export const DatabaseQueryTestingForm = ({
     data: databaseQueryTestResult,
     mutate: testDatabaseQuery,
   } = useMutation({
-    mutationFn: (databaseQuery) => {
+    mutationFn: (databaseQueryData) => {
       return testDatabaseQueryAPI({
         tenantID,
         databaseQueryID,
-        databaseQuery,
+        databaseQueryData,
       });
     },
     retry: false,
@@ -49,8 +49,8 @@ export const DatabaseQueryTestingForm = ({
       _handleOpenArgsForm();
     } else {
       testDatabaseQuery({
-        query: databaseQuery,
-        args: null,
+        databaseQueryString: databaseQueryString,
+        databaseQueryArgs: null,
       });
     }
   };
@@ -66,15 +66,10 @@ export const DatabaseQueryTestingForm = ({
   const _handleOnArgFormCompleted = (databaseQueryArgValues) => {
     setIsArgsFormOpen(false);
     testDatabaseQuery({
-      query: databaseQuery,
-      args: databaseQueryArgValues,
+      databaseQueryString: databaseQueryString,
+      databaseQueryArgValues: databaseQueryArgValues,
     });
   };
-  // useEffect(() => {
-  //   if (runQueryOnRender == true) {
-  //     _runQuery();
-  //   }
-  // }, [runQueryOnRender]);
 
   return (
     <>
@@ -83,7 +78,7 @@ export const DatabaseQueryTestingForm = ({
           open={isArgsFormOpen}
           onAccepted={_handleOnArgFormCompleted}
           onDecline={_handleOnArgFormDeclined}
-          args={databaseQueryArgs}
+          databaseQueryArgs={databaseQueryArgs}
         />
       )}
       <button

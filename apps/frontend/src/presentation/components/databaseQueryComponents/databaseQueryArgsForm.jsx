@@ -13,27 +13,27 @@ export const DatabaseQueryArgsForm = ({
   onDecline,
   onAccepted,
   open,
-  args,
+  databaseQueryArgs,
 }) => {
   const databaseQueryArgsForm = useFormik({
-    initialValues: args.reduce((acc, arg) => {
+    initialValues: databaseQueryArgs.reduce((acc, arg) => {
       acc[arg] = "";
       return acc;
     }, {}),
     validateOnMount: false,
     validateOnChange: false,
     validationSchema:
-      formValidations.databaseQueryArgsFormValidationSchema(args),
+      formValidations.databaseQueryArgsFormValidationSchema(databaseQueryArgs),
     onSubmit: (values) => {},
   });
 
   useEffect(() => {
-    if (databaseQueryArgsForm && args) {
-      args.forEach((arg) => {
+    if (databaseQueryArgsForm && databaseQueryArgs) {
+      databaseQueryArgs.forEach((arg) => {
         databaseQueryArgsForm.setFieldValue(arg, "");
       });
     }
-  }, [args]);
+  }, [databaseQueryArgs]);
 
   return (
     <Dialog
@@ -56,7 +56,7 @@ export const DatabaseQueryArgsForm = ({
           {CONSTANTS.STRINGS.DATABASE_QUERY_ARGS_FORM_DESCRIPTION}
         </span>
         <div className="space-y-4">
-          {args.map((arg) => (
+          {databaseQueryArgs.map((arg) => (
             <div key={arg} className="space-y-1">
               <label htmlFor={arg} className="text-xs font-light text-gray-500">
                 {arg}
@@ -86,9 +86,11 @@ export const DatabaseQueryArgsForm = ({
         <button
           type="button"
           onClick={() => onAccepted(databaseQueryArgsForm.values)}
-          disabled={args.some((arg) => !databaseQueryArgsForm.values[arg])}
+          disabled={databaseQueryArgs.some(
+            (arg) => !databaseQueryArgsForm.values[arg]
+          )}
           className={`px-2.5 py-1.5 text-white text-sm bg-[#646cff] rounded hover:outline-none hover:border-0 border-0 outline-none ${
-            args.some((arg) => !databaseQueryArgsForm.values[arg])
+            databaseQueryArgs.some((arg) => !databaseQueryArgsForm.values[arg])
               ? "opacity-50 cursor-not-allowed"
               : ""
           }`}

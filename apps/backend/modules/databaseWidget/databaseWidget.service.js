@@ -1,11 +1,6 @@
 const Logger = require("../../utils/logger");
 const { prisma } = require("../../config/prisma.config");
 const {
-  TenantAwarePostgreSQLPoolManager,
-} = require("../../config/tenant-aware-pgpool-manager.config");
-const jsonSchemaGenerator = require("json-schema-generator");
-const { postgreSQLParserUtil } = require("../../utils/postgresql.util");
-const {
   databaseQueryService,
 } = require("../databaseQuery/databaseQuery.service");
 const { databaseWidgetProcessor } = require("./databaseWidget.processor");
@@ -19,10 +14,7 @@ const databaseWidgetService = {};
  * @param {number} param0.tenantID
  * @returns {Promise<Array<object>>}
  */
-databaseWidgetService.getAllDatabaseWidgets = async ({
-  userID,
-  tenantID,
-}) => {
+databaseWidgetService.getAllDatabaseWidgets = async ({ userID, tenantID }) => {
   Logger.log("info", {
     message: "databaseWidgetService:getAllDatabaseWidgets:params",
     params: {
@@ -109,7 +101,7 @@ databaseWidgetService.createDatabaseWidget = async ({
             title: databaseQuery.title,
             parameters: databaseQuery.parameters,
             datasetFields: databaseQuery.datasetFields,
-            argsMap: databaseQuery.argsMap,
+            databaseQueryArgValues: databaseQuery.databaseQueryArgValues,
           };
         }),
       });
@@ -247,8 +239,9 @@ databaseWidgetService.getDatabaseWidgetDataByID = async ({
     const queriesToExecute = databaseWidget.tblDatabaseWidgetQueryMappings.map(
       (mapping) => ({
         databaseQueryID: mapping.databaseQueryID,
-        databaseQuery: mapping.tblDatabaseQueries.databaseQuery,
-        argsMap: mapping.argsMap,
+        databaseQueryString:
+          mapping.tblDatabaseQueries.databaseQueryData.databaseQueryString,
+        databaseQueryArgValues: mapping.databaseQueryArgValues,
       })
     );
 
@@ -264,7 +257,7 @@ databaseWidgetService.getDatabaseWidgetDataByID = async ({
     const queryResults = await databaseQueryService.runMultipleDatabaseQueries({
       userID,
       dbPool,
-      queries: queriesToExecute,
+      databaseQueriesData: queriesToExecute,
     });
 
     let processedData;
@@ -291,11 +284,15 @@ databaseWidgetService.getDatabaseWidgetDataByID = async ({
       data: processedData,
     };
   } catch (error) {
-    Logger.log("error", "databaseWidgetService:getDatabaseWidgetDataByID:error", {
-      error: error.message,
-      databaseWidgetID,
-      userID,
-    });
+    Logger.log(
+      "error",
+      "databaseWidgetService:getDatabaseWidgetDataByID:error",
+      {
+        error: error.message,
+        databaseWidgetID,
+        userID,
+      }
+    );
     throw error;
   }
 };
@@ -354,10 +351,10 @@ databaseWidgetService.getDatabaseWidgetDataUsingDatabaseWidget = async ({
     const queriesToExecute = databaseWidget.databaseQueries.map(
       (databaseQuery) => ({
         databaseQueryID: databaseQuery.databaseQueryID,
-        // struct | databaseQuery:{query:"Some query"}
-        databaseQuery:
-          databaseQueryIDMap[databaseQuery.databaseQueryID].databaseQuery,
-        argsMap: databaseQuery.argsMap,
+        databaseQueryString:
+          databaseQueryIDMap[databaseQuery.databaseQueryID].databaseQueryData
+            .databaseQueryString,
+        databaseQueryArgValues: databaseQuery.databaseQueryArgValues,
       })
     );
 
@@ -373,7 +370,7 @@ databaseWidgetService.getDatabaseWidgetDataUsingDatabaseWidget = async ({
     const queryResults = await databaseQueryService.runMultipleDatabaseQueries({
       userID,
       dbPool,
-      queries: queriesToExecute,
+      databaseQueriesData: queriesToExecute,
     });
 
     Logger.log("info", {
@@ -436,7 +433,7 @@ databaseWidgetService.getDatabaseWidgetDataUsingDatabaseWidget = async ({
  * @param {JSON} [params.databaseQueries[].parameters] - Query parameters
  * @param {number} [params.databaseQueries[].executionOrder] - Execution order of queries
  * @param {JSON} [params.databaseQueries[].datasetFields] - Dataset field definitions
- * @param {JSON} [params.databaseQueries[].argsMap] - Argument mappings
+ * @param {JSON} [params.databaseQueries[].databaseQueryArgValues] - Argument mappings
  *
  * @returns {Promise<boolean>} True if update succeeded
  * @throws {Error} If database operation fails
@@ -507,7 +504,7 @@ databaseWidgetService.updateDatabaseWidgetByID = async ({
             parameters: q.parameters,
             executionOrder: q.executionOrder,
             datasetFields: q.datasetFields,
-            argsMap: q.argsMap,
+            databaseQueryArgValues: q.databaseQueryArgValues,
           })),
         });
       }

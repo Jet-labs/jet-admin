@@ -18,7 +18,7 @@ export const DatabaseChartDatasetFieldMapping = ({
 }) => {
   const datasetFieldMappingForm = useFormik({
     initialValues: {
-      argsMap: {},
+      databaseQueryArgValues: {},
       datasetFields: {
         xAxis: "",
         yAxis: "",
@@ -37,8 +37,8 @@ export const DatabaseChartDatasetFieldMapping = ({
         values.datasetFields
       );
       chartForm.setFieldValue(
-        `databaseQueries[${datasetIndex}].argsMap`,
-        values.argsMap
+        `databaseQueries[${datasetIndex}].databaseQueryArgValues`,
+        values.databaseQueryArgValues
       );
       onClose();
     },

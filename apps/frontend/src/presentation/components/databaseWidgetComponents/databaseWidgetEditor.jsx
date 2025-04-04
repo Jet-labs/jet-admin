@@ -34,7 +34,7 @@ export const DatabaseWidgetEditor = ({ databaseWidgetEditorForm }) => {
           type: CONSTANTS.DATABASE_WIDGET_TYPES.TEXT_WIDGET.value,
           color: "#D84545",
         },
-        argsMap: {},
+        databaseQueryArgValues: {},
         datasetFields: {
           xAxis: "",
           yAxis: "",
