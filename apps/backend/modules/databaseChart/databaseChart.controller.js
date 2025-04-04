@@ -178,13 +178,15 @@ databaseChartController.getDatabaseChartDataByID = async (req, res) => {
   });
 
   try {
-    const databaseChartData =
-      await databaseChartService.getDatabaseChartDataByID({
-        userID: parseInt(user.userID, 10),
-        tenantID,
-        dbPool,
-        databaseChartID,
-      });
+    const {
+      databaseMultipleQueryRunnerJobID,
+      databaseMultipleQueryRunnerJobStatus,
+    } = await databaseChartService.getDatabaseChartDataByID({
+      userID: parseInt(user.userID, 10),
+      tenantID,
+      dbPool,
+      databaseChartID,
+    });
 
     Logger.log(
       "success",
@@ -196,8 +198,8 @@ databaseChartController.getDatabaseChartDataByID = async (req, res) => {
     );
 
     return expressUtils.sendResponse(res, true, {
-      databaseChartData,
-      message: "Chart data retrieved successfully",
+      databaseChartRunnerJobID: databaseMultipleQueryRunnerJobID,
+      databaseChartRunnerJobStatus: databaseMultipleQueryRunnerJobStatus,
     });
   } catch (error) {
     Logger.log(

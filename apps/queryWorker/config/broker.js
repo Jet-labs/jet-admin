@@ -47,10 +47,30 @@ const postQueryRunnerJobResult = async (databaseQueryRunnerJobID, result) => {
   });
 };
 
+const postMultipleQueryRunnerJobResult = async (
+  databaseMultipleQueryRunnerJobID,
+  result
+) => {
+  await kafkaQueryRunnerJobResultProducer.send({
+    topic:
+      constants.KAFKA_TOPIC_NAMES.DATABASE_MULTIPLE_QUERY_RUNNER_JOB_RESULTS,
+    messages: [
+      { key: databaseMultipleQueryRunnerJobID, value: JSON.stringify(result) },
+    ],
+  });
+  Logger.log("success", {
+    message: "kafka:postMultipleQueryRunnerJobResult:success",
+    params: { databaseMultipleQueryRunnerJobID },
+  });
+};
+
 const listenQueryRunnerJobs = async () => {
   await kafkaQueryRunnerJobConsumer.connect();
   await kafkaQueryRunnerJobConsumer.subscribe({
-    topic: constants.KAFKA_TOPIC_NAMES.DATABASE_QUERY_RUNNER_JOBS,
+    topics: [
+      constants.KAFKA_TOPIC_NAMES.DATABASE_QUERY_RUNNER_JOBS,
+      constants.KAFKA_TOPIC_NAMES.DATABASE_MULTIPLE_QUERY_RUNNER_JOBS,
+    ],
     fromBeginning: true,
   });
   await kafkaQueryRunnerJobConsumer.run({
@@ -59,7 +79,7 @@ const listenQueryRunnerJobs = async () => {
         message: "kafka:listenQueryRunnerJobs:eachMessage",
         params: { topic, partition, message },
       });
-      if(topic == constants.KAFKA_TOPIC_NAMES.DATABASE_QUERY_RUNNER_JOBS){
+      if (topic == constants.KAFKA_TOPIC_NAMES.DATABASE_QUERY_RUNNER_JOBS) {
         await databaseQueryService.runDatabaseQuery({
           databaseQueryRunnerJobID: message.key.toString(),
           ...JSON.parse(message.value.toString()),
@@ -67,19 +87,30 @@ const listenQueryRunnerJobs = async () => {
             await postQueryRunnerJobResult(message.key.toString(), result);
           },
         });
+      } else if (
+        topic == constants.KAFKA_TOPIC_NAMES.DATABASE_MULTIPLE_QUERY_RUNNER_JOBS
+      ) {
+        await databaseQueryService.runMultipleDatabaseQueries({
+          databaseMultipleQueryRunnerJobID: message.key.toString(),
+          ...JSON.parse(message.value.toString()),
+          postMultipleQueryRunnerJobResult: async (result) => {
+            await postMultipleQueryRunnerJobResult(
+              message.key.toString(),
+              result
+            );
+          },
+        });
       }
       // Acknowledge the message
       await kafkaQueryRunnerJobConsumer.commitOffsets([
-        { topic, partition, offset: (parseInt(message.offset) + 1).toString() }
+        { topic, partition, offset: (parseInt(message.offset) + 1).toString() },
       ]);
-      
+
       // Note: Kafka automatically removes consumed messages after the retention period.
       // If you want to manually delete a message, you'd need to use the Admin API,
       // but this is not typically necessary or recommended in most use cases.
       // Process the job here
-      
     },
-    
   });
 };
 

@@ -186,14 +186,12 @@ databaseChartService.getDatabaseChartByID = async ({
  * Service function to retrieve and process database chart data.
  * @param {Object} params
  * @param {number} params.userID - ID of the requesting user
- * @param {Object} params.dbPool - Database connection pool
  * @param {string} params.tenantID - Tenant ID
  * @param {string} params.databaseChartID - Database chart ID
  * @returns {Promise<Object>} Processed chart data with metadata
  */
 databaseChartService.getDatabaseChartDataByID = async ({
   userID,
-  dbPool,
   tenantID,
   databaseChartID,
 }) => {
@@ -239,7 +237,8 @@ databaseChartService.getDatabaseChartDataByID = async ({
     const queriesToExecute = databaseChart.tblDatabaseChartQueryMappings.map(
       (mapping) => ({
         databaseQueryID: mapping.databaseQueryID,
-        databaseQueryData: mapping.tblDatabaseQueries.databaseQueryData,
+        databaseQueryString:
+          mapping.tblDatabaseQueries.databaseQueryData.databaseQueryString,
         databaseQueryArgValues: mapping.databaseQueryArgValues,
       })
     );
@@ -253,71 +252,72 @@ databaseChartService.getDatabaseChartDataByID = async ({
     );
 
     // 3. Execute all queries
-    const queryResults = await databaseQueryService.runMultipleDatabaseQueries({
+    const {
+      databaseMultipleQueryRunnerJobID,
+      databaseMultipleQueryRunnerJobStatus,
+    } = await databaseQueryService.runMultipleDatabaseQueries({
       userID,
-      dbPool,
-      queries: queriesToExecute,
+      tenantID,
+      databaseQueriesData: queriesToExecute,
     });
 
-    let processedData;
-    // 4. Process results into chart format
-    switch (databaseChart.databaseChartType) {
-      case constants.DATABASE_CHART_TYPES.BAR_CHART.value:
-        processedData = databaseChartProcessor.processBarChartQueryResults({
-          databaseChart,
-          queryResults,
-        });
-        break;
-      case constants.DATABASE_CHART_TYPES.LINE_CHART.value:
-        processedData = databaseChartProcessor.processLineChartQueryResults({
-          databaseChart,
-          queryResults,
-        });
-        break;
+    // let processedData;
+    // // 4. Process results into chart format
+    // switch (databaseChart.databaseChartType) {
+    //   case constants.DATABASE_CHART_TYPES.BAR_CHART.value:
+    //     processedData = databaseChartProcessor.processBarChartQueryResults({
+    //       databaseChart,
+    //       queryResults,
+    //     });
+    //     break;
+    //   case constants.DATABASE_CHART_TYPES.LINE_CHART.value:
+    //     processedData = databaseChartProcessor.processLineChartQueryResults({
+    //       databaseChart,
+    //       queryResults,
+    //     });
+    //     break;
 
-      case constants.DATABASE_CHART_TYPES.PIE_CHART.value:
-        processedData = databaseChartProcessor.processPieChartQueryResults({
-          databaseChart,
-          queryResults,
-        });
-        break;
-      case constants.DATABASE_CHART_TYPES.RADAR_CHART.value:
-        processedData = databaseChartProcessor.processRadarChartQueryResults({
-          databaseChart,
-          queryResults,
-        });
-        break;
-      case constants.DATABASE_CHART_TYPES.RADIAL_CHART.value:
-        processedData = databaseChartProcessor.processRadialChartQueryResults({
-          databaseChart,
-          queryResults,
-        });
-        break;
-      case constants.DATABASE_CHART_TYPES.SCATTER_CHART.value:
-        processedData = databaseChartProcessor.processScatterChartQueryResults({
-          databaseChart,
-          queryResults,
-        });
-        break;
-      case constants.DATABASE_CHART_TYPES.BUBBLE_CHART.value:
-        processedData = databaseChartProcessor.processBubbleChartQueryResults({
-          databaseChart,
-          queryResults,
-        });
-        break;
-      default:
-        processedData = databaseChartProcessor.processBarChartQueryResults({
-          databaseChart,
-          queryResults,
-        });
-        break;
-    }
+    //   case constants.DATABASE_CHART_TYPES.PIE_CHART.value:
+    //     processedData = databaseChartProcessor.processPieChartQueryResults({
+    //       databaseChart,
+    //       queryResults,
+    //     });
+    //     break;
+    //   case constants.DATABASE_CHART_TYPES.RADAR_CHART.value:
+    //     processedData = databaseChartProcessor.processRadarChartQueryResults({
+    //       databaseChart,
+    //       queryResults,
+    //     });
+    //     break;
+    //   case constants.DATABASE_CHART_TYPES.RADIAL_CHART.value:
+    //     processedData = databaseChartProcessor.processRadialChartQueryResults({
+    //       databaseChart,
+    //       queryResults,
+    //     });
+    //     break;
+    //   case constants.DATABASE_CHART_TYPES.SCATTER_CHART.value:
+    //     processedData = databaseChartProcessor.processScatterChartQueryResults({
+    //       databaseChart,
+    //       queryResults,
+    //     });
+    //     break;
+    //   case constants.DATABASE_CHART_TYPES.BUBBLE_CHART.value:
+    //     processedData = databaseChartProcessor.processBubbleChartQueryResults({
+    //       databaseChart,
+    //       queryResults,
+    //     });
+    //     break;
+    //   default:
+    //     processedData = databaseChartProcessor.processBarChartQueryResults({
+    //       databaseChart,
+    //       queryResults,
+    //     });
+    //     break;
+    // }
 
     return {
-      databaseChartID: databaseChart.databaseChartID,
-      databaseChartName: databaseChart.databaseChartName,
-      lastUpdated: databaseChart.updatedAt,
-      data: processedData,
+      databaseMultipleQueryRunnerJobID,
+      databaseMultipleQueryRunnerJobStatus,
     };
   } catch (error) {
     Logger.log("error", "databaseChartService:getDatabaseChartDataByID:error", {
@@ -333,14 +333,12 @@ databaseChartService.getDatabaseChartDataByID = async ({
  * Service function to retrieve and process database chart data.
  * @param {Object} params
  * @param {number} params.userID - ID of the requesting user
- * @param {Object} params.dbPool - Database connection pool
  * @param {string} params.tenantID - Tenant ID
  * @param {object} params.databaseChart - Database chart ID
  * @returns {Promise<Object>} Processed chart data with metadata
  */
 databaseChartService.getDatabaseChartDataUsingDatabaseChart = async ({
   userID,
-  dbPool,
   tenantID,
   databaseChart,
 }) => {
@@ -383,8 +381,8 @@ databaseChartService.getDatabaseChartDataUsingDatabaseChart = async ({
     const queriesToExecute = databaseChart.databaseQueries.map(
       (databaseQuery) => ({
         databaseQueryID: databaseQuery.databaseQueryID,
-        databaseQueryData:
-          databaseQueryIDMap[databaseQuery.databaseQueryID].databaseQueryData,
+        databaseQueryString:
+          databaseQueryIDMap[databaseQuery.databaseQueryID].databaseQueryString,
         databaseQueryArgValues: databaseQuery.databaseQueryArgValues,
       })
     );
@@ -400,8 +398,8 @@ databaseChartService.getDatabaseChartDataUsingDatabaseChart = async ({
     // 3. Execute all queries
     const queryResults = await databaseQueryService.runMultipleDatabaseQueries({
       userID,
-      dbPool,
-      queries: queriesToExecute,
+      tenantID,
+      databaseQueriesData: queriesToExecute,
     });
 
     Logger.log("info", {

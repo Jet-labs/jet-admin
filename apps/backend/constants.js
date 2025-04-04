@@ -34,6 +34,9 @@ const constants = {
   KAFKA_TOPIC_NAMES: {
     DATABASE_QUERY_RUNNER_JOBS: "database-query-runner-jobs",
     DATABASE_QUERY_RUNNER_JOB_RESULTS: "database-query-runner-job-results",
+    DATABASE_MULTIPLE_QUERY_RUNNER_JOBS: "database-multiple-query-runner-jobs",
+    DATABASE_MULTIPLE_QUERY_RUNNER_JOB_RESULTS:
+      "database-multiple-query-runner-job-results",
   },
 
   SAMPLE_PLAN: {

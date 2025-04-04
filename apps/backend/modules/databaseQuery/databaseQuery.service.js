@@ -163,7 +163,7 @@ databaseQueryService.runDatabaseQuery = async ({
       params: { userID, tenantID, databaseQueryID, databaseQueryData },
     });
     const databaseQueryRunnerJobID = generateKafkaJobID();
-    kafkaDatabaseQueryJobPosterProducer.send({
+    await kafkaDatabaseQueryJobPosterProducer.send({
       topic: constants.KAFKA_TOPIC_NAMES.DATABASE_QUERY_RUNNER_JOBS,
       messages: [
         {
@@ -197,7 +197,7 @@ databaseQueryService.runDatabaseQuery = async ({
   } catch (error) {
     Logger.log("error", {
       message: "databaseQueryService:runDatabaseQuery:failure",
-      params: { userID, error: error.message },
+      params: { userID, error },
     });
     throw error;
   }
@@ -239,20 +239,20 @@ databaseQueryService.getDatabaseQueryJobResult = async ({
         databaseQueryRunnerJobStatus: constants.BACKEND_JOB_STATUS.PROCESSING,
       };
     }
-    
-    const databaseQueryRunnerJobPayload = 
-      kafkaQueryRunnerJobResultsCache.get(databaseQueryRunnerJobID)
-    ;
+
+    const databaseQueryRunnerJobPayload = kafkaQueryRunnerJobResultsCache.get(
+      databaseQueryRunnerJobID
+    );
     Logger.log("info", {
       message: "databaseQueryService:getDatabaseQueryJobResult:payload",
-      params: { userID,tenantID, databaseQueryRunnerJobPayload },
+      params: { userID, tenantID, databaseQueryRunnerJobPayload },
     });
     validationUtils.validateQueryResult(
       databaseQueryRunnerJobPayload.databaseQueryResult
     );
     Logger.log("info", {
       message: "databaseQueryService:getDatabaseQueryJobResult:validated",
-      params: { userID,tenantID, databaseQueryRunnerJobPayload },
+      params: { userID, tenantID, databaseQueryRunnerJobPayload },
     });
     kafkaQueryRunnerJobResultsCache.delete(databaseQueryRunnerJobID);
     const databaseQueryResult =
@@ -274,7 +274,7 @@ databaseQueryService.getDatabaseQueryJobResult = async ({
   } catch (error) {
     Logger.log("error", {
       message: "databaseQueryService:getDatabaseQueryJobResult:catch-1",
-      params: { userID, error: error.message },
+      params: { userID, error },
     });
     throw error;
   }
@@ -284,129 +284,60 @@ databaseQueryService.getDatabaseQueryJobResult = async ({
  *
  * @param {object} param0
  * @param {number} param0.userID
- * @param {object} param0.dbPool
- * @param {Array<object>} param0.queries
+ * @param {number} param0.tenantID
+ * @param {Array<object>} param0.databaseQueriesData
  * @returns {Promise<Array<object>>}
  */
-
 databaseQueryService.runMultipleDatabaseQueries = async ({
   userID,
-  dbPool,
-  queries,
+  tenantID,
+  databaseQueriesData,
 }) => {
   Logger.log("info", {
     message: "databaseQueryService:runMultipleDatabaseQueries:start",
     params: {
       userID,
-      queryCount: queries.length,
+      tenantID,
+      databaseQueriesCount: databaseQueriesData.length,
     },
   });
 
   try {
-    // Prefetch required queries
-    const queryIDsToFetch = queries
-      .filter((q) => !q.databaseQueryData && q.databaseQueryID)
-      .map((q) => parseInt(q.databaseQueryID, 10));
-
-    const dbQueries = queryIDsToFetch.length
-      ? await prisma.tblDatabaseQueries.findMany({
-          where: { databaseQueryID: { in: queryIDsToFetch } },
-        })
-      : [];
-
-    const queryMap = new Map(dbQueries.map((q) => [q.databaseQueryID, q]));
-
-    // Execute with connection pooling
-    return TenantAwarePostgreSQLPoolManager.withDatabaseClient(
-      dbPool,
-      async (client) => {
-        const executionPromises = queries.map(async (query, index) => {
-          const context = {
+    const databaseMultipleQueryRunnerJobID = generateKafkaJobID();
+    await kafkaDatabaseQueryJobPosterProducer.send({
+      topic: constants.KAFKA_TOPIC_NAMES.DATABASE_MULTIPLE_QUERY_RUNNER_JOBS,
+      messages: [
+        {
+          key: databaseMultipleQueryRunnerJobID,
+          value: JSON.stringify({
             userID,
-            queryIndex: index,
-            databaseQueryID: query.databaseQueryID,
-          };
+            tenantID,
+            databaseQueriesData,
+            status: constants.BACKEND_JOB_STATUS.PROCESSING,
+          }),
+        },
+      ],
+    });
+    Logger.log("success", {
+      message: "databaseQueryService:runMultipleDatabaseQueries:success",
+      params: {
+        userID,
+        tenantID,
+        databaseMultipleQueryRunnerJobID,
+      },
+    });
 
-          try {
-            // Resolve query content
-            let finalQuery = query.databaseQueryData;
-            if (!finalQuery && query.databaseQueryID) {
-              const storedQuery = queryMap.get(
-                parseInt(query.databaseQueryID, 10)
-              );
-              if (!storedQuery)
-                throw new Error(`Query ${query.databaseQueryID} not found`);
-              finalQuery = storedQuery.databaseQueryData;
-            }
-
-            if (!finalQuery) throw new Error("Invalid query parameters");
-
-            // Process and execute query
-            const {
-              databaseQueryString: processedQuery,
-              databaseQueryValues: values,
-            } = postgreSQLParserUtil.processDatabaseQuery({
-              databaseQueryString: finalQuery.databaseQueryString,
-              databaseQueryArgValues: query.databaseQueryArgValues,
-            });
-
-            Logger.log("info", {
-              message:
-                "databaseQueryService:runMultipleDatabaseQueries:execute-query",
-              params: {
-                ...context,
-                processedQuery,
-                parameters: values,
-              },
-            });
-
-            const result = await client.query(processedQuery, values);
-
-            // Update schema if needed
-            if (query.databaseQueryID) {
-              const schema = jsonSchemaGenerator(
-                JSON.parse(JSON.stringify(result.rows))
-              );
-              await prisma.tblDatabaseQueries.update({
-                where: { databaseQueryID: parseInt(query.databaseQueryID, 10) },
-                data: { databaseQueryResultSchema: schema },
-              });
-            }
-
-            return {
-              success: true,
-              queryIndex: index,
-              result: result.rows,
-              databaseQueryID: query.databaseQueryID,
-            };
-          } catch (error) {
-            Logger.log("error", {
-              message:
-                "databaseQueryService:runMultipleDatabaseQueries:catch-2",
-              params: {
-                ...context,
-                error: error.message,
-              },
-            });
-            return {
-              success: false,
-              queryIndex: index,
-              error: error.message,
-              databaseQueryID: query.databaseQueryID,
-            };
-          }
-        });
-
-        return Promise.all(executionPromises);
-      }
-    );
+    return {
+      databaseMultipleQueryRunnerJobID,
+      databaseMultipleQueryRunnerJobStatus:
+        constants.BACKEND_JOB_STATUS.PROCESSING,
+    };
   } catch (error) {
     Logger.log("error", {
       message: "databaseQueryService:runMultipleDatabaseQueries:catch-1",
       params: {
         userID,
-        error: error.message,
-        stack: error.stack,
+        error,
       },
     });
     throw error;

@@ -27,8 +27,8 @@ export const DatabaseQueryTestingForm = ({
     };
   }, []);
   useEffect(() => {
-    if (status.data?.result) {
-      setDatabaseQueryTestResult(status.data.result);
+    if (status.data?.databaseQueryResult) {
+      setDatabaseQueryTestResult(status.data.databaseQueryResult);
       displaySuccess(CONSTANTS.STRINGS.TEST_QUERY_FORM_QUERY_TESTING_SUCCESS);
     }
     if (status.error) {
@@ -40,7 +40,7 @@ export const DatabaseQueryTestingForm = ({
     if (status.isIdle) {
       setDatabaseQueryTestResult(null);
     }
-  }, [status]);
+  }, [status, displayError, displaySuccess, setDatabaseQueryTestResult]);
 
   const _handleTestQuery = () => {
     if (
