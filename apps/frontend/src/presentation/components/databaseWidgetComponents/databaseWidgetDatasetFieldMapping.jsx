@@ -18,7 +18,7 @@ export const DatabaseWidgetDatasetFieldMapping = ({
 }) => {
   const datasetFieldMappingForm = useFormik({
     initialValues: {
-      argsMap: {},
+      databaseQueryArgValues: {},
       datasetFields: {
         text: "",
       },
@@ -33,8 +33,8 @@ export const DatabaseWidgetDatasetFieldMapping = ({
         values.datasetFields
       );
       widgetForm.setFieldValue(
-        `databaseQueries[${datasetIndex}].argsMap`,
-        values.argsMap
+        `databaseQueries[${datasetIndex}].databaseQueryArgValues`,
+        values.databaseQueryArgValues
       );
       onClose();
     },

@@ -2,6 +2,9 @@ const express = require("express");
 const router = express.Router({mergeParams:true});
 const { databaseQueryController } = require("./databaseQuery.controller");
 const { authMiddleware } = require("../auth/auth.middleware");
+const { expressUtils } = require("../../utils/express.utils");
+const Logger = require("../../utils/logger");
+// const { kafkaService } = require("../kafka/kafka.service");
 
 // Database query routes
 
@@ -9,6 +12,11 @@ router.get(
   "/",
   authMiddleware.checkUserPermissions(["tenant:query:list"]),
   databaseQueryController.getAllDatabaseQueries
+);
+router.get(
+  "/runner-jobs/:databaseQueryRunnerJobID",
+  authMiddleware.checkUserPermissions(["tenant:query:test"]),
+  databaseQueryController.getDatabaseQueryRunnerJobByID
 );
 router.post(
   "/",

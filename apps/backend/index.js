@@ -4,6 +4,11 @@ const constants = require("./constants");
 const { expressApp } = require("./config/express-app.config");
 const { httpServer } = require("./config/http-server.config");
 const Logger = require("./utils/logger");
+const {
+  connectDatabaseQueryRunnerJobProducer,
+  disconnectDatabaseQueryRunnerJobProducer,
+  initDatabaseQueryRunnerJobResultConsumer,
+} = require("./config/kafka.config");
 
 // Middleware setup
 expressApp.use(cookieParser());
@@ -39,17 +44,20 @@ expressApp.all("*", (req, res) => {
 
 // Start the server
 const port = environment.PORT;
-httpServer.listen(port, () => {
+httpServer.listen(port, async () => {
   Logger.log("success", {
     message: "server started listening",
     params: { port },
   });
+  await connectDatabaseQueryRunnerJobProducer();
+  await initDatabaseQueryRunnerJobResultConsumer();
 });
 
 // Graceful shutdown
 process.on("SIGINT", () => {
   Logger.log("info", { message: "shutting down server" });
   httpServer.close(() => {
+    disconnectDatabaseQueryRunnerJobProducer();
     process.exit(0);
   });
 });

@@ -19,6 +19,7 @@ import {
   ResizablePanelGroup,
 } from "../ui/resizable";
 import { formValidations } from "../../../utils/formValidation";
+import { da } from "@faker-js/faker";
 
 export const DatabaseQueryAdditionForm = ({ tenantID }) => {
   const queryClient = useQueryClient();
@@ -36,9 +37,9 @@ export const DatabaseQueryAdditionForm = ({ tenantID }) => {
         tenantID,
         databaseQueryData: {
           ...data,
-          databaseQuery: {
-            query: data.databaseQuery,
-            args: data.databaseQueryArgs,
+          databaseQueryData: {
+            databaseQueryString: data.databaseQueryString,
+            databaseQueryArgs: data.databaseQueryArgs,
           },
         },
       });
@@ -59,7 +60,7 @@ export const DatabaseQueryAdditionForm = ({ tenantID }) => {
     initialValues: {
       databaseQueryTitle: "Untitled",
       databaseQueryDescription: "",
-      databaseQuery: "",
+      databaseQueryString: "",
       databaseQueryArgs: [],
       runOnLoad: false,
     },
@@ -176,17 +177,22 @@ export const DatabaseQueryAdditionForm = ({ tenantID }) => {
                 className="space-y-3 md:space-y-4 p-3"
               >
                 <PGSQLQueryEditor
-                  code={queryAdditionForm.values.databaseQuery}
+                  code={queryAdditionForm.values.databaseQueryString}
                   setCode={(value) => {
                     console.log({ value });
-                    queryAdditionForm.setFieldValue("databaseQuery", value);
+                    queryAdditionForm.setFieldValue(
+                      "databaseQueryString",
+                      value
+                    );
                   }}
                   language={"pgsql"}
                 />
                 <div className="w-full flex flex-row justify-end">
                   <DatabaseQueryTestingForm
                     tenantID={tenantID}
-                    databaseQuery={queryAdditionForm.values.databaseQuery}
+                    databaseQueryString={
+                      queryAdditionForm.values.databaseQueryString
+                    }
                     databaseQueryArgs={
                       queryAdditionForm.values.databaseQueryArgs
                     }

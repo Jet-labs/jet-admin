@@ -5,6 +5,13 @@ const {
 } = require("../../config/tenant-aware-pgpool-manager.config");
 const jsonSchemaGenerator = require("json-schema-generator");
 const { postgreSQLParserUtil } = require("../../utils/postgresql.util");
+const { generateKafkaJobID } = require("../../utils/crypto.util");
+const constants = require("../../constants");
+const {
+  kafkaDatabaseQueryJobPosterProducer,
+  kafkaQueryRunnerJobResultsCache,
+} = require("../../config/kafka.config");
+const { validationUtils } = require("../../utils/validation.util");
 const databaseQueryService = {};
 
 /**
@@ -72,7 +79,7 @@ databaseQueryService.getAllDatabaseQueries = async ({ userID, tenantID }) => {
  * @param {number} param0.userID
  * @param {string} param0.databaseQueryTitle
  * @param {string} param0.databaseQueryDescription
- * @param {JSON} param0.databaseQuery
+ * @param {JSON} param0.databaseQueryData
  * @param {Boolean} param0.runOnLoad
  * @returns {Promise<boolean>}
  */
@@ -81,7 +88,7 @@ databaseQueryService.createDatabaseQuery = async ({
   tenantID,
   databaseQueryTitle = "Untitled",
   databaseQueryDescription = null,
-  databaseQuery = null,
+  databaseQueryData = null,
   runOnLoad = false,
 }) => {
   Logger.log("info", {
@@ -91,7 +98,7 @@ databaseQueryService.createDatabaseQuery = async ({
       tenantID,
       databaseQueryTitle,
       databaseQueryDescription,
-      databaseQuery,
+      databaseQueryData,
       runOnLoad,
     },
   });
@@ -102,7 +109,7 @@ databaseQueryService.createDatabaseQuery = async ({
         tenantID: parseInt(tenantID),
         databaseQueryTitle,
         databaseQueryDescription,
-        databaseQuery,
+        databaseQueryData,
         creatorID: parseInt(userID),
         runOnLoad,
       },
@@ -113,7 +120,7 @@ databaseQueryService.createDatabaseQuery = async ({
         userID,
         databaseQueryTitle,
         databaseQueryDescription,
-        databaseQuery,
+        databaseQueryData,
         runOnLoad,
       },
     });
@@ -134,79 +141,139 @@ databaseQueryService.createDatabaseQuery = async ({
  *
  * @param {object} param0
  * @param {number} param0.userID
+ * @param {number} param0.tenantID
  * @param {number} param0.databaseQueryID
- * @param {object} param0.dbPool
- * @param {object} param0.databaseQuery
- * @returns {Promise<boolean>}
+ * @param {object} param0.databaseQueryData
+ * @returns {Promise<object>}
  */
 databaseQueryService.runDatabaseQuery = async ({
   userID,
-  dbPool,
+  tenantID,
   databaseQueryID,
-  databaseQuery,
+  databaseQueryData,
 }) => {
   Logger.log("info", {
     message: "databaseQueryService:runDatabaseQuery:params",
-    params: { userID, databaseQueryID },
+    params: { userID, tenantID, databaseQueryID, databaseQueryData },
   });
 
   try {
-    let _databaseQuery = databaseQuery;
-
-    if (!databaseQuery && databaseQueryID) {
-      _databaseQuery = (
-        await prisma.tblDatabaseQueries.findUnique({
-          where: { databaseQueryID: parseInt(databaseQueryID) },
-        })
-      ).databaseQuery;
-    }
-
-    Logger.log("info", {
-      message: "databaseQueryService:runDatabaseQuery:databaseQuery",
-      params: { userID, databaseQuery: _databaseQuery },
-    });
-
-    const { query: originalQuery, args } = _databaseQuery;
-
-    const { query: processedQuery, values: queryValues } =
-      postgreSQLParserUtil.processDatabaseQuery({
-        query: originalQuery,
-        args,
-      });
-
     Logger.log("info", {
       message: "databaseQueryService:runDatabaseQuery:processedQuery",
-      params: { userID, processedQuery, queryValues },
+      params: { userID, tenantID, databaseQueryID, databaseQueryData },
     });
-    const result = await TenantAwarePostgreSQLPoolManager.withDatabaseClient(
-      dbPool,
-      async (client) => client.query(processedQuery, queryValues)
-    );
+    const databaseQueryRunnerJobID = generateKafkaJobID();
+    kafkaDatabaseQueryJobPosterProducer.send({
+      topic: constants.KAFKA_TOPIC_NAMES.DATABASE_QUERY_RUNNER_JOBS,
+      messages: [
+        {
+          key: databaseQueryRunnerJobID,
+          value: JSON.stringify({
+            userID,
+            tenantID,
+            databaseQueryID,
+            databaseQueryData,
+            status: constants.BACKEND_JOB_STATUS.PROCESSING,
+          }),
+        },
+      ],
+    });
 
-    const resultSchema = jsonSchemaGenerator(
-      JSON.parse(JSON.stringify(result.rows))
-    );
-
-    if (databaseQueryID) {
-      await prisma.tblDatabaseQueries.update({
-        where: { databaseQueryID: parseInt(databaseQueryID) },
-        data: { databaseQueryResultSchema: resultSchema },
-      });
-      Logger.log("info", {
-        message:
-          "databaseQueryService:runDatabaseQuery:saved-query-result-schema",
-        params: { userID, databaseQuery: _databaseQuery },
-      });
-    }
     Logger.log("success", {
       message: "databaseQueryService:runDatabaseQuery:success",
-      params: { userID, databaseQuery: _databaseQuery },
+      params: {
+        userID,
+        tenantID,
+        databaseQueryID,
+        databaseQueryData,
+        databaseQueryRunnerJobID,
+      },
     });
 
-    return result;
+    return {
+      databaseQueryRunnerJobID,
+      databaseQueryRunnerJobStatus: constants.BACKEND_JOB_STATUS.PROCESSING,
+    };
   } catch (error) {
     Logger.log("error", {
       message: "databaseQueryService:runDatabaseQuery:failure",
+      params: { userID, error: error.message },
+    });
+    throw error;
+  }
+};
+
+/**
+ *
+ * @param {object} param0
+ * @param {number} param0.userID
+ * @param {number} param0.tenantID
+ * @param {string} param0.databaseQueryRunnerJobID
+ * @returns {Promise<object>}
+ */
+databaseQueryService.getDatabaseQueryJobResult = async ({
+  userID,
+  tenantID,
+  databaseQueryRunnerJobID,
+}) => {
+  try {
+    Logger.log("info", {
+      message: "databaseQueryService:getDatabaseQueryJobResult:params",
+      params: { userID, tenantID, databaseQueryRunnerJobID },
+    });
+    if (!kafkaQueryRunnerJobResultsCache) {
+      Logger.log("error", {
+        message: "databaseQueryService:getDatabaseQueryJobResult:catch-2",
+        params: {
+          userID,
+          error: "kafkaQueryRunnerJobResultsCache is undefined",
+        },
+      });
+      throw new Error("kafkaQueryRunnerJobResultsCache is undefined");
+    } else if (!kafkaQueryRunnerJobResultsCache.has(databaseQueryRunnerJobID)) {
+      Logger.log("error", {
+        message: "databaseQueryService:getDatabaseQueryJobResult:catch-2",
+        params: { userID, error: "databaseQueryRunnerJobID is not completed" },
+      });
+      return {
+        databaseQueryRunnerJobStatus: constants.BACKEND_JOB_STATUS.PROCESSING,
+      };
+    }
+    
+    const databaseQueryRunnerJobPayload = 
+      kafkaQueryRunnerJobResultsCache.get(databaseQueryRunnerJobID)
+    ;
+    Logger.log("info", {
+      message: "databaseQueryService:getDatabaseQueryJobResult:payload",
+      params: { userID,tenantID, databaseQueryRunnerJobPayload },
+    });
+    validationUtils.validateQueryResult(
+      databaseQueryRunnerJobPayload.databaseQueryResult
+    );
+    Logger.log("info", {
+      message: "databaseQueryService:getDatabaseQueryJobResult:validated",
+      params: { userID,tenantID, databaseQueryRunnerJobPayload },
+    });
+    kafkaQueryRunnerJobResultsCache.delete(databaseQueryRunnerJobID);
+    const databaseQueryResult =
+      databaseQueryRunnerJobPayload.databaseQueryResult;
+
+    Logger.log("success", {
+      message: "databaseQueryService:getDatabaseQueryJobResult:success",
+      params: {
+        userID,
+        tenantID,
+        databaseQueryResult,
+      },
+    });
+
+    return {
+      databaseQueryRunnerJobStatus: constants.BACKEND_JOB_STATUS.COMPLETED,
+      databaseQueryResult,
+    };
+  } catch (error) {
+    Logger.log("error", {
+      message: "databaseQueryService:getDatabaseQueryJobResult:catch-1",
       params: { userID, error: error.message },
     });
     throw error;
@@ -238,7 +305,7 @@ databaseQueryService.runMultipleDatabaseQueries = async ({
   try {
     // Prefetch required queries
     const queryIDsToFetch = queries
-      .filter((q) => !q.databaseQuery && q.databaseQueryID)
+      .filter((q) => !q.databaseQueryData && q.databaseQueryID)
       .map((q) => parseInt(q.databaseQueryID, 10));
 
     const dbQueries = queryIDsToFetch.length
@@ -262,24 +329,26 @@ databaseQueryService.runMultipleDatabaseQueries = async ({
 
           try {
             // Resolve query content
-            let finalQuery = query.databaseQuery;
+            let finalQuery = query.databaseQueryData;
             if (!finalQuery && query.databaseQueryID) {
               const storedQuery = queryMap.get(
                 parseInt(query.databaseQueryID, 10)
               );
               if (!storedQuery)
                 throw new Error(`Query ${query.databaseQueryID} not found`);
-              finalQuery = storedQuery.databaseQuery;
+              finalQuery = storedQuery.databaseQueryData;
             }
 
             if (!finalQuery) throw new Error("Invalid query parameters");
 
             // Process and execute query
-            const { query: processedQuery, values } =
-              postgreSQLParserUtil.processDatabaseQuery({
-                query: finalQuery.query,
-                args: query.argsMap,
-              });
+            const {
+              databaseQueryString: processedQuery,
+              databaseQueryValues: values,
+            } = postgreSQLParserUtil.processDatabaseQuery({
+              databaseQueryString: finalQuery.databaseQueryString,
+              databaseQueryArgValues: query.databaseQueryArgValues,
+            });
 
             Logger.log("info", {
               message:
@@ -424,7 +493,7 @@ databaseQueryService.getDatabaseQueryByID = async ({
  * @param {number} param0.databaseQueryID
  * @param {string} param0.databaseQueryTitle
  * @param {string} param0.databaseQueryDescription
- * @param {JSON} param0.databaseQuery
+ * @param {JSON} param0.databaseQueryData
  * @param {Boolean} param0.runOnLoad
  * @returns {Promise<boolean>}
  */
@@ -434,7 +503,7 @@ databaseQueryService.updateDatabaseQueryByID = async ({
   databaseQueryID,
   databaseQueryTitle,
   databaseQueryDescription,
-  databaseQuery,
+  databaseQueryData,
   runOnLoad,
 }) => {
   Logger.log("info", {
@@ -445,7 +514,7 @@ databaseQueryService.updateDatabaseQueryByID = async ({
       databaseQueryID,
       databaseQueryTitle,
       databaseQueryDescription,
-      databaseQuery,
+      databaseQueryData,
       runOnLoad,
     },
   });
@@ -460,7 +529,7 @@ databaseQueryService.updateDatabaseQueryByID = async ({
       data: {
         databaseQueryTitle,
         databaseQueryDescription,
-        databaseQuery,
+        databaseQueryData,
         runOnLoad,
       },
     });
@@ -473,7 +542,7 @@ databaseQueryService.updateDatabaseQueryByID = async ({
         databaseQueryID,
         databaseQueryTitle,
         databaseQueryDescription,
-        databaseQuery,
+        databaseQueryData,
         runOnLoad,
       },
     });
@@ -499,10 +568,6 @@ databaseQueryService.updateDatabaseQueryByID = async ({
  * @param {number} param0.userID
  * @param {string} param0.tenantID
  * @param {number} param0.databaseQueryID
- * @param {string} param0.databaseQueryTitle
- * @param {string} param0.databaseQueryDescription
- * @param {JSON} param0.databaseQuery
- * @param {Boolean} param0.runOnLoad
  * @returns {Promise<boolean>}
  */
 databaseQueryService.deleteDatabaseQueryByID = async ({

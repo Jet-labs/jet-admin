@@ -1,4 +1,5 @@
 const crypto = require("crypto");
+const uuid = require("uuid");
 
 /**
  *
@@ -47,9 +48,14 @@ const generateAPIKey = () => {
   return crypto.randomBytes(32).toString("hex");
 };
 
+const generateKafkaJobID = () => {
+  return uuid.v4();
+};
+
 module.exports = {
   generateRandomString,
   comparePasswordWithHash,
   generateSaltAndPasswordHash,
+  generateKafkaJobID,
   generateAPIKey,
 };

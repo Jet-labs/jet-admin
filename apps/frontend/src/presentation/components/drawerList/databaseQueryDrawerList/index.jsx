@@ -74,7 +74,6 @@ export const DatabaseQueryDrawerList = ({}) => {
                       isActive ? "font-bold" : ""
                     } `}
                   >
-                    {/* {StringUtils.truncateName(databaseQuery.databaseQueryTitle, 15)} */}
                     {`${databaseQuery.databaseQueryTitle}`}
                   </span>
                 </div>

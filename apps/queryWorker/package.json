@@ -1,0 +1,31 @@
+{
+  "name": "queryworker",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "export NODE_ENV=production&& nodemon index.js",
+    "dev-w": "set NODE_ENV=development&& nodemon index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "@prisma/engine-core": "^4.13.0",
+    "@prisma/internals": "^5.17.0",
+    "dotenv": "^16.4.7",
+    "json-schema-generator": "^2.0.6",
+    "kafkajs": "^2.2.4",
+    "lru-cache": "^11.1.0",
+    "nodemon": "^3.1.9",
+    "pg": "^8.14.1",
+    "winston": "^3.17.0",
+    "winston-daily-rotate-file": "^5.0.0",
+    "winston-slack-webhook-transport": "^2.3.6",
+    "winston-syslog": "^2.7.1"
+  },
+  "devDependencies": {
+    "prisma": "^6.5.0"
+  }
+}

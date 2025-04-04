@@ -108,9 +108,9 @@ export const DatabaseChartDatasetField = ({
               }
               onChange={(e) => {
                 chartForm.handleChange(e);
-                // Reset argsMap when changing query
+                // Reset databaseQueryArgValues when changing query
                 chartForm.setFieldValue(
-                  `databaseQueries[${index}].argsMap`,
+                  `databaseQueries[${index}].databaseQueryArgValues`,
                   {}
                 );
               }}
@@ -141,7 +141,9 @@ export const DatabaseChartDatasetField = ({
             <button
               type="button"
               onClick={() => setShowArgumentsOptions(true)}
-              disabled={!selectedQuery?.databaseQuery?.args?.length}
+              disabled={
+                !selectedQuery?.databaseQueryData?.databaseQueryArgs?.length
+              }
               className=" disabled:text-slate-400 disabled:cursor-not-allowed disabled:hover:text-slate-400 disabled:hover:border-slate-300 disabled:hover:bg-transparent focus:outline-none text-xs font-normal hover:text-[#646cff] text-slate-700 flex flex-col gap-1 justify-start items-center bg-slate-100 hover:bg-[#646cff]/10   py-1 px-2 rounded border hover:border-[#646cff] border-slate-300 transition-colors w-full"
             >
               <BiSitemap className=" text-2xl" />
@@ -184,7 +186,7 @@ export const DatabaseChartDatasetField = ({
             initialValues={{
               datasetFields:
                 chartForm.values.databaseQueries[index]?.datasetFields,
-              argsMap: chartForm.values.databaseQueries[index]?.argsMap,
+              databaseQueryArgValues: chartForm.values.databaseQueries[index]?.databaseQueryArgValues,
             }}
             selectedQuery={selectedQuery}
             datasetFields={datasetFields}
@@ -195,7 +197,7 @@ export const DatabaseChartDatasetField = ({
             datasetIndex={index}
             chartForm={chartForm}
             initialValues={{
-              argsMap: chartForm.values.databaseQueries[index]?.argsMap,
+              databaseQueryArgValues: chartForm.values.databaseQueries[index]?.databaseQueryArgValues,
             }}
             selectedQuery={selectedQuery}
           />

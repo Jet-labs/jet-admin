@@ -1203,6 +1203,8 @@ export const CONSTANTS = {
         `/api/v1/tenants/${tenantID}/queries/${databaseQueryID}`,
       deleteDatabaseQueryByID: (tenantID, databaseQueryID) =>
         `/api/v1/tenants/${tenantID}/queries/${databaseQueryID}`,
+      getDatabaseQueryRunnerJobByIDAPI: (tenantID, databaseQueryRunnerJobID) =>
+        `/api/v1/tenants/${tenantID}/queries/runner-jobs/${databaseQueryRunnerJobID}`,
 
       getAllDatabaseChartsAPI: (tenantID) =>
         `/api/v1/tenants/${tenantID}/charts/`,
@@ -1257,6 +1259,13 @@ export const CONSTANTS = {
       updateDatabaseNotificationByID: (tenantID, databaseNotificationID) =>
         `/api/v1/tenants/${tenantID}/database/notifications/${databaseNotificationID}`,
     },
+  },
+
+  BACKEND_JOB_STATUS: {
+    PENDING: "pending",
+    PROCESSING: "processing",
+    COMPLETED: "completed",
+    FAILED: "failed",
   },
 
   ERROR_CODES: {
@@ -1357,6 +1366,8 @@ export const CONSTANTS = {
     DATABASE_NOTIFICATIONS: (tenantID) => `${tenantID}-DATABASE_NOTIFICATIONS`,
     DATABASE_API_KEYS: (tenantID) => `${tenantID}-DATABASE_API_KEYS`,
     DATABASE_NOTIFICATION_DETAILS: "DATABASE_NOTIFICATION_DETAILS",
+    DATABASE_QUERY_RUNNER_JOB_KEYS: (tenantID) =>
+      `${tenantID}-DATABASE_QUERY_RUNNER_JOB_KEYS`,
   },
 
   DATA_TYPES: {

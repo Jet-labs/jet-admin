@@ -107,9 +107,9 @@ export const DatabaseWidgetDatasetField = ({
               }
               onChange={(e) => {
                 widgetForm.handleChange(e);
-                // Reset argsMap when changing query
+                // Reset databaseQueryArgValues when changing query
                 widgetForm.setFieldValue(
-                  `databaseQueries[${index}].argsMap`,
+                  `databaseQueries[${index}].databaseQueryArgValues`,
                   {}
                 );
               }}
@@ -140,7 +140,7 @@ export const DatabaseWidgetDatasetField = ({
             <button
               type="button"
               onClick={() => setShowArgumentsOptions(true)}
-              disabled={!selectedQuery?.databaseQuery?.args?.length}
+              disabled={!selectedQuery?.databaseQueryData?.args?.length}
               className=" disabled:text-slate-400 disabled:cursor-not-allowed disabled:hover:text-slate-400 disabled:hover:border-slate-300 disabled:hover:bg-transparent focus:outline-none text-xs font-normal hover:text-[#646cff] text-slate-700 flex flex-col gap-1 justify-start items-center bg-slate-100 hover:bg-[#646cff]/10   py-1 px-2 rounded border hover:border-[#646cff] border-slate-300 transition-colors w-full"
             >
               <BiSitemap className=" text-2xl" />
@@ -155,7 +155,10 @@ export const DatabaseWidgetDatasetField = ({
             >
               <BiSitemap className=" text-2xl" />
 
-              {CONSTANTS.STRINGS.WIDGET_EDITOR_FORM_DATASET_FIELD_MAPPINGS_LABEL}
+              {
+                CONSTANTS.STRINGS
+                  .WIDGET_EDITOR_FORM_DATASET_FIELD_MAPPINGS_LABEL
+              }
             </button>
             <button
               type="button"
@@ -183,7 +186,7 @@ export const DatabaseWidgetDatasetField = ({
             initialValues={{
               datasetFields:
                 widgetForm.values.databaseQueries[index]?.datasetFields,
-              argsMap: widgetForm.values.databaseQueries[index]?.argsMap,
+              databaseQueryArgValues: widgetForm.values.databaseQueries[index]?.databaseQueryArgValues,
             }}
             selectedQuery={selectedQuery}
             datasetFields={datasetFields}
@@ -194,7 +197,7 @@ export const DatabaseWidgetDatasetField = ({
             datasetIndex={index}
             widgetForm={widgetForm}
             initialValues={{
-              argsMap: widgetForm.values.databaseQueries[index]?.argsMap,
+              databaseQueryArgValues: widgetForm.values.databaseQueries[index]?.databaseQueryArgValues,
             }}
             selectedQuery={selectedQuery}
           />

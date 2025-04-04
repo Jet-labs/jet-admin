@@ -99,7 +99,7 @@ formValidations.queryAdditionFormValidationSchema = Yup.object().shape({
     .required("Query title is required")
     .min(3, "Query title must be at least 3 characters"),
   databaseQueryDescription: Yup.string().optional(), // Optional field
-  databaseQuery: Yup.string()
+  databaseQueryString: Yup.string()
     .required("Database query is required")
     .min(10, "Database query must be at least 10 characters"),
   databaseQueryArgs: Yup.array()
@@ -120,7 +120,7 @@ formValidations.queryUpdationFormValidationSchema = Yup.object().shape({
     .required("Query title is required")
     .min(3, "Query title must be at least 3 characters"),
   databaseQueryDescription: Yup.string().optional(), // Optional field
-  databaseQuery: Yup.string()
+  databaseQueryString: Yup.string()
     .required("Database query is required")
     .min(10, "Database query must be at least 10 characters"),
   databaseQueryArgs: Yup.array()
@@ -178,7 +178,7 @@ formValidations.datasetArgumentsFormValidationSchema = (args) => {
   });
 
   return Yup.object().shape({
-    argsMap: Yup.object().shape(argsMapSchema),
+    databaseQueryArgValues: Yup.object().shape(argsMapSchema),
   });
 };
 
@@ -194,7 +194,7 @@ formValidations.datasetFieldMappingFormValidationSchema = (datasetFields) => {
 
   return Yup.object().shape({
     datasetFields: Yup.object().shape(datasetFieldsSchema),
-    argsMap: Yup.object(), // Optional, no specific validation for argsMap here
+    databaseQueryArgValues: Yup.object(), // Optional, no specific validation for databaseQueryArgValues here
   });
 };
 

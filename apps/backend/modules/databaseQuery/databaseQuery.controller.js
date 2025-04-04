@@ -62,7 +62,7 @@ databaseQueryController.createDatabaseQuery = async (req, res) => {
     const {
       databaseQueryTitle,
       databaseQueryDescription,
-      databaseQuery,
+      databaseQueryData,
       runOnLoad,
     } = req.body;
 
@@ -73,7 +73,7 @@ databaseQueryController.createDatabaseQuery = async (req, res) => {
         tenantID,
         databaseQueryTitle,
         databaseQueryDescription,
-        databaseQuery,
+        databaseQueryData,
         runOnLoad,
       },
     });
@@ -83,7 +83,7 @@ databaseQueryController.createDatabaseQuery = async (req, res) => {
       tenantID,
       databaseQueryTitle,
       databaseQueryDescription,
-      databaseQuery,
+      databaseQueryData,
       runOnLoad,
     });
 
@@ -94,7 +94,7 @@ databaseQueryController.createDatabaseQuery = async (req, res) => {
         tenantID,
         databaseQueryTitle,
         databaseQueryDescription,
-        databaseQuery,
+        databaseQueryData,
         runOnLoad,
         result,
       },
@@ -155,28 +155,86 @@ databaseQueryController.runDatabaseQueryByID = async (req, res) => {
 databaseQueryController.runDatabaseQuery = async (req, res) => {
   try {
     const { user, dbPool } = req;
-    const { databaseQuery, databaseQueryID } = req.body;
+    const { tenantID } = req.params;
+    const { databaseQueryData, databaseQueryID } = req.body;
     Logger.log("info", {
       message: "databaseQueryController:runDatabaseQuery:params",
-      params: { userID: user.userID, databaseQueryID, databaseQuery },
+      params: { userID: user.userID, databaseQueryID, databaseQueryData },
     });
 
-    const databaseQueryResult = await databaseQueryService.runDatabaseQuery({
-      userID: parseInt(user.userID),
-      dbPool,
-      databaseQueryID,
-      databaseQuery,
-    });
+    const { databaseQueryRunnerJobID, databaseQueryRunnerJobStatus } =
+      await databaseQueryService.runDatabaseQuery({
+        userID: parseInt(user.userID),
+        tenantID: parseInt(tenantID),
+        dbPool,
+        databaseQueryID,
+        databaseQueryData,
+      });
 
     Logger.log("success", {
       message: "databaseQueryController:runDatabaseQuery:success",
-      params: { userID: user.userID, databaseQueryID },
+      params: {
+        userID: user.userID,
+        databaseQueryID,
+        databaseQueryData,
+        databaseQueryRunnerJobID,
+        databaseQueryRunnerJobStatus,
+      },
     });
 
-    return expressUtils.sendResponse(res, true, { databaseQueryResult });
+    return expressUtils.sendResponse(res, true, {
+      databaseQueryRunnerJobID,
+      databaseQueryRunnerJobStatus,
+    });
   } catch (error) {
     Logger.log("error", {
       message: "databaseQueryController:runDatabaseQuery:catch-1",
+      params: { userID: req.user?.userID, error },
+    });
+    return expressUtils.sendResponse(res, false, {}, error);
+  }
+};
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+
+databaseQueryController.getDatabaseQueryRunnerJobByID = async (req, res) => {
+  try {
+    const { user } = req;
+    const { tenantID, databaseQueryRunnerJobID } = req.params;
+    Logger.log("info", {
+      message: "databaseQueryController:getDatabaseQueryRunnerJobByID:params",
+      params: {
+        userID: user.userID,
+        tenantID,
+        databaseQueryRunnerJobID,
+      },
+    });
+
+    const databaseQueryJobResult =
+      await databaseQueryService.getDatabaseQueryJobResult({
+        userID: parseInt(user.userID),
+        tenantID,
+        databaseQueryRunnerJobID,
+      });
+
+    Logger.log("success", {
+      message: "databaseQueryController:getDatabaseQueryRunnerJobByID:success",
+      params: {
+        userID: user.userID,
+        tenantID,
+        databaseQueryRunnerJobID,
+        databaseQueryJobResult,
+      },
+    });
+
+    return expressUtils.sendResponse(res, true, { ...databaseQueryJobResult });
+  } catch (error) {
+    Logger.log("error", {
+      message: "databaseQueryController:getDatabaseQueryRunnerJobByID:catch-1",
       params: { userID: req.user?.userID, error },
     });
     return expressUtils.sendResponse(res, false, {}, error);
@@ -242,7 +300,7 @@ databaseQueryController.updateDatabaseQueryByID = async (req, res) => {
     const {
       databaseQueryTitle,
       databaseQueryDescription,
-      databaseQuery,
+      databaseQueryData,
       runOnLoad,
     } = req.body;
 
@@ -254,7 +312,7 @@ databaseQueryController.updateDatabaseQueryByID = async (req, res) => {
         databaseQueryID,
         databaseQueryTitle,
         databaseQueryDescription,
-        databaseQuery,
+        databaseQueryData,
         runOnLoad,
       },
     });
@@ -265,7 +323,7 @@ databaseQueryController.updateDatabaseQueryByID = async (req, res) => {
       databaseQueryID,
       databaseQueryTitle,
       databaseQueryDescription,
-      databaseQuery,
+      databaseQueryData,
       runOnLoad,
     });
 
@@ -277,7 +335,7 @@ databaseQueryController.updateDatabaseQueryByID = async (req, res) => {
         databaseQueryID,
         databaseQueryTitle,
         databaseQueryDescription,
-        databaseQuery,
+        databaseQueryData,
         runOnLoad,
         result,
       },

@@ -1,11 +1,6 @@
 const Logger = require("../../utils/logger");
 const { prisma } = require("../../config/prisma.config");
 const {
-  TenantAwarePostgreSQLPoolManager,
-} = require("../../config/tenant-aware-pgpool-manager.config");
-const jsonSchemaGenerator = require("json-schema-generator");
-const { postgreSQLParserUtil } = require("../../utils/postgresql.util");
-const {
   databaseQueryService,
 } = require("../databaseQuery/databaseQuery.service");
 const { databaseChartProcessor } = require("./databaseChart.processor");
@@ -19,10 +14,7 @@ const databaseChartService = {};
  * @param {number} param0.tenantID
  * @returns {Promise<Array<object>>}
  */
-databaseChartService.getAllDatabaseCharts = async ({
-  userID,
-  tenantID,
-}) => {
+databaseChartService.getAllDatabaseCharts = async ({ userID, tenantID }) => {
   Logger.log("info", {
     message: "databaseChartService:getAllDatabaseCharts:params",
     params: {
@@ -109,7 +101,7 @@ databaseChartService.createDatabaseChart = async ({
             title: databaseQuery.title,
             parameters: databaseQuery.parameters,
             datasetFields: databaseQuery.datasetFields,
-            argsMap: databaseQuery.argsMap,
+            databaseQueryArgValues: databaseQuery.databaseQueryArgValues,
           };
         }),
       });
@@ -247,8 +239,8 @@ databaseChartService.getDatabaseChartDataByID = async ({
     const queriesToExecute = databaseChart.tblDatabaseChartQueryMappings.map(
       (mapping) => ({
         databaseQueryID: mapping.databaseQueryID,
-        databaseQuery: mapping.tblDatabaseQueries.databaseQuery,
-        argsMap: mapping.argsMap,
+        databaseQueryData: mapping.tblDatabaseQueries.databaseQueryData,
+        databaseQueryArgValues: mapping.databaseQueryArgValues,
       })
     );
 
@@ -391,10 +383,9 @@ databaseChartService.getDatabaseChartDataUsingDatabaseChart = async ({
     const queriesToExecute = databaseChart.databaseQueries.map(
       (databaseQuery) => ({
         databaseQueryID: databaseQuery.databaseQueryID,
-        // struct | databaseQuery:{query:"Some query"}
-        databaseQuery:
-          databaseQueryIDMap[databaseQuery.databaseQueryID].databaseQuery,
-        argsMap: databaseQuery.argsMap,
+        databaseQueryData:
+          databaseQueryIDMap[databaseQuery.databaseQueryID].databaseQueryData,
+        databaseQueryArgValues: databaseQuery.databaseQueryArgValues,
       })
     );
 
@@ -492,7 +483,6 @@ databaseChartService.getDatabaseChartDataUsingDatabaseChart = async ({
   }
 };
 
-
 /**
  * Updates an existing database chart and its associated query mappings.
  *
@@ -510,7 +500,7 @@ databaseChartService.getDatabaseChartDataUsingDatabaseChart = async ({
  * @param {JSON} [params.databaseQueries[].parameters] - Query parameters
  * @param {number} [params.databaseQueries[].executionOrder] - Execution order of queries
  * @param {JSON} [params.databaseQueries[].datasetFields] - Dataset field definitions
- * @param {JSON} [params.databaseQueries[].argsMap] - Argument mappings
+ * @param {JSON} [params.databaseQueries[].databaseQueryArgValues] - Argument mappings
  *
  * @returns {Promise<boolean>} True if update succeeded
  * @throws {Error} If database operation fails
@@ -581,7 +571,7 @@ databaseChartService.updateDatabaseChartByID = async ({
             parameters: q.parameters,
             executionOrder: q.executionOrder,
             datasetFields: q.datasetFields,
-            argsMap: q.argsMap,
+            databaseQueryArgValues: q.databaseQueryArgValues,
           })),
         });
       }

@@ -108,7 +108,7 @@ export const DatabaseDashboardUpdationForm = ({
 
   useEffect(() => {
     if (databaseDashboard) {
-      // Update Formik form values with the fetched databaseQuery data
+      // Update Formik form values with the fetched databaseDashboard data
       dashboardUpdationForm.setFieldValue(
         "databaseDashboardName",
         databaseDashboard.databaseDashboardName || CONSTANTS.STRINGS.UNTITLED

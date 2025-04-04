@@ -34,7 +34,7 @@ const initialValues = {
         borderWidth: 1,
         type: CONSTANTS.DATABASE_CHART_TYPES.BAR_CHART.value,
       },
-      argsMap: {},
+      databaseQueryArgValues: {},
       datasetFields: {
         xAxis: "",
         yAxis: "",

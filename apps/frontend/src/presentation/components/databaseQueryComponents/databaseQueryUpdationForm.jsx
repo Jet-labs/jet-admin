@@ -60,9 +60,9 @@ export const DatabaseQueryUpdationForm = ({ tenantID, databaseQueryID }) => {
         databaseQueryID,
         databaseQueryData: {
           ...data,
-          databaseQuery: {
-            query: data.databaseQuery,
-            args: data.databaseQueryArgs,
+          databaseQueryData: {
+            databaseQueryString: data.databaseQueryString,
+            databaseQueryArgs: data.databaseQueryArgs,
           },
         },
       });
@@ -85,7 +85,7 @@ export const DatabaseQueryUpdationForm = ({ tenantID, databaseQueryID }) => {
     initialValues: {
       databaseQueryTitle: "Untitled",
       databaseQueryDescription: "",
-      databaseQuery: "",
+      databaseQueryString: "",
       databaseQueryArgs: [],
       runOnLoad: false,
     },
@@ -117,12 +117,12 @@ export const DatabaseQueryUpdationForm = ({ tenantID, databaseQueryID }) => {
         databaseQuery.databaseQueryDescription || ""
       );
       queryUpdationForm.setFieldValue(
-        "databaseQuery",
-        databaseQuery.databaseQuery.query || ""
+        "databaseQueryString",
+        databaseQuery.databaseQueryData.databaseQueryString || ""
       );
       queryUpdationForm.setFieldValue(
         "databaseQueryArgs",
-        databaseQuery.databaseQuery.args || []
+        databaseQuery.databaseQueryData.databaseQueryArgs || []
       );
       queryUpdationForm.setFieldValue(
         "runOnLoad",
@@ -276,10 +276,13 @@ export const DatabaseQueryUpdationForm = ({ tenantID, databaseQueryID }) => {
                   className="space-y-3 md:space-y-4 p-3"
                 >
                   <PGSQLQueryEditor
-                    code={queryUpdationForm.values.databaseQuery}
+                    code={queryUpdationForm.values.databaseQueryString}
                     setCode={(value) => {
                       console.log({ value });
-                      queryUpdationForm.setFieldValue("databaseQuery", value);
+                      queryUpdationForm.setFieldValue(
+                        "databaseQueryString",
+                        value
+                      );
                     }}
                     language={"pgsql"}
                   />
@@ -291,7 +294,9 @@ export const DatabaseQueryUpdationForm = ({ tenantID, databaseQueryID }) => {
                     <DatabaseQueryTestingForm
                       tenantID={tenantID}
                       databaseQueryID={databaseQueryID}
-                      databaseQuery={queryUpdationForm.values.databaseQuery}
+                      databaseQueryString={
+                        queryUpdationForm.values.databaseQueryString
+                      }
                       databaseQueryArgs={
                         queryUpdationForm.values.databaseQueryArgs
                       }

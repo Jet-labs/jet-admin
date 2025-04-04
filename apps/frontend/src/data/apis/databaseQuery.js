@@ -69,9 +69,8 @@ export const createDatabaseQueryAPI = async ({
 export const testDatabaseQueryAPI = async ({
   tenantID,
   databaseQueryID,
-  databaseQuery,
+  databaseQueryData,
 }) => {
-  console.log({ databaseQuery });
   try {
     const url =
       CONSTANTS.SERVER_HOST +
@@ -82,7 +81,7 @@ export const testDatabaseQueryAPI = async ({
         url,
         {
           databaseQueryID,
-          databaseQuery,
+          databaseQueryData,
         },
         {
           headers: {
@@ -91,7 +90,40 @@ export const testDatabaseQueryAPI = async ({
         }
       );
       if (response.data && response.data.success === true) {
-        return response.data.databaseQueryResult;
+        return response.data;
+      } else if (response.data.error) {
+        throw response.data.error;
+      } else {
+        throw CONSTANTS.ERROR_CODES.SERVER_ERROR;
+      }
+    } else {
+      throw CONSTANTS.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const getDatabaseQueryRunnerJobByIDAPI = async ({
+  tenantID,
+  databaseQueryRunnerJobID,
+}) => {
+  try {
+    const url =
+      CONSTANTS.SERVER_HOST +
+      CONSTANTS.APIS.DATABASE.getDatabaseQueryRunnerJobByIDAPI(
+        tenantID,
+        databaseQueryRunnerJobID
+      );
+    const bearerToken = await firebaseAuth.currentUser.getIdToken();
+    if (bearerToken) {
+      const response = await axios.get(url, {
+        headers: {
+          authorization: `Bearer ${bearerToken}`,
+        },
+      });
+      if (response.data && response.data.success === true) {
+        return response.data;
       } else if (response.data.error) {
         throw response.data.error;
       } else {

@@ -14,25 +14,25 @@ export const DatabaseChartDatasetArguments = ({
 }) => {
   const datasetArgumentsForm = useFormik({
     initialValues: {
-      argsMap: {},
+      databaseQueryArgValues: {},
       ...initialValues,
     },
     validationSchema: formValidations.datasetArgumentsFormValidationSchema(
-      selectedQuery?.databaseQuery?.args
+      selectedQuery?.databaseQueryData?.databaseQueryArgs
     ),
     enableReinitialize: true,
     onSubmit: (values) => {
       chartForm.setFieldValue(
-        `databaseQueries[${datasetIndex}].argsMap`,
-        values.argsMap
+        `databaseQueries[${datasetIndex}].databaseQueryArgValues`,
+        values.databaseQueryArgValues
       );
       onClose();
     },
   });
 
   const _handleUpdateDatasetQueryArgs = useCallback((arg, value) => {
-    datasetArgumentsForm.setFieldValue(`argsMap`, {
-      ...datasetArgumentsForm.values.argsMap,
+    datasetArgumentsForm.setFieldValue(`databaseQueryArgValues`, {
+      ...datasetArgumentsForm.values.databaseQueryArgValues,
       [arg]: value,
     });
   }, []);
@@ -43,32 +43,34 @@ export const DatabaseChartDatasetArguments = ({
         {CONSTANTS.STRINGS.CHART_DATASET_ARGUMENTS_TITLE}
       </DialogTitle>
       <DialogContent className="!p-4 !space-y-4">
-        {selectedQuery?.databaseQuery?.args?.length > 0 && (
+        {selectedQuery?.databaseQueryData?.databaseQueryArgs?.length > 0 && (
           <div>
             <label className="block mb-2 text-xs font-normal text-slate-500">
               {CONSTANTS.STRINGS.CHART_EDITOR_FORM_DATASET_ARGUMENTS_LABEL}
             </label>
             <div className="space-y-2">
-              {selectedQuery.databaseQuery.args.map((arg, argIndex) => {
-                const argName = arg.replace(/[{}]/g, "");
-                return (
-                  <div key={`arg-${argIndex}`}>
-                    <input
-                      type="text"
-                      id={`arg-${argName}`}
-                      className="placeholder:text-slate-400 text-xs w-full bg-slate-50 border border-slate-300 text-slate-700 rounded focus:outline-none focus:border-slate-400 block px-2.5 py-1.5"
-                      placeholder={`Value for ${argName}`}
-                      value={
-                        datasetArgumentsForm.values.argsMap?.[argName] || ""
-                      }
-                      onChange={(e) =>
-                        _handleUpdateDatasetQueryArgs(argName, e.target.value)
-                      }
-                      onBlur={datasetArgumentsForm.handleBlur}
-                    />
-                  </div>
-                );
-              })}
+              {selectedQuery.databaseQueryData.databaseQueryArgs.map(
+                (arg, argIndex) => {
+                  const argName = arg.replace(/[{}]/g, "");
+                  return (
+                    <div key={`arg-${argIndex}`}>
+                      <input
+                        type="text"
+                        id={`arg-${argName}`}
+                        className="placeholder:text-slate-400 text-xs w-full bg-slate-50 border border-slate-300 text-slate-700 rounded focus:outline-none focus:border-slate-400 block px-2.5 py-1.5"
+                        placeholder={`Value for ${argName}`}
+                        value={
+                          datasetArgumentsForm.values.databaseQueryArgValues?.[argName] || ""
+                        }
+                        onChange={(e) =>
+                          _handleUpdateDatasetQueryArgs(argName, e.target.value)
+                        }
+                        onBlur={datasetArgumentsForm.handleBlur}
+                      />
+                    </div>
+                  );
+                }
+              )}
             </div>
           </div>
         )}

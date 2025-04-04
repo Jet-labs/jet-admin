@@ -1,0 +1,4 @@
+[31merror[39m: dev_query_worker_node_1: 03-04-2025 23:03:11: [31mBroker start failed.[39m |====| {"error":{"name":"KafkaJSNumberOfRetriesExceeded","retriable":false,"retryCount":5,"retryTime":8274}}
+[31merror[39m: dev_query_worker_node_1: 03-04-2025 23:04:27: [31mBroker start failed.[39m |====| {"error":{"name":"KafkaJSProtocolError","retriable":true,"type":"UNKNOWN_TOPIC_OR_PARTITION","code":3}}
+[32msuccess[39m: dev_query_worker_node_1: 03-04-2025 23:06:48: [32mBroker started successfully.[39m
+[32msuccess[39m: dev_query_worker_node_1: 03-04-2025 23:26:57: [32mBroker started successfully.[39m

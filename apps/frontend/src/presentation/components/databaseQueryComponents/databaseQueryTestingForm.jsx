@@ -5,40 +5,42 @@ import { testDatabaseQueryAPI } from "../../../data/apis/databaseQuery";
 import { CircularProgress } from "@mui/material";
 import { useEffect, useState } from "react";
 import { DatabaseQueryArgsForm } from "./databaseQueryArgsForm";
+import { useDatabaseQueryRunner } from "../../../logic/hooks/useDatabaseQueryRunner";
 
 export const DatabaseQueryTestingForm = ({
   tenantID,
   databaseQueryID,
-  databaseQuery,
+  databaseQueryString,
   databaseQueryArgs,
   setDatabaseQueryTestResult,
 }) => {
+  const {
+    execute: testDatabaseQuery,
+    status,
+    reset,
+  } = useDatabaseQueryRunner(tenantID);
   const [isArgsFormOpen, setIsArgsFormOpen] = useState(false);
 
-  const {
-    isPending: isTestingDatabaseQuery,
-    isSuccess: isTestingDatabaseQuerySuccess,
-    isError: isTestingDatabaseQueryError,
-    error: testDatabaseQueryError,
-    data: databaseQueryTestResult,
-    mutate: testDatabaseQuery,
-  } = useMutation({
-    mutationFn: (databaseQuery) => {
-      return testDatabaseQueryAPI({
-        tenantID,
-        databaseQueryID,
-        databaseQuery,
-      });
-    },
-    retry: false,
-    onSuccess: (data) => {
-      setDatabaseQueryTestResult(data);
+  useEffect(() => {
+    return () => {
+      reset();
+    };
+  }, []);
+  useEffect(() => {
+    if (status.data?.result) {
+      setDatabaseQueryTestResult(status.data.result);
       displaySuccess(CONSTANTS.STRINGS.TEST_QUERY_FORM_QUERY_TESTING_SUCCESS);
-    },
-    onError: (error) => {
-      displayError(error);
-    },
-  });
+    }
+    if (status.error) {
+      displayError(status.error);
+    }
+    if (status.data?.status === CONSTANTS.BACKEND_JOB_STATUS.FAILED) {
+      displayError(status.data?.error);
+    }
+    if (status.isIdle) {
+      setDatabaseQueryTestResult(null);
+    }
+  }, [status]);
 
   const _handleTestQuery = () => {
     if (
@@ -49,8 +51,10 @@ export const DatabaseQueryTestingForm = ({
       _handleOpenArgsForm();
     } else {
       testDatabaseQuery({
-        query: databaseQuery,
-        args: null,
+        databaseQueryData: {
+          databaseQueryString: databaseQueryString,
+          databaseQueryArgValues: null,
+        },
       });
     }
   };
@@ -66,15 +70,12 @@ export const DatabaseQueryTestingForm = ({
   const _handleOnArgFormCompleted = (databaseQueryArgValues) => {
     setIsArgsFormOpen(false);
     testDatabaseQuery({
-      query: databaseQuery,
-      args: databaseQueryArgValues,
+      databaseQueryData: {
+        databaseQueryString: databaseQueryString,
+        databaseQueryArgValues: databaseQueryArgValues,
+      },
     });
   };
-  // useEffect(() => {
-  //   if (runQueryOnRender == true) {
-  //     _runQuery();
-  //   }
-  // }, [runQueryOnRender]);
 
   return (
     <>
@@ -88,17 +89,18 @@ export const DatabaseQueryTestingForm = ({
       )}
       <button
         onClick={_handleTestQuery}
-        disabled={isTestingDatabaseQuery}
+        disabled={status?.isExecuting || status?.isPolling}
         type="button"
         class="flex flex-row items-center justify-center rounded bg-[#646cff]/10 mr-2 px-3 py-1.5 text-xs text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50 outline-none focus:outline-none"
       >
-        {isTestingDatabaseQuery && (
-          <CircularProgress
-            className="!text-xs !mr-3"
-            size={16}
-            color="white"
-          />
-        )}
+        {status?.isExecuting ||
+          (status?.isPolling && (
+            <CircularProgress
+              className="!text-xs !mr-3"
+              size={16}
+              color="white"
+            />
+          ))}
         {CONSTANTS.STRINGS.TEST_QUERY_FORM_TEST_BUTTON}
       </button>
     </>

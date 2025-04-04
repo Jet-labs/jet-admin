@@ -12,6 +12,30 @@ const constants = {
   // defaults
   ROW_PAGE_SIZE: 100,
 
+  BACKEND_JOB_STATUS: {
+    PENDING: "pending",
+    PROCESSING: "processing",
+    COMPLETED: "completed",
+    FAILED: "failed",
+  },
+
+  KAFKA_GROUP_IDS: {
+    DATABASE_QUERY_RUNNER_JOB_RESULT_CONSUMER_GROUP:
+      "database-query-runner-job-results-consumer-group",
+  },
+
+  KAFKA_CLIENT_IDS: {
+    DATABASE_QUERY_RUNNER_JOB_POSTER: "database-query-runner-job-poster",
+    DATABASE_QUERY_RUNNER_JOB_WORKER: "database-query-runner-job-worker",
+    DATABASE_QUERY_RUNNER_JOB_RESULT_CONSUMER:
+      "database-query-runner-job-result-consumer",
+  },
+
+  KAFKA_TOPIC_NAMES: {
+    DATABASE_QUERY_RUNNER_JOBS: "database-query-runner-jobs",
+    DATABASE_QUERY_RUNNER_JOB_RESULTS: "database-query-runner-job-results",
+  },
+
   SAMPLE_PLAN: {
     maxTenantCount: Infinity,
     maxMembersPerTenant: Infinity,
