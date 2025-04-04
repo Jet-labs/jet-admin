@@ -39,36 +39,48 @@ postgreSQLParserUtil.generateFilterQuery = (filterModel) => {
   }
 };
 
-postgreSQLParserUtil.processDatabaseQuery = ({ query, args }) => {
+postgreSQLParserUtil.processDatabaseQuery = ({
+  databaseQueryString,
+  databaseQueryArgValues,
+}) => {
   // Validate input
-  if (typeof query !== "string") {
-    throw new TypeError("The 'query' parameter must be a string.");
+  if (typeof databaseQueryString !== "string") {
+    throw new TypeError(
+      "The 'databaseQueryString' parameter must be a string."
+    );
   }
-  if (args && typeof args !== "object") {
-    throw new TypeError("The 'args' parameter must be an object or undefined.");
+  if (databaseQueryArgValues && typeof databaseQueryArgValues !== "object") {
+    throw new TypeError(
+      "The 'databaseQueryArgValues' parameter must be an object or undefined."
+    );
   }
 
   const paramNames = [];
-  const processedQuery = query.replace(/\$\{(\w+)\}/g, (_, name) => {
-    // Ensure the placeholder name is valid
-    if (!/^\w+$/.test(name)) {
-      throw new Error(`Invalid placeholder name: \${${name}}`);
+  const processedQuery = databaseQueryString.replace(
+    /\$\{(\w+)\}/g,
+    (_, name) => {
+      // Ensure the placeholder name is valid
+      if (!/^\w+$/.test(name)) {
+        throw new Error(`Invalid placeholder name: \${${name}}`);
+      }
+      paramNames.push(name);
+      return `$${paramNames.length}`; // Replace with positional parameter
     }
-    paramNames.push(name);
-    return `$${paramNames.length}`; // Replace with positional parameter
-  });
+  );
 
   // Extract values for placeholders
   const values = paramNames.map((name) => {
-    if (!args || !Object.prototype.hasOwnProperty.call(args, name)) {
+    if (
+      !databaseQueryArgValues ||
+      !Object.prototype.hasOwnProperty.call(databaseQueryArgValues, name)
+    ) {
       throw new Error(`Missing value for placeholder: \${${name}}`);
     }
-    return args[name];
+    return databaseQueryArgValues[name];
   });
 
   return { query: processedQuery, values };
 };
-
 
 const postgreSQLQueryUtil = {};
 
@@ -1030,7 +1042,6 @@ postgreSQLQueryUtil.deleteDatabaseTableQuery = ({
   return sql;
 };
 
-
 postgreSQLQueryUtil.createTblDatabaseQueriesTable = ({
   databaseSchemaName = "public",
 }) => {
@@ -1045,7 +1056,7 @@ postgreSQLQueryUtil.createTblDatabaseQueriesTable = ({
     isDisabled BOOLEAN DEFAULT false,
     databaseQueryTitle VARCHAR NOT NULL DEFAULT 'Untitled',
     databaseQueryDescription VARCHAR,
-    databaseQuery JSON,
+    databaseQueryData JSON,
     runOnLoad BOOLEAN
 );`;
 };

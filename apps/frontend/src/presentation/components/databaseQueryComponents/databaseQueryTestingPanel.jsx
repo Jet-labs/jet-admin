@@ -44,8 +44,13 @@ export const DatabaseQueryTestingPanel = ({
                 <DatabaseQueryTestingForm
                   tenantID={tenantID}
                   databaseSchemaName={databaseSchemaName}
-                  databaseQuery={selectedQueryForTesting.databaseQuery.query}
-                  databaseQueryArgs={selectedQueryForTesting.databaseQuery.args}
+                  databaseQueryString={
+                    selectedQueryForTesting.databaseQueryData
+                      .databaseQueryString
+                  }
+                  databaseQueryArgs={
+                    selectedQueryForTesting.databaseQueryData.databaseQueryArgs
+                  }
                   setDatabaseQueryTestResult={setDatabaseQueryTestResult}
                 />
               </div>

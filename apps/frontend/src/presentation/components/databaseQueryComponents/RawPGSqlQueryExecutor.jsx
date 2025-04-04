@@ -1,19 +1,14 @@
 import { sql } from "@codemirror/lang-sql";
-import { Button, CircularProgress, Tab, Tabs } from "@mui/material";
+import { CircularProgress } from "@mui/material";
+import { useMutation } from "@tanstack/react-query";
 import { githubLight } from "@uiw/codemirror-theme-github";
 import CodeMirror from "@uiw/react-codemirror";
 import React, { useState } from "react";
 import { FaPlay } from "react-icons/fa";
-import { toast } from "react-toastify";
-import { executeRawSQLQueryAPI } from "../../../data/apis/database";
-import { PGSQLQueryResponseJSONTab } from "./pgsqlQueryResponseJSONTab";
-import { PGSQLQueryResponseRAWTab } from "./pgsqlQueryResponseRawTab";
-import { PGSQLQueryResponseSchemaTab } from "./pgsqlQueryResponseSchemaTab";
-import { PGSQLQueryResponseTableTab } from "./pgsqlQueryResponseTableTab";
-import { extractError } from "../../../utils/error";
-import { useMutation } from "@tanstack/react-query";
-import { displayError, displaySuccess } from "../../../utils/notification";
 import { CONSTANTS } from "../../../constants";
+import { executeRawSQLQueryAPI } from "../../../data/apis/database";
+import { extractError } from "../../../utils/error";
+import { displayError, displaySuccess } from "../../../utils/notification";
 import { DatabaseQueryResponseView } from "./databaseQueryResponseView";
 
 export const RawPGSqlQueryExecutor = ({tenantID}) => {

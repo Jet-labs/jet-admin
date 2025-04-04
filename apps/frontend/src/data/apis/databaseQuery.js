@@ -69,9 +69,8 @@ export const createDatabaseQueryAPI = async ({
 export const testDatabaseQueryAPI = async ({
   tenantID,
   databaseQueryID,
-  databaseQuery,
+  databaseQueryData,
 }) => {
-  console.log({ databaseQuery });
   try {
     const url =
       CONSTANTS.SERVER_HOST +
@@ -82,7 +81,7 @@ export const testDatabaseQueryAPI = async ({
         url,
         {
           databaseQueryID,
-          databaseQuery,
+          databaseQueryData,
         },
         {
           headers: {

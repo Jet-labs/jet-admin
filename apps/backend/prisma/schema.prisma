@@ -82,7 +82,7 @@ model tblDatabaseQueries {
   isDisabled                     Boolean?                         @default(false)
   databaseQueryTitle             String                           @default("Untitled") @db.VarChar
   databaseQueryDescription       String?                          @db.VarChar
-  databaseQuery                  Json?                            @db.Json
+  databaseQueryData              Json?                            @db.Json
   runOnLoad                      Boolean?
   databaseQueryResultSchema      Json?                            @db.Json
   creatorID                      Int?
@@ -130,15 +130,15 @@ model tblUserTenantRoleMappings {
 }
 
 model tblDatabaseChartQueryMappings {
-  databaseChartID    Int
-  databaseQueryID    Int
-  parameters         Json?
-  title              String?
-  executionOrder     Int?
-  datasetFields      Json?
-  argsMap            Json?
-  tblDatabaseCharts  tblDatabaseCharts  @relation(fields: [databaseChartID], references: [databaseChartID], onDelete: Cascade, onUpdate: NoAction)
-  tblDatabaseQueries tblDatabaseQueries @relation(fields: [databaseQueryID], references: [databaseQueryID], onDelete: Cascade, onUpdate: NoAction)
+  databaseChartID        Int
+  databaseQueryID        Int
+  parameters             Json?
+  title                  String?
+  executionOrder         Int?
+  datasetFields          Json?
+  databaseQueryArgValues Json?
+  tblDatabaseCharts      tblDatabaseCharts  @relation(fields: [databaseChartID], references: [databaseChartID], onDelete: Cascade, onUpdate: NoAction)
+  tblDatabaseQueries     tblDatabaseQueries @relation(fields: [databaseQueryID], references: [databaseQueryID], onDelete: Cascade, onUpdate: NoAction)
 
   @@id([databaseChartID, databaseQueryID])
 }
@@ -211,15 +211,15 @@ model tblUserNotifications {
 }
 
 model tblDatabaseWidgetQueryMappings {
-  databaseWidgetID   Int
-  databaseQueryID    Int
-  parameters         Json?
-  title              String?            @db.VarChar
-  executionOrder     Int?
-  datasetFields      Json?
-  argsMap            Json?
-  tblDatabaseQueries tblDatabaseQueries @relation(fields: [databaseQueryID], references: [databaseQueryID], onDelete: Cascade, onUpdate: NoAction, map: "fk_tblDatabaseWidgetQueryMappings_tblDatabaseQueries")
-  tblDatabaseWidgets tblDatabaseWidgets @relation(fields: [databaseWidgetID], references: [databaseWidgetID], onDelete: Cascade, onUpdate: NoAction, map: "fk_tblDatabaseWidgetQueryMappings_tblDatabaseWidgets")
+  databaseWidgetID       Int
+  databaseQueryID        Int
+  parameters             Json?
+  title                  String?            @db.VarChar
+  executionOrder         Int?
+  datasetFields          Json?
+  databaseQueryArgValues Json?
+  tblDatabaseQueries     tblDatabaseQueries @relation(fields: [databaseQueryID], references: [databaseQueryID], onDelete: Cascade, onUpdate: NoAction, map: "fk_tblDatabaseWidgetQueryMappings_tblDatabaseQueries")
+  tblDatabaseWidgets     tblDatabaseWidgets @relation(fields: [databaseWidgetID], references: [databaseWidgetID], onDelete: Cascade, onUpdate: NoAction, map: "fk_tblDatabaseWidgetQueryMappings_tblDatabaseWidgets")
 
   @@id([databaseWidgetID, databaseQueryID])
 }

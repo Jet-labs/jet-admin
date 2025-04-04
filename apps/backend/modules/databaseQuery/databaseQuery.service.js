@@ -72,7 +72,7 @@ databaseQueryService.getAllDatabaseQueries = async ({ userID, tenantID }) => {
  * @param {number} param0.userID
  * @param {string} param0.databaseQueryTitle
  * @param {string} param0.databaseQueryDescription
- * @param {JSON} param0.databaseQuery
+ * @param {JSON} param0.databaseQueryData
  * @param {Boolean} param0.runOnLoad
  * @returns {Promise<boolean>}
  */
@@ -81,7 +81,7 @@ databaseQueryService.createDatabaseQuery = async ({
   tenantID,
   databaseQueryTitle = "Untitled",
   databaseQueryDescription = null,
-  databaseQuery = null,
+  databaseQueryData = null,
   runOnLoad = false,
 }) => {
   Logger.log("info", {
@@ -91,7 +91,7 @@ databaseQueryService.createDatabaseQuery = async ({
       tenantID,
       databaseQueryTitle,
       databaseQueryDescription,
-      databaseQuery,
+      databaseQueryData,
       runOnLoad,
     },
   });
@@ -102,7 +102,7 @@ databaseQueryService.createDatabaseQuery = async ({
         tenantID: parseInt(tenantID),
         databaseQueryTitle,
         databaseQueryDescription,
-        databaseQuery,
+        databaseQueryData,
         creatorID: parseInt(userID),
         runOnLoad,
       },
@@ -113,7 +113,7 @@ databaseQueryService.createDatabaseQuery = async ({
         userID,
         databaseQueryTitle,
         databaseQueryDescription,
-        databaseQuery,
+        databaseQueryData,
         runOnLoad,
       },
     });
@@ -136,74 +136,111 @@ databaseQueryService.createDatabaseQuery = async ({
  * @param {number} param0.userID
  * @param {number} param0.databaseQueryID
  * @param {object} param0.dbPool
- * @param {object} param0.databaseQuery
+ * @param {object} param0.databaseQueryData
  * @returns {Promise<boolean>}
  */
 databaseQueryService.runDatabaseQuery = async ({
   userID,
   dbPool,
   databaseQueryID,
-  databaseQuery,
+  databaseQueryData,
 }) => {
   Logger.log("info", {
     message: "databaseQueryService:runDatabaseQuery:params",
-    params: { userID, databaseQueryID },
+    params: { userID, databaseQueryID, databaseQueryData },
   });
 
   try {
-    let _databaseQuery = databaseQuery;
+    let _databaseQueryData = databaseQueryData;
 
-    if (!databaseQuery && databaseQueryID) {
-      _databaseQuery = (
+    if (!databaseQueryData && databaseQueryID) {
+      _databaseQueryData = (
         await prisma.tblDatabaseQueries.findUnique({
           where: { databaseQueryID: parseInt(databaseQueryID) },
         })
-      ).databaseQuery;
+      ).databaseQueryData;
     }
 
     Logger.log("info", {
-      message: "databaseQueryService:runDatabaseQuery:databaseQuery",
-      params: { userID, databaseQuery: _databaseQuery },
+      message: "databaseQueryService:runDatabaseQuery:databaseQueryData",
+      params: {
+        userID,
+        databaseQueryID,
+        databaseQueryData: _databaseQueryData,
+      },
     });
 
-    const { query: originalQuery, args } = _databaseQuery;
+    const { databaseQueryString, databaseQueryArgValues } = _databaseQueryData;
 
-    const { query: processedQuery, values: queryValues } =
+    const { query: processedQuery, values: processedQueryValues } =
       postgreSQLParserUtil.processDatabaseQuery({
-        query: originalQuery,
-        args,
+        databaseQueryString,
+        databaseQueryArgValues,
       });
 
     Logger.log("info", {
       message: "databaseQueryService:runDatabaseQuery:processedQuery",
-      params: { userID, processedQuery, queryValues },
+      params: {
+        userID,
+        databaseQueryID,
+        databaseQueryData: _databaseQueryData,
+        processedQuery,
+        processedQueryValues,
+      },
     });
-    const result = await TenantAwarePostgreSQLPoolManager.withDatabaseClient(
-      dbPool,
-      async (client) => client.query(processedQuery, queryValues)
-    );
+    const databaseQueryResult =
+      await TenantAwarePostgreSQLPoolManager.withDatabaseClient(
+        dbPool,
+        async (client) => client.query(processedQuery, processedQueryValues)
+      );
 
-    const resultSchema = jsonSchemaGenerator(
-      JSON.parse(JSON.stringify(result.rows))
+    Logger.log("info", {
+      message: "databaseQueryService:runDatabaseQuery:databaseQueryResult",
+      params: {
+        userID,
+        databaseQueryID,
+        databaseQueryData: _databaseQueryData,
+        processedQuery,
+        processedQueryValues,
+        databaseQueryResult,
+      },
+    });
+
+    const databaseQueryResultSchema = jsonSchemaGenerator(
+      JSON.parse(JSON.stringify(databaseQueryResult.rows))
     );
 
     if (databaseQueryID) {
       await prisma.tblDatabaseQueries.update({
         where: { databaseQueryID: parseInt(databaseQueryID) },
-        data: { databaseQueryResultSchema: resultSchema },
+        data: { databaseQueryResultSchema: databaseQueryResultSchema },
       });
       Logger.log("info", {
         message:
-          "databaseQueryService:runDatabaseQuery:saved-query-result-schema",
-        params: { userID, databaseQuery: _databaseQuery },
+          "databaseQueryService:runDatabaseQuery:databaseQueryResultSchema:saved",
+        params: {
+          userID,
+          databaseQueryID,
+          databaseQueryData: _databaseQueryData,
+          processedQuery,
+          processedQueryValues,
+          databaseQueryResult,
+        },
       });
     }
     Logger.log("success", {
       message: "databaseQueryService:runDatabaseQuery:success",
-      params: { userID, databaseQuery: _databaseQuery },
+      params: {
+        userID,
+        databaseQueryID,
+        databaseQueryData: _databaseQueryData,
+        processedQuery,
+        processedQueryValues,
+        databaseQueryResult,
+      },
     });
 
-    return result;
+    return databaseQueryResult;
   } catch (error) {
     Logger.log("error", {
       message: "databaseQueryService:runDatabaseQuery:failure",
@@ -218,115 +255,103 @@ databaseQueryService.runDatabaseQuery = async ({
  * @param {object} param0
  * @param {number} param0.userID
  * @param {object} param0.dbPool
- * @param {Array<object>} param0.queries
+ * @param {Array<{databaseQueryID:number,databaseQueryString:string,databaseQueryArgValues:object}>} param0.databaseQueriesData
  * @returns {Promise<Array<object>>}
  */
 
 databaseQueryService.runMultipleDatabaseQueries = async ({
   userID,
   dbPool,
-  queries,
+  databaseQueriesData,
 }) => {
   Logger.log("info", {
     message: "databaseQueryService:runMultipleDatabaseQueries:start",
     params: {
       userID,
-      queryCount: queries.length,
+      databaseQueriesDataCount: databaseQueriesData.length,
     },
   });
 
   try {
-    // Prefetch required queries
-    const queryIDsToFetch = queries
-      .filter((q) => !q.databaseQuery && q.databaseQueryID)
-      .map((q) => parseInt(q.databaseQueryID, 10));
-
-    const dbQueries = queryIDsToFetch.length
-      ? await prisma.tblDatabaseQueries.findMany({
-          where: { databaseQueryID: { in: queryIDsToFetch } },
-        })
-      : [];
-
-    const queryMap = new Map(dbQueries.map((q) => [q.databaseQueryID, q]));
-
     // Execute with connection pooling
     return TenantAwarePostgreSQLPoolManager.withDatabaseClient(
       dbPool,
       async (client) => {
-        const executionPromises = queries.map(async (query, index) => {
-          const context = {
-            userID,
-            queryIndex: index,
-            databaseQueryID: query.databaseQueryID,
-          };
+        const executionPromises = databaseQueriesData.map(
+          async (databaseQueryData, index) => {
+            try {
+              // Process and execute query
+              const { query: processedQuery, values: processedQueryValues } =
+                postgreSQLParserUtil.processDatabaseQuery(databaseQueryData);
 
-          try {
-            // Resolve query content
-            let finalQuery = query.databaseQuery;
-            if (!finalQuery && query.databaseQueryID) {
-              const storedQuery = queryMap.get(
-                parseInt(query.databaseQueryID, 10)
-              );
-              if (!storedQuery)
-                throw new Error(`Query ${query.databaseQueryID} not found`);
-              finalQuery = storedQuery.databaseQuery;
-            }
-
-            if (!finalQuery) throw new Error("Invalid query parameters");
-
-            // Process and execute query
-            const { query: processedQuery, values } =
-              postgreSQLParserUtil.processDatabaseQuery({
-                query: finalQuery.query,
-                args: query.argsMap,
+              Logger.log("info", {
+                message:
+                  "databaseQueryService:runMultipleDatabaseQueries:processDatabaseQuery",
+                params: {
+                  userID,
+                  processedQuery,
+                  processedQueryValues,
+                },
               });
 
-            Logger.log("info", {
-              message:
-                "databaseQueryService:runMultipleDatabaseQueries:execute-query",
-              params: {
-                ...context,
+              const databaseQueryResult = await client.query(
                 processedQuery,
-                parameters: values,
-              },
-            });
-
-            const result = await client.query(processedQuery, values);
-
-            // Update schema if needed
-            if (query.databaseQueryID) {
-              const schema = jsonSchemaGenerator(
-                JSON.parse(JSON.stringify(result.rows))
+                processedQueryValues
               );
-              await prisma.tblDatabaseQueries.update({
-                where: { databaseQueryID: parseInt(query.databaseQueryID, 10) },
-                data: { databaseQueryResultSchema: schema },
-              });
-            }
 
-            return {
-              success: true,
-              queryIndex: index,
-              result: result.rows,
-              databaseQueryID: query.databaseQueryID,
-            };
-          } catch (error) {
-            Logger.log("error", {
-              message:
-                "databaseQueryService:runMultipleDatabaseQueries:catch-2",
-              params: {
-                ...context,
-                error: error.message,
-              },
-            });
-            return {
-              success: false,
-              queryIndex: index,
-              error: error.message,
-              databaseQueryID: query.databaseQueryID,
-            };
+              Logger.log("info", {
+                message:
+                  "databaseQueryService:runMultipleDatabaseQueries:databaseQueryResult",
+                params: {
+                  userID,
+                  processedQuery,
+                  processedQueryValues,
+                  databaseQueryResult,
+                },
+              });
+
+              // Update schema if needed
+              if (databaseQueryData.databaseQueryID) {
+                const databaseQueryResultSchema = jsonSchemaGenerator(
+                  JSON.parse(JSON.stringify(databaseQueryResult.rows))
+                );
+                await prisma.tblDatabaseQueries.update({
+                  where: {
+                    databaseQueryID: parseInt(
+                      databaseQueryData.databaseQueryID
+                    ),
+                  },
+                  data: {
+                    databaseQueryResultSchema: databaseQueryResultSchema,
+                  },
+                });
+              }
+
+              return {
+                success: true,
+                queryIndex: index,
+                result: databaseQueryResult.rows,
+                databaseQueryID: databaseQueryData.databaseQueryID,
+              };
+            } catch (error) {
+              Logger.log("error", {
+                message:
+                  "databaseQueryService:runMultipleDatabaseQueries:catch-2",
+                params: {
+                  userID,
+                  queryIndex: index,
+                  error,
+                },
+              });
+              return {
+                success: false,
+                queryIndex: index,
+                error,
+                databaseQueryID: query.databaseQueryID,
+              };
+            }
           }
-        });
+        );
 
         return Promise.all(executionPromises);
       }
@@ -336,8 +361,7 @@ databaseQueryService.runMultipleDatabaseQueries = async ({
       message: "databaseQueryService:runMultipleDatabaseQueries:catch-1",
       params: {
         userID,
-        error: error.message,
-        stack: error.stack,
+        error,
       },
     });
     throw error;
@@ -424,7 +448,7 @@ databaseQueryService.getDatabaseQueryByID = async ({
  * @param {number} param0.databaseQueryID
  * @param {string} param0.databaseQueryTitle
  * @param {string} param0.databaseQueryDescription
- * @param {JSON} param0.databaseQuery
+ * @param {JSON} param0.databaseQueryData
  * @param {Boolean} param0.runOnLoad
  * @returns {Promise<boolean>}
  */
@@ -434,7 +458,7 @@ databaseQueryService.updateDatabaseQueryByID = async ({
   databaseQueryID,
   databaseQueryTitle,
   databaseQueryDescription,
-  databaseQuery,
+  databaseQueryData,
   runOnLoad,
 }) => {
   Logger.log("info", {
@@ -445,7 +469,7 @@ databaseQueryService.updateDatabaseQueryByID = async ({
       databaseQueryID,
       databaseQueryTitle,
       databaseQueryDescription,
-      databaseQuery,
+      databaseQueryData,
       runOnLoad,
     },
   });
@@ -460,7 +484,7 @@ databaseQueryService.updateDatabaseQueryByID = async ({
       data: {
         databaseQueryTitle,
         databaseQueryDescription,
-        databaseQuery,
+        databaseQueryData,
         runOnLoad,
       },
     });
@@ -473,7 +497,7 @@ databaseQueryService.updateDatabaseQueryByID = async ({
         databaseQueryID,
         databaseQueryTitle,
         databaseQueryDescription,
-        databaseQuery,
+        databaseQueryData,
         runOnLoad,
       },
     });
@@ -486,7 +510,7 @@ databaseQueryService.updateDatabaseQueryByID = async ({
         userID,
         tenantID,
         databaseQueryID,
-        error: error.message,
+        error,
       },
     });
     throw error;
@@ -499,10 +523,6 @@ databaseQueryService.updateDatabaseQueryByID = async ({
  * @param {number} param0.userID
  * @param {string} param0.tenantID
  * @param {number} param0.databaseQueryID
- * @param {string} param0.databaseQueryTitle
- * @param {string} param0.databaseQueryDescription
- * @param {JSON} param0.databaseQuery
- * @param {Boolean} param0.runOnLoad
  * @returns {Promise<boolean>}
  */
 databaseQueryService.deleteDatabaseQueryByID = async ({

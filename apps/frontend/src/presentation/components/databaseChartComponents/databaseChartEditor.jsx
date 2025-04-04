@@ -28,7 +28,7 @@ export const DatabaseChartEditor = ({ databaseChartEditorForm }) => {
           type: CONSTANTS.DATABASE_CHART_TYPES.BAR_CHART.value,
           color: "#D84545",
         },
-        argsMap: {},
+        datbbaseQueryArgValues: {},
         datasetFields: {
           xAxis: "",
           yAxis: "",

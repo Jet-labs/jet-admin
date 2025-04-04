@@ -99,7 +99,7 @@ formValidations.queryAdditionFormValidationSchema = Yup.object().shape({
     .required("Query title is required")
     .min(3, "Query title must be at least 3 characters"),
   databaseQueryDescription: Yup.string().optional(), // Optional field
-  databaseQuery: Yup.string()
+  databaseQueryString: Yup.string()
     .required("Database query is required")
     .min(10, "Database query must be at least 10 characters"),
   databaseQueryArgs: Yup.array()
@@ -120,7 +120,7 @@ formValidations.queryUpdationFormValidationSchema = Yup.object().shape({
     .required("Query title is required")
     .min(3, "Query title must be at least 3 characters"),
   databaseQueryDescription: Yup.string().optional(), // Optional field
-  databaseQuery: Yup.string()
+  databaseQueryString: Yup.string()
     .required("Database query is required")
     .min(10, "Database query must be at least 10 characters"),
   databaseQueryArgs: Yup.array()
@@ -158,27 +158,27 @@ formValidations.apiKeyUpdationFormValidationSchema = Yup.object().shape({
   apiKeyName: Yup.string().required("API key name is required"),
 });
 
-formValidations.databaseQueryArgsFormValidationSchema = (args) =>
+formValidations.databaseQueryArgsFormValidationSchema = (databaseQueryArgs) =>
   Yup.object().shape(
-    args.reduce((acc, arg) => {
+    databaseQueryArgs.reduce((acc, arg) => {
       acc[arg] = Yup.string().required(`${arg} is required`);
       return acc;
     }, {})
   );
 
-formValidations.datasetArgumentsFormValidationSchema = (args) => {
-  const argsMapSchema = {};
+formValidations.datasetArgumentsFormValidationSchema = (databaseQueryArgs) => {
+  const databaseQueryArgValuesSchema = {};
 
   // Dynamically create validation rules for each argument
-  args?.forEach((arg) => {
+  databaseQueryArgs?.forEach((arg) => {
     const argName = arg.replace(/[{}]/g, ""); // Remove curly braces if present
-    argsMapSchema[argName] = Yup.string()
+    databaseQueryArgValuesSchema[argName] = Yup.string()
       .required(`Value for ${argName} is required`)
       .min(1, `Value for ${argName} cannot be empty`);
   });
 
   return Yup.object().shape({
-    argsMap: Yup.object().shape(argsMapSchema),
+    databaseQueryArgValues: Yup.object().shape(databaseQueryArgValuesSchema),
   });
 };
 

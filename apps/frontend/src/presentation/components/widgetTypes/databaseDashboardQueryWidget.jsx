@@ -42,7 +42,7 @@ export const DatabaseDashboardQueryWidget = ({
 
   const {
     isLoading: isLoadingDatabaseQueryData,
-    data: databaseQueryData,
+    data: databaseQueryResult,
     error: loadDatabaseQueryDataError,
     isFetching: isFetchingDatabaseQueryData,
     isRefetching: isRefetechingDatabaseQueryData,
@@ -61,7 +61,7 @@ export const DatabaseDashboardQueryWidget = ({
     refetchOnWindowFocus: false,
   });
 
-  const data = databaseQueryData?.rows;
+  const data = databaseQueryResult?.rows;
   const dataSchema = data
     ? jsonSchemaGenerator(Array.isArray(data) ? data[0] : data)
     : {};

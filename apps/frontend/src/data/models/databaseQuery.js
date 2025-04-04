@@ -8,7 +8,7 @@ export class DatabaseQuery {
     databaseQueryTitle,
     databaseSchemaName,
     databaseQueryDescription,
-    databaseQuery,
+    databaseQueryData,
     databaseQueryResultSchema,
     runOnLoad,
     tblDatabaseChartQueryMappings,
@@ -25,7 +25,7 @@ export class DatabaseQuery {
     this.databaseQueryDescription = databaseQueryDescription;
     this.runOnLoad = runOnLoad;
     this.databaseQueryResultSchema = databaseQueryResultSchema;
-    this.databaseQuery = databaseQuery;
+    this.databaseQueryData = databaseQueryData;
     this.tblDatabaseChartQueryMappings = tblDatabaseChartQueryMappings;
     this.linkedDatabaseChartCount = linkedDatabaseChartCount || 0;
     this.linkedDatabaseWidgetCount = linkedDatabaseWidgetCount || 0;
