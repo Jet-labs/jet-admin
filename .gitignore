@@ -8,5 +8,7 @@ apps/backend/logs
 apps/frontend/node_modules
 apps/frontend/.env
 
+docker-compose.yml
+
 node_modules
-.docker-compose.yml
+
