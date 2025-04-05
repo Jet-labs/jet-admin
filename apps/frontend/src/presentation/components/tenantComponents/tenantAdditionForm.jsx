@@ -19,8 +19,8 @@ export const TenantAdditionForm = () => {
     error: createNewTenantError,
     mutate: createNewTenant,
   } = useMutation({
-    mutationFn: ({ tenantName, tenantLogoURL }) =>
-      createNewTenantAPI({ tenantName, tenantLogoURL }),
+    mutationFn: ({ tenantName, tenantLogoURL, tenantDBURL }) =>
+      createNewTenantAPI({ tenantName, tenantLogoURL, tenantDBURL }),
     retry: false,
     onSuccess: (tenant) => {
       saveTenantLocallyAndReload(tenant);
@@ -36,10 +36,11 @@ export const TenantAdditionForm = () => {
     initialValues: {
       tenantName: "",
       tenantLogoURL: "",
+      tenantDBURL: "",
     },
     validationSchema: formValidations.addTenantFormValidationSchema,
-    onSubmit: ({ tenantName, tenantLogoURL }) => {
-      createNewTenant({ tenantName, tenantLogoURL });
+    onSubmit: ({ tenantName, tenantLogoURL, tenantDBURL }) => {
+      createNewTenant({ tenantName, tenantLogoURL, tenantDBURL });
     },
   });
 
