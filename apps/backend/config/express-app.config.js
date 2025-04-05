@@ -7,7 +7,15 @@ const constants = require("../constants");
 var corsOptions = {
   credentials: true,
   origin: function (origin, callback) {
-    if (environmentVariables.CORS_WHITELIST.indexOf(origin) !== -1) {
+    if (
+      [
+        ...environmentVariables.CORS_WHITELIST,
+        "chrome-extension://fhbjgbiflinjbdggehcddcbncdddomop",
+        // Allow requests with no origin (like mobile apps, Postman desktop app)
+        undefined,
+        "null",
+      ].indexOf(origin) !== -1
+    ) {
       callback(null, true);
     } else {
       console.log(origin);

@@ -1,0 +1,50 @@
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8090:8090"  # Backend API
+      - "3000:80"    # Frontend
+    image: jet-admin-image
+    container_name: jet-admin-container
+    environment:
+      # Server Configuration
+      - NODE_ENV=production
+      - VITE_FIREBASE_API_KEY=
+      - VITE_FIREBASE_AUTH_DOMAIN=
+      - VITE_FIREBASE_PROJECT_ID=
+      - VITE_FIREBASE_STORAGE_BUCKET=
+      - VITE_FIREBASE_MESSAGING_SENDER_ID=
+      - VITE_FIREBASE_APP_ID=
+      - VITE_FIREBASE_MEASUREMENT_ID=
+      - VITE_SUPABASE_URL=
+      - VITE_SUPABASE_KEY=
+      - PORT=8090
+      - EXPRESS_REQUEST_SIZE_LIMIT=5mb
+      
+      # Database Configuration
+      - DATABASE_URL=
+      - SEED_DATABASE=true
+      
+      # Authentication
+      - JWT_ACCESS_TOKEN_SECRET=your_access_token_secret
+      - JWT_REFRESH_TOKEN_SECRET=your_refresh_token_secret
+      - ACCESS_TOKEN_TIMEOUT=900
+      - REFRESH_TOKEN_TIMEOUT=100h
+      
+      # CORS Settings
+      - CORS_WHITELIST=http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173,http://127.0.0.1:3001,http://localhost:3001
+      
+      # Logging Configuration
+      - SYSLOG_HOST=127.0.0.1
+      - SYSLOG_PORT=514
+      - SYSLOG_PROTOCOL=udp4
+      - SYSLOG_LEVEL=warning
+      - LOG_LEVEL=info
+      - LOG_RETENTION=7
+      - LOG_FILE_SIZE=1
+      
+      # Node Identification
+      - NODE_ID=prod_node_1

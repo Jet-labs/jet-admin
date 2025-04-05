@@ -1,13 +1,12 @@
-# Backend Setup Guide
+# Backend Local Development
 
-This guide will walk you through setting up the backend environment for both development and production.
+This guide will walk you through setting up the backend environment for development.
 
 ## Prerequisites
 
 Before you begin, ensure you have the following installed:
 
 - **Node.js** (v18 or higher) & **npm** - [Download from nodejs.org](https://nodejs.org/)
-- **Docker** - [Download from docker.com](https://www.docker.com/)
 - **PostgreSQL** database (local or remote access)
 
 ## Local Development Setup
@@ -59,17 +58,13 @@ LOG_RETENTION=7
 LOG_FILE_SIZE=1
 ```
 
-:::tip
-You can copy these settings from `apps/backend/development.env` as a starting point and modify them as needed.
-:::
-
 :::caution
 Be sure to replace the placeholder values with your actual configurations, especially the `DATABASE_URL` and JWT secrets for security purposes.
 :::
 
 ### Firebase Configuration
 
-Create a `firebase-key.json` file in the root directory with the following structure:
+Generate Firebase key from Firebase console and rename the file to `firebase-key.json` in the root directory with the following structure:
 
 ```json
 {
@@ -115,68 +110,6 @@ npm run dev
 
 Your API will be available at `http://localhost:8090`.
 
-## Production Deployment
-
-### Environment Preparation
-
-1. Ensure all environment variables are properly configured for your production environment
-2. Configure the Firebase credentials as described in the development setup section
-
-### Docker Deployment
-
-1. **Build the Docker image**
-
-   ```bash
-   docker build -t backend .
-   ```
-
-2. **Run the container**
-
-   ```bash
-   docker run -p 8090:8090 \
-     -e DATABASE_URL="<your_production_db_url>" \
-     -e JWT_ACCESS_TOKEN_SECRET="<secure_token>" \
-     -e JWT_REFRESH_TOKEN_SECRET="<secure_token>" \
-     -e CORS_WHITELIST="<production_domains>" \
-     backend
-   ```
-
-:::tip
-For security, use environment variables rather than hardcoded values in your Docker commands.
-:::
-
-### Process Management Options
-
-**Option 1: Standard Node.js**
-
-```bash
-npm start
-```
-
-**Option 2: PM2 (Recommended)**
-
-```bash
-npm run pm2
-```
-
-PM2 provides enhanced process management, automatic restarts, and monitoring for your production application.
-
-### Database Seeding (Optional)
-
-To populate your database with initial data:
-
-```bash
-docker run -p 8090:8090 \
-  -e SEED_DATABASE=true \
-  -e DATABASE_URL="<your_production_db_url>" \
-  -e JWT_ACCESS_TOKEN_SECRET="<secure_token>" \
-  -e JWT_REFRESH_TOKEN_SECRET="<secure_token>" \
-  -e CORS_WHITELIST="<production_domains>" \
-  backend
-```
-
-This executes the `seed.js` script located in the `scripts` directory.
-
 ## Troubleshooting
 
 If you encounter issues during setup or deployment, check the following:
@@ -190,4 +123,3 @@ If you encounter issues during setup or deployment, check the following:
 
 - [Prisma Documentation](https://www.prisma.io/docs/)
 - [Node.js Best Practices](https://github.com/goldbergyoni/nodebestpractices)
-- [PM2 Documentation](https://pm2.keymetrics.io/docs/usage/quick-start/)

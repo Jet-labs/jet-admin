@@ -9,3 +9,4 @@ apps/frontend/node_modules
 apps/frontend/.env
 
 node_modules
+.docker-compose.yml
