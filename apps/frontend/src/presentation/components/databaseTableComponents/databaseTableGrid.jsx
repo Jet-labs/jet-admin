@@ -1,6 +1,6 @@
 import { Checkbox, CircularProgress } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useDebounce } from "@uidotdev/usehooks";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import "react-data-grid/lib/styles.css";
@@ -18,19 +18,20 @@ import {
 import {
   databaseTableBulkRowAdditionAPI,
   databaseTableBulkRowUpdationAPI,
-  getDatabaseTableByNameAPI,
-  getDatabaseTableRowsAPI,
-  getDatabaseTableStatisticsAPI,
 } from "../../../data/apis/databaseTable";
 import { useGlobalUI } from "../../../logic/contexts/globalUIContext";
+import { useDatabaseTable } from "../../../logic/hooks/useDatabaseTable";
+import { useDatabaseTableRows } from "../../../logic/hooks/useDatabaseTableRows";
+import { useDatabaseTableStatistics } from "../../../logic/hooks/useDatabaseTableStatistics";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { PostgreSQLUtils } from "../../../utils/postgre";
 import { NoEntityUI } from "../ui/noEntityUI";
 import { DatabaseTableColumnFilter } from "./databaseTableColumnFilter";
+import { getFormattedTableColumns } from "./databaseTableGridFormatter";
 import { DatabaseTableRowsDeletionForm } from "./databaseTableRowsDeletionForm";
 import { DatabaseTableRowsExportForm } from "./databaseTableRowsExportForm";
 import { DatabaseTableStatistics } from "./databaseTableStatistics";
-import { getFormattedTableColumns } from "./databaseTableGridFormatter";
+import { useDatabaseTableMutations } from "../../../logic/hooks/useDatabaseTableMutations";
 
 export const DatabaseTableGrid = ({
   tenantID,
@@ -85,140 +86,51 @@ export const DatabaseTableGrid = ({
   ).reduce((acc, row) => acc + Object.keys(row).length, 0);
 
   const {
+    databaseTableColumns,
+    databaseTableConstraints,
+    databaseTablePrimaryKey,
+    databaseTableColumnForeignKeyMap,
     isLoading: isLoadingDatabaseTable,
-    data: databaseTable,
     error: loadDatabaseTableError,
     isFetching: isFetchingDatabaseTable,
-    isRefetching: isRefetechingDatabaseTable,
-    refetch: refetchDatabaseTable,
-  } = useQuery({
-    queryKey: [
-      CONSTANTS.REACT_QUERY_KEYS.DATABASE_TABLES_META(
-        tenantID,
-        databaseSchemaName,
-        databaseTableName
-      ),
-    ],
-    queryFn: () =>
-      getDatabaseTableByNameAPI({
-        tenantID,
-        databaseSchemaName,
-        databaseTableName,
-      }),
-    refetchOnWindowFocus: false,
+  } = useDatabaseTable({
+    tenantID,
+    databaseSchemaName,
+    databaseTableName,
   });
 
   const {
     isLoading: isLoadingDatabaseTableRows,
-    data: data,
+    rows: databaseTableRows,
     error: loadRowsError,
     isFetching: isFetchingDatabaseTableRows,
     isPreviousData: isPreviousDatabaseTableRowsData,
-    refetch: reloadDatabaseTableRows,
-  } = useQuery({
-    queryKey: [
-      CONSTANTS.REACT_QUERY_KEYS.DATABASE_TABLES_ROWS(
-        tenantID,
-        databaseSchemaName,
-        databaseTableName
-      ),
-      page,
-      pageSize,
-      filterQuery,
-      databaseTableColumnSortModel,
-    ],
-    queryFn: () =>
-      getDatabaseTableRowsAPI({
-        tenantID,
-        databaseSchemaName,
-        databaseTableName,
-        page,
-        pageSize,
-        filterQuery: filterQuery,
-        databaseTableColumnSortModel: databaseTableColumnSortModel
-          ? PostgreSQLUtils.generateOrderByQuery(databaseTableColumnSortModel)
-          : null,
-      }),
-    refetchOnWindowFocus: false,
-    keepPreviousData: true,
+    reloadDatabaseTableRows,
+    invalidateDatabaseTableRows,
+  } = useDatabaseTableRows({
+    tenantID,
+    databaseSchemaName,
+    databaseTableName,
+    page,
+    pageSize,
+    databaseTablePrimaryKey,
+    filterQuery,
+    databaseTableColumnSortModel,
   });
 
   const {
+    databaseTableRowCount,
+    reloadDatabaseTableStatistics,
+    invalidateDatabaseTableStatistics,
     isLoading: isLoadingDatabaseTableStatistics,
-    data: databaseTableStatistics,
-    error: loadDataError,
-  } = useQuery({
-    queryKey: [
-      CONSTANTS.REACT_QUERY_KEYS.DATABASE_TABLES_STATISTICS(
-        tenantID,
-        databaseSchemaName,
-        databaseTableName
-      ),
-      filterQuery,
-    ],
-    queryFn: () =>
-      getDatabaseTableStatisticsAPI({
-        tenantID,
-        databaseSchemaName,
-        databaseTableName,
-        filterQuery: filterQuery,
-      }),
+    error: loadStatisticsError,
+    isFetching: isFetchingDatabaseTableStatistics,
+  } = useDatabaseTableStatistics({
+    tenantID,
+    databaseSchemaName,
+    databaseTableName,
+    filterQuery,
   });
-
-  const {
-    mutate: bulkAdditionDatabaseTableRows,
-    isPending: isBulkAddingDatabaseTableRows,
-    error: bulkAdditionDatabaseTableRowsError,
-  } = useMutation({
-    mutationFn: ({ databaseTableRowData }) => {
-      return databaseTableBulkRowAdditionAPI({
-        tenantID,
-        databaseSchemaName,
-        databaseTableName,
-        databaseTableRowData,
-      });
-    },
-    onSuccess: () => {
-      displaySuccess(
-        CONSTANTS.STRINGS.DATABASE_TABLE_VIEW_CHANGES_SAVED_SUCCESS
-      );
-      reloadDatabaseTableRows();
-      _handleClearAddDatabaseTableRow();
-    },
-    onError: (error) => {
-      displayError(error);
-    },
-  });
-
-  const {
-    mutate: bulkUpdateDatabaseTableRows,
-    isPending: isBulkUpdatingDatabaseTableRows,
-    error: bulkUpdateDatabaseTableRowsError,
-  } = useMutation({
-    mutationFn: ({ databaseTableRowData }) => {
-      return databaseTableBulkRowUpdationAPI({
-        tenantID,
-        databaseSchemaName,
-        databaseTableName,
-        databaseTableRowData,
-      });
-    },
-    onSuccess: () => {
-      displaySuccess(
-        CONSTANTS.STRINGS.DATABASE_TABLE_VIEW_CHANGES_UPDATED_SUCCESS
-      );
-      reloadDatabaseTableRows();
-      _handleClearDatabaseTableRowChanges();
-    },
-    onError: (error) => {
-      displayError(error);
-    },
-  });
-
-  const databaseTableColumns = databaseTable?.databaseTableColumns;
-  const databaseTableConstraints = databaseTable?.databaseTableConstraints;
-  const databaseTablePrimaryKey = databaseTable?.primaryKey;
-  const databaseTableColumnForeignKeyMap = databaseTable?.columnForeignKeyMap;
 
   useEffect(() => {
     if (
@@ -290,32 +202,6 @@ export const DatabaseTableGrid = ({
     databaseTableColumns,
   ]);
 
-  const _selectByIDQueryBuilder = useCallback(
-    (row) => {
-      if (databaseTablePrimaryKey) {
-        return {
-          query: PostgreSQLUtils.combinePrimaryKeyToWhereClause(
-            databaseTablePrimaryKey,
-            row
-          ),
-        };
-      }
-    },
-    [databaseTablePrimaryKey]
-  );
-
-  const _generateInitialRowID = useCallback(
-    (row) => {
-      if (databaseTablePrimaryKey) {
-        return PostgreSQLUtils.combinePrimaryKeyToWhereClause(
-          databaseTablePrimaryKey,
-          row
-        );
-      }
-    },
-    [databaseTablePrimaryKey]
-  );
-
   const _getRowID = useCallback(
     (row) => {
       if (row.__is__new__row) {
@@ -325,14 +211,6 @@ export const DatabaseTableGrid = ({
       }
     },
     [databaseTablePrimaryKey]
-  );
-
-  const databaseTableRows = useMemo(
-    () =>
-      data?.rows?.map((_row) => {
-        return { ..._row, __row__uid: _generateInitialRowID(_row) };
-      }),
-    [data, _generateInitialRowID]
   );
 
   const _handleToggleAllRowSelectCheckbox = useCallback(
@@ -377,7 +255,7 @@ export const DatabaseTableGrid = ({
       setMultipleSelectedQuery,
       setIsSelectAllRowCheckBoxEnabled,
       _handleToggleAllRowSelectCheckbox,
-      databaseTableStatistics,
+      databaseTableRowCount,
     ]
   );
 
@@ -400,25 +278,9 @@ export const DatabaseTableGrid = ({
   const _handleClearDatabaseTableRowChanges = useCallback(() => {
     setDatabaseTableRowChanges({});
     setDatabaseTableRowChangesForUITracking({});
-    queryClient.invalidateQueries([
-      CONSTANTS.REACT_QUERY_KEYS.DATABASE_TABLES_ROWS(
-        tenantID,
-        databaseSchemaName,
-        databaseTableName
-      ),
-      page,
-      pageSize,
-      filterQuery,
-      databaseTableColumnSortModel,
-    ]);
-  }, [
-    queryClient,
-    page,
-    pageSize,
-    filterQuery,
-    databaseTableColumnSortModel,
-    data,
-  ]);
+    invalidateDatabaseTableRows();
+    reloadDatabaseTableRows();
+  }, [queryClient, page, pageSize, filterQuery, databaseTableColumnSortModel]);
 
   const _handleCommitDatabaseTableRowChanges = () => {
     bulkUpdateDatabaseTableRows({
@@ -502,6 +364,23 @@ export const DatabaseTableGrid = ({
     setDatabaseTableNewRows([]);
   }, [setDatabaseTableNewRows]);
 
+  const {
+    bulkAddRows: bulkAdditionDatabaseTableRows,
+    bulkUpdateRows: bulkUpdateDatabaseTableRows,
+    isAdding: isBulkAddingDatabaseTableRows,
+    addError: bulkAdditionDatabaseTableRowsError,
+    isUpdating: isBulkUpdatingDatabaseTableRows,
+    updateError: bulkUpdateDatabaseTableRowsError,
+  } = useDatabaseTableMutations({
+    tenantID,
+    databaseSchemaName,
+    databaseTableName,
+    reloadDatabaseTableRows,
+    invalidateDatabaseTableRows,
+    onBulkAddSuccess: _handleClearAddDatabaseTableRow,
+    onBulkUpdateSuccess: _handleClearDatabaseTableRowChanges,
+  });
+
   return isLoadingDatabaseTableRows || isLoadingDatabaseTable ? (
     <div
       className={`w-full h-full !overflow-y-hidden ${containerClass} flex justify-center items-center`}
@@ -522,9 +401,7 @@ export const DatabaseTableGrid = ({
               isLoadingDatabaseTableStatistics={
                 isLoadingDatabaseTableStatistics
               }
-              databaseTableRowCount={
-                databaseTableStatistics?.databaseTableRowCount
-              }
+              databaseTableRowCount={databaseTableRowCount}
             />
           </div>
         )}
@@ -609,7 +486,10 @@ export const DatabaseTableGrid = ({
                 {CONSTANTS.STRINGS.DATABASE_TABLE_VIEW_ADD_FILTER}
               </button>
               <button
-                onClick={reloadDatabaseTableRows}
+                onClick={() => {
+                  invalidateDatabaseTableRows();
+                  reloadDatabaseTableRows();
+                }}
                 className="!outline-none !hover:outline-none flex items-center rounded bg-[#646cff]/10 px-1 py-1 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50"
               >
                 <MdOutlineRefresh
@@ -689,7 +569,7 @@ export const DatabaseTableGrid = ({
             )}
           </div>
         )}
-        {isSelectAllRowCheckBoxEnabled && databaseTableStatistics && (
+        {isSelectAllRowCheckBoxEnabled && !isNaN(databaseTableRowCount) && (
           <div className="w-full flex flex-row bg-[#ffe7a4] justify-between items-center gap-2 p-2 border-b border-slate-200">
             <div>
               <Checkbox
@@ -700,7 +580,7 @@ export const DatabaseTableGrid = ({
                 className="!p-0 text-[#646cff] hover:bg-[#646cff]/10 focus:outline-none focus:ring-2 focus:ring-[#646cff]/50"
               />
               <span className="text-sm font-medium mr-2 text-slate-700">
-                Select all {databaseTableStatistics.databaseTableRowCount} rows
+                Select all {databaseTableRowCount} rows
               </span>
             </div>
             <div className="flex flex-row justify-end items-center">
@@ -710,9 +590,7 @@ export const DatabaseTableGrid = ({
                 databaseTableName={databaseTableName}
                 filterQuery={filterQuery}
                 isAllRowSelectChecked={isAllRowSelectChecked}
-                databaseTableRowCount={
-                  databaseTableStatistics?.databaseTableRowCount
-                }
+                databaseTableRowCount={databaseTableRowCount}
                 rowSelectionModel={_rowSelectionModel}
                 multipleSelectedQuery={multipleSelectedQuery}
               />
@@ -722,12 +600,13 @@ export const DatabaseTableGrid = ({
                 databaseTableName={databaseTableName}
                 filterQuery={filterQuery}
                 isAllRowSelectChecked={isAllRowSelectChecked}
-                databaseTableRowCount={
-                  databaseTableStatistics?.databaseTableRowCount
-                }
+                databaseTableRowCount={databaseTableRowCount}
                 rowSelectionModel={_rowSelectionModel}
                 multipleSelectedQuery={multipleSelectedQuery}
-                reloadDatabaseTableRows={reloadDatabaseTableRows}
+                reloadDatabaseTableRows={() => {
+                  invalidateDatabaseTableRows();
+                  reloadDatabaseTableRows();
+                }}
               />
             </div>
           </div>
@@ -836,8 +715,8 @@ export const DatabaseTableGrid = ({
             }}
             paginationMode="server"
             rowCount={
-              databaseTableStatistics
-                ? parseInt(databaseTableStatistics.databaseTableRowCount)
+              !isNaN(databaseTableRowCount)
+                ? parseInt(databaseTableRowCount)
                 : 0
             }
             pageSizeOptions={[20, 50, 100]}
@@ -850,22 +729,6 @@ export const DatabaseTableGrid = ({
               setPageSize(newPageSize);
             }}
             hideFooterSelectedRowCount
-
-            // onRowClick={(params) => {
-            //   if (onRowClick) {
-            //     onRowClick(params);
-            //   } else {
-            //     navigate(
-            //       CONSTANTS.ROUTES.ROW_VIEW.path(
-            //         databaseTableName,
-            //         JSON.stringify(_selectByIDQueryBuilder(params.row))
-            //       )
-            //     );
-            //   }
-            // }}
-            // slots={{
-            //   loadingOverlay: LinearProgress, // Custom loading overlay
-            // }}
           />
         </div>
       ) : (
