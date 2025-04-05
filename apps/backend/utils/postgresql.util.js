@@ -425,22 +425,65 @@ postgreSQLQueryUtil.getDatabaseTableStatistics = ({
 };
 
 postgreSQLQueryUtil.databaseTableBulkRowUpdate = ({
-  databaseSchemaName = "public", // Default to "public" if not provided
+  databaseSchemaName = "public",
   databaseTableName,
   databaseTableRowData,
 }) => {
   const _databaseTableName = `"${databaseSchemaName}"."${databaseTableName}"`;
+
+  // Helper function to properly format values for PostgreSQL
+  const formatValue = (value) => {
+    if (value === null || value === undefined) {
+      return "NULL";
+    }
+
+    // Handle Date objects (convert to ISO and wrap with TIMESTAMP)
+    if (value instanceof Date) {
+      const isoString = value
+        .toISOString()
+        .replace("T", " ")
+        .replace(/\.\d+Z$/, "");
+      return `TIMESTAMP '${isoString}'`;
+    }
+
+    // Handle boolean values
+    if (typeof value === "boolean") {
+      return value ? "TRUE" : "FALSE";
+    }
+
+    // Handle numeric values
+    if (typeof value === "number") {
+      if (Number.isNaN(value) || !Number.isFinite(value)) {
+        throw new Error(`Invalid numeric value for PostgreSQL: ${value}`);
+      }
+      return value.toString();
+    }
+
+    // Handle Buffer (convert to bytea hex format)
+    if (Buffer.isBuffer(value)) {
+      return `'\\x${value.toString("hex")}'`;
+    }
+
+    // Handle arrays (convert to PostgreSQL array format)
+    if (Array.isArray(value)) {
+      const elements = value.map((element) => formatValue(element)).join(", ");
+      return `ARRAY[${elements}]`;
+    }
+
+    // Handle JSON objects (convert to JSONB)
+    if (typeof value === "object") {
+      return `JSONB '${JSON.stringify(value).replace(/'/g, "''")}'`;
+    }
+
+    // Handle string values (escape single quotes)
+    return `'${value.replace(/'/g, "''")}'`;
+  };
+
   return databaseTableRowData.map(({ data, query }) => {
-    const setClause = Object.keys(data)
-      .map(
-        (key) =>
-          `"${key}" = ${
-            typeof data[key] === "string"
-              ? `'${data[key].replace(/'/g, "''")}'`
-              : data[key]
-          }`
-      )
+    const setClause = Object.entries(data)
+      .map(([key, value]) => `"${key}" = ${formatValue(value)}`)
       .join(", ");
+
     return `UPDATE ${_databaseTableName} SET ${setClause} WHERE ${query};`;
   });
 };

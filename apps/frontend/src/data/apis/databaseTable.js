@@ -175,6 +175,7 @@ export const getDatabaseTableByNameAPI = async ({
       } else if (response.data.error) {
         throw response.data.error;
       } else {
+        console.log(response.data);
         throw CONSTANTS.ERROR_CODES.SERVER_ERROR;
       }
     } else {

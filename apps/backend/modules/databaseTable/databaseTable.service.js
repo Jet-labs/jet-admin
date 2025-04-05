@@ -462,6 +462,17 @@ databaseTableService.databaseTableBulkRowUpdate = async ({
           databaseTableRowData,
         });
 
+        Logger.log("warning", {
+          message: "databaseTableService:databaseTableBulkRowUpdate:warning",
+          params: {
+            userID,
+            databaseSchemaName,
+            databaseTableName,
+            databaseTableRowData,
+            updateQueries: String(updateQueries),
+          },
+        });
+
         // Execute each query within the transaction
         for (const query of updateQueries) {
           await client.query(query);
