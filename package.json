@@ -6,6 +6,7 @@
     "start:f": "cd apps/frontend && npm run dev",
     "start:b": "cd apps/backend && npm run dev-w",
     "start:all": "concurrently \"npm run start:frontend\" \"npm run start:backend\"",
+    "seed": "cd apps/backend && npm run seed",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -15,3 +16,5 @@
     "concurrently": "^9.1.2"
   }
 }
+
+

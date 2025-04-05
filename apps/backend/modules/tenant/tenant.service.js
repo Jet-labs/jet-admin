@@ -4,13 +4,9 @@ const {
   tenantAwarePostgreSQLPoolManager,
 } = require("../../config/tenant-aware-pgpool-manager.config");
 const constants = require("../../constants");
-const environmentVariables = require("../../environment");
 const Logger = require("../../utils/logger");
 const { tenantRoleService } = require("../tenantRole/tenantRole.service");
 const { databaseService } = require("../database/database.service");
-const {
-  databaseTableService,
-} = require("../databaseTable/databaseTable.service");
 const {
   databaseChartService,
 } = require("../databaseChart/databaseChart.service");
@@ -194,6 +190,7 @@ tenantService.createTenant = async ({
           creatorID: userID,
         },
       });
+
       const newUserTenantRelationship =
         await tx.tblUsersTenantsRelationship.createMany({
           data: [
@@ -205,8 +202,14 @@ tenantService.createTenant = async ({
             },
           ],
         });
+
       return newTenant;
     });
+    await tenantAwarePostgreSQLPoolManager.setTenantDBURL(
+      String(newTenant.tenantID),
+      tenantDBURL,
+      false
+    );
     Logger.log("success", {
       message: "tenantService:createTenant:newTenantCreated",
       params: { newTenant },
@@ -312,7 +315,7 @@ tenantService.updateTenant = async ({
     await tenantAwarePostgreSQLPoolManager.setTenantDBURL(
       String(tenantID),
       tenantDBURL,
-      true
+      false
     );
     Logger.log("success", {
       message: "tenantService:updateTenant:updatedTenant",

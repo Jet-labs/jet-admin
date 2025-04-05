@@ -22,7 +22,15 @@ const environmentVariables = {
   LOG_LEVEL: process.env.LOG_LEVEL || "info",
   LOG_FILE_SIZE: process.env.LOG_FILE_SIZE || 1,
   EXPRESS_REQUEST_SIZE_LIMIT: process.env.EXPRESS_REQUEST_SIZE_LIMIT || "5mb",
-  CORS_WHITELIST: process.env.CORS_WHITELIST?.split(","),
+  CORS_WHITELIST: process.env.CORS_WHITELIST
+    ? process.env.CORS_WHITELIST.split(",")
+    : [
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:3001",
+        "http://localhost:3001",
+      ],
 };
 console.log("environment variables set-----------------------------");
 console.log(environmentVariables);

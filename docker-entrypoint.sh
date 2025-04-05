@@ -1,11 +1,34 @@
 #!/bin/sh
 set -e
 
+# Build frontend with environment variables
+echo "Building frontend..."
+cd /apps/frontend
+
+# Create .env file from environment variables
+cat > .env <<EOL
+VITE_FIREBASE_API_KEY=${VITE_FIREBASE_API_KEY}
+VITE_FIREBASE_AUTH_DOMAIN=${VITE_FIREBASE_AUTH_DOMAIN}
+VITE_FIREBASE_PROJECT_ID=${VITE_FIREBASE_PROJECT_ID}
+VITE_FIREBASE_STORAGE_BUCKET=${VITE_FIREBASE_STORAGE_BUCKET}
+VITE_FIREBASE_MESSAGING_SENDER_ID=${VITE_FIREBASE_MESSAGING_SENDER_ID}
+VITE_FIREBASE_APP_ID=${VITE_FIREBASE_APP_ID}
+VITE_FIREBASE_MEASUREMENT_ID=${VITE_FIREBASE_MEASUREMENT_ID}
+VITE_SUPABASE_URL=${VITE_SUPABASE_URL}
+VITE_SUPABASE_KEY=${VITE_SUPABASE_KEY}
+EOL
+
+# Install dev dependencies and build
+npm run build
+
+# Change to backend directory
+cd /apps/backend
+
 # Set default NODE_ENV to production if not specified
 export NODE_ENV=${NODE_ENV:-production}
 
 # Generate environment-specific .env file from Docker environment variables
-cat > ${NODE_ENV}.env <<EOL
+cat > .env <<EOL
 NODE_ENV=${NODE_ENV}
 PORT=${PORT:-8090}
 DATABASE_URL=${DATABASE_URL}
@@ -19,14 +42,14 @@ SYSLOG_LEVEL=${SYSLOG_LEVEL:-warning}
 LOG_LEVEL=${LOG_LEVEL:-info}
 LOG_FILE_SIZE=${LOG_FILE_SIZE:-1}
 EXPRESS_REQUEST_SIZE_LIMIT=${EXPRESS_REQUEST_SIZE_LIMIT:-5mb}
-CORS_WHITELIST=${CORS_WHITELIST}
+CORS_WHITELIST=${CORS_WHITELIST:-http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173,http://127.0.0.1:3001,http://localhost:3001}
 ACCESS_TOKEN_TIMEOUT=${ACCESS_TOKEN_TIMEOUT:-900}
 REFRESH_TOKEN_TIMEOUT=${REFRESH_TOKEN_TIMEOUT:-100h}
 EOL
 
 # Source the generated environment file
 set -a
-. ./${NODE_ENV}.env
+. ./.env
 set +a
 
 # Database initialization logic
@@ -45,16 +68,20 @@ if [ "$SEED_DATABASE" = "true" ]; then
     sleep 2
   done
 
-    # 2. Run Migrations AFTER Client Generation
-    echo "Running database migrations..."
-    npx prisma migrate deploy
+  # Run Migrations AFTER Client Generation
+  echo "Running database migrations..."
+  npx prisma migrate deploy
 
-    # 3. Seed Data LAST
-    echo "Seeding database..."
-    npm run seed
+  # Seed Data LAST
+  echo "Seeding database..."
+  npm run seed
 else
   echo "Using external PostgreSQL database"
 fi
 
-echo "Starting application..."
+echo "Starting nginx for frontend..."
+nginx -g "daemon off;" &
+
+# Start backend application (keep in foreground)
+echo "Starting backend application..."
 exec "$@"

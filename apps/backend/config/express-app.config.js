@@ -19,7 +19,7 @@ var corsOptions = {
 const expressApp = express();
 expressApp.enable("trust proxy");
 expressApp.use(morganMiddleware);
-expressApp.use(cors());
+expressApp.use(cors(corsOptions));
 expressApp.use(
   express.json({
     limit: environmentVariables.EXPRESS_REQUEST_SIZE_LIMIT,

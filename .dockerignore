@@ -1,0 +1,13 @@
+node_modules
+**/node_modules
+**/.env
+**/*.env
+**/Dockerfile
+**/docker-compose.yml
+.git
+**/production.env
+**/development.env
+**/dist
+**/build
+**/.DS_Store
+**/.vscode
