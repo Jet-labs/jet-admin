@@ -280,7 +280,7 @@ apiKeyService.deleteAPIKeyByID = async ({
   try {
     await prisma.$transaction(async (tx) => {
       // Check if role exists
-      const existingAPIKey = await tx.tblAPIKeys.findFirst({
+      const existingAPIKey = await tx.tblAPIKeys.findUnique({
         where: { apiKeyID },
       });
       if (!existingAPIKey) {

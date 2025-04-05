@@ -175,7 +175,7 @@ apiKeyController.deleteAPIKeyByID = async (req, res) => {
 
     await apiKeyService.deleteAPIKeyByID({
       userID: parseInt(user.userID),
-      tenantID,
+      tenantID: parseInt(tenantID),
       apiKeyID: parseInt(apiKeyID),
     });
 
