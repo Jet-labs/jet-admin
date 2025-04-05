@@ -91,6 +91,7 @@ export const TenantEditor = ({ tenantEditorForm }) => {
           onLogoUpload={_handleLogoUpload}
         />
       </div>
+
       <div>
         <label
           for="tenantName"

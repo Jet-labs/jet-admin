@@ -28,20 +28,12 @@ formValidations.emailSignInFormValidationSchema = Yup.object().shape({
 
 formValidations.addTenantFormValidationSchema = Yup.object().shape({
   tenantName: Yup.string().required("Tenant name is required").trim(),
-  tenantLogoURL: Yup.string()
-    .required("Tenant logo URL is required")
-    .url("Must be a valid URL")
-    .trim(),
   tenantDBURL: Yup.string("Must be a valid URL"),
 });
 
 formValidations.updateTenantFormValidationSchema = Yup.object().shape({
   tenantID: Yup.string().required("Tenant ID is required"),
   tenantName: Yup.string().required("Tenant name is required").trim(),
-  tenantLogoURL: Yup.string()
-    .required("Tenant logo URL is required")
-    .url("Must be a valid URL")
-    .trim(),
   tenantDBURL: Yup.string("Must be a valid URL"),
 });
 

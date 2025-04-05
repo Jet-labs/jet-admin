@@ -170,17 +170,10 @@ authService.createUser = async ({ firebaseID, email }) => {
         firebaseID,
       },
     });
-    // add user config
-    const newUserConfig = await prisma.tblUserTenantConfigMap.create({
-      data: {
-        userID: newUser.userID,
-        tenantID: 1,
-        config: {},
-      },
-    });
+
     Logger.log("success", {
       message: "authService:createUser:createdNewUser",
-      params: { newUser, newUserConfig },
+      params: { newUser },
     });
     return newUser;
   } catch (error) {

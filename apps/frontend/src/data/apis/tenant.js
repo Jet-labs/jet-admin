@@ -52,7 +52,11 @@ export const getAllUserTenantsAPI = async () => {
   }
 };
 
-export const createNewTenantAPI = async ({ tenantName, tenantLogoURL }) => {
+export const createNewTenantAPI = async ({
+  tenantName,
+  tenantLogoURL,
+  tenantDBURL,
+}) => {
   try {
     const url =
       CONSTANTS.SERVER_HOST + CONSTANTS.APIS.TENANT.createNewTenantAPI();
@@ -60,7 +64,7 @@ export const createNewTenantAPI = async ({ tenantName, tenantLogoURL }) => {
     if (bearerToken) {
       const response = await axios.post(
         url,
-        { tenantName, tenantLogoURL },
+        { tenantName, tenantLogoURL, tenantDBURL },
         {
           headers: { authorization: `Bearer ${bearerToken}` },
         }

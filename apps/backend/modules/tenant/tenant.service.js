@@ -187,7 +187,15 @@ tenantService.createTenant = async ({
           tenantName,
           tenantLogoURL,
           tenantDBURL,
-          creatorID: userID,
+          creatorID: parseInt(userID),
+        },
+      });
+      // add user config
+      const newUserConfig = await tx.tblUserTenantConfigMap.create({
+        data: {
+          userID: parseInt(userID),
+          tenantID: newTenant.tenantID,
+          config: {},
         },
       });
 
