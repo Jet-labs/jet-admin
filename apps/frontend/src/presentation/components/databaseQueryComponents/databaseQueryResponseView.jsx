@@ -4,7 +4,7 @@ import { PGSQLQueryResponseJSONTab } from "./pgsqlQueryResponseJSONTab";
 import { PGSQLQueryResponseRAWTab } from "./pgsqlQueryResponseRawTab";
 import { PGSQLQueryResponseSchemaTab } from "./pgsqlQueryResponseSchemaTab";
 import { PGSQLQueryResponseTableTab } from "./pgsqlQueryResponseTableTab";
-export const DatabaseQueryResponseView = ({ databaseQueryTestResult }) => {
+export const DatabaseQueryResponseView = ({ databaseQueryResult }) => {
   const [tab, setTab] = useState(0);
   const _handleTabChange = (event, newTab) => {
     setTab(newTab);
@@ -61,22 +61,22 @@ export const DatabaseQueryResponseView = ({ databaseQueryTestResult }) => {
       <div className="w-100 h-[calc(100%-48px)]">
         {tab === 0 && (
           <PGSQLQueryResponseTableTab
-            data={databaseQueryTestResult ? databaseQueryTestResult.rows : ""}
+            data={databaseQueryResult ? databaseQueryResult.result : ""}
           />
         )}
         {tab === 1 && (
           <PGSQLQueryResponseJSONTab
-            data={databaseQueryTestResult ? databaseQueryTestResult.rows : ""}
+            data={databaseQueryResult ? databaseQueryResult.result : ""}
           />
         )}
         {tab === 2 && (
           <PGSQLQueryResponseRAWTab
-            data={databaseQueryTestResult ? databaseQueryTestResult.rows : ""}
+            data={databaseQueryResult ? databaseQueryResult.result : ""}
           />
         )}
         {tab === 3 && (
           <PGSQLQueryResponseSchemaTab
-            data={databaseQueryTestResult ? databaseQueryTestResult.rows : {}}
+            data={databaseQueryResult ? databaseQueryResult.result : {}}
           />
         )}
       </div>

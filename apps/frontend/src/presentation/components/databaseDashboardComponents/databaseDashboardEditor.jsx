@@ -2,7 +2,7 @@ import { CONSTANTS } from "../../../constants";
 
 export const DatabaseDashboardEditor = ({ databaseDashboardEditorForm }) => {
   return (
-    <div className="w-full flex flex-col justify-start items-stretch gap-2">
+    <div className="w-full flex flex-col justify-start items-stretch gap-2 p-2">
       <div>
         <label
           for="databaseDashboardName"

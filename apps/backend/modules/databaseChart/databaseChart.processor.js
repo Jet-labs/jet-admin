@@ -7,17 +7,17 @@ const databaseChartProcessor = {};
  * @param {Object} params
  * @param {number} params.userID - ID of the requesting user
  * @param {Object} params.databaseChart - Database chart configuration object
- * @param {Array<Object>} params.queryResults - Array of query results from execution
+ * @param {Array<Object>} params.databaseQueriesResult - Array of query results from execution
  * @returns {Object} Chart.js compatible data structure with labels and datasets
  */
 databaseChartProcessor.processBarChartQueryResults = ({
   databaseChart,
-  queryResults,
+  databaseQueriesResult,
 }) => {
   // Collect all x-axis values
   const xValues = new Set();
   databaseChart.databaseQueries.forEach((mapping, index) => {
-    const result = queryResults[index]?.result || [];
+    const result = databaseQueriesResult[index]?.result || [];
     const xField = mapping.datasetFields?.xAxis;
     if (xField) {
       result.forEach((row) => xValues.add(row[xField]));
@@ -39,7 +39,7 @@ databaseChartProcessor.processBarChartQueryResults = ({
 
   // Build datasets
   const datasets = databaseChart.databaseQueries.map((mapping, index) => {
-    const result = queryResults[index]?.result || [];
+    const result = databaseQueriesResult[index]?.result || [];
     const { xAxis, yAxis } = mapping.datasetFields;
     const dataMap = new Map(result.map((row) => [row[xAxis], row[yAxis]]));
 
@@ -58,17 +58,17 @@ databaseChartProcessor.processBarChartQueryResults = ({
  * @param {Object} params
  * @param {number} params.userID - ID of the requesting user
  * @param {Object} params.databaseChart - Database chart configuration object
- * @param {Array<Object>} params.queryResults - Array of query results from execution
+ * @param {Array<Object>} params.databaseQueriesResult - Array of query results from execution
  * @returns {Object} Chart.js compatible data structure with labels and datasets
  */
 databaseChartProcessor.processLineChartQueryResults = ({
   databaseChart,
-  queryResults,
+  databaseQueriesResult,
 }) => {
   // Collect all x-axis values
   const xValues = new Set();
   databaseChart.databaseQueries.forEach((mapping, index) => {
-    const result = queryResults[index]?.result || [];
+    const result = databaseQueriesResult[index]?.result || [];
     const xField = mapping.datasetFields?.xAxis;
     if (xField) {
       result.forEach((row) => xValues.add(row[xField]));
@@ -89,7 +89,7 @@ databaseChartProcessor.processLineChartQueryResults = ({
 
   // Build datasets
   const datasets = databaseChart.databaseQueries.map((mapping, index) => {
-    const result = queryResults[index]?.result || [];
+    const result = databaseQueriesResult[index]?.result || [];
     const { xAxis, yAxis } = mapping.datasetFields;
     const dataMap = new Map(result.map((row) => [row[xAxis], row[yAxis]]));
 
@@ -108,17 +108,17 @@ databaseChartProcessor.processLineChartQueryResults = ({
  * @param {Object} params
  * @param {number} params.userID - ID of the requesting user
  * @param {Object} params.databaseChart - Database chart configuration object
- * @param {Array<Object>} params.queryResults - Array of query results from execution
+ * @param {Array<Object>} params.databaseQueriesResult - Array of query results from execution
  * @returns {Object} Chart.js compatible data structure with labels and datasets
  */
 databaseChartProcessor.processPieChartQueryResults = ({
   databaseChart,
-  queryResults,
+  databaseQueriesResult,
 }) => {
   // Collect all labels
   const labels = new Set();
   databaseChart.databaseQueries.forEach((mapping, index) => {
-    const result = queryResults[index]?.result || [];
+    const result = databaseQueriesResult[index]?.result || [];
     const label = mapping.datasetFields?.label;
     if (label) {
       result.forEach((row) => labels.add(row[label]));
@@ -140,7 +140,7 @@ databaseChartProcessor.processPieChartQueryResults = ({
 
   // Build datasets
   const datasets = databaseChart.databaseQueries.map((mapping, index) => {
-    const result = queryResults[index]?.result || [];
+    const result = databaseQueriesResult[index]?.result || [];
     const { label, value } = mapping.datasetFields;
     const dataMap = new Map(result.map((row) => [row[label], row[value]]));
 
@@ -159,17 +159,17 @@ databaseChartProcessor.processPieChartQueryResults = ({
  * @param {Object} params
  * @param {number} params.userID - ID of the requesting user
  * @param {Object} params.databaseChart - Database chart configuration object
- * @param {Array<Object>} params.queryResults - Array of query results from execution
+ * @param {Array<Object>} params.databaseQueriesResult - Array of query results from execution
  * @returns {Object} Chart.js compatible data structure with labels and datasets
  */
 databaseChartProcessor.processDoughnutChartQueryResults = ({
   databaseChart,
-  queryResults,
+  databaseQueriesResult,
 }) => {
   // Collect all labels
   const labels = new Set();
   databaseChart.databaseQueries.forEach((mapping, index) => {
-    const result = queryResults[index]?.result || [];
+    const result = databaseQueriesResult[index]?.result || [];
     const label = mapping.datasetFields?.label;
     if (label) {
       result.forEach((row) => labels.add(row[label]));
@@ -191,7 +191,7 @@ databaseChartProcessor.processDoughnutChartQueryResults = ({
 
   // Build datasets
   const datasets = databaseChart.databaseQueries.map((mapping, index) => {
-    const result = queryResults[index]?.result || [];
+    const result = databaseQueriesResult[index]?.result || [];
     const { label, value } = mapping.datasetFields;
     const dataMap = new Map(result.map((row) => [row[label], row[value]]));
 
@@ -210,15 +210,15 @@ databaseChartProcessor.processDoughnutChartQueryResults = ({
  * @param {Object} params
  * @param {number} params.userID - ID of the requesting user
  * @param {Object} params.databaseChart - Database chart configuration object
- * @param {Array<Object>} params.queryResults - Array of query results from execution
+ * @param {Array<Object>} params.databaseQueriesResult - Array of query results from execution
  * @returns {Object} Chart.js compatible data structure with labels and datasets
  */
 databaseChartProcessor.processScatterChartQueryResults = ({
   databaseChart,
-  queryResults,
+  databaseQueriesResult,
 }) => {
   const datasets = databaseChart.databaseQueries.map((mapping, index) => {
-    const result = queryResults[index]?.result || [];
+    const result = databaseQueriesResult[index]?.result || [];
     const { xAxis, yAxis } = mapping.datasetFields;
 
     // Convert each row to {x, y} coordinate objects
@@ -244,15 +244,15 @@ databaseChartProcessor.processScatterChartQueryResults = ({
  * @param {Object} params
  * @param {number} params.userID - ID of the requesting user
  * @param {Object} params.databaseChart - Database chart configuration object
- * @param {Array<Object>} params.queryResults - Array of query results from execution
+ * @param {Array<Object>} params.databaseQueriesResult - Array of query results from execution
  * @returns {Object} Chart.js compatible data structure with labels and datasets
  */
 databaseChartProcessor.processBubbleChartQueryResults = ({
   databaseChart,
-  queryResults,
+  databaseQueriesResult,
 }) => {
   const datasets = databaseChart.databaseQueries.map((mapping, index) => {
-    const result = queryResults[index]?.result || [];
+    const result = databaseQueriesResult[index]?.result || [];
     const { xAxis, yAxis, radius } = mapping.datasetFields;
 
     // Convert each row to {x, y} coordinate objects
@@ -278,17 +278,17 @@ databaseChartProcessor.processBubbleChartQueryResults = ({
  * @param {Object} params
  * @param {number} params.userID - ID of the requesting user
  * @param {Object} params.databaseChart - Database chart configuration object
- * @param {Array<Object>} params.queryResults - Array of query results from execution
+ * @param {Array<Object>} params.databaseQueriesResult - Array of query results from execution
  * @returns {Object} Chart.js compatible data structure with labels and datasets
  */
 databaseChartProcessor.processRadialChartQueryResults = ({
   databaseChart,
-  queryResults,
+  databaseQueriesResult,
 }) => {
   // Collect all labels
   const labels = new Set();
   databaseChart.databaseQueries.forEach((mapping, index) => {
-    const result = queryResults[index]?.result || [];
+    const result = databaseQueriesResult[index]?.result || [];
     const label = mapping.datasetFields?.label;
     if (label) {
       result.forEach((row) => labels.add(row[label]));
@@ -310,7 +310,7 @@ databaseChartProcessor.processRadialChartQueryResults = ({
 
   // Build datasets
   const datasets = databaseChart.databaseQueries.map((mapping, index) => {
-    const result = queryResults[index]?.result || [];
+    const result = databaseQueriesResult[index]?.result || [];
     const { label, value } = mapping.datasetFields;
     const dataMap = new Map(result.map((row) => [row[label], row[value]]));
 
@@ -329,17 +329,17 @@ databaseChartProcessor.processRadialChartQueryResults = ({
  * @param {Object} params
  * @param {number} params.userID - ID of the requesting user
  * @param {Object} params.databaseChart - Database chart configuration object
- * @param {Array<Object>} params.queryResults - Array of query results from execution
+ * @param {Array<Object>} params.databaseQueriesResult - Array of query results from execution
  * @returns {Object} Chart.js compatible data structure with labels and datasets
  */
 databaseChartProcessor.processRadarChartQueryResults = ({
   databaseChart,
-  queryResults,
+  databaseQueriesResult,
 }) => {
   // Collect all labels
   const labels = new Set();
   databaseChart.databaseQueries.forEach((mapping, index) => {
-    const result = queryResults[index]?.result || [];
+    const result = databaseQueriesResult[index]?.result || [];
     const label = mapping.datasetFields?.label;
     if (label) {
       result.forEach((row) => labels.add(row[label]));
@@ -361,7 +361,7 @@ databaseChartProcessor.processRadarChartQueryResults = ({
 
   // Build datasets
   const datasets = databaseChart.databaseQueries.map((mapping, index) => {
-    const result = queryResults[index]?.result || [];
+    const result = databaseQueriesResult[index]?.result || [];
     const { label, value } = mapping.datasetFields;
     const dataMap = new Map(result.map((row) => [row[label], row[value]]));
 

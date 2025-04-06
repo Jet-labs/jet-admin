@@ -63,8 +63,8 @@ export const DatabaseDashboardDropzone = ({
       i: widget,
       x: layoutItem.x,
       y: layoutItem.y,
-      w: layoutItem.w || 2, // Default width if not provided
-      h: layoutItem.h || 3, // Default height if not provided
+      w: 10, // Default width if not provided
+      h: 10, // Default height if not provided
     };
 
     if (!_layouts[currentBreakpoint]) {
@@ -81,8 +81,8 @@ export const DatabaseDashboardDropzone = ({
             i: widget,
             x: 0,
             y: Infinity, // Auto-place at next available position
-            w: 2, // Adjust default based on breakpoint if needed
-            h: 3,
+            w: 10, // Adjust default based on breakpoint if needed
+            h: 10,
           });
         }
       }

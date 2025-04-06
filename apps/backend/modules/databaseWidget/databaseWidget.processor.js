@@ -8,18 +8,18 @@ const databaseWidgetProcessor = {};
  * @param {Object} params
  * @param {number} params.userID - ID of the requesting user
  * @param {Object} params.databaseWidget - Database widget configuration object
- * @param {Array<Object>} params.queryResults - Array of query results from execution
+ * @param {Array<Object>} params.databaseQueriesResult - Array of query results from execution
  * @returns {Object} Widget.js compatible data structure with labels and datasets
  */
 databaseWidgetProcessor.processTextWidgetQueryResults = ({
   databaseWidget,
-  queryResults,
+  databaseQueriesResult,
 }) => {
   const dataset = [];
   let consolidatedText = "";
 
   databaseWidget.databaseQueries.forEach((mapping, index) => {
-    const result = queryResults[index]?.result || [];
+    const result = databaseQueriesResult[index]?.result || [];
     const textField = mapping.datasetFields?.text;
     if (textField) {
       // for text widget, 1 value of result is considered

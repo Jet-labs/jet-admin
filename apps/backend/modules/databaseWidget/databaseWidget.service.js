@@ -236,28 +236,42 @@ databaseWidgetService.getDatabaseWidgetDataByID = async ({
     }
 
     // 2. Prepare queries for execution
-    const queriesToExecute = databaseWidget.tblDatabaseWidgetQueryMappings.map(
-      (mapping) => ({
+    const databaseQueriesToExecute =
+      databaseWidget.tblDatabaseWidgetQueryMappings.map((mapping) => ({
         databaseQueryID: mapping.databaseQueryID,
+        databaseQueryData: {
+          ...mapping.tblDatabaseQueries.databaseQueryData,
+          databaseQueryArgValues: mapping.databaseQueryArgValues,
+        },
         databaseQueryString:
           mapping.tblDatabaseQueries.databaseQueryData.databaseQueryString,
         databaseQueryArgValues: mapping.databaseQueryArgValues,
-      })
-    );
+      }));
 
     Logger.log(
       "info",
       "databaseWidgetService:getDatabaseWidgetDataByID:queries-prepared",
       {
-        queryCount: queriesToExecute.length,
+        databaseQueriesToExecuteCount: databaseQueriesToExecute.length,
       }
     );
 
     // 3. Execute all queries
-    const queryResults = await databaseQueryService.runMultipleDatabaseQueries({
-      userID,
-      dbPool,
-      databaseQueriesData: queriesToExecute,
+    const databaseQueriesResult = await databaseQueryService.runDatabaseQueries(
+      {
+        userID,
+        tenantID,
+        dbPool,
+        databaseQueries: databaseQueriesToExecute,
+      }
+    );
+
+    Logger.log("info", {
+      message:
+        "databaseWidgetService:getDatabaseWidgetDataByID:databaseQueriesResult",
+      params: {
+        databaseQueriesResultCount: databaseQueriesResult?.length,
+      },
     });
 
     let processedData;
@@ -266,13 +280,13 @@ databaseWidgetService.getDatabaseWidgetDataByID = async ({
       case constants.DATABASE_WIDGET_TYPES.TEXT_WIDGET.value:
         processedData = databaseWidgetProcessor.processTextWidgetQueryResults({
           databaseWidget,
-          queryResults,
+          databaseQueriesResult,
         });
         break;
       default:
         processedData = databaseWidgetProcessor.processTextWidgetQueryResults({
           databaseWidget,
-          queryResults,
+          databaseQueriesResult,
         });
         break;
     }
@@ -348,9 +362,14 @@ databaseWidgetService.getDatabaseWidgetDataUsingDatabaseWidget = async ({
     });
 
     // 2. Prepare queries for execution
-    const queriesToExecute = databaseWidget.databaseQueries.map(
+    const databaseQueriesToExecute = databaseWidget.databaseQueries.map(
       (databaseQuery) => ({
         databaseQueryID: databaseQuery.databaseQueryID,
+        databaseQueryData: {
+          ...databaseQueryIDMap[databaseQuery.databaseQueryID]
+            .databaseQueryData,
+          databaseQueryArgValues: databaseQuery.databaseQueryArgValues,
+        },
         databaseQueryString:
           databaseQueryIDMap[databaseQuery.databaseQueryID].databaseQueryData
             .databaseQueryString,
@@ -362,22 +381,25 @@ databaseWidgetService.getDatabaseWidgetDataUsingDatabaseWidget = async ({
       message:
         "databaseWidgetService:getDatabaseWidgetDataUsingDatabaseWidget:queries-prepared",
       params: {
-        queryCount: queriesToExecute.length,
+        databaseQueriesToExecuteCount: databaseQueriesToExecute.length,
       },
     });
 
     // 3. Execute all queries
-    const queryResults = await databaseQueryService.runMultipleDatabaseQueries({
-      userID,
-      dbPool,
-      databaseQueriesData: queriesToExecute,
-    });
+    const databaseQueriesResult = await databaseQueryService.runDatabaseQueries(
+      {
+        userID,
+        tenantID,
+        dbPool,
+        databaseQueries: databaseQueriesToExecute,
+      }
+    );
 
     Logger.log("info", {
       message:
-        "databaseWidgetService:getDatabaseWidgetDataUsingDatabaseWidget:queryResults",
+        "databaseWidgetService:getDatabaseWidgetDataUsingDatabaseWidget:databaseQueriesResult",
       params: {
-        queryResultsCount: queryResults?.length,
+        databaseQueriesResultCount: databaseQueriesResult?.length,
       },
     });
 
@@ -387,13 +409,13 @@ databaseWidgetService.getDatabaseWidgetDataUsingDatabaseWidget = async ({
       case constants.DATABASE_WIDGET_TYPES.TEXT_WIDGET.value:
         processedData = databaseWidgetProcessor.processTextWidgetQueryResults({
           databaseWidget,
-          queryResults,
+          databaseQueriesResult,
         });
         break;
       default:
         processedData = databaseWidgetProcessor.processTextWidgetQueryResults({
           databaseWidget,
-          queryResults,
+          databaseQueriesResult,
         });
         break;
     }

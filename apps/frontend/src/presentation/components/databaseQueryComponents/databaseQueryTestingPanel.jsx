@@ -56,7 +56,7 @@ export const DatabaseQueryTestingPanel = ({
               </div>
               <div className="w-full h-[calc(100%-70px)] mt-3 border-t border-t-slate-200">
                 <DatabaseQueryResponseView
-                  databaseQueryTestResult={databaseQueryTestResult}
+                  databaseQueryResult={databaseQueryTestResult}
                 />
               </div>
             </div>

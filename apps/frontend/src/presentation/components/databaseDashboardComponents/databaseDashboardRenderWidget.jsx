@@ -25,7 +25,7 @@ export const DatabaseDashboardRenderWidget = ({
 
   return (
     <div
-      className={`!h-full !w-full flex-grow relative ${
+      className={`!h-full !w-full flex-grow relative p-0.5 ${
         isMouseHover ? "bg-[#646cff]" : "bg-transparent"
       }`}
       onMouseEnter={

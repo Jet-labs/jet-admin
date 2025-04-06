@@ -120,7 +120,7 @@ export const RawPGSqlQueryExecutor = ({tenantID}) => {
           )}
           {queryResults && (
             <DatabaseQueryResponseView
-              databaseQueryTestResult={{ rows: queryResults }}
+              databaseQueryResult={{ result: queryResults }}
             />
           )}
 

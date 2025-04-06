@@ -134,161 +134,46 @@ databaseQueryService.createDatabaseQuery = async ({
  *
  * @param {object} param0
  * @param {number} param0.userID
- * @param {number} param0.databaseQueryID
  * @param {object} param0.dbPool
- * @param {object} param0.databaseQueryData
- * @returns {Promise<boolean>}
- */
-databaseQueryService.runDatabaseQuery = async ({
-  userID,
-  dbPool,
-  databaseQueryID,
-  databaseQueryData,
-}) => {
-  Logger.log("info", {
-    message: "databaseQueryService:runDatabaseQuery:params",
-    params: { userID, databaseQueryID, databaseQueryData },
-  });
-
-  try {
-    let _databaseQueryData = databaseQueryData;
-
-    if (!databaseQueryData && databaseQueryID) {
-      _databaseQueryData = (
-        await prisma.tblDatabaseQueries.findUnique({
-          where: { databaseQueryID: parseInt(databaseQueryID) },
-        })
-      ).databaseQueryData;
-    }
-
-    Logger.log("info", {
-      message: "databaseQueryService:runDatabaseQuery:databaseQueryData",
-      params: {
-        userID,
-        databaseQueryID,
-        databaseQueryData: _databaseQueryData,
-      },
-    });
-
-    const { databaseQueryString, databaseQueryArgValues } = _databaseQueryData;
-
-    const { query: processedQuery, values: processedQueryValues } =
-      postgreSQLParserUtil.processDatabaseQuery({
-        databaseQueryString,
-        databaseQueryArgValues,
-      });
-
-    Logger.log("info", {
-      message: "databaseQueryService:runDatabaseQuery:processedQuery",
-      params: {
-        userID,
-        databaseQueryID,
-        databaseQueryData: _databaseQueryData,
-        processedQuery,
-        processedQueryValues,
-      },
-    });
-    const databaseQueryResult =
-      await TenantAwarePostgreSQLPoolManager.withDatabaseClient(
-        dbPool,
-        async (client) => client.query(processedQuery, processedQueryValues)
-      );
-
-    Logger.log("info", {
-      message: "databaseQueryService:runDatabaseQuery:databaseQueryResult",
-      params: {
-        userID,
-        databaseQueryID,
-        databaseQueryData: _databaseQueryData,
-        processedQuery,
-        processedQueryValues,
-        databaseQueryResult,
-      },
-    });
-
-    const databaseQueryResultSchema = jsonSchemaGenerator(
-      JSON.parse(JSON.stringify(databaseQueryResult.rows))
-    );
-
-    if (databaseQueryID) {
-      await prisma.tblDatabaseQueries.update({
-        where: { databaseQueryID: parseInt(databaseQueryID) },
-        data: { databaseQueryResultSchema: databaseQueryResultSchema },
-      });
-      Logger.log("info", {
-        message:
-          "databaseQueryService:runDatabaseQuery:databaseQueryResultSchema:saved",
-        params: {
-          userID,
-          databaseQueryID,
-          databaseQueryData: _databaseQueryData,
-          processedQuery,
-          processedQueryValues,
-          databaseQueryResult,
-        },
-      });
-    }
-    Logger.log("success", {
-      message: "databaseQueryService:runDatabaseQuery:success",
-      params: {
-        userID,
-        databaseQueryID,
-        databaseQueryData: _databaseQueryData,
-        processedQuery,
-        processedQueryValues,
-        databaseQueryResult,
-      },
-    });
-
-    return databaseQueryResult;
-  } catch (error) {
-    Logger.log("error", {
-      message: "databaseQueryService:runDatabaseQuery:failure",
-      params: { userID, error: error.message },
-    });
-    throw error;
-  }
-};
-
-/**
- *
- * @param {object} param0
- * @param {number} param0.userID
- * @param {object} param0.dbPool
- * @param {Array<{databaseQueryID:number,databaseQueryString:string,databaseQueryArgValues:object}>} param0.databaseQueriesData
+ * @param {Array<{databaseQueryID:number,databaseQueryString:string,databaseQueryArgValues:object,databaseQueryData:{databaseQueryString:string,databaseQueryArgValues:object,databaseQueryArgs:object}}>} param0.databaseQueries
  * @returns {Promise<Array<object>>}
  */
 
-databaseQueryService.runMultipleDatabaseQueries = async ({
+databaseQueryService.runDatabaseQueries = async ({
   userID,
+  tenantID,
   dbPool,
-  databaseQueriesData,
+  databaseQueries,
 }) => {
   Logger.log("info", {
-    message: "databaseQueryService:runMultipleDatabaseQueries:start",
+    message: "databaseQueryService:runDatabaseQueries:start",
     params: {
       userID,
-      databaseQueriesDataCount: databaseQueriesData.length,
+      tenantID,
+      databaseQueriesCount: databaseQueries.length,
     },
   });
 
   try {
     // Execute with connection pooling
-    return TenantAwarePostgreSQLPoolManager.withDatabaseClient(
+    const databaseQueriesResult = await TenantAwarePostgreSQLPoolManager.withDatabaseClient(
       dbPool,
       async (client) => {
-        const executionPromises = databaseQueriesData.map(
-          async (databaseQueryData, index) => {
+        const executionPromises = databaseQueries.map(
+          async (databaseQuery, index) => {
             try {
               // Process and execute query
               const { query: processedQuery, values: processedQueryValues } =
-                postgreSQLParserUtil.processDatabaseQuery(databaseQueryData);
+                postgreSQLParserUtil.processDatabaseQuery(
+                  databaseQuery.databaseQueryData
+                );
 
               Logger.log("info", {
                 message:
-                  "databaseQueryService:runMultipleDatabaseQueries:processDatabaseQuery",
+                  "databaseQueryService:runDatabaseQueries:processDatabaseQuery",
                 params: {
                   userID,
+                  tenantID,
                   processedQuery,
                   processedQueryValues,
                 },
@@ -301,24 +186,24 @@ databaseQueryService.runMultipleDatabaseQueries = async ({
 
               Logger.log("info", {
                 message:
-                  "databaseQueryService:runMultipleDatabaseQueries:databaseQueryResult",
+                  "databaseQueryService:runDatabaseQueries:databaseQueryResult",
                 params: {
                   userID,
+                  tenantID,
                   processedQuery,
                   processedQueryValues,
-                  databaseQueryResult,
                 },
               });
 
               // Update schema if needed
-              if (databaseQueryData.databaseQueryID) {
+              if (databaseQuery.databaseQueryID) {
                 const databaseQueryResultSchema = jsonSchemaGenerator(
                   JSON.parse(JSON.stringify(databaseQueryResult.rows))
                 );
                 await prisma.tblDatabaseQueries.update({
                   where: {
                     databaseQueryID: parseInt(
-                      databaseQueryData.databaseQueryID
+                      databaseQuery.databaseQueryID
                     ),
                   },
                   data: {
@@ -331,14 +216,15 @@ databaseQueryService.runMultipleDatabaseQueries = async ({
                 success: true,
                 queryIndex: index,
                 result: databaseQueryResult.rows,
-                databaseQueryID: databaseQueryData.databaseQueryID,
+                databaseQueryID: databaseQuery.databaseQueryID,
               };
             } catch (error) {
               Logger.log("error", {
                 message:
-                  "databaseQueryService:runMultipleDatabaseQueries:catch-2",
+                  "databaseQueryService:runDatabaseQueries:catch-2",
                 params: {
                   userID,
+                  tenantID,
                   queryIndex: index,
                   error,
                 },
@@ -347,7 +233,7 @@ databaseQueryService.runMultipleDatabaseQueries = async ({
                 success: false,
                 queryIndex: index,
                 error,
-                databaseQueryID: query.databaseQueryID,
+                databaseQueryID: databaseQuery.databaseQueryID,
               };
             }
           }
@@ -356,11 +242,22 @@ databaseQueryService.runMultipleDatabaseQueries = async ({
         return Promise.all(executionPromises);
       }
     );
-  } catch (error) {
-    Logger.log("error", {
-      message: "databaseQueryService:runMultipleDatabaseQueries:catch-1",
+    Logger.log("success", {
+      message: "databaseQueryService:runDatabaseQueries:success",
       params: {
         userID,
+        tenantID,
+        databaseQueriesCount: databaseQueries.length,
+        databaseQueriesResultCount: databaseQueriesResult.length,
+      },
+    });
+    return databaseQueriesResult;
+  } catch (error) {
+    Logger.log("error", {
+      message: "databaseQueryService:runDatabaseQueries:catch-1",
+      params: {
+        userID,
+        tenantID,
         error,
       },
     });

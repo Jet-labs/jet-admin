@@ -1,13 +1,11 @@
-const constants = require("../../constants");
 const { expressUtils } = require("../../utils/express.utils");
 const Logger = require("../../utils/logger");
 const { databaseQueryService } = require("./databaseQuery.service");
 
 const databaseQueryController = {};
 
-
 /**
- * 
+ *
  * @param {import("express").Request} req
  * @param {import("express").Response} res
  */
@@ -120,21 +118,40 @@ databaseQueryController.createDatabaseQuery = async (req, res) => {
 databaseQueryController.runDatabaseQueryByID = async (req, res) => {
   try {
     const { user, dbPool } = req;
-    const { databaseQueryID } = req.params;
+    const { databaseQueryID, tenantID } = req.params;
     Logger.log("info", {
       message: "databaseQueryController:runDatabaseQueryByID:params",
-      params: { userID: user.userID, databaseQueryID },
+      params: { userID: user.userID, tenantID, databaseQueryID },
     });
 
-    const databaseQueryResult = await databaseQueryService.runDatabaseQuery({
+    const databaseQuery = await databaseQueryService.getDatabaseQueryByID({
       userID: parseInt(user.userID),
-      dbPool,
-      databaseQueryID,
+      tenantID,
+      databaseQueryID: parseInt(databaseQueryID),
     });
+
+    const databaseQueriesResult = await databaseQueryService.runDatabaseQueries(
+      {
+        userID: parseInt(user.userID),
+        dbPool,
+        tenantID,
+        databaseQueries: [
+          {
+            databaseQueryID,
+            databaseQueryData: databaseQuery.databaseQueryData,
+          },
+        ],
+      }
+    );
+    const databaseQueryResult = databaseQueriesResult[0];
 
     Logger.log("success", {
       message: "databaseQueryController:runDatabaseQueryByID:success",
-      params: { userID: user.userID, databaseQueryID },
+      params: {
+        userID: user.userID,
+        tenantID,
+        databaseQueryID,
+      },
     });
 
     return expressUtils.sendResponse(res, true, { databaseQueryResult });
@@ -155,18 +172,33 @@ databaseQueryController.runDatabaseQueryByID = async (req, res) => {
 databaseQueryController.runDatabaseQuery = async (req, res) => {
   try {
     const { user, dbPool } = req;
+    const { tenantID } = req.params;
     const { databaseQueryData, databaseQueryID } = req.body;
     Logger.log("info", {
       message: "databaseQueryController:runDatabaseQuery:params",
-      params: { userID: user.userID, databaseQueryID, databaseQueryData },
+      params: {
+        userID: user.userID,
+        tenantID,
+        databaseQueryID,
+        databaseQueryData,
+      },
     });
 
-    const databaseQueryResult = await databaseQueryService.runDatabaseQuery({
-      userID: parseInt(user.userID),
-      dbPool,
-      databaseQueryID,
-      databaseQueryData,
-    });
+    const databaseQueriesResult = await databaseQueryService.runDatabaseQueries(
+      {
+        userID: parseInt(user.userID),
+        dbPool,
+        tenantID,
+        databaseQueries: [
+          {
+            databaseQueryID,
+            databaseQueryData,
+          },
+        ],
+      }
+    );
+
+    const databaseQueryResult = databaseQueriesResult[0];
 
     Logger.log("success", {
       message: "databaseQueryController:runDatabaseQuery:success",

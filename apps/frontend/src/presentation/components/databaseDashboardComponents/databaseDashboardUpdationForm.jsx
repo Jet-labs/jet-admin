@@ -183,12 +183,12 @@ export const DatabaseDashboardUpdationForm = ({
             onSubmit={dashboardUpdationForm.handleSubmit}
             className="w-full h-full"
           >
-            <div className="w-full h-full flex flex-col justify-start items-stretch p-2 gap-2">
+            <div className="w-full h-full flex flex-col justify-start items-stretch">
               <DatabaseDashboardEditor
                 databaseDashboardEditorForm={dashboardUpdationForm}
               />
-              <DatabaseDashboardWidgetList />
-              <div className="flex flex-row justify-around items-center">
+              <DatabaseDashboardWidgetList tenantID={tenantID} />
+              <div className="flex flex-row justify-around items-center p-2">
                 <button
                   type="submit"
                   disabled={isUpdatingDatabaseDashboard}

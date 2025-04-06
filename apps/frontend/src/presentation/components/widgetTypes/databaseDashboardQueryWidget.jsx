@@ -61,7 +61,7 @@ export const DatabaseDashboardQueryWidget = ({
     refetchOnWindowFocus: false,
   });
 
-  const data = databaseQueryResult?.rows;
+  const data = databaseQueryResult?.result;
   const dataSchema = data
     ? jsonSchemaGenerator(Array.isArray(data) ? data[0] : data)
     : {};

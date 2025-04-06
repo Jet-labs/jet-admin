@@ -327,7 +327,7 @@ export const DatabaseQueryUpdationForm = ({ tenantID, databaseQueryID }) => {
           <ResizableHandle withHandle={true} />
           <ResizablePanel defaultSize={80}>
             <DatabaseQueryResponseView
-              databaseQueryTestResult={databaseQueryTestResult}
+              databaseQueryResult={databaseQueryTestResult}
             />
           </ResizablePanel>
         </ResizablePanelGroup>

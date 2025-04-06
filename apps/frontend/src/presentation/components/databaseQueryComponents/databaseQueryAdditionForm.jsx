@@ -219,7 +219,7 @@ export const DatabaseQueryAdditionForm = ({ tenantID }) => {
         <ResizableHandle withHandle={true} />
         <ResizablePanel defaultSize={80}>
           <DatabaseQueryResponseView
-            databaseQueryTestResult={databaseQueryTestResult}
+            databaseQueryResult={databaseQueryTestResult}
           />
         </ResizablePanel>
       </ResizablePanelGroup>

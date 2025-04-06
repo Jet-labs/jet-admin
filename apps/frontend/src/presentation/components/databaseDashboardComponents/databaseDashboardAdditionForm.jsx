@@ -77,25 +77,27 @@ export const DatabaseDashboardAdditionForm = ({ tenantID }) => {
             onSubmit={dashboardAdditionForm.handleSubmit}
             className="w-full h-full"
           >
-            <div className="w-full h-full flex flex-col justify-start items-stretch p-2 gap-2">
+            <div className="w-full h-full flex flex-col justify-start items-stretch">
               <DatabaseDashboardEditor
                 databaseDashboardEditorForm={dashboardAdditionForm}
               />
-              <DatabaseDashboardWidgetList />
-              <button
-                type="submit"
-                disabled={isAddingDatabaseDashboard}
-                className="flex flex-row items-center justify-center rounded bg-[#646cff] px-3 py-1 text-sm text-white  focus:ring-2 focus:ring-[#646cff]/50 w-full outline-none focus:outline-none"
-              >
-                {isAddingDatabaseDashboard && (
-                  <CircularProgress
-                    className="!text-xs !mr-3"
-                    size={16}
-                    color="white"
-                  />
-                )}
-                {CONSTANTS.STRINGS.ADD_DASHBOARD_BUTTON_TEXT}
-              </button>
+              <DatabaseDashboardWidgetList tenantID={tenantID} />
+              <div className="flex flex-row justify-around items-center p-2">
+                <button
+                  type="submit"
+                  disabled={isAddingDatabaseDashboard}
+                  className="flex flex-row items-center justify-center rounded bg-[#646cff] px-3 py-1 text-sm text-white  focus:ring-2 focus:ring-[#646cff]/50 w-full outline-none focus:outline-none"
+                >
+                  {isAddingDatabaseDashboard && (
+                    <CircularProgress
+                      className="!text-xs !mr-3"
+                      size={16}
+                      color="white"
+                    />
+                  )}
+                  {CONSTANTS.STRINGS.ADD_DASHBOARD_BUTTON_TEXT}
+                </button>
+              </div>
             </div>
           </form>
         </ResizablePanel>

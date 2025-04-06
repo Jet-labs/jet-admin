@@ -230,34 +230,55 @@ databaseChartService.getDatabaseChartDataByID = async ({
         {
           databaseChartID,
           userID,
+          tenantID,
         }
       );
       throw new Error(`Chart ${databaseChartID} not found`);
     }
 
     // 2. Prepare queries for execution
-    const queriesToExecute = databaseChart.tblDatabaseChartQueryMappings.map(
-      (mapping) => ({
+    const databaseQueriesToExecute =
+      databaseChart.tblDatabaseChartQueryMappings.map((mapping) => ({
         databaseQueryID: mapping.databaseQueryID,
+        databaseQueryData: {
+          ...mapping.tblDatabaseQueries.databaseQueryData,
+          databaseQueryArgValues: mapping.databaseQueryArgValues,
+        },
         databaseQueryString:
           mapping.tblDatabaseQueries.databaseQueryData.databaseQueryString,
         databaseQueryArgValues: mapping.databaseQueryArgValues,
-      })
-    );
+      }));
 
     Logger.log(
       "info",
       "databaseChartService:getDatabaseChartDataByID:queries-prepared",
       {
-        queryCount: queriesToExecute.length,
+        userID,
+        databaseChartID,
+        tenantID,
+        databaseQueriesToExecuteCount: databaseQueriesToExecute.length,
       }
     );
 
     // 3. Execute all queries
-    const queryResults = await databaseQueryService.runMultipleDatabaseQueries({
-      userID,
-      dbPool,
-      databaseQueriesData: queriesToExecute,
+    const databaseQueriesResult = await databaseQueryService.runDatabaseQueries(
+      {
+        userID,
+        tenantID,
+        dbPool,
+        databaseQueries: databaseQueriesToExecute,
+      }
+    );
+
+    Logger.log("info", {
+      message:
+        "databaseChartService:getDatabaseChartDataByID:databaseQueriesResult",
+      params: {
+        userID,
+        tenantID,
+        databaseChartID,
+        databaseQueriesResultCount: databaseQueriesResult?.length,
+      },
     });
 
     let processedData;
@@ -266,50 +287,50 @@ databaseChartService.getDatabaseChartDataByID = async ({
       case constants.DATABASE_CHART_TYPES.BAR_CHART.value:
         processedData = databaseChartProcessor.processBarChartQueryResults({
           databaseChart,
-          queryResults,
+          databaseQueriesResult,
         });
         break;
       case constants.DATABASE_CHART_TYPES.LINE_CHART.value:
         processedData = databaseChartProcessor.processLineChartQueryResults({
           databaseChart,
-          queryResults,
+          databaseQueriesResult,
         });
         break;
 
       case constants.DATABASE_CHART_TYPES.PIE_CHART.value:
         processedData = databaseChartProcessor.processPieChartQueryResults({
           databaseChart,
-          queryResults,
+          databaseQueriesResult,
         });
         break;
       case constants.DATABASE_CHART_TYPES.RADAR_CHART.value:
         processedData = databaseChartProcessor.processRadarChartQueryResults({
           databaseChart,
-          queryResults,
+          databaseQueriesResult,
         });
         break;
       case constants.DATABASE_CHART_TYPES.RADIAL_CHART.value:
         processedData = databaseChartProcessor.processRadialChartQueryResults({
           databaseChart,
-          queryResults,
+          databaseQueriesResult,
         });
         break;
       case constants.DATABASE_CHART_TYPES.SCATTER_CHART.value:
         processedData = databaseChartProcessor.processScatterChartQueryResults({
           databaseChart,
-          queryResults,
+          databaseQueriesResult,
         });
         break;
       case constants.DATABASE_CHART_TYPES.BUBBLE_CHART.value:
         processedData = databaseChartProcessor.processBubbleChartQueryResults({
           databaseChart,
-          queryResults,
+          databaseQueriesResult,
         });
         break;
       default:
         processedData = databaseChartProcessor.processBarChartQueryResults({
           databaseChart,
-          queryResults,
+          databaseQueriesResult,
         });
         break;
     }
@@ -381,9 +402,14 @@ databaseChartService.getDatabaseChartDataUsingDatabaseChart = async ({
     });
 
     // 2. Prepare queries for execution
-    const queriesToExecute = databaseChart.databaseQueries.map(
+    const databaseQueriesToExecute = databaseChart.databaseQueries.map(
       (databaseQuery) => ({
         databaseQueryID: databaseQuery.databaseQueryID,
+        databaseQueryData: {
+          ...databaseQueryIDMap[databaseQuery.databaseQueryID]
+            .databaseQueryData,
+          databaseQueryArgValues: databaseQuery.databaseQueryArgValues,
+        },
         databaseQueryString:
           databaseQueryIDMap[databaseQuery.databaseQueryID].databaseQueryData
             .databaseQueryString,
@@ -395,22 +421,29 @@ databaseChartService.getDatabaseChartDataUsingDatabaseChart = async ({
       message:
         "databaseChartService:getDatabaseChartDataUsingDatabaseChart:queries-prepared",
       params: {
-        queryCount: queriesToExecute.length,
+        userID,
+        tenantID,
+        databaseQueriesToExecuteCount: databaseQueriesToExecute.length,
       },
     });
 
     // 3. Execute all queries
-    const queryResults = await databaseQueryService.runMultipleDatabaseQueries({
-      userID,
-      dbPool,
-      databaseQueriesData: queriesToExecute,
-    });
+    const databaseQueriesResult = await databaseQueryService.runDatabaseQueries(
+      {
+        userID,
+        tenantID,
+        dbPool,
+        databaseQueries: databaseQueriesToExecute,
+      }
+    );
 
     Logger.log("info", {
       message:
-        "databaseChartService:getDatabaseChartDataUsingDatabaseChart:queryResults",
+        "databaseChartService:getDatabaseChartDataUsingDatabaseChart:databaseQueriesResult",
       params: {
-        queryResultsCount: queryResults?.length,
+        userID,
+        tenantID,
+        databaseQueriesResultCount: databaseQueriesResult?.length,
       },
     });
 
@@ -420,49 +453,49 @@ databaseChartService.getDatabaseChartDataUsingDatabaseChart = async ({
       case constants.DATABASE_CHART_TYPES.BAR_CHART.value:
         processedData = databaseChartProcessor.processBarChartQueryResults({
           databaseChart,
-          queryResults,
+          databaseQueriesResult,
         });
         break;
       case constants.DATABASE_CHART_TYPES.LINE_CHART.value:
         processedData = databaseChartProcessor.processLineChartQueryResults({
           databaseChart,
-          queryResults,
+          databaseQueriesResult,
         });
         break;
       case constants.DATABASE_CHART_TYPES.PIE_CHART.value:
         processedData = databaseChartProcessor.processPieChartQueryResults({
           databaseChart,
-          queryResults,
+          databaseQueriesResult,
         });
         break;
       case constants.DATABASE_CHART_TYPES.RADAR_CHART.value:
         processedData = databaseChartProcessor.processRadarChartQueryResults({
           databaseChart,
-          queryResults,
+          databaseQueriesResult,
         });
         break;
       case constants.DATABASE_CHART_TYPES.RADIAL_CHART.value:
         processedData = databaseChartProcessor.processRadialChartQueryResults({
           databaseChart,
-          queryResults,
+          databaseQueriesResult,
         });
         break;
       case constants.DATABASE_CHART_TYPES.SCATTER_CHART.value:
         processedData = databaseChartProcessor.processScatterChartQueryResults({
           databaseChart,
-          queryResults,
+          databaseQueriesResult,
         });
         break;
       case constants.DATABASE_CHART_TYPES.BUBBLE_CHART.value:
         processedData = databaseChartProcessor.processBubbleChartQueryResults({
           databaseChart,
-          queryResults,
+          databaseQueriesResult,
         });
         break;
       default:
         processedData = databaseChartProcessor.processBarChartQueryResults({
           databaseChart,
-          queryResults,
+          databaseQueriesResult,
         });
         break;
     }
