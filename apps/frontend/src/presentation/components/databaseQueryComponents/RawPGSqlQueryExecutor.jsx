@@ -10,11 +10,16 @@ import { executeRawSQLQueryAPI } from "../../../data/apis/database";
 import { extractError } from "../../../utils/error";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { DatabaseQueryResponseView } from "./databaseQueryResponseView";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "../ui/resizable";
 
-export const RawPGSqlQueryExecutor = ({tenantID}) => {
+export const RawPGSqlQueryExecutor = ({ tenantID }) => {
   const [sqlQuery, setSqlQuery] = useState("");
   const [queryResults, setQueryResults] = useState(null);
- 
+
   const [resultTab, setResultTab] = useState(0);
 
   // Use React Query's useMutation hook
@@ -33,9 +38,7 @@ export const RawPGSqlQueryExecutor = ({tenantID}) => {
     retry: false,
     onSuccess: (data) => {
       setQueryResults(data);
-      displaySuccess(
-        CONSTANTS.STRINGS.QUERY_EXECUTED_SUCCESSFULLY
-      );
+      displaySuccess(CONSTANTS.STRINGS.QUERY_EXECUTED_SUCCESSFULLY);
     },
     onError: (error) => {
       displayError(`Query execution failed: ${extractError(error)}`);
@@ -71,65 +74,78 @@ export const RawPGSqlQueryExecutor = ({tenantID}) => {
       </div>
 
       <div className="flex-grow flex flex-col h-full">
-        <div className="p-3 border-b border-slate-200 flex-shrink-0">
-          <div className="mb-2">
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              {CONSTANTS.STRINGS.RAW_QUERY_EXCECUTOR_QUERY_LABEL}
-            </label>
-            <div className="border border-slate-300 rounded-md">
-              <CodeMirror
-                value={sqlQuery}
-                height="150px"
-                theme={githubLight}
-                extensions={[sql()]}
-                onChange={(value) => setSqlQuery(value)}
-                placeholder={CONSTANTS.STRINGS.RAW_QUERY_EXCECUTOR_PLACEHOLDER}
-                className="border-slate-300 focus:border-slate-300 focus:outline-slate-300"
+        <ResizablePanelGroup
+          direction="vertical"
+          autoSaveId={
+            CONSTANTS.RESIZABLE_PANEL_KEYS
+              .RAW_QUERY_EXECUTION_FORM_RESULT_SEPARATION
+          }
+          className={"!w-full !h-full"}
+        >
+          <ResizablePanel defaultSize={20}>
+            <div className="p-3 flex-shrink-0">
+              <div className="mb-2">
+                <label className="block text-sm font-medium text-slate-700 mb-1">
+                  {CONSTANTS.STRINGS.RAW_QUERY_EXCECUTOR_QUERY_LABEL}
+                </label>
+                <div className="border border-slate-300 rounded-md">
+                  <CodeMirror
+                    value={sqlQuery}
+                    height="150px"
+                    theme={githubLight}
+                    extensions={[sql()]}
+                    onChange={(value) => setSqlQuery(value)}
+                    placeholder={
+                      CONSTANTS.STRINGS.RAW_QUERY_EXCECUTOR_PLACEHOLDER
+                    }
+                    className="border-slate-300 focus:border-slate-300 focus:outline-slate-300"
+                  />
+                </div>
+              </div>
+
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  onClick={handleExecuteQuery}
+                  disabled={isExecuting || !sqlQuery.trim()}
+                  className="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#747bff] focus:ring-4 focus:outline-none"
+                >
+                  {isExecuting && (
+                    <CircularProgress
+                      className="!text-xs !mr-3"
+                      size={16}
+                      color="inherit"
+                    />
+                  )}
+                  {!isExecuting && <FaPlay className="mr-2" size={12} />}
+                  {isExecuting ? "Executing..." : "Execute Query"}
+                </button>
+              </div>
+            </div>
+          </ResizablePanel>
+          <ResizableHandle withHandle={true} />
+          <ResizablePanel defaultSize={80}>
+            {error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded m-3">
+                <h3 className="font-semibold mb-1">Error</h3>
+                <pre className="text-sm whitespace-pre-wrap">
+                  {extractError(error)}
+                </pre>
+              </div>
+            )}
+            {queryResults && (
+              <DatabaseQueryResponseView
+                databaseQueryResult={{ result: queryResults }}
               />
-            </div>
-          </div>
+            )}
 
-          <div className="flex justify-end">
-            <button
-              type="button"
-              onClick={handleExecuteQuery}
-              disabled={isExecuting || !sqlQuery.trim()}
-              className="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#747bff] focus:ring-4 focus:outline-none"
-            >
-              {isExecuting && (
-                <CircularProgress
-                  className="!text-xs !mr-3"
-                  size={16}
-                  color="inherit"
-                />
-              )}
-              {!isExecuting && <FaPlay className="mr-2" size={12} />}
-              {isExecuting ? "Executing..." : "Execute Query"}
-            </button>
-          </div>
-        </div>
-
-        <div className="flex-grow overflow-auto flex flex-col">
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded m-3">
-              <h3 className="font-semibold mb-1">Error</h3>
-              <pre className="text-sm whitespace-pre-wrap">
-                {extractError(error)}
-              </pre>
-            </div>
-          )}
-          {queryResults && (
-            <DatabaseQueryResponseView
-              databaseQueryResult={{ result: queryResults }}
-            />
-          )}
-
-          {!queryResults && !error && !isExecuting && (
-            <div className="flex items-center justify-center h-full text-slate-500 p-3">
-              {CONSTANTS.STRINGS.RAW_QUERY_EXCECUTOR_RESULT_PLACEHOLDER}
-            </div>
-          )}
-        </div>
+            {!queryResults && !error && !isExecuting && (
+              <div className="flex items-center justify-center h-full text-slate-500 p-3">
+                {CONSTANTS.STRINGS.RAW_QUERY_EXCECUTOR_RESULT_PLACEHOLDER}
+              </div>
+            )}
+          </ResizablePanel>
+        </ResizablePanelGroup>
       </div>
     </div>
   );

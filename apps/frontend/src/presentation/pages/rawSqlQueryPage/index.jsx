@@ -1,6 +1,6 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import { RawPGSqlQueryExecutor } from "../../components/databaseQueryComponents/RawPGSqlQueryExecutor";
+import { RawPGSqlQueryExecutor } from "../../components/databaseQueryComponents/rawPGSqlQueryExecutor";
 
 /**
  * Page component for the Raw SQL Query Executor

@@ -1,5 +1,8 @@
 const { expressUtils } = require("../../utils/express.utils");
 const Logger = require("../../utils/logger");
+const {
+  databaseQueryService,
+} = require("../databaseQuery/databaseQuery.service");
 const { databaseService } = require("./database.service");
 
 const databaseController = {};
@@ -87,31 +90,51 @@ databaseController.executeRawSQLQuery = async (req, res) => {
   try {
     const { user, dbPool } = req;
     const { sqlQuery } = req.body;
-    
+
     Logger.log("info", {
       message: "databaseController:executeRawSQLQuery:params",
       params: { userID: user.userID, sqlQuery },
     });
 
-    if (!sqlQuery || typeof sqlQuery !== 'string') {
-      return expressUtils.sendResponse(res, false, {}, "Invalid SQL query provided");
+    if (!sqlQuery || typeof sqlQuery !== "string") {
+      return expressUtils.sendResponse(
+        res,
+        false,
+        {},
+        "Invalid SQL query provided"
+      );
     }
 
-    const result = await databaseService.executeRawSQLQuery({
-      userID: parseInt(user.userID),
-      dbPool,
-      sqlQuery,
-    });
+    const databaseQueriesResult = await databaseQueryService.runDatabaseQueries(
+      {
+        userID: parseInt(user.userID),
+        dbPool,
+        tenantID: null,
+        databaseQueries: [
+          {
+            databaseQueryID: null,
+            databaseQueryData: {
+              databaseQueryString: sqlQuery,
+              databaseQueryArgValues: {},
+              databaseQueryArgs: {},
+            },
+          },
+        ],
+      }
+    );
 
     Logger.log("success", {
       message: "databaseController:executeRawSQLQuery:success",
-      params: { userID: user.userID, rowCount: result.rowCount },
+      params: {
+        userID: user.userID,
+        rowCount: databaseQueriesResult[0].result.length,
+      },
     });
 
-    return expressUtils.sendResponse(res, true, { 
-      result: result.rows,
-      rowCount: result.rowCount,
-      message: "SQL query executed successfully."
+    return expressUtils.sendResponse(res, true, {
+      result: databaseQueriesResult[0].result,
+      rowCount: databaseQueriesResult[0].result.length,
+      message: "SQL query executed successfully.",
     });
   } catch (error) {
     Logger.log("error", {
