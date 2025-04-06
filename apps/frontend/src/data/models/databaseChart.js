@@ -1,3 +1,5 @@
+import { DatabaseChartQueryMapping } from "./databaseChartQueryMapping";
+
 export class DatabaseChart {
   constructor({
     createdAt,
@@ -24,7 +26,9 @@ export class DatabaseChart {
     this.databaseChartType = databaseChartType;
     this.databaseChartConfig = databaseChartConfig;
     this.refreshInterval = refreshInterval;
-    this.databaseQueries = tblDatabaseChartQueryMappings;
+    this.databaseQueries = tblDatabaseChartQueryMappings
+      ? DatabaseChartQueryMapping.toList(tblDatabaseChartQueryMappings)
+      : [];
   }
   static toList(data) {
     if (Array.isArray(data)) {

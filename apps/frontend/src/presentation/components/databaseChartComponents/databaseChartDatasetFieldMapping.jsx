@@ -1,6 +1,6 @@
 import { Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
 import { useFormik } from "formik";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { CONSTANTS } from "../../../constants";
 import ReactJson from "react-json-view";
 import { CollapseComponent } from "../ui/collapseComponent";
@@ -44,6 +44,24 @@ export const DatabaseChartDatasetFieldMapping = ({
     },
   });
 
+  console.log({ selectedQuery });
+
+  const _dataTypeSuggestionDataList = useMemo(() => {
+    if (selectedQuery && selectedQuery.databaseQueryResultSchema) {
+      const dataList = selectedQuery.databaseQueryResultSchema.items?.properties
+        ? Object.keys(selectedQuery.databaseQueryResultSchema.items.properties)
+        : Object.keys(selectedQuery.databaseQueryResultSchema);
+      return (
+        <datalist id="data-type-suggestions">
+          {dataList.map((item) => (
+            <option key={item} value={item} />
+          ))}
+        </datalist>
+      );
+    }
+    return null;
+  }, [selectedQuery]);
+
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
       <DialogTitle className="!p-4 !pb-0">
@@ -51,7 +69,8 @@ export const DatabaseChartDatasetFieldMapping = ({
       </DialogTitle>
       <DialogContent className="!p-4 !space-y-4">
         <div className="rounded border border-slate-200">
-          {selectedQuery && selectedQuery.databaseQueryResultSchema && false ? (
+          {_dataTypeSuggestionDataList}
+          {selectedQuery && selectedQuery.databaseQueryResultSchema ? (
             <CollapseComponent
               showButtonText={"Query result metadata"}
               hideButtonText={"Hide"}
@@ -62,7 +81,12 @@ export const DatabaseChartDatasetFieldMapping = ({
                   className="!max-h-32 !overflow-y-auto"
                 >
                   <ReactJson
-                    src={selectedQuery.databaseQueryResultSchema}
+                    src={
+                      selectedQuery.databaseQueryResultSchema.items?.properties
+                        ? selectedQuery.databaseQueryResultSchema.items
+                            .properties
+                        : selectedQuery.databaseQueryResultSchema
+                    }
                     theme={"ashes"}
                   />
                 </Box>
@@ -93,6 +117,7 @@ export const DatabaseChartDatasetFieldMapping = ({
                 onChange={datasetFieldMappingForm.handleChange}
                 onBlur={datasetFieldMappingForm.handleBlur}
                 value={datasetFieldMappingForm.values.datasetFields.xAxis}
+                list="data-type-suggestions"
               />
             </div>
           )}
@@ -113,6 +138,7 @@ export const DatabaseChartDatasetFieldMapping = ({
                 onChange={datasetFieldMappingForm.handleChange}
                 onBlur={datasetFieldMappingForm.handleBlur}
                 value={datasetFieldMappingForm.values.datasetFields.yAxis}
+                list="data-type-suggestions"
               />
             </div>
           )}
@@ -133,6 +159,7 @@ export const DatabaseChartDatasetFieldMapping = ({
                 onChange={datasetFieldMappingForm.handleChange}
                 onBlur={datasetFieldMappingForm.handleBlur}
                 value={datasetFieldMappingForm.values.datasetFields.label}
+                list="data-type-suggestions"
               />
             </div>
           )}
@@ -153,6 +180,7 @@ export const DatabaseChartDatasetFieldMapping = ({
                 onChange={datasetFieldMappingForm.handleChange}
                 onBlur={datasetFieldMappingForm.handleBlur}
                 value={datasetFieldMappingForm.values.datasetFields.value}
+                list="data-type-suggestions"
               />
             </div>
           )}
@@ -173,6 +201,7 @@ export const DatabaseChartDatasetFieldMapping = ({
                 onChange={datasetFieldMappingForm.handleChange}
                 onBlur={datasetFieldMappingForm.handleBlur}
                 value={datasetFieldMappingForm.values.datasetFields.radius}
+                list="data-type-suggestions"
               />
             </div>
           )}

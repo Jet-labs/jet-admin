@@ -159,7 +159,11 @@ databaseChartService.getDatabaseChartByID = async ({
         databaseChartID: parseInt(databaseChartID),
       },
       include: {
-        tblDatabaseChartQueryMappings: true,
+        tblDatabaseChartQueryMappings: {
+          include: {
+            tblDatabaseQueries: true,
+          },
+        },
       },
     });
     Logger.log("success", {
