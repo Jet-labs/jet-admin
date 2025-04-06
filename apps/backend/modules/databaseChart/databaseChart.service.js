@@ -244,9 +244,6 @@ databaseChartService.getDatabaseChartDataByID = async ({
           ...mapping.tblDatabaseQueries.databaseQueryData,
           databaseQueryArgValues: mapping.databaseQueryArgValues,
         },
-        databaseQueryString:
-          mapping.tblDatabaseQueries.databaseQueryData.databaseQueryString,
-        databaseQueryArgValues: mapping.databaseQueryArgValues,
       }));
 
     Logger.log(
@@ -410,10 +407,6 @@ databaseChartService.getDatabaseChartDataUsingDatabaseChart = async ({
             .databaseQueryData,
           databaseQueryArgValues: databaseQuery.databaseQueryArgValues,
         },
-        databaseQueryString:
-          databaseQueryIDMap[databaseQuery.databaseQueryID].databaseQueryData
-            .databaseQueryString,
-        databaseQueryArgValues: databaseQuery.databaseQueryArgValues,
       })
     );
 

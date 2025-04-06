@@ -243,9 +243,6 @@ databaseWidgetService.getDatabaseWidgetDataByID = async ({
           ...mapping.tblDatabaseQueries.databaseQueryData,
           databaseQueryArgValues: mapping.databaseQueryArgValues,
         },
-        databaseQueryString:
-          mapping.tblDatabaseQueries.databaseQueryData.databaseQueryString,
-        databaseQueryArgValues: mapping.databaseQueryArgValues,
       }));
 
     Logger.log(
@@ -370,10 +367,6 @@ databaseWidgetService.getDatabaseWidgetDataUsingDatabaseWidget = async ({
             .databaseQueryData,
           databaseQueryArgValues: databaseQuery.databaseQueryArgValues,
         },
-        databaseQueryString:
-          databaseQueryIDMap[databaseQuery.databaseQueryID].databaseQueryData
-            .databaseQueryString,
-        databaseQueryArgValues: databaseQuery.databaseQueryArgValues,
       })
     );
 
