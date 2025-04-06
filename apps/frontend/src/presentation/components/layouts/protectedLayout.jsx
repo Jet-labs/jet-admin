@@ -16,6 +16,7 @@ import { MainDrawerList } from "../drawerList/mainDrawerList";
 import { Spinner } from "../ui/spinner";
 import { UserAvatar } from "../ui/userAvatar";
 import { CONSTANTS } from "../../../constants";
+import { Breadcrumbs } from "../ui/breadCrumbs";
 export const ProtectedLayout = () => {
   const { firebaseUserState } = useAuthState();
   const { tenantID } = useParams();
@@ -59,6 +60,7 @@ export const ProtectedLayout = () => {
                 </span>
               </Link>
             </div>
+            <Breadcrumbs />
 
             {/* <button onClick={signOut}>Logout</button> */}
             <div>
