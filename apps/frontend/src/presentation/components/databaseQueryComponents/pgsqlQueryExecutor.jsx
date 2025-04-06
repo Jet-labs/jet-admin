@@ -16,7 +16,7 @@ import {
   ResizablePanelGroup,
 } from "../ui/resizable";
 
-export const RawPGSqlQueryExecutor = ({ tenantID }) => {
+export const PGSQLQueryExecutor = ({ tenantID }) => {
   const [sqlQuery, setSqlQuery] = useState("");
   const [queryResults, setQueryResults] = useState(null);
 
@@ -150,5 +150,3 @@ export const RawPGSqlQueryExecutor = ({ tenantID }) => {
     </div>
   );
 };
-
-
