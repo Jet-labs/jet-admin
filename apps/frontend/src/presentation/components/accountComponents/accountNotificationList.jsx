@@ -6,7 +6,11 @@ export const AccountNotificationList = () =>{
     const {user} = useAuthState();
     return (
       <div className="w-full mt-10 flex flex-col justify-start items-stretch gap-2">
-        <span  className="text-slate-700 font-semibold text-sm">{CONSTANTS.STRINGS.USER_NOTIFICATIONS_TITLE}</span>
+        {user?.notifications?.length > 0 ? (
+          <span className="text-slate-700 font-semibold text-sm">
+            {CONSTANTS.STRINGS.USER_NOTIFICATIONS_TITLE}
+          </span>
+        ) : null}
         {user?.notifications?.map((notification, index) => {
           return (
             <div className="p-2  border-slate-200 border rounded flex flex-col justify-start items-start gap-1 border-l-2 border-l-[#646cff]">
@@ -18,8 +22,7 @@ export const AccountNotificationList = () =>{
                   {notification.description}
                 </span>
               )}
-              {notification.actionType &&
-              (notification.actionType == "link") ? (
+              {notification.actionType && notification.actionType == "link" ? (
                 <Link to={notification.action} className="text-xs">
                   {notification.actionText}
                 </Link>

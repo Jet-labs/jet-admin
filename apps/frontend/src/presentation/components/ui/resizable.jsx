@@ -23,7 +23,7 @@ const ResizableHandle = ({ withHandle, className, ...props }) => {
     >
       {withHandle && (
         <div className="z-10 flex h-4 w-3 items-center justify-center rounded-sm border border-slate-200">
-          <GoGrabber className="!text-lg bg-white text-slate-700" />
+          <GoGrabber className="!text-lg bg-slate-100 text-slate-800" />
         </div>
       )}
     </ResizablePrimitive.PanelResizeHandle>
