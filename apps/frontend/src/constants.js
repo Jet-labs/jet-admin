@@ -4,7 +4,7 @@ export const CONSTANTS = {
   //   ? "https://api.jetforms.live"
   //   : "https://8090-idx-jet-restaurant-admin-1736926042490.cluster-fu5knmr55rd44vy7k7pxk74ams.cloudworkstations.dev",
   SERVER_HOST: import.meta.env.PROD
-    ? "http://localhost:80"
+    ? "https://localhost"
     : "http://localhost:8090",
   SUPABASE: {
     TENANT_ASSET_DIRECTORY: "tenant-assets",

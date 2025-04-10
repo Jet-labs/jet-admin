@@ -79,6 +79,56 @@ else
   echo "Using external PostgreSQL database"
 fi
 
+# ===============================================================
+# --- SSL Certificate Generation for Nginx (Self-Signed) ---
+# ===============================================================
+SSL_DIR="/etc/nginx/ssl"
+SSL_KEY_PATH="$SSL_DIR/nginx-selfsigned.key"
+SSL_CERT_PATH="$SSL_DIR/nginx-selfsigned.crt"
+
+# Use environment variable for Common Name (CN), default to localhost
+# You can set SSL_CERT_CN in your docker run/compose command for e.g., a specific dev domain
+SSL_CERT_CN=${SSL_CERT_CN:-localhost}
+
+# Ensure the target directory for SSL certs exists
+mkdir -p "$SSL_DIR"
+
+# Check if both certificate and key files already exist (e.g., mounted via volume)
+if [ ! -f "$SSL_CERT_PATH" ] || [ ! -f "$SSL_KEY_PATH" ]; then
+  echo "Generating self-signed SSL certificate for CN=$SSL_CERT_CN..."
+
+  # Generate the private key and certificate using openssl
+  # -x509: Output a self-signed certificate instead of a CSR
+  # -nodes: Do not encrypt the private key (no passphrase needed for Nginx)
+  # -days 3650: Set validity for 10 years (adjust as needed for dev)
+  # -newkey rsa:2048: Generate a new 2048-bit RSA private key
+  # -keyout: Specify the output file path for the private key
+  # -out: Specify the output file path for the certificate
+  # -subj: Provide subject information non-interactively
+  #        (C=Country, ST=State, L=Locality, O=Organization, OU=OrganizationalUnit, CN=CommonName)
+  #        Using current date/location context for defaults where applicable.
+  openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
+      -keyout "$SSL_KEY_PATH" \
+      -out "$SSL_CERT_PATH" \
+      -subj "/C=MW/ST=Solar System/L=Earth/O=Jet Labs/OU=JetAdminApp/CN=$SSL_CERT_CN"
+
+  echo "----------------------------------------------------------------------"
+  echo "Self-signed SSL certificate generated:"
+  echo "  Certificate: $SSL_CERT_PATH"
+  echo "  Private Key: $SSL_KEY_PATH"
+  echo "NOTE: This is a self-signed certificate suitable for DEVELOPMENT ONLY."
+  echo "Your browser will show security warnings."
+  echo "NOTE: The private key is stored UNENCRYPTED."
+  echo "----------------------------------------------------------------------"
+else
+  echo "Existing SSL certificate and key found in $SSL_DIR. Skipping generation."
+  # Optional: You could add a check here to see if the existing cert is expired
+  # or if its CN matches $SSL_CERT_CN and regenerate if needed.
+fi
+# ===============================================================
+# --- End SSL Certificate Generation ---
+# ===============================================================
+
 echo "Starting nginx for frontend..."
 nginx -g "daemon off;" &
 
