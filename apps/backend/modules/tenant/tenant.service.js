@@ -107,6 +107,119 @@ tenantService.getUserTenantByID = async ({ userID, tenantID, dbPool }) => {
     throw error;
   }
 };
+
+/**
+ *
+ * @param {object} param0
+ * @param {Number} param0.userID
+ * @param {Number} param0.tenantID
+ * @returns
+ */
+tenantService.deleteUserTenantByID = async ({ userID, tenantID }) => {
+  try {
+    Logger.log("info", {
+      message: "tenantService:deleteUserTenantByID:params",
+      params: { userID, tenantID },
+    });
+    
+    const tenantDeletionTransaction = await prisma.$transaction([
+      prisma.tblDatabaseDashboardChartMappings.deleteMany({
+        where: {
+          OR: [
+            { tblDatabaseCharts: { tenantID: tenantIdToDelete } },
+            { tblDatabaseDashboards: { tenantID: tenantIdToDelete } },
+          ],
+        },
+      }),
+      prisma.tblAPIKeyRoleMappings.deleteMany({
+        where: {
+          OR: [
+            { tblAPIKeys: { tenantID: tenantIdToDelete } },
+            { tblRoles: { tenantID: tenantIdToDelete } },
+          ],
+        },
+      }),
+      prisma.tblRolePermissionMappings.deleteMany({
+        where: {
+          tblRoles: { tenantID: tenantIdToDelete },
+        },
+      }),
+      prisma.tblUserTenantRoleMappings.deleteMany({
+        where: {
+          tenantID: tenantIdToDelete,
+        },
+      }),
+      prisma.tblUserNotifications.deleteMany({
+        where: {
+          tenantID: tenantIdToDelete,
+        },
+      }),
+      prisma.tblUserTenantConfigMap.deleteMany({
+        where: {
+          tenantID: tenantIdToDelete,
+        },
+      }),
+      prisma.tblUsersTenantsRelationship.deleteMany({
+        where: {
+          tenantID: tenantIdToDelete,
+        },
+      }),
+      prisma.tblAPIKeys.deleteMany({
+        where: {
+          tenantID: tenantIdToDelete,
+        },
+      }),
+      prisma.tblDatabaseCharts.deleteMany({
+        where: {
+          tenantID: tenantIdToDelete,
+        },
+      }),
+      prisma.tblDatabaseDashboards.deleteMany({
+        where: {
+          tenantID: tenantIdToDelete,
+        },
+      }),
+      prisma.tblDatabaseNotifications.deleteMany({
+        where: {
+          tenantID: tenantIdToDelete,
+        },
+      }),
+      prisma.tblDatabaseQueries.deleteMany({
+        where: {
+          tenantID: tenantIdToDelete,
+        },
+      }),
+      prisma.tblDatabaseWidgets.deleteMany({
+        where: {
+          tenantID: tenantIdToDelete,
+        },
+      }),
+      prisma.tblRoles.deleteMany({
+        where: {
+          tenantID: tenantIdToDelete,
+        },
+      }),
+      prisma.tblTenants.delete({
+        where: {
+          tenantID: tenantIdToDelete,
+        },
+      }),
+    ]);
+
+    Logger.log("success", {
+      message: "tenantService:deleteUserTenantByID:success",
+      params: { userID, tenantID },
+    });
+    return true;
+  } catch (error) {
+    Logger.log("error", {
+      message: "tenantService:deleteUserTenantByID:catch1",
+      params: { error },
+    });
+    throw error;
+  }
+};
+
 /**
  *
  * @param {object} param0

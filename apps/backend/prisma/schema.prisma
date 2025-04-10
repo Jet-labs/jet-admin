@@ -269,3 +269,10 @@ model tblAPIKeyRoleMappings {
 
   @@id([apiKeyID, roleID])
 }
+
+model tblRuntimeConfig {
+  key       String   @id
+  value     Json
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @db.Timestamptz(6)
+}

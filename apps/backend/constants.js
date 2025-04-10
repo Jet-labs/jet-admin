@@ -1,5 +1,4 @@
 const constants = {
-  // strings
   STRINGS: {
     REFRESH_TOKEN_COOKIE_STRING: "refreshToken",
     USER_TENANT_ADDITION_NOTIFICATION_TITLE: "Tenant addition notification",
@@ -7,22 +6,20 @@ const constants = {
       "You have been added to a new tenant",
   },
 
-  // thresholds
-
-  // defaults
   ROW_PAGE_SIZE: 100,
 
   SAMPLE_PLAN: {
     maxTenantCount: Infinity,
     maxMembersPerTenant: Infinity,
   },
+
   ROLES: {
     PRIMARY: {
       ADMIN: { name: "Admin", value: "ADMIN" },
       MEMBER: { name: "Member", value: "MEMBER" },
     },
   },
-  // error codes
+
   ERROR_CODES: {
     INVALID_TENANT: {
       code: "INVALID_TENANT",
@@ -106,6 +103,7 @@ const constants = {
       message: "Only data manupulation and data fetching queries are allowed",
     },
   },
+
   TABLE_FILTERS: {
     "=": (a, b) => `${a} = ${b}`,
     "!=": (a, b) => `${a} != ${b}`,
@@ -116,6 +114,7 @@ const constants = {
     LIKE: (a, b) => `${a} LIKE '%${b}%'`,
     ILIKE: (a, b) => `${a} ILIKE '%${b}%'`,
   },
+
   DATABASE_CHART_TYPES: {
     BAR_CHART: {
       name: "Bar Chart",
@@ -146,6 +145,7 @@ const constants = {
       value: "radial",
     },
   },
+
   DATABASE_WIDGET_TYPES: {
     TEXT_WIDGET: {
       name: "Text widget",

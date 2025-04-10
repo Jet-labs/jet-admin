@@ -89,14 +89,14 @@ databaseController.createDatabaseSchema = async (req, res) => {
 databaseController.executeRawSQLQuery = async (req, res) => {
   try {
     const { user, dbPool } = req;
-    const { sqlQuery } = req.body;
+    const { query } = req.body;
 
     Logger.log("info", {
       message: "databaseController:executeRawSQLQuery:params",
-      params: { userID: user.userID, sqlQuery },
+      params: { userID: user.userID, query },
     });
 
-    if (!sqlQuery || typeof sqlQuery !== "string") {
+    if (!query || typeof query !== "string") {
       return expressUtils.sendResponse(
         res,
         false,
@@ -114,7 +114,7 @@ databaseController.executeRawSQLQuery = async (req, res) => {
           {
             databaseQueryID: null,
             databaseQueryData: {
-              databaseQueryString: sqlQuery,
+              databaseQueryString: query,
               databaseQueryArgValues: {},
               databaseQueryArgs: {},
             },

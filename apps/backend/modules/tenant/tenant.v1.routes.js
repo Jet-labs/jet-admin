@@ -11,26 +11,45 @@ const databaseDashboardRouter = require("../databaseDashboard/databaseDashboard.
 const userManagementRouter = require("../userManagement/userManagement.v1.route");
 const tenantRoleRouter = require("../tenantRole/tenantRole.v1.route");
 const tenantAPIKeyRouter = require("../apiKey/apiKey.v1.routes");
-
-// Apply common middleware at the router level
-router.use(authMiddleware.authProvider);
+const { param, body } = require("express-validator");
+const { expressUtils } = require("../../utils/express.utils");
 
 // Tenant routes
+router.use(authMiddleware.authProvider);
 router.get("/", tenantController.getAllUserTenants);
 router.get(
   "/:tenantID",
+  param("tenantID").isNumeric().withMessage("tenantID must be a number"),
+  expressUtils.validationChecker,
   authMiddleware.checkUserPermissions(["tenant:read"]),
   tenantMiddleware.poolProvider,
   tenantController.getUserTenantByID
 );
+router.delete(
+  "/:tenantID",
+  param("tenantID").isNumeric().withMessage("tenantID must be a number"),
+  expressUtils.validationChecker,
+  authMiddleware.checkUserPermissions(["tenant:delete"]),
+  tenantMiddleware.poolProvider,
+  tenantController.deleteUserTenantByID
+);
 router.post(
   "/",
+  body("tenantName").notEmpty().withMessage("tenantName is required"),
+  body("tenantLogoURL").notEmpty().withMessage("tenantLogoURL is required"),
+  body("tenantDBURL").notEmpty().withMessage("tenantDBURL is required"),
+  expressUtils.validationChecker,
   tenantMiddleware.checkTenantCreationLimit,
   tenantController.createNewTenant
 );
 router.patch("/dbtest", tenantController.testTenantDatabaseConnection);
 router.patch(
   "/:tenantID",
+  param("tenantID").isNumeric().withMessage("tenantID must be a number"),
+  body("tenantName").notEmpty().withMessage("tenantName is required"),
+  body("tenantLogoURL").notEmpty().withMessage("tenantLogoURL is required"),
+  body("tenantDBURL").notEmpty().withMessage("tenantDBURL is required"),
+  expressUtils.validationChecker,
   authMiddleware.checkUserPermissions(["tenant:update"]),
   tenantController.updateTenant
 );
@@ -38,19 +57,32 @@ router.patch(
 // Nested database routes
 router.use(
   "/:tenantID/database",
+  expressUtils.validationChecker,
   authMiddleware.checkUserPermissions(["tenant:database"]),
   tenantMiddleware.poolProvider,
   databaseRouter
 );
 
 // Nested user management routes
-router.use("/:tenantID/users", userManagementRouter);
+router.use(
+  "/:tenantID/users",
+  authMiddleware.checkUserPermissions(["tenant:user"]),
+  userManagementRouter
+);
 
 // Nested user management routes
-router.use("/:tenantID/roles", tenantRoleRouter);
+router.use(
+  "/:tenantID/roles",
+  authMiddleware.checkUserPermissions(["tenant:role"]),
+  tenantRoleRouter
+);
 
 // Nested APIKey routes
-router.use("/:tenantID/apikeys", tenantAPIKeyRouter);
+router.use(
+  "/:tenantID/apikeys",
+  authMiddleware.checkUserPermissions(["tenant:apikey"]),
+  tenantAPIKeyRouter
+);
 
 router.use(
   "/:tenantID/queries",

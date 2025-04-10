@@ -43,6 +43,39 @@ tenantController.getUserTenantByID = async (req, res) => {
  * @param {import("express").Response} res
  * @returns
  */
+tenantController.deleteUserTenantByID = async (req, res) => {
+  try {
+    const { user, dbPool } = req;
+    const { tenantID } = req.params;
+    Logger.log("info", {
+      message: "tenantController:deleteUserTenantByID:params",
+      params: { userID: user.userID, tenantID },
+    });
+    await tenantService.deleteUserTenantByID({
+      userID: parseInt(user.userID),
+      tenantID: parseInt(tenantID),
+      dbPool,
+    });
+    Logger.log("success", {
+      message: "tenantController:deleteUserTenantByID:success",
+      params: {userID: user.userID, tenantID}
+    });
+    return expressUtils.sendResponse(res, true, { });
+  } catch (error) {
+    Logger.log("error", {
+      message: "tenantController:deleteUserTenantByID:catch1",
+      params: { error },
+    });
+    return expressUtils.sendResponse(res, false, {}, error);
+  }
+};
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ * @returns
+ */
 tenantController.getAllUserTenants = async (req, res) => {
   try {
     const { user } = req;
