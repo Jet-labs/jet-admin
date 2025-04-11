@@ -1,4 +1,4 @@
-# Multi-stage build for the restaurant admin application
+# Multi-stage build for the Jet admin application
 FROM node:18-alpine
 
 # Build frontend
