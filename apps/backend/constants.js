@@ -8,6 +8,17 @@ const constants = {
 
   ROW_PAGE_SIZE: 100,
 
+  SUPPORTED_DATABASES: {
+    postgresql: {
+      name: "PostgreSQL",
+      value: "postgresql",
+    },
+    mysql: {
+      name: "MySQL",
+      value: "mysql",
+    },
+  },
+
   SAMPLE_PLAN: {
     maxTenantCount: Infinity,
     maxMembersPerTenant: Infinity,

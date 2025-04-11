@@ -103,7 +103,7 @@ export const TenantEditor = ({ tenantEditorForm }) => {
           type="tenantName"
           name="tenantName"
           id="tenantName"
-          class=" placeholder:text-slate-400 bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:border-slate-700 block w-full px-2.5 py-1.5 "
+          className=" placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:outline-none focus:border-slate-400 block w-full px-1.5 py-1"
           placeholder={
             CONSTANTS.STRINGS.TENANT_EDITOR_FORM_NAME_FIELD_PLACEHOLDER
           }
@@ -112,6 +112,31 @@ export const TenantEditor = ({ tenantEditorForm }) => {
           onBlur={tenantEditorForm.handleBlur}
           value={tenantEditorForm.values.tenantName}
         />
+      </div>
+      <div>
+        <label
+          for="tenantDBType"
+          class="block mb-1 text-sm font-medium text-slate-500"
+        >
+          {CONSTANTS.STRINGS.TENANT_EDITOR_FORM_DB_TYPE_FIELD_LABEL}
+        </label>
+        <select
+          name="tenantDBType"
+          value={tenantEditorForm.values.tenantDBType}
+          onChange={tenantEditorForm.handleChange}
+          onBlur={tenantEditorForm.handleBlur}
+          className="placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:outline-none focus:border-slate-400 block w-full px-1.5 py-1"
+        >
+          {Object.keys(CONSTANTS.SUPPORTED_DATABASES).map((dbType) => (
+            <option
+              key={CONSTANTS.SUPPORTED_DATABASES[dbType].value}
+              value={CONSTANTS.SUPPORTED_DATABASES[dbType].value}
+              className="text-xs text-slate-700"
+            >
+              {CONSTANTS.SUPPORTED_DATABASES[dbType].name}
+            </option>
+          ))}
+        </select>
       </div>
       <div>
         <div className="flex flex-row justify-between items-center w-full mb-1 ">
@@ -159,7 +184,7 @@ export const TenantEditor = ({ tenantEditorForm }) => {
           type="tenantDBURL"
           name="tenantDBURL"
           id="tenantDBURL"
-          class=" placeholder:text-slate-400 bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:border-slate-700 block w-full px-2.5 py-1.5 "
+          className=" placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:outline-none focus:border-slate-400 block w-full px-1.5 py-1"
           placeholder={
             CONSTANTS.STRINGS.TENANT_EDITOR_FORM_DB_FIELD_PLACEHOLDER
           }

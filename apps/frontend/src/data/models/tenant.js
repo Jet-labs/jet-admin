@@ -8,6 +8,7 @@ export class Tenant {
     tenantName,
     tenantLogoURL,
     tenantDBURL,
+    tenantDBType,
     relationships,
     createdAt,
     roles,
@@ -23,6 +24,7 @@ export class Tenant {
     this.tenantName = tenantName;
     this.tenantLogoURL = tenantLogoURL;
     this.tenantDBURL = tenantDBURL;
+    this.tenantDBType = tenantDBType;
     this.relationships = relationships;
     this.createdAt = createdAt;
     this.roles = roles;

@@ -37,10 +37,11 @@ export const TenantAdditionForm = () => {
       tenantName: "",
       tenantLogoURL: "",
       tenantDBURL: "",
+      tenantDBType: CONSTANTS.SUPPORTED_DATABASES.postgresql.name,
     },
     validationSchema: formValidations.addTenantFormValidationSchema,
-    onSubmit: ({ tenantName, tenantLogoURL, tenantDBURL }) => {
-      createNewTenant({ tenantName, tenantLogoURL, tenantDBURL });
+    onSubmit: ({ tenantName, tenantLogoURL, tenantDBType, tenantDBURL }) => {
+      createNewTenant({ tenantName, tenantLogoURL, tenantDBType, tenantDBURL });
     },
   });
 

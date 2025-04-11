@@ -11,6 +11,17 @@ export const CONSTANTS = {
     TENANT_LOGO_DIRECTORY: "logos",
   },
 
+  SUPPORTED_DATABASES: {
+    postgresql: {
+      name: "PostgreSQL",
+      value: "postgresql",
+    },
+    mysql: {
+      name: "MySQL",
+      value: "mysql",
+    },
+  },
+
   ROLES: {
     PRIMARY: {
       ADMIN: { name: "Admin", value: "ADMIN" },
@@ -103,6 +114,7 @@ export const CONSTANTS = {
     TENANT_EDITOR_FORM_NAME_FIELD_LABEL: "Tenant name",
     TENANT_EDITOR_FORM_NAME_FIELD_PLACEHOLDER: "Your tenant's name",
     TENANT_EDITOR_FORM_LOGO_FIELD_LABEL: "Logo",
+    TENANT_EDITOR_FORM_DB_TYPE_FIELD_LABEL: "Database type",
     TENANT_EDITOR_FORM_DB_FIELD_LABEL: "Database URL",
     TENANT_EDITOR_FORM_DB_FIELD_PLACEHOLDER: "Your PostgreSQL database URL",
     TENANT_EDITOR_FORM_DB_URL_TEST: "Test connection",

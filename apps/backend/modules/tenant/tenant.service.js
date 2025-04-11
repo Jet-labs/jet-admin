@@ -287,11 +287,12 @@ tenantService.createTenant = async ({
   tenantName,
   tenantLogoURL,
   tenantDBURL,
+  tenantDBType,
 }) => {
   try {
     Logger.log("info", {
       message: "tenantService:createTenant:params",
-      params: { userID, tenantName, tenantLogoURL, tenantDBURL },
+      params: { userID, tenantName, tenantLogoURL, tenantDBURL, tenantDBType },
     });
 
     const newTenant = await prisma.$transaction(async (tx) => {
@@ -301,6 +302,7 @@ tenantService.createTenant = async ({
           tenantLogoURL,
           tenantDBURL,
           creatorID: parseInt(userID),
+          tenantDBType,
         },
       });
       // add user config
@@ -408,6 +410,7 @@ tenantService.testTenantDatabaseConnection = async ({
  * @param {String} param0.tenantName
  * @param {String} param0.tenantLogoURL
  * @param {String} param0.tenantDBURL
+ * @param {String} param0.tenantDBType
  * @returns
  */
 tenantService.updateTenant = async ({
@@ -416,11 +419,12 @@ tenantService.updateTenant = async ({
   tenantName,
   tenantLogoURL,
   tenantDBURL,
+  tenantDBType,
 }) => {
   try {
     Logger.log("info", {
       message: "tenantService:updateTenant:params",
-      params: { userID, tenantID, tenantName, tenantLogoURL },
+      params: { userID, tenantID, tenantName, tenantLogoURL, tenantDBType },
     });
 
     const updatedTenant = await prisma.tblTenants.update({
@@ -431,6 +435,7 @@ tenantService.updateTenant = async ({
         tenantName,
         tenantLogoURL,
         tenantDBURL,
+        tenantDBType,
       },
     });
     await tenantAwarePostgreSQLPoolManager.setTenantDBURL(

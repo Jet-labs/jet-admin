@@ -13,10 +13,13 @@ const tenantRoleRouter = require("../tenantRole/tenantRole.v1.route");
 const tenantAPIKeyRouter = require("../apiKey/apiKey.v1.routes");
 const { param, body } = require("express-validator");
 const { expressUtils } = require("../../utils/express.utils");
+const constants = require("../../constants");
 
 // Tenant routes
 router.use(authMiddleware.authProvider);
+
 router.get("/", tenantController.getAllUserTenants);
+
 router.get(
   "/:tenantID",
   param("tenantID").isNumeric().withMessage("tenantID must be a number"),
@@ -25,6 +28,7 @@ router.get(
   tenantMiddleware.poolProvider,
   tenantController.getUserTenantByID
 );
+
 router.delete(
   "/:tenantID",
   param("tenantID").isNumeric().withMessage("tenantID must be a number"),
@@ -33,22 +37,39 @@ router.delete(
   tenantMiddleware.poolProvider,
   tenantController.deleteUserTenantByID
 );
+
 router.post(
   "/",
   body("tenantName").notEmpty().withMessage("tenantName is required"),
   body("tenantLogoURL").notEmpty().withMessage("tenantLogoURL is required"),
   body("tenantDBURL").notEmpty().withMessage("tenantDBURL is required"),
+  body("tenantDBType")
+    .isIn(Object.keys(constants.SUPPORTED_DATABASES))
+    .withMessage(
+      `tenantDBType must be one of: ${Object.keys(
+        constants.SUPPORTED_DATABASES
+      ).join(", ")}`
+    ),
   expressUtils.validationChecker,
   tenantMiddleware.checkTenantCreationLimit,
   tenantController.createNewTenant
 );
+
 router.patch("/dbtest", tenantController.testTenantDatabaseConnection);
+
 router.patch(
   "/:tenantID",
   param("tenantID").isNumeric().withMessage("tenantID must be a number"),
   body("tenantName").notEmpty().withMessage("tenantName is required"),
   body("tenantLogoURL").notEmpty().withMessage("tenantLogoURL is required"),
   body("tenantDBURL").notEmpty().withMessage("tenantDBURL is required"),
+  body("tenantDBType")
+    .isIn(Object.keys(constants.SUPPORTED_DATABASES))
+    .withMessage(
+      `tenantDBType must be one of: ${Object.keys(
+        constants.SUPPORTED_DATABASES
+      ).join(", ")}`
+    ),
   expressUtils.validationChecker,
   authMiddleware.checkUserPermissions(["tenant:update"]),
   tenantController.updateTenant
@@ -90,18 +111,21 @@ router.use(
   tenantMiddleware.poolProvider,
   databaseQueryRouter
 );
+
 router.use(
   "/:tenantID/charts",
   authMiddleware.checkUserPermissions(["tenant:chart"]),
   tenantMiddleware.poolProvider,
   databaseChartRouter
 );
+
 router.use(
   "/:tenantID/widgets",
   authMiddleware.checkUserPermissions(["tenant:widget"]),
   tenantMiddleware.poolProvider,
   databaseWidgetRouter
 );
+
 router.use(
   "/:tenantID/dashboards",
   authMiddleware.checkUserPermissions(["tenant:dashboard"]),

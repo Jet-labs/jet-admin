@@ -40,8 +40,20 @@ export const TenantUpdationForm = ({ tenantID }) => {
     error: updateTenantError,
     mutate: updateTenant,
   } = useMutation({
-    mutationFn: ({ tenantID, tenantName, tenantLogoURL, tenantDBURL }) =>
-      updateTenantAPI({ tenantID, tenantName, tenantLogoURL, tenantDBURL }),
+    mutationFn: ({
+      tenantID,
+      tenantName,
+      tenantLogoURL,
+      tenantDBType,
+      tenantDBURL,
+    }) =>
+      updateTenantAPI({
+        tenantID,
+        tenantName,
+        tenantLogoURL,
+        tenantDBType,
+        tenantDBURL,
+      }),
     retry: false,
     onSuccess: (tenant) => {
       saveTenantLocally(tenant);
@@ -58,14 +70,27 @@ export const TenantUpdationForm = ({ tenantID }) => {
       tenantID: tenant ? tenant.tenantID : "",
       tenantName: tenant ? tenant.tenantName : "",
       tenantLogoURL: tenant ? tenant.tenantLogoURL : "",
+      tenantDBType: tenant
+        ? tenant.tenantDBType
+        : CONSTANTS.SUPPORTED_DATABASES.postgresql.name,
     },
     validationSchema: formValidations.updateTenantFormValidationSchema,
-    onSubmit: ({ tenantID, tenantName, tenantLogoURL, tenantDBURL }) => {
-      updateTenant({ tenantID, tenantName, tenantLogoURL, tenantDBURL });
+    onSubmit: ({
+      tenantID,
+      tenantName,
+      tenantLogoURL,
+      tenantDBType,
+      tenantDBURL,
+    }) => {
+      updateTenant({
+        tenantID,
+        tenantName,
+        tenantLogoURL,
+        tenantDBType,
+        tenantDBURL,
+      });
     },
   });
-
-  console.log({ updateTenantForm });
 
   useEffect(() => {
     if (tenant) {
@@ -73,6 +98,7 @@ export const TenantUpdationForm = ({ tenantID }) => {
       updateTenantForm.setFieldValue("tenantName", tenant.tenantName);
       updateTenantForm.setFieldValue("tenantLogoURL", tenant.tenantLogoURL);
       updateTenantForm.setFieldValue("tenantDBURL", tenant.tenantDBURL);
+      updateTenantForm.setFieldValue("tenantDBType", tenant.tenantDBType);
     }
   }, [tenant]);
 
@@ -83,6 +109,7 @@ export const TenantUpdationForm = ({ tenantID }) => {
     setIsAddTenantUserDialogOpen(false);
   };
 
+  console.log({ updateTenantForm });
   return (
     <div className="flex w-full h-full flex-col justify-start items-center overflow-y-auto">
       {tenant ? (
@@ -114,21 +141,6 @@ export const TenantUpdationForm = ({ tenantID }) => {
                 </div>
               </div>
             </div>
-            {/* <div className="flex flex-row justify-start items-stretch mt-4">
-              {updateTenantForm?.values?.tenantLogoURL ? (
-                <TenantLogo
-                  src={updateTenantForm.values.tenantLogoURL}
-                  height={100}
-                  width={100}
-                  className="!w-12 !h-12 !rounded !border-slate-300 !border mr-3"
-                />
-              ) : null}
-              <LogoUpload
-                isUploadingLogo={isUploadingLogo}
-                uploadError={uploadLogoError}
-                onLogoUpload={_handleLogoUpload}
-              />
-            </div> */}
             <form
               class="space-y-4 md:space-y-6 mt-4"
               onSubmit={(e) => {

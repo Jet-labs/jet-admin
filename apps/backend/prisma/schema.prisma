@@ -10,15 +10,16 @@ datasource db {
 
 model tblTenants {
   tenantID                    Int                           @id @default(autoincrement())
-  creatorID                   Int?
+  creatorID                   Int
   isDisabled                  Boolean?                      @default(false)
-  createdAt                   DateTime?                     @default(now()) @db.Timestamptz(6)
+  createdAt                   DateTime                      @default(now()) @db.Timestamptz(6)
   updatedAt                   DateTime?                     @default(now()) @db.Timestamptz(6)
   disabledAt                  DateTime?                     @db.Timestamptz(6)
   disableReason               String?                       @db.VarChar
-  tenantDBURL                 String?                       @db.VarChar
+  tenantDBURL                 String                        @db.VarChar
   tenantLogoURL               String?                       @db.VarChar
-  tenantName                  String?                       @db.VarChar
+  tenantName                  String                        @db.VarChar
+  tenantDBType                String                        @default("postgresql") @db.VarChar
   tblAPIKeys                  tblAPIKeys[]
   tblDatabaseCharts           tblDatabaseCharts[]
   tblDatabaseDashboards       tblDatabaseDashboards[]
@@ -26,7 +27,7 @@ model tblTenants {
   tblDatabaseQueries          tblDatabaseQueries[]
   tblDatabaseWidgets          tblDatabaseWidgets[]
   tblRoles                    tblRoles[]
-  tblUsers                    tblUsers?                     @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fktblTenantstblUsersCreatorID")
+  tblUsers                    tblUsers                      @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fktblTenantstblUsersCreatorID")
   tblUserNotifications        tblUserNotifications[]
   tblUserTenantConfigMap      tblUserTenantConfigMap[]
   tblUsersTenantsRelationship tblUsersTenantsRelationship[]

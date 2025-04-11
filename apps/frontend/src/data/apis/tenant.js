@@ -56,6 +56,7 @@ export const createNewTenantAPI = async ({
   tenantName,
   tenantLogoURL,
   tenantDBURL,
+  tenantDBType,
 }) => {
   try {
     const url =
@@ -64,7 +65,7 @@ export const createNewTenantAPI = async ({
     if (bearerToken) {
       const response = await axios.post(
         url,
-        { tenantName, tenantLogoURL, tenantDBURL },
+        { tenantName, tenantLogoURL, tenantDBURL, tenantDBType },
         {
           headers: { authorization: `Bearer ${bearerToken}` },
         }
@@ -118,6 +119,7 @@ export const updateTenantAPI = async ({
   tenantName,
   tenantLogoURL,
   tenantDBURL,
+  tenantDBType,
 }) => {
   try {
     const url =
@@ -126,7 +128,7 @@ export const updateTenantAPI = async ({
     if (bearerToken) {
       const response = await axios.patch(
         url,
-        { tenantName, tenantLogoURL, tenantDBURL },
+        { tenantName, tenantLogoURL, tenantDBURL, tenantDBType },
         {
           headers: { authorization: `Bearer ${bearerToken}` },
         }
