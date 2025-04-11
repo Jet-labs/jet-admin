@@ -19,6 +19,7 @@ import {
   ResizablePanelGroup,
 } from "../ui/resizable";
 import { formValidations } from "../../../utils/formValidation";
+import { DatabaseQueryAIGeneratePrompt } from "./databaseQueryAIGeneratePrompt";
 
 export const DatabaseQueryAdditionForm = ({ tenantID }) => {
   const queryClient = useQueryClient();
@@ -187,6 +188,15 @@ export const DatabaseQueryAdditionForm = ({ tenantID }) => {
                   language={"pgsql"}
                 />
                 <div className="w-full flex flex-row justify-end">
+                  <DatabaseQueryAIGeneratePrompt
+                    tenantID={tenantID}
+                    onAccepted={(aiGeneratedQuery) => {
+                      queryAdditionForm.setFieldValue(
+                        "databaseQueryString",
+                        aiGeneratedQuery
+                      );
+                    }}
+                  />
                   <DatabaseQueryTestingForm
                     tenantID={tenantID}
                     databaseQueryString={

@@ -29,6 +29,7 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@google/generative-ai": "^0.24.0",
     "@prisma/client": "^5.22.0",
     "@prisma/engine-core": "^4.13.0",
     "@prisma/internals": "^5.17.0",

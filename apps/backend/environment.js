@@ -14,6 +14,7 @@ const environmentVariables = {
   DATABASE_URL:
     process.env.DATABASE_URL ||
     "postgresql://jetadmin:password@jetadminpg:5432/jetadmindb?schema=public",
+  GEMINI_API_KEY: process.env.GEMINI_API_KEY,
   SYSLOG_HOST: process.env.SYSLOG_HOST || "127.0.0.1",
   SYSLOG_PORT: process.env.SYSLOG_PORT || 514,
   SYSLOG_PROTOCOL: process.env.SYSLOG_PROTOCOL || "udp4",

@@ -172,6 +172,193 @@ FROM (
 `;
 };
 
+postgreSQLQueryUtil.getDatabaseMetadataForAIQuery = () => {
+  return `WITH
+  -- 1. Get columns, types, defaults, and primary keys using pg_catalog
+  all_columns AS (
+    SELECT
+      n.nspname AS table_schema,
+      c.relname AS table_name,
+      a.attname AS column_name,
+      a.attnum AS ordinal_position,
+      CASE
+        WHEN t.typname = 'varchar' THEN 'VARCHAR(' || 
+          CASE WHEN a.atttypmod - 4 > 0 THEN (a.atttypmod - 4)::text ELSE 'max' END || ')'
+        WHEN t.typname = 'bpchar' THEN 'CHAR(' || 
+          CASE WHEN a.atttypmod - 4 > 0 THEN (a.atttypmod - 4)::text ELSE '1' END || ')'
+        WHEN t.typname IN ('numeric', 'decimal') THEN 
+          'NUMERIC(' || 
+          ((a.atttypmod - 4) >> 16)::text || ',' || 
+          ((a.atttypmod - 4) & 65535)::text || ')'
+        WHEN t.typname = 'int4' THEN 'INT'
+        WHEN t.typname = 'int8' THEN 'BIGINT'
+        WHEN t.typname = 'int2' THEN 'SMALLINT'
+        WHEN t.typname = 'timestamp' THEN 'TIMESTAMP'
+        WHEN t.typname = 'timestamptz' THEN 'TIMESTAMPTZ'
+        WHEN t.typname = 'date' THEN 'DATE'
+        WHEN t.typname = 'time' THEN 'TIME'
+        WHEN t.typname = 'bool' THEN 'BOOLEAN'
+        WHEN t.typname = 'uuid' THEN 'UUID'
+        WHEN t.typname = 'jsonb' THEN 'JSONB'
+        WHEN t.typname = 'json' THEN 'JSON'
+        WHEN t.typname = 'text' THEN 'TEXT'
+        ELSE t.typname
+      END AS data_type_formatted,
+      NOT a.attnotnull AS is_nullable,
+      pg_get_expr(ad.adbin, ad.adrelid) AS column_default,
+      EXISTS (
+        SELECT 1 FROM pg_index i 
+        WHERE i.indrelid = c.oid AND a.attnum = ANY(i.indkey) AND i.indisprimary
+      ) AS is_primary_key
+    FROM pg_attribute a
+    JOIN pg_class c ON a.attrelid = c.oid
+    JOIN pg_namespace n ON c.relnamespace = n.oid
+    JOIN pg_type t ON a.atttypid = t.oid
+    LEFT JOIN pg_attrdef ad ON (a.attrelid = ad.adrelid AND a.attnum = ad.adnum)
+    WHERE c.relkind IN ('r', 'p') -- Tables and partitioned tables
+      AND n.nspname NOT IN ('pg_catalog', 'information_schema', 'pg_toast')
+      AND a.attnum > 0
+      AND NOT a.attisdropped
+  ),
+  -- 2. Get UNIQUE and CHECK constraints from pg_constraint
+  other_constraints AS (
+    SELECT
+      n.nspname AS table_schema,
+      c.relname AS table_name,
+      con.conname AS constraint_name,
+      CASE con.contype
+        WHEN 'u' THEN 'UNIQUE'
+        WHEN 'c' THEN 'CHECK'
+      END AS constraint_type,
+      CASE WHEN con.contype = 'u' THEN
+        ARRAY(
+          SELECT a.attname
+          FROM unnest(con.conkey) WITH ORDINALITY AS k(attnum, ord)
+          JOIN pg_attribute a ON a.attrelid = con.conrelid AND a.attnum = k.attnum
+          ORDER BY k.ord
+        )
+      END AS constraint_columns,
+      CASE WHEN con.contype = 'c' THEN pg_get_constraintdef(con.oid) END AS check_clause
+    FROM pg_constraint con
+    JOIN pg_class c ON con.conrelid = c.oid
+    JOIN pg_namespace n ON c.relnamespace = n.oid
+    WHERE con.contype IN ('u', 'c')
+      AND n.nspname NOT IN ('pg_catalog', 'information_schema', 'pg_toast')
+  ),
+  -- 3. Get FOREIGN KEY relationships using pg_catalog
+  foreign_keys AS (
+    SELECT
+      con.conname AS constraint_name,
+      n.nspname AS table_schema,
+      c.relname AS table_name,
+      ARRAY(
+        SELECT a.attname
+        FROM unnest(con.conkey) WITH ORDINALITY AS k(attnum, ord)
+        JOIN pg_attribute a ON a.attrelid = con.conrelid AND a.attnum = k.attnum
+        ORDER BY k.ord
+      ) AS columns,
+      fn.nspname AS foreign_table_schema,
+      fc.relname AS foreign_table_name,
+      ARRAY(
+        SELECT a.attname
+        FROM unnest(con.confkey) WITH ORDINALITY AS k(attnum, ord)
+        JOIN pg_attribute a ON a.attrelid = con.confrelid AND a.attnum = k.attnum
+        ORDER BY k.ord
+      ) AS foreign_columns
+    FROM pg_constraint con
+    JOIN pg_class c ON con.conrelid = c.oid
+    JOIN pg_namespace n ON c.relnamespace = n.oid
+    JOIN pg_class fc ON con.confrelid = fc.oid
+    JOIN pg_namespace fn ON fc.relnamespace = fn.oid
+    WHERE con.contype = 'f'
+      AND n.nspname NOT IN ('pg_catalog', 'information_schema', 'pg_toast')
+  ),
+  -- 4. Get VIEW definitions using pg_catalog
+  views_info AS (
+    SELECT
+      n.nspname AS table_schema,
+      c.relname AS view_name,
+      pg_get_viewdef(c.oid, true) AS view_definition
+    FROM pg_class c
+    JOIN pg_namespace n ON c.relnamespace = n.oid
+    WHERE c.relkind = 'v' -- Views
+      AND n.nspname NOT IN ('pg_catalog', 'information_schema', 'pg_toast')
+  )
+
+-- Combine results into a unified format
+SELECT
+    'column' AS item_type,
+    table_schema AS schema_name,
+    table_name AS object_name,
+    column_name,
+    ordinal_position,
+    data_type_formatted AS data_type,
+    is_nullable,
+    column_default,
+    is_primary_key,
+    NULL::text AS constraint_name,
+    NULL::text AS constraint_type,
+    NULL::text[] AS constraint_columns,
+    NULL::text AS check_clause,
+    NULL::text AS foreign_schema,
+    NULL::text AS foreign_table,
+    NULL::text[] AS foreign_columns,
+    NULL::text AS view_definition
+FROM all_columns
+
+UNION ALL
+
+SELECT
+    'constraint' AS item_type,
+    table_schema,
+    table_name,
+    NULL, NULL, NULL, NULL, NULL, NULL,
+    constraint_name,
+    constraint_type,
+    constraint_columns,
+    check_clause,
+    NULL, NULL, NULL, NULL
+FROM other_constraints
+
+UNION ALL
+
+SELECT
+    'foreign_key' AS item_type,
+    table_schema,
+    table_name,
+    NULL, NULL, NULL, NULL, NULL, NULL,
+    constraint_name,
+    'FOREIGN KEY'::text,
+    columns,
+    NULL,
+    foreign_table_schema,
+    foreign_table_name,
+    foreign_columns,
+    NULL
+FROM foreign_keys
+
+UNION ALL
+
+SELECT
+    'view' AS item_type,
+    table_schema,
+    view_name,
+    NULL, NULL, NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL, NULL,
+    NULL, NULL, NULL,
+    view_definition
+FROM views_info
+
+ORDER BY
+  item_type,
+  schema_name,
+  object_name,
+  ordinal_position,      -- Will naturally order columns by position
+  constraint_name,       -- Orders constraints/FKs by name
+  column_name;   
+  `;
+};
+
 postgreSQLQueryUtil.getDatabaseTableColumnsQuery = ({
   databaseSchemaName = "public",
   databaseTableName,

@@ -111,6 +111,54 @@ databaseQueryController.createDatabaseQuery = async (req, res) => {
 };
 
 /**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+databaseQueryController.generateAIPromptBasedQuery = async (req, res) => {
+  try {
+    const { user, dbPool } = req;
+    const { tenantID } = req.params;
+    const { aiPrompt } = req.body;
+    Logger.log("info", {
+      message: "databaseQueryController:generateAIPromptBasedQuery:params",
+      params: {
+        userID: user.userID,
+        tenantID,
+        aiPrompt,
+      },
+    });
+
+    const databaseQuery = await databaseQueryService.generateAIPromptBasedQuery(
+      {
+        userID: parseInt(user.userID),
+        tenantID,
+        aiPrompt,
+        dbPool,
+      }
+    );
+
+    Logger.log("success", {
+      message: "databaseQueryController:generateAIPromptBasedQuery:success",
+      params: {
+        userID: user.userID,
+        tenantID,
+        aiPrompt,
+        databaseQuery,
+      },
+    });
+
+    return expressUtils.sendResponse(res, true, { databaseQuery });
+  } catch (error) {
+    Logger.log("error", {
+      message: "databaseQueryController:generateAIPromptBasedQuery:catch-1",
+      params: { error },
+    });
+    return expressUtils.sendResponse(res, false, {}, error);
+  }
+};
+
+/**
  * Creates a new database schema.
  * @param {import("express").Request} req
  * @param {import("express").Response} res

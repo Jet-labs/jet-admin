@@ -394,6 +394,13 @@ export const CONSTANTS = {
     DATABASE_QUERY_ARGS_FORM_DESCRIPTION: "Enter the query arguments",
     DATABASE_QUERY_ARGS_FORM_CONFIRM_BUTTON: "Confirm",
 
+    DATABASE_QUERY_AI_PROMPT_BUTTON: "AI Prompt",
+    DATABASE_QUERY_AI_PROMPT_FORM_TITLE: "AI Prompt",
+    DATABASE_QUERY_AI_PROMPT_FORM_DESCRIPTION:
+      "Enter the AI prompt to generate the query",
+    DATABASE_QUERY_AI_PROMPT_ACCEPT_FORM_CONFIRM_BUTTON: "Accept query",
+    DATABASE_QUERY_AI_PROMPT_FORM_CONFIRM_BUTTON: "Generate query",
+
     DATABASE_TABLES_STATS_TITLE: "Database Stats",
     DATABASE_TABLES_STATS_TOTAL_TABLES_LABEL: "Total Tables",
     DATABASE_TABLES_STATS_TOTAL_COLUMNS_LABEL: "Total Columns",
@@ -1211,6 +1218,8 @@ export const CONSTANTS = {
         `/api/v1/tenants/${tenantID}/queries/${databaseQueryID}`,
       testDatabaseQueryByIDAPI: (tenantID, databaseQueryID) =>
         `/api/v1/tenants/${tenantID}/queries/${databaseQueryID}/queryTest`,
+      generateAIPromptBasedQueryAPI: (tenantID) =>
+        `/api/v1/tenants/${tenantID}/queries/generate`,
       updateDatabaseQueryByID: (tenantID, databaseQueryID) =>
         `/api/v1/tenants/${tenantID}/queries/${databaseQueryID}`,
       deleteDatabaseQueryByID: (tenantID, databaseQueryID) =>

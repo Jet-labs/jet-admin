@@ -39,6 +39,14 @@ router.patch(
   authMiddleware.checkUserPermissions(["tenant:query:test"]),
   databaseQueryController.runDatabaseQuery
 );
+
+router.patch(
+  "/generate",
+  body("aiPrompt").notEmpty().withMessage("aiPrompt is required"),
+  expressUtils.validationChecker,
+  authMiddleware.checkUserPermissions(["tenant:query:test"]),
+  databaseQueryController.generateAIPromptBasedQuery
+);
 router.get(
   "/:databaseQueryID",
   param("databaseQueryID")
