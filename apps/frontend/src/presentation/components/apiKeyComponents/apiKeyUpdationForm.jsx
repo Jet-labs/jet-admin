@@ -15,7 +15,7 @@ import { APIKeyDeletionForm } from "./apiKeyDeletionForm";
 import { APIKeyEditor } from "./apiKeyEditor";
 import { formValidations } from "../../../utils/formValidation";
 import { APIKeyRoleSelectionDialog } from "./apiKeyRoleSelectionDialog";
-import CodeBlock from "../ui/codeBlock";
+import { CodeBlock } from "../ui/codeBlock";
 
 export const APIKeyUpdationForm = ({
   tenantID,

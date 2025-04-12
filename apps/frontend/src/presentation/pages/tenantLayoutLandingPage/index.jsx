@@ -18,8 +18,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 import { getUserTenantByIDAPI } from "../../../data/apis/tenant";
 import { TenantLogo } from "../../components/tenantComponents/tenantLogo";
-import CodeBlock from "../../components/ui/codeBlock";
+
 import { NoEntityUI } from "../../components/ui/noEntityUI";
+import { CodeBlock } from "../../components/ui/codeBlock";
 
 const TenantLayoutLandingPage = () => {
   const { tenantID } = useParams();

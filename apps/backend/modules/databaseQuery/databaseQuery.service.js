@@ -7,11 +7,8 @@ const jsonSchemaGenerator = require("json-schema-generator");
 const { postgreSQLParserUtil } = require("../../utils/postgresql.util");
 const environmentVariables = require("../../environment");
 const { databaseService } = require("../database/database.service");
-const {
-  HarmCategory,
-  HarmBlockThreshold,
-  GoogleGenerativeAI,
-} = require("@google/generative-ai");
+const { aiUtil } = require("../../utils/aiprompt.util");
+const { aiService } = require("../ai/ai.service");
 const databaseQueryService = {};
 
 /**
@@ -57,7 +54,7 @@ databaseQueryService.getAllDatabaseQueries = async ({ userID, tenantID }) => {
       message: "databaseQueryService:getAllDatabaseQueries:success",
       params: {
         userID,
-        databaseQueries: transformedQueries,
+        databaseQueriesLength: transformedQueries?.length,
       },
     });
     return transformedQueries;
@@ -167,44 +164,25 @@ databaseQueryService.generateAIPromptBasedQuery = async ({
         aiPrompt,
         error: "GEMINI_API_KEY environment variable not set.",
       },
-      durationMs: Date.now() - entryTime,
     });
     throw new Error("Server configuration error: Missing Gemini API Key.");
   }
 
-  // --- IMPORTANT: Define or Fetch Your Database Schema ---
-  // The AI *needs* to know your table structure to write queries.
-  // This is a simplified example; you'll need a robust way to get this,
-  // possibly based on tenantID.
-  let databaseSchemaInfo;
-  try {
-    // Replace with your actual schema fetching logic
-    // databaseSchemaInfo = await getSchemaForTenant(tenantID);
-    databaseSchemaInfo = await databaseService.getDatabaseSchemaForAI({
+  const databaseSchemaInfo = await databaseService.getDatabaseSchemaForAI({
+    userID,
+    tenantID,
+    dbPool,
+  });
+
+  Logger.log("info", {
+    message: "databaseQueryService:generateAIPromptBasedQuery:schema_loaded",
+    params: {
       userID,
-      dbPool,
-    });
-    console.log("databaseSchemaInfo", databaseSchemaInfo);
-    Logger.log("info", {
-      message: "databaseQueryService:generateAIPromptBasedQuery:schema_loaded",
-      params: { userID, tenantID },
-      // Avoid logging the full schema if it's sensitive or very large
-      databaseSchemaInfo,
-      schemaLength: databaseSchemaInfo?.length || 0,
-    });
-  } catch (schemaError) {
-    Logger.log("error", {
-      message: "databaseQueryService:generateAIPromptBasedQuery:failure",
-      params: {
-        userID,
-        tenantID,
-        aiPrompt,
-        error: `Failed to load database schema: ${schemaError.message}`,
-      },
-      durationMs: Date.now() - entryTime,
-    });
-    throw new Error(`Failed to load database schema: ${schemaError.message}`);
-  }
+      tenantID,
+      aiPrompt,
+      databaseSchemaInfoLength: databaseSchemaInfo?.length,
+    },
+  });
 
   if (!databaseSchemaInfo) {
     Logger.log("error", {
@@ -215,151 +193,33 @@ databaseQueryService.generateAIPromptBasedQuery = async ({
         aiPrompt,
         error: "Database schema information is missing.",
       },
-      durationMs: Date.now() - entryTime,
     });
     throw new Error("Database schema information is missing.");
   }
 
-  // --- Construct the Prompt for Gemini ---
-  const fullPrompt = `
-      Based on the following database schema:
-      ${databaseSchemaInfo}
+  const fullPrompt = await aiUtil.generateAIPromptForQueryGeneration({
+    databaseSchemaInfo,
+    aiPrompt,
+  });
 
-      Generate a concise and valid SQL SELECT query that fulfills the user's request.
-      User Request: "${aiPrompt}"
-
-      Rules:
-      1. ONLY return the SQL query. Do not include any explanations, introductory text, markdown formatting (like \`\`\`sql), or anything other than the SQL statement itself.
-      2. Ensure the query is syntactically correct for standard SQL (or specify target like PostgreSQL/MySQL if needed).
-      3. Adhere to the constraints mentioned in the schema description (e.g., tenant filtering, SELECT only).
-      4. For any error return the exact text: "QUERY_GENERATION_FAILED"
-
-      SQL Query:
-    `; // The "SQL Query:" helps guide the model to start generating the query immediately.
+  Logger.log("info", {
+    message: "databaseQueryService:generateAIPromptBasedQuery:prompt_generated",
+    params: {
+      userID,
+      tenantID,
+      aiPrompt,
+      fullPromptLength: fullPrompt?.length,
+    },
+  });
 
   try {
-    // --- Initialize Gemini Client ---
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash", // Or "gemini-1.5-pro" for potentially better results but higher cost/latency
-      // Safety settings can be adjusted if needed, but defaults are generally good.
-      // See: https://ai.google.dev/docs/safety_setting_gemini
-      safetySettings: [
-        {
-          category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-      ],
+    const databaseQuery = await aiService.generateAIPromptBasedQuery({
+      aiPrompt: fullPrompt,
     });
 
-    Logger.log("info", {
-      message: "databaseQueryService:generateAIPromptBasedQuery:calling_gemini",
-      params: { userID, tenantID },
-      promptLength: fullPrompt.length,
-    });
-
-    // --- Call Gemini API ---
-    const result = await model.generateContent(fullPrompt);
-    const response = await result.response;
-
-    // --- Extract and Validate Query ---
-    if (
-      !response ||
-      !response.candidates ||
-      response.candidates.length === 0 ||
-      !response.candidates[0].content ||
-      !response.candidates[0].content.parts ||
-      response.candidates[0].content.parts.length === 0
-    ) {
-      Logger.log("warning", {
-        message:
-          "databaseQueryService:generateAIPromptBasedQuery:gemini_empty_response",
-        params: { userID, tenantID, aiPrompt, response },
-        durationMs: Date.now() - entryTime,
-      });
-      throw new Error(
-        "AI model returned an empty or invalid response structure."
-      );
-    }
-
-    // Check for safety blocks
-    if (response.candidates[0].finishReason !== "STOP") {
-      Logger.log("warning", {
-        message:
-          "databaseQueryService:generateAIPromptBasedQuery:gemini_blocked",
-        params: {
-          userID,
-          tenantID,
-          aiPrompt,
-          finishReason: response.candidates[0].finishReason,
-          safetyRatings: response.candidates[0].safetyRatings,
-        },
-        durationMs: Date.now() - entryTime,
-      });
-      // You might want specific error messages based on safetyRatings if available
-      throw new Error(
-        `AI model stopped generation due to safety settings or other limit (Reason: ${response.candidates[0].finishReason}).`
-      );
-    }
-
-    // Extract the text, trim whitespace
-    const databaseQuery = response.candidates[0].content.parts[0].text?.trim();
-
-    if (!databaseQuery) {
-      Logger.log("warning", {
-        message:
-          "databaseQueryService:generateAIPromptBasedQuery:gemini_no_text",
-        params: { userID, tenantID, aiPrompt },
-        durationMs: Date.now() - entryTime,
-      });
-      throw new Error("AI model returned response with no text content.");
-    }
-
-    // Check if the AI refused based on our instruction
-    if (databaseQuery === "QUERY_GENERATION_FAILED") {
-      Logger.log("warning", {
-        message:
-          "databaseQueryService:generateAIPromptBasedQuery:generation_failed_flag",
-        params: { userID, tenantID, aiPrompt },
-        durationMs: Date.now() - entryTime,
-      });
-      throw new Error(
-        "AI determined the request could not be safely converted to a SQL query based on the provided schema and rules."
-      );
-    }
-
-    // Basic validation (can be expanded)
-    if (!databaseQuery.toUpperCase().startsWith("SELECT")) {
-      Logger.log("warning", {
-        message:
-          "databaseQueryService:generateAIPromptBasedQuery:invalid_query_start",
-        params: { userID, tenantID, aiPrompt, generatedText: databaseQuery },
-        durationMs: Date.now() - entryTime,
-      });
-      // It might have returned an explanation despite instructions, or failed in another way.
-      throw new Error("AI model did not return a valid SELECT query.");
-    }
-
-    // --- Success ---
     Logger.log("success", {
       message: "databaseQueryService:generateAIPromptBasedQuery:success",
-      params: { userID, tenantID /* aiPrompt - already logged */ },
-      // Be cautious logging the full query if it could contain sensitive info based on the prompt
-      // generatedQuery: databaseQuery
-      generatedQueryLength: databaseQuery.length,
-      durationMs: Date.now() - entryTime,
+      params: { userID, tenantID, databaseQuery },
     });
     return databaseQuery;
   } catch (error) {
@@ -370,13 +230,8 @@ databaseQueryService.generateAIPromptBasedQuery = async ({
         userID,
         tenantID,
         aiPrompt,
-        // Avoid logging the full prompt if it's very large or sensitive
-        promptLength: fullPrompt?.length,
-        error: error.message,
-        // Include stack trace for debugging if your logger supports it
-        // stack: error.stack
+        error,
       },
-      durationMs: Date.now() - entryTime,
     });
     // Re-throw the original error or a more user-friendly one
     throw new Error(

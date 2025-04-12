@@ -82,10 +82,14 @@ databaseService.getDatabaseMetadataForTenant = async ({ userID, dbPool }) => {
   }
 };
 
-databaseService.getDatabaseSchemaForAI = async ({ userID, dbPool }) => {
+databaseService.getDatabaseSchemaForAI = async ({
+  userID,
+  tenantID,
+  dbPool,
+}) => {
   Logger.log("info", {
     message: "databaseService:getDatabaseSchemaForAI:params",
-    params: { userID },
+    params: { userID, tenantID },
   });
 
   try {
@@ -95,7 +99,7 @@ databaseService.getDatabaseSchemaForAI = async ({ userID, dbPool }) => {
 
     Logger.log("info", {
       message: "databaseService:getDatabaseSchemaForAI:rows",
-      params: { userID, rows },
+      params: { userID, tenantID, rowsLength: rows?.length },
     });
 
     // Group data by schema and then by object type (table/view)
@@ -171,7 +175,7 @@ databaseService.getDatabaseSchemaForAI = async ({ userID, dbPool }) => {
 
     Logger.log("info", {
       message: "databaseService:getDatabaseSchemaForAI:schemas",
-      params: { userID, schemas },
+      params: { userID, tenantID },
     });
 
     // Format the grouped data into a string for the AI
@@ -243,7 +247,7 @@ databaseService.getDatabaseSchemaForAI = async ({ userID, dbPool }) => {
     }
     Logger.log("success", {
       message: "databaseService:getDatabaseSchemaForAI:result",
-      params: { userID, schemaDescription },
+      params: { userID, tenantID },
     });
 
     return schemaDescription.trim();
@@ -252,6 +256,8 @@ databaseService.getDatabaseSchemaForAI = async ({ userID, dbPool }) => {
     console.error("Detailed error inside getDatabaseSchemaForAI:", error);
     // Optionally log to your Logger as well
     Logger.log("error", {
+      userID,
+      tenantID,
       message: "getDatabaseSchemaForAI internal failure",
       specificError: error.message,
       errorCode: error.code, // PG error code can be helpful

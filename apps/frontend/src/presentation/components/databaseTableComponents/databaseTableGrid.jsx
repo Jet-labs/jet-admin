@@ -673,9 +673,6 @@ export const DatabaseTableGrid = ({
               "& .MuiCheckbox-root": {
                 padding: "4px",
               },
-              "& .MuiDataGrid-cellCheckbox": {
-                width: "unset",
-              },
               "& .MuiDataGrid-columnHeaderCheckbox": {
                 minWidth: "auto !important",
                 width: "auto !important",

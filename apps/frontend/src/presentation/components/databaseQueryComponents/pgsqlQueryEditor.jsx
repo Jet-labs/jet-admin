@@ -3,18 +3,21 @@ import { json } from "@codemirror/lang-json";
 import { sql } from "@codemirror/lang-sql";
 import CodeMirror from "@uiw/react-codemirror";
 import React, { useRef } from "react";
-
 import { useTheme } from "@mui/material";
 import { loadLanguage } from "@uiw/codemirror-extensions-langs";
 import { githubLight } from "@uiw/codemirror-theme-github";
+import { EditorView } from "@codemirror/view"; // Add this import
+
 const langMap = {
   javascript: javascript(),
   json: json(),
   sql: sql(),
   pgsql: loadLanguage("pgsql"),
 };
+
 export const PGSQLQueryEditor = ({
   readOnly,
+  codeWrapping = true,
   disabled,
   code,
   setCode,
@@ -25,9 +28,11 @@ export const PGSQLQueryEditor = ({
   rounded = true,
 }) => {
   const theme = useTheme();
-  // const {} = useCodeMirror();
   const ref = useRef();
-  // ref?.current?.indentLine(1);
+
+  // Create an extension for line wrapping if enabled
+  const lineWrappingExtension = codeWrapping ? [EditorView.lineWrapping] : [];
+
   return (
     <CodeMirror
       readOnly={readOnly || disabled}
@@ -36,7 +41,10 @@ export const PGSQLQueryEditor = ({
       height={height}
       width="100%"
       maxWidth="1000px"
-      extensions={[langMap[language]]}
+      extensions={[
+        langMap[language],
+        ...lineWrappingExtension, // Add the line wrapping extension here
+      ]}
       onChange={setCode}
       theme={githubLight}
       basicSetup={{
