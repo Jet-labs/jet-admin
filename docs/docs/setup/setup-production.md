@@ -50,6 +50,9 @@ environment:
   
   # Database Configuration
   - DATABASE_URL=postgresql://user:password@host:port/dbname
+
+  # AI Configuration
+  - GEMINI_API_KEY=your_gemini_api_key
   
   # Security Configuration
   - JWT_ACCESS_TOKEN_SECRET=strong_secret_here

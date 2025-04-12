@@ -175,9 +175,39 @@ export const DatabaseTableUpdationForm = ({
             onDelete: constraint.onDelete || "",
             onUpdate: constraint.onUpdate || "",
           })) || [];
+      
       tableUpdationForm.setFieldValue(
         "databaseTableConstraints.foreignKeys",
         updatedForeignKeys
+      );
+      const updatedUniqueConstraints =
+        databaseTable.databaseTableConstraints
+          ?.filter((constraint) => constraint.constraintType === "UNIQUE")
+          .map((constraint) => ({
+            constraintName: constraint.constraintName || "",
+            databaseTableColumns: constraint.databaseTableColumns || [],
+          })) || [];
+
+      tableUpdationForm.setFieldValue(
+        "databaseTableConstraints.unique",
+        updatedUniqueConstraints
+      );
+      tableUpdationForm.setFieldValue(
+        "databaseTableConstraints.exclude",
+        databaseTable.databaseTableConstraints?.exclude || ""
+      );
+      tableUpdationForm.setFieldValue(
+        "databaseTableConstraints.check",
+        databaseTable.databaseTableConstraints?.check || ""
+      );
+      const updatedPrimaryKey =
+        databaseTable.databaseTableConstraints
+          ?.filter((constraint) => constraint.constraintType === "PRIMARY KEY")
+          .map((constraint) => constraint.databaseTableColumns)
+          .flat() || [];
+      tableUpdationForm.setFieldValue(
+        "databaseTableConstraints.primaryKey",
+        updatedPrimaryKey
       );
     }
   }, [databaseTable]);

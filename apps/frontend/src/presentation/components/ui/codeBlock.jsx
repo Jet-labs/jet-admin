@@ -19,11 +19,22 @@ export const CodeBlock = ({
   const codeRef = useRef(null);
 
   // Handle syntax highlighting
+  // Inside the useEffect for highlighting
   useEffect(() => {
-    if (language && code) {
+    if (code) {
       try {
-        const highlighted = hljs.highlight(code, { language }).value;
-        setHighlightedCode(highlighted);
+        if (language === "plaintext") {
+          // For plaintext, don't use highlight.js but create properly escaped HTML
+          const escaped = code
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;");
+          setHighlightedCode(escaped);
+        } else {
+          // For other languages, use highlight.js
+          const highlighted = hljs.highlight(code, { language }).value;
+          setHighlightedCode(highlighted);
+        }
       } catch (error) {
         // If language not supported, fallback to auto detection
         const highlighted = hljs.highlightAuto(code).value;
@@ -43,6 +54,7 @@ export const CodeBlock = ({
   };
 
   // Add line numbers and syntax highlighting
+  // Modify the renderCodeWithLineNumbers function
   const renderCodeWithLineNumbers = () => {
     const lines = code.split("\n");
 
@@ -59,11 +71,23 @@ export const CodeBlock = ({
         )}
         <div className="flex-1">
           {highlightedCode ? (
-            <div
-              dangerouslySetInnerHTML={{
-                __html: line ? highlightedCode.split("\n")[index] || line : " ",
-              }}
-            />
+            language === "plaintext" ? (
+              <pre
+                className={`${
+                  theme === "dark" ? "text-gray-200" : "text-gray-800"
+                }`}
+              >
+                {line || " "}
+              </pre>
+            ) : (
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: line
+                    ? highlightedCode.split("\n")[index] || line
+                    : " ",
+                }}
+              />
+            )
           ) : (
             <pre
               className={`${

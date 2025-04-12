@@ -274,6 +274,19 @@ export const CONSTANTS = {
     TABLE_EDITOR_FORM_ADD_FOREIGN_KEY_BUTTON: "Add foreign Key",
     TABLE_EDITOR_FORM_ADD_FOREIGN_KEY_TITLE: "Foreign keys",
     TABLE_EDITOR_FORM_REMOVE_FOREIGN_KEY_BUTTON: "Remove",
+    TABLE_EDITOR_FORM_UNIQUE_COLUMN_LABEL: "Add Unique Column",
+    TABLE_EDITOR_FORM_PRIMARY_KEY_COLUMN_LABEL: "Add Primary Key Column",
+    TABLE_EDITOR_FORM_TABLE_CONSTRAINTS_TITLE: "Table Constraints",
+    TABLE_EDITOR_FORM_PRIMARY_KEY_TITLE: "Primary Key",
+    TABLE_EDITOR_FORM_UNIQUE_TITLE: "Unique Constraint",
+    TABLE_EDITOR_FORM_CHECK_TITLE: "Check Constraint",
+    TABLE_EDITOR_FORM_CHECK_PLACEHOLDER: "Enter check constraint expression",
+    TABLE_EDITOR_FORM_EXCLUDE_TITLE: "Exclude Constraint",
+    TABLE_EDITOR_FORM_EXCLUDE_PLACEHOLDER:
+      "Enter exclude constraint expression",
+    TABLE_EDITOR_FORM_ADD_UNIQUE_CONSTRAINT_BUTTON: "Add Unique Constraint",
+    TABLE_EDITOR_FORM_ADD_UNIQUE_CONSTRAINT_COLUMN_LABEL:
+      "Add Unique Constraint Column",
 
     DATABASE_TABLE_DELETION_SUCCESS: "Table deleted successfully!",
     DATABASE_TABLE_DELETION_DIALOG_TITLE: "Delete table?",

@@ -45,6 +45,12 @@ JWT_REFRESH_TOKEN_SECRET="lhflsdcshdlkflkfsldkcksldjljclsd"
 ACCESS_TOKEN_TIMEOUT=900
 REFRESH_TOKEN_TIMEOUT="100h"
 
+# Node Identification
+NODE_ID="dev_node_1"
+
+# AI configuration
+GEMINI_API_KEY=""
+
 # CORS Settings
 CORS_WHITELIST="http://localhost:3000,http://localhost:5173,http://127.0.0.1:3000,http://127.0.0.1:3001,http://localhost:3001"
 

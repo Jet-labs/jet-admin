@@ -1,4 +1,5 @@
 const constants = require("../constants");
+const Logger = require("./logger");
 
 const postgreSQLParserUtil = {};
 
@@ -1140,7 +1141,9 @@ postgreSQLQueryUtil.createDatabaseTableQuery = ({
     databaseTableConstraints.unique.length
   ) {
     databaseTableConstraints.unique.forEach((uniqueColumns) => {
-      sql += `, UNIQUE (${uniqueColumns.map(quoteIdentifier).join(", ")})`;
+      sql += `, UNIQUE (${uniqueColumns.databaseTableColumns
+        .map(quoteIdentifier)
+        .join(", ")})`;
     });
   }
   if (databaseTableConstraints.check) {
@@ -1217,6 +1220,211 @@ postgreSQLQueryUtil.createDatabaseTableQuery = ({
   return sql;
 };
 
+postgreSQLQueryUtil.updateDatabaseTableByNameQuery = ({
+  databaseSchemaName = "public", // Default schema is 'public'
+  currentTableData,
+  updatedTableData,
+}) => {
+  const quoteIdentifier = (identifier) => {
+    if (!identifier) return identifier;
+    const needsQuoting =
+      /[^a-zA-Z0-9_]/.test(identifier) ||
+      identifier.toUpperCase() !== identifier;
+    return needsQuoting ? `"${identifier}"` : identifier;
+  };
+
+  const fullTableName = `${quoteIdentifier(
+    databaseSchemaName
+  )}.${quoteIdentifier(currentTableData.databaseTableName)}`;
+
+  const sqlStatements = [];
+
+  // Helper to compare columns
+  const currentColumnsMap = new Map(
+    currentTableData.databaseTableColumns.map((col) => [
+      col.databaseTableColumnName,
+      col,
+    ])
+  );
+  const updatedColumnsMap = new Map(
+    updatedTableData.databaseTableColumns.map((col) => [
+      col.databaseTableColumnName,
+      col,
+    ])
+  );
+
+  // Add new columns
+  updatedTableData.databaseTableColumns.forEach((updatedColumn) => {
+    if (!currentColumnsMap.has(updatedColumn.databaseTableColumnName)) {
+      let colSQL = `ALTER TABLE ${fullTableName} ADD COLUMN ${quoteIdentifier(
+        updatedColumn.databaseTableColumnName
+      )} ${updatedColumn.databaseTableColumnType}`;
+      if (updatedColumn.notNull) colSQL += " NOT NULL";
+      if (updatedColumn.defaultValue)
+        colSQL += ` DEFAULT ${updatedColumn.defaultValue}`;
+      if (updatedColumn.collation)
+        colSQL += ` COLLATE ${quoteIdentifier(updatedColumn.collation)}`;
+      if (updatedColumn.check) colSQL += ` CHECK (${updatedColumn.check})`;
+      sqlStatements.push(colSQL);
+    }
+  });
+
+  // Drop removed columns
+  currentTableData.databaseTableColumns.forEach((currentColumn) => {
+    if (!updatedColumnsMap.has(currentColumn.databaseTableColumnName)) {
+      sqlStatements.push(
+        `ALTER TABLE ${fullTableName} DROP COLUMN ${quoteIdentifier(
+          currentColumn.databaseTableColumnName
+        )}`
+      );
+    }
+  });
+
+  // Modify existing columns
+  currentTableData.databaseTableColumns.forEach((currentColumn) => {
+    const updatedColumn = updatedColumnsMap.get(
+      currentColumn.databaseTableColumnName
+    );
+    if (updatedColumn) {
+      let changes = [];
+      if (
+        currentColumn.databaseTableColumnType !==
+        updatedColumn.databaseTableColumnType
+      ) {
+        changes.push(`TYPE ${updatedColumn.databaseTableColumnType}`);
+      }
+      if (currentColumn.notNull !== updatedColumn.notNull) {
+        changes.push(updatedColumn.notNull ? "SET NOT NULL" : "DROP NOT NULL");
+      }
+      if (currentColumn.defaultValue !== updatedColumn.defaultValue) {
+        changes.push(
+          updatedColumn.defaultValue
+            ? `SET DEFAULT ${updatedColumn.defaultValue}`
+            : "DROP DEFAULT"
+        );
+      }
+      if (changes.length > 0) {
+        sqlStatements.push(
+          `ALTER TABLE ${fullTableName} ALTER COLUMN ${quoteIdentifier(
+            currentColumn.databaseTableColumnName
+          )} ${changes.join(", ")}`
+        );
+      }
+    }
+  });
+
+  // Update constraints (e.g., primary key, unique, foreign keys)
+  const addConstraintSQL = (constraintType, constraintDef) => {
+    sqlStatements.push(
+      `ALTER TABLE ${fullTableName} ADD CONSTRAINT ${quoteIdentifier(
+        constraintDef.name
+      )} ${constraintType} (${constraintDef.columns
+        .map(quoteIdentifier)
+        .join(", ")})`
+    );
+  };
+
+  const dropConstraintSQL = (constraintName) => {
+    sqlStatements.push(
+      `ALTER TABLE ${fullTableName} DROP CONSTRAINT ${quoteIdentifier(
+        constraintName
+      )}`
+    );
+  };
+
+  Logger.log("warning", {
+    message: "postgreSQLQueryUtil:updateDatabaseTableByNameQuery:primarykey",
+    params: {
+      currentTableData,
+      c: currentTableData.databaseTableConstraints.primaryKey,
+      u: updatedTableData.databaseTableConstraints.primaryKey,
+    },
+  });
+
+  // Compare and update primary key
+  if (
+    JSON.stringify(currentTableData.databaseTableConstraints.primaryKey) !==
+    JSON.stringify(updatedTableData.databaseTableConstraints.primaryKey)
+  ) {
+    if (currentTableData.databaseTableConstraints.primaryKey?.length) {
+      dropConstraintSQL(`${currentTableData.databaseTableName}_pkey`);
+    }
+    if (updatedTableData.databaseTableConstraints.primaryKey?.length) {
+      addConstraintSQL("PRIMARY KEY", {
+        name: `${updatedTableData.databaseTableName}_pkey`,
+        columns: updatedTableData.databaseTableConstraints.primaryKey,
+      });
+    }
+  }
+
+  // Compare and update unique constraints
+  updatedTableData.databaseTableConstraints?.unique?.forEach(
+    (uniqueConstraint) => {
+      const currentUnique =
+        currentTableData.databaseTableConstraints.unique?.find(
+          (u) =>
+            JSON.stringify(u.databaseTableColumns) ===
+            JSON.stringify(uniqueConstraint.databaseTableColumns)
+        );
+      if (!currentUnique) {
+        addConstraintSQL("UNIQUE", {
+          name: `${uniqueConstraint.databaseTableColumns.join("_")}_unique`,
+          columns: uniqueConstraint.databaseTableColumns,
+        });
+      }
+    }
+  );
+
+  currentTableData.databaseTableConstraints?.unique?.forEach(
+    (uniqueConstraint) => {
+      const updatedUnique =
+        updatedTableData.databaseTableConstraints.unique.find(
+          (u) => JSON.stringify(u) === JSON.stringify(uniqueConstraint)
+        );
+      if (!updatedUnique) {
+        dropConstraintSQL(`${uniqueConstraint.join("_")}_unique`);
+      }
+    }
+  );
+
+  // Compare and update foreign keys
+  updatedTableData.databaseTableConstraints?.foreignKeys?.forEach((fk) => {
+    const currentFK =
+      currentTableData.databaseTableConstraints.foreignKeys?.find(
+        (f) => f.constraintName === fk.constraintName
+      );
+    if (!currentFK) {
+      sqlStatements.push(`
+        ALTER TABLE ${fullTableName}
+        ADD CONSTRAINT ${quoteIdentifier(fk.constraintName)}
+        FOREIGN KEY (${fk.databaseTableColumns.map(quoteIdentifier).join(", ")})
+        REFERENCES ${quoteIdentifier(fk.constraintSchema)}.${quoteIdentifier(
+        fk.referencedTable
+      )}(${fk.referencedColumns.map(quoteIdentifier).join(", ")})
+        ${fk.onDelete ? `ON DELETE ${fk.onDelete}` : ""}
+        ${fk.onUpdate ? `ON UPDATE ${fk.onUpdate}` : ""}
+      `);
+    }
+  });
+
+  currentTableData.databaseTableConstraints?.foreignKeys?.forEach((fk) => {
+    const updatedFK =
+      updatedTableData.databaseTableConstraints.foreignKeys.find(
+        (f) => f.constraintName === fk.constraintName
+      );
+    if (!updatedFK) {
+      dropConstraintSQL(fk.constraintName);
+    }
+  });
+
+  Logger.log("warning", {
+    message: "postgreSQLQueryUtil:updateDatabaseTableByNameQuery:sqlStatements",
+    params: {
+      sqlStatements,
+    },
+  });
+  return sqlStatements;
+};
 /**
  * Generates a SQL query to delete (drop) a database table.
  *
@@ -1333,238 +1541,5 @@ postgreSQLQueryUtil.checkIfTblDatabaseQueriesTableExist = ({
   `;
 };
 
-postgreSQLQueryUtil.createDatabaseQuery = ({
-  databaseSchemaName = "public",
-  createdAt = "CURRENT_TIMESTAMP",
-  updatedAt = "CURRENT_TIMESTAMP",
-  disabledAt = null,
-  isDisabled = false,
-  databaseQueryTitle = "Untitled",
-  databaseQueryDescription = null,
-  databaseQuery = null,
-  runOnLoad = false,
-}) => {
-  // Properly quote schema name for identifiers
-  const quotedSchemaName = `"${databaseSchemaName}"`;
-
-  // Handle JSON serialization for databaseQuery
-  const serializedDatabaseQuery = databaseQuery
-    ? `'${JSON.stringify(databaseQuery)}'`
-    : null;
-
-  // Construct the INSERT query
-  return `INSERT INTO ${quotedSchemaName}."_tblDatabaseQueries" (
-    "createdAt",
-    "updatedAt",
-    "disabledAt",
-    "isDisabled",
-    "databaseQueryTitle",
-    "databaseQueryDescription",
-    "databaseQuery",
-    "runOnLoad"
-  ) VALUES (
-    ${createdAt === "CURRENT_TIMESTAMP" ? createdAt : `'${createdAt}'`},
-    ${updatedAt === "CURRENT_TIMESTAMP" ? updatedAt : `'${updatedAt}'`},
-    ${disabledAt ? `'${disabledAt}'` : null},
-    ${isDisabled},
-    '${databaseQueryTitle.replace(/'/g, "''")}',
-    ${
-      databaseQueryDescription
-        ? `'${databaseQueryDescription.replace(/'/g, "''")}'`
-        : null
-    },
-    ${serializedDatabaseQuery},
-    ${runOnLoad}
-  ) RETURNING *;`;
-};
-
-postgreSQLQueryUtil.updateDatabaseTableByNameQuery = ({
-  databaseSchemaName = "public", // Default schema is 'public'
-  currentTableData,
-  updatedTableData,
-}) => {
-  const quoteIdentifier = (identifier) => {
-    if (!identifier) return identifier;
-    const needsQuoting =
-      /[^a-zA-Z0-9_]/.test(identifier) ||
-      identifier.toUpperCase() !== identifier;
-    return needsQuoting ? `"${identifier}"` : identifier;
-  };
-
-  const fullTableName = `${quoteIdentifier(
-    databaseSchemaName
-  )}.${quoteIdentifier(currentTableData.databaseTableName)}`;
-
-  const sqlStatements = [];
-
-  // Helper to compare columns
-  const currentColumnsMap = new Map(
-    currentTableData.databaseTableColumns.map((col) => [
-      col.databaseTableColumnName,
-      col,
-    ])
-  );
-  const updatedColumnsMap = new Map(
-    updatedTableData.databaseTableColumns.map((col) => [
-      col.databaseTableColumnName,
-      col,
-    ])
-  );
-
-  // Add new columns
-  updatedTableData.databaseTableColumns.forEach((updatedColumn) => {
-    if (!currentColumnsMap.has(updatedColumn.databaseTableColumnName)) {
-      let colSQL = `ALTER TABLE ${fullTableName} ADD COLUMN ${quoteIdentifier(
-        updatedColumn.databaseTableColumnName
-      )} ${updatedColumn.databaseTableColumnType}`;
-      if (updatedColumn.notNull) colSQL += " NOT NULL";
-      if (updatedColumn.defaultValue)
-        colSQL += ` DEFAULT ${updatedColumn.defaultValue}`;
-      if (updatedColumn.collation)
-        colSQL += ` COLLATE ${quoteIdentifier(updatedColumn.collation)}`;
-      if (updatedColumn.check) colSQL += ` CHECK (${updatedColumn.check})`;
-      sqlStatements.push(colSQL);
-    }
-  });
-
-  // Drop removed columns
-  currentTableData.databaseTableColumns.forEach((currentColumn) => {
-    if (!updatedColumnsMap.has(currentColumn.databaseTableColumnName)) {
-      sqlStatements.push(
-        `ALTER TABLE ${fullTableName} DROP COLUMN ${quoteIdentifier(
-          currentColumn.databaseTableColumnName
-        )}`
-      );
-    }
-  });
-
-  // Modify existing columns
-  currentTableData.databaseTableColumns.forEach((currentColumn) => {
-    const updatedColumn = updatedColumnsMap.get(
-      currentColumn.databaseTableColumnName
-    );
-    if (updatedColumn) {
-      let changes = [];
-      if (
-        currentColumn.databaseTableColumnType !==
-        updatedColumn.databaseTableColumnType
-      ) {
-        changes.push(`TYPE ${updatedColumn.databaseTableColumnType}`);
-      }
-      if (currentColumn.notNull !== updatedColumn.notNull) {
-        changes.push(updatedColumn.notNull ? "SET NOT NULL" : "DROP NOT NULL");
-      }
-      if (currentColumn.defaultValue !== updatedColumn.defaultValue) {
-        changes.push(
-          updatedColumn.defaultValue
-            ? `SET DEFAULT ${updatedColumn.defaultValue}`
-            : "DROP DEFAULT"
-        );
-      }
-      if (changes.length > 0) {
-        sqlStatements.push(
-          `ALTER TABLE ${fullTableName} ALTER COLUMN ${quoteIdentifier(
-            currentColumn.databaseTableColumnName
-          )} ${changes.join(", ")}`
-        );
-      }
-    }
-  });
-
-  // Update constraints (e.g., primary key, unique, foreign keys)
-  const addConstraintSQL = (constraintType, constraintDef) => {
-    sqlStatements.push(
-      `ALTER TABLE ${fullTableName} ADD CONSTRAINT ${quoteIdentifier(
-        constraintDef.name
-      )} ${constraintType} (${constraintDef.columns
-        .map(quoteIdentifier)
-        .join(", ")})`
-    );
-  };
-
-  const dropConstraintSQL = (constraintName) => {
-    sqlStatements.push(
-      `ALTER TABLE ${fullTableName} DROP CONSTRAINT ${quoteIdentifier(
-        constraintName
-      )}`
-    );
-  };
-
-  // Compare and update primary key
-  if (
-    JSON.stringify(currentTableData.databaseTableConstraints.primaryKey) !==
-    JSON.stringify(updatedTableData.databaseTableConstraints.primaryKey)
-  ) {
-    if (currentTableData.databaseTableConstraints.primaryKey?.length) {
-      dropConstraintSQL(`${currentTableData.databaseTableName}_pkey`);
-    }
-    if (updatedTableData.databaseTableConstraints.primaryKey?.length) {
-      addConstraintSQL("PRIMARY KEY", {
-        name: `${updatedTableData.databaseTableName}_pkey`,
-        columns: updatedTableData.databaseTableConstraints.primaryKey,
-      });
-    }
-  }
-
-  // Compare and update unique constraints
-  updatedTableData.databaseTableConstraints?.unique?.forEach(
-    (uniqueConstraint) => {
-      const currentUnique =
-        currentTableData.databaseTableConstraints.unique.find(
-          (u) => JSON.stringify(u) === JSON.stringify(uniqueConstraint)
-        );
-      if (!currentUnique) {
-        addConstraintSQL("UNIQUE", {
-          name: `${uniqueConstraint.join("_")}_unique`,
-          columns: uniqueConstraint,
-        });
-      }
-    }
-  );
-
-  currentTableData.databaseTableConstraints?.unique?.forEach(
-    (uniqueConstraint) => {
-      const updatedUnique =
-        updatedTableData.databaseTableConstraints.unique.find(
-          (u) => JSON.stringify(u) === JSON.stringify(uniqueConstraint)
-        );
-      if (!updatedUnique) {
-        dropConstraintSQL(`${uniqueConstraint.join("_")}_unique`);
-      }
-    }
-  );
-
-  // Compare and update foreign keys
-  updatedTableData.databaseTableConstraints?.foreignKeys?.forEach((fk) => {
-    const currentFK =
-      currentTableData.databaseTableConstraints.foreignKeys?.find(
-        (f) => f.constraintName === fk.constraintName
-      );
-    if (!currentFK) {
-      sqlStatements.push(`
-        ALTER TABLE ${fullTableName}
-        ADD CONSTRAINT ${quoteIdentifier(fk.constraintName)}
-        FOREIGN KEY (${fk.databaseTableColumns.map(quoteIdentifier).join(", ")})
-        REFERENCES ${quoteIdentifier(fk.constraintSchema)}.${quoteIdentifier(
-        fk.referencedTable
-      )}(${fk.referencedColumns.map(quoteIdentifier).join(", ")})
-        ${fk.onDelete ? `ON DELETE ${fk.onDelete}` : ""}
-        ${fk.onUpdate ? `ON UPDATE ${fk.onUpdate}` : ""}
-      `);
-    }
-  });
-
-  currentTableData.databaseTableConstraints?.foreignKeys?.forEach((fk) => {
-    const updatedFK =
-      updatedTableData.databaseTableConstraints.foreignKeys.find(
-        (f) => f.constraintName === fk.constraintName
-      );
-    if (!updatedFK) {
-      dropConstraintSQL(fk.constraintName);
-    }
-  });
-
-  return sqlStatements;
-};
 
 module.exports = { postgreSQLQueryUtil, postgreSQLParserUtil };

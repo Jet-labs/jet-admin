@@ -48,3 +48,6 @@ services:
       
       # Node Identification
       - NODE_ID=prod_node_1
+
+      # AI configuration
+      - GEMINI_API_KEY=

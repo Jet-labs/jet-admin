@@ -16,6 +16,11 @@
   border-bottom-left-radius: 4px !important;
 }
 
+input[type="date"]::-webkit-calendar-picker-indicator {
+  color: #646cff;
+  color-scheme: light;
+}
+
 /********** Range Input Styles **********/
 /*Range Reset*/
 input[type="range"] {

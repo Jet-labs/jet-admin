@@ -787,6 +787,17 @@ databaseTableService.updateDatabaseTableByName = async ({
               (constraint) => constraint.constraintType === "FOREIGN KEY"
             )
             .map((constraint) => new DatabaseTableConstraint(constraint)) || [],
+        unique:
+          _currentTableData.databaseTableConstraints
+            ?.filter((constraint) => constraint.constraintType === "UNIQUE")
+            .map((constraint) => new DatabaseTableConstraint(constraint)) || [],
+        primaryKey:
+          _currentTableData.databaseTableConstraints
+            ?.filter(
+              (constraint) => constraint.constraintType === "PRIMARY KEY"
+            )
+            .map((constraint) => constraint.databaseTableColumns)
+            .flat() || [],
       },
     };
     Logger.log("warning", {
