@@ -165,7 +165,7 @@ userManagementController.addUserToTenant = async (req, res) => {
     return expressUtils.sendResponse(res, true, {});
   } catch (error) {
     Logger.log("error", {
-      message: "userManagementController:addUserToTenant:catch1",
+      message: "userManagementController:addUserToTenant:catch-1",
       params: { error },
     });
     return expressUtils.sendResponse(res, false, {}, error);

@@ -30,7 +30,7 @@ tenantController.getUserTenantByID = async (req, res) => {
     return expressUtils.sendResponse(res, true, { tenant });
   } catch (error) {
     Logger.log("error", {
-      message: "tenantController:getUserTenantByID:catch1",
+      message: "tenantController:getUserTenantByID:catch-1",
       params: { error },
     });
     return expressUtils.sendResponse(res, false, {}, error);
@@ -58,12 +58,12 @@ tenantController.deleteUserTenantByID = async (req, res) => {
     });
     Logger.log("success", {
       message: "tenantController:deleteUserTenantByID:success",
-      params: {userID: user.userID, tenantID}
+      params: { userID: user.userID, tenantID },
     });
-    return expressUtils.sendResponse(res, true, { });
+    return expressUtils.sendResponse(res, true, {});
   } catch (error) {
     Logger.log("error", {
-      message: "tenantController:deleteUserTenantByID:catch1",
+      message: "tenantController:deleteUserTenantByID:catch-1",
       params: { error },
     });
     return expressUtils.sendResponse(res, false, {}, error);
@@ -93,7 +93,7 @@ tenantController.getAllUserTenants = async (req, res) => {
     return expressUtils.sendResponse(res, true, { tenants });
   } catch (error) {
     Logger.log("error", {
-      message: "tenantController:getAllUserTenants:catch1",
+      message: "tenantController:getAllUserTenants:catch-1",
       params: { error },
     });
     return expressUtils.sendResponse(res, false, {}, error);
@@ -134,7 +134,7 @@ tenantController.createNewTenant = async (req, res) => {
     return expressUtils.sendResponse(res, true, { tenant: newTenant });
   } catch (error) {
     Logger.log("error", {
-      message: "tenantController:createNewTenant:catch1",
+      message: "tenantController:createNewTenant:catch-1",
       params: { error },
     });
     return expressUtils.sendResponse(res, false, {}, error);
@@ -166,7 +166,7 @@ tenantController.testTenantDatabaseConnection = async (req, res) => {
     return expressUtils.sendResponse(res, true, { connectionResult });
   } catch (error) {
     Logger.log("error", {
-      message: "tenantController:testTenantDatabaseConnection:catch1",
+      message: "tenantController:testTenantDatabaseConnection:catch-1",
       params: { error },
     });
     return expressUtils.sendResponse(res, false, {}, error);
@@ -211,7 +211,7 @@ tenantController.updateTenant = async (req, res) => {
     return expressUtils.sendResponse(res, true, { tenant: updatedTenant });
   } catch (error) {
     Logger.log("error", {
-      message: "tenantController:updateTenant:catch1",
+      message: "tenantController:updateTenant:catch-1",
       params: { error },
     });
     return expressUtils.sendResponse(res, false, {}, error);

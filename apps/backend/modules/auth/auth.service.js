@@ -34,7 +34,7 @@ authService.getUserFromFirebaseID = async ({ firebaseID }) => {
     return { ...user, notifications };
   } catch (error) {
     Logger.log("error", {
-      message: "authService:getUserFromFirebaseID:catch1",
+      message: "authService:getUserFromFirebaseID:catch-1",
       params: { error },
     });
     throw error;
@@ -42,13 +42,13 @@ authService.getUserFromFirebaseID = async ({ firebaseID }) => {
 };
 
 /**
- * 
- * @param {object} param0 
+ *
+ * @param {object} param0
  * @param {Number} param0.userID
  * @param {Number} param0.tenantID
- * @returns 
+ * @returns
  */
-authService.getUserConfig = async ({ userID,tenantID }) => {
+authService.getUserConfig = async ({ userID, tenantID }) => {
   try {
     Logger.log("info", {
       message: "authService:getUserConfig:params",
@@ -56,9 +56,9 @@ authService.getUserConfig = async ({ userID,tenantID }) => {
     });
     const userConfig = await prisma.tblUserTenantConfigMap.findUnique({
       where: {
-        userID_tenantID:{
-          userID:parseInt(userID),
-          tenantID:parseInt(tenantID)
+        userID_tenantID: {
+          userID: parseInt(userID),
+          tenantID: parseInt(tenantID),
         },
       },
     });
@@ -69,7 +69,7 @@ authService.getUserConfig = async ({ userID,tenantID }) => {
     return userConfig.config;
   } catch (error) {
     Logger.log("error", {
-      message: "authService:getUserConfig:catch1",
+      message: "authService:getUserConfig:catch-1",
       params: { error },
     });
     throw error;
@@ -77,53 +77,52 @@ authService.getUserConfig = async ({ userID,tenantID }) => {
 };
 
 /**
- * 
- * @param {object} param0 
+ *
+ * @param {object} param0
  * @param {Number} param0.userID
  * @param {Number} param0.tenantID
  * @param {JSON} param0.config
- * @returns 
+ * @returns
  */
-authService.updateUserConfig = async ({ userID,tenantID,config }) => {
+authService.updateUserConfig = async ({ userID, tenantID, config }) => {
   try {
     Logger.log("info", {
       message: "authService:updateUserConfig:params",
-      params: { userID, tenantID,config },
+      params: { userID, tenantID, config },
     });
     await prisma.tblUserTenantConfigMap.upsert({
       where: {
-        userID_tenantID:{
-          userID:parseInt(userID),
-          tenantID:parseInt(tenantID)
+        userID_tenantID: {
+          userID: parseInt(userID),
+          tenantID: parseInt(tenantID),
         },
       },
-      create:{
-        userID:parseInt(userID),
-        tenantID:parseInt(tenantID),
-        config
+      create: {
+        userID: parseInt(userID),
+        tenantID: parseInt(tenantID),
+        config,
       },
-      update:{
-        config
-      }
+      update: {
+        config,
+      },
     });
     Logger.log("success", {
       message: "authService:updateUserConfig:success",
-      
     });
     return true;
   } catch (error) {
     Logger.log("error", {
-      message: "authService:updateUserConfig:catch1",
+      message: "authService:updateUserConfig:catch-1",
       params: { error },
     });
     throw error;
   }
 };
 /**
- * 
- * @param {object} param0 
+ *
+ * @param {object} param0
  * @param {String} param0.email
- * @returns 
+ * @returns
  */
 authService.getUserFromEmailID = async ({ email }) => {
   try {
@@ -143,7 +142,7 @@ authService.getUserFromEmailID = async ({ email }) => {
     return user;
   } catch (error) {
     Logger.log("error", {
-      message: "authService:getUserFromEmailID:catch1",
+      message: "authService:getUserFromEmailID:catch-1",
       params: { error },
     });
     throw error;
@@ -178,7 +177,7 @@ authService.createUser = async ({ firebaseID, email }) => {
     return newUser;
   } catch (error) {
     Logger.log("error", {
-      message: "authService:createUser:catch1",
+      message: "authService:createUser:catch-1",
       params: { error },
     });
     throw error;
@@ -307,7 +306,7 @@ authService.checkUserPermissions = async ({
     return { permission: true };
   } catch (error) {
     Logger.log("error", {
-      message: "authService:checkUserPermissions:catch1",
+      message: "authService:checkUserPermissions:catch-1",
       params: { error },
     });
     throw error;

@@ -303,7 +303,7 @@ userManagementService.addUserToTenant = async ({
     return newUserTenantRelationship;
   } catch (error) {
     Logger.log("error", {
-      message: "userManagementService:addUserToTenant:catch1",
+      message: "userManagementService:addUserToTenant:catch-1",
       params: { error },
     });
     throw error;

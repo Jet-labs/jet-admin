@@ -14,6 +14,7 @@ import { DatabaseDashboardLayout } from "../layouts/databaseDashboardLayout";
 import { DatabaseWidgetLayout } from "../layouts/databaseWidgetLayout";
 import { DatabaseNotificationLayout } from "../layouts/databaseNotificationLayout";
 import { APIKeyLayout } from "../layouts/apiKeyLayout";
+import { CronJobLayout } from "../layouts/cronJobLayout";
 const SignInPage = lazy(() => import("../../pages/signInPage"));
 const SignUpPage = lazy(() => import("../../pages/signUpPage"));
 const HomePage = lazy(() => import("../../pages/homePage"));
@@ -111,6 +112,7 @@ const AddAPIKeyPage = lazy(() => import("../../pages/addAPIKeyPage"));
 const UpdateAPIKeyPage = lazy(() => import("../../pages/updateAPIKeyPage"));
 
 const RawSqlQueryPage = lazy(() => import("../../pages/rawSqlQueryPage"));
+const AddCronJobPage = lazy(() => import("../../pages/addCronJobPage"));
 
 const router = createBrowserRouter([
   {
@@ -275,6 +277,25 @@ const router = createBrowserRouter([
               },
               {
                 path: CONSTANTS.ROUTES.UPDATE_API_KEY_BY_ID.code,
+                element: <UpdateAPIKeyPage />,
+              },
+            ],
+          },
+          {
+            element: <CronJobLayout />,
+            children: [
+              {
+                path: CONSTANTS.ROUTES.VIEW_CRON_JOBS.code,
+                element: <AddCronJobPage />,
+              },
+              {
+                path: CONSTANTS.ROUTES.ADD_CRON_JOB.code,
+                element: () => {
+                  <div className="text-slate-700">placeholder</div>;
+                },
+              },
+              {
+                path: CONSTANTS.ROUTES.UPDATE_CRON_JOB_BY_ID.code,
                 element: <UpdateAPIKeyPage />,
               },
             ],

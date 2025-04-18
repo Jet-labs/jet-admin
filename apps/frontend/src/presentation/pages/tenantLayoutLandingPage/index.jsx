@@ -2,7 +2,7 @@ import { CircularProgress } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import moment from "moment";
 import React from "react";
-import { BsServer } from "react-icons/bs";
+import { BsServer, BsTable, BsDatabaseCheck } from "react-icons/bs";
 import {
   FaChartPie,
   FaDatabase,
@@ -10,10 +10,17 @@ import {
   FaStoreAlt,
   FaUsers,
   FaUsersCog,
+  FaUserShield,
 } from "react-icons/fa";
-import { MdSchema } from "react-icons/md";
-import { RiDashboardFill } from "react-icons/ri";
-import { SiQuantconnect } from "react-icons/si";
+import {
+  MdSchema,
+  MdOutlineQueryStats,
+  MdDashboardCustomize,
+} from "react-icons/md";
+import { RiDashboardFill, RiLockPasswordFill } from "react-icons/ri";
+import { SiQuantconnect, SiPostgresql } from "react-icons/si";
+import { HiOutlineDocumentReport } from "react-icons/hi";
+import { GrGraphQl } from "react-icons/gr";
 import { useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 import { getUserTenantByIDAPI } from "../../../data/apis/tenant";
@@ -21,6 +28,15 @@ import { TenantLogo } from "../../components/tenantComponents/tenantLogo";
 
 import { NoEntityUI } from "../../components/ui/noEntityUI";
 import { CodeBlock } from "../../components/ui/codeBlock";
+
+import usersLogo from "../../../assets/users_logo.png";
+import apiKeyLogo from "../../../assets/api_key_logo.png";
+import schemaLogo from "../../../assets/schema_logo.png";
+import tableLogo from "../../../assets/table_logo.png";
+import dashboardLogo from "../../../assets/dashboard_logo.png";
+import chartLogo from "../../../assets/chart_logo.png";
+import rolesLogo from "../../../assets/roles_logo.png";
+import queryLogo from "../../../assets/query_logo.png";
 
 const TenantLayoutLandingPage = () => {
   const { tenantID } = useParams();
@@ -56,14 +72,14 @@ const TenantLayoutLandingPage = () => {
   const tenantCards = [
     {
       title: "Users",
-      icon: <FaUsers className="text-[#646cff] text-2xl" />,
+      icon: <img src={usersLogo} alt="Users" className="w-8 h-8" />,
       count: tenant?.relationships?.length || 0,
       description: "Manage tenant users and permissions",
       action: () => navigate(CONSTANTS.ROUTES.VIEW_TENANT_USERS.path(tenantID)),
     },
     {
       title: "Database Schemas",
-      icon: <MdSchema className="text-[#646cff] text-2xl" />,
+      icon: <img src={schemaLogo} alt="Database Schemas" className="w-8 h-8" />,
       count: tenant?.tenantDatabaseSchemasCount || 0,
       description: "View and manage database schemas",
       action: () =>
@@ -71,7 +87,7 @@ const TenantLayoutLandingPage = () => {
     },
     {
       title: "Database Tables",
-      icon: <BsServer className="text-[#646cff] text-2xl" />,
+      icon: <img src={tableLogo} alt="Database Tables" className="w-8 h-8" />,
       count: tenant?.tenantDatabaseTablesCount || 0,
       description: "View and manage database tables",
       action: () =>
@@ -81,7 +97,7 @@ const TenantLayoutLandingPage = () => {
     },
     {
       title: "Database saved queries",
-      icon: <SiQuantconnect className="text-[#646cff] text-2xl" />,
+      icon: <img src={queryLogo} alt="Database Queries" className="w-8 h-8" />,
       count: tenant?.tenantDatabaseQueryCount || 0,
       description: "View and manage database saved queries",
       action: () =>
@@ -89,7 +105,7 @@ const TenantLayoutLandingPage = () => {
     },
     {
       title: "Charts",
-      icon: <FaChartPie className="text-[#646cff] text-2xl" />,
+      icon: <img src={chartLogo} alt="Charts" className="w-8 h-8" />,
       count: tenant?.tenantChartCount || 0,
       description: "View and manage charts",
       action: () =>
@@ -97,7 +113,7 @@ const TenantLayoutLandingPage = () => {
     },
     {
       title: "Dashboards",
-      icon: <RiDashboardFill className="text-[#646cff] text-2xl" />,
+      icon: <img src={dashboardLogo} alt="Dashboards" className="w-8 h-8" />,
       count: tenant?.tenantDashboardCount || 0,
       description: "View and manage dashboards",
       action: () =>
@@ -105,15 +121,14 @@ const TenantLayoutLandingPage = () => {
     },
     {
       title: "Roles",
-      icon: <FaUsersCog className="text-[#646cff] text-2xl" />,
+      icon: <img src={rolesLogo} alt="Roles" className="w-8 h-8" />,
       count: tenant?.tenantRolesCount || 0,
       description: "Configure user roles and permissions",
       action: () => navigate(CONSTANTS.ROUTES.VIEW_TENANT_ROLES.path(tenantID)),
     },
     {
       title: "API Keys",
-      icon: <FaKey className="text-[#646cff] text-2xl" />,
-      
+      icon: <img src={apiKeyLogo} alt="API Keys" className="w-8 h-8" />,
       description: "Create and manage API keys",
       action: () => navigate(CONSTANTS.ROUTES.VIEW_API_KEYS.path(tenantID)),
     },
@@ -130,9 +145,9 @@ const TenantLayoutLandingPage = () => {
               className="w-16 h-16 rounded"
             />
           ) : (
-            <FaStoreAlt className="w-5 h-5 text-slate-500" />
+            <FaStoreAlt className="w-12 h-12 text-slate-500" />
           )}
-          <div className="ml-3">
+          <div className="ml-4">
             <h1 className="text-2xl font-bold text-slate-700">
               {tenant.tenantName}
             </h1>
@@ -146,7 +161,7 @@ const TenantLayoutLandingPage = () => {
           <h2 className="text-base font-semibold text-slate-700 mb-2">
             Database Connection
           </h2>
-          {tenant.tenantDBURL  ? (
+          {tenant.tenantDBURL ? (
             <CodeBlock code={tenant.tenantDBURL} />
           ) : (
             <div className="flex items-center mb-2">

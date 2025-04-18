@@ -37,7 +37,7 @@ databaseService.getDatabaseMetadata = async ({ userID, dbPool }) => {
     return result.rows[0];
   } catch (error) {
     Logger.log("error", {
-      message: "databaseService:getDatabaseMetadata:catch1",
+      message: "databaseService:getDatabaseMetadata:catch-1",
       params: { userID, error: error.message },
     });
     throw error;
@@ -75,7 +75,7 @@ databaseService.getDatabaseMetadataForTenant = async ({ userID, dbPool }) => {
     return result.rows[0];
   } catch (error) {
     Logger.log("error", {
-      message: "databaseService:getDatabaseMetadataForTenant:catch1",
+      message: "databaseService:getDatabaseMetadataForTenant:catch-1",
       params: { userID, error: error.message },
     });
     throw error;
@@ -303,7 +303,7 @@ databaseService.createDatabaseSchema = async ({
     return result.rows[0];
   } catch (error) {
     Logger.log("error", {
-      message: "databaseService:createDatabaseSchema:catch1",
+      message: "databaseService:createDatabaseSchema:catch-1",
       params: { userID, databaseSchemaName, error: error.message },
     });
     throw error;

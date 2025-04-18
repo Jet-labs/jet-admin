@@ -11,6 +11,7 @@ const databaseDashboardRouter = require("../databaseDashboard/databaseDashboard.
 const userManagementRouter = require("../userManagement/userManagement.v1.route");
 const tenantRoleRouter = require("../tenantRole/tenantRole.v1.route");
 const tenantAPIKeyRouter = require("../apiKey/apiKey.v1.routes");
+const cronjobRouter = require("../cronJob/cronJob.v1.routes");
 const { param, body } = require("express-validator");
 const { expressUtils } = require("../../utils/express.utils");
 const constants = require("../../constants");
@@ -106,6 +107,13 @@ router.use(
 );
 
 router.use(
+  "/:tenantID/cronjobs",
+  authMiddleware.checkUserPermissions(["tenant:cronjobs"]),
+  tenantMiddleware.poolProvider,
+  cronjobRouter
+);
+
+router.use(
   "/:tenantID/queries",
   authMiddleware.checkUserPermissions(["tenant:query"]),
   tenantMiddleware.poolProvider,
@@ -132,4 +140,6 @@ router.use(
   tenantMiddleware.poolProvider,
   databaseDashboardRouter
 );
+
+
 module.exports = router;

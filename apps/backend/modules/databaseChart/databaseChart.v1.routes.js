@@ -35,9 +35,7 @@ router.post(
 
 router.get(
   "/:databaseChartID",
-  param("databaseChartID")
-    .isNumeric()
-    .withMessage("databaseChartID must be a number"),
+
   expressUtils.validationChecker,
   authMiddleware.checkUserPermissions(["tenant:chart:read"]),
   databaseChartController.getDatabaseChartByID
@@ -56,6 +54,8 @@ router.get(
 router.post(
   "/:databaseChartID/data",
   param("databaseChartID")
+    .exists()
+
     .isNumeric()
     .withMessage("databaseChartID must be a number"),
   expressUtils.validationChecker,

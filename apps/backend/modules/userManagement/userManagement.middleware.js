@@ -50,7 +50,7 @@ userManagementMiddleware.checkTenantUserAdditionLimit = async (
     }
   } catch (error) {
     Logger.log("error", {
-      message: "userManagementMiddleware:checkTenantUserAdditionLimit:catch1",
+      message: "userManagementMiddleware:checkTenantUserAdditionLimit:catch-1",
       params: {
         error,
       },

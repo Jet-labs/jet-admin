@@ -150,6 +150,19 @@ formValidations.apiKeyUpdationFormValidationSchema = Yup.object().shape({
   apiKeyName: Yup.string().required("API key name is required"),
 });
 
+formValidations.cronJobAdditionFormValidationSchema = Yup.object().shape({
+  cronJobTitle: Yup.string().required("Cron job title is required"),
+  cronJobDescription: Yup.string().optional(),
+  cronJobSchedule: Yup.string().required("Cron schedule is required"),
+  databaseQueryID: Yup.string().required("Database query is required"),
+});
+
+formValidations.cronJobUpdationFormValidationSchema = Yup.object().shape({
+  title: Yup.string().required("API key name is required"),
+  description: Yup.string().optional(),
+  cronSchedule: Yup.string().required("Cron schedule is required"),
+});
+
 formValidations.databaseQueryArgsFormValidationSchema = (databaseQueryArgs) =>
   Yup.object().shape(
     databaseQueryArgs.reduce((acc, arg) => {

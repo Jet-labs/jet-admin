@@ -50,7 +50,7 @@ tenantMiddleware.checkIfUserIsAdmin = async (req, res, next) => {
     }
   } catch (error) {
     Logger.log("error", {
-      message: "tenantMiddleware:checkIfUserIsAdmin:catch1",
+      message: "tenantMiddleware:checkIfUserIsAdmin:catch-1",
       params: {
         error,
       },
@@ -100,7 +100,7 @@ tenantMiddleware.checkTenantCreationLimit = async function (req, res, next) {
     }
   } catch (error) {
     Logger.log("error", {
-      message: "tenantMiddleware:checkTenantCreationLimit:catch1",
+      message: "tenantMiddleware:checkTenantCreationLimit:catch-1",
       params: {
         error,
       },

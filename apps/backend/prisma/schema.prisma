@@ -21,6 +21,7 @@ model tblTenants {
   tenantName                  String                        @db.VarChar
   tenantDBType                String                        @default("postgresql") @db.VarChar
   tblAPIKeys                  tblAPIKeys[]
+  tblCronJobs                 tblCronJobs[]
   tblDatabaseCharts           tblDatabaseCharts[]
   tblDatabaseDashboards       tblDatabaseDashboards[]
   tblDatabaseNotifications    tblDatabaseNotifications[]
@@ -87,6 +88,7 @@ model tblDatabaseQueries {
   runOnLoad                      Boolean?
   databaseQueryResultSchema      Json?                            @db.Json
   creatorID                      Int?
+  tblCronJobs                    tblCronJobs[]
   tblDatabaseChartQueryMappings  tblDatabaseChartQueryMappings[]
   tblUsers                       tblUsers?                        @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDatabaseQueriesCreatorID")
   tblTenants                     tblTenants                       @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTenantIDTenantID")
@@ -276,4 +278,37 @@ model tblRuntimeConfig {
   value     Json
   createdAt DateTime @default(now()) @db.Timestamptz(6)
   updatedAt DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model tblCronJobs {
+  cronJobID          Int                @id @default(autoincrement())
+  cronJobTitle       String             @db.VarChar
+  cronJobDescription String?
+  cronJobSchedule    String             @db.VarChar
+  isDisabled         Boolean            @default(false)
+  nextRunAt          DateTime?          @db.Timestamptz(6)
+  timeoutSeconds     Int?               @default(300)
+  retryAttempts      Int                @default(0)
+  retryDelaySeconds  Int                @default(60)
+  createdAt          DateTime           @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime           @default(now()) @db.Timestamptz(6)
+  tenantID           Int
+  databaseQueryID    Int
+  tblDatabaseQueries tblDatabaseQueries @relation(fields: [databaseQueryID], references: [databaseQueryID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblConJobsDatabaseQueryID")
+  tblTenants         tblTenants         @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblCronJobsTenantID")
+  tblJobHistory      tblJobHistory[]
+}
+
+model tblJobHistory {
+  jobHistoryID Int         @id @default(autoincrement())
+  jobID        Int
+  status       String      @db.VarChar(50)
+  scheduledAt  DateTime?   @db.Timestamptz(6)
+  startTime    DateTime?   @db.Timestamptz(6)
+  endTime      DateTime?   @db.Timestamptz(6)
+  durationMs   Int?
+  output       String?
+  triggerType  String?     @default("SCHEDULED") @db.VarChar(50)
+  createdAt    DateTime    @default(now()) @db.Timestamptz(6)
+  tblCronJobs  tblCronJobs @relation(fields: [jobID], references: [cronJobID], onDelete: Cascade, onUpdate: NoAction)
 }

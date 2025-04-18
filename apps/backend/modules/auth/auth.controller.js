@@ -39,7 +39,7 @@ authController.getUserInfo = async (req, res) => {
     }
   } catch (error) {
     Logger.log("error", {
-      message: "userController:getUserInfo:catch1",
+      message: "userController:getUserInfo:catch-1",
       params: { error },
     });
     return res.json({

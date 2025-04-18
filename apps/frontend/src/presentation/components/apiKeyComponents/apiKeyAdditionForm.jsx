@@ -21,8 +21,8 @@ export const APIKeyAdditionForm = ({
     isPending: isAddingAPIKey,
     isSuccess: isAddingAPIKeySuccess,
     isError: isAddingAPIKeyError,
-    error: addNotificationError,
-    mutate: addNotification,
+    error: addAPIKeyError,
+    mutate: addAPIKey,
   } = useMutation({
     mutationFn: (data) => {
       return createAPIKeyAPI({
@@ -32,9 +32,7 @@ export const APIKeyAdditionForm = ({
     },
     retry: false,
     onSuccess: (data) => {
-      displaySuccess(
-        CONSTANTS.STRINGS.ADD_API_KEY_FORM_API_KEY_CREATED
-      );
+      displaySuccess(CONSTANTS.STRINGS.ADD_API_KEY_FORM_API_KEY_CREATED);
       queryClient.invalidateQueries([
         CONSTANTS.REACT_QUERY_KEYS.DATABASE_API_KEYS(tenantID),
       ]);
@@ -50,7 +48,7 @@ export const APIKeyAdditionForm = ({
     },
     validationSchema: formValidations.apiKeyAdditionFormValidationSchema,
     onSubmit: async (data) => {
-      addNotification(data);
+      addAPIKey(data);
     },
   });
 

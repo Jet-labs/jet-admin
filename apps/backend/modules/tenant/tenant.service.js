@@ -101,7 +101,7 @@ tenantService.getUserTenantByID = async ({ userID, tenantID, dbPool }) => {
     return tenant;
   } catch (error) {
     Logger.log("error", {
-      message: "tenantService:getUserTenantByID:catch1",
+      message: "tenantService:getUserTenantByID:catch-1",
       params: { error },
     });
     throw error;
@@ -121,7 +121,7 @@ tenantService.deleteUserTenantByID = async ({ userID, tenantID }) => {
       message: "tenantService:deleteUserTenantByID:params",
       params: { userID, tenantID },
     });
-    
+
     const tenantDeletionTransaction = await prisma.$transaction([
       prisma.tblDatabaseDashboardChartMappings.deleteMany({
         where: {
@@ -213,7 +213,7 @@ tenantService.deleteUserTenantByID = async ({ userID, tenantID }) => {
     return true;
   } catch (error) {
     Logger.log("error", {
-      message: "tenantService:deleteUserTenantByID:catch1",
+      message: "tenantService:deleteUserTenantByID:catch-1",
       params: { error },
     });
     throw error;
@@ -266,7 +266,7 @@ tenantService.getAllUserTenants = async ({ userID }) => {
     return tenants;
   } catch (error) {
     Logger.log("error", {
-      message: "tenantService:getAllUserTenants:catch1",
+      message: "tenantService:getAllUserTenants:catch-1",
       params: { error },
     });
     throw error;
@@ -340,7 +340,7 @@ tenantService.createTenant = async ({
     return newTenant;
   } catch (error) {
     Logger.log("error", {
-      message: "tenantService:createTenant:catch1",
+      message: "tenantService:createTenant:catch-1",
       params: { error },
     });
     throw error;
@@ -450,7 +450,7 @@ tenantService.updateTenant = async ({
     return updatedTenant;
   } catch (error) {
     Logger.log("error", {
-      message: "tenantService:updateTenant:catch1",
+      message: "tenantService:updateTenant:catch-1",
       params: { error },
     });
     throw error;
@@ -484,7 +484,7 @@ tenantService.getUserCreatedTenantCount = async ({ userID }) => {
     return userCreatedTenantCount;
   } catch (error) {
     Logger.log("error", {
-      message: "tenantService:getUserCreatedTenantCount:catch1",
+      message: "tenantService:getUserCreatedTenantCount:catch-1",
       params: { error },
     });
     throw error;
@@ -522,7 +522,7 @@ tenantService.getAllTenantUsers = async ({ tenantID }) => {
     return userTenantRelationships;
   } catch (error) {
     Logger.log("error", {
-      message: "tenantService:getAllTenantUsers:catch1",
+      message: "tenantService:getAllTenantUsers:catch-1",
       params: { error },
     });
     throw error;
@@ -555,7 +555,7 @@ tenantService.getTenantUserCount = async ({ tenantID }) => {
     return userTenantRelationship ? userTenantRelationship.length : 0;
   } catch (error) {
     Logger.log("error", {
-      message: "tenantService:getTenantUserCount:catch1",
+      message: "tenantService:getTenantUserCount:catch-1",
       params: { error },
     });
     throw error;
@@ -598,7 +598,7 @@ tenantService.checkIfUserIsAdmin = async ({ userID, tenantID }) => {
     }
   } catch (error) {
     Logger.log("error", {
-      message: "tenantService:checkIfUserIsAdmin:catch1",
+      message: "tenantService:checkIfUserIsAdmin:catch-1",
       params: { error },
     });
     throw error;

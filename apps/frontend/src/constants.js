@@ -54,6 +54,7 @@ export const CONSTANTS = {
     MAIN_DRAWER_DATABASE_WIDGETS_TITLE: "Widgets",
     MAIN_DRAWER_DATABASE_NOTIFICATIONS_TITLE: "Notifications",
     MAIN_DRAWER_API_KEYS_TITLE: "API Keys",
+    MAIN_DRAWER_CRON_JOBS_TITLE: "Scheduled jobs",
     MAIN_DRAWER_SQL_EDITOR_TITLE: "PG SQL Editor",
     MAIN_DRAWER_DATABASE_QUERIES_TITLE: "Database queries",
     MAIN_DRAWER_ADD_DATABASE_SCHEMA_BUTTON: "Add schema",
@@ -298,6 +299,7 @@ export const CONSTANTS = {
     QUERY_DRAWER_LIST_NO_QUERY: "No queries found",
     NOTIFICATION_DRAWER_LIST_NO_NOTIFICATION: "No notifications found",
     API_KEY_DRAWER_LIST_NO_API_KEY: "No API Keys found",
+    CRON_JOB_DRAWER_LIST_NO_CRON_JOB_FOUND: "No scheduled jobs found",
     CHART_DRAWER_LIST_NO_CHART: "No charts found",
     WIDGET_DRAWER_LIST_NO_WIDGET: "No widgets found",
     DASHBOARD_DRAWER_LIST_NO_DASHBOARD: "No dashboards found",
@@ -848,6 +850,24 @@ export const CONSTANTS = {
     API_KEY_ROLE_SELECTION_CANCEL: "Cancel",
     API_KEY_ROLE_SELECTION_SUBMIT: "Update roles",
 
+    ADD_CRON_JOB_BUTTON_TEXT: "Add scheduled job",
+
+    ADD_CRON_JOB_SUBMIT_BUTTON_TEXT: "Add scheduled job",
+    ADD_CRON_JOB_FORM_TITLE: "Create new scheduled job",
+    CRON_JOB_ADDED_SUCCESS: "Scheduled job created successfully",
+    CRON_JOB_DELETED_SUCCESS: "Scheduled job deleted successfully",
+
+    CRON_JOB_EDITOR_FORM_TITLE_FIELD_LABEL: "Cron job title",
+    CRON_JOB_EDITOR_FORM_TITLE_FIELD_PLACEHOLDER: "Your Cron job's title",
+
+    CRON_JOB_EDITOR_FORM_DESCRIPTION_FIELD_LABEL: "Cron job description",
+    CRON_JOB_EDITOR_FORM_DESCRIPTION_FIELD_PLACEHOLDER:
+      "Your Cron job's description",
+
+    CRON_JOB_EDITOR_FORM_CRON_EXPRESSION_FIELD_LABEL: "Cron expression",
+    CRON_JOB_EDITOR_FORM_CRON_EXPRESSION_FIELD_PLACEHOLDER:
+      "Your Cron job's cron expression",
+
     TENANTS_STATS_TITLE: "Tenant Stats",
     TENANTS_STATS_ADD_TENANT_BUTTON: "Add tenant",
 
@@ -1069,6 +1089,19 @@ export const CONSTANTS = {
       code: "/tenants/:tenantID/apikeys/:apiKeyID",
       path: (tenantID, apiKeyID) => `/tenants/${tenantID}/apikeys/${apiKeyID}`,
     },
+
+    VIEW_CRON_JOBS: {
+      code: "/tenants/:tenantID/cronjobs",
+      path: (tenantID) => `/tenants/${tenantID}/cronjobs`,
+    },
+    ADD_CRON_JOB: {
+      code: "/tenants/:tenantID/cronjobs/add",
+      path: (tenantID) => `/tenants/${tenantID}/cronjobs/add`,
+    },
+    UPDATE_CRON_JOB_BY_ID: {
+      code: "/tenants/:tenantID/cronjobs/:apiKeyID",
+      path: (tenantID, apiKeyID) => `/tenants/${tenantID}/cronjobs/${apiKeyID}`,
+    },
   },
 
   APIS: {
@@ -1123,6 +1156,19 @@ export const CONSTANTS = {
         `/api/v1/tenants/${tenantID}/apikeys/${apiKeyID}/roles`,
       deleteAPIKeyByIDAPI: (tenantID, apiKeyID) =>
         `/api/v1/tenants/${tenantID}/apikeys/${apiKeyID}`,
+    },
+    CRON_JOB: {
+      getAllCronJobsAPI: (tenantID, page, pageSize) =>
+        `/api/v1/tenants/${tenantID}/cronjobs?page=${page}&pageSize=${pageSize}`,
+      createCronJobAPI: (tenantID) => `/api/v1/tenants/${tenantID}/cronjobs/`,
+      getCronJobByIDAPI: (tenantID, jobID) =>
+        `/api/v1/tenants/${tenantID}/cronjobs/${jobID}`,
+      updateCronJobByIDAPI: (tenantID, jobID) =>
+        `/api/v1/tenants/${tenantID}/cronjobs/${jobID}`,
+      updateCronJobRolesByIDAPI: (tenantID, jobID) =>
+        `/api/v1/tenants/${tenantID}/cronjobs/${jobID}/roles`,
+      deleteCronJobByIDAPI: (tenantID, jobID) =>
+        `/api/v1/tenants/${tenantID}/cronjobs/${jobID}`,
     },
     DATABASE: {
       getDatabaseMetadataAPI: (tenantID) =>
@@ -1391,6 +1437,7 @@ export const CONSTANTS = {
     FORM_SUBMISSIONS: "FORM_SUBMISSIONS",
     DATABASE_NOTIFICATIONS: (tenantID) => `${tenantID}-DATABASE_NOTIFICATIONS`,
     DATABASE_API_KEYS: (tenantID) => `${tenantID}-DATABASE_API_KEYS`,
+    DATABASE_CRON_JOBS: (tenantID) => `${tenantID}-DATABASE_CRON_JOBS`,
     DATABASE_NOTIFICATION_DETAILS: "DATABASE_NOTIFICATION_DETAILS",
   },
 
@@ -1708,6 +1755,7 @@ export const CONSTANTS = {
       "DASHBOARD_UPDATION_FORM_RESULT_SEPARATION",
     DATABASE_NOTIFICATION_LAYOUT_SEPARATION:
       "DATABASE_NOTIFICATION_LAYOUT_SEPARATION",
+    DATABASE_CRON_JOB_LAYOUT_SEPARATION: "DATABASE_CRON_JOB_LAYOUT_SEPARATION",
     DATABASE_API_KEY_LAYOUT_SEPARATION: "DATABASE_API_KEY_LAYOUT_SEPARATION",
   },
 
