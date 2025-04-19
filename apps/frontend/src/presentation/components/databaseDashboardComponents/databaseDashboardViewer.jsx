@@ -7,13 +7,11 @@ import { CONSTANTS } from "../../../constants";
 import { DatabaseDashboardRenderWidget } from "./databaseDashboardRenderWidget";
 import { useQuery } from "@tanstack/react-query";
 import { getDatabaseDashboardByIDAPI } from "../../../data/apis/databaseDashboard";
+import { DatabaseDashboardPrintForm } from "./databaseDashboardPrintForm";
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
-export const DatabaseDashboardViewer = ({
-  tenantID,
-  databaseDashboardID,
-}) => {
+export const DatabaseDashboardViewer = ({ tenantID, databaseDashboardID }) => {
   const [currentBreakpoint, setCurrentBreakpoint] = useState("lg");
 
   const {
@@ -36,17 +34,14 @@ export const DatabaseDashboardViewer = ({
     refetchOnWindowFocus: false,
   });
 
-
   const onBreakpointChange = (newBreakpoint) => {
     setCurrentBreakpoint(newBreakpoint);
   };
 
-  
-
   return (
     <div className="w-full flex flex-col justify-start items-center h-full">
-      <div className="flex flex-row justify-between items-center w-full">
-        <div className="w-full px-3 py-2 border-b border-gray-200 flex flex-col justify-center items-start">
+      <div className="flex flex-row justify-between items-center w-full px-3 py-2 border-b border-gray-200 ">
+        <div className="w-full  flex flex-col justify-center items-start">
           {databaseDashboard && (
             <h1 className="text-lg font-bold leading-tight tracking-tight text-slate-700">
               {databaseDashboard.databaseDashboardName}
@@ -57,8 +52,16 @@ export const DatabaseDashboardViewer = ({
             <span className="text-xs text-[#646cff] mt-2">{`Dashboard ID: ${databaseDashboard.databaseDashboardID} `}</span>
           )}
         </div>
+        <div className="flex flex-row justify-end items-center">
+          <DatabaseDashboardPrintForm
+            databaseDashboardID={databaseDashboardID}
+          />
+        </div>
       </div>
-      <div className="w-full overflow-y-auto bg-slate-100 ">
+      <div
+        className="w-full overflow-y-auto bg-slate-100 "
+        id={`printable-area-dashboard-${databaseDashboardID}`}
+      >
         {databaseDashboard && (
           <ResponsiveReactGridLayout
             isDraggable={false}
@@ -70,9 +73,10 @@ export const DatabaseDashboardViewer = ({
             breakpoints={{ lg: 1000, md: 996, sm: 768, xs: 480, xxs: 0 }}
             onBreakpointChange={onBreakpointChange}
             resizeHandles={["ne", "se", "nw", "sw"]}
-            cols={{ lg: 4, md: 3, sm: 2, xs: 2, xxs: 1 }}
             margin={[8, 8]}
-            rowHeight={16}
+            cols={{ lg: 8, md: 6, sm: 5, xs: 4, xxs: 3 }}
+            rowHeight={32}
+            allowOverlap={false}
           >
             {databaseDashboard?.databaseDashboardConfig?.widgets.map(
               (widget, index) => (

@@ -281,22 +281,23 @@ model tblRuntimeConfig {
 }
 
 model tblCronJobs {
-  cronJobID          Int                 @id @default(autoincrement())
-  cronJobTitle       String              @db.VarChar
-  cronJobDescription String?
-  cronJobSchedule    String              @db.VarChar
-  isDisabled         Boolean             @default(false)
-  nextRunAt          DateTime?           @db.Timestamptz(6)
-  timeoutSeconds     Int?                @default(300)
-  retryAttempts      Int                 @default(0)
-  retryDelaySeconds  Int                 @default(60)
-  createdAt          DateTime            @default(now()) @db.Timestamptz(6)
-  updatedAt          DateTime            @default(now()) @db.Timestamptz(6)
-  tenantID           Int
-  databaseQueryID    Int
-  tblCronJobHistory  tblCronJobHistory[]
-  tblDatabaseQueries tblDatabaseQueries  @relation(fields: [databaseQueryID], references: [databaseQueryID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblConJobsDatabaseQueryID")
-  tblTenants         tblTenants          @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblCronJobsTenantID")
+  cronJobID              Int                 @id @default(autoincrement())
+  cronJobTitle           String              @db.VarChar
+  cronJobDescription     String?
+  cronJobSchedule        String              @db.VarChar
+  isDisabled             Boolean             @default(false)
+  nextRunAt              DateTime?           @db.Timestamptz(6)
+  timeoutSeconds         Int?                @default(300)
+  retryAttempts          Int                 @default(0)
+  retryDelaySeconds      Int                 @default(60)
+  createdAt              DateTime            @default(now()) @db.Timestamptz(6)
+  updatedAt              DateTime            @default(now()) @db.Timestamptz(6)
+  tenantID               Int
+  databaseQueryID        Int
+  databaseQueryArgValues Json?
+  tblCronJobHistory      tblCronJobHistory[]
+  tblDatabaseQueries     tblDatabaseQueries  @relation(fields: [databaseQueryID], references: [databaseQueryID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblConJobsDatabaseQueryID")
+  tblTenants             tblTenants          @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblCronJobsTenantID")
 }
 
 model tblCronJobHistory {

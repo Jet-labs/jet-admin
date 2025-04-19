@@ -25,8 +25,8 @@ export const DatabaseDashboardRenderWidget = ({
 
   return (
     <div
-      className={`!h-full !w-full flex-grow relative p-0.5 ${
-        isMouseHover ? "bg-[#646cff]" : "bg-transparent"
+      className={`!h-full !w-full flex-grow relative  ${
+        isMouseHover ? "border border-[#646cff]" : "border border-slate-200"
       }`}
       onMouseEnter={
         editable
@@ -52,7 +52,7 @@ export const DatabaseDashboardRenderWidget = ({
     >
       {handleDelete && isMouseHover && responsive && editable && (
         <div
-          className="!flex-row justify-end !items-center !w-full absolute top-0 left-0 z-50"
+          className="!flex-row justify-end !items-center !w-full  absolute top-0 left-0 z-50"
           style={{}}
         >
           <button

@@ -44,7 +44,7 @@ router.patch(
   "/generate",
   body("aiPrompt").notEmpty().withMessage("aiPrompt is required"),
   expressUtils.validationChecker,
-  authMiddleware.checkUserPermissions(["tenant:query:test"]),
+  authMiddleware.checkUserPermissions(["tenant:query:aigenerate"]),
   databaseQueryController.generateAIPromptBasedQuery
 );
 router.get(

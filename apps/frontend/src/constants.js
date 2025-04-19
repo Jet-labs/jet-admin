@@ -866,7 +866,12 @@ export const CONSTANTS = {
       "Are you sure you want to delete this item? This action cannot be undone.",
 
     CRON_JOB_EDITOR_FORM_TITLE_FIELD_LABEL: "Cron job title",
+
     CRON_JOB_EDITOR_FORM_TITLE_FIELD_PLACEHOLDER: "Your Cron job's title",
+
+    CRON_JOB_EDITOR_FORM_QUERY_ID_FIELD_LABEL: "Select query",
+
+    CRON_JOB_EDITOR_FORM_SCHEDULE_FIELD_LABEL: "Select schedule",
 
     CRON_JOB_EDITOR_FORM_DESCRIPTION_FIELD_LABEL: "Cron job description",
     CRON_JOB_EDITOR_FORM_DESCRIPTION_FIELD_PLACEHOLDER:
@@ -875,6 +880,8 @@ export const CONSTANTS = {
     CRON_JOB_EDITOR_FORM_CRON_EXPRESSION_FIELD_LABEL: "Cron expression",
     CRON_JOB_EDITOR_FORM_CRON_EXPRESSION_FIELD_PLACEHOLDER:
       "Your Cron job's cron expression",
+
+    CRON_JOB_EDITOR_FORM_QUERY_ARGUMENTS_LABEL: "Arguments",
 
     TENANTS_STATS_TITLE: "Tenant Stats",
     TENANTS_STATS_ADD_TENANT_BUTTON: "Add tenant",

@@ -7,6 +7,7 @@ const {
 const {
   tenantAwarePostgreSQLPoolManager,
 } = require("../../config/tenant-aware-pgpool-manager.config");
+const constants = require("../../constants");
 // const constants = require("../../constants"); // Include if needed
 
 const cronJobService = {};
@@ -19,6 +20,7 @@ const cronJobService = {};
  * @param {string} [param0.cronJobDescription]
  * @param {string} param0.cronJobSchedule
  * @param {number} param0.databaseQueryID
+ * @param {object} [param0.databaseQueryArgValues]
  * @param {boolean} [param0.isDisabled]
  * @param {number} [param0.timeoutSeconds]
  * @param {number} [param0.retryAttempts]
@@ -32,6 +34,7 @@ cronJobService.createCronJob = async ({
   cronJobDescription,
   cronJobSchedule,
   databaseQueryID,
+  databaseQueryArgValues,
   isDisabled,
   timeoutSeconds,
   retryAttempts,
@@ -47,6 +50,7 @@ cronJobService.createCronJob = async ({
       cronJobDescription,
       cronJobSchedule,
       databaseQueryID,
+      databaseQueryArgValues,
       isDisabled,
       timeoutSeconds,
       retryAttempts,
@@ -62,6 +66,7 @@ cronJobService.createCronJob = async ({
         cronJobDescription,
         cronJobSchedule,
         databaseQueryID,
+        databaseQueryArgValues,
         isDisabled,
         timeoutSeconds,
         retryAttempts,
@@ -80,6 +85,7 @@ cronJobService.createCronJob = async ({
         cronJobDescription,
         cronJobSchedule,
         databaseQueryID,
+        databaseQueryArgValues,
         isDisabled,
         timeoutSeconds,
         retryAttempts,
@@ -100,6 +106,7 @@ cronJobService.createCronJob = async ({
         cronJobDescription,
         cronJobSchedule,
         databaseQueryID,
+        databaseQueryArgValues,
         isDisabled,
         timeoutSeconds,
         retryAttempts,
@@ -339,7 +346,10 @@ cronJobService.runCronJob = async ({ cronJob }) => {
       dbPool,
       databaseQueries: [
         {
-          databaseQueryData: cronJob.tblDatabaseQueries.databaseQueryData,
+          databaseQueryData: {
+            ...cronJob.tblDatabaseQueries.databaseQueryData,
+            databaseQueryArgValues: cronJob.databaseQueryArgValues,
+          },
         },
       ],
     });
@@ -349,7 +359,7 @@ cronJobService.runCronJob = async ({ cronJob }) => {
         cronJobID: parseInt(cronJob.cronJobID),
         result: JSON.stringify(queryRunResult),
         triggerType: "SCHEDULED",
-        status: "SUCCESS",
+        status: constants.CRON_JOB_STATUS.SUCCESS,
         scheduledAt: startTime,
         startTime: startTime,
         endTime: new Date(),
@@ -367,6 +377,18 @@ cronJobService.runCronJob = async ({ cronJob }) => {
     Logger.log("error", {
       message: "cronJobService:runCronJob:failure",
       params: { cronJob, error },
+    });
+    await prisma.tblCronJobHistory.create({
+      data: {
+        cronJobID: parseInt(cronJob.cronJobID),
+        result: JSON.stringify(error),
+        triggerType: "SCHEDULED",
+        status: constants.CRON_JOB_STATUS.FAILURE,
+        scheduledAt: startTime,
+        startTime: startTime,
+        endTime: new Date(),
+        durationMs: new Date() - startTime,
+      },
     });
     throw error;
   }

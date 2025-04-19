@@ -10,16 +10,14 @@ import {
 import { NoEntityUI } from "../../ui/noEntityUI";
 import { MdNotificationsNone } from "react-icons/md";
 import { IoKeyOutline } from "react-icons/io5";
+import { RiCalendarScheduleLine } from "react-icons/ri";
 
 export const CronJobDrawerList = () => {
   const { tenantID } = useParams();
   const navigate = useNavigate();
   const routeParam = useParams();
-  const {
-    isLoadingCronJobs,
-    cronJobs,
-    isFetchingCronJobs,
-  } = useCronJobsState();
+  const { isLoadingCronJobs, cronJobs, isFetchingCronJobs } =
+    useCronJobsState();
   const { refetchCronJobs } = useCronJobsActions();
 
   const _navigateToAddNotification = () => {
@@ -63,7 +61,7 @@ export const CronJobDrawerList = () => {
                   }`}
                 >
                   <div className="!w-[16px]">
-                    <IoKeyOutline
+                    <RiCalendarScheduleLine
                       className={`w-[16px] h-[16px] ${
                         isActive ? "text-primary" : "text-slate-600"
                       }`}

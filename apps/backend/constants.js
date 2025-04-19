@@ -163,6 +163,11 @@ const constants = {
       value: "text",
     },
   },
+
+  CRON_JOB_STATUS: {
+    SUCCESS: "SUCCESS",
+    FAILURE: "FAILURE",
+  },
 };
 
 module.exports = constants;

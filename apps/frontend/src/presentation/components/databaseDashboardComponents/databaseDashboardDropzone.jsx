@@ -92,10 +92,7 @@ export const DatabaseDashboardDropzone = ({
   };
 
   return (
-    <div
-      className="w-full h-full min-h-full overflow-y-auto bg-slate-100 bg-[radial-gradient(circle,#73737350_1px,transparent_1px)] 
-bg-[size:10px_10px]"
-    >
+    <div className="w-full h-full min-h-full overflow-y-auto bg-slate-100">
       <ResponsiveReactGridLayout
         style={{ minHeight: "100%" }}
         draggableCancel=".cancelSelectorName"
@@ -108,9 +105,9 @@ bg-[size:10px_10px]"
         onDrop={onDrop}
         margin={[8, 8]}
         isDroppable
-        cols={{ lg: 40, md: 30, sm: 20, xs: 20, xxs: 10 }}
-        rowHeight={16}
-        allowOverlap={true}
+        cols={{ lg: 8, md: 6, sm: 5, xs: 4, xxs: 3 }}
+        rowHeight={32}
+        allowOverlap={false}
       >
         {widgets.map((widget, index) => (
           <div key={widget}>

@@ -1,10 +1,14 @@
 const Logger = require("../../utils/logger");
 const { prisma } = require("../../config/prisma.config");
+
+const { databaseChartProcessor } = require("./databaseChart.processor");
+const constants = require("../../constants");
+const { databaseService } = require("../database/database.service");
+const { aiUtil } = require("../../utils/aiprompt.util");
+const { aiService } = require("../ai/ai.service");
 const {
   databaseQueryService,
 } = require("../databaseQuery/databaseQuery.service");
-const { databaseChartProcessor } = require("./databaseChart.processor");
-const constants = require("../../constants");
 const databaseChartService = {};
 
 /**
@@ -690,4 +694,109 @@ databaseChartService.deleteDatabaseChartByID = async ({
   }
 };
 
+/**
+ *
+ * @param {object} param0
+ * @param {number} param0.userID
+ * @param {number} param0.tenantID
+ * @param {string} param0.aiPrompt
+ * @returns
+ */
+databaseChartService.generateAIPromptBasedChart = async ({
+  userID,
+  tenantID,
+  dbPool,
+  aiPrompt,
+}) => {
+  Logger.log("info", {
+    message: "databaseChartService:generateAIPromptBasedChart:started",
+    params: { userID, tenantID, aiPrompt },
+  });
+
+  // --- Get API Key ---
+  const apiKey = environmentVariables.GEMINI_API_KEY;
+  if (!apiKey) {
+    Logger.log("error", {
+      message: "databaseChartService:generateAIPromptBasedChart:failure",
+      params: {
+        userID,
+        tenantID,
+        aiPrompt,
+        error: "GEMINI_API_KEY environment variable not set.",
+      },
+    });
+    throw new Error("Server configuration error: Missing Gemini API Key.");
+  }
+
+  const databaseSchemaInfo = await databaseService.getDatabaseSchemaForAI({
+    userID,
+    tenantID,
+    dbPool,
+  });
+
+  Logger.log("info", {
+    message: "databaseChartService:generateAIPromptBasedChart:schema_loaded",
+    params: {
+      userID,
+      tenantID,
+      aiPrompt,
+      databaseSchemaInfoLength: databaseSchemaInfo?.length,
+    },
+  });
+
+  if (!databaseSchemaInfo) {
+    Logger.log("error", {
+      message: "databaseChartService:generateAIPromptBasedChart:failure",
+      params: {
+        userID,
+        tenantID,
+        aiPrompt,
+        error: "Database schema information is missing.",
+      },
+    });
+    throw new Error("Database schema information is missing.");
+  }
+
+  const fullPrompt = await aiUtil.generateAIPromptForChartGeneration({
+    databaseSchemaInfo,
+    aiPrompt,
+  });
+
+  Logger.log("info", {
+    message: "databaseChartService:generateAIPromptBasedChart:prompt_generated",
+    params: {
+      userID,
+      tenantID,
+      aiPrompt,
+      fullPromptLength: fullPrompt?.length,
+    },
+  });
+
+  try {
+    const databaseChartData = await aiService.generateAIPromptBasedChart({
+      aiPrompt: fullPrompt,
+    });
+
+    Logger.log("success", {
+      message: "databaseChartService:generateAIPromptBasedChart:success",
+      params: { userID, tenantID, databaseChartData },
+    });
+    return databaseChartData;
+  } catch (error) {
+    // Log API errors or other failures
+    Logger.log("error", {
+      message: "databaseChartService:generateAIPromptBasedChart:failure",
+      params: {
+        userID,
+        tenantID,
+        aiPrompt,
+        error,
+      },
+    });
+    // Re-throw the original error or a more user-friendly one
+    throw new Error(
+      `Failed to generate database query using AI: ${error.message}`
+    );
+  }
+};
 module.exports = { databaseChartService };

@@ -13,12 +13,13 @@ const cronJobController = {};
 cronJobController.createCronJob = async (req, res) => {
   try {
     const { user } = req;
-    const {tenantID} = req.params;
+    const { tenantID } = req.params;
     const {
       cronJobTitle,
       cronJobDescription,
       cronJobSchedule,
       databaseQueryID,
+      databaseQueryArgValues,
       isDisabled,
       timeoutSeconds,
       retryAttempts,
@@ -34,6 +35,7 @@ cronJobController.createCronJob = async (req, res) => {
         cronJobDescription,
         cronJobSchedule,
         databaseQueryID,
+        databaseQueryArgValues,
         isDisabled,
         timeoutSeconds,
         retryAttempts,
@@ -44,10 +46,11 @@ cronJobController.createCronJob = async (req, res) => {
     const newCronJob = await cronJobService.createCronJob({
       userID: parseInt(user.userID),
       cronJobTitle,
-      tenantID:parseInt(tenantID),
+      tenantID: parseInt(tenantID),
       cronJobDescription,
       cronJobSchedule,
       databaseQueryID: parseInt(databaseQueryID),
+      databaseQueryArgValues,
       isDisabled,
       timeoutSeconds,
       retryAttempts,
@@ -63,6 +66,7 @@ cronJobController.createCronJob = async (req, res) => {
         cronJobDescription,
         cronJobSchedule,
         databaseQueryID,
+        databaseQueryArgValues,
         isDisabled,
         timeoutSeconds,
         retryAttempts,
@@ -212,6 +216,7 @@ cronJobController.updateCronJobByID = async (req, res) => {
       cronJobDescription,
       cronJobSchedule,
       databaseQueryID,
+      databaseQueryArgValues,
       isDisabled,
       timeoutSeconds,
       retryAttempts,
@@ -224,6 +229,7 @@ cronJobController.updateCronJobByID = async (req, res) => {
       cronJobDescription,
       cronJobSchedule,
       databaseQueryID: parseInt(databaseQueryID),
+      databaseQueryArgValues,
       isDisabled,
       timeoutSeconds,
       retryAttempts,

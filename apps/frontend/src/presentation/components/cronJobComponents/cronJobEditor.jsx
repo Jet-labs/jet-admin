@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { CONSTANTS } from "../../../constants";
 import { CronJobScheduler } from "./cronJobScheduler";
 import { useCronJobsState } from "../../../logic/contexts/cronJobsContext";
@@ -15,6 +15,16 @@ export const CronJobEditor = ({
     },
     [cronJobEditorForm]
   );
+  const selectedQuery = useMemo(() => {
+    return databaseQueries
+      ? databaseQueries.find(
+          (q) =>
+            parseInt(q.databaseQueryID) ===
+            parseInt(cronJobEditorForm.values?.databaseQueryID || 0)
+        )
+      : null;
+  }, [databaseQueries, cronJobEditorForm.values]);
+
   return (
     <div className="w-full flex flex-col justify-start items-stretch gap-2">
       <div>
@@ -39,15 +49,19 @@ export const CronJobEditor = ({
         />
       </div>
       <div>
+        <label
+          for="cronJobTitle"
+          class="block mb-1 text-xs font-medium text-slate-500"
+        >
+          {CONSTANTS.STRINGS.CRON_JOB_EDITOR_FORM_QUERY_ID_FIELD_LABEL}
+        </label>
         <select
           name={`databaseQueryID`}
           id={`databaseQueryID`}
           value={cronJobEditorForm.values.databaseQueryID || ""}
           onChange={cronJobEditorForm.handleChange}
           onBlur={cronJobEditorForm.handleBlur}
-          className={`placeholder:text-slate-400 text-xs bg-slate-50 border ${
-            "border-slate-300"
-          } text-slate-700 rounded focus:outline-none focus:border-slate-400 block w-full py-1 px-1.5`}
+          className={`placeholder:text-slate-400 text-xs bg-slate-50 border ${"border-slate-300"} text-slate-700 rounded focus:outline-none focus:border-slate-400 block w-full py-1 px-1.5`}
         >
           <option value="" disabled selected>
             Select query dataset
@@ -61,12 +75,50 @@ export const CronJobEditor = ({
             </option>
           ))}
         </select>
-        
       </div>
-      <CronJobScheduler
-        value={cronJobEditorForm.values.cronJobSchedule}
-        handleChange={_handleOnScheduleChange}
-      />
+      {selectedQuery?.databaseQueryData?.databaseQueryArgs?.length > 0 && (
+        <div>
+          <label class="block mb-1 text-xs font-medium text-slate-500">
+            {CONSTANTS.STRINGS.CRON_JOB_EDITOR_FORM_QUERY_ARGUMENTS_LABEL}
+          </label>
+          <div className="space-y-2">
+            {selectedQuery.databaseQueryData.databaseQueryArgs.map(
+              (arg, argIndex) => {
+                const argName = arg.replace(/[{}]/g, "");
+                const key = `databaseQueryArgValues.${argName}`;
+                return (
+                  <div key={key}>
+                    <input
+                      type="text"
+                      name={key}
+                      required={true}
+                      id={key}
+                      className="placeholder:text-slate-400 text-xs w-full bg-slate-50 border border-slate-300 text-slate-700 rounded focus:outline-none focus:border-slate-400 block px-2.5 py-1.5"
+                      placeholder={`Value for ${argName}`}
+                      value={
+                        cronJobEditorForm.values.databaseQueryArgValues?.[
+                          argName
+                        ] || ""
+                      }
+                      onChange={cronJobEditorForm.handleChange}
+                      onBlur={cronJobEditorForm.handleBlur}
+                    />
+                  </div>
+                );
+              }
+            )}
+          </div>
+        </div>
+      )}
+      <div>
+        <label class="block mb-1 text-xs font-medium text-slate-500">
+          {CONSTANTS.STRINGS.CRON_JOB_EDITOR_FORM_SCHEDULE_FIELD_LABEL}
+        </label>
+        <CronJobScheduler
+          value={cronJobEditorForm.values.cronJobSchedule}
+          handleChange={_handleOnScheduleChange}
+        />
+      </div>
     </div>
   );
 };
