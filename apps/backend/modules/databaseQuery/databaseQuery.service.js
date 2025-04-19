@@ -74,6 +74,7 @@ databaseQueryService.getAllDatabaseQueries = async ({ userID, tenantID }) => {
  *
  * @param {object} param0
  * @param {number} param0.userID
+ * @param {number} param0.tenantID
  * @param {string} param0.databaseQueryTitle
  * @param {string} param0.databaseQueryDescription
  * @param {JSON} param0.databaseQueryData
@@ -122,6 +123,62 @@ databaseQueryService.createDatabaseQuery = async ({
       },
     });
     return true;
+  } catch (error) {
+    Logger.log("error", {
+      message: "databaseQueryService:createDatabaseQuery:failure",
+      params: {
+        userID,
+        error,
+      },
+    });
+    throw error;
+  }
+};
+
+/**
+ *
+ * @param {object} param0
+ * @param {number} param0.userID
+ * @param {number} param0.tenantID
+ * @param {Array<object>} param0.databaseQueriesData
+ * @returns {Promise<boolean>}
+ */
+databaseQueryService.createBulkDatabaseQuery = async ({
+  userID,
+  tenantID,
+  databaseQueriesData,
+}) => {
+  Logger.log("info", {
+    message: "databaseQueryService:createDatabaseQuery:params",
+    params: {
+      userID,
+      tenantID,
+      databaseQueriesData,
+    },
+  });
+
+  try {
+    const databaseQueries = await prisma.tblDatabaseQueries.createManyAndReturn({
+      data: databaseQueriesData.map((databaseQueryData) => ({
+        tenantID: parseInt(tenantID),
+        databaseQueryTitle: databaseQueryData.databaseQueryTitle,
+        databaseQueryDescription: databaseQueryData.databaseQueryDescription,
+        databaseQueryData: databaseQueryData.databaseQueryData,
+        creatorID: parseInt(userID),
+        runOnLoad: databaseQueryData.runOnLoad,
+      })),
+    });
+    
+    Logger.log("success", {
+      message: "databaseQueryService:createDatabaseQuery:success",
+      params: {
+        userID,
+        tenantID,
+        databaseQueriesData,
+        databaseQueriesLength: databaseQueries?.length,
+      },
+    });
+    return databaseQueries;
   } catch (error) {
     Logger.log("error", {
       message: "databaseQueryService:createDatabaseQuery:failure",

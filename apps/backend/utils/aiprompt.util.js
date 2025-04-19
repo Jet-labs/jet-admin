@@ -45,6 +45,7 @@ ${databaseSchemaInfo}
 Generate chart configuration in EXACTLY this JSON format:
 {
   "output": {
+    "databaseChartTitle":"Appropriate title for chart",
     "databaseChartType": "line|bar|pie|scatter|bubble|radar|radial",
     "databaseChartConfig": {
       "plugins": {},
@@ -110,7 +111,7 @@ Example for pie chart:
     },
     "databaseChartQueryMappings": [{
       "title": "Sales by Category",
-      "databaseQueryString": "SELECT category, SUM(sales) FROM orders GROUP BY category LIMIT ${limit}",
+      "databaseQueryString": "SELECT category, SUM(sales) FROM orders GROUP BY category LIMIT \${limit}",
       "databaseQueryArgs": ["limit"],
       "datasetFields": {
         "label": "category",

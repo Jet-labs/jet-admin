@@ -128,7 +128,7 @@ aiService.generateAIPromptBasedQuery = async ({ aiPrompt }) => {
         "AI determined the request could not be safely converted to a SQL query based on the provided schema and rules."
       );
     }
-    return stringUtil.removeMarkdownFencesRegex(databaseQuery);
+    return stringUtil.removeSQLMarkdownFencesRegex(databaseQuery);
   } catch (error) {
     // Log API errors or other failures
     Logger.log("error", {

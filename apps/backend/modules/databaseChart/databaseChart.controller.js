@@ -181,14 +181,13 @@ databaseChartController.generateAIPromptBasedChart = async (req, res) => {
       },
     });
 
-    const databaseQuery = await databaseChartService.generateAIPromptBasedChart(
-      {
+    const databaseChartData =
+      await databaseChartService.generateAIPromptBasedChart({
         userID: parseInt(user.userID),
         tenantID,
         aiPrompt,
         dbPool,
-      }
-    );
+      });
 
     Logger.log("success", {
       message: "databaseChartController:generateAIPromptBasedChart:success",
@@ -196,11 +195,11 @@ databaseChartController.generateAIPromptBasedChart = async (req, res) => {
         userID: user.userID,
         tenantID,
         aiPrompt,
-        databaseQuery,
+        databaseChartData,
       },
     });
 
-    return expressUtils.sendResponse(res, true, { databaseQuery });
+    return expressUtils.sendResponse(res, true, { databaseChartData });
   } catch (error) {
     Logger.log("error", {
       message: "databaseChartController:generateAIPromptBasedChart:catch-1",

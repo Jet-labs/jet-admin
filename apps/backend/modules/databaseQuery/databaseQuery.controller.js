@@ -115,6 +115,57 @@ databaseQueryController.createDatabaseQuery = async (req, res) => {
  * @param {import("express").Request} req
  * @param {import("express").Response} res
  */
+databaseQueryController.createBulkDatabaseQuery = async (req, res) => {
+  try {
+    const { user } = req;
+    const { tenantID } = req.params;
+    const {
+      databaseQueriesData,
+    } = req.body;
+
+    Logger.log("info", {
+      message: "databaseQueryController:createBulkDatabaseQuery:params",
+      params: {
+        userID: user.userID,
+        tenantID,
+        databaseQueriesData,
+      },
+    });
+
+    const databaseQueries = await databaseQueryService.createBulkDatabaseQuery({
+      userID: parseInt(user.userID),
+      tenantID,
+      databaseQueriesData,
+    });
+
+    Logger.log("success", {
+      message: "databaseQueryController:createBulkDatabaseQuery:success",
+      params: {
+        userID: user.userID,
+        tenantID,
+        databaseQueriesData,
+        databaseQueriesLength: databaseQueries.length,
+      },
+    });
+
+    return expressUtils.sendResponse(res, true, {
+      databaseQueries,
+      message: "Queries created successfully.",
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "databaseQueryController:createBulkDatabaseQuery:catch-1",
+      params: { error },
+    });
+    return expressUtils.sendResponse(res, false, {}, error);
+  }
+};
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
 databaseQueryController.generateAIPromptBasedQuery = async (req, res) => {
   try {
     const { user, dbPool } = req;

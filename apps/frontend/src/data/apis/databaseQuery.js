@@ -66,6 +66,42 @@ export const createDatabaseQueryAPI = async ({
   }
 };
 
+export const createBulkDatabaseQueryAPI = async ({
+  tenantID,
+  databaseQueriesData,
+}) => {
+  try {
+    const url =
+      CONSTANTS.SERVER_HOST +
+      CONSTANTS.APIS.DATABASE.createBulkDatabaseQueryAPI(tenantID);
+    const bearerToken = await firebaseAuth.currentUser.getIdToken();
+    if (bearerToken) {
+      const response = await axios.post(
+        url,
+        {
+          databaseQueriesData,
+        },
+        {
+          headers: {
+            authorization: `Bearer ${bearerToken}`,
+          },
+        }
+      );
+      if (response.data && response.data.success === true) {
+        return response.data.databaseQueries;
+      } else if (response.data.error) {
+        throw response.data.error;
+      } else {
+        throw CONSTANTS.ERROR_CODES.SERVER_ERROR;
+      }
+    } else {
+      throw CONSTANTS.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const testDatabaseQueryAPI = async ({
   tenantID,
   databaseQueryID,

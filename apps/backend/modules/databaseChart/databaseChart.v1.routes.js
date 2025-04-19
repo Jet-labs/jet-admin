@@ -42,7 +42,7 @@ router.get(
 );
 
 router.patch(
-  "/generate",
+  "/aigenerate",
   body("aiPrompt").notEmpty().withMessage("aiPrompt is required"),
   expressUtils.validationChecker,
   authMiddleware.checkUserPermissions(["tenant:chart:aigenerate"]),
@@ -52,6 +52,7 @@ router.patch(
 router.get(
   "/:databaseChartID/data",
   param("databaseChartID")
+    .exists()
     .isNumeric()
     .withMessage("databaseChartID must be a number"),
   expressUtils.validationChecker,
@@ -61,11 +62,6 @@ router.get(
 
 router.post(
   "/:databaseChartID/data",
-  param("databaseChartID")
-    .exists()
-
-    .isNumeric()
-    .withMessage("databaseChartID must be a number"),
   expressUtils.validationChecker,
   authMiddleware.checkUserPermissions(["tenant:chart:test"]),
   databaseChartController.getDatabaseChartDataUsingDatabaseChart

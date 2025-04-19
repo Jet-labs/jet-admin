@@ -716,6 +716,26 @@ export const CONSTANTS = {
     CHART_DATASET_ARGUMENTS_CONFIRM: "Save changes",
     CHART_DATASET_ARGUMENTS_CANCEL: "Discard",
 
+    DATABASE_CHART_AI_PROMPT_BUTTON: "AI Prompt",
+    DATABASE_CHART_AI_PROMPT_FORM_TITLE: "AI Prompt",
+    DATABASE_CHART_AI_PROMPT_FORM_DESCRIPTION:
+      "Enter the AI prompt to generate the chart",
+    DATABASE_CHART_AI_PROMPT_ACCEPT_FORM_CONFIRM_BUTTON: "Accept chart",
+    DATABASE_CHART_AI_PROMPT_FORM_GENERATE_BUTTON: "Generate chart",
+    DATABASE_CHART_AI_PROMPT_FORM_REGENERATE_BUTTON: "Re-generate chart",
+
+    DATABASE_CHART_AI_PROMPT_GENERATED_QUERIES_TITLE: "Generated queries",
+    DATABASE_CHART_AI_PROMPT_GENERATED_QUERIES_DESCRIPTION:
+      "The following queries will be created and used in the chart",
+    DATABASE_CHART_AI_PROMPT_GENERATED_QUERIES_ACCEPT_BUTTON: "Accept",
+
+    DATABASE_CHART_AI_PROMPT_GENERATED_CHART_CONFIG_TITLE:
+      "Generated chart config",
+    DATABASE_CHART_AI_PROMPT_GENERATED_CHART_CONFIG_DESCRIPTION:
+      "The following chart configuration will be used in the chart",
+    DATABASE_CHART_AI_PROMPT_GENERATED_CHART_CONFIG_ACCEPT_BUTTON:
+      "Accept config",
+
     WIDGET_DATASET_FIELD_MAPPING_TITLE: "Dataset field options",
     WIDGET_DATASET_FIELD_MAPPING_NO_META: "Dataset metadata not available",
     WIDGET_DATASET_FIELD_MAPPING_CONFIRM: "Save changes",
@@ -1294,6 +1314,8 @@ export const CONSTANTS = {
 
       createDatabaseQueryAPI: (tenantID) =>
         `/api/v1/tenants/${tenantID}/queries/`,
+      createBulkDatabaseQueryAPI: (tenantID) =>
+        `/api/v1/tenants/${tenantID}/queries/bulk`,
 
       testDatabaseQueryAPI: (tenantID) =>
         `/api/v1/tenants/${tenantID}/queries/queryTest`,
@@ -1302,7 +1324,7 @@ export const CONSTANTS = {
       testDatabaseQueryByIDAPI: (tenantID, databaseQueryID) =>
         `/api/v1/tenants/${tenantID}/queries/${databaseQueryID}/queryTest`,
       generateAIPromptBasedQueryAPI: (tenantID) =>
-        `/api/v1/tenants/${tenantID}/queries/generate`,
+        `/api/v1/tenants/${tenantID}/queries/aigenerate`,
       updateDatabaseQueryByID: (tenantID, databaseQueryID) =>
         `/api/v1/tenants/${tenantID}/queries/${databaseQueryID}`,
       deleteDatabaseQueryByID: (tenantID, databaseQueryID) =>
@@ -1323,6 +1345,8 @@ export const CONSTANTS = {
         `/api/v1/tenants/${tenantID}/charts/${databaseChartID}/data`,
       deleteDatabaseChartByID: (tenantID, databaseChartID) =>
         `/api/v1/tenants/${tenantID}/charts/${databaseChartID}`,
+      generateAIPromptBasedChartAPI: (tenantID) =>
+        `/api/v1/tenants/${tenantID}/charts/aigenerate`,
 
       getAllDatabaseWidgetsAPI: (tenantID) =>
         `/api/v1/tenants/${tenantID}/widgets/`,

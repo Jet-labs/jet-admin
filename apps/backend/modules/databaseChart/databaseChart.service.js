@@ -9,6 +9,8 @@ const { aiService } = require("../ai/ai.service");
 const {
   databaseQueryService,
 } = require("../databaseQuery/databaseQuery.service");
+const environmentVariables = require("../../environment");
+const { stringUtil } = require("../../utils/string.util");
 const databaseChartService = {};
 
 /**
@@ -781,7 +783,7 @@ databaseChartService.generateAIPromptBasedChart = async ({
       message: "databaseChartService:generateAIPromptBasedChart:success",
       params: { userID, tenantID, databaseChartData },
     });
-    return databaseChartData;
+    return stringUtil.removeJSONMarkdownFencesRegex(databaseChartData);
   } catch (error) {
     // Log API errors or other failures
     Logger.log("error", {

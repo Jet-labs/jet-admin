@@ -30,6 +30,13 @@ router.post(
   authMiddleware.checkUserPermissions(["tenant:query:create"]),
   databaseQueryController.createDatabaseQuery
 );
+router.post(
+  "/bulk",
+  expressUtils.validationChecker,
+  authMiddleware.authProvider,
+  authMiddleware.checkUserPermissions(["tenant:query:bulk:create"]),
+  databaseQueryController.createBulkDatabaseQuery
+);
 router.patch(
   "/queryTest",
   body("databaseQueryData")
@@ -41,7 +48,7 @@ router.patch(
 );
 
 router.patch(
-  "/generate",
+  "/aigenerate",
   body("aiPrompt").notEmpty().withMessage("aiPrompt is required"),
   expressUtils.validationChecker,
   authMiddleware.checkUserPermissions(["tenant:query:aigenerate"]),

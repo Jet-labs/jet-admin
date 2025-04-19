@@ -7,12 +7,13 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useMutation } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
-import { FaMagic } from "react-icons/fa";
+import { useCallback, useEffect, useState } from "react";
+import { FaCheck, FaMagic } from "react-icons/fa";
 import { CONSTANTS } from "../../../constants";
-import { generateAIPromptBasedQueryAPI } from "../../../data/apis/databaseQuery";
+import { generateAIPromptBasedChartAPI } from "../../../data/apis/databaseChart";
 import { displayError } from "../../../utils/notification";
 import { CodeBlock } from "../ui/codeBlock";
+import { createBulkDatabaseQueryAPI } from "../../../data/apis/databaseQuery";
 
 // Styled components to override MUI defaults
 const StyledDialog = styled(Dialog)(({ theme }) => ({
@@ -49,10 +50,14 @@ const StyledDialogActions = styled(DialogActions)(({ theme }) => ({
   background: "transparent",
 }));
 
-export const DatabaseQueryAIGeneratePrompt = ({ tenantID, onAccepted }) => {
-  const [aiPrompt, setAiPrompt] = useState("");
-  const [aiGeneratedQuery, setAiGeneratedQuery] = useState("");
+export const DatabaseChartAIGeneratePrompt = ({ tenantID, onAccepted }) => {
+  
+
+  const [aiPrompt, setAiPrompt] = useState("top 10 most spending users");
+  const [aiGeneratedChart, setAiGeneratedChart] = useState("");
   const [isAIPromptDialogOpen, setIsAIPromptDialogOpen] = useState(false);
+  const [generatedQueries, setGeneratedQueries] = useState([]);
+  
 
   const {
     isPending: isGeneratingAIPrompt,
@@ -62,19 +67,76 @@ export const DatabaseQueryAIGeneratePrompt = ({ tenantID, onAccepted }) => {
     mutate: generateAIPrompt,
   } = useMutation({
     mutationFn: ({ aiPrompt }) => {
-      return generateAIPromptBasedQueryAPI({
+      return generateAIPromptBasedChartAPI({
         tenantID,
         aiPrompt,
       });
     },
     retry: false,
     onSuccess: (data) => {
-      setAiGeneratedQuery(data);
+      console.log({ data });
+      setAiGeneratedChart(data);
     },
     onError: (error) => {
       displayError(error);
     },
   });
+
+  const {
+    isPending: isGeneratingQueries,
+    isSuccess: isGeneratingQueriesSuccess,
+    isError: isGeneratingQueriesError,
+    error: generateQueriesError,
+    mutate: generateQueries,
+  } = useMutation({
+    mutationFn: ({ databaseQueriesData }) => {
+      return createBulkDatabaseQueryAPI({
+        tenantID,
+        databaseQueriesData,
+      });
+    },
+    retry: false,
+    onSuccess: (data) => {
+      setGeneratedQueries(data);
+    },
+    onError: (error) => {
+      displayError(error);
+    },
+  });
+
+  console.log({ aiGeneratedChart });
+
+  const _handleAcceptGeneratedQueries =() => {
+    const databaseChart = JSON.parse(aiGeneratedChart);
+    const databaseQueriesData =
+      databaseChart.output.databaseChartQueryMappings?.map((q) => ({
+        databaseQueryTitle: q.title,
+        databaseQueryData: {
+          databaseQueryString: q.databaseQueryString,
+          databaseQueryArgs: q.databaseQueryArgs,
+        },
+        runOnLoad: false,
+      }));
+    generateQueries({ databaseQueriesData });
+  };
+
+  const _handleOnChartConfigAccepted = useCallback(() => {
+    if(!generatedQueries || generatedQueries.length === 0)return;
+    const databaseChart = JSON.parse(aiGeneratedChart).output;
+    onAccepted({
+      databaseChartName: databaseChart.databaseChartTitle,
+      databaseChartType: databaseChart.databaseChartType,
+      databaseQueries: databaseChart.databaseChartQueryMappings.map((q,index) => ({
+        title: q.title,
+        databaseQueryID: generatedQueries[index].databaseQueryID,
+        parameters: q.parameters,
+        databaseQueryArgValues: q.databaseQueryArgValues,
+        datasetFields: q.datasetFields,
+      })),
+      databaseChartConfig: databaseChart.databaseChartConfig
+    });
+    setIsAIPromptDialogOpen(false);
+  }, [aiGeneratedChart,generatedQueries, onAccepted]);
 
   return (
     <>
@@ -94,7 +156,7 @@ export const DatabaseQueryAIGeneratePrompt = ({ tenantID, onAccepted }) => {
       >
         <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-indigo-500/30 via-purple-500/30 to-pink-400/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
         <FaMagic className="text-sm mr-1 animate-pulse" />
-        {CONSTANTS.STRINGS.DATABASE_QUERY_AI_PROMPT_BUTTON}
+        {CONSTANTS.STRINGS.DATABASE_CHART_AI_PROMPT_BUTTON}
       </button>
 
       <StyledDialog
@@ -107,7 +169,7 @@ export const DatabaseQueryAIGeneratePrompt = ({ tenantID, onAccepted }) => {
           },
         }}
         fullWidth
-        maxWidth="sm"
+        maxWidth="md"
       >
         {/* Sci-Fi Animated Background - Light Theme without lines */}
         <div
@@ -148,7 +210,6 @@ export const DatabaseQueryAIGeneratePrompt = ({ tenantID, onAccepted }) => {
               bottom: 0,
               background:
                 "linear-gradient(135deg, rgba(99, 102, 241, 0.03) 0%, rgba(168, 85, 247, 0.03) 100%)",
-
               transition: "opacity 0.5s ease",
             }}
           />
@@ -156,13 +217,13 @@ export const DatabaseQueryAIGeneratePrompt = ({ tenantID, onAccepted }) => {
 
         <StyledDialogTitle>
           <div className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 font-medium">
-            {CONSTANTS.STRINGS.DATABASE_QUERY_AI_PROMPT_FORM_TITLE}
+            {CONSTANTS.STRINGS.DATABASE_CHART_AI_PROMPT_FORM_TITLE}
           </div>
         </StyledDialogTitle>
 
         <StyledDialogContent>
           <span className="text-sm font-normal text-gray-600">
-            {CONSTANTS.STRINGS.DATABASE_QUERY_AI_PROMPT_FORM_DESCRIPTION}
+            {CONSTANTS.STRINGS.DATABASE_CHART_AI_PROMPT_FORM_DESCRIPTION}
           </span>
 
           <div className="space-y-4 mt-4">
@@ -175,17 +236,71 @@ export const DatabaseQueryAIGeneratePrompt = ({ tenantID, onAccepted }) => {
               onChange={(e) => setAiPrompt(e.target.value)}
               autoComplete="off"
               className="w-full rounded border border-indigo-200 p-2.5 text-sm text-gray-800 bg-white/70 backdrop-blur-md outline-none transition-all duration-200 shadow-sm focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/30 focus:shadow-indigo-500/30"
-              placeholder="Describe what you want to query..."
+              placeholder="Describe what you want to create..."
               style={{
                 backdropFilter: "blur(4px)",
                 boxShadow: "0 0 10px rgba(99, 102, 241, 0.1)",
               }}
             />
           </div>
+          {aiGeneratedChart &&
+            JSON.parse(aiGeneratedChart).output?.databaseChartQueryMappings && (
+              <>
+                <div className="w-full flex flex-row justify-between items-center mt-4 pl-0.5">
+                  <div className="flex flex-col w-full justify-start items-start">
+                    <span className="text-sm font-medium text-gray-600">
+                      {
+                        CONSTANTS.STRINGS
+                          .DATABASE_CHART_AI_PROMPT_GENERATED_QUERIES_TITLE
+                      }
+                    </span>
+                    <span className="text-xs font-light text-gray-500">
+                      {
+                        CONSTANTS.STRINGS
+                          .DATABASE_CHART_AI_PROMPT_GENERATED_QUERIES_DESCRIPTION
+                      }
+                    </span>
+                  </div>
+                  <button
+                    onClick={_handleAcceptGeneratedQueries}
+                    disabled={isGeneratingQueries}
+                    type="button"
+                    className="flex flex-row items-center bg-green-100 px-2 py-1 rounded"
+                  >
+                    {isGeneratingQueries ? (
+                      <CircularProgress
+                        className="!text-xs !text-green-500"
+                        size={18}
+                        
+                      />
+                    ) : (
+                      <>
+                        <FaCheck className="mr-2 h-3 w-3 text-green-500" />
+                        <span className="text-xs font-medium text-green-600">
+                          {
+                            CONSTANTS.STRINGS
+                              .DATABASE_CHART_AI_PROMPT_GENERATED_QUERIES_ACCEPT_BUTTON
+                          }
+                        </span>
+                      </>
+                    )}
+                  </button>
+                </div>
+                <div className="mt-1 transition-all duration-300">
+                  <CodeBlock
+                    code={JSON.stringify(
+                      JSON.parse(aiGeneratedChart).output
+                        .databaseChartQueryMappings
+                    )}
+                    language="json"
+                  />
+                </div>
+              </>
+            )}
 
-          {aiGeneratedQuery && (
+          {aiGeneratedChart && (
             <div className="mt-4 transition-all duration-300">
-              <CodeBlock code={aiGeneratedQuery} language="pgsql" />
+              <CodeBlock code={aiGeneratedChart} language="json" />
             </div>
           )}
         </StyledDialogContent>
@@ -202,11 +317,11 @@ export const DatabaseQueryAIGeneratePrompt = ({ tenantID, onAccepted }) => {
             {CONSTANTS.STRINGS.CHART_DATASET_CHART_DOWNLOAD_FORM_CANCEL}
           </button>
 
-          {aiGeneratedQuery && (
+          {aiGeneratedChart && (
             <button
               type="button"
               onClick={() => {
-                onAccepted(aiGeneratedQuery);
+                _handleOnChartConfigAccepted();
                 setIsAIPromptDialogOpen(false);
               }}
               className="px-2.5 py-1.5 text-sm text-white bg-emerald-500 rounded hover:bg-emerald-600 transition-all duration-200 flex items-center"
@@ -217,7 +332,7 @@ export const DatabaseQueryAIGeneratePrompt = ({ tenantID, onAccepted }) => {
               <span>
                 {
                   CONSTANTS.STRINGS
-                    .DATABASE_QUERY_AI_PROMPT_ACCEPT_FORM_CONFIRM_BUTTON
+                    .DATABASE_CHART_AI_PROMPT_ACCEPT_FORM_CONFIRM_BUTTON
                 }
               </span>
             </button>
@@ -240,13 +355,13 @@ export const DatabaseQueryAIGeneratePrompt = ({ tenantID, onAccepted }) => {
                 />
                 <span>Generating...</span>
               </div>
-            ) : aiGeneratedQuery ? (
+            ) : aiGeneratedChart ? (
               <div className="flex items-center">
                 <FaMagic className="mr-2" />
                 <span>
                   {
                     CONSTANTS.STRINGS
-                      .DATABASE_QUERY_AI_PROMPT_FORM_REGENERATE_BUTTON
+                      .DATABASE_CHART_AI_PROMPT_FORM_REGENERATE_BUTTON
                   }
                 </span>
               </div>
@@ -256,7 +371,7 @@ export const DatabaseQueryAIGeneratePrompt = ({ tenantID, onAccepted }) => {
                 <span>
                   {
                     CONSTANTS.STRINGS
-                      .DATABASE_QUERY_AI_PROMPT_FORM_GENERATE_BUTTON
+                      .DATABASE_CHART_AI_PROMPT_FORM_GENERATE_BUTTON
                   }
                 </span>
               </div>

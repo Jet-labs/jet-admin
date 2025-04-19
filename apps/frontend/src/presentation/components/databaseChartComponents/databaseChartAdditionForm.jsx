@@ -16,6 +16,7 @@ import {
 } from "../ui/resizable";
 import { DatabaseChartEditor } from "./databaseChartEditor";
 import { DatabaseChartPreview } from "./databaseChartPreview";
+import { DatabaseChartAIGeneratePrompt } from "./databaseChartAIGeneratePrompt";
 const initialValues = {
   databaseChartName: "",
   databaseChartType: CONSTANTS.DATABASE_CHART_TYPES.BAR_CHART.value,
@@ -131,19 +132,48 @@ export const DatabaseChartAdditionForm = ({ tenantID }) => {
     }
   }, [addDatabaseChartForm]);
 
+  const _handleOnChartConfigAccepted = useCallback((databaseChart) => {
+    addDatabaseChartForm.setFieldValue(
+      "databaseChartConfig",
+      databaseChart?.databaseChartConfig
+    );
+    addDatabaseChartForm.setFieldValue(
+      "databaseQueries",
+      databaseChart?.databaseQueries
+    );
+    addDatabaseChartForm.setFieldValue(
+      "databaseChartType",
+      databaseChart?.databaseChartType
+    );
+    addDatabaseChartForm.setFieldValue(
+      "databaseChartName",
+      databaseChart?.databaseChartName
+    );
+    _handleFetchDatabaseChartData();
+  }, []);
+
   console.log({ addDatabaseChartForm: addDatabaseChartForm?.values });
   return (
     <div className="w-full flex flex-col justify-start items-center h-full">
-      <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl text-start w-full p-3">
-        {CONSTANTS.STRINGS.ADD_CHART_FORM_TITLE}
-      </h1>
+      <div className="w-full p-3 border-b border-gray-200 flex flex-row justify-between items-center">
+        <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl text-start">
+          {CONSTANTS.STRINGS.ADD_CHART_FORM_TITLE}
+        </h1>
+        {tenantID && (
+          <DatabaseChartAIGeneratePrompt
+            tenantID={tenantID}
+            onAccepted={_handleOnChartConfigAccepted}
+            // onAccepted={() => {}}
+          />
+        )}
+      </div>
 
       <ResizablePanelGroup
         direction="horizontal"
         autoSaveId={
           CONSTANTS.RESIZABLE_PANEL_KEYS.CHART_ADDITION_FORM_RESULT_SEPARATION
         }
-        className={"!w-full !h-full border-t border-gray-200"}
+        className={"!w-full !h-full"}
       >
         <ResizablePanel defaultSize={20}>
           <form
