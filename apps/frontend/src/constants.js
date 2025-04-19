@@ -850,12 +850,20 @@ export const CONSTANTS = {
     API_KEY_ROLE_SELECTION_CANCEL: "Cancel",
     API_KEY_ROLE_SELECTION_SUBMIT: "Update roles",
 
-    ADD_CRON_JOB_BUTTON_TEXT: "Add scheduled job",
+    ADD_CRON_JOB_BUTTON_TEXT: "Add job",
 
     ADD_CRON_JOB_SUBMIT_BUTTON_TEXT: "Add scheduled job",
     ADD_CRON_JOB_FORM_TITLE: "Create new scheduled job",
+    UPDATE_CRON_JOB_FORM_TITLE: "Update scheduled job",
+    VIEW_CRON_JOB_HISTORY_TITLE: "Scheduled job history",
+    UPDATE_CRON_JOB_SUBMIT_BUTTON_TEXT: "Update job",
     CRON_JOB_ADDED_SUCCESS: "Scheduled job created successfully",
+    CRON_JOB_UPDATED_SUCCESS: "Scheduled job updated successfully",
     CRON_JOB_DELETED_SUCCESS: "Scheduled job deleted successfully",
+
+    DELETE_CRON_JOB_DIALOG_TITLE: "Delete scheduled job",
+    DELETE_CRON_JOB_DIALOG_MESSAGE:
+      "Are you sure you want to delete this item? This action cannot be undone.",
 
     CRON_JOB_EDITOR_FORM_TITLE_FIELD_LABEL: "Cron job title",
     CRON_JOB_EDITOR_FORM_TITLE_FIELD_PLACEHOLDER: "Your Cron job's title",
@@ -1099,8 +1107,14 @@ export const CONSTANTS = {
       path: (tenantID) => `/tenants/${tenantID}/cronjobs/add`,
     },
     UPDATE_CRON_JOB_BY_ID: {
-      code: "/tenants/:tenantID/cronjobs/:apiKeyID",
-      path: (tenantID, apiKeyID) => `/tenants/${tenantID}/cronjobs/${apiKeyID}`,
+      code: "/tenants/:tenantID/cronjobs/:cronJobID",
+      path: (tenantID, cronJobID) =>
+        `/tenants/${tenantID}/cronjobs/${cronJobID}`,
+    },
+    VIEW_CRON_JOB_HISTORY_BY_ID: {
+      code: "/tenants/:tenantID/cronjobs/:cronJobID/history",
+      path: (tenantID, cronJobID) =>
+        `/tenants/${tenantID}/cronjobs/${cronJobID}/history`,
     },
   },
 
@@ -1163,6 +1177,8 @@ export const CONSTANTS = {
       createCronJobAPI: (tenantID) => `/api/v1/tenants/${tenantID}/cronjobs/`,
       getCronJobByIDAPI: (tenantID, jobID) =>
         `/api/v1/tenants/${tenantID}/cronjobs/${jobID}`,
+      getCronJobHistoryByIDAPI: (tenantID, jobID, page, pageSize) =>
+        `/api/v1/tenants/${tenantID}/cronjobs/${jobID}/history?page=${page}&pageSize=${pageSize}`,
       updateCronJobByIDAPI: (tenantID, jobID) =>
         `/api/v1/tenants/${tenantID}/cronjobs/${jobID}`,
       updateCronJobRolesByIDAPI: (tenantID, jobID) =>
@@ -1455,6 +1471,20 @@ export const CONSTANTS = {
     BYTES: "Bytes",
     SINGLE_SELECT: "SINGLE_SELECT",
     MULTIPLE_SELECT: "MULTIPLE_SELECT",
+  },
+
+  CRON_JOB_HISTORY_COLUMN_TYPES: {
+    cronJobHistoryID: "number",
+    cronJobID: "number",
+    status: "string",
+    scheduledAt: "date",
+    startTime: "date",
+    endTime: "date",
+    durationMs: "number",
+    result: "object",
+    triggerType: "string",
+    createdAt: "date",
+    updatedAt: "date",
   },
 
   JS_DATA_TYPES: {

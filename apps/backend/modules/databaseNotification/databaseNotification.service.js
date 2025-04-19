@@ -19,22 +19,25 @@ databaseNotificationService.getAllDatabaseNotifications = async ({
   });
 
   try {
-    const databaseNotifications = await prisma.tblDatabaseNotifications.findMany({
-      where: {
-        tenantID: parseInt(tenantID),
-      },
-    });
+    const databaseNotifications =
+      await prisma.tblDatabaseNotifications.findMany({
+        where: {
+          tenantID: parseInt(tenantID),
+        },
+      });
 
     Logger.log("success", {
-      message: "databaseNotificationService:getAllDatabaseNotifications:success",
+      message:
+        "databaseNotificationService:getAllDatabaseNotifications:success",
       params: { userID, databaseNotifications },
     });
 
     return databaseNotifications;
   } catch (error) {
     Logger.log("error", {
-      message: "databaseNotificationService:getAllDatabaseNotifications:failure",
-      params: { userID, error: error.message },
+      message:
+        "databaseNotificationService:getAllDatabaseNotifications:failure",
+      params: { userID, error },
     });
     throw error;
   }
@@ -74,7 +77,7 @@ databaseNotificationService.createDatabaseNotification = async ({
   } catch (error) {
     Logger.log("error", {
       message: "databaseNotificationService:createDatabaseNotification:failure",
-      params: { userID, error: error.message },
+      params: { userID, error },
     });
     throw error;
   }
@@ -98,27 +101,30 @@ databaseNotificationService.getDatabaseNotificationByID = async ({
   });
 
   try {
-    const databaseNotification = await prisma.tblDatabaseNotifications.findFirst({
-      where: {
-        databaseNotificationID: parseInt(databaseNotificationID),
-        tenantID: parseInt(tenantID),
-      },
-    });
+    const databaseNotification =
+      await prisma.tblDatabaseNotifications.findFirst({
+        where: {
+          databaseNotificationID: parseInt(databaseNotificationID),
+          tenantID: parseInt(tenantID),
+        },
+      });
 
     if (!databaseNotification) {
       throw new Error("Notification not found");
     }
 
     Logger.log("success", {
-      message: "databaseNotificationService:getDatabaseNotificationByID:success",
+      message:
+        "databaseNotificationService:getDatabaseNotificationByID:success",
       params: { userID, databaseNotification },
     });
 
     return databaseNotification;
   } catch (error) {
     Logger.log("error", {
-      message: "databaseNotificationService:getDatabaseNotificationByID:failure",
-      params: { userID, error: error.message },
+      message:
+        "databaseNotificationService:getDatabaseNotificationByID:failure",
+      params: { userID, error },
     });
     throw error;
   }
@@ -185,7 +191,7 @@ databaseNotificationService.updateDatabaseNotificationByID = async ({
         userID,
         tenantID,
         databaseNotificationID,
-        error: error.message,
+        error,
       },
     });
     throw error;
@@ -205,7 +211,8 @@ databaseNotificationService.deleteDatabaseNotificationByID = async ({
   databaseNotificationID,
 }) => {
   Logger.log("info", {
-    message: "databaseNotificationService:deleteDatabaseNotificationByID:params",
+    message:
+      "databaseNotificationService:deleteDatabaseNotificationByID:params",
     params: { userID, tenantID, databaseNotificationID },
   });
 
@@ -218,15 +225,17 @@ databaseNotificationService.deleteDatabaseNotificationByID = async ({
     });
 
     Logger.log("success", {
-      message: "databaseNotificationService:deleteDatabaseNotificationByID:success",
+      message:
+        "databaseNotificationService:deleteDatabaseNotificationByID:success",
       params: { userID, databaseNotificationID },
     });
 
     return true;
   } catch (error) {
     Logger.log("error", {
-      message: "databaseNotificationService:deleteDatabaseNotificationByID:failure",
-      params: { userID, error: error.message },
+      message:
+        "databaseNotificationService:deleteDatabaseNotificationByID:failure",
+      params: { userID, error },
     });
     throw error;
   }

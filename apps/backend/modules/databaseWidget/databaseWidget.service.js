@@ -42,7 +42,7 @@ databaseWidgetService.getAllDatabaseWidgets = async ({ userID, tenantID }) => {
       message: "databaseWidgetService:getAllDatabaseWidgets:failure",
       params: {
         userID,
-        error: error.message,
+        error,
       },
     });
     throw error;
@@ -123,7 +123,7 @@ databaseWidgetService.createDatabaseWidget = async ({
       message: "databaseWidgetService:createDatabaseWidget:failure",
       params: {
         userID,
-        error: error.message,
+        error,
       },
     });
     throw error;
@@ -175,7 +175,7 @@ databaseWidgetService.getDatabaseWidgetByID = async ({
       message: "databaseWidgetService:getDatabaseWidgetByID:failure",
       params: {
         userID,
-        error: error.message,
+        error,
       },
     });
     throw error;
@@ -299,7 +299,7 @@ databaseWidgetService.getDatabaseWidgetDataByID = async ({
       "error",
       "databaseWidgetService:getDatabaseWidgetDataByID:error",
       {
-        error: error.message,
+        error,
         databaseWidgetID,
         userID,
       }
@@ -423,7 +423,7 @@ databaseWidgetService.getDatabaseWidgetDataUsingDatabaseWidget = async ({
       message:
         "databaseWidgetService:getDatabaseWidgetDataUsingDatabaseWidget:catch-1",
       params: {
-        error: error.message,
+        error,
         userID,
       },
     });
@@ -544,7 +544,7 @@ databaseWidgetService.updateDatabaseWidgetByID = async ({
       params: {
         databaseWidgetID,
         userID,
-        error: error.message,
+        error,
       },
     });
     throw error;
@@ -563,7 +563,6 @@ databaseWidgetService.deleteDatabaseWidgetByID = async ({
   userID,
   tenantID,
   databaseWidgetID,
-  
 }) => {
   Logger.log("info", {
     message: "databaseWidgetService:deleteDatabaseWidgetByID:params",
@@ -600,7 +599,7 @@ databaseWidgetService.deleteDatabaseWidgetByID = async ({
         userID,
         tenantID,
         databaseWidgetID,
-        error: error.message,
+        error,
       },
     });
     throw error;

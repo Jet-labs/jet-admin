@@ -113,6 +113,10 @@ const UpdateAPIKeyPage = lazy(() => import("../../pages/updateAPIKeyPage"));
 
 const RawSqlQueryPage = lazy(() => import("../../pages/rawSqlQueryPage"));
 const AddCronJobPage = lazy(() => import("../../pages/addCronJobPage"));
+const UpdateCronJobPage = lazy(() => import("../../pages/updateCronJobPage"));
+const ViewCronJobHistoryPage = lazy(() =>
+  import("../../pages/viewCronJobHistoryPage")
+);
 
 const router = createBrowserRouter([
   {
@@ -290,13 +294,15 @@ const router = createBrowserRouter([
               },
               {
                 path: CONSTANTS.ROUTES.ADD_CRON_JOB.code,
-                element: () => {
-                  <div className="text-slate-700">placeholder</div>;
-                },
+                element: <AddCronJobPage />,
               },
               {
                 path: CONSTANTS.ROUTES.UPDATE_CRON_JOB_BY_ID.code,
-                element: <UpdateAPIKeyPage />,
+                element: <UpdateCronJobPage />,
+              },
+              {
+                path: CONSTANTS.ROUTES.VIEW_CRON_JOB_HISTORY_BY_ID.code,
+                element: <ViewCronJobHistoryPage />,
               },
             ],
           },

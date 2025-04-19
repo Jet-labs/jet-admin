@@ -4,6 +4,7 @@ const constants = require("./constants");
 const { expressApp } = require("./config/express-app.config");
 const { httpServer } = require("./config/http-server.config");
 const Logger = require("./utils/logger");
+const { cronJobService } = require("./modules/cronJob/cronJob.service");
 
 // Middleware setup
 expressApp.use(cookieParser());
@@ -44,6 +45,7 @@ httpServer.listen(port, () => {
     message: "server started listening",
     params: { port },
   });
+  cronJobService.scheduleAllCronJobs();
 });
 
 // Graceful shutdown

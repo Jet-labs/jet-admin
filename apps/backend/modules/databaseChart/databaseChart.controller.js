@@ -204,7 +204,7 @@ databaseChartController.getDatabaseChartDataByID = async (req, res) => {
       "error",
       "databaseChartController:getDatabaseChartDataByID:catch-1",
       {
-        error: error.message,
+        error,
         stack: error.stack,
         params: { databaseChartID, userID: user.userID },
       }
@@ -268,7 +268,7 @@ databaseChartController.getDatabaseChartDataUsingDatabaseChart = async (
       message:
         "databaseChartController:getDatabaseChartDataUsingDatabaseChart:catch-1",
       params: {
-        error: error.message,
+        error,
         stack: error.stack,
         params: { databaseChart, userID: user.userID },
       },

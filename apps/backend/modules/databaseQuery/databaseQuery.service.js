@@ -63,7 +63,7 @@ databaseQueryService.getAllDatabaseQueries = async ({ userID, tenantID }) => {
       message: "databaseQueryService:getAllDatabaseQueries:failure",
       params: {
         userID,
-        error: error.message,
+        error,
       },
     });
     throw error;
@@ -127,7 +127,7 @@ databaseQueryService.createDatabaseQuery = async ({
       message: "databaseQueryService:createDatabaseQuery:failure",
       params: {
         userID,
-        error: error.message,
+        error,
       },
     });
     throw error;
@@ -438,7 +438,7 @@ databaseQueryService.getDatabaseQueryByID = async ({
       message: "databaseQueryService:getDatabaseQueryByID:failure",
       params: {
         userID,
-        error: error.message,
+        error,
       },
     });
     throw error;
@@ -570,7 +570,7 @@ databaseQueryService.deleteDatabaseQueryByID = async ({
         userID,
         tenantID,
         databaseQueryID,
-        error: error.message,
+        error,
       },
     });
     throw error;

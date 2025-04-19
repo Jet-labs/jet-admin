@@ -49,7 +49,7 @@ databaseTableService.getAllDatabaseTables = async ({
   } catch (error) {
     Logger.log("error", {
       message: "databaseTableService:getAllDatabaseTables:catch-1",
-      params: { userID, databaseSchemaName, error: error.message },
+      params: { userID, databaseSchemaName, error },
     });
     throw error;
   }
@@ -100,7 +100,7 @@ databaseTableService.getDatabaseTableColumns = async ({
   } catch (error) {
     Logger.log("error", {
       message: "databaseTableService:getDatabaseTableColumns:catch-1",
-      params: { userID, databaseSchemaName, error: error.message },
+      params: { userID, databaseSchemaName, error },
     });
     throw error;
   }
@@ -154,7 +154,7 @@ databaseTableService.getDatabaseTableByName = async ({
         userID,
         databaseSchemaName,
         databaseTableName,
-        error: error.message,
+        error,
       },
     });
     throw error;
@@ -254,7 +254,7 @@ databaseTableService.getDatabaseTableRows = async ({
         orderBy,
         skip,
         take,
-        error: error.message,
+        error,
       },
     });
     throw error;
@@ -325,7 +325,7 @@ databaseTableService.getDatabaseTableStatistics = async ({
         databaseSchemaName,
         databaseTableName,
         filter,
-        error: error.message,
+        error,
       },
     });
     throw error;
@@ -415,7 +415,7 @@ databaseTableService.databaseTableBulkRowAddition = async ({
         userID,
         databaseSchemaName,
         databaseTableName,
-        error: error.message,
+        error,
       },
     });
     throw error;
@@ -499,7 +499,7 @@ databaseTableService.databaseTableBulkRowUpdate = async ({
         userID,
         databaseSchemaName,
         databaseTableName,
-        error: error.message,
+        error,
       },
     });
     throw error;
@@ -571,7 +571,7 @@ databaseTableService.databaseTableBulkRowDelete = async ({
         userID,
         databaseSchemaName,
         databaseTableName,
-        error: error.message,
+        error,
       },
     });
     throw error;
@@ -670,7 +670,7 @@ databaseTableService.databaseTableBulkRowExport = async ({
         userID,
         databaseSchemaName,
         databaseTableName,
-        error: error.message,
+        error,
       },
     });
     throw error;
@@ -734,7 +734,7 @@ databaseTableService.createDatabaseTable = async ({
         userID,
         databaseSchemaName,
         databaseTableData,
-        error: error.message,
+        error,
       },
     });
     throw error;
@@ -848,7 +848,7 @@ databaseTableService.updateDatabaseTableByName = async ({
         databaseSchemaName,
         databaseTableName,
         updatedTableData,
-        error: error.message,
+        error,
       },
     });
     throw error;
@@ -904,7 +904,7 @@ databaseTableService.deleteDatabaseTable = async ({
         userID,
         databaseSchemaName,
         databaseTableName,
-        error: error.message,
+        error,
       },
     });
     throw error;

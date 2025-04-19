@@ -46,7 +46,7 @@ databaseTriggerService.getAllDatabaseTriggers = async ({
   } catch (error) {
     Logger.log("error", {
       message: "databaseTriggerService:getAllDatabaseTriggers:catch-1",
-      params: { userID, databaseSchemaName, error: error.message },
+      params: { userID, databaseSchemaName, error },
     });
     throw error;
   }
@@ -101,7 +101,7 @@ databaseTriggerService.getDatabaseTriggerByName = async ({
         userID,
         databaseSchemaName,
         databaseTriggerName,
-        error: error.message,
+        error,
       },
     });
     throw error;
@@ -154,7 +154,7 @@ databaseTriggerService.deleteDatabaseTriggerByName = async ({
         userID,
         databaseSchemaName,
         databaseTriggerName,
-        error: error.message,
+        error,
       },
     });
     throw error;
@@ -249,7 +249,7 @@ databaseTriggerService.createDatabaseTrigger = async ({
         userID,
         databaseSchemaName,
         databaseTriggerName,
-        error: error.message,
+        error,
       },
     });
     throw error;

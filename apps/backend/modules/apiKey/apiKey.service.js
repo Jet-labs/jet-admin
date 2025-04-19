@@ -10,10 +10,7 @@ const apiKeyService = {};
  * @param {number} param0.tenantID
  * @returns {Promise<Array<object>>}
  */
-apiKeyService.getAllAPIKeys = async ({
-  userID,
-  tenantID,
-}) => {
+apiKeyService.getAllAPIKeys = async ({ userID, tenantID }) => {
   Logger.log("info", {
     message: "apiKeyService:getAllAPIKeys:params",
     params: { userID, tenantID },
@@ -35,7 +32,7 @@ apiKeyService.getAllAPIKeys = async ({
   } catch (error) {
     Logger.log("error", {
       message: "apiKeyService:getAllAPIKeys:failure",
-      params: { userID, error: error.message },
+      params: { userID, error },
     });
     throw error;
   }
@@ -86,7 +83,6 @@ apiKeyService.createAPIKey = async ({
 
       return apiKey;
     });
-    
 
     Logger.log("success", {
       message: "apiKeyService:createAPIKey:success",
@@ -97,7 +93,7 @@ apiKeyService.createAPIKey = async ({
   } catch (error) {
     Logger.log("error", {
       message: "apiKeyService:createAPIKey:failure",
-      params: { userID, error: error.message },
+      params: { userID, error },
     });
     throw error;
   }
@@ -110,11 +106,7 @@ apiKeyService.createAPIKey = async ({
  * @param {number} param0.apiKeyID
  * @returns {Promise<object>}
  */
-apiKeyService.getAPIKeyByID = async ({
-  userID,
-  tenantID,
-  apiKeyID,
-}) => {
+apiKeyService.getAPIKeyByID = async ({ userID, tenantID, apiKeyID }) => {
   Logger.log("info", {
     message: "apiKeyService:getAPIKeyByID:params",
     params: { userID, tenantID, apiKeyID },
@@ -144,7 +136,7 @@ apiKeyService.getAPIKeyByID = async ({
   } catch (error) {
     Logger.log("error", {
       message: "apiKeyService:getAPIKeyByID:failure",
-      params: { userID, error: error.message },
+      params: { userID, error },
     });
     throw error;
   }
@@ -169,7 +161,7 @@ apiKeyService.updateAPIKeyByID = async ({
   apiKeyID,
   apiKeyName,
   roleIDs,
-  isDisabled
+  isDisabled,
 }) => {
   Logger.log("info", {
     message: "apiKeyService:updateAPIKeyByID:params",
@@ -219,7 +211,7 @@ apiKeyService.updateAPIKeyByID = async ({
         // Create new mappings
         if (roleIDs.length > 0) {
           const newMappings = roleIDs.map((roleID) => ({
-            roleID:parseInt(roleID),
+            roleID: parseInt(roleID),
             apiKeyID,
           }));
 
@@ -247,13 +239,12 @@ apiKeyService.updateAPIKeyByID = async ({
     return true;
   } catch (error) {
     Logger.log("error", {
-      message:
-        "apiKeyService:updateAPIKeyByID:failure",
+      message: "apiKeyService:updateAPIKeyByID:failure",
       params: {
         userID,
         tenantID,
         apiKeyID,
-        error: error.message,
+        error,
       },
     });
     throw error;
@@ -267,11 +258,7 @@ apiKeyService.updateAPIKeyByID = async ({
  * @param {number} param0.apiKeyID
  * @returns {Promise<boolean>}
  */
-apiKeyService.deleteAPIKeyByID = async ({
-  userID,
-  tenantID,
-  apiKeyID,
-}) => {
+apiKeyService.deleteAPIKeyByID = async ({ userID, tenantID, apiKeyID }) => {
   Logger.log("info", {
     message: "apiKeyService:deleteAPIKeyByID:params",
     params: { userID, tenantID, apiKeyID },
@@ -313,7 +300,7 @@ apiKeyService.deleteAPIKeyByID = async ({
   } catch (error) {
     Logger.log("error", {
       message: "apiKeyService:deleteAPIKeyByID:failure",
-      params: { userID, error: error.message },
+      params: { userID, error },
     });
     throw error;
   }

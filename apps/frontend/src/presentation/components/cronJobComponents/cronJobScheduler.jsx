@@ -16,7 +16,7 @@ export const CronJobScheduler = ({
   const [humanize, setHumanize] = useState(true);
 
   return (
-    <div className="w-full border border-slate-200 rounded-md">
+    <div className="w-full border border-slate-300 rounded-md">
       {/* Humanize Toggle */}
       <div className="p-3 w-full">
         <label className="flex items-center space-x-3 text-sm font-medium">

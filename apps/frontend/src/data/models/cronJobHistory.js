@@ -1,24 +1,24 @@
 export class CronJobHistory {
   constructor({
-    jobHistoryID,
-    jobID,
+    cronJobHistoryID,
+    cronJobID,
     status,
     scheduledAt,
     startTime,
     endTime,
     durationMs,
-    output,
+    result,
     triggerType,
     createdAt,
   }) {
-    this.jobHistoryID = jobHistoryID;
-    this.jobID = jobID;
+    this.cronJobHistoryID = cronJobHistoryID;
+    this.cronJobID = cronJobID;
     this.status = status;
     this.scheduledAt = scheduledAt;
     this.startTime = startTime;
     this.endTime = endTime;
     this.durationMs = durationMs;
-    this.output = output;
+    this.result = result;
     this.triggerType = triggerType;
     this.createdAt = createdAt;
   }

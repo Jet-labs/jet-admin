@@ -171,11 +171,15 @@ databaseWidgetController.getDatabaseWidgetDataByID = async (req, res) => {
   const { user, dbPool } = req;
   const { tenantID, databaseWidgetID } = req.params;
 
-  Logger.log("info", "databaseWidgetController:getDatabaseWidgetDataByID:init", {
-    userID: user.userID,
-    tenantID,
-    databaseWidgetID,
-  });
+  Logger.log(
+    "info",
+    "databaseWidgetController:getDatabaseWidgetDataByID:init",
+    {
+      userID: user.userID,
+      tenantID,
+      databaseWidgetID,
+    }
+  );
 
   try {
     const databaseWidgetData =
@@ -204,7 +208,7 @@ databaseWidgetController.getDatabaseWidgetDataByID = async (req, res) => {
       "error",
       "databaseWidgetController:getDatabaseWidgetDataByID:catch-1",
       {
-        error: error.message,
+        error,
         stack: error.stack,
         params: { databaseWidgetID, userID: user.userID },
       }
@@ -268,7 +272,7 @@ databaseWidgetController.getDatabaseWidgetDataUsingDatabaseWidget = async (
       message:
         "databaseWidgetController:getDatabaseWidgetDataUsingDatabaseWidget:catch-1",
       params: {
-        error: error.message,
+        error,
         stack: error.stack,
         params: { databaseWidget, userID: user.userID },
       },

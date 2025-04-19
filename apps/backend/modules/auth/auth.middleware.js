@@ -216,7 +216,7 @@ authMiddleware.checkUserPermissions = (
     } catch (error) {
       Logger.log("error", {
         message: "authMiddleware:checkUserPermissions:catch-1",
-        params: { error: error.message },
+        params: { error },
       });
       return expressUtils.sendResponse(
         res,

@@ -135,7 +135,7 @@ aiService.generateAIPromptBasedQuery = async ({ aiPrompt }) => {
       message: "aiService:generateAIPromptBasedQuery:failure",
       params: {
         aiPromptLength: aiPrompt?.length,
-        error: error.message,
+        error,
       },
     });
     // Re-throw the original error or a more user-friendly one

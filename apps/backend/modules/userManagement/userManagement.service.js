@@ -167,7 +167,7 @@ userManagementService.getAllTenantUsers = async ({
       params: {
         userID,
         tenantID,
-        error: error.message,
+        error,
       },
     });
     throw error;
@@ -241,7 +241,7 @@ userManagementService.getTenantUserByID = async ({
   } catch (error) {
     Logger.log("error", {
       message: "userManagementService:getTenantUserByID:catch-1",
-      params: { userID, tenantUserID, tenantID, error: error.message },
+      params: { userID, tenantUserID, tenantID, error },
     });
     throw error;
   }
@@ -413,7 +413,7 @@ userManagementService.updateTenantUserRolesByID = async ({
         tenantID,
         roleIDs,
         userTenantRelationship,
-        error: error.message,
+        error,
       },
     });
     throw error;
@@ -497,7 +497,7 @@ userManagementService.removeTenantUserFromTenantByID = async ({
   } catch (error) {
     Logger.log("error", {
       message: "userManagementService:removeTenantUserFromTenantByID:catch-1",
-      params: { userID, tenantUserID, tenantID, error: error.message },
+      params: { userID, tenantUserID, tenantID, error },
     });
     throw error;
   }

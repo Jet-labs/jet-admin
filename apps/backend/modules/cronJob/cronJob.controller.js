@@ -106,12 +106,16 @@ cronJobController.getAllCronJobs = async (req, res) => {
 
     const cronJobs = await cronJobService.getAllCronJobs({
       userID: parseInt(user.userID),
-      tenantID
+      tenantID,
     });
 
     Logger.log("success", {
       message: "cronJobController:getAllCronJobs:success",
-      params: { userID: user.userID,tenantID, cronJobsLength: cronJobs.length },
+      params: {
+        userID: user.userID,
+        tenantID,
+        cronJobsLength: cronJobs.length,
+      },
     });
 
     return expressUtils.sendResponse(res, true, {
@@ -121,7 +125,7 @@ cronJobController.getAllCronJobs = async (req, res) => {
   } catch (error) {
     Logger.log("error", {
       message: "cronJobController:getAllCronJobs:catch-1",
-      params: { userID: req.user?.userID, error: error.message },
+      params: { userID: req.user?.userID, error },
     });
     return expressUtils.sendResponse(
       res,
@@ -140,22 +144,22 @@ cronJobController.getAllCronJobs = async (req, res) => {
 cronJobController.getCronJobByID = async (req, res) => {
   try {
     const { user } = req;
-    const {tenantID, cronJobID } = req.params;
+    const { tenantID, cronJobID } = req.params;
     Logger.log("info", {
       message: "cronJobController:getCronJobByID:params",
-      params: { userID: user.userID,tenantID, cronJobID },
+      params: { userID: user.userID, tenantID, cronJobID },
     });
 
     const cronJob = await cronJobService.getCronJobByID({
       userID: parseInt(user.userID),
-      tenantID:parseInt(tenantID),
+      tenantID: parseInt(tenantID),
       cronJobID: parseInt(cronJobID),
     });
 
     if (!cronJob) {
       Logger.log("warn", {
         message: "cronJobController:getCronJobByID:notfound",
-        params: { userID: user.userID,tenantID, cronJobID },
+        params: { userID: user.userID, tenantID, cronJobID },
       });
       return expressUtils.sendResponse(
         res,
@@ -181,7 +185,7 @@ cronJobController.getCronJobByID = async (req, res) => {
       params: {
         userID: req.user?.userID,
         cronJobID: req.params.cronJobID,
-        error: error.message,
+        error,
       },
     });
     return expressUtils.sendResponse(
@@ -201,12 +205,13 @@ cronJobController.getCronJobByID = async (req, res) => {
 cronJobController.updateCronJobByID = async (req, res) => {
   try {
     const { user } = req;
-    const { jobID } = req.params;
+    const { tenantID, cronJobID } = req.params;
     // Get only the fields allowed for update from the body
     const {
-      title,
-      description,
-      cronSchedule,
+      cronJobTitle,
+      cronJobDescription,
+      cronJobSchedule,
+      databaseQueryID,
       isDisabled,
       timeoutSeconds,
       retryAttempts,
@@ -215,9 +220,10 @@ cronJobController.updateCronJobByID = async (req, res) => {
     } = req.body;
 
     const updateData = {
-      title,
-      description,
-      cronSchedule,
+      cronJobTitle,
+      cronJobDescription,
+      cronJobSchedule,
+      databaseQueryID: parseInt(databaseQueryID),
       isDisabled,
       timeoutSeconds,
       retryAttempts,
@@ -228,21 +234,21 @@ cronJobController.updateCronJobByID = async (req, res) => {
       (key) => updateData[key] === undefined && delete updateData[key]
     );
 
-    const logParams = { userID: user.userID, jobID, updateData };
     Logger.log("info", {
       message: "cronJobController:updateCronJobByID:params",
-      params: logParams,
+      params: { userID: user.userID, tenantID, cronJobID, updateData },
     });
 
     const updatedCronJob = await cronJobService.updateCronJobByID({
       userID: parseInt(user.userID),
-      jobID: parseInt(jobID),
+      tenantID: parseInt(tenantID),
+      cronJobID: parseInt(cronJobID),
       updateData,
     });
 
     Logger.log("success", {
       message: "cronJobController:updateCronJobByID:success",
-      params: logParams,
+      params: { userID: user.userID, tenantID, cronJobID, updateData },
     });
 
     return expressUtils.sendResponse(res, true, {
@@ -254,8 +260,8 @@ cronJobController.updateCronJobByID = async (req, res) => {
       message: "cronJobController:updateCronJobByID:catch-1",
       params: {
         userID: req.user?.userID,
-        jobID: req.params.jobID,
-        error: error.message,
+        cronJobID: req.params.cronJobID,
+        error,
       },
     });
     // Check for specific errors from service
@@ -282,20 +288,21 @@ cronJobController.updateCronJobByID = async (req, res) => {
 cronJobController.deleteCronJobByID = async (req, res) => {
   try {
     const { user } = req;
-    const { jobID } = req.params;
+    const { tenantID, cronJobID } = req.params;
     Logger.log("info", {
       message: "cronJobController:deleteCronJobByID:params",
-      params: { userID: user.userID, jobID },
+      params: { userID: user.userID, tenantID, cronJobID },
     });
 
     await cronJobService.deleteCronJobByID({
       userID: parseInt(user.userID),
-      jobID: parseInt(jobID),
+      tenantID: parseInt(tenantID),
+      cronJobID: parseInt(cronJobID),
     });
 
     Logger.log("success", {
       message: "cronJobController:deleteCronJobByID:success",
-      params: { userID: user.userID, jobID },
+      params: { userID: user.userID, tenantID, cronJobID },
     });
 
     return expressUtils.sendResponse(res, true, {
@@ -306,14 +313,10 @@ cronJobController.deleteCronJobByID = async (req, res) => {
       message: "cronJobController:deleteCronJobByID:catch-1",
       params: {
         userID: req.user?.userID,
-        jobID: req.params.jobID,
-        error: error.message,
+        cronJobID: req.params.cronJobID,
+        error,
       },
     });
-    // Check for specific errors from service
-    if (error.message.includes("not found")) {
-      return expressUtils.sendResponse(res, false, {}, error.message, 404);
-    }
     return expressUtils.sendResponse(
       res,
       false,
@@ -330,45 +333,58 @@ cronJobController.deleteCronJobByID = async (req, res) => {
  * @param {import("express").Request} req
  * @param {import("express").Response} res
  */
-cronJobController.getJobHistoryByJobID = async (req, res) => {
+cronJobController.getCronJobHistoryByID = async (req, res) => {
   try {
     const { user } = req;
-    const { jobID } = req.params;
+    const { cronJobID, tenantID } = req.params;
     const { page = 1, pageSize = 20 } = req.query; // Get pagination from query params
 
-    const logParams = { userID: user.userID, jobID, page, pageSize };
+    const take = pageSize ? parseInt(pageSize) : constants.ROW_PAGE_SIZE;
+    const skip =
+      page && parseInt(page) > 0 ? (parseInt(page) - 1) * take : undefined;
+
     Logger.log("info", {
-      message: "cronJobController:getJobHistoryByJobID:params",
-      params: logParams,
+      message: "cronJobController:getCronJobHistoryByID:params",
+      params: { userID: user.userID, tenantID, cronJobID, page, pageSize },
     });
 
-    const result = await cronJobService.getJobHistoryByJobID({
-      userID: parseInt(user.userID),
-      jobID: parseInt(jobID),
-      page: parseInt(page),
-      pageSize: parseInt(pageSize),
-    });
+    const { cronJobHistory, cronJobHistoryCount } =
+      await cronJobService.getCronJobHistoryByID({
+        userID: parseInt(user.userID),
+        cronJobID: parseInt(cronJobID),
+        tenantID: parseInt(tenantID),
+        skip,
+        take,
+      });
 
     Logger.log("success", {
-      message: "cronJobController:getJobHistoryByJobID:success",
+      message: "cronJobController:getCronJobHistoryByID:success",
       params: {
-        ...logParams,
-        count: result.history.length,
-        totalCount: result.totalCount,
+        userID: user.userID,
+        tenantID,
+        cronJobID,
+        skip,
+        take,
+        cronJobHistoryLength: cronJobHistory.length,
+        cronJobHistoryCount,
       },
     });
 
     return expressUtils.sendResponse(res, true, {
-      ...result, // includes history, totalCount, page, pageSize
-      message: "Cron job history fetched successfully.",
+      cronJobHistory,
+      cronJobHistoryCount,
+      nextPage:
+        cronJobHistory?.length < take
+          ? null
+          : Math.floor((skip + take) / take) + 1,
     });
   } catch (error) {
     Logger.log("error", {
-      message: "cronJobController:getJobHistoryByJobID:catch-1",
+      message: "cronJobController:getCronJobHistoryByID:catch-1",
       params: {
         userID: req.user?.userID,
-        jobID: req.params.jobID,
-        error: error.message,
+        cronJobID: req.params.cronJobID,
+        error,
       },
     });
     return expressUtils.sendResponse(

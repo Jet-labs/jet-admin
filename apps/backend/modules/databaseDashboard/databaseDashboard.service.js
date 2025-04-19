@@ -26,7 +26,6 @@ databaseDashboardService.getAllDatabaseDashboards = async ({
       where: {
         tenantID: parseInt(tenantID),
       },
-     
     });
     Logger.log("success", {
       message: "databaseDashboardService:getAllDatabaseDashboards:success",
@@ -41,7 +40,7 @@ databaseDashboardService.getAllDatabaseDashboards = async ({
       message: "databaseDashboardService:getAllDatabaseDashboards:failure",
       params: {
         userID,
-        error: error.message,
+        error,
       },
     });
     throw error;
@@ -114,7 +113,7 @@ databaseDashboardService.createDatabaseDashboard = async ({
       message: "databaseDashboardService:createDatabaseDashboard:failure",
       params: {
         userID,
-        error: error.message,
+        error,
       },
     });
     throw error;
@@ -166,7 +165,7 @@ databaseDashboardService.getDatabaseDashboardByID = async ({
       message: "databaseDashboardService:getDatabaseDashboardByID:failure",
       params: {
         userID,
-        error: error.message,
+        error,
       },
     });
     throw error;
@@ -228,7 +227,9 @@ databaseDashboardService.updateDatabaseDashboardByID = async ({
           ...(databaseDashboardDescription != undefined && {
             databaseDashboardDescription,
           }),
-          ...(databaseDashboardConfig != undefined && { databaseDashboardConfig }),
+          ...(databaseDashboardConfig != undefined && {
+            databaseDashboardConfig,
+          }),
         },
       });
     });
@@ -251,7 +252,7 @@ databaseDashboardService.updateDatabaseDashboardByID = async ({
       params: {
         databaseDashboardID,
         userID,
-        error: error.message,
+        error,
       },
     });
     throw error;
@@ -270,7 +271,6 @@ databaseDashboardService.deleteDatabaseDashboardByID = async ({
   userID,
   tenantID,
   databaseDashboardID,
-  
 }) => {
   Logger.log("info", {
     message: "databaseDashboardService:deleteDatabaseDashboardByID:params",
@@ -307,7 +307,7 @@ databaseDashboardService.deleteDatabaseDashboardByID = async ({
         userID,
         tenantID,
         databaseDashboardID,
-        error: error.message,
+        error,
       },
     });
     throw error;

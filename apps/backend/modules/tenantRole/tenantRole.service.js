@@ -64,7 +64,7 @@ tenantRoleService.createRole = async ({
     Logger.log("error", {
       message: "tenantRoleService:createRole:failure",
       params: {
-        error: error.message,
+        error,
         details: error?.meta?.cause || "Unknown database error", // Enhanced error logging
       },
     });
@@ -165,7 +165,7 @@ tenantRoleService.updateTenantRoleByID = async ({
     Logger.log("error", {
       message: "tenantRoleService:updateTenantRoleByID:failure",
       params: {
-        error: error.message,
+        error,
         details: error?.meta?.cause || "Update failed",
       },
     });
@@ -210,7 +210,7 @@ tenantRoleService.getAllTenantRoles = async ({ userID, tenantID }) => {
   } catch (error) {
     Logger.log("error", {
       message: "tenantRoleService:getAllTenantRoles:failure",
-      params: { error: error.message },
+      params: { error },
     });
     throw error;
   }
@@ -238,7 +238,7 @@ tenantRoleService.getAllTenantPermissions = async ({ userID, tenantID }) => {
   } catch (error) {
     Logger.log("error", {
       message: "tenantRoleService:getAllTenantPermissions:failure",
-      params: { error: error.message },
+      params: { error },
     });
     throw error;
   }
@@ -277,7 +277,7 @@ tenantRoleService.getTenantRoleByID = async (roleID) => {
   } catch (error) {
     Logger.log("error", {
       message: "tenantRoleService:getTenantRoleByID:failure",
-      params: { error: error.message },
+      params: { error },
     });
     throw error;
   }
@@ -336,7 +336,7 @@ tenantRoleService.deleteTenantRoleByID = async ({ tenantID, roleID }) => {
   } catch (error) {
     Logger.log("error", {
       message: "tenantRoleService:deleteTenantRoleByID:failure",
-      params: { error: error.message },
+      params: { error },
     });
     throw error;
   }

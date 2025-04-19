@@ -108,7 +108,7 @@ notificationService.getAllUserNotifications = async ({
       message: "notificationService:getAllUserNotifications:catch-1",
       params: {
         userID,
-        error: error.message,
+        error,
       },
     });
     throw error;

@@ -44,7 +44,7 @@ export const CronJobAdditionForm = ({tenantID}) => {
       initialValues: {
         cronJobTitle: "",
         cronJobDescription: "",
-        cronJobSchedule: "",
+        cronJobSchedule: "* * * * *",
         databaseQueryID: "",
       },
       validationSchema: formValidations.cronJobAdditionFormValidationSchema,
@@ -52,39 +52,39 @@ export const CronJobAdditionForm = ({tenantID}) => {
         addCronJob(data);
       },
     });
-  
+
     console.log({ cronJobAdditionForm });
 
-  return (
-    <section className="max-w-3xl w-full">
-      <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl  p-3">
-        {CONSTANTS.STRINGS.ADD_CRON_JOB_FORM_TITLE}
-      </h1>
+    return (
+      <section className="max-w-3xl w-full">
+        <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl  p-3">
+          {CONSTANTS.STRINGS.ADD_CRON_JOB_FORM_TITLE}
+        </h1>
 
-      <form
-        class="space-y-3 md:space-y-4 mt-2 p-3"
-        onSubmit={cronJobAdditionForm.handleSubmit}
-      >
-        <CronJobEditor
-          tenantID={tenantID}
-          cronJobEditorForm={cronJobAdditionForm}
-          isLoadingCronJobEditorForm={isAddingCronJob}
-        />
+        <form
+          class="space-y-3 md:space-y-4 mt-2 p-3"
+          onSubmit={cronJobAdditionForm.handleSubmit}
+        >
+          <CronJobEditor
+            tenantID={tenantID}
+            cronJobEditorForm={cronJobAdditionForm}
+            isLoadingCronJobEditorForm={isAddingCronJob}
+          />
 
-        <div className="flex justify-end">
-          <button
-            type="submit"
-            class="flex ml-2 flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none "
-            disabled={isAddingCronJob}
-          >
-            {isAddingCronJob ? (
-              <CircularProgress size={20} color="inherit" />
-            ) : (
-              CONSTANTS.STRINGS.ADD_CRON_JOB_SUBMIT_BUTTON_TEXT
-            )}
-          </button>
-        </div>
-      </form>
-    </section>
-  );
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              class="flex ml-2 flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:outline-none "
+              disabled={isAddingCronJob}
+            >
+              {isAddingCronJob ? (
+                <CircularProgress size={20} color="inherit" />
+              ) : (
+                CONSTANTS.STRINGS.ADD_CRON_JOB_SUBMIT_BUTTON_TEXT
+              )}
+            </button>
+          </div>
+        </form>
+      </section>
+    );
 };

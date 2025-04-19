@@ -42,7 +42,7 @@ databaseChartService.getAllDatabaseCharts = async ({ userID, tenantID }) => {
       message: "databaseChartService:getAllDatabaseCharts:failure",
       params: {
         userID,
-        error: error.message,
+        error,
       },
     });
     throw error;
@@ -123,7 +123,7 @@ databaseChartService.createDatabaseChart = async ({
       message: "databaseChartService:createDatabaseChart:failure",
       params: {
         userID,
-        error: error.message,
+        error,
       },
     });
     throw error;
@@ -179,7 +179,7 @@ databaseChartService.getDatabaseChartByID = async ({
       message: "databaseChartService:getDatabaseChartByID:failure",
       params: {
         userID,
-        error: error.message,
+        error,
       },
     });
     throw error;
@@ -344,7 +344,7 @@ databaseChartService.getDatabaseChartDataByID = async ({
     };
   } catch (error) {
     Logger.log("error", "databaseChartService:getDatabaseChartDataByID:error", {
-      error: error.message,
+      error,
       databaseChartID,
       userID,
     });
@@ -507,7 +507,7 @@ databaseChartService.getDatabaseChartDataUsingDatabaseChart = async ({
       message:
         "databaseChartService:getDatabaseChartDataUsingDatabaseChart:catch-1",
       params: {
-        error: error.message,
+        error,
         userID,
       },
     });
@@ -628,7 +628,7 @@ databaseChartService.updateDatabaseChartByID = async ({
       params: {
         databaseChartID,
         userID,
-        error: error.message,
+        error,
       },
     });
     throw error;
@@ -647,7 +647,6 @@ databaseChartService.deleteDatabaseChartByID = async ({
   userID,
   tenantID,
   databaseChartID,
-  
 }) => {
   Logger.log("info", {
     message: "databaseChartService:deleteDatabaseChartByID:params",
@@ -684,7 +683,7 @@ databaseChartService.deleteDatabaseChartByID = async ({
         userID,
         tenantID,
         databaseChartID,
-        error: error.message,
+        error,
       },
     });
     throw error;

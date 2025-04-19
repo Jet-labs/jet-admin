@@ -63,7 +63,7 @@ router.post(
 
 
 
-// GET /:jobID - Get a specific Cron Job
+// GET /:cronJobID - Get a specific Cron Job
 router.get(
   "/:cronJobID",
   authMiddleware.checkUserPermissions(["tenant:cronjob:read"]), // Define appropriate permission
@@ -76,30 +76,36 @@ router.get(
   cronJobController.getCronJobByID
 );
 
-// PATCH /:jobID - Update a specific Cron Job
+// PATCH /:cronJobID - Update a specific Cron Job
 router.patch(
-  "/:jobID",
+  "/:cronJobID",
   authMiddleware.checkUserPermissions(["tenant:cronjob:update"]), // Define appropriate permission
   [
     // Validation middleware
-    param("jobID")
+    param("cronJobID")
       .isNumeric()
-      .withMessage("jobID must be a number in the URL parameter"),
+      .withMessage("cronJobID must be a number in the URL parameter"),
     // Validate fields if they are present in the body (use optional())
-    body("title")
-      .optional()
+    body("cronJobTitle")
       .notEmpty()
-      .withMessage("title cannot be empty if provided")
+      .withMessage("cronJobTitle is required")
       .isString(),
-    body("description").optional({ nullable: true }).isString(), // Allow explicit null to clear description
-    body("cronSchedule")
-      .optional()
+    body("cronJobDescription").optional().isString(),
+    body("databaseQueryID")
       .notEmpty()
+      .withMessage("databaseQueryID is required")
+      .isNumeric(),
+    body("cronJobSchedule")
+      .notEmpty()
+      .withMessage("cronJobSchedule is required")
       .isString()
+      // Basic cron validation (adjust regex as needed for complexity)
       .matches(
         /^(\*|([0-9]|1[0-9]|2[0-9]|3[0-9]|4[0-9]|5[0-9])|\*\/([0-9]|1[0-9]|2[0-9]|3[0-9]|4[0-9]|5[0-9])) (\*|([0-9]|1[0-9]|2[0-3])|\*\/([0-9]|1[0-9]|2[0-3])) (\*|([1-9]|1[0-9]|2[0-9]|3[0-1])|\*\/([1-9]|1[0-9]|2[0-9]|3[0-1])) (\*|([1-9]|1[0-2])|\*\/([1-9]|1[0-2])|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec) (\*|([0-6])|\*\/([0-6])|sun|mon|tue|wed|thu|fri|sat)$/i
       )
-      .withMessage("cronSchedule must be a valid cron string if provided"),
+      .withMessage(
+        'cronSchedule must be a valid cron string (e.g., "*/5 * * * *")'
+      ),
     body("isDisabled")
       .optional()
       .isBoolean()
@@ -121,14 +127,14 @@ router.patch(
   cronJobController.updateCronJobByID
 );
 
-// DELETE /:jobID - Delete a specific Cron Job
+// DELETE /:cronJobID - Delete a specific Cron Job
 router.delete(
-  "/:jobID",
+  "/:cronJobID",
   authMiddleware.checkUserPermissions(["tenant:cronjob:delete"]), // Define appropriate permission
   [
-    param("jobID")
+    param("cronJobID")
       .isNumeric()
-      .withMessage("jobID must be a number in the URL parameter"),
+      .withMessage("cronJobID must be a number in the URL parameter"),
   ],
   expressUtils.validationChecker,
   cronJobController.deleteCronJobByID
@@ -136,15 +142,15 @@ router.delete(
 
 // --- Job History Routes ---
 
-// GET /:jobID/history - Get history for a specific Cron Job (with pagination)
+// GET /:cronJobID/history - Get history for a specific Cron Job (with pagination)
 router.get(
-  "/:jobID/history",
+  "/:cronJobID/history",
   authMiddleware.checkUserPermissions([
     "tenant:cronjob:read",
     "tenant:cronjob:history:read",
   ]), // Or just tenant:cronjob:read
   [
-    param("jobID").isNumeric().withMessage("jobID parameter must be a number"),
+    param("cronJobID").isNumeric().withMessage("cronJobID parameter must be a number"),
     query("page")
       .optional()
       .isInt({ min: 1 })
@@ -155,7 +161,7 @@ router.get(
       .withMessage("pageSize query parameter must be between 1 and 100"), // Add reasonable limit
   ],
   expressUtils.validationChecker,
-  cronJobController.getJobHistoryByJobID
+  cronJobController.getCronJobHistoryByID
 );
 
 module.exports = router; // Use module.exports for CommonJS
