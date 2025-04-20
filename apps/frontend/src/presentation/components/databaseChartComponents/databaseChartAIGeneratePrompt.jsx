@@ -53,18 +53,17 @@ const StyledDialogActions = styled(DialogActions)(({ theme }) => ({
 export const DatabaseChartAIGeneratePrompt = ({ tenantID, onAccepted }) => {
   
 
-  const [aiPrompt, setAiPrompt] = useState("top 10 most spending users");
-  const [aiGeneratedChart, setAiGeneratedChart] = useState("");
+  const [aiPrompt, setAIPrompt] = useState("Top 10 most spending users");
+  const [aiGeneratedChart, setAIGeneratedChart] = useState("");
   const [isAIPromptDialogOpen, setIsAIPromptDialogOpen] = useState(false);
   const [generatedQueries, setGeneratedQueries] = useState([]);
-  
 
   const {
-    isPending: isGeneratingAIPrompt,
-    isSuccess: isGeneratingAIPromptSuccess,
-    isError: isGeneratingAIPromptError,
-    error: generateAIPromptError,
-    mutate: generateAIPrompt,
+    isPending: isGeneratingAIPromptBasedChart,
+    isSuccess: isGeneratingAIPromptBasedChartSuccess,
+    isError: isGeneratingAIPromptBasedChartError,
+    error: generateAIPromptBasedChartError,
+    mutate: generateAIPromptBasedChart,
   } = useMutation({
     mutationFn: ({ aiPrompt }) => {
       return generateAIPromptBasedChartAPI({
@@ -75,7 +74,7 @@ export const DatabaseChartAIGeneratePrompt = ({ tenantID, onAccepted }) => {
     retry: false,
     onSuccess: (data) => {
       console.log({ data });
-      setAiGeneratedChart(data);
+      setAIGeneratedChart(data);
     },
     onError: (error) => {
       displayError(error);
@@ -106,7 +105,7 @@ export const DatabaseChartAIGeneratePrompt = ({ tenantID, onAccepted }) => {
 
   console.log({ aiGeneratedChart });
 
-  const _handleAcceptGeneratedQueries =() => {
+  const _handleAcceptGeneratedQueries = () => {
     const databaseChart = JSON.parse(aiGeneratedChart);
     const databaseQueriesData =
       databaseChart.output.databaseChartQueryMappings?.map((q) => ({
@@ -121,30 +120,32 @@ export const DatabaseChartAIGeneratePrompt = ({ tenantID, onAccepted }) => {
   };
 
   const _handleOnChartConfigAccepted = useCallback(() => {
-    if(!generatedQueries || generatedQueries.length === 0)return;
+    if (!generatedQueries || generatedQueries.length === 0) return;
     const databaseChart = JSON.parse(aiGeneratedChart).output;
     onAccepted({
       databaseChartName: databaseChart.databaseChartTitle,
       databaseChartType: databaseChart.databaseChartType,
-      databaseQueries: databaseChart.databaseChartQueryMappings.map((q,index) => ({
-        title: q.title,
-        databaseQueryID: generatedQueries[index].databaseQueryID,
-        parameters: q.parameters,
-        databaseQueryArgValues: q.databaseQueryArgValues,
-        datasetFields: q.datasetFields,
-      })),
-      databaseChartConfig: databaseChart.databaseChartConfig
+      databaseQueries: databaseChart.databaseChartQueryMappings.map(
+        (q, index) => ({
+          title: q.title,
+          databaseQueryID: generatedQueries[index].databaseQueryID,
+          parameters: q.parameters,
+          databaseQueryArgValues: q.databaseQueryArgValues,
+          datasetFields: q.datasetFields,
+        })
+      ),
+      databaseChartConfig: databaseChart.databaseChartConfig,
     });
     setIsAIPromptDialogOpen(false);
-  }, [aiGeneratedChart,generatedQueries, onAccepted]);
+  }, [aiGeneratedChart, generatedQueries, onAccepted]);
 
   return (
     <>
       <button
-        type="submit"
+        type="button"
         onClick={() => setIsAIPromptDialogOpen(true)}
         className="
-        flex mr-2 flex-row justify-center items-center
+        flex flex-row justify-center items-center
         px-3 py-2 text-xs font-medium text-center text-white
         bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500
         rounded border-none shadow-md
@@ -233,7 +234,7 @@ export const DatabaseChartAIGeneratePrompt = ({ tenantID, onAccepted }) => {
               rows="4"
               required
               value={aiPrompt}
-              onChange={(e) => setAiPrompt(e.target.value)}
+              onChange={(e) => setAIPrompt(e.target.value)}
               autoComplete="off"
               className="w-full rounded border border-indigo-200 p-2.5 text-sm text-gray-800 bg-white/70 backdrop-blur-md outline-none transition-all duration-200 shadow-sm focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/30 focus:shadow-indigo-500/30"
               placeholder="Describe what you want to create..."
@@ -271,7 +272,6 @@ export const DatabaseChartAIGeneratePrompt = ({ tenantID, onAccepted }) => {
                       <CircularProgress
                         className="!text-xs !text-green-500"
                         size={18}
-                        
                       />
                     ) : (
                       <>
@@ -314,7 +314,10 @@ export const DatabaseChartAIGeneratePrompt = ({ tenantID, onAccepted }) => {
               boxShadow: "0 0 10px rgba(0, 0, 0, 0.05)",
             }}
           >
-            {CONSTANTS.STRINGS.CHART_DATASET_CHART_DOWNLOAD_FORM_CANCEL}
+            {
+              CONSTANTS.STRINGS
+                .DATABASE_CHART_AI_PROMPT_ACCEPT_FORM_CANCEL_BUTTON
+            }
           </button>
 
           {aiGeneratedChart && (
@@ -340,13 +343,13 @@ export const DatabaseChartAIGeneratePrompt = ({ tenantID, onAccepted }) => {
 
           <button
             type="button"
-            onClick={() => generateAIPrompt({ aiPrompt })}
+            onClick={() => generateAIPromptBasedChart({ aiPrompt })}
             className="px-2.5 py-1.5 text-sm text-white bg-gradient-to-r from-indigo-600 to-purple-600 flex flex-row items-center rounded hover:from-indigo-500 hover:to-purple-500 transition-all duration-200"
             style={{
               boxShadow: "0 0 15px rgba(99, 102, 241, 0.2)",
             }}
           >
-            {isGeneratingAIPrompt ? (
+            {isGeneratingAIPromptBasedChart ? (
               <div className="flex items-center">
                 <CircularProgress
                   className="!text-xs mr-2"

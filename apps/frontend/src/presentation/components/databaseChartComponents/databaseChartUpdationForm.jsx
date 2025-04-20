@@ -206,6 +206,8 @@ export const DatabaseChartUpdationForm = ({ tenantID, databaseChartID }) => {
     }
   }, [databaseChart]);
 
+  console.log({ updateDatabaseChartForm });
+
   return (
     <div className="w-full flex flex-col justify-start items-center h-full">
       <div className="w-full px-3 py-2 border-b border-gray-200 flex flex-col justify-center items-start">
@@ -237,6 +239,7 @@ export const DatabaseChartUpdationForm = ({ tenantID, databaseChartID }) => {
               <DatabaseChartEditor
                 key={databaseChart?.databaseChartID}
                 databaseChartEditorForm={updateDatabaseChartForm}
+                tenantID={tenantID}
               />
             )}
             <div className="flex flex-row justify-around items-center">

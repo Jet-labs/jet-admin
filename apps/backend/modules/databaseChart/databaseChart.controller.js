@@ -214,6 +214,54 @@ databaseChartController.generateAIPromptBasedChart = async (req, res) => {
  * @param {import("express").Request} req
  * @param {import("express").Response} res
  */
+databaseChartController.generateAIPromptBasedChartStyle = async (req, res) => {
+  try {
+    const { user, dbPool } = req;
+    const { tenantID } = req.params;
+    const { aiPrompt, databaseChartData:inputDatabaseChartData } = req.body;
+    Logger.log("info", {
+      message: "databaseChartController:generateAIPromptBasedChartStyle:params",
+      params: {
+        userID: user.userID,
+        tenantID,
+        aiPrompt,
+      },
+    });
+
+    const databaseChartData =
+      await databaseChartService.generateAIPromptBasedChartStyle({
+        userID: parseInt(user.userID),
+        tenantID,
+        aiPrompt,
+        dbPool,
+        databaseChartData:inputDatabaseChartData
+      });
+
+    Logger.log("success", {
+      message: "databaseChartController:generateAIPromptBasedChartStyle:success",
+      params: {
+        userID: user.userID,
+        tenantID,
+        aiPrompt,
+        databaseChartData,
+      },
+    });
+
+    return expressUtils.sendResponse(res, true, { databaseChartData });
+  } catch (error) {
+    Logger.log("error", {
+      message: "databaseChartController:generateAIPromptBasedChartStyle:catch-1",
+      params: { error },
+    });
+    return expressUtils.sendResponse(res, false, {}, error);
+  }
+};
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
 databaseChartController.getDatabaseChartDataByID = async (req, res) => {
   const { user, dbPool } = req;
   const { tenantID, databaseChartID } = req.params;

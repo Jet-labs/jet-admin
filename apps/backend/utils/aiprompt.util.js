@@ -135,4 +135,25 @@ User Request: "${aiPrompt}"
 `;
 };
 
+aiUtil.generateAIPromptForChartStyleGeneration = async ({
+  databaseChartData,
+  aiPrompt,
+}) => {
+  return `
+Based on the following chart config:
+${JSON.stringify(databaseChartData)}
+
+Enhance the chart style based on the user's request. Follow all rules strictly.
+
+Rules:
+1. Output should be in EXACTLY the same format as the format of chart config provided above and nothing else.
+2. Enhance the "databaseChartConfig", "databaseQueries[index].parameters" as per chart.js config.
+3. parameters must include complete Chart.js dataset options:
+   - Colors, borders, styling
+   - Type-specific properties (cutout for pie, etc)
+
+User Request: "${aiPrompt}"
+`;
+};
+
 module.exports = { aiUtil };

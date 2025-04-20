@@ -49,6 +49,14 @@ router.patch(
   databaseChartController.generateAIPromptBasedChart
 );
 
+router.patch(
+  "/aistyle",
+  body("aiPrompt").notEmpty().withMessage("aiPrompt is required"),
+  expressUtils.validationChecker,
+  authMiddleware.checkUserPermissions(["tenant:chart:aistyle"]),
+  databaseChartController.generateAIPromptBasedChartStyle
+);
+
 router.get(
   "/:databaseChartID/data",
   param("databaseChartID")

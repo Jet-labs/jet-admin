@@ -721,6 +721,7 @@ export const CONSTANTS = {
     DATABASE_CHART_AI_PROMPT_FORM_DESCRIPTION:
       "Enter the AI prompt to generate the chart",
     DATABASE_CHART_AI_PROMPT_ACCEPT_FORM_CONFIRM_BUTTON: "Accept chart",
+    DATABASE_CHART_AI_PROMPT_ACCEPT_FORM_CANCEL_BUTTON: "Cancel",
     DATABASE_CHART_AI_PROMPT_FORM_GENERATE_BUTTON: "Generate chart",
     DATABASE_CHART_AI_PROMPT_FORM_REGENERATE_BUTTON: "Re-generate chart",
 
@@ -735,6 +736,19 @@ export const CONSTANTS = {
       "The following chart configuration will be used in the chart",
     DATABASE_CHART_AI_PROMPT_GENERATED_CHART_CONFIG_ACCEPT_BUTTON:
       "Accept config",
+
+    DATABASE_CHART_AI_STYLE_PROMPT_BUTTON: "Style",
+    DATABASE_CHART_AI_STYLE_PROMPT_FORM_TITLE: "AI Prompt",
+    DATABASE_CHART_AI_STYLE_PROMPT_FORM_DESCRIPTION:
+      "Enter the AI prompt to style the chart",
+    DATABASE_CHART_AI_STYLE_PROMPT_ACCEPT_FORM_CONFIRM_BUTTON: "Accept chart",
+    DATABASE_CHART_AI_STYLE_PROMPT_ACCEPT_FORM_CANCEL_BUTTON: "Cancel",
+    DATABASE_CHART_AI_STYLE_PROMPT_FORM_GENERATE_BUTTON: "Style chart",
+    DATABASE_CHART_AI_STYLE_PROMPT_FORM_REGENERATE_BUTTON: "Re-style chart",
+
+    DATABASE_CHART_AI_STYLE_PROMPT_GENERATED_STYLES_TITLE: "Generated styles",
+    DATABASE_CHART_AI_STYLE_PROMPT_GENERATED_STYLES_DESCRIPTION:
+      "The following styles will be applied and used in the chart",
 
     WIDGET_DATASET_FIELD_MAPPING_TITLE: "Dataset field options",
     WIDGET_DATASET_FIELD_MAPPING_NO_META: "Dataset metadata not available",
@@ -1347,6 +1361,8 @@ export const CONSTANTS = {
         `/api/v1/tenants/${tenantID}/charts/${databaseChartID}`,
       generateAIPromptBasedChartAPI: (tenantID) =>
         `/api/v1/tenants/${tenantID}/charts/aigenerate`,
+      generateAIPromptBasedChartStyleAPI: (tenantID) =>
+        `/api/v1/tenants/${tenantID}/charts/aistyle`,
 
       getAllDatabaseWidgetsAPI: (tenantID) =>
         `/api/v1/tenants/${tenantID}/widgets/`,

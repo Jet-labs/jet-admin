@@ -801,4 +801,83 @@ databaseChartService.generateAIPromptBasedChart = async ({
     );
   }
 };
+
+/**
+ *
+ * @param {object} param0
+ * @param {number} param0.userID
+ * @param {number} param0.tenantID
+ * @param {string} param0.aiPrompt
+ * @returns
+ */
+databaseChartService.generateAIPromptBasedChartStyle = async ({
+  userID,
+  tenantID,
+  dbPool,
+  aiPrompt,
+  databaseChartData
+}) => {
+  Logger.log("info", {
+    message: "databaseChartService:generateAIPromptBasedChartStyle:started",
+    params: { userID, tenantID, aiPrompt, databaseChartData },
+  });
+
+  // --- Get API Key ---
+  const apiKey = environmentVariables.GEMINI_API_KEY;
+  if (!apiKey) {
+    Logger.log("error", {
+      message: "databaseChartService:generateAIPromptBasedChartStyle:failure",
+      params: {
+        userID,
+        tenantID,
+        aiPrompt,
+        error: "GEMINI_API_KEY environment variable not set.",
+      },
+    });
+    throw new Error("Server configuration error: Missing Gemini API Key.");
+  }
+
+  const fullPrompt = await aiUtil.generateAIPromptForChartStyleGeneration({
+    databaseChartData,
+    aiPrompt,
+  });
+  console.log(fullPrompt);
+
+  Logger.log("info", {
+    message: "databaseChartService:generateAIPromptBasedChartStyle:prompt_generated",
+    params: {
+      userID,
+      tenantID,
+      aiPrompt,
+      fullPromptLength: fullPrompt?.length,
+    },
+  });
+
+  try {
+    const databaseChartData = await aiService.generateAIPromptBasedChartStyle({
+      aiPrompt: fullPrompt,
+    });
+
+    Logger.log("success", {
+      message: "databaseChartService:generateAIPromptBasedChartStyle:success",
+      params: { userID, tenantID, databaseChartData },
+    });
+    return stringUtil.removeJSONMarkdownFencesRegex(databaseChartData);
+  } catch (error) {
+    // Log API errors or other failures
+    Logger.log("error", {
+      message: "databaseChartService:generateAIPromptBasedChartStyle:failure",
+      params: {
+        userID,
+        tenantID,
+        aiPrompt,
+        error,
+      },
+    });
+    // Re-throw the original error or a more user-friendly one
+    throw new Error(
+      `Failed to generate database query using AI: ${error.message}`
+    );
+  }
+};
 module.exports = { databaseChartService };

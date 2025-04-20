@@ -183,6 +183,8 @@ export const DatabaseChartAdditionForm = ({ tenantID }) => {
             {addDatabaseChartForm && (
               <DatabaseChartEditor
                 databaseChartEditorForm={addDatabaseChartForm}
+                tenantID={tenantID}
+                key={JSON.stringify(addDatabaseChartForm.values)}
               />
             )}
             <button

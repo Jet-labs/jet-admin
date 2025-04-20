@@ -8,8 +8,9 @@ import { DatabaseQueryTestingPanel } from "../databaseQueryComponents/databaseQu
 import { CollapseComponent } from "../ui/collapseComponent";
 import { DatabaseChartAdvancedOptions } from "./databaseChartAdvancedOptions";
 import { DatabaseChartDatasetField } from "./databaseChartDatasetField";
+import { DatabaseChartAIStylePrompt } from "./databaseChartAIStylePrompt";
 
-export const DatabaseChartEditor = ({ databaseChartEditorForm }) => {
+export const DatabaseChartEditor = ({ databaseChartEditorForm, tenantID }) => {
   const {
     databaseQueries,
     isLoadingDatabaseQueries,
@@ -45,6 +46,24 @@ export const DatabaseChartEditor = ({ databaseChartEditorForm }) => {
     items.splice(result.destination.index, 0, reorderedItem);
 
     databaseChartEditorForm.setFieldValue("databaseQueries", items);
+  };
+
+  const _handleOnChartStyleAccepted = ({ databaseChartData }) => {
+    const databaseQueries = databaseChartEditorForm.values.databaseQueries;
+    databaseChartEditorForm.setFieldValue(
+      "databaseChartConfig",
+      databaseChartData?.databaseChartConfig
+    );
+    console.log({ databaseQueries, databaseChartData });
+    const aiStyledDatabaseQueries = databaseQueries?.map((query, index) => ({
+      ...query,
+      parameters: databaseChartData?.databaseQueries[index]?.parameters,
+    }));
+
+    databaseChartEditorForm.setFieldValue(
+      "databaseQueries",
+      aiStyledDatabaseQueries
+    );
   };
 
   return (
@@ -102,6 +121,26 @@ export const DatabaseChartEditor = ({ databaseChartEditorForm }) => {
           </select>
         </div>
       </div>
+      <DatabaseChartAIStylePrompt
+        tenantID={tenantID}
+        onAccepted={_handleOnChartStyleAccepted}
+        key={JSON.stringify(databaseChartEditorForm.values)}
+        databaseChartData={{
+          ...databaseChartEditorForm.values,
+          databaseQueries: databaseChartEditorForm.values.databaseQueries?.map(
+            (q) => ({
+              ...q,
+              databaseQuery: {
+                databaseQueryTitle: q?.databaseQuery?.databaseQueryTitle,
+                databaseQueryData: q?.databaseQuery?.databaseQueryData,
+              },
+              datasetFields: q?.datasetFields,
+              databaseQueryArgValues: q?.databaseQueryArgValues,
+              parameters: q?.parameters,
+            })
+          ),
+        }}
+      />
 
       {databaseChartEditorForm && databaseChartEditorForm.values && (
         <div className="flex flex-col justify-start items-stretch gap-2 p-2 rounded bg-slate-100">
