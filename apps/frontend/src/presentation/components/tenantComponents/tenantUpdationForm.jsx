@@ -113,17 +113,17 @@ export const TenantUpdationForm = ({ tenantID }) => {
   return (
     <div className="flex w-full h-full flex-col justify-start items-center overflow-y-auto">
       {tenant ? (
-        <section class="max-w-3xl w-full">
+        <section className="max-w-3xl w-full">
           <TenantUserAdditionForm
             tenantID={tenant.tenantID}
             onClose={_handleCloseAddTenantUserDialog}
             open={isAddTenantUserDialogOpen}
           />
-          <div class="p-6 sm:p-8">
-            <h1 class="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl ">
+          <div className="p-6 sm:p-8">
+            <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl ">
               {CONSTANTS.STRINGS.UPDATE_TENANT_FORM_TITLE}
             </h1>
-            <span class="text-sm font-normal  text-slate-700">
+            <span className="text-sm font-normal  text-slate-700">
               {`Tenant id: ${tenant.tenantID}`}
             </span>
             <div className="flex flex-row justify-between items-center mt-4 w-full">
@@ -142,7 +142,7 @@ export const TenantUpdationForm = ({ tenantID }) => {
               </div>
             </div>
             <form
-              class="space-y-4 md:space-y-6 mt-4"
+              className="space-y-4 md:space-y-6 mt-4"
               onSubmit={(e) => {
                 e.preventDefault(), updateTenantForm.handleSubmit();
               }}
@@ -152,7 +152,7 @@ export const TenantUpdationForm = ({ tenantID }) => {
               <button
                 type="submit"
                 disabled={isUpdatingTenant}
-                class="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none focus:ring-blue-300 "
+                className="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none focus:ring-blue-300 "
               >
                 {isUpdatingTenant && (
                   <CircularProgress
@@ -206,7 +206,7 @@ export const TenantUpdationForm = ({ tenantID }) => {
               <button
                 type="button"
                 onClick={_handleOpenAddTenantUserDialog}
-                class="w-fit py-1 px-2 mt-8 text-sm flex flex-row items-center font-medium text-slate-600 focus:outline-none bg-white rounded border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 "
+                className="w-fit py-1 px-2 mt-8 text-sm flex flex-row items-center font-medium text-slate-600 focus:outline-none bg-white rounded border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 "
               >
                 <PersonAddIcon className="!text-base !me-2" />
                 {CONSTANTS.STRINGS.UPDATE_TENANT_ADD_MEMBERS_BUTTON}
@@ -217,14 +217,14 @@ export const TenantUpdationForm = ({ tenantID }) => {
       ) : tenantError ? (
         <div className="p-3 w-full">
           <div
-            class="p-4 text-sm text-blue-800 rounded bg-blue-50"
+            className="p-4 text-sm text-blue-800 rounded bg-blue-50"
             role="alert"
           >
-            <span class="font-medium">
+            <span className="font-medium">
               {CONSTANTS.STRINGS.NO_PERMISSION_TO_VIEW_TENANT_TITLE}
             </span>
             {"  "}
-            <span class="font-normal">
+            <span className="font-normal">
               {CONSTANTS.STRINGS.NO_PERMISSION_TO_VIEW_TENANT_DESCRIPTION}
             </span>
           </div>

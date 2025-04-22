@@ -65,8 +65,8 @@ export const DatabaseWidgetEditor = ({ databaseWidgetEditorForm }) => {
       <div className="flex flex-col justify-start items-stretch gap-2 p-2 rounded bg-slate-100">
         <div>
           <label
-            for="databaseWidgetName"
-            class="block mb-1 text-xs font-medium text-slate-500"
+            htmlFor="databaseWidgetName"
+            className="block mb-1 text-xs font-medium text-slate-500"
           >
             {CONSTANTS.STRINGS.WIDGET_EDITOR_FORM_NAME_FIELD_LABEL}
           </label>
@@ -87,8 +87,8 @@ export const DatabaseWidgetEditor = ({ databaseWidgetEditorForm }) => {
 
         <div>
           <label
-            for="databaseWidgetType"
-            class="block mb-1 text-xs font-medium text-slate-500"
+            htmlFor="databaseWidgetType"
+            className="block mb-1 text-xs font-medium text-slate-500"
           >
             {CONSTANTS.STRINGS.WIDGET_EDITOR_FORM_TYPE_FIELD_LABEL}
           </label>
@@ -136,8 +136,8 @@ export const DatabaseWidgetEditor = ({ databaseWidgetEditorForm }) => {
       <div className="flex flex-col justify-start items-stretch gap-2 p-2 rounded bg-slate-100">
         <div>
           <label
-            for="databaseWidgetConfig.refetchInterval"
-            class="block mb-1 text-xs font-medium text-slate-500"
+            htmlFor="databaseWidgetConfig.refetchInterval"
+            className="block mb-1 text-xs font-medium text-slate-500"
           >
             {CONSTANTS.STRINGS.WIDGET_EDITOR_FORM_REFRESH_INTERVAL_LABEL}
           </label>

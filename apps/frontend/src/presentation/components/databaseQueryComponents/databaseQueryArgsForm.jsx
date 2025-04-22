@@ -5,9 +5,10 @@ import {
   DialogTitle,
 } from "@mui/material";
 import { useFormik } from "formik";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { CONSTANTS } from "../../../constants";
 import { formValidations } from "../../../utils/formValidation";
+import PropTypes from "prop-types";
 
 export const DatabaseQueryArgsForm = ({
   onDecline,
@@ -15,6 +16,12 @@ export const DatabaseQueryArgsForm = ({
   open,
   databaseQueryArgs,
 }) => {
+  DatabaseQueryArgsForm.propTypes = {
+    onDecline: PropTypes.func.isRequired,
+    onAccepted: PropTypes.func.isRequired,
+    open: PropTypes.bool.isRequired,
+    databaseQueryArgs: PropTypes.array.isRequired,
+  };
   const databaseQueryArgsForm = useFormik({
     initialValues: databaseQueryArgs.reduce((acc, arg) => {
       acc[arg] = "";
@@ -24,7 +31,7 @@ export const DatabaseQueryArgsForm = ({
     validateOnChange: false,
     validationSchema:
       formValidations.databaseQueryArgsFormValidationSchema(databaseQueryArgs),
-    onSubmit: (values) => {},
+    onSubmit: () => {},
   });
 
   useEffect(() => {

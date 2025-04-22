@@ -19,7 +19,7 @@ export class DatabaseTable {
     try {
       this.columnForeignKeyMap = this.mapColumnsToForeignKeys();
     } catch (e) {
-      // console.log(e);
+      console.log(e);
     }
   }
 

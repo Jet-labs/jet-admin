@@ -1,12 +1,12 @@
 import { javascript } from "@codemirror/lang-javascript";
 import { json } from "@codemirror/lang-json";
 import { sql } from "@codemirror/lang-sql";
-import CodeMirror from "@uiw/react-codemirror";
-import React, { useRef } from "react";
-import { useTheme } from "@mui/material";
+import { EditorView } from "@codemirror/view";
 import { loadLanguage } from "@uiw/codemirror-extensions-langs";
 import { githubLight } from "@uiw/codemirror-theme-github";
-import { EditorView } from "@codemirror/view"; // Add this import
+import CodeMirror from "@uiw/react-codemirror";
+import PropTypes from "prop-types";
+import React, { useRef } from "react";
 
 const langMap = {
   javascript: javascript(),
@@ -24,10 +24,19 @@ export const PGSQLQueryEditor = ({
   language = "json",
   height = "200px",
   outlined = true,
-  transparent = false,
   rounded = true,
 }) => {
-  const theme = useTheme();
+  PGSQLQueryEditor.propTypes = {
+    readOnly: PropTypes.bool,
+    codeWrapping: PropTypes.bool,
+    disabled: PropTypes.bool,
+    code: PropTypes.string,
+    setCode: PropTypes.func,
+    language: PropTypes.string,
+    height: PropTypes.string,
+    outlined: PropTypes.bool,
+    rounded: PropTypes.bool,
+  };
   const ref = useRef();
 
   // Create an extension for line wrapping if enabled

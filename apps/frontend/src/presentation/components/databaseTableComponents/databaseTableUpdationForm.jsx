@@ -213,12 +213,12 @@ export const DatabaseTableUpdationForm = ({
   }, [databaseTable]);
 
   return (
-    <section class="max-w-3xl w-full ">
-      <h1 class="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl border-b border-slate-200 p-3">
+    <section className="max-w-3xl w-full ">
+      <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl border-b border-slate-200 p-3">
         {CONSTANTS.STRINGS.UPDATE_TABLE_FORM_TITLE}
       </h1>
       <form
-        class="space-y-3 md:space-y-4 p-3 "
+        className="space-y-3 md:space-y-4 p-3 "
         onSubmit={tableUpdationForm.handleSubmit}
       >
         {tableUpdationForm && (
@@ -236,7 +236,7 @@ export const DatabaseTableUpdationForm = ({
           <button
             type="submit"
             disabled={isAddingDatabaseTable}
-            class="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none "
+            className="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none "
           >
             {isAddingDatabaseTable && (
               <CircularProgress

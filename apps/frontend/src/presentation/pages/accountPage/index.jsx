@@ -45,9 +45,9 @@ const AccountPage = () => {
 
   return (
     <div className="flex w-full h-full flex-col justify-start items-center overflow-y-auto">
-      <section class="max-w-3xl w-full">
-        <div class="p-6 sm:p-8">
-          <h1 class="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl ">
+      <section className="max-w-3xl w-full">
+        <div className="p-6 sm:p-8">
+          <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl ">
             {CONSTANTS.STRINGS.ACCOUNT_PAGE_TITLE || "Your Account"}
           </h1>
 
@@ -62,8 +62,8 @@ const AccountPage = () => {
                 </div>
               </div>
               <div className="flex flex-1 flex-col justify-start items-start space-y-4">
-                <div class="h-6 bg-gray-200 rounded w-full"></div>
-                <div class="h-6 bg-gray-200 rounded  w-full"></div>
+                <div className="h-6 bg-gray-200 rounded w-full"></div>
+                <div className="h-6 bg-gray-200 rounded  w-full"></div>
               </div>
             </div>
           ) : (

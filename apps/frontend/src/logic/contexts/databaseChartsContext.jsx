@@ -6,9 +6,14 @@ import { useQuery } from "@tanstack/react-query";
 import { CONSTANTS } from "../../constants";
 import { getAllDatabaseQueriesAPI } from "../../data/apis/databaseQuery";
 import { getAllDatabaseChartsAPI } from "../../data/apis/databaseChart";
+import PropTypes from "prop-types";
+
 const DatabaseChartsStateContext = React.createContext(undefined);
 const DatabaseChartsActionsContext = React.createContext(undefined);
 const DatabaseChartsContextProvider = ({ children }) => {
+  DatabaseChartsContextProvider.propTypes = {
+    children: PropTypes.node.isRequired,
+  };
   const { tenantID, databaseSchemaName } = useParams();
   const {
     isLoading: isLoadingDatabaseCharts,
@@ -44,6 +49,10 @@ const DatabaseChartsContextProvider = ({ children }) => {
         databaseCharts,
         isLoadingDatabaseCharts,
         isFetchingDatabaseCharts,
+        loadDatabaseChartsError,
+        loadDatabaseQueriesError,
+        isRefetechingDatabaseCharts,
+        isRefetechingDatabaseQueries,
 
         databaseQueries,
         isLoadingDatabaseQueries,

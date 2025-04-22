@@ -1,17 +1,24 @@
+import { useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
-import { cloneDeep } from "lodash";
 import { Responsive, WidthProvider } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import { CONSTANTS } from "../../../constants";
-import { DatabaseDashboardRenderWidget } from "./databaseDashboardRenderWidget";
-import { useQuery } from "@tanstack/react-query";
 import { getDatabaseDashboardByIDAPI } from "../../../data/apis/databaseDashboard";
 import { DatabaseDashboardPrintForm } from "./databaseDashboardPrintForm";
+import { DatabaseDashboardRenderWidget } from "./databaseDashboardRenderWidget";
+import PropTypes from "prop-types";
+import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
 export const DatabaseDashboardViewer = ({ tenantID, databaseDashboardID }) => {
+  DatabaseDashboardViewer.propTypes = {
+    tenantID: PropTypes.number.isRequired,
+    databaseDashboardID: PropTypes.number.isRequired,
+  };
+
+  // eslint-disable-next-line no-unused-vars
   const [currentBreakpoint, setCurrentBreakpoint] = useState("lg");
 
   const {
@@ -58,41 +65,49 @@ export const DatabaseDashboardViewer = ({ tenantID, databaseDashboardID }) => {
           />
         </div>
       </div>
-      <div
-        className="w-full overflow-y-auto bg-slate-100 "
-        id={`printable-area-dashboard-${databaseDashboardID}`}
+      <ReactQueryLoadingErrorWrapper
+        isLoading={isLoadingDatabaseDashboard}
+        isFetching={isFetchingDatabaseDashboard}
+        error={loadDatabaseDashboardError}
+        refetch={refetchDatabaseDashboard}
+        isRefetching={isRefetechingDatabaseDashboard}
       >
-        {databaseDashboard && (
-          <ResponsiveReactGridLayout
-            isDraggable={false}
-            isResizable={false}
-            style={{ minHeight: "100%" }}
-            draggableCancel=".cancelSelectorName"
-            layouts={databaseDashboard?.databaseDashboardConfig?.layouts}
-            measureBeforeMount={false}
-            breakpoints={{ lg: 1000, md: 996, sm: 768, xs: 480, xxs: 0 }}
-            onBreakpointChange={onBreakpointChange}
-            resizeHandles={["ne", "se", "nw", "sw"]}
-            margin={[8, 8]}
-            cols={{ lg: 8, md: 6, sm: 5, xs: 4, xxs: 3 }}
-            rowHeight={32}
-            allowOverlap={false}
-          >
-            {databaseDashboard?.databaseDashboardConfig?.widgets.map(
-              (widget, index) => (
-                <div key={widget} draggable={false}>
-                  <DatabaseDashboardRenderWidget
-                    tenantID={tenantID}
-                    widget={widget}
-                    index={index}
-                    editable={false}
-                  />
-                </div>
-              )
-            )}
-          </ResponsiveReactGridLayout>
-        )}
-      </div>
+        <div
+          className="w-full overflow-y-auto bg-slate-100 "
+          id={`printable-area-dashboard-${databaseDashboardID}`}
+        >
+          {databaseDashboard && (
+            <ResponsiveReactGridLayout
+              isDraggable={false}
+              isResizable={false}
+              style={{ minHeight: "100%" }}
+              draggableCancel=".cancelSelectorName"
+              layouts={databaseDashboard?.databaseDashboardConfig?.layouts}
+              measureBeforeMount={false}
+              breakpoints={{ lg: 1000, md: 996, sm: 768, xs: 480, xxs: 0 }}
+              onBreakpointChange={onBreakpointChange}
+              resizeHandles={["ne", "se", "nw", "sw"]}
+              margin={[8, 8]}
+              cols={{ lg: 8, md: 6, sm: 5, xs: 4, xxs: 3 }}
+              rowHeight={32}
+              allowOverlap={false}
+            >
+              {databaseDashboard?.databaseDashboardConfig?.widgets.map(
+                (widget, index) => (
+                  <div key={widget} draggable={false}>
+                    <DatabaseDashboardRenderWidget
+                      tenantID={tenantID}
+                      widget={widget}
+                      index={index}
+                      editable={false}
+                    />
+                  </div>
+                )
+              )}
+            </ResponsiveReactGridLayout>
+          )}
+        </div>
+      </ReactQueryLoadingErrorWrapper>
     </div>
   );
 };

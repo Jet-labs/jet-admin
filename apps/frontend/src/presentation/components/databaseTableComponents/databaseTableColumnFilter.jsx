@@ -1,10 +1,10 @@
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { FaChevronDown, FaTimes } from "react-icons/fa";
 import { CONSTANTS } from "../../../constants";
 import { PostgreSQLUtils } from "../../../utils/postgre";
+import PropTypes from "prop-types";
 
 export const DatabaseTableColumnFilter = ({
-  databaseTableName,
   setDatabaseTableColumnFilters,
   databaseTableColumnFilters,
   isDatabaseTableColumnFiltersMenuOpen,
@@ -13,6 +13,15 @@ export const DatabaseTableColumnFilter = ({
   setDatabaseTableColumnFilterCombinator,
   databaseTableColumns,
 }) => {
+  DatabaseTableColumnFilter.propTypes = {
+    setDatabaseTableColumnFilters: PropTypes.func.isRequired,
+    databaseTableColumnFilters: PropTypes.array.isRequired,
+    isDatabaseTableColumnFiltersMenuOpen: PropTypes.bool.isRequired,
+    handleCloseDatabaseTableColumnFiltersMenu: PropTypes.func.isRequired,
+    databaseTableColumnFilterCombinator: PropTypes.string.isRequired,
+    setDatabaseTableColumnFilterCombinator: PropTypes.func.isRequired,
+    databaseTableColumns: PropTypes.array.isRequired,
+  };
   const [filterField, setFilterField] = useState("");
   const [filterOperator, setFilterOperator] = useState("");
   const [filterValue, setFilterValue] = useState("");

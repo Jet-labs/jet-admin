@@ -50,11 +50,11 @@ export const DatabaseWidgetDrawerList = ({}) => {
         </button>
       )}
       {isLoadingDatabaseWidgets || isFetchingDatabaseWidgets ? (
-        <div role="status" class=" animate-pulse w-full">
-          <div class="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
-          <div class="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
-          <div class="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
-          <div class="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
+        <div role="status" className=" animate-pulse w-full">
+          <div className="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
+          <div className="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
+          <div className="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
+          <div className="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
         </div>
       ) : databaseWidgets && databaseWidgets.length > 0 ? (
         <div className="h-full w-full overflow-y-auto">
@@ -99,7 +99,9 @@ export const DatabaseWidgetDrawerList = ({}) => {
         </div>
       ) : (
         <div className=" text-gray-500 dark:text-gray-400">
-          <NoEntityUI message={CONSTANTS.STRINGS.WIDGET_DRAWER_LIST_NO_WIDGET} />
+          <NoEntityUI
+            message={CONSTANTS.STRINGS.WIDGET_DRAWER_LIST_NO_WIDGET}
+          />
         </div>
       )}
 

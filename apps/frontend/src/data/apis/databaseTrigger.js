@@ -1,8 +1,8 @@
+/* eslint-disable no-useless-catch */
 import axios from "axios";
 import { firebaseAuth } from "../../config/firebase";
 import { CONSTANTS } from "../../constants";
 import { DatabaseTrigger } from "../models/databaseTrigger";
-
 
 export const getAllDatabaseTriggersAPI = async ({
   tenantID,

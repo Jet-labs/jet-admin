@@ -21,8 +21,14 @@ import {
   ResizablePanelGroup,
 } from "../ui/resizable";
 import { formValidations } from "../../../utils/formValidation";
+import PropTypes from "prop-types";
+import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 
 export const DatabaseQueryUpdationForm = ({ tenantID, databaseQueryID }) => {
+  DatabaseQueryUpdationForm.propTypes = {
+    tenantID: PropTypes.number.isRequired,
+    databaseQueryID: PropTypes.number.isRequired,
+  };
   const queryClient = useQueryClient();
   const [databaseQueryTestResult, setDatabaseQueryTestResult] = useState();
   const { showConfirmation } = useGlobalUI();
@@ -47,39 +53,34 @@ export const DatabaseQueryUpdationForm = ({ tenantID, databaseQueryID }) => {
     refetchOnWindowFocus: false,
   });
 
-  const {
-    isPending: isUpdatingDatabaseQuery,
-    isSuccess: isUpdatingDatabaseQuerySuccess,
-    isError: isUpdatingDatabaseQueryError,
-    error: updateDatabaseQueryError,
-    mutate: updateDatabaseQuery,
-  } = useMutation({
-    mutationFn: (data) => {
-      return updateDatabaseQueryByIDAPI({
-        tenantID,
-        databaseQueryID,
-        databaseQueryData: {
-          ...data,
+  const { isPending: isUpdatingDatabaseQuery, mutate: updateDatabaseQuery } =
+    useMutation({
+      mutationFn: (data) => {
+        return updateDatabaseQueryByIDAPI({
+          tenantID,
+          databaseQueryID,
           databaseQueryData: {
-            databaseQueryString: data.databaseQueryString,
-            databaseQueryArgs: data.databaseQueryArgs,
+            ...data,
+            databaseQueryData: {
+              databaseQueryString: data.databaseQueryString,
+              databaseQueryArgs: data.databaseQueryArgs,
+            },
           },
-        },
-      });
-    },
-    retry: false,
-    onSuccess: (data) => {
-      displaySuccess(
-        CONSTANTS.STRINGS.UPDATE_QUERY_FORM_QUERY_UPDATION_SUCCESS
-      );
-      queryClient.invalidateQueries([
-        CONSTANTS.REACT_QUERY_KEYS.DATABASE_QUERIES(tenantID),
-      ]);
-    },
-    onError: (error) => {
-      displayError(error);
-    },
-  });
+        });
+      },
+      retry: false,
+      onSuccess: () => {
+        displaySuccess(
+          CONSTANTS.STRINGS.UPDATE_QUERY_FORM_QUERY_UPDATION_SUCCESS
+        );
+        queryClient.invalidateQueries([
+          CONSTANTS.REACT_QUERY_KEYS.DATABASE_QUERIES(tenantID),
+        ]);
+      },
+      onError: (error) => {
+        displayError(error);
+      },
+    });
 
   const queryUpdationForm = useFormik({
     initialValues: {
@@ -161,11 +162,13 @@ export const DatabaseQueryUpdationForm = ({ tenantID, databaseQueryID }) => {
         )}
       </div>
 
-      {isLoadingDatabaseQuery || isFetchingDatabaseQuery ? (
-        <div className="!w-full !h-full flex justify-center items-center">
-          <CircularProgress />
-        </div>
-      ) : (
+      <ReactQueryLoadingErrorWrapper
+        isLoading={isLoadingDatabaseQuery}
+        isFetching={isFetchingDatabaseQuery}
+        isRefetching={isRefetechingDatabaseQuery}
+        refetch={refetchDatabaseQuery}
+        error={loadDatabaseQueryError}
+      >
         <ResizablePanelGroup
           direction="vertical"
           autoSaveId={
@@ -175,7 +178,7 @@ export const DatabaseQueryUpdationForm = ({ tenantID, databaseQueryID }) => {
         >
           <ResizablePanel defaultSize={20}>
             <form
-              class="w-full h-full "
+              className="w-full h-full "
               onSubmit={queryUpdationForm.handleSubmit}
             >
               <ResizablePanelGroup
@@ -192,8 +195,8 @@ export const DatabaseQueryUpdationForm = ({ tenantID, databaseQueryID }) => {
                 >
                   <div>
                     <label
-                      for="databaseQueryTitle"
-                      class="block mb-1 text-xs font-medium text-slate-500"
+                      htmlFor="databaseQueryTitle"
+                      className="block mb-1 text-xs font-medium text-slate-500"
                     >
                       {CONSTANTS.STRINGS.UPDATE_QUERY_FORM_NAME_FIELD_LABEL}
                     </label>
@@ -201,7 +204,7 @@ export const DatabaseQueryUpdationForm = ({ tenantID, databaseQueryID }) => {
                       type="databaseQueryTitle"
                       name="databaseQueryTitle"
                       id="databaseQueryTitle"
-                      class=" placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:border-slate-700 block w-full px-2.5 py-1.5 "
+                      className=" placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:border-slate-700 block w-full px-2.5 py-1.5 "
                       placeholder={
                         CONSTANTS.STRINGS
                           .UPDATE_QUERY_FORM_NAME_FIELD_PLACEHOLDER
@@ -214,8 +217,8 @@ export const DatabaseQueryUpdationForm = ({ tenantID, databaseQueryID }) => {
                   </div>
                   <div>
                     <label
-                      for="databaseQueryDescription"
-                      class="block mb-1 text-xs font-medium text-slate-500"
+                      htmlFor="databaseQueryDescription"
+                      className="block mb-1 text-xs font-medium text-slate-500"
                     >
                       {
                         CONSTANTS.STRINGS
@@ -226,7 +229,7 @@ export const DatabaseQueryUpdationForm = ({ tenantID, databaseQueryID }) => {
                       type="databaseQueryDescription"
                       name="databaseQueryDescription"
                       id="databaseQueryDescription"
-                      class=" placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:border-slate-700 block w-full px-2.5 py-1.5 "
+                      className=" placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:border-slate-700 block w-full px-2.5 py-1.5 "
                       placeholder={
                         CONSTANTS.STRINGS
                           .UPDATE_QUERY_FORM_DESCRIPTION_FIELD_PLACEHOLDER
@@ -253,8 +256,8 @@ export const DatabaseQueryUpdationForm = ({ tenantID, databaseQueryID }) => {
                   </label>
                   <div>
                     <label
-                      for="databaseQueryArgs"
-                      class="block mb-1 text-xs font-medium text-slate-500"
+                      htmlFor="databaseQueryArgs"
+                      className="block mb-1 text-xs font-medium text-slate-500"
                     >
                       {CONSTANTS.STRINGS.UPDATE_QUERY_FORM_PARAMS_FIELD_LABEL}
                     </label>
@@ -308,7 +311,7 @@ export const DatabaseQueryUpdationForm = ({ tenantID, databaseQueryID }) => {
                     <button
                       type="submit"
                       disabled={isUpdatingDatabaseQuery}
-                      class="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none "
+                      className="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none "
                     >
                       {isUpdatingDatabaseQuery && (
                         <CircularProgress
@@ -331,7 +334,7 @@ export const DatabaseQueryUpdationForm = ({ tenantID, databaseQueryID }) => {
             />
           </ResizablePanel>
         </ResizablePanelGroup>
-      )}
+      </ReactQueryLoadingErrorWrapper>
     </div>
   );
 };

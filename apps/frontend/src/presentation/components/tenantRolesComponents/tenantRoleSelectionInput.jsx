@@ -67,8 +67,8 @@ export const TenantRoleSelectionInput = ({
   return (
     <div>
       <label
-        for="roleSelection"
-        class="block text-sm font-medium text-slate-500 mb-1"
+        htmlFor="roleSelection"
+        className="block text-sm font-medium text-slate-500 mb-1"
       >
         {label || CONSTANTS.STRINGS.TENANT_ROLE_SELECTION_SELECT_ROLES_LABEL}
       </label>

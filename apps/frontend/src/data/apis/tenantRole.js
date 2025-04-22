@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-catch */
 import axios from "axios";
 import { CONSTANTS } from "../../constants";
 import { firebaseAuth } from "../../config/firebase";

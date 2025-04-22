@@ -1,13 +1,17 @@
-import React, { createContext, useContext } from "react";
+import { useQuery } from "@tanstack/react-query";
+import React from "react";
 import { useParams } from "react-router-dom";
 import { CONSTANTS } from "../../constants";
 import { getAllAPIKeysAPI } from "../../data/apis/apiKey";
-import { useQuery } from "@tanstack/react-query";
+import PropTypes from "prop-types";
 
 const APIKeysStateContext = React.createContext(undefined);
 const APIKeysActionsContext = React.createContext(undefined);
 
 const APIKeysContextProvider = ({ children }) => {
+  APIKeysContextProvider.propTypes = {
+    children: PropTypes.node.isRequired,
+  };
   const { tenantID } = useParams();
   const {
     isLoading: isLoadingAPIKeys,
@@ -21,18 +25,18 @@ const APIKeysContextProvider = ({ children }) => {
     queryFn: () => getAllAPIKeysAPI({ tenantID }),
     refetchOnWindowFocus: false,
   });
-  console.log({ apiKeys });
   return (
     <APIKeysStateContext.Provider
       value={{
         apiKeys,
         isLoadingAPIKeys,
         isFetchingAPIKeys,
+        isRefetechingAPIKeys,
+        refetchAPIKeys,
+        loadAPIKeysError,
       }}
     >
-      <APIKeysActionsContext.Provider
-        value={{ refetchAPIKeys }}
-      >
+      <APIKeysActionsContext.Provider value={{ refetchAPIKeys }}>
         {children}
       </APIKeysActionsContext.Provider>
     </APIKeysStateContext.Provider>
@@ -58,7 +62,9 @@ const useAPIKeysActions = () => {
 };
 
 export {
-  APIKeysActionsContext, APIKeysContextProvider, APIKeysStateContext,
+  APIKeysActionsContext,
+  APIKeysContextProvider,
+  APIKeysStateContext,
   useAPIKeysActions,
-  useAPIKeysState
+  useAPIKeysState,
 };

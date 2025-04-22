@@ -1,7 +1,8 @@
 import { CircularProgress } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
-import { useCallback, useEffect, useState } from "react";
+import PropTypes from "prop-types";
+import React, { useCallback, useEffect, useState } from "react";
 import { CONSTANTS } from "../../../constants";
 import {
   getDatabaseChartByIDAPI,
@@ -11,9 +12,10 @@ import {
 } from "../../../data/apis/databaseChart";
 import { useGlobalUI } from "../../../logic/contexts/globalUIContext";
 import { formValidations } from "../../../utils/formValidation";
-import { displaySuccess } from "../../../utils/notification";
+import { displayError, displaySuccess } from "../../../utils/notification";
 import { DATABASE_CHARTS_CONFIG_MAP } from "../chartTypes";
 import { DatabaseQueryTestingPanel } from "../databaseQueryComponents/databaseQueryTestingPanel";
+import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -70,6 +72,10 @@ const initialValues = {
 };
 
 export const DatabaseChartUpdationForm = ({ tenantID, databaseChartID }) => {
+  DatabaseChartUpdationForm.propTypes = {
+    tenantID: PropTypes.number.isRequired,
+    databaseChartID: PropTypes.number.isRequired,
+  };
   const queryClient = useQueryClient();
   const { showConfirmation } = useGlobalUI();
   const [selectedQueryForTesting, setSelectedQueryForTesting] = useState(false);
@@ -96,42 +102,35 @@ export const DatabaseChartUpdationForm = ({ tenantID, databaseChartID }) => {
     refetchOnWindowFocus: false,
   });
 
-  const {
-    isPending: isUpdatingDatabaseChart,
-    isSuccess: isUpdatingDatabaseChartSuccess,
-    isError: isUpdatingDatabaseChartError,
-    error: updateDatabaseChartError,
-    mutate: updateDatabaseChart,
-  } = useMutation({
-    mutationFn: (data) => {
-      return updateDatabaseChartByIDAPI({
-        tenantID,
-        databaseChartID,
-        databaseChartData: data,
-      });
-    },
-    retry: false,
-    onSuccess: (data) => {
-      displaySuccess(
-        CONSTANTS.STRINGS.UPDATE_CHART_FORM_CHART_UPDATION_SUCCESS
-      );
-      queryClient.invalidateQueries([
-        CONSTANTS.REACT_QUERY_KEYS.DATABASE_CHARTS(tenantID),
-      ]);
-    },
-    onError: (error) => {
-      displayError(error);
-    },
-  });
+  const { isPending: isUpdatingDatabaseChart, mutate: updateDatabaseChart } =
+    useMutation({
+      mutationFn: (data) => {
+        return updateDatabaseChartByIDAPI({
+          tenantID,
+          databaseChartID,
+          databaseChartData: data,
+        });
+      },
+      retry: false,
+      onSuccess: () => {
+        displaySuccess(
+          CONSTANTS.STRINGS.UPDATE_CHART_FORM_CHART_UPDATION_SUCCESS
+        );
+        queryClient.invalidateQueries([
+          CONSTANTS.REACT_QUERY_KEYS.DATABASE_CHARTS(tenantID),
+        ]);
+      },
+      onError: (error) => {
+        displayError(error);
+      },
+    });
 
   const {
     isLoading: isLoadingDatabaseChartDataByID,
     isPending: isPendingFetchingDatabaseChartDataByID,
     data: databaseChartDataByID,
-    error: loadDatabaseChartDataByIDError,
     isFetching: isFetchingDatabaseChartDataByID,
     isRefetching: isRefetechingDatabaseChartDataByID,
-    refetch: refetchDatabaseChartDataByID,
   } = useQuery({
     queryKey: [
       CONSTANTS.REACT_QUERY_KEYS.DATABASE_CHARTS(tenantID),
@@ -148,9 +147,6 @@ export const DatabaseChartUpdationForm = ({ tenantID, databaseChartID }) => {
 
   const {
     isPending: isFetchingDatabaseChartData,
-    isSuccess: isFetchingDatabaseChartDataSuccess,
-    isError: isFetchingDatabaseChartDataError,
-    error: fetchDatabaseChartDataError,
     mutate: fetchDatabaseChartData,
   } = useMutation({
     mutationFn: (data) => {
@@ -206,8 +202,6 @@ export const DatabaseChartUpdationForm = ({ tenantID, databaseChartID }) => {
     }
   }, [databaseChart]);
 
-  console.log({ updateDatabaseChartForm });
-
   return (
     <div className="w-full flex flex-col justify-start items-center h-full">
       <div className="w-full px-3 py-2 border-b border-gray-200 flex flex-col justify-center items-start">
@@ -223,84 +217,92 @@ export const DatabaseChartUpdationForm = ({ tenantID, databaseChartID }) => {
         selectedQueryForTesting={selectedQueryForTesting}
         setSelectedQueryForTesting={setSelectedQueryForTesting}
       />
-      <ResizablePanelGroup
-        direction="horizontal"
-        autoSaveId={
-          CONSTANTS.RESIZABLE_PANEL_KEYS.CHART_UPDATION_FORM_RESULT_SEPARATION
-        }
-        className={"!w-full !h-full"}
+      <ReactQueryLoadingErrorWrapper
+        isLoading={isLoadingDatabaseChart}
+        isFetching={isFetchingDatabaseChart}
+        isRefetching={isRefetechingDatabaseChart}
+        refetch={refetchDatabaseChart}
+        error={loadDatabaseChartError}
       >
-        <ResizablePanel defaultSize={20}>
-          <form
-            class="w-full h-full p-2 flex flex-col justify-start items-stretch gap-2 overflow-y-auto"
-            onSubmit={updateDatabaseChartForm.handleSubmit}
-          >
-            {updateDatabaseChartForm && (
-              <DatabaseChartEditor
+        <ResizablePanelGroup
+          direction="horizontal"
+          autoSaveId={
+            CONSTANTS.RESIZABLE_PANEL_KEYS.CHART_UPDATION_FORM_RESULT_SEPARATION
+          }
+          className={"!w-full !h-full"}
+        >
+          <ResizablePanel defaultSize={20}>
+            <form
+              className="w-full h-full p-2 flex flex-col justify-start items-stretch gap-2 overflow-y-auto"
+              onSubmit={updateDatabaseChartForm.handleSubmit}
+            >
+              {updateDatabaseChartForm && (
+                <DatabaseChartEditor
+                  key={databaseChart?.databaseChartID}
+                  databaseChartEditorForm={updateDatabaseChartForm}
+                  tenantID={tenantID}
+                />
+              )}
+              <div className="flex flex-row justify-around items-center">
+                <button
+                  type="submit"
+                  disabled={isUpdatingDatabaseChart}
+                  className="flex flex-row items-center justify-center rounded bg-[#646cff] px-3 py-1 text-sm text-white  focus:ring-2 focus:ring-[#646cff]/50 w-full outline-none focus:outline-none"
+                >
+                  {isUpdatingDatabaseChart && (
+                    <CircularProgress
+                      className="!text-xs !mr-3"
+                      size={16}
+                      color="white"
+                    />
+                  )}
+                  {CONSTANTS.STRINGS.UPDATE_CHART_FORM_SUBMIT_BUTTON}
+                </button>
+                <DatabaseChartDeletionForm
+                  key={databaseChart?.databaseChartID}
+                  tenantID={tenantID}
+                  databaseChartID={databaseChartID}
+                />
+              </div>
+            </form>
+          </ResizablePanel>
+          <ResizableHandle withHandle={true} />
+          <ResizablePanel defaultSize={80}>
+            {databaseChart?.databaseChartType ==
+            updateDatabaseChartForm?.values.databaseChartType ? (
+              <DatabaseChartPreview
                 key={databaseChart?.databaseChartID}
-                databaseChartEditorForm={updateDatabaseChartForm}
-                tenantID={tenantID}
+                databaseChartName={
+                  updateDatabaseChartForm.values.databaseChartName
+                }
+                databaseChartType={
+                  updateDatabaseChartForm.values.databaseChartType
+                }
+                databaseChartConfig={
+                  updateDatabaseChartForm.values.databaseChartConfig
+                }
+                refreshData={_handleFetchDatabaseChartData}
+                isFetchingData={
+                  isFetchingDatabaseChartData ||
+                  isFetchingDatabaseChartDataByID ||
+                  isLoadingDatabaseChartDataByID ||
+                  isPendingFetchingDatabaseChartDataByID
+                }
+                isRefreshingData={isRefetechingDatabaseChartDataByID}
+                data={
+                  databaseChartFetchedData
+                    ? databaseChartFetchedData
+                    : databaseChartDataByID?.data
+                }
               />
-            )}
-            <div className="flex flex-row justify-around items-center">
-              <button
-                type="submit"
-                disabled={isUpdatingDatabaseChart}
-                className="flex flex-row items-center justify-center rounded bg-[#646cff] px-3 py-1 text-sm text-white  focus:ring-2 focus:ring-[#646cff]/50 w-full outline-none focus:outline-none"
-              >
-                {isUpdatingDatabaseChart && (
-                  <CircularProgress
-                    className="!text-xs !mr-3"
-                    size={16}
-                    color="white"
-                  />
-                )}
-                {CONSTANTS.STRINGS.UPDATE_CHART_FORM_SUBMIT_BUTTON}
-              </button>
-              <DatabaseChartDeletionForm
-                key={databaseChart?.databaseChartID}
-                tenantID={tenantID}
-                databaseChartID={databaseChartID}
-              />
-            </div>
-          </form>
-        </ResizablePanel>
-        <ResizableHandle withHandle={true} />
-        <ResizablePanel defaultSize={80}>
-          {databaseChart?.databaseChartType ==
-          updateDatabaseChartForm?.values.databaseChartType ? (
-            <DatabaseChartPreview
-              key={databaseChart?.databaseChartID}
-              databaseChartName={
-                updateDatabaseChartForm.values.databaseChartName
-              }
-              databaseChartType={
-                updateDatabaseChartForm.values.databaseChartType
-              }
-              databaseChartConfig={
-                updateDatabaseChartForm.values.databaseChartConfig
-              }
-              refreshData={_handleFetchDatabaseChartData}
-              isFetchingData={
-                isFetchingDatabaseChartData ||
-                isFetchingDatabaseChartDataByID ||
-                isLoadingDatabaseChartDataByID ||
-                isPendingFetchingDatabaseChartDataByID
-              }
-              isRefreshingData={isRefetechingDatabaseChartDataByID}
-              data={
-                databaseChartFetchedData
-                  ? databaseChartFetchedData
-                  : databaseChartDataByID?.data
-              }
-            />
-          ) : isFetchingDatabaseChartData ? (
-            <div className="h-full w-full flex justify-center items-center">
-              <CircularProgress className="!text-[#646cff]" />
-            </div>
-          ) : null}
-        </ResizablePanel>
-      </ResizablePanelGroup>
+            ) : isFetchingDatabaseChartData ? (
+              <div className="h-full w-full flex justify-center items-center">
+                <CircularProgress className="!text-[#646cff]" />
+              </div>
+            ) : null}
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      </ReactQueryLoadingErrorWrapper>
     </div>
   );
 };

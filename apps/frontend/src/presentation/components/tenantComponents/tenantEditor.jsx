@@ -94,8 +94,8 @@ export const TenantEditor = ({ tenantEditorForm }) => {
 
       <div>
         <label
-          for="tenantName"
-          class="block mb-1 text-sm font-medium text-slate-500"
+          htmlFor="tenantName"
+          className="block mb-1 text-sm font-medium text-slate-500"
         >
           {CONSTANTS.STRINGS.TENANT_EDITOR_FORM_NAME_FIELD_LABEL}
         </label>
@@ -118,8 +118,8 @@ export const TenantEditor = ({ tenantEditorForm }) => {
         <div className="flex flex-row justify-between items-center w-full mb-1 ">
           <div className="flex flex-row justify-start items-center">
             <label
-              for="tenantDBURL"
-              class="block text-sm font-medium text-slate-500"
+              htmlFor="tenantDBURL"
+              className="block text-sm font-medium text-slate-500"
             >
               {CONSTANTS.STRINGS.TENANT_EDITOR_FORM_DB_FIELD_LABEL}
             </label>

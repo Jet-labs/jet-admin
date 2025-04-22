@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-catch */
 import axios from "axios";
 import { firebaseAuth } from "../../config/firebase";
 import { CONSTANTS } from "../../constants";
@@ -143,7 +144,6 @@ export const updateDatabaseWidgetByIDAPI = async ({
 export const getDatabaseWidgetDataByIDAPI = async ({
   tenantID,
   databaseWidgetID,
-  databaseWidgetData,
 }) => {
   try {
     const url =
@@ -246,4 +246,3 @@ export const deleteDatabaseWidgetByIDAPI = async ({
     throw error;
   }
 };
-

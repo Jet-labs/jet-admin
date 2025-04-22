@@ -1,9 +1,11 @@
 import { CircularProgress } from "@mui/material";
-import { useCallback, useRef } from "react";
+import React, { useCallback, useRef } from "react";
 import { FiRefreshCcw } from "react-icons/fi";
 import { DATABASE_CHARTS_CONFIG_MAP } from "../chartTypes";
 import { DatabaseChartDownloadForm } from "./databaseChartImageDownloadForm";
 import { CONSTANTS } from "../../../constants";
+import PropTypes from "prop-types";
+
 export const DatabaseChartPreview = ({
   databaseChartName,
   databaseChartType,
@@ -14,6 +16,16 @@ export const DatabaseChartPreview = ({
   refreshData,
   databaseChartConfig,
 }) => {
+  DatabaseChartPreview.propTypes = {
+    databaseChartName: PropTypes.string.isRequired,
+    databaseChartType: PropTypes.string.isRequired,
+    data: PropTypes.object,
+    refetchInterval: PropTypes.number,
+    isFetchingData: PropTypes.bool.isRequired,
+    isRefreshingData: PropTypes.bool.isRequired,
+    refreshData: PropTypes.func.isRequired,
+    databaseChartConfig: PropTypes.object,
+  };
   const chartRef = useRef();
   const _handleOnChartInit = useCallback(
     (ref) => {

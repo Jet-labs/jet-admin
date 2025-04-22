@@ -1,7 +1,7 @@
 // BaseChartComponent.js
 import React, { useMemo, useRef, useEffect } from "react";
 import {ChartWrapper} from "./chartWrapper";
-import { CONSTANTS } from "../../../constants";
+import PropTypes from "prop-types";
 import { getDemoData } from "./chartConfig";
 
 export const BaseChartComponent = ({
@@ -10,6 +10,12 @@ export const BaseChartComponent = ({
   onChartInit,
   databaseChartConfig,
 }) => {
+  BaseChartComponent.propTypes = {
+    type: PropTypes.string.isRequired,
+    data: PropTypes.object,
+    onChartInit: PropTypes.func,
+    databaseChartConfig: PropTypes.object,
+  };
   const chartRef = useRef(null);
 
   const plugin = {

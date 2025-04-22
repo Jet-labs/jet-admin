@@ -7,16 +7,17 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useMutation } from "@tanstack/react-query";
-import { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { FaCheck, FaMagic } from "react-icons/fa";
 import { CONSTANTS } from "../../../constants";
 import { generateAIPromptBasedChartAPI } from "../../../data/apis/databaseChart";
+import { createBulkDatabaseQueryAPI } from "../../../data/apis/databaseQuery";
 import { displayError } from "../../../utils/notification";
 import { CodeBlock } from "../ui/codeBlock";
-import { createBulkDatabaseQueryAPI } from "../../../data/apis/databaseQuery";
+import PropTypes from "prop-types";
 
 // Styled components to override MUI defaults
-const StyledDialog = styled(Dialog)(({ theme }) => ({
+const StyledDialog = styled(Dialog)(() => ({
   "& .MuiDialog-paper": {
     borderRadius: 4, // Keep original border radius
     border: "1px solid rgba(99, 102, 241, 0.2)",
@@ -27,7 +28,7 @@ const StyledDialog = styled(Dialog)(({ theme }) => ({
   },
 }));
 
-const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
+const StyledDialogTitle = styled(DialogTitle)(() => ({
   padding: "16px 16px 0 16px",
   fontWeight: 500,
   position: "relative",
@@ -36,14 +37,14 @@ const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
   background: "transparent",
 }));
 
-const StyledDialogContent = styled(DialogContent)(({ theme }) => ({
+const StyledDialogContent = styled(DialogContent)(() => ({
   padding: "16px",
   position: "relative",
   zIndex: 10,
   background: "transparent",
 }));
 
-const StyledDialogActions = styled(DialogActions)(({ theme }) => ({
+const StyledDialogActions = styled(DialogActions)(() => ({
   padding: "16px",
   position: "relative",
   zIndex: 10,
@@ -51,7 +52,10 @@ const StyledDialogActions = styled(DialogActions)(({ theme }) => ({
 }));
 
 export const DatabaseChartAIGeneratePrompt = ({ tenantID, onAccepted }) => {
-  
+  DatabaseChartAIGeneratePrompt.propTypes = {
+    tenantID: PropTypes.number.isRequired,
+    onAccepted: PropTypes.func.isRequired,
+  };
 
   const [aiPrompt, setAIPrompt] = useState("Top 10 most spending users");
   const [aiGeneratedChart, setAIGeneratedChart] = useState("");
@@ -60,9 +64,6 @@ export const DatabaseChartAIGeneratePrompt = ({ tenantID, onAccepted }) => {
 
   const {
     isPending: isGeneratingAIPromptBasedChart,
-    isSuccess: isGeneratingAIPromptBasedChartSuccess,
-    isError: isGeneratingAIPromptBasedChartError,
-    error: generateAIPromptBasedChartError,
     mutate: generateAIPromptBasedChart,
   } = useMutation({
     mutationFn: ({ aiPrompt }) => {
@@ -81,29 +82,22 @@ export const DatabaseChartAIGeneratePrompt = ({ tenantID, onAccepted }) => {
     },
   });
 
-  const {
-    isPending: isGeneratingQueries,
-    isSuccess: isGeneratingQueriesSuccess,
-    isError: isGeneratingQueriesError,
-    error: generateQueriesError,
-    mutate: generateQueries,
-  } = useMutation({
-    mutationFn: ({ databaseQueriesData }) => {
-      return createBulkDatabaseQueryAPI({
-        tenantID,
-        databaseQueriesData,
-      });
-    },
-    retry: false,
-    onSuccess: (data) => {
-      setGeneratedQueries(data);
-    },
-    onError: (error) => {
-      displayError(error);
-    },
-  });
-
-  console.log({ aiGeneratedChart });
+  const { isPending: isGeneratingQueries, mutate: generateQueries } =
+    useMutation({
+      mutationFn: ({ databaseQueriesData }) => {
+        return createBulkDatabaseQueryAPI({
+          tenantID,
+          databaseQueriesData,
+        });
+      },
+      retry: false,
+      onSuccess: (data) => {
+        setGeneratedQueries(data);
+      },
+      onError: (error) => {
+        displayError(error);
+      },
+    });
 
   const _handleAcceptGeneratedQueries = () => {
     const databaseChart = JSON.parse(aiGeneratedChart);
@@ -383,7 +377,7 @@ export const DatabaseChartAIGeneratePrompt = ({ tenantID, onAccepted }) => {
         </StyledDialogActions>
 
         {/* Add global CSS animation */}
-        <style jsx global>{`
+        <style>{`
           @keyframes pulse {
             0% {
               opacity: 0.4;

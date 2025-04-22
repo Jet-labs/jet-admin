@@ -3,11 +3,15 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { CONSTANTS } from "../../constants";
 import { getAllDatabaseTablesAPI } from "../../data/apis/databaseTable";
+import PropTypes from "prop-types";
 
 const DatabaseTablesStateContext = React.createContext(undefined);
 const DatabaseTablesActionsContext = React.createContext(undefined);
 
 const DatabaseTablesContextProvider = ({ children }) => {
+  DatabaseTablesContextProvider.propTypes = {
+    children: PropTypes.node.isRequired,
+  };
   const { tenantID, databaseSchemaName } = useParams();
   const {
     isLoading: isLoadingDatabaseTables,
@@ -30,6 +34,8 @@ const DatabaseTablesContextProvider = ({ children }) => {
         databaseTables,
         isLoadingDatabaseTables,
         isFetchingDatabaseTables,
+        loadDatabaseTablesError,
+        isRefetechingDatabaseTables,
       }}
     >
       <DatabaseTablesActionsContext.Provider value={{ refetchDatabaseTables }}>

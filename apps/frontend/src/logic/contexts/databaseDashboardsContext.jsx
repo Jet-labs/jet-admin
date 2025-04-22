@@ -8,9 +8,14 @@ import { getAllDatabaseQueriesAPI } from "../../data/apis/databaseQuery";
 import { getAllDatabaseChartsAPI } from "../../data/apis/databaseChart";
 import { getAllDatabaseDashboardsAPI } from "../../data/apis/databaseDashboard";
 import { getAllDatabaseWidgetsAPI } from "../../data/apis/databaseWidget";
+import PropTypes from "prop-types";
+
 const DatabaseDashboardsStateContext = React.createContext(undefined);
 const DatabaseDashboardsActionsContext = React.createContext(undefined);
 const DatabaseDashboardsContextProvider = ({ children }) => {
+  DatabaseDashboardsContextProvider.propTypes = {
+    children: PropTypes.node.isRequired,
+  };
   const { tenantID } = useParams();
   const {
     isLoading: isLoadingDatabaseDashboards,
@@ -66,18 +71,27 @@ const DatabaseDashboardsContextProvider = ({ children }) => {
         databaseDashboards,
         isLoadingDatabaseDashboards,
         isFetchingDatabaseDashboards,
+        loadDatabaseDashboardsError,
 
         databaseQueries,
         isLoadingDatabaseQueries,
         isFetchingDatabaseQueries,
+        loadDatabaseQueriesError,
 
         databaseCharts,
         isLoadingDatabaseCharts,
         isFetchingDatabaseCharts,
+        loadDatabaseChartsError,
 
         databaseWidgets,
         isLoadingDatabaseWidgets,
         isFetchingDatabaseWidgets,
+        loadDatabaseWidgetsError,
+
+        isRefetechingDatabaseDashboards,
+        isRefetechingDatabaseQueries,
+        isRefetechingDatabaseCharts,
+        isRefetechingDatabaseWidgets,
       }}
     >
       <DatabaseDashboardsActionsContext.Provider

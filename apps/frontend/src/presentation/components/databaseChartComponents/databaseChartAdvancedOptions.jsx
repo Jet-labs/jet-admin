@@ -1,4 +1,5 @@
-import { useCallback } from "react";
+import React, { useCallback } from "react";
+import PropTypes from "prop-types";
 
 const chartOptions = [
   // --- Global Options ---
@@ -433,8 +434,11 @@ const chartOptions = [
 export const DatabaseChartAdvancedOptions = ({
   chartForm,
   parentChartType,
-  initialValues: initialOpts = {},
 }) => {
+  DatabaseChartAdvancedOptions.propTypes = {
+    chartForm: PropTypes.object.isRequired,
+    parentChartType: PropTypes.string.isRequired,
+  };
   const renderOption = useCallback(
     (option) => {
       const {

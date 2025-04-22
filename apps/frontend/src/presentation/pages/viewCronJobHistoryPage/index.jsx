@@ -1,9 +1,6 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import { CronJobUpdationForm } from "../../components/cronJobComponents/cronJobUpdationForm";
 import { CronJobHistoryGrid } from "../../components/cronJobComponents/cronJobHistoryGrid";
-
-
 
 const ViewCronJobHistoryPage = () => {
     const { tenantID,cronJobID } = useParams();

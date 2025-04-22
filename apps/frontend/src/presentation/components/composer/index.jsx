@@ -1,8 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { Suspense } from "react";
+import React, { Suspense } from "react";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
 import { AuthContextProvider } from "../../../logic/contexts/authContext";
 import { GlobalUIProvider } from "../../../logic/contexts/globalUIContext";
 import { TenantContextProvider } from "../../../logic/contexts/tenantContext";

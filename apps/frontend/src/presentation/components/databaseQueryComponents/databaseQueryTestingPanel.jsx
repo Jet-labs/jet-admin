@@ -1,13 +1,18 @@
 import { IoClose } from "react-icons/io5";
 import { DatabaseQueryTestingForm } from "./databaseQueryTestingForm";
 import { useParams } from "react-router-dom";
-import { useState } from "react";
+import React, { useState } from "react";
 import { DatabaseQueryResponseView } from "./databaseQueryResponseView";
+import PropTypes from "prop-types";
 
 export const DatabaseQueryTestingPanel = ({
   selectedQueryForTesting,
   setSelectedQueryForTesting,
 }) => {
+  DatabaseQueryTestingPanel.propTypes = {
+    selectedQueryForTesting: PropTypes.object,
+    setSelectedQueryForTesting: PropTypes.func.isRequired,
+  };
   const [databaseQueryTestResult, setDatabaseQueryTestResult] = useState();
   const { tenantID, databaseSchemaName } = useParams();
   const isOpen = selectedQueryForTesting ? true : false;

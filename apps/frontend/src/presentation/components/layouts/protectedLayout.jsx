@@ -49,13 +49,13 @@ export const ProtectedLayout = () => {
 
   return (
     <div className="flex h-screen w-screen flex-col justify-start items-stretch overflow-hidden">
-      <nav class="w-full  border-b-2 border-[#646cff] bg-white">
-        <div class="px-3 py-2">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center justify-start rtl:justify-end">
-              <Link to={"/"} class="flex">
+      <nav className="w-full  border-b-2 border-[#646cff] bg-white">
+        <div className="px-3 py-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center justify-start rtl:justify-end">
+              <Link to={"/"} className="flex">
                 <img src={logo} className="w-8 h-8"></img>
-                <span class="ml-2 self-center text-xl !font-extrabold whitespace-nowrap text-[#00203e] aldrich-logo">
+                <span className="ml-2 self-center text-xl !font-extrabold whitespace-nowrap text-[#00203e] aldrich-logo">
                   {CONSTANTS.APP_NAME}
                 </span>
               </Link>
@@ -69,9 +69,9 @@ export const ProtectedLayout = () => {
           </div>
         </div>
       </nav>
-      <div class="flex w-full flex-grow flex-row justify-start items-start h-[calc(100vh-50px)]">
+      <div className="flex w-full flex-grow flex-row justify-start items-start h-[calc(100vh-50px)]">
         <MainDrawerList />
-        <div class="w-full h-[calc(100vh-50px)] overflow-y-auto bg-white">
+        <div className="w-full h-[calc(100vh-50px)] overflow-y-auto bg-white">
           <Outlet />
         </div>
       </div>

@@ -20,41 +20,40 @@ import {
 } from "../ui/resizable";
 import { formValidations } from "../../../utils/formValidation";
 import { DatabaseQueryAIGeneratePrompt } from "./databaseQueryAIGeneratePrompt";
+import PropTypes from "prop-types";
 
 export const DatabaseQueryAdditionForm = ({ tenantID }) => {
+  DatabaseQueryAdditionForm.propTypes = {
+    tenantID: PropTypes.number.isRequired,
+  };
   const queryClient = useQueryClient();
   const [databaseQueryTestResult, setDatabaseQueryTestResult] = useState();
 
-  const {
-    isPending: isAddingDatabaseQuery,
-    isSuccess: isAddingDatabaseQuerySuccess,
-    isError: isAddingDatabaseQueryError,
-    error: addDatabaseQueryError,
-    mutate: addDatabaseQuery,
-  } = useMutation({
-    mutationFn: (data) => {
-      return createDatabaseQueryAPI({
-        tenantID,
-        databaseQueryData: {
-          ...data,
+  const { isPending: isAddingDatabaseQuery, mutate: addDatabaseQuery } =
+    useMutation({
+      mutationFn: (data) => {
+        return createDatabaseQueryAPI({
+          tenantID,
           databaseQueryData: {
-            databaseQueryString: data.databaseQueryString,
-            databaseQueryArgs: data.databaseQueryArgs,
+            ...data,
+            databaseQueryData: {
+              databaseQueryString: data.databaseQueryString,
+              databaseQueryArgs: data.databaseQueryArgs,
+            },
           },
-        },
-      });
-    },
-    retry: false,
-    onSuccess: (data) => {
-      displaySuccess(CONSTANTS.STRINGS.ADD_QUERY_FORM_QUERY_ADDITION_SUCCESS);
-      queryClient.invalidateQueries([
-        CONSTANTS.REACT_QUERY_KEYS.DATABASE_QUERIES(tenantID),
-      ]);
-    },
-    onError: (error) => {
-      displayError(error);
-    },
-  });
+        });
+      },
+      retry: false,
+      onSuccess: () => {
+        displaySuccess(CONSTANTS.STRINGS.ADD_QUERY_FORM_QUERY_ADDITION_SUCCESS);
+        queryClient.invalidateQueries([
+          CONSTANTS.REACT_QUERY_KEYS.DATABASE_QUERIES(tenantID),
+        ]);
+      },
+      onError: (error) => {
+        displayError(error);
+      },
+    });
 
   const queryAdditionForm = useFormik({
     initialValues: {
@@ -85,7 +84,10 @@ export const DatabaseQueryAdditionForm = ({ tenantID }) => {
         className={"!w-full !h-full border-t border-gray-200"}
       >
         <ResizablePanel defaultSize={20}>
-          <form class="w-full h-full" onSubmit={queryAdditionForm.handleSubmit}>
+          <form
+            className="w-full h-full"
+            onSubmit={queryAdditionForm.handleSubmit}
+          >
             <ResizablePanelGroup
               direction="horizontal"
               autoSaveId={
@@ -100,8 +102,8 @@ export const DatabaseQueryAdditionForm = ({ tenantID }) => {
               >
                 <div>
                   <label
-                    for="databaseQueryTitle"
-                    class="block mb-1 text-xs font-medium text-slate-500"
+                    htmlFor="databaseQueryTitle"
+                    className="block mb-1 text-xs font-medium text-slate-500"
                   >
                     {CONSTANTS.STRINGS.ADD_QUERY_FORM_NAME_FIELD_LABEL}
                   </label>
@@ -109,7 +111,7 @@ export const DatabaseQueryAdditionForm = ({ tenantID }) => {
                     type="databaseQueryTitle"
                     name="databaseQueryTitle"
                     id="databaseQueryTitle"
-                    class=" placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:border-slate-700 block w-full px-2.5 py-1.5 "
+                    className=" placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:border-slate-700 block w-full px-2.5 py-1.5 "
                     placeholder={
                       CONSTANTS.STRINGS.ADD_QUERY_FORM_NAME_FIELD_PLACEHOLDER
                     }
@@ -121,8 +123,8 @@ export const DatabaseQueryAdditionForm = ({ tenantID }) => {
                 </div>
                 <div>
                   <label
-                    for="databaseQueryDescription"
-                    class="block mb-1 text-xs font-medium text-slate-500"
+                    htmlFor="databaseQueryDescription"
+                    className="block mb-1 text-xs font-medium text-slate-500"
                   >
                     {CONSTANTS.STRINGS.ADD_QUERY_FORM_DESCRIPTION_FIELD_LABEL}
                   </label>
@@ -130,7 +132,7 @@ export const DatabaseQueryAdditionForm = ({ tenantID }) => {
                     type="databaseQueryDescription"
                     name="databaseQueryDescription"
                     id="databaseQueryDescription"
-                    class=" placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:border-slate-700 block w-full px-2.5 py-1.5 "
+                    className=" placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:border-slate-700 block w-full px-2.5 py-1.5 "
                     placeholder={
                       CONSTANTS.STRINGS
                         .ADD_QUERY_FORM_DESCRIPTION_FIELD_PLACEHOLDER
@@ -154,8 +156,8 @@ export const DatabaseQueryAdditionForm = ({ tenantID }) => {
                 </label>
                 <div>
                   <label
-                    for="databaseQueryDescription"
-                    class="block mb-1 text-xs font-medium text-slate-500"
+                    htmlFor="databaseQueryDescription"
+                    className="block mb-1 text-xs font-medium text-slate-500"
                   >
                     {CONSTANTS.STRINGS.ADD_QUERY_FORM_PARAMS_FIELD_LABEL}
                   </label>
@@ -210,7 +212,7 @@ export const DatabaseQueryAdditionForm = ({ tenantID }) => {
                   <button
                     type="submit"
                     disabled={isAddingDatabaseQuery}
-                    class="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none "
+                    className="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none "
                   >
                     {isAddingDatabaseQuery && (
                       <CircularProgress

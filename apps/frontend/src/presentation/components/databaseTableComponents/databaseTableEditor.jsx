@@ -4,11 +4,17 @@ import { FaPlus, FaTimes } from "react-icons/fa";
 import { Menu, MenuItem } from "@mui/material";
 import { CONSTANTS } from "../../../constants";
 import { getDatabaseMetadataAPI } from "../../../data/apis/database";
+import PropTypes from "prop-types";
+import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 
 const MultipleColumnSelectDropdownForForeignKeyConstraint = ({
   tableEditorForm,
   fkIndex,
 }) => {
+  MultipleColumnSelectDropdownForForeignKeyConstraint.propTypes = {
+    tableEditorForm: PropTypes.object.isRequired,
+    fkIndex: PropTypes.number.isRequired,
+  };
   // State for dropdown visibility
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -132,6 +138,11 @@ const MultipleRefColumnSelectDropdownForForeignKeyConstraint = ({
   fkIndex,
   referencedTable,
 }) => {
+  MultipleRefColumnSelectDropdownForForeignKeyConstraint.propTypes = {
+    tableEditorForm: PropTypes.object.isRequired,
+    fkIndex: PropTypes.number.isRequired,
+    referencedTable: PropTypes.object.isRequired,
+  };
   // State for dropdown visibility
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -254,6 +265,9 @@ const MultipleRefColumnSelectDropdownForForeignKeyConstraint = ({
 };
 
 const PrimaryKeyConstraintSelector = ({ tableEditorForm }) => {
+  PrimaryKeyConstraintSelector.propTypes = {
+    tableEditorForm: PropTypes.object.isRequired,
+  };
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
 
@@ -360,6 +374,9 @@ const PrimaryKeyConstraintSelector = ({ tableEditorForm }) => {
 };
 
 const UniqueConstraintSelector = ({ tableEditorForm }) => {
+  UniqueConstraintSelector.propTypes = {
+    tableEditorForm: PropTypes.object.isRequired,
+  };
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [activeConstraintIndex, setActiveConstraintIndex] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null);
@@ -514,7 +531,7 @@ const UniqueConstraintSelector = ({ tableEditorForm }) => {
         <button
           type="button"
           onClick={_handleAddConstraint}
-          class="flex flex-row justify-center items-center px-0 py-1  text-xs font-medium text-center bg-white text-[#646cff]  rounded   focus:outline-none border-0  "
+          className="flex flex-row justify-center items-center px-0 py-1  text-xs font-medium text-center bg-white text-[#646cff]  rounded   focus:outline-none border-0  "
         >
           {CONSTANTS.STRINGS.TABLE_EDITOR_FORM_ADD_UNIQUE_CONSTRAINT_BUTTON}
         </button>
@@ -527,6 +544,10 @@ const ForeignKeyConstraintSelector = ({
   tableEditorForm,
   databaseMetadata,
 }) => {
+  ForeignKeyConstraintSelector.propTypes = {
+    tableEditorForm: PropTypes.object.isRequired,
+    databaseMetadata: PropTypes.object.isRequired,
+  };
   const _handleAddForeignKey = () => {
     tableEditorForm.setFieldValue("databaseTableConstraints.foreignKeys", [
       ...tableEditorForm.values.databaseTableConstraints.foreignKeys,
@@ -838,7 +859,7 @@ const ForeignKeyConstraintSelector = ({
         <button
           type="button"
           onClick={_handleAddForeignKey}
-          class="flex flex-row justify-center items-center px-0 py-1  text-xs font-medium text-center bg-white text-[#646cff]  rounded   focus:outline-none border-0  "
+          className="flex flex-row justify-center items-center px-0 py-1  text-xs font-medium text-center bg-white text-[#646cff]  rounded   focus:outline-none border-0  "
         >
           {CONSTANTS.STRINGS.TABLE_EDITOR_FORM_ADD_FOREIGN_KEY_BUTTON}
         </button>
@@ -848,6 +869,9 @@ const ForeignKeyConstraintSelector = ({
 };
 
 const ExcludeConstraintSelector = ({ tableEditorForm }) => {
+  ExcludeConstraintSelector.propTypes = {
+    tableEditorForm: PropTypes.object.isRequired,
+  };
   return (
     <div className="mb-4">
       <span className="block mb-1 text-xs font-medium text-slate-500">
@@ -875,6 +899,9 @@ const ExcludeConstraintSelector = ({ tableEditorForm }) => {
 };
 
 const ColumnSelector = ({ tableEditorForm }) => {
+  ColumnSelector.propTypes = {
+    tableEditorForm: PropTypes.object.isRequired,
+  };
   const _handleAddColumn = () => {
     tableEditorForm.setFieldValue("databaseTableColumns", [
       ...tableEditorForm.values.databaseTableColumns,
@@ -1126,7 +1153,7 @@ const ColumnSelector = ({ tableEditorForm }) => {
         <button
           onClick={_handleAddColumn}
           type="button"
-          class="flex flex-row justify-center items-center px-0 py-1  text-xs font-medium text-center bg-white text-[#646cff]  rounded   focus:outline-none border-0  "
+          className="flex flex-row justify-center items-center px-0 py-1  text-xs font-medium text-center bg-white text-[#646cff]  rounded   focus:outline-none border-0  "
         >
           {CONSTANTS.STRINGS.TABLE_EDITOR_FORM_ADD_COLUMN_BUTTON}
         </button>
@@ -1136,6 +1163,9 @@ const ColumnSelector = ({ tableEditorForm }) => {
 };
 
 const CheckConstraintSelector = ({ tableEditorForm }) => {
+  CheckConstraintSelector.propTypes = {
+    tableEditorForm: PropTypes.object.isRequired,
+  };
   return (
     <div className="mb-4">
       <span className="block mb-1 text-xs font-medium text-slate-500">
@@ -1163,6 +1193,10 @@ const CheckConstraintSelector = ({ tableEditorForm }) => {
 };
 
 export const DatabaseTableEditor = ({ tenantID, tableEditorForm }) => {
+  DatabaseTableEditor.propTypes = {
+    tenantID: PropTypes.number.isRequired,
+    tableEditorForm: PropTypes.object.isRequired,
+  };
   const {
     isLoading: isLoadingDatabaseMetadata,
     isFetching: isFetchingDatabaseMetadata,
@@ -1180,8 +1214,8 @@ export const DatabaseTableEditor = ({ tenantID, tableEditorForm }) => {
     <>
       <div>
         <label
-          for="databaseTableName"
-          class="block mb-1 text-xs font-medium text-slate-500"
+          htmlFor="databaseTableName"
+          className="block mb-1 text-xs font-medium text-slate-500"
         >
           {CONSTANTS.STRINGS.TABLE_EDITOR_FORM_NAME_FIELD_LABEL}
         </label>
@@ -1189,7 +1223,7 @@ export const DatabaseTableEditor = ({ tenantID, tableEditorForm }) => {
           type="databaseTableName"
           name="databaseTableName"
           id="databaseTableName"
-          class=" placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:border-slate-700 block w-full px-2.5 py-1.5 "
+          className=" placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:border-slate-700 block w-full px-2.5 py-1.5 "
           placeholder={
             CONSTANTS.STRINGS.TABLE_EDITOR_FORM_NAME_FIELD_PLACEHOLDER
           }
@@ -1219,12 +1253,20 @@ export const DatabaseTableEditor = ({ tenantID, tableEditorForm }) => {
 
       <ColumnSelector tableEditorForm={tableEditorForm} />
 
-      {databaseMetadata && databaseMetadata.schemas?.length > 0 && (
-        <ForeignKeyConstraintSelector
-          tableEditorForm={tableEditorForm}
-          databaseMetadata={databaseMetadata}
-        />
-      )}
+      <ReactQueryLoadingErrorWrapper
+        isLoading={isLoadingDatabaseMetadata}
+        isFetching={isFetchingDatabaseMetadata}
+        isRefetching={isRefetchingDatabaseMetadata}
+        error={databaseMetadataError}
+        refetch={refetchDatabaseMetadata}
+      >
+        {databaseMetadata && databaseMetadata.schemas?.length > 0 && (
+          <ForeignKeyConstraintSelector
+            tableEditorForm={tableEditorForm}
+            databaseMetadata={databaseMetadata}
+          />
+        )}
+      </ReactQueryLoadingErrorWrapper>
 
       {/* Table Constraints Section */}
       <div className="mt-6">

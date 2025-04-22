@@ -91,7 +91,7 @@ export const DatabaseTriggerAdditionForm = ({
       </h1>
 
       <form
-        class="space-y-3 md:space-y-4 mt-5 p-3"
+        className="space-y-3 md:space-y-4 mt-5 p-3"
         onSubmit={triggerAdditionForm.handleSubmit}
       >
         {/* Basic Information */}
@@ -316,7 +316,7 @@ export const DatabaseTriggerAdditionForm = ({
         <div className="flex justify-end">
           <button
             type="submit"
-            class="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none "
+            className="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none "
             disabled={isAddingDatabaseTrigger}
           >
             {isAddingDatabaseTrigger ? (

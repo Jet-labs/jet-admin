@@ -1,5 +1,6 @@
+import { useQuery } from "@tanstack/react-query";
+import PropTypes from "prop-types";
 import React from "react";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { CONSTANTS } from "../../constants";
 import { getAllUserTenantsAPI } from "../../data/apis/tenant";
 import { useAuthState } from "./authContext";
@@ -8,7 +9,9 @@ const TenantStateContext = React.createContext(undefined);
 const TenantActionsContext = React.createContext(undefined);
 
 const TenantContextProvider = ({ children }) => {
-  const queryClient = useQueryClient();
+  TenantContextProvider.propTypes = {
+    children: PropTypes.node.isRequired,
+  };
   const { user } = useAuthState();
 
   const {
@@ -49,6 +52,7 @@ const TenantContextProvider = ({ children }) => {
         isFetchingTenants,
         isRefetchingTenants,
         isLoadingTenants,
+        tenantsError,
       }}
     >
       <TenantActionsContext.Provider

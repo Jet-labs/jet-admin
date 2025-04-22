@@ -7,16 +7,16 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useMutation } from "@tanstack/react-query";
-import { useCallback, useEffect, useState } from "react";
-import { FaCheck, FaMagic } from "react-icons/fa";
+import React, { useCallback, useState } from "react";
+import { FaMagic } from "react-icons/fa";
 import { CONSTANTS } from "../../../constants";
-import { generateAIPromptBasedChartAPI, generateAIPromptBasedChartStyleAPI } from "../../../data/apis/databaseChart";
+import { generateAIPromptBasedChartStyleAPI } from "../../../data/apis/databaseChart";
 import { displayError } from "../../../utils/notification";
 import { CodeBlock } from "../ui/codeBlock";
-import { createBulkDatabaseQueryAPI } from "../../../data/apis/databaseQuery";
+import PropTypes from "prop-types";
 
 // Styled components to override MUI defaults
-const StyledDialog = styled(Dialog)(({ theme }) => ({
+const StyledDialog = styled(Dialog)(() => ({
   "& .MuiDialog-paper": {
     borderRadius: 4, // Keep original border radius
     border: "1px solid rgba(99, 102, 241, 0.2)",
@@ -27,7 +27,7 @@ const StyledDialog = styled(Dialog)(({ theme }) => ({
   },
 }));
 
-const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
+const StyledDialogTitle = styled(DialogTitle)(() => ({
   padding: "16px 16px 0 16px",
   fontWeight: 500,
   position: "relative",
@@ -36,32 +36,39 @@ const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
   background: "transparent",
 }));
 
-const StyledDialogContent = styled(DialogContent)(({ theme }) => ({
+const StyledDialogContent = styled(DialogContent)(() => ({
   padding: "16px",
   position: "relative",
   zIndex: 10,
   background: "transparent",
 }));
 
-const StyledDialogActions = styled(DialogActions)(({ theme }) => ({
+const StyledDialogActions = styled(DialogActions)(() => ({
   padding: "16px",
   position: "relative",
   zIndex: 10,
   background: "transparent",
 }));
 
-export const DatabaseChartAIStylePrompt = ({ tenantID,databaseChartData, onAccepted }) => {
-  
+export const DatabaseChartAIStylePrompt = ({
+  tenantID,
+  databaseChartData,
+  onAccepted,
+}) => {
+  DatabaseChartAIStylePrompt.propTypes = {
+    tenantID: PropTypes.number.isRequired,
+    onAccepted: PropTypes.func.isRequired,
+    databaseChartData: PropTypes.object.isRequired,
+  };
 
-  const [aiPrompt, setAIPrompt] = useState("Style the chart with more modern look and feel");
+  const [aiPrompt, setAIPrompt] = useState(
+    "Style the chart with more modern look and feel"
+  );
   const [aiStyledChart, setAIStyledChart] = useState("");
   const [isAIPromptDialogOpen, setIsAIPromptDialogOpen] = useState(false);
-  
+
   const {
     isPending: isGeneratingAIPromptBasedChartStyle,
-    isSuccess: isGeneratingAIPromptBasedChartStyleSuccess,
-    isError: isGeneratingAIPromptBasedChartStyleError,
-    error: generateAIPromptBasedChartStyleError,
     mutate: generateAIPromptBasedChartStyle,
   } = useMutation({
     mutationFn: ({ aiPrompt }) => {
@@ -85,7 +92,7 @@ export const DatabaseChartAIStylePrompt = ({ tenantID,databaseChartData, onAccep
 
   const _handleOnChartConfigAccepted = useCallback(() => {
     if (!aiStyledChart) return;
-    onAccepted({databaseChartData: JSON.parse(aiStyledChart)});
+    onAccepted({ databaseChartData: JSON.parse(aiStyledChart) });
     setIsAIPromptDialogOpen(false);
   }, [aiStyledChart, onAccepted]);
 
@@ -257,7 +264,7 @@ export const DatabaseChartAIStylePrompt = ({ tenantID,databaseChartData, onAccep
 
           <button
             type="button"
-            onClick={() => generateAIPromptBasedChartStyle({ aiPrompt})}
+            onClick={() => generateAIPromptBasedChartStyle({ aiPrompt })}
             className="px-2.5 py-1.5 text-sm text-white bg-gradient-to-r from-indigo-600 to-purple-600 flex flex-row items-center rounded hover:from-indigo-500 hover:to-purple-500 transition-all duration-200"
             style={{
               boxShadow: "0 0 15px rgba(99, 102, 241, 0.2)",
@@ -297,7 +304,7 @@ export const DatabaseChartAIStylePrompt = ({ tenantID,databaseChartData, onAccep
         </StyledDialogActions>
 
         {/* Add global CSS animation */}
-        <style jsx global>{`
+        <style>{`
           @keyframes pulse {
             0% {
               opacity: 0.4;

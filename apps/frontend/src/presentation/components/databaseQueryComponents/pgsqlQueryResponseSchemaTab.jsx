@@ -4,7 +4,12 @@ import CodeMirror from "@uiw/react-codemirror";
 import React from "react";
 import "react-data-grid/lib/styles.css";
 import jsonSchemaGenerator from "to-json-schema";
+import PropTypes from "prop-types";
+
 export const PGSQLQueryResponseSchemaTab = ({ data }) => {
+  PGSQLQueryResponseSchemaTab.propTypes = {
+    data: PropTypes.object,
+  };
   const dataSchema = jsonSchemaGenerator(
     data ? data : { arrays: { mode: "all" } }
   );

@@ -66,12 +66,12 @@ export const TenantUserAdditionForm = ({ tenantID, open, onClose }) => {
             {CONSTANTS.STRINGS.ADD_MEMBER_TO_TENANT_DIALOG_DESCRIPTION}
           </span>
           <form
-            class="space-y-4 md:space-y-6"
+            className="space-y-4 md:space-y-6"
             // onSubmit={addUserToTenantForm.handleSubmit}
           >
             <div>
               <label
-                for="tenantUserEmail"
+                htmlFor="tenantUserEmail"
                 className="block text-xs text-slate-500 mb-1"
               >
                 {
@@ -83,7 +83,7 @@ export const TenantUserAdditionForm = ({ tenantID, open, onClose }) => {
                 type="tenantUserEmail"
                 name="tenantUserEmail"
                 id="tenantUserEmail"
-                class=" placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:border-slate-700 block w-full px-2.5 py-1.5 "
+                className=" placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:border-slate-700 block w-full px-2.5 py-1.5 "
                 placeholder={
                   CONSTANTS.STRINGS
                     .ADD_MEMBER_TO_TENANT_DIALOG_FORM_MEMBER_EMAIL_PLACEHOLDER

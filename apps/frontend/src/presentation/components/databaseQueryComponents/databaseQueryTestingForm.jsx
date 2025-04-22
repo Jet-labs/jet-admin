@@ -1,10 +1,11 @@
-import { useMutation } from "@tanstack/react-query";
-import { CONSTANTS } from "../../../constants";
-import { displayError, displaySuccess } from "../../../utils/notification";
-import { testDatabaseQueryAPI } from "../../../data/apis/databaseQuery";
 import { CircularProgress } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import React, { useState } from "react";
+import { CONSTANTS } from "../../../constants";
+import { testDatabaseQueryAPI } from "../../../data/apis/databaseQuery";
+import { displayError, displaySuccess } from "../../../utils/notification";
 import { DatabaseQueryArgsForm } from "./databaseQueryArgsForm";
+import PropTypes from "prop-types";
 
 export const DatabaseQueryTestingForm = ({
   tenantID,
@@ -13,32 +14,33 @@ export const DatabaseQueryTestingForm = ({
   databaseQueryArgs,
   setDatabaseQueryTestResult,
 }) => {
+  DatabaseQueryTestingForm.propTypes = {
+    tenantID: PropTypes.number.isRequired,
+    databaseQueryID: PropTypes.number.isRequired,
+    databaseQueryString: PropTypes.string.isRequired,
+    databaseQueryArgs: PropTypes.array.isRequired,
+    setDatabaseQueryTestResult: PropTypes.func.isRequired,
+  };
   const [isArgsFormOpen, setIsArgsFormOpen] = useState(false);
 
-  const {
-    isPending: isTestingDatabaseQuery,
-    isSuccess: isTestingDatabaseQuerySuccess,
-    isError: isTestingDatabaseQueryError,
-    error: testDatabaseQueryError,
-    data: databaseQueryTestResult,
-    mutate: testDatabaseQuery,
-  } = useMutation({
-    mutationFn: (databaseQueryData) => {
-      return testDatabaseQueryAPI({
-        tenantID,
-        databaseQueryID,
-        databaseQueryData,
-      });
-    },
-    retry: false,
-    onSuccess: (data) => {
-      setDatabaseQueryTestResult(data);
-      displaySuccess(CONSTANTS.STRINGS.TEST_QUERY_FORM_QUERY_TESTING_SUCCESS);
-    },
-    onError: (error) => {
-      displayError(error);
-    },
-  });
+  const { isPending: isTestingDatabaseQuery, mutate: testDatabaseQuery } =
+    useMutation({
+      mutationFn: (databaseQueryData) => {
+        return testDatabaseQueryAPI({
+          tenantID,
+          databaseQueryID,
+          databaseQueryData,
+        });
+      },
+      retry: false,
+      onSuccess: (data) => {
+        setDatabaseQueryTestResult(data);
+        displaySuccess(CONSTANTS.STRINGS.TEST_QUERY_FORM_QUERY_TESTING_SUCCESS);
+      },
+      onError: (error) => {
+        displayError(error);
+      },
+    });
 
   const _handleTestQuery = () => {
     if (
@@ -85,7 +87,7 @@ export const DatabaseQueryTestingForm = ({
         onClick={_handleTestQuery}
         disabled={isTestingDatabaseQuery}
         type="button"
-        class="flex flex-row items-center justify-center rounded bg-[#646cff]/10 mr-2 px-3 py-1.5 text-xs text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50 outline-none focus:outline-none"
+        className="flex flex-row items-center justify-center rounded bg-[#646cff]/10 mr-2 px-3 py-1.5 text-xs text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50 outline-none focus:outline-none"
       >
         {isTestingDatabaseQuery && (
           <CircularProgress

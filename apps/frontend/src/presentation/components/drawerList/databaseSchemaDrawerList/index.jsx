@@ -32,7 +32,7 @@ export const DatabaseSchemaDrawerList = () => {
   return (
     <aside
       id="logo-sidebar"
-      class="h-[calc(100vh-50px)] overflow-y-auto transition-transform bg-white border-r border-slate-200"
+      className="h-[calc(100vh-50px)] overflow-y-auto transition-transform bg-white border-r border-slate-200"
       aria-label="Sidebar"
     >
       <div className=" bg-white p-2 w-full overflow-y-auto h-full">

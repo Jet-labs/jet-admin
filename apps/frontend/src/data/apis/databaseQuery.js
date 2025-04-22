@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-catch */
 import axios from "axios";
 import { firebaseAuth } from "../../config/firebase";
 import { CONSTANTS } from "../../constants";
@@ -204,7 +205,6 @@ export const generateAIPromptBasedQueryAPI = async ({ tenantID, aiPrompt }) => {
     throw error;
   }
 };
-
 
 export const testDatabaseQueryByIDAPI = async ({
   tenantID,

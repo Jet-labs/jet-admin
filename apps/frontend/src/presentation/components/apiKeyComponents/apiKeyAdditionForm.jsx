@@ -8,22 +8,16 @@ import { displayError, displaySuccess } from "../../../utils/notification";
 import { createAPIKeyAPI } from "../../../data/apis/apiKey";
 import { formValidations } from "../../../utils/formValidation";
 import { APIKeyEditor } from "./apiKeyEditor";
-import { NoEntityUI } from "../ui/noEntityUI";
-import { Link } from "react-router-dom";
 import { APIKeyRoleSelectionDialog } from "./apiKeyRoleSelectionDialog";
+import PropTypes from "prop-types";
 
-export const APIKeyAdditionForm = ({
-  tenantID,
-}) => {
+export const APIKeyAdditionForm = ({ tenantID }) => {
+  APIKeyAdditionForm.propTypes = {
+    tenantID: PropTypes.number.isRequired,
+  };
   const queryClient = useQueryClient();
 
-  const {
-    isPending: isAddingAPIKey,
-    isSuccess: isAddingAPIKeySuccess,
-    isError: isAddingAPIKeyError,
-    error: addAPIKeyError,
-    mutate: addAPIKey,
-  } = useMutation({
+  const { isPending: isAddingAPIKey, mutate: addAPIKey } = useMutation({
     mutationFn: (data) => {
       return createAPIKeyAPI({
         tenantID,
@@ -31,7 +25,7 @@ export const APIKeyAdditionForm = ({
       });
     },
     retry: false,
-    onSuccess: (data) => {
+    onSuccess: () => {
       displaySuccess(CONSTANTS.STRINGS.ADD_API_KEY_FORM_API_KEY_CREATED);
       queryClient.invalidateQueries([
         CONSTANTS.REACT_QUERY_KEYS.DATABASE_API_KEYS(tenantID),
@@ -59,21 +53,23 @@ export const APIKeyAdditionForm = ({
       </h1>
 
       <form
-        class="space-y-3 md:space-y-4 mt-2 p-3"
+        className="space-y-3 md:space-y-4 mt-2 p-3"
         onSubmit={apiKeyAdditionForm.handleSubmit}
       >
         <APIKeyEditor
-        tenantID={tenantID}
+          tenantID={tenantID}
           apiKeyEditorForm={apiKeyAdditionForm}
           isLoadingAPIKeyEditorForm={isAddingAPIKey}
         />
 
-
         <div className="flex justify-end">
-          <APIKeyRoleSelectionDialog tenantID={tenantID} apiKeyEditorForm={apiKeyAdditionForm} />
+          <APIKeyRoleSelectionDialog
+            tenantID={tenantID}
+            apiKeyEditorForm={apiKeyAdditionForm}
+          />
           <button
             type="submit"
-            class="flex ml-2 flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none "
+            className="flex ml-2 flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none "
             disabled={isAddingAPIKey}
           >
             {isAddingAPIKey ? (

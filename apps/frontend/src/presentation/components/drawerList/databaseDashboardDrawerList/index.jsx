@@ -37,11 +37,11 @@ export const DatabaseDashboardDrawerList = ({}) => {
         </button>
       )}
       {isLoadingDatabaseDashboards || isFetchingDatabaseDashboards ? (
-        <div role="status" class=" animate-pulse w-full">
-          <div class="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
-          <div class="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
-          <div class="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
-          <div class="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
+        <div role="status" className=" animate-pulse w-full">
+          <div className="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
+          <div className="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
+          <div className="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
+          <div className="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
         </div>
       ) : databaseDashboards && databaseDashboards.length > 0 ? (
         <div className="h-full w-full overflow-y-auto">

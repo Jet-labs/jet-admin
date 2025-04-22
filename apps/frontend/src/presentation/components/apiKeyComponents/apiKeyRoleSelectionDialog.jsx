@@ -3,11 +3,19 @@ import { FaCog, FaTimes } from "react-icons/fa";
 import { CONSTANTS } from "../../../constants";
 import { TenantRoleSelectionInput } from "../tenantRolesComponents/tenantRoleSelectionInput";
 import { CircularProgress } from "@mui/material";
+import PropTypes from "prop-types";
+import React from "react";
 
-
-export const APIKeyRoleSelectionDialog = ({ tenantID, apiKeyEditorForm ,isLoadingAPIKeyEditorForm}) => {
-  const [selectedTenantRoleIDs, setSelectedTenantRoleIDs] =
-    useState(apiKeyEditorForm?.values?.roleIDs);
+export const APIKeyRoleSelectionDialog = ({
+  tenantID,
+  apiKeyEditorForm,
+  isLoadingAPIKeyEditorForm,
+}) => {
+  APIKeyRoleSelectionDialog.propTypes = {
+    tenantID: PropTypes.number.isRequired,
+    apiKeyEditorForm: PropTypes.object.isRequired,
+    isLoadingAPIKeyEditorForm: PropTypes.bool.isRequired,
+  };
 
   const [isAPIKeyRoleSelectDialogOpen, setIsAPIKeyRoleSelectDialogOpen] =
     useState(false);
@@ -19,8 +27,6 @@ export const APIKeyRoleSelectionDialog = ({ tenantID, apiKeyEditorForm ,isLoadin
     setIsAPIKeyRoleSelectDialogOpen(false);
   };
 
-
- 
   return (
     <>
       <button
@@ -59,7 +65,8 @@ export const APIKeyRoleSelectionDialog = ({ tenantID, apiKeyEditorForm ,isLoadin
                   tenantID={tenantID}
                   selectedTenantRoleIDs={apiKeyEditorForm?.values?.roleIDs}
                   setSelectedTenantRoleIDs={(roleIDs) =>
-                    apiKeyEditorForm.setFieldValue("roleIDs", roleIDs)}
+                    apiKeyEditorForm.setFieldValue("roleIDs", roleIDs)
+                  }
                 />
               </div>
             </div>

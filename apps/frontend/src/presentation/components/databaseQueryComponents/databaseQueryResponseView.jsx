@@ -4,7 +4,12 @@ import { PGSQLQueryResponseJSONTab } from "./pgsqlQueryResponseJSONTab";
 import { PGSQLQueryResponseRAWTab } from "./pgsqlQueryResponseRawTab";
 import { PGSQLQueryResponseSchemaTab } from "./pgsqlQueryResponseSchemaTab";
 import { PGSQLQueryResponseTableTab } from "./pgsqlQueryResponseTableTab";
+import PropTypes from "prop-types";
+
 export const DatabaseQueryResponseView = ({ databaseQueryResult }) => {
+  DatabaseQueryResponseView.propTypes = {
+    databaseQueryResult: PropTypes.object,
+  };
   const [tab, setTab] = useState(0);
   const _handleTabChange = (event, newTab) => {
     setTab(newTab);

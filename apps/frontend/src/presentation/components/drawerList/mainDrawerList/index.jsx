@@ -71,20 +71,20 @@ export const MainDrawerList = ({ currentPageTitle }) => {
   return (
     <aside
       id="logo-sidebar"
-      class=" w-80 h-[calc(100vh-50px)] overflow-y-auto transition-transform bg-white border-r border-slate-200 flex flex-col justify-start items-stretch gap-2"
+      className=" w-80 h-[calc(100vh-50px)] overflow-y-auto transition-transform bg-white border-r border-slate-200 flex flex-col justify-start items-stretch gap-2"
       aria-label="Sidebar"
     >
-      <div class="h-full p-2 overflow-y-auto bg-white">
+      <div className="h-full p-2 overflow-y-auto bg-white">
         {isLoadingTenants ? (
           <div
             role="status"
-            class=" animate-pulse w-full flex flex-row justify-start items-end"
+            className=" animate-pulse w-full flex flex-row justify-start items-end"
           >
-            <div class="h-10 bg-gray-200 w-10 rounded-md"></div>
+            <div className="h-10 bg-gray-200 w-10 rounded-md"></div>
             <div className="flex flex-col justify-start items-start flex-grow ms-2">
-              <div class="h-2 bg-gray-200 rounded   mb-2 w-16"></div>
-              <div class="h-2 bg-gray-200 rounded   mb-2 w-full"></div>
-              <div class="h-2 bg-gray-200 rounded   mb-0 w-full"></div>
+              <div className="h-2 bg-gray-200 rounded   mb-2 w-16"></div>
+              <div className="h-2 bg-gray-200 rounded   mb-2 w-full"></div>
+              <div className="h-2 bg-gray-200 rounded   mb-0 w-full"></div>
             </div>
           </div>
         ) : tenants && tenants.length > 0 ? (
@@ -103,7 +103,7 @@ export const MainDrawerList = ({ currentPageTitle }) => {
           <>
             <button
               onClick={_handleNavigateToAddTenantPage}
-              class="w-full py-1 px-2 mt-1 mb-2 text-sm item-center flex flex-row items-center justify-center font-medium text-white focus:outline-none bg-[#646cff] rounded border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 "
+              className="w-full py-1 px-2 mt-1 mb-2 text-sm item-center flex flex-row items-center justify-center font-medium text-white focus:outline-none bg-[#646cff] rounded border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 "
             >
               {CONSTANTS.STRINGS.ADD_TENANT_FORM_TITLE}
               <FaPlus className="!w-4 !h-4 !text-white ml-1" />
@@ -118,7 +118,7 @@ export const MainDrawerList = ({ currentPageTitle }) => {
           <>
             <button
               type="button"
-              class={
+              className={
                 "w-full hover:border-none border-none mt-2 text-slate-900 bg-slate-200 justify-between hover:bg-slate-100 focus:outline-none  font-medium rounded text-sm px-1 py-2 text-center inline-flex items-center"
               }
               onClick={() =>
@@ -129,7 +129,7 @@ export const MainDrawerList = ({ currentPageTitle }) => {
               }
             >
               <BsServer className="!w-5 !h-5 !text-slate-600 ml-1" />
-              <span class="flex-1 ms-2 text-left font-semibold rtl:text-right whitespace-nowrap text-slate-700">
+              <span className="flex-1 ms-2 text-left font-semibold rtl:text-right whitespace-nowrap text-slate-700">
                 {CONSTANTS.STRINGS.MAIN_DRAWER_DATABASE_SCHEMA_TITLE}
               </span>
               {menuItemExpandedState.databaseSchema ? (
@@ -139,14 +139,14 @@ export const MainDrawerList = ({ currentPageTitle }) => {
               )}
             </button>
             {menuItemExpandedState.databaseSchema && (
-              <ul class=" space-y-2 rounded mt-2">
+              <ul className=" space-y-2 rounded mt-2">
                 <li className="">
                   {isLoadingDatabaseMetadata || isFetchingDatabaseMetadata ? (
-                    <div role="status" class=" animate-pulse">
-                      <div class="h-8 bg-gray-200 rounded   mb-2"></div>
-                      <div class="h-8 bg-gray-200 rounded   mb-2"></div>
-                      <div class="h-8 bg-gray-200 rounded   mb-2"></div>
-                      <div class="h-8 bg-gray-200 rounded   mb-2"></div>
+                    <div role="status" className=" animate-pulse">
+                      <div className="h-8 bg-gray-200 rounded   mb-2"></div>
+                      <div className="h-8 bg-gray-200 rounded   mb-2"></div>
+                      <div className="h-8 bg-gray-200 rounded   mb-2"></div>
+                      <div className="h-8 bg-gray-200 rounded   mb-2"></div>
                     </div>
                   ) : (
                     databaseMetadata?.schemas?.map((schema) => {
@@ -164,7 +164,7 @@ export const MainDrawerList = ({ currentPageTitle }) => {
                               parseInt(tenantID),
                               schema.databaseSchemaName
                             )}
-                            class={`flex items-center ${
+                            className={`flex items-center ${
                               isActive ? "bg-[#eaebff]" : "bg-slate-100"
                             } rounded mb-2 w-full p-2 text-slate-700 transition duration-75 group hover:bg-[#eaebff]  flex-row justify-start `}
                           >
@@ -200,7 +200,7 @@ export const MainDrawerList = ({ currentPageTitle }) => {
             <Link
               to={CONSTANTS.ROUTES.VIEW_DATABASE_DASHBOARDS.path(tenantID)}
               key={CONSTANTS.ROUTES.VIEW_DATABASE_DASHBOARDS.path(tenantID)}
-              class={`flex items-center ${
+              className={`flex items-center ${
                 decodeURIComponent(location.pathname).includes(
                   CONSTANTS.ROUTES.VIEW_DATABASE_DASHBOARDS.path(tenantID)
                 )
@@ -234,7 +234,7 @@ export const MainDrawerList = ({ currentPageTitle }) => {
             <Link
               to={CONSTANTS.ROUTES.VIEW_DATABASE_CHARTS.path(tenantID)}
               key={CONSTANTS.ROUTES.VIEW_DATABASE_CHARTS.path(tenantID)}
-              class={`flex items-center ${
+              className={`flex items-center ${
                 decodeURIComponent(location.pathname).includes(
                   CONSTANTS.ROUTES.VIEW_DATABASE_CHARTS.path(tenantID)
                 )
@@ -268,7 +268,7 @@ export const MainDrawerList = ({ currentPageTitle }) => {
             <Link
               to={CONSTANTS.ROUTES.VIEW_DATABASE_WIDGETS.path(tenantID)}
               key={CONSTANTS.ROUTES.VIEW_DATABASE_WIDGETS.path(tenantID)}
-              class={`flex items-center ${
+              className={`flex items-center ${
                 decodeURIComponent(location.pathname).includes(
                   CONSTANTS.ROUTES.VIEW_DATABASE_WIDGETS.path(tenantID)
                 )
@@ -302,7 +302,7 @@ export const MainDrawerList = ({ currentPageTitle }) => {
             <Link
               to={CONSTANTS.ROUTES.VIEW_DATABASE_QUERIES.path(tenantID)}
               key={CONSTANTS.ROUTES.VIEW_DATABASE_QUERIES.path(tenantID)}
-              class={`flex items-center ${
+              className={`flex items-center ${
                 decodeURIComponent(location.pathname).includes(
                   CONSTANTS.ROUTES.VIEW_DATABASE_QUERIES.path(tenantID)
                 )
@@ -337,7 +337,7 @@ export const MainDrawerList = ({ currentPageTitle }) => {
             {/* <Link
               to={CONSTANTS.ROUTES.VIEW_DATABASE_NOTIFICATIONS.path(tenantID)}
               key={CONSTANTS.ROUTES.VIEW_DATABASE_NOTIFICATIONS.path(tenantID)}
-              class={`flex items-center ${
+              className={`flex items-center ${
                 decodeURIComponent(location.pathname).includes(
                   CONSTANTS.ROUTES.VIEW_DATABASE_NOTIFICATIONS.path(tenantID)
                 )
@@ -364,7 +364,7 @@ export const MainDrawerList = ({ currentPageTitle }) => {
             <Link
               to={CONSTANTS.ROUTES.VIEW_API_KEYS.path(tenantID)}
               key={CONSTANTS.ROUTES.VIEW_API_KEYS.path(tenantID)}
-              class={`flex items-center ${
+              className={`flex items-center ${
                 decodeURIComponent(location.pathname).includes(
                   CONSTANTS.ROUTES.VIEW_API_KEYS.path(tenantID)
                 )
@@ -397,7 +397,7 @@ export const MainDrawerList = ({ currentPageTitle }) => {
             <Link
               to={CONSTANTS.ROUTES.VIEW_CRON_JOBS.path(tenantID)}
               key={CONSTANTS.ROUTES.VIEW_CRON_JOBS.path(tenantID)}
-              class={`flex items-center ${
+              className={`flex items-center ${
                 decodeURIComponent(location.pathname).includes(
                   CONSTANTS.ROUTES.VIEW_CRON_JOBS.path(tenantID)
                 )
@@ -430,7 +430,7 @@ export const MainDrawerList = ({ currentPageTitle }) => {
             <Link
               to={CONSTANTS.ROUTES.RAW_SQL_QUERY.path(tenantID)}
               key={CONSTANTS.ROUTES.RAW_SQL_QUERY.path(tenantID)}
-              class={`flex items-center ${
+              className={`flex items-center ${
                 decodeURIComponent(location.pathname).includes(
                   CONSTANTS.ROUTES.RAW_SQL_QUERY.path(tenantID)
                 )
@@ -462,7 +462,7 @@ export const MainDrawerList = ({ currentPageTitle }) => {
 
             <button
               type="button"
-              class={
+              className={
                 "w-full text-slate-900 bg-slate-200 hover:border-none border-none justify-between hover:bg-slate-100 focus:outline-none  font-medium rounded text-sm px-1 py-2 text-center inline-flex items-center"
               }
               onClick={() =>
@@ -473,7 +473,7 @@ export const MainDrawerList = ({ currentPageTitle }) => {
               }
             >
               <FaUserCog className="!w-5 !h-5 !text-slate-600 ml-1" />
-              <span class="flex-1 ms-2 text-left font-semibold rtl:text-right whitespace-nowrap text-slate-700">
+              <span className="flex-1 ms-2 text-left font-semibold rtl:text-right whitespace-nowrap text-slate-700">
                 {CONSTANTS.STRINGS.MAIN_DRAWER_USER_MANAGEMENT_TITLE}
               </span>
               {menuItemExpandedState.userManagement ? (
@@ -483,14 +483,14 @@ export const MainDrawerList = ({ currentPageTitle }) => {
               )}
             </button>
             {menuItemExpandedState.userManagement && (
-              <ul class=" space-y-2 rounded mt-2">
+              <ul className=" space-y-2 rounded mt-2">
                 <li className="">
                   {isLoadingDatabaseMetadata || isFetchingDatabaseMetadata ? (
-                    <div role="status" class=" animate-pulse">
-                      <div class="h-8 bg-gray-200 rounded   mb-2"></div>
-                      <div class="h-8 bg-gray-200 rounded   mb-2"></div>
-                      <div class="h-8 bg-gray-200 rounded   mb-2"></div>
-                      <div class="h-8 bg-gray-200 rounded   mb-2"></div>
+                    <div role="status" className=" animate-pulse">
+                      <div className="h-8 bg-gray-200 rounded   mb-2"></div>
+                      <div className="h-8 bg-gray-200 rounded   mb-2"></div>
+                      <div className="h-8 bg-gray-200 rounded   mb-2"></div>
+                      <div className="h-8 bg-gray-200 rounded   mb-2"></div>
                     </div>
                   ) : (
                     [
@@ -533,7 +533,7 @@ export const MainDrawerList = ({ currentPageTitle }) => {
                           <Link
                             to={tab.path}
                             key={tab.path}
-                            class={`flex items-center ${
+                            className={`flex items-center ${
                               isActive ? "bg-[#eaebff]" : "bg-slate-100"
                             } rounded mb-2 w-full p-2 text-slate-700 transition duration-75 group hover:bg-[#eaebff]  flex-row !justify-start `}
                           >

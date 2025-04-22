@@ -1,12 +1,17 @@
 import { CONSTANTS } from "../../../constants";
+import React from "react";
+import PropTypes from "prop-types";
 
 export const DatabaseDashboardEditor = ({ databaseDashboardEditorForm }) => {
+  DatabaseDashboardEditor.propTypes = {
+    databaseDashboardEditorForm: PropTypes.object.isRequired,
+  };
   return (
     <div className="w-full flex flex-col justify-start items-stretch gap-2 p-2">
       <div>
         <label
-          for="databaseDashboardName"
-          class="block mb-1 text-xs font-medium text-slate-500"
+          htmlFor="databaseDashboardName"
+          className="block mb-1 text-xs font-medium text-slate-500"
         >
           {CONSTANTS.STRINGS.DASHBOARD_EDITOR_FORM_NAME_FIELD_LABEL}
         </label>
@@ -26,8 +31,8 @@ export const DatabaseDashboardEditor = ({ databaseDashboardEditorForm }) => {
       </div>
       <div>
         <label
-          for="databaseDashboardDescription"
-          class="block mb-1 text-xs font-medium text-slate-500"
+          htmlFor="databaseDashboardDescription"
+          className="block mb-1 text-xs font-medium text-slate-500"
         >
           {
             CONSTANTS.STRINGS

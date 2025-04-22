@@ -1,14 +1,18 @@
+import React from "react";
 import { CONSTANTS } from "../../../constants";
+import PropTypes from "prop-types";
 
-export const APIKeyEditor = ({tenantID, apiKeyEditorForm,isLoadingAPIKeyEditorForm }) => {
+export const APIKeyEditor = ({ apiKeyEditorForm }) => {
+  APIKeyEditor.propTypes = {
+    apiKeyEditorForm: PropTypes.object.isRequired,
+  };
 
   return (
     <div className="w-full flex flex-col justify-start items-stretch gap-2">
-      
       <div>
         <label
-          for="apiKeyName"
-          class="block mb-1 text-xs font-medium text-slate-500"
+          htmlFor="apiKeyName"
+          className="block mb-1 text-xs font-medium text-slate-500"
         >
           {CONSTANTS.STRINGS.API_KEY_EDITOR_FORM_NAME_FIELD_LABEL}
         </label>
@@ -26,7 +30,6 @@ export const APIKeyEditor = ({tenantID, apiKeyEditorForm,isLoadingAPIKeyEditorFo
           value={apiKeyEditorForm.values.apiKeyName}
         />
       </div>
-      
     </div>
   );
 };

@@ -5,15 +5,17 @@ import { CONSTANTS } from "../../../constants";
 import { createDatabaseSchemaAPI } from "../../../data/apis/database";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { formValidations } from "../../../utils/formValidation";
+import PropTypes from "prop-types";
+import React from "react";
 
 export const DatabaseSchemaAdditionForm = ({ tenantID }) => {
+  DatabaseSchemaAdditionForm.propTypes = {
+    tenantID: PropTypes.number.isRequired,
+  };
   const queryClient = useQueryClient();
 
   const {
     isPending: isCreatingNewDatabaseSchema,
-    isSuccess: isCreatingNewDatabaseSchemaSuccess,
-    isError: isCreatingNewDatabaseSchemaError,
-    error: createNewDatabaseSchemaError,
     mutate: createNewDatabaseSchema,
   } = useMutation({
     mutationFn: ({ databaseSchemaName }) =>
@@ -44,19 +46,19 @@ export const DatabaseSchemaAdditionForm = ({ tenantID }) => {
   });
 
   return (
-    <section class="max-w-3xl w-full">
-      <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
-        <h1 class="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl ">
+    <section className="max-w-3xl w-full">
+      <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
+        <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl ">
           {CONSTANTS.STRINGS.ADD_SCHEMA_FORM_TITLE}
         </h1>
         <form
-          class="space-y-4 md:space-y-6"
+          className="space-y-4 md:space-y-6"
           onSubmit={addSchemaForm.handleSubmit}
         >
           <div>
             <label
-              for="databaseSchemaName"
-              class="block mb-1 text-sm font-medium text-slate-500"
+              htmlFor="databaseSchemaName"
+              className="block mb-1 text-sm font-medium text-slate-500"
             >
               {CONSTANTS.STRINGS.ADD_SCHEMA_FORM_NAME_FIELD_LABEL}
             </label>
@@ -64,7 +66,7 @@ export const DatabaseSchemaAdditionForm = ({ tenantID }) => {
               type="databaseSchemaName"
               name="databaseSchemaName"
               id="databaseSchemaName"
-              class=" placeholder:text-slate-400 bg-slate-50 text-sm border border-slate-300 text-slate-700 rounded  focus:border-slate-700 block w-full px-2.5 py-1.5 "
+              className=" placeholder:text-slate-400 bg-slate-50 text-sm border border-slate-300 text-slate-700 rounded  focus:border-slate-700 block w-full px-2.5 py-1.5 "
               placeholder={
                 CONSTANTS.STRINGS.ADD_SCHEMA_FORM_NAME_FIELD_PLACEHOLDER
               }
@@ -78,7 +80,7 @@ export const DatabaseSchemaAdditionForm = ({ tenantID }) => {
           <button
             type="submit"
             disabled={isCreatingNewDatabaseSchema}
-            class="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none "
+            className="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none "
           >
             {isCreatingNewDatabaseSchema && (
               <CircularProgress

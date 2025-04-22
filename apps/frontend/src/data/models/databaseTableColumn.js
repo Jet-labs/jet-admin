@@ -1,7 +1,6 @@
 export class DatabaseTableColumn {
   constructor({
     udtName,
-    databaseTableColumnType,
     databaseTableColumnName,
     isID,
     isList,

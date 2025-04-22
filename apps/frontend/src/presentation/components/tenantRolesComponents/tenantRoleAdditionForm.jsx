@@ -66,20 +66,20 @@ export const TenantRoleAdditionForm = () => {
   );
 
   return (
-    <section class="max-w-3xl w-full h-full">
-      <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
-        <h1 class="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl ">
+    <section className="max-w-3xl w-full h-full">
+      <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
+        <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl ">
           {CONSTANTS.STRINGS.TENANT_ROLE_ADDITION_TITLE}
         </h1>
         {addTenantRoleForm && (
           <form
-            class="space-y-4 md:space-y-6"
+            className="space-y-4 md:space-y-6"
             onSubmit={addTenantRoleForm.handleSubmit}
           >
             <div>
               <label
-                for="roleName"
-                class="block mb-1 text-sm font-medium text-slate-500"
+                htmlFor="roleName"
+                className="block mb-1 text-sm font-medium text-slate-500"
               >
                 {
                   CONSTANTS.STRINGS
@@ -90,7 +90,7 @@ export const TenantRoleAdditionForm = () => {
                 type="roleName"
                 name="roleName"
                 id="roleName"
-                class=" placeholder:text-slate-400 bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:border-slate-700 block w-full px-2.5 py-1.5 "
+                className=" placeholder:text-slate-400 bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:border-slate-700 block w-full px-2.5 py-1.5 "
                 placeholder={
                   CONSTANTS.STRINGS
                     .TENANT_ROLE_ADDITION_FORM_ROLE_NAME_FIELD_PLACEHOLDER
@@ -104,8 +104,8 @@ export const TenantRoleAdditionForm = () => {
 
             <div>
               <label
-                for="roleDescription"
-                class="block mb-1 text-sm font-medium text-slate-500"
+                htmlFor="roleDescription"
+                className="block mb-1 text-sm font-medium text-slate-500"
               >
                 {
                   CONSTANTS.STRINGS
@@ -116,7 +116,7 @@ export const TenantRoleAdditionForm = () => {
                 type="roleDescription"
                 name="roleDescription"
                 id="roleDescription"
-                class=" placeholder:text-slate-400 bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:border-slate-700 block w-full px-2.5 py-1.5 "
+                className=" placeholder:text-slate-400 bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:border-slate-700 block w-full px-2.5 py-1.5 "
                 placeholder={
                   CONSTANTS.STRINGS
                     .TENANT_ROLE_ADDITION_FORM_ROLE_DESCRIPTION_FIELD_PLACEHOLDER
@@ -137,7 +137,7 @@ export const TenantRoleAdditionForm = () => {
               <button
                 type="submit"
                 disabled={isAddingTenantRole}
-                class="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none focus:ring-blue-300 "
+                className="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none focus:ring-blue-300 "
               >
                 {isAddingTenantRole && (
                   <CircularProgress

@@ -55,7 +55,7 @@ export const TenantRoleDeletionForm = ({ tenantID, tenantRoleID }) => {
         onClick={_handleDeleteTenantRole}
         disabled={isDeletingTenantRole}
         type="button"
-        class="flex flex-row items-center justify-center rounded bg-red-50 mr-2 px-3 py-1.5 text-xs text-red-400 hover:bg-red-100 focus:ring-2 focus:ring-red-400 outline-none focus:outline-none hover:border-red-400"
+        className="flex flex-row items-center justify-center rounded bg-red-50 mr-2 px-3 py-1.5 text-xs text-red-400 hover:bg-red-100 focus:ring-2 focus:ring-red-400 outline-none focus:outline-none hover:border-red-400"
       >
         {isDeletingTenantRole ? (
           <CircularProgress className="!text-xs" size={20} color="white" />

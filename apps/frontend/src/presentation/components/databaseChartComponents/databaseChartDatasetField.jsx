@@ -1,15 +1,18 @@
-import { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { Draggable } from "react-beautiful-dnd";
+import { GrDrag } from "react-icons/gr";
 import { IoClose } from "react-icons/io5";
 import { CONSTANTS } from "../../../constants";
+// eslint-disable-next-line no-unused-vars
 import { DatabaseQuery } from "../../../data/models/databaseQuery";
-import { GrDrag } from "react-icons/gr";
 
-import { DatabaseChartDatasetAdvancedOptions } from "./databaseChartDatasetAdvancedOptions";
-import { IoIosColorFilter } from "react-icons/io";
 import { BiSitemap } from "react-icons/bi";
-import { DatabaseChartDatasetFieldMapping } from "./databaseChartDatasetFieldMapping";
+import { IoIosColorFilter } from "react-icons/io";
+import { DatabaseChartDatasetAdvancedOptions } from "./databaseChartDatasetAdvancedOptions";
 import { DatabaseChartDatasetArguments } from "./databaseChartDatasetArguments";
+import { DatabaseChartDatasetFieldMapping } from "./databaseChartDatasetFieldMapping";
+import PropTypes from "prop-types";
+
 /**
  * @param {object} param0
  * @param {number} param0.index
@@ -26,6 +29,13 @@ export const DatabaseChartDatasetField = ({
   databaseQueries,
   datasetFields,
 }) => {
+  DatabaseChartDatasetField.propTypes = {
+    index: PropTypes.number.isRequired,
+    chartForm: PropTypes.object.isRequired,
+    setSelectedQueryForTesting: PropTypes.func.isRequired,
+    databaseQueries: PropTypes.array.isRequired,
+    datasetFields: PropTypes.array.isRequired,
+  };
   const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
   const [showFieldMappingOptions, setShowFieldMappingOptions] = useState(false);
   const [showArgumentsOptions, setShowArgumentsOptions] = useState(false);
@@ -34,7 +44,6 @@ export const DatabaseChartDatasetField = ({
     updatedQueryArrayFieldValue.splice(index, 1);
     chartForm.setFieldValue("databaseQueries", updatedQueryArrayFieldValue);
   };
-
 
   const selectedQuery = useMemo(() => {
     return databaseQueries

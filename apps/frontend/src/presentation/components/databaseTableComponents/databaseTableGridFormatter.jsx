@@ -2,28 +2,17 @@ import { BiCalendar, BiLink, BiUnlink } from "react-icons/bi";
 import { Link } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 
+import { Box, IconButton, InputBase, MenuItem, Select } from "@mui/material"; // Import necessary MUI components
 import moment from "moment";
+import React, { useCallback, useState } from "react";
+import { FaTimes } from "react-icons/fa"; // Using FaTimes for consistency with other parts
 import ReactJson from "react-json-view";
+// eslint-disable-next-line no-unused-vars
 import { DatabaseTableColumn } from "../../../data/models/databaseTableColumn";
 import { PostgreSQLUtils } from "../../../utils/postgre";
-import {
-  Box,
-  IconButton,
-  InputBase,
-  Checkbox,
-  Select,
-  MenuItem,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  TextField,
-  FormHelperText,
-  Button,
-  DialogActions,
-} from "@mui/material"; // Import necessary MUI components
-import { FaTimes } from "react-icons/fa"; // Using FaTimes for consistency with other parts
-import { useCallback, useEffect, useState } from "react";
 import { JsonPopupEditor } from "./jsonPopupEditor";
+import PropTypes from "prop-types";
+
 /**
  * Helper component to wrap the editor input and add a cancel button.
  * @param {object} props - Component props.
@@ -32,6 +21,10 @@ import { JsonPopupEditor } from "./jsonPopupEditor";
  * @returns {React.ReactElement} - The wrapped editor with a cancel button.
  */
 const EditCellWrapper = ({ children, params }) => {
+  EditCellWrapper.propTypes = {
+    children: PropTypes.node.isRequired,
+    params: PropTypes.object.isRequired,
+  };
   // Handler to stop editing and discard changes
   const handleCancel = (event) => {
     event.stopPropagation(); // Prevent other grid events
@@ -92,9 +85,7 @@ const getFieldWidth = (type) => {
 const getFieldFormatting = ({
   tenantID,
   databaseSchemaName,
-  databaseTableName,
   type,
-  isID,
   isList,
   params,
   customIntMapping,
@@ -279,6 +270,9 @@ const getFieldFormatting = ({
  * Component rendered inside the cell during JSON edit mode. Manages the popup.
  */
 const JsonEditCell = ({ params }) => {
+  JsonEditCell.propTypes = {
+    params: PropTypes.object.isRequired,
+  };
   const [isPopupOpen, setIsPopupOpen] = useState(true); // Start open when edit begins
 
   // Callback when Save is clicked in the popup
@@ -384,7 +378,7 @@ export const getFormattedTableColumns = ({
         // --- Value Getter ---
         // Ensures the grid receives the correct data type (e.g., Date object for 'date' type)
         // especially if the raw data is a string.
-        valueGetter: (value, row) => {
+        valueGetter: (value) => {
           // If the column type is date or datetime, ensure a Date object or null is returned
           if (convertedType === "date" || convertedType === "datetime") {
             if (value && !(value instanceof Date)) {
@@ -542,32 +536,6 @@ export const getFormattedTableColumns = ({
             });
           };
 
-          // Handler specifically for JSON input
-          const handleJsonChange = (event) => {
-            const stringValue = event.target.value;
-            try {
-              // Attempt to parse the JSON string
-              const parsedObject = JSON.parse(stringValue);
-              // If parsing succeeds, update the grid value with the object
-              // Use a slightly longer debounce for potentially larger JSON inputs
-              params.api.setEditCellValue({
-                id: params.id,
-                field: params.field,
-                value: parsedObject,
-                debounceMs: 400,
-              });
-            } catch (error) {
-              // If parsing fails (invalid JSON syntax), DO NOT update the grid value.
-              // The user sees the invalid string in the textarea and can correct it.
-              // Log the error for debugging but don't crash.
-              console.warn(
-                `Invalid JSON entered for field ${params.field}: ${error.message}`
-              );
-              // Optionally, you could provide visual feedback here (e.g., set an error state)
-              // For now, we just prevent the invalid update.
-            }
-          };
-
           // --- Determine the editor component based on type ---
           let editor;
           // Common props for InputBase components (excluding onChange which varies)
@@ -661,7 +629,7 @@ export const getFormattedTableColumns = ({
               );
               break;
 
-            case "date":
+            case "date": {
               // Format Date object from initialValue (processed by valueGetter) for input type="date"
               let dateValueStr = "";
               try {
@@ -685,8 +653,9 @@ export const getFormattedTableColumns = ({
                 />
               );
               break;
+            }
 
-            case "datetime":
+            case "datetime": {
               // Format Date object from initialValue (processed by valueGetter) for input type="datetime-local"
               let dateTimeValueStr = "";
               try {
@@ -717,11 +686,12 @@ export const getFormattedTableColumns = ({
                 />
               );
               break;
+            }
 
             case "object":
               // Display JSON as a string in a multiline input (textarea)
               // initialValue should be an object/array here thanks to valueGetter (if it was a valid string initially)
-              return <JsonEditCell params={params} />;
+              editor = <JsonEditCell params={params} />;
               break;
 
             case "string":

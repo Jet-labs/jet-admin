@@ -1,10 +1,10 @@
+/* eslint-disable no-useless-catch */
 import axios from "axios";
 import { firebaseAuth } from "../../config/firebase";
 import { CONSTANTS } from "../../constants";
 import { TenantUser } from "../models/tenantUser";
 
-
-export const getAllTenantUsersAPI = async ({ tenantID, page = 1, pageSize = 20 }) => {
+export const getAllTenantUsersAPI = async ({ tenantID }) => {
   try {
     const url =
       CONSTANTS.SERVER_HOST +
@@ -15,7 +15,6 @@ export const getAllTenantUsersAPI = async ({ tenantID, page = 1, pageSize = 20 }
         headers: { authorization: `Bearer ${bearerToken}` },
       });
       if (response.data && response.data.success === true) {
-       
         return {
           users: TenantUser.toList(response.data.users),
           nextPage: response.data.nextPage,

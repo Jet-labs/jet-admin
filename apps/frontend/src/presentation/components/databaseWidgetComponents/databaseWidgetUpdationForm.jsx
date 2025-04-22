@@ -189,7 +189,7 @@ export const DatabaseWidgetUpdationForm = ({ tenantID, databaseWidgetID }) => {
       >
         <ResizablePanel defaultSize={20}>
           <form
-            class="w-full h-full p-2 flex flex-col justify-start items-stretch gap-2 overflow-y-auto"
+            className="w-full h-full p-2 flex flex-col justify-start items-stretch gap-2 overflow-y-auto"
             onSubmit={updateDatabaseWidgetForm.handleSubmit}
           >
             {updateDatabaseWidgetForm && (

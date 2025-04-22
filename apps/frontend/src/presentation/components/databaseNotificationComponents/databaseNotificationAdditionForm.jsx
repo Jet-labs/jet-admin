@@ -8,40 +8,40 @@ import { displayError, displaySuccess } from "../../../utils/notification";
 import { createDatabaseNotificationAPI } from "../../../data/apis/databaseNotification";
 import { formValidations } from "../../../utils/formValidation";
 import { DatabaseNotificationEditor } from "./databaseNotificationEditor";
+import PropTypes from "prop-types";
 
 export const DatabaseNotificationAdditionForm = ({
   tenantID,
   databaseSchemaName,
 }) => {
+  DatabaseNotificationAdditionForm.propTypes = {
+    tenantID: PropTypes.number.isRequired,
+    databaseSchemaName: PropTypes.string.isRequired,
+  };
   const queryClient = useQueryClient();
 
-  const {
-    isPending: isAddingDatabaseNotification,
-    isSuccess: isAddingDatabaseNotificationSuccess,
-    isError: isAddingDatabaseNotificationError,
-    error: addNotificationError,
-    mutate: addNotification,
-  } = useMutation({
-    mutationFn: (data) => {
-      return createDatabaseNotificationAPI({
-        tenantID,
-        databaseSchemaName,
-        databaseNotificationData: data,
-      });
-    },
-    retry: false,
-    onSuccess: (data) => {
-      displaySuccess(
-        CONSTANTS.STRINGS.ADD_NOTIFICATION_FORM_NOTIFICATION_CREATED
-      );
-      queryClient.invalidateQueries([
-        CONSTANTS.REACT_QUERY_KEYS.DATABASE_NOTIFICATIONS(tenantID),
-      ]);
-    },
-    onError: (error) => {
-      displayError(error);
-    },
-  });
+  const { isPending: isAddingDatabaseNotification, mutate: addNotification } =
+    useMutation({
+      mutationFn: (data) => {
+        return createDatabaseNotificationAPI({
+          tenantID,
+          databaseSchemaName,
+          databaseNotificationData: data,
+        });
+      },
+      retry: false,
+      onSuccess: () => {
+        displaySuccess(
+          CONSTANTS.STRINGS.ADD_NOTIFICATION_FORM_NOTIFICATION_CREATED
+        );
+        queryClient.invalidateQueries([
+          CONSTANTS.REACT_QUERY_KEYS.DATABASE_NOTIFICATIONS(tenantID),
+        ]);
+      },
+      onError: (error) => {
+        displayError(error);
+      },
+    });
   const databaseNotificationAdditionForm = useFormik({
     initialValues: {
       databaseNotificationName: "",
@@ -60,7 +60,7 @@ export const DatabaseNotificationAdditionForm = ({
       </h1>
 
       <form
-        class="space-y-3 md:space-y-4 mt-2 p-3"
+        className="space-y-3 md:space-y-4 mt-2 p-3"
         onSubmit={databaseNotificationAdditionForm.handleSubmit}
       >
         <DatabaseNotificationEditor
@@ -70,7 +70,7 @@ export const DatabaseNotificationAdditionForm = ({
         <div className="flex justify-end">
           <button
             type="submit"
-            class="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none "
+            className="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none "
             disabled={isAddingDatabaseNotification}
           >
             {isAddingDatabaseNotification ? (

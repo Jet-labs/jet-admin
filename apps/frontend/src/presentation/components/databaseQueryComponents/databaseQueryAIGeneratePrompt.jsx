@@ -7,15 +7,16 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useMutation } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { FaMagic } from "react-icons/fa";
 import { CONSTANTS } from "../../../constants";
 import { generateAIPromptBasedQueryAPI } from "../../../data/apis/databaseQuery";
 import { displayError } from "../../../utils/notification";
 import { CodeBlock } from "../ui/codeBlock";
+import PropTypes from "prop-types";
 
 // Styled components to override MUI defaults
-const StyledDialog = styled(Dialog)(({ theme }) => ({
+const StyledDialog = styled(Dialog)(() => ({
   "& .MuiDialog-paper": {
     borderRadius: 4, // Keep original border radius
     border: "1px solid rgba(99, 102, 241, 0.2)",
@@ -26,7 +27,7 @@ const StyledDialog = styled(Dialog)(({ theme }) => ({
   },
 }));
 
-const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
+const StyledDialogTitle = styled(DialogTitle)(() => ({
   padding: "16px 16px 0 16px",
   fontWeight: 500,
   position: "relative",
@@ -35,14 +36,14 @@ const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
   background: "transparent",
 }));
 
-const StyledDialogContent = styled(DialogContent)(({ theme }) => ({
+const StyledDialogContent = styled(DialogContent)(() => ({
   padding: "16px",
   position: "relative",
   zIndex: 10,
   background: "transparent",
 }));
 
-const StyledDialogActions = styled(DialogActions)(({ theme }) => ({
+const StyledDialogActions = styled(DialogActions)(() => ({
   padding: "16px",
   position: "relative",
   zIndex: 10,
@@ -50,15 +51,16 @@ const StyledDialogActions = styled(DialogActions)(({ theme }) => ({
 }));
 
 export const DatabaseQueryAIGeneratePrompt = ({ tenantID, onAccepted }) => {
+  DatabaseQueryAIGeneratePrompt.propTypes = {
+    tenantID: PropTypes.number.isRequired,
+    onAccepted: PropTypes.func.isRequired,
+  };
   const [aiPrompt, setAiPrompt] = useState("");
   const [aiGeneratedQuery, setAiGeneratedQuery] = useState("");
   const [isAIPromptDialogOpen, setIsAIPromptDialogOpen] = useState(false);
 
   const {
     isPending: isGeneratingAIPromptBasedQuery,
-    isSuccess: isGeneratingAIPromptBasedQuerySuccess,
-    isError: isGeneratingAIPromptBasedQueryError,
-    error: generateAIPromptBasedQueryError,
     mutate: generateAIPromptBasedQuery,
   } = useMutation({
     mutationFn: ({ aiPrompt }) => {
@@ -265,7 +267,7 @@ export const DatabaseQueryAIGeneratePrompt = ({ tenantID, onAccepted }) => {
         </StyledDialogActions>
 
         {/* Add global CSS animation */}
-        <style jsx global>{`
+        <style>{`
           @keyframes pulse {
             0% {
               opacity: 0.4;

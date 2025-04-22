@@ -122,7 +122,7 @@ export const TenantUserUpdationForm = ({ tenantID, tenantUserID }) => {
   };
 
   return tenantUser ? (
-    <section class="max-w-3xl w-full h-full">
+    <section className="max-w-3xl w-full h-full">
       <TenantRoleSelectionDialog
         tenantID={tenantID}
         isUserTenantAdmin={tenantUser.isTenantAdmin}
@@ -131,7 +131,7 @@ export const TenantUserUpdationForm = ({ tenantID, tenantUserID }) => {
         initialSelectedTenantRoles={tenantUser.roles.map((r) => r.roleID)}
         handleSubmitTenantRoleSelectDialog={_handleSubmitTenantRoleSelectDialog}
       />
-      <h1 class="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl p-3">
+      <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl p-3">
         {CONSTANTS.STRINGS.UPDATE_TENANT_USER_BY_ID_FORM_TITLE}
       </h1>
 

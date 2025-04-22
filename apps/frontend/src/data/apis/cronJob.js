@@ -1,67 +1,68 @@
+/* eslint-disable no-useless-catch */
 import axios from "axios";
 import { CONSTANTS } from "../../constants";
 import { firebaseAuth } from "../../config/firebase";
 import { CronJob } from "../models/cronjob";
 import { CronJobHistory } from "../models/cronJobHistory";
 
-export const getAllCronJobsAPI = async ({ tenantID}) => {
-    try {
-        const url =
-            CONSTANTS.SERVER_HOST +
-            CONSTANTS.APIS.CRON_JOB.getAllCronJobsAPI(tenantID);
-        const bearerToken = await firebaseAuth.currentUser.getIdToken();
-        if (bearerToken) {
-            const response = await axios.get(url, {
-                headers: {
-                    authorization: `Bearer ${bearerToken}`,
-                },
-            });
-            if (response.data && response.data.success === true) {
-                return CronJob.toList(response.data.cronJobs);
-            } else if (response.data.error) {
-                throw response.data.error;
-            } else {
-                throw CONSTANTS.ERROR_CODES.SERVER_ERROR;
-            }
-        } else {
-            throw CONSTANTS.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND;
-        }
-    } catch (error) {
-        throw error;
+export const getAllCronJobsAPI = async ({ tenantID }) => {
+  try {
+    const url =
+      CONSTANTS.SERVER_HOST +
+      CONSTANTS.APIS.CRON_JOB.getAllCronJobsAPI(tenantID);
+    const bearerToken = await firebaseAuth.currentUser.getIdToken();
+    if (bearerToken) {
+      const response = await axios.get(url, {
+        headers: {
+          authorization: `Bearer ${bearerToken}`,
+        },
+      });
+      if (response.data && response.data.success === true) {
+        return CronJob.toList(response.data.cronJobs);
+      } else if (response.data.error) {
+        throw response.data.error;
+      } else {
+        throw CONSTANTS.ERROR_CODES.SERVER_ERROR;
+      }
+    } else {
+      throw CONSTANTS.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND;
     }
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const createCronJobAPI = async ({ tenantID, cronJobData }) => {
-    try {
-        const url =
-            CONSTANTS.SERVER_HOST +
-            CONSTANTS.APIS.CRON_JOB.createCronJobAPI(tenantID);
-        const bearerToken = await firebaseAuth.currentUser.getIdToken();
-        if (bearerToken) {
-            const response = await axios.post(
-                url,
-                {
-                    ...cronJobData,
-                },
-                {
-                    headers: {
-                        authorization: `Bearer ${bearerToken}`,
-                    },
-                }
-            );
-            if (response.data && response.data.success === true) {
-                return true;
-            } else if (response.data.error) {
-                throw response.data.error;
-            } else {
-                throw CONSTANTS.ERROR_CODES.SERVER_ERROR;
-            }
-        } else {
-            throw CONSTANTS.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND;
+  try {
+    const url =
+      CONSTANTS.SERVER_HOST +
+      CONSTANTS.APIS.CRON_JOB.createCronJobAPI(tenantID);
+    const bearerToken = await firebaseAuth.currentUser.getIdToken();
+    if (bearerToken) {
+      const response = await axios.post(
+        url,
+        {
+          ...cronJobData,
+        },
+        {
+          headers: {
+            authorization: `Bearer ${bearerToken}`,
+          },
         }
-    } catch (error) {
-        throw error;
+      );
+      if (response.data && response.data.success === true) {
+        return true;
+      } else if (response.data.error) {
+        throw response.data.error;
+      } else {
+        throw CONSTANTS.ERROR_CODES.SERVER_ERROR;
+      }
+    } else {
+      throw CONSTANTS.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND;
     }
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const getCronJobByIDAPI = async ({ tenantID, cronJobID }) => {

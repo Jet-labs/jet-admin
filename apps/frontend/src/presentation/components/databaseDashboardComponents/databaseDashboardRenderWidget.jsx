@@ -1,6 +1,5 @@
-import { IconButton, useTheme } from "@mui/material";
 import React, { useState } from "react";
-
+import PropTypes from "prop-types";
 import "react-grid-layout/css/styles.css";
 import { FaTimes } from "react-icons/fa";
 import "react-resizable/css/styles.css";
@@ -17,7 +16,14 @@ export const DatabaseDashboardRenderWidget = ({
   responsive = true,
   editable = true,
 }) => {
-  const theme = useTheme();
+  DatabaseDashboardRenderWidget.propTypes = {
+    widget: PropTypes.string.isRequired,
+    tenantID: PropTypes.number.isRequired,
+    index: PropTypes.number.isRequired,
+    handleDelete: PropTypes.func,
+    responsive: PropTypes.bool,
+    editable: PropTypes.bool,
+  };
   const widgetType = String(widget).split("_")[0];
   const widgetID = String(widget).split("_")[1].split("-")[0];
   const [ref, size] = useComponentSize();
@@ -56,7 +62,7 @@ export const DatabaseDashboardRenderWidget = ({
           style={{}}
         >
           <button
-            onClick={(e) => {
+            onClick={() => {
               handleDelete(index);
             }}
             className="p-1 rounded-none m-0 bg-[#646cff]"

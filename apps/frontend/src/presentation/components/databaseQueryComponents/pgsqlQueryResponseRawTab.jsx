@@ -1,8 +1,12 @@
 import { githubLight } from "@uiw/codemirror-theme-github";
 import CodeMirror from "@uiw/react-codemirror";
 import React from "react";
+import PropTypes from "prop-types";
 
 export const PGSQLQueryResponseRAWTab = ({ data }) => {
+  PGSQLQueryResponseRAWTab.propTypes = {
+    data: PropTypes.object,
+  };
   return (
     <div className="w-100 flex-grow h-full overflow-y-auto ">
       <CodeMirror

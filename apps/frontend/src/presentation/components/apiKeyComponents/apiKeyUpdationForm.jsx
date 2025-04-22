@@ -16,11 +16,14 @@ import { APIKeyEditor } from "./apiKeyEditor";
 import { formValidations } from "../../../utils/formValidation";
 import { APIKeyRoleSelectionDialog } from "./apiKeyRoleSelectionDialog";
 import { CodeBlock } from "../ui/codeBlock";
+import PropTypes from "prop-types";
+import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 
-export const APIKeyUpdationForm = ({
-  tenantID,
-  apiKeyID,
-}) => {
+export const APIKeyUpdationForm = ({ tenantID, apiKeyID }) => {
+  APIKeyUpdationForm.propTypes = {
+    tenantID: PropTypes.number.isRequired,
+    apiKeyID: PropTypes.number.isRequired,
+  };
   const queryClient = useQueryClient();
   const { showConfirmation } = useGlobalUI();
 
@@ -32,10 +35,7 @@ export const APIKeyUpdationForm = ({
     isRefetching: isRefetechingAPIKey,
     refetch: refetchAPIKey,
   } = useQuery({
-    queryKey: [
-      CONSTANTS.REACT_QUERY_KEYS.DATABASE_QUERIES(tenantID),
-      apiKeyID,
-    ],
+    queryKey: [CONSTANTS.REACT_QUERY_KEYS.DATABASE_QUERIES(tenantID), apiKeyID],
     queryFn: () =>
       getAPIKeyByIDAPI({
         tenantID,
@@ -44,13 +44,7 @@ export const APIKeyUpdationForm = ({
     refetchOnWindowFocus: false,
   });
 
-  const {
-    isPending: isUpdatingAPIKey,
-    isSuccess: isUpdatingAPIKeySuccess,
-    isError: isUpdatingAPIKeyError,
-    error: updateAPIKeyError,
-    mutate: updateAPIKey,
-  } = useMutation({
+  const { isPending: isUpdatingAPIKey, mutate: updateAPIKey } = useMutation({
     mutationFn: (data) => {
       return updateAPIKeyByIDAPI({
         tenantID,
@@ -59,7 +53,7 @@ export const APIKeyUpdationForm = ({
       });
     },
     retry: false,
-    onSuccess: (data) => {
+    onSuccess: () => {
       displaySuccess(
         CONSTANTS.STRINGS.UPDATE_API_KEY_FORM_API_KEY_UPDATION_SUCCESS
       );
@@ -75,17 +69,15 @@ export const APIKeyUpdationForm = ({
   const apiKeyUpdationForm = useFormik({
     initialValues: {
       apiKeyName: "",
-      roleIDs:[]
+      roleIDs: [],
     },
     validateOnMount: false,
     validateOnChange: false,
-    validationSchema:
-      formValidations.apiKeyUpdationFormValidationSchema,
+    validationSchema: formValidations.apiKeyUpdationFormValidationSchema,
     onSubmit: async (values) => {
       await showConfirmation({
         title: CONSTANTS.STRINGS.UPDATE_API_KEY_FORM_UPDATE_DIALOG_TITLE,
-        message:
-          CONSTANTS.STRINGS.UPDATE_API_KEY_FORM_UPDATE_DIALOG_MESSAGE,
+        message: CONSTANTS.STRINGS.UPDATE_API_KEY_FORM_UPDATE_DIALOG_MESSAGE,
         confirmText: "Update",
         cancelText: "Cancel",
         confirmButtonClass: "!bg-[#646cff]",
@@ -100,10 +92,9 @@ export const APIKeyUpdationForm = ({
       // Update Formik form values with the fetched apiKey data
       apiKeyUpdationForm.setFieldValue(
         "apiKeyName",
-        apiKey.apiKeyName ||
-          CONSTANTS.STRINGS.UNTITLED
+        apiKey.apiKeyName || CONSTANTS.STRINGS.UNTITLED
       );
-      console.log(apiKey.roles)
+      console.log(apiKey.roles);
       apiKeyUpdationForm.setFieldValue(
         "roleIDs",
         apiKey.roles?.map((r) => parseInt(r.roleID)) || []
@@ -111,7 +102,7 @@ export const APIKeyUpdationForm = ({
     }
   }, [apiKey]);
 
-  console.log({apiKeyUpdationForm:apiKeyUpdationForm.values})
+  console.log({ apiKeyUpdationForm: apiKeyUpdationForm.values });
 
   return (
     <section className="max-w-3xl w-full">
@@ -124,22 +115,18 @@ export const APIKeyUpdationForm = ({
           <span className="text-xs text-[#646cff] mt-2">{`API Key ID: ${apiKey.apiKeyID}`}</span>
         )}
       </div>
-
-      {isLoadingAPIKey || isFetchingAPIKey ? (
-        <div className="!w-full !h-full flex justify-center items-center">
-          <CircularProgress />
-        </div>
-      ) : (
+      <ReactQueryLoadingErrorWrapper
+        isLoading={isLoadingAPIKey}
+        isFetching={isFetchingAPIKey}
+        isRefetching={isRefetechingAPIKey}
+        refetch={refetchAPIKey}
+        error={loadAPIKeyError}
+      >
         <form
-          class="space-y-3 md:space-y-4 mt-5 p-3"
+          className="space-y-3 md:space-y-4 mt-5 p-3"
           onSubmit={apiKeyUpdationForm.handleSubmit}
         >
-          {apiKey && (
-            <CodeBlock
-              code={`${apiKey.apiKey}`}
-              className="w-full"
-            />
-          )}
+          {apiKey && <CodeBlock code={`${apiKey.apiKey}`} className="w-full" />}
           <APIKeyEditor
             tenantID={tenantID}
             apiKeyEditorForm={apiKeyUpdationForm}
@@ -149,12 +136,15 @@ export const APIKeyUpdationForm = ({
           />
           <div className="w-full flex flex-row justify-end mt-10">
             <APIKeyDeletionForm tenantID={tenantID} apiKeyID={apiKeyID} />
-            <APIKeyRoleSelectionDialog tenantID={tenantID} apiKeyEditorForm={apiKeyUpdationForm} />
+            <APIKeyRoleSelectionDialog
+              tenantID={tenantID}
+              apiKeyEditorForm={apiKeyUpdationForm}
+            />
 
             <button
               type="submit"
               disabled={isUpdatingAPIKey}
-              class="flex flex-row justify-center items-center px-3 py-2 ml-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none "
+              className="flex flex-row justify-center items-center px-3 py-2 ml-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none "
             >
               {isUpdatingAPIKey && (
                 <CircularProgress
@@ -167,7 +157,7 @@ export const APIKeyUpdationForm = ({
             </button>
           </div>
         </form>
-      )}
+      </ReactQueryLoadingErrorWrapper>
     </section>
   );
 };

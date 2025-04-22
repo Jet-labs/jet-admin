@@ -1,12 +1,19 @@
 import { CONSTANTS } from "../../../constants";
+import PropTypes from "prop-types";
+import React from "react";
 
-export const DatabaseNotificationEditor = ({ databaseNotificationEditorForm }) => {
+export const DatabaseNotificationEditor = ({
+  databaseNotificationEditorForm,
+}) => {
+  DatabaseNotificationEditor.propTypes = {
+    databaseNotificationEditorForm: PropTypes.object.isRequired,
+  };
   return (
     <div className="w-full flex flex-col justify-start items-stretch gap-2">
       <div>
         <label
-          for="databaseNotificationName"
-          class="block mb-1 text-xs font-medium text-slate-500"
+          htmlFor="databaseNotificationName"
+          className="block mb-1 text-xs font-medium text-slate-500"
         >
           {CONSTANTS.STRINGS.NOTIFICATION_EDITOR_FORM_NAME_FIELD_LABEL}
         </label>

@@ -3,9 +3,14 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { CONSTANTS } from "../../constants";
 import { getAllDatabaseTriggersAPI } from "../../data/apis/databaseTrigger";
+import PropTypes from "prop-types";
+
 const DatabaseTriggersStateContext = React.createContext(undefined);
 const DatabaseTriggersActionsContext = React.createContext(undefined);
-const DatabaseTriggersContextProvider = ({children}) => {
+const DatabaseTriggersContextProvider = ({ children }) => {
+  DatabaseTriggersContextProvider.propTypes = {
+    children: PropTypes.node.isRequired,
+  };
   const { tenantID, databaseSchemaName } = useParams();
   const {
     isLoading: isLoadingDatabaseTriggers,
@@ -24,13 +29,14 @@ const DatabaseTriggersContextProvider = ({children}) => {
     queryFn: () => getAllDatabaseTriggersAPI({ tenantID, databaseSchemaName }),
     refetchOnWindowFocus: false,
   });
-console.log({databaseTriggers})
   return (
     <DatabaseTriggersStateContext.Provider
       value={{
         databaseTriggers,
         isLoadingDatabaseTriggers,
         isFetchingDatabaseTriggers,
+        loadDatabaseTriggersError,
+        isRefetechingDatabaseTriggers,
       }}
     >
       <DatabaseTriggersActionsContext.Provider

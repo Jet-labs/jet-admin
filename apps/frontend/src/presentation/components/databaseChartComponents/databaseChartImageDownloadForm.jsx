@@ -4,18 +4,18 @@ import {
   DialogContent,
   DialogTitle
 } from "@mui/material";
-import { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { FiDownload } from "react-icons/fi";
 import { CONSTANTS } from "../../../constants";
 import { StringUtils } from "../../../utils/string";
-export const DatabaseChartDownloadForm = ({
-  databaseChartName,
-  chartRef,
-}) => {
+import PropTypes from "prop-types";
+export const DatabaseChartDownloadForm = ({ databaseChartName, chartRef }) => {
+  DatabaseChartDownloadForm.propTypes = {
+    databaseChartName: PropTypes.string.isRequired,
+    chartRef: PropTypes.object.isRequired,
+  };
   const [isQualityDialogOpen, setIsQualityDialogOpen] = useState(false);
-  const [previewData, setPreviewData] = useState(
-    null
-  );
+  const [previewData, setPreviewData] = useState(null);
   const [selectedQuality, setSelectedQuality] = useState(1); // Default quality is 1 (high)
   const _handleDownloadImage = useCallback(() => {
     if (!chartRef || !chartRef.current) {
@@ -35,7 +35,7 @@ export const DatabaseChartDownloadForm = ({
       "image/jpeg",
       parseFloat(selectedQuality)
     );
-    if(!base64Image)return;
+    if (!base64Image) return;
 
     const link = document.createElement("a");
     link.href = base64Image;
@@ -61,8 +61,6 @@ export const DatabaseChartDownloadForm = ({
     [setSelectedQuality, chartRef, setPreviewData]
   );
 
-  
-
   const processedPreview = useMemo(() => {
     console.log(chartRef);
     if (previewData) return previewData;
@@ -71,7 +69,7 @@ export const DatabaseChartDownloadForm = ({
       console.log(base64Image);
       return base64Image;
     }
-  }, [chartRef, chartRef.current, previewData]); 
+  }, [chartRef, chartRef.current, previewData]);
 
   return (
     <>
@@ -106,9 +104,11 @@ export const DatabaseChartDownloadForm = ({
             step={0.1}
             className="w-full h-1 rounded-lg appearance-none cursor-pointer !z-10 text-blue-500 bg-[#646cff]"
           ></input>
-          {processedPreview&&<span className="text-xs text-slate-500">
-            Image size: {StringUtils.getImageSizeInKB(processedPreview)} KB
-          </span>}
+          {processedPreview && (
+            <span className="text-xs text-slate-500">
+              Image size: {StringUtils.getImageSizeInKB(processedPreview)} KB
+            </span>
+          )}
 
           {processedPreview && (
             <div className="flex flex-row justify-center items-center w-full relative">

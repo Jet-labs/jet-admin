@@ -1,17 +1,20 @@
 // GlobalUIContext.jsx
-import React, { createContext, useContext, useState, useCallback } from "react";
 import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   CircularProgress,
-  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
 } from "@mui/material";
+import React, { createContext, useCallback, useContext, useState } from "react";
+import PropTypes from "prop-types";
 
 const GlobalUIContext = createContext();
 
 export const GlobalUIProvider = ({ children }) => {
+  GlobalUIProvider.propTypes = {
+    children: PropTypes.node.isRequired,
+  };
   const [dialogState, setDialogState] = useState({
     open: false,
     type: null,

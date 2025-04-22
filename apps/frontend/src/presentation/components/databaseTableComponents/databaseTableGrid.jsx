@@ -1,13 +1,20 @@
 import { Checkbox, CircularProgress } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { useDebounce } from "@uidotdev/usehooks";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import "react-data-grid/lib/styles.css";
 import { v4 as uuidv4 } from "uuid";
 import { CONSTANTS } from "../../../constants";
 
 import { capitalize, lowerCase } from "lodash";
+import PropTypes from "prop-types";
 import { FaPlus, FaTimes } from "react-icons/fa";
 import {
   MdOutlineDensityLarge,
@@ -15,35 +22,37 @@ import {
   MdOutlineDensitySmall,
   MdOutlineRefresh,
 } from "react-icons/md";
-import {
-  databaseTableBulkRowAdditionAPI,
-  databaseTableBulkRowUpdationAPI,
-} from "../../../data/apis/databaseTable";
-import { useGlobalUI } from "../../../logic/contexts/globalUIContext";
 import { useDatabaseTable } from "../../../logic/hooks/useDatabaseTable";
+import { useDatabaseTableMutations } from "../../../logic/hooks/useDatabaseTableMutations";
 import { useDatabaseTableRows } from "../../../logic/hooks/useDatabaseTableRows";
 import { useDatabaseTableStatistics } from "../../../logic/hooks/useDatabaseTableStatistics";
-import { displayError, displaySuccess } from "../../../utils/notification";
+import { displayError } from "../../../utils/notification";
 import { PostgreSQLUtils } from "../../../utils/postgre";
 import { NoEntityUI } from "../ui/noEntityUI";
+import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import { DatabaseTableColumnFilter } from "./databaseTableColumnFilter";
 import { getFormattedTableColumns } from "./databaseTableGridFormatter";
 import { DatabaseTableRowsDeletionForm } from "./databaseTableRowsDeletionForm";
 import { DatabaseTableRowsExportForm } from "./databaseTableRowsExportForm";
 import { DatabaseTableStatistics } from "./databaseTableStatistics";
-import { useDatabaseTableMutations } from "../../../logic/hooks/useDatabaseTableMutations";
 
 export const DatabaseTableGrid = ({
   tenantID,
   databaseSchemaName,
   databaseTableName,
-  onRowClick,
   showStats,
   containerClass,
   initialFilterQuery,
 }) => {
+  DatabaseTableGrid.propTypes = {
+    tenantID: PropTypes.number.isRequired,
+    databaseSchemaName: PropTypes.string.isRequired,
+    databaseTableName: PropTypes.string.isRequired,
+    showStats: PropTypes.bool,
+    containerClass: PropTypes.string,
+    initialFilterQuery: PropTypes.object,
+  };
   const queryClient = useQueryClient();
-  const { showConfirmation } = useGlobalUI();
   const [page, setPage] = useState(1);
   const [filterQuery, setFilterQuery] = useState(null);
   const [databaseTableColumnFilters, setDatabaseTableColumnFilters] = useState(
@@ -53,6 +62,8 @@ export const DatabaseTableGrid = ({
     databaseTableColumnFilterCombinator,
     setDatabaseTableColumnFilterCombinator,
   ] = useState("AND");
+
+  // eslint-disable-next-line no-unused-vars
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const [databaseTableColumnSortModel, setDatabaseTableColumnSortModel] =
@@ -76,8 +87,6 @@ export const DatabaseTableGrid = ({
   const [_rowSelectionModel, _setRowSelectionModel] = useState();
   const [databaseTableGridDensity, setDatabaseTableGridDensity] =
     useState("compact");
-  const [databaseTableGridAutoheight, setDatabaseTableGridAutoheight] =
-    useState(false);
   const datagridRef = useRef();
   const datagridAPIRef = useRef();
 
@@ -87,7 +96,6 @@ export const DatabaseTableGrid = ({
 
   const {
     databaseTableColumns,
-    databaseTableConstraints,
     databaseTablePrimaryKey,
     databaseTableColumnForeignKeyMap,
     isLoading: isLoadingDatabaseTable,
@@ -102,9 +110,8 @@ export const DatabaseTableGrid = ({
   const {
     isLoading: isLoadingDatabaseTableRows,
     rows: databaseTableRows,
-    error: loadRowsError,
+    error: loadDatabaseTableRowsError,
     isFetching: isFetchingDatabaseTableRows,
-    isPreviousData: isPreviousDatabaseTableRowsData,
     reloadDatabaseTableRows,
     invalidateDatabaseTableRows,
   } = useDatabaseTableRows({
@@ -118,19 +125,13 @@ export const DatabaseTableGrid = ({
     databaseTableColumnSortModel,
   });
 
-  const {
-    databaseTableRowCount,
-    reloadDatabaseTableStatistics,
-    invalidateDatabaseTableStatistics,
-    isLoading: isLoadingDatabaseTableStatistics,
-    error: loadStatisticsError,
-    isFetching: isFetchingDatabaseTableStatistics,
-  } = useDatabaseTableStatistics({
-    tenantID,
-    databaseSchemaName,
-    databaseTableName,
-    filterQuery,
-  });
+  const { databaseTableRowCount, isLoading: isLoadingDatabaseTableStatistics } =
+    useDatabaseTableStatistics({
+      tenantID,
+      databaseSchemaName,
+      databaseTableName,
+      filterQuery,
+    });
 
   useEffect(() => {
     if (
@@ -233,10 +234,6 @@ export const DatabaseTableGrid = ({
     });
   }, [setDatabaseTableGridDensity]);
 
-  const _handleToggleDatabaseTableGridAutoheight = useCallback(() => {
-    setDatabaseTableGridAutoheight(!databaseTableGridAutoheight);
-  }, [setDatabaseTableGridAutoheight]);
-
   const _handleMultipleSelectedRowsQueryBuilder = useCallback(
     (rowSelectionModel) => {
       if (rowSelectionModel.length == 0) {
@@ -285,6 +282,7 @@ export const DatabaseTableGrid = ({
   const _handleCommitDatabaseTableRowChanges = () => {
     bulkUpdateDatabaseTableRows({
       databaseTableRowData: Object.keys(databaseTableRowChanges).map((key) => {
+        // eslint-disable-next-line no-unused-vars
         const { __row__uid, ...data } = databaseTableRowChanges[key];
         return { query: key, data };
       }),
@@ -353,6 +351,7 @@ export const DatabaseTableGrid = ({
   const _handleCommitAddDatabaseTableRow = () => {
     bulkAdditionDatabaseTableRows({
       databaseTableRowData: databaseTableNewRows.map((databaseTableNewRow) => {
+        // eslint-disable-next-line no-unused-vars
         const { __is__new__row, __new__row__uuid, ...data } =
           databaseTableNewRow;
         return data;
@@ -368,9 +367,7 @@ export const DatabaseTableGrid = ({
     bulkAddRows: bulkAdditionDatabaseTableRows,
     bulkUpdateRows: bulkUpdateDatabaseTableRows,
     isAdding: isBulkAddingDatabaseTableRows,
-    addError: bulkAdditionDatabaseTableRowsError,
     isUpdating: isBulkUpdatingDatabaseTableRows,
-    updateError: bulkUpdateDatabaseTableRowsError,
   } = useDatabaseTableMutations({
     tenantID,
     databaseSchemaName,
@@ -381,37 +378,36 @@ export const DatabaseTableGrid = ({
     onBulkUpdateSuccess: _handleClearDatabaseTableRowChanges,
   });
 
-  return isLoadingDatabaseTableRows || isLoadingDatabaseTable ? (
-    <div
-      className={`w-full h-full !overflow-y-hidden ${containerClass} flex justify-center items-center`}
+  return (
+    <ReactQueryLoadingErrorWrapper
+      isLoading={isLoadingDatabaseTable || isLoadingDatabaseTableRows}
+      error={loadDatabaseTableRowsError || loadDatabaseTableError}
+      isFetching={isFetchingDatabaseTableRows || isFetchingDatabaseTable}
+      refetch={reloadDatabaseTableRows}
     >
-      <CircularProgress />
-    </div>
-  ) : (
-    <div
-      className={`w-full h-full !overflow-y-hidden flex flex-col justify-start items-stretch ${containerClass} `}
-    >
-      <div className="w-full flex flex-col justify-start items-stretch">
-        {showStats && (
-          <div className="p-2 border-b border-slate-200 ">
-            <DatabaseTableStatistics
-              tenantID={tenantID}
-              databaseSchemaName={databaseSchemaName}
-              databaseTableName={databaseTableName}
-              isLoadingDatabaseTableStatistics={
-                isLoadingDatabaseTableStatistics
-              }
-              databaseTableRowCount={databaseTableRowCount}
-            />
-          </div>
-        )}
-        {databaseTableRowChangeCount > 0 ||
-        isSelectAllRowCheckBoxEnabled ? null : (
-          <div className="px-2 py-2 border-b border-slate-200 flex flex-row justify-between items-start gap-2 w-full">
-            {databaseTableColumnFilters &&
-            databaseTableColumnFilters.length > 0 ? null : (
-              <div className="flex flex-row justify-start items-center gap-2">
-                {!databaseTableGridAutoheight && (
+      <div
+        className={`w-full h-full !overflow-y-hidden flex flex-col justify-start items-stretch ${containerClass} `}
+      >
+        <div className="w-full flex flex-col justify-start items-stretch">
+          {showStats && (
+            <div className="p-2 border-b border-slate-200 ">
+              <DatabaseTableStatistics
+                tenantID={tenantID}
+                databaseSchemaName={databaseSchemaName}
+                databaseTableName={databaseTableName}
+                isLoadingDatabaseTableStatistics={
+                  isLoadingDatabaseTableStatistics
+                }
+                databaseTableRowCount={databaseTableRowCount}
+              />
+            </div>
+          )}
+          {databaseTableRowChangeCount > 0 ||
+          isSelectAllRowCheckBoxEnabled ? null : (
+            <div className="px-2 py-2 border-b border-slate-200 flex flex-row justify-between items-start gap-2 w-full">
+              {databaseTableColumnFilters &&
+              databaseTableColumnFilters.length > 0 ? null : (
+                <div className="flex flex-row justify-start items-center gap-2">
                   <button
                     onClick={_handleToggleDatabaseTableGridDensity}
                     className="!outline-none !hover:outline-none flex items-center rounded bg-[#646cff]/10 px-3 py-1 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50"
@@ -426,313 +422,306 @@ export const DatabaseTableGrid = ({
 
                     {`${capitalize(databaseTableGridDensity)} view`}
                   </button>
-                )}
-                {/* <button
-                  onClick={_handleToggleDatabaseTableGridAutoheight}
-                  className="!outline-none !hover:outline-none flex items-center rounded bg-[#646cff]/10 px-3 py-1 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50"
-                >
-                  {databaseTableGridAutoheight ? (
-                    <RiLineHeight className="mr-2 h-4 w-4" />
-                  ) : (
-                    <RiLineHeight className="mr-2 h-4 w-4" />
-                  )}
-
-                  {databaseTableGridAutoheight ? "Autoheight" : "Fixed height"}
-                </button> */}
-              </div>
-            )}
-            <div className="flex flex-row justify-end items-center gap-2">
-              {databaseTableColumnFilters.map((filter, index) => {
-                return (
-                  <div className="flex items-center border border-[#646cff]  rounded bg-[#646cff]/10 px-2 py-1 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50">
-                    {/* Sort info button */}
-                    <div className="text-sm font-medium text-[#646cff] ">
-                      {filter.field} {filter.operator}{" "}
-                      {PostgreSQLUtils.processFilteredValueToTextType({
-                        udtType: filter.fieldType,
-                        value: filter.value,
-                      })}
-                    </div>
-
-                    {/* Clear sort button */}
-                    <button
-                      onClick={() =>
-                        _handleDeleteDatabaseTableColumnFilters(index)
-                      }
-                      className="rounded bg-transparent ml-2 text-[#646cff] outline-none focus:outline-none border-0 p-0 "
+                </div>
+              )}
+              <div className="flex flex-row justify-end items-center gap-2">
+                {databaseTableColumnFilters.map((filter, index) => {
+                  const key = `filter_${index}`;
+                  return (
+                    <div
+                      key={key}
+                      className="flex items-center border border-[#646cff]  rounded bg-[#646cff]/10 px-2 py-1 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50"
                     >
-                      <FaTimes className="h-4 w-4" />
-                    </button>
-                  </div>
-                );
-              })}
-              {databaseTableColumnFilters &&
-              databaseTableColumnFilters.length > 0 ? null : (
+                      {/* Sort info button */}
+                      <div className="text-sm font-medium text-[#646cff] ">
+                        {filter.field} {filter.operator}{" "}
+                        {PostgreSQLUtils.processFilteredValueToTextType({
+                          udtType: filter.fieldType,
+                          value: filter.value,
+                        })}
+                      </div>
+
+                      {/* Clear sort button */}
+                      <button
+                        onClick={() =>
+                          _handleDeleteDatabaseTableColumnFilters(index)
+                        }
+                        className="rounded bg-transparent ml-2 text-[#646cff] outline-none focus:outline-none border-0 p-0 "
+                      >
+                        <FaTimes className="h-4 w-4" />
+                      </button>
+                    </div>
+                  );
+                })}
+                {databaseTableColumnFilters &&
+                databaseTableColumnFilters.length > 0 ? null : (
+                  <button
+                    onClick={_handleAddDatabaseTableBlankRow}
+                    className="!outline-none !hover:outline-none flex items-center rounded bg-[#646cff]/10 px-3 py-1 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50"
+                  >
+                    <FaPlus className="mr-2 h-4 w-4" />
+
+                    {CONSTANTS.STRINGS.DATABASE_TABLE_VIEW_ADD_ROW}
+                  </button>
+                )}
+
                 <button
-                  onClick={_handleAddDatabaseTableBlankRow}
+                  onClick={_handleOpenDatabaseTableColumnFilterMenu}
                   className="!outline-none !hover:outline-none flex items-center rounded bg-[#646cff]/10 px-3 py-1 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50"
                 >
                   <FaPlus className="mr-2 h-4 w-4" />
-
-                  {CONSTANTS.STRINGS.DATABASE_TABLE_VIEW_ADD_ROW}
+                  {CONSTANTS.STRINGS.DATABASE_TABLE_VIEW_ADD_FILTER}
+                </button>
+                <button
+                  onClick={() => {
+                    invalidateDatabaseTableRows();
+                    reloadDatabaseTableRows();
+                  }}
+                  className="!outline-none !hover:outline-none flex items-center rounded bg-[#646cff]/10 px-1 py-1 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50"
+                >
+                  <MdOutlineRefresh
+                    className={`h-5 w-5 ${
+                      isFetchingDatabaseTableRows ? "animate-spin" : ""
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+          )}
+          {databaseTableRowChangeCount > 0 && (
+            <div className="w-full flex flex-row bg-[#ffe7a4] justify-start items-center gap-2 p-2 border-b border-slate-200">
+              <button
+                onClick={_handleCommitDatabaseTableRowChanges}
+                disabled={isBulkUpdatingDatabaseTableRows} // Disable button during loading
+                className={`!outline-none !hover:outline-none flex items-center rounded px-2 py-0.5 text-xs ${
+                  isBulkUpdatingDatabaseTableRows
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-white text-[#646cff] border-[#646cff] hover:border-[#646cff] hover:bg-[#ebecff]"
+                }`}
+              >
+                {isBulkUpdatingDatabaseTableRows ? (
+                  <>
+                    Saving your changes...
+                    <CircularProgress
+                      size={16}
+                      color="inherit"
+                      className="!ml-2"
+                    />
+                  </>
+                ) : (
+                  `Save ${databaseTableRowChangeCount} row changes`
+                )}
+              </button>
+              {!isBulkUpdatingDatabaseTableRows && (
+                <button
+                  onClick={_handleClearDatabaseTableRowChanges}
+                  className="!outline-none !hover:outline-none flex items-center rounded bg-white px-2 py-0.5 text-xs text-[#ff6e64] border border-[#ff6e64] hover:bg-[#ffebe9] hover:border-[#ff6e64]"
+                >
+                  Discard changes
                 </button>
               )}
-
+            </div>
+          )}
+          {databaseTableNewRows && databaseTableNewRows.length > 0 && (
+            <div className="w-full flex flex-row bg-[#ffe7a4] justify-start items-center gap-2 p-2 border-b border-slate-200">
               <button
-                onClick={_handleOpenDatabaseTableColumnFilterMenu}
-                className="!outline-none !hover:outline-none flex items-center rounded bg-[#646cff]/10 px-3 py-1 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50"
+                onClick={_handleCommitAddDatabaseTableRow}
+                disabled={isBulkAddingDatabaseTableRows} // Disable button during loading
+                className={`!outline-none !hover:outline-none flex items-center rounded px-2 py-0.5 text-xs ${
+                  isBulkAddingDatabaseTableRows
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-white text-[#646cff] border-[#646cff] hover:border-[#646cff] hover:bg-[#ebecff]"
+                }`}
               >
-                <FaPlus className="mr-2 h-4 w-4" />
-                {CONSTANTS.STRINGS.DATABASE_TABLE_VIEW_ADD_FILTER}
+                {isBulkAddingDatabaseTableRows ? (
+                  <>
+                    Saving your changes...
+                    <CircularProgress
+                      size={16}
+                      color="inherit"
+                      className="!ml-2"
+                    />
+                  </>
+                ) : (
+                  `Save ${databaseTableNewRows.length} new row`
+                )}
               </button>
-              <button
-                onClick={() => {
-                  invalidateDatabaseTableRows();
-                  reloadDatabaseTableRows();
-                }}
-                className="!outline-none !hover:outline-none flex items-center rounded bg-[#646cff]/10 px-1 py-1 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50"
-              >
-                <MdOutlineRefresh
-                  className={`h-5 w-5 ${
-                    isFetchingDatabaseTableRows ? "animate-spin" : ""
-                  }`}
+              {!isBulkAddingDatabaseTableRows && (
+                <button
+                  onClick={_handleClearAddDatabaseTableRow}
+                  className="!outline-none !hover:outline-none flex items-center rounded bg-white px-2 py-0.5 text-xs text-[#ff6e64] border border-[#ff6e64] hover:bg-[#ffebe9] hover:border-[#ff6e64]"
+                >
+                  Discard changes
+                </button>
+              )}
+            </div>
+          )}
+          {isSelectAllRowCheckBoxEnabled && !isNaN(databaseTableRowCount) && (
+            <div className="w-full flex flex-row bg-[#ffe7a4] justify-between items-center gap-2 p-2 border-b border-slate-200">
+              <div>
+                <Checkbox
+                  checked={isAllRowSelectChecked}
+                  onChange={(_, checked) => {
+                    _handleToggleAllRowSelectCheckbox(checked);
+                  }}
+                  className="!p-0 text-[#646cff] hover:bg-[#646cff]/10 focus:outline-none focus:ring-2 focus:ring-[#646cff]/50"
                 />
-              </button>
+                <span className="text-sm font-medium mr-2 text-slate-700">
+                  Select all {databaseTableRowCount} rows
+                </span>
+              </div>
+              <div className="flex flex-row justify-end items-center">
+                <DatabaseTableRowsExportForm
+                  tenantID={tenantID}
+                  databaseSchemaName={databaseSchemaName}
+                  databaseTableName={databaseTableName}
+                  filterQuery={filterQuery}
+                  isAllRowSelectChecked={isAllRowSelectChecked}
+                  databaseTableRowCount={databaseTableRowCount}
+                  rowSelectionModel={_rowSelectionModel}
+                  multipleSelectedQuery={multipleSelectedQuery}
+                />
+                <DatabaseTableRowsDeletionForm
+                  tenantID={tenantID}
+                  databaseSchemaName={databaseSchemaName}
+                  databaseTableName={databaseTableName}
+                  filterQuery={filterQuery}
+                  isAllRowSelectChecked={isAllRowSelectChecked}
+                  databaseTableRowCount={databaseTableRowCount}
+                  rowSelectionModel={_rowSelectionModel}
+                  multipleSelectedQuery={multipleSelectedQuery}
+                  reloadDatabaseTableRows={() => {
+                    invalidateDatabaseTableRows();
+                    reloadDatabaseTableRows();
+                  }}
+                />
+              </div>
             </div>
-          </div>
-        )}
-        {databaseTableRowChangeCount > 0 && (
-          <div className="w-full flex flex-row bg-[#ffe7a4] justify-start items-center gap-2 p-2 border-b border-slate-200">
-            <button
-              onClick={_handleCommitDatabaseTableRowChanges}
-              disabled={isBulkUpdatingDatabaseTableRows} // Disable button during loading
-              className={`!outline-none !hover:outline-none flex items-center rounded px-2 py-0.5 text-xs ${
-                isBulkUpdatingDatabaseTableRows
-                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  : "bg-white text-[#646cff] border-[#646cff] hover:border-[#646cff] hover:bg-[#ebecff]"
-              }`}
-            >
-              {isBulkUpdatingDatabaseTableRows ? (
-                <>
-                  Saving your changes...
-                  <CircularProgress
-                    size={16}
-                    color="inherit"
-                    className="!ml-2"
-                  />
-                </>
-              ) : (
-                `Save ${databaseTableRowChangeCount} row changes`
-              )}
-            </button>
-            {!isBulkUpdatingDatabaseTableRows && (
-              <button
-                onClick={_handleClearDatabaseTableRowChanges}
-                className="!outline-none !hover:outline-none flex items-center rounded bg-white px-2 py-0.5 text-xs text-[#ff6e64] border border-[#ff6e64] hover:bg-[#ffebe9] hover:border-[#ff6e64]"
-              >
-                Discard changes
-              </button>
-            )}
-          </div>
-        )}
-        {databaseTableNewRows && databaseTableNewRows.length > 0 && (
-          <div className="w-full flex flex-row bg-[#ffe7a4] justify-start items-center gap-2 p-2 border-b border-slate-200">
-            <button
-              onClick={_handleCommitAddDatabaseTableRow}
-              disabled={isBulkAddingDatabaseTableRows} // Disable button during loading
-              className={`!outline-none !hover:outline-none flex items-center rounded px-2 py-0.5 text-xs ${
-                isBulkAddingDatabaseTableRows
-                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  : "bg-white text-[#646cff] border-[#646cff] hover:border-[#646cff] hover:bg-[#ebecff]"
-              }`}
-            >
-              {isBulkAddingDatabaseTableRows ? (
-                <>
-                  Saving your changes...
-                  <CircularProgress
-                    size={16}
-                    color="inherit"
-                    className="!ml-2"
-                  />
-                </>
-              ) : (
-                `Save ${databaseTableNewRows.length} new row`
-              )}
-            </button>
-            {!isBulkAddingDatabaseTableRows && (
-              <button
-                onClick={_handleClearAddDatabaseTableRow}
-                className="!outline-none !hover:outline-none flex items-center rounded bg-white px-2 py-0.5 text-xs text-[#ff6e64] border border-[#ff6e64] hover:bg-[#ffebe9] hover:border-[#ff6e64]"
-              >
-                Discard changes
-              </button>
-            )}
-          </div>
-        )}
-        {isSelectAllRowCheckBoxEnabled && !isNaN(databaseTableRowCount) && (
-          <div className="w-full flex flex-row bg-[#ffe7a4] justify-between items-center gap-2 p-2 border-b border-slate-200">
-            <div>
-              <Checkbox
-                checked={isAllRowSelectChecked}
-                onChange={(_, checked) => {
-                  _handleToggleAllRowSelectCheckbox(checked);
-                }}
-                className="!p-0 text-[#646cff] hover:bg-[#646cff]/10 focus:outline-none focus:ring-2 focus:ring-[#646cff]/50"
-              />
-              <span className="text-sm font-medium mr-2 text-slate-700">
-                Select all {databaseTableRowCount} rows
-              </span>
-            </div>
-            <div className="flex flex-row justify-end items-center">
-              <DatabaseTableRowsExportForm
-                tenantID={tenantID}
-                databaseSchemaName={databaseSchemaName}
-                databaseTableName={databaseTableName}
-                filterQuery={filterQuery}
-                isAllRowSelectChecked={isAllRowSelectChecked}
-                databaseTableRowCount={databaseTableRowCount}
-                rowSelectionModel={_rowSelectionModel}
-                multipleSelectedQuery={multipleSelectedQuery}
-              />
-              <DatabaseTableRowsDeletionForm
-                tenantID={tenantID}
-                databaseSchemaName={databaseSchemaName}
-                databaseTableName={databaseTableName}
-                filterQuery={filterQuery}
-                isAllRowSelectChecked={isAllRowSelectChecked}
-                databaseTableRowCount={databaseTableRowCount}
-                rowSelectionModel={_rowSelectionModel}
-                multipleSelectedQuery={multipleSelectedQuery}
-                reloadDatabaseTableRows={() => {
-                  invalidateDatabaseTableRows();
-                  reloadDatabaseTableRows();
-                }}
-              />
-            </div>
-          </div>
-        )}
-        <DatabaseTableColumnFilter
-          isDatabaseTableColumnFiltersMenuOpen={
-            isDatabaseTableColumnFiltersMenuOpen
-          }
-          handleCloseDatabaseTableColumnFiltersMenu={
-            _handleCloseDatabaseTableColumnFilterMenu
-          }
-          databaseTableColumnFilters={databaseTableColumnFilters}
-          setDatabaseTableColumnFilters={setDatabaseTableColumnFilters}
-          databaseTableColumnFilterCombinator={
-            databaseTableColumnFilterCombinator
-          }
-          setDatabaseTableColumnFilterCombinator={
-            setDatabaseTableColumnFilterCombinator
-          }
-          databaseTableColumns={databaseTableColumns}
-          databaseTableName={databaseTableName}
-        />
-      </div>
-      {databaseTableRows &&
-      formattedDatabaseTableColumns &&
-      databaseTablePrimaryKey ? (
-        <div className="flex flex-col w-full flex-grow h-full overflow-y-auto justify-between items-stretch text-sm font-medium">
-          <DataGrid
-            ref={datagridRef}
-            apiRef={datagridAPIRef}
-            rows={
-              databaseTableNewRows && databaseTableNewRows.length > 0
-                ? [...databaseTableNewRows, ...databaseTableRows]
-                : databaseTableRows
+          )}
+          <DatabaseTableColumnFilter
+            isDatabaseTableColumnFiltersMenuOpen={
+              isDatabaseTableColumnFiltersMenuOpen
             }
-            // autoHeight={databaseTableGridAutoheight}
-            columns={formattedDatabaseTableColumns}
-            loading={isLoadingDatabaseTableRows}
-            processRowUpdate={_handleDataGridRowUpdate}
-            experimentalFeatures={{ newEditingApi: true }}
-            getRowId={(row) => _getRowID(row)} // Custom row ID getter
-            // className="fill-grid border-t border-slate-200"
-            getCellClassName={(params) => {
-              const rowId = _getRowID(params.row);
-              const isChanged = databaseTableRowChangesForUITracking[
-                rowId
-              ]?.hasOwnProperty(params.field);
-              const isNewRow = params.row.__is__new__row;
-              return isChanged || isNewRow ? "changed-cell" : "";
-            }}
-            sx={{
-              "--unstable_DataGrid-radius": "0",
-              "& .MuiDataGrid-root": {
-                borderRadius: 0,
-              },
-              "& .MuiIconButton-root": {
-                outline: "none",
-              },
-              "& .MuiDataGrid-cell": {
-                fontSize: "0.875rem",
-                lineHeight: "1.25rem",
-                fontWeight: "400",
-              },
-              "& .MuiCheckbox-root": {
-                padding: "4px",
-              },
-              "& .MuiDataGrid-columnHeaderCheckbox": {
-                minWidth: "auto !important",
-                width: "auto !important",
-                flex: "0 0 auto !important",
-                padding: "0.25rem !important",
-                "& .MuiDataGrid-columnHeaderTitleContainer": {
-                  width: "auto",
-                  minWidth: "auto",
-                  flex: "none",
-                },
-              },
-              "& .MuiDataGrid-cellCheckbox": {
-                minWidth: "auto !important",
-                width: "auto !important",
-                flex: "0 0 auto !important",
-                color: "#646cff !important",
-                padding: "0.25rem !important",
-              },
-            }}
-            onRowSelectionModelChange={_handleMultipleSelectedRowsQueryBuilder}
-            density={databaseTableGridDensity}
-            showCellVerticalBorder
-            className="!border-0"
-            // checkboxSelection={!isAllRowSelectChecked}
-            checkboxSelection
-            disableRowSelectionOnClick
-            disableColumnFilter
-            getRowHeight={databaseTableGridAutoheight ? () => "auto" : null}
-            onSortModelChange={(model) => {
-              if (model.length > 0) {
-                const { field, sort } = model[0];
-                setDatabaseTableColumnSortModel({
-                  field: field,
-                  order: lowerCase(sort),
-                });
-              }
-            }}
-            paginationMode="server"
-            rowCount={
-              !isNaN(databaseTableRowCount)
-                ? parseInt(databaseTableRowCount)
-                : 0
+            handleCloseDatabaseTableColumnFiltersMenu={
+              _handleCloseDatabaseTableColumnFilterMenu
             }
-            pageSizeOptions={[20, 50, 100]}
-            paginationModel={{ page: page - 1, pageSize }}
-            onPaginationModelChange={({
-              page: newPage,
-              pageSize: newPageSize,
-            }) => {
-              setPage(newPage + 1); // Convert to 1-based for API
-              setPageSize(newPageSize);
-            }}
-            hideFooterSelectedRowCount
+            databaseTableColumnFilters={databaseTableColumnFilters}
+            setDatabaseTableColumnFilters={setDatabaseTableColumnFilters}
+            databaseTableColumnFilterCombinator={
+              databaseTableColumnFilterCombinator
+            }
+            setDatabaseTableColumnFilterCombinator={
+              setDatabaseTableColumnFilterCombinator
+            }
+            databaseTableColumns={databaseTableColumns}
+            databaseTableName={databaseTableName}
           />
         </div>
-      ) : (
-        <div className="!w-full !p-2">
-          <NoEntityUI message={CONSTANTS.ERROR_CODES.SERVER_ERROR.message} />
-        </div>
-      )}
-    </div>
+        {databaseTableRows &&
+        formattedDatabaseTableColumns &&
+        databaseTablePrimaryKey ? (
+          <div className="flex flex-col w-full flex-grow h-full overflow-y-auto justify-between items-stretch text-sm font-medium">
+            <DataGrid
+              ref={datagridRef}
+              apiRef={datagridAPIRef}
+              rows={
+                databaseTableNewRows && databaseTableNewRows.length > 0
+                  ? [...databaseTableNewRows, ...databaseTableRows]
+                  : databaseTableRows
+              }
+              columns={formattedDatabaseTableColumns}
+              loading={isLoadingDatabaseTableRows}
+              processRowUpdate={_handleDataGridRowUpdate}
+              experimentalFeatures={{ newEditingApi: true }}
+              getRowId={(row) => _getRowID(row)} // Custom row ID getter
+              // className="fill-grid border-t border-slate-200"
+              getCellClassName={(params) => {
+                const rowId = _getRowID(params.row);
+                const isChanged =
+                  databaseTableRowChangesForUITracking[rowId]?.[
+                    params.field
+                  ] !== undefined;
+                const isNewRow = params.row.__is__new__row;
+                return isChanged || isNewRow ? "changed-cell" : "";
+              }}
+              sx={{
+                "--unstable_DataGrid-radius": "0",
+                "& .MuiDataGrid-root": {
+                  borderRadius: 0,
+                },
+                "& .MuiIconButton-root": {
+                  outline: "none",
+                },
+                "& .MuiDataGrid-cell": {
+                  fontSize: "0.875rem",
+                  lineHeight: "1.25rem",
+                  fontWeight: "400",
+                },
+                "& .MuiCheckbox-root": {
+                  padding: "4px",
+                },
+                "& .MuiDataGrid-columnHeaderCheckbox": {
+                  minWidth: "auto !important",
+                  width: "auto !important",
+                  flex: "0 0 auto !important",
+                  padding: "0.25rem !important",
+                  "& .MuiDataGrid-columnHeaderTitleContainer": {
+                    width: "auto",
+                    minWidth: "auto",
+                    flex: "none",
+                  },
+                },
+                "& .MuiDataGrid-cellCheckbox": {
+                  minWidth: "auto !important",
+                  width: "auto !important",
+                  flex: "0 0 auto !important",
+                  color: "#646cff !important",
+                  padding: "0.25rem !important",
+                },
+              }}
+              onRowSelectionModelChange={
+                _handleMultipleSelectedRowsQueryBuilder
+              }
+              density={databaseTableGridDensity}
+              showCellVerticalBorder
+              className="!border-0"
+              // checkboxSelection={!isAllRowSelectChecked}
+              checkboxSelection
+              disableRowSelectionOnClick
+              disableColumnFilter
+              onSortModelChange={(model) => {
+                if (model.length > 0) {
+                  const { field, sort } = model[0];
+                  setDatabaseTableColumnSortModel({
+                    field: field,
+                    order: lowerCase(sort),
+                  });
+                }
+              }}
+              paginationMode="server"
+              rowCount={
+                !isNaN(databaseTableRowCount)
+                  ? parseInt(databaseTableRowCount)
+                  : 0
+              }
+              pageSizeOptions={[20, 50, 100]}
+              paginationModel={{ page: page - 1, pageSize }}
+              onPaginationModelChange={({
+                page: newPage,
+                pageSize: newPageSize,
+              }) => {
+                setPage(newPage + 1); // Convert to 1-based for API
+                setPageSize(newPageSize);
+              }}
+              hideFooterSelectedRowCount
+            />
+          </div>
+        ) : (
+          <div className="!w-full !p-2">
+            <NoEntityUI message={CONSTANTS.ERROR_CODES.SERVER_ERROR.message} />
+          </div>
+        )}
+      </div>
+    </ReactQueryLoadingErrorWrapper>
   );
 };

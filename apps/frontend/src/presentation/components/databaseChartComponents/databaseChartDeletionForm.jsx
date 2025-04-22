@@ -6,40 +6,37 @@ import { CONSTANTS } from "../../../constants";
 import { deleteDatabaseChartByIDAPI } from "../../../data/apis/databaseChart";
 import { useGlobalUI } from "../../../logic/contexts/globalUIContext";
 import { displayError, displaySuccess } from "../../../utils/notification";
-export const DatabaseChartDeletionForm = ({
-  tenantID,
-  databaseChartID,
-}) => {
+import PropTypes from "prop-types";
+import React from "react";
+
+export const DatabaseChartDeletionForm = ({ tenantID, databaseChartID }) => {
+  DatabaseChartDeletionForm.propTypes = {
+    tenantID: PropTypes.number.isRequired,
+    databaseChartID: PropTypes.number.isRequired,
+  };
   const navigate = useNavigate();
   const { showConfirmation } = useGlobalUI();
   const queryClient = useQueryClient();
-  const {
-    isPending: isDeletingDatabaseChart,
-    isSuccess: isDeletingDatabaseChartSuccess,
-    isError: isDeletingDatabaseChartError,
-    error: deleteDatabaseChartError,
-    mutate: deleteDatabaseChart,
-  } = useMutation({
-    mutationFn: (data) => {
-      return deleteDatabaseChartByIDAPI({
-        tenantID,
-        databaseChartID,
-      });
-    },
-    retry: false,
-    onSuccess: (data) => {
-      displaySuccess(CONSTANTS.STRINGS.DELETE_CHART_DELETION_SUCCESS);
-      queryClient.invalidateQueries([
-        CONSTANTS.REACT_QUERY_KEYS.DATABASE_CHARTS(
-          tenantID
-        ),
-      ]);
-      navigate(-1);
-    },
-    onError: (error) => {
-      displayError(error);
-    },
-  });
+  const { isPending: isDeletingDatabaseChart, mutate: deleteDatabaseChart } =
+    useMutation({
+      mutationFn: () => {
+        return deleteDatabaseChartByIDAPI({
+          tenantID,
+          databaseChartID,
+        });
+      },
+      retry: false,
+      onSuccess: () => {
+        displaySuccess(CONSTANTS.STRINGS.DELETE_CHART_DELETION_SUCCESS);
+        queryClient.invalidateQueries([
+          CONSTANTS.REACT_QUERY_KEYS.DATABASE_CHARTS(tenantID),
+        ]);
+        navigate(-1);
+      },
+      onError: (error) => {
+        displayError(error);
+      },
+    });
 
   const _handleDeleteChart = async () => {
     await showConfirmation({
@@ -57,7 +54,7 @@ export const DatabaseChartDeletionForm = ({
         onClick={_handleDeleteChart}
         disabled={isDeletingDatabaseChart}
         type="button"
-        class="flex flex-row items-center justify-center rounded bg-red-50 ms-2 px-1 py-1 text-xs text-red-400 hover:bg-red-100 focus:ring-2 focus:ring-red-400 outline-none focus:outline-none hover:border-red-400"
+        className="flex flex-row items-center justify-center rounded bg-red-50 ms-2 px-1 py-1 text-xs text-red-400 hover:bg-red-100 focus:ring-2 focus:ring-red-400 outline-none focus:outline-none hover:border-red-400"
       >
         {isDeletingDatabaseChart ? (
           <CircularProgress className="!text-xs" size={16} color="white" />

@@ -1,3 +1,4 @@
+import React from "react";
 import { BarChartComponent } from "./barChartComponent";
 import { LineChartComponent } from "./lineChartComponent";
 import { PieChartComponent } from "./pieChartComponent";

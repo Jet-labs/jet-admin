@@ -1,7 +1,7 @@
 import { CircularProgress } from "@mui/material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
-import { useCallback, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { CONSTANTS } from "../../../constants";
 import {
   createDatabaseChartAPI,
@@ -17,6 +17,9 @@ import {
 import { DatabaseChartEditor } from "./databaseChartEditor";
 import { DatabaseChartPreview } from "./databaseChartPreview";
 import { DatabaseChartAIGeneratePrompt } from "./databaseChartAIGeneratePrompt";
+import { displayError } from "../../../utils/notification";
+import PropTypes from "prop-types";
+
 const initialValues = {
   databaseChartName: "",
   databaseChartType: CONSTANTS.DATABASE_CHART_TYPES.BAR_CHART.value,
@@ -65,40 +68,35 @@ const initialValues = {
 };
 
 export const DatabaseChartAdditionForm = ({ tenantID }) => {
+  DatabaseChartAdditionForm.propTypes = {
+    tenantID: PropTypes.number.isRequired,
+  };
   const queryClient = useQueryClient();
   const [databaseChartFetchedData, setDatabaseChartFetchedData] =
     useState(null);
 
-  const {
-    isPending: isAddingDatabaseChart,
-    isSuccess: isAddingDatabaseChartSuccess,
-    isError: isAddingDatabaseChartError,
-    error: addDatabaseChartError,
-    mutate: addDatabaseChart,
-  } = useMutation({
-    mutationFn: (data) => {
-      return createDatabaseChartAPI({
-        tenantID,
-        databaseChartData: data,
-      });
-    },
-    retry: false,
-    onSuccess: (data) => {
-      displaySuccess(CONSTANTS.STRINGS.ADD_CHART_FORM_CHART_ADDITION_SUCCESS);
-      queryClient.invalidateQueries([
-        CONSTANTS.REACT_QUERY_KEYS.DATABASE_CHARTS(tenantID),
-      ]);
-    },
-    onError: (error) => {
-      displayError(error);
-    },
-  });
+  const { isPending: isAddingDatabaseChart, mutate: addDatabaseChart } =
+    useMutation({
+      mutationFn: (data) => {
+        return createDatabaseChartAPI({
+          tenantID,
+          databaseChartData: data,
+        });
+      },
+      retry: false,
+      onSuccess: () => {
+        displaySuccess(CONSTANTS.STRINGS.ADD_CHART_FORM_CHART_ADDITION_SUCCESS);
+        queryClient.invalidateQueries([
+          CONSTANTS.REACT_QUERY_KEYS.DATABASE_CHARTS(tenantID),
+        ]);
+      },
+      onError: (error) => {
+        displayError(error);
+      },
+    });
 
   const {
     isPending: isFetchingDatabaseChartData,
-    isSuccess: isFetchingDatabaseChartDataSuccess,
-    isError: isFetchingDatabaseChartDataError,
-    error: fetchDatabaseChartDataError,
     mutate: fetchDatabaseChartData,
   } = useMutation({
     mutationFn: (data) => {
@@ -152,7 +150,6 @@ export const DatabaseChartAdditionForm = ({ tenantID }) => {
     _handleFetchDatabaseChartData();
   }, []);
 
-  console.log({ addDatabaseChartForm: addDatabaseChartForm?.values });
   return (
     <div className="w-full flex flex-col justify-start items-center h-full">
       <div className="w-full p-3 border-b border-gray-200 flex flex-row justify-between items-center">
@@ -177,7 +174,7 @@ export const DatabaseChartAdditionForm = ({ tenantID }) => {
       >
         <ResizablePanel defaultSize={20}>
           <form
-            class="w-full h-full p-2 flex flex-col justify-start items-stretch gap-2 overflow-y-auto"
+            className="w-full h-full p-2 flex flex-col justify-start items-stretch gap-2 overflow-y-auto"
             onSubmit={addDatabaseChartForm.handleSubmit}
           >
             {addDatabaseChartForm && (

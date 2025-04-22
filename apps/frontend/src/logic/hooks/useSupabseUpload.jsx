@@ -89,7 +89,7 @@ const useSupabaseUpload = ({
         const filePath = `${directory.replace(/^\/+|\/+$/g, "")}/${fileName}`;
 
         // Upload file to Supabase
-        const { data, error } = await supabase.storage
+        const { error } = await supabase.storage
           .from(bucket)
           .upload(filePath, file, {
             upsert,

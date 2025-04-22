@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import {
   createUserWithEmailAndPassword,
   GoogleAuthProvider,
@@ -7,21 +7,22 @@ import {
   signInWithPopup,
 } from "firebase/auth";
 import React, { useCallback, useEffect, useState } from "react";
+import { firebaseAuth } from "../../config/firebase";
 import { CONSTANTS } from "../../constants";
 import {
   getUserConfigAPI,
   getUserInfoAPI,
   updateUserConfigAPI,
 } from "../../data/apis/auth";
-import { firebaseAuth } from "../../config/firebase";
-import { useParams } from "react-router-dom";
-import { set } from "lodash";
+import PropTypes from "prop-types";
 
 const AuthStateContext = React.createContext(undefined);
 const AuthActionsContext = React.createContext(undefined);
 
 const AuthContextProvider = ({ children }) => {
-  const queryClient = useQueryClient();
+  AuthContextProvider.propTypes = {
+    children: PropTypes.node.isRequired,
+  };
   const [userConfig, setUserConfig] = useState();
   // const { tenantID } = useParams();
 
@@ -83,7 +84,9 @@ const AuthContextProvider = ({ children }) => {
     onSuccess: (data) => {
       setUserConfig(data);
     },
-    onError: (error) => {},
+    onError: (error) => {
+      console.error(error);
+    },
   });
 
   const {
@@ -103,7 +106,9 @@ const AuthContextProvider = ({ children }) => {
     onSuccess: (tenantID) => {
       getUserConfig({ tenantID: tenantID });
     },
-    onError: (error) => {},
+    onError: (error) => {
+      console.error(error);
+    },
   });
 
   // effect for setting up firebase auth listener
@@ -202,6 +207,13 @@ const AuthContextProvider = ({ children }) => {
       value={{
         firebaseUserState,
         user,
+        userError,
+        getUserConfigError,
+        updateUserConfigError,
+        isFetchingUserConfigSuccess,
+        isUpdatingUserConfigSuccess,
+        isFetchingUserConfigError,
+        isUpdatingUserConfigError,
         isLoadingUser,
         isFetchingUser,
         signInState,
@@ -223,6 +235,8 @@ const AuthContextProvider = ({ children }) => {
           getUserConfig,
           updateUserConfig,
           updateUserConfigKey,
+          setUserConfig,
+          setFirebaseUserState,
         }}
       >
         {children}

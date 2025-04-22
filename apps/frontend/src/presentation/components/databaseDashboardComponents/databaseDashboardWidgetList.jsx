@@ -11,10 +11,26 @@ import { SiGooglebigquery } from "react-icons/si";
 import { GoGrabber } from "react-icons/go";
 import { Link } from "react-router-dom";
 import { FiExternalLink } from "react-icons/fi";
+import PropTypes from "prop-types";
+import React from "react";
+import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 
 export const DatabaseDashboardWidgetList = ({ tenantID }) => {
-  const { databaseCharts, databaseQueries, databaseWidgets } =
-    useDatabaseDashboardsState();
+  DatabaseDashboardWidgetList.propTypes = {
+    tenantID: PropTypes.number.isRequired,
+  };
+  const {
+    isLoadingDatabaseQueries,
+    isLoadingDatabaseCharts,
+    isLoadingDatabaseWidgets,
+    loadDatabaseQueriesError,
+    loadDatabaseChartsError,
+    loadDatabaseWidgetsError,
+    databaseCharts,
+    databaseQueries,
+    databaseWidgets,
+  } = useDatabaseDashboardsState();
+
   const _handleDragStart = (e, id) => {
     // Set the data transfer with the widget ID
     e.dataTransfer.setData("widget", `${id}-${Date.now()}`);
@@ -44,6 +60,7 @@ export const DatabaseDashboardWidgetList = ({ tenantID }) => {
       }, 0);
     }
   };
+
   const _renderChartIcon = (databaseChartType) => {
     switch (databaseChartType) {
       case CONSTANTS.DATABASE_CHART_TYPES.BAR_CHART.value:
@@ -62,6 +79,7 @@ export const DatabaseDashboardWidgetList = ({ tenantID }) => {
         return <FaChartBar className="text-slate-700 mr-3 !text-xl" />;
     }
   };
+
   const _renderWidgetIcon = (databaseWidgetType) => {
     switch (databaseWidgetType) {
       case CONSTANTS.DATABASE_WIDGET_TYPES.TEXT_WIDGET.value:
@@ -119,108 +137,131 @@ export const DatabaseDashboardWidgetList = ({ tenantID }) => {
         {CONSTANTS.STRINGS.DASHBOARD_WIDGET_LIST_CHARTS_TITLE}
       </span>
       <div className="flex flex-col justify-start items-stretch w-full gap-2">
-        {databaseCharts?.length > 0 ? (
-          databaseCharts.map((databaseChart) => {
-            const key = `chart_${databaseChart.databaseChartID}`;
-            return (
-              <div
-                key={key}
-                id={key}
-                className="bg-slate-200 flex flex-row justify-between p-2 rounded items-center"
-              >
-                <div className="flex flex-row justify-start items-center">
-                  <div
-                    draggable
-                    onDragStart={(e) => _handleDragStart(e, key)}
-                    className="cursor-grab"
-                  >
-                    <GoGrabber className="text-slate-700 mr-2 !text-xl" />
+        <ReactQueryLoadingErrorWrapper
+          isLoading={isLoadingDatabaseCharts}
+          error={loadDatabaseChartsError}
+        >
+          {databaseCharts?.length > 0 ? (
+            databaseCharts.map((databaseChart) => {
+              const key = `chart_${databaseChart.databaseChartID}`;
+              return (
+                <div
+                  key={key}
+                  id={key}
+                  className="bg-slate-200 flex flex-row justify-between p-2 rounded items-center"
+                >
+                  <div className="flex flex-row justify-start items-center">
+                    <div
+                      draggable
+                      onDragStart={(e) => _handleDragStart(e, key)}
+                      className="cursor-grab"
+                    >
+                      <GoGrabber className="text-slate-700 mr-2 !text-xl" />
+                    </div>
+                    <div>
+                      {_renderChartIcon(databaseChart.databaseChartType)}
+                    </div>
+                    <span className="text-xs text-slate-700 font-medium">
+                      {databaseChart.databaseChartName}
+                    </span>
                   </div>
-                  <div>{_renderChartIcon(databaseChart.databaseChartType)}</div>
-                  <span className="text-xs text-slate-700 font-medium">
-                    {databaseChart.databaseChartName}
-                  </span>
-                </div>
 
-                {_renderChartLinkIcon(databaseChart.databaseChartID)}
-              </div>
-            );
-          })
-        ) : (
-          <NoEntityUI message={CONSTANTS.STRINGS.CHART_DRAWER_LIST_NO_CHART} />
-        )}
+                  {_renderChartLinkIcon(databaseChart.databaseChartID)}
+                </div>
+              );
+            })
+          ) : (
+            <NoEntityUI
+              message={CONSTANTS.STRINGS.CHART_DRAWER_LIST_NO_CHART}
+            />
+          )}
+        </ReactQueryLoadingErrorWrapper>
       </div>
       <span className="text-[#646cff] font-semibold text-sm">
         {CONSTANTS.STRINGS.DASHBOARD_WIDGET_LIST_QUERIES_TITLE}
       </span>
       <div className="flex flex-col justify-start items-stretch w-full gap-2">
-        {databaseQueries?.length > 0 ? (
-          databaseQueries.map((databaseQuery) => {
-            const key = `query_${databaseQuery.databaseQueryID}`;
-            return (
-              <div
-                key={key}
-                id={key}
-                className="bg-slate-200 flex flex-row justify-between p-2 rounded items-center"
-              >
-                <div className="flex flex-row justify-start items-center">
-                  <div
-                    draggable
-                    onDragStart={(e) => _handleDragStart(e, key)}
-                    className="cursor-grab"
-                  >
-                    <GoGrabber className="text-slate-700 mr-2 !text-xl" />
+        <ReactQueryLoadingErrorWrapper
+          isLoading={isLoadingDatabaseQueries}
+          error={loadDatabaseQueriesError}
+        >
+          {databaseQueries?.length > 0 ? (
+            databaseQueries.map((databaseQuery) => {
+              const key = `query_${databaseQuery.databaseQueryID}`;
+              return (
+                <div
+                  key={key}
+                  id={key}
+                  className="bg-slate-200 flex flex-row justify-between p-2 rounded items-center"
+                >
+                  <div className="flex flex-row justify-start items-center">
+                    <div
+                      draggable
+                      onDragStart={(e) => _handleDragStart(e, key)}
+                      className="cursor-grab"
+                    >
+                      <GoGrabber className="text-slate-700 mr-2 !text-xl" />
+                    </div>
+                    <div>
+                      <SiGooglebigquery className="text-slate-700 mr-3 !text-xl" />
+                    </div>
+                    <span className="text-xs text-slate-700 font-medium">
+                      {databaseQuery.databaseQueryTitle}
+                    </span>
                   </div>
-                  <div>
-                    <SiGooglebigquery className="text-slate-700 mr-3 !text-xl" />
-                  </div>
-                  <span className="text-xs text-slate-700 font-medium">
-                    {databaseQuery.databaseQueryTitle}
-                  </span>
+                  {_renderQueryLinkIcon(databaseQuery.databaseQueryID)}
                 </div>
-                {_renderQueryLinkIcon(databaseQuery.databaseQueryID)}
-              </div>
-            );
-          })
-        ) : (
-          <NoEntityUI message={CONSTANTS.STRINGS.QUERY_DRAWER_LIST_NO_QUERY} />
-        )}
+              );
+            })
+          ) : (
+            <NoEntityUI
+              message={CONSTANTS.STRINGS.QUERY_DRAWER_LIST_NO_QUERY}
+            />
+          )}
+        </ReactQueryLoadingErrorWrapper>
       </div>
       <span className="text-[#646cff] font-semibold text-sm">
         {CONSTANTS.STRINGS.DASHBOARD_WIDGET_LIST_WIDGETS_TITLE}
       </span>
       <div className="flex flex-col justify-start items-stretch w-full gap-2">
-        {databaseWidgets?.length > 0 ? (
-          databaseWidgets.map((databaseWidget) => {
-            const key = `text_${databaseWidget.databaseWidgetID}`;
-            return (
-              <div
-                key={key}
-                id={key}
-                className="bg-slate-200 flex flex-row justify-between p-2 rounded items-center"
-              >
-                <div className="flex flex-row justify-start items-center">
-                  <div
-                    draggable
-                    onDragStart={(e) => _handleDragStart(e, key)}
-                    className="cursor-grab"
-                  >
-                    <GoGrabber className="text-slate-700 mr-2 !text-xl" />
+        <ReactQueryLoadingErrorWrapper
+          isLoading={isLoadingDatabaseWidgets}
+          error={loadDatabaseWidgetsError}
+        >
+          {databaseWidgets?.length > 0 ? (
+            databaseWidgets.map((databaseWidget) => {
+              const key = `text_${databaseWidget.databaseWidgetID}`;
+              return (
+                <div
+                  key={key}
+                  id={key}
+                  className="bg-slate-200 flex flex-row justify-between p-2 rounded items-center"
+                >
+                  <div className="flex flex-row justify-start items-center">
+                    <div
+                      draggable
+                      onDragStart={(e) => _handleDragStart(e, key)}
+                      className="cursor-grab"
+                    >
+                      <GoGrabber className="text-slate-700 mr-2 !text-xl" />
+                    </div>
+                    <div>
+                      {_renderWidgetIcon(databaseWidget.databaseWidgetType)}
+                    </div>
+                    <span className="text-xs text-slate-700 font-medium">
+                      {databaseWidget.databaseWidgetName}
+                    </span>
                   </div>
-                  <div>
-                    {_renderWidgetIcon(databaseWidget.databaseWidgetType)}
-                  </div>
-                  <span className="text-xs text-slate-700 font-medium">
-                    {databaseWidget.databaseWidgetName}
-                  </span>
+                  {_renderWidgetLinkIcon(databaseWidget.databaseWidgetID)}
                 </div>
-                {_renderWidgetLinkIcon(databaseWidget.databaseWidgetID)}
-              </div>
-            );
-          })
-        ) : (
-          <NoEntityUI message={CONSTANTS.STRINGS.QUERY_DRAWER_LIST_NO_QUERY} />
-        )}
+              );
+            })
+          ) : (
+            <NoEntityUI
+              message={CONSTANTS.STRINGS.QUERY_DRAWER_LIST_NO_QUERY}
+            />
+          )}
+        </ReactQueryLoadingErrorWrapper>
       </div>
     </div>
   );

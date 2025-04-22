@@ -1,8 +1,12 @@
 import React from "react";
 import { IoMdDownload } from "react-icons/io";
 import { displayError } from "../../../utils/notification";
+import PropTypes from "prop-types";
 
 export const DatabaseDashboardPrintForm = ({ databaseDashboardID }) => {
+  DatabaseDashboardPrintForm.propTypes = {
+    databaseDashboardID: PropTypes.number.isRequired,
+  };
   const getDocumentStyles = () => {
     // Get all style tags
     const styles = Array.from(
@@ -19,6 +23,7 @@ export const DatabaseDashboardPrintForm = ({ databaseDashboardID }) => {
             .map((rule) => rule.cssText)
             .join("");
         } catch (e) {
+          console.error("Error accessing CSS rules:", e);
           return "";
         }
       })
@@ -48,9 +53,6 @@ export const DatabaseDashboardPrintForm = ({ databaseDashboardID }) => {
         displayError("Failed to initialize print frame");
         return;
       }
-
-      // Clone content with styles and inline computed styles
-      const clone = content.cloneNode(true);
 
       // Copy inline styles for all elements
       const copyInlineStyles = (source, target) => {
@@ -91,7 +93,7 @@ export const DatabaseDashboardPrintForm = ({ databaseDashboardID }) => {
             </style>
           </head>
           <body style="margin: 0">
-            <div class="printable-area">
+            <div className="printable-area">
               ${styleClone.innerHTML}
             </div>
           </body>

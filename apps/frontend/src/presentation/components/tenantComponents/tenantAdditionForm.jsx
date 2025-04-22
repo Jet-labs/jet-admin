@@ -47,13 +47,13 @@ export const TenantAdditionForm = () => {
 
   return (
     <div className="flex w-full h-full flex-col justify-start items-center overflow-hidden">
-      <section class="max-w-3xl w-full">
-        <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
-          <h1 class="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl ">
+      <section className="max-w-3xl w-full">
+        <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
+          <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl ">
             {CONSTANTS.STRINGS.ADD_TENANT_FORM_TITLE}
           </h1>
           <form
-            class="space-y-4 md:space-y-6"
+            className="space-y-4 md:space-y-6"
             onSubmit={addTenantForm.handleSubmit}
           >
             <TenantEditor tenantEditorForm={addTenantForm} />
@@ -61,7 +61,7 @@ export const TenantAdditionForm = () => {
             <button
               type="submit"
               disabled={isCreatingNewTenant}
-              class="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none focus:ring-blue-300 "
+              className="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none focus:ring-blue-300 "
             >
               {isCreatingNewTenant && (
                 <CircularProgress

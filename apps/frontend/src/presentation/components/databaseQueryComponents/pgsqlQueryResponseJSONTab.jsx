@@ -1,9 +1,13 @@
 import { loadLanguage } from "@uiw/codemirror-extensions-langs";
 import { githubLight } from "@uiw/codemirror-theme-github";
 import CodeMirror from "@uiw/react-codemirror";
-import { default as React } from "react";
+import PropTypes from "prop-types";
+import React from "react";
 
 export const PGSQLQueryResponseJSONTab = ({ data }) => {
+  PGSQLQueryResponseJSONTab.propTypes = {
+    data: PropTypes.object,
+  };
   return (
     <div className="w-100 flex-grow h-full overflow-y-auto ">
       <CodeMirror

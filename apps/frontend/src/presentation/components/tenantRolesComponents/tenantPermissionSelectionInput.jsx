@@ -39,10 +39,9 @@ export const TenantPermissionSelectionInput = ({
   if (!tenantPermissions || !tenantPermissions.permissions) return null;
   return (
     <div>
-      
       <label
-        for="rolePermissions"
-        class="block mb-1 text-sm font-medium text-slate-500"
+        htmlFor="rolePermissions"
+        className="block mb-1 text-sm font-medium text-slate-500"
       >
         {label || CONSTANTS.STRINGS.TENANT_PERMISSION_SELECTION_LABEL}
       </label>

@@ -10,82 +10,78 @@ import { createCronJobAPI } from "../../../data/apis/cronJob";
 import { formValidations } from "../../../utils/formValidation";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { CronJobEditor } from "./cronJobEditor";
+import PropTypes from "prop-types";
 
-export const CronJobAdditionForm = ({tenantID}) => {
+export const CronJobAdditionForm = ({ tenantID }) => {
+  CronJobAdditionForm.propTypes = {
+    tenantID: PropTypes.number.isRequired,
+  };
   const queryClient = useQueryClient();
-  
-    const {
-      isPending: isAddingCronJob,
-      isSuccess: isAddingCronJobSuccess,
-      isError: isAddingCronJobError,
-      error: addCronJobError,
-      mutate: addCronJob,
-    } = useMutation({
-      mutationFn: (data) => {
-        return createCronJobAPI({
-          tenantID,
-          cronJobData: data,
-        });
-      },
-      retry: false,
-      onSuccess: (data) => {
-        displaySuccess(
-          CONSTANTS.STRINGS.CRON_JOB_ADDED_SUCCESS
-        );
-        queryClient.invalidateQueries([
-          CONSTANTS.REACT_QUERY_KEYS.DATABASE_CRON_JOBS(tenantID),
-        ]);
-      },
-      onError: (error) => {
-        displayError(error);
-      },
-    });
-    const cronJobAdditionForm = useFormik({
-      initialValues: {
-        cronJobTitle: "",
-        cronJobDescription: "",
-        cronJobSchedule: "* * * * *",
-        databaseQueryID: "",
-        databaseQueryArgValues: {},
-      },
-      validationSchema: formValidations.cronJobAdditionFormValidationSchema,
-      onSubmit: (data) => {
-        addCronJob(data);
-      },
-    });
 
-    console.log({ cronJobAdditionForm });
+  const { isPending: isAddingCronJob, mutate: addCronJob } = useMutation({
+    mutationFn: (data) => {
+      return createCronJobAPI({
+        tenantID,
+        cronJobData: data,
+      });
+    },
+    retry: false,
+    onSuccess: () => {
+      displaySuccess(CONSTANTS.STRINGS.CRON_JOB_ADDED_SUCCESS);
+      queryClient.invalidateQueries([
+        CONSTANTS.REACT_QUERY_KEYS.DATABASE_CRON_JOBS(tenantID),
+      ]);
+    },
+    onError: (error) => {
+      displayError(error);
+    },
+  });
+  const cronJobAdditionForm = useFormik({
+    initialValues: {
+      cronJobTitle: "",
+      cronJobDescription: "",
+      cronJobSchedule: "* * * * *",
+      databaseQueryID: "",
+      databaseQueryArgValues: {},
+    },
+    validationSchema: formValidations.cronJobAdditionFormValidationSchema,
+    onSubmit: (data) => {
+      addCronJob(data);
+    },
+  });
 
-    return (
-      <section className="max-w-3xl w-full">
-        <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl  p-3">
-          {CONSTANTS.STRINGS.ADD_CRON_JOB_FORM_TITLE}
-        </h1>
+  console.log({ cronJobAdditionForm });
 
-        <form
-          class="space-y-3 md:space-y-4 mt-2 p-3"
-          onSubmit={cronJobAdditionForm.handleSubmit}
-        >
-          <CronJobEditor
-            tenantID={tenantID}
-            cronJobEditorForm={cronJobAdditionForm}
-            isLoadingCronJobEditorForm={isAddingCronJob}
-          />
+  return (
+    <section className="max-w-3xl w-full">
+      <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl  p-3">
+        {CONSTANTS.STRINGS.ADD_CRON_JOB_FORM_TITLE}
+      </h1>
 
-          <div className="flex justify-end">
-            <button
-              type="submit"
-              class="flex ml-2 flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:outline-none "
-              disabled={isAddingCronJob}
-            >
-              {isAddingCronJob ? (
-                <CircularProgress size={20} color="inherit" />
-              ) : (
-                CONSTANTS.STRINGS.ADD_CRON_JOB_SUBMIT_BUTTON_TEXT
-              )}
-            </button>
-          </div>
-        </form>
-      </section>
-    );
+      <form
+        className="space-y-3 md:space-y-4 mt-2 p-3"
+        onSubmit={cronJobAdditionForm.handleSubmit}
+      >
+        <CronJobEditor
+          tenantID={tenantID}
+          cronJobEditorForm={cronJobAdditionForm}
+          isLoadingCronJobEditorForm={isAddingCronJob}
+        />
+
+        <div className="flex justify-end">
+          <button
+            type="submit"
+            className="flex ml-2 flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:outline-none "
+            disabled={isAddingCronJob}
+          >
+            {isAddingCronJob ? (
+              <CircularProgress size={20} color="inherit" />
+            ) : (
+              CONSTANTS.STRINGS.ADD_CRON_JOB_SUBMIT_BUTTON_TEXT
+            )}
+          </button>
+        </div>
+      </form>
+    </section>
+  );
 };

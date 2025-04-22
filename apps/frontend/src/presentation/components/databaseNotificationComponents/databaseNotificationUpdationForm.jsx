@@ -14,11 +14,17 @@ import { DatabaseNotificationDeletionForm } from "./databaseNotificationDeletion
 
 import { DatabaseNotificationEditor } from "./databaseNotificationEditor";
 import { formValidations } from "../../../utils/formValidation";
+import PropTypes from "prop-types";
+import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 
 export const DatabaseNotificationUpdationForm = ({
   tenantID,
   databaseNotificationID,
 }) => {
+  DatabaseNotificationUpdationForm.propTypes = {
+    tenantID: PropTypes.number.isRequired,
+    databaseNotificationID: PropTypes.number.isRequired,
+  };
   const queryClient = useQueryClient();
   const { showConfirmation } = useGlobalUI();
 
@@ -44,9 +50,6 @@ export const DatabaseNotificationUpdationForm = ({
 
   const {
     isPending: isUpdatingDatabaseNotification,
-    isSuccess: isUpdatingDatabaseNotificationSuccess,
-    isError: isUpdatingDatabaseNotificationError,
-    error: updateDatabaseNotificationError,
     mutate: updateDatabaseNotification,
   } = useMutation({
     mutationFn: (data) => {
@@ -57,7 +60,7 @@ export const DatabaseNotificationUpdationForm = ({
       });
     },
     retry: false,
-    onSuccess: (data) => {
+    onSuccess: () => {
       displaySuccess(
         CONSTANTS.STRINGS.UPDATE_NOTIFICATION_FORM_NOTIFICATION_UPDATION_SUCCESS
       );
@@ -115,13 +118,15 @@ export const DatabaseNotificationUpdationForm = ({
         )}
       </div>
 
-      {isLoadingDatabaseNotification || isFetchingDatabaseNotification ? (
-        <div className="!w-full !h-full flex justify-center items-center">
-          <CircularProgress />
-        </div>
-      ) : (
+      <ReactQueryLoadingErrorWrapper
+        isLoading={isLoadingDatabaseNotification}
+        isFetching={isFetchingDatabaseNotification}
+        isRefetching={isRefetechingDatabaseNotification}
+        refetch={refetchDatabaseNotification}
+        error={loadDatabaseNotificationError}
+      >
         <form
-          class="space-y-3 md:space-y-4 mt-5 p-3"
+          className="space-y-3 md:space-y-4 mt-5 p-3"
           onSubmit={databaseNotificationUpdationForm.handleSubmit}
         >
           <DatabaseNotificationEditor
@@ -136,7 +141,7 @@ export const DatabaseNotificationUpdationForm = ({
             <button
               type="submit"
               disabled={isUpdatingDatabaseNotification}
-              class="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none "
+              className="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none "
             >
               {isUpdatingDatabaseNotification && (
                 <CircularProgress
@@ -149,7 +154,7 @@ export const DatabaseNotificationUpdationForm = ({
             </button>
           </div>
         </form>
-      )}
+      </ReactQueryLoadingErrorWrapper>
     </section>
   );
 };

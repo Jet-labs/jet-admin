@@ -1,9 +1,9 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import { useParams } from "react-router-dom";
 import { CONSTANTS } from "../../constants";
 
-import { useAuthState } from "./authContext";
+import PropTypes from "prop-types";
 import {
   getAllTenantPermissionsAPI,
   getAllTenantRolesAPI,
@@ -13,7 +13,9 @@ const RoleManagementStateContext = React.createContext(undefined);
 const RoleManagementActionsContext = React.createContext(undefined);
 
 const RoleManagementContextProvider = ({ children }) => {
-  const queryClient = useQueryClient();
+  RoleManagementContextProvider.propTypes = {
+    children: PropTypes.node.isRequired,
+  };
   const { tenantID } = useParams();
   const {
     isLoading: isLoadingTenantRoles,
@@ -56,6 +58,8 @@ const RoleManagementContextProvider = ({ children }) => {
         isLoadingTenantPermissions,
         isRefetchingTenantPermissions,
         tenantPermissions,
+        tenantPermissionsError,
+        tenantRolesError,
       }}
     >
       <RoleManagementActionsContext.Provider
@@ -93,6 +97,5 @@ export {
   RoleManagementContextProvider,
   RoleManagementStateContext,
   useRoleManagementActions,
-  useRoleManagementState
+  useRoleManagementState,
 };
-

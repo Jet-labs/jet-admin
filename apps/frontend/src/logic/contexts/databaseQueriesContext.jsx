@@ -5,9 +5,14 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { CONSTANTS } from "../../constants";
 import { getAllDatabaseQueriesAPI } from "../../data/apis/databaseQuery";
+import PropTypes from "prop-types";
+
 const DatabaseQueriesStateContext = React.createContext(undefined);
 const DatabaseQueriesActionsContext = React.createContext(undefined);
 const DatabaseQueriesContextProvider = ({ children }) => {
+  DatabaseQueriesContextProvider.propTypes = {
+    children: PropTypes.node.isRequired,
+  };
   const { tenantID } = useParams();
   const {
     isLoading: isLoadingDatabaseQueries,
@@ -27,6 +32,8 @@ const DatabaseQueriesContextProvider = ({ children }) => {
         databaseQueries,
         isLoadingDatabaseQueries,
         isFetchingDatabaseQueries,
+        loadDatabaseQueriesError,
+        isRefetechingDatabaseQueries,
       }}
     >
       <DatabaseQueriesActionsContext.Provider

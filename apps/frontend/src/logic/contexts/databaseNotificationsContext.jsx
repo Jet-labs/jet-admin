@@ -1,13 +1,17 @@
-import React, { createContext, useContext } from "react";
+import { useQuery } from "@tanstack/react-query";
+import PropTypes from "prop-types";
+import React from "react";
 import { useParams } from "react-router-dom";
 import { CONSTANTS } from "../../constants";
 import { getAllDatabaseNotificationsAPI } from "../../data/apis/databaseNotification";
-import { useQuery } from "@tanstack/react-query";
 
 const DatabaseNotificationsStateContext = React.createContext(undefined);
 const DatabaseNotificationsActionsContext = React.createContext(undefined);
 
 const DatabaseNotificationsContextProvider = ({ children }) => {
+  DatabaseNotificationsContextProvider.propTypes = {
+    children: PropTypes.node.isRequired,
+  };
   const { tenantID } = useParams();
   const {
     isLoading: isLoadingDatabaseNotifications,
@@ -28,6 +32,8 @@ const DatabaseNotificationsContextProvider = ({ children }) => {
         databaseNotifications,
         isLoadingDatabaseNotifications,
         isFetchingDatabaseNotifications,
+        loadDatabaseNotificationsError,
+        isRefetechingDatabaseNotifications,
       }}
     >
       <DatabaseNotificationsActionsContext.Provider
@@ -58,7 +64,9 @@ const useDatabaseNotificationsActions = () => {
 };
 
 export {
-  DatabaseNotificationsActionsContext, DatabaseNotificationsContextProvider, DatabaseNotificationsStateContext,
+  DatabaseNotificationsActionsContext,
+  DatabaseNotificationsContextProvider,
+  DatabaseNotificationsStateContext,
   useDatabaseNotificationsActions,
-  useDatabaseNotificationsState
+  useDatabaseNotificationsState,
 };

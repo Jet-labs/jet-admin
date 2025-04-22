@@ -9,17 +9,16 @@ import { createDatabaseTableAPI } from "../../../data/apis/databaseTable";
 import { formValidations } from "../../../utils/formValidation";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { DatabaseTableEditor } from "./databaseTableEditor";
+import PropTypes from "prop-types";
 
 export const DatabaseTableAdditionForm = ({ tenantID, databaseSchemaName }) => {
+  DatabaseTableAdditionForm.propTypes = {
+    tenantID: PropTypes.number.isRequired,
+    databaseSchemaName: PropTypes.string.isRequired,
+  };
   const queryClient = useQueryClient();
 
-  const {
-    isPending: isAddingDatabaseTable,
-    isSuccess: isAddingDatabaseTableSuccess,
-    isError: isAddingDatabaseTableError,
-    error: addTableError,
-    mutate: addTable,
-  } = useMutation({
+  const { isPending: isAddingDatabaseTable, mutate: addTable } = useMutation({
     mutationFn: (data) => {
       return createDatabaseTableAPI({
         tenantID,
@@ -28,7 +27,7 @@ export const DatabaseTableAdditionForm = ({ tenantID, databaseSchemaName }) => {
       });
     },
     retry: false,
-    onSuccess: (data) => {
+    onSuccess: () => {
       displaySuccess(CONSTANTS.STRINGS.ADD_TABLE_SUCCESS_TOAST);
       queryClient.invalidateQueries([
         CONSTANTS.REACT_QUERY_KEYS.DATABASE_TABLES(
@@ -89,12 +88,12 @@ export const DatabaseTableAdditionForm = ({ tenantID, databaseSchemaName }) => {
   });
 
   return (
-    <section class="max-w-3xl w-full">
-      <h1 class="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl border-b border-slate-200 p-3">
+    <section className="max-w-3xl w-full">
+      <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl border-b border-slate-200 p-3">
         {CONSTANTS.STRINGS.ADD_TABLE_FORM_TITLE}
       </h1>
       <form
-        class="space-y-3 md:space-y-4 p-3"
+        className="space-y-3 md:space-y-4 p-3"
         onSubmit={tableAdditionForm.handleSubmit}
       >
         {tableAdditionForm && (
@@ -107,7 +106,7 @@ export const DatabaseTableAdditionForm = ({ tenantID, databaseSchemaName }) => {
           <button
             type="submit"
             disabled={isAddingDatabaseTable}
-            class="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none "
+            className="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none "
           >
             {isAddingDatabaseTable && (
               <CircularProgress

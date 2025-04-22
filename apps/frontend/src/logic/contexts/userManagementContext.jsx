@@ -1,16 +1,18 @@
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import { useParams } from "react-router-dom";
 import { CONSTANTS } from "../../constants";
 
-import { useAuthState } from "./authContext";
 import { getAllTenantUsersAPI } from "../../data/apis/userManagement";
+import PropTypes from "prop-types";
 
 const UserManagementStateContext = React.createContext(undefined);
 const UserManagementActionsContext = React.createContext(undefined);
 
 const UserManagementContextProvider = ({ children }) => {
-  const queryClient = useQueryClient();
+  UserManagementContextProvider.propTypes = {
+    children: PropTypes.node.isRequired,
+  };
   const { tenantID } = useParams();
   const {
     isLoading: isLoadingTenantUsers,
@@ -34,6 +36,7 @@ const UserManagementContextProvider = ({ children }) => {
         isFetchingTenantUsers,
         isRefetchingTenantUsers,
         tenantUsers,
+        tenantUsersError,
       }}
     >
       <UserManagementActionsContext.Provider
@@ -70,6 +73,5 @@ export {
   UserManagementContextProvider,
   UserManagementStateContext,
   useUserManagementActions,
-  useUserManagementState
+  useUserManagementState,
 };
-

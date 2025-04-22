@@ -8,6 +8,8 @@ import { useFormik } from "formik";
 import { CONSTANTS } from "../../../constants";
 import { DATABASE_CHARTS_CONFIG_MAP } from "../chartTypes";
 import { formValidations } from "../../../utils/formValidation";
+import PropTypes from "prop-types";
+import React from "react";
 
 export const DatabaseChartDatasetAdvancedOptions = ({
   open,
@@ -17,6 +19,15 @@ export const DatabaseChartDatasetAdvancedOptions = ({
   initialValues,
   parentChartType,
 }) => {
+  DatabaseChartDatasetAdvancedOptions.propTypes = {
+    open: PropTypes.bool.isRequired,
+    onClose: PropTypes.func.isRequired,
+    datasetIndex: PropTypes.number.isRequired,
+    chartForm: PropTypes.object.isRequired,
+    initialValues: PropTypes.object.isRequired,
+    parentChartType: PropTypes.string.isRequired,
+  };
+
   const datasetAdvancedOptionsForm = useFormik({
     initialValues: {
       // Core dataset properties

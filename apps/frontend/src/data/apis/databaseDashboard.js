@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-catch */
 import axios from "axios";
 import { firebaseAuth } from "../../config/firebase";
 import { CONSTANTS } from "../../constants";
@@ -173,4 +174,3 @@ export const deleteDatabaseDashboardByIDAPI = async ({
     throw error;
   }
 };
-

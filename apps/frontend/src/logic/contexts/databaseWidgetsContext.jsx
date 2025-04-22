@@ -6,9 +6,14 @@ import { useQuery } from "@tanstack/react-query";
 import { CONSTANTS } from "../../constants";
 import { getAllDatabaseQueriesAPI } from "../../data/apis/databaseQuery";
 import { getAllDatabaseWidgetsAPI } from "../../data/apis/databaseWidget";
+import PropTypes from "prop-types";
+
 const DatabaseWidgetsStateContext = React.createContext(undefined);
 const DatabaseWidgetsActionsContext = React.createContext(undefined);
 const DatabaseWidgetsContextProvider = ({ children }) => {
+  DatabaseWidgetsContextProvider.propTypes = {
+    children: PropTypes.node.isRequired,
+  };
   const { tenantID } = useParams();
   const {
     isLoading: isLoadingDatabaseWidgets,
@@ -35,15 +40,16 @@ const DatabaseWidgetsContextProvider = ({ children }) => {
     refetchOnWindowFocus: false,
   });
 
-  console.log({ databaseQueries });
-
   return (
     <DatabaseWidgetsStateContext.Provider
       value={{
         databaseWidgets,
         isLoadingDatabaseWidgets,
         isFetchingDatabaseWidgets,
-
+        loadDatabaseWidgetsError,
+        loadDatabaseQueriesError,
+        isRefetechingDatabaseWidgets,
+        isRefetechingDatabaseQueries,
         databaseQueries,
         isLoadingDatabaseQueries,
         isFetchingDatabaseQueries,

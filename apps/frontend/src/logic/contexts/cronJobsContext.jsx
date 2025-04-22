@@ -1,14 +1,18 @@
-import React, { createContext, useContext } from "react";
+import { useQuery } from "@tanstack/react-query";
+import React from "react";
 import { useParams } from "react-router-dom";
 import { CONSTANTS } from "../../constants";
 import { getAllCronJobsAPI } from "../../data/apis/cronJob";
-import { useQuery } from "@tanstack/react-query";
 import { getAllDatabaseQueriesAPI } from "../../data/apis/databaseQuery";
+import PropTypes from "prop-types";
 
 const CronJobsStateContext = React.createContext(undefined);
 const CronJobsActionsContext = React.createContext(undefined);
 
 const CronJobsContextProvider = ({ children }) => {
+  CronJobsContextProvider.propTypes = {
+    children: PropTypes.node.isRequired,
+  };
   const { tenantID } = useParams();
   const {
     isLoading: isLoadingCronJobs,
@@ -24,19 +28,18 @@ const CronJobsContextProvider = ({ children }) => {
   });
 
   const {
-      isLoading: isLoadingDatabaseQueries,
-      data: databaseQueries,
-      error: loadDatabaseQueriesError,
-      isFetching: isFetchingDatabaseQueries,
-      isRefetching: isRefetechingDatabaseQueries,
-      refetch: refetchDatabaseQueries,
-    } = useQuery({
-      queryKey: [CONSTANTS.REACT_QUERY_KEYS.DATABASE_QUERIES(tenantID)],
-      queryFn: () => getAllDatabaseQueriesAPI({ tenantID }),
-      refetchOnWindowFocus: false,
-    });
+    isLoading: isLoadingDatabaseQueries,
+    data: databaseQueries,
+    error: loadDatabaseQueriesError,
+    isFetching: isFetchingDatabaseQueries,
+    isRefetching: isRefetechingDatabaseQueries,
+    refetch: refetchDatabaseQueries,
+  } = useQuery({
+    queryKey: [CONSTANTS.REACT_QUERY_KEYS.DATABASE_QUERIES(tenantID)],
+    queryFn: () => getAllDatabaseQueriesAPI({ tenantID }),
+    refetchOnWindowFocus: false,
+  });
 
-  console.log({ cronJobs });
   return (
     <CronJobsStateContext.Provider
       value={{
@@ -46,6 +49,10 @@ const CronJobsContextProvider = ({ children }) => {
         databaseQueries,
         isLoadingDatabaseQueries,
         isFetchingDatabaseQueries,
+        loadDatabaseQueriesError,
+        loadCronJobsError,
+        isRefetechingCronJobs,
+        isRefetechingDatabaseQueries,
       }}
     >
       <CronJobsActionsContext.Provider
@@ -76,7 +83,9 @@ const useCronJobsActions = () => {
 };
 
 export {
-  CronJobsActionsContext, CronJobsContextProvider, CronJobsStateContext,
+  CronJobsActionsContext,
+  CronJobsContextProvider,
+  CronJobsStateContext,
   useCronJobsActions,
-  useCronJobsState
+  useCronJobsState,
 };

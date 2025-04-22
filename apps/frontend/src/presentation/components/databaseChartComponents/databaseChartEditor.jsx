@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { FaPlus } from "react-icons/fa";
 import { CONSTANTS } from "../../../constants";
@@ -9,16 +9,22 @@ import { CollapseComponent } from "../ui/collapseComponent";
 import { DatabaseChartAdvancedOptions } from "./databaseChartAdvancedOptions";
 import { DatabaseChartDatasetField } from "./databaseChartDatasetField";
 import { DatabaseChartAIStylePrompt } from "./databaseChartAIStylePrompt";
+import PropTypes from "prop-types";
+import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 
 export const DatabaseChartEditor = ({ databaseChartEditorForm, tenantID }) => {
+  DatabaseChartEditor.propTypes = {
+    databaseChartEditorForm: PropTypes.object.isRequired,
+    tenantID: PropTypes.number.isRequired,
+  };
   const {
     databaseQueries,
     isLoadingDatabaseQueries,
     isFetchingDatabaseQueries,
+    loadDatabaseQueriesError,
   } = useDatabaseChartsState();
 
   const [selectedQueryForTesting, setSelectedQueryForTesting] = useState(false);
-  const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
   const _handleAddDataset = useCallback(() => {
     databaseChartEditorForm.setFieldValue("databaseQueries", [
       ...databaseChartEditorForm.values["databaseQueries"],
@@ -54,7 +60,6 @@ export const DatabaseChartEditor = ({ databaseChartEditorForm, tenantID }) => {
       "databaseChartConfig",
       databaseChartData?.databaseChartConfig
     );
-    console.log({ databaseQueries, databaseChartData });
     const aiStyledDatabaseQueries = databaseQueries?.map((query, index) => ({
       ...query,
       parameters: databaseChartData?.databaseQueries[index]?.parameters,
@@ -76,8 +81,8 @@ export const DatabaseChartEditor = ({ databaseChartEditorForm, tenantID }) => {
       <div className="flex flex-col justify-start items-stretch gap-2 p-2 rounded bg-slate-100">
         <div>
           <label
-            for="databaseChartName"
-            class="block mb-1 text-xs font-medium text-slate-500"
+            htmlFor="databaseChartName"
+            className="block mb-1 text-xs font-medium text-slate-500"
           >
             {CONSTANTS.STRINGS.CHART_EDITOR_FORM_NAME_FIELD_LABEL}
           </label>
@@ -98,8 +103,8 @@ export const DatabaseChartEditor = ({ databaseChartEditorForm, tenantID }) => {
 
         <div>
           <label
-            for="databaseChartType"
-            class="block mb-1 text-xs font-medium text-slate-500"
+            htmlFor="databaseChartType"
+            className="block mb-1 text-xs font-medium text-slate-500"
           >
             {CONSTANTS.STRINGS.CHART_EDITOR_FORM_TYPE_FIELD_LABEL}
           </label>
@@ -165,8 +170,8 @@ export const DatabaseChartEditor = ({ databaseChartEditorForm, tenantID }) => {
       <div className="flex flex-col justify-start items-stretch gap-2 p-2 rounded bg-slate-100">
         <div>
           <label
-            for="databaseChartConfig.refetchInterval"
-            class="block mb-1 text-xs font-medium text-slate-500"
+            htmlFor="databaseChartConfig.refetchInterval"
+            className="block mb-1 text-xs font-medium text-slate-500"
           >
             {CONSTANTS.STRINGS.CHART_EDITOR_FORM_REFRESH_INTERVAL_LABEL}
           </label>
@@ -194,6 +199,7 @@ export const DatabaseChartEditor = ({ databaseChartEditorForm, tenantID }) => {
         </label>
         <button
           onClick={_handleAddDataset}
+          disabled={isLoadingDatabaseQueries}
           type="button"
           className="flex flex-row items-center justify-center rounded bg-transparent px-3 py-1 text-xs text-[#646cff] hover:bg-transparent border-0 hover:border-0 focus:border-0 focus:outline-none focus:border-none outline-none"
         >
@@ -202,45 +208,51 @@ export const DatabaseChartEditor = ({ databaseChartEditorForm, tenantID }) => {
         </button>
       </div>
 
-      <DragDropContext onDragEnd={_handleOnDatabaseQueryListDragEnd}>
-        <Droppable type="group" droppableId="droppable">
-          {(provided) => (
-            <div
-              {...provided.droppableProps}
-              ref={provided.innerRef}
-              className="space-y-2 h-full overflow-y-auto"
-            >
-              {databaseChartEditorForm.values.databaseQueries?.map(
-                (query, index) => {
-                  return DATABASE_CHARTS_CONFIG_MAP[
-                    databaseChartEditorForm.values?.databaseQueries?.[index]
-                      ?.parameters?.type ||
-                      databaseChartEditorForm.values.databaseChartType
-                  ] ? (
-                    <DatabaseChartDatasetField
-                      key={query.tempId} // Unique key from tempId
-                      index={index}
-                      chartForm={databaseChartEditorForm}
-                      databaseQueries={databaseQueries}
-                      datasetFields={
-                        DATABASE_CHARTS_CONFIG_MAP[
-                          databaseChartEditorForm.values?.databaseQueries?.[
-                            index
-                          ]?.parameters?.type ||
-                            databaseChartEditorForm.values.databaseChartType
-                        ].datasetFields
-                      }
-                      selectedQueryForTesting={selectedQueryForTesting}
-                      setSelectedQueryForTesting={setSelectedQueryForTesting}
-                    />
-                  ) : null;
-                }
-              )}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-      </DragDropContext>
+      <ReactQueryLoadingErrorWrapper
+        isLoading={isLoadingDatabaseQueries}
+        error={loadDatabaseQueriesError}
+        isFetching={isFetchingDatabaseQueries}
+      >
+        <DragDropContext onDragEnd={_handleOnDatabaseQueryListDragEnd}>
+          <Droppable type="group" droppableId="droppable">
+            {(provided) => (
+              <div
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+                className="space-y-2 h-full overflow-y-auto"
+              >
+                {databaseChartEditorForm.values.databaseQueries?.map(
+                  (query, index) => {
+                    return DATABASE_CHARTS_CONFIG_MAP[
+                      databaseChartEditorForm.values?.databaseQueries?.[index]
+                        ?.parameters?.type ||
+                        databaseChartEditorForm.values.databaseChartType
+                    ] ? (
+                      <DatabaseChartDatasetField
+                        key={query.tempId} // Unique key from tempId
+                        index={index}
+                        chartForm={databaseChartEditorForm}
+                        databaseQueries={databaseQueries}
+                        datasetFields={
+                          DATABASE_CHARTS_CONFIG_MAP[
+                            databaseChartEditorForm.values?.databaseQueries?.[
+                              index
+                            ]?.parameters?.type ||
+                              databaseChartEditorForm.values.databaseChartType
+                          ].datasetFields
+                        }
+                        selectedQueryForTesting={selectedQueryForTesting}
+                        setSelectedQueryForTesting={setSelectedQueryForTesting}
+                      />
+                    ) : null;
+                  }
+                )}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
+      </ReactQueryLoadingErrorWrapper>
     </>
   );
 };

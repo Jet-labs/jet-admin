@@ -1,8 +1,8 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useCallback } from "react";
 import { CONSTANTS } from "../../constants";
 import { getDatabaseTableRowsAPI } from "../../data/apis/databaseTable";
 import { PostgreSQLUtils } from "../../utils/postgre";
-import { useCallback, useMemo } from "react";
 
 export const useDatabaseTableRows = ({
   tenantID,

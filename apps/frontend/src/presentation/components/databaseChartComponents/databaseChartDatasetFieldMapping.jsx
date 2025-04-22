@@ -1,11 +1,17 @@
-import { Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
+import {
+  Box,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+} from "@mui/material";
 import { useFormik } from "formik";
-import { useCallback, useMemo } from "react";
-import { CONSTANTS } from "../../../constants";
+import PropTypes from "prop-types";
+import React, { useMemo } from "react";
 import ReactJson from "react-json-view";
-import { CollapseComponent } from "../ui/collapseComponent";
-import { Box } from "@mui/material";
+import { CONSTANTS } from "../../../constants";
 import { formValidations } from "../../../utils/formValidation";
+import { CollapseComponent } from "../ui/collapseComponent";
 
 export const DatabaseChartDatasetFieldMapping = ({
   open,
@@ -16,6 +22,16 @@ export const DatabaseChartDatasetFieldMapping = ({
   selectedQuery,
   datasetFields,
 }) => {
+  DatabaseChartDatasetFieldMapping.propTypes = {
+    open: PropTypes.bool.isRequired,
+    onClose: PropTypes.func.isRequired,
+    datasetIndex: PropTypes.number.isRequired,
+    chartForm: PropTypes.object.isRequired,
+    initialValues: PropTypes.object.isRequired,
+    selectedQuery: PropTypes.object.isRequired,
+    datasetFields: PropTypes.array.isRequired,
+  };
+
   const datasetFieldMappingForm = useFormik({
     initialValues: {
       databaseQueryArgValues: {},
@@ -43,8 +59,6 @@ export const DatabaseChartDatasetFieldMapping = ({
       onClose();
     },
   });
-
-  console.log({ selectedQuery });
 
   const _dataTypeSuggestionDataList = useMemo(() => {
     if (selectedQuery && selectedQuery.databaseQueryResultSchema) {

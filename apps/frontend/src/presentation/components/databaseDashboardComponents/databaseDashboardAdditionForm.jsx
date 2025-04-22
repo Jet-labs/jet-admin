@@ -13,35 +13,35 @@ import { DatabaseDashboardDropzone } from "./databaseDashboardDropzone";
 import { DatabaseDashboardEditor } from "./databaseDashboardEditor";
 import { DatabaseDashboardWidgetList } from "./databaseDashboardWidgetList";
 import { formValidations } from "../../../utils/formValidation";
+import PropTypes from "prop-types";
+import React from "react";
 
 export const DatabaseDashboardAdditionForm = ({ tenantID }) => {
+  DatabaseDashboardAdditionForm.propTypes = {
+    tenantID: PropTypes.number.isRequired,
+  };
   const queryClient = useQueryClient();
-  const {
-    isPending: isAddingDatabaseDashboard,
-    isSuccess: isAddingDatabaseDashboardSuccess,
-    isError: isAddingDatabaseDashboardError,
-    error: addDatabaseDashboardError,
-    mutate: addDatabaseDashboard,
-  } = useMutation({
-    mutationFn: (data) => {
-      return createDatabaseDashboardAPI({
-        tenantID,
-        databaseDashboardData: data,
-      });
-    },
-    retry: false,
-    onSuccess: (data) => {
-      displaySuccess(
-        CONSTANTS.STRINGS.ADD_DASHBOARD_FORM_DASHBOARD_ADDITION_SUCCESS
-      );
-      queryClient.invalidateQueries([
-        CONSTANTS.REACT_QUERY_KEYS.DATABASE_DASHBOARDS(tenantID),
-      ]);
-    },
-    onError: (error) => {
-      displayError(error);
-    },
-  });
+  const { isPending: isAddingDatabaseDashboard, mutate: addDatabaseDashboard } =
+    useMutation({
+      mutationFn: (data) => {
+        return createDatabaseDashboardAPI({
+          tenantID,
+          databaseDashboardData: data,
+        });
+      },
+      retry: false,
+      onSuccess: () => {
+        displaySuccess(
+          CONSTANTS.STRINGS.ADD_DASHBOARD_FORM_DASHBOARD_ADDITION_SUCCESS
+        );
+        queryClient.invalidateQueries([
+          CONSTANTS.REACT_QUERY_KEYS.DATABASE_DASHBOARDS(tenantID),
+        ]);
+      },
+      onError: (error) => {
+        displayError(error);
+      },
+    });
 
   const dashboardAdditionForm = useFormik({
     initialValues: {

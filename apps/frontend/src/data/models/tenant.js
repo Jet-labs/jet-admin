@@ -1,5 +1,3 @@
-import { DatabaseMetadata } from "./databaseMetadata";
-import { TenantRole } from "./tenantRole";
 import { User } from "./user";
 
 export class Tenant {

@@ -5,6 +5,7 @@ import "react-grid-layout/css/styles.css";
 import "react-resizable/css/styles.css";
 import { CONSTANTS } from "../../../constants";
 import { DatabaseDashboardRenderWidget } from "./databaseDashboardRenderWidget";
+import PropTypes from "prop-types";
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
@@ -15,6 +16,13 @@ export const DatabaseDashboardDropzone = ({
   layouts,
   setLayouts,
 }) => {
+  DatabaseDashboardDropzone.propTypes = {
+    tenantID: PropTypes.number.isRequired,
+    widgets: PropTypes.array.isRequired,
+    setWidgets: PropTypes.func.isRequired,
+    layouts: PropTypes.object.isRequired,
+    setLayouts: PropTypes.func.isRequired,
+  };
   const [currentBreakpoint, setCurrentBreakpoint] = useState("lg");
 
   const _handleDelete = (index) => {
@@ -22,8 +30,6 @@ export const DatabaseDashboardDropzone = ({
     const _widgets = [...widgets];
     _widgets.splice(index, 1);
     setWidgets(_widgets);
-
-    // Remove widget from all layouts
     const _layouts = cloneDeep(layouts);
     Object.keys(_layouts).forEach((breakpoint) => {
       _layouts[breakpoint] = _layouts[breakpoint].filter(

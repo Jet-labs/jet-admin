@@ -1,13 +1,13 @@
 import { CircularProgress } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
-import { useCallback, useEffect } from "react";
-import {
-  RiPushpinFill,
-  RiUnpinFill
-} from "react-icons/ri";
+import React, { useCallback, useEffect } from "react";
+import { RiPushpinFill, RiUnpinFill } from "react-icons/ri";
 import { CONSTANTS } from "../../../constants";
-import { getDatabaseDashboardByIDAPI, updateDatabaseDashboardByIDAPI } from "../../../data/apis/databaseDashboard";
+import {
+  getDatabaseDashboardByIDAPI,
+  updateDatabaseDashboardByIDAPI,
+} from "../../../data/apis/databaseDashboard";
 import {
   useAuthActions,
   useAuthState,
@@ -24,11 +24,17 @@ import { DatabaseDashboardDropzone } from "./databaseDashboardDropzone";
 import { DatabaseDashboardEditor } from "./databaseDashboardEditor";
 import { DatabaseDashboardWidgetList } from "./databaseDashboardWidgetList";
 import { formValidations } from "../../../utils/formValidation";
+import PropTypes from "prop-types";
+import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 
 export const DatabaseDashboardUpdationForm = ({
   tenantID,
   databaseDashboardID,
 }) => {
+  DatabaseDashboardUpdationForm.propTypes = {
+    tenantID: PropTypes.number.isRequired,
+    databaseDashboardID: PropTypes.number.isRequired,
+  };
   const queryClient = useQueryClient();
   const { showConfirmation } = useGlobalUI();
   const { updateUserConfigKey } = useAuthActions();
@@ -56,9 +62,6 @@ export const DatabaseDashboardUpdationForm = ({
 
   const {
     isPending: isUpdatingDatabaseDashboard,
-    isSuccess: isUpdatingDatabaseDashboardSuccess,
-    isError: isUpdatingDatabaseDashboardError,
-    error: updateDatabaseDashboardError,
     mutate: updateDatabaseDashboard,
   } = useMutation({
     mutationFn: (data) => {
@@ -69,7 +72,7 @@ export const DatabaseDashboardUpdationForm = ({
       });
     },
     retry: false,
-    onSuccess: (data) => {
+    onSuccess: () => {
       displaySuccess(
         CONSTANTS.STRINGS.UPDATE_DASHBOARD_FORM_DASHBOARD_UPDATION_SUCCESS
       );
@@ -170,75 +173,83 @@ export const DatabaseDashboardUpdationForm = ({
         </button>
       </div>
 
-      <ResizablePanelGroup
-        direction="horizontal"
-        autoSaveId={
-          CONSTANTS.RESIZABLE_PANEL_KEYS
-            .DASHBOARD_UPDATION_FORM_RESULT_SEPARATION
-        }
-        className={"!w-full !h-full border-t border-gray-200"}
+      <ReactQueryLoadingErrorWrapper
+        isLoading={isLoadingDatabaseDashboard}
+        isFetching={isFetchingDatabaseDashboard}
+        error={loadDatabaseDashboardError}
+        refetch={refetchDatabaseDashboard}
+        isRefetching={isRefetechingDatabaseDashboard}
       >
-        <ResizablePanel defaultSize={20}>
-          <form
-            onSubmit={dashboardUpdationForm.handleSubmit}
-            className="w-full h-full"
-          >
-            <div className="w-full h-full flex flex-col justify-start items-stretch">
-              <DatabaseDashboardEditor
-                databaseDashboardEditorForm={dashboardUpdationForm}
-              />
-              <DatabaseDashboardWidgetList tenantID={tenantID} />
-              <div className="flex flex-row justify-around items-center p-2">
-                <button
-                  type="submit"
-                  disabled={isUpdatingDatabaseDashboard}
-                  className="flex flex-row items-center justify-center rounded bg-[#646cff] px-3 py-1 text-sm text-white  focus:ring-2 focus:ring-[#646cff]/50 w-full outline-none focus:outline-none"
-                >
-                  {isUpdatingDatabaseDashboard && (
-                    <CircularProgress
-                      className="!text-xs !mr-3"
-                      size={16}
-                      color="white"
-                    />
-                  )}
-                  {CONSTANTS.STRINGS.UPDATE_DASHBOARD_BUTTON_TEXT}
-                </button>
-                <DatabaseDashboardDeletionForm
-                  key={databaseDashboard?.databaseDashboardID}
-                  tenantID={tenantID}
-                  databaseDashboardID={databaseDashboardID}
+        <ResizablePanelGroup
+          direction="horizontal"
+          autoSaveId={
+            CONSTANTS.RESIZABLE_PANEL_KEYS
+              .DASHBOARD_UPDATION_FORM_RESULT_SEPARATION
+          }
+          className={"!w-full !h-full border-t border-gray-200"}
+        >
+          <ResizablePanel defaultSize={20}>
+            <form
+              onSubmit={dashboardUpdationForm.handleSubmit}
+              className="w-full h-full"
+            >
+              <div className="w-full h-full flex flex-col justify-start items-stretch">
+                <DatabaseDashboardEditor
+                  databaseDashboardEditorForm={dashboardUpdationForm}
                 />
+                <DatabaseDashboardWidgetList tenantID={tenantID} />
+                <div className="flex flex-row justify-around items-center p-2">
+                  <button
+                    type="submit"
+                    disabled={isUpdatingDatabaseDashboard}
+                    className="flex flex-row items-center justify-center rounded bg-[#646cff] px-3 py-1 text-sm text-white  focus:ring-2 focus:ring-[#646cff]/50 w-full outline-none focus:outline-none"
+                  >
+                    {isUpdatingDatabaseDashboard && (
+                      <CircularProgress
+                        className="!text-xs !mr-3"
+                        size={16}
+                        color="white"
+                      />
+                    )}
+                    {CONSTANTS.STRINGS.UPDATE_DASHBOARD_BUTTON_TEXT}
+                  </button>
+                  <DatabaseDashboardDeletionForm
+                    key={databaseDashboard?.databaseDashboardID}
+                    tenantID={tenantID}
+                    databaseDashboardID={databaseDashboardID}
+                  />
+                </div>
               </div>
-            </div>
-          </form>
-        </ResizablePanel>
-        <ResizableHandle withHandle={true} />
-        <ResizablePanel defaultSize={80} className="">
-          {dashboardUpdationForm && dashboardUpdationForm.values && (
-            <DatabaseDashboardDropzone
-              tenantID={tenantID}
-              widgets={
-                dashboardUpdationForm.values.databaseDashboardConfig.widgets
-              }
-              setWidgets={(value) =>
-                dashboardUpdationForm.setFieldValue(
-                  "databaseDashboardConfig.widgets",
-                  value
-                )
-              }
-              layouts={
-                dashboardUpdationForm.values.databaseDashboardConfig.layouts
-              }
-              setLayouts={(value) => {
-                dashboardUpdationForm.setFieldValue(
-                  "databaseDashboardConfig.layouts",
-                  value
-                );
-              }}
-            />
-          )}
-        </ResizablePanel>
-      </ResizablePanelGroup>
+            </form>
+          </ResizablePanel>
+          <ResizableHandle withHandle={true} />
+          <ResizablePanel defaultSize={80} className="">
+            {dashboardUpdationForm && dashboardUpdationForm.values && (
+              <DatabaseDashboardDropzone
+                tenantID={tenantID}
+                widgets={
+                  dashboardUpdationForm.values.databaseDashboardConfig.widgets
+                }
+                setWidgets={(value) =>
+                  dashboardUpdationForm.setFieldValue(
+                    "databaseDashboardConfig.widgets",
+                    value
+                  )
+                }
+                layouts={
+                  dashboardUpdationForm.values.databaseDashboardConfig.layouts
+                }
+                setLayouts={(value) => {
+                  dashboardUpdationForm.setFieldValue(
+                    "databaseDashboardConfig.layouts",
+                    value
+                  );
+                }}
+              />
+            )}
+          </ResizablePanel>
+        </ResizablePanelGroup>
+      </ReactQueryLoadingErrorWrapper>
     </div>
   );
 };

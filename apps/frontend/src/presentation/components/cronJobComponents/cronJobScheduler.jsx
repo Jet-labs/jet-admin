@@ -1,6 +1,8 @@
+import React from "react";
 import "react-js-cron/dist/styles.css";
 import { Cron } from "react-js-cron";
 import { useState } from "react";
+import PropTypes from "prop-types";
 
 export const CronJobScheduler = ({
   key,
@@ -9,10 +11,17 @@ export const CronJobScheduler = ({
   onError,
   value,
   handleChange,
-  showRawInput,
   customStyle,
 }) => {
-  const [clockFormat, setClockFormat] = useState("24-hour-clock");
+  CronJobScheduler.propTypes = {
+    key: PropTypes.string,
+    readOnly: PropTypes.bool,
+    disabled: PropTypes.bool,
+    onError: PropTypes.func,
+    value: PropTypes.string,
+    handleChange: PropTypes.func,
+    customStyle: PropTypes.bool,
+  };
   const [humanize, setHumanize] = useState(true);
 
   return (
@@ -66,7 +75,7 @@ export const CronJobScheduler = ({
           clearButton={true}
           shortcuts={true}
           allowEmpty={true}
-          clockFormat={clockFormat}
+          clockFormat={"24-hour-clock"}
           defaultPeriod="day"
           leadingZero={true}
           className={customStyle ? "my-project-cron" : undefined}

@@ -15,18 +15,21 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "../ui/resizable";
+import PropTypes from "prop-types";
 
 export const PGSQLQueryExecutor = ({ tenantID }) => {
+  PGSQLQueryExecutor.propTypes = {
+    tenantID: PropTypes.number.isRequired,
+  };
   const [sqlQuery, setSqlQuery] = useState("");
   const [queryResults, setQueryResults] = useState(null);
-
+  // eslint-disable-next-line no-unused-vars
   const [resultTab, setResultTab] = useState(0);
 
   // Use React Query's useMutation hook
   const {
     isPending: isExecuting,
-    isError,
-    error,
+    error: executeQueryError,
     mutate: executeQuery,
   } = useMutation({
     mutationFn: (sqlQuery) => {
@@ -56,10 +59,6 @@ export const PGSQLQueryExecutor = ({ tenantID }) => {
 
     // Execute the mutation
     executeQuery(sqlQuery);
-  };
-
-  const handleTabChange = (event, newTab) => {
-    setResultTab(newTab);
   };
 
   return (
@@ -125,11 +124,11 @@ export const PGSQLQueryExecutor = ({ tenantID }) => {
           </ResizablePanel>
           <ResizableHandle withHandle={true} />
           <ResizablePanel defaultSize={80}>
-            {error && (
+            {executeQueryError && (
               <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded m-3">
                 <h3 className="font-semibold mb-1">Error</h3>
                 <pre className="text-sm whitespace-pre-wrap">
-                  {extractError(error)}
+                  {extractError(executeQueryError)}
                 </pre>
               </div>
             )}
@@ -139,7 +138,7 @@ export const PGSQLQueryExecutor = ({ tenantID }) => {
               />
             )}
 
-            {!queryResults && !error && !isExecuting && (
+            {!queryResults && !executeQueryError && !isExecuting && (
               <div className="flex items-center justify-center h-full text-slate-500 p-3">
                 {CONSTANTS.STRINGS.RAW_QUERY_EXCECUTOR_RESULT_PLACEHOLDER}
               </div>

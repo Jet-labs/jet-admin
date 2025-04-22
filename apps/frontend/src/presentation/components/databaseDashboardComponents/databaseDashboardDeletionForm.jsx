@@ -6,33 +6,35 @@ import { CONSTANTS } from "../../../constants";
 import { deleteDatabaseDashboardByIDAPI } from "../../../data/apis/databaseDashboard";
 import { useGlobalUI } from "../../../logic/contexts/globalUIContext";
 import { displayError, displaySuccess } from "../../../utils/notification";
+import PropTypes from "prop-types";
+import React from "react";
+
 export const DatabaseDashboardDeletionForm = ({
   tenantID,
   databaseDashboardID,
 }) => {
+  DatabaseDashboardDeletionForm.propTypes = {
+    tenantID: PropTypes.number.isRequired,
+    databaseDashboardID: PropTypes.number.isRequired,
+  };
   const navigate = useNavigate();
   const { showConfirmation } = useGlobalUI();
   const queryClient = useQueryClient();
   const {
     isPending: isDeletingDatabaseDashboard,
-    isSuccess: isDeletingDatabaseDashboardSuccess,
-    isError: isDeletingDatabaseDashboardError,
-    error: deleteDatabaseDashboardError,
     mutate: deleteDatabaseDashboard,
   } = useMutation({
-    mutationFn: (data) => {
+    mutationFn: () => {
       return deleteDatabaseDashboardByIDAPI({
         tenantID,
         databaseDashboardID,
       });
     },
     retry: false,
-    onSuccess: (data) => {
+    onSuccess: () => {
       displaySuccess(CONSTANTS.STRINGS.DELETE_DASHBOARD_DELETION_SUCCESS);
       queryClient.invalidateQueries([
-        CONSTANTS.REACT_QUERY_KEYS.DATABASE_DASHBOARDS(
-          tenantID
-        ),
+        CONSTANTS.REACT_QUERY_KEYS.DATABASE_DASHBOARDS(tenantID),
       ]);
       navigate(-1);
     },
@@ -57,7 +59,7 @@ export const DatabaseDashboardDeletionForm = ({
         onClick={_handleDeleteDashboard}
         disabled={isDeletingDatabaseDashboard}
         type="button"
-        class="flex flex-row items-center justify-center rounded bg-red-50 ms-2 px-1 py-1 text-xs text-red-400 hover:bg-red-100 focus:ring-2 focus:ring-red-400 outline-none focus:outline-none hover:border-red-400"
+        className="flex flex-row items-center justify-center rounded bg-red-50 ms-2 px-1 py-1 text-xs text-red-400 hover:bg-red-100 focus:ring-2 focus:ring-red-400 outline-none focus:outline-none hover:border-red-400"
       >
         {isDeletingDatabaseDashboard ? (
           <CircularProgress className="!text-xs" size={16} color="white" />

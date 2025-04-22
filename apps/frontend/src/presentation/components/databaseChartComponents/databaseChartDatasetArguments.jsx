@@ -3,6 +3,8 @@ import { useFormik } from "formik";
 import { useCallback } from "react";
 import { CONSTANTS } from "../../../constants";
 import { formValidations } from "../../../utils/formValidation";
+import PropTypes from "prop-types";
+import React from "react";
 
 export const DatabaseChartDatasetArguments = ({
   open,
@@ -12,6 +14,15 @@ export const DatabaseChartDatasetArguments = ({
   initialValues,
   selectedQuery,
 }) => {
+  DatabaseChartDatasetArguments.propTypes = {
+    open: PropTypes.bool.isRequired,
+    onClose: PropTypes.func.isRequired,
+    datasetIndex: PropTypes.number.isRequired,
+    chartForm: PropTypes.object.isRequired,
+    initialValues: PropTypes.object.isRequired,
+    selectedQuery: PropTypes.object.isRequired,
+  };
+
   const datasetArgumentsForm = useFormik({
     initialValues: {
       databaseQueryArgValues: {},

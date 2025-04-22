@@ -1,18 +1,21 @@
 import { Box } from "@mui/material";
 import React, { useMemo } from "react";
-
 import { DataGrid } from "@mui/x-data-grid";
 import jsonSchemaGenerator from "to-json-schema";
-
+import PropTypes from "prop-types";
 
 export const PGSQLQueryResponseTableTab = ({
   data,
-  border = true,
   className,
   height = "100%",
   width = "100%",
 }) => {
-  console.log(data);
+  PGSQLQueryResponseTableTab.propTypes = {
+    data: PropTypes.array,
+    className: PropTypes.string,
+    height: PropTypes.string,
+    width: PropTypes.string,
+  };
 
   const dataSchema =
     Array.isArray(data) && data.length > 0
