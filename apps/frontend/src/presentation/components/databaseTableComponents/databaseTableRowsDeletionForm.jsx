@@ -6,6 +6,8 @@ import { CONSTANTS } from "../../../constants";
 import { databaseTableBulkRowDeletionAPI } from "../../../data/apis/databaseTable";
 import { useGlobalUI } from "../../../logic/contexts/globalUIContext";
 import { displayError, displaySuccess } from "../../../utils/notification";
+import PropTypes from "prop-types";
+import React from "react";
 
 export const DatabaseTableRowsDeletionForm = ({
   tenantID,
@@ -18,11 +20,21 @@ export const DatabaseTableRowsDeletionForm = ({
   multipleSelectedQuery,
   reloadDatabaseTableRows,
 }) => {
+  DatabaseTableRowsDeletionForm.propTypes = {
+    tenantID: PropTypes.number.isRequired,
+    databaseSchemaName: PropTypes.string.isRequired,
+    databaseTableName: PropTypes.string.isRequired,
+    filterQuery: PropTypes.string,
+    isAllRowSelectChecked: PropTypes.bool.isRequired,
+    databaseTableRowCount: PropTypes.number.isRequired,
+    rowSelectionModel: PropTypes.array.isRequired,
+    multipleSelectedQuery: PropTypes.string,
+    reloadDatabaseTableRows: PropTypes.func,
+  };
   const { showConfirmation } = useGlobalUI();
   const {
     mutate: bulkDeleteDatabaseTableRows,
     isPending: isBulkDeletingDatabaseTableRows,
-    error: bulkDeleteDatabaseTableRowsError,
   } = useMutation({
     mutationFn: () =>
       databaseTableBulkRowDeletionAPI({
@@ -36,7 +48,7 @@ export const DatabaseTableRowsDeletionForm = ({
       displaySuccess(
         CONSTANTS.STRINGS.DATABASE_TABLE_VIEW_CHANGES_DELETED_SUCCESS
       );
-      reloadDatabaseTableRows?.()
+      reloadDatabaseTableRows?.();
     },
     onError: (error) => {
       displayError(error);

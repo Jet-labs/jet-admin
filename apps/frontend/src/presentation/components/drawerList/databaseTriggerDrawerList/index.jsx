@@ -2,18 +2,16 @@ import { FaPlus } from "react-icons/fa";
 import { LuDatabaseZap } from "react-icons/lu";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../../constants";
-import {
-  useDatabaseTriggersActions,
-  useDatabaseTriggersState,
-} from "../../../../logic/contexts/databaseTriggersContext";
+import { useDatabaseTriggersState } from "../../../../logic/contexts/databaseTriggersContext";
 import { NoEntityUI } from "../../ui/noEntityUI";
+import React from "react";
+
 export const DatabaseTriggerDrawerList = () => {
   const {
     isLoadingDatabaseTriggers,
     databaseTriggers,
     isFetchingDatabaseTriggers,
   } = useDatabaseTriggersState();
-  const { refetchDatabaseTriggers } = useDatabaseTriggersActions();
   const routeParam = useParams();
   const { tenantID, databaseSchemaName } = useParams();
   const navigate = useNavigate();
@@ -24,16 +22,13 @@ export const DatabaseTriggerDrawerList = () => {
   };
   return (
     <div className=" bg-white   h-[calc(100vh-48px)] overflow-hidden p-2 w-full">
-      {/* Add Trigger Button */}
-      {true && (
-        <button
-          onClick={_navigateToAddMoreTrigger}
-          className="flex mb-2 flex-row items-center justify-center rounded bg-[#646cff]/10 px-3 py-1.5 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50 w-full outline-none focus:outline-none"
-        >
-          <FaPlus className="!w-4 !h-4 !text-[#646cff] mr-1" />
-          {CONSTANTS.STRINGS.ADD_TRIGGER_BUTTON_TEXT}
-        </button>
-      )}
+      <button
+        onClick={_navigateToAddMoreTrigger}
+        className="flex mb-2 flex-row items-center justify-center rounded bg-[#646cff]/10 px-3 py-1.5 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50 w-full outline-none focus:outline-none"
+      >
+        <FaPlus className="!w-4 !h-4 !text-[#646cff] mr-1" />
+        {CONSTANTS.STRINGS.ADD_TRIGGER_BUTTON_TEXT}
+      </button>
 
       {/* Trigger List */}
 
@@ -47,7 +42,7 @@ export const DatabaseTriggerDrawerList = () => {
       ) : databaseTriggers && databaseTriggers.length > 0 ? (
         <div className="h-full w-full overflow-y-auto">
           {databaseTriggers.map((databaseTrigger) => {
-            const key = `databaseTrigger_${databaseTrigger.databaseTriggerName}`;
+            const key = `databaseTrigger_${databaseTrigger.databaseTriggerName}_${databaseTrigger.databaseTableName}`;
             const isActive =
               routeParam?.databaseTriggerName ==
                 databaseTrigger.databaseTriggerName &&

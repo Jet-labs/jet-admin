@@ -1,7 +1,12 @@
 import { FaDatabase, FaColumns, FaKey, FaLink } from "react-icons/fa";
 import { CONSTANTS } from "../../../constants";
+import PropTypes from "prop-types";
+import React from "react";
 
 export const DatabaseTableStats = ({ databaseTables }) => {
+  DatabaseTableStats.propTypes = {
+    databaseTables: PropTypes.array.isRequired,
+  };
   // Calculate stats
   const totalTables = databaseTables.length;
   const totalColumns = databaseTables.reduce(

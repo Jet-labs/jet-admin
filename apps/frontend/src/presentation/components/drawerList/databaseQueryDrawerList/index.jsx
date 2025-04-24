@@ -1,20 +1,17 @@
 import { FaPlus } from "react-icons/fa";
-import { TbBrandGoogleBigQuery } from "react-icons/tb";
+import { SiGooglebigquery } from "react-icons/si";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../../constants";
+import { useDatabaseQueriesState } from "../../../../logic/contexts/databaseQueriesContext";
 import { NoEntityUI } from "../../ui/noEntityUI";
-import {
-  useDatabaseQueriesActions,
-  useDatabaseQueriesState,
-} from "../../../../logic/contexts/databaseQueriesContext";
-import { SiGooglebigquery } from "react-icons/si";
-export const DatabaseQueryDrawerList = ({}) => {
+import React from "react";
+
+export const DatabaseQueryDrawerList = () => {
   const {
     isLoadingDatabaseQueries,
     databaseQueries,
     isFetchingDatabaseQueries,
   } = useDatabaseQueriesState();
-  const { refetchDatabaseQueries } = useDatabaseQueriesActions();
   const routeParam = useParams();
   const { tenantID } = useParams();
   const navigate = useNavigate();
@@ -23,16 +20,13 @@ export const DatabaseQueryDrawerList = ({}) => {
   };
   return (
     <div className=" bg-white   h-[calc(100vh-48px)] overflow-hidden p-2 w-full">
-      {/* Add Query Button */}
-      {true && (
-        <button
-          onClick={_navigateToAddMoreQuery}
-          className="flex mb-2 flex-row items-center justify-center rounded bg-[#646cff]/10 px-3 py-1.5 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50 w-full outline-none focus:outline-none"
-        >
-          <FaPlus className="!w-4 !h-4 !text-[#646cff] mr-1" />
-          {CONSTANTS.STRINGS.ADD_QUERY_BUTTON_TEXT}
-        </button>
-      )}
+      <button
+        onClick={_navigateToAddMoreQuery}
+        className="flex mb-2 flex-row items-center justify-center rounded bg-[#646cff]/10 px-3 py-1.5 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50 w-full outline-none focus:outline-none"
+      >
+        <FaPlus className="!w-4 !h-4 !text-[#646cff] mr-1" />
+        {CONSTANTS.STRINGS.ADD_QUERY_BUTTON_TEXT}
+      </button>
       {isLoadingDatabaseQueries || isFetchingDatabaseQueries ? (
         <div role="status" className=" animate-pulse w-full">
           <div className="h-6 bg-gray-200 rounded   mb-2 w-full"></div>

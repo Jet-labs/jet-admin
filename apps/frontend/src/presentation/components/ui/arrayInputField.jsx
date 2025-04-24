@@ -1,7 +1,15 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { FaPlus } from "react-icons/fa";
 import { FaXmark } from "react-icons/fa6";
+import PropTypes from "prop-types";
+
 const LocalEditableChip = ({ value, onChange, onDelete, type }) => {
+  LocalEditableChip.propTypes = {
+    value: PropTypes.string.isRequired,
+    onChange: PropTypes.func.isRequired,
+    onDelete: PropTypes.func.isRequired,
+    type: PropTypes.string.isRequired,
+  };
   return (
     <div className="w-fit">
       <div className="flex items-center justify-between rounded px-2 h-8 border border-gray-300 bg-white">
@@ -25,6 +33,10 @@ const LocalEditableChip = ({ value, onChange, onDelete, type }) => {
 };
 
 const LocalInput = ({ handleAddValue, type }) => {
+  LocalInput.propTypes = {
+    handleAddValue: PropTypes.func.isRequired,
+    type: PropTypes.string.isRequired,
+  };
   const [newValue, setNewValue] = useState(type === "number" ? 0 : "");
 
   return (
@@ -50,6 +62,11 @@ const LocalInput = ({ handleAddValue, type }) => {
 };
 
 export const ArrayInput = ({ value, onChange, type }) => {
+  ArrayInput.propTypes = {
+    value: PropTypes.array.isRequired,
+    onChange: PropTypes.func.isRequired,
+    type: PropTypes.string.isRequired,
+  };
   const handleDelete = (index) => {
     const newValues = [...value];
     newValues.splice(index, 1);

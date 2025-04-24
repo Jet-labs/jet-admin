@@ -1,8 +1,9 @@
 import { Checkbox } from "@mui/material";
-import { useState } from "react";
+import React, { useState } from "react";
 import { FaTimes } from "react-icons/fa";
 import { CONSTANTS } from "../../../constants";
 import { TenantRoleSelectionInput } from "./tenantRoleSelectionInput";
+import PropTypes from "prop-types";
 
 export const TenantRoleSelectionDialog = ({
   tenantID,
@@ -13,6 +14,15 @@ export const TenantRoleSelectionDialog = ({
   handleSubmitTenantRoleSelectDialog,
   isAdminSelectionEnabled = true,
 }) => {
+  TenantRoleSelectionDialog.propTypes = {
+    tenantID: PropTypes.number.isRequired,
+    isUserTenantAdmin: PropTypes.bool.isRequired,
+    initialSelectedTenantRoles: PropTypes.array,
+    isTenantRoleSelectDialogOpen: PropTypes.bool.isRequired,
+    handleCloseTenantRoleSelectDialog: PropTypes.func.isRequired,
+    handleSubmitTenantRoleSelectDialog: PropTypes.func.isRequired,
+    isAdminSelectionEnabled: PropTypes.bool,
+  };
   const [selectedTenantRoleIDs, setSelectedTenantRoleIDs] = useState(
     initialSelectedTenantRoles
   );

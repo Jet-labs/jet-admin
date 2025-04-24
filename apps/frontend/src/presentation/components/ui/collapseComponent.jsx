@@ -1,8 +1,8 @@
-import Button from "@mui/material/Button";
 import Collapse from "@mui/material/Collapse";
 import React, { useState } from "react";
 import { BiChevronDown, BiChevronUp } from "react-icons/bi";
 import { CONSTANTS } from "../../../constants";
+import PropTypes from "prop-types";
 
 export const CollapseComponent = ({
   showButtonText,
@@ -10,6 +10,12 @@ export const CollapseComponent = ({
   containerClass,
   content,
 }) => {
+  CollapseComponent.propTypes = {
+    showButtonText: PropTypes.string,
+    hideButtonText: PropTypes.string,
+    containerClass: PropTypes.string,
+    content: PropTypes.func.isRequired,
+  };
   const [isOpen, setIsOpen] = useState(false);
 
   const handleToggle = () => {

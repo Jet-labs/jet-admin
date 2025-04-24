@@ -1,28 +1,29 @@
-import { useCallback, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { FaPlus } from "react-icons/fa";
 import { CONSTANTS } from "../../../constants";
 import { useDatabaseWidgetsState } from "../../../logic/contexts/databaseWidgetsContext";
 
 import { DatabaseQueryTestingPanel } from "../databaseQueryComponents/databaseQueryTestingPanel";
-// import { CollapseComponent } from "../ui/collapseComponent";
-// import { DatabaseWidgetAdvancedOptions } from "./databaseWidgetAdvancedOptions";
 import { DatabaseWidgetDatasetField } from "./databaseWidgetDatasetField";
 import { DATABASE_WIDGETS_CONFIG_MAP } from "./widgetConfig";
 import { CollapseComponent } from "../ui/collapseComponent";
 import { DatabaseWidgetAdvancedOptions } from "./databaseWidgetAdvancedOptions";
+import PropTypes from "prop-types";
+import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 
 export const DatabaseWidgetEditor = ({ databaseWidgetEditorForm }) => {
+  DatabaseWidgetEditor.propTypes = {
+    databaseWidgetEditorForm: PropTypes.object.isRequired,
+  };
   const {
     databaseQueries,
     isLoadingDatabaseQueries,
     isFetchingDatabaseQueries,
+    loadDatabaseQueriesError,
   } = useDatabaseWidgetsState();
 
-  console.log(databaseQueries);
-
   const [selectedQueryForTesting, setSelectedQueryForTesting] = useState(false);
-  const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
   const _handleAddDataset = useCallback(() => {
     databaseWidgetEditorForm.setFieldValue("databaseQueries", [
       ...databaseWidgetEditorForm.values["databaseQueries"],
@@ -166,6 +167,7 @@ export const DatabaseWidgetEditor = ({ databaseWidgetEditorForm }) => {
         </label>
         <button
           onClick={_handleAddDataset}
+          disabled={isLoadingDatabaseQueries}
           type="button"
           className="flex flex-row items-center justify-center rounded bg-transparent px-3 py-1 text-xs text-[#646cff] hover:bg-transparent border-0 hover:border-0 focus:border-0 focus:outline-none focus:border-none outline-none"
         >
@@ -174,40 +176,46 @@ export const DatabaseWidgetEditor = ({ databaseWidgetEditorForm }) => {
         </button>
       </div>
 
-      <DragDropContext onDragEnd={_handleOnDatabaseQueryListDragEnd}>
-        <Droppable type="group" droppableId="droppable">
-          {(provided) => (
-            <div
-              {...provided.droppableProps}
-              ref={provided.innerRef}
-              className="space-y-2 h-full overflow-y-auto"
-            >
-              {databaseWidgetEditorForm.values.databaseQueries?.map(
-                (query, index) => {
-                  return DATABASE_WIDGETS_CONFIG_MAP[
-                    databaseWidgetEditorForm.values.databaseWidgetType
-                  ] ? (
-                    <DatabaseWidgetDatasetField
-                      key={query.tempId} // Unique key from tempId
-                      index={index}
-                      widgetForm={databaseWidgetEditorForm}
-                      databaseQueries={databaseQueries}
-                      datasetFields={
-                        DATABASE_WIDGETS_CONFIG_MAP[
-                          databaseWidgetEditorForm.values.databaseWidgetType
-                        ].datasetFields
-                      }
-                      selectedQueryForTesting={selectedQueryForTesting}
-                      setSelectedQueryForTesting={setSelectedQueryForTesting}
-                    />
-                  ) : null;
-                }
-              )}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-      </DragDropContext>
+      <ReactQueryLoadingErrorWrapper
+        isLoading={isLoadingDatabaseQueries}
+        isFetching={isFetchingDatabaseQueries}
+        error={loadDatabaseQueriesError}
+      >
+        <DragDropContext onDragEnd={_handleOnDatabaseQueryListDragEnd}>
+          <Droppable type="group" droppableId="droppable">
+            {(provided) => (
+              <div
+                {...provided.droppableProps}
+                ref={provided.innerRef}
+                className="space-y-2 h-full overflow-y-auto"
+              >
+                {databaseWidgetEditorForm.values.databaseQueries?.map(
+                  (query, index) => {
+                    return DATABASE_WIDGETS_CONFIG_MAP[
+                      databaseWidgetEditorForm.values.databaseWidgetType
+                    ] ? (
+                      <DatabaseWidgetDatasetField
+                        key={query.tempId} // Unique key from tempId
+                        index={index}
+                        widgetForm={databaseWidgetEditorForm}
+                        databaseQueries={databaseQueries}
+                        datasetFields={
+                          DATABASE_WIDGETS_CONFIG_MAP[
+                            databaseWidgetEditorForm.values.databaseWidgetType
+                          ].datasetFields
+                        }
+                        selectedQueryForTesting={selectedQueryForTesting}
+                        setSelectedQueryForTesting={setSelectedQueryForTesting}
+                      />
+                    ) : null;
+                  }
+                )}
+                {provided.placeholder}
+              </div>
+            )}
+          </Droppable>
+        </DragDropContext>
+      </ReactQueryLoadingErrorWrapper>
     </>
   );
 };

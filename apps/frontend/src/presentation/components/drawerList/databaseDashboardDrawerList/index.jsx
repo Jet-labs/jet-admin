@@ -1,22 +1,18 @@
 import { FaPlus } from "react-icons/fa";
-import { TbBrandGoogleBigQuery } from "react-icons/tb";
+import { MdOutlineSpaceDashboard } from "react-icons/md";
+import { RiPushpinFill } from "react-icons/ri";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../../constants";
-import { NoEntityUI } from "../../ui/noEntityUI";
-import {
-  useDatabaseDashboardsActions,
-  useDatabaseDashboardsState,
-} from "../../../../logic/contexts/databaseDashboardsContext";
-import { MdOutlineSpaceDashboard } from "react-icons/md";
 import { useAuthState } from "../../../../logic/contexts/authContext";
-import { RiPushpinFill } from "react-icons/ri";
-export const DatabaseDashboardDrawerList = ({}) => {
+import { useDatabaseDashboardsState } from "../../../../logic/contexts/databaseDashboardsContext";
+import { NoEntityUI } from "../../ui/noEntityUI";
+import React from "react";
+export const DatabaseDashboardDrawerList = () => {
   const {
     isLoadingDatabaseDashboards,
     databaseDashboards,
     isFetchingDatabaseDashboards,
   } = useDatabaseDashboardsState();
-  const { refetchDatabaseDashboards } = useDatabaseDashboardsActions();
   const routeParam = useParams();
   const { userConfig } = useAuthState();
   const { tenantID } = useParams();
@@ -26,16 +22,13 @@ export const DatabaseDashboardDrawerList = ({}) => {
   };
   return (
     <div className=" bg-white   h-[calc(100vh-48px)] overflow-hidden p-2 w-full">
-      {/* Add Dashboard Button */}
-      {true && (
-        <button
-          onClick={_navigateToAddMoreDashboard}
-          className="flex mb-2 flex-row items-center justify-center rounded bg-[#646cff]/10 px-3 py-1.5 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50 w-full outline-none focus:outline-none"
-        >
-          <FaPlus className="!w-4 !h-4 !text-[#646cff] mr-1" />
-          {CONSTANTS.STRINGS.ADD_DASHBOARD_BUTTON_TEXT}
-        </button>
-      )}
+      <button
+        onClick={_navigateToAddMoreDashboard}
+        className="flex mb-2 flex-row items-center justify-center rounded bg-[#646cff]/10 px-3 py-1.5 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50 w-full outline-none focus:outline-none"
+      >
+        <FaPlus className="!w-4 !h-4 !text-[#646cff] mr-1" />
+        {CONSTANTS.STRINGS.ADD_DASHBOARD_BUTTON_TEXT}
+      </button>
       {isLoadingDatabaseDashboards || isFetchingDatabaseDashboards ? (
         <div role="status" className=" animate-pulse w-full">
           <div className="h-6 bg-gray-200 rounded   mb-2 w-full"></div>

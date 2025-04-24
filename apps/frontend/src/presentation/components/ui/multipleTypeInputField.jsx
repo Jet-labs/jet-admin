@@ -1,22 +1,32 @@
-import { useState } from "react";
-import { FaChevronDown, FaTimes } from "react-icons/fa";
+import moment from "moment";
+import { FaChevronDown } from "react-icons/fa";
+import { CONSTANTS } from "../../../constants";
 import { ArrayInputField } from "./arrayInputField";
 import { CodeEditorField } from "./codeEditorField";
-import { CONSTANTS } from "../../../constants";
-import moment from "moment";
+import PropTypes from "prop-types";
+import React from "react";
 
-const InputWrapper = ({ label, customLabel, children, error, required }) => (
-  <div className="w-full flex flex-col space-y-1">
-    {customLabel || (
-      <label className="text-sm font-medium text-gray-600">
-        {label}
-        {required && <span className="text-red-500 ml-1">*</span>}
-      </label>
-    )}
-    {children}
-    {error && <span className="text-sm text-red-500">{error}</span>}
-  </div>
-);
+const InputWrapper = ({ label, customLabel, children, error, required }) => {
+  InputWrapper.propTypes = {
+    label: PropTypes.string,
+    customLabel: PropTypes.string,
+    children: PropTypes.node.isRequired,
+    error: PropTypes.string,
+    required: PropTypes.bool,
+  };
+  return (
+    <div className="w-full flex flex-col space-y-1">
+      {customLabel || (
+        <label className="text-sm font-medium text-gray-600">
+          {label}
+          {required && <span className="text-red-500 ml-1">*</span>}
+        </label>
+      )}
+      {children}
+      {error && <span className="text-sm text-red-500">{error}</span>}
+    </div>
+  );
+};
 
 export const MultipleTypeInputField = ({
   type,
@@ -24,12 +34,10 @@ export const MultipleTypeInputField = ({
   onChange,
   onBlur,
   value,
-  helperText,
   error,
   name,
   required,
   readOnly,
-  dateTimePicker = "normal",
   customMapping,
   selectOptions,
   setFieldValue,
@@ -37,6 +45,24 @@ export const MultipleTypeInputField = ({
   language,
   customLabel,
 }) => {
+  MultipleTypeInputField.propTypes = {
+    type: PropTypes.string.isRequired,
+    isList: PropTypes.bool.isRequired,
+    onChange: PropTypes.func.isRequired,
+    onBlur: PropTypes.func.isRequired,
+    value: PropTypes.any.isRequired,
+    error: PropTypes.string,
+    name: PropTypes.string.isRequired,
+    required: PropTypes.bool,
+    readOnly: PropTypes.bool,
+    customMapping: PropTypes.object,
+    selectOptions: PropTypes.array,
+    setFieldValue: PropTypes.func.isRequired,
+    showDefault: PropTypes.bool,
+    language: PropTypes.string,
+    customLabel: PropTypes.string,
+  };
+
   const label = name?.toLowerCase() || "";
   const convertedType =
     CONSTANTS.POSTGRE_SQL_DATA_TYPES[type]?.normalizedType ||

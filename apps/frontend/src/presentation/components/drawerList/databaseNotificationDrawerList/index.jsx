@@ -1,15 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import { FaPlus } from "react-icons/fa";
-import { Link, NavLink, useNavigate, useParams } from "react-router-dom";
-import { CONSTANTS } from "../../../../constants";
-import { getAllDatabaseNotificationsAPI } from "../../../../data/apis/databaseNotification";
-import {
-  useDatabaseNotificationsActions,
-  useDatabaseNotificationsState,
-} from "../../../../logic/contexts/databaseNotificationsContext";
-import { NoEntityUI } from "../../ui/noEntityUI";
 import { MdNotificationsNone } from "react-icons/md";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { CONSTANTS } from "../../../../constants";
+import { useDatabaseNotificationsState } from "../../../../logic/contexts/databaseNotificationsContext";
+import { NoEntityUI } from "../../ui/noEntityUI";
 
 export const DatabaseNotificationDrawerList = () => {
   const { tenantID } = useParams();
@@ -20,7 +15,6 @@ export const DatabaseNotificationDrawerList = () => {
     databaseNotifications,
     isFetchingDatabaseNotifications,
   } = useDatabaseNotificationsState();
-  const { refetchDatabaseNotifications } = useDatabaseNotificationsActions();
 
   const _navigateToAddNotification = () => {
     navigate(CONSTANTS.ROUTES.ADD_DATABASE_NOTIFICATION.path(tenantID));
@@ -87,7 +81,9 @@ export const DatabaseNotificationDrawerList = () => {
         </div>
       ) : (
         <div className=" text-gray-500 dark:text-gray-400">
-          <NoEntityUI message={CONSTANTS.STRINGS.NOTIFICATION_DRAWER_LIST_NO_NOTIFICATION} />
+          <NoEntityUI
+            message={CONSTANTS.STRINGS.NOTIFICATION_DRAWER_LIST_NO_NOTIFICATION}
+          />
         </div>
       )}
     </div>

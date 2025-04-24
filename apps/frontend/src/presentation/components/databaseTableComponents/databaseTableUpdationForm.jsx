@@ -12,22 +12,22 @@ import { formValidations } from "../../../utils/formValidation";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { DatabaseTableDeletionForm } from "./databaseTableDeletionForm";
 import { DatabaseTableEditor } from "./databaseTableEditor";
+import PropTypes from "prop-types";
+import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 
 export const DatabaseTableUpdationForm = ({
   tenantID,
   databaseSchemaName,
   databaseTableName,
 }) => {
+  DatabaseTableUpdationForm.propTypes = {
+    tenantID: PropTypes.number.isRequired,
+    databaseSchemaName: PropTypes.string.isRequired,
+    databaseTableName: PropTypes.string.isRequired,
+  };
   const queryClient = useQueryClient();
 
-  const {
-    isLoading: isLoadingDatabaseMetadata,
-    isFetching: isFetchingDatabaseMetadata,
-    isRefetching: isRefetchingDatabaseMetadata,
-    data: databaseMetadata,
-    error: databaseMetadataError,
-    refetch: refetchDatabaseMetadata,
-  } = useQuery({
+  const { isLoading: isLoadingDatabaseMetadata } = useQuery({
     queryKey: [CONSTANTS.REACT_QUERY_KEYS.DATABASE_METADATA(tenantID)],
     queryFn: () => getDatabaseMetadataAPI({ tenantID: parseInt(tenantID) }),
     refetchOnWindowFocus: false,
@@ -59,13 +59,7 @@ export const DatabaseTableUpdationForm = ({
 
   console.log({ databaseTable });
 
-  const {
-    isPending: isAddingDatabaseTable,
-    isSuccess: isAddingDatabaseTableSuccess,
-    isError: isAddingDatabaseTableError,
-    error: addTableError,
-    mutate: addTable,
-  } = useMutation({
+  const { isPending: isAddingDatabaseTable, mutate: addTable } = useMutation({
     mutationFn: (data) => {
       return updateDatabaseTableByNameAPI({
         tenantID,
@@ -75,7 +69,7 @@ export const DatabaseTableUpdationForm = ({
       });
     },
     retry: false,
-    onSuccess: (data) => {
+    onSuccess: () => {
       displaySuccess(CONSTANTS.STRINGS.UPDATE_TABLE_SUCCESS_TOAST);
       queryClient.invalidateQueries([
         CONSTANTS.REACT_QUERY_KEYS.DATABASE_TABLES(
@@ -175,7 +169,7 @@ export const DatabaseTableUpdationForm = ({
             onDelete: constraint.onDelete || "",
             onUpdate: constraint.onUpdate || "",
           })) || [];
-      
+
       tableUpdationForm.setFieldValue(
         "databaseTableConstraints.foreignKeys",
         updatedForeignKeys
@@ -217,38 +211,46 @@ export const DatabaseTableUpdationForm = ({
       <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl border-b border-slate-200 p-3">
         {CONSTANTS.STRINGS.UPDATE_TABLE_FORM_TITLE}
       </h1>
-      <form
-        className="space-y-3 md:space-y-4 p-3 "
-        onSubmit={tableUpdationForm.handleSubmit}
+      <ReactQueryLoadingErrorWrapper
+        isLoading={isLoadingDatabaseTable || isLoadingDatabaseMetadata}
+        isFetching={isFetchingDatabaseTable}
+        isRefetching={isRefetechingDatabaseTable}
+        refetch={refetchDatabaseTable}
+        error={loadDatabaseTableError}
       >
-        {tableUpdationForm && (
-          <DatabaseTableEditor
-            tenantID={tenantID}
-            tableEditorForm={tableUpdationForm}
-          />
-        )}
-        <div className="w-full flex flex-row justify-end">
-          <DatabaseTableDeletionForm
-            tenantID={tenantID}
-            databaseSchemaName={databaseSchemaName}
-            databaseTableName={databaseTableName}
-          />
-          <button
-            type="submit"
-            disabled={isAddingDatabaseTable}
-            className="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none "
-          >
-            {isAddingDatabaseTable && (
-              <CircularProgress
-                className="!text-xs !mr-3"
-                size={20}
-                color="white"
-              />
-            )}
-            {CONSTANTS.STRINGS.UPDATE_TABLE_FORM_SUBMIT_BUTTON}
-          </button>
-        </div>
-      </form>
+        <form
+          className="space-y-3 md:space-y-4 p-3 "
+          onSubmit={tableUpdationForm.handleSubmit}
+        >
+          {tableUpdationForm && (
+            <DatabaseTableEditor
+              tenantID={tenantID}
+              tableEditorForm={tableUpdationForm}
+            />
+          )}
+          <div className="w-full flex flex-row justify-end">
+            <DatabaseTableDeletionForm
+              tenantID={tenantID}
+              databaseSchemaName={databaseSchemaName}
+              databaseTableName={databaseTableName}
+            />
+            <button
+              type="submit"
+              disabled={isAddingDatabaseTable}
+              className="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none "
+            >
+              {isAddingDatabaseTable && (
+                <CircularProgress
+                  className="!text-xs !mr-3"
+                  size={20}
+                  color="white"
+                />
+              )}
+              {CONSTANTS.STRINGS.UPDATE_TABLE_FORM_SUBMIT_BUTTON}
+            </button>
+          </div>
+        </form>
+      </ReactQueryLoadingErrorWrapper>
     </section>
   );
 };

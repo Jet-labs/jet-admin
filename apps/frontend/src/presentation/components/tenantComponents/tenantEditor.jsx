@@ -7,23 +7,25 @@ import { testTenantDatabaseConnectionAPI } from "../../../data/apis/tenant";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { CircularProgress } from "@mui/material";
+import PropTypes from "prop-types";
+import React from "react";
+
 export const TenantEditor = ({ tenantEditorForm }) => {
+  TenantEditor.propTypes = {
+    tenantEditorForm: PropTypes.object.isRequired,
+  };
   const [tenantDatabaseConnectionResult, setTenantDatabaseConnectionResult] =
     useState(null);
   const {
     uploadFile,
-    uploadMultipleFiles,
-    deleteFile,
     isUploading: isUploadingLogo,
-    uploadProgress,
     uploadError: uploadLogoError,
-    resetUploadState,
   } = useSupabaseUpload({
     bucket: CONSTANTS.SUPABASE.TENANT_ASSET_DIRECTORY,
     directory: CONSTANTS.SUPABASE.TENANT_LOGO_DIRECTORY,
     allowedTypes: ["image/jpeg", "image/png", "image/gif"],
     maxSizeMB: 2,
-    onSuccess: (fileData) => {
+    onSuccess: () => {
       displaySuccess(CONSTANTS.STRINGS.TENANT_EDITOR_LOGO_UPLOAD_SUCCESS_TOAST);
     },
     onError: (error) => {
@@ -36,9 +38,6 @@ export const TenantEditor = ({ tenantEditorForm }) => {
 
   const {
     isPending: isTestingTenantDatabaseConnection,
-    isSuccess: isTestingTenantDatabaseConnectionSuccess,
-    isError: isTestingTenantDatabaseConnectionError,
-    error: testTenantDatabaseConnectionError,
     mutate: testTenantDatabaseConnection,
   } = useMutation({
     mutationFn: () =>

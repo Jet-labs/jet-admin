@@ -4,9 +4,10 @@ import { sql } from "@codemirror/lang-sql";
 import CodeMirror from "@uiw/react-codemirror";
 import React, { useRef } from "react";
 
-import { useTheme } from "@mui/material";
 import { loadLanguage } from "@uiw/codemirror-extensions-langs";
 import { githubLight } from "@uiw/codemirror-theme-github";
+import PropTypes from "prop-types";
+
 const langMap = {
   javascript: javascript(),
   json: json(),
@@ -21,13 +22,19 @@ export const CodeEditorField = ({
   language = "json",
   height = "200px",
   outlined = true,
-  transparent = false,
   rounded = true,
 }) => {
-  const theme = useTheme();
-  // const {} = useCodeMirror();
+  CodeEditorField.propTypes = {
+    readOnly: PropTypes.bool,
+    disabled: PropTypes.bool,
+    code: PropTypes.string,
+    setCode: PropTypes.func,
+    language: PropTypes.string,
+    height: PropTypes.string,
+    outlined: PropTypes.bool,
+    rounded: PropTypes.bool,
+  };
   const ref = useRef();
-  // ref?.current?.indentLine(1);
   return (
     <CodeMirror
       readOnly={readOnly || disabled}

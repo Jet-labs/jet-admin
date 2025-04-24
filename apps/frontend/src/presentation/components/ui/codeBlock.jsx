@@ -3,6 +3,7 @@ import { IoCodeOutline } from "react-icons/io5";
 import { FiCopy, FiCheck, FiMaximize, FiMinimize } from "react-icons/fi";
 import hljs from "highlight.js";
 import "highlight.js/styles/atom-one-light.css";
+import PropTypes from "prop-types";
 
 // Enhanced CodeBlock component
 export const CodeBlock = ({
@@ -13,6 +14,14 @@ export const CodeBlock = ({
   maxHeight = "500px",
   theme = "light", // Can be 'light' or 'dark'
 }) => {
+  CodeBlock.propTypes = {
+    code: PropTypes.string.isRequired,
+    language: PropTypes.string,
+    showLineNumbers: PropTypes.bool,
+    wrapText: PropTypes.bool,
+    maxHeight: PropTypes.string,
+    theme: PropTypes.string,
+  };
   const [copied, setCopied] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [highlightedCode, setHighlightedCode] = useState("");
@@ -37,6 +46,7 @@ export const CodeBlock = ({
         }
       } catch (error) {
         // If language not supported, fallback to auto detection
+        console.error("Error highlighting code:", error);
         const highlighted = hljs.highlightAuto(code).value;
         setHighlightedCode(highlighted);
       }
@@ -100,16 +110,6 @@ export const CodeBlock = ({
         </div>
       </div>
     ));
-  };
-
-  // For raw HTML display when using highlight.js
-  const renderHighlightedCode = () => {
-    return (
-      <pre
-        className={`${showLineNumbers ? "pl-10" : ""}`}
-        dangerouslySetInnerHTML={{ __html: highlightedCode }}
-      />
-    );
   };
 
   // Detect language name for display

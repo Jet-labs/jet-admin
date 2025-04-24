@@ -1,16 +1,17 @@
+import React from "react";
 import { FaPlus } from "react-icons/fa";
 import { MdOutlineTextFields } from "react-icons/md";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../../constants";
-import {
-  useDatabaseWidgetsActions,
-  useDatabaseWidgetsState,
-} from "../../../../logic/contexts/databaseWidgetsContext";
+import { useDatabaseWidgetsState } from "../../../../logic/contexts/databaseWidgetsContext";
 import { NoEntityUI } from "../../ui/noEntityUI";
-export const DatabaseWidgetDrawerList = ({}) => {
-  const { isLoadingDatabaseWidgets, databaseWidgets, isFetchingDatabaseWidgets } =
-    useDatabaseWidgetsState();
-  const { refetchDatabaseWidgets } = useDatabaseWidgetsActions();
+
+export const DatabaseWidgetDrawerList = () => {
+  const {
+    isLoadingDatabaseWidgets,
+    databaseWidgets,
+    isFetchingDatabaseWidgets,
+  } = useDatabaseWidgetsState();
   const routeParam = useParams();
   const { tenantID } = useParams();
   const navigate = useNavigate();
@@ -21,7 +22,7 @@ export const DatabaseWidgetDrawerList = ({}) => {
     switch (databaseWidgetType) {
       case CONSTANTS.DATABASE_WIDGET_TYPES.TEXT_WIDGET.value:
         return (
-          <MdOutlineTextFields 
+          <MdOutlineTextFields
             className={`${
               isActive ? "text-[#646cff] " : "text-slate-600"
             } mr-3 !text-base`}
@@ -29,7 +30,7 @@ export const DatabaseWidgetDrawerList = ({}) => {
         );
       default:
         return (
-          <MdOutlineTextFields 
+          <MdOutlineTextFields
             className={`${
               isActive ? "text-[#646cff] " : "text-slate-600"
             } mr-3 !text-base`}
@@ -39,16 +40,13 @@ export const DatabaseWidgetDrawerList = ({}) => {
   };
   return (
     <div className=" bg-white   h-[calc(100vh-48px)] overflow-hidden p-2 w-full">
-      {/* Add Widget Button */}
-      {true && (
-        <button
-          onClick={_navigateToAddMoreWidget}
-          className="flex mb-2 flex-row items-center justify-center rounded bg-[#646cff]/10 px-3 py-1.5 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50 w-full outline-none focus:outline-none"
-        >
-          <FaPlus className="!w-4 !h-4 !text-[#646cff] mr-1" />
-          {CONSTANTS.STRINGS.ADD_WIDGET_BUTTON_TEXT}
-        </button>
-      )}
+      <button
+        onClick={_navigateToAddMoreWidget}
+        className="flex mb-2 flex-row items-center justify-center rounded bg-[#646cff]/10 px-3 py-1.5 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50 w-full outline-none focus:outline-none"
+      >
+        <FaPlus className="!w-4 !h-4 !text-[#646cff] mr-1" />
+        {CONSTANTS.STRINGS.ADD_WIDGET_BUTTON_TEXT}
+      </button>
       {isLoadingDatabaseWidgets || isFetchingDatabaseWidgets ? (
         <div role="status" className=" animate-pulse w-full">
           <div className="h-6 bg-gray-200 rounded   mb-2 w-full"></div>

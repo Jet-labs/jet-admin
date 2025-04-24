@@ -6,7 +6,7 @@ import {
   CircularProgress
 } from "@mui/material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useCallback } from "react";
+import React, { useCallback } from "react";
 import { addTenantRoleAPI } from "../../../data/apis/tenantRole";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { TenantPermissionSelectionInput } from "./tenantPermissionSelectionInput";
@@ -15,13 +15,7 @@ import { formValidations } from "../../../utils/formValidation";
 export const TenantRoleAdditionForm = () => {
   const { tenantID } = useParams();
   const queryClient = useQueryClient();
-  const {
-    isPending: isAddingTenantRole,
-    isSuccess: isAddingTenantRoleSuccess,
-    isError: isAddingTenantRoleError,
-    error: addTenantRoleError,
-    mutate: addTenantRole,
-  } = useMutation({
+  const { isPending: isAddingTenantRole, mutate: addTenantRole } = useMutation({
     mutationFn: ({ roleName, roleDescription, permissionIDs }) =>
       addTenantRoleAPI({
         tenantID,

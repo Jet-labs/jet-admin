@@ -14,7 +14,7 @@ export const TenantSelectionDropdown = () => {
   const { tenants } = useTenantState();
   const { tenantID } = useParams();
   const navigate = useNavigate();
-  const { saveTenantLocallyAndReload, saveTenantLocally } = useTenantActions();
+  const { saveTenantLocally } = useTenantActions();
   const [isOpen, setIsOpen] = useState(false);
 
   // Ref for the dropdown container

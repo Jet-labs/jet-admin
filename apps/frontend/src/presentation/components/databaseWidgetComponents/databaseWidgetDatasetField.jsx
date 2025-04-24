@@ -1,15 +1,16 @@
-import { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import { Draggable } from "react-beautiful-dnd";
+import { GrDrag } from "react-icons/gr";
 import { IoClose } from "react-icons/io5";
 import { CONSTANTS } from "../../../constants";
+// eslint-disable-next-line no-unused-vars
 import { DatabaseQuery } from "../../../data/models/databaseQuery";
-import { GrDrag } from "react-icons/gr";
-
-// import { DatabaseWidgetDatasetAdvancedOptions } from "./databaseWidgetDatasetAdvancedOptions";
-import { IoIosColorFilter } from "react-icons/io";
 import { BiSitemap } from "react-icons/bi";
-import { DatabaseWidgetDatasetFieldMapping } from "./databaseWidgetDatasetFieldMapping";
+import { IoIosColorFilter } from "react-icons/io";
 import { DatabaseWidgetDatasetArguments } from "./databaseWidgetDatasetArguments";
+import { DatabaseWidgetDatasetFieldMapping } from "./databaseWidgetDatasetFieldMapping";
+import PropTypes from "prop-types";
+
 /**
  * @param {object} param0
  * @param {number} param0.index
@@ -26,6 +27,15 @@ export const DatabaseWidgetDatasetField = ({
   databaseQueries,
   datasetFields,
 }) => {
+  DatabaseWidgetDatasetField.propTypes = {
+    index: PropTypes.number.isRequired,
+    widgetForm: PropTypes.object.isRequired,
+    setSelectedQueryForTesting: PropTypes.func.isRequired,
+    databaseQueries: PropTypes.array.isRequired,
+    datasetFields: PropTypes.array.isRequired,
+  };
+
+  // eslint-disable-next-line no-unused-vars
   const [showAdvancedOptions, setShowAdvancedOptions] = useState(false);
   const [showFieldMappingOptions, setShowFieldMappingOptions] = useState(false);
   const [showArgumentsOptions, setShowArgumentsOptions] = useState(false);

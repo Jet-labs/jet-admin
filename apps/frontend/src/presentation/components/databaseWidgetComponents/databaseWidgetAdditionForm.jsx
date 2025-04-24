@@ -1,14 +1,14 @@
 import { CircularProgress } from "@mui/material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
-import { useCallback, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { CONSTANTS } from "../../../constants";
 import {
   createDatabaseWidgetAPI,
   getDatabaseWidgetDataUsingWidgetAPI,
 } from "../../../data/apis/databaseWidget";
 import { formValidations } from "../../../utils/formValidation";
-import { displaySuccess } from "../../../utils/notification";
+import { displayError, displaySuccess } from "../../../utils/notification";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -16,6 +16,7 @@ import {
 } from "../ui/resizable";
 import { DatabaseWidgetEditor } from "./databaseWidgetEditor";
 import { DatabaseWidgetPreview } from "./databaseWidgetPreview";
+import PropTypes from "prop-types";
 const initialValues = {
   databaseWidgetName: "",
   databaseWidgetType: CONSTANTS.DATABASE_WIDGET_TYPES.TEXT_WIDGET.value,
@@ -41,40 +42,37 @@ const initialValues = {
 };
 
 export const DatabaseWidgetAdditionForm = ({ tenantID }) => {
+  DatabaseWidgetAdditionForm.propTypes = {
+    tenantID: PropTypes.number.isRequired,
+  };
   const queryClient = useQueryClient();
   const [databaseWidgetFetchedData, setDatabaseWidgetFetchedData] =
     useState(null);
 
-  const {
-    isPending: isAddingDatabaseWidget,
-    isSuccess: isAddingDatabaseWidgetSuccess,
-    isError: isAddingDatabaseWidgetError,
-    error: addDatabaseWidgetError,
-    mutate: addDatabaseWidget,
-  } = useMutation({
-    mutationFn: (data) => {
-      return createDatabaseWidgetAPI({
-        tenantID,
-        databaseWidgetData: data,
-      });
-    },
-    retry: false,
-    onSuccess: (data) => {
-      displaySuccess(CONSTANTS.STRINGS.ADD_WIDGET_FORM_WIDGET_ADDITION_SUCCESS);
-      queryClient.invalidateQueries([
-        CONSTANTS.REACT_QUERY_KEYS.DATABASE_WIDGETS(tenantID),
-      ]);
-    },
-    onError: (error) => {
-      displayError(error);
-    },
-  });
+  const { isPending: isAddingDatabaseWidget, mutate: addDatabaseWidget } =
+    useMutation({
+      mutationFn: (data) => {
+        return createDatabaseWidgetAPI({
+          tenantID,
+          databaseWidgetData: data,
+        });
+      },
+      retry: false,
+      onSuccess: () => {
+        displaySuccess(
+          CONSTANTS.STRINGS.ADD_WIDGET_FORM_WIDGET_ADDITION_SUCCESS
+        );
+        queryClient.invalidateQueries([
+          CONSTANTS.REACT_QUERY_KEYS.DATABASE_WIDGETS(tenantID),
+        ]);
+      },
+      onError: (error) => {
+        displayError(error);
+      },
+    });
 
   const {
     isPending: isFetchingDatabaseWidgetData,
-    isSuccess: isFetchingDatabaseWidgetDataSuccess,
-    isError: isFetchingDatabaseWidgetDataError,
-    error: fetchDatabaseWidgetDataError,
     mutate: fetchDatabaseWidgetData,
   } = useMutation({
     mutationFn: (data) => {

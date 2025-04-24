@@ -1,18 +1,28 @@
-import { useTheme } from "@mui/material";
+import PropTypes from "prop-types";
+import React from "react";
 import { GoGrabber } from "react-icons/go";
 import * as ResizablePrimitive from "react-resizable-panels";
 
-const ResizablePanelGroup = ({ className, ...props }) => (
-  <ResizablePrimitive.PanelGroup
-    className={`flex h-full w-full data-[panel-group-direction=vertical]:flex-col ${className}`}
-    {...props}
-  />
-);
+const ResizablePanelGroup = ({ className, ...props }) => {
+  ResizablePanelGroup.propTypes = {
+    className: PropTypes.string,
+  };
+  return (
+    <ResizablePrimitive.PanelGroup
+      className={`flex h-full w-full data-[panel-group-direction=vertical]:flex-col ${className}`}
+      {...props}
+    />
+  );
+};
 
 const ResizablePanel = ResizablePrimitive.Panel;
 
 const ResizableHandle = ({ withHandle, className, ...props }) => {
-  const theme = useTheme();
+  ResizableHandle.propTypes = {
+    withHandle: PropTypes.bool,
+    className: PropTypes.string,
+  };
+
   return (
     <ResizablePrimitive.PanelResizeHandle
       className={`
@@ -30,4 +40,4 @@ const ResizableHandle = ({ withHandle, className, ...props }) => {
   );
 };
 
-export { ResizablePanelGroup, ResizablePanel, ResizableHandle };
+export { ResizableHandle, ResizablePanel, ResizablePanelGroup };

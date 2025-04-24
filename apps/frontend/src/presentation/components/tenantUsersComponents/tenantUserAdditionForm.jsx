@@ -1,44 +1,42 @@
 import {
-  Button,
   CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
-  IconButton,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
 import { useFormik } from "formik";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { displayError, displaySuccess } from "../../../utils/notification";
+import PropTypes from "prop-types";
 import { CONSTANTS } from "../../../constants";
 import { addUserToTenantAPI } from "../../../data/apis/userManagement";
 import { formValidations } from "../../../utils/formValidation";
+import { displayError, displaySuccess } from "../../../utils/notification";
+import React from "react";
 
 export const TenantUserAdditionForm = ({ tenantID, open, onClose }) => {
+  TenantUserAdditionForm.propTypes = {
+    tenantID: PropTypes.number.isRequired,
+    open: PropTypes.bool.isRequired,
+    onClose: PropTypes.func.isRequired,
+  };
   const queryClient = useQueryClient();
-  const {
-    isPending: isAddingMemberToTenant,
-    isSuccess: isAddingMemberToTenantSuccess,
-    isError: isAddingMemberToTenantError,
-    error: addUserToTenantError,
-    mutate: addUserToTenant,
-  } = useMutation({
-    mutationFn: ({ tenantID, tenantUserEmail }) =>
-      addUserToTenantAPI({ tenantID, tenantUserEmail }),
-    retry: false,
-    onSuccess: (tenant) => {
-      displaySuccess(CONSTANTS.STRINGS.ADD_MEMBER_TO_TENANT_SUCCESS_TOAST);
-      queryClient.invalidateQueries([CONSTANTS.REACT_QUERY_KEYS.TENANTS]);
-      onClose();
-    },
-    onError: (error) => {
-      console.log({ error });
-      displayError(error);
-    },
-  });
+  const { isPending: isAddingMemberToTenant, mutate: addUserToTenant } =
+    useMutation({
+      mutationFn: ({ tenantID, tenantUserEmail }) =>
+        addUserToTenantAPI({ tenantID, tenantUserEmail }),
+      retry: false,
+      onSuccess: () => {
+        displaySuccess(CONSTANTS.STRINGS.ADD_MEMBER_TO_TENANT_SUCCESS_TOAST);
+        queryClient.invalidateQueries([CONSTANTS.REACT_QUERY_KEYS.TENANTS]);
+        onClose();
+      },
+      onError: (error) => {
+        console.log({ error });
+        displayError(error);
+      },
+    });
   const addUserToTenantForm = useFormik({
     initialValues: {
       tenantID: tenantID,

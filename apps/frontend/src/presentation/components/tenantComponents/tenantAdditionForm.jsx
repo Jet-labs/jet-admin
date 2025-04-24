@@ -8,29 +8,25 @@ import { displayError, displaySuccess } from "../../../utils/notification";
 import { useTenantActions } from "../../../logic/contexts/tenantContext";
 import { TenantEditor } from "./tenantEditor";
 import { formValidations } from "../../../utils/formValidation";
+import React from "react";
 export const TenantAdditionForm = () => {
   const queryClient = useQueryClient();
-  const { saveTenantLocally, saveTenantLocallyAndReload } = useTenantActions();
+  const { saveTenantLocallyAndReload } = useTenantActions();
 
-  const {
-    isPending: isCreatingNewTenant,
-    isSuccess: isCreatingNewTenantSuccess,
-    isError: isCreatingNewTenantError,
-    error: createNewTenantError,
-    mutate: createNewTenant,
-  } = useMutation({
-    mutationFn: ({ tenantName, tenantLogoURL, tenantDBURL }) =>
-      createNewTenantAPI({ tenantName, tenantLogoURL, tenantDBURL }),
-    retry: false,
-    onSuccess: (tenant) => {
-      saveTenantLocallyAndReload(tenant);
-      displaySuccess(CONSTANTS.STRINGS.ADD_TENANT_SUCCESS_TOAST);
-      queryClient.invalidateQueries([CONSTANTS.REACT_QUERY_KEYS.TENANTS]);
-    },
-    onError: (error) => {
-      displayError(error);
-    },
-  });
+  const { isPending: isCreatingNewTenant, mutate: createNewTenant } =
+    useMutation({
+      mutationFn: ({ tenantName, tenantLogoURL, tenantDBURL }) =>
+        createNewTenantAPI({ tenantName, tenantLogoURL, tenantDBURL }),
+      retry: false,
+      onSuccess: (tenant) => {
+        saveTenantLocallyAndReload(tenant);
+        displaySuccess(CONSTANTS.STRINGS.ADD_TENANT_SUCCESS_TOAST);
+        queryClient.invalidateQueries([CONSTANTS.REACT_QUERY_KEYS.TENANTS]);
+      },
+      onError: (error) => {
+        displayError(error);
+      },
+    });
 
   const addTenantForm = useFormik({
     initialValues: {

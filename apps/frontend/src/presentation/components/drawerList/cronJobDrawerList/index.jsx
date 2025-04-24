@@ -1,16 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import { FaPlus } from "react-icons/fa";
-import { Link, NavLink, useNavigate, useParams } from "react-router-dom";
-import { CONSTANTS } from "../../../../constants";
-import {
-  useCronJobsActions,
-  useCronJobsState,
-} from "../../../../logic/contexts/cronJobsContext";
-import { NoEntityUI } from "../../ui/noEntityUI";
-import { MdNotificationsNone } from "react-icons/md";
-import { IoKeyOutline } from "react-icons/io5";
 import { RiCalendarScheduleLine } from "react-icons/ri";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { CONSTANTS } from "../../../../constants";
+import { useCronJobsState } from "../../../../logic/contexts/cronJobsContext";
+import { NoEntityUI } from "../../ui/noEntityUI";
 
 export const CronJobDrawerList = () => {
   const { tenantID } = useParams();
@@ -18,7 +12,6 @@ export const CronJobDrawerList = () => {
   const routeParam = useParams();
   const { isLoadingCronJobs, cronJobs, isFetchingCronJobs } =
     useCronJobsState();
-  const { refetchCronJobs } = useCronJobsActions();
 
   const _navigateToAddNotification = () => {
     navigate(CONSTANTS.ROUTES.ADD_CRON_JOB.path(tenantID));

@@ -1,8 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { Dialog, DialogTitle, DialogContent, DialogActions } from "@mui/material";
 import { CodeEditorField } from "../ui/codeEditorField";
+import PropTypes from "prop-types";
 
-export const JsonPopupEditor = ({ title, open, value, onSave, onCancel }) => {
+export const DataGridJSONPopupEditor = ({
+  title,
+  open,
+  value,
+  onSave,
+  onCancel,
+}) => {
+  DataGridJSONPopupEditor.propTypes = {
+    title: PropTypes.string,
+    open: PropTypes.bool.isRequired,
+    value: PropTypes.object.isRequired,
+    onSave: PropTypes.func.isRequired,
+    onCancel: PropTypes.func,
+  };
   const [jsonValue, setJsonValue] = useState(value);
 
   const handleClose = (e) => {

@@ -1,14 +1,15 @@
+import CloseIcon from "@mui/icons-material/Close";
 import {
-  Button,
   CircularProgress,
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
   IconButton,
 } from "@mui/material";
-import CloseIcon from "@mui/icons-material/Close";
+import PropTypes from "prop-types";
+import React from "react";
+
 export const ConfirmationDialog = ({
   onDecline,
   onAccepted,
@@ -17,10 +18,18 @@ export const ConfirmationDialog = ({
   open,
   isLoading,
   loadingText,
-  variant,
   confirmText,
-  illustration,
 }) => {
+  ConfirmationDialog.propTypes = {
+    onDecline: PropTypes.func.isRequired,
+    onAccepted: PropTypes.func.isRequired,
+    title: PropTypes.string.isRequired,
+    message: PropTypes.string.isRequired,
+    open: PropTypes.bool.isRequired,
+    isLoading: PropTypes.bool.isRequired,
+    loadingText: PropTypes.string,
+    confirmText: PropTypes.string,
+  };
   return (
     <Dialog
       open={open}

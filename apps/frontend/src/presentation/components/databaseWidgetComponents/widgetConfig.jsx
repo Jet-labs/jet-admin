@@ -1,6 +1,8 @@
 import { MdOutlineTextFields } from "react-icons/md";
 import { CONSTANTS } from "../../../constants";
 import { DatabaseTextWidget } from "./databaseTextWidget";
+import React from "react";
+
 
 export const DATABASE_WIDGETS_CONFIG_MAP = {
   text: {

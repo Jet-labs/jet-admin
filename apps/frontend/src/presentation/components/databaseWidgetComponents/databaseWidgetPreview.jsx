@@ -1,9 +1,11 @@
 import { CircularProgress } from "@mui/material";
-import { useCallback, useRef } from "react";
+import React, { useCallback, useRef } from "react";
 import { FiRefreshCcw } from "react-icons/fi";
 import { DATABASE_WIDGETS_CONFIG_MAP } from "./widgetConfig";
 // import { DatabaseWidgetDownloadForm } from "./databaseWidgetImageDownloadForm";
 import { CONSTANTS } from "../../../constants";
+import PropTypes from "prop-types";
+
 export const DatabaseWidgetPreview = ({
   databaseWidgetName,
   databaseWidgetType,
@@ -14,6 +16,16 @@ export const DatabaseWidgetPreview = ({
   refreshData,
   databaseWidgetConfig,
 }) => {
+  DatabaseWidgetPreview.propTypes = {
+    databaseWidgetName: PropTypes.string.isRequired,
+    databaseWidgetType: PropTypes.string.isRequired,
+    data: PropTypes.object,
+    refetchInterval: PropTypes.number,
+    isFetchingData: PropTypes.bool.isRequired,
+    isRefreshingData: PropTypes.bool.isRequired,
+    refreshData: PropTypes.func.isRequired,
+    databaseWidgetConfig: PropTypes.object,
+  };
   const widgetRef = useRef();
   const _handleOnWidgetInit = useCallback(
     (ref) => {

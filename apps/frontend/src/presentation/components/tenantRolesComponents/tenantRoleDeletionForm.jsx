@@ -8,36 +8,37 @@ import {
 import { useGlobalUI } from "../../../logic/contexts/globalUIContext";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
+import React from "react";
 export const TenantRoleDeletionForm = ({ tenantID, tenantRoleID }) => {
+  TenantRoleDeletionForm.propTypes = {
+    tenantID: PropTypes.number.isRequired,
+    tenantRoleID: PropTypes.number.isRequired,
+  };
   const navigate = useNavigate();
   const { showConfirmation } = useGlobalUI();
   const queryClient = useQueryClient();
-  const {
-    isPending: isDeletingTenantRole,
-    isSuccess: isDeletingTenantRoleSuccess,
-    isError: isDeletingTenantRoleError,
-    error: deleteTenantRoleError,
-    mutate: deleteTenantRole,
-  } = useMutation({
-    mutationFn: (data) => {
-      return deleteTenantRoleByIDAPI({
-        tenantID,
-        tenantRoleID,
-      });
-    },
-    retry: false,
-    onSuccess: (data) => {
-      displaySuccess(CONSTANTS.STRINGS.TENANT_ROLE_DELETION_SUCCESS);
-      queryClient.invalidateQueries([
-        CONSTANTS.REACT_QUERY_KEYS.TENANT_ROLES(tenantID),
-        tenantRoleID,
-      ]);
-      navigate(-1);
-    },
-    onError: (error) => {
-      displayError(error);
-    },
-  });
+  const { isPending: isDeletingTenantRole, mutate: deleteTenantRole } =
+    useMutation({
+      mutationFn: () => {
+        return deleteTenantRoleByIDAPI({
+          tenantID,
+          tenantRoleID,
+        });
+      },
+      retry: false,
+      onSuccess: () => {
+        displaySuccess(CONSTANTS.STRINGS.TENANT_ROLE_DELETION_SUCCESS);
+        queryClient.invalidateQueries([
+          CONSTANTS.REACT_QUERY_KEYS.TENANT_ROLES(tenantID),
+          tenantRoleID,
+        ]);
+        navigate(-1);
+      },
+      onError: (error) => {
+        displayError(error);
+      },
+    });
 
   const _handleDeleteTenantRole = async () => {
     await showConfirmation({

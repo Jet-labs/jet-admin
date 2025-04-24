@@ -1,4 +1,5 @@
-import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import React from "react";
+import { FiChevronRight } from "react-icons/fi";
 import { Link, useLocation } from "react-router-dom";
 
 export const Breadcrumbs = () => {
@@ -48,4 +49,3 @@ export const Breadcrumbs = () => {
     </div>
   );
 };
-

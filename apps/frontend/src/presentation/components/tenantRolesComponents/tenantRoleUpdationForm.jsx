@@ -4,7 +4,7 @@ import { CONSTANTS } from "../../../constants";
 
 import { CircularProgress } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useCallback, useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import {
   getTenantRoleByIDAPI,
   updateTenantRoleByIDAPI,
@@ -13,6 +13,7 @@ import { displayError, displaySuccess } from "../../../utils/notification";
 import { TenantRoleDeletionForm } from "./tenantRoleDeletionForm";
 import { TenantPermissionSelectionInput } from "./tenantPermissionSelectionInput";
 import { formValidations } from "../../../utils/formValidation";
+import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 
 export const TenantRoleUpdationForm = () => {
   const { tenantID, tenantRoleID } = useParams();
@@ -35,30 +36,25 @@ export const TenantRoleUpdationForm = () => {
     refetchOnWindowFocus: false,
   });
 
-  const {
-    isPending: isUpdatingTenantRoleByID,
-    isSuccess: isUpdatingTenantRoleByIDSuccess,
-    isError: isUpdatingTenantRoleByIDError,
-    error: updateTenantRoleError,
-    mutate: updateTenantRoleByID,
-  } = useMutation({
-    mutationFn: ({ roleName, roleDescription, permissionIDs }) =>
-      updateTenantRoleByIDAPI({
-        tenantID,
-        tenantRoleID,
-        data: { roleName, roleDescription, permissionIDs },
-      }),
-    retry: false,
-    onSuccess: () => {
-      displaySuccess(CONSTANTS.STRINGS.TENANT_ROLE_UPDATION_SUCCESS_TOAST);
-      queryClient.invalidateQueries([
-        CONSTANTS.REACT_QUERY_KEYS.TENANT_ROLES(tenantID),
-      ]);
-    },
-    onError: (error) => {
-      displayError(error);
-    },
-  });
+  const { isPending: isUpdatingTenantRoleByID, mutate: updateTenantRoleByID } =
+    useMutation({
+      mutationFn: ({ roleName, roleDescription, permissionIDs }) =>
+        updateTenantRoleByIDAPI({
+          tenantID,
+          tenantRoleID,
+          data: { roleName, roleDescription, permissionIDs },
+        }),
+      retry: false,
+      onSuccess: () => {
+        displaySuccess(CONSTANTS.STRINGS.TENANT_ROLE_UPDATION_SUCCESS_TOAST);
+        queryClient.invalidateQueries([
+          CONSTANTS.REACT_QUERY_KEYS.TENANT_ROLES(tenantID),
+        ]);
+      },
+      onError: (error) => {
+        displayError(error);
+      },
+    });
 
   const updateTenantRoleByIDForm = useFormik({
     initialValues: {
@@ -101,11 +97,13 @@ export const TenantRoleUpdationForm = () => {
 
   return (
     <section className="max-w-3xl w-full h-full">
-      {isLoadingTenantRoleByID ? (
-        <div className="h-full w-full flex justify-center items-center">
-          <CircularProgress />
-        </div>
-      ) : (
+      <ReactQueryLoadingErrorWrapper
+        isLoading={isLoadingTenantRoleByID}
+        isFetching={isFetchingTenantRoleByID}
+        isRefetching={isRefetechingTenantRoleByID}
+        refetch={refetchTenantRoleByID}
+        error={loadTenantRoleByIDError}
+      >
         <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
           <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl ">
             {CONSTANTS.STRINGS.TENANT_ROLE_UPDATION_TITLE}
@@ -195,7 +193,7 @@ export const TenantRoleUpdationForm = () => {
             </form>
           )}
         </div>
-      )}
+      </ReactQueryLoadingErrorWrapper>
     </section>
   );
 };

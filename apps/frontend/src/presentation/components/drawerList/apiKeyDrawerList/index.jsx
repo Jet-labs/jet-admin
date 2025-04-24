@@ -1,28 +1,16 @@
-import { useQuery } from "@tanstack/react-query";
 import React from "react";
 import { FaPlus } from "react-icons/fa";
-import { Link, NavLink, useNavigate, useParams } from "react-router-dom";
-import { CONSTANTS } from "../../../../constants";
-import { getAllAPIKeysAPI } from "../../../../data/apis/apiKey";
-import {
-  useAPIKeysActions,
-  useAPIKeysState,
-} from "../../../../logic/contexts/apiKeysContext";
-import { NoEntityUI } from "../../ui/noEntityUI";
-import { MdNotificationsNone } from "react-icons/md";
 import { IoKeyOutline } from "react-icons/io5";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import { CONSTANTS } from "../../../../constants";
+import { useAPIKeysState } from "../../../../logic/contexts/apiKeysContext";
+import { NoEntityUI } from "../../ui/noEntityUI";
 
 export const APIKeyDrawerList = () => {
   const { tenantID } = useParams();
   const navigate = useNavigate();
   const routeParam = useParams();
-  const {
-    isLoadingAPIKeys,
-    apiKeys,
-    isFetchingAPIKeys,
-  } = useAPIKeysState();
-  const { refetchAPIKeys } = useAPIKeysActions();
-
+  const { isLoadingAPIKeys, apiKeys, isFetchingAPIKeys } = useAPIKeysState();
   const _navigateToAddNotification = () => {
     navigate(CONSTANTS.ROUTES.ADD_API_KEY.path(tenantID));
   };
@@ -47,9 +35,7 @@ export const APIKeyDrawerList = () => {
         <div className="h-full w-full overflow-y-auto">
           {apiKeys.map((apiKey) => {
             const key = `apiKey_${apiKey.apiKeyID}`;
-            const isActive =
-              routeParam?.apiKeyID ==
-              apiKey.apiKeyID;
+            const isActive = routeParam?.apiKeyID == apiKey.apiKeyID;
 
             return (
               <Link
@@ -88,7 +74,9 @@ export const APIKeyDrawerList = () => {
         </div>
       ) : (
         <div className=" text-gray-500 dark:text-gray-400">
-          <NoEntityUI message={CONSTANTS.STRINGS.API_KEY_DRAWER_LIST_NO_API_KEY} />
+          <NoEntityUI
+            message={CONSTANTS.STRINGS.API_KEY_DRAWER_LIST_NO_API_KEY}
+          />
         </div>
       )}
     </div>

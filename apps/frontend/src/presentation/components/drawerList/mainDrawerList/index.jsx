@@ -3,13 +3,13 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { capitalize } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import React, { useState } from "react";
+import { BiLogoPostgresql } from "react-icons/bi";
 import { BsServer } from "react-icons/bs";
 import { FaChartPie, FaKey, FaUserCog } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa6";
 import { FiUsers } from "react-icons/fi";
 import {
-  MdNotifications,
   MdOutlineLockPerson,
   MdOutlineSchema,
   MdWidgets,
@@ -21,15 +21,10 @@ import { CONSTANTS } from "../../../../constants";
 import { getDatabaseMetadataAPI } from "../../../../data/apis/database";
 import { useAuthState } from "../../../../logic/contexts/authContext";
 import { useTenantState } from "../../../../logic/contexts/tenantContext";
-import { NoEntityUI } from "../../ui/noEntityUI";
 import { TenantSelectionDropdown } from "../../tenantComponents/tenantSelectionDropdown";
-import { BiLogoPostgresql } from "react-icons/bi";
-const defaultMenuItemExpandedState = {
-  databaseSchema: false,
-  userManagement: false,
-};
+import { NoEntityUI } from "../../ui/noEntityUI";
 
-export const MainDrawerList = ({ currentPageTitle }) => {
+export const MainDrawerList = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuthState();
@@ -44,10 +39,7 @@ export const MainDrawerList = ({ currentPageTitle }) => {
   const {
     isLoading: isLoadingDatabaseMetadata,
     isFetching: isFetchingDatabaseMetadata,
-    isRefetching: isRefetchingDatabaseMetadata,
     data: databaseMetadata,
-    error: databaseMetadataError,
-    refetch: refetchDatabaseMetadata,
   } = useQuery({
     queryKey: [CONSTANTS.REACT_QUERY_KEYS.DATABASE_METADATA(tenantID)],
     queryFn: () => getDatabaseMetadataAPI({ tenantID: parseInt(tenantID) }),

@@ -6,8 +6,9 @@ import {
   Select,
 } from "@mui/material";
 import { useRoleManagementState } from "../../../logic/contexts/roleManagementContext";
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import { CONSTANTS } from "../../../constants";
+import PropTypes from "prop-types";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -20,13 +21,13 @@ const MenuProps = {
   },
 };
 
-export const TenantPermissionSelectionInput = ({
-  label,
-  value,
-  onChange,
-}) => {
+export const TenantPermissionSelectionInput = ({ label, value, onChange }) => {
+  TenantPermissionSelectionInput.propTypes = {
+    label: PropTypes.string,
+    value: PropTypes.array.isRequired,
+    onChange: PropTypes.func.isRequired,
+  };
   const { tenantPermissions } = useRoleManagementState();
-
   const tenantPermissionIDToPermissionMapping = useMemo(() => {
     const map = {};
     if (tenantPermissions && tenantPermissions.permissions) {

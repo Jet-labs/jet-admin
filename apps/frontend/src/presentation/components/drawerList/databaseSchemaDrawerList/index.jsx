@@ -1,6 +1,6 @@
 import { Link, useLocation, useParams } from "react-router-dom";
 
-import { useMemo } from "react";
+import React, { useMemo } from "react";
 import { FaDatabase } from "react-icons/fa";
 import { VscGithubAction } from "react-icons/vsc";
 import { CONSTANTS } from "../../../../constants";

@@ -2,7 +2,14 @@ import React, { useRef } from "react";
 import { CONSTANTS } from "../../../constants";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
 import { CircularProgress } from "@mui/material";
+import PropTypes from "prop-types";
+
 export const LogoUpload = ({ isUploadingLogo, uploadError, onLogoUpload }) => {
+  LogoUpload.propTypes = {
+    isUploadingLogo: PropTypes.bool.isRequired,
+    uploadError: PropTypes.bool.isRequired,
+    onLogoUpload: PropTypes.func.isRequired,
+  };
   const fileInputRef = useRef(null);
 
   const handleButtonClick = () => {

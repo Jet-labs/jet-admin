@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 import {
@@ -6,12 +6,12 @@ import {
   useAuthState,
 } from "../../../logic/contexts/authContext";
 import { useFormik } from "formik";
-import { Spinner } from "../../components/ui/spinner";
 import logo from "../../../assets/logo.png";
 import { formValidations } from "../../../utils/formValidation";
+import { CircularProgress } from "@mui/material";
 const SignInPage = () => {
   const { firebaseUserState, signUpState } = useAuthState();
-  const { googleSignIn, emailSignUp } = useAuthActions();
+  const { emailSignUp } = useAuthActions();
   const navigate = useNavigate();
 
   const emailSignUpForm = useFormik({
@@ -118,7 +118,7 @@ const SignInPage = () => {
                 </div>
                 {signUpState && signUpState.isLoading ? (
                   <div className="w-full flex flex-row justify-center items-center">
-                    <Spinner />
+                    <CircularProgress />
                   </div>
                 ) : (
                   <button

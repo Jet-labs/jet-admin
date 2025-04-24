@@ -1,4 +1,5 @@
-import { useCallback } from "react";
+import React, { useCallback } from "react";
+import PropTypes from "prop-types";
 
 const widgetOptions = [
   // Container CSS Options
@@ -325,8 +326,11 @@ const widgetOptions = [
 export const DatabaseWidgetAdvancedOptions = ({
   widgetForm,
   parentWidgetType,
-  initialValues: initialOpts = {},
 }) => {
+  DatabaseWidgetAdvancedOptions.propTypes = {
+    widgetForm: PropTypes.object.isRequired,
+    parentWidgetType: PropTypes.string.isRequired,
+  };
   const renderOption = useCallback(
     (option) => {
       const {
@@ -334,6 +338,7 @@ export const DatabaseWidgetAdvancedOptions = ({
         type,
         description,
         options: selectOptions,
+        // eslint-disable-next-line no-unused-vars
         ...rest
       } = option;
 
@@ -386,7 +391,11 @@ export const DatabaseWidgetAdvancedOptions = ({
               className="placeholder:text-slate-400 text-xs bg-slate-50 border border-slate-300 text-slate-700 rounded focus:outline-none focus:border-slate-400 block w-full px-1.5 py-1"
             >
               {selectOptions.map((opt) => (
-                <option key={opt} value={opt} className="text-slate-500 text-xs">
+                <option
+                  key={opt}
+                  value={opt}
+                  className="text-slate-500 text-xs"
+                >
                   {opt.charAt(0).toUpperCase() + opt.slice(1)}
                 </option>
               ))}
@@ -409,19 +418,19 @@ export const DatabaseWidgetAdvancedOptions = ({
 
   return (
     <div className="grid grid-cols-2 gap-4 p-0 mt-2">
-      {widgetOptions.filter(
-        (option) => option.relevantWidgets.includes(parentWidgetType)
-      ).map((option) => (
-        <div key={option.key} className="col-span-2">
-          <label className="block mb-2 text-xs font-medium text-slate-600">
-            {option.name}
-            <span className="text-slate-400 text-[10px] block">
-              {option.description}
-            </span>
-          </label>
-          {widgetForm && renderOption(option)}
-        </div>
-      ))}
+      {widgetOptions
+        .filter((option) => option.relevantWidgets.includes(parentWidgetType))
+        .map((option) => (
+          <div key={option.key} className="col-span-2">
+            <label className="block mb-2 text-xs font-medium text-slate-600">
+              {option.name}
+              <span className="text-slate-400 text-[10px] block">
+                {option.description}
+              </span>
+            </label>
+            {widgetForm && renderOption(option)}
+          </div>
+        ))}
     </div>
   );
 };

@@ -6,40 +6,37 @@ import { CONSTANTS } from "../../../constants";
 import { deleteDatabaseWidgetByIDAPI } from "../../../data/apis/databaseWidget";
 import { useGlobalUI } from "../../../logic/contexts/globalUIContext";
 import { displayError, displaySuccess } from "../../../utils/notification";
-export const DatabaseWidgetDeletionForm = ({
-  tenantID,
-  databaseWidgetID,
-}) => {
+import PropTypes from "prop-types";
+import React from "react";
+
+export const DatabaseWidgetDeletionForm = ({ tenantID, databaseWidgetID }) => {
+  DatabaseWidgetDeletionForm.propTypes = {
+    tenantID: PropTypes.number.isRequired,
+    databaseWidgetID: PropTypes.number.isRequired,
+  };
   const navigate = useNavigate();
   const { showConfirmation } = useGlobalUI();
   const queryClient = useQueryClient();
-  const {
-    isPending: isDeletingDatabaseWidget,
-    isSuccess: isDeletingDatabaseWidgetSuccess,
-    isError: isDeletingDatabaseWidgetError,
-    error: deleteDatabaseWidgetError,
-    mutate: deleteDatabaseWidget,
-  } = useMutation({
-    mutationFn: (data) => {
-      return deleteDatabaseWidgetByIDAPI({
-        tenantID,
-        databaseWidgetID,
-      });
-    },
-    retry: false,
-    onSuccess: (data) => {
-      displaySuccess(CONSTANTS.STRINGS.DELETE_WIDGET_DELETION_SUCCESS);
-      queryClient.invalidateQueries([
-        CONSTANTS.REACT_QUERY_KEYS.DATABASE_WIDGETS(
-          tenantID
-        ),
-      ]);
-      navigate(-1);
-    },
-    onError: (error) => {
-      displayError(error);
-    },
-  });
+  const { isPending: isDeletingDatabaseWidget, mutate: deleteDatabaseWidget } =
+    useMutation({
+      mutationFn: () => {
+        return deleteDatabaseWidgetByIDAPI({
+          tenantID,
+          databaseWidgetID,
+        });
+      },
+      retry: false,
+      onSuccess: () => {
+        displaySuccess(CONSTANTS.STRINGS.DELETE_WIDGET_DELETION_SUCCESS);
+        queryClient.invalidateQueries([
+          CONSTANTS.REACT_QUERY_KEYS.DATABASE_WIDGETS(tenantID),
+        ]);
+        navigate(-1);
+      },
+      onError: (error) => {
+        displayError(error);
+      },
+    });
 
   const _handleDeleteWidget = async () => {
     await showConfirmation({

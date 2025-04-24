@@ -1,8 +1,9 @@
 import { Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
 import { useFormik } from "formik";
-import { useCallback } from "react";
+import React, { useCallback } from "react";
 import { CONSTANTS } from "../../../constants";
 import { formValidations } from "../../../utils/formValidation";
+import PropTypes from "prop-types";
 
 export const DatabaseWidgetDatasetArguments = ({
   open,
@@ -12,6 +13,15 @@ export const DatabaseWidgetDatasetArguments = ({
   initialValues,
   selectedQuery,
 }) => {
+  DatabaseWidgetDatasetArguments.propTypes = {
+    open: PropTypes.bool.isRequired,
+    onClose: PropTypes.func.isRequired,
+    datasetIndex: PropTypes.number.isRequired,
+    widgetForm: PropTypes.object.isRequired,
+    initialValues: PropTypes.object.isRequired,
+    selectedQuery: PropTypes.object.isRequired,
+  };
+
   const datasetArgumentsForm = useFormik({
     initialValues: {
       databaseQueryArgValues: {},

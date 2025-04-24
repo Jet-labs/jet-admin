@@ -1,14 +1,14 @@
-import { useTheme } from "@mui/material";
 import React from "react";
 
 import { useQuery } from "@tanstack/react-query";
+import PropTypes from "prop-types";
 import { CONSTANTS } from "../../../constants";
 import {
   getDatabaseWidgetByIDAPI,
   getDatabaseWidgetDataByIDAPI,
-  getDatabaseWidgetDataUsingWidgetAPI,
 } from "../../../data/apis/databaseWidget";
 import { DATABASE_WIDGETS_CONFIG_MAP } from "../databaseWidgetComponents/widgetConfig";
+import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 
 export const DatabaseDashboardTextWidget = ({
   tenantID,
@@ -16,8 +16,12 @@ export const DatabaseDashboardTextWidget = ({
   width,
   height,
 }) => {
-  const theme = useTheme();
-
+  DatabaseDashboardTextWidget.propTypes = {
+    tenantID: PropTypes.number.isRequired,
+    databaseWidgetID: PropTypes.number.isRequired,
+    width: PropTypes.number.isRequired,
+    height: PropTypes.number.isRequired,
+  };
   const {
     isLoading: isLoadingDatabaseWidget,
     data: databaseWidget,
@@ -36,7 +40,6 @@ export const DatabaseDashboardTextWidget = ({
     isLoading: isLoadingDatabaseWidgetData,
     data: databaseWidgetData,
     error: loadDatabaseWidgetDataError,
-    refetch: refetchDatabaseWidgetData,
   } = useQuery({
     queryKey: [
       CONSTANTS.REACT_QUERY_KEYS.DATABASE_WIDGETS(tenantID),
@@ -55,15 +58,23 @@ export const DatabaseDashboardTextWidget = ({
         height: height,
       }}
     >
-      {databaseWidget &&
-        DATABASE_WIDGETS_CONFIG_MAP[
-          databaseWidget.databaseWidgetType
-        ]?.component({
-          databaseWidgetName: databaseWidget.databaseWidgetName,
-          databaseWidgetConfig: databaseWidget.databaseWidgetConfig,
-          data: databaseWidgetData?.data,
-          refetchInterval: databaseWidget.databaseWidgetConfig.refetchInterval,
-        })}
+      <ReactQueryLoadingErrorWrapper
+        isLoading={isLoadingDatabaseWidget || isLoadingDatabaseWidgetData}
+        isFetching={isLoadingDatabaseWidget || isLoadingDatabaseWidgetData}
+        error={loadDatabaseWidgetError || loadDatabaseWidgetDataError}
+        refetch={refetchDatabaseWidget}
+      >
+        {databaseWidget &&
+          DATABASE_WIDGETS_CONFIG_MAP[
+            databaseWidget.databaseWidgetType
+          ]?.component({
+            databaseWidgetName: databaseWidget.databaseWidgetName,
+            databaseWidgetConfig: databaseWidget.databaseWidgetConfig,
+            data: databaseWidgetData?.data,
+            refetchInterval:
+              databaseWidget.databaseWidgetConfig.refetchInterval,
+          })}
+      </ReactQueryLoadingErrorWrapper>
     </div>
   );
 };

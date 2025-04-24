@@ -1,13 +1,18 @@
-import { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
+import PropTypes from "prop-types";
 
 export const DatabaseTextWidget = ({
   data,
-  refetchInterval,
   onWidgetInit,
   databaseWidgetConfig,
 }) => {
+  DatabaseTextWidget.propTypes = {
+    data: PropTypes.object,
+    onWidgetInit: PropTypes.func,
+    databaseWidgetConfig: PropTypes.object,
+  };
   const widgetRef = useRef(null);
-  
+
   useEffect(() => {
     if (widgetRef.current) {
       onWidgetInit?.(widgetRef);

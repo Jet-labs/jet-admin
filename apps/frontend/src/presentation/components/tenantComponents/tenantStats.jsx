@@ -1,11 +1,16 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
-import { FaCog, FaEdit, FaPlus, FaStoreAlt } from "react-icons/fa";
+import { FaCog, FaPlus, FaStoreAlt } from "react-icons/fa";
 import { CircularProgress } from "@mui/material";
 import { TenantLogo } from "./tenantLogo";
 import moment from "moment";
+import PropTypes from "prop-types";
+
 export const TenantStats = ({ tenants }) => {
+  TenantStats.propTypes = {
+    tenants: PropTypes.array.isRequired,
+  };
   const navigate = useNavigate();
 
   if (!tenants) {

@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 
 import { CONSTANTS } from "../../../constants";
 import { useAuthState } from "../../../logic/contexts/authContext";
+import React from "react";
 
 export const UserAvatar = () => {
   const { user } = useAuthState();

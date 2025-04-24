@@ -1,12 +1,20 @@
 import React, { useRef } from "react";
 import { CONSTANTS } from "../../../constants";
 import FileUploadIcon from "@mui/icons-material/FileUpload";
+import PropTypes from "prop-types";
+
 export const FileUpload = ({
   title,
   isUploadingLogo,
   uploadError,
   onLogoUpload,
 }) => {
+  FileUpload.propTypes = {
+    title: PropTypes.string.isRequired,
+    isUploadingLogo: PropTypes.bool.isRequired,
+    uploadError: PropTypes.bool.isRequired,
+    onLogoUpload: PropTypes.func.isRequired,
+  };
   const fileInputRef = useRef(null);
 
   const handleButtonClick = () => {

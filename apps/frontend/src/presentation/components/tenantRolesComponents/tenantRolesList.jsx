@@ -1,6 +1,6 @@
 import { useRoleManagementState, } from "../../../logic/contexts/roleManagementContext";
 import { DataGrid, gridClasses, useGridApiRef } from "@mui/x-data-grid";
-import { useEffect, useState } from "react";
+import React from "react";
 import { CONSTANTS } from "../../../constants";
 import { NoEntityUI } from "../ui/noEntityUI";
 import { useNavigate, useParams } from "react-router-dom";
@@ -10,8 +10,6 @@ export const TenantRolesList = () => {
   const { tenantRoles, isLoadingTenantRoles, isFetchingTenantRoles } =
     useRoleManagementState();
   const apiRef = useGridApiRef();
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(20);
   const navigate = useNavigate();
   const { tenantID } = useParams();
 
@@ -144,7 +142,7 @@ export const TenantRolesList = () => {
         }}
         // showCellVerticalBorder
         className="!border-0"
-        onRowClick={(params, e, details) => {
+        onRowClick={(params) => {
           _handleRowClick(params.id);
         }}
         // paginationMode="server"

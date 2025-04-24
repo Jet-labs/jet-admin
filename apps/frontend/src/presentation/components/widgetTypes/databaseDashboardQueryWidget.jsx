@@ -9,6 +9,8 @@ import {
 } from "../../../data/apis/databaseQuery";
 import { capitalize } from "@mui/material";
 import { BiChevronLeft, BiChevronRight } from "react-icons/bi";
+import PropTypes from "prop-types";
+import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 
 export const DatabaseDashboardQueryWidget = ({
   tenantID,
@@ -16,6 +18,12 @@ export const DatabaseDashboardQueryWidget = ({
   width,
   height,
 }) => {
+  DatabaseDashboardQueryWidget.propTypes = {
+    tenantID: PropTypes.number.isRequired,
+    databaseQueryID: PropTypes.number.isRequired,
+    width: PropTypes.number.isRequired,
+    height: PropTypes.number.isRequired,
+  };
   const [paginationModel, setPaginationModel] = useState({
     page: 0,
     pageSize: 10,
@@ -25,7 +33,6 @@ export const DatabaseDashboardQueryWidget = ({
     data: databaseQuery,
     error: loadDatabaseQueryError,
     isFetching: isFetchingDatabaseQuery,
-    isRefetching: isRefetechingDatabaseQuery,
     refetch: refetchDatabaseQuery,
   } = useQuery({
     queryKey: [
@@ -45,8 +52,6 @@ export const DatabaseDashboardQueryWidget = ({
     data: databaseQueryResult,
     error: loadDatabaseQueryDataError,
     isFetching: isFetchingDatabaseQueryData,
-    isRefetching: isRefetechingDatabaseQueryData,
-    refetch: refetchDatabaseQueryData,
   } = useQuery({
     queryKey: [
       CONSTANTS.REACT_QUERY_KEYS.DATABASE_QUERIES(tenantID),
@@ -137,62 +142,69 @@ export const DatabaseDashboardQueryWidget = ({
   // ... rest of the loading/error states remain the same
 
   return (
-    <div className="rounded bg-white" style={{ width, height }}>
-      <div className="px-3 py-2 min-h-[48px] flex items-center border-b border-gray-200">
-        <h2 className="text-sm font-semibold text-gray-700 truncate line-clamp-2">
-          {databaseQuery?.databaseQueryTitle || "Untitled Query"}
-        </h2>
-      </div>
+    <ReactQueryLoadingErrorWrapper
+      isLoading={isLoadingDatabaseQuery || isLoadingDatabaseQueryData}
+      error={loadDatabaseQueryError || loadDatabaseQueryDataError}
+      isFetching={isFetchingDatabaseQuery || isFetchingDatabaseQueryData}
+      refetch={refetchDatabaseQuery}
+    >
+      <div className="rounded bg-white" style={{ width, height }}>
+        <div className="px-3 py-2 min-h-[48px] flex items-center border-b border-gray-200">
+          <h2 className="text-sm font-semibold text-gray-700 truncate line-clamp-2">
+            {databaseQuery?.databaseQueryTitle || "Untitled Query"}
+          </h2>
+        </div>
 
-      <div className="h-[calc(100%-48px)] relative overflow-hidden">
-        {data?.length === 0 ? (
-          <div className="h-full w-full flex items-center justify-center">
-            <div className="bg-blue-100 text-blue-700 px-4 py-2 rounded-md">
-              No data available for this query
+        <div className="h-[calc(100%-48px)] relative overflow-hidden">
+          {data?.length === 0 ? (
+            <div className="h-full w-full flex items-center justify-center">
+              <div className="bg-blue-100 text-blue-700 px-4 py-2 rounded-md">
+                No data available for this query
+              </div>
             </div>
-          </div>
-        ) : (
-          data && (
-            <DataGrid
-              rows={data.map((item, index) => ({
-                _g_uuid: `_index_${index}`,
-                ...item,
-              }))}
-              getRowId={(row) => row._g_uuid}
-              columns={columns}
-              paginationModel={paginationModel}
-              onPaginationModelChange={setPaginationModel}
-              pageSizeOptions={[10, 25, 50]}
-              hideFooterPagination
-              slots={{
-                noRowsOverlay: () => (
-                  <div className="h-full w-full flex items-center justify-center">
-                    <div className="bg-blue-100 text-blue-700 px-4 py-2 rounded-md">
-                      No results found
+          ) : (
+            data && (
+              <DataGrid
+                rows={data.map((item, index) => ({
+                  _g_uuid: `_index_${index}`,
+                  ...item,
+                }))}
+                getRowId={(row) => row._g_uuid}
+                columns={columns}
+                paginationModel={paginationModel}
+                onPaginationModelChange={setPaginationModel}
+                pageSizeOptions={[10, 25, 50]}
+                hideFooterPagination
+                slots={{
+                  noRowsOverlay: () => (
+                    <div className="h-full w-full flex items-center justify-center">
+                      <div className="bg-blue-100 text-blue-700 px-4 py-2 rounded-md">
+                        No results found
+                      </div>
                     </div>
-                  </div>
-                ),
-                footer: CustomFooter,
-              }}
-              defaultColumnOptions={{
-                sortable: true,
-                resizable: true,
-              }}
-              sx={{
-                border: "none",
-                "& .MuiDataGrid-cell": {
-                  py: 1,
-                  fontSize: "0.875rem",
-                },
-                "& .MuiDataGrid-columnHeaders": {
-                  bgcolor: "transparent",
-                  borderBottom: "1px solid #e5e7eb",
-                },
-              }}
-            />
-          )
-        )}
+                  ),
+                  footer: CustomFooter,
+                }}
+                defaultColumnOptions={{
+                  sortable: true,
+                  resizable: true,
+                }}
+                sx={{
+                  border: "none",
+                  "& .MuiDataGrid-cell": {
+                    py: 1,
+                    fontSize: "0.875rem",
+                  },
+                  "& .MuiDataGrid-columnHeaders": {
+                    bgcolor: "transparent",
+                    borderBottom: "1px solid #e5e7eb",
+                  },
+                }}
+              />
+            )
+          )}
+        </div>
       </div>
-    </div>
+    </ReactQueryLoadingErrorWrapper>
   );
 };

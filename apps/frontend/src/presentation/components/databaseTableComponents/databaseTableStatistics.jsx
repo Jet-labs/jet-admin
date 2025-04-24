@@ -3,6 +3,8 @@ import { CircularProgress } from "@mui/material";
 import { FaGear } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
+import PropTypes from "prop-types";
+import React from "react";
 
 export const DatabaseTableStatistics = ({
   tenantID,
@@ -12,6 +14,14 @@ export const DatabaseTableStatistics = ({
   altTableName,
   databaseTableRowCount,
 }) => {
+  DatabaseTableStatistics.propTypes = {
+    tenantID: PropTypes.number.isRequired,
+    databaseSchemaName: PropTypes.string.isRequired,
+    isLoadingDatabaseTableStatistics: PropTypes.bool.isRequired,
+    databaseTableName: PropTypes.string.isRequired,
+    altTableName: PropTypes.string,
+    databaseTableRowCount: PropTypes.number.isRequired,
+  };
   const navigate = useNavigate();
   const _navigateToTableUpdate = () => {
     navigate(
@@ -30,12 +40,12 @@ export const DatabaseTableStatistics = ({
     </div>
   ) : (
     <div className=" flex flex-col justify-start items-start">
-      <div item xs={6} className="!flex !flex-row justify-start items-center">
+      <div className="!flex !flex-row justify-start items-center">
         <span className="!text-xl !font-bold text-slate-700">
           {altTableName ? altTableName : `${databaseTableName}`}
         </span>
       </div>
-      <div item xs={6} className="!flex !flex-row justify-start items-center">
+      <div className="!flex !flex-row justify-start items-center">
         <span className="!text-sm !font-normal !text-slate-500">{`Total records : ${databaseTableRowCount}`}</span>
         <button
           onClick={_navigateToTableUpdate}

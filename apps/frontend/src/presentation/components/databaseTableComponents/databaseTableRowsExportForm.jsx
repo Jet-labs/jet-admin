@@ -6,10 +6,11 @@ import {
   DialogTitle
 } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
-import { useCallback, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { CONSTANTS } from "../../../constants";
 import { databaseTableBulkRowExportAPI } from "../../../data/apis/databaseTable";
 import { displayError, displaySuccess } from "../../../utils/notification";
+import PropTypes from "prop-types";
 
 export const DatabaseTableRowsExportForm = ({
   tenantID,
@@ -21,6 +22,16 @@ export const DatabaseTableRowsExportForm = ({
   rowSelectionModel,
   multipleSelectedQuery,
 }) => {
+  DatabaseTableRowsExportForm.propTypes = {
+    tenantID: PropTypes.number.isRequired,
+    databaseSchemaName: PropTypes.string.isRequired,
+    databaseTableName: PropTypes.string.isRequired,
+    filterQuery: PropTypes.string,
+    isAllRowSelectChecked: PropTypes.bool.isRequired,
+    databaseTableRowCount: PropTypes.number.isRequired,
+    rowSelectionModel: PropTypes.array.isRequired,
+    multipleSelectedQuery: PropTypes.string,
+  };
   const [isExportRowsConfirmationOpen, setIsExportRowsConfirmationOpen] =
     useState(false);
   const [exportFormat, setExportFormat] = useState("json");
@@ -28,7 +39,6 @@ export const DatabaseTableRowsExportForm = ({
   const {
     mutate: bulkExportDatabaseTableRows,
     isPending: isBulkExportingDatabaseTableRows,
-    error: bulkExportDatabaseTableRowsError,
   } = useMutation({
     mutationFn: ({ exportFormat }) =>
       databaseTableBulkRowExportAPI({
