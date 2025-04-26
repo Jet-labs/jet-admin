@@ -1,3 +1,4 @@
+import React from "react";
 import { TenantRoleUpdationForm } from "../../components/tenantRolesComponents/tenantRoleUpdationForm";
 
 const UpdateTenantRolePage = () => {

@@ -8,6 +8,7 @@ const UpdateDatabaseChartPage = () => {
     <DatabaseChartUpdationForm
       tenantID={tenantID}
       databaseChartID={databaseChartID}
+      key={databaseChartID}
     />
   );
 };

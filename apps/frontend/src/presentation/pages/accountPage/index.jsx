@@ -13,6 +13,8 @@ import {
 import { useGlobalUI } from "../../../logic/contexts/globalUIContext";
 import { displaySuccess } from "../../../utils/notification";
 import { AccountNotificationList } from "../../components/accountComponents/accountNotificationList";
+import React from "react";
+
 
 const AccountPage = () => {
   const { user, firebaseUserState } = useAuthState();

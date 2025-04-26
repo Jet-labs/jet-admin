@@ -41,7 +41,7 @@ const initialValues = {
   ],
   databaseChartConfig: {
     responsive: true,
-    maintainAspectRatio: true,
+    maintainAspectRatio: false,
     backgroundColor: "rgba(255, 255, 255, 0)",
     color: "#666",
     plugins: {

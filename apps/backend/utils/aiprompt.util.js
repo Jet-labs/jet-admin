@@ -140,8 +140,30 @@ aiUtil.generateAIPromptForChartStyleGeneration = async ({
   aiPrompt,
 }) => {
   return `
-Based on the following chart config:
+Based on the following chart.js config:
 ${JSON.stringify(databaseChartData)}
+
+Also, custom plugin is used in the config as below to refer if user asks about background color of chart:
+
+//customCanvasBackgroundColor in chart.js options
+plugins: {
+  customCanvasBackgroundColor: {
+    backgroundColor: "#fff",
+  },
+},
+
+//frontend code of customCanvasBackgroundColor
+const plugin = {
+  id: "customCanvasBackgroundColor",
+  beforeDraw: (chart, args, options) => {
+    const { ctx } = chart;
+    ctx.save();
+    ctx.globalCompositeOperation = "destination-over";
+    ctx.fillStyle = options.backgroundColor || "#fff";
+    ctx.fillRect(0, 0, chart.width, chart.height);
+    ctx.restore();
+  },
+};
 
 Enhance the chart style based on the user's request. Follow all rules strictly.
 

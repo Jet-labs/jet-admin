@@ -89,83 +89,80 @@ export const CronJobHistoryGrid = ({ tenantID, cronJobID }) => {
                 <span className="text-xs text-[#646cff] mt-2">{`Job ID: ${cronJobID} `}</span>
               )}
             </div>
-            <DataGrid
-              ref={datagridRef}
-              apiRef={datagridAPIRef}
-              rows={cronJobHistory.cronJobHistory}
-              onRowDoubleClick={(param) => {
-                console.log({ param });
-              }}
-              autoHeight={true}
-              getRowHeight={() => "auto"}
-              columns={columns}
-              loading={isLoadingCronJobHistory}
-              getRowId={(row) => _getRowID(row)} // Custom row ID getter
-              sx={{
-                "--unstable_DataGrid-radius": "0",
-                "& .MuiDataGrid-root": {
-                  borderRadius: 0,
-                },
-                "& .MuiIconButton-root": {
-                  outline: "none",
-                },
-                "& .MuiDataGrid-cell": {
-                  fontSize: "0.875rem",
-                  lineHeight: "1.25rem",
-                  fontWeight: "400",
-                },
-                "& .MuiCheckbox-root": {
-                  padding: "4px",
-                },
-                "& .MuiDataGrid-columnHeaderCheckbox": {
-                  minWidth: "auto !important",
-                  width: "auto !important",
-                  flex: "0 0 auto !important",
-                  padding: "0.25rem !important",
-                  "& .MuiDataGrid-columnHeaderTitleContainer": {
-                    width: "auto",
-                    minWidth: "auto",
-                    flex: "none",
+            <div className="flex flex-col w-full flex-grow h-full overflow-y-auto justify-between items-stretch text-sm font-medium">
+              <DataGrid
+                ref={datagridRef}
+                apiRef={datagridAPIRef}
+                rows={cronJobHistory.cronJobHistory}
+                columns={columns}
+                loading={isLoadingCronJobHistory}
+                getRowId={(row) => _getRowID(row)} // Custom row ID getter
+                sx={{
+                  "--unstable_DataGrid-radius": "0",
+                  "& .MuiDataGrid-root": {
+                    borderRadius: 0,
                   },
-                },
-                "& .MuiDataGrid-cellCheckbox": {
-                  minWidth: "auto !important",
-                  width: "auto !important",
-                  flex: "0 0 auto !important",
-                  color: "#646cff !important",
-                  padding: "0.25rem !important",
-                },
-              }}
-              showCellVerticalBorder
-              className="!border-0"
-              disableRowSelectionOnClick
-              disableColumnFilter
-              // onSortModelChange={(model) => {
-              //   if (model.length > 0) {
-              //     const { field, sort } = model[0];
-              //     setCronJobHistoryColumnSortModel({
-              //       field: field,
-              //       order: lowerCase(sort),
-              //     });
-              //   }
-              // }}
-              paginationMode="server"
-              rowCount={
-                !isNaN(cronJobHistory?.cronJobHistoryCount)
-                  ? parseInt(cronJobHistory.cronJobHistoryCount)
-                  : 0
-              }
-              pageSizeOptions={[20, 50, 100]}
-              paginationModel={{ page: page - 1, pageSize }}
-              onPaginationModelChange={({
-                page: newPage,
-                pageSize: newPageSize,
-              }) => {
-                setPage(newPage + 1); // Convert to 1-based for API
-                setPageSize(newPageSize);
-              }}
-              hideFooterSelectedRowCount
-            />
+                  "& .MuiIconButton-root": {
+                    outline: "none",
+                  },
+                  "& .MuiDataGrid-cell": {
+                    fontSize: "0.875rem",
+                    lineHeight: "1.25rem",
+                    fontWeight: "400",
+                  },
+                  "& .MuiCheckbox-root": {
+                    padding: "4px",
+                  },
+                  "& .MuiDataGrid-columnHeaderCheckbox": {
+                    minWidth: "auto !important",
+                    width: "auto !important",
+                    flex: "0 0 auto !important",
+                    padding: "0.25rem !important",
+                    "& .MuiDataGrid-columnHeaderTitleContainer": {
+                      width: "auto",
+                      minWidth: "auto",
+                      flex: "none",
+                    },
+                  },
+                  "& .MuiDataGrid-cellCheckbox": {
+                    minWidth: "auto !important",
+                    width: "auto !important",
+                    flex: "0 0 auto !important",
+                    color: "#646cff !important",
+                    padding: "0.25rem !important",
+                  },
+                }}
+                showCellVerticalBorder
+                className="!border-0"
+                disableRowSelectionOnClick
+                disableColumnFilter
+                // onSortModelChange={(model) => {
+                //   if (model.length > 0) {
+                //     const { field, sort } = model[0];
+                //     setCronJobHistoryColumnSortModel({
+                //       field: field,
+                //       order: lowerCase(sort),
+                //     });
+                //   }
+                // }}
+                paginationMode="server"
+                rowCount={
+                  !isNaN(cronJobHistory?.cronJobHistoryCount)
+                    ? parseInt(cronJobHistory.cronJobHistoryCount)
+                    : 0
+                }
+                pageSizeOptions={[20, 50, 100]}
+                paginationModel={{ page: page - 1, pageSize }}
+                onPaginationModelChange={({
+                  page: newPage,
+                  pageSize: newPageSize,
+                }) => {
+                  setPage(newPage + 1); // Convert to 1-based for API
+                  setPageSize(newPageSize);
+                }}
+                hideFooterSelectedRowCount
+              />
+            </div>
           </div>
         ) : (
           <div className="!w-full !p-2">

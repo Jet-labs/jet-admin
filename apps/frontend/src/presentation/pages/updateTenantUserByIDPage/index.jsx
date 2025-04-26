@@ -1,5 +1,6 @@
 import { useParams } from "react-router-dom"
 import { TenantUserUpdationForm } from "../../components/tenantUsersComponents/tenantUserUpdationForm";
+import React from "react";
 
 const UpdateTenantUserByIDPage = () =>{
     const {tenantID,tenantUserID} = useParams();

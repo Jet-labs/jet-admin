@@ -1,10 +1,9 @@
 import React from "react";
-import { useParams, Link } from "react-router-dom";
+import { MdOutlineSpaceDashboard } from "react-icons/md";
+import { useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 import { useAuthState } from "../../../logic/contexts/authContext";
 import { DatabaseDashboardViewer } from "../../components/databaseDashboardComponents/databaseDashboardViewer";
-import { RiPushpinFill, RiDashboardLine } from "react-icons/ri";
-import { MdOutlineSpaceDashboard } from "react-icons/md";
 
 const ViewDatabaseDashboardPage = () => {
   const { tenantID } = useParams();

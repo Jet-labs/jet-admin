@@ -121,6 +121,7 @@ export const DatabaseChartDatasetAdvancedOptions = ({
       formValidations.datasetAdvancedOptionsFormValidationSchema,
     enableReinitialize: true,
     onSubmit: (values) => {
+      console.log({ values });
       chartForm.setFieldValue(
         `databaseQueries[${datasetIndex}].parameters`,
         values
@@ -891,90 +892,95 @@ export const DatabaseChartDatasetAdvancedOptions = ({
         {CONSTANTS.STRINGS.CHART_DATASET_ADV_TITLE}
       </DialogTitle>
       <DialogContent className="!p-4 !space-y-4">
-        <div className="grid grid-cols-3 gap-4">
-          {/* Common fields */}
-          <div className="col-span-2">
-            <label className="block mb-2 text-xs font-normal text-slate-500">
-              {CONSTANTS.STRINGS.CHART_DATASET_ADV_DATASET_TYPE_LABEL}
-            </label>
-            <select
-              value={datasetAdvancedOptionsForm.values.type}
-              onChange={(e) =>
-                datasetAdvancedOptionsForm.setFieldValue("type", e.target.value)
-              }
-              className={`placeholder:text-slate-400 text-xs bg-slate-50 border border-slate-300 text-slate-700 rounded focus:outline-none focus:border-slate-400 block w-full py-1 px-1.5`}
-            >
-              {Object.values(DATABASE_CHARTS_CONFIG_MAP).map((config) => (
-                <option key={config.value} value={config.value}>
-                  {config.label}
-                </option>
-              ))}
-            </select>
-          </div>
+        <form onSubmit={datasetAdvancedOptionsForm.handleSubmit}>
+          <div className="grid grid-cols-3 gap-4">
+            {/* Common fields */}
+            <div className="col-span-2">
+              <label className="block mb-2 text-xs font-normal text-slate-500">
+                {CONSTANTS.STRINGS.CHART_DATASET_ADV_DATASET_TYPE_LABEL}
+              </label>
+              <select
+                value={datasetAdvancedOptionsForm.values.type}
+                onChange={(e) =>
+                  datasetAdvancedOptionsForm.setFieldValue(
+                    "type",
+                    e.target.value
+                  )
+                }
+                className={`placeholder:text-slate-400 text-xs bg-slate-50 border border-slate-300 text-slate-700 rounded focus:outline-none focus:border-slate-400 block w-full py-1 px-1.5`}
+              >
+                {Object.values(DATABASE_CHARTS_CONFIG_MAP).map((config) => (
+                  <option key={config.value} value={config.value}>
+                    {config.label}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          {/* Color pickers */}
-          <div className="col-span-1">
-            <label className="block mb-2 text-xs font-normal text-slate-500">
-              {
-                CONSTANTS.STRINGS
-                  .CHART_DATASET_ADV_DATASET_BACKGROUND_COLOR_LABEL
-              }
-            </label>
-            <input
-              type="color"
-              value={datasetAdvancedOptionsForm.values.backgroundColor}
-              onChange={datasetAdvancedOptionsForm.handleChange}
-              name="backgroundColor"
-              className="placeholder:text-slate-400 text-xs w-full bg-slate-50 border border-slate-300 text-slate-700 rounded focus:outline-none focus:border-slate-400 block px-2.5 py-1.5"
-            />
-          </div>
-          <div className="col-span-1">
-            <label className="block mb-2 text-xs font-normal text-slate-500">
-              {CONSTANTS.STRINGS.CHART_DATASET_ADV_DATASET_BORDER_COLOR_LABEL}
-            </label>
-            <input
-              type="color"
-              value={datasetAdvancedOptionsForm.values.borderColor}
-              onChange={datasetAdvancedOptionsForm.handleChange}
-              name="borderColor"
-              className="placeholder:text-slate-400 text-xs w-full bg-slate-50 border border-slate-300 text-slate-700 rounded focus:outline-none focus:border-slate-400 block px-2.5 py-1.5"
-            />
-          </div>
+            {/* Color pickers */}
+            <div className="col-span-1">
+              <label className="block mb-2 text-xs font-normal text-slate-500">
+                {
+                  CONSTANTS.STRINGS
+                    .CHART_DATASET_ADV_DATASET_BACKGROUND_COLOR_LABEL
+                }
+              </label>
+              <input
+                type="color"
+                value={datasetAdvancedOptionsForm.values.backgroundColor}
+                onChange={datasetAdvancedOptionsForm.handleChange}
+                name="backgroundColor"
+                className="placeholder:text-slate-400 text-xs w-full bg-slate-50 border border-slate-300 text-slate-700 rounded focus:outline-none focus:border-slate-400 block px-2.5 py-1.5"
+              />
+            </div>
+            <div className="col-span-1">
+              <label className="block mb-2 text-xs font-normal text-slate-500">
+                {CONSTANTS.STRINGS.CHART_DATASET_ADV_DATASET_BORDER_COLOR_LABEL}
+              </label>
+              <input
+                type="color"
+                value={datasetAdvancedOptionsForm.values.borderColor}
+                onChange={datasetAdvancedOptionsForm.handleChange}
+                name="borderColor"
+                className="placeholder:text-slate-400 text-xs w-full bg-slate-50 border border-slate-300 text-slate-700 rounded focus:outline-none focus:border-slate-400 block px-2.5 py-1.5"
+              />
+            </div>
 
-          {/* Border settings */}
-          <div className="col-span-1">
-            <label className="block mb-2 text-xs font-normal text-slate-500">
-              {CONSTANTS.STRINGS.CHART_DATASET_ADV_DATASET_BORDER_WIDTH_LABEL}
-            </label>
-            <input
-              type="number"
-              value={datasetAdvancedOptionsForm.values.borderWidth}
-              onChange={datasetAdvancedOptionsForm.handleChange}
-              name="borderWidth"
-              className="placeholder:text-slate-400 text-xs w-full bg-slate-50 border border-slate-300 text-slate-700 rounded focus:outline-none focus:border-slate-400 block px-2.5 py-1.5"
-            />
-          </div>
-          <div className="col-span-1">
-            <label className="block mb-2 text-xs font-normal text-slate-500">
-              {CONSTANTS.STRINGS.CHART_DATASET_ADV_DATASET_BORDER_DASH_LABEL}
-            </label>
-            <input
-              type="text"
-              value={datasetAdvancedOptionsForm.values.borderDash.join(",")}
-              onChange={(e) =>
-                datasetAdvancedOptionsForm.setFieldValue(
-                  "borderDash",
-                  e.target.value.split(",").map(Number)
-                )
-              }
-              placeholder="e.g., 5,5"
-              className="placeholder:text-slate-400 text-xs w-full bg-slate-50 border border-slate-300 text-slate-700 rounded focus:outline-none focus:border-slate-400 block px-2.5 py-1.5"
-            />
-          </div>
+            {/* Border settings */}
+            <div className="col-span-1">
+              <label className="block mb-2 text-xs font-normal text-slate-500">
+                {CONSTANTS.STRINGS.CHART_DATASET_ADV_DATASET_BORDER_WIDTH_LABEL}
+              </label>
+              <input
+                type="number"
+                value={datasetAdvancedOptionsForm.values.borderWidth}
+                onChange={datasetAdvancedOptionsForm.handleChange}
+                name="borderWidth"
+                className="placeholder:text-slate-400 text-xs w-full bg-slate-50 border border-slate-300 text-slate-700 rounded focus:outline-none focus:border-slate-400 block px-2.5 py-1.5"
+              />
+            </div>
+            <div className="col-span-1">
+              <label className="block mb-2 text-xs font-normal text-slate-500">
+                {CONSTANTS.STRINGS.CHART_DATASET_ADV_DATASET_BORDER_DASH_LABEL}
+              </label>
+              <input
+                type="text"
+                value={datasetAdvancedOptionsForm.values.borderDash.join(",")}
+                onChange={(e) =>
+                  datasetAdvancedOptionsForm.setFieldValue(
+                    "borderDash",
+                    e.target.value.split(",").map(Number)
+                  )
+                }
+                placeholder="e.g., 5,5"
+                className="placeholder:text-slate-400 text-xs w-full bg-slate-50 border border-slate-300 text-slate-700 rounded focus:outline-none focus:border-slate-400 block px-2.5 py-1.5"
+              />
+            </div>
 
-          {/* Type-specific fields */}
-          {_renderTypeSpecificFields(datasetAdvancedOptionsForm.values.type)}
-        </div>
+            {/* Type-specific fields */}
+            {_renderTypeSpecificFields(datasetAdvancedOptionsForm.values.type)}
+          </div>
+        </form>
       </DialogContent>
       <DialogActions className="!p-4">
         <button

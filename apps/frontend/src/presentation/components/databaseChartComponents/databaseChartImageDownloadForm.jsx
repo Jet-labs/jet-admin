@@ -16,7 +16,7 @@ export const DatabaseChartDownloadForm = ({ databaseChartName, chartRef }) => {
   };
   const [isQualityDialogOpen, setIsQualityDialogOpen] = useState(false);
   const [previewData, setPreviewData] = useState(null);
-  const [selectedQuality, setSelectedQuality] = useState(1); // Default quality is 1 (high)
+  const [selectedQuality, setSelectedQuality] = useState(1);
   const _handleDownloadImage = useCallback(() => {
     if (!chartRef || !chartRef.current) {
       console.error("Chart reference is not available.");

@@ -174,20 +174,26 @@ export class PostgreSQLUtils {
 
     switch (operator) {
       case "AND":
-        return "(" + value.map(generateFilterQuery).join(" AND ") + ")";
+        return "(" + value.map(PostgreSQLUtils.generateFilterQuery).join(" AND ") + ")";
       case "OR":
-        return "(" + value.map(generateFilterQuery).join(" OR ") + ")";
+        return (
+          "(" +
+          value.map(PostgreSQLUtils.generateFilterQuery).join(" OR ") +
+          ")"
+        );
       case "NOT":
-        return "NOT (" + generateFilterQuery(value) + ")";
+        return "NOT (" + PostgreSQLUtils.generateFilterQuery(value) + ")";
       default:
         // Here, assume the operator is a field name with some filterModel
-        const field = operator;
-        const filterModelKey = Object.keys(value)[0];
-        const filterModelValue = value[filterModelKey];
-        const query = CONSTANTS.TABLE_FILTERS[
-          String(filterModelKey).toUpperCase()
-        ](field, filterModelValue);
-        return query;
+        {
+          const field = operator;
+          const filterModelKey = Object.keys(value)[0];
+          const filterModelValue = value[filterModelKey];
+          const query = CONSTANTS.TABLE_FILTERS[
+            String(filterModelKey).toUpperCase()
+          ](field, filterModelValue);
+          return query;
+        }
     }
   };
 
@@ -250,6 +256,7 @@ export class PostgreSQLUtils {
         break;
       case CONSTANTS.DATA_TYPES.INT:
         convertedValue = parseInt(value);
+        break;
       case CONSTANTS.DATA_TYPES.FLOAT:
         convertedValue = parseFloat(value);
         break;

@@ -1,12 +1,13 @@
 import { useParams, useSearchParams } from "react-router-dom";
 import { DatabaseTableGrid } from "../../components/databaseTableComponents/databaseTableGrid";
+import React from "react";
 
 /**
  *
  * @param {object} param0
  * @returns
  */
-const ViewDatabaseTablePage = ({}) => {
+const ViewDatabaseTablePage = () => {
   // Extract route parameters
   const { tenantID, databaseSchemaName, databaseTableName } = useParams();
 

@@ -1,5 +1,7 @@
 import { useParams } from "react-router-dom";
 import { DatabaseSchemaAdditionForm } from "../../components/databaseSchemaComponents/databaseSchemaAdditionForm";
+import React from "react";
+
 
 const AddSchemaPage = () => {
   const { tenantID } = useParams();

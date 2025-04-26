@@ -1,12 +1,13 @@
 import { useParams } from "react-router-dom";
 import { DatabaseTriggerView } from "../../components/databaseTriggerComponents/databaseTriggerView";
+import React from "react";
 
 /**
  *
  * @param {object} param0
  * @returns
  */
-const ViewDatabaseTriggerPage = ({}) => {
+const ViewDatabaseTriggerPage = () => {
   // Extract route parameters
   const {
     tenantID,

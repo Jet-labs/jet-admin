@@ -250,6 +250,9 @@ formValidations.datasetAdvancedOptionsFormValidationSchema = Yup.object().shape(
           CONSTANTS.DATABASE_CHART_TYPES.BAR_CHART.value,
           CONSTANTS.DATABASE_CHART_TYPES.PIE_CHART.value,
           CONSTANTS.DATABASE_CHART_TYPES.BUBBLE_CHART.value,
+          CONSTANTS.DATABASE_CHART_TYPES.RADAR_CHART.value,
+          CONSTANTS.DATABASE_CHART_TYPES.RADIAL_CHART.value,
+          CONSTANTS.DATABASE_CHART_TYPES.SCATTER_CHART.value,
         ],
         "Invalid chart type"
       ),
@@ -262,108 +265,32 @@ formValidations.datasetAdvancedOptionsFormValidationSchema = Yup.object().shape(
     clip: Yup.boolean(),
 
     // Element configuration
-    backgroundColor: Yup.string().matches(
-      /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/,
-      "Invalid color format"
-    ),
-    borderColor: Yup.string().matches(
-      /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/,
-      "Invalid color format"
-    ),
-    borderWidth: Yup.number().min(0, "Border width must be non-negative"),
-    borderDash: Yup.array().of(
-      Yup.number().min(0, "Dash values must be non-negative")
-    ),
-    borderDashOffset: Yup.number().min(0, "Dash offset must be non-negative"),
-    borderRadius: Yup.number().min(0, "Border radius must be non-negative"),
-    hoverBackgroundColor: Yup.string().matches(
-      /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/,
-      "Invalid color format"
-    ),
-    hoverBorderColor: Yup.string().matches(
-      /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/,
-      "Invalid color format"
-    ),
-    hoverBorderWidth: Yup.number().min(
-      0,
-      "Hover border width must be non-negative"
-    ),
-
-    // Type-specific configurations
-    tension: Yup.number()
-      .min(0)
-      .max(1)
-      .when("type", {
-        is: CONSTANTS.DATABASE_CHART_TYPES.LINE_CHART.value,
-        then: Yup.number().required("Tension is required for line charts"),
-      }),
-    stepped: Yup.boolean().when("type", {
-      is: CONSTANTS.DATABASE_CHART_TYPES.LINE_CHART.value,
-      then: Yup.boolean().required("Stepped is required for line charts"),
-    }),
-    pointRadius: Yup.number()
-      .min(0)
-      .when("type", {
-        is: CONSTANTS.DATABASE_CHART_TYPES.LINE_CHART.value,
-        then: Yup.number().required("Point radius is required for line charts"),
-      }),
-    pointStyle: Yup.string().when("type", {
-      is: CONSTANTS.DATABASE_CHART_TYPES.LINE_CHART.value,
-      then: Yup.string().required("Point style is required for line charts"),
-    }),
-    fill: Yup.boolean().when("type", {
-      is: CONSTANTS.DATABASE_CHART_TYPES.LINE_CHART.value,
-      then: Yup.boolean().required("Fill is required for line charts"),
-    }),
-    barPercentage: Yup.number()
-      .min(0)
-      .max(1)
-      .when("type", {
-        is: CONSTANTS.DATABASE_CHART_TYPES.BAR_CHART.value,
-        then: Yup.number().required(
-          "Bar percentage is required for bar charts"
-        ),
-      }),
-    barThickness: Yup.number()
-      .min(0)
-      .when("type", {
-        is: CONSTANTS.DATABASE_CHART_TYPES.BAR_CHART.value,
-        then: Yup.number().required("Bar thickness is required for bar charts"),
-      }),
-    maxBarThickness: Yup.number()
-      .min(0)
-      .when("type", {
-        is: CONSTANTS.DATABASE_CHART_TYPES.BAR_CHART.value,
-        then: Yup.number().required(
-          "Max bar thickness is required for bar charts"
-        ),
-      }),
-    rotation: Yup.number()
-      .min(0)
-      .max(360)
-      .when("type", {
-        is: CONSTANTS.DATABASE_CHART_TYPES.PIE_CHART.value,
-        then: Yup.number().required("Rotation is required for pie charts"),
-      }),
-    cutout: Yup.number()
-      .min(0)
-      .max(100)
-      .when("type", {
-        is: CONSTANTS.DATABASE_CHART_TYPES.PIE_CHART.value,
-        then: Yup.number().required("Cutout is required for pie charts"),
-      }),
-    radius: Yup.number()
-      .min(0)
-      .when("type", {
-        is: CONSTANTS.DATABASE_CHART_TYPES.BUBBLE_CHART.value,
-        then: Yup.number().required("Radius is required for bubble charts"),
-      }),
-    hitRadius: Yup.number()
-      .min(0)
-      .when("type", {
-        is: CONSTANTS.DATABASE_CHART_TYPES.BUBBLE_CHART.value,
-        then: Yup.number().required("Hit radius is required for bubble charts"),
-      }),
+    // backgroundColor: Yup.string().matches(
+    //   /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/,
+    //   "Invalid color format"
+    // ),
+    // borderColor: Yup.string().matches(
+    //   /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/,
+    //   "Invalid color format"
+    // ),
+    // borderWidth: Yup.number().min(0, "Border width must be non-negative"),
+    // borderDash: Yup.array().of(
+    //   Yup.number().min(0, "Dash values must be non-negative")
+    // ),
+    // borderDashOffset: Yup.number().min(0, "Dash offset must be non-negative"),
+    // borderRadius: Yup.number().min(0, "Border radius must be non-negative"),
+    // hoverBackgroundColor: Yup.string().matches(
+    //   /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/,
+    //   "Invalid color format"
+    // ),
+    // hoverBorderColor: Yup.string().matches(
+    //   /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/,
+    //   "Invalid color format"
+    // ),
+    // hoverBorderWidth: Yup.number().min(
+    //   0,
+    //   "Hover border width must be non-negative"
+    // ),
   }
 );
 
