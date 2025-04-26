@@ -81,6 +81,10 @@ const UpdateDatabaseWidgetPage = lazy(() =>
   import("../../pages/updateDatabaseWidgetPage")
 );
 
+const DatabaseWidgetLayoutLandingPage = lazy(() =>
+  import("../../pages/databaseWidgetLayoutLandingPage")
+);
+
 const AddDatabaseDashboardPage = lazy(() =>
   import("../../pages/addDatabaseDashboardPage")
 );
@@ -241,7 +245,7 @@ const router = createBrowserRouter([
             children: [
               {
                 path: CONSTANTS.ROUTES.VIEW_DATABASE_WIDGETS.code,
-                element: <AddDatabaseWidgetPage />,
+                element: <DatabaseWidgetLayoutLandingPage />,
               },
               {
                 path: CONSTANTS.ROUTES.ADD_DATABASE_WIDGET.code,

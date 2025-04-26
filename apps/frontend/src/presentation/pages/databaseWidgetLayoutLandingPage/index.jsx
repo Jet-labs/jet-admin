@@ -2,69 +2,61 @@ import React from "react";
 import { FaPlus } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
-import { useDatabaseChartsState } from "../../../logic/contexts/databaseChartsContext";
-import { DATABASE_CHARTS_CONFIG_MAP } from "../../components/chartTypes";
+import { useDatabaseWidgetsState } from "../../../logic/contexts/databaseWidgetsContext";
+import { DATABASE_WIDGETS_CONFIG_MAP } from "../../components/databaseWidgetComponents/widgetConfig";
 import { ReactQueryLoadingErrorWrapper } from "../../components/ui/reactQueryLoadingErrorWrapper";
 
-const DatabaseChartLayoutLandingPage = () => {
+
+const DatabaseWidgetLayoutLandingPage = () => {
   const { tenantID } = useParams();
   const navigate = useNavigate();
-  const { isLoadingDatabaseCharts, databaseCharts } = useDatabaseChartsState();
+  const { isLoadingDatabaseWidgets, databaseWidgets } = useDatabaseWidgetsState();
 
-  const chartTypes = Object.entries(DATABASE_CHARTS_CONFIG_MAP).map(
-    ([key, config]) => ({
-      title: `${config.label} Charts`,
-      icon: React.cloneElement(config.icon, {
-        className: "text-[#646cff] text-2xl",
-      }),
-      description: config.description,
-      count:
-        databaseCharts?.filter((chart) => chart.databaseChartType === key)
-          ?.length || 0,
-      action: () =>
-        navigate(
-          `${CONSTANTS.ROUTES.ADD_DATABASE_CHART.path(tenantID)}?type=${key}`
-        ),
-    })
-  );
+  const widgetTypes = Object.entries(DATABASE_WIDGETS_CONFIG_MAP).map(([key, config]) => ({
+    title: `${config.label} Widgets`,
+    icon: React.cloneElement(config.icon, { className: "text-[#646cff] text-2xl" }),
+    description: config.description,
+    count: databaseWidgets?.filter(widget => widget.databaseWidgetType === key)?.length || 0,
+    action: () => navigate(`${CONSTANTS.ROUTES.ADD_DATABASE_WIDGET.path(tenantID)}?type=${key}`),
+  }));
 
   return (
     <div className="w-full h-full">
       <div className="flex justify-between items-center w-full p-3 border-b border-slate-200">
         <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl">
-          {CONSTANTS.STRINGS.DATABASE_CHARTS_STATS_TITLE}
+          {CONSTANTS.STRINGS.DATABASE_WIDGETS_STATS_TITLE}
         </h1>
         <button
           onClick={() =>
-            navigate(CONSTANTS.ROUTES.ADD_DATABASE_CHART.path(tenantID))
+            navigate(CONSTANTS.ROUTES.ADD_DATABASE_WIDGET.path(tenantID))
           }
           className="flex flex-row items-center justify-center rounded bg-[#646cff]/10 px-3 py-1.5 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50 w-fit outline-none focus:outline-none"
         >
           <FaPlus className="mr-2" />
-          {CONSTANTS.STRINGS.ADD_CHART_BUTTON_TEXT}
+          {CONSTANTS.STRINGS.ADD_WIDGET_BUTTON_TEXT}
         </button>
       </div>
       <ReactQueryLoadingErrorWrapper
-        isLoading={isLoadingDatabaseCharts}
+        isLoading={isLoadingDatabaseWidgets}
         error={null}
       >
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 p-2">
-          {chartTypes.map((chartType, index) => (
+          {widgetTypes.map((widgetType, index) => (
             <div
               key={index}
               className="bg-white rounded border border-slate-200 p-4 cursor-pointer hover:border-[#646cff]"
-              onClick={chartType.action}
+              onClick={widgetType.action}
             >
               <div className="flex justify-between items-center mb-4">
-                {chartType.icon}
+                {widgetType.icon}
                 <span className="text-2xl font-bold text-slate-700">
-                  {chartType.count}
+                  {widgetType.count}
                 </span>
               </div>
               <h3 className="text-base font-semibold text-slate-700 mb-2">
-                {chartType.title}
+                {widgetType.title}
               </h3>
-              <p className="text-sm text-gray-600">{chartType.description}</p>
+              <p className="text-sm text-gray-600">{widgetType.description}</p>
             </div>
           ))}
         </div>
@@ -73,4 +65,5 @@ const DatabaseChartLayoutLandingPage = () => {
   );
 };
 
-export default DatabaseChartLayoutLandingPage;
+export default DatabaseWidgetLayoutLandingPage;
+

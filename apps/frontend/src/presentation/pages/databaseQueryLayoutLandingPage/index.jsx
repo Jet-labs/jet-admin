@@ -86,7 +86,9 @@ const DatabaseQueryLayoutLandingPage = () => {
           {CONSTANTS.STRINGS.DATABASE_QUERIES_STATS_TITLE}
         </h1>
         <button
-          onClick={() => navigate(CONSTANTS.ROUTES.ADD_DATABASE_QUERY.path(tenantID))}
+          onClick={() =>
+            navigate(CONSTANTS.ROUTES.ADD_DATABASE_QUERY.path(tenantID))
+          }
           className="flex flex-row items-center justify-center rounded bg-[#646cff]/10 px-3 py-1.5 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50 w-fit outline-none focus:outline-none"
         >
           <FaPlus className="mr-2" />
@@ -94,7 +96,7 @@ const DatabaseQueryLayoutLandingPage = () => {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 p-2">
         {categorizedQueries?.map((category, index) => (
           <div
             key={index}

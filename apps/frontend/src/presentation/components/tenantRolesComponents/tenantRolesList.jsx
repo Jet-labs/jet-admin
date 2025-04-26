@@ -1,10 +1,10 @@
-import { useRoleManagementState, } from "../../../logic/contexts/roleManagementContext";
 import { DataGrid, gridClasses, useGridApiRef } from "@mui/x-data-grid";
 import React from "react";
-import { CONSTANTS } from "../../../constants";
-import { NoEntityUI } from "../ui/noEntityUI";
 import { useNavigate, useParams } from "react-router-dom";
-import { CircularProgress } from "@mui/material";
+import { CONSTANTS } from "../../../constants";
+import { useRoleManagementState } from "../../../logic/contexts/roleManagementContext";
+import { NoEntityUI } from "../ui/noEntityUI";
+import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 
 export const TenantRolesList = () => {
   const { tenantRoles, isLoadingTenantRoles, isFetchingTenantRoles } =
@@ -69,101 +69,102 @@ export const TenantRolesList = () => {
     );
   };
 
-  return isLoadingTenantRoles || isFetchingTenantRoles ? (
-    <div
-      className={`w-full h-full !overflow-y-hidden flex justify-center items-center`}
+  return (
+    <ReactQueryLoadingErrorWrapper
+      isLoading={isLoadingTenantRoles}
+      isFetching={isFetchingTenantRoles}
     >
-      <CircularProgress />
-    </div>
-  ) : tenantRoles?.roles ? (
-    <div className="flex flex-col w-full flex-grow h-full overflow-y-auto justify-between items-stretch text-sm font-medium text-slate-700">
-      <DataGrid
-        apiRef={apiRef}
-        rows={tenantRoles.roles}
-        columns={columns}
-        density="standard"
-        loading={isLoadingTenantRoles}
-        getRowId={(row) => _getRowID(row)}
-        sx={{
-          [`& .${gridClasses.cell}:focus, & .${gridClasses.cell}:focus-within`]:
-            {
-              outline: "none",
-            },
-          [`& .${gridClasses.columnHeader}:focus, & .${gridClasses.columnHeader}:focus-within`]:
-            {
-              outline: "none",
-            },
-          "& .MuiDataGrid-columnHeader": {},
-          "& .MuiDataGrid-row": {
-            "&:hover": {
-              cursor: "pointer",
-            },
-          },
-          "& .MuiDataGrid-columnHeaderTitle": {
-            color: "#334155 !important",
-            fontWeight: "700 !important",
-          },
-          // "& .MuiDataGrid-columnSeparator": {
-          //   color: "#64748b !important",
-          // },
-          "--unstable_DataGrid-radius": "0",
-          "& .MuiDataGrid-root": {
-            borderRadius: 0,
-          },
-          "& .MuiIconButton-root": {
-            outline: "none",
-          },
-          "& .MuiDataGrid-cell": {
-            fontSize: "0.875rem",
-            lineHeight: "1.25rem",
-            fontWeight: "400",
-          },
-          "& .MuiCheckbox-root": {
-            padding: "4px",
-          },
-          "& .MuiDataGrid-columnHeaderCheckbox": {
-            minWidth: "auto !important",
-            width: "auto !important",
-            flex: "0 0 auto !important",
-            padding: "0.25rem !important",
-            "& .MuiDataGrid-columnHeaderTitleContainer": {
-              width: "auto",
-              minWidth: "auto",
-              flex: "none",
-            },
-          },
-          "& .MuiDataGrid-cellCheckbox": {
-            minWidth: "auto !important",
-            width: "auto !important",
-            flex: "0 0 auto !important",
-            color: "#646cff !important",
-            padding: "0.25rem !important",
-          },
-        }}
-        // showCellVerticalBorder
-        className="!border-0"
-        onRowClick={(params) => {
-          _handleRowClick(params.id);
-        }}
-        // paginationMode="server"
-        //   rowCount={
-        //     databaseTableStatistics
-        //       ? parseInt(databaseTableStatistics.databaseTableRowCount)
-        //       : 0
-        //   }
-        // pageSizeOptions={[20, 50, 100]}
-        // paginationModel={{ page: page - 1, pageSize }}
-        // onPaginationModelChange={({ page: newPage, pageSize: newPageSize }) => {
-        //   setPage(newPage + 1); // Convert to 1-based for API
-        //   setPageSize(newPageSize);
-        // }}
-        hideFooterPagination
-        hideFooterSelectedRowCount
-      />
-    </div>
-  ) : (
-    <div className="!w-full !p-2">
-      <NoEntityUI message={CONSTANTS.ERROR_CODES.SERVER_ERROR.message} />
-    </div>
+      {tenantRoles?.roles ? (
+        <div className="flex flex-col w-full flex-grow h-full overflow-y-auto justify-between items-stretch text-sm font-medium text-slate-700">
+          <DataGrid
+            apiRef={apiRef}
+            rows={tenantRoles.roles}
+            columns={columns}
+            density="standard"
+            loading={isLoadingTenantRoles}
+            getRowId={(row) => _getRowID(row)}
+            sx={{
+              [`& .${gridClasses.cell}:focus, & .${gridClasses.cell}:focus-within`]:
+                {
+                  outline: "none",
+                },
+              [`& .${gridClasses.columnHeader}:focus, & .${gridClasses.columnHeader}:focus-within`]:
+                {
+                  outline: "none",
+                },
+              "& .MuiDataGrid-columnHeader": {},
+              "& .MuiDataGrid-row": {
+                "&:hover": {
+                  cursor: "pointer",
+                },
+              },
+              "& .MuiDataGrid-columnHeaderTitle": {
+                color: "#334155 !important",
+                fontWeight: "700 !important",
+              },
+              // "& .MuiDataGrid-columnSeparator": {
+              //   color: "#64748b !important",
+              // },
+              "--unstable_DataGrid-radius": "0",
+              "& .MuiDataGrid-root": {
+                borderRadius: 0,
+              },
+              "& .MuiIconButton-root": {
+                outline: "none",
+              },
+              "& .MuiDataGrid-cell": {
+                fontSize: "0.875rem",
+                lineHeight: "1.25rem",
+                fontWeight: "400",
+              },
+              "& .MuiCheckbox-root": {
+                padding: "4px",
+              },
+              "& .MuiDataGrid-columnHeaderCheckbox": {
+                minWidth: "auto !important",
+                width: "auto !important",
+                flex: "0 0 auto !important",
+                padding: "0.25rem !important",
+                "& .MuiDataGrid-columnHeaderTitleContainer": {
+                  width: "auto",
+                  minWidth: "auto",
+                  flex: "none",
+                },
+              },
+              "& .MuiDataGrid-cellCheckbox": {
+                minWidth: "auto !important",
+                width: "auto !important",
+                flex: "0 0 auto !important",
+                color: "#646cff !important",
+                padding: "0.25rem !important",
+              },
+            }}
+            // showCellVerticalBorder
+            className="!border-0"
+            onRowClick={(params) => {
+              _handleRowClick(params.id);
+            }}
+            // paginationMode="server"
+            //   rowCount={
+            //     databaseTableStatistics
+            //       ? parseInt(databaseTableStatistics.databaseTableRowCount)
+            //       : 0
+            //   }
+            // pageSizeOptions={[20, 50, 100]}
+            // paginationModel={{ page: page - 1, pageSize }}
+            // onPaginationModelChange={({ page: newPage, pageSize: newPageSize }) => {
+            //   setPage(newPage + 1); // Convert to 1-based for API
+            //   setPageSize(newPageSize);
+            // }}
+            hideFooterPagination
+            hideFooterSelectedRowCount
+          />
+        </div>
+      ) : (
+        <div className="!w-full !p-2">
+          <NoEntityUI message={CONSTANTS.ERROR_CODES.SERVER_ERROR.message} />
+        </div>
+      )}
+    </ReactQueryLoadingErrorWrapper>
   );
 };

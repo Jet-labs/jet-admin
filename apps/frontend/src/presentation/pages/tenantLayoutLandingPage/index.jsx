@@ -105,8 +105,8 @@ const TenantLayoutLandingPage = () => {
       error={tenantError}
     >
       {tenant ? (
-        <div className="bg-gray-50 h-full w-full p-6">
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+        <div className="bg-gray-50 h-full w-full p-2">
+          <div className="bg-white rounded border border-gray-200 p-4 mb-2">
             <div className="flex items-center mb-4">
               {tenant.tenantLogoURL ? (
                 <TenantLogo
@@ -127,7 +127,7 @@ const TenantLayoutLandingPage = () => {
               </div>
             </div>
 
-            <div className="border-t border-gray-200 pt-4 mt-4">
+            <div className=" pt-2 mt-2">
               <h2 className="text-base font-semibold text-slate-700 mb-2">
                 Database Connection
               </h2>
@@ -144,11 +144,11 @@ const TenantLayoutLandingPage = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2">
             {tenantCards.map((card, index) => (
               <div
                 key={index}
-                className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 cursor-pointer hover:shadow-md transition-shadow"
+                className="bg-white rounded border border-gray-200 p-6 cursor-pointer hover:border-[#646cff]"
                 onClick={card.action}
               >
                 <div className="flex justify-between items-center mb-4">

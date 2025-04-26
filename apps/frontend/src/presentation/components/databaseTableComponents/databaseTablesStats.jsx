@@ -28,7 +28,7 @@ export const DatabaseTableStats = ({ databaseTables }) => {
         {CONSTANTS.STRINGS.DATABASE_TABLES_STATS_TITLE}
       </h1>
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 p-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 p-2">
         {/* Total Tables */}
         <div className="bg-white rounded border border-slate-200 p-4 flex flex-col justify-start items-start space-x-4">
           <div className="flex flex-row justify-start items-center">

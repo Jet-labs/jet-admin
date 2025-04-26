@@ -868,6 +868,8 @@ export const CONSTANTS = {
     DATABASE_CHARTS_STATS_TITLE: "Charts Stats",
     DATABASE_QUERIES_STATS_TITLE: "Queries Stats",
     QUERY_EXECUTED_SUCCESSFULLY: "Query executed successfully",
+
+    DATABASE_WIDGETS_STATS_TITLE: "Widgets Stats",
     RAW_QUERY_EXCECUTOR_TITLE: "Raw SQL Query Executor",
     RAW_QUERY_EXCECUTOR_DESCRIPTION:
       "Execute raw SQL queries against your database",
