@@ -59,7 +59,7 @@ export const DatabaseChartDrawerList = () => {
             } mr-3 !text-base`}
           />
         );
-      case CONSTANTS.DATABASE_CHART_TYPES.RADIAL_CHART.value:
+      case CONSTANTS.DATABASE_CHART_TYPES.POLAR_AREA.value:
         return (
           <PiChartPolar
             className={`${

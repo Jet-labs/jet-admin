@@ -366,15 +366,6 @@ const chartOptions = [
     category: "Polar Area",
     relevantCharts: ["polarArea"],
   },
-  {
-    name: "Spacing",
-    key: "databaseChartConfig.spacing",
-    type: "number",
-    description: "Space between data sets.",
-    defaultValue: 0,
-    category: "Polar Area",
-    relevantCharts: ["polarArea"],
-  },
   // --- Scatter Chart Options ---
   {
     name: "Show X Axis",

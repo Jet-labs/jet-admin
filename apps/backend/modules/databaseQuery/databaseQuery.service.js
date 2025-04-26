@@ -360,6 +360,7 @@ databaseQueryService.runDatabaseQueries = async ({
                     tenantID,
                     processedQuery,
                     processedQueryValues,
+                    databaseQuery,
                   },
                 });
 
@@ -374,6 +375,16 @@ databaseQueryService.runDatabaseQueries = async ({
                     },
                     data: {
                       databaseQueryResultSchema: databaseQueryResultSchema,
+                    },
+                  });
+                  Logger.log("info", {
+                    message:
+                      "databaseQueryService:runDatabaseQueries:updateDatabaseQueryResultSchema",
+                    params: {
+                      userID,
+                      tenantID,
+                      databaseQueryID: databaseQuery.databaseQueryID,
+                      databaseQueryResultSchema,
                     },
                   });
                 }

@@ -81,7 +81,7 @@ export const getDemoData = (type) => {
       };
     case CONSTANTS.DATABASE_CHART_TYPES.PIE_CHART.value:
     case CONSTANTS.DATABASE_CHART_TYPES.RADAR_CHART.value:
-    case CONSTANTS.DATABASE_CHART_TYPES.RADIAL_CHART.value:
+    case CONSTANTS.DATABASE_CHART_TYPES.POLAR_AREA.value:
       return {
         labels,
         datasets: [commonDatasetProps],

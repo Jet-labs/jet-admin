@@ -1,7 +1,7 @@
 import { CircularProgress } from "@mui/material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { CONSTANTS } from "../../../constants";
 import {
   createDatabaseChartAPI,
@@ -71,6 +71,8 @@ export const DatabaseChartAdditionForm = ({ tenantID }) => {
   DatabaseChartAdditionForm.propTypes = {
     tenantID: PropTypes.number.isRequired,
   };
+  const uniqueKey = useRef(`databaseChartAdditionForm_${Date.now()}`);
+  console.log({ uniqueKey });
   const queryClient = useQueryClient();
   const [databaseChartFetchedData, setDatabaseChartFetchedData] =
     useState(null);
@@ -156,10 +158,12 @@ export const DatabaseChartAdditionForm = ({ tenantID }) => {
         <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl text-start">
           {CONSTANTS.STRINGS.ADD_CHART_FORM_TITLE}
         </h1>
-        {tenantID && (
+        {tenantID && uniqueKey && uniqueKey.current && (
           <DatabaseChartAIGeneratePrompt
             tenantID={tenantID}
             onAccepted={_handleOnChartConfigAccepted}
+            key={`databaseChartAIGeneratePrompt_${uniqueKey.current}`}
+
             // onAccepted={() => {}}
           />
         )}
@@ -177,11 +181,11 @@ export const DatabaseChartAdditionForm = ({ tenantID }) => {
             className="w-full h-full p-2 flex flex-col justify-start items-stretch gap-2 overflow-y-auto"
             onSubmit={addDatabaseChartForm.handleSubmit}
           >
-            {addDatabaseChartForm && (
+            {addDatabaseChartForm && uniqueKey && uniqueKey.current && (
               <DatabaseChartEditor
                 databaseChartEditorForm={addDatabaseChartForm}
                 tenantID={tenantID}
-                key={JSON.stringify(addDatabaseChartForm.values)}
+                key={`databaseChartEditor_${uniqueKey.current}`}
               />
             )}
             <button
@@ -202,17 +206,20 @@ export const DatabaseChartAdditionForm = ({ tenantID }) => {
         </ResizablePanel>
         <ResizableHandle withHandle={true} />
         <ResizablePanel defaultSize={80}>
-          <DatabaseChartPreview
-            databaseChartName={addDatabaseChartForm.values.databaseChartName}
-            databaseChartType={addDatabaseChartForm.values.databaseChartType}
-            databaseChartConfig={
-              addDatabaseChartForm.values.databaseChartConfig
-            }
-            refreshData={_handleFetchDatabaseChartData}
-            isFetchingData={isFetchingDatabaseChartData}
-            isRefreshingData={isFetchingDatabaseChartData}
-            data={databaseChartFetchedData}
-          />
+          {uniqueKey && uniqueKey.current && (
+            <DatabaseChartPreview
+              databaseChartName={addDatabaseChartForm.values.databaseChartName}
+              databaseChartType={addDatabaseChartForm.values.databaseChartType}
+              databaseChartConfig={
+                addDatabaseChartForm.values.databaseChartConfig
+              }
+              refreshData={_handleFetchDatabaseChartData}
+              isFetchingData={isFetchingDatabaseChartData}
+              isRefreshingData={isFetchingDatabaseChartData}
+              data={databaseChartFetchedData}
+              key={`databaseChartPreview_${uniqueKey.current}`}
+            />
+          )}
         </ResizablePanel>
       </ResizablePanelGroup>
     </div>

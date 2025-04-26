@@ -316,8 +316,8 @@ databaseChartService.getDatabaseChartDataByID = async ({
           databaseQueriesResult,
         });
         break;
-      case constants.DATABASE_CHART_TYPES.RADIAL_CHART.value:
-        processedData = databaseChartProcessor.processRadialChartQueryResults({
+      case constants.DATABASE_CHART_TYPES.POLAR_AREA.value:
+        processedData = databaseChartProcessor.processPolarAreaChartQueryResults({
           databaseChart,
           databaseQueriesResult,
         });
@@ -477,8 +477,8 @@ databaseChartService.getDatabaseChartDataUsingDatabaseChart = async ({
           databaseQueriesResult,
         });
         break;
-      case constants.DATABASE_CHART_TYPES.RADIAL_CHART.value:
-        processedData = databaseChartProcessor.processRadialChartQueryResults({
+      case constants.DATABASE_CHART_TYPES.POLAR_AREA.value:
+        processedData = databaseChartProcessor.processPolarAreaChartQueryResults({
           databaseChart,
           databaseQueriesResult,
         });

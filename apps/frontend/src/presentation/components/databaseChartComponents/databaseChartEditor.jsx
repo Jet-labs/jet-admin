@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { DragDropContext, Droppable } from "react-beautiful-dnd";
 import { FaPlus } from "react-icons/fa";
 import { CONSTANTS } from "../../../constants";
@@ -17,6 +17,7 @@ export const DatabaseChartEditor = ({ databaseChartEditorForm, tenantID }) => {
     databaseChartEditorForm: PropTypes.object.isRequired,
     tenantID: PropTypes.number.isRequired,
   };
+  const uniqueKey = useRef(`databaseChartEditor_${Date.now()}`);
   const {
     databaseQueries,
     isLoadingDatabaseQueries,
@@ -126,47 +127,54 @@ export const DatabaseChartEditor = ({ databaseChartEditorForm, tenantID }) => {
           </select>
         </div>
       </div>
-      <DatabaseChartAIStylePrompt
-        tenantID={tenantID}
-        onAccepted={_handleOnChartStyleAccepted}
-        key={JSON.stringify(databaseChartEditorForm.values)}
-        databaseChartData={{
-          ...databaseChartEditorForm.values,
-          databaseQueries: databaseChartEditorForm.values.databaseQueries?.map(
-            (q) => ({
-              ...q,
-              databaseQuery: {
-                databaseQueryTitle: q?.databaseQuery?.databaseQueryTitle,
-                databaseQueryData: q?.databaseQuery?.databaseQueryData,
-              },
-              datasetFields: q?.datasetFields,
-              databaseQueryArgValues: q?.databaseQueryArgValues,
-              parameters: q?.parameters,
-            })
-          ),
-        }}
-      />
-
-      {databaseChartEditorForm && databaseChartEditorForm.values && (
-        <div className="flex flex-col justify-start items-stretch gap-2 p-2 rounded bg-slate-100">
-          <CollapseComponent
-            showButtonText={CONSTANTS.STRINGS.CHART_EDITOR_FORM_ADVANCED_BUTTON}
-            hideButtonText={"Hide"}
-            containerClass={"p-0"}
-            content={() => (
-              <DatabaseChartAdvancedOptions
-                chartForm={databaseChartEditorForm}
-                initialValues={
-                  databaseChartEditorForm.values.databaseChartConfig
-                }
-                parentChartType={
-                  databaseChartEditorForm.values.databaseChartType
-                }
-              />
-            )}
-          />
-        </div>
+      {uniqueKey && uniqueKey.current && (
+        <DatabaseChartAIStylePrompt
+          tenantID={tenantID}
+          onAccepted={_handleOnChartStyleAccepted}
+          key={`databaseChartAIStylePrompt_${uniqueKey.current}`}
+          databaseChartData={{
+            ...databaseChartEditorForm.values,
+            databaseQueries:
+              databaseChartEditorForm.values.databaseQueries?.map((q) => ({
+                ...q,
+                databaseQuery: {
+                  databaseQueryTitle: q?.databaseQuery?.databaseQueryTitle,
+                  databaseQueryData: q?.databaseQuery?.databaseQueryData,
+                },
+                datasetFields: q?.datasetFields,
+                databaseQueryArgValues: q?.databaseQueryArgValues,
+                parameters: q?.parameters,
+              })),
+          }}
+        />
       )}
+
+      {databaseChartEditorForm &&
+        databaseChartEditorForm.values &&
+        uniqueKey &&
+        uniqueKey.current && (
+          <div className="flex flex-col justify-start items-stretch gap-2 p-2 rounded bg-slate-100">
+            <CollapseComponent
+              showButtonText={
+                CONSTANTS.STRINGS.CHART_EDITOR_FORM_ADVANCED_BUTTON
+              }
+              hideButtonText={"Hide"}
+              containerClass={"p-0"}
+              key={`databaseChartAdvancedOptions_${uniqueKey.current}`}
+              content={() => (
+                <DatabaseChartAdvancedOptions
+                  chartForm={databaseChartEditorForm}
+                  initialValues={
+                    databaseChartEditorForm.values.databaseChartConfig
+                  }
+                  parentChartType={
+                    databaseChartEditorForm.values.databaseChartType
+                  }
+                />
+              )}
+            />
+          </div>
+        )}
       <div className="flex flex-col justify-start items-stretch gap-2 p-2 rounded bg-slate-100">
         <div>
           <label
@@ -221,32 +229,38 @@ export const DatabaseChartEditor = ({ databaseChartEditorForm, tenantID }) => {
                 ref={provided.innerRef}
                 className="space-y-2 h-full overflow-y-auto"
               >
-                {databaseChartEditorForm.values.databaseQueries?.map(
-                  (query, index) => {
-                    return DATABASE_CHARTS_CONFIG_MAP[
-                      databaseChartEditorForm.values?.databaseQueries?.[index]
-                        ?.parameters?.type ||
-                        databaseChartEditorForm.values.databaseChartType
-                    ] ? (
-                      <DatabaseChartDatasetField
-                        key={query.tempId} // Unique key from tempId
-                        index={index}
-                        chartForm={databaseChartEditorForm}
-                        databaseQueries={databaseQueries}
-                        datasetFields={
-                          DATABASE_CHARTS_CONFIG_MAP[
-                            databaseChartEditorForm.values?.databaseQueries?.[
-                              index
-                            ]?.parameters?.type ||
-                              databaseChartEditorForm.values.databaseChartType
-                          ].datasetFields
-                        }
-                        selectedQueryForTesting={selectedQueryForTesting}
-                        setSelectedQueryForTesting={setSelectedQueryForTesting}
-                      />
-                    ) : null;
-                  }
-                )}
+                {uniqueKey &&
+                  uniqueKey.current &&
+                  databaseChartEditorForm.values.databaseQueries?.map(
+                    (query, index) => {
+                      const key = `databaseChartDatasetField_${uniqueKey.current}_${index}`;
+                      console.log({ key });
+                      return DATABASE_CHARTS_CONFIG_MAP[
+                        databaseChartEditorForm.values?.databaseQueries?.[index]
+                          ?.parameters?.type ||
+                          databaseChartEditorForm.values.databaseChartType
+                      ] ? (
+                        <DatabaseChartDatasetField
+                          key={key} // Unique key from tempId
+                          index={index}
+                          chartForm={databaseChartEditorForm}
+                          databaseQueries={databaseQueries}
+                          datasetFields={
+                            DATABASE_CHARTS_CONFIG_MAP[
+                              databaseChartEditorForm.values?.databaseQueries?.[
+                                index
+                              ]?.parameters?.type ||
+                                databaseChartEditorForm.values.databaseChartType
+                            ].datasetFields
+                          }
+                          selectedQueryForTesting={selectedQueryForTesting}
+                          setSelectedQueryForTesting={
+                            setSelectedQueryForTesting
+                          }
+                        />
+                      ) : null;
+                    }
+                  )}
                 {provided.placeholder}
               </div>
             )}

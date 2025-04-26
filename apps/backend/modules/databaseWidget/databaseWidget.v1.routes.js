@@ -45,6 +45,7 @@ router.get(
 router.get(
   "/:databaseWidgetID/data",
   param("databaseWidgetID")
+    .exists()
     .isNumeric()
     .withMessage("databaseWidgetID must be a number"),
   expressUtils.validationChecker,
@@ -54,9 +55,6 @@ router.get(
 
 router.post(
   "/:databaseWidgetID/data",
-  param("databaseWidgetID")
-    .isNumeric()
-    .withMessage("databaseWidgetID must be a number"),
   expressUtils.validationChecker,
   authMiddleware.checkUserPermissions(["tenant:widget:test"]),
   databaseWidgetController.getDatabaseWidgetDataUsingDatabaseWidget

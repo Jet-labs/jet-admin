@@ -122,7 +122,7 @@ export const MainDrawerList = () => {
             >
               <BsServer className="!w-5 !h-5 !text-slate-600 ml-1" />
               <span className="flex-1 ms-2 text-left font-semibold rtl:text-right whitespace-nowrap text-slate-700">
-                {CONSTANTS.STRINGS.MAIN_DRAWER_DATABASE_SCHEMA_TITLE}
+                {CONSTANTS.STRINGS.MAIN_DRAWER_DATABASE_TITLE}
               </span>
               {menuItemExpandedState.databaseSchema ? (
                 <KeyboardArrowUpIcon fontSize="small" />

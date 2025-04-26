@@ -46,7 +46,7 @@ Generate chart configuration in EXACTLY this JSON format:
 {
   "output": {
     "databaseChartTitle":"Appropriate title for chart",
-    "databaseChartType": "line|bar|pie|scatter|bubble|radar|radial",
+    "databaseChartType": "line|bar|pie|scatter|bubble|radar",
     "databaseChartConfig": {
       "plugins": {},
       "xStacked": boolean,

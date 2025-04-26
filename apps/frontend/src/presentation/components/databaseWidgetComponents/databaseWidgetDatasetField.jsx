@@ -57,6 +57,8 @@ export const DatabaseWidgetDatasetField = ({
       : null;
   }, [databaseQueries, widgetForm.values.databaseQueries, index]);
 
+  console.log({ selectedQuery });
+
   const _handleTestQuery = useCallback(() => {
     setSelectedQueryForTesting(selectedQuery);
   }, [selectedQuery, setSelectedQueryForTesting]);

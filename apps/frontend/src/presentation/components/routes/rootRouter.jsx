@@ -118,6 +118,10 @@ const ViewCronJobHistoryPage = lazy(() =>
   import("../../pages/viewCronJobHistoryPage")
 );
 
+const DatabaseSchemaLandingPage = lazy(() =>
+  import("../../pages/databaseSchemaLandingPage")
+);
+
 const router = createBrowserRouter([
   {
     element: <RootLayout />,
@@ -154,9 +158,7 @@ const router = createBrowserRouter([
             children: [
               {
                 path: CONSTANTS.ROUTES.VIEW_SCHEMA.code,
-                element: () => {
-                  return <div>placeholder page</div>;
-                },
+                element: <DatabaseSchemaLandingPage />,
               },
               {
                 element: <DatabaseTableLayout />,

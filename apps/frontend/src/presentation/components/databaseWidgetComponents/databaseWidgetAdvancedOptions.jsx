@@ -2,13 +2,29 @@ import React, { useCallback } from "react";
 import PropTypes from "prop-types";
 
 const widgetOptions = [
+  // Widget Layout Options
+  {
+    name: "Title enabled",
+    key: "databaseWidgetConfig.titleEnabled",
+    type: "boolean",
+    description: "Enable or disable the widget title",
+    relevantWidgets: ["text"],
+  },
+  {
+    name: "Title CSS Class",
+    key: "databaseWidgetConfig.titleTailwindCss",
+    type: "text",
+    description: "Tailwind CSS classes for the title",
+    relevantWidgets: ["text"],
+  },
+
   // Container CSS Options
   {
     name: "Container CSS Class",
     key: "databaseWidgetConfig.containerTailwindCss",
     type: "text",
     description: "Tailwind CSS classes for the container",
-    relevantWidgets: [],
+    relevantWidgets: ["text"],
   },
   {
     name: "Widget CSS Class",
@@ -246,29 +262,8 @@ const widgetOptions = [
     description: "Outer spacing (e.g., 10px, 1rem)",
     relevantWidgets: ["text"],
   },
-  {
-    name: "Padding",
-    key: "databaseWidgetConfig.widgetCss.padding",
-    type: "text",
-    description: "Inner spacing (e.g., 10px, 1rem)",
-    relevantWidgets: ["text"],
-  },
 
   // Widget Size and Position
-  {
-    name: "Width",
-    key: "databaseWidgetConfig.widgetCss.width",
-    type: "text",
-    description: "Width (e.g., 100%, 200px)",
-    relevantWidgets: ["text"],
-  },
-  {
-    name: "Height",
-    key: "databaseWidgetConfig.widgetCss.height",
-    type: "text",
-    description: "Height (e.g., 100%, 200px)",
-    relevantWidgets: ["text"],
-  },
   {
     name: "Min Width",
     key: "databaseWidgetConfig.widgetCss.minWidth",
@@ -331,6 +326,11 @@ export const DatabaseWidgetAdvancedOptions = ({
     widgetForm: PropTypes.object.isRequired,
     parentWidgetType: PropTypes.string.isRequired,
   };
+
+  console.log({
+    widgetForm: widgetForm?.values?.databaseWidgetConfig?.titleEnabled,
+  });
+
   const renderOption = useCallback(
     (option) => {
       const {
@@ -352,7 +352,7 @@ export const DatabaseWidgetAdvancedOptions = ({
         key,
         className:
           "w-full text-xs p-1.5 bg-slate-50 border border-slate-300 rounded",
-        value: formValue || "",
+        value: formValue,
         onChange: (e) => {
           const value =
             type === "number"
@@ -370,7 +370,7 @@ export const DatabaseWidgetAdvancedOptions = ({
           return (
             <select
               {...commonProps}
-              className="placeholder:text-slate-400 text-xs bg-slate-50 border border-slate-300 text-slate-700 rounded focus:outline-none focus:border-slate-400 block w-full px-1.5 py-1"
+              className="placeholder:text-slate-400 text-xs bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:outline-none focus:border-slate-400 block w-full px-1.5 py-1"
             >
               <option value={"true"} className="text-slate-500 text-xs">
                 Yes

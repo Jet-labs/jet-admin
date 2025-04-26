@@ -18,7 +18,7 @@ export const ChartWrapper = forwardRef(
       line: Line,
       pie: Pie,
       radar: Radar,
-      radial: PolarArea,
+      polarArea: PolarArea,
       bubble: Bubble,
       scatter: Scatter,
     }[type];

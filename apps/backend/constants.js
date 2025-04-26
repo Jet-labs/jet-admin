@@ -151,9 +151,9 @@ const constants = {
       name: "Radar Chart",
       value: "radar",
     },
-    RADIAL_CHART: {
+    POLAR_AREA: {
       name: "Radial Bar Chart",
-      value: "radial",
+      value: "polarArea",
     },
   },
 

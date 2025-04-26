@@ -248,7 +248,7 @@ databaseChartProcessor.processScatterChartQueryResults = ({
  * @param {Array<Object>} params.queryResults - Array of query results from execution
  * @returns {Object} Chart.js compatible data structure with labels and datasets
  */
-databaseChartProcessor.processRadialChartQueryResults = ({
+databaseChartProcessor.processPolarAreaChartQueryResults = ({
   databaseChart,
   queryResults,
 }) => {

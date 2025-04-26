@@ -5,7 +5,7 @@ import { CONSTANTS } from "../../../constants";
 export const PolarAreaChartComponent = (props) => {
   return (
     <BaseChartComponent
-      type={CONSTANTS.DATABASE_CHART_TYPES.RADIAL_CHART.value}
+      type={CONSTANTS.DATABASE_CHART_TYPES.POLAR_AREA.value}
       {...props}
     />
   );

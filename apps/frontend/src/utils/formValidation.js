@@ -251,7 +251,7 @@ formValidations.datasetAdvancedOptionsFormValidationSchema = Yup.object().shape(
           CONSTANTS.DATABASE_CHART_TYPES.PIE_CHART.value,
           CONSTANTS.DATABASE_CHART_TYPES.BUBBLE_CHART.value,
           CONSTANTS.DATABASE_CHART_TYPES.RADAR_CHART.value,
-          CONSTANTS.DATABASE_CHART_TYPES.RADIAL_CHART.value,
+          CONSTANTS.DATABASE_CHART_TYPES.POLAR_AREA.value,
           CONSTANTS.DATABASE_CHART_TYPES.SCATTER_CHART.value,
         ],
         "Invalid chart type"

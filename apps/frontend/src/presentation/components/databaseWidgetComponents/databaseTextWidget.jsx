@@ -2,11 +2,13 @@ import React, { useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 
 export const DatabaseTextWidget = ({
+  databaseWidgetName,
   data,
   onWidgetInit,
   databaseWidgetConfig,
 }) => {
   DatabaseTextWidget.propTypes = {
+    databaseWidgetName: PropTypes.string.isRequired,
     data: PropTypes.object,
     onWidgetInit: PropTypes.func,
     databaseWidgetConfig: PropTypes.object,
@@ -27,12 +29,18 @@ export const DatabaseTextWidget = ({
   };
 
   return (
-    <span
-      ref={widgetRef}
-      style={widgetStyle}
-      className={`${widgetTailwindCss}`}
-    >
-      {data && data.text ? data.text : "Invalid data"}
-    </span>
+    <div ref={widgetRef} style={widgetStyle} className={`${widgetTailwindCss}`}>
+      {databaseWidgetConfig.titleEnabled && (
+        <h2
+          className={
+            "text-sm font-semibold text-gray-700 truncate line-clamp-2 " +
+            databaseWidgetConfig.titleTailwindCss
+          }
+        >
+          {databaseWidgetName}
+        </h2>
+      )}
+      <span>{data && data.text ? data.text : "Invalid data"}</span>
+    </div>
   );
 };

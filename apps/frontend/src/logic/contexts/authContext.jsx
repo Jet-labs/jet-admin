@@ -193,7 +193,6 @@ const AuthContextProvider = ({ children }) => {
 
   const updateUserConfigKey = useCallback(
     ({ tenantID, key, value }) => {
-      console.log("updateUserConfigKey", tenantID, key, value);
       updateUserConfig({
         tenantID,
         config: { ...userConfig, [key]: value },

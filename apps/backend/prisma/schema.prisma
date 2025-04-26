@@ -136,14 +136,14 @@ model tblDatabaseChartQueryMappings {
   databaseChartID        Int
   databaseQueryID        Int
   parameters             Json?
-  title                  String?
+  title                  String
   executionOrder         Int?
   datasetFields          Json?
   databaseQueryArgValues Json?
   tblDatabaseCharts      tblDatabaseCharts  @relation(fields: [databaseChartID], references: [databaseChartID], onDelete: Cascade, onUpdate: NoAction)
   tblDatabaseQueries     tblDatabaseQueries @relation(fields: [databaseQueryID], references: [databaseQueryID], onDelete: Cascade, onUpdate: NoAction)
 
-  @@id([databaseChartID, databaseQueryID])
+  @@id([databaseChartID, databaseQueryID, title])
 }
 
 model tblDatabaseCharts {
@@ -217,14 +217,14 @@ model tblDatabaseWidgetQueryMappings {
   databaseWidgetID       Int
   databaseQueryID        Int
   parameters             Json?
-  title                  String?            @db.VarChar
+  title                  String             @db.VarChar
   executionOrder         Int?
   datasetFields          Json?
   databaseQueryArgValues Json?
   tblDatabaseQueries     tblDatabaseQueries @relation(fields: [databaseQueryID], references: [databaseQueryID], onDelete: Cascade, onUpdate: NoAction, map: "fk_tblDatabaseWidgetQueryMappings_tblDatabaseQueries")
   tblDatabaseWidgets     tblDatabaseWidgets @relation(fields: [databaseWidgetID], references: [databaseWidgetID], onDelete: Cascade, onUpdate: NoAction, map: "fk_tblDatabaseWidgetQueryMappings_tblDatabaseWidgets")
 
-  @@id([databaseWidgetID, databaseQueryID])
+  @@id([databaseWidgetID, databaseQueryID, title])
 }
 
 model tblDatabaseWidgets {

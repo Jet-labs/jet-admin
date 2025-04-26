@@ -21,6 +21,11 @@ export const DatabaseQueryTestingForm = ({
     databaseQueryArgs: PropTypes.array.isRequired,
     setDatabaseQueryTestResult: PropTypes.func.isRequired,
   };
+  console.log({
+    databaseQueryID,
+    databaseQueryString,
+    databaseQueryArgs,
+  });
   const [isArgsFormOpen, setIsArgsFormOpen] = useState(false);
 
   const { isPending: isTestingDatabaseQuery, mutate: testDatabaseQuery } =

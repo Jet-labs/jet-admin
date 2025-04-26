@@ -73,7 +73,7 @@ export const DatabaseDashboardWidgetList = ({ tenantID }) => {
         return <TbChartScatter className="text-slate-700 mr-3 !text-xl" />;
       case CONSTANTS.DATABASE_CHART_TYPES.RADAR_CHART.value:
         return <AiOutlineRadarChart className="text-slate-700 mr-3 !text-xl" />;
-      case CONSTANTS.DATABASE_CHART_TYPES.RADIAL_CHART.value:
+      case CONSTANTS.DATABASE_CHART_TYPES.POLAR_AREA.value:
         return <PiChartPolar className="text-slate-700 mr-3 !text-xl" />;
       default:
         return <FaChartBar className="text-slate-700 mr-3 !text-xl" />;

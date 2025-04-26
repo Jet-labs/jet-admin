@@ -76,9 +76,9 @@ export const DATABASE_CHARTS_CONFIG_MAP = {
     ),
     icon: <FaChartPie className="!text-lg" />,
   },
-  radial: {
-    label: "Radial",
-    value: CONSTANTS.DATABASE_CHART_TYPES.RADIAL_CHART.value,
+  polarArea: {
+    label: "PolarArea",
+    value: CONSTANTS.DATABASE_CHART_TYPES.POLAR_AREA.value,
     datasetFields: ["label", "value"],
     description: "Display data in a circular gauge format",
     component: ({

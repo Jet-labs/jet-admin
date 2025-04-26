@@ -48,7 +48,7 @@ export const CONSTANTS = {
     ROW_EXPORT_CONFIRMATION_CANCEL_BUTTON: "Cancel",
     ROW_EXPORT_CONFIRMATION_BUTTON: "Export rows",
     EXPORT_BUTTON_TEXT: "Export data",
-    MAIN_DRAWER_DATABASE_SCHEMA_TITLE: "Database Schemas",
+    MAIN_DRAWER_DATABASE_TITLE: "Database",
     MAIN_DRAWER_DATABASE_DASHBOARDS_TITLE: "Dashboards",
     MAIN_DRAWER_DATABASE_CHARTS_TITLE: "Charts",
     MAIN_DRAWER_DATABASE_WIDGETS_TITLE: "Widgets",
@@ -1397,7 +1397,10 @@ export const CONSTANTS = {
     },
   },
 
-  USER_CONFIG_KEYS: { DEFAULT_DASHBOARD_ID: "DEFAULT_DASHBOARD_ID" },
+  USER_CONFIG_KEYS: {
+    DEFAULT_DASHBOARD_ID: "DEFAULT_DASHBOARD_ID",
+    DEFAULT_SCHEMA_DASHBAORD_ID: "DEFAULT_SCHEMA_DASHBAORD_ID",
+  },
   REACT_QUERY_KEYS: {
     DB_USER: "DB_USER",
     DB_USER_CONFIG: "DB_USER_CONFIG",
@@ -1812,9 +1815,9 @@ export const CONSTANTS = {
       name: "Radar Chart",
       value: "radar",
     },
-    RADIAL_CHART: {
-      name: "Radial Bar Chart",
-      value: "radial",
+    POLAR_AREA: {
+      name: "Polar Area Chart",
+      value: "polarArea",
     },
   },
 
