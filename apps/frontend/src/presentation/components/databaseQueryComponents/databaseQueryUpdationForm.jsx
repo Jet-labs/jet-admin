@@ -23,6 +23,7 @@ import {
 import { formValidations } from "../../../utils/formValidation";
 import PropTypes from "prop-types";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
+import { DatabaseQueryCloneForm } from "./databaseQueryCloneForm";
 
 export const DatabaseQueryUpdationForm = ({ tenantID, databaseQueryID }) => {
   DatabaseQueryUpdationForm.propTypes = {
@@ -292,11 +293,18 @@ export const DatabaseQueryUpdationForm = ({ tenantID, databaseQueryID }) => {
                     language={"pgsql"}
                   />
                   <div className="w-full flex flex-row justify-end">
+                    <DatabaseQueryCloneForm
+                      key={`databaseQueryCloneForm_${databaseQuery?.databaseQueryID}`}
+                      tenantID={tenantID}
+                      databaseQueryID={databaseQueryID}
+                    />
                     <DatabaseQueryDeletionForm
+                      key={`databaseQueryDeletionForm_${databaseQuery?.databaseQueryID}`}
                       tenantID={tenantID}
                       databaseQueryID={databaseQueryID}
                     />
                     <DatabaseQueryTestingForm
+                      key={`databaseQueryTestingForm_${databaseQuery?.databaseQueryID}`}
                       tenantID={tenantID}
                       databaseQueryID={databaseQueryID}
                       databaseQueryString={
