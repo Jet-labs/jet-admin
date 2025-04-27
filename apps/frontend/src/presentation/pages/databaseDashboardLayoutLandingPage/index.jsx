@@ -3,15 +3,15 @@ import { useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 import { DefaultDashboardSelectionLayout } from "../../components/ui/defaultDashboardSelectionLayout";
 
-const DatabaseChartLayoutLandingPage = () => {
+const DatabaseDashboardLayoutLandingPage = () => {
   const { tenantID } = useParams();
 
   return (
     <DefaultDashboardSelectionLayout
       tenantID={tenantID}
-      userConfigKey={`${CONSTANTS.USER_CONFIG_KEYS.DEFAULT_DASHBOARD_ID}_databaseChartLayoutLandingPage`}
+      userConfigKey={`${CONSTANTS.USER_CONFIG_KEYS.DEFAULT_DASHBOARD_ID}_databaseDashboardLayoutLandingPage`}
     />
   );
 };
 
-export default DatabaseChartLayoutLandingPage;
+export default DatabaseDashboardLayoutLandingPage;

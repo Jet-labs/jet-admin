@@ -1,32 +1,27 @@
 import { CircularProgress } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
-import React, { useCallback, useEffect } from "react";
-import { RiPushpinFill, RiUnpinFill } from "react-icons/ri";
+import PropTypes from "prop-types";
+import React, { useEffect } from "react";
 import { CONSTANTS } from "../../../constants";
 import {
   getDatabaseDashboardByIDAPI,
   updateDatabaseDashboardByIDAPI,
 } from "../../../data/apis/databaseDashboard";
-import {
-  useAuthActions,
-  useAuthState,
-} from "../../../logic/contexts/authContext";
 import { useGlobalUI } from "../../../logic/contexts/globalUIContext";
+import { formValidations } from "../../../utils/formValidation";
 import { displayError, displaySuccess } from "../../../utils/notification";
+import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "../ui/resizable";
+import { DatabaseDashboardCloneForm } from "./databaseDashboardCloneForm";
 import { DatabaseDashboardDeletionForm } from "./databaseDashboardDeletionForm";
 import { DatabaseDashboardDropzone } from "./databaseDashboardDropzone";
 import { DatabaseDashboardEditor } from "./databaseDashboardEditor";
 import { DatabaseDashboardWidgetList } from "./databaseDashboardWidgetList";
-import { formValidations } from "../../../utils/formValidation";
-import PropTypes from "prop-types";
-import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
-import { DatabaseDashboardCloneForm } from "./databaseDashboardCloneForm";
 
 export const DatabaseDashboardUpdationForm = ({
   tenantID,
@@ -38,8 +33,6 @@ export const DatabaseDashboardUpdationForm = ({
   };
   const queryClient = useQueryClient();
   const { showConfirmation } = useGlobalUI();
-  const { updateUserConfigKey } = useAuthActions();
-  const { userConfig, isUpdatingUserConfig } = useAuthState();
 
   const {
     isLoading: isLoadingDatabaseDashboard,
@@ -128,20 +121,6 @@ export const DatabaseDashboardUpdationForm = ({
     }
   }, [databaseDashboard]);
 
-  const isDashboardPinned =
-    userConfig &&
-    databaseDashboard &&
-    parseInt(userConfig[CONSTANTS.USER_CONFIG_KEYS.DEFAULT_DASHBOARD_ID]) ===
-      databaseDashboard.databaseDashboardID;
-  const _handleTogglePinDashboard = useCallback(() => {
-    if (databaseDashboard) {
-      updateUserConfigKey({
-        tenantID,
-        key: CONSTANTS.USER_CONFIG_KEYS.DEFAULT_DASHBOARD_ID,
-        value: isDashboardPinned ? null : databaseDashboard.databaseDashboardID,
-      });
-    }
-  }, [userConfig, isDashboardPinned, databaseDashboard, updateUserConfigKey]);
   return (
     <div className="w-full flex flex-col justify-start items-center h-full">
       <div className="flex flex-row justify-between items-center w-full">
@@ -154,24 +133,6 @@ export const DatabaseDashboardUpdationForm = ({
             <span className="text-xs text-[#646cff] mt-2">{`Dashboard ID: ${databaseDashboard.databaseDashboardID} `}</span>
           )}
         </div>
-        <button
-          onClick={_handleTogglePinDashboard}
-          className="p-0 m-0 mx-3 px-2  bg-[#646cff]/10 py-1 rounded-full text-[#646cff] border-0 focus:border-0 focus:outline-none focus:ring-0 inline-flex items-center"
-        >
-          {isUpdatingUserConfig ? (
-            <CircularProgress size={20} className="!text-[#646cff]" />
-          ) : isDashboardPinned ? (
-            <>
-              <RiUnpinFill className="text-sm" />
-              <span className="text-xs ml-1">Unpin</span>
-            </>
-          ) : (
-            <>
-              <RiPushpinFill className="text-sm" />
-              <span className="text-xs ml-1">Pin</span>
-            </>
-          )}
-        </button>
       </div>
 
       <ReactQueryLoadingErrorWrapper

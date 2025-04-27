@@ -102,8 +102,6 @@ export const APIKeyUpdationForm = ({ tenantID, apiKeyID }) => {
     }
   }, [apiKey]);
 
-  console.log({ apiKeyUpdationForm: apiKeyUpdationForm.values });
-
   return (
     <section className="max-w-3xl w-full">
       <div className="w-full px-3 py-2  flex flex-col justify-center items-start">

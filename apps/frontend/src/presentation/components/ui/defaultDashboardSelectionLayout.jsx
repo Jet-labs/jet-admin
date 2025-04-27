@@ -25,7 +25,8 @@ export const DefaultDashboardSelectionLayout = ({
     tenantID: PropTypes.number.isRequired,
     userConfigKey: PropTypes.string.isRequired,
   };
-  const { userConfig, isUpdatingUserConfig } = useAuthState();
+  const { userConfig, isFetchingUserConfig, isUpdatingUserConfig } =
+    useAuthState();
   const { updateUserConfigKey } = useAuthActions();
   // eslint-disable-next-line no-unused-vars
   const [currentBreakpoint, setCurrentBreakpoint] = useState("lg");
@@ -68,7 +69,7 @@ export const DefaultDashboardSelectionLayout = ({
   });
 
   const _handleSetDefaultDashboard = (dashboardID) => {
-    console.log({dashboardID});
+    console.log({ dashboardID });
     updateUserConfigKey({
       tenantID,
       key: userConfigKey,
@@ -167,7 +168,12 @@ export const DefaultDashboardSelectionLayout = ({
         </div>
       ) : (
         <ReactQueryLoadingErrorWrapper
-          isLoading={isLoadingDatabaseDashboards}
+          isLoading={
+            isLoadingDatabaseDashboards ||
+            isFetchingDatabaseDashboard ||
+            isFetchingUserConfig ||
+            (pinnedDashboardID && isLoadingDatabaseDashboards)
+          }
           error={loadDatabaseDashboardsError}
           isFetching={isFetchingDatabaseDashboards}
           isRefetching={isRefetechingDatabaseDashboards}
@@ -191,26 +197,28 @@ export const DefaultDashboardSelectionLayout = ({
               </p>
               <div className="flex flex-row justify-center items-center gap-2">
                 {isUpdatingUserConfig ? (
-                <CircularProgress size={20} className="!text-[#646cff]" />
-              ) : <select
-                  className="p-1 text-xs text-gray-700 bg-white border border-gray-300 rounded focus:outline-none focus:border-blue-500"
-                  value={pinnedDashboardID}
-                  onChange={(e) =>
-                    _handleSetDefaultDashboard(Number(e.target.value))
-                  }
-                >
-                  <option value="" disabled selected>
-                    Select a dashboard
-                  </option>
-                  {databaseDashboards?.map((dashboard) => (
-                    <option
-                      key={dashboard.databaseDashboardID}
-                      value={dashboard.databaseDashboardID}
-                    >
-                      {dashboard.databaseDashboardName}
+                  <CircularProgress size={20} className="!text-[#646cff]" />
+                ) : (
+                  <select
+                    className="p-1 text-xs text-gray-700 bg-white border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+                    value={pinnedDashboardID}
+                    onChange={(e) =>
+                      _handleSetDefaultDashboard(Number(e.target.value))
+                    }
+                  >
+                    <option value="" disabled selected>
+                      Select a dashboard
                     </option>
-                  ))}
-                </select>}
+                    {databaseDashboards?.map((dashboard) => (
+                      <option
+                        key={dashboard.databaseDashboardID}
+                        value={dashboard.databaseDashboardID}
+                      >
+                        {dashboard.databaseDashboardName}
+                      </option>
+                    ))}
+                  </select>
+                )}
               </div>
             </div>
           </div>

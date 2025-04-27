@@ -91,7 +91,7 @@ export const CronJobUpdationForm = ({ tenantID, cronJobID }) => {
 
   return (
     <section className="max-w-3xl w-full">
-      <div className="w-full px-3 py-2 border-b border-gray-200 flex flex-row justify-between items-center">
+      <div className="w-full px-3 py-2 flex flex-row justify-between items-center">
         <div className="flex flex-col justify-start items-start">
           <h1 className="text-lg font-bold leading-tight tracking-tight text-slate-700">
             {CONSTANTS.STRINGS.UPDATE_CRON_JOB_FORM_TITLE}

@@ -45,6 +45,10 @@ const ViewDatabaseTriggerPage = lazy(() =>
   import("../../pages/viewDatabaseTriggerPage")
 );
 
+const TriggerLayoutLandingPage = lazy(() =>
+  import("../../pages/triggerLayoutLandingPage")
+);
+
 const AddDatabaseQueryPage = lazy(() =>
   import("../../pages/addDatabaseQueryPage")
 );
@@ -69,8 +73,8 @@ const DatabaseChartLayoutLandingPage = lazy(() =>
   import("../../pages/databaseChartLayoutLandingPage")
 );
 
-const ViewDatabaseDashboardPage = lazy(() =>
-  import("../../pages/viewDatabaseDashboardPage")
+const DatabaseDashboardLayoutLandingPage = lazy(() =>
+  import("../../pages/databaseDashboardLayoutLandingPage")
 );
 
 const AddDatabaseWidgetPage = lazy(() =>
@@ -194,9 +198,7 @@ const router = createBrowserRouter([
                   },
                   {
                     path: CONSTANTS.ROUTES.VIEW_DATABASE_TRIGGERS.code,
-                    element: () => {
-                      return <div>placeholder page</div>;
-                    },
+                    element: <TriggerLayoutLandingPage />,
                   },
                   {
                     path: CONSTANTS.ROUTES.VIEW_DATABASE_TRIGGER_BY_NAME.code,
@@ -317,7 +319,7 @@ const router = createBrowserRouter([
             children: [
               {
                 path: CONSTANTS.ROUTES.VIEW_DATABASE_DASHBOARDS.code,
-                element: <ViewDatabaseDashboardPage />,
+                element: <DatabaseDashboardLayoutLandingPage />,
               },
               {
                 path: CONSTANTS.ROUTES.ADD_DATABASE_DASHBOARD.code,
