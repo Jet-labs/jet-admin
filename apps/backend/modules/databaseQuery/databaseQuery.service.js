@@ -517,6 +517,70 @@ databaseQueryService.getDatabaseQueryByID = async ({
  *
  * @param {object} param0
  * @param {number} param0.userID
+ * @param {number} param0.tenantID
+ * @param {number} param0.databaseQueryID
+ * @returns {Promise<boolean>}
+ */
+databaseQueryService.cloneDatabaseQueryByID = async ({
+  userID,
+  tenantID,
+  databaseQueryID,
+}) => {
+  Logger.log("info", {
+    message: "databaseQueryService:cloneDatabaseQueryByID:params",
+    params: {
+      userID,
+      tenantID,
+      databaseQueryID,
+    },
+  });
+
+  try {
+    const databaseQuery = await prisma.tblDatabaseQueries.findFirst({
+      where: {
+        tenantID: parseInt(tenantID),
+        databaseQueryID: parseInt(databaseQueryID),
+      },
+    });
+    if (!databaseQuery) {
+      throw new Error("Database query not found");
+    }
+    const newDatabaseQuery = await prisma.tblDatabaseQueries.create({
+      data: {
+        tenantID: parseInt(tenantID),
+        databaseQueryTitle: databaseQuery.databaseQueryTitle + " (Copy)",
+        databaseQueryDescription: databaseQuery.databaseQueryDescription,
+        databaseQueryData: databaseQuery.databaseQueryData,
+        creatorID: parseInt(userID),
+        runOnLoad: databaseQuery.runOnLoad,
+      },
+    });
+    Logger.log("success", {
+      message: "databaseQueryService:cloneDatabaseQueryByID:success",
+      params: {
+        userID,
+        databaseQueryID,
+        newDatabaseQueryID: newDatabaseQuery.databaseQueryID,
+      },
+    });
+    return true;
+  } catch (error) {
+    Logger.log("error", {
+      message: "databaseQueryService:cloneDatabaseQueryByID:failure",
+      params: {
+        userID,
+        error,
+      },
+    });
+    throw error;
+  }
+};
+
+
+/**
+ *
+ * @param {object} param0
+ * @param {number} param0.userID
  * @param {string} param0.tenantID
  * @param {number} param0.databaseQueryID
  * @param {string} param0.databaseQueryTitle

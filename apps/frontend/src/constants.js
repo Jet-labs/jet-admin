@@ -405,6 +405,11 @@ export const CONSTANTS = {
     DELETE_QUERY_DIALOG_MESSAGE:
       "Are you sure you want to delete this item? This action cannot be undone.",
 
+    CLONE_QUERY_CLONING_SUCCESS: "Query cloned successfully!",
+    CLONE_QUERY_DIALOG_TITLE: "Clone query",
+    CLONE_QUERY_DIALOG_MESSAGE:
+      "Are you sure you want to clone this item? This action cannot be undone.",
+
     DATABASE_QUERY_ARGS_FORM_TITLE: "Query arguments",
     DATABASE_QUERY_ARGS_FORM_DESCRIPTION: "Enter the query arguments",
     DATABASE_QUERY_ARGS_FORM_CONFIRM_BUTTON: "Confirm",
@@ -550,10 +555,20 @@ export const CONSTANTS = {
     DELETE_CHART_DIALOG_MESSAGE:
       "Are you sure you want to delete this item? This action cannot be undone.",
 
+    CLONE_CHART_CLONING_SUCCESS: "Chart cloned successfully!",
+    CLONE_CHART_DIALOG_TITLE: "Clone chart",
+    CLONE_CHART_DIALOG_MESSAGE:
+      "Are you sure you want to clone this item? This action cannot be undone.",
+
     DELETE_WIDGET_DELETION_SUCCESS: "Widget deleted successfully!",
     DELETE_WIDGET_DIALOG_TITLE: "Delete widget",
     DELETE_WIDGET_DIALOG_MESSAGE:
       "Are you sure you want to delete this item? This action cannot be undone.",
+
+    CLONE_WIDGET_CLONING_SUCCESS: "Widget cloned successfully!",
+    CLONE_WIDGET_DIALOG_TITLE: "Clone widget",
+    CLONE_WIDGET_DIALOG_MESSAGE:
+      "Are you sure you want to clone this item? This action cannot be undone.",
 
     DASHBOARD_WIDGET_LIST_TITLE: "Widgets",
     DASHBOARD_WIDGET_LIST_CHARTS_TITLE: "Charts",
@@ -581,6 +596,11 @@ export const CONSTANTS = {
     DELETE_DASHBOARD_DIALOG_TITLE: "Delete dashboard",
     DELETE_DASHBOARD_DIALOG_MESSAGE:
       "Are you sure you want to delete this item? This action cannot be undone.",
+
+    CLONE_DASHBOARD_CLONING_SUCCESS: "Dashboard cloned successfully!",
+    CLONE_DASHBOARD_DIALOG_TITLE: "Clone dashboard",
+    CLONE_DASHBOARD_DIALOG_MESSAGE:
+      "Are you sure you want to clone this item? This action cannot be undone.",
 
     CHART_ADV_OPTIONS_CONFIRM: "Save changes",
     CHART_ADV_OPTIONS_CANCEL: "Discard",
@@ -1282,6 +1302,8 @@ export const CONSTANTS = {
         `/api/v1/tenants/${tenantID}/queries/queryTest`,
       getDatabaseQueryByID: (tenantID, databaseQueryID) =>
         `/api/v1/tenants/${tenantID}/queries/${databaseQueryID}`,
+      cloneDatabaseQueryByID: (tenantID, databaseQueryID) =>
+        `/api/v1/tenants/${tenantID}/queries/${databaseQueryID}/clone`,
       testDatabaseQueryByIDAPI: (tenantID, databaseQueryID) =>
         `/api/v1/tenants/${tenantID}/queries/${databaseQueryID}/queryTest`,
       generateAIPromptBasedQueryAPI: (tenantID) =>
@@ -1298,6 +1320,8 @@ export const CONSTANTS = {
         `/api/v1/tenants/${tenantID}/charts/`,
       getDatabaseChartByIDAPI: (tenantID, databaseChartID) =>
         `/api/v1/tenants/${tenantID}/charts/${databaseChartID}`,
+      cloneDatabaseChartByIDAPI: (tenantID, databaseChartID) =>
+        `/api/v1/tenants/${tenantID}/charts/${databaseChartID}/clone`,
       updateDatabaseChartByIDAPI: (tenantID, databaseChartID) =>
         `/api/v1/tenants/${tenantID}/charts/${databaseChartID}`,
       getDatabaseChartDataByIDAPI: (tenantID, databaseChartID) =>
@@ -1318,6 +1342,8 @@ export const CONSTANTS = {
         `/api/v1/tenants/${tenantID}/widgets/`,
       getDatabaseWidgetByIDAPI: (tenantID, databaseWidgetID) =>
         `/api/v1/tenants/${tenantID}/widgets/${databaseWidgetID}`,
+      cloneDatabaseWidgetByIDAPI: (tenantID, databaseWidgetID) =>
+        `/api/v1/tenants/${tenantID}/widgets/${databaseWidgetID}/clone`,
       updateDatabaseWidgetByIDAPI: (tenantID, databaseWidgetID) =>
         `/api/v1/tenants/${tenantID}/widgets/${databaseWidgetID}`,
       getDatabaseWidgetDataByIDAPI: (tenantID, databaseWidgetID) =>
@@ -1333,6 +1359,8 @@ export const CONSTANTS = {
         `/api/v1/tenants/${tenantID}/dashboards/`,
       getDatabaseDashboardByIDAPI: (tenantID, databaseDashboardID) =>
         `/api/v1/tenants/${tenantID}/dashboards/${databaseDashboardID}`,
+      cloneDatabaseDashboardByIDAPI: (tenantID, databaseDashboardID) =>
+        `/api/v1/tenants/${tenantID}/dashboards/${databaseDashboardID}/clone`,
       updateDatabaseDashboardByIDAPI: (tenantID, databaseDashboardID) =>
         `/api/v1/tenants/${tenantID}/dashboards/${databaseDashboardID}`,
       deleteDatabaseDashboardByID: (tenantID, databaseDashboardID) =>

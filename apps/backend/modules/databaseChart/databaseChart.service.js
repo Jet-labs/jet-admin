@@ -193,6 +193,92 @@ databaseChartService.getDatabaseChartByID = async ({
 };
 
 /**
+ * 
+ * @param {object} param0 
+ * @param {number} param0.userID 
+ * @param {number} param0.tenantID 
+ * @param {number} param0.databaseChartID 
+ * @returns 
+ */
+databaseChartService.cloneDatabaseChartByID = async ({
+  userID,
+  tenantID,
+  databaseChartID,
+}) => {
+  Logger.log("info", {
+    message: "databaseChartService:cloneDatabaseChartByID:params",
+    params: {
+      userID,
+      tenantID,
+      databaseChartID,
+    },
+  });
+
+  try {
+    const databaseChart = await prisma.tblDatabaseCharts.findFirst({
+      where: {
+        tenantID: parseInt(tenantID),
+        databaseChartID: parseInt(databaseChartID),
+      },
+      include: {
+        tblDatabaseChartQueryMappings: {
+          include: {
+            tblDatabaseQueries: true,
+          },
+        },
+      },
+    });
+    if (!databaseChart) {
+      throw new Error("Database chart not found");
+    }
+    await prisma.$transaction(async (tx) => {
+      const newDatabaseChart = await tx.tblDatabaseCharts.create({
+        data: {
+          tenantID: parseInt(tenantID),
+          databaseChartName: databaseChart.databaseChartName + " (Copy)",
+          databaseChartDescription: databaseChart.databaseChartDescription,
+          databaseChartType: databaseChart.databaseChartType,
+          databaseChartConfig: databaseChart.databaseChartConfig,
+          creatorID: parseInt(userID),
+        },
+      });
+      await tx.tblDatabaseChartQueryMappings.createMany({
+        data: databaseChart.tblDatabaseChartQueryMappings.map(
+          (databaseQueryMapping) => {
+            return {
+              databaseChartID: newDatabaseChart.databaseChartID,
+              databaseQueryID: parseInt(databaseQueryMapping.databaseQueryID),
+              title: databaseQueryMapping.title,
+              parameters: databaseQueryMapping.parameters,
+              datasetFields: databaseQueryMapping.datasetFields,
+              databaseQueryArgValues:
+                databaseQueryMapping.databaseQueryArgValues,
+            };
+          }
+        ),
+      });
+    });
+    Logger.log("success", {
+      message: "databaseChartService:cloneDatabaseChartByID:success",
+      params: {
+        userID,
+        databaseChartID,
+      },
+    });
+    return true;
+  } catch (error) {
+    Logger.log("error", {
+      message: "databaseChartService:cloneDatabaseChartByID:failure",
+      params: {
+        userID,
+        error,
+      },
+    });
+    throw error;
+  }
+};
+
+/**
  * Service function to retrieve and process database chart data.
  * @param {Object} params
  * @param {number} params.userID - ID of the requesting user

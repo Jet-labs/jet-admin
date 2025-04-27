@@ -11,6 +11,7 @@ router.get(
   authMiddleware.checkUserPermissions(["tenant:dashboard:list"]),
   databaseDashboardController.getAllDatabaseDashboards
 );
+
 router.post(
   "/",
   body("databaseDashboardName")
@@ -36,6 +37,16 @@ router.get(
   expressUtils.validationChecker,
   authMiddleware.checkUserPermissions(["tenant:dashboard:read"]),
   databaseDashboardController.getDatabaseDashboardByID
+);
+
+router.post(
+  "/:databaseDashboardID/clone",
+  param("databaseDashboardID")
+    .isNumeric()
+    .withMessage("databaseDashboardID must be a number"),
+  expressUtils.validationChecker,
+  authMiddleware.checkUserPermissions(["tenant:dashboard:clone"]),
+  databaseDashboardController.cloneDatabaseDashboardByID
 );
 
 router.patch(

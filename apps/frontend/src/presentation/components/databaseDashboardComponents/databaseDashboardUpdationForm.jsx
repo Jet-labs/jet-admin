@@ -26,6 +26,7 @@ import { DatabaseDashboardWidgetList } from "./databaseDashboardWidgetList";
 import { formValidations } from "../../../utils/formValidation";
 import PropTypes from "prop-types";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
+import { DatabaseDashboardCloneForm } from "./databaseDashboardCloneForm";
 
 export const DatabaseDashboardUpdationForm = ({
   tenantID,
@@ -213,8 +214,13 @@ export const DatabaseDashboardUpdationForm = ({
                     )}
                     {CONSTANTS.STRINGS.UPDATE_DASHBOARD_BUTTON_TEXT}
                   </button>
+                  <DatabaseDashboardCloneForm
+                    key={`databaseDashboardCloneForm_${databaseDashboard?.databaseDashboardID}`}
+                    tenantID={tenantID}
+                    databaseDashboardID={databaseDashboardID}
+                  />
                   <DatabaseDashboardDeletionForm
-                    key={databaseDashboard?.databaseDashboardID}
+                    key={`databaseDashboardDeletionForm_${databaseDashboard?.databaseDashboardID}`}
                     tenantID={tenantID}
                     databaseDashboardID={databaseDashboardID}
                   />

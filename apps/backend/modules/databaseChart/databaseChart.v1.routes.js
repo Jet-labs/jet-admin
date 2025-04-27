@@ -35,7 +35,6 @@ router.post(
 
 router.get(
   "/:databaseChartID",
-
   expressUtils.validationChecker,
   authMiddleware.checkUserPermissions(["tenant:chart:read"]),
   databaseChartController.getDatabaseChartByID
@@ -74,6 +73,7 @@ router.post(
   authMiddleware.checkUserPermissions(["tenant:chart:test"]),
   databaseChartController.getDatabaseChartDataUsingDatabaseChart
 );
+
 router.patch(
   "/:databaseChartID",
   param("databaseChartID")
@@ -97,6 +97,17 @@ router.patch(
   authMiddleware.checkUserPermissions(["tenant:chart:update"]),
   databaseChartController.updateDatabaseChartByID
 );
+
+router.post(
+  "/:databaseChartID/clone",
+  param("databaseChartID")
+    .isNumeric()
+    .withMessage("databaseChartID must be a number"),
+  expressUtils.validationChecker,
+  authMiddleware.checkUserPermissions(["tenant:chart:clone"]),
+  databaseChartController.cloneDatabaseChartByID
+);
+
 router.delete(
   "/:databaseChartID",
   param("databaseChartID")

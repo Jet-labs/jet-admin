@@ -156,6 +156,50 @@ databaseDashboardController.getDatabaseDashboardByID = async (req, res) => {
 };
 
 /**
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+databaseDashboardController.cloneDatabaseDashboardByID = async (req, res) => {
+  try {
+    const { user } = req;
+    const { tenantID, databaseDashboardID } = req.params;
+    Logger.log("info", {
+      message: "databaseDashboardController:cloneDatabaseDashboardByID:params",
+      params: {
+        userID: user.userID,
+        tenantID,
+        databaseDashboardID,
+      },
+    });
+
+    await databaseDashboardService.cloneDatabaseDashboardByID({
+      userID: parseInt(user.userID),
+      tenantID,
+      databaseDashboardID,
+    });
+
+    Logger.log("success", {
+      message: "databaseDashboardController:cloneDatabaseDashboardByID:success",
+      params: {
+        userID: user.userID,
+        tenantID,
+        databaseDashboardID,
+      },
+    });
+
+    return expressUtils.sendResponse(res, true, {
+      message: "Dashboard cloned successfully.",
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "databaseDashboardController:cloneDatabaseDashboardByID:catch-1",
+      params: { error },
+    });
+    return expressUtils.sendResponse(res, false, {}, error);
+  }
+};
+
+/**
  *
  * @param {import("express").Request} req
  * @param {import("express").Response} res

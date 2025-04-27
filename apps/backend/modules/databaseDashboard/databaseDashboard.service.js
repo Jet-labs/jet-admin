@@ -173,6 +173,90 @@ databaseDashboardService.getDatabaseDashboardByID = async ({
 };
 
 /**
+ *
+ * @param {object} param0
+ * @param {number} param0.userID
+ * @param {number} param0.tenantID
+ * @param {number} param0.databaseDashboardID
+ * @returns {Promise<boolean>}
+ */
+databaseDashboardService.cloneDatabaseDashboardByID = async ({
+  userID,
+  tenantID,
+  databaseDashboardID,
+}) => {
+  Logger.log("info", {
+    message: "databaseDashboardService:cloneDatabaseDashboardByID:params",
+    params: {
+      userID,
+      tenantID,
+      databaseDashboardID,
+    },
+  });
+
+  try {
+    const databaseDashboard = await prisma.tblDatabaseDashboards.findFirst({
+      where: {
+        tenantID: parseInt(tenantID),
+        databaseDashboardID: parseInt(databaseDashboardID),
+      },
+      include: {
+        tblDatabaseDashboardChartMappings: true,
+      },
+    });
+    if (!databaseDashboard) {
+      throw new Error("Database dashboard not found");
+    }
+    await prisma.$transaction(async (tx) => {
+      const newDatabaseDashboard = await tx.tblDatabaseDashboards.create({
+        data: {
+          tenantID: parseInt(tenantID),
+          databaseDashboardName:
+            databaseDashboard.databaseDashboardName + " (Copy)",
+          databaseDashboardDescription:
+            databaseDashboard.databaseDashboardDescription,
+          databaseDashboardConfig: databaseDashboard.databaseDashboardConfig,
+          creatorID: parseInt(userID),
+        },
+      });
+      await tx.tblDatabaseDashboardChartMappings.createMany({
+        data: databaseDashboard.tblDatabaseDashboardChartMappings.map(
+          (databaseDashboardChartMapping) => {
+            return {
+              databaseDashboardID: newDatabaseDashboard.databaseDashboardID,
+              databaseChartID: parseInt(
+                databaseDashboardChartMapping.databaseChartID
+              ),
+              title: databaseDashboardChartMapping.title,
+              parameters: databaseDashboardChartMapping.parameters,
+            };
+          }
+        ),
+      });
+    });
+    Logger.log("success", {
+      message: "databaseDashboardService:cloneDatabaseDashboardByID:success",
+      params: {
+        userID,
+        databaseDashboardID,
+      },
+    });
+    return true;
+  } catch (error) {
+    Logger.log("error", {
+      message: "databaseDashboardService:cloneDatabaseDashboardByID:failure",
+      params: {
+        userID,
+        error,
+      },
+    });
+    throw error;
+  }
+};
+
+
+
+/**
  * Updates an existing database chart and its associated query mappings.
  *
  * @param {Object} params - Update parameters

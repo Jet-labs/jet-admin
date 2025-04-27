@@ -22,6 +22,7 @@ import { DatabaseWidgetPreview } from "./databaseWidgetPreview";
 import { DATABASE_WIDGETS_CONFIG_MAP } from "./widgetConfig";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import PropTypes from "prop-types";
+import { DatabaseWidgetCloneForm } from "./databaseWidgetCloneForm";
 
 const initialValues = {
   databaseWidgetName: "",
@@ -216,8 +217,13 @@ export const DatabaseWidgetUpdationForm = ({ tenantID, databaseWidgetID }) => {
                   )}
                   {CONSTANTS.STRINGS.UPDATE_WIDGET_FORM_SUBMIT_BUTTON}
                 </button>
+                <DatabaseWidgetCloneForm
+                  key={`databaseWidgetCloneForm_${databaseWidget?.databaseWidgetID}`}
+                  tenantID={tenantID}
+                  databaseWidgetID={databaseWidgetID}
+                />
                 <DatabaseWidgetDeletionForm
-                  key={databaseWidget?.databaseWidgetID}
+                  key={`databaseWidgetDeletionForm_${databaseWidget?.databaseWidgetID}`}
                   tenantID={tenantID}
                   databaseWidgetID={databaseWidgetID}
                 />

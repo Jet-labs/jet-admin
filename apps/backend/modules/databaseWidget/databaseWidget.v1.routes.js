@@ -42,6 +42,16 @@ router.get(
   databaseWidgetController.getDatabaseWidgetByID
 );
 
+router.post(
+  "/:databaseWidgetID/clone",
+  param("databaseWidgetID")
+    .isNumeric()
+    .withMessage("databaseWidgetID must be a number"),
+  expressUtils.validationChecker,
+  authMiddleware.checkUserPermissions(["tenant:widget:clone"]),
+  databaseWidgetController.cloneDatabaseWidgetByID
+);
+
 router.get(
   "/:databaseWidgetID/data",
   param("databaseWidgetID")

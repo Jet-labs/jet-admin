@@ -167,6 +167,51 @@ databaseWidgetController.getDatabaseWidgetByID = async (req, res) => {
  * @param {import("express").Request} req
  * @param {import("express").Response} res
  */
+databaseWidgetController.cloneDatabaseWidgetByID = async (req, res) => {
+  try {
+    const { user } = req;
+    const { tenantID, databaseWidgetID } = req.params;
+    Logger.log("info", {
+      message: "databaseWidgetController:cloneDatabaseWidgetByID:params",
+      params: {
+        userID: user.userID,
+        tenantID,
+        databaseWidgetID,
+      },
+    });
+
+    await databaseWidgetService.cloneDatabaseWidgetByID({
+      userID: parseInt(user.userID),
+      tenantID,
+      databaseWidgetID,
+    });
+
+    Logger.log("success", {
+      message: "databaseWidgetController:cloneDatabaseWidgetByID:success",
+      params: {
+        userID: user.userID,
+        tenantID,
+        databaseWidgetID,
+      },
+    });
+
+    return expressUtils.sendResponse(res, true, {
+      message: "Widget cloned successfully.",
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "databaseWidgetController:cloneDatabaseWidgetByID:catch-1",
+      params: { error },
+    });
+    return expressUtils.sendResponse(res, false, {}, error);
+  }
+};
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
 databaseWidgetController.getDatabaseWidgetDataByID = async (req, res) => {
   const { user, dbPool } = req;
   const { tenantID, databaseWidgetID } = req.params;

@@ -12,6 +12,7 @@ router.get(
   authMiddleware.checkUserPermissions(["tenant:query:list"]),
   databaseQueryController.getAllDatabaseQueries
 );
+
 router.post(
   "/",
   body("databaseQueryData")
@@ -30,6 +31,7 @@ router.post(
   authMiddleware.checkUserPermissions(["tenant:query:create"]),
   databaseQueryController.createDatabaseQuery
 );
+
 router.post(
   "/bulk",
   expressUtils.validationChecker,
@@ -37,6 +39,17 @@ router.post(
   authMiddleware.checkUserPermissions(["tenant:query:bulk:create"]),
   databaseQueryController.createBulkDatabaseQuery
 );
+
+router.post(
+  "/:databaseQueryID/clone",
+  param("databaseQueryID")
+    .isNumeric()
+    .withMessage("databaseQueryID must be a number"),
+  expressUtils.validationChecker,
+  authMiddleware.checkUserPermissions(["tenant:query:clone"]),
+  databaseQueryController.cloneDatabaseQueryByID
+);
+
 router.patch(
   "/queryTest",
   body("databaseQueryData")

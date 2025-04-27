@@ -24,6 +24,7 @@ import {
 import { DatabaseChartDeletionForm } from "./databaseChartDeletionForm";
 import { DatabaseChartEditor } from "./databaseChartEditor";
 import { DatabaseChartPreview } from "./databaseChartPreview";
+import { DatabaseChartCloneForm } from "./databaseChartCloneForm";
 const initialValues = {
   databaseChartName: "",
   databaseChartType: CONSTANTS.DATABASE_CHART_TYPES.BAR_CHART.value,
@@ -258,8 +259,13 @@ export const DatabaseChartUpdationForm = ({ tenantID, databaseChartID }) => {
                   )}
                   {CONSTANTS.STRINGS.UPDATE_CHART_FORM_SUBMIT_BUTTON}
                 </button>
+                <DatabaseChartCloneForm
+                  key={`databaseChartCloneForm_${databaseChart?.databaseChartID}`}
+                  tenantID={tenantID}
+                  databaseChartID={databaseChartID}
+                />
                 <DatabaseChartDeletionForm
-                  key={databaseChart?.databaseChartID}
+                  key={`databaseChartDeletionForm_${databaseChart?.databaseChartID}`}
                   tenantID={tenantID}
                   databaseChartID={databaseChartID}
                 />

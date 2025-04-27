@@ -183,6 +183,88 @@ databaseWidgetService.getDatabaseWidgetByID = async ({
 };
 
 /**
+ *
+ * @param {object} param0
+ * @param {number} param0.userID
+ * @param {string} param0.tenantID
+ * @param {number} param0.databaseWidgetID
+ * @returns {Promise<boolean>}
+ */
+databaseWidgetService.cloneDatabaseWidgetByID = async ({
+  userID,
+  tenantID,
+  databaseWidgetID,
+}) => {
+  Logger.log("info", {
+    message: "databaseWidgetService:cloneDatabaseWidgetByID:params",
+    params: {
+      userID,
+      tenantID,
+      databaseWidgetID,
+    },
+  });
+
+  try {
+    const databaseWidget = await prisma.tblDatabaseWidgets.findFirst({
+      where: {
+        tenantID: parseInt(tenantID),
+        databaseWidgetID: parseInt(databaseWidgetID),
+      },
+      include: {
+        tblDatabaseWidgetQueryMappings: true,
+      },
+    });
+    if (!databaseWidget) {
+      throw new Error("Database widget not found");
+    }
+    await prisma.$transaction(async (tx) => {
+      const newDatabaseWidget = await tx.tblDatabaseWidgets.create({
+        data: {
+          tenantID: parseInt(tenantID),
+          databaseWidgetName: databaseWidget.databaseWidgetName + " (Copy)",
+          databaseWidgetDescription: databaseWidget.databaseWidgetDescription,
+          databaseWidgetType: databaseWidget.databaseWidgetType,
+          databaseWidgetConfig: databaseWidget.databaseWidgetConfig,
+          creatorID: parseInt(userID),
+        },
+      });
+      await tx.tblDatabaseWidgetQueryMappings.createMany({
+        data: databaseWidget.tblDatabaseWidgetQueryMappings.map(
+          (databaseWidgetQueryMapping) => {
+            return {
+              databaseWidgetID: newDatabaseWidget.databaseWidgetID,
+              databaseQueryID: parseInt(databaseWidgetQueryMapping.databaseQueryID),
+              title: databaseWidgetQueryMapping.title,
+              parameters: databaseWidgetQueryMapping.parameters,
+              datasetFields: databaseWidgetQueryMapping.datasetFields,
+              databaseQueryArgValues: databaseWidgetQueryMapping.databaseQueryArgValues,
+            };
+          }
+        ),
+      });
+    });
+    Logger.log("success", {
+      message: "databaseWidgetService:cloneDatabaseWidgetByID:success",
+      params: {
+        userID,
+        databaseWidgetID,
+      },
+    });
+    return true;
+  } catch (error) {
+    Logger.log("error", {
+      message: "databaseWidgetService:cloneDatabaseWidgetByID:failure",
+      params: {
+        userID,
+        error,
+      },
+    });
+    throw error;
+  }
+};
+
+
+/**
  * Service function to retrieve and process database widget data.
  * @param {Object} params
  * @param {number} params.userID - ID of the requesting user

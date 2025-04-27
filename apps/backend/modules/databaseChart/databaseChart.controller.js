@@ -163,6 +163,53 @@ databaseChartController.getDatabaseChartByID = async (req, res) => {
 };
 
 /**
+ * 
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+databaseChartController.cloneDatabaseChartByID = async (req, res) => {
+  try {
+    const { user } = req;
+    const { tenantID, databaseChartID } = req.params;
+    Logger.log("info", {
+      message: "databaseChartController:cloneDatabaseChartByID:params",
+      params: {
+        userID: user.userID,
+        tenantID,
+        databaseChartID,
+      },
+    });
+
+    await databaseChartService.cloneDatabaseChartByID({
+      userID: parseInt(user.userID),
+      tenantID : parseInt(tenantID),
+      databaseChartID: parseInt(databaseChartID),
+    });
+
+    Logger.log("success", {
+      message: "databaseChartController:cloneDatabaseChartByID:success",
+      params: {
+        userID: user.userID,
+        tenantID,
+        databaseChartID,
+      },
+    });
+
+    return expressUtils.sendResponse(res, true, {
+      message: "Chart cloned successfully.",
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "databaseChartController:cloneDatabaseChartByID:catch-1",
+      params: { error },
+    });
+    return expressUtils.sendResponse(res, false, {}, error);
+  }
+};
+
+
+
+/**
  *
  * @param {import("express").Request} req
  * @param {import("express").Response} res

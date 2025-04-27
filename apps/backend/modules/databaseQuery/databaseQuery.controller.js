@@ -362,6 +362,50 @@ databaseQueryController.getDatabaseQueryByID = async (req, res) => {
 };
 
 /**
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+databaseQueryController.cloneDatabaseQueryByID = async (req, res) => {
+  try {
+    const { user } = req;
+    const { tenantID, databaseQueryID } = req.params;
+    Logger.log("info", {
+      message: "databaseQueryController:cloneDatabaseQueryByID:params",
+      params: {
+        userID: user.userID,
+        tenantID,
+        databaseQueryID,
+      },
+    });
+
+    await databaseQueryService.cloneDatabaseQueryByID({
+      userID: parseInt(user.userID),
+      tenantID,
+      databaseQueryID,
+    });
+
+    Logger.log("success", {
+      message: "databaseQueryController:cloneDatabaseQueryByID:success",
+      params: {
+        userID: user.userID,
+        tenantID,
+        databaseQueryID,
+      },
+    });
+
+    return expressUtils.sendResponse(res, true, {
+      message: "Query cloned successfully.",
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "databaseQueryController:cloneDatabaseQueryByID:catch-1",
+      params: { error },
+    });
+    return expressUtils.sendResponse(res, false, {}, error);
+  }
+};
+
+/**
  *
  * @param {import("express").Request} req
  * @param {import("express").Response} res

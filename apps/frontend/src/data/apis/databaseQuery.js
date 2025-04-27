@@ -175,6 +175,40 @@ export const getDatabaseQueryByIDAPI = async ({
   }
 };
 
+export const cloneDatabaseQueryByIDAPI = async ({
+  tenantID,
+  databaseQueryID,
+}) => {
+  try {
+    const url =
+      CONSTANTS.SERVER_HOST +
+      CONSTANTS.APIS.DATABASE.cloneDatabaseQueryByID(tenantID, databaseQueryID);
+    const bearerToken = await firebaseAuth.currentUser.getIdToken();
+    if (bearerToken) {
+      const response = await axios.post(
+        url,
+        {},
+        {
+          headers: {
+            authorization: `Bearer ${bearerToken}`,
+          },
+        }
+      );
+      if (response.data && response.data.success === true) {
+        return true;
+      } else if (response.data.error) {
+        throw response.data.error;
+      } else {
+        throw CONSTANTS.ERROR_CODES.SERVER_ERROR;
+      }
+    } else {
+      throw CONSTANTS.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const generateAIPromptBasedQueryAPI = async ({ tenantID, aiPrompt }) => {
   try {
     const url =

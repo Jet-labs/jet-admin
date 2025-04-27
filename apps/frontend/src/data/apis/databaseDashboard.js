@@ -101,6 +101,43 @@ export const createDatabaseDashboardAPI = async ({
   }
 };
 
+export const cloneDatabaseDashboardByIDAPI = async ({
+  tenantID,
+  databaseDashboardID,
+}) => {
+  try {
+    const url =
+      CONSTANTS.SERVER_HOST +
+      CONSTANTS.APIS.DATABASE.cloneDatabaseDashboardByIDAPI(
+        tenantID,
+        databaseDashboardID
+      );
+    const bearerToken = await firebaseAuth.currentUser.getIdToken();
+    if (bearerToken) {
+      const response = await axios.post(
+        url,
+        {},
+        {
+          headers: {
+            authorization: `Bearer ${bearerToken}`,
+          },
+        }
+      );
+      if (response.data && response.data.success === true) {
+        return true;
+      } else if (response.data.error) {
+        throw response.data.error;
+      } else {
+        throw CONSTANTS.ERROR_CODES.SERVER_ERROR;
+      }
+    } else {
+      throw CONSTANTS.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const updateDatabaseDashboardByIDAPI = async ({
   tenantID,
   databaseDashboardID,
