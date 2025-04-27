@@ -31,7 +31,6 @@ const AddDatabaseTablePage = lazy(() =>
 const AddDatabaseTriggerPage = lazy(() =>
   import("../../pages/addDatabaseTriggerPage")
 );
-
 const TableLayoutLandingPage = lazy(() =>
   import("../../pages/tableLayoutLandingPage")
 );
@@ -44,59 +43,45 @@ const UpdateDatabaseTablePage = lazy(() =>
 const ViewDatabaseTriggerPage = lazy(() =>
   import("../../pages/viewDatabaseTriggerPage")
 );
-
 const TriggerLayoutLandingPage = lazy(() =>
   import("../../pages/triggerLayoutLandingPage")
 );
-
 const AddDatabaseQueryPage = lazy(() =>
   import("../../pages/addDatabaseQueryPage")
 );
-
 const UpdateDatabaseQueryPage = lazy(() =>
   import("../../pages/updateDatabaseQueryPage")
 );
-
 const DatabaseQueryLayoutLandingPage = lazy(() =>
   import("../../pages/databaseQueryLayoutLandingPage")
 );
-
 const AddDatabaseChartPage = lazy(() =>
   import("../../pages/addDatabaseChartPage")
 );
-
 const UpdateDatabaseChartPage = lazy(() =>
   import("../../pages/updateDatabaseChartPage")
 );
-
 const DatabaseChartLayoutLandingPage = lazy(() =>
   import("../../pages/databaseChartLayoutLandingPage")
 );
-
 const DatabaseDashboardLayoutLandingPage = lazy(() =>
   import("../../pages/databaseDashboardLayoutLandingPage")
 );
-
 const AddDatabaseWidgetPage = lazy(() =>
   import("../../pages/addDatabaseWidgetPage")
 );
-
 const UpdateDatabaseWidgetPage = lazy(() =>
   import("../../pages/updateDatabaseWidgetPage")
 );
-
 const DatabaseWidgetLayoutLandingPage = lazy(() =>
   import("../../pages/databaseWidgetLayoutLandingPage")
 );
-
 const AddDatabaseDashboardPage = lazy(() =>
   import("../../pages/addDatabaseDashboardPage")
 );
-
 const UpdateDatabaseDashboardPage = lazy(() =>
   import("../../pages/updateDatabaseDashboardPage")
 );
-
 const UserManagementPage = lazy(() => import("../../pages/userManagementPage"));
 const UpdateTenantUserByIDPage = lazy(() =>
   import("../../pages/updateTenantUserByIDPage")
@@ -106,26 +91,26 @@ const AddTenantRolePage = lazy(() => import("../../pages/addTenantRolePage"));
 const UpdateTenantRolePage = lazy(() =>
   import("../../pages/updateTenantRolePage")
 );
-
 const AddDatabaseNotificationPage = lazy(() =>
   import("../../pages/addDatabaseNotificationPage")
 );
-
 const UpdateDatabaseNotificationPage = lazy(() =>
   import("../../pages/updateDatabaseNotificationPage")
 );
-
 const AddAPIKeyPage = lazy(() => import("../../pages/addAPIKeyPage"));
-
+const APIKeyLayoutLandingPage = lazy(() =>
+  import("../../pages/apiKeyLayoutLandingPage")
+);
 const UpdateAPIKeyPage = lazy(() => import("../../pages/updateAPIKeyPage"));
-
 const RawSqlQueryPage = lazy(() => import("../../pages/rawSqlQueryPage"));
 const AddCronJobPage = lazy(() => import("../../pages/addCronJobPage"));
 const UpdateCronJobPage = lazy(() => import("../../pages/updateCronJobPage"));
 const ViewCronJobHistoryPage = lazy(() =>
   import("../../pages/viewCronJobHistoryPage")
 );
-
+const CronJobLayoutLandingPage = lazy(() =>
+  import("../../pages/cronJobLayoutLandingPage")
+);
 const DatabaseSchemaLandingPage = lazy(() =>
   import("../../pages/databaseSchemaLandingPage")
 );
@@ -281,7 +266,7 @@ const router = createBrowserRouter([
             children: [
               {
                 path: CONSTANTS.ROUTES.VIEW_API_KEYS.code,
-                element: <AddAPIKeyPage />,
+                element: <APIKeyLayoutLandingPage />,
               },
               {
                 path: CONSTANTS.ROUTES.ADD_API_KEY.code,
@@ -298,7 +283,7 @@ const router = createBrowserRouter([
             children: [
               {
                 path: CONSTANTS.ROUTES.VIEW_CRON_JOBS.code,
-                element: <AddCronJobPage />,
+                element: <CronJobLayoutLandingPage />,
               },
               {
                 path: CONSTANTS.ROUTES.ADD_CRON_JOB.code,
