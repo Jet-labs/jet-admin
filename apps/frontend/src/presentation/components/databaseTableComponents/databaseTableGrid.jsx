@@ -35,8 +35,6 @@ import { getFormattedTableColumns } from "./databaseTableGridFormatter";
 import { DatabaseTableRowsDeletionForm } from "./databaseTableRowsDeletionForm";
 import { DatabaseTableRowsExportForm } from "./databaseTableRowsExportForm";
 import { DatabaseTableStatistics } from "./databaseTableStatistics";
-import { DatabaseTablePrimaryColumnSelection } from "./databaseTablePrimaryColumnSelection";
-import { useAuthState } from "../../../logic/contexts/authContext";
 
 export const DatabaseTableGrid = ({
   tenantID,
@@ -54,8 +52,6 @@ export const DatabaseTableGrid = ({
     containerClass: PropTypes.string,
     initialFilterQuery: PropTypes.object,
   };
-  const { userConfig, isFetchingUserConfig, getUserConfigError } =
-    useAuthState();
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
   const [filterQuery, setFilterQuery] = useState(null);
@@ -93,7 +89,6 @@ export const DatabaseTableGrid = ({
     useState("compact");
   const datagridRef = useRef();
   const datagridAPIRef = useRef();
-  const userConfigPrimaryKey = `${databaseSchemaName}_${databaseTableName}_${CONSTANTS.USER_CONFIG_KEYS.DATABASE_TABLE_CUSTOM_PRIMARY_KEY}`;
 
   const databaseTableRowChangeCount = Object.values(
     databaseTableRowChangesForUITracking
@@ -101,7 +96,7 @@ export const DatabaseTableGrid = ({
 
   const {
     databaseTableColumns,
-    databaseTablePrimaryKey: _databaseTablePrimaryKey,
+    databaseTablePrimaryKey,
     databaseTableColumnForeignKeyMap,
     isLoading: isLoadingDatabaseTable,
     error: loadDatabaseTableError,
@@ -110,17 +105,6 @@ export const DatabaseTableGrid = ({
     tenantID,
     databaseSchemaName,
     databaseTableName,
-  });
-
-  const databaseTablePrimaryKey = _databaseTablePrimaryKey
-    ? _databaseTablePrimaryKey
-    : userConfig?.[userConfigPrimaryKey];
-
-  console.log({
-    databaseTablePrimaryKey,
-    userConfig,
-    userConfigPrimaryKey,
-    _databaseTablePrimaryKey,
   });
 
   const {
@@ -136,6 +120,7 @@ export const DatabaseTableGrid = ({
     databaseTableName,
     page,
     pageSize,
+    databaseTableColumns,
     databaseTablePrimaryKey,
     filterQuery,
     databaseTableColumnSortModel,
@@ -229,6 +214,8 @@ export const DatabaseTableGrid = ({
     },
     [databaseTablePrimaryKey]
   );
+
+  console.log({ rows: databaseTableRows });
 
   const _handleToggleAllRowSelectCheckbox = useCallback(
     (v) => {
@@ -396,16 +383,8 @@ export const DatabaseTableGrid = ({
 
   return (
     <ReactQueryLoadingErrorWrapper
-      isLoading={
-        isLoadingDatabaseTable ||
-        isLoadingDatabaseTableRows ||
-        isFetchingUserConfig
-      }
-      error={
-        loadDatabaseTableRowsError ||
-        loadDatabaseTableError ||
-        getUserConfigError
-      }
+      isLoading={isLoadingDatabaseTable || isLoadingDatabaseTableRows}
+      error={loadDatabaseTableRowsError || loadDatabaseTableError}
       isFetching={isFetchingDatabaseTableRows || isFetchingDatabaseTable}
       refetch={reloadDatabaseTableRows}
     >
@@ -641,118 +620,107 @@ export const DatabaseTableGrid = ({
             databaseTableName={databaseTableName}
           />
         </div>
-        {databaseTablePrimaryKey ? (
-          databaseTableRows && formattedDatabaseTableColumns ? (
-            <div className="flex flex-col w-full flex-grow h-full overflow-y-auto justify-between items-stretch text-sm font-medium">
-              <DataGrid
-                ref={datagridRef}
-                apiRef={datagridAPIRef}
-                rows={
-                  databaseTableNewRows && databaseTableNewRows.length > 0
-                    ? [...databaseTableNewRows, ...databaseTableRows]
-                    : databaseTableRows
+        {databaseTableRows && formattedDatabaseTableColumns ? (
+          <div className="flex flex-col w-full flex-grow h-full overflow-y-auto justify-between items-stretch text-sm font-medium">
+            <DataGrid
+              ref={datagridRef}
+              apiRef={datagridAPIRef}
+              rows={
+                databaseTableNewRows && databaseTableNewRows.length > 0
+                  ? [...databaseTableNewRows, ...databaseTableRows]
+                  : databaseTableRows
+              }
+              columns={formattedDatabaseTableColumns}
+              loading={isLoadingDatabaseTableRows}
+              processRowUpdate={_handleDataGridRowUpdate}
+              experimentalFeatures={{ newEditingApi: true }}
+              getRowId={(row) => _getRowID(row)} // Custom row ID getter
+              // className="fill-grid border-t border-slate-200"
+              getCellClassName={(params) => {
+                const rowId = _getRowID(params.row);
+                const isChanged =
+                  databaseTableRowChangesForUITracking[rowId]?.[
+                    params.field
+                  ] !== undefined;
+                const isNewRow = params.row.__is__new__row;
+                return isChanged || isNewRow ? "changed-cell" : "";
+              }}
+              sx={{
+                "--unstable_DataGrid-radius": "0",
+                "& .MuiDataGrid-root": {
+                  borderRadius: 0,
+                },
+                "& .MuiIconButton-root": {
+                  outline: "none",
+                },
+                "& .MuiDataGrid-cell": {
+                  fontSize: "0.875rem",
+                  lineHeight: "1.25rem",
+                  fontWeight: "400",
+                },
+                "& .MuiCheckbox-root": {
+                  padding: "4px",
+                },
+                "& .MuiDataGrid-columnHeaderCheckbox": {
+                  minWidth: "auto !important",
+                  width: "auto !important",
+                  flex: "0 0 auto !important",
+                  padding: "0.25rem !important",
+                  "& .MuiDataGrid-columnHeaderTitleContainer": {
+                    width: "auto",
+                    minWidth: "auto",
+                    flex: "none",
+                  },
+                },
+                "& .MuiDataGrid-cellCheckbox": {
+                  minWidth: "auto !important",
+                  width: "auto !important",
+                  flex: "0 0 auto !important",
+                  color: "#646cff !important",
+                  padding: "0.25rem !important",
+                },
+              }}
+              onRowSelectionModelChange={
+                _handleMultipleSelectedRowsQueryBuilder
+              }
+              density={databaseTableGridDensity}
+              showCellVerticalBorder
+              className="!border-0"
+              // checkboxSelection={!isAllRowSelectChecked}
+              checkboxSelection
+              disableRowSelectionOnClick
+              disableColumnFilter
+              onSortModelChange={(model) => {
+                if (model.length > 0) {
+                  const { field, sort } = model[0];
+                  setDatabaseTableColumnSortModel({
+                    field: field,
+                    order: lowerCase(sort),
+                  });
                 }
-                columns={formattedDatabaseTableColumns}
-                loading={isLoadingDatabaseTableRows}
-                processRowUpdate={_handleDataGridRowUpdate}
-                experimentalFeatures={{ newEditingApi: true }}
-                getRowId={(row) => _getRowID(row)} // Custom row ID getter
-                // className="fill-grid border-t border-slate-200"
-                getCellClassName={(params) => {
-                  const rowId = _getRowID(params.row);
-                  const isChanged =
-                    databaseTableRowChangesForUITracking[rowId]?.[
-                      params.field
-                    ] !== undefined;
-                  const isNewRow = params.row.__is__new__row;
-                  return isChanged || isNewRow ? "changed-cell" : "";
-                }}
-                sx={{
-                  "--unstable_DataGrid-radius": "0",
-                  "& .MuiDataGrid-root": {
-                    borderRadius: 0,
-                  },
-                  "& .MuiIconButton-root": {
-                    outline: "none",
-                  },
-                  "& .MuiDataGrid-cell": {
-                    fontSize: "0.875rem",
-                    lineHeight: "1.25rem",
-                    fontWeight: "400",
-                  },
-                  "& .MuiCheckbox-root": {
-                    padding: "4px",
-                  },
-                  "& .MuiDataGrid-columnHeaderCheckbox": {
-                    minWidth: "auto !important",
-                    width: "auto !important",
-                    flex: "0 0 auto !important",
-                    padding: "0.25rem !important",
-                    "& .MuiDataGrid-columnHeaderTitleContainer": {
-                      width: "auto",
-                      minWidth: "auto",
-                      flex: "none",
-                    },
-                  },
-                  "& .MuiDataGrid-cellCheckbox": {
-                    minWidth: "auto !important",
-                    width: "auto !important",
-                    flex: "0 0 auto !important",
-                    color: "#646cff !important",
-                    padding: "0.25rem !important",
-                  },
-                }}
-                onRowSelectionModelChange={
-                  _handleMultipleSelectedRowsQueryBuilder
-                }
-                density={databaseTableGridDensity}
-                showCellVerticalBorder
-                className="!border-0"
-                // checkboxSelection={!isAllRowSelectChecked}
-                checkboxSelection
-                disableRowSelectionOnClick
-                disableColumnFilter
-                onSortModelChange={(model) => {
-                  if (model.length > 0) {
-                    const { field, sort } = model[0];
-                    setDatabaseTableColumnSortModel({
-                      field: field,
-                      order: lowerCase(sort),
-                    });
-                  }
-                }}
-                paginationMode="server"
-                rowCount={
-                  !isNaN(databaseTableRowCount)
-                    ? parseInt(databaseTableRowCount)
-                    : 0
-                }
-                pageSizeOptions={[20, 50, 100]}
-                paginationModel={{ page: page - 1, pageSize }}
-                onPaginationModelChange={({
-                  page: newPage,
-                  pageSize: newPageSize,
-                }) => {
-                  setPage(newPage + 1); // Convert to 1-based for API
-                  setPageSize(newPageSize);
-                }}
-                hideFooterSelectedRowCount
-              />
-            </div>
-          ) : (
-            <div className="!w-full !p-2">
-              <NoEntityUI
-                message={CONSTANTS.ERROR_CODES.SERVER_ERROR.message}
-              />
-            </div>
-          )
+              }}
+              paginationMode="server"
+              rowCount={
+                !isNaN(databaseTableRowCount)
+                  ? parseInt(databaseTableRowCount)
+                  : 0
+              }
+              pageSizeOptions={[20, 50, 100]}
+              paginationModel={{ page: page - 1, pageSize }}
+              onPaginationModelChange={({
+                page: newPage,
+                pageSize: newPageSize,
+              }) => {
+                setPage(newPage + 1); // Convert to 1-based for API
+                setPageSize(newPageSize);
+              }}
+              hideFooterSelectedRowCount
+            />
+          </div>
         ) : (
-          <DatabaseTablePrimaryColumnSelection
-            tenantID={tenantID}
-            databaseSchemaName={databaseSchemaName}
-            databaseTableName={databaseTableName}
-            databaseTableColumns={databaseTableColumns}
-          />
+          <div className="!w-full !p-2">
+            <NoEntityUI message={CONSTANTS.ERROR_CODES.SERVER_ERROR.message} />
+          </div>
         )}
       </div>
     </ReactQueryLoadingErrorWrapper>
