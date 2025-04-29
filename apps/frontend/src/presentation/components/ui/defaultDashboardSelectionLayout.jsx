@@ -69,7 +69,6 @@ export const DefaultDashboardSelectionLayout = ({
   });
 
   const _handleSetDefaultDashboard = (dashboardID) => {
-    console.log({ dashboardID });
     updateUserConfigKey({
       tenantID,
       key: userConfigKey,

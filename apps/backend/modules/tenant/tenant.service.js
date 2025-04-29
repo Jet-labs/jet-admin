@@ -56,30 +56,42 @@ tenantService.getUserTenantByID = async ({ userID, tenantID, dbPool }) => {
           tblUsers: true,
         },
       });
-    const tenantRoles = await tenantRoleService.getAllTenantRoles({
-      userID: parseInt(userID),
-      tenantID: parseInt(tenantID),
-    });
-    const tenantDatabaseMetadata =
-      await databaseService.getDatabaseMetadataForTenant({
-        userID: parseInt(userID),
-        dbPool,
-      });
-    const tenantCharts = await databaseChartService.getAllDatabaseCharts({
-      userID: parseInt(userID),
-      tenantID: parseInt(tenantID),
-    });
-    const tenantDashboards =
-      await databaseDashboardService.getAllDatabaseDashboards({
-        userID: parseInt(userID),
-        tenantID: parseInt(tenantID),
-      });
-    const tenantDatabaseQueries =
-      await databaseQueryService.getAllDatabaseQueries({
-        userID: parseInt(userID),
-        tenantID: parseInt(tenantID),
-      });
+    let tenantRoles = null,
+      tenantDatabaseMetadata = null,
+      tenantCharts = null,
+      tenantDashboards = null,
+      tenantDatabaseQueries = null;
 
+    try {
+      tenantRoles = await tenantRoleService.getAllTenantRoles({
+        userID: parseInt(userID),
+        tenantID: parseInt(tenantID),
+      });
+      tenantDatabaseMetadata =
+        await databaseService.getDatabaseMetadataForTenant({
+          userID: parseInt(userID),
+          dbPool,
+        });
+      tenantCharts = await databaseChartService.getAllDatabaseCharts({
+        userID: parseInt(userID),
+        tenantID: parseInt(tenantID),
+      });
+      tenantDashboards =
+        await databaseDashboardService.getAllDatabaseDashboards({
+          userID: parseInt(userID),
+          tenantID: parseInt(tenantID),
+        });
+      tenantDatabaseQueries = await databaseQueryService.getAllDatabaseQueries({
+        userID: parseInt(userID),
+        tenantID: parseInt(tenantID),
+      });
+    } catch (error) {
+      Logger.log("error", {
+        message: "tenantService:getUserTenantByID:catch-1",
+        params: { error },
+      });
+    }
+      
     const tenant = {
       ...userTenantRelationships.tblTenants,
       roles: userTenantRelationships,

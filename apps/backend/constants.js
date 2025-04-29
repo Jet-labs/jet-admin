@@ -152,7 +152,7 @@ const constants = {
       value: "radar",
     },
     POLAR_AREA: {
-      name: "Radial Bar Chart",
+      name: "Polar Area Chart",
       value: "polarArea",
     },
   },

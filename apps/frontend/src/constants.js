@@ -294,6 +294,10 @@ export const CONSTANTS = {
     DATABASE_TABLE_DELETION_DIALOG_MESSAGE:
       "Are you sure you want to delete this table? This action cannot be undone.",
 
+    DATABASE_TABLE_NO_PRIMARY_KEY_TITLE: "No primary key",
+    DATABASE_TABLE_NO_PRIMARY_KEY_DESCRIPTION:
+      "Table does not have a primary. Please select a custom primary to display data",
+
     TABLE_DRAWER_LIST_NO_TABLE: "No tables found",
     TRIGGER_DRAWER_LIST_NO_TRIGGER: "No triggers found",
     QUERY_DRAWER_LIST_NO_QUERY: "No queries found",
@@ -1430,6 +1434,7 @@ export const CONSTANTS = {
   USER_CONFIG_KEYS: {
     DEFAULT_DASHBOARD_ID: "DEFAULT_DASHBOARD_ID",
     DEFAULT_SCHEMA_DASHBAORD_ID: "DEFAULT_SCHEMA_DASHBAORD_ID",
+    DATABASE_TABLE_CUSTOM_PRIMARY_KEY: "DATABASE_TABLE_CUSTOM_PRIMARY_KEY",
   },
   REACT_QUERY_KEYS: {
     DB_USER: "DB_USER",

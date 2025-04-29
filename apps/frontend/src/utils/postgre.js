@@ -144,22 +144,36 @@ export class PostgreSQLUtils {
 
   static combinePrimaryKeyToWhereClause = (tablePrimaryKey, keyValues) => {
     // Initialize an array to hold the conditions
-    const conditions = tablePrimaryKey.map((key) => {
-      // Check if the key exists in the keyValues object
-      if (key in keyValues) {
+    if (Array.isArray(tablePrimaryKey)) {
+      const conditions = tablePrimaryKey.map((key) => {
+        // Check if the key exists in the keyValues object
+        if (key in keyValues) {
+          // Construct the condition string for this key
+          return `"${key}" = ${
+            typeof keyValues[key] === "string"
+              ? `'${keyValues[key]}'`
+              : keyValues[key]
+          }`;
+        } else {
+          console.warn(`Key ${key} not found in keyValues object.`);
+        }
+      });
+
+      // Join the conditions with 'AND' to form the final WHERE clause
+      return `${conditions.join(" AND ")}`;
+    } else {
+      if (tablePrimaryKey in keyValues) {
         // Construct the condition string for this key
-        return `"${key}" = ${
-          typeof keyValues[key] === "string"
-            ? `'${keyValues[key]}'`
-            : keyValues[key]
+        return `"${tablePrimaryKey}" = ${
+          typeof keyValues[tablePrimaryKey] === "string"
+            ? `'${keyValues[tablePrimaryKey]}'`
+            : keyValues[tablePrimaryKey]
         }`;
       } else {
-        console.warn(`Key ${key} not found in keyValues object.`);
+        console.warn(`Key ${tablePrimaryKey} not found in keyValues object.`);
       }
-    });
-
-    // Join the conditions with 'AND' to form the final WHERE clause
-    return `${conditions.join(" AND ")}`;
+    }
+    
   };
 
   static generateFilterQuery = (filterModel) => {

@@ -66,7 +66,7 @@ authService.getUserConfig = async ({ userID, tenantID }) => {
       message: "authService:getUserConfig:userConfig",
       params: { userConfig },
     });
-    return userConfig.config;
+    return userConfig?.config;
   } catch (error) {
     Logger.log("error", {
       message: "authService:getUserConfig:catch-1",
