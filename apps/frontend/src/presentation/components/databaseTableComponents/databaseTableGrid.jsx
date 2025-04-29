@@ -120,7 +120,6 @@ export const DatabaseTableGrid = ({
     databaseTableName,
     page,
     pageSize,
-    databaseTableColumns,
     databaseTablePrimaryKey,
     filterQuery,
     databaseTableColumnSortModel,

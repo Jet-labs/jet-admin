@@ -3,14 +3,12 @@ import { useCallback } from "react";
 import { CONSTANTS } from "../../constants";
 import { getDatabaseTableRowsAPI } from "../../data/apis/databaseTable";
 import { PostgreSQLUtils } from "../../utils/postgre";
-import { v4 as uuid4 } from "uuid";
 export const useDatabaseTableRows = ({
   tenantID,
   databaseSchemaName,
   databaseTableName,
   page,
   pageSize,
-  databaseTableColumns,
   databaseTablePrimaryKey,
   filterQuery,
   databaseTableColumnSortModel,
@@ -53,20 +51,18 @@ export const useDatabaseTableRows = ({
           databaseTablePrimaryKey,
           row
         );
-      } else if (databaseTableColumns) {
-        return PostgreSQLUtils.combinePrimaryKeyToWhereClause(
-          databaseTableColumns.map((column) => column.databaseTableColumnName),
-          row
-        );
       } else {
-        return uuid4();
+        return PostgreSQLUtils.combinePrimaryKeyToWhereClause(["ctid"], row);
       }
     },
-    [databaseTablePrimaryKey, databaseTableColumns]
+    [databaseTablePrimaryKey]
   );
 
   const processedDatabaseTableRows = queryResult.data?.rows?.map((_row) => {
-    return { ..._row, __row__uid: _generateInitialRowID(_row) };
+    // eslint-disable-next-line no-unused-vars
+    const { ctid, ...row } = _row;
+    const __row__uid = _generateInitialRowID(_row);
+    return { ...row, __row__uid };
   });
 
   return {

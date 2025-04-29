@@ -570,9 +570,9 @@ postgreSQLQueryUtil.getDatabaseTableRows = ({
 
   // Base query with optional filter
   if (filter) {
-    _q = `SELECT * FROM ${tableReference} WHERE ${filter}`;
+    _q = `SELECT ctid, * FROM ${tableReference} WHERE ${filter}`;
   } else {
-    _q = `SELECT * FROM ${tableReference}`;
+    _q = `SELECT ctid, * FROM ${tableReference}`;
   }
 
   // Add ORDER BY if provided and valid
