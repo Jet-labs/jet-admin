@@ -186,6 +186,7 @@ export const DatabaseChartAdditionForm = ({ tenantID }) => {
                 databaseChartEditorForm={addDatabaseChartForm}
                 tenantID={tenantID}
                 key={`databaseChartEditor_${uniqueKey.current}`}
+                databaseChartFetchedData={databaseChartFetchedData}
               />
             )}
             <button

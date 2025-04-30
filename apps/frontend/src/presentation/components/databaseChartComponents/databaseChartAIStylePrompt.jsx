@@ -7,13 +7,18 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 import { useMutation } from "@tanstack/react-query";
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import { FaMagic } from "react-icons/fa";
 import { CONSTANTS } from "../../../constants";
-import { generateAIPromptBasedChartStyleAPI } from "../../../data/apis/databaseChart";
+import {
+  generateAIPromptBasedChartStyleAPI,
+  getDatabaseChartDataUsingChartAPI,
+} from "../../../data/apis/databaseChart";
 import { displayError } from "../../../utils/notification";
 import { CodeBlock } from "../ui/codeBlock";
 import PropTypes from "prop-types";
+import { DatabaseChartPreview } from "./databaseChartPreview";
+import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 
 // Styled components to override MUI defaults
 const StyledDialog = styled(Dialog)(() => ({
@@ -54,18 +59,79 @@ export const DatabaseChartAIStylePrompt = ({
   tenantID,
   databaseChartData,
   onAccepted,
+  databaseChartFetchedData,
+  databaseChartName,
+  databaseChartType,
+  databaseChartConfig,
 }) => {
   DatabaseChartAIStylePrompt.propTypes = {
     tenantID: PropTypes.number.isRequired,
     onAccepted: PropTypes.func.isRequired,
     databaseChartData: PropTypes.object.isRequired,
+    databaseChartFetchedData: PropTypes.object.isRequired,
+    databaseChartName: PropTypes.string.isRequired,
+    databaseChartType: PropTypes.string.isRequired,
+    databaseChartConfig: PropTypes.object.isRequired,
   };
+
+  const uniqueKey = useRef(`databaseChartAIStylePrompt_${Date.now()}`);
+  const [generatedStyleBasedChartData, setGeneratedStyleBasedChartData] =
+    useState(null);
 
   const [aiPrompt, setAIPrompt] = useState(
     "Style the chart with more modern look and feel"
   );
   const [aiStyledChart, setAIStyledChart] = useState("");
   const [isAIPromptDialogOpen, setIsAIPromptDialogOpen] = useState(false);
+
+  const {
+    isPending: isFetchingDatabaseChartData,
+    mutate: fetchDatabaseChartData,
+  } = useMutation({
+    mutationFn: (data) => {
+      return getDatabaseChartDataUsingChartAPI({
+        tenantID,
+        databaseChartData: data,
+      });
+    },
+    retry: false,
+    onSuccess: (data) => {
+      setGeneratedStyleBasedChartData(data?.data);
+    },
+    onError: (error) => {
+      displayError(error);
+    },
+  });
+
+  const _handleOnNewDatabaseChartStyle = useCallback(
+    (aiStyledChart) => {
+      if (!aiStyledChart || !databaseChartData) return;
+      try {
+        const _aiStyledChart = JSON.parse(aiStyledChart);
+        const _databaseChartData = {
+          ...databaseChartData,
+          databaseChartConfig: _aiStyledChart?.databaseChartConfig,
+          databaseQueries: databaseChartData?.databaseQueries?.map(
+            (query, index) => {
+              console.log({
+                parameters: _aiStyledChart?.databaseQueries[index]?.parameters,
+              });
+              return {
+                ...query,
+                parameters: _aiStyledChart?.databaseQueries[index]?.parameters,
+              };
+            }
+          ),
+          databaseChartName,
+          databaseChartType,
+        };
+        fetchDatabaseChartData(_databaseChartData);
+      } catch (error) {
+        displayError(error);
+      }
+    },
+    [databaseChartData]
+  );
 
   const {
     isPending: isGeneratingAIPromptBasedChartStyle,
@@ -82,13 +148,18 @@ export const DatabaseChartAIStylePrompt = ({
     onSuccess: (data) => {
       console.log({ data });
       setAIStyledChart(data);
+      _handleOnNewDatabaseChartStyle(data);
     },
     onError: (error) => {
       displayError(error);
     },
   });
-
-  console.log({ aiStyledChart });
+  console.log({
+    databaseChartFetchedData,
+    databaseChartData,
+    aiStyledChart: aiStyledChart,
+    generatedStyleBasedChartData,
+  });
 
   const _handleOnChartConfigAccepted = useCallback(() => {
     if (!aiStyledChart) return;
@@ -180,50 +251,83 @@ export const DatabaseChartAIStylePrompt = ({
         </StyledDialogTitle>
 
         <StyledDialogContent>
-          <span className="text-sm font-normal text-gray-600">
-            {CONSTANTS.STRINGS.DATABASE_CHART_AI_STYLE_PROMPT_FORM_DESCRIPTION}
-          </span>
+          <div className="flex flex-col justify-start items-start w-full">
+            <span className="text-sm font-medium text-gray-600 mb-1 mt-4">
+              {
+                CONSTANTS.STRINGS
+                  .DATABASE_CHART_AI_STYLE_PROMPT_FORM_DESCRIPTION
+              }
+            </span>
 
-          <div className="space-y-4 mt-4">
-            <textarea
-              id="aiPrompt"
-              name="aiPrompt"
-              rows="4"
-              required
-              value={aiPrompt}
-              onChange={(e) => setAIPrompt(e.target.value)}
-              autoComplete="off"
-              className="w-full rounded border border-indigo-200 p-2.5 text-sm text-gray-800 bg-white/70 backdrop-blur-md outline-none transition-all duration-200 shadow-sm focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/30 focus:shadow-indigo-500/30"
-              placeholder="Describe what you want to create..."
-              style={{
-                backdropFilter: "blur(4px)",
-                boxShadow: "0 0 10px rgba(99, 102, 241, 0.1)",
-              }}
-            />
-          </div>
-          {aiStyledChart && (
-            <>
-              <div className="w-full flex flex-row justify-between items-center mt-4 pl-0.5">
-                <div className="flex flex-col w-full justify-start items-start">
-                  <span className="text-sm font-medium text-gray-600">
-                    {
-                      CONSTANTS.STRINGS
-                        .DATABASE_CHART_AI_STYLE_PROMPT_GENERATED_STYLES_TITLE
-                    }
-                  </span>
-                  <span className="text-xs font-light text-gray-500">
-                    {
-                      CONSTANTS.STRINGS
-                        .DATABASE_CHART_AI_STYLE_PROMPT_GENERATED_STYLES_DESCRIPTION
-                    }
-                  </span>
+            <div className="space-y-4 w-full">
+              <textarea
+                id="aiPrompt"
+                name="aiPrompt"
+                rows="4"
+                required
+                value={aiPrompt}
+                onChange={(e) => setAIPrompt(e.target.value)}
+                autoComplete="off"
+                className="w-full rounded border border-indigo-200 p-2.5 text-sm text-gray-800 bg-white/70 backdrop-blur-md outline-none transition-all duration-200 shadow-sm focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/30 focus:shadow-indigo-500/30"
+                placeholder="Describe what you want to create..."
+                style={{
+                  backdropFilter: "blur(4px)",
+                  boxShadow: "0 0 10px rgba(99, 102, 241, 0.1)",
+                }}
+              />
+            </div>
+            <span className="text-sm font-medium text-gray-600 mt-4 mb-1">
+              {CONSTANTS.STRINGS.DATABASE_CHART_AI_STYLE_CHART_PREVIEW}
+            </span>
+            <ReactQueryLoadingErrorWrapper
+              isLoading={isFetchingDatabaseChartData}
+              isFetching={isFetchingDatabaseChartData}
+              isRefetching={isFetchingDatabaseChartData}
+              refetch={fetchDatabaseChartData}
+              error={null}
+            >
+              <DatabaseChartPreview
+                databaseChartName={databaseChartName}
+                databaseChartType={databaseChartType}
+                databaseChartConfig={
+                  aiStyledChart
+                    ? JSON.parse(aiStyledChart)?.databaseChartConfig
+                    : databaseChartConfig
+                }
+                data={
+                  generatedStyleBasedChartData
+                    ? generatedStyleBasedChartData
+                    : databaseChartFetchedData
+                }
+                key={`databaseChartPreview_${uniqueKey.current}`}
+                allowActionBar={false}
+                containerClass="!rounded !overflow-hidden border border-indigo-200"
+              />
+            </ReactQueryLoadingErrorWrapper>
+            {aiStyledChart && (
+              <>
+                <div className="w-full flex flex-row justify-between items-center mt-4 pl-0.5">
+                  <div className="flex flex-col w-full justify-start items-start">
+                    <span className="text-sm font-medium text-gray-600">
+                      {
+                        CONSTANTS.STRINGS
+                          .DATABASE_CHART_AI_STYLE_PROMPT_GENERATED_STYLES_TITLE
+                      }
+                    </span>
+                    <span className="text-xs font-light text-gray-500">
+                      {
+                        CONSTANTS.STRINGS
+                          .DATABASE_CHART_AI_STYLE_PROMPT_GENERATED_STYLES_DESCRIPTION
+                      }
+                    </span>
+                  </div>
                 </div>
-              </div>
-              <div className="mt-1 transition-all duration-300">
-                <CodeBlock code={aiStyledChart} language="json" />
-              </div>
-            </>
-          )}
+                <div className="mt-1 transition-all duration-300 w-full">
+                  <CodeBlock code={aiStyledChart} language="json" />
+                </div>
+              </>
+            )}
+          </div>
         </StyledDialogContent>
 
         <StyledDialogActions className="justify-end space-x-2">

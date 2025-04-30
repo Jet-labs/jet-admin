@@ -12,10 +12,15 @@ import { DatabaseChartAIStylePrompt } from "./databaseChartAIStylePrompt";
 import PropTypes from "prop-types";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 
-export const DatabaseChartEditor = ({ databaseChartEditorForm, tenantID }) => {
+export const DatabaseChartEditor = ({
+  databaseChartEditorForm,
+  tenantID,
+  databaseChartFetchedData,
+}) => {
   DatabaseChartEditor.propTypes = {
     databaseChartEditorForm: PropTypes.object.isRequired,
     tenantID: PropTypes.number.isRequired,
+    databaseChartFetchedData: PropTypes.object.isRequired,
   };
   const uniqueKey = useRef(`databaseChartEditor_${Date.now()}`);
   const {
@@ -132,6 +137,15 @@ export const DatabaseChartEditor = ({ databaseChartEditorForm, tenantID }) => {
           tenantID={tenantID}
           onAccepted={_handleOnChartStyleAccepted}
           key={`databaseChartAIStylePrompt_${uniqueKey.current}`}
+          databaseChartName={databaseChartEditorForm.values.databaseChartName}
+          databaseChartType={databaseChartEditorForm.values.databaseChartType}
+          databaseChartConfig={
+            databaseChartEditorForm.values.databaseChartConfig
+          }
+          databaseChartDescription={
+            databaseChartEditorForm.values.databaseChartDescription
+          }
+          databaseChartFetchedData={databaseChartFetchedData}
           databaseChartData={{
             ...databaseChartEditorForm.values,
             databaseQueries:

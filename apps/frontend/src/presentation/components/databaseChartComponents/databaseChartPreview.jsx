@@ -15,7 +15,10 @@ export const DatabaseChartPreview = ({
   isRefreshingData,
   refreshData,
   databaseChartConfig,
+  allowActionBar = true,
+  containerClass,
 }) => {
+  console.log({ databaseChartName, databaseChartType, data });
   DatabaseChartPreview.propTypes = {
     databaseChartName: PropTypes.string.isRequired,
     databaseChartType: PropTypes.string.isRequired,
@@ -25,6 +28,8 @@ export const DatabaseChartPreview = ({
     isRefreshingData: PropTypes.bool.isRequired,
     refreshData: PropTypes.func.isRequired,
     databaseChartConfig: PropTypes.object,
+    allowActionBar: PropTypes.bool,
+    containerClass: PropTypes.string,
   };
   const chartRef = useRef();
   const _handleOnChartInit = useCallback(
@@ -36,32 +41,34 @@ export const DatabaseChartPreview = ({
     [chartRef]
   );
   return (
-    <div className="h-full w-full flex flex-col">
-      <div className="w-full flex flex-row justify-end items-center bg-slate-100 border-b border-b-slate-200 p-2 gap-2">
-        {chartRef && (
-          <DatabaseChartDownloadForm
-            databaseChartName={databaseChartName}
-            chartRef={chartRef}
-          />
-        )}
-        <button
-          type="button"
-          className="p-1 bg-[#646cff]/20 m-0 flex flex-row justify-center items-center rounded text-xs text-[#646cff] hover:border-[#646cff] hover:border outline-none focus:outline-none"
-          onClick={refreshData}
-        >
-          {isRefreshingData ? (
-            <CircularProgress size={16} className=" !text-[#646cff]" />
-          ) : (
-            <FiRefreshCcw className="h-4 w-4" />
+    <div className={`h-full w-full flex flex-col ${containerClass}`}>
+      {allowActionBar && (
+        <div className="w-full flex flex-row justify-end items-center bg-slate-100 border-b border-b-slate-200 p-2 gap-2">
+          {chartRef && (
+            <DatabaseChartDownloadForm
+              databaseChartName={databaseChartName}
+              chartRef={chartRef}
+            />
           )}
-        </button>
-      </div>
+          <button
+            type="button"
+            className="p-1 bg-[#646cff]/20 m-0 flex flex-row justify-center items-center rounded text-xs text-[#646cff] hover:border-[#646cff] hover:border outline-none focus:outline-none"
+            onClick={refreshData}
+          >
+            {isRefreshingData ? (
+              <CircularProgress size={16} className=" !text-[#646cff]" />
+            ) : (
+              <FiRefreshCcw className="h-4 w-4" />
+            )}
+          </button>
+        </div>
+      )}
       {isFetchingData || isRefreshingData ? (
         <div className="w-full h-full flex flex-col justify-center items-center">
           <CircularProgress className=" !text-[#646cff]" />
         </div>
       ) : (
-        <div className="h-full w-full p-3">
+        <div className="h-full w-full">
           {DATABASE_CHARTS_CONFIG_MAP[databaseChartType] ? (
             DATABASE_CHARTS_CONFIG_MAP[databaseChartType].component({
               databaseChartName,

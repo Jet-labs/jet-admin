@@ -242,6 +242,11 @@ export const DatabaseChartUpdationForm = ({ tenantID, databaseChartID }) => {
                   key={databaseChart?.databaseChartID}
                   databaseChartEditorForm={updateDatabaseChartForm}
                   tenantID={tenantID}
+                  databaseChartFetchedData={
+                    databaseChartFetchedData
+                      ? databaseChartFetchedData
+                      : databaseChartDataByID?.data
+                  }
                 />
               )}
               <div className="flex flex-row justify-around items-center">

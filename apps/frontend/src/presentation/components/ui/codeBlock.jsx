@@ -5,56 +5,65 @@ import hljs from "highlight.js";
 import "highlight.js/styles/atom-one-light.css";
 import PropTypes from "prop-types";
 
-// Enhanced CodeBlock component
 export const CodeBlock = ({
   code,
   language = "plaintext",
   showLineNumbers = false,
   wrapText = true,
   maxHeight = "500px",
-  theme = "light", // Can be 'light' or 'dark'
+  theme = "light",
 }) => {
-  CodeBlock.propTypes = {
-    code: PropTypes.string.isRequired,
-    language: PropTypes.string,
-    showLineNumbers: PropTypes.bool,
-    wrapText: PropTypes.bool,
-    maxHeight: PropTypes.string,
-    theme: PropTypes.string,
-  };
   const [copied, setCopied] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [highlightedCode, setHighlightedCode] = useState("");
+  const [displayedCode, setDisplayedCode] = useState(code || "");
   const codeRef = useRef(null);
 
-  // Handle syntax highlighting
-  // Inside the useEffect for highlighting
   useEffect(() => {
-    if (code) {
+    if (typeof code !== "string") {
+      setDisplayedCode("");
+      setHighlightedCode("");
+      return;
+    }
+
+    let processedCode = code;
+
+    // Format JSON if the language is JSON
+    if (language === "json") {
       try {
-        if (language === "plaintext") {
-          // For plaintext, don't use highlight.js but create properly escaped HTML
-          const escaped = code
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;");
-          setHighlightedCode(escaped);
-        } else {
-          // For other languages, use highlight.js
-          const highlighted = hljs.highlight(code, { language }).value;
-          setHighlightedCode(highlighted);
-        }
+        const parsed = JSON.parse(code);
+        processedCode = JSON.stringify(parsed, null, 2);
       } catch (error) {
-        // If language not supported, fallback to auto detection
-        console.error("Error highlighting code:", error);
-        const highlighted = hljs.highlightAuto(code).value;
+        console.warn("Invalid JSON provided. Will display as-is.", error);
+      }
+    }
+
+    setDisplayedCode(processedCode);
+
+    // Syntax highlight the processed code
+    try {
+      if (language === "plaintext") {
+        const escaped = processedCode
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "<")
+          .replace(/>/g, ">");
+        setHighlightedCode(escaped);
+      } else {
+        const highlighted = hljs.highlight(processedCode, { language }).value;
         setHighlightedCode(highlighted);
       }
+    } catch (error) {
+      console.warn(
+        "Failed to highlight code. Falling back to auto-detect.",
+        error
+      );
+      const highlighted = hljs.highlightAuto(processedCode).value;
+      setHighlightedCode(highlighted);
     }
   }, [code, language]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(code);
+    navigator.clipboard.writeText(displayedCode);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
@@ -63,10 +72,12 @@ export const CodeBlock = ({
     setExpanded(!expanded);
   };
 
-  // Add line numbers and syntax highlighting
-  // Modify the renderCodeWithLineNumbers function
+  useEffect(() => {
+    console.log("CodeBlock: code changed", code);
+  }, [code]);
+
   const renderCodeWithLineNumbers = () => {
-    const lines = code.split("\n");
+    const lines = (displayedCode || "").split("\n");
 
     return lines.map((line, index) => (
       <div key={index} className="flex">
@@ -92,9 +103,7 @@ export const CodeBlock = ({
             ) : (
               <div
                 dangerouslySetInnerHTML={{
-                  __html: line
-                    ? highlightedCode.split("\n")[index] || line
-                    : " ",
+                  __html: highlightedCode.split("\n")[index] || line || " ",
                 }}
               />
             )
@@ -112,7 +121,6 @@ export const CodeBlock = ({
     ));
   };
 
-  // Detect language name for display
   const getLanguageDisplay = () => {
     const languageMap = {
       js: "JavaScript",
@@ -147,7 +155,7 @@ export const CodeBlock = ({
 
   return (
     <div
-      className={`rounded-md overflow-hidden border ${
+      className={`rounded-md overflow-y-auto border ${
         theme === "dark"
           ? "border-gray-700 bg-gray-800"
           : "border-gray-200 bg-white"
@@ -206,7 +214,7 @@ export const CodeBlock = ({
       </div>
       <div
         ref={codeRef}
-        className={`p-4 font-mono text-sm overflow-y-auto ${
+        className={`p-4 font-mono text-sm overflow-y-auto h-full ${
           wrapText
             ? "whitespace-pre-wrap break-words"
             : "whitespace-pre overflow-x-auto"
@@ -218,12 +226,11 @@ export const CodeBlock = ({
   );
 };
 
-// Usage example:
-// <CodeBlock
-//   code="const hello = 'world';\nconsole.log(hello);"
-//   language="javascript"
-//   showLineNumbers={true}
-//   wrapText={true}
-//   maxHeight="300px"
-//   theme="light"
-// />
+CodeBlock.propTypes = {
+  code: PropTypes.string.isRequired,
+  language: PropTypes.string,
+  showLineNumbers: PropTypes.bool,
+  wrapText: PropTypes.bool,
+  maxHeight: PropTypes.string,
+  theme: PropTypes.string,
+};
