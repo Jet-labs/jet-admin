@@ -11,6 +11,7 @@ import ReactJson from "react-json-view";
 import { DatabaseTableColumn } from "../../../data/models/databaseTableColumn";
 import { PostgreSQLUtils } from "../../../utils/postgre";
 import PropTypes from "prop-types";
+import { DatabaseTableGridJSONEditor } from "./databaseTableGridJSONEditor";
 
 /**
  * Helper component to wrap the editor input and add a cancel button.
@@ -315,13 +316,13 @@ const JsonEditCell = ({ params }) => {
       >
         Editing JSON...
       </Box>
-      {/* <DataGridJSONPopupEditor
+      <DatabaseTableGridJSONEditor
         title={`Edit "${params.field}"`}
         open={isPopupOpen}
         value={params.value} // Pass the value from the grid (processed by valueGetter)
         onSave={handleSave}
         onCancel={handleCancel}
-      /> */}
+      />
     </>
   );
 };
