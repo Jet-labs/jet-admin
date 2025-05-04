@@ -20,7 +20,7 @@ import { DatabaseTableGridJSONEditor } from "./databaseTableGridJSONEditor";
  * @param {object} props.params - The DataGrid renderCell/renderEditCell params object.
  * @returns {React.ReactElement} - The wrapped editor with a cancel button.
  */
-const EditCellWrapper = ({ children, params }) => {
+const EditCellWrapper = React.memo(({ children, params }) => {
   EditCellWrapper.propTypes = {
     children: PropTypes.node.isRequired,
     params: PropTypes.object.isRequired,
@@ -66,7 +66,10 @@ const EditCellWrapper = ({ children, params }) => {
       </IconButton>
     </Box>
   );
-};
+});
+
+// Add display name to the component
+EditCellWrapper.displayName = "EditCellWrapper";
 
 /**
  * Returns width for different field types
@@ -91,6 +94,7 @@ const getFieldFormatting = ({
   customIntMapping,
   foreignKeyReference, // Indicates if the field is part of a foreign key
 }) => {
+  const uniqueKey = `databaseTableGridFormatter_${params.id}_${params.field}`;
   const cellValue = params.value;
   const convertedType = CONSTANTS.POSTGRE_SQL_DATA_TYPES[type]?.js_type;
   const commonTextStyle =
@@ -129,6 +133,7 @@ const getFieldFormatting = ({
           </div>
         ) : (
           <Link
+            key={`foreignKeyIndicator_${uniqueKey}`}
             to={foreignKeyReferenceLink()}
             target="_blank"
             className="p-1 bg-slate-100 mr-2 rounded cursor-pointer"
@@ -244,6 +249,7 @@ const getFieldFormatting = ({
         <div className="max-h-32 overflow-auto rounded !text-slate-700 p-2">
           {parsedCellValue !== null ? (
             <ReactJson
+              key={`reactJson_${uniqueKey}`}
               src={parsedCellValue}
               theme="rjv-default"
               displayDataTypes={false}
@@ -259,9 +265,7 @@ const getFieldFormatting = ({
 
     default:
       return (
-        <span className={commonTextStyle}>
-          {isList ? JSON.stringify(cellValue) : cellValue}
-        </span>
+        <span className={commonTextStyle}>{JSON.stringify(cellValue)}</span>
       );
   }
 };

@@ -9,7 +9,6 @@ import { DatabaseTriggerLayout } from "../layouts/databaseTriggerLayout";
 import { DatabaseQueryLayout } from "../layouts/databaseQueryLayout";
 import { UserManagementLayout } from "../layouts/userManagementLayout";
 import { RoleManagementLayout } from "../layouts/roleManagementLayout";
-import { DatabaseChartLayout } from "../layouts/databaseChartLayout";
 import { DatabaseDashboardLayout } from "../layouts/databaseDashboardLayout";
 import { DatabaseWidgetLayout } from "../layouts/databaseWidgetLayout";
 import { DatabaseNotificationLayout } from "../layouts/databaseNotificationLayout";
@@ -55,15 +54,7 @@ const UpdateDatabaseQueryPage = lazy(() =>
 const DatabaseQueryLayoutLandingPage = lazy(() =>
   import("../../pages/databaseQueryLayoutLandingPage")
 );
-const AddDatabaseChartPage = lazy(() =>
-  import("../../pages/addDatabaseChartPage")
-);
-const UpdateDatabaseChartPage = lazy(() =>
-  import("../../pages/updateDatabaseChartPage")
-);
-const DatabaseChartLayoutLandingPage = lazy(() =>
-  import("../../pages/databaseChartLayoutLandingPage")
-);
+
 const DatabaseDashboardLayoutLandingPage = lazy(() =>
   import("../../pages/databaseDashboardLayoutLandingPage")
 );
@@ -210,23 +201,7 @@ const router = createBrowserRouter([
               },
             ],
           },
-          {
-            element: <DatabaseChartLayout />,
-            children: [
-              {
-                path: CONSTANTS.ROUTES.VIEW_DATABASE_CHARTS.code,
-                element: <DatabaseChartLayoutLandingPage />,
-              },
-              {
-                path: CONSTANTS.ROUTES.ADD_DATABASE_CHART.code,
-                element: <AddDatabaseChartPage />,
-              },
-              {
-                path: CONSTANTS.ROUTES.UPDATE_DATABASE_CHART_BY_ID.code,
-                element: <UpdateDatabaseChartPage />,
-              },
-            ],
-          },
+
           {
             element: <DatabaseWidgetLayout />,
             children: [

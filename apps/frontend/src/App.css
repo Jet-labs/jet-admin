@@ -7,15 +7,6 @@
   border-bottom-left-radius: 4px !important;
 }
 
-.codemirror-editor-rounded-bottom .cm-editor {
-  border-bottom-left-radius: 4px !important;
-  border-bottom-right-radius: 4px !important;
-}
-
-.codemirror-editor-rounded-bottom .cm-gutters {
-  border-bottom-left-radius: 4px !important;
-}
-
 .codemirror-editor-rounded .cm-scroller {
   border-radius: 4px !important;
 }

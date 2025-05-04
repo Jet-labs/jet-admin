@@ -4,7 +4,7 @@ import "react-grid-layout/css/styles.css";
 import { FaTimes } from "react-icons/fa";
 import "react-resizable/css/styles.css";
 import { useComponentSize } from "../../../logic/hooks/useComponentSize";
-import { DatabaseDashboardWidget } from "../widgetTypes/databaseDashboardWidget";
+import { DatabaseDashboardWidget } from "./databaseDashboardWidget";
 
 export const DatabaseDashboardRenderWidget = ({
   widget,

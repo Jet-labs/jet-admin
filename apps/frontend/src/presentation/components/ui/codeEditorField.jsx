@@ -42,7 +42,7 @@ export const CodeEditorField = ({
       value={code}
       height={height}
       width="100%"
-      maxWidth="1000px"
+      // maxWidth="1000px"
       extensions={[langMap[language]]}
       onChange={setCode}
       theme={githubLight}
@@ -53,11 +53,12 @@ export const CodeEditorField = ({
       style={{
         borderWidth: outlined ? 1 : 0,
         borderRadius: outlined ? 4 : 0,
+        outline: "none",
       }}
       className={
         rounded
-          ? "codemirror-editor-rounded border-slate-300 focus:border-slate-700 !border !border-solid !focus:!border-solid"
-          : "border-slate-300 focus:border-slate-700"
+          ? "codemirror-editor-rounded border-slate-300 !border !border-solid focus:outline-none focus:!border-[#646cff]"
+          : "border-slate-200 !border !border-solid focus:outline-none focus:!border-[#646cff]"
       }
       indentWithTab={true}
     />

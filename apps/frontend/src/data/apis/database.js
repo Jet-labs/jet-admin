@@ -65,7 +65,7 @@ export const createDatabaseSchemaAPI = async ({
   }
 };
 
-export const executeRawSQLQueryAPI = async ({ tenantID, sqlQuery }) => {
+export const executeRawSQLQueryAPI = async ({ tenantID, query }) => {
   try {
     const url = `${
       CONSTANTS.SERVER_HOST
@@ -78,7 +78,7 @@ export const executeRawSQLQueryAPI = async ({ tenantID, sqlQuery }) => {
 
     const response = await axios.post(
       url,
-      { sqlQuery },
+      { query },
       {
         headers: {
           authorization: `Bearer ${bearerToken}`,

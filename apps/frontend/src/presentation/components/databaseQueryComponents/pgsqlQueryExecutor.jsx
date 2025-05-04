@@ -1,21 +1,19 @@
-import { sql } from "@codemirror/lang-sql";
 import { CircularProgress } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
-import { githubLight } from "@uiw/codemirror-theme-github";
-import CodeMirror from "@uiw/react-codemirror";
+import PropTypes from "prop-types";
 import React, { useState } from "react";
 import { FaPlay } from "react-icons/fa";
 import { CONSTANTS } from "../../../constants";
 import { executeRawSQLQueryAPI } from "../../../data/apis/database";
 import { extractError } from "../../../utils/error";
 import { displayError, displaySuccess } from "../../../utils/notification";
-import { DatabaseQueryResponseView } from "./databaseQueryResponseView";
+import { CodeEditorField } from "../ui/codeEditorField";
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "../ui/resizable";
-import PropTypes from "prop-types";
+import { DatabaseQueryResponseView } from "./databaseQueryResponseView";
 
 export const PGSQLQueryExecutor = ({ tenantID }) => {
   PGSQLQueryExecutor.propTypes = {
@@ -35,7 +33,7 @@ export const PGSQLQueryExecutor = ({ tenantID }) => {
     mutationFn: (sqlQuery) => {
       return executeRawSQLQueryAPI({
         tenantID,
-        sqlQuery: sqlQuery.trim(),
+        query: sqlQuery.trim(),
       });
     },
     retry: false,
@@ -84,22 +82,12 @@ export const PGSQLQueryExecutor = ({ tenantID }) => {
           <ResizablePanel defaultSize={20}>
             <div className="p-3 flex-shrink-0">
               <div className="mb-2">
-                <label className="block text-sm font-medium text-slate-700 mb-1">
-                  {CONSTANTS.STRINGS.RAW_QUERY_EXCECUTOR_QUERY_LABEL}
-                </label>
-                <div className="border border-slate-300 rounded-md">
-                  <CodeMirror
-                    value={sqlQuery}
-                    height="150px"
-                    theme={githubLight}
-                    extensions={[sql()]}
-                    onChange={(value) => setSqlQuery(value)}
-                    placeholder={
-                      CONSTANTS.STRINGS.RAW_QUERY_EXCECUTOR_PLACEHOLDER
-                    }
-                    className="border-slate-300 focus:border-slate-300 focus:outline-slate-300"
-                  />
-                </div>
+                <CodeEditorField
+                  code={sqlQuery}
+                  setCode={setSqlQuery}
+                  language="sql"
+                  height="150px"
+                />
               </div>
 
               <div className="flex justify-end">
@@ -107,7 +95,7 @@ export const PGSQLQueryExecutor = ({ tenantID }) => {
                   type="button"
                   onClick={handleExecuteQuery}
                   disabled={isExecuting || !sqlQuery.trim()}
-                  className="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#747bff] focus:ring-4 focus:outline-none"
+                  className="flex flex-row justify-center items-center px-2.5 !cursor-pointer py-1.5 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#747bff] focus:ring-4 focus:outline-none"
                 >
                   {isExecuting && (
                     <CircularProgress

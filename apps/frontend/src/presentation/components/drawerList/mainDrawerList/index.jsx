@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { BiLogoPostgresql } from "react-icons/bi";
 import { BsServer } from "react-icons/bs";
-import { FaChartPie, FaKey, FaUserCog } from "react-icons/fa";
+import { FaKey, FaUserCog } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa6";
 import { FiUsers } from "react-icons/fi";
 import {
@@ -223,40 +223,7 @@ export const MainDrawerList = () => {
                 )}
               </span>
             </Link>
-            <Link
-              to={CONSTANTS.ROUTES.VIEW_DATABASE_CHARTS.path(tenantID)}
-              key={CONSTANTS.ROUTES.VIEW_DATABASE_CHARTS.path(tenantID)}
-              className={`flex items-center ${
-                decodeURIComponent(location.pathname).includes(
-                  CONSTANTS.ROUTES.VIEW_DATABASE_CHARTS.path(tenantID)
-                )
-                  ? "bg-[#eaebff]"
-                  : "bg-slate-100"
-              } rounded mb-2 w-full p-2 text-slate-700 transition duration-75 group bg-slate-200  hover:bg-slate-100  flex-row !justify-start mt-2 `}
-            >
-              <FaChartPie
-                className={`!w-5 !h-5 ${
-                  decodeURIComponent(location.pathname).includes(
-                    CONSTANTS.ROUTES.VIEW_DATABASE_CHARTS.path(tenantID)
-                  )
-                    ? "!text-[#646cff]"
-                    : "!text-slate-700"
-                }`}
-              />
-              <span
-                className={`font-semibold text-sm ml-2 ${
-                  decodeURIComponent(location.pathname).includes(
-                    CONSTANTS.ROUTES.VIEW_DATABASE_CHARTS.path(tenantID)
-                  )
-                    ? "!text-[#646cff]"
-                    : "!text-slate-700"
-                }`}
-              >
-                {capitalize(
-                  CONSTANTS.STRINGS.MAIN_DRAWER_DATABASE_CHARTS_TITLE
-                )}
-              </span>
-            </Link>
+
             <Link
               to={CONSTANTS.ROUTES.VIEW_DATABASE_WIDGETS.path(tenantID)}
               key={CONSTANTS.ROUTES.VIEW_DATABASE_WIDGETS.path(tenantID)}

@@ -1012,21 +1012,6 @@ export const CONSTANTS = {
       path: (tenantID, databaseQueryID) =>
         `/tenants/${tenantID}/queries/${databaseQueryID}`,
     },
-
-    ADD_DATABASE_CHART: {
-      code: "/tenants/:tenantID/charts/add",
-      path: (tenantID) => `/tenants/${tenantID}/charts/add`,
-    },
-    VIEW_DATABASE_CHARTS: {
-      code: "/tenants/:tenantID/charts",
-      path: (tenantID) => `/tenants/${tenantID}/charts`,
-    },
-    UPDATE_DATABASE_CHART_BY_ID: {
-      code: "/tenants/:tenantID/charts/:databaseChartID",
-      path: (tenantID, databaseChartID) =>
-        `/tenants/${tenantID}/charts/${databaseChartID}`,
-    },
-
     ADD_DATABASE_WIDGET: {
       code: "/tenants/:tenantID/widgets/add",
       path: (tenantID) => `/tenants/${tenantID}/widgets/add`,
@@ -1325,23 +1310,8 @@ export const CONSTANTS = {
       deleteDatabaseQueryByID: (tenantID, databaseQueryID) =>
         `/api/v1/tenants/${tenantID}/queries/${databaseQueryID}`,
 
-      getAllDatabaseChartsAPI: (tenantID) =>
-        `/api/v1/tenants/${tenantID}/charts/`,
-
-      createDatabaseChartAPI: (tenantID) =>
-        `/api/v1/tenants/${tenantID}/charts/`,
-      getDatabaseChartByIDAPI: (tenantID, databaseChartID) =>
-        `/api/v1/tenants/${tenantID}/charts/${databaseChartID}`,
-      cloneDatabaseChartByIDAPI: (tenantID, databaseChartID) =>
-        `/api/v1/tenants/${tenantID}/charts/${databaseChartID}/clone`,
-      updateDatabaseChartByIDAPI: (tenantID, databaseChartID) =>
-        `/api/v1/tenants/${tenantID}/charts/${databaseChartID}`,
-      getDatabaseChartDataByIDAPI: (tenantID, databaseChartID) =>
-        `/api/v1/tenants/${tenantID}/charts/${databaseChartID}/data`,
       getDatabaseChartDataUsingChartAPI: (tenantID, databaseChartID) =>
         `/api/v1/tenants/${tenantID}/charts/${databaseChartID}/data`,
-      deleteDatabaseChartByID: (tenantID, databaseChartID) =>
-        `/api/v1/tenants/${tenantID}/charts/${databaseChartID}`,
       generateAIPromptBasedChartAPI: (tenantID) =>
         `/api/v1/tenants/${tenantID}/charts/aigenerate`,
       generateAIPromptBasedChartStyleAPI: (tenantID) =>

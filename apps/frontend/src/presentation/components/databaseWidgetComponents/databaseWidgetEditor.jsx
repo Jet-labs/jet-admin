@@ -55,8 +55,6 @@ export const DatabaseWidgetEditor = ({ databaseWidgetEditorForm }) => {
     databaseWidgetEditorForm.setFieldValue("databaseQueries", items);
   };
 
-  console.log({ queries: databaseWidgetEditorForm?.values?.databaseQueries });
-
   return (
     <>
       <DatabaseQueryTestingPanel

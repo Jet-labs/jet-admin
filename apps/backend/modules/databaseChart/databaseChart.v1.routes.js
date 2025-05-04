@@ -7,39 +7,6 @@ const { expressUtils } = require("../../utils/express.utils");
 
 // Database chart routes
 
-router.get(
-  "/",
-  authMiddleware.checkUserPermissions(["tenant:chart:list"]),
-  databaseChartController.getAllDatabaseCharts
-);
-router.post(
-  "/",
-  body("databaseChartName")
-    .notEmpty()
-    .withMessage("databaseChartName is required"),
-  body("databaseChartDescription")
-    .optional()
-    .isString()
-    .withMessage("databaseChartDescription must be a string"),
-  body("databaseChartType")
-    .notEmpty()
-    .withMessage("databaseChartType is required"),
-  body("databaseChartConfig")
-    .notEmpty()
-    .withMessage("databaseChartConfig is required"),
-  body("databaseQueries").notEmpty().withMessage("databaseQueries is required"),
-  expressUtils.validationChecker,
-  authMiddleware.checkUserPermissions(["tenant:chart:create"]),
-  databaseChartController.createDatabaseChart
-);
-
-router.get(
-  "/:databaseChartID",
-  expressUtils.validationChecker,
-  authMiddleware.checkUserPermissions(["tenant:chart:read"]),
-  databaseChartController.getDatabaseChartByID
-);
-
 router.patch(
   "/aigenerate",
   body("aiPrompt").notEmpty().withMessage("aiPrompt is required"),
@@ -56,17 +23,6 @@ router.patch(
   databaseChartController.generateAIPromptBasedChartStyle
 );
 
-router.get(
-  "/:databaseChartID/data",
-  param("databaseChartID")
-    .exists()
-    .isNumeric()
-    .withMessage("databaseChartID must be a number"),
-  expressUtils.validationChecker,
-  authMiddleware.checkUserPermissions(["tenant:chart:test"]),
-  databaseChartController.getDatabaseChartDataByID
-);
-
 router.post(
   "/:databaseChartID/data",
   expressUtils.validationChecker,
@@ -74,48 +30,6 @@ router.post(
   databaseChartController.getDatabaseChartDataUsingDatabaseChart
 );
 
-router.patch(
-  "/:databaseChartID",
-  param("databaseChartID")
-    .isNumeric()
-    .withMessage("databaseChartID must be a number"),
-  body("databaseChartName")
-    .notEmpty()
-    .withMessage("databaseChartName is required"),
-  body("databaseChartDescription")
-    .optional()
-    .isString()
-    .withMessage("databaseChartDescription must be a string"),
-  body("databaseChartType")
-    .notEmpty()
-    .withMessage("databaseChartType is required"),
-  body("databaseChartConfig")
-    .notEmpty()
-    .withMessage("databaseChartConfig is required"),
-  body("databaseQueries").notEmpty().withMessage("databaseQueries is required"),
-  expressUtils.validationChecker,
-  authMiddleware.checkUserPermissions(["tenant:chart:update"]),
-  databaseChartController.updateDatabaseChartByID
-);
 
-router.post(
-  "/:databaseChartID/clone",
-  param("databaseChartID")
-    .isNumeric()
-    .withMessage("databaseChartID must be a number"),
-  expressUtils.validationChecker,
-  authMiddleware.checkUserPermissions(["tenant:chart:clone"]),
-  databaseChartController.cloneDatabaseChartByID
-);
-
-router.delete(
-  "/:databaseChartID",
-  param("databaseChartID")
-    .isNumeric()
-    .withMessage("databaseChartID must be a number"),
-  expressUtils.validationChecker,
-  authMiddleware.checkUserPermissions(["tenant:chart:delete"]),
-  databaseChartController.deleteDatabaseChartByID
-);
 
 module.exports = router;

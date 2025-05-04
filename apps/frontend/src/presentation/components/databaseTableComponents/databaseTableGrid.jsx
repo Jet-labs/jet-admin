@@ -214,8 +214,6 @@ export const DatabaseTableGrid = ({
     [databaseTablePrimaryKey]
   );
 
-  console.log({ rows: databaseTableRows });
-
   const _handleToggleAllRowSelectCheckbox = useCallback(
     (v) => {
       setIsAllRowSelectChecked(v);

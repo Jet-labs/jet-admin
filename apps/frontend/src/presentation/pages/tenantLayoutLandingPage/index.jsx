@@ -11,7 +11,6 @@ import { CodeBlock } from "../../components/ui/codeBlock";
 import { NoEntityUI } from "../../components/ui/noEntityUI";
 
 import apiKeyLogo from "../../../assets/api_key_logo.png";
-import chartLogo from "../../../assets/chart_logo.png";
 import dashboardLogo from "../../../assets/dashboard_logo.png";
 import queryLogo from "../../../assets/query_logo.png";
 import rolesLogo from "../../../assets/roles_logo.png";
@@ -67,14 +66,6 @@ const TenantLayoutLandingPage = () => {
       description: "View and manage database saved queries",
       action: () =>
         navigate(CONSTANTS.ROUTES.VIEW_DATABASE_QUERIES.path(tenantID)),
-    },
-    {
-      title: "Charts",
-      icon: <img src={chartLogo} alt="Charts" className="w-8 h-8" />,
-      count: tenant?.tenantChartCount || 0,
-      description: "View and manage charts",
-      action: () =>
-        navigate(CONSTANTS.ROUTES.VIEW_DATABASE_CHARTS.path(tenantID)),
     },
     {
       title: "Dashboards",

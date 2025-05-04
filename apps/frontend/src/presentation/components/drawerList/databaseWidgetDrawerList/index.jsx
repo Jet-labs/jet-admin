@@ -20,8 +20,8 @@ export const DatabaseWidgetDrawerList = () => {
   };
   const _renderWidgetIcon = (databaseWidgetType, isActive) => {
     return WIDGETS_MAP[databaseWidgetType].icon({
-      className: `!text-slate-700 !text-xl !mr-3 ${
-        isActive ? "text-[#646cff] " : "text-slate-600"
+      className: `!text-xl ${
+        isActive ? "!text-[#646cff] " : "!text-slate-700 "
       }`,
     });
   };
@@ -62,12 +62,10 @@ export const DatabaseWidgetDrawerList = () => {
                     isActive ? "bg-[#eaebff]" : "bg-white text-gray-700"
                   }`}
                 >
-                  <div className="!w-[16px]">
-                    {_renderWidgetIcon(
-                      databaseWidget.databaseWidgetType,
-                      isActive
-                    )}
-                  </div>
+                  {_renderWidgetIcon(
+                    databaseWidget.databaseWidgetType,
+                    isActive
+                  )}
 
                   <span
                     className={`font-medium text-sm truncate ${
