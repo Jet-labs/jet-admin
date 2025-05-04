@@ -10,7 +10,6 @@ import ReactJson from "react-json-view";
 // eslint-disable-next-line no-unused-vars
 import { DatabaseTableColumn } from "../../../data/models/databaseTableColumn";
 import { PostgreSQLUtils } from "../../../utils/postgre";
-import { DataGridJSONPopupEditor } from "./dataGridJSONPopupEditor";
 import PropTypes from "prop-types";
 
 /**
@@ -316,13 +315,13 @@ const JsonEditCell = ({ params }) => {
       >
         Editing JSON...
       </Box>
-      <DataGridJSONPopupEditor
+      {/* <DataGridJSONPopupEditor
         title={`Edit "${params.field}"`}
         open={isPopupOpen}
         value={params.value} // Pass the value from the grid (processed by valueGetter)
         onSave={handleSave}
         onCancel={handleCancel}
-      />
+      /> */}
     </>
   );
 };
