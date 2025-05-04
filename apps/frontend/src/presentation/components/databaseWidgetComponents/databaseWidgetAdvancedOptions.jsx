@@ -34,7 +34,11 @@ export const DatabaseWidgetAdvancedOptions = ({
         key,
         className:
           "w-full text-xs p-1.5 bg-slate-50 border border-slate-300 rounded",
-        value: formValue,
+        value: formValue
+          ? formValue
+          : type === "boolean"
+          ? "false"
+          : defaultValue,
         onChange: (e) => {
           const value =
             type === "number"

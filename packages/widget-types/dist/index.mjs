@@ -319,6 +319,7 @@ var WIDGET_INITIAL_CONFIG = {
   },
   table: {
     options: {
+      titleEnabled: false,
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
@@ -342,14 +343,14 @@ var WIDGET_ADVANCED_OPTIONS = [
     key: "databaseWidgetConfig.title",
     type: "text",
     description: "Widget title",
-    relevantWidgets: ["text"]
+    relevantWidgets: ["text", "table"]
   },
   {
     name: "Title enabled",
     key: "databaseWidgetConfig.titleEnabled",
     type: "boolean",
     description: "Enable or disable the widget title",
-    relevantWidgets: ["text"],
+    relevantWidgets: ["text", "table"],
     defaultValue: true
   },
   {
@@ -357,21 +358,21 @@ var WIDGET_ADVANCED_OPTIONS = [
     key: "databaseWidgetConfig.titleTailwindCss",
     type: "text",
     description: "Tailwind CSS classes for the title",
-    relevantWidgets: ["text"]
+    relevantWidgets: ["text", "table"]
   },
   {
     name: "Container CSS Class",
     key: "databaseWidgetConfig.containerTailwindCss",
     type: "text",
     description: "Tailwind CSS classes for the container",
-    relevantWidgets: ["text"]
+    relevantWidgets: ["text", "table"]
   },
   {
     name: "Widget CSS Class",
     key: "databaseWidgetConfig.widgetTailwindCss",
     type: "text",
     description: "Tailwind CSS classes for the widget",
-    relevantWidgets: ["text"]
+    relevantWidgets: ["text", "table"]
   },
   {
     name: "Container Width",
@@ -640,6 +641,21 @@ var WIDGET_ADVANCED_OPTIONS = [
     type: "text",
     description: "Transition effects (e.g., all 0.3s ease)",
     relevantWidgets: ["text"]
+  },
+  {
+    name: "Chart background color",
+    key: "databaseWidgetConfig.chartBackgroundColor",
+    type: "color",
+    description: "Background color",
+    relevantWidgets: [
+      "bar",
+      "line",
+      "pie",
+      "scatter",
+      "bubble",
+      "radar",
+      "polarArea"
+    ]
   }
 ];
 var WIDGET_DATASET_ADVANCED_OPTIONS = [

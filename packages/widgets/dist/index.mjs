@@ -14988,18 +14988,26 @@ var BarChartComponent = ({
     databaseWidgetConfig: import_prop_types.default.object
   };
   const widgetRef = useRef2(null);
-  const options = useMemo(() => {
-    return {
-      ...databaseWidgetConfig
-    };
-  }, [databaseWidgetConfig]);
+  const options = useMemo(
+    () => ({
+      ...databaseWidgetConfig,
+      plugins: {
+        ...databaseWidgetConfig?.plugins,
+        customCanvasBackgroundColor: {
+          chartBackgroundColor: databaseWidgetConfig?.chartBackgroundColor || "#ffffff"
+        }
+      }
+    }),
+    [databaseWidgetConfig]
+  );
   const plugin = {
     id: "customCanvasBackgroundColor",
-    beforeDraw: (chart, args, options2) => {
+    beforeDraw: (chart) => {
       const { ctx } = chart;
+      const backgroundColor = chart.options.plugins.customCanvasBackgroundColor?.chartBackgroundColor;
       ctx.save();
       ctx.globalCompositeOperation = "destination-over";
-      ctx.fillStyle = options2.backgroundColor || "#fff";
+      ctx.fillStyle = backgroundColor;
       ctx.fillRect(0, 0, chart.width, chart.height);
       ctx.restore();
     }
@@ -15056,22 +15064,30 @@ var LineChartComponent = ({
     databaseWidgetConfig: import_prop_types2.default.object
   };
   const widgetRef = useRef3(null);
+  const options = useMemo2(
+    () => ({
+      ...databaseWidgetConfig,
+      plugins: {
+        ...databaseWidgetConfig?.plugins,
+        customCanvasBackgroundColor: {
+          chartBackgroundColor: databaseWidgetConfig?.chartBackgroundColor || "#ffffff"
+        }
+      }
+    }),
+    [databaseWidgetConfig]
+  );
   const plugin = {
     id: "customCanvasBackgroundColor",
-    beforeDraw: (chart, args, options2) => {
+    beforeDraw: (chart) => {
       const { ctx } = chart;
+      const backgroundColor = chart.options.plugins.customCanvasBackgroundColor?.chartBackgroundColor;
       ctx.save();
       ctx.globalCompositeOperation = "destination-over";
-      ctx.fillStyle = options2.backgroundColor || "#fff";
+      ctx.fillStyle = backgroundColor;
       ctx.fillRect(0, 0, chart.width, chart.height);
       ctx.restore();
     }
   };
-  const options = useMemo2(() => {
-    return {
-      ...databaseWidgetConfig
-    };
-  }, [databaseWidgetConfig]);
   useEffect3(() => {
     if (widgetRef.current) {
       onWidgetInit?.(widgetRef);
@@ -15124,22 +15140,30 @@ var PieChartComponent = ({
     databaseWidgetConfig: import_prop_types3.default.object
   };
   const widgetRef = useRef4(null);
+  const options = useMemo3(
+    () => ({
+      ...databaseWidgetConfig,
+      plugins: {
+        ...databaseWidgetConfig?.plugins,
+        customCanvasBackgroundColor: {
+          chartBackgroundColor: databaseWidgetConfig?.chartBackgroundColor || "#ffffff"
+        }
+      }
+    }),
+    [databaseWidgetConfig]
+  );
   const plugin = {
     id: "customCanvasBackgroundColor",
-    beforeDraw: (chart, args, options2) => {
+    beforeDraw: (chart) => {
       const { ctx } = chart;
+      const backgroundColor = chart.options.plugins.customCanvasBackgroundColor?.chartBackgroundColor;
       ctx.save();
       ctx.globalCompositeOperation = "destination-over";
-      ctx.fillStyle = options2.backgroundColor || "#fff";
+      ctx.fillStyle = backgroundColor;
       ctx.fillRect(0, 0, chart.width, chart.height);
       ctx.restore();
     }
   };
-  const options = useMemo3(() => {
-    return {
-      ...databaseWidgetConfig
-    };
-  }, [databaseWidgetConfig]);
   useEffect4(() => {
     if (widgetRef.current) {
       onWidgetInit?.(widgetRef);
@@ -15192,22 +15216,30 @@ var RadarChartComponent = ({
     databaseWidgetConfig: import_prop_types4.default.object
   };
   const widgetRef = useRef5(null);
+  const options = useMemo4(
+    () => ({
+      ...databaseWidgetConfig,
+      plugins: {
+        ...databaseWidgetConfig?.plugins,
+        customCanvasBackgroundColor: {
+          chartBackgroundColor: databaseWidgetConfig?.chartBackgroundColor || "#ffffff"
+        }
+      }
+    }),
+    [databaseWidgetConfig]
+  );
   const plugin = {
     id: "customCanvasBackgroundColor",
-    beforeDraw: (chart, args, options2) => {
+    beforeDraw: (chart) => {
       const { ctx } = chart;
+      const backgroundColor = chart.options.plugins.customCanvasBackgroundColor?.chartBackgroundColor;
       ctx.save();
       ctx.globalCompositeOperation = "destination-over";
-      ctx.fillStyle = options2.backgroundColor || "#fff";
+      ctx.fillStyle = backgroundColor;
       ctx.fillRect(0, 0, chart.width, chart.height);
       ctx.restore();
     }
   };
-  const options = useMemo4(() => {
-    return {
-      ...databaseWidgetConfig
-    };
-  }, [databaseWidgetConfig]);
   useEffect5(() => {
     if (widgetRef.current) {
       onWidgetInit?.(widgetRef);
@@ -15260,28 +15292,44 @@ var PolarAreaChartComponent = ({
     databaseWidgetConfig: import_prop_types5.default.object
   };
   const widgetRef = useRef6(null);
+  const options = useMemo5(
+    () => ({
+      ...databaseWidgetConfig,
+      plugins: {
+        ...databaseWidgetConfig?.plugins,
+        customCanvasBackgroundColor: {
+          chartBackgroundColor: databaseWidgetConfig?.chartBackgroundColor || "#ffffff"
+        }
+      }
+    }),
+    [databaseWidgetConfig]
+  );
   const plugin = {
     id: "customCanvasBackgroundColor",
-    beforeDraw: (chart, args, options2) => {
+    beforeDraw: (chart) => {
       const { ctx } = chart;
+      const backgroundColor = chart.options.plugins.customCanvasBackgroundColor?.chartBackgroundColor;
       ctx.save();
       ctx.globalCompositeOperation = "destination-over";
-      ctx.fillStyle = options2.backgroundColor || "#fff";
+      ctx.fillStyle = backgroundColor;
       ctx.fillRect(0, 0, chart.width, chart.height);
       ctx.restore();
     }
   };
-  const options = useMemo5(() => {
-    return {
-      ...databaseWidgetConfig
-    };
-  }, [databaseWidgetConfig]);
   useEffect6(() => {
     if (widgetRef.current) {
       onWidgetInit?.(widgetRef);
     }
   }, [onWidgetInit]);
-  return /* @__PURE__ */ React6.createElement(PolarArea, { ref: widgetRef, data, options, plugins: [plugin] });
+  return /* @__PURE__ */ React6.createElement(
+    PolarArea,
+    {
+      ref: widgetRef,
+      data,
+      options,
+      plugins: [plugin]
+    }
+  );
 };
 
 // src/scatter/logic/processors.js
@@ -15321,22 +15369,30 @@ var ScatterChartComponent = ({
     databaseWidgetConfig: import_prop_types6.default.object
   };
   const widgetRef = useRef7(null);
+  const options = useMemo6(
+    () => ({
+      ...databaseWidgetConfig,
+      plugins: {
+        ...databaseWidgetConfig?.plugins,
+        customCanvasBackgroundColor: {
+          chartBackgroundColor: databaseWidgetConfig?.chartBackgroundColor || "#ffffff"
+        }
+      }
+    }),
+    [databaseWidgetConfig]
+  );
   const plugin = {
     id: "customCanvasBackgroundColor",
-    beforeDraw: (chart, args, options2) => {
+    beforeDraw: (chart) => {
       const { ctx } = chart;
+      const backgroundColor = chart.options.plugins.customCanvasBackgroundColor?.chartBackgroundColor;
       ctx.save();
       ctx.globalCompositeOperation = "destination-over";
-      ctx.fillStyle = options2.backgroundColor || "#fff";
+      ctx.fillStyle = backgroundColor;
       ctx.fillRect(0, 0, chart.width, chart.height);
       ctx.restore();
     }
   };
-  const options = useMemo6(() => {
-    return {
-      ...databaseWidgetConfig
-    };
-  }, [databaseWidgetConfig]);
   useEffect7(() => {
     if (widgetRef.current) {
       onWidgetInit?.(widgetRef);
@@ -15383,22 +15439,30 @@ var BubbleChartComponent = ({
     databaseWidgetConfig: import_prop_types7.default.object
   };
   const widgetRef = useRef8(null);
+  const options = useMemo7(
+    () => ({
+      ...databaseWidgetConfig,
+      plugins: {
+        ...databaseWidgetConfig?.plugins,
+        customCanvasBackgroundColor: {
+          chartBackgroundColor: databaseWidgetConfig?.chartBackgroundColor || "#ffffff"
+        }
+      }
+    }),
+    [databaseWidgetConfig]
+  );
   const plugin = {
     id: "customCanvasBackgroundColor",
-    beforeDraw: (chart, args, options2) => {
+    beforeDraw: (chart) => {
       const { ctx } = chart;
+      const backgroundColor = chart.options.plugins.customCanvasBackgroundColor?.chartBackgroundColor;
       ctx.save();
       ctx.globalCompositeOperation = "destination-over";
-      ctx.fillStyle = options2.backgroundColor || "#fff";
+      ctx.fillStyle = backgroundColor;
       ctx.fillRect(0, 0, chart.width, chart.height);
       ctx.restore();
     }
   };
-  const options = useMemo7(() => {
-    return {
-      ...databaseWidgetConfig
-    };
-  }, [databaseWidgetConfig]);
   useEffect8(() => {
     if (widgetRef.current) {
       onWidgetInit?.(widgetRef);
@@ -15622,6 +15686,9 @@ function BiChevronRight(props) {
 function BiRadar(props) {
   return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 24 24" }, "child": [{ "tag": "path", "attr": { "d": "M12 2C6.579 2 2 6.58 2 12s4.579 10 10 10 10-4.58 10-10S17.421 2 12 2zm0 18c-4.337 0-8-3.664-8-8 0-3.998 3.115-7.417 7-7.927V6.09C8.167 6.569 6 9.033 6 12c0 3.309 2.691 6 6 6 1.595 0 3.1-.626 4.237-1.763l-1.414-1.415A3.97 3.97 0 0 1 12 16c-2.206 0-4-1.794-4-4 0-1.858 1.279-3.411 3-3.858v2.146c-.59.353-1 .993-1 1.712 0 1.081.919 2 2 2s2-.919 2-2c0-.719-.41-1.359-1-1.712V4.073c3.885.51 7 3.929 7 7.927 0 4.336-3.663 8-8 8z" }, "child": [] }] })(props);
 }
+function BiScatterChart(props) {
+  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 24 24" }, "child": [{ "tag": "path", "attr": { "d": "M4 21h17v-2H5V3H3v17a1 1 0 0 0 1 1z" }, "child": [] }, { "tag": "circle", "attr": { "cx": "10", "cy": "8", "r": "2" }, "child": [] }, { "tag": "circle", "attr": { "cx": "18", "cy": "12", "r": "2" }, "child": [] }, { "tag": "circle", "attr": { "cx": "11.5", "cy": "13.5", "r": "1.5" }, "child": [] }, { "tag": "circle", "attr": { "cx": "16.5", "cy": "6.5", "r": "1.5" }, "child": [] }] })(props);
+}
 
 // src/table/ui/index.js
 function jsonSchemaGenerator(data) {
@@ -15749,16 +15816,23 @@ var TableWidgetComponent = ({
   }, [onWidgetInit]);
   const isLoading = !data;
   const hasData = firstData && firstData.length > 0 && columns.length > 0;
+  const {
+    widgetTailwindCss = "",
+    containerTailwindCss = "",
+    titleEnabled,
+    titleTailwindCss = "",
+    title
+  } = databaseWidgetConfig;
   return (
     // Added flex and flex-col to make this a flex container stacking children vertically
     /* @__PURE__ */ React12.createElement(
       "div",
       {
-        className: "rounded bg-white w-full h-full flex flex-col",
+        className: `rounded bg-white w-full h-full flex flex-col ${containerTailwindCss}`,
         ref: widgetRef
       },
-      databaseWidgetConfig?.titleEnabled && // Title section - takes its natural height
-      /* @__PURE__ */ React12.createElement("div", { className: "px-3 py-2 min-h-[100px] flex items-center border-b border-gray-200" }, /* @__PURE__ */ React12.createElement("h2", { className: "text-sm font-semibold text-gray-700 truncate line-clamp-2" }, databaseWidgetConfig?.title || "Untitled Query")),
+      titleEnabled && // Title section - takes its natural height
+      /* @__PURE__ */ React12.createElement("div", { className: "px-3 py-2 min-h-[100px] flex items-center border-b border-gray-200" }, /* @__PURE__ */ React12.createElement("h2", { className: `truncate line-clamp-2 ${titleTailwindCss}` }, title || "Untitled Query")),
       /* @__PURE__ */ React12.createElement("div", { className: "flex-1 relative overflow-hidden" }, isLoading ? /* @__PURE__ */ React12.createElement("div", { className: "h-full w-full flex items-center justify-center p-3" }, /* @__PURE__ */ React12.createElement("div", { className: "text-[#646cff] text-sm" }, "Loading...")) : !hasData ? (
         // Conditionally render "No data" message
         /* @__PURE__ */ React12.createElement("div", { className: "h-full w-full flex items-center justify-center p-3" }, /* @__PURE__ */ React12.createElement("div", { className: "bg-transparent text-[#646cff] px-4 py-2 rounded z-0 text-sm" }, "No data available for this query or column schema could not be generated."))
@@ -15783,6 +15857,7 @@ var TableWidgetComponent = ({
               resizable: true
               // Assuming you want resizable columns
             },
+            className: widgetTailwindCss,
             sx: {
               border: "none",
               // Remove default border
@@ -18209,6 +18284,7 @@ var WIDGET_INITIAL_CONFIG = {
   },
   table: {
     options: {
+      titleEnabled: false,
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
@@ -18455,7 +18531,7 @@ var WIDGETS_MAP = {
         ...props
       }
     ),
-    icon: ({ className }) => /* @__PURE__ */ React13.createElement(FaChartLine, { className: `!text-lg ${className}` }),
+    icon: ({ className }) => /* @__PURE__ */ React13.createElement(BiScatterChart, { className: `!text-lg ${className}` }),
     sampleConfig: WIDGET_INITIAL_CONFIG.scatter
   },
   bubble: {

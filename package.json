@@ -11,6 +11,7 @@
     "start:b": "cd apps/backend && npm run dev-w",
     "start:all": "concurrently \"npm run start:frontend\" \"npm run start:backend\"",
     "watch-widgets": "cd packages/widgets && npm run dev -w @jet-admin/widgets",
+    "watch-widget-types": "cd packages/widget-types && npm run dev -w @jet-admin/widget-types",
     "seed": "cd apps/backend && npm run seed",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

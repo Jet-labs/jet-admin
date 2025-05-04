@@ -208,18 +208,25 @@ export const TableWidgetComponent = ({
   // Check if data is still loading or empty before rendering
   const isLoading = !data; // Example: Assume data being null/undefined means loading
   const hasData = firstData && firstData.length > 0 && columns.length > 0;
+  const {
+    widgetTailwindCss = "",
+    containerTailwindCss = "",
+    titleEnabled,
+    titleTailwindCss = "",
+    title,
+  } = databaseWidgetConfig;
 
   return (
     // Added flex and flex-col to make this a flex container stacking children vertically
     <div
-      className="rounded bg-white w-full h-full flex flex-col"
+      className={`rounded bg-white w-full h-full flex flex-col ${containerTailwindCss}`}
       ref={widgetRef}
     >
-      {databaseWidgetConfig?.titleEnabled && (
+      {titleEnabled && (
         // Title section - takes its natural height
         <div className="px-3 py-2 min-h-[100px] flex items-center border-b border-gray-200">
-          <h2 className="text-sm font-semibold text-gray-700 truncate line-clamp-2">
-            {databaseWidgetConfig?.title || "Untitled Query"}
+          <h2 className={`truncate line-clamp-2 ${titleTailwindCss}`}>
+            {title || "Untitled Query"}
           </h2>
         </div>
       )}
@@ -268,6 +275,7 @@ export const TableWidgetComponent = ({
               sortable: true,
               resizable: true, // Assuming you want resizable columns
             }}
+            className={widgetTailwindCss}
             sx={{
               border: "none", // Remove default border
               "& .MuiDataGrid-main": {

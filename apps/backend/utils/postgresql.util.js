@@ -727,6 +727,12 @@ postgreSQLQueryUtil.databaseTableBulkRowAddition = ({
             return value ? "TRUE" : "FALSE"; // PostgreSQL boolean handling
           } else if (value instanceof Date) {
             return `'${value.toISOString()}'`; // Convert dates to ISO format
+          } else if (typeof value === "object" && value !== null) {
+            const jsonString = JSON.stringify(value);
+            // Escape single quotes within the JSON string for the SQL literal
+            const escapedJsonString = jsonString.replace(/'/g, "''");
+            // Return the escaped JSON string enclosed in SQL single quotes and cast
+            return `'${escapedJsonString}'::json`; // Or ::jsonb if that's the column type
           } else {
             return value;
           }

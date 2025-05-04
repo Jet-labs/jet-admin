@@ -7,35 +7,49 @@ export const RadarChartComponent = ({
   onWidgetInit,
   databaseWidgetConfig,
 }) => {
-    RadarChartComponent.propTypes = {
-      data: PropTypes.object,
-      onWidgetInit: PropTypes.func,
-      databaseWidgetConfig: PropTypes.object,
-    };
-    const widgetRef = useRef(null);
+  RadarChartComponent.propTypes = {
+    data: PropTypes.object,
+    onWidgetInit: PropTypes.func,
+    databaseWidgetConfig: PropTypes.object,
+  };
+  const widgetRef = useRef(null);
 
-    const plugin = {
-      id: "customCanvasBackgroundColor",
-      beforeDraw: (chart, args, options) => {
-        const { ctx } = chart;
-        ctx.save();
-        ctx.globalCompositeOperation = "destination-over";
-        ctx.fillStyle = options.backgroundColor || "#fff";
-        ctx.fillRect(0, 0, chart.width, chart.height);
-        ctx.restore();
+  // Add plugin configuration to options
+  const options = useMemo(
+    () => ({
+      ...databaseWidgetConfig,
+      plugins: {
+        ...databaseWidgetConfig?.plugins,
+        customCanvasBackgroundColor: {
+          chartBackgroundColor:
+            databaseWidgetConfig?.chartBackgroundColor || "#ffffff",
+        },
       },
-    };
-    const options = useMemo(() => {
-      return {
-        ...databaseWidgetConfig,
-      };
-    }, [databaseWidgetConfig]);
+    }),
+    [databaseWidgetConfig]
+  );
 
-    useEffect(() => {
-      if (widgetRef.current) {
-        onWidgetInit?.(widgetRef);
-      }
-    }, [onWidgetInit]);
+  // Custom plugin with proper v3+ syntax
+  const plugin = {
+    id: "customCanvasBackgroundColor",
+    beforeDraw: (chart) => {
+      const { ctx } = chart;
+      const backgroundColor =
+        chart.options.plugins.customCanvasBackgroundColor?.chartBackgroundColor;
+
+      ctx.save();
+      ctx.globalCompositeOperation = "destination-over";
+      ctx.fillStyle = backgroundColor;
+      ctx.fillRect(0, 0, chart.width, chart.height);
+      ctx.restore();
+    },
+  };
+
+  useEffect(() => {
+    if (widgetRef.current) {
+      onWidgetInit?.(widgetRef);
+    }
+  }, [onWidgetInit]);
   return (
     <Radar ref={widgetRef} data={data} options={options} plugins={[plugin]} />
   );

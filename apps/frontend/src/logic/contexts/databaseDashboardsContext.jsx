@@ -3,12 +3,10 @@ import { useParams } from "react-router-dom";
 // import logo from "../../../assets/logo.png";
 
 import { useQuery } from "@tanstack/react-query";
+import PropTypes from "prop-types";
 import { CONSTANTS } from "../../constants";
-import { getAllDatabaseQueriesAPI } from "../../data/apis/databaseQuery";
-import { getAllDatabaseChartsAPI } from "../../data/apis/databaseChart";
 import { getAllDatabaseDashboardsAPI } from "../../data/apis/databaseDashboard";
 import { getAllDatabaseWidgetsAPI } from "../../data/apis/databaseWidget";
-import PropTypes from "prop-types";
 
 const DatabaseDashboardsStateContext = React.createContext(undefined);
 const DatabaseDashboardsActionsContext = React.createContext(undefined);
@@ -29,18 +27,7 @@ const DatabaseDashboardsContextProvider = ({ children }) => {
     queryFn: () => getAllDatabaseDashboardsAPI({ tenantID }),
     refetchOnWindowFocus: false,
   });
-  const {
-    isLoading: isLoadingDatabaseCharts,
-    data: databaseCharts,
-    error: loadDatabaseChartsError,
-    isFetching: isFetchingDatabaseCharts,
-    isRefetching: isRefetechingDatabaseCharts,
-    refetch: refetchDatabaseCharts,
-  } = useQuery({
-    queryKey: [CONSTANTS.REACT_QUERY_KEYS.DATABASE_CHARTS(tenantID)],
-    queryFn: () => getAllDatabaseChartsAPI({ tenantID }),
-    refetchOnWindowFocus: false,
-  });
+
   const {
     isLoading: isLoadingDatabaseWidgets,
     data: databaseWidgets,
@@ -53,18 +40,7 @@ const DatabaseDashboardsContextProvider = ({ children }) => {
     queryFn: () => getAllDatabaseWidgetsAPI({ tenantID }),
     refetchOnWindowFocus: false,
   });
-  const {
-    isLoading: isLoadingDatabaseQueries,
-    data: databaseQueries,
-    error: loadDatabaseQueriesError,
-    isFetching: isFetchingDatabaseQueries,
-    isRefetching: isRefetechingDatabaseQueries,
-    refetch: refetchDatabaseQueries,
-  } = useQuery({
-    queryKey: [CONSTANTS.REACT_QUERY_KEYS.DATABASE_QUERIES(tenantID)],
-    queryFn: () => getAllDatabaseQueriesAPI({ tenantID }),
-    refetchOnWindowFocus: false,
-  });
+
   return (
     <DatabaseDashboardsStateContext.Provider
       value={{
@@ -72,33 +48,17 @@ const DatabaseDashboardsContextProvider = ({ children }) => {
         isLoadingDatabaseDashboards,
         isFetchingDatabaseDashboards,
         loadDatabaseDashboardsError,
-
-        databaseQueries,
-        isLoadingDatabaseQueries,
-        isFetchingDatabaseQueries,
-        loadDatabaseQueriesError,
-
-        databaseCharts,
-        isLoadingDatabaseCharts,
-        isFetchingDatabaseCharts,
-        loadDatabaseChartsError,
-
         databaseWidgets,
         isLoadingDatabaseWidgets,
         isFetchingDatabaseWidgets,
         loadDatabaseWidgetsError,
-
         isRefetechingDatabaseDashboards,
-        isRefetechingDatabaseQueries,
-        isRefetechingDatabaseCharts,
         isRefetechingDatabaseWidgets,
       }}
     >
       <DatabaseDashboardsActionsContext.Provider
         value={{
           refetchDatabaseDashboards,
-          refetchDatabaseQueries,
-          refetchDatabaseCharts,
           refetchDatabaseWidgets,
         }}
       >

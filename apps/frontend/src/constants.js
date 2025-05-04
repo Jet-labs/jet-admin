@@ -27,7 +27,13 @@ export const CONSTANTS = {
     },
   },
 
+  DATABASE_DASHBOARD_ITEM_TYPES: {
+    WIDGET: "widget",
+  },
+
   STRINGS: {
+    DATAGRID_JSON_POPUP_CANCEL_BUTTON: "Cancel",
+    DATAGRID_JSON_POPUP_SAVE_BUTTON: "Save",
     NO_DATABASE_URL: "Please add database URL in the tenant settings",
     DASHBOARD_DROPPING_ELEMENT_TAG: "__dropping-elem__",
     HIDE_QUERY_META_CONTENT_BUTTON_TEXT: "Hide metadata",

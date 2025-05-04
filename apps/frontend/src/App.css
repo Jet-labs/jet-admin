@@ -16,9 +16,25 @@
   border-bottom-left-radius: 4px !important;
 }
 
+.codemirror-editor-rounded .cm-scroller {
+  border-radius: 4px !important;
+}
+
 input[type="date"]::-webkit-calendar-picker-indicator {
   color: #646cff;
   color-scheme: light;
+}
+
+.react-grid-item {
+  transition: all 0.2s ease;
+}
+
+.react-grid-item.cssTransforms {
+  transition-property: transform, height, width;
+}
+
+.custom-resize-handle {
+  transition: background-color 0.2s ease;
 }
 
 /********** Range Input Styles **********/

@@ -10,7 +10,7 @@ import ReactJson from "react-json-view";
 // eslint-disable-next-line no-unused-vars
 import { DatabaseTableColumn } from "../../../data/models/databaseTableColumn";
 import { PostgreSQLUtils } from "../../../utils/postgre";
-import { DataGridJSONPopupEditor } from "./jsonPopupEditor";
+import { DataGridJSONPopupEditor } from "./dataGridJSONPopupEditor";
 import PropTypes from "prop-types";
 
 /**

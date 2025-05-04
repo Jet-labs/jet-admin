@@ -3,7 +3,7 @@ import { FaChartBar, FaTable } from "react-icons/fa";
 import { FaChartLine } from "react-icons/fa6";
 import { FaChartPie } from "react-icons/fa";
 import { PiChartPolar } from "react-icons/pi";
-import { BiRadar } from "react-icons/bi";
+import { BiRadar, BiScatterChart } from "react-icons/bi";
 import { MdOutlineTextFields } from "react-icons/md";
 import { TextWidgetComponent } from "./text";
 import { BarChartComponent } from "./bar";
@@ -16,22 +16,22 @@ import { BubbleChartComponent } from "./bubble";
 
 import { getDemoData, registerWidgets } from "./widget.config";
 import { TableWidgetComponent } from "./table";
-import {WIDGET_TYPES,WIDGET_INITIAL_CONFIG} from "@jet-admin/widget-types";
+import { WIDGET_TYPES, WIDGET_INITIAL_CONFIG } from "@jet-admin/widget-types";
 
 // Register widgets
 registerWidgets();
 
 // All widget dataset fields
 export const ALL_WIDGET_DATASET_FIELDS = {
-    text: ["text"],
-    bar: ["xAxis", "yAxis"],
-    line: ["xAxis", "yAxis"],
-    pie: ["label", "value"],
-    polarArea: ["label", "value"],
-    radar: ["label", "value"],
-    scatter: ["xAxis", "yAxis"],
-    bubble: ["xAxis", "yAxis", "radius"],
-    table: [],  
+  text: ["text"],
+  bar: ["xAxis", "yAxis"],
+  line: ["xAxis", "yAxis"],
+  pie: ["label", "value"],
+  polarArea: ["label", "value"],
+  radar: ["label", "value"],
+  scatter: ["xAxis", "yAxis"],
+  bubble: ["xAxis", "yAxis", "radius"],
+  table: [],
 };
 
 // Widget map
@@ -161,7 +161,7 @@ export const WIDGETS_MAP = {
       />
     ),
     icon: ({ className }) => (
-      <FaChartLine className={`!text-lg ${className}`} />
+      <BiScatterChart className={`!text-lg ${className}`} />
     ),
     sampleConfig: WIDGET_INITIAL_CONFIG.scatter,
   },
