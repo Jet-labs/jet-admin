@@ -1,6 +1,6 @@
+import { WIDGETS_MAP } from "@jet-admin/widgets";
 import React from "react";
 import { FaPlus } from "react-icons/fa";
-import { MdOutlineTextFields } from "react-icons/md";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../../constants";
 import { useDatabaseWidgetsState } from "../../../../logic/contexts/databaseWidgetsContext";
@@ -19,24 +19,11 @@ export const DatabaseWidgetDrawerList = () => {
     navigate(CONSTANTS.ROUTES.ADD_DATABASE_WIDGET.path(tenantID));
   };
   const _renderWidgetIcon = (databaseWidgetType, isActive) => {
-    switch (databaseWidgetType) {
-      case CONSTANTS.DATABASE_WIDGET_TYPES.TEXT_WIDGET.value:
-        return (
-          <MdOutlineTextFields
-            className={`${
-              isActive ? "text-[#646cff] " : "text-slate-600"
-            } mr-3 !text-base`}
-          />
-        );
-      default:
-        return (
-          <MdOutlineTextFields
-            className={`${
-              isActive ? "text-[#646cff] " : "text-slate-600"
-            } mr-3 !text-base`}
-          />
-        );
-    }
+    return WIDGETS_MAP[databaseWidgetType].icon({
+      className: `!text-slate-700 !text-xl !mr-3 ${
+        isActive ? "text-[#646cff] " : "text-slate-600"
+      }`,
+    });
   };
   return (
     <div className=" bg-white   h-[calc(100vh-48px)] overflow-hidden p-2 w-full">

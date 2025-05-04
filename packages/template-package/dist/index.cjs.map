@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../src/index.js"],
+  "sourcesContent": ["/**\n * This file is the entry point for the ui-components package.\n * It exports all the components and utils from the package.\n */\nexport const stringUtils = {\n    /**\n     * \n     * @param {string} str \n     * @param {number} length \n     * @returns \n     */\n  truncateName: (str, length) => {\n    return str.length > length ? `${str.substring(0, length)}...` : str;\n  },\n  /**\n   * \n   * @param {string} str \n   * @returns \n   */\n  containsWhitespace: (str) => /\\s/.test(str),\n};\n\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAIO,IAAM,cAAc;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA,EAOzB,cAAc,CAAC,KAAK,WAAW;AAC7B,WAAO,IAAI,SAAS,SAAS,GAAG,IAAI,UAAU,GAAG,MAAM,CAAC,QAAQ;AAAA,EAClE;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA,EAMA,oBAAoB,CAAC,QAAQ,KAAK,KAAK,GAAG;AAC5C;",
+  "names": []
+}

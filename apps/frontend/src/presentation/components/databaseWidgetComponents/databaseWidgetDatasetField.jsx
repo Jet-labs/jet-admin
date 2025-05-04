@@ -10,6 +10,7 @@ import { IoIosColorFilter } from "react-icons/io";
 import { DatabaseWidgetDatasetArguments } from "./databaseWidgetDatasetArguments";
 import { DatabaseWidgetDatasetFieldMapping } from "./databaseWidgetDatasetFieldMapping";
 import PropTypes from "prop-types";
+import { DatabaseWidgetDatasetAdvancedOptions } from "./databaseWidgetDatasetAdvancedOptions";
 
 /**
  * @param {object} param0
@@ -27,6 +28,7 @@ export const DatabaseWidgetDatasetField = ({
   databaseQueries,
   datasetFields,
 }) => {
+  console.log({ datasetFields });
   DatabaseWidgetDatasetField.propTypes = {
     index: PropTypes.number.isRequired,
     widgetForm: PropTypes.object.isRequired,
@@ -184,14 +186,14 @@ export const DatabaseWidgetDatasetField = ({
             </button>
           </div>
 
-          {/* <DatabaseWidgetDatasetAdvancedOptions
+          <DatabaseWidgetDatasetAdvancedOptions
             open={showAdvancedOptions}
             onClose={() => setShowAdvancedOptions(false)}
             datasetIndex={index}
             widgetForm={widgetForm}
             initialValues={widgetForm.values.databaseQueries[index]?.parameters}
             parentWidgetType={widgetForm.values.databaseWidgetType}
-          /> */}
+          />
           <DatabaseWidgetDatasetFieldMapping
             open={showFieldMappingOptions}
             onClose={() => setShowFieldMappingOptions(false)}

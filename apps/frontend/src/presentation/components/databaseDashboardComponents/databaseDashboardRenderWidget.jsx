@@ -1,12 +1,10 @@
-import React, { useState } from "react";
 import PropTypes from "prop-types";
+import React, { useState } from "react";
 import "react-grid-layout/css/styles.css";
 import { FaTimes } from "react-icons/fa";
 import "react-resizable/css/styles.css";
 import { useComponentSize } from "../../../logic/hooks/useComponentSize";
-import { DatabaseDashboardChartWidget } from "../widgetTypes/databaseDashboardChartWidget";
-import { DatabaseDashboardQueryWidget } from "../widgetTypes/databaseDashboardQueryWidget";
-import { DatabaseDashboardTextWidget } from "../widgetTypes/databaseDashboardTextWidget";
+import { DatabaseDashboardWidget } from "../widgetTypes/databaseDashboardWidget";
 
 export const DatabaseDashboardRenderWidget = ({
   widget,
@@ -24,7 +22,6 @@ export const DatabaseDashboardRenderWidget = ({
     responsive: PropTypes.bool,
     editable: PropTypes.bool,
   };
-  const widgetType = String(widget).split("_")[0];
   const widgetID = String(widget).split("_")[1].split("-")[0];
   const [ref, size] = useComponentSize();
   const [isMouseHover, setIsMouseHover] = useState(false);
@@ -81,30 +78,12 @@ export const DatabaseDashboardRenderWidget = ({
         className="!flex-row justify-center !items-center !w-full !h-full"
         ref={ref}
       >
-        {widgetType == "chart" && (
-          <DatabaseDashboardChartWidget
-            databaseChartID={widgetID}
-            tenantID={tenantID}
-            height={size.height}
-            width={size.width}
-          />
-        )}
-        {widgetType == "query" && (
-          <DatabaseDashboardQueryWidget
-            databaseQueryID={widgetID}
-            tenantID={tenantID}
-            height={size.height}
-            width={size.width}
-          />
-        )}
-        {widgetType == "text" && (
-          <DatabaseDashboardTextWidget
-            databaseWidgetID={widgetID}
-            tenantID={tenantID}
-            height={size.height}
-            width={size.width}
-          />
-        )}
+        <DatabaseDashboardWidget
+          databaseWidgetID={widgetID}
+          tenantID={tenantID}
+          height={size.height}
+          width={size.width}
+        />
       </div>
     </div>
   );

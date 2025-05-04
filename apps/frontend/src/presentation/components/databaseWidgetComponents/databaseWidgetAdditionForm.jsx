@@ -17,15 +17,19 @@ import {
 import { DatabaseWidgetEditor } from "./databaseWidgetEditor";
 import { DatabaseWidgetPreview } from "./databaseWidgetPreview";
 import PropTypes from "prop-types";
+import { WIDGETS_MAP } from "@jet-admin/widgets";
+import { WIDGET_TYPES } from "@jet-admin/widget-types";
+
+const defaultChartType = WIDGET_TYPES.BAR_CHART.value;
 const initialValues = {
   databaseWidgetName: "",
-  databaseWidgetType: CONSTANTS.DATABASE_WIDGET_TYPES.TEXT_WIDGET.value,
+  databaseWidgetType: defaultChartType,
   databaseQueries: [
     {
       title: "",
       databaseQueryID: null,
       valueType: "static",
-      parameters: {},
+      parameters: WIDGETS_MAP[defaultChartType].sampleConfig,
       databaseQueryArgValues: {},
       datasetFields: {
         xAxis: "",

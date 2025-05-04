@@ -1,12 +1,13 @@
 import { CircularProgress } from "@mui/material";
 import React, { useCallback, useRef } from "react";
 import { FiRefreshCcw } from "react-icons/fi";
-import { DATABASE_WIDGETS_CONFIG_MAP } from "./widgetConfig";
-// import { DatabaseWidgetDownloadForm } from "./databaseWidgetImageDownloadForm";
 import { CONSTANTS } from "../../../constants";
 import PropTypes from "prop-types";
+import { WIDGETS_MAP } from "@jet-admin/widgets";
 
 export const DatabaseWidgetPreview = ({
+  tenantID,
+  databaseWidgetID,
   databaseWidgetName,
   databaseWidgetType,
   data,
@@ -17,6 +18,8 @@ export const DatabaseWidgetPreview = ({
   databaseWidgetConfig,
 }) => {
   DatabaseWidgetPreview.propTypes = {
+    tenantID: PropTypes.number.isRequired,
+    databaseWidgetID: PropTypes.number.isRequired,
     databaseWidgetName: PropTypes.string.isRequired,
     databaseWidgetType: PropTypes.string.isRequired,
     data: PropTypes.object,
@@ -26,6 +29,7 @@ export const DatabaseWidgetPreview = ({
     refreshData: PropTypes.func.isRequired,
     databaseWidgetConfig: PropTypes.object,
   };
+  const uniqueKey = `databaseWidgetPreview_${tenantID}_${databaseWidgetID}`;
   const widgetRef = useRef();
   const _handleOnWidgetInit = useCallback(
     (ref) => {
@@ -35,6 +39,10 @@ export const DatabaseWidgetPreview = ({
     },
     [widgetRef]
   );
+  console.log({
+    databaseWidgetConfig,
+    data,
+  });
   return (
     <div className="h-full w-full flex flex-col">
       <div className="w-full flex flex-row justify-end items-center bg-slate-100 border-b border-b-slate-200 p-2 gap-2">
@@ -61,9 +69,9 @@ export const DatabaseWidgetPreview = ({
           <CircularProgress className=" !text-[#646cff]" />
         </div>
       ) : (
-        <div className="h-full w-full p-3">
-          {DATABASE_WIDGETS_CONFIG_MAP[databaseWidgetType] ? (
-            DATABASE_WIDGETS_CONFIG_MAP[databaseWidgetType].component({
+        <div className="h-full w-full overflow-scroll" key={uniqueKey}>
+          {WIDGETS_MAP[databaseWidgetType] ? (
+            WIDGETS_MAP[databaseWidgetType].component({
               databaseWidgetName,
               databaseWidgetType,
               data,

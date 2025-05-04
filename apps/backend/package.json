@@ -30,6 +30,8 @@
   "description": "",
   "dependencies": {
     "@google/generative-ai": "^0.24.0",
+    "@jet-admin/widget-types": "^1.0.0",
+    "@jet-admin/widgets": "^1.0.0",
     "@prisma/client": "^5.22.0",
     "@prisma/engine-core": "^4.13.0",
     "@prisma/internals": "^5.17.0",
@@ -64,6 +66,7 @@
     "winston-syslog": "^2.7.0"
   },
   "devDependencies": {
+    "ignore-styles": "^5.0.1",
     "nodemon": "^2.0.22",
     "prisma": "^5.22.0",
     "prisma-json-schema-generator": "^5.1.1"

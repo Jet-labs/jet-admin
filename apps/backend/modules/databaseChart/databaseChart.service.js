@@ -1,7 +1,5 @@
 const Logger = require("../../utils/logger");
 const { prisma } = require("../../config/prisma.config");
-
-const { databaseChartProcessor } = require("./databaseChart.processor");
 const constants = require("../../constants");
 const { databaseService } = require("../database/database.service");
 const { aiUtil } = require("../../utils/aiprompt.util");
@@ -11,6 +9,15 @@ const {
 } = require("../databaseQuery/databaseQuery.service");
 const environmentVariables = require("../../environment");
 const { stringUtil } = require("../../utils/string.util");
+const {
+  processBarChartQueryResults,
+  processLineChartQueryResults,
+  processPieChartQueryResults,
+  processRadarChartQueryResults,
+  processPolarAreaChartQueryResults,
+  processScatterChartQueryResults,
+  processBubbleChartQueryResults,
+} = require("@jet-admin/widgets");
 const databaseChartService = {};
 
 /**
@@ -193,12 +200,12 @@ databaseChartService.getDatabaseChartByID = async ({
 };
 
 /**
- * 
- * @param {object} param0 
- * @param {number} param0.userID 
- * @param {number} param0.tenantID 
- * @param {number} param0.databaseChartID 
- * @returns 
+ *
+ * @param {object} param0
+ * @param {number} param0.userID
+ * @param {number} param0.tenantID
+ * @param {number} param0.databaseChartID
+ * @returns
  */
 databaseChartService.cloneDatabaseChartByID = async ({
   userID,
@@ -378,50 +385,50 @@ databaseChartService.getDatabaseChartDataByID = async ({
     // 4. Process results into chart format
     switch (databaseChart.databaseChartType) {
       case constants.DATABASE_CHART_TYPES.BAR_CHART.value:
-        processedData = databaseChartProcessor.processBarChartQueryResults({
+        processedData = processBarChartQueryResults({
           databaseChart,
           databaseQueriesResult,
         });
         break;
       case constants.DATABASE_CHART_TYPES.LINE_CHART.value:
-        processedData = databaseChartProcessor.processLineChartQueryResults({
+        processedData = processLineChartQueryResults({
           databaseChart,
           databaseQueriesResult,
         });
         break;
 
       case constants.DATABASE_CHART_TYPES.PIE_CHART.value:
-        processedData = databaseChartProcessor.processPieChartQueryResults({
+        processedData = processPieChartQueryResults({
           databaseChart,
           databaseQueriesResult,
         });
         break;
       case constants.DATABASE_CHART_TYPES.RADAR_CHART.value:
-        processedData = databaseChartProcessor.processRadarChartQueryResults({
+        processedData = processRadarChartQueryResults({
           databaseChart,
           databaseQueriesResult,
         });
         break;
       case constants.DATABASE_CHART_TYPES.POLAR_AREA.value:
-        processedData = databaseChartProcessor.processPolarAreaChartQueryResults({
+        processedData = processPolarAreaChartQueryResults({
           databaseChart,
           databaseQueriesResult,
         });
         break;
       case constants.DATABASE_CHART_TYPES.SCATTER_CHART.value:
-        processedData = databaseChartProcessor.processScatterChartQueryResults({
+        processedData = processScatterChartQueryResults({
           databaseChart,
           databaseQueriesResult,
         });
         break;
       case constants.DATABASE_CHART_TYPES.BUBBLE_CHART.value:
-        processedData = databaseChartProcessor.processBubbleChartQueryResults({
+        processedData = processBubbleChartQueryResults({
           databaseChart,
           databaseQueriesResult,
         });
         break;
       default:
-        processedData = databaseChartProcessor.processBarChartQueryResults({
+        processedData = processBarChartQueryResults({
           databaseChart,
           databaseQueriesResult,
         });
@@ -540,49 +547,49 @@ databaseChartService.getDatabaseChartDataUsingDatabaseChart = async ({
     // 4. Process results into chart format
     switch (databaseChart.databaseChartType) {
       case constants.DATABASE_CHART_TYPES.BAR_CHART.value:
-        processedData = databaseChartProcessor.processBarChartQueryResults({
+        processedData = processBarChartQueryResults({
           databaseChart,
           databaseQueriesResult,
         });
         break;
       case constants.DATABASE_CHART_TYPES.LINE_CHART.value:
-        processedData = databaseChartProcessor.processLineChartQueryResults({
+        processedData = processLineChartQueryResults({
           databaseChart,
           databaseQueriesResult,
         });
         break;
       case constants.DATABASE_CHART_TYPES.PIE_CHART.value:
-        processedData = databaseChartProcessor.processPieChartQueryResults({
+        processedData = processPieChartQueryResults({
           databaseChart,
           databaseQueriesResult,
         });
         break;
       case constants.DATABASE_CHART_TYPES.RADAR_CHART.value:
-        processedData = databaseChartProcessor.processRadarChartQueryResults({
+        processedData = processRadarChartQueryResults({
           databaseChart,
           databaseQueriesResult,
         });
         break;
       case constants.DATABASE_CHART_TYPES.POLAR_AREA.value:
-        processedData = databaseChartProcessor.processPolarAreaChartQueryResults({
+        processedData = processPolarAreaChartQueryResults({
           databaseChart,
           databaseQueriesResult,
         });
         break;
       case constants.DATABASE_CHART_TYPES.SCATTER_CHART.value:
-        processedData = databaseChartProcessor.processScatterChartQueryResults({
+        processedData = processScatterChartQueryResults({
           databaseChart,
           databaseQueriesResult,
         });
         break;
       case constants.DATABASE_CHART_TYPES.BUBBLE_CHART.value:
-        processedData = databaseChartProcessor.processBubbleChartQueryResults({
+        processedData = processBubbleChartQueryResults({
           databaseChart,
           databaseQueriesResult,
         });
         break;
       default:
-        processedData = databaseChartProcessor.processBarChartQueryResults({
+        processedData = processBarChartQueryResults({
           databaseChart,
           databaseQueriesResult,
         });

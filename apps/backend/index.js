@@ -1,3 +1,4 @@
+require("ignore-styles");
 const environment = require("./environment");
 const cookieParser = require("cookie-parser");
 const constants = require("./constants");
@@ -5,7 +6,7 @@ const { expressApp } = require("./config/express-app.config");
 const { httpServer } = require("./config/http-server.config");
 const Logger = require("./utils/logger");
 const { cronJobService } = require("./modules/cronJob/cronJob.service");
-
+const { stringUtils } = require("@jet-admin/template-package");
 // Middleware setup
 expressApp.use(cookieParser());
 expressApp.use("/api/v1/auth", require("./modules/auth/auth.v1.routes"));
@@ -45,6 +46,7 @@ httpServer.listen(port, () => {
     message: "server started listening",
     params: { port },
   });
+  console.log("truncate name", stringUtils.truncateName("Hello World", 5));
   cronJobService.scheduleAllCronJobs();
 });
 

@@ -6,11 +6,12 @@ import { useDatabaseWidgetsState } from "../../../logic/contexts/databaseWidgets
 
 import { DatabaseQueryTestingPanel } from "../databaseQueryComponents/databaseQueryTestingPanel";
 import { DatabaseWidgetDatasetField } from "./databaseWidgetDatasetField";
-import { DATABASE_WIDGETS_CONFIG_MAP } from "./widgetConfig";
 import { CollapseComponent } from "../ui/collapseComponent";
 import { DatabaseWidgetAdvancedOptions } from "./databaseWidgetAdvancedOptions";
 import PropTypes from "prop-types";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
+import { WIDGETS_MAP } from "@jet-admin/widgets";
+import { WIDGET_TYPES } from "@jet-admin/widget-types";
 
 export const DatabaseWidgetEditor = ({ databaseWidgetEditorForm }) => {
   DatabaseWidgetEditor.propTypes = {
@@ -100,12 +101,12 @@ export const DatabaseWidgetEditor = ({ databaseWidgetEditorForm }) => {
             onBlur={databaseWidgetEditorForm.handleBlur}
             className="placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:outline-none focus:border-slate-400 block w-full px-1.5 py-1"
           >
-            {Object.keys(CONSTANTS.DATABASE_WIDGET_TYPES).map((widgetType) => (
+            {Object.keys(WIDGET_TYPES).map((widgetType) => (
               <option
-                key={CONSTANTS.DATABASE_WIDGET_TYPES[widgetType].value}
-                value={CONSTANTS.DATABASE_WIDGET_TYPES[widgetType].value}
+                key={WIDGET_TYPES[widgetType].value}
+                value={WIDGET_TYPES[widgetType].value}
               >
-                {CONSTANTS.DATABASE_WIDGET_TYPES[widgetType].name}
+                {WIDGET_TYPES[widgetType].name}
               </option>
             ))}
           </select>
@@ -191,7 +192,7 @@ export const DatabaseWidgetEditor = ({ databaseWidgetEditorForm }) => {
               >
                 {databaseWidgetEditorForm.values.databaseQueries?.map(
                   (query, index) => {
-                    return DATABASE_WIDGETS_CONFIG_MAP[
+                    return WIDGETS_MAP[
                       databaseWidgetEditorForm.values.databaseWidgetType
                     ] ? (
                       <DatabaseWidgetDatasetField
@@ -200,7 +201,7 @@ export const DatabaseWidgetEditor = ({ databaseWidgetEditorForm }) => {
                         widgetForm={databaseWidgetEditorForm}
                         databaseQueries={databaseQueries}
                         datasetFields={
-                          DATABASE_WIDGETS_CONFIG_MAP[
+                          WIDGETS_MAP[
                             databaseWidgetEditorForm.values.databaseWidgetType
                           ].datasetFields
                         }

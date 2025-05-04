@@ -3,8 +3,18 @@ const { prisma } = require("../../config/prisma.config");
 const {
   databaseQueryService,
 } = require("../databaseQuery/databaseQuery.service");
-const { databaseWidgetProcessor } = require("./databaseWidget.processor");
-const constants = require("../../constants");
+const {
+  processTextWidgetQueryResults,
+  processBarChartQueryResults,
+  processLineChartQueryResults,
+  processPieChartQueryResults,
+  processRadarChartQueryResults,
+  processPolarAreaChartQueryResults,
+  processScatterChartQueryResults,
+  processBubbleChartQueryResults,
+  processTableWidgetQueryResults,
+} = require("@jet-admin/widgets");
+const { WIDGET_TYPES } = require("@jet-admin/widget-types");
 const databaseWidgetService = {};
 
 /**
@@ -233,11 +243,14 @@ databaseWidgetService.cloneDatabaseWidgetByID = async ({
           (databaseWidgetQueryMapping) => {
             return {
               databaseWidgetID: newDatabaseWidget.databaseWidgetID,
-              databaseQueryID: parseInt(databaseWidgetQueryMapping.databaseQueryID),
+              databaseQueryID: parseInt(
+                databaseWidgetQueryMapping.databaseQueryID
+              ),
               title: databaseWidgetQueryMapping.title,
               parameters: databaseWidgetQueryMapping.parameters,
               datasetFields: databaseWidgetQueryMapping.datasetFields,
-              databaseQueryArgValues: databaseWidgetQueryMapping.databaseQueryArgValues,
+              databaseQueryArgValues:
+                databaseWidgetQueryMapping.databaseQueryArgValues,
             };
           }
         ),
@@ -262,7 +275,6 @@ databaseWidgetService.cloneDatabaseWidgetByID = async ({
     throw error;
   }
 };
-
 
 /**
  * Service function to retrieve and process database widget data.
@@ -356,14 +368,62 @@ databaseWidgetService.getDatabaseWidgetDataByID = async ({
     let processedData;
     // 4. Process results into widget format
     switch (databaseWidget.databaseWidgetType) {
-      case constants.DATABASE_WIDGET_TYPES.TEXT_WIDGET.value:
-        processedData = databaseWidgetProcessor.processTextWidgetQueryResults({
+      case WIDGET_TYPES.TEXT_WIDGET.value:
+        processedData = processTextWidgetQueryResults({
+          databaseWidget,
+          databaseQueriesResult,
+        });
+        break;
+      case WIDGET_TYPES.BAR_CHART.value:
+        processedData = processBarChartQueryResults({
+          databaseWidget,
+          databaseQueriesResult,
+        });
+        break;
+      case WIDGET_TYPES.LINE_CHART.value:
+        processedData = processLineChartQueryResults({
+          databaseWidget,
+          databaseQueriesResult,
+        });
+        break;
+      case WIDGET_TYPES.PIE_CHART.value:
+        processedData = processPieChartQueryResults({
+          databaseWidget,
+          databaseQueriesResult,
+        });
+        break;
+      case WIDGET_TYPES.RADAR_CHART.value:
+        processedData = processRadarChartQueryResults({
+          databaseWidget,
+          databaseQueriesResult,
+        });
+        break;
+      case WIDGET_TYPES.POLAR_AREA.value:
+        processedData = processPolarAreaChartQueryResults({
+          databaseWidget,
+          databaseQueriesResult,
+        });
+        break;
+      case WIDGET_TYPES.SCATTER_CHART.value:
+        processedData = processScatterChartQueryResults({
+          databaseWidget,
+          databaseQueriesResult,
+        });
+        break;
+      case WIDGET_TYPES.BUBBLE_CHART.value:
+        processedData = processBubbleChartQueryResults({
+          databaseWidget,
+          databaseQueriesResult,
+        });
+        break;
+      case WIDGET_TYPES.TABLE_WIDGET.value:
+        processedData = processTableWidgetQueryResults({
           databaseWidget,
           databaseQueriesResult,
         });
         break;
       default:
-        processedData = databaseWidgetProcessor.processTextWidgetQueryResults({
+        processedData = processTextWidgetQueryResults({
           databaseWidget,
           databaseQueriesResult,
         });
@@ -377,15 +437,14 @@ databaseWidgetService.getDatabaseWidgetDataByID = async ({
       data: processedData,
     };
   } catch (error) {
-    Logger.log(
-      "error",
-      "databaseWidgetService:getDatabaseWidgetDataByID:error",
-      {
+    Logger.log("error", {
+      message: "databaseWidgetService:getDatabaseWidgetDataByID:catch-1",
+      params: {
         error,
         databaseWidgetID,
         userID,
-      }
-    );
+      },
+    });
     throw error;
   }
 };
@@ -411,6 +470,7 @@ databaseWidgetService.getDatabaseWidgetDataUsingDatabaseWidget = async ({
     params: {
       userID,
       tenantID,
+      databaseWidget,
     },
   });
 
@@ -481,14 +541,63 @@ databaseWidgetService.getDatabaseWidgetDataUsingDatabaseWidget = async ({
     let processedData;
     // 4. Process results into widget format
     switch (databaseWidget.databaseWidgetType) {
-      case constants.DATABASE_WIDGET_TYPES.TEXT_WIDGET.value:
-        processedData = databaseWidgetProcessor.processTextWidgetQueryResults({
+      case WIDGET_TYPES.TEXT_WIDGET.value:
+        processedData = processTextWidgetQueryResults({
           databaseWidget,
           databaseQueriesResult,
         });
         break;
+      case WIDGET_TYPES.BAR_CHART.value:
+        processedData = processBarChartQueryResults({
+          databaseWidget,
+          databaseQueriesResult,
+        });
+        break;
+      case WIDGET_TYPES.LINE_CHART.value:
+        processedData = processLineChartQueryResults({
+          databaseWidget,
+          databaseQueriesResult,
+        });
+        break;
+      case WIDGET_TYPES.PIE_CHART.value:
+        processedData = processPieChartQueryResults({
+          databaseWidget,
+          databaseQueriesResult,
+        });
+        break;
+      case WIDGET_TYPES.RADAR_CHART.value:
+        processedData = processRadarChartQueryResults({
+          databaseWidget,
+          databaseQueriesResult,
+        });
+        break;
+      case WIDGET_TYPES.POLAR_AREA.value:
+        processedData = processPolarAreaChartQueryResults({
+          databaseWidget,
+          databaseQueriesResult,
+        });
+        break;
+      case WIDGET_TYPES.SCATTER_CHART.value:
+        processedData = processScatterChartQueryResults({
+          databaseWidget,
+          databaseQueriesResult,
+        });
+        break;
+      case WIDGET_TYPES.BUBBLE_CHART.value:
+        processedData = processBubbleChartQueryResults({
+          databaseWidget,
+          databaseQueriesResult,
+        });
+        break;
+      case WIDGET_TYPES.TABLE_WIDGET.value:
+        processedData = processTableWidgetQueryResults({
+          databaseWidget,
+          databaseQueriesResult,
+        });
+        break;
+
       default:
-        processedData = databaseWidgetProcessor.processTextWidgetQueryResults({
+        processedData = processTextWidgetQueryResults({
           databaseWidget,
           databaseQueriesResult,
         });

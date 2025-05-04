@@ -37,6 +37,11 @@ export const DatabaseWidgetDatasetFieldMapping = ({
       databaseQueryArgValues: {},
       datasetFields: {
         text: "",
+        xAxis: "",
+        yAxis: "",
+        label: "",
+        value: "",
+        radius: "",
       },
       ...initialValues,
     },
@@ -127,6 +132,120 @@ export const DatabaseWidgetDatasetFieldMapping = ({
                 onChange={datasetFieldMappingForm.handleChange}
                 onBlur={datasetFieldMappingForm.handleBlur}
                 value={datasetFieldMappingForm.values.datasetFields.text}
+                list="data-type-suggestions"
+              />
+            </div>
+          )}
+          {datasetFields?.includes("xAxis") && (
+            <div>
+              <label
+                htmlFor={`datasetFields.xAxis`}
+                className="block mb-1 text-xs font-normal text-slate-500"
+              >
+                {
+                  CONSTANTS.STRINGS
+                    .WIDGET_EDITOR_FORM_DATASET_FIELD_X_AXIS_LABEL
+                }
+              </label>
+              <input
+                type="text"
+                name={`datasetFields.xAxis`}
+                id={`datasetFields.xAxis`}
+                className={`placeholder:text-slate-400 w-full text-xs bg-slate-50 border border-slate-300 text-slate-700 rounded  block py-1 px-1.5 focus:outline-none focus:border-slate-400`}
+                required={true}
+                onChange={datasetFieldMappingForm.handleChange}
+                onBlur={datasetFieldMappingForm.handleBlur}
+                value={datasetFieldMappingForm.values.datasetFields.xAxis}
+                list="data-type-suggestions"
+              />
+            </div>
+          )}
+          {datasetFields?.includes("yAxis") && (
+            <div>
+              <label
+                htmlFor={`datasetFields.yAxis`}
+                className="block mb-1 text-xs font-normal text-slate-500"
+              >
+                {
+                  CONSTANTS.STRINGS
+                    .WIDGET_EDITOR_FORM_DATASET_FIELD_Y_AXIS_LABEL
+                }
+              </label>
+              <input
+                type="text"
+                name={`datasetFields.yAxis`}
+                id={`datasetFields.yAxis`}
+                className={`placeholder:text-slate-400 w-full text-xs bg-slate-50 border border-slate-300 text-slate-700 rounded  block py-1 px-1.5 focus:outline-none focus:border-slate-400`}
+                required={true}
+                onChange={datasetFieldMappingForm.handleChange}
+                onBlur={datasetFieldMappingForm.handleBlur}
+                value={datasetFieldMappingForm.values.datasetFields.yAxis}
+                list="data-type-suggestions"
+              />
+            </div>
+          )}
+          {datasetFields?.includes("label") && (
+            <div>
+              <label
+                htmlFor={`datasetFields.label`}
+                className="block mb-1 text-xs font-normal text-slate-500"
+              >
+                {CONSTANTS.STRINGS.WIDGET_EDITOR_FORM_DATASET_FIELD_LABEL_LABEL}
+              </label>
+              <input
+                type="text"
+                name={`datasetFields.label`}
+                id={`datasetFields.label`}
+                className={`placeholder:text-slate-400 w-full text-xs bg-slate-50 border border-slate-300 text-slate-700 rounded  block py-1 px-1.5 focus:outline-none focus:border-slate-400`}
+                required={true}
+                onChange={datasetFieldMappingForm.handleChange}
+                onBlur={datasetFieldMappingForm.handleBlur}
+                value={datasetFieldMappingForm.values.datasetFields.label}
+                list="data-type-suggestions"
+              />
+            </div>
+          )}
+          {datasetFields?.includes("value") && (
+            <div>
+              <label
+                htmlFor={`datasetFields.value`}
+                className="block mb-1 text-xs font-normal text-slate-500"
+              >
+                {CONSTANTS.STRINGS.WIDGET_EDITOR_FORM_DATASET_FIELD_VALUE_LABEL}
+              </label>
+              <input
+                type="text"
+                name={`datasetFields.value`}
+                id={`datasetFields.value`}
+                className={`placeholder:text-slate-400 w-full text-xs bg-slate-50 border border-slate-300 text-slate-700 rounded  block py-1 px-1.5 focus:outline-none focus:border-slate-400`}
+                required={true}
+                onChange={datasetFieldMappingForm.handleChange}
+                onBlur={datasetFieldMappingForm.handleBlur}
+                value={datasetFieldMappingForm.values.datasetFields.value}
+                list="data-type-suggestions"
+              />
+            </div>
+          )}
+          {datasetFields?.includes("radius") && (
+            <div>
+              <label
+                htmlFor={`datasetFields.radius`}
+                className="block mb-1 text-xs font-normal text-slate-500"
+              >
+                {
+                  CONSTANTS.STRINGS
+                    .WIDGET_EDITOR_FORM_DATASET_FIELD_RADIUS_LABEL
+                }
+              </label>
+              <input
+                type="text"
+                name={`datasetFields.radius`}
+                id={`datasetFields.radius`}
+                className={`placeholder:text-slate-400 w-full text-xs bg-slate-50 border border-slate-300 text-slate-700 rounded  block py-1 px-1.5 focus:outline-none focus:border-slate-400`}
+                required={true}
+                onChange={datasetFieldMappingForm.handleChange}
+                onBlur={datasetFieldMappingForm.handleBlur}
+                value={datasetFieldMappingForm.values.datasetFields.radius}
                 list="data-type-suggestions"
               />
             </div>

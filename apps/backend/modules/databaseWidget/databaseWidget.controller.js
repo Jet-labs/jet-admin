@@ -240,6 +240,7 @@ databaseWidgetController.getDatabaseWidgetDataByID = async (req, res) => {
       "databaseWidgetController:getDatabaseWidgetDataByID:success",
       {
         databaseWidgetID,
+        databaseWidgetData,
         userID: user.userID,
       }
     );
@@ -304,6 +305,7 @@ databaseWidgetController.getDatabaseWidgetDataUsingDatabaseWidget = async (
         "databaseWidgetController:getDatabaseWidgetDataUsingDatabaseWidget:success",
       params: {
         databaseWidget,
+        databaseWidgetData,
         userID: user.userID,
       },
     });

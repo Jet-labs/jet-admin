@@ -1,18 +1,18 @@
+import { WIDGETS_MAP } from "@jet-admin/widgets";
+import PropTypes from "prop-types";
+import React from "react";
+import { AiOutlineRadarChart } from "react-icons/ai";
 import { FaChartBar, FaChartPie } from "react-icons/fa";
 import { FaChartLine } from "react-icons/fa6";
+import { FiExternalLink } from "react-icons/fi";
+import { GoGrabber } from "react-icons/go";
+import { PiChartPolar } from "react-icons/pi";
+import { SiGooglebigquery } from "react-icons/si";
+import { TbChartScatter } from "react-icons/tb";
+import { Link } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 import { useDatabaseDashboardsState } from "../../../logic/contexts/databaseDashboardsContext";
 import { NoEntityUI } from "../ui/noEntityUI";
-import { AiOutlineRadarChart } from "react-icons/ai";
-import { TbChartScatter } from "react-icons/tb";
-import { PiChartPolar } from "react-icons/pi";
-import { MdOutlineTextFields } from "react-icons/md";
-import { SiGooglebigquery } from "react-icons/si";
-import { GoGrabber } from "react-icons/go";
-import { Link } from "react-router-dom";
-import { FiExternalLink } from "react-icons/fi";
-import PropTypes from "prop-types";
-import React from "react";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 
 export const DatabaseDashboardWidgetList = ({ tenantID }) => {
@@ -81,12 +81,9 @@ export const DatabaseDashboardWidgetList = ({ tenantID }) => {
   };
 
   const _renderWidgetIcon = (databaseWidgetType) => {
-    switch (databaseWidgetType) {
-      case CONSTANTS.DATABASE_WIDGET_TYPES.TEXT_WIDGET.value:
-        return <MdOutlineTextFields className="text-slate-700 mr-3 !text-xl" />;
-      default:
-        return <MdOutlineTextFields className="text-slate-700 mr-3 !text-xl" />;
-    }
+    return WIDGETS_MAP[databaseWidgetType].icon({
+      className: "!text-slate-700 !text-xl !mr-3",
+    });
   };
 
   const _renderChartLinkIcon = (databaseChartID) => {
@@ -230,7 +227,7 @@ export const DatabaseDashboardWidgetList = ({ tenantID }) => {
         >
           {databaseWidgets?.length > 0 ? (
             databaseWidgets.map((databaseWidget) => {
-              const key = `text_${databaseWidget.databaseWidgetID}`;
+              const key = `widget_${databaseWidget.databaseWidgetID}`;
               return (
                 <div
                   key={key}

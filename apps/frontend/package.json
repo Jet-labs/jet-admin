@@ -16,6 +16,8 @@
     "@emotion/react": "^11.13.3",
     "@emotion/styled": "^11.13.0",
     "@faker-js/faker": "^9.5.1",
+    "@jet-admin/widget-types": "^1.0.0",
+    "@jet-admin/widgets": "^1.0.0",
     "@monaco-editor/react": "^4.6.0",
     "@mui/icons-material": "^6.1.6",
     "@mui/material": "^6.1.6",

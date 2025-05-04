@@ -2,10 +2,15 @@
   "name": "jet-admin",
   "version": "1.1.0",
   "main": "index.js",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "start:f": "cd apps/frontend && npm run dev",
     "start:b": "cd apps/backend && npm run dev-w",
     "start:all": "concurrently \"npm run start:frontend\" \"npm run start:backend\"",
+    "watch-widgets": "cd packages/widgets && npm run dev -w @jet-admin/widgets",
     "seed": "cd apps/backend && npm run seed",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

@@ -36,6 +36,8 @@ export const ProtectedLayout = () => {
   return (
     <ReactQueryLoadingErrorWrapper
       isLoading={!firebaseUserState || firebaseUserState.isLoading}
+      error={firebaseUserState.error}
+      loadingContainerClass="h-screen w-screen bg-white flex flex-col justify-center items-center"
     >
       <div className="flex h-screen w-screen flex-col justify-start items-stretch overflow-hidden">
         <nav className="w-full  border-b-2 border-[#646cff] bg-white">

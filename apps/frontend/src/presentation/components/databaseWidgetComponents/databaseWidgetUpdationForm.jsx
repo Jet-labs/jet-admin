@@ -1,6 +1,8 @@
+import { WIDGETS_MAP } from "@jet-admin/widgets";
 import { CircularProgress } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
+import PropTypes from "prop-types";
 import React, { useCallback, useEffect, useState } from "react";
 import { CONSTANTS } from "../../../constants";
 import {
@@ -11,18 +13,16 @@ import {
 } from "../../../data/apis/databaseWidget";
 import { formValidations } from "../../../utils/formValidation";
 import { displayError, displaySuccess } from "../../../utils/notification";
+import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "../ui/resizable";
+import { DatabaseWidgetCloneForm } from "./databaseWidgetCloneForm";
 import { DatabaseWidgetDeletionForm } from "./databaseWidgetDeletionForm";
 import { DatabaseWidgetEditor } from "./databaseWidgetEditor";
 import { DatabaseWidgetPreview } from "./databaseWidgetPreview";
-import { DATABASE_WIDGETS_CONFIG_MAP } from "./widgetConfig";
-import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
-import PropTypes from "prop-types";
-import { DatabaseWidgetCloneForm } from "./databaseWidgetCloneForm";
 
 const initialValues = {
   databaseWidgetName: "",
@@ -53,6 +53,7 @@ export const DatabaseWidgetUpdationForm = ({ tenantID, databaseWidgetID }) => {
     tenantID: PropTypes.number.isRequired,
     databaseWidgetID: PropTypes.number.isRequired,
   };
+  const uniqueKey = `databaseWidgetUpdationForm_${tenantID}_${databaseWidgetID}`;
   const queryClient = useQueryClient();
   const [databaseWidgetFetchedData, setDatabaseWidgetFetchedData] =
     useState(null);
@@ -124,6 +125,11 @@ export const DatabaseWidgetUpdationForm = ({ tenantID, databaseWidgetID }) => {
     isPending: isFetchingDatabaseWidgetData,
     mutate: fetchDatabaseWidgetData,
   } = useMutation({
+    mutationKey: [
+      CONSTANTS.REACT_QUERY_KEYS.DATABASE_WIDGETS(tenantID),
+      databaseWidgetID,
+      "data",
+    ],
     mutationFn: (data) => {
       return getDatabaseWidgetDataUsingWidgetAPI({
         tenantID,
@@ -161,8 +167,7 @@ export const DatabaseWidgetUpdationForm = ({ tenantID, databaseWidgetID }) => {
         databaseWidgetName:
           databaseWidget.databaseWidgetName || CONSTANTS.STRINGS.UNTITLED,
         databaseWidgetType:
-          databaseWidget.databaseWidgetType ||
-          DATABASE_WIDGETS_CONFIG_MAP.text.value,
+          databaseWidget.databaseWidgetType || WIDGETS_MAP.text.value,
         databaseWidgetDescription:
           databaseWidget.databaseWidgetDescription || "",
         databaseQueries: databaseWidget.databaseQueries || [],
@@ -199,6 +204,7 @@ export const DatabaseWidgetUpdationForm = ({ tenantID, databaseWidgetID }) => {
             >
               {updateDatabaseWidgetForm && (
                 <DatabaseWidgetEditor
+                  key={`databaseWidgetEditor_${uniqueKey}`}
                   databaseWidgetEditorForm={updateDatabaseWidgetForm}
                 />
               )}
@@ -218,12 +224,12 @@ export const DatabaseWidgetUpdationForm = ({ tenantID, databaseWidgetID }) => {
                   {CONSTANTS.STRINGS.UPDATE_WIDGET_FORM_SUBMIT_BUTTON}
                 </button>
                 <DatabaseWidgetCloneForm
-                  key={`databaseWidgetCloneForm_${databaseWidget?.databaseWidgetID}`}
+                  key={`databaseWidgetCloneForm_${uniqueKey}`}
                   tenantID={tenantID}
                   databaseWidgetID={databaseWidgetID}
                 />
                 <DatabaseWidgetDeletionForm
-                  key={`databaseWidgetDeletionForm_${databaseWidget?.databaseWidgetID}`}
+                  key={`databaseWidgetDeletionForm_${uniqueKey}`}
                   tenantID={tenantID}
                   databaseWidgetID={databaseWidgetID}
                 />
@@ -233,6 +239,9 @@ export const DatabaseWidgetUpdationForm = ({ tenantID, databaseWidgetID }) => {
           <ResizableHandle withHandle={true} />
           <ResizablePanel defaultSize={80}>
             <DatabaseWidgetPreview
+              key={`{databaseWidgetPreview_${uniqueKey}}`}
+              databaseWidgetID={databaseWidgetID}
+              tenantID={tenantID}
               databaseWidgetName={
                 updateDatabaseWidgetForm.values.databaseWidgetName
               }

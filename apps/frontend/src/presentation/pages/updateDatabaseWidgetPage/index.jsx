@@ -4,8 +4,10 @@ import { DatabaseWidgetUpdationForm } from "../../components/databaseWidgetCompo
 
 const UpdateDatabaseWidgetPage = () => {
   const { tenantID, databaseWidgetID } = useParams();
+  const uniqueKey = `updateDatabaseWidgetPage_${tenantID}_${databaseWidgetID}`;
   return (
     <DatabaseWidgetUpdationForm
+      key={`databaseWidgetUpdationForm_${uniqueKey}`}
       tenantID={tenantID}
       databaseWidgetID={databaseWidgetID}
     />
