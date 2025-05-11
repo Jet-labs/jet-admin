@@ -42,7 +42,6 @@ router.delete(
 router.post(
   "/",
   body("tenantName").notEmpty().withMessage("tenantName is required"),
-  body("tenantLogoURL").notEmpty().withMessage("tenantLogoURL is required"),
   body("tenantDBURL").notEmpty().withMessage("tenantDBURL is required"),
   body("tenantDBType")
     .isIn(Object.keys(constants.SUPPORTED_DATABASES))
@@ -62,7 +61,6 @@ router.patch(
   "/:tenantID",
   param("tenantID").isNumeric().withMessage("tenantID must be a number"),
   body("tenantName").notEmpty().withMessage("tenantName is required"),
-  body("tenantLogoURL").notEmpty().withMessage("tenantLogoURL is required"),
   body("tenantDBURL").notEmpty().withMessage("tenantDBURL is required"),
   body("tenantDBType")
     .isIn(Object.keys(constants.SUPPORTED_DATABASES))

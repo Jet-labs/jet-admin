@@ -2,7 +2,7 @@
 import axios from "axios";
 import { CONSTANTS } from "../../constants";
 import { firebaseAuth } from "../../config/firebase";
-import { CronJob } from "../models/cronjob";
+import { CronJob } from "../models/cronJob";
 import { CronJobHistory } from "../models/cronJobHistory";
 
 export const getAllCronJobsAPI = async ({ tenantID }) => {

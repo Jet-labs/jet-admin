@@ -173,3 +173,28 @@ export const getAllTenantUsersAPI = async ({ tenantID }) => {
     throw error;
   }
 };
+
+export const deleteUserTenantByIDAPI = async ({ tenantID }) => {
+  try {
+    const url =
+      CONSTANTS.SERVER_HOST +
+      CONSTANTS.APIS.TENANT.deleteUserTenantByIDAPI(tenantID);
+    const bearerToken = await firebaseAuth.currentUser.getIdToken();
+    if (bearerToken) {
+      const response = await axios.get(url, {
+        headers: { authorization: `Bearer ${bearerToken}` },
+      });
+      if (response.data && response.data.success === true) {
+        return true;
+      } else if (response.data.error) {
+        throw response.data.error;
+      } else {
+        throw CONSTANTS.ERROR_CODES.SERVER_ERROR;
+      }
+    } else {
+      throw CONSTANTS.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND;
+    }
+  } catch (error) {
+    throw error;
+  }
+};

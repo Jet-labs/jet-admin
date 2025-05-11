@@ -143,6 +143,14 @@ tenantService.deleteUserTenantByID = async ({ userID, tenantID }) => {
           ],
         },
       }),
+      prisma.tblDatabaseWidgetQueryMappings.deleteMany({
+        where: {
+          OR: [
+            { tblDatabaseQueries: { tenantID: tenantIdToDelete } },
+            { tblDatabaseWidgets: { tenantID: tenantIdToDelete } },
+          ],
+        },
+      }),
       prisma.tblAPIKeyRoleMappings.deleteMany({
         where: {
           OR: [
@@ -181,7 +189,7 @@ tenantService.deleteUserTenantByID = async ({ userID, tenantID }) => {
           tenantID: tenantIdToDelete,
         },
       }),
-      prisma.tblDatabaseCharts.deleteMany({
+      prisma.tblDatabaseWidgets.deleteMany({
         where: {
           tenantID: tenantIdToDelete,
         },
@@ -197,11 +205,6 @@ tenantService.deleteUserTenantByID = async ({ userID, tenantID }) => {
         },
       }),
       prisma.tblDatabaseQueries.deleteMany({
-        where: {
-          tenantID: tenantIdToDelete,
-        },
-      }),
-      prisma.tblDatabaseWidgets.deleteMany({
         where: {
           tenantID: tenantIdToDelete,
         },

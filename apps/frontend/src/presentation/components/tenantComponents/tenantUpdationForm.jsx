@@ -17,6 +17,7 @@ import { TenantUserAdditionForm } from "../tenantUsersComponents/tenantUserAddit
 import { TenantEditor } from "./tenantEditor";
 import PropTypes from "prop-types";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
+import { TenantDeletionForm } from "./tenantDeletionForm";
 
 export const TenantUpdationForm = ({ tenantID }) => {
   TenantUpdationForm.propTypes = {
@@ -150,11 +151,12 @@ export const TenantUpdationForm = ({ tenantID }) => {
                 }}
               >
                 <TenantEditor tenantEditorForm={updateTenantForm} />
-
-                <button
+                <div className="flex flex-row justify-start items-center w-full">
+                  
+                  <button
                   type="submit"
                   disabled={isUpdatingTenant}
-                  className="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none focus:ring-blue-300 "
+                  className="flex flex-row justify-center items-center px-3 py-1.5 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none focus:ring-blue-300 "
                 >
                   {isUpdatingTenant && (
                     <CircularProgress
@@ -165,7 +167,11 @@ export const TenantUpdationForm = ({ tenantID }) => {
                   )}
                   {CONSTANTS.STRINGS.UPDATE_TENANT_FORM_SUBMIT_BUTTON}
                 </button>
+                <TenantDeletionForm tenantID={tenantID}/>
 
+                </div>
+
+                
                 {/* {JSON.stringify(tenant.relationships)} */}
               </form>
               <div className="mt-6 flex flex-col justify-start items-stretch w-full">

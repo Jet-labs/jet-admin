@@ -3,7 +3,7 @@ export const CONSTANTS = {
 
   SERVER_HOST: import.meta.env.PROD
     ? "https://localhost"
-    : "http://localhost:8090",
+    : "https://8090-firebase-jet-admin-1746873252624.cluster-bg6uurscprhn6qxr6xwtrhvkf6.cloudworkstations.dev",
   SUPABASE: {
     TENANT_ASSET_DIRECTORY: "tenant-assets",
     TENANT_LOGO_DIRECTORY: "logos",
@@ -97,6 +97,13 @@ export const CONSTANTS = {
     ADD_TENANT_LOGO_UPLOAD_SUCCESS_TOAST: "Logo uploaded successfully!",
     ADD_TENANT_LOGO_UPLOAD_ERROR_MESSAGE: "Logo upload error!",
     ADD_TENANT_LOGO_UPLOAD_ERROR_TOAST: "Logo uploaded error!",
+
+    DELETE_TENANT_CONFIRMATION_TITLE:"Delete tenant",
+    DELETE_TENANT_CONFIRMATION_DESCRIPTION:"Are you sure you want to delete this tenant? All related assets will be deleted and this operation cannot be undone!",
+    DELETE_TENANT_CONFIRM_BUTTON:"Delete",
+    DELETE_TENANT_CANCEL_BUTTON:"Cancel",
+    DELETE_TENANT_SUCCESS_TOAST:"Tenant deleted successfully!",
+
 
     UPDATE_TENANT_FORM_TITLE: "Edit tenant",
     UPDATE_TENANT_FORM_NAME_FIELD_LABEL: "Tenant name",
@@ -1137,6 +1144,7 @@ export const CONSTANTS = {
       createNewTenantAPI: () => "/api/v1/tenants",
       updateTenantAPI: (tenantID) => `/api/v1/tenants/${tenantID}`,
       getAllTenantUsersAPI: (tenantID) => `/api/v1/tenants/${tenantID}/users`,
+      deleteUserTenantByIDAPI: (tenantID) => `/api/v1/tenants/${tenantID}`,
     },
     TENANT_ROLE: {
       getAllTenantRolesAPI: (tenantID) => `/api/v1/tenants/${tenantID}/roles`,

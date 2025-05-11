@@ -26,6 +26,7 @@ var corsOptions = {
 
 const expressApp = express();
 expressApp.enable("trust proxy");
+expressApp.options('*', cors());
 expressApp.use(morganMiddleware);
 expressApp.use(cors(corsOptions));
 expressApp.use(
