@@ -403,39 +403,48 @@ postgreSQLQueryUtil.getAllDatabaseTables = ({
 FROM (
     SELECT
         jsonb_build_object(
-            'databaseTableName', table_name,
-            'primaryKey', (
-                SELECT jsonb_agg(a.attname)
-                FROM pg_index i
-                JOIN pg_attribute a ON a.attnum = ANY(i.indkey)
-                WHERE i.indrelid = ('${databaseSchemaName}' || '.' || quote_ident(t.table_name))::regclass AND i.indisprimary
-            ),
+            'databaseTableName', t.table_name,
+            'primaryKey', pk_data.primary_key_columns,
             'databaseTableColumns', (
-                SELECT jsonb_agg(jsonb_build_object(
-                    'databaseTableColumnName', column_name,
-                    'databaseTableColumnType', data_type,
-                    'isNullable', is_nullable,
-                    'defaultValue', column_default
-                ))
+                SELECT COALESCE(jsonb_agg(jsonb_build_object(
+                    'databaseTableColumnName', c.column_name,
+                    'databaseTableColumnType', c.data_type,
+                    'isNullable', c.is_nullable,
+                    'defaultValue', c.column_default
+                ) ORDER BY c.ordinal_position), '[]'::jsonb)
                 FROM information_schema.columns c
-                WHERE c.table_schema = '${databaseSchemaName}' AND c.table_name = t.table_name
+                WHERE c.table_schema = t.table_schema AND c.table_name = t.table_name
             ),
             'databaseTableConstraints', (
-                SELECT jsonb_agg(jsonb_build_object(
-                    'constraintName', constraint_name,
-                    'constraintType', constraint_type,
+                SELECT COALESCE(jsonb_agg(jsonb_build_object(
+                    'constraintName', con.constraint_name,
+                    'constraintType', con.constraint_type,
                     'databaseTableColumns', (
-                        SELECT array_agg(column_name)
-                        FROM information_schema.key_column_usage k
-                        WHERE k.constraint_name = con.constraint_name AND k.table_name = t.table_name AND k.table_schema = '"public"'
+                        SELECT COALESCE(array_agg(kcu.column_name ORDER BY kcu.ordinal_position), ARRAY[]::TEXT[])
+                        FROM information_schema.key_column_usage kcu
+                        WHERE kcu.constraint_catalog = con.constraint_catalog
+                          AND kcu.constraint_schema = con.constraint_schema
+                          AND kcu.constraint_name = con.constraint_name
+                          AND kcu.table_schema = t.table_schema -- Correlate with outer table's schema
+                          AND kcu.table_name = t.table_name    -- Correlate with outer table's name
                     )
-                ))
+                )), '[]'::jsonb)
                 FROM information_schema.table_constraints con
-                WHERE con.table_schema = '${databaseSchemaName}' AND con.table_name = t.table_name
+                WHERE con.table_schema = t.table_schema AND con.table_name = t.table_name
             )
         ) AS result
     FROM information_schema.tables t
-    WHERE t.table_schema = '${databaseSchemaName}' AND t.table_type = 'BASE TABLE'
+    LEFT JOIN LATERAL (
+        SELECT COALESCE(jsonb_agg(a.attname ORDER BY array_position(i.indkey, a.attnum)), '[]'::jsonb) AS primary_key_columns
+        FROM pg_catalog.pg_index i
+        JOIN pg_catalog.pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey)
+        WHERE i.indrelid = (quote_ident(t.table_schema) || '.' || quote_ident(t.table_name))::regclass
+          AND i.indisprimary = TRUE
+          AND a.attnum > 0 -- Only user-defined columns
+          AND NOT a.attisdropped
+    ) pk_data ON TRUE
+    WHERE t.table_schema = '${databaseSchemaName}'
+      AND t.table_type = 'BASE TABLE'
 ) subquery;
 `;
 

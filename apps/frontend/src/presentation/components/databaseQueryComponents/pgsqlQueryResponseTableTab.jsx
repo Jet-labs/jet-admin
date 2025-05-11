@@ -62,6 +62,9 @@ export const PGSQLQueryResponseTableTab = ({
           className={`!w-100 !border-0`}
           density="compact"
           showCellVerticalBorder
+          getRowClassName={(params) =>
+            params.indexRelativeToCurrentPage % 2 === 0 ? 'bg-[#646cff]/10' : 'Mui-odd'
+          }
           getRowHeight={() => "auto"}
           getRowId={(row) => row._g_uuid}
           defaultColumnOptions={{

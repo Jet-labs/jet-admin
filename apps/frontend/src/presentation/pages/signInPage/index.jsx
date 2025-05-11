@@ -37,22 +37,25 @@ const SignInPage = () => {
       <section className=" md:w-2/3 sm:w-full w-full">
         <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
           <div className="flex flex-row justify-center items-center mb-6">
-            <img className=" w-20 h-20 mr-2  " src={logo} alt="logo" />
+          <img className=" w-8 h-8 mr-2  " src={logo} alt="logo" />
+            <span className=" self-center text-xl !font-extrabold whitespace-nowrap text-[#00203e] aldrich-logo">
+                    {CONSTANTS.APP_NAME}
+                  </span>
           </div>
 
           <div className="w-full bg-white rounded shadow  md:mt-0 sm:max-w-md xl:p-0">
-            <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-              <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-900 md:text-2xl ">
+          <div className="p-5">
+          <h1 className="text-lg font-bold leading-tight tracking-tight text-slate-900 md:text-lg mb-3">
                 {CONSTANTS.STRINGS.SIGN_IN_FORM_TITLE}
               </h1>
               <form
-                className="space-y-4 md:space-y-6"
+                className="space-y-3 md:space-y-4"
                 onSubmit={emailSignInForm.handleSubmit}
               >
                 <div>
                   <label
                     htmlFor="email"
-                    className="block mb-2 text-sm font-medium text-slate-900 "
+                    className="block mb-1 text-sm font-medium text-slate-500 "
                   >
                     {CONSTANTS.STRINGS.SIGN_IN_FORM_EMAIL_FIELD_LABEL}
                   </label>
@@ -60,7 +63,7 @@ const SignInPage = () => {
                     type="email"
                     name="email"
                     id="email"
-                    className="bg-slate-50 border border-slate-300 text-slate-900 rounded focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 "
+                    className=" placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:outline-none focus:border-slate-400 block w-full px-1.5 py-1.5"
                     placeholder={
                       CONSTANTS.STRINGS.SIGN_IN_FORM_EMAIL_FIELD_PLACEHOLDER
                     }
@@ -73,7 +76,7 @@ const SignInPage = () => {
                 <div>
                   <label
                     htmlFor="password"
-                    className="block mb-2 text-sm font-medium text-slate-900 "
+                    className="block mb-1 text-sm font-medium text-slate-500 "
                   >
                     {CONSTANTS.STRINGS.SIGN_IN_FORM_PASSWORD_FIELD_LABEL}
                   </label>
@@ -81,7 +84,7 @@ const SignInPage = () => {
                     type="password"
                     name="password"
                     id="password"
-                    className="bg-slate-50 border border-slate-300 text-slate-900 rounded focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 "
+                    className=" placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:outline-none focus:border-slate-400 block w-full px-1.5 py-1.5"
                     required={true}
                     onChange={emailSignInForm.handleChange}
                     onBlur={emailSignInForm.handleBlur}
@@ -90,7 +93,7 @@ const SignInPage = () => {
                 </div>
                 {signInState && signInState.isLoading ? (
                   <div className="w-full flex flex-row justify-center items-center">
-                    <CircularProgress />
+                    <CircularProgress className="!text-[#646cff] !h-6 !w-6" />
                   </div>
                 ) : (
                   <button
@@ -100,11 +103,7 @@ const SignInPage = () => {
                     {CONSTANTS.STRINGS.SIGN_IN_FORM_SUBMIT_BUTTON}
                   </button>
                 )}
-                <div className="!w-full justify-center items-center flex flex-row">
-                  <span className="w-full text-center text-sm font-medium">
-                    Or
-                  </span>
-                </div>
+                <div class="py-3 flex items-center text-sm text-slate-400 before:flex-1 before:border-t before:border-gray-200 before:me-6 after:flex-1 after:border-t after:border-gray-200 after:ms-6">Or</div>
                 <button
                   type="button"
                   onClick={googleSignIn}
@@ -141,7 +140,7 @@ const SignInPage = () => {
                   {CONSTANTS.STRINGS.SIGN_IN_FORM_TO_SIGN_UP_MESSAGE}
                   <Link
                     to={CONSTANTS.ROUTES.SIGN_UP.path()}
-                    className="font-medium text-primary-600 hover:underline "
+                    className="font-medium text-primary-600 hover:underline ml-2"
                   >
                     {CONSTANTS.STRINGS.SIGN_UP_FORM_SUBMIT_BUTTON}
                   </Link>

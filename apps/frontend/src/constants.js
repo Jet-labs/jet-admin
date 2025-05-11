@@ -69,7 +69,7 @@ export const CONSTANTS = {
     NO_PERMISSION_TO_VIEW_TENANT_TITLE: "Permission denied!",
     NO_PERMISSION_TO_VIEW_TENANT_DESCRIPTION:
       "You do not have permissions to view the tenant details",
-    SIGN_IN_FORM_TITLE: "Sign in to your account",
+    SIGN_IN_FORM_TITLE: "Log in to your account",
     SIGN_IN_FORM_EMAIL_FIELD_LABEL: "Email",
     SIGN_IN_FORM_EMAIL_FIELD_PLACEHOLDER: "yourname@org.com",
     SIGN_IN_FORM_PASSWORD_FIELD_LABEL: "Password",
@@ -78,7 +78,7 @@ export const CONSTANTS = {
     SIGN_IN_FORM_GOOGLE_SIGN_IN_LABEL: "Sign in with Google",
     SIGN_IN_FORM_TO_SIGN_UP_MESSAGE: "Don’t have an account yet?",
 
-    SIGN_UP_FORM_TITLE: "Sign up using email",
+    SIGN_UP_FORM_TITLE: "Create your account",
     SIGN_UP_FORM_EMAIL_FIELD_LABEL: "Email",
     SIGN_UP_FORM_EMAIL_FIELD_PLACEHOLDER: "yourname@org.com",
     SIGN_UP_FORM_PASSWORD_FIELD_LABEL: "Password",

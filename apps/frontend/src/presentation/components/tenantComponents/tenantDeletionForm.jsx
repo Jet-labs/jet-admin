@@ -52,13 +52,12 @@ export const TenantDeletionForm = ({ tenantID }) => {
         onClick={_handleDeleteTenant}
         disabled={isDeletingTenant}
         type="button"
-        className="flex flex-row items-center justify-center rounded bg-red-50 ms-2 px-1 py-1 text-xs text-red-400 hover:bg-red-100 focus:ring-2 focus:ring-red-400 outline-none focus:outline-none hover:border-red-400"
+        className="flex flex-row items-center justify-center rounded bg-red-50 ms-2 px-3 py-1.5 px-3 py-1.5 text-xs font-medium text-center text-red-400 hover:bg-red-100 focus:ring-2 focus:ring-red-400 outline-none focus:outline-none hover:border-red-400"
       >
         {isDeletingTenant ? (
-          <CircularProgress className="!text-xs" size={16} color="white" />
-        ) : (
-          <MdDeleteOutline className="text-xl text-red-400 hover:text-red-500" />
-        )}
+          <CircularProgress className="!text-xs mr-2" size={16} color="white" />
+        ) : null}
+        {isDeletingTenant?"Deleting...":CONSTANTS.STRINGS.DELETE_TENANT_CONFIRM_BUTTON}
       </button>
     </>
   );

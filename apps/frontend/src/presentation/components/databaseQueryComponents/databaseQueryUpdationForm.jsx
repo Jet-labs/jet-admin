@@ -144,14 +144,6 @@ export const DatabaseQueryUpdationForm = ({ tenantID, databaseQueryID }) => {
           <span className="text-xs text-[#646cff] mt-2">{`Query ID: ${
             databaseQuery.databaseQueryID
           } | ${
-            databaseQuery.linkedDatabaseChartCount > 0
-              ? `Used in ${databaseQuery.linkedDatabaseChartCount} ${
-                  databaseQuery.linkedDatabaseChartCount > 1
-                    ? "charts"
-                    : "chart"
-                } `
-              : `Not used in any chart`
-          } | ${
             databaseQuery.linkedDatabaseWidgetCount > 0
               ? `Used in ${databaseQuery.linkedDatabaseWidgetCount} ${
                   databaseQuery.linkedDatabaseWidgetCount > 1
