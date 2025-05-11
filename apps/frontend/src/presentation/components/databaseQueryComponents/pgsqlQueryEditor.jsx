@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useRef } from "react";
 import Editor from "@monaco-editor/react";
-import CloudTheme from "monaco-themes/themes/Clouds.json";
 import Github from "monaco-themes/themes/GitHub Light.json"
 import { useDatabaseQueriesState } from "../../../logic/contexts/databaseQueriesContext";
 

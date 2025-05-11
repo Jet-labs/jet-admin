@@ -11,6 +11,7 @@ import { MainDrawerList } from "../drawerList/mainDrawerList";
 import { Breadcrumbs } from "../ui/breadCrumbs";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import { UserAvatar } from "../ui/userAvatar";
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "../ui/resizable";
 export const ProtectedLayout = () => {
   const { firebaseUserState } = useAuthState();
   const { tenantID } = useParams();
@@ -39,6 +40,7 @@ export const ProtectedLayout = () => {
       error={firebaseUserState.error}
       loadingContainerClass="h-screen w-screen bg-white flex flex-col justify-center items-center"
     >
+      
       <div className="flex h-screen w-screen flex-col justify-start items-stretch overflow-hidden">
         <nav className="w-full  border-b-2 border-[#646cff] bg-white">
           <div className="px-3 py-2">
@@ -60,12 +62,24 @@ export const ProtectedLayout = () => {
             </div>
           </div>
         </nav>
-        <div className="flex w-full flex-grow flex-row justify-start items-start h-[calc(100vh-50px)]">
+        <ResizablePanelGroup
+          direction="horizontal"
+          autoSaveId={
+            CONSTANTS.RESIZABLE_PANEL_KEYS.MAIN_DRAWER_LIST_SEPARATION
+          }
+          className={'h-full'}
+        >
+          <ResizablePanel defaultSize={20}>
           <MainDrawerList />
+          </ResizablePanel>
+          <ResizableHandle withHandle={true} />
+          <ResizablePanel defaultSize={80}>
           <div className="w-full h-[calc(100vh-50px)] overflow-y-auto bg-white">
             <Outlet />
           </div>
-        </div>
+          </ResizablePanel>
+        </ResizablePanelGroup>
+        
       </div>
     </ReactQueryLoadingErrorWrapper>
   );

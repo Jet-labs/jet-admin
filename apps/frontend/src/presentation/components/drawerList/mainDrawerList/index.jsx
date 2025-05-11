@@ -3,7 +3,7 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { capitalize } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { BiLogoPostgresql } from "react-icons/bi";
 import { BsServer } from "react-icons/bs";
 import { FaKey, FaUserCog } from "react-icons/fa";
@@ -23,6 +23,7 @@ import { useAuthState } from "../../../../logic/contexts/authContext";
 import { useTenantState } from "../../../../logic/contexts/tenantContext";
 import { TenantSelectionDropdown } from "../../tenantComponents/tenantSelectionDropdown";
 import { NoEntityUI } from "../../ui/noEntityUI";
+import { useComponentSize } from "../../../../logic/hooks/useComponentSize";
 
 export const MainDrawerList = () => {
   const location = useLocation();
@@ -30,6 +31,7 @@ export const MainDrawerList = () => {
   const { user } = useAuthState();
   const { isLoadingTenants, tenants } = useTenantState();
   const { tenantID } = useParams();
+  const [ref, size] = useComponentSize();
 
   const [menuItemExpandedState, setMenuItemExpandedState] = useState({
     databaseSchema: false,
@@ -59,12 +61,14 @@ export const MainDrawerList = () => {
   const _navigateToAddDatabaseSchema = () => {
     navigate(CONSTANTS.ROUTES.ADD_SCHEMA.path(tenantID));
   };
+  
 
   return (
     <aside
       id="logo-sidebar"
-      className=" w-80 h-[calc(100vh-50px)] overflow-y-auto transition-transform bg-white border-r border-slate-200 flex flex-col justify-start items-stretch gap-2"
+      className=" w-full h-[calc(100vh-50px)] overflow-y-auto transition-transform bg-white  flex flex-col justify-start items-stretch gap-2 "
       aria-label="Sidebar"
+      ref={ref}
     >
       <div className="h-full p-2 overflow-y-auto bg-white">
         {isLoadingTenants ? (
