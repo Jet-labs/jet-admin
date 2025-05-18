@@ -3,7 +3,7 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { capitalize } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import { BiLogoPostgresql } from "react-icons/bi";
 import { BsServer } from "react-icons/bs";
 import { FaKey, FaUserCog } from "react-icons/fa";
@@ -21,9 +21,9 @@ import { CONSTANTS } from "../../../../constants";
 import { getDatabaseMetadataAPI } from "../../../../data/apis/database";
 import { useAuthState } from "../../../../logic/contexts/authContext";
 import { useTenantState } from "../../../../logic/contexts/tenantContext";
+import { useComponentSize } from "../../../../logic/hooks/useComponentSize";
 import { TenantSelectionDropdown } from "../../tenantComponents/tenantSelectionDropdown";
 import { NoEntityUI } from "../../ui/noEntityUI";
-import { useComponentSize } from "../../../../logic/hooks/useComponentSize";
 
 export const MainDrawerList = () => {
   const location = useLocation();
@@ -31,7 +31,7 @@ export const MainDrawerList = () => {
   const { user } = useAuthState();
   const { isLoadingTenants, tenants } = useTenantState();
   const { tenantID } = useParams();
-  const [ref, size] = useComponentSize();
+  const [ref] = useComponentSize();
 
   const [menuItemExpandedState, setMenuItemExpandedState] = useState({
     databaseSchema: false,
@@ -61,7 +61,6 @@ export const MainDrawerList = () => {
   const _navigateToAddDatabaseSchema = () => {
     navigate(CONSTANTS.ROUTES.ADD_SCHEMA.path(tenantID));
   };
-  
 
   return (
     <aside
@@ -420,6 +419,38 @@ export const MainDrawerList = () => {
                 }`}
               >
                 {capitalize(CONSTANTS.STRINGS.MAIN_DRAWER_SQL_EDITOR_TITLE)}
+              </span>
+            </Link>
+            <Link
+              to={CONSTANTS.ROUTES.VIEW_AUDIT_LOGS.path(tenantID)}
+              key={CONSTANTS.ROUTES.VIEW_AUDIT_LOGS.path(tenantID)}
+              className={`flex items-center ${
+                decodeURIComponent(location.pathname).includes(
+                  CONSTANTS.ROUTES.VIEW_AUDIT_LOGS.path(tenantID)
+                )
+                  ? "bg-[#eaebff]"
+                  : "bg-slate-100"
+              } rounded mb-2 w-full p-2 text-slate-700 transition duration-75 group bg-slate-200  hover:bg-slate-100  flex-row !justify-start mt-2 `}
+            >
+              <MdOutlineLockPerson
+                className={`!w-5 !h-5 ${
+                  decodeURIComponent(location.pathname).includes(
+                    CONSTANTS.ROUTES.VIEW_AUDIT_LOGS.path(tenantID)
+                  )
+                    ? "!text-[#646cff]"
+                    : "!text-slate-700"
+                }`}
+              />
+              <span
+                className={`font-semibold text-sm ml-2 ${
+                  decodeURIComponent(location.pathname).includes(
+                    CONSTANTS.ROUTES.VIEW_AUDIT_LOGS.path(tenantID)
+                  )
+                    ? "!text-[#646cff]"
+                    : "!text-slate-700"
+                }`}
+              >
+                {capitalize(CONSTANTS.STRINGS.MAIN_DRAWER_AUDIT_LOGS_TITLE)}
               </span>
             </Link>
 

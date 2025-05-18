@@ -139,11 +139,7 @@ export const DatabaseWidgetAdditionForm = ({ tenantID }) => {
               className="flex flex-row items-center justify-center rounded bg-[#646cff] px-3 py-1 text-sm text-white  focus:ring-2 focus:ring-[#646cff]/50 w-full outline-none focus:outline-none"
             >
               {isAddingDatabaseWidget && (
-                <CircularProgress
-                  className="!text-xs !mr-3"
-                  size={16}
-                  color="white"
-                />
+                <CircularProgress className="!mr-3" size={16} color="white" />
               )}
               {CONSTANTS.STRINGS.ADD_WIDGET_BUTTON_TEXT}
             </button>

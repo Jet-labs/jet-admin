@@ -73,7 +73,7 @@ export const APIKeyAdditionForm = ({ tenantID }) => {
             disabled={isAddingAPIKey}
           >
             {isAddingAPIKey ? (
-              <CircularProgress size={20} color="inherit" />
+              <CircularProgress size={16} color="inherit" />
             ) : (
               CONSTANTS.STRINGS.ADD_API_KEY_FORM_SUBMIT
             )}

@@ -313,3 +313,15 @@ model tblCronJobHistory {
   createdAt        DateTime    @default(now()) @db.Timestamptz(6)
   tblCronJobs      tblCronJobs @relation(fields: [cronJobID], references: [cronJobID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblCronJobHistoryCronjobID")
 }
+
+model tblAuditLogs {
+  auditLogID String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userID     Int?
+  tenantID   Int?
+  type       String   @db.VarChar
+  subType    String?  @db.VarChar
+  success    Boolean
+  createdAt  DateTime @default(now()) @db.Timestamptz(6)
+  metadata   Json?
+  error      Json?
+}

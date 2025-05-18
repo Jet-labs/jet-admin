@@ -166,7 +166,7 @@ export const DatabaseTablePrimaryColumnSelection = ({
         </div>
         <div className="flex flex-row justify-center items-center gap-2">
           {isUpdatingUserConfig ? (
-            <CircularProgress size={20} className="!text-[#646cff]" />
+            <CircularProgress size={16} className="!text-[#646cff]" />
           ) : (
             <div>
               <PrimaryKeyConstraintSelector
@@ -212,7 +212,7 @@ export const DatabaseTablePrimaryColumnSelection = ({
           </p>
           <div className="flex flex-row justify-center items-center gap-2">
             {isUpdatingUserConfig ? (
-              <CircularProgress size={20} className="!text-[#646cff]" />
+              <CircularProgress size={16} className="!text-[#646cff]" />
             ) : (
               <div>
                 <PrimaryKeyConstraintSelector

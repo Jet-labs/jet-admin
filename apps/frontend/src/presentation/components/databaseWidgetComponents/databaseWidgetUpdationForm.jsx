@@ -216,7 +216,7 @@ export const DatabaseWidgetUpdationForm = ({ tenantID, databaseWidgetID }) => {
                 >
                   {isUpdatingDatabaseWidget && (
                     <CircularProgress
-                      className="!text-xs !mr-3"
+                      className="!mr-3"
                       size={16}
                       color="white"
                     />

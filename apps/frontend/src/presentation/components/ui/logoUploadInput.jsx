@@ -52,7 +52,7 @@ export const LogoUpload = ({ isUploadingLogo, uploadError, onLogoUpload }) => {
           onClick={!isUploadingLogo ? handleButtonClick : undefined}
         >
           {isUploadingLogo ? (
-            <CircularProgress className="!w-5 !h-5" />
+            <CircularProgress size={16} className="!text-[#646cff]" />
           ) : (
             <FileUploadIcon className="w-5 h-5 text-slate-500" />
           )}

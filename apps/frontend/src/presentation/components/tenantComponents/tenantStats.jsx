@@ -16,7 +16,7 @@ export const TenantStats = ({ tenants }) => {
   if (!tenants) {
     return (
       <div className="flex justify-center items-center h-full">
-        <CircularProgress />
+        <CircularProgress size={16} className="!text-[#646cff]" />
       </div>
     );
   }

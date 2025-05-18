@@ -376,11 +376,7 @@ export const DatabaseChartAIStylePrompt = ({
           >
             {isGeneratingAIPromptBasedChartStyle ? (
               <div className="flex items-center">
-                <CircularProgress
-                  className="!text-xs mr-2"
-                  size={18}
-                  color="inherit"
-                />
+                <CircularProgress className="mr-2" size={16} color="inherit" />
                 <span>Generating...</span>
               </div>
             ) : aiStyledChart ? (

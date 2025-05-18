@@ -182,8 +182,8 @@ export const TenantRoleUpdationForm = () => {
                 >
                   {isUpdatingTenantRoleByID && (
                     <CircularProgress
-                      className="!text-sm !mr-3"
-                      size={20}
+                      className="!mr-3"
+                      size={16}
                       color="white"
                     />
                   )}

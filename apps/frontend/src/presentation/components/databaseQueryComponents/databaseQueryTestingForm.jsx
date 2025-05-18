@@ -95,11 +95,7 @@ export const DatabaseQueryTestingForm = ({
         className="flex flex-row items-center justify-center rounded bg-[#646cff]/10 mr-2 px-3 py-1.5 text-xs text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50 outline-none focus:outline-none"
       >
         {isTestingDatabaseQuery && (
-          <CircularProgress
-            className="!text-xs !mr-3"
-            size={16}
-            color="white"
-          />
+          <CircularProgress className="!mr-3" size={16} color="white" />
         )}
         {CONSTANTS.STRINGS.TEST_QUERY_FORM_TEST_BUTTON}
       </button>

@@ -36,7 +36,7 @@ export const DatabaseTableStatistics = ({
     <div
       className={`w-full h-full !overflow-y-auto !overflow-x-auto flex justify-center items-center`}
     >
-      <CircularProgress />
+      <CircularProgress size={16} className="text-[#646cff]" />
     </div>
   ) : (
     <div className=" flex flex-col justify-start items-start">

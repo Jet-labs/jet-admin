@@ -71,9 +71,9 @@ export const DatabaseTriggerDeletionForm = ({
         className="flex flex-row items-center justify-center rounded bg-red-50 ms-2 px-1 py-1 text-xs text-red-400 hover:bg-red-100 focus:ring-2 focus:ring-red-400 outline-none focus:outline-none hover:border-red-400"
       >
         {isDeletingDatabaseTrigger ? (
-          <CircularProgress className="!text-xs" size={16} color="white" />
+          <CircularProgress size={16} color="white" />
         ) : (
-          <MdDeleteOutline className="text-xl text-red-400 hover:text-red-500" /> 
+          <MdDeleteOutline className="text-xl text-red-400 hover:text-red-500" />
         )}
       </button>
     </>

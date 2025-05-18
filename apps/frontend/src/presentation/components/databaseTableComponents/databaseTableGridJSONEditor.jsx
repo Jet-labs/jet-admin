@@ -15,6 +15,7 @@ export const DatabaseTableGridJSONEditor = ({
   value,
   onSave,
   onCancel,
+  isViewMode = false,
 }) => {
   DatabaseTableGridJSONEditor.propTypes = {
     title: PropTypes.string,
@@ -22,6 +23,7 @@ export const DatabaseTableGridJSONEditor = ({
     value: PropTypes.object.isRequired,
     onSave: PropTypes.func.isRequired,
     onCancel: PropTypes.func,
+    isViewMode: PropTypes.bool,
   };
   const [jsonValue, setJsonValue] = useState(value);
 
@@ -79,13 +81,15 @@ export const DatabaseTableGridJSONEditor = ({
         >
           {CONSTANTS.STRINGS.DATAGRID_JSON_POPUP_CANCEL_BUTTON}
         </button>
-        <button
-          onClick={handleSave}
-          type="button"
-          className="px-3 py-1 bg-[#646cff] text-white rounded hover:bg-[#535bf2] text-xs"
-        >
-          {CONSTANTS.STRINGS.DATAGRID_JSON_POPUP_SAVE_BUTTON}
-        </button>
+        {!isViewMode && (
+          <button
+            onClick={handleSave}
+            type="button"
+            className="px-3 py-1 bg-[#646cff] text-white rounded hover:bg-[#535bf2] text-xs"
+          >
+            {CONSTANTS.STRINGS.DATAGRID_JSON_POPUP_SAVE_BUTTON}
+          </button>
+        )}
       </DialogActions>
     </Dialog>
   );

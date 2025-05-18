@@ -20,7 +20,7 @@ export const ReactQueryLoadingErrorWrapper = ({
     <div
       className={`h-full w-full flex justify-center items-center ${loadingContainerClass}`}
     >
-      <CircularProgress className="!text-[#646cff] !h-6 !w-6" />
+      <CircularProgress className="!text-[#646cff]" size={16} />
     </div>
   ) : error ? (
     <div className="h-full w-full flex flex-col justify-center items-center">

@@ -60,11 +60,7 @@ export const TenantAdditionForm = () => {
               className="flex flex-row justify-center items-center px-3 py-1.5 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none focus:ring-blue-300 "
             >
               {isCreatingNewTenant && (
-                <CircularProgress
-                  className="!text-sm !mr-3"
-                  size={20}
-                  color="white"
-                />
+                <CircularProgress className="!mr-3" size={16} color="white" />
               )}
               {CONSTANTS.STRINGS.ADD_TENANT_FORM_SUBMIT_BUTTON}
             </button>

@@ -62,7 +62,7 @@ export const DatabaseNotificationDeletionForm = ({
         className="flex flex-row items-center justify-center rounded bg-red-50 mr-2 px-3 py-1.5 text-xs text-red-400 hover:bg-red-100 focus:ring-2 focus:ring-red-400 outline-none focus:outline-none hover:border-red-400"
       >
         {isDeletingDatabaseNotification ? (
-          <CircularProgress className="!text-xs" size={20} color="white" />
+          <CircularProgress size={16} color="white" />
         ) : (
           <MdDeleteOutline className="text-xl text-red-400 hover:text-red-500" />
         )}

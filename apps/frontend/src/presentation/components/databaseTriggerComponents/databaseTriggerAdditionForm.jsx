@@ -329,7 +329,7 @@ export const DatabaseTriggerAdditionForm = ({
               disabled={isAddingDatabaseTrigger}
             >
               {isAddingDatabaseTrigger ? (
-                <CircularProgress size={20} color="inherit" />
+                <CircularProgress size={16} color="inherit" />
               ) : (
                 CONSTANTS.STRINGS.ADD_TRIGGER_FORM_SUBMIT
               )}

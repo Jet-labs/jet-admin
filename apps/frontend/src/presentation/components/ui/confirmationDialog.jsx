@@ -44,7 +44,7 @@ export const ConfirmationDialog = ({
               {loadingText}
             </span>
           )}
-          <CircularProgress size={20} className="!ml-3" />
+          <CircularProgress size={16} className="!ml-3" />
         </DialogContent>
       ) : (
         <>

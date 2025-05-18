@@ -3,7 +3,7 @@ export const CONSTANTS = {
 
   SERVER_HOST: import.meta.env.PROD
     ? "https://localhost"
-    : "https://8090-firebase-jet-admin-1746873252624.cluster-bg6uurscprhn6qxr6xwtrhvkf6.cloudworkstations.dev",
+    : "http://localhost:8090",
   SUPABASE: {
     TENANT_ASSET_DIRECTORY: "tenant-assets",
     TENANT_LOGO_DIRECTORY: "logos",
@@ -65,6 +65,7 @@ export const CONSTANTS = {
     MAIN_DRAWER_DATABASE_QUERIES_TITLE: "Database queries",
     MAIN_DRAWER_ADD_DATABASE_SCHEMA_BUTTON: "Add schema",
     MAIN_DRAWER_USER_MANAGEMENT_TITLE: "User management",
+    MAIN_DRAWER_AUDIT_LOGS_TITLE: "Audit logs",
     NO_TENANT_CREATED_TILL_NOW: "Please create a tenant",
     NO_PERMISSION_TO_VIEW_TENANT_TITLE: "Permission denied!",
     NO_PERMISSION_TO_VIEW_TENANT_DESCRIPTION:
@@ -98,12 +99,12 @@ export const CONSTANTS = {
     ADD_TENANT_LOGO_UPLOAD_ERROR_MESSAGE: "Logo upload error!",
     ADD_TENANT_LOGO_UPLOAD_ERROR_TOAST: "Logo uploaded error!",
 
-    DELETE_TENANT_CONFIRMATION_TITLE:"Delete tenant",
-    DELETE_TENANT_CONFIRMATION_DESCRIPTION:"Are you sure you want to delete this tenant? All related assets will be deleted and this operation cannot be undone!",
-    DELETE_TENANT_CONFIRM_BUTTON:"Delete",
-    DELETE_TENANT_CANCEL_BUTTON:"Cancel",
-    DELETE_TENANT_SUCCESS_TOAST:"Tenant deleted successfully!",
-
+    DELETE_TENANT_CONFIRMATION_TITLE: "Delete tenant",
+    DELETE_TENANT_CONFIRMATION_DESCRIPTION:
+      "Are you sure you want to delete this tenant? All related assets will be deleted and this operation cannot be undone!",
+    DELETE_TENANT_CONFIRM_BUTTON: "Delete",
+    DELETE_TENANT_CANCEL_BUTTON: "Cancel",
+    DELETE_TENANT_SUCCESS_TOAST: "Tenant deleted successfully!",
 
     UPDATE_TENANT_FORM_TITLE: "Edit tenant",
     UPDATE_TENANT_FORM_NAME_FIELD_LABEL: "Tenant name",
@@ -919,6 +920,8 @@ export const CONSTANTS = {
     RAW_QUERY_EXCECUTOR_RESULT_TITLE: "Query result",
     RAW_QUERY_EXCECUTOR_RESULT_PLACEHOLDER: "No results to display",
     RAW_QUERY_EXCECUTOR_RESULT_PLACEHOLDER_ERROR: "Error executing query",
+
+    VIEW_AUDIT_LOGS_TITLE: "Audit logs",
   },
 
   LOCAL_STORAGE_KEYS: {
@@ -978,13 +981,11 @@ export const CONSTANTS = {
       path: (tenantID, databaseSchemaName, databaseTableName) =>
         `/tenants/${tenantID}/schemas/${databaseSchemaName}/tables/${databaseTableName}`,
     },
-
     UPDATE_DATABASE_TABLE_BY_NAME: {
       code: "/tenants/:tenantID/schemas/:databaseSchemaName/tables/:databaseTableName/update",
       path: (tenantID, databaseSchemaName, databaseTableName) =>
         `/tenants/${tenantID}/schemas/${databaseSchemaName}/tables/${databaseTableName}/update`,
     },
-
     ADD_DATABASE_TRIGGER: {
       code: "/tenants/:tenantID/schemas/:databaseSchemaName/triggers/add",
       path: (tenantID, databaseSchemaName) =>
@@ -1005,7 +1006,6 @@ export const CONSTANTS = {
       ) =>
         `/tenants/${tenantID}/schemas/${databaseSchemaName}/triggers/${databaseTableName}/${databaseTriggerName}`,
     },
-
     ADD_DATABASE_QUERY: {
       code: "/tenants/:tenantID/queries/add",
       path: (tenantID) => `/tenants/${tenantID}/queries/add`,
@@ -1032,7 +1032,6 @@ export const CONSTANTS = {
       path: (tenantID, databaseWidgetID) =>
         `/tenants/${tenantID}/widgets/${databaseWidgetID}`,
     },
-
     ADD_DATABASE_DASHBOARD: {
       code: "/tenants/:tenantID/dashboards/add",
       path: (tenantID) => `/tenants/${tenantID}/dashboards/add`,
@@ -1046,7 +1045,6 @@ export const CONSTANTS = {
       path: (tenantID, databaseDashboardID) =>
         `/tenants/${tenantID}/dashboards/${databaseDashboardID}`,
     },
-
     VIEW_TENANT_USERS: {
       code: "/tenants/:tenantID/users/",
       path: (tenantID) => `/tenants/${tenantID}/users`,
@@ -1069,7 +1067,6 @@ export const CONSTANTS = {
       path: (tenantID, tenantRoleID) =>
         `/tenants/${tenantID}/roles/${tenantRoleID}`,
     },
-
     ACCOUNT: {
       code: "/account",
       path: () => "/account",
@@ -1078,7 +1075,6 @@ export const CONSTANTS = {
       code: "/contact-us",
       path: () => "/contact-us",
     },
-
     LEGAL: {
       code: "/terms",
       path: () => "/terms",
@@ -1096,7 +1092,6 @@ export const CONSTANTS = {
       path: (tenantID, databaseNotificationID) =>
         `/tenants/${tenantID}/notifications/${databaseNotificationID}`,
     },
-
     VIEW_API_KEYS: {
       code: "/tenants/:tenantID/apikeys",
       path: (tenantID) => `/tenants/${tenantID}/apikeys`,
@@ -1109,7 +1104,6 @@ export const CONSTANTS = {
       code: "/tenants/:tenantID/apikeys/:apiKeyID",
       path: (tenantID, apiKeyID) => `/tenants/${tenantID}/apikeys/${apiKeyID}`,
     },
-
     VIEW_CRON_JOBS: {
       code: "/tenants/:tenantID/cronjobs",
       path: (tenantID) => `/tenants/${tenantID}/cronjobs`,
@@ -1127,6 +1121,10 @@ export const CONSTANTS = {
       code: "/tenants/:tenantID/cronjobs/:cronJobID/history",
       path: (tenantID, cronJobID) =>
         `/tenants/${tenantID}/cronjobs/${cronJobID}/history`,
+    },
+    VIEW_AUDIT_LOGS: {
+      code: "/tenants/:tenantID/audit",
+      path: (tenantID) => `/tenants/${tenantID}/audit`,
     },
   },
 
@@ -1198,6 +1196,10 @@ export const CONSTANTS = {
         `/api/v1/tenants/${tenantID}/cronjobs/${jobID}/roles`,
       deleteCronJobByIDAPI: (tenantID, jobID) =>
         `/api/v1/tenants/${tenantID}/cronjobs/${jobID}`,
+    },
+    AUDIT_LOG: {
+      getAuditLogsAPI: (tenantID, page, pageSize) =>
+        `/api/v1/tenants/${tenantID}/audit?page=${page}&pageSize=${pageSize}`,
     },
     DATABASE: {
       getDatabaseMetadataAPI: (tenantID) =>
@@ -1470,6 +1472,7 @@ export const CONSTANTS = {
     DATABASE_NOTIFICATIONS: (tenantID) => `${tenantID}-DATABASE_NOTIFICATIONS`,
     DATABASE_API_KEYS: (tenantID) => `${tenantID}-DATABASE_API_KEYS`,
     DATABASE_CRON_JOBS: (tenantID) => `${tenantID}-DATABASE_CRON_JOBS`,
+    AUDIT_LOGS: (tenantID) => `${tenantID}-AUDIT_LOGS`,
     DATABASE_NOTIFICATION_DETAILS: "DATABASE_NOTIFICATION_DETAILS",
   },
 
@@ -1772,7 +1775,7 @@ export const CONSTANTS = {
   ],
 
   RESIZABLE_PANEL_KEYS: {
-    MAIN_DRAWER_LIST_SEPARATION:"MAIN_DRAWER_LIST_SEPARATION",
+    MAIN_DRAWER_LIST_SEPARATION: "MAIN_DRAWER_LIST_SEPARATION",
     QUERY_ADDITION_FORM_RESULT_SEPARATION:
       "QUERY_ADDITION_FORM_RESULT_SEPARATION",
     RAW_QUERY_EXECUTION_FORM_RESULT_SEPARATION:

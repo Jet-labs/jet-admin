@@ -93,7 +93,7 @@ export const DatabaseDashboardAdditionForm = ({ tenantID }) => {
                   >
                     {isAddingDatabaseDashboard && (
                       <CircularProgress
-                        className="!text-xs !mr-3"
+                        className="!mr-3"
                         size={16}
                         color="white"
                       />

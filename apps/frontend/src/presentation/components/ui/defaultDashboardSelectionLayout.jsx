@@ -97,7 +97,7 @@ export const DefaultDashboardSelectionLayout = ({
             </div>
             <div className="flex flex-row justify-center items-center gap-2">
               {isUpdatingUserConfig ? (
-                <CircularProgress size={20} className="!text-[#646cff]" />
+                <CircularProgress size={16} className="!text-[#646cff]" />
               ) : (
                 <select
                   className="p-1 text-xs text-gray-700 bg-white border border-gray-300 rounded focus:outline-none focus:border-blue-500"
@@ -196,7 +196,7 @@ export const DefaultDashboardSelectionLayout = ({
               </p>
               <div className="flex flex-row justify-center items-center gap-2">
                 {isUpdatingUserConfig ? (
-                  <CircularProgress size={20} className="!text-[#646cff]" />
+                  <CircularProgress size={16} className="!text-[#646cff]" />
                 ) : (
                   <select
                     className="p-1 text-xs text-gray-700 bg-white border border-gray-300 rounded focus:outline-none focus:border-blue-500"

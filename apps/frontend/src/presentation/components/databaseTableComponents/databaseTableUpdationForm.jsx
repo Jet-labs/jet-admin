@@ -240,11 +240,7 @@ export const DatabaseTableUpdationForm = ({
               className="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none "
             >
               {isAddingDatabaseTable && (
-                <CircularProgress
-                  className="!text-xs !mr-3"
-                  size={20}
-                  color="white"
-                />
+                <CircularProgress className="!mr-3" size={16} color="white" />
               )}
               {CONSTANTS.STRINGS.UPDATE_TABLE_FORM_SUBMIT_BUTTON}
             </button>

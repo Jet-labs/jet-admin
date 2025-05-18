@@ -109,7 +109,7 @@ export const TenantUserAdditionForm = ({ tenantID, open, onClose }) => {
             className={`px-2.5 py-1.5 text-white text-sm bg-[#646cff] rounded hover:outline-none hover:border-0 border-0 outline-none flex flex-row items-center justify-center`}
           >
             {isAddingMemberToTenant ? (
-              <CircularProgress className="!text-white" size={19} />
+              <CircularProgress className="!text-white" size={16} />
             ) : (
               CONSTANTS.STRINGS.ADD_MEMBER_TO_TENANT_DIALOG_FORM_SUBMIT_BUTTON
             )}

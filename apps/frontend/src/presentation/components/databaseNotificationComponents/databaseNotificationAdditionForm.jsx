@@ -74,7 +74,7 @@ export const DatabaseNotificationAdditionForm = ({
             disabled={isAddingDatabaseNotification}
           >
             {isAddingDatabaseNotification ? (
-              <CircularProgress size={20} color="inherit" />
+              <CircularProgress size={16} color="inherit" />
             ) : (
               CONSTANTS.STRINGS.ADD_NOTIFICATION_FORM_SUBMIT
             )}

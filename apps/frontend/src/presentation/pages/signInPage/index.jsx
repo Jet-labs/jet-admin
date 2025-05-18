@@ -37,15 +37,15 @@ const SignInPage = () => {
       <section className=" md:w-2/3 sm:w-full w-full">
         <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
           <div className="flex flex-row justify-center items-center mb-6">
-          <img className=" w-8 h-8 mr-2  " src={logo} alt="logo" />
+            <img className=" w-8 h-8 mr-2  " src={logo} alt="logo" />
             <span className=" self-center text-xl !font-extrabold whitespace-nowrap text-[#00203e] aldrich-logo">
-                    {CONSTANTS.APP_NAME}
-                  </span>
+              {CONSTANTS.APP_NAME}
+            </span>
           </div>
 
           <div className="w-full bg-white rounded shadow  md:mt-0 sm:max-w-md xl:p-0">
-          <div className="p-5">
-          <h1 className="text-lg font-bold leading-tight tracking-tight text-slate-900 md:text-lg mb-3">
+            <div className="p-5">
+              <h1 className="text-lg font-bold leading-tight tracking-tight text-slate-900 md:text-lg mb-3">
                 {CONSTANTS.STRINGS.SIGN_IN_FORM_TITLE}
               </h1>
               <form
@@ -93,7 +93,7 @@ const SignInPage = () => {
                 </div>
                 {signInState && signInState.isLoading ? (
                   <div className="w-full flex flex-row justify-center items-center">
-                    <CircularProgress className="!text-[#646cff] !h-6 !w-6" />
+                    <CircularProgress className="!text-[#646cff]" size={16} />
                   </div>
                 ) : (
                   <button
@@ -103,7 +103,9 @@ const SignInPage = () => {
                     {CONSTANTS.STRINGS.SIGN_IN_FORM_SUBMIT_BUTTON}
                   </button>
                 )}
-                <div class="py-3 flex items-center text-sm text-slate-400 before:flex-1 before:border-t before:border-gray-200 before:me-6 after:flex-1 after:border-t after:border-gray-200 after:ms-6">Or</div>
+                <div className="py-3 flex items-center text-sm text-slate-400 before:flex-1 before:border-t before:border-gray-200 before:me-6 after:flex-1 after:border-t after:border-gray-200 after:ms-6">
+                  Or
+                </div>
                 <button
                   type="button"
                   onClick={googleSignIn}

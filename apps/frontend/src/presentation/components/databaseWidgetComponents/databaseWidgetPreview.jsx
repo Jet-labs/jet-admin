@@ -66,7 +66,7 @@ export const DatabaseWidgetPreview = ({
       </div>
       {isFetchingData || isRefreshingData ? (
         <div className="w-full h-full flex flex-col justify-center items-center">
-          <CircularProgress className=" !text-[#646cff]" />
+          <CircularProgress size={16} className=" !text-[#646cff]" />
         </div>
       ) : (
         <div className="h-full w-full overflow-scroll" key={uniqueKey}>

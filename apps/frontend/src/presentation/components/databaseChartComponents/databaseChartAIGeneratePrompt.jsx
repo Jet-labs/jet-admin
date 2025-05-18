@@ -264,8 +264,8 @@ export const DatabaseChartAIGeneratePrompt = ({ tenantID, onAccepted }) => {
                   >
                     {isGeneratingQueries ? (
                       <CircularProgress
-                        className="!text-xs !text-green-500"
-                        size={18}
+                        className=" !text-green-500"
+                        size={16}
                       />
                     ) : (
                       <>
@@ -345,11 +345,7 @@ export const DatabaseChartAIGeneratePrompt = ({ tenantID, onAccepted }) => {
           >
             {isGeneratingAIPromptBasedChart ? (
               <div className="flex items-center">
-                <CircularProgress
-                  className="!text-xs mr-2"
-                  size={18}
-                  color="inherit"
-                />
+                <CircularProgress className="mr-2" size={16} color="inherit" />
                 <span>Generating...</span>
               </div>
             ) : aiGeneratedChart ? (

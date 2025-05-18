@@ -12,12 +12,16 @@ const userManagementRouter = require("../userManagement/userManagement.v1.route"
 const tenantRoleRouter = require("../tenantRole/tenantRole.v1.route");
 const tenantAPIKeyRouter = require("../apiKey/apiKey.v1.routes");
 const cronjobRouter = require("../cronJob/cronJob.v1.routes");
+const auditLogRouter = require("../audit/audit.v1.routes");
 const { param, body } = require("express-validator");
 const { expressUtils } = require("../../utils/express.utils");
 const constants = require("../../constants");
+const { auditLogMiddleware } = require("../audit/audit.middleware");
 
 // Tenant routes
 router.use(authMiddleware.authProvider);
+
+router.use(auditLogMiddleware.audit);
 
 router.get("/", tenantController.getAllUserTenants);
 
@@ -137,6 +141,12 @@ router.use(
   authMiddleware.checkUserPermissions(["tenant:dashboard"]),
   tenantMiddleware.poolProvider,
   databaseDashboardRouter
+);
+
+router.use(
+  "/:tenantID/audit",
+  authMiddleware.checkUserPermissions(["tenant:audit"]),
+  auditLogRouter
 );
 
 

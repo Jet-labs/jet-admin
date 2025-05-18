@@ -217,7 +217,7 @@ cronJobService.getCronJobByID = async ({ userID, tenantID, cronJobID }) => {
     });
 
     if (!cronJob) {
-      Logger.log("warn", {
+      Logger.log("warning", {
         message: "cronJobService:getCronJobByID:notfound",
         params: { userID, tenantID, cronJobID },
       });
@@ -302,13 +302,23 @@ cronJobService.deleteCronJobByID = async ({ userID, tenantID, cronJobID }) => {
 
   try {
     // Prisma will cascade delete history based on the schema relation (onDelete: Cascade)
-    const deletedCronJob = await prisma.tblCronJobs.delete({
-      where: {
-        cronJobID: parseInt(cronJobID),
-        tenantID: parseInt(tenantID),
-      },
+    const deletedCronJob = await prisma.$transaction(async (tx) => {
+      await tx.tblCronJobHistory.deleteMany({
+        where: {
+          cronJobID: parseInt(cronJobID),
+        },
+      });
+      await tx.tblCronJobs.delete({
+        where: {
+          cronJobID: parseInt(cronJobID),
+          tenantID: parseInt(tenantID),
+        },
+      });
     });
-
+    Logger.log("info", {
+      message: "cronJobService:deleteCronJobByID:deleted",
+      params: { userID, tenantID, cronJobID },
+    });
     await cronJobService.deleteScheduledCronJob({ cronJobID });
     Logger.log("success", {
       message: "cronJobService:deleteCronJobByID:success",

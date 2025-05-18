@@ -58,7 +58,7 @@ export const DatabaseQueryCloneForm = ({ tenantID, databaseQueryID }) => {
         className="flex flex-row items-center justify-center rounded bg-[#646cff]/10 mr-2 px-3 py-1.5 text-xs text-[#646cff]/50 hover:bg-[#646cff]/20 outline-none focus:outline-none hover:border-[#646cff]"
       >
         {isCloningDatabaseQuery ? (
-          <CircularProgress className="!text-xs" size={16} color="white" />
+          <CircularProgress size={16} color="white" />
         ) : (
           <FaRegClone className="text-xl text-[#646cff] hover:text-[#646cff]" />
         )}

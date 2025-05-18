@@ -161,7 +161,7 @@ cronJobController.getCronJobByID = async (req, res) => {
     });
 
     if (!cronJob) {
-      Logger.log("warn", {
+      Logger.log("warning", {
         message: "cronJobController:getCronJobByID:notfound",
         params: { userID: user.userID, tenantID, cronJobID },
       });

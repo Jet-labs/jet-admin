@@ -152,26 +152,23 @@ export const TenantUpdationForm = ({ tenantID }) => {
               >
                 <TenantEditor tenantEditorForm={updateTenantForm} />
                 <div className="flex flex-row justify-start items-center w-full">
-                  
                   <button
-                  type="submit"
-                  disabled={isUpdatingTenant}
-                  className="flex flex-row justify-center items-center px-3 py-1.5 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none focus:ring-blue-300 "
-                >
-                  {isUpdatingTenant && (
-                    <CircularProgress
-                      className="!text-sm !mr-3"
-                      size={20}
-                      color="white"
-                    />
-                  )}
-                  {CONSTANTS.STRINGS.UPDATE_TENANT_FORM_SUBMIT_BUTTON}
-                </button>
-                <TenantDeletionForm tenantID={tenantID}/>
-
+                    type="submit"
+                    disabled={isUpdatingTenant}
+                    className="flex flex-row justify-center items-center px-3 py-1.5 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none focus:ring-blue-300 "
+                  >
+                    {isUpdatingTenant && (
+                      <CircularProgress
+                        className="!mr-3"
+                        size={16}
+                        color="white"
+                      />
+                    )}
+                    {CONSTANTS.STRINGS.UPDATE_TENANT_FORM_SUBMIT_BUTTON}
+                  </button>
+                  <TenantDeletionForm tenantID={tenantID} />
                 </div>
 
-                
                 {/* {JSON.stringify(tenant.relationships)} */}
               </form>
               <div className="mt-6 flex flex-col justify-start items-stretch w-full">
@@ -214,7 +211,7 @@ export const TenantUpdationForm = ({ tenantID }) => {
                 <button
                   type="button"
                   onClick={_handleOpenAddTenantUserDialog}
-                  className="w-fit py-1 px-2 mt-8 text-sm flex flex-row items-center font-medium text-slate-600 focus:outline-none bg-white rounded border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 "
+                  className="w-fit py-1 px-2 mt-8 text-sm flex flex-row items-center font-medium text-slate-600 focus:outline-none bg-white rounded border border-gray-200 hover:bg-gray-100 hover:text-[#646cff]"
                 >
                   <PersonAddIcon className="!text-base !me-2" />
                   {CONSTANTS.STRINGS.UPDATE_TENANT_ADD_MEMBERS_BUTTON}

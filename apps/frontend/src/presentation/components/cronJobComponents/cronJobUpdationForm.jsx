@@ -138,7 +138,7 @@ export const CronJobUpdationForm = ({ tenantID, cronJobID }) => {
               disabled={isUpdatingCronJob}
             >
               {isUpdatingCronJob ? (
-                <CircularProgress size={20} color="inherit" />
+                <CircularProgress size={16} color="inherit" />
               ) : (
                 CONSTANTS.STRINGS.UPDATE_CRON_JOB_SUBMIT_BUTTON_TEXT
               )}

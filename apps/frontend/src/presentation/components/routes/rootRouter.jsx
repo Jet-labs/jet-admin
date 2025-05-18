@@ -54,7 +54,6 @@ const UpdateDatabaseQueryPage = lazy(() =>
 const DatabaseQueryLayoutLandingPage = lazy(() =>
   import("../../pages/databaseQueryLayoutLandingPage")
 );
-
 const DatabaseDashboardLayoutLandingPage = lazy(() =>
   import("../../pages/databaseDashboardLayoutLandingPage")
 );
@@ -105,6 +104,7 @@ const CronJobLayoutLandingPage = lazy(() =>
 const DatabaseSchemaLandingPage = lazy(() =>
   import("../../pages/databaseSchemaLandingPage")
 );
+const ViewAuditLogsPage = lazy(() => import("../../pages/viewAuditLogsPage"));
 
 const router = createBrowserRouter([
   {
@@ -273,6 +273,10 @@ const router = createBrowserRouter([
                 element: <ViewCronJobHistoryPage />,
               },
             ],
+          },
+          {
+            path: CONSTANTS.ROUTES.VIEW_AUDIT_LOGS.code,
+            element: <ViewAuditLogsPage />,
           },
           {
             element: <DatabaseDashboardLayout />,

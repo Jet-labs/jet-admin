@@ -39,13 +39,13 @@ const SignInPage = () => {
           <div className="flex flex-row justify-center items-center mb-6">
             <img className=" w-8 h-8 mr-2  " src={logo} alt="logo" />
             <span className=" self-center text-xl !font-extrabold whitespace-nowrap text-[#00203e] aldrich-logo">
-                    {CONSTANTS.APP_NAME}
-                  </span>
+              {CONSTANTS.APP_NAME}
+            </span>
           </div>
           <div className="w-full bg-white rounded shadow  md:mt-0 sm:max-w-md xl:p-0">
             <div className="p-5">
-            <h1 className="text-lg font-bold leading-tight tracking-tight text-slate-900 md:text-lg mb-3">
-            {CONSTANTS.STRINGS.SIGN_UP_FORM_TITLE}
+              <h1 className="text-lg font-bold leading-tight tracking-tight text-slate-900 md:text-lg mb-3">
+                {CONSTANTS.STRINGS.SIGN_UP_FORM_TITLE}
               </h1>
               <form
                 className="space-y-3 md:space-y-4"
@@ -86,7 +86,6 @@ const SignInPage = () => {
                     className={`${
                       emailSignUpForm.errors.password ? "!border-red-400" : ""
                     } placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:outline-none focus:border-slate-400 block w-full px-1.5 py-1.5`}
-
                     placeholder=""
                     required={true}
                     onChange={emailSignUpForm.handleChange}
@@ -109,9 +108,10 @@ const SignInPage = () => {
                     name="confirmPassword"
                     id="confirmPassword"
                     className={`${
-                      emailSignUpForm.errors.confirmPassword ? "!border-red-400" : ""
+                      emailSignUpForm.errors.confirmPassword
+                        ? "!border-red-400"
+                        : ""
                     } placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:outline-none focus:border-slate-400 block w-full px-1.5 py-1.5`}
-
                     placeholder=""
                     required={true}
                     onChange={emailSignUpForm.handleChange}
@@ -121,7 +121,7 @@ const SignInPage = () => {
                 </div>
                 {signUpState && signUpState.isLoading ? (
                   <div className="w-full flex flex-row justify-center items-center mt-3">
-                    <CircularProgress className="!text-[#646cff] !h-6 !w-6" />
+                    <CircularProgress className="!text-[#646cff]" size={16} />
                   </div>
                 ) : (
                   <button
@@ -132,7 +132,9 @@ const SignInPage = () => {
                   </button>
                 )}
 
-<div class="py-3 flex items-center text-sm text-slate-400 before:flex-1 before:border-t before:border-gray-200 before:me-6 after:flex-1 after:border-t after:border-gray-200 after:ms-6">Or</div>
+                <div className="py-3 flex items-center text-sm text-slate-400 before:flex-1 before:border-t before:border-gray-200 before:me-6 after:flex-1 after:border-t after:border-gray-200 after:ms-6">
+                  Or
+                </div>
                 <button
                   type="button"
                   onClick={googleSignIn}
