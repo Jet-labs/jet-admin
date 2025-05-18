@@ -3,6 +3,7 @@ const constants = require("../../constants");
 const {
   tenantAwarePostgreSQLPoolManager,
 } = require("../../config/tenant-aware-pgpool-manager.config");
+const { expressUtils } = require("../../utils/express.utils");
 
 //auth middlewares
 const databaseMiddleware = {};
@@ -32,9 +33,7 @@ databaseMiddleware.poolProvider = async (req, res, next) => {
           error: constants.ERROR_CODES.INVALID_TENANT,
         },
       });
-      return res.json({
-        error: constants.ERROR_CODES.INVALID_TENANT,
-      });
+      return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.INVALID_TENANT)
     }
     req.dbPool = await tenantAwarePostgreSQLPoolManager.getPool(tenantID);
     Logger.log("success", {
@@ -47,9 +46,7 @@ databaseMiddleware.poolProvider = async (req, res, next) => {
       message: "databaseMiddleware:poolProvider:catch-1",
       params: { error },
     });
-    return res.json({
-      error: constants.ERROR_CODES.SERVER_ERROR,
-    });
+    return expressUtils.sendResponse(res, false, {}, error)
   }
 };
 

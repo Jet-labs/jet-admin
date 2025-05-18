@@ -44,9 +44,12 @@ tenantMiddleware.checkIfUserIsAdmin = async (req, res, next) => {
           error: constants.ERROR_CODES.USER_NOT_ADMIN_OF_TENANT,
         },
       });
-      return res.json({
-        error: constants.ERROR_CODES.USER_NOT_ADMIN_OF_TENANT,
-      });
+      return expressUtils.sendResponse(
+        res,
+        false,
+        {},
+        constants.ERROR_CODES.USER_NOT_ADMIN_OF_TENANT
+      );
     }
   } catch (error) {
     Logger.log("error", {
@@ -55,9 +58,12 @@ tenantMiddleware.checkIfUserIsAdmin = async (req, res, next) => {
         error,
       },
     });
-    return res.json({
-      error,
-    });
+    return expressUtils.sendResponse(
+      res,
+      false,
+      {},
+      constants.ERROR_CODES.SERVER_ERROR
+    );
   }
 };
 
@@ -94,9 +100,12 @@ tenantMiddleware.checkTenantCreationLimit = async function (req, res, next) {
           error: constants.ERROR_CODES.TENANT_CREATION_LIMIT_EXCEED,
         },
       });
-      return res.json({
-        error: constants.ERROR_CODES.TENANT_CREATION_LIMIT_EXCEED,
-      });
+      return expressUtils.sendResponse(
+        res,
+        false,
+        {},
+        constants.ERROR_CODES.TENANT_CREATION_LIMIT_EXCEED
+      );
     }
   } catch (error) {
     Logger.log("error", {
@@ -105,9 +114,12 @@ tenantMiddleware.checkTenantCreationLimit = async function (req, res, next) {
         error,
       },
     });
-    return res.json({
-      error,
-    });
+    return expressUtils.sendResponse(
+      res,
+      false,
+      {},
+      error
+    );
   }
 };
 
@@ -136,9 +148,7 @@ tenantMiddleware.poolProvider = async (req, res, next) => {
           error: constants.ERROR_CODES.INVALID_TENANT,
         },
       });
-      return res.json({
-        error: constants.ERROR_CODES.INVALID_TENANT,
-      });
+      return expressUtils.sendResponse(res, false, {}, constants.ERROR_CODES.INVALID_TENANT)
     }
     req.dbPool = await tenantAwarePostgreSQLPoolManager.getPool(tenantID);
     Logger.log("success", {
@@ -151,9 +161,7 @@ tenantMiddleware.poolProvider = async (req, res, next) => {
       message: "tenantMiddleware:poolProvider:catch-1",
       params: { error },
     });
-    return res.json({
-      error: constants.ERROR_CODES.SERVER_ERROR,
-    });
+    return expressUtils.sendResponse(res, false, {}, error)
   }
 };
 

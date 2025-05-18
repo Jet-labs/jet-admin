@@ -48,7 +48,12 @@ authMiddleware.authProvider = async function (req, res, next) {
         message: "authMiddleware:authProvider:catch-2",
         params: { error },
       });
-      return res.json({ error: constants.ERROR_CODES.USER_AUTH_TOKEN_EXPIRED });
+      return expressUtils.sendResponse(
+        res,
+        false,
+        {},
+        error
+      );
     }
   } else if (
     req.headers.authorization &&
@@ -85,14 +90,24 @@ authMiddleware.authProvider = async function (req, res, next) {
         message: "authMiddleware:authProvider:catch-2",
         params: { error },
       });
-      return res.json({ error: constants.ERROR_CODES.USER_AUTH_TOKEN_EXPIRED });
+      return expressUtils.sendResponse(
+        res,
+        false,
+        {},
+        error
+      );
     }
   } else {
     Logger.log("error", {
       message: "authMiddleware:authProvider:catch-1",
       params: { error: constants.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND },
     });
-    return res.json({ error: constants.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND });
+    return expressUtils.sendResponse(
+      res,
+      false,
+      {},
+      constants.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND
+    );
   }
 };
 
@@ -114,7 +129,12 @@ authMiddleware.authProviderTest = async function (req, res, next) {
       message: "authMiddleware:authProviderTest:catch-2",
       params: { error },
     });
-    return res.json({ error: constants.ERROR_CODES.USER_AUTH_TOKEN_EXPIRED });
+    return expressUtils.sendResponse(
+      res,
+      false,
+      {},
+      error
+    )
   }
 };
 

@@ -44,9 +44,7 @@ userManagementMiddleware.checkTenantUserAdditionLimit = async (
           error: constants.ERROR_CODES.MEMBER_ADDITION_LIMIT_EXCEED,
         },
       });
-      return res.json({
-        error: constants.ERROR_CODES.MEMBER_ADDITION_LIMIT_EXCEED,
-      });
+      return expressUtils.sendResponse(res,false,{},constants.ERROR_CODES.MEMBER_ADDITION_LIMIT_EXCEED)
     }
   } catch (error) {
     Logger.log("error", {
@@ -55,9 +53,7 @@ userManagementMiddleware.checkTenantUserAdditionLimit = async (
         error,
       },
     });
-    return res.json({
-      error,
-    });
+    return expressUtils.sendResponse(res,false,{},error)
   }
 };
 

@@ -2,6 +2,7 @@
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
 const { authService } = require("./auth.service");
+const {expressUtils} = require("../../utils/express.utils")
 
 const authController = {};
 /**
@@ -18,9 +19,8 @@ authController.getUserInfo = async (req, res) => {
         message: "userController:getUserInfo:userAlreadyExists",
         params: { user },
       });
-      return res.json({
-        success: true,
-        user,
+      return expressUtils.sendResponse(res, true, {
+        user
       });
     } else {
       Logger.log("info", {
@@ -35,17 +35,16 @@ authController.getUserInfo = async (req, res) => {
         message: "userController:getUserInfo:createdNewUser",
         params: { newUser },
       });
-      return res.json({ success: true, user: newUser });
+      return expressUtils.sendResponse(res, true, {
+        user:newUser
+      });
     }
   } catch (error) {
     Logger.log("error", {
       message: "userController:getUserInfo:catch-1",
       params: { error },
     });
-    return res.json({
-      success: false,
-      error: constants.ERROR_CODES.SERVER_ERROR,
-    });
+    return expressUtils.sendResponse(res, false, {}, error);
   }
 };
 
@@ -67,8 +66,7 @@ authController.getUserConfig = async (req, res) => {
       userID: user.userID,
       tenantID: parseInt(tenantID),
     });
-    return res.json({
-      success: true,
+    return expressUtils.sendResponse(res, true, {
       userConfig,
     });
   } catch (error) {
@@ -76,10 +74,7 @@ authController.getUserConfig = async (req, res) => {
       message: "userController:getUserConfig:catch-1",
       params: { error },
     });
-    return res.json({
-      success: false,
-      error: constants.ERROR_CODES.SERVER_ERROR,
-    });
+    return expressUtils.sendResponse(res, false, {}, error);
   }
 };
 
@@ -103,8 +98,8 @@ authController.updateUserConfig = async (req, res) => {
       tenantID: parseInt(tenantID),
       config
     });
-    return res.json({
-      success: true,
+    return expressUtils.sendResponse(res, true, {
+      message: "User config updated successfully.",
       tenantID
     });
   } catch (error) {
@@ -112,10 +107,7 @@ authController.updateUserConfig = async (req, res) => {
       message: "userController:updateUserConfig:catch-1",
       params: { error },
     });
-    return res.json({
-      success: false,
-      error: constants.ERROR_CODES.SERVER_ERROR,
-    });
+    return expressUtils.sendResponse(res, false, {}, error);
   }
 };
 

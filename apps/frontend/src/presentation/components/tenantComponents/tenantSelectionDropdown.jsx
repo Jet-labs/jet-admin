@@ -1,4 +1,4 @@
-import { capitalize } from "@mui/material";
+import { Box, capitalize, Typography } from "@mui/material";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { FaChevronDown, FaPlus, FaStoreAlt } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
@@ -60,10 +60,12 @@ export const TenantSelectionDropdown = () => {
     <div className="relative w-full" ref={dropdownRef}>
       {/* Dropdown Trigger Button */}
       <button
-        onClick={() => setIsOpen(!isOpen)} // Toggle dropdown visibility
+        onClick={() => setIsOpen(!isOpen)}
         className="w-full flex justify-between items-center bg-white hover:bg-slate-100 border border-slate-300 focus:outline-none focus:ring-4 focus:ring-slate-100 rounded px-1 py-1 pr-2 text-sm font-medium text-slate-900"
       >
-        <div className="flex items-center">
+        {/* This div contains the logo/icon and the text section */}
+        {/* Add min-w-0 and flex-grow here */}
+        <div className="flex items-center min-w-0 flex-grow">
           <div className="flex-shrink-0 w-8 h-8 rounded border border-slate-300 bg-slate-100 flex justify-center items-center">
             {selectedTenant?.tenantLogoURL ? (
               <TenantLogo
@@ -75,14 +77,38 @@ export const TenantSelectionDropdown = () => {
               <FaStoreAlt className="w-5 h-5 text-slate-500" />
             )}
           </div>
-          <div className="ml-2 flex flex-col">
-            <span className="text-sm font-semibold text-slate-600">
+          {/* Use Box for the text container - it's a flex item inside the div above */}
+          <Box
+            sx={{
+              ml: 1, // ml-2 -> 8px -> MUI spacing unit 1
+              display: 'flex',
+              flexDirection: 'column', // flex-col as per original structure
+              minWidth: 0, // **min-w-0 - Still important here for distribution within this Box**
+              overflow: 'hidden', // Optional, but good practice
+              flexGrow: 1, // Allow this Box to take available space *within* its parent flex item
+            }}
+          >
+            {/* Use Typography for the selected tenant name */}
+            <Typography
+              variant="subtitle2" // text-sm (14px)
+              fontWeight="semibold" // font-semibold (600)
+              // color="text.secondary" // slate-600
+              noWrap // **This is the key prop for truncation**
+              className="!text-slate-600"
+              sx={{
+                // Typography inside a flex item (the Box) with minWidth: 0 and overflow: hidden
+                // should automatically truncate when its content exceeds the parent Box's width.
+                // width: '100%' on Typography is often not needed if the parent Box's size is correctly managed.
+                textAlign: 'left', // text-start
+                fontWeight:600
+              }}
+            >
               {selectedTenant
                 ? StringUtils.truncateName(selectedTenant.tenantName, 15)
                 : CONSTANTS.STRINGS
-                    .TENANT_SELECTION_DROPDOWN_NO_TENANT_SELECTED}
-            </span>
-          </div>
+                  .TENANT_SELECTION_DROPDOWN_NO_TENANT_SELECTED}
+            </Typography>
+          </Box>
         </div>
         <FaChevronDown className="text-slate-600" />
       </button>
@@ -93,7 +119,6 @@ export const TenantSelectionDropdown = () => {
           className="absolute left-0 mt-2 w-full bg-white rounded shadow-lg z-10 overflow-hidden p-2 gap-1 flex flex-col justify-start items-stretch"
           style={{ filter: "drop-shadow(0px 2px 2px rgba(0,0,0,0.32))" }}
         >
-          {/* Tenant List */}
           {tenants.map((tenant) => (
             <button
               key={`tenant_id_${tenant.tenantID}`}
@@ -111,14 +136,35 @@ export const TenantSelectionDropdown = () => {
                   <FaStoreAlt className="w-5 h-5 text-slate-500" />
                 )}
               </div>
-              <div className="ml-3 flex flex-col justify-start items-start">
-                <span className="text-sm font-semibold text-slate-700">
+              {/* Use Box for the text container */}
+              <Box
+                sx={{
+                  ml: 1.5, // ml-3 is typically 12px, MUI spacing unit 1.5 * 8px = 12px
+                  display: 'flex',
+                  flexDirection: 'column', // flex-col
+                  justifyContent: 'flex-start',
+                  alignItems: 'flex-start',
+                  width: '100%', // w-full
+                  minWidth: 0, // **min-w-0 - Crucial for flex truncation**
+                  overflow: 'hidden', // Optional, but good practice
+                }}
+              >
+                {/* Use Typography for the tenant name */}
+                <Typography
+                  variant="body2" // Corresponds roughly to text-sm (14px)
+                  fontWeight="semibold" // font-semibold
+                  color="text.primary" // Use MUI theme color or specify value (e.g. '#334155' for slate-700)
+                  textAlign="left" // text-start
+                  noWrap // **This is the key prop for truncation**
+                  sx={{ width: '100%' }} // Ensure typography takes available width within its parent Box
+                >
                   {capitalize(StringUtils.truncateName(tenant.tenantName, 16))}
-                </span>
-                <span className="text-xs text-slate-600">
+                </Typography>
+                {/* Use Typography for the tenant ID */}
+                <Typography variant="caption" color="text.secondary"> {/* Corresponds roughly to text-xs */}
                   Tenant ID: {tenant.tenantID}
-                </span>
-              </div>
+                </Typography>
+              </Box>
             </button>
           ))}
 
