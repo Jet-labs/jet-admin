@@ -18,6 +18,8 @@ import { TenantEditor } from "./tenantEditor";
 import PropTypes from "prop-types";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import { TenantDeletionForm } from "./tenantDeletionForm";
+import { Link } from "react-router-dom";
+import { MdOutlineLockPerson } from "react-icons/md";
 
 export const TenantUpdationForm = ({ tenantID }) => {
   TenantUpdationForm.propTypes = {
@@ -109,20 +111,21 @@ export const TenantUpdationForm = ({ tenantID }) => {
     setIsAddTenantUserDialogOpen(false);
   };
   return (
-    <div className="flex w-full h-full flex-col justify-start items-center overflow-y-auto">
+    <div className="flex w-full h-full lg:flex-row flex-col justify-center items-start overflow-y-auto">
+      <section className="max-w-xs w-full h-full p-3 text-[#646cff] hidden 2xl:block"></section>
       <ReactQueryLoadingErrorWrapper
         isLoading={isLoadingTenant}
         isFetching={isFetchingTenant}
         error={tenantError}
       >
         {tenant && (
-          <section className="max-w-3xl w-full">
+          <section className="w-full">
             <TenantUserAdditionForm
               tenantID={tenant.tenantID}
               onClose={_handleCloseAddTenantUserDialog}
               open={isAddTenantUserDialogOpen}
             />
-            <div className="p-6 sm:p-8">
+            <div className="p-3">
               <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl ">
                 {CONSTANTS.STRINGS.UPDATE_TENANT_FORM_TITLE}
               </h1>
@@ -221,6 +224,18 @@ export const TenantUpdationForm = ({ tenantID }) => {
           </section>
         )}
       </ReactQueryLoadingErrorWrapper>
+      <section className="lg:max-w-xs w-full h-full lg:p-3 text-[#646cff]">
+        <Link
+          to={CONSTANTS.ROUTES.VIEW_AUDIT_LOGS.path(tenantID)}
+          key={CONSTANTS.ROUTES.VIEW_AUDIT_LOGS.path(tenantID)}
+          className={`flex items-center rounded mb-2 w-full p-2 hover:underline transition duration-75 group flex-row !justify-start text-sm font-normal`}
+        >
+          <MdOutlineLockPerson className={`!text-sm`} />
+          <span className={`ml-1`}>
+            {CONSTANTS.STRINGS.MAIN_DRAWER_AUDIT_LOGS_TITLE}
+          </span>
+        </Link>
+      </section>
     </div>
   );
 };

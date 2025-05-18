@@ -421,38 +421,6 @@ export const MainDrawerList = () => {
                 {capitalize(CONSTANTS.STRINGS.MAIN_DRAWER_SQL_EDITOR_TITLE)}
               </span>
             </Link>
-            <Link
-              to={CONSTANTS.ROUTES.VIEW_AUDIT_LOGS.path(tenantID)}
-              key={CONSTANTS.ROUTES.VIEW_AUDIT_LOGS.path(tenantID)}
-              className={`flex items-center ${
-                decodeURIComponent(location.pathname).includes(
-                  CONSTANTS.ROUTES.VIEW_AUDIT_LOGS.path(tenantID)
-                )
-                  ? "bg-[#eaebff]"
-                  : "bg-slate-100"
-              } rounded mb-2 w-full p-2 text-slate-700 transition duration-75 group bg-slate-200  hover:bg-slate-100  flex-row !justify-start mt-2 `}
-            >
-              <MdOutlineLockPerson
-                className={`!w-5 !h-5 ${
-                  decodeURIComponent(location.pathname).includes(
-                    CONSTANTS.ROUTES.VIEW_AUDIT_LOGS.path(tenantID)
-                  )
-                    ? "!text-[#646cff]"
-                    : "!text-slate-700"
-                }`}
-              />
-              <span
-                className={`font-semibold text-sm ml-2 ${
-                  decodeURIComponent(location.pathname).includes(
-                    CONSTANTS.ROUTES.VIEW_AUDIT_LOGS.path(tenantID)
-                  )
-                    ? "!text-[#646cff]"
-                    : "!text-slate-700"
-                }`}
-              >
-                {capitalize(CONSTANTS.STRINGS.MAIN_DRAWER_AUDIT_LOGS_TITLE)}
-              </span>
-            </Link>
 
             <button
               type="button"
