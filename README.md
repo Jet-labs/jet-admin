@@ -63,14 +63,23 @@ Visit our [documentation website](https://jet-labs.github.io/jet-admin/) for:
 - API references
 - Best practices
 
-## Contributing
+## 🚀 Contributions
 
-Contributions are welcome! If you have ideas for new features, improvements, or bug fixes, feel free to:
-1. Fork the repository
-2. Create a feature branch
-3. Submit a pull request
+This project is still growing — and yes, it has a few bugs and rough edges. If you’re interested in helping out, **we’d love your contributions!**
 
-Please review our contribution guidelines before submitting changes.
+### How to Help
+- Fix bugs 🐛  
+- Improve code structure 🧱  
+- Suggest or add new features ✨  
+- Clean up or improve documentation 📝  
+
+### Getting Started
+1. Fork the repo  
+2. Create a branch  
+3. Make your changes  
+4. Open a pull request — that’s it!
+
+If you’re not sure where to start, check out the [issues](./issues) tab.
 
 ## License
 
