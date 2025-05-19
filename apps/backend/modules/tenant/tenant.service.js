@@ -16,6 +16,11 @@ const {
 const {
   databaseQueryService,
 } = require("../databaseQuery/databaseQuery.service");
+const { cronJobService } = require("../cronJob/cronJob.service");
+const { apiKeyService } = require("../apiKey/apiKey.service");
+const {
+  databaseWidgetService,
+} = require("../databaseWidget/databaseWidget.service");
 
 const tenantService = {};
 
@@ -58,9 +63,11 @@ tenantService.getUserTenantByID = async ({ userID, tenantID, dbPool }) => {
       });
     let tenantRoles = null,
       tenantDatabaseMetadata = null,
-      tenantCharts = null,
       tenantDashboards = null,
-      tenantDatabaseQueries = null;
+      tenantDatabaseQueries = null,
+      tenantDatabaseWidgets = null,
+      tenantCronJobs = null,
+      tenantAPIKeys = null;
 
     try {
       tenantRoles = await tenantRoleService.getAllTenantRoles({
@@ -72,10 +79,6 @@ tenantService.getUserTenantByID = async ({ userID, tenantID, dbPool }) => {
           userID: parseInt(userID),
           dbPool,
         });
-      tenantCharts = await databaseChartService.getAllDatabaseCharts({
-        userID: parseInt(userID),
-        tenantID: parseInt(tenantID),
-      });
       tenantDashboards =
         await databaseDashboardService.getAllDatabaseDashboards({
           userID: parseInt(userID),
@@ -85,13 +88,27 @@ tenantService.getUserTenantByID = async ({ userID, tenantID, dbPool }) => {
         userID: parseInt(userID),
         tenantID: parseInt(tenantID),
       });
+      tenantDatabaseWidgets = await databaseWidgetService.getAllDatabaseWidgets(
+        {
+          userID: parseInt(userID),
+          tenantID: parseInt(tenantID),
+        }
+      );
+      tenantCronJobs = await cronJobService.getAllCronJobs({
+        userID: parseInt(userID),
+        tenantID: parseInt(tenantID),
+      });
+      tenantAPIKeys = await apiKeyService.getAllAPIKeys({
+        userID: parseInt(userID),
+        tenantID: parseInt(tenantID),
+      });
     } catch (error) {
       Logger.log("error", {
         message: "tenantService:getUserTenantByID:catch-1",
         params: { error },
       });
     }
-      
+
     const tenant = {
       ...userTenantRelationships.tblTenants,
       roles: userTenantRelationships,
@@ -102,9 +119,11 @@ tenantService.getUserTenantByID = async ({ userID, tenantID, dbPool }) => {
         tenantDatabaseMetadata?.metadata
           ?.map((schema) => (schema.tables ? schema.tables.length : 0))
           .reduce((acc, curr) => acc + curr, 0) || 0,
-      tenantChartCount: tenantCharts?.length || 0,
       tenantDashboardCount: tenantDashboards?.length || 0,
       tenantDatabaseQueryCount: tenantDatabaseQueries?.length || 0,
+      tenantCronJobCount: tenantCronJobs?.length || 0,
+      tenantAPIKeyCount: tenantAPIKeys?.length || 0,
+      tenantWidgetCount: tenantDatabaseWidgets?.length || 0,
     };
     Logger.log("success", {
       message: "tenantService:getUserTenantByID:tenant",

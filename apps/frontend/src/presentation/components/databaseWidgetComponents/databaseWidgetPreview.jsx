@@ -69,7 +69,11 @@ export const DatabaseWidgetPreview = ({
           <CircularProgress size={16} className=" !text-[#646cff]" />
         </div>
       ) : (
-        <div className="h-full w-full overflow-scroll" key={uniqueKey}>
+        <div
+          className="h-full w-full overflow-scroll"
+          key={uniqueKey}
+          id={uniqueKey}
+        >
           {WIDGETS_MAP[databaseWidgetType] ? (
             WIDGETS_MAP[databaseWidgetType].component({
               databaseWidgetName,

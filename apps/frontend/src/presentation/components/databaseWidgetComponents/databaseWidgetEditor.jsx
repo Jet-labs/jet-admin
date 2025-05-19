@@ -12,10 +12,17 @@ import PropTypes from "prop-types";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import { WIDGETS_MAP } from "@jet-admin/widgets";
 import { WIDGET_TYPES } from "@jet-admin/widget-types";
+// import { DatabaseWidgetCustomCSSForm } from "./databaseWidgetCustomCSSForm";
 
-export const DatabaseWidgetEditor = ({ databaseWidgetEditorForm }) => {
+export const DatabaseWidgetEditor = ({
+  tenantID,
+  databaseWidgetID,
+  databaseWidgetEditorForm,
+}) => {
   DatabaseWidgetEditor.propTypes = {
     databaseWidgetEditorForm: PropTypes.object.isRequired,
+    tenantID: PropTypes.number.isRequired,
+    databaseWidgetID: PropTypes.number.isRequired,
   };
   const {
     databaseQueries,
@@ -133,6 +140,11 @@ export const DatabaseWidgetEditor = ({ databaseWidgetEditorForm }) => {
           />
         </div>
       )}
+      {/* <DatabaseWidgetCustomCSSForm
+        tenantID={tenantID}
+        databaseWidgetID={databaseWidgetID}
+        widgetForm={databaseWidgetEditorForm}
+      /> */}
       <div className="flex flex-col justify-start items-stretch gap-2 p-2 rounded bg-slate-100">
         <div>
           <label

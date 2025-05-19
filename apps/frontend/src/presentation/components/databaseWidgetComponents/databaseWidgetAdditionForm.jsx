@@ -130,6 +130,7 @@ export const DatabaseWidgetAdditionForm = ({ tenantID }) => {
           >
             {addDatabaseWidgetForm && (
               <DatabaseWidgetEditor
+                tenantID={tenantID}
                 databaseWidgetEditorForm={addDatabaseWidgetForm}
               />
             )}

@@ -29,12 +29,12 @@ export const CollapseComponent = ({
       <button
         onClick={handleToggle}
         type="button"
-        className="p-0 text-xs m-0 inline-flex bg-transparent text-blue-500 outline-none focus:outline-none hover:outline-none border-0 focus:border-0 hover:border-0"
+        className="p-0 text-xs m-0 inline-flex bg-transparent text-[#646cff] hover:text-[#646cff] outline-none focus:outline-none hover:outline-none border-0 focus:border-0 hover:border-0"
       >
         {isOpen ? (
-          <BiChevronUp className="!text-base" />
+          <BiChevronUp className="!text-base mr-1" />
         ) : (
-          <BiChevronDown className="!text-base" />
+          <BiChevronDown className="!text-base mr-1" />
         )}
         {isOpen
           ? hideButtonText ||

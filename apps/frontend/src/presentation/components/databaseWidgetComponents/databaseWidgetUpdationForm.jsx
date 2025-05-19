@@ -205,6 +205,8 @@ export const DatabaseWidgetUpdationForm = ({ tenantID, databaseWidgetID }) => {
               {updateDatabaseWidgetForm && (
                 <DatabaseWidgetEditor
                   key={`databaseWidgetEditor_${uniqueKey}`}
+                  tenantID={tenantID}
+                  databaseWidgetID={databaseWidgetID}
                   databaseWidgetEditorForm={updateDatabaseWidgetForm}
                 />
               )}

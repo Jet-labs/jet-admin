@@ -40,7 +40,6 @@ export const ProtectedLayout = () => {
       error={firebaseUserState.error}
       loadingContainerClass="h-screen w-screen bg-white flex flex-col justify-center items-center"
     >
-      
       <div className="flex h-screen w-screen flex-col justify-start items-stretch overflow-hidden">
         <nav className="w-full  border-b-2 border-[#646cff] bg-white">
           <div className="px-3 py-2">
@@ -67,19 +66,18 @@ export const ProtectedLayout = () => {
           autoSaveId={
             CONSTANTS.RESIZABLE_PANEL_KEYS.MAIN_DRAWER_LIST_SEPARATION
           }
-          className={'h-full'}
+          className={"h-full"}
         >
-          <ResizablePanel defaultSize={20}>
-          <MainDrawerList />
+          <ResizablePanel defaultSize={20} minSize={20} maxSize={30}>
+            <MainDrawerList />
           </ResizablePanel>
           <ResizableHandle withHandle={true} />
           <ResizablePanel defaultSize={80}>
-          <div className="w-full h-[calc(100vh-50px)] overflow-y-auto bg-white">
-            <Outlet />
-          </div>
+            <div className="w-full h-[calc(100vh-50px)] overflow-y-auto bg-white">
+              <Outlet />
+            </div>
           </ResizablePanel>
         </ResizablePanelGroup>
-        
       </div>
     </ReactQueryLoadingErrorWrapper>
   );

@@ -17,6 +17,9 @@ export class Tenant {
     tenantChartCount,
     tenantDashboardCount,
     tenantDatabaseQueryCount,
+    tenantCronJobCount,
+    tenantAPIKeyCount,
+    tenantWidgetCount,
   }) {
     this.tenantID = tenantID;
     this.tenantName = tenantName;
@@ -33,6 +36,9 @@ export class Tenant {
     this.tenantChartCount = tenantChartCount;
     this.tenantDashboardCount = tenantDashboardCount;
     this.tenantDatabaseQueryCount = tenantDatabaseQueryCount;
+    this.tenantCronJobCount = tenantCronJobCount;
+    this.tenantAPIKeyCount = tenantAPIKeyCount;
+    this.tenantWidgetCount = tenantWidgetCount;
   }
   static toList = (data) => {
     if (Array.isArray(data)) {

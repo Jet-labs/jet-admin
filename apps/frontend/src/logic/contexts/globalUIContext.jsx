@@ -115,7 +115,7 @@ export const GlobalUIProvider = ({ children }) => {
           >
             {dialogState.isLoading ? (
               <CircularProgress
-                size={20}
+                size={16}
                 className="!text-white !align-middle"
               />
             ) : (

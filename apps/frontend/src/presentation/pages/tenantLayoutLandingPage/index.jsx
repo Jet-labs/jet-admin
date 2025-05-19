@@ -17,6 +17,8 @@ import rolesLogo from "../../../assets/roles_logo.png";
 import schemaLogo from "../../../assets/schema_logo.png";
 import tableLogo from "../../../assets/table_logo.png";
 import usersLogo from "../../../assets/users_logo.png";
+import cronjobLogo from "../../../assets/cronjob_logo.png";
+import widgetLogo from "../../../assets/widget_logo.png";
 import { ReactQueryLoadingErrorWrapper } from "../../components/ui/reactQueryLoadingErrorWrapper";
 
 const TenantLayoutLandingPage = () => {
@@ -68,6 +70,14 @@ const TenantLayoutLandingPage = () => {
         navigate(CONSTANTS.ROUTES.VIEW_DATABASE_QUERIES.path(tenantID)),
     },
     {
+      title: "Database Widgets",
+      icon: <img src={widgetLogo} alt="Database Widgets" className="w-8 h-8" />,
+      count: tenant?.tenantWidgetCount || 0,
+      description: "View and manage database widgets",
+      action: () =>
+        navigate(CONSTANTS.ROUTES.VIEW_DATABASE_WIDGETS.path(tenantID)),
+    },
+    {
       title: "Dashboards",
       icon: <img src={dashboardLogo} alt="Dashboards" className="w-8 h-8" />,
       count: tenant?.tenantDashboardCount || 0,
@@ -85,8 +95,16 @@ const TenantLayoutLandingPage = () => {
     {
       title: "API Keys",
       icon: <img src={apiKeyLogo} alt="API Keys" className="w-8 h-8" />,
+      count: tenant?.tenantAPIKeyCount || 0,
       description: "Create and manage API keys",
       action: () => navigate(CONSTANTS.ROUTES.VIEW_API_KEYS.path(tenantID)),
+    },
+    {
+      title: "Cron Jobs",
+      icon: <img src={cronjobLogo} alt="Cron Jobs" className="w-8 h-8" />,
+      count: tenant?.tenantCronJobCount || 0,
+      description: "Create and manage scheduled jobs",
+      action: () => navigate(CONSTANTS.ROUTES.VIEW_CRON_JOBS.path(tenantID)),
     },
   ];
 
