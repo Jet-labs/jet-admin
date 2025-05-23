@@ -8,6 +8,25 @@ const constants = {
 
   ROW_PAGE_SIZE: 100,
 
+  SUPPORTED_DATASOURCES: {
+    postgresql: {
+      name: "PostgreSQL",
+      value: "postgresql",
+    },
+    mysql: {
+      name: "MySQL",
+      value: "mysql",
+    },
+    mssql: {
+      name: "MSSQL",
+      value: "mssql",
+    },
+    restapi: {
+      name: "REST API",
+      value: "restapi",
+    },
+  },
+
   SUPPORTED_DATABASES: {
     postgresql: {
       name: "PostgreSQL",

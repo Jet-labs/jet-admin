@@ -14,6 +14,7 @@ import { DatabaseWidgetLayout } from "../layouts/databaseWidgetLayout";
 import { DatabaseNotificationLayout } from "../layouts/databaseNotificationLayout";
 import { APIKeyLayout } from "../layouts/apiKeyLayout";
 import { CronJobLayout } from "../layouts/cronJobLayout";
+import { DatasourceLayout } from "../layouts/datasourceLayout";
 const SignInPage = lazy(() => import("../../pages/signInPage"));
 const SignUpPage = lazy(() => import("../../pages/signUpPage"));
 const HomePage = lazy(() => import("../../pages/homePage"));
@@ -181,6 +182,29 @@ const router = createBrowserRouter([
                     element: <ViewDatabaseTriggerPage />,
                   },
                 ],
+              },
+            ],
+          },
+          {
+            element: <DatasourceLayout />,
+            children: [
+              {
+                path: CONSTANTS.ROUTES.VIEW_DATASOURCES.code,
+                element: () => {
+                  <>test</>;
+                },
+              },
+              {
+                path: CONSTANTS.ROUTES.ADD_DATASOURCE.code,
+                element: () => {
+                  <>test</>;
+                },
+              },
+              {
+                path: CONSTANTS.ROUTES.UPDATE_DATASOURCE_BY_ID.code,
+                element: () => {
+                  <>test</>;
+                },
               },
             ],
           },

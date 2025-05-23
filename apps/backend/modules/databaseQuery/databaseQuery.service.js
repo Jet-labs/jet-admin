@@ -470,6 +470,7 @@ databaseQueryService.getDatabaseQueryByID = async ({
         databaseQueryID: parseInt(databaseQueryID),
       },
       include: {
+        tblDatasources: true,
         _count: {
           select: {
             tblDatabaseChartQueryMappings: true,

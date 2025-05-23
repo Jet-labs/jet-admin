@@ -12,7 +12,6 @@ import { displayError, displaySuccess } from "../../../utils/notification";
 import { ArrayInput } from "../ui/arrayInputField";
 import { DatabaseQueryResponseView } from "./databaseQueryResponseView";
 import { DatabaseQueryTestingForm } from "./databaseQueryTestingForm";
-import { PGSQLQueryEditor } from "./pgsqlQueryEditor";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -21,6 +20,8 @@ import {
 import { formValidations } from "../../../utils/formValidation";
 import { DatabaseQueryAIGeneratePrompt } from "./databaseQueryAIGeneratePrompt";
 import PropTypes from "prop-types";
+import { DATASOURCE_COMPONENTS } from "@jet-admin/datasources";
+import { DATASOURCE_TYPES } from "@jet-admin/datasource-types";
 
 export const DatabaseQueryAdditionForm = ({ tenantID }) => {
   DatabaseQueryAdditionForm.propTypes = {
@@ -107,6 +108,11 @@ export const DatabaseQueryAdditionForm = ({ tenantID }) => {
                   >
                     {CONSTANTS.STRINGS.ADD_QUERY_FORM_NAME_FIELD_LABEL}
                   </label>
+                  {queryAdditionForm.errors.databaseQueryTitle && (
+                    <span className="text-red-500 text-xs">
+                      {queryAdditionForm.errors.databaseQueryTitle}
+                    </span>
+                  )}
                   <input
                     type="databaseQueryTitle"
                     name="databaseQueryTitle"
@@ -128,6 +134,11 @@ export const DatabaseQueryAdditionForm = ({ tenantID }) => {
                   >
                     {CONSTANTS.STRINGS.ADD_QUERY_FORM_DESCRIPTION_FIELD_LABEL}
                   </label>
+                  {queryAdditionForm.errors.databaseQueryDescription && (
+                    <span className="text-red-500 text-xs">
+                      {queryAdditionForm.errors.databaseQueryDescription}
+                    </span>
+                  )}
                   <input
                     type="databaseQueryDescription"
                     name="databaseQueryDescription"
@@ -154,6 +165,7 @@ export const DatabaseQueryAdditionForm = ({ tenantID }) => {
                     {CONSTANTS.STRINGS.ADD_QUERY_FORM_RUN_ON_LOAD_FIELD_LABEL}
                   </span>
                 </label>
+
                 <div>
                   <label
                     htmlFor="databaseQueryDescription"
@@ -161,6 +173,11 @@ export const DatabaseQueryAdditionForm = ({ tenantID }) => {
                   >
                     {CONSTANTS.STRINGS.ADD_QUERY_FORM_PARAMS_FIELD_LABEL}
                   </label>
+                  {queryAdditionForm.errors.databaseQueryArgs && (
+                    <span className="text-red-500 text-xs">
+                      {queryAdditionForm.errors.databaseQueryArgs}
+                    </span>
+                  )}
                   <ArrayInput
                     value={queryAdditionForm.values.databaseQueryArgs}
                     onChange={(value) => {
@@ -178,17 +195,25 @@ export const DatabaseQueryAdditionForm = ({ tenantID }) => {
                 defaultSize={80}
                 className="space-y-3 md:space-y-4 p-3"
               >
-                <PGSQLQueryEditor
-                  code={queryAdditionForm.values.databaseQueryString}
-                  setCode={(value) => {
-                    console.log({ value });
+                {queryAdditionForm.errors.databaseQueryString && (
+                  <label
+                    htmlFor="databaseQueryString"
+                    className="block text-xs font-medium text-red-500"
+                  >
+                    {`${queryAdditionForm.errors.databaseQueryString}`}
+                  </label>
+                )}
+                {DATASOURCE_COMPONENTS[
+                  DATASOURCE_TYPES.POSTGRESQL.value
+                ].queryEditor({
+                  query: queryAdditionForm.values.databaseQueryString,
+                  setQuery: (value) => {
                     queryAdditionForm.setFieldValue(
                       "databaseQueryString",
                       value
                     );
-                  }}
-                  language={"pgsql"}
-                />
+                  },
+                })}
                 <div className="w-full flex flex-row justify-end">
                   <DatabaseQueryAIGeneratePrompt
                     tenantID={tenantID}

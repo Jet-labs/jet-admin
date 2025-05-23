@@ -1,0 +1,40 @@
+
+{
+  "name": "@jet-admin/datasource-types",
+  "version": "1.0.0",
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "esbuild src/index.js --bundle --outfile=dist/index.mjs --format=esm --sourcemap && esbuild src/index.js --bundle --outfile=dist/index.cjs --format=cjs --sourcemap",
+    "dev": "npm run build -- --watch",
+    "lint": "eslint .",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.x.x",
+    "@babel/preset-env": "^7.x.x",
+    "@rollup/plugin-babel": "^6.x.x",
+    "@rollup/plugin-commonjs": "^25.x.x",
+    "@rollup/plugin-node-resolve": "^15.x.x",
+    "esbuild": "^0.25.3",
+    "eslint": "^8.x.x",
+    "jest": "^29.x.x",
+    "rollup": "^4.x.x"
+  },
+  "peerDependencies": {
+  },
+  "publishConfig": {
+    "access": "restricted"
+  }
+}

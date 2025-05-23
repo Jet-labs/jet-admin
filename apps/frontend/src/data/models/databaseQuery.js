@@ -1,3 +1,5 @@
+import { Datasource } from "./datasource";
+
 export class DatabaseQuery {
   constructor({
     databaseQueryID,
@@ -14,6 +16,7 @@ export class DatabaseQuery {
     tblDatabaseChartQueryMappings,
     linkedDatabaseChartCount,
     linkedDatabaseWidgetCount,
+    tblDatasources,
   }) {
     this.databaseQueryID = databaseQueryID;
     this.createdAt = createdAt;
@@ -29,6 +32,7 @@ export class DatabaseQuery {
     this.tblDatabaseChartQueryMappings = tblDatabaseChartQueryMappings;
     this.linkedDatabaseChartCount = linkedDatabaseChartCount || 0;
     this.linkedDatabaseWidgetCount = linkedDatabaseWidgetCount || 0;
+    this.datasource = tblDatasources ? new Datasource(tblDatasources) : null;
   }
   static toList(data) {
     if (Array.isArray(data)) {

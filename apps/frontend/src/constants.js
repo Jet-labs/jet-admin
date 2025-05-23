@@ -55,6 +55,7 @@ export const CONSTANTS = {
     ROW_EXPORT_CONFIRMATION_BUTTON: "Export rows",
     EXPORT_BUTTON_TEXT: "Export data",
     MAIN_DRAWER_DATABASE_TITLE: "Database",
+    MAIN_DRAWER_DATASOURCE_TITLE: "Data sources",
     MAIN_DRAWER_DATABASE_DASHBOARDS_TITLE: "Dashboards",
     MAIN_DRAWER_DATABASE_CHARTS_TITLE: "Charts",
     MAIN_DRAWER_DATABASE_WIDGETS_TITLE: "Widgets",
@@ -314,6 +315,7 @@ export const CONSTANTS = {
 
     TABLE_DRAWER_LIST_NO_TABLE: "No tables found",
     TRIGGER_DRAWER_LIST_NO_TRIGGER: "No triggers found",
+    DATASOURCE_DRAWER_LIST_NO_DATASOURCE: "No data sources found",
     QUERY_DRAWER_LIST_NO_QUERY: "No queries found",
     NOTIFICATION_DRAWER_LIST_NO_NOTIFICATION: "No notifications found",
     API_KEY_DRAWER_LIST_NO_API_KEY: "No API Keys found",
@@ -383,6 +385,8 @@ export const CONSTANTS = {
     ADD_CHART_BUTTON_TEXT: "Add chart",
 
     ADD_WIDGET_BUTTON_TEXT: "Add widget",
+
+    ADD_DATASOURCE_BUTTON_TEXT: "Add datasource",
 
     // Labels
     ADD_QUERY_FORM_TITLE: "Add query",
@@ -1013,6 +1017,19 @@ export const CONSTANTS = {
       ) =>
         `/tenants/${tenantID}/schemas/${databaseSchemaName}/triggers/${databaseTableName}/${databaseTriggerName}`,
     },
+    ADD_DATASOURCE: {
+      code: "/tenants/:tenantID/datasources/add",
+      path: (tenantID) => `/tenants/${tenantID}/datasources/add`,
+    },
+    VIEW_DATASOURCES: {
+      code: "/tenants/:tenantID/datasources",
+      path: (tenantID) => `/tenants/${tenantID}/datasources`,
+    },
+    UPDATE_DATASOURCE_BY_ID: {
+      code: "/tenants/:tenantID/datasources/:datasourceID",
+      path: (tenantID, datasourceID) =>
+        `/tenants/${tenantID}/datasources/${datasourceID}`,
+    },
     ADD_DATABASE_QUERY: {
       code: "/tenants/:tenantID/queries/add",
       path: (tenantID) => `/tenants/${tenantID}/queries/add`,
@@ -1207,6 +1224,22 @@ export const CONSTANTS = {
     AUDIT_LOG: {
       getAuditLogsAPI: (tenantID, page, pageSize) =>
         `/api/v1/tenants/${tenantID}/audit?page=${page}&pageSize=${pageSize}`,
+    },
+    DATASOURCE: {
+      getAllDatasourcesAPI: (tenantID) =>
+        `/api/v1/tenants/${tenantID}/datasources`,
+      createDatasourceAPI: (tenantID) =>
+        `/api/v1/tenants/${tenantID}/datasources`,
+      getDatasourceByIDAPI: (tenantID, datasourceID) =>
+        `/api/v1/tenants/${tenantID}/datasources/${datasourceID}`,
+      updateDatasourceByIDAPI: (tenantID, datasourceID) =>
+        `/api/v1/tenants/${tenantID}/datasources/${datasourceID}`,
+      deleteDatasourceByIDAPI: (tenantID, datasourceID) =>
+        `/api/v1/tenants/${tenantID}/datasources/${datasourceID}`,
+      testDatasourceConnectionAPI: (tenantID) =>
+        `/api/v1/tenants/${tenantID}/datasources/test`,
+      cloneDatasourceByIDAPI: (tenantID, datasourceID) =>
+        `/api/v1/tenants/${tenantID}/datasources/${datasourceID}/clone`,
     },
     DATABASE: {
       getDatabaseMetadataAPI: (tenantID) =>
@@ -1462,6 +1495,8 @@ export const CONSTANTS = {
       databaseTriggerName
     ) =>
       `${tenantID}-${databaseSchemaName}-${databaseTableName}-DATABASE_TRIGGERS-${databaseTriggerName}`,
+
+    DATASOURCES: (tenantID) => `${tenantID}-DATASOURCES`,
 
     DATABASE_QUERIES: (tenantID) => `${tenantID}-DATABASE_QUERIES`,
 
@@ -1792,6 +1827,7 @@ export const CONSTANTS = {
     DATABASE_TRIGGER_LAYOUT_SEPARATION: "DATABASE_TRIGGER_LAYOUT_SEPARATION",
     DATABASE_TABLE_LAYOUT_SEPARATION: "DATABASE_TABLE_LAYOUT_SEPARATION",
     DATABASE_QUERY_LAYOUT_SEPARATION: "DATABASE_QUERY_LAYOUT_SEPARATION",
+    DATASOURCE_LAYOUT_SEPARATION: "DATASOURCE_LAYOUT_SEPARATION",
     DATABASE_CHART_LAYOUT_SEPARATION: "DATABASE_CHART_LAYOUT_SEPARATION",
     DATABASE_WIDGET_LAYOUT_SEPARATION: "DATABASE_WIDGET_LAYOUT_SEPARATION",
     DATABASE_DASHBOARD_LAYOUT_SEPARATION:

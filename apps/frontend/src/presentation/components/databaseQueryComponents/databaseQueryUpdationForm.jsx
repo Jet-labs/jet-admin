@@ -14,7 +14,6 @@ import { ArrayInput } from "../ui/arrayInputField";
 import { DatabaseQueryDeletionForm } from "./databaseQueryDeletionForm";
 import { DatabaseQueryResponseView } from "./databaseQueryResponseView";
 import { DatabaseQueryTestingForm } from "./databaseQueryTestingForm";
-import { PGSQLQueryEditor } from "./pgsqlQueryEditor";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -24,6 +23,8 @@ import { formValidations } from "../../../utils/formValidation";
 import PropTypes from "prop-types";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import { DatabaseQueryCloneForm } from "./databaseQueryCloneForm";
+import { DATASOURCE_COMPONENTS } from "@jet-admin/datasources";
+import { DATASOURCE_TYPES } from "@jet-admin/datasource-types";
 
 export const DatabaseQueryUpdationForm = ({ tenantID, databaseQueryID }) => {
   DatabaseQueryUpdationForm.propTypes = {
@@ -193,6 +194,11 @@ export const DatabaseQueryUpdationForm = ({ tenantID, databaseQueryID }) => {
                     >
                       {CONSTANTS.STRINGS.UPDATE_QUERY_FORM_NAME_FIELD_LABEL}
                     </label>
+                    {queryUpdationForm.errors.databaseQueryTitle && (
+                      <span className="text-red-500 text-xs">
+                        {queryUpdationForm.errors.databaseQueryTitle}
+                      </span>
+                    )}
                     <input
                       type="databaseQueryTitle"
                       name="databaseQueryTitle"
@@ -218,6 +224,12 @@ export const DatabaseQueryUpdationForm = ({ tenantID, databaseQueryID }) => {
                           .UPDATE_QUERY_FORM_DESCRIPTION_FIELD_LABEL
                       }
                     </label>
+                    {queryUpdationForm.errors.databaseQueryDescription && (
+                      <span className="text-red-500 text-xs">
+                        {queryUpdationForm.errors.databaseQueryDescription}
+                      </span>
+                    )}
+
                     <input
                       type="databaseQueryDescription"
                       name="databaseQueryDescription"
@@ -254,6 +266,11 @@ export const DatabaseQueryUpdationForm = ({ tenantID, databaseQueryID }) => {
                     >
                       {CONSTANTS.STRINGS.UPDATE_QUERY_FORM_PARAMS_FIELD_LABEL}
                     </label>
+                    {queryUpdationForm.errors.databaseQueryArgs && (
+                      <span className="text-red-500 text-xs">
+                        {queryUpdationForm.errors.databaseQueryArgs}
+                      </span>
+                    )}
                     <ArrayInput
                       key={"databaseQueryArgs"}
                       id={"databaseQueryArgs"}
@@ -273,17 +290,25 @@ export const DatabaseQueryUpdationForm = ({ tenantID, databaseQueryID }) => {
                   defaultSize={80}
                   className="space-y-3 md:space-y-4 p-3"
                 >
-                  <PGSQLQueryEditor
-                    code={queryUpdationForm.values.databaseQueryString}
-                    setCode={(value) => {
-                      console.log({ value });
+                  {queryUpdationForm.errors.databaseQueryString && (
+                    <label
+                      htmlFor="databaseQueryString"
+                      className="block text-xs font-medium text-red-500"
+                    >
+                      {`${queryUpdationForm.errors.databaseQueryString}`}
+                    </label>
+                  )}
+                  {DATASOURCE_COMPONENTS[
+                    DATASOURCE_TYPES.POSTGRESQL.value
+                  ].queryEditor({
+                    query: queryUpdationForm.values.databaseQueryString,
+                    setQuery: (value) => {
                       queryUpdationForm.setFieldValue(
                         "databaseQueryString",
                         value
                       );
-                    }}
-                    language={"pgsql"}
-                  />
+                    },
+                  })}
                   <div className="w-full flex flex-row justify-end">
                     <DatabaseQueryCloneForm
                       key={`databaseQueryCloneForm_${databaseQuery?.databaseQueryID}`}

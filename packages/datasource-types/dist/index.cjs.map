@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../src/index.js"],
+  "sourcesContent": ["export const DATASOURCE_TYPES = {\r\n  POSTGRESQL: {\r\n    name: \"PostgreSQL\",\r\n    value: \"postgresql\",\r\n  },\r\n  MYSQL: {\r\n    name: \"MySQL\",\r\n    value: \"mysql\",\r\n  },\r\n  MSSQL: {\r\n    name: \"MSSQL\",\r\n    value: \"mssql\",\r\n  },\r\n  RESTAPI: {\r\n    name: \"REST API\",\r\n    value: \"restapi\",\r\n  },\r\n};\r\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAO,IAAM,mBAAmB;AAAA,EAC9B,YAAY;AAAA,IACV,MAAM;AAAA,IACN,OAAO;AAAA,EACT;AAAA,EACA,OAAO;AAAA,IACL,MAAM;AAAA,IACN,OAAO;AAAA,EACT;AAAA,EACA,OAAO;AAAA,IACL,MAAM;AAAA,IACN,OAAO;AAAA,EACT;AAAA,EACA,SAAS;AAAA,IACP,MAAM;AAAA,IACN,OAAO;AAAA,EACT;AACF;",
+  "names": []
+}

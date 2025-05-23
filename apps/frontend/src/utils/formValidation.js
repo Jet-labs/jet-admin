@@ -95,14 +95,7 @@ formValidations.queryAdditionFormValidationSchema = Yup.object().shape({
     .required("Database query is required")
     .min(10, "Database query must be at least 10 characters"),
   databaseQueryArgs: Yup.array()
-    .of(
-      Yup.string()
-        .matches(
-          /^\{[a-zA-Z0-9_]+\}$/,
-          "Arguments must follow the format {argName}"
-        )
-        .required("Argument name is required")
-    )
+    .of(Yup.string().required("Argument name is required"))
     .optional(), // Optional array of arguments
   runOnLoad: Yup.boolean(),
 });
@@ -116,14 +109,7 @@ formValidations.queryUpdationFormValidationSchema = Yup.object().shape({
     .required("Database query is required")
     .min(10, "Database query must be at least 10 characters"),
   databaseQueryArgs: Yup.array()
-    .of(
-      Yup.string()
-        .matches(
-          /^\{[a-zA-Z0-9_]+\}$/,
-          "Arguments must follow the format {argName}"
-        )
-        .required("Argument name is required")
-    )
+    .of(Yup.string().required("Argument name is required"))
     .optional(), // Optional array of arguments
   runOnLoad: Yup.boolean(),
 });

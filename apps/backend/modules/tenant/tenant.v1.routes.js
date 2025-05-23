@@ -4,6 +4,7 @@ const { tenantController } = require("./tenant.controller");
 const { tenantMiddleware } = require("./tenant.middleware");
 const { authMiddleware } = require("../auth/auth.middleware");
 const databaseRouter = require("../database/database.v1.routes");
+const datasourceRouter = require("../datasource/datasource.v1.routes");
 const databaseQueryRouter = require("../databaseQuery/databaseQuery.v1.routes");
 const databaseChartRouter = require("../databaseChart/databaseChart.v1.routes");
 const databaseWidgetRouter = require("../databaseWidget/databaseWidget.v1.routes");
@@ -113,6 +114,13 @@ router.use(
   authMiddleware.checkUserPermissions(["tenant:cronjobs"]),
   tenantMiddleware.poolProvider,
   cronjobRouter
+);
+
+router.use(
+  "/:tenantID/datasources",
+  authMiddleware.checkUserPermissions(["tenant:datasource"]),
+  tenantMiddleware.poolProvider,
+  datasourceRouter
 );
 
 router.use(

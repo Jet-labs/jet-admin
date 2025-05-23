@@ -27,6 +27,7 @@ model tblTenants {
   tblDatabaseNotifications    tblDatabaseNotifications[]
   tblDatabaseQueries          tblDatabaseQueries[]
   tblDatabaseWidgets          tblDatabaseWidgets[]
+  tblDatasources              tblDatasources[]
   tblRoles                    tblRoles[]
   tblUsers                    tblUsers                      @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fktblTenantstblUsersCreatorID")
   tblUserNotifications        tblUserNotifications[]
@@ -54,6 +55,7 @@ model tblUsers {
   tblDatabaseDashboards       tblDatabaseDashboards[]
   tblDatabaseQueries          tblDatabaseQueries[]
   tblDatabaseWidgets          tblDatabaseWidgets[]
+  tblDatasources              tblDatasources[]
   tblTenants                  tblTenants[]
   tblUserNotifications        tblUserNotifications[]
   tblUserTenantConfigMap      tblUserTenantConfigMap[]
@@ -88,8 +90,10 @@ model tblDatabaseQueries {
   runOnLoad                      Boolean?
   databaseQueryResultSchema      Json?                            @db.Json
   creatorID                      Int?
+  datasourceID                   String?                          @db.Uuid
   tblCronJobs                    tblCronJobs[]
   tblDatabaseChartQueryMappings  tblDatabaseChartQueryMappings[]
+  tblDatasources                 tblDatasources?                  @relation(fields: [datasourceID], references: [datasourceID], onDelete: NoAction, onUpdate: NoAction, map: "fkDatasourceIDDatasourceID")
   tblUsers                       tblUsers?                        @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDatabaseQueriesCreatorID")
   tblTenants                     tblTenants                       @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTenantIDTenantID")
   tblDatabaseWidgetQueryMappings tblDatabaseWidgetQueryMappings[]
@@ -324,4 +328,18 @@ model tblAuditLogs {
   createdAt  DateTime @default(now()) @db.Timestamptz(6)
   metadata   Json?
   error      Json?
+}
+
+model tblDatasources {
+  datasourceID       String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  datasourceTitle    String               @db.VarChar
+  datasourceType     String               @db.VarChar
+  createdAt          DateTime             @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime             @default(now()) @db.Timestamptz(6)
+  tenantID           Int
+  creatorID          Int
+  datasourceOptions  Json
+  tblDatabaseQueries tblDatabaseQueries[]
+  tblTenants         tblTenants           @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDatasourceTblTenantsTenantID")
+  tblUsers           tblUsers             @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDatasourceTblUsersCreatorID")
 }

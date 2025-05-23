@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef } from "react";
 import Editor from "@monaco-editor/react";
 import Github from "monaco-themes/themes/GitHub Light.json"
 import { useDatabaseQueriesState } from "../../../logic/contexts/databaseQueriesContext";
+import PropTypes from "prop-types";
 
 export const PGSQLQueryEditor = ({
   readOnly,
@@ -12,6 +13,15 @@ export const PGSQLQueryEditor = ({
   rounded = true,
   outlined = true,
 }) => {
+  PGSQLQueryEditor.propTypes = {
+    readOnly: PropTypes.bool,
+    code: PropTypes.string,
+    setCode: PropTypes.func.isRequired,
+    height: PropTypes.string,
+    language: PropTypes.string,
+    rounded: PropTypes.bool,
+    outlined: PropTypes.bool,
+  };
   const { databaseMetadata } = useDatabaseQueriesState();
 
   // Create schema {tableName: [columns]}
@@ -50,9 +60,10 @@ export const PGSQLQueryEditor = ({
     // }
     // window.myPgsqlCompletionProvider = monaco.languages.registerCompletionItemProvider(...)
 
-    monaco.languages.registerCompletionItemProvider(language, { // Use the language prop
-      triggerCharacters: ['.', ' '], // Trigger on dot and space
-      provideCompletionItems: (model, position, context) => {
+    monaco.languages.registerCompletionItemProvider(language, {
+      // Use the language prop
+      triggerCharacters: [".", " "], // Trigger on dot and space
+      provideCompletionItems: (model, position) => {
         // Access the latest schema via the ref
         const currentSchema = schemaRef.current;
         const suggestions = [];
@@ -113,11 +124,41 @@ export const PGSQLQueryEditor = ({
 
           // Suggest basic SQL keywords
           const sqlKeywords = [
-            "SELECT", "FROM", "WHERE", "JOIN", "LEFT JOIN", "RIGHT JOIN", "INNER JOIN", "ON",
-            "GROUP BY", "ORDER BY", "ASC", "DESC", "AS", "DISTINCT", "LIMIT", "OFFSET",
-            "INSERT INTO", "VALUES", "UPDATE", "SET", "DELETE",
-            "CREATE TABLE", "ALTER TABLE", "DROP TABLE", "INDEX",
-            "COUNT", "SUM", "AVG", "MAX", "MIN", "AND", "OR", "NOT", "NULL", "IS"
+            "SELECT",
+            "FROM",
+            "WHERE",
+            "JOIN",
+            "LEFT JOIN",
+            "RIGHT JOIN",
+            "INNER JOIN",
+            "ON",
+            "GROUP BY",
+            "ORDER BY",
+            "ASC",
+            "DESC",
+            "AS",
+            "DISTINCT",
+            "LIMIT",
+            "OFFSET",
+            "INSERT INTO",
+            "VALUES",
+            "UPDATE",
+            "SET",
+            "DELETE",
+            "CREATE TABLE",
+            "ALTER TABLE",
+            "DROP TABLE",
+            "INDEX",
+            "COUNT",
+            "SUM",
+            "AVG",
+            "MAX",
+            "MIN",
+            "AND",
+            "OR",
+            "NOT",
+            "NULL",
+            "IS",
             // Add more keywords as needed
           ];
 
@@ -130,18 +171,19 @@ export const PGSQLQueryEditor = ({
             });
           });
         }
-        
+
         // console.log("Providing suggestions:", suggestions.length > 0 ? suggestions : "None for context"); // For debugging
         return { suggestions: suggestions };
       },
     });
-    monaco.editor.defineTheme('jet-theme', Github);
+    monaco.editor.defineTheme("jet-theme", Github);
   };
 
   return (
     <div
-      className={`${rounded ? "rounded-sm" : ""} ${outlined ? "border border-slate-200" : ""} overflow-hidden min-w-[300px]`}
-      
+      className={`${rounded ? "rounded-sm" : ""} ${
+        outlined ? "border border-slate-200" : ""
+      } overflow-hidden min-w-[300px]`}
     >
       <Editor
         height={height}
@@ -189,7 +231,7 @@ export const PGSQLQueryEditor = ({
             showSnippets: true,
           },
         }}
-        theme='jet-theme' // Monaco's default light theme
+        theme="jet-theme" // Monaco's default light theme
       />
     </div>
   );
