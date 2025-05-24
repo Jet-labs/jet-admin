@@ -107,6 +107,14 @@ const DatabaseSchemaLandingPage = lazy(() =>
 );
 const ViewAuditLogsPage = lazy(() => import("../../pages/viewAuditLogsPage"));
 
+const DatasourceLayoutLandingPage = lazy(() =>
+  import("../../pages/datasourceLayoutLandingPage")
+);
+const AddDatasourcePage = lazy(() => import("../../pages/addDatasourcePage"));
+const UpdateDatasourcePage = lazy(() =>
+  import("../../pages/updateDatasourcePage")
+);
+
 const router = createBrowserRouter([
   {
     element: <RootLayout />,
@@ -190,21 +198,15 @@ const router = createBrowserRouter([
             children: [
               {
                 path: CONSTANTS.ROUTES.VIEW_DATASOURCES.code,
-                element: () => {
-                  <>test</>;
-                },
+                element: <DatasourceLayoutLandingPage />,
               },
               {
                 path: CONSTANTS.ROUTES.ADD_DATASOURCE.code,
-                element: () => {
-                  <>test</>;
-                },
+                element: <AddDatasourcePage />,
               },
               {
                 path: CONSTANTS.ROUTES.UPDATE_DATASOURCE_BY_ID.code,
-                element: () => {
-                  <>test</>;
-                },
+                element: <UpdateDatasourcePage />,
               },
             ],
           },

@@ -387,6 +387,27 @@ export const CONSTANTS = {
     ADD_WIDGET_BUTTON_TEXT: "Add widget",
 
     ADD_DATASOURCE_BUTTON_TEXT: "Add datasource",
+    ADD_DATASOURCE_FORM_TITLE: "Add data source",
+    ADD_DATASOURCE_FORM_DATASOURCE_ADDITION_SUCCESS:
+      "Data source added successfully!",
+    ADD_DATASOURCE_FORM_DATASOURCE_TESTING_SUCCESS:
+      "Data source run successfully!",
+    ADD_DATASOURCE_FORM_SUBMIT_BUTTON: "Add data source",
+
+    UPDATE_DATASOURCE_FORM_TITLE: "Update data source",
+    UPDATE_DATASOURCE_FORM_DATASOURCE_ADDITION_SUCCESS:
+      "Data source updated successfully!",
+    UPDATE_DATASOURCE_FORM_DATASOURCE_TESTING_SUCCESS:
+      "Data source run successfully!",
+    UPDATE_DATASOURCE_FORM_SUBMIT_BUTTON: "Update data source",
+
+    DATASOURCE_EDITOR_FORM_TITLE_FIELD_LABEL: "Data source name",
+    DATASOURCE_EDITOR_FORM_TITLE_FIELD_PLACEHOLDER: "Your data source's name",
+    DATASOURCE_EDITOR_FORM_DESCRIPTION_FIELD_LABEL: "Description",
+    DATASOURCE_EDITOR_FORM_DESCRIPTION_FIELD_PLACEHOLDER:
+      "Your data source description (optional)",
+    DATASOURCE_EDITOR_FORM_TYPE_FIELD_LABEL: "Data source type",
+    DATASOURCE_EDITOR_FORM_TYPE_FIELD_PLACEHOLDER: "Select data source type",
 
     // Labels
     ADD_QUERY_FORM_TITLE: "Add query",

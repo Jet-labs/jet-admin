@@ -34,7 +34,9 @@ export const getAllDatasourcesAPI = async ({ tenantID }) => {
 
 export const createDatasourceAPI = async ({
   tenantID,
-  datasourceData,
+  datasourceTitle,
+  datasourceType,
+  datasourceOptions,
 }) => {
   try {
     const url =
@@ -45,7 +47,9 @@ export const createDatasourceAPI = async ({
       const response = await axios.post(
         url,
         {
-          ...datasourceData,
+          datasourceTitle,
+          datasourceType,
+          datasourceOptions,
         },
         {
           headers: {
@@ -71,21 +75,22 @@ export const createDatasourceAPI = async ({
 export const updateDatasourceAPI = async ({
   tenantID,
   datasourceID,
-  datasourceData,
+  datasourceTitle,
+  datasourceType,
+  datasourceOptions,
 }) => {
   try {
     const url =
       CONSTANTS.SERVER_HOST +
-      CONSTANTS.APIS.DATASOURCE.updateDatasourceByIDAPI(
-        tenantID,
-        datasourceID
-      );
+      CONSTANTS.APIS.DATASOURCE.updateDatasourceByIDAPI(tenantID, datasourceID);
     const bearerToken = await firebaseAuth.currentUser.getIdToken();
     if (bearerToken) {
       const response = await axios.patch(
         url,
         {
-          ...datasourceData,
+          datasourceTitle,
+          datasourceType,
+          datasourceOptions,
         },
         {
           headers: {

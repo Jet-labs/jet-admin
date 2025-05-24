@@ -368,3 +368,11 @@ formValidations.updateDatabaseWidgetFormValidationSchema = Yup.object().shape({
     )
     .min(1, "At least 1 query required"),
 });
+
+formValidations.datasourceAdditionFormValidationSchema = Yup.object().shape({
+  datasourceName: Yup.string().required("Datasource name is required"),
+  datasourceDescription: Yup.string().optional(),
+  datasourceType: Yup.string().required("Datasource type is required"),
+});
+
+

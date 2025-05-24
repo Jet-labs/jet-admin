@@ -37,16 +37,15 @@ export const DatasourceDrawerList = () => {
       ) : datasources && datasources.length > 0 ? (
         <div className="h-full w-full overflow-y-auto">
           {datasources.map((datasource) => {
-            const key = `databaseDatasource_${datasource.databaseDatasourceID}`;
+            const key = `datasource_${datasource.datasourceID}`;
             const isActive =
-              routeParam?.databaseDatasourceID ==
-              datasource.databaseDatasourceID;
+              routeParam?.datasourceID == datasource.datasourceID;
 
             return (
               <Link
                 to={CONSTANTS.ROUTES.UPDATE_DATASOURCE_BY_ID.path(
                   tenantID,
-                  datasource.databaseDatasourceID
+                  datasource.datasourceID
                 )}
                 key={key}
                 className="block mb-2 focus:outline-none "
@@ -69,8 +68,8 @@ export const DatasourceDrawerList = () => {
                       isActive ? "font-bold" : ""
                     } `}
                   >
-                    {/* {StringUtils.truncateName(datasource.databaseDatasourceTitle, 15)} */}
-                    {`${datasource.databaseDatasourceTitle}`}
+                    {/* {StringUtils.truncateName(datasource.datasourceTitle, 15)} */}
+                    {`${datasource.datasourceTitle}`}
                   </span>
                 </div>
               </Link>

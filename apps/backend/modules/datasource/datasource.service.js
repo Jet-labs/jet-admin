@@ -55,6 +55,7 @@ datasourceService.createDatasource = async ({
   userID,
   tenantID,
   datasourceTitle,
+  datasourceType,
   datasourceOptions,
 }) => {
   Logger.log("info", {
@@ -63,6 +64,7 @@ datasourceService.createDatasource = async ({
       userID,
       tenantID,
       datasourceTitle,
+      datasourceType,
       datasourceOptions,
     },
   });
@@ -71,6 +73,7 @@ datasourceService.createDatasource = async ({
       data: {
         tenantID: parseInt(tenantID),
         datasourceTitle,
+        datasourceType,
         datasourceOptions,
         creatorID: parseInt(userID),
       },
@@ -78,6 +81,7 @@ datasourceService.createDatasource = async ({
     Logger.log("success", {
       message: "datasourceService:createDatasource:success",
       params: {
+        tenantID,
         userID,
         newDatasource,
       },
@@ -87,6 +91,7 @@ datasourceService.createDatasource = async ({
     Logger.log("error", {
       message: "datasourceService:createDatasource:error",
       params: {
+        tenantID,
         userID,
         error,
       },
@@ -169,7 +174,7 @@ datasourceService.getDatasourceByID = async ({
       where: {
         datasourceID: parseInt(datasourceID),
         tenantID: parseInt(tenantID),
-        },
+      },
     });
     Logger.log("success", {
       message: "datasourceService:getDatasourceByID:success",
@@ -197,14 +202,18 @@ datasourceService.getDatasourceByID = async ({
  * @param {number} param0.userID
  * @param {number} param0.tenantID
  * @param {number} param0.datasourceID
- * @param {object} param0.datasource
+ * @param {string} param0.datasourceTitle
+ * @param {string} param0.datasourceType
+ * @param {object} param0.datasourceOptions
  * @returns {Promise<boolean>}
  */
 datasourceService.updateDatasourceByID = async ({
   userID,
   tenantID,
   datasourceID,
-  datasource,
+  datasourceTitle,
+  datasourceType,
+  datasourceOptions,
 }) => {
   Logger.log("info", {
     message: "datasourceService:updateDatasourceByID:params",
@@ -212,7 +221,9 @@ datasourceService.updateDatasourceByID = async ({
       userID,
       tenantID,
       datasourceID,
-      datasource,
+      datasourceTitle,
+      datasourceType,
+      datasourceOptions,
     },
   });
   try {
@@ -222,13 +233,10 @@ datasourceService.updateDatasourceByID = async ({
         tenantID: parseInt(tenantID),
       },
       data: {
-        datasourceName: datasource.datasourceName,
-        datasourceDescription: datasource.datasourceDescription,
-        datasourceType: datasource.datasourceType,
-        datasourceURL: datasource.datasourceURL,
-        datasourceUsername: datasource.datasourceUsername,
-        datasourcePassword: datasource.datasourcePassword,
-        datasourceSchema: datasource.datasourceSchema,
+        ...(datasourceTitle != undefined && { datasourceTitle }),
+        ...(datasourceType != undefined && { datasourceType }),
+        ...(datasourceOptions != undefined && { datasourceOptions }),
+        updatedAt: new Date(),
       },
     });
     Logger.log("success", {

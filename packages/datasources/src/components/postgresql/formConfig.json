@@ -90,22 +90,27 @@
         ]
       },
       {
-        "type": "Control",
-        "scope": "#/properties/database",
-        "label": "Database Name"
-      },
-      {
-        "type": "Control",
-        "scope": "#/properties/user",
-        "label": "Username"
-      },
-      {
-        "type": "Control",
-        "scope": "#/properties/password",
-        "label": "Password",
-        "options": {
-          "format": "password"
-        }
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/database",
+            "label": "Database Name"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/user",
+            "label": "Username"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/password",
+            "label": "Password",
+            "options": {
+              "format": "password"
+            }
+          }
+        ]
       },
       {
         "type": "Control",

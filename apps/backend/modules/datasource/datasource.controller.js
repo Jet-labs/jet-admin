@@ -58,7 +58,12 @@ datasourceController.createDatasource = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID } = req.params;
-    const { datasourceTitle, datasourceOptions } = req.body;
+    const {
+      datasourceTitle,
+      datasourceDescription,
+      datasourceType,
+      datasourceOptions,
+    } = req.body;
 
     Logger.log("info", {
       message: "datasourceController:createDatasource:params",
@@ -66,6 +71,8 @@ datasourceController.createDatasource = async (req, res) => {
         userID: user.userID,
         tenantID,
         datasourceTitle,
+        datasourceDescription,
+        datasourceType,
         datasourceOptions,
       },
     });
@@ -74,6 +81,8 @@ datasourceController.createDatasource = async (req, res) => {
       userID: parseInt(user.userID),
       tenantID,
       datasourceTitle,
+      datasourceDescription,
+      datasourceType,
       datasourceOptions,
     });
 
@@ -99,6 +108,69 @@ datasourceController.createDatasource = async (req, res) => {
     return expressUtils.sendResponse(res, false, {}, error);
   }
 };
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+datasourceController.updateDatasourceByID = async (req, res) => {
+  try {
+    const { user } = req;
+    const { tenantID, datasourceID } = req.params;
+    const {
+      datasourceTitle,
+      datasourceDescription,
+      datasourceType,
+      datasourceOptions,
+    } = req.body;
+
+    Logger.log("info", {
+      message: "datasourceController:updateDatasourceByID:params",
+      params: {
+        userID: user.userID,
+        tenantID,
+        datasourceID,
+        datasourceTitle,
+        datasourceDescription,
+        datasourceType,
+        datasourceOptions,
+      },
+    });
+
+    const datasource = await datasourceService.updateDatasourceByID({
+      userID: parseInt(user.userID),
+      tenantID,
+      datasourceID,
+      datasourceTitle,
+      datasourceDescription,
+      datasourceType,
+      datasourceOptions,
+    });
+
+    Logger.log("success", {
+      message: "datasourceController:updateDatasourceByID:success",
+      params: {
+        datasource,
+      },
+    });
+
+    return expressUtils.sendResponse(res, true, {
+      datasource,
+      message: "Datasource updated successfully.",
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "datasourceController:updateDatasourceByID:error",
+      params: {
+        error,
+      },
+    });
+
+    return expressUtils.sendResponse(res, false, {}, error);
+  }
+};
+
 
 module.exports = {
   datasourceController,
