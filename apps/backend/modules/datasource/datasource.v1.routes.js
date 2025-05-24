@@ -12,6 +12,11 @@ router.get(
   datasourceController.getAllDatasources
 );
 router.post(
+  "/test",
+  authMiddleware.checkUserPermissions(["tenant:datasource:test"]),
+  datasourceController.testDatasourceConnection
+);
+router.post(
   "/",
   authMiddleware.checkUserPermissions(["tenant:datasource:create"]),
   datasourceController.createDatasource

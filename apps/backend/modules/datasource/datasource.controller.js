@@ -1,3 +1,4 @@
+const constants = require("../../constants");
 const { expressUtils } = require("../../utils/express.utils");
 const Logger = require("../../utils/logger");
 const { datasourceService } = require("./datasource.service");
@@ -45,6 +46,63 @@ datasourceController.getAllDatasources = async (req, res) => {
       },
     });
 
+    return expressUtils.sendResponse(res, false, {}, error);
+  }
+};
+
+/**
+ *
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+datasourceController.testDatasourceConnection = async (req, res) => {
+  try {
+    const { user } = req;
+    const { tenantID } = req.params;
+    const { datasourceType, datasourceOptions } = req.body;
+
+    Logger.log("info", {
+      message: "datasourceController:testDatasourceConnection:params",
+      params: {
+        userID: user.userID,
+        tenantID,
+        datasourceType,
+        datasourceOptions,
+      },
+    });
+
+    const connectionResult = await datasourceService.testDatasourceConnection({
+      userID: parseInt(user.userID),
+      tenantID,
+      datasourceType,
+      datasourceOptions,
+    });
+
+    Logger.log("success", {
+      message: "datasourceController:testDatasourceConnection:success",
+      params: {
+        connectionResult,
+      },
+    });
+    if (connectionResult) {
+      return expressUtils.sendResponse(res, true, {
+        message: "Datasource connection tested successfully.",
+      });
+    } else {
+      return expressUtils.sendResponse(
+        res,
+        false,
+        {},
+        "Datasource connection failed."
+      );
+    }
+  } catch (error) {
+    Logger.log("error", {
+      message: "datasourceController:testDatasourceConnection:error",
+      params: {
+        error,
+      },
+    });
     return expressUtils.sendResponse(res, false, {}, error);
   }
 };
@@ -171,8 +229,6 @@ datasourceController.updateDatasourceByID = async (req, res) => {
   }
 };
 
-
 module.exports = {
   datasourceController,
 };
-

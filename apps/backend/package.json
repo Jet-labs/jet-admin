@@ -30,6 +30,7 @@
   "description": "",
   "dependencies": {
     "@google/generative-ai": "^0.24.0",
+    "@jet-admin/datasources-logic": "^1.0.0",
     "@jet-admin/widget-types": "^1.0.0",
     "@jet-admin/widgets": "^1.0.0",
     "@prisma/client": "^5.22.0",

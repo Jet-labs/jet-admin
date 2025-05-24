@@ -8,9 +8,6 @@ const Logger = require("../../utils/logger");
 const { tenantRoleService } = require("../tenantRole/tenantRole.service");
 const { databaseService } = require("../database/database.service");
 const {
-  databaseChartService,
-} = require("../databaseChart/databaseChart.service");
-const {
   databaseDashboardService,
 } = require("../databaseDashboard/databaseDashboard.service");
 const {

@@ -17,7 +17,7 @@
     "@emotion/styled": "^11.13.0",
     "@faker-js/faker": "^9.5.1",
     "@jet-admin/datasource-types": "^1.0.0",
-    "@jet-admin/datasources": "^1.0.0",
+    "@jet-admin/datasources-ui": "^1.0.0",
     "@jet-admin/widget-types": "^1.0.0",
     "@jet-admin/widgets": "^1.0.0",
     "@jsonforms/material-renderers": "^3.5.1",

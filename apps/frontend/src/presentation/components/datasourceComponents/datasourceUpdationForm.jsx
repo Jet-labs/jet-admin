@@ -11,13 +11,13 @@ import {
   ResizablePanelGroup,
 } from "../ui/resizable";
 import { CircularProgress } from "@mui/material";
-import { DATASOURCE_COMPONENTS } from "@jet-admin/datasources";
+import { DATASOURCE_UI_COMPONENTS } from "@jet-admin/datasources-ui";
 import { DATASOURCE_TYPES } from "@jet-admin/datasource-types";
 import { DatasourceEditor } from "./datasourceEditor";
 
 // --- Original Metadata (only for datasourceOptions) ---
 const datasourceOptionsMetadata =
-  DATASOURCE_COMPONENTS[DATASOURCE_TYPES.POSTGRESQL.value].formConfig;
+  DATASOURCE_UI_COMPONENTS[DATASOURCE_TYPES.POSTGRESQL.value].formConfig;
 
 export const DatasourceUpdationForm = ({ tenantID,datasourceID }) => {
   DatasourceUpdationForm.propTypes = {

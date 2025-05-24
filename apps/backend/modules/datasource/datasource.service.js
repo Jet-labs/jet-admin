@@ -1,5 +1,6 @@
 const Logger = require("../../utils/logger");
 const { prisma } = require("../../config/prisma.config");
+const { DATASOURCE_LOGIC_COMPONENTS } = require("@jet-admin/datasources-logic");
 
 const datasourceService = {};
 
@@ -43,6 +44,57 @@ datasourceService.getAllDatasources = async ({ userID, tenantID }) => {
     throw error;
   }
 };
+
+/**
+ *
+ * @param {object} param0
+ * @param {number} param0.userID
+ * @param {number} param0.tenantID
+ * @param {string} param0.datasourceType
+ * @param {object} param0.datasourceOptions
+ * @returns {Promise<boolean>}
+ */
+datasourceService.testDatasourceConnection = async ({
+  userID,
+  tenantID,
+  datasourceType,
+  datasourceOptions,
+}) => {
+  Logger.log("info", {
+    message: "datasourceService:testDatasourceConnection:params",
+    params: {
+      userID,
+      tenantID,
+      datasourceType,
+      datasourceOptions,
+    },
+  });
+  try {
+    const connectionResult = await DATASOURCE_LOGIC_COMPONENTS[
+      datasourceType
+    ].testConnection({
+      datasourceOptions,
+    });
+    Logger.log("success", {
+      message: "datasourceService:testDatasourceConnection:success",
+      params: {
+        userID,
+        connectionResult,
+      },
+    });
+    return connectionResult;
+  } catch (error) {
+    Logger.log("error", {
+      message: "datasourceService:testDatasourceConnection:error",
+      params: {
+        userID,
+        error,
+      },
+    });
+    throw error;
+  }
+};
+
 
 /**
  * @param {Object} param0

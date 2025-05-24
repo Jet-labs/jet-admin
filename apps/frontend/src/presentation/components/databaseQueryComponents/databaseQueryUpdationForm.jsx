@@ -23,7 +23,7 @@ import { formValidations } from "../../../utils/formValidation";
 import PropTypes from "prop-types";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import { DatabaseQueryCloneForm } from "./databaseQueryCloneForm";
-import { DATASOURCE_COMPONENTS } from "@jet-admin/datasources";
+import { DATASOURCE_UI_COMPONENTS } from "@jet-admin/datasources-ui";
 import { DATASOURCE_TYPES } from "@jet-admin/datasource-types";
 
 export const DatabaseQueryUpdationForm = ({ tenantID, databaseQueryID }) => {
@@ -298,7 +298,7 @@ export const DatabaseQueryUpdationForm = ({ tenantID, databaseQueryID }) => {
                       {`${queryUpdationForm.errors.databaseQueryString}`}
                     </label>
                   )}
-                  {DATASOURCE_COMPONENTS[
+                  {DATASOURCE_UI_COMPONENTS[
                     DATASOURCE_TYPES.POSTGRESQL.value
                   ].queryEditor({
                     query: queryUpdationForm.values.databaseQueryString,

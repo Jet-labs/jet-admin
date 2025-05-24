@@ -13,13 +13,14 @@ import {
 import {
   CircularProgress,
 } from "@mui/material";
-import {DATASOURCE_COMPONENTS} from "@jet-admin/datasources";
-import {DATASOURCE_TYPES} from "@jet-admin/datasource-types";
+import { DATASOURCE_UI_COMPONENTS } from "@jet-admin/datasources-ui";
+import { DATASOURCE_TYPES } from "@jet-admin/datasource-types";
 import { DatasourceEditor } from "./datasourceEditor";
-
+import { DatasourceTestingForm } from "./datasourceTestingForm";
 
 // --- Original Metadata (only for datasourceOptions) ---
-const datasourceOptionsMetadata = DATASOURCE_COMPONENTS[DATASOURCE_TYPES.POSTGRESQL.value].formConfig;
+const datasourceOptionsMetadata =
+  DATASOURCE_UI_COMPONENTS[DATASOURCE_TYPES.POSTGRESQL.value].formConfig;
 
 export const DatasourceAdditionForm = ({ tenantID }) => {
   DatasourceAdditionForm.propTypes = {
@@ -58,11 +59,10 @@ export const DatasourceAdditionForm = ({ tenantID }) => {
       datasourceOptions: datasourceOptionsMetadata.initialData, // Initialize nested object
     },
     onSubmit: (data) => {
-        console.log(data)
+      console.log(data);
       addDatasource(data);
     },
   });
-
 
   return (
     <div className="w-full flex flex-col justify-start items-center h-full">
@@ -86,16 +86,25 @@ export const DatasourceAdditionForm = ({ tenantID }) => {
             onSubmit={datasourceAdditionForm.handleSubmit}
           >
             <DatasourceEditor datasourceEditorForm={datasourceAdditionForm} />
-            <button
-              type="submit"
-              disabled={isAddingDatasource}
-              className="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none mt-4"
-            >
-              {isAddingDatasource && (
-                <CircularProgress className="!mr-3" size={16} color="white" />
-              )}
-              {CONSTANTS.STRINGS.ADD_DATASOURCE_BUTTON_TEXT}
-            </button>
+            <div className="flex flex-row justify-start items-center">
+              <DatasourceTestingForm
+                tenantID={tenantID}
+                datasourceType={datasourceAdditionForm.values.datasourceType}
+                datasourceOptions={
+                  datasourceAdditionForm.values.datasourceOptions
+                }
+              />
+              <button
+                type="submit"
+                disabled={isAddingDatasource}
+                className="flex flex-row justify-center items-center px-3 py-1.5 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none"
+              >
+                {isAddingDatasource && (
+                  <CircularProgress className="!mr-3" size={16} color="white" />
+                )}
+                {CONSTANTS.STRINGS.ADD_DATASOURCE_BUTTON_TEXT}
+              </button>
+            </div>
           </form>
         </ResizablePanel>
         <ResizableHandle withHandle={true} />

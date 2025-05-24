@@ -76,7 +76,7 @@ const CustomTextInput = (props) => {
   const isMulti = uischema?.options?.multi;
 
   return (
-    <div className="mb-2 w-full">
+    <div className="mb-2">
       <label
         htmlFor={path}
         className="block mb-1 text-xs font-medium text-slate-500"
@@ -110,7 +110,6 @@ const CustomTextInput = (props) => {
     </div>
   );
 };
-
 
 // --- Dynamic Custom Select Renderer ---
 const CustomSelectInput = (props) => {

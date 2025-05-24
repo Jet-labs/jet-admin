@@ -32,6 +32,45 @@ export const getAllDatasourcesAPI = async ({ tenantID }) => {
   }
 };
 
+export const testDatasourceConnectionAPI = async ({
+  tenantID,
+  datasourceType,
+  datasourceOptions,
+}) => {
+  try {
+    const url =
+      CONSTANTS.SERVER_HOST +
+      CONSTANTS.APIS.DATASOURCE.testDatasourceConnectionAPI(tenantID);
+    const bearerToken = await firebaseAuth.currentUser.getIdToken();
+    if (bearerToken) {
+      const response = await axios.post(
+        url,
+        {
+          datasourceType,
+          datasourceOptions,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${bearerToken}`,
+          },
+        }
+      );
+      if (response.data && response.data.success === true) {
+        return Boolean(response.data.connectionResult);
+      } else if (response.data.error) {
+        throw response.data.error;
+      } else {
+        throw CONSTANTS.ERROR_CODES.SERVER_ERROR;
+      }
+    } else {
+      throw CONSTANTS.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+
 export const createDatasourceAPI = async ({
   tenantID,
   datasourceTitle,

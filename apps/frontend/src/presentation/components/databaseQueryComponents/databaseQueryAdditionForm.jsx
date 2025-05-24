@@ -20,7 +20,7 @@ import {
 import { formValidations } from "../../../utils/formValidation";
 import { DatabaseQueryAIGeneratePrompt } from "./databaseQueryAIGeneratePrompt";
 import PropTypes from "prop-types";
-import { DATASOURCE_COMPONENTS } from "@jet-admin/datasources";
+import { DATASOURCE_UI_COMPONENTS } from "@jet-admin/datasources-ui";
 import { DATASOURCE_TYPES } from "@jet-admin/datasource-types";
 
 export const DatabaseQueryAdditionForm = ({ tenantID }) => {
@@ -203,7 +203,7 @@ export const DatabaseQueryAdditionForm = ({ tenantID }) => {
                     {`${queryAdditionForm.errors.databaseQueryString}`}
                   </label>
                 )}
-                {DATASOURCE_COMPONENTS[
+                {DATASOURCE_UI_COMPONENTS[
                   DATASOURCE_TYPES.POSTGRESQL.value
                 ].queryEditor({
                   query: queryAdditionForm.values.databaseQueryString,

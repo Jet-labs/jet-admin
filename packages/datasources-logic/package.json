@@ -1,0 +1,44 @@
+{
+  "name": "@jet-admin/datasources-logic",
+  "version": "1.0.0",
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "esbuild src/index.js --bundle --outfile=dist/index.mjs --loader:.js=jsx --format=esm --sourcemap --external:react --external:react-dom --external:@mui/material --external:@emotion/react --external:@emotion/styled --external:@mui/x-data-grid --platform=node && esbuild src/index.js --bundle --outfile=dist/index.cjs --loader:.js=jsx --format=cjs --sourcemap --external:react --external:react-dom --external:@mui/material --external:@emotion/react --external:@emotion/styled --external:@monaco-editor/react --external:@mui/x-data-grid --external:monaco-themes --platform=node",
+    "dev": "npm run build -- --watch",
+    "lint": "eslint .",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.x.x",
+    "@babel/preset-env": "^7.x.x",
+    "@rollup/plugin-babel": "^6.x.x",
+    "@rollup/plugin-commonjs": "^25.x.x",
+    "@rollup/plugin-node-resolve": "^15.x.x",
+    "esbuild": "^0.25.3",
+    "eslint": "^8.x.x",
+    "jest": "^29.x.x",
+    "rollup": "^4.x.x"
+  },
+  "peerDependencies": {
+    "@faker-js/faker": "^9.5.1",
+    "moment": "^2.30.1"
+  },
+  "publishConfig": {
+    "access": "restricted"
+  },
+  "dependencies": {
+    "winston": "^3.17.0"
+  }
+}

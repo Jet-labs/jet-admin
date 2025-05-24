@@ -409,6 +409,9 @@ export const CONSTANTS = {
     DATASOURCE_EDITOR_FORM_TYPE_FIELD_LABEL: "Data source type",
     DATASOURCE_EDITOR_FORM_TYPE_FIELD_PLACEHOLDER: "Select data source type",
 
+    TEST_QUERY_FORM_TEST_BUTTON: "Test query",
+    TEST_QUERY_FORM_QUERY_TESTING_SUCCESS: "Query run successfully!",
+
     // Labels
     ADD_QUERY_FORM_TITLE: "Add query",
     ADD_QUERY_FORM_QUERY_ADDITION_SUCCESS: "Query added successfully!",
@@ -440,8 +443,8 @@ export const CONSTANTS = {
     UPDATE_QUERY_FORM_UPDATE_DIALOG_MESSAGE:
       "Are you sure you want to update this item? This action cannot be undone.",
 
-    TEST_QUERY_FORM_TEST_BUTTON: "Test query",
-    TEST_QUERY_FORM_QUERY_TESTING_SUCCESS: "Query run successfully!",
+    TEST_DATASOURCE_FORM_TEST_BUTTON: "Test",
+    TEST_DATASOURCE_FORM_TESTING_SUCCESS: "Datasource connection success!",
 
     DELETE_QUERY_DELETION_SUCCESS: "Query deleted successfully!",
     DELETE_QUERY_DIALOG_TITLE: "Delete query",
