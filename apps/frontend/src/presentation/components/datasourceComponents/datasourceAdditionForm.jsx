@@ -1,5 +1,5 @@
 import { useFormik } from "formik";
-import React from "react";
+import React, { useState } from "react";
 import { createDatasourceAPI } from "../../../data/apis/datasource";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -10,9 +10,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "../ui/resizable";
-import {
-  CircularProgress,
-} from "@mui/material";
+import { CircularProgress } from "@mui/material";
 import { DATASOURCE_UI_COMPONENTS } from "@jet-admin/datasources-ui";
 import { DATASOURCE_TYPES } from "@jet-admin/datasource-types";
 import { DatasourceEditor } from "./datasourceEditor";
@@ -28,6 +26,7 @@ export const DatasourceAdditionForm = ({ tenantID }) => {
   };
 
   const queryClient = useQueryClient();
+  const [datasourceTestResult, setDatasourceTestResult] = useState();
 
   const { isPending: isAddingDatasource, mutate: addDatasource } = useMutation({
     mutationFn: (data) => {
@@ -93,6 +92,7 @@ export const DatasourceAdditionForm = ({ tenantID }) => {
                 datasourceOptions={
                   datasourceAdditionForm.values.datasourceOptions
                 }
+                setDatasourceTestResult={setDatasourceTestResult}
               />
               <button
                 type="submit"
@@ -108,7 +108,15 @@ export const DatasourceAdditionForm = ({ tenantID }) => {
           </form>
         </ResizablePanel>
         <ResizableHandle withHandle={true} />
-        <ResizablePanel defaultSize={80}></ResizablePanel>
+        <ResizablePanel defaultSize={80}>
+          {datasourceTestResult !== undefined || datasourceTestResult !== null
+            ? DATASOURCE_UI_COMPONENTS[
+                datasourceAdditionForm.values.datasourceType
+              ]?.datasourceTestResultUI({
+                connectionResult: datasourceTestResult,
+              })
+            : null}
+        </ResizablePanel>
       </ResizablePanelGroup>
     </div>
   );

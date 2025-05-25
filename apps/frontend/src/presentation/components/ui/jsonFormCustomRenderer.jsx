@@ -1,8 +1,22 @@
 // src/components/forms/customJSONFormRenderers.jsx
-import React from "react";
-import { JsonFormsDispatch, withJsonFormsControlProps, withJsonFormsLayoutProps } from "@jsonforms/react";
+
+import {
+  rankWith,
+  Resolve,
+  uiTypeIs,
+  // Make sure to import all necessary tester functions you use in 'and'
+} from "@jsonforms/core";
+import {
+  JsonFormsDispatch,
+  withJsonFormsControlProps,
+  withJsonFormsLayoutProps,
+} from "@jsonforms/react";
 import PropTypes from "prop-types";
-import { rankWith, Resolve, uiTypeIs } from "@jsonforms/core";
+import React, { useState } from "react";
+import { MdDeleteOutline } from "react-icons/md";
+
+// (Your CustomNumberInput, CustomTextInput, CustomSelectInput, CustomGroupLayout remain the same)
+// ... (paste them here from your provided code) ...
 
 const CustomNumberInput = (props) => {
   const {
@@ -69,7 +83,6 @@ const CustomNumberInput = (props) => {
   );
 };
 
-// --- Custom Text Renderer (no changes needed here, still good) ---
 const CustomTextInput = (props) => {
   const { data, path, handleChange, label, description, errors, uischema } =
     props;
@@ -111,7 +124,6 @@ const CustomTextInput = (props) => {
   );
 };
 
-// --- Dynamic Custom Select Renderer ---
 const CustomSelectInput = (props) => {
   const {
     data,
@@ -173,6 +185,7 @@ const CustomSelectInput = (props) => {
     </div>
   );
 };
+
 const CustomGroupLayout = (props) => {
   const { uischema, schema, path, visible, enabled, renderers } = props;
   const elements = uischema.elements;
@@ -188,7 +201,7 @@ const CustomGroupLayout = (props) => {
       className={`custom-group-container border p-3 mb-2 mt-1 rounded ${customClass}`}
     >
       {uischema.label && (
-        <h2 className="text-sm font-semibold text-slate-800 mb-2">
+        <h2 className="!text-sm font-semibold text-slate-800 mb-2">
           {uischema.label}
         </h2>
       )}
@@ -208,20 +221,191 @@ const CustomGroupLayout = (props) => {
   );
 };
 
+const CustomKeyValueArrayRenderer = ({
+  data,
+  path, // This 'path' is the absolute path to the array itself (e.g., 'root.headers')
+  handleChange,
+  schema, // This schema is for the array itself
+  uischema,
+  errors,
+  label,
+  enabled,
+  renderers,
+}) => {
+  const items = data || [];
+
+  // Determine the schema for an individual item based on the array schema
+  const itemSchema = schema.items;
+
+  const handleAddItem = () => {
+    const newItem = itemSchema.properties
+      ? Object.fromEntries(
+          Object.entries(itemSchema.properties).map(([key, propSchema]) => [
+            key,
+            propSchema.default !== undefined ? propSchema.default : "",
+          ])
+        )
+      : { key: "", value: "" };
+
+    handleChange(path, [...items, newItem]);
+  };
+
+  const handleRemoveItem = (index) => {
+    const newItems = items.filter((_, i) => i !== index);
+    handleChange(path, newItems);
+  };
+
+  return (
+    <div className="p-3 border border-slate-200 rounded bg-white shadow-sm">
+      <label className="block mb-2 text-sm font-medium text-slate-700">
+        {label || uischema.label || "Items"}
+      </label>
+      {errors && errors.length > 0 && (
+        <p className="text-red-500 text-xs mb-2">{errors}</p>
+      )}
+
+      <div className="space-y-3">
+        {items.map((item, index) => (
+          <div key={`${path}-${index}`} className="flex items-center space-x-2">
+            {/* Render 'key' field */}
+            <div className="flex-grow">
+              <JsonFormsDispatch
+                // For nested fields, the 'path' prop should be the *absolute path* to the data.
+                // The 'scope' in the uischema *could* be relative to the *root* schema,
+                // but passing the correct 'path' to the data is usually more robust.
+                // Here, we directly refer to the 'key' property of the item at the specific index.
+                uischema={{
+                  type: "Control",
+                  // The scope here refers to the path *within the item's schema itself*
+                  // NOT relative to the root schema.
+                  scope: "#/properties/key",
+                  label: "Key",
+                  options: uischema.options?.keyOptions,
+                }}
+                // Pass the schema for the *entire data object* (rootSchema) if you construct absolute paths.
+                // However, since we are setting `path` explicitly, `schema` here can be `itemSchema`
+                // and JsonForms will resolve relative to that.
+                schema={itemSchema} // The schema for the individual item object ({key, value})
+                path={`${path}.${index}.key`} // ABSOLUTE PATH TO THE 'KEY' DATA
+                enabled={enabled}
+                renderers={renderers}
+              />
+            </div>
+            {/* Render 'value' field */}
+            <div className="flex-grow">
+              <JsonFormsDispatch
+                uischema={{
+                  type: "Control",
+                  scope: "#/properties/value",
+                  label: "Value",
+                  options: uischema.options?.valueOptions,
+                }}
+                schema={itemSchema} // The schema for the individual item object ({key, value})
+                path={`${path}.${index}.value`} // ABSOLUTE PATH TO THE 'VALUE' DATA
+                enabled={enabled}
+                renderers={renderers}
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => handleRemoveItem(index)}
+              className="mt-3 p-2 rounded bg-red-100 text-red-400  focus:outline-none hover:border-red-400"
+              aria-label="Remove item"
+            >
+              <MdDeleteOutline />
+            </button>
+          </div>
+        ))}
+      </div>
+
+      <button
+        type="button"
+        onClick={handleAddItem}
+        className="mt-3 px-2 py-1 bg-white text-[#646cff] text-xs rounded hover:border-[#646cff] focus:outline-none border-slate-200"
+      >
+        Add Item
+      </button>
+    </div>
+  );
+};
+
+const CustomTabRenderer = (props) => {
+  const { uischema, schema, path, enabled, renderers, cells } = props;
+  const categories = uischema.elements;
+
+  const [activeTab, setActiveTab] = useState(0);
+
+  if (!categories || categories.length === 0) {
+    return null;
+  }
+
+  const activeCategory = categories[activeTab];
+
+  return (
+    <div className="custom-tabs-container mb-4">
+      {/* Tab Headers */}
+      <div className="flex border-slate-300">
+        {categories.map((category, index) => (
+          <button
+            key={category.label || `tab-${index}`}
+            className={`px-4 mr-2 py-2 text-sm font-medium rounded  ${
+              index === activeTab
+                ? "text-[#646cff] border-slate-200"
+                : "text-slate-700"
+            } focus:outline-none bg-white`}
+            onClick={() => setActiveTab(index)}
+            type="button"
+          >
+            {category.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Tab Content */}
+      <div className="p-3 border mt-3 border-slate-200 rounded bg-white">
+        {activeCategory?.elements.map((element, i) => (
+          <JsonFormsDispatch
+            key={i}
+            uischema={element}
+            schema={schema}
+            path={path}
+            enabled={enabled}
+            renderers={renderers}
+            cells={cells}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// Prop types for CustomTabRenderer
+
+// HOC wrapper for the tab renderer
+
+// --- NEW customTabRendererTester ---
+// This tester checks if the uischema is of type "Categorization"
+// and optionally if it has a specific option to trigger this custom renderer.
+
 export const MyCustomNumberInput = withJsonFormsControlProps(CustomNumberInput);
 export const MyCustomTextInput = withJsonFormsControlProps(CustomTextInput);
 export const MyCustomSelectInput = withJsonFormsControlProps(CustomSelectInput);
 export const MyCustomGroupLayout = withJsonFormsLayoutProps(CustomGroupLayout);
+export const MyCustomKeyValueArrayControl = withJsonFormsControlProps(
+  CustomKeyValueArrayRenderer
+);
+export const MyCustomTabRenderer = withJsonFormsLayoutProps(CustomTabRenderer);
 
+// PropTypes (slightly adjusted for errors prop being array of strings)
 CustomNumberInput.propTypes = {
   data: PropTypes.number,
   path: PropTypes.string.isRequired,
   handleChange: PropTypes.func.isRequired,
   label: PropTypes.string,
   description: PropTypes.string,
-  errors: PropTypes.string, // Corrected
+  errors: PropTypes.arrayOf(PropTypes.string), // Corrected to arrayOf(string)
   uischema: PropTypes.object.isRequired,
-  schema: PropTypes.object.isRequired, // `schema` (sub-schema) is provided by withJsonFormsControlProps
+  schema: PropTypes.object.isRequired,
 };
 
 CustomTextInput.propTypes = {
@@ -253,7 +437,33 @@ CustomGroupLayout.propTypes = {
   enabled: PropTypes.bool.isRequired,
   renderers: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
-// --- MODIFIED TESTER FUNCTIONS ---
+
+CustomKeyValueArrayRenderer.propTypes = {
+  data: PropTypes.arrayOf(PropTypes.object), // data is an array of objects ({key, value})
+  path: PropTypes.string.isRequired,
+  handleChange: PropTypes.func.isRequired,
+  schema: PropTypes.object.isRequired, // Schema for the array itself
+  uischema: PropTypes.object.isRequired,
+  label: PropTypes.string,
+  description: PropTypes.string, // Not usually passed to array renderers, but fine if it is.
+  errors: PropTypes.arrayOf(PropTypes.string),
+  enabled: PropTypes.bool, // Enabled can be optional as it might come from context
+  renderers: PropTypes.arrayOf(PropTypes.object).isRequired, // Must pass renderers down
+};
+
+CustomTabRenderer.propTypes = {
+  uischema: PropTypes.shape({
+    type: PropTypes.string.isRequired,
+    elements: PropTypes.arrayOf(PropTypes.object).isRequired,
+  }).isRequired,
+  schema: PropTypes.object.isRequired,
+  path: PropTypes.string.isRequired,
+  enabled: PropTypes.bool.isRequired,
+  renderers: PropTypes.arrayOf(PropTypes.object).isRequired,
+  cells: PropTypes.arrayOf(PropTypes.object), // <--- Add this propType
+};
+// --- TESTER FUNCTIONS (UNCHANGED, AS THEY SHOULD BE CORRECTED) ---
+
 // eslint-disable-next-line no-unused-vars
 const customNumberInputTester = (uischema, rootSchema, context) => {
   if (uischema.type !== "Control") {
@@ -261,20 +471,26 @@ const customNumberInputTester = (uischema, rootSchema, context) => {
   }
 
   try {
-    const currentSchema = Resolve.schema(rootSchema, uischema.scope, rootSchema);
+    const currentSchema = Resolve.schema(
+      rootSchema,
+      uischema.scope,
+      rootSchema
+    );
     if (!currentSchema) {
       return -1;
     }
 
-    // Target 'number' or 'integer' types, but not if it has an enum (could be a select)
     if (
       (currentSchema.type === "number" || currentSchema.type === "integer") &&
-      !currentSchema.enum // Don't use for enums, those might be better as selects
+      !currentSchema.enum
     ) {
-      return 10; // High priority
+      return 10;
     }
   } catch (e) {
-    console.warn(`Error resolving schema for scope ${uischema.scope} in customNumberInputTester:`, e);
+    console.warn(
+      `Error resolving schema for scope ${uischema.scope} in customNumberInputTester:`,
+      e
+    );
     return -1;
   }
   return -1;
@@ -282,13 +498,11 @@ const customNumberInputTester = (uischema, rootSchema, context) => {
 
 // eslint-disable-next-line no-unused-vars
 const customTextInputTester = (uischema, rootSchema, context) => {
-  // Check if the uischema is a Control
   if (uischema.type !== "Control") {
     return -1;
   }
 
   try {
-    // Resolve the specific schema for the control's scope
     const currentSchema = Resolve.schema(
       rootSchema,
       uischema.scope,
@@ -300,18 +514,13 @@ const customTextInputTester = (uischema, rootSchema, context) => {
       return -1;
     }
 
-    // Now use currentSchema for type checks
     if (
-      // Condition for datasourceDescription (if it were part of this JSONForm schema)
-      // (uischema.scope === "#/properties/datasourceDescription" && currentSchema.type === "string") ||
-
-      // Condition for password fields
       (currentSchema.format === "password" &&
         uischema.options?.format === "password") ||
-      // Condition for any general string control that is NOT an enum
       (currentSchema.type === "string" && !currentSchema.enum)
     ) {
-      return 10; // High priority
+      // Significantly increased rank for text inputs too
+      return 50; // <--- Changed from 10 to 50
     }
   } catch (e) {
     console.warn(
@@ -325,13 +534,11 @@ const customTextInputTester = (uischema, rootSchema, context) => {
 
 // eslint-disable-next-line no-unused-vars
 const customSelectInputTester = (uischema, rootSchema, context) => {
-  // Check if the uischema is a Control
   if (uischema.type !== "Control") {
     return -1;
   }
 
   try {
-    // Resolve the specific schema for the control's scope
     const currentSchema = Resolve.schema(
       rootSchema,
       uischema.scope,
@@ -339,14 +546,11 @@ const customSelectInputTester = (uischema, rootSchema, context) => {
     );
 
     if (!currentSchema) {
-      // console.warn('Could not resolve schema for', uischema.scope);
       return -1;
     }
 
-    // Now use currentSchema for type checks
-    // Use this renderer for any string field that has an `enum` property in its schema
     if (currentSchema.type === "string" && currentSchema.enum) {
-      return 10; // High priority for enum selects
+      return 10;
     }
   } catch (e) {
     console.warn(
@@ -359,11 +563,124 @@ const customSelectInputTester = (uischema, rootSchema, context) => {
 };
 
 const customGroupLayoutTester = (uischema) => {
-  // Use uiTypeIs helper for common UI Schema element types
   return rankWith(10, uiTypeIs("Group"))(uischema);
 };
 
+const customKeyValueArrayRendererTester = (uischema, rootSchema, context) => {
+  console.log("--- Testing customKeyValueArrayRendererTester ---");
+  console.log("uischema:", uischema);
+  console.log("context.path:", context.path); // Keep this log!
+
+  // 1. Must be a Control in the UI Schema
+  if (uischema.type !== "Control") {
+    console.log("Not a Control UI element. Returning -1.");
+    return -1;
+  }
+
+  try {
+    // 2. Resolve the schema for the current scope (the array itself)
+    const currentArraySchema = Resolve.schema(
+      rootSchema,
+      uischema.scope,
+      rootSchema
+    );
+
+    console.log("Resolved currentArraySchema:", currentArraySchema);
+
+    if (!currentArraySchema) {
+      console.log("Could not resolve array schema. Returning -1.");
+      return -1;
+    }
+
+    // 3. Check if the resolved schema is an array
+    if (currentArraySchema.type !== "array") {
+      console.log("Schema is not an array. Returning -1.");
+      return -1;
+    }
+
+    // 4. Check the schema of the items within the array
+    const itemSchema = currentArraySchema.items;
+    console.log("Resolved itemSchema:", itemSchema);
+
+    if (
+      !itemSchema ||
+      typeof itemSchema !== "object" ||
+      Array.isArray(itemSchema)
+    ) {
+      console.log("Items are not an object schema. Returning -1.");
+      return -1;
+    }
+
+    // 5. Check if 'key' and 'value' properties exist and are strings within the item schema
+    const hasKeyProp = itemSchema.properties?.key?.type === "string";
+    const hasValueProp = itemSchema.properties?.value?.type === "string";
+
+    console.log("hasKeyProp:", hasKeyProp, "hasValueProp:", hasValueProp);
+
+    if (!hasKeyProp || !hasValueProp) {
+      console.log(
+        "Item schema does not have string 'key' and 'value' properties. Returning -1."
+      );
+      return -1;
+    }
+
+    // --- MODIFIED LOGIC FOR TARGET SCOPE CHECK ---
+    // If context.path is undefined, we can't use it directly.
+    // Instead, rely on the uischema.scope which should always be present for a Control.
+    const scopeString = uischema.scope; // e.g., '#/properties/headers'
+    let isTargetScope = false;
+
+    if (scopeString) {
+      // Extract the last part of the scope, e.g., 'headers' from '#/properties/headers'
+      const scopeSegments = scopeString.split("/");
+      const lastScopeSegment = scopeSegments[scopeSegments.length - 1];
+      isTargetScope =
+        lastScopeSegment === "headers" || lastScopeSegment === "queryParams";
+    }
+
+    console.log(
+      "uischema.scope:",
+      uischema.scope,
+      "Is target scope (headers/queryParams):",
+      isTargetScope
+    );
+
+    if (!isTargetScope) {
+      console.log(
+        "uischema.scope does not point to 'headers' or 'queryParams'. Returning -1."
+      );
+      return -1;
+    }
+
+    // If all conditions pass, return a high rank
+    console.log("All conditions met! Returning rank 50.");
+    return 50;
+  } catch (e) {
+    console.warn(
+      `Error resolving schema for scope ${uischema.scope} in customKeyValueArrayRendererTester:`,
+      e
+    );
+    return -1;
+  }
+};
+
+const customTabRendererTester = (uischema) => {
+  // Check if it's a Categorization UI schema type
+  if (uischema.type === "Categorization") {
+    // You can add more specific checks here if needed,
+    // e.g., uischema.options?.variant === 'customTabs'
+    // For now, let's make it pick up all Categorization UIs.
+    // Return a high rank to ensure it overrides default Categorization renderers.
+    return 50; // Increased rank
+  }
+  return -1;
+};
+
 export const customJSONFormRenderers = [
+  {
+    tester: customTabRendererTester, // Keep this high and early
+    renderer: MyCustomTabRenderer,
+  },
   {
     tester: customNumberInputTester,
     renderer: MyCustomNumberInput,
@@ -379,5 +696,9 @@ export const customJSONFormRenderers = [
   {
     tester: customGroupLayoutTester,
     renderer: MyCustomGroupLayout,
+  },
+  {
+    tester: customKeyValueArrayRendererTester,
+    renderer: MyCustomKeyValueArrayControl,
   },
 ];

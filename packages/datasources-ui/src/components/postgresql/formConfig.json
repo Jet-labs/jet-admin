@@ -2,150 +2,233 @@
   "schema": {
     "type": "object",
     "properties": {
-      "connectionName": {
+      "connectionOption": {
         "type": "string",
-        "description": "A unique name for this data source connection.",
-        "minLength": 3
+        "enum": ["connectionDetails", "connectionString"],
+        "default": "connectionDetails",
+        "description": "Choose to enter connection details or a connection string."
       },
-      "host": {
-        "type": "string",
-        "description": "The hostname or IP address of the PostgreSQL server.",
-        "format": "hostname"
-      },
-      "port": {
-        "type": "integer",
-        "description": "The port number of the PostgreSQL server (default is 5432).",
-        "minimum": 1,
-        "maximum": 65535,
-        "default": 5432
-      },
-      "database": {
-        "type": "string",
-        "description": "The name of the database to connect to.",
-        "minLength": 1
-      },
-      "user": {
-        "type": "string",
-        "description": "The username for connecting to the database.",
-        "minLength": 1
-      },
-      "password": {
-        "type": "string",
-        "description": "The password for the specified user.",
-        "format": "password"
-      },
-      "sslMode": {
-        "type": "string",
-        "description": "SSL mode for the connection.",
-        "enum": [
-          "disable",
-          "allow",
-          "prefer",
-          "require",
-          "verify-ca",
-          "verify-full"
-        ],
-        "default": "prefer"
-      },
-      "additionalOptions": {
+      "connectionDetails": {
         "type": "object",
-        "description": "Additional connection options (e.g., timeout, application name).",
         "properties": {
-          "connectTimeout": {
-            "type": "integer",
-            "description": "Connection timeout in seconds.",
-            "minimum": 0
-          },
-          "applicationName": {
+          "connectionName": {
             "type": "string",
-            "description": "Application name to be sent to the server."
+            "description": "A unique name for this data source connection.",
+            "minLength": 3
+          },
+          "host": {
+            "type": "string",
+            "description": "The hostname or IP address of the PostgreSQL server.",
+            "format": "hostname"
+          },
+          "port": {
+            "type": "integer",
+            "description": "The port number of the PostgreSQL server (default is 5432).",
+            "minimum": 1,
+            "maximum": 65535,
+            "default": 5432
+          },
+          "database": {
+            "type": "string",
+            "description": "The name of the database to connect to.",
+            "minLength": 1
+          },
+          "user": {
+            "type": "string",
+            "description": "The username for connecting to the database.",
+            "minLength": 1
+          },
+          "password": {
+            "type": "string",
+            "description": "The password for the specified user.",
+            "format": "password"
+          },
+          "sslMode": {
+            "type": "string",
+            "description": "SSL mode for the connection.",
+            "enum": [
+              "disable",
+              "allow",
+              "prefer",
+              "require",
+              "verify-ca",
+              "verify-full"
+            ],
+            "default": "prefer"
+          },
+          "additionalOptions": {
+            "type": "object",
+            "description": "Additional connection options (e.g., timeout, application name).",
+            "properties": {
+              "connectTimeout": {
+                "type": "integer",
+                "description": "Connection timeout in seconds.",
+                "minimum": 0
+              },
+              "applicationName": {
+                "type": "string",
+                "description": "Application name to be sent to the server."
+              }
+            },
+            "additionalProperties": true
           }
         },
-        "additionalProperties": true
+        "required": ["connectionName", "host", "database", "user", "password"]
+      },
+      "connectionString": {
+        "type": "string",
+        "description": "The full PostgreSQL connection string (e.g., 'postgresql://user:password@host:port/database').",
+        "minLength": 1
       }
     },
-    "required": ["connectionName", "host", "database", "user", "password"]
+    "required": ["connectionOption"],
+    "allOf": [
+      {
+        "if": {
+          "properties": {
+            "connectionOption": {
+              "const": "connectionDetails"
+            }
+          }
+        },
+        "then": {
+          "required": ["connectionDetails"]
+        }
+      },
+      {
+        "if": {
+          "properties": {
+            "connectionOption": {
+              "const": "connectionString"
+            }
+          }
+        },
+        "then": {
+          "required": ["connectionString"]
+        }
+      }
+    ]
   },
   "uischema": {
     "type": "VerticalLayout",
     "elements": [
       {
-        "type": "HorizontalLayout",
-        "elements": [
-          {
-            "type": "Control",
-            "scope": "#/properties/connectionName",
-            "label": "Connection Name"
-          },
-          {
-            "type": "Control",
-            "scope": "#/properties/host",
-            "label": "Host"
-          },
-          {
-            "type": "Control",
-            "scope": "#/properties/port",
-            "label": "Port"
-          }
-        ]
-      },
-      {
-        "type": "HorizontalLayout",
-        "elements": [
-          {
-            "type": "Control",
-            "scope": "#/properties/database",
-            "label": "Database Name"
-          },
-          {
-            "type": "Control",
-            "scope": "#/properties/user",
-            "label": "Username"
-          },
-          {
-            "type": "Control",
-            "scope": "#/properties/password",
-            "label": "Password",
-            "options": {
-              "format": "password"
-            }
-          }
-        ]
-      },
-      {
         "type": "Control",
-        "scope": "#/properties/sslMode",
-        "label": "SSL Mode"
+        "scope": "#/properties/connectionOption",
+        "label": "Connection Type"
       },
       {
         "type": "Group",
-        "label": "Advanced Options",
+        "label": "Connection Details",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/connectionOption",
+            "schema": { "const": "connectionDetails" }
+          }
+        },
         "elements": [
           {
-            "type": "Control",
-            "scope": "#/properties/additionalOptions/properties/connectTimeout",
-            "label": "Connection Timeout (seconds)"
+            "type": "HorizontalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/connectionName",
+                "label": "Connection Name"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/host",
+                "label": "Host"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/port",
+                "label": "Port"
+              }
+            ]
+          },
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/database",
+                "label": "Database Name"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/user",
+                "label": "Username"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/password",
+                "label": "Password",
+                "options": {
+                  "format": "password"
+                }
+              }
+            ]
           },
           {
             "type": "Control",
-            "scope": "#/properties/additionalOptions/properties/applicationName",
-            "label": "Application Name"
+            "scope": "#/properties/connectionDetails/properties/sslMode",
+            "label": "SSL Mode"
+          },
+          {
+            "type": "Group",
+            "label": "Advanced Options",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/additionalOptions/properties/connectTimeout",
+                "label": "Connection Timeout (seconds)"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/additionalOptions/properties/applicationName",
+                "label": "Application Name"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Connection String",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/connectionOption",
+            "schema": { "const": "connectionString" }
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/connectionString",
+            "label": "Connection String"
           }
         ]
       }
     ]
   },
   "data": {
-    "connectionName": "MyDevPostgres",
-    "host": "localhost",
-    "port": 5432,
-    "database": "mydatabase",
-    "user": "dbuser",
-    "password": "securepassword",
-    "sslMode": "prefer",
-    "additionalOptions": {
-      "connectTimeout": 10,
-      "applicationName": "JSONFormsApp"
-    }
+    "connectionOption": "connectionDetails",
+    "connectionDetails": {
+      "connectionName": "MyDevPostgres",
+      "host": "localhost",
+      "port": 5432,
+      "database": "mydatabase",
+      "user": "dbuser",
+      "password": "securepassword",
+      "sslMode": "prefer",
+      "additionalOptions": {
+        "connectTimeout": 10,
+        "applicationName": "JSONFormsApp"
+      }
+    },
+    "connectionString": ""
   }
 }

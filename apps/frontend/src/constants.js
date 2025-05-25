@@ -408,6 +408,7 @@ export const CONSTANTS = {
       "Your data source description (optional)",
     DATASOURCE_EDITOR_FORM_TYPE_FIELD_LABEL: "Data source type",
     DATASOURCE_EDITOR_FORM_TYPE_FIELD_PLACEHOLDER: "Select data source type",
+    DATASOURCE_EDITOR_FORM_CONNECTION_DETAILS_FIELD_LABEL: "Connection details",
 
     TEST_QUERY_FORM_TEST_BUTTON: "Test query",
     TEST_QUERY_FORM_QUERY_TESTING_SUCCESS: "Query run successfully!",

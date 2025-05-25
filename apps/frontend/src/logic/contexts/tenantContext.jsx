@@ -51,7 +51,7 @@ const TenantContextProvider = ({ children }) => {
         tenants,
         isFetchingTenants,
         isRefetchingTenants,
-        isLoadingTenants,
+        isLoadingTenants: isLoadingTenants || !user,
         tenantsError,
       }}
     >

@@ -224,7 +224,7 @@ datasourceService.getDatasourceByID = async ({
   try {
     const datasource = await prisma.tblDatasources.findUnique({
       where: {
-        datasourceID: parseInt(datasourceID),
+        datasourceID: datasourceID,
         tenantID: parseInt(tenantID),
       },
     });
@@ -281,7 +281,7 @@ datasourceService.updateDatasourceByID = async ({
   try {
     await prisma.tblDatasources.update({
       where: {
-        datasourceID: parseInt(datasourceID),
+        datasourceID: datasourceID,
         tenantID: parseInt(tenantID),
       },
       data: {

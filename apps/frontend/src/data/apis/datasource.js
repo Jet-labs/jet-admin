@@ -70,6 +70,32 @@ export const testDatasourceConnectionAPI = async ({
   }
 };
 
+export const getDatasourceByIDAPI = async ({ tenantID, datasourceID }) => {
+  try {
+    const url =
+      CONSTANTS.SERVER_HOST +
+      CONSTANTS.APIS.DATASOURCE.getDatasourceByIDAPI(tenantID, datasourceID);
+    const bearerToken = await firebaseAuth.currentUser.getIdToken();
+    if (bearerToken) {
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${bearerToken}`,
+        },
+      });
+      if (response.data && response.data.success === true) {
+        return new Datasource(response.data.datasource);
+      } else if (response.data.error) {
+        throw response.data.error;
+      } else {
+        throw CONSTANTS.ERROR_CODES.SERVER_ERROR;
+      }
+    } else {
+      throw CONSTANTS.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
 
 export const createDatasourceAPI = async ({
   tenantID,

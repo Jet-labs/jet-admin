@@ -9,14 +9,15 @@ import PropTypes from "prop-types";
 export const DatasourceTestingForm = ({
   tenantID,
   datasourceType,
-  datasourceOptions
+  datasourceOptions,
+  setDatasourceTestResult,
 }) => {
   DatasourceTestingForm.propTypes = {
     tenantID: PropTypes.number.isRequired,
     datasourceType: PropTypes.string.isRequired,
     datasourceOptions: PropTypes.object.isRequired,
+    setDatasourceTestResult: PropTypes.func.isRequired,
   };
-  
 
   const { isPending: isTestingDatasource, mutate: testDatasource } =
     useMutation({
@@ -29,9 +30,11 @@ export const DatasourceTestingForm = ({
       },
       retry: false,
       onSuccess: () => {
+        setDatasourceTestResult(true);
         displaySuccess(CONSTANTS.STRINGS.TEST_DATASOURCE_FORM_TESTING_SUCCESS);
       },
       onError: (error) => {
+        setDatasourceTestResult(false);
         displayError(error);
       },
     });
@@ -40,10 +43,8 @@ export const DatasourceTestingForm = ({
     testDatasource();
   };
 
-
   return (
     <>
-      
       <button
         onClick={_handleTestQuery}
         disabled={isTestingDatasource}

@@ -108,6 +108,53 @@ datasourceController.testDatasourceConnection = async (req, res) => {
 };
 
 /**
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+datasourceController.getDatasourceByID = async (req, res) => {
+  try {
+    const { user } = req;
+    const { tenantID, datasourceID } = req.params;
+
+    Logger.log("info", {
+      message: "datasourceController:getDatasourceByID:params",
+      params: {
+        userID: user.userID,
+        tenantID,
+        datasourceID,
+      },
+    });
+
+    const datasource = await datasourceService.getDatasourceByID({
+      userID: parseInt(user.userID),
+      tenantID,
+      datasourceID,
+    });
+
+    Logger.log("success", {
+      message: "datasourceController:getDatasourceByID:success",
+      params: {
+        datasource,
+      },
+    });
+
+    return expressUtils.sendResponse(res, true, {
+      datasource,
+      message: "Datasource fetched successfully.",
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "datasourceController:getDatasourceByID:error",
+      params: {
+        error,
+      },
+    });
+
+    return expressUtils.sendResponse(res, false, {}, error);
+  }
+};
+
+/**
  *
  * @param {import("express").Request} req
  * @param {import("express").Response} res

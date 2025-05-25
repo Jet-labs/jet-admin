@@ -51,32 +51,6 @@ export const DatasourceEditor = ({ datasourceEditorForm }) => {
       </div>
       <div>
         <label
-          htmlFor="datasourceDescription"
-          className="block mb-1 text-xs font-medium text-slate-500"
-        >
-          {CONSTANTS.STRINGS.DATASOURCE_EDITOR_FORM_DESCRIPTION_FIELD_LABEL}
-        </label>
-        {datasourceEditorForm.errors.datasourceDescription && (
-          <span className="text-red-500 text-xs">
-            {datasourceEditorForm.errors.datasourceDescription}
-          </span>
-        )}
-        <input
-          type="text"
-          name="datasourceDescription"
-          id="datasourceDescription"
-          className=" placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:border-slate-700 block w-full px-2.5 py-1.5 "
-          placeholder={
-            CONSTANTS.STRINGS
-              .DATASOURCE_EDITOR_FORM_DESCRIPTION_FIELD_PLACEHOLDER
-          }
-          onChange={datasourceEditorForm.handleChange}
-          onBlur={datasourceEditorForm.handleBlur}
-          value={datasourceEditorForm.values.datasourceDescription}
-        />
-      </div>
-      <div>
-        <label
           htmlFor="datasourceType"
           className="block mb-1 text-xs font-medium text-slate-500"
         >
@@ -109,8 +83,11 @@ export const DatasourceEditor = ({ datasourceEditorForm }) => {
       {/* JSON Forms for datasourceOptions */}
       {DATASOURCE_UI_COMPONENTS[datasourceEditorForm.values.datasourceType] && (
         <>
-          <h2 className="text-lg font-bold mt-6 mb-2 text-slate-700">
-            Connection Details
+          <h2 className="text-base font-bold mt-6 !-mb-3 text-slate-700">
+            {
+              CONSTANTS.STRINGS
+                .DATASOURCE_EDITOR_FORM_CONNECTION_DETAILS_FIELD_LABEL
+            }
           </h2>
           <JsonForms
             schema={
