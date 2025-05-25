@@ -32,783 +32,6 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 ));
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 
-// ../../node_modules/prop-types/node_modules/react-is/cjs/react-is.development.js
-var require_react_is_development = __commonJS({
-  "../../node_modules/prop-types/node_modules/react-is/cjs/react-is.development.js"(exports) {
-    "use strict";
-    if (true) {
-      (function() {
-        "use strict";
-        var hasSymbol = typeof Symbol === "function" && Symbol.for;
-        var REACT_ELEMENT_TYPE = hasSymbol ? Symbol.for("react.element") : 60103;
-        var REACT_PORTAL_TYPE = hasSymbol ? Symbol.for("react.portal") : 60106;
-        var REACT_FRAGMENT_TYPE = hasSymbol ? Symbol.for("react.fragment") : 60107;
-        var REACT_STRICT_MODE_TYPE = hasSymbol ? Symbol.for("react.strict_mode") : 60108;
-        var REACT_PROFILER_TYPE = hasSymbol ? Symbol.for("react.profiler") : 60114;
-        var REACT_PROVIDER_TYPE = hasSymbol ? Symbol.for("react.provider") : 60109;
-        var REACT_CONTEXT_TYPE = hasSymbol ? Symbol.for("react.context") : 60110;
-        var REACT_ASYNC_MODE_TYPE = hasSymbol ? Symbol.for("react.async_mode") : 60111;
-        var REACT_CONCURRENT_MODE_TYPE = hasSymbol ? Symbol.for("react.concurrent_mode") : 60111;
-        var REACT_FORWARD_REF_TYPE = hasSymbol ? Symbol.for("react.forward_ref") : 60112;
-        var REACT_SUSPENSE_TYPE = hasSymbol ? Symbol.for("react.suspense") : 60113;
-        var REACT_SUSPENSE_LIST_TYPE = hasSymbol ? Symbol.for("react.suspense_list") : 60120;
-        var REACT_MEMO_TYPE = hasSymbol ? Symbol.for("react.memo") : 60115;
-        var REACT_LAZY_TYPE = hasSymbol ? Symbol.for("react.lazy") : 60116;
-        var REACT_BLOCK_TYPE = hasSymbol ? Symbol.for("react.block") : 60121;
-        var REACT_FUNDAMENTAL_TYPE = hasSymbol ? Symbol.for("react.fundamental") : 60117;
-        var REACT_RESPONDER_TYPE = hasSymbol ? Symbol.for("react.responder") : 60118;
-        var REACT_SCOPE_TYPE = hasSymbol ? Symbol.for("react.scope") : 60119;
-        function isValidElementType(type7) {
-          return typeof type7 === "string" || typeof type7 === "function" || // Note: its typeof might be other than 'symbol' or 'number' if it's a polyfill.
-          type7 === REACT_FRAGMENT_TYPE || type7 === REACT_CONCURRENT_MODE_TYPE || type7 === REACT_PROFILER_TYPE || type7 === REACT_STRICT_MODE_TYPE || type7 === REACT_SUSPENSE_TYPE || type7 === REACT_SUSPENSE_LIST_TYPE || typeof type7 === "object" && type7 !== null && (type7.$$typeof === REACT_LAZY_TYPE || type7.$$typeof === REACT_MEMO_TYPE || type7.$$typeof === REACT_PROVIDER_TYPE || type7.$$typeof === REACT_CONTEXT_TYPE || type7.$$typeof === REACT_FORWARD_REF_TYPE || type7.$$typeof === REACT_FUNDAMENTAL_TYPE || type7.$$typeof === REACT_RESPONDER_TYPE || type7.$$typeof === REACT_SCOPE_TYPE || type7.$$typeof === REACT_BLOCK_TYPE);
-        }
-        function typeOf(object) {
-          if (typeof object === "object" && object !== null) {
-            var $$typeof = object.$$typeof;
-            switch ($$typeof) {
-              case REACT_ELEMENT_TYPE:
-                var type7 = object.type;
-                switch (type7) {
-                  case REACT_ASYNC_MODE_TYPE:
-                  case REACT_CONCURRENT_MODE_TYPE:
-                  case REACT_FRAGMENT_TYPE:
-                  case REACT_PROFILER_TYPE:
-                  case REACT_STRICT_MODE_TYPE:
-                  case REACT_SUSPENSE_TYPE:
-                    return type7;
-                  default:
-                    var $$typeofType = type7 && type7.$$typeof;
-                    switch ($$typeofType) {
-                      case REACT_CONTEXT_TYPE:
-                      case REACT_FORWARD_REF_TYPE:
-                      case REACT_LAZY_TYPE:
-                      case REACT_MEMO_TYPE:
-                      case REACT_PROVIDER_TYPE:
-                        return $$typeofType;
-                      default:
-                        return $$typeof;
-                    }
-                }
-              case REACT_PORTAL_TYPE:
-                return $$typeof;
-            }
-          }
-          return void 0;
-        }
-        var AsyncMode = REACT_ASYNC_MODE_TYPE;
-        var ConcurrentMode = REACT_CONCURRENT_MODE_TYPE;
-        var ContextConsumer = REACT_CONTEXT_TYPE;
-        var ContextProvider = REACT_PROVIDER_TYPE;
-        var Element6 = REACT_ELEMENT_TYPE;
-        var ForwardRef = REACT_FORWARD_REF_TYPE;
-        var Fragment = REACT_FRAGMENT_TYPE;
-        var Lazy = REACT_LAZY_TYPE;
-        var Memo = REACT_MEMO_TYPE;
-        var Portal = REACT_PORTAL_TYPE;
-        var Profiler = REACT_PROFILER_TYPE;
-        var StrictMode = REACT_STRICT_MODE_TYPE;
-        var Suspense = REACT_SUSPENSE_TYPE;
-        var hasWarnedAboutDeprecatedIsAsyncMode = false;
-        function isAsyncMode(object) {
-          {
-            if (!hasWarnedAboutDeprecatedIsAsyncMode) {
-              hasWarnedAboutDeprecatedIsAsyncMode = true;
-              console["warn"]("The ReactIs.isAsyncMode() alias has been deprecated, and will be removed in React 17+. Update your code to use ReactIs.isConcurrentMode() instead. It has the exact same API.");
-            }
-          }
-          return isConcurrentMode(object) || typeOf(object) === REACT_ASYNC_MODE_TYPE;
-        }
-        function isConcurrentMode(object) {
-          return typeOf(object) === REACT_CONCURRENT_MODE_TYPE;
-        }
-        function isContextConsumer(object) {
-          return typeOf(object) === REACT_CONTEXT_TYPE;
-        }
-        function isContextProvider(object) {
-          return typeOf(object) === REACT_PROVIDER_TYPE;
-        }
-        function isElement(object) {
-          return typeof object === "object" && object !== null && object.$$typeof === REACT_ELEMENT_TYPE;
-        }
-        function isForwardRef(object) {
-          return typeOf(object) === REACT_FORWARD_REF_TYPE;
-        }
-        function isFragment(object) {
-          return typeOf(object) === REACT_FRAGMENT_TYPE;
-        }
-        function isLazy(object) {
-          return typeOf(object) === REACT_LAZY_TYPE;
-        }
-        function isMemo(object) {
-          return typeOf(object) === REACT_MEMO_TYPE;
-        }
-        function isPortal(object) {
-          return typeOf(object) === REACT_PORTAL_TYPE;
-        }
-        function isProfiler(object) {
-          return typeOf(object) === REACT_PROFILER_TYPE;
-        }
-        function isStrictMode(object) {
-          return typeOf(object) === REACT_STRICT_MODE_TYPE;
-        }
-        function isSuspense(object) {
-          return typeOf(object) === REACT_SUSPENSE_TYPE;
-        }
-        exports.AsyncMode = AsyncMode;
-        exports.ConcurrentMode = ConcurrentMode;
-        exports.ContextConsumer = ContextConsumer;
-        exports.ContextProvider = ContextProvider;
-        exports.Element = Element6;
-        exports.ForwardRef = ForwardRef;
-        exports.Fragment = Fragment;
-        exports.Lazy = Lazy;
-        exports.Memo = Memo;
-        exports.Portal = Portal;
-        exports.Profiler = Profiler;
-        exports.StrictMode = StrictMode;
-        exports.Suspense = Suspense;
-        exports.isAsyncMode = isAsyncMode;
-        exports.isConcurrentMode = isConcurrentMode;
-        exports.isContextConsumer = isContextConsumer;
-        exports.isContextProvider = isContextProvider;
-        exports.isElement = isElement;
-        exports.isForwardRef = isForwardRef;
-        exports.isFragment = isFragment;
-        exports.isLazy = isLazy;
-        exports.isMemo = isMemo;
-        exports.isPortal = isPortal;
-        exports.isProfiler = isProfiler;
-        exports.isStrictMode = isStrictMode;
-        exports.isSuspense = isSuspense;
-        exports.isValidElementType = isValidElementType;
-        exports.typeOf = typeOf;
-      })();
-    }
-  }
-});
-
-// ../../node_modules/prop-types/node_modules/react-is/index.js
-var require_react_is = __commonJS({
-  "../../node_modules/prop-types/node_modules/react-is/index.js"(exports, module2) {
-    "use strict";
-    if (false) {
-      module2.exports = null;
-    } else {
-      module2.exports = require_react_is_development();
-    }
-  }
-});
-
-// ../../node_modules/object-assign/index.js
-var require_object_assign = __commonJS({
-  "../../node_modules/object-assign/index.js"(exports, module2) {
-    "use strict";
-    var getOwnPropertySymbols = Object.getOwnPropertySymbols;
-    var hasOwnProperty = Object.prototype.hasOwnProperty;
-    var propIsEnumerable = Object.prototype.propertyIsEnumerable;
-    function toObject(val) {
-      if (val === null || val === void 0) {
-        throw new TypeError("Object.assign cannot be called with null or undefined");
-      }
-      return Object(val);
-    }
-    function shouldUseNative() {
-      try {
-        if (!Object.assign) {
-          return false;
-        }
-        var test1 = new String("abc");
-        test1[5] = "de";
-        if (Object.getOwnPropertyNames(test1)[0] === "5") {
-          return false;
-        }
-        var test2 = {};
-        for (var i = 0; i < 10; i++) {
-          test2["_" + String.fromCharCode(i)] = i;
-        }
-        var order2 = Object.getOwnPropertyNames(test2).map(function(n) {
-          return test2[n];
-        });
-        if (order2.join("") !== "0123456789") {
-          return false;
-        }
-        var test3 = {};
-        "abcdefghijklmnopqrst".split("").forEach(function(letter) {
-          test3[letter] = letter;
-        });
-        if (Object.keys(Object.assign({}, test3)).join("") !== "abcdefghijklmnopqrst") {
-          return false;
-        }
-        return true;
-      } catch (err) {
-        return false;
-      }
-    }
-    module2.exports = shouldUseNative() ? Object.assign : function(target, source) {
-      var from3;
-      var to = toObject(target);
-      var symbols;
-      for (var s = 1; s < arguments.length; s++) {
-        from3 = Object(arguments[s]);
-        for (var key in from3) {
-          if (hasOwnProperty.call(from3, key)) {
-            to[key] = from3[key];
-          }
-        }
-        if (getOwnPropertySymbols) {
-          symbols = getOwnPropertySymbols(from3);
-          for (var i = 0; i < symbols.length; i++) {
-            if (propIsEnumerable.call(from3, symbols[i])) {
-              to[symbols[i]] = from3[symbols[i]];
-            }
-          }
-        }
-      }
-      return to;
-    };
-  }
-});
-
-// ../../node_modules/prop-types/lib/ReactPropTypesSecret.js
-var require_ReactPropTypesSecret = __commonJS({
-  "../../node_modules/prop-types/lib/ReactPropTypesSecret.js"(exports, module2) {
-    "use strict";
-    var ReactPropTypesSecret = "SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED";
-    module2.exports = ReactPropTypesSecret;
-  }
-});
-
-// ../../node_modules/prop-types/lib/has.js
-var require_has = __commonJS({
-  "../../node_modules/prop-types/lib/has.js"(exports, module2) {
-    module2.exports = Function.call.bind(Object.prototype.hasOwnProperty);
-  }
-});
-
-// ../../node_modules/prop-types/checkPropTypes.js
-var require_checkPropTypes = __commonJS({
-  "../../node_modules/prop-types/checkPropTypes.js"(exports, module2) {
-    "use strict";
-    var printWarning = function() {
-    };
-    if (true) {
-      ReactPropTypesSecret = require_ReactPropTypesSecret();
-      loggedTypeFailures = {};
-      has = require_has();
-      printWarning = function(text5) {
-        var message = "Warning: " + text5;
-        if (typeof console !== "undefined") {
-          console.error(message);
-        }
-        try {
-          throw new Error(message);
-        } catch (x) {
-        }
-      };
-    }
-    var ReactPropTypesSecret;
-    var loggedTypeFailures;
-    var has;
-    function checkPropTypes(typeSpecs, values2, location, componentName, getStack) {
-      if (true) {
-        for (var typeSpecName in typeSpecs) {
-          if (has(typeSpecs, typeSpecName)) {
-            var error;
-            try {
-              if (typeof typeSpecs[typeSpecName] !== "function") {
-                var err = Error(
-                  (componentName || "React class") + ": " + location + " type `" + typeSpecName + "` is invalid; it must be a function, usually from the `prop-types` package, but received `" + typeof typeSpecs[typeSpecName] + "`.This often happens because of typos such as `PropTypes.function` instead of `PropTypes.func`."
-                );
-                err.name = "Invariant Violation";
-                throw err;
-              }
-              error = typeSpecs[typeSpecName](values2, typeSpecName, componentName, location, null, ReactPropTypesSecret);
-            } catch (ex) {
-              error = ex;
-            }
-            if (error && !(error instanceof Error)) {
-              printWarning(
-                (componentName || "React class") + ": type specification of " + location + " `" + typeSpecName + "` is invalid; the type checker function must return `null` or an `Error` but returned a " + typeof error + ". You may have forgotten to pass an argument to the type checker creator (arrayOf, instanceOf, objectOf, oneOf, oneOfType, and shape all require an argument)."
-              );
-            }
-            if (error instanceof Error && !(error.message in loggedTypeFailures)) {
-              loggedTypeFailures[error.message] = true;
-              var stack = getStack ? getStack() : "";
-              printWarning(
-                "Failed " + location + " type: " + error.message + (stack != null ? stack : "")
-              );
-            }
-          }
-        }
-      }
-    }
-    checkPropTypes.resetWarningCache = function() {
-      if (true) {
-        loggedTypeFailures = {};
-      }
-    };
-    module2.exports = checkPropTypes;
-  }
-});
-
-// ../../node_modules/prop-types/factoryWithTypeCheckers.js
-var require_factoryWithTypeCheckers = __commonJS({
-  "../../node_modules/prop-types/factoryWithTypeCheckers.js"(exports, module2) {
-    "use strict";
-    var ReactIs = require_react_is();
-    var assign = require_object_assign();
-    var ReactPropTypesSecret = require_ReactPropTypesSecret();
-    var has = require_has();
-    var checkPropTypes = require_checkPropTypes();
-    var printWarning = function() {
-    };
-    if (true) {
-      printWarning = function(text5) {
-        var message = "Warning: " + text5;
-        if (typeof console !== "undefined") {
-          console.error(message);
-        }
-        try {
-          throw new Error(message);
-        } catch (x) {
-        }
-      };
-    }
-    function emptyFunctionThatReturnsNull() {
-      return null;
-    }
-    module2.exports = function(isValidElement, throwOnDirectAccess) {
-      var ITERATOR_SYMBOL = typeof Symbol === "function" && Symbol.iterator;
-      var FAUX_ITERATOR_SYMBOL = "@@iterator";
-      function getIteratorFn(maybeIterable) {
-        var iteratorFn = maybeIterable && (ITERATOR_SYMBOL && maybeIterable[ITERATOR_SYMBOL] || maybeIterable[FAUX_ITERATOR_SYMBOL]);
-        if (typeof iteratorFn === "function") {
-          return iteratorFn;
-        }
-      }
-      var ANONYMOUS = "<<anonymous>>";
-      var ReactPropTypes = {
-        array: createPrimitiveTypeChecker("array"),
-        bigint: createPrimitiveTypeChecker("bigint"),
-        bool: createPrimitiveTypeChecker("boolean"),
-        func: createPrimitiveTypeChecker("function"),
-        number: createPrimitiveTypeChecker("number"),
-        object: createPrimitiveTypeChecker("object"),
-        string: createPrimitiveTypeChecker("string"),
-        symbol: createPrimitiveTypeChecker("symbol"),
-        any: createAnyTypeChecker(),
-        arrayOf: createArrayOfTypeChecker,
-        element: createElementTypeChecker(),
-        elementType: createElementTypeTypeChecker(),
-        instanceOf: createInstanceTypeChecker,
-        node: createNodeChecker(),
-        objectOf: createObjectOfTypeChecker,
-        oneOf: createEnumTypeChecker,
-        oneOfType: createUnionTypeChecker,
-        shape: createShapeTypeChecker,
-        exact: createStrictShapeTypeChecker
-      };
-      function is2(x, y) {
-        if (x === y) {
-          return x !== 0 || 1 / x === 1 / y;
-        } else {
-          return x !== x && y !== y;
-        }
-      }
-      function PropTypeError(message, data2) {
-        this.message = message;
-        this.data = data2 && typeof data2 === "object" ? data2 : {};
-        this.stack = "";
-      }
-      PropTypeError.prototype = Error.prototype;
-      function createChainableTypeChecker(validate) {
-        if (true) {
-          var manualPropTypeCallCache = {};
-          var manualPropTypeWarningCount = 0;
-        }
-        function checkType(isRequired, props2, propName, componentName, location, propFullName, secret) {
-          componentName = componentName || ANONYMOUS;
-          propFullName = propFullName || propName;
-          if (secret !== ReactPropTypesSecret) {
-            if (throwOnDirectAccess) {
-              var err = new Error(
-                "Calling PropTypes validators directly is not supported by the `prop-types` package. Use `PropTypes.checkPropTypes()` to call them. Read more at http://fb.me/use-check-prop-types"
-              );
-              err.name = "Invariant Violation";
-              throw err;
-            } else if (typeof console !== "undefined") {
-              var cacheKey = componentName + ":" + propName;
-              if (!manualPropTypeCallCache[cacheKey] && // Avoid spamming the console because they are often not actionable except for lib authors
-              manualPropTypeWarningCount < 3) {
-                printWarning(
-                  "You are manually calling a React.PropTypes validation function for the `" + propFullName + "` prop on `" + componentName + "`. This is deprecated and will throw in the standalone `prop-types` package. You may be seeing this warning due to a third-party PropTypes library. See https://fb.me/react-warning-dont-call-proptypes for details."
-                );
-                manualPropTypeCallCache[cacheKey] = true;
-                manualPropTypeWarningCount++;
-              }
-            }
-          }
-          if (props2[propName] == null) {
-            if (isRequired) {
-              if (props2[propName] === null) {
-                return new PropTypeError("The " + location + " `" + propFullName + "` is marked as required " + ("in `" + componentName + "`, but its value is `null`."));
-              }
-              return new PropTypeError("The " + location + " `" + propFullName + "` is marked as required in " + ("`" + componentName + "`, but its value is `undefined`."));
-            }
-            return null;
-          } else {
-            return validate(props2, propName, componentName, location, propFullName);
-          }
-        }
-        var chainedCheckType = checkType.bind(null, false);
-        chainedCheckType.isRequired = checkType.bind(null, true);
-        return chainedCheckType;
-      }
-      function createPrimitiveTypeChecker(expectedType) {
-        function validate(props2, propName, componentName, location, propFullName, secret) {
-          var propValue = props2[propName];
-          var propType = getPropType(propValue);
-          if (propType !== expectedType) {
-            var preciseType = getPreciseType(propValue);
-            return new PropTypeError(
-              "Invalid " + location + " `" + propFullName + "` of type " + ("`" + preciseType + "` supplied to `" + componentName + "`, expected ") + ("`" + expectedType + "`."),
-              { expectedType }
-            );
-          }
-          return null;
-        }
-        return createChainableTypeChecker(validate);
-      }
-      function createAnyTypeChecker() {
-        return createChainableTypeChecker(emptyFunctionThatReturnsNull);
-      }
-      function createArrayOfTypeChecker(typeChecker) {
-        function validate(props2, propName, componentName, location, propFullName) {
-          if (typeof typeChecker !== "function") {
-            return new PropTypeError("Property `" + propFullName + "` of component `" + componentName + "` has invalid PropType notation inside arrayOf.");
-          }
-          var propValue = props2[propName];
-          if (!Array.isArray(propValue)) {
-            var propType = getPropType(propValue);
-            return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type " + ("`" + propType + "` supplied to `" + componentName + "`, expected an array."));
-          }
-          for (var i = 0; i < propValue.length; i++) {
-            var error = typeChecker(propValue, i, componentName, location, propFullName + "[" + i + "]", ReactPropTypesSecret);
-            if (error instanceof Error) {
-              return error;
-            }
-          }
-          return null;
-        }
-        return createChainableTypeChecker(validate);
-      }
-      function createElementTypeChecker() {
-        function validate(props2, propName, componentName, location, propFullName) {
-          var propValue = props2[propName];
-          if (!isValidElement(propValue)) {
-            var propType = getPropType(propValue);
-            return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type " + ("`" + propType + "` supplied to `" + componentName + "`, expected a single ReactElement."));
-          }
-          return null;
-        }
-        return createChainableTypeChecker(validate);
-      }
-      function createElementTypeTypeChecker() {
-        function validate(props2, propName, componentName, location, propFullName) {
-          var propValue = props2[propName];
-          if (!ReactIs.isValidElementType(propValue)) {
-            var propType = getPropType(propValue);
-            return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type " + ("`" + propType + "` supplied to `" + componentName + "`, expected a single ReactElement type."));
-          }
-          return null;
-        }
-        return createChainableTypeChecker(validate);
-      }
-      function createInstanceTypeChecker(expectedClass) {
-        function validate(props2, propName, componentName, location, propFullName) {
-          if (!(props2[propName] instanceof expectedClass)) {
-            var expectedClassName = expectedClass.name || ANONYMOUS;
-            var actualClassName = getClassName(props2[propName]);
-            return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type " + ("`" + actualClassName + "` supplied to `" + componentName + "`, expected ") + ("instance of `" + expectedClassName + "`."));
-          }
-          return null;
-        }
-        return createChainableTypeChecker(validate);
-      }
-      function createEnumTypeChecker(expectedValues) {
-        if (!Array.isArray(expectedValues)) {
-          if (true) {
-            if (arguments.length > 1) {
-              printWarning(
-                "Invalid arguments supplied to oneOf, expected an array, got " + arguments.length + " arguments. A common mistake is to write oneOf(x, y, z) instead of oneOf([x, y, z])."
-              );
-            } else {
-              printWarning("Invalid argument supplied to oneOf, expected an array.");
-            }
-          }
-          return emptyFunctionThatReturnsNull;
-        }
-        function validate(props2, propName, componentName, location, propFullName) {
-          var propValue = props2[propName];
-          for (var i = 0; i < expectedValues.length; i++) {
-            if (is2(propValue, expectedValues[i])) {
-              return null;
-            }
-          }
-          var valuesString = JSON.stringify(expectedValues, function replacer(key, value) {
-            var type7 = getPreciseType(value);
-            if (type7 === "symbol") {
-              return String(value);
-            }
-            return value;
-          });
-          return new PropTypeError("Invalid " + location + " `" + propFullName + "` of value `" + String(propValue) + "` " + ("supplied to `" + componentName + "`, expected one of " + valuesString + "."));
-        }
-        return createChainableTypeChecker(validate);
-      }
-      function createObjectOfTypeChecker(typeChecker) {
-        function validate(props2, propName, componentName, location, propFullName) {
-          if (typeof typeChecker !== "function") {
-            return new PropTypeError("Property `" + propFullName + "` of component `" + componentName + "` has invalid PropType notation inside objectOf.");
-          }
-          var propValue = props2[propName];
-          var propType = getPropType(propValue);
-          if (propType !== "object") {
-            return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type " + ("`" + propType + "` supplied to `" + componentName + "`, expected an object."));
-          }
-          for (var key in propValue) {
-            if (has(propValue, key)) {
-              var error = typeChecker(propValue, key, componentName, location, propFullName + "." + key, ReactPropTypesSecret);
-              if (error instanceof Error) {
-                return error;
-              }
-            }
-          }
-          return null;
-        }
-        return createChainableTypeChecker(validate);
-      }
-      function createUnionTypeChecker(arrayOfTypeCheckers) {
-        if (!Array.isArray(arrayOfTypeCheckers)) {
-          true ? printWarning("Invalid argument supplied to oneOfType, expected an instance of array.") : void 0;
-          return emptyFunctionThatReturnsNull;
-        }
-        for (var i = 0; i < arrayOfTypeCheckers.length; i++) {
-          var checker = arrayOfTypeCheckers[i];
-          if (typeof checker !== "function") {
-            printWarning(
-              "Invalid argument supplied to oneOfType. Expected an array of check functions, but received " + getPostfixForTypeWarning(checker) + " at index " + i + "."
-            );
-            return emptyFunctionThatReturnsNull;
-          }
-        }
-        function validate(props2, propName, componentName, location, propFullName) {
-          var expectedTypes = [];
-          for (var i2 = 0; i2 < arrayOfTypeCheckers.length; i2++) {
-            var checker2 = arrayOfTypeCheckers[i2];
-            var checkerResult = checker2(props2, propName, componentName, location, propFullName, ReactPropTypesSecret);
-            if (checkerResult == null) {
-              return null;
-            }
-            if (checkerResult.data && has(checkerResult.data, "expectedType")) {
-              expectedTypes.push(checkerResult.data.expectedType);
-            }
-          }
-          var expectedTypesMessage = expectedTypes.length > 0 ? ", expected one of type [" + expectedTypes.join(", ") + "]" : "";
-          return new PropTypeError("Invalid " + location + " `" + propFullName + "` supplied to " + ("`" + componentName + "`" + expectedTypesMessage + "."));
-        }
-        return createChainableTypeChecker(validate);
-      }
-      function createNodeChecker() {
-        function validate(props2, propName, componentName, location, propFullName) {
-          if (!isNode(props2[propName])) {
-            return new PropTypeError("Invalid " + location + " `" + propFullName + "` supplied to " + ("`" + componentName + "`, expected a ReactNode."));
-          }
-          return null;
-        }
-        return createChainableTypeChecker(validate);
-      }
-      function invalidValidatorError(componentName, location, propFullName, key, type7) {
-        return new PropTypeError(
-          (componentName || "React class") + ": " + location + " type `" + propFullName + "." + key + "` is invalid; it must be a function, usually from the `prop-types` package, but received `" + type7 + "`."
-        );
-      }
-      function createShapeTypeChecker(shapeTypes) {
-        function validate(props2, propName, componentName, location, propFullName) {
-          var propValue = props2[propName];
-          var propType = getPropType(propValue);
-          if (propType !== "object") {
-            return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type `" + propType + "` " + ("supplied to `" + componentName + "`, expected `object`."));
-          }
-          for (var key in shapeTypes) {
-            var checker = shapeTypes[key];
-            if (typeof checker !== "function") {
-              return invalidValidatorError(componentName, location, propFullName, key, getPreciseType(checker));
-            }
-            var error = checker(propValue, key, componentName, location, propFullName + "." + key, ReactPropTypesSecret);
-            if (error) {
-              return error;
-            }
-          }
-          return null;
-        }
-        return createChainableTypeChecker(validate);
-      }
-      function createStrictShapeTypeChecker(shapeTypes) {
-        function validate(props2, propName, componentName, location, propFullName) {
-          var propValue = props2[propName];
-          var propType = getPropType(propValue);
-          if (propType !== "object") {
-            return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type `" + propType + "` " + ("supplied to `" + componentName + "`, expected `object`."));
-          }
-          var allKeys = assign({}, props2[propName], shapeTypes);
-          for (var key in allKeys) {
-            var checker = shapeTypes[key];
-            if (has(shapeTypes, key) && typeof checker !== "function") {
-              return invalidValidatorError(componentName, location, propFullName, key, getPreciseType(checker));
-            }
-            if (!checker) {
-              return new PropTypeError(
-                "Invalid " + location + " `" + propFullName + "` key `" + key + "` supplied to `" + componentName + "`.\nBad object: " + JSON.stringify(props2[propName], null, "  ") + "\nValid keys: " + JSON.stringify(Object.keys(shapeTypes), null, "  ")
-              );
-            }
-            var error = checker(propValue, key, componentName, location, propFullName + "." + key, ReactPropTypesSecret);
-            if (error) {
-              return error;
-            }
-          }
-          return null;
-        }
-        return createChainableTypeChecker(validate);
-      }
-      function isNode(propValue) {
-        switch (typeof propValue) {
-          case "number":
-          case "string":
-          case "undefined":
-            return true;
-          case "boolean":
-            return !propValue;
-          case "object":
-            if (Array.isArray(propValue)) {
-              return propValue.every(isNode);
-            }
-            if (propValue === null || isValidElement(propValue)) {
-              return true;
-            }
-            var iteratorFn = getIteratorFn(propValue);
-            if (iteratorFn) {
-              var iterator = iteratorFn.call(propValue);
-              var step;
-              if (iteratorFn !== propValue.entries) {
-                while (!(step = iterator.next()).done) {
-                  if (!isNode(step.value)) {
-                    return false;
-                  }
-                }
-              } else {
-                while (!(step = iterator.next()).done) {
-                  var entry = step.value;
-                  if (entry) {
-                    if (!isNode(entry[1])) {
-                      return false;
-                    }
-                  }
-                }
-              }
-            } else {
-              return false;
-            }
-            return true;
-          default:
-            return false;
-        }
-      }
-      function isSymbol(propType, propValue) {
-        if (propType === "symbol") {
-          return true;
-        }
-        if (!propValue) {
-          return false;
-        }
-        if (propValue["@@toStringTag"] === "Symbol") {
-          return true;
-        }
-        if (typeof Symbol === "function" && propValue instanceof Symbol) {
-          return true;
-        }
-        return false;
-      }
-      function getPropType(propValue) {
-        var propType = typeof propValue;
-        if (Array.isArray(propValue)) {
-          return "array";
-        }
-        if (propValue instanceof RegExp) {
-          return "object";
-        }
-        if (isSymbol(propType, propValue)) {
-          return "symbol";
-        }
-        return propType;
-      }
-      function getPreciseType(propValue) {
-        if (typeof propValue === "undefined" || propValue === null) {
-          return "" + propValue;
-        }
-        var propType = getPropType(propValue);
-        if (propType === "object") {
-          if (propValue instanceof Date) {
-            return "date";
-          } else if (propValue instanceof RegExp) {
-            return "regexp";
-          }
-        }
-        return propType;
-      }
-      function getPostfixForTypeWarning(value) {
-        var type7 = getPreciseType(value);
-        switch (type7) {
-          case "array":
-          case "object":
-            return "an " + type7;
-          case "boolean":
-          case "date":
-          case "regexp":
-            return "a " + type7;
-          default:
-            return type7;
-        }
-      }
-      function getClassName(propValue) {
-        if (!propValue.constructor || !propValue.constructor.name) {
-          return ANONYMOUS;
-        }
-        return propValue.constructor.name;
-      }
-      ReactPropTypes.checkPropTypes = checkPropTypes;
-      ReactPropTypes.resetWarningCache = checkPropTypes.resetWarningCache;
-      ReactPropTypes.PropTypes = ReactPropTypes;
-      return ReactPropTypes;
-    };
-  }
-});
-
-// ../../node_modules/prop-types/index.js
-var require_prop_types = __commonJS({
-  "../../node_modules/prop-types/index.js"(exports, module2) {
-    if (true) {
-      ReactIs = require_react_is();
-      throwOnDirectAccess = true;
-      module2.exports = require_factoryWithTypeCheckers()(ReactIs.isElement, throwOnDirectAccess);
-    } else {
-      module2.exports = null();
-    }
-    var ReactIs;
-    var throwOnDirectAccess;
-  }
-});
-
 // ../../node_modules/@lezer/common/dist/index.js
 function checkSide(side, pos, from3, to) {
   switch (side) {
@@ -59191,6 +58414,783 @@ var init_dist40 = __esm({
   }
 });
 
+// ../../node_modules/prop-types/node_modules/react-is/cjs/react-is.development.js
+var require_react_is_development = __commonJS({
+  "../../node_modules/prop-types/node_modules/react-is/cjs/react-is.development.js"(exports) {
+    "use strict";
+    if (true) {
+      (function() {
+        "use strict";
+        var hasSymbol = typeof Symbol === "function" && Symbol.for;
+        var REACT_ELEMENT_TYPE = hasSymbol ? Symbol.for("react.element") : 60103;
+        var REACT_PORTAL_TYPE = hasSymbol ? Symbol.for("react.portal") : 60106;
+        var REACT_FRAGMENT_TYPE = hasSymbol ? Symbol.for("react.fragment") : 60107;
+        var REACT_STRICT_MODE_TYPE = hasSymbol ? Symbol.for("react.strict_mode") : 60108;
+        var REACT_PROFILER_TYPE = hasSymbol ? Symbol.for("react.profiler") : 60114;
+        var REACT_PROVIDER_TYPE = hasSymbol ? Symbol.for("react.provider") : 60109;
+        var REACT_CONTEXT_TYPE = hasSymbol ? Symbol.for("react.context") : 60110;
+        var REACT_ASYNC_MODE_TYPE = hasSymbol ? Symbol.for("react.async_mode") : 60111;
+        var REACT_CONCURRENT_MODE_TYPE = hasSymbol ? Symbol.for("react.concurrent_mode") : 60111;
+        var REACT_FORWARD_REF_TYPE = hasSymbol ? Symbol.for("react.forward_ref") : 60112;
+        var REACT_SUSPENSE_TYPE = hasSymbol ? Symbol.for("react.suspense") : 60113;
+        var REACT_SUSPENSE_LIST_TYPE = hasSymbol ? Symbol.for("react.suspense_list") : 60120;
+        var REACT_MEMO_TYPE = hasSymbol ? Symbol.for("react.memo") : 60115;
+        var REACT_LAZY_TYPE = hasSymbol ? Symbol.for("react.lazy") : 60116;
+        var REACT_BLOCK_TYPE = hasSymbol ? Symbol.for("react.block") : 60121;
+        var REACT_FUNDAMENTAL_TYPE = hasSymbol ? Symbol.for("react.fundamental") : 60117;
+        var REACT_RESPONDER_TYPE = hasSymbol ? Symbol.for("react.responder") : 60118;
+        var REACT_SCOPE_TYPE = hasSymbol ? Symbol.for("react.scope") : 60119;
+        function isValidElementType(type7) {
+          return typeof type7 === "string" || typeof type7 === "function" || // Note: its typeof might be other than 'symbol' or 'number' if it's a polyfill.
+          type7 === REACT_FRAGMENT_TYPE || type7 === REACT_CONCURRENT_MODE_TYPE || type7 === REACT_PROFILER_TYPE || type7 === REACT_STRICT_MODE_TYPE || type7 === REACT_SUSPENSE_TYPE || type7 === REACT_SUSPENSE_LIST_TYPE || typeof type7 === "object" && type7 !== null && (type7.$$typeof === REACT_LAZY_TYPE || type7.$$typeof === REACT_MEMO_TYPE || type7.$$typeof === REACT_PROVIDER_TYPE || type7.$$typeof === REACT_CONTEXT_TYPE || type7.$$typeof === REACT_FORWARD_REF_TYPE || type7.$$typeof === REACT_FUNDAMENTAL_TYPE || type7.$$typeof === REACT_RESPONDER_TYPE || type7.$$typeof === REACT_SCOPE_TYPE || type7.$$typeof === REACT_BLOCK_TYPE);
+        }
+        function typeOf(object) {
+          if (typeof object === "object" && object !== null) {
+            var $$typeof = object.$$typeof;
+            switch ($$typeof) {
+              case REACT_ELEMENT_TYPE:
+                var type7 = object.type;
+                switch (type7) {
+                  case REACT_ASYNC_MODE_TYPE:
+                  case REACT_CONCURRENT_MODE_TYPE:
+                  case REACT_FRAGMENT_TYPE:
+                  case REACT_PROFILER_TYPE:
+                  case REACT_STRICT_MODE_TYPE:
+                  case REACT_SUSPENSE_TYPE:
+                    return type7;
+                  default:
+                    var $$typeofType = type7 && type7.$$typeof;
+                    switch ($$typeofType) {
+                      case REACT_CONTEXT_TYPE:
+                      case REACT_FORWARD_REF_TYPE:
+                      case REACT_LAZY_TYPE:
+                      case REACT_MEMO_TYPE:
+                      case REACT_PROVIDER_TYPE:
+                        return $$typeofType;
+                      default:
+                        return $$typeof;
+                    }
+                }
+              case REACT_PORTAL_TYPE:
+                return $$typeof;
+            }
+          }
+          return void 0;
+        }
+        var AsyncMode = REACT_ASYNC_MODE_TYPE;
+        var ConcurrentMode = REACT_CONCURRENT_MODE_TYPE;
+        var ContextConsumer = REACT_CONTEXT_TYPE;
+        var ContextProvider = REACT_PROVIDER_TYPE;
+        var Element6 = REACT_ELEMENT_TYPE;
+        var ForwardRef = REACT_FORWARD_REF_TYPE;
+        var Fragment = REACT_FRAGMENT_TYPE;
+        var Lazy = REACT_LAZY_TYPE;
+        var Memo = REACT_MEMO_TYPE;
+        var Portal = REACT_PORTAL_TYPE;
+        var Profiler = REACT_PROFILER_TYPE;
+        var StrictMode = REACT_STRICT_MODE_TYPE;
+        var Suspense = REACT_SUSPENSE_TYPE;
+        var hasWarnedAboutDeprecatedIsAsyncMode = false;
+        function isAsyncMode(object) {
+          {
+            if (!hasWarnedAboutDeprecatedIsAsyncMode) {
+              hasWarnedAboutDeprecatedIsAsyncMode = true;
+              console["warn"]("The ReactIs.isAsyncMode() alias has been deprecated, and will be removed in React 17+. Update your code to use ReactIs.isConcurrentMode() instead. It has the exact same API.");
+            }
+          }
+          return isConcurrentMode(object) || typeOf(object) === REACT_ASYNC_MODE_TYPE;
+        }
+        function isConcurrentMode(object) {
+          return typeOf(object) === REACT_CONCURRENT_MODE_TYPE;
+        }
+        function isContextConsumer(object) {
+          return typeOf(object) === REACT_CONTEXT_TYPE;
+        }
+        function isContextProvider(object) {
+          return typeOf(object) === REACT_PROVIDER_TYPE;
+        }
+        function isElement(object) {
+          return typeof object === "object" && object !== null && object.$$typeof === REACT_ELEMENT_TYPE;
+        }
+        function isForwardRef(object) {
+          return typeOf(object) === REACT_FORWARD_REF_TYPE;
+        }
+        function isFragment(object) {
+          return typeOf(object) === REACT_FRAGMENT_TYPE;
+        }
+        function isLazy(object) {
+          return typeOf(object) === REACT_LAZY_TYPE;
+        }
+        function isMemo(object) {
+          return typeOf(object) === REACT_MEMO_TYPE;
+        }
+        function isPortal(object) {
+          return typeOf(object) === REACT_PORTAL_TYPE;
+        }
+        function isProfiler(object) {
+          return typeOf(object) === REACT_PROFILER_TYPE;
+        }
+        function isStrictMode(object) {
+          return typeOf(object) === REACT_STRICT_MODE_TYPE;
+        }
+        function isSuspense(object) {
+          return typeOf(object) === REACT_SUSPENSE_TYPE;
+        }
+        exports.AsyncMode = AsyncMode;
+        exports.ConcurrentMode = ConcurrentMode;
+        exports.ContextConsumer = ContextConsumer;
+        exports.ContextProvider = ContextProvider;
+        exports.Element = Element6;
+        exports.ForwardRef = ForwardRef;
+        exports.Fragment = Fragment;
+        exports.Lazy = Lazy;
+        exports.Memo = Memo;
+        exports.Portal = Portal;
+        exports.Profiler = Profiler;
+        exports.StrictMode = StrictMode;
+        exports.Suspense = Suspense;
+        exports.isAsyncMode = isAsyncMode;
+        exports.isConcurrentMode = isConcurrentMode;
+        exports.isContextConsumer = isContextConsumer;
+        exports.isContextProvider = isContextProvider;
+        exports.isElement = isElement;
+        exports.isForwardRef = isForwardRef;
+        exports.isFragment = isFragment;
+        exports.isLazy = isLazy;
+        exports.isMemo = isMemo;
+        exports.isPortal = isPortal;
+        exports.isProfiler = isProfiler;
+        exports.isStrictMode = isStrictMode;
+        exports.isSuspense = isSuspense;
+        exports.isValidElementType = isValidElementType;
+        exports.typeOf = typeOf;
+      })();
+    }
+  }
+});
+
+// ../../node_modules/prop-types/node_modules/react-is/index.js
+var require_react_is = __commonJS({
+  "../../node_modules/prop-types/node_modules/react-is/index.js"(exports, module2) {
+    "use strict";
+    if (false) {
+      module2.exports = null;
+    } else {
+      module2.exports = require_react_is_development();
+    }
+  }
+});
+
+// ../../node_modules/object-assign/index.js
+var require_object_assign = __commonJS({
+  "../../node_modules/object-assign/index.js"(exports, module2) {
+    "use strict";
+    var getOwnPropertySymbols = Object.getOwnPropertySymbols;
+    var hasOwnProperty = Object.prototype.hasOwnProperty;
+    var propIsEnumerable = Object.prototype.propertyIsEnumerable;
+    function toObject(val) {
+      if (val === null || val === void 0) {
+        throw new TypeError("Object.assign cannot be called with null or undefined");
+      }
+      return Object(val);
+    }
+    function shouldUseNative() {
+      try {
+        if (!Object.assign) {
+          return false;
+        }
+        var test1 = new String("abc");
+        test1[5] = "de";
+        if (Object.getOwnPropertyNames(test1)[0] === "5") {
+          return false;
+        }
+        var test2 = {};
+        for (var i = 0; i < 10; i++) {
+          test2["_" + String.fromCharCode(i)] = i;
+        }
+        var order2 = Object.getOwnPropertyNames(test2).map(function(n) {
+          return test2[n];
+        });
+        if (order2.join("") !== "0123456789") {
+          return false;
+        }
+        var test3 = {};
+        "abcdefghijklmnopqrst".split("").forEach(function(letter) {
+          test3[letter] = letter;
+        });
+        if (Object.keys(Object.assign({}, test3)).join("") !== "abcdefghijklmnopqrst") {
+          return false;
+        }
+        return true;
+      } catch (err) {
+        return false;
+      }
+    }
+    module2.exports = shouldUseNative() ? Object.assign : function(target, source) {
+      var from3;
+      var to = toObject(target);
+      var symbols;
+      for (var s = 1; s < arguments.length; s++) {
+        from3 = Object(arguments[s]);
+        for (var key in from3) {
+          if (hasOwnProperty.call(from3, key)) {
+            to[key] = from3[key];
+          }
+        }
+        if (getOwnPropertySymbols) {
+          symbols = getOwnPropertySymbols(from3);
+          for (var i = 0; i < symbols.length; i++) {
+            if (propIsEnumerable.call(from3, symbols[i])) {
+              to[symbols[i]] = from3[symbols[i]];
+            }
+          }
+        }
+      }
+      return to;
+    };
+  }
+});
+
+// ../../node_modules/prop-types/lib/ReactPropTypesSecret.js
+var require_ReactPropTypesSecret = __commonJS({
+  "../../node_modules/prop-types/lib/ReactPropTypesSecret.js"(exports, module2) {
+    "use strict";
+    var ReactPropTypesSecret = "SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED";
+    module2.exports = ReactPropTypesSecret;
+  }
+});
+
+// ../../node_modules/prop-types/lib/has.js
+var require_has = __commonJS({
+  "../../node_modules/prop-types/lib/has.js"(exports, module2) {
+    module2.exports = Function.call.bind(Object.prototype.hasOwnProperty);
+  }
+});
+
+// ../../node_modules/prop-types/checkPropTypes.js
+var require_checkPropTypes = __commonJS({
+  "../../node_modules/prop-types/checkPropTypes.js"(exports, module2) {
+    "use strict";
+    var printWarning = function() {
+    };
+    if (true) {
+      ReactPropTypesSecret = require_ReactPropTypesSecret();
+      loggedTypeFailures = {};
+      has = require_has();
+      printWarning = function(text5) {
+        var message = "Warning: " + text5;
+        if (typeof console !== "undefined") {
+          console.error(message);
+        }
+        try {
+          throw new Error(message);
+        } catch (x) {
+        }
+      };
+    }
+    var ReactPropTypesSecret;
+    var loggedTypeFailures;
+    var has;
+    function checkPropTypes(typeSpecs, values2, location, componentName, getStack) {
+      if (true) {
+        for (var typeSpecName in typeSpecs) {
+          if (has(typeSpecs, typeSpecName)) {
+            var error;
+            try {
+              if (typeof typeSpecs[typeSpecName] !== "function") {
+                var err = Error(
+                  (componentName || "React class") + ": " + location + " type `" + typeSpecName + "` is invalid; it must be a function, usually from the `prop-types` package, but received `" + typeof typeSpecs[typeSpecName] + "`.This often happens because of typos such as `PropTypes.function` instead of `PropTypes.func`."
+                );
+                err.name = "Invariant Violation";
+                throw err;
+              }
+              error = typeSpecs[typeSpecName](values2, typeSpecName, componentName, location, null, ReactPropTypesSecret);
+            } catch (ex) {
+              error = ex;
+            }
+            if (error && !(error instanceof Error)) {
+              printWarning(
+                (componentName || "React class") + ": type specification of " + location + " `" + typeSpecName + "` is invalid; the type checker function must return `null` or an `Error` but returned a " + typeof error + ". You may have forgotten to pass an argument to the type checker creator (arrayOf, instanceOf, objectOf, oneOf, oneOfType, and shape all require an argument)."
+              );
+            }
+            if (error instanceof Error && !(error.message in loggedTypeFailures)) {
+              loggedTypeFailures[error.message] = true;
+              var stack = getStack ? getStack() : "";
+              printWarning(
+                "Failed " + location + " type: " + error.message + (stack != null ? stack : "")
+              );
+            }
+          }
+        }
+      }
+    }
+    checkPropTypes.resetWarningCache = function() {
+      if (true) {
+        loggedTypeFailures = {};
+      }
+    };
+    module2.exports = checkPropTypes;
+  }
+});
+
+// ../../node_modules/prop-types/factoryWithTypeCheckers.js
+var require_factoryWithTypeCheckers = __commonJS({
+  "../../node_modules/prop-types/factoryWithTypeCheckers.js"(exports, module2) {
+    "use strict";
+    var ReactIs = require_react_is();
+    var assign = require_object_assign();
+    var ReactPropTypesSecret = require_ReactPropTypesSecret();
+    var has = require_has();
+    var checkPropTypes = require_checkPropTypes();
+    var printWarning = function() {
+    };
+    if (true) {
+      printWarning = function(text5) {
+        var message = "Warning: " + text5;
+        if (typeof console !== "undefined") {
+          console.error(message);
+        }
+        try {
+          throw new Error(message);
+        } catch (x) {
+        }
+      };
+    }
+    function emptyFunctionThatReturnsNull() {
+      return null;
+    }
+    module2.exports = function(isValidElement, throwOnDirectAccess) {
+      var ITERATOR_SYMBOL = typeof Symbol === "function" && Symbol.iterator;
+      var FAUX_ITERATOR_SYMBOL = "@@iterator";
+      function getIteratorFn(maybeIterable) {
+        var iteratorFn = maybeIterable && (ITERATOR_SYMBOL && maybeIterable[ITERATOR_SYMBOL] || maybeIterable[FAUX_ITERATOR_SYMBOL]);
+        if (typeof iteratorFn === "function") {
+          return iteratorFn;
+        }
+      }
+      var ANONYMOUS = "<<anonymous>>";
+      var ReactPropTypes = {
+        array: createPrimitiveTypeChecker("array"),
+        bigint: createPrimitiveTypeChecker("bigint"),
+        bool: createPrimitiveTypeChecker("boolean"),
+        func: createPrimitiveTypeChecker("function"),
+        number: createPrimitiveTypeChecker("number"),
+        object: createPrimitiveTypeChecker("object"),
+        string: createPrimitiveTypeChecker("string"),
+        symbol: createPrimitiveTypeChecker("symbol"),
+        any: createAnyTypeChecker(),
+        arrayOf: createArrayOfTypeChecker,
+        element: createElementTypeChecker(),
+        elementType: createElementTypeTypeChecker(),
+        instanceOf: createInstanceTypeChecker,
+        node: createNodeChecker(),
+        objectOf: createObjectOfTypeChecker,
+        oneOf: createEnumTypeChecker,
+        oneOfType: createUnionTypeChecker,
+        shape: createShapeTypeChecker,
+        exact: createStrictShapeTypeChecker
+      };
+      function is2(x, y) {
+        if (x === y) {
+          return x !== 0 || 1 / x === 1 / y;
+        } else {
+          return x !== x && y !== y;
+        }
+      }
+      function PropTypeError(message, data2) {
+        this.message = message;
+        this.data = data2 && typeof data2 === "object" ? data2 : {};
+        this.stack = "";
+      }
+      PropTypeError.prototype = Error.prototype;
+      function createChainableTypeChecker(validate) {
+        if (true) {
+          var manualPropTypeCallCache = {};
+          var manualPropTypeWarningCount = 0;
+        }
+        function checkType(isRequired, props2, propName, componentName, location, propFullName, secret) {
+          componentName = componentName || ANONYMOUS;
+          propFullName = propFullName || propName;
+          if (secret !== ReactPropTypesSecret) {
+            if (throwOnDirectAccess) {
+              var err = new Error(
+                "Calling PropTypes validators directly is not supported by the `prop-types` package. Use `PropTypes.checkPropTypes()` to call them. Read more at http://fb.me/use-check-prop-types"
+              );
+              err.name = "Invariant Violation";
+              throw err;
+            } else if (typeof console !== "undefined") {
+              var cacheKey = componentName + ":" + propName;
+              if (!manualPropTypeCallCache[cacheKey] && // Avoid spamming the console because they are often not actionable except for lib authors
+              manualPropTypeWarningCount < 3) {
+                printWarning(
+                  "You are manually calling a React.PropTypes validation function for the `" + propFullName + "` prop on `" + componentName + "`. This is deprecated and will throw in the standalone `prop-types` package. You may be seeing this warning due to a third-party PropTypes library. See https://fb.me/react-warning-dont-call-proptypes for details."
+                );
+                manualPropTypeCallCache[cacheKey] = true;
+                manualPropTypeWarningCount++;
+              }
+            }
+          }
+          if (props2[propName] == null) {
+            if (isRequired) {
+              if (props2[propName] === null) {
+                return new PropTypeError("The " + location + " `" + propFullName + "` is marked as required " + ("in `" + componentName + "`, but its value is `null`."));
+              }
+              return new PropTypeError("The " + location + " `" + propFullName + "` is marked as required in " + ("`" + componentName + "`, but its value is `undefined`."));
+            }
+            return null;
+          } else {
+            return validate(props2, propName, componentName, location, propFullName);
+          }
+        }
+        var chainedCheckType = checkType.bind(null, false);
+        chainedCheckType.isRequired = checkType.bind(null, true);
+        return chainedCheckType;
+      }
+      function createPrimitiveTypeChecker(expectedType) {
+        function validate(props2, propName, componentName, location, propFullName, secret) {
+          var propValue = props2[propName];
+          var propType = getPropType(propValue);
+          if (propType !== expectedType) {
+            var preciseType = getPreciseType(propValue);
+            return new PropTypeError(
+              "Invalid " + location + " `" + propFullName + "` of type " + ("`" + preciseType + "` supplied to `" + componentName + "`, expected ") + ("`" + expectedType + "`."),
+              { expectedType }
+            );
+          }
+          return null;
+        }
+        return createChainableTypeChecker(validate);
+      }
+      function createAnyTypeChecker() {
+        return createChainableTypeChecker(emptyFunctionThatReturnsNull);
+      }
+      function createArrayOfTypeChecker(typeChecker) {
+        function validate(props2, propName, componentName, location, propFullName) {
+          if (typeof typeChecker !== "function") {
+            return new PropTypeError("Property `" + propFullName + "` of component `" + componentName + "` has invalid PropType notation inside arrayOf.");
+          }
+          var propValue = props2[propName];
+          if (!Array.isArray(propValue)) {
+            var propType = getPropType(propValue);
+            return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type " + ("`" + propType + "` supplied to `" + componentName + "`, expected an array."));
+          }
+          for (var i = 0; i < propValue.length; i++) {
+            var error = typeChecker(propValue, i, componentName, location, propFullName + "[" + i + "]", ReactPropTypesSecret);
+            if (error instanceof Error) {
+              return error;
+            }
+          }
+          return null;
+        }
+        return createChainableTypeChecker(validate);
+      }
+      function createElementTypeChecker() {
+        function validate(props2, propName, componentName, location, propFullName) {
+          var propValue = props2[propName];
+          if (!isValidElement(propValue)) {
+            var propType = getPropType(propValue);
+            return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type " + ("`" + propType + "` supplied to `" + componentName + "`, expected a single ReactElement."));
+          }
+          return null;
+        }
+        return createChainableTypeChecker(validate);
+      }
+      function createElementTypeTypeChecker() {
+        function validate(props2, propName, componentName, location, propFullName) {
+          var propValue = props2[propName];
+          if (!ReactIs.isValidElementType(propValue)) {
+            var propType = getPropType(propValue);
+            return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type " + ("`" + propType + "` supplied to `" + componentName + "`, expected a single ReactElement type."));
+          }
+          return null;
+        }
+        return createChainableTypeChecker(validate);
+      }
+      function createInstanceTypeChecker(expectedClass) {
+        function validate(props2, propName, componentName, location, propFullName) {
+          if (!(props2[propName] instanceof expectedClass)) {
+            var expectedClassName = expectedClass.name || ANONYMOUS;
+            var actualClassName = getClassName(props2[propName]);
+            return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type " + ("`" + actualClassName + "` supplied to `" + componentName + "`, expected ") + ("instance of `" + expectedClassName + "`."));
+          }
+          return null;
+        }
+        return createChainableTypeChecker(validate);
+      }
+      function createEnumTypeChecker(expectedValues) {
+        if (!Array.isArray(expectedValues)) {
+          if (true) {
+            if (arguments.length > 1) {
+              printWarning(
+                "Invalid arguments supplied to oneOf, expected an array, got " + arguments.length + " arguments. A common mistake is to write oneOf(x, y, z) instead of oneOf([x, y, z])."
+              );
+            } else {
+              printWarning("Invalid argument supplied to oneOf, expected an array.");
+            }
+          }
+          return emptyFunctionThatReturnsNull;
+        }
+        function validate(props2, propName, componentName, location, propFullName) {
+          var propValue = props2[propName];
+          for (var i = 0; i < expectedValues.length; i++) {
+            if (is2(propValue, expectedValues[i])) {
+              return null;
+            }
+          }
+          var valuesString = JSON.stringify(expectedValues, function replacer(key, value) {
+            var type7 = getPreciseType(value);
+            if (type7 === "symbol") {
+              return String(value);
+            }
+            return value;
+          });
+          return new PropTypeError("Invalid " + location + " `" + propFullName + "` of value `" + String(propValue) + "` " + ("supplied to `" + componentName + "`, expected one of " + valuesString + "."));
+        }
+        return createChainableTypeChecker(validate);
+      }
+      function createObjectOfTypeChecker(typeChecker) {
+        function validate(props2, propName, componentName, location, propFullName) {
+          if (typeof typeChecker !== "function") {
+            return new PropTypeError("Property `" + propFullName + "` of component `" + componentName + "` has invalid PropType notation inside objectOf.");
+          }
+          var propValue = props2[propName];
+          var propType = getPropType(propValue);
+          if (propType !== "object") {
+            return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type " + ("`" + propType + "` supplied to `" + componentName + "`, expected an object."));
+          }
+          for (var key in propValue) {
+            if (has(propValue, key)) {
+              var error = typeChecker(propValue, key, componentName, location, propFullName + "." + key, ReactPropTypesSecret);
+              if (error instanceof Error) {
+                return error;
+              }
+            }
+          }
+          return null;
+        }
+        return createChainableTypeChecker(validate);
+      }
+      function createUnionTypeChecker(arrayOfTypeCheckers) {
+        if (!Array.isArray(arrayOfTypeCheckers)) {
+          true ? printWarning("Invalid argument supplied to oneOfType, expected an instance of array.") : void 0;
+          return emptyFunctionThatReturnsNull;
+        }
+        for (var i = 0; i < arrayOfTypeCheckers.length; i++) {
+          var checker = arrayOfTypeCheckers[i];
+          if (typeof checker !== "function") {
+            printWarning(
+              "Invalid argument supplied to oneOfType. Expected an array of check functions, but received " + getPostfixForTypeWarning(checker) + " at index " + i + "."
+            );
+            return emptyFunctionThatReturnsNull;
+          }
+        }
+        function validate(props2, propName, componentName, location, propFullName) {
+          var expectedTypes = [];
+          for (var i2 = 0; i2 < arrayOfTypeCheckers.length; i2++) {
+            var checker2 = arrayOfTypeCheckers[i2];
+            var checkerResult = checker2(props2, propName, componentName, location, propFullName, ReactPropTypesSecret);
+            if (checkerResult == null) {
+              return null;
+            }
+            if (checkerResult.data && has(checkerResult.data, "expectedType")) {
+              expectedTypes.push(checkerResult.data.expectedType);
+            }
+          }
+          var expectedTypesMessage = expectedTypes.length > 0 ? ", expected one of type [" + expectedTypes.join(", ") + "]" : "";
+          return new PropTypeError("Invalid " + location + " `" + propFullName + "` supplied to " + ("`" + componentName + "`" + expectedTypesMessage + "."));
+        }
+        return createChainableTypeChecker(validate);
+      }
+      function createNodeChecker() {
+        function validate(props2, propName, componentName, location, propFullName) {
+          if (!isNode(props2[propName])) {
+            return new PropTypeError("Invalid " + location + " `" + propFullName + "` supplied to " + ("`" + componentName + "`, expected a ReactNode."));
+          }
+          return null;
+        }
+        return createChainableTypeChecker(validate);
+      }
+      function invalidValidatorError(componentName, location, propFullName, key, type7) {
+        return new PropTypeError(
+          (componentName || "React class") + ": " + location + " type `" + propFullName + "." + key + "` is invalid; it must be a function, usually from the `prop-types` package, but received `" + type7 + "`."
+        );
+      }
+      function createShapeTypeChecker(shapeTypes) {
+        function validate(props2, propName, componentName, location, propFullName) {
+          var propValue = props2[propName];
+          var propType = getPropType(propValue);
+          if (propType !== "object") {
+            return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type `" + propType + "` " + ("supplied to `" + componentName + "`, expected `object`."));
+          }
+          for (var key in shapeTypes) {
+            var checker = shapeTypes[key];
+            if (typeof checker !== "function") {
+              return invalidValidatorError(componentName, location, propFullName, key, getPreciseType(checker));
+            }
+            var error = checker(propValue, key, componentName, location, propFullName + "." + key, ReactPropTypesSecret);
+            if (error) {
+              return error;
+            }
+          }
+          return null;
+        }
+        return createChainableTypeChecker(validate);
+      }
+      function createStrictShapeTypeChecker(shapeTypes) {
+        function validate(props2, propName, componentName, location, propFullName) {
+          var propValue = props2[propName];
+          var propType = getPropType(propValue);
+          if (propType !== "object") {
+            return new PropTypeError("Invalid " + location + " `" + propFullName + "` of type `" + propType + "` " + ("supplied to `" + componentName + "`, expected `object`."));
+          }
+          var allKeys = assign({}, props2[propName], shapeTypes);
+          for (var key in allKeys) {
+            var checker = shapeTypes[key];
+            if (has(shapeTypes, key) && typeof checker !== "function") {
+              return invalidValidatorError(componentName, location, propFullName, key, getPreciseType(checker));
+            }
+            if (!checker) {
+              return new PropTypeError(
+                "Invalid " + location + " `" + propFullName + "` key `" + key + "` supplied to `" + componentName + "`.\nBad object: " + JSON.stringify(props2[propName], null, "  ") + "\nValid keys: " + JSON.stringify(Object.keys(shapeTypes), null, "  ")
+              );
+            }
+            var error = checker(propValue, key, componentName, location, propFullName + "." + key, ReactPropTypesSecret);
+            if (error) {
+              return error;
+            }
+          }
+          return null;
+        }
+        return createChainableTypeChecker(validate);
+      }
+      function isNode(propValue) {
+        switch (typeof propValue) {
+          case "number":
+          case "string":
+          case "undefined":
+            return true;
+          case "boolean":
+            return !propValue;
+          case "object":
+            if (Array.isArray(propValue)) {
+              return propValue.every(isNode);
+            }
+            if (propValue === null || isValidElement(propValue)) {
+              return true;
+            }
+            var iteratorFn = getIteratorFn(propValue);
+            if (iteratorFn) {
+              var iterator = iteratorFn.call(propValue);
+              var step;
+              if (iteratorFn !== propValue.entries) {
+                while (!(step = iterator.next()).done) {
+                  if (!isNode(step.value)) {
+                    return false;
+                  }
+                }
+              } else {
+                while (!(step = iterator.next()).done) {
+                  var entry = step.value;
+                  if (entry) {
+                    if (!isNode(entry[1])) {
+                      return false;
+                    }
+                  }
+                }
+              }
+            } else {
+              return false;
+            }
+            return true;
+          default:
+            return false;
+        }
+      }
+      function isSymbol(propType, propValue) {
+        if (propType === "symbol") {
+          return true;
+        }
+        if (!propValue) {
+          return false;
+        }
+        if (propValue["@@toStringTag"] === "Symbol") {
+          return true;
+        }
+        if (typeof Symbol === "function" && propValue instanceof Symbol) {
+          return true;
+        }
+        return false;
+      }
+      function getPropType(propValue) {
+        var propType = typeof propValue;
+        if (Array.isArray(propValue)) {
+          return "array";
+        }
+        if (propValue instanceof RegExp) {
+          return "object";
+        }
+        if (isSymbol(propType, propValue)) {
+          return "symbol";
+        }
+        return propType;
+      }
+      function getPreciseType(propValue) {
+        if (typeof propValue === "undefined" || propValue === null) {
+          return "" + propValue;
+        }
+        var propType = getPropType(propValue);
+        if (propType === "object") {
+          if (propValue instanceof Date) {
+            return "date";
+          } else if (propValue instanceof RegExp) {
+            return "regexp";
+          }
+        }
+        return propType;
+      }
+      function getPostfixForTypeWarning(value) {
+        var type7 = getPreciseType(value);
+        switch (type7) {
+          case "array":
+          case "object":
+            return "an " + type7;
+          case "boolean":
+          case "date":
+          case "regexp":
+            return "a " + type7;
+          default:
+            return type7;
+        }
+      }
+      function getClassName(propValue) {
+        if (!propValue.constructor || !propValue.constructor.name) {
+          return ANONYMOUS;
+        }
+        return propValue.constructor.name;
+      }
+      ReactPropTypes.checkPropTypes = checkPropTypes;
+      ReactPropTypes.resetWarningCache = checkPropTypes.resetWarningCache;
+      ReactPropTypes.PropTypes = ReactPropTypes;
+      return ReactPropTypes;
+    };
+  }
+});
+
+// ../../node_modules/prop-types/index.js
+var require_prop_types = __commonJS({
+  "../../node_modules/prop-types/index.js"(exports, module2) {
+    if (true) {
+      ReactIs = require_react_is();
+      throwOnDirectAccess = true;
+      module2.exports = require_factoryWithTypeCheckers()(ReactIs.isElement, throwOnDirectAccess);
+    } else {
+      module2.exports = null();
+    }
+    var ReactIs;
+    var throwOnDirectAccess;
+  }
+});
+
 // ../../node_modules/lodash.merge/index.js
 var require_lodash = __commonJS({
   "../../node_modules/lodash.merge/index.js"(exports, module2) {
@@ -61645,6 +61645,7 @@ __export(index_exports, {
   DATASOURCE_UI_COMPONENTS: () => DATASOURCE_UI_COMPONENTS
 });
 module.exports = __toCommonJS(index_exports);
+var import_react11 = __toESM(require("react"));
 
 // ../datasource-types/dist/index.mjs
 var DATASOURCE_TYPES = {
@@ -61666,218 +61667,9 @@ var DATASOURCE_TYPES = {
   }
 };
 
-// src/components/postgresql/query/postgreSQLQueryEditor.js
-var import_react = __toESM(require("react"));
-var import_react2 = __toESM(require("@monaco-editor/react"));
-var import_GitHub_Light = __toESM(require("monaco-themes/themes/GitHub Light.json"));
-var import_prop_types = __toESM(require_prop_types());
-var PostgreSQLQueryEditor = ({
-  readOnly: readOnly2,
-  query,
-  setQuery,
-  height = "200px",
-  language: language2 = "sql",
-  rounded = true,
-  outlined = true,
-  databaseMetadata
-}) => {
-  PostgreSQLQueryEditor.propTypes = {
-    readOnly: import_prop_types.default.bool,
-    query: import_prop_types.default.string,
-    setQuery: import_prop_types.default.func.isRequired,
-    height: import_prop_types.default.string,
-    language: import_prop_types.default.string,
-    rounded: import_prop_types.default.bool,
-    outlined: import_prop_types.default.bool,
-    databaseMetadata: import_prop_types.default.object
-  };
-  const schema = (0, import_react.useMemo)(() => {
-    if (!databaseMetadata || !databaseMetadata.schemas) return {};
-    const tablesMap = {};
-    databaseMetadata.schemas.forEach((schemaItem) => {
-      if (schemaItem.tables) {
-        schemaItem.tables.forEach((table) => {
-          const tableName = table.databaseTableName;
-          const columns = (table.databaseTableColumns || []).map(
-            (col) => col.databaseTableColumnName
-          );
-          tablesMap[tableName] = columns;
-        });
-      }
-    });
-    return tablesMap;
-  }, [databaseMetadata]);
-  const schemaRef = (0, import_react.useRef)(schema);
-  (0, import_react.useEffect)(() => {
-    schemaRef.current = schema;
-  }, [schema]);
-  const handleEditorWillMount = (monaco) => {
-    monaco.languages.registerCompletionItemProvider(language2, {
-      // Use the language prop
-      triggerCharacters: [".", " "],
-      // Trigger on dot and space
-      provideCompletionItems: (model, position) => {
-        const currentSchema = schemaRef.current;
-        const suggestions = [];
-        const wordInfo = model.getWordUntilPosition(position);
-        const defaultSuggestionRange = {
-          startLineNumber: position.lineNumber,
-          endLineNumber: position.lineNumber,
-          startColumn: wordInfo.startColumn,
-          endColumn: wordInfo.endColumn
-        };
-        const textUntilPosition = model.getValueInRange({
-          startLineNumber: 1,
-          startColumn: 1,
-          endLineNumber: position.lineNumber,
-          endColumn: position.column
-        });
-        const tableNameMatch = textUntilPosition.match(/(\b\w+)\.$/);
-        if (tableNameMatch && tableNameMatch[1]) {
-          const tableName = tableNameMatch[1];
-          if (currentSchema && currentSchema[tableName]) {
-            const columns = currentSchema[tableName];
-            columns.forEach((colName) => {
-              suggestions.push({
-                label: colName,
-                kind: monaco.languages.CompletionItemKind.Field,
-                insertText: colName,
-                detail: `Column of ${tableName}`,
-                range: defaultSuggestionRange
-                // Monaco will replace the typed part or insert
-              });
-            });
-          }
-        } else {
-          if (currentSchema) {
-            Object.keys(currentSchema).forEach((tableName) => {
-              suggestions.push({
-                label: tableName,
-                kind: monaco.languages.CompletionItemKind.Class,
-                // Using Class for tables
-                insertText: tableName,
-                detail: "Table",
-                range: defaultSuggestionRange
-              });
-            });
-          }
-          const sqlKeywords2 = [
-            "SELECT",
-            "FROM",
-            "WHERE",
-            "JOIN",
-            "LEFT JOIN",
-            "RIGHT JOIN",
-            "INNER JOIN",
-            "ON",
-            "GROUP BY",
-            "ORDER BY",
-            "ASC",
-            "DESC",
-            "AS",
-            "DISTINCT",
-            "LIMIT",
-            "OFFSET",
-            "INSERT INTO",
-            "VALUES",
-            "UPDATE",
-            "SET",
-            "DELETE",
-            "CREATE TABLE",
-            "ALTER TABLE",
-            "DROP TABLE",
-            "INDEX",
-            "COUNT",
-            "SUM",
-            "AVG",
-            "MAX",
-            "MIN",
-            "AND",
-            "OR",
-            "NOT",
-            "NULL",
-            "IS"
-            // Add more keywords as needed
-          ];
-          sqlKeywords2.forEach((keyword3) => {
-            suggestions.push({
-              label: keyword3,
-              kind: monaco.languages.CompletionItemKind.Keyword,
-              insertText: keyword3,
-              range: defaultSuggestionRange
-            });
-          });
-        }
-        return { suggestions };
-      }
-    });
-    monaco.editor.defineTheme("jet-theme", import_GitHub_Light.default);
-  };
-  return /* @__PURE__ */ import_react.default.createElement(
-    "div",
-    {
-      className: `${rounded ? "rounded-sm" : ""} ${outlined ? "border border-slate-200" : ""} overflow-hidden min-w-[300px]`
-    },
-    /* @__PURE__ */ import_react.default.createElement(
-      import_react2.default,
-      {
-        height,
-        defaultLanguage: language2,
-        value: query,
-        onChange: (value) => setQuery(value || ""),
-        beforeMount: handleEditorWillMount,
-        options: {
-          readOnly: readOnly2,
-          fontSize: 12,
-          minimap: { enabled: false },
-          lineNumbers: "on",
-          lineNumbersMinChars: 2,
-          folding: false,
-          // quickSuggestions: true, // Simplified: true enables default quick suggestions
-          quickSuggestions: { other: true, comments: false, strings: true },
-          // from original
-          suggestOnTriggerCharacters: true,
-          // Enable suggestions on trigger characters
-          wordBasedSuggestions: true,
-          // Enable default word-based suggestions
-          // Ensure suggestions pop up automatically
-          suggest: {
-            // Show suggestions automatically as you type
-            snippetsPreventQuickSuggestions: false,
-            showMethods: true,
-            showFunctions: true,
-            showConstructors: true,
-            showFields: true,
-            showVariables: true,
-            showClasses: true,
-            showStructs: true,
-            showInterfaces: true,
-            showModules: true,
-            showProperties: true,
-            showEvents: true,
-            showOperators: true,
-            showUnits: true,
-            showValues: true,
-            showConstants: true,
-            showEnums: true,
-            showEnumMembers: true,
-            showKeywords: true,
-            showWords: true,
-            showColors: true,
-            showFiles: true,
-            showFolders: true,
-            showSnippets: true
-          }
-        },
-        theme: "jet-theme"
-      }
-    )
-  );
-};
-
-// src/components/postgresql/query/postgreSQLQueryResponseView.js
+// src/components/common/queryResponseView.js
 var import_material2 = require("@mui/material");
-var import_react9 = __toESM(require("react"));
+var import_react7 = __toESM(require("react"));
 
 // ../../node_modules/@codemirror/language-data/dist/index.js
 init_dist5();
@@ -66376,10 +66168,10 @@ function _objectWithoutPropertiesLoose(r2, e) {
 }
 
 // ../../node_modules/@uiw/react-codemirror/esm/index.js
-var import_react4 = __toESM(require("react"), 1);
+var import_react2 = __toESM(require("react"), 1);
 
 // ../../node_modules/@uiw/react-codemirror/esm/useCodeMirror.js
-var import_react3 = require("react");
+var import_react = require("react");
 init_dist2();
 init_dist3();
 
@@ -69461,9 +69253,9 @@ function useCodeMirror(props2) {
     root,
     initialState
   } = props2;
-  var [container, setContainer] = (0, import_react3.useState)();
-  var [view, setView] = (0, import_react3.useState)();
-  var [state, setState] = (0, import_react3.useState)();
+  var [container, setContainer] = (0, import_react.useState)();
+  var [view, setView] = (0, import_react.useState)();
+  var [state, setState] = (0, import_react.useState)();
   var defaultThemeOption = EditorView.theme({
     "&": {
       height,
@@ -69500,7 +69292,7 @@ function useCodeMirror(props2) {
     getExtensions.push(EditorView.updateListener.of(onUpdate));
   }
   getExtensions = getExtensions.concat(extensions);
-  (0, import_react3.useLayoutEffect)(() => {
+  (0, import_react.useLayoutEffect)(() => {
     if (container && !state) {
       var config2 = {
         doc: value,
@@ -69526,30 +69318,30 @@ function useCodeMirror(props2) {
       }
     };
   }, [container, state]);
-  (0, import_react3.useEffect)(() => {
+  (0, import_react.useEffect)(() => {
     if (props2.container) {
       setContainer(props2.container);
     }
   }, [props2.container]);
-  (0, import_react3.useEffect)(() => () => {
+  (0, import_react.useEffect)(() => () => {
     if (view) {
       view.destroy();
       setView(void 0);
     }
   }, [view]);
-  (0, import_react3.useEffect)(() => {
+  (0, import_react.useEffect)(() => {
     if (autoFocus && view) {
       view.focus();
     }
   }, [autoFocus, view]);
-  (0, import_react3.useEffect)(() => {
+  (0, import_react.useEffect)(() => {
     if (view) {
       view.dispatch({
         effects: StateEffect.reconfigure.of(getExtensions)
       });
     }
   }, [theme2, extensions, height, minHeight, maxHeight, width, minWidth, maxWidth, placeholderStr, editable2, readOnly2, defaultIndentWithTab, defaultBasicSetup, onChange, onUpdate]);
-  (0, import_react3.useEffect)(() => {
+  (0, import_react.useEffect)(() => {
     if (value === void 0) {
       return;
     }
@@ -69580,7 +69372,7 @@ var import_jsx_runtime = require("react/jsx-runtime");
 init_dist3();
 init_dist2();
 var _excluded = ["className", "value", "selection", "extensions", "onChange", "onStatistics", "onCreateEditor", "onUpdate", "autoFocus", "theme", "height", "minHeight", "maxHeight", "width", "minWidth", "maxWidth", "basicSetup", "placeholder", "indentWithTab", "editable", "readOnly", "root", "initialState"];
-var ReactCodeMirror = /* @__PURE__ */ (0, import_react4.forwardRef)((props2, ref) => {
+var ReactCodeMirror = /* @__PURE__ */ (0, import_react2.forwardRef)((props2, ref) => {
   var {
     className: className2,
     value = "",
@@ -69606,7 +69398,7 @@ var ReactCodeMirror = /* @__PURE__ */ (0, import_react4.forwardRef)((props2, ref
     root,
     initialState
   } = props2, other = _objectWithoutPropertiesLoose(props2, _excluded);
-  var editor = (0, import_react4.useRef)(null);
+  var editor = (0, import_react2.useRef)(null);
   var {
     state,
     view,
@@ -69636,12 +69428,12 @@ var ReactCodeMirror = /* @__PURE__ */ (0, import_react4.forwardRef)((props2, ref
     extensions,
     initialState
   });
-  (0, import_react4.useImperativeHandle)(ref, () => ({
+  (0, import_react2.useImperativeHandle)(ref, () => ({
     editor: editor.current,
     state,
     view
   }), [editor, container, state, view]);
-  var setEditorRef = (0, import_react4.useCallback)((el) => {
+  var setEditorRef = (0, import_react2.useCallback)((el) => {
     editor.current = el;
     setContainer(el);
   }, [setContainer]);
@@ -69657,14 +69449,14 @@ var ReactCodeMirror = /* @__PURE__ */ (0, import_react4.forwardRef)((props2, ref
 ReactCodeMirror.displayName = "CodeMirror";
 var esm_default = ReactCodeMirror;
 
-// src/components/postgresql/query/postgreSQLQueryResponseJSONTab.js
-var import_prop_types2 = __toESM(require_prop_types());
-var import_react5 = __toESM(require("react"));
-var PostgreSQLQueryResponseJSONTab = ({ data: data2 }) => {
-  PostgreSQLQueryResponseJSONTab.propTypes = {
-    data: import_prop_types2.default.object
+// src/components/common/queryResponseJSONTab.js
+var import_prop_types = __toESM(require_prop_types());
+var import_react3 = __toESM(require("react"));
+var QueryResponseJSONTab = ({ data: data2 }) => {
+  QueryResponseJSONTab.propTypes = {
+    data: import_prop_types.default.object
   };
-  return /* @__PURE__ */ import_react5.default.createElement("div", { className: "w-100 flex-grow h-full overflow-y-auto " }, /* @__PURE__ */ import_react5.default.createElement(
+  return /* @__PURE__ */ import_react3.default.createElement("div", { className: "w-100 flex-grow h-full overflow-y-auto " }, /* @__PURE__ */ import_react3.default.createElement(
     esm_default,
     {
       value: JSON.stringify(data2, null, 2),
@@ -69681,14 +69473,14 @@ var PostgreSQLQueryResponseJSONTab = ({ data: data2 }) => {
   ));
 };
 
-// src/components/postgresql/query/postgreSQLQueryResponseRawTab.js
-var import_react6 = __toESM(require("react"));
-var import_prop_types3 = __toESM(require_prop_types());
-var PostgreSQLQueryResponseRAWTab = ({ data: data2 }) => {
-  PostgreSQLQueryResponseRAWTab.propTypes = {
-    data: import_prop_types3.default.object
+// src/components/common/queryResponseRawTab.js
+var import_react4 = __toESM(require("react"));
+var import_prop_types2 = __toESM(require_prop_types());
+var QueryResponseRAWTab = ({ data: data2 }) => {
+  QueryResponseRAWTab.propTypes = {
+    data: import_prop_types2.default.object
   };
-  return /* @__PURE__ */ import_react6.default.createElement("div", { className: "w-100 flex-grow h-full overflow-y-auto " }, /* @__PURE__ */ import_react6.default.createElement(
+  return /* @__PURE__ */ import_react4.default.createElement("div", { className: "w-100 flex-grow h-full overflow-y-auto " }, /* @__PURE__ */ import_react4.default.createElement(
     esm_default,
     {
       value: JSON.stringify(data2, null, 2),
@@ -69704,18 +69496,18 @@ var PostgreSQLQueryResponseRAWTab = ({ data: data2 }) => {
   ));
 };
 
-// src/components/postgresql/query/postgreSQLQueryResponseSchemaTab.js
-var import_react7 = __toESM(require("react"));
+// src/components/common/queryResponseSchemaTab.js
+var import_react5 = __toESM(require("react"));
 var import_to_json_schema = __toESM(require_lib());
-var import_prop_types4 = __toESM(require_prop_types());
-var PostgreSQLQueryResponseSchemaTab = ({ data: data2 }) => {
-  PostgreSQLQueryResponseSchemaTab.propTypes = {
-    data: import_prop_types4.default.object
+var import_prop_types3 = __toESM(require_prop_types());
+var QueryResponseSchemaTab = ({ data: data2 }) => {
+  QueryResponseSchemaTab.propTypes = {
+    data: import_prop_types3.default.object
   };
   const dataSchema = (0, import_to_json_schema.default)(
     data2 ? data2 : { arrays: { mode: "all" } }
   );
-  return /* @__PURE__ */ import_react7.default.createElement("div", { className: "w-100 flex-grow h-full overflow-y-auto " }, /* @__PURE__ */ import_react7.default.createElement(
+  return /* @__PURE__ */ import_react5.default.createElement("div", { className: "w-100 flex-grow h-full overflow-y-auto " }, /* @__PURE__ */ import_react5.default.createElement(
     esm_default,
     {
       value: JSON.stringify(dataSchema, null, 2),
@@ -69732,26 +69524,26 @@ var PostgreSQLQueryResponseSchemaTab = ({ data: data2 }) => {
   ));
 };
 
-// src/components/postgresql/query/postgreSQLQueryResponseTableTab.js
+// src/components/common/queryResponseTableTab.js
 var import_material = require("@mui/material");
-var import_react8 = __toESM(require("react"));
+var import_react6 = __toESM(require("react"));
 var import_x_data_grid = require("@mui/x-data-grid");
 var import_to_json_schema2 = __toESM(require_lib());
-var import_prop_types5 = __toESM(require_prop_types());
-var PostgreSQLQueryResponseTableTab = ({
+var import_prop_types4 = __toESM(require_prop_types());
+var QueryResponseTableTab = ({
   data: data2,
   className: className2,
   height = "100%",
   width = "100%"
 }) => {
-  PostgreSQLQueryResponseTableTab.propTypes = {
-    data: import_prop_types5.default.array,
-    className: import_prop_types5.default.string,
-    height: import_prop_types5.default.string,
-    width: import_prop_types5.default.string
+  QueryResponseTableTab.propTypes = {
+    data: import_prop_types4.default.array,
+    className: import_prop_types4.default.string,
+    height: import_prop_types4.default.string,
+    width: import_prop_types4.default.string
   };
   const dataSchema = Array.isArray(data2) && data2.length > 0 ? (0, import_to_json_schema2.default)(data2[0]) : null;
-  const columns = (0, import_react8.useMemo)(() => {
+  const columns = (0, import_react6.useMemo)(() => {
     if (dataSchema && dataSchema.properties) {
       return Object.keys(dataSchema.properties).map((key) => {
         return {
@@ -69767,13 +69559,13 @@ var PostgreSQLQueryResponseTableTab = ({
       return null;
     }
   }, [dataSchema]);
-  return /* @__PURE__ */ import_react8.default.createElement(
+  return /* @__PURE__ */ import_react6.default.createElement(
     import_material.Box,
     {
       sx: { width, height },
       className: `!flex !flex-col !justify-start !items-stretch ${className2}`
     },
-    !dataSchema ? /* @__PURE__ */ import_react8.default.createElement("div", { className: "!h-32 flex !flex-col !justify-center !items-center w-full text-slate-500" }, /* @__PURE__ */ import_react8.default.createElement("span", null, "Data schema not valid or no data available")) : !columns ? /* @__PURE__ */ import_react8.default.createElement("div", { className: "!h-32 flex !flex-col !justify-center !items-center w-full text-slate-500" }, /* @__PURE__ */ import_react8.default.createElement("span", null, "Columns cannot be extracted or mapped")) : data2 && Array.isArray(data2) && data2.length && columns ? /* @__PURE__ */ import_react8.default.createElement(
+    !dataSchema ? /* @__PURE__ */ import_react6.default.createElement("div", { className: "!h-32 flex !flex-col !justify-center !items-center w-full text-slate-500" }, /* @__PURE__ */ import_react6.default.createElement("span", null, "Data schema not valid or no data available")) : !columns ? /* @__PURE__ */ import_react6.default.createElement("div", { className: "!h-32 flex !flex-col !justify-center !items-center w-full text-slate-500" }, /* @__PURE__ */ import_react6.default.createElement("span", null, "Columns cannot be extracted or mapped")) : data2 && Array.isArray(data2) && data2.length && columns ? /* @__PURE__ */ import_react6.default.createElement(
       import_x_data_grid.DataGrid,
       {
         rows: data2.map((item, index) => {
@@ -69827,21 +69619,21 @@ var PostgreSQLQueryResponseTableTab = ({
           }
         }
       }
-    ) : /* @__PURE__ */ import_react8.default.createElement("div", { className: "!h-32 flex !flex-col !justify-center !items-center w-full text-slate-500" }, /* @__PURE__ */ import_react8.default.createElement("span", null, "No data"))
+    ) : /* @__PURE__ */ import_react6.default.createElement("div", { className: "!h-32 flex !flex-col !justify-center !items-center w-full text-slate-500" }, /* @__PURE__ */ import_react6.default.createElement("span", null, "No data"))
   );
 };
 
-// src/components/postgresql/query/postgreSQLQueryResponseView.js
-var import_prop_types6 = __toESM(require_prop_types());
-var PostgreSQLQueryResponseView = ({ queryResult }) => {
-  PostgreSQLQueryResponseView.propTypes = {
-    queryResult: import_prop_types6.default.object
+// src/components/common/queryResponseView.js
+var import_prop_types5 = __toESM(require_prop_types());
+var QueryResponseView = ({ queryResult }) => {
+  QueryResponseView.propTypes = {
+    queryResult: import_prop_types5.default.object
   };
-  const [tab4, setTab] = (0, import_react9.useState)(0);
+  const [tab4, setTab] = (0, import_react7.useState)(0);
   const _handleTabChange = (event, newTab) => {
     setTab(newTab);
   };
-  return /* @__PURE__ */ import_react9.default.createElement(import_react9.default.Fragment, null, /* @__PURE__ */ import_react9.default.createElement(
+  return /* @__PURE__ */ import_react7.default.createElement(import_react7.default.Fragment, null, /* @__PURE__ */ import_react7.default.createElement(
     import_material2.Tabs,
     {
       value: tab4,
@@ -69853,7 +69645,7 @@ var PostgreSQLQueryResponseView = ({ queryResult }) => {
         }
       }
     },
-    /* @__PURE__ */ import_react9.default.createElement(
+    /* @__PURE__ */ import_react7.default.createElement(
       import_material2.Tab,
       {
         label: "Table",
@@ -69863,7 +69655,7 @@ var PostgreSQLQueryResponseView = ({ queryResult }) => {
         className: `!outline-none !border-0 hover:!outline-none hover:!border-0 focus:!outline-none !font-medium !text-sm !normal-case ${tab4 === 0 ? "!text-[#646cff]" : "!text-slate-700"}`
       }
     ),
-    /* @__PURE__ */ import_react9.default.createElement(
+    /* @__PURE__ */ import_react7.default.createElement(
       import_material2.Tab,
       {
         label: "JSON",
@@ -69873,7 +69665,7 @@ var PostgreSQLQueryResponseView = ({ queryResult }) => {
         className: `!outline-none !border-0 hover:!outline-none hover:!border-0 focus:!outline-none !font-medium !text-sm !normal-case ${tab4 === 1 ? "!text-[#646cff]" : "!text-slate-700"}`
       }
     ),
-    /* @__PURE__ */ import_react9.default.createElement(
+    /* @__PURE__ */ import_react7.default.createElement(
       import_material2.Tab,
       {
         label: "Raw",
@@ -69883,7 +69675,7 @@ var PostgreSQLQueryResponseView = ({ queryResult }) => {
         className: `!outline-none !border-0 hover:!outline-none hover:!border-0 focus:!outline-none !font-medium !text-sm !normal-case ${tab4 === 2 ? "!text-[#646cff]" : "!text-slate-700"}`
       }
     ),
-    /* @__PURE__ */ import_react9.default.createElement(
+    /* @__PURE__ */ import_react7.default.createElement(
       import_material2.Tab,
       {
         label: "Data Schema",
@@ -69893,28 +69685,33 @@ var PostgreSQLQueryResponseView = ({ queryResult }) => {
         className: `!outline-none !border-0 hover:!outline-none hover:!border-0 focus:!outline-none !font-medium !text-sm !normal-case ${tab4 === 3 ? "!text-[#646cff]" : "!text-slate-700"}`
       }
     )
-  ), /* @__PURE__ */ import_react9.default.createElement("div", { className: "w-100 h-[calc(100%-48px)]" }, tab4 === 0 && /* @__PURE__ */ import_react9.default.createElement(
-    PostgreSQLQueryResponseTableTab,
+  ), /* @__PURE__ */ import_react7.default.createElement("div", { className: "w-100 h-[calc(100%-48px)]" }, tab4 === 0 && /* @__PURE__ */ import_react7.default.createElement(
+    QueryResponseTableTab,
     {
       data: queryResult ? queryResult.result : ""
     }
-  ), tab4 === 1 && /* @__PURE__ */ import_react9.default.createElement(
-    PostgreSQLQueryResponseJSONTab,
+  ), tab4 === 1 && /* @__PURE__ */ import_react7.default.createElement(
+    QueryResponseJSONTab,
     {
       data: queryResult ? queryResult.result : ""
     }
-  ), tab4 === 2 && /* @__PURE__ */ import_react9.default.createElement(
-    PostgreSQLQueryResponseRAWTab,
+  ), tab4 === 2 && /* @__PURE__ */ import_react7.default.createElement(
+    QueryResponseRAWTab,
     {
       data: queryResult ? queryResult.result : ""
     }
-  ), tab4 === 3 && /* @__PURE__ */ import_react9.default.createElement(
-    PostgreSQLQueryResponseSchemaTab,
+  ), tab4 === 3 && /* @__PURE__ */ import_react7.default.createElement(
+    QueryResponseSchemaTab,
     {
       data: queryResult ? queryResult.result : {}
     }
   )));
 };
+
+// src/components/postgresql/query/postgreSQLQueryEditor.js
+var import_react8 = __toESM(require("react"));
+var import_react9 = __toESM(require("@monaco-editor/react"));
+var import_GitHub_Light = __toESM(require("monaco-themes/themes/GitHub Light.json"));
 
 // src/components/postgresql/formConfig.json
 var formConfig_default = {
@@ -70152,8 +69949,49 @@ var formConfig_default = {
   }
 };
 
-// src/components/restapi/formConfig.json
-var formConfig_default2 = {
+// src/components/postgresql/query/queryConfig.json
+var queryConfig_default = {
+  schema: {
+    type: "object",
+    properties: {
+      "code-pgsql": {
+        type: "string",
+        description: "PostgreSQL code to execute",
+        format: "code-pgsql"
+      }
+    },
+    required: ["code-pgsql"]
+  },
+  uischema: {
+    type: "VerticalLayout",
+    elements: [
+      {
+        type: "Control",
+        scope: "#/properties/code-pgsql",
+        label: "PostgreSQL Code"
+      }
+    ]
+  },
+  data: {
+    "code-pgsql": "SELECT id, name FROM users WHERE active = true;"
+  }
+};
+
+// src/components/postgresql/datasource/datasourceTestResultUI.jsx
+var import_react10 = __toESM(require("react"));
+var PostgreSQLDatasourceTestResultUI = ({ connectionResult }) => {
+  const statusClasses = connectionResult ? "bg-green-100 !border-green-400 text-green-700" : "bg-red-100 !border-red-400 text-red-700";
+  return /* @__PURE__ */ import_react10.default.createElement("div", { className: "p-3" }, /* @__PURE__ */ import_react10.default.createElement(
+    "div",
+    {
+      className: `w-full flex flex-col justify-start items-start p-3 rounded-md border ${statusClasses}`
+    },
+    /* @__PURE__ */ import_react10.default.createElement("div", { className: "!flex !flex-row justify-start items-center" }, /* @__PURE__ */ import_react10.default.createElement("span", { className: "!text-sm !font-normal" }, connectionResult ? "Connection successful" : "Connection failed"))
+  ));
+};
+
+// src/components/restapi/query/queryConfig.json
+var queryConfig_default2 = {
   schema: {
     type: "object",
     properties: {
@@ -70438,76 +70276,23 @@ var formConfig_default2 = {
 };
 
 // src/index.js
-var import_react12 = __toESM(require("react"));
-
-// src/components/postgresql/datasource/datasourceTestResultUI.jsx
-var import_react10 = __toESM(require("react"));
-var PostgreSQLDatasourceTestResultUI = ({ connectionResult }) => {
-  const statusClasses = connectionResult ? "bg-green-100 !border-green-400 text-green-700" : "bg-red-100 !border-red-400 text-red-700";
-  return /* @__PURE__ */ import_react10.default.createElement("div", { className: "p-3" }, /* @__PURE__ */ import_react10.default.createElement(
-    "div",
-    {
-      className: `w-full flex flex-col justify-start items-start p-3 rounded-md border ${statusClasses}`
-    },
-    /* @__PURE__ */ import_react10.default.createElement("div", { className: "!flex !flex-row justify-start items-center" }, /* @__PURE__ */ import_react10.default.createElement("span", { className: "!text-sm !font-normal" }, connectionResult ? "Connection successful" : "Connection failed"))
-  ));
-};
-
-// src/components/restapi/datasource/datasourceTestResultUI.jsx
-var import_react11 = __toESM(require("react"));
-var RESTAPIDatasourceTestResultUI = ({ connectionResult }) => {
-  const statusClasses = connectionResult ? "bg-green-100 !border-green-400 text-green-700" : "bg-red-100 !border-red-400 text-red-700";
-  return /* @__PURE__ */ import_react11.default.createElement("div", { className: "p-3 flex flex-col justify-start items-start h-full w-full" }, /* @__PURE__ */ import_react11.default.createElement(
-    "div",
-    {
-      className: `w-full flex flex-col justify-start items-start p-3 rounded-md border ${statusClasses}`
-    },
-    /* @__PURE__ */ import_react11.default.createElement("div", { className: "!flex !flex-row justify-start items-center" }, /* @__PURE__ */ import_react11.default.createElement("span", { className: "!text-sm !font-normal" }, connectionResult ? "Connection successful" : "Connection failed"))
-  ), /* @__PURE__ */ import_react11.default.createElement("div", { className: "w-full flex-grow h-full overflow-y-auto border border-slate-200 rounded mt-3" }, /* @__PURE__ */ import_react11.default.createElement(
-    esm_default,
-    {
-      value: JSON.stringify(connectionResult, null, 2),
-      extensions: [loadLanguage("json")],
-      theme: githubLight,
-      style: {
-        width: "100%",
-        borderWidth: 0,
-        borderBottomWidth: 1,
-        outline: "none"
-      },
-      className: "border-slate-300 focus:border-slate-300 focus:outline-slate-300 flex-grow non-focusable-code-editor !h-full"
-    }
-  )));
-};
-
-// src/index.js
 var DATASOURCE_UI_COMPONENTS = {
   [DATASOURCE_TYPES.POSTGRESQL.value]: {
     formConfig: formConfig_default,
-    queryEditor: function({ query, setQuery }) {
-      return import_react12.default.createElement(PostgreSQLQueryEditor, { query, setQuery });
-    },
+    queryConfigForm: queryConfig_default,
     queryResponseView: function({ queryResult }) {
-      return import_react12.default.createElement(PostgreSQLQueryResponseView, { queryResult });
+      return import_react11.default.createElement(QueryResponseView, { queryResult });
     },
     datasourceTestResultUI: function({ connectionResult }) {
-      return import_react12.default.createElement(PostgreSQLDatasourceTestResultUI, {
+      return import_react11.default.createElement(PostgreSQLDatasourceTestResultUI, {
         connectionResult
       });
     }
   },
   [DATASOURCE_TYPES.RESTAPI.value]: {
-    formConfig: formConfig_default2,
-    queryEditor: function({ query, setQuery }) {
-      return import_react12.default.createElement(PostgreSQLQueryEditor, { query, setQuery });
-    },
+    queryConfigForm: queryConfig_default2,
     queryResponseView: function({ queryResult }) {
-      return import_react12.default.createElement(PostgreSQLQueryResponseView, { queryResult });
-    },
-    datasourceTestResultUI: function({ connectionResult }) {
-      return import_react12.default.createElement(RESTAPIDatasourceTestResultUI, {
-        connectionResult
-      });
+      return import_react11.default.createElement(QueryResponseView, { queryResult });
     }
   }
 };

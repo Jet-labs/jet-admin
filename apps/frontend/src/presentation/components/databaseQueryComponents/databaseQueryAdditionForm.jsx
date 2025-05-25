@@ -20,8 +20,7 @@ import {
 import { formValidations } from "../../../utils/formValidation";
 import { DatabaseQueryAIGeneratePrompt } from "./databaseQueryAIGeneratePrompt";
 import PropTypes from "prop-types";
-import { DATASOURCE_UI_COMPONENTS } from "@jet-admin/datasources-ui";
-import { DATASOURCE_TYPES } from "@jet-admin/datasource-types";
+import { DatabaseQueryEditor } from "./databaseQueryEditor";
 
 export const DatabaseQueryAdditionForm = ({ tenantID }) => {
   DatabaseQueryAdditionForm.propTypes = {
@@ -60,6 +59,8 @@ export const DatabaseQueryAdditionForm = ({ tenantID }) => {
     initialValues: {
       databaseQueryTitle: "Untitled",
       databaseQueryDescription: "",
+      datasourceID: "",
+      datasourceType: "",
       databaseQueryString: "",
       databaseQueryArgs: [],
       runOnLoad: false,
@@ -165,10 +166,9 @@ export const DatabaseQueryAdditionForm = ({ tenantID }) => {
                     {CONSTANTS.STRINGS.ADD_QUERY_FORM_RUN_ON_LOAD_FIELD_LABEL}
                   </span>
                 </label>
-
                 <div>
                   <label
-                    htmlFor="databaseQueryDescription"
+                    htmlFor="databaseQueryArgs"
                     className="block mb-1 text-xs font-medium text-slate-500"
                   >
                     {CONSTANTS.STRINGS.ADD_QUERY_FORM_PARAMS_FIELD_LABEL}
@@ -193,27 +193,11 @@ export const DatabaseQueryAdditionForm = ({ tenantID }) => {
               <ResizableHandle withHandle={true} />
               <ResizablePanel
                 defaultSize={80}
-                className="space-y-3 md:space-y-4 p-3"
+                className="space-y-3 md:space-y-4 p-3 h-full w-full !overflow-y-auto"
               >
-                {queryAdditionForm.errors.databaseQueryString && (
-                  <label
-                    htmlFor="databaseQueryString"
-                    className="block text-xs font-medium text-red-500"
-                  >
-                    {`${queryAdditionForm.errors.databaseQueryString}`}
-                  </label>
-                )}
-                {DATASOURCE_UI_COMPONENTS[
-                  DATASOURCE_TYPES.POSTGRESQL.value
-                ].queryEditor({
-                  query: queryAdditionForm.values.databaseQueryString,
-                  setQuery: (value) => {
-                    queryAdditionForm.setFieldValue(
-                      "databaseQueryString",
-                      value
-                    );
-                  },
-                })}
+                <DatabaseQueryEditor
+                  databaseQueryEditorForm={queryAdditionForm}
+                />
                 <div className="w-full flex flex-row justify-end">
                   <DatabaseQueryAIGeneratePrompt
                     tenantID={tenantID}

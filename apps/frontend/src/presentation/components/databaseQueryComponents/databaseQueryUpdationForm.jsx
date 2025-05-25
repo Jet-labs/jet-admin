@@ -23,8 +23,7 @@ import { formValidations } from "../../../utils/formValidation";
 import PropTypes from "prop-types";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import { DatabaseQueryCloneForm } from "./databaseQueryCloneForm";
-import { DATASOURCE_UI_COMPONENTS } from "@jet-admin/datasources-ui";
-import { DATASOURCE_TYPES } from "@jet-admin/datasource-types";
+import { DatabaseQueryEditor } from "./databaseQueryEditor";
 
 export const DatabaseQueryUpdationForm = ({ tenantID, databaseQueryID }) => {
   DatabaseQueryUpdationForm.propTypes = {
@@ -288,27 +287,11 @@ export const DatabaseQueryUpdationForm = ({ tenantID, databaseQueryID }) => {
                 <ResizableHandle withHandle={true} />
                 <ResizablePanel
                   defaultSize={80}
-                  className="space-y-3 md:space-y-4 p-3"
+                  className="space-y-3 md:space-y-4 p-3 h-full w-full !overflow-y-auto"
                 >
-                  {queryUpdationForm.errors.databaseQueryString && (
-                    <label
-                      htmlFor="databaseQueryString"
-                      className="block text-xs font-medium text-red-500"
-                    >
-                      {`${queryUpdationForm.errors.databaseQueryString}`}
-                    </label>
-                  )}
-                  {DATASOURCE_UI_COMPONENTS[
-                    DATASOURCE_TYPES.POSTGRESQL.value
-                  ].queryEditor({
-                    query: queryUpdationForm.values.databaseQueryString,
-                    setQuery: (value) => {
-                      queryUpdationForm.setFieldValue(
-                        "databaseQueryString",
-                        value
-                      );
-                    },
-                  })}
+                  <DatabaseQueryEditor
+                    databaseQueryEditorForm={queryUpdationForm}
+                  />
                   <div className="w-full flex flex-row justify-end">
                     <DatabaseQueryCloneForm
                       key={`databaseQueryCloneForm_${databaseQuery?.databaseQueryID}`}

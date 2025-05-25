@@ -24,6 +24,7 @@ import { useTenantState } from "../../../../logic/contexts/tenantContext";
 import { useComponentSize } from "../../../../logic/hooks/useComponentSize";
 import { TenantSelectionDropdown } from "../../tenantComponents/tenantSelectionDropdown";
 import { NoEntityUI } from "../../ui/noEntityUI";
+import { TbCloudDataConnection } from "react-icons/tb";
 
 export const MainDrawerList = () => {
   const location = useLocation();
@@ -203,7 +204,7 @@ export const MainDrawerList = () => {
                   : "bg-slate-100"
               } rounded mb-2 w-full p-2 text-slate-700 transition duration-75 group bg-slate-200  hover:bg-slate-100  flex-row !justify-start mt-2 `}
             >
-              <RiDashboardFill
+              <TbCloudDataConnection
                 className={`!w-5 !h-5 ${
                   decodeURIComponent(location.pathname).includes(
                     CONSTANTS.ROUTES.VIEW_DATASOURCES.path(tenantID)

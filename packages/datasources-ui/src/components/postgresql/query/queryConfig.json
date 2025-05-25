@@ -1,0 +1,27 @@
+{
+    "schema":{
+      "type": "object",
+      "properties": {
+        "code-pgsql": {
+          "type": "string",
+          "description": "PostgreSQL code to execute",
+          "format": "code-pgsql"
+        }
+      },
+      "required": ["code-pgsql"]
+    }
+    ,
+    "uischema":{
+      "type": "VerticalLayout",
+      "elements": [
+        {
+          "type": "Control",
+          "scope": "#/properties/code-pgsql",
+          "label": "PostgreSQL Code"
+        }
+      ]
+    },
+    "data":{
+      "code-pgsql": "SELECT id, name FROM users WHERE active = true;"
+    }
+}
