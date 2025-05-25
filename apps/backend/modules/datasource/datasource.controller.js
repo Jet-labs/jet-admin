@@ -84,18 +84,10 @@ datasourceController.testDatasourceConnection = async (req, res) => {
         connectionResult,
       },
     });
-    if (connectionResult) {
-      return expressUtils.sendResponse(res, true, {
-        message: "Datasource connection tested successfully.",
-      });
-    } else {
-      return expressUtils.sendResponse(
-        res,
-        false,
-        {},
-        "Datasource connection failed."
-      );
-    }
+    return expressUtils.sendResponse(res, true, {
+      connectionResult,
+      message: "Datasource connection tested successfully.",
+    });
   } catch (error) {
     Logger.log("error", {
       message: "datasourceController:testDatasourceConnection:error",

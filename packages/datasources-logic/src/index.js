@@ -1,5 +1,6 @@
 import { DATASOURCE_TYPES } from "@jet-admin/datasource-types";
-import { testConnection as postgresqlTestConnection } from "./components/postgresql/logic/connection";
+import { postgresqlTestConnection } from "./components/postgresql/logic/connection";
+import { restAPITestConnection } from "./components/restapi/logic/connection";
 
 export const DATASOURCE_LOGIC_COMPONENTS = {
   [DATASOURCE_TYPES.POSTGRESQL.value]: {
@@ -13,6 +14,13 @@ export const DATASOURCE_LOGIC_COMPONENTS = {
           user: datasourceOptions.user,
           password: datasourceOptions.password,
         },
+      });
+    },
+  },
+  [DATASOURCE_TYPES.RESTAPI.value]: {
+    testConnection: async ({ datasourceOptions }) => {
+      return await restAPITestConnection({
+        datasourceOptions,
       });
     },
   },

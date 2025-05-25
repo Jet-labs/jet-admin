@@ -29,8 +29,8 @@ export const DatasourceTestingForm = ({
         });
       },
       retry: false,
-      onSuccess: () => {
-        setDatasourceTestResult(true);
+      onSuccess: (data) => {
+        setDatasourceTestResult(data);
         displaySuccess(CONSTANTS.STRINGS.TEST_DATASOURCE_FORM_TESTING_SUCCESS);
       },
       onError: (error) => {

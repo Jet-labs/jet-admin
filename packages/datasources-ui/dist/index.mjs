@@ -71464,13 +71464,27 @@ var PostgreSQLDatasourceTestResultUI = ({ connectionResult }) => {
 import React9 from "react";
 var RESTAPIDatasourceTestResultUI = ({ connectionResult }) => {
   const statusClasses = connectionResult ? "bg-green-100 !border-green-400 text-green-700" : "bg-red-100 !border-red-400 text-red-700";
-  return /* @__PURE__ */ React9.createElement("div", { className: "p-3" }, /* @__PURE__ */ React9.createElement(
+  return /* @__PURE__ */ React9.createElement("div", { className: "p-3 flex flex-col justify-start items-start h-full w-full" }, /* @__PURE__ */ React9.createElement(
     "div",
     {
       className: `w-full flex flex-col justify-start items-start p-3 rounded-md border ${statusClasses}`
     },
     /* @__PURE__ */ React9.createElement("div", { className: "!flex !flex-row justify-start items-center" }, /* @__PURE__ */ React9.createElement("span", { className: "!text-sm !font-normal" }, connectionResult ? "Connection successful" : "Connection failed"))
-  ));
+  ), /* @__PURE__ */ React9.createElement("div", { className: "w-full flex-grow h-full overflow-y-auto border border-slate-200 rounded mt-3" }, /* @__PURE__ */ React9.createElement(
+    esm_default,
+    {
+      value: JSON.stringify(connectionResult, null, 2),
+      extensions: [loadLanguage("json")],
+      theme: githubLight,
+      style: {
+        width: "100%",
+        borderWidth: 0,
+        borderBottomWidth: 1,
+        outline: "none"
+      },
+      className: "border-slate-300 focus:border-slate-300 focus:outline-slate-300 flex-grow non-focusable-code-editor !h-full"
+    }
+  )));
 };
 
 // src/index.js

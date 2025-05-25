@@ -57,12 +57,14 @@ const CustomNumberInput = (props) => {
     (schema.type === "integer" ? 1 : "any");
 
   return (
-    <div className="mb-2">
+    <div className="">
       <label
         htmlFor={path}
-        className="block mb-1 text-xs font-medium text-slate-500"
+        className={`block mb-1 text-xs font-medium ${
+          errors && errors.length > 0 ? "text-red-500" : "text-slate-500"
+        }`}
       >
-        {label || description || schema.description}
+        {label || description} {errors && errors.length > 0 && errors}
       </label>
       {errors && errors.length > 0 && (
         <span className="text-red-500 text-xs">{errors}</span>
@@ -71,8 +73,16 @@ const CustomNumberInput = (props) => {
         type="number"
         id={path}
         name={path}
-        className="placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded focus:border-slate-700 block w-full px-2.5 py-1.5"
-        placeholder={uischema?.options?.placeholder || ""}
+        className={`placeholder:text-slate-400 text-sm bg-slate-50 border  focus:border-slate-700 ${
+          errors && errors.length > 0
+            ? "border-red-500 focus:border-red-500"
+            : "border-slate-200"
+        } text-slate-700 rounded  block w-full px-2.5 py-1.5`}
+        placeholder={
+          errors && errors.length > 0
+            ? errors
+            : uischema?.options?.placeholder || ""
+        }
         onChange={handleInputChange}
         value={data === undefined || data === null ? "" : data} // Handle undefined/null for controlled input
         min={schema.minimum}
@@ -89,22 +99,29 @@ const CustomTextInput = (props) => {
   const isMulti = uischema?.options?.multi;
 
   return (
-    <div className="mb-2">
+    <div className="">
       <label
         htmlFor={path}
-        className="block mb-1 text-xs font-medium text-slate-500"
+        className={`block mb-1 text-xs font-medium ${
+          errors && errors.length > 0 ? "text-red-500" : "text-slate-500"
+        }`}
       >
-        {label || description}
+        {label || description} {errors && errors.length > 0 && errors}
       </label>
-      {errors && errors.length > 0 && (
-        <span className="text-red-500 text-xs">{errors}</span>
-      )}
       {isMulti ? (
         <textarea
           id={path}
           name={path}
-          className="placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded focus:border-slate-700 block w-full px-2.5 py-1.5"
-          placeholder={uischema?.options?.placeholder || ""}
+          className={`placeholder:text-slate-400 text-sm bg-slate-50 border  focus:border-slate-700 ${
+            errors && errors.length > 0
+              ? "border-red-500 focus:border-red-500"
+              : "border-slate-200"
+          } text-slate-700 rounded  block w-full px-2.5 py-1.5`}
+          placeholder={
+            errors && errors.length > 0
+              ? errors
+              : uischema?.options?.placeholder || ""
+          }
           onChange={(ev) => handleChange(path, ev.target.value)}
           value={data || ""}
           rows={uischema?.options?.rows || 3}
@@ -114,8 +131,16 @@ const CustomTextInput = (props) => {
           type={uischema?.options?.format === "password" ? "password" : "text"}
           id={path}
           name={path}
-          className="placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded focus:border-slate-700 block w-full px-2.5 py-1.5"
-          placeholder={uischema?.options?.placeholder || ""}
+          className={`placeholder:text-slate-400 text-sm bg-slate-50 border  focus:border-slate-700 ${
+            errors && errors.length > 0
+              ? "border-red-500 focus:border-red-500"
+              : "border-slate-200"
+          } text-slate-700 rounded  block w-full px-2.5 py-1.5`}
+          placeholder={
+            errors && errors.length > 0
+              ? errors
+              : uischema?.options?.placeholder || ""
+          }
           onChange={(ev) => handleChange(path, ev.target.value)}
           value={data || ""}
         />
@@ -152,20 +177,23 @@ const CustomSelectInput = (props) => {
   };
 
   return (
-    <div className="mb-2">
+    <div className="">
       <label
         htmlFor={path}
-        className="block mb-1 text-xs font-medium text-slate-500"
+        className={`block mb-1 text-xs font-medium ${
+          errors && errors.length > 0 ? "text-red-500" : "text-slate-500"
+        }`}
       >
-        {label || description}
+        {label || description} {errors && errors.length > 0 && errors}
       </label>
-      {errors && errors.length > 0 && (
-        <span className="text-red-500 text-xs">{errors}</span>
-      )}
       <select
         id={path}
         name={path}
-        className="placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded focus:border-slate-700 block w-full px-2.5 py-1.5"
+        className={`placeholder:text-slate-400 text-sm bg-slate-50 border focus:border-slate-700 ${
+          errors && errors.length > 0
+            ? "border-red-500 focus:border-red-500"
+            : "border-slate-200"
+        } text-slate-700 rounded  block w-full px-2.5 py-1.5`}
         onChange={(ev) => handleChange(path, ev.target.value)}
         value={data || ""}
       >
@@ -198,14 +226,14 @@ const CustomGroupLayout = (props) => {
 
   return (
     <div
-      className={`custom-group-container border p-3 mb-2 mt-1 rounded ${customClass}`}
+      className={`custom-group-container border p-3 mt-1 rounded ${customClass}`}
     >
       {uischema.label && (
         <h2 className="!text-sm font-semibold text-slate-800 mb-2">
           {uischema.label}
         </h2>
       )}
-      <div className="custom-group-content">
+      <div className="custom-group-content flex flex-col gap-2">
         {elements.map((element, index) => (
           <JsonFormsDispatch
             key={index}
@@ -257,7 +285,7 @@ const CustomKeyValueArrayRenderer = ({
 
   return (
     <div className="p-3 border border-slate-200 rounded bg-white shadow-sm">
-      <label className="block mb-2 text-sm font-medium text-slate-700">
+      <label className="block mb-1 text-sm font-medium text-slate-700">
         {label || uischema.label || "Items"}
       </label>
       {errors && errors.length > 0 && (
@@ -329,6 +357,43 @@ const CustomKeyValueArrayRenderer = ({
   );
 };
 
+const CustomCheckboxInput = (props) => {
+  const {
+    data,
+    path,
+    handleChange,
+    label,
+    description,
+    errors,
+    enabled,
+    uischema,
+  } = props;
+
+  const onToggle = (ev) => {
+    handleChange(path, ev.target.checked);
+  };
+
+  return (
+    <div className="flex items-center">
+      <input
+        type="checkbox"
+        id={path}
+        name={path}
+        checked={!!data}
+        disabled={!enabled}
+        onChange={onToggle}
+        className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+      />
+      <label htmlFor={path} className="ml-2 text-sm font-medium text-slate-700">
+        {label || description || uischema.label}
+      </label>
+      {errors && errors.length > 0 && (
+        <p className="text-red-500 text-xs mt-1">{errors}</p>
+      )}
+    </div>
+  );
+};
+
 const CustomTabRenderer = (props) => {
   const { uischema, schema, path, enabled, renderers, cells } = props;
   const categories = uischema.elements;
@@ -362,7 +427,7 @@ const CustomTabRenderer = (props) => {
       </div>
 
       {/* Tab Content */}
-      <div className="p-3 border mt-3 border-slate-200 rounded bg-white">
+      <div className="p-3 border mt-3 border-slate-200 rounded bg-white flex flex-col gap-2">
         {activeCategory?.elements.map((element, i) => (
           <JsonFormsDispatch
             key={i}
@@ -395,6 +460,9 @@ export const MyCustomKeyValueArrayControl = withJsonFormsControlProps(
   CustomKeyValueArrayRenderer
 );
 export const MyCustomTabRenderer = withJsonFormsLayoutProps(CustomTabRenderer);
+
+export const MyCustomCheckboxInput =
+  withJsonFormsControlProps(CustomCheckboxInput);
 
 // PropTypes (slightly adjusted for errors prop being array of strings)
 CustomNumberInput.propTypes = {
@@ -451,6 +519,17 @@ CustomKeyValueArrayRenderer.propTypes = {
   renderers: PropTypes.arrayOf(PropTypes.object).isRequired, // Must pass renderers down
 };
 
+CustomCheckboxInput.propTypes = {
+  data: PropTypes.bool,
+  path: PropTypes.string.isRequired,
+  handleChange: PropTypes.func.isRequired,
+  label: PropTypes.string,
+  description: PropTypes.string,
+  errors: PropTypes.arrayOf(PropTypes.string),
+  enabled: PropTypes.bool.isRequired,
+  uischema: PropTypes.object.isRequired,
+};
+
 CustomTabRenderer.propTypes = {
   uischema: PropTypes.shape({
     type: PropTypes.string.isRequired,
@@ -462,7 +541,6 @@ CustomTabRenderer.propTypes = {
   renderers: PropTypes.arrayOf(PropTypes.object).isRequired,
   cells: PropTypes.arrayOf(PropTypes.object), // <--- Add this propType
 };
-// --- TESTER FUNCTIONS (UNCHANGED, AS THEY SHOULD BE CORRECTED) ---
 
 // eslint-disable-next-line no-unused-vars
 const customNumberInputTester = (uischema, rootSchema, context) => {
@@ -623,10 +701,6 @@ const customKeyValueArrayRendererTester = (uischema, rootSchema, context) => {
       );
       return -1;
     }
-
-    // --- MODIFIED LOGIC FOR TARGET SCOPE CHECK ---
-    // If context.path is undefined, we can't use it directly.
-    // Instead, rely on the uischema.scope which should always be present for a Control.
     const scopeString = uischema.scope; // e.g., '#/properties/headers'
     let isTargetScope = false;
 
@@ -664,6 +738,22 @@ const customKeyValueArrayRendererTester = (uischema, rootSchema, context) => {
   }
 };
 
+const customCheckboxTester = (uischema, schema) => {
+  if (uischema.type !== "Control") {
+    return -1;
+  }
+  try {
+    const current = Resolve.schema(schema, uischema.scope, schema);
+    if (current && current.type === "boolean") {
+      return 10; // adjust rank as needed
+    }
+  } catch (e) {
+    console.warn(e);
+    return -1;
+  }
+  return -1;
+};
+
 const customTabRendererTester = (uischema) => {
   // Check if it's a Categorization UI schema type
   if (uischema.type === "Categorization") {
@@ -688,6 +778,10 @@ export const customJSONFormRenderers = [
   {
     tester: customTextInputTester,
     renderer: MyCustomTextInput,
+  },
+  {
+    tester: customCheckboxTester,
+    renderer: MyCustomCheckboxInput,
   },
   {
     tester: customSelectInputTester,

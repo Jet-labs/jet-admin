@@ -56,7 +56,7 @@ export const testDatasourceConnectionAPI = async ({
         }
       );
       if (response.data && response.data.success === true) {
-        return Boolean(response.data.connectionResult);
+        return response.data.connectionResult;
       } else if (response.data.error) {
         throw response.data.error;
       } else {
