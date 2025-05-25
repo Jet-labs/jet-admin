@@ -18,7 +18,10 @@ export const DatabaseQueryEditor = ({ databaseQueryEditorForm }) => {
   // This handler specifically updates the 'datasourceOptions' part of Formik's state
   const _handleDatasourceOptionsChange = ({ data }) => {
     // Update only the 'datasourceOptions' field in Formik's state
-    databaseQueryEditorForm.setFieldValue("databaseQueryString", data);
+    console.log({
+      data,
+    });
+    databaseQueryEditorForm.setFieldValue("databaseQueryData", data);
     // You could also attempt to map JSON Forms errors to Formik's errors for 'datasourceOptions'
     // but often Yup handles it sufficiently for overall form validity.
   };
@@ -28,11 +31,15 @@ export const DatabaseQueryEditor = ({ databaseQueryEditorForm }) => {
     const selectedDatasource = datasources.find(
       (datasource) => datasource.value === event.target.value
     );
-    databaseQueryEditorForm.setFieldValue("datasourceType", selectedDatasource.type);
+    databaseQueryEditorForm.setFieldValue(
+      "datasourceType",
+      selectedDatasource.type
+    );
   };
-  
+
   console.log({
-    t: DATASOURCE_UI_COMPONENTS[databaseQueryEditorForm.values.datasourceType],
+    values: databaseQueryEditorForm.values,
+    errors: databaseQueryEditorForm.errors,
   });
   return (
     <>
@@ -69,43 +76,34 @@ export const DatabaseQueryEditor = ({ databaseQueryEditorForm }) => {
           ))}
         </select>
       </div>
-      {DATASOURCE_UI_COMPONENTS[
-        databaseQueryEditorForm.values.datasourceType
-      ] && (
-        <>
-          <h2 className="text-base font-bold mt-6 !-mb-3 text-slate-700">
-            {
-              CONSTANTS.STRINGS
-                .DATASOURCE_EDITOR_FORM_CONNECTION_DETAILS_FIELD_LABEL
-            }
-          </h2>
-          {DATASOURCE_UI_COMPONENTS[
+
+      <>
+        {DATASOURCE_UI_COMPONENTS[
+          databaseQueryEditorForm.values.datasourceType
+        ] &&
+          DATASOURCE_UI_COMPONENTS[
             databaseQueryEditorForm.values.datasourceType
-          ] &&
-            DATASOURCE_UI_COMPONENTS[
-              databaseQueryEditorForm.values.datasourceType
-            ].queryConfigForm && (
-              <JsonForms
-                schema={
-                  DATASOURCE_UI_COMPONENTS[
-                    databaseQueryEditorForm.values.datasourceType
-                  ].queryConfigForm.schema
-                }
-                uischema={
-                  DATASOURCE_UI_COMPONENTS[
-                    databaseQueryEditorForm.values.datasourceType
-                  ].queryConfigForm.uischema
-                }
-                // Pass only the 'datasourceOptions' part of Formik's values to JsonForms
-                data={databaseQueryEditorForm.values.datasourceOptions}
-                renderers={[...materialRenderers, ...customJSONFormRenderers]}
-                cells={materialCells}
-                // This onChange updates only the 'datasourceOptions' in Formik
-                onChange={_handleDatasourceOptionsChange}
-              />
-            )}
-        </>
-      )}
+          ].queryConfigForm && (
+            <JsonForms
+              schema={
+                DATASOURCE_UI_COMPONENTS[
+                  databaseQueryEditorForm.values.datasourceType
+                ].queryConfigForm.schema
+              }
+              uischema={
+                DATASOURCE_UI_COMPONENTS[
+                  databaseQueryEditorForm.values.datasourceType
+                ].queryConfigForm.uischema
+              }
+              data={databaseQueryEditorForm.values.databaseQueryData}
+              renderers={[...materialRenderers, ...customJSONFormRenderers]}
+              cells={materialCells}
+              // This onChange updates only the 'datasourceOptions' in Formik
+              validationMode="ValidateAndShow"
+              onChange={_handleDatasourceOptionsChange}
+            />
+          )}
+      </>
     </>
   );
 };

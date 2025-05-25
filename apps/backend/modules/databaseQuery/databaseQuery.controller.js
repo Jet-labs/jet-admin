@@ -61,6 +61,8 @@ databaseQueryController.createDatabaseQuery = async (req, res) => {
       databaseQueryTitle,
       databaseQueryDescription,
       databaseQueryData,
+      datasourceID,
+      datasourceType,
       runOnLoad,
     } = req.body;
 
@@ -72,6 +74,8 @@ databaseQueryController.createDatabaseQuery = async (req, res) => {
         databaseQueryTitle,
         databaseQueryDescription,
         databaseQueryData,
+        datasourceID,
+        datasourceType,
         runOnLoad,
       },
     });
@@ -82,6 +86,8 @@ databaseQueryController.createDatabaseQuery = async (req, res) => {
       databaseQueryTitle,
       databaseQueryDescription,
       databaseQueryData,
+      datasourceID,
+      datasourceType,
       runOnLoad,
     });
 
@@ -93,6 +99,8 @@ databaseQueryController.createDatabaseQuery = async (req, res) => {
         databaseQueryTitle,
         databaseQueryDescription,
         databaseQueryData,
+        datasourceID,
+        datasourceType,
         runOnLoad,
         result,
       },
@@ -119,9 +127,7 @@ databaseQueryController.createBulkDatabaseQuery = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID } = req.params;
-    const {
-      databaseQueriesData,
-    } = req.body;
+    const { databaseQueriesData } = req.body;
 
     Logger.log("info", {
       message: "databaseQueryController:createBulkDatabaseQuery:params",
@@ -418,6 +424,8 @@ databaseQueryController.updateDatabaseQueryByID = async (req, res) => {
       databaseQueryTitle,
       databaseQueryDescription,
       databaseQueryData,
+      datasourceID,
+      datasourceType,
       runOnLoad,
     } = req.body;
 
@@ -430,6 +438,8 @@ databaseQueryController.updateDatabaseQueryByID = async (req, res) => {
         databaseQueryTitle,
         databaseQueryDescription,
         databaseQueryData,
+        datasourceID,
+        datasourceType,
         runOnLoad,
       },
     });
@@ -441,6 +451,8 @@ databaseQueryController.updateDatabaseQueryByID = async (req, res) => {
       databaseQueryTitle,
       databaseQueryDescription,
       databaseQueryData,
+      datasourceID,
+      datasourceType,
       runOnLoad,
     });
 
@@ -453,6 +465,8 @@ databaseQueryController.updateDatabaseQueryByID = async (req, res) => {
         databaseQueryTitle,
         databaseQueryDescription,
         databaseQueryData,
+        datasourceID,
+        datasourceType,
         runOnLoad,
         result,
       },

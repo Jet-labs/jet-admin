@@ -1,6 +1,9 @@
 // src/components/forms/customJSONFormRenderers.jsx
 
 import {
+  and,
+  formatIs,
+  isControl,
   rankWith,
   Resolve,
   uiTypeIs,
@@ -12,8 +15,10 @@ import {
   withJsonFormsLayoutProps,
 } from "@jsonforms/react";
 import PropTypes from "prop-types";
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { MdDeleteOutline } from "react-icons/md";
+import Editor from "@monaco-editor/react";
+import GithubTheme from "monaco-themes/themes/GitHub Light.json";
 
 // (Your CustomNumberInput, CustomTextInput, CustomSelectInput, CustomGroupLayout remain the same)
 // ... (paste them here from your provided code) ...
@@ -214,6 +219,160 @@ const CustomSelectInput = (props) => {
   );
 };
 
+const CustomCodePgsqlControl = ({
+  data,
+  path,
+  label,
+  description,
+  errors,
+  handleChange,
+  enabled,
+  uischema,
+}) => {
+  const { databaseMetadata } = uischema.options || {};
+  // build schema for autocompletion
+  const tablesMap = useMemo(() => {
+    if (!databaseMetadata?.schemas) return {};
+    const map = {};
+    databaseMetadata.schemas.forEach((schemaItem) => {
+      schemaItem.tables?.forEach((t) => {
+        map[t.databaseTableName] =
+          t.databaseTableColumns?.map((c) => c.databaseTableColumnName) || [];
+      });
+    });
+    return map;
+  }, [databaseMetadata]);
+
+  const schemaRef = useRef(tablesMap);
+  useEffect(() => {
+    schemaRef.current = tablesMap;
+  }, [tablesMap]);
+
+  console.log("CustomCodePgsqlControl", { data });
+
+  const handleEditorWillMount = (monaco) => {
+    monaco.languages.registerCompletionItemProvider("sql", {
+      triggerCharacters: [".", " "],
+      provideCompletionItems: (model, pos) => {
+        const text = model.getValueInRange({
+          startLineNumber: 1,
+          startColumn: 1,
+          endLineNumber: pos.lineNumber,
+          endColumn: pos.column,
+        });
+        const wordInfo = model.getWordUntilPosition(pos);
+        const range = {
+          startLineNumber: pos.lineNumber,
+          endLineNumber: pos.lineNumber,
+          startColumn: wordInfo.startColumn,
+          endColumn: wordInfo.endColumn,
+        };
+        const suggestions = [];
+        const tableMatch = text.match(/(\b\w+)\.$/);
+        if (tableMatch) {
+          const cols = schemaRef.current[tableMatch[1]] || [];
+          cols.forEach((col) =>
+            suggestions.push({
+              label: col,
+              kind: monaco.languages.CompletionItemKind.Field,
+              insertText: col,
+              detail: `Column of ${tableMatch[1]}`,
+              range,
+            })
+          );
+        } else {
+          Object.keys(schemaRef.current).forEach((tbl) =>
+            suggestions.push({
+              label: tbl,
+              kind: monaco.languages.CompletionItemKind.Class,
+              insertText: tbl,
+              detail: "Table",
+              range,
+            })
+          );
+          const sqlKeywords = [
+            "SELECT",
+            "FROM",
+            "WHERE",
+            "JOIN",
+            "LEFT JOIN",
+            "RIGHT JOIN",
+            "INNER JOIN",
+            "ON",
+            "GROUP BY",
+            "ORDER BY",
+            "ASC",
+            "DESC",
+            "AS",
+            "DISTINCT",
+            "LIMIT",
+            "OFFSET",
+            "INSERT INTO",
+            "VALUES",
+            "UPDATE",
+            "SET",
+            "DELETE",
+            "CREATE TABLE",
+            "ALTER TABLE",
+            "DROP TABLE",
+            "INDEX",
+            "COUNT",
+            "SUM",
+            "AVG",
+            "MAX",
+            "MIN",
+            "AND",
+            "OR",
+            "NOT",
+            "NULL",
+            "IS",
+            // Add more keywords as needed
+          ];
+          sqlKeywords.forEach((kw) =>
+            suggestions.push({
+              label: kw,
+              kind: monaco.languages.CompletionItemKind.Keyword,
+              insertText: kw,
+              range,
+            })
+          );
+        }
+        return { suggestions };
+      },
+    });
+    monaco.editor.defineTheme("github-light", GithubTheme);
+  };
+
+  return (
+    <div className="mb-3">
+      <label
+        htmlFor={path}
+        className={`block mb-1 text-xs font-medium ${
+          errors && errors.length > 0 ? "text-red-500" : "text-slate-500"
+        }`}
+      >
+        {label || description} {errors && errors.length > 0 && errors}
+      </label>
+      <div className="border border-slate-200 rounded p-1">
+        <Editor
+          height={uischema.options?.height || "200px"}
+          defaultLanguage="sql"
+          value={data || ""}
+          onChange={(val) => handleChange(path, val || "")}
+          beforeMount={handleEditorWillMount}
+          options={{
+            readOnly: !enabled,
+            minimap: { enabled: false },
+            fontSize: 12,
+            wordWrap: "on",
+          }}
+          theme="github-light"
+        />
+      </div>
+    </div>
+  );
+};
+
 const CustomGroupLayout = (props) => {
   const { uischema, schema, path, visible, enabled, renderers } = props;
   const elements = uischema.elements;
@@ -284,7 +443,7 @@ const CustomKeyValueArrayRenderer = ({
   };
 
   return (
-    <div className="p-3 border border-slate-200 rounded bg-white shadow-sm">
+    <div className="p-3 border border-slate-200 rounded bg-white">
       <label className="block mb-1 text-sm font-medium text-slate-700">
         {label || uischema.label || "Items"}
       </label>
@@ -337,7 +496,7 @@ const CustomKeyValueArrayRenderer = ({
             <button
               type="button"
               onClick={() => handleRemoveItem(index)}
-              className="mt-3 p-2 rounded bg-red-100 text-red-400  focus:outline-none hover:border-red-400"
+              className="mt-5 p-2 rounded bg-red-100 text-red-400  focus:outline-none hover:border-red-400"
               aria-label="Remove item"
             >
               <MdDeleteOutline />
@@ -455,6 +614,9 @@ const CustomTabRenderer = (props) => {
 export const MyCustomNumberInput = withJsonFormsControlProps(CustomNumberInput);
 export const MyCustomTextInput = withJsonFormsControlProps(CustomTextInput);
 export const MyCustomSelectInput = withJsonFormsControlProps(CustomSelectInput);
+export const MyCustomCodePgsqlControl = withJsonFormsControlProps(
+  CustomCodePgsqlControl
+);
 export const MyCustomGroupLayout = withJsonFormsLayoutProps(CustomGroupLayout);
 export const MyCustomKeyValueArrayControl = withJsonFormsControlProps(
   CustomKeyValueArrayRenderer
@@ -495,6 +657,17 @@ CustomSelectInput.propTypes = {
   errors: PropTypes.arrayOf(PropTypes.string),
   schema: PropTypes.object.isRequired,
   uischema: PropTypes.object.isRequired,
+};
+
+CustomCodePgsqlControl.propTypes = {
+  data: PropTypes.string,
+  path: PropTypes.string.isRequired,
+  handleChange: PropTypes.func.isRequired,
+  enabled: PropTypes.bool.isRequired,
+  uischema: PropTypes.object,
+  label: PropTypes.string,
+  description: PropTypes.string,
+  errors: PropTypes.arrayOf(PropTypes.string),
 };
 
 CustomGroupLayout.propTypes = {
@@ -588,7 +761,6 @@ const customTextInputTester = (uischema, rootSchema, context) => {
     );
 
     if (!currentSchema) {
-      // console.warn('Could not resolve schema for', uischema.scope);
       return -1;
     }
 
@@ -640,100 +812,44 @@ const customSelectInputTester = (uischema, rootSchema, context) => {
   return -1;
 };
 
+const customCodePgsqlTester = rankWith(
+  100,
+  and(isControl, formatIs("code-pgsql"))
+);
+
 const customGroupLayoutTester = (uischema) => {
   return rankWith(10, uiTypeIs("Group"))(uischema);
 };
 
-const customKeyValueArrayRendererTester = (uischema, rootSchema, context) => {
-  console.log("--- Testing customKeyValueArrayRendererTester ---");
-  console.log("uischema:", uischema);
-  console.log("context.path:", context.path); // Keep this log!
-
-  // 1. Must be a Control in the UI Schema
+const customKeyValueArrayRendererTester = (uischema, rootSchema) => {
+  // 1) Must be a Control
   if (uischema.type !== "Control") {
-    console.log("Not a Control UI element. Returning -1.");
     return -1;
   }
-
   try {
-    // 2. Resolve the schema for the current scope (the array itself)
-    const currentArraySchema = Resolve.schema(
+    // 2) Resolve the schema at this control’s scope
+    const schemaAtScope = Resolve.schema(
       rootSchema,
       uischema.scope,
       rootSchema
     );
-
-    console.log("Resolved currentArraySchema:", currentArraySchema);
-
-    if (!currentArraySchema) {
-      console.log("Could not resolve array schema. Returning -1.");
+    // 3) It must be an array
+    if (!schemaAtScope || schemaAtScope.type !== "array") {
       return -1;
     }
-
-    // 3. Check if the resolved schema is an array
-    if (currentArraySchema.type !== "array") {
-      console.log("Schema is not an array. Returning -1.");
-      return -1;
-    }
-
-    // 4. Check the schema of the items within the array
-    const itemSchema = currentArraySchema.items;
-    console.log("Resolved itemSchema:", itemSchema);
-
+    // 4) Items must be objects with string key/value props
+    const itemSchema = schemaAtScope.items;
     if (
-      !itemSchema ||
-      typeof itemSchema !== "object" ||
-      Array.isArray(itemSchema)
+      itemSchema.type !== "object" ||
+      itemSchema.properties?.key?.type !== "string" ||
+      itemSchema.properties?.value?.type !== "string"
     ) {
-      console.log("Items are not an object schema. Returning -1.");
       return -1;
     }
-
-    // 5. Check if 'key' and 'value' properties exist and are strings within the item schema
-    const hasKeyProp = itemSchema.properties?.key?.type === "string";
-    const hasValueProp = itemSchema.properties?.value?.type === "string";
-
-    console.log("hasKeyProp:", hasKeyProp, "hasValueProp:", hasValueProp);
-
-    if (!hasKeyProp || !hasValueProp) {
-      console.log(
-        "Item schema does not have string 'key' and 'value' properties. Returning -1."
-      );
-      return -1;
-    }
-    const scopeString = uischema.scope; // e.g., '#/properties/headers'
-    let isTargetScope = false;
-
-    if (scopeString) {
-      // Extract the last part of the scope, e.g., 'headers' from '#/properties/headers'
-      const scopeSegments = scopeString.split("/");
-      const lastScopeSegment = scopeSegments[scopeSegments.length - 1];
-      isTargetScope =
-        lastScopeSegment === "headers" || lastScopeSegment === "queryParams";
-    }
-
-    console.log(
-      "uischema.scope:",
-      uischema.scope,
-      "Is target scope (headers/queryParams):",
-      isTargetScope
-    );
-
-    if (!isTargetScope) {
-      console.log(
-        "uischema.scope does not point to 'headers' or 'queryParams'. Returning -1."
-      );
-      return -1;
-    }
-
-    // If all conditions pass, return a high rank
-    console.log("All conditions met! Returning rank 50.");
-    return 50;
+    // If we get here, it’s a key/value array—give a high rank so our renderer wins
+    return 50; // e.g. return 50
   } catch (e) {
-    console.warn(
-      `Error resolving schema for scope ${uischema.scope} in customKeyValueArrayRendererTester:`,
-      e
-    );
+    console.warn("Error in key/value tester:", e);
     return -1;
   }
 };
@@ -778,6 +894,10 @@ export const customJSONFormRenderers = [
   {
     tester: customTextInputTester,
     renderer: MyCustomTextInput,
+  },
+  {
+    tester: customCodePgsqlTester,
+    renderer: MyCustomCodePgsqlControl,
   },
   {
     tester: customCheckboxTester,

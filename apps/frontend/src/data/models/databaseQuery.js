@@ -11,6 +11,8 @@ export class DatabaseQuery {
     databaseSchemaName,
     databaseQueryDescription,
     databaseQueryData,
+    datasourceID,
+    datasourceType,
     databaseQueryResultSchema,
     runOnLoad,
     tblDatabaseChartQueryMappings,
@@ -29,6 +31,8 @@ export class DatabaseQuery {
     this.runOnLoad = runOnLoad;
     this.databaseQueryResultSchema = databaseQueryResultSchema;
     this.databaseQueryData = databaseQueryData;
+    this.datasourceID = datasourceID;
+    this.datasourceType = datasourceType;
     this.tblDatabaseChartQueryMappings = tblDatabaseChartQueryMappings;
     this.linkedDatabaseChartCount = linkedDatabaseChartCount || 0;
     this.linkedDatabaseWidgetCount = linkedDatabaseWidgetCount || 0;

@@ -279,6 +279,10 @@ export const updateDatabaseQueryByIDAPI = async ({
   databaseQueryData,
 }) => {
   try {
+    console.log(
+      "updateDatabaseQuery",
+      databaseQueryData.databaseQueryData.databaseQueryString
+    );
     const url =
       CONSTANTS.SERVER_HOST +
       CONSTANTS.APIS.DATABASE.updateDatabaseQueryByID(

@@ -70610,26 +70610,66 @@ var queryConfig_default = {
   schema: {
     type: "object",
     properties: {
-      "code-pgsql": {
+      query: {
         type: "string",
         description: "PostgreSQL code to execute",
         format: "code-pgsql"
+      },
+      args: {
+        type: "array",
+        description: "Query arguments",
+        items: {
+          type: "object",
+          properties: {
+            key: {
+              type: "string"
+            },
+            value: {
+              type: "string"
+            }
+          },
+          required: ["key", "value"]
+        }
       }
     },
-    required: ["code-pgsql"]
+    required: ["query"]
   },
   uischema: {
     type: "VerticalLayout",
     elements: [
       {
         type: "Control",
-        scope: "#/properties/code-pgsql",
+        scope: "#/properties/query",
         label: "PostgreSQL Code"
+      },
+      {
+        type: "Control",
+        scope: "#/properties/args",
+        label: "Arguments",
+        options: {
+          detail: {
+            type: "VerticalLayout",
+            elements: [
+              {
+                type: "Control",
+                scope: "#/properties/key"
+              },
+              {
+                type: "Control",
+                scope: "#/properties/value"
+              }
+            ]
+          }
+        }
       }
     ]
   },
   data: {
-    "code-pgsql": "SELECT id, name FROM users WHERE active = true;"
+    query: "SELECT id, name FROM users WHERE active = true;",
+    args: [
+      { key: "user_id", value: "123" },
+      { key: "status", value: "active" }
+    ]
   }
 };
 

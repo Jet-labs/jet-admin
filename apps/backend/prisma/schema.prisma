@@ -91,6 +91,7 @@ model tblDatabaseQueries {
   databaseQueryResultSchema      Json?                            @db.Json
   creatorID                      Int?
   datasourceID                   String?                          @db.Uuid
+  datasourceType                 String                           @default("postgresql") @db.VarChar
   tblCronJobs                    tblCronJobs[]
   tblDatabaseChartQueryMappings  tblDatabaseChartQueryMappings[]
   tblDatasources                 tblDatasources?                  @relation(fields: [datasourceID], references: [datasourceID], onDelete: NoAction, onUpdate: NoAction, map: "fkDatasourceIDDatasourceID")

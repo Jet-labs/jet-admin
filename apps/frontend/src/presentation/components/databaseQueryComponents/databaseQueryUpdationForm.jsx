@@ -24,6 +24,7 @@ import PropTypes from "prop-types";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import { DatabaseQueryCloneForm } from "./databaseQueryCloneForm";
 import { DatabaseQueryEditor } from "./databaseQueryEditor";
+import { DATASOURCE_TYPES } from "@jet-admin/datasource-types";
 
 export const DatabaseQueryUpdationForm = ({ tenantID, databaseQueryID }) => {
   DatabaseQueryUpdationForm.propTypes = {
@@ -88,6 +89,8 @@ export const DatabaseQueryUpdationForm = ({ tenantID, databaseQueryID }) => {
       databaseQueryTitle: "Untitled",
       databaseQueryDescription: "",
       databaseQueryString: "",
+      datasourceID: "",
+      datasourceType: "",
       databaseQueryArgs: [],
       runOnLoad: false,
     },
@@ -125,6 +128,14 @@ export const DatabaseQueryUpdationForm = ({ tenantID, databaseQueryID }) => {
       queryUpdationForm.setFieldValue(
         "databaseQueryArgs",
         databaseQuery.databaseQueryData.databaseQueryArgs || []
+      );
+      queryUpdationForm.setFieldValue(
+        "datasourceID",
+        databaseQuery.datasourceID || ""
+      );
+      queryUpdationForm.setFieldValue(
+        "datasourceType",
+        databaseQuery.datasourceType || DATASOURCE_TYPES.POSTGRESQL.value
       );
       queryUpdationForm.setFieldValue(
         "runOnLoad",

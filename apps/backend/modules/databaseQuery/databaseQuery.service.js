@@ -9,6 +9,7 @@ const environmentVariables = require("../../environment");
 const { databaseService } = require("../database/database.service");
 const { aiUtil } = require("../../utils/aiprompt.util");
 const { aiService } = require("../ai/ai.service");
+const { isUUID } = require("validator");
 const databaseQueryService = {};
 
 /**
@@ -78,6 +79,8 @@ databaseQueryService.getAllDatabaseQueries = async ({ userID, tenantID }) => {
  * @param {string} param0.databaseQueryTitle
  * @param {string} param0.databaseQueryDescription
  * @param {JSON} param0.databaseQueryData
+ * @param {string} param0.datasourceID
+ * @param {string} param0.datasourceType
  * @param {Boolean} param0.runOnLoad
  * @returns {Promise<boolean>}
  */
@@ -87,6 +90,8 @@ databaseQueryService.createDatabaseQuery = async ({
   databaseQueryTitle = "Untitled",
   databaseQueryDescription = null,
   databaseQueryData = null,
+  datasourceID = null,
+  datasourceType,
   runOnLoad = false,
 }) => {
   Logger.log("info", {
@@ -97,6 +102,8 @@ databaseQueryService.createDatabaseQuery = async ({
       databaseQueryTitle,
       databaseQueryDescription,
       databaseQueryData,
+      datasourceID,
+      datasourceType,
       runOnLoad,
     },
   });
@@ -108,6 +115,8 @@ databaseQueryService.createDatabaseQuery = async ({
         databaseQueryTitle,
         databaseQueryDescription,
         databaseQueryData,
+        datasourceID: isUUID(datasourceID) ? datasourceID : null,
+        datasourceType,
         creatorID: parseInt(userID),
         runOnLoad,
       },
@@ -119,6 +128,8 @@ databaseQueryService.createDatabaseQuery = async ({
         databaseQueryTitle,
         databaseQueryDescription,
         databaseQueryData,
+        datasourceID,
+        datasourceType,
         runOnLoad,
       },
     });
@@ -158,17 +169,21 @@ databaseQueryService.createBulkDatabaseQuery = async ({
   });
 
   try {
-    const databaseQueries = await prisma.tblDatabaseQueries.createManyAndReturn({
-      data: databaseQueriesData.map((databaseQueryData) => ({
-        tenantID: parseInt(tenantID),
-        databaseQueryTitle: databaseQueryData.databaseQueryTitle,
-        databaseQueryDescription: databaseQueryData.databaseQueryDescription,
-        databaseQueryData: databaseQueryData.databaseQueryData,
-        creatorID: parseInt(userID),
-        runOnLoad: databaseQueryData.runOnLoad,
-      })),
-    });
-    
+    const databaseQueries = await prisma.tblDatabaseQueries.createManyAndReturn(
+      {
+        data: databaseQueriesData.map((databaseQueryData) => ({
+          tenantID: parseInt(tenantID),
+          databaseQueryTitle: databaseQueryData.databaseQueryTitle,
+          databaseQueryDescription: databaseQueryData.databaseQueryDescription,
+          databaseQueryData: databaseQueryData.databaseQueryData,
+          datasourceID: databaseQueryData.datasourceID,
+          datasourceType: databaseQueryData.datasourceType,
+          creatorID: parseInt(userID),
+          runOnLoad: databaseQueryData.runOnLoad,
+        })),
+      }
+    );
+
     Logger.log("success", {
       message: "databaseQueryService:createDatabaseQuery:success",
       params: {
@@ -577,7 +592,6 @@ databaseQueryService.cloneDatabaseQueryByID = async ({
   }
 };
 
-
 /**
  *
  * @param {object} param0
@@ -587,6 +601,8 @@ databaseQueryService.cloneDatabaseQueryByID = async ({
  * @param {string} param0.databaseQueryTitle
  * @param {string} param0.databaseQueryDescription
  * @param {JSON} param0.databaseQueryData
+ * @param {string} param0.datasourceID
+ * @param {string} param0.datasourceType
  * @param {Boolean} param0.runOnLoad
  * @returns {Promise<boolean>}
  */
@@ -597,6 +613,8 @@ databaseQueryService.updateDatabaseQueryByID = async ({
   databaseQueryTitle,
   databaseQueryDescription,
   databaseQueryData,
+  datasourceID,
+  datasourceType,
   runOnLoad,
 }) => {
   Logger.log("info", {
@@ -608,6 +626,8 @@ databaseQueryService.updateDatabaseQueryByID = async ({
       databaseQueryTitle,
       databaseQueryDescription,
       databaseQueryData,
+      datasourceID,
+      datasourceType,
       runOnLoad,
     },
   });
@@ -623,6 +643,8 @@ databaseQueryService.updateDatabaseQueryByID = async ({
         databaseQueryTitle,
         databaseQueryDescription,
         databaseQueryData,
+        datasourceID,
+        datasourceType,
         runOnLoad,
       },
     });
@@ -636,6 +658,8 @@ databaseQueryService.updateDatabaseQueryByID = async ({
         databaseQueryTitle,
         databaseQueryDescription,
         databaseQueryData,
+        datasourceID,
+        datasourceType,
         runOnLoad,
       },
     });
@@ -648,6 +672,7 @@ databaseQueryService.updateDatabaseQueryByID = async ({
         userID,
         tenantID,
         databaseQueryID,
+
         error,
       },
     });
