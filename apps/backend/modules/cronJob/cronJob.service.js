@@ -356,8 +356,8 @@ cronJobService.runCronJob = async ({ cronJob }) => {
       dbPool,
       databaseQueries: [
         {
-          databaseQueryData: {
-            ...cronJob.tblDatabaseQueries.databaseQueryData,
+          databaseQueryOptions: {
+            ...cronJob.tblDatabaseQueries.databaseQueryOptions,
             databaseQueryArgValues: cronJob.databaseQueryArgValues,
           },
         },

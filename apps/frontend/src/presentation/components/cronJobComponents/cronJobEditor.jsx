@@ -77,13 +77,13 @@ export const CronJobEditor = ({ cronJobEditorForm }) => {
           ))}
         </select>
       </div>
-      {selectedQuery?.databaseQueryData?.databaseQueryArgs?.length > 0 && (
+      {selectedQuery?.databaseQueryOptions?.databaseQueryArgs?.length > 0 && (
         <div>
           <label className="block mb-1 text-xs font-medium text-slate-500">
             {CONSTANTS.STRINGS.CRON_JOB_EDITOR_FORM_QUERY_ARGUMENTS_LABEL}
           </label>
           <div className="space-y-2">
-            {selectedQuery.databaseQueryData.databaseQueryArgs.map((arg) => {
+            {selectedQuery.databaseQueryOptions.databaseQueryArgs.map((arg) => {
               const argName = arg.replace(/[{}]/g, "");
               const key = `databaseQueryArgValues.${argName}`;
               return (

@@ -113,7 +113,7 @@ databaseController.executeRawSQLQuery = async (req, res) => {
         databaseQueries: [
           {
             databaseQueryID: null,
-            databaseQueryData: {
+            databaseQueryOptions: {
               databaseQueryString: query,
               databaseQueryArgValues: {},
               databaseQueryArgs: {},

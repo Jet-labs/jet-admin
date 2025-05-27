@@ -86,7 +86,7 @@ model tblDatabaseQueries {
   isDisabled                     Boolean?                         @default(false)
   databaseQueryTitle             String                           @default("Untitled") @db.VarChar
   databaseQueryDescription       String?                          @db.VarChar
-  databaseQueryData              Json?                            @db.Json
+  databaseQueryOptions           Json?                            @db.Json
   runOnLoad                      Boolean?
   databaseQueryResultSchema      Json?                            @db.Json
   creatorID                      Int?

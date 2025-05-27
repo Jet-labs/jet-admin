@@ -104,7 +104,7 @@ export const DatabaseChartAIGeneratePrompt = ({ tenantID, onAccepted }) => {
     const databaseQueriesData =
       databaseChart.output.databaseChartQueryMappings?.map((q) => ({
         databaseQueryTitle: q.title,
-        databaseQueryData: {
+        databaseQueryOptions: {
           databaseQueryString: q.databaseQueryString,
           databaseQueryArgs: q.databaseQueryArgs,
         },

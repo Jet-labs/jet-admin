@@ -59,8 +59,7 @@ databaseQueryController.createDatabaseQuery = async (req, res) => {
     const { tenantID } = req.params;
     const {
       databaseQueryTitle,
-      databaseQueryDescription,
-      databaseQueryData,
+      databaseQueryOptions,
       datasourceID,
       datasourceType,
       runOnLoad,
@@ -72,8 +71,7 @@ databaseQueryController.createDatabaseQuery = async (req, res) => {
         userID: user.userID,
         tenantID,
         databaseQueryTitle,
-        databaseQueryDescription,
-        databaseQueryData,
+        databaseQueryOptions,
         datasourceID,
         datasourceType,
         runOnLoad,
@@ -84,8 +82,7 @@ databaseQueryController.createDatabaseQuery = async (req, res) => {
       userID: parseInt(user.userID),
       tenantID,
       databaseQueryTitle,
-      databaseQueryDescription,
-      databaseQueryData,
+      databaseQueryOptions,
       datasourceID,
       datasourceType,
       runOnLoad,
@@ -97,8 +94,7 @@ databaseQueryController.createDatabaseQuery = async (req, res) => {
         userID: user.userID,
         tenantID,
         databaseQueryTitle,
-        databaseQueryDescription,
-        databaseQueryData,
+        databaseQueryOptions,
         datasourceID,
         datasourceType,
         runOnLoad,
@@ -243,7 +239,7 @@ databaseQueryController.runDatabaseQueryByID = async (req, res) => {
         databaseQueries: [
           {
             databaseQueryID,
-            databaseQueryData: databaseQuery.databaseQueryData,
+            databaseQueryOptions: databaseQuery.databaseQueryOptions,
           },
         ],
       }
@@ -278,14 +274,14 @@ databaseQueryController.runDatabaseQuery = async (req, res) => {
   try {
     const { user, dbPool } = req;
     const { tenantID } = req.params;
-    const { databaseQueryData, databaseQueryID } = req.body;
+    const { databaseQueryOptions, databaseQueryID } = req.body;
     Logger.log("info", {
       message: "databaseQueryController:runDatabaseQuery:params",
       params: {
         userID: user.userID,
         tenantID,
         databaseQueryID,
-        databaseQueryData,
+        databaseQueryOptions,
       },
     });
 
@@ -297,7 +293,7 @@ databaseQueryController.runDatabaseQuery = async (req, res) => {
         databaseQueries: [
           {
             databaseQueryID,
-            databaseQueryData,
+            databaseQueryOptions,
           },
         ],
       }
@@ -422,8 +418,7 @@ databaseQueryController.updateDatabaseQueryByID = async (req, res) => {
     const { tenantID, databaseQueryID } = req.params; // Assuming `databaseQueryID` identifies the query to update
     const {
       databaseQueryTitle,
-      databaseQueryDescription,
-      databaseQueryData,
+      databaseQueryOptions,
       datasourceID,
       datasourceType,
       runOnLoad,
@@ -436,8 +431,7 @@ databaseQueryController.updateDatabaseQueryByID = async (req, res) => {
         tenantID,
         databaseQueryID,
         databaseQueryTitle,
-        databaseQueryDescription,
-        databaseQueryData,
+        databaseQueryOptions,
         datasourceID,
         datasourceType,
         runOnLoad,
@@ -449,8 +443,7 @@ databaseQueryController.updateDatabaseQueryByID = async (req, res) => {
       tenantID,
       databaseQueryID,
       databaseQueryTitle,
-      databaseQueryDescription,
-      databaseQueryData,
+      databaseQueryOptions,
       datasourceID,
       datasourceType,
       runOnLoad,
@@ -463,8 +456,7 @@ databaseQueryController.updateDatabaseQueryByID = async (req, res) => {
         tenantID,
         databaseQueryID,
         databaseQueryTitle,
-        databaseQueryDescription,
-        databaseQueryData,
+        databaseQueryOptions,
         datasourceID,
         datasourceType,
         runOnLoad,

@@ -51,11 +51,11 @@ export const DatabaseQueryTestingPanel = ({
                   databaseSchemaName={databaseSchemaName}
                   databaseQueryID={selectedQueryForTesting.databaseQueryID}
                   databaseQueryString={
-                    selectedQueryForTesting.databaseQueryData
+                    selectedQueryForTesting.databaseQueryOptions
                       .databaseQueryString
                   }
                   databaseQueryArgs={
-                    selectedQueryForTesting.databaseQueryData.databaseQueryArgs
+                    selectedQueryForTesting.databaseQueryOptions.databaseQueryArgs
                   }
                   setDatabaseQueryTestResult={setDatabaseQueryTestResult}
                 />

@@ -9,8 +9,6 @@ import { CONSTANTS } from "../../../constants";
 // import { ArrayInput } from "../../ArrayInputComponent";
 import { createDatabaseQueryAPI } from "../../../data/apis/databaseQuery";
 import { displayError, displaySuccess } from "../../../utils/notification";
-import { ArrayInput } from "../ui/arrayInputField";
-import { DatabaseQueryResponseView } from "./databaseQueryResponseView";
 import { DatabaseQueryTestingForm } from "./databaseQueryTestingForm";
 import {
   ResizableHandle,
@@ -21,6 +19,7 @@ import { formValidations } from "../../../utils/formValidation";
 import { DatabaseQueryAIGeneratePrompt } from "./databaseQueryAIGeneratePrompt";
 import PropTypes from "prop-types";
 import { DatabaseQueryEditor } from "./databaseQueryEditor";
+import { DATASOURCE_UI_COMPONENTS } from "@jet-admin/datasources-ui";
 
 export const DatabaseQueryAdditionForm = ({ tenantID }) => {
   DatabaseQueryAdditionForm.propTypes = {
@@ -34,13 +33,7 @@ export const DatabaseQueryAdditionForm = ({ tenantID }) => {
       mutationFn: (data) => {
         return createDatabaseQueryAPI({
           tenantID,
-          databaseQueryData: {
-            ...data,
-            databaseQueryData: {
-              databaseQueryString: data.databaseQueryString,
-              databaseQueryArgs: data.databaseQueryArgs,
-            },
-          },
+          databaseQueryData: data,
         });
       },
       retry: false,
@@ -58,11 +51,9 @@ export const DatabaseQueryAdditionForm = ({ tenantID }) => {
   const queryAdditionForm = useFormik({
     initialValues: {
       databaseQueryTitle: "Untitled",
-      databaseQueryDescription: "",
       datasourceID: "",
       datasourceType: "",
-      databaseQueryString: "",
-      databaseQueryArgs: [],
+      databaseQueryOptions: {},
       runOnLoad: false,
     },
     validateOnMount: false,
@@ -128,32 +119,6 @@ export const DatabaseQueryAdditionForm = ({ tenantID }) => {
                     value={queryAdditionForm.values.databaseQueryTitle}
                   />
                 </div>
-                <div>
-                  <label
-                    htmlFor="databaseQueryDescription"
-                    className="block mb-1 text-xs font-medium text-slate-500"
-                  >
-                    {CONSTANTS.STRINGS.ADD_QUERY_FORM_DESCRIPTION_FIELD_LABEL}
-                  </label>
-                  {queryAdditionForm.errors.databaseQueryDescription && (
-                    <span className="text-red-500 text-xs">
-                      {queryAdditionForm.errors.databaseQueryDescription}
-                    </span>
-                  )}
-                  <input
-                    type="databaseQueryDescription"
-                    name="databaseQueryDescription"
-                    id="databaseQueryDescription"
-                    className=" placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:border-slate-700 block w-full px-2.5 py-1.5 "
-                    placeholder={
-                      CONSTANTS.STRINGS
-                        .ADD_QUERY_FORM_DESCRIPTION_FIELD_PLACEHOLDER
-                    }
-                    onChange={queryAdditionForm.handleChange}
-                    onBlur={queryAdditionForm.handleBlur}
-                    value={queryAdditionForm.values.databaseQueryDescription}
-                  />
-                </div>
                 <label className="flex items-center space-x-2">
                   <input
                     type="checkbox"
@@ -166,29 +131,6 @@ export const DatabaseQueryAdditionForm = ({ tenantID }) => {
                     {CONSTANTS.STRINGS.ADD_QUERY_FORM_RUN_ON_LOAD_FIELD_LABEL}
                   </span>
                 </label>
-                <div>
-                  <label
-                    htmlFor="databaseQueryArgs"
-                    className="block mb-1 text-xs font-medium text-slate-500"
-                  >
-                    {CONSTANTS.STRINGS.ADD_QUERY_FORM_PARAMS_FIELD_LABEL}
-                  </label>
-                  {queryAdditionForm.errors.databaseQueryArgs && (
-                    <span className="text-red-500 text-xs">
-                      {queryAdditionForm.errors.databaseQueryArgs}
-                    </span>
-                  )}
-                  <ArrayInput
-                    value={queryAdditionForm.values.databaseQueryArgs}
-                    onChange={(value) => {
-                      queryAdditionForm.setFieldValue(
-                        "databaseQueryArgs",
-                        value
-                      );
-                    }}
-                    type={"text"}
-                  />
-                </div>
               </ResizablePanel>
               <ResizableHandle withHandle={true} />
               <ResizablePanel
@@ -203,18 +145,17 @@ export const DatabaseQueryAdditionForm = ({ tenantID }) => {
                     tenantID={tenantID}
                     onAccepted={(aiGeneratedQuery) => {
                       queryAdditionForm.setFieldValue(
-                        "databaseQueryString",
+                        "databaseQueryOptions",
                         aiGeneratedQuery
                       );
                     }}
                   />
                   <DatabaseQueryTestingForm
                     tenantID={tenantID}
-                    databaseQueryString={
-                      queryAdditionForm.values.databaseQueryString
-                    }
-                    databaseQueryArgs={
-                      queryAdditionForm.values.databaseQueryArgs
+                    datasourceID={queryAdditionForm.values.datasourceID}
+                    datasourceType={queryAdditionForm.values.datasourceType}
+                    databaseQueryOptions={
+                      queryAdditionForm.values.databaseQueryOptions
                     }
                     setDatabaseQueryTestResult={setDatabaseQueryTestResult}
                   />
@@ -239,9 +180,14 @@ export const DatabaseQueryAdditionForm = ({ tenantID }) => {
         </ResizablePanel>
         <ResizableHandle withHandle={true} />
         <ResizablePanel defaultSize={80}>
-          <DatabaseQueryResponseView
+          {DATASOURCE_UI_COMPONENTS[
+            queryAdditionForm.values.datasourceType
+          ]?.queryResponseView({
+            queryResult: databaseQueryTestResult,
+          })}
+          {/* <DatabaseQueryResponseView
             databaseQueryResult={databaseQueryTestResult}
-          />
+          /> */}
         </ResizablePanel>
       </ResizablePanelGroup>
     </div>

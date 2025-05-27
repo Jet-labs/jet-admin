@@ -15,16 +15,12 @@ router.get(
 
 router.post(
   "/",
-  body("databaseQueryData")
+  body("databaseQueryOptions")
     .notEmpty()
-    .withMessage("databaseQueryData is required"),
+    .withMessage("databaseQueryOptions is required"),
   body("databaseQueryTitle")
     .notEmpty()
     .withMessage("databaseQueryTitle is required"),
-  body("databaseQueryDescription")
-    .optional()
-    .isString()
-    .withMessage("databaseQueryDescription must be a string"),
   body("runOnLoad").optional().isBoolean().withMessage("runOnLoad is required"),
   expressUtils.validationChecker,
   authMiddleware.authProvider,
@@ -52,9 +48,9 @@ router.post(
 
 router.patch(
   "/queryTest",
-  body("databaseQueryData")
+  body("databaseQueryOptions")
     .notEmpty()
-    .withMessage("databaseQueryData is required"),
+    .withMessage("databaseQueryOptions is required"),
   expressUtils.validationChecker,
   authMiddleware.checkUserPermissions(["tenant:query:test"]),
   databaseQueryController.runDatabaseQuery
@@ -90,9 +86,9 @@ router.patch(
   param("databaseQueryID")
     .isNumeric()
     .withMessage("databaseQueryID must be a number"),
-  body("databaseQueryData")
+  body("databaseQueryOptions")
     .notEmpty()
-    .withMessage("databaseQueryData is required"),
+    .withMessage("databaseQueryOptions is required"),
   body("databaseQueryTitle")
     .notEmpty()
     .withMessage("databaseQueryTitle is required"),

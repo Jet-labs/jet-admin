@@ -18,10 +18,10 @@ export const DatabaseQueryEditor = ({ databaseQueryEditorForm }) => {
   // This handler specifically updates the 'datasourceOptions' part of Formik's state
   const _handleDatasourceOptionsChange = ({ data }) => {
     // Update only the 'datasourceOptions' field in Formik's state
-    console.log({
+    console.log("databaseQueryOptions", {
       data,
     });
-    databaseQueryEditorForm.setFieldValue("databaseQueryData", data);
+    databaseQueryEditorForm.setFieldValue("databaseQueryOptions", data);
     // You could also attempt to map JSON Forms errors to Formik's errors for 'datasourceOptions'
     // but often Yup handles it sufficiently for overall form validity.
   };
@@ -37,10 +37,6 @@ export const DatabaseQueryEditor = ({ databaseQueryEditorForm }) => {
     );
   };
 
-  console.log({
-    values: databaseQueryEditorForm.values,
-    errors: databaseQueryEditorForm.errors,
-  });
   return (
     <>
       {/* JSON Forms for datasourceOptions */}
@@ -69,6 +65,9 @@ export const DatabaseQueryEditor = ({ databaseQueryEditorForm }) => {
           onBlur={databaseQueryEditorForm.handleBlur}
           value={databaseQueryEditorForm.values.datasourceID}
         >
+          <option value="" disabled selected>
+            Select datasource
+          </option>
           {datasources?.map((datasource) => (
             <option key={datasource.value} value={datasource.value}>
               {datasource.label}
@@ -95,7 +94,7 @@ export const DatabaseQueryEditor = ({ databaseQueryEditorForm }) => {
                   databaseQueryEditorForm.values.datasourceType
                 ].queryConfigForm.uischema
               }
-              data={databaseQueryEditorForm.values.databaseQueryData}
+              data={databaseQueryEditorForm.values.databaseQueryOptions}
               renderers={[...materialRenderers, ...customJSONFormRenderers]}
               cells={materialCells}
               // This onChange updates only the 'datasourceOptions' in Formik

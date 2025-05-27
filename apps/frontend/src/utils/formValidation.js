@@ -90,7 +90,6 @@ formValidations.queryAdditionFormValidationSchema = Yup.object().shape({
   databaseQueryTitle: Yup.string()
     .required("Query title is required")
     .min(3, "Query title must be at least 3 characters"),
-  databaseQueryDescription: Yup.string().optional(),
   databaseQueryArgs: Yup.array()
     .of(Yup.string().required("Argument name is required"))
     .optional(), // Optional array of arguments
@@ -101,7 +100,6 @@ formValidations.queryUpdationFormValidationSchema = Yup.object().shape({
   databaseQueryTitle: Yup.string()
     .required("Query title is required")
     .min(3, "Query title must be at least 3 characters"),
-  databaseQueryDescription: Yup.string().optional(), // Optional field
 
   databaseQueryArgs: Yup.array()
     .of(Yup.string().required("Argument name is required"))

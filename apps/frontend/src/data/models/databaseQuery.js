@@ -9,8 +9,7 @@ export class DatabaseQuery {
     isDisabled,
     databaseQueryTitle,
     databaseSchemaName,
-    databaseQueryDescription,
-    databaseQueryData,
+    databaseQueryOptions,
     datasourceID,
     datasourceType,
     databaseQueryResultSchema,
@@ -27,10 +26,9 @@ export class DatabaseQuery {
     this.isDisabled = isDisabled;
     this.databaseSchemaName = databaseSchemaName;
     this.databaseQueryTitle = databaseQueryTitle;
-    this.databaseQueryDescription = databaseQueryDescription;
     this.runOnLoad = runOnLoad;
     this.databaseQueryResultSchema = databaseQueryResultSchema;
-    this.databaseQueryData = databaseQueryData;
+    this.databaseQueryOptions = databaseQueryOptions;
     this.datasourceID = datasourceID;
     this.datasourceType = datasourceType;
     this.tblDatabaseChartQueryMappings = tblDatabaseChartQueryMappings;

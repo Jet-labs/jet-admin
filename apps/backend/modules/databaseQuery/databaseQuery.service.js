@@ -77,8 +77,7 @@ databaseQueryService.getAllDatabaseQueries = async ({ userID, tenantID }) => {
  * @param {number} param0.userID
  * @param {number} param0.tenantID
  * @param {string} param0.databaseQueryTitle
- * @param {string} param0.databaseQueryDescription
- * @param {JSON} param0.databaseQueryData
+ * @param {JSON} param0.databaseQueryOptions
  * @param {string} param0.datasourceID
  * @param {string} param0.datasourceType
  * @param {Boolean} param0.runOnLoad
@@ -88,8 +87,7 @@ databaseQueryService.createDatabaseQuery = async ({
   userID,
   tenantID,
   databaseQueryTitle = "Untitled",
-  databaseQueryDescription = null,
-  databaseQueryData = null,
+  databaseQueryOptions = null,
   datasourceID = null,
   datasourceType,
   runOnLoad = false,
@@ -100,8 +98,7 @@ databaseQueryService.createDatabaseQuery = async ({
       userID,
       tenantID,
       databaseQueryTitle,
-      databaseQueryDescription,
-      databaseQueryData,
+      databaseQueryOptions,
       datasourceID,
       datasourceType,
       runOnLoad,
@@ -113,8 +110,7 @@ databaseQueryService.createDatabaseQuery = async ({
       data: {
         tenantID: parseInt(tenantID),
         databaseQueryTitle,
-        databaseQueryDescription,
-        databaseQueryData,
+        databaseQueryOptions,
         datasourceID: isUUID(datasourceID) ? datasourceID : null,
         datasourceType,
         creatorID: parseInt(userID),
@@ -126,8 +122,7 @@ databaseQueryService.createDatabaseQuery = async ({
       params: {
         userID,
         databaseQueryTitle,
-        databaseQueryDescription,
-        databaseQueryData,
+        databaseQueryOptions,
         datasourceID,
         datasourceType,
         runOnLoad,
@@ -174,8 +169,7 @@ databaseQueryService.createBulkDatabaseQuery = async ({
         data: databaseQueriesData.map((databaseQueryData) => ({
           tenantID: parseInt(tenantID),
           databaseQueryTitle: databaseQueryData.databaseQueryTitle,
-          databaseQueryDescription: databaseQueryData.databaseQueryDescription,
-          databaseQueryData: databaseQueryData.databaseQueryData,
+          databaseQueryOptions: databaseQueryData.databaseQueryOptions,
           datasourceID: databaseQueryData.datasourceID,
           datasourceType: databaseQueryData.datasourceType,
           creatorID: parseInt(userID),
@@ -317,7 +311,7 @@ databaseQueryService.generateAIPromptBasedQuery = async ({
  * @param {object} param0
  * @param {number} param0.userID
  * @param {object} param0.dbPool
- * @param {Array<{databaseQueryID:number,databaseQueryData:{databaseQueryString:string,databaseQueryArgValues:object,databaseQueryArgs:object}}>} param0.databaseQueries
+ * @param {Array<{databaseQueryID:number,databaseQueryOptions:{databaseQueryString:string,databaseQueryArgValues:object,databaseQueryArgs:object}}>} param0.databaseQueries
  * @returns {Promise<Array<object>>}
  */
 
@@ -348,7 +342,7 @@ databaseQueryService.runDatabaseQueries = async ({
                 // Process and execute query
                 const { query: processedQuery, values: processedQueryValues } =
                   postgreSQLParserUtil.processDatabaseQuery(
-                    databaseQuery.databaseQueryData
+                    databaseQuery.databaseQueryOptions
                   );
 
                 Logger.log("info", {
@@ -565,8 +559,7 @@ databaseQueryService.cloneDatabaseQueryByID = async ({
       data: {
         tenantID: parseInt(tenantID),
         databaseQueryTitle: databaseQuery.databaseQueryTitle + " (Copy)",
-        databaseQueryDescription: databaseQuery.databaseQueryDescription,
-        databaseQueryData: databaseQuery.databaseQueryData,
+        databaseQueryOptions: databaseQuery.databaseQueryOptions,
         creatorID: parseInt(userID),
         runOnLoad: databaseQuery.runOnLoad,
       },
@@ -599,8 +592,7 @@ databaseQueryService.cloneDatabaseQueryByID = async ({
  * @param {string} param0.tenantID
  * @param {number} param0.databaseQueryID
  * @param {string} param0.databaseQueryTitle
- * @param {string} param0.databaseQueryDescription
- * @param {JSON} param0.databaseQueryData
+ * @param {JSON} param0.databaseQueryOptions
  * @param {string} param0.datasourceID
  * @param {string} param0.datasourceType
  * @param {Boolean} param0.runOnLoad
@@ -611,8 +603,7 @@ databaseQueryService.updateDatabaseQueryByID = async ({
   tenantID,
   databaseQueryID,
   databaseQueryTitle,
-  databaseQueryDescription,
-  databaseQueryData,
+  databaseQueryOptions,
   datasourceID,
   datasourceType,
   runOnLoad,
@@ -624,8 +615,7 @@ databaseQueryService.updateDatabaseQueryByID = async ({
       tenantID,
       databaseQueryID,
       databaseQueryTitle,
-      databaseQueryDescription,
-      databaseQueryData,
+      databaseQueryOptions,
       datasourceID,
       datasourceType,
       runOnLoad,
@@ -641,9 +631,8 @@ databaseQueryService.updateDatabaseQueryByID = async ({
       },
       data: {
         databaseQueryTitle,
-        databaseQueryDescription,
-        databaseQueryData,
-        datasourceID,
+        databaseQueryOptions,
+        datasourceID: isUUID(datasourceID) ? datasourceID : null,
         datasourceType,
         runOnLoad,
       },
@@ -656,8 +645,7 @@ databaseQueryService.updateDatabaseQueryByID = async ({
         tenantID,
         databaseQueryID,
         databaseQueryTitle,
-        databaseQueryDescription,
-        databaseQueryData,
+        databaseQueryOptions,
         datasourceID,
         datasourceType,
         runOnLoad,
@@ -672,7 +660,6 @@ databaseQueryService.updateDatabaseQueryByID = async ({
         userID,
         tenantID,
         databaseQueryID,
-
         error,
       },
     });

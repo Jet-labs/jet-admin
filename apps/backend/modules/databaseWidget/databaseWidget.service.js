@@ -333,8 +333,8 @@ databaseWidgetService.getDatabaseWidgetDataByID = async ({
     const databaseQueriesToExecute =
       databaseWidget.tblDatabaseWidgetQueryMappings.map((mapping) => ({
         databaseQueryID: mapping.databaseQueryID,
-        databaseQueryData: {
-          ...mapping.tblDatabaseQueries.databaseQueryData,
+        databaseQueryOptions: {
+          ...mapping.tblDatabaseQueries.databaseQueryOptions,
           databaseQueryArgValues: mapping.databaseQueryArgValues,
         },
       }));
@@ -504,9 +504,9 @@ databaseWidgetService.getDatabaseWidgetDataUsingDatabaseWidget = async ({
     const databaseQueriesToExecute = databaseWidget.databaseQueries.map(
       (databaseQuery) => ({
         databaseQueryID: databaseQuery.databaseQueryID,
-        databaseQueryData: {
+        databaseQueryOptions: {
           ...databaseQueryIDMap[databaseQuery.databaseQueryID]
-            .databaseQueryData,
+            .databaseQueryOptions,
           databaseQueryArgValues: databaseQuery.databaseQueryArgValues,
         },
       })

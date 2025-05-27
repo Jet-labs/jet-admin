@@ -106,7 +106,7 @@ export const createBulkDatabaseQueryAPI = async ({
 export const testDatabaseQueryAPI = async ({
   tenantID,
   databaseQueryID,
-  databaseQueryData,
+  databaseQueryOptions,
 }) => {
   try {
     const url =
@@ -118,7 +118,7 @@ export const testDatabaseQueryAPI = async ({
         url,
         {
           databaseQueryID,
-          databaseQueryData,
+          databaseQueryOptions,
         },
         {
           headers: {
@@ -279,10 +279,6 @@ export const updateDatabaseQueryByIDAPI = async ({
   databaseQueryData,
 }) => {
   try {
-    console.log(
-      "updateDatabaseQuery",
-      databaseQueryData.databaseQueryData.databaseQueryString
-    );
     const url =
       CONSTANTS.SERVER_HOST +
       CONSTANTS.APIS.DATABASE.updateDatabaseQueryByID(

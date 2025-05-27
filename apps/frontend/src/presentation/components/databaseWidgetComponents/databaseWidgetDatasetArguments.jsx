@@ -28,7 +28,7 @@ export const DatabaseWidgetDatasetArguments = ({
       ...initialValues,
     },
     validationSchema: formValidations.datasetArgumentsFormValidationSchema(
-      selectedQuery?.databaseQueryData?.databaseQueryArgs
+      selectedQuery?.databaseQueryOptions?.databaseQueryArgs
     ),
     enableReinitialize: true,
     onSubmit: (values) => {
@@ -53,13 +53,13 @@ export const DatabaseWidgetDatasetArguments = ({
         {CONSTANTS.STRINGS.WIDGET_DATASET_ARGUMENTS_TITLE}
       </DialogTitle>
       <DialogContent className="!p-4 !space-y-4">
-        {selectedQuery?.databaseQueryData?.databaseQueryArgs?.length > 0 && (
+        {selectedQuery?.databaseQueryOptions?.databaseQueryArgs?.length > 0 && (
           <div>
             <label className="block mb-2 text-xs font-normal text-slate-500">
               {CONSTANTS.STRINGS.WIDGET_EDITOR_FORM_DATASET_ARGUMENTS_LABEL}
             </label>
             <div className="space-y-2">
-              {selectedQuery.databaseQueryData.databaseQueryArgs.map(
+              {selectedQuery.databaseQueryOptions.databaseQueryArgs.map(
                 (arg, argIndex) => {
                   const argName = arg.replace(/[{}]/g, "");
                   return (

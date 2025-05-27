@@ -83,188 +83,240 @@
       "sslVerify": {
         "type": "boolean",
         "default": true
+      },
+      "args": {
+        "type": "array",
+        "description": "Query arguments",
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "string",
+                "number",
+                "boolean",
+                "array (, separated)",
+                "object (JSON stringified)"
+              ],
+              "default": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          },
+          "required": ["key", "value"]
+        }
       }
     },
     "required": ["baseUrl", "method"]
   },
   "uischema": {
-    "type": "Categorization",
+    "type": "VerticalLayout",
     "elements": [
       {
-        "type": "Category",
-        "label": "General",
+        "type": "Categorization",
         "elements": [
           {
-            "type": "Control",
-            "scope": "#/properties/baseUrl"
-          },
-          {
-            "type": "Control",
-            "scope": "#/properties/method"
-          },
-          {
-            "type": "Control",
-            "scope": "#/properties/timeout"
-          },
-          {
-            "type": "Control",
-            "scope": "#/properties/contentType"
-          }
-        ]
-      },
-      {
-        "type": "Category",
-        "label": "Authentication",
-        "elements": [
-          {
-            "type": "Control",
-            "scope": "#/properties/authType"
-          },
-          {
-            "type": "Group",
-            "label": "Basic Auth",
-            "rule": {
-              "effect": "SHOW",
-              "condition": {
-                "scope": "#/properties/authType",
-                "schema": { "const": "basic" }
-              }
-            },
+            "type": "Category",
+            "label": "General",
             "elements": [
               {
                 "type": "Control",
-                "scope": "#/properties/username"
+                "scope": "#/properties/baseUrl"
               },
               {
                 "type": "Control",
-                "scope": "#/properties/password"
+                "scope": "#/properties/method"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/timeout"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/contentType"
               }
             ]
           },
           {
-            "type": "Group",
-            "label": "Bearer Token",
-            "rule": {
-              "effect": "SHOW",
-              "condition": {
-                "scope": "#/properties/authType",
-                "schema": { "const": "bearer" }
-              }
-            },
+            "type": "Category",
+            "label": "Authentication",
             "elements": [
               {
                 "type": "Control",
-                "scope": "#/properties/bearerToken"
-              }
-            ]
-          },
-          {
-            "type": "Group",
-            "label": "OAuth2",
-            "rule": {
-              "effect": "SHOW",
-              "condition": {
-                "scope": "#/properties/authType",
-                "schema": { "const": "oauth2" }
-              }
-            },
-            "elements": [
-              {
-                "type": "Control",
-                "scope": "#/properties/oauth2/properties/clientId"
+                "scope": "#/properties/authType"
               },
               {
-                "type": "Control",
-                "scope": "#/properties/oauth2/properties/clientSecret"
-              },
-              {
-                "type": "Control",
-                "scope": "#/properties/oauth2/properties/tokenUrl"
-              }
-            ]
-          }
-        ]
-      },
-      {
-        "type": "Category",
-        "label": "Headers",
-        "elements": [
-          {
-            "type": "Control",
-            "scope": "#/properties/headers",
-            "options": {
-              "detail": {
-                "type": "VerticalLayout",
+                "type": "Group",
+                "label": "Basic Auth",
+                "rule": {
+                  "effect": "SHOW",
+                  "condition": {
+                    "scope": "#/properties/authType",
+                    "schema": { "const": "basic" }
+                  }
+                },
                 "elements": [
                   {
                     "type": "Control",
-                    "scope": "#/properties/key"
+                    "scope": "#/properties/username"
                   },
                   {
                     "type": "Control",
-                    "scope": "#/properties/value"
+                    "scope": "#/properties/password"
                   }
                 ]
-              }
-            }
-          }
-        ]
-      },
-      {
-        "type": "Category",
-        "label": "Query Params",
-        "elements": [
-          {
-            "type": "Control",
-            "scope": "#/properties/queryParams",
-            "options": {
-              "detail": {
-                "type": "VerticalLayout",
+              },
+              {
+                "type": "Group",
+                "label": "Bearer Token",
+                "rule": {
+                  "effect": "SHOW",
+                  "condition": {
+                    "scope": "#/properties/authType",
+                    "schema": { "const": "bearer" }
+                  }
+                },
                 "elements": [
                   {
                     "type": "Control",
-                    "scope": "#/properties/key"
+                    "scope": "#/properties/bearerToken"
+                  }
+                ]
+              },
+              {
+                "type": "Group",
+                "label": "OAuth2",
+                "rule": {
+                  "effect": "SHOW",
+                  "condition": {
+                    "scope": "#/properties/authType",
+                    "schema": { "const": "oauth2" }
+                  }
+                },
+                "elements": [
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/oauth2/properties/clientId"
                   },
                   {
                     "type": "Control",
-                    "scope": "#/properties/value"
+                    "scope": "#/properties/oauth2/properties/clientSecret"
+                  },
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/oauth2/properties/tokenUrl"
                   }
                 ]
               }
-            }
-          }
-        ]
-      },
-      {
-        "type": "Category",
-        "label": "Body",
-        "rule": {
-          "effect": "SHOW",
-          "condition": {
-            "scope": "#/properties/method",
-            "schema": { "enum": ["POST", "PUT", "PATCH"] }
-          }
-        },
-        "elements": [
-          {
-            "type": "Control",
-            "scope": "#/properties/body"
-          }
-        ]
-      },
-      {
-        "type": "Category",
-        "label": "Advanced",
-        "elements": [
-          {
-            "type": "Control",
-            "scope": "#/properties/followRedirects"
+            ]
           },
           {
-            "type": "Control",
-            "scope": "#/properties/sslVerify"
+            "type": "Category",
+            "label": "Headers",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/headers",
+                "options": {
+                  "detail": {
+                    "type": "VerticalLayout",
+                    "elements": [
+                      {
+                        "type": "Control",
+                        "scope": "#/properties/key"
+                      },
+                      {
+                        "type": "Control",
+                        "scope": "#/properties/value"
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "type": "Category",
+            "label": "Query Params",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/queryParams",
+                "options": {
+                  "detail": {
+                    "type": "VerticalLayout",
+                    "elements": [
+                      {
+                        "type": "Control",
+                        "scope": "#/properties/key"
+                      },
+                      {
+                        "type": "Control",
+                        "scope": "#/properties/value"
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "type": "Category",
+            "label": "Body",
+            "rule": {
+              "effect": "SHOW",
+              "condition": {
+                "scope": "#/properties/method",
+                "schema": { "enum": ["POST", "PUT", "PATCH"] }
+              }
+            },
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/body"
+              }
+            ]
+          },
+          {
+            "type": "Category",
+            "label": "Advanced",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/followRedirects"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/sslVerify"
+              }
+            ]
           }
         ]
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/args",
+        "label": "Arguments",
+        "options": {
+          "detail": {
+            "type": "VerticalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/key"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/value"
+              }
+            ]
+          }
+        }
       }
     ]
   },

@@ -74,9 +74,9 @@ databaseChartService.getDatabaseChartDataUsingDatabaseChart = async ({
     const databaseQueriesToExecute = databaseChart.databaseQueries.map(
       (databaseQuery) => ({
         databaseQueryID: databaseQuery.databaseQueryID,
-        databaseQueryData: {
+        databaseQueryOptions: {
           ...databaseQueryIDMap[databaseQuery.databaseQueryID]
-            .databaseQueryData,
+            .databaseQueryOptions,
           databaseQueryArgValues: databaseQuery.databaseQueryArgValues,
         },
       })

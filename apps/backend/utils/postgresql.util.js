@@ -1509,7 +1509,7 @@ postgreSQLQueryUtil.createTblDatabaseQueriesTable = ({
     isDisabled BOOLEAN DEFAULT false,
     databaseQueryTitle VARCHAR NOT NULL DEFAULT 'Untitled',
     databaseQueryDescription VARCHAR,
-    databaseQueryData JSON,
+    databaseQueryOptions JSON,
     runOnLoad BOOLEAN
 );`;
 };

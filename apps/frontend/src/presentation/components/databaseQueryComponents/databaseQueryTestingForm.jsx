@@ -30,11 +30,11 @@ export const DatabaseQueryTestingForm = ({
 
   const { isPending: isTestingDatabaseQuery, mutate: testDatabaseQuery } =
     useMutation({
-      mutationFn: (databaseQueryData) => {
+      mutationFn: (databaseQueryOptions) => {
         return testDatabaseQueryAPI({
           tenantID,
           databaseQueryID,
-          databaseQueryData,
+          databaseQueryOptions,
         });
       },
       retry: false,
