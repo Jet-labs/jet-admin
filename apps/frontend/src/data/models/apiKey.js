@@ -2,7 +2,7 @@ export class APIKey {
   constructor({
     apiKeyID,
     tenantID,
-    apiKeyName,
+    apiKeyTitle,
     apiKey,
     createdAt,
     isDisabled,
@@ -10,7 +10,7 @@ export class APIKey {
   }) {
     this.apiKeyID = apiKeyID;
     this.tenantID = tenantID;
-    this.apiKeyName = apiKeyName;
+    this.apiKeyTitle = apiKeyTitle;
     this.apiKey = apiKey;
     this.createdAt = createdAt;
     this.isDisabled = isDisabled;
@@ -21,8 +21,6 @@ export class APIKey {
     if (!apiKeys || !Array.isArray(apiKeys)) {
       return [];
     }
-    return apiKeys.map(
-      (apiKey) => new APIKey(apiKey)
-    );
+    return apiKeys.map((apiKey) => new APIKey(apiKey));
   }
 }

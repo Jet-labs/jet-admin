@@ -354,7 +354,7 @@ authService.extractUserPermissions = (roleMappings) => {
     for (const permMapping of permissionMappings) {
       const permission = permMapping.tblPermissions;
       if (permission) {
-        userPermissions.add(permission.permissionName.trim().toLowerCase());
+        userPermissions.add(permission.permissionTitle.trim().toLowerCase());
       }
     }
   }

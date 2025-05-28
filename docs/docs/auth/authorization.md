@@ -104,13 +104,13 @@ tenant
 ```prisma
 model tblPermissions {
   permissionID              Int
-  permissionName            String
+  permissionTitle            String
   permissionDescription     String?
 }
 
 model tblRoles {
   roleID                    Int
-  roleName                  String
+  roleTitle                  String
   tenantID                  Int?
 }
 

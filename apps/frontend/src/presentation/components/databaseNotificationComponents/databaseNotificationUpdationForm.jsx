@@ -75,7 +75,7 @@ export const DatabaseNotificationUpdationForm = ({
 
   const databaseNotificationUpdationForm = useFormik({
     initialValues: {
-      databaseNotificationName: "",
+      databaseNotificationTitle: "",
     },
     validateOnMount: false,
     validateOnChange: false,
@@ -99,8 +99,8 @@ export const DatabaseNotificationUpdationForm = ({
     if (databaseNotification) {
       // Update Formik form values with the fetched databaseNotification data
       databaseNotificationUpdationForm.setFieldValue(
-        "databaseNotificationName",
-        databaseNotification.databaseNotificationName ||
+        "databaseNotificationTitle",
+        databaseNotification.databaseNotificationTitle ||
           CONSTANTS.STRINGS.UNTITLED
       );
     }

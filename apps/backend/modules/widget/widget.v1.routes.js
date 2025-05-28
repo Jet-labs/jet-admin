@@ -13,7 +13,7 @@ router.get(
 );
 router.post(
   "/",
-  body("widgetName").notEmpty().withMessage("widgetName is required"),
+  body("widgetTitle").notEmpty().withMessage("widgetTitle is required"),
   body("widgetDescription")
     .optional()
     .isString()
@@ -62,7 +62,7 @@ router.post(
 router.patch(
   "/:widgetID",
   param("widgetID").isNumeric().withMessage("widgetID must be a number"),
-  body("widgetName").notEmpty().withMessage("widgetName is required"),
+  body("widgetTitle").notEmpty().withMessage("widgetTitle is required"),
   body("widgetDescription")
     .optional()
     .isString()

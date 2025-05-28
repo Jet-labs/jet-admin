@@ -66,15 +66,15 @@ export const WidgetEditor = ({ widgetEditorForm }) => {
       <div className="flex flex-col justify-start items-stretch gap-2 p-2 rounded bg-slate-100">
         <div>
           <label
-            htmlFor="widgetName"
+            htmlFor="widgetTitle"
             className="block mb-1 text-xs font-medium text-slate-500"
           >
             {CONSTANTS.STRINGS.WIDGET_EDITOR_FORM_NAME_FIELD_LABEL}
           </label>
           <input
             type="text"
-            name="widgetName"
-            id="widgetName"
+            name="widgetTitle"
+            id="widgetTitle"
             className=" placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:outline-none focus:border-slate-400 block w-full px-1.5 py-1"
             placeholder={
               CONSTANTS.STRINGS.WIDGET_EDITOR_FORM_NAME_FIELD_PLACEHOLDER
@@ -82,7 +82,7 @@ export const WidgetEditor = ({ widgetEditorForm }) => {
             required={true}
             onChange={widgetEditorForm.handleChange}
             onBlur={widgetEditorForm.handleBlur}
-            value={widgetEditorForm.values.widgetName}
+            value={widgetEditorForm.values.widgetTitle}
           />
         </div>
 

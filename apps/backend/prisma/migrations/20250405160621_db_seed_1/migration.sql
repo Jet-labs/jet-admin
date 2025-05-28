@@ -9,7 +9,7 @@ CREATE TABLE "tblTenants" (
     "disableReason" VARCHAR,
     "tenantDBURL" VARCHAR,
     "tenantLogoURL" VARCHAR,
-    "tenantName" VARCHAR,
+    "tenantTitle" VARCHAR,
 
     CONSTRAINT "tblTenants_pkey" PRIMARY KEY ("tenantID")
 );
@@ -66,7 +66,7 @@ CREATE TABLE "tblDatabaseQueries" (
 -- CreateTable
 CREATE TABLE "tblPermissions" (
     "permissionID" SERIAL NOT NULL,
-    "permissionName" VARCHAR NOT NULL,
+    "permissionTitle" VARCHAR NOT NULL,
     "permissionDescription" VARCHAR,
 
     CONSTRAINT "tblPermission_pkey" PRIMARY KEY ("permissionID")
@@ -83,7 +83,7 @@ CREATE TABLE "tblRolePermissionMappings" (
 -- CreateTable
 CREATE TABLE "tblRoles" (
     "roleID" SERIAL NOT NULL,
-    "roleName" VARCHAR NOT NULL,
+    "roleTitle" VARCHAR NOT NULL,
     "roleDescription" VARCHAR,
     "tenantID" INTEGER,
 
@@ -130,27 +130,27 @@ CREATE TABLE "tblDatabaseCharts" (
 );
 
 -- CreateTable
-CREATE TABLE "tblDatabaseDashboardChartMappings" (
+CREATE TABLE "tblDashboardChartMappings" (
     "databaseChartID" INTEGER NOT NULL,
-    "databaseDashboardID" INTEGER NOT NULL,
+    "dashboardID" INTEGER NOT NULL,
     "parameters" JSONB,
     "title" VARCHAR NOT NULL,
 
-    CONSTRAINT "pkTblDatabaseDashboardChartMappings" PRIMARY KEY ("databaseChartID","databaseDashboardID")
+    CONSTRAINT "pkTblDashboardChartMappings" PRIMARY KEY ("databaseChartID","dashboardID")
 );
 
 -- CreateTable
-CREATE TABLE "tblDatabaseDashboards" (
-    "databaseDashboardID" SERIAL NOT NULL,
-    "databaseDashboardDescription" VARCHAR,
+CREATE TABLE "tblDashboards" (
+    "dashboardID" SERIAL NOT NULL,
+    "dashboardDescription" VARCHAR,
     "tenantID" INTEGER NOT NULL,
     "createdAt" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
     "creatorID" INTEGER,
-    "databaseDashboardConfig" JSONB,
-    "databaseDashboardName" VARCHAR NOT NULL,
+    "dashboardConfig" JSONB,
+    "dashboardTitle" VARCHAR NOT NULL,
 
-    CONSTRAINT "tblDatabaseDashboards_pkey" PRIMARY KEY ("databaseDashboardID")
+    CONSTRAINT "tblDashboards_pkey" PRIMARY KEY ("dashboardID")
 );
 
 -- CreateTable
@@ -193,7 +193,7 @@ CREATE TABLE "tblWidgetQueryMappings" (
 -- CreateTable
 CREATE TABLE "tblWidgets" (
     "widgetID" SERIAL NOT NULL,
-    "widgetName" VARCHAR NOT NULL,
+    "widgetTitle" VARCHAR NOT NULL,
     "widgetDescription" VARCHAR,
     "widgetType" VARCHAR NOT NULL,
     "widgetConfig" JSONB NOT NULL,
@@ -210,7 +210,7 @@ CREATE TABLE "tblWidgets" (
 CREATE TABLE "tblDatabaseNotifications" (
     "databaseNotificationID" SERIAL NOT NULL,
     "createdAt" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "databaseNotificationName" VARCHAR NOT NULL,
+    "databaseNotificationTitle" VARCHAR NOT NULL,
     "tenantID" INTEGER NOT NULL,
 
     CONSTRAINT "tblDatabaseNotifications_pkey" PRIMARY KEY ("databaseNotificationID")
@@ -221,7 +221,7 @@ CREATE TABLE "tblAPIKeys" (
     "apiKeyID" SERIAL NOT NULL,
     "tenantID" INTEGER NOT NULL,
     "apiKey" VARCHAR NOT NULL,
-    "apiKeyName" VARCHAR NOT NULL,
+    "apiKeyTitle" VARCHAR NOT NULL,
     "createdAt" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "isDisabled" BOOLEAN NOT NULL,
     "creatorID" INTEGER NOT NULL,
@@ -283,16 +283,16 @@ ALTER TABLE "tblDatabaseCharts" ADD CONSTRAINT "fkTblDatabaseChartsCreatorID" FO
 ALTER TABLE "tblDatabaseCharts" ADD CONSTRAINT "fkTblDatabaseChartsTenantIDTenantID" FOREIGN KEY ("tenantID") REFERENCES "tblTenants"("tenantID") ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "tblDatabaseDashboardChartMappings" ADD CONSTRAINT "tblDatabaseDashboardChartMappings_databaseChartID_fkey" FOREIGN KEY ("databaseChartID") REFERENCES "tblDatabaseCharts"("databaseChartID") ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE "tblDashboardChartMappings" ADD CONSTRAINT "tblDashboardChartMappings_databaseChartID_fkey" FOREIGN KEY ("databaseChartID") REFERENCES "tblDatabaseCharts"("databaseChartID") ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "tblDatabaseDashboardChartMappings" ADD CONSTRAINT "tblDatabaseDashboardChartMappings_databaseDashboardID_fkey" FOREIGN KEY ("databaseDashboardID") REFERENCES "tblDatabaseDashboards"("databaseDashboardID") ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE "tblDashboardChartMappings" ADD CONSTRAINT "tblDashboardChartMappings_dashboardID_fkey" FOREIGN KEY ("dashboardID") REFERENCES "tblDashboards"("dashboardID") ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "tblDatabaseDashboards" ADD CONSTRAINT "fkTblDatabaseDashboardCreatorID" FOREIGN KEY ("creatorID") REFERENCES "tblUsers"("userID") ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE "tblDashboards" ADD CONSTRAINT "fkTblDashboardCreatorID" FOREIGN KEY ("creatorID") REFERENCES "tblUsers"("userID") ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "tblDatabaseDashboards" ADD CONSTRAINT "fkTblDatabaseDashboardsTenantIDTenantID" FOREIGN KEY ("tenantID") REFERENCES "tblTenants"("tenantID") ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE "tblDashboards" ADD CONSTRAINT "fkTblDashboardsTenantIDTenantID" FOREIGN KEY ("tenantID") REFERENCES "tblTenants"("tenantID") ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
 ALTER TABLE "tblUserTenantConfigMap" ADD CONSTRAINT "fkTenantIDTenantID" FOREIGN KEY ("tenantID") REFERENCES "tblTenants"("tenantID") ON DELETE NO ACTION ON UPDATE NO ACTION;

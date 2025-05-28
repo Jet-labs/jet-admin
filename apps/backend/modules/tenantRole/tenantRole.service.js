@@ -8,20 +8,20 @@ const tenantRoleService = {};
  *
  * @param {object} param0
  * @param {number} param0.tenantID
- * @param {string} param0.roleName
+ * @param {string} param0.roleTitle
  * @param {string} param0.roleDescription
  * @param {Array<number>} param0.permissionIDs
  * @returns {Promise<boolean>}
  */
 tenantRoleService.createRole = async ({
   tenantID,
-  roleName,
+  roleTitle,
   roleDescription,
   permissionIDs,
 }) => {
   Logger.log("info", {
     message: "tenantRoleService:createRole:params",
-    params: { tenantID, roleName, roleDescription, permissionIDs }, // Added permissionIDs to logging
+    params: { tenantID, roleTitle, roleDescription, permissionIDs }, // Added permissionIDs to logging
   });
 
   // Input validation for permissionIDs
@@ -36,7 +36,7 @@ tenantRoleService.createRole = async ({
       const role = await tx.tblRoles.create({
         data: {
           tenantID,
-          roleName,
+          roleTitle,
           roleDescription,
         },
       });
@@ -77,7 +77,7 @@ tenantRoleService.createRole = async ({
  * @param {object} param0
  * @param {number} param0.tenantID
  * @param {number} param0.roleID
- * @param {string} param0.roleName
+ * @param {string} param0.roleTitle
  * @param {string} param0.roleDescription
  * @param {Array<number>} param0.permissionIDs
  * @returns {Promise<boolean>}
@@ -85,13 +85,13 @@ tenantRoleService.createRole = async ({
 tenantRoleService.updateTenantRoleByID = async ({
   tenantID,
   roleID,
-  roleName,
+  roleTitle,
   roleDescription,
   permissionIDs,
 }) => {
   Logger.log("info", {
     message: "tenantRoleService:updateTenantRoleByID:params",
-    params: { tenantID, roleID, roleName, roleDescription, permissionIDs },
+    params: { tenantID, roleID, roleTitle, roleDescription, permissionIDs },
   });
 
   // Input validations
@@ -123,7 +123,7 @@ tenantRoleService.updateTenantRoleByID = async ({
 
       // Update role details
       const roleUpdateData = {
-        ...(roleName && { roleName }),
+        ...(roleTitle && { roleTitle }),
         ...(roleDescription && { roleDescription }),
       };
 

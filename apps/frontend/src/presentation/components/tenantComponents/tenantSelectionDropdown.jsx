@@ -81,10 +81,10 @@ export const TenantSelectionDropdown = () => {
           <Box
             sx={{
               ml: 1, // ml-2 -> 8px -> MUI spacing unit 1
-              display: 'flex',
-              flexDirection: 'column', // flex-col as per original structure
+              display: "flex",
+              flexDirection: "column", // flex-col as per original structure
               minWidth: 0, // **min-w-0 - Still important here for distribution within this Box**
-              overflow: 'hidden', // Optional, but good practice
+              overflow: "hidden", // Optional, but good practice
               flexGrow: 1, // Allow this Box to take available space *within* its parent flex item
             }}
           >
@@ -99,14 +99,14 @@ export const TenantSelectionDropdown = () => {
                 // Typography inside a flex item (the Box) with minWidth: 0 and overflow: hidden
                 // should automatically truncate when its content exceeds the parent Box's width.
                 // width: '100%' on Typography is often not needed if the parent Box's size is correctly managed.
-                textAlign: 'left', // text-start
-                fontWeight:600
+                textAlign: "left", // text-start
+                fontWeight: 600,
               }}
             >
               {selectedTenant
-                ? StringUtils.truncateName(selectedTenant.tenantName, 15)
+                ? StringUtils.truncateName(selectedTenant.tenantTitle, 15)
                 : CONSTANTS.STRINGS
-                  .TENANT_SELECTION_DROPDOWN_NO_TENANT_SELECTED}
+                    .TENANT_SELECTION_DROPDOWN_NO_TENANT_SELECTED}
             </Typography>
           </Box>
         </div>
@@ -140,13 +140,13 @@ export const TenantSelectionDropdown = () => {
               <Box
                 sx={{
                   ml: 1.5, // ml-3 is typically 12px, MUI spacing unit 1.5 * 8px = 12px
-                  display: 'flex',
-                  flexDirection: 'column', // flex-col
-                  justifyContent: 'flex-start',
-                  alignItems: 'flex-start',
-                  width: '100%', // w-full
+                  display: "flex",
+                  flexDirection: "column", // flex-col
+                  justifyContent: "flex-start",
+                  alignItems: "flex-start",
+                  width: "100%", // w-full
                   minWidth: 0, // **min-w-0 - Crucial for flex truncation**
-                  overflow: 'hidden', // Optional, but good practice
+                  overflow: "hidden", // Optional, but good practice
                 }}
               >
                 {/* Use Typography for the tenant name */}
@@ -156,12 +156,14 @@ export const TenantSelectionDropdown = () => {
                   color="text.primary" // Use MUI theme color or specify value (e.g. '#334155' for slate-700)
                   textAlign="left" // text-start
                   noWrap // **This is the key prop for truncation**
-                  sx={{ width: '100%' }} // Ensure typography takes available width within its parent Box
+                  sx={{ width: "100%" }} // Ensure typography takes available width within its parent Box
                 >
-                  {capitalize(StringUtils.truncateName(tenant.tenantName, 16))}
+                  {capitalize(StringUtils.truncateName(tenant.tenantTitle, 16))}
                 </Typography>
                 {/* Use Typography for the tenant ID */}
-                <Typography variant="caption" color="text.secondary"> {/* Corresponds roughly to text-xs */}
+                <Typography variant="caption" color="text.secondary">
+                  {" "}
+                  {/* Corresponds roughly to text-xs */}
                   Tenant ID: {tenant.tenantID}
                 </Typography>
               </Box>

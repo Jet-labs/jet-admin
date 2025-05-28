@@ -7,7 +7,7 @@ const databaseRouter = require("../database/database.v1.routes");
 const datasourceRouter = require("../datasource/datasource.v1.routes");
 const dataQueryRouter = require("../dataQuery/dataQuery.v1.routes");
 const widgetRouter = require("../widget/widget.v1.routes");
-const databaseDashboardRouter = require("../databaseDashboard/databaseDashboard.v1.routes");
+const dashboardRouter = require("../dashboard/dashboard.v1.routes");
 const userManagementRouter = require("../userManagement/userManagement.v1.route");
 const tenantRoleRouter = require("../tenantRole/tenantRole.v1.route");
 const tenantAPIKeyRouter = require("../apiKey/apiKey.v1.routes");
@@ -45,7 +45,7 @@ router.delete(
 
 router.post(
   "/",
-  body("tenantName").notEmpty().withMessage("tenantName is required"),
+  body("tenantTitle").notEmpty().withMessage("tenantTitle is required"),
   body("tenantDBURL").notEmpty().withMessage("tenantDBURL is required"),
   body("tenantDBType")
     .isIn(Object.keys(constants.SUPPORTED_DATABASES))
@@ -64,7 +64,7 @@ router.patch("/dbtest", tenantController.testTenantDatabaseConnection);
 router.patch(
   "/:tenantID",
   param("tenantID").isNumeric().withMessage("tenantID must be a number"),
-  body("tenantName").notEmpty().withMessage("tenantName is required"),
+  body("tenantTitle").notEmpty().withMessage("tenantTitle is required"),
   body("tenantDBURL").notEmpty().withMessage("tenantDBURL is required"),
   body("tenantDBType")
     .isIn(Object.keys(constants.SUPPORTED_DATABASES))
@@ -140,7 +140,7 @@ router.use(
   "/:tenantID/dashboards",
   authMiddleware.checkUserPermissions(["tenant:dashboard"]),
   tenantMiddleware.poolProvider,
-  databaseDashboardRouter
+  dashboardRouter
 );
 
 router.use(

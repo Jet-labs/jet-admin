@@ -93,15 +93,15 @@ export const TenantEditor = ({ tenantEditorForm }) => {
 
       <div>
         <label
-          htmlFor="tenantName"
+          htmlFor="tenantTitle"
           className="block mb-1 text-sm font-medium text-slate-500"
         >
           {CONSTANTS.STRINGS.TENANT_EDITOR_FORM_NAME_FIELD_LABEL}
         </label>
         <input
-          type="tenantName"
-          name="tenantName"
-          id="tenantName"
+          type="tenantTitle"
+          name="tenantTitle"
+          id="tenantTitle"
           className=" placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:outline-none focus:border-slate-400 block w-full px-1.5 py-1"
           placeholder={
             CONSTANTS.STRINGS.TENANT_EDITOR_FORM_NAME_FIELD_PLACEHOLDER
@@ -109,7 +109,7 @@ export const TenantEditor = ({ tenantEditorForm }) => {
           required={true}
           onChange={tenantEditorForm.handleChange}
           onBlur={tenantEditorForm.handleBlur}
-          value={tenantEditorForm.values.tenantName}
+          value={tenantEditorForm.values.tenantTitle}
         />
       </div>
 

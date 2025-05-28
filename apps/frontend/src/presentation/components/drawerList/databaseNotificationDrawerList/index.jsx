@@ -72,7 +72,7 @@ export const DatabaseNotificationDrawerList = () => {
                     } `}
                   >
                     {/* {StringUtils.truncateName(databaseNotification.databaseNotificationTitle, 15)} */}
-                    {`${databaseNotification.databaseNotificationName}`}
+                    {`${databaseNotification.databaseNotificationTitle}`}
                   </span>
                 </div>
               </Link>

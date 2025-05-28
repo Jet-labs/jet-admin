@@ -21,7 +21,7 @@ model tblAPIKeys {
   apiKeyID              Int                     @id @default(autoincrement())
   tenantID              Int
   apiKey                String                  @db.VarChar
-  apiKeyName            String                  @db.VarChar
+  apiKeyTitle           String                  @db.VarChar
   createdAt             DateTime                @default(now()) @db.Timestamptz(6)
   isDisabled            Boolean
   creatorID             Int
@@ -76,6 +76,19 @@ model tblCronJobs {
   tblTenants         tblTenants          @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblCronJobsTenantID")
 }
 
+model tblDashboards {
+  dashboardID          Int        @id @default(autoincrement())
+  dashboardDescription String?    @db.VarChar
+  tenantID             Int
+  createdAt            DateTime?  @default(now()) @db.Timestamptz(6)
+  updatedAt            DateTime?  @default(now()) @db.Timestamptz(6)
+  creatorID            Int?
+  dashboardConfig      Json?
+  dashboardTitle       String     @db.VarChar
+  tblUsers             tblUsers?  @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDashboardCreatorID")
+  tblTenants           tblTenants @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDashboardsTenantIDTenantID")
+}
+
 model tblDataQueries {
   dataQueryID            Int                      @id(map: "pktblDataQueries") @default(autoincrement())
   tenantID               Int
@@ -98,25 +111,12 @@ model tblDataQueries {
   tblWidgetQueryMappings tblWidgetQueryMappings[]
 }
 
-model tblDatabaseDashboards {
-  databaseDashboardID          Int        @id @default(autoincrement())
-  databaseDashboardDescription String?    @db.VarChar
-  tenantID                     Int
-  createdAt                    DateTime?  @default(now()) @db.Timestamptz(6)
-  updatedAt                    DateTime?  @default(now()) @db.Timestamptz(6)
-  creatorID                    Int?
-  databaseDashboardConfig      Json?
-  databaseDashboardName        String     @db.VarChar
-  tblUsers                     tblUsers?  @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDatabaseDashboardCreatorID")
-  tblTenants                   tblTenants @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDatabaseDashboardsTenantIDTenantID")
-}
-
 model tblDatabaseNotifications {
-  databaseNotificationID   Int        @id @default(autoincrement())
-  createdAt                DateTime   @default(now()) @db.Timestamptz(6)
-  databaseNotificationName String     @db.VarChar
-  tenantID                 Int
-  tblTenants               tblTenants @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDatabaseNotificationsTenantID")
+  databaseNotificationID    Int        @id @default(autoincrement())
+  createdAt                 DateTime   @default(now()) @db.Timestamptz(6)
+  databaseNotificationTitle String     @db.VarChar
+  tenantID                  Int
+  tblTenants                tblTenants @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDatabaseNotificationsTenantID")
 }
 
 model tblDatasources {
@@ -135,7 +135,7 @@ model tblDatasources {
 
 model tblPermissions {
   permissionID              Int                         @id(map: "tblPermission_pkey") @default(autoincrement())
-  permissionName            String                      @db.VarChar
+  permissionTitle           String                      @db.VarChar
   permissionDescription     String?                     @db.VarChar
   tblRolePermissionMappings tblRolePermissionMappings[]
 }
@@ -151,7 +151,7 @@ model tblRolePermissionMappings {
 
 model tblRoles {
   roleID                    Int                         @id(map: "tblroles_pkey") @default(autoincrement())
-  roleName                  String                      @db.VarChar
+  roleTitle                 String                      @db.VarChar
   roleDescription           String?                     @db.VarChar
   tenantID                  Int?
   tblAPIKeyRoleMappings     tblAPIKeyRoleMappings[]
@@ -177,12 +177,12 @@ model tblTenants {
   disableReason               String?                       @db.VarChar
   tenantDBURL                 String                        @db.VarChar
   tenantLogoURL               String?                       @db.VarChar
-  tenantName                  String                        @db.VarChar
+  tenantTitle                 String                        @db.VarChar
   tenantDBType                String                        @default("postgresql") @db.VarChar
   tblAPIKeys                  tblAPIKeys[]
   tblCronJobs                 tblCronJobs[]
+  tblDashboards               tblDashboards[]
   tblDataQueries              tblDataQueries[]
-  tblDatabaseDashboards       tblDatabaseDashboards[]
   tblDatabaseNotifications    tblDatabaseNotifications[]
   tblDatasources              tblDatasources[]
   tblRoles                    tblRoles[]
@@ -243,8 +243,8 @@ model tblUsers {
   disableReason               String?                       @db.VarChar
   lastSeen                    DateTime?                     @db.Timestamptz(6)
   tblAPIKeys                  tblAPIKeys[]
+  tblDashboards               tblDashboards[]
   tblDataQueries              tblDataQueries[]
-  tblDatabaseDashboards       tblDatabaseDashboards[]
   tblDatasources              tblDatasources[]
   tblTenants                  tblTenants[]
   tblUserNotifications        tblUserNotifications[]
@@ -283,7 +283,7 @@ model tblWidgetQueryMappings {
 
 model tblWidgets {
   widgetID               Int                      @id @default(autoincrement())
-  widgetName             String                   @db.VarChar
+  widgetTitle            String                   @db.VarChar
   widgetDescription      String?                  @db.VarChar
   widgetType             String                   @db.VarChar
   widgetConfig           Json

@@ -61,7 +61,7 @@ widgetService.getAllWidgets = async ({ userID, tenantID }) => {
  *
  * @param {object} param0
  * @param {number} param0.userID
- * @param {string} param0.widgetName
+ * @param {string} param0.widgetTitle
  * @param {string} param0.widgetDescription
  * @param {string} param0.widgetType
  * @param {JSON} param0.widgetConfig
@@ -71,7 +71,7 @@ widgetService.getAllWidgets = async ({ userID, tenantID }) => {
 widgetService.createWidget = async ({
   userID,
   tenantID,
-  widgetName,
+  widgetTitle,
   widgetDescription,
   widgetType,
   widgetConfig,
@@ -82,7 +82,7 @@ widgetService.createWidget = async ({
     params: {
       userID,
       tenantID,
-      widgetName,
+      widgetTitle,
       widgetDescription,
       widgetType,
       widgetConfig,
@@ -94,7 +94,7 @@ widgetService.createWidget = async ({
       const widget = await tx.tblWidgets.create({
         data: {
           tenantID: parseInt(tenantID),
-          widgetName,
+          widgetTitle,
           widgetDescription,
           widgetType,
           widgetConfig,
@@ -120,7 +120,7 @@ widgetService.createWidget = async ({
       params: {
         userID,
         tenantID: parseInt(tenantID),
-        widgetName,
+        widgetTitle,
         widgetDescription,
         widgetConfig,
       },
@@ -229,7 +229,7 @@ widgetService.cloneWidgetByID = async ({
       const newWidget = await tx.tblWidgets.create({
         data: {
           tenantID: parseInt(tenantID),
-          widgetName: widget.widgetName + " (Copy)",
+          widgetTitle: widget.widgetTitle + " (Copy)",
           widgetDescription: widget.widgetDescription,
           widgetType: widget.widgetType,
           widgetConfig: widget.widgetConfig,
@@ -423,7 +423,7 @@ widgetService.getWidgetDataByID = async ({
 
     return {
       widgetID: widget.widgetID,
-      widgetName: widget.widgetName,
+      widgetTitle: widget.widgetTitle,
       lastUpdated: widget.updatedAt,
       data: processedData,
     };
@@ -593,7 +593,7 @@ widgetService.getWidgetDataUsingWidget = async ({
     }
 
     return {
-      widgetName: widget.widgetName,
+      widgetTitle: widget.widgetTitle,
       lastUpdated: widget.updatedAt,
       data: processedData,
     };
@@ -617,7 +617,7 @@ widgetService.getWidgetDataUsingWidget = async ({
  * @param {number} params.widgetID - ID of the widget to update (REQUIRED)
  * @param {number} [params.userID] - ID of the user performing the update
  * @param {number} [params.tenantID] - Tenant ID associated with the widget
- * @param {string} [params.widgetName] - New widget name
+ * @param {string} [params.widgetTitle] - New widget name
  * @param {string} [params.widgetDescription] - New widget description
  * @param {string} [params.widgetType] - Widget type identifier
  * @param {JSON} [params.widgetConfig] - Widget configuration data
@@ -636,7 +636,7 @@ widgetService.updateWidgetByID = async ({
   widgetID,
   userID,
   tenantID,
-  widgetName,
+  widgetTitle,
   widgetDescription,
   widgetType,
   widgetConfig,
@@ -648,7 +648,7 @@ widgetService.updateWidgetByID = async ({
       widgetID,
       userID,
       tenantID,
-      widgetName,
+      widgetTitle,
       widgetDescription,
       widgetType,
       widgetConfig,
@@ -673,7 +673,7 @@ widgetService.updateWidgetByID = async ({
       const updatedWidget = await tx.tblWidgets.update({
         where: { widgetID: parseInt(widgetID) },
         data: {
-          ...(widgetName != undefined && { widgetName }),
+          ...(widgetTitle != undefined && { widgetTitle }),
           ...(widgetDescription != undefined && {
             widgetDescription,
           }),
@@ -710,7 +710,7 @@ widgetService.updateWidgetByID = async ({
         widgetID,
         userID,
         tenantID,
-        widgetName,
+        widgetTitle,
         widgetDescription,
         widgetType,
         widgetConfig,

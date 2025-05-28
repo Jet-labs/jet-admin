@@ -8,7 +8,7 @@ import { WIDGETS_MAP } from "@jet-admin/widgets";
 export const WidgetPreview = ({
   tenantID,
   widgetID,
-  widgetName,
+  widgetTitle,
   widgetType,
   data,
   refetchInterval,
@@ -20,7 +20,7 @@ export const WidgetPreview = ({
   WidgetPreview.propTypes = {
     tenantID: PropTypes.number.isRequired,
     widgetID: PropTypes.number.isRequired,
-    widgetName: PropTypes.string.isRequired,
+    widgetTitle: PropTypes.string.isRequired,
     widgetType: PropTypes.string.isRequired,
     data: PropTypes.object,
     refetchInterval: PropTypes.number,
@@ -48,7 +48,7 @@ export const WidgetPreview = ({
       <div className="w-full flex flex-row justify-end items-center bg-slate-100 border-b border-b-slate-200 p-2 gap-2">
         {/* {widgetRef && (
           <WidgetDownloadForm
-            widgetName={widgetName}
+            widgetTitle={widgetTitle}
             widgetRef={widgetRef}
           />
         )} */}
@@ -76,7 +76,7 @@ export const WidgetPreview = ({
         >
           {WIDGETS_MAP[widgetType] ? (
             WIDGETS_MAP[widgetType].component({
-              widgetName,
+              widgetTitle,
               widgetType,
               data,
               onWidgetInit: _handleOnWidgetInit,

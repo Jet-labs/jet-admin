@@ -9,7 +9,7 @@ import { DatabaseTriggerLayout } from "../layouts/databaseTriggerLayout";
 import { DataQueryLayout } from "../layouts/dataQueryLayout";
 import { UserManagementLayout } from "../layouts/userManagementLayout";
 import { RoleManagementLayout } from "../layouts/roleManagementLayout";
-import { DatabaseDashboardLayout } from "../layouts/databaseDashboardLayout";
+import { DashboardLayout } from "../layouts/dashboardLayout";
 import { WidgetLayout } from "../layouts/widgetLayout";
 import { DatabaseNotificationLayout } from "../layouts/databaseNotificationLayout";
 import { APIKeyLayout } from "../layouts/apiKeyLayout";
@@ -53,19 +53,17 @@ const UpdateDataQueryPage = lazy(() =>
 const DataQueryLayoutLandingPage = lazy(() =>
   import("../../pages/dataQueryLayoutLandingPage")
 );
-const DatabaseDashboardLayoutLandingPage = lazy(() =>
-  import("../../pages/databaseDashboardLayoutLandingPage")
+const DashboardLayoutLandingPage = lazy(() =>
+  import("../../pages/dashboardLayoutLandingPage")
 );
 const AddWidgetPage = lazy(() => import("../../pages/addWidgetPage"));
 const UpdateWidgetPage = lazy(() => import("../../pages/updateWidgetPage"));
 const WidgetLayoutLandingPage = lazy(() =>
   import("../../pages/widgetLayoutLandingPage")
 );
-const AddDatabaseDashboardPage = lazy(() =>
-  import("../../pages/addDatabaseDashboardPage")
-);
-const UpdateDatabaseDashboardPage = lazy(() =>
-  import("../../pages/updateDatabaseDashboardPage")
+const AddDashboardPage = lazy(() => import("../../pages/addDashboardPage"));
+const UpdateDashboardPage = lazy(() =>
+  import("../../pages/updateDashboardPage")
 );
 const UserManagementPage = lazy(() => import("../../pages/userManagementPage"));
 const UpdateTenantUserByIDPage = lazy(() =>
@@ -299,19 +297,19 @@ const router = createBrowserRouter([
             element: <ViewAuditLogsPage />,
           },
           {
-            element: <DatabaseDashboardLayout />,
+            element: <DashboardLayout />,
             children: [
               {
-                path: CONSTANTS.ROUTES.VIEW_DATABASE_DASHBOARDS.code,
-                element: <DatabaseDashboardLayoutLandingPage />,
+                path: CONSTANTS.ROUTES.VIEW_DASHBOARDS.code,
+                element: <DashboardLayoutLandingPage />,
               },
               {
-                path: CONSTANTS.ROUTES.ADD_DATABASE_DASHBOARD.code,
-                element: <AddDatabaseDashboardPage />,
+                path: CONSTANTS.ROUTES.ADD_DASHBOARD.code,
+                element: <AddDashboardPage />,
               },
               {
-                path: CONSTANTS.ROUTES.UPDATE_DATABASE_DASHBOARD_BY_ID.code,
-                element: <UpdateDatabaseDashboardPage />,
+                path: CONSTANTS.ROUTES.UPDATE_DASHBOARD_BY_ID.code,
+                element: <UpdateDashboardPage />,
               },
             ],
           },

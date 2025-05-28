@@ -1,13 +1,13 @@
 export class TenantRole {
   constructor({
     roleID,
-    roleName,
+    roleTitle,
     roleDescription,
     tenantID,
     tblRolePermissionMappings,
   }) {
     this.roleID = roleID;
-    this.roleName = roleName;
+    this.roleTitle = roleTitle;
     this.roleDescription = roleDescription;
     this.tenantID = tenantID;
     this.tblRolePermissionMappings = tblRolePermissionMappings;

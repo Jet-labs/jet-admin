@@ -13,7 +13,7 @@ router.get(
 );
 router.post(
   "/",
-  body("roleName").notEmpty().withMessage("roleName is required"),
+  body("roleTitle").notEmpty().withMessage("roleTitle is required"),
   body("roleDescription").notEmpty().withMessage("roleDescription is required"),
   body("permissionIDs")
     .optional()

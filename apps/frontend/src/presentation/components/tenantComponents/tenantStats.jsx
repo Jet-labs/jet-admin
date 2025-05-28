@@ -65,7 +65,7 @@ export const TenantStats = ({ tenants }) => {
                   )}
                 </div>
                 <h2 className="text-base font-semibold text-slate-700 ml-2 hover:text-[#646cff]">
-                  {tenant.tenantName}
+                  {tenant.tenantTitle}
                 </h2>
               </div>
               <button

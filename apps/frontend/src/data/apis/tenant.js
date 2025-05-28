@@ -54,7 +54,7 @@ export const getAllUserTenantsAPI = async () => {
 };
 
 export const createNewTenantAPI = async ({
-  tenantName,
+  tenantTitle,
   tenantLogoURL,
   tenantDBURL,
   tenantDBType,
@@ -66,7 +66,7 @@ export const createNewTenantAPI = async ({
     if (bearerToken) {
       const response = await axios.post(
         url,
-        { tenantName, tenantLogoURL, tenantDBURL, tenantDBType },
+        { tenantTitle, tenantLogoURL, tenantDBURL, tenantDBType },
         {
           headers: { authorization: `Bearer ${bearerToken}` },
         }
@@ -117,7 +117,7 @@ export const testTenantDatabaseConnectionAPI = async ({ tenantDBURL }) => {
 
 export const updateTenantAPI = async ({
   tenantID,
-  tenantName,
+  tenantTitle,
   tenantLogoURL,
   tenantDBURL,
   tenantDBType,
@@ -129,7 +129,7 @@ export const updateTenantAPI = async ({
     if (bearerToken) {
       const response = await axios.patch(
         url,
-        { tenantName, tenantLogoURL, tenantDBURL, tenantDBType },
+        { tenantTitle, tenantLogoURL, tenantDBURL, tenantDBType },
         {
           headers: { authorization: `Bearer ${bearerToken}` },
         }

@@ -27,7 +27,7 @@ export const CONSTANTS = {
     },
   },
 
-  DATABASE_DASHBOARD_ITEM_TYPES: {
+  DASHBOARD_ITEM_TYPES: {
     WIDGET: "widget",
   },
 
@@ -56,7 +56,7 @@ export const CONSTANTS = {
     EXPORT_BUTTON_TEXT: "Export data",
     MAIN_DRAWER_DATABASE_TITLE: "Database",
     MAIN_DRAWER_DATASOURCE_TITLE: "Data sources",
-    MAIN_DRAWER_DATABASE_DASHBOARDS_TITLE: "Dashboards",
+    MAIN_DRAWER_DASHBOARDS_TITLE: "Dashboards",
     MAIN_DRAWER_WIDGETS_TITLE: "Widgets",
     MAIN_DRAWER_DATABASE_NOTIFICATIONS_TITLE: "Notifications",
     MAIN_DRAWER_API_KEYS_TITLE: "API Keys",
@@ -903,18 +903,18 @@ export const CONSTANTS = {
       code: "/tenants/:tenantID/widgets/:widgetID",
       path: (tenantID, widgetID) => `/tenants/${tenantID}/widgets/${widgetID}`,
     },
-    ADD_DATABASE_DASHBOARD: {
+    ADD_DASHBOARD: {
       code: "/tenants/:tenantID/dashboards/add",
       path: (tenantID) => `/tenants/${tenantID}/dashboards/add`,
     },
-    VIEW_DATABASE_DASHBOARDS: {
+    VIEW_DASHBOARDS: {
       code: "/tenants/:tenantID/dashboards",
       path: (tenantID) => `/tenants/${tenantID}/dashboards`,
     },
-    UPDATE_DATABASE_DASHBOARD_BY_ID: {
-      code: "/tenants/:tenantID/dashboards/:databaseDashboardID",
-      path: (tenantID, databaseDashboardID) =>
-        `/tenants/${tenantID}/dashboards/${databaseDashboardID}`,
+    UPDATE_DASHBOARD_BY_ID: {
+      code: "/tenants/:tenantID/dashboards/:dashboardID",
+      path: (tenantID, dashboardID) =>
+        `/tenants/${tenantID}/dashboards/${dashboardID}`,
     },
     VIEW_TENANT_USERS: {
       code: "/tenants/:tenantID/users/",
@@ -1222,18 +1222,18 @@ export const CONSTANTS = {
       deleteWidgetByID: (tenantID, widgetID) =>
         `/api/v1/tenants/${tenantID}/widgets/${widgetID}`,
 
-      getAllDatabaseDashboardsAPI: (tenantID) =>
+      getAllDashboardsAPI: (tenantID) =>
         `/api/v1/tenants/${tenantID}/dashboards/`,
-      createDatabaseDashboardAPI: (tenantID) =>
+      createDashboardAPI: (tenantID) =>
         `/api/v1/tenants/${tenantID}/dashboards/`,
-      getDatabaseDashboardByIDAPI: (tenantID, databaseDashboardID) =>
-        `/api/v1/tenants/${tenantID}/dashboards/${databaseDashboardID}`,
-      cloneDatabaseDashboardByIDAPI: (tenantID, databaseDashboardID) =>
-        `/api/v1/tenants/${tenantID}/dashboards/${databaseDashboardID}/clone`,
-      updateDatabaseDashboardByIDAPI: (tenantID, databaseDashboardID) =>
-        `/api/v1/tenants/${tenantID}/dashboards/${databaseDashboardID}`,
-      deleteDatabaseDashboardByID: (tenantID, databaseDashboardID) =>
-        `/api/v1/tenants/${tenantID}/dashboards/${databaseDashboardID}`,
+      getDashboardByIDAPI: (tenantID, dashboardID) =>
+        `/api/v1/tenants/${tenantID}/dashboards/${dashboardID}`,
+      cloneDashboardByIDAPI: (tenantID, dashboardID) =>
+        `/api/v1/tenants/${tenantID}/dashboards/${dashboardID}/clone`,
+      updateDashboardByIDAPI: (tenantID, dashboardID) =>
+        `/api/v1/tenants/${tenantID}/dashboards/${dashboardID}`,
+      deleteDashboardByID: (tenantID, dashboardID) =>
+        `/api/v1/tenants/${tenantID}/dashboards/${dashboardID}`,
       getAllDatabaseNotificationsAPI: (tenantID) =>
         `/api/v1/tenants/${tenantID}/database/notifications`,
       getDatabaseNotificationByIDAPI: (tenantID, databaseNotificationID) =>
@@ -1341,7 +1341,7 @@ export const CONSTANTS = {
 
     WIDGETS: (tenantID) => `${tenantID}-WIDGETS`,
 
-    DATABASE_DASHBOARDS: (tenantID) => `${tenantID}-DATABASE_DASHBOARDS`,
+    DASHBOARDS: (tenantID) => `${tenantID}-DASHBOARDS`,
 
     CUSTOMER_PLAN: "CUSTOMER_PLAN",
     FORMS: "FORMS",
@@ -1664,8 +1664,7 @@ export const CONSTANTS = {
     DATA_QUERY_LAYOUT_SEPARATION: "DATA_QUERY_LAYOUT_SEPARATION",
     DATASOURCE_LAYOUT_SEPARATION: "DATASOURCE_LAYOUT_SEPARATION",
     WIDGET_LAYOUT_SEPARATION: "WIDGET_LAYOUT_SEPARATION",
-    DATABASE_DASHBOARD_LAYOUT_SEPARATION:
-      "DATABASE_DASHBOARD_LAYOUT_SEPARATION",
+    DASHBOARD_LAYOUT_SEPARATION: "DASHBOARD_LAYOUT_SEPARATION",
     WIDGET_ADDITION_FORM_RESULT_SEPARATION:
       "WIDGET_ADDITION_FORM_RESULT_SEPARATION",
     WIDGET_UPDATION_FORM_RESULT_SEPARATION:

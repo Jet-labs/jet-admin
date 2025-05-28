@@ -7,9 +7,7 @@ const constants = require("../../constants");
 const Logger = require("../../utils/logger");
 const { tenantRoleService } = require("../tenantRole/tenantRole.service");
 const { databaseService } = require("../database/database.service");
-const {
-  databaseDashboardService,
-} = require("../databaseDashboard/databaseDashboard.service");
+const { dashboardService } = require("../dashboard/dashboard.service");
 const { dataQueryService } = require("../dataQuery/dataQuery.service");
 const { cronJobService } = require("../cronJob/cronJob.service");
 const { apiKeyService } = require("../apiKey/apiKey.service");
@@ -72,11 +70,10 @@ tenantService.getUserTenantByID = async ({ userID, tenantID, dbPool }) => {
           userID: parseInt(userID),
           dbPool,
         });
-      tenantDashboards =
-        await databaseDashboardService.getAllDatabaseDashboards({
-          userID: parseInt(userID),
-          tenantID: parseInt(tenantID),
-        });
+      tenantDashboards = await dashboardService.getAllDashboards({
+        userID: parseInt(userID),
+        tenantID: parseInt(tenantID),
+      });
       tenantDataQueries = await dataQueryService.getAllDataQueries({
         userID: parseInt(userID),
         tenantID: parseInt(tenantID),
@@ -196,7 +193,7 @@ tenantService.deleteUserTenantByID = async ({ userID, tenantID }) => {
           tenantID: tenantIdToDelete,
         },
       }),
-      prisma.tblDatabaseDashboards.deleteMany({
+      prisma.tblDashboards.deleteMany({
         where: {
           tenantID: tenantIdToDelete,
         },
@@ -294,14 +291,14 @@ tenantService.getAllUserTenants = async ({ userID }) => {
  *
  * @param {object} param0
  * @param {Number} param0.userID
- * @param {String} param0.tenantName
+ * @param {String} param0.tenantTitle
  * @param {String} param0.tenantLogoURL
  * @param {String} param0.tenantDBURL
  * @returns
  */
 tenantService.createTenant = async ({
   userID,
-  tenantName,
+  tenantTitle,
   tenantLogoURL,
   tenantDBURL,
   tenantDBType,
@@ -309,13 +306,13 @@ tenantService.createTenant = async ({
   try {
     Logger.log("info", {
       message: "tenantService:createTenant:params",
-      params: { userID, tenantName, tenantLogoURL, tenantDBURL, tenantDBType },
+      params: { userID, tenantTitle, tenantLogoURL, tenantDBURL, tenantDBType },
     });
 
     const newTenant = await prisma.$transaction(async (tx) => {
       const newTenant = await tx.tblTenants.create({
         data: {
-          tenantName,
+          tenantTitle,
           tenantLogoURL,
           tenantDBURL,
           creatorID: parseInt(userID),
@@ -424,7 +421,7 @@ tenantService.testTenantDatabaseConnection = async ({
  * @param {object} param0
  * @param {Number} param0.userID
  * @param {Number} param0.tenantID
- * @param {String} param0.tenantName
+ * @param {String} param0.tenantTitle
  * @param {String} param0.tenantLogoURL
  * @param {String} param0.tenantDBURL
  * @param {String} param0.tenantDBType
@@ -433,7 +430,7 @@ tenantService.testTenantDatabaseConnection = async ({
 tenantService.updateTenant = async ({
   userID,
   tenantID,
-  tenantName,
+  tenantTitle,
   tenantLogoURL,
   tenantDBURL,
   tenantDBType,
@@ -441,7 +438,7 @@ tenantService.updateTenant = async ({
   try {
     Logger.log("info", {
       message: "tenantService:updateTenant:params",
-      params: { userID, tenantID, tenantName, tenantLogoURL, tenantDBType },
+      params: { userID, tenantID, tenantTitle, tenantLogoURL, tenantDBType },
     });
 
     const updatedTenant = await prisma.tblTenants.update({
@@ -449,7 +446,7 @@ tenantService.updateTenant = async ({
         tenantID,
       },
       data: {
-        tenantName,
+        tenantTitle,
         tenantLogoURL,
         tenantDBURL,
         tenantDBType,

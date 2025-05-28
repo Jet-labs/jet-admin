@@ -25,7 +25,7 @@ import { WidgetEditor } from "./widgetEditor";
 import { WidgetPreview } from "./widgetPreview";
 
 const initialValues = {
-  widgetName: "",
+  widgetTitle: "",
   widgetType: CONSTANTS.WIDGET_TYPES.TEXT_WIDGET.value,
   dataQueries: [
     {
@@ -153,7 +153,7 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
   useEffect(() => {
     if (widget && widget.widgetID) {
       updateWidgetForm.setValues({
-        widgetName: widget.widgetName || CONSTANTS.STRINGS.UNTITLED,
+        widgetTitle: widget.widgetTitle || CONSTANTS.STRINGS.UNTITLED,
         widgetType: widget.widgetType || WIDGETS_MAP.text.value,
         widgetDescription: widget.widgetDescription || "",
         dataQueries: widget.dataQueries || [],
@@ -230,7 +230,7 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
               key={`{widgetPreview_${uniqueKey}}`}
               widgetID={widgetID}
               tenantID={tenantID}
-              widgetName={updateWidgetForm.values.widgetName}
+              widgetTitle={updateWidgetForm.values.widgetTitle}
               widgetType={updateWidgetForm.values.widgetType}
               widgetConfig={updateWidgetForm.values.widgetConfig}
               refreshData={_handleFetchWidgetData}

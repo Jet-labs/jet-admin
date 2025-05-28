@@ -14,7 +14,7 @@ router.get(
 
 router.post(
   "/",
-  body("apiKeyName").notEmpty().withMessage("apiKeyName is required"),
+  body("apiKeyTitle").notEmpty().withMessage("apiKeyTitle is required"),
   body("roleIDs").optional().isArray().withMessage("roleIDs must be an array"),
   body("roleIDs.*")
     .optional()
@@ -36,7 +36,7 @@ router.get(
 router.patch(
   "/:apiKeyID",
   param("apiKeyID").isNumeric().withMessage("apiKeyID must be a number"),
-  body("apiKeyName").notEmpty().withMessage("apiKeyName is required"),
+  body("apiKeyTitle").notEmpty().withMessage("apiKeyTitle is required"),
   body("roleIDs").optional().isArray().withMessage("roleIDs must be an array"),
   body("roleIDs.*")
     .optional()

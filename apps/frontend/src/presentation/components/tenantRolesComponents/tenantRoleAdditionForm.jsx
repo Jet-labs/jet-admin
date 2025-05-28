@@ -16,10 +16,10 @@ export const TenantRoleAdditionForm = () => {
   const { tenantID } = useParams();
   const queryClient = useQueryClient();
   const { isPending: isAddingTenantRole, mutate: addTenantRole } = useMutation({
-    mutationFn: ({ roleName, roleDescription, permissionIDs }) =>
+    mutationFn: ({ roleTitle, roleDescription, permissionIDs }) =>
       addTenantRoleAPI({
         tenantID,
-        data: { roleName, roleDescription, permissionIDs },
+        data: { roleTitle, roleDescription, permissionIDs },
       }),
     retry: false,
     onSuccess: () => {
@@ -35,13 +35,13 @@ export const TenantRoleAdditionForm = () => {
 
   const addTenantRoleForm = useFormik({
     initialValues: {
-      roleName: "",
+      roleTitle: "",
       roleDescription: "",
       permissionIDs: [],
     },
     validationSchema: formValidations.addTenantRoleFormValidationSchema,
-    onSubmit: ({ roleName, roleDescription, permissionIDs }) => {
-      addTenantRole({ roleName, roleDescription, permissionIDs });
+    onSubmit: ({ roleTitle, roleDescription, permissionIDs }) => {
+      addTenantRole({ roleTitle, roleDescription, permissionIDs });
     },
   });
 
@@ -72,7 +72,7 @@ export const TenantRoleAdditionForm = () => {
           >
             <div>
               <label
-                htmlFor="roleName"
+                htmlFor="roleTitle"
                 className="block mb-1 text-sm font-medium text-slate-500"
               >
                 {
@@ -81,9 +81,9 @@ export const TenantRoleAdditionForm = () => {
                 }
               </label>
               <input
-                type="roleName"
-                name="roleName"
-                id="roleName"
+                type="roleTitle"
+                name="roleTitle"
+                id="roleTitle"
                 className=" placeholder:text-slate-400 bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:border-slate-700 block w-full px-2.5 py-1.5 "
                 placeholder={
                   CONSTANTS.STRINGS
@@ -92,7 +92,7 @@ export const TenantRoleAdditionForm = () => {
                 required={true}
                 onChange={addTenantRoleForm.handleChange}
                 onBlur={addTenantRoleForm.handleBlur}
-                value={addTenantRoleForm.values.roleName}
+                value={addTenantRoleForm.values.roleTitle}
               />
             </div>
 

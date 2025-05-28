@@ -45,18 +45,18 @@ apiKeyController.createAPIKey = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID } = req.params;
-    const { apiKeyName, roleIDs } = req.body;
+    const { apiKeyTitle, roleIDs } = req.body;
 
     Logger.log("info", {
       message: "apiKeyController:createAPIKey:params",
-      params: { userID: user.userID, tenantID, apiKeyName },
+      params: { userID: user.userID, tenantID, apiKeyTitle },
     });
 
     const result = await apiKeyService.createAPIKey({
       userID: parseInt(user.userID),
       tenantID: parseInt(tenantID),
       roleIDs,
-      apiKeyName,
+      apiKeyTitle,
     });
 
     return expressUtils.sendResponse(res, true, {
@@ -113,7 +113,7 @@ apiKeyController.updateAPIKeyByID = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID, apiKeyID } = req.params; // Assuming `apiKeyID` identifies the query to update
-    const { apiKeyName,roleIDs,isDisabled } = req.body;
+    const { apiKeyTitle, roleIDs, isDisabled } = req.body;
 
     Logger.log("info", {
       message: "apiKeyController:updateAPIKeyByID:params",
@@ -121,7 +121,7 @@ apiKeyController.updateAPIKeyByID = async (req, res) => {
         userID: user.userID,
         tenantID,
         apiKeyID,
-        apiKeyName,
+        apiKeyTitle,
         roleIDs,
         isDisabled,
       },
@@ -129,9 +129,9 @@ apiKeyController.updateAPIKeyByID = async (req, res) => {
 
     const result = await apiKeyService.updateAPIKeyByID({
       userID: parseInt(user.userID),
-      tenantID:parseInt(tenantID),
-      apiKeyID:parseInt(apiKeyID),
-      apiKeyName,
+      tenantID: parseInt(tenantID),
+      apiKeyID: parseInt(apiKeyID),
+      apiKeyTitle,
       roleIDs,
       isDisabled,
     });
@@ -142,7 +142,7 @@ apiKeyController.updateAPIKeyByID = async (req, res) => {
         userID: user.userID,
         tenantID,
         apiKeyID,
-        apiKeyName,
+        apiKeyTitle,
         result,
       },
     });

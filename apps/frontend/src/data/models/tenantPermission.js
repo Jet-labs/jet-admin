@@ -1,14 +1,8 @@
 export class TenantPermission {
-  constructor({
-    permissionID,
-    permissionName,
-    permissionDescription,
-    
-  }) {
+  constructor({ permissionID, permissionTitle, permissionDescription }) {
     this.permissionID = permissionID;
-    this.permissionName = permissionName;
+    this.permissionTitle = permissionTitle;
     this.permissionDescription = permissionDescription;
-    
   }
   static toList = (data) => {
     if (Array.isArray(data)) {

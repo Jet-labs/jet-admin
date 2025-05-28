@@ -47,30 +47,30 @@ databaseNotificationService.getAllDatabaseNotifications = async ({
  * @param {object} param0
  * @param {number} param0.userID
  * @param {number} param0.tenantID
- * @param {string} param0.databaseNotificationName
+ * @param {string} param0.databaseNotificationTitle
  * @returns {Promise<boolean>}
  */
 databaseNotificationService.createDatabaseNotification = async ({
   userID,
   tenantID,
-  databaseNotificationName,
+  databaseNotificationTitle,
 }) => {
   Logger.log("info", {
     message: "databaseNotificationService:createDatabaseNotification:params",
-    params: { userID, tenantID, databaseNotificationName },
+    params: { userID, tenantID, databaseNotificationTitle },
   });
 
   try {
     await prisma.tblDatabaseNotifications.create({
       data: {
         tenantID: parseInt(tenantID),
-        databaseNotificationName,
+        databaseNotificationTitle,
       },
     });
 
     Logger.log("success", {
       message: "databaseNotificationService:createDatabaseNotification:success",
-      params: { userID, databaseNotificationName },
+      params: { userID, databaseNotificationTitle },
     });
 
     return true;
@@ -136,7 +136,7 @@ databaseNotificationService.getDatabaseNotificationByID = async ({
  * @param {number} param0.userID
  * @param {string} param0.tenantID
  * @param {number} param0.databaseNotificationID
- * @param {string} param0.databaseNotificationName
+ * @param {string} param0.databaseNotificationTitle
  * @param {string} param0.databaseNotificationDescription
  * @param {JSON} param0.databaseNotification
  * @param {Boolean} param0.runOnLoad
@@ -146,7 +146,7 @@ databaseNotificationService.updateDatabaseNotificationByID = async ({
   userID,
   tenantID,
   databaseNotificationID,
-  databaseNotificationName,
+  databaseNotificationTitle,
 }) => {
   Logger.log("info", {
     message:
@@ -155,7 +155,7 @@ databaseNotificationService.updateDatabaseNotificationByID = async ({
       userID,
       tenantID,
       databaseNotificationID,
-      databaseNotificationName,
+      databaseNotificationTitle,
     },
   });
 
@@ -167,7 +167,7 @@ databaseNotificationService.updateDatabaseNotificationByID = async ({
         tenantID: parseInt(tenantID), // Ensure tenantID matches for security
       },
       data: {
-        databaseNotificationName,
+        databaseNotificationTitle,
       },
     });
 
@@ -178,7 +178,7 @@ databaseNotificationService.updateDatabaseNotificationByID = async ({
         userID,
         tenantID,
         databaseNotificationID,
-        databaseNotificationName,
+        databaseNotificationTitle,
       },
     });
 

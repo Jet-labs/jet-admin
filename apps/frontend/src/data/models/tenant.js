@@ -3,7 +3,7 @@ import { User } from "./user";
 export class Tenant {
   constructor({
     tenantID,
-    tenantName,
+    tenantTitle,
     tenantLogoURL,
     tenantDBURL,
     tenantDBType,
@@ -21,7 +21,7 @@ export class Tenant {
     tenantWidgetCount,
   }) {
     this.tenantID = tenantID;
-    this.tenantName = tenantName;
+    this.tenantTitle = tenantTitle;
     this.tenantLogoURL = tenantLogoURL;
     this.tenantDBURL = tenantDBURL;
     this.tenantDBType = tenantDBType;

@@ -65,7 +65,7 @@ export const APIKeyDrawerList = () => {
                     } `}
                   >
                     {/* {StringUtils.truncateName(apiKey.apiKeyTitle, 15)} */}
-                    {`${apiKey.apiKeyName}`}
+                    {`${apiKey.apiKeyTitle}`}
                   </span>
                 </div>
               </Link>

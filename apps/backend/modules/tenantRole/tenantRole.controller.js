@@ -14,22 +14,22 @@ const tenantRoleController = {};
 tenantRoleController.createRole = async (req, res) => {
   try {
     const { tenantID } = req.params;
-    const { roleName, roleDescription, permissionIDs } = req.body;
+    const { roleTitle, roleDescription, permissionIDs } = req.body;
     Logger.log("info", {
       message: "tenantRoleController:createRole:params",
-      params: { tenantID, roleName, roleDescription, permissionIDs },
+      params: { tenantID, roleTitle, roleDescription, permissionIDs },
     });
 
     await tenantRoleService.createRole({
       tenantID: parseInt(tenantID),
-      roleName,
+      roleTitle,
       roleDescription,
       permissionIDs,
     });
 
     Logger.log("success", {
       message: "tenantRoleController:createRole:success",
-      params: { tenantID, tenantID, roleName, roleDescription, permissionIDs },
+      params: { tenantID, tenantID, roleTitle, roleDescription, permissionIDs },
     });
 
     return expressUtils.sendResponse(res, true, {});
@@ -159,17 +159,17 @@ tenantRoleController.getTenantRoleByID = async (req, res) => {
 tenantRoleController.updateTenantRoleByID = async (req, res) => {
   try {
     const { tenantID, roleID } = req.params;
-    const { roleName, roleDescription, permissionIDs } = req.body;
+    const { roleTitle, roleDescription, permissionIDs } = req.body;
 
     Logger.log("info", {
       message: "tenantRoleController:updateTenantRoleByID:params",
-      params: { tenantID, roleID, roleName, roleDescription, permissionIDs },
+      params: { tenantID, roleID, roleTitle, roleDescription, permissionIDs },
     });
 
     await tenantRoleService.updateTenantRoleByID({
       tenantID: parseInt(tenantID),
       roleID: parseInt(roleID),
-      roleName,
+      roleTitle,
       roleDescription,
       permissionIDs,
     });

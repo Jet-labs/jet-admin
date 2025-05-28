@@ -26,13 +26,13 @@ formValidations.emailSignInFormValidationSchema = Yup.object().shape({
 });
 
 formValidations.addTenantFormValidationSchema = Yup.object().shape({
-  tenantName: Yup.string().required("Tenant name is required").trim(),
+  tenantTitle: Yup.string().required("Tenant name is required").trim(),
   tenantDBURL: Yup.string("Must be a valid URL"),
 });
 
 formValidations.updateTenantFormValidationSchema = Yup.object().shape({
   tenantID: Yup.string().required("Tenant ID is required"),
-  tenantName: Yup.string().required("Tenant name is required").trim(),
+  tenantTitle: Yup.string().required("Tenant name is required").trim(),
   tenantDBURL: Yup.string("Must be a valid URL"),
 });
 
@@ -45,13 +45,13 @@ formValidations.addUserToTenantFormValidationSchema = Yup.object().shape({
 });
 
 formValidations.addTenantRoleFormValidationSchema = Yup.object().shape({
-  roleName: Yup.string().required("Role name is required").trim(),
+  roleTitle: Yup.string().required("Role name is required").trim(),
   roleDescription: Yup.string().required("Role description is required").trim(),
   permissionIDs: Yup.array().of(Yup.string()),
 });
 
 formValidations.updateTenantRoleFormValidationSchema = Yup.object().shape({
-  roleName: Yup.string().required("Role name is required").trim(),
+  roleTitle: Yup.string().required("Role name is required").trim(),
   roleDescription: Yup.string().required("Role description is required").trim(),
   permissionIDs: Yup.array().of(Yup.string()),
 });
@@ -64,22 +64,18 @@ formValidations.addSchemaFormValidationSchema = Yup.object().shape({
 });
 
 formValidations.addDashboardFormValidationSchema = Yup.object().shape({
-  databaseDashboardName: Yup.string()
-    .required("Dashboard name is required")
-    .trim(),
-  databaseDashboardDescription: Yup.string().trim(),
-  databaseDashboardConfig: Yup.object().shape({
+  dashboardTitle: Yup.string().required("Dashboard name is required").trim(),
+  dashboardDescription: Yup.string().trim(),
+  dashboardConfig: Yup.object().shape({
     widgets: Yup.array(),
     layouts: Yup.object(),
   }),
 });
 
 formValidations.updateDashboardFormValidationSchema = Yup.object().shape({
-  databaseDashboardName: Yup.string()
-    .required("Dashboard name is required")
-    .trim(),
-  databaseDashboardDescription: Yup.string().trim(),
-  databaseDashboardConfig: Yup.object().shape({
+  dashboardTitle: Yup.string().required("Dashboard name is required").trim(),
+  dashboardDescription: Yup.string().trim(),
+  dashboardConfig: Yup.object().shape({
     widgets: Yup.array(),
     layouts: Yup.object(),
   }),
@@ -108,24 +104,24 @@ formValidations.queryUpdationFormValidationSchema = Yup.object().shape({
 
 formValidations.databaseNotificationAdditionFormValidationSchema =
   Yup.object().shape({
-    databaseNotificationName: Yup.string().required(
+    databaseNotificationTitle: Yup.string().required(
       "Notification name is required"
     ),
   });
 
 formValidations.databaseNotificationUpdationFormValidationSchema =
   Yup.object().shape({
-    databaseNotificationName: Yup.string().required(
+    databaseNotificationTitle: Yup.string().required(
       "Notification name is required"
     ),
   });
 
 formValidations.apiKeyAdditionFormValidationSchema = Yup.object().shape({
-  apiKeyName: Yup.string().required("API key name is required"),
+  apiKeyTitle: Yup.string().required("API key name is required"),
 });
 
 formValidations.apiKeyUpdationFormValidationSchema = Yup.object().shape({
-  apiKeyName: Yup.string().required("API key name is required"),
+  apiKeyTitle: Yup.string().required("API key name is required"),
 });
 
 formValidations.cronJobAdditionFormValidationSchema = Yup.object().shape({
@@ -277,7 +273,7 @@ formValidations.triggerAdditionFormValidationSchema = Yup.object().shape({
 });
 
 formValidations.addWidgetFormValidationSchema = Yup.object().shape({
-  widgetName: Yup.string().required("Widget name is required"),
+  widgetTitle: Yup.string().required("Widget name is required"),
   widgetType: Yup.string().required("Widget type is required"),
   queries: Yup.array()
     .of(
@@ -295,7 +291,7 @@ formValidations.addWidgetFormValidationSchema = Yup.object().shape({
 });
 
 formValidations.updateWidgetFormValidationSchema = Yup.object().shape({
-  widgetName: Yup.string().required("Widget name is required"),
+  widgetTitle: Yup.string().required("Widget name is required"),
   widgetType: Yup.string().required("Widget type is required"),
   queries: Yup.array()
     .of(

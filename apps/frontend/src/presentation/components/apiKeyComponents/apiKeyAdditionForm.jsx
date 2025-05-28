@@ -37,7 +37,7 @@ export const APIKeyAdditionForm = ({ tenantID }) => {
   });
   const apiKeyAdditionForm = useFormik({
     initialValues: {
-      apiKeyName: "",
+      apiKeyTitle: "",
       roleIDs: [],
     },
     validationSchema: formValidations.apiKeyAdditionFormValidationSchema,

@@ -22,7 +22,7 @@ import { WIDGET_TYPES } from "@jet-admin/widget-types";
 
 const defaultWidgetType = WIDGET_TYPES.BAR_CHART.value;
 const initialValues = {
-  widgetName: "",
+  widgetTitle: "",
   widgetType: defaultWidgetType,
   dataQueries: [
     {
@@ -143,7 +143,7 @@ export const WidgetAdditionForm = ({ tenantID }) => {
         <ResizableHandle withHandle={true} />
         <ResizablePanel defaultSize={80}>
           <WidgetPreview
-            widgetName={addWidgetForm.values.widgetName}
+            widgetTitle={addWidgetForm.values.widgetTitle}
             widgetType={addWidgetForm.values.widgetType}
             widgetConfig={addWidgetForm.values.widgetConfig}
             refreshData={_handleFetchWidgetData}

@@ -38,11 +38,11 @@ export const TenantRoleUpdationForm = () => {
 
   const { isPending: isUpdatingTenantRoleByID, mutate: updateTenantRoleByID } =
     useMutation({
-      mutationFn: ({ roleName, roleDescription, permissionIDs }) =>
+      mutationFn: ({ roleTitle, roleDescription, permissionIDs }) =>
         updateTenantRoleByIDAPI({
           tenantID,
           tenantRoleID,
-          data: { roleName, roleDescription, permissionIDs },
+          data: { roleTitle, roleDescription, permissionIDs },
         }),
       retry: false,
       onSuccess: () => {
@@ -58,20 +58,20 @@ export const TenantRoleUpdationForm = () => {
 
   const updateTenantRoleByIDForm = useFormik({
     initialValues: {
-      roleName: "",
+      roleTitle: "",
       roleDescription: "",
       permissionIDs: [],
     },
     validationSchema: formValidations.updateTenantRoleFormValidationSchema,
-    onSubmit: ({ roleName, roleDescription, permissionIDs }) => {
-      updateTenantRoleByID({ roleName, roleDescription, permissionIDs });
+    onSubmit: ({ roleTitle, roleDescription, permissionIDs }) => {
+      updateTenantRoleByID({ roleTitle, roleDescription, permissionIDs });
     },
   });
 
   useEffect(() => {
     if (tenantRole && updateTenantRoleByIDForm) {
       updateTenantRoleByIDForm.setValues({
-        roleName: tenantRole.roleName,
+        roleTitle: tenantRole.roleTitle,
         roleDescription: tenantRole.roleDescription,
         permissionIDs:
           tenantRole.tblRolePermissionMappings?.map(
@@ -115,7 +115,7 @@ export const TenantRoleUpdationForm = () => {
             >
               <div>
                 <label
-                  htmlFor="roleName"
+                  htmlFor="roleTitle"
                   className="block mb-1 text-sm font-medium text-slate-500"
                 >
                   {
@@ -124,9 +124,9 @@ export const TenantRoleUpdationForm = () => {
                   }
                 </label>
                 <input
-                  type="roleName"
-                  name="roleName"
-                  id="roleName"
+                  type="roleTitle"
+                  name="roleTitle"
+                  id="roleTitle"
                   className=" placeholder:text-slate-400 bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:border-slate-700 block w-full px-2.5 py-1.5 "
                   placeholder={
                     CONSTANTS.STRINGS
@@ -135,7 +135,7 @@ export const TenantRoleUpdationForm = () => {
                   required={true}
                   onChange={updateTenantRoleByIDForm.handleChange}
                   onBlur={updateTenantRoleByIDForm.handleBlur}
-                  value={updateTenantRoleByIDForm.values.roleName}
+                  value={updateTenantRoleByIDForm.values.roleTitle}
                 />
               </div>
 

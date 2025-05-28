@@ -54,7 +54,7 @@ API services encapsulate all backend communication, organized by domain:
 | `auth.js` | Authentication operations |
 | `database.js` | Core database operations |
 | `databaseChart.js` | Chart management |
-| `databaseDashboard.js` | Dashboard management |
+| `dashboard.js` | Dashboard management |
 | `dataQuery.js` | Query operations |
 | `databaseTable.js` | Table management |
 | `databaseTrigger.js` | Trigger operations |
@@ -96,7 +96,7 @@ export const SomeEntityAPI = {
 Data models define the structure and relationships of entities used throughout the application:
 
 - `databaseChart.js` - Chart data structure
-- `databaseDashboard.js` - Dashboard configuration
+- `dashboard.js` - Dashboard configuration
 - `databaseMetadata.js` - Database metadata
 - `dataQuery.js` - Query structure
 - `databaseSchema.js` - Schema definition
@@ -124,7 +124,7 @@ The application uses React Context for state management, with specialized contex
 |---------|---------|
 | `authContext.jsx` | User authentication state |
 | `databaseChartsContext.jsx` | Chart state management |
-| `databaseDashboardsContext.jsx` | Dashboard state management |
+| `dashboardsContext.jsx` | Dashboard state management |
 | `dataQueriesContext.jsx` | Query state management |
 | `databaseTablesContext.jsx` | Table state management |
 | `databaseTriggersContext.jsx` | Trigger state management |
@@ -208,7 +208,7 @@ Each page represents a distinct view in the application:
 
 - `accountPage/` - User account management
 - `addDatabaseChartPage/` - Chart creation interface
-- `addDatabaseDashboardPage/` - Dashboard creation
+- `addDashboardPage/` - Dashboard creation
 - `addDataQueryPage/` - Query creation
 - `addDatabaseTablePage/` - Table creation
 - `addDatabaseTriggerPage/` - Trigger creation

@@ -2,9 +2,9 @@ import React, {  useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { CONSTANTS } from "../../../constants";
 import {
-  getAllDatabaseDashboardsAPI,
-  getDatabaseDashboardByIDAPI,
-} from "../../../data/apis/databaseDashboard";
+  getAllDashboardsAPI,
+  getDashboardByIDAPI,
+} from "../../../data/apis/dashboard";
 import {
   useAuthActions,
   useAuthState,
@@ -13,7 +13,7 @@ import { Responsive, WidthProvider } from "react-grid-layout";
 import PropTypes from "prop-types";
 import { MdOutlineSpaceDashboard } from "react-icons/md";
 import { ReactQueryLoadingErrorWrapper } from "./reactQueryLoadingErrorWrapper";
-import { DatabaseDashboardRenderWidget } from "../databaseDashboardComponents/databaseDashboardRenderWidget";
+import { DashboardRenderWidget } from "../dashboardComponents/dashboardRenderWidget";
 import { CircularProgress } from "@mui/material";
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
@@ -35,34 +35,34 @@ export const DefaultDashboardSelectionLayout = ({
       ? parseInt(userConfig[userConfigKey])
       : null;
   const {
-    isLoading: isLoadingDatabaseDashboards,
-    data: databaseDashboards,
-    error: loadDatabaseDashboardsError,
-    isFetching: isFetchingDatabaseDashboards,
-    isRefetching: isRefetechingDatabaseDashboards,
-    refetch: refetchDatabaseDashboards,
+    isLoading: isLoadingDashboards,
+    data: dashboards,
+    error: loadDashboardsError,
+    isFetching: isFetchingDashboards,
+    isRefetching: isRefetechingDashboards,
+    refetch: refetchDashboards,
   } = useQuery({
-    queryKey: [CONSTANTS.REACT_QUERY_KEYS.DATABASE_DASHBOARDS(tenantID)],
-    queryFn: () => getAllDatabaseDashboardsAPI({ tenantID }),
+    queryKey: [CONSTANTS.REACT_QUERY_KEYS.DASHBOARDS(tenantID)],
+    queryFn: () => getAllDashboardsAPI({ tenantID }),
     refetchOnWindowFocus: false,
   });
 
   const {
-    isLoading: isLoadingDatabaseDashboard,
-    data: databaseDashboard,
-    error: loadDatabaseDashboardError,
-    isFetching: isFetchingDatabaseDashboard,
-    isRefetching: isRefetechingDatabaseDashboard,
-    refetch: refetchDatabaseDashboard,
+    isLoading: isLoadingDashboard,
+    data: dashboard,
+    error: loadDashboardError,
+    isFetching: isFetchingDashboard,
+    isRefetching: isRefetechingDashboard,
+    refetch: refetchDashboard,
   } = useQuery({
     queryKey: [
-      CONSTANTS.REACT_QUERY_KEYS.DATABASE_DASHBOARDS(tenantID),
+      CONSTANTS.REACT_QUERY_KEYS.DASHBOARDS(tenantID),
       pinnedDashboardID,
     ],
     queryFn: () =>
-      getDatabaseDashboardByIDAPI({
+      getDashboardByIDAPI({
         tenantID,
-        databaseDashboardID: pinnedDashboardID,
+        dashboardID: pinnedDashboardID,
       }),
     enabled: !!pinnedDashboardID,
     refetchOnWindowFocus: false,
@@ -81,18 +81,18 @@ export const DefaultDashboardSelectionLayout = ({
 
   return (
     <div className="w-full h-full">
-      {pinnedDashboardID && databaseDashboard ? (
+      {pinnedDashboardID && dashboard ? (
         <div className="w-full flex flex-col justify-start items-center h-full">
           <div className="flex flex-row justify-between items-center w-full px-3 py-2 border-b border-gray-200 ">
             <div className="w-full  flex flex-col justify-center items-start">
-              {databaseDashboard && (
+              {dashboard && (
                 <h1 className="text-lg font-bold leading-tight tracking-tight text-slate-700">
-                  {databaseDashboard.databaseDashboardName}
+                  {dashboard.dashboardTitle}
                 </h1>
               )}
 
-              {databaseDashboard && (
-                <span className="text-xs text-[#646cff] mt-2">{`Dashboard ID: ${databaseDashboard.databaseDashboardID} `}</span>
+              {dashboard && (
+                <span className="text-xs text-[#646cff] mt-2">{`Dashboard ID: ${dashboard.dashboardID} `}</span>
               )}
             </div>
             <div className="flex flex-row justify-center items-center gap-2">
@@ -109,12 +109,12 @@ export const DefaultDashboardSelectionLayout = ({
                   <option value="" disabled selected>
                     Select a dashboard
                   </option>
-                  {databaseDashboards?.map((dashboard) => (
+                  {dashboards?.map((dashboard) => (
                     <option
-                      key={dashboard.databaseDashboardID}
-                      value={dashboard.databaseDashboardID}
+                      key={dashboard.dashboardID}
+                      value={dashboard.dashboardID}
                     >
-                      {dashboard.databaseDashboardName}
+                      {dashboard.dashboardTitle}
                     </option>
                   ))}
                 </select>
@@ -122,23 +122,23 @@ export const DefaultDashboardSelectionLayout = ({
             </div>
           </div>
           <ReactQueryLoadingErrorWrapper
-            isLoading={isLoadingDatabaseDashboard}
-            isFetching={isFetchingDatabaseDashboard}
-            error={loadDatabaseDashboardError}
-            refetch={refetchDatabaseDashboard}
-            isRefetching={isRefetechingDatabaseDashboard}
+            isLoading={isLoadingDashboard}
+            isFetching={isFetchingDashboard}
+            error={loadDashboardError}
+            refetch={refetchDashboard}
+            isRefetching={isRefetechingDashboard}
           >
             <div
               className="w-full overflow-y-auto bg-slate-100 "
               id={`printable-area-dashboard-${pinnedDashboardID}`}
             >
-              {databaseDashboard && (
+              {dashboard && (
                 <ResponsiveReactGridLayout
                   isDraggable={false}
                   isResizable={false}
                   style={{ minHeight: "100%" }}
                   draggableCancel=".cancelSelectorName"
-                  layouts={databaseDashboard?.databaseDashboardConfig?.layouts}
+                  layouts={dashboard?.dashboardConfig?.layouts}
                   measureBeforeMount={false}
                   breakpoints={{ lg: 1000, md: 996, sm: 768, xs: 480, xxs: 0 }}
                   onBreakpointChange={onBreakpointChange}
@@ -148,18 +148,16 @@ export const DefaultDashboardSelectionLayout = ({
                   rowHeight={32}
                   allowOverlap={false}
                 >
-                  {databaseDashboard?.databaseDashboardConfig?.widgets.map(
-                    (widget, index) => (
-                      <div key={widget} draggable={false}>
-                        <DatabaseDashboardRenderWidget
-                          tenantID={tenantID}
-                          widget={widget}
-                          index={index}
-                          editable={false}
-                        />
-                      </div>
-                    )
-                  )}
+                  {dashboard?.dashboardConfig?.widgets.map((widget, index) => (
+                    <div key={widget} draggable={false}>
+                      <DashboardRenderWidget
+                        tenantID={tenantID}
+                        widget={widget}
+                        index={index}
+                        editable={false}
+                      />
+                    </div>
+                  ))}
                 </ResponsiveReactGridLayout>
               )}
             </div>
@@ -168,15 +166,15 @@ export const DefaultDashboardSelectionLayout = ({
       ) : (
         <ReactQueryLoadingErrorWrapper
           isLoading={
-            isLoadingDatabaseDashboards ||
-            isFetchingDatabaseDashboard ||
+            isLoadingDashboards ||
+            isFetchingDashboard ||
             isFetchingUserConfig ||
-            (pinnedDashboardID && isLoadingDatabaseDashboards)
+            (pinnedDashboardID && isLoadingDashboards)
           }
-          error={loadDatabaseDashboardsError}
-          isFetching={isFetchingDatabaseDashboards}
-          isRefetching={isRefetechingDatabaseDashboards}
-          refetch={refetchDatabaseDashboards}
+          error={loadDashboardsError}
+          isFetching={isFetchingDashboards}
+          isRefetching={isRefetechingDashboards}
+          refetch={refetchDashboards}
         >
           <div className="h-full w-full flex justify-center items-center p-6">
             <div className="bg-white p-8 max-w-md text-center">
@@ -208,12 +206,12 @@ export const DefaultDashboardSelectionLayout = ({
                     <option value="" disabled selected>
                       Select a dashboard
                     </option>
-                    {databaseDashboards?.map((dashboard) => (
+                    {dashboards?.map((dashboard) => (
                       <option
-                        key={dashboard.databaseDashboardID}
-                        value={dashboard.databaseDashboardID}
+                        key={dashboard.dashboardID}
+                        value={dashboard.dashboardID}
                       >
-                        {dashboard.databaseDashboardName}
+                        {dashboard.dashboardTitle}
                       </option>
                     ))}
                   </select>

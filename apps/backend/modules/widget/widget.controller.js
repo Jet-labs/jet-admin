@@ -59,7 +59,7 @@ widgetController.createWidget = async (req, res) => {
     const { user } = req;
     const { tenantID } = req.params;
     const {
-      widgetName,
+      widgetTitle,
       widgetDescription,
       widgetType,
       widgetConfig,
@@ -71,7 +71,7 @@ widgetController.createWidget = async (req, res) => {
       params: {
         userID: user.userID,
         tenantID,
-        widgetName,
+        widgetTitle,
         widgetDescription,
         widgetType,
         widgetConfig,
@@ -82,7 +82,7 @@ widgetController.createWidget = async (req, res) => {
     const result = await widgetService.createWidget({
       userID: parseInt(user.userID),
       tenantID,
-      widgetName,
+      widgetTitle,
       widgetDescription,
       widgetType,
       widgetConfig,
@@ -94,7 +94,7 @@ widgetController.createWidget = async (req, res) => {
       params: {
         userID: user.userID,
         tenantID,
-        widgetName,
+        widgetTitle,
         widgetDescription,
         widgetType,
         widgetConfig,
@@ -325,7 +325,7 @@ widgetController.updateWidgetByID = async (req, res) => {
     const {
       widgetConfig,
       widgetDescription,
-      widgetName,
+      widgetTitle,
       widgetType,
       dataQueries,
     } = req.body;
@@ -338,7 +338,7 @@ widgetController.updateWidgetByID = async (req, res) => {
         widgetID,
         widgetConfig,
         widgetDescription,
-        widgetName,
+        widgetTitle,
         widgetType,
         dataQueries,
       },
@@ -350,7 +350,7 @@ widgetController.updateWidgetByID = async (req, res) => {
       widgetID,
       widgetConfig,
       widgetDescription,
-      widgetName,
+      widgetTitle,
       widgetType,
       dataQueries,
     });
@@ -363,7 +363,7 @@ widgetController.updateWidgetByID = async (req, res) => {
         widgetID,
         widgetConfig,
         widgetDescription,
-        widgetName,
+        widgetTitle,
         widgetType,
         dataQueries,
       },

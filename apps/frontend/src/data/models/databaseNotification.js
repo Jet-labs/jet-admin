@@ -2,13 +2,13 @@ export class DatabaseNotification {
   constructor({
     databaseNotificationID,
     tenantID,
-    databaseNotificationName,
+    databaseNotificationTitle,
     createdAt,
     updatedAt,
   }) {
     this.databaseNotificationID = databaseNotificationID;
     this.tenantID = tenantID;
-    this.databaseNotificationName = databaseNotificationName;
+    this.databaseNotificationTitle = databaseNotificationTitle;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
   }

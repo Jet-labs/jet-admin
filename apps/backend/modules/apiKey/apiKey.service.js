@@ -43,18 +43,18 @@ apiKeyService.getAllAPIKeys = async ({ userID, tenantID }) => {
  * @param {number} param0.userID
  * @param {number} param0.tenantID
  * @param {Array<number>} param0.roleIDs
- * @param {string} param0.apiKeyName
+ * @param {string} param0.apiKeyTitle
  * @returns {Promise<boolean>}
  */
 apiKeyService.createAPIKey = async ({
   userID,
   tenantID,
   roleIDs,
-  apiKeyName,
+  apiKeyTitle,
 }) => {
   Logger.log("info", {
     message: "apiKeyService:createAPIKey:params",
-    params: { userID, tenantID, apiKeyName },
+    params: { userID, tenantID, apiKeyTitle },
   });
 
   try {
@@ -65,7 +65,7 @@ apiKeyService.createAPIKey = async ({
         data: {
           tenantID: parseInt(tenantID),
           creatorID: parseInt(userID),
-          apiKeyName,
+          apiKeyTitle,
           apiKey: generateAPIKey(),
           isDisabled: false,
         },
@@ -148,7 +148,7 @@ apiKeyService.getAPIKeyByID = async ({ userID, tenantID, apiKeyID }) => {
  * @param {number} param0.userID
  * @param {string} param0.tenantID
  * @param {number} param0.apiKeyID
- * @param {string} param0.apiKeyName
+ * @param {string} param0.apiKeyTitle
  * @param {Array<number>} param0.roleIDs
  * @param {string} param0.apiKeyDescription
  * @param {JSON} param0.apiKey
@@ -159,7 +159,7 @@ apiKeyService.updateAPIKeyByID = async ({
   userID,
   tenantID,
   apiKeyID,
-  apiKeyName,
+  apiKeyTitle,
   roleIDs,
   isDisabled,
 }) => {
@@ -169,7 +169,7 @@ apiKeyService.updateAPIKeyByID = async ({
       userID,
       tenantID,
       apiKeyID,
-      apiKeyName,
+      apiKeyTitle,
       isDisabled,
       roleIDs,
     },
@@ -192,7 +192,7 @@ apiKeyService.updateAPIKeyByID = async ({
 
       // Update role details
       const apiKeyUpdateData = {
-        ...(apiKeyName && { apiKeyName }),
+        ...(apiKeyTitle && { apiKeyTitle }),
         ...(isDisabled && { isDisabled }),
       };
 
@@ -230,7 +230,7 @@ apiKeyService.updateAPIKeyByID = async ({
         userID,
         tenantID,
         apiKeyID,
-        apiKeyName,
+        apiKeyTitle,
         roleIDs,
         updatedAPIKey,
       },

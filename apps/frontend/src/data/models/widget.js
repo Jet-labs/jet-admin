@@ -6,7 +6,7 @@ export class Widget {
     isDisabled,
     widgetID,
     databaseSchemaName,
-    widgetName,
+    widgetTitle,
     widgetDescription,
     widgetType,
     widgetConfig,
@@ -19,7 +19,7 @@ export class Widget {
     this.disabledAt = disabledAt;
     this.isDisabled = isDisabled;
     this.databaseSchemaName = databaseSchemaName;
-    this.widgetName = widgetName;
+    this.widgetTitle = widgetTitle;
     this.widgetDescription = widgetDescription;
     this.widgetType = widgetType;
     this.widgetConfig = widgetConfig;

@@ -209,7 +209,7 @@ export const TenantUserUpdationForm = ({ tenantID, tenantUserID }) => {
                     >
                       <div className="flex flex-col justify-start items-start">
                         <Link className=" underline font-semibold text-xs">
-                          {tenantUserRole.roleName}
+                          {tenantUserRole.roleTitle}
                         </Link>
                         <span className="text-slate-500 font-light text-xs mt-1">
                           {tenantUserRole.roleDescription}

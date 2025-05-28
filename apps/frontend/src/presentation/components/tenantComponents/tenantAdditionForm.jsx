@@ -15,8 +15,8 @@ export const TenantAdditionForm = () => {
 
   const { isPending: isCreatingNewTenant, mutate: createNewTenant } =
     useMutation({
-      mutationFn: ({ tenantName, tenantLogoURL, tenantDBURL }) =>
-        createNewTenantAPI({ tenantName, tenantLogoURL, tenantDBURL }),
+      mutationFn: ({ tenantTitle, tenantLogoURL, tenantDBURL }) =>
+        createNewTenantAPI({ tenantTitle, tenantLogoURL, tenantDBURL }),
       retry: false,
       onSuccess: (tenant) => {
         saveTenantLocallyAndReload(tenant);
@@ -30,14 +30,19 @@ export const TenantAdditionForm = () => {
 
   const addTenantForm = useFormik({
     initialValues: {
-      tenantName: "",
+      tenantTitle: "",
       tenantLogoURL: "",
       tenantDBURL: "",
       tenantDBType: CONSTANTS.SUPPORTED_DATABASES.postgresql.name,
     },
     validationSchema: formValidations.addTenantFormValidationSchema,
-    onSubmit: ({ tenantName, tenantLogoURL, tenantDBType, tenantDBURL }) => {
-      createNewTenant({ tenantName, tenantLogoURL, tenantDBType, tenantDBURL });
+    onSubmit: ({ tenantTitle, tenantLogoURL, tenantDBType, tenantDBURL }) => {
+      createNewTenant({
+        tenantTitle,
+        tenantLogoURL,
+        tenantDBType,
+        tenantDBURL,
+      });
     },
   });
 

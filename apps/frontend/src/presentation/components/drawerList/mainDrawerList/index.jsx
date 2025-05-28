@@ -239,9 +239,9 @@ export const MainDrawerList = () => {
     },
     {
       type: "link",
-      title: CONSTANTS.STRINGS.MAIN_DRAWER_DATABASE_DASHBOARDS_TITLE,
+      title: CONSTANTS.STRINGS.MAIN_DRAWER_DASHBOARDS_TITLE,
       icon: RiDashboardFill,
-      path: CONSTANTS.ROUTES.VIEW_DATABASE_DASHBOARDS.path(tenantID),
+      path: CONSTANTS.ROUTES.VIEW_DASHBOARDS.path(tenantID),
     },
     {
       type: "link",

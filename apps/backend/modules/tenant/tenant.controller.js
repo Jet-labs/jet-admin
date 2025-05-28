@@ -109,12 +109,12 @@ tenantController.getAllUserTenants = async (req, res) => {
 tenantController.createNewTenant = async (req, res) => {
   try {
     const { user } = req;
-    const { tenantName, tenantLogoURL, tenantDBType, tenantDBURL } = req.body;
+    const { tenantTitle, tenantLogoURL, tenantDBType, tenantDBURL } = req.body;
     Logger.log("info", {
       message: "tenantController:createNewTenant:params",
       params: {
         userID: user.userID,
-        tenantName,
+        tenantTitle,
         tenantLogoURL,
         tenantDBType,
         tenantDBURL,
@@ -122,7 +122,7 @@ tenantController.createNewTenant = async (req, res) => {
     });
     const newTenant = await tenantService.createTenant({
       userID: parseInt(user.userID),
-      tenantName,
+      tenantTitle,
       tenantLogoURL,
       tenantDBType,
       tenantDBURL,
@@ -183,13 +183,13 @@ tenantController.updateTenant = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID } = req.params;
-    const { tenantName, tenantLogoURL, tenantDBURL, tenantDBType } = req.body;
+    const { tenantTitle, tenantLogoURL, tenantDBURL, tenantDBType } = req.body;
     Logger.log("info", {
       message: "tenantController:updateTenant:params",
       params: {
         userID: user.userID,
         tenantID,
-        tenantName,
+        tenantTitle,
         tenantLogoURL,
         tenantDBType,
         // do not log tenantDBURL
@@ -199,7 +199,7 @@ tenantController.updateTenant = async (req, res) => {
     const updatedTenant = await tenantService.updateTenant({
       userID: parseInt(user.userID),
       tenantID: parseInt(tenantID),
-      tenantName,
+      tenantTitle,
       tenantLogoURL,
       tenantDBURL,
       tenantDBType,

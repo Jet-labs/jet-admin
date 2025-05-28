@@ -118,7 +118,7 @@ export const TenantRoleSelectionInput = ({
                       key={role.roleID}
                       className="px-2 py-1 bg-[#646cff]/10 text-[#646cff] rounded text-xs font-medium"
                     >
-                      {role.roleName}
+                      {role.roleTitle}
                     </span>
                   );
                 })}
@@ -133,7 +133,7 @@ export const TenantRoleSelectionInput = ({
                   checked={selectedTenantRoleIDs.includes(tenantRole.roleID)}
                 />
                 <ListItemText
-                  primary={tenantRole.roleName}
+                  primary={tenantRole.roleTitle}
                   secondary={tenantRole.roleDescription}
                 />
               </MenuItem>

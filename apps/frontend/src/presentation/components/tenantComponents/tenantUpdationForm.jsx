@@ -44,14 +44,14 @@ export const TenantUpdationForm = ({ tenantID }) => {
   const { isPending: isUpdatingTenant, mutate: updateTenant } = useMutation({
     mutationFn: ({
       tenantID,
-      tenantName,
+      tenantTitle,
       tenantLogoURL,
       tenantDBType,
       tenantDBURL,
     }) =>
       updateTenantAPI({
         tenantID,
-        tenantName,
+        tenantTitle,
         tenantLogoURL,
         tenantDBType,
         tenantDBURL,
@@ -70,7 +70,7 @@ export const TenantUpdationForm = ({ tenantID }) => {
   const updateTenantForm = useFormik({
     initialValues: {
       tenantID: tenant ? tenant.tenantID : "",
-      tenantName: tenant ? tenant.tenantName : "",
+      tenantTitle: tenant ? tenant.tenantTitle : "",
       tenantLogoURL: tenant ? tenant.tenantLogoURL : "",
       tenantDBType: tenant
         ? tenant.tenantDBType
@@ -79,14 +79,14 @@ export const TenantUpdationForm = ({ tenantID }) => {
     validationSchema: formValidations.updateTenantFormValidationSchema,
     onSubmit: ({
       tenantID,
-      tenantName,
+      tenantTitle,
       tenantLogoURL,
       tenantDBType,
       tenantDBURL,
     }) => {
       updateTenant({
         tenantID,
-        tenantName,
+        tenantTitle,
         tenantLogoURL,
         tenantDBType,
         tenantDBURL,
@@ -97,7 +97,7 @@ export const TenantUpdationForm = ({ tenantID }) => {
   useEffect(() => {
     if (tenant) {
       updateTenantForm.setFieldValue("tenantID", tenant.tenantID);
-      updateTenantForm.setFieldValue("tenantName", tenant.tenantName);
+      updateTenantForm.setFieldValue("tenantTitle", tenant.tenantTitle);
       updateTenantForm.setFieldValue("tenantLogoURL", tenant.tenantLogoURL);
       updateTenantForm.setFieldValue("tenantDBURL", tenant.tenantDBURL);
       updateTenantForm.setFieldValue("tenantDBType", tenant.tenantDBType);

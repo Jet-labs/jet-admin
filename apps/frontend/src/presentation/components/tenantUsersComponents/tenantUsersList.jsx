@@ -63,7 +63,7 @@ export const TenantUsersList = () => {
       headerName: "Roles",
       valueGetter: (value, row) => {
         return Array.from(row.roles)
-          .map((role) => role.roleName)
+          .map((role) => role.roleTitle)
           .join(", ");
       },
       // width: 500,

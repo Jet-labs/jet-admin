@@ -68,7 +68,7 @@ export const APIKeyUpdationForm = ({ tenantID, apiKeyID }) => {
 
   const apiKeyUpdationForm = useFormik({
     initialValues: {
-      apiKeyName: "",
+      apiKeyTitle: "",
       roleIDs: [],
     },
     validateOnMount: false,
@@ -91,8 +91,8 @@ export const APIKeyUpdationForm = ({ tenantID, apiKeyID }) => {
     if (apiKey) {
       // Update Formik form values with the fetched apiKey data
       apiKeyUpdationForm.setFieldValue(
-        "apiKeyName",
-        apiKey.apiKeyName || CONSTANTS.STRINGS.UNTITLED
+        "apiKeyTitle",
+        apiKey.apiKeyTitle || CONSTANTS.STRINGS.UNTITLED
       );
       console.log(apiKey.roles);
       apiKeyUpdationForm.setFieldValue(

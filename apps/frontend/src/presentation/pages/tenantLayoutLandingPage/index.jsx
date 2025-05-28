@@ -80,8 +80,7 @@ const TenantLayoutLandingPage = () => {
       icon: <img src={dashboardLogo} alt="Dashboards" className="w-8 h-8" />,
       count: tenant?.tenantDashboardCount || 0,
       description: "View and manage dashboards",
-      action: () =>
-        navigate(CONSTANTS.ROUTES.VIEW_DATABASE_DASHBOARDS.path(tenantID)),
+      action: () => navigate(CONSTANTS.ROUTES.VIEW_DASHBOARDS.path(tenantID)),
     },
     {
       title: "Roles",
@@ -126,7 +125,7 @@ const TenantLayoutLandingPage = () => {
               )}
               <div className="ml-4">
                 <h1 className="text-2xl font-bold text-slate-700">
-                  {tenant.tenantName}
+                  {tenant.tenantTitle}
                 </h1>
                 <p className="text-gray-500">
                   Created {moment(tenant.createdAt).format("MMMM D, YYYY")}

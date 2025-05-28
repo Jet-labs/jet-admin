@@ -44,7 +44,7 @@ export const DatabaseNotificationAdditionForm = ({
     });
   const databaseNotificationAdditionForm = useFormik({
     initialValues: {
-      databaseNotificationName: "",
+      databaseNotificationTitle: "",
     },
     validationSchema:
       formValidations.databaseNotificationAdditionFormValidationSchema,

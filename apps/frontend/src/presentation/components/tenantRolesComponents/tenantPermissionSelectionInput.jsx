@@ -80,7 +80,7 @@ export const TenantPermissionSelectionInput = ({ label, value, onChange }) => {
                     key={id}
                     className="px-2 py-1 bg-[#646cff]/10 text-[#646cff] rounded text-xs font-medium"
                   >
-                    {permission?.permissionName}
+                    {permission?.permissionTitle}
                   </span>
                 );
               })}
@@ -98,7 +98,7 @@ export const TenantPermissionSelectionInput = ({ label, value, onChange }) => {
                 checked={value?.includes(tenantPermission.permissionID)}
               />
               <ListItemText
-                primary={tenantPermission.permissionName}
+                primary={tenantPermission.permissionTitle}
                 secondary={tenantPermission.permissionDescription}
               />
             </MenuItem>

@@ -23,7 +23,7 @@ export const TenantRolesList = () => {
       headerName: "Role ID",
     },
     {
-      field: "roleName",
+      field: "roleTitle",
       display: "flex",
       // width: 300,
       headerClassName: "bg-white text-slate-700 font-semibold",
