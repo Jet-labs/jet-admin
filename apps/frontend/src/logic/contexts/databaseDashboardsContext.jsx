@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import PropTypes from "prop-types";
 import { CONSTANTS } from "../../constants";
 import { getAllDatabaseDashboardsAPI } from "../../data/apis/databaseDashboard";
-import { getAllDatabaseWidgetsAPI } from "../../data/apis/databaseWidget";
+import { getAllWidgetsAPI } from "../../data/apis/widget";
 
 const DatabaseDashboardsStateContext = React.createContext(undefined);
 const DatabaseDashboardsActionsContext = React.createContext(undefined);
@@ -29,15 +29,15 @@ const DatabaseDashboardsContextProvider = ({ children }) => {
   });
 
   const {
-    isLoading: isLoadingDatabaseWidgets,
-    data: databaseWidgets,
-    error: loadDatabaseWidgetsError,
-    isFetching: isFetchingDatabaseWidgets,
-    isRefetching: isRefetechingDatabaseWidgets,
-    refetch: refetchDatabaseWidgets,
+    isLoading: isLoadingWidgets,
+    data: widgets,
+    error: loadWidgetsError,
+    isFetching: isFetchingWidgets,
+    isRefetching: isRefetechingWidgets,
+    refetch: refetchWidgets,
   } = useQuery({
-    queryKey: [CONSTANTS.REACT_QUERY_KEYS.DATABASE_WIDGETS(tenantID)],
-    queryFn: () => getAllDatabaseWidgetsAPI({ tenantID }),
+    queryKey: [CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID)],
+    queryFn: () => getAllWidgetsAPI({ tenantID }),
     refetchOnWindowFocus: false,
   });
 
@@ -48,18 +48,18 @@ const DatabaseDashboardsContextProvider = ({ children }) => {
         isLoadingDatabaseDashboards,
         isFetchingDatabaseDashboards,
         loadDatabaseDashboardsError,
-        databaseWidgets,
-        isLoadingDatabaseWidgets,
-        isFetchingDatabaseWidgets,
-        loadDatabaseWidgetsError,
+        widgets,
+        isLoadingWidgets,
+        isFetchingWidgets,
+        loadWidgetsError,
         isRefetechingDatabaseDashboards,
-        isRefetechingDatabaseWidgets,
+        isRefetechingWidgets,
       }}
     >
       <DatabaseDashboardsActionsContext.Provider
         value={{
           refetchDatabaseDashboards,
-          refetchDatabaseWidgets,
+          refetchWidgets,
         }}
       >
         {children}

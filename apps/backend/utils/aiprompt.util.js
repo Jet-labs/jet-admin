@@ -59,8 +59,8 @@ Generate chart configuration in EXACTLY this JSON format:
     },
     "databaseChartQueryMappings": [{
       "title": "Dataset title",
-      "databaseQueryString": "SQL query with \${parameters}",
-      "databaseQueryArgs": ["param1", "param2"],
+      "dataQueryString": "SQL query with \${parameters}",
+      "dataQueryArgs": ["param1", "param2"],
       "datasetFields": {
         "label": "result_column",
         "value": "result_column",
@@ -68,7 +68,7 @@ Generate chart configuration in EXACTLY this JSON format:
         "yAxis": "result_column", 
         "radius": "result_column"
       },
-      "databaseQueryArgValues": {
+      "dataQueryArgValues": {
         "param1": "default_value"
       },
       "parameters": {
@@ -111,13 +111,13 @@ Example for pie chart:
     },
     "databaseChartQueryMappings": [{
       "title": "Sales by Category",
-      "databaseQueryString": "SELECT category, SUM(sales) FROM orders GROUP BY category LIMIT \${limit}",
-      "databaseQueryArgs": ["limit"],
+      "dataQueryString": "SELECT category, SUM(sales) FROM orders GROUP BY category LIMIT \${limit}",
+      "dataQueryArgs": ["limit"],
       "datasetFields": {
         "label": "category",
         "value": "sum"
       },
-      "databaseQueryArgValues": {
+      "dataQueryArgValues": {
         "limit": "5"
       },
       "parameters": {
@@ -169,7 +169,7 @@ Enhance the chart style based on the user's request. Follow all rules strictly.
 
 Rules:
 1. Output should be in EXACTLY the same format as the format of chart config provided above and nothing else.
-2. Enhance the "databaseChartConfig", "databaseQueries[index].parameters" as per chart.js config.
+2. Enhance the "databaseChartConfig", "dataQueries[index].parameters" as per chart.js config.
 3. parameters must include complete Chart.js dataset options:
    - Colors, borders, styling
    - Type-specific properties (cutout for pie, etc)

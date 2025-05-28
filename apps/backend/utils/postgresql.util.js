@@ -40,44 +40,39 @@ postgreSQLParserUtil.generateFilterQuery = (filterModel) => {
   }
 };
 
-postgreSQLParserUtil.processDatabaseQuery = ({
-  databaseQueryString,
-  databaseQueryArgValues,
+postgreSQLParserUtil.processDataQuery = ({
+  dataQueryString,
+  dataQueryArgValues,
 }) => {
   // Validate input
-  if (typeof databaseQueryString !== "string") {
-    throw new TypeError(
-      "The 'databaseQueryString' parameter must be a string."
-    );
+  if (typeof dataQueryString !== "string") {
+    throw new TypeError("The 'dataQueryString' parameter must be a string.");
   }
-  if (databaseQueryArgValues && typeof databaseQueryArgValues !== "object") {
+  if (dataQueryArgValues && typeof dataQueryArgValues !== "object") {
     throw new TypeError(
-      "The 'databaseQueryArgValues' parameter must be an object or undefined."
+      "The 'dataQueryArgValues' parameter must be an object or undefined."
     );
   }
 
   const paramNames = [];
-  const processedQuery = databaseQueryString.replace(
-    /\$\{(\w+)\}/g,
-    (_, name) => {
-      // Ensure the placeholder name is valid
-      if (!/^\w+$/.test(name)) {
-        throw new Error(`Invalid placeholder name: \${${name}}`);
-      }
-      paramNames.push(name);
-      return `$${paramNames.length}`; // Replace with positional parameter
+  const processedQuery = dataQueryString.replace(/\$\{(\w+)\}/g, (_, name) => {
+    // Ensure the placeholder name is valid
+    if (!/^\w+$/.test(name)) {
+      throw new Error(`Invalid placeholder name: \${${name}}`);
     }
-  );
+    paramNames.push(name);
+    return `$${paramNames.length}`; // Replace with positional parameter
+  });
 
   // Extract values for placeholders
   const values = paramNames.map((name) => {
     if (
-      !databaseQueryArgValues ||
-      !Object.prototype.hasOwnProperty.call(databaseQueryArgValues, name)
+      !dataQueryArgValues ||
+      !Object.prototype.hasOwnProperty.call(dataQueryArgValues, name)
     ) {
       throw new Error(`Missing value for placeholder: \${${name}}`);
     }
-    return databaseQueryArgValues[name];
+    return dataQueryArgValues[name];
   });
 
   return { query: processedQuery, values };
@@ -1495,31 +1490,31 @@ postgreSQLQueryUtil.deleteDatabaseTableQuery = ({
   return sql;
 };
 
-postgreSQLQueryUtil.createTblDatabaseQueriesTable = ({
+postgreSQLQueryUtil.createTblDataQueriesTable = ({
   databaseSchemaName = "public",
 }) => {
   // Properly quote schema name for identifiers
   const quotedSchemaName = `"${databaseSchemaName}"`;
 
-  return `CREATE TABLE ${quotedSchemaName}."_tblDatabaseQueries" (
-    databaseQueryID SERIAL NOT NULL PRIMARY KEY,
+  return `CREATE TABLE ${quotedSchemaName}."_tblDataQueries" (
+    dataQueryID SERIAL NOT NULL PRIMARY KEY,
     createdAt TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updatedAt TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     disabledAt TIMESTAMPTZ(6),
     isDisabled BOOLEAN DEFAULT false,
-    databaseQueryTitle VARCHAR NOT NULL DEFAULT 'Untitled',
-    databaseQueryDescription VARCHAR,
-    databaseQueryOptions JSON,
+    dataQueryTitle VARCHAR NOT NULL DEFAULT 'Untitled',
+    dataQueryDescription VARCHAR,
+    dataQueryOptions JSON,
     runOnLoad BOOLEAN
 );`;
 };
 
-postgreSQLQueryUtil.createAutoupdateFunctionOnDatabaseQueriesTable = ({
+postgreSQLQueryUtil.createAutoupdateFunctionOnDataQueriesTable = ({
   databaseSchemaName = "public",
 }) => {
   const quotedSchemaName = `"${databaseSchemaName}"`;
 
-  return `CREATE OR REPLACE FUNCTION ${quotedSchemaName}.updateTblDatabaseQueriesUpdatedAtColumn()
+  return `CREATE OR REPLACE FUNCTION ${quotedSchemaName}.updateTblDataQueriesUpdatedAtColumn()
 RETURNS TRIGGER AS $$
 BEGIN
     NEW.updatedAt = CURRENT_TIMESTAMP;
@@ -1528,30 +1523,30 @@ END;
 $$ LANGUAGE plpgsql;`;
 };
 
-postgreSQLQueryUtil.createAutoupdateTriggerOnDatabaseQueriesTable = ({
+postgreSQLQueryUtil.createAutoupdateTriggerOnDataQueriesTable = ({
   databaseSchemaName = "public",
 }) => {
   const quotedSchemaName = `"${databaseSchemaName}"`;
 
-  return `CREATE TRIGGER triggerUpdateTblDatabaseQueriesUpdatedAtColumn
-BEFORE UPDATE ON ${quotedSchemaName}."tblDatabaseQueries"
+  return `CREATE TRIGGER triggerUpdateTblDataQueriesUpdatedAtColumn
+BEFORE UPDATE ON ${quotedSchemaName}."tblDataQueries"
 FOR EACH ROW
-EXECUTE FUNCTION ${quotedSchemaName}.updateTblDatabaseQueriesUpdatedAtColumn();`;
+EXECUTE FUNCTION ${quotedSchemaName}.updateTblDataQueriesUpdatedAtColumn();`;
 };
 
-postgreSQLQueryUtil.checkIfTblDatabaseQueriesTableExist = ({
+postgreSQLQueryUtil.checkIfTblDataQueriesTableExist = ({
   databaseSchemaName = "public",
 }) => {
   // Ensure schema name is properly quoted if it contains spaces or mixed cases
   const quotedSchemaName = `'${databaseSchemaName}'`;
 
   return `
-    -- Check if the table 'tblDatabaseQueries' exists in the schema
+    -- Check if the table 'tblDataQueries' exists in the schema
     SELECT EXISTS (
       SELECT 1
       FROM pg_tables
       WHERE schemaname = ${quotedSchemaName}
-        AND tablename = 'tblDatabaseQueries'
+        AND tablename = 'tblDataQueries'
     ) AS isTableExists;
   `;
 };

@@ -13,11 +13,8 @@ export const DatabaseDashboardWidgetList = ({ tenantID }) => {
   DatabaseDashboardWidgetList.propTypes = {
     tenantID: PropTypes.number.isRequired,
   };
-  const {
-    isLoadingDatabaseWidgets,
-    loadDatabaseWidgetsError,
-    databaseWidgets,
-  } = useDatabaseDashboardsState();
+  const { isLoadingWidgets, loadWidgetsError, widgets } =
+    useDatabaseDashboardsState();
 
   const _handleDragStart = (e, id) => {
     // Set the data transfer with the widget ID
@@ -49,19 +46,16 @@ export const DatabaseDashboardWidgetList = ({ tenantID }) => {
     }
   };
 
-  const _renderWidgetIcon = (databaseWidgetType) => {
-    return WIDGETS_MAP[databaseWidgetType].icon({
+  const _renderWidgetIcon = (widgetType) => {
+    return WIDGETS_MAP[widgetType].icon({
       className: "!text-slate-700 !text-xl !mr-3",
     });
   };
 
-  const _renderWidgetLinkIcon = (databaseWidgetID) => {
+  const _renderWidgetLinkIcon = (widgetID) => {
     return (
       <Link
-        to={CONSTANTS.ROUTES.UPDATE_DATABASE_WIDGET_BY_ID.path(
-          tenantID,
-          databaseWidgetID
-        )}
+        to={CONSTANTS.ROUTES.UPDATE_WIDGET_BY_ID.path(tenantID, widgetID)}
         target="_blank"
       >
         <FiExternalLink className="text-[#646cff] !text-sm ml-2" />
@@ -76,12 +70,12 @@ export const DatabaseDashboardWidgetList = ({ tenantID }) => {
       </span>
       <div className="flex flex-col justify-start items-stretch w-full gap-2">
         <ReactQueryLoadingErrorWrapper
-          isLoading={isLoadingDatabaseWidgets}
-          error={loadDatabaseWidgetsError}
+          isLoading={isLoadingWidgets}
+          error={loadWidgetsError}
         >
-          {databaseWidgets?.length > 0 ? (
-            databaseWidgets.map((databaseWidget) => {
-              const key = `widget_${databaseWidget.databaseWidgetID}`;
+          {widgets?.length > 0 ? (
+            widgets.map((widget) => {
+              const key = `widget_${widget.widgetID}`;
               return (
                 <div
                   key={key}
@@ -96,14 +90,12 @@ export const DatabaseDashboardWidgetList = ({ tenantID }) => {
                     >
                       <GoGrabber className="text-slate-700 mr-2 !text-xl" />
                     </div>
-                    <div>
-                      {_renderWidgetIcon(databaseWidget.databaseWidgetType)}
-                    </div>
+                    <div>{_renderWidgetIcon(widget.widgetType)}</div>
                     <span className="text-xs text-slate-700 font-medium">
-                      {databaseWidget.databaseWidgetName}
+                      {widget.widgetName}
                     </span>
                   </div>
-                  {_renderWidgetLinkIcon(databaseWidget.databaseWidgetID)}
+                  {_renderWidgetLinkIcon(widget.widgetID)}
                 </div>
               );
             })

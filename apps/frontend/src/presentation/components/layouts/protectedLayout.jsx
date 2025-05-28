@@ -68,7 +68,7 @@ export const ProtectedLayout = () => {
           }
           className={"h-full"}
         >
-          <ResizablePanel defaultSize={20} minSize={20} maxSize={30}>
+          <ResizablePanel defaultSize={20} minSize={15} maxSize={30}>
             <MainDrawerList />
           </ResizablePanel>
           <ResizableHandle withHandle={true} />

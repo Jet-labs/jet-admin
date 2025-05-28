@@ -27,10 +27,10 @@ export const CronJobUpdationForm = ({ tenantID, cronJobID }) => {
   const {
     isLoading: isLoadingCronJob,
     data: cronJob,
-    error: loadDatabaseChartError,
-    isFetching: isFetchingDatabaseChart,
-    isRefetching: isRefetechingDatabaseChart,
-    refetch: refetchDatabaseChart,
+    error: loadCronJobError,
+    isFetching: isFetchingCronJob,
+    isRefetching: isRefetechingCronJob,
+    refetch: refetchCronJob,
   } = useQuery({
     queryKey: [
       CONSTANTS.REACT_QUERY_KEYS.DATABASE_CRON_JOBS(tenantID),
@@ -68,8 +68,8 @@ export const CronJobUpdationForm = ({ tenantID, cronJobID }) => {
       cronJobTitle: "",
       cronJobDescription: "",
       cronJobSchedule: "",
-      databaseQueryID: "",
-      databaseQueryArgValues: {},
+      dataQueryID: "",
+      dataQueryArgValues: {},
     },
     validationSchema: formValidations.cronJobUpdationFormValidationSchema,
     onSubmit: (data) => {
@@ -83,8 +83,8 @@ export const CronJobUpdationForm = ({ tenantID, cronJobID }) => {
         cronJobTitle: cronJob.cronJobTitle,
         cronJobDescription: cronJob.cronJobDescription,
         cronJobSchedule: cronJob.cronJobSchedule,
-        databaseQueryID: cronJob.databaseQueryID,
-        databaseQueryArgValues: cronJob.databaseQueryArgValues,
+        dataQueryID: cronJob.dataQueryID,
+        dataQueryArgValues: cronJob.dataQueryArgValues,
       });
     }
   }, [cronJob]);
@@ -115,10 +115,10 @@ export const CronJobUpdationForm = ({ tenantID, cronJobID }) => {
       </div>
       <ReactQueryLoadingErrorWrapper
         isLoading={isLoadingCronJob}
-        isFetching={isFetchingDatabaseChart}
-        isRefetching={isRefetechingDatabaseChart}
-        refetch={refetchDatabaseChart}
-        error={loadDatabaseChartError}
+        isFetching={isFetchingCronJob}
+        isRefetching={isRefetechingCronJob}
+        refetch={refetchCronJob}
+        error={loadCronJobError}
       >
         <form
           className="space-y-3 md:space-y-4 mt-2 p-3"

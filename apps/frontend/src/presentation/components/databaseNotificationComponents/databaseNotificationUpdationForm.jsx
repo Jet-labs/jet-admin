@@ -37,7 +37,7 @@ export const DatabaseNotificationUpdationForm = ({
     refetch: refetchDatabaseNotification,
   } = useQuery({
     queryKey: [
-      CONSTANTS.REACT_QUERY_KEYS.DATABASE_QUERIES(tenantID),
+      CONSTANTS.REACT_QUERY_KEYS.QUERIES(tenantID),
       databaseNotificationID,
     ],
     queryFn: () =>
@@ -65,7 +65,7 @@ export const DatabaseNotificationUpdationForm = ({
         CONSTANTS.STRINGS.UPDATE_NOTIFICATION_FORM_NOTIFICATION_UPDATION_SUCCESS
       );
       queryClient.invalidateQueries([
-        CONSTANTS.REACT_QUERY_KEYS.DATABASE_QUERIES(tenantID),
+        CONSTANTS.REACT_QUERY_KEYS.QUERIES(tenantID),
       ]);
     },
     onError: (error) => {

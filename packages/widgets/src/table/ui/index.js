@@ -90,15 +90,11 @@ function jsonSchemaGenerator(data) {
   return {}; // Return an empty schema or { type: 'unknown' } if preferred
 }
 
-export const TableWidgetComponent = ({
-  data,
-  onWidgetInit,
-  databaseWidgetConfig,
-}) => {
+export const TableWidgetComponent = ({ data, onWidgetInit, widgetConfig }) => {
   TableWidgetComponent.propTypes = {
     data: PropTypes.object,
     onWidgetInit: PropTypes.func,
-    databaseWidgetConfig: PropTypes.object,
+    widgetConfig: PropTypes.object,
   };
 
   // The data structure seems to be an array containing another array.
@@ -214,7 +210,7 @@ export const TableWidgetComponent = ({
     titleEnabled,
     titleTailwindCss = "",
     title,
-  } = databaseWidgetConfig;
+  } = widgetConfig;
 
   return (
     // Added flex and flex-col to make this a flex container stacking children vertically

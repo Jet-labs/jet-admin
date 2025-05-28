@@ -2,18 +2,18 @@
  * Processes raw query results into Chart.js compatible format.
  * @param {Object} params
  * @param {number} params.userID - ID of the requesting user
- * @param {Object} params.databaseWidget - Database chart configuration object
- * @param {Array<Object>} params.databaseQueriesResult - Array of query results from execution
+ * @param {Object} params.widget - Database chart configuration object
+ * @param {Array<Object>} params.dataQueriesResult - Array of query results from execution
  * @returns {Object} Chart.js compatible data structure with labels and datasets
  */
 export const processLineChartQueryResults = ({
-  databaseWidget,
-  databaseQueriesResult,
+  widget,
+  dataQueriesResult,
 }) => {
   // Collect all x-axis values
   const xValues = new Set();
-  databaseWidget.databaseQueries.forEach((mapping, index) => {
-    const result = databaseQueriesResult[index]?.result || [];
+  widget.dataQueries.forEach((mapping, index) => {
+    const result = dataQueriesResult[index]?.result || [];
     const xField = mapping.datasetFields?.xAxis;
     if (xField) {
       result.forEach((row) => xValues.add(row[xField]));
@@ -26,8 +26,8 @@ export const processLineChartQueryResults = ({
   });
 
   // Build datasets
-  const datasets = databaseWidget.databaseQueries.map((mapping, index) => {
-    const result = databaseQueriesResult[index]?.result || [];
+  const datasets = widget.dataQueries.map((mapping, index) => {
+    const result = dataQueriesResult[index]?.result || [];
     const { xAxis, yAxis } = mapping.datasetFields;
     const dataMap = new Map(result.map((row) => [row[xAxis], row[yAxis]]));
 

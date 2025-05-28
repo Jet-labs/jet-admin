@@ -145,38 +145,7 @@ const constants = {
     ILIKE: (a, b) => `${a} ILIKE '%${b}%'`,
   },
 
-  DATABASE_CHART_TYPES: {
-    BAR_CHART: {
-      name: "Bar Chart",
-      value: "bar",
-    },
-    LINE_CHART: {
-      name: "Line Chart",
-      value: "line",
-    },
-    PIE_CHART: {
-      name: "Pie Chart",
-      value: "pie",
-    },
-    SCATTER_CHART: {
-      name: "Scatter Chart",
-      value: "scatter",
-    },
-    BUBBLE_CHART: {
-      name: "Bubble Chart",
-      value: "bubble",
-    },
-    RADAR_CHART: {
-      name: "Radar Chart",
-      value: "radar",
-    },
-    POLAR_AREA: {
-      name: "Polar Area Chart",
-      value: "polarArea",
-    },
-  },
-
-  DATABASE_WIDGET_TYPES: {
+  WIDGET_TYPES: {
     TEXT_WIDGET: {
       name: "Text widget",
       value: "text",

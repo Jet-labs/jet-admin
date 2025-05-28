@@ -1,9 +1,7 @@
 const Logger = require("../../utils/logger"); // Adjust path as needed
 const cron = require("node-cron");
 const { prisma } = require("../../config/prisma.config"); // Adjust path as needed
-const {
-  databaseQueryService,
-} = require("../databaseQuery/databaseQuery.service");
+const { dataQueryService } = require("../dataQuery/dataQuery.service");
 const {
   tenantAwarePostgreSQLPoolManager,
 } = require("../../config/tenant-aware-pgpool-manager.config");
@@ -19,8 +17,8 @@ const cronJobService = {};
  * @param {string} param0.cronJobTitle
  * @param {string} [param0.cronJobDescription]
  * @param {string} param0.cronJobSchedule
- * @param {number} param0.databaseQueryID
- * @param {object} [param0.databaseQueryArgValues]
+ * @param {number} param0.dataQueryID
+ * @param {object} [param0.dataQueryArgValues]
  * @param {boolean} [param0.isDisabled]
  * @param {number} [param0.timeoutSeconds]
  * @param {number} [param0.retryAttempts]
@@ -33,8 +31,8 @@ cronJobService.createCronJob = async ({
   tenantID,
   cronJobDescription,
   cronJobSchedule,
-  databaseQueryID,
-  databaseQueryArgValues,
+  dataQueryID,
+  dataQueryArgValues,
   isDisabled,
   timeoutSeconds,
   retryAttempts,
@@ -49,8 +47,8 @@ cronJobService.createCronJob = async ({
       tenantID,
       cronJobDescription,
       cronJobSchedule,
-      databaseQueryID,
-      databaseQueryArgValues,
+      dataQueryID,
+      dataQueryArgValues,
       isDisabled,
       timeoutSeconds,
       retryAttempts,
@@ -65,15 +63,15 @@ cronJobService.createCronJob = async ({
         tenantID,
         cronJobDescription,
         cronJobSchedule,
-        databaseQueryID,
-        databaseQueryArgValues,
+        dataQueryID,
+        dataQueryArgValues,
         isDisabled,
         timeoutSeconds,
         retryAttempts,
         retryDelaySeconds,
       },
       include: {
-        tblDatabaseQueries: true,
+        tblDataQueries: true,
       },
     });
 
@@ -84,8 +82,8 @@ cronJobService.createCronJob = async ({
         tenantID,
         cronJobDescription,
         cronJobSchedule,
-        databaseQueryID,
-        databaseQueryArgValues,
+        dataQueryID,
+        dataQueryArgValues,
         isDisabled,
         timeoutSeconds,
         retryAttempts,
@@ -105,8 +103,8 @@ cronJobService.createCronJob = async ({
         tenantID,
         cronJobDescription,
         cronJobSchedule,
-        databaseQueryID,
-        databaseQueryArgValues,
+        dataQueryID,
+        dataQueryArgValues,
         isDisabled,
         timeoutSeconds,
         retryAttempts,
@@ -173,7 +171,7 @@ cronJobService.getAllCronJobsForScheduler = async () => {
         isDisabled: false,
       },
       include: {
-        tblDatabaseQueries: true,
+        tblDataQueries: true,
       },
       orderBy: {
         createdAt: "desc", // Or order by title, etc.
@@ -267,7 +265,7 @@ cronJobService.updateCronJobByID = async ({
       },
       data: updateData,
       include: {
-        tblDatabaseQueries: true,
+        tblDataQueries: true,
       },
     });
 
@@ -337,7 +335,7 @@ cronJobService.deleteCronJobByID = async ({ userID, tenantID, cronJobID }) => {
 /**
  * Runs a Cron Job immediately.
  * @param {object} param0
- * @param {import("@prisma/client").tblCronJobs & {tblDatabaseQueries: import("@prisma/client").tblDatabaseQueries}} param0.cronJob - The ID of the cron job to run
+ * @param {import("@prisma/client").tblCronJobs & {tblDataQueries: import("@prisma/client").tblDataQueries}} param0.cronJob - The ID of the cron job to run
  * @returns {Promise<object>} The cron job object
  */
 cronJobService.runCronJob = async ({ cronJob }) => {
@@ -350,15 +348,15 @@ cronJobService.runCronJob = async ({ cronJob }) => {
     const dbPool = await tenantAwarePostgreSQLPoolManager.getPool(
       cronJob.tenantID
     );
-    const queryRunResult = await databaseQueryService.runDatabaseQueries({
+    const queryRunResult = await dataQueryService.runDataQueries({
       userID: parseInt(cronJob.cronJobID),
       tenantID: parseInt(cronJob.tenantID),
       dbPool,
-      databaseQueries: [
+      dataQueries: [
         {
-          databaseQueryOptions: {
-            ...cronJob.tblDatabaseQueries.databaseQueryOptions,
-            databaseQueryArgValues: cronJob.databaseQueryArgValues,
+          dataQueryOptions: {
+            ...cronJob.tblDataQueries.dataQueryOptions,
+            dataQueryArgValues: cronJob.dataQueryArgValues,
           },
         },
       ],

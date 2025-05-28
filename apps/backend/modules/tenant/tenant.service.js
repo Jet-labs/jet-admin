@@ -10,14 +10,10 @@ const { databaseService } = require("../database/database.service");
 const {
   databaseDashboardService,
 } = require("../databaseDashboard/databaseDashboard.service");
-const {
-  databaseQueryService,
-} = require("../databaseQuery/databaseQuery.service");
+const { dataQueryService } = require("../dataQuery/dataQuery.service");
 const { cronJobService } = require("../cronJob/cronJob.service");
 const { apiKeyService } = require("../apiKey/apiKey.service");
-const {
-  databaseWidgetService,
-} = require("../databaseWidget/databaseWidget.service");
+const { widgetService } = require("../widget/widget.service");
 
 const tenantService = {};
 
@@ -61,8 +57,8 @@ tenantService.getUserTenantByID = async ({ userID, tenantID, dbPool }) => {
     let tenantRoles = null,
       tenantDatabaseMetadata = null,
       tenantDashboards = null,
-      tenantDatabaseQueries = null,
-      tenantDatabaseWidgets = null,
+      tenantDataQueries = null,
+      tenantWidgets = null,
       tenantCronJobs = null,
       tenantAPIKeys = null;
 
@@ -81,16 +77,14 @@ tenantService.getUserTenantByID = async ({ userID, tenantID, dbPool }) => {
           userID: parseInt(userID),
           tenantID: parseInt(tenantID),
         });
-      tenantDatabaseQueries = await databaseQueryService.getAllDatabaseQueries({
+      tenantDataQueries = await dataQueryService.getAllDataQueries({
         userID: parseInt(userID),
         tenantID: parseInt(tenantID),
       });
-      tenantDatabaseWidgets = await databaseWidgetService.getAllDatabaseWidgets(
-        {
-          userID: parseInt(userID),
-          tenantID: parseInt(tenantID),
-        }
-      );
+      tenantWidgets = await widgetService.getAllWidgets({
+        userID: parseInt(userID),
+        tenantID: parseInt(tenantID),
+      });
       tenantCronJobs = await cronJobService.getAllCronJobs({
         userID: parseInt(userID),
         tenantID: parseInt(tenantID),
@@ -117,10 +111,10 @@ tenantService.getUserTenantByID = async ({ userID, tenantID, dbPool }) => {
           ?.map((schema) => (schema.tables ? schema.tables.length : 0))
           .reduce((acc, curr) => acc + curr, 0) || 0,
       tenantDashboardCount: tenantDashboards?.length || 0,
-      tenantDatabaseQueryCount: tenantDatabaseQueries?.length || 0,
+      tenantDataQueryCount: tenantDataQueries?.length || 0,
       tenantCronJobCount: tenantCronJobs?.length || 0,
       tenantAPIKeyCount: tenantAPIKeys?.length || 0,
-      tenantWidgetCount: tenantDatabaseWidgets?.length || 0,
+      tenantWidgetCount: tenantWidgets?.length || 0,
     };
     Logger.log("success", {
       message: "tenantService:getUserTenantByID:tenant",
@@ -151,19 +145,11 @@ tenantService.deleteUserTenantByID = async ({ userID, tenantID }) => {
     });
 
     const tenantDeletionTransaction = await prisma.$transaction([
-      prisma.tblDatabaseDashboardChartMappings.deleteMany({
+      prisma.tblWidgetQueryMappings.deleteMany({
         where: {
           OR: [
-            { tblDatabaseCharts: { tenantID: tenantIdToDelete } },
-            { tblDatabaseDashboards: { tenantID: tenantIdToDelete } },
-          ],
-        },
-      }),
-      prisma.tblDatabaseWidgetQueryMappings.deleteMany({
-        where: {
-          OR: [
-            { tblDatabaseQueries: { tenantID: tenantIdToDelete } },
-            { tblDatabaseWidgets: { tenantID: tenantIdToDelete } },
+            { tblDataQueries: { tenantID: tenantIdToDelete } },
+            { tblWidgets: { tenantID: tenantIdToDelete } },
           ],
         },
       }),
@@ -205,7 +191,7 @@ tenantService.deleteUserTenantByID = async ({ userID, tenantID }) => {
           tenantID: tenantIdToDelete,
         },
       }),
-      prisma.tblDatabaseWidgets.deleteMany({
+      prisma.tblWidgets.deleteMany({
         where: {
           tenantID: tenantIdToDelete,
         },
@@ -220,7 +206,7 @@ tenantService.deleteUserTenantByID = async ({ userID, tenantID }) => {
           tenantID: tenantIdToDelete,
         },
       }),
-      prisma.tblDatabaseQueries.deleteMany({
+      prisma.tblDataQueries.deleteMany({
         where: {
           tenantID: tenantIdToDelete,
         },

@@ -340,85 +340,85 @@ var WIDGET_INITIAL_CONFIG = {
 var WIDGET_ADVANCED_OPTIONS = [
   {
     name: "Title",
-    key: "databaseWidgetConfig.title",
+    key: "widgetConfig.title",
     type: "text",
     description: "Widget title",
-    relevantWidgets: ["text", "table"]
+    relevantWidgets: ["text", "table"],
   },
   {
     name: "Title enabled",
-    key: "databaseWidgetConfig.titleEnabled",
+    key: "widgetConfig.titleEnabled",
     type: "boolean",
     description: "Enable or disable the widget title",
     relevantWidgets: ["text", "table"],
-    defaultValue: true
+    defaultValue: true,
   },
   {
     name: "Title CSS Class",
-    key: "databaseWidgetConfig.titleTailwindCss",
+    key: "widgetConfig.titleTailwindCss",
     type: "text",
     description: "Tailwind CSS classes for the title",
-    relevantWidgets: ["text", "table"]
+    relevantWidgets: ["text", "table"],
   },
   {
     name: "Container CSS Class",
-    key: "databaseWidgetConfig.containerTailwindCss",
+    key: "widgetConfig.containerTailwindCss",
     type: "text",
     description: "Tailwind CSS classes for the container",
-    relevantWidgets: ["text", "table"]
+    relevantWidgets: ["text", "table"],
   },
   {
     name: "Widget CSS Class",
-    key: "databaseWidgetConfig.widgetTailwindCss",
+    key: "widgetConfig.widgetTailwindCss",
     type: "text",
     description: "Tailwind CSS classes for the widget",
-    relevantWidgets: ["text", "table"]
+    relevantWidgets: ["text", "table"],
   },
   {
     name: "Container Width",
-    key: "databaseWidgetConfig.containerCss.width",
+    key: "widgetConfig.containerCss.width",
     type: "text",
     description: "Custom width for container (e.g., 100%, 200px)",
-    relevantWidgets: ["text"]
+    relevantWidgets: ["text"],
   },
   {
     name: "Container Height",
-    key: "databaseWidgetConfig.containerCss.height",
+    key: "widgetConfig.containerCss.height",
     type: "text",
     description: "Custom height for container (e.g., 100%, 200px)",
-    relevantWidgets: ["text"]
+    relevantWidgets: ["text"],
   },
   {
     name: "Container Padding",
-    key: "databaseWidgetConfig.containerCss.padding",
+    key: "widgetConfig.containerCss.padding",
     type: "text",
     description: "Custom padding for container (e.g., 10px, 1rem)",
-    relevantWidgets: ["text"]
+    relevantWidgets: ["text"],
   },
   {
     name: "Widget Width",
-    key: "databaseWidgetConfig.widgetCss.width",
+    key: "widgetConfig.widgetCss.width",
     type: "text",
     description: "Custom width for widget (e.g., 100%, 200px)",
-    relevantWidgets: ["text"]
+    relevantWidgets: ["text"],
   },
   {
     name: "Widget Height",
-    key: "databaseWidgetConfig.widgetCss.height",
+    key: "widgetConfig.widgetCss.height",
     type: "text",
     description: "Custom height for widget (e.g., 100%, 200px)",
-    relevantWidgets: ["text"]
+    relevantWidgets: ["text"],
   },
   {
     name: "Widget Padding",
-    key: "databaseWidgetConfig.widgetCss.padding",
+    key: "widgetConfig.widgetCss.padding",
     type: "text",
     description: "Custom padding for widget (e.g., 10px, 1rem)",
-    relevantWidgets: ["text"]
+    relevantWidgets: ["text"],
   },
   {
     name: "Font Family",
-    key: "databaseWidgetConfig.widgetCss.fontFamily",
+    key: "widgetConfig.widgetCss.fontFamily",
     type: "select",
     description: "Font family for the widget text",
     options: [
@@ -430,20 +430,20 @@ var WIDGET_ADVANCED_OPTIONS = [
       "Courier New",
       "monospace",
       "sans-serif",
-      "serif"
+      "serif",
     ],
-    relevantWidgets: ["text"]
+    relevantWidgets: ["text"],
   },
   {
     name: "Font Size",
-    key: "databaseWidgetConfig.widgetCss.fontSize",
+    key: "widgetConfig.widgetCss.fontSize",
     type: "text",
     description: "Font size (e.g., 16px, 1.2rem)",
-    relevantWidgets: ["text"]
+    relevantWidgets: ["text"],
   },
   {
     name: "Font Weight",
-    key: "databaseWidgetConfig.widgetCss.fontWeight",
+    key: "widgetConfig.widgetCss.fontWeight",
     type: "select",
     description: "Font weight for the text",
     options: [
@@ -457,194 +457,194 @@ var WIDGET_ADVANCED_OPTIONS = [
       "600",
       "700",
       "800",
-      "900"
+      "900",
     ],
-    relevantWidgets: ["text"]
+    relevantWidgets: ["text"],
   },
   {
     name: "Font Style",
-    key: "databaseWidgetConfig.widgetCss.fontStyle",
+    key: "widgetConfig.widgetCss.fontStyle",
     type: "select",
     description: "Font style for the text",
     options: ["normal", "italic", "oblique"],
-    relevantWidgets: ["text"]
+    relevantWidgets: ["text"],
   },
   {
     name: "Text Decoration",
-    key: "databaseWidgetConfig.widgetCss.textDecoration",
+    key: "widgetConfig.widgetCss.textDecoration",
     type: "select",
     description: "Text decoration style",
     options: ["none", "underline", "overline", "line-through"],
-    relevantWidgets: ["text"]
+    relevantWidgets: ["text"],
   },
   {
     name: "Text Transform",
-    key: "databaseWidgetConfig.widgetCss.textTransform",
+    key: "widgetConfig.widgetCss.textTransform",
     type: "select",
     description: "Text transformation",
     options: ["none", "uppercase", "lowercase", "capitalize"],
-    relevantWidgets: ["text"]
+    relevantWidgets: ["text"],
   },
   {
     name: "Letter Spacing",
-    key: "databaseWidgetConfig.widgetCss.letterSpacing",
+    key: "widgetConfig.widgetCss.letterSpacing",
     type: "text",
     description: "Space between letters (e.g., 1px, 0.1em)",
-    relevantWidgets: ["text"]
+    relevantWidgets: ["text"],
   },
   {
     name: "Word Spacing",
-    key: "databaseWidgetConfig.widgetCss.wordSpacing",
+    key: "widgetConfig.widgetCss.wordSpacing",
     type: "text",
     description: "Space between words (e.g., 2px, 0.2em)",
-    relevantWidgets: ["text"]
+    relevantWidgets: ["text"],
   },
   {
     name: "Line Height",
-    key: "databaseWidgetConfig.widgetCss.lineHeight",
+    key: "widgetConfig.widgetCss.lineHeight",
     type: "text",
     description: "Line height (e.g., 1.5, 24px)",
-    relevantWidgets: ["text"]
+    relevantWidgets: ["text"],
   },
   {
     name: "Text Align",
-    key: "databaseWidgetConfig.widgetCss.textAlign",
+    key: "widgetConfig.widgetCss.textAlign",
     type: "select",
     description: "Text alignment",
     options: ["left", "center", "right", "justify"],
-    relevantWidgets: ["text"]
+    relevantWidgets: ["text"],
   },
   {
     name: "Text Color",
-    key: "databaseWidgetConfig.widgetCss.color",
+    key: "widgetConfig.widgetCss.color",
     type: "color",
     description: "Text color",
-    relevantWidgets: ["text"]
+    relevantWidgets: ["text"],
   },
   {
     name: "Background Color",
-    key: "databaseWidgetConfig.widgetCss.backgroundColor",
+    key: "widgetConfig.widgetCss.backgroundColor",
     type: "color",
     description: "Background color",
-    relevantWidgets: ["text"]
+    relevantWidgets: ["text"],
   },
   {
     name: "Background Opacity",
-    key: "databaseWidgetConfig.widgetCss.opacity",
+    key: "widgetConfig.widgetCss.opacity",
     type: "text",
     description: "Background opacity (0-1)",
-    relevantWidgets: ["text"]
+    relevantWidgets: ["text"],
   },
   {
     name: "Border Style",
-    key: "databaseWidgetConfig.widgetCss.borderStyle",
+    key: "widgetConfig.widgetCss.borderStyle",
     type: "select",
     description: "Border style",
     options: ["none", "solid", "dashed", "dotted", "double", "groove", "ridge"],
-    relevantWidgets: ["text"]
+    relevantWidgets: ["text"],
   },
   {
     name: "Border Width",
-    key: "databaseWidgetConfig.widgetCss.borderWidth",
+    key: "widgetConfig.widgetCss.borderWidth",
     type: "text",
     description: "Border width (e.g., 1px, 2px)",
-    relevantWidgets: ["text"]
+    relevantWidgets: ["text"],
   },
   {
     name: "Border Color",
-    key: "databaseWidgetConfig.widgetCss.borderColor",
+    key: "widgetConfig.widgetCss.borderColor",
     type: "color",
     description: "Border color",
-    relevantWidgets: ["text"]
+    relevantWidgets: ["text"],
   },
   {
     name: "Border Radius",
-    key: "databaseWidgetConfig.widgetCss.borderRadius",
+    key: "widgetConfig.widgetCss.borderRadius",
     type: "text",
     description: "Border radius (e.g., 4px, 0.5rem)",
-    relevantWidgets: ["text"]
+    relevantWidgets: ["text"],
   },
   {
     name: "Box Shadow",
-    key: "databaseWidgetConfig.widgetCss.boxShadow",
+    key: "widgetConfig.widgetCss.boxShadow",
     type: "text",
     description: "Box shadow (e.g., 0 2px 4px rgba(0,0,0,0.1))",
-    relevantWidgets: ["text"]
+    relevantWidgets: ["text"],
   },
   {
     name: "Text Shadow",
-    key: "databaseWidgetConfig.widgetCss.textShadow",
+    key: "widgetConfig.widgetCss.textShadow",
     type: "text",
     description: "Text shadow (e.g., 1px 1px 2px rgba(0,0,0,0.5))",
-    relevantWidgets: ["text"]
+    relevantWidgets: ["text"],
   },
   {
     name: "Backdrop Filter",
-    key: "databaseWidgetConfig.widgetCss.backdropFilter",
+    key: "widgetConfig.widgetCss.backdropFilter",
     type: "text",
     description: "Backdrop filter (e.g., blur(5px))",
-    relevantWidgets: ["text"]
+    relevantWidgets: ["text"],
   },
   {
     name: "Margin",
-    key: "databaseWidgetConfig.widgetCss.margin",
+    key: "widgetConfig.widgetCss.margin",
     type: "text",
     description: "Outer spacing (e.g., 10px, 1rem)",
-    relevantWidgets: ["text"]
+    relevantWidgets: ["text"],
   },
   {
     name: "Min Width",
-    key: "databaseWidgetConfig.widgetCss.minWidth",
+    key: "widgetConfig.widgetCss.minWidth",
     type: "text",
     description: "Minimum width (e.g., 100px)",
-    relevantWidgets: ["text"]
+    relevantWidgets: ["text"],
   },
   {
     name: "Max Width",
-    key: "databaseWidgetConfig.widgetCss.maxWidth",
+    key: "widgetConfig.widgetCss.maxWidth",
     type: "text",
     description: "Maximum width (e.g., 500px)",
-    relevantWidgets: ["text"]
+    relevantWidgets: ["text"],
   },
   {
     name: "Min Height",
-    key: "databaseWidgetConfig.widgetCss.minHeight",
+    key: "widgetConfig.widgetCss.minHeight",
     type: "text",
     description: "Minimum height (e.g., 50px)",
-    relevantWidgets: ["text"]
+    relevantWidgets: ["text"],
   },
   {
     name: "Max Height",
-    key: "databaseWidgetConfig.widgetCss.maxHeight",
+    key: "widgetConfig.widgetCss.maxHeight",
     type: "text",
     description: "Maximum height (e.g., 300px)",
-    relevantWidgets: ["text"]
+    relevantWidgets: ["text"],
   },
   {
     name: "Overflow",
-    key: "databaseWidgetConfig.widgetCss.overflow",
+    key: "widgetConfig.widgetCss.overflow",
     type: "select",
     description: "Content overflow behavior",
     options: ["visible", "hidden", "scroll", "auto"],
-    relevantWidgets: ["text"]
+    relevantWidgets: ["text"],
   },
   {
     name: "Transform",
-    key: "databaseWidgetConfig.widgetCss.transform",
+    key: "widgetConfig.widgetCss.transform",
     type: "text",
     description: "Transform (e.g., rotate(45deg), scale(1.1))",
-    relevantWidgets: ["text"]
+    relevantWidgets: ["text"],
   },
   {
     name: "Transition",
-    key: "databaseWidgetConfig.widgetCss.transition",
+    key: "widgetConfig.widgetCss.transition",
     type: "text",
     description: "Transition effects (e.g., all 0.3s ease)",
-    relevantWidgets: ["text"]
+    relevantWidgets: ["text"],
   },
   {
     name: "Chart background color",
-    key: "databaseWidgetConfig.chartBackgroundColor",
+    key: "widgetConfig.chartBackgroundColor",
     type: "color",
     description: "Background color",
     relevantWidgets: [
@@ -654,9 +654,9 @@ var WIDGET_ADVANCED_OPTIONS = [
       "scatter",
       "bubble",
       "radar",
-      "polarArea"
-    ]
-  }
+      "polarArea",
+    ],
+  },
 ];
 var WIDGET_DATASET_ADVANCED_OPTIONS = [
   {

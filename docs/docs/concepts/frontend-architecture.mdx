@@ -55,7 +55,7 @@ API services encapsulate all backend communication, organized by domain:
 | `database.js` | Core database operations |
 | `databaseChart.js` | Chart management |
 | `databaseDashboard.js` | Dashboard management |
-| `databaseQuery.js` | Query operations |
+| `dataQuery.js` | Query operations |
 | `databaseTable.js` | Table management |
 | `databaseTrigger.js` | Trigger operations |
 | `tenant.js` | Tenant management |
@@ -98,7 +98,7 @@ Data models define the structure and relationships of entities used throughout t
 - `databaseChart.js` - Chart data structure
 - `databaseDashboard.js` - Dashboard configuration
 - `databaseMetadata.js` - Database metadata
-- `databaseQuery.js` - Query structure
+- `dataQuery.js` - Query structure
 - `databaseSchema.js` - Schema definition
 - `databaseTable.js` - Table structure
 - `databaseTableColumn.js` - Table column definition
@@ -125,7 +125,7 @@ The application uses React Context for state management, with specialized contex
 | `authContext.jsx` | User authentication state |
 | `databaseChartsContext.jsx` | Chart state management |
 | `databaseDashboardsContext.jsx` | Dashboard state management |
-| `databaseQueriesContext.jsx` | Query state management |
+| `dataQueriesContext.jsx` | Query state management |
 | `databaseTablesContext.jsx` | Table state management |
 | `databaseTriggersContext.jsx` | Trigger state management |
 | `globalUIContext.jsx` | Application-wide UI state |
@@ -209,7 +209,7 @@ Each page represents a distinct view in the application:
 - `accountPage/` - User account management
 - `addDatabaseChartPage/` - Chart creation interface
 - `addDatabaseDashboardPage/` - Dashboard creation
-- `addDatabaseQueryPage/` - Query creation
+- `addDataQueryPage/` - Query creation
 - `addDatabaseTablePage/` - Table creation
 - `addDatabaseTriggerPage/` - Trigger creation
 

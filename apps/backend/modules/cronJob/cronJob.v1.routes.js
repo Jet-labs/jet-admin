@@ -25,9 +25,9 @@ router.post(
       .withMessage("cronJobTitle is required")
       .isString(),
     body("cronJobDescription").optional().isString(),
-    body("databaseQueryID")
+    body("dataQueryID")
       .notEmpty()
-      .withMessage("databaseQueryID is required")
+      .withMessage("dataQueryID is required")
       .isString(),
     body("cronJobSchedule")
       .notEmpty()
@@ -61,8 +61,6 @@ router.post(
   cronJobController.createCronJob
 );
 
-
-
 // GET /:cronJobID - Get a specific Cron Job
 router.get(
   "/:cronJobID",
@@ -91,9 +89,9 @@ router.patch(
       .withMessage("cronJobTitle is required")
       .isString(),
     body("cronJobDescription").optional().isString(),
-    body("databaseQueryID")
+    body("dataQueryID")
       .notEmpty()
-      .withMessage("databaseQueryID is required")
+      .withMessage("dataQueryID is required")
       .isNumeric(),
     body("cronJobSchedule")
       .notEmpty()

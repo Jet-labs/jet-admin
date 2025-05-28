@@ -1,8 +1,6 @@
 const { expressUtils } = require("../../utils/express.utils");
 const Logger = require("../../utils/logger");
-const {
-  databaseQueryService,
-} = require("../databaseQuery/databaseQuery.service");
+const { dataQueryService } = require("../dataQuery/dataQuery.service");
 const { databaseService } = require("./database.service");
 
 const databaseController = {};
@@ -105,35 +103,33 @@ databaseController.executeRawSQLQuery = async (req, res) => {
       );
     }
 
-    const databaseQueriesResult = await databaseQueryService.runDatabaseQueries(
-      {
-        userID: parseInt(user.userID),
-        dbPool,
-        tenantID: null,
-        databaseQueries: [
-          {
-            databaseQueryID: null,
-            databaseQueryOptions: {
-              databaseQueryString: query,
-              databaseQueryArgValues: {},
-              databaseQueryArgs: {},
-            },
+    const dataQueriesResult = await dataQueryService.runDataQueries({
+      userID: parseInt(user.userID),
+      dbPool,
+      tenantID: null,
+      dataQueries: [
+        {
+          dataQueryID: null,
+          dataQueryOptions: {
+            dataQueryString: query,
+            dataQueryArgValues: {},
+            dataQueryArgs: {},
           },
-        ],
-      }
-    );
+        },
+      ],
+    });
 
     Logger.log("success", {
       message: "databaseController:executeRawSQLQuery:success",
       params: {
         userID: user.userID,
-        rowCount: databaseQueriesResult[0].result.length,
+        rowCount: dataQueriesResult[0].result.length,
       },
     });
 
     return expressUtils.sendResponse(res, true, {
-      result: databaseQueriesResult[0].result,
-      rowCount: databaseQueriesResult[0].result.length,
+      result: dataQueriesResult[0].result,
+      rowCount: dataQueriesResult[0].result.length,
       message: "SQL query executed successfully.",
     });
   } catch (error) {

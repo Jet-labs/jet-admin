@@ -3,23 +3,19 @@ import React from "react";
 import { FaPlus } from "react-icons/fa";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../../constants";
-import { useDatabaseWidgetsState } from "../../../../logic/contexts/databaseWidgetsContext";
+import { useWidgetsState } from "../../../../logic/contexts/widgetsContext";
 import { NoEntityUI } from "../../ui/noEntityUI";
 
-export const DatabaseWidgetDrawerList = () => {
-  const {
-    isLoadingDatabaseWidgets,
-    databaseWidgets,
-    isFetchingDatabaseWidgets,
-  } = useDatabaseWidgetsState();
+export const WidgetDrawerList = () => {
+  const { isLoadingWidgets, widgets, isFetchingWidgets } = useWidgetsState();
   const routeParam = useParams();
   const { tenantID } = useParams();
   const navigate = useNavigate();
   const _navigateToAddMoreWidget = () => {
-    navigate(CONSTANTS.ROUTES.ADD_DATABASE_WIDGET.path(tenantID));
+    navigate(CONSTANTS.ROUTES.ADD_WIDGET.path(tenantID));
   };
-  const _renderWidgetIcon = (databaseWidgetType, isActive) => {
-    return WIDGETS_MAP[databaseWidgetType].icon({
+  const _renderWidgetIcon = (widgetType, isActive) => {
+    return WIDGETS_MAP[widgetType].icon({
       className: `!text-xl ${
         isActive ? "!text-[#646cff] " : "!text-slate-700 "
       }`,
@@ -34,25 +30,24 @@ export const DatabaseWidgetDrawerList = () => {
         <FaPlus className="!w-4 !h-4 !text-[#646cff] mr-1" />
         {CONSTANTS.STRINGS.ADD_WIDGET_BUTTON_TEXT}
       </button>
-      {isLoadingDatabaseWidgets || isFetchingDatabaseWidgets ? (
+      {isLoadingWidgets || isFetchingWidgets ? (
         <div role="status" className=" animate-pulse w-full">
           <div className="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
           <div className="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
           <div className="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
           <div className="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
         </div>
-      ) : databaseWidgets && databaseWidgets.length > 0 ? (
+      ) : widgets && widgets.length > 0 ? (
         <div className="h-full w-full overflow-y-auto">
-          {databaseWidgets.map((databaseWidget) => {
-            const key = `databaseWidget_${databaseWidget.databaseWidgetID}`;
-            const isActive =
-              routeParam?.databaseWidgetID == databaseWidget.databaseWidgetID;
+          {widgets.map((widget) => {
+            const key = `widget_${widget.widgetID}`;
+            const isActive = routeParam?.widgetID == widget.widgetID;
 
             return (
               <Link
-                to={CONSTANTS.ROUTES.UPDATE_DATABASE_WIDGET_BY_ID.path(
+                to={CONSTANTS.ROUTES.UPDATE_WIDGET_BY_ID.path(
                   tenantID,
-                  databaseWidget.databaseWidgetID
+                  widget.widgetID
                 )}
                 key={key}
                 className="block mb-2 focus:outline-none "
@@ -62,18 +57,15 @@ export const DatabaseWidgetDrawerList = () => {
                     isActive ? "bg-[#eaebff]" : "bg-white text-gray-700"
                   }`}
                 >
-                  {_renderWidgetIcon(
-                    databaseWidget.databaseWidgetType,
-                    isActive
-                  )}
+                  {_renderWidgetIcon(widget.widgetType, isActive)}
 
                   <span
                     className={`font-medium text-sm truncate ${
                       isActive ? "font-bold" : ""
                     } `}
                   >
-                    {/* {StringUtils.truncateName(databaseWidget.databaseWidgetName, 15)} */}
-                    {`${databaseWidget.databaseWidgetName}`}
+                    {/* {StringUtils.truncateName(widget.widgetName, 15)} */}
+                    {`${widget.widgetName}`}
                   </span>
                 </div>
               </Link>

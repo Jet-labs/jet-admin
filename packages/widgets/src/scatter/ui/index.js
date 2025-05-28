@@ -2,31 +2,26 @@ import React, { useEffect, useRef, useMemo } from "react";
 import { Scatter } from "react-chartjs-2";
 import PropTypes from "prop-types";
 
-export const ScatterChartComponent = ({
-  data,
-  onWidgetInit,
-  databaseWidgetConfig,
-}) => {
+export const ScatterChartComponent = ({ data, onWidgetInit, widgetConfig }) => {
   ScatterChartComponent.propTypes = {
     data: PropTypes.object,
     onWidgetInit: PropTypes.func,
-    databaseWidgetConfig: PropTypes.object,
+    widgetConfig: PropTypes.object,
   };
   const widgetRef = useRef(null);
 
   // Add plugin configuration to options
   const options = useMemo(
     () => ({
-      ...databaseWidgetConfig,
+      ...widgetConfig,
       plugins: {
-        ...databaseWidgetConfig?.plugins,
+        ...widgetConfig?.plugins,
         customCanvasBackgroundColor: {
-          chartBackgroundColor:
-            databaseWidgetConfig?.chartBackgroundColor || "#ffffff",
+          chartBackgroundColor: widgetConfig?.chartBackgroundColor || "#ffffff",
         },
       },
     }),
-    [databaseWidgetConfig]
+    [widgetConfig]
   );
 
   // Custom plugin with proper v3+ syntax

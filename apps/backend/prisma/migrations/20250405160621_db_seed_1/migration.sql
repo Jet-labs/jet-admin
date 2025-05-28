@@ -47,20 +47,20 @@ CREATE TABLE "tblUsersTenantsRelationship" (
 
 -- CreateTable
 CREATE TABLE "tblDatabaseQueries" (
-    "databaseQueryID" SERIAL NOT NULL,
+    "dataQueryID" SERIAL NOT NULL,
     "tenantID" INTEGER NOT NULL,
     "createdAt" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMPTZ(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "disabledAt" TIMESTAMPTZ(6),
     "isDisabled" BOOLEAN DEFAULT false,
-    "databaseQueryTitle" VARCHAR NOT NULL DEFAULT 'Untitled',
-    "databaseQueryDescription" VARCHAR,
-    "databaseQueryData" JSON,
+    "dataQueryTitle" VARCHAR NOT NULL DEFAULT 'Untitled',
+    "dataQueryDescription" VARCHAR,
+    "dataQueryData" JSON,
     "runOnLoad" BOOLEAN,
-    "databaseQueryResultSchema" JSON,
+    "dataQueryResultSchema" JSON,
     "creatorID" INTEGER,
 
-    CONSTRAINT "pktblDatabaseQueries" PRIMARY KEY ("databaseQueryID")
+    CONSTRAINT "pktblDatabaseQueries" PRIMARY KEY ("dataQueryID")
 );
 
 -- CreateTable
@@ -102,14 +102,14 @@ CREATE TABLE "tblUserTenantRoleMappings" (
 -- CreateTable
 CREATE TABLE "tblDatabaseChartQueryMappings" (
     "databaseChartID" INTEGER NOT NULL,
-    "databaseQueryID" INTEGER NOT NULL,
+    "dataQueryID" INTEGER NOT NULL,
     "parameters" JSONB,
     "title" TEXT,
     "executionOrder" INTEGER,
     "datasetFields" JSONB,
-    "databaseQueryArgValues" JSONB,
+    "dataQueryArgValues" JSONB,
 
-    CONSTRAINT "tblDatabaseChartQueryMappings_pkey" PRIMARY KEY ("databaseChartID","databaseQueryID")
+    CONSTRAINT "tblDatabaseChartQueryMappings_pkey" PRIMARY KEY ("databaseChartID","dataQueryID")
 );
 
 -- CreateTable
@@ -178,32 +178,32 @@ CREATE TABLE "tblUserNotifications" (
 );
 
 -- CreateTable
-CREATE TABLE "tblDatabaseWidgetQueryMappings" (
-    "databaseWidgetID" INTEGER NOT NULL,
-    "databaseQueryID" INTEGER NOT NULL,
+CREATE TABLE "tblWidgetQueryMappings" (
+    "widgetID" INTEGER NOT NULL,
+    "dataQueryID" INTEGER NOT NULL,
     "parameters" JSONB,
     "title" VARCHAR,
     "executionOrder" INTEGER,
     "datasetFields" JSONB,
-    "databaseQueryArgValues" JSONB,
+    "dataQueryArgValues" JSONB,
 
-    CONSTRAINT "tblDatabaseWidgetQueryMappings_pkey" PRIMARY KEY ("databaseWidgetID","databaseQueryID")
+    CONSTRAINT "tblWidgetQueryMappings_pkey" PRIMARY KEY ("widgetID","dataQueryID")
 );
 
 -- CreateTable
-CREATE TABLE "tblDatabaseWidgets" (
-    "databaseWidgetID" SERIAL NOT NULL,
-    "databaseWidgetName" VARCHAR NOT NULL,
-    "databaseWidgetDescription" VARCHAR,
-    "databaseWidgetType" VARCHAR NOT NULL,
-    "databaseWidgetConfig" JSONB NOT NULL,
+CREATE TABLE "tblWidgets" (
+    "widgetID" SERIAL NOT NULL,
+    "widgetName" VARCHAR NOT NULL,
+    "widgetDescription" VARCHAR,
+    "widgetType" VARCHAR NOT NULL,
+    "widgetConfig" JSONB NOT NULL,
     "createdAt" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMPTZ(6) DEFAULT CURRENT_TIMESTAMP,
     "tenantID" INTEGER NOT NULL,
     "creatorID" INTEGER,
     "refreshInterval" INTEGER,
 
-    CONSTRAINT "tblDatabaseWidgets_pkey" PRIMARY KEY ("databaseWidgetID")
+    CONSTRAINT "tblWidgets_pkey" PRIMARY KEY ("widgetID")
 );
 
 -- CreateTable
@@ -274,7 +274,7 @@ ALTER TABLE "tblUserTenantRoleMappings" ADD CONSTRAINT "fkUserTenantRoleUserTena
 ALTER TABLE "tblDatabaseChartQueryMappings" ADD CONSTRAINT "tblDatabaseChartQueryMappings_databaseChartID_fkey" FOREIGN KEY ("databaseChartID") REFERENCES "tblDatabaseCharts"("databaseChartID") ON DELETE CASCADE ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "tblDatabaseChartQueryMappings" ADD CONSTRAINT "tblDatabaseChartQueryMappings_databaseQueryID_fkey" FOREIGN KEY ("databaseQueryID") REFERENCES "tblDatabaseQueries"("databaseQueryID") ON DELETE CASCADE ON UPDATE NO ACTION;
+ALTER TABLE "tblDatabaseChartQueryMappings" ADD CONSTRAINT "tblDatabaseChartQueryMappings_dataQueryID_fkey" FOREIGN KEY ("dataQueryID") REFERENCES "tblDatabaseQueries"("dataQueryID") ON DELETE CASCADE ON UPDATE NO ACTION;
 
 -- AddForeignKey
 ALTER TABLE "tblDatabaseCharts" ADD CONSTRAINT "fkTblDatabaseChartsCreatorID" FOREIGN KEY ("creatorID") REFERENCES "tblUsers"("userID") ON DELETE NO ACTION ON UPDATE NO ACTION;
@@ -307,16 +307,16 @@ ALTER TABLE "tblUserNotifications" ADD CONSTRAINT "fkTblUserNotificationsTenantI
 ALTER TABLE "tblUserNotifications" ADD CONSTRAINT "fkTblUserNotificationsUserIDUserID" FOREIGN KEY ("userID") REFERENCES "tblUsers"("userID") ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "tblDatabaseWidgetQueryMappings" ADD CONSTRAINT "fk_tblDatabaseWidgetQueryMappings_tblDatabaseQueries" FOREIGN KEY ("databaseQueryID") REFERENCES "tblDatabaseQueries"("databaseQueryID") ON DELETE CASCADE ON UPDATE NO ACTION;
+ALTER TABLE "tblWidgetQueryMappings" ADD CONSTRAINT "fk_tblWidgetQueryMappings_tblDatabaseQueries" FOREIGN KEY ("dataQueryID") REFERENCES "tblDatabaseQueries"("dataQueryID") ON DELETE CASCADE ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "tblDatabaseWidgetQueryMappings" ADD CONSTRAINT "fk_tblDatabaseWidgetQueryMappings_tblDatabaseWidgets" FOREIGN KEY ("databaseWidgetID") REFERENCES "tblDatabaseWidgets"("databaseWidgetID") ON DELETE CASCADE ON UPDATE NO ACTION;
+ALTER TABLE "tblWidgetQueryMappings" ADD CONSTRAINT "fk_tblWidgetQueryMappings_tblWidgets" FOREIGN KEY ("widgetID") REFERENCES "tblWidgets"("widgetID") ON DELETE CASCADE ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "tblDatabaseWidgets" ADD CONSTRAINT "fkTblDatabaseWidgetsCreatorID" FOREIGN KEY ("creatorID") REFERENCES "tblUsers"("userID") ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE "tblWidgets" ADD CONSTRAINT "fkTblWidgetsCreatorID" FOREIGN KEY ("creatorID") REFERENCES "tblUsers"("userID") ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
-ALTER TABLE "tblDatabaseWidgets" ADD CONSTRAINT "fkTblDatabaseWidgetsTenantIDTenantID" FOREIGN KEY ("tenantID") REFERENCES "tblTenants"("tenantID") ON DELETE NO ACTION ON UPDATE NO ACTION;
+ALTER TABLE "tblWidgets" ADD CONSTRAINT "fkTblWidgetsTenantIDTenantID" FOREIGN KEY ("tenantID") REFERENCES "tblTenants"("tenantID") ON DELETE NO ACTION ON UPDATE NO ACTION;
 
 -- AddForeignKey
 ALTER TABLE "tblDatabaseNotifications" ADD CONSTRAINT "fkTblDatabaseNotificationsTenantID" FOREIGN KEY ("tenantID") REFERENCES "tblTenants"("tenantID") ON DELETE NO ACTION ON UPDATE NO ACTION;

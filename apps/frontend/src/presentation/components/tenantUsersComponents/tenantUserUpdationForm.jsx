@@ -119,7 +119,7 @@ export const TenantUserUpdationForm = ({ tenantID, tenantUserID }) => {
       cancelText: "Cancel",
     });
     removeTenantUserFromTenant();
-    // deleteDatabaseQuery();
+    // deleteDataQuery();
   };
 
   return (

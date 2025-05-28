@@ -3,7 +3,7 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import { CONSTANTS } from "../../constants";
 import { getAllCronJobsAPI } from "../../data/apis/cronJob";
-import { getAllDatabaseQueriesAPI } from "../../data/apis/databaseQuery";
+import { getAllDataQueriesAPI } from "../../data/apis/dataQuery";
 import PropTypes from "prop-types";
 
 const CronJobsStateContext = React.createContext(undefined);
@@ -28,15 +28,15 @@ const CronJobsContextProvider = ({ children }) => {
   });
 
   const {
-    isLoading: isLoadingDatabaseQueries,
-    data: databaseQueries,
-    error: loadDatabaseQueriesError,
-    isFetching: isFetchingDatabaseQueries,
-    isRefetching: isRefetechingDatabaseQueries,
-    refetch: refetchDatabaseQueries,
+    isLoading: isLoadingDataQueries,
+    data: dataQueries,
+    error: loadDataQueriesError,
+    isFetching: isFetchingDataQueries,
+    isRefetching: isRefetechingDataQueries,
+    refetch: refetchDataQueries,
   } = useQuery({
-    queryKey: [CONSTANTS.REACT_QUERY_KEYS.DATABASE_QUERIES(tenantID)],
-    queryFn: () => getAllDatabaseQueriesAPI({ tenantID }),
+    queryKey: [CONSTANTS.REACT_QUERY_KEYS.QUERIES(tenantID)],
+    queryFn: () => getAllDataQueriesAPI({ tenantID }),
     refetchOnWindowFocus: false,
   });
 
@@ -46,17 +46,17 @@ const CronJobsContextProvider = ({ children }) => {
         cronJobs,
         isLoadingCronJobs,
         isFetchingCronJobs,
-        databaseQueries,
-        isLoadingDatabaseQueries,
-        isFetchingDatabaseQueries,
-        loadDatabaseQueriesError,
+        dataQueries,
+        isLoadingDataQueries,
+        isFetchingDataQueries,
+        loadDataQueriesError,
         loadCronJobsError,
         isRefetechingCronJobs,
-        isRefetechingDatabaseQueries,
+        isRefetechingDataQueries,
       }}
     >
       <CronJobsActionsContext.Provider
-        value={{ refetchCronJobs, refetchDatabaseQueries }}
+        value={{ refetchCronJobs, refetchDataQueries }}
       >
         {children}
       </CronJobsActionsContext.Provider>

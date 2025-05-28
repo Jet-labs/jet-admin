@@ -4,8 +4,8 @@ export class CronJob {
     cronJobTitle,
     cronJobDescription,
     cronJobSchedule,
-    databaseQueryID,
-    databaseQueryArgValues,
+    dataQueryID,
+    dataQueryArgValues,
     isDisabled,
     nextRunAt,
     timeoutSeconds,
@@ -18,8 +18,8 @@ export class CronJob {
     this.cronJobTitle = cronJobTitle;
     this.cronJobDescription = cronJobDescription;
     this.cronJobSchedule = cronJobSchedule;
-    this.databaseQueryID = databaseQueryID;
-    this.databaseQueryArgValues = databaseQueryArgValues;
+    this.dataQueryID = dataQueryID;
+    this.dataQueryArgValues = dataQueryArgValues;
     this.isDisabled = isDisabled;
     this.nextRunAt = nextRunAt;
     this.timeoutSeconds = timeoutSeconds;

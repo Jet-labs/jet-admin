@@ -2,16 +2,16 @@
  * Processes raw query results into Chart.js compatible format.
  * @param {Object} params
  * @param {number} params.userID - ID of the requesting user
- * @param {Object} params.databaseWidget - Database chart configuration object
- * @param {Array<Object>} params.databaseQueriesResult - Array of query results from execution
+ * @param {Object} params.widget - Database chart configuration object
+ * @param {Array<Object>} params.dataQueriesResult - Array of query results from execution
  * @returns {Object} Chart.js compatible data structure with labels and datasets
  */
 export const processBubbleChartQueryResults = ({
-  databaseWidget,
-  databaseQueriesResult,
+  widget,
+  dataQueriesResult,
 }) => {
-  const datasets = databaseWidget.databaseQueries.map((mapping, index) => {
-    const result = databaseQueriesResult[index]?.result || [];
+  const datasets = widget.dataQueries.map((mapping, index) => {
+    const result = dataQueriesResult[index]?.result || [];
     const { xAxis, yAxis, radius } = mapping.datasetFields;
 
     // Convert each row to {x, y} coordinate objects

@@ -2,18 +2,18 @@
  * Processes raw query results into Chart.js compatible format.
  * @param {Object} params
  * @param {number} params.userID - ID of the requesting user
- * @param {Object} params.databaseWidget - Database chart configuration object
- * @param {Array<Object>} params.databaseQueriesResult - Array of query results from execution
+ * @param {Object} params.widget - Database chart configuration object
+ * @param {Array<Object>} params.dataQueriesResult - Array of query results from execution
  * @returns {Object} Chart.js compatible data structure with labels and datasets
  */
 export const processRadarChartQueryResults = ({
-  databaseWidget,
-  databaseQueriesResult,
+  widget,
+  dataQueriesResult,
 }) => {
   // Collect all labels
   const labels = new Set();
-  databaseWidget.databaseQueries.forEach((mapping, index) => {
-    const result = databaseQueriesResult[index]?.result || [];
+  widget.dataQueries.forEach((mapping, index) => {
+    const result = dataQueriesResult[index]?.result || [];
     const label = mapping.datasetFields?.label;
     if (label) {
       result.forEach((row) => labels.add(row[label]));
@@ -27,8 +27,8 @@ export const processRadarChartQueryResults = ({
   });
 
   // Build datasets
-  const datasets = databaseWidget.databaseQueries.map((mapping, index) => {
-    const result = databaseQueriesResult[index]?.result || [];
+  const datasets = widget.dataQueries.map((mapping, index) => {
+    const result = dataQueriesResult[index]?.result || [];
     const { label, value } = mapping.datasetFields;
     const dataMap = new Map(result.map((row) => [row[label], row[value]]));
 

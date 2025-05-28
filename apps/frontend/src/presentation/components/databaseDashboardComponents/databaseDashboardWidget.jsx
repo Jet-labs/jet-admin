@@ -5,48 +5,41 @@ import { useQuery } from "@tanstack/react-query";
 import PropTypes from "prop-types";
 import { CONSTANTS } from "../../../constants";
 import {
-  getDatabaseWidgetByIDAPI,
-  getDatabaseWidgetDataByIDAPI,
-} from "../../../data/apis/databaseWidget";
+  getWidgetByIDAPI,
+  getWidgetDataByIDAPI,
+} from "../../../data/apis/widget";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 
 export const DatabaseDashboardWidget = ({
   tenantID,
-  databaseWidgetID,
+  widgetID,
   width,
   height,
 }) => {
   DatabaseDashboardWidget.propTypes = {
     tenantID: PropTypes.number.isRequired,
-    databaseWidgetID: PropTypes.number.isRequired,
+    widgetID: PropTypes.number.isRequired,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
   };
   const {
-    isLoading: isLoadingDatabaseWidget,
-    data: databaseWidget,
-    error: loadDatabaseWidgetError,
-    refetch: refetchDatabaseWidget,
+    isLoading: isLoadingWidget,
+    data: widget,
+    error: loadWidgetError,
+    refetch: refetchWidget,
   } = useQuery({
-    queryKey: [
-      CONSTANTS.REACT_QUERY_KEYS.DATABASE_WIDGETS(tenantID),
-      databaseWidgetID,
-    ],
-    queryFn: () => getDatabaseWidgetByIDAPI({ tenantID, databaseWidgetID }),
+    queryKey: [CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID), widgetID],
+    queryFn: () => getWidgetByIDAPI({ tenantID, widgetID }),
     refetchOnWindowFocus: false,
   });
 
   const {
-    isLoading: isLoadingDatabaseWidgetData,
-    data: databaseWidgetData,
-    error: loadDatabaseWidgetDataError,
+    isLoading: isLoadingWidgetData,
+    data: widgetData,
+    error: loadWidgetDataError,
   } = useQuery({
-    queryKey: [
-      CONSTANTS.REACT_QUERY_KEYS.DATABASE_WIDGETS(tenantID),
-      databaseWidgetID,
-      "data",
-    ],
-    queryFn: () => getDatabaseWidgetDataByIDAPI({ tenantID, databaseWidgetID }),
+    queryKey: [CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID), widgetID, "data"],
+    queryFn: () => getWidgetDataByIDAPI({ tenantID, widgetID }),
     refetchOnWindowFocus: false,
   });
 
@@ -59,18 +52,17 @@ export const DatabaseDashboardWidget = ({
       }}
     >
       <ReactQueryLoadingErrorWrapper
-        isLoading={isLoadingDatabaseWidget || isLoadingDatabaseWidgetData}
-        isFetching={isLoadingDatabaseWidget || isLoadingDatabaseWidgetData}
-        error={loadDatabaseWidgetError || loadDatabaseWidgetDataError}
-        refetch={refetchDatabaseWidget}
+        isLoading={isLoadingWidget || isLoadingWidgetData}
+        isFetching={isLoadingWidget || isLoadingWidgetData}
+        error={loadWidgetError || loadWidgetDataError}
+        refetch={refetchWidget}
       >
-        {databaseWidget &&
-          WIDGETS_MAP[databaseWidget.databaseWidgetType]?.component({
-            databaseWidgetName: databaseWidget.databaseWidgetName,
-            databaseWidgetConfig: databaseWidget.databaseWidgetConfig,
-            data: databaseWidgetData?.data,
-            refetchInterval:
-              databaseWidget.databaseWidgetConfig.refetchInterval,
+        {widget &&
+          WIDGETS_MAP[widget.widgetType]?.component({
+            widgetName: widget.widgetName,
+            widgetConfig: widget.widgetConfig,
+            data: widgetData?.data,
+            refetchInterval: widget.widgetConfig.refetchInterval,
           })}
       </ReactQueryLoadingErrorWrapper>
     </div>

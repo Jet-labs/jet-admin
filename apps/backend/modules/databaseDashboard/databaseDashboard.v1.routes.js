@@ -4,7 +4,6 @@ const { databaseDashboardController } = require("./databaseDashboard.controller"
 const { authMiddleware } = require("../auth/auth.middleware");
 const { body, param } = require("express-validator");
 const { expressUtils } = require("../../utils/express.utils");
-// Database chart routes
 
 router.get(
   "/",

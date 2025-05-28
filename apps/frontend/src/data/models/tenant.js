@@ -14,9 +14,8 @@ export class Tenant {
     tenantRolesCount,
     tenantDatabaseSchemasCount,
     tenantDatabaseTablesCount,
-    tenantChartCount,
     tenantDashboardCount,
-    tenantDatabaseQueryCount,
+    tenantDataQueryCount,
     tenantCronJobCount,
     tenantAPIKeyCount,
     tenantWidgetCount,
@@ -33,9 +32,8 @@ export class Tenant {
     this.tenantRolesCount = tenantRolesCount;
     this.tenantDatabaseSchemasCount = tenantDatabaseSchemasCount;
     this.tenantDatabaseTablesCount = tenantDatabaseTablesCount;
-    this.tenantChartCount = tenantChartCount;
     this.tenantDashboardCount = tenantDashboardCount;
-    this.tenantDatabaseQueryCount = tenantDatabaseQueryCount;
+    this.tenantDataQueryCount = tenantDataQueryCount;
     this.tenantCronJobCount = tenantCronJobCount;
     this.tenantAPIKeyCount = tenantAPIKeyCount;
     this.tenantWidgetCount = tenantWidgetCount;

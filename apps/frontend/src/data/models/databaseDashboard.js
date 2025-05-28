@@ -8,7 +8,6 @@ export class DatabaseDashboard {
     databaseDashboardName,
     databaseDashboardDescription,
     databaseDashboardConfig,
-    tblDatabaseDashboardChartMappings,
   }) {
     this.databaseDashboardID = databaseDashboardID;
     this.createdAt = createdAt;
@@ -18,7 +17,6 @@ export class DatabaseDashboard {
     this.databaseDashboardName = databaseDashboardName;
     this.databaseDashboardDescription = databaseDashboardDescription;
     this.databaseDashboardConfig = databaseDashboardConfig;
-    this.databaseCharts = tblDatabaseDashboardChartMappings;
   }
   static toList(data) {
     if (Array.isArray(data)) {

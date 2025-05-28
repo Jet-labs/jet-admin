@@ -3,26 +3,24 @@ import { Outlet } from "react-router-dom";
 // import logo from "../../../assets/logo.png";
 
 import { CONSTANTS } from "../../../constants";
-import { DatabaseWidgetsContextProvider } from "../../../logic/contexts/databaseWidgetsContext";
-import { DatabaseWidgetDrawerList } from "../drawerList/databaseWidgetDrawerList";
+import { WidgetsContextProvider } from "../../../logic/contexts/widgetsContext";
+import { WidgetDrawerList } from "../drawerList/widgetDrawerList";
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "../ui/resizable";
 
-export const DatabaseWidgetLayout = () => {
+export const WidgetLayout = () => {
   return (
-    <DatabaseWidgetsContextProvider>
+    <WidgetsContextProvider>
       <div className="flex h-full w-full flex-col justify-start items-stretch overflow-hidden">
         <ResizablePanelGroup
           direction="horizontal"
-          autoSaveId={
-            CONSTANTS.RESIZABLE_PANEL_KEYS.DATABASE_WIDGET_LAYOUT_SEPARATION
-          }
+          autoSaveId={CONSTANTS.RESIZABLE_PANEL_KEYS.WIDGET_LAYOUT_SEPARATION}
         >
           <ResizablePanel defaultSize={20}>
-            <DatabaseWidgetDrawerList />
+            <WidgetDrawerList />
           </ResizablePanel>
           <ResizableHandle withHandle={true} />
           <ResizablePanel defaultSize={80}>
@@ -30,6 +28,6 @@ export const DatabaseWidgetLayout = () => {
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>
-    </DatabaseWidgetsContextProvider>
+    </WidgetsContextProvider>
   );
 };

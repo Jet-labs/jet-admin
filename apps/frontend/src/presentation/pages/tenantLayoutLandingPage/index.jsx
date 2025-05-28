@@ -64,18 +64,16 @@ const TenantLayoutLandingPage = () => {
     {
       title: "Database saved queries",
       icon: <img src={queryLogo} alt="Database Queries" className="w-8 h-8" />,
-      count: tenant?.tenantDatabaseQueryCount || 0,
+      count: tenant?.tenantDataQueryCount || 0,
       description: "View and manage database saved queries",
-      action: () =>
-        navigate(CONSTANTS.ROUTES.VIEW_DATABASE_QUERIES.path(tenantID)),
+      action: () => navigate(CONSTANTS.ROUTES.VIEW_QUERIES.path(tenantID)),
     },
     {
       title: "Database Widgets",
       icon: <img src={widgetLogo} alt="Database Widgets" className="w-8 h-8" />,
       count: tenant?.tenantWidgetCount || 0,
       description: "View and manage database widgets",
-      action: () =>
-        navigate(CONSTANTS.ROUTES.VIEW_DATABASE_WIDGETS.path(tenantID)),
+      action: () => navigate(CONSTANTS.ROUTES.VIEW_WIDGETS.path(tenantID)),
     },
     {
       title: "Dashboards",

@@ -57,13 +57,12 @@ export const CONSTANTS = {
     MAIN_DRAWER_DATABASE_TITLE: "Database",
     MAIN_DRAWER_DATASOURCE_TITLE: "Data sources",
     MAIN_DRAWER_DATABASE_DASHBOARDS_TITLE: "Dashboards",
-    MAIN_DRAWER_DATABASE_CHARTS_TITLE: "Charts",
-    MAIN_DRAWER_DATABASE_WIDGETS_TITLE: "Widgets",
+    MAIN_DRAWER_WIDGETS_TITLE: "Widgets",
     MAIN_DRAWER_DATABASE_NOTIFICATIONS_TITLE: "Notifications",
     MAIN_DRAWER_API_KEYS_TITLE: "API Keys",
     MAIN_DRAWER_CRON_JOBS_TITLE: "Scheduled jobs",
     MAIN_DRAWER_SQL_EDITOR_TITLE: "PG SQL Editor",
-    MAIN_DRAWER_DATABASE_QUERIES_TITLE: "Database queries",
+    MAIN_DRAWER_QUERIES_TITLE: "Queries",
     MAIN_DRAWER_ADD_DATABASE_SCHEMA_BUTTON: "Add schema",
     MAIN_DRAWER_USER_MANAGEMENT_TITLE: "User management",
     MAIN_DRAWER_AUDIT_LOGS_TITLE: "Audit logs",
@@ -320,7 +319,6 @@ export const CONSTANTS = {
     NOTIFICATION_DRAWER_LIST_NO_NOTIFICATION: "No notifications found",
     API_KEY_DRAWER_LIST_NO_API_KEY: "No API Keys found",
     CRON_JOB_DRAWER_LIST_NO_CRON_JOB_FOUND: "No scheduled jobs found",
-    CHART_DRAWER_LIST_NO_CHART: "No charts found",
     WIDGET_DRAWER_LIST_NO_WIDGET: "No widgets found",
     DASHBOARD_DRAWER_LIST_NO_DASHBOARD: "No dashboards found",
 
@@ -381,8 +379,6 @@ export const CONSTANTS = {
     TRIGGER_VIEW_DELETE_SUCCESS: "Trigger deleted successfully",
 
     ADD_QUERY_BUTTON_TEXT: "Add query",
-
-    ADD_CHART_BUTTON_TEXT: "Add chart",
 
     ADD_WIDGET_BUTTON_TEXT: "Add widget",
 
@@ -457,17 +453,18 @@ export const CONSTANTS = {
     CLONE_QUERY_DIALOG_MESSAGE:
       "Are you sure you want to clone this item? This action cannot be undone.",
 
-    DATABASE_QUERY_ARGS_FORM_TITLE: "Query arguments",
-    DATABASE_QUERY_ARGS_FORM_DESCRIPTION: "Enter the query arguments",
-    DATABASE_QUERY_ARGS_FORM_CONFIRM_BUTTON: "Confirm",
+    DATA_QUERY_ARGS_FORM_TITLE: "Query arguments",
+    DATA_QUERY_ARGS_FORM_DESCRIPTION: "Enter the query arguments",
+    DATA_QUERY_ARGS_FORM_CONFIRM_BUTTON: "Confirm",
+    DATA_QUERY_ARGS_FORM_CANCEL_BUTTON: "Cancel",
 
-    DATABASE_QUERY_AI_PROMPT_BUTTON: "AI Prompt",
-    DATABASE_QUERY_AI_PROMPT_FORM_TITLE: "AI Prompt",
-    DATABASE_QUERY_AI_PROMPT_FORM_DESCRIPTION:
+    DATA_QUERY_AI_PROMPT_BUTTON: "AI Prompt",
+    DATA_QUERY_AI_PROMPT_FORM_TITLE: "AI Prompt",
+    DATA_QUERY_AI_PROMPT_FORM_DESCRIPTION:
       "Enter the AI prompt to generate the query",
-    DATABASE_QUERY_AI_PROMPT_ACCEPT_FORM_CONFIRM_BUTTON: "Accept query",
-    DATABASE_QUERY_AI_PROMPT_FORM_GENERATE_BUTTON: "Generate query",
-    DATABASE_QUERY_AI_PROMPT_FORM_REGENERATE_BUTTON: "Re-generate query",
+    DATA_QUERY_AI_PROMPT_ACCEPT_FORM_CONFIRM_BUTTON: "Accept query",
+    DATA_QUERY_AI_PROMPT_FORM_GENERATE_BUTTON: "Generate query",
+    DATA_QUERY_AI_PROMPT_FORM_REGENERATE_BUTTON: "Re-generate query",
 
     DATABASE_TABLES_STATS_TITLE: "Database Stats",
     DATABASE_TABLES_STATS_TOTAL_TABLES_LABEL: "Total Tables",
@@ -543,11 +540,6 @@ export const CONSTANTS = {
     TENANT_ROLE_DELETION_DIALOG_MESSAGE:
       "Are you sure you want to delete this role? This action cannot be undone.",
 
-    ADD_CHART_FORM_TITLE: "Add chart",
-    ADD_CHART_FORM_CHART_ADDITION_SUCCESS: "Chart added successfully!",
-    ADD_CHART_FORM_CHART_TESTING_SUCCESS: "Chart run successfully!",
-    ADD_CHART_FORM_SUBMIT_BUTTON: "Add chart",
-
     ADD_WIDGET_FORM_TITLE: "Add widget",
     ADD_WIDGET_FORM_WIDGET_ADDITION_SUCCESS: "Widget added successfully!",
     ADD_WIDGET_FORM_WIDGET_TESTING_SUCCESS: "Widget run successfully!",
@@ -557,55 +549,6 @@ export const CONSTANTS = {
     UPDATE_WIDGET_FORM_WIDGET_UPDATION_SUCCESS: "Widget updated successfully!",
     UPDATE_WIDGET_FORM_WIDGET_TESTING_SUCCESS: "Widget run successfully!",
     UPDATE_WIDGET_FORM_SUBMIT_BUTTON: "Update widget",
-
-    UPDATE_CHART_FORM_TITLE: "Update chart",
-    UPDATE_CHART_FORM_CHART_UPDATION_SUCCESS: "Chart updated successfully!",
-    UPDATE_CHART_FORM_CHART_TESTING_SUCCESS: "Chart run successfully!",
-    UPDATE_CHART_FORM_SUBMIT_BUTTON: "Update chart",
-
-    UPDATE_CHART_FORM_UPDATE_DIALOG_TITLE: "Update chart",
-    UPDATE_CHART_FORM_UPDATE_DIALOG_MESSAGE:
-      "Are you sure you want to update this item? This action cannot be undone.",
-
-    CHART_EDITOR_FORM_NAME_FIELD_LABEL: "Chart name",
-    CHART_EDITOR_FORM_NAME_FIELD_PLACEHOLDER: "Your chart's name",
-    CHART_EDITOR_FORM_TYPE_FIELD_LABEL: "Chart type",
-    CHART_EDITOR_FORM_ADVANCED_BUTTON: "Advanced config",
-    CHART_EDITOR_FORM_TITLE_ENABLED_FIELD_LABEL: "Title enabled",
-    CHART_EDITOR_FORM_LEGEND_ENABLED_FIELD_LABEL: "Legend enabled",
-    CHART_EDITOR_FORM_LEGEND_POSITION_FIELD_LABEL: "Legend position",
-    CHART_EDITOR_FORM_X_STACKED_FIELD_LABEL: "X stacked",
-    CHART_EDITOR_FORM_Y_STACKED_FIELD_LABEL: "Y stacked",
-    CHART_EDITOR_FORM_INDEX_AXIS_LABEL: "Index axis",
-    CHART_EDITOR_FORM_REFRESH_INTERVAL_LABEL: "Refresh interval",
-    CHART_EDITOR_FORM_DATASET_FIELD_LABEL: "Datasets",
-    CHART_EDITOR_FORM_ADD_DATASET_BUTTON: "Add dataset",
-
-    CHART_EDITOR_FORM_DESCRIPTION_FIELD_LABEL: "Chart description",
-    CHART_EDITOR_FORM_DESCRIPTION_FIELD_PLACEHOLDER: "Your chart's description",
-
-    CHART_EDITOR_FORM_DATASET_TITLE_LABEL: "Dataset title",
-    CHART_EDITOR_FORM_DATASET_QUERY_LABEL: "Dataset query",
-    CHART_EDITOR_FORM_DATASET_UI_CONFIG_LABEL: "UI options",
-    CHART_EDITOR_FORM_DATASET_FIELD_MAPPINGS_LABEL: "Mappings",
-    CHART_EDITOR_FORM_DATASET_ARGUMENTS_LABEL: "Arguments",
-    CHART_EDITOR_FORM_DATASET_COLOR_LABEL: "Dataset color",
-    CHART_EDITOR_FORM_DATASET_BORDER_WIDTH_LABEL: "Border width",
-    CHART_EDITOR_FORM_DATASET_FIELD_X_AXIS_LABEL: "X axis",
-    CHART_EDITOR_FORM_DATASET_FIELD_Y_AXIS_LABEL: "Y axis",
-    CHART_EDITOR_FORM_DATASET_FIELD_LABEL_LABEL: "Label",
-    CHART_EDITOR_FORM_DATASET_FIELD_VALUE_LABEL: "Value",
-    CHART_EDITOR_FORM_DATASET_FIELD_RADIUS_LABEL: "Radius",
-
-    DELETE_CHART_DELETION_SUCCESS: "Chart deleted successfully!",
-    DELETE_CHART_DIALOG_TITLE: "Delete chart",
-    DELETE_CHART_DIALOG_MESSAGE:
-      "Are you sure you want to delete this item? This action cannot be undone.",
-
-    CLONE_CHART_CLONING_SUCCESS: "Chart cloned successfully!",
-    CLONE_CHART_DIALOG_TITLE: "Clone chart",
-    CLONE_CHART_DIALOG_MESSAGE:
-      "Are you sure you want to clone this item? This action cannot be undone.",
 
     DELETE_WIDGET_DELETION_SUCCESS: "Widget deleted successfully!",
     DELETE_WIDGET_DIALOG_TITLE: "Delete widget",
@@ -618,7 +561,6 @@ export const CONSTANTS = {
       "Are you sure you want to clone this item? This action cannot be undone.",
 
     DASHBOARD_WIDGET_LIST_TITLE: "Widgets",
-    DASHBOARD_WIDGET_LIST_CHARTS_TITLE: "Charts",
     DASHBOARD_WIDGET_LIST_WIDGETS_TITLE: "Widgets",
     DASHBOARD_WIDGET_LIST_QUERIES_TITLE: "Queries",
 
@@ -656,125 +598,11 @@ export const CONSTANTS = {
     CLONE_DASHBOARD_DIALOG_MESSAGE:
       "Are you sure you want to clone this item? This action cannot be undone.",
 
-    CHART_ADV_OPTIONS_CONFIRM: "Save changes",
-    CHART_ADV_OPTIONS_CANCEL: "Discard",
-
     DASHBOARD_EDITOR_FORM_NAME_FIELD_LABEL: "Dashboard name",
     DASHBOARD_EDITOR_FORM_NAME_FIELD_PLACEHOLDER: "Your dashboard's name",
     DASHBOARD_EDITOR_FORM_DESCRIPTION_FIELD_LABEL: "Description",
     DASHBOARD_EDITOR_FORM_DESCRIPTION_FIELD_PLACEHOLDER:
       "Descripton (Optional)",
-    CHART_DATASET_ADV_TITLE: "Dataset Configuration",
-    CHART_DATASET_ADV_CONFIRM: "Save changes",
-    CHART_DATASET_ADV_CANCEL: "Discard",
-    CHART_DATASET_ADV_DATASET_TYPE_LABEL: "Chart type override",
-    CHART_DATASET_ADV_DATASET_BACKGROUND_COLOR_LABEL: "Background color",
-    CHART_DATASET_ADV_DATASET_BORDER_COLOR_LABEL: "Border color",
-    CHART_DATASET_ADV_DATASET_BORDER_WIDTH_LABEL: "Border width",
-    CHART_DATASET_ADV_DATASET_BORDER_DASH_LABEL: "Border dash",
-    CHART_DATASET_ADV_DATASET_LINE_TENSION_LABEL: "Line tension",
-    CHART_DATASET_ADV_DATASET_LINE_STEPPED_LABEL: "Line stepped",
-    CHART_DATASET_ADV_DATASET_BAR_THICKNESS_LABEL: "Bar thickness",
-    CHART_DATASET_ADV_DATASET_BORDER_SKIPPED_LABEL: "Border skipped",
-    CHART_DATASET_ADV_DATASET_GROUPED_LABEL: "Grouped",
-    CHART_DATASET_ADV_DATASET_MAX_BAR_THICKNESS_LABEL: "Max bar thickness",
-    CHART_DATASET_ADV_DATASET_BASE_LABEL: "Base",
-    CHART_DATASET_ADV_DATASET_BAR_PERCENTAGE_LABEL: "Bar percentage",
-    CHART_DATASET_ADV_DATASET_CATEGORY_PERCENTAGE_LABEL: "Category percentage",
-    CHART_DATASET_ADV_DATASET_BORDER_RADIUS_LABEL: "Border radius",
-    CHART_DATASET_ADV_DATASET_X_AXIS_ID_LABEL: "X-axis ID",
-    CHART_DATASET_ADV_DATASET_Y_AXIS_ID_LABEL: "Y-axis ID",
-    CHART_DATASET_ADV_DATASET_HIDDEN_LABEL: "Hidden",
-    CHART_DATASET_ADV_DATASET_ORDER_LABEL: "Order",
-    CHART_DATASET_ADV_DATASET_CLIP_LABEL: "Clip",
-    CHART_DATASET_ADV_DATASET_BORDER_DASH_OFFSET_LABEL: "Border dash offset",
-    CHART_DATASET_ADV_DATASET_HOVER_BACKGROUND_COLOR_LABEL:
-      "Hover background color",
-    CHART_DATASET_ADV_DATASET_HOVER_BORDER_COLOR_LABEL: "Hover border color",
-    CHART_DATASET_ADV_DATASET_HOVER_BORDER_WIDTH_LABEL: "Hover border width",
-    CHART_DATASET_ADV_DATASET_POINT_RADIUS_LABEL: "Point radius",
-    CHART_DATASET_ADV_DATASET_POINT_STYLE_LABEL: "Point style",
-    CHART_DATASET_ADV_DATASET_POINT_BACKGROUND_COLOR_LABEL:
-      "Point background color",
-    CHART_DATASET_ADV_DATASET_POINT_BORDER_COLOR_LABEL: "Point border color",
-    CHART_DATASET_ADV_DATASET_POINT_BORDER_WIDTH_LABEL: "Point border width",
-    CHART_DATASET_ADV_DATASET_POINT_HIT_RADIUS_LABEL: "Point hit radius",
-    CHART_DATASET_ADV_DATASET_POINT_HOVER_RADIUS_LABEL: "Point hover radius",
-    CHART_DATASET_ADV_DATASET_POINT_HOVER_BACKGROUND_COLOR_LABEL:
-      "Point hover background color",
-    CHART_DATASET_ADV_DATASET_POINT_HOVER_BORDER_COLOR_LABEL:
-      "Point hover border color",
-    CHART_DATASET_ADV_DATASET_POINT_HOVER_BORDER_WIDTH_LABEL:
-      "Point hover border width",
-    CHART_DATASET_ADV_DATASET_FILL_LABEL: "Fill",
-    CHART_DATASET_ADV_DATASET_INDEX_AXIS_LABEL: "Index axis",
-    CHART_DATASET_ADV_DATASET_STACK_LABEL: "Stack",
-    CHART_DATASET_ADV_DATASET_ROTATION_LABEL: "Rotation",
-    CHART_DATASET_ADV_DATASET_CIRCUMFERENCE_LABEL: "Circumference",
-    CHART_DATASET_ADV_DATASET_CUTOUT_LABEL: "Cutout",
-    CHART_DATASET_ADV_DATASET_OFFSET_LABEL: "Offset",
-    CHART_DATASET_ADV_DATASET_SPACING_LABEL: "Spacing",
-    CHART_DATASET_ADV_DATASET_HOVER_OFFSET_LABEL: "Hover offset",
-    CHART_DATASET_ADV_DATASET_WEIGHT_LABEL: "Weight",
-    CHART_DATASET_ADV_DATASET_HIT_RADIUS_LABEL: "Hit radius",
-    CHART_DATASET_ADV_DATASET_HOVER_RADIUS_LABEL: "Hover radius",
-    CHART_DATASET_ADV_DATASET_RADIUS_LABEL: "Radius",
-    CHART_DATASET_ADV_DATASET_HOVER_BORDER_RADIUS_LABEL: "Hover Border Radius",
-    CHART_DATASET_ADV_DATASET_POINT_ROTATION_LABEL: "Point Rotation",
-    CHART_DATASET_ADV_DATASET_SHOW_LINE_LABEL: "Show Line",
-    CHART_DATASET_ADV_DATASET_SPAN_GAPS_LABEL: "Span Gaps",
-    CHART_DATASET_ADV_DATASET_BORDER_CAP_STYLE_LABEL: "Border Cap Style",
-    CHART_DATASET_ADV_DATASET_BORDER_JOIN_STYLE_LABEL: "Border Join Style",
-
-    // New constant for Bar Chart
-    CHART_DATASET_ADV_DATASET_MIN_BAR_LENGTH_LABEL: "Minimum Bar Length",
-
-    // New constants for Pie/Doughnut Chart
-    CHART_DATASET_ADV_DATASET_BORDER_ALIGN_LABEL: "Border Align",
-
-    CHART_DATASET_FIELD_MAPPING_TITLE: "Dataset field options",
-    CHART_DATASET_FIELD_MAPPING_NO_META: "Dataset metadata not available",
-    CHART_DATASET_FIELD_MAPPING_CONFIRM: "Save changes",
-    CHART_DATASET_FIELD_MAPPING_CANCEL: "Discard",
-
-    CHART_DATASET_ARGUMENTS_TITLE: "Dataset field options",
-    CHART_DATASET_ARGUMENTS_CONFIRM: "Save changes",
-    CHART_DATASET_ARGUMENTS_CANCEL: "Discard",
-
-    DATABASE_CHART_AI_PROMPT_BUTTON: "AI Prompt",
-    DATABASE_CHART_AI_PROMPT_FORM_TITLE: "AI Prompt",
-    DATABASE_CHART_AI_PROMPT_FORM_DESCRIPTION:
-      "Enter the AI prompt to generate the chart",
-    DATABASE_CHART_AI_PROMPT_ACCEPT_FORM_CONFIRM_BUTTON: "Accept chart",
-    DATABASE_CHART_AI_PROMPT_ACCEPT_FORM_CANCEL_BUTTON: "Cancel",
-    DATABASE_CHART_AI_PROMPT_FORM_GENERATE_BUTTON: "Generate chart",
-    DATABASE_CHART_AI_PROMPT_FORM_REGENERATE_BUTTON: "Re-generate chart",
-
-    DATABASE_CHART_AI_PROMPT_GENERATED_QUERIES_TITLE: "Generated queries",
-    DATABASE_CHART_AI_PROMPT_GENERATED_QUERIES_DESCRIPTION:
-      "The following queries will be created and used in the chart",
-    DATABASE_CHART_AI_PROMPT_GENERATED_QUERIES_ACCEPT_BUTTON: "Accept",
-
-    DATABASE_CHART_AI_PROMPT_GENERATED_CHART_CONFIG_TITLE:
-      "Generated chart config",
-    DATABASE_CHART_AI_PROMPT_GENERATED_CHART_CONFIG_DESCRIPTION:
-      "The following chart configuration will be used in the chart",
-    DATABASE_CHART_AI_PROMPT_GENERATED_CHART_CONFIG_ACCEPT_BUTTON:
-      "Accept config",
-
-    DATABASE_CHART_AI_STYLE_PROMPT_BUTTON: "Style",
-    DATABASE_CHART_AI_STYLE_PROMPT_FORM_TITLE: "AI Prompt",
-    DATABASE_CHART_AI_STYLE_PROMPT_FORM_DESCRIPTION:
-      "Enter the AI prompt to style the chart",
-    DATABASE_CHART_AI_STYLE_CHART_PREVIEW: "Chart preview",
-    DATABASE_CHART_AI_STYLE_PROMPT_ACCEPT_FORM_CONFIRM_BUTTON: "Accept chart",
-    DATABASE_CHART_AI_STYLE_PROMPT_ACCEPT_FORM_CANCEL_BUTTON: "Cancel",
-    DATABASE_CHART_AI_STYLE_PROMPT_FORM_GENERATE_BUTTON: "Style chart",
-    DATABASE_CHART_AI_STYLE_PROMPT_FORM_REGENERATE_BUTTON: "Re-style chart",
-
-    DATABASE_CHART_AI_STYLE_PROMPT_GENERATED_STYLES_TITLE: "Generated styles",
-    DATABASE_CHART_AI_STYLE_PROMPT_GENERATED_STYLES_DESCRIPTION:
-      "The following styles will be applied and used in the chart",
 
     WIDGET_DATASET_FIELD_MAPPING_TITLE: "Dataset field options",
     WIDGET_DATASET_FIELD_MAPPING_NO_META: "Dataset metadata not available",
@@ -785,13 +613,6 @@ export const CONSTANTS = {
     WIDGET_DATASET_ARGUMENTS_CONFIRM: "Save changes",
     WIDGET_DATASET_ARGUMENTS_CANCEL: "Discard",
 
-    CHART_DATASET_CHART_DOWNLOAD_FORM_TITLE: "Select Image Quality",
-    CHART_DATASET_CHART_DOWNLOAD_FORM_DESCRIPTION:
-      "Choose the quality of the image you want to download. Higher quality results in larger file sizes.",
-    CHART_DATASET_CHART_DOWNLOAD_FORM_CONFIRM: "Download",
-    CHART_DATASET_CHART_DOWNLOAD_FORM_CANCEL: "Cancel",
-
-    CHART_TYPE_INVALID_ERROR: "Invalid chart type",
     WIDGET_TYPE_INVALID_ERROR: "Invalid widget type",
 
     ACCOUNT_PAGE_TITLE: "Accounts",
@@ -840,6 +661,10 @@ export const CONSTANTS = {
     WIDGET_EDITOR_FORM_DATASET_FIELD_LABEL_LABEL: "Label",
     WIDGET_EDITOR_FORM_DATASET_FIELD_VALUE_LABEL: "Value",
     WIDGET_EDITOR_FORM_DATASET_FIELD_RADIUS_LABEL: "Radius",
+
+    WIDGET_DATASET_ADV_TITLE: "Dataset advanced options",
+    WIDGET_DATASET_ADV_CONFIRM: "Save changes",
+    WIDGET_DATASET_ADV_CANCEL: "Discard",
 
     ADD_NOTIFICATION_BUTTON_TEXT: "Add Notification",
     ADD_NOTIFICATION_FORM_TITLE: "Create New Notification",
@@ -940,12 +765,10 @@ export const CONSTANTS = {
 
     TENANTS_STATS_TITLE: "Tenant Stats",
     TENANTS_STATS_ADD_TENANT_BUTTON: "Add tenant",
-
-    DATABASE_CHARTS_STATS_TITLE: "Charts Stats",
-    DATABASE_QUERIES_STATS_TITLE: "Queries Stats",
+    QUERIES_STATS_TITLE: "Queries Stats",
     QUERY_EXECUTED_SUCCESSFULLY: "Query executed successfully",
 
-    DATABASE_WIDGETS_STATS_TITLE: "Widgets Stats",
+    WIDGETS_STATS_TITLE: "Widgets Stats",
     RAW_QUERY_EXCECUTOR_TITLE: "Raw SQL Query Executor",
     RAW_QUERY_EXCECUTOR_DESCRIPTION:
       "Execute raw SQL queries against your database",
@@ -1055,31 +878,30 @@ export const CONSTANTS = {
       path: (tenantID, datasourceID) =>
         `/tenants/${tenantID}/datasources/${datasourceID}`,
     },
-    ADD_DATABASE_QUERY: {
+    ADD_DATA_QUERY: {
       code: "/tenants/:tenantID/queries/add",
       path: (tenantID) => `/tenants/${tenantID}/queries/add`,
     },
-    VIEW_DATABASE_QUERIES: {
+    VIEW_QUERIES: {
       code: "/tenants/:tenantID/queries",
       path: (tenantID) => `/tenants/${tenantID}/queries`,
     },
-    UPDATE_DATABASE_QUERY_BY_ID: {
-      code: "/tenants/:tenantID/queries/:databaseQueryID",
-      path: (tenantID, databaseQueryID) =>
-        `/tenants/${tenantID}/queries/${databaseQueryID}`,
+    UPDATE_DATA_QUERY_BY_ID: {
+      code: "/tenants/:tenantID/queries/:dataQueryID",
+      path: (tenantID, dataQueryID) =>
+        `/tenants/${tenantID}/queries/${dataQueryID}`,
     },
-    ADD_DATABASE_WIDGET: {
+    ADD_WIDGET: {
       code: "/tenants/:tenantID/widgets/add",
       path: (tenantID) => `/tenants/${tenantID}/widgets/add`,
     },
-    VIEW_DATABASE_WIDGETS: {
+    VIEW_WIDGETS: {
       code: "/tenants/:tenantID/widgets",
       path: (tenantID) => `/tenants/${tenantID}/widgets`,
     },
-    UPDATE_DATABASE_WIDGET_BY_ID: {
-      code: "/tenants/:tenantID/widgets/:databaseWidgetID",
-      path: (tenantID, databaseWidgetID) =>
-        `/tenants/${tenantID}/widgets/${databaseWidgetID}`,
+    UPDATE_WIDGET_BY_ID: {
+      code: "/tenants/:tenantID/widgets/:widgetID",
+      path: (tenantID, widgetID) => `/tenants/${tenantID}/widgets/${widgetID}`,
     },
     ADD_DATABASE_DASHBOARD: {
       code: "/tenants/:tenantID/dashboards/add",
@@ -1362,53 +1184,43 @@ export const CONSTANTS = {
       ) =>
         `/api/v1/tenants/${tenantID}/database/schemas/${databaseSchemaName}/triggers/${databaseTableName}/${databaseTriggerName}`,
 
-      getAllDatabaseQueriesAPI: (tenantID) =>
+      getAllDataQueriesAPI: (tenantID) =>
         `/api/v1/tenants/${tenantID}/queries/`,
 
-      createDatabaseQueryAPI: (tenantID) =>
-        `/api/v1/tenants/${tenantID}/queries/`,
-      createBulkDatabaseQueryAPI: (tenantID) =>
+      createDataQueryAPI: (tenantID) => `/api/v1/tenants/${tenantID}/queries/`,
+      createBulkDataQueryAPI: (tenantID) =>
         `/api/v1/tenants/${tenantID}/queries/bulk`,
 
-      testDatabaseQueryAPI: (tenantID) =>
+      testDataQueryAPI: (tenantID) =>
         `/api/v1/tenants/${tenantID}/queries/queryTest`,
-      getDatabaseQueryByID: (tenantID, databaseQueryID) =>
-        `/api/v1/tenants/${tenantID}/queries/${databaseQueryID}`,
-      cloneDatabaseQueryByID: (tenantID, databaseQueryID) =>
-        `/api/v1/tenants/${tenantID}/queries/${databaseQueryID}/clone`,
-      testDatabaseQueryByIDAPI: (tenantID, databaseQueryID) =>
-        `/api/v1/tenants/${tenantID}/queries/${databaseQueryID}/queryTest`,
+      getDataQueryByID: (tenantID, dataQueryID) =>
+        `/api/v1/tenants/${tenantID}/queries/${dataQueryID}`,
+      cloneDataQueryByID: (tenantID, dataQueryID) =>
+        `/api/v1/tenants/${tenantID}/queries/${dataQueryID}/clone`,
+      testDataQueryByIDAPI: (tenantID, dataQueryID) =>
+        `/api/v1/tenants/${tenantID}/queries/${dataQueryID}/queryTest`,
       generateAIPromptBasedQueryAPI: (tenantID) =>
         `/api/v1/tenants/${tenantID}/queries/aigenerate`,
-      updateDatabaseQueryByID: (tenantID, databaseQueryID) =>
-        `/api/v1/tenants/${tenantID}/queries/${databaseQueryID}`,
-      deleteDatabaseQueryByID: (tenantID, databaseQueryID) =>
-        `/api/v1/tenants/${tenantID}/queries/${databaseQueryID}`,
+      updateDataQueryByID: (tenantID, dataQueryID) =>
+        `/api/v1/tenants/${tenantID}/queries/${dataQueryID}`,
+      deleteDataQueryByID: (tenantID, dataQueryID) =>
+        `/api/v1/tenants/${tenantID}/queries/${dataQueryID}`,
 
-      getDatabaseChartDataUsingChartAPI: (tenantID, databaseChartID) =>
-        `/api/v1/tenants/${tenantID}/charts/${databaseChartID}/data`,
-      generateAIPromptBasedChartAPI: (tenantID) =>
-        `/api/v1/tenants/${tenantID}/charts/aigenerate`,
-      generateAIPromptBasedChartStyleAPI: (tenantID) =>
-        `/api/v1/tenants/${tenantID}/charts/aistyle`,
+      getAllWidgetsAPI: (tenantID) => `/api/v1/tenants/${tenantID}/widgets/`,
 
-      getAllDatabaseWidgetsAPI: (tenantID) =>
-        `/api/v1/tenants/${tenantID}/widgets/`,
-
-      createDatabaseWidgetAPI: (tenantID) =>
-        `/api/v1/tenants/${tenantID}/widgets/`,
-      getDatabaseWidgetByIDAPI: (tenantID, databaseWidgetID) =>
-        `/api/v1/tenants/${tenantID}/widgets/${databaseWidgetID}`,
-      cloneDatabaseWidgetByIDAPI: (tenantID, databaseWidgetID) =>
-        `/api/v1/tenants/${tenantID}/widgets/${databaseWidgetID}/clone`,
-      updateDatabaseWidgetByIDAPI: (tenantID, databaseWidgetID) =>
-        `/api/v1/tenants/${tenantID}/widgets/${databaseWidgetID}`,
-      getDatabaseWidgetDataByIDAPI: (tenantID, databaseWidgetID) =>
-        `/api/v1/tenants/${tenantID}/widgets/${databaseWidgetID}/data`,
-      getDatabaseWidgetDataUsingWidgetAPI: (tenantID, databaseWidgetID) =>
-        `/api/v1/tenants/${tenantID}/widgets/${databaseWidgetID}/data`,
-      deleteDatabaseWidgetByID: (tenantID, databaseWidgetID) =>
-        `/api/v1/tenants/${tenantID}/widgets/${databaseWidgetID}`,
+      createWidgetAPI: (tenantID) => `/api/v1/tenants/${tenantID}/widgets/`,
+      getWidgetByIDAPI: (tenantID, widgetID) =>
+        `/api/v1/tenants/${tenantID}/widgets/${widgetID}`,
+      cloneWidgetByIDAPI: (tenantID, widgetID) =>
+        `/api/v1/tenants/${tenantID}/widgets/${widgetID}/clone`,
+      updateWidgetByIDAPI: (tenantID, widgetID) =>
+        `/api/v1/tenants/${tenantID}/widgets/${widgetID}`,
+      getWidgetDataByIDAPI: (tenantID, widgetID) =>
+        `/api/v1/tenants/${tenantID}/widgets/${widgetID}/data`,
+      getWidgetDataUsingWidgetAPI: (tenantID, widgetID) =>
+        `/api/v1/tenants/${tenantID}/widgets/${widgetID}/data`,
+      deleteWidgetByID: (tenantID, widgetID) =>
+        `/api/v1/tenants/${tenantID}/widgets/${widgetID}`,
 
       getAllDatabaseDashboardsAPI: (tenantID) =>
         `/api/v1/tenants/${tenantID}/dashboards/`,
@@ -1523,13 +1335,11 @@ export const CONSTANTS = {
 
     DATASOURCES: (tenantID) => `${tenantID}-DATASOURCES`,
 
-    DATABASE_QUERIES: (tenantID) => `${tenantID}-DATABASE_QUERIES`,
+    QUERIES: (tenantID) => `${tenantID}-QUERIES`,
 
-    DATABASE_QUERIES_CHECK: (tenantID) => `${tenantID}-DATABASE_QUERIES_CHECK`,
+    QUERIES_CHECK: (tenantID) => `${tenantID}-QUERIES_CHECK`,
 
-    DATABASE_CHARTS: (tenantID) => `${tenantID}-DATABASE_CHARTS`,
-
-    DATABASE_WIDGETS: (tenantID) => `${tenantID}-DATABASE_WIDGETS`,
+    WIDGETS: (tenantID) => `${tenantID}-WIDGETS`,
 
     DATABASE_DASHBOARDS: (tenantID) => `${tenantID}-DATABASE_DASHBOARDS`,
 
@@ -1851,17 +1661,11 @@ export const CONSTANTS = {
       "QUERY_ADDITION_FORM_QUERY_EDITOR_SEPARATION",
     DATABASE_TRIGGER_LAYOUT_SEPARATION: "DATABASE_TRIGGER_LAYOUT_SEPARATION",
     DATABASE_TABLE_LAYOUT_SEPARATION: "DATABASE_TABLE_LAYOUT_SEPARATION",
-    DATABASE_QUERY_LAYOUT_SEPARATION: "DATABASE_QUERY_LAYOUT_SEPARATION",
+    DATA_QUERY_LAYOUT_SEPARATION: "DATA_QUERY_LAYOUT_SEPARATION",
     DATASOURCE_LAYOUT_SEPARATION: "DATASOURCE_LAYOUT_SEPARATION",
-    DATABASE_CHART_LAYOUT_SEPARATION: "DATABASE_CHART_LAYOUT_SEPARATION",
-    DATABASE_WIDGET_LAYOUT_SEPARATION: "DATABASE_WIDGET_LAYOUT_SEPARATION",
+    WIDGET_LAYOUT_SEPARATION: "WIDGET_LAYOUT_SEPARATION",
     DATABASE_DASHBOARD_LAYOUT_SEPARATION:
       "DATABASE_DASHBOARD_LAYOUT_SEPARATION",
-    CHART_ADDITION_FORM_RESULT_SEPARATION:
-      "CHART_ADDITION_FORM_RESULT_SEPARATION",
-    CHART_UPDATION_FORM_RESULT_SEPARATION:
-      "CHART_UPDATION_FORM_RESULT_SEPARATION",
-
     WIDGET_ADDITION_FORM_RESULT_SEPARATION:
       "WIDGET_ADDITION_FORM_RESULT_SEPARATION",
     WIDGET_UPDATION_FORM_RESULT_SEPARATION:
@@ -1883,48 +1687,10 @@ export const CONSTANTS = {
 
   PG_TRIGGER_FORM_FOR_EACH_OPTIONS: ["ROW", "STATEMENT"],
 
-  DATABASE_CHART_TYPES: {
-    BAR_CHART: {
-      name: "Bar Chart",
-      value: "bar",
-    },
-    LINE_CHART: {
-      name: "Line Chart",
-      value: "line",
-    },
-    PIE_CHART: {
-      name: "Pie Chart",
-      value: "pie",
-    },
-    SCATTER_CHART: {
-      name: "Scatter Chart",
-      value: "scatter",
-    },
-    BUBBLE_CHART: {
-      name: "Bubble Chart",
-      value: "bubble",
-    },
-    RADAR_CHART: {
-      name: "Radar Chart",
-      value: "radar",
-    },
-    POLAR_AREA: {
-      name: "Polar Area Chart",
-      value: "polarArea",
-    },
-  },
-
-  DATABASE_WIDGET_TYPES: {
+  WIDGET_TYPES: {
     TEXT_WIDGET: {
       name: "Text widget",
       value: "text",
     },
-  },
-
-  DATABASE_CHART_LEGEND_POSITION: {
-    TOP: "top",
-    BOTTOM: "bottom",
-    LEFT: "left",
-    RIGHT: "right",
   },
 };

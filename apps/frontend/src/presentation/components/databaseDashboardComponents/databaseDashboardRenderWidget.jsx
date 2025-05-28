@@ -79,7 +79,7 @@ export const DatabaseDashboardRenderWidget = ({
         ref={ref}
       >
         <DatabaseDashboardWidget
-          databaseWidgetID={widgetID}
+          widgetID={widgetID}
           tenantID={tenantID}
           height={size.height}
           width={size.width}

@@ -6,11 +6,11 @@ import { ProtectedLayout } from "../layouts/protectedLayout";
 import { DatabaseSchemaLayout } from "../layouts/databaseSchemaLayout";
 import { DatabaseTableLayout } from "../layouts/databaseTableLayout";
 import { DatabaseTriggerLayout } from "../layouts/databaseTriggerLayout";
-import { DatabaseQueryLayout } from "../layouts/databaseQueryLayout";
+import { DataQueryLayout } from "../layouts/dataQueryLayout";
 import { UserManagementLayout } from "../layouts/userManagementLayout";
 import { RoleManagementLayout } from "../layouts/roleManagementLayout";
 import { DatabaseDashboardLayout } from "../layouts/databaseDashboardLayout";
-import { DatabaseWidgetLayout } from "../layouts/databaseWidgetLayout";
+import { WidgetLayout } from "../layouts/widgetLayout";
 import { DatabaseNotificationLayout } from "../layouts/databaseNotificationLayout";
 import { APIKeyLayout } from "../layouts/apiKeyLayout";
 import { CronJobLayout } from "../layouts/cronJobLayout";
@@ -46,26 +46,20 @@ const ViewDatabaseTriggerPage = lazy(() =>
 const TriggerLayoutLandingPage = lazy(() =>
   import("../../pages/triggerLayoutLandingPage")
 );
-const AddDatabaseQueryPage = lazy(() =>
-  import("../../pages/addDatabaseQueryPage")
+const AddDataQueryPage = lazy(() => import("../../pages/addDataQueryPage"));
+const UpdateDataQueryPage = lazy(() =>
+  import("../../pages/updateDataQueryPage")
 );
-const UpdateDatabaseQueryPage = lazy(() =>
-  import("../../pages/updateDatabaseQueryPage")
-);
-const DatabaseQueryLayoutLandingPage = lazy(() =>
-  import("../../pages/databaseQueryLayoutLandingPage")
+const DataQueryLayoutLandingPage = lazy(() =>
+  import("../../pages/dataQueryLayoutLandingPage")
 );
 const DatabaseDashboardLayoutLandingPage = lazy(() =>
   import("../../pages/databaseDashboardLayoutLandingPage")
 );
-const AddDatabaseWidgetPage = lazy(() =>
-  import("../../pages/addDatabaseWidgetPage")
-);
-const UpdateDatabaseWidgetPage = lazy(() =>
-  import("../../pages/updateDatabaseWidgetPage")
-);
-const DatabaseWidgetLayoutLandingPage = lazy(() =>
-  import("../../pages/databaseWidgetLayoutLandingPage")
+const AddWidgetPage = lazy(() => import("../../pages/addWidgetPage"));
+const UpdateWidgetPage = lazy(() => import("../../pages/updateWidgetPage"));
+const WidgetLayoutLandingPage = lazy(() =>
+  import("../../pages/widgetLayoutLandingPage")
 );
 const AddDatabaseDashboardPage = lazy(() =>
   import("../../pages/addDatabaseDashboardPage")
@@ -211,37 +205,37 @@ const router = createBrowserRouter([
             ],
           },
           {
-            element: <DatabaseQueryLayout />,
+            element: <DataQueryLayout />,
             children: [
               {
-                path: CONSTANTS.ROUTES.VIEW_DATABASE_QUERIES.code,
-                element: <DatabaseQueryLayoutLandingPage />,
+                path: CONSTANTS.ROUTES.VIEW_QUERIES.code,
+                element: <DataQueryLayoutLandingPage />,
               },
               {
-                path: CONSTANTS.ROUTES.ADD_DATABASE_QUERY.code,
-                element: <AddDatabaseQueryPage />,
+                path: CONSTANTS.ROUTES.ADD_DATA_QUERY.code,
+                element: <AddDataQueryPage />,
               },
               {
-                path: CONSTANTS.ROUTES.UPDATE_DATABASE_QUERY_BY_ID.code,
-                element: <UpdateDatabaseQueryPage />,
+                path: CONSTANTS.ROUTES.UPDATE_DATA_QUERY_BY_ID.code,
+                element: <UpdateDataQueryPage />,
               },
             ],
           },
 
           {
-            element: <DatabaseWidgetLayout />,
+            element: <WidgetLayout />,
             children: [
               {
-                path: CONSTANTS.ROUTES.VIEW_DATABASE_WIDGETS.code,
-                element: <DatabaseWidgetLayoutLandingPage />,
+                path: CONSTANTS.ROUTES.VIEW_WIDGETS.code,
+                element: <WidgetLayoutLandingPage />,
               },
               {
-                path: CONSTANTS.ROUTES.ADD_DATABASE_WIDGET.code,
-                element: <AddDatabaseWidgetPage />,
+                path: CONSTANTS.ROUTES.ADD_WIDGET.code,
+                element: <AddWidgetPage />,
               },
               {
-                path: CONSTANTS.ROUTES.UPDATE_DATABASE_WIDGET_BY_ID.code,
-                element: <UpdateDatabaseWidgetPage />,
+                path: CONSTANTS.ROUTES.UPDATE_WIDGET_BY_ID.code,
+                element: <UpdateWidgetPage />,
               },
             ],
           },

@@ -106,29 +106,27 @@ aiService.generateAIPromptBasedQuery = async ({ aiPrompt }) => {
     }
 
     // Extract the text, trim whitespace
-    const databaseQuery = response.candidates[0].content.parts[0].text?.trim();
+    const dataQuery = response.candidates[0].content.parts[0].text?.trim();
 
-    if (!databaseQuery) {
+    if (!dataQuery) {
       Logger.log("warning", {
-        message:
-          "aiService:generateAIPromptBasedQuery:gemini_no_text",
+        message: "aiService:generateAIPromptBasedQuery:gemini_no_text",
         params: { aiPromptLength: aiPrompt?.length },
       });
       throw new Error("AI model returned response with no text content.");
     }
 
     // Check if the AI refused based on our instruction
-    if (databaseQuery === "QUERY_GENERATION_FAILED") {
+    if (dataQuery === "QUERY_GENERATION_FAILED") {
       Logger.log("warning", {
-        message:
-          "aiService:generateAIPromptBasedQuery:generation_failed_flag",
+        message: "aiService:generateAIPromptBasedQuery:generation_failed_flag",
         params: { aiPromptLength: aiPrompt?.length },
       });
       throw new Error(
         "AI determined the request could not be safely converted to a SQL query based on the provided schema and rules."
       );
     }
-    return stringUtil.removeSQLMarkdownFencesRegex(databaseQuery);
+    return stringUtil.removeSQLMarkdownFencesRegex(dataQuery);
   } catch (error) {
     // Log API errors or other failures
     Logger.log("error", {

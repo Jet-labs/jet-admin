@@ -1,5 +1,4 @@
 import * as Yup from "yup";
-import { CONSTANTS } from "../constants";
 export const formValidations = {};
 
 formValidations.emailSignUpFormValidationSchema = Yup.object().shape({
@@ -87,21 +86,21 @@ formValidations.updateDashboardFormValidationSchema = Yup.object().shape({
 });
 
 formValidations.queryAdditionFormValidationSchema = Yup.object().shape({
-  databaseQueryTitle: Yup.string()
+  dataQueryTitle: Yup.string()
     .required("Query title is required")
     .min(3, "Query title must be at least 3 characters"),
-  databaseQueryArgs: Yup.array()
+  dataQueryArgs: Yup.array()
     .of(Yup.string().required("Argument name is required"))
     .optional(), // Optional array of arguments
   runOnLoad: Yup.boolean(),
 });
 
 formValidations.queryUpdationFormValidationSchema = Yup.object().shape({
-  databaseQueryTitle: Yup.string()
+  dataQueryTitle: Yup.string()
     .required("Query title is required")
     .min(3, "Query title must be at least 3 characters"),
 
-  databaseQueryArgs: Yup.array()
+  dataQueryArgs: Yup.array()
     .of(Yup.string().required("Argument name is required"))
     .optional(), // Optional array of arguments
   runOnLoad: Yup.boolean(),
@@ -133,37 +132,37 @@ formValidations.cronJobAdditionFormValidationSchema = Yup.object().shape({
   cronJobTitle: Yup.string().required("Cron job title is required"),
   cronJobDescription: Yup.string().optional(),
   cronJobSchedule: Yup.string().required("Cron schedule is required"),
-  databaseQueryID: Yup.string().required("Database query is required"),
+  dataQueryID: Yup.string().required("Database query is required"),
 });
 
 formValidations.cronJobUpdationFormValidationSchema = Yup.object().shape({
   cronJobTitle: Yup.string().required("Cron job title is required"),
   cronJobDescription: Yup.string().optional(),
   cronJobSchedule: Yup.string().required("Cron schedule is required"),
-  databaseQueryID: Yup.string().required("Database query is required"),
+  dataQueryID: Yup.string().required("Database query is required"),
 });
 
-formValidations.databaseQueryArgsFormValidationSchema = (databaseQueryArgs) =>
+formValidations.dataQueryArgsFormValidationSchema = (dataQueryArgs) =>
   Yup.object().shape(
-    databaseQueryArgs.reduce((acc, arg) => {
+    dataQueryArgs.reduce((acc, arg) => {
       acc[arg] = Yup.string().required(`${arg} is required`);
       return acc;
     }, {})
   );
 
-formValidations.datasetArgumentsFormValidationSchema = (databaseQueryArgs) => {
-  const databaseQueryArgValuesSchema = {};
+formValidations.datasetArgumentsFormValidationSchema = (dataQueryArgs) => {
+  const dataQueryArgValuesSchema = {};
 
   // Dynamically create validation rules for each argument
-  databaseQueryArgs?.forEach((arg) => {
+  dataQueryArgs?.forEach((arg) => {
     const argName = arg.replace(/[{}]/g, ""); // Remove curly braces if present
-    databaseQueryArgValuesSchema[argName] = Yup.string()
+    dataQueryArgValuesSchema[argName] = Yup.string()
       .required(`Value for ${argName} is required`)
       .min(1, `Value for ${argName} cannot be empty`);
   });
 
   return Yup.object().shape({
-    databaseQueryArgValues: Yup.object().shape(databaseQueryArgValuesSchema),
+    dataQueryArgValues: Yup.object().shape(dataQueryArgValuesSchema),
   });
 };
 
@@ -183,58 +182,9 @@ formValidations.datasetFieldMappingFormValidationSchema = (datasetFields) => {
   });
 };
 
-formValidations.addDatabaseChartFormValidationSchema = Yup.object().shape({
-  databaseChartName: Yup.string().required("Chart name is required"),
-  databaseChartType: Yup.string().required("Chart type is required"),
-  queries: Yup.array()
-    .of(
-      Yup.object().shape({
-        databaseQueryID: Yup.string().required("Query is required"),
-        title: Yup.string()
-          .required("Alias is required")
-          .test("unique-alias", "Alias must be unique", function (value) {
-            const aliases = this.parent.map((q) => q.title);
-            return aliases.filter((a) => a === value).length === 1;
-          }),
-      })
-    )
-    .min(1, "At least 1 query required"),
-});
-
-formValidations.updateDatabaseChartFormValidationSchema = Yup.object().shape({
-  databaseChartName: Yup.string().required("Chart name is required"),
-  databaseChartType: Yup.string().required("Chart type is required"),
-  queries: Yup.array()
-    .of(
-      Yup.object().shape({
-        databaseQueryID: Yup.string().required("Query is required"),
-        title: Yup.string()
-          .required("Alias is required")
-          .test("unique-alias", "Alias must be unique", function (value) {
-            const aliases = this.parent.map((q) => q.title);
-            return aliases.filter((a) => a === value).length === 1;
-          }),
-      })
-    )
-    .min(1, "At least 1 query required"),
-});
-
 formValidations.datasetAdvancedOptionsFormValidationSchema = Yup.object().shape(
   {
-    type: Yup.string()
-      .required("Chart type is required")
-      .oneOf(
-        [
-          CONSTANTS.DATABASE_CHART_TYPES.LINE_CHART.value,
-          CONSTANTS.DATABASE_CHART_TYPES.BAR_CHART.value,
-          CONSTANTS.DATABASE_CHART_TYPES.PIE_CHART.value,
-          CONSTANTS.DATABASE_CHART_TYPES.BUBBLE_CHART.value,
-          CONSTANTS.DATABASE_CHART_TYPES.RADAR_CHART.value,
-          CONSTANTS.DATABASE_CHART_TYPES.POLAR_AREA.value,
-          CONSTANTS.DATABASE_CHART_TYPES.SCATTER_CHART.value,
-        ],
-        "Invalid chart type"
-      ),
+    type: Yup.string().required("Widget type is required"),
     xAxisID: Yup.string().required("X-axis ID is required"),
     yAxisID: Yup.string().required("Y-axis ID is required"),
     hidden: Yup.boolean(),
@@ -326,13 +276,13 @@ formValidations.triggerAdditionFormValidationSchema = Yup.object().shape({
   forEach: Yup.string().required("For each option is required"),
 });
 
-formValidations.addDatabaseWidgetFormValidationSchema = Yup.object().shape({
-  databaseWidgetName: Yup.string().required("Widget name is required"),
-  databaseWidgetType: Yup.string().required("Widget type is required"),
+formValidations.addWidgetFormValidationSchema = Yup.object().shape({
+  widgetName: Yup.string().required("Widget name is required"),
+  widgetType: Yup.string().required("Widget type is required"),
   queries: Yup.array()
     .of(
       Yup.object().shape({
-        databaseQueryID: Yup.string().required("Query is required"),
+        dataQueryID: Yup.string().required("Query is required"),
         title: Yup.string()
           .required("Alias is required")
           .test("unique-alias", "Alias must be unique", function (value) {
@@ -344,13 +294,13 @@ formValidations.addDatabaseWidgetFormValidationSchema = Yup.object().shape({
     .min(1, "At least 1 query required"),
 });
 
-formValidations.updateDatabaseWidgetFormValidationSchema = Yup.object().shape({
-  databaseWidgetName: Yup.string().required("Widget name is required"),
-  databaseWidgetType: Yup.string().required("Widget type is required"),
+formValidations.updateWidgetFormValidationSchema = Yup.object().shape({
+  widgetName: Yup.string().required("Widget name is required"),
+  widgetType: Yup.string().required("Widget type is required"),
   queries: Yup.array()
     .of(
       Yup.object().shape({
-        databaseQueryID: Yup.string().required("Query is required"),
+        dataQueryID: Yup.string().required("Query is required"),
         title: Yup.string()
           .required("Alias is required")
           .test("unique-alias", "Alias must be unique", function (value) {
@@ -367,5 +317,3 @@ formValidations.datasourceAdditionFormValidationSchema = Yup.object().shape({
   datasourceDescription: Yup.string().optional(),
   datasourceType: Yup.string().required("Datasource type is required"),
 });
-
-

@@ -9,7 +9,7 @@ export const CronJobEditor = ({ cronJobEditorForm }) => {
   CronJobEditor.propTypes = {
     cronJobEditorForm: PropTypes.object.isRequired,
   };
-  const { databaseQueries } = useCronJobsState();
+  const { dataQueries } = useCronJobsState();
   const _handleOnScheduleChange = useCallback(
     (value) => {
       cronJobEditorForm?.setFieldValue("cronJobSchedule", value);
@@ -17,14 +17,14 @@ export const CronJobEditor = ({ cronJobEditorForm }) => {
     [cronJobEditorForm]
   );
   const selectedQuery = useMemo(() => {
-    return databaseQueries
-      ? databaseQueries.find(
+    return dataQueries
+      ? dataQueries.find(
           (q) =>
-            parseInt(q.databaseQueryID) ===
-            parseInt(cronJobEditorForm.values?.databaseQueryID || 0)
+            parseInt(q.dataQueryID) ===
+            parseInt(cronJobEditorForm.values?.dataQueryID || 0)
         )
       : null;
-  }, [databaseQueries, cronJobEditorForm.values]);
+  }, [dataQueries, cronJobEditorForm.values]);
 
   return (
     <div className="w-full flex flex-col justify-start items-stretch gap-2">
@@ -57,9 +57,9 @@ export const CronJobEditor = ({ cronJobEditorForm }) => {
           {CONSTANTS.STRINGS.CRON_JOB_EDITOR_FORM_QUERY_ID_FIELD_LABEL}
         </label>
         <select
-          name={`databaseQueryID`}
-          id={`databaseQueryID`}
-          value={cronJobEditorForm.values.databaseQueryID || ""}
+          name={`dataQueryID`}
+          id={`dataQueryID`}
+          value={cronJobEditorForm.values.dataQueryID || ""}
           onChange={cronJobEditorForm.handleChange}
           onBlur={cronJobEditorForm.handleBlur}
           className={`placeholder:text-slate-400 text-xs bg-slate-50 border ${"border-slate-300"} text-slate-700 rounded focus:outline-none focus:border-slate-400 block w-full py-1 px-1.5`}
@@ -67,25 +67,25 @@ export const CronJobEditor = ({ cronJobEditorForm }) => {
           <option value="" disabled selected>
             Select query dataset
           </option>
-          {databaseQueries?.map((databaseQuery) => (
+          {dataQueries?.map((dataQuery) => (
             <option
-              key={`database_query_item_${databaseQuery.databaseQueryID}`}
-              value={databaseQuery.databaseQueryID}
+              key={`database_query_item_${dataQuery.dataQueryID}`}
+              value={dataQuery.dataQueryID}
             >
-              {databaseQuery.databaseQueryTitle}
+              {dataQuery.dataQueryTitle}
             </option>
           ))}
         </select>
       </div>
-      {selectedQuery?.databaseQueryOptions?.databaseQueryArgs?.length > 0 && (
+      {selectedQuery?.dataQueryOptions?.dataQueryArgs?.length > 0 && (
         <div>
           <label className="block mb-1 text-xs font-medium text-slate-500">
             {CONSTANTS.STRINGS.CRON_JOB_EDITOR_FORM_QUERY_ARGUMENTS_LABEL}
           </label>
           <div className="space-y-2">
-            {selectedQuery.databaseQueryOptions.databaseQueryArgs.map((arg) => {
+            {selectedQuery.dataQueryOptions.dataQueryArgs.map((arg) => {
               const argName = arg.replace(/[{}]/g, "");
-              const key = `databaseQueryArgValues.${argName}`;
+              const key = `dataQueryArgValues.${argName}`;
               return (
                 <div key={key}>
                   <input
@@ -96,9 +96,8 @@ export const CronJobEditor = ({ cronJobEditorForm }) => {
                     className="placeholder:text-slate-400 text-xs w-full bg-slate-50 border border-slate-300 text-slate-700 rounded focus:outline-none focus:border-slate-400 block px-2.5 py-1.5"
                     placeholder={`Value for ${argName}`}
                     value={
-                      cronJobEditorForm.values.databaseQueryArgValues?.[
-                        argName
-                      ] || ""
+                      cronJobEditorForm.values.dataQueryArgValues?.[argName] ||
+                      ""
                     }
                     onChange={cronJobEditorForm.handleChange}
                     onBlur={cronJobEditorForm.handleBlur}

@@ -5,9 +5,8 @@ const { tenantMiddleware } = require("./tenant.middleware");
 const { authMiddleware } = require("../auth/auth.middleware");
 const databaseRouter = require("../database/database.v1.routes");
 const datasourceRouter = require("../datasource/datasource.v1.routes");
-const databaseQueryRouter = require("../databaseQuery/databaseQuery.v1.routes");
-const databaseChartRouter = require("../databaseChart/databaseChart.v1.routes");
-const databaseWidgetRouter = require("../databaseWidget/databaseWidget.v1.routes");
+const dataQueryRouter = require("../dataQuery/dataQuery.v1.routes");
+const widgetRouter = require("../widget/widget.v1.routes");
 const databaseDashboardRouter = require("../databaseDashboard/databaseDashboard.v1.routes");
 const userManagementRouter = require("../userManagement/userManagement.v1.route");
 const tenantRoleRouter = require("../tenantRole/tenantRole.v1.route");
@@ -127,21 +126,14 @@ router.use(
   "/:tenantID/queries",
   authMiddleware.checkUserPermissions(["tenant:query"]),
   tenantMiddleware.poolProvider,
-  databaseQueryRouter
-);
-
-router.use(
-  "/:tenantID/charts",
-  authMiddleware.checkUserPermissions(["tenant:chart"]),
-  tenantMiddleware.poolProvider,
-  databaseChartRouter
+  dataQueryRouter
 );
 
 router.use(
   "/:tenantID/widgets",
   authMiddleware.checkUserPermissions(["tenant:widget"]),
   tenantMiddleware.poolProvider,
-  databaseWidgetRouter
+  widgetRouter
 );
 
 router.use(

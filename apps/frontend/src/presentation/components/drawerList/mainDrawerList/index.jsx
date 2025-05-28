@@ -1,7 +1,10 @@
+// DrawerLinkItem.jsx
+import { capitalize } from "@mui/material";
+import { Link, useLocation } from "react-router-dom";
+// MainDrawerList.jsx (Updated)
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import SettingsIcon from "@mui/icons-material/Settings";
-import { capitalize } from "@mui/material";
 import { useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { BiLogoPostgresql } from "react-icons/bi";
@@ -16,7 +19,8 @@ import {
 } from "react-icons/md";
 import { RiCalendarScheduleFill, RiDashboardFill } from "react-icons/ri";
 import { SiQuantconnect } from "react-icons/si";
-import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
+import { TbCloudDataConnection } from "react-icons/tb";
+import { useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../../constants";
 import { getDatabaseMetadataAPI } from "../../../../data/apis/database";
 import { useAuthState } from "../../../../logic/contexts/authContext";
@@ -24,10 +28,139 @@ import { useTenantState } from "../../../../logic/contexts/tenantContext";
 import { useComponentSize } from "../../../../logic/hooks/useComponentSize";
 import { TenantSelectionDropdown } from "../../tenantComponents/tenantSelectionDropdown";
 import { NoEntityUI } from "../../ui/noEntityUI";
-import { TbCloudDataConnection } from "react-icons/tb";
+import PropTypes from "prop-types";
+
+// eslint-disable-next-line no-unused-vars
+const DrawerLinkItem = ({ item, tenantID }) => {
+  DrawerLinkItem.propTypes = {
+    item: PropTypes.object.isRequired,
+    tenantID: PropTypes.number.isRequired,
+  };
+  const location = useLocation();
+  const isActive = decodeURIComponent(location.pathname).includes(item.path);
+
+  return (
+    <Link
+      to={item.path}
+      className={`flex items-center ${
+        isActive ? "bg-[#eaebff]" : "bg-slate-100"
+      } rounded w-full p-2 text-slate-700 transition duration-75 group bg-slate-200  hover:bg-slate-100  flex-row !justify-start`}
+    >
+      <item.icon
+        className={`!w-5 !h-5 ${
+          isActive ? "!text-[#646cff]" : "!text-slate-700"
+        }`}
+      />
+      <span
+        className={`font-semibold text-sm ml-2 ${
+          isActive ? "!text-[#646cff]" : "!text-slate-700"
+        }`}
+      >
+        {capitalize(item.title)}
+      </span>
+    </Link>
+  );
+};
+// eslint-disable-next-line no-unused-vars
+const DrawerSubMenuItem = ({ subItem, tenantID }) => {
+  DrawerSubMenuItem.propTypes = {
+    subItem: PropTypes.object.isRequired,
+    tenantID: PropTypes.number.isRequired,
+  };
+  const location = useLocation();
+  const isActive = decodeURIComponent(location.pathname).includes(subItem.path);
+
+  return (
+    <Link
+      to={subItem.path}
+      className={`flex items-center ${
+        isActive ? "bg-[#eaebff]" : "bg-slate-100"
+      } rounded mb-2 w-full p-2 text-slate-700 transition duration-75 group hover:bg-[#eaebff]  flex-row justify-start `}
+    >
+      <subItem.icon
+        fontSize="small"
+        className={`${isActive ? "!text-[#646cff]" : "!text-slate-700"}`}
+      />
+      <span
+        className={` font-semisolid text-sm ml-1 ${
+          isActive ? "!text-[#646cff]" : "!text-slate-700"
+        }`}
+      >
+        {capitalize(subItem.name)}
+      </span>
+    </Link>
+  );
+};
+
+const DrawerCollapsibleItem = ({
+  item,
+  isExpanded,
+  setExpanded,
+  isLoadingMetadata,
+  isFetchingMetadata,
+  tenantID,
+}) => {
+  DrawerCollapsibleItem.propTypes = {
+    item: PropTypes.object.isRequired,
+    isExpanded: PropTypes.bool.isRequired,
+    setExpanded: PropTypes.func.isRequired,
+    isLoadingMetadata: PropTypes.bool.isRequired,
+    isFetchingMetadata: PropTypes.bool.isRequired,
+    tenantID: PropTypes.number.isRequired,
+  };
+  return (
+    <div>
+      <button
+        type="button"
+        className="w-full hover:border-none border-none text-slate-900 bg-slate-200 justify-between hover:bg-slate-100 focus:outline-none  font-medium rounded text-sm px-1 py-2 text-center inline-flex items-center"
+        onClick={() => setExpanded()}
+      >
+        <item.icon className="!w-5 !h-5 !text-slate-600 ml-1" />
+        <span className="flex-1 ms-2 text-left font-semibold rtl:text-right whitespace-nowrap text-slate-700">
+          {item.title}
+        </span>
+        {isExpanded ? (
+          <KeyboardArrowUpIcon fontSize="small" />
+        ) : (
+          <KeyboardArrowDownIcon fontSize="small" />
+        )}
+      </button>
+      {isExpanded && (
+        <ul className=" space-y-2 rounded mt-2">
+          <li>
+            {isLoadingMetadata || isFetchingMetadata ? (
+              <div role="status" className=" animate-pulse">
+                <div className="h-8 bg-gray-200 rounded    mb-2"></div>
+                <div className="h-8 bg-gray-200 rounded    mb-2"></div>
+                <div className="h-8 bg-gray-200 rounded    mb-2"></div>
+                <div className="h-8 bg-gray-200 rounded    mb-2"></div>
+              </div>
+            ) : (
+              item.subItems.map((subItem, subIndex) => (
+                <DrawerSubMenuItem
+                  key={subIndex}
+                  subItem={subItem}
+                  tenantID={tenantID}
+                />
+              ))
+            )}
+            {item.addButton && (
+              <button
+                onClick={item.addButton.onClick}
+                className="flex mt-2 flex-row items-center justify-center rounded bg-[#646cff]/10 px-3 py-1.5 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50 w-full outline-none focus:outline-none"
+              >
+                <item.addButton.icon className="!w-4 !h-4 !text-[#646cff] mr-1" />
+                {item.addButton.text}
+              </button>
+            )}
+          </li>
+        </ul>
+      )}
+    </div>
+  );
+};
 
 export const MainDrawerList = () => {
-  const location = useLocation();
   const navigate = useNavigate();
   const { user } = useAuthState();
   const { isLoadingTenants, tenants } = useTenantState();
@@ -63,6 +196,91 @@ export const MainDrawerList = () => {
     navigate(CONSTANTS.ROUTES.ADD_SCHEMA.path(tenantID));
   };
 
+  // Define the drawer list items as an array of objects
+  const drawerListItems = [
+    {
+      type: "collapsible",
+      title: CONSTANTS.STRINGS.MAIN_DRAWER_DATABASE_TITLE,
+      icon: BsServer,
+      expandedStateKey: "databaseSchema",
+      subItems:
+        databaseMetadata?.schemas?.map((schema) => ({
+          name: capitalize(schema.databaseSchemaName),
+          path: CONSTANTS.ROUTES.VIEW_SCHEMA.path(
+            parseInt(tenantID),
+            schema.databaseSchemaName
+          ),
+          icon: MdOutlineSchema,
+        })) || [],
+      addButton: {
+        text: CONSTANTS.STRINGS.MAIN_DRAWER_ADD_DATABASE_SCHEMA_BUTTON,
+        onClick: _navigateToAddDatabaseSchema,
+        icon: FaPlus,
+      },
+    },
+    {
+      type: "link",
+      title: CONSTANTS.STRINGS.MAIN_DRAWER_DATASOURCE_TITLE,
+      icon: TbCloudDataConnection,
+      path: CONSTANTS.ROUTES.VIEW_DATASOURCES.path(tenantID),
+    },
+    {
+      type: "link",
+      title: CONSTANTS.STRINGS.MAIN_DRAWER_QUERIES_TITLE,
+      icon: SiQuantconnect,
+      path: CONSTANTS.ROUTES.VIEW_QUERIES.path(tenantID),
+    },
+
+    {
+      type: "link",
+      title: CONSTANTS.STRINGS.MAIN_DRAWER_WIDGETS_TITLE,
+      icon: MdWidgets,
+      path: CONSTANTS.ROUTES.VIEW_WIDGETS.path(tenantID),
+    },
+    {
+      type: "link",
+      title: CONSTANTS.STRINGS.MAIN_DRAWER_DATABASE_DASHBOARDS_TITLE,
+      icon: RiDashboardFill,
+      path: CONSTANTS.ROUTES.VIEW_DATABASE_DASHBOARDS.path(tenantID),
+    },
+    {
+      type: "link",
+      title: CONSTANTS.STRINGS.MAIN_DRAWER_API_KEYS_TITLE,
+      icon: FaKey,
+      path: CONSTANTS.ROUTES.VIEW_API_KEYS.path(tenantID),
+    },
+    {
+      type: "link",
+      title: CONSTANTS.STRINGS.MAIN_DRAWER_CRON_JOBS_TITLE,
+      icon: RiCalendarScheduleFill,
+      path: CONSTANTS.ROUTES.VIEW_CRON_JOBS.path(tenantID),
+    },
+    {
+      type: "link",
+      title: CONSTANTS.STRINGS.MAIN_DRAWER_SQL_EDITOR_TITLE,
+      icon: BiLogoPostgresql,
+      path: CONSTANTS.ROUTES.RAW_SQL_QUERY.path(tenantID),
+    },
+    {
+      type: "collapsible",
+      title: CONSTANTS.STRINGS.MAIN_DRAWER_USER_MANAGEMENT_TITLE,
+      icon: FaUserCog,
+      expandedStateKey: "userManagement",
+      subItems: [
+        {
+          name: "Users",
+          path: CONSTANTS.ROUTES.VIEW_TENANT_USERS.path(tenantID),
+          icon: FiUsers,
+        },
+        {
+          name: "Roles and permissions",
+          path: CONSTANTS.ROUTES.VIEW_TENANT_ROLES.path(tenantID),
+          icon: MdOutlineLockPerson,
+        },
+      ],
+    },
+  ];
+
   return (
     <aside
       id="logo-sidebar"
@@ -70,7 +288,7 @@ export const MainDrawerList = () => {
       aria-label="Sidebar"
       ref={ref}
     >
-      <div className="h-full p-2 overflow-y-auto bg-white">
+      <div className="h-full p-2 overflow-y-auto bg-white flex flex-col justify-start items-stretch gap-2">
         {isLoadingTenants ? (
           <div
             role="status"
@@ -78,9 +296,9 @@ export const MainDrawerList = () => {
           >
             <div className="h-10 bg-gray-200 w-10 rounded-md"></div>
             <div className="flex flex-col justify-start items-start flex-grow ms-2">
-              <div className="h-2 bg-gray-200 rounded   mb-2 w-16"></div>
-              <div className="h-2 bg-gray-200 rounded   mb-2 w-full"></div>
-              <div className="h-2 bg-gray-200 rounded   mb-0 w-full"></div>
+              <div className="h-2 bg-gray-200 rounded    mb-2 w-16"></div>
+              <div className="h-2 bg-gray-200 rounded    mb-2 w-full"></div>
+              <div className="h-2 bg-gray-200 rounded    mb-0 w-full"></div>
             </div>
           </div>
         ) : tenants && tenants.length > 0 ? (
@@ -112,442 +330,32 @@ export const MainDrawerList = () => {
 
         {tenantID ? (
           <>
-            <button
-              type="button"
-              className={
-                "w-full hover:border-none border-none mt-2 text-slate-900 bg-slate-200 justify-between hover:bg-slate-100 focus:outline-none  font-medium rounded text-sm px-1 py-2 text-center inline-flex items-center"
+            {drawerListItems.map((item, index) => {
+              if (item.type === "collapsible") {
+                return (
+                  <DrawerCollapsibleItem
+                    key={index}
+                    item={item}
+                    isExpanded={menuItemExpandedState[item.expandedStateKey]}
+                    setExpanded={() =>
+                      setMenuItemExpandedState((prevState) => ({
+                        ...prevState,
+                        [item.expandedStateKey]:
+                          !prevState[item.expandedStateKey],
+                      }))
+                    }
+                    isLoadingMetadata={isLoadingDatabaseMetadata}
+                    isFetchingMetadata={isFetchingDatabaseMetadata}
+                    tenantID={tenantID}
+                  />
+                );
+              } else if (item.type === "link") {
+                return (
+                  <DrawerLinkItem key={index} item={item} tenantID={tenantID} />
+                );
               }
-              onClick={() =>
-                setMenuItemExpandedState({
-                  ...menuItemExpandedState,
-                  databaseSchema: !menuItemExpandedState.databaseSchema,
-                })
-              }
-            >
-              <BsServer className="!w-5 !h-5 !text-slate-600 ml-1" />
-              <span className="flex-1 ms-2 text-left font-semibold rtl:text-right whitespace-nowrap text-slate-700">
-                {CONSTANTS.STRINGS.MAIN_DRAWER_DATABASE_TITLE}
-              </span>
-              {menuItemExpandedState.databaseSchema ? (
-                <KeyboardArrowUpIcon fontSize="small" />
-              ) : (
-                <KeyboardArrowDownIcon fontSize="small" />
-              )}
-            </button>
-            {menuItemExpandedState.databaseSchema && (
-              <ul className=" space-y-2 rounded mt-2">
-                <li className="">
-                  {isLoadingDatabaseMetadata || isFetchingDatabaseMetadata ? (
-                    <div role="status" className=" animate-pulse">
-                      <div className="h-8 bg-gray-200 rounded   mb-2"></div>
-                      <div className="h-8 bg-gray-200 rounded   mb-2"></div>
-                      <div className="h-8 bg-gray-200 rounded   mb-2"></div>
-                      <div className="h-8 bg-gray-200 rounded   mb-2"></div>
-                    </div>
-                  ) : (
-                    databaseMetadata?.schemas?.map((schema) => {
-                      const isActive = decodeURIComponent(location.pathname)
-                        .split("/")
-                        .includes(schema.databaseSchemaName);
-                      return (
-                        <>
-                          <Link
-                            to={CONSTANTS.ROUTES.VIEW_SCHEMA.path(
-                              parseInt(tenantID),
-                              schema.databaseSchemaName
-                            )}
-                            key={CONSTANTS.ROUTES.VIEW_SCHEMA.path(
-                              parseInt(tenantID),
-                              schema.databaseSchemaName
-                            )}
-                            className={`flex items-center ${
-                              isActive ? "bg-[#eaebff]" : "bg-slate-100"
-                            } rounded mb-2 w-full p-2 text-slate-700 transition duration-75 group hover:bg-[#eaebff]  flex-row justify-start `}
-                          >
-                            <MdOutlineSchema
-                              fontSize="small"
-                              className={`${
-                                isActive ? "!text-[#646cff]" : "!text-slate-700"
-                              }`}
-                            />
-                            <span
-                              className={` font-semisolid text-sm ml-1 ${
-                                isActive ? "!text-[#646cff]" : "!text-slate-700"
-                              }`}
-                            >
-                              {capitalize(schema.databaseSchemaName)}
-                            </span>
-                          </Link>
-                        </>
-                      );
-                    })
-                  )}
-
-                  <button
-                    onClick={_navigateToAddDatabaseSchema}
-                    className="flex mt-2 flex-row items-center justify-center rounded bg-[#646cff]/10 px-3 py-1.5 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50 w-full outline-none focus:outline-none"
-                  >
-                    <FaPlus className="!w-4 !h-4 !text-[#646cff] mr-1" />
-                    {CONSTANTS.STRINGS.MAIN_DRAWER_ADD_DATABASE_SCHEMA_BUTTON}
-                  </button>
-                </li>
-              </ul>
-            )}
-            <Link
-              to={CONSTANTS.ROUTES.VIEW_DATASOURCES.path(tenantID)}
-              key={CONSTANTS.ROUTES.VIEW_DATASOURCES.path(tenantID)}
-              className={`flex items-center ${
-                decodeURIComponent(location.pathname).includes(
-                  CONSTANTS.ROUTES.VIEW_DATASOURCES.path(tenantID)
-                )
-                  ? "bg-[#eaebff]"
-                  : "bg-slate-100"
-              } rounded mb-2 w-full p-2 text-slate-700 transition duration-75 group bg-slate-200  hover:bg-slate-100  flex-row !justify-start mt-2 `}
-            >
-              <TbCloudDataConnection
-                className={`!w-5 !h-5 ${
-                  decodeURIComponent(location.pathname).includes(
-                    CONSTANTS.ROUTES.VIEW_DATASOURCES.path(tenantID)
-                  )
-                    ? "!text-[#646cff]"
-                    : "!text-slate-700"
-                }`}
-              />
-              <span
-                className={`font-semibold text-sm ml-2 ${
-                  decodeURIComponent(location.pathname).includes(
-                    CONSTANTS.ROUTES.VIEW_DATASOURCES.path(tenantID)
-                  )
-                    ? "!text-[#646cff]"
-                    : "!text-slate-700"
-                }`}
-              >
-                {capitalize(CONSTANTS.STRINGS.MAIN_DRAWER_DATASOURCE_TITLE)}
-              </span>
-            </Link>
-            <Link
-              to={CONSTANTS.ROUTES.VIEW_DATABASE_DASHBOARDS.path(tenantID)}
-              key={CONSTANTS.ROUTES.VIEW_DATABASE_DASHBOARDS.path(tenantID)}
-              className={`flex items-center ${
-                decodeURIComponent(location.pathname).includes(
-                  CONSTANTS.ROUTES.VIEW_DATABASE_DASHBOARDS.path(tenantID)
-                )
-                  ? "bg-[#eaebff]"
-                  : "bg-slate-100"
-              } rounded mb-2 w-full p-2 text-slate-700 transition duration-75 group bg-slate-200  hover:bg-slate-100  flex-row !justify-start mt-2 `}
-            >
-              <RiDashboardFill
-                className={`!w-5 !h-5 ${
-                  decodeURIComponent(location.pathname).includes(
-                    CONSTANTS.ROUTES.VIEW_DATABASE_DASHBOARDS.path(tenantID)
-                  )
-                    ? "!text-[#646cff]"
-                    : "!text-slate-700"
-                }`}
-              />
-              <span
-                className={`font-semibold text-sm ml-2 ${
-                  decodeURIComponent(location.pathname).includes(
-                    CONSTANTS.ROUTES.VIEW_DATABASE_DASHBOARDS.path(tenantID)
-                  )
-                    ? "!text-[#646cff]"
-                    : "!text-slate-700"
-                }`}
-              >
-                {capitalize(
-                  CONSTANTS.STRINGS.MAIN_DRAWER_DATABASE_DASHBOARDS_TITLE
-                )}
-              </span>
-            </Link>
-
-            <Link
-              to={CONSTANTS.ROUTES.VIEW_DATABASE_WIDGETS.path(tenantID)}
-              key={CONSTANTS.ROUTES.VIEW_DATABASE_WIDGETS.path(tenantID)}
-              className={`flex items-center ${
-                decodeURIComponent(location.pathname).includes(
-                  CONSTANTS.ROUTES.VIEW_DATABASE_WIDGETS.path(tenantID)
-                )
-                  ? "bg-[#eaebff]"
-                  : "bg-slate-100"
-              } rounded mb-2 w-full p-2 text-slate-700 transition duration-75 group bg-slate-200  hover:bg-slate-100  flex-row !justify-start mt-2 `}
-            >
-              <MdWidgets
-                className={`!w-5 !h-5 ${
-                  decodeURIComponent(location.pathname).includes(
-                    CONSTANTS.ROUTES.VIEW_DATABASE_WIDGETS.path(tenantID)
-                  )
-                    ? "!text-[#646cff]"
-                    : "!text-slate-700"
-                }`}
-              />
-              <span
-                className={`font-semibold text-sm ml-2 ${
-                  decodeURIComponent(location.pathname).includes(
-                    CONSTANTS.ROUTES.VIEW_DATABASE_WIDGETS.path(tenantID)
-                  )
-                    ? "!text-[#646cff]"
-                    : "!text-slate-700"
-                }`}
-              >
-                {capitalize(
-                  CONSTANTS.STRINGS.MAIN_DRAWER_DATABASE_WIDGETS_TITLE
-                )}
-              </span>
-            </Link>
-            <Link
-              to={CONSTANTS.ROUTES.VIEW_DATABASE_QUERIES.path(tenantID)}
-              key={CONSTANTS.ROUTES.VIEW_DATABASE_QUERIES.path(tenantID)}
-              className={`flex items-center ${
-                decodeURIComponent(location.pathname).includes(
-                  CONSTANTS.ROUTES.VIEW_DATABASE_QUERIES.path(tenantID)
-                )
-                  ? "bg-[#eaebff]"
-                  : "bg-slate-100"
-              } rounded mb-2 w-full p-2 text-slate-700 transition duration-75 group bg-slate-200  hover:bg-slate-100  flex-row !justify-start mt-2 `}
-            >
-              <SiQuantconnect
-                className={`!w-5 !h-5 ${
-                  decodeURIComponent(location.pathname).includes(
-                    CONSTANTS.ROUTES.VIEW_DATABASE_QUERIES.path(tenantID)
-                  )
-                    ? "!text-[#646cff]"
-                    : "!text-slate-700"
-                }`}
-              />
-              <span
-                className={`font-semibold text-sm ml-2 ${
-                  decodeURIComponent(location.pathname).includes(
-                    CONSTANTS.ROUTES.VIEW_DATABASE_QUERIES.path(tenantID)
-                  )
-                    ? "!text-[#646cff]"
-                    : "!text-slate-700"
-                }`}
-              >
-                {capitalize(
-                  CONSTANTS.STRINGS.MAIN_DRAWER_DATABASE_QUERIES_TITLE
-                )}
-              </span>
-            </Link>
-
-            {/* <Link
-              to={CONSTANTS.ROUTES.VIEW_DATABASE_NOTIFICATIONS.path(tenantID)}
-              key={CONSTANTS.ROUTES.VIEW_DATABASE_NOTIFICATIONS.path(tenantID)}
-              className={`flex items-center ${
-                decodeURIComponent(location.pathname).includes(
-                  CONSTANTS.ROUTES.VIEW_DATABASE_NOTIFICATIONS.path(tenantID)
-                )
-                  ? "bg-[#eaebff]"
-                  : "bg-slate-100"
-              } rounded mb-2 w-full p-2 text-slate-700 transition duration-75 group bg-slate-200  hover:bg-slate-100  flex-row !justify-start mt-2 `}
-            >
-              <MdNotifications className="!w-5 !h-5 !text-slate-600" />
-              <span
-                className={`font-semibold text-sm ml-2 ${
-                  decodeURIComponent(location.pathname).includes(
-                    CONSTANTS.ROUTES.VIEW_DATABASE_NOTIFICATIONS.path(tenantID)
-                  )
-                    ? "!text-[#646cff]"
-                    : "!text-slate-700"
-                }`}
-              >
-                {capitalize(
-                  CONSTANTS.STRINGS.MAIN_DRAWER_DATABASE_NOTIFICATIONS_TITLE
-                )}
-              </span>
-            </Link> */}
-
-            <Link
-              to={CONSTANTS.ROUTES.VIEW_API_KEYS.path(tenantID)}
-              key={CONSTANTS.ROUTES.VIEW_API_KEYS.path(tenantID)}
-              className={`flex items-center ${
-                decodeURIComponent(location.pathname).includes(
-                  CONSTANTS.ROUTES.VIEW_API_KEYS.path(tenantID)
-                )
-                  ? "bg-[#eaebff]"
-                  : "bg-slate-100"
-              } rounded mb-2 w-full p-2 text-slate-700 transition duration-75 group bg-slate-200  hover:bg-slate-100  flex-row !justify-start mt-2 `}
-            >
-              <FaKey
-                className={`!w-5 !h-5 ${
-                  decodeURIComponent(location.pathname).includes(
-                    CONSTANTS.ROUTES.VIEW_API_KEYS.path(tenantID)
-                  )
-                    ? "!text-[#646cff]"
-                    : "!text-slate-700"
-                }`}
-              />
-              <span
-                className={`font-semibold text-sm ml-2 ${
-                  decodeURIComponent(location.pathname).includes(
-                    CONSTANTS.ROUTES.VIEW_API_KEYS.path(tenantID)
-                  )
-                    ? "!text-[#646cff]"
-                    : "!text-slate-700"
-                }`}
-              >
-                {capitalize(CONSTANTS.STRINGS.MAIN_DRAWER_API_KEYS_TITLE)}
-              </span>
-            </Link>
-
-            <Link
-              to={CONSTANTS.ROUTES.VIEW_CRON_JOBS.path(tenantID)}
-              key={CONSTANTS.ROUTES.VIEW_CRON_JOBS.path(tenantID)}
-              className={`flex items-center ${
-                decodeURIComponent(location.pathname).includes(
-                  CONSTANTS.ROUTES.VIEW_CRON_JOBS.path(tenantID)
-                )
-                  ? "bg-[#eaebff]"
-                  : "bg-slate-100"
-              } rounded mb-2 w-full p-2 text-slate-700 transition duration-75 group bg-slate-200  hover:bg-slate-100  flex-row !justify-start mt-2 `}
-            >
-              <RiCalendarScheduleFill
-                className={`!w-5 !h-5 ${
-                  decodeURIComponent(location.pathname).includes(
-                    CONSTANTS.ROUTES.VIEW_CRON_JOBS.path(tenantID)
-                  )
-                    ? "!text-[#646cff]"
-                    : "!text-slate-700"
-                }`}
-              />
-              <span
-                className={`font-semibold text-sm ml-2 ${
-                  decodeURIComponent(location.pathname).includes(
-                    CONSTANTS.ROUTES.VIEW_CRON_JOBS.path(tenantID)
-                  )
-                    ? "!text-[#646cff]"
-                    : "!text-slate-700"
-                }`}
-              >
-                {capitalize(CONSTANTS.STRINGS.MAIN_DRAWER_CRON_JOBS_TITLE)}
-              </span>
-            </Link>
-
-            <Link
-              to={CONSTANTS.ROUTES.RAW_SQL_QUERY.path(tenantID)}
-              key={CONSTANTS.ROUTES.RAW_SQL_QUERY.path(tenantID)}
-              className={`flex items-center ${
-                decodeURIComponent(location.pathname).includes(
-                  CONSTANTS.ROUTES.RAW_SQL_QUERY.path(tenantID)
-                )
-                  ? "bg-[#eaebff]"
-                  : "bg-slate-100"
-              } rounded mb-2 w-full p-2 text-slate-700 transition duration-75 group bg-slate-200  hover:bg-slate-100  flex-row !justify-start mt-2 `}
-            >
-              <BiLogoPostgresql
-                className={`!w-5 !h-5 ${
-                  decodeURIComponent(location.pathname).includes(
-                    CONSTANTS.ROUTES.RAW_SQL_QUERY.path(tenantID)
-                  )
-                    ? "!text-[#646cff]"
-                    : "!text-slate-700"
-                }`}
-              />
-              <span
-                className={`font-semibold text-sm ml-2 ${
-                  decodeURIComponent(location.pathname).includes(
-                    CONSTANTS.ROUTES.RAW_SQL_QUERY.path(tenantID)
-                  )
-                    ? "!text-[#646cff]"
-                    : "!text-slate-700"
-                }`}
-              >
-                {capitalize(CONSTANTS.STRINGS.MAIN_DRAWER_SQL_EDITOR_TITLE)}
-              </span>
-            </Link>
-
-            <button
-              type="button"
-              className={
-                "w-full text-slate-900 bg-slate-200 hover:border-none border-none justify-between hover:bg-slate-100 focus:outline-none  font-medium rounded text-sm px-1 py-2 text-center inline-flex items-center"
-              }
-              onClick={() =>
-                setMenuItemExpandedState({
-                  ...menuItemExpandedState,
-                  userManagement: !menuItemExpandedState.userManagement,
-                })
-              }
-            >
-              <FaUserCog className="!w-5 !h-5 !text-slate-600 ml-1" />
-              <span className="flex-1 ms-2 text-left font-semibold rtl:text-right whitespace-nowrap text-slate-700">
-                {CONSTANTS.STRINGS.MAIN_DRAWER_USER_MANAGEMENT_TITLE}
-              </span>
-              {menuItemExpandedState.userManagement ? (
-                <KeyboardArrowUpIcon fontSize="small" />
-              ) : (
-                <KeyboardArrowDownIcon fontSize="small" />
-              )}
-            </button>
-            {menuItemExpandedState.userManagement && (
-              <ul className=" space-y-2 rounded mt-2">
-                <li className="">
-                  {isLoadingDatabaseMetadata || isFetchingDatabaseMetadata ? (
-                    <div role="status" className=" animate-pulse">
-                      <div className="h-8 bg-gray-200 rounded   mb-2"></div>
-                      <div className="h-8 bg-gray-200 rounded   mb-2"></div>
-                      <div className="h-8 bg-gray-200 rounded   mb-2"></div>
-                      <div className="h-8 bg-gray-200 rounded   mb-2"></div>
-                    </div>
-                  ) : (
-                    [
-                      {
-                        name: "Users",
-                        path: CONSTANTS.ROUTES.VIEW_TENANT_USERS.path(tenantID),
-                        icon: ({ isActive }) => {
-                          return (
-                            <FiUsers
-                              className={`${
-                                isActive
-                                  ? "!text-lg !text-[#646cff]"
-                                  : "!text-lg !text-slate-700"
-                              }`}
-                            />
-                          );
-                        },
-                      },
-                      {
-                        name: "Roles and permissions",
-                        path: CONSTANTS.ROUTES.VIEW_TENANT_ROLES.path(tenantID),
-                        icon: ({ isActive }) => {
-                          return (
-                            <MdOutlineLockPerson
-                              className={`${
-                                isActive
-                                  ? "!text-lg !text-[#646cff] -ml-0.5"
-                                  : "!text-lg !text-slate-700 -ml-0.5"
-                              }`}
-                            />
-                          );
-                        },
-                      },
-                    ]?.map((tab) => {
-                      const isActive = decodeURIComponent(
-                        location.pathname
-                      ).includes(tab.path);
-                      return (
-                        <>
-                          <Link
-                            to={tab.path}
-                            key={tab.path}
-                            className={`flex items-center ${
-                              isActive ? "bg-[#eaebff]" : "bg-slate-100"
-                            } rounded mb-2 w-full p-2 text-slate-700 transition duration-75 group hover:bg-[#eaebff]  flex-row !justify-start `}
-                          >
-                            {tab.icon({ isActive })}
-                            <span
-                              className={` font-semisolid text-sm ml-1 ${
-                                isActive ? "!text-[#646cff]" : "!text-slate-700"
-                              }`}
-                            >
-                              {capitalize(tab.name)}
-                            </span>
-                          </Link>
-                        </>
-                      );
-                    })
-                  )}
-                </li>
-              </ul>
-            )}
+              return null;
+            })}
           </>
         ) : null}
       </div>

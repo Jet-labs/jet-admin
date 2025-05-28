@@ -35,7 +35,7 @@ export const APIKeyUpdationForm = ({ tenantID, apiKeyID }) => {
     isRefetching: isRefetechingAPIKey,
     refetch: refetchAPIKey,
   } = useQuery({
-    queryKey: [CONSTANTS.REACT_QUERY_KEYS.DATABASE_QUERIES(tenantID), apiKeyID],
+    queryKey: [CONSTANTS.REACT_QUERY_KEYS.QUERIES(tenantID), apiKeyID],
     queryFn: () =>
       getAPIKeyByIDAPI({
         tenantID,
@@ -58,7 +58,7 @@ export const APIKeyUpdationForm = ({ tenantID, apiKeyID }) => {
         CONSTANTS.STRINGS.UPDATE_API_KEY_FORM_API_KEY_UPDATION_SUCCESS
       );
       queryClient.invalidateQueries([
-        CONSTANTS.REACT_QUERY_KEYS.DATABASE_QUERIES(tenantID),
+        CONSTANTS.REACT_QUERY_KEYS.QUERIES(tenantID),
       ]);
     },
     onError: (error) => {

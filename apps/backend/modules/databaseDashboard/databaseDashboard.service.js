@@ -85,16 +85,6 @@ databaseDashboardService.createDatabaseDashboard = async ({
           creatorID: parseInt(userID),
         },
       });
-      // await tx.tblDatabaseDashboardChartMappings.createMany({
-      //   data: databaseCharts.map((databaseChart) => {
-      //     return {
-      //       databaseDashboardID: databaseDashboard.databaseDashboardID,
-      //       databaseChartID: parseInt(databaseChart.databaseChartID),
-      //       title: databaseChart.title,
-      //       parameters: databaseChart.parameters,
-      //     };
-      //   }),
-      // });
     });
 
     Logger.log("success", {
@@ -148,9 +138,6 @@ databaseDashboardService.getDatabaseDashboardByID = async ({
         tenantID: parseInt(tenantID),
         databaseDashboardID: parseInt(databaseDashboardID),
       },
-      include: {
-        tblDatabaseDashboardChartMappings: true,
-      },
     });
     Logger.log("success", {
       message: "databaseDashboardService:getDatabaseDashboardByID:success",
@@ -200,9 +187,6 @@ databaseDashboardService.cloneDatabaseDashboardByID = async ({
         tenantID: parseInt(tenantID),
         databaseDashboardID: parseInt(databaseDashboardID),
       },
-      include: {
-        tblDatabaseDashboardChartMappings: true,
-      },
     });
     if (!databaseDashboard) {
       throw new Error("Database dashboard not found");
@@ -218,20 +202,6 @@ databaseDashboardService.cloneDatabaseDashboardByID = async ({
           databaseDashboardConfig: databaseDashboard.databaseDashboardConfig,
           creatorID: parseInt(userID),
         },
-      });
-      await tx.tblDatabaseDashboardChartMappings.createMany({
-        data: databaseDashboard.tblDatabaseDashboardChartMappings.map(
-          (databaseDashboardChartMapping) => {
-            return {
-              databaseDashboardID: newDatabaseDashboard.databaseDashboardID,
-              databaseChartID: parseInt(
-                databaseDashboardChartMapping.databaseChartID
-              ),
-              title: databaseDashboardChartMapping.title,
-              parameters: databaseDashboardChartMapping.parameters,
-            };
-          }
-        ),
       });
     });
     Logger.log("success", {
@@ -254,18 +224,15 @@ databaseDashboardService.cloneDatabaseDashboardByID = async ({
   }
 };
 
-
-
 /**
- * Updates an existing database chart and its associated query mappings.
  *
- * @param {Object} params - Update parameters
- * @param {number} params.databaseDashboardID - ID of the chart to update (REQUIRED)
- * @param {number} [params.userID] - ID of the user performing the update
- * @param {number} [params.tenantID] - Tenant ID associated with the chart
- * @param {string} [params.databaseDashboardName] - New chart name
- * @param {string} [params.databaseDashboardDescription] - New chart description
- * @param {JSON} [params.databaseDashboardConfig] - Dashboard configuration data
+ * @param {Object} params
+ * @param {number} params.databaseDashboardID
+ * @param {number} [params.userID]
+ * @param {number} [params.tenantID]
+ * @param {string} [params.databaseDashboardName]
+ * @param {string} [params.databaseDashboardDescription]
+ * @param {JSON} [params.databaseDashboardConfig]
  *
  * @returns {Promise<boolean>} True if update succeeded
  * @throws {Error} If database operation fails
@@ -291,7 +258,6 @@ databaseDashboardService.updateDatabaseDashboardByID = async ({
   });
 
   try {
-    // Fetch existing chart and verify ownership
     const existingDashboard = await prisma.tblDatabaseDashboards.findFirst({
       where: {
         databaseDashboardID: parseInt(databaseDashboardID),
@@ -303,7 +269,6 @@ databaseDashboardService.updateDatabaseDashboardByID = async ({
       throw new Error("Dashboard not found");
     }
     await prisma.$transaction(async (tx) => {
-      // Update main chart data
       const updatedDashboard = await tx.tblDatabaseDashboards.update({
         where: { databaseDashboardID: parseInt(databaseDashboardID) },
         data: {
