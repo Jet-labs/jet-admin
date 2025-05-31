@@ -1,6 +1,6 @@
 import { Client } from "pg";
 import { Logger } from "../../utils/logger.js";
-import DataSource from "../../core/models/datasource.js";
+import DataSource from "../datasource.js";
 
 export default class PostgreSQLDataSource extends DataSource {
   async execute(dataQueryOptions, context) {

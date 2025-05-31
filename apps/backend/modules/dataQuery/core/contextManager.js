@@ -1,6 +1,6 @@
-import { Logger } from "../utils/logger";
+const Logger = require("../../../utils/logger.js");
 
-export default class ContextManager {
+class ContextManager {
   constructor() {
     this.results = new Map(); // Stores query results
     this.parameterizedResults = new Map(); // Stores parameterized query results
@@ -128,7 +128,7 @@ export default class ContextManager {
     return {
       results: this.results?.size > 0 ? Object.fromEntries(this.results) : {},
       parameterizedResults:
-        this.parameterizedResults?.size > 0
+        this.parameterizedResults?.size > 0 && this.context
           ? Object.fromEntries(this.context)
           : {},
       variables:
@@ -136,3 +136,5 @@ export default class ContextManager {
     };
   }
 }
+
+module.exports = { ContextManager };

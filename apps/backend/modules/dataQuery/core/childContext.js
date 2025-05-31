@@ -1,7 +1,6 @@
-// packages/datasources-logic/src/core/ChildContext.js
-import { Logger } from "../utils/logger";
+const Logger = require("../../../utils/logger.js");
 
-export default class ChildContext {
+class ChildContext {
   constructor(parentContext, parameters = {}) {
     this.parent = parentContext;
     this.parameters = parameters;
@@ -79,7 +78,10 @@ export default class ChildContext {
     const paramKey = this.getParameterKey(params);
 
     // Check local results first
-    if (this.localResults?.has(id) && this.localResults?.get(id)?.has(paramKey)) {
+    if (
+      this.localResults?.has(id) &&
+      this.localResults?.get(id)?.has(paramKey)
+    ) {
       return this.localResults.get(id).get(paramKey);
     }
 
@@ -92,7 +94,10 @@ export default class ChildContext {
     const paramKey = this.getParameterKey(params);
 
     // Check local results
-    if (this.localResults?.has(id) && this.localResults?.get(id)?.has(paramKey)) {
+    if (
+      this.localResults?.has(id) &&
+      this.localResults?.get(id)?.has(paramKey)
+    ) {
       return true;
     }
 
@@ -119,3 +124,5 @@ export default class ChildContext {
     return `child-of-${this.parent.instanceId}`;
   }
 }
+
+module.exports = { ChildContext };

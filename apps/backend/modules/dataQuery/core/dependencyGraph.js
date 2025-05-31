@@ -1,4 +1,4 @@
-export default class DependencyGraph {
+class DependencyGraph {
   constructor() {
     this.graph = new Map();
   }
@@ -85,3 +85,5 @@ export default class DependencyGraph {
     return independent;
   }
 }
+
+module.exports = { DependencyGraph };

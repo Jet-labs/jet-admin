@@ -1,6 +1,6 @@
-import { Logger } from "../utils/logger";
+const Logger = require("../../../utils/logger.js");
 
-export default class TemplateResolver {
+class TemplateResolver {
   // Unified regex for all placeholder types
   static PLACEHOLDER_REGEX =
     /\$\{([^:}]+)(?::(\d+))?(?:\[([^\]]+)\])?(?:\.([\w]+))?(?::(\{[^}]*\}))?\}/g;
@@ -195,3 +195,5 @@ export default class TemplateResolver {
     return resolved;
   }
 }
+
+module.exports = { TemplateResolver };

@@ -1,12 +1,15 @@
-import DependencyGraph from "./dependencyGraph.js";
-import TemplateResolver from "./templateResolver.js";
-import ContextManager from "./contextManager.js";
-import dataSourceRegistry from "../data-sources/index.js";
-import { Logger } from "../utils/logger.js";
-import { DATASOURCE_TYPES } from "@jet-admin/datasource-types";
-import ChildContext from "./childContext.js";
 
-export default class QueryRunner {
+
+
+const { ContextManager } = require("./contextManager.js");
+const { TemplateResolver } = require("./templateResolver.js");
+const { DependencyGraph } = require("./dependencyGraph.js");
+const { ChildContext } = require("./childContext.js");
+const { DATASOURCE_TYPES } = require("@jet-admin/datasource-types");
+const { dataSourceRegistry } = require("@jet-admin/datasources-logic");
+const Logger = require("../../../utils/logger.js");
+
+class QueryRunner {
   constructor(queryFetcher, datasourceFetcher) {
     this.queryFetcher = queryFetcher;
     this.datasourceFetcher = datasourceFetcher;
@@ -234,3 +237,5 @@ export default class QueryRunner {
     this.dataSourceCache.clear();
   }
 }
+
+module.exports = { QueryRunner };

@@ -11,8 +11,8 @@ const { aiUtil } = require("../../utils/aiprompt.util");
 const { aiService } = require("../ai/ai.service");
 const { isUUID } = require("validator");
 const dataQueryService = {};
-const { QueryRunner } = require("@jet-admin/datasources-logic");
 const { keyValueTypeArrayToObject } = require("../../utils/json.util");
+const { QueryRunner } = require("./core/queryRunner.js");
 
 /**
  *

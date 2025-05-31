@@ -1,6 +1,7 @@
 import axios from "axios";
 import { Logger } from "../../utils/logger.js";
-import DataSource from "../../core/models/datasource.js";
+import DataSource from "../datasource.js";
+
 
 export default class RestAPIDataSource extends DataSource {
   async execute(dataQueryOptions, context) {
