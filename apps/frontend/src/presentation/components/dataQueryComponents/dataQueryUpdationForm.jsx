@@ -97,6 +97,8 @@ export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
     },
   });
 
+  console.log({ dataQueryTestResult });
+
   // Use useEffect to update Formik values when dataQuery is fetched
   useEffect(() => {
     if (dataQuery) {
@@ -137,9 +139,9 @@ export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
           <span className="text-xs text-[#646cff] mt-2">{`Query ID: ${
             dataQuery.dataQueryID
           } | ${
-            dataQuery.linkedDatabaseWidgetCount > 0
-              ? `Used in ${dataQuery.linkedDatabaseWidgetCount} ${
-                  dataQuery.linkedDatabaseWidgetCount > 1 ? "widgets" : "widget"
+            dataQuery.linkedWidgetCount > 0
+              ? `Used in ${dataQuery.linkedWidgetCount} ${
+                  dataQuery.linkedWidgetCount > 1 ? "widgets" : "widget"
                 } `
               : `Not used in any widget`
           }`}</span>

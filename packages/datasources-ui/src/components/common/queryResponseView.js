@@ -10,6 +10,7 @@ export const QueryResponseView = ({ queryResult }) => {
   QueryResponseView.propTypes = {
     queryResult: PropTypes.object,
   };
+  console.log("queryResult", queryResult);
   const [tab, setTab] = useState(0);
   const _handleTabChange = (event, newTab) => {
     setTab(newTab);
@@ -65,24 +66,16 @@ export const QueryResponseView = ({ queryResult }) => {
       </Tabs>
       <div className="w-100 h-[calc(100%-48px)]">
         {tab === 0 && (
-          <QueryResponseTableTab
-            data={queryResult ? queryResult.result : ""}
-          />
+          <QueryResponseTableTab data={queryResult ? queryResult : ""} />
         )}
         {tab === 1 && (
-          <QueryResponseJSONTab
-            data={queryResult ? queryResult.result : ""}
-          />
+          <QueryResponseJSONTab data={queryResult ? queryResult : ""} />
         )}
         {tab === 2 && (
-          <QueryResponseRAWTab
-            data={queryResult ? queryResult.result : ""}
-          />
+          <QueryResponseRAWTab data={queryResult ? queryResult : ""} />
         )}
         {tab === 3 && (
-          <QueryResponseSchemaTab
-            data={queryResult ? queryResult.result : {}}
-          />
+          <QueryResponseSchemaTab data={queryResult ? queryResult : {}} />
         )}
       </div>
     </>

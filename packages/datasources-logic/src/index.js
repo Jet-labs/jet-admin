@@ -1,6 +1,10 @@
 import { DATASOURCE_TYPES } from "@jet-admin/datasource-types";
-import { postgresqlTestConnection } from "./components/postgresql/logic/connection";
-import { restAPITestConnection } from "./components/restapi/logic/connection";
+import { postgresqlTestConnection } from "./data-sources/postgresql/connection";
+import { restAPITestConnection } from "./data-sources/restapi/connection";
+import dataSourceRegistry from "./data-sources/index.js";
+import QueryRunner from "./core/queryRunner.js";
+
+export { QueryRunner, dataSourceRegistry };
 
 export const DATASOURCE_LOGIC_COMPONENTS = {
   [DATASOURCE_TYPES.POSTGRESQL.value]: {

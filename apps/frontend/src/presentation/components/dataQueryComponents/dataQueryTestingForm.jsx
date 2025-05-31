@@ -2,7 +2,7 @@ import { CircularProgress } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { CONSTANTS } from "../../../constants";
-import { testDataQueryAPI } from "../../../data/apis/dataQuery";
+import { testDataQueryByIDAPI } from "../../../data/apis/dataQuery";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { DataQueryArgsForm } from "./dataQueryArgsForm";
 import PropTypes from "prop-types";
@@ -10,30 +10,27 @@ import PropTypes from "prop-types";
 export const DataQueryTestingForm = ({
   tenantID,
   dataQueryID,
-  dataQueryString,
-  dataQueryArgs,
   setDataQueryTestResult,
+  datasourceID,
+  datasourceType,
+  dataQueryOptions,
 }) => {
   DataQueryTestingForm.propTypes = {
     tenantID: PropTypes.number.isRequired,
     dataQueryID: PropTypes.number.isRequired,
-    dataQueryString: PropTypes.string.isRequired,
-    dataQueryArgs: PropTypes.array.isRequired,
     setDataQueryTestResult: PropTypes.func.isRequired,
+    datasourceID: PropTypes.string.isRequired,
+    datasourceType: PropTypes.string.isRequired,
+    dataQueryOptions: PropTypes.object.isRequired,
   };
-  console.log({
-    dataQueryID,
-    dataQueryString,
-    dataQueryArgs,
-  });
   const [isArgsFormOpen, setIsArgsFormOpen] = useState(false);
 
   const { isPending: isTestingDataQuery, mutate: testDataQuery } = useMutation({
-    mutationFn: (dataQueryOptions) => {
-      return testDataQueryAPI({
+    mutationFn: (argValues) => {
+      return testDataQueryByIDAPI({
         tenantID,
         dataQueryID,
-        dataQueryOptions,
+        argValues,
       });
     },
     retry: false,
@@ -48,16 +45,13 @@ export const DataQueryTestingForm = ({
 
   const _handleTestQuery = () => {
     if (
-      dataQueryArgs &&
-      Array.isArray(dataQueryArgs) &&
-      dataQueryArgs.length > 0
+      dataQueryOptions &&
+      Array.isArray(dataQueryOptions.args) &&
+      dataQueryOptions.args.length > 0
     ) {
       _handleOpenArgsForm();
     } else {
-      testDataQuery({
-        dataQueryString: dataQueryString,
-        dataQueryArgs: null,
-      });
+      testDataQuery();
     }
   };
 
@@ -72,21 +66,20 @@ export const DataQueryTestingForm = ({
   const _handleOnArgFormCompleted = (dataQueryArgValues) => {
     setIsArgsFormOpen(false);
     testDataQuery({
-      dataQueryString: dataQueryString,
-      dataQueryArgValues: dataQueryArgValues,
+      args: dataQueryArgValues,
     });
   };
 
   return (
     <>
-      {dataQueryArgs && (
+      {dataQueryOptions?.args?.length > 0 ? (
         <DataQueryArgsForm
           open={isArgsFormOpen}
           onAccepted={_handleOnArgFormCompleted}
           onDecline={_handleOnArgFormDeclined}
-          dataQueryArgs={dataQueryArgs}
+          dataQueryArgs={dataQueryOptions?.args}
         />
-      )}
+      ) : null}
       <button
         onClick={_handleTestQuery}
         disabled={isTestingDataQuery}

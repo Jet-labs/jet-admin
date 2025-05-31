@@ -23,10 +23,9 @@ export const DataQueryArgsForm = ({
     dataQueryArgs: PropTypes.array.isRequired,
   };
   const dataQueryArgsForm = useFormik({
-    initialValues: dataQueryArgs.reduce((acc, arg) => {
-      acc[arg] = "";
-      return acc;
-    }, {}),
+    initialValues: Object.fromEntries(
+      dataQueryArgs?.map(({ key, value }) => [key, value])
+    ),
     validateOnMount: false,
     validateOnChange: false,
     validationSchema:
@@ -37,7 +36,7 @@ export const DataQueryArgsForm = ({
   useEffect(() => {
     if (dataQueryArgsForm && dataQueryArgs) {
       dataQueryArgs.forEach((arg) => {
-        dataQueryArgsForm.setFieldValue(arg, "");
+        dataQueryArgsForm.setFieldValue(arg.key, "");
       });
     }
   }, [dataQueryArgs]);
@@ -64,14 +63,17 @@ export const DataQueryArgsForm = ({
         </span>
         <div className="space-y-4">
           {dataQueryArgs.map((arg) => (
-            <div key={arg} className="space-y-1">
-              <label htmlFor={arg} className="text-xs font-light text-gray-500">
-                {arg}
+            <div key={arg.key} className="space-y-1">
+              <label
+                htmlFor={arg.key}
+                className="text-xs font-light text-gray-500"
+              >
+                {arg.key}
               </label>
               <input
-                id={arg}
-                name={arg}
-                value={dataQueryArgsForm.values[arg]}
+                id={arg.key}
+                name={arg.key}
+                value={dataQueryArgsForm.values[arg]?.value}
                 onChange={dataQueryArgsForm.handleChange}
                 onBlur={dataQueryArgsForm.handleBlur}
                 autoComplete="off"
@@ -93,9 +95,11 @@ export const DataQueryArgsForm = ({
         <button
           type="button"
           onClick={() => onAccepted(dataQueryArgsForm.values)}
-          disabled={dataQueryArgs.some((arg) => !dataQueryArgsForm.values[arg])}
+          disabled={dataQueryArgs.some(
+            (arg) => !dataQueryArgsForm.values[arg.key]
+          )}
           className={`px-2.5 py-1.5 text-white text-sm bg-[#646cff] rounded hover:outline-none hover:border-0 border-0 outline-none ${
-            dataQueryArgs.some((arg) => !dataQueryArgsForm.values[arg])
+            dataQueryArgs.some((arg) => !dataQueryArgsForm.values[arg.key])
               ? "opacity-50 cursor-not-allowed"
               : ""
           }`}

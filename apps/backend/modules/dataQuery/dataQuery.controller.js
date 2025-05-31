@@ -225,24 +225,11 @@ dataQueryController.runDataQueryByID = async (req, res) => {
       params: { userID: user.userID, tenantID, dataQueryID },
     });
 
-    const dataQuery = await dataQueryService.getDataQueryByID({
+    const dataQueryResult = await dataQueryService.runDataQueryByID({
       userID: parseInt(user.userID),
       tenantID,
-      dataQueryID: parseInt(dataQueryID),
+      dataQueryID,
     });
-
-    const dataQueriesResult = await dataQueryService.runDataQueries({
-      userID: parseInt(user.userID),
-      dbPool,
-      tenantID,
-      dataQueries: [
-        {
-          dataQueryID,
-          dataQueryOptions: dataQuery.dataQueryOptions,
-        },
-      ],
-    });
-    const dataQueryResult = dataQueriesResult[0];
 
     Logger.log("success", {
       message: "dataQueryController:runDataQueryByID:success",

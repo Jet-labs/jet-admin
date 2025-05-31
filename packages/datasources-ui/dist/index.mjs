@@ -69623,6 +69623,7 @@ var QueryResponseView = ({ queryResult }) => {
   QueryResponseView.propTypes = {
     queryResult: import_prop_types5.default.object
   };
+  console.log("queryResult", queryResult);
   const [tab4, setTab] = useState2(0);
   const _handleTabChange = (event, newTab) => {
     setTab(newTab);
@@ -69679,27 +69680,7 @@ var QueryResponseView = ({ queryResult }) => {
         className: `!outline-none !border-0 hover:!outline-none hover:!border-0 focus:!outline-none !font-medium !text-sm !normal-case ${tab4 === 3 ? "!text-[#646cff]" : "!text-slate-700"}`
       }
     )
-  ), /* @__PURE__ */ React6.createElement("div", { className: "w-100 h-[calc(100%-48px)]" }, tab4 === 0 && /* @__PURE__ */ React6.createElement(
-    QueryResponseTableTab,
-    {
-      data: queryResult ? queryResult.result : ""
-    }
-  ), tab4 === 1 && /* @__PURE__ */ React6.createElement(
-    QueryResponseJSONTab,
-    {
-      data: queryResult ? queryResult.result : ""
-    }
-  ), tab4 === 2 && /* @__PURE__ */ React6.createElement(
-    QueryResponseRAWTab,
-    {
-      data: queryResult ? queryResult.result : ""
-    }
-  ), tab4 === 3 && /* @__PURE__ */ React6.createElement(
-    QueryResponseSchemaTab,
-    {
-      data: queryResult ? queryResult.result : {}
-    }
-  )));
+  ), /* @__PURE__ */ React6.createElement("div", { className: "w-100 h-[calc(100%-48px)]" }, tab4 === 0 && /* @__PURE__ */ React6.createElement(QueryResponseTableTab, { data: queryResult ? queryResult : "" }), tab4 === 1 && /* @__PURE__ */ React6.createElement(QueryResponseJSONTab, { data: queryResult ? queryResult : "" }), tab4 === 2 && /* @__PURE__ */ React6.createElement(QueryResponseRAWTab, { data: queryResult ? queryResult : "" }), tab4 === 3 && /* @__PURE__ */ React6.createElement(QueryResponseSchemaTab, { data: queryResult ? queryResult : {} })));
 };
 
 // src/components/postgresql/query/postgreSQLQueryEditor.js

@@ -11,6 +11,8 @@ const { aiUtil } = require("../../utils/aiprompt.util");
 const { aiService } = require("../ai/ai.service");
 const { isUUID } = require("validator");
 const dataQueryService = {};
+const { QueryRunner } = require("@jet-admin/datasources-logic");
+const { keyValueTypeArrayToObject } = require("../../utils/json.util");
 
 /**
  *
@@ -306,6 +308,90 @@ dataQueryService.generateAIPromptBasedQuery = async ({
  *
  * @param {object} param0
  * @param {number} param0.userID
+ * @param {string} param0.tenantID
+ * @param {number} param0.dataQueryID
+ * @returns {Promise<object>}
+ */
+dataQueryService.runDataQueryByID = async ({
+  userID,
+  tenantID,
+  dataQueryID,
+}) => {
+  Logger.log("info", {
+    message: "dataQueryService:runDataQueryByID:params",
+    params: {
+      userID,
+      tenantID,
+      dataQueryID,
+    },
+  });
+
+  try {
+    const dataQuery = await prisma.tblDataQueries.findFirst({
+      where: {
+        tenantID: parseInt(tenantID),
+        dataQueryID: parseInt(dataQueryID),
+      },
+      include: {
+        tblDatasources: true,
+      },
+    });
+
+    if (!dataQuery) {
+      Logger.log("error", {
+        message: "dataQueryService:runDataQueryByID:catch-2",
+        params: {
+          userID,
+          tenantID,
+          dataQueryID,
+          error: "Database query not found",
+        },
+      });
+      throw new Error(`Database query with ID ${dataQueryID} not found`);
+    }
+
+    const queryRunner = new QueryRunner(
+      async (queryId) => {
+        return dataQuery;
+      },
+      async (datasourceID) => {
+        return dataQuery.tblDatasources;
+      }
+    );
+
+    const results = await queryRunner.run(
+      [dataQueryID],
+      keyValueTypeArrayToObject(dataQuery.dataQueryOptions.args)
+    );
+
+    Logger.log("success", {
+      message: "dataQueryService:runDataQueryByID:success",
+      params: {
+        userID,
+        tenantID,
+        dataQueryID,
+        results,
+      },
+    });
+    return results && results[dataQueryID] ? results[dataQueryID] : {};
+  } catch (error) {
+    Logger.log("error", {
+      message: "dataQueryService:runDataQueryByID:failure",
+      params: {
+        userID,
+        tenantID,
+        dataQueryID,
+        error,
+      },
+    });
+    throw error;
+  }
+};
+
+/**
+ *
+ * @param {object} param0
+ * @param {number} param0.userID
  * @param {object} param0.dbPool
  * @param {Array<{dataQueryID:number,dataQueryOptions:{dataQueryString:string,dataQueryArgValues:object,dataQueryArgs:object}}>} param0.dataQueries
  * @returns {Promise<Array<object>>}
@@ -342,8 +428,7 @@ dataQueryService.runDataQueries = async ({
                   );
 
                 Logger.log("info", {
-                  message:
-                    "dataQueryService:runDataQueries:processDataQuery",
+                  message: "dataQueryService:runDataQueries:processDataQuery",
                   params: {
                     userID,
                     tenantID,
@@ -358,8 +443,7 @@ dataQueryService.runDataQueries = async ({
                 );
 
                 Logger.log("info", {
-                  message:
-                    "dataQueryService:runDataQueries:dataQueryResult",
+                  message: "dataQueryService:runDataQueries:dataQueryResult",
                   params: {
                     userID,
                     tenantID,
@@ -491,8 +575,7 @@ dataQueryService.getDataQueryByID = async ({
     // Transform the result to include counts in a more accessible format
     const transformedQuery = {
       ...dataQuery,
-      linkedWidgetCount:
-        dataQuery._count.tblWidgetQueryMappings,
+      linkedWidgetCount: dataQuery._count.tblWidgetQueryMappings,
       _count: undefined, // Remove the _count property
     };
 
