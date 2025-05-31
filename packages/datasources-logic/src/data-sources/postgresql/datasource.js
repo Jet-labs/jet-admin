@@ -3,10 +3,15 @@ import { Logger } from "../../utils/logger.js";
 import DataSource from "../../core/models/datasource.js";
 
 export default class PostgreSQLDataSource extends DataSource {
-  async execute(query, context) {
+  async execute(dataQueryOptions, context) {
+    Logger.log("info", {
+      message: "postgresql:PostgreSQLDataSource:execute:params",
+      params: { dataQueryOptions, config: this.config },
+    });
+    const { query } = dataQueryOptions;
     const client = new Client({
-      connectionString: this.config.connectionString,
-      ...this.config.connectionData,
+      connectionString: this.config.datasourceOptions?.connectionString,
+      ...this.config.datasourceOptions?.connectionData,
     });
     try {
       await client.connect();
@@ -16,7 +21,7 @@ export default class PostgreSQLDataSource extends DataSource {
       });
       const result = await client.query(query);
       return result.rows;
-    }catch (error) {
+    } catch (error) {
       Logger.log("error", {
         message: "postgresql:PostgreSQLDataSource:execute:catch",
         params: error.message || error,

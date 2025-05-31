@@ -4,6 +4,7 @@ import ContextManager from "./contextManager.js";
 import dataSourceRegistry from "../data-sources/index.js";
 import { Logger } from "../utils/logger.js";
 import { DATASOURCE_TYPES } from "@jet-admin/datasource-types";
+import ChildContext from "./childContext.js";
 
 export default class QueryRunner {
   constructor(queryFetcher, datasourceFetcher) {
@@ -17,9 +18,18 @@ export default class QueryRunner {
   async run(initialQueryIds, contextVariables = {}) {
     try {
       // Set context variables
+      Logger.log("info", {
+        message: "QueryRunner:run:contextVariables",
+        params: { initialQueryIds, contextVariables },
+      });
       for (const [name, value] of Object.entries(contextVariables)) {
         this.context.setVariable(name, value);
       }
+
+      Logger.log("info", {
+        message: "QueryRunner:run:contextVariables",
+        params: { contextVariables: this.context.getExecutionState() },
+      });
 
       // Build dependency graph
       await this.buildDependencyGraph(initialQueryIds);
@@ -53,7 +63,6 @@ export default class QueryRunner {
           initialQueryIds,
           results,
           context: this.context.getResult(parseInt(initialQueryIds[0])),
-          contextVariables: this.context.getExecutionState(),
         },
       });
 
@@ -69,64 +78,82 @@ export default class QueryRunner {
     }
   }
 
-  async runQuery(queryId) {
-    if (this.context.hasResult(queryId)) {
-      return this.context.getResult(queryId);
+  async runQuery(queryId, parameters = {}) {
+    const id = Number(queryId);
+
+    Logger.log("info", {
+      message: "QueryRunner:runQuery",
+      params: { queryId: id, parameters },
+    });
+
+    // Check if we already have a result for these parameters
+    if (this.context.hasResult(id, parameters)) {
+      Logger.log("info", {
+        message: "QueryRunner:runQuery:cached",
+        params: { queryId: id, parameters },
+      });
+      return this.context.getResult(id, parameters);
     }
 
-    const node = this.graph.graph.get(queryId);
+    const node = this.graph.graph.get(id);
+
     if (!node) {
-      throw new Error(`Query not found in graph: ${queryId}`);
+      Logger.log("error", {
+        message: "QueryRunner:runQuery:catch-2",
+        params: { queryId: id, error: "Query not found in graph" },
+      });
+      throw new Error(`Query ${id} not found in graph`);
     }
 
     const query = node.query;
     const datasource = await this.getDataSource(query);
 
     try {
+      // Create a child context with parameters
+      const childContext = new ChildContext(this.context, parameters);
+
       // Resolve templates in query options
+      Logger.log("info", {
+        message: "QueryRunner:runQuery:resolveOptions",
+        params: { queryId: id, parameters, options: query.dataQueryOptions },
+      });
+
       const resolvedOptions = await TemplateResolver.resolve(
         query.dataQueryOptions,
-        this.context,
+        childContext,
         this
       );
+
+      Logger.log("info", {
+        message: "QueryRunner:runQuery:resolvedOptions",
+        params: { queryId: id, parameters, resolvedOptions },
+      });
 
       // Execute query
       Logger.log("info", {
-        message: "QueryRunner:runQuery:executing",
-        params: { queryId, query },
+        message: "QueryRunner:runQuery:execute",
+        params: { queryId: id, parameters, resolvedOptions },
       });
-      const result = await datasource.execute(resolvedOptions, this.context);
 
-      // Resolve any dynamic results
+      const result = await datasource.execute(resolvedOptions, childContext);
+
+      // Resolve any dynamic results in the result
       const resolvedResult = await TemplateResolver.resolve(
         result,
-        this.context,
+        childContext,
         this
       );
 
-      Logger.log("success", {
-        message: "QueryRunner:runQuery:success",
-        params: { queryId, result, resolvedResult },
-      });
-
-      this.context.setResult(queryId, resolvedResult);
-
-      Logger.log("warning", {
-        message: "QueryRunner:runQuery:success:context",
-        params: {
-          queryId,
-          context: this.context.getResult(queryId),
-          contextVariables: this.context.getExecutionState(),
-        },
-      });
+      // Store result with parameters
+      this.context.setResult(id, resolvedResult, parameters);
 
       return resolvedResult;
     } catch (error) {
       Logger.log("error", {
-        message: "QueryRunner:runQuery:catch-1",
-        params: { queryId, error },
+        message: "QueryRunner:runQuery:catch-3",
+        params: { queryId: id, parameters, error },
       });
-      throw new Error(`Query ${queryId} failed: ${error.message}`);
+      throw error;
     }
   }
 

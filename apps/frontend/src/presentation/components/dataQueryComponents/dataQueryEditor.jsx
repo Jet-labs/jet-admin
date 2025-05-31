@@ -3,39 +3,48 @@ import {
   materialRenderers,
 } from "@jsonforms/material-renderers";
 import { JsonForms } from "@jsonforms/react";
-import React from "react";
+import React, { useCallback } from "react";
 import PropTypes from "prop-types";
 import { DATASOURCE_UI_COMPONENTS } from "@jet-admin/datasources-ui";
 import { CONSTANTS } from "../../../constants";
 import { customJSONFormRenderers } from "../ui/jsonFormCustomRenderer";
 import { useDataQueriesState } from "../../../logic/contexts/dataQueriesContext";
 
-export const DataQueryEditor = ({ dataQueryEditorForm }) => {
+export const DataQueryEditor = ({
+  dataQueryEditorForm,
+  tenantID,
+  dataQueryID,
+}) => {
   DataQueryEditor.propTypes = {
     dataQueryEditorForm: PropTypes.object.isRequired,
+    tenantID: PropTypes.number,
+    dataQueryID: PropTypes.number,
   };
+  const uniqueKey = dataQueryID
+    ? `dataQueryEditor_${tenantID}_${dataQueryID}`
+    : `dataQueryEditor_${tenantID}`;
   const { datasources } = useDataQueriesState();
   // This handler specifically updates the 'datasourceOptions' part of Formik's state
-  const _handleDatasourceOptionsChange = ({ data }) => {
-    // Update only the 'datasourceOptions' field in Formik's state
-    console.log("dataQueryOptions", {
-      data,
-    });
-    dataQueryEditorForm.setFieldValue("dataQueryOptions", data);
-    // You could also attempt to map JSON Forms errors to Formik's errors for 'datasourceOptions'
-    // but often Yup handles it sufficiently for overall form validity.
-  };
+  const _handleDatasourceOptionsChange = useCallback(
+    ({ data }) => {
+      dataQueryEditorForm.setFieldValue("dataQueryOptions", data);
+    },
+    [dataQueryEditorForm]
+  );
 
-  const _handleDatasourceTypeChange = (event) => {
-    dataQueryEditorForm.setFieldValue("datasourceID", event.target.value);
-    const selectedDatasource = datasources.find(
-      (datasource) => datasource.value === event.target.value
-    );
-    dataQueryEditorForm.setFieldValue(
-      "datasourceType",
-      selectedDatasource.type
-    );
-  };
+  const _handleDatasourceTypeChange = useCallback(
+    (event) => {
+      dataQueryEditorForm.setFieldValue("datasourceID", event.target.value);
+      const selectedDatasource = datasources.find(
+        (datasource) => datasource.value === event.target.value
+      );
+      dataQueryEditorForm.setFieldValue(
+        "datasourceType",
+        selectedDatasource.type
+      );
+    },
+    [dataQueryEditorForm, datasources]
+  );
 
   return (
     <>
@@ -81,6 +90,7 @@ export const DataQueryEditor = ({ dataQueryEditorForm }) => {
           DATASOURCE_UI_COMPONENTS[dataQueryEditorForm.values.datasourceType]
             .queryConfigForm && (
             <JsonForms
+              key={uniqueKey}
               schema={
                 DATASOURCE_UI_COMPONENTS[
                   dataQueryEditorForm.values.datasourceType

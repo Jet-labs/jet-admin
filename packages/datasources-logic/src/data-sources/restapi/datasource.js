@@ -3,8 +3,8 @@ import { Logger } from "../../utils/logger.js";
 import DataSource from "../../core/models/datasource.js";
 
 export default class RestAPIDataSource extends DataSource {
-  async execute(config, context) {
-    const { method, baseUrl, headers, body, params } = config;
+  async execute(dataQueryOptions, context) {
+    const { method, baseUrl, headers, body, params } = dataQueryOptions;
     Logger.log("info", {
       message: "restapi:RestAPIDataSource:execute:params",
       params: { method, baseUrl, headers, body, params },
@@ -23,7 +23,11 @@ export default class RestAPIDataSource extends DataSource {
       Logger.log("info", {
         message: "restapi:RestAPIDataSource:execute:response",
         params: {
-          method, baseUrl, headers, body, params,
+          method,
+          baseUrl,
+          headers,
+          body,
+          params,
           status: response.status,
           statusText: response.statusText,
           body: response.data,

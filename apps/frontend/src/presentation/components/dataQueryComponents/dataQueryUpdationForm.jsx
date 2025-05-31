@@ -97,10 +97,9 @@ export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
     },
   });
 
-  console.log({ dataQueryTestResult });
-
   // Use useEffect to update Formik values when dataQuery is fetched
   useEffect(() => {
+    console.log("dataQuery", dataQuery);
     if (dataQuery) {
       // Update Formik form values with the fetched dataQuery data
       queryUpdationForm.setFieldValue(
@@ -230,6 +229,8 @@ export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
                   <DataQueryEditor
                     key={`dataQueryEditor_${dataQuery?.dataQueryID}`}
                     dataQueryEditorForm={queryUpdationForm}
+                    tenantID={tenantID}
+                    dataQueryID={dataQueryID}
                   />
                   <div className="w-full flex flex-row justify-end">
                     <DataQueryCloneForm

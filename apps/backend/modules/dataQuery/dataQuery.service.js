@@ -364,7 +364,7 @@ dataQueryService.runDataQueryByID = async ({
       async (datasourceID) => {
         return await prisma.tblDatasources.findFirst({
           where: {
-            datasourceID: parseInt(datasourceID),
+            datasourceID: datasourceID,
           },
         });
       }

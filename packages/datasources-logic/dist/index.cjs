@@ -30772,6 +30772,7 @@ var DataSource = class {
   constructor(config) {
     this.datasourceID = config?.datasourceID;
     this.datasourceType = config?.datasourceType;
+    this.config = config;
   }
   async execute(query, context) {
     throw new Error("execute() method must be implemented");
@@ -30780,10 +30781,15 @@ var DataSource = class {
 
 // src/data-sources/postgresql/datasource.js
 var PostgreSQLDataSource = class extends DataSource {
-  async execute(query, context) {
+  async execute(dataQueryOptions, context) {
+    Logger.log("info", {
+      message: "postgresql:PostgreSQLDataSource:execute:params",
+      params: { dataQueryOptions, config: this.config }
+    });
+    const { query } = dataQueryOptions;
     const client = new Client({
-      connectionString: this.config.connectionString,
-      ...this.config.connectionData
+      connectionString: this.config.datasourceOptions?.connectionString,
+      ...this.config.datasourceOptions?.connectionData
     });
     try {
       await client.connect();
@@ -34118,8 +34124,8 @@ var {
 
 // src/data-sources/restapi/datasource.js
 var RestAPIDataSource = class extends DataSource {
-  async execute(config, context) {
-    const { method, baseUrl, headers, body, params } = config;
+  async execute(dataQueryOptions, context) {
+    const { method, baseUrl, headers, body, params } = dataQueryOptions;
     Logger.log("info", {
       message: "restapi:RestAPIDataSource:execute:params",
       params: { method, baseUrl, headers, body, params }
@@ -34187,23 +34193,23 @@ var DependencyGraph = class {
     });
   }
   addDependency(fromId, toId) {
-    if (!this.graph.has(parseInt(fromId))) {
+    if (!this.graph?.has(parseInt(fromId))) {
       throw new Error(`Query ${fromId} not found in graph`);
     }
-    this.graph.get(parseInt(fromId)).dependencies.add(toId);
+    this.graph?.get(parseInt(fromId)).dependencies?.add(toId);
   }
   detectCircularDependencies() {
     const visited = /* @__PURE__ */ new Set();
     const recursionStack = /* @__PURE__ */ new Set();
     const visit = (nodeId) => {
-      if (!visited.has(nodeId)) {
+      if (!visited?.has(nodeId)) {
         visited.add(nodeId);
         recursionStack.add(nodeId);
         const node = this.graph.get(nodeId);
         for (const depId of node.dependencies) {
-          if (!visited.has(depId)) {
+          if (!visited?.has(depId)) {
             if (visit(depId)) return true;
-          } else if (recursionStack.has(depId)) {
+          } else if (recursionStack?.has(depId)) {
             return true;
           }
         }
@@ -34256,7 +34262,7 @@ var DependencyGraph = class {
 // src/core/templateResolver.js
 var TemplateResolver = class {
   // Unified regex for all placeholder types
-  static PLACEHOLDER_REGEX = /\$\{([^:}]+)(?::(\d+))?(?:\[([^\]]+)\])?(?:\.([\w]+))?\}/g;
+  static PLACEHOLDER_REGEX = /\$\{([^:}]+)(?::(\d+))?(?:\[([^\]]+)\])?(?:\.([\w]+))?(?::(\{[^}]*\}))?\}/g;
   static extractDependencies(template) {
     const dependencies = /* @__PURE__ */ new Set();
     const extract = (value) => {
@@ -34295,49 +34301,99 @@ var TemplateResolver = class {
     return template;
   }
   static async resolveString(str, context, queryRunner, depth = 0) {
+    Logger.log("info", {
+      message: "TemplateResolver:resolveString:enter",
+      params: { input: str, depth, context: context.getExecutionState() }
+    });
     const MAX_DEPTH = 10;
     if (depth > MAX_DEPTH) {
       Logger.log("error", {
-        message: "TemplateResolver:resolveString:catch-1",
-        params: { error: "Max recursion depth reached", depth, MAX_DEPTH }
+        message: "TemplateResolver:resolveString:maxDepth",
+        params: { depth, MAX_DEPTH, context: context.getExecutionState() }
       });
       return str;
     }
     let resolved = str;
     const matches = [...str.matchAll(this.PLACEHOLDER_REGEX)];
     Logger.log("info", {
-      message: "TemplateResolver:resolveString:params",
-      params: { str, matches, depth }
+      message: "TemplateResolver:resolveString:matches",
+      params: { input: str, matches: matches.map((m) => m[0]), depth }
     });
     for (const match of matches) {
-      const [fullMatch, type, id, arrayIndex, property] = match;
+      const [fullMatch, type, id, arrayIndex, property, paramsJson] = match;
       try {
         let value;
+        let parameters = {};
+        if (paramsJson) {
+          try {
+            parameters = JSON.parse(paramsJson);
+            for (const [key, val] of Object.entries(parameters)) {
+              parameters[key] = await this.resolve(val, context, queryRunner);
+            }
+          } catch (e) {
+            Logger.log("error", {
+              message: "TemplateResolver:resolveString:parseParams:catch",
+              params: { paramsJson, error: e.message }
+            });
+          }
+        }
         if (type === "query_id" && id) {
           const queryId = parseInt(id, 10);
-          if (!context.hasResult(queryId)) {
+          if (!context.hasResult(queryId, parameters)) {
             Logger.log("info", {
               message: "TemplateResolver:resolveString:runQuery",
-              params: { queryId }
+              params: { queryId, parameters }
             });
-            await queryRunner.runQuery(queryId);
+            await queryRunner.runQuery(queryId, parameters);
           }
-          value = context.getResult(queryId);
+          value = context.getResult(queryId, parameters);
           if (arrayIndex) {
+            Logger.log("info", {
+              message: "TemplateResolver:resolveString:resolveArrayIndex",
+              params: { arrayIndex }
+            });
             const index = arrayIndex.replace(/['"]/g, "");
-            value = value?.[index];
+            const resolvedIndex = await this.resolve(
+              index,
+              context,
+              queryRunner
+            );
+            if (isNaN(resolvedIndex)) {
+              Logger.log("error", {
+                message: "TemplateResolver:resolveString:invalidArrayIndex",
+                params: { arrayIndex, resolvedIndex }
+              });
+              throw new Error(`Invalid array index: ${resolvedIndex}`);
+            }
+            value = value?.[resolvedIndex];
+            Logger.log("info", {
+              message: "TemplateResolver:resolveString:resolvedArrayIndex",
+              params: { arrayIndex, resolvedIndex }
+            });
           }
           if (property) {
             value = value?.[property];
           }
         } else {
           const varName = type;
-          if (context.variables.has(varName)) {
+          Logger.log("info", {
+            message: "TemplateResolver:resolveString:resolveVariable",
+            params: {
+              varName,
+              context: context.getExecutionState(),
+              t: context?.variables?.keys()
+            }
+          });
+          try {
             value = context.getVariable(varName);
-          } else {
-            Logger.log("warning", {
-              message: "TemplateResolver:resolveString:variable_not_found",
-              params: { varName }
+            Logger.log("info", {
+              message: "TemplateResolver:resolveString:resolvedVariable",
+              params: { varName, value }
+            });
+          } catch (e) {
+            Logger.log("error", {
+              message: "TemplateResolver:resolveString:variableNotFound",
+              params: { varName, error: e.message }
             });
             continue;
           }
@@ -34347,13 +34403,13 @@ var TemplateResolver = class {
         }
         resolved = resolved.replace(fullMatch, value);
         Logger.log("info", {
-          message: "TemplateResolver:resolveString:placeholder_resolved",
+          message: "TemplateResolver:resolveString:resolved",
           params: { fullMatch, value, resolvedSoFar: resolved }
         });
       } catch (error) {
         Logger.log("error", {
-          message: "TemplateResolver:resolveString:catch-1",
-          params: { error }
+          message: "TemplateResolver:resolveString:catch",
+          params: { fullMatch, error }
         });
       }
     }
@@ -34367,32 +34423,195 @@ var TemplateResolver = class {
 // src/core/contextManager.js
 var ContextManager = class {
   constructor() {
-    this.context = /* @__PURE__ */ new Map();
+    this.results = /* @__PURE__ */ new Map();
+    this.parameterizedResults = /* @__PURE__ */ new Map();
     this.variables = /* @__PURE__ */ new Map();
+    this.instanceId = Math.random().toString(36).substr(2, 6);
+    Logger.log("info", {
+      message: "ContextManager:constructor",
+      params: { instanceId: this.instanceId }
+    });
   }
-  setResult(queryId, result) {
-    this.context.set(queryId, result);
+  setResult(queryId, result, parameters = {}) {
+    const id = Number(queryId);
+    const paramKey = this.getParameterKey(parameters);
+    if (Object.keys(parameters).length > 0) {
+      if (!this.parameterizedResults?.has(id)) {
+        this.parameterizedResults.set(id, /* @__PURE__ */ new Map());
+      }
+      this.parameterizedResults.get(id).set(paramKey, result);
+    } else {
+      this.results.set(id, result);
+    }
+    Logger.log("info", {
+      message: "ContextManager:setResult",
+      params: {
+        queryId: id,
+        parameters,
+        result,
+        instanceId: this.instanceId,
+        allResults: this.getResultsSnapshot()
+      }
+    });
   }
-  getResult(queryId) {
-    return this.context.get(queryId);
+  getResult(queryId, parameters = {}) {
+    const id = Number(queryId);
+    const paramKey = this.getParameterKey(parameters);
+    if (Object.keys(parameters).length > 0 && this.parameterizedResults?.has(id) && this.parameterizedResults.get(id)?.has(paramKey)) {
+      return this.parameterizedResults.get(id).get(paramKey);
+    }
+    if (this.results?.has(id)) {
+      return this.results.get(id);
+    }
+    Logger.log("error", {
+      message: "ContextManager:getResult:notFound",
+      params: {
+        queryId: id,
+        parameters,
+        availableResults: this.getResultsSnapshot(),
+        instanceId: this.instanceId
+      }
+    });
+    throw new Error(
+      `Result not found for query ${id} with parameters ${JSON.stringify(
+        parameters
+      )}`
+    );
   }
-  hasResult(queryId) {
-    return this.context.has(queryId);
+  hasResult(queryId, parameters = {}) {
+    const id = Number(queryId);
+    const paramKey = this.getParameterKey(parameters);
+    if (Object.keys(parameters).length > 0) {
+      return this.parameterizedResults?.has(id) && this.parameterizedResults?.get(id)?.has(paramKey);
+    }
+    return this.results?.has(id);
+  }
+  getResultsSnapshot() {
+    return Array.from(this.results.entries()).reduce((acc, [key, value]) => {
+      acc[key] = value;
+      return acc;
+    }, {});
+  }
+  getParameterKey(parameters) {
+    return JSON.stringify(Object.entries(parameters).sort());
   }
   setVariable(name, value) {
     this.variables.set(name, value);
   }
   getVariable(name) {
-    if (!this.variables.has(name)) {
+    Logger.log("info", {
+      message: "ContextManager:getVariable",
+      params: {
+        name,
+        instanceId: this.instanceId,
+        value: this.variables.get(name)
+      }
+    });
+    if (this.variables.has(name) === null || this.variables.has(name) === void 0) {
       throw new Error(`Context variable not found: ${name}`);
     }
     return this.variables.get(name);
   }
   getExecutionState() {
     return {
-      results: Object.fromEntries(this.context),
-      variables: Object.fromEntries(this.variables)
+      results: this.results?.size > 0 ? Object.fromEntries(this.results) : {},
+      parameterizedResults: this.parameterizedResults?.size > 0 ? Object.fromEntries(this.context) : {},
+      variables: this.variables?.size > 0 ? Object.fromEntries(this.variables) : {}
     };
+  }
+};
+
+// src/core/childContext.js
+var ChildContext = class {
+  constructor(parentContext, parameters = {}) {
+    this.parent = parentContext;
+    this.parameters = parameters;
+    this.localVariables = /* @__PURE__ */ new Map();
+    this.localResults = /* @__PURE__ */ new Map();
+    Logger.log("info", {
+      message: "ChildContext:constructor",
+      params: { parameters, parentId: parentContext.instanceId }
+    });
+  }
+  // Variable Management
+  getVariable(name) {
+    if (this.localVariables?.has(name)) {
+      Logger.log("info", {
+        message: "ChildContext:getVariable:local",
+        params: { name, instanceId: this.instanceId }
+      });
+      return this.localVariables.get(name);
+    }
+    if (this.parameters?.hasOwnProperty(name)) {
+      Logger.log("info", {
+        message: "ChildContext:getVariable:parameters",
+        params: { name, instanceId: this.instanceId }
+      });
+      return this.parameters[name];
+    }
+    Logger.log("info", {
+      message: "ChildContext:getVariable:parent",
+      params: { name, instanceId: this.instanceId }
+    });
+    return this.parent.getVariable(name);
+  }
+  setVariable(name, value) {
+    this.localVariables.set(name, value);
+    Logger.log("info", {
+      message: "ChildContext:setVariable",
+      params: { name, value, instanceId: this.instanceId }
+    });
+  }
+  // Result Management
+  setResult(queryId, result, params = {}) {
+    const id = Number(queryId);
+    const paramKey = this.getParameterKey(params);
+    if (!this.localResults?.has(id)) {
+      this.localResults.set(id, /* @__PURE__ */ new Map());
+    }
+    this.localResults.get(id).set(paramKey, result);
+    Logger.log("info", {
+      message: "ChildContext:setResult",
+      params: {
+        queryId: id,
+        params,
+        result,
+        instanceId: this.instanceId,
+        allResults: this.getResultsSnapshot()
+      }
+    });
+  }
+  getResult(queryId, params = {}) {
+    const id = Number(queryId);
+    const paramKey = this.getParameterKey(params);
+    if (this.localResults?.has(id) && this.localResults?.get(id)?.has(paramKey)) {
+      return this.localResults.get(id).get(paramKey);
+    }
+    return this.parent.getResult(id, params);
+  }
+  hasResult(queryId, params = {}) {
+    const id = Number(queryId);
+    const paramKey = this.getParameterKey(params);
+    if (this.localResults?.has(id) && this.localResults?.get(id)?.has(paramKey)) {
+      return true;
+    }
+    return this.parent.hasResult(id, params);
+  }
+  // Helper Methods
+  getParameterKey(parameters) {
+    return JSON.stringify(Object.entries(parameters).sort());
+  }
+  // Context Inspection
+  getExecutionState() {
+    return {
+      localVariables: Object.fromEntries(this.localVariables),
+      parameters: this.parameters,
+      parentState: this.parent.getExecutionState()
+    };
+  }
+  // Access to parent's instance ID for debugging
+  get instanceId() {
+    return `child-of-${this.parent.instanceId}`;
   }
 };
 
@@ -34407,9 +34626,17 @@ var QueryRunner = class {
   }
   async run(initialQueryIds, contextVariables = {}) {
     try {
+      Logger.log("info", {
+        message: "QueryRunner:run:contextVariables",
+        params: { initialQueryIds, contextVariables }
+      });
       for (const [name, value] of Object.entries(contextVariables)) {
         this.context.setVariable(name, value);
       }
+      Logger.log("info", {
+        message: "QueryRunner:run:contextVariables",
+        params: { contextVariables: this.context.getExecutionState() }
+      });
       await this.buildDependencyGraph(initialQueryIds);
       this.graph.detectCircularDependencies();
       const executionOrder = this.graph.getExecutionOrder();
@@ -34429,8 +34656,7 @@ var QueryRunner = class {
         params: {
           initialQueryIds,
           results,
-          context: this.context.getResult(parseInt(initialQueryIds[0])),
-          contextVariables: this.context.getExecutionState()
+          context: this.context.getResult(parseInt(initialQueryIds[0]))
         }
       });
       return results;
@@ -34444,52 +34670,62 @@ var QueryRunner = class {
       this.cleanup();
     }
   }
-  async runQuery(queryId) {
-    if (this.context.hasResult(queryId)) {
-      return this.context.getResult(queryId);
+  async runQuery(queryId, parameters = {}) {
+    const id = Number(queryId);
+    Logger.log("info", {
+      message: "QueryRunner:runQuery",
+      params: { queryId: id, parameters }
+    });
+    if (this.context.hasResult(id, parameters)) {
+      Logger.log("info", {
+        message: "QueryRunner:runQuery:cached",
+        params: { queryId: id, parameters }
+      });
+      return this.context.getResult(id, parameters);
     }
-    const node = this.graph.graph.get(queryId);
+    const node = this.graph.graph.get(id);
     if (!node) {
-      throw new Error(`Query not found in graph: ${queryId}`);
+      Logger.log("error", {
+        message: "QueryRunner:runQuery:catch-2",
+        params: { queryId: id, error: "Query not found in graph" }
+      });
+      throw new Error(`Query ${id} not found in graph`);
     }
     const query = node.query;
     const datasource = await this.getDataSource(query);
     try {
+      const childContext = new ChildContext(this.context, parameters);
+      Logger.log("info", {
+        message: "QueryRunner:runQuery:resolveOptions",
+        params: { queryId: id, parameters, options: query.dataQueryOptions }
+      });
       const resolvedOptions = await TemplateResolver.resolve(
         query.dataQueryOptions,
-        this.context,
+        childContext,
         this
       );
       Logger.log("info", {
-        message: "QueryRunner:runQuery:executing",
-        params: { queryId, query }
+        message: "QueryRunner:runQuery:resolvedOptions",
+        params: { queryId: id, parameters, resolvedOptions }
       });
-      const result = await datasource.execute(resolvedOptions, this.context);
+      Logger.log("info", {
+        message: "QueryRunner:runQuery:execute",
+        params: { queryId: id, parameters, resolvedOptions }
+      });
+      const result = await datasource.execute(resolvedOptions, childContext);
       const resolvedResult = await TemplateResolver.resolve(
         result,
-        this.context,
+        childContext,
         this
       );
-      Logger.log("success", {
-        message: "QueryRunner:runQuery:success",
-        params: { queryId, result, resolvedResult }
-      });
-      this.context.setResult(queryId, resolvedResult);
-      Logger.log("warning", {
-        message: "QueryRunner:runQuery:success:context",
-        params: {
-          queryId,
-          context: this.context.getResult(queryId),
-          contextVariables: this.context.getExecutionState()
-        }
-      });
+      this.context.setResult(id, resolvedResult, parameters);
       return resolvedResult;
     } catch (error) {
       Logger.log("error", {
-        message: "QueryRunner:runQuery:catch-1",
-        params: { queryId, error }
+        message: "QueryRunner:runQuery:catch-3",
+        params: { queryId: id, parameters, error }
       });
-      throw new Error(`Query ${queryId} failed: ${error.message}`);
+      throw error;
     }
   }
   async buildDependencyGraph(queryIds) {

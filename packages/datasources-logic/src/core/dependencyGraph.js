@@ -11,10 +11,10 @@ export default class DependencyGraph {
   }
 
   addDependency(fromId, toId) {
-    if (!this.graph.has(parseInt(fromId))) {
+    if (!this.graph?.has(parseInt(fromId))) {
       throw new Error(`Query ${fromId} not found in graph`);
     }
-    this.graph.get(parseInt(fromId)).dependencies.add(toId);
+    this.graph?.get(parseInt(fromId)).dependencies?.add(toId);
   }
 
   detectCircularDependencies() {
@@ -22,15 +22,15 @@ export default class DependencyGraph {
     const recursionStack = new Set();
 
     const visit = (nodeId) => {
-      if (!visited.has(nodeId)) {
+      if (!visited?.has(nodeId)) {
         visited.add(nodeId);
         recursionStack.add(nodeId);
 
         const node = this.graph.get(nodeId);
         for (const depId of node.dependencies) {
-          if (!visited.has(depId)) {
+          if (!visited?.has(depId)) {
             if (visit(depId)) return true;
-          } else if (recursionStack.has(depId)) {
+          } else if (recursionStack?.has(depId)) {
             return true;
           }
         }
