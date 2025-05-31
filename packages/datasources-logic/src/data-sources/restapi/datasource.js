@@ -7,7 +7,7 @@ export default class RestAPIDataSource extends DataSource {
     const { method, baseUrl, headers, body, params } = config;
     Logger.log("info", {
       message: "restapi:RestAPIDataSource:execute:params",
-      params: {config, method, baseUrl, headers, body, params },
+      params: { method, baseUrl, headers, body, params },
     });
 
     try {

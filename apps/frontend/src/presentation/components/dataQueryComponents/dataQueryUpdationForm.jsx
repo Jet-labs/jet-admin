@@ -227,7 +227,10 @@ export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
                   defaultSize={80}
                   className="space-y-3 md:space-y-4 p-3 h-full w-full !overflow-y-auto"
                 >
-                  <DataQueryEditor dataQueryEditorForm={queryUpdationForm} />
+                  <DataQueryEditor
+                    key={`dataQueryEditor_${dataQuery?.dataQueryID}`}
+                    dataQueryEditorForm={queryUpdationForm}
+                  />
                   <div className="w-full flex flex-row justify-end">
                     <DataQueryCloneForm
                       key={`dataQueryCloneForm_${dataQuery?.dataQueryID}`}

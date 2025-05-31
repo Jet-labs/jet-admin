@@ -11,10 +11,10 @@ export default class DependencyGraph {
   }
 
   addDependency(fromId, toId) {
-    if (!this.graph.has(fromId)) {
+    if (!this.graph.has(parseInt(fromId))) {
       throw new Error(`Query ${fromId} not found in graph`);
     }
-    this.graph.get(fromId).dependencies.add(toId);
+    this.graph.get(parseInt(fromId)).dependencies.add(toId);
   }
 
   detectCircularDependencies() {

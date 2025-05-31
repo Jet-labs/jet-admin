@@ -72,11 +72,9 @@ router.get(
   authMiddleware.checkUserPermissions(["tenant:query:read"]),
   dataQueryController.getDataQueryByID
 );
-router.get(
+router.post(
   "/:dataQueryID/queryTest",
-  param("dataQueryID")
-    .isNumeric()
-    .withMessage("dataQueryID must be a number"),
+  param("dataQueryID").isNumeric().withMessage("dataQueryID must be a number"),
   expressUtils.validationChecker,
   authMiddleware.checkUserPermissions(["tenant:query:test"]),
   dataQueryController.runDataQueryByID

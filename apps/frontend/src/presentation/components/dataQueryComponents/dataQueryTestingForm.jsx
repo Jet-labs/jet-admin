@@ -11,7 +11,9 @@ export const DataQueryTestingForm = ({
   tenantID,
   dataQueryID,
   setDataQueryTestResult,
+  // eslint-disable-next-line no-unused-vars
   datasourceID,
+  // eslint-disable-next-line no-unused-vars
   datasourceType,
   dataQueryOptions,
 }) => {
@@ -26,7 +28,7 @@ export const DataQueryTestingForm = ({
   const [isArgsFormOpen, setIsArgsFormOpen] = useState(false);
 
   const { isPending: isTestingDataQuery, mutate: testDataQuery } = useMutation({
-    mutationFn: (argValues) => {
+    mutationFn: ({ argValues }) => {
       return testDataQueryByIDAPI({
         tenantID,
         dataQueryID,
@@ -51,7 +53,7 @@ export const DataQueryTestingForm = ({
     ) {
       _handleOpenArgsForm();
     } else {
-      testDataQuery();
+      testDataQuery({ argValues: null });
     }
   };
 
@@ -66,7 +68,7 @@ export const DataQueryTestingForm = ({
   const _handleOnArgFormCompleted = (dataQueryArgValues) => {
     setIsArgsFormOpen(false);
     testDataQuery({
-      args: dataQueryArgValues,
+      argValues: dataQueryArgValues,
     });
   };
 

@@ -34118,7 +34118,7 @@ var RestAPIDataSource = class extends DataSource {
     const { method, baseUrl, headers, body, params } = config;
     Logger.log("info", {
       message: "restapi:RestAPIDataSource:execute:params",
-      params: { config, method, baseUrl, headers, body, params }
+      params: { method, baseUrl, headers, body, params }
     });
     try {
       const response = await axios_default({
@@ -34183,10 +34183,10 @@ var DependencyGraph = class {
     });
   }
   addDependency(fromId, toId) {
-    if (!this.graph.has(fromId)) {
+    if (!this.graph.has(parseInt(fromId))) {
       throw new Error(`Query ${fromId} not found in graph`);
     }
-    this.graph.get(fromId).dependencies.add(toId);
+    this.graph.get(parseInt(fromId)).dependencies.add(toId);
   }
   detectCircularDependencies() {
     const visited = /* @__PURE__ */ new Set();
@@ -34250,20 +34250,22 @@ var DependencyGraph = class {
 };
 
 // src/core/templateResolver.js
-var DYNAMIC_PLACEHOLDER_REGEX = /\$\{query_id_(\d+)(?:\[([^\]]+)\])?(?:\.([\w]+))?\}/g;
-var NESTED_ID_REGEX = /\$\{query_id_(\d+)(?:\[([^\]]+)\])?(?:\.([\w]+))?\}/;
 var TemplateResolver = class {
+  // Unified regex for all placeholder types
+  static PLACEHOLDER_REGEX = /\$\{([^:}]+)(?::(\d+))?(?:\[([^\]]+)\])?(?:\.([\w]+))?\}/g;
   static extractDependencies(template) {
     const dependencies = /* @__PURE__ */ new Set();
     const extract = (value) => {
       if (typeof value === "string") {
-        let match;
-        while ((match = DYNAMIC_PLACEHOLDER_REGEX.exec(value)) !== null) {
-          dependencies.add(parseInt(match[1], 10));
+        const matches = value.matchAll(this.PLACEHOLDER_REGEX);
+        for (const match of matches) {
+          if (match[1] === "query_id" && match[2]) {
+            dependencies.add(parseInt(match[2], 10));
+          }
         }
       } else if (Array.isArray(value)) {
         value.forEach(extract);
-      } else if (typeof value === "object" && value !== null) {
+      } else if (value && typeof value === "object") {
         Object.values(value).forEach(extract);
       }
     };
@@ -34279,58 +34281,82 @@ var TemplateResolver = class {
         template.map((item) => this.resolve(item, context, queryRunner))
       );
     }
-    if (typeof template === "object" && template !== null) {
-      return this.resolveObject(template, context, queryRunner);
+    if (template && typeof template === "object") {
+      const resolvedObj = {};
+      for (const [key, value] of Object.entries(template)) {
+        resolvedObj[key] = await this.resolve(value, context, queryRunner);
+      }
+      return resolvedObj;
     }
     return template;
   }
-  static async resolveString(str, context, queryRunner) {
-    let resolvedStr = str;
-    let nestedMatch;
-    while ((nestedMatch = NESTED_ID_REGEX.exec(str)) !== null) {
-      const [fullMatch, queryId] = nestedMatch;
-      if (!context.hasResult(parseInt(queryId, 10))) {
-        await queryRunner.runQuery(parseInt(queryId, 10));
-      }
-      const innerResult = context.getResult(parseInt(queryId, 10));
-      resolvedStr = resolvedStr.replace(fullMatch, innerResult);
-    }
-    const placeholders = [];
-    let match;
-    while ((match = DYNAMIC_PLACEHOLDER_REGEX.exec(resolvedStr)) !== null) {
-      placeholders.push({
-        fullMatch: match[0],
-        queryId: parseInt(match[1], 10),
-        arrayIndex: match[2],
-        property: match[3]
+  static async resolveString(str, context, queryRunner, depth = 0) {
+    const MAX_DEPTH = 10;
+    if (depth > MAX_DEPTH) {
+      Logger.log("error", {
+        message: "TemplateResolver:resolveString:catch-1",
+        params: { error: "Max recursion depth reached", depth, MAX_DEPTH }
       });
+      return str;
     }
-    for (const { fullMatch, queryId, arrayIndex, property } of placeholders) {
-      if (!context.hasResult(queryId)) {
-        await queryRunner.runQuery(queryId);
-      }
-      let value = context.getResult(queryId);
-      if (arrayIndex) {
-        const index = arrayIndex.replace(/['"]/g, "");
-        if (Array.isArray(value)) {
-          value = value[parseInt(index, 10)];
-        } else if (typeof value === "object") {
-          value = value[index];
+    let resolved = str;
+    const matches = [...str.matchAll(this.PLACEHOLDER_REGEX)];
+    Logger.log("info", {
+      message: "TemplateResolver:resolveString:params",
+      params: { str, matches, depth }
+    });
+    for (const match of matches) {
+      const [fullMatch, type, id, arrayIndex, property] = match;
+      try {
+        let value;
+        if (type === "query_id" && id) {
+          const queryId = parseInt(id, 10);
+          if (!context.hasResult(queryId)) {
+            Logger.log("info", {
+              message: "TemplateResolver:resolveString:runQuery",
+              params: { queryId }
+            });
+            await queryRunner.runQuery(queryId);
+          }
+          value = context.getResult(queryId);
+          if (arrayIndex) {
+            const index = arrayIndex.replace(/['"]/g, "");
+            value = value?.[index];
+          }
+          if (property) {
+            value = value?.[property];
+          }
+        } else {
+          const varName = type;
+          if (context.variables.has(varName)) {
+            value = context.getVariable(varName);
+          } else {
+            Logger.log("warning", {
+              message: "TemplateResolver:resolveString:variable_not_found",
+              params: { varName }
+            });
+            continue;
+          }
         }
+        if (typeof value === "object") {
+          value = JSON.stringify(value);
+        }
+        resolved = resolved.replace(fullMatch, value);
+        Logger.log("info", {
+          message: "TemplateResolver:resolveString:placeholder_resolved",
+          params: { fullMatch, value, resolvedSoFar: resolved }
+        });
+      } catch (error) {
+        Logger.log("error", {
+          message: "TemplateResolver:resolveString:catch-1",
+          params: { error }
+        });
       }
-      if (property) {
-        value = value?.[property];
-      }
-      resolvedStr = resolvedStr.replace(fullMatch, value);
     }
-    return resolvedStr;
-  }
-  static async resolveObject(obj, context, queryRunner) {
-    const result = {};
-    for (const [key, value] of Object.entries(obj)) {
-      result[key] = await this.resolve(value, context, queryRunner);
+    if (resolved.includes("${") && resolved !== str) {
+      return this.resolveString(resolved, context, queryRunner, depth + 1);
     }
-    return result;
+    return resolved;
   }
 };
 
@@ -34470,6 +34496,17 @@ var QueryRunner = class {
       if (processed.has(queryId)) continue;
       processed.add(queryId);
       const query = await this.queryFetcher(queryId);
+      if (!query) {
+        Logger.log("error", {
+          message: "QueryRunner:buildDependencyGraph:catch-2",
+          params: { queryId, error: "Query not found in data store" }
+        });
+        throw new Error(`Query not found in data store: ${queryId}`);
+      }
+      Logger.log("info", {
+        message: "QueryRunner:buildDependencyGraph:query",
+        params: { queryId, query }
+      });
       this.graph.addNode(query);
       const dependencies = TemplateResolver.extractDependencies(
         JSON.stringify(query.dataQueryOptions)
@@ -34485,7 +34522,18 @@ var QueryRunner = class {
     if (this.dataSourceCache.has(cacheKey)) {
       return this.dataSourceCache.get(cacheKey);
     }
-    const datasourceConfig = await this.datasourceFetcher(query.datasourceID);
+    let datasourceConfig;
+    switch (query.datasourceType) {
+      case DATASOURCE_TYPES.RESTAPI.value:
+        datasourceConfig = {
+          datasourceType: query.datasourceType,
+          datasourceOptions: query.dataQueryOptions
+        };
+        break;
+      default:
+        datasourceConfig = await this.datasourceFetcher(query.datasourceID);
+        break;
+    }
     const DataSource2 = data_sources_default.getDataSource(query.datasourceType);
     const instance = new DataSource2(datasourceConfig);
     this.dataSourceCache.set(cacheKey, instance);

@@ -611,6 +611,102 @@ const CustomKeyValueTypeArrayRenderer = ({
   );
 };
 
+const CustomKeyTypeArrayRenderer = ({
+  data,
+  path,
+  handleChange,
+  schema,
+  uischema,
+  errors,
+  label,
+  enabled,
+  renderers,
+}) => {
+  const items = data || [];
+  const itemSchema = schema.items;
+
+  const handleAddItem = () => {
+    const newItem = itemSchema.properties
+      ? Object.fromEntries(
+          Object.entries(itemSchema.properties).map(([key, propSchema]) => [
+            key,
+            propSchema.default !== undefined ? propSchema.default : "",
+          ])
+        )
+      : { key: "", value: "" };
+    handleChange(path, [...items, newItem]);
+  };
+
+  const handleRemoveItem = (index) => {
+    const newItems = items.filter((_, i) => i !== index);
+    handleChange(path, newItems);
+  };
+
+  return (
+    <div className="p-3 border border-slate-200 rounded bg-white">
+      <label className="block mb-1 text-sm font-medium text-slate-700">
+        {label || uischema.label || "Items"}
+      </label>
+      {errors && errors.length > 0 && (
+        <p className="text-red-500 text-xs mb-2">{errors}</p>
+      )}
+
+      <div className="space-y-3">
+        {items.map((item, index) => (
+          <div key={`${path}-${index}`} className="flex items-center space-x-2">
+            {/* Key Field */}
+            <div className="flex-grow">
+              <JsonFormsDispatch
+                uischema={{
+                  type: "Control",
+                  scope: "#/properties/key",
+                  label: "Key",
+                  options: uischema.options?.keyOptions,
+                }}
+                schema={itemSchema} // Pass the entire item schema
+                path={`${path}.${index}`} // Path to the item object
+                enabled={enabled}
+                renderers={renderers}
+              />
+            </div>
+            {/* Vlaue type */}
+            <div className="flex-grow">
+              <JsonFormsDispatch
+                uischema={{
+                  type: "Control",
+                  scope: "#/properties/type",
+                  label: "Value Type",
+                  options: uischema.options?.typeOptions,
+                }}
+                schema={itemSchema} // Pass the entire item schema
+                path={`${path}.${index}`} // Path to the item object
+                enabled={enabled}
+                renderers={renderers}
+              />
+            </div>
+
+            <button
+              type="button"
+              onClick={() => handleRemoveItem(index)}
+              className="mt-5 p-2 rounded bg-red-100 text-red-400 focus:outline-none hover:border-red-400"
+            >
+              <MdDeleteOutline />
+            </button>
+          </div>
+        ))}
+      </div>
+
+      <button
+        type="button"
+        onClick={handleAddItem}
+        className="mt-3 px-2 py-1 bg-white text-[#646cff] text-xs rounded hover:border-[#646cff] focus:outline-none border-slate-200"
+      >
+        Add Item
+      </button>
+    </div>
+  );
+};
+
 const CustomCheckboxInput = (props) => {
   const {
     data,
@@ -719,6 +815,9 @@ export const MyCustomKeyValueArrayControl = withJsonFormsControlProps(
 export const MyCustomKeyValueTypeArrayControl = withJsonFormsControlProps(
   CustomKeyValueTypeArrayRenderer
 );
+export const MyCustomKeyTypeArrayControl = withJsonFormsControlProps(
+  CustomKeyTypeArrayRenderer
+);
 export const MyCustomTabRenderer = withJsonFormsLayoutProps(CustomTabRenderer);
 
 export const MyCustomCheckboxInput =
@@ -791,6 +890,19 @@ CustomKeyValueArrayRenderer.propTypes = {
 };
 
 CustomKeyValueTypeArrayRenderer.propTypes = {
+  data: PropTypes.arrayOf(PropTypes.object), // data is an array of objects ({key, value})
+  path: PropTypes.string.isRequired,
+  handleChange: PropTypes.func.isRequired,
+  schema: PropTypes.object.isRequired, // Schema for the array itself
+  uischema: PropTypes.object.isRequired,
+  label: PropTypes.string,
+  description: PropTypes.string, // Not usually passed to array renderers, but fine if it is.
+  errors: PropTypes.arrayOf(PropTypes.string),
+  enabled: PropTypes.bool, // Enabled can be optional as it might come from context
+  renderers: PropTypes.arrayOf(PropTypes.object).isRequired, // Must pass renderers down
+};
+
+CustomKeyTypeArrayRenderer.propTypes = {
   data: PropTypes.arrayOf(PropTypes.object), // data is an array of objects ({key, value})
   path: PropTypes.string.isRequired,
   handleChange: PropTypes.func.isRequired,
@@ -999,6 +1111,40 @@ const customKeyValueTypeArrayRendererTester = (uischema, rootSchema) => {
   }
 };
 
+const customKeyTypeArrayRendererTester = (uischema, rootSchema) => {
+  // 1) Must be a Control
+  if (uischema.type !== "Control") {
+    return -1;
+  }
+  try {
+    // 2) Resolve the schema at this control’s scope
+    const schemaAtScope = Resolve.schema(
+      rootSchema,
+      uischema.scope,
+      rootSchema
+    );
+    // 3) It must be an array
+    if (!schemaAtScope || schemaAtScope.type !== "array") {
+      return -1;
+    }
+    // 4) Items must be objects with string key/type props
+    const itemSchema = schemaAtScope.items;
+    if (
+      itemSchema.type !== "object" ||
+      itemSchema.properties?.key?.type !== "string" ||
+      itemSchema.properties?.type?.type !== "string" ||
+      itemSchema.properties?.value?.type
+    ) {
+      return -1;
+    }
+    // If we get here, it’s a key/value array—give a high rank so our renderer wins
+    return 60; // e.g. return 60
+  } catch (e) {
+    console.warn("Error in key/value tester:", e);
+    return -1;
+  }
+};
+
 const customCheckboxTester = (uischema, schema) => {
   if (uischema.type !== "Control") {
     return -1;
@@ -1063,5 +1209,9 @@ export const customJSONFormRenderers = [
   {
     tester: customKeyValueTypeArrayRendererTester,
     renderer: MyCustomKeyValueTypeArrayControl,
+  },
+  {
+    tester: customKeyTypeArrayRendererTester,
+    renderer: MyCustomKeyTypeArrayControl,
   },
 ];

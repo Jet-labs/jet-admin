@@ -4,8 +4,7 @@
     "properties": {
       "baseUrl": {
         "type": "string",
-        "description": "Base URL of the REST API (e.g., https://api.example.com/v1 )",
-        "format": "uri"
+        "description": "Base URL of the REST API (e.g., https://api.example.com/v1 )"
       },
       "method": {
         "type": "string",
@@ -103,12 +102,9 @@
                 "object (JSON stringified)"
               ],
               "default": "string"
-            },
-            "value": {
-              "type": "string"
             }
           },
-          "required": ["key", "value"]
+          "required": ["key", "type"]
         }
       }
     },
@@ -312,7 +308,7 @@
               },
               {
                 "type": "Control",
-                "scope": "#/properties/value"
+                "scope": "#/properties/type"
               }
             ]
           }

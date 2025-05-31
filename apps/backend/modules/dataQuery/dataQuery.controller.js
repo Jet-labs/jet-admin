@@ -219,16 +219,18 @@ dataQueryController.generateAIPromptBasedQuery = async (req, res) => {
 dataQueryController.runDataQueryByID = async (req, res) => {
   try {
     const { user, dbPool } = req;
+    const { argValues } = req.body;
     const { dataQueryID, tenantID } = req.params;
     Logger.log("info", {
       message: "dataQueryController:runDataQueryByID:params",
-      params: { userID: user.userID, tenantID, dataQueryID },
+      params: { userID: user.userID, tenantID, dataQueryID, argValues },
     });
 
     const dataQueryResult = await dataQueryService.runDataQueryByID({
       userID: parseInt(user.userID),
       tenantID,
       dataQueryID,
+      argValues,
     });
 
     Logger.log("success", {

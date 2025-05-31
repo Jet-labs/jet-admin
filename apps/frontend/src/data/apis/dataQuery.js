@@ -243,21 +243,23 @@ export const generateAIPromptBasedQueryAPI = async ({ tenantID, aiPrompt }) => {
 export const testDataQueryByIDAPI = async ({
   tenantID,
   dataQueryID,
+  argValues,
 }) => {
   try {
     const url =
       CONSTANTS.SERVER_HOST +
-      CONSTANTS.APIS.DATABASE.testDataQueryByIDAPI(
-        tenantID,
-        dataQueryID
-      );
+      CONSTANTS.APIS.DATABASE.testDataQueryByIDAPI(tenantID, dataQueryID);
     const bearerToken = await firebaseAuth.currentUser.getIdToken();
     if (bearerToken) {
-      const response = await axios.get(url, {
-        headers: {
-          authorization: `Bearer ${bearerToken}`,
-        },
-      });
+      const response = await axios.post(
+        url,
+        { argValues },
+        {
+          headers: {
+            authorization: `Bearer ${bearerToken}`,
+          },
+        }
+      );
       if (response.data && response.data.success === true) {
         return response.data.dataQueryResult;
       } else if (response.data.error) {

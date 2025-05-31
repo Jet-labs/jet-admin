@@ -3,7 +3,7 @@ import TemplateResolver from "./templateResolver.js";
 import ContextManager from "./contextManager.js";
 import dataSourceRegistry from "../data-sources/index.js";
 import { Logger } from "../utils/logger.js";
-
+import { DATASOURCE_TYPES } from "@jet-admin/datasource-types";
 
 export default class QueryRunner {
   constructor(queryFetcher, datasourceFetcher) {
@@ -59,10 +59,10 @@ export default class QueryRunner {
 
       return results;
     } catch (error) {
-        Logger.log("error", {
-          message: "QueryRunner:run:catch-1",
-          params: { error },
-        });
+      Logger.log("error", {
+        message: "QueryRunner:run:catch-1",
+        params: { error },
+      });
       throw error;
     } finally {
       this.cleanup();
@@ -142,6 +142,19 @@ export default class QueryRunner {
 
       // Fetch query from data store
       const query = await this.queryFetcher(queryId);
+      if (!query) {
+        Logger.log("error", {
+          message: "QueryRunner:buildDependencyGraph:catch-2",
+          params: { queryId, error: "Query not found in data store" },
+        });
+        throw new Error(`Query not found in data store: ${queryId}`);
+      }
+
+      Logger.log("info", {
+        message: "QueryRunner:buildDependencyGraph:query",
+        params: { queryId, query },
+      });
+
       this.graph.addNode(query);
 
       // Extract dependencies from query text
@@ -164,7 +177,19 @@ export default class QueryRunner {
       return this.dataSourceCache.get(cacheKey);
     }
 
-    const datasourceConfig = await this.datasourceFetcher(query.datasourceID);
+    let datasourceConfig;
+    switch (query.datasourceType) {
+      case DATASOURCE_TYPES.RESTAPI.value:
+        datasourceConfig = {
+          datasourceType: query.datasourceType,
+          datasourceOptions: query.dataQueryOptions,
+        };
+        break;
+      default:
+        datasourceConfig = await this.datasourceFetcher(query.datasourceID);
+        break;
+    }
+
     const DataSource = dataSourceRegistry.getDataSource(query.datasourceType);
     const instance = new DataSource(datasourceConfig);
 

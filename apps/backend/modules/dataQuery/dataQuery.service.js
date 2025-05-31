@@ -310,12 +310,14 @@ dataQueryService.generateAIPromptBasedQuery = async ({
  * @param {number} param0.userID
  * @param {string} param0.tenantID
  * @param {number} param0.dataQueryID
+ * @param {object} param0.argValues
  * @returns {Promise<object>}
  */
 dataQueryService.runDataQueryByID = async ({
   userID,
   tenantID,
   dataQueryID,
+  argValues,
 }) => {
   Logger.log("info", {
     message: "dataQueryService:runDataQueryByID:params",
@@ -323,6 +325,7 @@ dataQueryService.runDataQueryByID = async ({
       userID,
       tenantID,
       dataQueryID,
+      argValues,
     },
   });
 
@@ -352,16 +355,44 @@ dataQueryService.runDataQueryByID = async ({
 
     const queryRunner = new QueryRunner(
       async (queryId) => {
-        return dataQuery;
+        return await prisma.tblDataQueries.findFirst({
+          where: {
+            dataQueryID: parseInt(queryId),
+          },
+        });
       },
       async (datasourceID) => {
-        return dataQuery.tblDatasources;
+        return await prisma.tblDatasources.findFirst({
+          where: {
+            datasourceID: parseInt(datasourceID),
+          },
+        });
       }
     );
 
+    const mappedArgsToValues =
+      argValues && dataQuery.dataQueryOptions.args
+        ? dataQuery.dataQueryOptions.args.map((arg) => ({
+            ...arg,
+            value: argValues[arg.key],
+          }))
+        : [];
+
+    Logger.log("info", {
+      message: "dataQueryService:runDataQueryByID:queryRunner.run",
+      params: {
+        userID,
+        tenantID,
+        dataQueryID,
+        argValues,
+        args: dataQuery.dataQueryOptions.args,
+        mappedArgsToValues,
+      },
+    });
+
     const results = await queryRunner.run(
       [dataQueryID],
-      keyValueTypeArrayToObject(dataQuery.dataQueryOptions.args)
+      keyValueTypeArrayToObject(mappedArgsToValues)
     );
 
     Logger.log("success", {

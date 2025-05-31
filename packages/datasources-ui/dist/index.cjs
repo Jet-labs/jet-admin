@@ -69949,11 +69949,19 @@ var queryConfig_default = {
             key: {
               type: "string"
             },
-            value: {
-              type: "string"
+            type: {
+              type: "string",
+              enum: [
+                "string",
+                "number",
+                "boolean",
+                "array (, separated)",
+                "object (JSON stringified)"
+              ],
+              default: "string"
             }
           },
-          required: ["key", "value"]
+          required: ["key", "type"]
         }
       }
     },
@@ -69981,7 +69989,7 @@ var queryConfig_default = {
               },
               {
                 type: "Control",
-                scope: "#/properties/value"
+                scope: "#/properties/type"
               }
             ]
           }
@@ -70018,8 +70026,7 @@ var queryConfig_default2 = {
     properties: {
       baseUrl: {
         type: "string",
-        description: "Base URL of the REST API (e.g., https://api.example.com/v1 )",
-        format: "uri"
+        description: "Base URL of the REST API (e.g., https://api.example.com/v1 )"
       },
       method: {
         type: "string",
@@ -70117,12 +70124,9 @@ var queryConfig_default2 = {
                 "object (JSON stringified)"
               ],
               default: "string"
-            },
-            value: {
-              type: "string"
             }
           },
-          required: ["key", "value"]
+          required: ["key", "type"]
         }
       }
     },
@@ -70326,7 +70330,7 @@ var queryConfig_default2 = {
               },
               {
                 type: "Control",
-                scope: "#/properties/value"
+                scope: "#/properties/type"
               }
             ]
           }
