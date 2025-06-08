@@ -180,9 +180,6 @@ export const DataQueryAdditionForm = ({ tenantID }) => {
           ]?.queryResponseView({
             queryResult: dataQueryTestResult,
           })}
-          {/* <DataQueryResponseView
-            dataQueryResult={dataQueryTestResult}
-          /> */}
         </ResizablePanel>
       </ResizablePanelGroup>
     </div>

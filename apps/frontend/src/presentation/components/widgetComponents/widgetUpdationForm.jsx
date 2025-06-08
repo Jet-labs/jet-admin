@@ -119,10 +119,10 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
         widgetID,
         "data",
       ],
-      mutationFn: (data) => {
-        return getWidgetDataUsingWidgetAPI({
+      mutationFn: () => {
+        return getWidgetDataByIDAPI({
           tenantID,
-          widgetData: data,
+          widgetID,
         });
       },
       retry: false,

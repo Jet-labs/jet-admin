@@ -12,7 +12,7 @@ const { aiService } = require("../ai/ai.service");
 const { isUUID } = require("validator");
 const dataQueryService = {};
 const { keyValueTypeArrayToObject } = require("../../utils/json.util");
-const { QueryRunner } = require("./core/queryRunner.js");
+const { QueryEngine } = require("./core2/engine");
 
 /**
  *
@@ -353,7 +353,7 @@ dataQueryService.runDataQueryByID = async ({
       throw new Error(`Database query with ID ${dataQueryID} not found`);
     }
 
-    const queryRunner = new QueryRunner(
+    const queryRunner = new QueryEngine(
       async (queryId) => {
         return await prisma.tblDataQueries.findFirst({
           where: {
@@ -377,6 +377,7 @@ dataQueryService.runDataQueryByID = async ({
             value: argValues[arg.key],
           }))
         : [];
+    const kvtObject = keyValueTypeArrayToObject(mappedArgsToValues);
 
     Logger.log("info", {
       message: "dataQueryService:runDataQueryByID:queryRunner.run",
@@ -387,13 +388,11 @@ dataQueryService.runDataQueryByID = async ({
         argValues,
         args: dataQuery.dataQueryOptions.args,
         mappedArgsToValues,
+        kvtObject,
       },
     });
 
-    const results = await queryRunner.run(
-      [dataQueryID],
-      keyValueTypeArrayToObject(mappedArgsToValues)
-    );
+    const results = await queryRunner.executeQuery(dataQueryID, kvtObject);
 
     Logger.log("success", {
       message: "dataQueryService:runDataQueryByID:success",
@@ -404,7 +403,7 @@ dataQueryService.runDataQueryByID = async ({
         results,
       },
     });
-    return results && results[dataQueryID] ? results[dataQueryID] : {};
+    return results;
   } catch (error) {
     Logger.log("error", {
       message: "dataQueryService:runDataQueryByID:failure",

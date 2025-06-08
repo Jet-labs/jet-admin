@@ -11,7 +11,7 @@ export const processTableWidgetQueryResults = ({
   dataQueriesResult,
 }) => {
   const datasets = widget.dataQueries.map((mapping, index) => {
-    const result = dataQueriesResult[index]?.result || [];
+    const result = dataQueriesResult[index] || [];
     return result;
   });
   return datasets;

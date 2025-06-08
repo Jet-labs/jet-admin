@@ -2,8 +2,8 @@ import { IoClose } from "react-icons/io5";
 import { DataQueryTestingForm } from "./dataQueryTestingForm";
 import { useParams } from "react-router-dom";
 import React, { useState } from "react";
-import { DataQueryResponseView } from "./dataQueryResponseView";
 import PropTypes from "prop-types";
+import { DATASOURCE_UI_COMPONENTS } from "@jet-admin/datasources-ui";
 
 export const DataQueryTestingPanel = ({
   selectedQueryForTesting,
@@ -14,7 +14,7 @@ export const DataQueryTestingPanel = ({
     setSelectedQueryForTesting: PropTypes.func.isRequired,
   };
   const [dataQueryTestResult, setDataQueryTestResult] = useState();
-  const { tenantID, databaseSchemaName } = useParams();
+  const { tenantID } = useParams();
   const isOpen = selectedQueryForTesting ? true : false;
   const _handleClose = () => {
     setSelectedQueryForTesting(null);
@@ -47,20 +47,21 @@ export const DataQueryTestingPanel = ({
             <div className="w-full flex flex-col justify-start items-stretch h-full flex-grow">
               <div className="w-full flex flex-row justify-end mt-2">
                 <DataQueryTestingForm
+                  key={`dataQueryTestingPanel_${selectedQueryForTesting?.dataQueryID}`}
                   tenantID={tenantID}
-                  databaseSchemaName={databaseSchemaName}
                   dataQueryID={selectedQueryForTesting.dataQueryID}
-                  dataQueryString={
-                    selectedQueryForTesting.dataQueryOptions.dataQueryString
-                  }
-                  dataQueryArgs={
-                    selectedQueryForTesting.dataQueryOptions.dataQueryArgs
-                  }
+                  datasourceID={selectedQueryForTesting.datasourceID}
+                  datasourceType={selectedQueryForTesting.datasourceType}
+                  dataQueryOptions={selectedQueryForTesting.dataQueryOptions}
                   setDataQueryTestResult={setDataQueryTestResult}
                 />
               </div>
               <div className="w-full h-[calc(100%-70px)] mt-3 border-t border-t-slate-200">
-                <DataQueryResponseView dataQueryResult={dataQueryTestResult} />
+                {DATASOURCE_UI_COMPONENTS[
+                  selectedQueryForTesting?.datasourceType
+                ]?.queryResponseView({
+                  queryResult: dataQueryTestResult,
+                })}
               </div>
             </div>
           )}

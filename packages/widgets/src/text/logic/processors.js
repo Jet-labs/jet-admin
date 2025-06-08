@@ -14,12 +14,12 @@ export const processTextWidgetQueryResults = ({
   let consolidatedText = "";
 
   widget.dataQueries.forEach((mapping, index) => {
-    const result = dataQueriesResult[index]?.result || [];
+    const result = dataQueriesResult[index] || {};
     const textField = mapping.datasetFields?.text;
     if (textField) {
       // for text widget, 1 value of result is considered
-      dataset.push({ ...mapping.parameters, text: result[0][textField] });
-      consolidatedText += result[0][textField];
+      dataset.push({ ...mapping.parameters, text: result[textField] });
+      consolidatedText += result[textField];
     }
   });
 

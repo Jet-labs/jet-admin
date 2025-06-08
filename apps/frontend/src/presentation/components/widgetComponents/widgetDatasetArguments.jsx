@@ -28,7 +28,7 @@ export const WidgetDatasetArguments = ({
       ...initialValues,
     },
     validationSchema: formValidations.datasetArgumentsFormValidationSchema(
-      selectedQuery?.dataQueryOptions?.dataQueryArgs
+      selectedQuery?.dataQueryOptions?.args
     ),
     enableReinitialize: true,
     onSubmit: (values) => {
@@ -53,36 +53,34 @@ export const WidgetDatasetArguments = ({
         {CONSTANTS.STRINGS.WIDGET_DATASET_ARGUMENTS_TITLE}
       </DialogTitle>
       <DialogContent className="!p-4 !space-y-4">
-        {selectedQuery?.dataQueryOptions?.dataQueryArgs?.length > 0 && (
+        {selectedQuery?.dataQueryOptions?.args?.length > 0 && (
           <div>
             <label className="block mb-2 text-xs font-normal text-slate-500">
               {CONSTANTS.STRINGS.WIDGET_EDITOR_FORM_DATASET_ARGUMENTS_LABEL}
             </label>
             <div className="space-y-2">
-              {selectedQuery.dataQueryOptions.dataQueryArgs.map(
-                (arg, argIndex) => {
-                  const argName = arg.replace(/[{}]/g, "");
-                  return (
-                    <div key={`arg-${argIndex}`}>
-                      <input
-                        type="text"
-                        id={`arg-${argName}`}
-                        className="placeholder:text-slate-400 text-xs w-full bg-slate-50 border border-slate-300 text-slate-700 rounded focus:outline-none focus:border-slate-400 block px-2.5 py-1.5"
-                        placeholder={`Value for ${argName}`}
-                        value={
-                          datasetArgumentsForm.values.dataQueryArgValues?.[
-                            argName
-                          ] || ""
-                        }
-                        onChange={(e) =>
-                          _handleUpdateDatasetQueryArgs(argName, e.target.value)
-                        }
-                        onBlur={datasetArgumentsForm.handleBlur}
-                      />
-                    </div>
-                  );
-                }
-              )}
+              {selectedQuery.dataQueryOptions.args.map((arg, argIndex) => {
+                const argName = arg.key;
+                return (
+                  <div key={`arg-${argIndex}`}>
+                    <input
+                      type="text"
+                      id={`arg-${argName}`}
+                      className="placeholder:text-slate-400 text-xs w-full bg-slate-50 border border-slate-300 text-slate-700 rounded focus:outline-none focus:border-slate-400 block px-2.5 py-1.5"
+                      placeholder={`Value for ${argName}`}
+                      value={
+                        datasetArgumentsForm.values.dataQueryArgValues?.[
+                          argName
+                        ] || ""
+                      }
+                      onChange={(e) =>
+                        _handleUpdateDatasetQueryArgs(argName, e.target.value)
+                      }
+                      onBlur={datasetArgumentsForm.handleBlur}
+                    />
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}

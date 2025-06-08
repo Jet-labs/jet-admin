@@ -383,7 +383,7 @@ const CustomGroupLayout = (props) => {
 
   return (
     <div
-      className={`custom-group-container border p-3 mt-1 rounded ${customClass}`}
+      className={`custom-group-container border p-3 mt-3 rounded ${customClass}`}
     >
       {uischema.label && (
         <h2 className="!text-sm font-semibold text-slate-800 mb-2">
@@ -446,7 +446,7 @@ const CustomKeyValueArrayRenderer = ({
         <p className="text-red-500 text-xs mb-2">{errors}</p>
       )}
 
-      <div className="space-y-3">
+      <div className="">
         {items.map((item, index) => (
           <div key={`${path}-${index}`} className="flex items-center space-x-2">
             {/* Key Field */}
@@ -541,7 +541,7 @@ const CustomKeyValueTypeArrayRenderer = ({
         <p className="text-red-500 text-xs mb-2">{errors}</p>
       )}
 
-      <div className="space-y-3">
+      <div className="">
         {items.map((item, index) => (
           <div key={`${path}-${index}`} className="flex items-center space-x-2">
             {/* Key Field */}
@@ -643,7 +643,7 @@ const CustomKeyTypeArrayRenderer = ({
   };
 
   return (
-    <div className="p-3 border border-slate-200 rounded bg-white">
+    <div className="p-3 border mt-3 border-slate-200 rounded bg-white">
       <label className="block mb-1 text-sm font-medium text-slate-700">
         {label || uischema.label || "Items"}
       </label>
@@ -651,7 +651,7 @@ const CustomKeyTypeArrayRenderer = ({
         <p className="text-red-500 text-xs mb-2">{errors}</p>
       )}
 
-      <div className="space-y-3">
+      <div className="">
         {items.map((item, index) => (
           <div key={`${path}-${index}`} className="flex items-center space-x-2">
             {/* Key Field */}
@@ -757,7 +757,7 @@ const CustomTabRenderer = (props) => {
   const activeCategory = categories[activeTab];
 
   return (
-    <div className="custom-tabs-container mb-4">
+    <div className="custom-tabs-container">
       {/* Tab Headers */}
       <div className="flex border-slate-300">
         {categories.map((category, index) => (

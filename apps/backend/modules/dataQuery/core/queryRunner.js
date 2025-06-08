@@ -28,32 +28,25 @@ class QueryRunner {
       for (const [name, value] of Object.entries(contextVariables)) {
         this.context.setVariable(name, value);
       }
-
       Logger.log("info", {
         message: "QueryRunner:run:contextVariables",
         params: { contextVariables: this.context.getExecutionState() },
       });
-
       // Build dependency graph
       await this.buildDependencyGraph(initialQueryIds);
-
       // Detect circular dependencies
       this.graph.detectCircularDependencies();
-
       // Get execution order
       const executionOrder = this.graph.getExecutionOrder();
-
       // Execute independent queries in parallel
       const independentQueries = this.graph.getIndependentQueries();
       await Promise.all(independentQueries.map((id) => this.runQuery(id)));
-
       // Execute dependent queries sequentially
       for (const queryId of executionOrder) {
         if (!independentQueries.includes(queryId)) {
           await this.runQuery(queryId);
         }
       }
-
       // Return results for initial queries
       const results = {};
       for (const queryId of initialQueryIds) {
@@ -83,12 +76,10 @@ class QueryRunner {
 
   async runQuery(queryId, parameters = {}) {
     const id = Number(queryId);
-
     Logger.log("info", {
       message: "QueryRunner:runQuery",
       params: { queryId: id, parameters },
     });
-
     // Check if we already have a result for these parameters
     if (this.context.hasResult(id, parameters)) {
       Logger.log("info", {
@@ -112,6 +103,11 @@ class QueryRunner {
     const datasource = await this.getDataSource(query);
 
     try {
+      if (parameters) {
+        for (const [key, value] of Object.entries(parameters)) {
+          this.context.setVariable(key, value); // Set in parent context
+        }
+      }
       // Create a child context with parameters
       const childContext = new ChildContext(this.context, parameters);
 
@@ -163,13 +159,10 @@ class QueryRunner {
   async buildDependencyGraph(queryIds) {
     const queue = [...queryIds];
     const processed = new Set();
-
     while (queue.length > 0) {
       const queryId = queue.shift();
-
       if (processed.has(queryId)) continue;
       processed.add(queryId);
-
       // Fetch query from data store
       const query = await this.queryFetcher(queryId);
       if (!query) {
@@ -179,19 +172,15 @@ class QueryRunner {
         });
         throw new Error(`Query not found in data store: ${queryId}`);
       }
-
       Logger.log("info", {
         message: "QueryRunner:buildDependencyGraph:query",
         params: { queryId, query },
       });
-
       this.graph.addNode(query);
-
       // Extract dependencies from query text
       const dependencies = TemplateResolver.extractDependencies(
         JSON.stringify(query.dataQueryOptions)
       );
-
       // Add dependencies to graph
       for (const depId of dependencies) {
         this.graph.addDependency(queryId, depId);

@@ -151,7 +151,7 @@ formValidations.datasetArgumentsFormValidationSchema = (dataQueryArgs) => {
 
   // Dynamically create validation rules for each argument
   dataQueryArgs?.forEach((arg) => {
-    const argName = arg.replace(/[{}]/g, ""); // Remove curly braces if present
+    const argName = arg.key; // Remove curly braces if present
     dataQueryArgValuesSchema[argName] = Yup.string()
       .required(`Value for ${argName} is required`)
       .min(1, `Value for ${argName} cannot be empty`);

@@ -15023,18 +15023,20 @@ var processLineChartQueryResults = ({
 }) => {
   const xValues = /* @__PURE__ */ new Set();
   widget.dataQueries.forEach((mapping, index2) => {
-    const result = dataQueriesResult[index2]?.result || [];
+    const result = dataQueriesResult[index2] || [];
     const xField = mapping.datasetFields?.xAxis;
     if (xField) {
       result.forEach((row) => xValues.add(row[xField]));
     }
   });
+  console.log("xValues", xValues);
   const sortedLabels = [...xValues].sort((a2, b2) => {
     if (typeof a2 === "number" && typeof b2 === "number") return a2 - b2;
     return a2.toString().localeCompare(b2.toString());
   });
+  console.log("sortedLabels", sortedLabels);
   const datasets = widget.dataQueries.map((mapping, index2) => {
-    const result = dataQueriesResult[index2]?.result || [];
+    const result = dataQueriesResult[index2] || [];
     const { xAxis, yAxis } = mapping.datasetFields;
     const dataMap = new Map(result.map((row) => [row[xAxis], row[yAxis]]));
     return {
@@ -15043,6 +15045,7 @@ var processLineChartQueryResults = ({
       data: sortedLabels.map((x3) => dataMap.get(x3) ?? 0)
     };
   });
+  console.log("datasets", datasets);
   return { labels: sortedLabels, datasets };
 };
 
@@ -15451,11 +15454,11 @@ var processTextWidgetQueryResults = ({
   const dataset = [];
   let consolidatedText = "";
   widget.dataQueries.forEach((mapping, index2) => {
-    const result = dataQueriesResult[index2]?.result || [];
+    const result = dataQueriesResult[index2] || {};
     const textField = mapping.datasetFields?.text;
     if (textField) {
-      dataset.push({ ...mapping.parameters, text: result[0][textField] });
-      consolidatedText += result[0][textField];
+      dataset.push({ ...mapping.parameters, text: result[textField] });
+      consolidatedText += result[textField];
     }
   });
   return { dataset, text: consolidatedText };
@@ -15495,7 +15498,7 @@ var processTableWidgetQueryResults = ({
   dataQueriesResult
 }) => {
   const datasets = widget.dataQueries.map((mapping, index2) => {
-    const result = dataQueriesResult[index2]?.result || [];
+    const result = dataQueriesResult[index2] || [];
     return result;
   });
   return datasets;

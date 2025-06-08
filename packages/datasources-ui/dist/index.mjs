@@ -70591,6 +70591,11 @@ var queryConfig_default = {
   schema: {
     type: "object",
     properties: {
+      queryType: {
+        type: "string",
+        enum: ["query", "gui"],
+        default: "query"
+      },
       query: {
         type: "string",
         description: "PostgreSQL code to execute",
@@ -70621,15 +70626,33 @@ var queryConfig_default = {
         }
       }
     },
-    required: ["query"]
+    required: ["queryType"]
   },
   uischema: {
     type: "VerticalLayout",
     elements: [
       {
         type: "Control",
-        scope: "#/properties/query",
-        label: "PostgreSQL Code"
+        scope: "#/properties/queryType",
+        label: "Query Type"
+      },
+      {
+        type: "Group",
+        label: "Raw SQL",
+        rule: {
+          effect: "SHOW",
+          condition: {
+            scope: "#/properties/queryType",
+            schema: { const: "query" }
+          }
+        },
+        elements: [
+          {
+            type: "Control",
+            scope: "#/properties/query",
+            label: "Raw sql"
+          }
+        ]
       },
       {
         type: "Control",
@@ -70654,6 +70677,7 @@ var queryConfig_default = {
     ]
   },
   data: {
+    queryType: "query",
     query: "SELECT id, name FROM users WHERE active = true;",
     args: [
       { key: "user_id", value: "123" },

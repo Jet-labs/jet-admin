@@ -286,10 +286,13 @@ widgetService.getWidgetDataByID = async ({
   tenantID,
   widgetID,
 }) => {
-  Logger.log("info", "widgetService:getWidgetDataByID:params", {
-    userID,
-    tenantID,
-    widgetID,
+  Logger.log("info", {
+    message: "widgetService:getWidgetDataByID:params",
+    params: {
+      userID,
+      tenantID,
+      widgetID,
+    },
   });
 
   try {
@@ -310,48 +313,46 @@ widgetService.getWidgetDataByID = async ({
       dataQueries: _widget.tblWidgetQueryMappings.map((t) => t),
     };
 
+    delete widget.tblWidgetQueryMappings;
+    Logger.log("info", {
+      message: "widgetService:getWidgetDataByID:widget",
+      params: {
+        userID,
+        tenantID,
+        widget,
+      },
+    });
+
     if (!widget) {
-      Logger.log(
-        "warn",
-        "widgetService:getWidgetDataByID:not-found",
-        {
+      Logger.log("error", {
+        message: "widgetService:getWidgetDataByID:catch-2",
+        params: {
           widgetID,
           userID,
-        }
-      );
+        },
+      });
       throw new Error(`Widget ${widgetID} not found`);
     }
 
-    // 2. Prepare queries for execution
-    const dataQueriesToExecute =
-      widget.tblWidgetQueryMappings.map((mapping) => ({
-        dataQueryID: mapping.dataQueryID,
-        dataQueryOptions: {
-          ...mapping.tblDataQueries.dataQueryOptions,
-          dataQueryArgValues: mapping.dataQueryArgValues,
-        },
-      }));
-
-    Logger.log(
-      "info",
-      "widgetService:getWidgetDataByID:queries-prepared",
-      {
-        dataQueriesToExecuteCount: dataQueriesToExecute.length,
-      }
+    const dataQueriesResult = await Promise.all(
+      widget.dataQueries.map((dataQuery) => {
+        const argValues = dataQuery.dataQueryArgValues;
+        return dataQueryService.runDataQueryByID({
+          userID,
+          tenantID,
+          dataQueryID: dataQuery.tblDataQueries?.dataQueryID,
+          argValues: argValues,
+        });
+      })
     );
 
-    // 3. Execute all queries
-    const dataQueriesResult = await dataQueryService.runDataQueries({
-      userID,
-      tenantID,
-      dbPool,
-      dataQueries: dataQueriesToExecute,
-    });
-
     Logger.log("info", {
-      message:
-        "widgetService:getWidgetDataByID:dataQueriesResult",
+      message: "widgetService:getWidgetDataByID:dataQueriesResult",
       params: {
+        userID,
+        tenantID,
+        widgetID,
+        dataQueriesResult,
         dataQueriesResultCount: dataQueriesResult?.length,
       },
     });
@@ -420,6 +421,16 @@ widgetService.getWidgetDataByID = async ({
         });
         break;
     }
+
+    Logger.log("success", {
+      message: "widgetService:getWidgetDataByID:processedData",
+      params: {
+        userID,
+        tenantID,
+        widgetID,
+        processedData,
+      },
+    });
 
     return {
       widgetID: widget.widgetID,

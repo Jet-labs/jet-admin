@@ -52,7 +52,6 @@ class DependencyGraph {
   getExecutionOrder() {
     const visited = new Set();
     const order = [];
-
     const visit = (nodeId) => {
       if (!visited.has(nodeId)) {
         visited.add(nodeId);
@@ -63,7 +62,6 @@ class DependencyGraph {
         order.push(nodeId);
       }
     };
-
     for (const nodeId of this.graph.keys()) {
       visit(nodeId);
     }

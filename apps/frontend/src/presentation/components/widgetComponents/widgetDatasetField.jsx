@@ -150,7 +150,7 @@ export const WidgetDatasetField = ({
             <button
               type="button"
               onClick={() => setShowArgumentsOptions(true)}
-              disabled={!selectedQuery?.dataQueryOptions?.dataQueryArgs?.length}
+              disabled={!selectedQuery?.dataQueryOptions?.args?.length}
               className=" disabled:text-slate-400 disabled:cursor-not-allowed disabled:hover:text-slate-400 disabled:hover:border-slate-300 disabled:hover:bg-transparent focus:outline-none text-xs font-normal hover:text-[#646cff] text-slate-700 flex flex-col gap-1 justify-start items-center bg-slate-100 hover:bg-[#646cff]/10   py-1 px-2 rounded border hover:border-[#646cff] border-slate-300 transition-colors w-full"
             >
               <BiSitemap className=" text-2xl" />
