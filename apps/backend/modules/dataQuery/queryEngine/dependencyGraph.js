@@ -1,5 +1,5 @@
 // src/graph.js
-class DependencyGraph {
+class QueryGraph {
   constructor() {
     this.graph = new Map(); // { queryId -> Set<queryId> }
   }
@@ -45,4 +45,4 @@ class DependencyGraph {
   }
 }
 
-module.exports = { DependencyGraph };
+module.exports = { QueryGraph };

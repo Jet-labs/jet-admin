@@ -12,7 +12,7 @@ const { aiService } = require("../ai/ai.service");
 const { isUUID } = require("validator");
 const dataQueryService = {};
 const { keyValueTypeArrayToObject } = require("../../utils/json.util");
-const { QueryEngine } = require("./core2/engine");
+const { QueryEngine } = require("./queryEngine/engine");
 
 /**
  *

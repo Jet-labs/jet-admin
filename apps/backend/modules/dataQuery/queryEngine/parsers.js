@@ -75,7 +75,6 @@ const parseQueryCalls = (expression, runtimeArgs) => {
   return calls;
 };
 
-
 module.exports = {
   extractTemplateBlocks,
   parseQueryCalls,

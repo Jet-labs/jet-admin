@@ -1,6 +1,6 @@
 // src/engine.js
-const { extractTemplateBlocks, parseQueryCalls, resolveArgs } = require("./parser");
-const { DependencyGraph } = require("./graph");
+const { extractTemplateBlocks, parseQueryCalls, resolveArgs } = require("./parsers");
+const { QueryGraph } = require("./dependencyGraph");
 const Logger = require("../../../utils/logger");
 const { DATASOURCE_TYPES } = require("@jet-admin/datasource-types");
 const { dataSourceRegistry } = require("@jet-admin/datasources-logic");
@@ -237,7 +237,7 @@ class QueryEngine {
   }
   
   buildDependencyGraph(template) {
-    const graph = new DependencyGraph();
+    const graph = new QueryGraph();
     const blocks = extractTemplateBlocks(template);
 
     for (const block of blocks) {
