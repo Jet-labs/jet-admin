@@ -69450,7 +69450,7 @@ var QueryResponseJSONTab = ({ data: data2 }) => {
   QueryResponseJSONTab.propTypes = {
     data: import_prop_types.default.object
   };
-  return /* @__PURE__ */ React2.createElement("div", { className: "w-100 flex-grow h-full overflow-y-auto " }, /* @__PURE__ */ React2.createElement(
+  return /* @__PURE__ */ React2.createElement("div", { className: "w-100 flex-grow h-full overflow-y-auto pb-5" }, /* @__PURE__ */ React2.createElement(
     esm_default,
     {
       value: JSON.stringify(data2, null, 2),
@@ -69680,7 +69680,7 @@ var QueryResponseView = ({ queryResult }) => {
         className: `!outline-none !border-0 hover:!outline-none hover:!border-0 focus:!outline-none !font-medium !text-sm !normal-case ${tab4 === 3 ? "!text-[#646cff]" : "!text-slate-700"}`
       }
     )
-  ), /* @__PURE__ */ React6.createElement("div", { className: "w-100 h-[calc(100%-48px)]" }, tab4 === 0 && /* @__PURE__ */ React6.createElement(QueryResponseTableTab, { data: queryResult ? queryResult : "" }), tab4 === 1 && /* @__PURE__ */ React6.createElement(QueryResponseJSONTab, { data: queryResult ? queryResult : "" }), tab4 === 2 && /* @__PURE__ */ React6.createElement(QueryResponseRAWTab, { data: queryResult ? queryResult : "" }), tab4 === 3 && /* @__PURE__ */ React6.createElement(QueryResponseSchemaTab, { data: queryResult ? queryResult : {} })));
+  ), /* @__PURE__ */ React6.createElement("div", { className: "w-100  h-full overflow-y-auto pb-5" }, tab4 === 0 && /* @__PURE__ */ React6.createElement(QueryResponseTableTab, { data: queryResult ? queryResult : "" }), tab4 === 1 && /* @__PURE__ */ React6.createElement(QueryResponseJSONTab, { data: queryResult ? queryResult : "" }), tab4 === 2 && /* @__PURE__ */ React6.createElement(QueryResponseRAWTab, { data: queryResult ? queryResult : "" }), tab4 === 3 && /* @__PURE__ */ React6.createElement(QueryResponseSchemaTab, { data: queryResult ? queryResult : {} })));
 };
 
 // src/components/postgresql/query/postgreSQLQueryEditor.js

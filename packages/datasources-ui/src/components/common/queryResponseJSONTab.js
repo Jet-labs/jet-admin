@@ -9,7 +9,7 @@ export const QueryResponseJSONTab = ({ data }) => {
     data: PropTypes.object,
   };
   return (
-    <div className="w-100 flex-grow h-full overflow-y-auto ">
+    <div className="w-100 flex-grow h-full overflow-y-auto pb-5">
       <CodeMirror
         value={JSON.stringify(data, null, 2)}
         // height="400px"

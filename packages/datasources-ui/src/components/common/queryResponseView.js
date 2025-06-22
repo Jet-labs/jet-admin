@@ -64,7 +64,7 @@ export const QueryResponseView = ({ queryResult }) => {
           }`}
         />
       </Tabs>
-      <div className="w-100 h-[calc(100%-48px)]">
+      <div className="w-100  h-full overflow-y-auto pb-5">
         {tab === 0 && (
           <QueryResponseTableTab data={queryResult ? queryResult : ""} />
         )}

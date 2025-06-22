@@ -348,18 +348,11 @@ cronJobService.runCronJob = async ({ cronJob }) => {
     const dbPool = await tenantAwarePostgreSQLPoolManager.getPool(
       cronJob.tenantID
     );
-    const queryRunResult = await dataQueryService.runDataQueries({
+    const queryRunResult = await dataQueryService.runDataQueryByID({
       userID: parseInt(cronJob.cronJobID),
       tenantID: parseInt(cronJob.tenantID),
-      dbPool,
-      dataQueries: [
-        {
-          dataQueryOptions: {
-            ...cronJob.tblDataQueries.dataQueryOptions,
-            dataQueryArgValues: cronJob.dataQueryArgValues,
-          },
-        },
-      ],
+      dataQueryID: parseInt(cronJob.dataQueryID),
+      argValues: cronJob.dataQueryArgValues,
     });
 
     await prisma.tblCronJobHistory.create({
