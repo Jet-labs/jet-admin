@@ -406,6 +406,10 @@ export const CONSTANTS = {
     DATASOURCE_EDITOR_FORM_TYPE_FIELD_PLACEHOLDER: "Select data source type",
     DATASOURCE_EDITOR_FORM_CONNECTION_DETAILS_FIELD_LABEL: "Connection details",
 
+    DELETE_DATASOURCE_DIALOG_TITLE: "Delete datasource",
+    DELETE_DATASOURCE_DIALOG_MESSAGE:
+      "Are you sure you want to delete this item? This action cannot be undone.",
+
     TEST_QUERY_FORM_TEST_BUTTON: "Test query",
     TEST_QUERY_FORM_QUERY_TESTING_SUCCESS: "Query run successfully!",
 
@@ -442,6 +446,13 @@ export const CONSTANTS = {
 
     TEST_DATASOURCE_FORM_TEST_BUTTON: "Test",
     TEST_DATASOURCE_FORM_TESTING_SUCCESS: "Datasource connection success!",
+
+    DELETE_DATASOURCE_DELETION_SUCCESS: "Datasource deleted successfully!",
+
+    CLONE_DATASOURCE_CLONING_SUCCESS: "Datasource cloned successfully!",
+    CLONE_DATASOURCE_DIALOG_TITLE: "Clone datasource",
+    CLONE_DATASOURCE_DIALOG_MESSAGE:
+      "Are you sure you want to clone this item? This action cannot be undone.",
 
     DELETE_QUERY_DELETION_SUCCESS: "Query deleted successfully!",
     DELETE_QUERY_DIALOG_TITLE: "Delete query",

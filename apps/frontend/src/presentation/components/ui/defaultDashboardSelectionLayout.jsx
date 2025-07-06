@@ -11,6 +11,7 @@ import {
 } from "../../../logic/contexts/authContext";
 import { Responsive, WidthProvider } from "react-grid-layout";
 import PropTypes from "prop-types";
+import { LuPinOff } from "react-icons/lu";
 import { MdOutlineSpaceDashboard } from "react-icons/md";
 import { ReactQueryLoadingErrorWrapper } from "./reactQueryLoadingErrorWrapper";
 import { DashboardRenderWidget } from "../dashboardComponents/dashboardRenderWidget";
@@ -99,25 +100,33 @@ export const DefaultDashboardSelectionLayout = ({
               {isUpdatingUserConfig ? (
                 <CircularProgress size={16} className="!text-[#646cff]" />
               ) : (
-                <select
-                  className="p-1 text-xs text-gray-700 bg-white border border-gray-300 rounded focus:outline-none focus:border-blue-500"
-                  value={pinnedDashboardID}
-                  onChange={(e) =>
-                    _handleSetDefaultDashboard(Number(e.target.value))
-                  }
-                >
-                  <option value="" disabled selected>
-                    Select a dashboard
-                  </option>
-                  {dashboards?.map((dashboard) => (
-                    <option
-                      key={dashboard.dashboardID}
-                      value={dashboard.dashboardID}
-                    >
-                      {dashboard.dashboardTitle}
+                <>
+                  <select
+                    className="p-1 text-xs text-gray-700 bg-white border border-gray-300 rounded focus:outline-none focus:border-blue-500"
+                    value={pinnedDashboardID}
+                    onChange={(e) =>
+                      _handleSetDefaultDashboard(Number(e.target.value))
+                    }
+                  >
+                    <option value="" disabled selected>
+                      Select a dashboard
                     </option>
-                  ))}
-                </select>
+                    {dashboards?.map((dashboard) => (
+                      <option
+                        key={dashboard.dashboardID}
+                        value={dashboard.dashboardID}
+                      >
+                        {dashboard.dashboardTitle}
+                      </option>
+                    ))}
+                  </select>
+                  <button
+                    onClick={() => _handleSetDefaultDashboard(null)}
+                    className="!outline-none !hover:outline-none  items-center text-nowrap w-fit inline-flex rounded bg-[#646cff]/10 px-3 py-1.5 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50"
+                  >
+                    <LuPinOff className="!w-3.5 !h-3.5 !text-[#646cff]" />
+                  </button>
+                </>
               )}
             </div>
           </div>

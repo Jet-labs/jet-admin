@@ -19,6 +19,8 @@ import { DATASOURCE_TYPES } from "@jet-admin/datasource-types";
 import { DatasourceEditor } from "./datasourceEditor";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import { DatasourceTestingForm } from "./datasourceTestingForm";
+import { DatasourceDeletionForm } from "./datasourceDeletionForm";
+import { DatasourceCloneForm } from "./dataQueryCloneForm";
 
 // --- Original Metadata (only for datasourceOptions) ---
 const datasourceOptionsMetadata =
@@ -130,8 +132,17 @@ export const DatasourceUpdationForm = ({ tenantID, datasourceID }) => {
               className="space-y-3 md:space-y-4 w-full"
               onSubmit={datasourceUpdationForm.handleSubmit}
             >
-              <DatasourceEditor datasourceEditorForm={datasourceUpdationForm} />
-              <div className="flex flex-row justify-start items-center">
+              <DatasourceEditor datasourceEditorForm={datasourceUpdationForm} key={`datasourceEditor_${datasource?.datasourceID}`} />
+              <div className="flex flex-row justify-end items-center">
+                <DatasourceCloneForm
+                  tenantID={tenantID}
+                  datasourceID={datasourceID}
+                />
+
+                <DatasourceDeletionForm
+                  tenantID={tenantID}
+                  datasourceID={datasourceID}
+                />
                 <DatasourceTestingForm
                   tenantID={tenantID}
                   datasourceType={datasourceUpdationForm.values.datasourceType}
@@ -139,11 +150,12 @@ export const DatasourceUpdationForm = ({ tenantID, datasourceID }) => {
                     datasourceUpdationForm.values.datasourceOptions
                   }
                   setDatasourceTestResult={setDatasourceTestResult}
+                  key={`datasourceTestingForm_${datasource?.datasourceID}`}
                 />
                 <button
                   type="submit"
                   disabled={isAddingDatasource}
-                  className="flex flex-row justify-center items-center px-3 py-1.5 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none"
+                  className="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none"
                 >
                   {isAddingDatasource && (
                     <CircularProgress

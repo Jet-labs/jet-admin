@@ -268,6 +268,102 @@ datasourceController.updateDatasourceByID = async (req, res) => {
   }
 };
 
+/**
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+datasourceController.deleteDatasourceByID = async (req, res) => {
+  try {
+    const { user } = req;
+    const { tenantID, datasourceID } = req.params;
+
+    Logger.log("info", {
+      message: "datasourceController:deleteDatasourceByID:params",
+      params: {
+        userID: user.userID,
+        tenantID,
+        datasourceID,
+      },
+    });
+
+    await datasourceService.deleteDatasourceByID({
+      userID: parseInt(user.userID),
+      tenantID,
+      datasourceID,
+    });
+
+    Logger.log("success", {
+      message: "datasourceController:deleteDatasourceByID:success",
+      params: {
+        userID: user.userID,
+        tenantID,
+        datasourceID,
+      },
+    });
+
+    return expressUtils.sendResponse(res, true, {
+      message: "Datasource deleted successfully.",
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "datasourceController:deleteDatasourceByID:error",
+      params: {
+        error,
+      },
+    });
+
+    return expressUtils.sendResponse(res, false, {}, error);
+  }
+};
+
+/**
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+datasourceController.cloneDatasourceByID = async (req, res) => {
+  try {
+    const { user } = req;
+    const { tenantID, datasourceID } = req.params;
+
+    Logger.log("info", {
+      message: "datasourceController:cloneDatasourceByID:params",
+      params: {
+        userID: user.userID,
+        tenantID,
+        datasourceID,
+      },
+    });
+
+    await datasourceService.cloneDatasourceByID({
+      userID: parseInt(user.userID),
+      tenantID,
+      datasourceID,
+    });
+
+    Logger.log("success", {
+      message: "datasourceController:cloneDatasourceByID:success",
+      params: {
+        userID: user.userID,
+        tenantID,
+        datasourceID,
+      },
+    });
+
+    return expressUtils.sendResponse(res, true, {
+      message: "Datasource cloned successfully.",
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "datasourceController:cloneDatasourceByID:error",
+      params: {
+        error,
+      },
+    });
+
+    return expressUtils.sendResponse(res, false, {}, error);
+  }
+};
+
 module.exports = {
   datasourceController,
 };

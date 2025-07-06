@@ -42,6 +42,22 @@ router.patch(
   datasourceController.updateDatasourceByID
 );
 
+router.post(
+  "/:datasourceID/clone",
+  param("datasourceID").isUUID().withMessage("datasourceID must be a uuid"),
+  expressUtils.validationChecker,
+  authMiddleware.checkUserPermissions(["tenant:datasource:clone"]),
+  datasourceController.cloneDatasourceByID
+);
+
+router.delete(
+  "/:datasourceID",
+  param("datasourceID").isUUID().withMessage("datasourceID must be a uuid"),
+  expressUtils.validationChecker,
+  authMiddleware.checkUserPermissions(["tenant:datasource:delete"]),
+  datasourceController.deleteDatasourceByID
+);
+
 
 
 

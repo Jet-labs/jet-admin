@@ -174,9 +174,10 @@ datasourceService.deleteDatasourceByID = async ({
     },
   });
   try {
+    // Prisma will cascade delete database tables based on the schema relation (onDelete: Cascade)
     await prisma.tblDatasources.delete({
       where: {
-        datasourceID: parseInt(datasourceID),
+        datasourceID: datasourceID,
         tenantID: parseInt(tenantID),
       },
     });
@@ -310,6 +311,70 @@ datasourceService.updateDatasourceByID = async ({
     throw error;
   }
 };
+
+/**
+ *
+ * @param {object} param0
+ * @param {number} param0.userID
+ * @param {number} param0.tenantID
+ * @param {number} param0.datasourceID
+ * @returns {Promise<boolean>}
+ */
+datasourceService.cloneDatasourceByID = async ({
+  userID,
+  tenantID,
+  datasourceID,
+}) => {
+  Logger.log("info", {
+    message: "datasourceService:cloneDatasourceByID:params",
+    params: {
+      userID,
+      tenantID,
+      datasourceID,
+    },
+  });
+  try {
+    const datasource = await prisma.tblDatasources.findUnique({
+      where: {
+        datasourceID: datasourceID,
+        tenantID: parseInt(tenantID),
+      },
+    });
+    if (!datasource) {
+      throw new Error("Datasource not found");
+    }
+    const newDatasource = await prisma.tblDatasources.create({
+      data: {
+        tenantID: parseInt(tenantID),
+        datasourceTitle: datasource.datasourceTitle + " (Copy)",
+        datasourceType: datasource.datasourceType,
+        datasourceOptions: datasource.datasourceOptions,
+        creatorID: parseInt(userID),
+      },
+    });
+    Logger.log("success", {
+      message: "datasourceService:cloneDatasourceByID:success",
+      params: {
+        userID,
+        datasourceID,
+        newDatasourceID: newDatasource.datasourceID,
+      },
+    });
+    return true;
+  } catch (error) {
+    Logger.log("error", {
+      message: "datasourceService:cloneDatasourceByID:error",
+      params: {
+        userID,
+        error,
+      },
+    });
+    throw error;
+  }
+};
+
+
+
 
 module.exports = {datasourceService};
 

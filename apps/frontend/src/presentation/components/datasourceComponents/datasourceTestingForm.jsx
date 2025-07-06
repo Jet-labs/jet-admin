@@ -49,7 +49,7 @@ export const DatasourceTestingForm = ({
         onClick={_handleTestQuery}
         disabled={isTestingDatasource}
         type="button"
-        className="flex flex-row items-center justify-center rounded bg-[#646cff]/10 mr-2 px-3 py-1.5 text-xs text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50 outline-none focus:outline-none"
+        className="flex flex-row items-center justify-center rounded bg-[#646cff]/10 mr-2 px-3 py-2 text-xs text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50 outline-none focus:outline-none"
       >
         {isTestingDatasource && (
           <CircularProgress className="!mr-3" size={16} color="white" />

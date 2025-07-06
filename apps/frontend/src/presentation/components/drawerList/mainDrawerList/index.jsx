@@ -7,7 +7,6 @@ import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import SettingsIcon from "@mui/icons-material/Settings";
 import { useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
-import { BiLogoPostgresql } from "react-icons/bi";
 import { BsServer } from "react-icons/bs";
 import { FaKey, FaUserCog } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa6";
@@ -255,12 +254,12 @@ export const MainDrawerList = () => {
       icon: RiCalendarScheduleFill,
       path: CONSTANTS.ROUTES.VIEW_CRON_JOBS.path(tenantID),
     },
-    {
-      type: "link",
-      title: CONSTANTS.STRINGS.MAIN_DRAWER_SQL_EDITOR_TITLE,
-      icon: BiLogoPostgresql,
-      path: CONSTANTS.ROUTES.RAW_SQL_QUERY.path(tenantID),
-    },
+    // {
+    //   type: "link",
+    //   title: CONSTANTS.STRINGS.MAIN_DRAWER_SQL_EDITOR_TITLE,
+    //   icon: BiLogoPostgresql,
+    //   path: CONSTANTS.ROUTES.RAW_SQL_QUERY.path(tenantID),
+    // },
     {
       type: "collapsible",
       title: CONSTANTS.STRINGS.MAIN_DRAWER_USER_MANAGEMENT_TITLE,
