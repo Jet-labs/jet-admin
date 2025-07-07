@@ -11,6 +11,7 @@ const {
   processScatterChartQueryResults,
   processBubbleChartQueryResults,
   processTableWidgetQueryResults,
+  processIframeWidgetQueryResults,
 } = require("@jet-admin/widgets");
 const { WIDGET_TYPES } = require("@jet-admin/widget-types");
 const widgetService = {};
@@ -146,11 +147,7 @@ widgetService.createWidget = async ({
  * @param {string} param0.widgetID
  * @returns {Promise<Array<object>>}
  */
-widgetService.getWidgetByID = async ({
-  userID,
-  tenantID,
-  widgetID,
-}) => {
+widgetService.getWidgetByID = async ({ userID, tenantID, widgetID }) => {
   Logger.log("info", {
     message: "widgetService:getWidgetByID:params",
     params: {
@@ -198,11 +195,7 @@ widgetService.getWidgetByID = async ({
  * @param {number} param0.widgetID
  * @returns {Promise<boolean>}
  */
-widgetService.cloneWidgetByID = async ({
-  userID,
-  tenantID,
-  widgetID,
-}) => {
+widgetService.cloneWidgetByID = async ({ userID, tenantID, widgetID }) => {
   Logger.log("info", {
     message: "widgetService:cloneWidgetByID:params",
     params: {
@@ -237,18 +230,16 @@ widgetService.cloneWidgetByID = async ({
         },
       });
       await tx.tblWidgetQueryMappings.createMany({
-        data: widget.tblWidgetQueryMappings.map(
-          (widgetQueryMapping) => {
-            return {
-              widgetID: newWidget.widgetID,
-              dataQueryID: parseInt(widgetQueryMapping.dataQueryID),
-              title: widgetQueryMapping.title,
-              parameters: widgetQueryMapping.parameters,
-              datasetFields: widgetQueryMapping.datasetFields,
-              dataQueryArgValues: widgetQueryMapping.dataQueryArgValues,
-            };
-          }
-        ),
+        data: widget.tblWidgetQueryMappings.map((widgetQueryMapping) => {
+          return {
+            widgetID: newWidget.widgetID,
+            dataQueryID: parseInt(widgetQueryMapping.dataQueryID),
+            title: widgetQueryMapping.title,
+            parameters: widgetQueryMapping.parameters,
+            datasetFields: widgetQueryMapping.datasetFields,
+            dataQueryArgValues: widgetQueryMapping.dataQueryArgValues,
+          };
+        }),
       });
     });
     Logger.log("success", {
@@ -410,6 +401,12 @@ widgetService.getWidgetDataByID = async ({
         break;
       case WIDGET_TYPES.TABLE_WIDGET.value:
         processedData = processTableWidgetQueryResults({
+          widget,
+          dataQueriesResult,
+        });
+        break;
+      case WIDGET_TYPES.IFRAME_WIDGET.value:
+        processedData = processIframeWidgetQueryResults({
           widget,
           dataQueriesResult,
         });

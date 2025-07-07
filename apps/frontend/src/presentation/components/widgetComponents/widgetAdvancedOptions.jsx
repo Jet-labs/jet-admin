@@ -100,6 +100,8 @@ export const WidgetAdvancedOptions = ({ widgetForm, parentWidgetType }) => {
     [widgetForm]
   );
 
+  console.log("widget options", WIDGET_ADVANCED_OPTIONS);
+
   return (
     <div className="grid grid-cols-2 gap-4 p-0 mt-2">
       {WIDGET_ADVANCED_OPTIONS.filter((option) =>

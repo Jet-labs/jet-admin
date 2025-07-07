@@ -6,5 +6,6 @@ export * from "./polarArea";
 export * from "./scatter";
 export * from "./bubble";
 export * from "./text";
-export * from "./table";        
+export * from "./table";
+export * from "./iframe";   
 export * from "./widget.map";

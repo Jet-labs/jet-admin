@@ -128,6 +128,8 @@ export const getDemoData = (type) => {
           { column1: "value1", column2: "value2" },
         ],
       ];
+    case WIDGET_TYPES.IFRAME_WIDGET.value:
+      return { url: "https://www.google.com" };
     default:
       return { labels, datasets: [] };
   }

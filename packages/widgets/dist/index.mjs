@@ -15864,8 +15864,64 @@ var TableWidgetComponent = ({ data, onWidgetInit, widgetConfig }) => {
   );
 };
 
+// src/iframe/logic/processors.js
+var processIframeWidgetQueryResults = ({
+  widget,
+  dataQueriesResult
+}) => {
+  const datasets = widget.dataQueries.map((mapping, index2) => {
+    const result = dataQueriesResult[index2] || [];
+    return result;
+  });
+  return datasets;
+};
+
+// src/iframe/ui/index.js
+var import_prop_types10 = __toESM(require_prop_types());
+import React13, { useEffect as useEffect11, useRef as useRef11 } from "react";
+var IframeWidgetComponent = ({ data, onWidgetInit, widgetConfig }) => {
+  IframeWidgetComponent.propTypes = {
+    data: import_prop_types10.default.object,
+    onWidgetInit: import_prop_types10.default.func,
+    widgetConfig: import_prop_types10.default.object
+  };
+  const widgetRef = useRef11(null);
+  const { widgetCss = {}, widgetTailwindCss = "" } = widgetConfig || {};
+  const widgetStyle = {
+    ...widgetCss
+  };
+  useEffect11(() => {
+    if (widgetRef.current) {
+      onWidgetInit?.(widgetRef);
+    }
+  }, [onWidgetInit, widgetRef]);
+  return /* @__PURE__ */ React13.createElement(
+    "div",
+    {
+      ref: widgetRef,
+      style: widgetStyle,
+      className: `w-full flex-grow h-full overflow-y-auto${widgetTailwindCss}`
+    },
+    widgetConfig.titleEnabled && widgetConfig.title && /* @__PURE__ */ React13.createElement(
+      "h2",
+      {
+        className: "text-sm font-semibold text-gray-700 truncate line-clamp-2" + widgetConfig.titleTailwindCss
+      },
+      widgetConfig.title
+    ),
+    /* @__PURE__ */ React13.createElement(
+      "iframe",
+      {
+        src: data[0].url,
+        title: "Web View",
+        className: "w-full flex-grow h-full overflow-y-auto"
+      }
+    )
+  );
+};
+
 // src/widget.map.js
-import React13 from "react";
+import React14 from "react";
 
 // ../../node_modules/react-icons/fa/index.mjs
 function FaChartBar(props) {
@@ -15889,6 +15945,9 @@ function PiChartPolar(props) {
 }
 
 // ../../node_modules/react-icons/md/index.mjs
+function MdWebAsset(props) {
+  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 24 24" }, "child": [{ "tag": "path", "attr": { "fill": "none", "d": "M0 0h24v24H0z" }, "child": [] }, { "tag": "path", "attr": { "d": "M19 4H5a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h14c1.1 0 2-.9 2-2V6a2 2 0 0 0-2-2zm0 14H5V8h14v10z" }, "child": [] }] })(props);
+}
 function MdOutlineTextFields(props) {
   return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 24 24" }, "child": [{ "tag": "path", "attr": { "fill": "none", "d": "M0 0h24v24H0z" }, "child": [] }, { "tag": "path", "attr": { "d": "M2.5 4v3h5v12h3V7h5V4h-13zm19 5h-9v3h3v7h3v-7h3V9z" }, "child": [] }] })(props);
 }
@@ -17967,10 +18026,36 @@ var WIDGET_TYPES = {
   TABLE_WIDGET: {
     name: "Table Widget",
     value: "table"
+  },
+  IFRAME_WIDGET: {
+    name: "IFrame Widget",
+    value: "iframe"
   }
 };
 var WIDGET_INITIAL_CONFIG = {
   text: {
+    options: {
+      backgroundColor: "rgba(255, 255, 255, 0)",
+      color: "#666",
+      plugins: {
+        title: {
+          display: false,
+          text: "Chart Title",
+          position: "top",
+          font: { size: 16, color: "#333" }
+        },
+        legend: {
+          display: false,
+          position: "top",
+          labels: { font: { size: 12, color: "#666" } }
+        },
+        tooltip: {
+          enabled: false
+        }
+      }
+    }
+  },
+  iframe: {
     options: {
       backgroundColor: "rgba(255, 255, 255, 0)",
       color: "#666",
@@ -18378,6 +18463,8 @@ var getDemoData = (type) => {
           { column1: "value1", column2: "value2" }
         ]
       ];
+    case WIDGET_TYPES.IFRAME_WIDGET.value:
+      return { url: "https://www.google.com" };
     default:
       return { labels, datasets: [] };
   }
@@ -18394,36 +18481,51 @@ var ALL_WIDGET_DATASET_FIELDS = {
   radar: ["label", "value"],
   scatter: ["xAxis", "yAxis"],
   bubble: ["xAxis", "yAxis", "radius"],
-  table: []
+  table: [],
+  iframe: ["url"]
 };
 var WIDGETS_MAP = {
   text: {
     label: "Text",
     value: WIDGET_TYPES.TEXT_WIDGET.value,
     datasetFields: ALL_WIDGET_DATASET_FIELDS.text,
-    component: ({ data, ...props }) => /* @__PURE__ */ React13.createElement(
+    component: ({ data, ...props }) => /* @__PURE__ */ React14.createElement(
       TextWidgetComponent,
       {
         data: data || getDemoData(WIDGET_TYPES.TEXT_WIDGET.value),
         ...props
       }
     ),
-    icon: ({ className }) => /* @__PURE__ */ React13.createElement(MdOutlineTextFields, { className: `!text-lg ${className}` }),
+    icon: ({ className }) => /* @__PURE__ */ React14.createElement(MdOutlineTextFields, { className: `!text-lg ${className}` }),
     sampleConfig: WIDGET_INITIAL_CONFIG.text
+  },
+  iframe: {
+    label: "IFrame",
+    value: WIDGET_TYPES.IFRAME_WIDGET.value,
+    datasetFields: ALL_WIDGET_DATASET_FIELDS.iframe,
+    component: ({ data, ...props }) => /* @__PURE__ */ React14.createElement(
+      IframeWidgetComponent,
+      {
+        data: data || getDemoData(WIDGET_TYPES.IFRAME_WIDGET.value),
+        ...props
+      }
+    ),
+    icon: ({ className }) => /* @__PURE__ */ React14.createElement(MdWebAsset, { className: `!text-lg ${className}` }),
+    sampleConfig: WIDGET_INITIAL_CONFIG.iframe
   },
   bar: {
     label: "Bar",
     value: WIDGET_TYPES.BAR_CHART.value,
     datasetFields: ALL_WIDGET_DATASET_FIELDS.bar,
     description: "Compare categorical data with rectangular bars",
-    component: ({ data, ...props }) => /* @__PURE__ */ React13.createElement(
+    component: ({ data, ...props }) => /* @__PURE__ */ React14.createElement(
       BarChartComponent,
       {
         data: data && data.datasets ? data : getDemoData(WIDGET_TYPES.BAR_CHART.value),
         ...props
       }
     ),
-    icon: ({ className }) => /* @__PURE__ */ React13.createElement(FaChartBar, { className: `!text-lg ${className}` }),
+    icon: ({ className }) => /* @__PURE__ */ React14.createElement(FaChartBar, { className: `!text-lg ${className}` }),
     sampleConfig: WIDGET_INITIAL_CONFIG.bar
   },
   line: {
@@ -18431,14 +18533,14 @@ var WIDGETS_MAP = {
     value: WIDGET_TYPES.LINE_CHART.value,
     datasetFields: ALL_WIDGET_DATASET_FIELDS.line,
     description: "Display trends over time/intervals",
-    component: ({ data, ...props }) => /* @__PURE__ */ React13.createElement(
+    component: ({ data, ...props }) => /* @__PURE__ */ React14.createElement(
       LineChartComponent,
       {
         data: data && data.datasets ? data : getDemoData(WIDGET_TYPES.LINE_CHART.value),
         ...props
       }
     ),
-    icon: ({ className }) => /* @__PURE__ */ React13.createElement(FaChartLine, { className: `!text-lg ${className}` }),
+    icon: ({ className }) => /* @__PURE__ */ React14.createElement(FaChartLine, { className: `!text-lg ${className}` }),
     sampleConfig: WIDGET_INITIAL_CONFIG.line
   },
   pie: {
@@ -18446,14 +18548,14 @@ var WIDGETS_MAP = {
     value: WIDGET_TYPES.PIE_CHART.value,
     datasetFields: ALL_WIDGET_DATASET_FIELDS.pie,
     description: "Show proportional relationships",
-    component: ({ data, ...props }) => /* @__PURE__ */ React13.createElement(
+    component: ({ data, ...props }) => /* @__PURE__ */ React14.createElement(
       PieChartComponent,
       {
         data: data && data.datasets ? data : getDemoData(WIDGET_TYPES.PIE_CHART.value),
         ...props
       }
     ),
-    icon: ({ className }) => /* @__PURE__ */ React13.createElement(FaChartPie, { className: `!text-lg ${className}` }),
+    icon: ({ className }) => /* @__PURE__ */ React14.createElement(FaChartPie, { className: `!text-lg ${className}` }),
     sampleConfig: WIDGET_INITIAL_CONFIG.pie
   },
   polarArea: {
@@ -18461,14 +18563,14 @@ var WIDGETS_MAP = {
     value: WIDGET_TYPES.POLAR_AREA.value,
     datasetFields: ALL_WIDGET_DATASET_FIELDS.polarArea,
     description: "Display data in a circular gauge format",
-    component: ({ data, ...props }) => /* @__PURE__ */ React13.createElement(
+    component: ({ data, ...props }) => /* @__PURE__ */ React14.createElement(
       PolarAreaChartComponent,
       {
         data: data && data.datasets ? data : getDemoData(WIDGET_TYPES.POLAR_AREA.value),
         ...props
       }
     ),
-    icon: ({ className }) => /* @__PURE__ */ React13.createElement(PiChartPolar, { className: `!text-lg ${className}` }),
+    icon: ({ className }) => /* @__PURE__ */ React14.createElement(PiChartPolar, { className: `!text-lg ${className}` }),
     sampleConfig: WIDGET_INITIAL_CONFIG.polarArea
   },
   radar: {
@@ -18476,14 +18578,14 @@ var WIDGETS_MAP = {
     value: WIDGET_TYPES.RADAR_CHART.value,
     datasetFields: ALL_WIDGET_DATASET_FIELDS.radar,
     description: "Compare multiple variables in a radial display",
-    component: ({ data, ...props }) => /* @__PURE__ */ React13.createElement(
+    component: ({ data, ...props }) => /* @__PURE__ */ React14.createElement(
       RadarChartComponent,
       {
         data: data && data.datasets ? data : getDemoData(WIDGET_TYPES.RADAR_CHART.value),
         ...props
       }
     ),
-    icon: ({ className }) => /* @__PURE__ */ React13.createElement(BiRadar, { className: `!text-lg ${className}` }),
+    icon: ({ className }) => /* @__PURE__ */ React14.createElement(BiRadar, { className: `!text-lg ${className}` }),
     sampleConfig: WIDGET_INITIAL_CONFIG.radar
   },
   scatter: {
@@ -18491,14 +18593,14 @@ var WIDGETS_MAP = {
     value: WIDGET_TYPES.SCATTER_CHART.value,
     datasetFields: ALL_WIDGET_DATASET_FIELDS.scatter,
     description: "Plot individual data points on a graph",
-    component: ({ data, ...props }) => /* @__PURE__ */ React13.createElement(
+    component: ({ data, ...props }) => /* @__PURE__ */ React14.createElement(
       ScatterChartComponent,
       {
         data: data && data.datasets ? data : getDemoData(WIDGET_TYPES.SCATTER_CHART.value),
         ...props
       }
     ),
-    icon: ({ className }) => /* @__PURE__ */ React13.createElement(BiScatterChart, { className: `!text-lg ${className}` }),
+    icon: ({ className }) => /* @__PURE__ */ React14.createElement(BiScatterChart, { className: `!text-lg ${className}` }),
     sampleConfig: WIDGET_INITIAL_CONFIG.scatter
   },
   bubble: {
@@ -18506,14 +18608,14 @@ var WIDGETS_MAP = {
     value: WIDGET_TYPES.BUBBLE_CHART.value,
     datasetFields: ALL_WIDGET_DATASET_FIELDS.bubble,
     description: "Display three dimensions of data with size-varying points",
-    component: ({ data, ...props }) => /* @__PURE__ */ React13.createElement(
+    component: ({ data, ...props }) => /* @__PURE__ */ React14.createElement(
       BubbleChartComponent,
       {
         data: data && data.datasets ? data : getDemoData(WIDGET_TYPES.BUBBLE_CHART.value),
         ...props
       }
     ),
-    icon: ({ className }) => /* @__PURE__ */ React13.createElement(FaChartLine, { className: `!text-lg ${className}` }),
+    icon: ({ className }) => /* @__PURE__ */ React14.createElement(FaChartLine, { className: `!text-lg ${className}` }),
     sampleConfig: WIDGET_INITIAL_CONFIG.bubble
   },
   table: {
@@ -18521,14 +18623,14 @@ var WIDGETS_MAP = {
     value: WIDGET_TYPES.TABLE_WIDGET.value,
     datasetFields: ALL_WIDGET_DATASET_FIELDS.table,
     description: "Display data in a tabular format",
-    component: ({ data, ...props }) => /* @__PURE__ */ React13.createElement(
+    component: ({ data, ...props }) => /* @__PURE__ */ React14.createElement(
       TableWidgetComponent,
       {
         data: data && data.length > 0 ? data : getDemoData(WIDGET_TYPES.TABLE_WIDGET.value),
         ...props
       }
     ),
-    icon: ({ className }) => /* @__PURE__ */ React13.createElement(FaTable, { className: `!text-lg ${className}` }),
+    icon: ({ className }) => /* @__PURE__ */ React14.createElement(FaTable, { className: `!text-lg ${className}` }),
     sampleConfig: WIDGET_INITIAL_CONFIG.table
   }
 };
@@ -18536,6 +18638,7 @@ export {
   ALL_WIDGET_DATASET_FIELDS,
   BarChartComponent,
   BubbleChartComponent,
+  IframeWidgetComponent,
   LineChartComponent,
   PieChartComponent,
   PolarAreaChartComponent,
@@ -18546,6 +18649,7 @@ export {
   WIDGETS_MAP,
   processBarChartQueryResults,
   processBubbleChartQueryResults,
+  processIframeWidgetQueryResults,
   processLineChartQueryResults,
   processPieChartQueryResults,
   processPolarAreaChartQueryResults,

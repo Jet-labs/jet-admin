@@ -61,10 +61,36 @@ var WIDGET_TYPES = {
   TABLE_WIDGET: {
     name: "Table Widget",
     value: "table"
+  },
+  IFRAME_WIDGET: {
+    name: "IFrame Widget",
+    value: "iframe"
   }
 };
 var WIDGET_INITIAL_CONFIG = {
   text: {
+    options: {
+      backgroundColor: "rgba(255, 255, 255, 0)",
+      color: "#666",
+      plugins: {
+        title: {
+          display: false,
+          text: "Chart Title",
+          position: "top",
+          font: { size: 16, color: "#333" }
+        },
+        legend: {
+          display: false,
+          position: "top",
+          labels: { font: { size: 12, color: "#666" } }
+        },
+        tooltip: {
+          enabled: false
+        }
+      }
+    }
+  },
+  iframe: {
     options: {
       backgroundColor: "rgba(255, 255, 255, 0)",
       color: "#666",
@@ -369,78 +395,78 @@ var WIDGET_ADVANCED_OPTIONS = [
     key: "widgetConfig.title",
     type: "text",
     description: "Widget title",
-    relevantWidgets: ["text", "table"],
+    relevantWidgets: ["text", "table", "iframe"]
   },
   {
     name: "Title enabled",
     key: "widgetConfig.titleEnabled",
     type: "boolean",
     description: "Enable or disable the widget title",
-    relevantWidgets: ["text", "table"],
-    defaultValue: true,
+    relevantWidgets: ["text", "table", "iframe"],
+    defaultValue: true
   },
   {
     name: "Title CSS Class",
     key: "widgetConfig.titleTailwindCss",
     type: "text",
     description: "Tailwind CSS classes for the title",
-    relevantWidgets: ["text", "table"],
+    relevantWidgets: ["text", "table", "iframe"]
   },
   {
     name: "Container CSS Class",
     key: "widgetConfig.containerTailwindCss",
     type: "text",
     description: "Tailwind CSS classes for the container",
-    relevantWidgets: ["text", "table"],
+    relevantWidgets: ["text", "table", "iframe"]
   },
   {
     name: "Widget CSS Class",
     key: "widgetConfig.widgetTailwindCss",
     type: "text",
     description: "Tailwind CSS classes for the widget",
-    relevantWidgets: ["text", "table"],
+    relevantWidgets: ["text", "table", "iframe"]
   },
   {
     name: "Container Width",
     key: "widgetConfig.containerCss.width",
     type: "text",
     description: "Custom width for container (e.g., 100%, 200px)",
-    relevantWidgets: ["text"],
+    relevantWidgets: ["text", "iframe"]
   },
   {
     name: "Container Height",
     key: "widgetConfig.containerCss.height",
     type: "text",
     description: "Custom height for container (e.g., 100%, 200px)",
-    relevantWidgets: ["text"],
+    relevantWidgets: ["text", "iframe"]
   },
   {
     name: "Container Padding",
     key: "widgetConfig.containerCss.padding",
     type: "text",
     description: "Custom padding for container (e.g., 10px, 1rem)",
-    relevantWidgets: ["text"],
+    relevantWidgets: ["text", "iframe"]
   },
   {
     name: "Widget Width",
     key: "widgetConfig.widgetCss.width",
     type: "text",
     description: "Custom width for widget (e.g., 100%, 200px)",
-    relevantWidgets: ["text"],
+    relevantWidgets: ["text", "iframe"]
   },
   {
     name: "Widget Height",
     key: "widgetConfig.widgetCss.height",
     type: "text",
     description: "Custom height for widget (e.g., 100%, 200px)",
-    relevantWidgets: ["text"],
+    relevantWidgets: ["text", "iframe"]
   },
   {
     name: "Widget Padding",
     key: "widgetConfig.widgetCss.padding",
     type: "text",
     description: "Custom padding for widget (e.g., 10px, 1rem)",
-    relevantWidgets: ["text"],
+    relevantWidgets: ["text", "iframe"]
   },
   {
     name: "Font Family",
@@ -456,16 +482,16 @@ var WIDGET_ADVANCED_OPTIONS = [
       "Courier New",
       "monospace",
       "sans-serif",
-      "serif",
+      "serif"
     ],
-    relevantWidgets: ["text"],
+    relevantWidgets: ["text"]
   },
   {
     name: "Font Size",
     key: "widgetConfig.widgetCss.fontSize",
     type: "text",
     description: "Font size (e.g., 16px, 1.2rem)",
-    relevantWidgets: ["text"],
+    relevantWidgets: ["text", "iframe"]
   },
   {
     name: "Font Weight",
@@ -483,9 +509,9 @@ var WIDGET_ADVANCED_OPTIONS = [
       "600",
       "700",
       "800",
-      "900",
+      "900"
     ],
-    relevantWidgets: ["text"],
+    relevantWidgets: ["text", "iframe"]
   },
   {
     name: "Font Style",
@@ -493,7 +519,7 @@ var WIDGET_ADVANCED_OPTIONS = [
     type: "select",
     description: "Font style for the text",
     options: ["normal", "italic", "oblique"],
-    relevantWidgets: ["text"],
+    relevantWidgets: ["text", "iframe"]
   },
   {
     name: "Text Decoration",
@@ -501,7 +527,7 @@ var WIDGET_ADVANCED_OPTIONS = [
     type: "select",
     description: "Text decoration style",
     options: ["none", "underline", "overline", "line-through"],
-    relevantWidgets: ["text"],
+    relevantWidgets: ["text", "iframe"]
   },
   {
     name: "Text Transform",
@@ -509,28 +535,28 @@ var WIDGET_ADVANCED_OPTIONS = [
     type: "select",
     description: "Text transformation",
     options: ["none", "uppercase", "lowercase", "capitalize"],
-    relevantWidgets: ["text"],
+    relevantWidgets: ["text", "iframe"]
   },
   {
     name: "Letter Spacing",
     key: "widgetConfig.widgetCss.letterSpacing",
     type: "text",
     description: "Space between letters (e.g., 1px, 0.1em)",
-    relevantWidgets: ["text"],
+    relevantWidgets: ["text", "iframe"]
   },
   {
     name: "Word Spacing",
     key: "widgetConfig.widgetCss.wordSpacing",
     type: "text",
     description: "Space between words (e.g., 2px, 0.2em)",
-    relevantWidgets: ["text"],
+    relevantWidgets: ["text", "iframe"]
   },
   {
     name: "Line Height",
     key: "widgetConfig.widgetCss.lineHeight",
     type: "text",
     description: "Line height (e.g., 1.5, 24px)",
-    relevantWidgets: ["text"],
+    relevantWidgets: ["text", "iframe"]
   },
   {
     name: "Text Align",
@@ -538,28 +564,28 @@ var WIDGET_ADVANCED_OPTIONS = [
     type: "select",
     description: "Text alignment",
     options: ["left", "center", "right", "justify"],
-    relevantWidgets: ["text"],
+    relevantWidgets: ["text", "iframe"]
   },
   {
     name: "Text Color",
     key: "widgetConfig.widgetCss.color",
     type: "color",
     description: "Text color",
-    relevantWidgets: ["text"],
+    relevantWidgets: ["text", "iframe"]
   },
   {
     name: "Background Color",
     key: "widgetConfig.widgetCss.backgroundColor",
     type: "color",
     description: "Background color",
-    relevantWidgets: ["text"],
+    relevantWidgets: ["text", "iframe"]
   },
   {
     name: "Background Opacity",
     key: "widgetConfig.widgetCss.opacity",
     type: "text",
     description: "Background opacity (0-1)",
-    relevantWidgets: ["text"],
+    relevantWidgets: ["text", "iframe"]
   },
   {
     name: "Border Style",
@@ -567,84 +593,84 @@ var WIDGET_ADVANCED_OPTIONS = [
     type: "select",
     description: "Border style",
     options: ["none", "solid", "dashed", "dotted", "double", "groove", "ridge"],
-    relevantWidgets: ["text"],
+    relevantWidgets: ["text", "iframe"]
   },
   {
     name: "Border Width",
     key: "widgetConfig.widgetCss.borderWidth",
     type: "text",
     description: "Border width (e.g., 1px, 2px)",
-    relevantWidgets: ["text"],
+    relevantWidgets: ["text", "iframe"]
   },
   {
     name: "Border Color",
     key: "widgetConfig.widgetCss.borderColor",
     type: "color",
     description: "Border color",
-    relevantWidgets: ["text"],
+    relevantWidgets: ["text", "iframe"]
   },
   {
     name: "Border Radius",
     key: "widgetConfig.widgetCss.borderRadius",
     type: "text",
     description: "Border radius (e.g., 4px, 0.5rem)",
-    relevantWidgets: ["text"],
+    relevantWidgets: ["text", "iframe"]
   },
   {
     name: "Box Shadow",
     key: "widgetConfig.widgetCss.boxShadow",
     type: "text",
     description: "Box shadow (e.g., 0 2px 4px rgba(0,0,0,0.1))",
-    relevantWidgets: ["text"],
+    relevantWidgets: ["text", "iframe"]
   },
   {
     name: "Text Shadow",
     key: "widgetConfig.widgetCss.textShadow",
     type: "text",
     description: "Text shadow (e.g., 1px 1px 2px rgba(0,0,0,0.5))",
-    relevantWidgets: ["text"],
+    relevantWidgets: ["text", "iframe"]
   },
   {
     name: "Backdrop Filter",
     key: "widgetConfig.widgetCss.backdropFilter",
     type: "text",
     description: "Backdrop filter (e.g., blur(5px))",
-    relevantWidgets: ["text"],
+    relevantWidgets: ["text", "iframe"]
   },
   {
     name: "Margin",
     key: "widgetConfig.widgetCss.margin",
     type: "text",
     description: "Outer spacing (e.g., 10px, 1rem)",
-    relevantWidgets: ["text"],
+    relevantWidgets: ["text", "iframe"]
   },
   {
     name: "Min Width",
     key: "widgetConfig.widgetCss.minWidth",
     type: "text",
     description: "Minimum width (e.g., 100px)",
-    relevantWidgets: ["text"],
+    relevantWidgets: ["text", "iframe"]
   },
   {
     name: "Max Width",
     key: "widgetConfig.widgetCss.maxWidth",
     type: "text",
     description: "Maximum width (e.g., 500px)",
-    relevantWidgets: ["text"],
+    relevantWidgets: ["text", "iframe"]
   },
   {
     name: "Min Height",
     key: "widgetConfig.widgetCss.minHeight",
     type: "text",
     description: "Minimum height (e.g., 50px)",
-    relevantWidgets: ["text"],
+    relevantWidgets: ["text", "iframe"]
   },
   {
     name: "Max Height",
     key: "widgetConfig.widgetCss.maxHeight",
     type: "text",
     description: "Maximum height (e.g., 300px)",
-    relevantWidgets: ["text"],
+    relevantWidgets: ["text", "iframe"]
   },
   {
     name: "Overflow",
@@ -652,21 +678,21 @@ var WIDGET_ADVANCED_OPTIONS = [
     type: "select",
     description: "Content overflow behavior",
     options: ["visible", "hidden", "scroll", "auto"],
-    relevantWidgets: ["text"],
+    relevantWidgets: ["text", "iframe"]
   },
   {
     name: "Transform",
     key: "widgetConfig.widgetCss.transform",
     type: "text",
     description: "Transform (e.g., rotate(45deg), scale(1.1))",
-    relevantWidgets: ["text"],
+    relevantWidgets: ["text", "iframe"]
   },
   {
     name: "Transition",
     key: "widgetConfig.widgetCss.transition",
     type: "text",
     description: "Transition effects (e.g., all 0.3s ease)",
-    relevantWidgets: ["text"],
+    relevantWidgets: ["text", "iframe"]
   },
   {
     name: "Chart background color",
@@ -680,9 +706,9 @@ var WIDGET_ADVANCED_OPTIONS = [
       "scatter",
       "bubble",
       "radar",
-      "polarArea",
-    ],
-  },
+      "polarArea"
+    ]
+  }
 ];
 var WIDGET_DATASET_ADVANCED_OPTIONS = [
   {
