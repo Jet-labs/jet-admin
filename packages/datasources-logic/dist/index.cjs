@@ -18726,12 +18726,12 @@ var require_lib4 = __commonJS({
       const dest = new URL$1(destination).protocol;
       return orig === dest;
     };
-    function fetch3(url2, opts) {
-      if (!fetch3.Promise) {
+    function fetch5(url2, opts) {
+      if (!fetch5.Promise) {
         throw new Error("native promise missing, set fetch.Promise to your favorite alternative");
       }
-      Body.Promise = fetch3.Promise;
-      return new fetch3.Promise(function(resolve, reject) {
+      Body.Promise = fetch5.Promise;
+      return new fetch5.Promise(function(resolve, reject) {
         const request = new Request2(url2, opts);
         const options = getNodeRequestOptions(request);
         const send = (options.protocol === "https:" ? https2 : http2).request;
@@ -18802,7 +18802,7 @@ var require_lib4 = __commonJS({
         req.on("response", function(res) {
           clearTimeout(reqTimeout);
           const headers = createHeadersLenient(res.headers);
-          if (fetch3.isRedirect(res.statusCode)) {
+          if (fetch5.isRedirect(res.statusCode)) {
             const location = headers.get("Location");
             let locationURL = null;
             try {
@@ -18864,7 +18864,7 @@ var require_lib4 = __commonJS({
                   requestOpts.body = void 0;
                   requestOpts.headers.delete("content-length");
                 }
-                resolve(fetch3(new Request2(locationURL, requestOpts)));
+                resolve(fetch5(new Request2(locationURL, requestOpts)));
                 finalize();
                 return;
             }
@@ -18956,11 +18956,11 @@ var require_lib4 = __commonJS({
         stream4.end();
       }
     }
-    fetch3.isRedirect = function(code) {
+    fetch5.isRedirect = function(code) {
       return code === 301 || code === 302 || code === 303 || code === 307 || code === 308;
     };
-    fetch3.Promise = global.Promise;
-    module2.exports = exports2 = fetch3;
+    fetch5.Promise = global.Promise;
+    module2.exports = exports2 = fetch5;
     Object.defineProperty(exports2, "__esModule", { value: true });
     exports2.default = exports2;
     exports2.Headers = Headers;
@@ -30486,7 +30486,6 @@ var require_follow_redirects = __commonJS({
 var index_exports = {};
 __export(index_exports, {
   DATASOURCE_LOGIC_COMPONENTS: () => DATASOURCE_LOGIC_COMPONENTS,
-  QueryRunner: () => QueryRunner,
   dataSourceRegistry: () => data_sources_default
 });
 module.exports = __toCommonJS(index_exports);
@@ -30508,6 +30507,10 @@ var DATASOURCE_TYPES = {
   RESTAPI: {
     name: "REST API",
     value: "restapi"
+  },
+  WEB_URL: {
+    name: "Web URL",
+    value: "weburl"
   }
 };
 
@@ -30767,7 +30770,7 @@ var restAPITestConnection = async ({ datasourceOptions }) => {
   }
 };
 
-// src/core/models/datasource.js
+// src/data-sources/datasource.js
 var DataSource = class {
   constructor(config) {
     this.datasourceID = config?.datasourceID;
@@ -34165,10 +34168,57 @@ var RestAPIDataSource = class extends DataSource {
   }
 };
 
+// src/data-sources/weburl/datasource.js
+var import_node_fetch2 = __toESM(require_lib4());
+var WebURLDataSource = class extends DataSource {
+  async execute(dataQueryOptions, context) {
+    Logger.log("info", {
+      message: "weburl:WebURLDataSource:execute:params",
+      params: { dataQueryOptions, config: this.config }
+    });
+    const { action, args } = dataQueryOptions;
+    const { url: url2, timeout } = this.config.datasourceOptions;
+    try {
+      const opts = {
+        method: "GET",
+        headers: {},
+        redirect: "follow",
+        timeout
+      };
+      const res = await (0, import_node_fetch2.default)(url2, opts);
+      const contentTypeHeader = res.headers.get("content-type") || "";
+      let parsedBody;
+      if (contentTypeHeader.includes("application/json")) {
+        parsedBody = await res.json();
+      } else {
+        parsedBody = await res.text();
+      }
+      Logger.log("info", {
+        message: "weburl:WebURLDataSource:execute:response",
+        params: {
+          status: res.status,
+          statusText: res.statusText,
+          body: parsedBody
+        }
+      });
+      return { url: url2, timeout, args };
+    } catch (err) {
+      Logger.log("error", {
+        message: "weburl:WebURLDataSource:execute:catch",
+        params: err.message || err
+      });
+      throw new Error(
+        `API request failed: ${err.response?.status || "No response"}`
+      );
+    }
+  }
+};
+
 // src/data-sources/index.js
 var dataSources = {
   postgresql: PostgreSQLDataSource,
-  restapi: RestAPIDataSource
+  restapi: RestAPIDataSource,
+  weburl: WebURLDataSource
 };
 var data_sources_default = {
   getDataSource(type) {
@@ -34181,611 +34231,52 @@ var data_sources_default = {
   }
 };
 
-// src/core/dependencyGraph.js
-var DependencyGraph = class {
-  constructor() {
-    this.graph = /* @__PURE__ */ new Map();
-  }
-  addNode(query) {
-    this.graph.set(query.dataQueryID, {
-      query,
-      dependencies: /* @__PURE__ */ new Set()
-    });
-  }
-  addDependency(fromId, toId) {
-    if (!this.graph?.has(parseInt(fromId))) {
-      throw new Error(`Query ${fromId} not found in graph`);
-    }
-    this.graph?.get(parseInt(fromId)).dependencies?.add(toId);
-  }
-  detectCircularDependencies() {
-    const visited = /* @__PURE__ */ new Set();
-    const recursionStack = /* @__PURE__ */ new Set();
-    const visit = (nodeId) => {
-      if (!visited?.has(nodeId)) {
-        visited.add(nodeId);
-        recursionStack.add(nodeId);
-        const node = this.graph.get(nodeId);
-        for (const depId of node.dependencies) {
-          if (!visited?.has(depId)) {
-            if (visit(depId)) return true;
-          } else if (recursionStack?.has(depId)) {
-            return true;
-          }
-        }
-      }
-      recursionStack.delete(nodeId);
-      return false;
-    };
-    for (const nodeId of this.graph.keys()) {
-      if (visit(nodeId)) {
-        throw new Error(
-          `Circular dependency detected involving query ${nodeId}`
-        );
-      }
-    }
-    return false;
-  }
-  getExecutionOrder() {
-    const visited = /* @__PURE__ */ new Set();
-    const order = [];
-    const visit = (nodeId) => {
-      if (!visited.has(nodeId)) {
-        visited.add(nodeId);
-        const node = this.graph.get(nodeId);
-        for (const depId of node.dependencies) {
-          visit(depId);
-        }
-        order.push(nodeId);
-      }
-    };
-    for (const nodeId of this.graph.keys()) {
-      visit(nodeId);
-    }
-    return order.reverse();
-  }
-  getIndependentQueries() {
-    const allDependencies = /* @__PURE__ */ new Set();
-    this.graph.forEach((node) => {
-      node.dependencies.forEach((depId) => allDependencies.add(depId));
-    });
-    const independent = [];
-    this.graph.forEach((_, nodeId) => {
-      if (!allDependencies.has(nodeId)) {
-        independent.push(nodeId);
-      }
-    });
-    return independent;
-  }
-};
-
-// src/core/templateResolver.js
-var TemplateResolver = class {
-  // Unified regex for all placeholder types
-  static PLACEHOLDER_REGEX = /\$\{([^:}]+)(?::(\d+))?(?:\[([^\]]+)\])?(?:\.([\w]+))?(?::(\{[^}]*\}))?\}/g;
-  static extractDependencies(template) {
-    const dependencies = /* @__PURE__ */ new Set();
-    const extract = (value) => {
-      if (typeof value === "string") {
-        const matches = value.matchAll(this.PLACEHOLDER_REGEX);
-        for (const match of matches) {
-          if (match[1] === "query_id" && match[2]) {
-            dependencies.add(parseInt(match[2], 10));
-          }
-        }
-      } else if (Array.isArray(value)) {
-        value.forEach(extract);
-      } else if (value && typeof value === "object") {
-        Object.values(value).forEach(extract);
-      }
-    };
-    extract(template);
-    return Array.from(dependencies);
-  }
-  static async resolve(template, context, queryRunner) {
-    if (typeof template === "string") {
-      return this.resolveString(template, context, queryRunner);
-    }
-    if (Array.isArray(template)) {
-      return Promise.all(
-        template.map((item) => this.resolve(item, context, queryRunner))
-      );
-    }
-    if (template && typeof template === "object") {
-      const resolvedObj = {};
-      for (const [key, value] of Object.entries(template)) {
-        resolvedObj[key] = await this.resolve(value, context, queryRunner);
-      }
-      return resolvedObj;
-    }
-    return template;
-  }
-  static async resolveString(str, context, queryRunner, depth = 0) {
+// src/data-sources/weburl/connection.js
+var import_node_fetch3 = __toESM(require_lib4());
+var webURLTestConnection = async ({ datasourceOptions }) => {
+  const { url: url2, timeout } = datasourceOptions;
+  try {
     Logger.log("info", {
-      message: "TemplateResolver:resolveString:enter",
-      params: { input: str, depth, context: context.getExecutionState() }
+      message: "weburl:webURLTestConnection:params",
+      params: { url: url2, timeout }
     });
-    const MAX_DEPTH = 10;
-    if (depth > MAX_DEPTH) {
-      Logger.log("error", {
-        message: "TemplateResolver:resolveString:maxDepth",
-        params: { depth, MAX_DEPTH, context: context.getExecutionState() }
-      });
-      return str;
-    }
-    let resolved = str;
-    const matches = [...str.matchAll(this.PLACEHOLDER_REGEX)];
-    Logger.log("info", {
-      message: "TemplateResolver:resolveString:matches",
-      params: { input: str, matches: matches.map((m) => m[0]), depth }
-    });
-    for (const match of matches) {
-      const [fullMatch, type, id, arrayIndex, property, paramsJson] = match;
-      try {
-        let value;
-        let parameters = {};
-        if (paramsJson) {
-          try {
-            parameters = JSON.parse(paramsJson);
-            for (const [key, val] of Object.entries(parameters)) {
-              parameters[key] = await this.resolve(val, context, queryRunner);
-            }
-          } catch (e) {
-            Logger.log("error", {
-              message: "TemplateResolver:resolveString:parseParams:catch",
-              params: { paramsJson, error: e.message }
-            });
-          }
-        }
-        if (type === "query_id" && id) {
-          const queryId = parseInt(id, 10);
-          if (!context.hasResult(queryId, parameters)) {
-            Logger.log("info", {
-              message: "TemplateResolver:resolveString:runQuery",
-              params: { queryId, parameters }
-            });
-            await queryRunner.runQuery(queryId, parameters);
-          }
-          value = context.getResult(queryId, parameters);
-          if (arrayIndex) {
-            Logger.log("info", {
-              message: "TemplateResolver:resolveString:resolveArrayIndex",
-              params: { arrayIndex }
-            });
-            const index = arrayIndex.replace(/['"]/g, "");
-            const resolvedIndex = await this.resolve(
-              index,
-              context,
-              queryRunner
-            );
-            if (isNaN(resolvedIndex)) {
-              Logger.log("error", {
-                message: "TemplateResolver:resolveString:invalidArrayIndex",
-                params: { arrayIndex, resolvedIndex }
-              });
-              throw new Error(`Invalid array index: ${resolvedIndex}`);
-            }
-            value = value?.[resolvedIndex];
-            Logger.log("info", {
-              message: "TemplateResolver:resolveString:resolvedArrayIndex",
-              params: { arrayIndex, resolvedIndex }
-            });
-          }
-          if (property) {
-            value = value?.[property];
-          }
-        } else {
-          const varName = type;
-          Logger.log("info", {
-            message: "TemplateResolver:resolveString:resolveVariable",
-            params: {
-              varName,
-              context: context.getExecutionState(),
-              t: context?.variables?.keys()
-            }
-          });
-          try {
-            value = context.getVariable(varName);
-            Logger.log("info", {
-              message: "TemplateResolver:resolveString:resolvedVariable",
-              params: { varName, value }
-            });
-          } catch (e) {
-            Logger.log("error", {
-              message: "TemplateResolver:resolveString:variableNotFound",
-              params: { varName, error: e.message }
-            });
-            continue;
-          }
-        }
-        if (typeof value === "object") {
-          value = JSON.stringify(value);
-        }
-        resolved = resolved.replace(fullMatch, value);
-        Logger.log("info", {
-          message: "TemplateResolver:resolveString:resolved",
-          params: { fullMatch, value, resolvedSoFar: resolved }
-        });
-      } catch (error) {
-        Logger.log("error", {
-          message: "TemplateResolver:resolveString:catch",
-          params: { fullMatch, error }
-        });
-      }
-    }
-    if (resolved.includes("${") && resolved !== str) {
-      return this.resolveString(resolved, context, queryRunner, depth + 1);
-    }
-    return resolved;
-  }
-};
-
-// src/core/contextManager.js
-var ContextManager = class {
-  constructor() {
-    this.results = /* @__PURE__ */ new Map();
-    this.parameterizedResults = /* @__PURE__ */ new Map();
-    this.variables = /* @__PURE__ */ new Map();
-    this.instanceId = Math.random().toString(36).substr(2, 6);
-    Logger.log("info", {
-      message: "ContextManager:constructor",
-      params: { instanceId: this.instanceId }
-    });
-  }
-  setResult(queryId, result, parameters = {}) {
-    const id = Number(queryId);
-    const paramKey = this.getParameterKey(parameters);
-    if (Object.keys(parameters).length > 0) {
-      if (!this.parameterizedResults?.has(id)) {
-        this.parameterizedResults.set(id, /* @__PURE__ */ new Map());
-      }
-      this.parameterizedResults.get(id).set(paramKey, result);
+    const opts = {
+      method: "GET",
+      headers: {},
+      redirect: "follow",
+      timeout
+    };
+    const res = await (0, import_node_fetch3.default)(url2, opts);
+    const contentTypeHeader = res.headers.get("content-type") || "";
+    let parsedBody;
+    if (contentTypeHeader.includes("application/json")) {
+      parsedBody = await res.json();
     } else {
-      this.results.set(id, result);
+      parsedBody = await res.text();
     }
     Logger.log("info", {
-      message: "ContextManager:setResult",
+      message: "weburl:webURLTestConnection:response",
       params: {
-        queryId: id,
-        parameters,
-        result,
-        instanceId: this.instanceId,
-        allResults: this.getResultsSnapshot()
+        status: res.status,
+        statusText: res.statusText,
+        body: parsedBody
       }
     });
-  }
-  getResult(queryId, parameters = {}) {
-    const id = Number(queryId);
-    const paramKey = this.getParameterKey(parameters);
-    if (Object.keys(parameters).length > 0 && this.parameterizedResults?.has(id) && this.parameterizedResults.get(id)?.has(paramKey)) {
-      return this.parameterizedResults.get(id).get(paramKey);
-    }
-    if (this.results?.has(id)) {
-      return this.results.get(id);
-    }
+    return {
+      ok: res.ok,
+      status: res.status,
+      statusText: res.statusText,
+      body: parsedBody
+    };
+  } catch (err) {
     Logger.log("error", {
-      message: "ContextManager:getResult:notFound",
-      params: {
-        queryId: id,
-        parameters,
-        availableResults: this.getResultsSnapshot(),
-        instanceId: this.instanceId
-      }
+      message: "weburl:webURLTestConnection:catch",
+      params: err.message || err
     });
-    throw new Error(
-      `Result not found for query ${id} with parameters ${JSON.stringify(
-        parameters
-      )}`
-    );
-  }
-  hasResult(queryId, parameters = {}) {
-    const id = Number(queryId);
-    const paramKey = this.getParameterKey(parameters);
-    if (Object.keys(parameters).length > 0) {
-      return this.parameterizedResults?.has(id) && this.parameterizedResults?.get(id)?.has(paramKey);
-    }
-    return this.results?.has(id);
-  }
-  getResultsSnapshot() {
-    return Array.from(this.results.entries()).reduce((acc, [key, value]) => {
-      acc[key] = value;
-      return acc;
-    }, {});
-  }
-  getParameterKey(parameters) {
-    return JSON.stringify(Object.entries(parameters).sort());
-  }
-  setVariable(name, value) {
-    this.variables.set(name, value);
-  }
-  getVariable(name) {
-    Logger.log("info", {
-      message: "ContextManager:getVariable",
-      params: {
-        name,
-        instanceId: this.instanceId,
-        value: this.variables.get(name)
-      }
-    });
-    if (this.variables.has(name) === null || this.variables.has(name) === void 0) {
-      throw new Error(`Context variable not found: ${name}`);
-    }
-    return this.variables.get(name);
-  }
-  getExecutionState() {
     return {
-      results: this.results?.size > 0 ? Object.fromEntries(this.results) : {},
-      parameterizedResults: this.parameterizedResults?.size > 0 ? Object.fromEntries(this.context) : {},
-      variables: this.variables?.size > 0 ? Object.fromEntries(this.variables) : {}
+      ok: false,
+      error: err.message || err
     };
-  }
-};
-
-// src/core/childContext.js
-var ChildContext = class {
-  constructor(parentContext, parameters = {}) {
-    this.parent = parentContext;
-    this.parameters = parameters;
-    this.localVariables = /* @__PURE__ */ new Map();
-    this.localResults = /* @__PURE__ */ new Map();
-    Logger.log("info", {
-      message: "ChildContext:constructor",
-      params: { parameters, parentId: parentContext.instanceId }
-    });
-  }
-  // Variable Management
-  getVariable(name) {
-    if (this.localVariables?.has(name)) {
-      Logger.log("info", {
-        message: "ChildContext:getVariable:local",
-        params: { name, instanceId: this.instanceId }
-      });
-      return this.localVariables.get(name);
-    }
-    if (this.parameters?.hasOwnProperty(name)) {
-      Logger.log("info", {
-        message: "ChildContext:getVariable:parameters",
-        params: { name, instanceId: this.instanceId }
-      });
-      return this.parameters[name];
-    }
-    Logger.log("info", {
-      message: "ChildContext:getVariable:parent",
-      params: { name, instanceId: this.instanceId }
-    });
-    return this.parent.getVariable(name);
-  }
-  setVariable(name, value) {
-    this.localVariables.set(name, value);
-    Logger.log("info", {
-      message: "ChildContext:setVariable",
-      params: { name, value, instanceId: this.instanceId }
-    });
-  }
-  // Result Management
-  setResult(queryId, result, params = {}) {
-    const id = Number(queryId);
-    const paramKey = this.getParameterKey(params);
-    if (!this.localResults?.has(id)) {
-      this.localResults.set(id, /* @__PURE__ */ new Map());
-    }
-    this.localResults.get(id).set(paramKey, result);
-    Logger.log("info", {
-      message: "ChildContext:setResult",
-      params: {
-        queryId: id,
-        params,
-        result,
-        instanceId: this.instanceId,
-        allResults: this.getResultsSnapshot()
-      }
-    });
-  }
-  getResult(queryId, params = {}) {
-    const id = Number(queryId);
-    const paramKey = this.getParameterKey(params);
-    if (this.localResults?.has(id) && this.localResults?.get(id)?.has(paramKey)) {
-      return this.localResults.get(id).get(paramKey);
-    }
-    return this.parent.getResult(id, params);
-  }
-  hasResult(queryId, params = {}) {
-    const id = Number(queryId);
-    const paramKey = this.getParameterKey(params);
-    if (this.localResults?.has(id) && this.localResults?.get(id)?.has(paramKey)) {
-      return true;
-    }
-    return this.parent.hasResult(id, params);
-  }
-  // Helper Methods
-  getParameterKey(parameters) {
-    return JSON.stringify(Object.entries(parameters).sort());
-  }
-  // Context Inspection
-  getExecutionState() {
-    return {
-      localVariables: Object.fromEntries(this.localVariables),
-      parameters: this.parameters,
-      parentState: this.parent.getExecutionState()
-    };
-  }
-  // Access to parent's instance ID for debugging
-  get instanceId() {
-    return `child-of-${this.parent.instanceId}`;
-  }
-};
-
-// src/core/queryRunner.js
-var QueryRunner = class {
-  constructor(queryFetcher, datasourceFetcher) {
-    this.queryFetcher = queryFetcher;
-    this.datasourceFetcher = datasourceFetcher;
-    this.context = new ContextManager();
-    this.graph = new DependencyGraph();
-    this.dataSourceCache = /* @__PURE__ */ new Map();
-  }
-  async run(initialQueryIds, contextVariables = {}) {
-    try {
-      Logger.log("info", {
-        message: "QueryRunner:run:contextVariables",
-        params: { initialQueryIds, contextVariables }
-      });
-      for (const [name, value] of Object.entries(contextVariables)) {
-        this.context.setVariable(name, value);
-      }
-      Logger.log("info", {
-        message: "QueryRunner:run:contextVariables",
-        params: { contextVariables: this.context.getExecutionState() }
-      });
-      await this.buildDependencyGraph(initialQueryIds);
-      this.graph.detectCircularDependencies();
-      const executionOrder = this.graph.getExecutionOrder();
-      const independentQueries = this.graph.getIndependentQueries();
-      await Promise.all(independentQueries.map((id) => this.runQuery(id)));
-      for (const queryId of executionOrder) {
-        if (!independentQueries.includes(queryId)) {
-          await this.runQuery(queryId);
-        }
-      }
-      const results = {};
-      for (const queryId of initialQueryIds) {
-        results[queryId] = this.context.getResult(parseInt(queryId));
-      }
-      Logger.log("warning", {
-        message: "QueryRunner:run:success",
-        params: {
-          initialQueryIds,
-          results,
-          context: this.context.getResult(parseInt(initialQueryIds[0]))
-        }
-      });
-      return results;
-    } catch (error) {
-      Logger.log("error", {
-        message: "QueryRunner:run:catch-1",
-        params: { error }
-      });
-      throw error;
-    } finally {
-      this.cleanup();
-    }
-  }
-  async runQuery(queryId, parameters = {}) {
-    const id = Number(queryId);
-    Logger.log("info", {
-      message: "QueryRunner:runQuery",
-      params: { queryId: id, parameters }
-    });
-    if (this.context.hasResult(id, parameters)) {
-      Logger.log("info", {
-        message: "QueryRunner:runQuery:cached",
-        params: { queryId: id, parameters }
-      });
-      return this.context.getResult(id, parameters);
-    }
-    const node = this.graph.graph.get(id);
-    if (!node) {
-      Logger.log("error", {
-        message: "QueryRunner:runQuery:catch-2",
-        params: { queryId: id, error: "Query not found in graph" }
-      });
-      throw new Error(`Query ${id} not found in graph`);
-    }
-    const query = node.query;
-    const datasource = await this.getDataSource(query);
-    try {
-      const childContext = new ChildContext(this.context, parameters);
-      Logger.log("info", {
-        message: "QueryRunner:runQuery:resolveOptions",
-        params: { queryId: id, parameters, options: query.dataQueryOptions }
-      });
-      const resolvedOptions = await TemplateResolver.resolve(
-        query.dataQueryOptions,
-        childContext,
-        this
-      );
-      Logger.log("info", {
-        message: "QueryRunner:runQuery:resolvedOptions",
-        params: { queryId: id, parameters, resolvedOptions }
-      });
-      Logger.log("info", {
-        message: "QueryRunner:runQuery:execute",
-        params: { queryId: id, parameters, resolvedOptions }
-      });
-      const result = await datasource.execute(resolvedOptions, childContext);
-      const resolvedResult = await TemplateResolver.resolve(
-        result,
-        childContext,
-        this
-      );
-      this.context.setResult(id, resolvedResult, parameters);
-      return resolvedResult;
-    } catch (error) {
-      Logger.log("error", {
-        message: "QueryRunner:runQuery:catch-3",
-        params: { queryId: id, parameters, error }
-      });
-      throw error;
-    }
-  }
-  async buildDependencyGraph(queryIds) {
-    const queue = [...queryIds];
-    const processed = /* @__PURE__ */ new Set();
-    while (queue.length > 0) {
-      const queryId = queue.shift();
-      if (processed.has(queryId)) continue;
-      processed.add(queryId);
-      const query = await this.queryFetcher(queryId);
-      if (!query) {
-        Logger.log("error", {
-          message: "QueryRunner:buildDependencyGraph:catch-2",
-          params: { queryId, error: "Query not found in data store" }
-        });
-        throw new Error(`Query not found in data store: ${queryId}`);
-      }
-      Logger.log("info", {
-        message: "QueryRunner:buildDependencyGraph:query",
-        params: { queryId, query }
-      });
-      this.graph.addNode(query);
-      const dependencies = TemplateResolver.extractDependencies(
-        JSON.stringify(query.dataQueryOptions)
-      );
-      for (const depId of dependencies) {
-        this.graph.addDependency(queryId, depId);
-        queue.push(depId);
-      }
-    }
-  }
-  async getDataSource(query) {
-    const cacheKey = `${query.datasourceType}_${query.datasourceID}`;
-    if (this.dataSourceCache.has(cacheKey)) {
-      return this.dataSourceCache.get(cacheKey);
-    }
-    let datasourceConfig;
-    switch (query.datasourceType) {
-      case DATASOURCE_TYPES.RESTAPI.value:
-        datasourceConfig = {
-          datasourceType: query.datasourceType,
-          datasourceOptions: query.dataQueryOptions
-        };
-        break;
-      default:
-        datasourceConfig = await this.datasourceFetcher(query.datasourceID);
-        break;
-    }
-    const DataSource2 = data_sources_default.getDataSource(query.datasourceType);
-    const instance = new DataSource2(datasourceConfig);
-    this.dataSourceCache.set(cacheKey, instance);
-    return instance;
-  }
-  cleanup() {
-    for (const datasource of this.dataSourceCache.values()) {
-      if (typeof datasource.cleanup === "function") {
-        datasource.cleanup();
-      }
-    }
-    this.dataSourceCache.clear();
   }
 };
 
@@ -34811,12 +34302,18 @@ var DATASOURCE_LOGIC_COMPONENTS = {
         datasourceOptions
       });
     }
+  },
+  [DATASOURCE_TYPES.WEB_URL.value]: {
+    testConnection: async ({ datasourceOptions }) => {
+      return await webURLTestConnection({
+        datasourceOptions
+      });
+    }
   }
 };
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   DATASOURCE_LOGIC_COMPONENTS,
-  QueryRunner,
   dataSourceRegistry
 });
 /*! Bundled license information:

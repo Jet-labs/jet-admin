@@ -62,6 +62,8 @@ export const DatasourceAdditionForm = ({ tenantID }) => {
       addDatasource(data);
     },
   });
+  console.log(datasourceAdditionForm);
+  console.log(DATASOURCE_TYPES, DATASOURCE_UI_COMPONENTS);
 
   return (
     <div className="w-full flex flex-col justify-start items-center h-full">
@@ -85,7 +87,7 @@ export const DatasourceAdditionForm = ({ tenantID }) => {
             onSubmit={datasourceAdditionForm.handleSubmit}
           >
             <DatasourceEditor datasourceEditorForm={datasourceAdditionForm} />
-            <div className="flex flex-row justify-start items-center">
+            <div className="flex flex-row justify-end items-center">
               <DatasourceTestingForm
                 tenantID={tenantID}
                 datasourceType={datasourceAdditionForm.values.datasourceType}
@@ -97,7 +99,7 @@ export const DatasourceAdditionForm = ({ tenantID }) => {
               <button
                 type="submit"
                 disabled={isAddingDatasource}
-                className="flex flex-row justify-center items-center px-3 py-1.5 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none"
+                className="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none"
               >
                 {isAddingDatasource && (
                   <CircularProgress className="!mr-3" size={16} color="white" />
@@ -112,7 +114,7 @@ export const DatasourceAdditionForm = ({ tenantID }) => {
           {datasourceTestResult !== undefined || datasourceTestResult !== null
             ? DATASOURCE_UI_COMPONENTS[
                 datasourceAdditionForm.values.datasourceType
-              ]?.datasourceTestResultUI({
+            ]?.datasourceTestResultUI?.({
                 connectionResult: datasourceTestResult,
               })
             : null}

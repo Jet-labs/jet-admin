@@ -1,10 +1,11 @@
 import PostgreSQLDataSource from "./postgresql/datasource";
 import RestAPIDataSource from "./restapi/datasource";
-
+import WebURLDataSource from "./weburl/datasource";
 
 const dataSources = {
   postgresql: PostgreSQLDataSource,
   restapi: RestAPIDataSource,
+  weburl: WebURLDataSource,
 };
 
 export default {

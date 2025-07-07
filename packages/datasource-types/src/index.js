@@ -15,4 +15,8 @@ export const DATASOURCE_TYPES = {
     name: "REST API",
     value: "restapi",
   },
+  WEB_URL: {
+    name: "Web URL",
+    value: "weburl",
+  },
 };

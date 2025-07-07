@@ -10,9 +10,14 @@ Postgres queries can be saved as variables which when used will be executed in r
 #### **Using queries variables**
 
 
-  ```sql
-  select * from city where city_id=${arg1} or city_id=${arg2};
-  ```  
+```
+https://api.restful-api.dev/objects/{{query(51,{"param1":phoneapi})[0].id}}
+```
+
+```
+https://api.restful-api.dev/objects?id={{param1}}
+```
+
 The query variables are defined in the query test section.
 
 

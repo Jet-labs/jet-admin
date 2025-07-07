@@ -61645,7 +61645,7 @@ __export(index_exports, {
   DATASOURCE_UI_COMPONENTS: () => DATASOURCE_UI_COMPONENTS
 });
 module.exports = __toCommonJS(index_exports);
-var import_react11 = __toESM(require("react"));
+var import_react12 = __toESM(require("react"));
 
 // ../datasource-types/dist/index.mjs
 var DATASOURCE_TYPES = {
@@ -61664,6 +61664,10 @@ var DATASOURCE_TYPES = {
   RESTAPI: {
     name: "REST API",
     value: "restapi"
+  },
+  WEB_URL: {
+    name: "Web URL",
+    value: "weburl"
   }
 };
 
@@ -69689,11 +69693,6 @@ var QueryResponseView = ({ queryResult }) => {
   ), /* @__PURE__ */ import_react7.default.createElement("div", { className: "w-100  h-full overflow-y-auto pb-5" }, tab4 === 0 && /* @__PURE__ */ import_react7.default.createElement(QueryResponseTableTab, { data: queryResult ? queryResult : "" }), tab4 === 1 && /* @__PURE__ */ import_react7.default.createElement(QueryResponseJSONTab, { data: queryResult ? queryResult : "" }), tab4 === 2 && /* @__PURE__ */ import_react7.default.createElement(QueryResponseRAWTab, { data: queryResult ? queryResult : "" }), tab4 === 3 && /* @__PURE__ */ import_react7.default.createElement(QueryResponseSchemaTab, { data: queryResult ? queryResult : {} })));
 };
 
-// src/components/postgresql/query/postgreSQLQueryEditor.js
-var import_react8 = __toESM(require("react"));
-var import_react9 = __toESM(require("@monaco-editor/react"));
-var import_GitHub_Light = __toESM(require("monaco-themes/themes/GitHub Light.json"));
-
 // src/components/postgresql/formConfig.json
 var formConfig_default = {
   schema: {
@@ -70031,15 +70030,15 @@ var queryConfig_default = {
 };
 
 // src/components/postgresql/datasource/datasourceTestResultUI.jsx
-var import_react10 = __toESM(require("react"));
+var import_react8 = __toESM(require("react"));
 var PostgreSQLDatasourceTestResultUI = ({ connectionResult }) => {
   const statusClasses = connectionResult ? "bg-green-100 !border-green-400 text-green-700" : "bg-red-100 !border-red-400 text-red-700";
-  return /* @__PURE__ */ import_react10.default.createElement("div", { className: "p-3" }, /* @__PURE__ */ import_react10.default.createElement(
+  return /* @__PURE__ */ import_react8.default.createElement("div", { className: "p-3" }, /* @__PURE__ */ import_react8.default.createElement(
     "div",
     {
       className: `w-full flex flex-col justify-start items-start p-3 rounded-md border ${statusClasses}`
     },
-    /* @__PURE__ */ import_react10.default.createElement("div", { className: "!flex !flex-row justify-start items-center" }, /* @__PURE__ */ import_react10.default.createElement("span", { className: "!text-sm !font-normal" }, connectionResult ? "Connection successful" : "Connection failed"))
+    /* @__PURE__ */ import_react8.default.createElement("div", { className: "!flex !flex-row justify-start items-center" }, /* @__PURE__ */ import_react8.default.createElement("span", { className: "!text-sm !font-normal" }, connectionResult ? "Connection successful" : "Connection failed"))
   ));
 };
 
@@ -70376,16 +70375,257 @@ var queryConfig_default2 = {
   }
 };
 
+// src/components/weburl/formConfig.json
+var formConfig_default2 = {
+  schema: {
+    type: "object",
+    properties: {
+      url: {
+        type: "string",
+        description: "URL to fetch data from"
+      },
+      timeout: {
+        type: "integer",
+        description: "Request timeout in seconds",
+        minimum: 1
+      }
+    },
+    required: [
+      "url"
+    ]
+  },
+  uischema: {
+    type: "VerticalLayout",
+    elements: [
+      {
+        type: "Control",
+        scope: "#/properties/url",
+        label: "URL"
+      },
+      {
+        type: "Control",
+        scope: "#/properties/timeout",
+        label: "Timeout"
+      }
+    ]
+  },
+  data: {
+    url: "https://api.example.com/v1/data",
+    timeout: 10
+  }
+};
+
+// src/components/weburl/query/queryConfig.json
+var queryConfig_default3 = {
+  schema: {
+    type: "object",
+    properties: {
+      action: {
+        type: "string",
+        description: "Action to perform",
+        enum: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+        default: "GET"
+      },
+      args: {
+        type: "array",
+        description: "Query arguments",
+        items: {
+          type: "object",
+          properties: {
+            key: {
+              type: "string"
+            },
+            type: {
+              type: "string",
+              enum: [
+                "string",
+                "number",
+                "boolean",
+                "array (, separated)",
+                "object (JSON stringified)"
+              ],
+              default: "string"
+            }
+          },
+          required: ["key", "type"]
+        }
+      }
+    },
+    required: ["action"]
+  },
+  uischema: {
+    type: "VerticalLayout",
+    elements: [
+      {
+        type: "Control",
+        scope: "#/properties/action",
+        label: "Action"
+      },
+      {
+        type: "Control",
+        scope: "#/properties/args",
+        label: "Arguments",
+        options: {
+          detail: {
+            type: "VerticalLayout",
+            elements: [
+              {
+                type: "Control",
+                scope: "#/properties/key"
+              },
+              {
+                type: "Control",
+                scope: "#/properties/type"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  data: {
+    action: "GET",
+    timeout: 10,
+    args: [
+      { key: "user_id", value: "123" },
+      { key: "status", value: "active" }
+    ]
+  }
+};
+
+// src/components/weburl/datasource/datasourceTestResultUI.jsx
+var import_react9 = __toESM(require("react"));
+var WebURLDatasourceTestResultUI = ({ connectionResult }) => {
+  const statusClasses = connectionResult ? "bg-green-100 !border-green-400 text-green-700" : "bg-red-100 !border-red-400 text-red-700";
+  return /* @__PURE__ */ import_react9.default.createElement("div", { className: "p-3 flex flex-col justify-start items-start h-full w-full" }, /* @__PURE__ */ import_react9.default.createElement(
+    "div",
+    {
+      className: `w-full flex flex-col justify-start items-start p-3 rounded-md border ${statusClasses}`
+    },
+    /* @__PURE__ */ import_react9.default.createElement("div", { className: "!flex !flex-row justify-start items-center" }, /* @__PURE__ */ import_react9.default.createElement("span", { className: "!text-sm !font-normal" }, connectionResult ? "Connection successful" : "Connection failed"))
+  ), /* @__PURE__ */ import_react9.default.createElement("div", { className: "w-full flex-grow h-full overflow-y-auto border border-slate-200 rounded mt-3" }, /* @__PURE__ */ import_react9.default.createElement(
+    esm_default,
+    {
+      value: JSON.stringify(connectionResult, null, 2),
+      extensions: [loadLanguage("json")],
+      theme: githubLight,
+      style: {
+        width: "100%",
+        borderWidth: 0,
+        borderBottomWidth: 1,
+        outline: "none"
+      },
+      className: "border-slate-300 focus:border-slate-300 focus:outline-slate-300 flex-grow non-focusable-code-editor !h-full"
+    }
+  )));
+};
+
+// src/components/common/webViewQueryResponseView.js
+var import_material3 = require("@mui/material");
+var import_react11 = __toESM(require("react"));
+var import_prop_types7 = __toESM(require_prop_types());
+
+// src/components/common/queryResponseWebViewTab.js
+var import_react10 = __toESM(require("react"));
+var import_prop_types6 = __toESM(require_prop_types());
+var QueryResponseWebViewTab = ({
+  data: data2,
+  className: className2,
+  height = "100%",
+  width = "100%"
+}) => {
+  QueryResponseWebViewTab.propTypes = {
+    data: import_prop_types6.default.array,
+    className: import_prop_types6.default.string,
+    height: import_prop_types6.default.string,
+    width: import_prop_types6.default.string
+  };
+  console.log("data", data2);
+  return /* @__PURE__ */ import_react10.default.createElement("div", { className: "w-100 flex-grow h-full overflow-y-auto pb-5" }, /* @__PURE__ */ import_react10.default.createElement(
+    "iframe",
+    {
+      src: data2.url,
+      title: "Web View",
+      className: "w-full h-full border-none"
+    }
+  ));
+};
+
+// src/components/common/webViewQueryResponseView.js
+var WebViewQueryResponseView = ({ queryResult }) => {
+  WebViewQueryResponseView.propTypes = {
+    queryResult: import_prop_types7.default.object
+  };
+  console.log("queryResult", queryResult);
+  const [tab4, setTab] = (0, import_react11.useState)(0);
+  const _handleTabChange = (event, newTab) => {
+    setTab(newTab);
+  };
+  return /* @__PURE__ */ import_react11.default.createElement(import_react11.default.Fragment, null, /* @__PURE__ */ import_react11.default.createElement(
+    import_material3.Tabs,
+    {
+      value: tab4,
+      onChange: _handleTabChange,
+      className: "!w-full !border-b !border-gray-200",
+      sx: {
+        "& .MuiTabs-indicator": {
+          background: "#646cff !important"
+        }
+      }
+    },
+    /* @__PURE__ */ import_react11.default.createElement(
+      import_material3.Tab,
+      {
+        label: "Web View",
+        disableRipple: true,
+        disableFocusRipple: true,
+        disableTouchRipple: true,
+        className: `!outline-none !border-0 hover:!outline-none hover:!border-0 focus:!outline-none !font-medium !text-sm !normal-case ${tab4 === 0 ? "!text-[#646cff]" : "!text-slate-700"}`
+      }
+    ),
+    /* @__PURE__ */ import_react11.default.createElement(
+      import_material3.Tab,
+      {
+        label: "JSON",
+        disableRipple: true,
+        disableFocusRipple: true,
+        disableTouchRipple: true,
+        className: `!outline-none !border-0 hover:!outline-none hover:!border-0 focus:!outline-none !font-medium !text-sm !normal-case ${tab4 === 1 ? "!text-[#646cff]" : "!text-slate-700"}`
+      }
+    ),
+    /* @__PURE__ */ import_react11.default.createElement(
+      import_material3.Tab,
+      {
+        label: "Raw",
+        disableRipple: true,
+        disableFocusRipple: true,
+        disableTouchRipple: true,
+        className: `!outline-none !border-0 hover:!outline-none hover:!border-0 focus:!outline-none !font-medium !text-sm !normal-case ${tab4 === 2 ? "!text-[#646cff]" : "!text-slate-700"}`
+      }
+    ),
+    /* @__PURE__ */ import_react11.default.createElement(
+      import_material3.Tab,
+      {
+        label: "Data Schema",
+        disableRipple: true,
+        disableFocusRipple: true,
+        disableTouchRipple: true,
+        className: `!outline-none !border-0 hover:!outline-none hover:!border-0 focus:!outline-none !font-medium !text-sm !normal-case ${tab4 === 3 ? "!text-[#646cff]" : "!text-slate-700"}`
+      }
+    )
+  ), /* @__PURE__ */ import_react11.default.createElement("div", { className: "w-100  h-full overflow-y-auto pb-5" }, tab4 === 0 && /* @__PURE__ */ import_react11.default.createElement(QueryResponseWebViewTab, { data: queryResult ? queryResult : "" }), tab4 === 1 && /* @__PURE__ */ import_react11.default.createElement(QueryResponseJSONTab, { data: queryResult ? queryResult : "" }), tab4 === 2 && /* @__PURE__ */ import_react11.default.createElement(QueryResponseRAWTab, { data: queryResult ? queryResult : "" }), tab4 === 3 && /* @__PURE__ */ import_react11.default.createElement(QueryResponseSchemaTab, { data: queryResult ? queryResult : {} })));
+};
+
 // src/index.js
 var DATASOURCE_UI_COMPONENTS = {
   [DATASOURCE_TYPES.POSTGRESQL.value]: {
     formConfig: formConfig_default,
     queryConfigForm: queryConfig_default,
     queryResponseView: function({ queryResult }) {
-      return import_react11.default.createElement(QueryResponseView, { queryResult });
+      return import_react12.default.createElement(QueryResponseView, { queryResult });
     },
     datasourceTestResultUI: function({ connectionResult }) {
-      return import_react11.default.createElement(PostgreSQLDatasourceTestResultUI, {
+      return import_react12.default.createElement(PostgreSQLDatasourceTestResultUI, {
         connectionResult
       });
     }
@@ -70393,7 +70633,19 @@ var DATASOURCE_UI_COMPONENTS = {
   [DATASOURCE_TYPES.RESTAPI.value]: {
     queryConfigForm: queryConfig_default2,
     queryResponseView: function({ queryResult }) {
-      return import_react11.default.createElement(QueryResponseView, { queryResult });
+      return import_react12.default.createElement(QueryResponseView, { queryResult });
+    }
+  },
+  [DATASOURCE_TYPES.WEB_URL.value]: {
+    formConfig: formConfig_default2,
+    queryConfigForm: queryConfig_default3,
+    datasourceTestResultUI: function({ connectionResult }) {
+      return import_react12.default.createElement(WebURLDatasourceTestResultUI, {
+        connectionResult
+      });
+    },
+    queryResponseView: function({ queryResult }) {
+      return import_react12.default.createElement(WebViewQueryResponseView, { queryResult });
     }
   }
 };

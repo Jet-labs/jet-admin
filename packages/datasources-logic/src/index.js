@@ -2,9 +2,9 @@ import { DATASOURCE_TYPES } from "@jet-admin/datasource-types";
 import { postgresqlTestConnection } from "./data-sources/postgresql/connection";
 import { restAPITestConnection } from "./data-sources/restapi/connection";
 import dataSourceRegistry from "./data-sources/index.js";
-import QueryRunner from "./core/queryRunner.js";
+import { webURLTestConnection } from "./data-sources/weburl/connection";
 
-export { QueryRunner, dataSourceRegistry };
+export { dataSourceRegistry };
 
 export const DATASOURCE_LOGIC_COMPONENTS = {
   [DATASOURCE_TYPES.POSTGRESQL.value]: {
@@ -24,6 +24,13 @@ export const DATASOURCE_LOGIC_COMPONENTS = {
   [DATASOURCE_TYPES.RESTAPI.value]: {
     testConnection: async ({ datasourceOptions }) => {
       return await restAPITestConnection({
+        datasourceOptions,
+      });
+    },
+  },
+  [DATASOURCE_TYPES.WEB_URL.value]: {
+    testConnection: async ({ datasourceOptions }) => {
+      return await webURLTestConnection({
         datasourceOptions,
       });
     },

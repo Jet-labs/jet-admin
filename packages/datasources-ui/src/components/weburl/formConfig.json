@@ -1,0 +1,38 @@
+{
+    "schema": {
+        "type": "object",
+        "properties": {
+            "url": {
+                "type": "string",
+                "description": "URL to fetch data from"
+            },
+            "timeout": {
+                "type": "integer",
+                "description": "Request timeout in seconds",
+                "minimum": 1
+            }
+        },
+        "required": [
+            "url"
+        ]
+    },
+    "uischema": {
+        "type": "VerticalLayout",
+        "elements": [
+            {
+                "type": "Control",
+                "scope": "#/properties/url",
+                "label": "URL"
+            },
+            {
+                "type": "Control",
+                "scope": "#/properties/timeout",
+                "label": "Timeout"
+            }
+        ]
+    },
+    "data": {
+        "url": "https://api.example.com/v1/data",
+        "timeout": 10
+    }
+}
