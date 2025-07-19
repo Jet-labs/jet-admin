@@ -12,6 +12,7 @@ import { Breadcrumbs } from "../ui/breadCrumbs";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import { UserAvatar } from "../ui/userAvatar";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "../ui/resizable";
+import { AIChatButton } from "../aiChatComponents/aiChatButton";
 export const ProtectedLayout = () => {
   const { firebaseUserState } = useAuthState();
   const { tenantID } = useParams();
@@ -54,8 +55,9 @@ export const ProtectedLayout = () => {
               </div>
               <Breadcrumbs />
 
-              {/* <button onClick={signOut}>Logout</button> */}
-              <div>
+
+              <div className="flex flex-row justify-end items-center gap-2 w-full">
+                <AIChatButton />
                 <UserAvatar />
               </div>
             </div>

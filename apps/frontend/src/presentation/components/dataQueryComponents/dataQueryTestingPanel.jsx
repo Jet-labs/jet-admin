@@ -29,11 +29,17 @@ export const DataQueryTestingPanel = ({
             : "opacity-0 pointer-events-none"
         }`}
         onClick={_handleClose}
+        style={{
+          zIndex: 1500,
+        }}
       ></div>
       <div
-        className={`fixed right-0 top-0 h-full w-1/3 bg-white transform transition-transform duration-300 ease-in-out   ${
+        className={`fixed right-0 top-0 h-full w-1/3 bg-white transform transition-transform duration-300 ease-in-out  ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
+        style={{
+          zIndex: 2000,
+        }}
       >
         <div className="p-2 h-full">
           <button
@@ -49,6 +55,7 @@ export const DataQueryTestingPanel = ({
                 <DataQueryTestingForm
                   key={`dataQueryTestingPanel_${selectedQueryForTesting?.dataQueryID}`}
                   tenantID={tenantID}
+                  dataQuery={selectedQueryForTesting}
                   dataQueryID={selectedQueryForTesting.dataQueryID}
                   datasourceID={selectedQueryForTesting.datasourceID}
                   datasourceType={selectedQueryForTesting.datasourceType}

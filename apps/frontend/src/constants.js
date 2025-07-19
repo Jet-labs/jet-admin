@@ -4,6 +4,11 @@ export const CONSTANTS = {
   SERVER_HOST: import.meta.env.PROD
     ? "https://localhost"
     : "http://localhost:8090",
+
+  SOCKET_HOST: import.meta.env.PROD
+    ? "https://localhost"
+    : "http://localhost:8090",
+
   SUPABASE: {
     TENANT_ASSET_DIRECTORY: "tenant-assets",
     TENANT_LOGO_DIRECTORY: "logos",
@@ -31,7 +36,18 @@ export const CONSTANTS = {
     WIDGET: "widget",
   },
 
+  SOCKET_EMIT_EVENTS: {
+    AI_CHAT_ROOM_JOIN: "ai_chat_room_join",
+    AI_CHAT_ROOM_DISCONNECT: "ai_chat_room_disconnect",
+    AI_CHAT_ROOM_ID: "ai_chat_room_id",
+    AI_CHAT_USER_MESSAGE: "ai_chat_user_message",
+  },
+
+  SOCKET_RECEIVE_EVENTS: {
+    AI_CHAT_BOT_MESSAGE: "ai_chat_bot_message",
+  },
   STRINGS: {
+    AI_CHAT_BUTTON_TEXT: "AI Chat",
     DATAGRID_JSON_POPUP_CANCEL_BUTTON: "Cancel",
     DATAGRID_JSON_POPUP_SAVE_BUTTON: "Save",
     NO_DATABASE_URL: "Please add database URL in the tenant settings",
@@ -1011,6 +1027,12 @@ export const CONSTANTS = {
   },
 
   APIS: {
+    AI: {
+      getAIChatRoomIDAPI: (tenantID) =>
+        `/api/v1/tenants/${tenantID}/ai/chat_room`,
+      sendUserMessageAPI: (tenantID) =>
+        `/api/v1/tenants/${tenantID}/ai/user_message`,
+    },
     AUTH: {
       getUserInfoAPI: () => "/api/v1/auth",
       getUserConfigAPI: (tenantID) => `/api/v1/auth/config/${tenantID}`,

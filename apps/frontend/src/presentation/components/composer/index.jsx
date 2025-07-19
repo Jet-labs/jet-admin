@@ -5,8 +5,10 @@ import "react-toastify/dist/ReactToastify.css";
 import { AuthContextProvider } from "../../../logic/contexts/authContext";
 import { GlobalUIProvider } from "../../../logic/contexts/globalUIContext";
 import { TenantContextProvider } from "../../../logic/contexts/tenantContext";
+import { SocketContextProvider } from "../../../logic/contexts/socketContext";
 import { RootRouter } from "../routes/rootRouter";
 import { SuspenseFallback } from "../ui/suspenseFallback";
+
 const queryClient = new QueryClient();
 
 export const Composer = () => {
@@ -16,9 +18,9 @@ export const Composer = () => {
         <AuthContextProvider>
           <GlobalUIProvider>
             <TenantContextProvider>
-              {/* <DelayedRender delay={5000}> */}
-              <RootRouter />
-              {/* </DelayedRender> */}
+              <SocketContextProvider>
+                <RootRouter />
+              </SocketContextProvider>
             </TenantContextProvider>
           </GlobalUIProvider>
         </AuthContextProvider>
