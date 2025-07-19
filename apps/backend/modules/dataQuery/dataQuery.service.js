@@ -10,6 +10,7 @@ const { databaseService } = require("../database/database.service");
 const { aiUtil } = require("../../utils/aiprompt.util");
 const { aiService } = require("../ai/ai.service");
 const { isUUID } = require("validator");
+const { v4: uuid } = require("uuid");
 const dataQueryService = {};
 const { keyValueTypeArrayToObject } = require("../../utils/json.util");
 const { QueryEngine } = require("./queryEngine/engine");
@@ -418,6 +419,117 @@ dataQueryService.runDataQueryByID = async ({
   }
 };
 
+/**
+ *
+ * @param {object} param0
+ * @param {number} param0.userID
+ * @param {string} param0.tenantID
+ * @param {number} param0.dataQueryID
+ * @param {object} param0.argValues
+ * @returns {Promise<object>}
+ */
+dataQueryService.runDataQueryByData = async ({
+  userID,
+  tenantID,
+  dataQuery,
+  argValues,
+}) => {
+  const tempQueryID = uuid();
+  Logger.log("info", {
+    message: "dataQueryService:runDataQueryByData:params",
+    params: {
+      userID,
+      tenantID,
+      argValues,
+      dataQuery,
+      tempQueryID,
+    },
+  });
+
+  try {
+    const processedDataQuery = {
+      ...dataQuery,
+      dataQueryID: parseInt(tempQueryID),
+    };
+
+    Logger.log("info", {
+      message: "dataQueryService:runDataQueryByData:processedDataQuery",
+      params: {
+        userID,
+        tenantID,
+        tempQueryID,
+        processedDataQuery,
+      },
+    });
+
+    const queryRunner = new QueryEngine(
+      async (queryId) => {
+        if (queryId == tempQueryID) {
+          return processedDataQuery;
+        } else {
+          return await prisma.tblDataQueries.findFirst({
+            where: {
+              dataQueryID: parseInt(queryId),
+            },
+          });
+        }
+      },
+      async (datasourceID) => {
+        return await prisma.tblDatasources.findFirst({
+          where: {
+            datasourceID: datasourceID,
+          },
+        });
+      }
+    );
+
+    const mappedArgsToValues =
+      argValues && processedDataQuery.dataQueryOptions.args
+        ? processedDataQuery.dataQueryOptions.args.map((arg) => ({
+            ...arg,
+            value: argValues[arg.key],
+          }))
+        : [];
+    const kvtObject = keyValueTypeArrayToObject(mappedArgsToValues);
+
+    Logger.log("info", {
+      message: "dataQueryService:runDataQueryByData:queryRunner.run",
+      params: {
+        userID,
+        tenantID,
+        tempQueryID,
+        argValues,
+        args: processedDataQuery.dataQueryOptions.args,
+        mappedArgsToValues,
+        kvtObject,
+      },
+    });
+
+    const results = await queryRunner.executeQuery(tempQueryID, kvtObject);
+
+    Logger.log("success", {
+      message: "dataQueryService:runDataQueryByData:success",
+      params: {
+        userID,
+        tenantID,
+        tempQueryID,
+        results,
+      },
+    });
+    return results;
+  } catch (error) {
+    Logger.log("error", {
+      message: "dataQueryService:runDataQueryByData:failure",
+      params: {
+        userID,
+        tenantID,
+        tempQueryID,
+        error,
+      },
+    });
+    throw error;
+  }
+};
 /**
  *
  * @param {object} param0

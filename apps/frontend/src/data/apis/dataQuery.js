@@ -275,6 +275,41 @@ export const testDataQueryByIDAPI = async ({
   }
 };
 
+export const testDataQueryByDataAPI = async ({
+  tenantID,
+  dataQuery,
+  argValues,
+}) => {
+  try {
+    const url =
+      CONSTANTS.SERVER_HOST +
+      CONSTANTS.APIS.DATABASE.testDataQueryByDataAPI(tenantID);
+    const bearerToken = await firebaseAuth.currentUser.getIdToken();
+    if (bearerToken) {
+      const response = await axios.patch(
+        url,
+        { dataQuery, argValues },
+        {
+          headers: {
+            authorization: `Bearer ${bearerToken}`,
+          },
+        }
+      );
+      if (response.data && response.data.success === true) {
+        return response.data.dataQueryResult;
+      } else if (response.data.error) {
+        throw response.data.error;
+      } else {
+        throw CONSTANTS.ERROR_CODES.SERVER_ERROR;
+      }
+    } else {
+      throw CONSTANTS.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const updateDataQueryByIDAPI = async ({
   tenantID,
   dataQueryID,

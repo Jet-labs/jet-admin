@@ -48,12 +48,10 @@ router.post(
 
 router.patch(
   "/queryTest",
-  body("dataQueryOptions")
-    .notEmpty()
-    .withMessage("dataQueryOptions is required"),
+  body("dataQuery").notEmpty().withMessage("dataQuery is required"),
   expressUtils.validationChecker,
   authMiddleware.checkUserPermissions(["tenant:query:test"]),
-  dataQueryController.runDataQuery
+  dataQueryController.runDataQueryByData
 );
 
 router.patch(

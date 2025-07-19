@@ -251,6 +251,7 @@ export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
                       datasourceType={dataQuery?.datasourceType}
                       dataQueryOptions={dataQuery?.dataQueryOptions}
                       setDataQueryTestResult={setDataQueryTestResult}
+                      dataQuery={queryUpdationForm.values}
                     />
 
                     <button

@@ -153,6 +153,7 @@ export const DataQueryAdditionForm = ({ tenantID }) => {
                     datasourceType={queryAdditionForm.values.datasourceType}
                     dataQueryOptions={queryAdditionForm.values.dataQueryOptions}
                     setDataQueryTestResult={setDataQueryTestResult}
+                    dataQuery={queryAdditionForm.values}
                   />
                   <button
                     type="submit"

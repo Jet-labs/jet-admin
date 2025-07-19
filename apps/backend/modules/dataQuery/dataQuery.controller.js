@@ -218,7 +218,7 @@ dataQueryController.generateAIPromptBasedQuery = async (req, res) => {
  */
 dataQueryController.runDataQueryByID = async (req, res) => {
   try {
-    const { user, dbPool } = req;
+    const { user } = req;
     const { argValues } = req.body;
     const { dataQueryID, tenantID } = req.params;
     Logger.log("info", {
@@ -257,44 +257,36 @@ dataQueryController.runDataQueryByID = async (req, res) => {
  * @param {import("express").Request} req
  * @param {import("express").Response} res
  */
-dataQueryController.runDataQuery = async (req, res) => {
+dataQueryController.runDataQueryByData = async (req, res) => {
   try {
-    const { user, dbPool } = req;
+    const { user } = req;
+    const { argValues, dataQuery } = req.body;
     const { tenantID } = req.params;
-    const { dataQueryOptions, dataQueryID } = req.body;
     Logger.log("info", {
-      message: "dataQueryController:runDataQuery:params",
+      message: "dataQueryController:runDataQueryByData:params",
+      params: { userID: user.userID, tenantID, dataQuery, argValues },
+    });
+
+    const dataQueryResult = await dataQueryService.runDataQueryByData({
+      userID: parseInt(user.userID),
+      tenantID,
+      dataQuery,
+      argValues,
+    });
+
+    Logger.log("success", {
+      message: "dataQueryController:runDataQueryByData:success",
       params: {
         userID: user.userID,
         tenantID,
-        dataQueryID,
-        dataQueryOptions,
+        dataQuery,
       },
-    });
-
-    const dataQueriesResult = await dataQueryService.runDataQueries({
-      userID: parseInt(user.userID),
-      dbPool,
-      tenantID,
-      dataQueries: [
-        {
-          dataQueryID,
-          dataQueryOptions,
-        },
-      ],
-    });
-
-    const dataQueryResult = dataQueriesResult[0];
-
-    Logger.log("success", {
-      message: "dataQueryController:runDataQuery:success",
-      params: { userID: user.userID, dataQueryID },
     });
 
     return expressUtils.sendResponse(res, true, { dataQueryResult });
   } catch (error) {
     Logger.log("error", {
-      message: "dataQueryController:runDataQuery:catch-1",
+      message: "dataQueryController:runDataQueryByData:catch-1",
       params: { userID: req.user?.userID, error },
     });
     return expressUtils.sendResponse(res, false, {}, error);

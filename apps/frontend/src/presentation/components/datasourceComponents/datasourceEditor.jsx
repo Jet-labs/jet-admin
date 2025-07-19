@@ -21,11 +21,7 @@ export const DatasourceEditor = ({ datasourceEditorForm }) => {
     // You could also attempt to map JSON Forms errors to Formik's errors for 'datasourceOptions'
     // but often Yup handles it sufficiently for overall form validity.
   };
-  console.log(DATASOURCE_UI_COMPONENTS[
-    datasourceEditorForm.values.datasourceType
-  ].formConfig.uischema, DATASOURCE_UI_COMPONENTS[
-    datasourceEditorForm.values.datasourceType
-  ].formConfig.schema)
+
   return (
     <>
       <div>

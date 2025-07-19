@@ -2,7 +2,7 @@ import { CircularProgress } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { CONSTANTS } from "../../../constants";
-import { testDataQueryByIDAPI } from "../../../data/apis/dataQuery";
+import { testDataQueryByDataAPI, testDataQueryByIDAPI } from "../../../data/apis/dataQuery";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { DataQueryArgsForm } from "./dataQueryArgsForm";
 import PropTypes from "prop-types";
@@ -16,6 +16,7 @@ export const DataQueryTestingForm = ({
   // eslint-disable-next-line no-unused-vars
   datasourceType,
   dataQueryOptions,
+  dataQuery,
 }) => {
   DataQueryTestingForm.propTypes = {
     tenantID: PropTypes.number.isRequired,
@@ -24,16 +25,25 @@ export const DataQueryTestingForm = ({
     datasourceID: PropTypes.string.isRequired,
     datasourceType: PropTypes.string.isRequired,
     dataQueryOptions: PropTypes.object.isRequired,
+    dataQuery: PropTypes.object.isRequired,
   };
   const [isArgsFormOpen, setIsArgsFormOpen] = useState(false);
 
   const { isPending: isTestingDataQuery, mutate: testDataQuery } = useMutation({
     mutationFn: ({ argValues }) => {
-      return testDataQueryByIDAPI({
-        tenantID,
-        dataQueryID,
-        argValues,
-      });
+      if (dataQuery) {
+        return testDataQueryByDataAPI({
+          tenantID,
+          dataQuery,
+          argValues,
+        });
+      } else {
+        return testDataQueryByIDAPI({
+          tenantID,
+          dataQueryID,
+          argValues,
+        });
+      }
     },
     retry: false,
     onSuccess: (data) => {
