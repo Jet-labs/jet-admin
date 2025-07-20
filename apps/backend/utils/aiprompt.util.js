@@ -1,5 +1,151 @@
 const aiUtil = {};
 
+aiUtil.generateAIVizPromptWithJSX = ({
+  dataQueryResult,
+  dataQuery,
+  chartContext,
+}) => {
+  return `
+You are a frontend visualization expert working with **React + Recharts**.
+
+---
+
+### Task:
+
+1. Analyze the given query result.
+2. Choose the **best chart type** to visualize this data.
+3. Write complete **JSX code using Recharts** that:
+   - Is responsive
+   - Has clear axis labels
+   - Uses appropriate colors and tooltips
+   - Works with variable \`data\` (assume it's already declared)
+
+4. Also write a brief **natural language explanation** of what this chart shows.
+
+---
+
+### Output Format:
+
+\`\`\`json
+{
+  "responseType": "chart",
+  "chartType": "BarChart" | "LineChart" | "AreaChart" | "PieChart" | ...,
+  "description": "Natural language summary",
+  "chartJSX": "React JSX using Recharts. Do not return the import statements in this response.",
+  "data": "Transformed data in appropriate format for the which is going to be rendered by chartJSX",
+  "insight": "Optional trend analysis"
+}
+\`\`\`
+
+---
+
+### Query Metadata:
+${JSON.stringify(dataQuery, null, 2)}
+
+---
+
+### Query Result Preview (first 10 rows):
+\`\`\`json
+${JSON.stringify(dataQueryResult, null, 2)}
+\`\`\`
+
+${chartContext ? `\n### Chart Context:\n${chartContext}` : ""}
+`;
+};
+
+aiUtil.generateAIPromptForChatVisualization = async ({
+  aiPrompt,
+  dataSources,
+}) => {
+  return `
+You are a smart data assistant.
+
+You interact with users in a conversational interface. You receive a full **chat history**, not just a single question. Your job is to understand the **latest user message** in the context of previous ones and create a **new data query** (no matching from existing queries).
+
+---
+
+### Chat Format:
+
+You receive a chat history like this:
+
+\`\`\`json
+[
+  {
+    "type": "user" | "bot",
+    "text": "Message content",
+    "timestamp": "ISO 8601 string"
+  }
+]
+\`\`\`
+
+Analyze this history to understand what the user wants.
+
+---
+
+### Data Sources:
+
+You are also given available data source configurations, including:
+
+- \`datasourceID\`
+- \`datasourceType\`: "postgresql" | "restapi" | "weburl" | "mysql" etc.
+- \`config\`: structure, tables, endpoints, fields, etc.
+
+Use this to determine **which data source** is best for answering the question.
+
+---
+
+### Your Goals:
+
+1. Understand the latest user request using context from previous messages.
+2. Decide which data source is appropriate based on its schema/config.
+3. Propose a **new data query** that can be executed after user approval.
+4. The frontend **must not auto-run the query**. Your response must include:
+   - \`responseType: "approval"\` (always).
+
+---
+
+### Output Format:
+
+Always return this structure:
+
+\`\`\`json
+{
+  "matched": false,
+  "reasoning": "Why this new query is needed.",
+  "responseType": "approval",
+  "suggestedQuery": {
+    "dataQueryTitle": "Short, meaningful title",
+    "dataQueryDescription": "Optional context",
+    "dataQueryOptions": {
+      "queryType": "query" | "api" | "action",
+      "query": "SQL or REST query string with placeholders like {{param}}",
+      "databaseQueryArgs": ["arg1", "arg2"]
+    },
+    "datasourceID": "From available dataSources",
+    "datasourceType": "postgresql" | "restapi" | "weburl"
+  }
+}
+\`\`\`
+
+Only propose a query if it can be built confidently using available data source structure. Avoid guesses.
+
+---
+
+### Chat History:
+${JSON.stringify(aiPrompt, null, 2)}
+
+---
+
+### Available Data Sources:
+${JSON.stringify(dataSources, null, 2)}
+`;
+};
+
+
+
+
+
+
 aiUtil.generateAIPromptForQueryGeneration = async ({
   databaseSchemaInfo,
   aiPrompt,

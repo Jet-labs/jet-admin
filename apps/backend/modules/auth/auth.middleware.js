@@ -9,6 +9,43 @@ const { authService } = require("./auth.service");
 //auth middlewares
 const authMiddleware = {};
 
+authMiddleware.authProviderSocket = async function (socket, next) {
+  if (socket && socket.handshake && socket.handshake.auth) {
+    try {
+      let { token } = socket.handshake.auth;
+      const decodedIdToken = await firebaseApp.auth().verifyIdToken(token);
+      Logger.log("info", {
+        message: "authMiddleware:authProviderSocket:params",
+        params: { uid: decodedIdToken.uid, email: decodedIdToken.email },
+      });
+      if (!decodedIdToken) {
+        throw constants.ERROR_CODES.USER_AUTH_TOKEN_EXPIRED;
+      } else {
+        Logger.log("success", {
+          message: "authMiddleware:authProviderSocket:success",
+          params: { uid: decodedIdToken.uid },
+        });
+        socket.handshake.auth.firebase_id = decodedIdToken.uid;
+        socket.handshake.auth.firebaseUser = decodedIdToken;
+
+        next();
+      }
+    } catch (error) {
+      Logger.log("error", {
+        message: "authMiddleware:authProviderSocket:catch-2",
+        params: { error },
+      });
+      next(new Error(error.message));
+    }
+  } else {
+    Logger.log("error", {
+      message: "authMiddleware:authProviderSocket:catch-1",
+      params: { error: constants.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND },
+    });
+    next(new Error(constants.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND.message));
+  }
+};
+
 /**
  *
  * @param {import("express").Request} req

@@ -34125,15 +34125,24 @@ var {
 // src/data-sources/restapi/datasource.js
 var RestAPIDataSource = class extends DataSource {
   async execute(dataQueryOptions, context) {
-    const { method, baseUrl, headers, body, params } = dataQueryOptions;
+    const { method, apiEndpoint, headers, body, params } = dataQueryOptions;
+    const finalUrl = `${this.config.datasourceOptions.baseUrl}${apiEndpoint}`;
     Logger.log("info", {
       message: "restapi:RestAPIDataSource:execute:params",
-      params: { method, baseUrl, headers, body, params }
+      params: {
+        method,
+        apiEndpoint,
+        finalUrl,
+        headers,
+        body,
+        params,
+        config: this.config
+      }
     });
     try {
       const response = await axios_default({
         method,
-        url: baseUrl,
+        url: finalUrl,
         headers,
         data: body,
         params,
@@ -34143,7 +34152,7 @@ var RestAPIDataSource = class extends DataSource {
         message: "restapi:RestAPIDataSource:execute:response",
         params: {
           method,
-          baseUrl,
+          finalUrl,
           headers,
           body,
           params,

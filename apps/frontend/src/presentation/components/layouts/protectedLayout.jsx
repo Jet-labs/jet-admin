@@ -56,7 +56,7 @@ export const ProtectedLayout = () => {
               <Breadcrumbs />
 
 
-              <div className="flex flex-row justify-end items-center gap-2 w-full">
+              <div className="flex flex-row justify-end items-center gap-2">
                 <AIChatButton />
                 <UserAvatar />
               </div>

@@ -15,6 +15,49 @@ const dataQueryService = {};
 const { keyValueTypeArrayToObject } = require("../../utils/json.util");
 const { QueryEngine } = require("./queryEngine/engine");
 
+dataQueryService.getDataQueriesWithDatasource = async ({
+  userID,
+  tenantID,
+}) => {
+  Logger.log("info", {
+    message: "dataQueryService:getDataQueriesWithDatasource:params",
+    params: {
+      userID,
+      tenantID,
+    },
+  });
+
+  try {
+    const dataQueries = await prisma.tblDataQueries.findMany({
+      where: {
+        tenantID: parseInt(tenantID),
+      },
+      include: {
+        tblDatasources: true,
+      },
+    });
+
+    Logger.log("success", {
+      message: "dataQueryService:getDataQueriesWithDatasource:success",
+      params: {
+        userID,
+        dataQueriesLength: dataQueries?.length,
+      },
+    });
+
+    return dataQueries;
+  } catch (error) {
+    Logger.log("error", {
+      message: "dataQueryService:getDataQueriesWithDatasource:failure",
+      params: {
+        userID,
+        error,
+      },
+    });
+    throw error;
+  }
+};
+
 /**
  *
  * @param {object} param0

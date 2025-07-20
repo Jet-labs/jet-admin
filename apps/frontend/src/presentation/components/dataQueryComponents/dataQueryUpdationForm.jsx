@@ -112,9 +112,7 @@ export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
       );
       queryUpdationForm.setFieldValue(
         "datasourceID",
-        dataQuery.datasourceType === DATASOURCE_TYPES.RESTAPI.value
-          ? DATASOURCE_TYPES.RESTAPI.value
-          : dataQuery.datasourceID || ""
+        dataQuery.datasourceID || ""
       );
       queryUpdationForm.setFieldValue(
         "datasourceType",

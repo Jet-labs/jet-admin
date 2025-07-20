@@ -38,6 +38,17 @@ const constants = {
     },
   },
 
+  SOCKET_EMIT_EVENTS: {
+    AI_CHAT_ROOM_JOIN: "ai_chat_room_join",
+    AI_CHAT_ROOM_DISCONNECT: "ai_chat_room_disconnect",
+    AI_CHAT_ROOM_ID: "ai_chat_room_id",
+    AI_CHAT_BOT_MESSAGE: "ai_chat_bot_message",
+  },
+
+  SOCKET_RECEIVE_EVENTS: {
+    AI_CHAT_USER_MESSAGE: "ai_chat_user_message",
+  },
+
   SAMPLE_PLAN: {
     maxTenantCount: Infinity,
     maxMembersPerTenant: Infinity,

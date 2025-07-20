@@ -13,6 +13,7 @@ const tenantRoleRouter = require("../tenantRole/tenantRole.v1.route");
 const tenantAPIKeyRouter = require("../apiKey/apiKey.v1.routes");
 const cronjobRouter = require("../cronJob/cronJob.v1.routes");
 const auditLogRouter = require("../audit/audit.v1.routes");
+const aiRouter = require("../ai/ai.v1.routes");
 const { param, body } = require("express-validator");
 const { expressUtils } = require("../../utils/express.utils");
 const constants = require("../../constants");
@@ -76,6 +77,13 @@ router.patch(
   expressUtils.validationChecker,
   authMiddleware.checkUserPermissions(["tenant:update"]),
   tenantController.updateTenant
+);
+
+router.use(
+  "/:tenantID/ai",
+  authMiddleware.checkUserPermissions(["tenant:ai"]),
+  tenantMiddleware.poolProvider,
+  aiRouter
 );
 
 // Nested database routes

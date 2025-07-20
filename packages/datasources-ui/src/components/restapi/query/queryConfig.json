@@ -2,7 +2,7 @@
   "schema": {
     "type": "object",
     "properties": {
-      "baseUrl": {
+      "apiEndpoint": {
         "type": "string",
         "description": "Base URL of the REST API (e.g., https://api.example.com/v1 )"
       },
@@ -108,7 +108,10 @@
         }
       }
     },
-    "required": ["baseUrl", "method"]
+    "required": [
+      "apiEndpoint",
+      "method"
+    ]
   },
   "uischema": {
     "type": "VerticalLayout",
@@ -122,7 +125,7 @@
             "elements": [
               {
                 "type": "Control",
-                "scope": "#/properties/baseUrl"
+                "scope": "#/properties/apiEndpoint"
               },
               {
                 "type": "Control",
@@ -317,7 +320,7 @@
     ]
   },
   "data": {
-    "baseUrl": "https://api.example.com/v1/data ",
+    "apiEndpoint": "/data ",
     "method": "GET",
     "timeout": 10,
     "authType": "bearer",

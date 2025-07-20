@@ -61645,7 +61645,7 @@ __export(index_exports, {
   DATASOURCE_UI_COMPONENTS: () => DATASOURCE_UI_COMPONENTS
 });
 module.exports = __toCommonJS(index_exports);
-var import_react12 = __toESM(require("react"));
+var import_react13 = __toESM(require("react"));
 
 // ../datasource-types/dist/index.mjs
 var DATASOURCE_TYPES = {
@@ -70042,12 +70042,367 @@ var PostgreSQLDatasourceTestResultUI = ({ connectionResult }) => {
   ));
 };
 
+// src/components/restapi/formConfig.json
+var formConfig_default2 = {
+  schema: {
+    type: "object",
+    properties: {
+      baseUrl: {
+        type: "string",
+        description: "Base URL of the REST API (e.g., https://api.example.com )"
+      },
+      method: {
+        type: "string",
+        enum: [
+          "GET",
+          "POST",
+          "PUT",
+          "DELETE",
+          "PATCH"
+        ],
+        default: "GET"
+      },
+      timeout: {
+        type: "integer",
+        description: "Request timeout in seconds",
+        minimum: 1
+      },
+      authType: {
+        type: "string",
+        enum: [
+          "none",
+          "basic",
+          "bearer",
+          "oauth2"
+        ],
+        default: "none"
+      },
+      username: {
+        type: "string",
+        description: "Username for Basic Auth"
+      },
+      password: {
+        type: "string",
+        description: "Password for Basic Auth",
+        format: "password"
+      },
+      bearerToken: {
+        type: "string",
+        description: "Bearer token for authentication",
+        format: "password"
+      },
+      oauth2: {
+        type: "object",
+        properties: {
+          clientId: {
+            type: "string"
+          },
+          clientSecret: {
+            type: "string",
+            format: "password"
+          },
+          tokenUrl: {
+            type: "string",
+            format: "uri"
+          }
+        },
+        required: [
+          "clientId",
+          "clientSecret",
+          "tokenUrl"
+        ]
+      },
+      headers: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            key: {
+              type: "string"
+            },
+            value: {
+              type: "string"
+            }
+          },
+          required: [
+            "key",
+            "value"
+          ]
+        }
+      },
+      queryParams: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            key: {
+              type: "string"
+            },
+            value: {
+              type: "string"
+            }
+          },
+          required: [
+            "key",
+            "value"
+          ]
+        }
+      },
+      body: {
+        type: "string",
+        description: "Request body (for POST/PUT/PATCH)"
+      },
+      contentType: {
+        type: "string",
+        enum: [
+          "application/json",
+          "application/xml",
+          "text/plain"
+        ],
+        default: "application/json"
+      },
+      followRedirects: {
+        type: "boolean",
+        default: true
+      },
+      sslVerify: {
+        type: "boolean",
+        default: true
+      }
+    },
+    required: [
+      "baseUrl",
+      "method"
+    ]
+  },
+  uischema: {
+    type: "VerticalLayout",
+    elements: [
+      {
+        type: "Categorization",
+        elements: [
+          {
+            type: "Category",
+            label: "General",
+            elements: [
+              {
+                type: "Control",
+                scope: "#/properties/baseUrl"
+              },
+              {
+                type: "Control",
+                scope: "#/properties/method"
+              },
+              {
+                type: "Control",
+                scope: "#/properties/timeout"
+              },
+              {
+                type: "Control",
+                scope: "#/properties/contentType"
+              }
+            ]
+          },
+          {
+            type: "Category",
+            label: "Authentication",
+            elements: [
+              {
+                type: "Control",
+                scope: "#/properties/authType"
+              },
+              {
+                type: "Group",
+                label: "Basic Auth",
+                rule: {
+                  effect: "SHOW",
+                  condition: {
+                    scope: "#/properties/authType",
+                    schema: {
+                      const: "basic"
+                    }
+                  }
+                },
+                elements: [
+                  {
+                    type: "Control",
+                    scope: "#/properties/username"
+                  },
+                  {
+                    type: "Control",
+                    scope: "#/properties/password"
+                  }
+                ]
+              },
+              {
+                type: "Group",
+                label: "Bearer Token",
+                rule: {
+                  effect: "SHOW",
+                  condition: {
+                    scope: "#/properties/authType",
+                    schema: {
+                      const: "bearer"
+                    }
+                  }
+                },
+                elements: [
+                  {
+                    type: "Control",
+                    scope: "#/properties/bearerToken"
+                  }
+                ]
+              },
+              {
+                type: "Group",
+                label: "OAuth2",
+                rule: {
+                  effect: "SHOW",
+                  condition: {
+                    scope: "#/properties/authType",
+                    schema: {
+                      const: "oauth2"
+                    }
+                  }
+                },
+                elements: [
+                  {
+                    type: "Control",
+                    scope: "#/properties/oauth2/properties/clientId"
+                  },
+                  {
+                    type: "Control",
+                    scope: "#/properties/oauth2/properties/clientSecret"
+                  },
+                  {
+                    type: "Control",
+                    scope: "#/properties/oauth2/properties/tokenUrl"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            type: "Category",
+            label: "Headers",
+            elements: [
+              {
+                type: "Control",
+                scope: "#/properties/headers",
+                options: {
+                  detail: {
+                    type: "VerticalLayout",
+                    elements: [
+                      {
+                        type: "Control",
+                        scope: "#/properties/key"
+                      },
+                      {
+                        type: "Control",
+                        scope: "#/properties/value"
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            type: "Category",
+            label: "Query Params",
+            elements: [
+              {
+                type: "Control",
+                scope: "#/properties/queryParams",
+                options: {
+                  detail: {
+                    type: "VerticalLayout",
+                    elements: [
+                      {
+                        type: "Control",
+                        scope: "#/properties/key"
+                      },
+                      {
+                        type: "Control",
+                        scope: "#/properties/value"
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            type: "Category",
+            label: "Body",
+            rule: {
+              effect: "SHOW",
+              condition: {
+                scope: "#/properties/method",
+                schema: {
+                  enum: [
+                    "POST",
+                    "PUT",
+                    "PATCH"
+                  ]
+                }
+              }
+            },
+            elements: [
+              {
+                type: "Control",
+                scope: "#/properties/body"
+              }
+            ]
+          },
+          {
+            type: "Category",
+            label: "Advanced",
+            elements: [
+              {
+                type: "Control",
+                scope: "#/properties/followRedirects"
+              },
+              {
+                type: "Control",
+                scope: "#/properties/sslVerify"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  data: {
+    baseUrl: "https://api.example.com",
+    method: "GET",
+    timeout: 10,
+    authType: "bearer",
+    bearerToken: "your-bearer-token-here",
+    headers: [
+      {
+        key: "X-Custom-Header",
+        value: "HeaderValue"
+      }
+    ],
+    queryParams: [
+      {
+        key: "filter",
+        value: "active"
+      }
+    ],
+    contentType: "application/json",
+    followRedirects: true,
+    sslVerify: true
+  }
+};
+
 // src/components/restapi/query/queryConfig.json
 var queryConfig_default2 = {
   schema: {
     type: "object",
     properties: {
-      baseUrl: {
+      apiEndpoint: {
         type: "string",
         description: "Base URL of the REST API (e.g., https://api.example.com/v1 )"
       },
@@ -70153,7 +70508,10 @@ var queryConfig_default2 = {
         }
       }
     },
-    required: ["baseUrl", "method"]
+    required: [
+      "apiEndpoint",
+      "method"
+    ]
   },
   uischema: {
     type: "VerticalLayout",
@@ -70167,7 +70525,7 @@ var queryConfig_default2 = {
             elements: [
               {
                 type: "Control",
-                scope: "#/properties/baseUrl"
+                scope: "#/properties/apiEndpoint"
               },
               {
                 type: "Control",
@@ -70362,7 +70720,7 @@ var queryConfig_default2 = {
     ]
   },
   data: {
-    baseUrl: "https://api.example.com/v1/data ",
+    apiEndpoint: "/data ",
     method: "GET",
     timeout: 10,
     authType: "bearer",
@@ -70375,8 +70733,35 @@ var queryConfig_default2 = {
   }
 };
 
+// src/components/restapi/datasource/datasourceTestResultUI.jsx
+var import_react9 = __toESM(require("react"));
+var RESTAPIDatasourceTestResultUI = ({ connectionResult }) => {
+  const statusClasses = connectionResult ? "bg-green-100 !border-green-400 text-green-700" : "bg-red-100 !border-red-400 text-red-700";
+  return /* @__PURE__ */ import_react9.default.createElement("div", { className: "p-3 flex flex-col justify-start items-start h-full w-full" }, /* @__PURE__ */ import_react9.default.createElement(
+    "div",
+    {
+      className: `w-full flex flex-col justify-start items-start p-3 rounded-md border ${statusClasses}`
+    },
+    /* @__PURE__ */ import_react9.default.createElement("div", { className: "!flex !flex-row justify-start items-center" }, /* @__PURE__ */ import_react9.default.createElement("span", { className: "!text-sm !font-normal" }, connectionResult ? "Connection successful" : "Connection failed"))
+  ), /* @__PURE__ */ import_react9.default.createElement("div", { className: "w-full flex-grow h-full overflow-y-auto border border-slate-200 rounded mt-3" }, /* @__PURE__ */ import_react9.default.createElement(
+    esm_default,
+    {
+      value: JSON.stringify(connectionResult, null, 2),
+      extensions: [loadLanguage("json")],
+      theme: githubLight,
+      style: {
+        width: "100%",
+        borderWidth: 0,
+        borderBottomWidth: 1,
+        outline: "none"
+      },
+      className: "border-slate-300 focus:border-slate-300 focus:outline-slate-300 flex-grow non-focusable-code-editor !h-full"
+    }
+  )));
+};
+
 // src/components/weburl/formConfig.json
-var formConfig_default2 = {
+var formConfig_default3 = {
   schema: {
     type: "object",
     properties: {
@@ -70494,16 +70879,16 @@ var queryConfig_default3 = {
 };
 
 // src/components/weburl/datasource/datasourceTestResultUI.jsx
-var import_react9 = __toESM(require("react"));
+var import_react10 = __toESM(require("react"));
 var WebURLDatasourceTestResultUI = ({ connectionResult }) => {
   const statusClasses = connectionResult ? "bg-green-100 !border-green-400 text-green-700" : "bg-red-100 !border-red-400 text-red-700";
-  return /* @__PURE__ */ import_react9.default.createElement("div", { className: "p-3 flex flex-col justify-start items-start h-full w-full" }, /* @__PURE__ */ import_react9.default.createElement(
+  return /* @__PURE__ */ import_react10.default.createElement("div", { className: "p-3 flex flex-col justify-start items-start h-full w-full" }, /* @__PURE__ */ import_react10.default.createElement(
     "div",
     {
       className: `w-full flex flex-col justify-start items-start p-3 rounded-md border ${statusClasses}`
     },
-    /* @__PURE__ */ import_react9.default.createElement("div", { className: "!flex !flex-row justify-start items-center" }, /* @__PURE__ */ import_react9.default.createElement("span", { className: "!text-sm !font-normal" }, connectionResult ? "Connection successful" : "Connection failed"))
-  ), /* @__PURE__ */ import_react9.default.createElement("div", { className: "w-full flex-grow h-full overflow-y-auto border border-slate-200 rounded mt-3" }, /* @__PURE__ */ import_react9.default.createElement(
+    /* @__PURE__ */ import_react10.default.createElement("div", { className: "!flex !flex-row justify-start items-center" }, /* @__PURE__ */ import_react10.default.createElement("span", { className: "!text-sm !font-normal" }, connectionResult ? "Connection successful" : "Connection failed"))
+  ), /* @__PURE__ */ import_react10.default.createElement("div", { className: "w-full flex-grow h-full overflow-y-auto border border-slate-200 rounded mt-3" }, /* @__PURE__ */ import_react10.default.createElement(
     esm_default,
     {
       value: JSON.stringify(connectionResult, null, 2),
@@ -70522,11 +70907,11 @@ var WebURLDatasourceTestResultUI = ({ connectionResult }) => {
 
 // src/components/common/webViewQueryResponseView.js
 var import_material3 = require("@mui/material");
-var import_react11 = __toESM(require("react"));
+var import_react12 = __toESM(require("react"));
 var import_prop_types7 = __toESM(require_prop_types());
 
 // src/components/common/queryResponseWebViewTab.js
-var import_react10 = __toESM(require("react"));
+var import_react11 = __toESM(require("react"));
 var import_prop_types6 = __toESM(require_prop_types());
 var QueryResponseWebViewTab = ({
   data: data2,
@@ -70541,7 +70926,7 @@ var QueryResponseWebViewTab = ({
     width: import_prop_types6.default.string
   };
   console.log("data", data2);
-  return /* @__PURE__ */ import_react10.default.createElement("div", { className: "w-100 flex-grow h-full overflow-y-auto pb-5" }, /* @__PURE__ */ import_react10.default.createElement(
+  return /* @__PURE__ */ import_react11.default.createElement("div", { className: "w-100 flex-grow h-full overflow-y-auto pb-5" }, /* @__PURE__ */ import_react11.default.createElement(
     "iframe",
     {
       src: data2.url,
@@ -70557,11 +70942,11 @@ var WebViewQueryResponseView = ({ queryResult }) => {
     queryResult: import_prop_types7.default.object
   };
   console.log("queryResult", queryResult);
-  const [tab4, setTab] = (0, import_react11.useState)(0);
+  const [tab4, setTab] = (0, import_react12.useState)(0);
   const _handleTabChange = (event, newTab) => {
     setTab(newTab);
   };
-  return /* @__PURE__ */ import_react11.default.createElement(import_react11.default.Fragment, null, /* @__PURE__ */ import_react11.default.createElement(
+  return /* @__PURE__ */ import_react12.default.createElement(import_react12.default.Fragment, null, /* @__PURE__ */ import_react12.default.createElement(
     import_material3.Tabs,
     {
       value: tab4,
@@ -70573,7 +70958,7 @@ var WebViewQueryResponseView = ({ queryResult }) => {
         }
       }
     },
-    /* @__PURE__ */ import_react11.default.createElement(
+    /* @__PURE__ */ import_react12.default.createElement(
       import_material3.Tab,
       {
         label: "Web View",
@@ -70583,7 +70968,7 @@ var WebViewQueryResponseView = ({ queryResult }) => {
         className: `!outline-none !border-0 hover:!outline-none hover:!border-0 focus:!outline-none !font-medium !text-sm !normal-case ${tab4 === 0 ? "!text-[#646cff]" : "!text-slate-700"}`
       }
     ),
-    /* @__PURE__ */ import_react11.default.createElement(
+    /* @__PURE__ */ import_react12.default.createElement(
       import_material3.Tab,
       {
         label: "JSON",
@@ -70593,7 +70978,7 @@ var WebViewQueryResponseView = ({ queryResult }) => {
         className: `!outline-none !border-0 hover:!outline-none hover:!border-0 focus:!outline-none !font-medium !text-sm !normal-case ${tab4 === 1 ? "!text-[#646cff]" : "!text-slate-700"}`
       }
     ),
-    /* @__PURE__ */ import_react11.default.createElement(
+    /* @__PURE__ */ import_react12.default.createElement(
       import_material3.Tab,
       {
         label: "Raw",
@@ -70603,7 +70988,7 @@ var WebViewQueryResponseView = ({ queryResult }) => {
         className: `!outline-none !border-0 hover:!outline-none hover:!border-0 focus:!outline-none !font-medium !text-sm !normal-case ${tab4 === 2 ? "!text-[#646cff]" : "!text-slate-700"}`
       }
     ),
-    /* @__PURE__ */ import_react11.default.createElement(
+    /* @__PURE__ */ import_react12.default.createElement(
       import_material3.Tab,
       {
         label: "Data Schema",
@@ -70613,7 +70998,7 @@ var WebViewQueryResponseView = ({ queryResult }) => {
         className: `!outline-none !border-0 hover:!outline-none hover:!border-0 focus:!outline-none !font-medium !text-sm !normal-case ${tab4 === 3 ? "!text-[#646cff]" : "!text-slate-700"}`
       }
     )
-  ), /* @__PURE__ */ import_react11.default.createElement("div", { className: "w-100  h-full overflow-y-auto pb-5" }, tab4 === 0 && /* @__PURE__ */ import_react11.default.createElement(QueryResponseWebViewTab, { data: queryResult ? queryResult : "" }), tab4 === 1 && /* @__PURE__ */ import_react11.default.createElement(QueryResponseJSONTab, { data: queryResult ? queryResult : "" }), tab4 === 2 && /* @__PURE__ */ import_react11.default.createElement(QueryResponseRAWTab, { data: queryResult ? queryResult : "" }), tab4 === 3 && /* @__PURE__ */ import_react11.default.createElement(QueryResponseSchemaTab, { data: queryResult ? queryResult : {} })));
+  ), /* @__PURE__ */ import_react12.default.createElement("div", { className: "w-100  h-full overflow-y-auto pb-5" }, tab4 === 0 && /* @__PURE__ */ import_react12.default.createElement(QueryResponseWebViewTab, { data: queryResult ? queryResult : "" }), tab4 === 1 && /* @__PURE__ */ import_react12.default.createElement(QueryResponseJSONTab, { data: queryResult ? queryResult : "" }), tab4 === 2 && /* @__PURE__ */ import_react12.default.createElement(QueryResponseRAWTab, { data: queryResult ? queryResult : "" }), tab4 === 3 && /* @__PURE__ */ import_react12.default.createElement(QueryResponseSchemaTab, { data: queryResult ? queryResult : {} })));
 };
 
 // src/index.js
@@ -70622,30 +71007,36 @@ var DATASOURCE_UI_COMPONENTS = {
     formConfig: formConfig_default,
     queryConfigForm: queryConfig_default,
     queryResponseView: function({ queryResult }) {
-      return import_react12.default.createElement(QueryResponseView, { queryResult });
+      return import_react13.default.createElement(QueryResponseView, { queryResult });
     },
     datasourceTestResultUI: function({ connectionResult }) {
-      return import_react12.default.createElement(PostgreSQLDatasourceTestResultUI, {
+      return import_react13.default.createElement(PostgreSQLDatasourceTestResultUI, {
         connectionResult
       });
     }
   },
   [DATASOURCE_TYPES.RESTAPI.value]: {
+    formConfig: formConfig_default2,
     queryConfigForm: queryConfig_default2,
     queryResponseView: function({ queryResult }) {
-      return import_react12.default.createElement(QueryResponseView, { queryResult });
+      return import_react13.default.createElement(QueryResponseView, { queryResult });
+    },
+    datasourceTestResultUI: function({ connectionResult }) {
+      return import_react13.default.createElement(RESTAPIDatasourceTestResultUI, {
+        connectionResult
+      });
     }
   },
   [DATASOURCE_TYPES.WEB_URL.value]: {
-    formConfig: formConfig_default2,
+    formConfig: formConfig_default3,
     queryConfigForm: queryConfig_default3,
     datasourceTestResultUI: function({ connectionResult }) {
-      return import_react12.default.createElement(WebURLDatasourceTestResultUI, {
+      return import_react13.default.createElement(WebURLDatasourceTestResultUI, {
         connectionResult
       });
     },
     queryResponseView: function({ queryResult }) {
-      return import_react12.default.createElement(WebViewQueryResponseView, { queryResult });
+      return import_react13.default.createElement(WebViewQueryResponseView, { queryResult });
     }
   }
 };

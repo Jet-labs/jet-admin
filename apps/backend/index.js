@@ -7,6 +7,10 @@ const { httpServer } = require("./config/http-server.config");
 const Logger = require("./utils/logger");
 const { cronJobService } = require("./modules/cronJob/cronJob.service");
 const { stringUtils } = require("@jet-admin/template-package");
+const { socketIO } = require("./config/socket.io");
+const {
+  aiSocketController,
+} = require("./modules/ai/socket/ai.socket.controller");
 // Middleware setup
 expressApp.use(cookieParser());
 expressApp.use("/api/v1/auth", require("./modules/auth/auth.v1.routes"));
@@ -36,6 +40,34 @@ expressApp.all("*", (req, res) => {
   });
   res.status(404).json({
     error: constants.ERROR_CODES.INVALID_REQUEST,
+  });
+});
+
+socketIO.on("connection", async (socket) => {
+  const { firebase_id, token } = socket.handshake.auth;
+
+  socket.on(
+    constants.SOCKET_RECEIVE_EVENTS.AI_CHAT_USER_MESSAGE,
+    async (data) => {
+      await aiSocketController.onUserMessageReceived({
+        socket,
+        message: data.message,
+        chatRoomID: data.chatRoomID,
+        firebaseID: firebase_id,
+      });
+    }
+  );
+
+  Logger.log("success", {
+    message: "user connected to socket",
+    params: { firebase_id },
+  });
+
+  socket.on("disconnect", () => {
+    Logger.log("info", {
+      message: "socket connection disconnected",
+      params: { firebase_id },
+    });
   });
 });
 

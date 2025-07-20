@@ -81,12 +81,12 @@ class QueryEngine {
 
     let datasourceConfig;
     switch (query.datasourceType) {
-      case DATASOURCE_TYPES.RESTAPI.value:
-        datasourceConfig = {
-          datasourceType: query.datasourceType,
-          datasourceOptions: query.dataQueryOptions,
-        };
-        break;
+      // case DATASOURCE_TYPES.RESTAPI.value:
+      //   datasourceConfig = {
+      //     datasourceType: query.datasourceType,
+      //     datasourceOptions: query.dataQueryOptions,
+      //   };
+      //   break;
       default:
         datasourceConfig = await this.datasourceFetcher(query.datasourceID);
         break;
