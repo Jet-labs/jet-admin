@@ -61,7 +61,7 @@ export const AIChatRenderMessage = React.memo(({ message, sendApproval }) => {
                         <div className="space-y-2">
                             {Object.entries(processedJSONMessage.suggestedQuery).map(([key, value], index) => (
                                 <details key={index} className="group" open>
-                                    <summary className="flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 rounded-lg cursor-pointer transition-colors">
+                                    <summary className="flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100  cursor-pointer transition-colors" style={{ borderRadius: '6px' }}>
                                         <span className="font-semibold text-gray-800 capitalize">
                                             {key.replace(/([A-Z])/g, ' $1').trim()}
                                         </span>
@@ -74,7 +74,7 @@ export const AIChatRenderMessage = React.memo(({ message, sendApproval }) => {
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                         </svg>
                                     </summary>
-                                    <div className="mt-2 p-4 bg-white border border-gray-200 rounded-lg shadow-sm">
+                                    <div className="mt-2 p-4 bg-white border border-gray-200  shadow-sm" style={{ borderRadius: '6px' }}>
                                         {typeof value === 'string' ? (
                                             <p className="text-gray-700 leading-relaxed break-words">
                                                 {value}
@@ -102,13 +102,13 @@ export const AIChatRenderMessage = React.memo(({ message, sendApproval }) => {
 
                     {/* Action buttons */}
                     <div className="flex gap-2">
-                        <button onClick={_handleApprovePrompt} className="px-3 py-1 text-xs bg-green-500 hover:bg-green-600 text-white rounded transition-colors">
+                        <button onClick={_handleApprovePrompt} className="px-3 py-1 text-xs bg-green-500 hover:bg-green-600 text-white  transition-colors" style={{ borderRadius: '6px' }}>
                             Approve
                         </button>
-                        <button className="px-3 py-1 text-xs bg-red-500 hover:bg-red-600 text-white rounded transition-colors">
+                        <button className="px-3 py-1 text-xs bg-red-500 hover:bg-red-600 text-white  transition-colors" style={{ borderRadius: '6px' }}>
                             Reject
                         </button>
-                        <button onClick={_handleSelectQueryForTesting} className="px-3 py-1 text-xs bg-yellow-500 hover:bg-yellow-600 text-white rounded transition-colors">
+                        <button onClick={_handleSelectQueryForTesting} className="px-3 py-1 text-xs bg-yellow-500 hover:bg-yellow-600 text-white  transition-colors" style={{ borderRadius: '6px' }}>
                             Test query
                         </button>
                         {selectedQueryForTesting && <DataQueryTestingPanel selectedQueryForTesting={selectedQueryForTesting} setSelectedQueryForTesting={_handleDeselectQueryForTesting} />}

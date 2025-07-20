@@ -38,14 +38,15 @@ export const AIChatMessageBubble = React.memo(({ message, sendApproval, isTyping
                 <div className={`max-w-[80%] ${isUser ? 'order-first' : ''}`}>
                     <div
                         className={`
-                            px-4 py-3 rounded-2xl text-sm leading-relaxed
+                            px-4 py-3 text-sm leading-relaxed
                             ${isUser
                                 ? 'bg-[#646cff] text-white ml-auto'
                                 : 'bg-gray-100 text-gray-800'
                             }
-                            ${isUser ? 'rounded-br-md' : 'rounded-bl-md'}
+
                             shadow-sm
                         `}
+                        style={{ borderRadius: '6px' }}
                     >
                         {isTyping ? (
                             <div className="flex items-center gap-1">

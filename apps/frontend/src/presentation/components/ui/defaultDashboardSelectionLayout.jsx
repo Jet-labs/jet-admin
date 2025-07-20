@@ -16,6 +16,8 @@ import { MdOutlineSpaceDashboard } from "react-icons/md";
 import { ReactQueryLoadingErrorWrapper } from "./reactQueryLoadingErrorWrapper";
 import { DashboardRenderWidget } from "../dashboardComponents/dashboardRenderWidget";
 import { CircularProgress } from "@mui/material";
+import { AiOutlineFullscreen } from "react-icons/ai";
+import { FullScreen, useFullScreenHandle } from "react-full-screen";
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
 export const DefaultDashboardSelectionLayout = ({
@@ -26,6 +28,7 @@ export const DefaultDashboardSelectionLayout = ({
     tenantID: PropTypes.number.isRequired,
     userConfigKey: PropTypes.string.isRequired,
   };
+  const fullScreenHandle = useFullScreenHandle();
   const { userConfig, isFetchingUserConfig, isUpdatingUserConfig } =
     useAuthState();
   const { updateUserConfigKey } = useAuthActions();
@@ -126,11 +129,17 @@ export const DefaultDashboardSelectionLayout = ({
                   >
                     <LuPinOff className="!w-3.5 !h-3.5 !text-[#646cff]" />
                   </button>
+                    <button
+                      onClick={fullScreenHandle.enter}
+                      className="!outline-none !hover:outline-none  items-center text-nowrap w-fit inline-flex rounded bg-[#646cff]/10 px-3 py-1.5 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50"
+                    >
+                      <AiOutlineFullscreen className="text-[#646cff] h-4 w-4" />
+                    </button>
                 </>
               )}
             </div>
           </div>
-          <ReactQueryLoadingErrorWrapper
+          <FullScreen handle={fullScreenHandle} className="w-full h-full"><ReactQueryLoadingErrorWrapper
             isLoading={isLoadingDashboard}
             isFetching={isFetchingDashboard}
             error={loadDashboardError}
@@ -138,7 +147,7 @@ export const DefaultDashboardSelectionLayout = ({
             isRefetching={isRefetechingDashboard}
           >
             <div
-              className="w-full overflow-y-auto bg-slate-100 "
+              className="w-full overflow-y-auto bg-slate-100 h-full"
               id={`printable-area-dashboard-${pinnedDashboardID}`}
             >
               {dashboard && (
@@ -170,7 +179,8 @@ export const DefaultDashboardSelectionLayout = ({
                 </ResponsiveReactGridLayout>
               )}
             </div>
-          </ReactQueryLoadingErrorWrapper>
+          </ReactQueryLoadingErrorWrapper></FullScreen>
+
         </div>
       ) : (
         <ReactQueryLoadingErrorWrapper
