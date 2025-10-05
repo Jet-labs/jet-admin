@@ -12,7 +12,7 @@ import { displayError, displaySuccess } from "../../../utils/notification";
 export const DatasourceCloneForm = ({ tenantID, datasourceID }) => {
   DatasourceCloneForm.propTypes = {
     tenantID: PropTypes.number.isRequired,
-    datasourceID: PropTypes.number.isRequired,
+    datasourceID: PropTypes.string.isRequired,
   };
   const navigate = useNavigate();
   const { showConfirmation } = useGlobalUI();

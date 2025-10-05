@@ -12,7 +12,7 @@ import React from "react";
 export const DatasourceDeletionForm = ({ tenantID, datasourceID }) => {
   DatasourceDeletionForm.propTypes = {
     tenantID: PropTypes.number.isRequired,
-    datasourceID: PropTypes.number.isRequired,
+    datasourceID: PropTypes.string.isRequired,
   };
   const navigate = useNavigate();
   const { showConfirmation } = useGlobalUI();

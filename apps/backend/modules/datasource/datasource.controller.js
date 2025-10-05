@@ -160,6 +160,7 @@ datasourceController.createDatasource = async (req, res) => {
       datasourceDescription,
       datasourceType,
       datasourceOptions,
+      datasourceTags,
     } = req.body;
 
     Logger.log("info", {
@@ -171,6 +172,7 @@ datasourceController.createDatasource = async (req, res) => {
         datasourceDescription,
         datasourceType,
         datasourceOptions,
+        datasourceTags,
       },
     });
 
@@ -181,6 +183,7 @@ datasourceController.createDatasource = async (req, res) => {
       datasourceDescription,
       datasourceType,
       datasourceOptions,
+      datasourceTags,
     });
 
     Logger.log("success", {
@@ -220,6 +223,7 @@ datasourceController.updateDatasourceByID = async (req, res) => {
       datasourceDescription,
       datasourceType,
       datasourceOptions,
+      datasourceTags,
     } = req.body;
 
     Logger.log("info", {
@@ -232,6 +236,7 @@ datasourceController.updateDatasourceByID = async (req, res) => {
         datasourceDescription,
         datasourceType,
         datasourceOptions,
+        datasourceTags,
       },
     });
 
@@ -243,6 +248,7 @@ datasourceController.updateDatasourceByID = async (req, res) => {
       datasourceDescription,
       datasourceType,
       datasourceOptions,
+      datasourceTags,
     });
 
     Logger.log("success", {

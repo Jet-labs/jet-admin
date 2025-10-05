@@ -45,7 +45,7 @@ export const QueryResponseTableTab = ({
       className={`!flex !flex-col !justify-start !items-stretch ${className}`}
     >
       {!dataSchema ? (
-        <div className="!h-32 flex !flex-col !justify-center !items-center w-full text-slate-500">
+        <div className="!h-32 flex flex-col justify-center items-center w-full text-slate-500">
           <span>Data schema not valid or no data available</span>
         </div>
       ) : !columns ? (
@@ -63,7 +63,9 @@ export const QueryResponseTableTab = ({
           density="compact"
           showCellVerticalBorder
           getRowClassName={(params) =>
-            params.indexRelativeToCurrentPage % 2 === 0 ? 'bg-[#646cff]/10' : 'Mui-odd'
+            params.indexRelativeToCurrentPage % 2 === 0
+              ? "bg-[#646cff]/10"
+              : "Mui-odd"
           }
           getRowHeight={() => "auto"}
           getRowId={(row) => row._g_uuid}

@@ -1028,8 +1028,8 @@ export const CONSTANTS = {
 
   APIS: {
     AI: {
-      getAIChatRoomIDAPI: (tenantID) =>
-        `/api/v1/tenants/${tenantID}/ai/chat_room`,
+      sendUserMessageToAIAPI: (tenantID) =>
+        `/api/v1/tenants/${tenantID}/mcp/chat`,
       sendUserMessageAPI: (tenantID) =>
         `/api/v1/tenants/${tenantID}/ai/user_message`,
     },

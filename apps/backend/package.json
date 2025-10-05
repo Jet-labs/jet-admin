@@ -33,6 +33,7 @@
     "@jet-admin/datasources-logic": "^1.0.0",
     "@jet-admin/widget-types": "^1.0.0",
     "@jet-admin/widgets": "^1.0.0",
+    "@modelcontextprotocol/sdk": "^1.17.0",
     "@prisma/client": "^5.22.0",
     "@prisma/engine-core": "^4.13.0",
     "@prisma/internals": "^5.17.0",
@@ -66,7 +67,8 @@
     "winston": "^3.8.2",
     "winston-daily-rotate-file": "^4.7.1",
     "winston-slack-webhook-transport": "^2.2.3",
-    "winston-syslog": "^2.7.0"
+    "winston-syslog": "^2.7.0",
+    "zod": "^4.0.10"
   },
   "devDependencies": {
     "ignore-styles": "^5.0.1",

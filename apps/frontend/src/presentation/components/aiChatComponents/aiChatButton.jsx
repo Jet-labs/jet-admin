@@ -21,9 +21,7 @@ import { IoClose, IoSend, } from "react-icons/io5";
 import { useParams } from "react-router-dom";
 import logo from "../../../assets/logo.png";
 import { CONSTANTS } from "../../../constants";
-import { getAIChatRoomIDAPI } from "../../../data/apis/ai";
-import { sendAIChatMessage } from "../../../data/sockets/aichat";
-import { useSocketState } from "../../../logic/contexts/socketContext";
+import { sendUserMessageToAIAPI } from "../../../data/apis/ai";
 import { displayError } from "../../../utils/notification";
 import { AIChatMessageBubble } from "./aiChatMessageBubble";
 
@@ -34,14 +32,12 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 export const AIChatButton = () => {
     const { tenantID } = useParams();
     const [isAIChatOpen, setIsAIChatOpen] = useState(false);
-    const [roomId, setRoomId] = useState(null);
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
     const [isTyping, setIsTyping] = useState(false);
     const [selectedMode, setSelectedMode] = useState('chat');
     const messagesEndRef = useRef(null);
     const inputRef = useRef(null);
-    const { socket } = useSocketState();
 
     const modes = [
         { id: 'chat', label: 'General Chat', icon: FaRobot, color: 'text-blue-600', description: 'General conversation and questions' },
@@ -49,54 +45,31 @@ export const AIChatButton = () => {
         { id: 'analysis', label: 'Data Analysis', icon: FaImage, color: 'text-orange-600', description: 'Data interpretation and insights' }
     ];
 
-    const { isPending: isFetchingChatRoomID, mutate: fetchChatRoomID } = useMutation({
-        mutationFn: () => {
-            return getAIChatRoomIDAPI({
+    const { isPending: isSendingUserMessage, mutate: sendUserMessage } = useMutation({
+        mutationFn: (input) => {
+            return sendUserMessageToAIAPI({
+                input,
                 tenantID,
             });
         },
         retry: false,
         onSuccess: (chatRoomID) => {
             console.log("chat room id", chatRoomID);
-            setRoomId(chatRoomID);
-            // Add welcome message when room is ready
-            if (messages.length === 0) {
-                const selectedModeData = modes.find(mode => mode.id === selectedMode);
-                setMessages([{
-                    type: "bot",
-                    text: `Hello! I'm your AI assistant in ${selectedModeData.label} mode. ${selectedModeData.description}. How can I help you today?`,
+            setMessages((prev) => [
+                ...prev,
+                {
+                    type: 'bot',
+                    text: chatRoomID,
                     timestamp: new Date(),
                     mode: selectedMode
-                }]);
-            }
+                }
+            ]);
+            setInput("");
         },
         onError: (error) => {
             displayError(error);
         },
     });
-
-    useEffect(() => {
-        if (!isAIChatOpen) return;
-        fetchChatRoomID();
-    }, [isAIChatOpen]);
-
-    useEffect(() => {
-        if (!socket) return;
-
-        socket.on(CONSTANTS.SOCKET_RECEIVE_EVENTS.AI_CHAT_BOT_MESSAGE, (msg) => {
-            setIsTyping(false);
-            setMessages((prev) => [...prev, {
-                type: "bot",
-                text: msg.text,
-                timestamp: new Date(),
-                mode: selectedMode
-            }]);
-        });
-
-        return () => {
-            socket.off(CONSTANTS.SOCKET_RECEIVE_EVENTS.AI_CHAT_BOT_MESSAGE);
-        };
-    }, [socket, selectedMode]);
 
     useEffect(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -117,60 +90,7 @@ export const AIChatButton = () => {
         setIsTyping(false);
     };
 
-    const sendMessage = () => {
-        if (!input.trim() || !roomId || isTyping) return;
 
-        const userMessage = {
-            type: "user",
-            text: input.trim(),
-            timestamp: new Date(),
-            mode: selectedMode
-        };
-
-        // Include mode context in the message
-        const messageWithContext = {
-            ...userMessage,
-            context: {
-                mode: selectedMode,
-                modeLabel: modes.find(m => m.id === selectedMode)?.label
-            }
-        };
-
-        sendAIChatMessage(socket, [...messages, messageWithContext], roomId);
-        setMessages((prev) => [...prev, userMessage]);
-        setIsTyping(true);
-        setInput("");
-    };
-
-    const sendApproval = useCallback((dataQueryData) => {
-        if (!dataQueryData || !roomId || isTyping) return;
-
-        const userMessage = {
-            type: "user",
-            text: 'approve',
-            timestamp: new Date(),
-            mode: selectedMode
-        };
-
-        sendAIChatMessage(socket, {
-            type: "user",
-            text: 'approve',
-            dataQueryData: dataQueryData,
-            action: 'approve',
-            timestamp: new Date(),
-            mode: selectedMode
-        }, roomId);
-        setMessages((prev) => [...prev, userMessage]);
-        setIsTyping(true);
-        setInput("");
-    }, [messages, roomId, socket, isTyping, selectedMode]);
-
-    const handleKeyPress = (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            sendMessage();
-        }
-    };
 
     const handleModeSelect = (mode) => {
         setSelectedMode(mode.id);
@@ -185,7 +105,21 @@ export const AIChatButton = () => {
         setMessages((prev) => [...prev, modeChangeMessage]);
     };
 
-    const isInputDisabled = !roomId || isFetchingChatRoomID || isTyping;
+
+    const _handleSendUserMessage = useCallback(() => {
+        setMessages((prev) => [...prev, { type: 'user', text: input.trim(), timestamp: new Date(), mode: selectedMode }]);
+        sendUserMessage(input.trim());
+    }, [input, sendUserMessage, selectedMode, setMessages]);
+
+    const handleKeyPress = useCallback((e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            _handleSendUserMessage();
+        }
+    }, [_handleSendUserMessage]);
+
+
+    const isInputDisabled = isSendingUserMessage || isTyping;
     const selectedModeData = modes.find(mode => mode.id === selectedMode);
 
     return (
@@ -261,37 +195,30 @@ export const AIChatButton = () => {
                     {/* Messages Area */}
                     <div className="flex-1 overflow-y-auto px-4 py-6">
                         <div className="max-w-4xl mx-auto">
-                            {isFetchingChatRoomID ? (
-                                <div className="flex items-center justify-center py-8">
-                                    <FaSpinner className="animate-spin text-gray-400 mr-2" />
-                                    <span className="text-gray-500">Setting up chat...</span>
-                                </div>
-                            ) : (
-                                <>
-                                    {messages.map((msg, index) => (
-                                        <div key={index}>
-                                            {msg.type === 'system' ? (
-                                                <div className="flex justify-center my-4">
-                                                    <div className="bg-blue-50 text-blue-700 px-3 py-1 text-xs font-medium" style={{ borderRadius: '6px' }}>
-                                                        {msg.text}
-                                                    </div>
+                            <>
+                                {messages.map((msg, index) => (
+                                    <div key={index}>
+                                        {msg.type === 'system' ? (
+                                            <div className="flex justify-center my-4">
+                                                <div className="bg-blue-50 text-blue-700 px-3 py-1 text-xs font-medium" style={{ borderRadius: '6px' }}>
+                                                    {msg.text}
                                                 </div>
-                                            ) : (
-                                                <AIChatMessageBubble message={msg} sendApproval={sendApproval} />
-                                            )}
-                                        </div>
-                                    ))}
+                                            </div>
+                                        ) : (
+                                            <AIChatMessageBubble message={msg} />
+                                        )}
+                                    </div>
+                                ))}
 
-                                    {isTyping && (
-                                            <AIChatMessageBubble
-                                                message={{ type: 'bot', text: '', mode: selectedMode }}
-                                            isTyping={true}
-                                            key={messages.length}
-                                                sendApproval={sendApproval}
-                                        />
-                                    )}
-                                </>
-                            )}
+                                {isSendingUserMessage && (
+                                    <AIChatMessageBubble
+                                        message={{ type: 'bot', text: '', mode: selectedMode }}
+                                        isTyping={true}
+                                        key={messages.length}
+
+                                    />
+                                )}
+                            </>
                             <div ref={messagesEndRef} />
                         </div>
                     </div>
@@ -400,7 +327,7 @@ export const AIChatButton = () => {
 
                                 {/* Send Button */}
                                 <button
-                                    onClick={sendMessage}
+                                    onClick={_handleSendUserMessage}
                                     disabled={!input.trim() || isInputDisabled}
                                     className={`
                                         p-2.5  transition-all duration-200 shrink-0

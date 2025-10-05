@@ -34,7 +34,7 @@ export const CronJobDrawerList = () => {
           <div className="h-8 bg-gray-200 rounded mb-2"></div>
         </div>
       ) : cronJobs && cronJobs.length > 0 ? (
-        <div className="h-full w-full overflow-y-auto">
+          <div className="h-full w-full overflow-y-auto pb-10">
           {cronJobs.map((cronJob) => {
             const key = `cronJob_${cronJob.cronJobID}`;
             const isActive = routeParam?.cronJobID == cronJob.cronJobID;

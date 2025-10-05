@@ -14,6 +14,7 @@ const tenantAPIKeyRouter = require("../apiKey/apiKey.v1.routes");
 const cronjobRouter = require("../cronJob/cronJob.v1.routes");
 const auditLogRouter = require("../audit/audit.v1.routes");
 const aiRouter = require("../ai/ai.v1.routes");
+const mcpRouter = require("../mcp/mcp.v1.routes");
 const { param, body } = require("express-validator");
 const { expressUtils } = require("../../utils/express.utils");
 const constants = require("../../constants");
@@ -48,13 +49,7 @@ router.post(
   "/",
   body("tenantTitle").notEmpty().withMessage("tenantTitle is required"),
   body("tenantDBURL").notEmpty().withMessage("tenantDBURL is required"),
-  body("tenantDBType")
-    .isIn(Object.keys(constants.SUPPORTED_DATABASES))
-    .withMessage(
-      `tenantDBType must be one of: ${Object.keys(
-        constants.SUPPORTED_DATABASES
-      ).join(", ")}`
-    ),
+
   expressUtils.validationChecker,
   tenantMiddleware.checkTenantCreationLimit,
   tenantController.createNewTenant
@@ -84,6 +79,13 @@ router.use(
   authMiddleware.checkUserPermissions(["tenant:ai"]),
   tenantMiddleware.poolProvider,
   aiRouter
+);
+
+router.use(
+  "/:tenantID/mcp",
+  authMiddleware.checkUserPermissions(["tenant:mcp"]),
+  tenantMiddleware.poolProvider,
+  mcpRouter
 );
 
 // Nested database routes

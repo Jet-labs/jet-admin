@@ -37,7 +37,7 @@ export const IframeWidgetComponent = ({ data, onWidgetInit, widgetConfig }) => {
         </h2>
       )}
       <iframe
-        src={data[0].url}
+        src={data?.[0]?.url}
         title="Web View"
         className="w-full flex-grow h-full overflow-y-auto"
       />

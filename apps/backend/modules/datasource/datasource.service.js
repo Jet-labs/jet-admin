@@ -101,6 +101,8 @@ datasourceService.testDatasourceConnection = async ({
  * @param {number} param0.tenantID
  * @param {string} param0.datasourceTitle
  * @param {object} param0.datasourceOptions
+ * @param {string} param0.datasourceType
+ * @param {Array<string>} param0.datasourceTags
  * @param {number} param0.userID
  */
 datasourceService.createDatasource = async ({
@@ -109,6 +111,7 @@ datasourceService.createDatasource = async ({
   datasourceTitle,
   datasourceType,
   datasourceOptions,
+  datasourceTags,
 }) => {
   Logger.log("info", {
     message: "datasourceService:createDatasource:params",
@@ -118,6 +121,7 @@ datasourceService.createDatasource = async ({
       datasourceTitle,
       datasourceType,
       datasourceOptions,
+      datasourceTags,
     },
   });
   try {
@@ -128,6 +132,7 @@ datasourceService.createDatasource = async ({
         datasourceType,
         datasourceOptions,
         creatorID: parseInt(userID),
+        datasourceTags,
       },
     });
     Logger.log("success", {
@@ -258,6 +263,7 @@ datasourceService.getDatasourceByID = async ({
  * @param {string} param0.datasourceTitle
  * @param {string} param0.datasourceType
  * @param {object} param0.datasourceOptions
+ * @param {Array<string>} param0.datasourceTags
  * @returns {Promise<boolean>}
  */
 datasourceService.updateDatasourceByID = async ({
@@ -267,6 +273,7 @@ datasourceService.updateDatasourceByID = async ({
   datasourceTitle,
   datasourceType,
   datasourceOptions,
+  datasourceTags,
 }) => {
   Logger.log("info", {
     message: "datasourceService:updateDatasourceByID:params",
@@ -277,6 +284,7 @@ datasourceService.updateDatasourceByID = async ({
       datasourceTitle,
       datasourceType,
       datasourceOptions,
+      datasourceTags,
     },
   });
   try {
@@ -289,6 +297,7 @@ datasourceService.updateDatasourceByID = async ({
         ...(datasourceTitle != undefined && { datasourceTitle }),
         ...(datasourceType != undefined && { datasourceType }),
         ...(datasourceOptions != undefined && { datasourceOptions }),
+        ...(datasourceTags != undefined && { datasourceTags }),
         updatedAt: new Date(),
       },
     });
@@ -349,6 +358,7 @@ datasourceService.cloneDatasourceByID = async ({
         datasourceTitle: datasource.datasourceTitle + " (Copy)",
         datasourceType: datasource.datasourceType,
         datasourceOptions: datasource.datasourceOptions,
+        datasourceTags: datasource.datasourceTags,
         creatorID: parseInt(userID),
       },
     });

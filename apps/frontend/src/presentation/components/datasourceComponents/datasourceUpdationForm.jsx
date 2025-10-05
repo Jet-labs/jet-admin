@@ -29,7 +29,7 @@ const datasourceOptionsMetadata =
 export const DatasourceUpdationForm = ({ tenantID, datasourceID }) => {
   DatasourceUpdationForm.propTypes = {
     tenantID: PropTypes.number.isRequired,
-    datasourceID: PropTypes.number.isRequired,
+    datasourceID: PropTypes.string.isRequired,
   };
 
   const queryClient = useQueryClient();
@@ -51,6 +51,7 @@ export const DatasourceUpdationForm = ({ tenantID, datasourceID }) => {
       }),
     refetchOnWindowFocus: false,
   });
+  console.log({ datasource });
 
   const { isPending: isAddingDatasource, mutate: updateDatasource } =
     useMutation({
@@ -79,9 +80,8 @@ export const DatasourceUpdationForm = ({ tenantID, datasourceID }) => {
   const datasourceUpdationForm = useFormik({
     initialValues: {
       datasourceTitle: "",
-      datasourceDescription: "",
       datasourceType: "postgresql", // Default value
-      datasourceOptions: datasourceOptionsMetadata.initialData, // Initialize nested object
+      datasourceOptions: datasourceOptionsMetadata.data, // Initialize nested object
     },
     onSubmit: (data) => {
       updateDatasource(data);
@@ -104,6 +104,8 @@ export const DatasourceUpdationForm = ({ tenantID, datasourceID }) => {
       );
     }
   }, [datasource]);
+
+  console.log("datasourceTestResult", datasourceTestResult);
 
   return (
     <div className="w-full flex flex-col justify-start items-center h-full">

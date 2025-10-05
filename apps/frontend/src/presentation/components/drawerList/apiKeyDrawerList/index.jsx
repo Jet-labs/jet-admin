@@ -32,7 +32,7 @@ export const APIKeyDrawerList = () => {
           <div className="h-8 bg-gray-200 rounded mb-2"></div>
         </div>
       ) : apiKeys && apiKeys.length > 0 ? (
-        <div className="h-full w-full overflow-y-auto">
+          <div className="h-full w-full overflow-y-auto pb-10">
           {apiKeys.map((apiKey) => {
             const key = `apiKey_${apiKey.apiKeyID}`;
             const isActive = routeParam?.apiKeyID == apiKey.apiKeyID;

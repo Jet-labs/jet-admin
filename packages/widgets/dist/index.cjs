@@ -841,18 +841,20 @@ var processBarChartQueryResults = ({
 }) => {
   const xValues = /* @__PURE__ */ new Set();
   widget.dataQueries.forEach((mapping, index2) => {
-    const result = dataQueriesResult[index2]?.result || [];
+    const result = dataQueriesResult[index2] || [];
     const xField = mapping.datasetFields?.xAxis;
     if (xField) {
       result.forEach((row) => xValues.add(row[xField]));
     }
   });
+  console.log("xValues", xValues);
   const sortedLabels = [...xValues].sort((a2, b2) => {
     if (typeof a2 === "number" && typeof b2 === "number") return a2 - b2;
     return a2.toString().localeCompare(b2.toString());
   });
+  console.log("sortedLabels", sortedLabels);
   const datasets = widget.dataQueries.map((mapping, index2) => {
-    const result = dataQueriesResult[index2]?.result || [];
+    const result = dataQueriesResult[index2] || [];
     const { xAxis, yAxis } = mapping.datasetFields;
     const dataMap = new Map(result.map((row) => [row[xAxis], row[yAxis]]));
     return {
@@ -861,6 +863,7 @@ var processBarChartQueryResults = ({
       data: sortedLabels.map((x3) => dataMap.get(x3) ?? 0)
     };
   });
+  console.log("datasets", datasets);
   return { labels: sortedLabels, datasets };
 };
 
@@ -15945,7 +15948,7 @@ var IframeWidgetComponent = ({ data, onWidgetInit, widgetConfig }) => {
     /* @__PURE__ */ import_react13.default.createElement(
       "iframe",
       {
-        src: data[0].url,
+        src: data?.[0]?.url,
         title: "Web View",
         className: "w-full flex-grow h-full overflow-y-auto"
       }

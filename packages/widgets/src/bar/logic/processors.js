@@ -14,22 +14,24 @@ export const processBarChartQueryResults = ({
   // Collect all x-axis values
   const xValues = new Set();
   widget.dataQueries.forEach((mapping, index) => {
-    const result = dataQueriesResult[index]?.result || [];
+    const result = dataQueriesResult[index] || [];
     const xField = mapping.datasetFields?.xAxis;
     if (xField) {
       result.forEach((row) => xValues.add(row[xField]));
     }
   });
+  console.log("xValues", xValues);
 
   // Sort labels
   const sortedLabels = [...xValues].sort((a, b) => {
     if (typeof a === "number" && typeof b === "number") return a - b;
     return a.toString().localeCompare(b.toString());
   });
+  console.log("sortedLabels", sortedLabels);
 
   // Build datasets
   const datasets = widget.dataQueries.map((mapping, index) => {
-    const result = dataQueriesResult[index]?.result || [];
+    const result = dataQueriesResult[index] || [];
     const { xAxis, yAxis } = mapping.datasetFields;
     const dataMap = new Map(result.map((row) => [row[xAxis], row[yAxis]]));
 
@@ -39,6 +41,7 @@ export const processBarChartQueryResults = ({
       data: sortedLabels.map((x) => dataMap.get(x) ?? 0),
     };
   });
+  console.log("datasets", datasets);
 
   return { labels: sortedLabels, datasets };
 };

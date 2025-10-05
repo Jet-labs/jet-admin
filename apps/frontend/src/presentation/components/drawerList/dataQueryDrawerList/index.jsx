@@ -32,7 +32,7 @@ export const DataQueryDrawerList = () => {
           <div className="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
         </div>
       ) : dataQueries && dataQueries.length > 0 ? (
-        <div className="h-full w-full overflow-y-auto">
+          <div className="h-full w-full overflow-y-auto pb-10">
           {dataQueries.map((dataQuery) => {
             const key = `dataQuery_${dataQuery.dataQueryID}`;
             const isActive = routeParam?.dataQueryID == dataQuery.dataQueryID;

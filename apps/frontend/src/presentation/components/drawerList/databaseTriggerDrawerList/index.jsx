@@ -40,7 +40,7 @@ export const DatabaseTriggerDrawerList = () => {
           <div className="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
         </div>
       ) : databaseTriggers && databaseTriggers.length > 0 ? (
-        <div className="h-full w-full overflow-y-auto">
+          <div className="h-full w-full overflow-y-auto pb-10">
           {databaseTriggers.map((databaseTrigger) => {
             const key = `databaseTrigger_${databaseTrigger.databaseTriggerName}_${databaseTrigger.databaseTableName}`;
             const isActive =

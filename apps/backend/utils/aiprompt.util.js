@@ -1,5 +1,65 @@
 const aiUtil = {};
 
+aiUtil.generateUserPromptIntent = async ({ userPrompt }) => {
+  return `
+    Analyze the following user query and extract the key information as a JSON object.
+    The user query is: "${userPrompt}"
+
+    Extract the following fields:
+    - "metric": The primary data point the user is asking for (e.g., "user signups", "sales").
+    - "dimensions": A list of categories to group the metric by (e.g., ["country", "product"]).
+    - "timeframe": The time period mentioned (e.g., "last 30 days", "this quarter").
+    - "limit": A number, if the user asks for a top/bottom N list.
+    - "visualizationHint": The suggested chart type if mentioned (e.g., "pie chart", "bar chart", "table").
+    - "outputFormat": Determine if the user wants a 'chat' response or a 'visualization'. Infer 'visualization' if they mention a chart type or ask to "show" or "plot" data. Otherwise, default to 'chat'.
+
+    Respond ONLY with the JSON object.
+  `;
+};
+
+aiUtil.generateAIPromptForDatasourceSelection = ({
+  userPrompt,
+  datasources,
+}) => {
+  return `
+You are a system that helps identify which datasources are most relevant to a user's query.
+
+User query:
+"${JSON.stringify(userPrompt)}"
+
+Available datasources (JSON):
+${JSON.stringify(datasources, null, 2)}
+
+Your task:
+- Analyze the user query.
+- Return a JSON array of matching datasource objects, each with the following format:
+  {
+    "datasourceID": "<id>",
+    "datasourceTitle": "<title>",
+    "datasourceType": "<type>",
+    "reason": "<brief reason why this datasource is relevant>"
+  }
+
+Guidelines:
+- Include all datasources that clearly relate to the user's intent.
+- Return an empty array if none match.
+- Do NOT include any explanation outside the JSON array.
+
+Example response:
+[
+  {
+    "datasourceID": "ds1",
+    "reason": "Matches 'sales' keyword in user query"
+  },
+  {
+    "datasourceID": "ds4",
+    "reason": "Contains regional sales data mentioned by user"
+  }
+]
+  `;
+};
+
+
 aiUtil.generateAIVizPromptWithJSX = ({
   dataQueryResult,
   dataQuery,

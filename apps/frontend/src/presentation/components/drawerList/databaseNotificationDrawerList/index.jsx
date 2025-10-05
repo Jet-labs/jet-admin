@@ -37,7 +37,7 @@ export const DatabaseNotificationDrawerList = () => {
           <div className="h-8 bg-gray-200 rounded mb-2"></div>
         </div>
       ) : databaseNotifications && databaseNotifications.length > 0 ? (
-        <div className="h-full w-full overflow-y-auto">
+          <div className="h-full w-full overflow-y-auto pb-10">
           {databaseNotifications.map((databaseNotification) => {
             const key = `databaseNotification_${databaseNotification.databaseNotificationID}`;
             const isActive =

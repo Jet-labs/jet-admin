@@ -128,6 +128,7 @@ model tblDatasources {
   tenantID          Int
   creatorID         Int
   datasourceOptions Json
+  datasourceTags    String[]         @db.VarChar
   tblDataQueries    tblDataQueries[]
   tblTenants        tblTenants       @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDatasourceTblTenantsTenantID")
   tblUsers          tblUsers         @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDatasourceTblUsersCreatorID")

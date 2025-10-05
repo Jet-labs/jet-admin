@@ -31,7 +31,7 @@ export const DashboardDrawerList = () => {
           <div className="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
         </div>
       ) : dashboards && dashboards.length > 0 ? (
-        <div className="h-full w-full overflow-y-auto">
+          <div className="h-full w-full overflow-y-auto pb-10">
           {dashboards.map((dashboard) => {
             const key = `dashboard_${dashboard.dashboardID}`;
             const isActive = routeParam?.dashboardID == dashboard.dashboardID;

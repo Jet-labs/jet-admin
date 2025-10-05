@@ -61642,10 +61642,1145 @@ var require_lib = __commonJS({
 import React12 from "react";
 
 // ../datasource-types/dist/index.mjs
+var formConfig_default = {
+  schema: {
+    type: "object",
+    properties: {
+      connectionOption: {
+        type: "string",
+        enum: ["connectionDetails", "connectionString"],
+        default: "connectionDetails",
+        description: "Choose to enter connection details or a connection string."
+      },
+      connectionDetails: {
+        type: "object",
+        properties: {
+          connectionName: {
+            type: "string",
+            description: "A unique name for this data source connection.",
+            minLength: 3
+          },
+          host: {
+            type: "string",
+            description: "The hostname or IP address of the PostgreSQL server.",
+            format: "hostname"
+          },
+          port: {
+            type: "integer",
+            description: "The port number of the PostgreSQL server (default is 5432).",
+            minimum: 1,
+            maximum: 65535,
+            default: 5432
+          },
+          database: {
+            type: "string",
+            description: "The name of the database to connect to.",
+            minLength: 1
+          },
+          user: {
+            type: "string",
+            description: "The username for connecting to the database.",
+            minLength: 1
+          },
+          password: {
+            type: "string",
+            description: "The password for the specified user.",
+            format: "password"
+          },
+          sslMode: {
+            type: "string",
+            description: "SSL mode for the connection.",
+            enum: [
+              "disable",
+              "allow",
+              "prefer",
+              "require",
+              "verify-ca",
+              "verify-full"
+            ],
+            default: "prefer"
+          },
+          additionalOptions: {
+            type: "object",
+            description: "Additional connection options (e.g., timeout, application name).",
+            properties: {
+              connectTimeout: {
+                type: "integer",
+                description: "Connection timeout in seconds.",
+                minimum: 0
+              },
+              applicationName: {
+                type: "string",
+                description: "Application name to be sent to the server."
+              }
+            },
+            additionalProperties: true
+          }
+        },
+        required: ["connectionName", "host", "database", "user", "password"]
+      },
+      connectionString: {
+        type: "string",
+        description: "The full PostgreSQL connection string (e.g., 'postgresql://user:password@host:port/database').",
+        minLength: 1
+      }
+    },
+    required: ["connectionOption"],
+    allOf: [
+      {
+        if: {
+          properties: {
+            connectionOption: {
+              const: "connectionDetails"
+            }
+          }
+        },
+        then: {
+          required: ["connectionDetails"]
+        }
+      },
+      {
+        if: {
+          properties: {
+            connectionOption: {
+              const: "connectionString"
+            }
+          }
+        },
+        then: {
+          required: ["connectionString"]
+        }
+      }
+    ]
+  },
+  uischema: {
+    type: "VerticalLayout",
+    elements: [
+      {
+        type: "Control",
+        scope: "#/properties/connectionOption",
+        label: "Connection Type"
+      },
+      {
+        type: "Group",
+        label: "Connection Details",
+        rule: {
+          effect: "SHOW",
+          condition: {
+            scope: "#/properties/connectionOption",
+            schema: { const: "connectionDetails" }
+          }
+        },
+        elements: [
+          {
+            type: "HorizontalLayout",
+            elements: [
+              {
+                type: "Control",
+                scope: "#/properties/connectionDetails/properties/connectionName",
+                label: "Connection Name"
+              },
+              {
+                type: "Control",
+                scope: "#/properties/connectionDetails/properties/host",
+                label: "Host"
+              },
+              {
+                type: "Control",
+                scope: "#/properties/connectionDetails/properties/port",
+                label: "Port"
+              }
+            ]
+          },
+          {
+            type: "HorizontalLayout",
+            elements: [
+              {
+                type: "Control",
+                scope: "#/properties/connectionDetails/properties/database",
+                label: "Database Name"
+              },
+              {
+                type: "Control",
+                scope: "#/properties/connectionDetails/properties/user",
+                label: "Username"
+              },
+              {
+                type: "Control",
+                scope: "#/properties/connectionDetails/properties/password",
+                label: "Password",
+                options: {
+                  format: "password"
+                }
+              }
+            ]
+          },
+          {
+            type: "Control",
+            scope: "#/properties/connectionDetails/properties/sslMode",
+            label: "SSL Mode"
+          },
+          {
+            type: "Group",
+            label: "Advanced Options",
+            elements: [
+              {
+                type: "Control",
+                scope: "#/properties/connectionDetails/properties/additionalOptions/properties/connectTimeout",
+                label: "Connection Timeout (seconds)"
+              },
+              {
+                type: "Control",
+                scope: "#/properties/connectionDetails/properties/additionalOptions/properties/applicationName",
+                label: "Application Name"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        type: "Group",
+        label: "Connection String",
+        rule: {
+          effect: "SHOW",
+          condition: {
+            scope: "#/properties/connectionOption",
+            schema: { const: "connectionString" }
+          }
+        },
+        elements: [
+          {
+            type: "Control",
+            scope: "#/properties/connectionString",
+            label: "Connection String"
+          }
+        ]
+      }
+    ]
+  },
+  data: {
+    connectionOption: "connectionDetails",
+    connectionDetails: {
+      connectionName: "MyDevPostgres",
+      host: "localhost",
+      port: 5432,
+      database: "mydatabase",
+      user: "dbuser",
+      password: "securepassword",
+      sslMode: "prefer",
+      additionalOptions: {
+        connectTimeout: 10,
+        applicationName: "JSONFormsApp"
+      }
+    },
+    connectionString: ""
+  }
+};
+var queryConfig_default = {
+  schema: {
+    type: "object",
+    properties: {
+      queryType: {
+        type: "string",
+        enum: ["query", "gui"],
+        default: "query"
+      },
+      query: {
+        type: "string",
+        description: "PostgreSQL code to execute",
+        format: "code-pgsql"
+      },
+      args: {
+        type: "array",
+        description: "Query arguments",
+        items: {
+          type: "object",
+          properties: {
+            key: {
+              type: "string"
+            },
+            type: {
+              type: "string",
+              enum: [
+                "string",
+                "number",
+                "boolean",
+                "array (, separated)",
+                "object (JSON stringified)"
+              ],
+              default: "string"
+            }
+          },
+          required: ["key", "type"]
+        }
+      }
+    },
+    required: ["queryType"]
+  },
+  uischema: {
+    type: "VerticalLayout",
+    elements: [
+      {
+        type: "Control",
+        scope: "#/properties/queryType",
+        label: "Query Type"
+      },
+      {
+        type: "Group",
+        label: "Raw SQL",
+        rule: {
+          effect: "SHOW",
+          condition: {
+            scope: "#/properties/queryType",
+            schema: { const: "query" }
+          }
+        },
+        elements: [
+          {
+            type: "Control",
+            scope: "#/properties/query",
+            label: "Raw sql"
+          }
+        ]
+      },
+      {
+        type: "Control",
+        scope: "#/properties/args",
+        label: "Arguments",
+        options: {
+          detail: {
+            type: "VerticalLayout",
+            elements: [
+              {
+                type: "Control",
+                scope: "#/properties/key"
+              },
+              {
+                type: "Control",
+                scope: "#/properties/type"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  data: {
+    queryType: "query",
+    query: "SELECT id, name FROM users WHERE active = true;",
+    args: [
+      { key: "user_id", value: "123" },
+      { key: "status", value: "active" }
+    ]
+  }
+};
+var formConfig_default2 = {
+  schema: {
+    type: "object",
+    properties: {
+      baseUrl: {
+        type: "string",
+        description: "Base URL of the REST API (e.g., https://api.example.com )"
+      },
+      method: {
+        type: "string",
+        enum: [
+          "GET",
+          "POST",
+          "PUT",
+          "DELETE",
+          "PATCH"
+        ],
+        default: "GET"
+      },
+      timeout: {
+        type: "integer",
+        description: "Request timeout in seconds",
+        minimum: 1
+      },
+      authType: {
+        type: "string",
+        enum: [
+          "none",
+          "basic",
+          "bearer",
+          "oauth2"
+        ],
+        default: "none"
+      },
+      username: {
+        type: "string",
+        description: "Username for Basic Auth"
+      },
+      password: {
+        type: "string",
+        description: "Password for Basic Auth",
+        format: "password"
+      },
+      bearerToken: {
+        type: "string",
+        description: "Bearer token for authentication",
+        format: "password"
+      },
+      oauth2: {
+        type: "object",
+        properties: {
+          clientId: {
+            type: "string"
+          },
+          clientSecret: {
+            type: "string",
+            format: "password"
+          },
+          tokenUrl: {
+            type: "string",
+            format: "uri"
+          }
+        },
+        required: [
+          "clientId",
+          "clientSecret",
+          "tokenUrl"
+        ]
+      },
+      headers: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            key: {
+              type: "string"
+            },
+            value: {
+              type: "string"
+            }
+          },
+          required: [
+            "key",
+            "value"
+          ]
+        }
+      },
+      queryParams: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            key: {
+              type: "string"
+            },
+            value: {
+              type: "string"
+            }
+          },
+          required: [
+            "key",
+            "value"
+          ]
+        }
+      },
+      body: {
+        type: "string",
+        description: "Request body (for POST/PUT/PATCH)"
+      },
+      contentType: {
+        type: "string",
+        enum: [
+          "application/json",
+          "application/xml",
+          "text/plain"
+        ],
+        default: "application/json"
+      },
+      followRedirects: {
+        type: "boolean",
+        default: true
+      },
+      sslVerify: {
+        type: "boolean",
+        default: true
+      }
+    },
+    required: [
+      "baseUrl",
+      "method"
+    ]
+  },
+  uischema: {
+    type: "VerticalLayout",
+    elements: [
+      {
+        type: "Categorization",
+        elements: [
+          {
+            type: "Category",
+            label: "General",
+            elements: [
+              {
+                type: "Control",
+                scope: "#/properties/baseUrl"
+              },
+              {
+                type: "Control",
+                scope: "#/properties/method"
+              },
+              {
+                type: "Control",
+                scope: "#/properties/timeout"
+              },
+              {
+                type: "Control",
+                scope: "#/properties/contentType"
+              }
+            ]
+          },
+          {
+            type: "Category",
+            label: "Authentication",
+            elements: [
+              {
+                type: "Control",
+                scope: "#/properties/authType"
+              },
+              {
+                type: "Group",
+                label: "Basic Auth",
+                rule: {
+                  effect: "SHOW",
+                  condition: {
+                    scope: "#/properties/authType",
+                    schema: {
+                      const: "basic"
+                    }
+                  }
+                },
+                elements: [
+                  {
+                    type: "Control",
+                    scope: "#/properties/username"
+                  },
+                  {
+                    type: "Control",
+                    scope: "#/properties/password"
+                  }
+                ]
+              },
+              {
+                type: "Group",
+                label: "Bearer Token",
+                rule: {
+                  effect: "SHOW",
+                  condition: {
+                    scope: "#/properties/authType",
+                    schema: {
+                      const: "bearer"
+                    }
+                  }
+                },
+                elements: [
+                  {
+                    type: "Control",
+                    scope: "#/properties/bearerToken"
+                  }
+                ]
+              },
+              {
+                type: "Group",
+                label: "OAuth2",
+                rule: {
+                  effect: "SHOW",
+                  condition: {
+                    scope: "#/properties/authType",
+                    schema: {
+                      const: "oauth2"
+                    }
+                  }
+                },
+                elements: [
+                  {
+                    type: "Control",
+                    scope: "#/properties/oauth2/properties/clientId"
+                  },
+                  {
+                    type: "Control",
+                    scope: "#/properties/oauth2/properties/clientSecret"
+                  },
+                  {
+                    type: "Control",
+                    scope: "#/properties/oauth2/properties/tokenUrl"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            type: "Category",
+            label: "Headers",
+            elements: [
+              {
+                type: "Control",
+                scope: "#/properties/headers",
+                options: {
+                  detail: {
+                    type: "VerticalLayout",
+                    elements: [
+                      {
+                        type: "Control",
+                        scope: "#/properties/key"
+                      },
+                      {
+                        type: "Control",
+                        scope: "#/properties/value"
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            type: "Category",
+            label: "Query Params",
+            elements: [
+              {
+                type: "Control",
+                scope: "#/properties/queryParams",
+                options: {
+                  detail: {
+                    type: "VerticalLayout",
+                    elements: [
+                      {
+                        type: "Control",
+                        scope: "#/properties/key"
+                      },
+                      {
+                        type: "Control",
+                        scope: "#/properties/value"
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            type: "Category",
+            label: "Body",
+            rule: {
+              effect: "SHOW",
+              condition: {
+                scope: "#/properties/method",
+                schema: {
+                  enum: [
+                    "POST",
+                    "PUT",
+                    "PATCH"
+                  ]
+                }
+              }
+            },
+            elements: [
+              {
+                type: "Control",
+                scope: "#/properties/body"
+              }
+            ]
+          },
+          {
+            type: "Category",
+            label: "Advanced",
+            elements: [
+              {
+                type: "Control",
+                scope: "#/properties/followRedirects"
+              },
+              {
+                type: "Control",
+                scope: "#/properties/sslVerify"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  data: {
+    baseUrl: "https://api.example.com",
+    method: "GET",
+    timeout: 10,
+    authType: "bearer",
+    bearerToken: "your-bearer-token-here",
+    headers: [
+      {
+        key: "X-Custom-Header",
+        value: "HeaderValue"
+      }
+    ],
+    queryParams: [
+      {
+        key: "filter",
+        value: "active"
+      }
+    ],
+    contentType: "application/json",
+    followRedirects: true,
+    sslVerify: true
+  }
+};
+var queryConfig_default2 = {
+  schema: {
+    type: "object",
+    properties: {
+      apiEndpoint: {
+        type: "string",
+        description: "API endpoint to fetch data from baseUrl (e.g., /data)"
+      },
+      method: {
+        type: "string",
+        enum: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+        default: "GET"
+      },
+      timeout: {
+        type: "integer",
+        description: "Request timeout in seconds",
+        minimum: 1
+      },
+      authType: {
+        type: "string",
+        enum: ["none", "basic", "bearer", "oauth2"],
+        default: "none"
+      },
+      username: {
+        type: "string",
+        description: "Username for Basic Auth"
+      },
+      password: {
+        type: "string",
+        description: "Password for Basic Auth",
+        format: "password"
+      },
+      bearerToken: {
+        type: "string",
+        description: "Bearer token for authentication",
+        format: "password"
+      },
+      oauth2: {
+        type: "object",
+        properties: {
+          clientId: { type: "string" },
+          clientSecret: { type: "string", format: "password" },
+          tokenUrl: { type: "string", format: "uri" }
+        },
+        required: ["clientId", "clientSecret", "tokenUrl"]
+      },
+      headers: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            key: { type: "string" },
+            value: { type: "string" }
+          },
+          required: ["key", "value"]
+        }
+      },
+      queryParams: {
+        type: "array",
+        items: {
+          type: "object",
+          properties: {
+            key: { type: "string" },
+            value: { type: "string" }
+          },
+          required: ["key", "value"]
+        }
+      },
+      body: {
+        type: "string",
+        description: "Request body (for POST/PUT/PATCH)"
+      },
+      contentType: {
+        type: "string",
+        enum: ["application/json", "application/xml", "text/plain"],
+        default: "application/json"
+      },
+      followRedirects: {
+        type: "boolean",
+        default: true
+      },
+      sslVerify: {
+        type: "boolean",
+        default: true
+      },
+      args: {
+        type: "array",
+        description: "Query arguments",
+        items: {
+          type: "object",
+          properties: {
+            key: {
+              type: "string"
+            },
+            type: {
+              type: "string",
+              enum: [
+                "string",
+                "number",
+                "boolean",
+                "array (, separated)",
+                "object (JSON stringified)"
+              ],
+              default: "string"
+            }
+          },
+          required: ["key", "type"]
+        }
+      }
+    },
+    required: [
+      "apiEndpoint",
+      "method"
+    ]
+  },
+  uischema: {
+    type: "VerticalLayout",
+    elements: [
+      {
+        type: "Categorization",
+        elements: [
+          {
+            type: "Category",
+            label: "General",
+            elements: [
+              {
+                type: "Control",
+                scope: "#/properties/apiEndpoint"
+              },
+              {
+                type: "Control",
+                scope: "#/properties/method"
+              },
+              {
+                type: "Control",
+                scope: "#/properties/timeout"
+              },
+              {
+                type: "Control",
+                scope: "#/properties/contentType"
+              }
+            ]
+          },
+          {
+            type: "Category",
+            label: "Authentication",
+            elements: [
+              {
+                type: "Control",
+                scope: "#/properties/authType"
+              },
+              {
+                type: "Group",
+                label: "Basic Auth",
+                rule: {
+                  effect: "SHOW",
+                  condition: {
+                    scope: "#/properties/authType",
+                    schema: { const: "basic" }
+                  }
+                },
+                elements: [
+                  {
+                    type: "Control",
+                    scope: "#/properties/username"
+                  },
+                  {
+                    type: "Control",
+                    scope: "#/properties/password"
+                  }
+                ]
+              },
+              {
+                type: "Group",
+                label: "Bearer Token",
+                rule: {
+                  effect: "SHOW",
+                  condition: {
+                    scope: "#/properties/authType",
+                    schema: { const: "bearer" }
+                  }
+                },
+                elements: [
+                  {
+                    type: "Control",
+                    scope: "#/properties/bearerToken"
+                  }
+                ]
+              },
+              {
+                type: "Group",
+                label: "OAuth2",
+                rule: {
+                  effect: "SHOW",
+                  condition: {
+                    scope: "#/properties/authType",
+                    schema: { const: "oauth2" }
+                  }
+                },
+                elements: [
+                  {
+                    type: "Control",
+                    scope: "#/properties/oauth2/properties/clientId"
+                  },
+                  {
+                    type: "Control",
+                    scope: "#/properties/oauth2/properties/clientSecret"
+                  },
+                  {
+                    type: "Control",
+                    scope: "#/properties/oauth2/properties/tokenUrl"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            type: "Category",
+            label: "Headers",
+            elements: [
+              {
+                type: "Control",
+                scope: "#/properties/headers",
+                options: {
+                  detail: {
+                    type: "VerticalLayout",
+                    elements: [
+                      {
+                        type: "Control",
+                        scope: "#/properties/key"
+                      },
+                      {
+                        type: "Control",
+                        scope: "#/properties/value"
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            type: "Category",
+            label: "Query Params",
+            elements: [
+              {
+                type: "Control",
+                scope: "#/properties/queryParams",
+                options: {
+                  detail: {
+                    type: "VerticalLayout",
+                    elements: [
+                      {
+                        type: "Control",
+                        scope: "#/properties/key"
+                      },
+                      {
+                        type: "Control",
+                        scope: "#/properties/value"
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          },
+          {
+            type: "Category",
+            label: "Body",
+            rule: {
+              effect: "SHOW",
+              condition: {
+                scope: "#/properties/method",
+                schema: { enum: ["POST", "PUT", "PATCH"] }
+              }
+            },
+            elements: [
+              {
+                type: "Control",
+                scope: "#/properties/body"
+              }
+            ]
+          },
+          {
+            type: "Category",
+            label: "Advanced",
+            elements: [
+              {
+                type: "Control",
+                scope: "#/properties/followRedirects"
+              },
+              {
+                type: "Control",
+                scope: "#/properties/sslVerify"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        type: "Control",
+        scope: "#/properties/args",
+        label: "Arguments",
+        options: {
+          detail: {
+            type: "VerticalLayout",
+            elements: [
+              {
+                type: "Control",
+                scope: "#/properties/key"
+              },
+              {
+                type: "Control",
+                scope: "#/properties/type"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  data: {
+    apiEndpoint: "/data ",
+    method: "GET",
+    timeout: 10,
+    authType: "bearer",
+    bearerToken: "your-bearer-token-here",
+    headers: [{ key: "X-Custom-Header", value: "HeaderValue" }],
+    queryParams: [{ key: "filter", value: "active" }],
+    contentType: "application/json",
+    followRedirects: true,
+    sslVerify: true
+  }
+};
+var formConfig_default3 = {
+  schema: {
+    type: "object",
+    properties: {
+      url: {
+        type: "string",
+        description: "URL to fetch data from"
+      },
+      timeout: {
+        type: "integer",
+        description: "Request timeout in seconds",
+        minimum: 1
+      }
+    },
+    required: [
+      "url"
+    ]
+  },
+  uischema: {
+    type: "VerticalLayout",
+    elements: [
+      {
+        type: "Control",
+        scope: "#/properties/url",
+        label: "URL"
+      },
+      {
+        type: "Control",
+        scope: "#/properties/timeout",
+        label: "Timeout"
+      }
+    ]
+  },
+  data: {
+    url: "https://api.example.com/v1/data",
+    timeout: 10
+  }
+};
+var queryConfig_default3 = {
+  schema: {
+    type: "object",
+    properties: {
+      action: {
+        type: "string",
+        description: "Action to perform",
+        enum: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+        default: "GET"
+      },
+      args: {
+        type: "array",
+        description: "Query arguments",
+        items: {
+          type: "object",
+          properties: {
+            key: {
+              type: "string"
+            },
+            type: {
+              type: "string",
+              enum: [
+                "string",
+                "number",
+                "boolean",
+                "array (, separated)",
+                "object (JSON stringified)"
+              ],
+              default: "string"
+            }
+          },
+          required: ["key", "type"]
+        }
+      }
+    },
+    required: ["action"]
+  },
+  uischema: {
+    type: "VerticalLayout",
+    elements: [
+      {
+        type: "Control",
+        scope: "#/properties/action",
+        label: "Action"
+      },
+      {
+        type: "Control",
+        scope: "#/properties/args",
+        label: "Arguments",
+        options: {
+          detail: {
+            type: "VerticalLayout",
+            elements: [
+              {
+                type: "Control",
+                scope: "#/properties/key"
+              },
+              {
+                type: "Control",
+                scope: "#/properties/type"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  data: {
+    action: "GET",
+    timeout: 10,
+    args: [
+      { key: "user_id", value: "123" },
+      { key: "status", value: "active" }
+    ]
+  }
+};
 var DATASOURCE_TYPES = {
   POSTGRESQL: {
     name: "PostgreSQL",
-    value: "postgresql"
+    value: "postgresql",
+    formConfig: formConfig_default,
+    queryConfigForm: queryConfig_default
   },
   MYSQL: {
     name: "MySQL",
@@ -61657,11 +62792,15 @@ var DATASOURCE_TYPES = {
   },
   RESTAPI: {
     name: "REST API",
-    value: "restapi"
+    value: "restapi",
+    formConfig: formConfig_default2,
+    queryConfigForm: queryConfig_default2
   },
   WEB_URL: {
     name: "Web URL",
-    value: "weburl"
+    value: "weburl",
+    formConfig: formConfig_default3,
+    queryConfigForm: queryConfig_default3
   }
 };
 
@@ -69563,7 +70702,7 @@ var QueryResponseTableTab = ({
       sx: { width, height },
       className: `!flex !flex-col !justify-start !items-stretch ${className2}`
     },
-    !dataSchema ? /* @__PURE__ */ React5.createElement("div", { className: "!h-32 flex !flex-col !justify-center !items-center w-full text-slate-500" }, /* @__PURE__ */ React5.createElement("span", null, "Data schema not valid or no data available")) : !columns ? /* @__PURE__ */ React5.createElement("div", { className: "!h-32 flex !flex-col !justify-center !items-center w-full text-slate-500" }, /* @__PURE__ */ React5.createElement("span", null, "Columns cannot be extracted or mapped")) : data2 && Array.isArray(data2) && data2.length && columns ? /* @__PURE__ */ React5.createElement(
+    !dataSchema ? /* @__PURE__ */ React5.createElement("div", { className: "!h-32 flex flex-col justify-center items-center w-full text-slate-500" }, /* @__PURE__ */ React5.createElement("span", null, "Data schema not valid or no data available")) : !columns ? /* @__PURE__ */ React5.createElement("div", { className: "!h-32 flex !flex-col !justify-center !items-center w-full text-slate-500" }, /* @__PURE__ */ React5.createElement("span", null, "Columns cannot be extracted or mapped")) : data2 && Array.isArray(data2) && data2.length && columns ? /* @__PURE__ */ React5.createElement(
       DataGrid,
       {
         rows: data2.map((item, index) => {
@@ -69687,1044 +70826,36 @@ var QueryResponseView = ({ queryResult }) => {
   ), /* @__PURE__ */ React6.createElement("div", { className: "w-100  h-full overflow-y-auto pb-5" }, tab4 === 0 && /* @__PURE__ */ React6.createElement(QueryResponseTableTab, { data: queryResult ? queryResult : "" }), tab4 === 1 && /* @__PURE__ */ React6.createElement(QueryResponseJSONTab, { data: queryResult ? queryResult : "" }), tab4 === 2 && /* @__PURE__ */ React6.createElement(QueryResponseRAWTab, { data: queryResult ? queryResult : "" }), tab4 === 3 && /* @__PURE__ */ React6.createElement(QueryResponseSchemaTab, { data: queryResult ? queryResult : {} })));
 };
 
-// src/components/postgresql/formConfig.json
-var formConfig_default = {
-  schema: {
-    type: "object",
-    properties: {
-      connectionOption: {
-        type: "string",
-        enum: ["connectionDetails", "connectionString"],
-        default: "connectionDetails",
-        description: "Choose to enter connection details or a connection string."
-      },
-      connectionDetails: {
-        type: "object",
-        properties: {
-          connectionName: {
-            type: "string",
-            description: "A unique name for this data source connection.",
-            minLength: 3
-          },
-          host: {
-            type: "string",
-            description: "The hostname or IP address of the PostgreSQL server.",
-            format: "hostname"
-          },
-          port: {
-            type: "integer",
-            description: "The port number of the PostgreSQL server (default is 5432).",
-            minimum: 1,
-            maximum: 65535,
-            default: 5432
-          },
-          database: {
-            type: "string",
-            description: "The name of the database to connect to.",
-            minLength: 1
-          },
-          user: {
-            type: "string",
-            description: "The username for connecting to the database.",
-            minLength: 1
-          },
-          password: {
-            type: "string",
-            description: "The password for the specified user.",
-            format: "password"
-          },
-          sslMode: {
-            type: "string",
-            description: "SSL mode for the connection.",
-            enum: [
-              "disable",
-              "allow",
-              "prefer",
-              "require",
-              "verify-ca",
-              "verify-full"
-            ],
-            default: "prefer"
-          },
-          additionalOptions: {
-            type: "object",
-            description: "Additional connection options (e.g., timeout, application name).",
-            properties: {
-              connectTimeout: {
-                type: "integer",
-                description: "Connection timeout in seconds.",
-                minimum: 0
-              },
-              applicationName: {
-                type: "string",
-                description: "Application name to be sent to the server."
-              }
-            },
-            additionalProperties: true
-          }
-        },
-        required: ["connectionName", "host", "database", "user", "password"]
-      },
-      connectionString: {
-        type: "string",
-        description: "The full PostgreSQL connection string (e.g., 'postgresql://user:password@host:port/database').",
-        minLength: 1
-      }
-    },
-    required: ["connectionOption"],
-    allOf: [
-      {
-        if: {
-          properties: {
-            connectionOption: {
-              const: "connectionDetails"
-            }
-          }
-        },
-        then: {
-          required: ["connectionDetails"]
-        }
-      },
-      {
-        if: {
-          properties: {
-            connectionOption: {
-              const: "connectionString"
-            }
-          }
-        },
-        then: {
-          required: ["connectionString"]
-        }
-      }
-    ]
-  },
-  uischema: {
-    type: "VerticalLayout",
-    elements: [
-      {
-        type: "Control",
-        scope: "#/properties/connectionOption",
-        label: "Connection Type"
-      },
-      {
-        type: "Group",
-        label: "Connection Details",
-        rule: {
-          effect: "SHOW",
-          condition: {
-            scope: "#/properties/connectionOption",
-            schema: { const: "connectionDetails" }
-          }
-        },
-        elements: [
-          {
-            type: "HorizontalLayout",
-            elements: [
-              {
-                type: "Control",
-                scope: "#/properties/connectionDetails/properties/connectionName",
-                label: "Connection Name"
-              },
-              {
-                type: "Control",
-                scope: "#/properties/connectionDetails/properties/host",
-                label: "Host"
-              },
-              {
-                type: "Control",
-                scope: "#/properties/connectionDetails/properties/port",
-                label: "Port"
-              }
-            ]
-          },
-          {
-            type: "HorizontalLayout",
-            elements: [
-              {
-                type: "Control",
-                scope: "#/properties/connectionDetails/properties/database",
-                label: "Database Name"
-              },
-              {
-                type: "Control",
-                scope: "#/properties/connectionDetails/properties/user",
-                label: "Username"
-              },
-              {
-                type: "Control",
-                scope: "#/properties/connectionDetails/properties/password",
-                label: "Password",
-                options: {
-                  format: "password"
-                }
-              }
-            ]
-          },
-          {
-            type: "Control",
-            scope: "#/properties/connectionDetails/properties/sslMode",
-            label: "SSL Mode"
-          },
-          {
-            type: "Group",
-            label: "Advanced Options",
-            elements: [
-              {
-                type: "Control",
-                scope: "#/properties/connectionDetails/properties/additionalOptions/properties/connectTimeout",
-                label: "Connection Timeout (seconds)"
-              },
-              {
-                type: "Control",
-                scope: "#/properties/connectionDetails/properties/additionalOptions/properties/applicationName",
-                label: "Application Name"
-              }
-            ]
-          }
-        ]
-      },
-      {
-        type: "Group",
-        label: "Connection String",
-        rule: {
-          effect: "SHOW",
-          condition: {
-            scope: "#/properties/connectionOption",
-            schema: { const: "connectionString" }
-          }
-        },
-        elements: [
-          {
-            type: "Control",
-            scope: "#/properties/connectionString",
-            label: "Connection String"
-          }
-        ]
-      }
-    ]
-  },
-  data: {
-    connectionOption: "connectionDetails",
-    connectionDetails: {
-      connectionName: "MyDevPostgres",
-      host: "localhost",
-      port: 5432,
-      database: "mydatabase",
-      user: "dbuser",
-      password: "securepassword",
-      sslMode: "prefer",
-      additionalOptions: {
-        connectTimeout: 10,
-        applicationName: "JSONFormsApp"
-      }
-    },
-    connectionString: ""
-  }
-};
-
-// src/components/postgresql/query/queryConfig.json
-var queryConfig_default = {
-  schema: {
-    type: "object",
-    properties: {
-      queryType: {
-        type: "string",
-        enum: ["query", "gui"],
-        default: "query"
-      },
-      query: {
-        type: "string",
-        description: "PostgreSQL code to execute",
-        format: "code-pgsql"
-      },
-      args: {
-        type: "array",
-        description: "Query arguments",
-        items: {
-          type: "object",
-          properties: {
-            key: {
-              type: "string"
-            },
-            type: {
-              type: "string",
-              enum: [
-                "string",
-                "number",
-                "boolean",
-                "array (, separated)",
-                "object (JSON stringified)"
-              ],
-              default: "string"
-            }
-          },
-          required: ["key", "type"]
-        }
-      }
-    },
-    required: ["queryType"]
-  },
-  uischema: {
-    type: "VerticalLayout",
-    elements: [
-      {
-        type: "Control",
-        scope: "#/properties/queryType",
-        label: "Query Type"
-      },
-      {
-        type: "Group",
-        label: "Raw SQL",
-        rule: {
-          effect: "SHOW",
-          condition: {
-            scope: "#/properties/queryType",
-            schema: { const: "query" }
-          }
-        },
-        elements: [
-          {
-            type: "Control",
-            scope: "#/properties/query",
-            label: "Raw sql"
-          }
-        ]
-      },
-      {
-        type: "Control",
-        scope: "#/properties/args",
-        label: "Arguments",
-        options: {
-          detail: {
-            type: "VerticalLayout",
-            elements: [
-              {
-                type: "Control",
-                scope: "#/properties/key"
-              },
-              {
-                type: "Control",
-                scope: "#/properties/type"
-              }
-            ]
-          }
-        }
-      }
-    ]
-  },
-  data: {
-    queryType: "query",
-    query: "SELECT id, name FROM users WHERE active = true;",
-    args: [
-      { key: "user_id", value: "123" },
-      { key: "status", value: "active" }
-    ]
-  }
-};
-
 // src/components/postgresql/datasource/datasourceTestResultUI.jsx
+var import_prop_types6 = __toESM(require_prop_types());
 import React7 from "react";
 var PostgreSQLDatasourceTestResultUI = ({ connectionResult }) => {
-  const statusClasses = connectionResult ? "bg-green-100 !border-green-400 text-green-700" : "bg-red-100 !border-red-400 text-red-700";
+  PostgreSQLDatasourceTestResultUI.propTypes = {
+    connectionResult: import_prop_types6.default.object
+  };
+  let connectionResultClass = "bg-slate-100 !border-slate-400 text-slate-700";
+  let connectionResultText = "Connection not tested";
+  if (connectionResult === true) {
+    connectionResultClass = "bg-green-100 !border-green-400 text-green-700";
+    connectionResultText = "Connection successful";
+  } else if (connectionResult === false) {
+    connectionResultClass = "bg-red-100 !border-red-400 text-red-700";
+    connectionResultText = "Connection failed";
+    connectionResult = "Connection failed";
+  } else if (connectionResult === void 0) {
+    connectionResultClass = "bg-slate-100 !border-slate-400 text-slate-700";
+    connectionResultText = "Connection not tested";
+  } else {
+    connectionResultClass = "bg-orange-100 !border-orange-400 text-orange-700";
+    connectionResultText = "Error testing connection";
+  }
   return /* @__PURE__ */ React7.createElement("div", { className: "p-3" }, /* @__PURE__ */ React7.createElement(
     "div",
     {
-      className: `w-full flex flex-col justify-start items-start p-3 rounded-md border ${statusClasses}`
+      className: `w-full flex flex-col justify-start items-start p-3 rounded-md border ${connectionResultClass}`
     },
-    /* @__PURE__ */ React7.createElement("div", { className: "!flex !flex-row justify-start items-center" }, /* @__PURE__ */ React7.createElement("span", { className: "!text-sm !font-normal" }, connectionResult ? "Connection successful" : "Connection failed"))
+    /* @__PURE__ */ React7.createElement("div", { className: "!flex !flex-row justify-start items-center" }, /* @__PURE__ */ React7.createElement("span", { className: "!text-sm !font-normal" }, connectionResultText))
   ));
-};
-
-// src/components/restapi/formConfig.json
-var formConfig_default2 = {
-  schema: {
-    type: "object",
-    properties: {
-      baseUrl: {
-        type: "string",
-        description: "Base URL of the REST API (e.g., https://api.example.com )"
-      },
-      method: {
-        type: "string",
-        enum: [
-          "GET",
-          "POST",
-          "PUT",
-          "DELETE",
-          "PATCH"
-        ],
-        default: "GET"
-      },
-      timeout: {
-        type: "integer",
-        description: "Request timeout in seconds",
-        minimum: 1
-      },
-      authType: {
-        type: "string",
-        enum: [
-          "none",
-          "basic",
-          "bearer",
-          "oauth2"
-        ],
-        default: "none"
-      },
-      username: {
-        type: "string",
-        description: "Username for Basic Auth"
-      },
-      password: {
-        type: "string",
-        description: "Password for Basic Auth",
-        format: "password"
-      },
-      bearerToken: {
-        type: "string",
-        description: "Bearer token for authentication",
-        format: "password"
-      },
-      oauth2: {
-        type: "object",
-        properties: {
-          clientId: {
-            type: "string"
-          },
-          clientSecret: {
-            type: "string",
-            format: "password"
-          },
-          tokenUrl: {
-            type: "string",
-            format: "uri"
-          }
-        },
-        required: [
-          "clientId",
-          "clientSecret",
-          "tokenUrl"
-        ]
-      },
-      headers: {
-        type: "array",
-        items: {
-          type: "object",
-          properties: {
-            key: {
-              type: "string"
-            },
-            value: {
-              type: "string"
-            }
-          },
-          required: [
-            "key",
-            "value"
-          ]
-        }
-      },
-      queryParams: {
-        type: "array",
-        items: {
-          type: "object",
-          properties: {
-            key: {
-              type: "string"
-            },
-            value: {
-              type: "string"
-            }
-          },
-          required: [
-            "key",
-            "value"
-          ]
-        }
-      },
-      body: {
-        type: "string",
-        description: "Request body (for POST/PUT/PATCH)"
-      },
-      contentType: {
-        type: "string",
-        enum: [
-          "application/json",
-          "application/xml",
-          "text/plain"
-        ],
-        default: "application/json"
-      },
-      followRedirects: {
-        type: "boolean",
-        default: true
-      },
-      sslVerify: {
-        type: "boolean",
-        default: true
-      }
-    },
-    required: [
-      "baseUrl",
-      "method"
-    ]
-  },
-  uischema: {
-    type: "VerticalLayout",
-    elements: [
-      {
-        type: "Categorization",
-        elements: [
-          {
-            type: "Category",
-            label: "General",
-            elements: [
-              {
-                type: "Control",
-                scope: "#/properties/baseUrl"
-              },
-              {
-                type: "Control",
-                scope: "#/properties/method"
-              },
-              {
-                type: "Control",
-                scope: "#/properties/timeout"
-              },
-              {
-                type: "Control",
-                scope: "#/properties/contentType"
-              }
-            ]
-          },
-          {
-            type: "Category",
-            label: "Authentication",
-            elements: [
-              {
-                type: "Control",
-                scope: "#/properties/authType"
-              },
-              {
-                type: "Group",
-                label: "Basic Auth",
-                rule: {
-                  effect: "SHOW",
-                  condition: {
-                    scope: "#/properties/authType",
-                    schema: {
-                      const: "basic"
-                    }
-                  }
-                },
-                elements: [
-                  {
-                    type: "Control",
-                    scope: "#/properties/username"
-                  },
-                  {
-                    type: "Control",
-                    scope: "#/properties/password"
-                  }
-                ]
-              },
-              {
-                type: "Group",
-                label: "Bearer Token",
-                rule: {
-                  effect: "SHOW",
-                  condition: {
-                    scope: "#/properties/authType",
-                    schema: {
-                      const: "bearer"
-                    }
-                  }
-                },
-                elements: [
-                  {
-                    type: "Control",
-                    scope: "#/properties/bearerToken"
-                  }
-                ]
-              },
-              {
-                type: "Group",
-                label: "OAuth2",
-                rule: {
-                  effect: "SHOW",
-                  condition: {
-                    scope: "#/properties/authType",
-                    schema: {
-                      const: "oauth2"
-                    }
-                  }
-                },
-                elements: [
-                  {
-                    type: "Control",
-                    scope: "#/properties/oauth2/properties/clientId"
-                  },
-                  {
-                    type: "Control",
-                    scope: "#/properties/oauth2/properties/clientSecret"
-                  },
-                  {
-                    type: "Control",
-                    scope: "#/properties/oauth2/properties/tokenUrl"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            type: "Category",
-            label: "Headers",
-            elements: [
-              {
-                type: "Control",
-                scope: "#/properties/headers",
-                options: {
-                  detail: {
-                    type: "VerticalLayout",
-                    elements: [
-                      {
-                        type: "Control",
-                        scope: "#/properties/key"
-                      },
-                      {
-                        type: "Control",
-                        scope: "#/properties/value"
-                      }
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            type: "Category",
-            label: "Query Params",
-            elements: [
-              {
-                type: "Control",
-                scope: "#/properties/queryParams",
-                options: {
-                  detail: {
-                    type: "VerticalLayout",
-                    elements: [
-                      {
-                        type: "Control",
-                        scope: "#/properties/key"
-                      },
-                      {
-                        type: "Control",
-                        scope: "#/properties/value"
-                      }
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            type: "Category",
-            label: "Body",
-            rule: {
-              effect: "SHOW",
-              condition: {
-                scope: "#/properties/method",
-                schema: {
-                  enum: [
-                    "POST",
-                    "PUT",
-                    "PATCH"
-                  ]
-                }
-              }
-            },
-            elements: [
-              {
-                type: "Control",
-                scope: "#/properties/body"
-              }
-            ]
-          },
-          {
-            type: "Category",
-            label: "Advanced",
-            elements: [
-              {
-                type: "Control",
-                scope: "#/properties/followRedirects"
-              },
-              {
-                type: "Control",
-                scope: "#/properties/sslVerify"
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  data: {
-    baseUrl: "https://api.example.com",
-    method: "GET",
-    timeout: 10,
-    authType: "bearer",
-    bearerToken: "your-bearer-token-here",
-    headers: [
-      {
-        key: "X-Custom-Header",
-        value: "HeaderValue"
-      }
-    ],
-    queryParams: [
-      {
-        key: "filter",
-        value: "active"
-      }
-    ],
-    contentType: "application/json",
-    followRedirects: true,
-    sslVerify: true
-  }
-};
-
-// src/components/restapi/query/queryConfig.json
-var queryConfig_default2 = {
-  schema: {
-    type: "object",
-    properties: {
-      apiEndpoint: {
-        type: "string",
-        description: "Base URL of the REST API (e.g., https://api.example.com/v1 )"
-      },
-      method: {
-        type: "string",
-        enum: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-        default: "GET"
-      },
-      timeout: {
-        type: "integer",
-        description: "Request timeout in seconds",
-        minimum: 1
-      },
-      authType: {
-        type: "string",
-        enum: ["none", "basic", "bearer", "oauth2"],
-        default: "none"
-      },
-      username: {
-        type: "string",
-        description: "Username for Basic Auth"
-      },
-      password: {
-        type: "string",
-        description: "Password for Basic Auth",
-        format: "password"
-      },
-      bearerToken: {
-        type: "string",
-        description: "Bearer token for authentication",
-        format: "password"
-      },
-      oauth2: {
-        type: "object",
-        properties: {
-          clientId: { type: "string" },
-          clientSecret: { type: "string", format: "password" },
-          tokenUrl: { type: "string", format: "uri" }
-        },
-        required: ["clientId", "clientSecret", "tokenUrl"]
-      },
-      headers: {
-        type: "array",
-        items: {
-          type: "object",
-          properties: {
-            key: { type: "string" },
-            value: { type: "string" }
-          },
-          required: ["key", "value"]
-        }
-      },
-      queryParams: {
-        type: "array",
-        items: {
-          type: "object",
-          properties: {
-            key: { type: "string" },
-            value: { type: "string" }
-          },
-          required: ["key", "value"]
-        }
-      },
-      body: {
-        type: "string",
-        description: "Request body (for POST/PUT/PATCH)"
-      },
-      contentType: {
-        type: "string",
-        enum: ["application/json", "application/xml", "text/plain"],
-        default: "application/json"
-      },
-      followRedirects: {
-        type: "boolean",
-        default: true
-      },
-      sslVerify: {
-        type: "boolean",
-        default: true
-      },
-      args: {
-        type: "array",
-        description: "Query arguments",
-        items: {
-          type: "object",
-          properties: {
-            key: {
-              type: "string"
-            },
-            type: {
-              type: "string",
-              enum: [
-                "string",
-                "number",
-                "boolean",
-                "array (, separated)",
-                "object (JSON stringified)"
-              ],
-              default: "string"
-            }
-          },
-          required: ["key", "type"]
-        }
-      }
-    },
-    required: [
-      "apiEndpoint",
-      "method"
-    ]
-  },
-  uischema: {
-    type: "VerticalLayout",
-    elements: [
-      {
-        type: "Categorization",
-        elements: [
-          {
-            type: "Category",
-            label: "General",
-            elements: [
-              {
-                type: "Control",
-                scope: "#/properties/apiEndpoint"
-              },
-              {
-                type: "Control",
-                scope: "#/properties/method"
-              },
-              {
-                type: "Control",
-                scope: "#/properties/timeout"
-              },
-              {
-                type: "Control",
-                scope: "#/properties/contentType"
-              }
-            ]
-          },
-          {
-            type: "Category",
-            label: "Authentication",
-            elements: [
-              {
-                type: "Control",
-                scope: "#/properties/authType"
-              },
-              {
-                type: "Group",
-                label: "Basic Auth",
-                rule: {
-                  effect: "SHOW",
-                  condition: {
-                    scope: "#/properties/authType",
-                    schema: { const: "basic" }
-                  }
-                },
-                elements: [
-                  {
-                    type: "Control",
-                    scope: "#/properties/username"
-                  },
-                  {
-                    type: "Control",
-                    scope: "#/properties/password"
-                  }
-                ]
-              },
-              {
-                type: "Group",
-                label: "Bearer Token",
-                rule: {
-                  effect: "SHOW",
-                  condition: {
-                    scope: "#/properties/authType",
-                    schema: { const: "bearer" }
-                  }
-                },
-                elements: [
-                  {
-                    type: "Control",
-                    scope: "#/properties/bearerToken"
-                  }
-                ]
-              },
-              {
-                type: "Group",
-                label: "OAuth2",
-                rule: {
-                  effect: "SHOW",
-                  condition: {
-                    scope: "#/properties/authType",
-                    schema: { const: "oauth2" }
-                  }
-                },
-                elements: [
-                  {
-                    type: "Control",
-                    scope: "#/properties/oauth2/properties/clientId"
-                  },
-                  {
-                    type: "Control",
-                    scope: "#/properties/oauth2/properties/clientSecret"
-                  },
-                  {
-                    type: "Control",
-                    scope: "#/properties/oauth2/properties/tokenUrl"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            type: "Category",
-            label: "Headers",
-            elements: [
-              {
-                type: "Control",
-                scope: "#/properties/headers",
-                options: {
-                  detail: {
-                    type: "VerticalLayout",
-                    elements: [
-                      {
-                        type: "Control",
-                        scope: "#/properties/key"
-                      },
-                      {
-                        type: "Control",
-                        scope: "#/properties/value"
-                      }
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            type: "Category",
-            label: "Query Params",
-            elements: [
-              {
-                type: "Control",
-                scope: "#/properties/queryParams",
-                options: {
-                  detail: {
-                    type: "VerticalLayout",
-                    elements: [
-                      {
-                        type: "Control",
-                        scope: "#/properties/key"
-                      },
-                      {
-                        type: "Control",
-                        scope: "#/properties/value"
-                      }
-                    ]
-                  }
-                }
-              }
-            ]
-          },
-          {
-            type: "Category",
-            label: "Body",
-            rule: {
-              effect: "SHOW",
-              condition: {
-                scope: "#/properties/method",
-                schema: { enum: ["POST", "PUT", "PATCH"] }
-              }
-            },
-            elements: [
-              {
-                type: "Control",
-                scope: "#/properties/body"
-              }
-            ]
-          },
-          {
-            type: "Category",
-            label: "Advanced",
-            elements: [
-              {
-                type: "Control",
-                scope: "#/properties/followRedirects"
-              },
-              {
-                type: "Control",
-                scope: "#/properties/sslVerify"
-              }
-            ]
-          }
-        ]
-      },
-      {
-        type: "Control",
-        scope: "#/properties/args",
-        label: "Arguments",
-        options: {
-          detail: {
-            type: "VerticalLayout",
-            elements: [
-              {
-                type: "Control",
-                scope: "#/properties/key"
-              },
-              {
-                type: "Control",
-                scope: "#/properties/type"
-              }
-            ]
-          }
-        }
-      }
-    ]
-  },
-  data: {
-    apiEndpoint: "/data ",
-    method: "GET",
-    timeout: 10,
-    authType: "bearer",
-    bearerToken: "your-bearer-token-here",
-    headers: [{ key: "X-Custom-Header", value: "HeaderValue" }],
-    queryParams: [{ key: "filter", value: "active" }],
-    contentType: "application/json",
-    followRedirects: true,
-    sslVerify: true
-  }
 };
 
 // src/components/restapi/datasource/datasourceTestResultUI.jsx
@@ -70752,124 +70883,6 @@ var RESTAPIDatasourceTestResultUI = ({ connectionResult }) => {
       className: "border-slate-300 focus:border-slate-300 focus:outline-slate-300 flex-grow non-focusable-code-editor !h-full"
     }
   )));
-};
-
-// src/components/weburl/formConfig.json
-var formConfig_default3 = {
-  schema: {
-    type: "object",
-    properties: {
-      url: {
-        type: "string",
-        description: "URL to fetch data from"
-      },
-      timeout: {
-        type: "integer",
-        description: "Request timeout in seconds",
-        minimum: 1
-      }
-    },
-    required: [
-      "url"
-    ]
-  },
-  uischema: {
-    type: "VerticalLayout",
-    elements: [
-      {
-        type: "Control",
-        scope: "#/properties/url",
-        label: "URL"
-      },
-      {
-        type: "Control",
-        scope: "#/properties/timeout",
-        label: "Timeout"
-      }
-    ]
-  },
-  data: {
-    url: "https://api.example.com/v1/data",
-    timeout: 10
-  }
-};
-
-// src/components/weburl/query/queryConfig.json
-var queryConfig_default3 = {
-  schema: {
-    type: "object",
-    properties: {
-      action: {
-        type: "string",
-        description: "Action to perform",
-        enum: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-        default: "GET"
-      },
-      args: {
-        type: "array",
-        description: "Query arguments",
-        items: {
-          type: "object",
-          properties: {
-            key: {
-              type: "string"
-            },
-            type: {
-              type: "string",
-              enum: [
-                "string",
-                "number",
-                "boolean",
-                "array (, separated)",
-                "object (JSON stringified)"
-              ],
-              default: "string"
-            }
-          },
-          required: ["key", "type"]
-        }
-      }
-    },
-    required: ["action"]
-  },
-  uischema: {
-    type: "VerticalLayout",
-    elements: [
-      {
-        type: "Control",
-        scope: "#/properties/action",
-        label: "Action"
-      },
-      {
-        type: "Control",
-        scope: "#/properties/args",
-        label: "Arguments",
-        options: {
-          detail: {
-            type: "VerticalLayout",
-            elements: [
-              {
-                type: "Control",
-                scope: "#/properties/key"
-              },
-              {
-                type: "Control",
-                scope: "#/properties/type"
-              }
-            ]
-          }
-        }
-      }
-    ]
-  },
-  data: {
-    action: "GET",
-    timeout: 10,
-    args: [
-      { key: "user_id", value: "123" },
-      { key: "status", value: "active" }
-    ]
-  }
 };
 
 // src/components/weburl/datasource/datasourceTestResultUI.jsx
@@ -70902,10 +70915,10 @@ var WebURLDatasourceTestResultUI = ({ connectionResult }) => {
 // src/components/common/webViewQueryResponseView.js
 import { Tab as Tab2, Tabs as Tabs2 } from "@mui/material";
 import React11, { useState as useState3 } from "react";
-var import_prop_types7 = __toESM(require_prop_types());
+var import_prop_types8 = __toESM(require_prop_types());
 
 // src/components/common/queryResponseWebViewTab.js
-var import_prop_types6 = __toESM(require_prop_types());
+var import_prop_types7 = __toESM(require_prop_types());
 import React10 from "react";
 var QueryResponseWebViewTab = ({
   data: data2,
@@ -70914,10 +70927,10 @@ var QueryResponseWebViewTab = ({
   width = "100%"
 }) => {
   QueryResponseWebViewTab.propTypes = {
-    data: import_prop_types6.default.array,
-    className: import_prop_types6.default.string,
-    height: import_prop_types6.default.string,
-    width: import_prop_types6.default.string
+    data: import_prop_types7.default.array,
+    className: import_prop_types7.default.string,
+    height: import_prop_types7.default.string,
+    width: import_prop_types7.default.string
   };
   console.log("data", data2);
   return /* @__PURE__ */ React10.createElement("div", { className: "w-100 flex-grow h-full overflow-y-auto pb-5" }, /* @__PURE__ */ React10.createElement(
@@ -70933,7 +70946,7 @@ var QueryResponseWebViewTab = ({
 // src/components/common/webViewQueryResponseView.js
 var WebViewQueryResponseView = ({ queryResult }) => {
   WebViewQueryResponseView.propTypes = {
-    queryResult: import_prop_types7.default.object
+    queryResult: import_prop_types8.default.object
   };
   console.log("queryResult", queryResult);
   const [tab4, setTab] = useState3(0);
@@ -70998,8 +71011,8 @@ var WebViewQueryResponseView = ({ queryResult }) => {
 // src/index.js
 var DATASOURCE_UI_COMPONENTS = {
   [DATASOURCE_TYPES.POSTGRESQL.value]: {
-    formConfig: formConfig_default,
-    queryConfigForm: queryConfig_default,
+    formConfig: DATASOURCE_TYPES.POSTGRESQL.formConfig,
+    queryConfigForm: DATASOURCE_TYPES.POSTGRESQL.queryConfigForm,
     queryResponseView: function({ queryResult }) {
       return React12.createElement(QueryResponseView, { queryResult });
     },
@@ -71010,8 +71023,8 @@ var DATASOURCE_UI_COMPONENTS = {
     }
   },
   [DATASOURCE_TYPES.RESTAPI.value]: {
-    formConfig: formConfig_default2,
-    queryConfigForm: queryConfig_default2,
+    formConfig: DATASOURCE_TYPES.RESTAPI.formConfig,
+    queryConfigForm: DATASOURCE_TYPES.RESTAPI.queryConfigForm,
     queryResponseView: function({ queryResult }) {
       return React12.createElement(QueryResponseView, { queryResult });
     },
@@ -71022,8 +71035,8 @@ var DATASOURCE_UI_COMPONENTS = {
     }
   },
   [DATASOURCE_TYPES.WEB_URL.value]: {
-    formConfig: formConfig_default3,
-    queryConfigForm: queryConfig_default3,
+    formConfig: DATASOURCE_TYPES.WEB_URL.formConfig,
+    queryConfigForm: DATASOURCE_TYPES.WEB_URL.queryConfigForm,
     datasourceTestResultUI: function({ connectionResult }) {
       return React12.createElement(WebURLDatasourceTestResultUI, {
         connectionResult

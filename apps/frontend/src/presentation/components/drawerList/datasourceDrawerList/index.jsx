@@ -35,7 +35,7 @@ export const DatasourceDrawerList = () => {
           <div className="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
         </div>
       ) : datasources && datasources.length > 0 ? (
-        <div className="h-full w-full overflow-y-auto">
+          <div className="h-full w-full overflow-y-auto pb-10">
           {datasources.map((datasource) => {
             const key = `datasource_${datasource.datasourceID}`;
             const isActive =

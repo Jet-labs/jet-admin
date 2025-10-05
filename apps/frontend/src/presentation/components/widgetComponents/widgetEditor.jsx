@@ -32,11 +32,9 @@ export const WidgetEditor = ({ widgetEditorForm }) => {
       {
         tempId: new Date().getTime(),
         title: "",
-        dataQueryID: "",
-        parameters: {
-          type: CONSTANTS.WIDGET_TYPES.TEXT_WIDGET.value,
-          color: "#D84545",
-        },
+        dataQueryID: null,
+        valueType: "static",
+        parameters: WIDGETS_MAP[widgetEditorForm.values.widgetType].sampleConfig,
         dataQueryArgValues: {},
         datasetFields: {
           xAxis: "",

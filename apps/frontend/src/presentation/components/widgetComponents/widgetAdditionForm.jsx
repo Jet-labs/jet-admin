@@ -104,6 +104,8 @@ export const WidgetAdditionForm = ({ tenantID }) => {
     }
   }, [addWidgetForm]);
 
+  console.log("addWidgetForm", addWidgetForm);
+
   return (
     <div className="w-full flex flex-col justify-start items-center h-full">
       <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl text-start w-full p-3">

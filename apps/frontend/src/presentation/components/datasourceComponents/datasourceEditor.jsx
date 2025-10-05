@@ -9,18 +9,21 @@ import { DATASOURCE_UI_COMPONENTS } from "@jet-admin/datasources-ui";
 import { DATASOURCE_TYPES } from "@jet-admin/datasource-types";
 import { CONSTANTS } from "../../../constants";
 import { customJSONFormRenderers } from "../ui/jsonFormCustomRenderer";
+import { useCallback } from "react";
 
 export const DatasourceEditor = ({ datasourceEditorForm }) => {
   DatasourceEditor.propTypes = {
     datasourceEditorForm: PropTypes.object.isRequired,
   };
   // This handler specifically updates the 'datasourceOptions' part of Formik's state
-  const handleDatasourceOptionsChange = ({ data }) => {
+  const handleDatasourceOptionsChange = useCallback(({ data }) => {
     // Update only the 'datasourceOptions' field in Formik's state
+    console.log('data', data);
     datasourceEditorForm.setFieldValue("datasourceOptions", data);
     // You could also attempt to map JSON Forms errors to Formik's errors for 'datasourceOptions'
     // but often Yup handles it sufficiently for overall form validity.
-  };
+  }, [datasourceEditorForm]);
+
 
   return (
     <>
@@ -91,6 +94,7 @@ export const DatasourceEditor = ({ datasourceEditorForm }) => {
             }
           </h2>
           <JsonForms
+
             schema={
               DATASOURCE_UI_COMPONENTS[
                 datasourceEditorForm.values.datasourceType

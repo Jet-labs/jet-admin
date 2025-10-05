@@ -15,6 +15,8 @@ const {
 expressApp.use(cookieParser());
 expressApp.use("/api/v1/auth", require("./modules/auth/auth.v1.routes"));
 expressApp.use("/api/v1/tenants", require("./modules/tenant/tenant.v1.routes"));
+expressApp.use("/api/v1/mcp", require("./modules/mcp/mcp.v1.routes"));
+
 
 // Global error-handling middleware
 expressApp.use((err, req, res, next) => {
