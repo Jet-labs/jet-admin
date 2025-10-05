@@ -19,7 +19,7 @@ apiKeyService.getAllAPIKeys = async ({ userID, tenantID }) => {
   try {
     const apiKeys = await prisma.tblAPIKeys.findMany({
       where: {
-        tenantID: parseInt(tenantID),
+        tenantID: tenantID,
       },
     });
 
@@ -63,8 +63,8 @@ apiKeyService.createAPIKey = async ({
       // Create the role
       const apiKey = await prisma.tblAPIKeys.create({
         data: {
-          tenantID: parseInt(tenantID),
-          creatorID: parseInt(userID),
+          tenantID: tenantID,
+          creatorID: userID,
           apiKeyTitle,
           apiKey: generateAPIKey(),
           isDisabled: false,
@@ -73,8 +73,8 @@ apiKeyService.createAPIKey = async ({
 
       // Create permission mappings
       const apiKeyRoleMappings = roleIDs.map((roleID) => ({
-        roleID: parseInt(roleID),
-        apiKeyID: parseInt(apiKey.apiKeyID),
+        roleID: roleID,
+        apiKeyID: apiKey.apiKeyID,
       }));
 
       await tx.tblAPIKeyRoleMappings.createMany({
@@ -115,8 +115,8 @@ apiKeyService.getAPIKeyByID = async ({ userID, tenantID, apiKeyID }) => {
   try {
     const apiKey = await prisma.tblAPIKeys.findFirst({
       where: {
-        apiKeyID: parseInt(apiKeyID),
-        tenantID: parseInt(tenantID),
+        apiKeyID: apiKeyID,
+        tenantID: tenantID,
       },
       include: {
         tblAPIKeyRoleMappings: true,
@@ -211,7 +211,7 @@ apiKeyService.updateAPIKeyByID = async ({
         // Create new mappings
         if (roleIDs.length > 0) {
           const newMappings = roleIDs.map((roleID) => ({
-            roleID: parseInt(roleID),
+            roleID: roleID,
             apiKeyID,
           }));
 

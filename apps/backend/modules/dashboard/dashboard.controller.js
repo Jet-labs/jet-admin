@@ -23,7 +23,7 @@ dashboardController.getAllDashboards = async (req, res) => {
     });
 
     const dashboards = await dashboardService.getAllDashboards({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       tenantID,
     });
 
@@ -72,7 +72,7 @@ dashboardController.createDashboard = async (req, res) => {
     });
 
     const result = await dashboardService.createDashboard({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       tenantID,
       dashboardTitle,
       dashboardDescription,
@@ -122,7 +122,7 @@ dashboardController.getDashboardByID = async (req, res) => {
     });
 
     const dashboard = await dashboardService.getDashboardByID({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       tenantID,
       dashboardID,
     });
@@ -168,7 +168,7 @@ dashboardController.cloneDashboardByID = async (req, res) => {
     });
 
     await dashboardService.cloneDashboardByID({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       tenantID,
       dashboardID,
     });
@@ -218,7 +218,7 @@ dashboardController.updateDashboardByID = async (req, res) => {
     });
 
     const result = await dashboardService.updateDashboardByID({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       tenantID,
       dashboardID,
       dashboardConfig,
@@ -270,7 +270,7 @@ dashboardController.deleteDashboardByID = async (req, res) => {
     });
 
     const result = await dashboardService.deleteDashboardByID({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       tenantID,
       dashboardID,
     });

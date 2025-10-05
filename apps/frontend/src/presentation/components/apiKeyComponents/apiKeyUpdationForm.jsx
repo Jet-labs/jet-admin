@@ -97,7 +97,7 @@ export const APIKeyUpdationForm = ({ tenantID, apiKeyID }) => {
       console.log(apiKey.roles);
       apiKeyUpdationForm.setFieldValue(
         "roleIDs",
-        apiKey.roles?.map((r) => parseInt(r.roleID)) || []
+        apiKey.roles?.map((r) => r.roleID) || []
       );
     }
   }, [apiKey]);

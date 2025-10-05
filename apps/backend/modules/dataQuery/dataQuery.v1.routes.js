@@ -38,9 +38,7 @@ router.post(
 
 router.post(
   "/:dataQueryID/clone",
-  param("dataQueryID")
-    .isNumeric()
-    .withMessage("dataQueryID must be a number"),
+  param("dataQueryID").isUUID().withMessage("dataQueryID must be a uuid"),
   expressUtils.validationChecker,
   authMiddleware.checkUserPermissions(["tenant:query:clone"]),
   dataQueryController.cloneDataQueryByID
@@ -63,40 +61,32 @@ router.patch(
 );
 router.get(
   "/:dataQueryID",
-  param("dataQueryID")
-    .isNumeric()
-    .withMessage("dataQueryID must be a number"),
+  param("dataQueryID").isUUID().withMessage("dataQueryID must be a uuid"),
   expressUtils.validationChecker,
   authMiddleware.checkUserPermissions(["tenant:query:read"]),
   dataQueryController.getDataQueryByID
 );
 router.post(
   "/:dataQueryID/queryTest",
-  param("dataQueryID").isNumeric().withMessage("dataQueryID must be a number"),
+  param("dataQueryID").isUUID().withMessage("dataQueryID must be a uuid"),
   expressUtils.validationChecker,
   authMiddleware.checkUserPermissions(["tenant:query:test"]),
   dataQueryController.runDataQueryByID
 );
 router.patch(
   "/:dataQueryID",
-  param("dataQueryID")
-    .isNumeric()
-    .withMessage("dataQueryID must be a number"),
+  param("dataQueryID").isUUID().withMessage("dataQueryID must be a uuid"),
   body("dataQueryOptions")
     .notEmpty()
     .withMessage("dataQueryOptions is required"),
-  body("dataQueryTitle")
-    .notEmpty()
-    .withMessage("dataQueryTitle is required"),
+  body("dataQueryTitle").notEmpty().withMessage("dataQueryTitle is required"),
   expressUtils.validationChecker,
   authMiddleware.checkUserPermissions(["tenant:query:update"]),
   dataQueryController.updateDataQueryByID
 );
 router.delete(
   "/:dataQueryID",
-  param("dataQueryID")
-    .isNumeric()
-    .withMessage("dataQueryID must be a number"),
+  param("dataQueryID").isUUID().withMessage("dataQueryID must be a uuid"),
   expressUtils.validationChecker,
   authMiddleware.checkUserPermissions(["tenant:query:delete"]),
   dataQueryController.deleteDataQueryByID

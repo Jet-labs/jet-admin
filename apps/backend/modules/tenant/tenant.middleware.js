@@ -25,8 +25,8 @@ tenantMiddleware.checkIfUserIsAdmin = async (req, res, next) => {
       params: { userID: user.userID, tenantID },
     });
     const isTenantAdmin = await tenantService.checkIfUserIsAdmin({
-      tenantID: parseInt(tenantID),
-      userID: parseInt(user.userID),
+      tenantID: tenantID,
+      userID: user.userID,
     });
     if (isTenantAdmin) {
       Logger.log("success", {
@@ -84,7 +84,7 @@ tenantMiddleware.checkTenantCreationLimit = async function (req, res, next) {
     });
     const userCreatedTenantCount =
       await tenantService.getUserCreatedTenantCount({
-        userID: parseInt(user.userID),
+        userID: user.userID,
       });
     if (userPlan.maxTenantCount > userCreatedTenantCount) {
       Logger.log("success", {
@@ -114,12 +114,7 @@ tenantMiddleware.checkTenantCreationLimit = async function (req, res, next) {
         error,
       },
     });
-    return expressUtils.sendResponse(
-      res,
-      false,
-      {},
-      error
-    );
+    return expressUtils.sendResponse(res, false, {}, error);
   }
 };
 

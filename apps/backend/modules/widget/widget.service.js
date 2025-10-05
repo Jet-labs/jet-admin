@@ -35,7 +35,7 @@ widgetService.getAllWidgets = async ({ userID, tenantID }) => {
   try {
     const widgets = await prisma.tblWidgets.findMany({
       where: {
-        tenantID: parseInt(tenantID),
+        tenantID: tenantID,
       },
     });
     Logger.log("success", {
@@ -94,19 +94,19 @@ widgetService.createWidget = async ({
     await prisma.$transaction(async (tx) => {
       const widget = await tx.tblWidgets.create({
         data: {
-          tenantID: parseInt(tenantID),
+          tenantID: tenantID,
           widgetTitle,
           widgetDescription,
           widgetType,
           widgetConfig,
-          creatorID: parseInt(userID),
+          creatorID: userID,
         },
       });
       await tx.tblWidgetQueryMappings.createMany({
         data: dataQueries.map((dataQuery) => {
           return {
             widgetID: widget.widgetID,
-            dataQueryID: parseInt(dataQuery.dataQueryID),
+            dataQueryID: dataQuery.dataQueryID,
             title: dataQuery.title,
             parameters: dataQuery.parameters,
             datasetFields: dataQuery.datasetFields,
@@ -120,7 +120,7 @@ widgetService.createWidget = async ({
       message: "widgetService:createWidget:success",
       params: {
         userID,
-        tenantID: parseInt(tenantID),
+        tenantID: tenantID,
         widgetTitle,
         widgetDescription,
         widgetConfig,
@@ -160,8 +160,8 @@ widgetService.getWidgetByID = async ({ userID, tenantID, widgetID }) => {
   try {
     const widget = await prisma.tblWidgets.findFirst({
       where: {
-        tenantID: parseInt(tenantID),
-        widgetID: parseInt(widgetID),
+        tenantID: tenantID,
+        widgetID: widgetID,
       },
       include: {
         tblWidgetQueryMappings: true,
@@ -208,8 +208,8 @@ widgetService.cloneWidgetByID = async ({ userID, tenantID, widgetID }) => {
   try {
     const widget = await prisma.tblWidgets.findFirst({
       where: {
-        tenantID: parseInt(tenantID),
-        widgetID: parseInt(widgetID),
+        tenantID: tenantID,
+        widgetID: widgetID,
       },
       include: {
         tblWidgetQueryMappings: true,
@@ -221,19 +221,19 @@ widgetService.cloneWidgetByID = async ({ userID, tenantID, widgetID }) => {
     await prisma.$transaction(async (tx) => {
       const newWidget = await tx.tblWidgets.create({
         data: {
-          tenantID: parseInt(tenantID),
+          tenantID: tenantID,
           widgetTitle: widget.widgetTitle + " (Copy)",
           widgetDescription: widget.widgetDescription,
           widgetType: widget.widgetType,
           widgetConfig: widget.widgetConfig,
-          creatorID: parseInt(userID),
+          creatorID: userID,
         },
       });
       await tx.tblWidgetQueryMappings.createMany({
         data: widget.tblWidgetQueryMappings.map((widgetQueryMapping) => {
           return {
             widgetID: newWidget.widgetID,
-            dataQueryID: parseInt(widgetQueryMapping.dataQueryID),
+            dataQueryID: widgetQueryMapping.dataQueryID,
             title: widgetQueryMapping.title,
             parameters: widgetQueryMapping.parameters,
             datasetFields: widgetQueryMapping.datasetFields,
@@ -289,7 +289,7 @@ widgetService.getWidgetDataByID = async ({
   try {
     // 1. Fetch widget configuration with related queries
     let _widget = await prisma.tblWidgets.findUnique({
-      where: { widgetID: parseInt(widgetID, 10) },
+      where: { widgetID: widgetID },
       include: {
         tblWidgetQueryMappings: {
           include: {
@@ -464,8 +464,7 @@ widgetService.getWidgetDataUsingWidget = async ({
   widget,
 }) => {
   Logger.log("info", {
-    message:
-      "widgetService:getWidgetDataUsingWidget:params",
+    message: "widgetService:getWidgetDataUsingWidget:params",
     params: {
       userID,
       tenantID,
@@ -474,61 +473,20 @@ widgetService.getWidgetDataUsingWidget = async ({
   });
 
   try {
-    const dataQueries = await prisma.tblDataQueries.findMany({
-      where: {
-        dataQueryID: {
-          in: Array.from(widget.dataQueries).map((t) =>
-            parseInt(t.dataQueryID)
-          ),
-        },
-      },
-    });
-
-    Logger.log("info", {
-      message:
-        "widgetService:getWidgetDataUsingWidget:dataQueries",
-      params: {
-        userID,
-        tenantID,
-        dataQueries,
-      },
-    });
-
-    const dataQueryIDMap = {};
-    dataQueries.forEach((t) => {
-      dataQueryIDMap[t.dataQueryID] = t;
-    });
-
-    // 2. Prepare queries for execution
-    const dataQueriesToExecute = widget.dataQueries.map(
-      (dataQuery) => ({
-        dataQueryID: dataQuery.dataQueryID,
-        dataQueryOptions: {
-          ...dataQueryIDMap[dataQuery.dataQueryID].dataQueryOptions,
-          dataQueryArgValues: dataQuery.dataQueryArgValues,
-        },
+    const dataQueriesResult = await Promise.all(
+      widget.dataQueries.map((dataQuery) => {
+        const argValues = dataQuery.dataQueryArgValues;
+        return dataQueryService.runDataQueryByID({
+          userID,
+          tenantID,
+          dataQueryID: dataQuery.dataQueryID,
+          argValues: argValues,
+        });
       })
     );
 
     Logger.log("info", {
-      message:
-        "widgetService:getWidgetDataUsingWidget:queries-prepared",
-      params: {
-        dataQueriesToExecuteCount: dataQueriesToExecute.length,
-      },
-    });
-
-    // 3. Execute all queries
-    const dataQueriesResult = await dataQueryService.runDataQueries({
-      userID,
-      tenantID,
-      dbPool,
-      dataQueries: dataQueriesToExecute,
-    });
-
-    Logger.log("info", {
-      message:
-        "widgetService:getWidgetDataUsingWidget:dataQueriesResult",
+      message: "widgetService:getWidgetDataUsingWidget:dataQueriesResult",
       params: {
         dataQueriesResultCount: dataQueriesResult?.length,
       },
@@ -607,8 +565,7 @@ widgetService.getWidgetDataUsingWidget = async ({
     };
   } catch (error) {
     Logger.log("error", {
-      message:
-        "widgetService:getWidgetDataUsingWidget:catch-1",
+      message: "widgetService:getWidgetDataUsingWidget:catch-1",
       params: {
         error,
         userID,
@@ -668,8 +625,8 @@ widgetService.updateWidgetByID = async ({
     // Fetch existing widget and verify ownership
     const existingWidget = await prisma.tblWidgets.findFirst({
       where: {
-        widgetID: parseInt(widgetID),
-        tenantID: parseInt(tenantID),
+        widgetID: widgetID,
+        tenantID: tenantID,
       },
     });
 
@@ -679,7 +636,7 @@ widgetService.updateWidgetByID = async ({
     await prisma.$transaction(async (tx) => {
       // Update main widget data
       const updatedWidget = await tx.tblWidgets.update({
-        where: { widgetID: parseInt(widgetID) },
+        where: { widgetID: widgetID },
         data: {
           ...(widgetTitle != undefined && { widgetTitle }),
           ...(widgetDescription != undefined && {
@@ -694,14 +651,14 @@ widgetService.updateWidgetByID = async ({
       if (dataQueries) {
         // Delete existing mappings
         await tx.tblWidgetQueryMappings.deleteMany({
-          where: { widgetID: parseInt(widgetID) },
+          where: { widgetID: widgetID },
         });
 
         // Create new mappings
         await tx.tblWidgetQueryMappings.createMany({
           data: dataQueries.map((q) => ({
-            widgetID: parseInt(widgetID),
-            dataQueryID: parseInt(q.dataQueryID),
+            widgetID: widgetID,
+            dataQueryID: q.dataQueryID,
             title: q.title,
             parameters: q.parameters,
             executionOrder: q.executionOrder,
@@ -746,11 +703,7 @@ widgetService.updateWidgetByID = async ({
  * @param {number} param0.widgetID
  * @returns {Promise<boolean>}
  */
-widgetService.deleteWidgetByID = async ({
-  userID,
-  tenantID,
-  widgetID,
-}) => {
+widgetService.deleteWidgetByID = async ({ userID, tenantID, widgetID }) => {
   Logger.log("info", {
     message: "widgetService:deleteWidgetByID:params",
     params: {
@@ -764,8 +717,8 @@ widgetService.deleteWidgetByID = async ({
     // Update the database query using Prisma
     await prisma.tblWidgets.delete({
       where: {
-        widgetID: parseInt(widgetID), // Assuming `id` is the primary key for the query
-        tenantID: parseInt(tenantID), // Ensure tenantID matches for security
+        widgetID: widgetID, // Assuming `id` is the primary key for the query
+        tenantID: tenantID, // Ensure tenantID matches for security
       },
     });
 

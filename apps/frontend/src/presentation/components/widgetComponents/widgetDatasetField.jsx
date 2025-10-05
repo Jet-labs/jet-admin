@@ -28,7 +28,6 @@ export const WidgetDatasetField = ({
   dataQueries,
   datasetFields,
 }) => {
-  console.log({ datasetFields });
   WidgetDatasetField.propTypes = {
     index: PropTypes.number.isRequired,
     widgetForm: PropTypes.object.isRequired,
@@ -51,13 +50,11 @@ export const WidgetDatasetField = ({
     return dataQueries
       ? dataQueries.find(
           (q) =>
-            parseInt(q.dataQueryID) ===
-            parseInt(widgetForm.values.dataQueries[index]?.dataQueryID || 0)
+          q.dataQueryID ==
+          widgetForm.values.dataQueries[index]?.dataQueryID
         )
       : null;
   }, [dataQueries, widgetForm.values.dataQueries, index]);
-
-  console.log({ selectedQuery });
 
   const _handleTestQuery = useCallback(() => {
     setSelectedQueryForTesting(selectedQuery);

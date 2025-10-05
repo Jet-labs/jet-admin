@@ -44,12 +44,12 @@ cronJobController.createCronJob = async (req, res) => {
     });
 
     const newCronJob = await cronJobService.createCronJob({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       cronJobTitle,
-      tenantID: parseInt(tenantID),
+      tenantID,
       cronJobDescription,
       cronJobSchedule,
-      dataQueryID: parseInt(dataQueryID),
+      dataQueryID,
       dataQueryArgValues,
       isDisabled,
       timeoutSeconds,
@@ -109,7 +109,7 @@ cronJobController.getAllCronJobs = async (req, res) => {
     });
 
     const cronJobs = await cronJobService.getAllCronJobs({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       tenantID,
     });
 
@@ -155,9 +155,9 @@ cronJobController.getCronJobByID = async (req, res) => {
     });
 
     const cronJob = await cronJobService.getCronJobByID({
-      userID: parseInt(user.userID),
-      tenantID: parseInt(tenantID),
-      cronJobID: parseInt(cronJobID),
+      userID: user.userID,
+      tenantID: tenantID,
+      cronJobID: cronJobID,
     });
 
     if (!cronJob) {
@@ -228,7 +228,7 @@ cronJobController.updateCronJobByID = async (req, res) => {
       cronJobTitle,
       cronJobDescription,
       cronJobSchedule,
-      dataQueryID: parseInt(dataQueryID),
+      dataQueryID,
       dataQueryArgValues,
       isDisabled,
       timeoutSeconds,
@@ -246,9 +246,9 @@ cronJobController.updateCronJobByID = async (req, res) => {
     });
 
     const updatedCronJob = await cronJobService.updateCronJobByID({
-      userID: parseInt(user.userID),
-      tenantID: parseInt(tenantID),
-      cronJobID: parseInt(cronJobID),
+      userID: user.userID,
+      tenantID: tenantID,
+      cronJobID: cronJobID,
       updateData,
     });
 
@@ -301,9 +301,9 @@ cronJobController.deleteCronJobByID = async (req, res) => {
     });
 
     await cronJobService.deleteCronJobByID({
-      userID: parseInt(user.userID),
-      tenantID: parseInt(tenantID),
-      cronJobID: parseInt(cronJobID),
+      userID: user.userID,
+      tenantID: tenantID,
+      cronJobID: cronJobID,
     });
 
     Logger.log("success", {
@@ -356,9 +356,9 @@ cronJobController.getCronJobHistoryByID = async (req, res) => {
 
     const { cronJobHistory, cronJobHistoryCount } =
       await cronJobService.getCronJobHistoryByID({
-        userID: parseInt(user.userID),
-        cronJobID: parseInt(cronJobID),
-        tenantID: parseInt(tenantID),
+        userID: user.userID,
+        cronJobID: cronJobID,
+        tenantID: tenantID,
         skip,
         take,
       });

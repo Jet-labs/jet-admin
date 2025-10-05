@@ -26,7 +26,7 @@ router.post(
 
 router.get(
   "/:dashboardID",
-  param("dashboardID").isNumeric().withMessage("dashboardID must be a number"),
+  param("dashboardID").isUUID().withMessage("dashboardID must be a uuid"),
   expressUtils.validationChecker,
   authMiddleware.checkUserPermissions(["tenant:dashboard:read"]),
   dashboardController.getDashboardByID
@@ -34,7 +34,7 @@ router.get(
 
 router.post(
   "/:dashboardID/clone",
-  param("dashboardID").isNumeric().withMessage("dashboardID must be a number"),
+  param("dashboardID").isUUID().withMessage("dashboardID must be a uuid"),
   expressUtils.validationChecker,
   authMiddleware.checkUserPermissions(["tenant:dashboard:clone"]),
   dashboardController.cloneDashboardByID
@@ -42,7 +42,7 @@ router.post(
 
 router.patch(
   "/:dashboardID",
-  param("dashboardID").isNumeric().withMessage("dashboardID must be a number"),
+  param("dashboardID").isUUID().withMessage("dashboardID must be a uuid"),
   body("dashboardTitle").notEmpty().withMessage("dashboardTitle is required"),
   body("dashboardDescription")
     .optional()
@@ -56,7 +56,7 @@ router.patch(
 
 router.delete(
   "/:dashboardID",
-  param("dashboardID").isNumeric().withMessage("dashboardID must be a number"),
+  param("dashboardID").isUUID().withMessage("dashboardID must be a uuid"),
   expressUtils.validationChecker,
   authMiddleware.checkUserPermissions(["tenant:dashboard:delete"]),
   dashboardController.deleteDashboardByID

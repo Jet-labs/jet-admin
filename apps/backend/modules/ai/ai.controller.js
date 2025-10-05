@@ -40,19 +40,15 @@ aiController.generateAIPromptForChatVisualization = async ({ aiPrompt ,firebaseI
       },
     });
 
-    const dataQueries = await dataQueryService.getDataQueriesWithDatasource(
-      {
-        userID: parseInt(user.userID),
-        tenantID,
-      }
-    );
+    const dataQueries = await dataQueryService.getDataQueriesWithDatasource({
+      userID: user.userID,
+      tenantID,
+    });
 
-    const dataSources = await datasourceService.getAllDatasources(
-      {
-        userID: parseInt(user.userID),
-        tenantID,
-      }
-    );
+    const dataSources = await datasourceService.getAllDatasources({
+      userID: user.userID,
+      tenantID,
+    });
 
     Logger.log("info", {
       message: "aiController:generateAIPromptForChatVisualization:schema",

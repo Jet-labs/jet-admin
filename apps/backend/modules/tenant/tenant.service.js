@@ -62,33 +62,33 @@ tenantService.getUserTenantByID = async ({ userID, tenantID, dbPool }) => {
 
     try {
       tenantRoles = await tenantRoleService.getAllTenantRoles({
-        userID: parseInt(userID),
-        tenantID: parseInt(tenantID),
+        userID: userID,
+        tenantID: tenantID,
       });
       tenantDatabaseMetadata =
         await databaseService.getDatabaseMetadataForTenant({
-          userID: parseInt(userID),
+          userID: userID,
           dbPool,
         });
       tenantDashboards = await dashboardService.getAllDashboards({
-        userID: parseInt(userID),
-        tenantID: parseInt(tenantID),
+        userID: userID,
+        tenantID: tenantID,
       });
       tenantDataQueries = await dataQueryService.getAllDataQueries({
-        userID: parseInt(userID),
-        tenantID: parseInt(tenantID),
+        userID: userID,
+        tenantID: tenantID,
       });
       tenantWidgets = await widgetService.getAllWidgets({
-        userID: parseInt(userID),
-        tenantID: parseInt(tenantID),
+        userID: userID,
+        tenantID: tenantID,
       });
       tenantCronJobs = await cronJobService.getAllCronJobs({
-        userID: parseInt(userID),
-        tenantID: parseInt(tenantID),
+        userID: userID,
+        tenantID: tenantID,
       });
       tenantAPIKeys = await apiKeyService.getAllAPIKeys({
-        userID: parseInt(userID),
-        tenantID: parseInt(tenantID),
+        userID: userID,
+        tenantID: tenantID,
       });
     } catch (error) {
       Logger.log("error", {
@@ -315,14 +315,14 @@ tenantService.createTenant = async ({
           tenantTitle,
           tenantLogoURL,
           tenantDBURL,
-          creatorID: parseInt(userID),
+          creatorID: userID,
           tenantDBType,
         },
       });
       // add user config
       const newUserConfig = await tx.tblUserTenantConfigMap.create({
         data: {
-          userID: parseInt(userID),
+          userID: userID,
           tenantID: newTenant.tenantID,
           config: {},
         },

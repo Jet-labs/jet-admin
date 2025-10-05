@@ -20,11 +20,12 @@ databaseTriggerController.getAllDatabaseTriggers = async (req, res) => {
       params: { userID: user.userID, databaseSchemaName },
     });
 
-    const databaseTriggers = await databaseTriggerService.getAllDatabaseTriggers({
-      userID: parseInt(user.userID),
-      dbPool,
-      databaseSchemaName,
-    });
+    const databaseTriggers =
+      await databaseTriggerService.getAllDatabaseTriggers({
+        userID: user.userID,
+        dbPool,
+        databaseSchemaName,
+      });
 
     Logger.log("success", {
       message: "databaseTriggerController:getAllDatabaseTriggers:success",
@@ -66,13 +67,14 @@ databaseTriggerController.getDatabaseTriggerByName = async (req, res) => {
       },
     });
 
-    const databaseTrigger = await databaseTriggerService.getDatabaseTriggerByName({
-      userID: parseInt(user.userID),
-      dbPool,
-      databaseSchemaName,
-      databaseTableName,
-      databaseTriggerName,
-    });
+    const databaseTrigger =
+      await databaseTriggerService.getDatabaseTriggerByName({
+        userID: user.userID,
+        dbPool,
+        databaseSchemaName,
+        databaseTableName,
+        databaseTriggerName,
+      });
 
     Logger.log("success", {
       message: "databaseTriggerController:getDatabaseTriggerByName:success",
@@ -116,7 +118,7 @@ databaseTriggerController.deleteDatabaseTriggerByName = async (req, res) => {
     });
 
     const result = await databaseTriggerService.deleteDatabaseTriggerByName({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       dbPool,
       databaseSchemaName,
       databaseTableName,
@@ -187,7 +189,7 @@ databaseTriggerController.createDatabaseTrigger = async (req, res) => {
     });
 
     const result = await databaseTriggerService.createDatabaseTrigger({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       dbPool,
       databaseSchemaName,
       databaseTableName,

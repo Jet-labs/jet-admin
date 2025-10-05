@@ -12,7 +12,7 @@ const notificationService = {};
  * @returns {Promise<object>}
  */
 notificationService.sendUserTenantAdditionNotification = async ({
-    notifierID,
+  notifierID,
   userID,
   tenantID,
 }) => {
@@ -28,14 +28,15 @@ notificationService.sendUserTenantAdditionNotification = async ({
   try {
     const notification = await prisma.tblUserNotifications.create({
       data: {
-        userID: parseInt(userID),
-        tenantID: parseInt(tenantID),
+        userID: userID,
+        tenantID: tenantID,
         notifierID: `user_${notifierID}`,
         title: constants.STRINGS.USER_TENANT_ADDITION_NOTIFICATION_TITLE,
-        description: constants.STRINGS.USER_TENANT_ADDITION_NOTIFICATION_DESCRIPTION,
-        actionType:'link',
-        action:`../tenants/${parseInt(tenantID)}`,
-        actionText:'View Tenant'
+        description:
+          constants.STRINGS.USER_TENANT_ADDITION_NOTIFICATION_DESCRIPTION,
+        actionType: "link",
+        action: `../tenants/${tenantID}`,
+        actionText: "View Tenant",
       },
     });
     Logger.log("success", {
@@ -54,7 +55,7 @@ notificationService.sendUserTenantAdditionNotification = async ({
         notifierID,
         userID,
         tenantID,
-        error
+        error,
       },
     });
     throw error;
@@ -71,8 +72,8 @@ notificationService.sendUserTenantAdditionNotification = async ({
  */
 notificationService.getAllUserNotifications = async ({
   userID,
-  skip=0,
-  take=20,
+  skip = 0,
+  take = 20,
 }) => {
   Logger.log("info", {
     message: "notificationService:getAllUserNotifications:params",
@@ -86,7 +87,7 @@ notificationService.getAllUserNotifications = async ({
   try {
     const notifications = await prisma.tblUserNotifications.findMany({
       where: {
-        userID: parseInt(userID),
+        userID: userID,
       },
       skip,
       take,

@@ -177,7 +177,7 @@ export const MainDrawerList = () => {
     data: databaseMetadata,
   } = useQuery({
     queryKey: [CONSTANTS.REACT_QUERY_KEYS.DATABASE_METADATA(tenantID)],
-    queryFn: () => getDatabaseMetadataAPI({ tenantID: parseInt(tenantID) }),
+    queryFn: () => getDatabaseMetadataAPI({ tenantID: tenantID }),
     enabled: Boolean(user),
     refetchOnWindowFocus: false,
   });
@@ -206,7 +206,7 @@ export const MainDrawerList = () => {
         databaseMetadata?.schemas?.map((schema) => ({
           name: capitalize(schema.databaseSchemaName),
           path: CONSTANTS.ROUTES.VIEW_SCHEMA.path(
-            parseInt(tenantID),
+            tenantID,
             schema.databaseSchemaName
           ),
           icon: MdOutlineSchema,

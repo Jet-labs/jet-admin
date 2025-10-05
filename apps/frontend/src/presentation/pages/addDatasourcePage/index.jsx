@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 
 const AddDatasourcePage = () => {
     const { tenantID } = useParams();
-    return <DatasourceAdditionForm tenantID={parseInt(tenantID)} />;
+    return <DatasourceAdditionForm tenantID={tenantID} />;
 };
 
 export default AddDatasourcePage;

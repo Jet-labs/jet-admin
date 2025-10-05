@@ -14,27 +14,21 @@ router.get(
 );
 router.get(
   "/:tenantUserID",
-  param("tenantUserID")
-    .isNumeric()
-    .withMessage("tenantUserID must be a number"),
+  param("tenantUserID").isUUID().withMessage("tenantUserID must be a uuid"),
   expressUtils.validationChecker,
   authMiddleware.checkUserPermissions(["tenant:user:read"]),
   userManagementController.getTenantUserByID
 );
 router.delete(
   "/:tenantUserID",
-  param("tenantUserID")
-    .isNumeric()
-    .withMessage("tenantUserID must be a number"),
+  param("tenantUserID").isUUID().withMessage("tenantUserID must be a uuid"),
   expressUtils.validationChecker,
   authMiddleware.checkUserPermissions(["tenant:user:delete"]),
   userManagementController.removeTenantUserFromTenantByID
 );
 router.patch(
   "/:tenantUserID/roles",
-  param("tenantUserID")
-    .isNumeric()
-    .withMessage("tenantUserID must be a number"),
+  param("tenantUserID").isUUID().withMessage("tenantUserID must be a uuid"),
   body("roleIDs").isArray().withMessage("roleIDs must be an array"),
   body("userTenantRelationship")
     .optional()

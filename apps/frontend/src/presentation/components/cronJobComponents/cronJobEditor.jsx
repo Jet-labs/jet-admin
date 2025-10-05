@@ -20,8 +20,8 @@ export const CronJobEditor = ({ cronJobEditorForm }) => {
     return dataQueries
       ? dataQueries.find(
           (q) =>
-            parseInt(q.dataQueryID) ===
-            parseInt(cronJobEditorForm.values?.dataQueryID || 0)
+          q.dataQueryID ==
+          cronJobEditorForm.values?.dataQueryID
         )
       : null;
   }, [dataQueries, cronJobEditorForm.values]);

@@ -36,7 +36,7 @@ export const DefaultDashboardSelectionLayout = ({
   const [currentBreakpoint, setCurrentBreakpoint] = useState("lg");
   const pinnedDashboardID =
     userConfig && userConfig[userConfigKey]
-      ? parseInt(userConfig[userConfigKey])
+      ? userConfig[userConfigKey]
       : null;
   const {
     isLoading: isLoadingDashboards,

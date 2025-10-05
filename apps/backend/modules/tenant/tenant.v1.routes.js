@@ -29,7 +29,7 @@ router.get("/", tenantController.getAllUserTenants);
 
 router.get(
   "/:tenantID",
-  param("tenantID").isNumeric().withMessage("tenantID must be a number"),
+  param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
   expressUtils.validationChecker,
   authMiddleware.checkUserPermissions(["tenant:read"]),
   tenantMiddleware.poolProvider,
@@ -38,7 +38,7 @@ router.get(
 
 router.delete(
   "/:tenantID",
-  param("tenantID").isNumeric().withMessage("tenantID must be a number"),
+  param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
   expressUtils.validationChecker,
   authMiddleware.checkUserPermissions(["tenant:delete"]),
   tenantMiddleware.poolProvider,
@@ -59,7 +59,7 @@ router.patch("/dbtest", tenantController.testTenantDatabaseConnection);
 
 router.patch(
   "/:tenantID",
-  param("tenantID").isNumeric().withMessage("tenantID must be a number"),
+  param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
   body("tenantTitle").notEmpty().withMessage("tenantTitle is required"),
   body("tenantDBURL").notEmpty().withMessage("tenantDBURL is required"),
   body("tenantDBType")
@@ -76,6 +76,7 @@ router.patch(
 
 router.use(
   "/:tenantID/ai",
+  param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
   authMiddleware.checkUserPermissions(["tenant:ai"]),
   tenantMiddleware.poolProvider,
   aiRouter
@@ -83,6 +84,7 @@ router.use(
 
 router.use(
   "/:tenantID/mcp",
+  param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
   authMiddleware.checkUserPermissions(["tenant:mcp"]),
   tenantMiddleware.poolProvider,
   mcpRouter
@@ -91,6 +93,7 @@ router.use(
 // Nested database routes
 router.use(
   "/:tenantID/database",
+  param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
   expressUtils.validationChecker,
   authMiddleware.checkUserPermissions(["tenant:database"]),
   tenantMiddleware.poolProvider,
@@ -100,6 +103,7 @@ router.use(
 // Nested user management routes
 router.use(
   "/:tenantID/users",
+  param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
   authMiddleware.checkUserPermissions(["tenant:user"]),
   userManagementRouter
 );
@@ -107,6 +111,7 @@ router.use(
 // Nested user management routes
 router.use(
   "/:tenantID/roles",
+  param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
   authMiddleware.checkUserPermissions(["tenant:role"]),
   tenantRoleRouter
 );
@@ -114,12 +119,14 @@ router.use(
 // Nested APIKey routes
 router.use(
   "/:tenantID/apikeys",
+  param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
   authMiddleware.checkUserPermissions(["tenant:apikey"]),
   tenantAPIKeyRouter
 );
 
 router.use(
   "/:tenantID/cronjobs",
+  param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
   authMiddleware.checkUserPermissions(["tenant:cronjobs"]),
   tenantMiddleware.poolProvider,
   cronjobRouter
@@ -127,6 +134,7 @@ router.use(
 
 router.use(
   "/:tenantID/datasources",
+  param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
   authMiddleware.checkUserPermissions(["tenant:datasource"]),
   tenantMiddleware.poolProvider,
   datasourceRouter
@@ -134,6 +142,7 @@ router.use(
 
 router.use(
   "/:tenantID/queries",
+  param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
   authMiddleware.checkUserPermissions(["tenant:query"]),
   tenantMiddleware.poolProvider,
   dataQueryRouter
@@ -141,6 +150,7 @@ router.use(
 
 router.use(
   "/:tenantID/widgets",
+  param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
   authMiddleware.checkUserPermissions(["tenant:widget"]),
   tenantMiddleware.poolProvider,
   widgetRouter
@@ -148,6 +158,7 @@ router.use(
 
 router.use(
   "/:tenantID/dashboards",
+  param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
   authMiddleware.checkUserPermissions(["tenant:dashboard"]),
   tenantMiddleware.poolProvider,
   dashboardRouter
@@ -155,6 +166,7 @@ router.use(
 
 router.use(
   "/:tenantID/audit",
+  param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
   authMiddleware.checkUserPermissions(["tenant:audit"]),
   auditLogRouter
 );

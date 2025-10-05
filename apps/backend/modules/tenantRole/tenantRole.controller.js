@@ -21,7 +21,7 @@ tenantRoleController.createRole = async (req, res) => {
     });
 
     await tenantRoleService.createRole({
-      tenantID: parseInt(tenantID),
+      tenantID: tenantID,
       roleTitle,
       roleDescription,
       permissionIDs,
@@ -58,8 +58,8 @@ tenantRoleController.getAllTenantRoles = async (req, res) => {
       params: { userID: user.userID, tenantID },
     });
     const roles = await tenantRoleService.getAllTenantRoles({
-      userID: parseInt(user.userID),
-      tenantID: parseInt(tenantID),
+      userID: user.userID,
+      tenantID: tenantID,
     });
 
     Logger.log("success", {
@@ -93,8 +93,8 @@ tenantRoleController.getAllTenantPermissions = async (req, res) => {
       params: { userID: user.userID, tenantID },
     });
     const permissions = await tenantRoleService.getAllTenantPermissions({
-      userID: parseInt(user.userID),
-      tenantID: parseInt(tenantID),
+      userID: user.userID,
+      tenantID: tenantID,
     });
 
     Logger.log("success", {
@@ -128,7 +128,7 @@ tenantRoleController.getTenantRoleByID = async (req, res) => {
       params: { roleID },
     });
 
-    const role = await tenantRoleService.getTenantRoleByID(parseInt(roleID));
+    const role = await tenantRoleService.getTenantRoleByID(roleID);
 
     if (!role) {
       return expressUtils.sendResponse(res, false, {}, "Role not found");
@@ -167,8 +167,8 @@ tenantRoleController.updateTenantRoleByID = async (req, res) => {
     });
 
     await tenantRoleService.updateTenantRoleByID({
-      tenantID: parseInt(tenantID),
-      roleID: parseInt(roleID),
+      tenantID: tenantID,
+      roleID: roleID,
       roleTitle,
       roleDescription,
       permissionIDs,
@@ -206,8 +206,8 @@ tenantRoleController.deleteTenantRoleByID = async (req, res) => {
     });
 
     const deletedRole = await tenantRoleService.deleteTenantRoleByID({
-      tenantID: parseInt(tenantID),
-      roleID: parseInt(roleID),
+      tenantID: tenantID,
+      roleID: roleID,
     });
 
     if (!deletedRole) {

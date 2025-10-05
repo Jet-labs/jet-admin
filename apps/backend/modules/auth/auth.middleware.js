@@ -226,7 +226,7 @@ authMiddleware.checkUserPermissions = (
       }
       const permissionCheck = await authService.checkUserPermissions({
         userID,
-        tenantID: parseInt(tenantID),
+        tenantID: tenantID,
         requiredPermissions,
         requireAll,
       });

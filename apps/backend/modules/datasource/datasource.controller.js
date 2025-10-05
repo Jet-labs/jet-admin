@@ -23,7 +23,7 @@ datasourceController.getAllDatasources = async (req, res) => {
     });
 
     const datasources = await datasourceService.getAllDatasources({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       tenantID,
     });
 
@@ -72,7 +72,7 @@ datasourceController.testDatasourceConnection = async (req, res) => {
     });
 
     const connectionResult = await datasourceService.testDatasourceConnection({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       tenantID,
       datasourceType,
       datasourceOptions,
@@ -118,7 +118,7 @@ datasourceController.getDatasourceByID = async (req, res) => {
     });
 
     const datasource = await datasourceService.getDatasourceByID({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       tenantID,
       datasourceID,
     });
@@ -177,7 +177,7 @@ datasourceController.createDatasource = async (req, res) => {
     });
 
     const datasource = await datasourceService.createDatasource({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       tenantID,
       datasourceTitle,
       datasourceDescription,
@@ -241,7 +241,7 @@ datasourceController.updateDatasourceByID = async (req, res) => {
     });
 
     const datasource = await datasourceService.updateDatasourceByID({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       tenantID,
       datasourceID,
       datasourceTitle,
@@ -293,7 +293,7 @@ datasourceController.deleteDatasourceByID = async (req, res) => {
     });
 
     await datasourceService.deleteDatasourceByID({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       tenantID,
       datasourceID,
     });
@@ -341,7 +341,7 @@ datasourceController.cloneDatasourceByID = async (req, res) => {
     });
 
     await datasourceService.cloneDatasourceByID({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       tenantID,
       datasourceID,
     });

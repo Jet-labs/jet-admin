@@ -22,7 +22,7 @@ databaseNotificationService.getAllDatabaseNotifications = async ({
     const databaseNotifications =
       await prisma.tblDatabaseNotifications.findMany({
         where: {
-          tenantID: parseInt(tenantID),
+          tenantID: tenantID,
         },
       });
 
@@ -63,7 +63,7 @@ databaseNotificationService.createDatabaseNotification = async ({
   try {
     await prisma.tblDatabaseNotifications.create({
       data: {
-        tenantID: parseInt(tenantID),
+        tenantID: tenantID,
         databaseNotificationTitle,
       },
     });
@@ -104,8 +104,8 @@ databaseNotificationService.getDatabaseNotificationByID = async ({
     const databaseNotification =
       await prisma.tblDatabaseNotifications.findFirst({
         where: {
-          databaseNotificationID: parseInt(databaseNotificationID),
-          tenantID: parseInt(tenantID),
+          databaseNotificationID: databaseNotificationID,
+          tenantID: tenantID,
         },
       });
 
@@ -163,8 +163,8 @@ databaseNotificationService.updateDatabaseNotificationByID = async ({
     // Update the database query using Prisma
     await prisma.tblDatabaseNotifications.update({
       where: {
-        databaseNotificationID: parseInt(databaseNotificationID), // Assuming `id` is the primary key for the query
-        tenantID: parseInt(tenantID), // Ensure tenantID matches for security
+        databaseNotificationID: databaseNotificationID, // Assuming `id` is the primary key for the query
+        tenantID: tenantID, // Ensure tenantID matches for security
       },
       data: {
         databaseNotificationTitle,
@@ -219,8 +219,8 @@ databaseNotificationService.deleteDatabaseNotificationByID = async ({
   try {
     await prisma.tblDatabaseNotifications.delete({
       where: {
-        databaseNotificationID: parseInt(databaseNotificationID),
-        tenantID: parseInt(tenantID),
+        databaseNotificationID: databaseNotificationID,
+        tenantID: tenantID,
       },
     });
 

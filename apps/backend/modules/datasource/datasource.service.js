@@ -22,7 +22,7 @@ datasourceService.getAllDatasources = async ({ userID, tenantID }) => {
   try {
     const datasources = await prisma.tblDatasources.findMany({
       where: {
-        tenantID: parseInt(tenantID),
+        tenantID: tenantID,
       },
     });
     Logger.log("success", {
@@ -95,7 +95,6 @@ datasourceService.testDatasourceConnection = async ({
   }
 };
 
-
 /**
  * @param {Object} param0
  * @param {number} param0.tenantID
@@ -127,11 +126,11 @@ datasourceService.createDatasource = async ({
   try {
     const newDatasource = await prisma.tblDatasources.create({
       data: {
-        tenantID: parseInt(tenantID),
+        tenantID: tenantID,
         datasourceTitle,
         datasourceType,
         datasourceOptions,
-        creatorID: parseInt(userID),
+        creatorID: userID,
         datasourceTags,
       },
     });
@@ -183,7 +182,7 @@ datasourceService.deleteDatasourceByID = async ({
     await prisma.tblDatasources.delete({
       where: {
         datasourceID: datasourceID,
-        tenantID: parseInt(tenantID),
+        tenantID: tenantID,
       },
     });
     Logger.log("success", {
@@ -231,7 +230,7 @@ datasourceService.getDatasourceByID = async ({
     const datasource = await prisma.tblDatasources.findUnique({
       where: {
         datasourceID: datasourceID,
-        tenantID: parseInt(tenantID),
+        tenantID: tenantID,
       },
     });
     Logger.log("success", {
@@ -291,7 +290,7 @@ datasourceService.updateDatasourceByID = async ({
     await prisma.tblDatasources.update({
       where: {
         datasourceID: datasourceID,
-        tenantID: parseInt(tenantID),
+        tenantID: tenantID,
       },
       data: {
         ...(datasourceTitle != undefined && { datasourceTitle }),
@@ -346,7 +345,7 @@ datasourceService.cloneDatasourceByID = async ({
     const datasource = await prisma.tblDatasources.findUnique({
       where: {
         datasourceID: datasourceID,
-        tenantID: parseInt(tenantID),
+        tenantID: tenantID,
       },
     });
     if (!datasource) {
@@ -354,12 +353,12 @@ datasourceService.cloneDatasourceByID = async ({
     }
     const newDatasource = await prisma.tblDatasources.create({
       data: {
-        tenantID: parseInt(tenantID),
+        tenantID: tenantID,
         datasourceTitle: datasource.datasourceTitle + " (Copy)",
         datasourceType: datasource.datasourceType,
         datasourceOptions: datasource.datasourceOptions,
         datasourceTags: datasource.datasourceTags,
-        creatorID: parseInt(userID),
+        creatorID: userID,
       },
     });
     Logger.log("success", {

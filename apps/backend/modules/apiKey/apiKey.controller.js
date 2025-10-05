@@ -20,7 +20,7 @@ apiKeyController.getAllAPIKeys = async (req, res) => {
     });
 
     const apiKeys = await apiKeyService.getAllAPIKeys({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       tenantID,
     });
 
@@ -53,8 +53,8 @@ apiKeyController.createAPIKey = async (req, res) => {
     });
 
     const result = await apiKeyService.createAPIKey({
-      userID: parseInt(user.userID),
-      tenantID: parseInt(tenantID),
+      userID: user.userID,
+      tenantID: tenantID,
       roleIDs,
       apiKeyTitle,
     });
@@ -86,9 +86,9 @@ apiKeyController.getAPIKeyByID = async (req, res) => {
     });
 
     const apiKey = await apiKeyService.getAPIKeyByID({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       tenantID,
-      apiKeyID: parseInt(apiKeyID),
+      apiKeyID: apiKeyID,
     });
 
     return expressUtils.sendResponse(res, true, {
@@ -128,9 +128,9 @@ apiKeyController.updateAPIKeyByID = async (req, res) => {
     });
 
     const result = await apiKeyService.updateAPIKeyByID({
-      userID: parseInt(user.userID),
-      tenantID: parseInt(tenantID),
-      apiKeyID: parseInt(apiKeyID),
+      userID: user.userID,
+      tenantID: tenantID,
+      apiKeyID: apiKeyID,
       apiKeyTitle,
       roleIDs,
       isDisabled,
@@ -174,9 +174,9 @@ apiKeyController.deleteAPIKeyByID = async (req, res) => {
     });
 
     await apiKeyService.deleteAPIKeyByID({
-      userID: parseInt(user.userID),
-      tenantID: parseInt(tenantID),
-      apiKeyID: parseInt(apiKeyID),
+      userID: user.userID,
+      tenantID: tenantID,
+      apiKeyID: apiKeyID,
     });
 
     return expressUtils.sendResponse(res, true, {

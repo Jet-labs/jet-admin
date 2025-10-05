@@ -114,15 +114,10 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
 
   const { isPending: isFetchingWidgetData, mutate: fetchWidgetData } =
     useMutation({
-      mutationKey: [
-        CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID),
-        widgetID,
-        "data",
-      ],
-      mutationFn: () => {
-        return getWidgetDataByIDAPI({
+      mutationFn: (data) => {
+        return getWidgetDataUsingWidgetAPI({
           tenantID,
-          widgetID,
+          widgetData: data,
         });
       },
       retry: false,
@@ -191,8 +186,6 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
               {updateWidgetForm && (
                 <WidgetEditor
                   key={`widgetEditor_${uniqueKey}`}
-                  tenantID={tenantID}
-                  widgetID={widgetID}
                   widgetEditorForm={updateWidgetForm}
                 />
               )}

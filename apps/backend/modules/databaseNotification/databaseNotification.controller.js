@@ -9,19 +9,23 @@ const databaseNotificationController = {};
  * @param {import("express").Request} req
  * @param {import("express").Response} res
  */
-databaseNotificationController.getAllDatabaseNotifications = async (req, res) => {
+databaseNotificationController.getAllDatabaseNotifications = async (
+  req,
+  res
+) => {
   try {
     const { user } = req;
     const { tenantID } = req.params;
 
     Logger.log("info", {
-      message: "databaseNotificationController:getAllDatabaseNotifications:params",
+      message:
+        "databaseNotificationController:getAllDatabaseNotifications:params",
       params: { userID: user.userID, tenantID },
     });
 
     const databaseNotifications =
       await databaseNotificationService.getAllDatabaseNotifications({
-        userID: parseInt(user.userID),
+        userID: user.userID,
         tenantID,
       });
 
@@ -31,7 +35,8 @@ databaseNotificationController.getAllDatabaseNotifications = async (req, res) =>
     });
   } catch (error) {
     Logger.log("error", {
-      message: "databaseNotificationController:getAllDatabaseNotifications:catch-1",
+      message:
+        "databaseNotificationController:getAllDatabaseNotifications:catch-1",
       params: { error },
     });
     return expressUtils.sendResponse(res, false, {}, error);
@@ -59,7 +64,7 @@ databaseNotificationController.createDatabaseNotification = async (
 
     const result = await databaseNotificationService.createDatabaseNotification(
       {
-        userID: parseInt(user.userID),
+        userID: user.userID,
         tenantID,
         databaseNotificationTitle,
       }
@@ -98,9 +103,9 @@ databaseNotificationController.getDatabaseNotificationByID = async (
 
     const databaseNotification =
       await databaseNotificationService.getDatabaseNotificationByID({
-        userID: parseInt(user.userID),
+        userID: user.userID,
         tenantID,
-        databaseNotificationID: parseInt(databaseNotificationID),
+        databaseNotificationID: databaseNotificationID,
       });
 
     return expressUtils.sendResponse(res, true, {
@@ -144,7 +149,7 @@ databaseNotificationController.updateDatabaseNotificationByID = async (
 
     const result =
       await databaseNotificationService.updateDatabaseNotificationByID({
-        userID: parseInt(user.userID),
+        userID: user.userID,
         tenantID,
         databaseNotificationID,
         databaseNotificationTitle,
@@ -179,20 +184,24 @@ databaseNotificationController.updateDatabaseNotificationByID = async (
  * @param {import("express").Request} req
  * @param {import("express").Response} res
  */
-databaseNotificationController.deleteDatabaseNotificationByID = async (req, res) => {
+databaseNotificationController.deleteDatabaseNotificationByID = async (
+  req,
+  res
+) => {
   try {
     const { user } = req;
     const { tenantID, databaseNotificationID } = req.params;
 
     Logger.log("info", {
-      message: "databaseNotificationController:deleteDatabaseNotificationByID:params",
+      message:
+        "databaseNotificationController:deleteDatabaseNotificationByID:params",
       params: { userID: user.userID, tenantID, databaseNotificationID },
     });
 
     await databaseNotificationService.deleteDatabaseNotificationByID({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       tenantID,
-      databaseNotificationID: parseInt(databaseNotificationID),
+      databaseNotificationID: databaseNotificationID,
     });
 
     return expressUtils.sendResponse(res, true, {
@@ -200,7 +209,8 @@ databaseNotificationController.deleteDatabaseNotificationByID = async (req, res)
     });
   } catch (error) {
     Logger.log("error", {
-      message: "databaseNotificationController:deleteDatabaseNotificationByID:catch-1",
+      message:
+        "databaseNotificationController:deleteDatabaseNotificationByID:catch-1",
       params: { error },
     });
     return expressUtils.sendResponse(res, false, {}, error);

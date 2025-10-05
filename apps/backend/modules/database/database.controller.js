@@ -20,7 +20,7 @@ databaseController.getDatabaseMetadata = async (req, res) => {
     });
 
     const databaseMetadata = await databaseService.getDatabaseMetadata({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       dbPool,
     });
 
@@ -59,7 +59,7 @@ databaseController.createDatabaseSchema = async (req, res) => {
     });
 
     const databaseSchema = await databaseService.createDatabaseSchema({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       dbPool,
       databaseSchemaName,
     });
@@ -104,7 +104,7 @@ databaseController.executeRawSQLQuery = async (req, res) => {
     }
 
     const dataQueriesResult = await dataQueryService.runDataQueries({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       dbPool,
       tenantID: null,
       dataQueries: [

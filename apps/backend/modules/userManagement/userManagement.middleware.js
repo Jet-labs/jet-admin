@@ -26,7 +26,7 @@ userManagementMiddleware.checkTenantUserAdditionLimit = async (
       params: { userID: user.userID, tenantID },
     });
     const currentTenantUserCount = await tenantService.getTenantUserCount({
-      tenantID: parseInt(tenantID),
+      tenantID: tenantID,
     });
     if (userPlan.maxMembersPerTenant > currentTenantUserCount) {
       Logger.log("success", {

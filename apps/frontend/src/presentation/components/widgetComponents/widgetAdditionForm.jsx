@@ -49,6 +49,7 @@ export const WidgetAdditionForm = ({ tenantID }) => {
   WidgetAdditionForm.propTypes = {
     tenantID: PropTypes.number.isRequired,
   };
+  const uniqueKey = `${tenantID}`;
   const queryClient = useQueryClient();
   const [widgetFetchedData, setWidgetFetchedData] = useState(null);
 
@@ -104,7 +105,7 @@ export const WidgetAdditionForm = ({ tenantID }) => {
     }
   }, [addWidgetForm]);
 
-  console.log("addWidgetForm", addWidgetForm);
+
 
   return (
     <div className="w-full flex flex-col justify-start items-center h-full">
@@ -126,7 +127,7 @@ export const WidgetAdditionForm = ({ tenantID }) => {
           >
             {addWidgetForm && (
               <WidgetEditor
-                tenantID={tenantID}
+                key={`widgetEditor_${uniqueKey}`}
                 widgetEditorForm={addWidgetForm}
               />
             )}

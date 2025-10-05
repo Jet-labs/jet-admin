@@ -30,7 +30,7 @@ dataQueryService.getDataQueriesWithDatasource = async ({
   try {
     const dataQueries = await prisma.tblDataQueries.findMany({
       where: {
-        tenantID: parseInt(tenantID),
+        tenantID: tenantID,
       },
       include: {
         tblDatasources: true,
@@ -77,7 +77,7 @@ dataQueryService.getAllDataQueries = async ({ userID, tenantID }) => {
   try {
     const dataQueries = await prisma.tblDataQueries.findMany({
       where: {
-        tenantID: parseInt(tenantID),
+        tenantID: tenantID,
       },
       include: {
         _count: {
@@ -152,12 +152,12 @@ dataQueryService.createDataQuery = async ({
   try {
     await prisma.tblDataQueries.create({
       data: {
-        tenantID: parseInt(tenantID),
+        tenantID: tenantID,
         dataQueryTitle,
         dataQueryOptions,
         datasourceID: isUUID(datasourceID) ? datasourceID : null,
         datasourceType,
-        creatorID: parseInt(userID),
+        creatorID: userID,
         runOnLoad,
       },
     });
@@ -210,12 +210,12 @@ dataQueryService.createBulkDataQuery = async ({
   try {
     const dataQueries = await prisma.tblDataQueries.createManyAndReturn({
       data: dataQueriesData.map((dataQueryData) => ({
-        tenantID: parseInt(tenantID),
+        tenantID: tenantID,
         dataQueryTitle: dataQueryData.dataQueryTitle,
         dataQueryOptions: dataQueryData.dataQueryOptions,
         datasourceID: dataQueryData.datasourceID,
         datasourceType: dataQueryData.datasourceType,
-        creatorID: parseInt(userID),
+        creatorID: userID,
         runOnLoad: dataQueryData.runOnLoad,
       })),
     });
@@ -376,8 +376,8 @@ dataQueryService.runDataQueryByID = async ({
   try {
     const dataQuery = await prisma.tblDataQueries.findFirst({
       where: {
-        tenantID: parseInt(tenantID),
-        dataQueryID: parseInt(dataQueryID),
+        tenantID: tenantID,
+        dataQueryID: dataQueryID,
       },
       include: {
         tblDatasources: true,
@@ -401,7 +401,7 @@ dataQueryService.runDataQueryByID = async ({
       async (queryId) => {
         return await prisma.tblDataQueries.findFirst({
           where: {
-            dataQueryID: parseInt(queryId),
+            dataQueryID: queryId,
           },
         });
       },
@@ -492,7 +492,7 @@ dataQueryService.runDataQueryByData = async ({
   try {
     const processedDataQuery = {
       ...dataQuery,
-      dataQueryID: parseInt(tempQueryID),
+      dataQueryID: tempQueryID,
     };
 
     Logger.log("info", {
@@ -512,7 +512,7 @@ dataQueryService.runDataQueryByData = async ({
         } else {
           return await prisma.tblDataQueries.findFirst({
             where: {
-              dataQueryID: parseInt(queryId),
+              dataQueryID: queryId,
             },
           });
         }
@@ -645,7 +645,7 @@ dataQueryService.runDataQueries = async ({
                   );
                   await prisma.tblDataQueries.update({
                     where: {
-                      dataQueryID: parseInt(dataQuery.dataQueryID),
+                      dataQueryID: dataQuery.dataQueryID,
                     },
                     data: {
                       dataQueryResultSchema: dataQueryResultSchema,
@@ -740,8 +740,8 @@ dataQueryService.getDataQueryByID = async ({
   try {
     const dataQuery = await prisma.tblDataQueries.findFirst({
       where: {
-        tenantID: parseInt(tenantID),
-        dataQueryID: parseInt(dataQueryID),
+        tenantID: tenantID,
+        dataQueryID: dataQueryID,
       },
       include: {
         tblDatasources: true,
@@ -809,8 +809,8 @@ dataQueryService.cloneDataQueryByID = async ({
   try {
     const dataQuery = await prisma.tblDataQueries.findFirst({
       where: {
-        tenantID: parseInt(tenantID),
-        dataQueryID: parseInt(dataQueryID),
+        tenantID: tenantID,
+        dataQueryID: dataQueryID,
       },
     });
     if (!dataQuery) {
@@ -818,10 +818,10 @@ dataQueryService.cloneDataQueryByID = async ({
     }
     const newDataQuery = await prisma.tblDataQueries.create({
       data: {
-        tenantID: parseInt(tenantID),
+        tenantID: tenantID,
         dataQueryTitle: dataQuery.dataQueryTitle + " (Copy)",
         dataQueryOptions: dataQuery.dataQueryOptions,
-        creatorID: parseInt(userID),
+        creatorID: userID,
         runOnLoad: dataQuery.runOnLoad,
       },
     });
@@ -887,8 +887,8 @@ dataQueryService.updateDataQueryByID = async ({
     // Update the database query using Prisma
     await prisma.tblDataQueries.update({
       where: {
-        dataQueryID: parseInt(dataQueryID), // Assuming `id` is the primary key for the query
-        tenantID: parseInt(tenantID), // Ensure tenantID matches for security
+        dataQueryID: dataQueryID, // Assuming `id` is the primary key for the query
+        tenantID: tenantID, // Ensure tenantID matches for security
       },
       data: {
         dataQueryTitle,
@@ -954,8 +954,8 @@ dataQueryService.deleteDataQueryByID = async ({
     // Update the database query using Prisma
     await prisma.tblDataQueries.delete({
       where: {
-        dataQueryID: parseInt(dataQueryID), // Assuming `id` is the primary key for the query
-        tenantID: parseInt(tenantID), // Ensure tenantID matches for security
+        dataQueryID: dataQueryID, // Assuming `id` is the primary key for the query
+        tenantID: tenantID, // Ensure tenantID matches for security
       },
     });
 

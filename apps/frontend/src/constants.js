@@ -1252,8 +1252,8 @@ export const CONSTANTS = {
         `/api/v1/tenants/${tenantID}/widgets/${widgetID}`,
       getWidgetDataByIDAPI: (tenantID, widgetID) =>
         `/api/v1/tenants/${tenantID}/widgets/${widgetID}/data`,
-      getWidgetDataUsingWidgetAPI: (tenantID, widgetID) =>
-        `/api/v1/tenants/${tenantID}/widgets/${widgetID}/data`,
+      getWidgetDataUsingWidgetAPI: (tenantID) =>
+        `/api/v1/tenants/${tenantID}/widgets/data`,
       deleteWidgetByID: (tenantID, widgetID) =>
         `/api/v1/tenants/${tenantID}/widgets/${widgetID}`,
 

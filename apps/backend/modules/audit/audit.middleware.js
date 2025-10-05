@@ -135,8 +135,8 @@ auditLogMiddleware.audit = (req, res, next) => {
     const logEvent = {
       type: "API_REQUEST",
       subType: req.method, // Use HTTP method as subType
-      userID: req.user?.userID ? parseInt(req.user.userID) : null, // Add user ID if available
-      tenantID: req?.params?.tenantID ? parseInt(req.params.tenantID) : null, // Add tenant ID if available
+      userID: req.user?.userID ? req.user.userID : null, // Add user ID if available
+      tenantID: req?.params?.tenantID ? req.params.tenantID : null, // Add tenant ID if available
       success: res.statusCode >= 200 && res.statusCode < 400, // Consider 4xx as not necessarily failure? Depends on policy.
       metadata: {
         // Map details to metadata field

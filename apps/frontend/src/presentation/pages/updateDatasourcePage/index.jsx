@@ -8,7 +8,7 @@ const UpdateDatasourcePage = () => {
     const { tenantID, datasourceID } = useParams();
   return (
     <DatasourceUpdationForm
-      tenantID={parseInt(tenantID)}
+      tenantID={tenantID}
       datasourceID={datasourceID}
     />
   );

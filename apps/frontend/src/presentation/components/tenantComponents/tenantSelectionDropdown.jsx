@@ -23,7 +23,7 @@ export const TenantSelectionDropdown = () => {
   // Memoized selected tenant
   const selectedTenant = useMemo(() => {
     if (tenantID && tenants) {
-      return tenants.find((tenant) => tenant.tenantID === parseInt(tenantID));
+      return tenants.find((tenant) => tenant.tenantID === tenantID);
     }
   }, [tenants, tenantID]);
 

@@ -132,7 +132,7 @@ cronJobService.getAllCronJobs = async ({ userID, tenantID }) => {
   try {
     const cronJobs = await prisma.tblCronJobs.findMany({
       where: {
-        tenantID: parseInt(tenantID),
+        tenantID: tenantID,
       },
       orderBy: {
         createdAt: "desc", // Or order by title, etc.
@@ -209,8 +209,8 @@ cronJobService.getCronJobByID = async ({ userID, tenantID, cronJobID }) => {
   try {
     const cronJob = await prisma.tblCronJobs.findUnique({
       where: {
-        cronJobID: parseInt(cronJobID), // Ensure cronJobID is an integer
-        tenantID: parseInt(tenantID), // Ensure tenantID matches for security
+        cronJobID: cronJobID, // Ensure cronJobID is an integer
+        tenantID: tenantID, // Ensure tenantID matches for security
       },
     });
 
@@ -260,8 +260,8 @@ cronJobService.updateCronJobByID = async ({
   try {
     const updatedCronJob = await prisma.tblCronJobs.update({
       where: {
-        cronJobID: parseInt(cronJobID),
-        tenantID: parseInt(tenantID),
+        cronJobID: cronJobID,
+        tenantID: tenantID,
       },
       data: updateData,
       include: {
@@ -303,13 +303,13 @@ cronJobService.deleteCronJobByID = async ({ userID, tenantID, cronJobID }) => {
     const deletedCronJob = await prisma.$transaction(async (tx) => {
       await tx.tblCronJobHistory.deleteMany({
         where: {
-          cronJobID: parseInt(cronJobID),
+          cronJobID: cronJobID,
         },
       });
       await tx.tblCronJobs.delete({
         where: {
-          cronJobID: parseInt(cronJobID),
-          tenantID: parseInt(tenantID),
+          cronJobID: cronJobID,
+          tenantID: tenantID,
         },
       });
     });
@@ -349,15 +349,15 @@ cronJobService.runCronJob = async ({ cronJob }) => {
       cronJob.tenantID
     );
     const queryRunResult = await dataQueryService.runDataQueryByID({
-      userID: parseInt(cronJob.cronJobID),
-      tenantID: parseInt(cronJob.tenantID),
-      dataQueryID: parseInt(cronJob.dataQueryID),
+      userID: cronJob.cronJobID,
+      tenantID: cronJob.tenantID,
+      dataQueryID: cronJob.dataQueryID,
       argValues: cronJob.dataQueryArgValues,
     });
 
     await prisma.tblCronJobHistory.create({
       data: {
-        cronJobID: parseInt(cronJob.cronJobID),
+        cronJobID: cronJob.cronJobID,
         result: JSON.stringify(queryRunResult),
         triggerType: "SCHEDULED",
         status: constants.CRON_JOB_STATUS.SUCCESS,
@@ -381,7 +381,7 @@ cronJobService.runCronJob = async ({ cronJob }) => {
     });
     await prisma.tblCronJobHistory.create({
       data: {
-        cronJobID: parseInt(cronJob.cronJobID),
+        cronJobID: cronJob.cronJobID,
         result: JSON.stringify(error),
         triggerType: "SCHEDULED",
         status: constants.CRON_JOB_STATUS.FAILURE,
@@ -538,7 +538,7 @@ cronJobService.getCronJobHistoryByID = async ({
 
     const cronJobHistory = await prisma.tblCronJobHistory.findMany({
       where: {
-        cronJobID: parseInt(cronJobID),
+        cronJobID: cronJobID,
       },
       orderBy: {
         createdAt: "desc", // Show most recent history first
@@ -549,7 +549,7 @@ cronJobService.getCronJobHistoryByID = async ({
 
     const cronJobHistoryCount = await prisma.tblCronJobHistory.count({
       where: {
-        cronJobID: parseInt(cronJobID),
+        cronJobID: cronJobID,
       },
     });
 

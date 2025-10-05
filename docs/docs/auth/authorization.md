@@ -157,7 +157,7 @@ authMiddleware.checkUserPermissions = (requiredPermissions, options) => {
   return async (req, res, next) => {
     const permissionCheck = await authService.checkUserPermissions({
       userID: user.userID,
-      tenantID: parseInt(tenantID),
+      tenantID: tenantID,
       requiredPermissions,
     });
     

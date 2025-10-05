@@ -23,7 +23,7 @@ widgetController.getAllWidgets = async (req, res) => {
     });
 
     const widgets = await widgetService.getAllWidgets({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       tenantID,
     });
 
@@ -80,7 +80,7 @@ widgetController.createWidget = async (req, res) => {
     });
 
     const result = await widgetService.createWidget({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       tenantID,
       widgetTitle,
       widgetDescription,
@@ -134,7 +134,7 @@ widgetController.getWidgetByID = async (req, res) => {
     });
 
     const widget = await widgetService.getWidgetByID({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       tenantID,
       widgetID,
     });
@@ -181,7 +181,7 @@ widgetController.cloneWidgetByID = async (req, res) => {
     });
 
     await widgetService.cloneWidgetByID({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       tenantID,
       widgetID,
     });
@@ -224,7 +224,7 @@ widgetController.getWidgetDataByID = async (req, res) => {
 
   try {
     const widgetData = await widgetService.getWidgetDataByID({
-      userID: parseInt(user.userID, 10),
+      userID: user.userID,
       tenantID,
       dbPool,
       widgetID,
@@ -276,7 +276,7 @@ widgetController.getWidgetDataUsingWidget = async (req, res) => {
 
   try {
     const widgetData = await widgetService.getWidgetDataUsingWidget({
-      userID: parseInt(user.userID, 10),
+      userID: user.userID,
       tenantID,
       dbPool,
       widget,
@@ -345,7 +345,7 @@ widgetController.updateWidgetByID = async (req, res) => {
     });
 
     const result = await widgetService.updateWidgetByID({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       tenantID,
       widgetID,
       widgetConfig,
@@ -401,7 +401,7 @@ widgetController.deleteWidgetByID = async (req, res) => {
     });
 
     const result = await widgetService.deleteWidgetByID({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       tenantID,
       widgetID,
     });

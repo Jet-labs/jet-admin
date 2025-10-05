@@ -19,8 +19,8 @@ tenantController.getUserTenantByID = async (req, res) => {
       params: { userID: user.userID, tenantID },
     });
     const tenant = await tenantService.getUserTenantByID({
-      userID: parseInt(user.userID),
-      tenantID: parseInt(tenantID),
+      userID: user.userID,
+      tenantID: tenantID,
       dbPool,
     });
     Logger.log("success", {
@@ -52,8 +52,8 @@ tenantController.deleteUserTenantByID = async (req, res) => {
       params: { userID: user.userID, tenantID },
     });
     await tenantService.deleteUserTenantByID({
-      userID: parseInt(user.userID),
-      tenantID: parseInt(tenantID),
+      userID: user.userID,
+      tenantID: tenantID,
       dbPool,
     });
     Logger.log("success", {
@@ -84,7 +84,7 @@ tenantController.getAllUserTenants = async (req, res) => {
       params: { userID: user.userID },
     });
     const tenants = await tenantService.getAllUserTenants({
-      userID: parseInt(user.userID),
+      userID: user.userID,
     });
     Logger.log("success", {
       message: "tenantController:getAllUserTenants:tenantsLength",
@@ -121,7 +121,7 @@ tenantController.createNewTenant = async (req, res) => {
       },
     });
     const newTenant = await tenantService.createTenant({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       tenantTitle,
       tenantLogoURL,
       tenantDBType,
@@ -156,7 +156,7 @@ tenantController.testTenantDatabaseConnection = async (req, res) => {
       params: { userID: user.userID, tenantDBURL },
     });
     const connectionResult = await tenantService.testTenantDatabaseConnection({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       tenantDBURL,
     });
     Logger.log("success", {
@@ -197,8 +197,8 @@ tenantController.updateTenant = async (req, res) => {
       },
     });
     const updatedTenant = await tenantService.updateTenant({
-      userID: parseInt(user.userID),
-      tenantID: parseInt(tenantID),
+      userID: user.userID,
+      tenantID: tenantID,
       tenantTitle,
       tenantLogoURL,
       tenantDBURL,

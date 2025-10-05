@@ -64,7 +64,7 @@ authController.getUserConfig = async (req, res) => {
     });
     const userConfig = await authService.getUserConfig({
       userID: user.userID,
-      tenantID: parseInt(tenantID),
+      tenantID: tenantID,
     });
     return expressUtils.sendResponse(res, true, {
       userConfig,
@@ -95,8 +95,8 @@ authController.updateUserConfig = async (req, res) => {
     });
     await authService.updateUserConfig({
       userID: user.userID,
-      tenantID: parseInt(tenantID),
-      config
+      tenantID: tenantID,
+      config,
     });
     return expressUtils.sendResponse(res, true, {
       message: "User config updated successfully.",

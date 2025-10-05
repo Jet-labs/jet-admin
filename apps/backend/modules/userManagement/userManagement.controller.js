@@ -63,8 +63,8 @@ userManagementController.getAllTenantUsers = async (req, res) => {
     });
 
     const users = await userManagementService.getAllTenantUsers({
-      userID: parseInt(user.userID),
-      tenantID: parseInt(tenantID),
+      userID: user.userID,
+      tenantID: tenantID,
       skip,
       take,
     });
@@ -106,9 +106,9 @@ userManagementController.getTenantUserByID = async (req, res) => {
     });
 
     const userDetails = await userManagementService.getTenantUserByID({
-      userID: parseInt(user.userID),
-      tenantUserID: parseInt(tenantUserID),
-      tenantID: parseInt(tenantID),
+      userID: user.userID,
+      tenantUserID: tenantUserID,
+      tenantID: tenantID,
     });
 
     Logger.log("success", {
@@ -148,8 +148,8 @@ userManagementController.addUserToTenant = async (req, res) => {
     });
     const newUserTenantRelationship =
       await userManagementService.addUserToTenant({
-        userID: parseInt(user.userID),
-        tenantID: parseInt(tenantID),
+        userID: user.userID,
+        tenantID: tenantID,
         tenantUserID: tenantUser.userID,
       });
     Logger.log("success", {
@@ -197,10 +197,10 @@ userManagementController.updateTenantUserRolesByID = async (req, res) => {
     });
 
     await userManagementService.updateTenantUserRolesByID({
-      userID: parseInt(user.userID),
-      tenantUserID: parseInt(tenantUserID),
-      tenantID: parseInt(tenantID),
-      roleIDs: roleIDs.map((id) => parseInt(id)),
+      userID: user.userID,
+      tenantUserID: tenantUserID,
+      tenantID: tenantID,
+      roleIDs: roleIDs,
       userTenantRelationship,
     });
 
@@ -248,9 +248,9 @@ userManagementController.removeTenantUserFromTenantByID = async (req, res) => {
     });
 
     await userManagementService.removeTenantUserFromTenantByID({
-      userID: parseInt(user.userID),
-      tenantUserID: parseInt(tenantUserID),
-      tenantID: parseInt(tenantID),
+      userID: user.userID,
+      tenantUserID: tenantUserID,
+      tenantID: tenantID,
     });
 
     Logger.log("success", {

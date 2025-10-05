@@ -64,7 +64,7 @@ const parseQueryCalls = (expression, runtimeArgs) => {
         params: {expression, rawArgs, parsedArgs,runtimeArgs },
       });
       calls.push({
-        dataQueryID: parseInt(match[1]),
+        dataQueryID: match[1],
         args: parsedArgs,
         raw: match[0],
       });

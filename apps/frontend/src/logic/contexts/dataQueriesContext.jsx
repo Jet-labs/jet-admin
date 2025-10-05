@@ -58,7 +58,7 @@ const DataQueriesContextProvider = ({ children }) => {
     refetch: refetchDatabaseMetadata,
   } = useQuery({
     queryKey: [CONSTANTS.REACT_QUERY_KEYS.DATABASE_METADATA(tenantID)],
-    queryFn: () => getDatabaseMetadataAPI({ tenantID: parseInt(tenantID) }),
+    queryFn: () => getDatabaseMetadataAPI({ tenantID: tenantID }),
     refetchOnWindowFocus: false,
   });
 

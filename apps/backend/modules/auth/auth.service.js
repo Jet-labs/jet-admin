@@ -57,8 +57,8 @@ authService.getUserConfig = async ({ userID, tenantID }) => {
     const userConfig = await prisma.tblUserTenantConfigMap.findUnique({
       where: {
         userID_tenantID: {
-          userID: parseInt(userID),
-          tenantID: parseInt(tenantID),
+          userID: userID,
+          tenantID: tenantID,
         },
       },
     });
@@ -93,13 +93,13 @@ authService.updateUserConfig = async ({ userID, tenantID, config }) => {
     await prisma.tblUserTenantConfigMap.upsert({
       where: {
         userID_tenantID: {
-          userID: parseInt(userID),
-          tenantID: parseInt(tenantID),
+          userID: userID,
+          tenantID: tenantID,
         },
       },
       create: {
-        userID: parseInt(userID),
-        tenantID: parseInt(tenantID),
+        userID: userID,
+        tenantID: tenantID,
         config,
       },
       update: {
@@ -202,12 +202,7 @@ authService.checkUserPermissions = async ({
 }) => {
   try {
     // Input Validation
-    if (!Number.isInteger(userID) || userID <= 0) {
-      throw new Error("Invalid userID");
-    }
-    if (!Number.isInteger(tenantID) || tenantID <= 0) {
-      throw new Error("Invalid tenantID");
-    }
+
     if (
       !Array.isArray(requiredPermissions) ||
       !requiredPermissions.every((perm) => typeof perm === "string")
@@ -229,7 +224,12 @@ authService.checkUserPermissions = async ({
 
     // Step 1: Check if the user is a member of the tenant
     const userTenant = await prisma.tblUsersTenantsRelationship.findUnique({
-      where: { tenantID_userID: { tenantID, userID } },
+      where: {
+        tenantID_userID: {
+          tenantID,
+          userID,
+        },
+      },
     });
 
     if (!userTenant) {

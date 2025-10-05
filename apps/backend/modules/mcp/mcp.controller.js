@@ -44,7 +44,7 @@ mcpController.generateUserPromptIntent = async (req, res) => {
       params: { userIntentResponse },
     });
     const datasources = await datasourceService.getAllDatasources({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       tenantID,
     });
     Logger.log("info", {
@@ -111,19 +111,15 @@ aiController.generateAIPromptForChatVisualization = async ({ aiPrompt ,firebaseI
       },
     });
 
-    const dataQueries = await dataQueryService.getDataQueriesWithDatasource(
-      {
-        userID: parseInt(user.userID),
-        tenantID,
-      }
-    );
+    const dataQueries = await dataQueryService.getDataQueriesWithDatasource({
+      userID: user.userID,
+      tenantID,
+    });
 
-    const dataSources = await datasourceService.getAllDatasources(
-      {
-        userID: parseInt(user.userID),
-        tenantID,
-      }
-    );
+    const dataSources = await datasourceService.getAllDatasources({
+      userID: user.userID,
+      tenantID,
+    });
 
     Logger.log("info", {
       message: "aiController:generateAIPromptForChatVisualization:schema",

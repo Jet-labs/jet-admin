@@ -21,7 +21,7 @@ dashboardService.getAllDashboards = async ({ userID, tenantID }) => {
   try {
     const dashboards = await prisma.tblDashboards.findMany({
       where: {
-        tenantID: parseInt(tenantID),
+        tenantID: tenantID,
       },
     });
     Logger.log("success", {
@@ -75,11 +75,11 @@ dashboardService.createDashboard = async ({
     await prisma.$transaction(async (tx) => {
       const dashboard = await tx.tblDashboards.create({
         data: {
-          tenantID: parseInt(tenantID),
+          tenantID: tenantID,
           dashboardTitle,
           dashboardDescription,
           dashboardConfig,
-          creatorID: parseInt(userID),
+          creatorID: userID,
         },
       });
     });
@@ -88,7 +88,7 @@ dashboardService.createDashboard = async ({
       message: "dashboardService:createDashboard:success",
       params: {
         userID,
-        tenantID: parseInt(tenantID),
+        tenantID: tenantID,
         dashboardTitle,
         dashboardDescription,
         dashboardConfig,
@@ -132,8 +132,8 @@ dashboardService.getDashboardByID = async ({
   try {
     const dashboard = await prisma.tblDashboards.findFirst({
       where: {
-        tenantID: parseInt(tenantID),
-        dashboardID: parseInt(dashboardID),
+        tenantID: tenantID,
+        dashboardID: dashboardID,
       },
     });
     Logger.log("success", {
@@ -181,8 +181,8 @@ dashboardService.cloneDashboardByID = async ({
   try {
     const dashboard = await prisma.tblDashboards.findFirst({
       where: {
-        tenantID: parseInt(tenantID),
-        dashboardID: parseInt(dashboardID),
+        tenantID: tenantID,
+        dashboardID: dashboardID,
       },
     });
     if (!dashboard) {
@@ -191,11 +191,11 @@ dashboardService.cloneDashboardByID = async ({
     await prisma.$transaction(async (tx) => {
       const newDashboard = await tx.tblDashboards.create({
         data: {
-          tenantID: parseInt(tenantID),
+          tenantID: tenantID,
           dashboardTitle: dashboard.dashboardTitle + " (Copy)",
           dashboardDescription: dashboard.dashboardDescription,
           dashboardConfig: dashboard.dashboardConfig,
-          creatorID: parseInt(userID),
+          creatorID: userID,
         },
       });
     });
@@ -255,8 +255,8 @@ dashboardService.updateDashboardByID = async ({
   try {
     const existingDashboard = await prisma.tblDashboards.findFirst({
       where: {
-        dashboardID: parseInt(dashboardID),
-        tenantID: parseInt(tenantID),
+        dashboardID: dashboardID,
+        tenantID: tenantID,
       },
     });
 
@@ -265,7 +265,7 @@ dashboardService.updateDashboardByID = async ({
     }
     await prisma.$transaction(async (tx) => {
       const updatedDashboard = await tx.tblDashboards.update({
-        where: { dashboardID: parseInt(dashboardID) },
+        where: { dashboardID: dashboardID },
         data: {
           ...(dashboardTitle != undefined && { dashboardTitle }),
           ...(dashboardDescription != undefined && {
@@ -329,8 +329,8 @@ dashboardService.deleteDashboardByID = async ({
     // Update the database query using Prisma
     await prisma.tblDashboards.delete({
       where: {
-        dashboardID: parseInt(dashboardID), // Assuming `id` is the primary key for the query
-        tenantID: parseInt(tenantID), // Ensure tenantID matches for security
+        dashboardID: dashboardID, // Assuming `id` is the primary key for the query
+        tenantID: tenantID, // Ensure tenantID matches for security
       },
     });
 

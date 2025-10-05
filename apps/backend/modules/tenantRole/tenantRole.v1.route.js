@@ -30,14 +30,14 @@ router.get(
 );
 router.get(
   "/:roleID",
-  param("roleID").isNumeric().withMessage("roleID must be a number"),
+  param("roleID").isUUID().withMessage("roleID must be a uuid"),
   expressUtils.validationChecker,
   authMiddleware.checkUserPermissions(["tenant:role:read"]),
   tenantRoleController.getTenantRoleByID
 );
 router.patch(
   "/:roleID",
-  param("roleID").isNumeric().withMessage("roleID must be a number"),
+  param("roleID").isUUID().withMessage("roleID must be a uuid"),
   body("permissionIDs")
     .optional()
     .isArray()
@@ -48,7 +48,7 @@ router.patch(
 );
 router.delete(
   "/:roleID",
-  param("roleID").isNumeric().withMessage("roleID must be a number"),
+  param("roleID").isUUID().withMessage("roleID must be a uuid"),
   expressUtils.validationChecker,
   authMiddleware.checkUserPermissions(["tenant:role:delete"]),
   tenantRoleController.deleteTenantRoleByID

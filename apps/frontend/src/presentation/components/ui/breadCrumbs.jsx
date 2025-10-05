@@ -25,7 +25,7 @@ export const Breadcrumbs = () => {
               to={url}
               className="text-xs text-[#646cff]/80 hover:text-[#646cff] transition duration-150"
             >
-              {segment}
+                {segment.length > 8 ? segment.slice(0, 8) + "..." : segment}
             </Link>
             <FiChevronRight className="text-[#646cff]/80 mx-1" />
           </>

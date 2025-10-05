@@ -51,7 +51,7 @@ databaseTableController.getAllDatabaseTables = async (req, res) => {
     });
 
     const databaseTables = await databaseTableService.getAllDatabaseTables({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       dbPool,
       databaseSchemaName,
     });
@@ -102,7 +102,7 @@ databaseTableController.getDatabaseTableByName = async (req, res) => {
     });
 
     const databaseTable = await databaseTableService.getDatabaseTableByName({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       dbPool,
       databaseSchemaName,
       databaseTableName,
@@ -160,7 +160,7 @@ databaseTableController.getDatabaseTableRows = async (req, res) => {
     });
 
     const databaseTableRows = await databaseTableService.getDatabaseTableRows({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       dbPool,
       databaseSchemaName,
       databaseTableName,
@@ -225,7 +225,7 @@ databaseTableController.getDatabaseTableStatistics = async (req, res) => {
 
     const { databaseTableRowCount } =
       await databaseTableService.getDatabaseTableStatistics({
-        userID: parseInt(user.userID),
+        userID: user.userID,
         dbPool,
         databaseSchemaName,
         databaseTableName,
@@ -289,7 +289,7 @@ databaseTableController.databaseTableBulkRowAddition = async (req, res) => {
 
     // Perform the bulk row update
     await databaseTableService.databaseTableBulkRowAddition({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       dbPool,
       databaseSchemaName,
       databaseTableName,
@@ -359,7 +359,7 @@ databaseTableController.databaseTableBulkRowUpdate = async (req, res) => {
 
     // Perform the bulk row update
     await databaseTableService.databaseTableBulkRowUpdate({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       dbPool,
       databaseSchemaName,
       databaseTableName,
@@ -426,7 +426,7 @@ databaseTableController.databaseTableBulkRowDelete = async (req, res) => {
 
     // Perform the bulk row update
     await databaseTableService.databaseTableBulkRowDelete({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       dbPool,
       databaseSchemaName,
       databaseTableName,
@@ -493,7 +493,7 @@ databaseTableController.databaseTableBulkRowExport = async (req, res) => {
 
     // Perform the bulk row update
     const exportedData = await databaseTableService.databaseTableBulkRowExport({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       dbPool,
       databaseSchemaName,
       databaseTableName,
@@ -535,7 +535,6 @@ databaseTableController.databaseTableBulkRowExport = async (req, res) => {
     res.setHeader("Content-Type", contentType);
     res.setHeader("Content-Disposition", `attachment; filename="${fileName}"`);
     return res.send(exportedData);
-
   } catch (error) {
     Logger.log("error", {
       message: "databaseTableController:databaseTableBulkRowExport:catch-1",
@@ -571,7 +570,7 @@ databaseTableController.createDatabaseTable = async (req, res) => {
     });
 
     const result = await databaseTableService.createDatabaseTable({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       dbPool,
       databaseSchemaName,
       databaseTableData,
@@ -616,7 +615,7 @@ databaseTableController.updateDatabaseTableByName = async (req, res) => {
     });
 
     const result = await databaseTableService.updateDatabaseTableByName({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       dbPool,
       databaseSchemaName,
       databaseTableName,
@@ -665,7 +664,7 @@ databaseTableController.deleteDatabaseTableByName = async (req, res) => {
     });
 
     const result = await databaseTableService.deleteDatabaseTable({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       dbPool,
       databaseSchemaName,
       databaseTableName,

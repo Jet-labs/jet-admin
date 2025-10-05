@@ -28,7 +28,7 @@ router.post(
 
 router.get(
   "/:widgetID",
-  param("widgetID").isNumeric().withMessage("widgetID must be a number"),
+  param("widgetID").isUUID().withMessage("widgetID must be a uuid"),
   expressUtils.validationChecker,
   authMiddleware.checkUserPermissions(["tenant:widget:read"]),
   widgetController.getWidgetByID
@@ -36,7 +36,7 @@ router.get(
 
 router.post(
   "/:widgetID/clone",
-  param("widgetID").isNumeric().withMessage("widgetID must be a number"),
+  param("widgetID").isUUID().withMessage("widgetID must be a uuid"),
   expressUtils.validationChecker,
   authMiddleware.checkUserPermissions(["tenant:widget:clone"]),
   widgetController.cloneWidgetByID
@@ -44,24 +44,21 @@ router.post(
 
 router.get(
   "/:widgetID/data",
-  param("widgetID")
-    .exists()
-    .isNumeric()
-    .withMessage("widgetID must be a number"),
+  param("widgetID").exists().isUUID().withMessage("widgetID must be a uuid"),
   expressUtils.validationChecker,
   authMiddleware.checkUserPermissions(["tenant:widget:test"]),
   widgetController.getWidgetDataByID
 );
 
 router.post(
-  "/:widgetID/data",
+  "/data",
   expressUtils.validationChecker,
   authMiddleware.checkUserPermissions(["tenant:widget:test"]),
   widgetController.getWidgetDataUsingWidget
 );
 router.patch(
   "/:widgetID",
-  param("widgetID").isNumeric().withMessage("widgetID must be a number"),
+  param("widgetID").isUUID().withMessage("widgetID must be a uuid"),
   body("widgetTitle").notEmpty().withMessage("widgetTitle is required"),
   body("widgetDescription")
     .optional()
@@ -76,7 +73,7 @@ router.patch(
 );
 router.delete(
   "/:widgetID",
-  param("widgetID").isNumeric().withMessage("widgetID must be a number"),
+  param("widgetID").isUUID().withMessage("widgetID must be a uuid"),
   expressUtils.validationChecker,
   authMiddleware.checkUserPermissions(["tenant:widget:delete"]),
   widgetController.deleteWidgetByID

@@ -22,7 +22,7 @@ dataQueryController.getAllDataQueries = async (req, res) => {
     });
 
     const dataQueries = await dataQueryService.getAllDataQueries({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       tenantID,
     });
 
@@ -79,7 +79,7 @@ dataQueryController.createDataQuery = async (req, res) => {
     });
 
     const result = await dataQueryService.createDataQuery({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       tenantID,
       dataQueryTitle,
       dataQueryOptions,
@@ -135,7 +135,7 @@ dataQueryController.createBulkDataQuery = async (req, res) => {
     });
 
     const dataQueries = await dataQueryService.createBulkDataQuery({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       tenantID,
       dataQueriesData,
     });
@@ -182,14 +182,12 @@ dataQueryController.generateAIPromptBasedQuery = async (req, res) => {
       },
     });
 
-    const dataQuery = await dataQueryService.generateAIPromptBasedQuery(
-      {
-        userID: parseInt(user.userID),
-        tenantID,
-        aiPrompt,
-        dbPool,
-      }
-    );
+    const dataQuery = await dataQueryService.generateAIPromptBasedQuery({
+      userID: user.userID,
+      tenantID,
+      aiPrompt,
+      dbPool,
+    });
 
     Logger.log("success", {
       message: "dataQueryController:generateAIPromptBasedQuery:success",
@@ -227,7 +225,7 @@ dataQueryController.runDataQueryByID = async (req, res) => {
     });
 
     const dataQueryResult = await dataQueryService.runDataQueryByID({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       tenantID,
       dataQueryID,
       argValues,
@@ -268,7 +266,7 @@ dataQueryController.runDataQueryByData = async (req, res) => {
     });
 
     const dataQueryResult = await dataQueryService.runDataQueryByData({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       tenantID,
       dataQuery,
       argValues,
@@ -312,7 +310,7 @@ dataQueryController.getDataQueryByID = async (req, res) => {
     });
 
     const dataQuery = await dataQueryService.getDataQueryByID({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       tenantID,
       dataQueryID,
     });
@@ -358,7 +356,7 @@ dataQueryController.cloneDataQueryByID = async (req, res) => {
     });
 
     await dataQueryService.cloneDataQueryByID({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       tenantID,
       dataQueryID,
     });
@@ -416,7 +414,7 @@ dataQueryController.updateDataQueryByID = async (req, res) => {
     });
 
     const result = await dataQueryService.updateDataQueryByID({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       tenantID,
       dataQueryID,
       dataQueryTitle,
@@ -473,7 +471,7 @@ dataQueryController.deleteDataQueryByID = async (req, res) => {
     });
 
     const result = await dataQueryService.deleteDataQueryByID({
-      userID: parseInt(user.userID),
+      userID: user.userID,
       tenantID,
       dataQueryID,
     });

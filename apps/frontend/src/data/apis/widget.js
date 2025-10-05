@@ -186,15 +186,11 @@ export const getWidgetDataByIDAPI = async ({ tenantID, widgetID }) => {
   }
 };
 
-export const getWidgetDataUsingWidgetAPI = async ({
-  tenantID,
-  widgetID,
-  widgetData,
-}) => {
+export const getWidgetDataUsingWidgetAPI = async ({ tenantID, widgetData }) => {
   try {
     const url =
       CONSTANTS.SERVER_HOST +
-      CONSTANTS.APIS.DATABASE.getWidgetDataUsingWidgetAPI(tenantID, widgetID);
+      CONSTANTS.APIS.DATABASE.getWidgetDataUsingWidgetAPI(tenantID);
     const bearerToken = await firebaseAuth.currentUser.getIdToken();
     if (bearerToken) {
       const response = await axios.post(

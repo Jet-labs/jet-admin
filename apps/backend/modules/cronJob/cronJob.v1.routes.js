@@ -17,7 +17,6 @@ router.get(
 // POST / - Create a new Cron Job
 router.post(
   "/",
-  authMiddleware.checkUserPermissions(["tenant:cronjob:create"]), // Define appropriate permission
   [
     // Validation middleware
     body("cronJobTitle")
@@ -58,31 +57,27 @@ router.post(
       .withMessage("retryDelaySeconds must be a positive integer"),
   ],
   expressUtils.validationChecker, // Check validation results
+  authMiddleware.checkUserPermissions(["tenant:cronjob:create"]), // Define appropriate permission
   cronJobController.createCronJob
 );
 
 // GET /:cronJobID - Get a specific Cron Job
 router.get(
   "/:cronJobID",
-  authMiddleware.checkUserPermissions(["tenant:cronjob:read"]), // Define appropriate permission
-  [
-    param("cronJobID")
-      .isNumeric()
-      .withMessage("cronJobID must be a number in the URL parameter"),
-  ],
+
+  [param("cronJobID").isUUID().withMessage("cronJobID must be a uuid")],
   expressUtils.validationChecker,
+  authMiddleware.checkUserPermissions(["tenant:cronjob:read"]), // Define appropriate permission
   cronJobController.getCronJobByID
 );
 
 // PATCH /:cronJobID - Update a specific Cron Job
 router.patch(
   "/:cronJobID",
-  authMiddleware.checkUserPermissions(["tenant:cronjob:update"]), // Define appropriate permission
+
   [
     // Validation middleware
-    param("cronJobID")
-      .isNumeric()
-      .withMessage("cronJobID must be a number in the URL parameter"),
+    param("cronJobID").isUUID().withMessage("cronJobID must be a uuid"),
     // Validate fields if they are present in the body (use optional())
     body("cronJobTitle")
       .notEmpty()
@@ -92,7 +87,7 @@ router.patch(
     body("dataQueryID")
       .notEmpty()
       .withMessage("dataQueryID is required")
-      .isNumeric(),
+      .isUUID(),
     body("cronJobSchedule")
       .notEmpty()
       .withMessage("cronJobSchedule is required")
@@ -122,19 +117,16 @@ router.patch(
       .withMessage("retryDelaySeconds must be a positive integer if provided"),
   ],
   expressUtils.validationChecker,
+  authMiddleware.checkUserPermissions(["tenant:cronjob:update"]), // Define appropriate permission
   cronJobController.updateCronJobByID
 );
 
 // DELETE /:cronJobID - Delete a specific Cron Job
 router.delete(
   "/:cronJobID",
-  authMiddleware.checkUserPermissions(["tenant:cronjob:delete"]), // Define appropriate permission
-  [
-    param("cronJobID")
-      .isNumeric()
-      .withMessage("cronJobID must be a number in the URL parameter"),
-  ],
+  [param("cronJobID").isUUID().withMessage("cronJobID must be a uuid")],
   expressUtils.validationChecker,
+  authMiddleware.checkUserPermissions(["tenant:cronjob:delete"]), // Define appropriate permission
   cronJobController.deleteCronJobByID
 );
 
@@ -143,12 +135,9 @@ router.delete(
 // GET /:cronJobID/history - Get history for a specific Cron Job (with pagination)
 router.get(
   "/:cronJobID/history",
-  authMiddleware.checkUserPermissions([
-    "tenant:cronjob:read",
-    "tenant:cronjob:history:read",
-  ]), // Or just tenant:cronjob:read
+
   [
-    param("cronJobID").isNumeric().withMessage("cronJobID parameter must be a number"),
+    param("cronJobID").isUUID().withMessage("cronJobID must be a uuid"),
     query("page")
       .optional()
       .isInt({ min: 1 })
@@ -159,6 +148,10 @@ router.get(
       .withMessage("pageSize query parameter must be between 1 and 100"), // Add reasonable limit
   ],
   expressUtils.validationChecker,
+  authMiddleware.checkUserPermissions([
+    "tenant:cronjob:read",
+    "tenant:cronjob:history:read",
+  ]), // Or just tenant:cronjob:read
   cronJobController.getCronJobHistoryByID
 );
 
