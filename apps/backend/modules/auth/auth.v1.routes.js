@@ -17,14 +17,14 @@ router.get(
 );
 router.get(
   "/config/:tenantID",
-  param("tenantID").isInt().withMessage("Invalid tenantID"),
+  param("tenantID").isUUID().withMessage("Invalid tenantID"),
   expressUtils.validationChecker,
   authMiddleware.authProvider,
   authController.getUserConfig
 );
 router.post(
   "/config/:tenantID",
-  param("tenantID").isInt().withMessage("Invalid tenantID"),
+  param("tenantID").isUUID().withMessage("Invalid tenantID"),
   body("config").notEmpty().withMessage("config is required"),
   expressUtils.validationChecker,
   authMiddleware.authProvider,

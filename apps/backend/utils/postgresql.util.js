@@ -1,8 +1,569 @@
 const constants = require("../constants");
 const Logger = require("./logger");
 
+/**
+ * PostgreSQL Filter Query to SQL Converter (without table columns dependency)
+ * Converts complex filter objects to PostgreSQL WHERE clauses
+ */
+
+class PostgreSQLFilterConverter {
+  constructor(options = {}) {
+    this.options = {
+      useParameterized: true, // Use parameterized queries for security
+      parameterStyle: 'numbered', // 'numbered' ($1, $2) or 'named' (:param1)
+      tableAlias: null, // Optional table alias
+      columnTypes: {}, // Optional: { columnName: 'type' } for type hints
+      ...options,
+    };
+    this.parameters = [];
+    this.paramCounter = 1;
+  }
+
+  /**
+   * Main conversion method
+   */
+  convert(filterQuery) {
+    this.parameters = [];
+    this.paramCounter = 1;
+
+    if (!filterQuery) {
+      return {
+        sql: '',
+        parameters: [],
+        whereClause: '',
+      };
+    }
+
+    const whereClause = this.buildWhereClause(filterQuery);
+
+    return {
+      sql: whereClause || '1=1',
+      parameters: this.options.useParameterized ? this.parameters : [],
+      whereClause: whereClause ? `WHERE ${whereClause}` : '',
+      parameterCount: this.paramCounter - 1,
+    };
+  }
+
+  /**
+   * Escape PostgreSQL identifiers (table/column names)
+   */
+  escapeIdentifier(identifier) {
+    const escaped = identifier.replace(/"/g, '""');
+    const prefix = this.options.tableAlias ? `${this.options.tableAlias}.` : '';
+    return `${prefix}"${escaped}"`;
+  }
+
+  /**
+   * Get parameter placeholder based on style
+   */
+  getParameterPlaceholder() {
+    if (this.options.parameterStyle === 'numbered') {
+      return `$${this.paramCounter++}`;
+    } else if (this.options.parameterStyle === 'named') {
+      return `:param${this.paramCounter++}`;
+    }
+    return '?';
+  }
+
+  /**
+   * Detect type from value automatically
+   */
+  detectValueType(value) {
+    if (value === null || value === undefined) return 'null';
+    if (typeof value === 'boolean') return 'boolean';
+    if (typeof value === 'number') return 'number';
+    if (value instanceof Date) return 'datetime';
+    if (Array.isArray(value)) return 'array';
+    if (typeof value === 'object') return 'json';
+    return 'string';
+  }
+
+  /**
+   * Add parameter and return placeholder
+   */
+  addParameter(value, castType = null) {
+    if (this.options.useParameterized) {
+      this.parameters.push(value);
+      const placeholder = this.getParameterPlaceholder();
+      
+      // Add PostgreSQL type cast if specified
+      if (castType) {
+        return `${placeholder}::${castType}`;
+      }
+      return placeholder;
+    }
+    return this.formatValueForSQL(value, castType);
+  }
+
+  /**
+   * Format value for direct SQL (non-parameterized, use with caution)
+   */
+  formatValueForSQL(value, castType = null) {
+    if (value === null || value === undefined) {
+      return 'NULL';
+    }
+
+    const valueType = this.detectValueType(value);
+    let formatted;
+
+    switch (valueType) {
+      case 'number':
+        formatted = String(value);
+        break;
+      
+      case 'boolean':
+        formatted = value ? 'TRUE' : 'FALSE';
+        break;
+      
+      case 'datetime':
+        const date = value instanceof Date ? value : new Date(value);
+        formatted = `'${date.toISOString()}'`;
+        break;
+      
+      case 'json':
+      case 'array':
+        const jsonStr = JSON.stringify(value);
+        formatted = `'${jsonStr.replace(/'/g, "''")}'`;
+        break;
+      
+      case 'string':
+      default:
+        formatted = `'${String(value).replace(/'/g, "''")}'`;
+        break;
+    }
+
+    if (castType) {
+      return `${formatted}::${castType}`;
+    }
+    return formatted;
+  }
+
+  /**
+   * Build a single condition for a field and operator
+   */
+  buildCondition(field, operator, value) {
+    const escapedField = this.escapeIdentifier(field);
+
+    switch (operator) {
+      case 'eq':
+        if (value === null) return `${escapedField} IS NULL`;
+        return `${escapedField} = ${this.addParameter(value)}`;
+
+      case 'ne':
+        if (value === null) return `${escapedField} IS NOT NULL`;
+        return `${escapedField} != ${this.addParameter(value)}`;
+
+      case 'gt':
+        return `${escapedField} > ${this.addParameter(value)}`;
+
+      case 'gte':
+        return `${escapedField} >= ${this.addParameter(value)}`;
+
+      case 'lt':
+        return `${escapedField} < ${this.addParameter(value)}`;
+
+      case 'lte':
+        return `${escapedField} <= ${this.addParameter(value)}`;
+
+      case 'like':
+        return `${escapedField} LIKE ${this.addParameter(value)}`;
+
+      case 'nlike':
+        return `${escapedField} NOT LIKE ${this.addParameter(value)}`;
+
+      case 'ilike':
+        return `${escapedField} ILIKE ${this.addParameter(value)}`;
+
+      case 'nilike':
+        return `${escapedField} NOT ILIKE ${this.addParameter(value)}`;
+
+      case 'in':
+        if (!Array.isArray(value) || value.length === 0) {
+          return '1=0'; // Always false for empty IN clause
+        }
+        if (this.options.useParameterized) {
+          // Use ANY() with array parameter - more efficient
+          return `${escapedField} = ANY(${this.addParameter(value)})`;
+        } else {
+          const formattedValues = value.map((v) => this.formatValueForSQL(v));
+          return `${escapedField} IN (${formattedValues.join(', ')})`;
+        }
+
+      case 'nin':
+        if (!Array.isArray(value) || value.length === 0) {
+          return '1=1'; // Always true for empty NOT IN clause
+        }
+        if (this.options.useParameterized) {
+          // Use != ALL() with array parameter
+          return `${escapedField} != ALL(${this.addParameter(value)})`;
+        } else {
+          const formattedValues = value.map((v) => this.formatValueForSQL(v));
+          return `${escapedField} NOT IN (${formattedValues.join(', ')})`;
+        }
+
+      case 'null':
+        return `${escapedField} IS NULL`;
+
+      case 'nnull':
+        return `${escapedField} IS NOT NULL`;
+
+      case 'between':
+        if (!Array.isArray(value) || value.length !== 2) {
+          throw new Error('BETWEEN operator requires array with 2 values');
+        }
+        return `${escapedField} BETWEEN ${this.addParameter(
+          value[0]
+        )} AND ${this.addParameter(value[1])}`;
+
+      // JSON operators
+      case 'contains':
+        return `${escapedField} @> ${this.addParameter(
+          typeof value === 'string' ? value : JSON.stringify(value),
+          'jsonb'
+        )}`;
+
+      case 'containedBy':
+        return `${escapedField} <@ ${this.addParameter(
+          typeof value === 'string' ? value : JSON.stringify(value),
+          'jsonb'
+        )}`;
+
+      case 'hasKey':
+        return `${escapedField} ? ${this.addParameter(value)}`;
+
+      case 'hasAnyKey':
+        if (!Array.isArray(value)) {
+          throw new Error('hasAnyKey operator requires array');
+        }
+        return `${escapedField} ?| ${this.addParameter(value)}`;
+
+      case 'hasAllKeys':
+        if (!Array.isArray(value)) {
+          throw new Error('hasAllKeys operator requires array');
+        }
+        return `${escapedField} ?& ${this.addParameter(value)}`;
+
+      // Array operators
+      case 'arrayContains':
+        return `${escapedField} @> ${this.addParameter(value)}`;
+
+      case 'arrayContainedBy':
+        return `${escapedField} <@ ${this.addParameter(value)}`;
+
+      case 'arrayOverlap':
+        return `${escapedField} && ${this.addParameter(value)}`;
+
+      // Pattern matching
+      case 'regex':
+        return `${escapedField} ~ ${this.addParameter(value)}`;
+
+      case 'iregex':
+        return `${escapedField} ~* ${this.addParameter(value)}`;
+
+      case 'notRegex':
+        return `${escapedField} !~ ${this.addParameter(value)}`;
+
+      case 'notIRegex':
+        return `${escapedField} !~* ${this.addParameter(value)}`;
+
+      // Full-text search
+      case 'tsquery':
+        return `to_tsvector(${escapedField}) @@ to_tsquery(${this.addParameter(
+          value
+        )})`;
+
+      case 'tsqueryPlain':
+        return `to_tsvector(${escapedField}) @@ plainto_tsquery(${this.addParameter(
+          value
+        )})`;
+
+      // Case-insensitive comparisons
+      case 'ieq':
+        return `LOWER(${escapedField}) = LOWER(${this.addParameter(value)})`;
+
+      case 'ine':
+        return `LOWER(${escapedField}) != LOWER(${this.addParameter(value)})`;
+
+      // String operations
+      case 'startsWith':
+        return `${escapedField} LIKE ${this.addParameter(value + '%')}`;
+
+      case 'endsWith':
+        return `${escapedField} LIKE ${this.addParameter('%' + value)}`;
+
+      case 'contains':
+        return `${escapedField} LIKE ${this.addParameter('%' + value + '%')}`;
+
+      case 'icontains':
+        return `${escapedField} ILIKE ${this.addParameter('%' + value + '%')}`;
+
+      default:
+        console.warn(`Unknown operator: ${operator}, using equality`);
+        return `${escapedField} = ${this.addParameter(value)}`;
+    }
+  }
+
+  /**
+   * Recursively build WHERE clause from filter query
+   */
+  buildWhereClause(query) {
+    if (!query || typeof query !== 'object') {
+      return '';
+    }
+
+    // Handle combinators (AND/OR/NOT)
+    if (query.AND || query.OR || query.NOT) {
+      if (query.NOT) {
+        const notClause = this.buildWhereClause(query.NOT);
+        return notClause ? `NOT (${notClause})` : '';
+      }
+
+      const combinator = query.AND ? 'AND' : 'OR';
+      const conditions = query[combinator];
+
+      if (!Array.isArray(conditions) || conditions.length === 0) {
+        return '';
+      }
+
+      const clauses = conditions
+        .map((condition) => this.buildWhereClause(condition))
+        .filter((clause) => clause && clause.trim() !== '');
+
+      if (clauses.length === 0) return '';
+      if (clauses.length === 1) return clauses[0];
+
+      return `(${clauses.join(` ${combinator} `)})`;
+    }
+
+    // Handle field conditions
+    const fieldConditions = [];
+
+    for (const [field, operatorValue] of Object.entries(query)) {
+      if (typeof operatorValue !== 'object' || operatorValue === null) {
+        continue;
+      }
+
+      for (const [operator, value] of Object.entries(operatorValue)) {
+        try {
+          const condition = this.buildCondition(field, operator, value);
+          if (condition) {
+            fieldConditions.push(condition);
+          }
+        } catch (error) {
+          console.error(
+            `Error building condition for ${field}.${operator}:`,
+            error
+          );
+          throw error;
+        }
+      }
+    }
+
+    if (fieldConditions.length === 0) return '';
+    if (fieldConditions.length === 1) return fieldConditions[0];
+
+    return `(${fieldConditions.join(' AND ')})`;
+  }
+
+  /**
+   * Build complete SELECT query
+   */
+  buildSelectQuery(tableName, filterQuery, options = {}) {
+    const {
+      columns = ['*'],
+      orderBy = null,
+      limit = null,
+      offset = null,
+      distinct = false,
+      groupBy = null,
+      having = null,
+    } = options;
+
+    const result = this.convert(filterQuery);
+    
+    const columnList = columns
+      .map((col) => (col === '*' ? '*' : this.escapeIdentifier(col)))
+      .join(', ');
+    
+    const tableRef = this.options.tableAlias
+      ? `${this.escapeIdentifier(tableName)} AS ${this.options.tableAlias}`
+      : this.escapeIdentifier(tableName);
+
+    let query = `SELECT ${distinct ? 'DISTINCT ' : ''}${columnList} FROM ${tableRef}`;
+
+    if (result.whereClause) {
+      query += ` ${result.whereClause}`;
+    }
+
+    if (groupBy) {
+      const groupByColumns = Array.isArray(groupBy) ? groupBy : [groupBy];
+      const groupBySQL = groupByColumns
+        .map((col) => this.escapeIdentifier(col))
+        .join(', ');
+      query += ` GROUP BY ${groupBySQL}`;
+    }
+
+    if (having) {
+      const havingClause = this.buildWhereClause(having);
+      if (havingClause) {
+        query += ` HAVING ${havingClause}`;
+      }
+    }
+
+    if (orderBy) {
+      const orderClauses = Array.isArray(orderBy) ? orderBy : [orderBy];
+      const orderBySQL = orderClauses
+        .map((order) => {
+          if (typeof order === 'string') {
+            return this.escapeIdentifier(order);
+          }
+          const { field, direction = 'ASC', nulls = null } = order;
+          let sql = `${this.escapeIdentifier(field)} ${direction.toUpperCase()}`;
+          if (nulls) {
+            sql += ` NULLS ${nulls.toUpperCase()}`;
+          }
+          return sql;
+        })
+        .join(', ');
+      query += ` ORDER BY ${orderBySQL}`;
+    }
+
+    if (limit !== null && limit !== undefined) {
+      query += ` LIMIT ${parseInt(limit, 10)}`;
+    }
+
+    if (offset !== null && offset !== undefined) {
+      query += ` OFFSET ${parseInt(offset, 10)}`;
+    }
+
+    return {
+      query,
+      parameters: result.parameters,
+    };
+  }
+
+  /**
+   * Build UPDATE query
+   */
+  buildUpdateQuery(tableName, values, filterQuery) {
+    const setClauses = [];
+    const updateParams = [];
+
+    for (const [field, value] of Object.entries(values)) {
+      setClauses.push(`${this.escapeIdentifier(field)} = ${this.addParameter(value)}`);
+    }
+
+    const whereResult = this.convert(filterQuery);
+    
+    let query = `UPDATE ${this.escapeIdentifier(tableName)} SET ${setClauses.join(', ')}`;
+    
+    if (whereResult.whereClause) {
+      query += ` ${whereResult.whereClause}`;
+    }
+
+    return {
+      query,
+      parameters: this.parameters,
+    };
+  }
+
+  /**
+   * Build DELETE query
+   */
+  buildDeleteQuery(tableName, filterQuery) {
+    const result = this.convert(filterQuery);
+    
+    let query = `DELETE FROM ${this.escapeIdentifier(tableName)}`;
+    
+    if (result.whereClause) {
+      query += ` ${result.whereClause}`;
+    }
+
+    return {
+      query,
+      parameters: result.parameters,
+    };
+  }
+
+  /**
+   * Build COUNT query
+   */
+  buildCountQuery(tableName, filterQuery, options = {}) {
+    const { distinct = false, column = '*' } = options;
+    
+    const result = this.convert(filterQuery);
+    
+    const countExpr = distinct && column !== '*'
+      ? `COUNT(DISTINCT ${this.escapeIdentifier(column)})`
+      : 'COUNT(*)';
+    
+    const tableRef = this.options.tableAlias
+      ? `${this.escapeIdentifier(tableName)} AS ${this.options.tableAlias}`
+      : this.escapeIdentifier(tableName);
+
+    let query = `SELECT ${countExpr} FROM ${tableRef}`;
+    
+    if (result.whereClause) {
+      query += ` ${result.whereClause}`;
+    }
+
+    return {
+      query,
+      parameters: result.parameters,
+    };
+  }
+}
+
+// Utility functions for easy use
+const convertFilterQueryToSQL = (filterQuery, options = {}) => {
+  const converter = new PostgreSQLFilterConverter(options);
+  return converter.convert(filterQuery);
+};
+
+const buildPostgreSQLQuery = (
+  tableName,
+  filterQuery,
+  options = {}
+) => {
+  const converter = new PostgreSQLFilterConverter(options);
+  return converter.buildSelectQuery(tableName, filterQuery, options);
+};
+
+const buildPostgreSQLUpdate = (
+  tableName,
+  values,
+  filterQuery,
+  options = {}
+) => {
+  const converter = new PostgreSQLFilterConverter(options);
+  return converter.buildUpdateQuery(tableName, values, filterQuery);
+};
+
+const buildPostgreSQLDelete = (
+  tableName,
+  filterQuery,
+  options = {}
+) => {
+  const converter = new PostgreSQLFilterConverter(options);
+  return converter.buildDeleteQuery(tableName, filterQuery);
+};
+
+const buildPostgreSQLCount = (
+  tableName,
+  filterQuery,
+  options = {}
+) => {
+  const converter = new PostgreSQLFilterConverter(options);
+  return converter.buildCountQuery(tableName, filterQuery, options);
+};
+
 const postgreSQLParserUtil = {};
 
+postgreSQLParserUtil.convertFilterQueryToSQL = convertFilterQueryToSQL;
+postgreSQLParserUtil.buildPostgreSQLQuery = buildPostgreSQLQuery;
+postgreSQLParserUtil.buildPostgreSQLUpdate = buildPostgreSQLUpdate;
+postgreSQLParserUtil.buildPostgreSQLDelete = buildPostgreSQLDelete;
+postgreSQLParserUtil.buildPostgreSQLCount = buildPostgreSQLCount;
 postgreSQLParserUtil.generateFilterQuery = (filterModel) => {
   if (!filterModel) return null;
   if (typeof filterModel !== "object" || filterModel === null) {
@@ -557,6 +1118,17 @@ FROM (
     WHERE t.table_schema = '${databaseSchemaName}' AND t.table_name = '${databaseTableName}'
 ) subquery;`;
 
+/**
+ * Retrieves rows from a database table with filtering, ordering, and pagination.
+ * @param {object} param0
+ * @param {String} param0.databaseSchemaName
+ * @param {String} param0.databaseTableName
+ * @param {String} param0.orderBy
+ * @param {{sql:string, parameters:Array<any>, whereClause:string, parameterCount:number}} param0.filter
+ * @param {Number} param0.limit
+ * @param {Number} param0.skip
+ * @returns {String} - PostgreSQL query string
+ */
 postgreSQLQueryUtil.getDatabaseTableRows = ({
   databaseSchemaName = "public", // Default to "public" if not provided
   databaseTableName,
@@ -574,7 +1146,7 @@ postgreSQLQueryUtil.getDatabaseTableRows = ({
 
   // Base query with optional filter
   if (filter) {
-    _q = `SELECT ctid, * FROM ${tableReference} WHERE ${filter}`;
+    _q = `SELECT ctid, * FROM ${tableReference} ${filter.whereClause}`;
   } else {
     _q = `SELECT ctid, * FROM ${tableReference}`;
   }
@@ -597,6 +1169,14 @@ postgreSQLQueryUtil.getDatabaseTableRows = ({
   return _q;
 };
 
+/**
+ * Retrieves statistics for a database table.
+ * @param {object} param0
+ * @param {String} param0.databaseSchemaName
+ * @param {String} param0.databaseTableName
+ * @param {{sql:string, parameters:Array<any>, whereClause:string, parameterCount:number}} param0.filter
+ * @returns {String} - PostgreSQL query string
+ */
 postgreSQLQueryUtil.getDatabaseTableStatistics = ({
   databaseSchemaName = "public", // Default to "public" if not provided
   databaseTableName,
@@ -608,7 +1188,7 @@ postgreSQLQueryUtil.getDatabaseTableStatistics = ({
     : `"${databaseTableName}"`;
 
   if (filter) {
-    _q = `SELECT COUNT(*) FROM ${tableReference} WHERE ${filter}`;
+    _q = `SELECT COUNT(*) FROM ${tableReference} ${filter.whereClause}`;
   } else {
     _q = `SELECT COUNT(*) FROM ${tableReference}`;
   }
@@ -1435,6 +2015,7 @@ postgreSQLQueryUtil.updateDatabaseTableByNameQuery = ({
   });
   return sqlStatements;
 };
+
 /**
  * Generates a SQL query to delete (drop) a database table.
  *

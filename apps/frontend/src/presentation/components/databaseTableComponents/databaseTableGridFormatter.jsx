@@ -13,7 +13,7 @@ import { DatabaseTableColumn } from "../../../data/models/databaseTableColumn";
 import { PostgreSQLUtils } from "../../../utils/postgre";
 import { EditCellWrapper } from "../ui/editCellWrapper";
 import { DatabaseTableGridJSONEditor } from "./databaseTableGridJSONEditor";
-
+import { DatabaseTableGridCellForeignKeyPopup } from "./databaseTableGridCellForeignKeyPopup";
 
 /**
  * Returns width for different field types
@@ -49,25 +49,7 @@ const getFieldFormatting = ({
       ? ""
       : "inline-flex items-center  text-blue-600 ";
 
-  const foreignKeyReferenceLink = () => {
-    return `${CONSTANTS.ROUTES.VIEW_DATABASE_TABLE_BY_NAME.path(
-      tenantID,
-      databaseSchemaName,
-      foreignKeyReference?.[0]?.referencedTable
-    )}?filterQuery=${encodeURIComponent(
-      JSON.stringify([
-        {
-          field: foreignKeyReference?.[0]?.referencedColumns[0],
-          operator: "=",
-          value: PostgreSQLUtils.processFilterValueAccordingToFieldType({
-            type: CONSTANTS.POSTGRE_SQL_DATA_TYPES[type].js_type,
-            value: cellValue,
-          }),
-          fieldType: type,
-        },
-      ])
-    )}`;
-  };
+
   const renderForeignKeyIndicator = (value) => {
     return (
       <span className={foreignKeyIndicatorStyle}>
@@ -76,14 +58,15 @@ const getFieldFormatting = ({
             <BiUnlink size={14} className="text-red-400" />
           </div>
         ) : (
-          <Link
-            key={`foreignKeyIndicator_${uniqueKey}`}
-            to={foreignKeyReferenceLink()}
-            target="_blank"
-            className="p-1 bg-slate-100 mr-2 rounded cursor-pointer"
-          >
-            <BiLink size={14} />
-          </Link>
+            <DatabaseTableGridCellForeignKeyPopup
+              tenantID={tenantID}
+              databaseSchemaName={databaseSchemaName}
+              foreignKeyReference={foreignKeyReference}
+              cellValue={cellValue}
+              type={type}
+            >
+
+            </DatabaseTableGridCellForeignKeyPopup>
         )}
         {/* Icon to indicate foreign key */}
         <span>{value}</span>

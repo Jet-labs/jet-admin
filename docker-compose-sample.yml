@@ -28,12 +28,6 @@ services:
       - DATABASE_URL=
       - SEED_DATABASE=true
       
-      # Authentication
-      - JWT_ACCESS_TOKEN_SECRET=your_access_token_secret
-      - JWT_REFRESH_TOKEN_SECRET=your_refresh_token_secret
-      - ACCESS_TOKEN_TIMEOUT=900
-      - REFRESH_TOKEN_TIMEOUT=100h
-      
       # CORS Settings
       - CORS_WHITELIST=http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173,http://127.0.0.1:3001,http://localhost:3001
       

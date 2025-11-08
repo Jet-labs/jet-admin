@@ -46,14 +46,12 @@ export const TenantUpdationForm = ({ tenantID }) => {
       tenantID,
       tenantTitle,
       tenantLogoURL,
-      tenantDBType,
       tenantDBURL,
     }) =>
       updateTenantAPI({
         tenantID,
         tenantTitle,
         tenantLogoURL,
-        tenantDBType,
         tenantDBURL,
       }),
     retry: false,
@@ -72,23 +70,18 @@ export const TenantUpdationForm = ({ tenantID }) => {
       tenantID: tenant ? tenant.tenantID : "",
       tenantTitle: tenant ? tenant.tenantTitle : "",
       tenantLogoURL: tenant ? tenant.tenantLogoURL : "",
-      tenantDBType: tenant
-        ? tenant.tenantDBType
-        : CONSTANTS.SUPPORTED_DATABASES.postgresql.name,
     },
     validationSchema: formValidations.updateTenantFormValidationSchema,
     onSubmit: ({
       tenantID,
       tenantTitle,
       tenantLogoURL,
-      tenantDBType,
       tenantDBURL,
     }) => {
       updateTenant({
         tenantID,
         tenantTitle,
         tenantLogoURL,
-        tenantDBType,
         tenantDBURL,
       });
     },
@@ -100,7 +93,6 @@ export const TenantUpdationForm = ({ tenantID }) => {
       updateTenantForm.setFieldValue("tenantTitle", tenant.tenantTitle);
       updateTenantForm.setFieldValue("tenantLogoURL", tenant.tenantLogoURL);
       updateTenantForm.setFieldValue("tenantDBURL", tenant.tenantDBURL);
-      updateTenantForm.setFieldValue("tenantDBType", tenant.tenantDBType);
     }
   }, [tenant]);
 
@@ -111,27 +103,43 @@ export const TenantUpdationForm = ({ tenantID }) => {
     setIsAddTenantUserDialogOpen(false);
   };
   return (
-    <div className="flex w-full h-full lg:flex-row flex-col justify-center items-start overflow-y-auto">
-      <section className="max-w-xs w-full h-full p-3 text-[#646cff] hidden 2xl:block"></section>
+    <div className="flex w-full   flex-col justify-start items-center overflow-y-auto">
+
       <ReactQueryLoadingErrorWrapper
         isLoading={isLoadingTenant}
         isFetching={isFetchingTenant}
         error={tenantError}
       >
         {tenant && (
-          <section className="w-full">
+          <section className="w-2/3 sm:w-full md:w-full lg:w-2/3">
             <TenantUserAdditionForm
               tenantID={tenant.tenantID}
               onClose={_handleCloseAddTenantUserDialog}
               open={isAddTenantUserDialogOpen}
             />
             <div className="p-3">
-              <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl ">
-                {CONSTANTS.STRINGS.UPDATE_TENANT_FORM_TITLE}
-              </h1>
-              <span className="text-sm font-normal  text-slate-700">
-                {`Tenant id: ${tenant.tenantID}`}
-              </span>
+              <div className="flex flex-row justify-between items-center w-full">
+                <div className="flex flex-col justify-start items-start">
+                  <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl ">
+                    {CONSTANTS.STRINGS.UPDATE_TENANT_FORM_TITLE}
+                  </h1>
+                  <span className="text-sm font-normal  text-slate-700">
+                    {`Tenant id: ${tenant.tenantID}`}
+                  </span>
+                </div>
+
+                <Link
+                  to={CONSTANTS.ROUTES.VIEW_AUDIT_LOGS.path(tenantID)}
+                  key={CONSTANTS.ROUTES.VIEW_AUDIT_LOGS.path(tenantID)}
+                  className={`flex items-center rounded mb-2 w-full p-2 hover:underline transition duration-75 group flex-row !justify-end text-sm font-normal`}
+                >
+                  <MdOutlineLockPerson className={`!text-sm`} />
+                  <span className={`ml-1`}>
+                    {CONSTANTS.STRINGS.MAIN_DRAWER_AUDIT_LOGS_TITLE}
+                  </span>
+                </Link>
+              </div>
+
               <div className="flex flex-row justify-between items-center mt-4 w-full">
                 <div className="flex flex-row justify-start items-center">
                   <div className="flex flex-col justify-start items-start">
@@ -224,18 +232,7 @@ export const TenantUpdationForm = ({ tenantID }) => {
           </section>
         )}
       </ReactQueryLoadingErrorWrapper>
-      <section className="lg:max-w-xs w-full h-full lg:p-3 text-[#646cff]">
-        <Link
-          to={CONSTANTS.ROUTES.VIEW_AUDIT_LOGS.path(tenantID)}
-          key={CONSTANTS.ROUTES.VIEW_AUDIT_LOGS.path(tenantID)}
-          className={`flex items-center rounded mb-2 w-full p-2 hover:underline transition duration-75 group flex-row !justify-start text-sm font-normal`}
-        >
-          <MdOutlineLockPerson className={`!text-sm`} />
-          <span className={`ml-1`}>
-            {CONSTANTS.STRINGS.MAIN_DRAWER_AUDIT_LOGS_TITLE}
-          </span>
-        </Link>
-      </section>
+
     </div>
   );
 };

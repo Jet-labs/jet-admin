@@ -1,6 +1,5 @@
 const constants = {
   STRINGS: {
-    REFRESH_TOKEN_COOKIE_STRING: "refreshToken",
     USER_TENANT_ADDITION_NOTIFICATION_TITLE: "Tenant addition notification",
     USER_TENANT_ADDITION_NOTIFICATION_DESCRIPTION:
       "You have been added to a new tenant",
@@ -114,10 +113,6 @@ const constants = {
     USER_AUTH_TOKEN_EXPIRED: {
       code: "USER_AUTH_TOKEN_EXPIRED",
       message: "User auth token expired",
-    },
-    USER_REFRESH_TOKEN_EXPIRED: {
-      code: "USER_REFRESH_TOKEN_EXPIRED",
-      message: "User refresh token expired",
     },
     USER_AUTH_TOKEN_NOT_FOUND: {
       code: "USER_AUTH_TOKEN_NOT_FOUND",

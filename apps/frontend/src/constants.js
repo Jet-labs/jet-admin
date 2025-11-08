@@ -14,17 +14,6 @@ export const CONSTANTS = {
     TENANT_LOGO_DIRECTORY: "logos",
   },
 
-  SUPPORTED_DATABASES: {
-    postgresql: {
-      name: "PostgreSQL",
-      value: "postgresql",
-    },
-    mysql: {
-      name: "MySQL",
-      value: "mysql",
-    },
-  },
-
   ROLES: {
     PRIMARY: {
       ADMIN: { name: "Admin", value: "ADMIN" },
@@ -1029,8 +1018,6 @@ export const CONSTANTS = {
   APIS: {
     AI: {
       sendUserMessageToAIAPI: (tenantID) =>
-        `/api/v1/tenants/${tenantID}/mcp/chat`,
-      sendUserMessageAPI: (tenantID) =>
         `/api/v1/tenants/${tenantID}/ai/user_message`,
     },
     AUTH: {
@@ -1320,10 +1307,6 @@ export const CONSTANTS = {
     USER_AUTH_TOKEN_EXPIRED: {
       code: "USER_AUTH_TOKEN_EXPIRED",
       message: "User auth token expired",
-    },
-    USER_REFRESH_TOKEN_EXPIRED: {
-      code: "USER_REFRESH_TOKEN_EXPIRED",
-      message: "User refresh token expired",
     },
     USER_AUTH_TOKEN_NOT_FOUND: {
       code: "USER_AUTH_TOKEN_NOT_FOUND",

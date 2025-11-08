@@ -1,2 +1,9 @@
-improve the errors of signin signup for firebase
-change debounce hoook
+modules
+----------------
+postgres manager
+datasources
+dataqueries
+widgets
+dashboards
+cronjobs
+apikeys

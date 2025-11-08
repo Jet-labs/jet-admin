@@ -22,7 +22,7 @@ export const DashboardRenderWidget = ({
     responsive: PropTypes.bool,
     editable: PropTypes.bool,
   };
-  const widgetID = String(widget).split("_")[1].split("-")[0];
+  const widgetID = String(widget).split("_")[1];
   const [ref, size] = useComponentSize();
   const [isMouseHover, setIsMouseHover] = useState(false);
 

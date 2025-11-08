@@ -21,7 +21,7 @@
 
 Our authentication system integrates Firebase Authentication with custom backend services to provide secure user management. Key features include:
 
-- Firebase-based JWT token authentication
+- Firebase authentication
 - Automatic user profile creation
 - Session management with access/refresh tokens
 - Role-based access control integration
@@ -29,8 +29,8 @@ Our authentication system integrates Firebase Authentication with custom backend
 ```mermaid
 sequenceDiagram
     Client->>Firebase: Login with credentials
-    Firebase-->>Client: Returns JWT token
-    Client->>Backend: API request with JWT
+    Firebase-->>Client: Returns Firebase token
+    Client->>Backend: API request with Firebase token
     Backend->>Firebase Admin: Verify token
     Firebase Admin-->>Backend: Token verification result
     Backend->>Database: Get/Create user profile
@@ -70,7 +70,7 @@ VITE_FIREBASE_PROJECT_ID=your-project-id
 ### Authentication Flow <a name="authentication-flow"></a>
 
 1. Client-side Firebase authentication
-2. JWT token verification in backend middleware
+2. Firebase token verification in backend middleware
 3. User profile synchronization
 4. Session management with dual tokens
 

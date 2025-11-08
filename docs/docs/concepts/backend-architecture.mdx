@@ -149,7 +149,7 @@ Located in the `config` directory:
 
 Key middleware components:
 
-- **Authentication Middleware** (`auth.middleware.js`): Validates JWT tokens and Firebase authentication
+- **Authentication Middleware** (`auth.middleware.js`): Validates Firebase authentication
 - **Tenant Middleware** (`tenant.middleware.js`): Handles tenant context for multi-tenant operations
 - **Database Middleware** (`database.middleware.js`): Manages database connections and transactions
 - **Error Handling** (`utils/error.util.js`): Provides centralized error handling
@@ -209,8 +209,8 @@ Located in the `utils` directory:
 ## Authentication Flow
 
 1. Client submits credentials to Firebase Authentication
-2. Firebase returns JWT token to client
-3. Client includes JWT in Authorization header for subsequent requests
+2. Firebase returns firebase token to client
+3. Client includes firebase in Authorization header for subsequent requests
 4. Authentication middleware validates the token
 5. Tenant middleware establishes tenant context
 6. Role-based access control enforces permissions
@@ -264,7 +264,7 @@ The application implements a hierarchical error handling approach:
 
 ## Security Architecture
 
-- **Authentication**: Firebase and JWT-based
+- **Authentication**: Firebase
 - **Authorization**: Role-based access control
 - **Data Validation**: Input validation at controller level
 - **CORS Protection**: Whitelist-based approach

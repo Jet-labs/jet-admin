@@ -15,7 +15,7 @@ export const DashboardWidgetListItem = ({ id, type, children }) => {
     () => ({
       type: CONSTANTS.DASHBOARD_ITEM_TYPES.WIDGET,
       item: () => {
-        const instanceId = `${id}-${Date.now()}`;
+        const instanceId = `${id}_${Date.now()}`;
         console.log(`Dragging started for item: ${instanceId}, type: ${type}`);
         return {
           id: instanceId,

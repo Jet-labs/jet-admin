@@ -16,7 +16,7 @@ const parseDatabaseTableGetRowsQueryParams = (query) => {
 
   const filter =
     q && q !== "" && q !== "null" && q !== "undefined"
-      ? postgreSQLParserUtil.generateFilterQuery(JSON.parse(q))
+      ? postgreSQLParserUtil.convertFilterQueryToSQL(JSON.parse(q))
       : null;
 
   const orderBy =

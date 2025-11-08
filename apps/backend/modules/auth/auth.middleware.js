@@ -77,7 +77,12 @@ authMiddleware.authProvider = async function (req, res, next) {
           req.user = await authService.getUserFromFirebaseID({
             firebaseID: decodedIdToken.uid,
           });
-        } catch (error) {}
+        } catch (error) {
+          Logger.log("error", {
+            message: "authMiddleware:authProvider:catch-3",
+            params: { error },
+          });
+        }
         return next();
       }
     } catch (error) {

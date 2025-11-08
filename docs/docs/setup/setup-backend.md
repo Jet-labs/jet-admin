@@ -39,11 +39,6 @@ EXPRESS_REQUEST_SIZE_LIMIT="5mb"
 # Database Configuration
 DATABASE_URL="postgresql://user:pass@localhost:5432/db?schema=public"
 
-# Authentication
-JWT_ACCESS_TOKEN_SECRET="lhflsdcshdlkflkfsldkcksldjljclsd"
-JWT_REFRESH_TOKEN_SECRET="lhflsdcshdlkflkfsldkcksldjljclsd"
-ACCESS_TOKEN_TIMEOUT=900
-REFRESH_TOKEN_TIMEOUT="100h"
 
 # Node Identification
 NODE_ID="dev_node_1"
@@ -65,7 +60,7 @@ LOG_FILE_SIZE=1
 ```
 
 :::caution
-Be sure to replace the placeholder values with your actual configurations, especially the `DATABASE_URL` and JWT secrets for security purposes.
+Be sure to replace the placeholder values with your actual configurations, especially the `DATABASE_URL` for security purposes.
 :::
 
 ### Firebase Configuration

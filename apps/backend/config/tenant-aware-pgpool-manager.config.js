@@ -18,7 +18,11 @@ class TenantAwarePostgreSQLPoolManager {
     this.prisma = prisma;
     this.pools = new LRUCache({
       max: maxPools,
-      dispose: (_, pool) => {try{pool.end();}catch(e){}}, // Close pool when evicted
+      dispose: (_, pool) => {
+        try {
+          pool.end();
+        } catch (e) {}
+      }, // Close pool when evicted
     });
 
     this.poolConfig = poolConfig;
@@ -28,7 +32,7 @@ class TenantAwarePostgreSQLPoolManager {
 
   /**
    * Helper function to acquire and release a database client.
-   * @param {object} dbPool - The PostgreSQL connection pool.
+   * @param {Pool} dbPool - The PostgreSQL connection pool.
    * @param {function} operation - The operation to perform with the client.
    * @returns {Promise<any>} - The result of the operation.
    */

@@ -35,6 +35,7 @@ import { getFormattedTableColumns } from "./databaseTableGridFormatter";
 import { DatabaseTableRowsDeletionForm } from "./databaseTableRowsDeletionForm";
 import { DatabaseTableRowsExportForm } from "./databaseTableRowsExportForm";
 import { DatabaseTableStatistics } from "./databaseTableStatistics";
+import { AppliedFilters, AppliedFiltersBadge, AppliedFiltersCompact } from "./databaseTableAppliedFilters";
 
 export const DatabaseTableGrid = ({
   tenantID,
@@ -43,6 +44,8 @@ export const DatabaseTableGrid = ({
   showStats,
   containerClass,
   initialFilterQuery,
+  visiblyShowPagination = true,
+  visiblyShowFilters = true,
 }) => {
   DatabaseTableGrid.propTypes = {
     tenantID: PropTypes.number.isRequired,
@@ -58,10 +61,6 @@ export const DatabaseTableGrid = ({
   const [databaseTableColumnFilters, setDatabaseTableColumnFilters] = useState(
     initialFilterQuery || []
   );
-  const [
-    databaseTableColumnFilterCombinator,
-    setDatabaseTableColumnFilterCombinator,
-  ] = useState("AND");
 
   // eslint-disable-next-line no-unused-vars
   const [searchTerm, setSearchTerm] = useState("");
@@ -134,55 +133,215 @@ export const DatabaseTableGrid = ({
     });
 
   useEffect(() => {
-    if (
-      databaseTableColumns &&
-      databaseTableName &&
-      databaseTableColumnFilterCombinator &&
-      databaseTableColumnFilters &&
-      databaseTableColumnFilters.length > 0
-    ) {
-      const queries = [];
-      databaseTableColumnFilters.map((filter) => {
-        let query = {};
-        let o = {};
-        o[filter.operator] = filter.value;
-        query[filter.field] = o;
-        queries.push({ ...query });
+    /**
+     * Build complex filter query from filter structure
+     * Handles nested groups, special operators, and combinators
+     */
+    const buildComplexFilterQuery = (filters) => {
+      if (!filters || filters.length === 0) return null;
+
+      const stack = [{ combinator: 'AND', queries: [] }];
+      let currentLevel = stack[0];
+
+      filters.forEach((filter) => {
+        // Handle group start - create new nesting level
+        if (filter.groupStart) {
+          const newLevel = { combinator: 'AND', queries: [] };
+          stack.push(newLevel);
+          currentLevel = newLevel;
+          return;
+        }
+
+        // Handle group end - pop level and add to parent
+        if (filter.groupEnd) {
+          const completedLevel = stack.pop();
+          currentLevel = stack[stack.length - 1];
+
+          if (completedLevel.queries.length > 0) {
+            const groupQuery = completedLevel.queries.length === 1
+              ? completedLevel.queries[0]
+              : { [completedLevel.combinator]: completedLevel.queries };
+            currentLevel.queries.push(groupQuery);
+          }
+          return;
+        }
+
+        // Handle combinator
+        if (filter.combinator) {
+          currentLevel.combinator = filter.combinator;
+          return;
+        }
+
+        // Handle regular filter rule
+        if (filter.field && filter.operator) {
+          const query = buildFilterCondition(filter);
+          if (query) {
+            currentLevel.queries.push(query);
+          }
+        }
       });
-      const fq = {};
-      fq[databaseTableColumnFilterCombinator] = [...queries];
-      setFilterQuery?.(fq);
-    } else if (
-      databaseTableColumns &&
-      databaseTableName &&
-      debouncedSearchTerm &&
-      debouncedSearchTerm !== ""
-    ) {
-      let queries = [];
+
+      // Build final query from root level
+      if (currentLevel.queries.length === 0) return null;
+      if (currentLevel.queries.length === 1) return currentLevel.queries[0];
+      return { [currentLevel.combinator]: currentLevel.queries };
+    };
+
+    /**
+     * Build a single filter condition with proper operator handling
+     */
+    const buildFilterCondition = (filter) => {
+      const { field, operator, value } = filter;
+
+      // Map operators to query format
+      const operatorMap = {
+        '=': 'eq',
+        '!=': 'ne',
+        '>': 'gt',
+        '>=': 'gte',
+        '<': 'lt',
+        '<=': 'lte',
+        'LIKE': 'like',
+        'NOT LIKE': 'nlike',
+        'ILIKE': 'ilike',
+        'NOT ILIKE': 'nilike',
+        'IN': 'in',
+        'NOT IN': 'nin',
+        'IS NULL': 'null',
+        'IS NOT NULL': 'nnull',
+        '@>': 'contains',      // JSON contains
+        '<@': 'containedBy',   // JSON contained by
+        '?': 'hasKey',         // JSON has key
+      };
+
+      // Handle NULL checks (no value needed)
+      if (operator === 'IS NULL') {
+        return { [field]: { null: true } };
+      }
+      if (operator === 'IS NOT NULL') {
+        return { [field]: { nnull: true } };
+      }
+
+      // Handle BETWEEN operator
+      if (operator === 'BETWEEN') {
+        if (Array.isArray(value) && value.length === 2) {
+          return {
+            AND: [
+              { [field]: { gte: value[0] } },
+              { [field]: { lte: value[1] } },
+            ],
+          };
+        }
+        return null;
+      }
+
+      // Handle STARTS_WITH
+      if (operator === 'STARTS_WITH') {
+        return { [field]: { ilike: `${value}%` } };
+      }
+
+      // Handle ENDS_WITH
+      if (operator === 'ENDS_WITH') {
+        return { [field]: { ilike: `%${value}` } };
+      }
+
+      // Handle array values (IN, NOT IN)
+      if (Array.isArray(value)) {
+        const mappedOp = operatorMap[operator] || operator.toLowerCase();
+        return { [field]: { [mappedOp]: value } };
+      }
+
+      // Handle standard operators
+      const mappedOperator = operatorMap[operator] || operator.toLowerCase();
+      return { [field]: { [mappedOperator]: value } };
+    };
+
+    /**
+     * Build search query across all string columns
+     */
+    const buildSearchQuery = (searchTerm) => {
+      if (!searchTerm || !databaseTableColumns) return null;
+
+      const searchQueries = [];
+      const trimmedSearchTerm = searchTerm.trim();
+
       databaseTableColumns.forEach((column) => {
+        const columnType = CONSTANTS.POSTGRE_SQL_DATA_TYPES[
+          column.databaseTableColumnType
+        ];
+
+        // Only search in string type columns
         if (
-          CONSTANTS.POSTGRE_SQL_DATA_TYPES[column.databaseTableColumnType] &&
-          CONSTANTS.POSTGRE_SQL_DATA_TYPES[column.databaseTableColumnType]
-            .normalizedType == CONSTANTS.DATA_TYPES.STRING
+          columnType &&
+          columnType.normalizedType === CONSTANTS.DATA_TYPES.STRING
         ) {
-          queries.push({
+          searchQueries.push({
             [column.databaseTableColumnName]: {
-              ilike: debouncedSearchTerm,
+              ilike: `%${trimmedSearchTerm}%`,
             },
           });
         }
       });
-      setFilterQuery?.({ OR: queries });
-    } else {
-      setFilterQuery(null);
-    }
+
+      if (searchQueries.length === 0) return null;
+      if (searchQueries.length === 1) return searchQueries[0];
+      return { OR: searchQueries };
+    };
+
+    /**
+     * Combine filters and search into final query
+     */
+    const buildFinalQuery = () => {
+      let filterQuery = null;
+      let searchQuery = null;
+
+    // Build filter query from complex filter structure
+      if (
+        databaseTableColumns &&
+        databaseTableName &&
+        databaseTableColumnFilters &&
+        databaseTableColumnFilters.length > 0
+      ) {
+        filterQuery = buildComplexFilterQuery(databaseTableColumnFilters);
+      }
+
+      // Build search query
+      if (
+        databaseTableColumns &&
+        databaseTableName &&
+        debouncedSearchTerm &&
+        debouncedSearchTerm.trim() !== ""
+      ) {
+        searchQuery = buildSearchQuery(debouncedSearchTerm.trim());
+      }
+
+      // Combine filter and search queries
+      if (filterQuery && searchQuery) {
+        // Both filters and search exist - combine with AND
+        // This means: apply filters AND match search term
+        setFilterQuery?.({ AND: [filterQuery, searchQuery] });
+      } else if (filterQuery) {
+        // Only filters
+        setFilterQuery?.(filterQuery);
+      } else if (searchQuery) {
+        // Only search
+        setFilterQuery?.(searchQuery);
+      } else {
+        // No filters or search
+        setFilterQuery?.(null);
+      }
+    };
+
+    buildFinalQuery();
   }, [
     databaseTableColumnFilters,
     debouncedSearchTerm,
-    databaseTableColumnFilterCombinator,
     databaseTableColumns,
     databaseTableName,
+    setFilterQuery,
   ]);
+
+  console.log({ "filterQuery": filterQuery, "searchTerm": searchTerm, "databaseTableColumnFilters": databaseTableColumnFilters });
 
   const formattedDatabaseTableColumns = useMemo(() => {
     if (databaseTableColumns && databaseTableName) {
@@ -363,6 +522,26 @@ export const DatabaseTableGrid = ({
     setDatabaseTableNewRows([]);
   }, [setDatabaseTableNewRows]);
 
+  const handleRemoveFilter = (filterIndex) => {
+    const newFilters = databaseTableColumnFilters.filter(
+      (_, index) => index !== filterIndex
+    );
+    setDatabaseTableColumnFilters(newFilters);
+  };
+
+  const handleClearAllFilters = () => {
+    setDatabaseTableColumnFilters([]);
+    setSearchTerm("");
+  };
+
+  const handleClearSearch = () => {
+    setSearchTerm("");
+  };
+
+  const handleEditFilters = () => {
+    setIsDatabaseTableColumnFilterMenuOpen(true);
+  };
+
   const {
     bulkAddRows: bulkAdditionDatabaseTableRows,
     bulkUpdateRows: bulkUpdateDatabaseTableRows,
@@ -402,8 +581,8 @@ export const DatabaseTableGrid = ({
               />
             </div>
           )}
-          {databaseTableRowChangeCount > 0 ||
-          isSelectAllRowCheckBoxEnabled ? null : (
+          {(databaseTableRowChangeCount > 0 ||
+            isSelectAllRowCheckBoxEnabled) ? null : visiblyShowFilters ? (
             <div className="px-2 py-2 border-b border-slate-200 flex flex-row justify-between items-start gap-2 w-full">
               {databaseTableColumnFilters &&
               databaseTableColumnFilters.length > 0 ? null : (
@@ -424,35 +603,13 @@ export const DatabaseTableGrid = ({
                   </button>
                 </div>
               )}
-              <div className="flex flex-row justify-end items-center gap-2">
-                {databaseTableColumnFilters.map((filter, index) => {
-                  const key = `filter_${index}`;
-                  return (
-                    <div
-                      key={key}
-                      className="flex items-center border border-[#646cff]  rounded bg-[#646cff]/10 px-2 py-1 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50"
-                    >
-                      {/* Sort info button */}
-                      <div className="text-sm font-medium text-[#646cff] ">
-                        {filter.field} {filter.operator}{" "}
-                        {PostgreSQLUtils.processFilteredValueToTextType({
-                          udtType: filter.fieldType,
-                          value: filter.value,
-                        })}
-                      </div>
-
-                      {/* Clear sort button */}
-                      <button
-                        onClick={() =>
-                          _handleDeleteDatabaseTableColumnFilters(index)
-                        }
-                        className="rounded bg-transparent ml-2 text-[#646cff] outline-none focus:outline-none border-0 p-0 "
-                      >
-                        <FaTimes className="h-4 w-4" />
-                      </button>
-                    </div>
-                  );
-                })}
+                <div className="flex flex-row justify-end items-center gap-2">
+                  <AppliedFiltersCompact
+                    databaseTableColumnFilters={databaseTableColumnFilters}
+                    debouncedSearchTerm={debouncedSearchTerm}
+                    onClearAllFilters={handleClearAllFilters}
+                    onEditFilters={handleEditFilters}
+                  />
                 {databaseTableColumnFilters &&
                 databaseTableColumnFilters.length > 0 ? null : (
                   <button
@@ -487,7 +644,7 @@ export const DatabaseTableGrid = ({
                 </button>
               </div>
             </div>
-          )}
+          ) : null}
           {databaseTableRowChangeCount > 0 && (
             <div className="w-full flex flex-row bg-[#ffe7a4] justify-start items-center gap-2 p-2 border-b border-slate-200">
               <button
@@ -607,12 +764,6 @@ export const DatabaseTableGrid = ({
             }
             databaseTableColumnFilters={databaseTableColumnFilters}
             setDatabaseTableColumnFilters={setDatabaseTableColumnFilters}
-            databaseTableColumnFilterCombinator={
-              databaseTableColumnFilterCombinator
-            }
-            setDatabaseTableColumnFilterCombinator={
-              setDatabaseTableColumnFilterCombinator
-            }
             databaseTableColumns={databaseTableColumns}
             databaseTableName={databaseTableName}
           />
@@ -687,6 +838,7 @@ export const DatabaseTableGrid = ({
               checkboxSelection
               disableRowSelectionOnClick
               disableColumnFilter
+              hideFooterPagination={!visiblyShowPagination}
               onSortModelChange={(model) => {
                 if (model.length > 0) {
                   const { field, sort } = model[0];

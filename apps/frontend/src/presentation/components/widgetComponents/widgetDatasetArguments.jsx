@@ -41,11 +41,13 @@ export const WidgetDatasetArguments = ({
   });
 
   const _handleUpdateDatasetQueryArgs = useCallback((arg, value) => {
+    console.log(arg, value, datasetArgumentsForm.values.dataQueryArgValues[arg]);
     datasetArgumentsForm.setFieldValue(`dataQueryArgValues`, {
       ...datasetArgumentsForm.values.dataQueryArgValues,
       [arg]: value,
     });
-  }, []);
+  }, [datasetArgumentsForm]);
+  // console.log("datasetArgumentsForm.values", datasetArgumentsForm.values);
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">

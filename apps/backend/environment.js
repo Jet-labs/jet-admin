@@ -11,9 +11,7 @@ const environmentVariables = {
   NODE_ENV: env,
   NODE_ID: env == "development" ? "dev_node_1" : "prod_node_1",
   PORT: process.env.PORT || 8090,
-  DATABASE_URL:
-    process.env.DATABASE_URL ||
-    "postgresql://jetadmin:password@jetadminpg:5432/jetadmindb?schema=public",
+  DATABASE_URL: process.env.DATABASE_URL,
   GEMINI_API_KEY: process.env.GEMINI_API_KEY,
   SYSLOG_HOST: process.env.SYSLOG_HOST || "127.0.0.1",
   SYSLOG_PORT: process.env.SYSLOG_PORT || 514,

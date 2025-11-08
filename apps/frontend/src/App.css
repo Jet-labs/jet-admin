@@ -134,4 +134,12 @@ input[type="range"]:focus::-moz-range-thumb {
 
 .react-grid-item.react-grid-placeholder { background: #646cff !important; }
 
+.react-grid-placeholder {
+  background: #646cff3a !important;
+  /* Tailwind blue-500 tint */
+  border: 2px dashed #646cffb4;
+  border-radius: 4px;
+  /* Match widget card radius */
+  transition: all 0.15s ease;
+}
 

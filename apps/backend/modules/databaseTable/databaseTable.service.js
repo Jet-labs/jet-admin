@@ -168,7 +168,7 @@ databaseTableService.getDatabaseTableByName = async ({
  * @param {object} param0.dbPool
  * @param {String} param0.databaseSchemaName
  * @param {String} param0.databaseTableName
- * @param {JSON} param0.filter
+ * @param {{sql:string, parameters:Array<any>, whereClause:string, parameterCount:number}} param0.filter
  * @param {JSON} param0.orderBy
  * @param {Number} param0.skip
  * @param {Number} param0.take
@@ -222,7 +222,7 @@ databaseTableService.getDatabaseTableRows = async ({
     const result = await TenantAwarePostgreSQLPoolManager.withDatabaseClient(
       dbPool,
       async (client) => {
-        return await client.query(generatedQuery);
+        return await client.query(generatedQuery, filter?.parameters);
       }
     );
 
@@ -268,7 +268,7 @@ databaseTableService.getDatabaseTableRows = async ({
  * @param {object} param0.dbPool
  * @param {String} param0.databaseSchemaName
  * @param {String} param0.databaseTableName
- * @param {JSON} param0.filter
+ * @param {{sql:string, parameters:Array<any>, whereClause:string, parameterCount:number}} param0.filter
  * @returns {Promise<object>}
  */
 databaseTableService.getDatabaseTableStatistics = async ({
@@ -287,18 +287,17 @@ databaseTableService.getDatabaseTableStatistics = async ({
       filter,
     },
   });
+  const generatedQuery = postgreSQLQueryUtil.getDatabaseTableStatistics({
+    databaseSchemaName,
+    databaseTableName,
+    filter,
+  });
 
   try {
     const result = await TenantAwarePostgreSQLPoolManager.withDatabaseClient(
       dbPool,
       async (client) => {
-        return await client.query(
-          postgreSQLQueryUtil.getDatabaseTableStatistics({
-            databaseSchemaName,
-            databaseTableName,
-            filter,
-          })
-        );
+        return await client.query(generatedQuery, filter?.parameters);
       }
     );
 

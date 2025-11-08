@@ -41,6 +41,7 @@ export const DataQueryArgsForm = ({
     }
   }, [dataQueryArgs]);
 
+  console.log("dataQueryArgsForm.values", dataQueryArgsForm.values);
   return (
     <Dialog
       open={open}
@@ -79,6 +80,11 @@ export const DataQueryArgsForm = ({
                 autoComplete="off"
                 className="w-full rounded border p-2.5 text-sm text-gray-900 focus:border-[#646cff] focus:ring-2 focus:ring-[#646cff]/50 bg-white outline-none"
               />
+              {dataQueryArgsForm.errors[arg.key] && (
+                <span className="text-red-500 text-xs">
+                  {dataQueryArgsForm.errors[arg.key]}
+                </span>
+              )}
             </div>
           ))}
         </div>

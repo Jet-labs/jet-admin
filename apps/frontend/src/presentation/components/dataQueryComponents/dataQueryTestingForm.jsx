@@ -76,6 +76,7 @@ export const DataQueryTestingForm = ({
   };
 
   const _handleOnArgFormCompleted = (dataQueryArgValues) => {
+    console.log('dataQueryArgValues', dataQueryArgValues);
     setIsArgsFormOpen(false);
     testDataQuery({
       argValues: dataQueryArgValues,

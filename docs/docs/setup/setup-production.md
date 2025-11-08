@@ -54,9 +54,6 @@ environment:
   # AI Configuration
   - GEMINI_API_KEY=your_gemini_api_key
   
-  # Security Configuration
-  - JWT_ACCESS_TOKEN_SECRET=strong_secret_here
-  - JWT_REFRESH_TOKEN_SECRET=strong_secret_here
 ```
 
 ---
@@ -142,7 +139,6 @@ module.exports = {
      ```
 
 2. **Secret Rotation**
-   - Rotate JWT secrets regularly
    - Use Docker secrets for sensitive credentials in production
 
 3. **Firewall Rules**

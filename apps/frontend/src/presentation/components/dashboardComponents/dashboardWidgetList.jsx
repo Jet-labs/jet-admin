@@ -17,7 +17,7 @@ export const DashboardWidgetList = ({ tenantID }) => {
 
   const _handleDragStart = (e, id) => {
     // Set the data transfer with the widget ID
-    e.dataTransfer.setData("widget", `${id}-${Date.now()}`);
+    e.dataTransfer.setData("widget", `${id}_${Date.now()}`);
 
     // Create a custom drag image using the parent element
     const parentElement = document.getElementById(id);

@@ -87,7 +87,7 @@ export const DatabaseTriggerAdditionForm = ({
 
   return (
     <section className="max-w-3xl w-full">
-      <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl border-b border-slate-200 p-3">
+      <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl  p-3">
         {CONSTANTS.STRINGS.ADD_TRIGGER_FORM_TITLE}
       </h1>
 

@@ -73,6 +73,7 @@ export const DefaultDashboardSelectionLayout = ({
   });
 
   const _handleSetDefaultDashboard = (dashboardID) => {
+    console.log("dashboardID", dashboardID);
     updateUserConfigKey({
       tenantID,
       key: userConfigKey,
@@ -108,7 +109,7 @@ export const DefaultDashboardSelectionLayout = ({
                     className="p-1 text-xs text-gray-700 bg-white border border-gray-300 rounded focus:outline-none focus:border-blue-500"
                     value={pinnedDashboardID}
                     onChange={(e) =>
-                      _handleSetDefaultDashboard(Number(e.target.value))
+                      _handleSetDefaultDashboard(e.target.value)
                     }
                   >
                     <option value="" disabled selected>
@@ -219,7 +220,7 @@ export const DefaultDashboardSelectionLayout = ({
                     className="p-1 text-xs text-gray-700 bg-white border border-gray-300 rounded focus:outline-none focus:border-blue-500"
                     value={pinnedDashboardID}
                     onChange={(e) =>
-                      _handleSetDefaultDashboard(Number(e.target.value))
+                      _handleSetDefaultDashboard(e.target.value)
                     }
                   >
                     <option value="" disabled selected>

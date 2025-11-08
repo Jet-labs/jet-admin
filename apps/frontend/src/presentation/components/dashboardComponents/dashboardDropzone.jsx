@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { cloneDeep } from "lodash";
 import { Responsive, WidthProvider } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
@@ -24,6 +24,9 @@ export const DashboardDropzone = ({
     setLayouts: PropTypes.func.isRequired,
   };
   const [currentBreakpoint, setCurrentBreakpoint] = useState("lg");
+  const defaultWidgetSize = { w: 4, h: 6 };
+  const containerRef = useRef(null);
+  const previousWidth = useRef(0);
 
   const _handleDelete = (index) => {
     const widgetToDelete = widgets[index];
@@ -49,6 +52,7 @@ export const DashboardDropzone = ({
 
   const onDrop = (currentLayout, layoutItem, _ev) => {
     const widget = _ev.dataTransfer.getData("widget");
+    console.log("widget", widget);
     const _widgets = [...widgets, widget];
     setWidgets(_widgets);
 
@@ -69,8 +73,7 @@ export const DashboardDropzone = ({
       i: widget,
       x: layoutItem.x,
       y: layoutItem.y,
-      w: 10, // Default width if not provided
-      h: 10, // Default height if not provided
+      ...defaultWidgetSize,
     };
 
     if (!_layouts[currentBreakpoint]) {
@@ -96,9 +99,45 @@ export const DashboardDropzone = ({
 
     setLayouts(_layouts);
   };
+  const scaleLayouts = (layouts, scaleFactor) => {
+    const _layouts = cloneDeep(layouts);
+    console.log("layouts:before", layouts);
+    Object.keys(_layouts).forEach((bp) => {
+      _layouts[bp] = _layouts[bp].map((item) => ({
+        ...item,
+        w: Math.round(item.w * scaleFactor),
+        x: Math.round(item.x * scaleFactor),
+      }));
+    });
+    console.log("layouts:after", _layouts);
+    return _layouts;
+  };
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const observer = new ResizeObserver((entries) => {
+      for (let entry of entries) {
+        const newWidth = entry.contentRect.width;
+
+        if (previousWidth.current && previousWidth.current !== newWidth) {
+          const scaleFactor = newWidth / previousWidth.current;
+
+          // Scale the layout proportionally
+          const newLayouts = scaleLayouts(layouts, scaleFactor);
+          setLayouts(newLayouts);
+        }
+
+        previousWidth.current = newWidth;
+      }
+    });
+
+    observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, [setLayouts, layouts, widgets, containerRef, scaleLayouts]);
 
   return (
-    <div className="w-full h-full min-h-full overflow-y-auto bg-slate-100">
+    <div ref={containerRef} className="w-full h-full min-h-full overflow-y-auto bg-slate-100">
       <ResponsiveReactGridLayout
         style={{ minHeight: "100%" }}
         draggableCancel=".cancelSelectorName"
@@ -109,11 +148,12 @@ export const DashboardDropzone = ({
         onLayoutChange={onLayoutChange}
         resizeHandles={["ne", "se", "nw", "sw"]}
         onDrop={onDrop}
-        margin={[8, 8]}
+        margin={[6, 6]}
         isDroppable
-        cols={{ lg: 8, md: 6, sm: 5, xs: 4, xxs: 3 }}
-        rowHeight={32}
+        cols={{ lg: 24, md: 18, sm: 12, xs: 8, xxs: 4 }} // More columns = finer control
+        rowHeight={16} // Smaller height = finer control vertically
         allowOverlap={false}
+
       >
         {widgets.map((widget, index) => (
           <div key={widget}>

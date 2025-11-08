@@ -1,3 +1,4 @@
+const constants = require("../../constants");
 const { expressUtils } = require("../../utils/express.utils");
 const Logger = require("../../utils/logger");
 const { tenantService } = require("./tenant.service");
@@ -183,7 +184,7 @@ tenantController.updateTenant = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID } = req.params;
-    const { tenantTitle, tenantLogoURL, tenantDBURL, tenantDBType } = req.body;
+    const { tenantTitle, tenantLogoURL, tenantDBURL } = req.body;
     Logger.log("info", {
       message: "tenantController:updateTenant:params",
       params: {
@@ -191,9 +192,6 @@ tenantController.updateTenant = async (req, res) => {
         tenantID,
         tenantTitle,
         tenantLogoURL,
-        tenantDBType,
-        // do not log tenantDBURL
-        // tenantDBURL,
       },
     });
     const updatedTenant = await tenantService.updateTenant({
@@ -202,7 +200,7 @@ tenantController.updateTenant = async (req, res) => {
       tenantTitle,
       tenantLogoURL,
       tenantDBURL,
-      tenantDBType,
+      tenantDBType: constants.SUPPORTED_DATABASES.postgresql.value,
     });
     Logger.log("success", {
       message: "tenantController:updateTenant:updatedTenant",
