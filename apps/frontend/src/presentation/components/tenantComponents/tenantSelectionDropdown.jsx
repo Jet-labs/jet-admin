@@ -123,7 +123,7 @@ export const TenantSelectionDropdown = () => {
             <button
               key={`tenant_id_${tenant.tenantID}`}
               onClick={() => handleTenantChange(tenant)}
-              className="w-full flex items-center rounded p-1 hover:bg-slate-100 bg-white hover:border-0 focus:border-0 border-0"
+              className="w-full flex items-center rounded p-0 hover:bg-slate-100 bg-white hover:border-0 focus:border-0 border-0"
             >
               <div className="flex-shrink-0 w-8 h-8 rounded border border-slate-300 bg-slate-100 flex justify-center items-center">
                 {tenant.tenantLogoURL ? (
@@ -161,11 +161,11 @@ export const TenantSelectionDropdown = () => {
                   {capitalize(StringUtils.truncateName(tenant.tenantTitle, 16))}
                 </Typography>
                 {/* Use Typography for the tenant ID */}
-                <Typography variant="caption" color="text.secondary">
+                {/* <Typography variant="caption" color="text.secondary">
                   {" "}
                   {/* Corresponds roughly to text-xs */}
-                  Tenant ID: {tenant.tenantID}
-                </Typography>
+                {/* Tenant ID: {tenant.tenantID} */}
+                {/* </Typography> */} 
               </Box>
             </button>
           ))}

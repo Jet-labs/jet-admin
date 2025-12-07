@@ -1,5 +1,6 @@
 const dotenv = require("dotenv");
 const path = require("path");
+const constants = require("./constants");
 const p = path.resolve(__dirname, `.env`);
 console.log("setting path for environment...", p);
 console.log("setting up environment variables...");
@@ -11,6 +12,9 @@ const environmentVariables = {
   NODE_ENV: env,
   NODE_ID: env == "development" ? "dev_node_1" : "prod_node_1",
   PORT: process.env.PORT || 8090,
+  ENABLED_MODULES: process.env.ENABLED_MODULES
+    ? process.env.ENABLED_MODULES.split(",")
+    : [constants.MODULES.AUTH, constants.MODULES.TENANT],
   DATABASE_URL: process.env.DATABASE_URL,
   GEMINI_API_KEY: process.env.GEMINI_API_KEY,
   SYSLOG_HOST: process.env.SYSLOG_HOST || "127.0.0.1",

@@ -8,14 +8,26 @@ const Logger = require("./utils/logger");
 const { cronJobService } = require("./modules/cronJob/cronJob.service");
 const { stringUtils } = require("@jet-admin/template-package");
 const { socketIO } = require("./config/socket.io");
+const { isModuleEnabled } = require("./config/module.config");
 const {
   aiSocketController,
 } = require("./modules/ai/socket/ai.socket.controller");
 // Middleware setup
 expressApp.use(cookieParser());
-expressApp.use("/api/v1/auth", require("./modules/auth/auth.v1.routes"));
-expressApp.use("/api/v1/tenants", require("./modules/tenant/tenant.v1.routes"));
 
+// API routes
+if (isModuleEnabled(constants.MODULES.AUTH)) {
+  Logger.log("success", { message: "auth module enabled" });
+  expressApp.use("/api/v1/auth", require("./modules/auth/auth.v1.routes"));
+}
+
+if (isModuleEnabled(constants.MODULES.TENANT)) {
+  Logger.log("success", { message: "tenant module enabled" });
+  expressApp.use(
+    "/api/v1/tenants",
+    require("./modules/tenant/tenant.v1.routes")
+  );
+}
 
 // Global error-handling middleware
 expressApp.use((err, req, res, next) => {

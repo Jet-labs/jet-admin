@@ -1,37 +1,65 @@
-const modules = [
-  "apiKey",
-  "audit",
-  "auth",
-  "cronJob",
-  "dashboard",
-  "database",
-  "databaseTable",
-  "databaseTrigger",
-  "dataQuery",
-  "datasource",
-  "notification",
-  "tenant",
-  "tenantRole",
-  "widget",
-  "userManagement",
-];
+const constants = require("../constants");
+const environmentVariables = require("../environment");
 
 const moduleDependencies = {
-    apiKey: ["auth", "tenant"],
-    audit: ["auth", "tenant"],
-    auth: [],
-    cronJob: ["auth", "tenant", "dataQuery"],
-    dashboard: ["auth", "tenant", "widget"],
-    database: ["auth", "tenant"],
-    databaseTable: ["auth", "tenant", "database"],
-    databaseTrigger: ["auth", "tenant", "database"],
-    dataQuery: ["auth", "tenant", "datasource"],
-    datasource: ["auth", "tenant"],
-    notification: ["auth", "tenant"],
-    tenant: ["auth"],
-    tenantRole: ["auth", "tenant"],
-    widget: ["auth", "tenant", "dataQuery"],
-    userManagement: ["auth", "tenant"],
+  apiKey: [constants.MODULES.AUTH, constants.MODULES.TENANT],
+  audit: [constants.MODULES.AUTH, constants.MODULES.TENANT],
+  auth: [],
+  cronJob: [
+    constants.MODULES.AUTH,
+    constants.MODULES.TENANT,
+    constants.MODULES.DATAQUERY,
+  ],
+  dashboard: [
+    constants.MODULES.AUTH,
+    constants.MODULES.TENANT,
+    constants.MODULES.WIDGET,
+  ],
+  database: [constants.MODULES.AUTH, constants.MODULES.TENANT],
+  databaseTable: [
+    constants.MODULES.AUTH,
+    constants.MODULES.TENANT,
+    constants.MODULES.DATABASE,
+  ],
+  databaseTrigger: [
+    constants.MODULES.AUTH,
+    constants.MODULES.TENANT,
+    constants.MODULES.DATABASE,
+  ],
+  dataQuery: [
+    constants.MODULES.AUTH,
+    constants.MODULES.TENANT,
+    constants.MODULES.DATASOURCE,
+  ],
+  datasource: [constants.MODULES.AUTH, constants.MODULES.TENANT],
+  notification: [constants.MODULES.AUTH, constants.MODULES.TENANT],
+  tenant: [constants.MODULES.AUTH],
+  tenantRole: [constants.MODULES.AUTH, constants.MODULES.TENANT],
+  widget: [
+    constants.MODULES.AUTH,
+    constants.MODULES.TENANT,
+    constants.MODULES.DATAQUERY,
+  ],
+  userManagement: [constants.MODULES.AUTH, constants.MODULES.TENANT],
 };
 
-module.exports = { modules, moduleDependencies };
+const isModuleEnabled = (moduleName) => {
+  if (
+    !environmentVariables.ENABLED_MODULES ||
+    !Array.isArray(environmentVariables.ENABLED_MODULES)
+  ) {
+    return true; // If not configured, enable all modules
+  }
+
+  if (!environmentVariables.ENABLED_MODULES.includes(moduleName)) {
+    return false;
+  }
+
+  // Check if all dependencies are also enabled
+  const dependencies = moduleDependencies[moduleName] || [];
+  return dependencies.every((dep) =>
+    environmentVariables.ENABLED_MODULES.includes(dep)
+  );
+};
+
+module.exports = { moduleDependencies, isModuleEnabled };

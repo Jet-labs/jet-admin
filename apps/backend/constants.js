@@ -1,4 +1,20 @@
 const constants = {
+  MODULES: {
+    AI: "ai",
+    AUTH: "auth",
+    TENANT: "tenant",
+    DATABASE: "database",
+    DATASOURCE: "datasource",
+    DATAQUERY: "dataQuery",
+    DASHBOARD: "dashboard",
+    WIDGET: "widget",
+    USERMANAGEMENT: "userManagement",
+    ROLE: "role",
+    APIKEY: "apiKey",
+    CRONJOB: "cronJob",
+    NOTIFICATION: "notification",
+    PERMISSION: "permission",
+  },
   STRINGS: {
     USER_TENANT_ADDITION_NOTIFICATION_TITLE: "Tenant addition notification",
     USER_TENANT_ADDITION_NOTIFICATION_DESCRIPTION:
