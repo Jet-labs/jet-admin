@@ -36,9 +36,19 @@ export const CONSTANTS = {
     AI_CHAT_BOT_MESSAGE: "ai_chat_bot_message",
   },
   STRINGS: {
+    ADD_WORKFLOW_BUTTON_TEXT: "Add workflow",
     AI_CHAT_BUTTON_TEXT: "AI Chat",
+    ADD_WORKFLOW_FORM_NAME_FIELD_LABEL: "Workflow name",
+    ADD_WORKFLOW_FORM_NAME_FIELD_PLACEHOLDER: "Your workflow's name",
+    ADD_WORKFLOW_FORM_TITLE: "Create workflow",
     DATAGRID_JSON_POPUP_CANCEL_BUTTON: "Cancel",
     DATAGRID_JSON_POPUP_SAVE_BUTTON: "Save",
+    DATAGRID_JSON_POPUP_TITLE: "Edit JSON",
+    WORKFLOW_ADDITION_FORM_TITLE: "Create workflow",
+    WORKFLOW_ADDITION_FORM_NAME_FIELD_LABEL: "Workflow name",
+    WORKFLOW_ADDITION_FORM_NAME_FIELD_PLACEHOLDER: "Your workflow's name",
+    WORKFLOW_ADDITION_FORM_SUBMIT_BUTTON: "Add workflow",
+    WORKFLOW_ADDITION_FORM_TEST_BUTTON: "Test workflow",
     NO_DATABASE_URL: "Please add database URL in the tenant settings",
     DASHBOARD_DROPPING_ELEMENT_TAG: "__dropping-elem__",
     HIDE_QUERY_META_CONTENT_BUTTON_TEXT: "Hide metadata",
@@ -66,6 +76,7 @@ export const CONSTANTS = {
     MAIN_DRAWER_DATABASE_NOTIFICATIONS_TITLE: "Notifications",
     MAIN_DRAWER_API_KEYS_TITLE: "API Keys",
     MAIN_DRAWER_CRON_JOBS_TITLE: "Scheduled jobs",
+    MAIN_DRAWER_WORKFLOWS_TITLE: "Workflows",
     MAIN_DRAWER_SQL_EDITOR_TITLE: "PG SQL Editor",
     MAIN_DRAWER_QUERIES_TITLE: "Queries",
     MAIN_DRAWER_ADD_DATABASE_SCHEMA_BUTTON: "Add schema",
@@ -841,6 +852,19 @@ export const CONSTANTS = {
       code: "/tenants/:tenantID/raw-sql-query",
       path: (tenantID) => `/tenants/${tenantID}/raw-sql-query`,
     },
+    VIEW_WORKFLOWS: {
+      code: "/tenants/:tenantID/workflows",
+      path: (tenantID) => `/tenants/${tenantID}/workflows`,
+    },
+    ADD_WORKFLOW: {
+      code: "/tenants/:tenantID/workflows/add",
+      path: (tenantID) => `/tenants/${tenantID}/workflows/add`,
+    },
+    WORKFLOW_BUILDER: {
+      code: "/tenants/:tenantID/workflows/:workflowID/editor",
+      path: (tenantID, workflowID) =>
+        `/tenants/${tenantID}/workflows/${workflowID}/editor`,
+    },
     ADD_DATABASE_TABLE: {
       code: "/tenants/:tenantID/schemas/:databaseSchemaName/tables/add",
       path: (tenantID, databaseSchemaName) =>
@@ -1019,6 +1043,12 @@ export const CONSTANTS = {
     AI: {
       sendUserMessageToAIAPI: (tenantID) =>
         `/api/v1/tenants/${tenantID}/ai/user_message`,
+    },
+    WORKFLOW: {
+      getAllWorkflowsAPI: (tenantID) => `/api/v1/tenants/${tenantID}/workflows`,
+      executeWorkflowAPI: (workflowID) =>
+        `/api/v1/workflows/${workflowID}/execute`,
+      getWorkflowRunStatusAPI: (runID) => `/api/v1/workflows/run/${runID}`,
     },
     AUTH: {
       getUserInfoAPI: () => "/api/v1/auth",
@@ -1359,6 +1389,8 @@ export const CONSTANTS = {
 
     WIDGETS: (tenantID) => `${tenantID}-WIDGETS`,
 
+    WORKFLOWS: (tenantID) => `${tenantID}-WORKFLOWS`,
+
     DASHBOARDS: (tenantID) => `${tenantID}-DASHBOARDS`,
 
     CUSTOMER_PLAN: "CUSTOMER_PLAN",
@@ -1670,7 +1702,10 @@ export const CONSTANTS = {
   ],
 
   RESIZABLE_PANEL_KEYS: {
+    WORKFLOW_ADDITION_FORM_QUERY_EDITOR_SEPARATION:
+      "WORKFLOW_ADDITION_FORM_QUERY_EDITOR_SEPARATION",
     MAIN_DRAWER_LIST_SEPARATION: "MAIN_DRAWER_LIST_SEPARATION",
+    WORKFLOW_LAYOUT_SEPARATION: "WORKFLOW_LAYOUT_SEPARATION",
     QUERY_ADDITION_FORM_RESULT_SEPARATION:
       "QUERY_ADDITION_FORM_RESULT_SEPARATION",
     RAW_QUERY_EXECUTION_FORM_RESULT_SEPARATION:

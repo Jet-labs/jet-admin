@@ -27,6 +27,18 @@ if (isModuleEnabled(constants.MODULES.TENANT)) {
     "/api/v1/tenants",
     require("./modules/tenant/tenant.v1.routes")
   );
+  expressApp.use(
+    "/api/v1/tenants",
+    require("./modules/tenant/tenant.v1.routes")
+  );
+}
+
+if (isModuleEnabled(constants.MODULES.WORKFLOW)) {
+  Logger.log("success", { message: "workflow module enabled" });
+  expressApp.use(
+    "/api/v1/workflows",
+    require("./modules/workflow/routes/workflow.routes")
+  );
 }
 
 // Global error-handling middleware
@@ -66,6 +78,18 @@ socketIO.on("connection", async (socket) => {
         socket,
         message: data.message,
         chatRoomID: data.chatRoomID,
+        firebaseID: firebase_id,
+      });
+    }
+  );
+
+  socket.on(
+    constants.SOCKET_RECEIVE_EVENTS.WORKFLOW_RUN_JOIN,
+    async (data) => {
+      const { workflowSocketController } = require("./modules/workflow/controllers/workflow.socket.controller");
+      await workflowSocketController.onWorkflowRunJoin({
+        socket,
+        runId: data.runId,
         firebaseID: firebase_id,
       });
     }

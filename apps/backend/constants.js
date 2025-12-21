@@ -14,6 +14,7 @@ const constants = {
     CRONJOB: "cronJob",
     NOTIFICATION: "notification",
     PERMISSION: "permission",
+    WORKFLOW: "workflow",
   },
   STRINGS: {
     USER_TENANT_ADDITION_NOTIFICATION_TITLE: "Tenant addition notification",
@@ -62,6 +63,7 @@ const constants = {
 
   SOCKET_RECEIVE_EVENTS: {
     AI_CHAT_USER_MESSAGE: "ai_chat_user_message",
+    WORKFLOW_RUN_JOIN: "workflow_run_join",
   },
 
   SAMPLE_PLAN: {

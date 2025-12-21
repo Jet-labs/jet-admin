@@ -192,6 +192,8 @@ model tblTenants {
   tblUserTenantConfigMap      tblUserTenantConfigMap[]
   tblUsersTenantsRelationship tblUsersTenantsRelationship[]
   tblWidgets                  tblWidgets[]
+  tblWorkflowInstances        tblWorkflowInstances[]
+  tblWorkflows                tblWorkflows[]
 }
 
 model tblUserNotifications {
@@ -252,6 +254,7 @@ model tblUsers {
   tblUserTenantConfigMap      tblUserTenantConfigMap[]
   tblUsersTenantsRelationship tblUsersTenantsRelationship[]
   tblWidgets                  tblWidgets[]
+  tblWorkflows                tblWorkflows[]
 }
 
 model tblUsersTenantsRelationship {
@@ -304,4 +307,83 @@ model tblTenantConfig {
   allowedModules String[]  @db.VarChar
   createdAt      DateTime? @default(now()) @db.Timestamptz(6)
   updatedAt      DateTime? @default(now()) @db.Timestamptz(6)
+}
+
+model tblNodeExecutionLogs {
+  executionLogID       BigInt               @id @default(autoincrement())
+  instanceID           String               @db.Uuid
+  nodeID               String               @db.Uuid
+  eventType            String               @db.VarChar
+  inputData            Json?
+  outputData           Json?
+  errorMessage         Json?
+  createdAt            DateTime             @default(now()) @db.Timestamptz(6)
+  tblWorkflowInstances tblWorkflowInstances @relation(fields: [instanceID], references: [instanceID], onDelete: Cascade, onUpdate: NoAction)
+  tblWorkflowNodes     tblWorkflowNodes     @relation(fields: [nodeID], references: [nodeID], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([instanceID], map: "idx_tblNodeExecutionLogs_instanceID")
+}
+
+model tblWorkflowEdge {
+  edgeID                                                              String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  workflowID                                                          String           @db.Uuid
+  upstreamNodeID                                                      String           @db.Uuid
+  downstreamNodeID                                                    String           @db.Uuid
+  createdAt                                                           DateTime         @default(now()) @db.Timestamptz(6)
+  updatedAt                                                           DateTime         @default(now()) @db.Timestamptz(6)
+  tblWorkflowNodes_tblWorkflowEdge_downstreamNodeIDTotblWorkflowNodes tblWorkflowNodes @relation("tblWorkflowEdge_downstreamNodeIDTotblWorkflowNodes", fields: [downstreamNodeID], references: [nodeID], onDelete: Cascade, onUpdate: NoAction, map: "tblWorkflowEdge_downstream_fkey")
+  tblWorkflowNodes_tblWorkflowEdge_upstreamNodeIDTotblWorkflowNodes   tblWorkflowNodes @relation("tblWorkflowEdge_upstreamNodeIDTotblWorkflowNodes", fields: [upstreamNodeID], references: [nodeID], onDelete: Cascade, onUpdate: NoAction, map: "tblWorkflowEdge_upstream_fkey")
+  tblWorkflows                                                        tblWorkflows     @relation(fields: [workflowID], references: [workflowID], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([workflowID], map: "idx_tblWorkflowEdge_workflowID")
+}
+
+model tblWorkflowInstances {
+  instanceID           String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  workflowID           String                 @db.Uuid
+  tenantID             String                 @db.Uuid
+  status               String                 @default("PENDING") @db.VarChar
+  contextData          Json                   @default("{}")
+  version              Int                    @default(1)
+  startedAt            DateTime?              @db.Timestamptz(6)
+  completedAt          DateTime?              @db.Timestamptz(6)
+  createdAt            DateTime               @default(now()) @db.Timestamptz(6)
+  updatedAt            DateTime               @default(now()) @db.Timestamptz(6)
+  tblNodeExecutionLogs tblNodeExecutionLogs[]
+  tblTenants           tblTenants             @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction)
+  tblWorkflows         tblWorkflows           @relation(fields: [workflowID], references: [workflowID], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([tenantID, status], map: "idx_tblWorkflowInstances_tenantID_status")
+}
+
+model tblWorkflowNodes {
+  nodeID                                                             String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  workflowID                                                         String                 @db.Uuid
+  nodeType                                                           String                 @db.VarChar
+  timeoutSeconds                                                     Int?                   @default(300)
+  retryLimit                                                         Int?                   @default(3)
+  createdAt                                                          DateTime               @default(now()) @db.Timestamptz(6)
+  updatedAt                                                          DateTime               @default(now()) @db.Timestamptz(6)
+  tblNodeExecutionLogs                                               tblNodeExecutionLogs[]
+  tblWorkflowEdge_tblWorkflowEdge_downstreamNodeIDTotblWorkflowNodes tblWorkflowEdge[]      @relation("tblWorkflowEdge_downstreamNodeIDTotblWorkflowNodes")
+  tblWorkflowEdge_tblWorkflowEdge_upstreamNodeIDTotblWorkflowNodes   tblWorkflowEdge[]      @relation("tblWorkflowEdge_upstreamNodeIDTotblWorkflowNodes")
+  tblWorkflows                                                       tblWorkflows           @relation(fields: [workflowID], references: [workflowID], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([workflowID], map: "idx_tblWorkflowNodes_workflowID")
+}
+
+model tblWorkflows {
+  workflowID           String                 @id(map: "tblWorflows_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title                String                 @db.VarChar
+  tenantID             String                 @db.Uuid
+  creatorID            String?                @db.Uuid
+  isDisabled           Boolean?
+  disabledAt           DateTime?              @db.Timestamptz(6)
+  createdAt            DateTime               @default(now()) @db.Timestamptz(6)
+  updatedAt            DateTime               @default(now()) @db.Timestamptz(6)
+  tblWorkflowEdge      tblWorkflowEdge[]
+  tblWorkflowInstances tblWorkflowInstances[]
+  tblWorkflowNodes     tblWorkflowNodes[]
+  tblUsers             tblUsers?              @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "tblWorkflowsCreatorID")
+  tblTenants           tblTenants             @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "tblWorkflowsTenantID")
 }

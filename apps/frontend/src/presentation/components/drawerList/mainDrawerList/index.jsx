@@ -28,6 +28,8 @@ import { useComponentSize } from "../../../../logic/hooks/useComponentSize";
 import { TenantSelectionDropdown } from "../../tenantComponents/tenantSelectionDropdown";
 import { NoEntityUI } from "../../ui/noEntityUI";
 import PropTypes from "prop-types";
+import { GoWorkflow } from "react-icons/go";
+import { LuWorkflow } from "react-icons/lu";
 
 // eslint-disable-next-line no-unused-vars
 const DrawerLinkItem = ({ item, tenantID }) => {
@@ -253,6 +255,12 @@ export const MainDrawerList = () => {
       title: CONSTANTS.STRINGS.MAIN_DRAWER_CRON_JOBS_TITLE,
       icon: RiCalendarScheduleFill,
       path: CONSTANTS.ROUTES.VIEW_CRON_JOBS.path(tenantID),
+    },
+    {
+      type: "link",
+      title: CONSTANTS.STRINGS.MAIN_DRAWER_WORKFLOWS_TITLE,
+      icon: LuWorkflow,
+      path: CONSTANTS.ROUTES.VIEW_WORKFLOWS.path(tenantID),
     },
     // {
     //   type: "link",

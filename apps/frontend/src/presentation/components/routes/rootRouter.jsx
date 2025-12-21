@@ -14,6 +14,7 @@ import { WidgetLayout } from "../layouts/widgetLayout";
 import { DatabaseNotificationLayout } from "../layouts/databaseNotificationLayout";
 import { APIKeyLayout } from "../layouts/apiKeyLayout";
 import { CronJobLayout } from "../layouts/cronJobLayout";
+import { WorkflowLayout } from "../layouts/workflowLayout";
 import { DatasourceLayout } from "../layouts/datasourceLayout";
 const SignInPage = lazy(() => import("../../pages/signInPage"));
 const SignUpPage = lazy(() => import("../../pages/signUpPage"));
@@ -101,6 +102,10 @@ const ViewAuditLogsPage = lazy(() => import("../../pages/viewAuditLogsPage"));
 
 const DatasourceLayoutLandingPage = lazy(() =>
   import("../../pages/datasourceLayoutLandingPage")
+);
+const AddWorkflowPage = lazy(() => import("../../pages/addWorkflowPage"));
+const WorkflowLayoutLandingPage = lazy(() =>
+  import("../../pages/workflowLayoutLandingPage")
 );
 const AddDatasourcePage = lazy(() => import("../../pages/addDatasourcePage"));
 const UpdateDatasourcePage = lazy(() =>
@@ -316,6 +321,20 @@ const router = createBrowserRouter([
           {
             path: CONSTANTS.ROUTES.RAW_SQL_QUERY.code,
             element: <RawSqlQueryPage />,
+          },
+
+          {
+            element: <WorkflowLayout />,
+            children: [
+              {
+                path: CONSTANTS.ROUTES.VIEW_WORKFLOWS.code,
+                element: <WorkflowLayoutLandingPage />,
+              },
+              {
+                path: CONSTANTS.ROUTES.ADD_WORKFLOW.code,
+                element: <AddWorkflowPage />,
+              },
+            ],
           },
           {
             element: <UserManagementLayout />,

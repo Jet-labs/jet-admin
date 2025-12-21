@@ -3,15 +3,15 @@ import { useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 import { DefaultDashboardSelectionLayout } from "../../components/ui/defaultDashboardSelectionLayout";
 
-const APIKeyLayoutLandingPage = () => {
+const CronjobLayoutLandingPage = () => {
   const { tenantID } = useParams();
 
   return (
     <DefaultDashboardSelectionLayout
       tenantID={tenantID}
-      userConfigKey={`${CONSTANTS.USER_CONFIG_KEYS.DEFAULT_DASHBOARD_ID}_apiKeyLayoutLandingPage`}
+      userConfigKey={`${CONSTANTS.USER_CONFIG_KEYS.DEFAULT_DASHBOARD_ID}_cronjobLayoutLandingPage`}
     />
   );
 };
 
-export default APIKeyLayoutLandingPage;
+export default CronjobLayoutLandingPage;

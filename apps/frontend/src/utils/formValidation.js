@@ -1,6 +1,7 @@
 import * as Yup from "yup";
 export const formValidations = {};
 
+
 formValidations.emailSignUpFormValidationSchema = Yup.object().shape({
   email: Yup.string()
     .required("Email is required")
@@ -312,4 +313,9 @@ formValidations.datasourceAdditionFormValidationSchema = Yup.object().shape({
   datasourceName: Yup.string().required("Datasource name is required"),
   datasourceDescription: Yup.string().optional(),
   datasourceType: Yup.string().required("Datasource type is required"),
+});
+
+formValidations.workflowAdditionFormValidationSchema = Yup.object().shape({
+  title: Yup.string().required("Workflow name is required"),
+  workflowConfig: Yup.object().required("Workflow config is required"),
 });
