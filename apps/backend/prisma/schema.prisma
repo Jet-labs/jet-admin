@@ -364,6 +364,7 @@ model tblWorkflowNodes {
   retryLimit                                                         Int?                   @default(3)
   createdAt                                                          DateTime               @default(now()) @db.Timestamptz(6)
   updatedAt                                                          DateTime               @default(now()) @db.Timestamptz(6)
+  nodeConfig                                                         Json?
   tblNodeExecutionLogs                                               tblNodeExecutionLogs[]
   tblWorkflowEdge_tblWorkflowEdge_downstreamNodeIDTotblWorkflowNodes tblWorkflowEdge[]      @relation("tblWorkflowEdge_downstreamNodeIDTotblWorkflowNodes")
   tblWorkflowEdge_tblWorkflowEdge_upstreamNodeIDTotblWorkflowNodes   tblWorkflowEdge[]      @relation("tblWorkflowEdge_upstreamNodeIDTotblWorkflowNodes")

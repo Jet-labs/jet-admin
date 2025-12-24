@@ -1,0 +1,32 @@
+{
+  "name": "@jet-admin/workflow-edges",
+  "version": "1.0.0",
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "react-icons": "^5.5.0"
+  },
+  "scripts": {
+    "build": "esbuild src/index.js --bundle --outfile=dist/index.mjs --loader:.js=jsx --format=esm --sourcemap --external:react --external:react-dom --external:reactflow && esbuild src/index.js --bundle --outfile=dist/index.cjs --loader:.js=jsx --format=cjs --sourcemap --external:react --external:react-dom --external:reactflow",
+    "dev": "npm run build -- --watch"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "reactflow": "^11.11.4"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  }
+}

@@ -33,13 +33,13 @@ if (isModuleEnabled(constants.MODULES.TENANT)) {
   );
 }
 
-if (isModuleEnabled(constants.MODULES.WORKFLOW)) {
-  Logger.log("success", { message: "workflow module enabled" });
-  expressApp.use(
-    "/api/v1/workflows",
-    require("./modules/workflow/routes/workflow.routes")
-  );
-}
+// if (isModuleEnabled(constants.MODULES.WORKFLOW)) {
+//   Logger.log("success", { message: "workflow module enabled" });
+//   expressApp.use(
+//     "/api/v1/workflows",
+//     require("./modules/workflow/routes/workflow.routes")
+//   );
+// }
 
 // Global error-handling middleware
 expressApp.use((err, req, res, next) => {

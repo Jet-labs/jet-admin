@@ -13,7 +13,8 @@ let databaseRouter,
   tenantAPIKeyRouter,
   cronjobRouter,
   auditLogRouter,
-  aiRouter;
+  aiRouter,
+  workflowRouter;
 const { isModuleEnabled } = require("../../config/module.config");
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
@@ -34,6 +35,12 @@ if (isModuleEnabled(constants.MODULES.DATAQUERY)) {
     message: `${constants.MODULES.DATAQUERY} module imported`,
   });
   dataQueryRouter = require("../dataQuery/dataQuery.v1.routes");
+}
+if (isModuleEnabled(constants.MODULES.WORKFLOW)) {
+  Logger.log("success", {
+    message: `${constants.MODULES.WORKFLOW} module imported`,
+  });
+  workflowRouter = require("../workflow/workflow.v1.routes");
 }
 if (isModuleEnabled(constants.MODULES.WIDGET)) {
   Logger.log("success", {
@@ -234,6 +241,20 @@ if (isModuleEnabled(constants.MODULES.DATAQUERY)) {
     authMiddleware.checkUserPermissions(["tenant:query"]),
     tenantMiddleware.poolProvider,
     dataQueryRouter
+  );
+}
+
+// Nested workflow routes
+if (isModuleEnabled(constants.MODULES.WORKFLOW)) {
+  Logger.log("success", {
+    message: `${constants.MODULES.WORKFLOW} module enabled`,
+  });
+  router.use(
+    "/:tenantID/workflows",
+    param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
+    authMiddleware.checkUserPermissions(["tenant:workflow"]),
+    tenantMiddleware.poolProvider,
+    workflowRouter
   );
 }
 

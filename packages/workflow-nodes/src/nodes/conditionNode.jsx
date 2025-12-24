@@ -1,15 +1,21 @@
 import React, { memo } from 'react';
 import { Handle, Position } from 'reactflow';
+import { useWorkflowNodes } from '../context';
+import { TbLogicAnd } from 'react-icons/tb';
 
 export const ConditionNode = memo(({ data, isConnectable }) => {
+  const { strings } = useWorkflowNodes();
   return (
-    <div className="bg-white border-2 border-orange-200 rounded shadow-md min-w-[150px]">
+    <div className="bg-white border-2 border-orange-200 rounded shadow-md min-w-[150px] hover:border-orange-400 transition-colors">
       <div className="bg-orange-50 px-3 py-1 border-b border-orange-100 rounded-t text-xs font-bold text-orange-700">
-        CONDITION
+        {strings.WORKFLOW_EDITOR_CONDITION_NODE_LABEL }
       </div>
       <div className="p-3 text-sm">
-        {data.label || 'Condition'}
-        <div className="text-xs text-gray-400 mt-1 font-mono bg-gray-50 p-1 rounded">
+        <div className="flex items-center gap-2 mb-2">
+            <TbLogicAnd className="text-orange-500 text-lg" />
+            <span className="font-bold text-slate-700">{data.label || 'Condition'}</span>
+        </div>
+        <div className="text-xs text-gray-500 font-mono bg-gray-50 p-2 rounded break-all border border-gray-100">
           {data.condition || 'true'}
         </div>
       </div>

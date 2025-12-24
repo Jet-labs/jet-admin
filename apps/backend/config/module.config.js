@@ -41,6 +41,7 @@ const moduleDependencies = {
     constants.MODULES.DATAQUERY,
   ],
   userManagement: [constants.MODULES.AUTH, constants.MODULES.TENANT],
+  workflow: [constants.MODULES.AUTH, constants.MODULES.TENANT, constants.MODULES.DATAQUERY],
 };
 
 const isModuleEnabled = (moduleName) => {

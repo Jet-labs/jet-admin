@@ -36,6 +36,21 @@ export const CONSTANTS = {
     AI_CHAT_BOT_MESSAGE: "ai_chat_bot_message",
   },
   STRINGS: {
+    ADD_WORKFLOW_FORM_WORKFLOW_ADDITION_SUCCESS: "Workflow added successfully!",
+    WORKFLOW_EDITOR_DATA_QUERY_TITLE_LABEL: "Query name",
+    WORKFLOW_EDITOR_DATA_QUERY_TITLE_PLACEHOLDER: "Your query's name",
+    WORKFLOW_EDITOR_DATA_QUERY_NODE_SELECT_LABEL: "Select query",
+    WORKFLOW_EDITOR_DATA_QUERY_NODE_ARGUMENTS_LABEL: "Query arguments",
+    WORKFLOW_EDITOR_DATA_QUERY_NODE_SAVE_BUTTON: "Save",
+    WORKFLOW_EDITOR_DATA_QUERY_NODE_TEST_BUTTON: "Test",
+    WORKFLOW_EDITOR_DATA_QUERY_NODE_TESTING_SUCCESS: "Query run successfully!",
+    WORKFLOW_EDITOR_DATA_QUERY_NODE_PLACEHOLDER: "Select query dataset",
+    WORKFLOW_EDITOR_DATA_QUERY_NODE_LABEL: "Data Query",
+    WORKFLOW_EDITOR_JAVASCRIPT_NODE_LABEL: "Javascript",
+    WORKFLOW_EDITOR_CONDITION_NODE_LABEL: "Condition",
+    WORKFLOW_EDITOR_ADD_DATA_QUERY_BUTTON_TEXT: "Add data query",
+    WORKFLOW_EDITOR_ADD_JAVASCRIPT_BUTTON_TEXT: "Add javascript",
+    WORKFLOW_EDITOR_ADD_CONDITION_BUTTON_TEXT: "Add condition",
     ADD_WORKFLOW_BUTTON_TEXT: "Add workflow",
     AI_CHAT_BUTTON_TEXT: "AI Chat",
     ADD_WORKFLOW_FORM_NAME_FIELD_LABEL: "Workflow name",
@@ -1046,6 +1061,13 @@ export const CONSTANTS = {
     },
     WORKFLOW: {
       getAllWorkflowsAPI: (tenantID) => `/api/v1/tenants/${tenantID}/workflows`,
+      createWorkflowAPI: (tenantID) => `/api/v1/tenants/${tenantID}/workflows`,
+      getWorkflowByIDAPI: (tenantID, workflowID) =>
+        `/api/v1/tenants/${tenantID}/workflows/${workflowID}`,
+      updateWorkflowAPI: (tenantID, workflowID) =>
+        `/api/v1/tenants/${tenantID}/workflows/${workflowID}`,
+      deleteWorkflowAPI: (tenantID, workflowID) =>
+        `/api/v1/tenants/${tenantID}/workflows/${workflowID}`,
       executeWorkflowAPI: (workflowID) =>
         `/api/v1/workflows/${workflowID}/execute`,
       getWorkflowRunStatusAPI: (runID) => `/api/v1/workflows/run/${runID}`,
