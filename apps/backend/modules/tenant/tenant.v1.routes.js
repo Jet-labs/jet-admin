@@ -4,17 +4,10 @@ const { tenantController } = require("./tenant.controller");
 const { tenantMiddleware } = require("./tenant.middleware");
 const { authMiddleware } = require("../auth/auth.middleware");
 let databaseRouter,
-  datasourceRouter,
-  dataQueryRouter,
-  widgetRouter,
-  dashboardRouter,
   userManagementRouter,
   tenantRoleRouter,
-  tenantAPIKeyRouter,
-  cronjobRouter,
   auditLogRouter,
-  aiRouter,
-  workflowRouter;
+  aiRouter;
 const { isModuleEnabled } = require("../../config/module.config");
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
@@ -23,36 +16,6 @@ if (isModuleEnabled(constants.MODULES.DATABASE)) {
     message: `${constants.MODULES.DATABASE} module imported`,
   });
   databaseRouter = require("../database/database.v1.routes");
-}
-if (isModuleEnabled(constants.MODULES.DATASOURCE)) {
-  Logger.log("success", {
-    message: `${constants.MODULES.DATASOURCE} module imported`,
-  });
-  datasourceRouter = require("../datasource/datasource.v1.routes");
-}
-if (isModuleEnabled(constants.MODULES.DATAQUERY)) {
-  Logger.log("success", {
-    message: `${constants.MODULES.DATAQUERY} module imported`,
-  });
-  dataQueryRouter = require("../dataQuery/dataQuery.v1.routes");
-}
-if (isModuleEnabled(constants.MODULES.WORKFLOW)) {
-  Logger.log("success", {
-    message: `${constants.MODULES.WORKFLOW} module imported`,
-  });
-  workflowRouter = require("../workflow/workflow.v1.routes");
-}
-if (isModuleEnabled(constants.MODULES.WIDGET)) {
-  Logger.log("success", {
-    message: `${constants.MODULES.WIDGET} module imported`,
-  });
-  widgetRouter = require("../widget/widget.v1.routes");
-}
-if (isModuleEnabled(constants.MODULES.DASHBOARD)) {
-  Logger.log("success", {
-    message: `${constants.MODULES.DASHBOARD} module imported`,
-  });
-  dashboardRouter = require("../dashboard/dashboard.v1.routes");
 }
 if (isModuleEnabled(constants.MODULES.USERMANAGEMENT)) {
   Logger.log("success", {
@@ -65,18 +28,6 @@ if (isModuleEnabled(constants.MODULES.ROLE)) {
     message: `${constants.MODULES.ROLE} module imported`,
   });
   tenantRoleRouter = require("../tenantRole/tenantRole.v1.route");
-}
-if (isModuleEnabled(constants.MODULES.APIKEY)) {
-  Logger.log("success", {
-    message: `${constants.MODULES.APIKEY} module imported`,
-  });
-  tenantAPIKeyRouter = require("../apiKey/apiKey.v1.routes");
-}
-if (isModuleEnabled(constants.MODULES.CRONJOB)) {
-  Logger.log("success", {
-    message: `${constants.MODULES.CRONJOB} module imported`,
-  });
-  cronjobRouter = require("../cronJob/cronJob.v1.routes");
 }
 if (isModuleEnabled(constants.MODULES.AI)) {
   Logger.log("success", {
@@ -189,102 +140,6 @@ if (isModuleEnabled(constants.MODULES.ROLE)) {
   );
 }
 
-// Nested APIKey routes
-if (isModuleEnabled(constants.MODULES.APIKEY)) {
-  Logger.log("success", {
-    message: `${constants.MODULES.APIKEY} module enabled`,
-  });
-  router.use(
-    "/:tenantID/apikeys",
-    param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
-    authMiddleware.checkUserPermissions(["tenant:apikey"]),
-    tenantAPIKeyRouter
-  );
-}
-
-// Nested cronjob routes
-if (isModuleEnabled(constants.MODULES.CRONJOB)) {
-  Logger.log("success", {
-    message: `${constants.MODULES.CRONJOB} module enabled`,
-  });
-  router.use(
-    "/:tenantID/cronjobs",
-    param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
-    authMiddleware.checkUserPermissions(["tenant:cronjobs"]),
-    tenantMiddleware.poolProvider,
-    cronjobRouter
-  );
-}
-
-// Nested datasource routes
-if (isModuleEnabled(constants.MODULES.DATASOURCE)) {
-  Logger.log("success", {
-    message: `${constants.MODULES.DATASOURCE} module enabled`,
-  });
-  router.use(
-    "/:tenantID/datasources",
-    param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
-    authMiddleware.checkUserPermissions(["tenant:datasource"]),
-    tenantMiddleware.poolProvider,
-    datasourceRouter
-  );
-}
-
-// Nested dataQuery routes
-if (isModuleEnabled(constants.MODULES.DATAQUERY)) {
-  Logger.log("success", {
-    message: `${constants.MODULES.DATAQUERY} module enabled`,
-  });
-  router.use(
-    "/:tenantID/queries",
-    param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
-    authMiddleware.checkUserPermissions(["tenant:query"]),
-    tenantMiddleware.poolProvider,
-    dataQueryRouter
-  );
-}
-
-// Nested workflow routes
-if (isModuleEnabled(constants.MODULES.WORKFLOW)) {
-  Logger.log("success", {
-    message: `${constants.MODULES.WORKFLOW} module enabled`,
-  });
-  router.use(
-    "/:tenantID/workflows",
-    param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
-    authMiddleware.checkUserPermissions(["tenant:workflow"]),
-    tenantMiddleware.poolProvider,
-    workflowRouter
-  );
-}
-
-// Nested widget routes
-if (isModuleEnabled(constants.MODULES.WIDGET)) {
-  Logger.log("success", {
-    message: `${constants.MODULES.WIDGET} module enabled`,
-  });
-  router.use(
-    "/:tenantID/widgets",
-    param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
-    authMiddleware.checkUserPermissions(["tenant:widget"]),
-    tenantMiddleware.poolProvider,
-    widgetRouter
-  );
-}
-
-// Nested dashboard routes
-if (isModuleEnabled(constants.MODULES.DASHBOARD)) {
-  Logger.log("success", {
-    message: `${constants.MODULES.DASHBOARD} module enabled`,
-  });
-  router.use(
-    "/:tenantID/dashboards",
-    param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
-    authMiddleware.checkUserPermissions(["tenant:dashboard"]),
-    tenantMiddleware.poolProvider,
-    dashboardRouter
-  );
-}
 
 // Nested audit log routes
 router.use(

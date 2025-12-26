@@ -13,8 +13,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "../ui/resizable";
-import { DATASOURCE_UI_COMPONENTS } from "@jet-admin/datasources-ui";
-import { DATASOURCE_TYPES } from "@jet-admin/datasource-types";
+import { QueryResponseView } from "./queryResponseView";
 
 export const PGSQLQueryExecutor = ({ tenantID }) => {
   PGSQLQueryExecutor.propTypes = {
@@ -122,11 +121,8 @@ export const PGSQLQueryExecutor = ({ tenantID }) => {
               </div>
             )}
             {queryResults &&
-              DATASOURCE_UI_COMPONENTS[
-                DATASOURCE_TYPES.POSTGRESQL.value
-              ]?.queryResponseView({
-                queryResult: queryResults,
-              })}
+              <QueryResponseView queryResult={queryResults} />
+            }
 
             {!queryResults && !executeQueryError && !isExecuting && (
               <div className="flex items-center justify-center h-full text-slate-500 p-3">

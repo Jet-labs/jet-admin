@@ -1,6 +1,8 @@
+const {
+  TenantAwarePostgreSQLPoolManager,
+} = require("../../config/tenant-aware-pgpool-manager.config");
 const { expressUtils } = require("../../utils/express.utils");
 const Logger = require("../../utils/logger");
-const { dataQueryService } = require("../dataQuery/dataQuery.service");
 const { databaseService } = require("./database.service");
 
 const databaseController = {};
@@ -33,6 +35,42 @@ databaseController.getDatabaseMetadata = async (req, res) => {
   } catch (error) {
     Logger.log("error", {
       message: "databaseController:getDatabaseMetadata:catch-1",
+      params: { userID: req.user?.userID, error },
+    });
+    return expressUtils.sendResponse(res, false, {}, error);
+  }
+};
+
+/**
+ * Retrieves database metadata for a specific schema.
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+databaseController.getDatabaseMetadataBySchema = async (req, res) => {
+  try {
+    const { user, dbPool } = req;
+    const { databaseSchemaName } = req.params;
+
+    Logger.log("info", {
+      message: "databaseController:getDatabaseMetadataBySchema:params",
+      params: { userID: user.userID, databaseSchemaName },
+    });
+
+    const schemaMetadata = await databaseService.getDatabaseMetadataBySchema({
+      userID: user.userID,
+      dbPool,
+      databaseSchemaName,
+    });
+
+    Logger.log("success", {
+      message: "databaseController:getDatabaseMetadataBySchema:success",
+      params: { userID: user.userID, databaseSchemaName },
+    });
+
+    return expressUtils.sendResponse(res, true, { schemaMetadata });
+  } catch (error) {
+    Logger.log("error", {
+      message: "databaseController:getDatabaseMetadataBySchema:catch-1",
       params: { userID: req.user?.userID, error },
     });
     return expressUtils.sendResponse(res, false, {}, error);
@@ -103,33 +141,24 @@ databaseController.executeRawSQLQuery = async (req, res) => {
       );
     }
 
-    const dataQueriesResult = await dataQueryService.runDataQueries({
-      userID: user.userID,
+    const result = await TenantAwarePostgreSQLPoolManager.withDatabaseClient(
       dbPool,
-      tenantID: null,
-      dataQueries: [
-        {
-          dataQueryID: null,
-          dataQueryOptions: {
-            dataQueryString: query,
-            dataQueryArgValues: {},
-            dataQueryArgs: {},
-          },
-        },
-      ],
-    });
+      async (client) => {
+        return await client.query(query);
+      }
+    );
 
     Logger.log("success", {
       message: "databaseController:executeRawSQLQuery:success",
       params: {
         userID: user.userID,
-        rowCount: dataQueriesResult[0].result.length,
+        rowCount: result.rowCount,
       },
     });
 
     return expressUtils.sendResponse(res, true, {
-      result: dataQueriesResult[0].result,
-      rowCount: dataQueriesResult[0].result.length,
+      result: result.rows,
+      rowCount: result.rowCount,
       message: "SQL query executed successfully.",
     });
   } catch (error) {

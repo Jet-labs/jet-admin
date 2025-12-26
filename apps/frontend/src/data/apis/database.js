@@ -31,6 +31,39 @@ export const getDatabaseMetadataAPI = async ({ tenantID }) => {
   }
 };
 
+export const getDatabaseMetadataBySchemaAPI = async ({
+  tenantID,
+  databaseSchemaName,
+}) => {
+  try {
+    const url =
+      CONSTANTS.SERVER_HOST +
+      CONSTANTS.APIS.DATABASE.getDatabaseMetadataBySchemaAPI(
+        tenantID,
+        databaseSchemaName
+      );
+    const bearerToken = await firebaseAuth.currentUser.getIdToken();
+    if (bearerToken) {
+      const response = await axios.get(url, {
+        headers: {
+          authorization: `Bearer ${bearerToken}`,
+        },
+      });
+      if (response.data && response.data.success === true) {
+        return response.data.schemaMetadata;
+      } else if (response.data.error) {
+        throw response.data.error;
+      } else {
+        throw CONSTANTS.ERROR_CODES.SERVER_ERROR;
+      }
+    } else {
+      throw CONSTANTS.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
 export const createDatabaseSchemaAPI = async ({
   tenantID,
   databaseSchemaName,

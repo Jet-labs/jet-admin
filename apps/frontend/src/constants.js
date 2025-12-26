@@ -805,7 +805,7 @@ export const CONSTANTS = {
 
     CRON_JOB_EDITOR_FORM_QUERY_ARGUMENTS_LABEL: "Arguments",
 
-    TENANTS_STATS_TITLE: "Tenant Stats",
+    TENANTS_STATS_TITLE: "Overview",
     TENANTS_STATS_ADD_TENANT_BUTTON: "Add tenant",
     QUERIES_STATS_TITLE: "Queries Stats",
     QUERY_EXECUTED_SUCCESSFULLY: "Query executed successfully",
@@ -1163,6 +1163,8 @@ export const CONSTANTS = {
     DATABASE: {
       getDatabaseMetadataAPI: (tenantID) =>
         `/api/v1/tenants/${tenantID}/database/metadata`,
+      getDatabaseMetadataBySchemaAPI: (tenantID, databaseSchemaName) =>
+        `/api/v1/tenants/${tenantID}/database/schemas/${databaseSchemaName}/metadata`,
       executeRawSQLQueryAPI: (tenantID) =>
         `/api/v1/tenants/${tenantID}/database/execute-raw-sql`,
       createDatabaseSchemaAPI: (tenantID) =>

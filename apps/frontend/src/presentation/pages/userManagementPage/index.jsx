@@ -15,8 +15,8 @@ const UserManagementPage = () => {
     setIsAddTenantUserDialogOpen(false);
   };
   return (
-    <div className="flex flex-col justify-start items-stretch w-full h-full ">
-      <div className="flex flex-row items-center justify-between border-b border-slate-200 p-3">
+    <div className="flex flex-col justify-start items-center w-full h-full ">
+      <div className="flex flex-row items-center justify-between py-3 w-2/3 sm:w-full md:w-full lg:w-2/3">
         <h1 className="bg-white !text-xl !font-bold text-slate-700 ">
           {CONSTANTS.STRINGS.TENANT_USER_MANAGEMENT_TITLE}
         </h1>
@@ -34,8 +34,9 @@ const UserManagementPage = () => {
         onClose={_handleCloseAddTenantUserDialog}
         open={isAddTenantUserDialogOpen}
       />
-
-      <TenantUsersList />
+      <div className="w-full flex flex-col justify-center items-center">
+        <TenantUsersList />
+      </div>
     </div>
   );
 };

@@ -82,6 +82,50 @@ databaseService.getDatabaseMetadataForTenant = async ({ userID, dbPool }) => {
   }
 };
 
+/**
+ * Retrieves database metadata for a specific schema.
+ * @param {object} param0
+ * @param {Number} param0.userID
+ * @param {object} param0.dbPool
+ * @param {String} param0.databaseSchemaName
+ * @returns {Promise<object>}
+ */
+databaseService.getDatabaseMetadataBySchema = async ({
+  userID,
+  dbPool,
+  databaseSchemaName,
+}) => {
+  Logger.log("info", {
+    message: "databaseService:getDatabaseMetadataBySchema:params",
+    params: { userID, databaseSchemaName },
+  });
+
+  try {
+    const query = postgreSQLQueryUtil.getDatabaseMetadataBySchemaQuery(
+      databaseSchemaName
+    );
+    const result = await TenantAwarePostgreSQLPoolManager.withDatabaseClient(
+      dbPool,
+      async (client) => {
+        return await client.query(query.text, query.values);
+      }
+    );
+
+    Logger.log("success", {
+      message: "databaseService:getDatabaseMetadataBySchema:result",
+      params: { userID, databaseSchemaName },
+    });
+
+    return result.rows[0]?.metadata || null;
+  } catch (error) {
+    Logger.log("error", {
+      message: "databaseService:getDatabaseMetadataBySchema:catch-1",
+      params: { userID, databaseSchemaName, error },
+    });
+    throw error;
+  }
+};
+
 databaseService.getDatabaseSchemaForAI = async ({
   userID,
   tenantID,

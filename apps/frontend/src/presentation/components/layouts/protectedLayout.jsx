@@ -12,7 +12,6 @@ import { Breadcrumbs } from "../ui/breadCrumbs";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import { UserAvatar } from "../ui/userAvatar";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "../ui/resizable";
-import { AIChatButton } from "../aiChatComponents/aiChatButton";
 export const ProtectedLayout = () => {
   const { firebaseUserState } = useAuthState();
   const { tenantID } = useParams();

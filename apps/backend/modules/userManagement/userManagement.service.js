@@ -1,7 +1,6 @@
 const Logger = require("../../utils/logger");
 const { prisma } = require("../../config/prisma.config");
 const constants = require("../../constants");
-const { notificationService } = require("../notification/notification.service");
 
 const userManagementService = {};
 
@@ -290,11 +289,6 @@ userManagementService.addUserToTenant = async ({
           role: "MEMBER",
         },
       });
-    await notificationService.sendUserTenantAdditionNotification({
-      notifierID: userID,
-      userID: tenantUserID,
-      tenantID,
-    });
     Logger.log("success", {
       message:
         "userManagementService:addUserToTenant:newUserTenantRelationship",

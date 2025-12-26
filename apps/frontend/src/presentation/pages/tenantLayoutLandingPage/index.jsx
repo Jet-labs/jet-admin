@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import moment from "moment";
-import React from "react";
 import { FaDatabase, FaStoreAlt } from "react-icons/fa";
 import { useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
@@ -10,15 +9,10 @@ import { TenantLogo } from "../../components/tenantComponents/tenantLogo";
 import { CodeBlock } from "../../components/ui/codeBlock";
 import { NoEntityUI } from "../../components/ui/noEntityUI";
 
-import apiKeyLogo from "../../../assets/api_key_logo.png";
-import dashboardLogo from "../../../assets/dashboard_logo.png";
-import queryLogo from "../../../assets/query_logo.png";
 import rolesLogo from "../../../assets/roles_logo.png";
 import schemaLogo from "../../../assets/schema_logo.png";
 import tableLogo from "../../../assets/table_logo.png";
 import usersLogo from "../../../assets/users_logo.png";
-import cronjobLogo from "../../../assets/cronjob_logo.png";
-import widgetLogo from "../../../assets/widget_logo.png";
 import { ReactQueryLoadingErrorWrapper } from "../../components/ui/reactQueryLoadingErrorWrapper";
 
 const TenantLayoutLandingPage = () => {
@@ -62,46 +56,11 @@ const TenantLayoutLandingPage = () => {
         ),
     },
     {
-      title: "Database saved queries",
-      icon: <img src={queryLogo} alt="Database Queries" className="w-8 h-8" />,
-      count: tenant?.tenantDataQueryCount || 0,
-      description: "View and manage database saved queries",
-      action: () => navigate(CONSTANTS.ROUTES.VIEW_QUERIES.path(tenantID)),
-    },
-    {
-      title: "Database Widgets",
-      icon: <img src={widgetLogo} alt="Database Widgets" className="w-8 h-8" />,
-      count: tenant?.tenantWidgetCount || 0,
-      description: "View and manage database widgets",
-      action: () => navigate(CONSTANTS.ROUTES.VIEW_WIDGETS.path(tenantID)),
-    },
-    {
-      title: "Dashboards",
-      icon: <img src={dashboardLogo} alt="Dashboards" className="w-8 h-8" />,
-      count: tenant?.tenantDashboardCount || 0,
-      description: "View and manage dashboards",
-      action: () => navigate(CONSTANTS.ROUTES.VIEW_DASHBOARDS.path(tenantID)),
-    },
-    {
       title: "Roles",
       icon: <img src={rolesLogo} alt="Roles" className="w-8 h-8" />,
       count: tenant?.tenantRolesCount || 0,
       description: "Configure user roles and permissions",
       action: () => navigate(CONSTANTS.ROUTES.VIEW_TENANT_ROLES.path(tenantID)),
-    },
-    {
-      title: "API Keys",
-      icon: <img src={apiKeyLogo} alt="API Keys" className="w-8 h-8" />,
-      count: tenant?.tenantAPIKeyCount || 0,
-      description: "Create and manage API keys",
-      action: () => navigate(CONSTANTS.ROUTES.VIEW_API_KEYS.path(tenantID)),
-    },
-    {
-      title: "Cron Jobs",
-      icon: <img src={cronjobLogo} alt="Cron Jobs" className="w-8 h-8" />,
-      count: tenant?.tenantCronJobCount || 0,
-      description: "Create and manage scheduled jobs",
-      action: () => navigate(CONSTANTS.ROUTES.VIEW_CRON_JOBS.path(tenantID)),
     },
   ];
 

@@ -3,7 +3,6 @@ const { prisma } = require("../../config/prisma.config");
 const constants = require("../../constants");
 const environmentVariables = require("../../environment");
 const Logger = require("../../utils/logger");
-const { notificationService } = require("../notification/notification.service");
 
 const authService = {};
 
@@ -24,14 +23,11 @@ authService.getUserFromFirebaseID = async ({ firebaseID }) => {
         firebaseID,
       },
     });
-    const notifications = await notificationService.getAllUserNotifications({
-      userID: user.userID,
-    });
     Logger.log("success", {
       message: "authService:getUserFromFirebaseID:userFound",
       params: { user },
     });
-    return { ...user, notifications };
+    return { ...user };
   } catch (error) {
     Logger.log("error", {
       message: "authService:getUserFromFirebaseID:catch-1",

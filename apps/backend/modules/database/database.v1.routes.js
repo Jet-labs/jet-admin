@@ -14,6 +14,11 @@ router.get(
   authMiddleware.checkUserPermissions(["tenant:database:metadata"]),
   databaseController.getDatabaseMetadata
 );
+router.get(
+  "/schemas/:databaseSchemaName/metadata",
+  authMiddleware.checkUserPermissions(["tenant:database:metadata"]),
+  databaseController.getDatabaseMetadataBySchema
+);
 router.post(
   "/schemas",
   body("databaseSchemaName")

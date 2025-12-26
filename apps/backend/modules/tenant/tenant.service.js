@@ -7,11 +7,6 @@ const constants = require("../../constants");
 const Logger = require("../../utils/logger");
 const { tenantRoleService } = require("../tenantRole/tenantRole.service");
 const { databaseService } = require("../database/database.service");
-const { dashboardService } = require("../dashboard/dashboard.service");
-const { dataQueryService } = require("../dataQuery/dataQuery.service");
-const { cronJobService } = require("../cronJob/cronJob.service");
-const { apiKeyService } = require("../apiKey/apiKey.service");
-const { widgetService } = require("../widget/widget.service");
 
 const tenantService = {};
 
@@ -70,26 +65,6 @@ tenantService.getUserTenantByID = async ({ userID, tenantID, dbPool }) => {
           userID: userID,
           dbPool,
         });
-      tenantDashboards = await dashboardService.getAllDashboards({
-        userID: userID,
-        tenantID: tenantID,
-      });
-      tenantDataQueries = await dataQueryService.getAllDataQueries({
-        userID: userID,
-        tenantID: tenantID,
-      });
-      tenantWidgets = await widgetService.getAllWidgets({
-        userID: userID,
-        tenantID: tenantID,
-      });
-      tenantCronJobs = await cronJobService.getAllCronJobs({
-        userID: userID,
-        tenantID: tenantID,
-      });
-      tenantAPIKeys = await apiKeyService.getAllAPIKeys({
-        userID: userID,
-        tenantID: tenantID,
-      });
     } catch (error) {
       Logger.log("error", {
         message: "tenantService:getUserTenantByID:catch-1",
@@ -107,11 +82,6 @@ tenantService.getUserTenantByID = async ({ userID, tenantID, dbPool }) => {
         tenantDatabaseMetadata?.metadata
           ?.map((schema) => (schema.tables ? schema.tables.length : 0))
           .reduce((acc, curr) => acc + curr, 0) || 0,
-      tenantDashboardCount: tenantDashboards?.length || 0,
-      tenantDataQueryCount: tenantDataQueries?.length || 0,
-      tenantCronJobCount: tenantCronJobs?.length || 0,
-      tenantAPIKeyCount: tenantAPIKeys?.length || 0,
-      tenantWidgetCount: tenantWidgets?.length || 0,
     };
     Logger.log("success", {
       message: "tenantService:getUserTenantByID:tenant",

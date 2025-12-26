@@ -5,8 +5,6 @@ const constants = require("./constants");
 const { expressApp } = require("./config/express-app.config");
 const { httpServer } = require("./config/http-server.config");
 const Logger = require("./utils/logger");
-const { cronJobService } = require("./modules/cronJob/cronJob.service");
-const { stringUtils } = require("@jet-admin/template-package");
 const { socketIO } = require("./config/socket.io");
 const { isModuleEnabled } = require("./config/module.config");
 const {
@@ -83,17 +81,16 @@ socketIO.on("connection", async (socket) => {
     }
   );
 
-  socket.on(
-    constants.SOCKET_RECEIVE_EVENTS.WORKFLOW_RUN_JOIN,
-    async (data) => {
-      const { workflowSocketController } = require("./modules/workflow/controllers/workflow.socket.controller");
-      await workflowSocketController.onWorkflowRunJoin({
-        socket,
-        runId: data.runId,
-        firebaseID: firebase_id,
-      });
-    }
-  );
+  socket.on(constants.SOCKET_RECEIVE_EVENTS.WORKFLOW_RUN_JOIN, async (data) => {
+    const {
+      workflowSocketController,
+    } = require("./modules/workflow/controllers/workflow.socket.controller");
+    await workflowSocketController.onWorkflowRunJoin({
+      socket,
+      runId: data.runId,
+      firebaseID: firebase_id,
+    });
+  });
 
   Logger.log("success", {
     message: "user connected to socket",
@@ -115,8 +112,6 @@ httpServer.listen(port, () => {
     message: "server started listening",
     params: { port },
   });
-  console.log("truncate name", stringUtils.truncateName("Hello World", 5));
-  cronJobService.scheduleAllCronJobs();
 });
 
 // Graceful shutdown

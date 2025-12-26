@@ -96,7 +96,7 @@ export const TenantRoleUpdationForm = () => {
   );
 
   return (
-    <section className="max-w-3xl w-full h-full">
+    <section className="w-2/3 sm:w-full md:w-full lg:w-2/3 h-full">
       <ReactQueryLoadingErrorWrapper
         isLoading={isLoadingTenantRoleByID}
         isFetching={isFetchingTenantRoleByID}

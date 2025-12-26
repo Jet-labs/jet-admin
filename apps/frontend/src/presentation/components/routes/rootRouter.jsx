@@ -6,16 +6,8 @@ import { ProtectedLayout } from "../layouts/protectedLayout";
 import { DatabaseSchemaLayout } from "../layouts/databaseSchemaLayout";
 import { DatabaseTableLayout } from "../layouts/databaseTableLayout";
 import { DatabaseTriggerLayout } from "../layouts/databaseTriggerLayout";
-import { DataQueryLayout } from "../layouts/dataQueryLayout";
 import { UserManagementLayout } from "../layouts/userManagementLayout";
 import { RoleManagementLayout } from "../layouts/roleManagementLayout";
-import { DashboardLayout } from "../layouts/dashboardLayout";
-import { WidgetLayout } from "../layouts/widgetLayout";
-import { DatabaseNotificationLayout } from "../layouts/databaseNotificationLayout";
-import { APIKeyLayout } from "../layouts/apiKeyLayout";
-import { CronJobLayout } from "../layouts/cronJobLayout";
-import { WorkflowLayout } from "../layouts/workflowLayout";
-import { DatasourceLayout } from "../layouts/datasourceLayout";
 const SignInPage = lazy(() => import("../../pages/signInPage"));
 const SignUpPage = lazy(() => import("../../pages/signUpPage"));
 const HomePage = lazy(() => import("../../pages/homePage"));
@@ -47,25 +39,6 @@ const ViewDatabaseTriggerPage = lazy(() =>
 const TriggerLayoutLandingPage = lazy(() =>
   import("../../pages/triggerLayoutLandingPage")
 );
-const AddDataQueryPage = lazy(() => import("../../pages/addDataQueryPage"));
-const UpdateDataQueryPage = lazy(() =>
-  import("../../pages/updateDataQueryPage")
-);
-const DataQueryLayoutLandingPage = lazy(() =>
-  import("../../pages/dataQueryLayoutLandingPage")
-);
-const DashboardLayoutLandingPage = lazy(() =>
-  import("../../pages/dashboardLayoutLandingPage")
-);
-const AddWidgetPage = lazy(() => import("../../pages/addWidgetPage"));
-const UpdateWidgetPage = lazy(() => import("../../pages/updateWidgetPage"));
-const WidgetLayoutLandingPage = lazy(() =>
-  import("../../pages/widgetLayoutLandingPage")
-);
-const AddDashboardPage = lazy(() => import("../../pages/addDashboardPage"));
-const UpdateDashboardPage = lazy(() =>
-  import("../../pages/updateDashboardPage")
-);
 const UserManagementPage = lazy(() => import("../../pages/userManagementPage"));
 const UpdateTenantUserByIDPage = lazy(() =>
   import("../../pages/updateTenantUserByIDPage")
@@ -75,42 +48,11 @@ const AddTenantRolePage = lazy(() => import("../../pages/addTenantRolePage"));
 const UpdateTenantRolePage = lazy(() =>
   import("../../pages/updateTenantRolePage")
 );
-const AddDatabaseNotificationPage = lazy(() =>
-  import("../../pages/addDatabaseNotificationPage")
-);
-const UpdateDatabaseNotificationPage = lazy(() =>
-  import("../../pages/updateDatabaseNotificationPage")
-);
-const AddAPIKeyPage = lazy(() => import("../../pages/addAPIKeyPage"));
-const APIKeyLayoutLandingPage = lazy(() =>
-  import("../../pages/apiKeyLayoutLandingPage")
-);
-const UpdateAPIKeyPage = lazy(() => import("../../pages/updateAPIKeyPage"));
 const RawSqlQueryPage = lazy(() => import("../../pages/rawSqlQueryPage"));
-const AddCronJobPage = lazy(() => import("../../pages/addCronJobPage"));
-const UpdateCronJobPage = lazy(() => import("../../pages/updateCronJobPage"));
-const ViewCronJobHistoryPage = lazy(() =>
-  import("../../pages/viewCronJobHistoryPage")
-);
-const CronJobLayoutLandingPage = lazy(() =>
-  import("../../pages/cronJobLayoutLandingPage")
-);
 const DatabaseSchemaLandingPage = lazy(() =>
   import("../../pages/databaseSchemaLandingPage")
 );
 const ViewAuditLogsPage = lazy(() => import("../../pages/viewAuditLogsPage"));
-
-const DatasourceLayoutLandingPage = lazy(() =>
-  import("../../pages/datasourceLayoutLandingPage")
-);
-const AddWorkflowPage = lazy(() => import("../../pages/addWorkflowPage"));
-const WorkflowLayoutLandingPage = lazy(() =>
-  import("../../pages/workflowLayoutLandingPage")
-);
-const AddDatasourcePage = lazy(() => import("../../pages/addDatasourcePage"));
-const UpdateDatasourcePage = lazy(() =>
-  import("../../pages/updateDatasourcePage")
-);
 
 const router = createBrowserRouter([
   {
@@ -142,7 +84,6 @@ const router = createBrowserRouter([
             path: CONSTANTS.ROUTES.ADD_SCHEMA.code,
             element: <AddSchemaPage />,
           },
-
           {
             element: <DatabaseSchemaLayout />,
             children: [
@@ -191,150 +132,12 @@ const router = createBrowserRouter([
             ],
           },
           {
-            element: <DatasourceLayout />,
-            children: [
-              {
-                path: CONSTANTS.ROUTES.VIEW_DATASOURCES.code,
-                element: <DatasourceLayoutLandingPage />,
-              },
-              {
-                path: CONSTANTS.ROUTES.ADD_DATASOURCE.code,
-                element: <AddDatasourcePage />,
-              },
-              {
-                path: CONSTANTS.ROUTES.UPDATE_DATASOURCE_BY_ID.code,
-                element: <UpdateDatasourcePage />,
-              },
-            ],
-          },
-          {
-            element: <DataQueryLayout />,
-            children: [
-              {
-                path: CONSTANTS.ROUTES.VIEW_QUERIES.code,
-                element: <DataQueryLayoutLandingPage />,
-              },
-              {
-                path: CONSTANTS.ROUTES.ADD_DATA_QUERY.code,
-                element: <AddDataQueryPage />,
-              },
-              {
-                path: CONSTANTS.ROUTES.UPDATE_DATA_QUERY_BY_ID.code,
-                element: <UpdateDataQueryPage />,
-              },
-            ],
-          },
-
-          {
-            element: <WidgetLayout />,
-            children: [
-              {
-                path: CONSTANTS.ROUTES.VIEW_WIDGETS.code,
-                element: <WidgetLayoutLandingPage />,
-              },
-              {
-                path: CONSTANTS.ROUTES.ADD_WIDGET.code,
-                element: <AddWidgetPage />,
-              },
-              {
-                path: CONSTANTS.ROUTES.UPDATE_WIDGET_BY_ID.code,
-                element: <UpdateWidgetPage />,
-              },
-            ],
-          },
-          {
-            element: <DatabaseNotificationLayout />,
-            children: [
-              {
-                path: CONSTANTS.ROUTES.VIEW_DATABASE_NOTIFICATIONS.code,
-                element: <AddDatabaseNotificationPage />,
-              },
-              {
-                path: CONSTANTS.ROUTES.ADD_DATABASE_NOTIFICATION.code,
-                element: <AddDatabaseNotificationPage />,
-              },
-              {
-                path: CONSTANTS.ROUTES.UPDATE_DATABASE_NOTIFICATION_BY_ID.code,
-                element: <UpdateDatabaseNotificationPage />,
-              },
-            ],
-          },
-          {
-            element: <APIKeyLayout />,
-            children: [
-              {
-                path: CONSTANTS.ROUTES.VIEW_API_KEYS.code,
-                element: <APIKeyLayoutLandingPage />,
-              },
-              {
-                path: CONSTANTS.ROUTES.ADD_API_KEY.code,
-                element: <AddAPIKeyPage />,
-              },
-              {
-                path: CONSTANTS.ROUTES.UPDATE_API_KEY_BY_ID.code,
-                element: <UpdateAPIKeyPage />,
-              },
-            ],
-          },
-          {
-            element: <CronJobLayout />,
-            children: [
-              {
-                path: CONSTANTS.ROUTES.VIEW_CRON_JOBS.code,
-                element: <CronJobLayoutLandingPage />,
-              },
-              {
-                path: CONSTANTS.ROUTES.ADD_CRON_JOB.code,
-                element: <AddCronJobPage />,
-              },
-              {
-                path: CONSTANTS.ROUTES.UPDATE_CRON_JOB_BY_ID.code,
-                element: <UpdateCronJobPage />,
-              },
-              {
-                path: CONSTANTS.ROUTES.VIEW_CRON_JOB_HISTORY_BY_ID.code,
-                element: <ViewCronJobHistoryPage />,
-              },
-            ],
-          },
-          {
             path: CONSTANTS.ROUTES.VIEW_AUDIT_LOGS.code,
             element: <ViewAuditLogsPage />,
           },
           {
-            element: <DashboardLayout />,
-            children: [
-              {
-                path: CONSTANTS.ROUTES.VIEW_DASHBOARDS.code,
-                element: <DashboardLayoutLandingPage />,
-              },
-              {
-                path: CONSTANTS.ROUTES.ADD_DASHBOARD.code,
-                element: <AddDashboardPage />,
-              },
-              {
-                path: CONSTANTS.ROUTES.UPDATE_DASHBOARD_BY_ID.code,
-                element: <UpdateDashboardPage />,
-              },
-            ],
-          },
-          {
             path: CONSTANTS.ROUTES.RAW_SQL_QUERY.code,
             element: <RawSqlQueryPage />,
-          },
-
-          {
-            element: <WorkflowLayout />,
-            children: [
-              {
-                path: CONSTANTS.ROUTES.VIEW_WORKFLOWS.code,
-                element: <WorkflowLayoutLandingPage />,
-              },
-              {
-                path: CONSTANTS.ROUTES.ADD_WORKFLOW.code,
-                element: <AddWorkflowPage />,
-              },
-            ],
           },
           {
             element: <UserManagementLayout />,

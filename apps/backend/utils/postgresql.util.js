@@ -729,6 +729,66 @@ FROM (
 `;
 };
 
+postgreSQLQueryUtil.getDatabaseMetadataBySchemaQuery = (databaseSchemaName) => {
+  return {
+    text: `SELECT jsonb_build_object(
+    'databaseSchemaName', $1::text,
+    'tables', (
+        SELECT jsonb_agg(jsonb_build_object(
+            'databaseTableName', t.table_name,
+            'databaseTableColumns', (
+                SELECT jsonb_agg(jsonb_build_object(
+                    'databaseTableColumnName', c.column_name,
+                    'databaseTableColumnType', c.udt_name,
+                    'isNullable', c.is_nullable = 'YES',
+                    'columnDefault', c.column_default,
+                    'ordinalPosition', c.ordinal_position
+                ) ORDER BY c.ordinal_position)
+                FROM information_schema.columns c
+                WHERE c.table_schema = $1::text AND c.table_name = t.table_name
+            )
+        ))
+        FROM information_schema.tables t
+        WHERE t.table_schema = $1::text AND t.table_type = 'BASE TABLE'
+    ),
+    'views', (
+        SELECT jsonb_agg(jsonb_build_object(
+            'viewName', v.table_name,
+            'viewDefinition', v.view_definition
+        ))
+        FROM information_schema.views v
+        WHERE v.table_schema = $1::text
+    ),
+    'triggers', (
+        SELECT jsonb_agg(jsonb_build_object(
+            'triggerName', trigger_name,
+            'tableName', event_object_table,
+            'eventManipulation', event_manipulation,
+            'actionTiming', action_timing
+        ))
+        FROM information_schema.triggers tr
+        WHERE tr.trigger_schema = $1::text
+    ),
+    'enums', (
+        SELECT jsonb_agg(jsonb_build_object(
+            'enumName', e.enum_name,
+            'enumValues', e.enum_values
+        ))
+        FROM (
+            SELECT t.typname AS enum_name,
+                   array_agg(e.enumlabel ORDER BY e.enumsortorder) AS enum_values
+            FROM pg_type t
+            JOIN pg_enum e ON t.oid = e.enumtypid
+            JOIN pg_namespace n ON n.oid = t.typnamespace
+            WHERE n.nspname = $1::text
+            GROUP BY t.typname
+        ) e
+    )
+) AS metadata;`,
+    values: [databaseSchemaName],
+  };
+};
+
 postgreSQLQueryUtil.getDatabaseMetadataForAIQuery = () => {
   return `WITH
   -- 1. Get columns, types, defaults, and primary keys using pg_catalog

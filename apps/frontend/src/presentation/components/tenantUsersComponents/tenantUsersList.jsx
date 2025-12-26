@@ -88,7 +88,7 @@ export const TenantUsersList = () => {
       isFetching={isFetchingTenantUsers}
     >
       {tenantUsers?.users ? (
-        <div className="flex flex-col w-full flex-grow h-full overflow-y-auto justify-between items-stretch text-sm font-medium">
+        <div className=" border border-slate-200 rounded mt-4 flex flex-col w-2/3 sm:w-full md:w-full lg:w-2/3 flex-grow h-full overflow-y-auto justify-between items-stretch text-sm font-medium">
           <DataGrid
             apiRef={apiRef}
             rows={tenantUsers.users}

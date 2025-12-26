@@ -1,8 +1,7 @@
 
 const constants = require("../../../constants");
 const Logger = require("../../../utils/logger");
-const {v4: uuid } = require("uuid");
-const { aiController } = require("../ai.controller");
+const { v4: uuid } = require("uuid");
 const { Socket } = require("socket.io");
 
 
@@ -80,25 +79,12 @@ aiSocketController.unsubscribeUserFromChatRoom = async ({
 
        let botResponse;
 
-       switch(message.action){
-        case 'approve':
-            botResponse =
-              await aiController.generateRechartsJSXFromQueryResult({
-                aiPrompt: message,
-                firebaseID,
-                tenantID,
-              });
-          break;
-        case 'reject':
-        case 'test':
-        default:
-            botResponse =
-              await aiController.generateAIPromptForChatVisualization({
-                aiPrompt: message,
-                firebaseID,
-                tenantID,
-              });
-          break;
+       switch (message.action) {
+         case "approve":
+         case "reject":
+         case "test":
+         default:
+           break;
        }
 
        

@@ -8,17 +8,14 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import { useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { BsServer } from "react-icons/bs";
-import { FaKey, FaUserCog } from "react-icons/fa";
+import { FaUserCog } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa6";
 import { FiUsers } from "react-icons/fi";
+import { PiFileSql } from "react-icons/pi";
 import {
   MdOutlineLockPerson,
   MdOutlineSchema,
-  MdWidgets,
 } from "react-icons/md";
-import { RiCalendarScheduleFill, RiDashboardFill } from "react-icons/ri";
-import { SiQuantconnect } from "react-icons/si";
-import { TbCloudDataConnection } from "react-icons/tb";
 import { useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../../constants";
 import { getDatabaseMetadataAPI } from "../../../../data/apis/database";
@@ -28,8 +25,6 @@ import { useComponentSize } from "../../../../logic/hooks/useComponentSize";
 import { TenantSelectionDropdown } from "../../tenantComponents/tenantSelectionDropdown";
 import { NoEntityUI } from "../../ui/noEntityUI";
 import PropTypes from "prop-types";
-import { GoWorkflow } from "react-icons/go";
-import { LuWorkflow } from "react-icons/lu";
 
 // eslint-disable-next-line no-unused-vars
 const DrawerLinkItem = ({ item, tenantID }) => {
@@ -221,53 +216,10 @@ export const MainDrawerList = () => {
     },
     {
       type: "link",
-      title: CONSTANTS.STRINGS.MAIN_DRAWER_DATASOURCE_TITLE,
-      icon: TbCloudDataConnection,
-      path: CONSTANTS.ROUTES.VIEW_DATASOURCES.path(tenantID),
-    },
-    {
-      type: "link",
       title: CONSTANTS.STRINGS.MAIN_DRAWER_QUERIES_TITLE,
-      icon: SiQuantconnect,
-      path: CONSTANTS.ROUTES.VIEW_QUERIES.path(tenantID),
+      icon: PiFileSql,
+      path: CONSTANTS.ROUTES.RAW_SQL_QUERY.path(tenantID),
     },
-
-    {
-      type: "link",
-      title: CONSTANTS.STRINGS.MAIN_DRAWER_WIDGETS_TITLE,
-      icon: MdWidgets,
-      path: CONSTANTS.ROUTES.VIEW_WIDGETS.path(tenantID),
-    },
-    {
-      type: "link",
-      title: CONSTANTS.STRINGS.MAIN_DRAWER_DASHBOARDS_TITLE,
-      icon: RiDashboardFill,
-      path: CONSTANTS.ROUTES.VIEW_DASHBOARDS.path(tenantID),
-    },
-    {
-      type: "link",
-      title: CONSTANTS.STRINGS.MAIN_DRAWER_API_KEYS_TITLE,
-      icon: FaKey,
-      path: CONSTANTS.ROUTES.VIEW_API_KEYS.path(tenantID),
-    },
-    {
-      type: "link",
-      title: CONSTANTS.STRINGS.MAIN_DRAWER_CRON_JOBS_TITLE,
-      icon: RiCalendarScheduleFill,
-      path: CONSTANTS.ROUTES.VIEW_CRON_JOBS.path(tenantID),
-    },
-    {
-      type: "link",
-      title: CONSTANTS.STRINGS.MAIN_DRAWER_WORKFLOWS_TITLE,
-      icon: LuWorkflow,
-      path: CONSTANTS.ROUTES.VIEW_WORKFLOWS.path(tenantID),
-    },
-    // {
-    //   type: "link",
-    //   title: CONSTANTS.STRINGS.MAIN_DRAWER_SQL_EDITOR_TITLE,
-    //   icon: BiLogoPostgresql,
-    //   path: CONSTANTS.ROUTES.RAW_SQL_QUERY.path(tenantID),
-    // },
     {
       type: "collapsible",
       title: CONSTANTS.STRINGS.MAIN_DRAWER_USER_MANAGEMENT_TITLE,

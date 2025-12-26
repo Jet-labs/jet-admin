@@ -15,14 +15,6 @@ export const TenantRolesList = () => {
 
   const columns = [
     {
-      field: "roleID",
-      display: "flex",
-      // width: 300,
-      headerClassName: "bg-white text-slate-700 font-semibold",
-      flex: 1,
-      headerName: "Role ID",
-    },
-    {
       field: "roleTitle",
       display: "flex",
       // width: 300,
@@ -75,7 +67,7 @@ export const TenantRolesList = () => {
       isFetching={isFetchingTenantRoles}
     >
       {tenantRoles?.roles ? (
-        <div className="flex flex-col w-full flex-grow h-full overflow-y-auto justify-between items-stretch text-sm font-medium text-slate-700">
+        <div className="w-2/3 sm:w-full md:w-full lg:w-2/3 flex flex-col border border-slate-200 mt-4 rounded flex-grow h-full overflow-y-auto justify-between items-stretch text-sm font-medium text-slate-700">
           <DataGrid
             apiRef={apiRef}
             rows={tenantRoles.roles}
