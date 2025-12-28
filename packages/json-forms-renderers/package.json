@@ -1,0 +1,34 @@
+{
+  "name": "@jet-admin/json-forms-renderers",
+  "version": "1.0.0",
+  "main": "dist/index.cjs",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.cjs",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "esbuild src/index.js --bundle --outfile=dist/index.mjs --loader:.js=jsx --format=esm --sourcemap --external:react --external:react-dom --external:@jsonforms/core --external:@jsonforms/react --external:@monaco-editor/react --external:monaco-themes --external:prop-types --external:react-icons && esbuild src/index.js --bundle --outfile=dist/index.cjs --loader:.js=jsx --format=cjs --sourcemap --external:react --external:react-dom --external:@jsonforms/core --external:@jsonforms/react --external:@monaco-editor/react --external:monaco-themes --external:prop-types --external:react-icons",
+    "dev": "npm run build -- --watch"
+  },
+  "peerDependencies": {
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "@jsonforms/core": "^3.5.1",
+    "@jsonforms/react": "^3.5.1",
+    "@monaco-editor/react": "^4.7.0",
+    "monaco-themes": "^0.4.4",
+    "prop-types": "^15.8.1",
+    "react-icons": "^5.4.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.3"
+  }
+}

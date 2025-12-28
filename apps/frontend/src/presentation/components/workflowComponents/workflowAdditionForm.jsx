@@ -5,7 +5,7 @@ import { formValidations } from "../../../utils/formValidation";
 import { WorkflowEditor } from "./workflowEditor";
 import { WorkflowNodesProvider } from "@jet-admin/workflow-nodes";
 import { useWorkflowState } from "../../../logic/contexts/workflowContext";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createWorkflowAPI } from "../../../data/apis/workflow";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { CircularProgress } from "@mui/material";
@@ -14,6 +14,7 @@ export const WorkflowAdditionForm = ({ tenantID }) => {
   WorkflowAdditionForm.propTypes = {
     tenantID: PropTypes.number.isRequired,
   };
+  const queryClient = useQueryClient();
 
   const {
     isPending: isAddingWorkflow,

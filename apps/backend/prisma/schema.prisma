@@ -312,16 +312,18 @@ model tblTenantConfig {
 model tblNodeExecutionLogs {
   executionLogID       BigInt               @id @default(autoincrement())
   instanceID           String               @db.Uuid
-  nodeID               String               @db.Uuid
+  nodeID               String?              @db.Uuid
   eventType            String               @db.VarChar
   inputData            Json?
   outputData           Json?
   errorMessage         Json?
   createdAt            DateTime             @default(now()) @db.Timestamptz(6)
+  nodeUUID             String?              @db.VarChar
   tblWorkflowInstances tblWorkflowInstances @relation(fields: [instanceID], references: [instanceID], onDelete: Cascade, onUpdate: NoAction)
-  tblWorkflowNodes     tblWorkflowNodes     @relation(fields: [nodeID], references: [nodeID], onDelete: NoAction, onUpdate: NoAction)
+  tblWorkflowNodes     tblWorkflowNodes?    @relation(fields: [nodeID], references: [nodeID], onUpdate: NoAction)
 
   @@index([instanceID], map: "idx_tblNodeExecutionLogs_instanceID")
+  @@index([nodeID], map: "fki_tblNodeExecutionLogs_nodeID_fkey")
 }
 
 model tblWorkflowEdge {
@@ -331,6 +333,10 @@ model tblWorkflowEdge {
   downstreamNodeID                                                    String           @db.Uuid
   createdAt                                                           DateTime         @default(now()) @db.Timestamptz(6)
   updatedAt                                                           DateTime         @default(now()) @db.Timestamptz(6)
+  sourceHandle                                                        String?          @db.VarChar
+  targetHandle                                                        String?          @db.VarChar
+  edgeType                                                            String?          @db.VarChar
+  edgeConfig                                                          Json?
   tblWorkflowNodes_tblWorkflowEdge_downstreamNodeIDTotblWorkflowNodes tblWorkflowNodes @relation("tblWorkflowEdge_downstreamNodeIDTotblWorkflowNodes", fields: [downstreamNodeID], references: [nodeID], onDelete: Cascade, onUpdate: NoAction, map: "tblWorkflowEdge_downstream_fkey")
   tblWorkflowNodes_tblWorkflowEdge_upstreamNodeIDTotblWorkflowNodes   tblWorkflowNodes @relation("tblWorkflowEdge_upstreamNodeIDTotblWorkflowNodes", fields: [upstreamNodeID], references: [nodeID], onDelete: Cascade, onUpdate: NoAction, map: "tblWorkflowEdge_upstream_fkey")
   tblWorkflows                                                        tblWorkflows     @relation(fields: [workflowID], references: [workflowID], onDelete: Cascade, onUpdate: NoAction)
@@ -340,7 +346,7 @@ model tblWorkflowEdge {
 
 model tblWorkflowInstances {
   instanceID           String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  workflowID           String                 @db.Uuid
+  workflowID           String?                @db.Uuid
   tenantID             String                 @db.Uuid
   status               String                 @default("PENDING") @db.VarChar
   contextData          Json                   @default("{}")
@@ -349,9 +355,10 @@ model tblWorkflowInstances {
   completedAt          DateTime?              @db.Timestamptz(6)
   createdAt            DateTime               @default(now()) @db.Timestamptz(6)
   updatedAt            DateTime               @default(now()) @db.Timestamptz(6)
+  isTest               Boolean                @default(false)
   tblNodeExecutionLogs tblNodeExecutionLogs[]
   tblTenants           tblTenants             @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction)
-  tblWorkflows         tblWorkflows           @relation(fields: [workflowID], references: [workflowID], onDelete: NoAction, onUpdate: NoAction)
+  tblWorkflows         tblWorkflows?          @relation(fields: [workflowID], references: [workflowID], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([tenantID, status], map: "idx_tblWorkflowInstances_tenantID_status")
 }

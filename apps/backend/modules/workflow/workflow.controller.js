@@ -111,15 +111,20 @@ workflowController.deleteWorkflow = async (req, res) => {
  * @param {import("express").Response} res
  */
 workflowController.executeWorkflow = async (req, res) => {
-  const { id } = req.params;
-  const { params } = req.body; // Trigger params
-
   try {
-    const result = await workflowService.executeWorkflow(id, params);
-    res.status(202).json(result);
+    const { user } = req;
+    const { tenantID, workflowID } = req.params;
+    const { inputParams = {} } = req.body;
+
+    Logger.log("info", { message: "WorkflowController:executeWorkflow:params", params: { workflowID, tenantID } });
+
+    const result = await workflowService.executeWorkflow({ workflowID, tenantID, inputParams });
+
+    Logger.log("success", { message: "WorkflowController:executeWorkflow:success", params: { instanceID: result.instanceID } });
+    expressUtils.sendResponse(res, true, result);
   } catch (error) {
     Logger.log("error", { message: "WorkflowController:executeWorkflow:error", params: { error: error.message } });
-    res.status(500).json({ error: error.message });
+    expressUtils.sendResponse(res, false, {}, error);
   }
 };
 
@@ -129,18 +134,46 @@ workflowController.executeWorkflow = async (req, res) => {
  * @param {import("express").Response} res
  */
 workflowController.getRunStatus = async (req, res) => {
-  const { runId } = req.params;
-
   try {
-    const status = await workflowService.getRunStatus(runId);
+    const { instanceID } = req.params;
+
+    const status = await workflowService.getRunStatus(instanceID);
+
     if (!status) {
-      return res.status(404).json({ error: "Run not found" });
+      return expressUtils.sendResponse(res, false, {}, { message: "Run not found" });
     }
-    res.json(status);
+
+    expressUtils.sendResponse(res, true, status);
   } catch (error) {
     Logger.log("error", { message: "WorkflowController:getRunStatus:error", params: { error: error.message } });
-    res.status(500).json({ error: error.message });
+    expressUtils.sendResponse(res, false, {}, error);
+  }
+};
+
+/**
+ * Test run a workflow without saving.
+ * Accepts nodes and edges directly in request body.
+ */
+workflowController.testWorkflow = async (req, res) => {
+  try {
+    const { tenantID } = req.params;
+    const { nodes, edges, inputParams = {} } = req.body;
+
+    if (!nodes || !edges) {
+      return expressUtils.sendResponse(res, false, {}, { message: "nodes and edges are required" });
+    }
+
+    Logger.log("info", { message: "WorkflowController:testWorkflow:params", params: { tenantID, nodeCount: nodes.length } });
+
+    const result = await workflowService.testWorkflow({ tenantID, nodes, edges, inputParams });
+
+    Logger.log("success", { message: "WorkflowController:testWorkflow:success", params: { instanceID: result.instanceID } });
+    expressUtils.sendResponse(res, true, result);
+  } catch (error) {
+    Logger.log("error", { message: "WorkflowController:testWorkflow:error", params: { error: error.message } });
+    expressUtils.sendResponse(res, false, {}, error);
   }
 };
 
 module.exports = { workflowController };
+

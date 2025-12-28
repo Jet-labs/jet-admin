@@ -1,353 +1,34 @@
-var __create = Object.create;
-var __defProp = Object.defineProperty;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
-var __getOwnPropNames = Object.getOwnPropertyNames;
-var __getProtoOf = Object.getPrototypeOf;
-var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __commonJS = (cb, mod) => function __require() {
-  return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
-};
-var __copyProps = (to, from, except, desc) => {
-  if (from && typeof from === "object" || typeof from === "function") {
-    for (let key of __getOwnPropNames(from))
-      if (!__hasOwnProp.call(to, key) && key !== except)
-        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
-  }
-  return to;
-};
-var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
-  // If the importer is in node compatibility mode or this is not an ESM
-  // file that has been converted to a CommonJS file using a Babel-
-  // compatible transform (i.e. "__esModule" has not been set), then set
-  // "default" to the CommonJS "module.exports" for node compatibility.
-  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
-  mod
-));
-
-// ../../node_modules/react-fast-compare/index.js
-var require_react_fast_compare = __commonJS({
-  "../../node_modules/react-fast-compare/index.js"(exports2, module2) {
-    "use strict";
-    var isArray2 = Array.isArray;
-    var keyList = Object.keys;
-    var hasProp = Object.prototype.hasOwnProperty;
-    var hasElementType = typeof Element !== "undefined";
-    function equal(a, b) {
-      if (a === b) return true;
-      if (a && b && typeof a == "object" && typeof b == "object") {
-        var arrA = isArray2(a), arrB = isArray2(b), i, length, key;
-        if (arrA && arrB) {
-          length = a.length;
-          if (length != b.length) return false;
-          for (i = length; i-- !== 0; )
-            if (!equal(a[i], b[i])) return false;
-          return true;
-        }
-        if (arrA != arrB) return false;
-        var dateA = a instanceof Date, dateB = b instanceof Date;
-        if (dateA != dateB) return false;
-        if (dateA && dateB) return a.getTime() == b.getTime();
-        var regexpA = a instanceof RegExp, regexpB = b instanceof RegExp;
-        if (regexpA != regexpB) return false;
-        if (regexpA && regexpB) return a.toString() == b.toString();
-        var keys2 = keyList(a);
-        length = keys2.length;
-        if (length !== keyList(b).length)
-          return false;
-        for (i = length; i-- !== 0; )
-          if (!hasProp.call(b, keys2[i])) return false;
-        if (hasElementType && a instanceof Element && b instanceof Element)
-          return a === b;
-        for (i = length; i-- !== 0; ) {
-          key = keys2[i];
-          if (key === "_owner" && a.$$typeof) {
-            continue;
-          } else {
-            if (!equal(a[key], b[key])) return false;
-          }
-        }
-        return true;
-      }
-      return a !== a && b !== b;
-    }
-    module2.exports = function exportedEqual(a, b) {
-      try {
-        return equal(a, b);
-      } catch (error) {
-        if (error.message && error.message.match(/stack|recursion/i) || error.number === -2146828260) {
-          console.warn("Warning: react-fast-compare does not handle circular references.", error.name, error.message);
-          return false;
-        }
-        throw error;
-      }
-    };
-  }
-});
-
-// ../../node_modules/hoist-non-react-statics/node_modules/react-is/cjs/react-is.development.js
-var require_react_is_development = __commonJS({
-  "../../node_modules/hoist-non-react-statics/node_modules/react-is/cjs/react-is.development.js"(exports2) {
-    "use strict";
-    if (true) {
-      (function() {
-        "use strict";
-        var hasSymbol = typeof Symbol === "function" && Symbol.for;
-        var REACT_ELEMENT_TYPE2 = hasSymbol ? Symbol.for("react.element") : 60103;
-        var REACT_PORTAL_TYPE = hasSymbol ? Symbol.for("react.portal") : 60106;
-        var REACT_FRAGMENT_TYPE = hasSymbol ? Symbol.for("react.fragment") : 60107;
-        var REACT_STRICT_MODE_TYPE = hasSymbol ? Symbol.for("react.strict_mode") : 60108;
-        var REACT_PROFILER_TYPE = hasSymbol ? Symbol.for("react.profiler") : 60114;
-        var REACT_PROVIDER_TYPE = hasSymbol ? Symbol.for("react.provider") : 60109;
-        var REACT_CONTEXT_TYPE = hasSymbol ? Symbol.for("react.context") : 60110;
-        var REACT_ASYNC_MODE_TYPE = hasSymbol ? Symbol.for("react.async_mode") : 60111;
-        var REACT_CONCURRENT_MODE_TYPE = hasSymbol ? Symbol.for("react.concurrent_mode") : 60111;
-        var REACT_FORWARD_REF_TYPE = hasSymbol ? Symbol.for("react.forward_ref") : 60112;
-        var REACT_SUSPENSE_TYPE = hasSymbol ? Symbol.for("react.suspense") : 60113;
-        var REACT_SUSPENSE_LIST_TYPE = hasSymbol ? Symbol.for("react.suspense_list") : 60120;
-        var REACT_MEMO_TYPE = hasSymbol ? Symbol.for("react.memo") : 60115;
-        var REACT_LAZY_TYPE = hasSymbol ? Symbol.for("react.lazy") : 60116;
-        var REACT_BLOCK_TYPE = hasSymbol ? Symbol.for("react.block") : 60121;
-        var REACT_FUNDAMENTAL_TYPE = hasSymbol ? Symbol.for("react.fundamental") : 60117;
-        var REACT_RESPONDER_TYPE = hasSymbol ? Symbol.for("react.responder") : 60118;
-        var REACT_SCOPE_TYPE = hasSymbol ? Symbol.for("react.scope") : 60119;
-        function isValidElementType(type) {
-          return typeof type === "string" || typeof type === "function" || // Note: its typeof might be other than 'symbol' or 'number' if it's a polyfill.
-          type === REACT_FRAGMENT_TYPE || type === REACT_CONCURRENT_MODE_TYPE || type === REACT_PROFILER_TYPE || type === REACT_STRICT_MODE_TYPE || type === REACT_SUSPENSE_TYPE || type === REACT_SUSPENSE_LIST_TYPE || typeof type === "object" && type !== null && (type.$$typeof === REACT_LAZY_TYPE || type.$$typeof === REACT_MEMO_TYPE || type.$$typeof === REACT_PROVIDER_TYPE || type.$$typeof === REACT_CONTEXT_TYPE || type.$$typeof === REACT_FORWARD_REF_TYPE || type.$$typeof === REACT_FUNDAMENTAL_TYPE || type.$$typeof === REACT_RESPONDER_TYPE || type.$$typeof === REACT_SCOPE_TYPE || type.$$typeof === REACT_BLOCK_TYPE);
-        }
-        function typeOf(object) {
-          if (typeof object === "object" && object !== null) {
-            var $$typeof = object.$$typeof;
-            switch ($$typeof) {
-              case REACT_ELEMENT_TYPE2:
-                var type = object.type;
-                switch (type) {
-                  case REACT_ASYNC_MODE_TYPE:
-                  case REACT_CONCURRENT_MODE_TYPE:
-                  case REACT_FRAGMENT_TYPE:
-                  case REACT_PROFILER_TYPE:
-                  case REACT_STRICT_MODE_TYPE:
-                  case REACT_SUSPENSE_TYPE:
-                    return type;
-                  default:
-                    var $$typeofType = type && type.$$typeof;
-                    switch ($$typeofType) {
-                      case REACT_CONTEXT_TYPE:
-                      case REACT_FORWARD_REF_TYPE:
-                      case REACT_LAZY_TYPE:
-                      case REACT_MEMO_TYPE:
-                      case REACT_PROVIDER_TYPE:
-                        return $$typeofType;
-                      default:
-                        return $$typeof;
-                    }
-                }
-              case REACT_PORTAL_TYPE:
-                return $$typeof;
-            }
-          }
-          return void 0;
-        }
-        var AsyncMode = REACT_ASYNC_MODE_TYPE;
-        var ConcurrentMode = REACT_CONCURRENT_MODE_TYPE;
-        var ContextConsumer = REACT_CONTEXT_TYPE;
-        var ContextProvider = REACT_PROVIDER_TYPE;
-        var Element2 = REACT_ELEMENT_TYPE2;
-        var ForwardRef = REACT_FORWARD_REF_TYPE;
-        var Fragment = REACT_FRAGMENT_TYPE;
-        var Lazy = REACT_LAZY_TYPE;
-        var Memo = REACT_MEMO_TYPE;
-        var Portal = REACT_PORTAL_TYPE;
-        var Profiler = REACT_PROFILER_TYPE;
-        var StrictMode = REACT_STRICT_MODE_TYPE;
-        var Suspense = REACT_SUSPENSE_TYPE;
-        var hasWarnedAboutDeprecatedIsAsyncMode = false;
-        function isAsyncMode(object) {
-          {
-            if (!hasWarnedAboutDeprecatedIsAsyncMode) {
-              hasWarnedAboutDeprecatedIsAsyncMode = true;
-              console["warn"]("The ReactIs.isAsyncMode() alias has been deprecated, and will be removed in React 17+. Update your code to use ReactIs.isConcurrentMode() instead. It has the exact same API.");
-            }
-          }
-          return isConcurrentMode(object) || typeOf(object) === REACT_ASYNC_MODE_TYPE;
-        }
-        function isConcurrentMode(object) {
-          return typeOf(object) === REACT_CONCURRENT_MODE_TYPE;
-        }
-        function isContextConsumer(object) {
-          return typeOf(object) === REACT_CONTEXT_TYPE;
-        }
-        function isContextProvider(object) {
-          return typeOf(object) === REACT_PROVIDER_TYPE;
-        }
-        function isElement(object) {
-          return typeof object === "object" && object !== null && object.$$typeof === REACT_ELEMENT_TYPE2;
-        }
-        function isForwardRef(object) {
-          return typeOf(object) === REACT_FORWARD_REF_TYPE;
-        }
-        function isFragment(object) {
-          return typeOf(object) === REACT_FRAGMENT_TYPE;
-        }
-        function isLazy(object) {
-          return typeOf(object) === REACT_LAZY_TYPE;
-        }
-        function isMemo(object) {
-          return typeOf(object) === REACT_MEMO_TYPE;
-        }
-        function isPortal(object) {
-          return typeOf(object) === REACT_PORTAL_TYPE;
-        }
-        function isProfiler(object) {
-          return typeOf(object) === REACT_PROFILER_TYPE;
-        }
-        function isStrictMode(object) {
-          return typeOf(object) === REACT_STRICT_MODE_TYPE;
-        }
-        function isSuspense(object) {
-          return typeOf(object) === REACT_SUSPENSE_TYPE;
-        }
-        exports2.AsyncMode = AsyncMode;
-        exports2.ConcurrentMode = ConcurrentMode;
-        exports2.ContextConsumer = ContextConsumer;
-        exports2.ContextProvider = ContextProvider;
-        exports2.Element = Element2;
-        exports2.ForwardRef = ForwardRef;
-        exports2.Fragment = Fragment;
-        exports2.Lazy = Lazy;
-        exports2.Memo = Memo;
-        exports2.Portal = Portal;
-        exports2.Profiler = Profiler;
-        exports2.StrictMode = StrictMode;
-        exports2.Suspense = Suspense;
-        exports2.isAsyncMode = isAsyncMode;
-        exports2.isConcurrentMode = isConcurrentMode;
-        exports2.isContextConsumer = isContextConsumer;
-        exports2.isContextProvider = isContextProvider;
-        exports2.isElement = isElement;
-        exports2.isForwardRef = isForwardRef;
-        exports2.isFragment = isFragment;
-        exports2.isLazy = isLazy;
-        exports2.isMemo = isMemo;
-        exports2.isPortal = isPortal;
-        exports2.isProfiler = isProfiler;
-        exports2.isStrictMode = isStrictMode;
-        exports2.isSuspense = isSuspense;
-        exports2.isValidElementType = isValidElementType;
-        exports2.typeOf = typeOf;
-      })();
-    }
-  }
-});
-
-// ../../node_modules/hoist-non-react-statics/node_modules/react-is/index.js
-var require_react_is = __commonJS({
-  "../../node_modules/hoist-non-react-statics/node_modules/react-is/index.js"(exports2, module2) {
-    "use strict";
-    if (false) {
-      module2.exports = null;
-    } else {
-      module2.exports = require_react_is_development();
-    }
-  }
-});
-
-// ../../node_modules/hoist-non-react-statics/dist/hoist-non-react-statics.cjs.js
-var require_hoist_non_react_statics_cjs = __commonJS({
-  "../../node_modules/hoist-non-react-statics/dist/hoist-non-react-statics.cjs.js"(exports2, module2) {
-    "use strict";
-    var reactIs = require_react_is();
-    var REACT_STATICS = {
-      childContextTypes: true,
-      contextType: true,
-      contextTypes: true,
-      defaultProps: true,
-      displayName: true,
-      getDefaultProps: true,
-      getDerivedStateFromError: true,
-      getDerivedStateFromProps: true,
-      mixins: true,
-      propTypes: true,
-      type: true
-    };
-    var KNOWN_STATICS = {
-      name: true,
-      length: true,
-      prototype: true,
-      caller: true,
-      callee: true,
-      arguments: true,
-      arity: true
-    };
-    var FORWARD_REF_STATICS = {
-      "$$typeof": true,
-      render: true,
-      defaultProps: true,
-      displayName: true,
-      propTypes: true
-    };
-    var MEMO_STATICS = {
-      "$$typeof": true,
-      compare: true,
-      defaultProps: true,
-      displayName: true,
-      propTypes: true,
-      type: true
-    };
-    var TYPE_STATICS = {};
-    TYPE_STATICS[reactIs.ForwardRef] = FORWARD_REF_STATICS;
-    TYPE_STATICS[reactIs.Memo] = MEMO_STATICS;
-    function getStatics(component) {
-      if (reactIs.isMemo(component)) {
-        return MEMO_STATICS;
-      }
-      return TYPE_STATICS[component["$$typeof"]] || REACT_STATICS;
-    }
-    var defineProperty2 = Object.defineProperty;
-    var getOwnPropertyNames = Object.getOwnPropertyNames;
-    var getOwnPropertySymbols = Object.getOwnPropertySymbols;
-    var getOwnPropertyDescriptor = Object.getOwnPropertyDescriptor;
-    var getPrototypeOf = Object.getPrototypeOf;
-    var objectPrototype = Object.prototype;
-    function hoistNonReactStatics2(targetComponent, sourceComponent, blacklist) {
-      if (typeof sourceComponent !== "string") {
-        if (objectPrototype) {
-          var inheritedComponent = getPrototypeOf(sourceComponent);
-          if (inheritedComponent && inheritedComponent !== objectPrototype) {
-            hoistNonReactStatics2(targetComponent, inheritedComponent, blacklist);
-          }
-        }
-        var keys2 = getOwnPropertyNames(sourceComponent);
-        if (getOwnPropertySymbols) {
-          keys2 = keys2.concat(getOwnPropertySymbols(sourceComponent));
-        }
-        var targetStatics = getStatics(targetComponent);
-        var sourceStatics = getStatics(sourceComponent);
-        for (var i = 0; i < keys2.length; ++i) {
-          var key = keys2[i];
-          if (!KNOWN_STATICS[key] && !(blacklist && blacklist[key]) && !(sourceStatics && sourceStatics[key]) && !(targetStatics && targetStatics[key])) {
-            var descriptor = getOwnPropertyDescriptor(sourceComponent, key);
-            try {
-              defineProperty2(targetComponent, key, descriptor);
-            } catch (e) {
-            }
-          }
-        }
-      }
-      return targetComponent;
-    }
-    module2.exports = hoistNonReactStatics2;
-  }
-});
-
 // src/nodes/conditionNode.jsx
-import React4, { memo } from "react";
+import React4, { memo, useState, useEffect, useMemo, useCallback } from "react";
 import { Handle, Position } from "reactflow";
+import { JsonForms } from "@jsonforms/react";
 
 // src/context.jsx
 import React, { createContext, useContext } from "react";
 var WorkflowNodesContext = createContext(null);
-var WorkflowNodesProvider = ({ children, dataQueries, strings = {} }) => {
-  return /* @__PURE__ */ React.createElement(WorkflowNodesContext.Provider, { value: { dataQueries, strings } }, children);
+var NODE_EXECUTION_STATUS = {
+  IDLE: "idle",
+  RUNNING: "running",
+  COMPLETED: "completed",
+  FAILED: "failed",
+  SKIPPED: "skipped"
+};
+var WorkflowNodesProvider = ({
+  children,
+  dataQueries,
+  strings = {},
+  onRefreshDataQueries,
+  workflowNodes = [],
+  nodeExecutionStatus = {}
+  // Map of nodeId -> status
+}) => {
+  return /* @__PURE__ */ React.createElement(WorkflowNodesContext.Provider, { value: {
+    dataQueries,
+    strings,
+    onRefreshDataQueries,
+    workflowNodes,
+    nodeExecutionStatus
+  } }, children);
 };
 var useWorkflowNodes = () => {
   const context = useContext(WorkflowNodesContext);
@@ -356,6 +37,33 @@ var useWorkflowNodes = () => {
   }
   return context;
 };
+var useNodeExecutionStatus = (nodeId) => {
+  const { nodeExecutionStatus } = useWorkflowNodes();
+  return nodeExecutionStatus[nodeId] || NODE_EXECUTION_STATUS.IDLE;
+};
+
+// src/jsonFormsRenderers.jsx
+import { jetFormsRenderers } from "@jet-admin/json-forms-renderers";
+import {
+  JetTextControl,
+  JetSelectControl,
+  JetDynamicArgsControl,
+  JetNumberControl,
+  JetCheckboxControl,
+  JetVerticalLayout,
+  JetGroupLayout,
+  JetTabLayout,
+  textInputTester,
+  selectInputTester,
+  dynamicArgsTester,
+  verticalLayoutTester,
+  groupLayoutTester,
+  tabRendererTester,
+  numberInputTester,
+  checkboxTester,
+  jetFormsRenderers as jetFormsRenderers2,
+  jetFormsBaseRenderers
+} from "@jet-admin/json-forms-renderers";
 
 // ../../node_modules/react-icons/lib/iconBase.mjs
 import React3 from "react";
@@ -499,2765 +207,848 @@ function IconBase(props) {
 function TbLogicAnd(props) {
   return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 24 24", "fill": "none", "stroke": "currentColor", "strokeWidth": "2", "strokeLinecap": "round", "strokeLinejoin": "round" }, "child": [{ "tag": "path", "attr": { "d": "M22 12h-5" }, "child": [] }, { "tag": "path", "attr": { "d": "M2 9h5" }, "child": [] }, { "tag": "path", "attr": { "d": "M2 15h5" }, "child": [] }, { "tag": "path", "attr": { "d": "M9 5c6 0 8 3.5 8 7s-2 7 -8 7h-2v-14h2z" }, "child": [] }] })(props);
 }
-
-// src/nodes/conditionNode.jsx
-var ConditionNode = memo(({ data, isConnectable }) => {
-  const { strings } = useWorkflowNodes();
-  return /* @__PURE__ */ React4.createElement("div", { className: "bg-white border-2 border-orange-200 rounded shadow-md min-w-[150px] hover:border-orange-400 transition-colors" }, /* @__PURE__ */ React4.createElement("div", { className: "bg-orange-50 px-3 py-1 border-b border-orange-100 rounded-t text-xs font-bold text-orange-700" }, strings.WORKFLOW_EDITOR_CONDITION_NODE_LABEL), /* @__PURE__ */ React4.createElement("div", { className: "p-3 text-sm" }, /* @__PURE__ */ React4.createElement("div", { className: "flex items-center gap-2 mb-2" }, /* @__PURE__ */ React4.createElement(TbLogicAnd, { className: "text-orange-500 text-lg" }), /* @__PURE__ */ React4.createElement("span", { className: "font-bold text-slate-700" }, data.label || "Condition")), /* @__PURE__ */ React4.createElement("div", { className: "text-xs text-gray-500 font-mono bg-gray-50 p-2 rounded break-all border border-gray-100" }, data.condition || "true")), /* @__PURE__ */ React4.createElement(
-    Handle,
-    {
-      type: "target",
-      position: Position.Top,
-      isConnectable,
-      className: "w-3 h-3 bg-gray-400"
-    }
-  ), /* @__PURE__ */ React4.createElement("div", { className: "absolute -bottom-6 left-1/4 transform -translate-x-1/2 flex flex-col items-center" }, /* @__PURE__ */ React4.createElement("span", { className: "text-[10px] text-green-600 font-bold mb-1" }, "TRUE"), /* @__PURE__ */ React4.createElement(
-    Handle,
-    {
-      type: "source",
-      position: Position.Bottom,
-      id: "true",
-      isConnectable,
-      className: "w-3 h-3 bg-green-500 !static transform-none"
-    }
-  )), /* @__PURE__ */ React4.createElement("div", { className: "absolute -bottom-6 right-1/4 transform translate-x-1/2 flex flex-col items-center" }, /* @__PURE__ */ React4.createElement("span", { className: "text-[10px] text-red-600 font-bold mb-1" }, "FALSE"), /* @__PURE__ */ React4.createElement(
-    Handle,
-    {
-      type: "source",
-      position: Position.Bottom,
-      id: "false",
-      isConnectable,
-      className: "w-3 h-3 bg-red-500 !static transform-none"
-    }
-  )));
-});
-
-// src/nodes/dataQueryNode.jsx
-import React5, { memo as memo2, useState as useState2, useEffect as useEffect2 } from "react";
-import { Handle as Handle2, Position as Position2 } from "reactflow";
-
-// ../../node_modules/deepmerge/dist/es.js
-var isMergeableObject = function isMergeableObject2(value) {
-  return isNonNullObject(value) && !isSpecial(value);
-};
-function isNonNullObject(value) {
-  return !!value && typeof value === "object";
-}
-function isSpecial(value) {
-  var stringValue = Object.prototype.toString.call(value);
-  return stringValue === "[object RegExp]" || stringValue === "[object Date]" || isReactElement(value);
-}
-var canUseSymbol = typeof Symbol === "function" && Symbol.for;
-var REACT_ELEMENT_TYPE = canUseSymbol ? Symbol.for("react.element") : 60103;
-function isReactElement(value) {
-  return value.$$typeof === REACT_ELEMENT_TYPE;
-}
-function emptyTarget(val) {
-  return Array.isArray(val) ? [] : {};
-}
-function cloneUnlessOtherwiseSpecified(value, options) {
-  return options.clone !== false && options.isMergeableObject(value) ? deepmerge(emptyTarget(value), value, options) : value;
-}
-function defaultArrayMerge(target, source, options) {
-  return target.concat(source).map(function(element) {
-    return cloneUnlessOtherwiseSpecified(element, options);
-  });
-}
-function mergeObject(target, source, options) {
-  var destination = {};
-  if (options.isMergeableObject(target)) {
-    Object.keys(target).forEach(function(key) {
-      destination[key] = cloneUnlessOtherwiseSpecified(target[key], options);
-    });
-  }
-  Object.keys(source).forEach(function(key) {
-    if (!options.isMergeableObject(source[key]) || !target[key]) {
-      destination[key] = cloneUnlessOtherwiseSpecified(source[key], options);
-    } else {
-      destination[key] = deepmerge(target[key], source[key], options);
-    }
-  });
-  return destination;
-}
-function deepmerge(target, source, options) {
-  options = options || {};
-  options.arrayMerge = options.arrayMerge || defaultArrayMerge;
-  options.isMergeableObject = options.isMergeableObject || isMergeableObject;
-  var sourceIsArray = Array.isArray(source);
-  var targetIsArray = Array.isArray(target);
-  var sourceAndTargetTypesMatch = sourceIsArray === targetIsArray;
-  if (!sourceAndTargetTypesMatch) {
-    return cloneUnlessOtherwiseSpecified(source, options);
-  } else if (sourceIsArray) {
-    return options.arrayMerge(target, source, options);
-  } else {
-    return mergeObject(target, source, options);
-  }
-}
-deepmerge.all = function deepmergeAll(array, options) {
-  if (!Array.isArray(array)) {
-    throw new Error("first argument should be an array");
-  }
-  return array.reduce(function(prev, next) {
-    return deepmerge(prev, next, options);
-  }, {});
-};
-var deepmerge_1 = deepmerge;
-var es_default = deepmerge_1;
-
-// ../../node_modules/lodash-es/_freeGlobal.js
-var freeGlobal = typeof global == "object" && global && global.Object === Object && global;
-var freeGlobal_default = freeGlobal;
-
-// ../../node_modules/lodash-es/_root.js
-var freeSelf = typeof self == "object" && self && self.Object === Object && self;
-var root = freeGlobal_default || freeSelf || Function("return this")();
-var root_default = root;
-
-// ../../node_modules/lodash-es/_Symbol.js
-var Symbol2 = root_default.Symbol;
-var Symbol_default = Symbol2;
-
-// ../../node_modules/lodash-es/_getRawTag.js
-var objectProto = Object.prototype;
-var hasOwnProperty = objectProto.hasOwnProperty;
-var nativeObjectToString = objectProto.toString;
-var symToStringTag = Symbol_default ? Symbol_default.toStringTag : void 0;
-function getRawTag(value) {
-  var isOwn = hasOwnProperty.call(value, symToStringTag), tag = value[symToStringTag];
-  try {
-    value[symToStringTag] = void 0;
-    var unmasked = true;
-  } catch (e) {
-  }
-  var result = nativeObjectToString.call(value);
-  if (unmasked) {
-    if (isOwn) {
-      value[symToStringTag] = tag;
-    } else {
-      delete value[symToStringTag];
-    }
-  }
-  return result;
-}
-var getRawTag_default = getRawTag;
-
-// ../../node_modules/lodash-es/_objectToString.js
-var objectProto2 = Object.prototype;
-var nativeObjectToString2 = objectProto2.toString;
-function objectToString(value) {
-  return nativeObjectToString2.call(value);
-}
-var objectToString_default = objectToString;
-
-// ../../node_modules/lodash-es/_baseGetTag.js
-var nullTag = "[object Null]";
-var undefinedTag = "[object Undefined]";
-var symToStringTag2 = Symbol_default ? Symbol_default.toStringTag : void 0;
-function baseGetTag(value) {
-  if (value == null) {
-    return value === void 0 ? undefinedTag : nullTag;
-  }
-  return symToStringTag2 && symToStringTag2 in Object(value) ? getRawTag_default(value) : objectToString_default(value);
-}
-var baseGetTag_default = baseGetTag;
-
-// ../../node_modules/lodash-es/_overArg.js
-function overArg(func, transform) {
-  return function(arg) {
-    return func(transform(arg));
-  };
-}
-var overArg_default = overArg;
-
-// ../../node_modules/lodash-es/_getPrototype.js
-var getPrototype = overArg_default(Object.getPrototypeOf, Object);
-var getPrototype_default = getPrototype;
-
-// ../../node_modules/lodash-es/isObjectLike.js
-function isObjectLike(value) {
-  return value != null && typeof value == "object";
-}
-var isObjectLike_default = isObjectLike;
-
-// ../../node_modules/lodash-es/isPlainObject.js
-var objectTag = "[object Object]";
-var funcProto = Function.prototype;
-var objectProto3 = Object.prototype;
-var funcToString = funcProto.toString;
-var hasOwnProperty2 = objectProto3.hasOwnProperty;
-var objectCtorString = funcToString.call(Object);
-function isPlainObject(value) {
-  if (!isObjectLike_default(value) || baseGetTag_default(value) != objectTag) {
-    return false;
-  }
-  var proto = getPrototype_default(value);
-  if (proto === null) {
-    return true;
-  }
-  var Ctor = hasOwnProperty2.call(proto, "constructor") && proto.constructor;
-  return typeof Ctor == "function" && Ctor instanceof Ctor && funcToString.call(Ctor) == objectCtorString;
-}
-var isPlainObject_default = isPlainObject;
-
-// ../../node_modules/lodash-es/_listCacheClear.js
-function listCacheClear() {
-  this.__data__ = [];
-  this.size = 0;
-}
-var listCacheClear_default = listCacheClear;
-
-// ../../node_modules/lodash-es/eq.js
-function eq(value, other) {
-  return value === other || value !== value && other !== other;
-}
-var eq_default = eq;
-
-// ../../node_modules/lodash-es/_assocIndexOf.js
-function assocIndexOf(array, key) {
-  var length = array.length;
-  while (length--) {
-    if (eq_default(array[length][0], key)) {
-      return length;
-    }
-  }
-  return -1;
-}
-var assocIndexOf_default = assocIndexOf;
-
-// ../../node_modules/lodash-es/_listCacheDelete.js
-var arrayProto = Array.prototype;
-var splice = arrayProto.splice;
-function listCacheDelete(key) {
-  var data = this.__data__, index = assocIndexOf_default(data, key);
-  if (index < 0) {
-    return false;
-  }
-  var lastIndex = data.length - 1;
-  if (index == lastIndex) {
-    data.pop();
-  } else {
-    splice.call(data, index, 1);
-  }
-  --this.size;
-  return true;
-}
-var listCacheDelete_default = listCacheDelete;
-
-// ../../node_modules/lodash-es/_listCacheGet.js
-function listCacheGet(key) {
-  var data = this.__data__, index = assocIndexOf_default(data, key);
-  return index < 0 ? void 0 : data[index][1];
-}
-var listCacheGet_default = listCacheGet;
-
-// ../../node_modules/lodash-es/_listCacheHas.js
-function listCacheHas(key) {
-  return assocIndexOf_default(this.__data__, key) > -1;
-}
-var listCacheHas_default = listCacheHas;
-
-// ../../node_modules/lodash-es/_listCacheSet.js
-function listCacheSet(key, value) {
-  var data = this.__data__, index = assocIndexOf_default(data, key);
-  if (index < 0) {
-    ++this.size;
-    data.push([key, value]);
-  } else {
-    data[index][1] = value;
-  }
-  return this;
-}
-var listCacheSet_default = listCacheSet;
-
-// ../../node_modules/lodash-es/_ListCache.js
-function ListCache(entries) {
-  var index = -1, length = entries == null ? 0 : entries.length;
-  this.clear();
-  while (++index < length) {
-    var entry = entries[index];
-    this.set(entry[0], entry[1]);
-  }
-}
-ListCache.prototype.clear = listCacheClear_default;
-ListCache.prototype["delete"] = listCacheDelete_default;
-ListCache.prototype.get = listCacheGet_default;
-ListCache.prototype.has = listCacheHas_default;
-ListCache.prototype.set = listCacheSet_default;
-var ListCache_default = ListCache;
-
-// ../../node_modules/lodash-es/_stackClear.js
-function stackClear() {
-  this.__data__ = new ListCache_default();
-  this.size = 0;
-}
-var stackClear_default = stackClear;
-
-// ../../node_modules/lodash-es/_stackDelete.js
-function stackDelete(key) {
-  var data = this.__data__, result = data["delete"](key);
-  this.size = data.size;
-  return result;
-}
-var stackDelete_default = stackDelete;
-
-// ../../node_modules/lodash-es/_stackGet.js
-function stackGet(key) {
-  return this.__data__.get(key);
-}
-var stackGet_default = stackGet;
-
-// ../../node_modules/lodash-es/_stackHas.js
-function stackHas(key) {
-  return this.__data__.has(key);
-}
-var stackHas_default = stackHas;
-
-// ../../node_modules/lodash-es/isObject.js
-function isObject(value) {
-  var type = typeof value;
-  return value != null && (type == "object" || type == "function");
-}
-var isObject_default = isObject;
-
-// ../../node_modules/lodash-es/isFunction.js
-var asyncTag = "[object AsyncFunction]";
-var funcTag = "[object Function]";
-var genTag = "[object GeneratorFunction]";
-var proxyTag = "[object Proxy]";
-function isFunction(value) {
-  if (!isObject_default(value)) {
-    return false;
-  }
-  var tag = baseGetTag_default(value);
-  return tag == funcTag || tag == genTag || tag == asyncTag || tag == proxyTag;
-}
-var isFunction_default = isFunction;
-
-// ../../node_modules/lodash-es/_coreJsData.js
-var coreJsData = root_default["__core-js_shared__"];
-var coreJsData_default = coreJsData;
-
-// ../../node_modules/lodash-es/_isMasked.js
-var maskSrcKey = (function() {
-  var uid = /[^.]+$/.exec(coreJsData_default && coreJsData_default.keys && coreJsData_default.keys.IE_PROTO || "");
-  return uid ? "Symbol(src)_1." + uid : "";
-})();
-function isMasked(func) {
-  return !!maskSrcKey && maskSrcKey in func;
-}
-var isMasked_default = isMasked;
-
-// ../../node_modules/lodash-es/_toSource.js
-var funcProto2 = Function.prototype;
-var funcToString2 = funcProto2.toString;
-function toSource(func) {
-  if (func != null) {
-    try {
-      return funcToString2.call(func);
-    } catch (e) {
-    }
-    try {
-      return func + "";
-    } catch (e) {
-    }
-  }
-  return "";
-}
-var toSource_default = toSource;
-
-// ../../node_modules/lodash-es/_baseIsNative.js
-var reRegExpChar = /[\\^$.*+?()[\]{}|]/g;
-var reIsHostCtor = /^\[object .+?Constructor\]$/;
-var funcProto3 = Function.prototype;
-var objectProto4 = Object.prototype;
-var funcToString3 = funcProto3.toString;
-var hasOwnProperty3 = objectProto4.hasOwnProperty;
-var reIsNative = RegExp(
-  "^" + funcToString3.call(hasOwnProperty3).replace(reRegExpChar, "\\$&").replace(/hasOwnProperty|(function).*?(?=\\\()| for .+?(?=\\\])/g, "$1.*?") + "$"
-);
-function baseIsNative(value) {
-  if (!isObject_default(value) || isMasked_default(value)) {
-    return false;
-  }
-  var pattern = isFunction_default(value) ? reIsNative : reIsHostCtor;
-  return pattern.test(toSource_default(value));
-}
-var baseIsNative_default = baseIsNative;
-
-// ../../node_modules/lodash-es/_getValue.js
-function getValue(object, key) {
-  return object == null ? void 0 : object[key];
-}
-var getValue_default = getValue;
-
-// ../../node_modules/lodash-es/_getNative.js
-function getNative(object, key) {
-  var value = getValue_default(object, key);
-  return baseIsNative_default(value) ? value : void 0;
-}
-var getNative_default = getNative;
-
-// ../../node_modules/lodash-es/_Map.js
-var Map = getNative_default(root_default, "Map");
-var Map_default = Map;
-
-// ../../node_modules/lodash-es/_nativeCreate.js
-var nativeCreate = getNative_default(Object, "create");
-var nativeCreate_default = nativeCreate;
-
-// ../../node_modules/lodash-es/_hashClear.js
-function hashClear() {
-  this.__data__ = nativeCreate_default ? nativeCreate_default(null) : {};
-  this.size = 0;
-}
-var hashClear_default = hashClear;
-
-// ../../node_modules/lodash-es/_hashDelete.js
-function hashDelete(key) {
-  var result = this.has(key) && delete this.__data__[key];
-  this.size -= result ? 1 : 0;
-  return result;
-}
-var hashDelete_default = hashDelete;
-
-// ../../node_modules/lodash-es/_hashGet.js
-var HASH_UNDEFINED = "__lodash_hash_undefined__";
-var objectProto5 = Object.prototype;
-var hasOwnProperty4 = objectProto5.hasOwnProperty;
-function hashGet(key) {
-  var data = this.__data__;
-  if (nativeCreate_default) {
-    var result = data[key];
-    return result === HASH_UNDEFINED ? void 0 : result;
-  }
-  return hasOwnProperty4.call(data, key) ? data[key] : void 0;
-}
-var hashGet_default = hashGet;
-
-// ../../node_modules/lodash-es/_hashHas.js
-var objectProto6 = Object.prototype;
-var hasOwnProperty5 = objectProto6.hasOwnProperty;
-function hashHas(key) {
-  var data = this.__data__;
-  return nativeCreate_default ? data[key] !== void 0 : hasOwnProperty5.call(data, key);
-}
-var hashHas_default = hashHas;
-
-// ../../node_modules/lodash-es/_hashSet.js
-var HASH_UNDEFINED2 = "__lodash_hash_undefined__";
-function hashSet(key, value) {
-  var data = this.__data__;
-  this.size += this.has(key) ? 0 : 1;
-  data[key] = nativeCreate_default && value === void 0 ? HASH_UNDEFINED2 : value;
-  return this;
-}
-var hashSet_default = hashSet;
-
-// ../../node_modules/lodash-es/_Hash.js
-function Hash(entries) {
-  var index = -1, length = entries == null ? 0 : entries.length;
-  this.clear();
-  while (++index < length) {
-    var entry = entries[index];
-    this.set(entry[0], entry[1]);
-  }
-}
-Hash.prototype.clear = hashClear_default;
-Hash.prototype["delete"] = hashDelete_default;
-Hash.prototype.get = hashGet_default;
-Hash.prototype.has = hashHas_default;
-Hash.prototype.set = hashSet_default;
-var Hash_default = Hash;
-
-// ../../node_modules/lodash-es/_mapCacheClear.js
-function mapCacheClear() {
-  this.size = 0;
-  this.__data__ = {
-    "hash": new Hash_default(),
-    "map": new (Map_default || ListCache_default)(),
-    "string": new Hash_default()
-  };
-}
-var mapCacheClear_default = mapCacheClear;
-
-// ../../node_modules/lodash-es/_isKeyable.js
-function isKeyable(value) {
-  var type = typeof value;
-  return type == "string" || type == "number" || type == "symbol" || type == "boolean" ? value !== "__proto__" : value === null;
-}
-var isKeyable_default = isKeyable;
-
-// ../../node_modules/lodash-es/_getMapData.js
-function getMapData(map, key) {
-  var data = map.__data__;
-  return isKeyable_default(key) ? data[typeof key == "string" ? "string" : "hash"] : data.map;
-}
-var getMapData_default = getMapData;
-
-// ../../node_modules/lodash-es/_mapCacheDelete.js
-function mapCacheDelete(key) {
-  var result = getMapData_default(this, key)["delete"](key);
-  this.size -= result ? 1 : 0;
-  return result;
-}
-var mapCacheDelete_default = mapCacheDelete;
-
-// ../../node_modules/lodash-es/_mapCacheGet.js
-function mapCacheGet(key) {
-  return getMapData_default(this, key).get(key);
-}
-var mapCacheGet_default = mapCacheGet;
-
-// ../../node_modules/lodash-es/_mapCacheHas.js
-function mapCacheHas(key) {
-  return getMapData_default(this, key).has(key);
-}
-var mapCacheHas_default = mapCacheHas;
-
-// ../../node_modules/lodash-es/_mapCacheSet.js
-function mapCacheSet(key, value) {
-  var data = getMapData_default(this, key), size = data.size;
-  data.set(key, value);
-  this.size += data.size == size ? 0 : 1;
-  return this;
-}
-var mapCacheSet_default = mapCacheSet;
-
-// ../../node_modules/lodash-es/_MapCache.js
-function MapCache(entries) {
-  var index = -1, length = entries == null ? 0 : entries.length;
-  this.clear();
-  while (++index < length) {
-    var entry = entries[index];
-    this.set(entry[0], entry[1]);
-  }
-}
-MapCache.prototype.clear = mapCacheClear_default;
-MapCache.prototype["delete"] = mapCacheDelete_default;
-MapCache.prototype.get = mapCacheGet_default;
-MapCache.prototype.has = mapCacheHas_default;
-MapCache.prototype.set = mapCacheSet_default;
-var MapCache_default = MapCache;
-
-// ../../node_modules/lodash-es/_stackSet.js
-var LARGE_ARRAY_SIZE = 200;
-function stackSet(key, value) {
-  var data = this.__data__;
-  if (data instanceof ListCache_default) {
-    var pairs = data.__data__;
-    if (!Map_default || pairs.length < LARGE_ARRAY_SIZE - 1) {
-      pairs.push([key, value]);
-      this.size = ++data.size;
-      return this;
-    }
-    data = this.__data__ = new MapCache_default(pairs);
-  }
-  data.set(key, value);
-  this.size = data.size;
-  return this;
-}
-var stackSet_default = stackSet;
-
-// ../../node_modules/lodash-es/_Stack.js
-function Stack(entries) {
-  var data = this.__data__ = new ListCache_default(entries);
-  this.size = data.size;
-}
-Stack.prototype.clear = stackClear_default;
-Stack.prototype["delete"] = stackDelete_default;
-Stack.prototype.get = stackGet_default;
-Stack.prototype.has = stackHas_default;
-Stack.prototype.set = stackSet_default;
-var Stack_default = Stack;
-
-// ../../node_modules/lodash-es/_arrayEach.js
-function arrayEach(array, iteratee) {
-  var index = -1, length = array == null ? 0 : array.length;
-  while (++index < length) {
-    if (iteratee(array[index], index, array) === false) {
-      break;
-    }
-  }
-  return array;
-}
-var arrayEach_default = arrayEach;
-
-// ../../node_modules/lodash-es/_defineProperty.js
-var defineProperty = (function() {
-  try {
-    var func = getNative_default(Object, "defineProperty");
-    func({}, "", {});
-    return func;
-  } catch (e) {
-  }
-})();
-var defineProperty_default = defineProperty;
-
-// ../../node_modules/lodash-es/_baseAssignValue.js
-function baseAssignValue(object, key, value) {
-  if (key == "__proto__" && defineProperty_default) {
-    defineProperty_default(object, key, {
-      "configurable": true,
-      "enumerable": true,
-      "value": value,
-      "writable": true
-    });
-  } else {
-    object[key] = value;
-  }
-}
-var baseAssignValue_default = baseAssignValue;
-
-// ../../node_modules/lodash-es/_assignValue.js
-var objectProto7 = Object.prototype;
-var hasOwnProperty6 = objectProto7.hasOwnProperty;
-function assignValue(object, key, value) {
-  var objValue = object[key];
-  if (!(hasOwnProperty6.call(object, key) && eq_default(objValue, value)) || value === void 0 && !(key in object)) {
-    baseAssignValue_default(object, key, value);
-  }
-}
-var assignValue_default = assignValue;
-
-// ../../node_modules/lodash-es/_copyObject.js
-function copyObject(source, props, object, customizer) {
-  var isNew = !object;
-  object || (object = {});
-  var index = -1, length = props.length;
-  while (++index < length) {
-    var key = props[index];
-    var newValue = customizer ? customizer(object[key], source[key], key, object, source) : void 0;
-    if (newValue === void 0) {
-      newValue = source[key];
-    }
-    if (isNew) {
-      baseAssignValue_default(object, key, newValue);
-    } else {
-      assignValue_default(object, key, newValue);
-    }
-  }
-  return object;
-}
-var copyObject_default = copyObject;
-
-// ../../node_modules/lodash-es/_baseTimes.js
-function baseTimes(n, iteratee) {
-  var index = -1, result = Array(n);
-  while (++index < n) {
-    result[index] = iteratee(index);
-  }
-  return result;
-}
-var baseTimes_default = baseTimes;
-
-// ../../node_modules/lodash-es/_baseIsArguments.js
-var argsTag = "[object Arguments]";
-function baseIsArguments(value) {
-  return isObjectLike_default(value) && baseGetTag_default(value) == argsTag;
-}
-var baseIsArguments_default = baseIsArguments;
-
-// ../../node_modules/lodash-es/isArguments.js
-var objectProto8 = Object.prototype;
-var hasOwnProperty7 = objectProto8.hasOwnProperty;
-var propertyIsEnumerable = objectProto8.propertyIsEnumerable;
-var isArguments = baseIsArguments_default(/* @__PURE__ */ (function() {
-  return arguments;
-})()) ? baseIsArguments_default : function(value) {
-  return isObjectLike_default(value) && hasOwnProperty7.call(value, "callee") && !propertyIsEnumerable.call(value, "callee");
-};
-var isArguments_default = isArguments;
-
-// ../../node_modules/lodash-es/isArray.js
-var isArray = Array.isArray;
-var isArray_default = isArray;
-
-// ../../node_modules/lodash-es/stubFalse.js
-function stubFalse() {
-  return false;
-}
-var stubFalse_default = stubFalse;
-
-// ../../node_modules/lodash-es/isBuffer.js
-var freeExports = typeof exports == "object" && exports && !exports.nodeType && exports;
-var freeModule = freeExports && typeof module == "object" && module && !module.nodeType && module;
-var moduleExports = freeModule && freeModule.exports === freeExports;
-var Buffer2 = moduleExports ? root_default.Buffer : void 0;
-var nativeIsBuffer = Buffer2 ? Buffer2.isBuffer : void 0;
-var isBuffer = nativeIsBuffer || stubFalse_default;
-var isBuffer_default = isBuffer;
-
-// ../../node_modules/lodash-es/_isIndex.js
-var MAX_SAFE_INTEGER = 9007199254740991;
-var reIsUint = /^(?:0|[1-9]\d*)$/;
-function isIndex(value, length) {
-  var type = typeof value;
-  length = length == null ? MAX_SAFE_INTEGER : length;
-  return !!length && (type == "number" || type != "symbol" && reIsUint.test(value)) && (value > -1 && value % 1 == 0 && value < length);
-}
-var isIndex_default = isIndex;
-
-// ../../node_modules/lodash-es/isLength.js
-var MAX_SAFE_INTEGER2 = 9007199254740991;
-function isLength(value) {
-  return typeof value == "number" && value > -1 && value % 1 == 0 && value <= MAX_SAFE_INTEGER2;
-}
-var isLength_default = isLength;
-
-// ../../node_modules/lodash-es/_baseIsTypedArray.js
-var argsTag2 = "[object Arguments]";
-var arrayTag = "[object Array]";
-var boolTag = "[object Boolean]";
-var dateTag = "[object Date]";
-var errorTag = "[object Error]";
-var funcTag2 = "[object Function]";
-var mapTag = "[object Map]";
-var numberTag = "[object Number]";
-var objectTag2 = "[object Object]";
-var regexpTag = "[object RegExp]";
-var setTag = "[object Set]";
-var stringTag = "[object String]";
-var weakMapTag = "[object WeakMap]";
-var arrayBufferTag = "[object ArrayBuffer]";
-var dataViewTag = "[object DataView]";
-var float32Tag = "[object Float32Array]";
-var float64Tag = "[object Float64Array]";
-var int8Tag = "[object Int8Array]";
-var int16Tag = "[object Int16Array]";
-var int32Tag = "[object Int32Array]";
-var uint8Tag = "[object Uint8Array]";
-var uint8ClampedTag = "[object Uint8ClampedArray]";
-var uint16Tag = "[object Uint16Array]";
-var uint32Tag = "[object Uint32Array]";
-var typedArrayTags = {};
-typedArrayTags[float32Tag] = typedArrayTags[float64Tag] = typedArrayTags[int8Tag] = typedArrayTags[int16Tag] = typedArrayTags[int32Tag] = typedArrayTags[uint8Tag] = typedArrayTags[uint8ClampedTag] = typedArrayTags[uint16Tag] = typedArrayTags[uint32Tag] = true;
-typedArrayTags[argsTag2] = typedArrayTags[arrayTag] = typedArrayTags[arrayBufferTag] = typedArrayTags[boolTag] = typedArrayTags[dataViewTag] = typedArrayTags[dateTag] = typedArrayTags[errorTag] = typedArrayTags[funcTag2] = typedArrayTags[mapTag] = typedArrayTags[numberTag] = typedArrayTags[objectTag2] = typedArrayTags[regexpTag] = typedArrayTags[setTag] = typedArrayTags[stringTag] = typedArrayTags[weakMapTag] = false;
-function baseIsTypedArray(value) {
-  return isObjectLike_default(value) && isLength_default(value.length) && !!typedArrayTags[baseGetTag_default(value)];
-}
-var baseIsTypedArray_default = baseIsTypedArray;
-
-// ../../node_modules/lodash-es/_baseUnary.js
-function baseUnary(func) {
-  return function(value) {
-    return func(value);
-  };
-}
-var baseUnary_default = baseUnary;
-
-// ../../node_modules/lodash-es/_nodeUtil.js
-var freeExports2 = typeof exports == "object" && exports && !exports.nodeType && exports;
-var freeModule2 = freeExports2 && typeof module == "object" && module && !module.nodeType && module;
-var moduleExports2 = freeModule2 && freeModule2.exports === freeExports2;
-var freeProcess = moduleExports2 && freeGlobal_default.process;
-var nodeUtil = (function() {
-  try {
-    var types = freeModule2 && freeModule2.require && freeModule2.require("util").types;
-    if (types) {
-      return types;
-    }
-    return freeProcess && freeProcess.binding && freeProcess.binding("util");
-  } catch (e) {
-  }
-})();
-var nodeUtil_default = nodeUtil;
-
-// ../../node_modules/lodash-es/isTypedArray.js
-var nodeIsTypedArray = nodeUtil_default && nodeUtil_default.isTypedArray;
-var isTypedArray = nodeIsTypedArray ? baseUnary_default(nodeIsTypedArray) : baseIsTypedArray_default;
-var isTypedArray_default = isTypedArray;
-
-// ../../node_modules/lodash-es/_arrayLikeKeys.js
-var objectProto9 = Object.prototype;
-var hasOwnProperty8 = objectProto9.hasOwnProperty;
-function arrayLikeKeys(value, inherited) {
-  var isArr = isArray_default(value), isArg = !isArr && isArguments_default(value), isBuff = !isArr && !isArg && isBuffer_default(value), isType = !isArr && !isArg && !isBuff && isTypedArray_default(value), skipIndexes = isArr || isArg || isBuff || isType, result = skipIndexes ? baseTimes_default(value.length, String) : [], length = result.length;
-  for (var key in value) {
-    if ((inherited || hasOwnProperty8.call(value, key)) && !(skipIndexes && // Safari 9 has enumerable `arguments.length` in strict mode.
-    (key == "length" || // Node.js 0.10 has enumerable non-index properties on buffers.
-    isBuff && (key == "offset" || key == "parent") || // PhantomJS 2 has enumerable non-index properties on typed arrays.
-    isType && (key == "buffer" || key == "byteLength" || key == "byteOffset") || // Skip index properties.
-    isIndex_default(key, length)))) {
-      result.push(key);
-    }
-  }
-  return result;
-}
-var arrayLikeKeys_default = arrayLikeKeys;
-
-// ../../node_modules/lodash-es/_isPrototype.js
-var objectProto10 = Object.prototype;
-function isPrototype(value) {
-  var Ctor = value && value.constructor, proto = typeof Ctor == "function" && Ctor.prototype || objectProto10;
-  return value === proto;
-}
-var isPrototype_default = isPrototype;
-
-// ../../node_modules/lodash-es/_nativeKeys.js
-var nativeKeys = overArg_default(Object.keys, Object);
-var nativeKeys_default = nativeKeys;
-
-// ../../node_modules/lodash-es/_baseKeys.js
-var objectProto11 = Object.prototype;
-var hasOwnProperty9 = objectProto11.hasOwnProperty;
-function baseKeys(object) {
-  if (!isPrototype_default(object)) {
-    return nativeKeys_default(object);
-  }
-  var result = [];
-  for (var key in Object(object)) {
-    if (hasOwnProperty9.call(object, key) && key != "constructor") {
-      result.push(key);
-    }
-  }
-  return result;
-}
-var baseKeys_default = baseKeys;
-
-// ../../node_modules/lodash-es/isArrayLike.js
-function isArrayLike(value) {
-  return value != null && isLength_default(value.length) && !isFunction_default(value);
-}
-var isArrayLike_default = isArrayLike;
-
-// ../../node_modules/lodash-es/keys.js
-function keys(object) {
-  return isArrayLike_default(object) ? arrayLikeKeys_default(object) : baseKeys_default(object);
-}
-var keys_default = keys;
-
-// ../../node_modules/lodash-es/_baseAssign.js
-function baseAssign(object, source) {
-  return object && copyObject_default(source, keys_default(source), object);
-}
-var baseAssign_default = baseAssign;
-
-// ../../node_modules/lodash-es/_nativeKeysIn.js
-function nativeKeysIn(object) {
-  var result = [];
-  if (object != null) {
-    for (var key in Object(object)) {
-      result.push(key);
-    }
-  }
-  return result;
-}
-var nativeKeysIn_default = nativeKeysIn;
-
-// ../../node_modules/lodash-es/_baseKeysIn.js
-var objectProto12 = Object.prototype;
-var hasOwnProperty10 = objectProto12.hasOwnProperty;
-function baseKeysIn(object) {
-  if (!isObject_default(object)) {
-    return nativeKeysIn_default(object);
-  }
-  var isProto = isPrototype_default(object), result = [];
-  for (var key in object) {
-    if (!(key == "constructor" && (isProto || !hasOwnProperty10.call(object, key)))) {
-      result.push(key);
-    }
-  }
-  return result;
-}
-var baseKeysIn_default = baseKeysIn;
-
-// ../../node_modules/lodash-es/keysIn.js
-function keysIn(object) {
-  return isArrayLike_default(object) ? arrayLikeKeys_default(object, true) : baseKeysIn_default(object);
-}
-var keysIn_default = keysIn;
-
-// ../../node_modules/lodash-es/_baseAssignIn.js
-function baseAssignIn(object, source) {
-  return object && copyObject_default(source, keysIn_default(source), object);
-}
-var baseAssignIn_default = baseAssignIn;
-
-// ../../node_modules/lodash-es/_cloneBuffer.js
-var freeExports3 = typeof exports == "object" && exports && !exports.nodeType && exports;
-var freeModule3 = freeExports3 && typeof module == "object" && module && !module.nodeType && module;
-var moduleExports3 = freeModule3 && freeModule3.exports === freeExports3;
-var Buffer3 = moduleExports3 ? root_default.Buffer : void 0;
-var allocUnsafe = Buffer3 ? Buffer3.allocUnsafe : void 0;
-function cloneBuffer(buffer, isDeep) {
-  if (isDeep) {
-    return buffer.slice();
-  }
-  var length = buffer.length, result = allocUnsafe ? allocUnsafe(length) : new buffer.constructor(length);
-  buffer.copy(result);
-  return result;
-}
-var cloneBuffer_default = cloneBuffer;
-
-// ../../node_modules/lodash-es/_copyArray.js
-function copyArray(source, array) {
-  var index = -1, length = source.length;
-  array || (array = Array(length));
-  while (++index < length) {
-    array[index] = source[index];
-  }
-  return array;
-}
-var copyArray_default = copyArray;
-
-// ../../node_modules/lodash-es/_arrayFilter.js
-function arrayFilter(array, predicate) {
-  var index = -1, length = array == null ? 0 : array.length, resIndex = 0, result = [];
-  while (++index < length) {
-    var value = array[index];
-    if (predicate(value, index, array)) {
-      result[resIndex++] = value;
-    }
-  }
-  return result;
-}
-var arrayFilter_default = arrayFilter;
-
-// ../../node_modules/lodash-es/stubArray.js
-function stubArray() {
-  return [];
-}
-var stubArray_default = stubArray;
-
-// ../../node_modules/lodash-es/_getSymbols.js
-var objectProto13 = Object.prototype;
-var propertyIsEnumerable2 = objectProto13.propertyIsEnumerable;
-var nativeGetSymbols = Object.getOwnPropertySymbols;
-var getSymbols = !nativeGetSymbols ? stubArray_default : function(object) {
-  if (object == null) {
-    return [];
-  }
-  object = Object(object);
-  return arrayFilter_default(nativeGetSymbols(object), function(symbol) {
-    return propertyIsEnumerable2.call(object, symbol);
-  });
-};
-var getSymbols_default = getSymbols;
-
-// ../../node_modules/lodash-es/_copySymbols.js
-function copySymbols(source, object) {
-  return copyObject_default(source, getSymbols_default(source), object);
-}
-var copySymbols_default = copySymbols;
-
-// ../../node_modules/lodash-es/_arrayPush.js
-function arrayPush(array, values) {
-  var index = -1, length = values.length, offset = array.length;
-  while (++index < length) {
-    array[offset + index] = values[index];
-  }
-  return array;
-}
-var arrayPush_default = arrayPush;
-
-// ../../node_modules/lodash-es/_getSymbolsIn.js
-var nativeGetSymbols2 = Object.getOwnPropertySymbols;
-var getSymbolsIn = !nativeGetSymbols2 ? stubArray_default : function(object) {
-  var result = [];
-  while (object) {
-    arrayPush_default(result, getSymbols_default(object));
-    object = getPrototype_default(object);
-  }
-  return result;
-};
-var getSymbolsIn_default = getSymbolsIn;
-
-// ../../node_modules/lodash-es/_copySymbolsIn.js
-function copySymbolsIn(source, object) {
-  return copyObject_default(source, getSymbolsIn_default(source), object);
-}
-var copySymbolsIn_default = copySymbolsIn;
-
-// ../../node_modules/lodash-es/_baseGetAllKeys.js
-function baseGetAllKeys(object, keysFunc, symbolsFunc) {
-  var result = keysFunc(object);
-  return isArray_default(object) ? result : arrayPush_default(result, symbolsFunc(object));
-}
-var baseGetAllKeys_default = baseGetAllKeys;
-
-// ../../node_modules/lodash-es/_getAllKeys.js
-function getAllKeys(object) {
-  return baseGetAllKeys_default(object, keys_default, getSymbols_default);
-}
-var getAllKeys_default = getAllKeys;
-
-// ../../node_modules/lodash-es/_getAllKeysIn.js
-function getAllKeysIn(object) {
-  return baseGetAllKeys_default(object, keysIn_default, getSymbolsIn_default);
-}
-var getAllKeysIn_default = getAllKeysIn;
-
-// ../../node_modules/lodash-es/_DataView.js
-var DataView = getNative_default(root_default, "DataView");
-var DataView_default = DataView;
-
-// ../../node_modules/lodash-es/_Promise.js
-var Promise2 = getNative_default(root_default, "Promise");
-var Promise_default = Promise2;
-
-// ../../node_modules/lodash-es/_Set.js
-var Set = getNative_default(root_default, "Set");
-var Set_default = Set;
-
-// ../../node_modules/lodash-es/_WeakMap.js
-var WeakMap2 = getNative_default(root_default, "WeakMap");
-var WeakMap_default = WeakMap2;
-
-// ../../node_modules/lodash-es/_getTag.js
-var mapTag2 = "[object Map]";
-var objectTag3 = "[object Object]";
-var promiseTag = "[object Promise]";
-var setTag2 = "[object Set]";
-var weakMapTag2 = "[object WeakMap]";
-var dataViewTag2 = "[object DataView]";
-var dataViewCtorString = toSource_default(DataView_default);
-var mapCtorString = toSource_default(Map_default);
-var promiseCtorString = toSource_default(Promise_default);
-var setCtorString = toSource_default(Set_default);
-var weakMapCtorString = toSource_default(WeakMap_default);
-var getTag = baseGetTag_default;
-if (DataView_default && getTag(new DataView_default(new ArrayBuffer(1))) != dataViewTag2 || Map_default && getTag(new Map_default()) != mapTag2 || Promise_default && getTag(Promise_default.resolve()) != promiseTag || Set_default && getTag(new Set_default()) != setTag2 || WeakMap_default && getTag(new WeakMap_default()) != weakMapTag2) {
-  getTag = function(value) {
-    var result = baseGetTag_default(value), Ctor = result == objectTag3 ? value.constructor : void 0, ctorString = Ctor ? toSource_default(Ctor) : "";
-    if (ctorString) {
-      switch (ctorString) {
-        case dataViewCtorString:
-          return dataViewTag2;
-        case mapCtorString:
-          return mapTag2;
-        case promiseCtorString:
-          return promiseTag;
-        case setCtorString:
-          return setTag2;
-        case weakMapCtorString:
-          return weakMapTag2;
-      }
-    }
-    return result;
-  };
-}
-var getTag_default = getTag;
-
-// ../../node_modules/lodash-es/_initCloneArray.js
-var objectProto14 = Object.prototype;
-var hasOwnProperty11 = objectProto14.hasOwnProperty;
-function initCloneArray(array) {
-  var length = array.length, result = new array.constructor(length);
-  if (length && typeof array[0] == "string" && hasOwnProperty11.call(array, "index")) {
-    result.index = array.index;
-    result.input = array.input;
-  }
-  return result;
-}
-var initCloneArray_default = initCloneArray;
-
-// ../../node_modules/lodash-es/_Uint8Array.js
-var Uint8Array2 = root_default.Uint8Array;
-var Uint8Array_default = Uint8Array2;
-
-// ../../node_modules/lodash-es/_cloneArrayBuffer.js
-function cloneArrayBuffer(arrayBuffer) {
-  var result = new arrayBuffer.constructor(arrayBuffer.byteLength);
-  new Uint8Array_default(result).set(new Uint8Array_default(arrayBuffer));
-  return result;
-}
-var cloneArrayBuffer_default = cloneArrayBuffer;
-
-// ../../node_modules/lodash-es/_cloneDataView.js
-function cloneDataView(dataView, isDeep) {
-  var buffer = isDeep ? cloneArrayBuffer_default(dataView.buffer) : dataView.buffer;
-  return new dataView.constructor(buffer, dataView.byteOffset, dataView.byteLength);
-}
-var cloneDataView_default = cloneDataView;
-
-// ../../node_modules/lodash-es/_cloneRegExp.js
-var reFlags = /\w*$/;
-function cloneRegExp(regexp) {
-  var result = new regexp.constructor(regexp.source, reFlags.exec(regexp));
-  result.lastIndex = regexp.lastIndex;
-  return result;
-}
-var cloneRegExp_default = cloneRegExp;
-
-// ../../node_modules/lodash-es/_cloneSymbol.js
-var symbolProto = Symbol_default ? Symbol_default.prototype : void 0;
-var symbolValueOf = symbolProto ? symbolProto.valueOf : void 0;
-function cloneSymbol(symbol) {
-  return symbolValueOf ? Object(symbolValueOf.call(symbol)) : {};
-}
-var cloneSymbol_default = cloneSymbol;
-
-// ../../node_modules/lodash-es/_cloneTypedArray.js
-function cloneTypedArray(typedArray, isDeep) {
-  var buffer = isDeep ? cloneArrayBuffer_default(typedArray.buffer) : typedArray.buffer;
-  return new typedArray.constructor(buffer, typedArray.byteOffset, typedArray.length);
-}
-var cloneTypedArray_default = cloneTypedArray;
-
-// ../../node_modules/lodash-es/_initCloneByTag.js
-var boolTag2 = "[object Boolean]";
-var dateTag2 = "[object Date]";
-var mapTag3 = "[object Map]";
-var numberTag2 = "[object Number]";
-var regexpTag2 = "[object RegExp]";
-var setTag3 = "[object Set]";
-var stringTag2 = "[object String]";
-var symbolTag = "[object Symbol]";
-var arrayBufferTag2 = "[object ArrayBuffer]";
-var dataViewTag3 = "[object DataView]";
-var float32Tag2 = "[object Float32Array]";
-var float64Tag2 = "[object Float64Array]";
-var int8Tag2 = "[object Int8Array]";
-var int16Tag2 = "[object Int16Array]";
-var int32Tag2 = "[object Int32Array]";
-var uint8Tag2 = "[object Uint8Array]";
-var uint8ClampedTag2 = "[object Uint8ClampedArray]";
-var uint16Tag2 = "[object Uint16Array]";
-var uint32Tag2 = "[object Uint32Array]";
-function initCloneByTag(object, tag, isDeep) {
-  var Ctor = object.constructor;
-  switch (tag) {
-    case arrayBufferTag2:
-      return cloneArrayBuffer_default(object);
-    case boolTag2:
-    case dateTag2:
-      return new Ctor(+object);
-    case dataViewTag3:
-      return cloneDataView_default(object, isDeep);
-    case float32Tag2:
-    case float64Tag2:
-    case int8Tag2:
-    case int16Tag2:
-    case int32Tag2:
-    case uint8Tag2:
-    case uint8ClampedTag2:
-    case uint16Tag2:
-    case uint32Tag2:
-      return cloneTypedArray_default(object, isDeep);
-    case mapTag3:
-      return new Ctor();
-    case numberTag2:
-    case stringTag2:
-      return new Ctor(object);
-    case regexpTag2:
-      return cloneRegExp_default(object);
-    case setTag3:
-      return new Ctor();
-    case symbolTag:
-      return cloneSymbol_default(object);
-  }
-}
-var initCloneByTag_default = initCloneByTag;
-
-// ../../node_modules/lodash-es/_baseCreate.js
-var objectCreate = Object.create;
-var baseCreate = /* @__PURE__ */ (function() {
-  function object() {
-  }
-  return function(proto) {
-    if (!isObject_default(proto)) {
-      return {};
-    }
-    if (objectCreate) {
-      return objectCreate(proto);
-    }
-    object.prototype = proto;
-    var result = new object();
-    object.prototype = void 0;
-    return result;
-  };
-})();
-var baseCreate_default = baseCreate;
-
-// ../../node_modules/lodash-es/_initCloneObject.js
-function initCloneObject(object) {
-  return typeof object.constructor == "function" && !isPrototype_default(object) ? baseCreate_default(getPrototype_default(object)) : {};
-}
-var initCloneObject_default = initCloneObject;
-
-// ../../node_modules/lodash-es/_baseIsMap.js
-var mapTag4 = "[object Map]";
-function baseIsMap(value) {
-  return isObjectLike_default(value) && getTag_default(value) == mapTag4;
-}
-var baseIsMap_default = baseIsMap;
-
-// ../../node_modules/lodash-es/isMap.js
-var nodeIsMap = nodeUtil_default && nodeUtil_default.isMap;
-var isMap = nodeIsMap ? baseUnary_default(nodeIsMap) : baseIsMap_default;
-var isMap_default = isMap;
-
-// ../../node_modules/lodash-es/_baseIsSet.js
-var setTag4 = "[object Set]";
-function baseIsSet(value) {
-  return isObjectLike_default(value) && getTag_default(value) == setTag4;
-}
-var baseIsSet_default = baseIsSet;
-
-// ../../node_modules/lodash-es/isSet.js
-var nodeIsSet = nodeUtil_default && nodeUtil_default.isSet;
-var isSet = nodeIsSet ? baseUnary_default(nodeIsSet) : baseIsSet_default;
-var isSet_default = isSet;
-
-// ../../node_modules/lodash-es/_baseClone.js
-var CLONE_DEEP_FLAG = 1;
-var CLONE_FLAT_FLAG = 2;
-var CLONE_SYMBOLS_FLAG = 4;
-var argsTag3 = "[object Arguments]";
-var arrayTag2 = "[object Array]";
-var boolTag3 = "[object Boolean]";
-var dateTag3 = "[object Date]";
-var errorTag2 = "[object Error]";
-var funcTag3 = "[object Function]";
-var genTag2 = "[object GeneratorFunction]";
-var mapTag5 = "[object Map]";
-var numberTag3 = "[object Number]";
-var objectTag4 = "[object Object]";
-var regexpTag3 = "[object RegExp]";
-var setTag5 = "[object Set]";
-var stringTag3 = "[object String]";
-var symbolTag2 = "[object Symbol]";
-var weakMapTag3 = "[object WeakMap]";
-var arrayBufferTag3 = "[object ArrayBuffer]";
-var dataViewTag4 = "[object DataView]";
-var float32Tag3 = "[object Float32Array]";
-var float64Tag3 = "[object Float64Array]";
-var int8Tag3 = "[object Int8Array]";
-var int16Tag3 = "[object Int16Array]";
-var int32Tag3 = "[object Int32Array]";
-var uint8Tag3 = "[object Uint8Array]";
-var uint8ClampedTag3 = "[object Uint8ClampedArray]";
-var uint16Tag3 = "[object Uint16Array]";
-var uint32Tag3 = "[object Uint32Array]";
-var cloneableTags = {};
-cloneableTags[argsTag3] = cloneableTags[arrayTag2] = cloneableTags[arrayBufferTag3] = cloneableTags[dataViewTag4] = cloneableTags[boolTag3] = cloneableTags[dateTag3] = cloneableTags[float32Tag3] = cloneableTags[float64Tag3] = cloneableTags[int8Tag3] = cloneableTags[int16Tag3] = cloneableTags[int32Tag3] = cloneableTags[mapTag5] = cloneableTags[numberTag3] = cloneableTags[objectTag4] = cloneableTags[regexpTag3] = cloneableTags[setTag5] = cloneableTags[stringTag3] = cloneableTags[symbolTag2] = cloneableTags[uint8Tag3] = cloneableTags[uint8ClampedTag3] = cloneableTags[uint16Tag3] = cloneableTags[uint32Tag3] = true;
-cloneableTags[errorTag2] = cloneableTags[funcTag3] = cloneableTags[weakMapTag3] = false;
-function baseClone(value, bitmask, customizer, key, object, stack) {
-  var result, isDeep = bitmask & CLONE_DEEP_FLAG, isFlat = bitmask & CLONE_FLAT_FLAG, isFull = bitmask & CLONE_SYMBOLS_FLAG;
-  if (customizer) {
-    result = object ? customizer(value, key, object, stack) : customizer(value);
-  }
-  if (result !== void 0) {
-    return result;
-  }
-  if (!isObject_default(value)) {
-    return value;
-  }
-  var isArr = isArray_default(value);
-  if (isArr) {
-    result = initCloneArray_default(value);
-    if (!isDeep) {
-      return copyArray_default(value, result);
-    }
-  } else {
-    var tag = getTag_default(value), isFunc = tag == funcTag3 || tag == genTag2;
-    if (isBuffer_default(value)) {
-      return cloneBuffer_default(value, isDeep);
-    }
-    if (tag == objectTag4 || tag == argsTag3 || isFunc && !object) {
-      result = isFlat || isFunc ? {} : initCloneObject_default(value);
-      if (!isDeep) {
-        return isFlat ? copySymbolsIn_default(value, baseAssignIn_default(result, value)) : copySymbols_default(value, baseAssign_default(result, value));
-      }
-    } else {
-      if (!cloneableTags[tag]) {
-        return object ? value : {};
-      }
-      result = initCloneByTag_default(value, tag, isDeep);
-    }
-  }
-  stack || (stack = new Stack_default());
-  var stacked = stack.get(value);
-  if (stacked) {
-    return stacked;
-  }
-  stack.set(value, result);
-  if (isSet_default(value)) {
-    value.forEach(function(subValue) {
-      result.add(baseClone(subValue, bitmask, customizer, subValue, value, stack));
-    });
-  } else if (isMap_default(value)) {
-    value.forEach(function(subValue, key2) {
-      result.set(key2, baseClone(subValue, bitmask, customizer, key2, value, stack));
-    });
-  }
-  var keysFunc = isFull ? isFlat ? getAllKeysIn_default : getAllKeys_default : isFlat ? keysIn_default : keys_default;
-  var props = isArr ? void 0 : keysFunc(value);
-  arrayEach_default(props || value, function(subValue, key2) {
-    if (props) {
-      key2 = subValue;
-      subValue = value[key2];
-    }
-    assignValue_default(result, key2, baseClone(subValue, bitmask, customizer, key2, value, stack));
-  });
-  return result;
-}
-var baseClone_default = baseClone;
-
-// ../../node_modules/lodash-es/cloneDeep.js
-var CLONE_DEEP_FLAG2 = 1;
-var CLONE_SYMBOLS_FLAG2 = 4;
-function cloneDeep(value) {
-  return baseClone_default(value, CLONE_DEEP_FLAG2 | CLONE_SYMBOLS_FLAG2);
-}
-var cloneDeep_default = cloneDeep;
-
-// ../../node_modules/formik/dist/formik.esm.js
-var import_react_fast_compare = __toESM(require_react_fast_compare());
-import { createContext as createContext2, useContext as useContext2, Children, useRef, useEffect, useState, useCallback, useMemo, useImperativeHandle, createElement, useLayoutEffect, forwardRef, Component } from "react";
-
-// ../../node_modules/tiny-warning/dist/tiny-warning.esm.js
-var isProduction = false;
-function warning(condition, message) {
-  if (!isProduction) {
-    if (condition) {
-      return;
-    }
-    var text = "Warning: " + message;
-    if (typeof console !== "undefined") {
-      console.warn(text);
-    }
-    try {
-      throw Error(text);
-    } catch (x) {
-    }
-  }
-}
-var tiny_warning_esm_default = warning;
-
-// ../../node_modules/lodash-es/clone.js
-var CLONE_SYMBOLS_FLAG3 = 4;
-function clone(value) {
-  return baseClone_default(value, CLONE_SYMBOLS_FLAG3);
-}
-var clone_default = clone;
-
-// ../../node_modules/lodash-es/_arrayMap.js
-function arrayMap(array, iteratee) {
-  var index = -1, length = array == null ? 0 : array.length, result = Array(length);
-  while (++index < length) {
-    result[index] = iteratee(array[index], index, array);
-  }
-  return result;
-}
-var arrayMap_default = arrayMap;
-
-// ../../node_modules/lodash-es/isSymbol.js
-var symbolTag3 = "[object Symbol]";
-function isSymbol(value) {
-  return typeof value == "symbol" || isObjectLike_default(value) && baseGetTag_default(value) == symbolTag3;
-}
-var isSymbol_default = isSymbol;
-
-// ../../node_modules/lodash-es/memoize.js
-var FUNC_ERROR_TEXT = "Expected a function";
-function memoize(func, resolver) {
-  if (typeof func != "function" || resolver != null && typeof resolver != "function") {
-    throw new TypeError(FUNC_ERROR_TEXT);
-  }
-  var memoized = function() {
-    var args = arguments, key = resolver ? resolver.apply(this, args) : args[0], cache = memoized.cache;
-    if (cache.has(key)) {
-      return cache.get(key);
-    }
-    var result = func.apply(this, args);
-    memoized.cache = cache.set(key, result) || cache;
-    return result;
-  };
-  memoized.cache = new (memoize.Cache || MapCache_default)();
-  return memoized;
-}
-memoize.Cache = MapCache_default;
-var memoize_default = memoize;
-
-// ../../node_modules/lodash-es/_memoizeCapped.js
-var MAX_MEMOIZE_SIZE = 500;
-function memoizeCapped(func) {
-  var result = memoize_default(func, function(key) {
-    if (cache.size === MAX_MEMOIZE_SIZE) {
-      cache.clear();
-    }
-    return key;
-  });
-  var cache = result.cache;
-  return result;
-}
-var memoizeCapped_default = memoizeCapped;
-
-// ../../node_modules/lodash-es/_stringToPath.js
-var rePropName = /[^.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|$))/g;
-var reEscapeChar = /\\(\\)?/g;
-var stringToPath = memoizeCapped_default(function(string) {
-  var result = [];
-  if (string.charCodeAt(0) === 46) {
-    result.push("");
-  }
-  string.replace(rePropName, function(match, number, quote, subString) {
-    result.push(quote ? subString.replace(reEscapeChar, "$1") : number || match);
-  });
-  return result;
-});
-var stringToPath_default = stringToPath;
-
-// ../../node_modules/lodash-es/_toKey.js
-var INFINITY = 1 / 0;
-function toKey(value) {
-  if (typeof value == "string" || isSymbol_default(value)) {
-    return value;
-  }
-  var result = value + "";
-  return result == "0" && 1 / value == -INFINITY ? "-0" : result;
-}
-var toKey_default = toKey;
-
-// ../../node_modules/lodash-es/_baseToString.js
-var INFINITY2 = 1 / 0;
-var symbolProto2 = Symbol_default ? Symbol_default.prototype : void 0;
-var symbolToString = symbolProto2 ? symbolProto2.toString : void 0;
-function baseToString(value) {
-  if (typeof value == "string") {
-    return value;
-  }
-  if (isArray_default(value)) {
-    return arrayMap_default(value, baseToString) + "";
-  }
-  if (isSymbol_default(value)) {
-    return symbolToString ? symbolToString.call(value) : "";
-  }
-  var result = value + "";
-  return result == "0" && 1 / value == -INFINITY2 ? "-0" : result;
-}
-var baseToString_default = baseToString;
-
-// ../../node_modules/lodash-es/toString.js
-function toString(value) {
-  return value == null ? "" : baseToString_default(value);
-}
-var toString_default = toString;
-
-// ../../node_modules/lodash-es/toPath.js
-function toPath(value) {
-  if (isArray_default(value)) {
-    return arrayMap_default(value, toKey_default);
-  }
-  return isSymbol_default(value) ? [value] : copyArray_default(stringToPath_default(toString_default(value)));
-}
-var toPath_default = toPath;
-
-// ../../node_modules/formik/dist/formik.esm.js
-var import_hoist_non_react_statics = __toESM(require_hoist_non_react_statics_cjs());
-function _extends2() {
-  _extends2 = Object.assign || function(target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i];
-      for (var key in source) {
-        if (Object.prototype.hasOwnProperty.call(source, key)) {
-          target[key] = source[key];
-        }
-      }
-    }
-    return target;
-  };
-  return _extends2.apply(this, arguments);
-}
-function _inheritsLoose(subClass, superClass) {
-  subClass.prototype = Object.create(superClass.prototype);
-  subClass.prototype.constructor = subClass;
-  subClass.__proto__ = superClass;
-}
-function _objectWithoutPropertiesLoose2(source, excluded) {
-  if (source == null) return {};
-  var target = {};
-  var sourceKeys = Object.keys(source);
-  var key, i;
-  for (i = 0; i < sourceKeys.length; i++) {
-    key = sourceKeys[i];
-    if (excluded.indexOf(key) >= 0) continue;
-    target[key] = source[key];
-  }
-  return target;
-}
-function _assertThisInitialized(self2) {
-  if (self2 === void 0) {
-    throw new ReferenceError("this hasn't been initialised - super() hasn't been called");
-  }
-  return self2;
-}
-var FormikContext = /* @__PURE__ */ createContext2(void 0);
-FormikContext.displayName = "FormikContext";
-var FormikProvider = FormikContext.Provider;
-var FormikConsumer = FormikContext.Consumer;
-function useFormikContext() {
-  var formik = useContext2(FormikContext);
-  !!!formik ? true ? tiny_warning_esm_default(false, "Formik context is undefined, please verify you are calling useFormikContext() as child of a <Formik> component.") : tiny_warning_esm_default(false) : void 0;
-  return formik;
-}
-var isEmptyArray = function isEmptyArray2(value) {
-  return Array.isArray(value) && value.length === 0;
-};
-var isFunction2 = function isFunction3(obj) {
-  return typeof obj === "function";
-};
-var isObject2 = function isObject3(obj) {
-  return obj !== null && typeof obj === "object";
-};
-var isInteger = function isInteger2(obj) {
-  return String(Math.floor(Number(obj))) === obj;
-};
-var isString = function isString2(obj) {
-  return Object.prototype.toString.call(obj) === "[object String]";
-};
-var isEmptyChildren = function isEmptyChildren2(children) {
-  return Children.count(children) === 0;
-};
-var isPromise = function isPromise2(value) {
-  return isObject2(value) && isFunction2(value.then);
-};
-function getActiveElement(doc) {
-  doc = doc || (typeof document !== "undefined" ? document : void 0);
-  if (typeof doc === "undefined") {
-    return null;
-  }
-  try {
-    return doc.activeElement || doc.body;
-  } catch (e) {
-    return doc.body;
-  }
-}
-function getIn(obj, key, def, p) {
-  if (p === void 0) {
-    p = 0;
-  }
-  var path = toPath_default(key);
-  while (obj && p < path.length) {
-    obj = obj[path[p++]];
-  }
-  if (p !== path.length && !obj) {
-    return def;
-  }
-  return obj === void 0 ? def : obj;
-}
-function setIn(obj, path, value) {
-  var res = clone_default(obj);
-  var resVal = res;
-  var i = 0;
-  var pathArray = toPath_default(path);
-  for (; i < pathArray.length - 1; i++) {
-    var currentPath = pathArray[i];
-    var currentObj = getIn(obj, pathArray.slice(0, i + 1));
-    if (currentObj && (isObject2(currentObj) || Array.isArray(currentObj))) {
-      resVal = resVal[currentPath] = clone_default(currentObj);
-    } else {
-      var nextPath = pathArray[i + 1];
-      resVal = resVal[currentPath] = isInteger(nextPath) && Number(nextPath) >= 0 ? [] : {};
-    }
-  }
-  if ((i === 0 ? obj : resVal)[pathArray[i]] === value) {
-    return obj;
-  }
-  if (value === void 0) {
-    delete resVal[pathArray[i]];
-  } else {
-    resVal[pathArray[i]] = value;
-  }
-  if (i === 0 && value === void 0) {
-    delete res[pathArray[i]];
-  }
-  return res;
-}
-function setNestedObjectValues(object, value, visited, response) {
-  if (visited === void 0) {
-    visited = /* @__PURE__ */ new WeakMap();
-  }
-  if (response === void 0) {
-    response = {};
-  }
-  for (var _i = 0, _Object$keys = Object.keys(object); _i < _Object$keys.length; _i++) {
-    var k = _Object$keys[_i];
-    var val = object[k];
-    if (isObject2(val)) {
-      if (!visited.get(val)) {
-        visited.set(val, true);
-        response[k] = Array.isArray(val) ? [] : {};
-        setNestedObjectValues(val, value, visited, response[k]);
-      }
-    } else {
-      response[k] = value;
-    }
-  }
-  return response;
-}
-function formikReducer(state, msg) {
-  switch (msg.type) {
-    case "SET_VALUES":
-      return _extends2({}, state, {
-        values: msg.payload
-      });
-    case "SET_TOUCHED":
-      return _extends2({}, state, {
-        touched: msg.payload
-      });
-    case "SET_ERRORS":
-      if ((0, import_react_fast_compare.default)(state.errors, msg.payload)) {
-        return state;
-      }
-      return _extends2({}, state, {
-        errors: msg.payload
-      });
-    case "SET_STATUS":
-      return _extends2({}, state, {
-        status: msg.payload
-      });
-    case "SET_ISSUBMITTING":
-      return _extends2({}, state, {
-        isSubmitting: msg.payload
-      });
-    case "SET_ISVALIDATING":
-      return _extends2({}, state, {
-        isValidating: msg.payload
-      });
-    case "SET_FIELD_VALUE":
-      return _extends2({}, state, {
-        values: setIn(state.values, msg.payload.field, msg.payload.value)
-      });
-    case "SET_FIELD_TOUCHED":
-      return _extends2({}, state, {
-        touched: setIn(state.touched, msg.payload.field, msg.payload.value)
-      });
-    case "SET_FIELD_ERROR":
-      return _extends2({}, state, {
-        errors: setIn(state.errors, msg.payload.field, msg.payload.value)
-      });
-    case "RESET_FORM":
-      return _extends2({}, state, msg.payload);
-    case "SET_FORMIK_STATE":
-      return msg.payload(state);
-    case "SUBMIT_ATTEMPT":
-      return _extends2({}, state, {
-        touched: setNestedObjectValues(state.values, true),
-        isSubmitting: true,
-        submitCount: state.submitCount + 1
-      });
-    case "SUBMIT_FAILURE":
-      return _extends2({}, state, {
-        isSubmitting: false
-      });
-    case "SUBMIT_SUCCESS":
-      return _extends2({}, state, {
-        isSubmitting: false
-      });
-    default:
-      return state;
-  }
-}
-var emptyErrors = {};
-var emptyTouched = {};
-function useFormik(_ref) {
-  var _ref$validateOnChange = _ref.validateOnChange, validateOnChange = _ref$validateOnChange === void 0 ? true : _ref$validateOnChange, _ref$validateOnBlur = _ref.validateOnBlur, validateOnBlur = _ref$validateOnBlur === void 0 ? true : _ref$validateOnBlur, _ref$validateOnMount = _ref.validateOnMount, validateOnMount = _ref$validateOnMount === void 0 ? false : _ref$validateOnMount, isInitialValid = _ref.isInitialValid, _ref$enableReinitiali = _ref.enableReinitialize, enableReinitialize = _ref$enableReinitiali === void 0 ? false : _ref$enableReinitiali, onSubmit = _ref.onSubmit, rest = _objectWithoutPropertiesLoose2(_ref, ["validateOnChange", "validateOnBlur", "validateOnMount", "isInitialValid", "enableReinitialize", "onSubmit"]);
-  var props = _extends2({
-    validateOnChange,
-    validateOnBlur,
-    validateOnMount,
-    onSubmit
-  }, rest);
-  var initialValues = useRef(props.initialValues);
-  var initialErrors = useRef(props.initialErrors || emptyErrors);
-  var initialTouched = useRef(props.initialTouched || emptyTouched);
-  var initialStatus = useRef(props.initialStatus);
-  var isMounted = useRef(false);
-  var fieldRegistry = useRef({});
-  if (true) {
-    useEffect(function() {
-      !(typeof isInitialValid === "undefined") ? true ? tiny_warning_esm_default(false, "isInitialValid has been deprecated and will be removed in future versions of Formik. Please use initialErrors or validateOnMount instead.") : tiny_warning_esm_default(false) : void 0;
-    }, []);
-  }
-  useEffect(function() {
-    isMounted.current = true;
-    return function() {
-      isMounted.current = false;
-    };
-  }, []);
-  var _React$useState = useState(0), setIteration = _React$useState[1];
-  var stateRef = useRef({
-    values: cloneDeep_default(props.initialValues),
-    errors: cloneDeep_default(props.initialErrors) || emptyErrors,
-    touched: cloneDeep_default(props.initialTouched) || emptyTouched,
-    status: cloneDeep_default(props.initialStatus),
-    isSubmitting: false,
-    isValidating: false,
-    submitCount: 0
-  });
-  var state = stateRef.current;
-  var dispatch = useCallback(function(action) {
-    var prev = stateRef.current;
-    stateRef.current = formikReducer(prev, action);
-    if (prev !== stateRef.current) setIteration(function(x) {
-      return x + 1;
-    });
-  }, []);
-  var runValidateHandler = useCallback(function(values, field) {
-    return new Promise(function(resolve, reject) {
-      var maybePromisedErrors = props.validate(values, field);
-      if (maybePromisedErrors == null) {
-        resolve(emptyErrors);
-      } else if (isPromise(maybePromisedErrors)) {
-        maybePromisedErrors.then(function(errors) {
-          resolve(errors || emptyErrors);
-        }, function(actualException) {
-          if (true) {
-            console.warn("Warning: An unhandled error was caught during validation in <Formik validate />", actualException);
-          }
-          reject(actualException);
-        });
-      } else {
-        resolve(maybePromisedErrors);
-      }
-    });
-  }, [props.validate]);
-  var runValidationSchema = useCallback(function(values, field) {
-    var validationSchema = props.validationSchema;
-    var schema = isFunction2(validationSchema) ? validationSchema(field) : validationSchema;
-    var promise = field && schema.validateAt ? schema.validateAt(field, values) : validateYupSchema(values, schema);
-    return new Promise(function(resolve, reject) {
-      promise.then(function() {
-        resolve(emptyErrors);
-      }, function(err) {
-        if (err.name === "ValidationError") {
-          resolve(yupToFormErrors(err));
-        } else {
-          if (true) {
-            console.warn("Warning: An unhandled error was caught during validation in <Formik validationSchema />", err);
-          }
-          reject(err);
-        }
-      });
-    });
-  }, [props.validationSchema]);
-  var runSingleFieldLevelValidation = useCallback(function(field, value) {
-    return new Promise(function(resolve) {
-      return resolve(fieldRegistry.current[field].validate(value));
-    });
-  }, []);
-  var runFieldLevelValidations = useCallback(function(values) {
-    var fieldKeysWithValidation = Object.keys(fieldRegistry.current).filter(function(f) {
-      return isFunction2(fieldRegistry.current[f].validate);
-    });
-    var fieldValidations = fieldKeysWithValidation.length > 0 ? fieldKeysWithValidation.map(function(f) {
-      return runSingleFieldLevelValidation(f, getIn(values, f));
-    }) : [Promise.resolve("DO_NOT_DELETE_YOU_WILL_BE_FIRED")];
-    return Promise.all(fieldValidations).then(function(fieldErrorsList) {
-      return fieldErrorsList.reduce(function(prev, curr, index) {
-        if (curr === "DO_NOT_DELETE_YOU_WILL_BE_FIRED") {
-          return prev;
-        }
-        if (curr) {
-          prev = setIn(prev, fieldKeysWithValidation[index], curr);
-        }
-        return prev;
-      }, {});
-    });
-  }, [runSingleFieldLevelValidation]);
-  var runAllValidations = useCallback(function(values) {
-    return Promise.all([runFieldLevelValidations(values), props.validationSchema ? runValidationSchema(values) : {}, props.validate ? runValidateHandler(values) : {}]).then(function(_ref2) {
-      var fieldErrors = _ref2[0], schemaErrors = _ref2[1], validateErrors = _ref2[2];
-      var combinedErrors = es_default.all([fieldErrors, schemaErrors, validateErrors], {
-        arrayMerge
-      });
-      return combinedErrors;
-    });
-  }, [props.validate, props.validationSchema, runFieldLevelValidations, runValidateHandler, runValidationSchema]);
-  var validateFormWithHighPriority = useEventCallback(function(values) {
-    if (values === void 0) {
-      values = state.values;
-    }
-    dispatch({
-      type: "SET_ISVALIDATING",
-      payload: true
-    });
-    return runAllValidations(values).then(function(combinedErrors) {
-      if (!!isMounted.current) {
-        dispatch({
-          type: "SET_ISVALIDATING",
-          payload: false
-        });
-        dispatch({
-          type: "SET_ERRORS",
-          payload: combinedErrors
-        });
-      }
-      return combinedErrors;
-    });
-  });
-  useEffect(function() {
-    if (validateOnMount && isMounted.current === true && (0, import_react_fast_compare.default)(initialValues.current, props.initialValues)) {
-      validateFormWithHighPriority(initialValues.current);
-    }
-  }, [validateOnMount, validateFormWithHighPriority]);
-  var resetForm = useCallback(function(nextState) {
-    var values = nextState && nextState.values ? nextState.values : initialValues.current;
-    var errors = nextState && nextState.errors ? nextState.errors : initialErrors.current ? initialErrors.current : props.initialErrors || {};
-    var touched = nextState && nextState.touched ? nextState.touched : initialTouched.current ? initialTouched.current : props.initialTouched || {};
-    var status = nextState && nextState.status ? nextState.status : initialStatus.current ? initialStatus.current : props.initialStatus;
-    initialValues.current = values;
-    initialErrors.current = errors;
-    initialTouched.current = touched;
-    initialStatus.current = status;
-    var dispatchFn = function dispatchFn2() {
-      dispatch({
-        type: "RESET_FORM",
-        payload: {
-          isSubmitting: !!nextState && !!nextState.isSubmitting,
-          errors,
-          touched,
-          status,
-          values,
-          isValidating: !!nextState && !!nextState.isValidating,
-          submitCount: !!nextState && !!nextState.submitCount && typeof nextState.submitCount === "number" ? nextState.submitCount : 0
-        }
-      });
-    };
-    if (props.onReset) {
-      var maybePromisedOnReset = props.onReset(state.values, imperativeMethods);
-      if (isPromise(maybePromisedOnReset)) {
-        maybePromisedOnReset.then(dispatchFn);
-      } else {
-        dispatchFn();
-      }
-    } else {
-      dispatchFn();
-    }
-  }, [props.initialErrors, props.initialStatus, props.initialTouched, props.onReset]);
-  useEffect(function() {
-    if (isMounted.current === true && !(0, import_react_fast_compare.default)(initialValues.current, props.initialValues)) {
-      if (enableReinitialize) {
-        initialValues.current = props.initialValues;
-        resetForm();
-        if (validateOnMount) {
-          validateFormWithHighPriority(initialValues.current);
-        }
-      }
-    }
-  }, [enableReinitialize, props.initialValues, resetForm, validateOnMount, validateFormWithHighPriority]);
-  useEffect(function() {
-    if (enableReinitialize && isMounted.current === true && !(0, import_react_fast_compare.default)(initialErrors.current, props.initialErrors)) {
-      initialErrors.current = props.initialErrors || emptyErrors;
-      dispatch({
-        type: "SET_ERRORS",
-        payload: props.initialErrors || emptyErrors
-      });
-    }
-  }, [enableReinitialize, props.initialErrors]);
-  useEffect(function() {
-    if (enableReinitialize && isMounted.current === true && !(0, import_react_fast_compare.default)(initialTouched.current, props.initialTouched)) {
-      initialTouched.current = props.initialTouched || emptyTouched;
-      dispatch({
-        type: "SET_TOUCHED",
-        payload: props.initialTouched || emptyTouched
-      });
-    }
-  }, [enableReinitialize, props.initialTouched]);
-  useEffect(function() {
-    if (enableReinitialize && isMounted.current === true && !(0, import_react_fast_compare.default)(initialStatus.current, props.initialStatus)) {
-      initialStatus.current = props.initialStatus;
-      dispatch({
-        type: "SET_STATUS",
-        payload: props.initialStatus
-      });
-    }
-  }, [enableReinitialize, props.initialStatus, props.initialTouched]);
-  var validateField = useEventCallback(function(name) {
-    if (fieldRegistry.current[name] && isFunction2(fieldRegistry.current[name].validate)) {
-      var value = getIn(state.values, name);
-      var maybePromise = fieldRegistry.current[name].validate(value);
-      if (isPromise(maybePromise)) {
-        dispatch({
-          type: "SET_ISVALIDATING",
-          payload: true
-        });
-        return maybePromise.then(function(x) {
-          return x;
-        }).then(function(error) {
-          dispatch({
-            type: "SET_FIELD_ERROR",
-            payload: {
-              field: name,
-              value: error
-            }
-          });
-          dispatch({
-            type: "SET_ISVALIDATING",
-            payload: false
-          });
-        });
-      } else {
-        dispatch({
-          type: "SET_FIELD_ERROR",
-          payload: {
-            field: name,
-            value: maybePromise
-          }
-        });
-        return Promise.resolve(maybePromise);
-      }
-    } else if (props.validationSchema) {
-      dispatch({
-        type: "SET_ISVALIDATING",
-        payload: true
-      });
-      return runValidationSchema(state.values, name).then(function(x) {
-        return x;
-      }).then(function(error) {
-        dispatch({
-          type: "SET_FIELD_ERROR",
-          payload: {
-            field: name,
-            value: getIn(error, name)
-          }
-        });
-        dispatch({
-          type: "SET_ISVALIDATING",
-          payload: false
-        });
-      });
-    }
-    return Promise.resolve();
-  });
-  var registerField = useCallback(function(name, _ref3) {
-    var validate = _ref3.validate;
-    fieldRegistry.current[name] = {
-      validate
-    };
-  }, []);
-  var unregisterField = useCallback(function(name) {
-    delete fieldRegistry.current[name];
-  }, []);
-  var setTouched = useEventCallback(function(touched, shouldValidate) {
-    dispatch({
-      type: "SET_TOUCHED",
-      payload: touched
-    });
-    var willValidate = shouldValidate === void 0 ? validateOnBlur : shouldValidate;
-    return willValidate ? validateFormWithHighPriority(state.values) : Promise.resolve();
-  });
-  var setErrors = useCallback(function(errors) {
-    dispatch({
-      type: "SET_ERRORS",
-      payload: errors
-    });
-  }, []);
-  var setValues = useEventCallback(function(values, shouldValidate) {
-    var resolvedValues = isFunction2(values) ? values(state.values) : values;
-    dispatch({
-      type: "SET_VALUES",
-      payload: resolvedValues
-    });
-    var willValidate = shouldValidate === void 0 ? validateOnChange : shouldValidate;
-    return willValidate ? validateFormWithHighPriority(resolvedValues) : Promise.resolve();
-  });
-  var setFieldError = useCallback(function(field, value) {
-    dispatch({
-      type: "SET_FIELD_ERROR",
-      payload: {
-        field,
-        value
-      }
-    });
-  }, []);
-  var setFieldValue = useEventCallback(function(field, value, shouldValidate) {
-    var resolvedValue = isFunction2(value) ? value(getIn(state.values, field)) : value;
-    dispatch({
-      type: "SET_FIELD_VALUE",
-      payload: {
-        field,
-        value: resolvedValue
-      }
-    });
-    var willValidate = shouldValidate === void 0 ? validateOnChange : shouldValidate;
-    return willValidate ? validateFormWithHighPriority(setIn(state.values, field, resolvedValue)) : Promise.resolve();
-  });
-  var executeChange = useCallback(function(eventOrTextValue, maybePath) {
-    var field = maybePath;
-    var val = eventOrTextValue;
-    var parsed;
-    if (!isString(eventOrTextValue)) {
-      if (eventOrTextValue.persist) {
-        eventOrTextValue.persist();
-      }
-      var target = eventOrTextValue.target ? eventOrTextValue.target : eventOrTextValue.currentTarget;
-      var type = target.type, name = target.name, id = target.id, value = target.value, checked = target.checked, outerHTML = target.outerHTML, options = target.options, multiple = target.multiple;
-      field = maybePath ? maybePath : name ? name : id;
-      if (!field && true) {
-        warnAboutMissingIdentifier({
-          htmlContent: outerHTML,
-          documentationAnchorLink: "handlechange-e-reactchangeeventany--void",
-          handlerName: "handleChange"
-        });
-      }
-      val = /number|range/.test(type) ? (parsed = parseFloat(value), isNaN(parsed) ? "" : parsed) : /checkbox/.test(type) ? getValueForCheckbox(getIn(state.values, field), checked, value) : options && multiple ? getSelectedValues(options) : value;
-    }
-    if (field) {
-      setFieldValue(field, val);
-    }
-  }, [setFieldValue, state.values]);
-  var handleChange = useEventCallback(function(eventOrPath) {
-    if (isString(eventOrPath)) {
-      return function(event) {
-        return executeChange(event, eventOrPath);
-      };
-    } else {
-      executeChange(eventOrPath);
-    }
-  });
-  var setFieldTouched = useEventCallback(function(field, touched, shouldValidate) {
-    if (touched === void 0) {
-      touched = true;
-    }
-    dispatch({
-      type: "SET_FIELD_TOUCHED",
-      payload: {
-        field,
-        value: touched
-      }
-    });
-    var willValidate = shouldValidate === void 0 ? validateOnBlur : shouldValidate;
-    return willValidate ? validateFormWithHighPriority(state.values) : Promise.resolve();
-  });
-  var executeBlur = useCallback(function(e, path) {
-    if (e.persist) {
-      e.persist();
-    }
-    var _e$target = e.target, name = _e$target.name, id = _e$target.id, outerHTML = _e$target.outerHTML;
-    var field = path ? path : name ? name : id;
-    if (!field && true) {
-      warnAboutMissingIdentifier({
-        htmlContent: outerHTML,
-        documentationAnchorLink: "handleblur-e-any--void",
-        handlerName: "handleBlur"
-      });
-    }
-    setFieldTouched(field, true);
-  }, [setFieldTouched]);
-  var handleBlur = useEventCallback(function(eventOrString) {
-    if (isString(eventOrString)) {
-      return function(event) {
-        return executeBlur(event, eventOrString);
-      };
-    } else {
-      executeBlur(eventOrString);
-    }
-  });
-  var setFormikState = useCallback(function(stateOrCb) {
-    if (isFunction2(stateOrCb)) {
-      dispatch({
-        type: "SET_FORMIK_STATE",
-        payload: stateOrCb
-      });
-    } else {
-      dispatch({
-        type: "SET_FORMIK_STATE",
-        payload: function payload() {
-          return stateOrCb;
-        }
-      });
-    }
-  }, []);
-  var setStatus = useCallback(function(status) {
-    dispatch({
-      type: "SET_STATUS",
-      payload: status
-    });
-  }, []);
-  var setSubmitting = useCallback(function(isSubmitting) {
-    dispatch({
-      type: "SET_ISSUBMITTING",
-      payload: isSubmitting
-    });
-  }, []);
-  var submitForm = useEventCallback(function() {
-    dispatch({
-      type: "SUBMIT_ATTEMPT"
-    });
-    return validateFormWithHighPriority().then(function(combinedErrors) {
-      var isInstanceOfError = combinedErrors instanceof Error;
-      var isActuallyValid = !isInstanceOfError && Object.keys(combinedErrors).length === 0;
-      if (isActuallyValid) {
-        var promiseOrUndefined;
-        try {
-          promiseOrUndefined = executeSubmit();
-          if (promiseOrUndefined === void 0) {
-            return;
-          }
-        } catch (error) {
-          throw error;
-        }
-        return Promise.resolve(promiseOrUndefined).then(function(result) {
-          if (!!isMounted.current) {
-            dispatch({
-              type: "SUBMIT_SUCCESS"
-            });
-          }
-          return result;
-        })["catch"](function(_errors) {
-          if (!!isMounted.current) {
-            dispatch({
-              type: "SUBMIT_FAILURE"
-            });
-            throw _errors;
-          }
-        });
-      } else if (!!isMounted.current) {
-        dispatch({
-          type: "SUBMIT_FAILURE"
-        });
-        if (isInstanceOfError) {
-          throw combinedErrors;
-        }
-      }
-      return;
-    });
-  });
-  var handleSubmit = useEventCallback(function(e) {
-    if (e && e.preventDefault && isFunction2(e.preventDefault)) {
-      e.preventDefault();
-    }
-    if (e && e.stopPropagation && isFunction2(e.stopPropagation)) {
-      e.stopPropagation();
-    }
-    if (typeof document !== "undefined") {
-      var activeElement = getActiveElement();
-      if (activeElement !== null && activeElement instanceof HTMLButtonElement) {
-        !(activeElement.attributes && activeElement.attributes.getNamedItem("type")) ? true ? tiny_warning_esm_default(false, 'You submitted a Formik form using a button with an unspecified `type` attribute.  Most browsers default button elements to `type="submit"`. If this is not a submit button, please add `type="button"`.') : tiny_warning_esm_default(false) : void 0;
-      }
-    }
-    submitForm()["catch"](function(reason) {
-      console.warn("Warning: An unhandled error was caught from submitForm()", reason);
-    });
-  });
-  var imperativeMethods = {
-    resetForm,
-    validateForm: validateFormWithHighPriority,
-    validateField,
-    setErrors,
-    setFieldError,
-    setFieldTouched,
-    setFieldValue,
-    setStatus,
-    setSubmitting,
-    setTouched,
-    setValues,
-    setFormikState,
-    submitForm
-  };
-  var executeSubmit = useEventCallback(function() {
-    return onSubmit(state.values, imperativeMethods);
-  });
-  var handleReset = useEventCallback(function(e) {
-    if (e && e.preventDefault && isFunction2(e.preventDefault)) {
-      e.preventDefault();
-    }
-    if (e && e.stopPropagation && isFunction2(e.stopPropagation)) {
-      e.stopPropagation();
-    }
-    resetForm();
-  });
-  var getFieldMeta = useCallback(function(name) {
-    return {
-      value: getIn(state.values, name),
-      error: getIn(state.errors, name),
-      touched: !!getIn(state.touched, name),
-      initialValue: getIn(initialValues.current, name),
-      initialTouched: !!getIn(initialTouched.current, name),
-      initialError: getIn(initialErrors.current, name)
-    };
-  }, [state.errors, state.touched, state.values]);
-  var getFieldHelpers = useCallback(function(name) {
-    return {
-      setValue: function setValue(value, shouldValidate) {
-        return setFieldValue(name, value, shouldValidate);
-      },
-      setTouched: function setTouched2(value, shouldValidate) {
-        return setFieldTouched(name, value, shouldValidate);
-      },
-      setError: function setError(value) {
-        return setFieldError(name, value);
-      }
-    };
-  }, [setFieldValue, setFieldTouched, setFieldError]);
-  var getFieldProps = useCallback(function(nameOrOptions) {
-    var isAnObject = isObject2(nameOrOptions);
-    var name = isAnObject ? nameOrOptions.name : nameOrOptions;
-    var valueState = getIn(state.values, name);
-    var field = {
-      name,
-      value: valueState,
-      onChange: handleChange,
-      onBlur: handleBlur
-    };
-    if (isAnObject) {
-      var type = nameOrOptions.type, valueProp = nameOrOptions.value, is = nameOrOptions.as, multiple = nameOrOptions.multiple;
-      if (type === "checkbox") {
-        if (valueProp === void 0) {
-          field.checked = !!valueState;
-        } else {
-          field.checked = !!(Array.isArray(valueState) && ~valueState.indexOf(valueProp));
-          field.value = valueProp;
-        }
-      } else if (type === "radio") {
-        field.checked = valueState === valueProp;
-        field.value = valueProp;
-      } else if (is === "select" && multiple) {
-        field.value = field.value || [];
-        field.multiple = true;
-      }
-    }
-    return field;
-  }, [handleBlur, handleChange, state.values]);
-  var dirty = useMemo(function() {
-    return !(0, import_react_fast_compare.default)(initialValues.current, state.values);
-  }, [initialValues.current, state.values]);
-  var isValid = useMemo(function() {
-    return typeof isInitialValid !== "undefined" ? dirty ? state.errors && Object.keys(state.errors).length === 0 : isInitialValid !== false && isFunction2(isInitialValid) ? isInitialValid(props) : isInitialValid : state.errors && Object.keys(state.errors).length === 0;
-  }, [isInitialValid, dirty, state.errors, props]);
-  var ctx = _extends2({}, state, {
-    initialValues: initialValues.current,
-    initialErrors: initialErrors.current,
-    initialTouched: initialTouched.current,
-    initialStatus: initialStatus.current,
-    handleBlur,
-    handleChange,
-    handleReset,
-    handleSubmit,
-    resetForm,
-    setErrors,
-    setFormikState,
-    setFieldTouched,
-    setFieldValue,
-    setFieldError,
-    setStatus,
-    setSubmitting,
-    setTouched,
-    setValues,
-    submitForm,
-    validateForm: validateFormWithHighPriority,
-    validateField,
-    isValid,
-    dirty,
-    unregisterField,
-    registerField,
-    getFieldProps,
-    getFieldMeta,
-    getFieldHelpers,
-    validateOnBlur,
-    validateOnChange,
-    validateOnMount
-  });
-  return ctx;
-}
-function warnAboutMissingIdentifier(_ref4) {
-  var htmlContent = _ref4.htmlContent, documentationAnchorLink = _ref4.documentationAnchorLink, handlerName = _ref4.handlerName;
-  console.warn("Warning: Formik called `" + handlerName + "`, but you forgot to pass an `id` or `name` attribute to your input:\n    " + htmlContent + "\n    Formik cannot determine which value to update. For more info see https://formik.org/docs/api/formik#" + documentationAnchorLink + "\n  ");
-}
-function yupToFormErrors(yupError) {
-  var errors = {};
-  if (yupError.inner) {
-    if (yupError.inner.length === 0) {
-      return setIn(errors, yupError.path, yupError.message);
-    }
-    for (var _iterator = yupError.inner, _isArray = Array.isArray(_iterator), _i = 0, _iterator = _isArray ? _iterator : _iterator[Symbol.iterator](); ; ) {
-      var _ref5;
-      if (_isArray) {
-        if (_i >= _iterator.length) break;
-        _ref5 = _iterator[_i++];
-      } else {
-        _i = _iterator.next();
-        if (_i.done) break;
-        _ref5 = _i.value;
-      }
-      var err = _ref5;
-      if (!getIn(errors, err.path)) {
-        errors = setIn(errors, err.path, err.message);
-      }
-    }
-  }
-  return errors;
-}
-function validateYupSchema(values, schema, sync, context) {
-  if (sync === void 0) {
-    sync = false;
-  }
-  var normalizedValues = prepareDataForValidation(values);
-  return schema[sync ? "validateSync" : "validate"](normalizedValues, {
-    abortEarly: false,
-    context: context || normalizedValues
-  });
-}
-function prepareDataForValidation(values) {
-  var data = Array.isArray(values) ? [] : {};
-  for (var k in values) {
-    if (Object.prototype.hasOwnProperty.call(values, k)) {
-      var key = String(k);
-      if (Array.isArray(values[key]) === true) {
-        data[key] = values[key].map(function(value) {
-          if (Array.isArray(value) === true || isPlainObject_default(value)) {
-            return prepareDataForValidation(value);
-          } else {
-            return value !== "" ? value : void 0;
-          }
-        });
-      } else if (isPlainObject_default(values[key])) {
-        data[key] = prepareDataForValidation(values[key]);
-      } else {
-        data[key] = values[key] !== "" ? values[key] : void 0;
-      }
-    }
-  }
-  return data;
-}
-function arrayMerge(target, source, options) {
-  var destination = target.slice();
-  source.forEach(function merge(e, i) {
-    if (typeof destination[i] === "undefined") {
-      var cloneRequested = options.clone !== false;
-      var shouldClone = cloneRequested && options.isMergeableObject(e);
-      destination[i] = shouldClone ? es_default(Array.isArray(e) ? [] : {}, e, options) : e;
-    } else if (options.isMergeableObject(e)) {
-      destination[i] = es_default(target[i], e, options);
-    } else if (target.indexOf(e) === -1) {
-      destination.push(e);
-    }
-  });
-  return destination;
-}
-function getSelectedValues(options) {
-  return Array.from(options).filter(function(el) {
-    return el.selected;
-  }).map(function(el) {
-    return el.value;
-  });
-}
-function getValueForCheckbox(currentValue, checked, valueProp) {
-  if (typeof currentValue === "boolean") {
-    return Boolean(checked);
-  }
-  var currentArrayOfValues = [];
-  var isValueInArray = false;
-  var index = -1;
-  if (!Array.isArray(currentValue)) {
-    if (!valueProp || valueProp == "true" || valueProp == "false") {
-      return Boolean(checked);
-    }
-  } else {
-    currentArrayOfValues = currentValue;
-    index = currentValue.indexOf(valueProp);
-    isValueInArray = index >= 0;
-  }
-  if (checked && valueProp && !isValueInArray) {
-    return currentArrayOfValues.concat(valueProp);
-  }
-  if (!isValueInArray) {
-    return currentArrayOfValues;
-  }
-  return currentArrayOfValues.slice(0, index).concat(currentArrayOfValues.slice(index + 1));
-}
-var useIsomorphicLayoutEffect = typeof window !== "undefined" && typeof window.document !== "undefined" && typeof window.document.createElement !== "undefined" ? useLayoutEffect : useEffect;
-function useEventCallback(fn) {
-  var ref = useRef(fn);
-  useIsomorphicLayoutEffect(function() {
-    ref.current = fn;
-  });
-  return useCallback(function() {
-    for (var _len = arguments.length, args = new Array(_len), _key = 0; _key < _len; _key++) {
-      args[_key] = arguments[_key];
-    }
-    return ref.current.apply(void 0, args);
-  }, []);
-}
-var Form = /* @__PURE__ */ forwardRef(function(props, ref) {
-  var action = props.action, rest = _objectWithoutPropertiesLoose2(props, ["action"]);
-  var _action = action != null ? action : "#";
-  var _useFormikContext = useFormikContext(), handleReset = _useFormikContext.handleReset, handleSubmit = _useFormikContext.handleSubmit;
-  return createElement("form", _extends2({
-    onSubmit: handleSubmit,
-    ref,
-    onReset: handleReset,
-    action: _action
-  }, rest));
-});
-Form.displayName = "Form";
-var move = function move2(array, from, to) {
-  var copy = copyArrayLike(array);
-  var value = copy[from];
-  copy.splice(from, 1);
-  copy.splice(to, 0, value);
-  return copy;
-};
-var swap = function swap2(arrayLike, indexA, indexB) {
-  var copy = copyArrayLike(arrayLike);
-  var a = copy[indexA];
-  copy[indexA] = copy[indexB];
-  copy[indexB] = a;
-  return copy;
-};
-var insert = function insert2(arrayLike, index, value) {
-  var copy = copyArrayLike(arrayLike);
-  copy.splice(index, 0, value);
-  return copy;
-};
-var replace = function replace2(arrayLike, index, value) {
-  var copy = copyArrayLike(arrayLike);
-  copy[index] = value;
-  return copy;
-};
-var copyArrayLike = function copyArrayLike2(arrayLike) {
-  if (!arrayLike) {
-    return [];
-  } else if (Array.isArray(arrayLike)) {
-    return [].concat(arrayLike);
-  } else {
-    var maxIndex = Object.keys(arrayLike).map(function(key) {
-      return parseInt(key);
-    }).reduce(function(max, el) {
-      return el > max ? el : max;
-    }, 0);
-    return Array.from(_extends2({}, arrayLike, {
-      length: maxIndex + 1
-    }));
-  }
-};
-var createAlterationHandler = function createAlterationHandler2(alteration, defaultFunction) {
-  var fn = typeof alteration === "function" ? alteration : defaultFunction;
-  return function(data) {
-    if (Array.isArray(data) || isObject2(data)) {
-      var clone2 = copyArrayLike(data);
-      return fn(clone2);
-    }
-    return data;
-  };
-};
-var FieldArrayInner = /* @__PURE__ */ (function(_React$Component) {
-  _inheritsLoose(FieldArrayInner2, _React$Component);
-  function FieldArrayInner2(props) {
-    var _this;
-    _this = _React$Component.call(this, props) || this;
-    _this.updateArrayField = function(fn, alterTouched, alterErrors) {
-      var _this$props = _this.props, name = _this$props.name, setFormikState = _this$props.formik.setFormikState;
-      setFormikState(function(prevState) {
-        var updateErrors = createAlterationHandler(alterErrors, fn);
-        var updateTouched = createAlterationHandler(alterTouched, fn);
-        var values = setIn(prevState.values, name, fn(getIn(prevState.values, name)));
-        var fieldError = alterErrors ? updateErrors(getIn(prevState.errors, name)) : void 0;
-        var fieldTouched = alterTouched ? updateTouched(getIn(prevState.touched, name)) : void 0;
-        if (isEmptyArray(fieldError)) {
-          fieldError = void 0;
-        }
-        if (isEmptyArray(fieldTouched)) {
-          fieldTouched = void 0;
-        }
-        return _extends2({}, prevState, {
-          values,
-          errors: alterErrors ? setIn(prevState.errors, name, fieldError) : prevState.errors,
-          touched: alterTouched ? setIn(prevState.touched, name, fieldTouched) : prevState.touched
-        });
-      });
-    };
-    _this.push = function(value) {
-      return _this.updateArrayField(function(arrayLike) {
-        return [].concat(copyArrayLike(arrayLike), [cloneDeep_default(value)]);
-      }, false, false);
-    };
-    _this.handlePush = function(value) {
-      return function() {
-        return _this.push(value);
-      };
-    };
-    _this.swap = function(indexA, indexB) {
-      return _this.updateArrayField(function(array) {
-        return swap(array, indexA, indexB);
-      }, true, true);
-    };
-    _this.handleSwap = function(indexA, indexB) {
-      return function() {
-        return _this.swap(indexA, indexB);
-      };
-    };
-    _this.move = function(from, to) {
-      return _this.updateArrayField(function(array) {
-        return move(array, from, to);
-      }, true, true);
-    };
-    _this.handleMove = function(from, to) {
-      return function() {
-        return _this.move(from, to);
-      };
-    };
-    _this.insert = function(index, value) {
-      return _this.updateArrayField(function(array) {
-        return insert(array, index, value);
-      }, function(array) {
-        return insert(array, index, null);
-      }, function(array) {
-        return insert(array, index, null);
-      });
-    };
-    _this.handleInsert = function(index, value) {
-      return function() {
-        return _this.insert(index, value);
-      };
-    };
-    _this.replace = function(index, value) {
-      return _this.updateArrayField(function(array) {
-        return replace(array, index, value);
-      }, false, false);
-    };
-    _this.handleReplace = function(index, value) {
-      return function() {
-        return _this.replace(index, value);
-      };
-    };
-    _this.unshift = function(value) {
-      var length = -1;
-      _this.updateArrayField(function(array) {
-        var arr = array ? [value].concat(array) : [value];
-        length = arr.length;
-        return arr;
-      }, function(array) {
-        return array ? [null].concat(array) : [null];
-      }, function(array) {
-        return array ? [null].concat(array) : [null];
-      });
-      return length;
-    };
-    _this.handleUnshift = function(value) {
-      return function() {
-        return _this.unshift(value);
-      };
-    };
-    _this.handleRemove = function(index) {
-      return function() {
-        return _this.remove(index);
-      };
-    };
-    _this.handlePop = function() {
-      return function() {
-        return _this.pop();
-      };
-    };
-    _this.remove = _this.remove.bind(_assertThisInitialized(_this));
-    _this.pop = _this.pop.bind(_assertThisInitialized(_this));
-    return _this;
-  }
-  var _proto = FieldArrayInner2.prototype;
-  _proto.componentDidUpdate = function componentDidUpdate(prevProps) {
-    if (this.props.validateOnChange && this.props.formik.validateOnChange && !(0, import_react_fast_compare.default)(getIn(prevProps.formik.values, prevProps.name), getIn(this.props.formik.values, this.props.name))) {
-      this.props.formik.validateForm(this.props.formik.values);
-    }
-  };
-  _proto.remove = function remove(index) {
-    var result;
-    this.updateArrayField(
-      // so this gets call 3 times
-      function(array) {
-        var copy = array ? copyArrayLike(array) : [];
-        if (!result) {
-          result = copy[index];
-        }
-        if (isFunction2(copy.splice)) {
-          copy.splice(index, 1);
-        }
-        return isFunction2(copy.every) ? copy.every(function(v) {
-          return v === void 0;
-        }) ? [] : copy : copy;
-      },
-      true,
-      true
-    );
-    return result;
-  };
-  _proto.pop = function pop() {
-    var result;
-    this.updateArrayField(
-      // so this gets call 3 times
-      function(array) {
-        var tmp = array.slice();
-        if (!result) {
-          result = tmp && tmp.pop && tmp.pop();
-        }
-        return tmp;
-      },
-      true,
-      true
-    );
-    return result;
-  };
-  _proto.render = function render() {
-    var arrayHelpers = {
-      push: this.push,
-      pop: this.pop,
-      swap: this.swap,
-      move: this.move,
-      insert: this.insert,
-      replace: this.replace,
-      unshift: this.unshift,
-      remove: this.remove,
-      handlePush: this.handlePush,
-      handlePop: this.handlePop,
-      handleSwap: this.handleSwap,
-      handleMove: this.handleMove,
-      handleInsert: this.handleInsert,
-      handleReplace: this.handleReplace,
-      handleUnshift: this.handleUnshift,
-      handleRemove: this.handleRemove
-    };
-    var _this$props2 = this.props, component = _this$props2.component, render2 = _this$props2.render, children = _this$props2.children, name = _this$props2.name, _this$props2$formik = _this$props2.formik, restOfFormik = _objectWithoutPropertiesLoose2(_this$props2$formik, ["validate", "validationSchema"]);
-    var props = _extends2({}, arrayHelpers, {
-      form: restOfFormik,
-      name
-    });
-    return component ? createElement(component, props) : render2 ? render2(props) : children ? typeof children === "function" ? children(props) : !isEmptyChildren(children) ? Children.only(children) : null : null;
-  };
-  return FieldArrayInner2;
-})(Component);
-FieldArrayInner.defaultProps = {
-  validateOnChange: true
-};
-
-// src/nodes/dataQueryNode.jsx
-import { useCallback as useCallback2 } from "react";
-import { useMemo as useMemo2 } from "react";
-
-// ../../node_modules/react-icons/si/index.mjs
-function SiQuantconnect(props) {
-  return GenIcon({ "tag": "svg", "attr": { "role": "img", "viewBox": "0 0 24 24" }, "child": [{ "tag": "path", "attr": { "d": "M23.0673 16.6635a12.1084 12.1084 0 0 1-6.404 6.4046A12.0185 12.0185 0 0 1 12.0002 24v-2.7975a8.63 8.63 0 0 0 3.5454-.7466 9.4574 9.4574 0 0 0 2.9836-1.9273 11.3659 11.3659 0 0 0 1.9273-2.922 9.1472 9.1472 0 0 0 .7465-3.6064 8.6298 8.6298 0 0 0-.7465-3.5454 8.9285 8.9285 0 0 0-4.9109-4.9122 9.5282 9.5282 0 0 0-7.091 0 9.4798 9.4798 0 0 0-4.9108 4.9122A9.7584 9.7584 0 0 0 2.7977 12H.0003A12.0115 12.0115 0 0 1 .932 7.3375 12.093 12.093 0 0 1 7.336.9328a12.121 12.121 0 0 1 9.326 0 11.5066 11.5066 0 0 1 3.7923 2.609 11.4988 11.4988 0 0 1 2.613 3.7963 12.1232 12.1232 0 0 1 0 9.3254zM11.998 9.8868V7.0892a4.7884 4.7884 0 0 0-3.4826 1.4296 4.7089 4.7089 0 0 0-1.4911 3.482 4.609 4.609 0 0 0 1.4911 3.4779c1.8316 1.923 4.8752 1.9972 6.7983.1656a4.7631 4.7631 0 0 0 .1656-.1656 4.34 4.34 0 0 0 1.4296-3.4786h-2.7976a2.0583 2.0583 0 0 1-.6215 1.4918 2.0189 2.0189 0 0 1-1.4918.6221c-1.1653-.0051-2.1088-.9485-2.114-2.114a2.0199 2.0199 0 0 1 .6216-1.4917 2.0637 2.0637 0 0 1 1.4924-.6215zm5.972 8.0798a7.0439 7.0439 0 0 0 1.806-2.6759 7.4712 7.4712 0 0 0 .6838-3.2953 7.655 7.655 0 0 0-.6837-3.2953 8.453 8.453 0 0 0-4.4767-4.4767 7.4678 7.4678 0 0 0-3.2953-.6836v2.7976a5.3066 5.3066 0 0 1 3.979 1.6784 5.4031 5.4031 0 0 1 1.6784 3.979c-.0338 3.1246-2.5943 5.6303-5.719 5.5964-3.077-.0333-5.5632-2.5195-5.5965-5.5964H3.5484a8.4 8.4 0 0 0 .616 3.298 9.2912 9.2912 0 0 0 4.5397 4.5381 9.0414 9.0414 0 0 0 6.59 0 7.9963 7.9963 0 0 0 2.6758-1.8643z" }, "child": [] }] })(props);
+function TbRefresh(props) {
+  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 24 24", "fill": "none", "stroke": "currentColor", "strokeWidth": "2", "strokeLinecap": "round", "strokeLinejoin": "round" }, "child": [{ "tag": "path", "attr": { "d": "M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" }, "child": [] }, { "tag": "path", "attr": { "d": "M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" }, "child": [] }] })(props);
+}
+function TbRepeat(props) {
+  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 24 24", "fill": "none", "stroke": "currentColor", "strokeWidth": "2", "strokeLinecap": "round", "strokeLinejoin": "round" }, "child": [{ "tag": "path", "attr": { "d": "M4 12v-3a3 3 0 0 1 3 -3h13m-3 -3l3 3l-3 3" }, "child": [] }, { "tag": "path", "attr": { "d": "M20 12v3a3 3 0 0 1 -3 3h-13m3 3l-3 -3l3 -3" }, "child": [] }] })(props);
 }
 
 // ../../node_modules/react-icons/vsc/index.mjs
-function VscJson(props) {
-  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 16 16", "fill": "currentColor" }, "child": [{ "tag": "path", "attr": { "fillRule": "evenodd", "clipRule": "evenodd", "d": "M6 2.984V2h-.09c-.313 0-.616.062-.909.185a2.33 2.33 0 0 0-.775.53 2.23 2.23 0 0 0-.493.753v.001a3.542 3.542 0 0 0-.198.83v.002a6.08 6.08 0 0 0-.024.863c.012.29.018.58.018.869 0 .203-.04.393-.117.572v.001a1.504 1.504 0 0 1-.765.787 1.376 1.376 0 0 1-.558.115H2v.984h.09c.195 0 .38.04.556.121l.001.001c.178.078.329.184.455.318l.002.002c.13.13.233.285.307.465l.001.002c.078.18.117.368.117.566 0 .29-.006.58-.018.869-.012.296-.004.585.024.87v.001c.033.283.099.558.197.824v.001c.106.273.271.524.494.753.223.23.482.407.775.53.293.123.596.185.91.185H6v-.984h-.09c-.2 0-.387-.038-.563-.115a1.613 1.613 0 0 1-.457-.32 1.659 1.659 0 0 1-.309-.467c-.074-.18-.11-.37-.11-.573 0-.228.003-.453.011-.672.008-.228.008-.45 0-.665a4.639 4.639 0 0 0-.055-.64 2.682 2.682 0 0 0-.168-.609A2.284 2.284 0 0 0 3.522 8a2.284 2.284 0 0 0 .738-.955c.08-.192.135-.393.168-.602.033-.21.051-.423.055-.64.008-.22.008-.442 0-.666-.008-.224-.012-.45-.012-.678a1.47 1.47 0 0 1 .877-1.354 1.33 1.33 0 0 1 .563-.121H6zm4 10.032V14h.09c.313 0 .616-.062.909-.185.293-.123.552-.3.775-.53.223-.23.388-.48.493-.753v-.001c.1-.266.165-.543.198-.83v-.002c.028-.28.036-.567.024-.863-.012-.29-.018-.58-.018-.869 0-.203.04-.393.117-.572v-.001a1.502 1.502 0 0 1 .765-.787 1.38 1.38 0 0 1 .558-.115H14v-.984h-.09c-.196 0-.381-.04-.557-.121l-.001-.001a1.376 1.376 0 0 1-.455-.318l-.002-.002a1.415 1.415 0 0 1-.307-.465v-.002a1.405 1.405 0 0 1-.118-.566c0-.29.006-.58.018-.869a6.174 6.174 0 0 0-.024-.87v-.001a3.537 3.537 0 0 0-.197-.824v-.001a2.23 2.23 0 0 0-.494-.753 2.331 2.331 0 0 0-.775-.53 2.325 2.325 0 0 0-.91-.185H10v.984h.09c.2 0 .387.038.562.115.174.082.326.188.457.32.127.134.23.29.309.467.074.18.11.37.11.573 0 .228-.003.452-.011.672-.008.228-.008.45 0 .665.004.222.022.435.055.64.033.214.089.416.168.609a2.285 2.285 0 0 0 .738.955 2.285 2.285 0 0 0-.738.955 2.689 2.689 0 0 0-.168.602c-.033.21-.051.423-.055.64a9.15 9.15 0 0 0 0 .666c.008.224.012.45.012.678a1.471 1.471 0 0 1-.877 1.354 1.33 1.33 0 0 1-.563.121H10z" }, "child": [] }] })(props);
+function VscDebugDisconnect(props) {
+  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 16 16", "fill": "currentColor" }, "child": [{ "tag": "path", "attr": { "fillRule": "evenodd", "clipRule": "evenodd", "d": "M13.617 3.844a2.87 2.87 0 0 0-.451-.868l1.354-1.36L13.904 1l-1.36 1.354a2.877 2.877 0 0 0-.868-.452 3.073 3.073 0 0 0-2.14.075 3.03 3.03 0 0 0-.991.664L7 4.192l4.327 4.328 1.552-1.545c.287-.287.508-.618.663-.992a3.074 3.074 0 0 0 .075-2.14zm-.889 1.804a2.15 2.15 0 0 1-.471.705l-.93.93-3.09-3.09.93-.93a2.15 2.15 0 0 1 .704-.472 2.134 2.134 0 0 1 1.689.007c.264.114.494.271.69.472.2.195.358.426.472.69a2.134 2.134 0 0 1 .007 1.688zm-4.824 4.994l1.484-1.545-.616-.622-1.49 1.551-1.86-1.859 1.491-1.552L6.291 6 4.808 7.545l-.616-.615-1.551 1.545a3 3 0 0 0-.663.998 3.023 3.023 0 0 0-.233 1.169c0 .332.05.656.15.97.105.31.258.597.459.862L1 13.834l.615.615 1.36-1.353c.265.2.552.353.862.458.314.1.638.15.97.15.406 0 .796-.077 1.17-.232.378-.155.71-.376.998-.663l1.545-1.552-.616-.615zm-2.262 2.023a2.16 2.16 0 0 1-.834.164c-.301 0-.586-.057-.855-.17a2.278 2.278 0 0 1-.697-.466 2.28 2.28 0 0 1-.465-.697 2.167 2.167 0 0 1-.17-.854 2.16 2.16 0 0 1 .642-1.545l.93-.93 3.09 3.09-.93.93a2.22 2.22 0 0 1-.711.478z" }, "child": [] }] })(props);
+}
+function VscDebugStart(props) {
+  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 16 16", "fill": "currentColor" }, "child": [{ "tag": "path", "attr": { "fillRule": "evenodd", "clipRule": "evenodd", "d": "M4.25 3l1.166-.624 8 5.333v1.248l-8 5.334-1.166-.624V3zm1.5 1.401v7.864l5.898-3.932L5.75 4.401z" }, "child": [] }] })(props);
+}
+function VscDebugStop(props) {
+  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 16 16", "fill": "currentColor" }, "child": [{ "tag": "path", "attr": { "fillRule": "evenodd", "clipRule": "evenodd", "d": "M13 1.99976L14 2.99976V12.9998L13 13.9998H3L2 12.9998L2 2.99976L3 1.99976H13ZM12.7461 3.25057L3.25469 3.25057L3.25469 12.7504H12.7461V3.25057Z" }, "child": [] }] })(props);
 }
 
 // ../../node_modules/react-icons/fa/index.mjs
 function FaJs(props) {
   return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 448 512" }, "child": [{ "tag": "path", "attr": { "d": "M0 32v448h448V32H0zm243.8 349.4c0 43.6-25.6 63.5-62.9 63.5-33.7 0-53.2-17.4-63.2-38.5l34.3-20.7c6.6 11.7 12.6 21.6 27.1 21.6 13.8 0 22.6-5.4 22.6-26.5V237.7h42.1v143.7zm99.6 63.5c-39.1 0-64.4-18.6-76.7-43l34.3-19.8c9 14.7 20.8 25.6 41.5 25.6 17.4 0 28.6-8.7 28.6-20.8 0-14.4-11.4-19.5-30.7-28l-10.5-4.5c-30.4-12.9-50.5-29.2-50.5-63.5 0-31.6 24.1-55.6 61.6-55.6 26.8 0 46 9.3 59.8 33.7L368 290c-7.2-12.9-15-18-27.1-18-12.3 0-20.1 7.8-20.1 18 0 12.6 7.8 17.7 25.9 25.6l10.5 4.5c35.8 15.3 55.9 31 55.9 66.2 0 37.8-29.8 58.6-69.7 58.6z" }, "child": [] }] })(props);
 }
-
-// ../../node_modules/react-icons/md/index.mjs
-function MdOutlineDeleteOutline(props) {
-  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 24 24" }, "child": [{ "tag": "path", "attr": { "fill": "none", "d": "M0 0h24v24H0V0z" }, "child": [] }, { "tag": "path", "attr": { "d": "M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM8 9h8v10H8V9zm7.5-5-1-1h-5l-1 1H5v2h14V4h-3.5z" }, "child": [] }] })(props);
+function FaCheck(props) {
+  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 512 512" }, "child": [{ "tag": "path", "attr": { "d": "M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z" }, "child": [] }] })(props);
+}
+function FaExclamationTriangle(props) {
+  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 576 512" }, "child": [{ "tag": "path", "attr": { "d": "M569.517 440.013C587.975 472.007 564.806 512 527.94 512H48.054c-36.937 0-59.999-40.055-41.577-71.987L246.423 23.985c18.467-32.009 64.72-31.951 83.154 0l239.94 416.028zM288 354c-25.405 0-46 20.595-46 46s20.595 46 46 46 46-20.595 46-46-20.595-46-46-46zm-43.673-165.346l7.418 136c.347 6.364 5.609 11.346 11.982 11.346h48.546c6.373 0 11.635-4.982 11.982-11.346l7.418-136c.375-6.874-5.098-12.654-11.982-12.654h-63.383c-6.884 0-12.356 5.78-11.981 12.654z" }, "child": [] }] })(props);
+}
+function FaPlus(props) {
+  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 448 512" }, "child": [{ "tag": "path", "attr": { "d": "M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z" }, "child": [] }] })(props);
+}
+function FaTimes(props) {
+  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 352 512" }, "child": [{ "tag": "path", "attr": { "d": "M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z" }, "child": [] }] })(props);
+}
+function FaTrash(props) {
+  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 448 512" }, "child": [{ "tag": "path", "attr": { "d": "M432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16zM53.2 467a48 48 0 0 0 47.9 45h245.8a48 48 0 0 0 47.9-45L416 128H32z" }, "child": [] }] })(props);
 }
 
-// src/nodes/dataQueryNode.jsx
-var DataQueryNodeConfigurator = ({ data, onChange }) => {
-  console.log("data", data);
-  const { dataQueries, strings } = useWorkflowNodes();
-  const configurationForm = useFormik({
-    initialValues: {
-      dataQueryID: data.dataQueryID,
-      title: data.title,
-      args: data.args
-    },
-    onSubmit: (values) => {
-      onChange(values);
-    }
-  });
-  useEffect2(() => {
-    if (data) {
-      console.log("data", data.title);
-      configurationForm.setFieldValue("title", data.title ? data.title : "");
-      configurationForm.setFieldValue("dataQueryID", data.dataQueryID);
-      configurationForm.setFieldValue("args", data.args);
-    }
-  }, [data]);
-  const _handleUpdateDatasetQueryArgs = useCallback2((arg, value) => {
-    configurationForm.setFieldValue(`args.${arg}`, value);
-  }, [configurationForm]);
-  const selectedQuery = useMemo2(() => {
-    return dataQueries ? dataQueries.find(
-      (q) => q.dataQueryID == configurationForm.values.dataQueryID
-    ) : null;
-  }, [dataQueries, configurationForm.values.dataQueryID]);
-  return /* @__PURE__ */ React5.createElement("div", { className: "w-full h-full" }, /* @__PURE__ */ React5.createElement(
-    "form",
+// ../../node_modules/react-icons/io/index.mjs
+function IoMdArrowDropdown(props) {
+  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 512 512" }, "child": [{ "tag": "path", "attr": { "d": "M128 192l128 128 128-128z" }, "child": [] }] })(props);
+}
+function IoMdArrowDropleft(props) {
+  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 512 512" }, "child": [{ "tag": "path", "attr": { "d": "M320 128L192 256l128 128z" }, "child": [] }] })(props);
+}
+function IoMdArrowDropright(props) {
+  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 512 512" }, "child": [{ "tag": "path", "attr": { "d": "M192 128l128 128-128 128z" }, "child": [] }] })(props);
+}
+function IoMdArrowDropup(props) {
+  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 512 512" }, "child": [{ "tag": "path", "attr": { "d": "M128 320l128-128 128 128z" }, "child": [] }] })(props);
+}
+function IoMdTime(props) {
+  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 512 512" }, "child": [{ "tag": "g", "attr": { "fillOpacity": ".9" }, "child": [{ "tag": "path", "attr": { "d": "M255.8 48C141 48 48 141.2 48 256s93 208 207.8 208c115 0 208.2-93.2 208.2-208S370.8 48 255.8 48zm.2 374.4c-91.9 0-166.4-74.5-166.4-166.4S164.1 89.6 256 89.6 422.4 164.1 422.4 256 347.9 422.4 256 422.4z" }, "child": [] }, { "tag": "path", "attr": { "d": "M266.4 152h-31.2v124.8l109.2 65.5 15.6-25.6-93.6-55.5V152z" }, "child": [] }] }] })(props);
+}
+
+// src/nodes/conditionNode.jsx
+var ERROR_HANDLING_OPTIONS = {
+  FAIL_WORKFLOW: "fail_workflow",
+  CONTINUE_DEFAULT: "continue_default"
+};
+var CONDITION_TYPES = {
+  EXPRESSION: "expression",
+  EQUALS: "equals",
+  NOT_EQUALS: "not_equals",
+  CONTAINS: "contains",
+  GREATER_THAN: "greater_than",
+  LESS_THAN: "less_than",
+  IS_EMPTY: "is_empty",
+  IS_NOT_EMPTY: "is_not_empty",
+  REGEX: "regex"
+};
+var ConditionBranchEditor = ({ branches, onChange, workflowNodes, currentNodeId }) => {
+  const addBranch = () => {
+    const newBranch = {
+      id: `branch_${Date.now()}`,
+      name: `Branch ${branches.length + 1}`,
+      conditionType: CONDITION_TYPES.EXPRESSION,
+      expression: "true",
+      leftOperand: "",
+      rightOperand: ""
+    };
+    onChange([...branches, newBranch]);
+  };
+  const updateBranch = (index, field, value) => {
+    const updated = [...branches];
+    updated[index] = { ...updated[index], [field]: value };
+    onChange(updated);
+  };
+  const removeBranch = (index) => {
+    if (branches.length <= 1) return;
+    const updated = branches.filter((_, i) => i !== index);
+    onChange(updated);
+  };
+  const moveBranch = (index, direction) => {
+    if (direction === -1 && index === 0 || direction === 1 && index === branches.length - 1) return;
+    const updated = [...branches];
+    const temp = updated[index];
+    updated[index] = updated[index + direction];
+    updated[index + direction] = temp;
+    onChange(updated);
+  };
+  const availableVariables = useMemo(() => {
+    if (!workflowNodes) return [];
+    return workflowNodes.filter((n) => n.id !== currentNodeId && n.data?.outputVariable).map((n) => ({
+      nodeId: n.id,
+      nodeTitle: n.data?.title || n.type,
+      variable: n.data.outputVariable
+    }));
+  }, [workflowNodes, currentNodeId]);
+  return /* @__PURE__ */ React4.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React4.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React4.createElement("label", { className: "text-xs font-medium text-slate-500" }, "Condition Branches"), /* @__PURE__ */ React4.createElement(
+    "button",
     {
-      onSubmit: configurationForm.handleSubmit,
-      className: "space-y-3"
+      type: "button",
+      onClick: addBranch,
+      className: "flex items-center gap-1 px-2 py-1 text-xs bg-white text-[#646cff] hover:bg-[#646cff]/10 rounded transition-colors border border-slate-200"
     },
-    /* @__PURE__ */ React5.createElement("div", { className: "flex flex-col justify-start items-stretch h-full" }, /* @__PURE__ */ React5.createElement("label", { className: "block mb-1 text-xs font-medium text-slate-500" }, strings.WORKFLOW_EDITOR_DATA_QUERY_TITLE_LABEL), /* @__PURE__ */ React5.createElement(
+    /* @__PURE__ */ React4.createElement(FaPlus, { className: "w-2.5 h-2.5" }),
+    "Add Branch"
+  )), availableVariables.length > 0 && /* @__PURE__ */ React4.createElement("p", { className: "text-[10px] text-slate-400" }, "Available: ", availableVariables.map((v) => `ctx.${v.variable}`).join(", ")), /* @__PURE__ */ React4.createElement("div", { className: "space-y-2" }, branches.map((branch, index) => /* @__PURE__ */ React4.createElement(
+    "div",
+    {
+      key: branch.id,
+      className: "border border-slate-200 rounded p-2 bg-slate-50"
+    },
+    /* @__PURE__ */ React4.createElement("div", { className: "flex items-center justify-between mb-2" }, /* @__PURE__ */ React4.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React4.createElement("span", { className: "w-5 h-5 flex items-center justify-center bg-purple-100 text-purple-600 text-[10px] font-bold rounded" }, index + 1), /* @__PURE__ */ React4.createElement(
       "input",
       {
         type: "text",
-        name: "title",
-        id: "title",
-        placeholder: strings.WORKFLOW_EDITOR_DATA_QUERY_TITLE_PLACEHOLDER,
-        className: "placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded focus:outline-none focus:border-slate-400 block w-full px-2.5 py-1.5",
-        value: configurationForm.values.title,
-        onChange: configurationForm.handleChange
+        value: branch.name,
+        onChange: (e) => updateBranch(index, "name", e.target.value),
+        className: "text-xs font-medium text-slate-700 bg-transparent border-none outline-none w-24",
+        placeholder: "Branch name"
       }
-    )),
-    /* @__PURE__ */ React5.createElement("div", { className: "flex flex-col justify-start items-stretch h-full" }, /* @__PURE__ */ React5.createElement("label", { className: "block mb-1 text-xs font-medium text-slate-500" }, strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_LABEL), /* @__PURE__ */ React5.createElement(
-      "select",
-      {
-        name: "dataQueryID",
-        id: "dataQueryID",
-        value: configurationForm.values.dataQueryID,
-        onChange: configurationForm.handleChange,
-        onBlur: configurationForm.handleBlur,
-        className: "placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded focus:outline-none focus:border-slate-400 block w-full px-2.5 py-1.5"
-      },
-      /* @__PURE__ */ React5.createElement("option", { value: "", disabled: true, selected: true }, strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_SELECT_LABEL),
-      dataQueries?.map((query) => /* @__PURE__ */ React5.createElement("option", { key: query.dataQueryID, value: query.dataQueryID }, query.dataQueryTitle))
-    )),
-    selectedQuery?.dataQueryOptions?.args?.length > 0 && /* @__PURE__ */ React5.createElement("div", null, /* @__PURE__ */ React5.createElement("label", { className: "block mb-2 text-xs font-normal text-slate-500" }, strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_ARGUMENTS_LABEL), /* @__PURE__ */ React5.createElement("div", { className: "space-y-2" }, selectedQuery.dataQueryOptions.args.map((arg, argIndex) => {
-      const argName = arg.key;
-      return /* @__PURE__ */ React5.createElement("div", { key: `arg-${argIndex}`, className: "flex flex-row justify-between items-center" }, /* @__PURE__ */ React5.createElement(
-        "input",
-        {
-          type: "text",
-          id: `arg-${argName}`,
-          className: "placeholder:text-slate-400 text-xs w-full bg-slate-50 border border-slate-300 text-slate-700 rounded focus:outline-none focus:border-slate-400 block px-2.5 py-1.5",
-          placeholder: `Value for ${argName}`,
-          value: configurationForm.values.args?.[argName] || "",
-          onChange: (e) => _handleUpdateDatasetQueryArgs(argName, e.target.value),
-          onBlur: configurationForm.handleBlur
-        }
-      ), /* @__PURE__ */ React5.createElement(
-        "button",
-        {
-          type: "button",
-          className: "ml-2  bg-white p-1.5 text-slate-700 border border-slate-200 rounded"
-        },
-        /* @__PURE__ */ React5.createElement(VscJson, { className: "w-4 h-4 " })
-      ));
-    }))),
-    /* @__PURE__ */ React5.createElement(
+    )), /* @__PURE__ */ React4.createElement("div", { className: "flex items-center gap-1" }, /* @__PURE__ */ React4.createElement(
       "button",
       {
         type: "button",
-        onClick: configurationForm.handleSubmit,
-        className: "px-3 py-1.5 text-sm text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none"
+        onClick: () => moveBranch(index, -1),
+        disabled: index === 0,
+        className: "p-1 bg-white text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded disabled:opacity-30 transition-colors",
+        title: "Move up"
       },
-      strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_SAVE_BUTTON
-    )
-  ));
+      /* @__PURE__ */ React4.createElement(IoMdArrowDropup, { className: "w-3 h-3" })
+    ), /* @__PURE__ */ React4.createElement(
+      "button",
+      {
+        type: "button",
+        onClick: () => moveBranch(index, 1),
+        disabled: index === branches.length - 1,
+        className: "p-1 bg-white text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded disabled:opacity-30 transition-colors",
+        title: "Move down"
+      },
+      /* @__PURE__ */ React4.createElement(IoMdArrowDropdown, { className: "w-3 h-3" })
+    ), /* @__PURE__ */ React4.createElement(
+      "button",
+      {
+        type: "button",
+        onClick: () => removeBranch(index),
+        disabled: branches.length <= 1,
+        className: "p-1 bg-white text-slate-400 hover:text-red-500 hover:bg-red-50 rounded disabled:opacity-30 transition-colors",
+        title: "Remove branch"
+      },
+      /* @__PURE__ */ React4.createElement(FaTrash, { className: "w-3 h-3" })
+    ))),
+    /* @__PURE__ */ React4.createElement("div", { className: "mb-2" }, /* @__PURE__ */ React4.createElement(
+      "select",
+      {
+        value: branch.conditionType,
+        onChange: (e) => updateBranch(index, "conditionType", e.target.value),
+        className: "w-full text-xs p-1.5 border border-slate-200 rounded bg-white focus:outline-none focus:border-[#646cff]"
+      },
+      /* @__PURE__ */ React4.createElement("option", { value: CONDITION_TYPES.EXPRESSION }, "JavaScript Expression"),
+      /* @__PURE__ */ React4.createElement("option", { value: CONDITION_TYPES.EQUALS }, "Equals (==)"),
+      /* @__PURE__ */ React4.createElement("option", { value: CONDITION_TYPES.NOT_EQUALS }, "Not Equals (!=)"),
+      /* @__PURE__ */ React4.createElement("option", { value: CONDITION_TYPES.CONTAINS }, "Contains"),
+      /* @__PURE__ */ React4.createElement("option", { value: CONDITION_TYPES.GREATER_THAN }, "Greater Than (>)"),
+      /* @__PURE__ */ React4.createElement("option", { value: CONDITION_TYPES.LESS_THAN }, "Less Than (<)"),
+      /* @__PURE__ */ React4.createElement("option", { value: CONDITION_TYPES.IS_EMPTY }, "Is Empty"),
+      /* @__PURE__ */ React4.createElement("option", { value: CONDITION_TYPES.IS_NOT_EMPTY }, "Is Not Empty"),
+      /* @__PURE__ */ React4.createElement("option", { value: CONDITION_TYPES.REGEX }, "Regex Match")
+    )),
+    branch.conditionType === CONDITION_TYPES.EXPRESSION ? /* @__PURE__ */ React4.createElement(
+      "textarea",
+      {
+        value: branch.expression || "",
+        onChange: (e) => updateBranch(index, "expression", e.target.value),
+        placeholder: "ctx.value === true",
+        className: "w-full text-xs p-2 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff] resize-none",
+        rows: 2
+      }
+    ) : branch.conditionType === CONDITION_TYPES.IS_EMPTY || branch.conditionType === CONDITION_TYPES.IS_NOT_EMPTY ? /* @__PURE__ */ React4.createElement(
+      "input",
+      {
+        type: "text",
+        value: branch.leftOperand || "",
+        onChange: (e) => updateBranch(index, "leftOperand", e.target.value),
+        placeholder: "ctx.variableName",
+        className: "w-full text-xs p-2 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff]"
+      }
+    ) : /* @__PURE__ */ React4.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React4.createElement(
+      "input",
+      {
+        type: "text",
+        value: branch.leftOperand || "",
+        onChange: (e) => updateBranch(index, "leftOperand", e.target.value),
+        placeholder: "ctx.variableName",
+        className: "flex-1 text-xs p-2 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff]"
+      }
+    ), /* @__PURE__ */ React4.createElement(
+      "input",
+      {
+        type: "text",
+        value: branch.rightOperand || "",
+        onChange: (e) => updateBranch(index, "rightOperand", e.target.value),
+        placeholder: "value",
+        className: "flex-1 text-xs p-2 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff]"
+      }
+    ))
+  ))), /* @__PURE__ */ React4.createElement("div", { className: "border border-dashed border-slate-300 rounded p-2 bg-slate-50/50" }, /* @__PURE__ */ React4.createElement("div", { className: "flex items-center gap-2 text-xs text-slate-500" }, /* @__PURE__ */ React4.createElement("span", { className: "w-5 h-5 flex items-center justify-center bg-slate-200 text-slate-600 text-[10px] font-bold rounded" }, "\u2205"), /* @__PURE__ */ React4.createElement("span", { className: "font-medium" }, "Default (else)"), /* @__PURE__ */ React4.createElement("span", { className: "text-slate-400" }, "- Used when no conditions match"))));
 };
-var DataQueryNode = memo2(({ data, isConnectable }) => {
-  const { dataQueries, strings } = useWorkflowNodes();
-  const [selectedQueryTitle, setSelectedQueryTitle] = useState2("Select a Query");
+var ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
+  const { strings, workflowNodes } = useWorkflowNodes();
+  const [formData, setFormData] = useState({
+    title: data?.title || "Condition",
+    description: data?.description || "",
+    branches: data?.branches || [
+      {
+        id: "branch_default",
+        name: "Branch 1",
+        conditionType: CONDITION_TYPES.EXPRESSION,
+        expression: "true",
+        leftOperand: "",
+        rightOperand: ""
+      }
+    ],
+    evaluationMode: data?.evaluationMode || "first_match",
+    errorHandling: data?.errorHandling || ERROR_HANDLING_OPTIONS.FAIL_WORKFLOW,
+    isDisabled: data?.isDisabled ?? false
+  });
+  useEffect(() => {
+    if (data) {
+      setFormData({
+        title: data.title || "Condition",
+        description: data.description || "",
+        branches: data.branches || [
+          {
+            id: "branch_default",
+            name: "Branch 1",
+            conditionType: CONDITION_TYPES.EXPRESSION,
+            expression: "true",
+            leftOperand: "",
+            rightOperand: ""
+          }
+        ],
+        evaluationMode: data.evaluationMode || "first_match",
+        errorHandling: data.errorHandling || ERROR_HANDLING_OPTIONS.FAIL_WORKFLOW,
+        isDisabled: data.isDisabled ?? false
+      });
+    }
+  }, [data]);
+  const schema = useMemo(() => {
+    return {
+      type: "object",
+      properties: {
+        title: {
+          type: "string",
+          title: strings?.WORKFLOW_EDITOR_CONDITION_TITLE_LABEL || "Node Title"
+        },
+        description: {
+          type: "string",
+          title: strings?.WORKFLOW_EDITOR_NODE_DESCRIPTION_LABEL || "Description"
+        },
+        evaluationMode: {
+          type: "string",
+          title: "Evaluation Mode",
+          enum: ["first_match", "all_matches"]
+        },
+        errorHandling: {
+          type: "string",
+          title: strings?.WORKFLOW_EDITOR_ERROR_HANDLING_LABEL || "Error Behavior",
+          enum: Object.values(ERROR_HANDLING_OPTIONS)
+        },
+        isDisabled: {
+          type: "boolean",
+          title: strings?.WORKFLOW_EDITOR_IS_DISABLED_LABEL || "Skip this node",
+          default: false
+        }
+      }
+    };
+  }, [strings]);
+  const uischema = useMemo(() => {
+    return {
+      type: "Categorization",
+      elements: [
+        {
+          type: "Category",
+          label: strings?.WORKFLOW_EDITOR_TAB_GENERAL || "General",
+          elements: [
+            {
+              type: "Control",
+              scope: "#/properties/title",
+              options: {
+                placeholder: strings?.WORKFLOW_EDITOR_CONDITION_TITLE_PLACEHOLDER || "Enter node title"
+              }
+            },
+            {
+              type: "Control",
+              scope: "#/properties/description",
+              options: {
+                placeholder: strings?.WORKFLOW_EDITOR_NODE_DESCRIPTION_PLACEHOLDER || "Describe this condition...",
+                multi: true,
+                rows: 2
+              }
+            }
+          ]
+        },
+        {
+          type: "Category",
+          label: strings?.WORKFLOW_EDITOR_TAB_ADVANCED || "Advanced",
+          elements: [
+            {
+              type: "Control",
+              scope: "#/properties/evaluationMode",
+              options: {
+                enumLabels: {
+                  "first_match": "First Match (stop at first true)",
+                  "all_matches": "All Matches (execute all true branches)"
+                }
+              }
+            },
+            {
+              type: "Control",
+              scope: "#/properties/errorHandling",
+              options: {
+                enumLabels: {
+                  [ERROR_HANDLING_OPTIONS.FAIL_WORKFLOW]: "Fail Workflow on Error",
+                  [ERROR_HANDLING_OPTIONS.CONTINUE_DEFAULT]: "Continue to Default Branch on Error"
+                }
+              }
+            },
+            {
+              type: "Control",
+              scope: "#/properties/isDisabled"
+            }
+          ]
+        }
+      ]
+    };
+  }, [strings]);
+  const handleFormChange = useCallback(({ data: newData }) => {
+    setFormData((prev) => ({ ...prev, ...newData }));
+  }, []);
+  const handleBranchesChange = useCallback((newBranches) => {
+    setFormData((prev) => ({ ...prev, branches: newBranches }));
+  }, []);
+  const handleSave = useCallback(() => {
+    onChange(formData);
+  }, [onChange, formData]);
+  return /* @__PURE__ */ React4.createElement("div", { className: "w-full h-full" }, /* @__PURE__ */ React4.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React4.createElement(
+    JsonForms,
+    {
+      schema,
+      uischema,
+      data: formData,
+      renderers: jetFormsRenderers,
+      onChange: handleFormChange
+    }
+  ), /* @__PURE__ */ React4.createElement("div", { className: "border-t border-slate-100 pt-4" }, /* @__PURE__ */ React4.createElement(
+    ConditionBranchEditor,
+    {
+      branches: formData.branches,
+      onChange: handleBranchesChange,
+      workflowNodes,
+      currentNodeId: nodeId
+    }
+  )), /* @__PURE__ */ React4.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: handleSave,
+      className: "px-3 py-1.5 text-sm text-white bg-[#646cff] rounded hover:bg-[#5558dd] focus:ring-4 focus:outline-none focus:ring-[#646cff]/30"
+    },
+    strings?.WORKFLOW_EDITOR_CONDITION_NODE_SAVE_BUTTON || "Save"
+  )));
+};
+var ConditionNode = memo(({ data, isConnectable }) => {
+  const { strings } = useWorkflowNodes();
+  const isDisabled = data?.isDisabled ?? false;
+  const branches = data?.branches || [];
+  const branchCount = branches.length;
+  const getHandlePosition = (index, total) => {
+    const totalHandles = total + 1;
+    const spacing = 100 / (totalHandles + 1);
+    return spacing * (index + 1);
+  };
+  const getConditionPreview = (branch) => {
+    if (branch.conditionType === CONDITION_TYPES.EXPRESSION) {
+      const expr = branch.expression || "true";
+      return expr.length > 20 ? expr.substring(0, 20) + "..." : expr;
+    }
+    const left = branch.leftOperand || "?";
+    const right = branch.rightOperand || "?";
+    switch (branch.conditionType) {
+      case CONDITION_TYPES.EQUALS:
+        return `${left} == ${right}`;
+      case CONDITION_TYPES.NOT_EQUALS:
+        return `${left} != ${right}`;
+      case CONDITION_TYPES.CONTAINS:
+        return `${left} contains ${right}`;
+      case CONDITION_TYPES.GREATER_THAN:
+        return `${left} > ${right}`;
+      case CONDITION_TYPES.LESS_THAN:
+        return `${left} < ${right}`;
+      case CONDITION_TYPES.IS_EMPTY:
+        return `${left} is empty`;
+      case CONDITION_TYPES.IS_NOT_EMPTY:
+        return `${left} is not empty`;
+      case CONDITION_TYPES.REGEX:
+        return `${left} matches ${right}`;
+      default:
+        return "condition";
+    }
+  };
+  return /* @__PURE__ */ React4.createElement("div", { className: `
+      bg-white border rounded
+      min-w-[280px] max-w-[350px]
+      transition-all duration-150
+      ${isDisabled ? "border-slate-200 opacity-50" : "border-slate-200 hover:border-purple-400 hover:shadow-md"}
+    ` }, /* @__PURE__ */ React4.createElement("div", { className: "flex items-stretch" }, /* @__PURE__ */ React4.createElement(
+    "div",
+    {
+      style: {
+        borderTopLeftRadius: "0.25rem",
+        borderBottomLeftRadius: "0.25rem"
+      },
+      className: `
+          flex flex-col items-center justify-center px-3 py-3 border-r
+          ${isDisabled ? "bg-slate-50 border-slate-100" : "bg-purple-50 border-purple-100"}
+        `
+    },
+    /* @__PURE__ */ React4.createElement(TbLogicAnd, { className: `w-5 h-5 ${isDisabled ? "text-slate-400" : "text-purple-500"}` })
+  ), /* @__PURE__ */ React4.createElement("div", { className: "flex-1 px-3 py-2 min-w-0" }, /* @__PURE__ */ React4.createElement("div", { className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ React4.createElement("span", { className: `text-xs font-semibold truncate ${isDisabled ? "text-slate-400 line-through" : "text-slate-700"}` }, data?.title || "Condition"), isDisabled && /* @__PURE__ */ React4.createElement("span", { className: "inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded border border-orange-200" }, /* @__PURE__ */ React4.createElement(VscDebugDisconnect, { className: "w-2.5 h-2.5" }), "Skip")), /* @__PURE__ */ React4.createElement("div", { className: `text-[10px] mt-0.5 ${isDisabled ? "text-slate-300" : "text-slate-400"}` }, branchCount, " branch", branchCount !== 1 ? "es" : "", " + default"), /* @__PURE__ */ React4.createElement("div", { className: "mt-1 space-y-0.5" }, branches.slice(0, 3).map((branch, index) => /* @__PURE__ */ React4.createElement(
+    "div",
+    {
+      key: branch.id,
+      className: `flex items-center gap-1 text-[9px] ${isDisabled ? "text-slate-300" : "text-slate-500"}`
+    },
+    /* @__PURE__ */ React4.createElement(IoMdArrowDropright, { className: "w-3 h-3 text-purple-400 flex-shrink-0" }),
+    /* @__PURE__ */ React4.createElement("span", { className: "truncate font-medium" }, branch.name, ":"),
+    /* @__PURE__ */ React4.createElement("span", { className: "truncate font-mono opacity-75" }, getConditionPreview(branch))
+  )), branches.length > 3 && /* @__PURE__ */ React4.createElement("div", { className: `text-[9px] ${isDisabled ? "text-slate-300" : "text-slate-400"}` }, "+", branches.length - 3, " more..."))), /* @__PURE__ */ React4.createElement("div", { className: "flex flex-col items-center justify-center px-2 border-l border-slate-100 min-w-[50px]" }, branches.slice(0, 4).map((branch, index) => /* @__PURE__ */ React4.createElement(
+    "div",
+    {
+      key: branch.id,
+      className: `w-2 h-2 rounded-full mb-0.5 ${isDisabled ? "bg-slate-300" : "bg-purple-400"}`,
+      title: branch.name
+    }
+  )), branches.length > 4 && /* @__PURE__ */ React4.createElement("span", { className: "text-[8px] text-slate-400" }, "+", branches.length - 4), /* @__PURE__ */ React4.createElement("div", { className: `w-2 h-2 rounded-full mt-1 ${isDisabled ? "bg-slate-300" : "bg-slate-400"}`, title: "Default" }))), /* @__PURE__ */ React4.createElement(
+    Handle,
+    {
+      type: "target",
+      position: Position.Top,
+      isConnectable,
+      style: {
+        width: "10px",
+        height: "10px",
+        backgroundColor: isDisabled ? "#cbd5e1" : "#a855f7",
+        border: "none",
+        top: "-5px"
+      }
+    }
+  ), branches.map((branch, index) => /* @__PURE__ */ React4.createElement(
+    Handle,
+    {
+      key: branch.id,
+      type: "source",
+      position: Position.Bottom,
+      id: branch.id,
+      isConnectable,
+      style: {
+        left: `${getHandlePosition(index, branchCount)}%`,
+        width: "10px",
+        height: "10px",
+        backgroundColor: isDisabled ? "#cbd5e1" : "#a855f7",
+        border: "none",
+        bottom: "-5px"
+      }
+    }
+  )), /* @__PURE__ */ React4.createElement(
+    Handle,
+    {
+      type: "source",
+      position: Position.Bottom,
+      id: "default",
+      isConnectable,
+      style: {
+        left: `${getHandlePosition(branchCount, branchCount)}%`,
+        width: "10px",
+        height: "10px",
+        backgroundColor: isDisabled ? "#cbd5e1" : "#94a3b8",
+        border: "none",
+        bottom: "-5px"
+      }
+    }
+  ), /* @__PURE__ */ React4.createElement(
+    Handle,
+    {
+      type: "source",
+      position: Position.Bottom,
+      id: "error",
+      isConnectable,
+      style: {
+        right: "10px",
+        left: "auto",
+        width: "10px",
+        height: "10px",
+        backgroundColor: isDisabled ? "#cbd5e1" : "#ef4444",
+        border: "none",
+        bottom: "-5px"
+      }
+    }
+  ));
+});
+
+// src/nodes/dataQueryNode.jsx
+import React5, { memo as memo2, useState as useState2, useEffect as useEffect2, useMemo as useMemo2, useCallback as useCallback2 } from "react";
+import { Handle as Handle2, Position as Position2 } from "reactflow";
+import { JsonForms as JsonForms2 } from "@jsonforms/react";
+
+// ../../node_modules/react-icons/si/index.mjs
+function SiQuantconnect(props) {
+  return GenIcon({ "tag": "svg", "attr": { "role": "img", "viewBox": "0 0 24 24" }, "child": [{ "tag": "path", "attr": { "d": "M23.0673 16.6635a12.1084 12.1084 0 0 1-6.404 6.4046A12.0185 12.0185 0 0 1 12.0002 24v-2.7975a8.63 8.63 0 0 0 3.5454-.7466 9.4574 9.4574 0 0 0 2.9836-1.9273 11.3659 11.3659 0 0 0 1.9273-2.922 9.1472 9.1472 0 0 0 .7465-3.6064 8.6298 8.6298 0 0 0-.7465-3.5454 8.9285 8.9285 0 0 0-4.9109-4.9122 9.5282 9.5282 0 0 0-7.091 0 9.4798 9.4798 0 0 0-4.9108 4.9122A9.7584 9.7584 0 0 0 2.7977 12H.0003A12.0115 12.0115 0 0 1 .932 7.3375 12.093 12.093 0 0 1 7.336.9328a12.121 12.121 0 0 1 9.326 0 11.5066 11.5066 0 0 1 3.7923 2.609 11.4988 11.4988 0 0 1 2.613 3.7963 12.1232 12.1232 0 0 1 0 9.3254zM11.998 9.8868V7.0892a4.7884 4.7884 0 0 0-3.4826 1.4296 4.7089 4.7089 0 0 0-1.4911 3.482 4.609 4.609 0 0 0 1.4911 3.4779c1.8316 1.923 4.8752 1.9972 6.7983.1656a4.7631 4.7631 0 0 0 .1656-.1656 4.34 4.34 0 0 0 1.4296-3.4786h-2.7976a2.0583 2.0583 0 0 1-.6215 1.4918 2.0189 2.0189 0 0 1-1.4918.6221c-1.1653-.0051-2.1088-.9485-2.114-2.114a2.0199 2.0199 0 0 1 .6216-1.4917 2.0637 2.0637 0 0 1 1.4924-.6215zm5.972 8.0798a7.0439 7.0439 0 0 0 1.806-2.6759 7.4712 7.4712 0 0 0 .6838-3.2953 7.655 7.655 0 0 0-.6837-3.2953 8.453 8.453 0 0 0-4.4767-4.4767 7.4678 7.4678 0 0 0-3.2953-.6836v2.7976a5.3066 5.3066 0 0 1 3.979 1.6784 5.4031 5.4031 0 0 1 1.6784 3.979c-.0338 3.1246-2.5943 5.6303-5.719 5.5964-3.077-.0333-5.5632-2.5195-5.5965-5.5964H3.5484a8.4 8.4 0 0 0 .616 3.298 9.2912 9.2912 0 0 0 4.5397 4.5381 9.0414 9.0414 0 0 0 6.59 0 7.9963 7.9963 0 0 0 2.6758-1.8643z" }, "child": [] }] })(props);
+}
+
+// src/nodes/dataQueryNode.jsx
+var ERROR_HANDLING_OPTIONS2 = {
+  FAIL_WORKFLOW: "fail_workflow",
+  CONTINUE: "continue",
+  RETRY_THEN_CONTINUE: "retry_then_continue",
+  RETRY_THEN_FAIL: "retry_then_fail"
+};
+var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
+  const { dataQueries, strings, onRefreshDataQueries, workflowNodes } = useWorkflowNodes();
+  const [formData, setFormData] = useState2({
+    title: data?.title || "",
+    description: data?.description || "",
+    dataQueryID: data?.dataQueryID || "",
+    args: data?.args || {},
+    outputVariable: data?.outputVariable || "queryResult",
+    timeoutSeconds: data?.timeoutSeconds ?? 300,
+    retryLimit: data?.retryLimit ?? 0,
+    retryDelaySeconds: data?.retryDelaySeconds ?? 5,
+    errorHandling: data?.errorHandling || ERROR_HANDLING_OPTIONS2.FAIL_WORKFLOW,
+    isDisabled: data?.isDisabled ?? false
+  });
+  useEffect2(() => {
+    if (data) {
+      setFormData({
+        title: data.title || "",
+        description: data.description || "",
+        dataQueryID: data.dataQueryID || "",
+        args: data.args || {},
+        outputVariable: data.outputVariable || "queryResult",
+        timeoutSeconds: data.timeoutSeconds ?? 300,
+        retryLimit: data.retryLimit ?? 0,
+        retryDelaySeconds: data.retryDelaySeconds ?? 5,
+        errorHandling: data.errorHandling || ERROR_HANDLING_OPTIONS2.FAIL_WORKFLOW,
+        isDisabled: data.isDisabled ?? false
+      });
+    }
+  }, [data]);
+  const selectedQuery = useMemo2(() => {
+    return dataQueries?.find((q) => q.dataQueryID == formData.dataQueryID) || null;
+  }, [dataQueries, formData.dataQueryID]);
+  const schema = useMemo2(() => {
+    const queryEnums = dataQueries?.map((q) => String(q.dataQueryID)) || [""];
+    return {
+      type: "object",
+      properties: {
+        // General Tab
+        title: {
+          type: "string",
+          title: strings.WORKFLOW_EDITOR_DATA_QUERY_TITLE_LABEL || "Node Title"
+        },
+        description: {
+          type: "string",
+          title: strings.WORKFLOW_EDITOR_NODE_DESCRIPTION_LABEL || "Description"
+        },
+        dataQueryID: {
+          type: "string",
+          title: strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_LABEL || "Data Query",
+          enum: queryEnums.length > 0 ? queryEnums : [""]
+        },
+        args: {
+          type: "object",
+          title: strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_ARGUMENTS_LABEL || "Arguments"
+        },
+        // Output Tab
+        outputVariable: {
+          type: "string",
+          title: strings.WORKFLOW_EDITOR_OUTPUT_VARIABLE_LABEL || "Output Variable Name",
+          description: "Variable name to store result (accessible as ctx.{name})",
+          pattern: "^[a-zA-Z_][a-zA-Z0-9_]*$"
+        },
+        // Execution Settings Tab
+        timeoutSeconds: {
+          type: "integer",
+          title: strings.WORKFLOW_EDITOR_TIMEOUT_LABEL || "Timeout (seconds)",
+          minimum: 1,
+          maximum: 3600,
+          default: 300
+        },
+        retryLimit: {
+          type: "integer",
+          title: strings.WORKFLOW_EDITOR_RETRY_LIMIT_LABEL || "Retry Attempts",
+          minimum: 0,
+          maximum: 10,
+          default: 0
+        },
+        retryDelaySeconds: {
+          type: "integer",
+          title: strings.WORKFLOW_EDITOR_RETRY_DELAY_LABEL || "Retry Delay (seconds)",
+          minimum: 1,
+          maximum: 300,
+          default: 5
+        },
+        errorHandling: {
+          type: "string",
+          title: strings.WORKFLOW_EDITOR_ERROR_HANDLING_LABEL || "Error Behavior",
+          enum: Object.values(ERROR_HANDLING_OPTIONS2)
+        },
+        isDisabled: {
+          type: "boolean",
+          title: strings.WORKFLOW_EDITOR_IS_DISABLED_LABEL || "Skip this node",
+          default: false
+        }
+      },
+      required: ["dataQueryID"]
+    };
+  }, [dataQueries, strings]);
+  const uischema = useMemo2(() => {
+    const generalElements = [
+      {
+        type: "Control",
+        scope: "#/properties/title",
+        options: {
+          placeholder: strings.WORKFLOW_EDITOR_DATA_QUERY_TITLE_PLACEHOLDER || "Enter node title"
+        }
+      },
+      {
+        type: "Control",
+        scope: "#/properties/description",
+        options: {
+          placeholder: strings.WORKFLOW_EDITOR_NODE_DESCRIPTION_PLACEHOLDER || "Describe what this node does...",
+          multi: true,
+          rows: 2
+        }
+      },
+      {
+        type: "Control",
+        scope: "#/properties/dataQueryID",
+        options: {
+          placeholder: strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_SELECT_LABEL || "Select a query",
+          enumLabels: dataQueries?.reduce((acc, q) => {
+            acc[String(q.dataQueryID)] = q.dataQueryTitle;
+            return acc;
+          }, {}) || {},
+          showRefreshButton: !!onRefreshDataQueries,
+          onRefresh: onRefreshDataQueries
+        }
+      }
+    ];
+    if (selectedQuery?.dataQueryOptions?.args?.length > 0) {
+      generalElements.push({
+        type: "Control",
+        scope: "#/properties/args",
+        options: {
+          isDynamicArgs: true,
+          args: selectedQuery.dataQueryOptions.args,
+          workflowNodes,
+          currentNodeId: nodeId
+        }
+      });
+    }
+    return {
+      type: "Categorization",
+      elements: [
+        {
+          type: "Category",
+          label: strings.WORKFLOW_EDITOR_TAB_GENERAL || "General",
+          elements: generalElements
+        },
+        {
+          type: "Category",
+          label: strings.WORKFLOW_EDITOR_TAB_OUTPUT || "Output",
+          elements: [
+            {
+              type: "Control",
+              scope: "#/properties/outputVariable",
+              options: {
+                placeholder: "e.g., queryResult, userData, orderList"
+              }
+            }
+          ]
+        },
+        {
+          type: "Category",
+          label: strings.WORKFLOW_EDITOR_TAB_ADVANCED || "Advanced",
+          elements: [
+            {
+              type: "Control",
+              scope: "#/properties/timeoutSeconds"
+            },
+            {
+              type: "Control",
+              scope: "#/properties/retryLimit"
+            },
+            {
+              type: "Control",
+              scope: "#/properties/retryDelaySeconds"
+            },
+            {
+              type: "Control",
+              scope: "#/properties/errorHandling",
+              options: {
+                enumLabels: {
+                  [ERROR_HANDLING_OPTIONS2.FAIL_WORKFLOW]: "Fail Workflow",
+                  [ERROR_HANDLING_OPTIONS2.CONTINUE]: "Continue (ignore error)",
+                  [ERROR_HANDLING_OPTIONS2.RETRY_THEN_CONTINUE]: "Retry, then Continue",
+                  [ERROR_HANDLING_OPTIONS2.RETRY_THEN_FAIL]: "Retry, then Fail"
+                }
+              }
+            },
+            {
+              type: "Control",
+              scope: "#/properties/isDisabled"
+            }
+          ]
+        }
+      ]
+    };
+  }, [dataQueries, strings, selectedQuery]);
+  const handleFormChange = useCallback2(({ data: newData }) => {
+    setFormData(newData);
+  }, []);
+  const handleSave = useCallback2(() => {
+    onChange(formData);
+  }, [onChange, formData]);
+  return /* @__PURE__ */ React5.createElement("div", { className: "w-full h-full" }, /* @__PURE__ */ React5.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React5.createElement(
+    JsonForms2,
+    {
+      schema,
+      uischema,
+      data: formData,
+      renderers: jetFormsRenderers,
+      onChange: handleFormChange
+    }
+  ), /* @__PURE__ */ React5.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: handleSave,
+      className: "px-3 py-1.5 text-sm text-white bg-[#646cff] rounded hover:bg-[#5558dd] focus:ring-4 focus:outline-none focus:ring-[#646cff]/30"
+    },
+    strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_SAVE_BUTTON || "Save"
+  )));
+};
+var DataQueryNode = memo2(({ id, data, isConnectable }) => {
+  const { dataQueries, strings, nodeExecutionStatus } = useWorkflowNodes();
+  const [selectedQueryTitle, setSelectedQueryTitle] = useState2("Select Query");
+  const executionStatus = nodeExecutionStatus?.[id] || "idle";
   useEffect2(() => {
     if (data.dataQueryID && dataQueries) {
       const query = dataQueries.find((q) => q.dataQueryID === data.dataQueryID);
       setSelectedQueryTitle(query?.dataQueryTitle || "Unknown Query");
     } else {
-      setSelectedQueryTitle("Select a Query");
+      setSelectedQueryTitle("Select Query");
     }
   }, [data.dataQueryID, dataQueries]);
-  return /* @__PURE__ */ React5.createElement("div", { className: "bg-white border rounded shadow-md min-w-[250px] max-w-[300px] hover:border-blue-400 transition-colors" }, /* @__PURE__ */ React5.createElement("div", { className: "bg-blue-50 px-2 py-1 border-b rounded-t font-semibold flex justify-between items-center" }, /* @__PURE__ */ React5.createElement("div", { className: "flex flex-col justify-start items-start w-full" }, /* @__PURE__ */ React5.createElement("span", { className: " font-normal text-slate-500 truncate max-w-[100px] text-xs" }, data?.title ? data.title : "Untitled node"), /* @__PURE__ */ React5.createElement("span", { className: " font-normal text-slate-500 text-[10px]" }, strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_LABEL)), /* @__PURE__ */ React5.createElement("button", { type: "button", className: "text-red-500 text-xs bg-transparent p-1 outline-none rounded border-none hover:bg-red-100 !hover:border-red-200 ml-2" }, /* @__PURE__ */ React5.createElement(MdOutlineDeleteOutline, { className: "w-4 h-4" }))), /* @__PURE__ */ React5.createElement("div", { className: "p-3 text-sm" }, /* @__PURE__ */ React5.createElement("div", { className: "font-medium text-slate-700 flex items-center gap-2" }, /* @__PURE__ */ React5.createElement(SiQuantconnect, { className: "text-blue-500 text-lg" }), selectedQueryTitle), data.args && Object.keys(data.args).length > 0 && /* @__PURE__ */ React5.createElement("div", { className: "mt-2 text-[10px] text-slate-500 bg-slate-50 p-1.5 rounded border border-slate-100" }, Object.keys(data.args).length, " argument(s) configured")), /* @__PURE__ */ React5.createElement(
+  const isDisabled = data?.isDisabled ?? false;
+  const hasRetry = (data?.retryLimit ?? 0) > 0;
+  const hasCustomTimeout = (data?.timeoutSeconds ?? 300) !== 300;
+  const argCount = data.args ? Object.keys(data.args).length : 0;
+  const outputVar = data.outputVariable || "queryResult";
+  const getStatusStyles2 = () => {
+    switch (executionStatus) {
+      case "running":
+        return "border-blue-400 ring-2 ring-blue-300 ring-opacity-50 animate-pulse";
+      case "completed":
+        return "border-green-400 ring-2 ring-green-300 ring-opacity-50";
+      case "failed":
+        return "border-red-400 ring-2 ring-red-300 ring-opacity-50";
+      case "skipped":
+        return "border-orange-300 opacity-60";
+      default:
+        return "border-slate-200 hover:border-blue-400 hover:shadow-md";
+    }
+  };
+  const StatusIndicator2 = () => {
+    if (executionStatus === "running") {
+      return /* @__PURE__ */ React5.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center animate-spin" }, /* @__PURE__ */ React5.createElement(TbRefresh, { className: "w-3 h-3 text-white" }));
+    }
+    if (executionStatus === "completed") {
+      return /* @__PURE__ */ React5.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center" }, /* @__PURE__ */ React5.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React5.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" })));
+    }
+    if (executionStatus === "failed") {
+      return /* @__PURE__ */ React5.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center" }, /* @__PURE__ */ React5.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React5.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M6 18L18 6M6 6l12 12" })));
+    }
+    return null;
+  };
+  return /* @__PURE__ */ React5.createElement("div", { className: `
+      relative bg-white border rounded
+      min-w-[340px] max-w-[400px]
+      transition-all duration-150
+      ${isDisabled ? "border-slate-200 opacity-50" : getStatusStyles2()}
+      ${!data.dataQueryID ? "!border-red-400 !bg-red-50" : ""}
+    ` }, /* @__PURE__ */ React5.createElement(StatusIndicator2, null), /* @__PURE__ */ React5.createElement("div", { className: "flex items-stretch" }, /* @__PURE__ */ React5.createElement(
+    "div",
+    {
+      style: {
+        borderTopLeftRadius: "0.25rem",
+        borderBottomLeftRadius: "0.25rem"
+      },
+      className: `
+          flex flex-col items-center justify-center px-3 py-3 border-r
+          ${isDisabled ? "bg-slate-50 border-slate-100" : executionStatus === "running" ? "bg-blue-100 border-blue-200" : executionStatus === "completed" ? "bg-green-50 border-green-100" : executionStatus === "failed" ? "bg-red-50 border-red-100" : "bg-blue-50 border-blue-100"}}
+        `
+    },
+    /* @__PURE__ */ React5.createElement(SiQuantconnect, { className: `w-5 h-5 ${isDisabled ? "text-slate-400" : executionStatus === "running" ? "text-blue-600" : executionStatus === "completed" ? "text-green-600" : executionStatus === "failed" ? "text-red-600" : "text-blue-500"}` })
+  ), /* @__PURE__ */ React5.createElement("div", { className: "flex-1 px-3 py-2 min-w-0" }, /* @__PURE__ */ React5.createElement("div", { className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ React5.createElement("span", { className: `text-xs font-semibold truncate ${isDisabled ? "text-slate-400 line-through" : "text-slate-700"}` }, data?.title || "Untitled"), isDisabled && /* @__PURE__ */ React5.createElement("span", { className: "inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded border border-orange-200" }, /* @__PURE__ */ React5.createElement(VscDebugDisconnect, { className: "w-2.5 h-2.5" }), "Skip")), /* @__PURE__ */ React5.createElement("div", { className: `text-sm truncate mt-0.5 ${isDisabled ? "text-slate-300" : "text-slate-500"}` }, selectedQueryTitle.length > 20 ? `${String(selectedQueryTitle).substring(0, 20)}...` : selectedQueryTitle)), /* @__PURE__ */ React5.createElement("div", { className: "flex flex-col items-center justify-center px-2 border-l border-slate-100" }, /* @__PURE__ */ React5.createElement("div", { className: `w-2 h-2 rounded-full mb-1 ${isDisabled ? "bg-slate-300" : "bg-green-400"}`, title: "Success" }), /* @__PURE__ */ React5.createElement("div", { className: `w-2 h-2 rounded-full ${isDisabled ? "bg-slate-300" : "bg-red-400"}`, title: "Error" }))), /* @__PURE__ */ React5.createElement(
     Handle2,
     {
       type: "target",
       position: Position2.Top,
       isConnectable,
-      className: "w-3 h-3 bg-blue-400"
+      style: {
+        width: "10px",
+        height: "10px",
+        backgroundColor: isDisabled ? "#cbd5e1" : "#3b82f6",
+        border: "none",
+        top: "-5px"
+      }
     }
   ), /* @__PURE__ */ React5.createElement(
     Handle2,
@@ -3267,13 +1058,12 @@ var DataQueryNode = memo2(({ data, isConnectable }) => {
       id: "success",
       isConnectable,
       style: {
-        left: "25%",
-        backgroundColor: "#22c55e",
-        // green-500
-        width: "20px",
-        height: "6px",
-        borderRadius: "0px",
-        border: "none"
+        left: "35%",
+        width: "10px",
+        height: "10px",
+        backgroundColor: isDisabled ? "#cbd5e1" : "#22c55e",
+        border: "none",
+        bottom: "-5px"
       }
     }
   ), /* @__PURE__ */ React5.createElement(
@@ -3284,48 +1074,1437 @@ var DataQueryNode = memo2(({ data, isConnectable }) => {
       id: "error",
       isConnectable,
       style: {
-        left: "75%",
-        backgroundColor: "#ef4444",
-        // red-500
-        width: "20px",
-        height: "6px",
-        borderRadius: "0px",
-        border: "none"
+        left: "65%",
+        width: "10px",
+        height: "10px",
+        backgroundColor: isDisabled ? "#cbd5e1" : "#ef4444",
+        border: "none",
+        bottom: "-5px"
       }
     }
   ));
 });
 
 // src/nodes/javascriptNode.jsx
-import React6, { memo as memo3 } from "react";
+import React6, { memo as memo3, useState as useState3, useEffect as useEffect3, useMemo as useMemo3, useCallback as useCallback3 } from "react";
 import { Handle as Handle3, Position as Position3 } from "reactflow";
-var JavascriptNode = memo3(({ data, isConnectable }) => {
-  const { strings } = useWorkflowNodes();
-  return /* @__PURE__ */ React6.createElement("div", { className: "bg-white border rounded shadow-md min-w-[200px] hover:border-yellow-400 transition-colors" }, /* @__PURE__ */ React6.createElement("div", { className: "bg-yellow-50 px-3 py-1 border-b rounded-t text-xs font-bold text-yellow-700 flex justify-between items-center" }, /* @__PURE__ */ React6.createElement("span", null, strings.WORKFLOW_EDITOR_JAVASCRIPT_NODE_LABEL)), /* @__PURE__ */ React6.createElement("div", { className: "p-3" }, /* @__PURE__ */ React6.createElement("div", { className: "flex items-center gap-2 mb-1" }, /* @__PURE__ */ React6.createElement(FaJs, { className: "text-yellow-500 text-lg" }), /* @__PURE__ */ React6.createElement("span", { className: "font-bold text-sm text-slate-700 break-all" }, data.label || "Script")), /* @__PURE__ */ React6.createElement("div", { className: "text-[10px] text-slate-400 font-mono bg-slate-50 p-1.5 rounded truncate" }, data.code ? `${data.code.substring(0, 30)}...` : "// No code")), /* @__PURE__ */ React6.createElement(
+import { JsonForms as JsonForms3 } from "@jsonforms/react";
+var ERROR_HANDLING_OPTIONS3 = {
+  FAIL_WORKFLOW: "fail_workflow",
+  CONTINUE: "continue",
+  RETRY_THEN_CONTINUE: "retry_then_continue",
+  RETRY_THEN_FAIL: "retry_then_fail"
+};
+var JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
+  const { strings, workflowNodes } = useWorkflowNodes();
+  const [formData, setFormData] = useState3({
+    title: data?.title || "",
+    description: data?.description || "",
+    code: data?.code || "return true;",
+    outputVariable: data?.outputVariable || "scriptResult",
+    timeoutSeconds: data?.timeoutSeconds ?? 30,
+    retryLimit: data?.retryLimit ?? 0,
+    retryDelaySeconds: data?.retryDelaySeconds ?? 5,
+    errorHandling: data?.errorHandling || ERROR_HANDLING_OPTIONS3.FAIL_WORKFLOW,
+    isDisabled: data?.isDisabled ?? false
+  });
+  useEffect3(() => {
+    if (data) {
+      setFormData({
+        title: data.title || "",
+        description: data.description || "",
+        code: data.code || "return true;",
+        outputVariable: data.outputVariable || "scriptResult",
+        timeoutSeconds: data.timeoutSeconds ?? 30,
+        retryLimit: data.retryLimit ?? 0,
+        retryDelaySeconds: data.retryDelaySeconds ?? 5,
+        errorHandling: data.errorHandling || ERROR_HANDLING_OPTIONS3.FAIL_WORKFLOW,
+        isDisabled: data.isDisabled ?? false
+      });
+    }
+  }, [data]);
+  const availableVariables = useMemo3(() => {
+    if (!workflowNodes) return [];
+    return workflowNodes.filter((n) => n.id !== nodeId && n.data?.outputVariable).map((n) => ({
+      nodeId: n.id,
+      nodeTitle: n.data?.title || n.type,
+      variable: n.data.outputVariable
+    }));
+  }, [workflowNodes, nodeId]);
+  const schema = useMemo3(() => {
+    return {
+      type: "object",
+      properties: {
+        // General Tab
+        title: {
+          type: "string",
+          title: strings?.WORKFLOW_EDITOR_JAVASCRIPT_TITLE_LABEL || "Node Title"
+        },
+        description: {
+          type: "string",
+          title: strings?.WORKFLOW_EDITOR_NODE_DESCRIPTION_LABEL || "Description"
+        },
+        code: {
+          type: "string",
+          title: strings?.WORKFLOW_EDITOR_JAVASCRIPT_CODE_LABEL || "JavaScript Code"
+        },
+        // Output Tab
+        outputVariable: {
+          type: "string",
+          title: strings?.WORKFLOW_EDITOR_OUTPUT_VARIABLE_LABEL || "Output Variable Name",
+          description: "Variable name to store result (accessible as ctx.{name})",
+          pattern: "^[a-zA-Z_][a-zA-Z0-9_]*$"
+        },
+        // Execution Settings Tab
+        timeoutSeconds: {
+          type: "integer",
+          title: strings?.WORKFLOW_EDITOR_TIMEOUT_LABEL || "Timeout (seconds)",
+          minimum: 1,
+          maximum: 300,
+          default: 30
+        },
+        retryLimit: {
+          type: "integer",
+          title: strings?.WORKFLOW_EDITOR_RETRY_LIMIT_LABEL || "Retry Attempts",
+          minimum: 0,
+          maximum: 10,
+          default: 0
+        },
+        retryDelaySeconds: {
+          type: "integer",
+          title: strings?.WORKFLOW_EDITOR_RETRY_DELAY_LABEL || "Retry Delay (seconds)",
+          minimum: 1,
+          maximum: 300,
+          default: 5
+        },
+        errorHandling: {
+          type: "string",
+          title: strings?.WORKFLOW_EDITOR_ERROR_HANDLING_LABEL || "Error Behavior",
+          enum: Object.values(ERROR_HANDLING_OPTIONS3)
+        },
+        isDisabled: {
+          type: "boolean",
+          title: strings?.WORKFLOW_EDITOR_IS_DISABLED_LABEL || "Skip this node",
+          default: false
+        }
+      },
+      required: ["code"]
+    };
+  }, [strings]);
+  const uischema = useMemo3(() => {
+    const contextHint = availableVariables.length > 0 ? `Available: ${availableVariables.map((v) => `ctx.${v.variable}`).join(", ")}` : "No context variables available yet";
+    return {
+      type: "Categorization",
+      elements: [
+        {
+          type: "Category",
+          label: strings?.WORKFLOW_EDITOR_TAB_GENERAL || "General",
+          elements: [
+            {
+              type: "Control",
+              scope: "#/properties/title",
+              options: {
+                placeholder: strings?.WORKFLOW_EDITOR_JAVASCRIPT_TITLE_PLACEHOLDER || "Enter node title"
+              }
+            },
+            {
+              type: "Control",
+              scope: "#/properties/description",
+              options: {
+                placeholder: strings?.WORKFLOW_EDITOR_NODE_DESCRIPTION_PLACEHOLDER || "Describe what this script does...",
+                multi: true,
+                rows: 2
+              }
+            },
+            {
+              type: "Control",
+              scope: "#/properties/code",
+              options: {
+                format: "code-javascript",
+                multi: true,
+                rows: 12,
+                placeholder: "// Your JavaScript code here\n// Access context: ctx.variableName\n// Return a value to store in outputVariable\nreturn true;",
+                hint: contextHint
+              }
+            }
+          ]
+        },
+        {
+          type: "Category",
+          label: strings?.WORKFLOW_EDITOR_TAB_OUTPUT || "Output",
+          elements: [
+            {
+              type: "Control",
+              scope: "#/properties/outputVariable",
+              options: {
+                placeholder: "e.g., scriptResult, processedData, isValid"
+              }
+            }
+          ]
+        },
+        {
+          type: "Category",
+          label: strings?.WORKFLOW_EDITOR_TAB_ADVANCED || "Advanced",
+          elements: [
+            {
+              type: "Control",
+              scope: "#/properties/timeoutSeconds"
+            },
+            {
+              type: "Control",
+              scope: "#/properties/retryLimit"
+            },
+            {
+              type: "Control",
+              scope: "#/properties/retryDelaySeconds"
+            },
+            {
+              type: "Control",
+              scope: "#/properties/errorHandling",
+              options: {
+                enumLabels: {
+                  [ERROR_HANDLING_OPTIONS3.FAIL_WORKFLOW]: "Fail Workflow",
+                  [ERROR_HANDLING_OPTIONS3.CONTINUE]: "Continue (ignore error)",
+                  [ERROR_HANDLING_OPTIONS3.RETRY_THEN_CONTINUE]: "Retry, then Continue",
+                  [ERROR_HANDLING_OPTIONS3.RETRY_THEN_FAIL]: "Retry, then Fail"
+                }
+              }
+            },
+            {
+              type: "Control",
+              scope: "#/properties/isDisabled"
+            }
+          ]
+        }
+      ]
+    };
+  }, [strings, availableVariables]);
+  const handleFormChange = useCallback3(({ data: newData }) => {
+    setFormData(newData);
+  }, []);
+  const handleSave = useCallback3(() => {
+    onChange(formData);
+  }, [onChange, formData]);
+  return /* @__PURE__ */ React6.createElement("div", { className: "w-full h-full" }, /* @__PURE__ */ React6.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React6.createElement(
+    JsonForms3,
+    {
+      schema,
+      uischema,
+      data: formData,
+      renderers: jetFormsRenderers,
+      onChange: handleFormChange
+    }
+  ), /* @__PURE__ */ React6.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: handleSave,
+      className: "px-3 py-1.5 text-sm text-white bg-[#646cff] rounded hover:bg-[#5558dd] focus:ring-4 focus:outline-none focus:ring-[#646cff]/30"
+    },
+    strings?.WORKFLOW_EDITOR_JAVASCRIPT_NODE_SAVE_BUTTON || "Save"
+  )));
+};
+var JavascriptNode = memo3(({ id, data, isConnectable }) => {
+  const { strings, nodeExecutionStatus } = useWorkflowNodes();
+  const executionStatus = nodeExecutionStatus?.[id] || "idle";
+  const isDisabled = data?.isDisabled ?? false;
+  const hasRetry = (data?.retryLimit ?? 0) > 0;
+  const hasCustomTimeout = (data?.timeoutSeconds ?? 30) !== 30;
+  const outputVar = data.outputVariable || "scriptResult";
+  const codePreview = data.code ? data.code.trim().split("\n")[0].substring(0, 25) + (data.code.length > 25 ? "..." : "") : "// No code";
+  const getStatusStyles2 = () => {
+    switch (executionStatus) {
+      case "running":
+        return "border-blue-400 ring-2 ring-blue-300 ring-opacity-50 animate-pulse";
+      case "completed":
+        return "border-green-400 ring-2 ring-green-300 ring-opacity-50";
+      case "failed":
+        return "border-red-400 ring-2 ring-red-300 ring-opacity-50";
+      case "skipped":
+        return "border-orange-300 opacity-60";
+      default:
+        return "border-slate-200 hover:border-yellow-400 hover:shadow-md";
+    }
+  };
+  const StatusIndicator2 = () => {
+    if (executionStatus === "running") {
+      return /* @__PURE__ */ React6.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center animate-spin" }, /* @__PURE__ */ React6.createElement(TbRefresh, { className: "w-3 h-3 text-white" }));
+    }
+    if (executionStatus === "completed") {
+      return /* @__PURE__ */ React6.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center" }, /* @__PURE__ */ React6.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React6.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" })));
+    }
+    if (executionStatus === "failed") {
+      return /* @__PURE__ */ React6.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center" }, /* @__PURE__ */ React6.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React6.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M6 18L18 6M6 6l12 12" })));
+    }
+    return null;
+  };
+  return /* @__PURE__ */ React6.createElement("div", { className: `
+      relative bg-white border rounded
+      min-w-[340px] max-w-[400px]
+      transition-all duration-150
+      ${isDisabled ? "border-slate-200 opacity-50" : getStatusStyles2()}
+      ${!data.code ? "!border-red-400 !bg-red-50" : ""}
+    ` }, /* @__PURE__ */ React6.createElement(StatusIndicator2, null), /* @__PURE__ */ React6.createElement("div", { className: "flex items-stretch" }, /* @__PURE__ */ React6.createElement(
+    "div",
+    {
+      style: {
+        borderTopLeftRadius: "0.25rem",
+        borderBottomLeftRadius: "0.25rem"
+      },
+      className: `
+          flex flex-col items-center justify-center px-3 py-3 border-r
+          ${isDisabled ? "bg-slate-50 border-slate-100" : executionStatus === "running" ? "bg-blue-100 border-blue-200" : executionStatus === "completed" ? "bg-green-50 border-green-100" : executionStatus === "failed" ? "bg-red-50 border-red-100" : "bg-yellow-50 border-yellow-100"}
+        `
+    },
+    /* @__PURE__ */ React6.createElement(FaJs, { className: `w-5 h-5 ${isDisabled ? "text-slate-400" : executionStatus === "running" ? "text-blue-600" : executionStatus === "completed" ? "text-green-600" : executionStatus === "failed" ? "text-red-600" : "text-yellow-500"}` })
+  ), /* @__PURE__ */ React6.createElement("div", { className: "flex-1 px-3 py-2 min-w-0" }, /* @__PURE__ */ React6.createElement("div", { className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ React6.createElement("span", { className: `text-xs font-semibold truncate ${isDisabled ? "text-slate-400 line-through" : "text-slate-700"}` }, data?.title || "Untitled Script"), isDisabled && /* @__PURE__ */ React6.createElement("span", { className: "inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded border border-orange-200" }, /* @__PURE__ */ React6.createElement(VscDebugDisconnect, { className: "w-2.5 h-2.5" }), "Skip")), /* @__PURE__ */ React6.createElement("div", { className: `text-[10px] font-mono truncate mt-0.5 ${isDisabled ? "text-slate-300" : "text-slate-400"}` }, codePreview)), /* @__PURE__ */ React6.createElement("div", { className: "flex flex-col items-center justify-center px-2 border-l border-slate-100" }, /* @__PURE__ */ React6.createElement("div", { className: `w-2 h-2 rounded-full mb-1 ${isDisabled ? "bg-slate-300" : "bg-green-400"}`, title: "Success" }), /* @__PURE__ */ React6.createElement("div", { className: `w-2 h-2 rounded-full ${isDisabled ? "bg-slate-300" : "bg-red-400"}`, title: "Error" }))), /* @__PURE__ */ React6.createElement(
     Handle3,
     {
       type: "target",
       position: Position3.Top,
       isConnectable,
-      className: "w-3 h-3 bg-yellow-400"
+      style: {
+        width: "10px",
+        height: "10px",
+        backgroundColor: isDisabled ? "#cbd5e1" : "#eab308",
+        border: "none",
+        top: "-5px"
+      }
     }
   ), /* @__PURE__ */ React6.createElement(
     Handle3,
     {
       type: "source",
       position: Position3.Bottom,
+      id: "success",
       isConnectable,
-      className: "w-3 h-3 bg-yellow-400"
+      style: {
+        left: "35%",
+        width: "10px",
+        height: "10px",
+        backgroundColor: isDisabled ? "#cbd5e1" : "#22c55e",
+        border: "none",
+        bottom: "-5px"
+      }
+    }
+  ), /* @__PURE__ */ React6.createElement(
+    Handle3,
+    {
+      type: "source",
+      position: Position3.Bottom,
+      id: "error",
+      isConnectable,
+      style: {
+        left: "65%",
+        width: "10px",
+        height: "10px",
+        backgroundColor: isDisabled ? "#cbd5e1" : "#ef4444",
+        border: "none",
+        bottom: "-5px"
+      }
     }
   ));
 });
 
+// src/nodes/startNode.jsx
+import React7, { memo as memo4, useState as useState4, useEffect as useEffect4, useMemo as useMemo4, useCallback as useCallback4 } from "react";
+import { Handle as Handle4, Position as Position4 } from "reactflow";
+import { JsonForms as JsonForms4 } from "@jsonforms/react";
+var PARAM_TYPES = {
+  STRING: "string",
+  NUMBER: "number",
+  BOOLEAN: "boolean",
+  OBJECT: "object",
+  ARRAY: "array"
+};
+var InputParameterEditor = ({ parameters, onChange }) => {
+  const addParameter = () => {
+    const newParam = {
+      id: `param_${Date.now()}`,
+      name: `param${parameters.length + 1}`,
+      type: PARAM_TYPES.STRING,
+      required: false,
+      defaultValue: "",
+      description: ""
+    };
+    onChange([...parameters, newParam]);
+  };
+  const updateParameter = (index, field, value) => {
+    const updated = [...parameters];
+    updated[index] = { ...updated[index], [field]: value };
+    onChange(updated);
+  };
+  const removeParameter = (index) => {
+    const updated = parameters.filter((_, i) => i !== index);
+    onChange(updated);
+  };
+  return /* @__PURE__ */ React7.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React7.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React7.createElement("label", { className: "text-xs font-medium text-slate-500" }, "Input Parameters"), /* @__PURE__ */ React7.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: addParameter,
+      className: "flex items-center gap-1 px-2 py-1 text-xs bg-white text-[#646cff] hover:bg-[#646cff]/10 rounded transition-colors border border-slate-200"
+    },
+    /* @__PURE__ */ React7.createElement(FaPlus, { className: "w-2.5 h-2.5" }),
+    "Add Parameter"
+  )), /* @__PURE__ */ React7.createElement("p", { className: "text-[10px] text-slate-400" }, "Define inputs that will be available as ", /* @__PURE__ */ React7.createElement("code", { className: "bg-slate-100 px-1 rounded" }, "ctx.input.paramName")), parameters.length === 0 ? /* @__PURE__ */ React7.createElement("div", { className: "text-xs text-slate-400 italic py-3 text-center border border-dashed border-slate-200 rounded" }, "No input parameters defined. Workflow can still be triggered.") : /* @__PURE__ */ React7.createElement("div", { className: "space-y-2" }, parameters.map((param, index) => /* @__PURE__ */ React7.createElement(
+    "div",
+    {
+      key: param.id,
+      className: "border border-slate-200 rounded p-2 bg-slate-50"
+    },
+    /* @__PURE__ */ React7.createElement("div", { className: "flex items-center justify-between mb-2" }, /* @__PURE__ */ React7.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React7.createElement(IoMdArrowDropright, { className: "w-3 h-3 text-green-500" }), /* @__PURE__ */ React7.createElement(
+      "input",
+      {
+        type: "text",
+        value: param.name,
+        onChange: (e) => updateParameter(index, "name", e.target.value.replace(/[^a-zA-Z0-9_]/g, "")),
+        className: "text-xs font-mono font-medium text-slate-700 bg-white border border-slate-200 rounded px-2 py-1 w-28 focus:outline-none focus:border-[#646cff]",
+        placeholder: "paramName"
+      }
+    )), /* @__PURE__ */ React7.createElement(
+      "button",
+      {
+        type: "button",
+        onClick: () => removeParameter(index),
+        className: "p-1 bg-white text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors",
+        title: "Remove parameter"
+      },
+      /* @__PURE__ */ React7.createElement(FaTrash, { className: "w-3 h-3" })
+    )),
+    /* @__PURE__ */ React7.createElement("div", { className: "grid grid-cols-2 gap-2" }, /* @__PURE__ */ React7.createElement("div", null, /* @__PURE__ */ React7.createElement("label", { className: "text-[10px] text-slate-400" }, "Type"), /* @__PURE__ */ React7.createElement(
+      "select",
+      {
+        value: param.type,
+        onChange: (e) => updateParameter(index, "type", e.target.value),
+        className: "w-full text-xs p-1.5 border border-slate-200 rounded bg-white focus:outline-none focus:border-[#646cff]"
+      },
+      /* @__PURE__ */ React7.createElement("option", { value: PARAM_TYPES.STRING }, "String"),
+      /* @__PURE__ */ React7.createElement("option", { value: PARAM_TYPES.NUMBER }, "Number"),
+      /* @__PURE__ */ React7.createElement("option", { value: PARAM_TYPES.BOOLEAN }, "Boolean"),
+      /* @__PURE__ */ React7.createElement("option", { value: PARAM_TYPES.OBJECT }, "Object"),
+      /* @__PURE__ */ React7.createElement("option", { value: PARAM_TYPES.ARRAY }, "Array")
+    )), /* @__PURE__ */ React7.createElement("div", null, /* @__PURE__ */ React7.createElement("label", { className: "text-[10px] text-slate-400" }, "Required"), /* @__PURE__ */ React7.createElement("div", { className: "flex items-center h-[30px]" }, /* @__PURE__ */ React7.createElement(
+      "input",
+      {
+        type: "checkbox",
+        checked: param.required,
+        onChange: (e) => updateParameter(index, "required", e.target.checked),
+        className: "w-4 h-4 text-[#646cff] rounded border-slate-300 focus:ring-[#646cff]"
+      }
+    ), /* @__PURE__ */ React7.createElement("span", { className: "text-xs text-slate-500 ml-2" }, param.required ? "Yes" : "No")))),
+    /* @__PURE__ */ React7.createElement("div", { className: "mt-2" }, /* @__PURE__ */ React7.createElement("label", { className: "text-[10px] text-slate-400" }, "Default Value"), /* @__PURE__ */ React7.createElement(
+      "input",
+      {
+        type: "text",
+        value: param.defaultValue,
+        onChange: (e) => updateParameter(index, "defaultValue", e.target.value),
+        placeholder: param.type === PARAM_TYPES.OBJECT ? "{}" : param.type === PARAM_TYPES.ARRAY ? "[]" : "",
+        className: "w-full text-xs p-1.5 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff]"
+      }
+    )),
+    /* @__PURE__ */ React7.createElement("div", { className: "mt-2" }, /* @__PURE__ */ React7.createElement("label", { className: "text-[10px] text-slate-400" }, "Description"), /* @__PURE__ */ React7.createElement(
+      "input",
+      {
+        type: "text",
+        value: param.description,
+        onChange: (e) => updateParameter(index, "description", e.target.value),
+        placeholder: "What is this parameter for?",
+        className: "w-full text-xs p-1.5 border border-slate-200 rounded bg-white focus:outline-none focus:border-[#646cff]"
+      }
+    ))
+  ))));
+};
+var StartNodeConfigurator = ({ data, onChange, nodeId }) => {
+  const { strings } = useWorkflowNodes();
+  const [formData, setFormData] = useState4({
+    title: data?.title || "Start",
+    description: data?.description || "",
+    inputParameters: data?.inputParameters || []
+  });
+  useEffect4(() => {
+    if (data) {
+      setFormData({
+        title: data.title || "Start",
+        description: data.description || "",
+        inputParameters: data.inputParameters || []
+      });
+    }
+  }, [data]);
+  const schema = useMemo4(() => {
+    return {
+      type: "object",
+      properties: {
+        title: {
+          type: "string",
+          title: "Node Title"
+        },
+        description: {
+          type: "string",
+          title: "Description"
+        }
+      }
+    };
+  }, []);
+  const uischema = useMemo4(() => {
+    return {
+      type: "VerticalLayout",
+      elements: [
+        {
+          type: "Control",
+          scope: "#/properties/title",
+          options: { placeholder: "Enter node title" }
+        },
+        {
+          type: "Control",
+          scope: "#/properties/description",
+          options: { placeholder: "Describe this workflow...", multi: true, rows: 2 }
+        }
+      ]
+    };
+  }, []);
+  const handleFormChange = useCallback4(({ data: newData }) => {
+    setFormData((prev) => ({ ...prev, ...newData }));
+  }, []);
+  const handleParametersChange = useCallback4((newParams) => {
+    setFormData((prev) => ({ ...prev, inputParameters: newParams }));
+  }, []);
+  const handleSave = useCallback4(() => {
+    onChange(formData);
+  }, [onChange, formData]);
+  return /* @__PURE__ */ React7.createElement("div", { className: "w-full h-full" }, /* @__PURE__ */ React7.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React7.createElement(
+    JsonForms4,
+    {
+      schema,
+      uischema,
+      data: formData,
+      renderers: jetFormsRenderers,
+      onChange: handleFormChange
+    }
+  ), /* @__PURE__ */ React7.createElement("div", { className: "p-2 bg-blue-50 border border-blue-100 rounded text-[10px] text-blue-600" }, /* @__PURE__ */ React7.createElement("strong", null, "Triggers:"), " Workflows can be started manually or via HTTP webhook (POST /api/workflows/:id/run)"), /* @__PURE__ */ React7.createElement("div", { className: "border-t border-slate-100 pt-4" }, /* @__PURE__ */ React7.createElement(
+    InputParameterEditor,
+    {
+      parameters: formData.inputParameters,
+      onChange: handleParametersChange
+    }
+  )), /* @__PURE__ */ React7.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: handleSave,
+      className: "px-3 py-1.5 text-sm text-white bg-[#646cff] rounded hover:bg-[#5558dd] focus:ring-4 focus:outline-none focus:ring-[#646cff]/30"
+    },
+    "Save"
+  )));
+};
+var StartNode = memo4(({ id, data, isConnectable }) => {
+  const { strings, nodeExecutionStatus } = useWorkflowNodes();
+  const executionStatus = nodeExecutionStatus?.[id] || "idle";
+  const inputParams = data?.inputParameters || [];
+  const paramCount = inputParams.length;
+  const getStatusStyles2 = () => {
+    switch (executionStatus) {
+      case "running":
+        return "border-blue-400 ring-2 ring-blue-300 ring-opacity-50 animate-pulse";
+      case "completed":
+        return "border-green-400 ring-2 ring-green-300 ring-opacity-50";
+      case "failed":
+        return "border-red-400 ring-2 ring-red-300 ring-opacity-50";
+      case "skipped":
+        return "border-orange-300 opacity-60";
+      default:
+        return "border-slate-200 hover:border-green-400 hover:shadow-md";
+    }
+  };
+  const StatusIndicator2 = () => {
+    if (executionStatus === "running") {
+      return /* @__PURE__ */ React7.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center animate-spin z-10" }, /* @__PURE__ */ React7.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React7.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" })));
+    }
+    if (executionStatus === "completed") {
+      return /* @__PURE__ */ React7.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ React7.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React7.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" })));
+    }
+    if (executionStatus === "failed") {
+      return /* @__PURE__ */ React7.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ React7.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React7.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M6 18L18 6M6 6l12 12" })));
+    }
+    return null;
+  };
+  return /* @__PURE__ */ React7.createElement("div", { className: `
+      relative bg-white border rounded
+      min-w-[280px] max-w-[350px]
+      transition-all duration-150
+      ${getStatusStyles2()}
+    ` }, /* @__PURE__ */ React7.createElement(StatusIndicator2, null), /* @__PURE__ */ React7.createElement("div", { className: "flex items-stretch" }, /* @__PURE__ */ React7.createElement("div", { style: {
+    borderTopLeftRadius: "0.25rem",
+    borderBottomLeftRadius: "0.25rem"
+  }, className: `flex flex-col items-center justify-center px-3 py-3 border-r ${executionStatus === "running" ? "bg-blue-100 border-blue-200" : executionStatus === "completed" ? "bg-green-100 border-green-200" : executionStatus === "failed" ? "bg-red-50 border-red-100" : "bg-green-50 border-green-100"}` }, /* @__PURE__ */ React7.createElement(VscDebugStart, { className: `w-5 h-5 ${executionStatus === "running" ? "text-blue-600" : executionStatus === "completed" ? "text-green-600" : executionStatus === "failed" ? "text-red-600" : "text-green-500"}` })), /* @__PURE__ */ React7.createElement("div", { className: "flex-1 px-3 py-2 min-w-0" }, /* @__PURE__ */ React7.createElement("div", { className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ React7.createElement("span", { className: "text-xs font-semibold truncate text-slate-700" }, data?.title || "Start")), /* @__PURE__ */ React7.createElement("div", { className: "text-[10px] mt-0.5 text-slate-400" }, paramCount === 0 ? "No input parameters" : `${paramCount} input${paramCount !== 1 ? "s" : ""}: ${inputParams.slice(0, 3).map((p) => p.name).join(", ")}${paramCount > 3 ? "..." : ""}`), inputParams.some((p) => p.required) && /* @__PURE__ */ React7.createElement("div", { className: "text-[9px] mt-0.5 text-amber-500" }, "* Has required parameters")), /* @__PURE__ */ React7.createElement("div", { className: "flex flex-col items-center justify-center px-2 border-l border-slate-100" }, /* @__PURE__ */ React7.createElement("div", { className: "w-2 h-2 rounded-full bg-green-400", title: "Output" }))), /* @__PURE__ */ React7.createElement(
+    Handle4,
+    {
+      type: "source",
+      position: Position4.Bottom,
+      id: "output",
+      isConnectable,
+      style: {
+        width: "10px",
+        height: "10px",
+        backgroundColor: "#22c55e",
+        border: "none",
+        bottom: "-5px"
+      }
+    }
+  ));
+});
+
+// src/nodes/loopNode.jsx
+import React8, { memo as memo5, useState as useState5, useEffect as useEffect5, useMemo as useMemo5, useCallback as useCallback5 } from "react";
+import { Handle as Handle5, Position as Position5 } from "reactflow";
+import { JsonForms as JsonForms5 } from "@jsonforms/react";
+var ERROR_HANDLING_OPTIONS4 = {
+  FAIL_WORKFLOW: "fail_workflow",
+  CONTINUE: "continue",
+  SKIP_ITEM: "skip_item"
+};
+var LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
+  const { strings, workflowNodes } = useWorkflowNodes();
+  const [formData, setFormData] = useState5({
+    title: data?.title || "Loop",
+    description: data?.description || "",
+    sourceVariable: data?.sourceVariable || "",
+    itemVariable: data?.itemVariable || "item",
+    indexVariable: data?.indexVariable || "index",
+    maxIterations: data?.maxIterations ?? 1e3,
+    batchSize: data?.batchSize ?? 1,
+    delayBetweenItems: data?.delayBetweenItems ?? 0,
+    errorHandling: data?.errorHandling || ERROR_HANDLING_OPTIONS4.FAIL_WORKFLOW,
+    isDisabled: data?.isDisabled ?? false
+  });
+  useEffect5(() => {
+    if (data) {
+      setFormData({
+        title: data.title || "Loop",
+        description: data.description || "",
+        sourceVariable: data.sourceVariable || "",
+        itemVariable: data.itemVariable || "item",
+        indexVariable: data.indexVariable || "index",
+        maxIterations: data.maxIterations ?? 1e3,
+        batchSize: data.batchSize ?? 1,
+        delayBetweenItems: data.delayBetweenItems ?? 0,
+        errorHandling: data.errorHandling || ERROR_HANDLING_OPTIONS4.FAIL_WORKFLOW,
+        isDisabled: data.isDisabled ?? false
+      });
+    }
+  }, [data]);
+  const availableVariables = useMemo5(() => {
+    if (!workflowNodes) return [];
+    return workflowNodes.filter((n) => n.id !== nodeId && n.data?.outputVariable).map((n) => ({
+      nodeId: n.id,
+      nodeTitle: n.data?.title || n.type,
+      variable: n.data.outputVariable
+    }));
+  }, [workflowNodes, nodeId]);
+  const schema = useMemo5(() => {
+    return {
+      type: "object",
+      properties: {
+        title: {
+          type: "string",
+          title: "Node Title"
+        },
+        description: {
+          type: "string",
+          title: "Description"
+        },
+        sourceVariable: {
+          type: "string",
+          title: "Source Array",
+          description: "Variable containing the array to iterate (e.g., ctx.queryResult)"
+        },
+        itemVariable: {
+          type: "string",
+          title: "Item Variable Name",
+          description: "Variable name for current item (accessible as ctx.{name})",
+          pattern: "^[a-zA-Z_][a-zA-Z0-9_]*$"
+        },
+        indexVariable: {
+          type: "string",
+          title: "Index Variable Name",
+          description: "Variable name for current index (accessible as ctx.{name})",
+          pattern: "^[a-zA-Z_][a-zA-Z0-9_]*$"
+        },
+        maxIterations: {
+          type: "integer",
+          title: "Max Iterations",
+          description: "Safety limit to prevent infinite loops",
+          minimum: 1,
+          maximum: 1e5,
+          default: 1e3
+        },
+        batchSize: {
+          type: "integer",
+          title: "Batch Size",
+          description: "Process items in batches (1 = sequential)",
+          minimum: 1,
+          maximum: 100,
+          default: 1
+        },
+        delayBetweenItems: {
+          type: "integer",
+          title: "Delay Between Items (ms)",
+          description: "Wait time between processing each item",
+          minimum: 0,
+          maximum: 6e4,
+          default: 0
+        },
+        errorHandling: {
+          type: "string",
+          title: "Error Behavior",
+          enum: Object.values(ERROR_HANDLING_OPTIONS4)
+        },
+        isDisabled: {
+          type: "boolean",
+          title: "Skip this node",
+          default: false
+        }
+      },
+      required: ["sourceVariable", "itemVariable"]
+    };
+  }, []);
+  const uischema = useMemo5(() => {
+    const contextHint = availableVariables.length > 0 ? `Available: ${availableVariables.map((v) => `ctx.${v.variable}`).join(", ")}` : "No context variables available yet";
+    return {
+      type: "Categorization",
+      elements: [
+        {
+          type: "Category",
+          label: "General",
+          elements: [
+            {
+              type: "Control",
+              scope: "#/properties/title",
+              options: { placeholder: "Enter node title" }
+            },
+            {
+              type: "Control",
+              scope: "#/properties/description",
+              options: { placeholder: "Describe what this loop does...", multi: true, rows: 2 }
+            }
+          ]
+        },
+        {
+          type: "Category",
+          label: "Loop Config",
+          elements: [
+            {
+              type: "Control",
+              scope: "#/properties/sourceVariable",
+              options: { placeholder: "ctx.queryResult", hint: contextHint }
+            },
+            {
+              type: "Control",
+              scope: "#/properties/itemVariable",
+              options: { placeholder: "item" }
+            },
+            {
+              type: "Control",
+              scope: "#/properties/indexVariable",
+              options: { placeholder: "index" }
+            }
+          ]
+        },
+        {
+          type: "Category",
+          label: "Advanced",
+          elements: [
+            { type: "Control", scope: "#/properties/maxIterations" },
+            { type: "Control", scope: "#/properties/batchSize" },
+            { type: "Control", scope: "#/properties/delayBetweenItems" },
+            {
+              type: "Control",
+              scope: "#/properties/errorHandling",
+              options: {
+                enumLabels: {
+                  [ERROR_HANDLING_OPTIONS4.FAIL_WORKFLOW]: "Fail Workflow",
+                  [ERROR_HANDLING_OPTIONS4.CONTINUE]: "Continue to next item",
+                  [ERROR_HANDLING_OPTIONS4.SKIP_ITEM]: "Skip failed item"
+                }
+              }
+            },
+            { type: "Control", scope: "#/properties/isDisabled" }
+          ]
+        }
+      ]
+    };
+  }, [availableVariables]);
+  const handleFormChange = useCallback5(({ data: newData }) => {
+    setFormData(newData);
+  }, []);
+  const handleSave = useCallback5(() => {
+    onChange(formData);
+  }, [onChange, formData]);
+  return /* @__PURE__ */ React8.createElement("div", { className: "w-full h-full" }, /* @__PURE__ */ React8.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React8.createElement(
+    JsonForms5,
+    {
+      schema,
+      uischema,
+      data: formData,
+      renderers: jetFormsRenderers,
+      onChange: handleFormChange
+    }
+  ), /* @__PURE__ */ React8.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: handleSave,
+      className: "px-3 py-1.5 text-sm text-white bg-[#646cff] rounded hover:bg-[#5558dd] focus:ring-4 focus:outline-none focus:ring-[#646cff]/30"
+    },
+    "Save"
+  )));
+};
+var LoopNode = memo5(({ data, isConnectable }) => {
+  const { strings } = useWorkflowNodes();
+  const isDisabled = data?.isDisabled ?? false;
+  const sourceVariable = data?.sourceVariable || "ctx.array";
+  const itemVariable = data?.itemVariable || "item";
+  return /* @__PURE__ */ React8.createElement("div", { className: `
+      bg-white border rounded
+      min-w-[280px] max-w-[350px]
+      transition-all duration-150
+      ${isDisabled ? "border-slate-200 opacity-50" : "border-slate-200 hover:border-cyan-400 hover:shadow-md"}
+      ${!data.sourceVariable ? "!border-red-400 !bg-red-50" : ""}
+    ` }, /* @__PURE__ */ React8.createElement("div", { className: "flex items-stretch" }, /* @__PURE__ */ React8.createElement(
+    "div",
+    {
+      style: {
+        borderTopLeftRadius: "0.25rem",
+        borderBottomLeftRadius: "0.25rem"
+      },
+      className: `
+          flex flex-col items-center justify-center px-3 py-3 border-r
+          ${isDisabled ? "bg-slate-50 border-slate-100" : "bg-cyan-50 border-cyan-100"}
+        `
+    },
+    /* @__PURE__ */ React8.createElement(TbRepeat, { className: `w-5 h-5 ${isDisabled ? "text-slate-400" : "text-cyan-500"}` })
+  ), /* @__PURE__ */ React8.createElement("div", { className: "flex-1 px-3 py-2 min-w-0" }, /* @__PURE__ */ React8.createElement("div", { className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ React8.createElement("span", { className: `text-xs font-semibold truncate ${isDisabled ? "text-slate-400 line-through" : "text-slate-700"}` }, data?.title || "Loop"), isDisabled && /* @__PURE__ */ React8.createElement("span", { className: "inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded border border-orange-200" }, /* @__PURE__ */ React8.createElement(VscDebugDisconnect, { className: "w-2.5 h-2.5" }), "Skip")), /* @__PURE__ */ React8.createElement("div", { className: `text-[10px] font-mono mt-0.5 ${isDisabled ? "text-slate-300" : "text-slate-400"}` }, "for (", itemVariable, " in ", sourceVariable.length > 20 ? sourceVariable.substring(0, 20) + "..." : sourceVariable, ")")), /* @__PURE__ */ React8.createElement("div", { className: "flex flex-col items-center justify-center px-2 border-l border-slate-100" }, /* @__PURE__ */ React8.createElement("div", { className: `w-2 h-2 rounded-full mb-1 ${isDisabled ? "bg-slate-300" : "bg-cyan-400"}`, title: "Loop Body" }), /* @__PURE__ */ React8.createElement("div", { className: `w-2 h-2 rounded-full ${isDisabled ? "bg-slate-300" : "bg-green-400"}`, title: "Completed" }))), /* @__PURE__ */ React8.createElement(
+    Handle5,
+    {
+      type: "target",
+      position: Position5.Top,
+      isConnectable,
+      style: {
+        width: "10px",
+        height: "10px",
+        backgroundColor: isDisabled ? "#cbd5e1" : "#06b6d4",
+        border: "none",
+        top: "-5px"
+      }
+    }
+  ), /* @__PURE__ */ React8.createElement(
+    Handle5,
+    {
+      type: "source",
+      position: Position5.Bottom,
+      id: "loop",
+      isConnectable,
+      style: {
+        left: "35%",
+        width: "10px",
+        height: "10px",
+        backgroundColor: isDisabled ? "#cbd5e1" : "#06b6d4",
+        border: "none",
+        bottom: "-5px"
+      }
+    }
+  ), /* @__PURE__ */ React8.createElement(
+    Handle5,
+    {
+      type: "source",
+      position: Position5.Bottom,
+      id: "completed",
+      isConnectable,
+      style: {
+        left: "65%",
+        width: "10px",
+        height: "10px",
+        backgroundColor: isDisabled ? "#cbd5e1" : "#22c55e",
+        border: "none",
+        bottom: "-5px"
+      }
+    }
+  ));
+});
+
+// src/nodes/delayNode.jsx
+import React9, { memo as memo6, useState as useState6, useEffect as useEffect6, useMemo as useMemo6, useCallback as useCallback6 } from "react";
+import { Handle as Handle6, Position as Position6 } from "reactflow";
+import { JsonForms as JsonForms6 } from "@jsonforms/react";
+var DelayNodeConfigurator = ({ data, onChange, nodeId }) => {
+  const { strings } = useWorkflowNodes();
+  const [formData, setFormData] = useState6({
+    title: data?.title || "Delay",
+    description: data?.description || "",
+    delayType: data?.delayType || "fixed",
+    delayMs: data?.delayMs ?? 1e3,
+    delaySeconds: data?.delaySeconds ?? 0,
+    delayMinutes: data?.delayMinutes ?? 0,
+    // For dynamic delay
+    delayVariable: data?.delayVariable || "",
+    // For until time
+    untilTime: data?.untilTime || "",
+    isDisabled: data?.isDisabled ?? false
+  });
+  useEffect6(() => {
+    if (data) {
+      setFormData({
+        title: data.title || "Delay",
+        description: data.description || "",
+        delayType: data.delayType || "fixed",
+        delayMs: data.delayMs ?? 1e3,
+        delaySeconds: data.delaySeconds ?? 0,
+        delayMinutes: data.delayMinutes ?? 0,
+        delayVariable: data.delayVariable || "",
+        untilTime: data.untilTime || "",
+        isDisabled: data.isDisabled ?? false
+      });
+    }
+  }, [data]);
+  const schema = useMemo6(() => {
+    return {
+      type: "object",
+      properties: {
+        title: {
+          type: "string",
+          title: "Node Title"
+        },
+        description: {
+          type: "string",
+          title: "Description"
+        },
+        delayType: {
+          type: "string",
+          title: "Delay Type",
+          enum: ["fixed", "dynamic", "until"]
+        },
+        delayMs: {
+          type: "integer",
+          title: "Milliseconds",
+          minimum: 0,
+          maximum: 999,
+          default: 0
+        },
+        delaySeconds: {
+          type: "integer",
+          title: "Seconds",
+          minimum: 0,
+          maximum: 59,
+          default: 1
+        },
+        delayMinutes: {
+          type: "integer",
+          title: "Minutes",
+          minimum: 0,
+          maximum: 1440,
+          default: 0
+        },
+        delayVariable: {
+          type: "string",
+          title: "Delay Variable",
+          description: "Context variable containing delay in ms (e.g., ctx.waitTime)"
+        },
+        untilTime: {
+          type: "string",
+          title: "Until Time",
+          description: "Wait until this time (ISO format or ctx variable)"
+        },
+        isDisabled: {
+          type: "boolean",
+          title: "Skip this node",
+          default: false
+        }
+      }
+    };
+  }, []);
+  const uischema = useMemo6(() => {
+    const delayElements = [
+      {
+        type: "Control",
+        scope: "#/properties/delayType",
+        options: {
+          enumLabels: {
+            "fixed": "Fixed Duration",
+            "dynamic": "From Variable",
+            "until": "Until Time"
+          }
+        }
+      }
+    ];
+    if (formData.delayType === "fixed") {
+      delayElements.push(
+        { type: "Control", scope: "#/properties/delayMinutes" },
+        { type: "Control", scope: "#/properties/delaySeconds" },
+        { type: "Control", scope: "#/properties/delayMs" }
+      );
+    } else if (formData.delayType === "dynamic") {
+      delayElements.push({
+        type: "Control",
+        scope: "#/properties/delayVariable",
+        options: { placeholder: "ctx.waitTime (in milliseconds)" }
+      });
+    } else if (formData.delayType === "until") {
+      delayElements.push({
+        type: "Control",
+        scope: "#/properties/untilTime",
+        options: { placeholder: "2024-12-31T23:59:59Z or ctx.targetTime" }
+      });
+    }
+    return {
+      type: "Categorization",
+      elements: [
+        {
+          type: "Category",
+          label: "General",
+          elements: [
+            {
+              type: "Control",
+              scope: "#/properties/title",
+              options: { placeholder: "Enter node title" }
+            },
+            {
+              type: "Control",
+              scope: "#/properties/description",
+              options: { placeholder: "Describe this delay...", multi: true, rows: 2 }
+            }
+          ]
+        },
+        {
+          type: "Category",
+          label: "Delay Config",
+          elements: delayElements
+        },
+        {
+          type: "Category",
+          label: "Advanced",
+          elements: [
+            { type: "Control", scope: "#/properties/isDisabled" }
+          ]
+        }
+      ]
+    };
+  }, [formData.delayType]);
+  const handleFormChange = useCallback6(({ data: newData }) => {
+    setFormData(newData);
+  }, []);
+  const handleSave = useCallback6(() => {
+    onChange(formData);
+  }, [onChange, formData]);
+  return /* @__PURE__ */ React9.createElement("div", { className: "w-full h-full" }, /* @__PURE__ */ React9.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React9.createElement(
+    JsonForms6,
+    {
+      schema,
+      uischema,
+      data: formData,
+      renderers: jetFormsRenderers,
+      onChange: handleFormChange
+    }
+  ), /* @__PURE__ */ React9.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: handleSave,
+      className: "px-3 py-1.5 text-sm text-white bg-[#646cff] rounded hover:bg-[#5558dd] focus:ring-4 focus:outline-none focus:ring-[#646cff]/30"
+    },
+    "Save"
+  )));
+};
+var DelayNode = memo6(({ data, isConnectable }) => {
+  const { strings } = useWorkflowNodes();
+  const isDisabled = data?.isDisabled ?? false;
+  const delayType = data?.delayType || "fixed";
+  const getDelayDisplay = () => {
+    if (delayType === "dynamic") {
+      return data?.delayVariable || "ctx.delay";
+    }
+    if (delayType === "until") {
+      const time = data?.untilTime || "";
+      return time.length > 20 ? time.substring(0, 20) + "..." : time || "until time";
+    }
+    const mins = data?.delayMinutes || 0;
+    const secs = data?.delaySeconds || 0;
+    const ms = data?.delayMs || 0;
+    const parts = [];
+    if (mins > 0) parts.push(`${mins}m`);
+    if (secs > 0) parts.push(`${secs}s`);
+    if (ms > 0) parts.push(`${ms}ms`);
+    return parts.length > 0 ? parts.join(" ") : "0s";
+  };
+  return /* @__PURE__ */ React9.createElement("div", { className: `
+      bg-white border rounded
+      min-w-[280px] max-w-[350px]
+      transition-all duration-150
+      ${isDisabled ? "border-slate-200 opacity-50" : "border-slate-200 hover:border-amber-400 hover:shadow-md"}
+    ` }, /* @__PURE__ */ React9.createElement("div", { className: "flex items-stretch" }, /* @__PURE__ */ React9.createElement(
+    "div",
+    {
+      style: {
+        borderTopLeftRadius: "0.25rem",
+        borderBottomLeftRadius: "0.25rem"
+      },
+      className: `
+          flex flex-col items-center justify-center px-3 py-3 border-r
+          ${isDisabled ? "bg-slate-50 border-slate-100" : "bg-amber-50 border-amber-100"}
+        `
+    },
+    /* @__PURE__ */ React9.createElement(IoMdTime, { className: `w-5 h-5 ${isDisabled ? "text-slate-400" : "text-amber-500"}` })
+  ), /* @__PURE__ */ React9.createElement("div", { className: "flex-1 px-3 py-2 min-w-0" }, /* @__PURE__ */ React9.createElement("div", { className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ React9.createElement("span", { className: `text-xs font-semibold truncate ${isDisabled ? "text-slate-400 line-through" : "text-slate-700"}` }, data?.title || "Delay"), isDisabled && /* @__PURE__ */ React9.createElement("span", { className: "inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded border border-orange-200" }, /* @__PURE__ */ React9.createElement(VscDebugDisconnect, { className: "w-2.5 h-2.5" }), "Skip")), /* @__PURE__ */ React9.createElement("div", { className: `text-[10px] font-mono mt-0.5 ${isDisabled ? "text-slate-300" : "text-slate-400"}` }, "wait ", getDelayDisplay())), /* @__PURE__ */ React9.createElement("div", { className: "flex flex-col items-center justify-center px-2 border-l border-slate-100" }, /* @__PURE__ */ React9.createElement("div", { className: `w-2 h-2 rounded-full ${isDisabled ? "bg-slate-300" : "bg-amber-400"}`, title: "After Delay" }))), /* @__PURE__ */ React9.createElement(
+    Handle6,
+    {
+      type: "target",
+      position: Position6.Top,
+      isConnectable,
+      style: {
+        width: "10px",
+        height: "10px",
+        backgroundColor: isDisabled ? "#cbd5e1" : "#f59e0b",
+        border: "none",
+        top: "-5px"
+      }
+    }
+  ), /* @__PURE__ */ React9.createElement(
+    Handle6,
+    {
+      type: "source",
+      position: Position6.Bottom,
+      id: "output",
+      isConnectable,
+      style: {
+        width: "10px",
+        height: "10px",
+        backgroundColor: isDisabled ? "#cbd5e1" : "#f59e0b",
+        border: "none",
+        bottom: "-5px"
+      }
+    }
+  ));
+});
+
+// src/nodes/endNode.jsx
+import React10, { memo as memo7, useState as useState7, useEffect as useEffect7, useMemo as useMemo7, useCallback as useCallback7 } from "react";
+import { Handle as Handle7, Position as Position7 } from "reactflow";
+import { JsonForms as JsonForms7 } from "@jsonforms/react";
+var END_STATUS = {
+  SUCCESS: "success",
+  FAILURE: "failure",
+  CANCELLED: "cancelled"
+};
+var OutputParameterEditor = ({ parameters, onChange, availableVariables }) => {
+  const addParameter = () => {
+    const newParam = {
+      id: `output_${Date.now()}`,
+      name: `output${parameters.length + 1}`,
+      sourceVariable: "",
+      description: ""
+    };
+    onChange([...parameters, newParam]);
+  };
+  const updateParameter = (index, field, value) => {
+    const updated = [...parameters];
+    updated[index] = { ...updated[index], [field]: value };
+    onChange(updated);
+  };
+  const removeParameter = (index) => {
+    const updated = parameters.filter((_, i) => i !== index);
+    onChange(updated);
+  };
+  return /* @__PURE__ */ React10.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React10.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React10.createElement("label", { className: "text-xs font-medium text-slate-500" }, "Output Parameters"), /* @__PURE__ */ React10.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: addParameter,
+      className: "flex items-center gap-1 px-2 py-1 text-xs bg-white text-[#646cff] hover:bg-[#646cff]/10 rounded transition-colors border border-slate-200"
+    },
+    /* @__PURE__ */ React10.createElement(FaPlus, { className: "w-2.5 h-2.5" }),
+    "Add Output"
+  )), /* @__PURE__ */ React10.createElement("p", { className: "text-[10px] text-slate-400" }, "Define outputs that will be returned when the workflow completes."), parameters.length === 0 ? /* @__PURE__ */ React10.createElement("div", { className: "text-xs text-slate-400 italic py-3 text-center border border-dashed border-slate-200 rounded" }, "No output parameters defined. Workflow will complete with no output.") : /* @__PURE__ */ React10.createElement("div", { className: "space-y-2" }, parameters.map((param, index) => /* @__PURE__ */ React10.createElement(
+    "div",
+    {
+      key: param.id,
+      className: "border border-slate-200 rounded p-2 bg-slate-50"
+    },
+    /* @__PURE__ */ React10.createElement("div", { className: "flex items-center justify-between mb-2" }, /* @__PURE__ */ React10.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React10.createElement(IoMdArrowDropleft, { className: "w-3 h-3 text-red-500" }), /* @__PURE__ */ React10.createElement(
+      "input",
+      {
+        type: "text",
+        value: param.name,
+        onChange: (e) => updateParameter(index, "name", e.target.value.replace(/[^a-zA-Z0-9_]/g, "")),
+        className: "text-xs font-mono font-medium text-slate-700 bg-white border border-slate-200 rounded px-2 py-1 w-28 focus:outline-none focus:border-[#646cff]",
+        placeholder: "outputName"
+      }
+    )), /* @__PURE__ */ React10.createElement(
+      "button",
+      {
+        type: "button",
+        onClick: () => removeParameter(index),
+        className: "p-1 bg-white text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors",
+        title: "Remove output"
+      },
+      /* @__PURE__ */ React10.createElement(FaTrash, { className: "w-3 h-3" })
+    )),
+    /* @__PURE__ */ React10.createElement("div", null, /* @__PURE__ */ React10.createElement("label", { className: "text-[10px] text-slate-400" }, "Source Variable"), /* @__PURE__ */ React10.createElement(
+      "input",
+      {
+        type: "text",
+        value: param.sourceVariable,
+        onChange: (e) => updateParameter(index, "sourceVariable", e.target.value),
+        placeholder: "ctx.result or a value",
+        className: "w-full text-xs p-1.5 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff]"
+      }
+    ), availableVariables.length > 0 && /* @__PURE__ */ React10.createElement("p", { className: "text-[9px] text-slate-400 mt-0.5" }, "Available: ", availableVariables.slice(0, 5).map((v) => `ctx.${v.variable}`).join(", "), availableVariables.length > 5 && "...")),
+    /* @__PURE__ */ React10.createElement("div", { className: "mt-2" }, /* @__PURE__ */ React10.createElement("label", { className: "text-[10px] text-slate-400" }, "Description"), /* @__PURE__ */ React10.createElement(
+      "input",
+      {
+        type: "text",
+        value: param.description,
+        onChange: (e) => updateParameter(index, "description", e.target.value),
+        placeholder: "What this output represents",
+        className: "w-full text-xs p-1.5 border border-slate-200 rounded bg-white focus:outline-none focus:border-[#646cff]"
+      }
+    ))
+  ))));
+};
+var EndNodeConfigurator = ({ data, onChange, nodeId }) => {
+  const { strings, workflowNodes } = useWorkflowNodes();
+  const [formData, setFormData] = useState7({
+    title: data?.title || "End",
+    description: data?.description || "",
+    status: data?.status || END_STATUS.SUCCESS,
+    outputParameters: data?.outputParameters || []
+  });
+  useEffect7(() => {
+    if (data) {
+      setFormData({
+        title: data.title || "End",
+        description: data.description || "",
+        status: data.status || END_STATUS.SUCCESS,
+        outputParameters: data.outputParameters || []
+      });
+    }
+  }, [data]);
+  const availableVariables = useMemo7(() => {
+    if (!workflowNodes) return [];
+    return workflowNodes.filter((n) => n.id !== nodeId && n.data?.outputVariable).map((n) => ({
+      nodeId: n.id,
+      nodeTitle: n.data?.title || n.type,
+      variable: n.data.outputVariable
+    }));
+  }, [workflowNodes, nodeId]);
+  const schema = useMemo7(() => {
+    return {
+      type: "object",
+      properties: {
+        title: {
+          type: "string",
+          title: "Node Title"
+        },
+        description: {
+          type: "string",
+          title: "Description"
+        },
+        status: {
+          type: "string",
+          title: "Completion Status",
+          enum: Object.values(END_STATUS)
+        }
+      }
+    };
+  }, []);
+  const uischema = useMemo7(() => {
+    return {
+      type: "VerticalLayout",
+      elements: [
+        {
+          type: "Control",
+          scope: "#/properties/title",
+          options: { placeholder: "Enter node title" }
+        },
+        {
+          type: "Control",
+          scope: "#/properties/description",
+          options: { placeholder: "Describe this end point...", multi: true, rows: 2 }
+        },
+        {
+          type: "Control",
+          scope: "#/properties/status",
+          options: {
+            enumLabels: {
+              [END_STATUS.SUCCESS]: "\u2713 Success",
+              [END_STATUS.FAILURE]: "\u2717 Failure",
+              [END_STATUS.CANCELLED]: "\u26A0 Cancelled"
+            }
+          }
+        }
+      ]
+    };
+  }, []);
+  const handleFormChange = useCallback7(({ data: newData }) => {
+    setFormData((prev) => ({ ...prev, ...newData }));
+  }, []);
+  const handleParametersChange = useCallback7((newParams) => {
+    setFormData((prev) => ({ ...prev, outputParameters: newParams }));
+  }, []);
+  const handleSave = useCallback7(() => {
+    onChange(formData);
+  }, [onChange, formData]);
+  return /* @__PURE__ */ React10.createElement("div", { className: "w-full h-full" }, /* @__PURE__ */ React10.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React10.createElement(
+    JsonForms7,
+    {
+      schema,
+      uischema,
+      data: formData,
+      renderers: jetFormsRenderers,
+      onChange: handleFormChange
+    }
+  ), /* @__PURE__ */ React10.createElement("div", { className: "border-t border-slate-100 pt-4" }, /* @__PURE__ */ React10.createElement(
+    OutputParameterEditor,
+    {
+      parameters: formData.outputParameters,
+      onChange: handleParametersChange,
+      availableVariables
+    }
+  )), /* @__PURE__ */ React10.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: handleSave,
+      className: "px-3 py-1.5 text-sm text-white bg-[#646cff] rounded hover:bg-[#5558dd] focus:ring-4 focus:outline-none focus:ring-[#646cff]/30"
+    },
+    "Save"
+  )));
+};
+var EndNode = memo7(({ id, data, isConnectable }) => {
+  const { strings, nodeExecutionStatus } = useWorkflowNodes();
+  const executionStatus = nodeExecutionStatus?.[id] || "idle";
+  const status = data?.status || END_STATUS.SUCCESS;
+  const outputParams = data?.outputParameters || [];
+  const outputCount = outputParams.length;
+  const getStatusConfig = () => {
+    switch (status) {
+      case END_STATUS.SUCCESS:
+        return {
+          color: "green",
+          bgColor: "bg-green-50",
+          borderColor: "border-green-100",
+          textColor: "text-green-500",
+          hoverBorder: "hover:border-green-400",
+          handleColor: "#22c55e",
+          icon: FaCheck,
+          label: "Success"
+        };
+      case END_STATUS.FAILURE:
+        return {
+          color: "red",
+          bgColor: "bg-red-50",
+          borderColor: "border-red-100",
+          textColor: "text-red-500",
+          hoverBorder: "hover:border-red-400",
+          handleColor: "#ef4444",
+          icon: FaTimes,
+          label: "Failure"
+        };
+      case END_STATUS.CANCELLED:
+        return {
+          color: "amber",
+          bgColor: "bg-amber-50",
+          borderColor: "border-amber-100",
+          textColor: "text-amber-500",
+          hoverBorder: "hover:border-amber-400",
+          handleColor: "#f59e0b",
+          icon: FaExclamationTriangle,
+          label: "Cancelled"
+        };
+      default:
+        return {
+          color: "slate",
+          bgColor: "bg-slate-50",
+          borderColor: "border-slate-100",
+          textColor: "text-slate-500",
+          hoverBorder: "hover:border-slate-400",
+          handleColor: "#94a3b8",
+          icon: VscDebugStop,
+          label: "End"
+        };
+    }
+  };
+  const getExecutionStatusStyles = () => {
+    switch (executionStatus) {
+      case "running":
+        return "border-blue-400 ring-2 ring-blue-300 ring-opacity-50 animate-pulse";
+      case "completed":
+        return "border-green-400 ring-2 ring-green-300 ring-opacity-50";
+      case "failed":
+        return "border-red-400 ring-2 ring-red-300 ring-opacity-50";
+      case "skipped":
+        return "border-orange-300 opacity-60";
+      default:
+        return "border-slate-200";
+    }
+  };
+  const ExecutionIndicator = () => {
+    if (executionStatus === "running") {
+      return /* @__PURE__ */ React10.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center animate-spin z-10" }, /* @__PURE__ */ React10.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React10.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" })));
+    }
+    if (executionStatus === "completed") {
+      return /* @__PURE__ */ React10.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ React10.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React10.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" })));
+    }
+    if (executionStatus === "failed") {
+      return /* @__PURE__ */ React10.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ React10.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React10.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M6 18L18 6M6 6l12 12" })));
+    }
+    return null;
+  };
+  const statusConfig = getStatusConfig();
+  const StatusIcon = statusConfig.icon;
+  return /* @__PURE__ */ React10.createElement("div", { className: `
+      relative bg-white border rounded
+      min-w-[280px] max-w-[350px]
+      transition-all duration-150
+      ${getExecutionStatusStyles()} ${statusConfig.hoverBorder} hover:shadow-md
+    ` }, /* @__PURE__ */ React10.createElement(ExecutionIndicator, null), /* @__PURE__ */ React10.createElement(
+    Handle7,
+    {
+      type: "target",
+      position: Position7.Top,
+      isConnectable,
+      style: {
+        width: "10px",
+        height: "10px",
+        backgroundColor: statusConfig.handleColor,
+        border: "none",
+        top: "-5px"
+      }
+    }
+  ), /* @__PURE__ */ React10.createElement("div", { className: "flex items-stretch" }, /* @__PURE__ */ React10.createElement(
+    "div",
+    {
+      style: {
+        borderTopLeftRadius: "0.25rem",
+        borderBottomLeftRadius: "0.25rem"
+      },
+      className: `
+            flex flex-col items-center justify-center px-3 py-3 border-r
+            ${executionStatus === "running" ? "bg-blue-100 border-blue-200" : executionStatus === "completed" ? "bg-green-100 border-green-200" : executionStatus === "failed" ? "bg-red-50 border-red-100" : `${statusConfig.bgColor} ${statusConfig.borderColor}`}
+          `
+    },
+    /* @__PURE__ */ React10.createElement(StatusIcon, { className: `w-5 h-5 ${executionStatus === "running" ? "text-blue-600" : executionStatus === "completed" ? "text-green-600" : executionStatus === "failed" ? "text-red-600" : statusConfig.textColor}` })
+  ), /* @__PURE__ */ React10.createElement("div", { className: "flex-1 px-3 py-2 min-w-0" }, /* @__PURE__ */ React10.createElement("div", { className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ React10.createElement("span", { className: "text-xs font-semibold truncate text-slate-700" }, data?.title || "End"), /* @__PURE__ */ React10.createElement("span", { className: `text-xs font-medium px-1.5 py-0.5 rounded border ${statusConfig.bgColor} ${statusConfig.textColor} ${statusConfig.borderColor}` }, statusConfig.label)), /* @__PURE__ */ React10.createElement("div", { className: "text-[10px] mt-0.5 text-slate-400" }, outputCount === 0 ? "No outputs defined" : `${outputCount} output${outputCount !== 1 ? "s" : ""}: ${outputParams.slice(0, 3).map((p) => p.name).join(", ")}${outputCount > 3 ? "..." : ""}`)), /* @__PURE__ */ React10.createElement("div", { className: "flex flex-col items-center justify-center px-2 border-l border-slate-100" }, /* @__PURE__ */ React10.createElement("div", { className: `w-2 h-2 rounded-full`, style: { backgroundColor: statusConfig.handleColor }, title: statusConfig.label }))));
+});
+
 // src/map.js
-import React7 from "react";
+import React11 from "react";
 var WORKFLOW_NODE_TYPES = {
+  START: { value: "start", label: "Start" },
   DATA_QUERY: { value: "dataQuery", label: "Data Query" },
   JAVASCRIPT: { value: "javascript", label: "Javascript" },
-  CONDITION: { value: "condition", label: "Condition" }
+  CONDITION: { value: "condition", label: "Condition" },
+  LOOP: { value: "loop", label: "Loop" },
+  DELAY: { value: "delay", label: "Delay" },
+  END: { value: "end", label: "End" }
 };
 var WORKFLOW_NODES_MAP = {
   [WORKFLOW_NODE_TYPES.DATA_QUERY.value]: {
@@ -3333,22 +2512,97 @@ var WORKFLOW_NODES_MAP = {
     value: WORKFLOW_NODE_TYPES.DATA_QUERY.value,
     component: DataQueryNode,
     configurator: DataQueryNodeConfigurator,
-    defaultValue: { dataQueryID: "", label: "Data Query", args: {} },
+    defaultValue: {
+      title: "Data Query",
+      description: "",
+      dataQueryID: "",
+      args: {},
+      outputVariable: "queryResult",
+      timeoutSeconds: 300,
+      retryLimit: 0,
+      retryDelaySeconds: 5,
+      errorHandling: "fail_workflow",
+      isDisabled: false
+    },
     schema: {
       type: "object",
       properties: {
-        label: { type: "string", title: "Node Name" },
-        dataQueryID: { type: "string", title: "Data Query", enum: [] }
-        // Enum populated dynamically
+        title: { type: "string", title: "Node Title" },
+        description: { type: "string", title: "Description" },
+        dataQueryID: { type: "string", title: "Data Query" },
+        // Schema populated dynamically in DataQueryNodeConfigurator
+        outputVariable: {
+          type: "string",
+          title: "Output Variable Name",
+          pattern: "^[a-zA-Z_][a-zA-Z0-9_]*$",
+          default: "queryResult"
+        },
+        timeoutSeconds: {
+          type: "integer",
+          title: "Timeout (seconds)",
+          minimum: 1,
+          maximum: 3600,
+          default: 300
+        },
+        retryLimit: {
+          type: "integer",
+          title: "Retry Attempts",
+          minimum: 0,
+          maximum: 10,
+          default: 0
+        },
+        retryDelaySeconds: {
+          type: "integer",
+          title: "Retry Delay (seconds)",
+          minimum: 1,
+          maximum: 300,
+          default: 5
+        },
+        errorHandling: {
+          type: "string",
+          title: "Error Behavior",
+          enum: ["fail_workflow", "continue", "retry_then_continue", "retry_then_fail"],
+          default: "fail_workflow"
+        },
+        isDisabled: {
+          type: "boolean",
+          title: "Skip this node",
+          default: false
+        }
         // Args added dynamically
       },
       required: ["dataQueryID"]
     },
     uischema: {
-      type: "VerticalLayout",
+      type: "Categorization",
       elements: [
-        { type: "Control", scope: "#/properties/label" },
-        { type: "Control", scope: "#/properties/dataQueryID" }
+        {
+          type: "Category",
+          label: "General",
+          elements: [
+            { type: "Control", scope: "#/properties/title" },
+            { type: "Control", scope: "#/properties/description", options: { multi: true, rows: 2 } },
+            { type: "Control", scope: "#/properties/dataQueryID" }
+          ]
+        },
+        {
+          type: "Category",
+          label: "Output",
+          elements: [
+            { type: "Control", scope: "#/properties/outputVariable" }
+          ]
+        },
+        {
+          type: "Category",
+          label: "Advanced",
+          elements: [
+            { type: "Control", scope: "#/properties/timeoutSeconds" },
+            { type: "Control", scope: "#/properties/retryLimit" },
+            { type: "Control", scope: "#/properties/retryDelaySeconds" },
+            { type: "Control", scope: "#/properties/errorHandling" },
+            { type: "Control", scope: "#/properties/isDisabled" }
+          ]
+        }
       ]
     }
   },
@@ -3356,23 +2610,94 @@ var WORKFLOW_NODES_MAP = {
     label: WORKFLOW_NODE_TYPES.JAVASCRIPT.label,
     value: WORKFLOW_NODE_TYPES.JAVASCRIPT.value,
     component: JavascriptNode,
-    defaultValue: { label: "Script", code: "return true;" },
+    configurator: JavascriptNodeConfigurator,
+    defaultValue: {
+      title: "JavaScript",
+      description: "",
+      code: "// Your JavaScript code here\n// Access context: ctx.variableName\n// Return a value to store in outputVariable\nreturn true;",
+      outputVariable: "scriptResult",
+      timeoutSeconds: 30,
+      retryLimit: 0,
+      retryDelaySeconds: 5,
+      errorHandling: "fail_workflow",
+      isDisabled: false
+    },
     schema: {
       type: "object",
       properties: {
-        label: { type: "string", title: "Node Name" },
-        code: { type: "string", title: "Code", description: "JavaScript code to execute" }
+        title: { type: "string", title: "Node Title" },
+        description: { type: "string", title: "Description" },
+        code: { type: "string", title: "JavaScript Code" },
+        outputVariable: {
+          type: "string",
+          title: "Output Variable Name",
+          pattern: "^[a-zA-Z_][a-zA-Z0-9_]*$",
+          default: "scriptResult"
+        },
+        timeoutSeconds: {
+          type: "integer",
+          title: "Timeout (seconds)",
+          minimum: 1,
+          maximum: 300,
+          default: 30
+        },
+        retryLimit: {
+          type: "integer",
+          title: "Retry Attempts",
+          minimum: 0,
+          maximum: 10,
+          default: 0
+        },
+        retryDelaySeconds: {
+          type: "integer",
+          title: "Retry Delay (seconds)",
+          minimum: 1,
+          maximum: 300,
+          default: 5
+        },
+        errorHandling: {
+          type: "string",
+          title: "Error Behavior",
+          enum: ["fail_workflow", "continue", "retry_then_continue", "retry_then_fail"],
+          default: "fail_workflow"
+        },
+        isDisabled: {
+          type: "boolean",
+          title: "Skip this node",
+          default: false
+        }
       },
       required: ["code"]
     },
     uischema: {
-      type: "VerticalLayout",
+      type: "Categorization",
       elements: [
-        { type: "Control", scope: "#/properties/label" },
         {
-          type: "Control",
-          scope: "#/properties/code",
-          options: { multi: true, rows: 10, format: "javascript" }
+          type: "Category",
+          label: "General",
+          elements: [
+            { type: "Control", scope: "#/properties/title" },
+            { type: "Control", scope: "#/properties/description", options: { multi: true, rows: 2 } },
+            { type: "Control", scope: "#/properties/code", options: { format: "code-javascript", multi: true, rows: 12 } }
+          ]
+        },
+        {
+          type: "Category",
+          label: "Output",
+          elements: [
+            { type: "Control", scope: "#/properties/outputVariable" }
+          ]
+        },
+        {
+          type: "Category",
+          label: "Advanced",
+          elements: [
+            { type: "Control", scope: "#/properties/timeoutSeconds" },
+            { type: "Control", scope: "#/properties/retryLimit" },
+            { type: "Control", scope: "#/properties/retryDelaySeconds" },
+            { type: "Control", scope: "#/properties/errorHandling" },
+            { type: "Control", scope: "#/properties/isDisabled" }
+          ]
         }
       ]
     }
@@ -3381,44 +2706,402 @@ var WORKFLOW_NODES_MAP = {
     label: WORKFLOW_NODE_TYPES.CONDITION.label,
     value: WORKFLOW_NODE_TYPES.CONDITION.value,
     component: ConditionNode,
-    defaultValue: { label: "Condition", condition: "true" },
+    configurator: ConditionNodeConfigurator,
+    defaultValue: {
+      title: "Condition",
+      description: "",
+      branches: [
+        {
+          id: "branch_1",
+          name: "Branch 1",
+          conditionType: "expression",
+          expression: "true",
+          leftOperand: "",
+          rightOperand: ""
+        }
+      ],
+      evaluationMode: "first_match",
+      errorHandling: "fail_workflow",
+      isDisabled: false
+    },
     schema: {
       type: "object",
       properties: {
-        label: { type: "string", title: "Node Name" },
-        condition: { type: "string", title: "Condition Expression", description: "Evaluates to true/false" }
+        title: { type: "string", title: "Node Title" },
+        description: { type: "string", title: "Description" },
+        branches: {
+          type: "array",
+          title: "Condition Branches",
+          items: {
+            type: "object",
+            properties: {
+              id: { type: "string" },
+              name: { type: "string", title: "Branch Name" },
+              conditionType: {
+                type: "string",
+                title: "Condition Type",
+                enum: ["expression", "equals", "not_equals", "contains", "greater_than", "less_than", "is_empty", "is_not_empty", "regex"]
+              },
+              expression: { type: "string", title: "Expression" },
+              leftOperand: { type: "string", title: "Left Operand" },
+              rightOperand: { type: "string", title: "Right Operand" }
+            }
+          }
+        },
+        evaluationMode: {
+          type: "string",
+          title: "Evaluation Mode",
+          enum: ["first_match", "all_matches"],
+          default: "first_match"
+        },
+        errorHandling: {
+          type: "string",
+          title: "Error Behavior",
+          enum: ["fail_workflow", "continue_default"],
+          default: "fail_workflow"
+        },
+        isDisabled: {
+          type: "boolean",
+          title: "Skip this node",
+          default: false
+        }
       },
-      required: ["condition"]
+      required: ["branches"]
+    },
+    uischema: {
+      type: "Categorization",
+      elements: [
+        {
+          type: "Category",
+          label: "General",
+          elements: [
+            { type: "Control", scope: "#/properties/title" },
+            { type: "Control", scope: "#/properties/description", options: { multi: true, rows: 2 } }
+          ]
+        },
+        {
+          type: "Category",
+          label: "Advanced",
+          elements: [
+            { type: "Control", scope: "#/properties/evaluationMode" },
+            { type: "Control", scope: "#/properties/errorHandling" },
+            { type: "Control", scope: "#/properties/isDisabled" }
+          ]
+        }
+      ]
+    }
+  },
+  [WORKFLOW_NODE_TYPES.START.value]: {
+    label: WORKFLOW_NODE_TYPES.START.label,
+    value: WORKFLOW_NODE_TYPES.START.value,
+    component: StartNode,
+    configurator: StartNodeConfigurator,
+    defaultValue: {
+      title: "Start",
+      description: "",
+      inputParameters: []
+    },
+    schema: {
+      type: "object",
+      properties: {
+        title: { type: "string", title: "Node Title" },
+        description: { type: "string", title: "Description" },
+        inputParameters: {
+          type: "array",
+          title: "Input Parameters",
+          items: {
+            type: "object",
+            properties: {
+              id: { type: "string" },
+              name: { type: "string", title: "Parameter Name", pattern: "^[a-zA-Z_][a-zA-Z0-9_]*$" },
+              type: { type: "string", title: "Type", enum: ["string", "number", "boolean", "object", "array"] },
+              required: { type: "boolean", title: "Required", default: false },
+              defaultValue: { type: "string", title: "Default Value" },
+              description: { type: "string", title: "Description" }
+            }
+          }
+        }
+      }
     },
     uischema: {
       type: "VerticalLayout",
       elements: [
-        { type: "Control", scope: "#/properties/label" },
-        { type: "Control", scope: "#/properties/condition" }
+        { type: "Control", scope: "#/properties/title" },
+        { type: "Control", scope: "#/properties/description", options: { multi: true, rows: 2 } }
+      ]
+    }
+  },
+  [WORKFLOW_NODE_TYPES.LOOP.value]: {
+    label: WORKFLOW_NODE_TYPES.LOOP.label,
+    value: WORKFLOW_NODE_TYPES.LOOP.value,
+    component: LoopNode,
+    configurator: LoopNodeConfigurator,
+    defaultValue: {
+      title: "Loop",
+      description: "",
+      sourceVariable: "",
+      itemVariable: "item",
+      indexVariable: "index",
+      maxIterations: 1e3,
+      batchSize: 1,
+      delayBetweenItems: 0,
+      errorHandling: "fail_workflow",
+      isDisabled: false
+    },
+    schema: {
+      type: "object",
+      properties: {
+        title: { type: "string", title: "Node Title" },
+        description: { type: "string", title: "Description" },
+        sourceVariable: { type: "string", title: "Source Array" },
+        itemVariable: { type: "string", title: "Item Variable Name", pattern: "^[a-zA-Z_][a-zA-Z0-9_]*$", default: "item" },
+        indexVariable: { type: "string", title: "Index Variable Name", pattern: "^[a-zA-Z_][a-zA-Z0-9_]*$", default: "index" },
+        maxIterations: { type: "integer", title: "Max Iterations", minimum: 1, maximum: 1e5, default: 1e3 },
+        batchSize: { type: "integer", title: "Batch Size", minimum: 1, maximum: 100, default: 1 },
+        delayBetweenItems: { type: "integer", title: "Delay Between Items (ms)", minimum: 0, maximum: 6e4, default: 0 },
+        errorHandling: { type: "string", title: "Error Behavior", enum: ["fail_workflow", "continue", "skip_item"], default: "fail_workflow" },
+        isDisabled: { type: "boolean", title: "Skip this node", default: false }
+      },
+      required: ["sourceVariable", "itemVariable"]
+    },
+    uischema: {
+      type: "Categorization",
+      elements: [
+        {
+          type: "Category",
+          label: "General",
+          elements: [
+            { type: "Control", scope: "#/properties/title" },
+            { type: "Control", scope: "#/properties/description", options: { multi: true, rows: 2 } }
+          ]
+        },
+        {
+          type: "Category",
+          label: "Loop Config",
+          elements: [
+            { type: "Control", scope: "#/properties/sourceVariable" },
+            { type: "Control", scope: "#/properties/itemVariable" },
+            { type: "Control", scope: "#/properties/indexVariable" }
+          ]
+        },
+        {
+          type: "Category",
+          label: "Advanced",
+          elements: [
+            { type: "Control", scope: "#/properties/maxIterations" },
+            { type: "Control", scope: "#/properties/batchSize" },
+            { type: "Control", scope: "#/properties/delayBetweenItems" },
+            { type: "Control", scope: "#/properties/errorHandling" },
+            { type: "Control", scope: "#/properties/isDisabled" }
+          ]
+        }
+      ]
+    }
+  },
+  [WORKFLOW_NODE_TYPES.DELAY.value]: {
+    label: WORKFLOW_NODE_TYPES.DELAY.label,
+    value: WORKFLOW_NODE_TYPES.DELAY.value,
+    component: DelayNode,
+    configurator: DelayNodeConfigurator,
+    defaultValue: {
+      title: "Delay",
+      description: "",
+      delayType: "fixed",
+      delayMs: 0,
+      delaySeconds: 1,
+      delayMinutes: 0,
+      delayVariable: "",
+      untilTime: "",
+      isDisabled: false
+    },
+    schema: {
+      type: "object",
+      properties: {
+        title: { type: "string", title: "Node Title" },
+        description: { type: "string", title: "Description" },
+        delayType: { type: "string", title: "Delay Type", enum: ["fixed", "dynamic", "until"], default: "fixed" },
+        delayMs: { type: "integer", title: "Milliseconds", minimum: 0, maximum: 999, default: 0 },
+        delaySeconds: { type: "integer", title: "Seconds", minimum: 0, maximum: 59, default: 1 },
+        delayMinutes: { type: "integer", title: "Minutes", minimum: 0, maximum: 1440, default: 0 },
+        delayVariable: { type: "string", title: "Delay Variable" },
+        untilTime: { type: "string", title: "Until Time" },
+        isDisabled: { type: "boolean", title: "Skip this node", default: false }
+      }
+    },
+    uischema: {
+      type: "Categorization",
+      elements: [
+        {
+          type: "Category",
+          label: "General",
+          elements: [
+            { type: "Control", scope: "#/properties/title" },
+            { type: "Control", scope: "#/properties/description", options: { multi: true, rows: 2 } }
+          ]
+        },
+        {
+          type: "Category",
+          label: "Delay Config",
+          elements: [
+            { type: "Control", scope: "#/properties/delayType" },
+            { type: "Control", scope: "#/properties/delayMinutes" },
+            { type: "Control", scope: "#/properties/delaySeconds" },
+            { type: "Control", scope: "#/properties/delayMs" }
+          ]
+        },
+        {
+          type: "Category",
+          label: "Advanced",
+          elements: [
+            { type: "Control", scope: "#/properties/isDisabled" }
+          ]
+        }
+      ]
+    }
+  },
+  [WORKFLOW_NODE_TYPES.END.value]: {
+    label: WORKFLOW_NODE_TYPES.END.label,
+    value: WORKFLOW_NODE_TYPES.END.value,
+    component: EndNode,
+    configurator: EndNodeConfigurator,
+    defaultValue: {
+      title: "End",
+      description: "",
+      status: "success",
+      outputParameters: []
+    },
+    schema: {
+      type: "object",
+      properties: {
+        title: { type: "string", title: "Node Title" },
+        description: { type: "string", title: "Description" },
+        status: {
+          type: "string",
+          title: "Completion Status",
+          enum: ["success", "failure", "cancelled"],
+          default: "success"
+        },
+        outputParameters: {
+          type: "array",
+          title: "Output Parameters",
+          items: {
+            type: "object",
+            properties: {
+              id: { type: "string" },
+              name: { type: "string", title: "Output Name", pattern: "^[a-zA-Z_][a-zA-Z0-9_]*$" },
+              sourceVariable: { type: "string", title: "Source Variable" },
+              description: { type: "string", title: "Description" }
+            }
+          }
+        }
+      }
+    },
+    uischema: {
+      type: "VerticalLayout",
+      elements: [
+        { type: "Control", scope: "#/properties/title" },
+        { type: "Control", scope: "#/properties/description", options: { multi: true, rows: 2 } },
+        { type: "Control", scope: "#/properties/status" }
       ]
     }
   }
 };
+
+// src/StatusIndicator.jsx
+import React12 from "react";
+var StatusIndicator = ({ executionStatus }) => {
+  if (executionStatus === "running") {
+    return /* @__PURE__ */ React12.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center animate-spin z-10" }, /* @__PURE__ */ React12.createElement(TbRefresh, { className: "w-3 h-3 text-white" }));
+  }
+  if (executionStatus === "completed") {
+    return /* @__PURE__ */ React12.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ React12.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React12.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" })));
+  }
+  if (executionStatus === "failed") {
+    return /* @__PURE__ */ React12.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ React12.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React12.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M6 18L18 6M6 6l12 12" })));
+  }
+  return null;
+};
+var getStatusStyles = (executionStatus, defaultHoverColor = "blue-400") => {
+  switch (executionStatus) {
+    case "running":
+      return "border-blue-400 ring-2 ring-blue-300 ring-opacity-50 animate-pulse";
+    case "completed":
+      return "border-green-400 ring-2 ring-green-300 ring-opacity-50";
+    case "failed":
+      return "border-red-400 ring-2 ring-red-300 ring-opacity-50";
+    case "skipped":
+      return "border-orange-300 opacity-60";
+    default:
+      return `border-slate-200 hover:border-${defaultHoverColor} hover:shadow-md`;
+  }
+};
+var getIconColor = (executionStatus, defaultColor) => {
+  switch (executionStatus) {
+    case "running":
+      return "text-blue-600";
+    case "completed":
+      return "text-green-600";
+    case "failed":
+      return "text-red-600";
+    default:
+      return defaultColor;
+  }
+};
+var getStatusBgColor = (executionStatus, defaultBg) => {
+  switch (executionStatus) {
+    case "running":
+      return "bg-blue-100 border-blue-200";
+    case "completed":
+      return "bg-green-50 border-green-100";
+    case "failed":
+      return "bg-red-50 border-red-100";
+    default:
+      return defaultBg;
+  }
+};
 export {
   ConditionNode,
+  ConditionNodeConfigurator,
   DataQueryNode,
   DataQueryNodeConfigurator,
+  DelayNode,
+  DelayNodeConfigurator,
+  EndNode,
+  EndNodeConfigurator,
   JavascriptNode,
+  JavascriptNodeConfigurator,
+  LoopNode,
+  LoopNodeConfigurator,
+  NODE_EXECUTION_STATUS,
+  StartNode,
+  StartNodeConfigurator,
+  StatusIndicator,
   WORKFLOW_NODES_MAP,
   WORKFLOW_NODE_TYPES,
+  JetCheckboxControl as WorkflowCheckboxControl,
+  JetDynamicArgsControl as WorkflowDynamicArgsControl,
+  JetGroupLayout as WorkflowGroupLayout,
   WorkflowNodesProvider,
-  useWorkflowNodes
+  JetNumberControl as WorkflowNumberControl,
+  JetSelectControl as WorkflowSelectControl,
+  JetTabLayout as WorkflowTabLayout,
+  JetTextControl as WorkflowTextControl,
+  JetVerticalLayout as WorkflowVerticalLayout,
+  checkboxTester,
+  dynamicArgsTester,
+  getIconColor,
+  getStatusBgColor,
+  getStatusStyles,
+  groupLayoutTester,
+  jetFormsBaseRenderers,
+  jetFormsRenderers2 as jetFormsRenderers,
+  numberInputTester,
+  selectInputTester,
+  tabRendererTester,
+  textInputTester,
+  useNodeExecutionStatus,
+  useWorkflowNodes,
+  verticalLayoutTester,
+  jetFormsRenderers as workflowNodeRenderers
 };
-/*! Bundled license information:
-
-react-is/cjs/react-is.development.js:
-  (** @license React v16.13.1
-   * react-is.development.js
-   *
-   * Copyright (c) Facebook, Inc. and its affiliates.
-   *
-   * This source code is licensed under the MIT license found in the
-   * LICENSE file in the root directory of this source tree.
-   *)
-*/
 //# sourceMappingURL=index.mjs.map

@@ -63,7 +63,7 @@ export const DataQueryTestingPanel = ({
                   setDataQueryTestResult={setDataQueryTestResult}
                 />
               </div>
-              <div className="w-full h-[calc(100%-70px)] mt-3 border-t border-t-slate-200">
+              <div className="w-full !h-[calc(100%-50px)] mt-3 border-t border-t-slate-200">
                 {DATASOURCE_UI_COMPONENTS[
                   selectedQueryForTesting?.datasourceType
                 ]?.queryResponseView({

@@ -86,7 +86,7 @@ socketIO.on("connection", async (socket) => {
   socket.on(
     constants.SOCKET_RECEIVE_EVENTS.WORKFLOW_RUN_JOIN,
     async (data) => {
-      const { workflowSocketController } = require("./modules/workflow/controllers/workflow.socket.controller");
+      const { workflowSocketController } = require("./modules/workflow/workflow.socket.controller");
       await workflowSocketController.onWorkflowRunJoin({
         socket,
         runId: data.runId,
@@ -110,19 +110,38 @@ socketIO.on("connection", async (socket) => {
 
 // Start the server
 const port = environment.PORT;
-httpServer.listen(port, () => {
+httpServer.listen(port, async () => {
   Logger.log("success", {
     message: "server started listening",
     params: { port },
   });
   console.log("truncate name", stringUtils.truncateName("Hello World", 5));
   cronJobService.scheduleAllCronJobs();
+
+  // Start workflow workers (if RabbitMQ is available)
+  try {
+    const { startWorkflowWorkers } = require("./modules/workflow/workflowWorkers");
+    await startWorkflowWorkers();
+    Logger.log("success", { message: "workflow workers started" });
+  } catch (error) {
+    Logger.log("warning", { message: "workflow workers not started", params: { error: error.message } });
+  }
 });
 
 // Graceful shutdown
-process.on("SIGINT", () => {
+process.on("SIGINT", async () => {
   Logger.log("info", { message: "shutting down server" });
+
+  // Stop workflow workers
+  try {
+    const { stopWorkflowWorkers } = require("./modules/workflow/workflowWorkers");
+    await stopWorkflowWorkers();
+  } catch (error) {
+    // Ignore cleanup errors
+  }
+
   httpServer.close(() => {
     process.exit(0);
   });
 });
+

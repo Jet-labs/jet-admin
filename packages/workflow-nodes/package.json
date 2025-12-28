@@ -15,18 +15,19 @@
     "dist"
   ],
   "scripts": {
-    "build": "esbuild src/index.js --bundle --outfile=dist/index.mjs --loader:.js=jsx --format=esm --sourcemap --external:react --external:react-dom --external:reactflow && esbuild src/index.js --bundle --outfile=dist/index.cjs --loader:.js=jsx --format=cjs --sourcemap --external:react --external:react-dom --external:reactflow",
+    "build": "esbuild src/index.js --bundle --outfile=dist/index.mjs --loader:.js=jsx --format=esm --sourcemap --external:react --external:react-dom --external:reactflow --external:@jsonforms/core --external:@jsonforms/react --external:@jet-admin/json-forms-renderers && esbuild src/index.js --bundle --outfile=dist/index.cjs --loader:.js=jsx --format=cjs --sourcemap --external:react --external:react-dom --external:reactflow --external:@jsonforms/core --external:@jsonforms/react --external:@jet-admin/json-forms-renderers",
     "dev": "npm run build -- --watch"
   },
   "peerDependencies": {
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "reactflow": "^11.11.4"
+    "reactflow": "^11.11.4",
+    "@jsonforms/core": "^3.5.1",
+    "@jsonforms/react": "^3.5.1",
+    "@jet-admin/json-forms-renderers": "^1.0.0"
   },
   "devDependencies": {
     "esbuild": "^0.25.3"
-  },
-  "dependencies": {
-    "formik": "^2.4.9"
   }
 }
+

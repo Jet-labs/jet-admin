@@ -1,14 +1,18 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useState, useMemo } from "react";
 import ReactFlow, {
     ReactFlowProvider,
     Controls,
     MiniMap,
     Background,
+    Panel,
+    useReactFlow,
     applyNodeChanges, // Required to handle dragging/selection
     applyEdgeChanges, // Required to handle edge interactions
-    addEdge           // Required to create valid connections
+    addEdge,          // Required to create valid connections
+    ConnectionLineType,
 } from "reactflow";
 import "reactflow/dist/style.css"; // Ensure styles are imported
+import dagre from "dagre";
 
 import { v4 as uuidv4 } from "uuid";
 import PropTypes from "prop-types";
@@ -22,9 +26,62 @@ import {
     ResizablePanelGroup,
 } from "../ui/resizable";
 import { SiQuantconnect } from "react-icons/si";
-import { FaCode, FaCodeBranch } from "react-icons/fa";
-import { useWorkflowState } from "../../../logic/contexts/workflowContext";
+import { FaCode, FaCodeBranch, FaPlay, FaStop } from "react-icons/fa";
+import { TbLayoutDistributeHorizontal, TbRepeat } from "react-icons/tb";
+import { VscJson, VscTerminal } from "react-icons/vsc";
+import { IoMdTime } from "react-icons/io";
+import { useWorkflowState, useWorkflowActions } from "../../../logic/contexts/workflowContext";
 import { WorkflowNodeConfigPanel } from "./workflowNodeConfigPanel";
+import { WorkflowSchemaPanel } from "./workflowSchemaPanel";
+import { WorkflowConsole } from "./workflowConsole";
+import { useParams } from "react-router-dom";
+
+// Dagre graph for auto-layout
+const dagreGraph = new dagre.graphlib.Graph();
+dagreGraph.setDefaultEdgeLabel(() => ({}));
+
+// Node dimensions for layout calculation
+const NODE_WIDTH = 340;
+const NODE_HEIGHT = 80;
+
+/**
+ * Auto-layout nodes using dagre algorithm
+ * @param {Array} nodes - React Flow nodes
+ * @param {Array} edges - React Flow edges
+ * @param {string} direction - Layout direction: 'LR' (left-right) or 'TB' (top-bottom)
+ * @returns {Array} Nodes with updated positions
+ */
+const getLayoutedNodes = (nodes, edges, direction = "LR") => {
+    dagreGraph.setGraph({ rankdir: direction, nodesep: 80, ranksep: 120 });
+
+    // Clear existing nodes/edges
+    dagreGraph.nodes().forEach((n) => dagreGraph.removeNode(n));
+
+    // Add nodes to dagre
+    nodes.forEach((node) => {
+        dagreGraph.setNode(node.id, { width: NODE_WIDTH, height: NODE_HEIGHT });
+    });
+
+    // Add edges to dagre
+    edges.forEach((edge) => {
+        dagreGraph.setEdge(edge.source, edge.target);
+    });
+
+    // Run the layout
+    dagre.layout(dagreGraph);
+
+    // Apply positions back to React Flow nodes
+    return nodes.map((node) => {
+        const nodeWithPosition = dagreGraph.node(node.id);
+        return {
+            ...node,
+            position: {
+                x: nodeWithPosition.x - NODE_WIDTH / 2,
+                y: nodeWithPosition.y - NODE_HEIGHT / 2,
+            },
+        };
+    });
+};
 
 // Create nodeTypes from the map
 const nodeTypes = Object.entries(WORKFLOW_NODES_MAP).reduce((acc, [key, node]) => {
@@ -37,11 +94,51 @@ const edgeTypes = Object.entries(WORKFLOW_EDGES_MAP).reduce((acc, [key, edge]) =
     return acc;
 }, {});
 
+// Fit View Button Component (must be inside ReactFlow)
+const FitViewButton = () => {
+    const { fitView } = useReactFlow();
+    return (
+        <Panel position="top-right">
+            <button
+                onClick={() => fitView({ padding: 0.2, maxZoom: 1.5, duration: 300 })}
+                className="px-2 py-1 text-xs bg-white border border-slate-200 rounded shadow-sm hover:bg-slate-50 transition-colors"
+                title="Fit View"
+            >
+                Fit View
+            </button>
+        </Panel>
+    );
+};
+
 export const WorkflowEditor = ({ workflowEditorForm }) => {
     // Destructure for cleaner access
     const { values, setFieldValue, errors, handleChange, handleBlur } = workflowEditorForm;
+    const { tenantID } = useParams();
     const { dataQueries } = useWorkflowState();
+    const { refetchDataQueries } = useWorkflowActions();
     const [selectedNodeId, setSelectedNodeId] = useState(null);
+    const [showSchemaPanel, setShowSchemaPanel] = useState(false);
+    const [showConsole, setShowConsole] = useState(false);
+    const [consoleLogs, setConsoleLogs] = useState([]);
+    const [isTestRunning, setIsTestRunning] = useState(false);
+    const [testResult, setTestResult] = useState(null);
+    const [nodeExecutionStatus, setNodeExecutionStatus] = useState({}); // Map of nodeId -> status
+
+    // Helper to add log entry
+    const addLog = useCallback((type, label, message, extra = {}) => {
+        setConsoleLogs(prev => [...prev, {
+            type,
+            label,
+            message,
+            timestamp: Date.now(),
+            ...extra,
+        }]);
+    }, []);
+
+    // Clear console logs
+    const clearLogs = useCallback(() => {
+        setConsoleLogs([]);
+    }, []);
 
     // 1. Handle Node Changes (Dragging, selecting, deleting)
     const onNodesChange = useCallback(
@@ -64,14 +161,20 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
     // 3. Handle Connections between nodes
     const onConnect = useCallback(
         (connection) => {
-            let type = 'deletable'; // Default type
-            if (connection.sourceHandle === 'error') {
-                type = 'error';
-            }
-            const updatedEdges = addEdge({ ...connection, type }, values.edges);
+            const isErrorEdge = connection.sourceHandle === 'error';
+            const currentEdgeType = values.edgeType || 'smoothstep';
+            const newEdge = {
+                ...connection,
+                type: isErrorEdge ? 'error' : currentEdgeType,
+                style: {
+                    strokeWidth: 2,
+                    stroke: isErrorEdge ? '#ef4444' : '#94a3b8',
+                },
+            };
+            const updatedEdges = addEdge(newEdge, values.edges);
             setFieldValue("edges", updatedEdges);
         },
-        [values.edges, setFieldValue]
+        [values.edges, values.edgeType, setFieldValue]
     );
 
     // 4. Add New Node logic
@@ -137,6 +240,175 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
         setFieldValue("nodes", updatedNodes);
     }, [values.nodes, setFieldValue]);
 
+    const deleteNode = useCallback((nodeId) => {
+        // Remove the node
+        const updatedNodes = values.nodes.filter(node => node.id !== nodeId);
+        // Remove any edges connected to this node
+        const updatedEdges = values.edges.filter(edge => edge.source !== nodeId && edge.target !== nodeId);
+        setFieldValue("nodes", updatedNodes);
+        setFieldValue("edges", updatedEdges);
+        setSelectedNodeId(null);
+    }, [values.nodes, values.edges, setFieldValue]);
+
+    // Auto-layout nodes using dagre
+    const onAutoLayout = useCallback((direction = "TB") => {
+        if (values.nodes.length === 0) return;
+        const layoutedNodes = getLayoutedNodes(values.nodes, values.edges, direction);
+        setFieldValue("nodes", layoutedNodes);
+    }, [values.nodes, values.edges, setFieldValue]);
+
+    // Update all existing edges when edge type changes
+    const updateAllEdgesType = useCallback((newType) => {
+        const updatedEdges = values.edges.map(edge => ({
+            ...edge,
+            type: edge.sourceHandle === 'error' ? 'error' : newType,
+        }));
+        setFieldValue("edges", updatedEdges);
+    }, [values.edges, setFieldValue]);
+
+    // Reset node execution status
+    const resetNodeExecutionStatus = useCallback(() => {
+        setNodeExecutionStatus({});
+    }, []);
+
+    // Test run workflow using WebSocket for status updates
+    const onTestRun = useCallback(async () => {
+        const { testWorkflowAPI } = await import("../../../data/apis/workflow");
+
+        setIsTestRunning(true);
+        setTestResult(null);
+        // Reset all nodes to idle before starting
+        resetNodeExecutionStatus();
+        // Clear previous logs and show console
+        clearLogs();
+        setShowConsole(true);
+
+        // Log start
+        addLog('start', 'Test Run Started', `Running workflow with ${values.nodes.length} nodes`);
+
+        try {
+            // Start test execution
+            const result = await testWorkflowAPI({
+                tenantID,
+                nodes: values.nodes,
+                edges: values.edges,
+                inputParams: {},
+            });
+
+            const instanceID = result.instanceID;
+            addLog('info', 'Instance Created', `Instance ID: ${instanceID.substring(0, 8)}...`);
+
+            // Get socket from context (we need to access it directly)
+            const socketModule = await import("socket.io-client");
+            const { CONSTANTS: constants } = await import("../../../constants");
+            const { firebaseAuth } = await import("../../../config/firebase");
+
+            const bearerToken = await firebaseAuth.currentUser?.getIdToken();
+            const socket = socketModule.io(constants.SOCKET_HOST, {
+                auth: { token: bearerToken }
+            });
+
+            // Store socket reference for cleanup
+            let socketRef = socket;
+
+            // Join the workflow run room
+            socket.emit("workflow_run_join", { runId: instanceID });
+            addLog('info', 'Connected', 'Joined workflow execution room');
+
+            // Mark start node as running
+            const startNode = values.nodes.find(n => n.type === 'start');
+            if (startNode) {
+                setNodeExecutionStatus(prev => ({
+                    ...prev,
+                    [startNode.id]: 'running',
+                }));
+                addLog('node_start', 'Node: Start', startNode.data?.title || 'Start', { nodeId: startNode.id });
+            }
+
+            // Helper to get node name
+            const getNodeName = (nodeId) => {
+                const node = values.nodes.find(n => n.id === nodeId);
+                return node?.data?.title || node?.type || nodeId;
+            };
+
+            // Listen for node updates from backend
+            socket.on("workflow_node_update", (data) => {
+                const nodeId = data.nodeID;
+                if (nodeId && data.status) {
+                    const nodeName = getNodeName(nodeId);
+                    const status = data.status === 'success' ? 'completed' : 'failed';
+
+                    setNodeExecutionStatus(prev => ({
+                        ...prev,
+                        [nodeId]: status,
+                    }));
+
+                    // Log the node update
+                    if (data.status === 'success') {
+                        addLog('node_complete', `Node: ${nodeName}`, 'Completed successfully', {
+                            nodeId,
+                            output: data.output
+                        });
+                    } else {
+                        addLog('node_error', `Node: ${nodeName}`, 'Execution failed', {
+                            nodeId,
+                            error: data.error
+                        });
+                    }
+
+                    // Mark next nodes as running
+                    const nextEdges = values.edges.filter(e => e.source === nodeId);
+                    if (data.status === 'success') {
+                        nextEdges.forEach(edge => {
+                            const nextNodeName = getNodeName(edge.target);
+                            setNodeExecutionStatus(prev => {
+                                if (!prev[edge.target]) {
+                                    addLog('node_start', `Node: ${nextNodeName}`, 'Starting execution', { nodeId: edge.target });
+                                }
+                                return {
+                                    ...prev,
+                                    [edge.target]: prev[edge.target] || 'running',
+                                };
+                            });
+                        });
+                    }
+                }
+            });
+
+            // Listen for workflow status update (completion/failure)
+            socket.on("workflow_status_update", (data) => {
+                if (data.status === "COMPLETED") {
+                    addLog('workflow_complete', 'Workflow Complete', 'All nodes executed successfully');
+                    setIsTestRunning(false);
+                    setTestResult(data);
+                    socketRef.disconnect();
+                } else if (data.status === "FAILED") {
+                    addLog('workflow_error', 'Workflow Failed', 'Execution terminated with errors');
+                    setIsTestRunning(false);
+                    setTestResult(data);
+                    socketRef.disconnect();
+                }
+            });
+
+            // Timeout after 2 minutes
+            const timeout = setTimeout(() => {
+                addLog('info', 'Timeout', 'Workflow execution timed out after 2 minutes');
+                setIsTestRunning(false);
+                socketRef.disconnect();
+            }, 120000);
+
+            // Cleanup on disconnect
+            socket.on("disconnect", () => {
+                clearTimeout(timeout);
+            });
+
+        } catch (error) {
+            addLog('workflow_error', 'Error', error.message);
+            setIsTestRunning(false);
+            resetNodeExecutionStatus();
+        }
+    }, [tenantID, values.nodes, values.edges, resetNodeExecutionStatus, addLog, clearLogs]);
+
     // Find selected node
     const selectedNode = values.nodes.find(n => n.id === selectedNodeId);
 
@@ -144,6 +416,9 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
         <WorkflowNodesProvider
             dataQueries={dataQueries}
             strings={CONSTANTS.STRINGS}
+            onRefreshDataQueries={refetchDataQueries}
+            workflowNodes={values.nodes}
+            nodeExecutionStatus={nodeExecutionStatus}
         >
             <WorkflowEdgeContext.Provider value={{ deleteEdge, updateEdge }}>
                 <ReactFlowProvider>
@@ -175,24 +450,113 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
 
                             <div className="flex flex-col gap-2">
                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Nodes</p>
-                                {Object.values(WORKFLOW_NODES_MAP).map((node) => (
+                                {Object.values(WORKFLOW_NODES_MAP)
+                                    .filter(node => {
+                                        // Hide dataQuery node if no queries available
+                                        if (node.value === 'dataQuery' && (!dataQueries || dataQueries.length === 0)) {
+                                            return false;
+                                        }
+                                        return true;
+                                    })
+                                    .map((node) => (
                                     <button
                                         key={node.value}
                                         type="button"
                                         onClick={() => onAddNode(node.value)}
                                         className="px-3 py-2 text-left text-sm text-slate-700 bg-slate-100 rounded hover:bg-[#646cff]/10 transition-colors border-none hover:border-none"
                                     >
-                                        {/* You might want to add icons to the map if you want them dynamic too, 
-                                    or map them here based on type */}
-                                        {node.value === 'dataQuery' && <SiQuantconnect className="inline-block h-4 w-4 mr-2" />}
-                                        {node.value === 'javascript' && <FaCode className="inline-block h-4 w-4 mr-2" />}
-                                        {node.value === 'condition' && <FaCodeBranch className="inline-block h-4 w-4 mr-2" />}
+                                            {/* Icon mapping for node types */}
+                                            {node.value === 'start' && <FaPlay className="inline-block h-3.5 w-3.5 mr-2 text-green-500" />}
+                                            {node.value === 'dataQuery' && <SiQuantconnect className="inline-block h-4 w-4 mr-2 text-blue-500" />}
+                                            {node.value === 'javascript' && <FaCode className="inline-block h-4 w-4 mr-2 text-yellow-500" />}
+                                            {node.value === 'condition' && <FaCodeBranch className="inline-block h-4 w-4 mr-2 text-purple-500" />}
+                                            {node.value === 'loop' && <TbRepeat className="inline-block h-4 w-4 mr-2 text-cyan-500" />}
+                                            {node.value === 'delay' && <IoMdTime className="inline-block h-4 w-4 mr-2 text-amber-500" />}
+                                            {node.value === 'end' && <FaStop className="inline-block h-3.5 w-3.5 mr-2 text-red-500" />}
                                         {node.label}
                                     </button>
                                 ))}
                             </div>
-                            <div>
-                                <pre className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{JSON.stringify(values, null, 2)}</pre>
+
+                            {/* Settings Section */}
+                            <div className="flex flex-col gap-2">
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Settings</p>
+                                <div>
+                                    <label className="text-[10px] text-slate-500 mb-1 block">Edge Style</label>
+                                    <select
+                                        value={values.edgeType || 'smoothstep'}
+                                        onChange={(e) => {
+                                            setFieldValue("edgeType", e.target.value);
+                                            updateAllEdgesType(e.target.value);
+                                        }}
+                                        className="w-full px-2 py-1.5 text-xs text-slate-700 bg-white border border-slate-200 rounded focus:outline-none focus:border-[#646cff]"
+                                    >
+                                        <option value="default">Bezier (Curved)</option>
+                                        <option value="straight">Straight</option>
+                                        <option value="step">Step (Sharp corners)</option>
+                                        <option value="smoothstep">Smooth Step (Rounded corners)</option>
+                                        <option value="simplebezier">Simple Bezier</option>
+                                    </select>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <label className="text-[10px] text-slate-500">Snap to Grid</label>
+                                    <input
+                                        type="checkbox"
+                                        checked={values.snapToGrid ?? true}
+                                        onChange={(e) => setFieldValue("snapToGrid", e.target.checked)}
+                                        className="w-4 h-4 text-[#646cff] rounded border-slate-300 focus:ring-[#646cff]"
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Actions Section */}
+                            <div className="flex flex-col gap-2">
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Actions</p>
+                                <button
+                                    type="button"
+                                    onClick={() => onAutoLayout("TB")}
+                                    disabled={values.nodes.length === 0}
+                                    className="px-3 py-2 text-left text-sm text-slate-700 bg-white border border-slate-200 rounded hover:bg-[#646cff]/10 hover:border-[#646cff]/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    <TbLayoutDistributeHorizontal className="inline-block h-4 w-4 mr-2" />
+                                    Auto-layout
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={onTestRun}
+                                    disabled={values.nodes.length === 0 || isTestRunning}
+                                    className="px-3 py-2 text-left text-sm text-white bg-green-600 rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                                >
+                                    <FaPlay className="inline-block h-3 w-3 mr-2" />
+                                    {isTestRunning ? "Running..." : "Test Run"}
+                                </button>
+                            </div>
+
+                            {/* Debug Section */}
+                            <div className="flex flex-col gap-2">
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Debug</p>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowSchemaPanel(true)}
+                                    className="px-3 py-2 text-left text-sm text-slate-700 bg-white border border-slate-200 rounded hover:bg-[#646cff]/10 hover:border-[#646cff]/30 transition-colors"
+                                >
+                                    <VscJson className="inline-block h-4 w-4 mr-2" />
+                                    View Schema
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowConsole(!showConsole)}
+                                    className={`px-3 py-2 text-left text-sm text-slate-700 bg-white border rounded hover:bg-[#646cff]/10 hover:border-[#646cff]/30 transition-colors ${showConsole ? 'border-[#646cff] bg-[#646cff]/5' : 'border-slate-200'
+                                        }`}
+                                >
+                                    <VscTerminal className="inline-block h-4 w-4 mr-2" />
+                                    {showConsole ? 'Hide Console' : 'Show Console'}
+                                    {consoleLogs.length > 0 && (
+                                        <span className="ml-2 px-1.5 py-0.5 text-[10px] bg-slate-200 text-slate-600 rounded-full">
+                                            {consoleLogs.length}
+                                        </span>
+                                    )}
+                                </button>
                             </div>
 
 
@@ -213,12 +577,27 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                     onPaneClick={onPaneClick}
                                     nodeTypes={nodeTypes}
                                     edgeTypes={edgeTypes}
+                                    defaultEdgeOptions={{
+                                        type: values.edgeType || 'smoothstep',
+                                        animated: false,
+                                        style: {
+                                            strokeWidth: 2,
+                                            stroke: '#94a3b8',
+                                        },
+                                    }}
+                                    connectionLineType={ConnectionLineType.SmoothStep}
+                                    connectionLineStyle={{ stroke: '#646cff', strokeWidth: 2 }}
+                                    snapToGrid={values.snapToGrid ?? true}
+                                    snapGrid={[20, 20]}
+                                    fitView
+                                    fitViewOptions={{ padding: 0.2, maxZoom: 1.5 }}
                                     className="bg-slate-100"
                                     proOptions={{ hideAttribution: true }}
                                 >
                                     <Controls />
                                     <MiniMap />
                                     <Background variant="dots" gap={12} size={1} />
+                                    <FitViewButton />
                                 </ReactFlow>
 
                                 {/* Configuration Panel Overlay */}
@@ -227,7 +606,28 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                         node={selectedNode}
                                         onChange={updateNodeData}
                                         onClose={() => setSelectedNodeId(null)}
+                                        onDelete={deleteNode}
                                     />
+                                )}
+
+                                {/* Schema Viewer Panel */}
+                                {showSchemaPanel && (
+                                    <WorkflowSchemaPanel
+                                        values={values}
+                                        onClose={() => setShowSchemaPanel(false)}
+                                    />
+                                )}
+
+                                {/* Workflow Console */}
+                                {showConsole && (
+                                    <div className="absolute bottom-4 left-4 right-4 z-20">
+                                        <WorkflowConsole
+                                            logs={consoleLogs}
+                                            isRunning={isTestRunning}
+                                            onClear={clearLogs}
+                                            onClose={() => setShowConsole(false)}
+                                        />
+                                    </div>
                                 )}
                             </div>
                         </ResizablePanel>

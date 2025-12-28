@@ -155,4 +155,69 @@ export const deleteWorkflowAPI = async ({ tenantID, workflowID }) => {
   }
 };
 
+/**
+ * Test run a workflow without saving (uses in-memory nodes/edges)
+ */
+export const testWorkflowAPI = async ({ tenantID, nodes, edges, inputParams = {} }) => {
+  try {
+    const url =
+      CONSTANTS.SERVER_HOST +
+      CONSTANTS.APIS.WORKFLOW.testWorkflowAPI(tenantID);
+    const bearerToken = await firebaseAuth.currentUser.getIdToken();
+    if (bearerToken) {
+      const response = await axios.post(
+        url,
+        { nodes, edges, inputParams },
+        {
+          headers: {
+            authorization: `Bearer ${bearerToken}`,
+          },
+        }
+      );
+      if (response.data && response.data.success === true) {
+        return response.data;
+      } else if (response.data.error) {
+        throw response.data.error;
+      } else {
+        throw CONSTANTS.ERROR_CODES.SERVER_ERROR;
+      }
+    } else {
+      throw CONSTANTS.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Get workflow run status
+ */
+export const getWorkflowRunStatusAPI = async ({ tenantID, instanceID }) => {
+  try {
+    const url =
+      CONSTANTS.SERVER_HOST +
+      CONSTANTS.APIS.WORKFLOW.getWorkflowRunStatusAPI(tenantID, instanceID);
+    const bearerToken = await firebaseAuth.currentUser.getIdToken();
+    if (bearerToken) {
+      const response = await axios.get(url, {
+        headers: {
+          authorization: `Bearer ${bearerToken}`,
+        },
+      });
+      if (response.data && response.data.success === true) {
+        return response.data;
+      } else if (response.data.error) {
+        throw response.data.error;
+      } else {
+        throw CONSTANTS.ERROR_CODES.SERVER_ERROR;
+      }
+    } else {
+      throw CONSTANTS.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+
 

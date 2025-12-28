@@ -1,8 +1,11 @@
 import React, { useState } from 'react';
-import { BaseEdge, EdgeLabelRenderer, getBezierPath } from 'reactflow';
-import { FaScissors } from 'react-icons/fa6';
+import { BaseEdge, EdgeLabelRenderer, getBezierPath, getSmoothStepPath, getStraightPath, getSimpleBezierPath } from 'reactflow';
 import { useWorkflowEdge } from '../context';
 
+/**
+ * Base Deletable Edge component that supports all edge path types
+ * @param {string} pathType - 'bezier' | 'smoothstep' | 'straight' | 'step' | 'simplebezier'
+ */
 export default function DeletableEdge({
   id,
   sourceX,
@@ -15,16 +18,38 @@ export default function DeletableEdge({
   markerEnd,
   label,
   data,
+  pathType = 'smoothstep', // Default to smoothstep for best appearance
 }) {
   const { deleteEdge, updateEdge } = useWorkflowEdge();
-  const [edgePath, labelX, labelY] = getBezierPath({
-    sourceX,
-    sourceY,
-    sourcePosition,
-    targetX,
-    targetY,
-    targetPosition,
-  });
+
+  // Calculate path based on pathType
+  const getPath = () => {
+    const pathParams = {
+      sourceX,
+      sourceY,
+      sourcePosition,
+      targetX,
+      targetY,
+      targetPosition,
+    };
+
+    switch (pathType) {
+      case 'straight':
+        return getStraightPath(pathParams);
+      case 'step':
+        return getSmoothStepPath({ ...pathParams, borderRadius: 0 });
+      case 'smoothstep':
+        return getSmoothStepPath(pathParams);
+      case 'simplebezier':
+        return getSimpleBezierPath(pathParams);
+      case 'bezier':
+      case 'default':
+      default:
+        return getBezierPath(pathParams);
+    }
+  };
+
+  const [edgePath, labelX, labelY] = getPath();
 
   const [isEditing, setIsEditing] = useState(false);
   const [edgeLabel, setEdgeLabel] = useState(label || data?.label || "");

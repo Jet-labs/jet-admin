@@ -59,6 +59,8 @@ const constants = {
     AI_CHAT_ROOM_DISCONNECT: "ai_chat_room_disconnect",
     AI_CHAT_ROOM_ID: "ai_chat_room_id",
     AI_CHAT_BOT_MESSAGE: "ai_chat_bot_message",
+    WORKFLOW_NODE_UPDATE: "workflow_node_update",
+    WORKFLOW_STATUS_UPDATE: "workflow_status_update",
   },
 
   SOCKET_RECEIVE_EVENTS: {

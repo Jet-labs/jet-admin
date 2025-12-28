@@ -318,3 +318,7 @@ formValidations.datasourceAdditionFormValidationSchema = Yup.object().shape({
 formValidations.workflowAdditionFormValidationSchema = Yup.object().shape({
   title: Yup.string().required("Workflow name is required"),
 });
+
+formValidations.workflowUpdationFormValidationSchema = Yup.object().shape({
+  title: Yup.string().required("Workflow name is required"),
+});

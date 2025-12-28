@@ -273,11 +273,14 @@ export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
           </ResizablePanel>
           <ResizableHandle withHandle={true} />
           <ResizablePanel defaultSize={80}>
-            {DATASOURCE_UI_COMPONENTS[
-              dataQuery?.datasourceType
-            ]?.queryResponseView({
-              queryResult: dataQueryTestResult,
-            })}
+            <div className="w-full h-[calc(100%-50px)]">
+              {DATASOURCE_UI_COMPONENTS[
+                dataQuery?.datasourceType
+              ]?.queryResponseView({
+                queryResult: dataQueryTestResult,
+              })}
+            </div>
+
           </ResizablePanel>
         </ResizablePanelGroup>
       </ReactQueryLoadingErrorWrapper>

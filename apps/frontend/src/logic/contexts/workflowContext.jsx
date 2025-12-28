@@ -55,7 +55,7 @@ const WorkflowContextProvider = ({ children }) => {
         isRefetechingDataQueries,
       }}
     >
-      <WorkflowActionsContext.Provider value={{ refetchWorkflows }}>
+      <WorkflowActionsContext.Provider value={{ refetchWorkflows, refetchDataQueries }}>
         {children}
       </WorkflowActionsContext.Provider>
     </WorkflowStateContext.Provider>

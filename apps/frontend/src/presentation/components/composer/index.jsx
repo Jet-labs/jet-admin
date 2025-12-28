@@ -9,7 +9,15 @@ import { SocketContextProvider } from "../../../logic/contexts/socketContext";
 import { RootRouter } from "../routes/rootRouter";
 import { SuspenseFallback } from "../ui/suspenseFallback";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient(
+  {
+    defaultOptions: {
+      queries: {
+        refetchOnWindowFocus: false,
+      },
+    }
+  }
+);
 
 export const Composer = () => {
   return (

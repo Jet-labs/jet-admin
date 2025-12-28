@@ -64,6 +64,9 @@ export const CONSTANTS = {
     WORKFLOW_ADDITION_FORM_NAME_FIELD_PLACEHOLDER: "Your workflow's name",
     WORKFLOW_ADDITION_FORM_SUBMIT_BUTTON: "Add workflow",
     WORKFLOW_ADDITION_FORM_TEST_BUTTON: "Test workflow",
+    UPDATE_WORKFLOW_FORM_TITLE: "Update workflow",
+    UPDATE_WORKFLOW_BUTTON_TEXT: "Update workflow",
+    UPDATE_WORKFLOW_FORM_WORKFLOW_UPDATION_SUCCESS: "Workflow updated successfully!",
     NO_DATABASE_URL: "Please add database URL in the tenant settings",
     DASHBOARD_DROPPING_ELEMENT_TAG: "__dropping-elem__",
     HIDE_QUERY_META_CONTENT_BUTTON_TEXT: "Hide metadata",
@@ -880,6 +883,11 @@ export const CONSTANTS = {
       path: (tenantID, workflowID) =>
         `/tenants/${tenantID}/workflows/${workflowID}/editor`,
     },
+    UPDATE_WORKFLOW_BY_ID: {
+      code: "/tenants/:tenantID/workflows/:workflowID",
+      path: (tenantID, workflowID) =>
+        `/tenants/${tenantID}/workflows/${workflowID}`,
+    },
     ADD_DATABASE_TABLE: {
       code: "/tenants/:tenantID/schemas/:databaseSchemaName/tables/add",
       path: (tenantID, databaseSchemaName) =>
@@ -1068,9 +1076,12 @@ export const CONSTANTS = {
         `/api/v1/tenants/${tenantID}/workflows/${workflowID}`,
       deleteWorkflowAPI: (tenantID, workflowID) =>
         `/api/v1/tenants/${tenantID}/workflows/${workflowID}`,
-      executeWorkflowAPI: (workflowID) =>
-        `/api/v1/workflows/${workflowID}/execute`,
-      getWorkflowRunStatusAPI: (runID) => `/api/v1/workflows/run/${runID}`,
+      executeWorkflowAPI: (tenantID, workflowID) =>
+        `/api/v1/tenants/${tenantID}/workflows/${workflowID}/execute`,
+      testWorkflowAPI: (tenantID) =>
+        `/api/v1/tenants/${tenantID}/workflows/test`,
+      getWorkflowRunStatusAPI: (tenantID, instanceID) =>
+        `/api/v1/tenants/${tenantID}/workflows/instances/${instanceID}`,
     },
     AUTH: {
       getUserInfoAPI: () => "/api/v1/auth",

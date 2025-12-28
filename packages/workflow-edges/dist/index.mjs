@@ -1,6 +1,9 @@
+// src/index.js
+import React3 from "react";
+
 // src/edges/DeletableEdge.jsx
 import React, { useState } from "react";
-import { BaseEdge, EdgeLabelRenderer, getBezierPath } from "reactflow";
+import { BaseEdge, EdgeLabelRenderer, getBezierPath, getSmoothStepPath, getStraightPath, getSimpleBezierPath } from "reactflow";
 
 // src/context.js
 import { createContext, useContext } from "react";
@@ -24,17 +27,36 @@ function DeletableEdge({
   style = {},
   markerEnd,
   label,
-  data
+  data,
+  pathType = "smoothstep"
+  // Default to smoothstep for best appearance
 }) {
   const { deleteEdge, updateEdge } = useWorkflowEdge();
-  const [edgePath, labelX, labelY] = getBezierPath({
-    sourceX,
-    sourceY,
-    sourcePosition,
-    targetX,
-    targetY,
-    targetPosition
-  });
+  const getPath = () => {
+    const pathParams = {
+      sourceX,
+      sourceY,
+      sourcePosition,
+      targetX,
+      targetY,
+      targetPosition
+    };
+    switch (pathType) {
+      case "straight":
+        return getStraightPath(pathParams);
+      case "step":
+        return getSmoothStepPath({ ...pathParams, borderRadius: 0 });
+      case "smoothstep":
+        return getSmoothStepPath(pathParams);
+      case "simplebezier":
+        return getSimpleBezierPath(pathParams);
+      case "bezier":
+      case "default":
+      default:
+        return getBezierPath(pathParams);
+    }
+  };
+  const [edgePath, labelX, labelY] = getPath();
   const [isEditing, setIsEditing] = useState(false);
   const [edgeLabel, setEdgeLabel] = useState(label || data?.label || "");
   const onEdgeClick = (evt) => {
@@ -114,26 +136,63 @@ function ErrorEdge(props) {
 }
 
 // src/index.js
+var SmoothStepEdge = (props) => /* @__PURE__ */ React3.createElement(DeletableEdge, { ...props, pathType: "smoothstep" });
+var StraightEdge = (props) => /* @__PURE__ */ React3.createElement(DeletableEdge, { ...props, pathType: "straight" });
+var StepEdge = (props) => /* @__PURE__ */ React3.createElement(DeletableEdge, { ...props, pathType: "step" });
+var BezierEdge = (props) => /* @__PURE__ */ React3.createElement(DeletableEdge, { ...props, pathType: "bezier" });
+var SimpleBezierEdge = (props) => /* @__PURE__ */ React3.createElement(DeletableEdge, { ...props, pathType: "simplebezier" });
 var WORKFLOW_EDGES_MAP = {
+  // Default bezier edge
   default: {
     value: "default",
-    label: "Default",
-    component: DeletableEdge
+    label: "Bezier (Curved)",
+    component: BezierEdge
   },
-  deletable: {
-    value: "deletable",
-    label: "Deletable",
-    component: DeletableEdge
+  // Smooth step edge (rounded corners)
+  smoothstep: {
+    value: "smoothstep",
+    label: "Smooth Step",
+    component: SmoothStepEdge
   },
+  // Straight edge
+  straight: {
+    value: "straight",
+    label: "Straight",
+    component: StraightEdge
+  },
+  // Step edge (sharp corners)
+  step: {
+    value: "step",
+    label: "Step",
+    component: StepEdge
+  },
+  // Simple bezier edge
+  simplebezier: {
+    value: "simplebezier",
+    label: "Simple Bezier",
+    component: SimpleBezierEdge
+  },
+  // Error edge (red, for error handles)
   error: {
     value: "error",
     label: "Error",
     component: ErrorEdge
+  },
+  // Deletable is an alias for default
+  deletable: {
+    value: "deletable",
+    label: "Deletable",
+    component: BezierEdge
   }
 };
 export {
+  BezierEdge,
   DeletableEdge,
   ErrorEdge,
+  SimpleBezierEdge,
+  SmoothStepEdge,
+  StepEdge,
+  StraightEdge,
   WORKFLOW_EDGES_MAP,
   WorkflowEdgeContext
 };

@@ -107,6 +107,9 @@ const AddWorkflowPage = lazy(() => import("../../pages/addWorkflowPage"));
 const WorkflowLayoutLandingPage = lazy(() =>
   import("../../pages/workflowLayoutLandingPage")
 );
+const UpdateWorkflowPage = lazy(() =>
+  import("../../pages/updateWorkflowPage")
+);
 const AddDatasourcePage = lazy(() => import("../../pages/addDatasourcePage"));
 const UpdateDatasourcePage = lazy(() =>
   import("../../pages/updateDatasourcePage")
@@ -333,6 +336,10 @@ const router = createBrowserRouter([
               {
                 path: CONSTANTS.ROUTES.ADD_WORKFLOW.code,
                 element: <AddWorkflowPage />,
+              },
+              {
+                path: CONSTANTS.ROUTES.UPDATE_WORKFLOW_BY_ID.code,
+                element: <UpdateWorkflowPage />,
               },
             ],
           },

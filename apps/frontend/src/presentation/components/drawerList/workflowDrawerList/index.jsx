@@ -38,7 +38,7 @@ export const WorkflowDrawerList = () => {
             const isActive = routeParam?.workflowID == workflow.workflowID;
             return (
               <Link
-                to={CONSTANTS.ROUTES.WORKFLOW_BUILDER.path(
+                to={CONSTANTS.ROUTES.UPDATE_WORKFLOW_BY_ID.path(
                   tenantID,
                   workflow.workflowID
                 )}
