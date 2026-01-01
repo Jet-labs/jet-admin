@@ -1,0 +1,193 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "connectionOption": {
+        "type": "string",
+        "enum": ["connectionUrl", "connectionDetails"],
+        "default": "connectionDetails",
+        "description": "Choose to enter connection URL or individual details."
+      },
+      "connectionUrl": {
+        "type": "string",
+        "description": "AMQP connection URL (e.g., 'amqp://user:pass@localhost:5672/vhost')",
+        "minLength": 1
+      },
+      "connectionDetails": {
+        "type": "object",
+        "properties": {
+          "connectionName": {
+            "type": "string",
+            "description": "A unique name for this connection.",
+            "minLength": 3
+          },
+          "host": {
+            "type": "string",
+            "description": "RabbitMQ server hostname.",
+            "default": "localhost"
+          },
+          "port": {
+            "type": "integer",
+            "description": "RabbitMQ server port (default 5672).",
+            "minimum": 1,
+            "maximum": 65535,
+            "default": 5672
+          },
+          "vhost": {
+            "type": "string",
+            "description": "Virtual host (default '/').",
+            "default": "/"
+          },
+          "username": {
+            "type": "string",
+            "description": "Username for authentication.",
+            "default": "guest"
+          },
+          "password": {
+            "type": "string",
+            "description": "Password for authentication.",
+            "format": "password"
+          },
+          "heartbeat": {
+            "type": "integer",
+            "description": "Heartbeat interval in seconds (0 to disable).",
+            "minimum": 0,
+            "default": 60
+          },
+          "ssl": {
+            "type": "boolean",
+            "description": "Enable SSL/TLS connection.",
+            "default": false
+          }
+        },
+        "required": ["connectionName", "host", "username", "password"]
+      }
+    },
+    "required": ["connectionOption"],
+    "allOf": [
+      {
+        "if": {
+          "properties": { "connectionOption": { "const": "connectionUrl" } }
+        },
+        "then": { "required": ["connectionUrl"] }
+      },
+      {
+        "if": {
+          "properties": { "connectionOption": { "const": "connectionDetails" } }
+        },
+        "then": { "required": ["connectionDetails"] }
+      }
+    ]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/connectionOption",
+        "label": "Connection Type"
+      },
+      {
+        "type": "Group",
+        "label": "Connection URL",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/connectionOption",
+            "schema": { "const": "connectionUrl" }
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/connectionUrl",
+            "label": "AMQP URL"
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Connection Details",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/connectionOption",
+            "schema": { "const": "connectionDetails" }
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/connectionDetails/properties/connectionName",
+            "label": "Connection Name"
+          },
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/host",
+                "label": "Host"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/port",
+                "label": "Port"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/vhost",
+                "label": "Virtual Host"
+              }
+            ]
+          },
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/username",
+                "label": "Username"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/password",
+                "label": "Password",
+                "options": { "format": "password" }
+              }
+            ]
+          },
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/heartbeat",
+                "label": "Heartbeat (seconds)"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/ssl",
+                "label": "Enable SSL"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "data": {
+    "connectionOption": "connectionDetails",
+    "connectionUrl": "",
+    "connectionDetails": {
+      "connectionName": "MyRabbitMQ",
+      "host": "localhost",
+      "port": 5672,
+      "vhost": "/",
+      "username": "guest",
+      "password": "guest",
+      "heartbeat": 60,
+      "ssl": false
+    }
+  }
+}

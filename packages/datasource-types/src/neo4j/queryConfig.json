@@ -1,0 +1,59 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "queryType": {
+        "type": "string",
+        "enum": ["cypher"],
+        "default": "cypher"
+      },
+      "query": {
+        "type": "string",
+        "description": "Cypher query to execute",
+        "format": "code-sql"
+      },
+      "args": {
+        "type": "array",
+        "description": "Query parameters",
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": { "type": "string" },
+            "type": {
+              "type": "string",
+              "enum": ["string", "number", "boolean", "array"],
+              "default": "string"
+            }
+          },
+          "required": ["key", "type"]
+        }
+      }
+    },
+    "required": ["queryType", "query"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/queryType",
+        "label": "Query Type"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/query",
+        "label": "Cypher Query"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/args",
+        "label": "Parameters"
+      }
+    ]
+  },
+  "data": {
+    "queryType": "cypher",
+    "query": "MATCH (n) RETURN n LIMIT 10",
+    "args": []
+  }
+}

@@ -1,0 +1,164 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "node": {
+        "type": "string",
+        "description": "Elasticsearch node URL (e.g., https://localhost:9200)",
+        "minLength": 1
+      },
+      "authType": {
+        "type": "string",
+        "enum": ["none", "basic", "apiKey", "cloud"],
+        "default": "none"
+      },
+      "username": {
+        "type": "string",
+        "description": "Username for basic auth"
+      },
+      "password": {
+        "type": "string",
+        "description": "Password for basic auth",
+        "format": "password"
+      },
+      "apiKey": {
+        "type": "string",
+        "description": "API Key for authentication",
+        "format": "password"
+      },
+      "cloudId": {
+        "type": "string",
+        "description": "Elastic Cloud ID"
+      }
+    },
+    "required": ["authType"],
+    "allOf": [
+      {
+        "if": {
+          "properties": { "authType": { "const": "none" } }
+        },
+        "then": { "required": ["node"] }
+      },
+      {
+        "if": {
+          "properties": { "authType": { "const": "basic" } }
+        },
+        "then": { "required": ["node", "username", "password"] }
+      },
+      {
+        "if": {
+          "properties": { "authType": { "const": "apiKey" } }
+        },
+        "then": { "required": ["node", "apiKey"] }
+      },
+      {
+        "if": {
+          "properties": { "authType": { "const": "cloud" } }
+        },
+        "then": { "required": ["cloudId", "apiKey"] }
+      }
+    ]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/authType",
+        "label": "Authentication Type"
+      },
+      {
+        "type": "Group",
+        "label": "Node Configuration",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/authType",
+            "schema": { "enum": ["none", "basic", "apiKey"] }
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/node",
+            "label": "Node URL"
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Cloud Configuration",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/authType",
+            "schema": { "const": "cloud" }
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/cloudId",
+            "label": "Cloud ID"
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Basic Authentication",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/authType",
+            "schema": { "const": "basic" }
+          }
+        },
+        "elements": [
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/username",
+                "label": "Username"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/password",
+                "label": "Password",
+                "options": { "format": "password" }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "API Key",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/authType",
+            "schema": { "enum": ["apiKey", "cloud"] }
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/apiKey",
+            "label": "API Key",
+            "options": { "format": "password" }
+          }
+        ]
+      }
+    ]
+  },
+  "data": {
+    "node": "https://localhost:9200",
+    "authType": "none",
+    "username": "",
+    "password": "",
+    "apiKey": "",
+    "cloudId": ""
+  }
+}

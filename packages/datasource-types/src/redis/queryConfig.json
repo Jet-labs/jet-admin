@@ -1,0 +1,224 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "operation": {
+        "type": "string",
+        "enum": [
+          "get", "set", "del", "exists", "keys", "expire", "ttl",
+          "hget", "hset", "hgetall", "hdel",
+          "lpush", "rpush", "lpop", "rpop", "lrange", "llen",
+          "sadd", "smembers", "srem", "sismember",
+          "publish", "xadd", "xread", "xrange", "xlen"
+        ],
+        "default": "get"
+      },
+      "key": {
+        "type": "string",
+        "description": "Redis key"
+      },
+      "value": {
+        "type": "string",
+        "description": "Value to set (JSON for objects)",
+        "format": "code-json"
+      },
+      "field": {
+        "type": "string",
+        "description": "Hash field name"
+      },
+      "pattern": {
+        "type": "string",
+        "description": "Key pattern for KEYS command",
+        "default": "*"
+      },
+      "ttl": {
+        "type": "integer",
+        "description": "TTL in seconds",
+        "minimum": 0
+      },
+      "start": {
+        "type": "integer",
+        "description": "Start index for list/stream operations",
+        "default": 0
+      },
+      "stop": {
+        "type": "integer",
+        "description": "Stop index for list operations",
+        "default": -1
+      },
+      "count": {
+        "type": "integer",
+        "description": "Number of items to read",
+        "default": 10
+      },
+      "streamId": {
+        "type": "string",
+        "description": "Stream entry ID (for XREAD, use '$' for new entries)",
+        "default": "0"
+      },
+      "channel": {
+        "type": "string",
+        "description": "Pub/sub channel name"
+      },
+      "consumeMode": {
+        "type": "string",
+        "enum": ["preview", "consume", "consumeAndStore"],
+        "default": "preview"
+      },
+      "storeDestination": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string", "enum": ["dataQuery"], "default": "dataQuery" },
+          "dataQueryId": { "type": "string" }
+        }
+      },
+      "args": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": { "type": "string" },
+            "type": { "type": "string", "enum": ["string", "number", "boolean", "object"], "default": "string" }
+          }
+        }
+      }
+    },
+    "required": ["operation"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          { "type": "Control", "scope": "#/properties/operation", "label": "Operation" },
+          { "type": "Control", "scope": "#/properties/key", "label": "Key" }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Value",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "type": "OR",
+            "conditions": [
+              { "scope": "#/properties/operation", "schema": { "const": "set" } },
+              { "scope": "#/properties/operation", "schema": { "const": "hset" } },
+              { "scope": "#/properties/operation", "schema": { "const": "lpush" } },
+              { "scope": "#/properties/operation", "schema": { "const": "rpush" } },
+              { "scope": "#/properties/operation", "schema": { "const": "sadd" } },
+              { "scope": "#/properties/operation", "schema": { "const": "publish" } },
+              { "scope": "#/properties/operation", "schema": { "const": "xadd" } }
+            ]
+          }
+        },
+        "elements": [
+          { "type": "Control", "scope": "#/properties/value", "label": "Value (JSON)" },
+          { "type": "Control", "scope": "#/properties/ttl", "label": "TTL (seconds)" }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Hash Field",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "type": "OR",
+            "conditions": [
+              { "scope": "#/properties/operation", "schema": { "const": "hget" } },
+              { "scope": "#/properties/operation", "schema": { "const": "hset" } },
+              { "scope": "#/properties/operation", "schema": { "const": "hdel" } }
+            ]
+          }
+        },
+        "elements": [
+          { "type": "Control", "scope": "#/properties/field", "label": "Field" }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "List/Stream Options",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "type": "OR",
+            "conditions": [
+              { "scope": "#/properties/operation", "schema": { "const": "lrange" } },
+              { "scope": "#/properties/operation", "schema": { "const": "xread" } },
+              { "scope": "#/properties/operation", "schema": { "const": "xrange" } }
+            ]
+          }
+        },
+        "elements": [
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              { "type": "Control", "scope": "#/properties/start", "label": "Start" },
+              { "type": "Control", "scope": "#/properties/stop", "label": "Stop" },
+              { "type": "Control", "scope": "#/properties/count", "label": "Count" }
+            ]
+          },
+          { "type": "Control", "scope": "#/properties/streamId", "label": "Stream ID" }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Pub/Sub",
+        "rule": { "effect": "SHOW", "condition": { "scope": "#/properties/operation", "schema": { "const": "publish" } } },
+        "elements": [
+          { "type": "Control", "scope": "#/properties/channel", "label": "Channel" }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Keys Pattern",
+        "rule": { "effect": "SHOW", "condition": { "scope": "#/properties/operation", "schema": { "const": "keys" } } },
+        "elements": [
+          { "type": "Control", "scope": "#/properties/pattern", "label": "Pattern" }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Consume Options",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "type": "OR",
+            "conditions": [
+              { "scope": "#/properties/operation", "schema": { "const": "lpop" } },
+              { "scope": "#/properties/operation", "schema": { "const": "rpop" } },
+              { "scope": "#/properties/operation", "schema": { "const": "xread" } }
+            ]
+          }
+        },
+        "elements": [
+          { "type": "Control", "scope": "#/properties/consumeMode", "label": "Consume Mode" },
+          {
+            "type": "Control",
+            "scope": "#/properties/storeDestination/properties/dataQueryId",
+            "label": "Store Data Query ID",
+            "rule": { "effect": "SHOW", "condition": { "scope": "#/properties/consumeMode", "schema": { "const": "consumeAndStore" } } }
+          }
+        ]
+      },
+      { "type": "Control", "scope": "#/properties/args", "label": "Dynamic Arguments" }
+    ]
+  },
+  "data": {
+    "operation": "get",
+    "key": "my-key",
+    "value": "",
+    "field": "",
+    "pattern": "*",
+    "ttl": 0,
+    "start": 0,
+    "stop": -1,
+    "count": 10,
+    "streamId": "0",
+    "channel": "",
+    "consumeMode": "preview",
+    "storeDestination": { "type": "dataQuery", "dataQueryId": "" },
+    "args": []
+  }
+}

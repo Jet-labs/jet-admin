@@ -1,0 +1,107 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "resource": {
+        "type": "string",
+        "enum": ["databases", "pages", "blocks", "users", "search"],
+        "default": "databases"
+      },
+      "operation": {
+        "type": "string",
+        "enum": ["list", "query", "retrieve", "create", "update"],
+        "default": "list"
+      },
+      "databaseId": {
+        "type": "string",
+        "description": "Database ID for database operations"
+      },
+      "pageId": {
+        "type": "string",
+        "description": "Page ID for page operations"
+      },
+      "filter": {
+        "type": "string",
+        "description": "Filter object (JSON) for query",
+        "format": "code-json"
+      },
+      "sorts": {
+        "type": "string",
+        "description": "Sort array (JSON) for query",
+        "format": "code-json"
+      },
+      "searchQuery": {
+        "type": "string",
+        "description": "Search query text"
+      },
+      "pageSize": {
+        "type": "integer",
+        "description": "Page size",
+        "default": 100,
+        "minimum": 1,
+        "maximum": 100
+      }
+    },
+    "required": ["resource", "operation"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/resource",
+            "label": "Resource"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/operation",
+            "label": "Operation"
+          }
+        ]
+      },
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/databaseId",
+            "label": "Database ID"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/pageId",
+            "label": "Page ID"
+          }
+        ]
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/searchQuery",
+        "label": "Search Query"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/filter",
+        "label": "Filter (JSON)"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/sorts",
+        "label": "Sorts (JSON)"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/pageSize",
+        "label": "Page Size"
+      }
+    ]
+  },
+  "data": {
+    "resource": "databases",
+    "operation": "list",
+    "pageSize": 100
+  }
+}

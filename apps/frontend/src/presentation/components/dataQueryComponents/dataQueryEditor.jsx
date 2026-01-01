@@ -6,6 +6,7 @@ import { JsonForms } from "@jsonforms/react";
 import React, { useCallback } from "react";
 import PropTypes from "prop-types";
 import { DATASOURCE_UI_COMPONENTS } from "@jet-admin/datasources-ui";
+import { getDatasourceTypeByValue } from "@jet-admin/datasource-types";
 import { CONSTANTS } from "../../../constants";
 import { customJSONFormRenderers } from "../ui/jsonFormCustomRenderer";
 import { useDataQueriesState } from "../../../logic/contexts/dataQueriesContext";
@@ -24,6 +25,10 @@ export const DataQueryEditor = ({
     ? `dataQueryEditor_${tenantID}_${dataQueryID}`
     : `dataQueryEditor_${tenantID}`;
   const { datasources } = useDataQueriesState();
+
+  // Get the current datasource type config
+  const currentDatasourceType = getDatasourceTypeByValue(dataQueryEditorForm.values.datasourceType);
+
   // This handler specifically updates the 'datasourceOptions' part of Formik's state
   const _handleDatasourceOptionsChange = useCallback(
     ({ data }) => {
@@ -87,20 +92,11 @@ export const DataQueryEditor = ({
 
       <>
         {DATASOURCE_UI_COMPONENTS[dataQueryEditorForm.values.datasourceType] &&
-          DATASOURCE_UI_COMPONENTS[dataQueryEditorForm.values.datasourceType]
-            .queryConfigForm && (
+          currentDatasourceType?.queryConfigForm && (
             <JsonForms
               key={uniqueKey}
-              schema={
-                DATASOURCE_UI_COMPONENTS[
-                  dataQueryEditorForm.values.datasourceType
-                ].queryConfigForm.schema
-              }
-              uischema={
-                DATASOURCE_UI_COMPONENTS[
-                  dataQueryEditorForm.values.datasourceType
-                ].queryConfigForm.uischema
-              }
+            schema={currentDatasourceType.queryConfigForm.schema}
+            uischema={currentDatasourceType.queryConfigForm.uischema}
               data={dataQueryEditorForm.values.dataQueryOptions}
               renderers={[...materialRenderers, ...customJSONFormRenderers]}
               cells={materialCells}

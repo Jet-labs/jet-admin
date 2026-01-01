@@ -1,0 +1,37 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "databasePath": {
+        "type": "string",
+        "description": "Path to the SQLite database file (use ':memory:' for in-memory)",
+        "minLength": 1
+      },
+      "readonly": {
+        "type": "boolean",
+        "description": "Open database in read-only mode",
+        "default": false
+      }
+    },
+    "required": ["databasePath"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/databasePath",
+        "label": "Database Path"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/readonly",
+        "label": "Read-Only Mode"
+      }
+    ]
+  },
+  "data": {
+    "databasePath": "",
+    "readonly": false
+  }
+}

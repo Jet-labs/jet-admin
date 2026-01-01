@@ -11,39 +11,6 @@
         "enum": ["GET", "POST", "PUT", "DELETE", "PATCH"],
         "default": "GET"
       },
-      "timeout": {
-        "type": "integer",
-        "description": "Request timeout in seconds",
-        "minimum": 1
-      },
-      "authType": {
-        "type": "string",
-        "enum": ["none", "basic", "bearer", "oauth2"],
-        "default": "none"
-      },
-      "username": {
-        "type": "string",
-        "description": "Username for Basic Auth"
-      },
-      "password": {
-        "type": "string",
-        "description": "Password for Basic Auth",
-        "format": "password"
-      },
-      "bearerToken": {
-        "type": "string",
-        "description": "Bearer token for authentication",
-        "format": "password"
-      },
-      "oauth2": {
-        "type": "object",
-        "properties": {
-          "clientId": { "type": "string" },
-          "clientSecret": { "type": "string", "format": "password" },
-          "tokenUrl": { "type": "string", "format": "uri" }
-        },
-        "required": ["clientId", "clientSecret", "tokenUrl"]
-      },
       "headers": {
         "type": "array",
         "items": {
@@ -69,19 +36,6 @@
       "body": {
         "type": "string",
         "description": "Request body (for POST/PUT/PATCH)"
-      },
-      "contentType": {
-        "type": "string",
-        "enum": ["application/json", "application/xml", "text/plain"],
-        "default": "application/json"
-      },
-      "followRedirects": {
-        "type": "boolean",
-        "default": true
-      },
-      "sslVerify": {
-        "type": "boolean",
-        "default": true
       },
       "args": {
         "type": "array",
@@ -130,87 +84,6 @@
               {
                 "type": "Control",
                 "scope": "#/properties/method"
-              },
-              {
-                "type": "Control",
-                "scope": "#/properties/timeout"
-              },
-              {
-                "type": "Control",
-                "scope": "#/properties/contentType"
-              }
-            ]
-          },
-          {
-            "type": "Category",
-            "label": "Authentication",
-            "elements": [
-              {
-                "type": "Control",
-                "scope": "#/properties/authType"
-              },
-              {
-                "type": "Group",
-                "label": "Basic Auth",
-                "rule": {
-                  "effect": "SHOW",
-                  "condition": {
-                    "scope": "#/properties/authType",
-                    "schema": { "const": "basic" }
-                  }
-                },
-                "elements": [
-                  {
-                    "type": "Control",
-                    "scope": "#/properties/username"
-                  },
-                  {
-                    "type": "Control",
-                    "scope": "#/properties/password"
-                  }
-                ]
-              },
-              {
-                "type": "Group",
-                "label": "Bearer Token",
-                "rule": {
-                  "effect": "SHOW",
-                  "condition": {
-                    "scope": "#/properties/authType",
-                    "schema": { "const": "bearer" }
-                  }
-                },
-                "elements": [
-                  {
-                    "type": "Control",
-                    "scope": "#/properties/bearerToken"
-                  }
-                ]
-              },
-              {
-                "type": "Group",
-                "label": "OAuth2",
-                "rule": {
-                  "effect": "SHOW",
-                  "condition": {
-                    "scope": "#/properties/authType",
-                    "schema": { "const": "oauth2" }
-                  }
-                },
-                "elements": [
-                  {
-                    "type": "Control",
-                    "scope": "#/properties/oauth2/properties/clientId"
-                  },
-                  {
-                    "type": "Control",
-                    "scope": "#/properties/oauth2/properties/clientSecret"
-                  },
-                  {
-                    "type": "Control",
-                    "scope": "#/properties/oauth2/properties/tokenUrl"
-                  }
-                ]
               }
             ]
           },
@@ -280,20 +153,6 @@
                 "scope": "#/properties/body"
               }
             ]
-          },
-          {
-            "type": "Category",
-            "label": "Advanced",
-            "elements": [
-              {
-                "type": "Control",
-                "scope": "#/properties/followRedirects"
-              },
-              {
-                "type": "Control",
-                "scope": "#/properties/sslVerify"
-              }
-            ]
           }
         ]
       },
@@ -320,15 +179,14 @@
     ]
   },
   "data": {
-    "apiEndpoint": "/data ",
+    "apiEndpoint": "/data",
     "method": "GET",
-    "timeout": 10,
-    "authType": "bearer",
-    "bearerToken": "your-bearer-token-here",
     "headers": [{ "key": "X-Custom-Header", "value": "HeaderValue" }],
-    "queryParams": [{ "key": "filter", "value": "active" }],
-    "contentType": "application/json",
-    "followRedirects": true,
-    "sslVerify": true
+    "queryParams": [
+      {
+        "key": "filter",
+        "value": "active"
+      }
+    ]
   }
 }

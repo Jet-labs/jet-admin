@@ -1,0 +1,98 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "operationType": {
+        "type": "string",
+        "enum": ["query", "mutation"],
+        "default": "query",
+        "description": "Type of GraphQL operation"
+      },
+      "query": {
+        "type": "string",
+        "description": "GraphQL query or mutation",
+        "format": "code-graphql"
+      },
+      "variables": {
+        "type": "string",
+        "description": "Variables for the query (JSON format)",
+        "format": "code-json"
+      },
+      "operationName": {
+        "type": "string",
+        "description": "Operation name (optional, for queries with multiple operations)"
+      },
+      "args": {
+        "type": "array",
+        "description": "Dynamic arguments to inject into variables",
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string",
+              "enum": ["string", "number", "boolean", "array", "object"],
+              "default": "string"
+            }
+          },
+          "required": ["key", "type"]
+        }
+      }
+    },
+    "required": ["query"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/operationType",
+        "label": "Operation Type"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/query",
+        "label": "GraphQL Query / Mutation"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/variables",
+        "label": "Variables (JSON)"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/operationName",
+        "label": "Operation Name (Optional)"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/args",
+        "label": "Dynamic Arguments",
+        "options": {
+          "detail": {
+            "type": "VerticalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/key"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/type"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "data": {
+    "operationType": "query",
+    "query": "query GetUsers($limit: Int) {\n  users(limit: $limit) {\n    id\n    name\n    email\n  }\n}",
+    "variables": "{\n  \"limit\": 10\n}",
+    "operationName": "",
+    "args": []
+  }
+}

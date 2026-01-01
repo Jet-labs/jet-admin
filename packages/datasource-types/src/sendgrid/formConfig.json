@@ -1,0 +1,28 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "apiKey": {
+        "type": "string",
+        "description": "SendGrid API Key",
+        "format": "password",
+        "minLength": 1
+      }
+    },
+    "required": ["apiKey"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/apiKey",
+        "label": "API Key",
+        "options": { "format": "password" }
+      }
+    ]
+  },
+  "data": {
+    "apiKey": ""
+  }
+}

@@ -1,0 +1,143 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "connectionOption": {
+        "type": "string",
+        "enum": ["connectionDetails", "connectionString"],
+        "default": "connectionDetails"
+      },
+      "connectionDetails": {
+        "type": "object",
+        "properties": {
+          "connectionName": {
+            "type": "string",
+            "description": "A unique name for this connection.",
+            "minLength": 3
+          },
+          "host": {
+            "type": "string",
+            "description": "The hostname or IP address of the Oracle server."
+          },
+          "port": {
+            "type": "integer",
+            "description": "The port number (default is 1521).",
+            "default": 1521
+          },
+          "serviceName": {
+            "type": "string",
+            "description": "The Oracle service name or SID."
+          },
+          "user": {
+            "type": "string",
+            "description": "The username for connecting."
+          },
+          "password": {
+            "type": "string",
+            "description": "The password for the user.",
+            "format": "password"
+          }
+        },
+        "required": ["connectionName", "host", "serviceName", "user", "password"]
+      },
+      "connectionString": {
+        "type": "string",
+        "description": "Full Oracle connection string (e.g., 'host:port/serviceName')."
+      }
+    },
+    "required": ["connectionOption"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/connectionOption",
+        "label": "Connection Type"
+      },
+      {
+        "type": "Group",
+        "label": "Connection Details",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/connectionOption",
+            "schema": { "const": "connectionDetails" }
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/connectionDetails/properties/connectionName",
+            "label": "Connection Name"
+          },
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/host",
+                "label": "Host"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/port",
+                "label": "Port"
+              }
+            ]
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/connectionDetails/properties/serviceName",
+            "label": "Service Name / SID"
+          },
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/user",
+                "label": "Username"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/password",
+                "label": "Password",
+                "options": { "format": "password" }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Connection String",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/connectionOption",
+            "schema": { "const": "connectionString" }
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/connectionString",
+            "label": "Connection String"
+          }
+        ]
+      }
+    ]
+  },
+  "data": {
+    "connectionOption": "connectionDetails",
+    "connectionDetails": {
+      "connectionName": "",
+      "host": "localhost",
+      "port": 1521,
+      "serviceName": "ORCL",
+      "user": "",
+      "password": ""
+    }
+  }
+}

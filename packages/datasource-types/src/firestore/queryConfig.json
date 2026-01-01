@@ -1,0 +1,183 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "operation": {
+        "type": "string",
+        "enum": ["get", "list", "query", "add", "set", "update", "delete"],
+        "default": "list",
+        "description": "Firestore operation to perform"
+      },
+      "collectionPath": {
+        "type": "string",
+        "description": "Collection path (e.g., 'users' or 'users/uid/orders')"
+      },
+      "documentId": {
+        "type": "string",
+        "description": "Document ID (for get, set, update, delete operations)"
+      },
+      "data": {
+        "type": "string",
+        "description": "Document data as JSON (for add, set, update operations)",
+        "format": "code-json"
+      },
+      "where": {
+        "type": "array",
+        "description": "Query conditions",
+        "items": {
+          "type": "object",
+          "properties": {
+            "field": { "type": "string" },
+            "operator": {
+              "type": "string",
+              "enum": ["==", "!=", "<", "<=", ">", ">=", "array-contains", "array-contains-any", "in", "not-in"]
+            },
+            "value": { "type": "string" }
+          },
+          "required": ["field", "operator", "value"]
+        }
+      },
+      "orderBy": {
+        "type": "object",
+        "properties": {
+          "field": { "type": "string" },
+          "direction": {
+            "type": "string",
+            "enum": ["asc", "desc"],
+            "default": "asc"
+          }
+        }
+      },
+      "limit": {
+        "type": "integer",
+        "description": "Maximum number of documents to return",
+        "minimum": 1,
+        "maximum": 1000
+      },
+      "args": {
+        "type": "array",
+        "description": "Query arguments",
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": { "type": "string" },
+            "type": {
+              "type": "string",
+              "enum": ["string", "number", "boolean", "array (, separated)", "object (JSON stringified)"],
+              "default": "string"
+            }
+          },
+          "required": ["key", "type"]
+        }
+      }
+    },
+    "required": ["operation", "collectionPath"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/operation",
+            "label": "Operation"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/collectionPath",
+            "label": "Collection Path"
+          }
+        ]
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/documentId",
+        "label": "Document ID",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/operation",
+            "schema": { "enum": ["get", "set", "update", "delete"] }
+          }
+        }
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/data",
+        "label": "Document Data (JSON)",
+        "options": {
+          "multi": true,
+          "rows": 6
+        },
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/operation",
+            "schema": { "enum": ["add", "set", "update"] }
+          }
+        }
+      },
+      {
+        "type": "Group",
+        "label": "Query Options",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/operation",
+            "schema": { "enum": ["list", "query"] }
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/where",
+            "label": "Where Conditions",
+            "options": {
+              "detail": {
+                "type": "HorizontalLayout",
+                "elements": [
+                  { "type": "Control", "scope": "#/properties/field" },
+                  { "type": "Control", "scope": "#/properties/operator" },
+                  { "type": "Control", "scope": "#/properties/value" }
+                ]
+              }
+            }
+          },
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              { "type": "Control", "scope": "#/properties/orderBy/properties/field", "label": "Order By Field" },
+              { "type": "Control", "scope": "#/properties/orderBy/properties/direction", "label": "Direction" }
+            ]
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/limit",
+            "label": "Limit"
+          }
+        ]
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/args",
+        "label": "Arguments",
+        "options": {
+          "detail": {
+            "type": "VerticalLayout",
+            "elements": [
+              { "type": "Control", "scope": "#/properties/key" },
+              { "type": "Control", "scope": "#/properties/type" }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "data": {
+    "operation": "list",
+    "collectionPath": "users",
+    "limit": 100
+  }
+}

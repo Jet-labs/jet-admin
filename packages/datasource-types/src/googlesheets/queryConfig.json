@@ -1,0 +1,250 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "operation": {
+        "type": "string",
+        "enum": ["read", "write", "append", "update", "clear", "getSpreadsheetInfo"],
+        "default": "read",
+        "description": "Google Sheets operation to perform"
+      },
+      "spreadsheetId": {
+        "type": "string",
+        "description": "The ID of the spreadsheet (from the URL)"
+      },
+      "sheetName": {
+        "type": "string",
+        "description": "Name of the sheet/tab within the spreadsheet"
+      },
+      "range": {
+        "type": "string",
+        "description": "Cell range in A1 notation (e.g., 'A1:D10', 'Sheet1!A1:D10')",
+        "default": "A1:Z1000"
+      },
+      "data": {
+        "type": "string",
+        "description": "Data to write (JSON array of arrays for rows/columns)",
+        "format": "code-json"
+      },
+      "valueInputOption": {
+        "type": "string",
+        "enum": ["RAW", "USER_ENTERED"],
+        "default": "USER_ENTERED",
+        "description": "How input data should be interpreted"
+      },
+      "insertDataOption": {
+        "type": "string",
+        "enum": ["OVERWRITE", "INSERT_ROWS"],
+        "default": "INSERT_ROWS",
+        "description": "How to insert data when appending"
+      },
+      "majorDimension": {
+        "type": "string",
+        "enum": ["ROWS", "COLUMNS"],
+        "default": "ROWS",
+        "description": "The major dimension of the data"
+      },
+      "includeHeaders": {
+        "type": "boolean",
+        "description": "Treat first row as headers when reading",
+        "default": true
+      },
+      "args": {
+        "type": "array",
+        "description": "Dynamic arguments",
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string",
+              "enum": ["string", "number", "boolean"],
+              "default": "string"
+            }
+          },
+          "required": ["key", "type"]
+        }
+      }
+    },
+    "required": ["operation", "spreadsheetId"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/operation",
+        "label": "Operation"
+      },
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/spreadsheetId",
+            "label": "Spreadsheet ID"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/sheetName",
+            "label": "Sheet Name"
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Read Options",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/operation",
+            "schema": { "const": "read" }
+          }
+        },
+        "elements": [
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/range",
+                "label": "Range (A1 notation)"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/majorDimension",
+                "label": "Major Dimension"
+              }
+            ]
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/includeHeaders",
+            "label": "Treat first row as headers"
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Write Options",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "type": "OR",
+            "conditions": [
+              { "scope": "#/properties/operation", "schema": { "const": "write" } },
+              { "scope": "#/properties/operation", "schema": { "const": "update" } }
+            ]
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/range",
+            "label": "Range (A1 notation)"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/data",
+            "label": "Data (JSON array of arrays)"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/valueInputOption",
+            "label": "Value Input Option"
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Append Options",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/operation",
+            "schema": { "const": "append" }
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/range",
+            "label": "Range (A1 notation)"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/data",
+            "label": "Data (JSON array of arrays)"
+          },
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/valueInputOption",
+                "label": "Value Input Option"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/insertDataOption",
+                "label": "Insert Data Option"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Clear Options",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/operation",
+            "schema": { "const": "clear" }
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/range",
+            "label": "Range to Clear (A1 notation)"
+          }
+        ]
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/args",
+        "label": "Dynamic Arguments",
+        "options": {
+          "detail": {
+            "type": "VerticalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/key"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/type"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "data": {
+    "operation": "read",
+    "spreadsheetId": "",
+    "sheetName": "Sheet1",
+    "range": "A1:Z1000",
+    "data": "[[\"Header1\", \"Header2\"], [\"Value1\", \"Value2\"]]",
+    "valueInputOption": "USER_ENTERED",
+    "insertDataOption": "INSERT_ROWS",
+    "majorDimension": "ROWS",
+    "includeHeaders": true,
+    "args": []
+  }
+}

@@ -1,0 +1,201 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "queryType": {
+        "type": "string",
+        "enum": ["select", "insert", "update", "delete", "rpc"],
+        "default": "select"
+      },
+      "table": {
+        "type": "string",
+        "description": "The table name to query"
+      },
+      "columns": {
+        "type": "string",
+        "description": "Columns to select (comma-separated, or * for all)",
+        "default": "*"
+      },
+      "filters": {
+        "type": "array",
+        "description": "Filter conditions",
+        "items": {
+          "type": "object",
+          "properties": {
+            "column": {
+              "type": "string"
+            },
+            "operator": {
+              "type": "string",
+              "enum": ["eq", "neq", "gt", "gte", "lt", "lte", "like", "ilike", "is", "in"]
+            },
+            "value": {
+              "type": "string"
+            }
+          },
+          "required": ["column", "operator", "value"]
+        }
+      },
+      "data": {
+        "type": "string",
+        "description": "JSON data for insert/update operations",
+        "format": "code-json"
+      },
+      "functionName": {
+        "type": "string",
+        "description": "RPC function name to call"
+      },
+      "functionArgs": {
+        "type": "string",
+        "description": "JSON arguments for RPC function",
+        "format": "code-json"
+      },
+      "limit": {
+        "type": "integer",
+        "description": "Maximum number of rows to return",
+        "minimum": 1
+      },
+      "orderBy": {
+        "type": "string",
+        "description": "Column to order by"
+      },
+      "ascending": {
+        "type": "boolean",
+        "description": "Sort ascending",
+        "default": true
+      }
+    },
+    "required": ["queryType", "table"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/queryType",
+            "label": "Operation"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/table",
+            "label": "Table Name"
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Select Options",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/queryType",
+            "schema": { "const": "select" }
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/columns",
+            "label": "Columns"
+          },
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/limit",
+                "label": "Limit"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/orderBy",
+                "label": "Order By"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/ascending",
+                "label": "Ascending"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Data",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/queryType",
+            "schema": { "enum": ["insert", "update"] }
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/data",
+            "label": "Data (JSON)"
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "RPC Function",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/queryType",
+            "schema": { "const": "rpc" }
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/functionName",
+            "label": "Function Name"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/functionArgs",
+            "label": "Arguments (JSON)"
+          }
+        ]
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/filters",
+        "label": "Filters",
+        "options": {
+          "detail": {
+            "type": "HorizontalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/column"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/operator"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/value"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "data": {
+    "queryType": "select",
+    "table": "",
+    "columns": "*",
+    "filters": [],
+    "limit": 100,
+    "ascending": true
+  }
+}

@@ -135,7 +135,16 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
     validateOnMount: false,
     validateOnChange: false,
     onSubmit: (values) => {
-      updateWidget(values);
+      // Separate dataQueries into query and workflow sources
+      const allDataSources = values.dataQueries || [];
+      const dataQueries = allDataSources.filter(ds => ds.dataSourceType !== 'workflow');
+      const workflowSources = allDataSources.filter(ds => ds.dataSourceType === 'workflow');
+
+      updateWidget({
+        ...values,
+        dataQueries,
+        workflowSources,
+      });
     },
   });
 

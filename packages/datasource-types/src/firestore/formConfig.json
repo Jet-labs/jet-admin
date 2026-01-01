@@ -1,0 +1,93 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "connectionOption": {
+        "type": "string",
+        "enum": ["serviceAccount", "projectId"],
+        "default": "serviceAccount",
+        "description": "Choose authentication method"
+      },
+      "projectId": {
+        "type": "string",
+        "description": "Firebase/GCP Project ID",
+        "minLength": 1
+      },
+      "serviceAccountKey": {
+        "type": "string",
+        "description": "Service Account JSON key (paste the entire JSON content)",
+        "format": "textarea"
+      },
+      "databaseURL": {
+        "type": "string",
+        "description": "Optional: Firestore database URL (for non-default databases)"
+      }
+    },
+    "required": ["connectionOption", "projectId"],
+    "allOf": [
+      {
+        "if": {
+          "properties": {
+            "connectionOption": {
+              "const": "serviceAccount"
+            }
+          }
+        },
+        "then": {
+          "required": ["serviceAccountKey"]
+        }
+      }
+    ]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/connectionOption",
+        "label": "Authentication Method",
+        "options": {
+          "format": "radio"
+        }
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/projectId",
+        "label": "Project ID"
+      },
+      {
+        "type": "Group",
+        "label": "Service Account",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/connectionOption",
+            "schema": { "const": "serviceAccount" }
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/serviceAccountKey",
+            "label": "Service Account JSON Key",
+            "options": {
+              "multi": true,
+              "rows": 8
+            }
+          }
+        ]
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/databaseURL",
+        "label": "Database URL (Optional)"
+      }
+    ]
+  },
+  "data": {
+    "connectionOption": "serviceAccount",
+    "projectId": "my-firebase-project",
+    "serviceAccountKey": "",
+    "databaseURL": ""
+  }
+}

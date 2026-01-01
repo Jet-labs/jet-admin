@@ -1,0 +1,37 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "propertyId": {
+        "type": "string",
+        "description": "Google Analytics 4 Property ID",
+        "minLength": 1
+      },
+      "credentials": {
+        "type": "string",
+        "description": "Service Account credentials JSON",
+        "format": "code-json"
+      }
+    },
+    "required": ["propertyId"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/propertyId",
+        "label": "Property ID"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/credentials",
+        "label": "Service Account Credentials (JSON)"
+      }
+    ]
+  },
+  "data": {
+    "propertyId": "",
+    "credentials": ""
+  }
+}

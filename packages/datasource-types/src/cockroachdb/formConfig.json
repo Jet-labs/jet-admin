@@ -1,0 +1,47 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "connectionString": {
+        "type": "string",
+        "description": "CockroachDB connection string (postgresql:// format)",
+        "minLength": 1
+      },
+      "ssl": {
+        "type": "boolean",
+        "description": "Enable SSL connection",
+        "default": true
+      },
+      "sslCert": {
+        "type": "string",
+        "description": "Path to SSL certificate file (optional)"
+      }
+    },
+    "required": ["connectionString"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/connectionString",
+        "label": "Connection String"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/ssl",
+        "label": "Enable SSL"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/sslCert",
+        "label": "SSL Certificate Path (Optional)"
+      }
+    ]
+  },
+  "data": {
+    "connectionString": "postgresql://user:password@localhost:26257/defaultdb?sslmode=require",
+    "ssl": true,
+    "sslCert": ""
+  }
+}

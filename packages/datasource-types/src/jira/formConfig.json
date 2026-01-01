@@ -1,0 +1,55 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "host": {
+        "type": "string",
+        "description": "Jira instance URL (e.g., https://your-domain.atlassian.net)",
+        "minLength": 1
+      },
+      "email": {
+        "type": "string",
+        "description": "Atlassian account email",
+        "minLength": 1
+      },
+      "apiToken": {
+        "type": "string",
+        "description": "Jira API Token",
+        "format": "password",
+        "minLength": 1
+      }
+    },
+    "required": ["host", "email", "apiToken"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/host",
+        "label": "Jira URL"
+      },
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/email",
+            "label": "Email"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/apiToken",
+            "label": "API Token",
+            "options": { "format": "password" }
+          }
+        ]
+      }
+    ]
+  },
+  "data": {
+    "host": "",
+    "email": "",
+    "apiToken": ""
+  }
+}

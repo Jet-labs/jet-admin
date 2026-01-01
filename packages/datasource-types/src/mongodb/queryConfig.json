@@ -1,0 +1,294 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "operation": {
+        "type": "string",
+        "enum": ["find", "findOne", "insertOne", "insertMany", "updateOne", "updateMany", "deleteOne", "deleteMany", "aggregate", "count"],
+        "default": "find",
+        "description": "MongoDB operation to perform"
+      },
+      "collection": {
+        "type": "string",
+        "description": "Name of the collection to query",
+        "minLength": 1
+      },
+      "filter": {
+        "type": "string",
+        "description": "Query filter document (JSON format)",
+        "format": "code-json",
+        "default": "{}"
+      },
+      "projection": {
+        "type": "string",
+        "description": "Fields to include/exclude (JSON format)",
+        "format": "code-json"
+      },
+      "sort": {
+        "type": "string",
+        "description": "Sort order document (JSON format, e.g., {\"createdAt\": -1})",
+        "format": "code-json"
+      },
+      "limit": {
+        "type": "integer",
+        "description": "Maximum number of documents to return",
+        "minimum": 0
+      },
+      "skip": {
+        "type": "integer",
+        "description": "Number of documents to skip",
+        "minimum": 0
+      },
+      "document": {
+        "type": "string",
+        "description": "Document to insert or update data (JSON format)",
+        "format": "code-json"
+      },
+      "pipeline": {
+        "type": "string",
+        "description": "Aggregation pipeline stages (JSON array format)",
+        "format": "code-json"
+      },
+      "options": {
+        "type": "object",
+        "description": "Additional operation options",
+        "properties": {
+          "upsert": {
+            "type": "boolean",
+            "description": "Create document if it doesn't exist (for update operations)",
+            "default": false
+          }
+        }
+      },
+      "args": {
+        "type": "array",
+        "description": "Dynamic arguments to inject into filter/document",
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string",
+              "enum": ["string", "number", "boolean", "objectId", "date", "array", "object"],
+              "default": "string"
+            }
+          },
+          "required": ["key", "type"]
+        }
+      }
+    },
+    "required": ["operation", "collection"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/operation",
+            "label": "Operation"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/collection",
+            "label": "Collection"
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Query Options",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "type": "OR",
+            "conditions": [
+              { "scope": "#/properties/operation", "schema": { "const": "find" } },
+              { "scope": "#/properties/operation", "schema": { "const": "findOne" } },
+              { "scope": "#/properties/operation", "schema": { "const": "count" } }
+            ]
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/filter",
+            "label": "Filter"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/projection",
+            "label": "Projection",
+            "rule": {
+              "effect": "SHOW",
+              "condition": {
+                "type": "OR",
+                "conditions": [
+                  { "scope": "#/properties/operation", "schema": { "const": "find" } },
+                  { "scope": "#/properties/operation", "schema": { "const": "findOne" } }
+                ]
+              }
+            }
+          },
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/sort",
+                "label": "Sort"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/limit",
+                "label": "Limit"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/skip",
+                "label": "Skip"
+              }
+            ],
+            "rule": {
+              "effect": "SHOW",
+              "condition": {
+                "scope": "#/properties/operation",
+                "schema": { "const": "find" }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Document",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "type": "OR",
+            "conditions": [
+              { "scope": "#/properties/operation", "schema": { "const": "insertOne" } },
+              { "scope": "#/properties/operation", "schema": { "const": "insertMany" } }
+            ]
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/document",
+            "label": "Document(s) to Insert"
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Update",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "type": "OR",
+            "conditions": [
+              { "scope": "#/properties/operation", "schema": { "const": "updateOne" } },
+              { "scope": "#/properties/operation", "schema": { "const": "updateMany" } }
+            ]
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/filter",
+            "label": "Filter"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/document",
+            "label": "Update Document"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/options/properties/upsert",
+            "label": "Upsert (create if not exists)"
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Delete",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "type": "OR",
+            "conditions": [
+              { "scope": "#/properties/operation", "schema": { "const": "deleteOne" } },
+              { "scope": "#/properties/operation", "schema": { "const": "deleteMany" } }
+            ]
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/filter",
+            "label": "Filter"
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Aggregation Pipeline",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/operation",
+            "schema": { "const": "aggregate" }
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/pipeline",
+            "label": "Pipeline Stages"
+          }
+        ]
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/args",
+        "label": "Dynamic Arguments",
+        "options": {
+          "detail": {
+            "type": "VerticalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/key"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/type"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "data": {
+    "operation": "find",
+    "collection": "users",
+    "filter": "{}",
+    "projection": "",
+    "sort": "{\"createdAt\": -1}",
+    "limit": 100,
+    "skip": 0,
+    "document": "",
+    "pipeline": "",
+    "options": {
+      "upsert": false
+    },
+    "args": []
+  }
+}

@@ -1,0 +1,196 @@
+import amqp from "amqplib";
+import { Logger } from "../../utils/logger.js";
+import DataSource from "../datasource.js";
+
+export default class RabbitMQDataSource extends DataSource {
+  buildConnectionUrl() {
+    const opts = this.config.datasourceOptions || {};
+    
+    if (opts.connectionUrl) {
+      return opts.connectionUrl;
+    }
+    
+    const details = opts.connectionDetails || opts;
+    const protocol = details.ssl ? "amqps" : "amqp";
+    const auth = details.username && details.password 
+      ? `${encodeURIComponent(details.username)}:${encodeURIComponent(details.password)}@`
+      : "";
+    const vhost = encodeURIComponent(details.vhost || "/");
+    const heartbeat = details.heartbeat ? `?heartbeat=${details.heartbeat}` : "";
+    
+    return `${protocol}://${auth}${details.host || "localhost"}:${details.port || 5672}/${vhost}${heartbeat}`;
+  }
+
+  async execute(dataQueryOptions, context) {
+    Logger.log("info", {
+      message: "rabbitmq:RabbitMQDataSource:execute:params",
+      params: { dataQueryOptions, datasourceID: this.config.datasourceID },
+    });
+
+    const { 
+      operation, 
+      queue, 
+      exchange, 
+      routingKey, 
+      message, 
+      messageCount = 1,
+      consumeMode = "preview",
+      storeDestination,
+      queueOptions = {},
+      messageOptions = {}
+    } = dataQueryOptions;
+
+    let connection;
+    let channel;
+    
+    try {
+      connection = await amqp.connect(this.buildConnectionUrl());
+      channel = await connection.createChannel();
+      
+      let result;
+      
+      switch (operation) {
+        case "publish":
+          result = await this.publish(channel, queue, exchange, routingKey, message, queueOptions, messageOptions);
+          break;
+        case "consume":
+        case "peek":
+          result = await this.consume(channel, queue, messageCount, consumeMode, storeDestination, queueOptions, context);
+          break;
+        case "ack":
+          result = { success: true, message: "Messages acknowledged" };
+          break;
+        case "nack":
+          result = { success: true, message: "Messages rejected" };
+          break;
+        case "purge":
+          result = await this.purge(channel, queue);
+          break;
+        case "getQueueInfo":
+          result = await this.getQueueInfo(channel, queue);
+          break;
+        case "deleteQueue":
+          result = await this.deleteQueue(channel, queue);
+          break;
+        default:
+          throw new Error(`Unknown operation: ${operation}`);
+      }
+
+      Logger.log("info", {
+        message: "rabbitmq:RabbitMQDataSource:execute:success",
+        params: { operation, queue },
+      });
+
+      return result;
+    } catch (error) {
+      Logger.log("error", {
+        message: "rabbitmq:RabbitMQDataSource:execute:catch",
+        params: { error: error.message },
+      });
+      throw new Error(`RabbitMQ ${operation} failed: ${error.message}`);
+    } finally {
+      if (channel) await channel.close();
+      if (connection) await connection.close();
+    }
+  }
+
+  async publish(channel, queue, exchange, routingKey, message, queueOptions, messageOptions) {
+    const msgContent = typeof message === "string" ? message : JSON.stringify(message);
+    const buffer = Buffer.from(msgContent);
+    
+    const options = {
+      persistent: messageOptions.persistent !== false,
+      contentType: messageOptions.contentType || "application/json",
+      ...(messageOptions.expiration ? { expiration: messageOptions.expiration } : {}),
+    };
+
+    if (exchange) {
+      await channel.assertExchange(exchange, "direct", { durable: true });
+      channel.publish(exchange, routingKey || queue, buffer, options);
+    } else {
+      await channel.assertQueue(queue, {
+        durable: queueOptions.durable !== false,
+        autoDelete: queueOptions.autoDelete || false,
+        exclusive: queueOptions.exclusive || false,
+      });
+      channel.sendToQueue(queue, buffer, options);
+    }
+
+    return { success: true, queue, exchange, routingKey, messageSize: buffer.length };
+  }
+
+  async consume(channel, queue, messageCount, consumeMode, storeDestination, queueOptions, context) {
+    await channel.assertQueue(queue, {
+      durable: queueOptions.durable !== false,
+      autoDelete: queueOptions.autoDelete || false,
+      exclusive: queueOptions.exclusive || false,
+    });
+
+    const messages = [];
+    
+    for (let i = 0; i < messageCount; i++) {
+      const msg = await channel.get(queue, { noAck: false });
+      
+      if (!msg) break;
+      
+      let content;
+      try {
+        content = JSON.parse(msg.content.toString());
+      } catch {
+        content = msg.content.toString();
+      }
+      
+      const messageData = {
+        content,
+        properties: {
+          messageId: msg.properties.messageId,
+          contentType: msg.properties.contentType,
+          timestamp: msg.properties.timestamp,
+          deliveryTag: msg.fields.deliveryTag,
+          redelivered: msg.fields.redelivered,
+        },
+      };
+      
+      messages.push(messageData);
+      
+      if (consumeMode === "preview") {
+        // Put message back in queue
+        channel.nack(msg, false, true);
+      } else if (consumeMode === "consume" || consumeMode === "consumeAndStore") {
+        // Acknowledge and remove from queue
+        channel.ack(msg);
+        
+        // If storing, execute the store destination data query
+        if (consumeMode === "consumeAndStore" && storeDestination?.dataQueryId && context?.executeDataQuery) {
+          await context.executeDataQuery(storeDestination.dataQueryId, { message: content });
+        }
+      }
+    }
+
+    return {
+      messages,
+      count: messages.length,
+      queue,
+      consumeMode,
+    };
+  }
+
+  async purge(channel, queue) {
+    const result = await channel.purgeQueue(queue);
+    return { success: true, messageCount: result.messageCount, queue };
+  }
+
+  async getQueueInfo(channel, queue) {
+    const info = await channel.checkQueue(queue);
+    return {
+      queue: info.queue,
+      messageCount: info.messageCount,
+      consumerCount: info.consumerCount,
+    };
+  }
+
+  async deleteQueue(channel, queue) {
+    const result = await channel.deleteQueue(queue);
+    return { success: true, messageCount: result.messageCount, queue };
+  }
+}

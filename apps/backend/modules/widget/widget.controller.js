@@ -64,6 +64,7 @@ widgetController.createWidget = async (req, res) => {
       widgetType,
       widgetConfig,
       dataQueries,
+      workflowSources,
     } = req.body;
 
     Logger.log("info", {
@@ -75,7 +76,8 @@ widgetController.createWidget = async (req, res) => {
         widgetDescription,
         widgetType,
         widgetConfig,
-        dataQueries,
+        dataQueriesCount: dataQueries?.length,
+        workflowSourcesCount: workflowSources?.length,
       },
     });
 
@@ -87,6 +89,7 @@ widgetController.createWidget = async (req, res) => {
       widgetType,
       widgetConfig,
       dataQueries,
+      workflowSources,
     });
 
     Logger.log("success", {
@@ -328,6 +331,7 @@ widgetController.updateWidgetByID = async (req, res) => {
       widgetTitle,
       widgetType,
       dataQueries,
+      workflowSources,
     } = req.body;
 
     Logger.log("info", {
@@ -340,7 +344,8 @@ widgetController.updateWidgetByID = async (req, res) => {
         widgetDescription,
         widgetTitle,
         widgetType,
-        dataQueries,
+        dataQueriesCount: dataQueries?.length,
+        workflowSourcesCount: workflowSources?.length,
       },
     });
 
@@ -353,6 +358,7 @@ widgetController.updateWidgetByID = async (req, res) => {
       widgetTitle,
       widgetType,
       dataQueries,
+      workflowSources,
     });
 
     Logger.log("success", {

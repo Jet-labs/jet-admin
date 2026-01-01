@@ -1,0 +1,76 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "resource": {
+        "type": "string",
+        "enum": ["stats", "messages", "contacts", "templates", "suppressions"],
+        "default": "stats"
+      },
+      "operation": {
+        "type": "string",
+        "enum": ["list", "get", "send"],
+        "default": "list"
+      },
+      "params": {
+        "type": "string",
+        "description": "Request parameters or email data (JSON)",
+        "format": "code-json"
+      },
+      "startDate": {
+        "type": "string",
+        "description": "Start date for stats (YYYY-MM-DD)"
+      },
+      "endDate": {
+        "type": "string",
+        "description": "End date for stats (YYYY-MM-DD)"
+      }
+    },
+    "required": ["resource", "operation"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/resource",
+            "label": "Resource"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/operation",
+            "label": "Operation"
+          }
+        ]
+      },
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/startDate",
+            "label": "Start Date"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/endDate",
+            "label": "End Date"
+          }
+        ]
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/params",
+        "label": "Parameters (JSON)"
+      }
+    ]
+  },
+  "data": {
+    "resource": "stats",
+    "operation": "list",
+    "params": "{}"
+  }
+}

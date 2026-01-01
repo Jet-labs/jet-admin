@@ -55,9 +55,9 @@ workflowController.createWorkflow = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID } = req.params;
-    const { title, nodes, edges } = req.body;
-    Logger.log("info", { message: "WorkflowController:createWorkflow:params", params: { userID: user.userID, tenantID, title, nodes, edges } });
-    const workflow = await workflowService.createWorkflow({ userID: user.userID, tenantID, title, nodes, edges });
+    const { title, nodes, edges, workflowOptions } = req.body;
+    Logger.log("info", { message: "WorkflowController:createWorkflow:params", params: { userID: user.userID, tenantID, title, nodes, edges, workflowOptions } });
+    const workflow = await workflowService.createWorkflow({ userID: user.userID, tenantID, title, nodes, edges, workflowOptions });
     Logger.log("success", { message: "WorkflowController:createWorkflow:success", params: { workflow } });
     expressUtils.sendResponse(res, true, { workflow });
   } catch (error) {
@@ -75,9 +75,9 @@ workflowController.updateWorkflow = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID, workflowID } = req.params;
-    const { title, nodes, edges } = req.body;
-    Logger.log("info", { message: "WorkflowController:updateWorkflow:params", params: { userID: user.userID, tenantID, workflowID, title, nodes, edges } });
-    const workflow = await workflowService.updateWorkflow({ userID: user.userID, tenantID, workflowID, title, nodes, edges });
+    const { title, nodes, edges, workflowOptions } = req.body;
+    Logger.log("info", { message: "WorkflowController:updateWorkflow:params", params: { userID: user.userID, tenantID, workflowID, title, nodes, edges, workflowOptions } });
+    const workflow = await workflowService.updateWorkflow({ userID: user.userID, tenantID, workflowID, title, nodes, edges, workflowOptions });
     Logger.log("success", { message: "WorkflowController:updateWorkflow:success", params: { workflow } });
     expressUtils.sendResponse(res, true, { workflow });
   } catch (error) {

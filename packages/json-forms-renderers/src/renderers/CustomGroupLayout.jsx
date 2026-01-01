@@ -9,6 +9,8 @@ export const CustomGroupLayout = (props) => {
 
   const customClass = uischema.options?.customClass || "";
 
+  console.log('[CustomGroupLayout] Rendering group:', uischema.label, 'visible:', visible);
+
   if (!visible) {
     return null;
   }

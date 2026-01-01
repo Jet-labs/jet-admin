@@ -29,12 +29,20 @@ export const postgresqlTestConnection = async ({
       message: "postgresql:postgresqlTestConnection:disconnected",
       params: { connectionString, connectionData },
     });
-    return true;
+    // Return consistent object format like other datasources
+    return {
+      ok: true,
+      status: 200,
+      statusText: "Connected",
+    };
   } catch (error) {
     Logger.log("error", {
       message: "postgresql:postgresqlTestConnection:catch-1",
       params: { error },
     });
-    return false;
+    return {
+      ok: false,
+      error: error.message || error,
+    };
   }
 };

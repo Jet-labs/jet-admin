@@ -16,7 +16,7 @@ const DIRECT_QUERY_DATASOURCES = Object.keys(DATASOURCE_TYPES)
     if (!DATASOURCE_UI_COMPONENTS[DATASOURCE_TYPES[key].value]) {
       return null;
     } else if (
-      DATASOURCE_UI_COMPONENTS[DATASOURCE_TYPES[key].value].formConfig
+      DATASOURCE_TYPES[key].formConfig
     ) {
       return null;
     } else {

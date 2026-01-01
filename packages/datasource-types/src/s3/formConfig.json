@@ -1,0 +1,82 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "accessKeyId": {
+        "type": "string",
+        "description": "AWS Access Key ID",
+        "minLength": 1
+      },
+      "secretAccessKey": {
+        "type": "string",
+        "description": "AWS Secret Access Key",
+        "format": "password",
+        "minLength": 1
+      },
+      "region": {
+        "type": "string",
+        "description": "AWS Region (e.g., us-east-1)",
+        "default": "us-east-1"
+      },
+      "bucket": {
+        "type": "string",
+        "description": "Default S3 bucket name"
+      },
+      "endpoint": {
+        "type": "string",
+        "description": "Custom endpoint URL (for S3-compatible services)"
+      }
+    },
+    "required": ["accessKeyId", "secretAccessKey", "region"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/accessKeyId",
+            "label": "Access Key ID"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/secretAccessKey",
+            "label": "Secret Access Key",
+            "options": {
+              "format": "password"
+            }
+          }
+        ]
+      },
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/region",
+            "label": "Region"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/bucket",
+            "label": "Default Bucket"
+          }
+        ]
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/endpoint",
+        "label": "Custom Endpoint (Optional)"
+      }
+    ]
+  },
+  "data": {
+    "accessKeyId": "",
+    "secretAccessKey": "",
+    "region": "us-east-1",
+    "bucket": "",
+    "endpoint": ""
+  }
+}

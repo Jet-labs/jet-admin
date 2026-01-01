@@ -1,0 +1,150 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "operation": {
+        "type": "string",
+        "enum": ["search", "get", "index", "update", "delete", "count"],
+        "default": "search"
+      },
+      "index": {
+        "type": "string",
+        "description": "Index name or pattern",
+        "minLength": 1
+      },
+      "documentId": {
+        "type": "string",
+        "description": "Document ID (for get/update/delete)"
+      },
+      "query": {
+        "type": "string",
+        "description": "Elasticsearch Query DSL (JSON)",
+        "format": "code-json"
+      },
+      "body": {
+        "type": "string",
+        "description": "Document body for index/update (JSON)",
+        "format": "code-json"
+      },
+      "size": {
+        "type": "integer",
+        "description": "Number of results to return",
+        "default": 10,
+        "minimum": 0
+      },
+      "from": {
+        "type": "integer",
+        "description": "Starting offset for pagination",
+        "default": 0,
+        "minimum": 0
+      },
+      "sort": {
+        "type": "string",
+        "description": "Sort criteria (JSON array)",
+        "format": "code-json"
+      }
+    },
+    "required": ["operation", "index"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/operation",
+            "label": "Operation"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/index",
+            "label": "Index"
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Document ID",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/operation",
+            "schema": { "enum": ["get", "update", "delete"] }
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/documentId",
+            "label": "Document ID"
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Search Query",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/operation",
+            "schema": { "enum": ["search", "count"] }
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/query",
+            "label": "Query DSL (JSON)"
+          },
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/size",
+                "label": "Size"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/from",
+                "label": "From"
+              }
+            ]
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/sort",
+            "label": "Sort (JSON)"
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Document Body",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/operation",
+            "schema": { "enum": ["index", "update"] }
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/body",
+            "label": "Document (JSON)"
+          }
+        ]
+      }
+    ]
+  },
+  "data": {
+    "operation": "search",
+    "index": "",
+    "query": "{\n  \"match_all\": {}\n}",
+    "size": 10,
+    "from": 0
+  }
+}

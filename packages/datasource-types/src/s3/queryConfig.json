@@ -1,0 +1,161 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "operation": {
+        "type": "string",
+        "enum": ["listObjects", "getObject", "putObject", "deleteObject", "headObject"],
+        "default": "listObjects"
+      },
+      "bucket": {
+        "type": "string",
+        "description": "S3 bucket name (overrides default)"
+      },
+      "prefix": {
+        "type": "string",
+        "description": "Key prefix for listing objects"
+      },
+      "key": {
+        "type": "string",
+        "description": "Object key (path)"
+      },
+      "body": {
+        "type": "string",
+        "description": "Object content for putObject"
+      },
+      "contentType": {
+        "type": "string",
+        "description": "Content type for putObject",
+        "default": "application/octet-stream"
+      },
+      "maxKeys": {
+        "type": "integer",
+        "description": "Maximum number of keys to return",
+        "default": 1000,
+        "minimum": 1,
+        "maximum": 1000
+      },
+      "responseType": {
+        "type": "string",
+        "enum": ["text", "json", "base64"],
+        "default": "text",
+        "description": "Response format for getObject"
+      }
+    },
+    "required": ["operation"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/operation",
+            "label": "Operation"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/bucket",
+            "label": "Bucket"
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "List Options",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/operation",
+            "schema": { "const": "listObjects" }
+          }
+        },
+        "elements": [
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/prefix",
+                "label": "Prefix"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/maxKeys",
+                "label": "Max Keys"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Object Key",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/operation",
+            "schema": { "enum": ["getObject", "putObject", "deleteObject", "headObject"] }
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/key",
+            "label": "Object Key"
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Get Options",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/operation",
+            "schema": { "const": "getObject" }
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/responseType",
+            "label": "Response Type"
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Put Options",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/operation",
+            "schema": { "const": "putObject" }
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/body",
+            "label": "Content"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/contentType",
+            "label": "Content Type"
+          }
+        ]
+      }
+    ]
+  },
+  "data": {
+    "operation": "listObjects",
+    "bucket": "",
+    "prefix": "",
+    "maxKeys": 1000,
+    "responseType": "text"
+  }
+}

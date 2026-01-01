@@ -180,7 +180,7 @@ var CustomSelectInput = (props) => {
       id: path,
       name: path,
       disabled: isDisabled,
-      className: `placeholder:text-slate-400 text-sm bg-slate-50 border focus:border-slate-700 ${errors && errors.length > 0 ? "border-red-500 focus:border-red-500" : "border-slate-200"} text-slate-700 rounded block w-full px-2.5 py-1.5 disabled:opacity-50 disabled:cursor-not-allowed`,
+      className: `placeholder:text-slate-400 text-sm bg-slate-50 border focus:border-slate-700 ${errors && errors.length > 0 ? "border-red-500 focus:border-red-500" : "border-slate-200"} text-slate-700 rounded block w-full px-2.5 py-1.5 h-[34px] disabled:opacity-50 disabled:cursor-not-allowed`,
       onChange: (ev) => handleChange(path, ev.target.value),
       value: data || ""
     },
@@ -758,7 +758,7 @@ var CustomKeyValueArrayRenderer = ({
     {
       type: "button",
       onClick: () => handleRemoveItem(index),
-      className: "mt-5 p-2 rounded bg-red-100 text-red-400 focus:outline-none hover:border-red-400"
+      className: "mt-2 p-2 rounded bg-red-100 text-red-400 focus:outline-none hover:border-red-400"
     },
     /* @__PURE__ */ React9.createElement(MdDeleteOutline, null)
   )))), /* @__PURE__ */ React9.createElement(
@@ -862,7 +862,7 @@ var CustomKeyValueTypeArrayRenderer = ({
     {
       type: "button",
       onClick: () => handleRemoveItem(index),
-      className: "mt-5 p-2 rounded bg-red-100 text-red-400 focus:outline-none hover:border-red-400"
+      className: "mt-2 p-2 rounded bg-red-100 text-red-400 focus:outline-none hover:border-red-400"
     },
     /* @__PURE__ */ React10.createElement(MdDeleteOutline2, null)
   )))), /* @__PURE__ */ React10.createElement(
@@ -978,18 +978,183 @@ CustomKeyTypeArrayRenderer.propTypes = {
   renderers: PropTypes11.arrayOf(PropTypes11.object).isRequired
 };
 
-// src/renderers/CustomGroupLayout.jsx
+// src/renderers/CustomStringArrayRenderer.jsx
 import React12 from "react";
 import PropTypes12 from "prop-types";
+import { MdDeleteOutline as MdDeleteOutline4 } from "react-icons/md";
+var CustomStringArrayRenderer = (props) => {
+  const { data, path, handleChange, label, uischema, enabled, visible } = props;
+  const arrayData = Array.isArray(data) ? data : [];
+  const handleAddItem = () => {
+    handleChange(path, [...arrayData, ""]);
+  };
+  const handleRemoveItem = (index) => {
+    const newData = arrayData.filter((_, i) => i !== index);
+    handleChange(path, newData);
+  };
+  const handleItemChange = (index, value) => {
+    const newData = [...arrayData];
+    newData[index] = value;
+    handleChange(path, newData);
+  };
+  if (visible === false) {
+    return null;
+  }
+  return /* @__PURE__ */ React12.createElement("div", { className: "p-3 border border-slate-200 rounded bg-white mb-3" }, /* @__PURE__ */ React12.createElement("label", { className: "block mb-1 text-sm font-medium text-slate-700" }, label || uischema?.label || "Items"), /* @__PURE__ */ React12.createElement("div", { className: "gap-2" }, arrayData.map((item, index) => /* @__PURE__ */ React12.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2 mb-2" }, /* @__PURE__ */ React12.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ React12.createElement(
+    "input",
+    {
+      type: "text",
+      value: item || "",
+      onChange: (e) => handleItemChange(index, e.target.value),
+      disabled: !enabled,
+      placeholder: "Enter value...",
+      className: "w-full placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-200 text-slate-700 rounded focus:border-slate-400 focus:outline-none px-2.5 py-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+    }
+  )), /* @__PURE__ */ React12.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: () => handleRemoveItem(index),
+      disabled: !enabled,
+      className: "p-2 rounded bg-red-100 text-red-400 focus:outline-none hover:border-red-400 disabled:opacity-50 disabled:cursor-not-allowed"
+    },
+    /* @__PURE__ */ React12.createElement(MdDeleteOutline4, null)
+  )))), arrayData.length === 0 && /* @__PURE__ */ React12.createElement("div", { className: "text-xs text-slate-400 italic py-2" }, "No items added yet."), /* @__PURE__ */ React12.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: handleAddItem,
+      disabled: !enabled,
+      className: "mt-3 px-2 py-1 bg-white text-[#646cff] text-xs rounded hover:border-[#646cff] focus:outline-none border border-slate-200 disabled:opacity-50 disabled:cursor-not-allowed"
+    },
+    "Add Item"
+  ));
+};
+CustomStringArrayRenderer.propTypes = {
+  data: PropTypes12.array,
+  path: PropTypes12.string.isRequired,
+  handleChange: PropTypes12.func.isRequired,
+  label: PropTypes12.string,
+  uischema: PropTypes12.object,
+  enabled: PropTypes12.bool,
+  visible: PropTypes12.bool
+};
+
+// src/renderers/CustomFieldOperatorValueArrayRenderer.jsx
+import React13 from "react";
+import PropTypes13 from "prop-types";
+import { MdDeleteOutline as MdDeleteOutline5 } from "react-icons/md";
+var CustomFieldOperatorValueArrayRenderer = ({
+  data,
+  path,
+  handleChange,
+  schema,
+  uischema,
+  errors,
+  label,
+  enabled
+}) => {
+  const items = data || [];
+  const itemSchema = schema.items;
+  const isDisabled = enabled === false;
+  const operatorOptions = itemSchema?.properties?.operator?.enum || [
+    "==",
+    "!=",
+    "<",
+    "<=",
+    ">",
+    ">=",
+    "array-contains",
+    "array-contains-any",
+    "in",
+    "not-in"
+  ];
+  const handleAddItem = () => {
+    const newItem = { field: "", operator: "==", value: "" };
+    handleChange(path, [...items, newItem]);
+  };
+  const handleRemoveItem = (index) => {
+    const newItems = items.filter((_, i) => i !== index);
+    handleChange(path, newItems);
+  };
+  const handleItemChange = (index, field, value) => {
+    const newItems = [...items];
+    newItems[index] = { ...newItems[index], [field]: value };
+    handleChange(path, newItems);
+  };
+  return /* @__PURE__ */ React13.createElement("div", { className: "p-3 border border-slate-200 rounded bg-white mb-3" }, /* @__PURE__ */ React13.createElement("label", { className: "block mb-2 text-sm font-medium text-slate-700" }, label || uischema.label || "Conditions"), errors && errors.length > 0 && /* @__PURE__ */ React13.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ React13.createElement("div", { className: "space-y-2" }, items.map((item, index) => /* @__PURE__ */ React13.createElement("div", { key: `${path}-${index}`, className: "flex items-center gap-2" }, /* @__PURE__ */ React13.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React13.createElement(
+    "input",
+    {
+      type: "text",
+      placeholder: "Field",
+      value: item.field || "",
+      disabled: isDisabled,
+      onChange: (e) => handleItemChange(index, "field", e.target.value),
+      className: "w-full px-2.5 py-1.5 text-sm bg-slate-50 border border-slate-200 rounded text-slate-700 placeholder:text-slate-400 focus:border-slate-700 disabled:opacity-50"
+    }
+  )), /* @__PURE__ */ React13.createElement("div", { className: "w-36" }, /* @__PURE__ */ React13.createElement(
+    "select",
+    {
+      value: item.operator || "==",
+      disabled: isDisabled,
+      onChange: (e) => handleItemChange(index, "operator", e.target.value),
+      className: "w-full px-2.5 py-1.5 text-sm bg-slate-50 border border-slate-200 rounded text-slate-700 focus:border-slate-700 disabled:opacity-50"
+    },
+    operatorOptions.map((op) => /* @__PURE__ */ React13.createElement("option", { key: op, value: op }, op))
+  )), /* @__PURE__ */ React13.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React13.createElement(
+    "input",
+    {
+      type: "text",
+      placeholder: "Value",
+      value: item.value || "",
+      disabled: isDisabled,
+      onChange: (e) => handleItemChange(index, "value", e.target.value),
+      className: "w-full px-2.5 py-1.5 text-sm bg-slate-50 border border-slate-200 rounded text-slate-700 placeholder:text-slate-400 focus:border-slate-700 disabled:opacity-50"
+    }
+  )), /* @__PURE__ */ React13.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: () => handleRemoveItem(index),
+      disabled: isDisabled,
+      className: "p-2 rounded bg-red-100 text-red-400 focus:outline-none hover:bg-red-200 disabled:opacity-50"
+    },
+    /* @__PURE__ */ React13.createElement(MdDeleteOutline5, null)
+  )))), /* @__PURE__ */ React13.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: handleAddItem,
+      disabled: isDisabled,
+      className: "mt-3 px-2 py-1 bg-white text-[#646cff] text-xs rounded hover:border-[#646cff] focus:outline-none border border-slate-200 disabled:opacity-50"
+    },
+    "Add Condition"
+  ));
+};
+CustomFieldOperatorValueArrayRenderer.propTypes = {
+  data: PropTypes13.arrayOf(PropTypes13.object),
+  path: PropTypes13.string.isRequired,
+  handleChange: PropTypes13.func.isRequired,
+  schema: PropTypes13.object.isRequired,
+  uischema: PropTypes13.object.isRequired,
+  label: PropTypes13.string,
+  errors: PropTypes13.arrayOf(PropTypes13.string),
+  enabled: PropTypes13.bool
+};
+
+// src/renderers/CustomGroupLayout.jsx
+import React14 from "react";
+import PropTypes14 from "prop-types";
 import { JsonFormsDispatch as JsonFormsDispatch4 } from "@jsonforms/react";
 var CustomGroupLayout = (props) => {
   const { uischema, schema, path, visible, enabled, renderers, cells } = props;
   const elements = uischema.elements || [];
   const customClass = uischema.options?.customClass || "";
+  console.log("[CustomGroupLayout] Rendering group:", uischema.label, "visible:", visible);
   if (!visible) {
     return null;
   }
-  return /* @__PURE__ */ React12.createElement("div", { className: `border border-slate-200 rounded p-3 mt-2 bg-white ${customClass}` }, uischema.label && /* @__PURE__ */ React12.createElement("h3", { className: "text-xs font-medium text-slate-500 mb-2" }, uischema.label), /* @__PURE__ */ React12.createElement("div", { className: "flex flex-col gap-2" }, elements.map((element, index) => /* @__PURE__ */ React12.createElement(
+  return /* @__PURE__ */ React14.createElement("div", { className: `border border-slate-200 rounded p-3 mt-2 bg-white ${customClass}` }, uischema.label && /* @__PURE__ */ React14.createElement("h3", { className: "text-xs font-medium text-slate-500 mb-2" }, uischema.label), /* @__PURE__ */ React14.createElement("div", { className: "flex flex-col gap-2" }, elements.map((element, index) => /* @__PURE__ */ React14.createElement(
     JsonFormsDispatch4,
     {
       key: index,
@@ -1003,18 +1168,92 @@ var CustomGroupLayout = (props) => {
   ))));
 };
 CustomGroupLayout.propTypes = {
-  uischema: PropTypes12.object.isRequired,
-  schema: PropTypes12.object.isRequired,
-  path: PropTypes12.string.isRequired,
-  visible: PropTypes12.bool.isRequired,
-  enabled: PropTypes12.bool.isRequired,
-  renderers: PropTypes12.arrayOf(PropTypes12.object).isRequired,
-  cells: PropTypes12.arrayOf(PropTypes12.object)
+  uischema: PropTypes14.object.isRequired,
+  schema: PropTypes14.object.isRequired,
+  path: PropTypes14.string.isRequired,
+  visible: PropTypes14.bool.isRequired,
+  enabled: PropTypes14.bool.isRequired,
+  renderers: PropTypes14.arrayOf(PropTypes14.object).isRequired,
+  cells: PropTypes14.arrayOf(PropTypes14.object)
+};
+
+// src/renderers/CustomRadioInput.jsx
+import React15 from "react";
+import PropTypes15 from "prop-types";
+var CustomRadioInput = (props) => {
+  const {
+    data,
+    path,
+    handleChange,
+    label,
+    description,
+    errors,
+    schema,
+    uischema,
+    enabled
+  } = props;
+  const options = schema.enum || [];
+  const isDisabled = enabled === false;
+  const orientation = uischema?.options?.orientation || "horizontal";
+  const getDisplayName = (optionValue) => {
+    if (uischema.options && uischema.options.enumLabels) {
+      if (Array.isArray(uischema.options.enumLabels)) {
+        const labelMap = uischema.options.enumLabels.find(
+          (item) => item.value === optionValue
+        );
+        if (labelMap) return labelMap.label;
+      } else if (typeof uischema.options.enumLabels === "object") {
+        if (uischema.options.enumLabels[optionValue]) {
+          return uischema.options.enumLabels[optionValue];
+        }
+      }
+    }
+    return optionValue.charAt(0).toUpperCase() + optionValue.slice(1).replace(/([A-Z])/g, " $1");
+  };
+  return /* @__PURE__ */ React15.createElement("div", { className: "mb-3" }, /* @__PURE__ */ React15.createElement(
+    "label",
+    {
+      className: `block mb-2 text-xs font-medium ${errors && errors.length > 0 ? "text-red-500" : "text-slate-500"}`
+    },
+    label || description,
+    " ",
+    errors && errors.length > 0 && errors
+  ), /* @__PURE__ */ React15.createElement("div", { className: `flex ${orientation === "vertical" ? "flex-col gap-2" : "flex-row flex-wrap gap-4"}` }, options.map((optionValue) => /* @__PURE__ */ React15.createElement(
+    "label",
+    {
+      key: optionValue,
+      className: `flex items-center gap-2 cursor-pointer ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`
+    },
+    /* @__PURE__ */ React15.createElement(
+      "input",
+      {
+        type: "radio",
+        name: path,
+        value: optionValue,
+        checked: data === optionValue,
+        disabled: isDisabled,
+        onChange: (ev) => handleChange(path, ev.target.value),
+        className: "w-4 h-4 text-indigo-600 bg-slate-50 border-slate-300 focus:ring-indigo-500 focus:ring-2"
+      }
+    ),
+    /* @__PURE__ */ React15.createElement("span", { className: `text-sm ${data === optionValue ? "text-slate-700 font-medium" : "text-slate-600"}` }, getDisplayName(optionValue))
+  ))));
+};
+CustomRadioInput.propTypes = {
+  data: PropTypes15.string,
+  path: PropTypes15.string.isRequired,
+  handleChange: PropTypes15.func.isRequired,
+  label: PropTypes15.string,
+  description: PropTypes15.string,
+  errors: PropTypes15.arrayOf(PropTypes15.string),
+  schema: PropTypes15.object.isRequired,
+  uischema: PropTypes15.object.isRequired,
+  enabled: PropTypes15.bool
 };
 
 // src/renderers/CustomVerticalLayout.jsx
-import React13 from "react";
-import PropTypes13 from "prop-types";
+import React16 from "react";
+import PropTypes16 from "prop-types";
 import { JsonFormsDispatch as JsonFormsDispatch5 } from "@jsonforms/react";
 var CustomVerticalLayout = (props) => {
   const { uischema, schema, path, visible, enabled, renderers, cells } = props;
@@ -1022,7 +1261,7 @@ var CustomVerticalLayout = (props) => {
   if (!visible) {
     return null;
   }
-  return /* @__PURE__ */ React13.createElement("div", { className: "flex flex-col" }, elements.map((element, index) => /* @__PURE__ */ React13.createElement(
+  return /* @__PURE__ */ React16.createElement("div", { className: "flex flex-col" }, elements.map((element, index) => /* @__PURE__ */ React16.createElement(
     JsonFormsDispatch5,
     {
       key: index,
@@ -1036,18 +1275,18 @@ var CustomVerticalLayout = (props) => {
   )));
 };
 CustomVerticalLayout.propTypes = {
-  uischema: PropTypes13.object.isRequired,
-  schema: PropTypes13.object.isRequired,
-  path: PropTypes13.string.isRequired,
-  visible: PropTypes13.bool.isRequired,
-  enabled: PropTypes13.bool.isRequired,
-  renderers: PropTypes13.arrayOf(PropTypes13.object).isRequired,
-  cells: PropTypes13.arrayOf(PropTypes13.object)
+  uischema: PropTypes16.object.isRequired,
+  schema: PropTypes16.object.isRequired,
+  path: PropTypes16.string.isRequired,
+  visible: PropTypes16.bool.isRequired,
+  enabled: PropTypes16.bool.isRequired,
+  renderers: PropTypes16.arrayOf(PropTypes16.object).isRequired,
+  cells: PropTypes16.arrayOf(PropTypes16.object)
 };
 
 // src/renderers/CustomTabRenderer.jsx
-import React14, { useState as useState4 } from "react";
-import PropTypes14 from "prop-types";
+import React17, { useState as useState4 } from "react";
+import PropTypes17 from "prop-types";
 import { JsonFormsDispatch as JsonFormsDispatch6 } from "@jsonforms/react";
 var CustomTabRenderer = (props) => {
   const { uischema, schema, path, enabled, renderers, cells } = props;
@@ -1057,7 +1296,7 @@ var CustomTabRenderer = (props) => {
     return null;
   }
   const activeCategory = categories[activeTab];
-  return /* @__PURE__ */ React14.createElement("div", { className: "custom-tabs-container" }, /* @__PURE__ */ React14.createElement("div", { className: "flex border-slate-300" }, categories.map((category, index) => /* @__PURE__ */ React14.createElement(
+  return /* @__PURE__ */ React17.createElement("div", { className: "custom-tabs-container" }, /* @__PURE__ */ React17.createElement("div", { className: "flex border-slate-300" }, categories.map((category, index) => /* @__PURE__ */ React17.createElement(
     "button",
     {
       key: category.label || `tab-${index}`,
@@ -1066,7 +1305,7 @@ var CustomTabRenderer = (props) => {
       type: "button"
     },
     category.label
-  ))), /* @__PURE__ */ React14.createElement("div", { className: "p-3 border mt-3 border-slate-200 rounded bg-white flex flex-col gap-2" }, activeCategory?.elements.map((element, i) => /* @__PURE__ */ React14.createElement(
+  ))), /* @__PURE__ */ React17.createElement("div", { className: "p-3 border mt-3 border-slate-200 rounded bg-white flex flex-col gap-2" }, activeCategory?.elements.map((element, i) => /* @__PURE__ */ React17.createElement(
     JsonFormsDispatch6,
     {
       key: i,
@@ -1080,15 +1319,15 @@ var CustomTabRenderer = (props) => {
   ))));
 };
 CustomTabRenderer.propTypes = {
-  uischema: PropTypes14.shape({
-    type: PropTypes14.string.isRequired,
-    elements: PropTypes14.arrayOf(PropTypes14.object).isRequired
+  uischema: PropTypes17.shape({
+    type: PropTypes17.string.isRequired,
+    elements: PropTypes17.arrayOf(PropTypes17.object).isRequired
   }).isRequired,
-  schema: PropTypes14.object.isRequired,
-  path: PropTypes14.string.isRequired,
-  enabled: PropTypes14.bool.isRequired,
-  renderers: PropTypes14.arrayOf(PropTypes14.object).isRequired,
-  cells: PropTypes14.arrayOf(PropTypes14.object)
+  schema: PropTypes17.object.isRequired,
+  path: PropTypes17.string.isRequired,
+  enabled: PropTypes17.bool.isRequired,
+  renderers: PropTypes17.arrayOf(PropTypes17.object).isRequired,
+  cells: PropTypes17.arrayOf(PropTypes17.object)
 };
 
 // src/renderers/index.js
@@ -1103,7 +1342,10 @@ var JetDynamicArgsControl = withJsonFormsControlProps(DynamicArgsControl);
 var JetKeyValueArrayControl = withJsonFormsControlProps(CustomKeyValueArrayRenderer);
 var JetKeyValueTypeArrayControl = withJsonFormsControlProps(CustomKeyValueTypeArrayRenderer);
 var JetKeyTypeArrayControl = withJsonFormsControlProps(CustomKeyTypeArrayRenderer);
+var JetStringArrayControl = withJsonFormsControlProps(CustomStringArrayRenderer);
+var JetFieldOperatorValueArrayControl = withJsonFormsControlProps(CustomFieldOperatorValueArrayRenderer);
 var JetGroupLayout = withJsonFormsLayoutProps(CustomGroupLayout);
+var JetRadioControl = withJsonFormsControlProps(CustomRadioInput);
 var JetVerticalLayout = withJsonFormsLayoutProps(CustomVerticalLayout);
 var JetTabLayout = withJsonFormsLayoutProps(CustomTabRenderer);
 
@@ -1201,6 +1443,25 @@ var dynamicArgsTester = rankWith(
   20,
   and(isControl, (uischema) => uischema?.options?.isDynamicArgs === true)
 );
+var stringArrayTester = (uischema, rootSchema) => {
+  if (uischema.type !== "Control") {
+    return -1;
+  }
+  try {
+    const schemaAtScope = Resolve.schema(rootSchema, uischema.scope, rootSchema);
+    if (!schemaAtScope || schemaAtScope.type !== "array") {
+      return -1;
+    }
+    const itemSchema = schemaAtScope.items;
+    if (itemSchema && itemSchema.type === "string" && !itemSchema.properties) {
+      return 40;
+    }
+    return -1;
+  } catch (e) {
+    console.warn("Error in string array tester:", e);
+    return -1;
+  }
+};
 var keyValueArrayTester = (uischema, rootSchema) => {
   if (uischema.type !== "Control") {
     return -1;
@@ -1258,9 +1519,46 @@ var keyTypeArrayTester = (uischema, rootSchema) => {
     return -1;
   }
 };
-var groupLayoutTester = (uischema) => {
-  return rankWith(10, uiTypeIs("Group"))(uischema);
+var radioInputTester = (uischema, rootSchema, context) => {
+  if (uischema.type !== "Control") {
+    return -1;
+  }
+  if (uischema.options && uischema.options.format === "radio") {
+    try {
+      const currentSchema = Resolve.schema(rootSchema, uischema.scope, rootSchema);
+      if (currentSchema && currentSchema.type === "string" && currentSchema.enum) {
+        return 100;
+      }
+    } catch (e) {
+      console.warn(`Error resolving schema for scope ${uischema.scope} in radioInputTester:`, e);
+      return -1;
+    }
+  }
+  return -1;
 };
+var fieldOperatorValueArrayTester = (uischema, rootSchema) => {
+  if (uischema.type !== "Control") {
+    return -1;
+  }
+  try {
+    const schemaAtScope = Resolve.schema(rootSchema, uischema.scope, rootSchema);
+    if (!schemaAtScope || schemaAtScope.type !== "array") {
+      return -1;
+    }
+    const itemSchema = schemaAtScope.items;
+    if (itemSchema.type !== "object" || itemSchema.properties?.field?.type !== "string" || itemSchema.properties?.operator?.type !== "string" || itemSchema.properties?.value?.type !== "string") {
+      return -1;
+    }
+    if (!itemSchema.properties?.operator?.enum) {
+      return -1;
+    }
+    return 70;
+  } catch (e) {
+    console.warn("Error in field/operator/value tester:", e);
+    return -1;
+  }
+};
+var groupLayoutTester = rankWith(100, uiTypeIs("Group"));
 var verticalLayoutTester = (uischema) => {
   return uischema.type === "VerticalLayout" ? 10 : -1;
 };
@@ -1277,10 +1575,13 @@ var jetFormsBaseRenderers = [
   { tester: numberInputTester, renderer: JetNumberControl },
   { tester: textInputTester, renderer: JetTextControl },
   { tester: selectInputTester, renderer: JetSelectControl },
+  { tester: radioInputTester, renderer: JetRadioControl },
   { tester: checkboxTester, renderer: JetCheckboxControl },
   { tester: keyValueArrayTester, renderer: JetKeyValueArrayControl },
   { tester: keyValueTypeArrayTester, renderer: JetKeyValueTypeArrayControl },
   { tester: keyTypeArrayTester, renderer: JetKeyTypeArrayControl },
+  { tester: stringArrayTester, renderer: JetStringArrayControl },
+  { tester: fieldOperatorValueArrayTester, renderer: JetFieldOperatorValueArrayControl },
   { tester: groupLayoutTester, renderer: JetGroupLayout },
   { tester: verticalLayoutTester, renderer: JetVerticalLayout }
 ];
@@ -1295,12 +1596,15 @@ export {
   CustomCheckboxInput,
   CustomCodeJavascriptControl,
   CustomCodePgsqlControl,
+  CustomFieldOperatorValueArrayRenderer,
   CustomGroupLayout,
   CustomKeyTypeArrayRenderer,
   CustomKeyValueArrayRenderer,
   CustomKeyValueTypeArrayRenderer,
   CustomNumberInput,
+  CustomRadioInput,
   CustomSelectInput,
+  CustomStringArrayRenderer,
   CustomSuggestionInput,
   CustomTabRenderer,
   CustomTextInput,
@@ -1310,12 +1614,15 @@ export {
   JetCodeJavascriptControl,
   JetCodePgsqlControl,
   JetDynamicArgsControl,
+  JetFieldOperatorValueArrayControl,
   JetGroupLayout,
   JetKeyTypeArrayControl,
   JetKeyValueArrayControl,
   JetKeyValueTypeArrayControl,
   JetNumberControl,
+  JetRadioControl,
   JetSelectControl,
+  JetStringArrayControl,
   JetSuggestionControl,
   JetTabLayout,
   JetTextControl,
@@ -1324,6 +1631,7 @@ export {
   codeJavascriptTester,
   codePgsqlTester,
   dynamicArgsTester,
+  fieldOperatorValueArrayTester,
   groupLayoutTester,
   jetFormsBaseRenderers,
   jetFormsRenderers,
@@ -1331,7 +1639,9 @@ export {
   keyValueArrayTester,
   keyValueTypeArrayTester,
   numberInputTester,
+  radioInputTester,
   selectInputTester,
+  stringArrayTester,
   suggestionInputTester,
   tabRendererTester,
   textInputTester,

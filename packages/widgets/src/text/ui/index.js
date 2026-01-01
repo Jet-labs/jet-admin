@@ -2,11 +2,6 @@ import PropTypes from "prop-types";
 import React, { useEffect, useRef } from "react";
 
 export const TextWidgetComponent = ({ data, onWidgetInit, widgetConfig }) => {
-  TextWidgetComponent.propTypes = {
-    data: PropTypes.object,
-    onWidgetInit: PropTypes.func,
-    widgetConfig: PropTypes.object,
-  };
   const widgetRef = useRef(null);
   const { widgetCss = {}, widgetTailwindCss = "" } = widgetConfig || {};
 

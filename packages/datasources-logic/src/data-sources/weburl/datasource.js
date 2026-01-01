@@ -1,8 +1,4 @@
-
-
 import fetch from "node-fetch";
-import { Agent as HttpsAgent } from "https";
-import { Agent as HttpAgent } from "http";
 import { Logger } from "../../utils/logger";
 import DataSource from "../datasource.js";
 
@@ -13,11 +9,11 @@ export default class WebURLDataSource extends DataSource {
       params: { dataQueryOptions, config: this.config },
     });
     const { action, args } = dataQueryOptions;
-    const {url, timeout } = this.config.datasourceOptions;
+    const { url, timeout } = this.config.datasourceOptions;
     try {
       // Fetch options
       const opts = {
-        method: "GET",
+        method: action || "GET",
         headers: {},
         redirect: "follow",
         timeout: timeout,
@@ -42,14 +38,15 @@ export default class WebURLDataSource extends DataSource {
         },
       });
 
-      return { url, timeout, args };
+      // Return the actual response data
+      return parsedBody;
     } catch (err) {
       Logger.log("error", {
         message: "weburl:WebURLDataSource:execute:catch",
         params: err.message || err,
       });
       throw new Error(
-        `API request failed: ${err.response?.status || "No response"}`
+        `Web URL request failed: ${err.message || "No response"}`
       );
     }
   }

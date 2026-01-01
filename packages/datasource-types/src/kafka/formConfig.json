@@ -1,0 +1,114 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "connectionName": {
+        "type": "string",
+        "description": "A unique name for this connection.",
+        "minLength": 3
+      },
+      "brokers": {
+        "type": "string",
+        "description": "Comma-separated list of Kafka brokers (e.g., 'localhost:9092,localhost:9093')"
+      },
+      "clientId": {
+        "type": "string",
+        "description": "Client identifier.",
+        "default": "jet-admin"
+      },
+      "ssl": {
+        "type": "boolean",
+        "description": "Enable SSL/TLS.",
+        "default": false
+      },
+      "sasl": {
+        "type": "object",
+        "description": "SASL authentication options",
+        "properties": {
+          "enabled": {
+            "type": "boolean",
+            "default": false
+          },
+          "mechanism": {
+            "type": "string",
+            "enum": ["plain", "scram-sha-256", "scram-sha-512"],
+            "default": "plain"
+          },
+          "username": { "type": "string" },
+          "password": { "type": "string", "format": "password" }
+        }
+      },
+      "connectionTimeout": {
+        "type": "integer",
+        "description": "Connection timeout in ms",
+        "default": 10000
+      },
+      "requestTimeout": {
+        "type": "integer",
+        "description": "Request timeout in ms",
+        "default": 30000
+      }
+    },
+    "required": ["connectionName", "brokers"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          { "type": "Control", "scope": "#/properties/connectionName", "label": "Connection Name" },
+          { "type": "Control", "scope": "#/properties/clientId", "label": "Client ID" }
+        ]
+      },
+      { "type": "Control", "scope": "#/properties/brokers", "label": "Brokers (comma-separated)" },
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          { "type": "Control", "scope": "#/properties/ssl", "label": "Enable SSL" },
+          { "type": "Control", "scope": "#/properties/sasl/properties/enabled", "label": "Enable SASL Auth" }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "SASL Authentication",
+        "rule": {
+          "effect": "SHOW",
+          "condition": { "scope": "#/properties/sasl/properties/enabled", "schema": { "const": true } }
+        },
+        "elements": [
+          { "type": "Control", "scope": "#/properties/sasl/properties/mechanism", "label": "Mechanism" },
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              { "type": "Control", "scope": "#/properties/sasl/properties/username", "label": "Username" },
+              { "type": "Control", "scope": "#/properties/sasl/properties/password", "label": "Password", "options": { "format": "password" } }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Timeouts",
+        "elements": [
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              { "type": "Control", "scope": "#/properties/connectionTimeout", "label": "Connection Timeout (ms)" },
+              { "type": "Control", "scope": "#/properties/requestTimeout", "label": "Request Timeout (ms)" }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "data": {
+    "connectionName": "MyKafka",
+    "brokers": "localhost:9092",
+    "clientId": "jet-admin",
+    "ssl": false,
+    "sasl": { "enabled": false, "mechanism": "plain", "username": "", "password": "" },
+    "connectionTimeout": 10000,
+    "requestTimeout": 30000
+  }
+}

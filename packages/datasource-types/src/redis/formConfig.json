@@ -1,0 +1,131 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "connectionOption": {
+        "type": "string",
+        "enum": ["connectionUrl", "connectionDetails"],
+        "default": "connectionDetails"
+      },
+      "connectionUrl": {
+        "type": "string",
+        "description": "Redis connection URL (e.g., 'redis://user:pass@localhost:6379/0')"
+      },
+      "connectionDetails": {
+        "type": "object",
+        "properties": {
+          "connectionName": {
+            "type": "string",
+            "minLength": 3
+          },
+          "host": {
+            "type": "string",
+            "default": "localhost"
+          },
+          "port": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 65535,
+            "default": 6379
+          },
+          "password": {
+            "type": "string",
+            "format": "password"
+          },
+          "database": {
+            "type": "integer",
+            "description": "Database index (0-15)",
+            "minimum": 0,
+            "maximum": 15,
+            "default": 0
+          },
+          "tls": {
+            "type": "boolean",
+            "default": false
+          },
+          "username": {
+            "type": "string",
+            "description": "Username (Redis 6+ ACL)"
+          }
+        },
+        "required": ["connectionName", "host"]
+      },
+      "clusterMode": {
+        "type": "boolean",
+        "description": "Enable cluster mode",
+        "default": false
+      },
+      "clusterNodes": {
+        "type": "string",
+        "description": "Cluster nodes (comma-separated host:port)"
+      }
+    },
+    "required": ["connectionOption"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      { "type": "Control", "scope": "#/properties/connectionOption", "label": "Connection Type" },
+      {
+        "type": "Group",
+        "label": "Connection URL",
+        "rule": { "effect": "SHOW", "condition": { "scope": "#/properties/connectionOption", "schema": { "const": "connectionUrl" } } },
+        "elements": [
+          { "type": "Control", "scope": "#/properties/connectionUrl", "label": "Redis URL" }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Connection Details",
+        "rule": { "effect": "SHOW", "condition": { "scope": "#/properties/connectionOption", "schema": { "const": "connectionDetails" } } },
+        "elements": [
+          { "type": "Control", "scope": "#/properties/connectionDetails/properties/connectionName", "label": "Connection Name" },
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              { "type": "Control", "scope": "#/properties/connectionDetails/properties/host", "label": "Host" },
+              { "type": "Control", "scope": "#/properties/connectionDetails/properties/port", "label": "Port" },
+              { "type": "Control", "scope": "#/properties/connectionDetails/properties/database", "label": "Database" }
+            ]
+          },
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              { "type": "Control", "scope": "#/properties/connectionDetails/properties/username", "label": "Username" },
+              { "type": "Control", "scope": "#/properties/connectionDetails/properties/password", "label": "Password", "options": { "format": "password" } }
+            ]
+          },
+          { "type": "Control", "scope": "#/properties/connectionDetails/properties/tls", "label": "Enable TLS" }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Cluster Mode",
+        "elements": [
+          { "type": "Control", "scope": "#/properties/clusterMode", "label": "Enable Cluster Mode" },
+          {
+            "type": "Control",
+            "scope": "#/properties/clusterNodes",
+            "label": "Cluster Nodes",
+            "rule": { "effect": "SHOW", "condition": { "scope": "#/properties/clusterMode", "schema": { "const": true } } }
+          }
+        ]
+      }
+    ]
+  },
+  "data": {
+    "connectionOption": "connectionDetails",
+    "connectionUrl": "",
+    "connectionDetails": {
+      "connectionName": "MyRedis",
+      "host": "localhost",
+      "port": 6379,
+      "password": "",
+      "database": 0,
+      "tls": false,
+      "username": ""
+    },
+    "clusterMode": false,
+    "clusterNodes": ""
+  }
+}

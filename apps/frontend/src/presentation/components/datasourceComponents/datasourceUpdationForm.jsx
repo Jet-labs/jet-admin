@@ -24,7 +24,7 @@ import { DatasourceCloneForm } from "./dataQueryCloneForm";
 
 // --- Original Metadata (only for datasourceOptions) ---
 const datasourceOptionsMetadata =
-  DATASOURCE_UI_COMPONENTS[DATASOURCE_TYPES.POSTGRESQL.value].formConfig;
+  DATASOURCE_TYPES.POSTGRESQL.formConfig;
 
 export const DatasourceUpdationForm = ({ tenantID, datasourceID }) => {
   DatasourceUpdationForm.propTypes = {

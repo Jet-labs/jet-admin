@@ -5,13 +5,22 @@ import { CONSTANTS } from "../../../constants";
 import { formValidations } from "../../../utils/formValidation";
 import PropTypes from "prop-types";
 
+/**
+ * Reusable component for configuring input arguments for both queries and workflows.
+ * Works with dataQueryOptions.args for queries and workflowOptions.args for workflows.
+ */
 export const WidgetDatasetArguments = ({
   open,
   onClose,
   datasetIndex,
   widgetForm,
   initialValues,
+  // For queries
   selectedQuery,
+  // For workflows
+  selectedWorkflow,
+  // Data source type
+  dataSourceType = "query",
 }) => {
   WidgetDatasetArguments.propTypes = {
     open: PropTypes.bool.isRequired,
@@ -19,61 +28,80 @@ export const WidgetDatasetArguments = ({
     datasetIndex: PropTypes.number.isRequired,
     widgetForm: PropTypes.object.isRequired,
     initialValues: PropTypes.object.isRequired,
-    selectedQuery: PropTypes.object.isRequired,
+    selectedQuery: PropTypes.object,
+    selectedWorkflow: PropTypes.object,
+    dataSourceType: PropTypes.oneOf(["query", "workflow"]),
   };
+
+  // Get args based on data source type
+  const args = dataSourceType === "workflow"
+    ? selectedWorkflow?.workflowOptions?.args || []
+    : selectedQuery?.dataQueryOptions?.args || [];
+
+  // Get the field name for storing values based on type
+  const valuesFieldName = dataSourceType === "workflow"
+    ? "workflowArgValues"
+    : "dataQueryArgValues";
 
   const datasetArgumentsForm = useFormik({
     initialValues: {
-      dataQueryArgValues: {},
+      [valuesFieldName]: {},
       ...initialValues,
     },
-    validationSchema: formValidations.datasetArgumentsFormValidationSchema(
-      selectedQuery?.dataQueryOptions?.args
-    ),
+    validationSchema: formValidations.datasetArgumentsFormValidationSchema(args),
     enableReinitialize: true,
     onSubmit: (values) => {
       widgetForm.setFieldValue(
-        `dataQueries[${datasetIndex}].dataQueryArgValues`,
-        values.dataQueryArgValues
+        `dataQueries[${datasetIndex}].${valuesFieldName}`,
+        values[valuesFieldName]
       );
       onClose();
     },
   });
 
   const _handleUpdateDatasetQueryArgs = useCallback((arg, value) => {
-    console.log(arg, value, datasetArgumentsForm.values.dataQueryArgValues[arg]);
-    datasetArgumentsForm.setFieldValue(`dataQueryArgValues`, {
-      ...datasetArgumentsForm.values.dataQueryArgValues,
+    datasetArgumentsForm.setFieldValue(valuesFieldName, {
+      ...datasetArgumentsForm.values[valuesFieldName],
       [arg]: value,
     });
-  }, [datasetArgumentsForm]);
-  // console.log("datasetArgumentsForm.values", datasetArgumentsForm.values);
+  }, [datasetArgumentsForm, valuesFieldName]);
+
+  const title = dataSourceType === "workflow"
+    ? "Workflow Input Parameters"
+    : CONSTANTS.STRINGS.WIDGET_DATASET_ARGUMENTS_TITLE;
+
+  const label = dataSourceType === "workflow"
+    ? "Workflow Inputs"
+    : CONSTANTS.STRINGS.WIDGET_EDITOR_FORM_DATASET_ARGUMENTS_LABEL;
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
       <DialogTitle className="!p-4 !pb-0">
-        {CONSTANTS.STRINGS.WIDGET_DATASET_ARGUMENTS_TITLE}
+        {title}
       </DialogTitle>
       <DialogContent className="!p-4 !space-y-4">
-        {selectedQuery?.dataQueryOptions?.args?.length > 0 && (
+        {args?.length > 0 ? (
           <div>
             <label className="block mb-2 text-xs font-normal text-slate-500">
-              {CONSTANTS.STRINGS.WIDGET_EDITOR_FORM_DATASET_ARGUMENTS_LABEL}
+              {label}
             </label>
             <div className="space-y-2">
-              {selectedQuery.dataQueryOptions.args.map((arg, argIndex) => {
+              {args.map((arg, argIndex) => {
                 const argName = arg.key;
                 return (
                   <div key={`arg-${argIndex}`}>
+                    <label className="block mb-1 text-xs text-slate-600">
+                      {argName}
+                      {arg.required && <span className="text-red-500 ml-0.5">*</span>}
+                      {arg.type && <span className="text-slate-400 ml-1">({arg.type})</span>}
+                    </label>
                     <input
                       type="text"
                       id={`arg-${argName}`}
                       className="placeholder:text-slate-400 text-xs w-full bg-slate-50 border border-slate-300 text-slate-700 rounded focus:outline-none focus:border-slate-400 block px-2.5 py-1.5"
                       placeholder={`Value for ${argName}`}
                       value={
-                        datasetArgumentsForm.values.dataQueryArgValues?.[
-                          argName
-                        ] || ""
+                        datasetArgumentsForm.values[valuesFieldName]?.[argName] || ""
                       }
                       onChange={(e) =>
                         _handleUpdateDatasetQueryArgs(argName, e.target.value)
@@ -85,6 +113,10 @@ export const WidgetDatasetArguments = ({
               })}
             </div>
           </div>
+        ) : (
+          <p className="text-xs text-slate-500 italic">
+            No input parameters defined for this {dataSourceType}.
+          </p>
         )}
       </DialogContent>
       <DialogActions className="!p-4">

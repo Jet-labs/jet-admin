@@ -1,0 +1,75 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "resource": {
+        "type": "string",
+        "enum": ["messages", "calls", "accounts", "phonenumbers"],
+        "default": "messages"
+      },
+      "operation": {
+        "type": "string",
+        "enum": ["list", "fetch", "create"],
+        "default": "list"
+      },
+      "resourceSid": {
+        "type": "string",
+        "description": "Resource SID for fetch operation"
+      },
+      "params": {
+        "type": "string",
+        "description": "Request parameters (JSON)",
+        "format": "code-json"
+      },
+      "limit": {
+        "type": "integer",
+        "description": "Maximum results to return",
+        "default": 20,
+        "minimum": 1,
+        "maximum": 1000
+      }
+    },
+    "required": ["resource", "operation"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/resource",
+            "label": "Resource"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/operation",
+            "label": "Operation"
+          }
+        ]
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/resourceSid",
+        "label": "Resource SID"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/params",
+        "label": "Parameters (JSON)"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/limit",
+        "label": "Limit"
+      }
+    ]
+  },
+  "data": {
+    "resource": "messages",
+    "operation": "list",
+    "limit": 20,
+    "params": "{}"
+  }
+}

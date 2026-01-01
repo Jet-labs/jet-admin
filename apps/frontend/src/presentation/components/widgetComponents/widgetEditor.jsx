@@ -23,6 +23,8 @@ export const WidgetEditor = ({ widgetEditorForm }) => {
     isLoadingDataQueries,
     isFetchingDataQueries,
     loadDataQueriesError,
+    workflows,
+    isLoadingWorkflows,
   } = useWidgetsState();
 
   const [selectedQueryForTesting, setSelectedQueryForTesting] = useState(false);
@@ -32,7 +34,11 @@ export const WidgetEditor = ({ widgetEditorForm }) => {
       {
         tempId: new Date().getTime(),
         title: "",
+        dataSourceType: "query", // 'query' or 'workflow'
         dataQueryID: null,
+        workflowID: null,
+        workflowArgValues: {},
+        outputVarMapping: null,
         valueType: "static",
         parameters: WIDGETS_MAP[widgetEditorForm.values.widgetType].sampleConfig,
         dataQueryArgValues: {},
@@ -192,6 +198,7 @@ export const WidgetEditor = ({ widgetEditorForm }) => {
                       index={index}
                       widgetForm={widgetEditorForm}
                       dataQueries={dataQueries}
+                      workflows={workflows}
                       datasetFields={
                         WIDGETS_MAP[widgetEditorForm.values.widgetType]
                           .datasetFields

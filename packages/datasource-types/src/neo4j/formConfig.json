@@ -1,0 +1,65 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "uri": {
+        "type": "string",
+        "description": "Neo4j connection URI (e.g., bolt://localhost:7687)",
+        "minLength": 1
+      },
+      "username": {
+        "type": "string",
+        "description": "Neo4j username",
+        "default": "neo4j"
+      },
+      "password": {
+        "type": "string",
+        "description": "Neo4j password",
+        "format": "password"
+      },
+      "database": {
+        "type": "string",
+        "description": "Database name (optional, defaults to 'neo4j')",
+        "default": "neo4j"
+      }
+    },
+    "required": ["uri", "username", "password"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/uri",
+        "label": "Connection URI"
+      },
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/username",
+            "label": "Username"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/password",
+            "label": "Password",
+            "options": { "format": "password" }
+          }
+        ]
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/database",
+        "label": "Database"
+      }
+    ]
+  },
+  "data": {
+    "uri": "bolt://localhost:7687",
+    "username": "neo4j",
+    "password": "",
+    "database": "neo4j"
+  }
+}

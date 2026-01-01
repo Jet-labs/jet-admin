@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { CONSTANTS } from "../../constants";
 import { getAllDataQueriesAPI } from "../../data/apis/dataQuery";
 import { getAllWidgetsAPI } from "../../data/apis/widget";
+import { getAllWorkflowsAPI } from "../../data/apis/workflow";
 import PropTypes from "prop-types";
 
 const WidgetsStateContext = React.createContext(undefined);
@@ -39,6 +40,18 @@ const WidgetsContextProvider = ({ children }) => {
     queryFn: () => getAllDataQueriesAPI({ tenantID }),
     refetchOnWindowFocus: false,
   });
+  const {
+    isLoading: isLoadingWorkflows,
+    data: workflows,
+    error: loadWorkflowsError,
+    isFetching: isFetchingWorkflows,
+    isRefetching: isRefetchingWorkflows,
+    refetch: refetchWorkflows,
+  } = useQuery({
+    queryKey: [CONSTANTS.REACT_QUERY_KEYS.WORKFLOWS(tenantID)],
+    queryFn: () => getAllWorkflowsAPI({ tenantID }),
+    refetchOnWindowFocus: false,
+  });
 
   return (
     <WidgetsStateContext.Provider
@@ -53,10 +66,16 @@ const WidgetsContextProvider = ({ children }) => {
         dataQueries,
         isLoadingDataQueries,
         isFetchingDataQueries,
+        // Workflows
+        workflows,
+        isLoadingWorkflows,
+        isFetchingWorkflows,
+        loadWorkflowsError,
+        isRefetchingWorkflows,
       }}
     >
       <WidgetsActionsContext.Provider
-        value={{ refetchWidgets, refetchDataQueries }}
+        value={{ refetchWidgets, refetchDataQueries, refetchWorkflows }}
       >
         {children}
       </WidgetsActionsContext.Provider>

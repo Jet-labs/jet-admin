@@ -34,6 +34,7 @@ import { useWorkflowState, useWorkflowActions } from "../../../logic/contexts/wo
 import { WorkflowNodeConfigPanel } from "./workflowNodeConfigPanel";
 import { WorkflowSchemaPanel } from "./workflowSchemaPanel";
 import { WorkflowConsole } from "./workflowConsole";
+import { WorkflowInputArgsPanel } from "./workflowInputArgsPanel";
 import { useParams } from "react-router-dom";
 
 // Dagre graph for auto-layout
@@ -428,7 +429,11 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                         className="!w-full !h-full relative"
                     >
                         {/* Sidebar Controls */}
-                        <ResizablePanel defaultSize={20} className="space-y-3 p-3 ">
+                        <ResizablePanel defaultSize={20} className="flex flex-col h-full overflow-hidden pb-20">
+
+                            <div className="flex-1 overflow-y-auto space-y-3 p-3 flex flex-col justify-start items-stretch">
+
+
                             <div>
                                 <label htmlFor="title" className="block mb-1 text-xs font-medium text-slate-500">
                                     {CONSTANTS.STRINGS.ADD_WORKFLOW_FORM_NAME_FIELD_LABEL}
@@ -509,54 +514,56 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                 </div>
                             </div>
 
+                                {/* Input Arguments Section */}
+                                <WorkflowInputArgsPanel workflowForm={workflowEditorForm} />
+
                             {/* Actions Section */}
                             <div className="flex flex-col gap-2">
                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Actions</p>
                                 <button
-                                    type="button"
-                                    onClick={() => onAutoLayout("TB")}
-                                    disabled={values.nodes.length === 0}
-                                    className="px-3 py-2 text-left text-sm text-slate-700 bg-white border border-slate-200 rounded hover:bg-[#646cff]/10 hover:border-[#646cff]/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                                >
-                                    <TbLayoutDistributeHorizontal className="inline-block h-4 w-4 mr-2" />
-                                    Auto-layout
-                                </button>
-                                <button
-                                    type="button"
+                                        type="button"
                                     onClick={onTestRun}
                                     disabled={values.nodes.length === 0 || isTestRunning}
-                                    className="px-3 py-2 text-left text-sm text-white bg-green-600 rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center"
+                                        className="px-3 py-2 text-left text-sm text-white bg-green-600 rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center border-none hover:border-none"
                                 >
                                     <FaPlay className="inline-block h-3 w-3 mr-2" />
                                     {isTestRunning ? "Running..." : "Test Run"}
                                 </button>
                             </div>
 
-                            {/* Debug Section */}
-                            <div className="flex flex-col gap-2">
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Debug</p>
+                                {/* Utilities - Minimal */}
+                                <div className="flex flex-row flex-wrap gap-1">
+                                    <button
+                                        type="button"
+                                        onClick={() => onAutoLayout("TB")}
+                                        disabled={values.nodes.length === 0}
+                                        title="Auto-layout"
+                                        className="p-1.5 text-slate-500 bg-white border border-slate-200 rounded hover:bg-slate-100 hover:text-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        <TbLayoutDistributeHorizontal className="h-3.5 w-3.5" />
+                                    </button>
                                 <button
                                     type="button"
                                     onClick={() => setShowSchemaPanel(true)}
-                                    className="px-3 py-2 text-left text-sm text-slate-700 bg-white border border-slate-200 rounded hover:bg-[#646cff]/10 hover:border-[#646cff]/30 transition-colors"
+                                        title="View Schema"
+                                        className="p-1.5 text-slate-500 bg-white border border-slate-200 rounded hover:bg-slate-100 hover:text-slate-700 transition-colors"
                                 >
-                                    <VscJson className="inline-block h-4 w-4 mr-2" />
-                                    View Schema
+                                        <VscJson className="h-3.5 w-3.5" />
                                 </button>
                                 <button
                                     type="button"
                                     onClick={() => setShowConsole(!showConsole)}
-                                    className={`px-3 py-2 text-left text-sm text-slate-700 bg-white border rounded hover:bg-[#646cff]/10 hover:border-[#646cff]/30 transition-colors ${showConsole ? 'border-[#646cff] bg-[#646cff]/5' : 'border-slate-200'
-                                        }`}
+                                        title={showConsole ? 'Hide Console' : 'Show Console'}
+                                        className={`p-1.5 text-slate-500 bg-white border rounded hover:bg-slate-100 hover:text-slate-700 transition-colors flex items-center gap-1 ${showConsole ? 'border-[#646cff] text-[#646cff]' : 'border-slate-200'}`}
                                 >
-                                    <VscTerminal className="inline-block h-4 w-4 mr-2" />
-                                    {showConsole ? 'Hide Console' : 'Show Console'}
+                                        <VscTerminal className="h-3.5 w-3.5" />
                                     {consoleLogs.length > 0 && (
-                                        <span className="ml-2 px-1.5 py-0.5 text-[10px] bg-slate-200 text-slate-600 rounded-full">
+                                            <span className="px-1 py-0.5 text-[8px] bg-slate-200 text-slate-600 rounded-full leading-none">
                                             {consoleLogs.length}
                                         </span>
                                     )}
                                 </button>
+                            </div>
                             </div>
 
 

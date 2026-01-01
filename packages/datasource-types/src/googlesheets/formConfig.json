@@ -1,0 +1,165 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "authType": {
+        "type": "string",
+        "enum": ["serviceAccount", "oauth2"],
+        "default": "serviceAccount",
+        "description": "Choose authentication method"
+      },
+      "connectionName": {
+        "type": "string",
+        "description": "A unique name for this data source connection.",
+        "minLength": 3
+      },
+      "serviceAccountKey": {
+        "type": "string",
+        "description": "Service Account JSON key (paste the entire JSON content)",
+        "format": "textarea"
+      },
+      "oauth2": {
+        "type": "object",
+        "description": "OAuth2 credentials",
+        "properties": {
+          "clientId": {
+            "type": "string",
+            "description": "OAuth2 Client ID"
+          },
+          "clientSecret": {
+            "type": "string",
+            "description": "OAuth2 Client Secret",
+            "format": "password"
+          },
+          "refreshToken": {
+            "type": "string",
+            "description": "OAuth2 Refresh Token",
+            "format": "password"
+          }
+        },
+        "required": ["clientId", "clientSecret", "refreshToken"]
+      },
+      "defaultSpreadsheetId": {
+        "type": "string",
+        "description": "Default Spreadsheet ID to use (optional, can be specified per query)"
+      }
+    },
+    "required": ["authType", "connectionName"],
+    "allOf": [
+      {
+        "if": {
+          "properties": {
+            "authType": {
+              "const": "serviceAccount"
+            }
+          }
+        },
+        "then": {
+          "required": ["serviceAccountKey"]
+        }
+      },
+      {
+        "if": {
+          "properties": {
+            "authType": {
+              "const": "oauth2"
+            }
+          }
+        },
+        "then": {
+          "required": ["oauth2"]
+        }
+      }
+    ]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/connectionName",
+        "label": "Connection Name"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/authType",
+        "label": "Authentication Method",
+        "options": {
+          "format": "radio"
+        }
+      },
+      {
+        "type": "Group",
+        "label": "Service Account",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/authType",
+            "schema": { "const": "serviceAccount" }
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/serviceAccountKey",
+            "label": "Service Account JSON Key",
+            "options": {
+              "multi": true,
+              "rows": 10
+            }
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "OAuth2 Credentials",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/authType",
+            "schema": { "const": "oauth2" }
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/oauth2/properties/clientId",
+            "label": "Client ID"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/oauth2/properties/clientSecret",
+            "label": "Client Secret",
+            "options": {
+              "format": "password"
+            }
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/oauth2/properties/refreshToken",
+            "label": "Refresh Token",
+            "options": {
+              "format": "password"
+            }
+          }
+        ]
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/defaultSpreadsheetId",
+        "label": "Default Spreadsheet ID (Optional)"
+      }
+    ]
+  },
+  "data": {
+    "authType": "serviceAccount",
+    "connectionName": "MyGoogleSheets",
+    "serviceAccountKey": "",
+    "oauth2": {
+      "clientId": "",
+      "clientSecret": "",
+      "refreshToken": ""
+    },
+    "defaultSpreadsheetId": ""
+  }
+}

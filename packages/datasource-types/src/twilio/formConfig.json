@@ -1,0 +1,39 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "accountSid": {
+        "type": "string",
+        "description": "Twilio Account SID",
+        "minLength": 1
+      },
+      "authToken": {
+        "type": "string",
+        "description": "Twilio Auth Token",
+        "format": "password",
+        "minLength": 1
+      }
+    },
+    "required": ["accountSid", "authToken"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/accountSid",
+        "label": "Account SID"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/authToken",
+        "label": "Auth Token",
+        "options": { "format": "password" }
+      }
+    ]
+  },
+  "data": {
+    "accountSid": "",
+    "authToken": ""
+  }
+}

@@ -12,6 +12,7 @@ export class Workflow {
     edges,
     tblWorkflowNodes,
     tblWorkflowEdge,
+    workflowOptions,
   }) {
     this.workflowID = workflowID;
     this.title = title;
@@ -21,6 +22,7 @@ export class Workflow {
     this.disabledAt = disabledAt;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
+    this.workflowOptions = workflowOptions || {};
 
     // Transform tblWorkflowNodes to React Flow node format if present
     if (tblWorkflowNodes && Array.isArray(tblWorkflowNodes)) {

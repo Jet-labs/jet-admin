@@ -1,0 +1,59 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "queryType": {
+        "type": "string",
+        "enum": ["query"],
+        "default": "query"
+      },
+      "query": {
+        "type": "string",
+        "description": "CockroachDB SQL query (PostgreSQL-compatible)",
+        "format": "code-pgsql"
+      },
+      "args": {
+        "type": "array",
+        "description": "Query arguments",
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": { "type": "string" },
+            "type": {
+              "type": "string",
+              "enum": ["string", "number", "boolean"],
+              "default": "string"
+            }
+          },
+          "required": ["key", "type"]
+        }
+      }
+    },
+    "required": ["queryType"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/queryType",
+        "label": "Query Type"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/query",
+        "label": "SQL Query"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/args",
+        "label": "Arguments"
+      }
+    ]
+  },
+  "data": {
+    "queryType": "query",
+    "query": "SELECT * FROM crdb_internal.tables LIMIT 10;",
+    "args": []
+  }
+}

@@ -91,127 +91,6 @@ function jsonSchemaGenerator(data) {
 }
 
 export const TableWidgetComponent = ({ data, onWidgetInit, widgetConfig }) => {
-  TableWidgetComponent.propTypes = {
-    data: PropTypes.object,
-    onWidgetInit: PropTypes.func,
-    widgetConfig: PropTypes.object,
-  };
-
-  // The data structure seems to be an array containing another array.
-  // We assume the actual rows are in data[0]
-  const firstData =
-    data && Array.isArray(data) && data.length > 0 && Array.isArray(data[0])
-      ? data[0].map((item, index) => ({ ...item, _g_uuid: `row_${index}` }))
-      : null;
-
-  const widgetRef = useRef(null);
-
-  const dataSchema = useMemo(() => {
-    // Generate schema from the first row of the actual data array
-    if (firstData && firstData.length > 0) {
-      return jsonSchemaGenerator(firstData[0]);
-    }
-    return {};
-  }, [firstData]);
-
-  // Adapt column definitions for @mui/x-data-grid
-  const columns = useMemo(() => {
-    if (dataSchema && dataSchema.properties) {
-      return Object.keys(dataSchema.properties).map((key) => {
-        return {
-          field: key, // Use 'field' for mui-x-data-grid
-          headerName: key,
-          flex: 1,
-          minWidth: 150,
-          renderCell: (params) => {
-            return (
-              <div className="text-sm whitespace-pre-wrap py-2">
-                {/* Safely access value and handle null/undefined */}
-                {params.value !== null && params.value !== undefined
-                  ? params.value.toString()
-                  : "-"}
-              </div>
-            );
-          },
-        };
-      });
-    }
-    return []; // Return empty array if no schema or properties to avoid grid rendering issues
-  }, [dataSchema]);
-
-  const [paginationModel, setPaginationModel] = useState({
-    page: 0,
-    pageSize: 10,
-  });
-
-  // Update totalPages calculation based on firstData length
-  const rowCount = firstData?.length || 0;
-  const totalPages = Math.ceil(rowCount / paginationModel.pageSize);
-
-  const CustomFooter = () => {
-    // This component will be rendered *outside* the DataGrid's internal scroll area now
-    return (
-      <div className="cancelSelectorName flex items-center gap-2 p-2 border-t border-gray-200">
-        <button
-          className="p-1 text-xs font-medium text-gray-700 bg-gray-100 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
-          onClick={() =>
-            setPaginationModel((prev) => ({ ...prev, page: prev.page - 1 }))
-          }
-          disabled={paginationModel.page === 0}
-        >
-          <BiChevronLeft className="text-lg" />
-        </button>
-        <span className="text-xs text-gray-600">
-          Page {paginationModel.page + 1} of {totalPages}
-        </span>
-        <button
-          className="p-1 text-xs font-medium text-gray-700 bg-gray-100 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed"
-          onClick={() =>
-            setPaginationModel((prev) => ({ ...prev, page: prev.page + 1 }))
-          }
-          // Disable next button if on the last page (or no data)
-          disabled={paginationModel.page >= totalPages - 1 || totalPages === 0}
-        >
-          <BiChevronRight className="text-lg" />
-        </button>
-        <select
-          className="p-1 text-xs text-gray-700 bg-white border border-gray-300 rounded focus:outline-none focus:border-blue-500"
-          value={paginationModel.pageSize}
-          onChange={(e) =>
-            setPaginationModel({
-              page: 0,
-              pageSize: Number(e.target.value),
-            })
-          }
-        >
-          {[10, 25, 50].map((size) => (
-            <option key={size} value={size}>
-              {size}
-            </option>
-          ))}
-        </select>
-        <span className="text-xs text-gray-600">{rowCount} total rows</span>
-      </div>
-    );
-  };
-
-  useEffect(() => {
-    if (widgetRef.current) {
-      onWidgetInit?.(widgetRef);
-    }
-  }, [onWidgetInit]);
-
-  // Check if data is still loading or empty before rendering
-  const isLoading = !data; // Example: Assume data being null/undefined means loading
-  const hasData = firstData && firstData.length > 0 && columns.length > 0;
-  const {
-    widgetTailwindCss = "",
-    containerTailwindCss = "",
-    titleEnabled,
-    titleTailwindCss = "",
-    title,
-  } = widgetConfig;
-
   return (
     // Added flex and flex-col to make this a flex container stacking children vertically
     <div
@@ -309,4 +188,10 @@ export const TableWidgetComponent = ({ data, onWidgetInit, widgetConfig }) => {
       {hasData && <CustomFooter />}
     </div>
   );
+};
+
+TableWidgetComponent.propTypes = {
+  data: PropTypes.object,
+  onWidgetInit: PropTypes.func,
+  widgetConfig: PropTypes.object,
 };

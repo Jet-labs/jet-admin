@@ -1,0 +1,58 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "projectId": {
+        "type": "string",
+        "description": "Your Google Cloud project ID",
+        "minLength": 1
+      },
+      "keyFilePath": {
+        "type": "string",
+        "description": "Path to service account key file (JSON)"
+      },
+      "credentials": {
+        "type": "string",
+        "description": "Service account credentials JSON (alternative to key file)",
+        "format": "code-json"
+      },
+      "location": {
+        "type": "string",
+        "description": "Default dataset location (e.g., US, EU)",
+        "default": "US"
+      }
+    },
+    "required": ["projectId"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/projectId",
+        "label": "Project ID"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/location",
+        "label": "Dataset Location"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/keyFilePath",
+        "label": "Key File Path"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/credentials",
+        "label": "Credentials JSON (Alternative)"
+      }
+    ]
+  },
+  "data": {
+    "projectId": "",
+    "location": "US",
+    "keyFilePath": "",
+    "credentials": ""
+  }
+}

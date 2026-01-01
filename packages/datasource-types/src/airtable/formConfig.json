@@ -1,0 +1,41 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "apiKey": {
+        "type": "string",
+        "description": "Your Airtable API key or Personal Access Token",
+        "format": "password",
+        "minLength": 1
+      },
+      "baseId": {
+        "type": "string",
+        "description": "The Airtable Base ID (starts with 'app')",
+        "minLength": 1
+      }
+    },
+    "required": ["apiKey", "baseId"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/apiKey",
+        "label": "API Key / Personal Access Token",
+        "options": {
+          "format": "password"
+        }
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/baseId",
+        "label": "Base ID"
+      }
+    ]
+  },
+  "data": {
+    "apiKey": "",
+    "baseId": ""
+  }
+}

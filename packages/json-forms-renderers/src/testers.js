@@ -140,6 +140,30 @@ export const dynamicArgsTester = rankWith(
 );
 
 // ============================================================================
+// String Array Tester (for arrays of simple strings)
+// ============================================================================
+export const stringArrayTester = (uischema, rootSchema) => {
+  if (uischema.type !== "Control") {
+    return -1;
+  }
+  try {
+    const schemaAtScope = Resolve.schema(rootSchema, uischema.scope, rootSchema);
+    if (!schemaAtScope || schemaAtScope.type !== "array") {
+      return -1;
+    }
+    const itemSchema = schemaAtScope.items;
+    // Match arrays where items are simple strings (not objects)
+    if (itemSchema && itemSchema.type === "string" && !itemSchema.properties) {
+      return 40; // Lower priority than key-value arrays
+    }
+    return -1;
+  } catch (e) {
+    console.warn("Error in string array tester:", e);
+    return -1;
+  }
+};
+
+// ============================================================================
 // Key-Value Array Tester
 // ============================================================================
 export const keyValueArrayTester = (uischema, rootSchema) => {
@@ -223,11 +247,65 @@ export const keyTypeArrayTester = (uischema, rootSchema) => {
 };
 
 // ============================================================================
-// Group Layout Tester
+// Radio Input Tester (for radio button groups)
 // ============================================================================
-export const groupLayoutTester = (uischema) => {
-  return rankWith(10, uiTypeIs("Group"))(uischema);
+export const radioInputTester = (uischema, rootSchema, context) => {
+  if (uischema.type !== "Control") {
+    return -1;
+  }
+
+  // Check for format: 'radio' option in uischema
+  if (uischema.options && uischema.options.format === 'radio') {
+    try {
+      const currentSchema = Resolve.schema(rootSchema, uischema.scope, rootSchema);
+      if (currentSchema && currentSchema.type === "string" && currentSchema.enum) {
+        return 100; // Higher priority than select
+      }
+    } catch (e) {
+      console.warn(`Error resolving schema for scope ${uischema.scope} in radioInputTester:`, e);
+      return -1;
+    }
+  }
+  return -1;
 };
+
+// ============================================================================
+// Field-Operator-Value Array Tester (for Firestore where conditions)
+// ============================================================================
+export const fieldOperatorValueArrayTester = (uischema, rootSchema) => {
+  if (uischema.type !== "Control") {
+    return -1;
+  }
+  try {
+    const schemaAtScope = Resolve.schema(rootSchema, uischema.scope, rootSchema);
+    if (!schemaAtScope || schemaAtScope.type !== "array") {
+      return -1;
+    }
+    const itemSchema = schemaAtScope.items;
+    if (
+      itemSchema.type !== "object" ||
+      itemSchema.properties?.field?.type !== "string" ||
+      itemSchema.properties?.operator?.type !== "string" ||
+      itemSchema.properties?.value?.type !== "string"
+    ) {
+      return -1;
+    }
+    // Check that operator has enum (to distinguish from regular key-value-type)
+    if (!itemSchema.properties?.operator?.enum) {
+      return -1;
+    }
+    return 70; // Higher priority than key-value-type
+  } catch (e) {
+    console.warn("Error in field/operator/value tester:", e);
+    return -1;
+  }
+};
+
+// ============================================================================
+// Group Layout Tester
+// Higher rank (100) to take priority over material-renderers' default Group
+// ============================================================================
+export const groupLayoutTester = rankWith(100, uiTypeIs("Group"));
 
 // ============================================================================
 // Vertical Layout Tester

@@ -1,0 +1,239 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "connectionName": {
+        "type": "string",
+        "description": "A unique name for this data source connection.",
+        "minLength": 3
+      },
+      "endpoint": {
+        "type": "string",
+        "description": "The GraphQL endpoint URL",
+        "format": "uri",
+        "minLength": 1
+      },
+      "authType": {
+        "type": "string",
+        "enum": ["none", "bearer", "apiKey", "basic"],
+        "default": "none",
+        "description": "Authentication method"
+      },
+      "bearerToken": {
+        "type": "string",
+        "description": "Bearer token for authentication",
+        "format": "password"
+      },
+      "apiKey": {
+        "type": "object",
+        "properties": {
+          "headerName": {
+            "type": "string",
+            "description": "Header name for API key (e.g., 'x-api-key')",
+            "default": "x-api-key"
+          },
+          "value": {
+            "type": "string",
+            "description": "API key value",
+            "format": "password"
+          }
+        }
+      },
+      "basicAuth": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "description": "Username for basic auth"
+          },
+          "password": {
+            "type": "string",
+            "description": "Password for basic auth",
+            "format": "password"
+          }
+        }
+      },
+      "headers": {
+        "type": "array",
+        "description": "Additional headers to include in requests",
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          },
+          "required": ["key", "value"]
+        }
+      },
+      "timeout": {
+        "type": "integer",
+        "description": "Request timeout in seconds",
+        "default": 30,
+        "minimum": 1,
+        "maximum": 300
+      }
+    },
+    "required": ["connectionName", "endpoint"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/connectionName",
+            "label": "Connection Name"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/endpoint",
+            "label": "GraphQL Endpoint URL"
+          }
+        ]
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/authType",
+        "label": "Authentication"
+      },
+      {
+        "type": "Group",
+        "label": "Bearer Token",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/authType",
+            "schema": { "const": "bearer" }
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/bearerToken",
+            "label": "Bearer Token",
+            "options": {
+              "format": "password"
+            }
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "API Key",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/authType",
+            "schema": { "const": "apiKey" }
+          }
+        },
+        "elements": [
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/apiKey/properties/headerName",
+                "label": "Header Name"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/apiKey/properties/value",
+                "label": "API Key",
+                "options": {
+                  "format": "password"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Basic Authentication",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/authType",
+            "schema": { "const": "basic" }
+          }
+        },
+        "elements": [
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/basicAuth/properties/username",
+                "label": "Username"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/basicAuth/properties/password",
+                "label": "Password",
+                "options": {
+                  "format": "password"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Advanced Options",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/timeout",
+            "label": "Timeout (seconds)"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/headers",
+            "label": "Custom Headers",
+            "options": {
+              "detail": {
+                "type": "HorizontalLayout",
+                "elements": [
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/key",
+                    "label": "Header"
+                  },
+                  {
+                    "type": "Control",
+                    "scope": "#/properties/value",
+                    "label": "Value"
+                  }
+                ]
+              }
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "data": {
+    "connectionName": "MyGraphQLAPI",
+    "endpoint": "https://api.example.com/graphql",
+    "authType": "none",
+    "bearerToken": "",
+    "apiKey": {
+      "headerName": "x-api-key",
+      "value": ""
+    },
+    "basicAuth": {
+      "username": "",
+      "password": ""
+    },
+    "headers": [],
+    "timeout": 30
+  }
+}

@@ -1,0 +1,160 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "operation": {
+        "type": "string",
+        "enum": ["list", "find", "create", "update", "delete"],
+        "default": "list"
+      },
+      "tableName": {
+        "type": "string",
+        "description": "The name of the table",
+        "minLength": 1
+      },
+      "recordId": {
+        "type": "string",
+        "description": "Record ID (for find/update/delete operations)"
+      },
+      "fields": {
+        "type": "string",
+        "description": "JSON object of fields for create/update",
+        "format": "code-json"
+      },
+      "filterByFormula": {
+        "type": "string",
+        "description": "Airtable formula to filter records"
+      },
+      "maxRecords": {
+        "type": "integer",
+        "description": "Maximum number of records to return",
+        "minimum": 1,
+        "default": 100
+      },
+      "sortField": {
+        "type": "string",
+        "description": "Field to sort by"
+      },
+      "sortDirection": {
+        "type": "string",
+        "enum": ["asc", "desc"],
+        "default": "asc"
+      },
+      "view": {
+        "type": "string",
+        "description": "View name to use"
+      }
+    },
+    "required": ["operation", "tableName"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/operation",
+            "label": "Operation"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/tableName",
+            "label": "Table Name"
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Record ID",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/operation",
+            "schema": { "enum": ["find", "update", "delete"] }
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/recordId",
+            "label": "Record ID"
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Fields Data",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/operation",
+            "schema": { "enum": ["create", "update"] }
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/fields",
+            "label": "Fields (JSON)"
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "List Options",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/operation",
+            "schema": { "const": "list" }
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/filterByFormula",
+            "label": "Filter Formula"
+          },
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/maxRecords",
+                "label": "Max Records"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/view",
+                "label": "View"
+              }
+            ]
+          },
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/sortField",
+                "label": "Sort Field"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/sortDirection",
+                "label": "Sort Direction"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "data": {
+    "operation": "list",
+    "tableName": "",
+    "maxRecords": 100,
+    "sortDirection": "asc"
+  }
+}

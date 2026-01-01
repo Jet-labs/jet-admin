@@ -72,7 +72,7 @@ export const CustomSelectInput = (props) => {
             errors && errors.length > 0
               ? "border-red-500 focus:border-red-500"
               : "border-slate-200"
-          } text-slate-700 rounded block w-full px-2.5 py-1.5 disabled:opacity-50 disabled:cursor-not-allowed`}
+            } text-slate-700 rounded block w-full px-2.5 py-1.5 h-[34px] disabled:opacity-50 disabled:cursor-not-allowed`}
           onChange={(ev) => handleChange(path, ev.target.value)}
           value={data || ""}
         >

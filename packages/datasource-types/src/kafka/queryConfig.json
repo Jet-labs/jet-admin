@@ -1,0 +1,174 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "operation": {
+        "type": "string",
+        "enum": ["produce", "consume", "getTopicMetadata", "listTopics", "createTopic", "deleteTopic"],
+        "default": "produce"
+      },
+      "topic": {
+        "type": "string",
+        "description": "Kafka topic name"
+      },
+      "message": {
+        "type": "string",
+        "description": "Message content (JSON)",
+        "format": "code-json"
+      },
+      "key": {
+        "type": "string",
+        "description": "Message key (optional)"
+      },
+      "partition": {
+        "type": "integer",
+        "description": "Specific partition (optional)",
+        "minimum": 0
+      },
+      "consumerGroup": {
+        "type": "string",
+        "description": "Consumer group ID",
+        "default": "jet-admin-group"
+      },
+      "messageCount": {
+        "type": "integer",
+        "description": "Number of messages to consume",
+        "minimum": 1,
+        "default": 10
+      },
+      "fromBeginning": {
+        "type": "boolean",
+        "description": "Start reading from beginning",
+        "default": false
+      },
+      "consumeMode": {
+        "type": "string",
+        "enum": ["preview", "consume", "consumeAndStore"],
+        "default": "preview"
+      },
+      "storeDestination": {
+        "type": "object",
+        "properties": {
+          "type": { "type": "string", "enum": ["dataQuery"], "default": "dataQuery" },
+          "dataQueryId": { "type": "string" }
+        }
+      },
+      "topicConfig": {
+        "type": "object",
+        "description": "Topic configuration for createTopic",
+        "properties": {
+          "numPartitions": { "type": "integer", "default": 1 },
+          "replicationFactor": { "type": "integer", "default": 1 }
+        }
+      },
+      "args": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": { "type": "string" },
+            "type": { "type": "string", "enum": ["string", "number", "boolean", "object"], "default": "string" }
+          },
+          "required": ["key", "type"]
+        }
+      }
+    },
+    "required": ["operation"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          { "type": "Control", "scope": "#/properties/operation", "label": "Operation" },
+          { "type": "Control", "scope": "#/properties/topic", "label": "Topic" }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Produce Options",
+        "rule": {
+          "effect": "SHOW",
+          "condition": { "scope": "#/properties/operation", "schema": { "const": "produce" } }
+        },
+        "elements": [
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              { "type": "Control", "scope": "#/properties/key", "label": "Message Key" },
+              { "type": "Control", "scope": "#/properties/partition", "label": "Partition" }
+            ]
+          },
+          { "type": "Control", "scope": "#/properties/message", "label": "Message (JSON)" }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Consume Options",
+        "rule": {
+          "effect": "SHOW",
+          "condition": { "scope": "#/properties/operation", "schema": { "const": "consume" } }
+        },
+        "elements": [
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              { "type": "Control", "scope": "#/properties/consumerGroup", "label": "Consumer Group" },
+              { "type": "Control", "scope": "#/properties/messageCount", "label": "Message Count" }
+            ]
+          },
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              { "type": "Control", "scope": "#/properties/fromBeginning", "label": "From Beginning" },
+              { "type": "Control", "scope": "#/properties/consumeMode", "label": "Consume Mode" }
+            ]
+          },
+          {
+            "type": "Group",
+            "label": "Store Destination",
+            "rule": {
+              "effect": "SHOW",
+              "condition": { "scope": "#/properties/consumeMode", "schema": { "const": "consumeAndStore" } }
+            },
+            "elements": [
+              { "type": "Control", "scope": "#/properties/storeDestination/properties/dataQueryId", "label": "Data Query ID" }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Topic Config",
+        "rule": {
+          "effect": "SHOW",
+          "condition": { "scope": "#/properties/operation", "schema": { "const": "createTopic" } }
+        },
+        "elements": [
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              { "type": "Control", "scope": "#/properties/topicConfig/properties/numPartitions", "label": "Partitions" },
+              { "type": "Control", "scope": "#/properties/topicConfig/properties/replicationFactor", "label": "Replication Factor" }
+            ]
+          }
+        ]
+      },
+      { "type": "Control", "scope": "#/properties/args", "label": "Dynamic Arguments" }
+    ]
+  },
+  "data": {
+    "operation": "produce",
+    "topic": "my-topic",
+    "message": "{\n  \"event\": \"order_created\",\n  \"data\": {}\n}",
+    "key": "",
+    "consumerGroup": "jet-admin-group",
+    "messageCount": 10,
+    "fromBeginning": false,
+    "consumeMode": "preview",
+    "storeDestination": { "type": "dataQuery", "dataQueryId": "" },
+    "topicConfig": { "numPartitions": 1, "replicationFactor": 1 },
+    "args": []
+  }
+}

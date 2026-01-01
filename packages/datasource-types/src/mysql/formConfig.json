@@ -1,0 +1,227 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "connectionOption": {
+        "type": "string",
+        "enum": ["connectionDetails", "connectionString"],
+        "default": "connectionDetails",
+        "description": "Choose to enter connection details or a connection string."
+      },
+      "connectionDetails": {
+        "type": "object",
+        "properties": {
+          "connectionName": {
+            "type": "string",
+            "description": "A unique name for this data source connection.",
+            "minLength": 3
+          },
+          "host": {
+            "type": "string",
+            "description": "The hostname or IP address of the MySQL server.",
+            "format": "hostname"
+          },
+          "port": {
+            "type": "integer",
+            "description": "The port number of the MySQL server (default is 3306).",
+            "minimum": 1,
+            "maximum": 65535,
+            "default": 3306
+          },
+          "database": {
+            "type": "string",
+            "description": "The name of the database to connect to.",
+            "minLength": 1
+          },
+          "user": {
+            "type": "string",
+            "description": "The username for connecting to the database.",
+            "minLength": 1
+          },
+          "password": {
+            "type": "string",
+            "description": "The password for the specified user.",
+            "format": "password"
+          },
+          "ssl": {
+            "type": "boolean",
+            "description": "Enable SSL/TLS for the connection.",
+            "default": false
+          },
+          "additionalOptions": {
+            "type": "object",
+            "description": "Additional connection options.",
+            "properties": {
+              "connectTimeout": {
+                "type": "integer",
+                "description": "Connection timeout in milliseconds.",
+                "minimum": 0,
+                "default": 10000
+              },
+              "timezone": {
+                "type": "string",
+                "description": "Timezone for the connection (e.g., '+05:30', 'Z')."
+              }
+            },
+            "additionalProperties": true
+          }
+        },
+        "required": ["connectionName", "host", "database", "user", "password"]
+      },
+      "connectionString": {
+        "type": "string",
+        "description": "The full MySQL connection string (e.g., 'mysql://user:password@host:port/database').",
+        "minLength": 1
+      }
+    },
+    "required": ["connectionOption"],
+    "allOf": [
+      {
+        "if": {
+          "properties": {
+            "connectionOption": {
+              "const": "connectionDetails"
+            }
+          }
+        },
+        "then": {
+          "required": ["connectionDetails"]
+        }
+      },
+      {
+        "if": {
+          "properties": {
+            "connectionOption": {
+              "const": "connectionString"
+            }
+          }
+        },
+        "then": {
+          "required": ["connectionString"]
+        }
+      }
+    ]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/connectionOption",
+        "label": "Connection Type"
+      },
+      {
+        "type": "Group",
+        "label": "Connection Details",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/connectionOption",
+            "schema": { "const": "connectionDetails" }
+          }
+        },
+        "elements": [
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/connectionName",
+                "label": "Connection Name"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/host",
+                "label": "Host"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/port",
+                "label": "Port"
+              }
+            ]
+          },
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/database",
+                "label": "Database Name"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/user",
+                "label": "Username"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/password",
+                "label": "Password",
+                "options": {
+                  "format": "password"
+                }
+              }
+            ]
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/connectionDetails/properties/ssl",
+            "label": "Enable SSL"
+          },
+          {
+            "type": "Group",
+            "label": "Advanced Options",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/additionalOptions/properties/connectTimeout",
+                "label": "Connection Timeout (ms)"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/additionalOptions/properties/timezone",
+                "label": "Timezone"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Connection String",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/connectionOption",
+            "schema": { "const": "connectionString" }
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/connectionString",
+            "label": "Connection String"
+          }
+        ]
+      }
+    ]
+  },
+  "data": {
+    "connectionOption": "connectionDetails",
+    "connectionDetails": {
+      "connectionName": "MyDevMySQL",
+      "host": "localhost",
+      "port": 3306,
+      "database": "mydatabase",
+      "user": "root",
+      "password": "",
+      "ssl": false,
+      "additionalOptions": {
+        "connectTimeout": 10000,
+        "timezone": "Z"
+      }
+    },
+    "connectionString": ""
+  }
+}

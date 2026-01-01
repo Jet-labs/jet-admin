@@ -32,12 +32,15 @@ __export(index_exports, {
   CustomCheckboxInput: () => CustomCheckboxInput,
   CustomCodeJavascriptControl: () => CustomCodeJavascriptControl,
   CustomCodePgsqlControl: () => CustomCodePgsqlControl,
+  CustomFieldOperatorValueArrayRenderer: () => CustomFieldOperatorValueArrayRenderer,
   CustomGroupLayout: () => CustomGroupLayout,
   CustomKeyTypeArrayRenderer: () => CustomKeyTypeArrayRenderer,
   CustomKeyValueArrayRenderer: () => CustomKeyValueArrayRenderer,
   CustomKeyValueTypeArrayRenderer: () => CustomKeyValueTypeArrayRenderer,
   CustomNumberInput: () => CustomNumberInput,
+  CustomRadioInput: () => CustomRadioInput,
   CustomSelectInput: () => CustomSelectInput,
+  CustomStringArrayRenderer: () => CustomStringArrayRenderer,
   CustomSuggestionInput: () => CustomSuggestionInput,
   CustomTabRenderer: () => CustomTabRenderer,
   CustomTextInput: () => CustomTextInput,
@@ -47,12 +50,15 @@ __export(index_exports, {
   JetCodeJavascriptControl: () => JetCodeJavascriptControl,
   JetCodePgsqlControl: () => JetCodePgsqlControl,
   JetDynamicArgsControl: () => JetDynamicArgsControl,
+  JetFieldOperatorValueArrayControl: () => JetFieldOperatorValueArrayControl,
   JetGroupLayout: () => JetGroupLayout,
   JetKeyTypeArrayControl: () => JetKeyTypeArrayControl,
   JetKeyValueArrayControl: () => JetKeyValueArrayControl,
   JetKeyValueTypeArrayControl: () => JetKeyValueTypeArrayControl,
   JetNumberControl: () => JetNumberControl,
+  JetRadioControl: () => JetRadioControl,
   JetSelectControl: () => JetSelectControl,
+  JetStringArrayControl: () => JetStringArrayControl,
   JetSuggestionControl: () => JetSuggestionControl,
   JetTabLayout: () => JetTabLayout,
   JetTextControl: () => JetTextControl,
@@ -61,6 +67,7 @@ __export(index_exports, {
   codeJavascriptTester: () => codeJavascriptTester,
   codePgsqlTester: () => codePgsqlTester,
   dynamicArgsTester: () => dynamicArgsTester,
+  fieldOperatorValueArrayTester: () => fieldOperatorValueArrayTester,
   groupLayoutTester: () => groupLayoutTester,
   jetFormsBaseRenderers: () => jetFormsBaseRenderers,
   jetFormsRenderers: () => jetFormsRenderers,
@@ -68,7 +75,9 @@ __export(index_exports, {
   keyValueArrayTester: () => keyValueArrayTester,
   keyValueTypeArrayTester: () => keyValueTypeArrayTester,
   numberInputTester: () => numberInputTester,
+  radioInputTester: () => radioInputTester,
   selectInputTester: () => selectInputTester,
+  stringArrayTester: () => stringArrayTester,
   suggestionInputTester: () => suggestionInputTester,
   tabRendererTester: () => tabRendererTester,
   textInputTester: () => textInputTester,
@@ -77,7 +86,7 @@ __export(index_exports, {
 module.exports = __toCommonJS(index_exports);
 
 // src/renderers/index.js
-var import_react23 = require("@jsonforms/react");
+var import_react26 = require("@jsonforms/react");
 
 // src/renderers/CustomNumberInput.jsx
 var import_react = __toESM(require("react"));
@@ -255,7 +264,7 @@ var CustomSelectInput = (props) => {
       id: path,
       name: path,
       disabled: isDisabled,
-      className: `placeholder:text-slate-400 text-sm bg-slate-50 border focus:border-slate-700 ${errors && errors.length > 0 ? "border-red-500 focus:border-red-500" : "border-slate-200"} text-slate-700 rounded block w-full px-2.5 py-1.5 disabled:opacity-50 disabled:cursor-not-allowed`,
+      className: `placeholder:text-slate-400 text-sm bg-slate-50 border focus:border-slate-700 ${errors && errors.length > 0 ? "border-red-500 focus:border-red-500" : "border-slate-200"} text-slate-700 rounded block w-full px-2.5 py-1.5 h-[34px] disabled:opacity-50 disabled:cursor-not-allowed`,
       onChange: (ev) => handleChange(path, ev.target.value),
       value: data || ""
     },
@@ -833,7 +842,7 @@ var CustomKeyValueArrayRenderer = ({
     {
       type: "button",
       onClick: () => handleRemoveItem(index),
-      className: "mt-5 p-2 rounded bg-red-100 text-red-400 focus:outline-none hover:border-red-400"
+      className: "mt-2 p-2 rounded bg-red-100 text-red-400 focus:outline-none hover:border-red-400"
     },
     /* @__PURE__ */ import_react11.default.createElement(import_md.MdDeleteOutline, null)
   )))), /* @__PURE__ */ import_react11.default.createElement(
@@ -937,7 +946,7 @@ var CustomKeyValueTypeArrayRenderer = ({
     {
       type: "button",
       onClick: () => handleRemoveItem(index),
-      className: "mt-5 p-2 rounded bg-red-100 text-red-400 focus:outline-none hover:border-red-400"
+      className: "mt-2 p-2 rounded bg-red-100 text-red-400 focus:outline-none hover:border-red-400"
     },
     /* @__PURE__ */ import_react13.default.createElement(import_md2.MdDeleteOutline, null)
   )))), /* @__PURE__ */ import_react13.default.createElement(
@@ -1053,19 +1062,184 @@ CustomKeyTypeArrayRenderer.propTypes = {
   renderers: import_prop_types11.default.arrayOf(import_prop_types11.default.object).isRequired
 };
 
-// src/renderers/CustomGroupLayout.jsx
+// src/renderers/CustomStringArrayRenderer.jsx
 var import_react17 = __toESM(require("react"));
 var import_prop_types12 = __toESM(require("prop-types"));
-var import_react18 = require("@jsonforms/react");
+var import_md4 = require("react-icons/md");
+var CustomStringArrayRenderer = (props) => {
+  const { data, path, handleChange, label, uischema, enabled, visible } = props;
+  const arrayData = Array.isArray(data) ? data : [];
+  const handleAddItem = () => {
+    handleChange(path, [...arrayData, ""]);
+  };
+  const handleRemoveItem = (index) => {
+    const newData = arrayData.filter((_, i) => i !== index);
+    handleChange(path, newData);
+  };
+  const handleItemChange = (index, value) => {
+    const newData = [...arrayData];
+    newData[index] = value;
+    handleChange(path, newData);
+  };
+  if (visible === false) {
+    return null;
+  }
+  return /* @__PURE__ */ import_react17.default.createElement("div", { className: "p-3 border border-slate-200 rounded bg-white mb-3" }, /* @__PURE__ */ import_react17.default.createElement("label", { className: "block mb-1 text-sm font-medium text-slate-700" }, label || uischema?.label || "Items"), /* @__PURE__ */ import_react17.default.createElement("div", { className: "gap-2" }, arrayData.map((item, index) => /* @__PURE__ */ import_react17.default.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2 mb-2" }, /* @__PURE__ */ import_react17.default.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ import_react17.default.createElement(
+    "input",
+    {
+      type: "text",
+      value: item || "",
+      onChange: (e) => handleItemChange(index, e.target.value),
+      disabled: !enabled,
+      placeholder: "Enter value...",
+      className: "w-full placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-200 text-slate-700 rounded focus:border-slate-400 focus:outline-none px-2.5 py-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+    }
+  )), /* @__PURE__ */ import_react17.default.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: () => handleRemoveItem(index),
+      disabled: !enabled,
+      className: "p-2 rounded bg-red-100 text-red-400 focus:outline-none hover:border-red-400 disabled:opacity-50 disabled:cursor-not-allowed"
+    },
+    /* @__PURE__ */ import_react17.default.createElement(import_md4.MdDeleteOutline, null)
+  )))), arrayData.length === 0 && /* @__PURE__ */ import_react17.default.createElement("div", { className: "text-xs text-slate-400 italic py-2" }, "No items added yet."), /* @__PURE__ */ import_react17.default.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: handleAddItem,
+      disabled: !enabled,
+      className: "mt-3 px-2 py-1 bg-white text-[#646cff] text-xs rounded hover:border-[#646cff] focus:outline-none border border-slate-200 disabled:opacity-50 disabled:cursor-not-allowed"
+    },
+    "Add Item"
+  ));
+};
+CustomStringArrayRenderer.propTypes = {
+  data: import_prop_types12.default.array,
+  path: import_prop_types12.default.string.isRequired,
+  handleChange: import_prop_types12.default.func.isRequired,
+  label: import_prop_types12.default.string,
+  uischema: import_prop_types12.default.object,
+  enabled: import_prop_types12.default.bool,
+  visible: import_prop_types12.default.bool
+};
+
+// src/renderers/CustomFieldOperatorValueArrayRenderer.jsx
+var import_react18 = __toESM(require("react"));
+var import_prop_types13 = __toESM(require("prop-types"));
+var import_md5 = require("react-icons/md");
+var CustomFieldOperatorValueArrayRenderer = ({
+  data,
+  path,
+  handleChange,
+  schema,
+  uischema,
+  errors,
+  label,
+  enabled
+}) => {
+  const items = data || [];
+  const itemSchema = schema.items;
+  const isDisabled = enabled === false;
+  const operatorOptions = itemSchema?.properties?.operator?.enum || [
+    "==",
+    "!=",
+    "<",
+    "<=",
+    ">",
+    ">=",
+    "array-contains",
+    "array-contains-any",
+    "in",
+    "not-in"
+  ];
+  const handleAddItem = () => {
+    const newItem = { field: "", operator: "==", value: "" };
+    handleChange(path, [...items, newItem]);
+  };
+  const handleRemoveItem = (index) => {
+    const newItems = items.filter((_, i) => i !== index);
+    handleChange(path, newItems);
+  };
+  const handleItemChange = (index, field, value) => {
+    const newItems = [...items];
+    newItems[index] = { ...newItems[index], [field]: value };
+    handleChange(path, newItems);
+  };
+  return /* @__PURE__ */ import_react18.default.createElement("div", { className: "p-3 border border-slate-200 rounded bg-white mb-3" }, /* @__PURE__ */ import_react18.default.createElement("label", { className: "block mb-2 text-sm font-medium text-slate-700" }, label || uischema.label || "Conditions"), errors && errors.length > 0 && /* @__PURE__ */ import_react18.default.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ import_react18.default.createElement("div", { className: "space-y-2" }, items.map((item, index) => /* @__PURE__ */ import_react18.default.createElement("div", { key: `${path}-${index}`, className: "flex items-center gap-2" }, /* @__PURE__ */ import_react18.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react18.default.createElement(
+    "input",
+    {
+      type: "text",
+      placeholder: "Field",
+      value: item.field || "",
+      disabled: isDisabled,
+      onChange: (e) => handleItemChange(index, "field", e.target.value),
+      className: "w-full px-2.5 py-1.5 text-sm bg-slate-50 border border-slate-200 rounded text-slate-700 placeholder:text-slate-400 focus:border-slate-700 disabled:opacity-50"
+    }
+  )), /* @__PURE__ */ import_react18.default.createElement("div", { className: "w-36" }, /* @__PURE__ */ import_react18.default.createElement(
+    "select",
+    {
+      value: item.operator || "==",
+      disabled: isDisabled,
+      onChange: (e) => handleItemChange(index, "operator", e.target.value),
+      className: "w-full px-2.5 py-1.5 text-sm bg-slate-50 border border-slate-200 rounded text-slate-700 focus:border-slate-700 disabled:opacity-50"
+    },
+    operatorOptions.map((op) => /* @__PURE__ */ import_react18.default.createElement("option", { key: op, value: op }, op))
+  )), /* @__PURE__ */ import_react18.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react18.default.createElement(
+    "input",
+    {
+      type: "text",
+      placeholder: "Value",
+      value: item.value || "",
+      disabled: isDisabled,
+      onChange: (e) => handleItemChange(index, "value", e.target.value),
+      className: "w-full px-2.5 py-1.5 text-sm bg-slate-50 border border-slate-200 rounded text-slate-700 placeholder:text-slate-400 focus:border-slate-700 disabled:opacity-50"
+    }
+  )), /* @__PURE__ */ import_react18.default.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: () => handleRemoveItem(index),
+      disabled: isDisabled,
+      className: "p-2 rounded bg-red-100 text-red-400 focus:outline-none hover:bg-red-200 disabled:opacity-50"
+    },
+    /* @__PURE__ */ import_react18.default.createElement(import_md5.MdDeleteOutline, null)
+  )))), /* @__PURE__ */ import_react18.default.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: handleAddItem,
+      disabled: isDisabled,
+      className: "mt-3 px-2 py-1 bg-white text-[#646cff] text-xs rounded hover:border-[#646cff] focus:outline-none border border-slate-200 disabled:opacity-50"
+    },
+    "Add Condition"
+  ));
+};
+CustomFieldOperatorValueArrayRenderer.propTypes = {
+  data: import_prop_types13.default.arrayOf(import_prop_types13.default.object),
+  path: import_prop_types13.default.string.isRequired,
+  handleChange: import_prop_types13.default.func.isRequired,
+  schema: import_prop_types13.default.object.isRequired,
+  uischema: import_prop_types13.default.object.isRequired,
+  label: import_prop_types13.default.string,
+  errors: import_prop_types13.default.arrayOf(import_prop_types13.default.string),
+  enabled: import_prop_types13.default.bool
+};
+
+// src/renderers/CustomGroupLayout.jsx
+var import_react19 = __toESM(require("react"));
+var import_prop_types14 = __toESM(require("prop-types"));
+var import_react20 = require("@jsonforms/react");
 var CustomGroupLayout = (props) => {
   const { uischema, schema, path, visible, enabled, renderers, cells } = props;
   const elements = uischema.elements || [];
   const customClass = uischema.options?.customClass || "";
+  console.log("[CustomGroupLayout] Rendering group:", uischema.label, "visible:", visible);
   if (!visible) {
     return null;
   }
-  return /* @__PURE__ */ import_react17.default.createElement("div", { className: `border border-slate-200 rounded p-3 mt-2 bg-white ${customClass}` }, uischema.label && /* @__PURE__ */ import_react17.default.createElement("h3", { className: "text-xs font-medium text-slate-500 mb-2" }, uischema.label), /* @__PURE__ */ import_react17.default.createElement("div", { className: "flex flex-col gap-2" }, elements.map((element, index) => /* @__PURE__ */ import_react17.default.createElement(
-    import_react18.JsonFormsDispatch,
+  return /* @__PURE__ */ import_react19.default.createElement("div", { className: `border border-slate-200 rounded p-3 mt-2 bg-white ${customClass}` }, uischema.label && /* @__PURE__ */ import_react19.default.createElement("h3", { className: "text-xs font-medium text-slate-500 mb-2" }, uischema.label), /* @__PURE__ */ import_react19.default.createElement("div", { className: "flex flex-col gap-2" }, elements.map((element, index) => /* @__PURE__ */ import_react19.default.createElement(
+    import_react20.JsonFormsDispatch,
     {
       key: index,
       uischema: element,
@@ -1078,27 +1252,101 @@ var CustomGroupLayout = (props) => {
   ))));
 };
 CustomGroupLayout.propTypes = {
-  uischema: import_prop_types12.default.object.isRequired,
-  schema: import_prop_types12.default.object.isRequired,
-  path: import_prop_types12.default.string.isRequired,
-  visible: import_prop_types12.default.bool.isRequired,
-  enabled: import_prop_types12.default.bool.isRequired,
-  renderers: import_prop_types12.default.arrayOf(import_prop_types12.default.object).isRequired,
-  cells: import_prop_types12.default.arrayOf(import_prop_types12.default.object)
+  uischema: import_prop_types14.default.object.isRequired,
+  schema: import_prop_types14.default.object.isRequired,
+  path: import_prop_types14.default.string.isRequired,
+  visible: import_prop_types14.default.bool.isRequired,
+  enabled: import_prop_types14.default.bool.isRequired,
+  renderers: import_prop_types14.default.arrayOf(import_prop_types14.default.object).isRequired,
+  cells: import_prop_types14.default.arrayOf(import_prop_types14.default.object)
+};
+
+// src/renderers/CustomRadioInput.jsx
+var import_react21 = __toESM(require("react"));
+var import_prop_types15 = __toESM(require("prop-types"));
+var CustomRadioInput = (props) => {
+  const {
+    data,
+    path,
+    handleChange,
+    label,
+    description,
+    errors,
+    schema,
+    uischema,
+    enabled
+  } = props;
+  const options = schema.enum || [];
+  const isDisabled = enabled === false;
+  const orientation = uischema?.options?.orientation || "horizontal";
+  const getDisplayName = (optionValue) => {
+    if (uischema.options && uischema.options.enumLabels) {
+      if (Array.isArray(uischema.options.enumLabels)) {
+        const labelMap = uischema.options.enumLabels.find(
+          (item) => item.value === optionValue
+        );
+        if (labelMap) return labelMap.label;
+      } else if (typeof uischema.options.enumLabels === "object") {
+        if (uischema.options.enumLabels[optionValue]) {
+          return uischema.options.enumLabels[optionValue];
+        }
+      }
+    }
+    return optionValue.charAt(0).toUpperCase() + optionValue.slice(1).replace(/([A-Z])/g, " $1");
+  };
+  return /* @__PURE__ */ import_react21.default.createElement("div", { className: "mb-3" }, /* @__PURE__ */ import_react21.default.createElement(
+    "label",
+    {
+      className: `block mb-2 text-xs font-medium ${errors && errors.length > 0 ? "text-red-500" : "text-slate-500"}`
+    },
+    label || description,
+    " ",
+    errors && errors.length > 0 && errors
+  ), /* @__PURE__ */ import_react21.default.createElement("div", { className: `flex ${orientation === "vertical" ? "flex-col gap-2" : "flex-row flex-wrap gap-4"}` }, options.map((optionValue) => /* @__PURE__ */ import_react21.default.createElement(
+    "label",
+    {
+      key: optionValue,
+      className: `flex items-center gap-2 cursor-pointer ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`
+    },
+    /* @__PURE__ */ import_react21.default.createElement(
+      "input",
+      {
+        type: "radio",
+        name: path,
+        value: optionValue,
+        checked: data === optionValue,
+        disabled: isDisabled,
+        onChange: (ev) => handleChange(path, ev.target.value),
+        className: "w-4 h-4 text-indigo-600 bg-slate-50 border-slate-300 focus:ring-indigo-500 focus:ring-2"
+      }
+    ),
+    /* @__PURE__ */ import_react21.default.createElement("span", { className: `text-sm ${data === optionValue ? "text-slate-700 font-medium" : "text-slate-600"}` }, getDisplayName(optionValue))
+  ))));
+};
+CustomRadioInput.propTypes = {
+  data: import_prop_types15.default.string,
+  path: import_prop_types15.default.string.isRequired,
+  handleChange: import_prop_types15.default.func.isRequired,
+  label: import_prop_types15.default.string,
+  description: import_prop_types15.default.string,
+  errors: import_prop_types15.default.arrayOf(import_prop_types15.default.string),
+  schema: import_prop_types15.default.object.isRequired,
+  uischema: import_prop_types15.default.object.isRequired,
+  enabled: import_prop_types15.default.bool
 };
 
 // src/renderers/CustomVerticalLayout.jsx
-var import_react19 = __toESM(require("react"));
-var import_prop_types13 = __toESM(require("prop-types"));
-var import_react20 = require("@jsonforms/react");
+var import_react22 = __toESM(require("react"));
+var import_prop_types16 = __toESM(require("prop-types"));
+var import_react23 = require("@jsonforms/react");
 var CustomVerticalLayout = (props) => {
   const { uischema, schema, path, visible, enabled, renderers, cells } = props;
   const elements = uischema.elements || [];
   if (!visible) {
     return null;
   }
-  return /* @__PURE__ */ import_react19.default.createElement("div", { className: "flex flex-col" }, elements.map((element, index) => /* @__PURE__ */ import_react19.default.createElement(
-    import_react20.JsonFormsDispatch,
+  return /* @__PURE__ */ import_react22.default.createElement("div", { className: "flex flex-col" }, elements.map((element, index) => /* @__PURE__ */ import_react22.default.createElement(
+    import_react23.JsonFormsDispatch,
     {
       key: index,
       uischema: element,
@@ -1111,28 +1359,28 @@ var CustomVerticalLayout = (props) => {
   )));
 };
 CustomVerticalLayout.propTypes = {
-  uischema: import_prop_types13.default.object.isRequired,
-  schema: import_prop_types13.default.object.isRequired,
-  path: import_prop_types13.default.string.isRequired,
-  visible: import_prop_types13.default.bool.isRequired,
-  enabled: import_prop_types13.default.bool.isRequired,
-  renderers: import_prop_types13.default.arrayOf(import_prop_types13.default.object).isRequired,
-  cells: import_prop_types13.default.arrayOf(import_prop_types13.default.object)
+  uischema: import_prop_types16.default.object.isRequired,
+  schema: import_prop_types16.default.object.isRequired,
+  path: import_prop_types16.default.string.isRequired,
+  visible: import_prop_types16.default.bool.isRequired,
+  enabled: import_prop_types16.default.bool.isRequired,
+  renderers: import_prop_types16.default.arrayOf(import_prop_types16.default.object).isRequired,
+  cells: import_prop_types16.default.arrayOf(import_prop_types16.default.object)
 };
 
 // src/renderers/CustomTabRenderer.jsx
-var import_react21 = __toESM(require("react"));
-var import_prop_types14 = __toESM(require("prop-types"));
-var import_react22 = require("@jsonforms/react");
+var import_react24 = __toESM(require("react"));
+var import_prop_types17 = __toESM(require("prop-types"));
+var import_react25 = require("@jsonforms/react");
 var CustomTabRenderer = (props) => {
   const { uischema, schema, path, enabled, renderers, cells } = props;
   const categories = uischema.elements || [];
-  const [activeTab, setActiveTab] = (0, import_react21.useState)(0);
+  const [activeTab, setActiveTab] = (0, import_react24.useState)(0);
   if (!categories || categories.length === 0) {
     return null;
   }
   const activeCategory = categories[activeTab];
-  return /* @__PURE__ */ import_react21.default.createElement("div", { className: "custom-tabs-container" }, /* @__PURE__ */ import_react21.default.createElement("div", { className: "flex border-slate-300" }, categories.map((category, index) => /* @__PURE__ */ import_react21.default.createElement(
+  return /* @__PURE__ */ import_react24.default.createElement("div", { className: "custom-tabs-container" }, /* @__PURE__ */ import_react24.default.createElement("div", { className: "flex border-slate-300" }, categories.map((category, index) => /* @__PURE__ */ import_react24.default.createElement(
     "button",
     {
       key: category.label || `tab-${index}`,
@@ -1141,8 +1389,8 @@ var CustomTabRenderer = (props) => {
       type: "button"
     },
     category.label
-  ))), /* @__PURE__ */ import_react21.default.createElement("div", { className: "p-3 border mt-3 border-slate-200 rounded bg-white flex flex-col gap-2" }, activeCategory?.elements.map((element, i) => /* @__PURE__ */ import_react21.default.createElement(
-    import_react22.JsonFormsDispatch,
+  ))), /* @__PURE__ */ import_react24.default.createElement("div", { className: "p-3 border mt-3 border-slate-200 rounded bg-white flex flex-col gap-2" }, activeCategory?.elements.map((element, i) => /* @__PURE__ */ import_react24.default.createElement(
+    import_react25.JsonFormsDispatch,
     {
       key: i,
       uischema: element,
@@ -1155,32 +1403,35 @@ var CustomTabRenderer = (props) => {
   ))));
 };
 CustomTabRenderer.propTypes = {
-  uischema: import_prop_types14.default.shape({
-    type: import_prop_types14.default.string.isRequired,
-    elements: import_prop_types14.default.arrayOf(import_prop_types14.default.object).isRequired
+  uischema: import_prop_types17.default.shape({
+    type: import_prop_types17.default.string.isRequired,
+    elements: import_prop_types17.default.arrayOf(import_prop_types17.default.object).isRequired
   }).isRequired,
-  schema: import_prop_types14.default.object.isRequired,
-  path: import_prop_types14.default.string.isRequired,
-  enabled: import_prop_types14.default.bool.isRequired,
-  renderers: import_prop_types14.default.arrayOf(import_prop_types14.default.object).isRequired,
-  cells: import_prop_types14.default.arrayOf(import_prop_types14.default.object)
+  schema: import_prop_types17.default.object.isRequired,
+  path: import_prop_types17.default.string.isRequired,
+  enabled: import_prop_types17.default.bool.isRequired,
+  renderers: import_prop_types17.default.arrayOf(import_prop_types17.default.object).isRequired,
+  cells: import_prop_types17.default.arrayOf(import_prop_types17.default.object)
 };
 
 // src/renderers/index.js
-var JetNumberControl = (0, import_react23.withJsonFormsControlProps)(CustomNumberInput);
-var JetTextControl = (0, import_react23.withJsonFormsControlProps)(CustomTextInput);
-var JetSelectControl = (0, import_react23.withJsonFormsControlProps)(CustomSelectInput);
-var JetCheckboxControl = (0, import_react23.withJsonFormsControlProps)(CustomCheckboxInput);
-var JetCodePgsqlControl = (0, import_react23.withJsonFormsControlProps)(CustomCodePgsqlControl);
-var JetCodeJavascriptControl = (0, import_react23.withJsonFormsControlProps)(CustomCodeJavascriptControl);
-var JetSuggestionControl = (0, import_react23.withJsonFormsControlProps)(CustomSuggestionInput);
-var JetDynamicArgsControl = (0, import_react23.withJsonFormsControlProps)(DynamicArgsControl);
-var JetKeyValueArrayControl = (0, import_react23.withJsonFormsControlProps)(CustomKeyValueArrayRenderer);
-var JetKeyValueTypeArrayControl = (0, import_react23.withJsonFormsControlProps)(CustomKeyValueTypeArrayRenderer);
-var JetKeyTypeArrayControl = (0, import_react23.withJsonFormsControlProps)(CustomKeyTypeArrayRenderer);
-var JetGroupLayout = (0, import_react23.withJsonFormsLayoutProps)(CustomGroupLayout);
-var JetVerticalLayout = (0, import_react23.withJsonFormsLayoutProps)(CustomVerticalLayout);
-var JetTabLayout = (0, import_react23.withJsonFormsLayoutProps)(CustomTabRenderer);
+var JetNumberControl = (0, import_react26.withJsonFormsControlProps)(CustomNumberInput);
+var JetTextControl = (0, import_react26.withJsonFormsControlProps)(CustomTextInput);
+var JetSelectControl = (0, import_react26.withJsonFormsControlProps)(CustomSelectInput);
+var JetCheckboxControl = (0, import_react26.withJsonFormsControlProps)(CustomCheckboxInput);
+var JetCodePgsqlControl = (0, import_react26.withJsonFormsControlProps)(CustomCodePgsqlControl);
+var JetCodeJavascriptControl = (0, import_react26.withJsonFormsControlProps)(CustomCodeJavascriptControl);
+var JetSuggestionControl = (0, import_react26.withJsonFormsControlProps)(CustomSuggestionInput);
+var JetDynamicArgsControl = (0, import_react26.withJsonFormsControlProps)(DynamicArgsControl);
+var JetKeyValueArrayControl = (0, import_react26.withJsonFormsControlProps)(CustomKeyValueArrayRenderer);
+var JetKeyValueTypeArrayControl = (0, import_react26.withJsonFormsControlProps)(CustomKeyValueTypeArrayRenderer);
+var JetKeyTypeArrayControl = (0, import_react26.withJsonFormsControlProps)(CustomKeyTypeArrayRenderer);
+var JetStringArrayControl = (0, import_react26.withJsonFormsControlProps)(CustomStringArrayRenderer);
+var JetFieldOperatorValueArrayControl = (0, import_react26.withJsonFormsControlProps)(CustomFieldOperatorValueArrayRenderer);
+var JetGroupLayout = (0, import_react26.withJsonFormsLayoutProps)(CustomGroupLayout);
+var JetRadioControl = (0, import_react26.withJsonFormsControlProps)(CustomRadioInput);
+var JetVerticalLayout = (0, import_react26.withJsonFormsLayoutProps)(CustomVerticalLayout);
+var JetTabLayout = (0, import_react26.withJsonFormsLayoutProps)(CustomTabRenderer);
 
 // src/testers.js
 var import_core = require("@jsonforms/core");
@@ -1269,6 +1520,25 @@ var dynamicArgsTester = (0, import_core.rankWith)(
   20,
   (0, import_core.and)(import_core.isControl, (uischema) => uischema?.options?.isDynamicArgs === true)
 );
+var stringArrayTester = (uischema, rootSchema) => {
+  if (uischema.type !== "Control") {
+    return -1;
+  }
+  try {
+    const schemaAtScope = import_core.Resolve.schema(rootSchema, uischema.scope, rootSchema);
+    if (!schemaAtScope || schemaAtScope.type !== "array") {
+      return -1;
+    }
+    const itemSchema = schemaAtScope.items;
+    if (itemSchema && itemSchema.type === "string" && !itemSchema.properties) {
+      return 40;
+    }
+    return -1;
+  } catch (e) {
+    console.warn("Error in string array tester:", e);
+    return -1;
+  }
+};
 var keyValueArrayTester = (uischema, rootSchema) => {
   if (uischema.type !== "Control") {
     return -1;
@@ -1326,9 +1596,46 @@ var keyTypeArrayTester = (uischema, rootSchema) => {
     return -1;
   }
 };
-var groupLayoutTester = (uischema) => {
-  return (0, import_core.rankWith)(10, (0, import_core.uiTypeIs)("Group"))(uischema);
+var radioInputTester = (uischema, rootSchema, context) => {
+  if (uischema.type !== "Control") {
+    return -1;
+  }
+  if (uischema.options && uischema.options.format === "radio") {
+    try {
+      const currentSchema = import_core.Resolve.schema(rootSchema, uischema.scope, rootSchema);
+      if (currentSchema && currentSchema.type === "string" && currentSchema.enum) {
+        return 100;
+      }
+    } catch (e) {
+      console.warn(`Error resolving schema for scope ${uischema.scope} in radioInputTester:`, e);
+      return -1;
+    }
+  }
+  return -1;
 };
+var fieldOperatorValueArrayTester = (uischema, rootSchema) => {
+  if (uischema.type !== "Control") {
+    return -1;
+  }
+  try {
+    const schemaAtScope = import_core.Resolve.schema(rootSchema, uischema.scope, rootSchema);
+    if (!schemaAtScope || schemaAtScope.type !== "array") {
+      return -1;
+    }
+    const itemSchema = schemaAtScope.items;
+    if (itemSchema.type !== "object" || itemSchema.properties?.field?.type !== "string" || itemSchema.properties?.operator?.type !== "string" || itemSchema.properties?.value?.type !== "string") {
+      return -1;
+    }
+    if (!itemSchema.properties?.operator?.enum) {
+      return -1;
+    }
+    return 70;
+  } catch (e) {
+    console.warn("Error in field/operator/value tester:", e);
+    return -1;
+  }
+};
+var groupLayoutTester = (0, import_core.rankWith)(100, (0, import_core.uiTypeIs)("Group"));
 var verticalLayoutTester = (uischema) => {
   return uischema.type === "VerticalLayout" ? 10 : -1;
 };
@@ -1345,10 +1652,13 @@ var jetFormsBaseRenderers = [
   { tester: numberInputTester, renderer: JetNumberControl },
   { tester: textInputTester, renderer: JetTextControl },
   { tester: selectInputTester, renderer: JetSelectControl },
+  { tester: radioInputTester, renderer: JetRadioControl },
   { tester: checkboxTester, renderer: JetCheckboxControl },
   { tester: keyValueArrayTester, renderer: JetKeyValueArrayControl },
   { tester: keyValueTypeArrayTester, renderer: JetKeyValueTypeArrayControl },
   { tester: keyTypeArrayTester, renderer: JetKeyTypeArrayControl },
+  { tester: stringArrayTester, renderer: JetStringArrayControl },
+  { tester: fieldOperatorValueArrayTester, renderer: JetFieldOperatorValueArrayControl },
   { tester: groupLayoutTester, renderer: JetGroupLayout },
   { tester: verticalLayoutTester, renderer: JetVerticalLayout }
 ];

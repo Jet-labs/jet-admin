@@ -6,10 +6,11 @@ import { JsonForms } from "@jsonforms/react";
 import React from "react";
 import PropTypes from "prop-types";
 import { DATASOURCE_UI_COMPONENTS } from "@jet-admin/datasources-ui";
-import { DATASOURCE_TYPES } from "@jet-admin/datasource-types";
+import { DATASOURCE_TYPES, getDatasourceTypeByValue } from "@jet-admin/datasource-types";
 import { CONSTANTS } from "../../../constants";
 import { customJSONFormRenderers } from "../ui/jsonFormCustomRenderer";
 import { useCallback } from "react";
+import { DatasourceIcon } from "./datasourceIcon";
 
 export const DatasourceEditor = ({ datasourceEditorForm }) => {
   DatasourceEditor.propTypes = {
@@ -24,6 +25,7 @@ export const DatasourceEditor = ({ datasourceEditorForm }) => {
     // but often Yup handles it sufficiently for overall form validity.
   }, [datasourceEditorForm]);
 
+  const currentDatasourceType = getDatasourceTypeByValue(datasourceEditorForm.values.datasourceType);
 
   return (
     <>
@@ -65,27 +67,30 @@ export const DatasourceEditor = ({ datasourceEditorForm }) => {
             {datasourceEditorForm.errors.datasourceType}
           </span>
         )}
-        <select
-          name="datasourceType"
-          id="datasourceType"
-          className=" placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:border-slate-700 block w-full px-2.5 py-1.5 "
-          onChange={datasourceEditorForm.handleChange}
-          onBlur={datasourceEditorForm.handleBlur}
-          value={datasourceEditorForm.values.datasourceType}
-        >
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
           {Object.keys(DATASOURCE_TYPES).map((type) => (
-            <option
+            <button
+              type="button"
               key={DATASOURCE_TYPES[type].value}
-              value={DATASOURCE_TYPES[type].value}
+              onClick={() => datasourceEditorForm.setFieldValue("datasourceType", DATASOURCE_TYPES[type].value)}
+              className={`flex items-center gap-2 px-3 py-2 rounded border text-sm transition-all ${datasourceEditorForm.values.datasourceType === DATASOURCE_TYPES[type].value
+                  ? "bg-slate-100 border-slate-400 ring-1 ring-slate-400"
+                  : "bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50"
+                }`}
             >
-              {DATASOURCE_TYPES[type].name}
-            </option>
+              <DatasourceIcon
+                icon={DATASOURCE_TYPES[type].icon}
+                iconColor={DATASOURCE_TYPES[type].iconColor}
+                size={18}
+              />
+              <span className="text-slate-700 truncate">{DATASOURCE_TYPES[type].name}</span>
+            </button>
           ))}
-        </select>
+        </div>
       </div>
 
       {/* JSON Forms for datasourceOptions */}
-      {DATASOURCE_UI_COMPONENTS[datasourceEditorForm.values.datasourceType] && (
+      {DATASOURCE_UI_COMPONENTS[datasourceEditorForm.values.datasourceType] && currentDatasourceType?.formConfig && (
         <>
           <h2 className="text-base font-bold mt-6 !-mb-3 text-slate-700">
             {
@@ -95,16 +100,8 @@ export const DatasourceEditor = ({ datasourceEditorForm }) => {
           </h2>
           <JsonForms
 
-            schema={
-              DATASOURCE_UI_COMPONENTS[
-                datasourceEditorForm.values.datasourceType
-              ].formConfig.schema
-            }
-            uischema={
-              DATASOURCE_UI_COMPONENTS[
-                datasourceEditorForm.values.datasourceType
-              ].formConfig.uischema
-            }
+            schema={currentDatasourceType.formConfig.schema}
+            uischema={currentDatasourceType.formConfig.uischema}
             // Pass only the 'datasourceOptions' part of Formik's values to JsonForms
             data={datasourceEditorForm.values.datasourceOptions}
             renderers={[...materialRenderers, ...customJSONFormRenderers]}

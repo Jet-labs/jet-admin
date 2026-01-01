@@ -72,9 +72,10 @@ workflowService.getWorkflowByID = async ({ workflowID, tenantID }) => {
  * @param {string} param0.title
  * @param {JSON} param0.nodes
  * @param {JSON} param0.edges
+ * @param {JSON} param0.workflowOptions
  * @returns {Promise<object>}
  */
-workflowService.createWorkflow = async ({ userID, tenantID, title, nodes, edges }) => {
+workflowService.createWorkflow = async ({ userID, tenantID, title, nodes, edges, workflowOptions }) => {
   Logger.log("info", {
     message: "workflowService:createWorkflow:params",
     params: {
@@ -83,6 +84,7 @@ workflowService.createWorkflow = async ({ userID, tenantID, title, nodes, edges 
       title,
       nodes,
       edges,
+      workflowOptions,
     },
   });
 
@@ -93,6 +95,7 @@ workflowService.createWorkflow = async ({ userID, tenantID, title, nodes, edges 
           tenantID: tenantID,
           title,
           creatorID: userID,
+          workflowOptions: workflowOptions || {},
         },
       });
       await tx.tblWorkflowNodes.createMany({
@@ -157,9 +160,10 @@ workflowService.createWorkflow = async ({ userID, tenantID, title, nodes, edges 
  * @param {string} param0.title
  * @param {JSON} param0.nodes
  * @param {JSON} param0.edges
+ * @param {JSON} param0.workflowOptions
  * @returns {Promise<object>}
  */
-workflowService.updateWorkflow = async ({ userID, tenantID, workflowID, title, nodes, edges }) => {
+workflowService.updateWorkflow = async ({ userID, tenantID, workflowID, title, nodes, edges, workflowOptions }) => {
   Logger.log("info", {
     message: "workflowService:updateWorkflow:params",
     params: {
@@ -169,16 +173,18 @@ workflowService.updateWorkflow = async ({ userID, tenantID, workflowID, title, n
       title,
       nodes,
       edges,
+      workflowOptions,
     },
   });
 
   try {
     const workflowUpdateTransaction = await prisma.$transaction(async (tx) => {
-      // Update workflow title
+      // Update workflow title and options
       const workflow = await tx.tblWorkflows.update({
         where: { workflowID: workflowID },
         data: {
           title,
+          workflowOptions: workflowOptions || {},
           updatedAt: new Date(),
         },
       });

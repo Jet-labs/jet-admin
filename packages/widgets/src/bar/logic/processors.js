@@ -1,8 +1,6 @@
-
 /**
  * Processes raw query results into Chart.js compatible format.
  * @param {Object} params
- * @param {number} params.userID - ID of the requesting user
  * @param {Object} params.widget - Database chart configuration object
  * @param {Array<Object>} params.dataQueriesResult - Array of query results from execution
  * @returns {Object} Chart.js compatible data structure with labels and datasets
@@ -20,14 +18,12 @@ export const processBarChartQueryResults = ({
       result.forEach((row) => xValues.add(row[xField]));
     }
   });
-  console.log("xValues", xValues);
 
   // Sort labels
   const sortedLabels = [...xValues].sort((a, b) => {
     if (typeof a === "number" && typeof b === "number") return a - b;
     return a.toString().localeCompare(b.toString());
   });
-  console.log("sortedLabels", sortedLabels);
 
   // Build datasets
   const datasets = widget.dataQueries.map((mapping, index) => {
@@ -41,7 +37,6 @@ export const processBarChartQueryResults = ({
       data: sortedLabels.map((x) => dataMap.get(x) ?? 0),
     };
   });
-  console.log("datasets", datasets);
 
   return { labels: sortedLabels, datasets };
 };

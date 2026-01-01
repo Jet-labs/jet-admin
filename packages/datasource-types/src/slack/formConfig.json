@@ -1,0 +1,28 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "botToken": {
+        "type": "string",
+        "description": "Slack Bot User OAuth Token (xoxb-...)",
+        "format": "password",
+        "minLength": 1
+      }
+    },
+    "required": ["botToken"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/botToken",
+        "label": "Bot Token",
+        "options": { "format": "password" }
+      }
+    ]
+  },
+  "data": {
+    "botToken": ""
+  }
+}

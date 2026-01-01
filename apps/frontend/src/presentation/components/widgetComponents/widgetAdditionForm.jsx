@@ -95,7 +95,16 @@ export const WidgetAdditionForm = ({ tenantID }) => {
     validateOnMount: false,
     validateOnChange: false,
     onSubmit: (values) => {
-      addWidget(values);
+      // Separate dataQueries into query and workflow sources
+      const allDataSources = values.dataQueries || [];
+      const dataQueries = allDataSources.filter(ds => ds.dataSourceType !== 'workflow');
+      const workflowSources = allDataSources.filter(ds => ds.dataSourceType === 'workflow');
+
+      addWidget({
+        ...values,
+        dataQueries,
+        workflowSources,
+      });
     },
   });
 

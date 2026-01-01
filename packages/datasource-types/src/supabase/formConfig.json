@@ -1,0 +1,51 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "projectUrl": {
+        "type": "string",
+        "description": "Your Supabase project URL (e.g., https://xxxxx.supabase.co)",
+        "minLength": 1
+      },
+      "anonKey": {
+        "type": "string",
+        "description": "The anon/public API key for your Supabase project.",
+        "minLength": 1
+      },
+      "serviceRoleKey": {
+        "type": "string",
+        "description": "The service role key for admin access (optional, use with caution).",
+        "format": "password"
+      }
+    },
+    "required": ["projectUrl", "anonKey"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/projectUrl",
+        "label": "Project URL"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/anonKey",
+        "label": "Anon/Public Key"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/serviceRoleKey",
+        "label": "Service Role Key (Optional)",
+        "options": {
+          "format": "password"
+        }
+      }
+    ]
+  },
+  "data": {
+    "projectUrl": "",
+    "anonKey": "",
+    "serviceRoleKey": ""
+  }
+}

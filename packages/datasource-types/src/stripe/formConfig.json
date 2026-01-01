@@ -1,0 +1,40 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "secretKey": {
+        "type": "string",
+        "description": "Your Stripe Secret Key (starts with sk_)",
+        "format": "password",
+        "minLength": 1
+      },
+      "apiVersion": {
+        "type": "string",
+        "description": "Stripe API version (optional, uses latest if not specified)"
+      }
+    },
+    "required": ["secretKey"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/secretKey",
+        "label": "Secret Key",
+        "options": {
+          "format": "password"
+        }
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/apiVersion",
+        "label": "API Version (Optional)"
+      }
+    ]
+  },
+  "data": {
+    "secretKey": "",
+    "apiVersion": ""
+  }
+}

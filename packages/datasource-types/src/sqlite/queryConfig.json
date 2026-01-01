@@ -1,0 +1,59 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "queryType": {
+        "type": "string",
+        "enum": ["query"],
+        "default": "query"
+      },
+      "query": {
+        "type": "string",
+        "description": "SQLite SQL query to execute",
+        "format": "code-sql"
+      },
+      "args": {
+        "type": "array",
+        "description": "Query arguments",
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": { "type": "string" },
+            "type": {
+              "type": "string",
+              "enum": ["string", "number", "boolean"],
+              "default": "string"
+            }
+          },
+          "required": ["key", "type"]
+        }
+      }
+    },
+    "required": ["queryType"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/queryType",
+        "label": "Query Type"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/query",
+        "label": "SQL Query"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/args",
+        "label": "Arguments"
+      }
+    ]
+  },
+  "data": {
+    "queryType": "query",
+    "query": "SELECT * FROM sqlite_master WHERE type='table';",
+    "args": []
+  }
+}

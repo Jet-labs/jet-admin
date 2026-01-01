@@ -1,9 +1,10 @@
 import { FaPlus } from "react-icons/fa";
-import { SiGooglebigquery } from "react-icons/si";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../../constants";
 import { useDataQueriesState } from "../../../../logic/contexts/dataQueriesContext";
 import { NoEntityUI } from "../../ui/noEntityUI";
+import { DatasourceIcon } from "../../datasourceComponents/datasourceIcon";
+import { getDatasourceTypeByValue } from "@jet-admin/datasource-types";
 import React from "react";
 
 export const DataQueryDrawerList = () => {
@@ -36,6 +37,7 @@ export const DataQueryDrawerList = () => {
           {dataQueries.map((dataQuery) => {
             const key = `dataQuery_${dataQuery.dataQueryID}`;
             const isActive = routeParam?.dataQueryID == dataQuery.dataQueryID;
+            const datasourceConfig = getDatasourceTypeByValue(dataQuery.datasourceType);
 
             return (
               <Link
@@ -51,11 +53,11 @@ export const DataQueryDrawerList = () => {
                     isActive ? "bg-[#eaebff]" : "bg-white text-gray-700"
                   }`}
                 >
-                  <div className="!w-[16px]">
-                    <SiGooglebigquery
-                      className={`w-[16px] h-[16px] ${
-                        isActive ? "text-primary" : "text-slate-600"
-                      }`}
+                  <div className="!w-[16px] flex-shrink-0">
+                    <DatasourceIcon
+                      icon={datasourceConfig?.icon}
+                      iconColor={isActive ? "#646cff" : datasourceConfig?.iconColor}
+                      size={16}
                     />
                   </div>
 

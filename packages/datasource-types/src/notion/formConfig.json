@@ -1,0 +1,28 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "apiToken": {
+        "type": "string",
+        "description": "Notion Integration Token",
+        "format": "password",
+        "minLength": 1
+      }
+    },
+    "required": ["apiToken"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/apiToken",
+        "label": "Integration Token",
+        "options": { "format": "password" }
+      }
+    ]
+  },
+  "data": {
+    "apiToken": ""
+  }
+}

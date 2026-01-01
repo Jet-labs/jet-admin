@@ -1,6 +1,5 @@
 // src/engine.js
-const { extractTemplateBlocks, parseQueryCalls, resolveArgs } = require("./parsers");
-const { QueryGraph } = require("./dependencyGraph");
+const { extractTemplateBlocks, resolveArgs } = require("./parsers");
 const Logger = require("../../../utils/logger");
 const { DATASOURCE_TYPES } = require("@jet-admin/datasource-types");
 const { dataSourceRegistry } = require("@jet-admin/datasources-logic");
@@ -81,12 +80,6 @@ class QueryEngine {
 
     let datasourceConfig;
     switch (query.datasourceType) {
-      // case DATASOURCE_TYPES.RESTAPI.value:
-      //   datasourceConfig = {
-      //     datasourceType: query.datasourceType,
-      //     datasourceOptions: query.dataQueryOptions,
-      //   };
-      //   break;
       default:
         datasourceConfig = await this.datasourceFetcher(query.datasourceID);
         break;
@@ -150,146 +143,21 @@ class QueryEngine {
         params: { dataQueryID, block },
       });
 
-      const calls = parseQueryCalls(block.expression, runtimeArgs);
+      // Resolve input variable from runtimeArgs
+      const value = eval(`runtimeArgs.${block.expression}`);
 
       Logger.log("info", {
-        message: "QueryEngine:resolveTemplate:parseQueryCalls",
-        params: { dataQueryID, block, calls },
+        message: "QueryEngine:resolveTemplate:resolveVariable",
+        params: { dataQueryID, block, value },
       });
 
-      if (calls.length > 0) {
-        const call = calls[0];
+      result = result.replace(block.fullMatch, value);
 
-        Logger.log("info", {
-          message: "QueryEngine:resolveTemplate:executeSubQuery",
-          params: { dataQueryID, block, call },
-        });
-
-        const resolvedArgs = resolveArgs(call.args, runtimeArgs);
-        
-        Logger.log("info", {
-          message: "QueryEngine:resolveTemplate:resolvedArgs",
-          params: { dataQueryID, block, call, resolvedArgs, runtimeArgs },
-        });
-
-        const subResult = await this.executeQuery(call.dataQueryID, {
-          ...runtimeArgs,
-          ...resolvedArgs,
-        });
-
-        // const subResult = await this.executeQuery(call.dataQueryID, {
-        //   ...runtimeArgs,
-        //   ...call.args,
-        // });
-
-        
-
-        Logger.log("info", {
-          message: "QueryEngine:resolveTemplate:executedSubQuery",
-          params: { dataQueryID, call, subResult,block },
-        });
-
-        const processedExpression = this.replaceQueryCallsWithResult(
-          block.expression,
-          'subResult'
-        );
-
-        Logger.log("info", {
-          message: "QueryEngine:resolveTemplate:processedExpression",
-          params: { dataQueryID, block, processedExpression },
-        });
-
-        const value = eval(processedExpression);
-
-        Logger.log("info", {
-          message: "QueryEngine:resolveTemplate:evaluatedQueryExpression",
-          params: { dataQueryID, block, value },
-        });
-
-        result = result.replace(block.fullMatch, value);
-
-        Logger.log("info", {
-          message: "QueryEngine:resolveTemplate:replacedQueryResult",
-          params: { dataQueryID, block, result },
-        });
-      } else {
-        const value = eval(`runtimeArgs.${block.expression}`);
-
-        Logger.log("info", {
-          message: "QueryEngine:resolveTemplate:resolveContextVariable",
-          params: { dataQueryID, block, value },
-        });
-
-        result = result.replace(block.fullMatch, value);
-
-        Logger.log("info", {
-          message: "QueryEngine:resolveTemplate:resolvedContextVariable",
-          params: { dataQueryID, block, result },
-        });
-      }
-    }
-
-    return result;
-  }
-
-  replaceQueryCallsWithResult(template, replacer = 'queryResult') {
-    return template.replace(/query\s*\(\s*\d+\s*,\s*{[^}]*}\s*\)/g, replacer);
-  }
-  
-  buildDependencyGraph(template) {
-    const graph = new QueryGraph();
-    const blocks = extractTemplateBlocks(template);
-
-    for (const block of blocks) {
-      const calls = parseQueryCalls(block.expression);
-      for (const call of calls) {
-        graph.addDependency(call.dataQueryID, call.dataQueryID);
-      }
-    }
-
-    if (graph.detectCycles()) {
-      Logger.log("error", {
-        message: "QueryEngine:buildDependencyGraph:cycleDetected",
-        params: { template },
-      });
-      throw new Error("Circular dependency detected in query template");
-    }
-
-    Logger.log("info", {
-      message: "QueryEngine:buildDependencyGraph:complete",
-      params: { template },
-    });
-
-    return graph;
-  }
-
-  async renderTemplate(template, runtimeArgs) {
-    Logger.log("info", {
-      message: "QueryEngine:renderTemplate:start",
-      params: { template, runtimeArgs },
-    });
-
-    const graph = this.buildDependencyGraph(template);
-    const executionOrder = topologicalSort(graph);
-    const context = { args: runtimeArgs, queryResults: {} };
-
-    for (const dataQueryID of executionOrder) {
       Logger.log("info", {
-        message: "QueryEngine:renderTemplate:executeInOrder",
-        params: { dataQueryID },
+        message: "QueryEngine:resolveTemplate:resolvedVariable",
+        params: { dataQueryID, block, result },
       });
-      context.queryResults[dataQueryID] = await this.executeQuery(
-        dataQueryID,
-        context.args
-      );
     }
-
-    const result = replaceTemplateValues(template, context);
-
-    Logger.log("info", {
-      message: "QueryEngine:renderTemplate:complete",
-      params: { result },
-    });
 
     return result;
   }

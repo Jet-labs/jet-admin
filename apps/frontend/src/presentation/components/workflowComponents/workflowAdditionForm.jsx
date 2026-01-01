@@ -78,7 +78,7 @@ export const WorkflowAdditionForm = ({ tenantID }) => {
     </div>
 
     <form
-      className="w-full h-full "
+      className="w-full"
       onSubmit={workflowAdditionForm.handleSubmit}
     >
       <WorkflowEditor workflowEditorForm={workflowAdditionForm} />

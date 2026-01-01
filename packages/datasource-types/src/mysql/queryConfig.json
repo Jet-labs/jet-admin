@@ -1,0 +1,100 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "queryType": {
+        "type": "string",
+        "enum": ["query", "gui"],
+        "default": "query"
+      },
+      "query": {
+        "type": "string",
+        "description": "MySQL code to execute",
+        "format": "code-mysql"
+      },
+      "args": {
+        "type": "array",
+        "description": "Query arguments",
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string"
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "string",
+                "number",
+                "boolean",
+                "array (, separated)",
+                "object (JSON stringified)"
+              ],
+              "default": "string"
+            }
+          },
+          "required": ["key", "type"]
+        }
+      }
+    },
+    "required": ["queryType"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/queryType",
+        "label": "Query Type"
+      },
+      {
+        "type": "Group",
+        "label": "Raw SQL",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/queryType",
+            "schema": { "const": "query" }
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/query",
+            "label": "Raw SQL"
+          }
+        ]
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/args",
+        "label": "Arguments",
+        "options": {
+          "detail": {
+            "type": "VerticalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/key"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/type"
+              }
+            ]
+          }
+        }
+      }
+    ]
+  },
+  "data": {
+    "queryType": "query",
+    "query": "SELECT id, name FROM users WHERE active = 1;",
+    "args": [
+      {
+        "key": "user_id",
+        "type": "string"
+      }
+    ]
+  }
+}

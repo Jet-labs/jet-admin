@@ -1,0 +1,113 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "resource": {
+        "type": "string",
+        "enum": ["issues", "projects", "users", "boards", "sprints"],
+        "default": "issues"
+      },
+      "operation": {
+        "type": "string",
+        "enum": ["search", "get", "create", "update"],
+        "default": "search"
+      },
+      "jql": {
+        "type": "string",
+        "description": "JQL query for issue search"
+      },
+      "issueKey": {
+        "type": "string",
+        "description": "Issue key (e.g., PROJ-123)"
+      },
+      "projectKey": {
+        "type": "string",
+        "description": "Project key"
+      },
+      "fields": {
+        "type": "string",
+        "description": "Fields to return (comma-separated)"
+      },
+      "maxResults": {
+        "type": "integer",
+        "description": "Maximum results",
+        "default": 50,
+        "minimum": 1,
+        "maximum": 100
+      },
+      "startAt": {
+        "type": "integer",
+        "description": "Start index for pagination",
+        "default": 0
+      }
+    },
+    "required": ["resource", "operation"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/resource",
+            "label": "Resource"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/operation",
+            "label": "Operation"
+          }
+        ]
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/jql",
+        "label": "JQL Query"
+      },
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/issueKey",
+            "label": "Issue Key"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/projectKey",
+            "label": "Project Key"
+          }
+        ]
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/fields",
+        "label": "Fields"
+      },
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/maxResults",
+            "label": "Max Results"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/startAt",
+            "label": "Start At"
+          }
+        ]
+      }
+    ]
+  },
+  "data": {
+    "resource": "issues",
+    "operation": "search",
+    "jql": "project = PROJ ORDER BY created DESC",
+    "maxResults": 50,
+    "startAt": 0
+  }
+}

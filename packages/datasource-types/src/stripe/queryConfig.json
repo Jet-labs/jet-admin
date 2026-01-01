@@ -1,0 +1,152 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "resource": {
+        "type": "string",
+        "enum": [
+          "customers",
+          "charges",
+          "paymentIntents",
+          "invoices",
+          "subscriptions",
+          "products",
+          "prices",
+          "refunds",
+          "balanceTransactions",
+          "payouts"
+        ],
+        "default": "customers"
+      },
+      "operation": {
+        "type": "string",
+        "enum": ["list", "retrieve", "create", "update"],
+        "default": "list"
+      },
+      "resourceId": {
+        "type": "string",
+        "description": "Resource ID (for retrieve/update)"
+      },
+      "params": {
+        "type": "string",
+        "description": "Request parameters (JSON)",
+        "format": "code-json"
+      },
+      "limit": {
+        "type": "integer",
+        "description": "Maximum number of items to return",
+        "default": 10,
+        "minimum": 1,
+        "maximum": 100
+      },
+      "startingAfter": {
+        "type": "string",
+        "description": "Cursor for pagination (ID of last item)"
+      },
+      "expand": {
+        "type": "array",
+        "description": "Fields to expand",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "required": ["resource", "operation"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/resource",
+            "label": "Resource"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/operation",
+            "label": "Operation"
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Resource ID",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/operation",
+            "schema": { "enum": ["retrieve", "update"] }
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/resourceId",
+            "label": "Resource ID"
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "List Options",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/operation",
+            "schema": { "const": "list" }
+          }
+        },
+        "elements": [
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/limit",
+                "label": "Limit"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/startingAfter",
+                "label": "Starting After"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Parameters",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/operation",
+            "schema": { "enum": ["create", "update", "list"] }
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/params",
+            "label": "Parameters (JSON)"
+          }
+        ]
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/expand",
+        "label": "Expand Fields"
+      }
+    ]
+  },
+  "data": {
+    "resource": "customers",
+    "operation": "list",
+    "limit": 10,
+    "params": "{}",
+    "expand": []
+  }
+}

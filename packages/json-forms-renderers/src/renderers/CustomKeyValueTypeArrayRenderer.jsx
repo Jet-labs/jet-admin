@@ -95,7 +95,7 @@ export const CustomKeyValueTypeArrayRenderer = ({
             <button
               type="button"
               onClick={() => handleRemoveItem(index)}
-              className="mt-5 p-2 rounded bg-red-100 text-red-400 focus:outline-none hover:border-red-400"
+              className="mt-2 p-2 rounded bg-red-100 text-red-400 focus:outline-none hover:border-red-400"
             >
               <MdDeleteOutline />
             </button>

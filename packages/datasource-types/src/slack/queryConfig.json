@@ -1,0 +1,87 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "resource": {
+        "type": "string",
+        "enum": ["channels", "users", "messages", "conversations"],
+        "default": "channels"
+      },
+      "operation": {
+        "type": "string",
+        "enum": ["list", "info", "history", "post"],
+        "default": "list"
+      },
+      "channelId": {
+        "type": "string",
+        "description": "Channel ID for channel-specific operations"
+      },
+      "userId": {
+        "type": "string",
+        "description": "User ID for user-specific operations"
+      },
+      "message": {
+        "type": "string",
+        "description": "Message text for post operation"
+      },
+      "limit": {
+        "type": "integer",
+        "description": "Maximum results to return",
+        "default": 100,
+        "minimum": 1,
+        "maximum": 1000
+      }
+    },
+    "required": ["resource", "operation"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/resource",
+            "label": "Resource"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/operation",
+            "label": "Operation"
+          }
+        ]
+      },
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/channelId",
+            "label": "Channel ID"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/userId",
+            "label": "User ID"
+          }
+        ]
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/message",
+        "label": "Message"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/limit",
+        "label": "Limit"
+      }
+    ]
+  },
+  "data": {
+    "resource": "channels",
+    "operation": "list",
+    "limit": 100
+  }
+}

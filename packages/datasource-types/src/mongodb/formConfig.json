@@ -1,0 +1,219 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "connectionOption": {
+        "type": "string",
+        "enum": ["connectionString", "connectionDetails"],
+        "default": "connectionString",
+        "description": "Choose to enter connection string or individual details."
+      },
+      "connectionString": {
+        "type": "string",
+        "description": "MongoDB connection URI (e.g., 'mongodb://localhost:27017/mydb' or 'mongodb+srv://...').",
+        "minLength": 1
+      },
+      "connectionDetails": {
+        "type": "object",
+        "properties": {
+          "connectionName": {
+            "type": "string",
+            "description": "A unique name for this data source connection.",
+            "minLength": 3
+          },
+          "host": {
+            "type": "string",
+            "description": "The hostname or IP address of the MongoDB server.",
+            "format": "hostname"
+          },
+          "port": {
+            "type": "integer",
+            "description": "The port number of the MongoDB server (default is 27017).",
+            "minimum": 1,
+            "maximum": 65535,
+            "default": 27017
+          },
+          "database": {
+            "type": "string",
+            "description": "The name of the database to connect to.",
+            "minLength": 1
+          },
+          "username": {
+            "type": "string",
+            "description": "Username for authentication (optional)."
+          },
+          "password": {
+            "type": "string",
+            "description": "Password for authentication (optional).",
+            "format": "password"
+          },
+          "authSource": {
+            "type": "string",
+            "description": "Authentication database (default is 'admin').",
+            "default": "admin"
+          },
+          "ssl": {
+            "type": "boolean",
+            "description": "Enable SSL/TLS for the connection.",
+            "default": false
+          },
+          "replicaSet": {
+            "type": "string",
+            "description": "Replica set name (optional)."
+          }
+        },
+        "required": ["connectionName", "host", "database"]
+      }
+    },
+    "required": ["connectionOption"],
+    "allOf": [
+      {
+        "if": {
+          "properties": {
+            "connectionOption": {
+              "const": "connectionString"
+            }
+          }
+        },
+        "then": {
+          "required": ["connectionString"]
+        }
+      },
+      {
+        "if": {
+          "properties": {
+            "connectionOption": {
+              "const": "connectionDetails"
+            }
+          }
+        },
+        "then": {
+          "required": ["connectionDetails"]
+        }
+      }
+    ]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/connectionOption",
+        "label": "Connection Type"
+      },
+      {
+        "type": "Group",
+        "label": "Connection String",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/connectionOption",
+            "schema": { "const": "connectionString" }
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/connectionString",
+            "label": "MongoDB Connection URI",
+            "options": {
+              "multi": true,
+              "rows": 2
+            }
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Connection Details",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/connectionOption",
+            "schema": { "const": "connectionDetails" }
+          }
+        },
+        "elements": [
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/connectionName",
+                "label": "Connection Name"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/host",
+                "label": "Host"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/port",
+                "label": "Port"
+              }
+            ]
+          },
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/database",
+                "label": "Database Name"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/username",
+                "label": "Username"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/password",
+                "label": "Password",
+                "options": {
+                  "format": "password"
+                }
+              }
+            ]
+          },
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/authSource",
+                "label": "Auth Database"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/replicaSet",
+                "label": "Replica Set"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/ssl",
+                "label": "Enable SSL"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "data": {
+    "connectionOption": "connectionString",
+    "connectionString": "mongodb://localhost:27017/mydb",
+    "connectionDetails": {
+      "connectionName": "MyDevMongoDB",
+      "host": "localhost",
+      "port": 27017,
+      "database": "mydb",
+      "username": "",
+      "password": "",
+      "authSource": "admin",
+      "ssl": false,
+      "replicaSet": ""
+    }
+  }
+}

@@ -1,0 +1,205 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "connectionOption": {
+        "type": "string",
+        "enum": ["connectionDetails", "connectionString"],
+        "default": "connectionDetails",
+        "description": "Choose to enter connection details or a connection string."
+      },
+      "connectionDetails": {
+        "type": "object",
+        "properties": {
+          "connectionName": {
+            "type": "string",
+            "description": "A unique name for this data source connection.",
+            "minLength": 3
+          },
+          "server": {
+            "type": "string",
+            "description": "The hostname or IP address of the SQL Server."
+          },
+          "port": {
+            "type": "integer",
+            "description": "The port number of the SQL Server (default is 1433).",
+            "minimum": 1,
+            "maximum": 65535,
+            "default": 1433
+          },
+          "database": {
+            "type": "string",
+            "description": "The name of the database to connect to.",
+            "minLength": 1
+          },
+          "user": {
+            "type": "string",
+            "description": "The username for connecting to the database.",
+            "minLength": 1
+          },
+          "password": {
+            "type": "string",
+            "description": "The password for the specified user.",
+            "format": "password"
+          },
+          "encrypt": {
+            "type": "boolean",
+            "description": "Enable encryption for the connection.",
+            "default": true
+          },
+          "trustServerCertificate": {
+            "type": "boolean",
+            "description": "Trust the server certificate (useful for self-signed certs).",
+            "default": false
+          }
+        },
+        "required": ["connectionName", "server", "database", "user", "password"]
+      },
+      "connectionString": {
+        "type": "string",
+        "description": "The full SQL Server connection string.",
+        "minLength": 1
+      }
+    },
+    "required": ["connectionOption"],
+    "allOf": [
+      {
+        "if": {
+          "properties": {
+            "connectionOption": {
+              "const": "connectionDetails"
+            }
+          }
+        },
+        "then": {
+          "required": ["connectionDetails"]
+        }
+      },
+      {
+        "if": {
+          "properties": {
+            "connectionOption": {
+              "const": "connectionString"
+            }
+          }
+        },
+        "then": {
+          "required": ["connectionString"]
+        }
+      }
+    ]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/connectionOption",
+        "label": "Connection Type"
+      },
+      {
+        "type": "Group",
+        "label": "Connection Details",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/connectionOption",
+            "schema": { "const": "connectionDetails" }
+          }
+        },
+        "elements": [
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/connectionName",
+                "label": "Connection Name"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/server",
+                "label": "Server"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/port",
+                "label": "Port"
+              }
+            ]
+          },
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/database",
+                "label": "Database Name"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/user",
+                "label": "Username"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/password",
+                "label": "Password",
+                "options": {
+                  "format": "password"
+                }
+              }
+            ]
+          },
+          {
+            "type": "HorizontalLayout",
+            "elements": [
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/encrypt",
+                "label": "Encrypt Connection"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/connectionDetails/properties/trustServerCertificate",
+                "label": "Trust Server Certificate"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "Group",
+        "label": "Connection String",
+        "rule": {
+          "effect": "SHOW",
+          "condition": {
+            "scope": "#/properties/connectionOption",
+            "schema": { "const": "connectionString" }
+          }
+        },
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/connectionString",
+            "label": "Connection String"
+          }
+        ]
+      }
+    ]
+  },
+  "data": {
+    "connectionOption": "connectionDetails",
+    "connectionDetails": {
+      "connectionName": "MyMSSQLServer",
+      "server": "localhost",
+      "port": 1433,
+      "database": "master",
+      "user": "sa",
+      "password": "",
+      "encrypt": true,
+      "trustServerCertificate": false
+    },
+    "connectionString": ""
+  }
+}

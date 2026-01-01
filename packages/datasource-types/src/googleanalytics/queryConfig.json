@@ -1,0 +1,86 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "reportType": {
+        "type": "string",
+        "enum": ["runReport", "runRealtimeReport"],
+        "default": "runReport"
+      },
+      "dateRanges": {
+        "type": "array",
+        "description": "Date ranges for the report",
+        "items": {
+          "type": "object",
+          "properties": {
+            "startDate": { "type": "string" },
+            "endDate": { "type": "string" }
+          }
+        }
+      },
+      "dimensions": {
+        "type": "array",
+        "description": "Dimensions to include",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" }
+          }
+        }
+      },
+      "metrics": {
+        "type": "array",
+        "description": "Metrics to include",
+        "items": {
+          "type": "object",
+          "properties": {
+            "name": { "type": "string" }
+          }
+        }
+      },
+      "limit": {
+        "type": "integer",
+        "description": "Maximum rows to return",
+        "default": 10000
+      }
+    },
+    "required": ["reportType"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/reportType",
+        "label": "Report Type"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/dateRanges",
+        "label": "Date Ranges"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/dimensions",
+        "label": "Dimensions"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/metrics",
+        "label": "Metrics"
+      },
+      {
+        "type": "Control",
+        "scope": "#/properties/limit",
+        "label": "Row Limit"
+      }
+    ]
+  },
+  "data": {
+    "reportType": "runReport",
+    "dateRanges": [{ "startDate": "30daysAgo", "endDate": "today" }],
+    "dimensions": [{ "name": "date" }],
+    "metrics": [{ "name": "activeUsers" }, { "name": "sessions" }],
+    "limit": 10000
+  }
+}

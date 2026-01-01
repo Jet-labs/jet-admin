@@ -286,19 +286,20 @@ model tblWidgetQueryMappings {
 }
 
 model tblWidgets {
-  widgetID               String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  widgetTitle            String                   @db.VarChar
-  widgetDescription      String?                  @db.VarChar
-  widgetType             String                   @db.VarChar
-  widgetConfig           Json
-  createdAt              DateTime?                @default(now()) @db.Timestamptz(6)
-  updatedAt              DateTime?                @default(now()) @db.Timestamptz(6)
-  tenantID               String                   @db.Uuid
-  creatorID              String?                  @db.Uuid
-  refreshInterval        Int?
-  tblWidgetQueryMappings tblWidgetQueryMappings[]
-  tblUsers               tblUsers?                @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblWidgetsCreatorID")
-  tblTenants             tblTenants               @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblWidgetsTenantIDTenantID")
+  widgetID                  String                      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  widgetTitle               String                      @db.VarChar
+  widgetDescription         String?                     @db.VarChar
+  widgetType                String                      @db.VarChar
+  widgetConfig              Json
+  createdAt                 DateTime?                   @default(now()) @db.Timestamptz(6)
+  updatedAt                 DateTime?                   @default(now()) @db.Timestamptz(6)
+  tenantID                  String                      @db.Uuid
+  creatorID                 String?                     @db.Uuid
+  refreshInterval           Int?
+  tblWidgetQueryMappings    tblWidgetQueryMappings[]
+  tblWidgetWorkflowMappings tblWidgetWorkflowMappings[]
+  tblUsers                  tblUsers?                   @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblWidgetsCreatorID")
+  tblTenants                tblTenants                  @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblWidgetsTenantIDTenantID")
 }
 
 model tblTenantConfig {
@@ -381,17 +382,36 @@ model tblWorkflowNodes {
 }
 
 model tblWorkflows {
-  workflowID           String                 @id(map: "tblWorflows_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  title                String                 @db.VarChar
-  tenantID             String                 @db.Uuid
-  creatorID            String?                @db.Uuid
-  isDisabled           Boolean?
-  disabledAt           DateTime?              @db.Timestamptz(6)
-  createdAt            DateTime               @default(now()) @db.Timestamptz(6)
-  updatedAt            DateTime               @default(now()) @db.Timestamptz(6)
-  tblWorkflowEdge      tblWorkflowEdge[]
-  tblWorkflowInstances tblWorkflowInstances[]
-  tblWorkflowNodes     tblWorkflowNodes[]
-  tblUsers             tblUsers?              @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "tblWorkflowsCreatorID")
-  tblTenants           tblTenants             @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "tblWorkflowsTenantID")
+  workflowID                String                      @id(map: "tblWorflows_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title                     String                      @db.VarChar
+  tenantID                  String                      @db.Uuid
+  creatorID                 String?                     @db.Uuid
+  isDisabled                Boolean?
+  disabledAt                DateTime?                   @db.Timestamptz(6)
+  createdAt                 DateTime                    @default(now()) @db.Timestamptz(6)
+  updatedAt                 DateTime                    @default(now()) @db.Timestamptz(6)
+  workflowOptions           Json?                       @default("{}")
+  tblWidgetWorkflowMappings tblWidgetWorkflowMappings[]
+  tblWorkflowEdge           tblWorkflowEdge[]
+  tblWorkflowInstances      tblWorkflowInstances[]
+  tblWorkflowNodes          tblWorkflowNodes[]
+  tblUsers                  tblUsers?                   @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "tblWorkflowsCreatorID")
+  tblTenants                tblTenants                  @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "tblWorkflowsTenantID")
+}
+
+model tblWidgetWorkflowMappings {
+  widgetID          String       @db.Uuid
+  workflowID        String       @db.Uuid
+  parameters        Json?
+  title             String       @db.VarChar
+  executionOrder    Int?
+  datasetFields     Json?
+  workflowArgValues Json?
+  outputVarMapping  String?      @db.VarChar
+  tblWidgets        tblWidgets   @relation(fields: [widgetID], references: [widgetID], onDelete: Cascade, onUpdate: NoAction, map: "fk_tblWidgetWorkflowMappings_tblWidgets")
+  tblWorkflows      tblWorkflows @relation(fields: [workflowID], references: [workflowID], onDelete: Cascade, onUpdate: NoAction, map: "fk_tblWidgetWorkflowMappings_tblWorkflows")
+
+  @@id([widgetID, workflowID, title])
+  @@index([widgetID], map: "idx_tblWidgetWorkflowMappings_widgetID")
+  @@index([workflowID], map: "idx_tblWidgetWorkflowMappings_workflowID")
 }

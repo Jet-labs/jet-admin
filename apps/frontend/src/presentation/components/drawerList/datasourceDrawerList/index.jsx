@@ -1,10 +1,11 @@
 import { FaPlus } from "react-icons/fa";
-import { SiGooglebigquery } from "react-icons/si";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../../constants";
 import { NoEntityUI } from "../../ui/noEntityUI";
 import React from "react";
 import { useDatasourcesState } from "../../../../logic/contexts/datasourceContext";
+import { getDatasourceTypeByValue } from "@jet-admin/datasource-types";
+import { DatasourceIcon } from "../../datasourceComponents/datasourceIcon";
 
 export const DatasourceDrawerList = () => {
   const {
@@ -40,6 +41,7 @@ export const DatasourceDrawerList = () => {
             const key = `datasource_${datasource.datasourceID}`;
             const isActive =
               routeParam?.datasourceID == datasource.datasourceID;
+            const datasourceTypeConfig = getDatasourceTypeByValue(datasource.datasourceType);
 
             return (
               <Link
@@ -55,11 +57,11 @@ export const DatasourceDrawerList = () => {
                     isActive ? "bg-[#eaebff]" : "bg-white text-gray-700"
                   }`}
                 >
-                  <div className="!w-[16px]">
-                    <SiGooglebigquery
-                      className={`w-[16px] h-[16px] ${
-                        isActive ? "text-primary" : "text-slate-600"
-                      }`}
+                  <div className="!w-[16px] flex-shrink-0">
+                    <DatasourceIcon
+                      icon={datasourceTypeConfig?.icon}
+                      iconColor={isActive ? "#646cff" : datasourceTypeConfig?.iconColor}
+                      size={16}
                     />
                   </div>
 
