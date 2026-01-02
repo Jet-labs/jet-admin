@@ -5,7 +5,28 @@ import { JsonForms } from "@jsonforms/react";
 
 // src/context.jsx
 import React, { createContext, useContext } from "react";
-var WorkflowNodesContext = createContext(null);
+
+// src/constants.js
+var ERROR_HANDLING = {
+  CONTINUE: "continue",
+  // Continue workflow via error handle
+  FAIL_WORKFLOW: "fail_workflow"
+  // Stop entire workflow on error
+};
+var ERROR_HANDLING_OPTIONS = [
+  { value: ERROR_HANDLING.FAIL_WORKFLOW, label: "Fail Workflow" },
+  { value: ERROR_HANDLING.CONTINUE, label: "Continue on Error Path" }
+];
+var HANDLE_TYPE = {
+  SUCCESS: "success",
+  ERROR: "error",
+  DEFAULT: "default",
+  TRUE: "true",
+  FALSE: "false",
+  LOOP: "loop",
+  DONE: "done",
+  OUTPUT: "output"
+};
 var NODE_EXECUTION_STATUS = {
   IDLE: "idle",
   RUNNING: "running",
@@ -13,6 +34,9 @@ var NODE_EXECUTION_STATUS = {
   FAILED: "failed",
   SKIPPED: "skipped"
 };
+
+// src/context.jsx
+var WorkflowNodesContext = createContext(null);
 var WorkflowNodesProvider = ({
   children,
   dataQueries,
@@ -263,7 +287,7 @@ function IoMdTime(props) {
 }
 
 // src/nodes/conditionNode.jsx
-var ERROR_HANDLING_OPTIONS = {
+var ERROR_HANDLING_OPTIONS2 = {
   FAIL_WORKFLOW: "fail_workflow",
   CONTINUE_DEFAULT: "continue_default"
 };
@@ -443,7 +467,7 @@ var ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
       }
     ],
     evaluationMode: data?.evaluationMode || "first_match",
-    errorHandling: data?.errorHandling || ERROR_HANDLING_OPTIONS.FAIL_WORKFLOW,
+    errorHandling: data?.errorHandling || ERROR_HANDLING_OPTIONS2.FAIL_WORKFLOW,
     isDisabled: data?.isDisabled ?? false
   });
   useEffect(() => {
@@ -462,7 +486,7 @@ var ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
           }
         ],
         evaluationMode: data.evaluationMode || "first_match",
-        errorHandling: data.errorHandling || ERROR_HANDLING_OPTIONS.FAIL_WORKFLOW,
+        errorHandling: data.errorHandling || ERROR_HANDLING_OPTIONS2.FAIL_WORKFLOW,
         isDisabled: data.isDisabled ?? false
       });
     }
@@ -487,7 +511,7 @@ var ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
         errorHandling: {
           type: "string",
           title: strings?.WORKFLOW_EDITOR_ERROR_HANDLING_LABEL || "Error Behavior",
-          enum: Object.values(ERROR_HANDLING_OPTIONS)
+          enum: Object.values(ERROR_HANDLING_OPTIONS2)
         },
         isDisabled: {
           type: "boolean",
@@ -542,8 +566,8 @@ var ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
               scope: "#/properties/errorHandling",
               options: {
                 enumLabels: {
-                  [ERROR_HANDLING_OPTIONS.FAIL_WORKFLOW]: "Fail Workflow on Error",
-                  [ERROR_HANDLING_OPTIONS.CONTINUE_DEFAULT]: "Continue to Default Branch on Error"
+                  [ERROR_HANDLING_OPTIONS2.FAIL_WORKFLOW]: "Fail Workflow on Error",
+                  [ERROR_HANDLING_OPTIONS2.CONTINUE_DEFAULT]: "Continue to Default Branch on Error"
                 }
               }
             },
@@ -742,7 +766,7 @@ function SiQuantconnect(props) {
 }
 
 // src/nodes/dataQueryNode.jsx
-var ERROR_HANDLING_OPTIONS2 = {
+var ERROR_HANDLING_OPTIONS3 = {
   FAIL_WORKFLOW: "fail_workflow",
   CONTINUE: "continue",
   RETRY_THEN_CONTINUE: "retry_then_continue",
@@ -759,7 +783,7 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
     timeoutSeconds: data?.timeoutSeconds ?? 300,
     retryLimit: data?.retryLimit ?? 0,
     retryDelaySeconds: data?.retryDelaySeconds ?? 5,
-    errorHandling: data?.errorHandling || ERROR_HANDLING_OPTIONS2.FAIL_WORKFLOW,
+    errorHandling: data?.errorHandling || ERROR_HANDLING_OPTIONS3.FAIL_WORKFLOW,
     isDisabled: data?.isDisabled ?? false
   });
   useEffect2(() => {
@@ -773,7 +797,7 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
         timeoutSeconds: data.timeoutSeconds ?? 300,
         retryLimit: data.retryLimit ?? 0,
         retryDelaySeconds: data.retryDelaySeconds ?? 5,
-        errorHandling: data.errorHandling || ERROR_HANDLING_OPTIONS2.FAIL_WORKFLOW,
+        errorHandling: data.errorHandling || ERROR_HANDLING_OPTIONS3.FAIL_WORKFLOW,
         isDisabled: data.isDisabled ?? false
       });
     }
@@ -836,7 +860,7 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
         errorHandling: {
           type: "string",
           title: strings.WORKFLOW_EDITOR_ERROR_HANDLING_LABEL || "Error Behavior",
-          enum: Object.values(ERROR_HANDLING_OPTIONS2)
+          enum: Object.values(ERROR_HANDLING_OPTIONS3)
         },
         isDisabled: {
           type: "boolean",
@@ -933,10 +957,10 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
               scope: "#/properties/errorHandling",
               options: {
                 enumLabels: {
-                  [ERROR_HANDLING_OPTIONS2.FAIL_WORKFLOW]: "Fail Workflow",
-                  [ERROR_HANDLING_OPTIONS2.CONTINUE]: "Continue (ignore error)",
-                  [ERROR_HANDLING_OPTIONS2.RETRY_THEN_CONTINUE]: "Retry, then Continue",
-                  [ERROR_HANDLING_OPTIONS2.RETRY_THEN_FAIL]: "Retry, then Fail"
+                  [ERROR_HANDLING_OPTIONS3.FAIL_WORKFLOW]: "Fail Workflow",
+                  [ERROR_HANDLING_OPTIONS3.CONTINUE]: "Continue (ignore error)",
+                  [ERROR_HANDLING_OPTIONS3.RETRY_THEN_CONTINUE]: "Retry, then Continue",
+                  [ERROR_HANDLING_OPTIONS3.RETRY_THEN_FAIL]: "Retry, then Fail"
                 }
               }
             },
@@ -1089,7 +1113,7 @@ var DataQueryNode = memo2(({ id, data, isConnectable }) => {
 import React6, { memo as memo3, useState as useState3, useEffect as useEffect3, useMemo as useMemo3, useCallback as useCallback3 } from "react";
 import { Handle as Handle3, Position as Position3 } from "reactflow";
 import { JsonForms as JsonForms3 } from "@jsonforms/react";
-var ERROR_HANDLING_OPTIONS3 = {
+var ERROR_HANDLING_OPTIONS4 = {
   FAIL_WORKFLOW: "fail_workflow",
   CONTINUE: "continue",
   RETRY_THEN_CONTINUE: "retry_then_continue",
@@ -1105,7 +1129,7 @@ var JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
     timeoutSeconds: data?.timeoutSeconds ?? 30,
     retryLimit: data?.retryLimit ?? 0,
     retryDelaySeconds: data?.retryDelaySeconds ?? 5,
-    errorHandling: data?.errorHandling || ERROR_HANDLING_OPTIONS3.FAIL_WORKFLOW,
+    errorHandling: data?.errorHandling || ERROR_HANDLING_OPTIONS4.FAIL_WORKFLOW,
     isDisabled: data?.isDisabled ?? false
   });
   useEffect3(() => {
@@ -1118,7 +1142,7 @@ var JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
         timeoutSeconds: data.timeoutSeconds ?? 30,
         retryLimit: data.retryLimit ?? 0,
         retryDelaySeconds: data.retryDelaySeconds ?? 5,
-        errorHandling: data.errorHandling || ERROR_HANDLING_OPTIONS3.FAIL_WORKFLOW,
+        errorHandling: data.errorHandling || ERROR_HANDLING_OPTIONS4.FAIL_WORKFLOW,
         isDisabled: data.isDisabled ?? false
       });
     }
@@ -1146,6 +1170,7 @@ var JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
         },
         code: {
           type: "string",
+          format: "code-javascript",
           title: strings?.WORKFLOW_EDITOR_JAVASCRIPT_CODE_LABEL || "JavaScript Code"
         },
         // Output Tab
@@ -1180,7 +1205,7 @@ var JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
         errorHandling: {
           type: "string",
           title: strings?.WORKFLOW_EDITOR_ERROR_HANDLING_LABEL || "Error Behavior",
-          enum: Object.values(ERROR_HANDLING_OPTIONS3)
+          enum: Object.values(ERROR_HANDLING_OPTIONS4)
         },
         isDisabled: {
           type: "boolean",
@@ -1263,10 +1288,10 @@ var JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
               scope: "#/properties/errorHandling",
               options: {
                 enumLabels: {
-                  [ERROR_HANDLING_OPTIONS3.FAIL_WORKFLOW]: "Fail Workflow",
-                  [ERROR_HANDLING_OPTIONS3.CONTINUE]: "Continue (ignore error)",
-                  [ERROR_HANDLING_OPTIONS3.RETRY_THEN_CONTINUE]: "Retry, then Continue",
-                  [ERROR_HANDLING_OPTIONS3.RETRY_THEN_FAIL]: "Retry, then Fail"
+                  [ERROR_HANDLING_OPTIONS4.FAIL_WORKFLOW]: "Fail Workflow",
+                  [ERROR_HANDLING_OPTIONS4.CONTINUE]: "Continue (ignore error)",
+                  [ERROR_HANDLING_OPTIONS4.RETRY_THEN_CONTINUE]: "Retry, then Continue",
+                  [ERROR_HANDLING_OPTIONS4.RETRY_THEN_FAIL]: "Retry, then Fail"
                 }
               }
             },
@@ -1658,7 +1683,7 @@ var StartNode = memo4(({ id, data, isConnectable }) => {
 import React8, { memo as memo5, useState as useState5, useEffect as useEffect5, useMemo as useMemo5, useCallback as useCallback5 } from "react";
 import { Handle as Handle5, Position as Position5 } from "reactflow";
 import { JsonForms as JsonForms5 } from "@jsonforms/react";
-var ERROR_HANDLING_OPTIONS4 = {
+var ERROR_HANDLING_OPTIONS5 = {
   FAIL_WORKFLOW: "fail_workflow",
   CONTINUE: "continue",
   SKIP_ITEM: "skip_item"
@@ -1674,7 +1699,7 @@ var LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
     maxIterations: data?.maxIterations ?? 1e3,
     batchSize: data?.batchSize ?? 1,
     delayBetweenItems: data?.delayBetweenItems ?? 0,
-    errorHandling: data?.errorHandling || ERROR_HANDLING_OPTIONS4.FAIL_WORKFLOW,
+    errorHandling: data?.errorHandling || ERROR_HANDLING_OPTIONS5.FAIL_WORKFLOW,
     isDisabled: data?.isDisabled ?? false
   });
   useEffect5(() => {
@@ -1688,7 +1713,7 @@ var LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
         maxIterations: data.maxIterations ?? 1e3,
         batchSize: data.batchSize ?? 1,
         delayBetweenItems: data.delayBetweenItems ?? 0,
-        errorHandling: data.errorHandling || ERROR_HANDLING_OPTIONS4.FAIL_WORKFLOW,
+        errorHandling: data.errorHandling || ERROR_HANDLING_OPTIONS5.FAIL_WORKFLOW,
         isDisabled: data.isDisabled ?? false
       });
     }
@@ -1757,7 +1782,7 @@ var LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
         errorHandling: {
           type: "string",
           title: "Error Behavior",
-          enum: Object.values(ERROR_HANDLING_OPTIONS4)
+          enum: Object.values(ERROR_HANDLING_OPTIONS5)
         },
         isDisabled: {
           type: "boolean",
@@ -1822,9 +1847,9 @@ var LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
               scope: "#/properties/errorHandling",
               options: {
                 enumLabels: {
-                  [ERROR_HANDLING_OPTIONS4.FAIL_WORKFLOW]: "Fail Workflow",
-                  [ERROR_HANDLING_OPTIONS4.CONTINUE]: "Continue to next item",
-                  [ERROR_HANDLING_OPTIONS4.SKIP_ITEM]: "Skip failed item"
+                  [ERROR_HANDLING_OPTIONS5.FAIL_WORKFLOW]: "Fail Workflow",
+                  [ERROR_HANDLING_OPTIONS5.CONTINUE]: "Continue to next item",
+                  [ERROR_HANDLING_OPTIONS5.SKIP_ITEM]: "Skip failed item"
                 }
               }
             },
@@ -3066,8 +3091,11 @@ export {
   DataQueryNodeConfigurator,
   DelayNode,
   DelayNodeConfigurator,
+  ERROR_HANDLING,
+  ERROR_HANDLING_OPTIONS,
   EndNode,
   EndNodeConfigurator,
+  HANDLE_TYPE,
   JavascriptNode,
   JavascriptNodeConfigurator,
   LoopNode,

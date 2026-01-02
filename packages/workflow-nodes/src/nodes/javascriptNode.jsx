@@ -81,6 +81,7 @@ export const JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
         },
         code: {
           type: 'string',
+          format: 'code-javascript',
           title: strings?.WORKFLOW_EDITOR_JAVASCRIPT_CODE_LABEL || 'JavaScript Code',
         },
 

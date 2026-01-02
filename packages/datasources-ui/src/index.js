@@ -7,6 +7,7 @@ import { WebViewQueryResponseView } from "./components/common/webViewQueryRespon
 const GenericDatasourceTestResultUI = ({ connectionResult }) => {
   let connectionResultClass = "bg-slate-100 !border-slate-400 text-slate-700";
   let connectionResultText = "Connection not tested";
+  console.log("connectionResult", connectionResult);
 
   if (connectionResult === true || (connectionResult?.ok === true)) {
     connectionResultClass = "bg-green-100 !border-green-400 text-green-700";

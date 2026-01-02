@@ -2,8 +2,12 @@ const express = require("express");
 const router = express.Router({ mergeParams: true });
 const { tenantRoleController } = require("./tenantRole.controller");
 const { authMiddleware } = require("../auth/auth.middleware");
-const { body, param } = require("express-validator");
-const { expressUtils } = require("../../utils/express.utils");
+const { validate, validateAll } = require("../../utils/validation.utils");
+const {
+    createRoleSchema,
+    updateRoleSchema,
+    roleIdParamSchema,
+} = require("./tenantRole.validator");
 
 // Role management routes
 router.get(
@@ -11,45 +15,40 @@ router.get(
   authMiddleware.checkUserPermissions(["tenant:role:list"]),
   tenantRoleController.getAllTenantRoles
 );
+
 router.post(
   "/",
-  body("roleTitle").notEmpty().withMessage("roleTitle is required"),
-  body("roleDescription").notEmpty().withMessage("roleDescription is required"),
-  body("permissionIDs")
-    .optional()
-    .isArray()
-    .withMessage("permissionIDs must be an array"),
-  expressUtils.validationChecker,
+    validate(createRoleSchema, "body"),
   authMiddleware.checkUserPermissions(["tenant:role:create"]),
   tenantRoleController.createRole
 );
+
 router.get(
   "/permissions",
   authMiddleware.checkUserPermissions(["tenant:permissions:list"]),
   tenantRoleController.getAllTenantPermissions
 );
+
 router.get(
   "/:roleID",
-  param("roleID").isUUID().withMessage("roleID must be a uuid"),
-  expressUtils.validationChecker,
+    validate(roleIdParamSchema, "params"),
   authMiddleware.checkUserPermissions(["tenant:role:read"]),
   tenantRoleController.getTenantRoleByID
 );
+
 router.patch(
   "/:roleID",
-  param("roleID").isUUID().withMessage("roleID must be a uuid"),
-  body("permissionIDs")
-    .optional()
-    .isArray()
-    .withMessage("permissionIDs must be an array"),
-  expressUtils.validationChecker,
+    validateAll({
+        params: roleIdParamSchema,
+        body: updateRoleSchema,
+    }),
   authMiddleware.checkUserPermissions(["tenant:role:update"]),
   tenantRoleController.updateTenantRoleByID
 );
+
 router.delete(
   "/:roleID",
-  param("roleID").isUUID().withMessage("roleID must be a uuid"),
-  expressUtils.validationChecker,
+    validate(roleIdParamSchema, "params"),
   authMiddleware.checkUserPermissions(["tenant:role:delete"]),
   tenantRoleController.deleteTenantRoleByID
 );

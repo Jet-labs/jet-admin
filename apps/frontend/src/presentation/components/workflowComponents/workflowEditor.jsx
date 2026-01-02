@@ -30,10 +30,12 @@ import { FaCode, FaCodeBranch, FaPlay, FaStop } from "react-icons/fa";
 import { TbLayoutDistributeHorizontal, TbRepeat } from "react-icons/tb";
 import { VscJson, VscTerminal } from "react-icons/vsc";
 import { IoMdTime } from "react-icons/io";
+import { TbBraces } from "react-icons/tb";
 import { useWorkflowState, useWorkflowActions } from "../../../logic/contexts/workflowContext";
 import { WorkflowNodeConfigPanel } from "./workflowNodeConfigPanel";
 import { WorkflowSchemaPanel } from "./workflowSchemaPanel";
 import { WorkflowConsole } from "./workflowConsole";
+import { WorkflowContextPanel } from "./workflowContextPanel";
 import { WorkflowInputArgsPanel } from "./workflowInputArgsPanel";
 import { useParams } from "react-router-dom";
 
@@ -124,6 +126,8 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
     const [isTestRunning, setIsTestRunning] = useState(false);
     const [testResult, setTestResult] = useState(null);
     const [nodeExecutionStatus, setNodeExecutionStatus] = useState({}); // Map of nodeId -> status
+    const [showContextPanel, setShowContextPanel] = useState(false);
+    const [workflowContext, setWorkflowContext] = useState({});
 
     // Helper to add log entry
     const addLog = useCallback((type, label, message, extra = {}) => {
@@ -139,6 +143,11 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
     // Clear console logs
     const clearLogs = useCallback(() => {
         setConsoleLogs([]);
+    }, []);
+
+    // Clear workflow context
+    const clearContext = useCallback(() => {
+        setWorkflowContext({});
     }, []);
 
     // 1. Handle Node Changes (Dragging, selecting, deleting)
@@ -280,9 +289,11 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
         setTestResult(null);
         // Reset all nodes to idle before starting
         resetNodeExecutionStatus();
-        // Clear previous logs and show console
+        // Clear previous logs and context, show panels
         clearLogs();
+        clearContext();
         setShowConsole(true);
+        setShowContextPanel(true);
 
         // Log start
         addLog('start', 'Test Run Started', `Running workflow with ${values.nodes.length} nodes`);
@@ -344,6 +355,14 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                         [nodeId]: status,
                     }));
 
+                    // Update workflow context with node output
+                    if (data.output !== undefined) {
+                        setWorkflowContext(prev => ({
+                            ...prev,
+                            [nodeId]: data.output,
+                        }));
+                    }
+
                     // Log the node update
                     if (data.status === 'success') {
                         addLog('node_complete', `Node: ${nodeName}`, 'Completed successfully', {
@@ -378,6 +397,11 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
 
             // Listen for workflow status update (completion/failure)
             socket.on("workflow_status_update", (data) => {
+                // Update context with full contextData from completion
+                if (data.contextData) {
+                    setWorkflowContext(data.contextData);
+                }
+
                 if (data.status === "COMPLETED") {
                     addLog('workflow_complete', 'Workflow Complete', 'All nodes executed successfully');
                     setIsTestRunning(false);
@@ -563,6 +587,19 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                         </span>
                                     )}
                                 </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowContextPanel(!showContextPanel)}
+                                        title={showContextPanel ? 'Hide Context' : 'Show Context'}
+                                        className={`p-1.5 text-slate-500 bg-white border rounded hover:bg-slate-100 hover:text-slate-700 transition-colors flex items-center gap-1 ${showContextPanel ? 'border-[#646cff] text-[#646cff]' : 'border-slate-200'}`}
+                                    >
+                                        <TbBraces className="h-3.5 w-3.5" />
+                                        {Object.keys(workflowContext).filter(k => !k.startsWith('__')).length > 0 && (
+                                            <span className="px-1 py-0.5 text-[8px] bg-slate-200 text-slate-600 rounded-full leading-none">
+                                                {Object.keys(workflowContext).filter(k => !k.startsWith('__')).length}
+                                            </span>
+                                        )}
+                                    </button>
                             </div>
                             </div>
 
@@ -627,12 +664,23 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
 
                                 {/* Workflow Console */}
                                 {showConsole && (
-                                    <div className="absolute bottom-4 left-4 right-4 z-20">
+                                    <div className="absolute bottom-4 left-4 z-20" style={{ right: showContextPanel ? 'calc(50% + 8px)' : '16px' }}>
                                         <WorkflowConsole
                                             logs={consoleLogs}
                                             isRunning={isTestRunning}
                                             onClear={clearLogs}
                                             onClose={() => setShowConsole(false)}
+                                        />
+                                    </div>
+                                )}
+
+                                {/* Workflow Context Panel */}
+                                {showContextPanel && (
+                                    <div className="absolute bottom-4 right-4 z-20" style={{ left: showConsole ? 'calc(50% + 8px)' : '16px' }}>
+                                        <WorkflowContextPanel
+                                            context={workflowContext}
+                                            isRunning={isTestRunning}
+                                            onClose={() => setShowContextPanel(false)}
                                         />
                                     </div>
                                 )}

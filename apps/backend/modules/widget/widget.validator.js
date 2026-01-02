@@ -1,0 +1,54 @@
+/**
+ * Widget Validation Schemas
+ */
+
+const { z, schemas } = require("../../utils/validation.utils");
+
+// ============================================================
+// Request Body Schemas
+// ============================================================
+
+const createWidgetSchema = z.object({
+  widgetTitle: z.string().min(1, "widgetTitle is required").max(255),
+  widgetDescription: z.string().optional(),
+  widgetType: z.string().min(1, "widgetType is required"),
+  widgetConfig: z.object({}).passthrough(),
+  dataQueries: z.array(z.any()),
+  workflowSources: z.array(z.any()).optional(),
+}).passthrough();
+
+const updateWidgetSchema = z.object({
+  widgetTitle: z.string().min(1, "widgetTitle is required").max(255),
+  widgetDescription: z.string().optional(),
+  widgetType: z.string().min(1, "widgetType is required"),
+  widgetConfig: z.object({}).passthrough(),
+  dataQueries: z.array(z.any()),
+  workflowSources: z.array(z.any()).optional(),
+}).passthrough();
+
+const testWidgetDataSchema = z.object({
+  widgetTitle: z.string().optional(),
+  widgetType: z.string().optional(),
+  widgetConfig: z.object({}).passthrough().optional(),
+  dataQueries: z.array(z.any()).optional(),
+  workflowSources: z.array(z.any()).optional(),
+}).passthrough();
+
+// ============================================================
+// URL Param Schemas
+// ============================================================
+
+const widgetIdParamSchema = z.object({
+  widgetID: schemas.uuidSchema,
+}).passthrough();
+
+// ============================================================
+// Exports
+// ============================================================
+
+module.exports = {
+  createWidgetSchema,
+  updateWidgetSchema,
+  testWidgetDataSchema,
+  widgetIdParamSchema,
+};

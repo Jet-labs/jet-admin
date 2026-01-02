@@ -262,7 +262,7 @@ dataQueryController.runDataQueryByData = async (req, res) => {
     const { tenantID } = req.params;
     Logger.log("info", {
       message: "dataQueryController:runDataQueryByData:params",
-      params: { userID: user.userID, tenantID, dataQuery, argValues },
+      params: { userID: user.userID, tenantID, dataQuery, argValues, body: req.body },
     });
 
     const dataQueryResult = await dataQueryService.runDataQueryByData({

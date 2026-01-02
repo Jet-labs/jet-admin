@@ -3,6 +3,13 @@ const router = express.Router({ mergeParams: true });
 const { tenantController } = require("./tenant.controller");
 const { tenantMiddleware } = require("./tenant.middleware");
 const { authMiddleware } = require("../auth/auth.middleware");
+const { validate, validateAll } = require("../../utils/validation.utils");
+const {
+    createTenantSchema,
+    updateTenantSchema,
+    tenantIdParamSchema,
+} = require("./tenant.validator");
+
 let databaseRouter,
   datasourceRouter,
   dataQueryRouter,
@@ -18,6 +25,8 @@ let databaseRouter,
 const { isModuleEnabled } = require("../../config/module.config");
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
+const { auditLogMiddleware } = require("../audit/audit.middleware");
+
 if (isModuleEnabled(constants.MODULES.DATABASE)) {
   Logger.log("success", {
     message: `${constants.MODULES.DATABASE} module imported`,
@@ -86,10 +95,6 @@ if (isModuleEnabled(constants.MODULES.AI)) {
 }
 auditLogRouter = require("../audit/audit.v1.routes");
 
-const { param, body } = require("express-validator");
-const { expressUtils } = require("../../utils/express.utils");
-const { auditLogMiddleware } = require("../audit/audit.middleware");
-
 // Tenant routes
 router.use(authMiddleware.authProvider);
 
@@ -99,8 +104,7 @@ router.get("/", tenantController.getAllUserTenants);
 
 router.get(
   "/:tenantID",
-  param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
-  expressUtils.validationChecker,
+    validate(tenantIdParamSchema, "params"),
   authMiddleware.checkUserPermissions(["tenant:read"]),
   tenantMiddleware.poolProvider,
   tenantController.getUserTenantByID
@@ -108,8 +112,7 @@ router.get(
 
 router.delete(
   "/:tenantID",
-  param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
-  expressUtils.validationChecker,
+    validate(tenantIdParamSchema, "params"),
   authMiddleware.checkUserPermissions(["tenant:delete"]),
   tenantMiddleware.poolProvider,
   tenantController.deleteUserTenantByID
@@ -117,10 +120,7 @@ router.delete(
 
 router.post(
   "/",
-  body("tenantTitle").notEmpty().withMessage("tenantTitle is required"),
-  body("tenantDBURL").notEmpty().withMessage("tenantDBURL is required"),
-
-  expressUtils.validationChecker,
+    validate(createTenantSchema, "body"),
   tenantMiddleware.checkTenantCreationLimit,
   tenantController.createNewTenant
 );
@@ -129,10 +129,10 @@ router.patch("/dbtest", tenantController.testTenantDatabaseConnection);
 
 router.patch(
   "/:tenantID",
-  param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
-  body("tenantTitle").notEmpty().withMessage("tenantTitle is required"),
-  body("tenantDBURL").notEmpty().withMessage("tenantDBURL is required"),
-  expressUtils.validationChecker,
+    validateAll({
+        params: tenantIdParamSchema,
+        body: updateTenantSchema,
+    }),
   authMiddleware.checkUserPermissions(["tenant:update"]),
   tenantController.updateTenant
 );
@@ -142,7 +142,7 @@ if (isModuleEnabled(constants.MODULES.AI)) {
   Logger.log("success", { message: `${constants.MODULES.AI} module enabled` });
   router.use(
     "/:tenantID/ai",
-    param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
+      validate(tenantIdParamSchema, "params"),
     authMiddleware.checkUserPermissions(["tenant:ai"]),
     tenantMiddleware.poolProvider,
     aiRouter
@@ -156,8 +156,7 @@ if (isModuleEnabled(constants.MODULES.DATABASE)) {
   });
   router.use(
     "/:tenantID/database",
-    param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
-    expressUtils.validationChecker,
+      validate(tenantIdParamSchema, "params"),
     authMiddleware.checkUserPermissions(["tenant:database"]),
     tenantMiddleware.poolProvider,
     databaseRouter
@@ -170,20 +169,20 @@ if (isModuleEnabled(constants.MODULES.USERMANAGEMENT)) {
   });
   router.use(
     "/:tenantID/users",
-    param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
+      validate(tenantIdParamSchema, "params"),
     authMiddleware.checkUserPermissions(["tenant:user"]),
     userManagementRouter
   );
 }
 
-// Nested user management routes
+// Nested role routes
 if (isModuleEnabled(constants.MODULES.ROLE)) {
   Logger.log("success", {
     message: `${constants.MODULES.ROLE} module enabled`,
   });
   router.use(
     "/:tenantID/roles",
-    param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
+      validate(tenantIdParamSchema, "params"),
     authMiddleware.checkUserPermissions(["tenant:role"]),
     tenantRoleRouter
   );
@@ -196,7 +195,7 @@ if (isModuleEnabled(constants.MODULES.APIKEY)) {
   });
   router.use(
     "/:tenantID/apikeys",
-    param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
+      validate(tenantIdParamSchema, "params"),
     authMiddleware.checkUserPermissions(["tenant:apikey"]),
     tenantAPIKeyRouter
   );
@@ -209,7 +208,7 @@ if (isModuleEnabled(constants.MODULES.CRONJOB)) {
   });
   router.use(
     "/:tenantID/cronjobs",
-    param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
+      validate(tenantIdParamSchema, "params"),
     authMiddleware.checkUserPermissions(["tenant:cronjobs"]),
     tenantMiddleware.poolProvider,
     cronjobRouter
@@ -223,7 +222,7 @@ if (isModuleEnabled(constants.MODULES.DATASOURCE)) {
   });
   router.use(
     "/:tenantID/datasources",
-    param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
+      validate(tenantIdParamSchema, "params"),
     authMiddleware.checkUserPermissions(["tenant:datasource"]),
     tenantMiddleware.poolProvider,
     datasourceRouter
@@ -237,7 +236,7 @@ if (isModuleEnabled(constants.MODULES.DATAQUERY)) {
   });
   router.use(
     "/:tenantID/queries",
-    param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
+      validate(tenantIdParamSchema, "params"),
     authMiddleware.checkUserPermissions(["tenant:query"]),
     tenantMiddleware.poolProvider,
     dataQueryRouter
@@ -251,7 +250,7 @@ if (isModuleEnabled(constants.MODULES.WORKFLOW)) {
   });
   router.use(
     "/:tenantID/workflows",
-    param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
+      validate(tenantIdParamSchema, "params"),
     authMiddleware.checkUserPermissions(["tenant:workflow"]),
     tenantMiddleware.poolProvider,
     workflowRouter
@@ -265,7 +264,7 @@ if (isModuleEnabled(constants.MODULES.WIDGET)) {
   });
   router.use(
     "/:tenantID/widgets",
-    param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
+      validate(tenantIdParamSchema, "params"),
     authMiddleware.checkUserPermissions(["tenant:widget"]),
     tenantMiddleware.poolProvider,
     widgetRouter
@@ -279,7 +278,7 @@ if (isModuleEnabled(constants.MODULES.DASHBOARD)) {
   });
   router.use(
     "/:tenantID/dashboards",
-    param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
+      validate(tenantIdParamSchema, "params"),
     authMiddleware.checkUserPermissions(["tenant:dashboard"]),
     tenantMiddleware.poolProvider,
     dashboardRouter
@@ -289,10 +288,9 @@ if (isModuleEnabled(constants.MODULES.DASHBOARD)) {
 // Nested audit log routes
 router.use(
   "/:tenantID/audit",
-  param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
+    validate(tenantIdParamSchema, "params"),
   authMiddleware.checkUserPermissions(["tenant:audit"]),
   auditLogRouter
 );
-
 
 module.exports = router;

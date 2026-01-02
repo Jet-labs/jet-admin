@@ -3,8 +3,12 @@ const router = express.Router({ mergeParams: true });
 const { userManagementController } = require("./userManagement.controller");
 const { userManagementMiddleware } = require("./userManagement.middleware");
 const { authMiddleware } = require("../auth/auth.middleware");
-const { param, body } = require("express-validator");
-const { expressUtils } = require("../../utils/express.utils");
+const { validate, validateAll } = require("../../utils/validation.utils");
+const {
+    addUserToTenantSchema,
+    updateUserRolesSchema,
+    tenantUserIdParamSchema,
+} = require("./userManagement.validator");
 
 // User management routes
 router.get(
@@ -12,36 +16,34 @@ router.get(
   authMiddleware.checkUserPermissions(["tenant:user:list"]),
   userManagementController.getAllTenantUsers
 );
+
 router.get(
   "/:tenantUserID",
-  param("tenantUserID").isUUID().withMessage("tenantUserID must be a uuid"),
-  expressUtils.validationChecker,
+    validate(tenantUserIdParamSchema, "params"),
   authMiddleware.checkUserPermissions(["tenant:user:read"]),
   userManagementController.getTenantUserByID
 );
+
 router.delete(
   "/:tenantUserID",
-  param("tenantUserID").isUUID().withMessage("tenantUserID must be a uuid"),
-  expressUtils.validationChecker,
+    validate(tenantUserIdParamSchema, "params"),
   authMiddleware.checkUserPermissions(["tenant:user:delete"]),
   userManagementController.removeTenantUserFromTenantByID
 );
+
 router.patch(
   "/:tenantUserID/roles",
-  param("tenantUserID").isUUID().withMessage("tenantUserID must be a uuid"),
-  body("roleIDs").isArray().withMessage("roleIDs must be an array"),
-  body("userTenantRelationship")
-    .optional()
-    .isString()
-    .withMessage("userTenantRelationship must be a string"),
-  expressUtils.validationChecker,
+    validateAll({
+        params: tenantUserIdParamSchema,
+        body: updateUserRolesSchema,
+    }),
   authMiddleware.checkUserPermissions(["tenant:user:update"]),
   userManagementController.updateTenantUserRolesByID
 );
+
 router.post(
   "/",
-  body("tenantUserEmail").notEmpty().withMessage("tenantUserEmail is required"),
-  expressUtils.validationChecker,
+    validate(addUserToTenantSchema, "body"),
   authMiddleware.checkUserPermissions(["tenant:user:create"]),
   userManagementMiddleware.checkTenantUserAdditionLimit,
   userManagementController.addUserToTenant

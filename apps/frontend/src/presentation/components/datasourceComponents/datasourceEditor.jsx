@@ -67,26 +67,43 @@ export const DatasourceEditor = ({ datasourceEditorForm }) => {
             {datasourceEditorForm.errors.datasourceType}
           </span>
         )}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+        <select
+          id="datasourceType"
+          name="datasourceType"
+          onChange={datasourceEditorForm.handleChange}
+          onBlur={datasourceEditorForm.handleBlur}
+          value={datasourceEditorForm.values.datasourceType}
+          className="bg-slate-50 border border-slate-300 text-slate-700 text-sm rounded focus:border-slate-700 block w-full px-2.5 py-2 appearance-none"
+          style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%236b7280'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E")`,
+            backgroundRepeat: 'no-repeat',
+            backgroundPosition: 'right 0.5rem center',
+            backgroundSize: '1.5em 1.5em',
+            paddingRight: '2.5rem'
+          }}
+        >
           {Object.keys(DATASOURCE_TYPES).map((type) => (
-            <button
-              type="button"
+            <option
               key={DATASOURCE_TYPES[type].value}
-              onClick={() => datasourceEditorForm.setFieldValue("datasourceType", DATASOURCE_TYPES[type].value)}
-              className={`flex items-center gap-2 px-3 py-2 rounded border text-sm transition-all ${datasourceEditorForm.values.datasourceType === DATASOURCE_TYPES[type].value
-                  ? "bg-slate-100 border-slate-400 ring-1 ring-slate-400"
-                  : "bg-white border-slate-200 hover:border-slate-300 hover:bg-slate-50"
-                }`}
+              value={DATASOURCE_TYPES[type].value}
             >
-              <DatasourceIcon
-                icon={DATASOURCE_TYPES[type].icon}
-                iconColor={DATASOURCE_TYPES[type].iconColor}
-                size={18}
-              />
-              <span className="text-slate-700 truncate">{DATASOURCE_TYPES[type].name}</span>
-            </button>
+              {DATASOURCE_TYPES[type].name}
+            </option>
           ))}
-        </div>
+        </select>
+        {/* Show selected datasource with icon */}
+        {currentDatasourceType && (
+          <div className="mt-2 flex items-center gap-2 px-3 py-2 bg-slate-100 rounded border border-slate-200">
+            <DatasourceIcon
+              icon={currentDatasourceType.icon}
+              iconColor={currentDatasourceType.iconColor}
+              size={20}
+            />
+            <span className="text-sm font-medium text-slate-700">
+              {currentDatasourceType.name}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* JSON Forms for datasourceOptions */}

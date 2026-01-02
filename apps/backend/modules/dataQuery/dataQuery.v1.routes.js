@@ -1,9 +1,15 @@
 const express = require("express");
-const router = express.Router({mergeParams:true});
+const router = express.Router({ mergeParams: true });
 const { dataQueryController } = require("./dataQuery.controller");
 const { authMiddleware } = require("../auth/auth.middleware");
-const { body, param } = require("express-validator");
-const { expressUtils } = require("../../utils/express.utils");
+const { validate, validateAll } = require("../../utils/validation.utils");
+const {
+  createDataQuerySchema,
+  updateDataQuerySchema,
+  testDataQuerySchema,
+  aiGenerateSchema,
+  dataQueryIdParamSchema,
+} = require("./dataQuery.validator");
 
 // Database query routes
 
@@ -15,14 +21,7 @@ router.get(
 
 router.post(
   "/",
-  body("dataQueryOptions")
-    .notEmpty()
-    .withMessage("dataQueryOptions is required"),
-  body("dataQueryTitle")
-    .notEmpty()
-    .withMessage("dataQueryTitle is required"),
-  body("runOnLoad").optional().isBoolean().withMessage("runOnLoad is required"),
-  expressUtils.validationChecker,
+  validate(createDataQuerySchema, "body"),
   authMiddleware.authProvider,
   authMiddleware.checkUserPermissions(["tenant:query:create"]),
   dataQueryController.createDataQuery
@@ -30,7 +29,6 @@ router.post(
 
 router.post(
   "/bulk",
-  expressUtils.validationChecker,
   authMiddleware.authProvider,
   authMiddleware.checkUserPermissions(["tenant:query:bulk:create"]),
   dataQueryController.createBulkDataQuery
@@ -38,56 +36,52 @@ router.post(
 
 router.post(
   "/:dataQueryID/clone",
-  param("dataQueryID").isUUID().withMessage("dataQueryID must be a uuid"),
-  expressUtils.validationChecker,
+  validate(dataQueryIdParamSchema, "params"),
   authMiddleware.checkUserPermissions(["tenant:query:clone"]),
   dataQueryController.cloneDataQueryByID
 );
 
 router.patch(
   "/queryTest",
-  body("dataQuery").notEmpty().withMessage("dataQuery is required"),
-  expressUtils.validationChecker,
+  validate(testDataQuerySchema, "body"),
   authMiddleware.checkUserPermissions(["tenant:query:test"]),
   dataQueryController.runDataQueryByData
 );
 
 router.patch(
   "/aigenerate",
-  body("aiPrompt").notEmpty().withMessage("aiPrompt is required"),
-  expressUtils.validationChecker,
+  validate(aiGenerateSchema, "body"),
   authMiddleware.checkUserPermissions(["tenant:query:aigenerate"]),
   dataQueryController.generateAIPromptBasedQuery
 );
+
 router.get(
   "/:dataQueryID",
-  param("dataQueryID").isUUID().withMessage("dataQueryID must be a uuid"),
-  expressUtils.validationChecker,
+  validate(dataQueryIdParamSchema, "params"),
   authMiddleware.checkUserPermissions(["tenant:query:read"]),
   dataQueryController.getDataQueryByID
 );
+
 router.post(
   "/:dataQueryID/queryTest",
-  param("dataQueryID").isUUID().withMessage("dataQueryID must be a uuid"),
-  expressUtils.validationChecker,
+  validate(dataQueryIdParamSchema, "params"),
   authMiddleware.checkUserPermissions(["tenant:query:test"]),
   dataQueryController.runDataQueryByID
 );
+
 router.patch(
   "/:dataQueryID",
-  param("dataQueryID").isUUID().withMessage("dataQueryID must be a uuid"),
-  body("dataQueryOptions")
-    .notEmpty()
-    .withMessage("dataQueryOptions is required"),
-  body("dataQueryTitle").notEmpty().withMessage("dataQueryTitle is required"),
-  expressUtils.validationChecker,
+  validateAll({
+    params: dataQueryIdParamSchema,
+    body: updateDataQuerySchema,
+  }),
   authMiddleware.checkUserPermissions(["tenant:query:update"]),
   dataQueryController.updateDataQueryByID
 );
+
 router.delete(
   "/:dataQueryID",
-  param("dataQueryID").isUUID().withMessage("dataQueryID must be a uuid"),
-  expressUtils.validationChecker,
+  validate(dataQueryIdParamSchema, "params"),
   authMiddleware.checkUserPermissions(["tenant:query:delete"]),
   dataQueryController.deleteDataQueryByID
 );

@@ -111,7 +111,7 @@ export const DatasourceAdditionForm = ({ tenantID }) => {
         </ResizablePanel>
         <ResizableHandle withHandle={true} />
         <ResizablePanel defaultSize={80}>
-          {datasourceTestResult !== undefined || datasourceTestResult !== null
+          {datasourceTestResult !== undefined && datasourceTestResult !== null
             ? DATASOURCE_UI_COMPONENTS[
                 datasourceAdditionForm.values.datasourceType
             ]?.datasourceTestResultUI?.({

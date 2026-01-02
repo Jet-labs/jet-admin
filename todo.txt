@@ -1,9 +1,0 @@
-modules
-----------------
-postgres manager
-datasources
-dataqueries
-widgets
-dashboards
-cronjobs
-apikeys

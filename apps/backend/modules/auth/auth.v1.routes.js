@@ -1,11 +1,10 @@
-
 const express = require("express");
 const router = express.Router();
 const { authController } = require("./auth.controller");
 const { authMiddleware } = require("./auth.middleware");
-const { body, param } = require("express-validator");
-const { expressUtils } = require("../../utils/express.utils");
 const { auditLogMiddleware } = require("../audit/audit.middleware");
+const { validate, validateAll } = require("../../utils/validation.utils");
+const { updateConfigSchema, tenantIdParamSchema } = require("./auth.validator");
 
 //auth routes
 
@@ -15,20 +14,23 @@ router.get(
   auditLogMiddleware.audit,
   authController.getUserInfo
 );
+
 router.get(
   "/config/:tenantID",
-  param("tenantID").isUUID().withMessage("Invalid tenantID"),
-  expressUtils.validationChecker,
+  validate(tenantIdParamSchema, "params"),
   authMiddleware.authProvider,
   authController.getUserConfig
 );
+
 router.post(
   "/config/:tenantID",
-  param("tenantID").isUUID().withMessage("Invalid tenantID"),
-  body("config").notEmpty().withMessage("config is required"),
-  expressUtils.validationChecker,
+  validateAll({
+    params: tenantIdParamSchema,
+    body: updateConfigSchema,
+  }),
   authMiddleware.authProvider,
   auditLogMiddleware.audit,
   authController.updateUserConfig
 );
+
 module.exports = router;

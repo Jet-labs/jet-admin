@@ -1,9 +1,9 @@
 /**
  * Unit tests for queryEngine parsers
- * Tests the template extraction and argument resolution functions
+ * Tests the template extraction function
  */
 
-const { extractTemplateBlocks, resolveArgs } = require('../../../modules/dataQuery/queryEngine/parsers');
+const { extractTemplateBlocks } = require('../../../modules/dataQuery/queryEngine/parsers');
 
 describe('queryEngine/parsers', () => {
   describe('extractTemplateBlocks', () => {
@@ -73,64 +73,37 @@ describe('queryEngine/parsers', () => {
       expect(result).toHaveLength(1);
       expect(result[0].expression).toBe('args.user.id');
     });
-  });
 
-  describe('resolveArgs', () => {
-    it('should resolve string key in object argument', () => {
-      const args = { field: 'userId' };
-      const runtimeArgs = { userId: 'user_123' };
-      const result = resolveArgs(args, runtimeArgs);
+    it('should handle newlines in template block content', () => {
+      const template = `SELECT * FROM users WHERE id = {{
+        userId
+      }}`;
+      const result = extractTemplateBlocks(template);
 
-      expect(result.field).toBe('user_123');
+      expect(result).toHaveLength(1);
+      expect(result[0].expression).toBe('userId');
     });
 
-    it('should resolve numeric arguments by converting to string', () => {
-      const args = { limit: 'count' };
-      const runtimeArgs = { count: 100 };
-      const result = resolveArgs(args, runtimeArgs);
+    it('should handle array index access in expressions', () => {
+      const template = 'SELECT * FROM users WHERE id = {{items[0].id}}';
+      const result = extractTemplateBlocks(template);
 
-      // Numeric values get converted
-      expect(result.limit).toBe(100);
+      expect(result).toHaveLength(1);
+      expect(result[0].expression).toBe('items[0].id');
     });
 
-    it('should handle multiple replacements in object', () => {
-      const args = { 
-        query: 'userId',
-        limit: 'pageSize'
+    it('should handle deeply nested object templates', () => {
+      const template = {
+        level1: {
+          level2: {
+            query: 'SELECT {{field}}'
+          }
+        }
       };
-      const runtimeArgs = { 
-        userId: 'user_1',
-        pageSize: 10
-      };
-      const result = resolveArgs(args, runtimeArgs);
+      const result = extractTemplateBlocks(template);
 
-      expect(result.query).toBe('user_1');
-      expect(result.limit).toBe(10);
-    });
-
-    it('should handle string input and parse as JSON', () => {
-      const args = '{"userId": "id"}';
-      const runtimeArgs = { id: '12345' };
-      const result = resolveArgs(args, runtimeArgs);
-
-      expect(result.userId).toBe('12345');
-    });
-
-    it('should preserve keys that dont match any runtime arg', () => {
-      const args = { field: 'unknownKey' };
-      const runtimeArgs = { userId: 'user_123' };
-      const result = resolveArgs(args, runtimeArgs);
-
-      expect(result.field).toBe('unknownKey');
-    });
-
-    it('should handle object values in runtimeArgs', () => {
-      const args = { data: 'filterObj' };
-      const runtimeArgs = { filterObj: { active: true } };
-      const result = resolveArgs(args, runtimeArgs);
-
-      // Object gets stringified
-      expect(typeof result.data).toBe('string');
+      expect(result).toHaveLength(1);
+      expect(result[0].expression).toBe('field');
     });
   });
 });

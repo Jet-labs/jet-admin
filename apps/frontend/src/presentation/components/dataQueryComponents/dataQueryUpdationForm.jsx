@@ -1,7 +1,7 @@
 import { CircularProgress } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
-import React, { useEffect, useState } from "react";
+import React, { useMemo, useState } from "react";
 import "react-data-grid/lib/styles.css";
 import { CONSTANTS } from "../../../constants";
 import {
@@ -22,7 +22,7 @@ import PropTypes from "prop-types";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import { DataQueryCloneForm } from "./dataQueryCloneForm";
 import { DataQueryEditor } from "./dataQueryEditor";
-import { DATASOURCE_TYPES } from "@jet-admin/datasource-types";
+
 import { DATASOURCE_UI_COMPONENTS } from "@jet-admin/datasources-ui";
 
 export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
@@ -74,14 +74,18 @@ export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
       },
     });
 
+  // Derive initial values from fetched data query
+  const initialValues = useMemo(() => ({
+    dataQueryTitle: dataQuery?.dataQueryTitle || "Untitled",
+    datasourceID: dataQuery?.datasourceID || "",
+    datasourceType: dataQuery?.datasourceType || "",
+    dataQueryOptions: dataQuery?.dataQueryOptions || {},
+    runOnLoad: dataQuery?.runOnLoad || false,
+  }), [dataQuery]);
+
   const queryUpdationForm = useFormik({
-    initialValues: {
-      dataQueryTitle: "Untitled",
-      datasourceID: "",
-      datasourceType: "",
-      dataQueryOptions: {},
-      runOnLoad: false,
-    },
+    initialValues,
+    enableReinitialize: true, // Re-initialize form when dataQuery changes
     validateOnMount: false,
     validateOnChange: false,
     validationSchema: formValidations.queryUpdationFormValidationSchema,
@@ -97,33 +101,10 @@ export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
     },
   });
 
-  // Use useEffect to update Formik values when dataQuery is fetched
-  useEffect(() => {
-    console.log("dataQuery", dataQuery);
-    if (dataQuery) {
-      // Update Formik form values with the fetched dataQuery data
-      queryUpdationForm.setFieldValue(
-        "dataQueryTitle",
-        dataQuery.dataQueryTitle || CONSTANTS.STRINGS.UNTITLED
-      );
-      queryUpdationForm.setFieldValue(
-        "dataQueryOptions",
-        dataQuery.dataQueryOptions || {}
-      );
-      queryUpdationForm.setFieldValue(
-        "datasourceID",
-        dataQuery.datasourceID || ""
-      );
-      queryUpdationForm.setFieldValue(
-        "datasourceType",
-        dataQuery.datasourceType || DATASOURCE_TYPES.POSTGRESQL.value
-      );
-      queryUpdationForm.setFieldValue(
-        "runOnLoad",
-        dataQuery.runOnLoad || false
-      );
-    }
-  }, [dataQuery]);
+  // Reset test result when switching to a different data query
+  React.useEffect(() => {
+    setDataQueryTestResult(undefined);
+  }, [dataQueryID]);
 
   return (
     <div className="w-full flex flex-col justify-start items-center h-full">

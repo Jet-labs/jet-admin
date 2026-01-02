@@ -1,5 +1,5 @@
 import { useFormik } from "formik";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   getDatasourceByIDAPI,
   updateDatasourceAPI,
@@ -77,33 +77,27 @@ export const DatasourceUpdationForm = ({ tenantID, datasourceID }) => {
       },
     });
 
+  // Derive initial values from fetched datasource
+  const initialValues = useMemo(() => ({
+    datasourceTitle: datasource?.datasourceTitle || "",
+    datasourceType: datasource?.datasourceType || "postgresql",
+    datasourceOptions: datasource?.datasourceOptions || datasourceOptionsMetadata.data,
+  }), [datasource]);
+
   const datasourceUpdationForm = useFormik({
-    initialValues: {
-      datasourceTitle: "",
-      datasourceType: "postgresql", // Default value
-      datasourceOptions: datasourceOptionsMetadata.data, // Initialize nested object
-    },
+    initialValues,
+    enableReinitialize: true, // Re-initialize form when datasource changes
     onSubmit: (data) => {
       updateDatasource(data);
     },
   });
 
+  // Reset test result when switching to a different datasource
   useEffect(() => {
-    if (datasource) {
-      datasourceUpdationForm.setFieldValue(
-        "datasourceTitle",
-        datasource.datasourceTitle
-      );
-      datasourceUpdationForm.setFieldValue(
-        "datasourceType",
-        datasource.datasourceType
-      );
-      datasourceUpdationForm.setFieldValue(
-        "datasourceOptions",
-        datasource.datasourceOptions
-      );
-    }
-  }, [datasource]);
+    setDatasourceTestResult(undefined);
+  }, [datasourceID]);
+
+
 
   console.log("datasourceTestResult", datasourceTestResult);
 
@@ -173,7 +167,7 @@ export const DatasourceUpdationForm = ({ tenantID, datasourceID }) => {
           </ResizablePanel>
           <ResizableHandle withHandle={true} />
           <ResizablePanel defaultSize={80}>
-            {datasourceTestResult !== undefined || datasourceTestResult !== null
+            {datasourceTestResult !== undefined && datasourceTestResult !== null
               ? DATASOURCE_UI_COMPONENTS[
                   datasourceUpdationForm.values.datasourceType
                 ]?.datasourceTestResultUI({

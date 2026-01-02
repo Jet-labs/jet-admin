@@ -61639,7 +61639,7 @@ var require_lib = __commonJS({
 });
 
 // src/index.js
-import React20 from "react";
+import React9 from "react";
 
 // ../datasource-types/dist/index.mjs
 var formConfig_default = {
@@ -76765,100 +76765,14 @@ var QueryResponseView = ({ queryResult }) => {
   ), /* @__PURE__ */ React6.createElement("div", { className: "w-100  h-full overflow-y-auto pb-5" }, tab4 === 0 && /* @__PURE__ */ React6.createElement(QueryResponseTableTab, { data: queryResult ? queryResult : "" }), tab4 === 1 && /* @__PURE__ */ React6.createElement(QueryResponseJSONTab, { data: queryResult ? queryResult : "" }), tab4 === 2 && /* @__PURE__ */ React6.createElement(QueryResponseRAWTab, { data: queryResult ? queryResult : "" }), tab4 === 3 && /* @__PURE__ */ React6.createElement(QueryResponseSchemaTab, { data: queryResult ? queryResult : {} })));
 };
 
-// src/components/postgresql/datasource/datasourceTestResultUI.jsx
-var import_prop_types6 = __toESM(require_prop_types());
-import React7 from "react";
-var PostgreSQLDatasourceTestResultUI = ({ connectionResult }) => {
-  PostgreSQLDatasourceTestResultUI.propTypes = {
-    connectionResult: import_prop_types6.default.object
-  };
-  let connectionResultClass = "bg-slate-100 !border-slate-400 text-slate-700";
-  let connectionResultText = "Connection not tested";
-  if (connectionResult === true) {
-    connectionResultClass = "bg-green-100 !border-green-400 text-green-700";
-    connectionResultText = "Connection successful";
-  } else if (connectionResult === false) {
-    connectionResultClass = "bg-red-100 !border-red-400 text-red-700";
-    connectionResultText = "Connection failed";
-    connectionResult = "Connection failed";
-  } else if (connectionResult === void 0) {
-    connectionResultClass = "bg-slate-100 !border-slate-400 text-slate-700";
-    connectionResultText = "Connection not tested";
-  } else {
-    connectionResultClass = "bg-orange-100 !border-orange-400 text-orange-700";
-    connectionResultText = "Error testing connection";
-  }
-  return /* @__PURE__ */ React7.createElement("div", { className: "p-3" }, /* @__PURE__ */ React7.createElement(
-    "div",
-    {
-      className: `w-full flex flex-col justify-start items-start p-3 rounded-md border ${connectionResultClass}`
-    },
-    /* @__PURE__ */ React7.createElement("div", { className: "!flex !flex-row justify-start items-center" }, /* @__PURE__ */ React7.createElement("span", { className: "!text-sm !font-normal" }, connectionResultText))
-  ));
-};
-
-// src/components/restapi/datasource/datasourceTestResultUI.jsx
-import React8 from "react";
-var RESTAPIDatasourceTestResultUI = ({ connectionResult }) => {
-  const statusClasses = connectionResult ? "bg-green-100 !border-green-400 text-green-700" : "bg-red-100 !border-red-400 text-red-700";
-  return /* @__PURE__ */ React8.createElement("div", { className: "p-3 flex flex-col justify-start items-start h-full w-full" }, /* @__PURE__ */ React8.createElement(
-    "div",
-    {
-      className: `w-full flex flex-col justify-start items-start p-3 rounded-md border ${statusClasses}`
-    },
-    /* @__PURE__ */ React8.createElement("div", { className: "!flex !flex-row justify-start items-center" }, /* @__PURE__ */ React8.createElement("span", { className: "!text-sm !font-normal" }, connectionResult ? "Connection successful" : "Connection failed"))
-  ), /* @__PURE__ */ React8.createElement("div", { className: "w-full flex-grow h-full overflow-y-auto border border-slate-200 rounded mt-3" }, /* @__PURE__ */ React8.createElement(
-    esm_default,
-    {
-      value: JSON.stringify(connectionResult, null, 2),
-      extensions: [loadLanguage("json")],
-      theme: githubLight,
-      style: {
-        width: "100%",
-        borderWidth: 0,
-        borderBottomWidth: 1,
-        outline: "none"
-      },
-      className: "border-slate-300 focus:border-slate-300 focus:outline-slate-300 flex-grow non-focusable-code-editor !h-full"
-    }
-  )));
-};
-
-// src/components/weburl/datasource/datasourceTestResultUI.jsx
-import React9 from "react";
-var WebURLDatasourceTestResultUI = ({ connectionResult }) => {
-  const statusClasses = connectionResult ? "bg-green-100 !border-green-400 text-green-700" : "bg-red-100 !border-red-400 text-red-700";
-  return /* @__PURE__ */ React9.createElement("div", { className: "p-3 flex flex-col justify-start items-start h-full w-full" }, /* @__PURE__ */ React9.createElement(
-    "div",
-    {
-      className: `w-full flex flex-col justify-start items-start p-3 rounded-md border ${statusClasses}`
-    },
-    /* @__PURE__ */ React9.createElement("div", { className: "!flex !flex-row justify-start items-center" }, /* @__PURE__ */ React9.createElement("span", { className: "!text-sm !font-normal" }, connectionResult ? "Connection successful" : "Connection failed"))
-  ), /* @__PURE__ */ React9.createElement("div", { className: "w-full flex-grow h-full overflow-y-auto border border-slate-200 rounded mt-3" }, /* @__PURE__ */ React9.createElement(
-    esm_default,
-    {
-      value: JSON.stringify(connectionResult, null, 2),
-      extensions: [loadLanguage("json")],
-      theme: githubLight,
-      style: {
-        width: "100%",
-        borderWidth: 0,
-        borderBottomWidth: 1,
-        outline: "none"
-      },
-      className: "border-slate-300 focus:border-slate-300 focus:outline-slate-300 flex-grow non-focusable-code-editor !h-full"
-    }
-  )));
-};
-
 // src/components/common/webViewQueryResponseView.js
 import { Tab as Tab2, Tabs as Tabs2 } from "@mui/material";
-import React11, { useState as useState3 } from "react";
-var import_prop_types8 = __toESM(require_prop_types());
+import React8, { useState as useState3 } from "react";
+var import_prop_types7 = __toESM(require_prop_types());
 
 // src/components/common/queryResponseWebViewTab.js
-var import_prop_types7 = __toESM(require_prop_types());
-import React10 from "react";
+var import_prop_types6 = __toESM(require_prop_types());
+import React7 from "react";
 var QueryResponseWebViewTab = ({
   data: data2,
   className: className2,
@@ -76866,13 +76780,13 @@ var QueryResponseWebViewTab = ({
   width = "100%"
 }) => {
   QueryResponseWebViewTab.propTypes = {
-    data: import_prop_types7.default.array,
-    className: import_prop_types7.default.string,
-    height: import_prop_types7.default.string,
-    width: import_prop_types7.default.string
+    data: import_prop_types6.default.array,
+    className: import_prop_types6.default.string,
+    height: import_prop_types6.default.string,
+    width: import_prop_types6.default.string
   };
   console.log("data", data2);
-  return /* @__PURE__ */ React10.createElement("div", { className: "w-100 flex-grow h-full overflow-y-auto pb-5" }, /* @__PURE__ */ React10.createElement(
+  return /* @__PURE__ */ React7.createElement("div", { className: "w-100 flex-grow h-full overflow-y-auto pb-5" }, /* @__PURE__ */ React7.createElement(
     "iframe",
     {
       src: data2.url,
@@ -76885,14 +76799,14 @@ var QueryResponseWebViewTab = ({
 // src/components/common/webViewQueryResponseView.js
 var WebViewQueryResponseView = ({ queryResult }) => {
   WebViewQueryResponseView.propTypes = {
-    queryResult: import_prop_types8.default.object
+    queryResult: import_prop_types7.default.object
   };
   console.log("queryResult", queryResult);
   const [tab4, setTab] = useState3(0);
   const _handleTabChange = (event, newTab) => {
     setTab(newTab);
   };
-  return /* @__PURE__ */ React11.createElement(React11.Fragment, null, /* @__PURE__ */ React11.createElement(
+  return /* @__PURE__ */ React8.createElement(React8.Fragment, null, /* @__PURE__ */ React8.createElement(
     Tabs2,
     {
       value: tab4,
@@ -76904,7 +76818,7 @@ var WebViewQueryResponseView = ({ queryResult }) => {
         }
       }
     },
-    /* @__PURE__ */ React11.createElement(
+    /* @__PURE__ */ React8.createElement(
       Tab2,
       {
         label: "Web View",
@@ -76914,7 +76828,7 @@ var WebViewQueryResponseView = ({ queryResult }) => {
         className: `!outline-none !border-0 hover:!outline-none hover:!border-0 focus:!outline-none !font-medium !text-sm !normal-case ${tab4 === 0 ? "!text-[#646cff]" : "!text-slate-700"}`
       }
     ),
-    /* @__PURE__ */ React11.createElement(
+    /* @__PURE__ */ React8.createElement(
       Tab2,
       {
         label: "JSON",
@@ -76924,7 +76838,7 @@ var WebViewQueryResponseView = ({ queryResult }) => {
         className: `!outline-none !border-0 hover:!outline-none hover:!border-0 focus:!outline-none !font-medium !text-sm !normal-case ${tab4 === 1 ? "!text-[#646cff]" : "!text-slate-700"}`
       }
     ),
-    /* @__PURE__ */ React11.createElement(
+    /* @__PURE__ */ React8.createElement(
       Tab2,
       {
         label: "Raw",
@@ -76934,7 +76848,7 @@ var WebViewQueryResponseView = ({ queryResult }) => {
         className: `!outline-none !border-0 hover:!outline-none hover:!border-0 focus:!outline-none !font-medium !text-sm !normal-case ${tab4 === 2 ? "!text-[#646cff]" : "!text-slate-700"}`
       }
     ),
-    /* @__PURE__ */ React11.createElement(
+    /* @__PURE__ */ React8.createElement(
       Tab2,
       {
         label: "Data Schema",
@@ -76944,155 +76858,14 @@ var WebViewQueryResponseView = ({ queryResult }) => {
         className: `!outline-none !border-0 hover:!outline-none hover:!border-0 focus:!outline-none !font-medium !text-sm !normal-case ${tab4 === 3 ? "!text-[#646cff]" : "!text-slate-700"}`
       }
     )
-  ), /* @__PURE__ */ React11.createElement("div", { className: "w-100  h-full overflow-y-auto pb-5" }, tab4 === 0 && /* @__PURE__ */ React11.createElement(QueryResponseWebViewTab, { data: queryResult ? queryResult : "" }), tab4 === 1 && /* @__PURE__ */ React11.createElement(QueryResponseJSONTab, { data: queryResult ? queryResult : "" }), tab4 === 2 && /* @__PURE__ */ React11.createElement(QueryResponseRAWTab, { data: queryResult ? queryResult : "" }), tab4 === 3 && /* @__PURE__ */ React11.createElement(QueryResponseSchemaTab, { data: queryResult ? queryResult : {} })));
-};
-
-// src/components/firestore/datasource/datasourceTestResultUI.jsx
-var import_prop_types9 = __toESM(require_prop_types());
-import React12 from "react";
-var FirestoreDatasourceTestResultUI = ({ connectionResult }) => {
-  FirestoreDatasourceTestResultUI.propTypes = {
-    connectionResult: import_prop_types9.default.object
-  };
-  if (!connectionResult) {
-    return /* @__PURE__ */ React12.createElement("div", { className: "flex flex-col items-center justify-center h-full text-slate-400" }, /* @__PURE__ */ React12.createElement("p", null, "Test your Firestore connection to see results here"));
-  }
-  if (connectionResult.ok) {
-    return /* @__PURE__ */ React12.createElement("div", { className: "p-4 space-y-4" }, /* @__PURE__ */ React12.createElement("div", { className: "flex items-center gap-2 text-green-600" }, /* @__PURE__ */ React12.createElement("svg", { className: "w-5 h-5", fill: "currentColor", viewBox: "0 0 20 20" }, /* @__PURE__ */ React12.createElement("path", { fillRule: "evenodd", d: "M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z", clipRule: "evenodd" })), /* @__PURE__ */ React12.createElement("span", { className: "font-medium" }, "Connection Successful!")), connectionResult.collections && connectionResult.collections.length > 0 && /* @__PURE__ */ React12.createElement("div", { className: "mt-4" }, /* @__PURE__ */ React12.createElement("h4", { className: "text-sm font-medium text-slate-700 mb-2" }, "Collections Found (", connectionResult.collections.length, "):"), /* @__PURE__ */ React12.createElement("div", { className: "bg-slate-50 rounded p-3 max-h-48 overflow-y-auto" }, /* @__PURE__ */ React12.createElement("ul", { className: "space-y-1" }, connectionResult.collections.map((collection, index) => /* @__PURE__ */ React12.createElement("li", { key: index, className: "text-sm text-slate-600 flex items-center gap-2" }, /* @__PURE__ */ React12.createElement("span", { className: "text-orange-500" }, "\u{1F4C1}"), collection))))), connectionResult.collections && connectionResult.collections.length === 0 && /* @__PURE__ */ React12.createElement("div", { className: "text-sm text-slate-500" }, "No collections found in this Firestore database. You can create collections when adding documents."));
-  }
-  return /* @__PURE__ */ React12.createElement("div", { className: "p-4" }, /* @__PURE__ */ React12.createElement("div", { className: "flex items-center gap-2 text-red-600" }, /* @__PURE__ */ React12.createElement("svg", { className: "w-5 h-5", fill: "currentColor", viewBox: "0 0 20 20" }, /* @__PURE__ */ React12.createElement("path", { fillRule: "evenodd", d: "M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z", clipRule: "evenodd" })), /* @__PURE__ */ React12.createElement("span", { className: "font-medium" }, "Connection Failed")), connectionResult.error && /* @__PURE__ */ React12.createElement("div", { className: "mt-3 p-3 bg-red-50 rounded text-sm text-red-700" }, connectionResult.error), /* @__PURE__ */ React12.createElement("div", { className: "mt-4 text-sm text-slate-600" }, /* @__PURE__ */ React12.createElement("p", { className: "font-medium mb-2" }, "Troubleshooting tips:"), /* @__PURE__ */ React12.createElement("ul", { className: "list-disc pl-5 space-y-1 text-slate-500" }, /* @__PURE__ */ React12.createElement("li", null, "Verify your Project ID is correct"), /* @__PURE__ */ React12.createElement("li", null, "Ensure the service account JSON is valid and complete"), /* @__PURE__ */ React12.createElement("li", null, "Check that the service account has Firestore access permissions"), /* @__PURE__ */ React12.createElement("li", null, "Verify Firestore is enabled in your Firebase project"))));
-};
-
-// src/components/mysql/datasource/datasourceTestResultUI.jsx
-var import_prop_types10 = __toESM(require_prop_types());
-import React13 from "react";
-var MySQLDatasourceTestResultUI = ({ connectionResult }) => {
-  MySQLDatasourceTestResultUI.propTypes = {
-    connectionResult: import_prop_types10.default.object
-  };
-  if (!connectionResult) {
-    return /* @__PURE__ */ React13.createElement("div", { className: "flex flex-col items-center justify-center h-full text-slate-400" }, /* @__PURE__ */ React13.createElement("p", null, "Test your MySQL connection to see results here"));
-  }
-  if (connectionResult.ok) {
-    return /* @__PURE__ */ React13.createElement("div", { className: "p-4 space-y-4" }, /* @__PURE__ */ React13.createElement("div", { className: "flex items-center gap-2 text-green-600" }, /* @__PURE__ */ React13.createElement("svg", { className: "w-5 h-5", fill: "currentColor", viewBox: "0 0 20 20" }, /* @__PURE__ */ React13.createElement("path", { fillRule: "evenodd", d: "M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z", clipRule: "evenodd" })), /* @__PURE__ */ React13.createElement("span", { className: "font-medium" }, "Connection Successful!")), connectionResult.version && /* @__PURE__ */ React13.createElement("div", { className: "text-sm text-slate-600" }, /* @__PURE__ */ React13.createElement("span", { className: "font-medium" }, "Server Version:"), " ", connectionResult.version), connectionResult.databases && connectionResult.databases.length > 0 && /* @__PURE__ */ React13.createElement("div", { className: "mt-4" }, /* @__PURE__ */ React13.createElement("h4", { className: "text-sm font-medium text-slate-700 mb-2" }, "Databases Found (", connectionResult.databases.length, "):"), /* @__PURE__ */ React13.createElement("div", { className: "bg-slate-50 rounded p-3 max-h-48 overflow-y-auto" }, /* @__PURE__ */ React13.createElement("ul", { className: "space-y-1" }, connectionResult.databases.map((db, index) => /* @__PURE__ */ React13.createElement("li", { key: index, className: "text-sm text-slate-600 flex items-center gap-2" }, /* @__PURE__ */ React13.createElement("span", { className: "text-blue-500" }, "\u{1F5C4}\uFE0F"), db))))));
-  }
-  return /* @__PURE__ */ React13.createElement("div", { className: "p-4" }, /* @__PURE__ */ React13.createElement("div", { className: "flex items-center gap-2 text-red-600" }, /* @__PURE__ */ React13.createElement("svg", { className: "w-5 h-5", fill: "currentColor", viewBox: "0 0 20 20" }, /* @__PURE__ */ React13.createElement("path", { fillRule: "evenodd", d: "M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z", clipRule: "evenodd" })), /* @__PURE__ */ React13.createElement("span", { className: "font-medium" }, "Connection Failed")), connectionResult.error && /* @__PURE__ */ React13.createElement("div", { className: "mt-3 p-3 bg-red-50 rounded text-sm text-red-700" }, connectionResult.error), /* @__PURE__ */ React13.createElement("div", { className: "mt-4 text-sm text-slate-600" }, /* @__PURE__ */ React13.createElement("p", { className: "font-medium mb-2" }, "Troubleshooting tips:"), /* @__PURE__ */ React13.createElement("ul", { className: "list-disc pl-5 space-y-1 text-slate-500" }, /* @__PURE__ */ React13.createElement("li", null, "Verify the hostname and port are correct"), /* @__PURE__ */ React13.createElement("li", null, "Check that MySQL server is running and accessible"), /* @__PURE__ */ React13.createElement("li", null, "Ensure username and password are valid"), /* @__PURE__ */ React13.createElement("li", null, "Verify the database exists and user has access"), /* @__PURE__ */ React13.createElement("li", null, "Check firewall rules if connecting remotely"))));
-};
-
-// src/components/mongodb/datasource/datasourceTestResultUI.jsx
-var import_prop_types11 = __toESM(require_prop_types());
-import React14 from "react";
-var MongoDBDatasourceTestResultUI = ({ connectionResult }) => {
-  MongoDBDatasourceTestResultUI.propTypes = {
-    connectionResult: import_prop_types11.default.object
-  };
-  if (!connectionResult) {
-    return /* @__PURE__ */ React14.createElement("div", { className: "flex flex-col items-center justify-center h-full text-slate-400" }, /* @__PURE__ */ React14.createElement("p", null, "Test your MongoDB connection to see results here"));
-  }
-  if (connectionResult.ok) {
-    return /* @__PURE__ */ React14.createElement("div", { className: "p-4 space-y-4" }, /* @__PURE__ */ React14.createElement("div", { className: "flex items-center gap-2 text-green-600" }, /* @__PURE__ */ React14.createElement("svg", { className: "w-5 h-5", fill: "currentColor", viewBox: "0 0 20 20" }, /* @__PURE__ */ React14.createElement("path", { fillRule: "evenodd", d: "M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z", clipRule: "evenodd" })), /* @__PURE__ */ React14.createElement("span", { className: "font-medium" }, "Connection Successful!")), connectionResult.version && /* @__PURE__ */ React14.createElement("div", { className: "text-sm text-slate-600" }, /* @__PURE__ */ React14.createElement("span", { className: "font-medium" }, "Server Version:"), " ", connectionResult.version), connectionResult.database && /* @__PURE__ */ React14.createElement("div", { className: "text-sm text-slate-600" }, /* @__PURE__ */ React14.createElement("span", { className: "font-medium" }, "Database:"), " ", connectionResult.database), connectionResult.collections && connectionResult.collections.length > 0 && /* @__PURE__ */ React14.createElement("div", { className: "mt-4" }, /* @__PURE__ */ React14.createElement("h4", { className: "text-sm font-medium text-slate-700 mb-2" }, "Collections Found (", connectionResult.collections.length, "):"), /* @__PURE__ */ React14.createElement("div", { className: "bg-slate-50 rounded p-3 max-h-48 overflow-y-auto" }, /* @__PURE__ */ React14.createElement("ul", { className: "space-y-1" }, connectionResult.collections.map((col, index) => /* @__PURE__ */ React14.createElement("li", { key: index, className: "text-sm text-slate-600 flex items-center gap-2" }, /* @__PURE__ */ React14.createElement("span", { className: "text-green-500" }, "\u{1F4E6}"), col))))), connectionResult.collections && connectionResult.collections.length === 0 && /* @__PURE__ */ React14.createElement("div", { className: "text-sm text-slate-500" }, "No collections found in this database. You can create collections when inserting documents."));
-  }
-  return /* @__PURE__ */ React14.createElement("div", { className: "p-4" }, /* @__PURE__ */ React14.createElement("div", { className: "flex items-center gap-2 text-red-600" }, /* @__PURE__ */ React14.createElement("svg", { className: "w-5 h-5", fill: "currentColor", viewBox: "0 0 20 20" }, /* @__PURE__ */ React14.createElement("path", { fillRule: "evenodd", d: "M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z", clipRule: "evenodd" })), /* @__PURE__ */ React14.createElement("span", { className: "font-medium" }, "Connection Failed")), connectionResult.error && /* @__PURE__ */ React14.createElement("div", { className: "mt-3 p-3 bg-red-50 rounded text-sm text-red-700" }, connectionResult.error), /* @__PURE__ */ React14.createElement("div", { className: "mt-4 text-sm text-slate-600" }, /* @__PURE__ */ React14.createElement("p", { className: "font-medium mb-2" }, "Troubleshooting tips:"), /* @__PURE__ */ React14.createElement("ul", { className: "list-disc pl-5 space-y-1 text-slate-500" }, /* @__PURE__ */ React14.createElement("li", null, "Verify the connection string or host/port are correct"), /* @__PURE__ */ React14.createElement("li", null, "Check that MongoDB server is running and accessible"), /* @__PURE__ */ React14.createElement("li", null, "Ensure username and password are valid (if using authentication)"), /* @__PURE__ */ React14.createElement("li", null, "Verify the database exists or user has permissions to create it"), /* @__PURE__ */ React14.createElement("li", null, "Check if IP whitelist is configured (for MongoDB Atlas)"))));
-};
-
-// src/components/googlesheets/datasource/datasourceTestResultUI.jsx
-var import_prop_types12 = __toESM(require_prop_types());
-import React15 from "react";
-var GoogleSheetsDatasourceTestResultUI = ({ connectionResult }) => {
-  GoogleSheetsDatasourceTestResultUI.propTypes = {
-    connectionResult: import_prop_types12.default.object
-  };
-  if (!connectionResult) {
-    return /* @__PURE__ */ React15.createElement("div", { className: "flex flex-col items-center justify-center h-full text-slate-400" }, /* @__PURE__ */ React15.createElement("p", null, "Test your Google Sheets connection to see results here"));
-  }
-  if (connectionResult.ok) {
-    return /* @__PURE__ */ React15.createElement("div", { className: "p-4 space-y-4" }, /* @__PURE__ */ React15.createElement("div", { className: "flex items-center gap-2 text-green-600" }, /* @__PURE__ */ React15.createElement("svg", { className: "w-5 h-5", fill: "currentColor", viewBox: "0 0 20 20" }, /* @__PURE__ */ React15.createElement("path", { fillRule: "evenodd", d: "M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z", clipRule: "evenodd" })), /* @__PURE__ */ React15.createElement("span", { className: "font-medium" }, "Connection Successful!")), connectionResult.email && /* @__PURE__ */ React15.createElement("div", { className: "text-sm text-slate-600" }, /* @__PURE__ */ React15.createElement("span", { className: "font-medium" }, "Authenticated as:"), " ", connectionResult.email), connectionResult.spreadsheet && /* @__PURE__ */ React15.createElement("div", { className: "mt-4 p-3 bg-slate-50 rounded" }, /* @__PURE__ */ React15.createElement("div", { className: "flex items-center gap-2 mb-2" }, /* @__PURE__ */ React15.createElement("span", { className: "text-green-600" }, "\u{1F4CA}"), /* @__PURE__ */ React15.createElement("span", { className: "font-medium text-slate-700" }, connectionResult.spreadsheet.title)), connectionResult.spreadsheet.sheets && connectionResult.spreadsheet.sheets.length > 0 && /* @__PURE__ */ React15.createElement("div", { className: "mt-2" }, /* @__PURE__ */ React15.createElement("h4", { className: "text-xs font-medium text-slate-500 mb-1" }, "Sheets (", connectionResult.spreadsheet.sheets.length, "):"), /* @__PURE__ */ React15.createElement("div", { className: "flex flex-wrap gap-2" }, connectionResult.spreadsheet.sheets.map((sheet, index) => /* @__PURE__ */ React15.createElement(
-      "span",
-      {
-        key: index,
-        className: "px-2 py-1 bg-white border border-slate-200 rounded text-xs text-slate-600"
-      },
-      sheet.title
-    ))))), !connectionResult.spreadsheet && /* @__PURE__ */ React15.createElement("div", { className: "text-sm text-slate-500" }, "Authentication verified. You can now access Google Sheets."));
-  }
-  return /* @__PURE__ */ React15.createElement("div", { className: "p-4" }, /* @__PURE__ */ React15.createElement("div", { className: "flex items-center gap-2 text-red-600" }, /* @__PURE__ */ React15.createElement("svg", { className: "w-5 h-5", fill: "currentColor", viewBox: "0 0 20 20" }, /* @__PURE__ */ React15.createElement("path", { fillRule: "evenodd", d: "M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z", clipRule: "evenodd" })), /* @__PURE__ */ React15.createElement("span", { className: "font-medium" }, "Connection Failed")), connectionResult.error && /* @__PURE__ */ React15.createElement("div", { className: "mt-3 p-3 bg-red-50 rounded text-sm text-red-700" }, connectionResult.error), /* @__PURE__ */ React15.createElement("div", { className: "mt-4 text-sm text-slate-600" }, /* @__PURE__ */ React15.createElement("p", { className: "font-medium mb-2" }, "Troubleshooting tips:"), /* @__PURE__ */ React15.createElement("ul", { className: "list-disc pl-5 space-y-1 text-slate-500" }, /* @__PURE__ */ React15.createElement("li", null, "Verify the service account JSON is valid and complete"), /* @__PURE__ */ React15.createElement("li", null, "Ensure the Google Sheets API is enabled in your project"), /* @__PURE__ */ React15.createElement("li", null, "Check that the service account has access to the spreadsheet"), /* @__PURE__ */ React15.createElement("li", null, "For OAuth2, verify the refresh token is still valid"), /* @__PURE__ */ React15.createElement("li", null, "Share the spreadsheet with the service account email"))));
-};
-
-// src/components/graphql/datasource/datasourceTestResultUI.jsx
-var import_prop_types13 = __toESM(require_prop_types());
-import React16 from "react";
-var GraphQLDatasourceTestResultUI = ({ connectionResult }) => {
-  GraphQLDatasourceTestResultUI.propTypes = {
-    connectionResult: import_prop_types13.default.object
-  };
-  if (!connectionResult) {
-    return /* @__PURE__ */ React16.createElement("div", { className: "flex flex-col items-center justify-center h-full text-slate-400" }, /* @__PURE__ */ React16.createElement("p", null, "Test your GraphQL connection to see results here"));
-  }
-  if (connectionResult.ok) {
-    return /* @__PURE__ */ React16.createElement("div", { className: "p-4 space-y-4" }, /* @__PURE__ */ React16.createElement("div", { className: "flex items-center gap-2 text-green-600" }, /* @__PURE__ */ React16.createElement("svg", { className: "w-5 h-5", fill: "currentColor", viewBox: "0 0 20 20" }, /* @__PURE__ */ React16.createElement("path", { fillRule: "evenodd", d: "M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z", clipRule: "evenodd" })), /* @__PURE__ */ React16.createElement("span", { className: "font-medium" }, "Connection Successful!")), connectionResult.endpoint && /* @__PURE__ */ React16.createElement("div", { className: "text-sm text-slate-600" }, /* @__PURE__ */ React16.createElement("span", { className: "font-medium" }, "Endpoint:"), " ", connectionResult.endpoint), connectionResult.schema && /* @__PURE__ */ React16.createElement("div", { className: "mt-4" }, /* @__PURE__ */ React16.createElement("h4", { className: "text-sm font-medium text-slate-700 mb-2" }, "Schema Information:"), /* @__PURE__ */ React16.createElement("div", { className: "bg-slate-50 rounded p-3 space-y-2" }, connectionResult.schema.queryType && /* @__PURE__ */ React16.createElement("div", { className: "text-sm text-slate-600" }, /* @__PURE__ */ React16.createElement("span", { className: "font-medium text-blue-600" }, "Query Type:"), " ", connectionResult.schema.queryType), connectionResult.schema.mutationType && /* @__PURE__ */ React16.createElement("div", { className: "text-sm text-slate-600" }, /* @__PURE__ */ React16.createElement("span", { className: "font-medium text-purple-600" }, "Mutation Type:"), " ", connectionResult.schema.mutationType), connectionResult.schema.types && /* @__PURE__ */ React16.createElement("div", { className: "text-sm text-slate-600" }, /* @__PURE__ */ React16.createElement("span", { className: "font-medium text-slate-700" }, "Available Types:"), " ", connectionResult.schema.types.length))), connectionResult.types && connectionResult.types.length > 0 && /* @__PURE__ */ React16.createElement("div", { className: "mt-4" }, /* @__PURE__ */ React16.createElement("h4", { className: "text-sm font-medium text-slate-700 mb-2" }, "Types (showing first 10):"), /* @__PURE__ */ React16.createElement("div", { className: "bg-slate-50 rounded p-3 max-h-48 overflow-y-auto" }, /* @__PURE__ */ React16.createElement("div", { className: "flex flex-wrap gap-2" }, connectionResult.types.slice(0, 10).map((type7, index) => /* @__PURE__ */ React16.createElement(
-      "span",
-      {
-        key: index,
-        className: "px-2 py-1 bg-white border border-slate-200 rounded text-xs text-slate-600"
-      },
-      type7
-    ))))), !connectionResult.schema && /* @__PURE__ */ React16.createElement("div", { className: "text-sm text-slate-500" }, "GraphQL endpoint is reachable. Run an introspection query for schema details."));
-  }
-  return /* @__PURE__ */ React16.createElement("div", { className: "p-4" }, /* @__PURE__ */ React16.createElement("div", { className: "flex items-center gap-2 text-red-600" }, /* @__PURE__ */ React16.createElement("svg", { className: "w-5 h-5", fill: "currentColor", viewBox: "0 0 20 20" }, /* @__PURE__ */ React16.createElement("path", { fillRule: "evenodd", d: "M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z", clipRule: "evenodd" })), /* @__PURE__ */ React16.createElement("span", { className: "font-medium" }, "Connection Failed")), connectionResult.error && /* @__PURE__ */ React16.createElement("div", { className: "mt-3 p-3 bg-red-50 rounded text-sm text-red-700" }, connectionResult.error), /* @__PURE__ */ React16.createElement("div", { className: "mt-4 text-sm text-slate-600" }, /* @__PURE__ */ React16.createElement("p", { className: "font-medium mb-2" }, "Troubleshooting tips:"), /* @__PURE__ */ React16.createElement("ul", { className: "list-disc pl-5 space-y-1 text-slate-500" }, /* @__PURE__ */ React16.createElement("li", null, "Verify the GraphQL endpoint URL is correct"), /* @__PURE__ */ React16.createElement("li", null, "Check that the server is running and accessible"), /* @__PURE__ */ React16.createElement("li", null, "Ensure authentication credentials are valid"), /* @__PURE__ */ React16.createElement("li", null, "Verify CORS settings allow requests from this origin"), /* @__PURE__ */ React16.createElement("li", null, "Check if the endpoint requires specific headers"))));
-};
-
-// src/components/rabbitmq/datasource/datasourceTestResultUI.jsx
-var import_prop_types14 = __toESM(require_prop_types());
-import React17 from "react";
-var RabbitMQDatasourceTestResultUI = ({ connectionResult }) => {
-  RabbitMQDatasourceTestResultUI.propTypes = {
-    connectionResult: import_prop_types14.default.object
-  };
-  if (!connectionResult) {
-    return /* @__PURE__ */ React17.createElement("div", { className: "flex flex-col items-center justify-center h-full text-slate-400" }, /* @__PURE__ */ React17.createElement("p", null, "Test your RabbitMQ connection to see results here"));
-  }
-  if (connectionResult.ok) {
-    return /* @__PURE__ */ React17.createElement("div", { className: "p-4 space-y-4" }, /* @__PURE__ */ React17.createElement("div", { className: "flex items-center gap-2 text-green-600" }, /* @__PURE__ */ React17.createElement("svg", { className: "w-5 h-5", fill: "currentColor", viewBox: "0 0 20 20" }, /* @__PURE__ */ React17.createElement("path", { fillRule: "evenodd", d: "M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z", clipRule: "evenodd" })), /* @__PURE__ */ React17.createElement("span", { className: "font-medium" }, "Connection Successful!")), connectionResult.serverProperties && /* @__PURE__ */ React17.createElement("div", { className: "mt-4 p-3 bg-slate-50 rounded space-y-2" }, /* @__PURE__ */ React17.createElement("div", { className: "text-sm text-slate-600" }, /* @__PURE__ */ React17.createElement("span", { className: "font-medium" }, "Product:"), " ", connectionResult.serverProperties.product || "RabbitMQ"), connectionResult.serverProperties.version && /* @__PURE__ */ React17.createElement("div", { className: "text-sm text-slate-600" }, /* @__PURE__ */ React17.createElement("span", { className: "font-medium" }, "Version:"), " ", connectionResult.serverProperties.version)), connectionResult.queues && connectionResult.queues.length > 0 && /* @__PURE__ */ React17.createElement("div", { className: "mt-4" }, /* @__PURE__ */ React17.createElement("h4", { className: "text-sm font-medium text-slate-700 mb-2" }, "Queues (", connectionResult.queues.length, "):"), /* @__PURE__ */ React17.createElement("div", { className: "bg-slate-50 rounded p-3 max-h-48 overflow-y-auto" }, /* @__PURE__ */ React17.createElement("ul", { className: "space-y-1" }, connectionResult.queues.map((queue, index) => /* @__PURE__ */ React17.createElement("li", { key: index, className: "text-sm text-slate-600 flex items-center gap-2" }, /* @__PURE__ */ React17.createElement("span", { className: "text-orange-500" }, "\u{1F4E8}"), queue.name, " (", queue.messages, " messages)"))))));
-  }
-  return /* @__PURE__ */ React17.createElement("div", { className: "p-4" }, /* @__PURE__ */ React17.createElement("div", { className: "flex items-center gap-2 text-red-600" }, /* @__PURE__ */ React17.createElement("svg", { className: "w-5 h-5", fill: "currentColor", viewBox: "0 0 20 20" }, /* @__PURE__ */ React17.createElement("path", { fillRule: "evenodd", d: "M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z", clipRule: "evenodd" })), /* @__PURE__ */ React17.createElement("span", { className: "font-medium" }, "Connection Failed")), connectionResult.error && /* @__PURE__ */ React17.createElement("div", { className: "mt-3 p-3 bg-red-50 rounded text-sm text-red-700" }, connectionResult.error), /* @__PURE__ */ React17.createElement("div", { className: "mt-4 text-sm text-slate-600" }, /* @__PURE__ */ React17.createElement("p", { className: "font-medium mb-2" }, "Troubleshooting:"), /* @__PURE__ */ React17.createElement("ul", { className: "list-disc pl-5 space-y-1 text-slate-500" }, /* @__PURE__ */ React17.createElement("li", null, "Verify RabbitMQ server is running"), /* @__PURE__ */ React17.createElement("li", null, "Check host, port, and credentials"), /* @__PURE__ */ React17.createElement("li", null, "Ensure virtual host exists and user has access"), /* @__PURE__ */ React17.createElement("li", null, "Check firewall and network settings"))));
-};
-
-// src/components/kafka/datasource/datasourceTestResultUI.jsx
-var import_prop_types15 = __toESM(require_prop_types());
-import React18 from "react";
-var KafkaDatasourceTestResultUI = ({ connectionResult }) => {
-  KafkaDatasourceTestResultUI.propTypes = {
-    connectionResult: import_prop_types15.default.object
-  };
-  if (!connectionResult) {
-    return /* @__PURE__ */ React18.createElement("div", { className: "flex flex-col items-center justify-center h-full text-slate-400" }, /* @__PURE__ */ React18.createElement("p", null, "Test your Kafka connection to see results here"));
-  }
-  if (connectionResult.ok) {
-    return /* @__PURE__ */ React18.createElement("div", { className: "p-4 space-y-4" }, /* @__PURE__ */ React18.createElement("div", { className: "flex items-center gap-2 text-green-600" }, /* @__PURE__ */ React18.createElement("svg", { className: "w-5 h-5", fill: "currentColor", viewBox: "0 0 20 20" }, /* @__PURE__ */ React18.createElement("path", { fillRule: "evenodd", d: "M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z", clipRule: "evenodd" })), /* @__PURE__ */ React18.createElement("span", { className: "font-medium" }, "Connection Successful!")), connectionResult.brokers && /* @__PURE__ */ React18.createElement("div", { className: "text-sm text-slate-600" }, /* @__PURE__ */ React18.createElement("span", { className: "font-medium" }, "Connected Brokers:"), " ", connectionResult.brokers.join(", ")), connectionResult.topics && connectionResult.topics.length > 0 && /* @__PURE__ */ React18.createElement("div", { className: "mt-4" }, /* @__PURE__ */ React18.createElement("h4", { className: "text-sm font-medium text-slate-700 mb-2" }, "Topics (", connectionResult.topics.length, "):"), /* @__PURE__ */ React18.createElement("div", { className: "bg-slate-50 rounded p-3 max-h-48 overflow-y-auto" }, /* @__PURE__ */ React18.createElement("ul", { className: "space-y-1" }, connectionResult.topics.map((topic, index) => /* @__PURE__ */ React18.createElement("li", { key: index, className: "text-sm text-slate-600 flex items-center gap-2" }, /* @__PURE__ */ React18.createElement("span", { className: "text-purple-500" }, "\u{1F4CA}"), topic))))), (!connectionResult.topics || connectionResult.topics.length === 0) && /* @__PURE__ */ React18.createElement("div", { className: "text-sm text-slate-500" }, "No topics found. You can create topics using the createTopic operation."));
-  }
-  return /* @__PURE__ */ React18.createElement("div", { className: "p-4" }, /* @__PURE__ */ React18.createElement("div", { className: "flex items-center gap-2 text-red-600" }, /* @__PURE__ */ React18.createElement("svg", { className: "w-5 h-5", fill: "currentColor", viewBox: "0 0 20 20" }, /* @__PURE__ */ React18.createElement("path", { fillRule: "evenodd", d: "M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z", clipRule: "evenodd" })), /* @__PURE__ */ React18.createElement("span", { className: "font-medium" }, "Connection Failed")), connectionResult.error && /* @__PURE__ */ React18.createElement("div", { className: "mt-3 p-3 bg-red-50 rounded text-sm text-red-700" }, connectionResult.error), /* @__PURE__ */ React18.createElement("div", { className: "mt-4 text-sm text-slate-600" }, /* @__PURE__ */ React18.createElement("p", { className: "font-medium mb-2" }, "Troubleshooting:"), /* @__PURE__ */ React18.createElement("ul", { className: "list-disc pl-5 space-y-1 text-slate-500" }, /* @__PURE__ */ React18.createElement("li", null, "Verify Kafka brokers are running"), /* @__PURE__ */ React18.createElement("li", null, "Check broker addresses are correct"), /* @__PURE__ */ React18.createElement("li", null, "Ensure SASL credentials are valid (if enabled)"), /* @__PURE__ */ React18.createElement("li", null, "Verify network connectivity to brokers"))));
-};
-
-// src/components/redis/datasource/datasourceTestResultUI.jsx
-var import_prop_types16 = __toESM(require_prop_types());
-import React19 from "react";
-var RedisDatasourceTestResultUI = ({ connectionResult }) => {
-  RedisDatasourceTestResultUI.propTypes = {
-    connectionResult: import_prop_types16.default.object
-  };
-  if (!connectionResult) {
-    return /* @__PURE__ */ React19.createElement("div", { className: "flex flex-col items-center justify-center h-full text-slate-400" }, /* @__PURE__ */ React19.createElement("p", null, "Test your Redis connection to see results here"));
-  }
-  if (connectionResult.ok) {
-    return /* @__PURE__ */ React19.createElement("div", { className: "p-4 space-y-4" }, /* @__PURE__ */ React19.createElement("div", { className: "flex items-center gap-2 text-green-600" }, /* @__PURE__ */ React19.createElement("svg", { className: "w-5 h-5", fill: "currentColor", viewBox: "0 0 20 20" }, /* @__PURE__ */ React19.createElement("path", { fillRule: "evenodd", d: "M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z", clipRule: "evenodd" })), /* @__PURE__ */ React19.createElement("span", { className: "font-medium" }, "Connection Successful!")), connectionResult.info && /* @__PURE__ */ React19.createElement("div", { className: "mt-4 p-3 bg-slate-50 rounded space-y-2" }, connectionResult.info.redis_version && /* @__PURE__ */ React19.createElement("div", { className: "text-sm text-slate-600" }, /* @__PURE__ */ React19.createElement("span", { className: "font-medium" }, "Version:"), " ", connectionResult.info.redis_version), connectionResult.info.connected_clients && /* @__PURE__ */ React19.createElement("div", { className: "text-sm text-slate-600" }, /* @__PURE__ */ React19.createElement("span", { className: "font-medium" }, "Connected Clients:"), " ", connectionResult.info.connected_clients), connectionResult.info.used_memory_human && /* @__PURE__ */ React19.createElement("div", { className: "text-sm text-slate-600" }, /* @__PURE__ */ React19.createElement("span", { className: "font-medium" }, "Memory Used:"), " ", connectionResult.info.used_memory_human)), connectionResult.dbSize !== void 0 && /* @__PURE__ */ React19.createElement("div", { className: "text-sm text-slate-600" }, /* @__PURE__ */ React19.createElement("span", { className: "font-medium" }, "Keys in Database:"), " ", connectionResult.dbSize));
-  }
-  return /* @__PURE__ */ React19.createElement("div", { className: "p-4" }, /* @__PURE__ */ React19.createElement("div", { className: "flex items-center gap-2 text-red-600" }, /* @__PURE__ */ React19.createElement("svg", { className: "w-5 h-5", fill: "currentColor", viewBox: "0 0 20 20" }, /* @__PURE__ */ React19.createElement("path", { fillRule: "evenodd", d: "M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z", clipRule: "evenodd" })), /* @__PURE__ */ React19.createElement("span", { className: "font-medium" }, "Connection Failed")), connectionResult.error && /* @__PURE__ */ React19.createElement("div", { className: "mt-3 p-3 bg-red-50 rounded text-sm text-red-700" }, connectionResult.error), /* @__PURE__ */ React19.createElement("div", { className: "mt-4 text-sm text-slate-600" }, /* @__PURE__ */ React19.createElement("p", { className: "font-medium mb-2" }, "Troubleshooting:"), /* @__PURE__ */ React19.createElement("ul", { className: "list-disc pl-5 space-y-1 text-slate-500" }, /* @__PURE__ */ React19.createElement("li", null, "Verify Redis server is running"), /* @__PURE__ */ React19.createElement("li", null, "Check host and port settings"), /* @__PURE__ */ React19.createElement("li", null, "Ensure password is correct (if set)"), /* @__PURE__ */ React19.createElement("li", null, "Check if TLS is required"))));
+  ), /* @__PURE__ */ React8.createElement("div", { className: "w-100  h-full overflow-y-auto pb-5" }, tab4 === 0 && /* @__PURE__ */ React8.createElement(QueryResponseWebViewTab, { data: queryResult ? queryResult : "" }), tab4 === 1 && /* @__PURE__ */ React8.createElement(QueryResponseJSONTab, { data: queryResult ? queryResult : "" }), tab4 === 2 && /* @__PURE__ */ React8.createElement(QueryResponseRAWTab, { data: queryResult ? queryResult : "" }), tab4 === 3 && /* @__PURE__ */ React8.createElement(QueryResponseSchemaTab, { data: queryResult ? queryResult : {} })));
 };
 
 // src/index.js
 var GenericDatasourceTestResultUI = ({ connectionResult }) => {
   let connectionResultClass = "bg-slate-100 !border-slate-400 text-slate-700";
   let connectionResultText = "Connection not tested";
+  console.log("connectionResult", connectionResult);
   if (connectionResult === true || connectionResult?.ok === true) {
     connectionResultClass = "bg-green-100 !border-green-400 text-green-700";
     connectionResultText = connectionResult?.statusText || "Connection successful";
@@ -77106,119 +76879,50 @@ var GenericDatasourceTestResultUI = ({ connectionResult }) => {
     connectionResultClass = "bg-orange-100 !border-orange-400 text-orange-700";
     connectionResultText = "Error testing connection";
   }
-  return React20.createElement(
+  return React9.createElement(
     "div",
     { className: "p-3" },
-    React20.createElement(
+    React9.createElement(
       "div",
       {
         className: `w-full flex flex-col justify-start items-start p-3 rounded-md border ${connectionResultClass}`
       },
-      React20.createElement(
+      React9.createElement(
         "div",
         { className: "!flex !flex-row justify-start items-center" },
-        React20.createElement("span", { className: "!text-sm !font-normal" }, connectionResultText)
+        React9.createElement("span", { className: "!text-sm !font-normal" }, connectionResultText)
       )
     )
   );
 };
 var createGenericDatasourceUI = () => ({
   queryResponseView: function({ queryResult }) {
-    return React20.createElement(QueryResponseView, { queryResult });
+    return React9.createElement(QueryResponseView, { queryResult });
   },
   datasourceTestResultUI: function({ connectionResult }) {
-    return React20.createElement(GenericDatasourceTestResultUI, { connectionResult });
+    return React9.createElement(GenericDatasourceTestResultUI, { connectionResult });
+  }
+});
+var createWebUrlDatasourceUI = () => ({
+  queryResponseView: function({ queryResult }) {
+    return React9.createElement(WebViewQueryResponseView, { queryResult });
+  },
+  datasourceTestResultUI: function({ connectionResult }) {
+    return React9.createElement(GenericDatasourceTestResultUI, { connectionResult });
   }
 });
 var DATASOURCE_UI_COMPONENTS = {
-  [DATASOURCE_TYPES.POSTGRESQL.value]: {
-    queryResponseView: function({ queryResult }) {
-      return React20.createElement(QueryResponseView, { queryResult });
-    },
-    datasourceTestResultUI: function({ connectionResult }) {
-      return React20.createElement(PostgreSQLDatasourceTestResultUI, { connectionResult });
-    }
-  },
-  [DATASOURCE_TYPES.RESTAPI.value]: {
-    queryResponseView: function({ queryResult }) {
-      return React20.createElement(QueryResponseView, { queryResult });
-    },
-    datasourceTestResultUI: function({ connectionResult }) {
-      return React20.createElement(RESTAPIDatasourceTestResultUI, { connectionResult });
-    }
-  },
-  [DATASOURCE_TYPES.WEB_URL.value]: {
-    datasourceTestResultUI: function({ connectionResult }) {
-      return React20.createElement(WebURLDatasourceTestResultUI, { connectionResult });
-    },
-    queryResponseView: function({ queryResult }) {
-      return React20.createElement(WebViewQueryResponseView, { queryResult });
-    }
-  },
-  [DATASOURCE_TYPES.FIRESTORE.value]: {
-    queryResponseView: function({ queryResult }) {
-      return React20.createElement(QueryResponseView, { queryResult });
-    },
-    datasourceTestResultUI: function({ connectionResult }) {
-      return React20.createElement(FirestoreDatasourceTestResultUI, { connectionResult });
-    }
-  },
-  [DATASOURCE_TYPES.MYSQL.value]: {
-    queryResponseView: function({ queryResult }) {
-      return React20.createElement(QueryResponseView, { queryResult });
-    },
-    datasourceTestResultUI: function({ connectionResult }) {
-      return React20.createElement(MySQLDatasourceTestResultUI, { connectionResult });
-    }
-  },
-  [DATASOURCE_TYPES.MONGODB.value]: {
-    queryResponseView: function({ queryResult }) {
-      return React20.createElement(QueryResponseView, { queryResult });
-    },
-    datasourceTestResultUI: function({ connectionResult }) {
-      return React20.createElement(MongoDBDatasourceTestResultUI, { connectionResult });
-    }
-  },
-  [DATASOURCE_TYPES.GOOGLESHEETS.value]: {
-    queryResponseView: function({ queryResult }) {
-      return React20.createElement(QueryResponseView, { queryResult });
-    },
-    datasourceTestResultUI: function({ connectionResult }) {
-      return React20.createElement(GoogleSheetsDatasourceTestResultUI, { connectionResult });
-    }
-  },
-  [DATASOURCE_TYPES.GRAPHQL.value]: {
-    queryResponseView: function({ queryResult }) {
-      return React20.createElement(QueryResponseView, { queryResult });
-    },
-    datasourceTestResultUI: function({ connectionResult }) {
-      return React20.createElement(GraphQLDatasourceTestResultUI, { connectionResult });
-    }
-  },
-  [DATASOURCE_TYPES.RABBITMQ.value]: {
-    queryResponseView: function({ queryResult }) {
-      return React20.createElement(QueryResponseView, { queryResult });
-    },
-    datasourceTestResultUI: function({ connectionResult }) {
-      return React20.createElement(RabbitMQDatasourceTestResultUI, { connectionResult });
-    }
-  },
-  [DATASOURCE_TYPES.KAFKA.value]: {
-    queryResponseView: function({ queryResult }) {
-      return React20.createElement(QueryResponseView, { queryResult });
-    },
-    datasourceTestResultUI: function({ connectionResult }) {
-      return React20.createElement(KafkaDatasourceTestResultUI, { connectionResult });
-    }
-  },
-  [DATASOURCE_TYPES.REDIS.value]: {
-    queryResponseView: function({ queryResult }) {
-      return React20.createElement(QueryResponseView, { queryResult });
-    },
-    datasourceTestResultUI: function({ connectionResult }) {
-      return React20.createElement(RedisDatasourceTestResultUI, { connectionResult });
-    }
-  },
+  [DATASOURCE_TYPES.POSTGRESQL.value]: createGenericDatasourceUI(),
+  [DATASOURCE_TYPES.RESTAPI.value]: createGenericDatasourceUI(),
+  [DATASOURCE_TYPES.WEB_URL.value]: createWebUrlDatasourceUI(),
+  [DATASOURCE_TYPES.FIRESTORE.value]: createGenericDatasourceUI(),
+  [DATASOURCE_TYPES.MYSQL.value]: createGenericDatasourceUI(),
+  [DATASOURCE_TYPES.MONGODB.value]: createGenericDatasourceUI(),
+  [DATASOURCE_TYPES.GOOGLESHEETS.value]: createGenericDatasourceUI(),
+  [DATASOURCE_TYPES.GRAPHQL.value]: createGenericDatasourceUI(),
+  [DATASOURCE_TYPES.RABBITMQ.value]: createGenericDatasourceUI(),
+  [DATASOURCE_TYPES.KAFKA.value]: createGenericDatasourceUI(),
+  [DATASOURCE_TYPES.REDIS.value]: createGenericDatasourceUI(),
   // Batch 1 datasources
   [DATASOURCE_TYPES.MSSQL.value]: createGenericDatasourceUI(),
   [DATASOURCE_TYPES.SUPABASE.value]: createGenericDatasourceUI(),

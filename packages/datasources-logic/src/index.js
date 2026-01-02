@@ -14,6 +14,16 @@ import { s3TestConnection } from "./data-sources/s3/connection";
 import { elasticsearchTestConnection } from "./data-sources/elasticsearch/connection";
 import { stripeTestConnection } from "./data-sources/stripe/connection";
 
+// Data sources with newly created connection files
+import { googlesheetsTestConnection } from "./data-sources/googlesheets/connection";
+import { graphqlTestConnection } from "./data-sources/graphql/connection";
+import { mongodbTestConnection } from "./data-sources/mongodb/connection";
+import { mysqlTestConnection } from "./data-sources/mysql/connection";
+import { kafkaTestConnection } from "./data-sources/kafka/connection";
+import { rabbitmqTestConnection } from "./data-sources/rabbitmq/connection";
+import { redisTestConnection } from "./data-sources/redis/connection";
+
+
 // Batch 2 datasource connection imports
 import { oracleTestConnection } from "./data-sources/oracle/connection";
 import { sqliteTestConnection } from "./data-sources/sqlite/connection";
@@ -25,6 +35,7 @@ import { slackTestConnection } from "./data-sources/slack/connection";
 import { notionTestConnection } from "./data-sources/notion/connection";
 import { jiraTestConnection } from "./data-sources/jira/connection";
 import { googleanalyticsTestConnection } from "./data-sources/googleanalytics/connection";
+
 
 export { dataSourceRegistry };
 
@@ -58,6 +69,26 @@ export const DATASOURCE_LOGIC_COMPONENTS = {
       return await firestoreTestConnection({ datasourceOptions });
     },
   },
+  [DATASOURCE_TYPES.MYSQL.value]: {
+    testConnection: async ({ datasourceOptions }) => {
+      return await mysqlTestConnection({ datasourceOptions });
+    },
+  },
+  [DATASOURCE_TYPES.MONGODB.value]: {
+    testConnection: async ({ datasourceOptions }) => {
+      return await mongodbTestConnection({ datasourceOptions });
+    },
+  },
+  [DATASOURCE_TYPES.GOOGLESHEETS.value]: {
+    testConnection: async ({ datasourceOptions }) => {
+      return await googlesheetsTestConnection({ datasourceOptions });
+    },
+  },
+  [DATASOURCE_TYPES.GRAPHQL.value]: {
+    testConnection: async ({ datasourceOptions }) => {
+      return await graphqlTestConnection({ datasourceOptions });
+    },
+  },
   // Batch 1 datasources
   [DATASOURCE_TYPES.MSSQL.value]: {
     testConnection: async ({ datasourceOptions }) => {
@@ -77,6 +108,21 @@ export const DATASOURCE_LOGIC_COMPONENTS = {
   [DATASOURCE_TYPES.AIRTABLE.value]: {
     testConnection: async ({ datasourceOptions }) => {
       return await airtableTestConnection({ datasourceOptions });
+    },
+  },
+  [DATASOURCE_TYPES.KAFKA.value]: {
+    testConnection: async ({ datasourceOptions }) => {
+      return await kafkaTestConnection({ datasourceOptions });
+    },
+  },
+  [DATASOURCE_TYPES.RABBITMQ.value]: {
+    testConnection: async ({ datasourceOptions }) => {
+      return await rabbitmqTestConnection({ datasourceOptions });
+    },
+  },
+  [DATASOURCE_TYPES.REDIS.value]: {
+    testConnection: async ({ datasourceOptions }) => {
+      return await redisTestConnection({ datasourceOptions });
     },
   },
   [DATASOURCE_TYPES.S3.value]: {
