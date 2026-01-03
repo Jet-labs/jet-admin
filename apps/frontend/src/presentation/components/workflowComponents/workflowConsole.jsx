@@ -55,7 +55,7 @@ export const WorkflowConsole = ({
   };
 
   return (
-    <div className={`flex flex-col bg-slate-900 rounded-lg border border-slate-700 shadow-xl overflow-hidden ${className}`}>
+    <div className={`flex flex-col bg-slate-900 rounded border border-slate-700 shadow-xl overflow-hidden ${className}`}>
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-2 bg-slate-800 border-b border-slate-700">
         <div className="flex items-center gap-2">

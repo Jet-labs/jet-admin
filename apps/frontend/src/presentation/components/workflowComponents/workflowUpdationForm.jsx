@@ -3,17 +3,31 @@ import PropTypes from "prop-types";
 import { CONSTANTS } from "../../../constants";
 import { formValidations } from "../../../utils/formValidation";
 import { WorkflowEditor } from "./workflowEditor";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { updateWorkflowAPI } from "../../../data/apis/workflow";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { getWorkflowByIDAPI, updateWorkflowAPI } from "../../../data/apis/workflow";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { CircularProgress } from "@mui/material";
+import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 
-export const WorkflowUpdationForm = ({ tenantID, workflow }) => {
+export const WorkflowUpdationForm = ({ tenantID, workflowID }) => {
   WorkflowUpdationForm.propTypes = {
-    tenantID: PropTypes.number.isRequired,
-    workflow: PropTypes.object.isRequired,
+    tenantID: PropTypes.string.isRequired,
+    workflowID: PropTypes.string.isRequired,
   };
   const queryClient = useQueryClient();
+
+  const {
+    isLoading: isLoadingWorkflow,
+    data: workflow,
+    error: loadWorkflowError,
+    isFetching: isFetchingWorkflow,
+    isRefetching: isRefetechingWorkflow,
+    refetch: refetchWorkflow,
+  } = useQuery({
+    queryKey: [CONSTANTS.REACT_QUERY_KEYS.WORKFLOWS(tenantID), workflowID],
+    queryFn: () => getWorkflowByIDAPI({ tenantID, workflowID }),
+    refetchOnWindowFocus: false,
+  });
 
   const {
     isPending: isUpdatingWorkflow,
@@ -76,12 +90,19 @@ export const WorkflowUpdationForm = ({ tenantID, workflow }) => {
         {CONSTANTS.STRINGS.UPDATE_WORKFLOW_BUTTON_TEXT}
       </button>
     </div>
-
-    <form
+    <ReactQueryLoadingErrorWrapper
+      isLoading={isLoadingWorkflow}
+      isFetching={isFetchingWorkflow}
+      isRefetching={isRefetechingWorkflow}
+      refetch={refetchWorkflow}
+      error={loadWorkflowError}
+    ><form
       className="w-full h-full "
       onSubmit={workflowUpdationForm.handleSubmit}
     >
-      <WorkflowEditor workflowEditorForm={workflowUpdationForm} />
-    </form>
+        <WorkflowEditor workflowEditorForm={workflowUpdationForm} />
+      </form></ReactQueryLoadingErrorWrapper>
+
+
   </div>
 }

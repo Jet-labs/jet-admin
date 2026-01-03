@@ -1,3 +1,5 @@
+const Logger = require("../../../../utils/logger");
+
 /**
  * End Node Handler
  * Collects outputs and marks workflow as terminal
@@ -15,10 +17,20 @@ async function execute(nodeConfig, context, helpers) {
   for (const param of outputParameters) {
     const { name, sourceVariable } = param;
     if (name && sourceVariable) {
-      workflowOutput[name] = resolveFromContext(sourceVariable);
+      const value = resolveFromContext(sourceVariable);
+      Logger.log('info', {
+        message: 'endHandler:collectingOutput',
+        params: { instanceID: helpers.instanceID, name, sourceVariable, value },
+      });
+      workflowOutput[name] = value;
     }
   }
-  
+
+  Logger.log('info', {
+    message: 'endHandler:executed',
+    params: { instanceID: helpers.instanceID, outputParameters, output: workflowOutput },
+  });
+
   const output = {
     status,
     workflowOutput,

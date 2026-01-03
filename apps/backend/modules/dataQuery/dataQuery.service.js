@@ -14,6 +14,7 @@ const { v4: uuid } = require("uuid");
 const dataQueryService = {};
 const { keyValueTypeArrayToObject } = require("../../utils/json.util");
 const { QueryEngine } = require("./queryEngine/engine");
+const { getCreationContextFromAuthContext } = require("../../utils/auth.context.utils");
 
 dataQueryService.getDataQueriesWithDatasource = async ({
   userID,
@@ -135,6 +136,7 @@ dataQueryService.createDataQuery = async ({
   datasourceID = null,
   datasourceType,
   runOnLoad = false,
+  authContext,
 }) => {
   Logger.log("info", {
     message: "dataQueryService:createDataQuery:params",
@@ -146,10 +148,12 @@ dataQueryService.createDataQuery = async ({
       datasourceID,
       datasourceType,
       runOnLoad,
+      authContext,
     },
   });
 
   try {
+    const { creatorID, createdByApiKeyID } = getCreationContextFromAuthContext(authContext);
     await prisma.tblDataQueries.create({
       data: {
         tenantID: tenantID,
@@ -157,7 +161,8 @@ dataQueryService.createDataQuery = async ({
         dataQueryOptions,
         datasourceID: isUUID(datasourceID) ? datasourceID : null,
         datasourceType,
-        creatorID: userID,
+        creatorID,
+        createdByApiKeyID,
         runOnLoad,
       },
     });

@@ -1,6 +1,7 @@
 const { expressUtils } = require("../../utils/express.utils");
 const Logger = require("../../utils/logger");
 const { tenantRoleService } =require("./tenantRole.service");
+const { getServiceAuthContext } = require("../../utils/auth.context.utils");
 
 const tenantRoleController = {};
 
@@ -53,13 +54,15 @@ tenantRoleController.getAllTenantRoles = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID } = req.params;
+    const authContext = getServiceAuthContext(req);
     Logger.log("info", {
       message: "tenantRoleController:getAllTenantRoles:params",
-      params: { userID: user.userID, tenantID },
+      params: { userID: user.userID, tenantID, authContext },
     });
     const roles = await tenantRoleService.getAllTenantRoles({
       userID: user.userID,
       tenantID: tenantID,
+      authContext,
     });
 
     Logger.log("success", {

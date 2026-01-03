@@ -231,7 +231,12 @@ export const MainDrawerList = () => {
       icon: SiQuantconnect,
       path: CONSTANTS.ROUTES.VIEW_QUERIES.path(tenantID),
     },
-
+    {
+      type: "link",
+      title: CONSTANTS.STRINGS.MAIN_DRAWER_WORKFLOWS_TITLE,
+      icon: LuWorkflow,
+      path: CONSTANTS.ROUTES.VIEW_WORKFLOWS.path(tenantID),
+    },
     {
       type: "link",
       title: CONSTANTS.STRINGS.MAIN_DRAWER_WIDGETS_TITLE,
@@ -256,12 +261,7 @@ export const MainDrawerList = () => {
       icon: RiCalendarScheduleFill,
       path: CONSTANTS.ROUTES.VIEW_CRON_JOBS.path(tenantID),
     },
-    {
-      type: "link",
-      title: CONSTANTS.STRINGS.MAIN_DRAWER_WORKFLOWS_TITLE,
-      icon: LuWorkflow,
-      path: CONSTANTS.ROUTES.VIEW_WORKFLOWS.path(tenantID),
-    },
+
     // {
     //   type: "link",
     //   title: CONSTANTS.STRINGS.MAIN_DRAWER_SQL_EDITOR_TITLE,

@@ -156,6 +156,40 @@ export const deleteWorkflowAPI = async ({ tenantID, workflowID }) => {
 };
 
 /**
+ * Execute a saved workflow by ID
+ */
+export const executeWorkflowAPI = async ({ tenantID, workflowID, inputParams = {} }) => {
+  try {
+    const url =
+      CONSTANTS.SERVER_HOST +
+      CONSTANTS.APIS.WORKFLOW.executeWorkflowAPI(tenantID, workflowID);
+    const bearerToken = await firebaseAuth.currentUser.getIdToken();
+    if (bearerToken) {
+      const response = await axios.post(
+        url,
+        { inputParams },
+        {
+          headers: {
+            authorization: `Bearer ${bearerToken}`,
+          },
+        }
+      );
+      if (response.data && response.data.success === true) {
+        return response.data;
+      } else if (response.data.error) {
+        throw response.data.error;
+      } else {
+        throw CONSTANTS.ERROR_CODES.SERVER_ERROR;
+      }
+    } else {
+      throw CONSTANTS.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
  * Test run a workflow without saving (uses in-memory nodes/edges)
  */
 export const testWorkflowAPI = async ({ tenantID, nodes, edges, inputParams = {} }) => {

@@ -1,6 +1,7 @@
 const { expressUtils } = require("../../utils/express.utils");
 const Logger = require("../../utils/logger");
 const { databaseTriggerService } = require("./databaseTrigger.service");
+const { getServiceAuthContext } = require("../../utils/auth.context.utils");
 
 const databaseTriggerController = {};
 
@@ -14,10 +15,11 @@ databaseTriggerController.getAllDatabaseTriggers = async (req, res) => {
   try {
     const { user, dbPool } = req;
     const { databaseSchemaName } = req.params;
+    const authContext = getServiceAuthContext(req);
 
     Logger.log("info", {
       message: "databaseTriggerController:getAllDatabaseTriggers:params",
-      params: { userID: user.userID, databaseSchemaName },
+      params: { userID: user.userID, databaseSchemaName, authContext },
     });
 
     const databaseTriggers =
@@ -25,6 +27,7 @@ databaseTriggerController.getAllDatabaseTriggers = async (req, res) => {
         userID: user.userID,
         dbPool,
         databaseSchemaName,
+        authContext,
       });
 
     Logger.log("success", {

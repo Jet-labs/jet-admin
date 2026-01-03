@@ -5,6 +5,7 @@ import { CONSTANTS } from "../../../constants";
 import { useWidgetsState } from "../../../logic/contexts/widgetsContext";
 
 import { DataQueryTestingPanel } from "../dataQueryComponents/dataQueryTestingPanel";
+import { WorkflowTestingPanel } from "../workflowComponents/workflowTestingPanel";
 import { WidgetDatasetField } from "./widgetDatasetField";
 import { CollapseComponent } from "../ui/collapseComponent";
 import { WidgetAdvancedOptions } from "./widgetAdvancedOptions";
@@ -19,52 +20,19 @@ export const WidgetEditor = ({ widgetEditorForm }) => {
     widgetEditorForm: PropTypes.object.isRequired,
   };
   const {
-    dataQueries,
-    isLoadingDataQueries,
-    isFetchingDataQueries,
-    loadDataQueriesError,
     workflows,
     isLoadingWorkflows,
   } = useWidgetsState();
 
-  const [selectedQueryForTesting, setSelectedQueryForTesting] = useState(false);
-  const _handleAddDataset = useCallback(() => {
-    widgetEditorForm.setFieldValue("dataQueries", [
-      ...widgetEditorForm.values["dataQueries"],
-      {
-        tempId: new Date().getTime(),
-        title: "",
-        dataSourceType: "query", // 'query' or 'workflow'
-        dataQueryID: null,
-        workflowID: null,
-        workflowArgValues: {},
-        outputVarMapping: null,
-        valueType: "static",
-        parameters: WIDGETS_MAP[widgetEditorForm.values.widgetType].sampleConfig,
-        dataQueryArgValues: {},
-        datasetFields: {
-          xAxis: "",
-          yAxis: "",
-        },
-      },
-    ]);
-  }, [widgetEditorForm]);
+  console.log({ workflows })
 
-  const _handleOnDataQueryListDragEnd = (result) => {
-    if (!result.destination) return;
-
-    const items = Array.from(widgetEditorForm.values.dataQueries);
-    const [reorderedItem] = items.splice(result.source.index, 1);
-    items.splice(result.destination.index, 0, reorderedItem);
-
-    widgetEditorForm.setFieldValue("dataQueries", items);
-  };
+  const [selectedWorkflowForTesting, setSelectedWorkflowForTesting] = useState(null);
 
   return (
     <>
-      <DataQueryTestingPanel
-        selectedQueryForTesting={selectedQueryForTesting}
-        setSelectedQueryForTesting={setSelectedQueryForTesting}
+      <WorkflowTestingPanel
+        selectedWorkflowForTesting={selectedWorkflowForTesting}
+        setSelectedWorkflowForTesting={setSelectedWorkflowForTesting}
       />
 
       <div className="flex flex-col justify-start items-stretch gap-2 p-2 rounded bg-slate-100">
@@ -134,11 +102,6 @@ export const WidgetEditor = ({ widgetEditorForm }) => {
           />
         </div>
       )}
-      {/* <WidgetCustomCSSForm
-        tenantID={tenantID}
-        widgetID={widgetID}
-        widgetForm={widgetEditorForm}
-      /> */}
       <div className="flex flex-col justify-start items-stretch gap-2 p-2 rounded bg-slate-100">
         <div>
           <label
@@ -162,58 +125,23 @@ export const WidgetEditor = ({ widgetEditorForm }) => {
           />
         </div>
       </div>
-
-      <div className="flex flex-row justify-between w-full items-center">
-        <label className="block text-xs font-medium text-slate-500 -mb-1">
-          {CONSTANTS.STRINGS.WIDGET_EDITOR_FORM_DATASET_FIELD_LABEL}
+      <div className="flex flex-col justify-start items-stretch gap-2 rounded">
+        <label className="block text-xs font-medium text-slate-500">
+          Workflow Data Source
         </label>
-        <button
-          onClick={_handleAddDataset}
-          disabled={isLoadingDataQueries}
-          type="button"
-          className="flex flex-row items-center justify-center rounded bg-transparent px-3 py-1 text-xs text-[#646cff] hover:bg-transparent border-0 hover:border-0 focus:border-0 focus:outline-none focus:border-none outline-none"
-        >
-          <FaPlus className="!w-3 !h-3 !text-[#646cff] mr-1" />
-          {CONSTANTS.STRINGS.WIDGET_EDITOR_FORM_ADD_DATASET_BUTTON}
-        </button>
+
+        <WidgetDatasetField
+          // key={widgetEditorForm.values.workflowSource.tempId}
+          index={0}
+          widgetForm={widgetEditorForm}
+          workflows={workflows}
+          datasetFields={
+            WIDGETS_MAP[widgetEditorForm.values.widgetType]?.datasetFields || []
+          }
+          setSelectedWorkflowForTesting={setSelectedWorkflowForTesting}
+        />
       </div>
 
-      <ReactQueryLoadingErrorWrapper
-        isLoading={isLoadingDataQueries}
-        isFetching={isFetchingDataQueries}
-        error={loadDataQueriesError}
-      >
-        <DragDropContext onDragEnd={_handleOnDataQueryListDragEnd}>
-          <Droppable type="group" droppableId="droppable">
-            {(provided) => (
-              <div
-                {...provided.droppableProps}
-                ref={provided.innerRef}
-                className="space-y-2 h-full overflow-y-auto"
-              >
-                {widgetEditorForm.values.dataQueries?.map((query, index) => {
-                  return WIDGETS_MAP[widgetEditorForm.values.widgetType] ? (
-                    <WidgetDatasetField
-                      key={query.tempId} // Unique key from tempId
-                      index={index}
-                      widgetForm={widgetEditorForm}
-                      dataQueries={dataQueries}
-                      workflows={workflows}
-                      datasetFields={
-                        WIDGETS_MAP[widgetEditorForm.values.widgetType]
-                          .datasetFields
-                      }
-                      selectedQueryForTesting={selectedQueryForTesting}
-                      setSelectedQueryForTesting={setSelectedQueryForTesting}
-                    />
-                  ) : null;
-                })}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        </DragDropContext>
-      </ReactQueryLoadingErrorWrapper>
     </>
   );
 };

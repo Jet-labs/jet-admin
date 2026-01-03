@@ -5,6 +5,7 @@ const constants = require("../../constants");
 const { expressUtils } = require("../../utils/express.utils");
 const Logger = require("../../utils/logger");
 const { authService } = require("./auth.service");
+const { AUTH_TYPES } = require("../../types/auth.types");
 
 //auth middlewares
 const authMiddleware = {};
@@ -77,6 +78,12 @@ authMiddleware.authProvider = async function (req, res, next) {
           req.user = await authService.getUserFromFirebaseID({
             firebaseID: decodedIdToken.uid,
           });
+          // Set auth context for user authentication
+          req.authContext = {
+            authType: AUTH_TYPES.USER,
+            user: req.user,
+            apiKey: null,
+          };
         } catch (error) {
           Logger.log("error", {
             message: "authMiddleware:authProvider:catch-3",
@@ -122,9 +129,27 @@ authMiddleware.authProvider = async function (req, res, next) {
       } else {
         Logger.log("success", {
           message: "authMiddleware:authProvider:success",
-          params: { creatorID: apiKeyData?.creatorID },
+          params: {
+            creatorID: apiKeyData?.creatorID,
+            apiKeyID: apiKeyData?.apiKeyID,
+            authType: AUTH_TYPES.API_KEY,
+          },
         });
+        // Set user to API key creator for backward compatibility
         req.user = apiKeyData.tblUsers;
+        // Set auth context for API key authentication
+        req.authContext = {
+          authType: AUTH_TYPES.API_KEY,
+          user: apiKeyData.tblUsers,
+          apiKey: {
+            apiKeyID: apiKeyData.apiKeyID,
+            tenantID: apiKeyData.tenantID,
+            apiKeyTitle: apiKeyData.apiKeyTitle,
+            creatorID: apiKeyData.creatorID,
+            isDisabled: apiKeyData.isDisabled,
+            createdAt: apiKeyData.createdAt,
+          },
+        };
         return next();
       }
     } catch (error) {
@@ -202,56 +227,92 @@ authMiddleware.checkUserPermissions = (
    */
   return async (req, res, next) => {
     try {
-      const { user } = req;
+      const { user, authContext } = req;
       const { tenantID } = req.params;
-      const userID = user.userID;
+      const userID = user?.userID;
+      const authType = authContext?.authType || AUTH_TYPES.USER;
+      const apiKeyID = authContext?.apiKey?.apiKeyID;
 
       // Log the incoming request for debugging
       Logger.log("info", {
         message: "authMiddleware:checkUserPermissions:params",
-        params: { userID, tenantID, requiredPermissions, requireAll },
+        params: { userID, tenantID, requiredPermissions, requireAll, authType, apiKeyID },
       });
 
-      // Validate user and tenant information
-      if (!userID || !tenantID) {
+      // Validate tenant information
+      if (!tenantID) {
         Logger.log("error", {
-          message: "authMiddleware:checkUserPermissions:catch-2",
-          params: {
-            userID,
-            tenantID,
-            error: "User or Tenant information missing",
-          },
+          message: "authMiddleware:checkUserPermissions:missing-tenant",
+          params: { tenantID, error: "Tenant information missing" },
         });
         return expressUtils.sendResponse(
           res,
           false,
           {},
-          "User or Tenant information missing"
+          "Tenant information missing"
         );
       }
-      const permissionCheck = await authService.checkUserPermissions({
-        userID,
-        tenantID: tenantID,
-        requiredPermissions,
-        requireAll,
-      });
 
-      // Permission check passed
+      let permissionCheck;
+
+      // Check permissions based on auth type
+      if (authType === AUTH_TYPES.API_KEY && apiKeyID) {
+        // API Key authentication - check API key's assigned roles
+        Logger.log("info", {
+          message: "authMiddleware:checkUserPermissions:api-key-auth",
+          params: { apiKeyID, tenantID, requiredPermissions },
+        });
+
+        permissionCheck = await authService.checkAPIKeyPermissions({
+          apiKeyID,
+          tenantID,
+          requiredPermissions,
+          requireAll,
+        });
+      } else {
+        // User authentication - check user's roles
+        if (!userID) {
+          Logger.log("error", {
+            message: "authMiddleware:checkUserPermissions:missing-user",
+            params: { userID, error: "User information missing" },
+          });
+          return expressUtils.sendResponse(
+            res,
+            false,
+            {},
+            "User information missing"
+          );
+        }
+
+        permissionCheck = await authService.checkUserPermissions({
+          userID,
+          tenantID,
+          requiredPermissions,
+          requireAll,
+        });
+      }
+
+      // Log permission check result
       Logger.log("info", {
         message: "authMiddleware:checkUserPermissions:permissionCheck",
         params: {
           userID,
+          apiKeyID,
+          authType,
           tenantID,
           requiredPermissions,
           requireAll,
           permissionCheck,
         },
       });
+
       if (permissionCheck.permission) {
         Logger.log("success", {
           message: "authMiddleware:checkUserPermissions:success",
           params: {
             userID,
+            apiKeyID,
+            authType,
             tenantID,
             requiredPermissions,
             requireAll,
@@ -260,12 +321,15 @@ authMiddleware.checkUserPermissions = (
         return next();
       } else {
         Logger.log("error", {
-          message: "authMiddleware:checkUserPermissions:catch-2",
+          message: "authMiddleware:checkUserPermissions:permission-denied",
           params: {
             userID,
+            apiKeyID,
+            authType,
             tenantID,
             requiredPermissions,
             requireAll,
+            reason: permissionCheck.reason,
           },
         });
         return expressUtils.sendResponse(

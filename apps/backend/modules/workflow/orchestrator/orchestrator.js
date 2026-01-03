@@ -75,17 +75,21 @@ async function handleTaskResult(result) {
     if (nodeType === 'end') {
       // Workflow complete
       const finalStatus = output?.status || 'success';
+      Logger.log('info', {
+        message: 'orchestrator:workflowComplete:output',
+        params: { instanceID, output },
+      });
       await stateManager.completeInstance(
         instanceID,
         finalStatus === 'success' ? 'COMPLETED' : 'FAILED',
-        updatedInstance.contextData
+        { ...updatedInstance.contextData, output: output?.workflowOutput }
       );
       
       // *** Emit workflow completion via WebSocket ***
       socketIO.to(instanceID).emit(constants.SOCKET_EMIT_EVENTS.WORKFLOW_STATUS_UPDATE, {
         instanceID,
         status: finalStatus === 'success' ? 'COMPLETED' : 'FAILED',
-        contextData: updatedInstance.contextData,
+        contextData: { ...updatedInstance.contextData, output: output?.workflowOutput },
       });
       
       Logger.log('success', { message: 'orchestrator:workflowCompleted', params: { instanceID } });

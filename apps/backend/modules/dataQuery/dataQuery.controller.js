@@ -1,6 +1,7 @@
 const { expressUtils } = require("../../utils/express.utils");
 const Logger = require("../../utils/logger");
 const { dataQueryService } = require("./dataQuery.service");
+const { getServiceAuthContext } = require("../../utils/auth.context.utils");
 
 const dataQueryController = {};
 
@@ -13,17 +14,20 @@ dataQueryController.getAllDataQueries = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID } = req.params;
+    const authContext = getServiceAuthContext(req);
     Logger.log("info", {
       message: "dataQueryController:getAllDataQueries:params",
       params: {
         userID: user.userID,
         tenantID,
+        authContext,
       },
     });
 
     const dataQueries = await dataQueryService.getAllDataQueries({
       userID: user.userID,
       tenantID,
+      authContext,
     });
 
     Logger.log("success", {
@@ -57,6 +61,7 @@ dataQueryController.createDataQuery = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID } = req.params;
+    const authContext = getServiceAuthContext(req);
     const {
       dataQueryTitle,
       dataQueryOptions,
@@ -75,6 +80,7 @@ dataQueryController.createDataQuery = async (req, res) => {
         datasourceID,
         datasourceType,
         runOnLoad,
+        authContext,
       },
     });
 
@@ -86,6 +92,7 @@ dataQueryController.createDataQuery = async (req, res) => {
       datasourceID,
       datasourceType,
       runOnLoad,
+      authContext,
     });
 
     Logger.log("success", {

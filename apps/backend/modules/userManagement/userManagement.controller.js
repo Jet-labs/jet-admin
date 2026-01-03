@@ -3,6 +3,7 @@ const { expressUtils } = require("../../utils/express.utils");
 const Logger = require("../../utils/logger");
 const { authService } = require("../auth/auth.service");
 const { userManagementService } = require("./userManagement.service");
+const { getServiceAuthContext } = require("../../utils/auth.context.utils");
 
 const userManagementController = {};
 
@@ -56,10 +57,11 @@ userManagementController.getAllTenantUsers = async (req, res) => {
     const { user } = req;
     const { tenantID } = req.params;
     const { skip, take } = parseUserManagementQueryParams(req.query);
+    const authContext = getServiceAuthContext(req);
 
     Logger.log("info", {
       message: "userManagementController:getAllTenantUsers:params",
-      params: { userID: user.userID, tenantID, skip, take },
+      params: { userID: user.userID, tenantID, skip, take, authContext },
     });
 
     const users = await userManagementService.getAllTenantUsers({
@@ -67,6 +69,7 @@ userManagementController.getAllTenantUsers = async (req, res) => {
       tenantID: tenantID,
       skip,
       take,
+      authContext,
     });
 
     Logger.log("success", {

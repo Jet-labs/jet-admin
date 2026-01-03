@@ -2,6 +2,7 @@ const constants = require("../../constants");
 const { expressUtils } = require("../../utils/express.utils");
 const Logger = require("../../utils/logger");
 const { tenantService } = require("./tenant.service");
+const { getServiceAuthContext } = require("../../utils/auth.context.utils");
 
 const tenantController = {};
 
@@ -15,14 +16,16 @@ tenantController.getUserTenantByID = async (req, res) => {
   try {
     const { user, dbPool } = req;
     const { tenantID } = req.params;
+    const authContext = getServiceAuthContext(req);
     Logger.log("info", {
       message: "tenantController:getUserTenantByID:params",
-      params: { userID: user.userID, tenantID },
+      params: { userID: user.userID, tenantID, authContext },
     });
     const tenant = await tenantService.getUserTenantByID({
       userID: user.userID,
       tenantID: tenantID,
       dbPool,
+      authContext,
     });
     Logger.log("success", {
       message: "tenantController:getUserTenantByID:tenant",
@@ -111,6 +114,7 @@ tenantController.createNewTenant = async (req, res) => {
   try {
     const { user } = req;
     const { tenantTitle, tenantLogoURL, tenantDBType, tenantDBURL } = req.body;
+    const authContext = getServiceAuthContext(req);
     Logger.log("info", {
       message: "tenantController:createNewTenant:params",
       params: {
@@ -119,6 +123,7 @@ tenantController.createNewTenant = async (req, res) => {
         tenantLogoURL,
         tenantDBType,
         tenantDBURL,
+        authContext,
       },
     });
     const newTenant = await tenantService.createTenant({
@@ -127,6 +132,7 @@ tenantController.createNewTenant = async (req, res) => {
       tenantLogoURL,
       tenantDBType,
       tenantDBURL,
+      authContext,
     });
     Logger.log("success", {
       message: "tenantController:createNewTenant:createdNewTenant",

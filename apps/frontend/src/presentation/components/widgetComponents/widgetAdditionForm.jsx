@@ -24,25 +24,15 @@ const defaultWidgetType = WIDGET_TYPES.BAR_CHART.value;
 const initialValues = {
   widgetTitle: "",
   widgetType: defaultWidgetType,
-  dataQueries: [
-    {
-      title: "",
-      dataQueryID: null,
-      valueType: "static",
-      parameters: WIDGETS_MAP[defaultWidgetType].sampleConfig,
-      dataQueryArgValues: {},
-      datasetFields: {
-        xAxis: "",
-        yAxis: "",
-      },
-    },
-  ],
   widgetConfig: {
     containerCss: {},
     widgetCss: {},
     containerTailwindCss: "",
     widgetTailwindCss: "text-slate-700",
+    refetchInterval: 0,
   },
+  workflowID: null,
+  workflowConfig: {},// For workflow mode - single workflow object
 };
 
 export const WidgetAdditionForm = ({ tenantID }) => {
@@ -95,16 +85,7 @@ export const WidgetAdditionForm = ({ tenantID }) => {
     validateOnMount: false,
     validateOnChange: false,
     onSubmit: (values) => {
-      // Separate dataQueries into query and workflow sources
-      const allDataSources = values.dataQueries || [];
-      const dataQueries = allDataSources.filter(ds => ds.dataSourceType !== 'workflow');
-      const workflowSources = allDataSources.filter(ds => ds.dataSourceType === 'workflow');
-
-      addWidget({
-        ...values,
-        dataQueries,
-        workflowSources,
-      });
+      addWidget(values);
     },
   });
 

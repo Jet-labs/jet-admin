@@ -410,5 +410,182 @@ authService.checkPermissions = (
   }
 };
 
+/**
+ * Fetches all roles and their associated permissions for an API key.
+ *
+ * @param {String} apiKeyID - The ID of the API key.
+ * @returns {Promise<Array>} - List of role mappings with permissions.
+ */
+authService.fetchAPIKeyRolesAndPermissions = async (apiKeyID) => {
+  Logger.log("info", {
+    message: "authService:fetchAPIKeyRolesAndPermissions:params",
+    params: { apiKeyID },
+  });
+
+  const roleMappings = await prisma.tblAPIKeyRoleMappings.findMany({
+    where: { apiKeyID },
+    include: {
+      tblRoles: {
+        include: {
+          tblRolePermissionMappings: {
+            include: {
+              tblPermissions: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  Logger.log("info", {
+    message: "authService:fetchAPIKeyRolesAndPermissions:result",
+    params: { apiKeyID, roleCount: roleMappings.length },
+  });
+
+  return roleMappings;
+};
+
+/**
+ * Extracts all unique permissions from API key role mappings into a Set.
+ *
+ * @param {Array} roleMappings - List of role mappings with permissions.
+ * @returns {Set<string>} - Set of unique permission names.
+ */
+authService.extractAPIKeyPermissions = (roleMappings) => {
+  const permissions = new Set();
+
+  for (const mapping of roleMappings) {
+    const role = mapping.tblRoles;
+    if (!role) continue;
+
+    const permissionMappings = role.tblRolePermissionMappings;
+    for (const permMapping of permissionMappings) {
+      const permission = permMapping.tblPermissions;
+      if (permission) {
+        permissions.add(permission.permissionTitle.trim().toLowerCase());
+      }
+    }
+  }
+
+  return permissions;
+};
+
+/**
+ * Checks if an API key has the required permissions.
+ *
+ * @param {object} params - Input parameters.
+ * @param {String} params.apiKeyID - The ID of the API key.
+ * @param {String} params.tenantID - The ID of the tenant.
+ * @param {Array<string>} params.requiredPermissions - List of required permissions.
+ * @param {Boolean} [params.requireAll=true] - Whether the API key must have ALL or ANY of the required permissions.
+ * @returns {Promise<{permission: boolean, reason?: string}>} - Result of the permission check.
+ */
+authService.checkAPIKeyPermissions = async ({
+  apiKeyID,
+  tenantID,
+  requiredPermissions,
+  requireAll = true,
+}) => {
+  try {
+    // Input Validation
+    if (
+      !Array.isArray(requiredPermissions) ||
+      !requiredPermissions.every((perm) => typeof perm === "string")
+    ) {
+      throw new Error("Invalid requiredPermissions");
+    }
+    if (typeof requireAll !== "boolean") {
+      throw new Error("Invalid requireAll");
+    }
+
+    // Normalize Permissions
+    const normalizePermission = (perm) => perm.trim().toLowerCase();
+    requiredPermissions = requiredPermissions.map(normalizePermission);
+
+    Logger.log("info", {
+      message: "authService:checkAPIKeyPermissions:params",
+      params: { apiKeyID, tenantID, requiredPermissions, requireAll },
+    });
+
+    // Step 1: Verify API key exists and belongs to the tenant
+    const apiKey = await prisma.tblAPIKeys.findFirst({
+      where: {
+        apiKeyID,
+        tenantID,
+        isDisabled: false,
+      },
+    });
+
+    if (!apiKey) {
+      Logger.log("error", {
+        message: "authService:checkAPIKeyPermissions:api-key-not-found",
+        params: { apiKeyID, tenantID },
+      });
+      return {
+        permission: false,
+        reason: "API key not found or disabled",
+      };
+    }
+
+    // Step 2: Fetch all roles and permissions assigned to the API key
+    const roleMappings = await authService.fetchAPIKeyRolesAndPermissions(apiKeyID);
+
+    if (roleMappings.length === 0) {
+      Logger.log("error", {
+        message: "authService:checkAPIKeyPermissions:no-roles-assigned",
+        params: { apiKeyID, tenantID },
+      });
+      return {
+        permission: false,
+        reason: "API key has no roles assigned",
+      };
+    }
+
+    // Extract API key permissions into a Set
+    const apiKeyPermissions = authService.extractAPIKeyPermissions(roleMappings);
+
+    Logger.log("info", {
+      message: "authService:checkAPIKeyPermissions:permissions",
+      params: {
+        apiKeyID,
+        tenantID,
+        permissionCount: apiKeyPermissions.size,
+        permissions: Array.from(apiKeyPermissions),
+      },
+    });
+
+    // Step 3: Check if the API key has the required permissions
+    // Reuse the same checkPermissions logic used for users
+    const hasRequiredPermissions = authService.checkPermissions(
+      apiKeyPermissions,
+      requiredPermissions,
+      requireAll
+    );
+
+    if (!hasRequiredPermissions) {
+      Logger.log("error", {
+        message: "authService:checkAPIKeyPermissions:insufficient-permissions",
+        params: { apiKeyID, tenantID, requiredPermissions, requireAll },
+      });
+      return {
+        permission: false,
+        reason: "Insufficient permissions for API key",
+      };
+    }
+
+    // Permission check passed
+    Logger.log("success", {
+      message: "authService:checkAPIKeyPermissions:success",
+      params: { apiKeyID, tenantID, requiredPermissions, requireAll },
+    });
+    return { permission: true };
+  } catch (error) {
+    Logger.log("error", {
+      message: "authService:checkAPIKeyPermissions:catch-1",
+      params: { error },
+    });
+    throw error;
+  }
+};
 
 module.exports = { authService };

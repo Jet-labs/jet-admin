@@ -12,6 +12,7 @@ const { dataQueryService } = require("../dataQuery/dataQuery.service");
 const { cronJobService } = require("../cronJob/cronJob.service");
 const { apiKeyService } = require("../apiKey/apiKey.service");
 const { widgetService } = require("../widget/widget.service");
+const { getCreationContextFromAuthContext } = require("../../utils/auth.context.utils");
 
 const tenantService = {};
 
@@ -302,20 +303,23 @@ tenantService.createTenant = async ({
   tenantLogoURL,
   tenantDBURL,
   tenantDBType,
+  authContext,
 }) => {
   try {
     Logger.log("info", {
       message: "tenantService:createTenant:params",
-      params: { userID, tenantTitle, tenantLogoURL, tenantDBURL, tenantDBType },
+      params: { userID, tenantTitle, tenantLogoURL, tenantDBURL, tenantDBType, authContext },
     });
 
+    const { creatorID, createdByApiKeyID } = getCreationContextFromAuthContext(authContext);
     const newTenant = await prisma.$transaction(async (tx) => {
       const newTenant = await tx.tblTenants.create({
         data: {
           tenantTitle,
           tenantLogoURL,
           tenantDBURL,
-          creatorID: userID,
+          creatorID,
+          createdByApiKeyID,
           tenantDBType,
         },
       });

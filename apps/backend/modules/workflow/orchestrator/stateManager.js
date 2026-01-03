@@ -51,62 +51,32 @@ stateManager.getInstance = async (instanceID) => {
  * @returns {Promise<Object>} Updated instance (or throws on max retries exceeded)
  */
 stateManager.updateContext = async (instanceID, contextUpdate, expectedVersion = null) => {
-  const MAX_RETRIES = 5;
-  const BASE_DELAY_MS = 50;
-  
-  for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-    const instance = await prisma.tblWorkflowInstances.findUnique({
-      where: { instanceID },
-    });
-    
-    if (!instance) {
-      throw new Error(`Instance ${instanceID} not found`);
-    }
-    
-    // Use current version if not provided or on retry
-    const currentVersion = instance.version;
-    
-    // Merge context
-    const updatedContext = {
-      ...instance.contextData,
-      ...contextUpdate,
-    };
-    
-    // Optimistic lock update
-    const result = await prisma.tblWorkflowInstances.updateMany({
-      where: {
-        instanceID,
-        version: currentVersion,
-      },
-      data: {
-        contextData: updatedContext,
-        version: currentVersion + 1,
-        updatedAt: new Date(),
-      },
-    });
-    
-    if (result.count > 0) {
-      // Success
-      return {
-        ...instance,
-        contextData: updatedContext,
-        version: currentVersion + 1,
-      };
-    }
-    
-    // Version conflict - retry with exponential backoff
-    if (attempt < MAX_RETRIES - 1) {
-      const delay = BASE_DELAY_MS * Math.pow(2, attempt) + Math.random() * 50;
-      Logger.log('warning', {
-        message: 'stateManager:updateContext:retrying',
-        params: { instanceID, attempt: attempt + 1, delay },
-      });
-      await new Promise(resolve => setTimeout(resolve, delay));
-    }
+  const instance = await prisma.tblWorkflowInstances.findUnique({
+    where: { instanceID },
+  });
+
+  if (!instance) {
+    throw new Error(`Instance ${instanceID} not found`);
   }
-  
-  // Max retries exceeded
-  throw new Error(`Failed to update instance ${instanceID} after ${MAX_RETRIES} retries (optimistic lock)`);
+
+  // Merge context
+  const updatedContext = {
+    ...instance.contextData,
+    ...contextUpdate,
+  };
+
+  // Direct update without version check
+  const result = await prisma.tblWorkflowInstances.update({
+    where: {
+      instanceID,
+    },
+    data: {
+      contextData: updatedContext,
+      updatedAt: new Date(),
+    },
+  });
+
+  return result;
 };
 
 /**
@@ -127,7 +97,8 @@ stateManager.completeInstance = async (instanceID, status, output = null) => {
       status,
       completedAt: new Date(),
       updatedAt: new Date(),
-      contextData: output ? { ...output } : undefined,
+      // Directly update context data if output is provided
+      ...(output ? { contextData: output } : {}),
     },
   });
 };

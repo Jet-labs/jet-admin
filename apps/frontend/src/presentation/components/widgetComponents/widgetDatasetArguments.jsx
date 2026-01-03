@@ -15,12 +15,7 @@ export const WidgetDatasetArguments = ({
   datasetIndex,
   widgetForm,
   initialValues,
-  // For queries
-  selectedQuery,
-  // For workflows
   selectedWorkflow,
-  // Data source type
-  dataSourceType = "query",
 }) => {
   WidgetDatasetArguments.propTypes = {
     open: PropTypes.bool.isRequired,
@@ -28,20 +23,14 @@ export const WidgetDatasetArguments = ({
     datasetIndex: PropTypes.number.isRequired,
     widgetForm: PropTypes.object.isRequired,
     initialValues: PropTypes.object.isRequired,
-    selectedQuery: PropTypes.object,
     selectedWorkflow: PropTypes.object,
-    dataSourceType: PropTypes.oneOf(["query", "workflow"]),
   };
 
   // Get args based on data source type
-  const args = dataSourceType === "workflow"
-    ? selectedWorkflow?.workflowOptions?.args || []
-    : selectedQuery?.dataQueryOptions?.args || [];
+  const args = selectedWorkflow?.workflowOptions?.args || []
 
   // Get the field name for storing values based on type
-  const valuesFieldName = dataSourceType === "workflow"
-    ? "workflowArgValues"
-    : "dataQueryArgValues";
+  const valuesFieldName = "workflowArgValues"
 
   const datasetArgumentsForm = useFormik({
     initialValues: {
@@ -52,7 +41,7 @@ export const WidgetDatasetArguments = ({
     enableReinitialize: true,
     onSubmit: (values) => {
       widgetForm.setFieldValue(
-        `dataQueries[${datasetIndex}].${valuesFieldName}`,
+        `workflows[${datasetIndex}].${valuesFieldName}`,
         values[valuesFieldName]
       );
       onClose();
@@ -66,13 +55,9 @@ export const WidgetDatasetArguments = ({
     });
   }, [datasetArgumentsForm, valuesFieldName]);
 
-  const title = dataSourceType === "workflow"
-    ? "Workflow Input Parameters"
-    : CONSTANTS.STRINGS.WIDGET_DATASET_ARGUMENTS_TITLE;
+  const title = CONSTANTS.STRINGS.WIDGET_DATASET_ARGUMENTS_TITLE;
 
-  const label = dataSourceType === "workflow"
-    ? "Workflow Inputs"
-    : CONSTANTS.STRINGS.WIDGET_EDITOR_FORM_DATASET_ARGUMENTS_LABEL;
+  const label = CONSTANTS.STRINGS.WIDGET_EDITOR_FORM_DATASET_ARGUMENTS_LABEL;
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
@@ -115,7 +100,7 @@ export const WidgetDatasetArguments = ({
           </div>
         ) : (
           <p className="text-xs text-slate-500 italic">
-            No input parameters defined for this {dataSourceType}.
+              No input parameters defined.
           </p>
         )}
       </DialogContent>

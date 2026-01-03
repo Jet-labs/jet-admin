@@ -1,6 +1,7 @@
 const Logger = require("../../utils/logger");
 const { prisma } = require("../../config/prisma.config");
 const { DATASOURCE_LOGIC_COMPONENTS } = require("@jet-admin/datasources-logic");
+const { getCreationContextFromAuthContext } = require("../../utils/auth.context.utils");
 
 const datasourceService = {};
 
@@ -111,6 +112,7 @@ datasourceService.createDatasource = async ({
   datasourceType,
   datasourceOptions,
   datasourceTags,
+  authContext,
 }) => {
   Logger.log("info", {
     message: "datasourceService:createDatasource:params",
@@ -121,16 +123,19 @@ datasourceService.createDatasource = async ({
       datasourceType,
       datasourceOptions,
       datasourceTags,
+      authContext,
     },
   });
   try {
+    const { creatorID, createdByApiKeyID } = getCreationContextFromAuthContext(authContext);
     const newDatasource = await prisma.tblDatasources.create({
       data: {
         tenantID: tenantID,
         datasourceTitle,
         datasourceType,
         datasourceOptions,
-        creatorID: userID,
+        creatorID,
+        createdByApiKeyID,
         datasourceTags,
       },
     });

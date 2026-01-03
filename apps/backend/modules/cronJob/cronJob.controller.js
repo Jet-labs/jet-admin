@@ -2,6 +2,7 @@ const constants = require("../../constants"); // Include if needed
 const { expressUtils } = require("../../utils/express.utils"); // Adjust path as needed
 const Logger = require("../../utils/logger"); // Adjust path as needed
 const { cronJobService } = require("./cronJob.service");
+const { getServiceAuthContext } = require("../../utils/auth.context.utils");
 
 const cronJobController = {};
 
@@ -103,14 +104,16 @@ cronJobController.getAllCronJobs = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID } = req.params;
+    const authContext = getServiceAuthContext(req);
     Logger.log("info", {
       message: "cronJobController:getAllCronJobs:params",
-      params: { userID: user.userID, tenantID },
+      params: { userID: user.userID, tenantID, authContext },
     });
 
     const cronJobs = await cronJobService.getAllCronJobs({
       userID: user.userID,
       tenantID,
+      authContext,
     });
 
     Logger.log("success", {

@@ -30,7 +30,7 @@ export const DataQueryTestingPanel = ({
         }`}
         onClick={_handleClose}
         style={{
-          zIndex: 1500,
+          zIndex: 1000,
         }}
       ></div>
       <div
@@ -38,7 +38,7 @@ export const DataQueryTestingPanel = ({
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
         style={{
-          zIndex: 2000,
+          zIndex: 1100,
         }}
       >
         <div className="p-2 h-full">

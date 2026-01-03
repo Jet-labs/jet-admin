@@ -143,6 +143,10 @@ auditLogMiddleware.audit = (req, res, next) => {
         request: requestDetails,
         response: responseDetails,
         durationMs: duration,
+        // Auth context information
+        authType: req.authContext?.authType || 'USER',
+        apiKeyID: req.authContext?.apiKey?.apiKeyID || null,
+        apiKeyTitle: req.authContext?.apiKey?.apiKeyTitle || null,
       },
       error:
         res.statusCode >= 400

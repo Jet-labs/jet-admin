@@ -27,24 +27,14 @@ import { WidgetPreview } from "./widgetPreview";
 const initialValues = {
   widgetTitle: "",
   widgetType: CONSTANTS.WIDGET_TYPES.TEXT_WIDGET.value,
-  dataQueries: [
-    {
-      title: "",
-      dataQueryID: null,
-      parameters: {},
-      dataQueryArgValues: {},
-      valueType: "static",
-      datasetFields: {
-        xAxis: "",
-        yAxis: "",
-      },
-    },
-  ],
+  workflowID: null,
+  workflowConfig: {},// For workflow mode - single workflow object
   widgetConfig: {
     containerCss: {},
     widgetCss: {},
     containerTailwindCss: "",
     widgetTailwindCss: "text-slate-700",
+    refetchInterval: 0,
   },
 };
 
@@ -73,6 +63,8 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
       }),
     refetchOnWindowFocus: false,
   });
+
+  console.log({ widget });
 
   const { isPending: isUpdatingWidget, mutate: updateWidget } = useMutation({
     mutationFn: (data) => {
@@ -122,6 +114,7 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
       },
       retry: false,
       onSuccess: (data) => {
+        console.log("data", data);
         setWidgetFetchedData(data?.data);
       },
       onError: (error) => {
@@ -135,16 +128,7 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
     validateOnMount: false,
     validateOnChange: false,
     onSubmit: (values) => {
-      // Separate dataQueries into query and workflow sources
-      const allDataSources = values.dataQueries || [];
-      const dataQueries = allDataSources.filter(ds => ds.dataSourceType !== 'workflow');
-      const workflowSources = allDataSources.filter(ds => ds.dataSourceType === 'workflow');
-
-      updateWidget({
-        ...values,
-        dataQueries,
-        workflowSources,
-      });
+      updateWidget(values);
     },
   });
 
@@ -155,13 +139,14 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
   }, [updateWidgetForm]);
 
   useEffect(() => {
-    if (widget && widget.widgetID) {
+    if (widget && widget.widgetID) {    
       updateWidgetForm.setValues({
         widgetTitle: widget.widgetTitle || CONSTANTS.STRINGS.UNTITLED,
         widgetType: widget.widgetType || WIDGETS_MAP.text.value,
         widgetDescription: widget.widgetDescription || "",
-        dataQueries: widget.dataQueries || [],
         widgetConfig: widget.widgetConfig || {},
+        workflowID: widget.workflowID || null,
+        workflowConfig: widget.workflowConfig || {},
       });
     }
   }, [widget]);

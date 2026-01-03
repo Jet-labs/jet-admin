@@ -2,6 +2,7 @@ const constants = require("../../constants");
 const { expressUtils } = require("../../utils/express.utils");
 const Logger = require("../../utils/logger");
 const { datasourceService } = require("./datasource.service");
+const { getServiceAuthContext } = require("../../utils/auth.context.utils");
 
 const datasourceController = {};
 
@@ -14,17 +15,20 @@ datasourceController.getAllDatasources = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID } = req.params;
+    const authContext = getServiceAuthContext(req);
     Logger.log("info", {
       message: "datasourceController:getAllDatasources:params",
       params: {
         userID: user.userID,
         tenantID,
+        authContext,
       },
     });
 
     const datasources = await datasourceService.getAllDatasources({
       userID: user.userID,
       tenantID,
+      authContext,
     });
 
     Logger.log("success", {
@@ -155,6 +159,7 @@ datasourceController.createDatasource = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID } = req.params;
+    const authContext = getServiceAuthContext(req);
     const {
       datasourceTitle,
       datasourceDescription,
@@ -173,6 +178,7 @@ datasourceController.createDatasource = async (req, res) => {
         datasourceType,
         datasourceOptions,
         datasourceTags,
+        authContext,
       },
     });
 
@@ -184,6 +190,7 @@ datasourceController.createDatasource = async (req, res) => {
       datasourceType,
       datasourceOptions,
       datasourceTags,
+      authContext,
     });
 
     Logger.log("success", {

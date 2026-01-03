@@ -13,8 +13,6 @@ const createWidgetSchema = z.object({
   widgetDescription: z.string().optional(),
   widgetType: z.string().min(1, "widgetType is required"),
   widgetConfig: z.object({}).passthrough(),
-  dataQueries: z.array(z.any()),
-  workflowSources: z.array(z.any()).optional(),
 }).passthrough();
 
 const updateWidgetSchema = z.object({
@@ -22,16 +20,12 @@ const updateWidgetSchema = z.object({
   widgetDescription: z.string().optional(),
   widgetType: z.string().min(1, "widgetType is required"),
   widgetConfig: z.object({}).passthrough(),
-  dataQueries: z.array(z.any()),
-  workflowSources: z.array(z.any()).optional(),
 }).passthrough();
 
 const testWidgetDataSchema = z.object({
   widgetTitle: z.string().optional(),
   widgetType: z.string().optional(),
   widgetConfig: z.object({}).passthrough().optional(),
-  dataQueries: z.array(z.any()).optional(),
-  workflowSources: z.array(z.any()).optional(),
 }).passthrough();
 
 // ============================================================

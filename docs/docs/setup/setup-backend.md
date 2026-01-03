@@ -11,19 +11,16 @@ Before you begin, ensure you have the following installed:
 
 ## Local Development Setup
 
-### Getting Started
-
-1. **Clone the repository**
-
    ```bash
    git clone <repository_url>
-   cd apps/backend
+   cd jet-admin
    ```
 
 2. **Install dependencies**
 
    ```bash
    npm install
+   npm install --workspaces
    ```
 
 ### Environment Configuration
@@ -106,7 +103,7 @@ The first command applies migrations based on your schema definition in `prisma/
 Start the development server with hot-reload enabled:
 
 ```bash
-npm run dev
+npm run start:b
 ```
 
 Your API will be available at `http://localhost:8090`.

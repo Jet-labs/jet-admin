@@ -1,6 +1,7 @@
 const Logger = require("../../utils/logger");
 const { prisma } = require("../../config/prisma.config");
 const { generateAPIKey } = require("../../utils/crypto.util");
+const { getCreationContextFromAuthContext } = require("../../utils/auth.context.utils");
 
 const apiKeyService = {};
 
@@ -51,20 +52,23 @@ apiKeyService.createAPIKey = async ({
   tenantID,
   roleIDs,
   apiKeyTitle,
+  authContext,
 }) => {
   Logger.log("info", {
     message: "apiKeyService:createAPIKey:params",
-    params: { userID, tenantID, apiKeyTitle },
+    params: { userID, tenantID, apiKeyTitle, authContext },
   });
 
   try {
+    const { creatorID, createdByApiKeyID } = getCreationContextFromAuthContext(authContext);
     // Use a transaction for atomicity
     const createdAPIKey = await prisma.$transaction(async (tx) => {
       // Create the role
       const apiKey = await prisma.tblAPIKeys.create({
         data: {
           tenantID: tenantID,
-          creatorID: userID,
+          creatorID,
+          createdByApiKeyID,
           apiKeyTitle,
           apiKey: generateAPIKey(),
           isDisabled: false,

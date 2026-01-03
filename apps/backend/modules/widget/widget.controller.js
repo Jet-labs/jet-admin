@@ -2,6 +2,7 @@ const constants = require("../../constants");
 const { expressUtils } = require("../../utils/express.utils");
 const Logger = require("../../utils/logger");
 const { widgetService } = require("./widget.service");
+const { getServiceAuthContext } = require("../../utils/auth.context.utils");
 
 const widgetController = {};
 
@@ -14,17 +15,20 @@ widgetController.getAllWidgets = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID } = req.params;
+    const authContext = getServiceAuthContext(req);
     Logger.log("info", {
       message: "widgetController:getAllWidgets:params",
       params: {
         userID: user.userID,
         tenantID,
+        authContext,
       },
     });
 
     const widgets = await widgetService.getAllWidgets({
       userID: user.userID,
       tenantID,
+      authContext,
     });
 
     Logger.log("success", {
@@ -58,13 +62,14 @@ widgetController.createWidget = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID } = req.params;
+    const authContext = getServiceAuthContext(req);
     const {
       widgetTitle,
       widgetDescription,
       widgetType,
       widgetConfig,
-      dataQueries,
-      workflowSources,
+      workflowID,
+      workflowConfig,
     } = req.body;
 
     Logger.log("info", {
@@ -76,8 +81,9 @@ widgetController.createWidget = async (req, res) => {
         widgetDescription,
         widgetType,
         widgetConfig,
-        dataQueriesCount: dataQueries?.length,
-        workflowSourcesCount: workflowSources?.length,
+        workflowID,
+        workflowConfig,
+        authContext,
       },
     });
 
@@ -88,8 +94,9 @@ widgetController.createWidget = async (req, res) => {
       widgetDescription,
       widgetType,
       widgetConfig,
-      dataQueries,
-      workflowSources,
+      workflowID,
+      workflowConfig,
+      authContext,
     });
 
     Logger.log("success", {
@@ -101,7 +108,8 @@ widgetController.createWidget = async (req, res) => {
         widgetDescription,
         widgetType,
         widgetConfig,
-        dataQueries,
+        workflowID,
+        workflowConfig,
         result,
       },
     });
@@ -330,8 +338,8 @@ widgetController.updateWidgetByID = async (req, res) => {
       widgetDescription,
       widgetTitle,
       widgetType,
-      dataQueries,
-      workflowSources,
+      workflowID,
+      workflowConfig,
     } = req.body;
 
     Logger.log("info", {
@@ -344,8 +352,8 @@ widgetController.updateWidgetByID = async (req, res) => {
         widgetDescription,
         widgetTitle,
         widgetType,
-        dataQueriesCount: dataQueries?.length,
-        workflowSourcesCount: workflowSources?.length,
+        workflowID,
+        workflowConfig,
       },
     });
 
@@ -357,8 +365,8 @@ widgetController.updateWidgetByID = async (req, res) => {
       widgetDescription,
       widgetTitle,
       widgetType,
-      dataQueries,
-      workflowSources,
+      workflowID,
+      workflowConfig,
     });
 
     Logger.log("success", {
@@ -371,7 +379,9 @@ widgetController.updateWidgetByID = async (req, res) => {
         widgetDescription,
         widgetTitle,
         widgetType,
-        dataQueries,
+        workflowID,
+        workflowConfig,
+        result,
       },
     });
 

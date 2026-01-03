@@ -5,6 +5,10 @@
 const { prisma } = require("../../config/prisma.config");
 const Logger = require("../../utils/logger");
 const { startWorkflow } = require("./orchestrator/orchestrator");
+const {
+  formatAuthContextForLog,
+  getCreationContextFromAuthContext,
+} = require("../../utils/auth.context.utils");
 
 const workflowService = {}
 
@@ -15,12 +19,13 @@ const workflowService = {}
  * @param {number} param0.tenantID
  * @returns {Promise<Array<object>>}
  */
-workflowService.getAllWorkflows = async ({ userID, tenantID }) => {
+workflowService.getAllWorkflows = async ({ userID, tenantID, authContext }) => {
   Logger.log("info", {
     message: "workflowService:getAllWorkflows:params",
     params: {
       userID,
       tenantID,
+      ...formatAuthContextForLog(authContext),
     },
   });
 
@@ -75,7 +80,7 @@ workflowService.getWorkflowByID = async ({ workflowID, tenantID }) => {
  * @param {JSON} param0.workflowOptions
  * @returns {Promise<object>}
  */
-workflowService.createWorkflow = async ({ userID, tenantID, title, nodes, edges, workflowOptions }) => {
+workflowService.createWorkflow = async ({ userID, tenantID, title, nodes, edges, workflowOptions, authContext }) => {
   Logger.log("info", {
     message: "workflowService:createWorkflow:params",
     params: {
@@ -85,16 +90,19 @@ workflowService.createWorkflow = async ({ userID, tenantID, title, nodes, edges,
       nodes,
       edges,
       workflowOptions,
+      ...formatAuthContextForLog(authContext),
     },
   });
 
   try {
+    const { creatorID, createdByApiKeyID } = getCreationContextFromAuthContext(authContext);
     const workflowCreationTransaction = await prisma.$transaction(async (tx) => {
       const workflow = await tx.tblWorkflows.create({
         data: {
           tenantID: tenantID,
           title,
-          creatorID: userID,
+          creatorID,
+          createdByApiKeyID,
           workflowOptions: workflowOptions || {},
         },
       });
@@ -163,7 +171,7 @@ workflowService.createWorkflow = async ({ userID, tenantID, title, nodes, edges,
  * @param {JSON} param0.workflowOptions
  * @returns {Promise<object>}
  */
-workflowService.updateWorkflow = async ({ userID, tenantID, workflowID, title, nodes, edges, workflowOptions }) => {
+workflowService.updateWorkflow = async ({ userID, tenantID, workflowID, title, nodes, edges, workflowOptions, authContext }) => {
   Logger.log("info", {
     message: "workflowService:updateWorkflow:params",
     params: {
@@ -174,6 +182,7 @@ workflowService.updateWorkflow = async ({ userID, tenantID, workflowID, title, n
       nodes,
       edges,
       workflowOptions,
+      ...formatAuthContextForLog(authContext),
     },
   });
 
@@ -266,13 +275,14 @@ workflowService.updateWorkflow = async ({ userID, tenantID, workflowID, title, n
  * @param {number} param0.workflowID
  * @returns {Promise<void>}
  */
-workflowService.deleteWorkflow = async ({ userID, tenantID, workflowID }) => {
+workflowService.deleteWorkflow = async ({ userID, tenantID, workflowID, authContext }) => {
   Logger.log("info", {
     message: "workflowService:deleteWorkflow:params",
     params: {
       userID,
       tenantID,
       workflowID,
+      ...formatAuthContextForLog(authContext),
     },
   });
 
@@ -361,32 +371,55 @@ workflowService.executeWorkflow = async ({ workflowID, tenantID, inputParams = {
  * @returns {Promise<object>}
  */
 workflowService.getRunStatus = async (instanceID) => {
-  const instance = await prisma.tblWorkflowInstances.findUnique({
-    where: { instanceID },
-    include: {
-      tblNodeExecutionLogs: {
-        orderBy: { createdAt: 'asc' },
-      },
-      tblWorkflows: {
-        select: { title: true },
-      },
-    },
+  Logger.log("info", {
+    message: "workflowService:getRunStatus:params",
+    params: { instanceID },
   });
+  try {
+    const instance = await prisma.tblWorkflowInstances.findUnique({
+      where: { instanceID: instanceID },
+      include: {
+        tblNodeExecutionLogs: {
+          orderBy: { createdAt: 'asc' },
+        },
+        tblWorkflows: {
+          select: { title: true },
+        },
+      },
+    });
+    Logger.log("info", {
+      message: "workflowService:getRunStatus:result",
+      params: { instanceID, found: !!instance },
+    });
 
-  if (!instance) {
-    return null;
+    if (!instance) {
+      return null;
+    }
+
+    // Convert BigInt executionLogID to string to avoid JSON serialization issues
+    const logs = instance.tblNodeExecutionLogs.map(log => ({
+      ...log,
+      executionLogID: log.executionLogID.toString(),
+    }));
+
+    return {
+      instanceID: instance.instanceID,
+      workflowID: instance.workflowID,
+      workflowTitle: instance.tblWorkflows?.title,
+      status: instance.status,
+      contextData: instance.contextData,
+      startedAt: instance.startedAt,
+      completedAt: instance.completedAt,
+      logs: logs,
+    };
   }
-
-  return {
-    instanceID: instance.instanceID,
-    workflowID: instance.workflowID,
-    workflowTitle: instance.tblWorkflows?.title,
-    status: instance.status,
-    contextData: instance.contextData,
-    startedAt: instance.startedAt,
-    completedAt: instance.completedAt,
-    logs: instance.tblNodeExecutionLogs,
-  };
+  catch (error) {
+    Logger.log("error", {
+      message: "workflowService:getRunStatus:failure",
+      params: { instanceID, error: error.message },
+    });
+    throw error;
+  }
 };
 
 /**

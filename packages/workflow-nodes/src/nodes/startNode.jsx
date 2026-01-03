@@ -102,7 +102,7 @@ const InputParameterEditor = ({ parameters, onChange }) => {
                   <select
                     value={param.type}
                     onChange={(e) => updateParameter(index, 'type', e.target.value)}
-                    className="w-full text-xs p-1.5 border border-slate-200 rounded bg-white focus:outline-none focus:border-[#646cff]"
+                    className="w-full text-xs text-slate-700 p-1.5 border border-slate-200 rounded bg-white focus:outline-none focus:border-[#646cff]"
                   >
                     <option value={PARAM_TYPES.STRING}>String</option>
                     <option value={PARAM_TYPES.NUMBER}>Number</option>
@@ -135,7 +135,7 @@ const InputParameterEditor = ({ parameters, onChange }) => {
                   value={param.defaultValue}
                   onChange={(e) => updateParameter(index, 'defaultValue', e.target.value)}
                   placeholder={param.type === PARAM_TYPES.OBJECT ? '{}' : param.type === PARAM_TYPES.ARRAY ? '[]' : ''}
-                  className="w-full text-xs p-1.5 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff]"
+                  className="w-full text-xs text-slate-700 p-1.5 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff]"
                 />
               </div>
 
@@ -147,7 +147,7 @@ const InputParameterEditor = ({ parameters, onChange }) => {
                   value={param.description}
                   onChange={(e) => updateParameter(index, 'description', e.target.value)}
                   placeholder="What is this parameter for?"
-                  className="w-full text-xs p-1.5 border border-slate-200 rounded bg-white focus:outline-none focus:border-[#646cff]"
+                  className="w-full text-xs text-slate-700 p-1.5 border border-slate-200 rounded bg-white focus:outline-none focus:border-[#646cff]"
                 />
               </div>
             </div>

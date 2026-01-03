@@ -12,6 +12,8 @@ export const WorkflowNodesProvider = ({
   onRefreshDataQueries,
   workflowNodes = [],
   nodeExecutionStatus = {},  // Map of nodeId -> status
+  tenantID = null,           // Tenant ID for API calls
+  onQueryTest = null,        // Callback for testing queries: (dataQueryID, argValues) => Promise<result>
 }) => {
   return (
     <WorkflowNodesContext.Provider value={{
@@ -20,6 +22,8 @@ export const WorkflowNodesProvider = ({
       onRefreshDataQueries,
       workflowNodes,
       nodeExecutionStatus,
+      tenantID,
+      onQueryTest,
     }}>
       {children}
     </WorkflowNodesContext.Provider>

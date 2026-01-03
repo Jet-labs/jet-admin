@@ -2,6 +2,7 @@ const constants = require("../../constants");
 const { expressUtils } = require("../../utils/express.utils");
 const Logger = require("../../utils/logger");
 const { databaseNotificationService } = require("./databaseNotification.service");
+const { getServiceAuthContext } = require("../../utils/auth.context.utils");
 
 const databaseNotificationController = {};
 
@@ -16,17 +17,19 @@ databaseNotificationController.getAllDatabaseNotifications = async (
   try {
     const { user } = req;
     const { tenantID } = req.params;
+    const authContext = getServiceAuthContext(req);
 
     Logger.log("info", {
       message:
         "databaseNotificationController:getAllDatabaseNotifications:params",
-      params: { userID: user.userID, tenantID },
+      params: { userID: user.userID, tenantID, authContext },
     });
 
     const databaseNotifications =
       await databaseNotificationService.getAllDatabaseNotifications({
         userID: user.userID,
         tenantID,
+        authContext,
       });
 
     return expressUtils.sendResponse(res, true, {

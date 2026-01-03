@@ -2,6 +2,7 @@ const { expressUtils } = require("../../utils/express.utils");
 const Logger = require("../../utils/logger");
 const { dataQueryService } = require("../dataQuery/dataQuery.service");
 const { databaseService } = require("./database.service");
+const { getServiceAuthContext } = require("../../utils/auth.context.utils");
 
 const databaseController = {};
 
@@ -13,15 +14,17 @@ const databaseController = {};
 databaseController.getDatabaseMetadata = async (req, res) => {
   try {
     const { user, dbPool } = req;
+    const authContext = getServiceAuthContext(req);
 
     Logger.log("info", {
       message: "databaseController:getDatabaseMetadata:params",
-      params: { userID: user.userID },
+      params: { userID: user.userID, authContext },
     });
 
     const databaseMetadata = await databaseService.getDatabaseMetadata({
       userID: user.userID,
       dbPool,
+      authContext,
     });
 
     Logger.log("success", {

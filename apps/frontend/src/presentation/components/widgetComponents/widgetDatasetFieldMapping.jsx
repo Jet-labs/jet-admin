@@ -1,17 +1,13 @@
 import {
-  Box,
   Dialog,
   DialogActions,
   DialogContent,
-  DialogTitle,
+  DialogTitle
 } from "@mui/material";
 import { useFormik } from "formik";
-import React, { useMemo } from "react";
-import ReactJson from "react-json-view";
+import PropTypes from "prop-types";
 import { CONSTANTS } from "../../../constants";
 import { formValidations } from "../../../utils/formValidation";
-import { CollapseComponent } from "../ui/collapseComponent";
-import PropTypes from "prop-types";
 
 export const WidgetDatasetFieldMapping = ({
   open,
@@ -19,7 +15,6 @@ export const WidgetDatasetFieldMapping = ({
   datasetIndex,
   widgetForm,
   initialValues,
-  selectedQuery,
   datasetFields,
 }) => {
   WidgetDatasetFieldMapping.propTypes = {
@@ -28,13 +23,12 @@ export const WidgetDatasetFieldMapping = ({
     datasetIndex: PropTypes.number.isRequired,
     widgetForm: PropTypes.object.isRequired,
     initialValues: PropTypes.object.isRequired,
-    selectedQuery: PropTypes.object.isRequired,
+    selectedWorkflow: PropTypes.object.isRequired,
     datasetFields: PropTypes.array.isRequired,
   };
 
   const datasetFieldMappingForm = useFormik({
     initialValues: {
-      dataQueryArgValues: {},
       datasetFields: {
         text: "",
         xAxis: "",
@@ -53,29 +47,9 @@ export const WidgetDatasetFieldMapping = ({
         `dataQueries[${datasetIndex}].datasetFields`,
         values.datasetFields
       );
-      widgetForm.setFieldValue(
-        `dataQueries[${datasetIndex}].dataQueryArgValues`,
-        values.dataQueryArgValues
-      );
       onClose();
     },
   });
-
-  const _dataTypeSuggestionDataList = useMemo(() => {
-    if (selectedQuery && selectedQuery.dataQueryResultSchema) {
-      const dataList = selectedQuery.dataQueryResultSchema.items?.properties
-        ? Object.keys(selectedQuery.dataQueryResultSchema.items.properties)
-        : Object.keys(selectedQuery.dataQueryResultSchema);
-      return (
-        <datalist id="data-type-suggestions">
-          {dataList.map((item) => (
-            <option key={item} value={item} />
-          ))}
-        </datalist>
-      );
-    }
-    return null;
-  }, [selectedQuery]);
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="xs">
@@ -83,35 +57,7 @@ export const WidgetDatasetFieldMapping = ({
         {CONSTANTS.STRINGS.WIDGET_DATASET_FIELD_MAPPING_TITLE}
       </DialogTitle>
       <DialogContent className="!p-4 !space-y-4">
-        <div className="rounded border border-slate-200">
-          {_dataTypeSuggestionDataList}
-          {selectedQuery && selectedQuery.dataQueryResultSchema ? (
-            <CollapseComponent
-              showButtonText={"Query result metadata"}
-              hideButtonText={"Hide"}
-              containerClass={"p-1"}
-              content={() => (
-                <Box
-                  sx={{ bgcolor: "background.secondary" }}
-                  className="!max-h-32 !overflow-y-auto"
-                >
-                  <ReactJson
-                    src={
-                      selectedQuery.dataQueryResultSchema.items?.properties
-                        ? selectedQuery.dataQueryResultSchema.items.properties
-                        : selectedQuery.dataQueryResultSchema
-                    }
-                    theme={"ashes"}
-                  />
-                </Box>
-              )}
-            />
-          ) : (
-            <span className=" text-red-500 font-normal text-xs p-2">
-              {CONSTANTS.STRINGS.WIDGET_DATASET_FIELD_MAPPING_NO_META}
-            </span>
-          )}
-        </div>
+
 
         <div className="grid grid-cols-2 gap-2">
           {datasetFields?.includes("text") && (
@@ -130,7 +76,7 @@ export const WidgetDatasetFieldMapping = ({
                 required={true}
                 onChange={datasetFieldMappingForm.handleChange}
                 onBlur={datasetFieldMappingForm.handleBlur}
-                value={datasetFieldMappingForm.values.datasetFields.text}
+                value={datasetFieldMappingForm.values.datasetFields?.text}
                 list="data-type-suggestions"
               />
             </div>
@@ -154,7 +100,7 @@ export const WidgetDatasetFieldMapping = ({
                 required={true}
                 onChange={datasetFieldMappingForm.handleChange}
                 onBlur={datasetFieldMappingForm.handleBlur}
-                value={datasetFieldMappingForm.values.datasetFields.xAxis}
+                value={datasetFieldMappingForm.values.datasetFields?.xAxis}
                 list="data-type-suggestions"
               />
             </div>
@@ -178,7 +124,7 @@ export const WidgetDatasetFieldMapping = ({
                 required={true}
                 onChange={datasetFieldMappingForm.handleChange}
                 onBlur={datasetFieldMappingForm.handleBlur}
-                value={datasetFieldMappingForm.values.datasetFields.yAxis}
+                value={datasetFieldMappingForm.values.datasetFields?.yAxis}
                 list="data-type-suggestions"
               />
             </div>
@@ -199,7 +145,7 @@ export const WidgetDatasetFieldMapping = ({
                 required={true}
                 onChange={datasetFieldMappingForm.handleChange}
                 onBlur={datasetFieldMappingForm.handleBlur}
-                value={datasetFieldMappingForm.values.datasetFields.label}
+                value={datasetFieldMappingForm.values.datasetFields?.label}
                 list="data-type-suggestions"
               />
             </div>
@@ -220,7 +166,7 @@ export const WidgetDatasetFieldMapping = ({
                 required={true}
                 onChange={datasetFieldMappingForm.handleChange}
                 onBlur={datasetFieldMappingForm.handleBlur}
-                value={datasetFieldMappingForm.values.datasetFields.value}
+                value={datasetFieldMappingForm.values.datasetFields?.value}
                 list="data-type-suggestions"
               />
             </div>
@@ -244,7 +190,7 @@ export const WidgetDatasetFieldMapping = ({
                 required={true}
                 onChange={datasetFieldMappingForm.handleChange}
                 onBlur={datasetFieldMappingForm.handleBlur}
-                value={datasetFieldMappingForm.values.datasetFields.radius}
+                value={datasetFieldMappingForm.values.datasetFields?.radius}
                 list="data-type-suggestions"
               />
             </div>

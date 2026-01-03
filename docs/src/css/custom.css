@@ -1,34 +1,84 @@
-/**
- * Any CSS included here will be global. The classic template
- * bundles Infima by default. Infima is a CSS framework designed to
- * work well for content-centric websites.
- */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-/* You can override the default Infima variables here. */
+
+/* Import Inter font */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 :root {
-  --ifm-color-primary: #646cff;
-  --ifm-color-primary-dark: #132C9C;
-  --ifm-color-primary-darker: #132C9C;
-  --ifm-color-primary-darkest: #132C9C;
-  --ifm-color-primary-light: #B7C4FF;
-  --ifm-color-primary-lighter: #B7C4FF;
-  --ifm-color-primary-lightest: #B7C4FF;
-  --ifm-code-font-size: 95%;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
-  --ifm-color-primary-border: #132C9C;
+  /* Brand Colors - Indigo/Violet base for a premium tech feel */
+  --ifm-color-primary: #4f46e5;
+  --ifm-color-primary-dark: #4338ca;
+  --ifm-color-primary-darker: #3730a3;
+  --ifm-color-primary-darkest: #312e81;
+  --ifm-color-primary-light: #6366f1;
+  --ifm-color-primary-lighter: #818cf8;
+  --ifm-color-primary-lightest: #c7d2fe;
+
+  /* UI Colors */
+  --ifm-menu-color: #4b5563; /* Gray-600 */
+  --ifm-menu-color-active: #4f46e5;
+  --ifm-navbar-background-color: rgba(255, 255, 255, 0.85);
+  --ifm-background-color: #ffffff;
+  --ifm-font-family-base: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  
+  /* Typography */
+  --ifm-heading-font-weight: 600;
+  --ifm-font-size-base: 16px;
+  --ifm-line-height-base: 1.6;
+
+  /* Components */
+  --ifm-code-font-size: 90%;
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.05);
+  --ifm-global-radius: 0.5rem;
+  --ifm-navbar-height: 4rem;
+  --ifm-navbar-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
 
-/* For readability concerns, you should choose a lighter palette in dark mode. */
+/* Dark Mode - Deep Slate/Blue Gray */
 [data-theme='dark'] {
-  --ifm-color-primary: #646cff;
-  --ifm-color-primary-dark: #132C9C;
-  --ifm-color-primary-darker: #132C9C;
-  --ifm-color-primary-darkest: #132C9C;
-  --ifm-color-primary-light: #B7C4FF;
-  --ifm-color-primary-lighter: #B7C4FF;
-  --ifm-color-primary-lightest: #B7C4FF;
-  --ifm-color-primary-border: #363636;
-  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+  --ifm-color-primary: #6366f1;
+  --ifm-color-primary-dark: #4f46e5;
+  --ifm-color-primary-darker: #4338ca;
+  --ifm-color-primary-darkest: #3730a3;
+  --ifm-color-primary-light: #818cf8;
+  --ifm-color-primary-lighter: #a5b4fc;
+  --ifm-color-primary-lightest: #e0e7ff;
+
+  --ifm-background-color: #0f172a; /* Slate-900 */
+  --ifm-navbar-background-color: rgba(15, 23, 42, 0.85);
+  --ifm-menu-color: #cbd5e1; /* Slate-300 */
+  --ifm-menu-color-active: #818cf8;
+  
+  --ifm-font-color-base: #e2e8f0; /* Slate-200 */
+  --ifm-heading-color: #f8fafc; /* Slate-50 */
+  
+  --ifm-color-primary-border: #334155;
+  --docusaurus-highlighted-code-line-bg: rgba(255, 255, 255, 0.05);
+}
+
+/* Glassmorphism Utilities */
+.navbar {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--ifm-color-emphasis-200);
+}
+
+[data-theme='dark'] .navbar {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Button Refinements */
+.button {
+  font-weight: 600;
+  transition: all 0.2sease;
+}
+
+.button--primary {
+  box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.1), 0 2px 4px -1px rgba(79, 70, 229, 0.06);
+}
+
+.button--primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.2), 0 4px 6px -2px rgba(79, 70, 229, 0.1);
 }

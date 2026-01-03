@@ -5,6 +5,7 @@
 const { workflowService } = require("./workflow.service");
 const Logger = require("../../utils/logger");
 const { expressUtils } = require("../../utils/express.utils");
+const { getServiceAuthContext } = require("../../utils/auth.context.utils");
 
 const workflowController = {};
 
@@ -17,8 +18,9 @@ workflowController.getAllWorkflows = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID } = req.params;
-    Logger.log("info", { message: "WorkflowController:getAllWorkflows:params", params: { userID: user.userID, tenantID } });
-    const workflows = await workflowService.getAllWorkflows({ userID: user.userID, tenantID });
+    const authContext = getServiceAuthContext(req);
+    Logger.log("info", { message: "WorkflowController:getAllWorkflows:params", params: { userID: user.userID, tenantID, authContext } });
+    const workflows = await workflowService.getAllWorkflows({ userID: user.userID, tenantID, authContext });
     Logger.log("success", { message: "WorkflowController:getAllWorkflows:success", params: { workflows } });
     expressUtils.sendResponse(res, true, { workflows });
   } catch (error) {
@@ -36,8 +38,9 @@ workflowController.getWorkflowByID = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID, workflowID } = req.params;
-    Logger.log("info", { message: "WorkflowController:getWorkflowByID:params", params: { userID: user.userID, tenantID, workflowID } });
-    const workflow = await workflowService.getWorkflowByID({ userID: user.userID, tenantID, workflowID });
+    const authContext = getServiceAuthContext(req);
+    Logger.log("info", { message: "WorkflowController:getWorkflowByID:params", params: { userID: user.userID, tenantID, workflowID, authContext } });
+    const workflow = await workflowService.getWorkflowByID({ userID: user.userID, tenantID, workflowID, authContext });
     Logger.log("success", { message: "WorkflowController:getWorkflowByID:success", params: { workflow } });
     expressUtils.sendResponse(res, true, { workflow });
   } catch (error) {
@@ -56,8 +59,9 @@ workflowController.createWorkflow = async (req, res) => {
     const { user } = req;
     const { tenantID } = req.params;
     const { title, nodes, edges, workflowOptions } = req.body;
-    Logger.log("info", { message: "WorkflowController:createWorkflow:params", params: { userID: user.userID, tenantID, title, nodes, edges, workflowOptions } });
-    const workflow = await workflowService.createWorkflow({ userID: user.userID, tenantID, title, nodes, edges, workflowOptions });
+    const authContext = getServiceAuthContext(req);
+    Logger.log("info", { message: "WorkflowController:createWorkflow:params", params: { userID: user.userID, tenantID, title, nodes, edges, workflowOptions, authContext } });
+    const workflow = await workflowService.createWorkflow({ userID: user.userID, tenantID, title, nodes, edges, workflowOptions, authContext });
     Logger.log("success", { message: "WorkflowController:createWorkflow:success", params: { workflow } });
     expressUtils.sendResponse(res, true, { workflow });
   } catch (error) {
@@ -76,8 +80,9 @@ workflowController.updateWorkflow = async (req, res) => {
     const { user } = req;
     const { tenantID, workflowID } = req.params;
     const { title, nodes, edges, workflowOptions } = req.body;
-    Logger.log("info", { message: "WorkflowController:updateWorkflow:params", params: { userID: user.userID, tenantID, workflowID, title, nodes, edges, workflowOptions } });
-    const workflow = await workflowService.updateWorkflow({ userID: user.userID, tenantID, workflowID, title, nodes, edges, workflowOptions });
+    const authContext = getServiceAuthContext(req);
+    Logger.log("info", { message: "WorkflowController:updateWorkflow:params", params: { userID: user.userID, tenantID, workflowID, title, nodes, edges, workflowOptions, authContext } });
+    const workflow = await workflowService.updateWorkflow({ userID: user.userID, tenantID, workflowID, title, nodes, edges, workflowOptions, authContext });
     Logger.log("success", { message: "WorkflowController:updateWorkflow:success", params: { workflow } });
     expressUtils.sendResponse(res, true, { workflow });
   } catch (error) {
@@ -95,8 +100,9 @@ workflowController.deleteWorkflow = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID, workflowID } = req.params;
-    Logger.log("info", { message: "WorkflowController:deleteWorkflow:params", params: { userID: user.userID, tenantID, workflowID } });
-    await workflowService.deleteWorkflow({ userID: user.userID, tenantID, workflowID });
+    const authContext = getServiceAuthContext(req);
+    Logger.log("info", { message: "WorkflowController:deleteWorkflow:params", params: { userID: user.userID, tenantID, workflowID, authContext } });
+    await workflowService.deleteWorkflow({ userID: user.userID, tenantID, workflowID, authContext });
     Logger.log("success", { message: "WorkflowController:deleteWorkflow:success", params: { workflowID } });
     expressUtils.sendResponse(res, true, { message: "Workflow deleted successfully." });
   } catch (error) {
@@ -115,10 +121,11 @@ workflowController.executeWorkflow = async (req, res) => {
     const { user } = req;
     const { tenantID, workflowID } = req.params;
     const { inputParams = {} } = req.body;
+    const authContext = getServiceAuthContext(req);
 
-    Logger.log("info", { message: "WorkflowController:executeWorkflow:params", params: { workflowID, tenantID } });
+    Logger.log("info", { message: "WorkflowController:executeWorkflow:params", params: { workflowID, tenantID, authContext } });
 
-    const result = await workflowService.executeWorkflow({ workflowID, tenantID, inputParams });
+    const result = await workflowService.executeWorkflow({ workflowID, tenantID, inputParams, authContext });
 
     Logger.log("success", { message: "WorkflowController:executeWorkflow:success", params: { instanceID: result.instanceID } });
     expressUtils.sendResponse(res, true, result);
@@ -136,10 +143,13 @@ workflowController.executeWorkflow = async (req, res) => {
 workflowController.getRunStatus = async (req, res) => {
   try {
     const { instanceID } = req.params;
+    const authContext = getServiceAuthContext(req);
+    Logger.log("info", { message: "WorkflowController:getRunStatus:params", params: { instanceID, authContext } });
 
-    const status = await workflowService.getRunStatus(instanceID);
+    const status = await workflowService.getRunStatus(instanceID, authContext);
 
     if (!status) {
+      Logger.log("error", { message: "WorkflowController:getRunStatus:notFound", params: { instanceID } });
       return expressUtils.sendResponse(res, false, {}, { message: "Run not found" });
     }
 
@@ -158,14 +168,15 @@ workflowController.testWorkflow = async (req, res) => {
   try {
     const { tenantID } = req.params;
     const { nodes, edges, inputParams = {} } = req.body;
+    const authContext = getServiceAuthContext(req);
 
     if (!nodes || !edges) {
       return expressUtils.sendResponse(res, false, {}, { message: "nodes and edges are required" });
     }
 
-    Logger.log("info", { message: "WorkflowController:testWorkflow:params", params: { tenantID, nodeCount: nodes.length } });
+    Logger.log("info", { message: "WorkflowController:testWorkflow:params", params: { tenantID, nodeCount: nodes.length, authContext } });
 
-    const result = await workflowService.testWorkflow({ tenantID, nodes, edges, inputParams });
+    const result = await workflowService.testWorkflow({ tenantID, nodes, edges, inputParams, authContext });
 
     Logger.log("success", { message: "WorkflowController:testWorkflow:success", params: { instanceID: result.instanceID } });
     expressUtils.sendResponse(res, true, result);

@@ -4,6 +4,8 @@ sidebar_position: 1
 
 # Jet Admin
 
+![Jet Admin Mockup](/img/mackup_final.png)
+
 Welcome to Jet Admin, a powerful web-based PostgreSQL management and visualization platform.
 
 ## Overview
@@ -26,6 +28,19 @@ Jet Admin is a comprehensive solution for managing PostgreSQL databases through 
   - [x] Alter
   - [x] Drop
   - [ ] Truncate
+
+#### Workflow Engine
+- **Visual Workflow Builder**
+  - [x] Drag-and-drop node editor
+  - [x] JavaScript (Sandboxed)
+  - [x] Database Queries
+  - [x] Conditionals / Loops
+  - [x] Delays
+  - [x] Error Handling
+- **Integration**
+  - [x] Trigger from UI (Widgets)
+  - [x] Trigger via API
+  - [x] Scheduled Triggers (Cron)
 
 #### Queries
 - **PostgreSQL Queries**
@@ -70,7 +85,7 @@ Jet Admin is a comprehensive solution for managing PostgreSQL databases through 
 
 ### Topics to cover
 
-- **Setup:** To get started with the project, follow the instructions in the [Frontend Setup](#frontend-setup) and [Backend Setup](#backend-setup) sections to set up the frontend and backend components respectively.
+- **Setup:** To get started with the project, follow the instructions in the [Frontend Setup](./setup/setup-frontend.md) and [Backend Setup](./setup/setup-backend.md) sections to set up the frontend and backend components respectively.
 - [**Concepts**](#concepts)
 - [**Database Schemas**](#schemas)
 - [**Tables**](#tables)

@@ -2,6 +2,7 @@ const constants = require("../../constants");
 const { expressUtils } = require("../../utils/express.utils");
 const Logger = require("../../utils/logger");
 const { dashboardService } = require("./dashboard.service");
+const { getServiceAuthContext } = require("../../utils/auth.context.utils");
 
 const dashboardController = {};
 
@@ -14,17 +15,20 @@ dashboardController.getAllDashboards = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID } = req.params;
+    const authContext = getServiceAuthContext(req);
     Logger.log("info", {
       message: "dashboardController:getAllDashboards:params",
       params: {
         userID: user.userID,
         tenantID,
+        authContext,
       },
     });
 
     const dashboards = await dashboardService.getAllDashboards({
       userID: user.userID,
       tenantID,
+      authContext,
     });
 
     Logger.log("success", {
@@ -58,6 +62,7 @@ dashboardController.createDashboard = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID } = req.params;
+    const authContext = getServiceAuthContext(req);
     const { dashboardTitle, dashboardDescription, dashboardConfig } = req.body;
 
     Logger.log("info", {
@@ -68,6 +73,7 @@ dashboardController.createDashboard = async (req, res) => {
         dashboardTitle,
         dashboardDescription,
         dashboardConfig,
+        authContext,
       },
     });
 
@@ -77,6 +83,7 @@ dashboardController.createDashboard = async (req, res) => {
       dashboardTitle,
       dashboardDescription,
       dashboardConfig,
+      authContext,
     });
 
     Logger.log("success", {

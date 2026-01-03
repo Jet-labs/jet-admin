@@ -45,6 +45,8 @@ Our authorization system implements a granular, role-based access control (RBAC)
 
 ### Permissions <a name="permissions"></a>
 
+![Policy Editor](/img/policy_editor.png)
+
 **Structure:**
 ```typescript
 // Standard format
@@ -81,6 +83,8 @@ tenant
 ```
 
 ### Roles <a name="roles"></a>
+
+![Role Index](/img/role-index.png)
 
 **Types:**
 | Global Roles (tenantID=null)      | Tenant-Specific Roles          |

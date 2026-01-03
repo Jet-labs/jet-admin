@@ -6,25 +6,55 @@ const { getChannel, addResult, QUEUE_NAMES } = require('../queue/queueConfig');
 const Logger = require('../../../utils/logger');
 
 /**
- * Context resolver - resolves paths like "ctx.abc123.result"
+ * Context resolver - resolves paths like "ctx.abc123.result" or "ctx[\"abc123\"].result"
+ * Supports both dot notation and bracket notation
  * @param {Object} ctx - The context object
- * @param {string} path - Path like "ctx.abc123.result" or just "abc123.result"
+ * @param {string} path - Path like "ctx.abc123.result" or "ctx[\"uuid\"].prop"
  */
 function resolveFromContext(ctx, path) {
   if (!path) return undefined;
+
+  Logger.log('info', { message: 'resolveFromContext', params: { path } });
+
+  // Remove "ctx." or "ctx" prefix if present at the start
+  let cleanPath = path;
+  if (cleanPath.startsWith('ctx.')) {
+    cleanPath = cleanPath.slice(4);
+  } else if (cleanPath.startsWith('ctx[')) {
+    cleanPath = cleanPath.slice(3); // Remove "ctx" but keep the bracket
+  }
+
+  Logger.log('info', { message: 'resolveFromContext:cleanPath', params: { cleanPath } });
+
+  // Parse the path into segments, handling both dot and bracket notation
+  // This regex matches:
+  // - Bracket notation with double quotes: ["..."]
+  // - Bracket notation with single quotes: ['...']
+  // - Dot notation: .propertyName or just propertyName at start
+  const parts = [];
+  const regex = /\[["']([^"']+)["']\]|\.?([^.\[\]]+)/g;
+  let match;
   
-  // Remove "ctx." prefix if present
-  const cleanPath = path.startsWith('ctx.') ? path.slice(4) : path;
-  
-  // Split and traverse
-  const parts = cleanPath.split('.');
+  while ((match = regex.exec(cleanPath)) !== null) {
+    // match[1] is bracket notation content, match[2] is dot notation content
+    const part = match[1] || match[2];
+    if (part) {
+      parts.push(part);
+    }
+  }
+
+  Logger.log('info', { message: 'resolveFromContext:parts', params: { parts } });
+
   let current = ctx;
   
   for (const part of parts) {
+    Logger.log('info', { message: 'resolveFromContext:traversing', params: { part, currentKeys: current ? Object.keys(current) : null } });
     if (current === undefined || current === null) return undefined;
     current = current[part];
   }
   
+  Logger.log('info', { message: 'resolveFromContext:resolved', params: { path, value: current } });
+
   return current;
 }
 

@@ -2,6 +2,7 @@ const constants = require("../../constants");
 const { expressUtils } = require("../../utils/express.utils");
 const Logger = require("../../utils/logger");
 const { apiKeyService } = require("./apiKey.service");
+const { getServiceAuthContext } = require("../../utils/auth.context.utils");
 
 const apiKeyController = {};
 
@@ -13,15 +14,17 @@ apiKeyController.getAllAPIKeys = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID } = req.params;
+    const authContext = getServiceAuthContext(req);
 
     Logger.log("info", {
       message: "apiKeyController:getAllAPIKeys:params",
-      params: { userID: user.userID, tenantID },
+      params: { userID: user.userID, tenantID, authContext },
     });
 
     const apiKeys = await apiKeyService.getAllAPIKeys({
       userID: user.userID,
       tenantID,
+      authContext,
     });
 
     return expressUtils.sendResponse(res, true, {
@@ -46,10 +49,11 @@ apiKeyController.createAPIKey = async (req, res) => {
     const { user } = req;
     const { tenantID } = req.params;
     const { apiKeyTitle, roleIDs } = req.body;
+    const authContext = getServiceAuthContext(req);
 
     Logger.log("info", {
       message: "apiKeyController:createAPIKey:params",
-      params: { userID: user.userID, tenantID, apiKeyTitle },
+      params: { userID: user.userID, tenantID, apiKeyTitle, authContext },
     });
 
     const result = await apiKeyService.createAPIKey({
@@ -57,6 +61,7 @@ apiKeyController.createAPIKey = async (req, res) => {
       tenantID: tenantID,
       roleIDs,
       apiKeyTitle,
+      authContext,
     });
 
     return expressUtils.sendResponse(res, true, {

@@ -3,6 +3,7 @@ const { expressUtils } = require("../../utils/express.utils");
 const Logger = require("../../utils/logger");
 const { postgreSQLParserUtil } = require("../../utils/postgresql.util");
 const { databaseTableService } = require("./databaseTable.service");
+const { getServiceAuthContext } = require("../../utils/auth.context.utils");
 
 const databaseTableController = {};
 
@@ -40,6 +41,7 @@ databaseTableController.getAllDatabaseTables = async (req, res) => {
   try {
     const { user, dbPool } = req;
     const { databaseSchemaName } = req.params;
+    const authContext = getServiceAuthContext(req);
 
     if (!databaseSchemaName || typeof databaseSchemaName !== "string") {
       throw new Error("Invalid or missing databaseSchemaName.");
@@ -47,13 +49,14 @@ databaseTableController.getAllDatabaseTables = async (req, res) => {
 
     Logger.log("info", {
       message: "databaseTableController:getAllDatabaseTables:params",
-      params: { userID: user.userID, databaseSchemaName },
+      params: { userID: user.userID, databaseSchemaName, authContext },
     });
 
     const databaseTables = await databaseTableService.getAllDatabaseTables({
       userID: user.userID,
       dbPool,
       databaseSchemaName,
+      authContext,
     });
 
     Logger.log("success", {

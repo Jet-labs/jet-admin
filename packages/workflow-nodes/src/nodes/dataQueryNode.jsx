@@ -9,6 +9,7 @@ import { IoMdTime } from 'react-icons/io';
 import { TbRefresh } from 'react-icons/tb';
 import { BiErrorCircle } from 'react-icons/bi';
 import { VscDebugDisconnect } from 'react-icons/vsc';
+import { FaPlay } from 'react-icons/fa';
 
 // ============================================================================
 // Error handling options
@@ -24,7 +25,7 @@ const ERROR_HANDLING_OPTIONS = {
 // DataQueryNodeConfigurator - JSON Forms based configuration
 // ============================================================================
 export const DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
-  const { dataQueries, strings, onRefreshDataQueries, workflowNodes } = useWorkflowNodes();
+  const { dataQueries, strings, onRefreshDataQueries, workflowNodes, onQueryTest } = useWorkflowNodes();
   const [formData, setFormData] = useState({
     title: data?.title || '',
     description: data?.description || '',
@@ -249,6 +250,13 @@ export const DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
     onChange(formData);
   }, [onChange, formData]);
 
+  // Handle opening test panel
+  const handleOpenTest = useCallback(() => {
+    if (onQueryTest && formData.dataQueryID) {
+      onQueryTest(formData.dataQueryID);
+    }
+  }, [onQueryTest, formData.dataQueryID]);
+
   return (
     <div className="w-full h-full">
       <div className="space-y-3">
@@ -259,17 +267,33 @@ export const DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
           renderers={workflowNodeRenderers}
           onChange={handleFormChange}
         />
-        <button
-          type="button"
-          onClick={handleSave}
-          className="px-3 py-1.5 text-sm text-white bg-[#646cff] rounded hover:bg-[#5558dd] focus:ring-4 focus:outline-none focus:ring-[#646cff]/30"
-        >
-          {strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_SAVE_BUTTON || 'Save'}
-        </button>
+
+        <div className="flex justify-between items-center gap-2 pt-2 border-t border-slate-100">
+          <button
+            type="button"
+            onClick={handleSave}
+            className="px-3 py-1.5 text-sm text-white bg-[#646cff] rounded hover:bg-[#5558dd] focus:ring-4 focus:outline-none focus:ring-[#646cff]/30"
+          >
+            {strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_SAVE_BUTTON || 'Save'}
+          </button>
+
+          {onQueryTest && formData.dataQueryID && (
+            <button
+              type="button"
+              onClick={handleOpenTest}
+              className="px-3 py-1.5 text-sm text-slate-600 bg-slate-100 rounded hover:bg-slate-200 border border-slate-200 flex items-center gap-1.5"
+              title="Test this query"
+            >
+              <FaPlay className="w-3 h-3 text-slate-500" />
+              Test Query
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
 };
+
 
 // ============================================================================
 // DataQueryNode - Minimalist flat landscape design with execution status

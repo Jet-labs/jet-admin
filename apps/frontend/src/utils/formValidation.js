@@ -276,37 +276,43 @@ formValidations.triggerAdditionFormValidationSchema = Yup.object().shape({
 formValidations.addWidgetFormValidationSchema = Yup.object().shape({
   widgetTitle: Yup.string().required("Widget name is required"),
   widgetType: Yup.string().required("Widget type is required"),
-  queries: Yup.array()
-    .of(
+  dataSourceMode: Yup.string().default("query"),
+  dataQueries: Yup.array().when("dataSourceMode", {
+    is: (val) => val === "query" || !val,
+    then: () => Yup.array().of(
       Yup.object().shape({
         dataQueryID: Yup.string().required("Query is required"),
         title: Yup.string()
           .required("Alias is required")
           .test("unique-alias", "Alias must be unique", function (value) {
-            const aliases = this.parent.map((q) => q.title);
-            return aliases.filter((a) => a === value).length === 1;
+            const aliases = this.parent.parent ? this.parent.parent.map((q) => q.title) : [];
+            return aliases.filter((a) => a === value).length <= 1;
           }),
       })
-    )
-    .min(1, "At least 1 query required"),
+    ).min(1, "At least 1 query required"),
+    otherwise: () => Yup.array().optional(),
+  }),
+  workflowSource: Yup.object().when("dataSourceMode", {
+    is: "workflow",
+    then: () => Yup.object().shape({
+      workflowID: Yup.string().required("Workflow is required"),
+    }).required("Workflow is required"),
+    otherwise: () => Yup.object().nullable().optional(),
+  }),
 });
 
 formValidations.updateWidgetFormValidationSchema = Yup.object().shape({
   widgetTitle: Yup.string().required("Widget name is required"),
   widgetType: Yup.string().required("Widget type is required"),
-  queries: Yup.array()
-    .of(
-      Yup.object().shape({
-        dataQueryID: Yup.string().required("Query is required"),
-        title: Yup.string()
-          .required("Alias is required")
-          .test("unique-alias", "Alias must be unique", function (value) {
-            const aliases = this.parent.map((q) => q.title);
-            return aliases.filter((a) => a === value).length === 1;
-          }),
-      })
-    )
-    .min(1, "At least 1 query required"),
+  dataSourceMode: Yup.string().default("query"),
+
+  workflowSource: Yup.object().when("dataSourceMode", {
+    is: "workflow",
+    then: () => Yup.object().shape({
+      workflowID: Yup.string().required("Workflow is required"),
+    }).required("Workflow is required"),
+    otherwise: () => Yup.object().nullable().optional(),
+  }),
 });
 
 formValidations.datasourceAdditionFormValidationSchema = Yup.object().shape({

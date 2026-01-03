@@ -31,8 +31,12 @@
   },
   "dependencies": {
     "@jet-admin/datasources-ui": "^1.0.0",
+    "@prisma/client": "^7.2.0",
     "acorn": "^8.14.1",
+    "axios": "^1.13.2",
+    "dotenv": "^17.2.3",
     "estree-walker": "^3.0.3",
-    "handlebars": "^4.7.8"
+    "handlebars": "^4.7.8",
+    "pg": "^8.16.3"
   }
 }

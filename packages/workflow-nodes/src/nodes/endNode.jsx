@@ -99,7 +99,7 @@ const OutputParameterEditor = ({ parameters, onChange, availableVariables }) => 
                   value={param.sourceVariable}
                   onChange={(e) => updateParameter(index, 'sourceVariable', e.target.value)}
                   placeholder="ctx.result or a value"
-                  className="w-full text-xs p-1.5 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff]"
+                  className="w-full text-xs text-slate-700 p-1.5 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff]"
                 />
                 {availableVariables.length > 0 && (
                   <p className="text-[9px] text-slate-400 mt-0.5">
@@ -117,7 +117,7 @@ const OutputParameterEditor = ({ parameters, onChange, availableVariables }) => 
                   value={param.description}
                   onChange={(e) => updateParameter(index, 'description', e.target.value)}
                   placeholder="What this output represents"
-                  className="w-full text-xs p-1.5 border border-slate-200 rounded bg-white focus:outline-none focus:border-[#646cff]"
+                  className="w-full text-xs text-slate-700 p-1.5 border border-slate-200 rounded bg-white focus:outline-none focus:border-[#646cff]"
                 />
               </div>
             </div>

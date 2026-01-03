@@ -159,7 +159,7 @@ const ConditionBranchEditor = ({ branches, onChange, workflowNodes, currentNodeI
               <select
                 value={branch.conditionType}
                 onChange={(e) => updateBranch(index, 'conditionType', e.target.value)}
-                className="w-full text-xs p-1.5 border border-slate-200 rounded bg-white focus:outline-none focus:border-[#646cff]"
+                className="w-full text-xs text-slate-700 p-1.5 border border-slate-200 rounded bg-white focus:outline-none focus:border-[#646cff]"
               >
                 <option value={CONDITION_TYPES.EXPRESSION}>JavaScript Expression</option>
                 <option value={CONDITION_TYPES.EQUALS}>Equals (==)</option>
@@ -179,7 +179,7 @@ const ConditionBranchEditor = ({ branches, onChange, workflowNodes, currentNodeI
                 value={branch.expression || ''}
                 onChange={(e) => updateBranch(index, 'expression', e.target.value)}
                 placeholder="ctx.value === true"
-                className="w-full text-xs p-2 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff] resize-none"
+                className="w-full text-xs text-slate-700 p-2 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff] resize-none"
                 rows={2}
               />
             ) : branch.conditionType === CONDITION_TYPES.IS_EMPTY ||
@@ -189,7 +189,7 @@ const ConditionBranchEditor = ({ branches, onChange, workflowNodes, currentNodeI
                 value={branch.leftOperand || ''}
                 onChange={(e) => updateBranch(index, 'leftOperand', e.target.value)}
                 placeholder="ctx.variableName"
-                className="w-full text-xs p-2 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff]"
+                    className="w-full text-xs text-slate-700 p-2 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff]"
               />
             ) : (
               <div className="flex gap-2">
@@ -198,7 +198,7 @@ const ConditionBranchEditor = ({ branches, onChange, workflowNodes, currentNodeI
                   value={branch.leftOperand || ''}
                   onChange={(e) => updateBranch(index, 'leftOperand', e.target.value)}
                   placeholder="ctx.variableName"
-                  className="flex-1 text-xs p-2 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff]"
+                      className="flex-1 text-xs text-slate-700 p-2 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff]"
                 />
                 <input
                   type="text"

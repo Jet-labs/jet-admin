@@ -22,8 +22,9 @@ Clone the repository and install dependencies:
 
 ```bash
 git clone <repository_url>
-cd apps/frontend
+cd jet-admin
 npm install
+npm install --workspaces
 ```
 
 ### Environment Configuration
@@ -57,7 +58,7 @@ Never commit `.env` files to your repository. Add them to your `.gitignore` file
 Start the development server:
 
 ```bash
-npm run dev
+npm run start:f
 ```
 
 This will launch the application on `http://localhost:5173` with hot module replacement enabled.

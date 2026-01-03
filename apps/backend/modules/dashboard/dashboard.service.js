@@ -1,5 +1,6 @@
 const Logger = require("../../utils/logger");
 const { prisma } = require("../../config/prisma.config");
+const { getCreationContextFromAuthContext } = require("../../utils/auth.context.utils");
 const dashboardService = {};
 
 /**
@@ -59,6 +60,7 @@ dashboardService.createDashboard = async ({
   dashboardTitle,
   dashboardDescription,
   dashboardConfig,
+  authContext,
 }) => {
   Logger.log("info", {
     message: "dashboardService:createDashboard:params",
@@ -68,10 +70,12 @@ dashboardService.createDashboard = async ({
       dashboardTitle,
       dashboardDescription,
       dashboardConfig,
+      authContext,
     },
   });
 
   try {
+    const { creatorID, createdByApiKeyID } = getCreationContextFromAuthContext(authContext);
     await prisma.$transaction(async (tx) => {
       const dashboard = await tx.tblDashboards.create({
         data: {
@@ -79,7 +83,8 @@ dashboardService.createDashboard = async ({
           dashboardTitle,
           dashboardDescription,
           dashboardConfig,
-          creatorID: userID,
+          creatorID,
+          createdByApiKeyID,
         },
       });
     });

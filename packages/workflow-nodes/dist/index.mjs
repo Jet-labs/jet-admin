@@ -43,15 +43,21 @@ var WorkflowNodesProvider = ({
   strings = {},
   onRefreshDataQueries,
   workflowNodes = [],
-  nodeExecutionStatus = {}
+  nodeExecutionStatus = {},
   // Map of nodeId -> status
+  tenantID = null,
+  // Tenant ID for API calls
+  onQueryTest = null
+  // Callback for testing queries: (dataQueryID, argValues) => Promise<result>
 }) => {
   return /* @__PURE__ */ React.createElement(WorkflowNodesContext.Provider, { value: {
     dataQueries,
     strings,
     onRefreshDataQueries,
     workflowNodes,
-    nodeExecutionStatus
+    nodeExecutionStatus,
+    tenantID,
+    onQueryTest
   } }, children);
 };
 var useWorkflowNodes = () => {
@@ -259,6 +265,9 @@ function FaCheck(props) {
 function FaExclamationTriangle(props) {
   return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 576 512" }, "child": [{ "tag": "path", "attr": { "d": "M569.517 440.013C587.975 472.007 564.806 512 527.94 512H48.054c-36.937 0-59.999-40.055-41.577-71.987L246.423 23.985c18.467-32.009 64.72-31.951 83.154 0l239.94 416.028zM288 354c-25.405 0-46 20.595-46 46s20.595 46 46 46 46-20.595 46-46-20.595-46-46-46zm-43.673-165.346l7.418 136c.347 6.364 5.609 11.346 11.982 11.346h48.546c6.373 0 11.635-4.982 11.982-11.346l7.418-136c.375-6.874-5.098-12.654-11.982-12.654h-63.383c-6.884 0-12.356 5.78-11.981 12.654z" }, "child": [] }] })(props);
 }
+function FaPlay(props) {
+  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 448 512" }, "child": [{ "tag": "path", "attr": { "d": "M424.4 214.7L72.4 6.6C43.8-10.3 0 6.1 0 47.9V464c0 37.5 40.7 60.1 72.4 41.3l352-208c31.4-18.5 31.5-64.1 0-82.6z" }, "child": [] }] })(props);
+}
 function FaPlus(props) {
   return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 448 512" }, "child": [{ "tag": "path", "attr": { "d": "M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z" }, "child": [] }] })(props);
 }
@@ -400,7 +409,7 @@ var ConditionBranchEditor = ({ branches, onChange, workflowNodes, currentNodeId 
       {
         value: branch.conditionType,
         onChange: (e) => updateBranch(index, "conditionType", e.target.value),
-        className: "w-full text-xs p-1.5 border border-slate-200 rounded bg-white focus:outline-none focus:border-[#646cff]"
+        className: "w-full text-xs text-slate-700 p-1.5 border border-slate-200 rounded bg-white focus:outline-none focus:border-[#646cff]"
       },
       /* @__PURE__ */ React4.createElement("option", { value: CONDITION_TYPES.EXPRESSION }, "JavaScript Expression"),
       /* @__PURE__ */ React4.createElement("option", { value: CONDITION_TYPES.EQUALS }, "Equals (==)"),
@@ -418,7 +427,7 @@ var ConditionBranchEditor = ({ branches, onChange, workflowNodes, currentNodeId 
         value: branch.expression || "",
         onChange: (e) => updateBranch(index, "expression", e.target.value),
         placeholder: "ctx.value === true",
-        className: "w-full text-xs p-2 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff] resize-none",
+        className: "w-full text-xs text-slate-700 p-2 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff] resize-none",
         rows: 2
       }
     ) : branch.conditionType === CONDITION_TYPES.IS_EMPTY || branch.conditionType === CONDITION_TYPES.IS_NOT_EMPTY ? /* @__PURE__ */ React4.createElement(
@@ -428,7 +437,7 @@ var ConditionBranchEditor = ({ branches, onChange, workflowNodes, currentNodeId 
         value: branch.leftOperand || "",
         onChange: (e) => updateBranch(index, "leftOperand", e.target.value),
         placeholder: "ctx.variableName",
-        className: "w-full text-xs p-2 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff]"
+        className: "w-full text-xs text-slate-700 p-2 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff]"
       }
     ) : /* @__PURE__ */ React4.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React4.createElement(
       "input",
@@ -437,7 +446,7 @@ var ConditionBranchEditor = ({ branches, onChange, workflowNodes, currentNodeId 
         value: branch.leftOperand || "",
         onChange: (e) => updateBranch(index, "leftOperand", e.target.value),
         placeholder: "ctx.variableName",
-        className: "flex-1 text-xs p-2 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff]"
+        className: "flex-1 text-xs text-slate-700 p-2 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff]"
       }
     ), /* @__PURE__ */ React4.createElement(
       "input",
@@ -773,7 +782,7 @@ var ERROR_HANDLING_OPTIONS3 = {
   RETRY_THEN_FAIL: "retry_then_fail"
 };
 var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
-  const { dataQueries, strings, onRefreshDataQueries, workflowNodes } = useWorkflowNodes();
+  const { dataQueries, strings, onRefreshDataQueries, workflowNodes, onQueryTest } = useWorkflowNodes();
   const [formData, setFormData] = useState2({
     title: data?.title || "",
     description: data?.description || "",
@@ -979,6 +988,11 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
   const handleSave = useCallback2(() => {
     onChange(formData);
   }, [onChange, formData]);
+  const handleOpenTest = useCallback2(() => {
+    if (onQueryTest && formData.dataQueryID) {
+      onQueryTest(formData.dataQueryID);
+    }
+  }, [onQueryTest, formData.dataQueryID]);
   return /* @__PURE__ */ React5.createElement("div", { className: "w-full h-full" }, /* @__PURE__ */ React5.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React5.createElement(
     JsonForms2,
     {
@@ -988,7 +1002,7 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
       renderers: jetFormsRenderers,
       onChange: handleFormChange
     }
-  ), /* @__PURE__ */ React5.createElement(
+  ), /* @__PURE__ */ React5.createElement("div", { className: "flex justify-between items-center gap-2 pt-2 border-t border-slate-100" }, /* @__PURE__ */ React5.createElement(
     "button",
     {
       type: "button",
@@ -996,7 +1010,17 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
       className: "px-3 py-1.5 text-sm text-white bg-[#646cff] rounded hover:bg-[#5558dd] focus:ring-4 focus:outline-none focus:ring-[#646cff]/30"
     },
     strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_SAVE_BUTTON || "Save"
-  )));
+  ), onQueryTest && formData.dataQueryID && /* @__PURE__ */ React5.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: handleOpenTest,
+      className: "px-3 py-1.5 text-sm text-slate-600 bg-slate-100 rounded hover:bg-slate-200 border border-slate-200 flex items-center gap-1.5",
+      title: "Test this query"
+    },
+    /* @__PURE__ */ React5.createElement(FaPlay, { className: "w-3 h-3 text-slate-500" }),
+    "Test Query"
+  ))));
 };
 var DataQueryNode = memo2(({ id, data, isConnectable }) => {
   const { dataQueries, strings, nodeExecutionStatus } = useWorkflowNodes();
@@ -1502,7 +1526,7 @@ var InputParameterEditor = ({ parameters, onChange }) => {
       {
         value: param.type,
         onChange: (e) => updateParameter(index, "type", e.target.value),
-        className: "w-full text-xs p-1.5 border border-slate-200 rounded bg-white focus:outline-none focus:border-[#646cff]"
+        className: "w-full text-xs text-slate-700 p-1.5 border border-slate-200 rounded bg-white focus:outline-none focus:border-[#646cff]"
       },
       /* @__PURE__ */ React7.createElement("option", { value: PARAM_TYPES.STRING }, "String"),
       /* @__PURE__ */ React7.createElement("option", { value: PARAM_TYPES.NUMBER }, "Number"),
@@ -1525,7 +1549,7 @@ var InputParameterEditor = ({ parameters, onChange }) => {
         value: param.defaultValue,
         onChange: (e) => updateParameter(index, "defaultValue", e.target.value),
         placeholder: param.type === PARAM_TYPES.OBJECT ? "{}" : param.type === PARAM_TYPES.ARRAY ? "[]" : "",
-        className: "w-full text-xs p-1.5 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff]"
+        className: "w-full text-xs text-slate-700 p-1.5 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff]"
       }
     )),
     /* @__PURE__ */ React7.createElement("div", { className: "mt-2" }, /* @__PURE__ */ React7.createElement("label", { className: "text-[10px] text-slate-400" }, "Description"), /* @__PURE__ */ React7.createElement(
@@ -1535,7 +1559,7 @@ var InputParameterEditor = ({ parameters, onChange }) => {
         value: param.description,
         onChange: (e) => updateParameter(index, "description", e.target.value),
         placeholder: "What is this parameter for?",
-        className: "w-full text-xs p-1.5 border border-slate-200 rounded bg-white focus:outline-none focus:border-[#646cff]"
+        className: "w-full text-xs text-slate-700 p-1.5 border border-slate-200 rounded bg-white focus:outline-none focus:border-[#646cff]"
       }
     ))
   ))));
@@ -2279,7 +2303,7 @@ var OutputParameterEditor = ({ parameters, onChange, availableVariables }) => {
         value: param.sourceVariable,
         onChange: (e) => updateParameter(index, "sourceVariable", e.target.value),
         placeholder: "ctx.result or a value",
-        className: "w-full text-xs p-1.5 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff]"
+        className: "w-full text-xs text-slate-700 p-1.5 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff]"
       }
     ), availableVariables.length > 0 && /* @__PURE__ */ React10.createElement("p", { className: "text-[9px] text-slate-400 mt-0.5" }, "Available: ", availableVariables.slice(0, 5).map((v) => `ctx.${v.variable}`).join(", "), availableVariables.length > 5 && "...")),
     /* @__PURE__ */ React10.createElement("div", { className: "mt-2" }, /* @__PURE__ */ React10.createElement("label", { className: "text-[10px] text-slate-400" }, "Description"), /* @__PURE__ */ React10.createElement(
@@ -2289,7 +2313,7 @@ var OutputParameterEditor = ({ parameters, onChange, availableVariables }) => {
         value: param.description,
         onChange: (e) => updateParameter(index, "description", e.target.value),
         placeholder: "What this output represents",
-        className: "w-full text-xs p-1.5 border border-slate-200 rounded bg-white focus:outline-none focus:border-[#646cff]"
+        className: "w-full text-xs text-slate-700 p-1.5 border border-slate-200 rounded bg-white focus:outline-none focus:border-[#646cff]"
       }
     ))
   ))));

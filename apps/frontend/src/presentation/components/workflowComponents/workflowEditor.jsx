@@ -37,6 +37,7 @@ import { WorkflowSchemaPanel } from "./workflowSchemaPanel";
 import { WorkflowConsole } from "./workflowConsole";
 import { WorkflowContextPanel } from "./workflowContextPanel";
 import { WorkflowInputArgsPanel } from "./workflowInputArgsPanel";
+import { DataQueryTestingPanel } from "../dataQueryComponents/dataQueryTestingPanel";
 import { useParams } from "react-router-dom";
 
 // Dagre graph for auto-layout
@@ -128,6 +129,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
     const [nodeExecutionStatus, setNodeExecutionStatus] = useState({}); // Map of nodeId -> status
     const [showContextPanel, setShowContextPanel] = useState(false);
     const [workflowContext, setWorkflowContext] = useState({});
+    const [selectedQueryForTesting, setSelectedQueryForTesting] = useState(null);
 
     // Helper to add log entry
     const addLog = useCallback((type, label, message, extra = {}) => {
@@ -434,6 +436,14 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
         }
     }, [tenantID, values.nodes, values.edges, resetNodeExecutionStatus, addLog, clearLogs]);
 
+    // Query testing callback for node configurators
+    const handleQueryTest = useCallback((dataQueryID) => {
+        const query = dataQueries.find(q => String(q.dataQueryID) === String(dataQueryID));
+        if (query) {
+            setSelectedQueryForTesting(query);
+        }
+    }, [dataQueries]);
+
     // Find selected node
     const selectedNode = values.nodes.find(n => n.id === selectedNodeId);
 
@@ -444,6 +454,8 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
             onRefreshDataQueries={refetchDataQueries}
             workflowNodes={values.nodes}
             nodeExecutionStatus={nodeExecutionStatus}
+            tenantID={tenantID}
+            onQueryTest={handleQueryTest}
         >
             <WorkflowEdgeContext.Provider value={{ deleteEdge, updateEdge }}>
                 <ReactFlowProvider>
@@ -687,6 +699,15 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                             </div>
                         </ResizablePanel>
                     </ResizablePanelGroup>
+
+                    {/* Render Query Testing Panel when a query is selected for testing */}
+                    {selectedQueryForTesting && (
+                        <DataQueryTestingPanel
+                            selectedQueryForTesting={selectedQueryForTesting}
+                            setSelectedQueryForTesting={setSelectedQueryForTesting}
+                        />
+                    )}
+
                 </ReactFlowProvider>
             </WorkflowEdgeContext.Provider>
         </WorkflowNodesProvider>
