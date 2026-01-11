@@ -153,7 +153,6 @@ body {
   min-width: 320px;
   min-height: 100vh;
   font-family: "Poppins", serif !important;
-  
 }
 
 button:focus {outline:0 !important;}

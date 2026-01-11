@@ -12,6 +12,7 @@ import { FaUserCog } from "react-icons/fa";
 import { FaPlus } from "react-icons/fa6";
 import { FiUsers } from "react-icons/fi";
 import { PiFileSql } from "react-icons/pi";
+import { IoChatbubblesOutline } from "react-icons/io5";
 import {
   MdOutlineLockPerson,
   MdOutlineSchema,
@@ -219,6 +220,12 @@ export const MainDrawerList = () => {
       title: CONSTANTS.STRINGS.MAIN_DRAWER_QUERIES_TITLE,
       icon: PiFileSql,
       path: CONSTANTS.ROUTES.RAW_SQL_QUERY.path(tenantID),
+    },
+    {
+      type: "link",
+      title: "Data Explorer",
+      icon: IoChatbubblesOutline,
+      path: CONSTANTS.ROUTES.DATABASE_CHAT.path(tenantID),
     },
     {
       type: "collapsible",

@@ -7,9 +7,6 @@ const { httpServer } = require("./config/http-server.config");
 const Logger = require("./utils/logger");
 const { socketIO } = require("./config/socket.io");
 const { isModuleEnabled } = require("./config/module.config");
-const {
-  aiSocketController,
-} = require("./modules/ai/socket/ai.socket.controller");
 // Middleware setup
 expressApp.use(cookieParser());
 
@@ -39,8 +36,19 @@ if (isModuleEnabled(constants.MODULES.TENANT)) {
 //   );
 // }
 
+// Health check endpoint for Docker/Kubernetes health monitoring
+expressApp.get("/api/v1/health", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: environment.NODE_ENV || "development",
+  });
+});
+
 // Global error-handling middleware
 expressApp.use((err, req, res, next) => {
+
   Logger.log("error", {
     message: "unhandled error",
     params: { error: err.message, stack: err.stack },
@@ -68,19 +76,6 @@ expressApp.all("*", (req, res) => {
 
 socketIO.on("connection", async (socket) => {
   const { firebase_id, token } = socket.handshake.auth;
-
-  socket.on(
-    constants.SOCKET_RECEIVE_EVENTS.AI_CHAT_USER_MESSAGE,
-    async (data) => {
-      await aiSocketController.onUserMessageReceived({
-        socket,
-        message: data.message,
-        chatRoomID: data.chatRoomID,
-        firebaseID: firebase_id,
-      });
-    }
-  );
-
   socket.on(constants.SOCKET_RECEIVE_EVENTS.WORKFLOW_RUN_JOIN, async (data) => {
     const {
       workflowSocketController,

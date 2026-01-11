@@ -160,13 +160,13 @@ export const AIChatButton = () => {
                                 </Typography>
                                 <div className="flex items-center gap-2 ml-3">
                                     <selectedModeData.icon className={`text-sm ${selectedModeData.color}`} />
-                                    <span className="text-xs bg-gray-100 px-2 py-1  font-medium" style={{ borderRadius: '6px' }}>
+                                    <span className="text-xs bg-gray-100 px-2.5 py-1 font-medium text-gray-700" style={{ borderRadius: '8px' }}>
                                         {selectedModeData.label}
                                     </span>
                                 </div>
                                 {isTyping && (
-                                    <div className="flex items-center gap-1 ml-2">
-                                        <div className="w-1.5 h-1.5 bg-green-500  animate-pulse" style={{ borderRadius: '6px' }}></div>
+                                    <div className="flex items-center gap-1.5 ml-2">
+                                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                                         <span className="text-xs text-green-600 font-medium">Active</span>
                                     </div>
                                 )}
@@ -200,7 +200,7 @@ export const AIChatButton = () => {
                                     <div key={index}>
                                         {msg.type === 'system' ? (
                                             <div className="flex justify-center my-4">
-                                                <div className="bg-blue-50 text-blue-700 px-3 py-1 text-xs font-medium" style={{ borderRadius: '6px' }}>
+                                                <div className="bg-blue-50 text-blue-700 px-3 py-1.5 text-xs font-medium border border-blue-100" style={{ borderRadius: '8px' }}>
                                                     {msg.text}
                                                 </div>
                                             </div>
@@ -244,7 +244,7 @@ export const AIChatButton = () => {
                                             },
                                             '& .MuiOutlinedInput-notchedOutline': {
                                                 borderColor: '#e5e7eb',
-                                                borderRadius: '6px'
+                                                borderRadius: '8px'
                                             },
                                             '&:hover .MuiOutlinedInput-notchedOutline': {
                                                 borderColor: '#9ca3af'
@@ -299,7 +299,7 @@ export const AIChatButton = () => {
                             </div>
 
                             {/* Main Input Container */}
-                            <div style={{ borderRadius: '6px' }} className="relative flex flex-row items-center justify-between gap-2 bg-white  border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 p-2">
+                            <div style={{ borderRadius: '8px' }} className="relative flex flex-row items-center justify-between gap-2 bg-white border border-gray-200 hover:border-gray-300 transition-colors p-2">
                                 {/* Left Utility Buttons */}
 
 
@@ -315,7 +315,7 @@ export const AIChatButton = () => {
                                             : `Ask about ${selectedModeData.label.toLowerCase()}...`
                                     }
                                     disabled={isInputDisabled}
-                                    className="flex-1 resize-none border-none outline-none bg-transparent px-3 py-3 text-sm leading-relaxed max-h-32 min-h-[20px] placeholder-gray-400 disabled:opacity-50"
+                                    className="flex-1 resize-none border-none outline-none bg-transparent px-3 py-3 text-sm leading-relaxed max-h-32 min-h-[20px] placeholder-gray-400 text-gray-700 disabled:opacity-50"
                                     rows={1}
                                     style={{
                                         height: 'auto',
@@ -330,13 +330,13 @@ export const AIChatButton = () => {
                                     onClick={_handleSendUserMessage}
                                     disabled={!input.trim() || isInputDisabled}
                                     className={`
-                                        p-2.5  transition-all duration-200 shrink-0
+                                        p-2.5 transition-all duration-200 shrink-0
                                         ${(!input.trim() || isInputDisabled)
-                                            ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                        : 'bg-[#646cff] text-white hover:bg-[#4f56df] shadow-sm hover:shadow-md'
+                                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                        : 'bg-[#646cff] text-white hover:bg-[#5558e3]'
                                         }
                                     `}
-                                    style={{ borderRadius: '6px' }}
+                                    style={{ borderRadius: '8px' }}
                                 >
                                     {isTyping ? (
                                         <FaSpinner className="animate-spin text-sm" />

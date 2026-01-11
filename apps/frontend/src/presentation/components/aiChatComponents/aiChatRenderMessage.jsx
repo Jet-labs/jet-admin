@@ -61,12 +61,12 @@ export const AIChatRenderMessage = React.memo(({ message, sendApproval }) => {
                         <div className="space-y-2">
                             {Object.entries(processedJSONMessage.suggestedQuery).map(([key, value], index) => (
                                 <details key={index} className="group" open>
-                                    <summary className="flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100  cursor-pointer transition-colors" style={{ borderRadius: '6px' }}>
-                                        <span className="font-semibold text-gray-800 capitalize">
+                                    <summary className="flex items-center justify-between p-3 bg-gray-50 hover:bg-gray-100 cursor-pointer transition-colors border border-gray-200" style={{ borderRadius: '8px' }}>
+                                        <span className="font-semibold text-gray-700 capitalize">
                                             {key.replace(/([A-Z])/g, ' $1').trim()}
                                         </span>
                                         <svg
-                                            className="w-5 h-5 text-gray-500 transition-transform group-open:rotate-180"
+                                            className="w-5 h-5 text-gray-400 transition-transform group-open:rotate-180"
                                             fill="none"
                                             stroke="currentColor"
                                             viewBox="0 0 24 24"
@@ -74,7 +74,7 @@ export const AIChatRenderMessage = React.memo(({ message, sendApproval }) => {
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                                         </svg>
                                     </summary>
-                                    <div className="mt-2 p-4 bg-white border border-gray-200  shadow-sm" style={{ borderRadius: '6px' }}>
+                                    <div className="mt-2 p-4 bg-white border border-gray-200" style={{ borderRadius: '8px' }}>
                                         {typeof value === 'string' ? (
                                             <p className="text-gray-700 leading-relaxed break-words">
                                                 {value}
@@ -101,15 +101,15 @@ export const AIChatRenderMessage = React.memo(({ message, sendApproval }) => {
                     </div>
 
                     {/* Action buttons */}
-                    <div className="flex gap-2">
-                        <button onClick={_handleApprovePrompt} className="px-3 py-1 text-xs bg-green-500 hover:bg-green-600 text-white  transition-colors" style={{ borderRadius: '6px' }}>
+                    <div className="flex gap-2 flex-wrap">
+                        <button onClick={_handleApprovePrompt} className="px-4 py-2 text-xs font-medium bg-emerald-500 hover:bg-emerald-600 text-white transition-colors" style={{ borderRadius: '8px' }}>
                             Approve
                         </button>
-                        <button className="px-3 py-1 text-xs bg-red-500 hover:bg-red-600 text-white  transition-colors" style={{ borderRadius: '6px' }}>
+                        <button className="px-4 py-2 text-xs font-medium bg-rose-500 hover:bg-rose-600 text-white transition-colors" style={{ borderRadius: '8px' }}>
                             Reject
                         </button>
-                        <button onClick={_handleSelectQueryForTesting} className="px-3 py-1 text-xs bg-yellow-500 hover:bg-yellow-600 text-white  transition-colors" style={{ borderRadius: '6px' }}>
-                            Test query
+                        <button onClick={_handleSelectQueryForTesting} className="px-4 py-2 text-xs font-medium bg-amber-500 hover:bg-amber-600 text-white transition-colors" style={{ borderRadius: '8px' }}>
+                            Test Query
                         </button>
                         {selectedQueryForTesting && <DataQueryTestingPanel selectedQueryForTesting={selectedQueryForTesting} setSelectedQueryForTesting={_handleDeselectQueryForTesting} />}
                         

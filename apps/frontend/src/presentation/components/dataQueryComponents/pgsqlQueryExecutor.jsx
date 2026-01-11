@@ -1,8 +1,10 @@
-import { CircularProgress } from "@mui/material";
+import { CircularProgress, Tooltip } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import PropTypes from "prop-types";
 import React, { useState } from "react";
 import { FaPlay } from "react-icons/fa";
+import { MdFormatAlignLeft, MdWrapText } from "react-icons/md";
+import { format as formatSQL } from "sql-formatter";
 import { CONSTANTS } from "../../../constants";
 import { executeRawSQLQueryAPI } from "../../../data/apis/database";
 import { extractError } from "../../../utils/error";
@@ -15,14 +17,16 @@ import {
 } from "../ui/resizable";
 import { QueryResponseView } from "./queryResponseView";
 
-export const PGSQLQueryExecutor = ({ tenantID }) => {
+export const PGSQLQueryExecutor = ({ tenantID, initialQuery }) => {
   PGSQLQueryExecutor.propTypes = {
     tenantID: PropTypes.number.isRequired,
+    initialQuery: PropTypes.string,
   };
-  const [sqlQuery, setSqlQuery] = useState("");
+  const [sqlQuery, setSqlQuery] = useState(initialQuery || "");
   const [queryResults, setQueryResults] = useState(null);
   // eslint-disable-next-line no-unused-vars
   const [resultTab, setResultTab] = useState(0);
+  const [wordWrap, setWordWrap] = useState(true);
 
   // Use React Query's useMutation hook
   const {
@@ -45,6 +49,30 @@ export const PGSQLQueryExecutor = ({ tenantID }) => {
       displayError(`Query execution failed: ${extractError(error)}`);
     },
   });
+
+  const handleFormatSQL = () => {
+    if (!sqlQuery.trim()) {
+      displayError("No SQL query to format");
+      return;
+    }
+    try {
+      const formatted = formatSQL(sqlQuery, {
+        language: "postgresql",
+        tabWidth: 2,
+        useTabs: false,
+        keywordCase: "upper",
+        linesBetweenQueries: 2,
+      });
+      setSqlQuery(formatted);
+      displaySuccess("SQL formatted successfully");
+    } catch (error) {
+      displayError(`Failed to format SQL: ${error.message}`);
+    }
+  };
+
+  const handleToggleWordWrap = () => {
+    setWordWrap((prev) => !prev);
+  };
 
   const handleExecuteQuery = () => {
     if (!sqlQuery.trim()) {
@@ -81,12 +109,36 @@ export const PGSQLQueryExecutor = ({ tenantID }) => {
         >
           <ResizablePanel defaultSize={20}>
             <div className="p-3 flex-shrink-0">
+              {/* Toolbar */}
+              <div className="flex items-center gap-1 mb-2">
+                <Tooltip title="Format SQL" arrow>
+                  <button
+                    type="button"
+                    onClick={handleFormatSQL}
+                    disabled={!sqlQuery.trim()}
+                    className="p-1.5 bg-[#f5f5ff] rounded hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed text-slate-600 hover:text-slate-800 transition-colors"
+                  >
+                    <MdFormatAlignLeft size={14} />
+                  </button>
+                </Tooltip>
+                <Tooltip title={wordWrap ? "Disable Word Wrap" : "Enable Word Wrap"} arrow>
+                  <button
+                    type="button"
+                    onClick={handleToggleWordWrap}
+                    className={`p-1.5 rounded bg-[#f5f5ff] hover:bg-slate-100 transition-colors ${wordWrap ? "text-[#646cff] bg-slate-100" : "text-slate-600 hover:text-slate-800"
+                      }`}
+                  >
+                    <MdWrapText size={14} />
+                  </button>
+                </Tooltip>
+              </div>
               <div className="mb-2">
                 <CodeEditorField
                   code={sqlQuery}
                   setCode={setSqlQuery}
                   language="sql"
                   height="150px"
+                  wordWrap={wordWrap}
                 />
               </div>
 

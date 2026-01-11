@@ -6,6 +6,9 @@ import { ProtectedLayout } from "../layouts/protectedLayout";
 import { DatabaseSchemaLayout } from "../layouts/databaseSchemaLayout";
 import { DatabaseTableLayout } from "../layouts/databaseTableLayout";
 import { DatabaseTriggerLayout } from "../layouts/databaseTriggerLayout";
+import { DatabaseViewLayout } from "../layouts/databaseViewLayout";
+import { StoredProcedureLayout } from "../layouts/storedProcedureLayout";
+import { DatabaseFunctionLayout } from "../layouts/databaseFunctionLayout";
 import { UserManagementLayout } from "../layouts/userManagementLayout";
 import { RoleManagementLayout } from "../layouts/roleManagementLayout";
 const SignInPage = lazy(() => import("../../pages/signInPage"));
@@ -49,10 +52,38 @@ const UpdateTenantRolePage = lazy(() =>
   import("../../pages/updateTenantRolePage")
 );
 const RawSqlQueryPage = lazy(() => import("../../pages/rawSqlQueryPage"));
+const DatabaseChatPage = lazy(() => import("../../pages/databaseChatPage"));
 const DatabaseSchemaLandingPage = lazy(() =>
   import("../../pages/databaseSchemaLandingPage")
 );
 const ViewAuditLogsPage = lazy(() => import("../../pages/viewAuditLogsPage"));
+const ViewsLayoutLandingPage = lazy(() =>
+  import("../../pages/viewsLayoutLandingPage")
+);
+const ViewDatabaseViewDetailPage = lazy(() =>
+  import("../../pages/viewDatabaseViewDetailPage")
+);
+const AddDatabaseViewPage = lazy(() =>
+  import("../../pages/addDatabaseViewPage")
+);
+const ProceduresLayoutLandingPage = lazy(() =>
+  import("../../pages/proceduresLayoutLandingPage")
+);
+const ViewStoredProcedureDetailPage = lazy(() =>
+  import("../../pages/viewStoredProcedureDetailPage")
+);
+const AddStoredProcedurePage = lazy(() =>
+  import("../../pages/addStoredProcedurePage")
+);
+const FunctionsLayoutLandingPage = lazy(() =>
+  import("../../pages/viewFunctionsPage")
+);
+const ViewFunctionDetailPage = lazy(() =>
+  import("../../pages/viewFunctionDetailPage")
+);
+const AddFunctionPage = lazy(() =>
+  import("../../pages/addFunctionPage")
+);
 
 const router = createBrowserRouter([
   {
@@ -129,6 +160,57 @@ const router = createBrowserRouter([
                   },
                 ],
               },
+              {
+                element: <DatabaseViewLayout />,
+                children: [
+                  {
+                    path: CONSTANTS.ROUTES.VIEW_DATABASE_VIEWS.code,
+                    element: <ViewsLayoutLandingPage />,
+                  },
+                  {
+                    path: CONSTANTS.ROUTES.ADD_DATABASE_VIEW.code,
+                    element: <AddDatabaseViewPage />,
+                  },
+                  {
+                    path: CONSTANTS.ROUTES.VIEW_DATABASE_VIEW_BY_NAME.code,
+                    element: <ViewDatabaseViewDetailPage />,
+                  },
+                ],
+              },
+              {
+                element: <StoredProcedureLayout />,
+                children: [
+                  {
+                    path: CONSTANTS.ROUTES.VIEW_STORED_PROCEDURES.code,
+                    element: <ProceduresLayoutLandingPage />,
+                  },
+                  {
+                    path: CONSTANTS.ROUTES.ADD_STORED_PROCEDURE.code,
+                    element: <AddStoredProcedurePage />,
+                  },
+                  {
+                    path: CONSTANTS.ROUTES.VIEW_STORED_PROCEDURE_BY_NAME.code,
+                    element: <ViewStoredProcedureDetailPage />,
+                  },
+                ],
+              },
+              {
+                element: <DatabaseFunctionLayout />,
+                children: [
+                  {
+                    path: CONSTANTS.ROUTES.VIEW_FUNCTIONS.code,
+                    element: <FunctionsLayoutLandingPage />,
+                  },
+                  {
+                    path: CONSTANTS.ROUTES.ADD_FUNCTION.code,
+                    element: <AddFunctionPage />,
+                  },
+                  {
+                    path: CONSTANTS.ROUTES.VIEW_FUNCTION_BY_NAME.code,
+                    element: <ViewFunctionDetailPage />,
+                  },
+                ],
+              },
             ],
           },
           {
@@ -138,6 +220,10 @@ const router = createBrowserRouter([
           {
             path: CONSTANTS.ROUTES.RAW_SQL_QUERY.code,
             element: <RawSqlQueryPage />,
+          },
+          {
+            path: CONSTANTS.ROUTES.DATABASE_CHAT.code,
+            element: <DatabaseChatPage />,
           },
           {
             element: <UserManagementLayout />,

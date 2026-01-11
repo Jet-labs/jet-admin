@@ -125,13 +125,14 @@ const DatabaseSchemaLandingPage = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-3">
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 mb-3">
         <StatCard
           title="Tables"
           count={tableCount}
           icon={<FaTable className="text-blue-500" />}
           iconBgClass="bg-blue-100"
           subtext="Active Tables"
+          onClick={() => navigate(CONSTANTS.ROUTES.VIEW_DATABASE_TABLES.path(tenantID, databaseSchemaName))}
         />
         <StatCard
           title="Views"
@@ -139,6 +140,7 @@ const DatabaseSchemaLandingPage = () => {
           icon={<FaEye className="text-purple-500" />}
           iconBgClass="bg-purple-100"
           subtext="Database Views"
+          onClick={() => navigate(CONSTANTS.ROUTES.VIEW_DATABASE_VIEWS.path(tenantID, databaseSchemaName))}
         />
         <StatCard
           title="Triggers"
@@ -146,13 +148,23 @@ const DatabaseSchemaLandingPage = () => {
           icon={<FaBolt className="text-amber-500" />}
           iconBgClass="bg-amber-100"
           subtext="Event Triggers"
+          onClick={() => navigate(CONSTANTS.ROUTES.VIEW_DATABASE_TRIGGERS.path(tenantID, databaseSchemaName))}
         />
         <StatCard
           title="Functions"
           count="--"
           icon={<FaCode className="text-emerald-500" />}
           iconBgClass="bg-emerald-100"
-          subtext="Stored Procedures"
+          subtext="SQL Functions"
+          onClick={() => navigate(CONSTANTS.ROUTES.VIEW_FUNCTIONS.path(tenantID, databaseSchemaName))}
+        />
+        <StatCard
+          title="Procedures"
+          count="--"
+          icon={<FaTerminal className="text-rose-500" />}
+          iconBgClass="bg-rose-100"
+          subtext="Stored Procs"
+          onClick={() => navigate(CONSTANTS.ROUTES.VIEW_STORED_PROCEDURES.path(tenantID, databaseSchemaName))}
         />
       </div>
 

@@ -16,6 +16,7 @@ export const CodeEditorField = ({
   outlined = true,
   rounded = true,
   className = "",
+  wordWrap = true,
 }) => {
   // PropTypes should be defined outside the component function body
   CodeEditorField.propTypes = {
@@ -27,6 +28,7 @@ export const CodeEditorField = ({
     height: PropTypes.string,
     outlined: PropTypes.bool,
     rounded: PropTypes.bool,
+    wordWrap: PropTypes.bool,
   };
 
   const handleEditorWillMount = (monaco) => {
@@ -48,6 +50,7 @@ export const CodeEditorField = ({
     scrollBeyondLastLine: false, // Don't allow scrolling past the last line
     lineNumbersMinChars: 2,
     folding: false,
+    wordWrap: wordWrap ? 'on' : 'off', // Control word wrap
   };
 
   return (

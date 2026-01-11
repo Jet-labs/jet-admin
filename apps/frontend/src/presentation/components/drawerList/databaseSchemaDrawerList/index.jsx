@@ -3,6 +3,8 @@ import { Link, useLocation, useParams } from "react-router-dom";
 import React, { useMemo } from "react";
 import { FaDatabase } from "react-icons/fa";
 import { VscGithubAction } from "react-icons/vsc";
+import { MdTableView, MdFunctions, MdSettings } from "react-icons/md";
+import { TbMathFunction } from "react-icons/tb";
 import { CONSTANTS } from "../../../../constants";
 
 export const DatabaseSchemaDrawerList = () => {
@@ -14,6 +16,30 @@ export const DatabaseSchemaDrawerList = () => {
         text: "Tables",
         icon: <FaDatabase size={24} className="!text-sm" />,
         to: CONSTANTS.ROUTES.VIEW_DATABASE_TABLES.path(
+          tenantID,
+          databaseSchemaName
+        ),
+      },
+      {
+        text: "Views",
+        icon: <MdTableView size={24} className="!text-sm" />,
+        to: CONSTANTS.ROUTES.VIEW_DATABASE_VIEWS.path(
+          tenantID,
+          databaseSchemaName
+        ),
+      },
+      {
+        text: "Functions",
+        icon: <TbMathFunction size={24} className="!text-sm" />,
+        to: CONSTANTS.ROUTES.VIEW_FUNCTIONS.path(
+          tenantID,
+          databaseSchemaName
+        ),
+      },
+      {
+        text: "Procedures",
+        icon: <MdFunctions size={24} className="!text-sm" />,
+        to: CONSTANTS.ROUTES.VIEW_STORED_PROCEDURES.path(
           tenantID,
           databaseSchemaName
         ),
