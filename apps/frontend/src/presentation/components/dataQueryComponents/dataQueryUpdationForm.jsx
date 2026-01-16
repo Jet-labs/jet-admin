@@ -116,12 +116,6 @@ export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
         {dataQuery && (
           <span className="text-xs text-[#646cff] mt-2">{`Query ID: ${
             dataQuery.dataQueryID
-          } | ${
-            dataQuery.linkedWidgetCount > 0
-              ? `Used in ${dataQuery.linkedWidgetCount} ${
-                  dataQuery.linkedWidgetCount > 1 ? "widgets" : "widget"
-                } `
-              : `Not used in any widget`
           }`}</span>
         )}
       </div>

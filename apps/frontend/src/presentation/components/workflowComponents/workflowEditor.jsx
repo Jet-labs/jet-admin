@@ -37,6 +37,7 @@ import { WorkflowSchemaPanel } from "./workflowSchemaPanel";
 import { WorkflowConsole } from "./workflowConsole";
 import { WorkflowContextPanel } from "./workflowContextPanel";
 import { WorkflowInputArgsPanel } from "./workflowInputArgsPanel";
+import { WorkflowInputModal } from "./workflowInputModal";
 import { DataQueryTestingPanel } from "../dataQueryComponents/dataQueryTestingPanel";
 import { useParams } from "react-router-dom";
 
@@ -130,6 +131,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
     const [showContextPanel, setShowContextPanel] = useState(false);
     const [workflowContext, setWorkflowContext] = useState({});
     const [selectedQueryForTesting, setSelectedQueryForTesting] = useState(null);
+    const [showInputModal, setShowInputModal] = useState(false);
 
     // Helper to add log entry
     const addLog = useCallback((type, label, message, extra = {}) => {
@@ -283,8 +285,23 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
         setNodeExecutionStatus({});
     }, []);
 
-    // Test run workflow using WebSocket for status updates
-    const onTestRun = useCallback(async () => {
+    // Get workflow input args from options
+    const workflowArgs = useMemo(() => {
+        return values.workflowOptions?.args?.filter(arg => arg.key) || [];
+    }, [values.workflowOptions?.args]);
+
+    // Handle Test Run button click - show modal if args exist
+    const onTestRunClick = useCallback(() => {
+        if (workflowArgs.length > 0) {
+            setShowInputModal(true);
+        } else {
+            // No args, run directly with empty params
+            executeTestRun({});
+        }
+    }, [workflowArgs]);
+
+    // Execute the actual test run with provided input params
+    const executeTestRun = useCallback(async (inputParams) => {
         const { testWorkflowAPI } = await import("../../../data/apis/workflow");
 
         setIsTestRunning(true);
@@ -306,7 +323,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                 tenantID,
                 nodes: values.nodes,
                 edges: values.edges,
-                inputParams: {},
+                inputParams,
             });
 
             const instanceID = result.instanceID;
@@ -436,6 +453,12 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
         }
     }, [tenantID, values.nodes, values.edges, resetNodeExecutionStatus, addLog, clearLogs]);
 
+    // Handle input modal submit
+    const handleInputModalSubmit = useCallback((inputParams) => {
+        setShowInputModal(false);
+        executeTestRun(inputParams);
+    }, [executeTestRun]);
+
     // Query testing callback for node configurators
     const handleQueryTest = useCallback((dataQueryID) => {
         const query = dataQueries.find(q => String(q.dataQueryID) === String(dataQueryID));
@@ -558,7 +581,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Actions</p>
                                 <button
                                         type="button"
-                                    onClick={onTestRun}
+                                        onClick={onTestRunClick}
                                     disabled={values.nodes.length === 0 || isTestRunning}
                                         className="px-3 py-2 text-left text-sm text-white bg-green-600 rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center border-none hover:border-none"
                                 >
@@ -705,6 +728,15 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                         <DataQueryTestingPanel
                             selectedQueryForTesting={selectedQueryForTesting}
                             setSelectedQueryForTesting={setSelectedQueryForTesting}
+                        />
+                    )}
+
+                    {/* Workflow Input Modal */}
+                    {showInputModal && (
+                        <WorkflowInputModal
+                            args={workflowArgs}
+                            onSubmit={handleInputModalSubmit}
+                            onClose={() => setShowInputModal(false)}
                         />
                     )}
 

@@ -80,19 +80,11 @@ dataQueryService.getAllDataQueries = async ({ userID, tenantID }) => {
       where: {
         tenantID: tenantID,
       },
-      include: {
-        _count: {
-          select: {
-            tblWidgetQueryMappings: true,
-          },
-        },
-      },
     });
 
     // Transform the result to include counts in a more accessible format
     const transformedQueries = dataQueries.map((query) => ({
       ...query,
-      linkedWidgetCount: query._count.tblWidgetQueryMappings,
       _count: undefined, // Remove the _count property
     }));
 
@@ -752,11 +744,6 @@ dataQueryService.getDataQueryByID = async ({
       },
       include: {
         tblDatasources: true,
-        _count: {
-          select: {
-            tblWidgetQueryMappings: true,
-          },
-        },
       },
     });
 
@@ -767,7 +754,6 @@ dataQueryService.getDataQueryByID = async ({
     // Transform the result to include counts in a more accessible format
     const transformedQuery = {
       ...dataQuery,
-      linkedWidgetCount: dataQuery._count.tblWidgetQueryMappings,
       _count: undefined, // Remove the _count property
     };
 

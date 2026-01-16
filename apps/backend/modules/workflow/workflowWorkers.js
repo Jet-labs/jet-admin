@@ -2,7 +2,7 @@
  * Workflow Workers Startup
  * Initialize all workflow workers and the orchestrator
  */
-const { initializeRabbitMQ, closeRabbitMQ } = require('./queue/queueConfig');
+const { initializeRabbitMQ, closeRabbitMQ } = require('../../config/rabbitmq.config');
 const { startResultsConsumer } = require('./orchestrator/orchestrator');
 const { startTaskWorker } = require('./workers/taskWorker');
 const Logger = require('../../utils/logger');

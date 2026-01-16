@@ -1,7 +1,6 @@
 const winston = require("winston");
 require("winston-daily-rotate-file");
 require("winston-syslog").Syslog;
-const SlackHook = require("winston-slack-webhook-transport");
 const environment = require("../environment");
 const environmentVariables = require("../environment");
 const appLogLevels = {
@@ -61,10 +60,6 @@ const winstonLogger = winston.createLogger({
       level: environment.LOG_LEVEL,
       maxSize: `${environment.LOG_FILE_SIZE}m`,
       maxFiles: `${environment.LOG_RETENTION}d`,
-    }),
-    new SlackHook({
-      webhookUrl: environment.SLACK_ERROR_NOTIFICATION_HOOK,
-      level: "error",
     }),
   ],
 });

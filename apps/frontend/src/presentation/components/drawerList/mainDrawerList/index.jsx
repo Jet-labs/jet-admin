@@ -324,7 +324,7 @@ export const MainDrawerList = () => {
           <>
             <button
               onClick={_handleNavigateToAddTenantPage}
-              className="w-full py-1 px-2 mt-1 mb-2 text-sm item-center flex flex-row items-center justify-center font-medium text-white focus:outline-none bg-[#646cff] rounded border border-gray-200 hover:bg-gray-100 hover:text-blue-700 focus:z-10 focus:ring-4 focus:ring-gray-100 "
+                  className="flex flex-row items-center justify-center rounded bg-[#646cff] px-3 py-1.5 text-sm text-white hover:bg-[#646cff]/90 focus:ring-2 focus:ring-[#646cff]/50 w-full outline-none focus:outline-none"
             >
               {CONSTANTS.STRINGS.ADD_TENANT_FORM_TITLE}
               <FaPlus className="!w-4 !h-4 !text-white ml-1" />

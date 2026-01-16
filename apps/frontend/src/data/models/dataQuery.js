@@ -14,7 +14,6 @@ export class DataQuery {
     datasourceType,
     dataQueryResultSchema,
     runOnLoad,
-    linkedWidgetCount,
     tblDatasources,
   }) {
     this.dataQueryID = dataQueryID;
@@ -29,7 +28,6 @@ export class DataQuery {
     this.dataQueryOptions = dataQueryOptions;
     this.datasourceID = datasourceID;
     this.datasourceType = datasourceType;
-    this.linkedWidgetCount = linkedWidgetCount || 0;
     this.datasource = tblDatasources ? new Datasource(tblDatasources) : null;
   }
   static toList(data) {

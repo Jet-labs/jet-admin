@@ -2,7 +2,7 @@
  * Task Worker
  * Main worker that processes all node types using RabbitMQ
  */
-const { getChannel, addResult, QUEUE_NAMES } = require('../queue/queueConfig');
+const { getChannel, addResult, QUEUE_NAMES } = require('../../../config/rabbitmq.config');
 const { getHandler } = require('./handlers');
 const { resolveFromContext } = require('./workerSDK');
 const Logger = require('../../../utils/logger');

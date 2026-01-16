@@ -26,9 +26,7 @@ export default class PostgreSQLDataSource extends DataSource {
         message: "postgresql:PostgreSQLDataSource:execute:catch",
         params: error.message || error,
       });
-      throw new Error(
-        `Database request failed: ${error.response?.status || "No response"}`
-      );
+      throw error;
     } finally {
       await client.end();
     }

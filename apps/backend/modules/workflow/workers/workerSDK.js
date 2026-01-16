@@ -2,7 +2,7 @@
  * Worker SDK
  * Abstraction layer for dumb workers - handles queue connection and result publishing
  */
-const { getChannel, addResult, QUEUE_NAMES } = require('../queue/queueConfig');
+const { getChannel, addResult, QUEUE_NAMES } = require('../../../config/rabbitmq.config');
 const Logger = require('../../../utils/logger');
 
 /**

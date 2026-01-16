@@ -9,7 +9,7 @@ const { z, schemas } = require("../../utils/validation.utils");
 // ============================================================
 
 const createWorkflowSchema = z.object({
-  workflowTitle: z.string().min(1, "workflowTitle is required").max(255),
+  title: z.string().min(1, "workflow title is required").max(255),
   workflowDescription: z.string().optional(),
   workflowNodes: z.array(z.any()).optional(),
   workflowEdges: z.array(z.any()).optional(),

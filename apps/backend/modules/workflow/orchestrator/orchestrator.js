@@ -3,7 +3,7 @@
  * Main orchestration loop - Check-Decide-Act cycle
  */
 const { v4: uuidv4 } = require('uuid');
-const { getChannel, addNodeJob, QUEUE_NAMES } = require('../queue/queueConfig');
+const { getChannel, addNodeJob, QUEUE_NAMES } = require('../../../config/rabbitmq.config');
 const { stateManager } = require('./stateManager');
 const { dagScheduler } = require('./dagScheduler');
 const Logger = require('../../../utils/logger');
