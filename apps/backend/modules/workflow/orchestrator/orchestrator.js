@@ -15,11 +15,11 @@ const constants = require('../../../constants');
  * This is the core Check-Decide-Act cycle
  */
 async function handleTaskResult(result) {
-  const { instanceID, nodeID, status, output, nextHandle, queueDelay, error } = result;
+  const { instanceID, nodeID, nodeType, outputVariable, status, output, nextHandle, queueDelay, error } = result;
   
   Logger.log('info', {
     message: 'orchestrator:handleTaskResult',
-    params: { instanceID, nodeID, status, nextHandle },
+    params: { instanceID, nodeID, nodeType, outputVariable, status, nextHandle },
   });
   
   try {
@@ -44,8 +44,23 @@ async function handleTaskResult(result) {
       isTest: isTestRun,
     });
     
-    // 3. Update context with node output (keyed by node UUID)
-    const contextUpdate = { [nodeID]: output };
+    // 3. Update context with node output
+    // Use outputVariable as key (e.g., "queryResult") for friendly access like ctx.queryResult
+    // Flatten the output so values are directly accessible (e.g., ctx.queryResult instead of ctx.queryResult.queryResult)
+    let contextUpdate = {};
+    if (outputVariable && output) {
+      // Check if output contains the outputVariable key (handlers return { [outputVariable]: data, success: true })
+      // Extract just the data value for cleaner context
+      if (output[outputVariable] !== undefined) {
+        contextUpdate[outputVariable] = output[outputVariable];
+      } else {
+        // Fallback: store entire output
+        contextUpdate[outputVariable] = output;
+      }
+    }
+    // Also store by nodeID for backward compatibility and debugging
+    contextUpdate[`__node_${nodeID}`] = { output, status, outputVariable };
+
     const updatedInstance = await stateManager.updateContext(
       instanceID,
       contextUpdate,

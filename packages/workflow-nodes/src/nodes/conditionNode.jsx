@@ -403,6 +403,34 @@ export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
           />
         </div>
 
+        {/* Comprehensive instructions */}
+        <div className="p-2.5 bg-slate-50 border border-slate-200 rounded text-[10px] text-slate-600 space-y-2">
+          <div className="font-semibold text-slate-700 text-xs">📘 Condition Expressions</div>
+
+          <div>
+            <span className="font-medium text-slate-700">Expression Examples:</span>
+            <div className="ml-3 mt-0.5 text-slate-500 font-mono text-[9px] space-y-0.5">
+              <div><code className="bg-white px-1 rounded">ctx.queryResult.length &gt; 0</code></div>
+              <div><code className="bg-white px-1 rounded">ctx.input.status === "active"</code></div>
+              <div><code className="bg-white px-1 rounded">ctx.userData?.role === "admin"</code></div>
+            </div>
+          </div>
+
+          <div>
+            <span className="font-medium text-slate-700">Evaluation:</span>
+            <div className="ml-3 mt-0.5 text-slate-500">
+              Branches are evaluated top-to-bottom. First matching branch is taken. If none match, <strong>Default (else)</strong> is used.
+            </div>
+          </div>
+
+          <div>
+            <span className="font-medium text-slate-700">Handles:</span>
+            <div className="ml-3 mt-0.5 text-slate-500">
+              Each branch creates a <strong>purple</strong> output handle. <strong>Gray</strong> = Default, <strong>Red</strong> = Error.
+            </div>
+          </div>
+        </div>
+
         <button
           type="button"
           onClick={handleSave}

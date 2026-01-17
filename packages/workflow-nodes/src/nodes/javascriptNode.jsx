@@ -244,6 +244,39 @@ export const JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
           renderers={workflowNodeRenderers}
           onChange={handleFormChange}
         />
+
+        {/* Comprehensive instructions */}
+        <div className="p-2.5 bg-slate-50 border border-slate-200 rounded text-[10px] text-slate-600 space-y-2">
+          <div className="font-semibold text-slate-700 text-xs">📘 Writing JavaScript Code</div>
+
+          <div>
+            <span className="font-medium text-slate-700">Access Context:</span>
+            <div className="ml-3 mt-0.5 text-slate-500 font-mono text-[9px] space-y-0.5">
+              <div><code className="bg-white px-1 rounded">ctx.input.paramName</code> → workflow input</div>
+              <div><code className="bg-white px-1 rounded">ctx.queryResult</code> → previous node output</div>
+              <div><code className="bg-white px-1 rounded">ctx.item</code> → current loop item</div>
+            </div>
+          </div>
+
+          <div>
+            <span className="font-medium text-slate-700">Return Value:</span>
+            <div className="ml-3 mt-0.5 text-slate-500">
+              Use <code className="bg-white px-1 py-0.5 rounded font-mono">return yourValue;</code> to store result in output variable.
+            </div>
+          </div>
+
+          <div>
+            <span className="font-medium text-slate-700">Available Globals:</span>
+            <div className="ml-3 mt-0.5 text-slate-500">
+              <code className="bg-white px-1 rounded font-mono text-[9px]">JSON, Math, Date, Array, Object, String, Number, Boolean, parseInt, parseFloat</code>
+            </div>
+          </div>
+
+          <div className="text-amber-600 bg-amber-50 border border-amber-200 rounded p-1.5 mt-2">
+            <strong>⚠️ Note:</strong> Code runs in a sandbox. No network access, filesystem, or require().
+          </div>
+        </div>
+
         <button
           type="button"
           onClick={handleSave}

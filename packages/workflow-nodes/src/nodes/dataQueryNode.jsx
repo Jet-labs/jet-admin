@@ -25,7 +25,7 @@ const ERROR_HANDLING_OPTIONS = {
 // DataQueryNodeConfigurator - JSON Forms based configuration
 // ============================================================================
 export const DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
-  const { dataQueries, strings, onRefreshDataQueries, workflowNodes, onQueryTest } = useWorkflowNodes();
+  const { dataQueries, strings, onRefreshDataQueries, workflowNodes, workflowEdges, workflowInputArgs, onQueryTest } = useWorkflowNodes();
   const [formData, setFormData] = useState({
     title: data?.title || '',
     description: data?.description || '',
@@ -92,7 +92,7 @@ export const DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
         outputVariable: {
           type: 'string',
           title: strings.WORKFLOW_EDITOR_OUTPUT_VARIABLE_LABEL || 'Output Variable Name',
-          description: 'Variable name to store result (accessible as ctx.{name})',
+          description: 'Variable name to store result (accessible as {{ctx.{name}}})',
           pattern: '^[a-zA-Z_][a-zA-Z0-9_]*$',
         },
 
@@ -176,6 +176,8 @@ export const DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
           isDynamicArgs: true,
           args: selectedQuery.dataQueryOptions.args,
           workflowNodes: workflowNodes,
+          workflowEdges: workflowEdges,
+          workflowInputArgs: workflowInputArgs,
           currentNodeId: nodeId,
         },
       });
@@ -267,6 +269,34 @@ export const DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
           renderers={workflowNodeRenderers}
           onChange={handleFormChange}
         />
+
+        {/* Comprehensive instructions */}
+        <div className="p-2.5 bg-slate-50 border border-slate-200 rounded text-[10px] text-slate-600 space-y-2">
+          <div className="font-semibold text-slate-700 text-xs">📘 Query Arguments</div>
+
+          <div>
+            <span className="font-medium text-slate-700">Argument Format:</span>
+            <div className="ml-3 mt-0.5 text-slate-500 font-mono text-[9px] space-y-0.5">
+              <div><code className="bg-white px-1 rounded">{"{{ctx.input.userId}}"}</code> → pass input value</div>
+              <div><code className="bg-white px-1 rounded">{"{{ctx.queryResult.id}}"}</code> → from previous query</div>
+              <div><code className="bg-white px-1 rounded">{"id_{{ctx.input.id}}"}</code> → string interpolation</div>
+            </div>
+          </div>
+
+          <div>
+            <span className="font-medium text-slate-700">Access Result:</span>
+            <div className="ml-3 mt-0.5 text-slate-500">
+              Result stored in <code className="bg-white px-1 py-0.5 rounded font-mono">{"ctx.{outputVariable}"}</code> for use in next nodes.
+            </div>
+          </div>
+
+          <div>
+            <span className="font-medium text-slate-700">Handles:</span>
+            <div className="ml-3 mt-0.5 text-slate-500">
+              <strong>Green:</strong> Query succeeded → <strong>Red:</strong> Query failed (use for error handling)
+            </div>
+          </div>
+        </div>
 
         <div className="flex justify-between items-center gap-2 pt-2 border-t border-slate-100">
           <button

@@ -1082,6 +1082,8 @@ export const CONSTANTS = {
         `/api/v1/tenants/${tenantID}/workflows/test`,
       getWorkflowRunStatusAPI: (tenantID, instanceID) =>
         `/api/v1/tenants/${tenantID}/workflows/instances/${instanceID}`,
+      stopTestWorkflowAPI: (tenantID, instanceID) =>
+        `/api/v1/tenants/${tenantID}/workflows/instances/${instanceID}/stop`,
     },
     AUTH: {
       getUserInfoAPI: () => "/api/v1/auth",

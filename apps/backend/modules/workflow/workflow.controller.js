@@ -186,5 +186,27 @@ workflowController.testWorkflow = async (req, res) => {
   }
 };
 
+/**
+ * Stop and delete a test workflow instance.
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+workflowController.stopTestWorkflow = async (req, res) => {
+  try {
+    const { instanceID } = req.params;
+    const authContext = getServiceAuthContext(req);
+
+    Logger.log("info", { message: "WorkflowController:stopTestWorkflow:params", params: { instanceID, authContext } });
+
+    const result = await workflowService.stopTestWorkflow({ instanceID });
+
+    Logger.log("success", { message: "WorkflowController:stopTestWorkflow:success", params: { instanceID } });
+    expressUtils.sendResponse(res, true, result);
+  } catch (error) {
+    Logger.log("error", { message: "WorkflowController:stopTestWorkflow:error", params: { error: error.message } });
+    expressUtils.sendResponse(res, false, {}, error);
+  }
+};
+
 module.exports = { workflowController };
 

@@ -43,6 +43,10 @@ var WorkflowNodesProvider = ({
   strings = {},
   onRefreshDataQueries,
   workflowNodes = [],
+  workflowEdges = [],
+  // Edges for DAG traversal
+  workflowInputArgs = [],
+  // Declared workflow input parameters [{key, type, ...}]
   nodeExecutionStatus = {},
   // Map of nodeId -> status
   tenantID = null,
@@ -55,6 +59,8 @@ var WorkflowNodesProvider = ({
     strings,
     onRefreshDataQueries,
     workflowNodes,
+    workflowEdges,
+    workflowInputArgs,
     nodeExecutionStatus,
     tenantID,
     onQueryTest
@@ -615,7 +621,7 @@ var ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
       workflowNodes,
       currentNodeId: nodeId
     }
-  )), /* @__PURE__ */ React4.createElement(
+  )), /* @__PURE__ */ React4.createElement("div", { className: "p-2.5 bg-slate-50 border border-slate-200 rounded text-[10px] text-slate-600 space-y-2" }, /* @__PURE__ */ React4.createElement("div", { className: "font-semibold text-slate-700 text-xs" }, "\u{1F4D8} Condition Expressions"), /* @__PURE__ */ React4.createElement("div", null, /* @__PURE__ */ React4.createElement("span", { className: "font-medium text-slate-700" }, "Expression Examples:"), /* @__PURE__ */ React4.createElement("div", { className: "ml-3 mt-0.5 text-slate-500 font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ React4.createElement("div", null, /* @__PURE__ */ React4.createElement("code", { className: "bg-white px-1 rounded" }, "ctx.queryResult.length > 0")), /* @__PURE__ */ React4.createElement("div", null, /* @__PURE__ */ React4.createElement("code", { className: "bg-white px-1 rounded" }, 'ctx.input.status === "active"')), /* @__PURE__ */ React4.createElement("div", null, /* @__PURE__ */ React4.createElement("code", { className: "bg-white px-1 rounded" }, 'ctx.userData?.role === "admin"')))), /* @__PURE__ */ React4.createElement("div", null, /* @__PURE__ */ React4.createElement("span", { className: "font-medium text-slate-700" }, "Evaluation:"), /* @__PURE__ */ React4.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, "Branches are evaluated top-to-bottom. First matching branch is taken. If none match, ", /* @__PURE__ */ React4.createElement("strong", null, "Default (else)"), " is used.")), /* @__PURE__ */ React4.createElement("div", null, /* @__PURE__ */ React4.createElement("span", { className: "font-medium text-slate-700" }, "Handles:"), /* @__PURE__ */ React4.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, "Each branch creates a ", /* @__PURE__ */ React4.createElement("strong", null, "purple"), " output handle. ", /* @__PURE__ */ React4.createElement("strong", null, "Gray"), " = Default, ", /* @__PURE__ */ React4.createElement("strong", null, "Red"), " = Error."))), /* @__PURE__ */ React4.createElement(
     "button",
     {
       type: "button",
@@ -782,7 +788,7 @@ var ERROR_HANDLING_OPTIONS3 = {
   RETRY_THEN_FAIL: "retry_then_fail"
 };
 var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
-  const { dataQueries, strings, onRefreshDataQueries, workflowNodes, onQueryTest } = useWorkflowNodes();
+  const { dataQueries, strings, onRefreshDataQueries, workflowNodes, workflowEdges, workflowInputArgs, onQueryTest } = useWorkflowNodes();
   const [formData, setFormData] = useState2({
     title: data?.title || "",
     description: data?.description || "",
@@ -841,7 +847,7 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
         outputVariable: {
           type: "string",
           title: strings.WORKFLOW_EDITOR_OUTPUT_VARIABLE_LABEL || "Output Variable Name",
-          description: "Variable name to store result (accessible as ctx.{name})",
+          description: "Variable name to store result (accessible as {{ctx.{name}}})",
           pattern: "^[a-zA-Z_][a-zA-Z0-9_]*$"
         },
         // Execution Settings Tab
@@ -920,6 +926,8 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
           isDynamicArgs: true,
           args: selectedQuery.dataQueryOptions.args,
           workflowNodes,
+          workflowEdges,
+          workflowInputArgs,
           currentNodeId: nodeId
         }
       });
@@ -1002,7 +1010,7 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
       renderers: jetFormsRenderers,
       onChange: handleFormChange
     }
-  ), /* @__PURE__ */ React5.createElement("div", { className: "flex justify-between items-center gap-2 pt-2 border-t border-slate-100" }, /* @__PURE__ */ React5.createElement(
+  ), /* @__PURE__ */ React5.createElement("div", { className: "p-2.5 bg-slate-50 border border-slate-200 rounded text-[10px] text-slate-600 space-y-2" }, /* @__PURE__ */ React5.createElement("div", { className: "font-semibold text-slate-700 text-xs" }, "\u{1F4D8} Query Arguments"), /* @__PURE__ */ React5.createElement("div", null, /* @__PURE__ */ React5.createElement("span", { className: "font-medium text-slate-700" }, "Argument Format:"), /* @__PURE__ */ React5.createElement("div", { className: "ml-3 mt-0.5 text-slate-500 font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ React5.createElement("div", null, /* @__PURE__ */ React5.createElement("code", { className: "bg-white px-1 rounded" }, "{{ctx.input.userId}}"), " \u2192 pass input value"), /* @__PURE__ */ React5.createElement("div", null, /* @__PURE__ */ React5.createElement("code", { className: "bg-white px-1 rounded" }, "{{ctx.queryResult.id}}"), " \u2192 from previous query"), /* @__PURE__ */ React5.createElement("div", null, /* @__PURE__ */ React5.createElement("code", { className: "bg-white px-1 rounded" }, "id_{{ctx.input.id}}"), " \u2192 string interpolation"))), /* @__PURE__ */ React5.createElement("div", null, /* @__PURE__ */ React5.createElement("span", { className: "font-medium text-slate-700" }, "Access Result:"), /* @__PURE__ */ React5.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, "Result stored in ", /* @__PURE__ */ React5.createElement("code", { className: "bg-white px-1 py-0.5 rounded font-mono" }, "ctx.{outputVariable}"), " for use in next nodes.")), /* @__PURE__ */ React5.createElement("div", null, /* @__PURE__ */ React5.createElement("span", { className: "font-medium text-slate-700" }, "Handles:"), /* @__PURE__ */ React5.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, /* @__PURE__ */ React5.createElement("strong", null, "Green:"), " Query succeeded \u2192 ", /* @__PURE__ */ React5.createElement("strong", null, "Red:"), " Query failed (use for error handling)"))), /* @__PURE__ */ React5.createElement("div", { className: "flex justify-between items-center gap-2 pt-2 border-t border-slate-100" }, /* @__PURE__ */ React5.createElement(
     "button",
     {
       type: "button",
@@ -1343,7 +1351,7 @@ var JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
       renderers: jetFormsRenderers,
       onChange: handleFormChange
     }
-  ), /* @__PURE__ */ React6.createElement(
+  ), /* @__PURE__ */ React6.createElement("div", { className: "p-2.5 bg-slate-50 border border-slate-200 rounded text-[10px] text-slate-600 space-y-2" }, /* @__PURE__ */ React6.createElement("div", { className: "font-semibold text-slate-700 text-xs" }, "\u{1F4D8} Writing JavaScript Code"), /* @__PURE__ */ React6.createElement("div", null, /* @__PURE__ */ React6.createElement("span", { className: "font-medium text-slate-700" }, "Access Context:"), /* @__PURE__ */ React6.createElement("div", { className: "ml-3 mt-0.5 text-slate-500 font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ React6.createElement("div", null, /* @__PURE__ */ React6.createElement("code", { className: "bg-white px-1 rounded" }, "ctx.input.paramName"), " \u2192 workflow input"), /* @__PURE__ */ React6.createElement("div", null, /* @__PURE__ */ React6.createElement("code", { className: "bg-white px-1 rounded" }, "ctx.queryResult"), " \u2192 previous node output"), /* @__PURE__ */ React6.createElement("div", null, /* @__PURE__ */ React6.createElement("code", { className: "bg-white px-1 rounded" }, "ctx.item"), " \u2192 current loop item"))), /* @__PURE__ */ React6.createElement("div", null, /* @__PURE__ */ React6.createElement("span", { className: "font-medium text-slate-700" }, "Return Value:"), /* @__PURE__ */ React6.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, "Use ", /* @__PURE__ */ React6.createElement("code", { className: "bg-white px-1 py-0.5 rounded font-mono" }, "return yourValue;"), " to store result in output variable.")), /* @__PURE__ */ React6.createElement("div", null, /* @__PURE__ */ React6.createElement("span", { className: "font-medium text-slate-700" }, "Available Globals:"), /* @__PURE__ */ React6.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, /* @__PURE__ */ React6.createElement("code", { className: "bg-white px-1 rounded font-mono text-[9px]" }, "JSON, Math, Date, Array, Object, String, Number, Boolean, parseInt, parseFloat"))), /* @__PURE__ */ React6.createElement("div", { className: "text-amber-600 bg-amber-50 border border-amber-200 rounded p-1.5 mt-2" }, /* @__PURE__ */ React6.createElement("strong", null, "\u26A0\uFE0F Note:"), " Code runs in a sandbox. No network access, filesystem, or require().")), /* @__PURE__ */ React6.createElement(
     "button",
     {
       type: "button",
@@ -1459,124 +1467,17 @@ var JavascriptNode = memo3(({ id, data, isConnectable }) => {
 import React7, { memo as memo4, useState as useState4, useEffect as useEffect4, useMemo as useMemo4, useCallback as useCallback4 } from "react";
 import { Handle as Handle4, Position as Position4 } from "reactflow";
 import { JsonForms as JsonForms4 } from "@jsonforms/react";
-var PARAM_TYPES = {
-  STRING: "string",
-  NUMBER: "number",
-  BOOLEAN: "boolean",
-  OBJECT: "object",
-  ARRAY: "array"
-};
-var InputParameterEditor = ({ parameters, onChange }) => {
-  const addParameter = () => {
-    const newParam = {
-      id: `param_${Date.now()}`,
-      name: `param${parameters.length + 1}`,
-      type: PARAM_TYPES.STRING,
-      required: false,
-      defaultValue: "",
-      description: ""
-    };
-    onChange([...parameters, newParam]);
-  };
-  const updateParameter = (index, field, value) => {
-    const updated = [...parameters];
-    updated[index] = { ...updated[index], [field]: value };
-    onChange(updated);
-  };
-  const removeParameter = (index) => {
-    const updated = parameters.filter((_, i) => i !== index);
-    onChange(updated);
-  };
-  return /* @__PURE__ */ React7.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React7.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React7.createElement("label", { className: "text-xs font-medium text-slate-500" }, "Input Parameters"), /* @__PURE__ */ React7.createElement(
-    "button",
-    {
-      type: "button",
-      onClick: addParameter,
-      className: "flex items-center gap-1 px-2 py-1 text-xs bg-white text-[#646cff] hover:bg-[#646cff]/10 rounded transition-colors border border-slate-200"
-    },
-    /* @__PURE__ */ React7.createElement(FaPlus, { className: "w-2.5 h-2.5" }),
-    "Add Parameter"
-  )), /* @__PURE__ */ React7.createElement("p", { className: "text-[10px] text-slate-400" }, "Define inputs that will be available as ", /* @__PURE__ */ React7.createElement("code", { className: "bg-slate-100 px-1 rounded" }, "ctx.input.paramName")), parameters.length === 0 ? /* @__PURE__ */ React7.createElement("div", { className: "text-xs text-slate-400 italic py-3 text-center border border-dashed border-slate-200 rounded" }, "No input parameters defined. Workflow can still be triggered.") : /* @__PURE__ */ React7.createElement("div", { className: "space-y-2" }, parameters.map((param, index) => /* @__PURE__ */ React7.createElement(
-    "div",
-    {
-      key: param.id,
-      className: "border border-slate-200 rounded p-2 bg-slate-50"
-    },
-    /* @__PURE__ */ React7.createElement("div", { className: "flex items-center justify-between mb-2" }, /* @__PURE__ */ React7.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React7.createElement(IoMdArrowDropright, { className: "w-3 h-3 text-green-500" }), /* @__PURE__ */ React7.createElement(
-      "input",
-      {
-        type: "text",
-        value: param.name,
-        onChange: (e) => updateParameter(index, "name", e.target.value.replace(/[^a-zA-Z0-9_]/g, "")),
-        className: "text-xs font-mono font-medium text-slate-700 bg-white border border-slate-200 rounded px-2 py-1 w-28 focus:outline-none focus:border-[#646cff]",
-        placeholder: "paramName"
-      }
-    )), /* @__PURE__ */ React7.createElement(
-      "button",
-      {
-        type: "button",
-        onClick: () => removeParameter(index),
-        className: "p-1 bg-white text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors",
-        title: "Remove parameter"
-      },
-      /* @__PURE__ */ React7.createElement(FaTrash, { className: "w-3 h-3" })
-    )),
-    /* @__PURE__ */ React7.createElement("div", { className: "grid grid-cols-2 gap-2" }, /* @__PURE__ */ React7.createElement("div", null, /* @__PURE__ */ React7.createElement("label", { className: "text-[10px] text-slate-400" }, "Type"), /* @__PURE__ */ React7.createElement(
-      "select",
-      {
-        value: param.type,
-        onChange: (e) => updateParameter(index, "type", e.target.value),
-        className: "w-full text-xs text-slate-700 p-1.5 border border-slate-200 rounded bg-white focus:outline-none focus:border-[#646cff]"
-      },
-      /* @__PURE__ */ React7.createElement("option", { value: PARAM_TYPES.STRING }, "String"),
-      /* @__PURE__ */ React7.createElement("option", { value: PARAM_TYPES.NUMBER }, "Number"),
-      /* @__PURE__ */ React7.createElement("option", { value: PARAM_TYPES.BOOLEAN }, "Boolean"),
-      /* @__PURE__ */ React7.createElement("option", { value: PARAM_TYPES.OBJECT }, "Object"),
-      /* @__PURE__ */ React7.createElement("option", { value: PARAM_TYPES.ARRAY }, "Array")
-    )), /* @__PURE__ */ React7.createElement("div", null, /* @__PURE__ */ React7.createElement("label", { className: "text-[10px] text-slate-400" }, "Required"), /* @__PURE__ */ React7.createElement("div", { className: "flex items-center h-[30px]" }, /* @__PURE__ */ React7.createElement(
-      "input",
-      {
-        type: "checkbox",
-        checked: param.required,
-        onChange: (e) => updateParameter(index, "required", e.target.checked),
-        className: "w-4 h-4 text-[#646cff] rounded border-slate-300 focus:ring-[#646cff]"
-      }
-    ), /* @__PURE__ */ React7.createElement("span", { className: "text-xs text-slate-500 ml-2" }, param.required ? "Yes" : "No")))),
-    /* @__PURE__ */ React7.createElement("div", { className: "mt-2" }, /* @__PURE__ */ React7.createElement("label", { className: "text-[10px] text-slate-400" }, "Default Value"), /* @__PURE__ */ React7.createElement(
-      "input",
-      {
-        type: "text",
-        value: param.defaultValue,
-        onChange: (e) => updateParameter(index, "defaultValue", e.target.value),
-        placeholder: param.type === PARAM_TYPES.OBJECT ? "{}" : param.type === PARAM_TYPES.ARRAY ? "[]" : "",
-        className: "w-full text-xs text-slate-700 p-1.5 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff]"
-      }
-    )),
-    /* @__PURE__ */ React7.createElement("div", { className: "mt-2" }, /* @__PURE__ */ React7.createElement("label", { className: "text-[10px] text-slate-400" }, "Description"), /* @__PURE__ */ React7.createElement(
-      "input",
-      {
-        type: "text",
-        value: param.description,
-        onChange: (e) => updateParameter(index, "description", e.target.value),
-        placeholder: "What is this parameter for?",
-        className: "w-full text-xs text-slate-700 p-1.5 border border-slate-200 rounded bg-white focus:outline-none focus:border-[#646cff]"
-      }
-    ))
-  ))));
-};
 var StartNodeConfigurator = ({ data, onChange, nodeId }) => {
   const { strings } = useWorkflowNodes();
   const [formData, setFormData] = useState4({
     title: data?.title || "Start",
-    description: data?.description || "",
-    inputParameters: data?.inputParameters || []
+    description: data?.description || ""
   });
   useEffect4(() => {
     if (data) {
       setFormData({
         title: data.title || "Start",
-        description: data.description || "",
-        inputParameters: data.inputParameters || []
+        description: data.description || ""
       });
     }
   }, [data]);
@@ -1615,9 +1516,6 @@ var StartNodeConfigurator = ({ data, onChange, nodeId }) => {
   const handleFormChange = useCallback4(({ data: newData }) => {
     setFormData((prev) => ({ ...prev, ...newData }));
   }, []);
-  const handleParametersChange = useCallback4((newParams) => {
-    setFormData((prev) => ({ ...prev, inputParameters: newParams }));
-  }, []);
   const handleSave = useCallback4(() => {
     onChange(formData);
   }, [onChange, formData]);
@@ -1630,13 +1528,7 @@ var StartNodeConfigurator = ({ data, onChange, nodeId }) => {
       renderers: jetFormsRenderers,
       onChange: handleFormChange
     }
-  ), /* @__PURE__ */ React7.createElement("div", { className: "p-2 bg-blue-50 border border-blue-100 rounded text-[10px] text-blue-600" }, /* @__PURE__ */ React7.createElement("strong", null, "Triggers:"), " Workflows can be started manually or via HTTP webhook (POST /api/workflows/:id/run)"), /* @__PURE__ */ React7.createElement("div", { className: "border-t border-slate-100 pt-4" }, /* @__PURE__ */ React7.createElement(
-    InputParameterEditor,
-    {
-      parameters: formData.inputParameters,
-      onChange: handleParametersChange
-    }
-  )), /* @__PURE__ */ React7.createElement(
+  ), /* @__PURE__ */ React7.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React7.createElement("div", { className: "p-2.5 bg-slate-50 border border-slate-200 rounded text-[10px] text-slate-600 space-y-2" }, /* @__PURE__ */ React7.createElement("div", { className: "font-semibold text-slate-700 text-xs" }, "\u{1F4D8} How This Works"), /* @__PURE__ */ React7.createElement("div", null, /* @__PURE__ */ React7.createElement("span", { className: "font-medium text-slate-700" }, "Triggers:"), /* @__PURE__ */ React7.createElement("ul", { className: "ml-3 mt-0.5 space-y-0.5 list-disc list-inside text-slate-500" }, /* @__PURE__ */ React7.createElement("li", null, 'Manual: Click "Test Workflow" button'), /* @__PURE__ */ React7.createElement("li", null, "API: POST /api/v1/workflows/:id/run"), /* @__PURE__ */ React7.createElement("li", null, "Widget: Link workflow to a widget"))), /* @__PURE__ */ React7.createElement("div", null, /* @__PURE__ */ React7.createElement("span", { className: "font-medium text-slate-700" }, "Input Parameters:"), /* @__PURE__ */ React7.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, "Define inputs in the ", /* @__PURE__ */ React7.createElement("strong", null, '"Input Parameters"'), " panel (right side). Access them in other nodes using: ", /* @__PURE__ */ React7.createElement("code", { className: "bg-white px-1 py-0.5 rounded border border-slate-200 font-mono" }, "{{ctx.input.paramName}}"))), /* @__PURE__ */ React7.createElement("div", null, /* @__PURE__ */ React7.createElement("span", { className: "font-medium text-slate-700" }, "Variable Format:"), /* @__PURE__ */ React7.createElement("div", { className: "ml-3 mt-0.5 text-slate-500 font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ React7.createElement("div", null, /* @__PURE__ */ React7.createElement("code", { className: "bg-white px-1 rounded" }, "{{ctx.input.userId}}"), " \u2192 input parameter"), /* @__PURE__ */ React7.createElement("div", null, /* @__PURE__ */ React7.createElement("code", { className: "bg-white px-1 rounded" }, "{{ctx.queryResult}}"), " \u2192 previous node output"), /* @__PURE__ */ React7.createElement("div", null, /* @__PURE__ */ React7.createElement("code", { className: "bg-white px-1 rounded" }, "id_{{ctx.input.id}}"), " \u2192 string interpolation"))))), /* @__PURE__ */ React7.createElement(
     "button",
     {
       type: "button",
@@ -1649,8 +1541,6 @@ var StartNodeConfigurator = ({ data, onChange, nodeId }) => {
 var StartNode = memo4(({ id, data, isConnectable }) => {
   const { strings, nodeExecutionStatus } = useWorkflowNodes();
   const executionStatus = nodeExecutionStatus?.[id] || "idle";
-  const inputParams = data?.inputParameters || [];
-  const paramCount = inputParams.length;
   const getStatusStyles2 = () => {
     switch (executionStatus) {
       case "running":
@@ -1685,7 +1575,7 @@ var StartNode = memo4(({ id, data, isConnectable }) => {
     ` }, /* @__PURE__ */ React7.createElement(StatusIndicator2, null), /* @__PURE__ */ React7.createElement("div", { className: "flex items-stretch" }, /* @__PURE__ */ React7.createElement("div", { style: {
     borderTopLeftRadius: "0.25rem",
     borderBottomLeftRadius: "0.25rem"
-  }, className: `flex flex-col items-center justify-center px-3 py-3 border-r ${executionStatus === "running" ? "bg-blue-100 border-blue-200" : executionStatus === "completed" ? "bg-green-100 border-green-200" : executionStatus === "failed" ? "bg-red-50 border-red-100" : "bg-green-50 border-green-100"}` }, /* @__PURE__ */ React7.createElement(VscDebugStart, { className: `w-5 h-5 ${executionStatus === "running" ? "text-blue-600" : executionStatus === "completed" ? "text-green-600" : executionStatus === "failed" ? "text-red-600" : "text-green-500"}` })), /* @__PURE__ */ React7.createElement("div", { className: "flex-1 px-3 py-2 min-w-0" }, /* @__PURE__ */ React7.createElement("div", { className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ React7.createElement("span", { className: "text-xs font-semibold truncate text-slate-700" }, data?.title || "Start")), /* @__PURE__ */ React7.createElement("div", { className: "text-[10px] mt-0.5 text-slate-400" }, paramCount === 0 ? "No input parameters" : `${paramCount} input${paramCount !== 1 ? "s" : ""}: ${inputParams.slice(0, 3).map((p) => p.name).join(", ")}${paramCount > 3 ? "..." : ""}`), inputParams.some((p) => p.required) && /* @__PURE__ */ React7.createElement("div", { className: "text-[9px] mt-0.5 text-amber-500" }, "* Has required parameters")), /* @__PURE__ */ React7.createElement("div", { className: "flex flex-col items-center justify-center px-2 border-l border-slate-100" }, /* @__PURE__ */ React7.createElement("div", { className: "w-2 h-2 rounded-full bg-green-400", title: "Output" }))), /* @__PURE__ */ React7.createElement(
+  }, className: `flex flex-col items-center justify-center px-3 py-3 border-r ${executionStatus === "running" ? "bg-blue-100 border-blue-200" : executionStatus === "completed" ? "bg-green-100 border-green-200" : executionStatus === "failed" ? "bg-red-50 border-red-100" : "bg-green-50 border-green-100"}` }, /* @__PURE__ */ React7.createElement(VscDebugStart, { className: `w-5 h-5 ${executionStatus === "running" ? "text-blue-600" : executionStatus === "completed" ? "text-green-600" : executionStatus === "failed" ? "text-red-600" : "text-green-500"}` })), /* @__PURE__ */ React7.createElement("div", { className: "flex-1 px-3 py-2 min-w-0" }, /* @__PURE__ */ React7.createElement("div", { className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ React7.createElement("span", { className: "text-xs font-semibold truncate text-slate-700" }, data?.title || "Start")), /* @__PURE__ */ React7.createElement("div", { className: "text-[10px] mt-0.5 text-slate-400" }, "Workflow entry point")), /* @__PURE__ */ React7.createElement("div", { className: "flex flex-col items-center justify-center px-2 border-l border-slate-100" }, /* @__PURE__ */ React7.createElement("div", { className: "w-2 h-2 rounded-full bg-green-400", title: "Output" }))), /* @__PURE__ */ React7.createElement(
     Handle4,
     {
       type: "source",
@@ -1898,7 +1788,7 @@ var LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
       renderers: jetFormsRenderers,
       onChange: handleFormChange
     }
-  ), /* @__PURE__ */ React8.createElement(
+  ), /* @__PURE__ */ React8.createElement("div", { className: "p-2.5 bg-slate-50 border border-slate-200 rounded text-[10px] text-slate-600 space-y-2" }, /* @__PURE__ */ React8.createElement("div", { className: "font-semibold text-slate-700 text-xs" }, "\u{1F4D8} Loop Configuration"), /* @__PURE__ */ React8.createElement("div", null, /* @__PURE__ */ React8.createElement("span", { className: "font-medium text-slate-700" }, "Source Array Format:"), /* @__PURE__ */ React8.createElement("div", { className: "ml-3 mt-0.5 text-slate-500 font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ React8.createElement("div", null, /* @__PURE__ */ React8.createElement("code", { className: "bg-white px-1 rounded" }, "{{ctx.queryResult}}"), " \u2192 array from previous node"), /* @__PURE__ */ React8.createElement("div", null, /* @__PURE__ */ React8.createElement("code", { className: "bg-white px-1 rounded" }, "{{ctx.input.items}}"), " \u2192 array from input"))), /* @__PURE__ */ React8.createElement("div", null, /* @__PURE__ */ React8.createElement("span", { className: "font-medium text-slate-700" }, "Inside Loop Body:"), /* @__PURE__ */ React8.createElement("div", { className: "ml-3 mt-0.5 text-slate-500 font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ React8.createElement("div", null, /* @__PURE__ */ React8.createElement("code", { className: "bg-white px-1 rounded" }, "ctx.item"), " \u2192 current array element"), /* @__PURE__ */ React8.createElement("div", null, /* @__PURE__ */ React8.createElement("code", { className: "bg-white px-1 rounded" }, "ctx.index"), " \u2192 current iteration index (0-based)"))), /* @__PURE__ */ React8.createElement("div", null, /* @__PURE__ */ React8.createElement("span", { className: "font-medium text-slate-700" }, "Handles:"), /* @__PURE__ */ React8.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, /* @__PURE__ */ React8.createElement("strong", null, "Loop (cyan):"), " Executes for each item \u2192 ", /* @__PURE__ */ React8.createElement("strong", null, "Completed (green):"), " After all iterations"))), /* @__PURE__ */ React8.createElement(
     "button",
     {
       type: "button",
@@ -2153,7 +2043,7 @@ var DelayNodeConfigurator = ({ data, onChange, nodeId }) => {
       renderers: jetFormsRenderers,
       onChange: handleFormChange
     }
-  ), /* @__PURE__ */ React9.createElement(
+  ), /* @__PURE__ */ React9.createElement("div", { className: "p-2.5 bg-slate-50 border border-slate-200 rounded text-[10px] text-slate-600 space-y-2" }, /* @__PURE__ */ React9.createElement("div", { className: "font-semibold text-slate-700 text-xs" }, "\u{1F4D8} Delay Types"), /* @__PURE__ */ React9.createElement("div", null, /* @__PURE__ */ React9.createElement("span", { className: "font-medium text-slate-700" }, "Fixed Duration:"), /* @__PURE__ */ React9.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, "Set exact wait time using minutes, seconds, and milliseconds.")), /* @__PURE__ */ React9.createElement("div", null, /* @__PURE__ */ React9.createElement("span", { className: "font-medium text-slate-700" }, "From Variable:"), /* @__PURE__ */ React9.createElement("div", { className: "ml-3 mt-0.5 text-slate-500 font-mono text-[9px]" }, /* @__PURE__ */ React9.createElement("code", { className: "bg-white px-1 rounded" }, "{{ctx.waitTime}}"), " \u2192 value in milliseconds")), /* @__PURE__ */ React9.createElement("div", { className: "text-green-600 bg-green-50 border border-green-200 rounded p-1.5 mt-2" }, /* @__PURE__ */ React9.createElement("strong", null, "\u2713 Non-blocking:"), " Delay uses queue scheduling. Workflow resources are released during wait.")), /* @__PURE__ */ React9.createElement(
     "button",
     {
       type: "button",
@@ -2417,7 +2307,7 @@ var EndNodeConfigurator = ({ data, onChange, nodeId }) => {
       onChange: handleParametersChange,
       availableVariables
     }
-  )), /* @__PURE__ */ React10.createElement(
+  )), /* @__PURE__ */ React10.createElement("div", { className: "p-2.5 bg-slate-50 border border-slate-200 rounded text-[10px] text-slate-600 space-y-2" }, /* @__PURE__ */ React10.createElement("div", { className: "font-semibold text-slate-700 text-xs" }, "\u{1F4D8} Workflow Output"), /* @__PURE__ */ React10.createElement("div", null, /* @__PURE__ */ React10.createElement("span", { className: "font-medium text-slate-700" }, "Source Variable Format:"), /* @__PURE__ */ React10.createElement("div", { className: "ml-3 mt-0.5 text-slate-500 font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ React10.createElement("div", null, /* @__PURE__ */ React10.createElement("code", { className: "bg-white px-1 rounded" }, "{{ctx.queryResult}}"), " \u2192 from previous node"), /* @__PURE__ */ React10.createElement("div", null, /* @__PURE__ */ React10.createElement("code", { className: "bg-white px-1 rounded" }, "{{ctx.processedData}}"), " \u2192 from script node"))), /* @__PURE__ */ React10.createElement("div", null, /* @__PURE__ */ React10.createElement("span", { className: "font-medium text-slate-700" }, "Completion Status:"), /* @__PURE__ */ React10.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, /* @__PURE__ */ React10.createElement("strong", null, "Success:"), " Normal completion \u2022 ", /* @__PURE__ */ React10.createElement("strong", null, "Failure:"), " Ended with error \u2022 ", /* @__PURE__ */ React10.createElement("strong", null, "Cancelled:"), " Manual stop")), /* @__PURE__ */ React10.createElement("div", null, /* @__PURE__ */ React10.createElement("span", { className: "font-medium text-slate-700" }, "Multiple End Nodes:"), /* @__PURE__ */ React10.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, "You can have multiple End nodes for different outcomes (e.g., success/failure branches)."))), /* @__PURE__ */ React10.createElement(
     "button",
     {
       type: "button",
@@ -2847,29 +2737,14 @@ var WORKFLOW_NODES_MAP = {
     configurator: StartNodeConfigurator,
     defaultValue: {
       title: "Start",
-      description: "",
-      inputParameters: []
+      description: ""
+      // Note: Input parameters are managed at workflow level (workflowOptions.args)
     },
     schema: {
       type: "object",
       properties: {
         title: { type: "string", title: "Node Title" },
-        description: { type: "string", title: "Description" },
-        inputParameters: {
-          type: "array",
-          title: "Input Parameters",
-          items: {
-            type: "object",
-            properties: {
-              id: { type: "string" },
-              name: { type: "string", title: "Parameter Name", pattern: "^[a-zA-Z_][a-zA-Z0-9_]*$" },
-              type: { type: "string", title: "Type", enum: ["string", "number", "boolean", "object", "array"] },
-              required: { type: "boolean", title: "Required", default: false },
-              defaultValue: { type: "string", title: "Default Value" },
-              description: { type: "string", title: "Description" }
-            }
-          }
-        }
+        description: { type: "string", title: "Description" }
       }
     },
     uischema: {

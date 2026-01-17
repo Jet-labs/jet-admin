@@ -4,7 +4,7 @@
  */
 const { getChannel, addResult, QUEUE_NAMES } = require('../../../config/rabbitmq.config');
 const { getHandler } = require('./handlers');
-const { resolveFromContext } = require('./workerSDK');
+const { resolveFromContext, resolveStringWithContext } = require('./workerSDK');
 const Logger = require('../../../utils/logger');
 
 /**
@@ -47,12 +47,16 @@ async function startTaskWorker() {
         nodeID,
         workflowID,
         resolveFromContext: (path) => resolveFromContext(context, path),
+        resolveStringWithContext: (str) => resolveStringWithContext(context, str),
       });
       
       // Send result to orchestrator
+      // Include outputVariable so orchestrator can store by friendly name instead of UUID
       await addResult({
         instanceID,
         nodeID,
+        nodeType,
+        outputVariable: nodeConfig?.outputVariable, // For friendly context key
         status: 'success',
         output: result.output,
         nextHandle: result.nextHandle || 'output',

@@ -59,6 +59,44 @@ function resolveFromContext(ctx, path) {
 }
 
 /**
+ * Resolve context variables within a string using mustache syntax {{...}}
+ * 
+ * This is the PRIMARY method for resolving variables in workflow node configs.
+ * 
+ * Type Behavior:
+ * - Single variable "{{ctx.input.id}}" -> preserves the original type (number, object, array, etc.)
+ * - String interpolation "id_{{ctx.input.id}}" -> always returns a string
+ * - Literal value "hardcoded" -> returns as-is
+ * 
+ * Examples:
+ * - "{{ctx.input.userId}}"           -> number (if userId is a number)
+ * - "{{ctx.previousNode.data}}"      -> object/array (preserves type)
+ * - "prefix_{{ctx.input.id}}_suffix" -> string
+ * - "plain text"                     -> string (no modification)
+ * 
+ * @param {Object} ctx - The workflow context object
+ * @param {string} str - The string containing mustache templates to resolve
+ * @returns {*} Resolved value - type depends on the pattern (see above)
+ */
+function resolveStringWithContext(ctx, str) {
+  if (typeof str !== 'string') return str;
+
+  // Case 1: Single variable substitution - preserve type
+  // Matches typical pattern like "{{ctx.variable}}" with optional whitespace
+  if (/^\{\{([^}]+)\}\}$/.test(str)) {
+    const path = str.replace(/^\{\{|\}\}$/g, '').trim();
+    return resolveFromContext(ctx, path);
+  }
+
+  // Case 2: String interpolation - return string
+  // Matches "prefix {{ctx.a}} suffix"
+  return str.replace(/\{\{([^}]+)\}\}/g, (match, path) => {
+    const val = resolveFromContext(ctx, path.trim());
+    return val !== undefined && val !== null ? val : '';
+  });
+}
+
+/**
  * Create a worker for a specific node type using RabbitMQ
  * @param {string} nodeType - The node type this worker handles
  * @param {Function} handler - async (nodeConfig, context) => { output, nextHandle, queueDelay }
@@ -155,4 +193,5 @@ async function createWorker(nodeType, handler) {
 module.exports = {
   createWorker,
   resolveFromContext,
+  resolveStringWithContext,
 };

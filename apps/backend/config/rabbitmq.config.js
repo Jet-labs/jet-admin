@@ -13,6 +13,8 @@ const QUEUE_NAMES = {
   TASK_DLQ: 'workflow.tasks.dlq',
 };
 
+const MONITOR_EXCHANGE = 'monitor.exchange';
+
 // Connection state
 let connection = null;
 let channel = null;
@@ -63,7 +65,10 @@ async function initializeRabbitMQ() {
     await channel.assertQueue(QUEUE_NAMES.TASK_DLQ, {
       durable: true,
     });
-    
+
+    // Create Monitor Exchange (Non-durable, auto-delete not needed but transient is fine)
+    await channel.assertExchange(MONITOR_EXCHANGE, 'topic', { durable: false });
+
     // Handle connection close
     connection.on('close', () => {
       Logger.log('warning', { message: 'rabbitmq.config:connection closed' });
@@ -139,6 +144,20 @@ async function getChannel() {
 }
 
 /**
+ * Helper to safely publish to monitor exchange
+ */
+function publishToMonitor(routingKey, content) {
+  if (channel) {
+    try {
+      channel.publish(MONITOR_EXCHANGE, routingKey, Buffer.from(JSON.stringify(content)));
+    } catch (error) {
+      // Monitor failures should not block main flow
+      console.error('Failed to publish to monitor exchange', error);
+    }
+  }
+}
+
+/**
  * Add a node execution job to the queue
  * @param {Object} jobData - { instanceID, nodeID, nodeType, nodeConfig, context }
  * @param {Object} options - { delay }
@@ -150,7 +169,7 @@ async function addNodeJob(jobData, options = {}) {
     ...jobData,
     timestamp: Date.now(),
     attempts: 0,
-    maxAttempts: 3,
+    maxAttempts: 1,
   };
   
   Logger.log('info', {
@@ -173,10 +192,14 @@ async function addNodeJob(jobData, options = {}) {
     ch.sendToQueue(delayedQueue, Buffer.from(JSON.stringify(message)), {
       persistent: true,
     });
+    // Publish to monitor with special key indicating delay
+    publishToMonitor(delayedQueue, message);
+
   } else {
     ch.sendToQueue(QUEUE_NAMES.TASK, Buffer.from(JSON.stringify(message)), {
       persistent: true,
     });
+    publishToMonitor(QUEUE_NAMES.TASK, message);
   }
 }
 
@@ -190,6 +213,7 @@ async function addResult(result) {
   ch.sendToQueue(QUEUE_NAMES.RESULTS, Buffer.from(JSON.stringify(result)), {
     persistent: true,
   });
+  publishToMonitor(QUEUE_NAMES.RESULTS, result);
 }
 
 /**
@@ -223,5 +247,6 @@ module.exports = {
   addNodeJob,
   addResult,
   QUEUE_NAMES,
+  MONITOR_EXCHANGE,
   isConnectionHealthy,
 };

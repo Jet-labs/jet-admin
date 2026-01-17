@@ -1,4 +1,4 @@
-import React, { useCallback, useState, useMemo } from "react";
+import React, { useCallback, useState, useMemo, useRef } from "react";
 import ReactFlow, {
     ReactFlowProvider,
     Controls,
@@ -132,6 +132,9 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
     const [workflowContext, setWorkflowContext] = useState({});
     const [selectedQueryForTesting, setSelectedQueryForTesting] = useState(null);
     const [showInputModal, setShowInputModal] = useState(false);
+    const socketRef = useRef(null);
+    const timeoutRef = useRef(null);
+    const instanceIdRef = useRef(null);
 
     // Helper to add log entry
     const addLog = useCallback((type, label, message, extra = {}) => {
@@ -243,6 +246,19 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
 
     const updateNodeData = useCallback((nodeId, newData) => {
         console.log("updateNodeData", nodeId, newData);
+
+        // Validate outputVariable uniqueness if it's being set
+        if (newData.outputVariable) {
+            const duplicate = values.nodes.find(n =>
+                n.id !== nodeId &&
+                n.data?.outputVariable === newData.outputVariable
+            );
+            if (duplicate) {
+                alert(`Error: Output variable name "${newData.outputVariable}" is already used by node "${duplicate.data?.title || duplicate.type}".\n\nPlease choose a unique name.`);
+                return; // Prevent update
+            }
+        }
+
         const updatedNodes = values.nodes.map(node => {
             if (node.id === nodeId) {
                 // Ensure label update propagates if strictly managed
@@ -327,6 +343,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
             });
 
             const instanceID = result.instanceID;
+            instanceIdRef.current = instanceID;
             addLog('info', 'Instance Created', `Instance ID: ${instanceID.substring(0, 8)}...`);
 
             // Get socket from context (we need to access it directly)
@@ -340,7 +357,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
             });
 
             // Store socket reference for cleanup
-            let socketRef = socket;
+            socketRef.current = socket;
 
             // Join the workflow run room
             socket.emit("workflow_run_join", { runId: instanceID });
@@ -425,33 +442,68 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                     addLog('workflow_complete', 'Workflow Complete', 'All nodes executed successfully');
                     setIsTestRunning(false);
                     setTestResult(data);
-                    socketRef.disconnect();
+                    socketRef.current?.disconnect();
+                    socketRef.current = null;
                 } else if (data.status === "FAILED") {
                     addLog('workflow_error', 'Workflow Failed', 'Execution terminated with errors');
                     setIsTestRunning(false);
                     setTestResult(data);
-                    socketRef.disconnect();
+                    socketRef.current?.disconnect();
+                    socketRef.current = null;
                 }
             });
 
             // Timeout after 2 minutes
-            const timeout = setTimeout(() => {
+            timeoutRef.current = setTimeout(() => {
                 addLog('info', 'Timeout', 'Workflow execution timed out after 2 minutes');
                 setIsTestRunning(false);
-                socketRef.disconnect();
+                socketRef.current?.disconnect();
+                socketRef.current = null;
             }, 120000);
 
             // Cleanup on disconnect
             socket.on("disconnect", () => {
-                clearTimeout(timeout);
+                if (timeoutRef.current) {
+                    clearTimeout(timeoutRef.current);
+                    timeoutRef.current = null;
+                }
             });
 
         } catch (error) {
             addLog('workflow_error', 'Error', error.message);
             setIsTestRunning(false);
             resetNodeExecutionStatus();
+            socketRef.current = null;
         }
     }, [tenantID, values.nodes, values.edges, resetNodeExecutionStatus, addLog, clearLogs]);
+
+    // Stop the test run
+    const stopTestRun = useCallback(async () => {
+        const currentInstanceId = instanceIdRef.current;
+
+        if (socketRef.current) {
+            socketRef.current.disconnect();
+            socketRef.current = null;
+        }
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+            timeoutRef.current = null;
+        }
+        addLog('info', 'Test Stopped', 'Workflow test run was manually stopped');
+        setIsTestRunning(false);
+
+        // Delete the test instance from database
+        if (currentInstanceId) {
+            try {
+                const { stopTestWorkflowAPI } = await import("../../../data/apis/workflow");
+                await stopTestWorkflowAPI({ tenantID, instanceID: currentInstanceId });
+                addLog('info', 'Cleanup', 'Test instance deleted from database');
+            } catch (error) {
+                addLog('warning', 'Cleanup Warning', `Failed to delete test instance: ${error.message}`);
+            }
+            instanceIdRef.current = null;
+        }
+    }, [addLog, tenantID]);
 
     // Handle input modal submit
     const handleInputModalSubmit = useCallback((inputParams) => {
@@ -476,6 +528,8 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
             strings={CONSTANTS.STRINGS}
             onRefreshDataQueries={refetchDataQueries}
             workflowNodes={values.nodes}
+            workflowEdges={values.edges}
+            workflowInputArgs={workflowArgs}
             nodeExecutionStatus={nodeExecutionStatus}
             tenantID={tenantID}
             onQueryTest={handleQueryTest}
@@ -579,15 +633,27 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                             {/* Actions Section */}
                             <div className="flex flex-col gap-2">
                                 <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Actions</p>
-                                <button
-                                        type="button"
-                                        onClick={onTestRunClick}
-                                    disabled={values.nodes.length === 0 || isTestRunning}
-                                        className="px-3 py-2 text-left text-sm text-white bg-green-600 rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center border-none hover:border-none"
-                                >
-                                    <FaPlay className="inline-block h-3 w-3 mr-2" />
-                                    {isTestRunning ? "Running..." : "Test Run"}
-                                </button>
+                                    <div className="flex flex-row gap-2">
+                                        <button
+                                            type="button"
+                                            onClick={onTestRunClick}
+                                            disabled={values.nodes.length === 0 || isTestRunning}
+                                            className="flex-1 px-3 py-2 text-left text-sm text-white bg-green-600 rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center border-none hover:border-none"
+                                        >
+                                            <FaPlay className="inline-block h-3 w-3 mr-2" />
+                                            {isTestRunning ? "Running..." : "Test Run"}
+                                        </button>
+                                        {isTestRunning && (
+                                            <button
+                                                type="button"
+                                                onClick={stopTestRun}
+                                                className="px-3 py-2 text-sm text-white bg-red-600 rounded hover:bg-red-700 transition-colors flex items-center border-none hover:border-none"
+                                                title="Stop Test"
+                                            >
+                                                <FaStop className="inline-block h-3 w-3" />
+                                            </button>
+                                        )}
+                                    </div>
                             </div>
 
                                 {/* Utilities - Minimal */}

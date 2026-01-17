@@ -224,6 +224,35 @@ export const LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
           renderers={workflowNodeRenderers}
           onChange={handleFormChange}
         />
+
+        {/* Comprehensive instructions */}
+        <div className="p-2.5 bg-slate-50 border border-slate-200 rounded text-[10px] text-slate-600 space-y-2">
+          <div className="font-semibold text-slate-700 text-xs">📘 Loop Configuration</div>
+
+          <div>
+            <span className="font-medium text-slate-700">Source Array Format:</span>
+            <div className="ml-3 mt-0.5 text-slate-500 font-mono text-[9px] space-y-0.5">
+              <div><code className="bg-white px-1 rounded">{"{{ctx.queryResult}}"}</code> → array from previous node</div>
+              <div><code className="bg-white px-1 rounded">{"{{ctx.input.items}}"}</code> → array from input</div>
+            </div>
+          </div>
+
+          <div>
+            <span className="font-medium text-slate-700">Inside Loop Body:</span>
+            <div className="ml-3 mt-0.5 text-slate-500 font-mono text-[9px] space-y-0.5">
+              <div><code className="bg-white px-1 rounded">ctx.item</code> → current array element</div>
+              <div><code className="bg-white px-1 rounded">ctx.index</code> → current iteration index (0-based)</div>
+            </div>
+          </div>
+
+          <div>
+            <span className="font-medium text-slate-700">Handles:</span>
+            <div className="ml-3 mt-0.5 text-slate-500">
+              <strong>Loop (cyan):</strong> Executes for each item → <strong>Completed (green):</strong> After all iterations
+            </div>
+          </div>
+        </div>
+
         <button
           type="button"
           onClick={handleSave}

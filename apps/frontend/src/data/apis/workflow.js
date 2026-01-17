@@ -253,5 +253,32 @@ export const getWorkflowRunStatusAPI = async ({ tenantID, instanceID }) => {
   }
 };
 
-
-
+/**
+ * Stop and delete a test workflow instance
+ */
+export const stopTestWorkflowAPI = async ({ tenantID, instanceID }) => {
+  try {
+    const url =
+      CONSTANTS.SERVER_HOST +
+      CONSTANTS.APIS.WORKFLOW.stopTestWorkflowAPI(tenantID, instanceID);
+    const bearerToken = await firebaseAuth.currentUser.getIdToken();
+    if (bearerToken) {
+      const response = await axios.delete(url, {
+        headers: {
+          authorization: `Bearer ${bearerToken}`,
+        },
+      });
+      if (response.data && response.data.success === true) {
+        return response.data;
+      } else if (response.data.error) {
+        throw response.data.error;
+      } else {
+        throw CONSTANTS.ERROR_CODES.SERVER_ERROR;
+      }
+    } else {
+      throw CONSTANTS.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND;
+    }
+  } catch (error) {
+    throw error;
+  }
+};

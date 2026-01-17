@@ -14,6 +14,12 @@ const {
 } = require("./modules/ai/socket/ai.socket.controller");
 // Middleware setup
 expressApp.use(cookieParser());
+const path = require('path');
+
+// Monitor UI Route
+expressApp.get('/monitor', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'monitor.html'));
+});
 
 // API routes
 if (isModuleEnabled(constants.MODULES.AUTH)) {
@@ -117,6 +123,14 @@ httpServer.listen(port, async () => {
   });
   console.log("truncate name", stringUtils.truncateName("Hello World", 5));
   cronJobService.scheduleAllCronJobs();
+
+  // Initialize Monitor Socket
+  try {
+    const { initializeMonitorSocket } = require('./modules/monitor/monitor.socket');
+    initializeMonitorSocket();
+  } catch (err) {
+    Logger.log('error', { message: 'Failed to init monitor socket', params: { error: err.message } });
+  }
 
   // Start workflow workers (if RabbitMQ is available)
   try {

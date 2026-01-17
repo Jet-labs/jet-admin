@@ -84,4 +84,12 @@ router.post(
   workflowController.testWorkflow
 );
 
+// Stop and delete a test workflow instance
+router.delete(
+  "/instances/:instanceID/stop",
+  validate(instanceIdParamSchema, "params"),
+  authMiddleware.checkUserPermissions(["tenant:workflow:execute"]),
+  workflowController.stopTestWorkflow
+);
+
 module.exports = router;

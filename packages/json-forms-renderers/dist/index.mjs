@@ -586,26 +586,68 @@ CustomSuggestionInput.propTypes = {
 };
 
 // src/renderers/DynamicArgsControl.jsx
-import React8, { useState as useState3, useRef as useRef2, useEffect as useEffect2 } from "react";
+import React8, { useState as useState3, useRef as useRef2, useEffect as useEffect2, useMemo as useMemo2 } from "react";
 import PropTypes8 from "prop-types";
 import { TbVariable } from "react-icons/tb";
 var DynamicArgsControl = (props) => {
   const { data, path, handleChange, uischema, errors } = props;
   const args = uischema?.options?.args || [];
   const workflowNodes = uischema?.options?.workflowNodes || [];
+  const workflowEdges = uischema?.options?.workflowEdges || [];
+  const workflowInputArgs = uischema?.options?.workflowInputArgs || [];
   const currentNodeId = uischema?.options?.currentNodeId || null;
   const argsData = data || {};
   const handleArgChange = (argKey, value) => {
     handleChange(path, { ...argsData, [argKey]: value });
   };
+  const getUpstreamNodeIds = useMemo2(() => {
+    if (!currentNodeId || !workflowEdges || workflowEdges.length === 0) {
+      return /* @__PURE__ */ new Set();
+    }
+    const upstreamIds = /* @__PURE__ */ new Set();
+    const visited = /* @__PURE__ */ new Set();
+    const queue = [currentNodeId];
+    while (queue.length > 0) {
+      const nodeId = queue.shift();
+      if (visited.has(nodeId)) continue;
+      visited.add(nodeId);
+      const incomingEdges = workflowEdges.filter((e) => e.target === nodeId);
+      for (const edge of incomingEdges) {
+        if (!visited.has(edge.source)) {
+          upstreamIds.add(edge.source);
+          queue.push(edge.source);
+        }
+      }
+    }
+    return upstreamIds;
+  }, [currentNodeId, workflowEdges]);
   const getAvailableVariables = () => {
-    if (!workflowNodes || workflowNodes.length === 0) return [];
-    return workflowNodes.filter((node) => node.id !== currentNodeId).filter((node) => node.data?.outputVariable).map((node) => ({
-      nodeId: node.id,
-      nodeTitle: node.data?.title || node.data?.label || node.type,
-      variableName: node.data.outputVariable,
-      contextPath: `ctx.${node.data.outputVariable}`
-    }));
+    const variables = [];
+    if (workflowInputArgs && workflowInputArgs.length > 0) {
+      workflowInputArgs.forEach((arg) => {
+        if (arg.key) {
+          variables.push({
+            nodeId: "input",
+            nodeTitle: "Workflow Input",
+            variableName: arg.key,
+            contextPath: `ctx.input.${arg.key}`,
+            category: "input",
+            type: arg.type || "string"
+          });
+        }
+      });
+    }
+    if (workflowNodes && workflowNodes.length > 0) {
+      const nodeVariables = workflowNodes.filter((node) => node.id !== currentNodeId).filter((node) => getUpstreamNodeIds.has(node.id)).filter((node) => node.data?.outputVariable).map((node) => ({
+        nodeId: node.id,
+        nodeTitle: node.data?.title || node.data?.label || node.type,
+        variableName: node.data.outputVariable,
+        contextPath: `ctx.${node.data.outputVariable}`,
+        category: "node"
+      }));
+      variables.push(...nodeVariables);
+    }
+    return variables;
   };
   const availableVariables = getAvailableVariables();
   if (args.length === 0) {
@@ -643,17 +685,21 @@ var ArgInputWithVariablePicker = ({ argName, value, onChange, availableVariables
     if (input) {
       const start = input.selectionStart;
       const end = input.selectionEnd;
-      const newValue = value.substring(0, start) + `{{${contextPath + value.substring(end)}}}`;
+      const mustacheVar = `{{${contextPath}}}`;
+      const newValue = value.substring(0, start) + mustacheVar + value.substring(end);
       onChange(newValue);
       setTimeout(() => {
         input.focus();
-        input.setSelectionRange(start + contextPath.length, start + contextPath.length);
+        const newCursorPos = start + mustacheVar.length;
+        input.setSelectionRange(newCursorPos, newCursorPos);
       }, 0);
     } else {
-      onChange(value + contextPath);
+      onChange(`{{${contextPath}}}`);
     }
     setShowDropdown(false);
   };
+  const inputVariables = availableVariables.filter((v) => v.category === "input");
+  const nodeVariables = availableVariables.filter((v) => v.category === "node");
   return /* @__PURE__ */ React8.createElement("div", { className: "flex flex-row justify-between items-center gap-2" }, /* @__PURE__ */ React8.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React8.createElement("label", { className: "block mb-1 text-[10px] font-medium text-slate-400" }, argName), /* @__PURE__ */ React8.createElement("div", { className: "flex items-center gap-1" }, /* @__PURE__ */ React8.createElement(
     "input",
     {
@@ -674,17 +720,27 @@ var ArgInputWithVariablePicker = ({ argName, value, onChange, availableVariables
       title: "Insert variable from previous node"
     },
     /* @__PURE__ */ React8.createElement(TbVariable, { className: "w-4 h-4" })
-  ), showDropdown && /* @__PURE__ */ React8.createElement("div", { className: "absolute right-0 top-full mt-1 w-56 bg-white border border-slate-200 rounded shadow-lg z-50 max-h-48 overflow-y-auto" }, /* @__PURE__ */ React8.createElement("div", { className: "px-2 py-1.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-100" }, "Available Variables"), availableVariables.length === 0 ? /* @__PURE__ */ React8.createElement("div", { className: "px-2 py-3 text-xs text-slate-400 text-center" }, "No variables available yet.", /* @__PURE__ */ React8.createElement("br", null), /* @__PURE__ */ React8.createElement("span", { className: "text-[10px]" }, "Add more nodes with output variables.")) : availableVariables.map((variable, idx) => /* @__PURE__ */ React8.createElement(
+  ), showDropdown && /* @__PURE__ */ React8.createElement("div", { className: "absolute right-0 top-full mt-1 w-64 bg-white border border-slate-200 rounded shadow-lg z-50 max-h-64 overflow-y-auto" }, availableVariables.length === 0 ? /* @__PURE__ */ React8.createElement("div", { className: "px-2 py-3 text-xs text-slate-400 text-center" }, "No variables available yet.", /* @__PURE__ */ React8.createElement("br", null), /* @__PURE__ */ React8.createElement("span", { className: "text-[10px]" }, "Add workflow inputs or connect upstream nodes.")) : /* @__PURE__ */ React8.createElement(React8.Fragment, null, inputVariables.length > 0 && /* @__PURE__ */ React8.createElement(React8.Fragment, null, /* @__PURE__ */ React8.createElement("div", { className: "px-2 py-1.5 text-[10px] font-semibold text-green-600 uppercase tracking-wider border-b border-slate-100 bg-green-50" }, "\u{1F4E5} Workflow Inputs"), inputVariables.map((variable, idx) => /* @__PURE__ */ React8.createElement(
     "button",
     {
-      key: idx,
+      key: `input-${idx}`,
       type: "button",
       onClick: () => insertVariable(variable.contextPath),
-      className: "w-full bg-white text-left px-2 py-1.5 hover:bg-slate-100 hover:border-none border-none rounded-none transition-colors border-b border-slate-50 last:border-b-0"
+      className: "w-full bg-white text-left px-2 py-1.5 hover:bg-green-50 hover:border-none border-none rounded-none transition-colors border-b border-slate-50"
+    },
+    /* @__PURE__ */ React8.createElement("div", { className: "text-xs font-medium text-slate-700 font-mono" }, variable.contextPath),
+    /* @__PURE__ */ React8.createElement("div", { className: "text-[10px] text-slate-400 truncate" }, "type: ", variable.type || "any")
+  ))), nodeVariables.length > 0 && /* @__PURE__ */ React8.createElement(React8.Fragment, null, /* @__PURE__ */ React8.createElement("div", { className: "px-2 py-1.5 text-[10px] font-semibold text-blue-600 uppercase tracking-wider border-b border-slate-100 bg-blue-50" }, "\u{1F4E4} Upstream Node Outputs"), nodeVariables.map((variable, idx) => /* @__PURE__ */ React8.createElement(
+    "button",
+    {
+      key: `node-${idx}`,
+      type: "button",
+      onClick: () => insertVariable(variable.contextPath),
+      className: "w-full bg-white text-left px-2 py-1.5 hover:bg-blue-50 hover:border-none border-none rounded-none transition-colors border-b border-slate-50 last:border-b-0"
     },
     /* @__PURE__ */ React8.createElement("div", { className: "text-xs font-medium text-slate-700 font-mono" }, variable.contextPath),
     /* @__PURE__ */ React8.createElement("div", { className: "text-[10px] text-slate-400 truncate" }, "from: ", variable.nodeTitle)
-  )))))));
+  )))))))));
 };
 DynamicArgsControl.propTypes = {
   data: PropTypes8.object,

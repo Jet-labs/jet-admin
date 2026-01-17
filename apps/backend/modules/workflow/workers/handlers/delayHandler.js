@@ -5,7 +5,7 @@
 const { ERROR_HANDLING, NEXT_HANDLE } = require('./constants');
 
 async function execute(nodeConfig, context, helpers) {
-  const { resolveFromContext } = helpers;
+  const { resolveStringWithContext } = helpers;
   const { 
     delayType = 'fixed', 
     delayMinutes = 0, 
@@ -21,7 +21,7 @@ async function execute(nodeConfig, context, helpers) {
     if (delayType === 'fixed') {
       totalDelayMs = (delayMinutes * 60000) + (delaySeconds * 1000) + delayMs;
     } else if (delayType === 'dynamic' && delayVariable) {
-      const dynamicDelay = resolveFromContext(delayVariable);
+      const dynamicDelay = resolveStringWithContext(delayVariable);
       totalDelayMs = parseInt(dynamicDelay) || 0;
     }
     

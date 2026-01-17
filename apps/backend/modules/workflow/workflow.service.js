@@ -458,6 +458,39 @@ workflowService.testWorkflow = async ({ tenantID, nodes, edges, inputParams = {}
   }
 };
 
+/**
+ * Stop and delete a test workflow instance.
+ * Removes the instance and all related logs from the database.
+ * @param {object} param0
+ * @param {string} param0.instanceID - The test instance ID to stop and delete
+ * @returns {Promise<{success: boolean}>}
+ */
+workflowService.stopTestWorkflow = async ({ instanceID }) => {
+  const { stateManager } = require("./orchestrator/stateManager");
+
+  Logger.log("info", {
+    message: "workflowService:stopTestWorkflow:params",
+    params: { instanceID },
+  });
+
+  try {
+    await stateManager.deleteTestInstance(instanceID);
+
+    Logger.log("success", {
+      message: "workflowService:stopTestWorkflow:deleted",
+      params: { instanceID },
+    });
+
+    return { success: true };
+  } catch (error) {
+    Logger.log("error", {
+      message: "workflowService:stopTestWorkflow:failure",
+      params: { error: error.message },
+    });
+    throw error;
+  }
+};
+
 module.exports = { workflowService };
 
 

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jet RabbitMQ Monitor</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        gray: {
+                            850: '#1f2937',
+                            900: '#111827',
+                            950: '#0B0F19', // Deep background
+                        },
+                        primary: {
+                            500: '#3B82F6',
+                            600: '#2563EB',
+                        },
+                        accent: {
+                            success: '#10B981',
+                            warning: '#F59E0B',
+                            error: '#EF4444',
+                        }
+                    },
+                    animation: {
+                        'fade-in-down': 'fadeInDown 0.3s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeInDown: {
+                            '0%': { opacity: '0', transform: 'translateY(-10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #0B0F19;
+            color: #E5E7EB;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #111827; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #374151; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #4B5563; 
+        }
+        .json-key { color: #9CDCFE; }
+        .json-string { color: #CE9178; }
+        .json-number { color: #B5CEA8; }
+        .json-boolean { color: #569CD6; }
+        .json-null { color: #569CD6; }
+        
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(75, 85, 99, 0.4);
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden">
+
+    <!-- Header -->
+    <header class="h-16 border-b border-gray-800 flex items-center justify-between px-6 bg-gray-900/50 backdrop-blur-md z-10">
+        <div class="flex items-center gap-3">
+            <div class="w-3 h-3 rounded-full bg-accent-success animate-pulse"></div>
+            <h1 class="text-lg font-bold tracking-tight text-white">Jet<span class="text-primary-500">Rabbit</span> Monitor</h1>
+        </div>
+        <div class="flex items-center gap-4 text-sm text-gray-400">
+            <div class="flex items-center gap-2">
+                <span id="connection-status" class="w-2 h-2 rounded-full bg-gray-500"></span>
+                <span id="connection-text">Connecting...</span>
+            </div>
+            <div class="h-4 w-px bg-gray-700"></div>
+            <div id="stats-msg-rate">0 msgs/sec</div>
+        </div>
+    </header>
+
+    <div class="flex-1 flex overflow-hidden">
+        <!-- Sidebar -->
+        <aside class="w-64 border-r border-gray-800 bg-gray-900/30 flex flex-col">
+            <div class="p-4 border-b border-gray-800">
+                <h2 class="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">Live Channels</h2>
+                <div id="channels-list" class="space-y-1">
+                    <!-- Channels injected here -->
+                    <button class="w-full text-left px-3 py-2 rounded-md bg-primary-600/10 text-primary-500 text-sm font-medium border border-primary-500/20 flex justify-between items-center group">
+                        <span>ALL</span>
+                        <span class="text-xs bg-primary-500/20 px-1.5 py-0.5 rounded text-primary-400">LIVE</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="p-4 mt-auto">
+                <button onclick="clearLogs()" class="w-full py-2 px-4 rounded-md border border-gray-700 hover:bg-gray-800 text-gray-400 text-sm transition-colors">
+                    Clear Logs
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col relative">
+            <!-- Filter Bar -->
+            <div class="h-12 border-b border-gray-800 flex items-center px-4 bg-gray-900/20">
+                <svg class="w-4 h-4 text-gray-500 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <input type="text" id="filter-input" placeholder="Filter messages content..." class="bg-transparent border-none focus:ring-0 text-sm text-gray-300 w-full hover:placeholder-gray-400 transition-colors">
+            </div>
+
+            <!-- Logs Container -->
+            <div id="logs-container" class="flex-1 overflow-y-auto p-4 space-y-3 scroll-smooth">
+                <!-- Empty State -->
+                <div id="empty-state" class="h-full flex flex-col items-center justify-center text-gray-600">
+                    <svg class="w-16 h-16 mb-4 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    <p class="text-sm">Waiting for messages...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- JS Logic -->
+    <script>
+        const socket = io('/monitor', {
+            transports: ['websocket', 'polling']
+        });
+
+        const state = {
+            logs: [],
+            filter: '',
+            activeChannel: 'ALL', // 'ALL' or specific routing key
+            channels: new Set(),
+            startTime: Date.now(),
+            msgCount: 0
+        };
+
+        const els = {
+            container: document.getElementById('logs-container'),
+            empty: document.getElementById('empty-state'),
+            status: document.getElementById('connection-status'),
+            statusText: document.getElementById('connection-text'),
+            channelsRec: document.getElementById('channels-list'),
+            filter: document.getElementById('filter-input'),
+            rate: document.getElementById('stats-msg-rate')
+        };
+
+        // --- Socket Events ---
+        socket.on('connect', () => {
+            els.status.className = 'w-2 h-2 rounded-full bg-accent-success animate-pulse';
+            els.statusText.textContent = 'Connected';
+            els.statusText.className = 'text-accent-success font-medium';
+        });
+
+        socket.on('disconnect', () => {
+            els.status.className = 'w-2 h-2 rounded-full bg-accent-error';
+            els.statusText.textContent = 'Disconnected';
+            els.statusText.className = 'text-accent-error font-medium';
+        });
+
+        socket.on('log', (data) => {
+            // data structure: { routingKey: "workflow.tasks", content: {...}, timestamp: 123 }
+            addLog(data);
+        });
+
+        // --- Core Functions ---
+        
+        function addLog(data) {
+            state.msgCount++;
+            state.logs.push(data);
+            
+            // Update Channels
+            if (!state.channels.has(data.routingKey)) {
+                state.channels.add(data.routingKey);
+                renderChannels();
+            }
+
+            // Render if matches filter
+            if (matchesFilter(data)) {
+                if (els.empty) els.empty.style.display = 'none';
+                const el = createLogElement(data);
+                els.container.insertBefore(el, els.container.firstChild);
+                
+                // Cleanup DOM if too many items (keep DOM light)
+                if (els.container.children.length > 200) {
+                    els.container.removeChild(els.container.lastChild);
+                }
+            }
+        }
+
+        function createLogElement(data) {
+            const date = new Date(data.timestamp || Date.now());
+            const timeStr = date.toLocaleTimeString() + '.' + date.getMilliseconds().toString().padStart(3, '0');
+            
+            const isError = data.routingKey.includes('dlq') || data.routingKey.includes('error');
+            const borderColor = isError ? 'border-accent-error/30' : 'border-gray-700';
+            const badgeColor = isError ? 'bg-accent-error/20 text-accent-error' : 'bg-primary-500/20 text-primary-400';
+
+            const div = document.createElement('div');
+            div.className = `glass-panel rounded-lg p-3 border ${borderColor} text-sm flex flex-col gap-2 font-mono animate-fade-in-down hover:border-gray-500 transition-colors cursor-default group`;
+            
+            let contentStr = '';
+            try {
+                contentStr = JSON.stringify(data.content, null, 2);
+                contentStr = syntaxHighlight(contentStr); // Apply coloring
+            } catch (e) {
+                contentStr = String(data.content);
+            }
+
+            div.innerHTML = `
+                <div class="flex items-center justify-between pointer-events-none">
+                    <div class="flex items-center gap-3">
+                        <span class="text-gray-500 text-xs">${timeStr}</span>
+                        <span class="px-2 py-0.5 rounded text-xs font-semibold tracking-wide ${badgeColor}">${data.routingKey}</span>
+                    </div>
+                </div>
+                <div class="overflow-x-auto mt-1 max-h-32 group-hover:max-h-96 transition-all duration-300">
+                    <pre class="text-xs leading-relaxed whitespace-pre-wrap break-all text-gray-300">${contentStr}</pre>
+                </div>
+            `;
+            return div;
+        }
+
+        function syntaxHighlight(json) {
+            json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, function (match) {
+                let cls = 'json-number';
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) {
+                        cls = 'json-key';
+                    } else {
+                        cls = 'json-string';
+                    }
+                } else if (/true|false/.test(match)) {
+                    cls = 'json-boolean';
+                } else if (/null/.test(match)) {
+                    cls = 'json-null';
+                }
+                return '<span class="' + cls + '">' + match + '</span>';
+            });
+        }
+
+        function matchesFilter(log) {
+            if (state.activeChannel !== 'ALL' && log.routingKey !== state.activeChannel) return false;
+            if (!state.filter) return true;
+            try {
+                const searchStr = JSON.stringify(log).toLowerCase();
+                return searchStr.includes(state.filter.toLowerCase());
+            } catch(e) { return false; }
+        }
+
+        function clearLogs() {
+            state.logs = [];
+            state.msgCount = 0;
+            state.startTime = Date.now();
+            els.container.innerHTML = '';
+            els.container.appendChild(els.empty);
+            els.empty.style.display = 'flex';
+        }
+
+        function renderChannels() {
+            // Keep "All" at top
+            let html = `
+                <button onclick="setChannel('ALL')" class="w-full text-left px-3 py-2 rounded-md ${state.activeChannel === 'ALL' ? 'bg-primary-600/10 text-primary-500 border border-primary-500/20' : 'text-gray-400 hover:bg-gray-800 border border-transparent'} text-sm font-medium flex justify-between items-center mb-1 transition-all">
+                    <span>ALL</span>
+                    <span class="text-xs opacity-50">∞</span>
+                </button>
+            `;
+            
+            Array.from(state.channels).sort().forEach(ch => {
+                const isActive = state.activeChannel === ch;
+                const cls = isActive 
+                    ? 'bg-gray-800 text-white border-gray-600' 
+                    : 'text-gray-400 hover:bg-gray-800 border-transparent';
+                    
+                html += `
+                    <button onclick="setChannel('${ch}')" class="w-full text-left px-3 py-2 rounded-md ${cls} border text-sm flex items-center gap-2 mb-1 transition-all">
+                        <span class="truncate">${ch}</span>
+                    </button>
+                `;
+            });
+            els.channelsRec.innerHTML = html;
+        }
+
+        window.setChannel = (ch) => {
+            state.activeChannel = ch;
+            renderChannels();
+            
+            // Re-render logs
+            els.container.innerHTML = '';
+            state.logs.forEach(log => {
+                if(matchesFilter(log)) {
+                    const el = createLogElement(log);
+                    els.container.insertBefore(el, els.container.firstChild);
+                }
+            });
+            if(els.container.children.length === 0) {
+                 els.container.appendChild(els.empty);
+                 els.empty.style.display = 'flex';
+            }
+        }
+
+        // --- Filter Stats ---
+        els.filter.addEventListener('input', (e) => {
+            state.filter = e.target.value;
+            // Debounce re-render could be nice but basic is fine for now
+            window.setChannel(state.activeChannel); // Re-trigger render
+        });
+
+        // --- FPS / Rate Stats ---
+        setInterval(() => {
+            const seconds = (Date.now() - state.startTime) / 1000;
+            if (seconds > 0) {
+                const rate = (state.msgCount / seconds).toFixed(1);
+                els.rate.textContent = `${rate} msgs/avg`;
+            }
+        }, 1000);
+
+    </script>
+</body>
+</html>

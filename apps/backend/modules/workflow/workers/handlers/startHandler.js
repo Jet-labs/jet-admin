@@ -1,12 +1,12 @@
 /**
  * Start Node Handler
- * Initializes workflow context with input parameters
+ * Entry point for workflow execution.
+ * Note: Input parameters are managed at workflow level (workflowOptions.args),
+ * not in the Start Node config.
  */
 async function execute(nodeConfig, context, helpers) {
-  const { inputParameters = [] } = nodeConfig || {};
-  
-  // Input is already set in context by orchestrator
-  // Just pass through - start node mainly validates inputs
+  // Input is already set in context by orchestrator from workflowOptions.args
+  // The start node simply marks the workflow as started and passes through
   
   const output = {
     started: true,

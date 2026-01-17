@@ -192,6 +192,30 @@ export const DelayNodeConfigurator = ({ data, onChange, nodeId }) => {
           renderers={workflowNodeRenderers}
           onChange={handleFormChange}
         />
+
+        {/* Comprehensive instructions */}
+        <div className="p-2.5 bg-slate-50 border border-slate-200 rounded text-[10px] text-slate-600 space-y-2">
+          <div className="font-semibold text-slate-700 text-xs">📘 Delay Types</div>
+
+          <div>
+            <span className="font-medium text-slate-700">Fixed Duration:</span>
+            <div className="ml-3 mt-0.5 text-slate-500">
+              Set exact wait time using minutes, seconds, and milliseconds.
+            </div>
+          </div>
+
+          <div>
+            <span className="font-medium text-slate-700">From Variable:</span>
+            <div className="ml-3 mt-0.5 text-slate-500 font-mono text-[9px]">
+              <code className="bg-white px-1 rounded">{"{{ctx.waitTime}}"}</code> → value in milliseconds
+            </div>
+          </div>
+
+          <div className="text-green-600 bg-green-50 border border-green-200 rounded p-1.5 mt-2">
+            <strong>✓ Non-blocking:</strong> Delay uses queue scheduling. Workflow resources are released during wait.
+          </div>
+        </div>
+
         <button
           type="button"
           onClick={handleSave}

@@ -5,7 +5,7 @@
 const { ERROR_HANDLING, NEXT_HANDLE } = require('./constants');
 
 async function execute(nodeConfig, context, helpers) {
-  const { resolveFromContext } = helpers;
+  const { resolveStringWithContext } = helpers;
   const { 
     sourceVariable, 
     itemVariable = 'item', 
@@ -15,12 +15,20 @@ async function execute(nodeConfig, context, helpers) {
   } = nodeConfig || {};
   
   try {
-    // Resolve source array from context
-    let items = resolveFromContext(sourceVariable);
+    // Resolve source array using mustache syntax {{ctx.variablePath}}
+    // e.g., "{{ctx.input.items}}" or "{{ctx.previousNode.data}}"
+    let items;
+    if (typeof sourceVariable === 'string') {
+      items = resolveStringWithContext(sourceVariable);
+    } else {
+      items = sourceVariable;
+    }
     
+    // Ensure items is always an array
     if (!Array.isArray(items)) {
       items = items ? [items] : [];
     }
+
     
     // Note: For now, we return the loop config
     // The orchestrator will need to handle loop iteration

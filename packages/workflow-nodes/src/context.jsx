@@ -11,6 +11,8 @@ export const WorkflowNodesProvider = ({
   strings = {},
   onRefreshDataQueries,
   workflowNodes = [],
+  workflowEdges = [],       // Edges for DAG traversal
+  workflowInputArgs = [],   // Declared workflow input parameters [{key, type, ...}]
   nodeExecutionStatus = {},  // Map of nodeId -> status
   tenantID = null,           // Tenant ID for API calls
   onQueryTest = null,        // Callback for testing queries: (dataQueryID, argValues) => Promise<result>
@@ -21,6 +23,8 @@ export const WorkflowNodesProvider = ({
       strings,
       onRefreshDataQueries,
       workflowNodes,
+      workflowEdges,
+      workflowInputArgs,
       nodeExecutionStatus,
       tenantID,
       onQueryTest,

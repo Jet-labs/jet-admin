@@ -132,7 +132,7 @@ class QueryEngine {
 
     Logger.log("info", {
       message: "QueryEngine:resolveStringTemplate:blocksExtracted",
-      params: { dataQueryID, template, runtimeArgs, blocks },
+      // params: { dataQueryID, template, runtimeArgs, blocks },
     });
 
     let result = template;
@@ -148,7 +148,7 @@ class QueryEngine {
 
       Logger.log("info", {
         message: "QueryEngine:resolveTemplate:resolveVariable",
-        params: { dataQueryID, block, value },
+        // params: { dataQueryID, block, value },
       });
 
       result = result.replace(block.fullMatch, value);

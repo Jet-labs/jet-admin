@@ -20,7 +20,7 @@ const datasourceFetcher = async (id) => {
 };
 
 async function execute(nodeConfig, context, helpers) {
-  const { resolveFromContext } = helpers;
+  const { resolveStringWithContext } = helpers;
   const { 
     dataQueryID, 
     args = {}, 
@@ -32,17 +32,21 @@ async function execute(nodeConfig, context, helpers) {
     throw new Error('Data Query node requires dataQueryID');
   }
   
-  // Resolve arguments - only resolve values with "ctx." prefix from context
+  // Resolve arguments using mustache syntax {{ctx.variablePath}}
+  // Supports:
+  // - Single variable: "{{ctx.input.id}}" -> preserves type
+  // - String interpolation: "id_{{ctx.input.id}}" -> returns string
+  // - Literal values: "hardcoded" -> returns as-is
   const resolvedArgs = {};
   for (const [key, value] of Object.entries(args)) {
-    if (typeof value === 'string' && value.startsWith('ctx.')) {
-      // Resolve from context (e.g., "ctx.data.someField" -> context value)
-      resolvedArgs[key] = resolveFromContext(value);
+    if (typeof value === 'string') {
+      resolvedArgs[key] = resolveStringWithContext(value);
     } else {
-      // Use value as-is
+      // Non-string values (numbers, booleans, objects) pass through as-is
       resolvedArgs[key] = value;
     }
   }
+
   
   try {
     // Execute query using QueryEngine

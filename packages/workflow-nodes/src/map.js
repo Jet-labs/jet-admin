@@ -309,28 +309,13 @@ export const WORKFLOW_NODES_MAP = {
         defaultValue: {
             title: "Start",
             description: "",
-            inputParameters: [],
+            // Note: Input parameters are managed at workflow level (workflowOptions.args)
         },
         schema: {
             type: "object",
             properties: {
                 title: { type: "string", title: "Node Title" },
                 description: { type: "string", title: "Description" },
-                inputParameters: {
-                    type: "array",
-                    title: "Input Parameters",
-                    items: {
-                        type: "object",
-                        properties: {
-                            id: { type: "string" },
-                            name: { type: "string", title: "Parameter Name", pattern: "^[a-zA-Z_][a-zA-Z0-9_]*$" },
-                            type: { type: "string", title: "Type", enum: ["string", "number", "boolean", "object", "array"] },
-                            required: { type: "boolean", title: "Required", default: false },
-                            defaultValue: { type: "string", title: "Default Value" },
-                            description: { type: "string", title: "Description" },
-                        },
-                    },
-                },
             },
         },
         uischema: {

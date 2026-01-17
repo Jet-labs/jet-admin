@@ -137,4 +137,45 @@ stateManager.getInstanceWithLogs = async (instanceID) => {
   });
 };
 
+/**
+ * Delete a test workflow instance and its logs
+ * Only works for instances marked as isTest = true
+ * @param {string} instanceID 
+ * @returns {Promise<void>}
+ */
+stateManager.deleteTestInstance = async (instanceID) => {
+  Logger.log('info', {
+    message: 'stateManager:deleteTestInstance',
+    params: { instanceID },
+  });
+
+  // First verify this is a test instance
+  const instance = await prisma.tblWorkflowInstances.findUnique({
+    where: { instanceID },
+  });
+
+  if (!instance) {
+    throw new Error(`Instance ${instanceID} not found`);
+  }
+
+  if (!instance.isTest) {
+    throw new Error(`Instance ${instanceID} is not a test instance`);
+  }
+
+  // Delete in transaction: logs first, then instance
+  await prisma.$transaction([
+    prisma.tblNodeExecutionLogs.deleteMany({
+      where: { instanceID },
+    }),
+    prisma.tblWorkflowInstances.delete({
+      where: { instanceID },
+    }),
+  ]);
+
+  Logger.log('success', {
+    message: 'stateManager:deleteTestInstance:deleted',
+    params: { instanceID },
+  });
+};
+
 module.exports = { stateManager };

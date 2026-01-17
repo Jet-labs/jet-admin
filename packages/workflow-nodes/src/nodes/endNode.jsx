@@ -252,6 +252,33 @@ export const EndNodeConfigurator = ({ data, onChange, nodeId }) => {
           />
         </div>
 
+        {/* Comprehensive instructions */}
+        <div className="p-2.5 bg-slate-50 border border-slate-200 rounded text-[10px] text-slate-600 space-y-2">
+          <div className="font-semibold text-slate-700 text-xs">📘 Workflow Output</div>
+
+          <div>
+            <span className="font-medium text-slate-700">Source Variable Format:</span>
+            <div className="ml-3 mt-0.5 text-slate-500 font-mono text-[9px] space-y-0.5">
+              <div><code className="bg-white px-1 rounded">{"{{ctx.queryResult}}"}</code> → from previous node</div>
+              <div><code className="bg-white px-1 rounded">{"{{ctx.processedData}}"}</code> → from script node</div>
+            </div>
+          </div>
+
+          <div>
+            <span className="font-medium text-slate-700">Completion Status:</span>
+            <div className="ml-3 mt-0.5 text-slate-500">
+              <strong>Success:</strong> Normal completion • <strong>Failure:</strong> Ended with error • <strong>Cancelled:</strong> Manual stop
+            </div>
+          </div>
+
+          <div>
+            <span className="font-medium text-slate-700">Multiple End Nodes:</span>
+            <div className="ml-3 mt-0.5 text-slate-500">
+              You can have multiple End nodes for different outcomes (e.g., success/failure branches).
+            </div>
+          </div>
+        </div>
+
         <button
           type="button"
           onClick={handleSave}
