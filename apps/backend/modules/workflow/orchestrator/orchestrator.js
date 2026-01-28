@@ -9,6 +9,7 @@ const { dagScheduler } = require('./dagScheduler');
 const Logger = require('../../../utils/logger');
 const { socketIO } = require('../../../config/socket.io');
 const constants = require('../../../constants');
+const { widgetWorkflowBridge } = require('../../widget/widgetWorkflowBridge');
 
 /**
  * Handle task result from worker
@@ -76,6 +77,16 @@ async function handleTaskResult(result) {
       error,
     });
     
+    // *** Emit to subscribed widgets ***
+    widgetWorkflowBridge.emitContextUpdate(instanceID, {
+      type: 'NODE_COMPLETE',
+      nodeID,
+      outputVariable,
+      value: output?.[outputVariable] ?? output,
+      status,
+      contextSnapshot: updatedInstance.contextData,
+    });
+
     // 4. Check if this is a terminal node
     let nodeType;
     if (isTestRun && workflowDefinition) {
@@ -92,7 +103,7 @@ async function handleTaskResult(result) {
       const finalStatus = output?.status || 'success';
       Logger.log('info', {
         message: 'orchestrator:workflowComplete:output',
-        params: { instanceID, output },
+        params: { instanceID },
       });
       await stateManager.completeInstance(
         instanceID,
@@ -107,6 +118,13 @@ async function handleTaskResult(result) {
         contextData: { ...updatedInstance.contextData, output: output?.workflowOutput },
       });
       
+      // *** Emit to subscribed widgets ***
+      widgetWorkflowBridge.emitWorkflowStatus(
+        instanceID,
+        finalStatus === 'success' ? 'COMPLETED' : 'FAILED',
+        { ...updatedInstance.contextData, output: output?.workflowOutput }
+      );
+
       Logger.log('success', { message: 'orchestrator:workflowCompleted', params: { instanceID } });
       return;
     }

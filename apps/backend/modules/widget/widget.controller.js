@@ -226,6 +226,7 @@ widgetController.cloneWidgetByID = async (req, res) => {
 widgetController.getWidgetDataByID = async (req, res) => {
   const { user, dbPool } = req;
   const { tenantID, widgetID } = req.params;
+  const { executionMode } = req.query; // Extract from query params
 
   Logger.log("info", "widgetController:getWidgetDataByID:init", {
     userID: user.userID,
@@ -275,6 +276,7 @@ widgetController.getWidgetDataUsingWidget = async (req, res) => {
   const { user, dbPool } = req;
   const { tenantID } = req.params;
   const widget = req.body;
+  const { executionMode } = req.query; // Also check query params for consistency, or body if preferred. Using query for consistency.
 
   Logger.log("info", {
     message: "widgetController:getWidgetDataUsingWidget:init",
@@ -282,6 +284,7 @@ widgetController.getWidgetDataUsingWidget = async (req, res) => {
       userID: user.userID,
       tenantID,
       widget,
+      executionMode,
     },
   });
 
@@ -291,6 +294,7 @@ widgetController.getWidgetDataUsingWidget = async (req, res) => {
       tenantID,
       dbPool,
       widget,
+      executionMode,
     });
 
     Logger.log("success", {
@@ -438,6 +442,94 @@ widgetController.deleteWidgetByID = async (req, res) => {
   } catch (error) {
     Logger.log("error", {
       message: "widgetController:deleteWidgetByID:catch-1",
+      params: { error },
+    });
+    return expressUtils.sendResponse(res, false, {}, error);
+  }
+};
+
+/**
+ * Get workflow context schema for widget binding
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+widgetController.getWidgetWorkflowSchema = async (req, res) => {
+  try {
+    const { user } = req;
+    const { tenantID, widgetID } = req.params;
+
+    Logger.log("info", {
+      message: "widgetController:getWidgetWorkflowSchema:params",
+      params: { userID: user.userID, tenantID, widgetID },
+    });
+
+    const { widgetSocketController } = require("./widget.socket.controller");
+
+    // Get widget to find associated workflow
+    const widget = await widgetService.getWidgetByID({
+      userID: user.userID,
+      tenantID,
+      widgetID,
+    });
+
+    if (!widget || !widget.workflowID) {
+      return expressUtils.sendResponse(res, false, {}, "Widget has no associated workflow");
+    }
+
+    // Get workflow schema
+    const schema = await widgetSocketController.getWorkflowContextSchema({
+      workflowID: widget.workflowID,
+      tenantID,
+    });
+
+    Logger.log("success", {
+      message: "widgetController:getWidgetWorkflowSchema:success",
+      params: { widgetID, workflowID: widget.workflowID },
+    });
+
+    return expressUtils.sendResponse(res, true, {
+      schema,
+      message: "Workflow schema retrieved successfully.",
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "widgetController:getWidgetWorkflowSchema:catch-1",
+      params: { error },
+    });
+    return expressUtils.sendResponse(res, false, {}, error);
+  }
+};
+
+/**
+ * Get widget-workflow bridge connection stats (admin/debug)
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+widgetController.getWidgetBridgeStats = async (req, res) => {
+  try {
+    const { user } = req;
+    const { tenantID } = req.params;
+
+    Logger.log("info", {
+      message: "widgetController:getWidgetBridgeStats:params",
+      params: { userID: user.userID, tenantID },
+    });
+
+    const { widgetWorkflowBridge } = require("./widgetWorkflowBridge");
+    const stats = widgetWorkflowBridge.getStats();
+
+    Logger.log("success", {
+      message: "widgetController:getWidgetBridgeStats:success",
+      params: { stats },
+    });
+
+    return expressUtils.sendResponse(res, true, {
+      stats,
+      message: "Bridge stats retrieved successfully.",
+    });
+  } catch (error) {
+    Logger.log("error", {
+      message: "widgetController:getWidgetBridgeStats:catch-1",
       params: { error },
     });
     return expressUtils.sendResponse(res, false, {}, error);

@@ -5,7 +5,6 @@ import React, { useCallback, useState } from "react";
 import { CONSTANTS } from "../../../constants";
 import {
   createWidgetAPI,
-  getWidgetDataUsingWidgetAPI,
 } from "../../../data/apis/widget";
 import { formValidations } from "../../../utils/formValidation";
 import { displayError, displaySuccess } from "../../../utils/notification";
@@ -17,8 +16,9 @@ import {
 import { WidgetEditor } from "./widgetEditor";
 import { WidgetPreview } from "./widgetPreview";
 import PropTypes from "prop-types";
-import { WIDGETS_MAP } from "@jet-admin/widgets";
 import { WIDGET_TYPES } from "@jet-admin/widget-types";
+import { useWidgetRun, WIDGET_EXECUTION_MODES } from "./useWidgetRun";
+import { Switch, FormControlLabel } from "@mui/material";
 
 const defaultWidgetType = WIDGET_TYPES.BAR_CHART.value;
 const initialValues = {
@@ -41,7 +41,24 @@ export const WidgetAdditionForm = ({ tenantID }) => {
   };
   const uniqueKey = `${tenantID}`;
   const queryClient = useQueryClient();
-  const [widgetFetchedData, setWidgetFetchedData] = useState(null);
+  const [executionMode, setExecutionMode] = useState(WIDGET_EXECUTION_MODES.ASYNC);
+
+  // New Hook for Widget Execution/Preview
+  const {
+    data: previewData,
+    isLoading: isPreviewLoading,
+    runWidget,
+    isLive,
+    workflowStatus
+  } = useWidgetRun({
+    tenantID,
+    executionMode,
+    // Pass config for socket connection if available in form
+    workflowID: addWidgetForm?.values?.workflowID,
+    widgetType: addWidgetForm?.values?.widgetType,
+    datasetFields: addWidgetForm?.values?.workflowConfig?.datasetFields,
+    parameters: addWidgetForm?.values?.workflowConfig?.parameters,
+  });
 
   const { isPending: isAddingWidget, mutate: addWidget } = useMutation({
     mutationFn: (data) => {
@@ -62,23 +79,6 @@ export const WidgetAdditionForm = ({ tenantID }) => {
     },
   });
 
-  const { isPending: isFetchingWidgetData, mutate: fetchWidgetData } =
-    useMutation({
-      mutationFn: (data) => {
-        return getWidgetDataUsingWidgetAPI({
-          tenantID,
-          widgetData: data,
-        });
-      },
-      retry: false,
-      onSuccess: (data) => {
-        setWidgetFetchedData(data?.data);
-      },
-      onError: (error) => {
-        displayError(error);
-      },
-    });
-
   const addWidgetForm = useFormik({
     initialValues: initialValues,
     validationSchema: formValidations.addWidgetFormValidationSchema,
@@ -91,11 +91,9 @@ export const WidgetAdditionForm = ({ tenantID }) => {
 
   const _handleFetchWidgetData = useCallback(() => {
     if (addWidgetForm && addWidgetForm.values) {
-      fetchWidgetData(addWidgetForm.values);
+      runWidget(addWidgetForm.values);
     }
-  }, [addWidgetForm]);
-
-
+  }, [addWidgetForm, runWidget]);
 
   return (
     <div className="w-full flex flex-col justify-start items-center h-full">
@@ -134,15 +132,35 @@ export const WidgetAdditionForm = ({ tenantID }) => {
           </form>
         </ResizablePanel>
         <ResizableHandle withHandle={true} />
-        <ResizablePanel defaultSize={80}>
+        <ResizablePanel defaultSize={80} className="relative">
+          {/* Execution Mode Toggle */}
+          <div className="absolute top-2 right-2 z-10 flex items-center gap-2 bg-white/80 p-1 rounded shadow-sm">
+            <FormControlLabel
+              control={
+                <Switch
+                  size="small"
+                  checked={executionMode === WIDGET_EXECUTION_MODES.ASYNC}
+                  onChange={(e) => setExecutionMode(e.target.checked ? WIDGET_EXECUTION_MODES.ASYNC : WIDGET_EXECUTION_MODES.SYNC)}
+                />
+              }
+              label={<span className="text-xs">{executionMode === WIDGET_EXECUTION_MODES.ASYNC ? "Real-time" : "Sync"}</span>}
+            />
+
+            {isLive && (
+              <div className="flex items-center gap-1 px-2 py-1 rounded text-xs bg-green-100 text-green-700">
+                <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                <span>Live</span>
+              </div>
+            )}
+          </div>
           <WidgetPreview
             widgetTitle={addWidgetForm.values.widgetTitle}
             widgetType={addWidgetForm.values.widgetType}
             widgetConfig={addWidgetForm.values.widgetConfig}
             refreshData={_handleFetchWidgetData}
-            isFetchingData={isFetchingWidgetData}
-            isRefreshingData={isFetchingWidgetData}
-            data={widgetFetchedData}
+            isFetchingData={isPreviewLoading}
+            isRefreshingData={isPreviewLoading}
+            data={previewData}
           />
         </ResizablePanel>
       </ResizablePanelGroup>

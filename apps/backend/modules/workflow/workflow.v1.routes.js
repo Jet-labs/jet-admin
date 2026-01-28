@@ -92,4 +92,12 @@ router.delete(
   workflowController.stopTestWorkflow
 );
 
+// Get run status with processed widget data
+router.post(
+  "/instances/:instanceID/widget",
+  validate(instanceIdParamSchema, "params"),
+  authMiddleware.checkUserPermissions(["tenant:workflow:read"]),
+  workflowController.getRunStatusForWidget
+);
+
 module.exports = router;

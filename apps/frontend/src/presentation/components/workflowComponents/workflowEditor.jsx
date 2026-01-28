@@ -16,7 +16,6 @@ import dagre from "dagre";
 
 import { v4 as uuidv4 } from "uuid";
 import PropTypes from "prop-types";
-
 import { WORKFLOW_NODES_MAP, WorkflowNodesProvider } from "@jet-admin/workflow-nodes";
 import { WORKFLOW_EDGES_MAP, WorkflowEdgeContext } from "@jet-admin/workflow-edges";
 import { CONSTANTS } from "../../../constants";
@@ -40,6 +39,8 @@ import { WorkflowInputArgsPanel } from "./workflowInputArgsPanel";
 import { WorkflowInputModal } from "./workflowInputModal";
 import { DataQueryTestingPanel } from "../dataQueryComponents/dataQueryTestingPanel";
 import { useParams } from "react-router-dom";
+import { useWorkflowRun } from "./useWorkflowRun";
+import { useEffect } from "react";
 
 // Dagre graph for auto-layout
 const dagreGraph = new dagre.graphlib.Graph();
@@ -123,39 +124,34 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
     const { refetchDataQueries } = useWorkflowActions();
     const [selectedNodeId, setSelectedNodeId] = useState(null);
     const [showSchemaPanel, setShowSchemaPanel] = useState(false);
+
+    // New Hook for Workflow Execution
+    const {
+        isRunning: isTestRunning,
+        result: testResult,
+        nodeExecutionStatus,
+        logs: consoleLogs,
+        context: workflowContext,
+        startTestRun,
+        stopRun: stopTestRun,
+        clearLogs
+    } = useWorkflowRun({ tenantID });
+
+    // UI State only
     const [showConsole, setShowConsole] = useState(false);
-    const [consoleLogs, setConsoleLogs] = useState([]);
-    const [isTestRunning, setIsTestRunning] = useState(false);
-    const [testResult, setTestResult] = useState(null);
-    const [nodeExecutionStatus, setNodeExecutionStatus] = useState({}); // Map of nodeId -> status
     const [showContextPanel, setShowContextPanel] = useState(false);
-    const [workflowContext, setWorkflowContext] = useState({});
     const [selectedQueryForTesting, setSelectedQueryForTesting] = useState(null);
     const [showInputModal, setShowInputModal] = useState(false);
-    const socketRef = useRef(null);
-    const timeoutRef = useRef(null);
-    const instanceIdRef = useRef(null);
 
-    // Helper to add log entry
-    const addLog = useCallback((type, label, message, extra = {}) => {
-        setConsoleLogs(prev => [...prev, {
-            type,
-            label,
-            message,
-            timestamp: Date.now(),
-            ...extra,
-        }]);
-    }, []);
+    // Auto-show console/context when run starts
+    useEffect(() => {
+        if (isTestRunning) {
+            setShowConsole(true);
+            setShowContextPanel(true);
+        }
+    }, [isTestRunning]);
 
-    // Clear console logs
-    const clearLogs = useCallback(() => {
-        setConsoleLogs([]);
-    }, []);
 
-    // Clear workflow context
-    const clearContext = useCallback(() => {
-        setWorkflowContext({});
-    }, []);
 
     // 1. Handle Node Changes (Dragging, selecting, deleting)
     const onNodesChange = useCallback(
@@ -297,14 +293,24 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
     }, [values.edges, setFieldValue]);
 
     // Reset node execution status
-    const resetNodeExecutionStatus = useCallback(() => {
-        setNodeExecutionStatus({});
-    }, []);
+    // const resetNodeExecutionStatus = useCallback(() => {
+    //     setNodeExecutionStatus({});
+    // }, []);
 
     // Get workflow input args from options
     const workflowArgs = useMemo(() => {
         return values.workflowOptions?.args?.filter(arg => arg.key) || [];
     }, [values.workflowOptions?.args]);
+
+    // Execute test run wrapper
+    const executeTestRun = useCallback((inputParams) => {
+        startTestRun({
+            nodes: values.nodes,
+            edges: values.edges,
+            inputParams
+        });
+    }, [startTestRun, values.nodes, values.edges]);
+
 
     // Handle Test Run button click - show modal if args exist
     const onTestRunClick = useCallback(() => {
@@ -314,196 +320,10 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
             // No args, run directly with empty params
             executeTestRun({});
         }
-    }, [workflowArgs]);
+    }, [workflowArgs, executeTestRun]);
 
-    // Execute the actual test run with provided input params
-    const executeTestRun = useCallback(async (inputParams) => {
-        const { testWorkflowAPI } = await import("../../../data/apis/workflow");
 
-        setIsTestRunning(true);
-        setTestResult(null);
-        // Reset all nodes to idle before starting
-        resetNodeExecutionStatus();
-        // Clear previous logs and context, show panels
-        clearLogs();
-        clearContext();
-        setShowConsole(true);
-        setShowContextPanel(true);
 
-        // Log start
-        addLog('start', 'Test Run Started', `Running workflow with ${values.nodes.length} nodes`);
-
-        try {
-            // Start test execution
-            const result = await testWorkflowAPI({
-                tenantID,
-                nodes: values.nodes,
-                edges: values.edges,
-                inputParams,
-            });
-
-            const instanceID = result.instanceID;
-            instanceIdRef.current = instanceID;
-            addLog('info', 'Instance Created', `Instance ID: ${instanceID.substring(0, 8)}...`);
-
-            // Get socket from context (we need to access it directly)
-            const socketModule = await import("socket.io-client");
-            const { CONSTANTS: constants } = await import("../../../constants");
-            const { firebaseAuth } = await import("../../../config/firebase");
-
-            const bearerToken = await firebaseAuth.currentUser?.getIdToken();
-            const socket = socketModule.io(constants.SOCKET_HOST, {
-                auth: { token: bearerToken }
-            });
-
-            // Store socket reference for cleanup
-            socketRef.current = socket;
-
-            // Join the workflow run room
-            socket.emit("workflow_run_join", { runId: instanceID });
-            addLog('info', 'Connected', 'Joined workflow execution room');
-
-            // Mark start node as running
-            const startNode = values.nodes.find(n => n.type === 'start');
-            if (startNode) {
-                setNodeExecutionStatus(prev => ({
-                    ...prev,
-                    [startNode.id]: 'running',
-                }));
-                addLog('node_start', 'Node: Start', startNode.data?.title || 'Start', { nodeId: startNode.id });
-            }
-
-            // Helper to get node name
-            const getNodeName = (nodeId) => {
-                const node = values.nodes.find(n => n.id === nodeId);
-                return node?.data?.title || node?.type || nodeId;
-            };
-
-            // Listen for node updates from backend
-            socket.on("workflow_node_update", (data) => {
-                const nodeId = data.nodeID;
-                if (nodeId && data.status) {
-                    const nodeName = getNodeName(nodeId);
-                    const status = data.status === 'success' ? 'completed' : 'failed';
-
-                    setNodeExecutionStatus(prev => ({
-                        ...prev,
-                        [nodeId]: status,
-                    }));
-
-                    // Update workflow context with node output
-                    if (data.output !== undefined) {
-                        setWorkflowContext(prev => ({
-                            ...prev,
-                            [nodeId]: data.output,
-                        }));
-                    }
-
-                    // Log the node update
-                    if (data.status === 'success') {
-                        addLog('node_complete', `Node: ${nodeName}`, 'Completed successfully', {
-                            nodeId,
-                            output: data.output
-                        });
-                    } else {
-                        addLog('node_error', `Node: ${nodeName}`, 'Execution failed', {
-                            nodeId,
-                            error: data.error
-                        });
-                    }
-
-                    // Mark next nodes as running
-                    const nextEdges = values.edges.filter(e => e.source === nodeId);
-                    if (data.status === 'success') {
-                        nextEdges.forEach(edge => {
-                            const nextNodeName = getNodeName(edge.target);
-                            setNodeExecutionStatus(prev => {
-                                if (!prev[edge.target]) {
-                                    addLog('node_start', `Node: ${nextNodeName}`, 'Starting execution', { nodeId: edge.target });
-                                }
-                                return {
-                                    ...prev,
-                                    [edge.target]: prev[edge.target] || 'running',
-                                };
-                            });
-                        });
-                    }
-                }
-            });
-
-            // Listen for workflow status update (completion/failure)
-            socket.on("workflow_status_update", (data) => {
-                // Update context with full contextData from completion
-                if (data.contextData) {
-                    setWorkflowContext(data.contextData);
-                }
-
-                if (data.status === "COMPLETED") {
-                    addLog('workflow_complete', 'Workflow Complete', 'All nodes executed successfully');
-                    setIsTestRunning(false);
-                    setTestResult(data);
-                    socketRef.current?.disconnect();
-                    socketRef.current = null;
-                } else if (data.status === "FAILED") {
-                    addLog('workflow_error', 'Workflow Failed', 'Execution terminated with errors');
-                    setIsTestRunning(false);
-                    setTestResult(data);
-                    socketRef.current?.disconnect();
-                    socketRef.current = null;
-                }
-            });
-
-            // Timeout after 2 minutes
-            timeoutRef.current = setTimeout(() => {
-                addLog('info', 'Timeout', 'Workflow execution timed out after 2 minutes');
-                setIsTestRunning(false);
-                socketRef.current?.disconnect();
-                socketRef.current = null;
-            }, 120000);
-
-            // Cleanup on disconnect
-            socket.on("disconnect", () => {
-                if (timeoutRef.current) {
-                    clearTimeout(timeoutRef.current);
-                    timeoutRef.current = null;
-                }
-            });
-
-        } catch (error) {
-            addLog('workflow_error', 'Error', error.message);
-            setIsTestRunning(false);
-            resetNodeExecutionStatus();
-            socketRef.current = null;
-        }
-    }, [tenantID, values.nodes, values.edges, resetNodeExecutionStatus, addLog, clearLogs]);
-
-    // Stop the test run
-    const stopTestRun = useCallback(async () => {
-        const currentInstanceId = instanceIdRef.current;
-
-        if (socketRef.current) {
-            socketRef.current.disconnect();
-            socketRef.current = null;
-        }
-        if (timeoutRef.current) {
-            clearTimeout(timeoutRef.current);
-            timeoutRef.current = null;
-        }
-        addLog('info', 'Test Stopped', 'Workflow test run was manually stopped');
-        setIsTestRunning(false);
-
-        // Delete the test instance from database
-        if (currentInstanceId) {
-            try {
-                const { stopTestWorkflowAPI } = await import("../../../data/apis/workflow");
-                await stopTestWorkflowAPI({ tenantID, instanceID: currentInstanceId });
-                addLog('info', 'Cleanup', 'Test instance deleted from database');
-            } catch (error) {
-                addLog('warning', 'Cleanup Warning', `Failed to delete test instance: ${error.message}`);
-            }
-            instanceIdRef.current = null;
-        }
-    }, [addLog, tenantID]);
 
     // Handle input modal submit
     const handleInputModalSubmit = useCallback((inputParams) => {
@@ -711,81 +531,109 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
 
                         {/* Canvas Area */}
                         <ResizablePanel defaultSize={80}>
-                            <div className="h-full w-full relative">
-                                <ReactFlow
-                                    nodes={values.nodes}
-                                    edges={values.edges}
-                                    onNodesChange={onNodesChange}
-                                    onEdgesChange={onEdgesChange}
-                                    onConnect={onConnect}
-                                    onNodeClick={onNodeClick}
-                                    onPaneClick={onPaneClick}
-                                    nodeTypes={nodeTypes}
-                                    edgeTypes={edgeTypes}
-                                    defaultEdgeOptions={{
-                                        type: values.edgeType || 'smoothstep',
-                                        animated: false,
-                                        style: {
-                                            strokeWidth: 2,
-                                            stroke: '#94a3b8',
-                                        },
-                                    }}
-                                    connectionLineType={ConnectionLineType.SmoothStep}
-                                    connectionLineStyle={{ stroke: '#646cff', strokeWidth: 2 }}
-                                    snapToGrid={values.snapToGrid ?? true}
-                                    snapGrid={[20, 20]}
-                                    fitView
-                                    fitViewOptions={{ padding: 0.2, maxZoom: 1.5 }}
-                                    className="bg-slate-100"
-                                    proOptions={{ hideAttribution: true }}
-                                >
-                                    <Controls />
-                                    <MiniMap />
-                                    <Background variant="dots" gap={12} size={1} />
-                                    <FitViewButton />
-                                </ReactFlow>
+                            <ResizablePanelGroup
+                                direction="vertical"
+                                autoSaveId="workflow-editor-canvas-terminal-split"
+                                className="!h-full"
+                            >
+                                {/* ReactFlow Canvas */}
+                                <ResizablePanel defaultSize={showConsole || showContextPanel ? 70 : 100} minSize={30}>
+                                    <div className="h-full w-full relative">
+                                        <ReactFlow
+                                            nodes={values.nodes}
+                                            edges={values.edges}
+                                            onNodesChange={onNodesChange}
+                                            onEdgesChange={onEdgesChange}
+                                            onConnect={onConnect}
+                                            onNodeClick={onNodeClick}
+                                            onPaneClick={onPaneClick}
+                                            nodeTypes={nodeTypes}
+                                            edgeTypes={edgeTypes}
+                                            defaultEdgeOptions={{
+                                                type: values.edgeType || 'smoothstep',
+                                                animated: false,
+                                                style: {
+                                                    strokeWidth: 2,
+                                                    stroke: '#94a3b8',
+                                                },
+                                            }}
+                                            connectionLineType={ConnectionLineType.SmoothStep}
+                                            connectionLineStyle={{ stroke: '#646cff', strokeWidth: 2 }}
+                                            snapToGrid={values.snapToGrid ?? true}
+                                            snapGrid={[20, 20]}
+                                            fitView
+                                            fitViewOptions={{ padding: 0.2, maxZoom: 0.8 }}
+                                            className="bg-slate-100"
+                                            proOptions={{ hideAttribution: true }}
+                                        >
+                                            <Controls />
+                                            <MiniMap />
+                                            <Background variant="dots" gap={12} size={1} />
+                                            <FitViewButton />
+                                        </ReactFlow>
 
-                                {/* Configuration Panel Overlay */}
-                                {selectedNode && (
-                                    <WorkflowNodeConfigPanel
-                                        node={selectedNode}
-                                        onChange={updateNodeData}
-                                        onClose={() => setSelectedNodeId(null)}
-                                        onDelete={deleteNode}
-                                    />
-                                )}
+                                        {/* Configuration Panel Overlay */}
+                                        {selectedNode && (
+                                            <WorkflowNodeConfigPanel
+                                                node={selectedNode}
+                                                onChange={updateNodeData}
+                                                onClose={() => setSelectedNodeId(null)}
+                                                onDelete={deleteNode}
+                                            />
+                                        )}
 
-                                {/* Schema Viewer Panel */}
-                                {showSchemaPanel && (
-                                    <WorkflowSchemaPanel
-                                        values={values}
-                                        onClose={() => setShowSchemaPanel(false)}
-                                    />
-                                )}
-
-                                {/* Workflow Console */}
-                                {showConsole && (
-                                    <div className="absolute bottom-4 left-4 z-20" style={{ right: showContextPanel ? 'calc(50% + 8px)' : '16px' }}>
-                                        <WorkflowConsole
-                                            logs={consoleLogs}
-                                            isRunning={isTestRunning}
-                                            onClear={clearLogs}
-                                            onClose={() => setShowConsole(false)}
-                                        />
+                                        {/* Schema Viewer Panel */}
+                                        {showSchemaPanel && (
+                                            <WorkflowSchemaPanel
+                                                values={values}
+                                                onClose={() => setShowSchemaPanel(false)}
+                                            />
+                                        )}
                                     </div>
-                                )}
+                                </ResizablePanel>
 
-                                {/* Workflow Context Panel */}
-                                {showContextPanel && (
-                                    <div className="absolute bottom-4 right-4 z-20" style={{ left: showConsole ? 'calc(50% + 8px)' : '16px' }}>
-                                        <WorkflowContextPanel
-                                            context={workflowContext}
-                                            isRunning={isTestRunning}
-                                            onClose={() => setShowContextPanel(false)}
-                                        />
-                                    </div>
+                                {/* Terminal Section - Console and Context */}
+                                {(showConsole || showContextPanel) && (
+                                    <>
+                                        <ResizableHandle withHandle />
+                                        <ResizablePanel defaultSize={30} minSize={15} maxSize={60}>
+                                            <ResizablePanelGroup
+                                                direction="horizontal"
+                                                autoSaveId="workflow-editor-console-context-split"
+                                                className="!h-full"
+                                            >
+                                                {/* Console Panel */}
+                                                {showConsole && (
+                                                    <ResizablePanel defaultSize={showContextPanel ? 50 : 100} minSize={25}>
+                                                        <WorkflowConsole
+                                                            logs={consoleLogs}
+                                                            isRunning={isTestRunning}
+                                                            onClear={clearLogs}
+                                                            className="h-full rounded-none"
+                                                        />
+                                                    </ResizablePanel>
+                                                )}
+
+                                                {/* Resize Handle between Console and Context */}
+                                                {showConsole && showContextPanel && (
+                                                    <ResizableHandle withHandle />
+                                                )}
+
+                                                {/* Context Panel */}
+                                                {showContextPanel && (
+                                                    <ResizablePanel defaultSize={showConsole ? 50 : 100} minSize={25}>
+                                                        <WorkflowContextPanel
+                                                            context={workflowContext}
+                                                            isRunning={isTestRunning}
+                                                            className="h-full rounded-none"
+                                                        />
+                                                    </ResizablePanel>
+                                                )}
+                                            </ResizablePanelGroup>
+                                        </ResizablePanel>
+                                    </>
                                 )}
-                            </div>
+                            </ResizablePanelGroup>
                         </ResizablePanel>
                     </ResizablePanelGroup>
 

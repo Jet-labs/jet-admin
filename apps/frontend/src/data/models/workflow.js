@@ -1,3 +1,12 @@
+import { WorkflowNode } from "./workflowNode";
+import { WorkflowEdge } from "./workflowEdge";
+
+/**
+ * Workflow Model
+ * 
+ * Represents a workflow with nodes and edges.
+ * Uses WorkflowNode and WorkflowEdge models for type-safe node/edge handling.
+ */
 export class Workflow {
   constructor({
     workflowID,
@@ -24,45 +33,69 @@ export class Workflow {
     this.updatedAt = updatedAt;
     this.workflowOptions = workflowOptions || {};
 
-    // Transform tblWorkflowNodes to React Flow node format if present
-    if (tblWorkflowNodes && Array.isArray(tblWorkflowNodes)) {
-      this.nodes = tblWorkflowNodes.map((node) => {
-        const { position, width, height, measured, ...restData } = node.nodeConfig || {};
-        return {
-          id: node.nodeID,
-          type: node.nodeType,
-          data: restData,
-          position: position || { x: 0, y: 0 },
-          width: width,
-          height: height,
-          measured: measured,
-        };
-      });
-    } else {
-      this.nodes = nodes || [];
-    }
+    // Transform nodes using WorkflowNode model
+    // Handle both backend format (tblWorkflowNodes) and direct format (nodes)
+    const rawNodes = tblWorkflowNodes || nodes || [];
+    this.nodes = WorkflowNode.toList(rawNodes);
 
-    // Transform tblWorkflowEdge to React Flow edge format if present
-    if (tblWorkflowEdge && Array.isArray(tblWorkflowEdge)) {
-      this.edges = tblWorkflowEdge.map((edge) => {
-        const config = edge.edgeConfig || {};
-        return {
-          id: edge.edgeID,
-          source: edge.upstreamNodeID,
-          target: edge.downstreamNodeID,
-          sourceHandle: edge.sourceHandle || null,
-          targetHandle: edge.targetHandle || null,
-          type: edge.edgeType || 'smoothstep',
-          label: config.label,
-          style: config.style,
-          animated: config.animated,
-          data: config.data,
-        };
-      });
-    } else {
-      this.edges = edges || [];
-    }
+    // Transform edges using WorkflowEdge model
+    // Handle both backend format (tblWorkflowEdge) and direct format (edges)
+    const rawEdges = tblWorkflowEdge || edges || [];
+    this.edges = WorkflowEdge.toList(rawEdges);
   }
+
+  /**
+   * Get nodes in React Flow format for rendering
+   */
+  getReactFlowNodes() {
+    return this.nodes.map(node => node.toReactFlow());
+  }
+
+  /**
+   * Get edges in React Flow format for rendering
+   */
+  getReactFlowEdges() {
+    return this.edges.map(edge => edge.toReactFlow());
+  }
+
+  /**
+   * Get the start node
+   */
+  get startNode() {
+    return this.nodes.find(node => node.isStart) || null;
+  }
+
+  /**
+   * Get the end node
+   */
+  get endNode() {
+    return this.nodes.find(node => node.isEnd) || null;
+  }
+
+  /**
+   * Get all nodes that produce output variables
+   */
+  get outputNodes() {
+    return this.nodes.filter(node => node.hasOutput);
+  }
+
+  /**
+   * Get workflow inputs from workflowOptions.args
+   */
+  get inputs() {
+    return this.workflowOptions?.args || [];
+  }
+
+  /**
+   * Get workflow outputs from end node config
+   */
+  get outputs() {
+    return this.endNode?.data?.outputs || [];
+  }
+
+  /**
+   * Convert array of raw workflow data to Workflow instances
+   */
   static toList(data) {
     if (Array.isArray(data)) {
       return data.map((item) => new Workflow(item));

@@ -61,11 +61,23 @@ const constants = {
     AI_CHAT_BOT_MESSAGE: "ai_chat_bot_message",
     WORKFLOW_NODE_UPDATE: "workflow_node_update",
     WORKFLOW_STATUS_UPDATE: "workflow_status_update",
+    // Widget-Workflow integration events
+    WIDGET_WORKFLOW_CONNECTED: "widget_workflow_connected",
+    WIDGET_CONTEXT_UPDATE: "widget_context_update",
+    WIDGET_WORKFLOW_STATUS: "widget_workflow_status",
+    WIDGET_WORKFLOW_ERROR: "widget_workflow_error",
+    WIDGET_WORKFLOW_DISCONNECTED: "widget_workflow_disconnected",
+    WIDGET_INPUT_RECEIVED: "widget_input_received",
   },
 
   SOCKET_RECEIVE_EVENTS: {
     AI_CHAT_USER_MESSAGE: "ai_chat_user_message",
     WORKFLOW_RUN_JOIN: "workflow_run_join",
+    // Widget-Workflow integration events
+    WIDGET_WORKFLOW_CONNECT: "widget_workflow_connect",
+    WIDGET_SEND_INPUT: "widget_send_input",
+    WIDGET_REFRESH: "widget_refresh",
+    WIDGET_WORKFLOW_DISCONNECT: "widget_workflow_disconnect",
   },
 
   SAMPLE_PLAN: {

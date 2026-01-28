@@ -9,3 +9,5 @@ export * from "./text";
 export * from "./table";
 export * from "./iframe";   
 export * from "./widget.map";
+export * from "./workflow";
+

@@ -9,6 +9,7 @@ const { cronJobService } = require("./modules/cronJob/cronJob.service");
 const { stringUtils } = require("@jet-admin/template-package");
 const { socketIO } = require("./config/socket.io");
 const { isModuleEnabled } = require("./config/module.config");
+const { widgetSocketController } = require("./modules/widget/widget.socket.controller");
 const {
   aiSocketController,
 } = require("./modules/ai/socket/ai.socket.controller");
@@ -101,12 +102,78 @@ socketIO.on("connection", async (socket) => {
     }
   );
 
+  // === Widget-Workflow Integration Events ===
+  socket.on(
+    constants.SOCKET_RECEIVE_EVENTS.WIDGET_WORKFLOW_CONNECT,
+    async (data) => {
+      Logger.log('warning', {
+        message: 'socket:widget_workflow_connect:received',
+        params: { widgetID: data.widgetID, workflowID: data.workflowID, mode: data.mode, instanceID: data.instanceID },
+      });
+      await widgetSocketController.onWidgetWorkflowConnect({
+        socket,
+        widgetID: data.widgetID,
+        workflowID: data.workflowID,
+        mode: data.mode || 'execute',
+        inputParams: data.inputParams || {},
+        instanceID: data.instanceID,
+        tenantID: data.tenantID,
+        firebaseID: firebase_id,
+        // Widget configuration for real-time data processing
+        widgetType: data.widgetType,
+        datasetFields: data.datasetFields,
+        parameters: data.parameters,
+      });
+    }
+  );
+
+  socket.on(
+    constants.SOCKET_RECEIVE_EVENTS.WIDGET_SEND_INPUT,
+    async (data) => {
+      await widgetSocketController.onWidgetSendInput({
+        socket,
+        widgetID: data.widgetID,
+        instanceID: data.instanceID,
+        inputType: data.inputType,
+        data: data.data,
+      });
+    }
+  );
+
+  socket.on(
+    constants.SOCKET_RECEIVE_EVENTS.WIDGET_REFRESH,
+    async (data) => {
+      await widgetSocketController.onWidgetRefresh({
+        socket,
+        widgetID: data.widgetID,
+        inputParams: data.inputParams,
+        tenantID: data.tenantID,
+      });
+    }
+  );
+
+  socket.on(
+    constants.SOCKET_RECEIVE_EVENTS.WIDGET_WORKFLOW_DISCONNECT,
+    async (data) => {
+      await widgetSocketController.onWidgetWorkflowDisconnect({
+        socket,
+        widgetID: data.widgetID,
+      });
+    }
+  );
+
   Logger.log("success", {
     message: "user connected to socket",
     params: { firebase_id },
   });
 
   socket.on("disconnect", () => {
+    // Clean up widget connections on disconnect
+    widgetSocketController.onSocketDisconnect({
+      socket,
+      firebaseID: firebase_id,
+    });
+
     Logger.log("info", {
       message: "socket connection disconnected",
       params: { firebase_id },

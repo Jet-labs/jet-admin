@@ -57,7 +57,7 @@ class QueryEngine {
     this.cache.set(cacheKey, result);
     Logger.log("info", {
       message: "QueryEngine:executeQuery:executed",
-      params: { dataQueryID, runtimeArgs, result },
+      params: { dataQueryID, runtimeArgs },
     });
     return result;
   }

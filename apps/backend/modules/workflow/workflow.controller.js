@@ -21,7 +21,7 @@ workflowController.getAllWorkflows = async (req, res) => {
     const authContext = getServiceAuthContext(req);
     Logger.log("info", { message: "WorkflowController:getAllWorkflows:params", params: { userID: user.userID, tenantID, authContext } });
     const workflows = await workflowService.getAllWorkflows({ userID: user.userID, tenantID, authContext });
-    Logger.log("success", { message: "WorkflowController:getAllWorkflows:success", params: { workflows } });
+    Logger.log("success", { message: "WorkflowController:getAllWorkflows:success", params: { workflowLength: workflows.length } });
     expressUtils.sendResponse(res, true, { workflows });
   } catch (error) {
     Logger.log("error", { message: "WorkflowController:getAllWorkflows:error", params: { error: error.message } });
@@ -204,6 +204,45 @@ workflowController.stopTestWorkflow = async (req, res) => {
     expressUtils.sendResponse(res, true, result);
   } catch (error) {
     Logger.log("error", { message: "WorkflowController:stopTestWorkflow:error", params: { error: error.message } });
+    expressUtils.sendResponse(res, false, {}, error);
+  }
+};
+
+/**
+ * Get the status of a workflow run with processed widget data.
+ * @param {import("express").Request} req
+ * @param {import("express").Response} res
+ */
+workflowController.getRunStatusForWidget = async (req, res) => {
+  try {
+    const { instanceID } = req.params;
+    const { widgetType, datasetFields, parameters } = req.body;
+    const authContext = getServiceAuthContext(req);
+
+    Logger.log("info", {
+      message: "WorkflowController:getRunStatusForWidget:params",
+      params: { instanceID, widgetType, authContext }
+    });
+
+    const status = await workflowService.getRunStatusForWidget({
+      instanceID,
+      widgetType,
+      datasetFields,
+      parameters
+    });
+
+    if (!status) {
+      Logger.log("error", { message: "WorkflowController:getRunStatusForWidget:notFound", params: { instanceID } });
+      return expressUtils.sendResponse(res, false, {}, { message: "Run not found" });
+    }
+
+    Logger.log("success", {
+      message: "WorkflowController:getRunStatusForWidget:success",
+      params: { instanceID, status: status.status, hasData: !!status.data }
+    });
+    expressUtils.sendResponse(res, true, status);
+  } catch (error) {
+    Logger.log("error", { message: "WorkflowController:getRunStatusForWidget:error", params: { error: error.message } });
     expressUtils.sendResponse(res, false, {}, error);
   }
 };

@@ -260,14 +260,39 @@ widgetService.cloneWidgetByID = async ({ authContext, tenantID, widgetID, }) => 
 };
 
 /**
+ * Helper to wait for workflow completion (polling)
+ * @param {string} instanceID
+ * @param {number} timeoutMs
+ * @returns {Promise<string>} Final status
+ */
+const _waitForWorkflowCompletion = async (instanceID, timeoutMs = 30000) => {
+  const startTime = Date.now();
+
+  while (Date.now() - startTime < timeoutMs) {
+    const status = await workflowService.getRunStatus(instanceID);
+    if (!status) throw new Error("Instance not found");
+
+    if (status.status === 'COMPLETED' || status.status === 'FAILED') {
+      return status.status;
+    }
+
+    // Wait 500ms
+    await new Promise(resolve => setTimeout(resolve, 500));
+  }
+
+  throw new Error("Workflow execution timed out");
+};
+
+/**
  * Execute workflow for Workflow Mode widgets (non-persisted/preview widgets)
  * @param {object} params
  * @param {object} params.widget - Widget config with workflowSource object
  * @param {object} params.authContext - User ID
  * @param {string} params.tenantID - Tenant ID
- * @returns {Promise<object>} Workflow instance info
+ * @param {string} params.executionMode - 'ASYNC' (default) or 'SYNC'
+ * @returns {Promise<object>} Workflow instance info or full data
  */
-const _executeWorkflowMode = async ({ widget, tenantID }) => {
+const _executeWorkflowMode = async ({ widget, tenantID, executionMode = 'ASYNC' }) => {
   const workflowConfig = widget.workflowConfig;
 
   try {
@@ -278,13 +303,49 @@ const _executeWorkflowMode = async ({ widget, tenantID }) => {
     });
 
     Logger.log("info", {
-      message: "widgetService:_executeWorkflowMode:completed",
+      message: "widgetService:_executeWorkflowMode:started",
       params: {
         workflowID: widget.workflowID,
         instanceID,
+        executionMode,
       },
     });
 
+    // Handle SYNC execution mode
+    if (executionMode === 'SYNC') {
+      try {
+        await _waitForWorkflowCompletion(instanceID);
+
+        // Fetch processed data
+        const result = await workflowService.getRunStatusForWidget({
+          instanceID,
+          widgetType: widget.widgetType,
+          datasetFields: workflowConfig.datasetFields,
+          parameters: workflowConfig.parameters,
+        });
+
+        return {
+          title: workflowConfig.title,
+          instanceID,
+          workflowID: widget.workflowID,
+          datasetFields: workflowConfig.datasetFields,
+          parameters: workflowConfig.parameters,
+          status: result?.status || 'UNKNOWN',
+          // Return the full processed data
+          data: result?.data,
+          message: "Workflow execution completed synchronously",
+        };
+      } catch (waitError) {
+        Logger.log("error", {
+          message: "widgetService:_executeWorkflowMode:sync-timeout",
+          params: { instanceID, error: waitError.message },
+        });
+        // Fallback to returning instanceID with error/timeout status (or let it fail)
+        throw waitError;
+      }
+    }
+
+    // Default ASYNC: Return ID immediately
     return {
       title: workflowConfig.title,
       instanceID,
@@ -323,6 +384,7 @@ widgetService.getWidgetDataByID = async ({
   authContext,
   tenantID,
   widgetID,
+  executionMode = 'ASYNC',
 }) => {
   Logger.log("info", {
     message: "widgetService:getWidgetDataByID:params",
@@ -364,7 +426,7 @@ widgetService.getWidgetDataByID = async ({
       },
     });
 
-    const workflowInstance = await _executeWorkflowMode({ widget, authContext, tenantID });
+    const workflowInstance = await _executeWorkflowMode({ widget, authContext, tenantID, executionMode });
 
     Logger.log("success", {
       message: "widgetService:getWidgetDataByID:workflowMode:success",
@@ -404,6 +466,7 @@ widgetService.getWidgetDataUsingWidget = async ({
   authContext,
   tenantID,
   widget,
+  executionMode = 'ASYNC',
 }) => {
   Logger.log("info", {
     message: "widgetService:getWidgetDataUsingWidget:params",
@@ -417,7 +480,7 @@ widgetService.getWidgetDataUsingWidget = async ({
   try {
     // Workflow Mode: Execute single workflow
     const workflowInstance = await _executeWorkflowMode({
-      widget, authContext, tenantID
+      widget, authContext, tenantID, executionMode
     });
 
     return {

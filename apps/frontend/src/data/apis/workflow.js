@@ -282,3 +282,52 @@ export const stopTestWorkflowAPI = async ({ tenantID, instanceID }) => {
     throw error;
   }
 };
+
+/**
+ * Get workflow run status with processed data for widget display
+ * 
+ * @param {object} params
+ * @param {string} params.tenantID - Tenant ID
+ * @param {string} params.instanceID - Workflow instance ID
+ * @param {string} params.widgetType - Widget type (bar, line, pie, etc.)
+ * @param {object} params.datasetFields - Field mappings
+ * @param {object} params.parameters - Additional chart parameters
+ * @returns {Promise<object>} Workflow status with processed data
+ */
+export const getWorkflowRunStatusForWidgetAPI = async ({
+  tenantID,
+  instanceID,
+  widgetType,
+  datasetFields,
+  parameters
+}) => {
+  try {
+    const url =
+      CONSTANTS.SERVER_HOST +
+      CONSTANTS.APIS.WORKFLOW.getWorkflowRunStatusForWidgetAPI(tenantID, instanceID);
+    const bearerToken = await firebaseAuth.currentUser.getIdToken();
+    if (bearerToken) {
+      const response = await axios.post(
+        url,
+        { widgetType, datasetFields, parameters },
+        {
+          headers: {
+            authorization: `Bearer ${bearerToken}`,
+          },
+        }
+      );
+      if (response.data && response.data.success === true) {
+        return response.data;
+      } else if (response.data.error) {
+        throw response.data.error;
+      } else {
+        throw CONSTANTS.ERROR_CODES.SERVER_ERROR;
+      }
+    } else {
+      throw CONSTANTS.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND;
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+

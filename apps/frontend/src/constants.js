@@ -30,10 +30,22 @@ export const CONSTANTS = {
     AI_CHAT_ROOM_DISCONNECT: "ai_chat_room_disconnect",
     AI_CHAT_ROOM_ID: "ai_chat_room_id",
     AI_CHAT_USER_MESSAGE: "ai_chat_user_message",
+    // Widget-Workflow integration events (send to server)
+    WIDGET_WORKFLOW_CONNECT: "widget_workflow_connect",
+    WIDGET_SEND_INPUT: "widget_send_input",
+    WIDGET_REFRESH: "widget_refresh",
+    WIDGET_WORKFLOW_DISCONNECT: "widget_workflow_disconnect",
   },
 
   SOCKET_RECEIVE_EVENTS: {
     AI_CHAT_BOT_MESSAGE: "ai_chat_bot_message",
+    // Widget-Workflow integration events (receive from server)
+    WIDGET_WORKFLOW_CONNECTED: "widget_workflow_connected",
+    WIDGET_CONTEXT_UPDATE: "widget_context_update",
+    WIDGET_WORKFLOW_STATUS: "widget_workflow_status",
+    WIDGET_WORKFLOW_ERROR: "widget_workflow_error",
+    WIDGET_WORKFLOW_DISCONNECTED: "widget_workflow_disconnected",
+    WIDGET_INPUT_RECEIVED: "widget_input_received",
   },
   STRINGS: {
     ADD_WORKFLOW_FORM_WORKFLOW_ADDITION_SUCCESS: "Workflow added successfully!",
@@ -1084,6 +1096,8 @@ export const CONSTANTS = {
         `/api/v1/tenants/${tenantID}/workflows/instances/${instanceID}`,
       stopTestWorkflowAPI: (tenantID, instanceID) =>
         `/api/v1/tenants/${tenantID}/workflows/instances/${instanceID}/stop`,
+      getWorkflowRunStatusForWidgetAPI: (tenantID, instanceID) =>
+        `/api/v1/tenants/${tenantID}/workflows/instances/${instanceID}/widget`,
     },
     AUTH: {
       getUserInfoAPI: () => "/api/v1/auth",

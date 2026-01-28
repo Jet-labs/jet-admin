@@ -34,12 +34,16 @@ workflowService.getAllWorkflows = async ({ userID, tenantID, authContext }) => {
       where: {
         tenantID: tenantID,
       },
+      include: {
+        tblWorkflowNodes: true,
+        tblWorkflowEdge: true,
+      },
     });
     Logger.log("success", {
       message: "workflowService:getAllWorkflows:success",
       params: {
         userID,
-        workflows,
+        workflowLength: workflows?.length,
       },
     });
     return workflows;
@@ -486,6 +490,64 @@ workflowService.stopTestWorkflow = async ({ instanceID }) => {
     Logger.log("error", {
       message: "workflowService:stopTestWorkflow:failure",
       params: { error: error.message },
+    });
+    throw error;
+  }
+};
+
+/**
+ * Get the status of a workflow run and process context data for widget display.
+ * Transforms contextData according to widgetType and datasetFields.
+ * 
+ * @param {object} params
+ * @param {string} params.instanceID - Workflow instance ID
+ * @param {string} params.widgetType - Widget type (bar, line, pie, etc.)
+ * @param {object} params.datasetFields - Field mappings { xAxis: "{{ctx.data[*].date}}", yAxis: "..." }
+ * @param {object} params.parameters - Additional chart parameters
+ * @returns {Promise<object>} Workflow status with processed data
+ */
+workflowService.getRunStatusForWidget = async ({ instanceID, widgetType, datasetFields, parameters }) => {
+  Logger.log("info", {
+    message: "workflowService:getRunStatusForWidget:params",
+    params: { instanceID, widgetType },
+  });
+
+  try {
+    // Get base run status
+    const runStatus = await workflowService.getRunStatus(instanceID);
+
+    if (!runStatus) {
+      return null;
+    }
+
+    // If not completed, return status as-is
+    if (runStatus.status !== 'COMPLETED') {
+      return runStatus;
+    }
+
+    // Process context data for widget display
+    const { processWorkflowDataForWidget } = require("@jet-admin/widgets");
+
+    const processedData = processWorkflowDataForWidget({
+      widgetType,
+      context: runStatus.contextData,
+      datasetFields,
+      parameters,
+    });
+
+    Logger.log("success", {
+      message: "workflowService:getRunStatusForWidget:processed",
+      params: { instanceID, widgetType, hasData: !!processedData },
+    });
+
+    return {
+      ...runStatus,
+      data: processedData,
+    };
+  } catch (error) {
+    Logger.log("error", {
+      message: "workflowService:getRunStatusForWidget:failure",
+      params: { instanceID, error: error.message },
     });
     throw error;
   }

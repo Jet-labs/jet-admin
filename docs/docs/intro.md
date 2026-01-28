@@ -1,100 +1,70 @@
 ---
+id: intro
+title: Introduction
+sidebar_label: Introduction
 sidebar_position: 1
+description: Overview of the Jet Admin project, technology stack, and high-level architecture.
 ---
 
-# Jet Admin
+# Jet Admin CodeWiki
 
-![Jet Admin Mockup](/img/mackup_final.png)
+Welcome to the technical documentation for **Jet Admin**, a comprehensive web-based PostgreSQL management and visualization platform. This documentation is designed to help developers understand the codebase, architecture, and modules in extreme detail.
 
-Welcome to Jet Admin, a powerful web-based PostgreSQL management and visualization platform.
+## Project Overview
 
-## Overview
+**Jet Admin** allows users to:
+- Manage PostgreSQL databases (DML/DDL operations).
+- Visualise data using drag-and-drop dashboards.
+- Build and execute complex workflows.
+- Manage teams with granular role-based access control.
 
-Jet Admin is a comprehensive solution for managing PostgreSQL databases through an intuitive web interface. It combines robust database management capabilities with powerful visualization tools, making it ideal for both developers and operations teams.
+The project is structured as a **Monorepo** using NPM Workspaces.
 
-## Core Features
+## Technology Stack
 
-#### Database Management
-- **Data Manipulation Language**
-  - [x] Insert
-  - [x] Update
-  - [x] Delete
-  - [x] Select
-  - [x] Bulk Delete
-  - [x] Bulk Update
-  - [x] Bulk Insert
-- **Data Definition Language (DDL)**
-  - [x] Create
-  - [x] Alter
-  - [x] Drop
-  - [ ] Truncate
+### Frontend (`apps/frontend`)
+- **Framework:** [React](https://reactjs.org/) (Vite)
+- **UI Library:** [Material UI (MUI)](https://mui.com/)
+- **State Management:** `react-query`, `Context API`
+- **Editor:** Monaco Editor, React Flow (for workflows)
+- **Styling:** Tailwind CSS + Emotion
 
-#### Workflow Engine
-- **Visual Workflow Builder**
-  - [x] Drag-and-drop node editor
-  - [x] JavaScript (Sandboxed)
-  - [x] Database Queries
-  - [x] Conditionals / Loops
-  - [x] Delays
-  - [x] Error Handling
-- **Integration**
-  - [x] Trigger from UI (Widgets)
-  - [x] Trigger via API
-  - [x] Scheduled Triggers (Cron)
+### Backend (`apps/backend`)
+- **Runtime:** [Node.js](https://nodejs.org/)
+- **Framework:** [Express.js](https://expressjs.com/)
+- **ORM:** [Prisma](https://www.prisma.io/)
+- **Database:** PostgreSQL
+- **Real-time:** Socket.io
+- **Queue/Messaging:** `amqplib` (RabbitMQ)
 
-#### Queries
-- **PostgreSQL Queries**
-  - [x] Create query
-  - [x] Edit query
-  - [x] Delete query
-  - [x] Run query
-  - [ ] Duplicate query
-- **Javascript-based Query**
-- **Rest API-based Query**
+### Shared Packages (`packages/`)
+- `widgets`: Shared UI widgets for dashboards.
+- `workflow-nodes`: Logic for workflow execution nodes.
+- `datasources`: Connectors for different database types.
 
-#### Charts
-- [x] Line chart
-- [x] Bar chart
-- [x] Pie chart
-- [x] Radial chart
-- [x] Doughnut chart
-- [x] Polar chart
-- [x] Radar chart (new)
-- [x] Scatter chart (new)
-- [x] Bubble chart (new)
+## High-Level Architecture
 
-#### Authentication
-- [x] Firebase Authentication
-  - [x] Google Authentication
-  - [x] Email Authentication
-  - [ ] Phone Authentication
-  - [ ] Facebook Authentication
-  - [ ] Twitter Authentication
-  - [ ] Github Authentication
-  - [ ] Apple Authentication
-  - [ ] Microsoft Authentication
-- [ ] JWT-based authentication
+```mermaid
+graph TD
+    User["User / Browser"] -->|HTTP/HTTPS| Frontend["Frontend App (Vite)"]
+    User -->|WebSocket| Frontend
+    
+    Frontend -->|REST API| Backend["Backend API (Express)"]
+    Frontend -->|Socket.io| Backend
+    
+    Backend -->|Prisma| DB[("PostgreSQL Database")]
+    Backend -->|AMQP| Queue["Message Queue (RabbitMQ)"]
+    
+    Backend -->|Execute| WorkflowEngine["Workflow Orchestrator"]
+    WorkflowEngine -->|Read/Write| DB
+    WorkflowEngine -->|http| ExternalAPIs["External APIs"]
+```
 
-#### Authorization
-- [x] Global roles
-- [x] Tenant specific roles
-- [x] Permissions (per API)
-- [x] Map permissions to roles
-- [x] Map roles to users
-- [ ] Asset level permissions
+## Directory Structure
 
-### Topics to cover
-
-- **Setup:** To get started with the project, follow the instructions in the [Frontend Setup](./setup/setup-frontend.md) and [Backend Setup](./setup/setup-backend.md) sections to set up the frontend and backend components respectively.
-- [**Concepts**](#concepts)
-- [**Database Schemas**](#schemas)
-- [**Tables**](#tables)
-- [**Queries**](#queries)
-- [**Charts**](#charts)
-- [**Widgets**](#widgets)
-- [**Dashboards**](#dashboards)
-- [**Accounts**](#accounts)
-- [**Authentication**](#authentication)
-- [**Authorization**](#authorization)
-- [**Scheduling (coming soon)**](#scheduling)
-
+| Directory | Description |
+| :--- | :--- |
+| `apps/frontend` | The main React application source code. |
+| `apps/backend` | The Node.js API server and background workers. |
+| `packages/*` | Shared internal libraries used by both apps. |
+| `docs` | This Docusaurus documentation site. |

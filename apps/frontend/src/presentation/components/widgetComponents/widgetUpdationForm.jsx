@@ -3,12 +3,10 @@ import { CircularProgress } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import PropTypes from "prop-types";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, useMemo } from "react";
 import { CONSTANTS } from "../../../constants";
 import {
   getWidgetByIDAPI,
-  getWidgetDataByIDAPI,
-  getWidgetDataUsingWidgetAPI,
   updateWidgetByIDAPI,
 } from "../../../data/apis/widget";
 import { formValidations } from "../../../utils/formValidation";
@@ -23,6 +21,8 @@ import { WidgetCloneForm } from "./widgetCloneForm";
 import { WidgetDeletionForm } from "./widgetDeletionForm";
 import { WidgetEditor } from "./widgetEditor";
 import { WidgetPreview } from "./widgetPreview";
+import { useWidgetRun, WIDGET_EXECUTION_MODES } from "./useWidgetRun";
+import { Switch, FormControlLabel } from "@mui/material";
 
 const initialValues = {
   widgetTitle: "",
@@ -43,9 +43,40 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
     tenantID: PropTypes.number.isRequired,
     widgetID: PropTypes.number.isRequired,
   };
-  const uniqueKey = `widgetUpdationForm_${tenantID}_${widgetID}`;
-  const queryClient = useQueryClient();
-  const [widgetFetchedData, setWidgetFetchedData] = useState(null);
+
+  const [executionMode, setExecutionMode] = useState(WIDGET_EXECUTION_MODES.ASYNC);
+
+
+
+
+
+  const updateWidgetForm = useFormik({
+    initialValues: initialValues,
+    validationSchema: formValidations.updateWidgetFormValidationSchema,
+    validateOnMount: false,
+    validateOnChange: false,
+    onSubmit: (values) => {
+      updateWidget(values);
+    },
+  });
+
+  // New Hook for Widget Execution/Preview
+  const {
+    data: previewData,
+    isLoading: isPreviewLoading,
+    runWidget,
+    isLive,
+    workflowStatus
+  } = useWidgetRun({
+    tenantID,
+    widgetID,
+    executionMode,
+    // Pass config for socket
+    workflowID: updateWidgetForm?.values?.workflowID,
+    widgetType: updateWidgetForm?.values?.widgetType,
+    datasetFields: updateWidgetForm?.values?.workflowConfig?.datasetFields,
+    parameters: updateWidgetForm?.values?.workflowConfig?.parameters,
+  });
 
   const {
     isLoading: isLoadingWidget,
@@ -88,55 +119,12 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
     },
   });
 
-  const {
-    isLoading: isLoadingWidgetDataByID,
-    isPending: isPendingFetchingWidgetDataByID,
-    data: widgetDataByID,
-    isFetching: isFetchingWidgetDataByID,
-    isRefetching: isRefetechingWidgetDataByID,
-  } = useQuery({
-    queryKey: [CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID), widgetID, "data"],
-    queryFn: () =>
-      getWidgetDataByIDAPI({
-        tenantID,
-        widgetID,
-      }),
-    refetchOnWindowFocus: false,
-  });
-
-  const { isPending: isFetchingWidgetData, mutate: fetchWidgetData } =
-    useMutation({
-      mutationFn: (data) => {
-        return getWidgetDataUsingWidgetAPI({
-          tenantID,
-          widgetData: data,
-        });
-      },
-      retry: false,
-      onSuccess: (data) => {
-        console.log("data", data);
-        setWidgetFetchedData(data?.data);
-      },
-      onError: (error) => {
-        displayError(error);
-      },
-    });
-
-  const updateWidgetForm = useFormik({
-    initialValues: initialValues,
-    validationSchema: formValidations.updateWidgetFormValidationSchema,
-    validateOnMount: false,
-    validateOnChange: false,
-    onSubmit: (values) => {
-      updateWidget(values);
-    },
-  });
 
   const _handleFetchWidgetData = useCallback(() => {
     if (updateWidgetForm && updateWidgetForm.values) {
-      fetchWidgetData(updateWidgetForm.values);
+      runWidget(updateWidgetForm.values);
     }
-  }, [updateWidgetForm]);
+  }, [updateWidgetForm, runWidget]);
 
   useEffect(() => {
     if (widget && widget.widgetID) {    
@@ -150,6 +138,8 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
       });
     }
   }, [widget]);
+
+
 
   return (
     <div className="w-full flex flex-col justify-start items-center h-full">
@@ -179,7 +169,7 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
             >
               {updateWidgetForm && (
                 <WidgetEditor
-                  key={`widgetEditor_${uniqueKey}`}
+                  key={`widgetEditor_${widgetID}`}
                   widgetEditorForm={updateWidgetForm}
                 />
               )}
@@ -199,12 +189,12 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
                   {CONSTANTS.STRINGS.UPDATE_WIDGET_FORM_SUBMIT_BUTTON}
                 </button>
                 <WidgetCloneForm
-                  key={`widgetCloneForm_${uniqueKey}`}
+                  key={`widgetCloneForm_${widgetID}`}
                   tenantID={tenantID}
                   widgetID={widgetID}
                 />
                 <WidgetDeletionForm
-                  key={`widgetDeletionForm_${uniqueKey}`}
+                  key={`widgetDeletionForm_${widgetID}`}
                   tenantID={tenantID}
                   widgetID={widgetID}
                 />
@@ -213,24 +203,37 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
           </ResizablePanel>
           <ResizableHandle withHandle={true} />
           <ResizablePanel defaultSize={80}>
+            {/* Execution Mode Toggle */}
+            <div className="absolute top-2 right-2 z-10 flex items-center gap-2 bg-white/80 p-1 rounded shadow-sm">
+              <FormControlLabel
+                control={
+                  <Switch
+                    size="small"
+                    checked={executionMode === WIDGET_EXECUTION_MODES.ASYNC}
+                    onChange={(e) => setExecutionMode(e.target.checked ? WIDGET_EXECUTION_MODES.ASYNC : WIDGET_EXECUTION_MODES.SYNC)}
+                  />
+                }
+                label={<span className="text-xs">{executionMode === WIDGET_EXECUTION_MODES.ASYNC ? "Real-time" : "Sync"}</span>}
+              />
+
+              {isLive && (
+                <div className="flex items-center gap-1 px-2 py-1 rounded text-xs bg-green-100 text-green-700">
+                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                  <span>Live</span>
+                </div>
+              )}
+            </div>
             <WidgetPreview
-              key={`{widgetPreview_${uniqueKey}}`}
+              key={`{widgetPreview_${widgetID}}`}
               widgetID={widgetID}
               tenantID={tenantID}
               widgetTitle={updateWidgetForm.values.widgetTitle}
               widgetType={updateWidgetForm.values.widgetType}
               widgetConfig={updateWidgetForm.values.widgetConfig}
               refreshData={_handleFetchWidgetData}
-              isFetchingData={
-                isFetchingWidgetData ||
-                isFetchingWidgetDataByID ||
-                isLoadingWidgetDataByID ||
-                isPendingFetchingWidgetDataByID
-              }
-              isRefreshingData={isRefetechingWidgetDataByID}
-              data={
-                widgetFetchedData ? widgetFetchedData : widgetDataByID?.data
-              }
+              isFetchingData={isPreviewLoading}
+              isRefreshingData={isPreviewLoading}
+              data={previewData}
             />
           </ResizablePanel>
         </ResizablePanelGroup>

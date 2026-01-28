@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useSocketState } from "../contexts/socketContext";
-import { getWorkflowRunStatusAPI } from "../../data/apis/workflow";
+import { getWorkflowRunStatusAPI, getWorkflowRunStatusForWidgetAPI } from "../../data/apis/workflow";
 
 /**
  * Hook to manage asynchronous workflow data for widgets.
@@ -9,6 +9,9 @@ import { getWorkflowRunStatusAPI } from "../../data/apis/workflow";
  * @param {object} params
  * @param {string} params.tenantID - Tenant ID
  * @param {string} params.widgetID - Widget ID
+ * @param {string} params.widgetType - Widget type (bar, line, pie, etc.) for data processing
+ * @param {object} params.datasetFields - Field mappings for data processing
+ * @param {object} params.parameters - Additional chart parameters
  * @param {Array} params.workflowInstances - Array of workflow instances from getWidgetDataByIDAPI
  * @param {function} params.onWorkflowComplete - Callback when a workflow completes with its data
  * @returns {object} - { workflowData, isLoadingWorkflows, workflowErrors }
@@ -16,6 +19,9 @@ import { getWorkflowRunStatusAPI } from "../../data/apis/workflow";
 export const useWidgetWorkflowData = ({
   tenantID,
   widgetID,
+  widgetType,
+  datasetFields,
+  parameters,
   workflowInstances = [],
   onWorkflowComplete,
 }) => {
@@ -33,22 +39,34 @@ export const useWidgetWorkflowData = ({
 
   /**
    * Poll for a specific workflow instance status
+   * Uses the widget-specific API to get processed data from backend
    */
   const pollWorkflowStatus = useCallback(async (instance) => {
     if (!mountedRef.current) return;
 
     try {
-      const result = await getWorkflowRunStatusAPI({
-        tenantID,
-        instanceID: instance.instanceID,
-      });
+      // Use the widget-specific API if widgetType and datasetFields are provided
+      // Otherwise fall back to the regular status API
+      const useWidgetAPI = widgetType && datasetFields && Object.keys(datasetFields).length > 0;
+
+      const result = useWidgetAPI
+        ? await getWorkflowRunStatusForWidgetAPI({
+          tenantID,
+          instanceID: instance.instanceID,
+          widgetType,
+          datasetFields: instance.datasetFields || datasetFields,
+          parameters: instance.parameters || parameters,
+        })
+        : await getWorkflowRunStatusAPI({
+          tenantID,
+          instanceID: instance.instanceID,
+        });
 
       if (!mountedRef.current) return;
 
       if (result.status === 'COMPLETED') {
-        // Extract data from contextData using outputVarMapping
-        const outputKey = instance.outputVarMapping || 'result';
-        const outputData = result.contextData?.[outputKey] || result.contextData;
+        // Use processed data if available, otherwise extract from contextData
+        const outputData = result.data || result.contextData;
 
         setWorkflowData((prev) => ({
           ...prev,
@@ -90,7 +108,7 @@ export const useWidgetWorkflowData = ({
         [instance.title]: error.message || 'Failed to fetch workflow status',
       }));
     }
-  }, [tenantID, onWorkflowComplete]);
+  }, [tenantID, widgetType, datasetFields, parameters, onWorkflowComplete]);
 
   /**
    * Start polling for pending workflows

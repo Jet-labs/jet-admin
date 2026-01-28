@@ -22,7 +22,7 @@ const updateDataQuerySchema = z.object({
 
 const testDataQuerySchema = z.object({
   dataQuery: z.object({}).passthrough(),
-  argValues: z.object({}).passthrough().optional(),
+  // argValues: z.object({}).optional(),
 }).passthrough();
 
 const aiGenerateSchema = z.object({

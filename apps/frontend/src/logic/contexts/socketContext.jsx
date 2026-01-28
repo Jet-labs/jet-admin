@@ -30,7 +30,7 @@ const SocketContextProvider = ({ children }) => {
                 }
             });
 
-            console.log("Socket connected");
+            console.log("Socket connected:", _socket);
             setSocket(_socket);
         } catch (error) {
             console.error("Socket connection error:", error);

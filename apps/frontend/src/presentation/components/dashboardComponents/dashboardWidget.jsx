@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from "react";
+import React, { useState, useCallback, useMemo, useEffect } from "react";
 
 import { WIDGETS_MAP } from "@jet-admin/widgets";
 import { useQuery } from "@tanstack/react-query";
@@ -9,7 +9,8 @@ import {
   getWidgetDataByIDAPI,
 } from "../../../data/apis/widget";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
-import { useWidgetWorkflowData } from "../../../logic/hooks/useWidgetWorkflowData";
+// Use the merged hook
+import { useWidgetRun, WIDGET_EXECUTION_MODES } from "../widgetComponents/useWidgetRun";
 
 export const DashboardWidget = ({ tenantID, widgetID, width, height }) => {
   DashboardWidget.propTypes = {
@@ -19,8 +20,7 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height }) => {
     height: PropTypes.number.isRequired,
   };
 
-  const [mergedWorkflowData, setMergedWorkflowData] = useState({});
-
+  // Fetch widget configuration
   const {
     isLoading: isLoadingWidget,
     data: widget,
@@ -32,76 +32,58 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height }) => {
     refetchOnWindowFocus: false,
   });
 
+  // Fetch widget data (triggers workflow execution for workflow mode)
   const {
     isLoading: isLoadingWidgetData,
     data: widgetData,
     error: loadWidgetDataError,
+    refetch: refetchWidgetData,
   } = useQuery({
     queryKey: [CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID), widgetID, "data"],
     queryFn: () => getWidgetDataByIDAPI({ tenantID, widgetID }),
     refetchOnWindowFocus: false,
+    // Disable automatic refetch if we are going to use the hook to manage it?
+    // Actually, stick to React Query for initial load, passthrough to hook as 'initialData'
   });
 
-  // Handle workflow data completion
-  const handleWorkflowComplete = useCallback((title, data) => {
-    setMergedWorkflowData((prev) => ({
-      ...prev,
-      [title]: data,
-    }));
-  }, []);
+  // Determine Execution Mode (Default to ASYNC/Live for workflows)
+  const executionMode = useMemo(() => {
+    if (widget?.workflowConfig?.mode === 'polling') return WIDGET_EXECUTION_MODES.SYNC; // Or legacy polling
+    return WIDGET_EXECUTION_MODES.ASYNC;
+  }, [widget]);
 
-  // Use the workflow data hook
+  // Use the merged hook for execution management (Socket + Data merging)
   const {
-    workflowData,
-    isLoadingWorkflows,
-    workflowErrors,
-    pendingCount,
-  } = useWidgetWorkflowData({
+    data: finalData,
+    isLoading: isWorkflowRunning,
+    isLive,
+    workflowStatus,
+    resolveVariable,
+    // On Dashboard, we might assume the "Initial Fetch" above triggered the execution
+    // So we pass the `widgetData` result (which contains instanceID) to the hook
+  } = useWidgetRun({
     tenantID,
     widgetID,
-    workflowInstances: widgetData?.workflowInstances || [],
-    onWorkflowComplete: handleWorkflowComplete,
+    widgetFetchedData: widgetData, // Pass the Initial Data
+    executionMode,
+    // Workflow Params for Socket
+    workflowID: widget?.workflowID,
+    widgetType: widget?.widgetType,
+    datasetFields: widget?.workflowConfig?.datasetFields,
+    parameters: widget?.workflowConfig?.parameters,
   });
 
-  // Determine if we have any pending workflow data
-  const hasWorkflowInstances = (widgetData?.workflowInstances || []).length > 0;
-  const isWorkflowsComplete = pendingCount === 0;
 
-  // Combine query data with workflow data for display
-  const combinedData = useMemo(() => {
-    if (!widgetData?.data) return null;
+  // Extract data for display
+  const displayData = useMemo(() => {
+    // If hook gives us data (merged or socket), use it
+    if (finalData?.workflowInstances?.data) return finalData.workflowInstances.data;
+    if (finalData?.data) return finalData.data;
 
-    // If there are no workflow instances, just return query data
-    if (!hasWorkflowInstances) {
-      return widgetData.data;
-    }
+    // Fallback to query data directly if hook hasn't processed it yet
+    return widgetData?.data;
+  }, [finalData, widgetData]);
 
-    // Merge workflow data into the result
-    // The structure depends on the widget type, but we'll add workflow results
-    const workflowResults = Object.entries(workflowData).reduce((acc, [title, wfData]) => {
-      if (wfData.data) {
-        acc[title] = wfData.data;
-      }
-      return acc;
-    }, {});
-
-    // If the original data is an object, merge workflow data
-    if (typeof widgetData.data === 'object' && !Array.isArray(widgetData.data)) {
-      return {
-        ...widgetData.data,
-        workflowData: workflowResults,
-      };
-    }
-
-    // For array data, append workflow results as additional data source
-    return {
-      queryData: widgetData.data,
-      workflowData: workflowResults,
-    };
-  }, [widgetData, workflowData, hasWorkflowInstances]);
-
-  // Show loading state for workflows
-  const showWorkflowLoading = hasWorkflowInstances && isLoadingWorkflows && pendingCount > 0;
 
   return (
     <div
@@ -112,23 +94,22 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height }) => {
       }}
     >
       <ReactQueryLoadingErrorWrapper
-        isLoading={isLoadingWidget || isLoadingWidgetData}
+        isLoading={isLoadingWidget || (isLoadingWidgetData && !widgetData)}
         isFetching={isLoadingWidget || isLoadingWidgetData}
         error={loadWidgetError || loadWidgetDataError}
-        refetch={refetchWidget}
+        refetch={() => { refetchWidget(); refetchWidgetData(); }}
       >
-        {/* Workflow loading indicator */}
-        {showWorkflowLoading && (
-          <div className="absolute top-1 right-1 z-10 flex items-center gap-1 bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs">
-            <div className="animate-spin h-3 w-3 border-2 border-blue-500 border-t-transparent rounded-full" />
-            <span>{pendingCount} workflow{pendingCount > 1 ? 's' : ''} running</span>
-          </div>
+        {/* WebSocket connection indicator */}
+        {isLive && (
+          <div className={`absolute top-1 left-1 z-10 w-2 h-2 rounded-full bg-green-500`}
+            title="Live Connection" />
         )}
 
-        {/* Workflow errors indicator */}
-        {Object.keys(workflowErrors).length > 0 && (
-          <div className="absolute top-1 left-1 z-10 bg-red-100 text-red-700 px-2 py-0.5 rounded text-xs">
-            {Object.keys(workflowErrors).length} workflow error{Object.keys(workflowErrors).length > 1 ? 's' : ''}
+        {/* Workflow loading indicator */}
+        {isWorkflowRunning && (
+          <div className="absolute top-1 right-1 z-10 flex items-center gap-1 bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs">
+            <div className="animate-spin h-3 w-3 border-2 border-blue-500 border-t-transparent rounded-full" />
+            <span>Running...</span>
           </div>
         )}
 
@@ -136,13 +117,16 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height }) => {
           WIDGETS_MAP[widget.widgetType]?.component({
             widgetTitle: widget.widgetTitle,
             widgetConfig: widget.widgetConfig,
-            data: combinedData || widgetData?.data,
+            data: displayData,
             refetchInterval: widget.widgetConfig?.refetchInterval,
-            // Pass workflow-specific data for advanced widgets
-            workflowData: workflowData,
-            isLoadingWorkflows: isLoadingWorkflows,
+            // Pass advanced props
+            isLoadingWorkflows: isWorkflowRunning,
+            isConnected: isLive,
+            workflowStatus: workflowStatus,
+            resolveVariable: resolveVariable,
           })}
       </ReactQueryLoadingErrorWrapper>
     </div>
   );
 };
+

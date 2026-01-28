@@ -1,16 +1,16 @@
 import React, { useRef, useEffect } from 'react';
 import { FaPlay, FaCheck, FaTimes, FaSpinner, FaClock, FaArrowRight } from 'react-icons/fa';
 import { VscTerminal, VscClearAll } from 'react-icons/vsc';
-import { IoClose } from 'react-icons/io5';
+import PropTypes from 'prop-types';
 
 /**
- * WorkflowConsole - Modern terminal-style console for workflow execution logs
+ * WorkflowConsole - Terminal-style console for workflow execution logs
+ * Uses light theme to match project styling
  */
 export const WorkflowConsole = ({ 
   logs = [], 
   isRunning = false, 
   onClear,
-  onClose,
   className = '',
 }) => {
   const logsEndRef = useRef(null);
@@ -24,21 +24,21 @@ export const WorkflowConsole = ({
   const getLogStyle = (log) => {
     switch (log.type) {
       case 'start':
-        return { icon: FaPlay, color: 'text-green-400', bgColor: 'bg-green-500/10' };
+        return { icon: FaPlay, color: 'text-green-600', bgColor: 'bg-green-50' };
       case 'node_start':
-        return { icon: FaArrowRight, color: 'text-blue-400', bgColor: 'bg-blue-500/10' };
+        return { icon: FaArrowRight, color: 'text-blue-600', bgColor: 'bg-blue-50' };
       case 'node_complete':
-        return { icon: FaCheck, color: 'text-green-400', bgColor: 'bg-green-500/10' };
+        return { icon: FaCheck, color: 'text-green-600', bgColor: 'bg-green-50' };
       case 'node_error':
-        return { icon: FaTimes, color: 'text-red-400', bgColor: 'bg-red-500/10' };
+        return { icon: FaTimes, color: 'text-red-600', bgColor: 'bg-red-50' };
       case 'workflow_complete':
-        return { icon: FaCheck, color: 'text-emerald-400', bgColor: 'bg-emerald-500/10' };
+        return { icon: FaCheck, color: 'text-emerald-600', bgColor: 'bg-emerald-50' };
       case 'workflow_error':
-        return { icon: FaTimes, color: 'text-red-400', bgColor: 'bg-red-500/10' };
+        return { icon: FaTimes, color: 'text-red-600', bgColor: 'bg-red-50' };
       case 'info':
-        return { icon: FaClock, color: 'text-slate-400', bgColor: '' };
-      default:
         return { icon: FaClock, color: 'text-slate-500', bgColor: '' };
+      default:
+        return { icon: FaClock, color: 'text-slate-400', bgColor: '' };
     }
   };
 
@@ -55,14 +55,14 @@ export const WorkflowConsole = ({
   };
 
   return (
-    <div className={`flex flex-col bg-slate-900 rounded border border-slate-700 shadow-xl overflow-hidden ${className}`}>
+    <div className={`flex flex-col bg-white overflow-hidden ${className}`}>
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2 bg-slate-800 border-b border-slate-700">
+      <div className="flex items-center justify-between px-2 py-1.5 bg-slate-50 border-b border-slate-200">
         <div className="flex items-center gap-2">
-          <VscTerminal className="w-4 h-4 text-slate-400" />
-          <span className="text-sm font-medium text-slate-300">Workflow Console</span>
+          <VscTerminal className="w-4 h-4 text-slate-500" />
+          <span className="text-sm font-medium text-slate-700">Console</span>
           {isRunning && (
-            <span className="flex items-center gap-1 text-xs text-blue-400">
+            <span className="flex items-center gap-1 text-xs text-blue-600">
               <FaSpinner className="w-3 h-3 animate-spin" />
               Running
             </span>
@@ -73,29 +73,19 @@ export const WorkflowConsole = ({
             <button
               onClick={onClear}
               type='button'
-              className="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-700 rounded transition-colors"
+              className="p-1 text-slate-400 bg-white hover:text-slate-600 hover:bg-slate-100 rounded transition-colors"
               title="Clear logs"
             >
-              <VscClearAll className="w-4 h-4" />
-            </button>
-          )}
-          {onClose && (
-            <button
-              onClick={onClose}
-              type='button'
-              className="p-1.5 text-slate-400 hover:text-slate-200 hover:bg-slate-700 rounded transition-colors"
-              title="Close console"
-            >
-              <IoClose className="w-4 h-4" />
+              <VscClearAll className="w-3 h-3" />
             </button>
           )}
         </div>
       </div>
 
       {/* Logs area */}
-      <div className="flex-1 overflow-y-auto p-3 min-h-[200px] max-h-[400px] font-mono text-xs">
+      <div className="flex-1 overflow-y-auto p-3 font-mono text-xs bg-slate-50/50">
         {logs.length === 0 ? (
-          <div className="flex items-center justify-center h-full text-slate-500">
+          <div className="flex items-center justify-center h-full text-slate-400">
             <span>No logs yet. Click "Test Run" to start.</span>
           </div>
         ) : (
@@ -105,10 +95,10 @@ export const WorkflowConsole = ({
               return (
                 <div
                   key={index}
-                  className={`flex items-start gap-2 py-1.5 px-2 rounded ${bgColor} group hover:bg-slate-800/50 transition-colors`}
+                  className={`flex items-start gap-2 py-1.5 px-2 rounded ${bgColor} group hover:bg-slate-100 transition-colors`}
                 >
                   {/* Timestamp */}
-                  <span className="text-slate-500 whitespace-nowrap shrink-0">
+                  <span className="text-slate-400 whitespace-nowrap shrink-0">
                     [{formatTime(log.timestamp)}]
                   </span>
                   
@@ -119,15 +109,15 @@ export const WorkflowConsole = ({
                   <div className="flex-1 min-w-0">
                     <span className={`${color} font-medium`}>{log.label}</span>
                     {log.message && (
-                      <span className="text-slate-400 ml-2">{log.message}</span>
+                      <span className="text-slate-600 ml-2">{log.message}</span>
                     )}
                     {log.nodeId && (
-                      <span className="text-slate-600 ml-2 text-[10px]">
+                      <span className="text-slate-400 ml-2 text-[10px]">
                         ({log.nodeId.substring(0, 8)}...)
                       </span>
                     )}
                     {log.output && (
-                      <div className="mt-1 p-2 bg-slate-800/50 rounded border border-slate-700 text-slate-400 overflow-x-auto">
+                      <div className="mt-1 p-2 bg-white rounded border border-slate-200 text-slate-600 overflow-x-auto">
                         <pre className="whitespace-pre-wrap break-all">
                           {typeof log.output === 'object' 
                             ? JSON.stringify(log.output, null, 2) 
@@ -136,7 +126,7 @@ export const WorkflowConsole = ({
                       </div>
                     )}
                     {log.error && (
-                      <div className="mt-1 p-2 bg-red-950/30 rounded border border-red-900/30 text-red-400 overflow-x-auto">
+                      <div className="mt-1 p-2 bg-red-50 rounded border border-red-200 text-red-600 overflow-x-auto">
                         <pre className="whitespace-pre-wrap break-all">{log.error}</pre>
                       </div>
                     )}
@@ -151,7 +141,7 @@ export const WorkflowConsole = ({
 
       {/* Footer with stats */}
       {logs.length > 0 && (
-        <div className="px-4 py-2 bg-slate-800/50 border-t border-slate-700 text-xs text-slate-500">
+        <div className="px-4 py-2 bg-slate-50 border-t border-slate-200 text-xs text-slate-500">
           <span>{logs.length} log{logs.length !== 1 ? 's' : ''}</span>
           <span className="mx-2">•</span>
           <span>
@@ -164,4 +154,12 @@ export const WorkflowConsole = ({
   );
 };
 
+WorkflowConsole.propTypes = {
+  logs: PropTypes.array,
+  isRunning: PropTypes.bool,
+  onClear: PropTypes.func,
+  className: PropTypes.string,
+};
+
 export default WorkflowConsole;
+

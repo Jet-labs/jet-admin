@@ -20,7 +20,7 @@ async function execute(nodeConfig, context, helpers) {
       const value = resolveFromContext(sourceVariable);
       Logger.log('info', {
         message: 'endHandler:collectingOutput',
-        params: { instanceID: helpers.instanceID, name, sourceVariable, value },
+        params: { instanceID: helpers.instanceID, name, sourceVariable },
       });
       workflowOutput[name] = value;
     }
@@ -28,7 +28,7 @@ async function execute(nodeConfig, context, helpers) {
 
   Logger.log('info', {
     message: 'endHandler:executed',
-    params: { instanceID: helpers.instanceID, outputParameters, output: workflowOutput },
+    params: { instanceID: helpers.instanceID, outputParameters },
   });
 
   const output = {
