@@ -133,7 +133,17 @@ async function handleTaskResult(result) {
     let nextNodes;
     if (isTestRun && workflowDefinition) {
       // Test mode: calculate from in-memory edges
-      const edges = workflowDefinition.edges.filter(e => e.upstreamNodeID === nodeID);
+      // Filter edges by sourceHandle matching the nextHandle from the completed node
+      const edges = workflowDefinition.edges.filter(e => {
+        if (e.upstreamNodeID !== nodeID) return false;
+
+        // Match sourceHandle to nextHandle
+        // If edge has no sourceHandle (null/undefined), treat as default 'output' handle
+        const edgeHandle = e.sourceHandle || 'output';
+        const resultHandle = nextHandle || 'output';
+
+        return edgeHandle === resultHandle;
+      });
       nextNodes = edges.map(e => workflowDefinition.nodes[e.downstreamNodeID]).filter(Boolean);
     } else {
       // Normal mode: use DAG scheduler

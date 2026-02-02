@@ -1,0 +1,8 @@
+{
+  "label": "Workflow",
+  "position": 3,
+  "link": {
+    "type": "generated-index",
+    "description": "Automate logic with visual workflows."
+  }
+}

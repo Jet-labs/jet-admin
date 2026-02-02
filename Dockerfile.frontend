@@ -1,0 +1,45 @@
+# ============================================
+# Jet Admin - Frontend Container (Multi-Stage)
+# ============================================
+# Stage 1: Build
+FROM node:18-slim AS builder
+WORKDIR /app
+
+# Copy dependency definitions
+COPY package*.json ./
+COPY apps/frontend/package*.json ./apps/frontend/
+COPY apps/backend/package*.json ./apps/backend/
+# Copy all workspace packages
+COPY packages/ ./packages/
+
+# Install dependencies
+RUN npm install
+
+# Copy source code (respects .dockerignore)
+COPY apps/frontend ./apps/frontend
+
+# Build frontend
+WORKDIR /app/apps/frontend
+RUN npm run build
+
+# Stage 2: Serve
+FROM nginx:alpine
+
+# Copy custom nginx config
+COPY nginx.frontend.conf /etc/nginx/nginx.conf
+
+# Copy build artifacts from builder stage
+COPY --from=builder /app/apps/frontend/dist /usr/share/nginx/html
+
+# Expose port
+EXPOSE 80
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=10s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost/health || exit 1
+
+# Copy entrypoint script for runtime config
+COPY docker-entrypoint.frontend.sh /
+RUN sed -i 's/\r$//' /docker-entrypoint.frontend.sh && chmod +x /docker-entrypoint.frontend.sh
+
+CMD ["/docker-entrypoint.frontend.sh"]

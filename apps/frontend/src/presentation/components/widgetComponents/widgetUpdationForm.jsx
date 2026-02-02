@@ -96,6 +96,7 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
   });
 
   console.log({ widget });
+  console.log('[widgetUpdationForm] previewData from hook:', previewData);
 
   const { isPending: isUpdatingWidget, mutate: updateWidget } = useMutation({
     mutationFn: (data) => {

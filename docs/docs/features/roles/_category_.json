@@ -1,0 +1,8 @@
+{
+  "label": "Roles",
+  "position": 7,
+  "link": {
+    "type": "generated-index",
+    "description": "Configure access control and permissions."
+  }
+}

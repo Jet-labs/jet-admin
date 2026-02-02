@@ -57,11 +57,10 @@ export const DataQueryEditor = ({
       <div className="w-full">
         <label
           htmlFor="datasourceID"
-          className={`block mb-1 text-xs font-medium text-slate-500 ${
-            dataQueryEditorForm.errors.datasourceID
+          className={`block mb-1 text-xs font-medium text-slate-500 ${dataQueryEditorForm.errors.datasourceID
               ? "text-red-500"
               : "text-slate-500"
-          }}`}
+            }}`}
         >
           {CONSTANTS.STRINGS.DATASOURCE_EDITOR_FORM_TYPE_FIELD_LABEL}
           {dataQueryEditorForm.errors.datasourceID ? (

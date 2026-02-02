@@ -8,6 +8,7 @@
  */
 const Logger = require('../../utils/logger');
 const { socketIO } = require('../../config/socket.io');
+const { processWorkflowDataForWidget } = require('@jet-admin/widgets');
 
 // In-memory store for widget-workflow connections
 // In production, consider Redis for horizontal scaling
@@ -170,7 +171,7 @@ const widgetWorkflowBridge = {
     }
 
     try {
-      const { processWorkflowDataForWidget } = require('@jet-admin/widgets');
+
       return processWorkflowDataForWidget({
         widgetType,
         context,

@@ -25,7 +25,7 @@ Before you begin, ensure you have the following installed:
 
 ### Environment Configuration
 
-Create a `.env` file in the root directory of your backend project with the following variables:
+Create a `.env` file in the `apps/backend` directory with the following variables:
 
 ```dotenv
 # Server Configuration
@@ -89,11 +89,17 @@ Fill in your actual Firebase credentials. Never commit this file to your reposit
 We use Prisma as our ORM for database management. Set up your database with these commands:
 
 ```bash
+# Navigate to backend app
+cd apps/backend
+
 # Create database schema
 npx prisma migrate dev
 
 # Open visual database editor (optional)
 npx prisma studio
+
+# Return to root
+cd ../..
 ```
 
 The first command applies migrations based on your schema definition in `prisma/schema.prisma`, while the second opens a visual interface to manage your database at `http://localhost:5555`.

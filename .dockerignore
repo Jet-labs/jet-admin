@@ -1,13 +1,73 @@
-node_modules
-**/node_modules
-**/.env
-**/*.env
-**/Dockerfile
-**/docker-compose.yml
-.git
-**/production.env
-**/development.env
-**/dist
-**/build
-**/.DS_Store
-**/.vscode
+# Dependencies
+node_modules/
+**/node_modules/
+npm-debug.log*
+yarn-error.log*
+
+apps/frontend/dist/
+apps/frontend/build/
+dist/
+build/
+
+# Development files
+.git/
+.gitignore
+.vscode/
+.idea/
+*.md
+!README.md
+!DOCKER_DEPLOYMENT.md
+
+# Test files
+**/*.test.js
+**/*.spec.js
+**/tests/
+**/test/
+**/__tests__/
+coverage/
+.nyc_output/
+
+# Documentation
+docs/
+*.pdf
+*.doc*
+
+# Environment files (will be generated at runtime)
+.env
+.env.*
+!.env.docker
+!.env.example
+
+# Logs
+logs/
+*.log
+apps/backend/logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# Backup files
+backups/
+*.sql
+*.bak
+
+# Docker files (prevent recursive inclusion)
+Dockerfile*
+docker-compose*.yml
+!docker-compose.yml
+!docker-compose.prod.yml
+!docker-compose.override.yml
+
+# Miscellaneous
+.agent/
+.gemini/
+*.tar
+*.gz

@@ -73,6 +73,13 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height }) => {
     parameters: widget?.workflowConfig?.parameters,
   });
 
+  // Debug: Log immediately on every render to see if component renders at all
+  console.log(`[DashboardWidget RENDER] widgetID=${widgetID}`, { finalData, wsProcessedData: finalData?.workflowInstances?.data });
+
+  useEffect(() => {
+    console.log(`[DashboardWidget useEffect] widgetID=${widgetID}`, finalData, isWorkflowRunning, isLive, workflowStatus);
+  }, [finalData, isWorkflowRunning, isLive, workflowStatus, widgetID]);
+
 
   // Extract data for display
   const displayData = useMemo(() => {

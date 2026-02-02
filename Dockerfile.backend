@@ -1,0 +1,55 @@
+# ============================================
+# Jet Admin - Backend Container
+# ============================================
+# Node.js API server
+
+FROM node:18-slim
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    postgresql-client \
+    openssl \
+    netcat-openbsd \
+    wget \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy root package files (for workspace resolution)
+COPY package*.json ./
+
+# Copy workspace package.json files
+COPY apps/backend/package*.json ./apps/backend/
+COPY packages/datasource-types/package*.json ./packages/datasource-types/
+COPY packages/datasources-logic/package*.json ./packages/datasources-logic/
+COPY packages/template-package/package*.json ./packages/template-package/
+COPY packages/widget-types/package*.json ./packages/widget-types/
+COPY packages/widgets/package*.json ./packages/widgets/
+
+# Install dependencies
+RUN npm install --legacy-peer-deps
+
+# Copy source files
+COPY apps/backend/ ./apps/backend/
+COPY packages/ ./packages/
+
+# Generate Prisma client
+WORKDIR /app/apps/backend
+RUN npx prisma generate
+
+# Copy entrypoint script
+COPY docker-entrypoint.backend.sh /entrypoint.sh
+RUN sed -i 's/\r$//' /entrypoint.sh && chmod +x /entrypoint.sh
+
+# Create log directory
+RUN mkdir -p /app/apps/backend/logs && chmod 755 /app/apps/backend/logs
+
+# Expose port
+EXPOSE 8090
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:8090/health || exit 1
+
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["npm", "run", "pm2"]

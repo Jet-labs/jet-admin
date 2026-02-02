@@ -172,6 +172,7 @@ const generateChartColors = (count) => {
  * @returns {object} Chart.js compatible data { labels: [], datasets: [{ data: [] }] }
  */
 export const processBarChartWorkflowData = ({ context, datasetFields, parameters = {} }) => {
+  const params = parameters || {};
   const resolved = resolveDatasetFields(context, datasetFields);
   
   const labels = resolved.xAxis || [];
@@ -184,11 +185,11 @@ export const processBarChartWorkflowData = ({ context, datasetFields, parameters
   return {
     labels,
     datasets: [{
-      label: parameters.label || 'Data',
+      label: params.label || 'Data',
       data,
-      backgroundColor: parameters.backgroundColor || 'rgba(100, 108, 255, 0.6)',
-      borderColor: parameters.borderColor || 'rgba(100, 108, 255, 1)',
-      borderWidth: parameters.borderWidth || 1,
+      backgroundColor: params.backgroundColor || 'rgba(100, 108, 255, 0.6)',
+      borderColor: params.borderColor || 'rgba(100, 108, 255, 1)',
+      borderWidth: params.borderWidth || 1,
     }],
   };
 };
@@ -197,6 +198,7 @@ export const processBarChartWorkflowData = ({ context, datasetFields, parameters
  * Process workflow context data for Line Chart
  */
 export const processLineChartWorkflowData = ({ context, datasetFields, parameters = {} }) => {
+  const params = parameters || {};
   const resolved = resolveDatasetFields(context, datasetFields);
   
   const labels = resolved.xAxis || [];
@@ -209,13 +211,13 @@ export const processLineChartWorkflowData = ({ context, datasetFields, parameter
   return {
     labels,
     datasets: [{
-      label: parameters.label || 'Data',
+      label: params.label || 'Data',
       data,
-      fill: parameters.fill !== undefined ? parameters.fill : false,
-      backgroundColor: parameters.backgroundColor || 'rgba(100, 108, 255, 0.6)',
-      borderColor: parameters.borderColor || 'rgba(100, 108, 255, 1)',
-      borderWidth: parameters.borderWidth || 2,
-      tension: parameters.tension || 0.1,
+      fill: params.fill !== undefined ? params.fill : false,
+      backgroundColor: params.backgroundColor || 'rgba(100, 108, 255, 0.6)',
+      borderColor: params.borderColor || 'rgba(100, 108, 255, 1)',
+      borderWidth: params.borderWidth || 2,
+      tension: params.tension || 0.1,
     }],
   };
 };
@@ -224,6 +226,7 @@ export const processLineChartWorkflowData = ({ context, datasetFields, parameter
  * Process workflow context data for Pie Chart
  */
 export const processPieChartWorkflowData = ({ context, datasetFields, parameters = {} }) => {
+  const params = parameters || {};
   const resolved = resolveDatasetFields(context, datasetFields);
   
   const labels = resolved.label || [];
@@ -233,15 +236,15 @@ export const processPieChartWorkflowData = ({ context, datasetFields, parameters
     return { labels: [], datasets: [] };
   }
 
-  const colors = parameters.backgroundColor || generateChartColors(data.length);
+  const colors = params.backgroundColor || generateChartColors(data.length);
 
   return {
     labels,
     datasets: [{
       data,
       backgroundColor: colors,
-      borderColor: parameters.borderColor || colors.map(c => c.replace('0.6', '1')),
-      borderWidth: parameters.borderWidth || 1,
+      borderColor: params.borderColor || colors.map(c => c.replace('0.6', '1')),
+      borderWidth: params.borderWidth || 1,
     }],
   };
 };
@@ -264,6 +267,7 @@ export const processPolarAreaChartWorkflowData = ({ context, datasetFields, para
  * Process workflow context data for Scatter Chart
  */
 export const processScatterChartWorkflowData = ({ context, datasetFields, parameters = {} }) => {
+  const params = parameters || {};
   const resolved = resolveDatasetFields(context, datasetFields);
   
   const xData = resolved.xAxis || [];
@@ -277,9 +281,9 @@ export const processScatterChartWorkflowData = ({ context, datasetFields, parame
 
   return {
     datasets: [{
-      label: parameters.label || 'Data',
+      label: params.label || 'Data',
       data: dataPoints,
-      backgroundColor: parameters.backgroundColor || 'rgba(100, 108, 255, 0.6)',
+      backgroundColor: params.backgroundColor || 'rgba(100, 108, 255, 0.6)',
     }],
   };
 };
@@ -288,6 +292,7 @@ export const processScatterChartWorkflowData = ({ context, datasetFields, parame
  * Process workflow context data for Bubble Chart
  */
 export const processBubbleChartWorkflowData = ({ context, datasetFields, parameters = {} }) => {
+  const params = parameters || {};
   const resolved = resolveDatasetFields(context, datasetFields);
   
   const xData = resolved.xAxis || [];
@@ -306,9 +311,9 @@ export const processBubbleChartWorkflowData = ({ context, datasetFields, paramet
 
   return {
     datasets: [{
-      label: parameters.label || 'Data',
+      label: params.label || 'Data',
       data: dataPoints,
-      backgroundColor: parameters.backgroundColor || 'rgba(100, 108, 255, 0.6)',
+      backgroundColor: params.backgroundColor || 'rgba(100, 108, 255, 0.6)',
     }],
   };
 };

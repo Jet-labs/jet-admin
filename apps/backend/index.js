@@ -22,6 +22,11 @@ expressApp.get('/monitor', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'monitor.html'));
 });
 
+// Health Check Route
+expressApp.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date() });
+});
+
 // API routes
 if (isModuleEnabled(constants.MODULES.AUTH)) {
   Logger.log("success", { message: "auth module enabled" });

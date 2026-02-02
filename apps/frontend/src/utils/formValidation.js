@@ -89,7 +89,7 @@ formValidations.queryAdditionFormValidationSchema = Yup.object().shape({
   dataQueryArgs: Yup.array()
     .of(Yup.string().required("Argument name is required"))
     .optional(), // Optional array of arguments
-  runOnLoad: Yup.boolean(),
+
 });
 
 formValidations.queryUpdationFormValidationSchema = Yup.object().shape({
@@ -100,7 +100,7 @@ formValidations.queryUpdationFormValidationSchema = Yup.object().shape({
   dataQueryArgs: Yup.array()
     .of(Yup.string().required("Argument name is required"))
     .optional(), // Optional array of arguments
-  runOnLoad: Yup.boolean(),
+
 });
 
 formValidations.databaseNotificationAdditionFormValidationSchema =

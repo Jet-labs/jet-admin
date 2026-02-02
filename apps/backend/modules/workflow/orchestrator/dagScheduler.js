@@ -69,9 +69,15 @@ dagScheduler.calculateNextNodes = async (workflowID, completedNodeID, outputHand
     },
   });
   
-  // Filter edges by sourceHandle if specified in edge data
-  // For now, take all downstream nodes (can enhance with handle matching later)
-  const downstreamNodeIDs = edges.map(e => e.downstreamNodeID);
+  // Filter edges by sourceHandle matching the outputHandle from the completed node
+  // If edge has no sourceHandle (null/undefined), treat as default 'output' handle
+  const filteredEdges = edges.filter(e => {
+    const edgeHandle = e.sourceHandle || 'output';
+    const resultHandle = outputHandle || 'output';
+    return edgeHandle === resultHandle;
+  });
+
+  const downstreamNodeIDs = filteredEdges.map(e => e.downstreamNodeID);
   
   if (downstreamNodeIDs.length === 0) {
     Logger.log('info', { message: 'dagScheduler:noDownstreamNodes', params: { completedNodeID } });

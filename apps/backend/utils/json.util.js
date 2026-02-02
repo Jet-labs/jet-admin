@@ -1,4 +1,5 @@
-export const keyValueTypeArrayToObject = (keyValueTypeArray) => {
+// Utility for JSON handling
+const keyValueTypeArrayToObject = (keyValueTypeArray) => {
   let obj = {};
   keyValueTypeArray.forEach((item) => {
     switch (item.type) {
@@ -24,4 +25,8 @@ export const keyValueTypeArrayToObject = (keyValueTypeArray) => {
     }
   });
   return obj;
+};
+
+module.exports = {
+  keyValueTypeArrayToObject,
 };

@@ -40,6 +40,8 @@ export const WidgetPreview = ({
     [widgetRef]
   );
 
+  console.log('[WidgetPreview] data prop received:', data);
+
   return (
     <div className="h-full w-full flex flex-col">
       <div className="w-full flex flex-row justify-end items-center bg-slate-100 border-b border-b-slate-200 p-2 gap-2">
@@ -71,17 +73,20 @@ export const WidgetPreview = ({
           key={uniqueKey}
           id={uniqueKey}
         >
-          {WIDGETS_MAP[widgetType] ? (
-            WIDGETS_MAP[widgetType].component({
+            {WIDGETS_MAP[widgetType] ? (() => {
+              // Extract actual chart data from workflow wrapper if present
+              const chartData = data?.workflowInstances?.data || data?.data || data;
+              console.log('[WidgetPreview] Extracted chartData for widget:', chartData);
+              return WIDGETS_MAP[widgetType].component({
               widgetTitle,
               widgetType,
-              data,
+              data: chartData,
               onWidgetInit: _handleOnWidgetInit,
               refetchInterval,
               refreshData,
               widgetConfig,
-            })
-          ) : (
+            });
+            })() : (
             <div className="h-full w-full p-3 flex justify-center items-center">
               <span className="text-red-500 text-xs">
                 {CONSTANTS.STRINGS.WIDGET_TYPE_INVALID_ERROR}

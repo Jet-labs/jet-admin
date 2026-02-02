@@ -1,13 +1,15 @@
 export const CONSTANTS = {
   APP_NAME: "Jet Admin",
 
-  SERVER_HOST: import.meta.env.PROD
-    ? "https://localhost"
-    : "http://localhost:8090",
+  SERVER_HOST:
+    window.JET_ADMIN_CONFIG?.SERVER_HOST ||
+    import.meta.env.VITE_SERVER_HOST ||
+    "http://localhost:8090",
 
-  SOCKET_HOST: import.meta.env.PROD
-    ? "https://localhost"
-    : "http://localhost:8090",
+  SOCKET_HOST:
+    window.JET_ADMIN_CONFIG?.SOCKET_HOST ||
+    import.meta.env.VITE_SOCKET_HOST ||
+    "http://localhost:8090",
 
   SUPABASE: {
     TENANT_ASSET_DIRECTORY: "tenant-assets",

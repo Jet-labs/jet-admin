@@ -814,12 +814,10 @@ var processBarChartQueryResults = ({
       result.forEach((row) => xValues.add(row[xField]));
     }
   });
-  console.log("xValues", xValues);
   const sortedLabels = [...xValues].sort((a2, b2) => {
     if (typeof a2 === "number" && typeof b2 === "number") return a2 - b2;
     return a2.toString().localeCompare(b2.toString());
   });
-  console.log("sortedLabels", sortedLabels);
   const datasets = widget.dataQueries.map((mapping, index2) => {
     const result = dataQueriesResult[index2] || [];
     const { xAxis, yAxis } = mapping.datasetFields;
@@ -830,7 +828,6 @@ var processBarChartQueryResults = ({
       data: sortedLabels.map((x3) => dataMap.get(x3) ?? 0)
     };
   });
-  console.log("datasets", datasets);
   return { labels: sortedLabels, datasets };
 };
 
@@ -8573,25 +8570,25 @@ var Scale = class _Scale extends Element {
     }
   }
   drawTitle() {
-    const { ctx, options: { position, title, reverse } } = this;
-    if (!title.display) {
+    const { ctx, options: { position, title: title2, reverse } } = this;
+    if (!title2.display) {
       return;
     }
-    const font = toFont(title.font);
-    const padding = toPadding(title.padding);
-    const align = title.align;
+    const font = toFont(title2.font);
+    const padding = toPadding(title2.padding);
+    const align = title2.align;
     let offset = font.lineHeight / 2;
     if (position === "bottom" || position === "center" || isObject(position)) {
       offset += padding.bottom;
-      if (isArray(title.text)) {
-        offset += font.lineHeight * (title.text.length - 1);
+      if (isArray(title2.text)) {
+        offset += font.lineHeight * (title2.text.length - 1);
       }
     } else {
       offset += padding.top;
     }
     const { titleX, titleY, maxWidth, rotation } = titleArgs(this, offset, position, align);
-    renderText(ctx, title.text, 0, 0, font, {
-      color: title.color,
+    renderText(ctx, title2.text, 0, 0, font, {
+      color: title2.color,
       maxWidth,
       rotation,
       textAlign: titleAlign(align, position, reverse),
@@ -12249,14 +12246,14 @@ var Title = class extends Element {
   }
 };
 function createTitle(chart, titleOpts) {
-  const title = new Title({
+  const title2 = new Title({
     ctx: chart.ctx,
     options: titleOpts,
     chart
   });
-  layouts.configure(chart, title, titleOpts);
-  layouts.addBox(chart, title);
-  chart.titleBlock = title;
+  layouts.configure(chart, title2, titleOpts);
+  layouts.addBox(chart, title2);
+  chart.titleBlock = title2;
 }
 var plugin_title = {
   id: "title",
@@ -12270,9 +12267,9 @@ var plugin_title = {
     delete chart.titleBlock;
   },
   beforeUpdate(chart, _args, options) {
-    const title = chart.titleBlock;
-    layouts.configure(chart, title, options);
-    title.options = options;
+    const title2 = chart.titleBlock;
+    layouts.configure(chart, title2, options);
+    title2.options = options;
   },
   defaults: {
     align: "center",
@@ -12387,12 +12384,12 @@ function createTooltipItem(chart, item) {
 }
 function getTooltipSize(tooltip, options) {
   const ctx = tooltip.chart.ctx;
-  const { body, footer, title } = tooltip;
+  const { body, footer, title: title2 } = tooltip;
   const { boxWidth, boxHeight } = options;
   const bodyFont = toFont(options.bodyFont);
   const titleFont = toFont(options.titleFont);
   const footerFont = toFont(options.footerFont);
-  const titleLineCount = title.length;
+  const titleLineCount = title2.length;
   const footerLineCount = footer.length;
   const bodyLineItemCount = body.length;
   const padding = toPadding(options.padding);
@@ -12665,11 +12662,11 @@ var Tooltip = class extends Element {
   getTitle(context, options) {
     const { callbacks } = options;
     const beforeTitle = invokeCallbackWithFallback(callbacks, "beforeTitle", this, context);
-    const title = invokeCallbackWithFallback(callbacks, "title", this, context);
+    const title2 = invokeCallbackWithFallback(callbacks, "title", this, context);
     const afterTitle = invokeCallbackWithFallback(callbacks, "afterTitle", this, context);
     let lines = [];
     lines = pushOrConcat(lines, splitNewlines(beforeTitle));
-    lines = pushOrConcat(lines, splitNewlines(title));
+    lines = pushOrConcat(lines, splitNewlines(title2));
     lines = pushOrConcat(lines, splitNewlines(afterTitle));
     return lines;
   }
@@ -12842,8 +12839,8 @@ var Tooltip = class extends Element {
     };
   }
   drawTitle(pt, ctx, options) {
-    const title = this.title;
-    const length = title.length;
+    const title2 = this.title;
+    const length = title2.length;
     let titleFont, titleSpacing, i2;
     if (length) {
       const rtlHelper = getRtlAdapter(options.rtl, this.x, this.width);
@@ -12855,7 +12852,7 @@ var Tooltip = class extends Element {
       ctx.fillStyle = options.titleColor;
       ctx.font = titleFont.string;
       for (i2 = 0; i2 < length; ++i2) {
-        ctx.fillText(title[i2], rtlHelper.x(pt.x), pt.y + titleFont.lineHeight / 2);
+        ctx.fillText(title2[i2], rtlHelper.x(pt.x), pt.y + titleFont.lineHeight / 2);
         pt.y += titleFont.lineHeight + titleSpacing;
         if (i2 + 1 === length) {
           pt.y += options.titleMarginBottom - titleSpacing;
@@ -14981,42 +14978,40 @@ var Scatter = /* @__PURE__ */ createTypedChart("scatter", ScatterController);
 // src/bar/ui/index.js
 var import_prop_types = __toESM(require_prop_types());
 var BarChartComponent = ({ data, onWidgetInit, widgetConfig }) => {
-  BarChartComponent.propTypes = {
-    data: import_prop_types.default.object,
-    onWidgetInit: import_prop_types.default.func,
-    widgetConfig: import_prop_types.default.object
-  };
-  const widgetRef = useRef2(null);
-  const options = useMemo(
-    () => ({
-      ...widgetConfig,
-      plugins: {
-        ...widgetConfig?.plugins,
-        customCanvasBackgroundColor: {
-          chartBackgroundColor: widgetConfig?.chartBackgroundColor || "#ffffff"
-        }
+  const widgetRef2 = useRef2(null);
+  const options = useMemo(() => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: widgetConfig?.showLegend !== false
       }
-    }),
-    [widgetConfig]
-  );
-  const plugin = {
+    },
+    ...widgetConfig?.chartOptions
+  }), [widgetConfig]);
+  const plugin = useMemo(() => ({
     id: "customCanvasBackgroundColor",
     beforeDraw: (chart) => {
       const { ctx } = chart;
-      const backgroundColor = chart.options.plugins.customCanvasBackgroundColor?.chartBackgroundColor;
+      const backgroundColor = widgetConfig?.backgroundColor || "transparent";
       ctx.save();
       ctx.globalCompositeOperation = "destination-over";
       ctx.fillStyle = backgroundColor;
       ctx.fillRect(0, 0, chart.width, chart.height);
       ctx.restore();
     }
-  };
+  }), [widgetConfig?.backgroundColor]);
   useEffect2(() => {
-    if (widgetRef.current) {
-      onWidgetInit?.(widgetRef);
+    if (onWidgetInit && widgetRef2.current) {
+      onWidgetInit(widgetRef2);
     }
   }, [onWidgetInit]);
-  return /* @__PURE__ */ React2.createElement(Bar, { ref: widgetRef, data, options, plugins: [plugin] });
+  return /* @__PURE__ */ React2.createElement(Bar, { ref: widgetRef2, data, options, plugins: [plugin] });
+};
+BarChartComponent.propTypes = {
+  data: import_prop_types.default.object,
+  onWidgetInit: import_prop_types.default.func,
+  widgetConfig: import_prop_types.default.object
 };
 
 // src/line/logic/processors.js
@@ -15032,12 +15027,10 @@ var processLineChartQueryResults = ({
       result.forEach((row) => xValues.add(row[xField]));
     }
   });
-  console.log("xValues", xValues);
   const sortedLabels = [...xValues].sort((a2, b2) => {
     if (typeof a2 === "number" && typeof b2 === "number") return a2 - b2;
     return a2.toString().localeCompare(b2.toString());
   });
-  console.log("sortedLabels", sortedLabels);
   const datasets = widget.dataQueries.map((mapping, index2) => {
     const result = dataQueriesResult[index2] || [];
     const { xAxis, yAxis } = mapping.datasetFields;
@@ -15048,7 +15041,6 @@ var processLineChartQueryResults = ({
       data: sortedLabels.map((x3) => dataMap.get(x3) ?? 0)
     };
   });
-  console.log("datasets", datasets);
   return { labels: sortedLabels, datasets };
 };
 
@@ -15056,42 +15048,40 @@ var processLineChartQueryResults = ({
 import React3, { useEffect as useEffect3, useRef as useRef3, useMemo as useMemo2 } from "react";
 var import_prop_types2 = __toESM(require_prop_types());
 var LineChartComponent = ({ data, onWidgetInit, widgetConfig }) => {
-  LineChartComponent.propTypes = {
-    data: import_prop_types2.default.object,
-    onWidgetInit: import_prop_types2.default.func,
-    widgetConfig: import_prop_types2.default.object
-  };
-  const widgetRef = useRef3(null);
-  const options = useMemo2(
-    () => ({
-      ...widgetConfig,
-      plugins: {
-        ...widgetConfig?.plugins,
-        customCanvasBackgroundColor: {
-          chartBackgroundColor: widgetConfig?.chartBackgroundColor || "#ffffff"
-        }
+  const widgetRef2 = useRef3(null);
+  const options = useMemo2(() => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: widgetConfig?.showLegend !== false
       }
-    }),
-    [widgetConfig]
-  );
-  const plugin = {
+    },
+    ...widgetConfig?.chartOptions
+  }), [widgetConfig]);
+  const plugin = useMemo2(() => ({
     id: "customCanvasBackgroundColor",
     beforeDraw: (chart) => {
       const { ctx } = chart;
-      const backgroundColor = chart.options.plugins.customCanvasBackgroundColor?.chartBackgroundColor;
+      const backgroundColor = widgetConfig?.backgroundColor || "transparent";
       ctx.save();
       ctx.globalCompositeOperation = "destination-over";
       ctx.fillStyle = backgroundColor;
       ctx.fillRect(0, 0, chart.width, chart.height);
       ctx.restore();
     }
-  };
+  }), [widgetConfig?.backgroundColor]);
   useEffect3(() => {
-    if (widgetRef.current) {
-      onWidgetInit?.(widgetRef);
+    if (onWidgetInit && widgetRef2.current) {
+      onWidgetInit(widgetRef2);
     }
   }, [onWidgetInit]);
-  return /* @__PURE__ */ React3.createElement(Line, { ref: widgetRef, data, options, plugins: [plugin] });
+  return /* @__PURE__ */ React3.createElement(Line, { ref: widgetRef2, data, options, plugins: [plugin] });
+};
+LineChartComponent.propTypes = {
+  data: import_prop_types2.default.object,
+  onWidgetInit: import_prop_types2.default.func,
+  widgetConfig: import_prop_types2.default.object
 };
 
 // src/pie/logic/processors.js
@@ -15101,7 +15091,7 @@ var processPieChartQueryResults = ({
 }) => {
   const labels = /* @__PURE__ */ new Set();
   widget.dataQueries.forEach((mapping, index2) => {
-    const result = dataQueriesResult[index2]?.result || [];
+    const result = dataQueriesResult[index2] || [];
     const label = mapping.datasetFields?.label;
     if (label) {
       result.forEach((row) => labels.add(row[label]));
@@ -15112,7 +15102,7 @@ var processPieChartQueryResults = ({
     return a2.toString().localeCompare(b2.toString());
   });
   const datasets = widget.dataQueries.map((mapping, index2) => {
-    const result = dataQueriesResult[index2]?.result || [];
+    const result = dataQueriesResult[index2] || [];
     const { label, value } = mapping.datasetFields;
     const dataMap = new Map(result.map((row) => [row[label], row[value]]));
     return {
@@ -15128,42 +15118,40 @@ var processPieChartQueryResults = ({
 import React4, { useEffect as useEffect4, useRef as useRef4, useMemo as useMemo3 } from "react";
 var import_prop_types3 = __toESM(require_prop_types());
 var PieChartComponent = ({ data, onWidgetInit, widgetConfig }) => {
-  PieChartComponent.propTypes = {
-    data: import_prop_types3.default.object,
-    onWidgetInit: import_prop_types3.default.func,
-    widgetConfig: import_prop_types3.default.object
-  };
-  const widgetRef = useRef4(null);
-  const options = useMemo3(
-    () => ({
-      ...widgetConfig,
-      plugins: {
-        ...widgetConfig?.plugins,
-        customCanvasBackgroundColor: {
-          chartBackgroundColor: widgetConfig?.chartBackgroundColor || "#ffffff"
-        }
+  const widgetRef2 = useRef4(null);
+  const options = useMemo3(() => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: widgetConfig?.showLegend !== false
       }
-    }),
-    [widgetConfig]
-  );
-  const plugin = {
+    },
+    ...widgetConfig?.chartOptions
+  }), [widgetConfig]);
+  const plugin = useMemo3(() => ({
     id: "customCanvasBackgroundColor",
     beforeDraw: (chart) => {
       const { ctx } = chart;
-      const backgroundColor = chart.options.plugins.customCanvasBackgroundColor?.chartBackgroundColor;
+      const backgroundColor = widgetConfig?.backgroundColor || "transparent";
       ctx.save();
       ctx.globalCompositeOperation = "destination-over";
       ctx.fillStyle = backgroundColor;
       ctx.fillRect(0, 0, chart.width, chart.height);
       ctx.restore();
     }
-  };
+  }), [widgetConfig?.backgroundColor]);
   useEffect4(() => {
-    if (widgetRef.current) {
-      onWidgetInit?.(widgetRef);
+    if (onWidgetInit && widgetRef2.current) {
+      onWidgetInit(widgetRef2);
     }
   }, [onWidgetInit]);
-  return /* @__PURE__ */ React4.createElement(Pie, { ref: widgetRef, data, options, plugins: [plugin] });
+  return /* @__PURE__ */ React4.createElement(Pie, { ref: widgetRef2, data, options, plugins: [plugin] });
+};
+PieChartComponent.propTypes = {
+  data: import_prop_types3.default.object,
+  onWidgetInit: import_prop_types3.default.func,
+  widgetConfig: import_prop_types3.default.object
 };
 
 // src/radar/logic/processors.js
@@ -15173,7 +15161,7 @@ var processRadarChartQueryResults = ({
 }) => {
   const labels = /* @__PURE__ */ new Set();
   widget.dataQueries.forEach((mapping, index2) => {
-    const result = dataQueriesResult[index2]?.result || [];
+    const result = dataQueriesResult[index2] || [];
     const label = mapping.datasetFields?.label;
     if (label) {
       result.forEach((row) => labels.add(row[label]));
@@ -15184,7 +15172,7 @@ var processRadarChartQueryResults = ({
     return a2.toString().localeCompare(b2.toString());
   });
   const datasets = widget.dataQueries.map((mapping, index2) => {
-    const result = dataQueriesResult[index2]?.result || [];
+    const result = dataQueriesResult[index2] || [];
     const { label, value } = mapping.datasetFields;
     const dataMap = new Map(result.map((row) => [row[label], row[value]]));
     return {
@@ -15200,42 +15188,40 @@ var processRadarChartQueryResults = ({
 import React5, { useEffect as useEffect5, useRef as useRef5, useMemo as useMemo4 } from "react";
 var import_prop_types4 = __toESM(require_prop_types());
 var RadarChartComponent = ({ data, onWidgetInit, widgetConfig }) => {
-  RadarChartComponent.propTypes = {
-    data: import_prop_types4.default.object,
-    onWidgetInit: import_prop_types4.default.func,
-    widgetConfig: import_prop_types4.default.object
-  };
-  const widgetRef = useRef5(null);
-  const options = useMemo4(
-    () => ({
-      ...widgetConfig,
-      plugins: {
-        ...widgetConfig?.plugins,
-        customCanvasBackgroundColor: {
-          chartBackgroundColor: widgetConfig?.chartBackgroundColor || "#ffffff"
-        }
+  const widgetRef2 = useRef5(null);
+  const options = useMemo4(() => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: widgetConfig?.showLegend !== false
       }
-    }),
-    [widgetConfig]
-  );
-  const plugin = {
+    },
+    ...widgetConfig?.chartOptions
+  }), [widgetConfig]);
+  const plugin = useMemo4(() => ({
     id: "customCanvasBackgroundColor",
     beforeDraw: (chart) => {
       const { ctx } = chart;
-      const backgroundColor = chart.options.plugins.customCanvasBackgroundColor?.chartBackgroundColor;
+      const backgroundColor = widgetConfig?.backgroundColor || "transparent";
       ctx.save();
       ctx.globalCompositeOperation = "destination-over";
       ctx.fillStyle = backgroundColor;
       ctx.fillRect(0, 0, chart.width, chart.height);
       ctx.restore();
     }
-  };
+  }), [widgetConfig?.backgroundColor]);
   useEffect5(() => {
-    if (widgetRef.current) {
-      onWidgetInit?.(widgetRef);
+    if (onWidgetInit && widgetRef2.current) {
+      onWidgetInit(widgetRef2);
     }
   }, [onWidgetInit]);
-  return /* @__PURE__ */ React5.createElement(Radar, { ref: widgetRef, data, options, plugins: [plugin] });
+  return /* @__PURE__ */ React5.createElement(Radar, { ref: widgetRef2, data, options, plugins: [plugin] });
+};
+RadarChartComponent.propTypes = {
+  data: import_prop_types4.default.object,
+  onWidgetInit: import_prop_types4.default.func,
+  widgetConfig: import_prop_types4.default.object
 };
 
 // src/polarArea/logic/processors.js
@@ -15245,7 +15231,7 @@ var processPolarAreaChartQueryResults = ({
 }) => {
   const labels = /* @__PURE__ */ new Set();
   widget.dataQueries.forEach((mapping, index2) => {
-    const result = dataQueriesResult[index2]?.result || [];
+    const result = dataQueriesResult[index2] || [];
     const label = mapping.datasetFields?.label;
     if (label) {
       result.forEach((row) => labels.add(row[label]));
@@ -15256,7 +15242,7 @@ var processPolarAreaChartQueryResults = ({
     return a2.toString().localeCompare(b2.toString());
   });
   const datasets = widget.dataQueries.map((mapping, index2) => {
-    const result = dataQueriesResult[index2]?.result || [];
+    const result = dataQueriesResult[index2] || [];
     const { label, value } = mapping.datasetFields;
     const dataMap = new Map(result.map((row) => [row[label], row[value]]));
     return {
@@ -15272,50 +15258,40 @@ var processPolarAreaChartQueryResults = ({
 import React6, { useEffect as useEffect6, useRef as useRef6, useMemo as useMemo5 } from "react";
 var import_prop_types5 = __toESM(require_prop_types());
 var PolarAreaChartComponent = ({ data, onWidgetInit, widgetConfig }) => {
-  PolarAreaChartComponent.propTypes = {
-    data: import_prop_types5.default.object,
-    onWidgetInit: import_prop_types5.default.func,
-    widgetConfig: import_prop_types5.default.object
-  };
-  const widgetRef = useRef6(null);
-  const options = useMemo5(
-    () => ({
-      ...widgetConfig,
-      plugins: {
-        ...widgetConfig?.plugins,
-        customCanvasBackgroundColor: {
-          chartBackgroundColor: widgetConfig?.chartBackgroundColor || "#ffffff"
-        }
+  const widgetRef2 = useRef6(null);
+  const options = useMemo5(() => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: widgetConfig?.showLegend !== false
       }
-    }),
-    [widgetConfig]
-  );
-  const plugin = {
+    },
+    ...widgetConfig?.chartOptions
+  }), [widgetConfig]);
+  const plugin = useMemo5(() => ({
     id: "customCanvasBackgroundColor",
     beforeDraw: (chart) => {
       const { ctx } = chart;
-      const backgroundColor = chart.options.plugins.customCanvasBackgroundColor?.chartBackgroundColor;
+      const backgroundColor = widgetConfig?.backgroundColor || "transparent";
       ctx.save();
       ctx.globalCompositeOperation = "destination-over";
       ctx.fillStyle = backgroundColor;
       ctx.fillRect(0, 0, chart.width, chart.height);
       ctx.restore();
     }
-  };
+  }), [widgetConfig?.backgroundColor]);
   useEffect6(() => {
-    if (widgetRef.current) {
-      onWidgetInit?.(widgetRef);
+    if (onWidgetInit && widgetRef2.current) {
+      onWidgetInit(widgetRef2);
     }
   }, [onWidgetInit]);
-  return /* @__PURE__ */ React6.createElement(
-    PolarArea,
-    {
-      ref: widgetRef,
-      data,
-      options,
-      plugins: [plugin]
-    }
-  );
+  return /* @__PURE__ */ React6.createElement(PolarArea, { ref: widgetRef2, data, options, plugins: [plugin] });
+};
+PolarAreaChartComponent.propTypes = {
+  data: import_prop_types5.default.object,
+  onWidgetInit: import_prop_types5.default.func,
+  widgetConfig: import_prop_types5.default.object
 };
 
 // src/scatter/logic/processors.js
@@ -15324,7 +15300,7 @@ var processScatterChartQueryResults = ({
   dataQueriesResult
 }) => {
   const datasets = widget.dataQueries.map((mapping, index2) => {
-    const result = dataQueriesResult[index2]?.result || [];
+    const result = dataQueriesResult[index2] || [];
     const { xAxis, yAxis } = mapping.datasetFields;
     const data = result.map((row) => ({
       x: row[xAxis],
@@ -15334,8 +15310,6 @@ var processScatterChartQueryResults = ({
       ...mapping.parameters,
       label: mapping.title,
       data
-      // Preserve other dataset properties if needed
-      // pointRadius: mapping.parameters?.pointRadius || 3,
     };
   });
   return { datasets };
@@ -15345,42 +15319,40 @@ var processScatterChartQueryResults = ({
 import React7, { useEffect as useEffect7, useRef as useRef7, useMemo as useMemo6 } from "react";
 var import_prop_types6 = __toESM(require_prop_types());
 var ScatterChartComponent = ({ data, onWidgetInit, widgetConfig }) => {
-  ScatterChartComponent.propTypes = {
-    data: import_prop_types6.default.object,
-    onWidgetInit: import_prop_types6.default.func,
-    widgetConfig: import_prop_types6.default.object
-  };
-  const widgetRef = useRef7(null);
-  const options = useMemo6(
-    () => ({
-      ...widgetConfig,
-      plugins: {
-        ...widgetConfig?.plugins,
-        customCanvasBackgroundColor: {
-          chartBackgroundColor: widgetConfig?.chartBackgroundColor || "#ffffff"
-        }
+  const widgetRef2 = useRef7(null);
+  const options = useMemo6(() => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: widgetConfig?.showLegend !== false
       }
-    }),
-    [widgetConfig]
-  );
-  const plugin = {
+    },
+    ...widgetConfig?.chartOptions
+  }), [widgetConfig]);
+  const plugin = useMemo6(() => ({
     id: "customCanvasBackgroundColor",
     beforeDraw: (chart) => {
       const { ctx } = chart;
-      const backgroundColor = chart.options.plugins.customCanvasBackgroundColor?.chartBackgroundColor;
+      const backgroundColor = widgetConfig?.backgroundColor || "transparent";
       ctx.save();
       ctx.globalCompositeOperation = "destination-over";
       ctx.fillStyle = backgroundColor;
       ctx.fillRect(0, 0, chart.width, chart.height);
       ctx.restore();
     }
-  };
+  }), [widgetConfig?.backgroundColor]);
   useEffect7(() => {
-    if (widgetRef.current) {
-      onWidgetInit?.(widgetRef);
+    if (onWidgetInit && widgetRef2.current) {
+      onWidgetInit(widgetRef2);
     }
   }, [onWidgetInit]);
-  return /* @__PURE__ */ React7.createElement(Scatter, { ref: widgetRef, data, options, plugins: [plugin] });
+  return /* @__PURE__ */ React7.createElement(Scatter, { ref: widgetRef2, data, options, plugins: [plugin] });
+};
+ScatterChartComponent.propTypes = {
+  data: import_prop_types6.default.object,
+  onWidgetInit: import_prop_types6.default.func,
+  widgetConfig: import_prop_types6.default.object
 };
 
 // src/bubble/logic/processors.js
@@ -15389,7 +15361,7 @@ var processBubbleChartQueryResults = ({
   dataQueriesResult
 }) => {
   const datasets = widget.dataQueries.map((mapping, index2) => {
-    const result = dataQueriesResult[index2]?.result || [];
+    const result = dataQueriesResult[index2] || [];
     const { xAxis, yAxis, radius } = mapping.datasetFields;
     const data = result.map((row) => ({
       x: row[xAxis],
@@ -15400,8 +15372,6 @@ var processBubbleChartQueryResults = ({
       ...mapping.parameters,
       label: mapping.title,
       data
-      // Preserve other dataset properties if needed
-      // pointRadius: mapping.parameters?.pointRadius || 3,
     };
   });
   return { datasets };
@@ -15411,42 +15381,40 @@ var processBubbleChartQueryResults = ({
 import React8, { useEffect as useEffect8, useRef as useRef8, useMemo as useMemo7 } from "react";
 var import_prop_types7 = __toESM(require_prop_types());
 var BubbleChartComponent = ({ data, onWidgetInit, widgetConfig }) => {
-  BubbleChartComponent.propTypes = {
-    data: import_prop_types7.default.object,
-    onWidgetInit: import_prop_types7.default.func,
-    widgetConfig: import_prop_types7.default.object
-  };
-  const widgetRef = useRef8(null);
-  const options = useMemo7(
-    () => ({
-      ...widgetConfig,
-      plugins: {
-        ...widgetConfig?.plugins,
-        customCanvasBackgroundColor: {
-          chartBackgroundColor: widgetConfig?.chartBackgroundColor || "#ffffff"
-        }
+  const widgetRef2 = useRef8(null);
+  const options = useMemo7(() => ({
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: widgetConfig?.showLegend !== false
       }
-    }),
-    [widgetConfig]
-  );
-  const plugin = {
+    },
+    ...widgetConfig?.chartOptions
+  }), [widgetConfig]);
+  const plugin = useMemo7(() => ({
     id: "customCanvasBackgroundColor",
     beforeDraw: (chart) => {
       const { ctx } = chart;
-      const backgroundColor = chart.options.plugins.customCanvasBackgroundColor?.chartBackgroundColor;
+      const backgroundColor = widgetConfig?.backgroundColor || "transparent";
       ctx.save();
       ctx.globalCompositeOperation = "destination-over";
       ctx.fillStyle = backgroundColor;
       ctx.fillRect(0, 0, chart.width, chart.height);
       ctx.restore();
     }
-  };
+  }), [widgetConfig?.backgroundColor]);
   useEffect8(() => {
-    if (widgetRef.current) {
-      onWidgetInit?.(widgetRef);
+    if (onWidgetInit && widgetRef2.current) {
+      onWidgetInit(widgetRef2);
     }
   }, [onWidgetInit]);
-  return /* @__PURE__ */ React8.createElement(Bubble, { ref: widgetRef, data, options, plugins: [plugin] });
+  return /* @__PURE__ */ React8.createElement(Bubble, { ref: widgetRef2, data, options, plugins: [plugin] });
+};
+BubbleChartComponent.propTypes = {
+  data: import_prop_types7.default.object,
+  onWidgetInit: import_prop_types7.default.func,
+  widgetConfig: import_prop_types7.default.object
 };
 
 // src/text/logic/processors.js
@@ -15468,25 +15436,19 @@ var processTextWidgetQueryResults = ({
 };
 
 // src/text/ui/index.js
-var import_prop_types8 = __toESM(require_prop_types());
 import React9, { useEffect as useEffect9, useRef as useRef9 } from "react";
 var TextWidgetComponent = ({ data, onWidgetInit, widgetConfig }) => {
-  TextWidgetComponent.propTypes = {
-    data: import_prop_types8.default.object,
-    onWidgetInit: import_prop_types8.default.func,
-    widgetConfig: import_prop_types8.default.object
-  };
-  const widgetRef = useRef9(null);
-  const { widgetCss = {}, widgetTailwindCss = "" } = widgetConfig || {};
+  const widgetRef2 = useRef9(null);
+  const { widgetCss = {}, widgetTailwindCss: widgetTailwindCss2 = "" } = widgetConfig || {};
   const widgetStyle = {
     ...widgetCss
   };
   useEffect9(() => {
-    if (widgetRef.current) {
-      onWidgetInit?.(widgetRef);
+    if (widgetRef2.current) {
+      onWidgetInit?.(widgetRef2);
     }
-  }, [onWidgetInit, widgetRef]);
-  return /* @__PURE__ */ React9.createElement("div", { ref: widgetRef, style: widgetStyle, className: `${widgetTailwindCss}` }, widgetConfig.titleEnabled && widgetConfig.title && /* @__PURE__ */ React9.createElement(
+  }, [onWidgetInit, widgetRef2]);
+  return /* @__PURE__ */ React9.createElement("div", { ref: widgetRef2, style: widgetStyle, className: `${widgetTailwindCss2}` }, widgetConfig.titleEnabled && widgetConfig.title && /* @__PURE__ */ React9.createElement(
     "h2",
     {
       className: "text-sm font-semibold text-gray-700 truncate line-clamp-2" + widgetConfig.titleTailwindCss
@@ -15508,7 +15470,7 @@ var processTableWidgetQueryResults = ({
 };
 
 // src/table/ui/index.js
-var import_prop_types9 = __toESM(require_prop_types());
+var import_prop_types8 = __toESM(require_prop_types());
 import { DataGrid } from "@mui/x-data-grid";
 import React12, { useEffect as useEffect10, useMemo as useMemo8, useRef as useRef10, useState } from "react";
 
@@ -15627,7 +15589,7 @@ function IconBase(props) {
     var {
       attr,
       size,
-      title
+      title: title2
     } = props, svgProps = _objectWithoutProperties(props, _excluded);
     var computedSize = size || conf.size || "1em";
     var className;
@@ -15645,18 +15607,12 @@ function IconBase(props) {
       height: computedSize,
       width: computedSize,
       xmlns: "http://www.w3.org/2000/svg"
-    }), title && /* @__PURE__ */ React11.createElement("title", null, title), props.children);
+    }), title2 && /* @__PURE__ */ React11.createElement("title", null, title2), props.children);
   };
   return IconContext !== void 0 ? /* @__PURE__ */ React11.createElement(IconContext.Consumer, null, (conf) => elem(conf)) : elem(DefaultContext);
 }
 
 // ../../node_modules/react-icons/bi/index.mjs
-function BiChevronLeft(props) {
-  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 24 24" }, "child": [{ "tag": "path", "attr": { "d": "M13.293 6.293 7.586 12l5.707 5.707 1.414-1.414L10.414 12l4.293-4.293z" }, "child": [] }] })(props);
-}
-function BiChevronRight(props) {
-  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 24 24" }, "child": [{ "tag": "path", "attr": { "d": "M10.707 17.707 16.414 12l-5.707-5.707-1.414 1.414L13.586 12l-4.293 4.293z" }, "child": [] }] })(props);
-}
 function BiRadar(props) {
   return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 24 24" }, "child": [{ "tag": "path", "attr": { "d": "M12 2C6.579 2 2 6.58 2 12s4.579 10 10 10 10-4.58 10-10S17.421 2 12 2zm0 18c-4.337 0-8-3.664-8-8 0-3.998 3.115-7.417 7-7.927V6.09C8.167 6.569 6 9.033 6 12c0 3.309 2.691 6 6 6 1.595 0 3.1-.626 4.237-1.763l-1.414-1.415A3.97 3.97 0 0 1 12 16c-2.206 0-4-1.794-4-4 0-1.858 1.279-3.411 3-3.858v2.146c-.59.353-1 .993-1 1.712 0 1.081.919 2 2 2s2-.919 2-2c0-.719-.41-1.359-1-1.712V4.073c3.885.51 7 3.929 7 7.927 0 4.336-3.663 8-8 8z" }, "child": [] }] })(props);
 }
@@ -15665,134 +15621,7 @@ function BiScatterChart(props) {
 }
 
 // src/table/ui/index.js
-function jsonSchemaGenerator(data) {
-  if (data === null || data === void 0) {
-    return { type: "null" };
-  }
-  const dataType = typeof data;
-  if (dataType === "string") {
-    return { type: "string" };
-  } else if (dataType === "number") {
-    return { type: "number" };
-  } else if (dataType === "boolean") {
-    return { type: "boolean" };
-  }
-  if (Array.isArray(data)) {
-    if (data.length > 0) {
-      const itemSchema = jsonSchemaGenerator(data[0]);
-      return {
-        type: "array",
-        items: itemSchema
-        // Optionally, specify minItems or maxItems if known, but not typically inferred.
-      };
-    } else {
-      return {
-        type: "array"
-        // items: {} // Could explicitly allow any type using an empty schema
-      };
-    }
-  }
-  if (dataType === "object") {
-    const properties = {};
-    for (const key in data) {
-      if (Object.prototype.hasOwnProperty.call(data, key)) {
-        properties[key] = jsonSchemaGenerator(data[key]);
-      }
-    }
-    const schema = {
-      type: "object",
-      properties
-      // Additional properties are allowed by default. If you wanted to disallow unknown properties:
-      // additionalProperties: false,
-    };
-    return schema;
-  }
-  console.warn(
-    `jsonSchemaGenerator encountered unexpected data type: ${dataType}`
-  );
-  return {};
-}
 var TableWidgetComponent = ({ data, onWidgetInit, widgetConfig }) => {
-  TableWidgetComponent.propTypes = {
-    data: import_prop_types9.default.object,
-    onWidgetInit: import_prop_types9.default.func,
-    widgetConfig: import_prop_types9.default.object
-  };
-  const firstData = data && Array.isArray(data) && data.length > 0 && Array.isArray(data[0]) ? data[0].map((item, index2) => ({ ...item, _g_uuid: `row_${index2}` })) : null;
-  const widgetRef = useRef10(null);
-  const dataSchema = useMemo8(() => {
-    if (firstData && firstData.length > 0) {
-      return jsonSchemaGenerator(firstData[0]);
-    }
-    return {};
-  }, [firstData]);
-  const columns = useMemo8(() => {
-    if (dataSchema && dataSchema.properties) {
-      return Object.keys(dataSchema.properties).map((key) => {
-        return {
-          field: key,
-          // Use 'field' for mui-x-data-grid
-          headerName: key,
-          flex: 1,
-          minWidth: 150,
-          renderCell: (params) => {
-            return /* @__PURE__ */ React12.createElement("div", { className: "text-sm whitespace-pre-wrap py-2" }, params.value !== null && params.value !== void 0 ? params.value.toString() : "-");
-          }
-        };
-      });
-    }
-    return [];
-  }, [dataSchema]);
-  const [paginationModel, setPaginationModel] = useState({
-    page: 0,
-    pageSize: 10
-  });
-  const rowCount = firstData?.length || 0;
-  const totalPages = Math.ceil(rowCount / paginationModel.pageSize);
-  const CustomFooter = () => {
-    return /* @__PURE__ */ React12.createElement("div", { className: "cancelSelectorName flex items-center gap-2 p-2 border-t border-gray-200" }, /* @__PURE__ */ React12.createElement(
-      "button",
-      {
-        className: "p-1 text-xs font-medium text-gray-700 bg-gray-100 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed",
-        onClick: () => setPaginationModel((prev) => ({ ...prev, page: prev.page - 1 })),
-        disabled: paginationModel.page === 0
-      },
-      /* @__PURE__ */ React12.createElement(BiChevronLeft, { className: "text-lg" })
-    ), /* @__PURE__ */ React12.createElement("span", { className: "text-xs text-gray-600" }, "Page ", paginationModel.page + 1, " of ", totalPages), /* @__PURE__ */ React12.createElement(
-      "button",
-      {
-        className: "p-1 text-xs font-medium text-gray-700 bg-gray-100 rounded hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed",
-        onClick: () => setPaginationModel((prev) => ({ ...prev, page: prev.page + 1 })),
-        disabled: paginationModel.page >= totalPages - 1 || totalPages === 0
-      },
-      /* @__PURE__ */ React12.createElement(BiChevronRight, { className: "text-lg" })
-    ), /* @__PURE__ */ React12.createElement(
-      "select",
-      {
-        className: "p-1 text-xs text-gray-700 bg-white border border-gray-300 rounded focus:outline-none focus:border-blue-500",
-        value: paginationModel.pageSize,
-        onChange: (e2) => setPaginationModel({
-          page: 0,
-          pageSize: Number(e2.target.value)
-        })
-      },
-      [10, 25, 50].map((size) => /* @__PURE__ */ React12.createElement("option", { key: size, value: size }, size))
-    ), /* @__PURE__ */ React12.createElement("span", { className: "text-xs text-gray-600" }, rowCount, " total rows"));
-  };
-  useEffect10(() => {
-    if (widgetRef.current) {
-      onWidgetInit?.(widgetRef);
-    }
-  }, [onWidgetInit]);
-  const isLoading = !data;
-  const hasData = firstData && firstData.length > 0 && columns.length > 0;
-  const {
-    widgetTailwindCss = "",
-    containerTailwindCss = "",
-    titleEnabled,
-    titleTailwindCss = "",
-    title
-  } = widgetConfig;
   return (
     // Added flex and flex-col to make this a flex container stacking children vertically
     /* @__PURE__ */ React12.createElement(
@@ -15866,6 +15695,11 @@ var TableWidgetComponent = ({ data, onWidgetInit, widgetConfig }) => {
     )
   );
 };
+TableWidgetComponent.propTypes = {
+  data: import_prop_types8.default.object,
+  onWidgetInit: import_prop_types8.default.func,
+  widgetConfig: import_prop_types8.default.object
+};
 
 // src/iframe/logic/processors.js
 var processIframeWidgetQueryResults = ({
@@ -15880,30 +15714,24 @@ var processIframeWidgetQueryResults = ({
 };
 
 // src/iframe/ui/index.js
-var import_prop_types10 = __toESM(require_prop_types());
 import React13, { useEffect as useEffect11, useRef as useRef11 } from "react";
 var IframeWidgetComponent = ({ data, onWidgetInit, widgetConfig }) => {
-  IframeWidgetComponent.propTypes = {
-    data: import_prop_types10.default.object,
-    onWidgetInit: import_prop_types10.default.func,
-    widgetConfig: import_prop_types10.default.object
-  };
-  const widgetRef = useRef11(null);
-  const { widgetCss = {}, widgetTailwindCss = "" } = widgetConfig || {};
+  const widgetRef2 = useRef11(null);
+  const { widgetCss = {}, widgetTailwindCss: widgetTailwindCss2 = "" } = widgetConfig || {};
   const widgetStyle = {
     ...widgetCss
   };
   useEffect11(() => {
-    if (widgetRef.current) {
-      onWidgetInit?.(widgetRef);
+    if (widgetRef2.current) {
+      onWidgetInit?.(widgetRef2);
     }
-  }, [onWidgetInit, widgetRef]);
+  }, [onWidgetInit, widgetRef2]);
   return /* @__PURE__ */ React13.createElement(
     "div",
     {
-      ref: widgetRef,
+      ref: widgetRef2,
       style: widgetStyle,
-      className: `w-full flex-grow h-full overflow-y-auto${widgetTailwindCss}`
+      className: `w-full flex-grow h-full overflow-y-auto${widgetTailwindCss2}`
     },
     widgetConfig.titleEnabled && widgetConfig.title && /* @__PURE__ */ React13.createElement(
       "h2",
@@ -18637,6 +18465,243 @@ var WIDGETS_MAP = {
     sampleConfig: WIDGET_INITIAL_CONFIG.table
   }
 };
+
+// src/workflow/processors.js
+var resolveVariablePath = (context, pathExpr, fallback = void 0) => {
+  if (!pathExpr || !context) return fallback;
+  let cleanPath = pathExpr;
+  const mustacheMatch = pathExpr.match(/^\{\{(.+?)\}\}$/);
+  if (mustacheMatch) {
+    cleanPath = mustacheMatch[1];
+  }
+  if (cleanPath.startsWith("ctx.")) {
+    cleanPath = cleanPath.slice(4);
+  }
+  if (cleanPath.includes("[*]")) {
+    return resolveWildcardPath(context, cleanPath, fallback);
+  }
+  const parts = cleanPath.split(".");
+  let current = context;
+  for (const part of parts) {
+    if (current === void 0 || current === null) {
+      return fallback;
+    }
+    const indexMatch = part.match(/^(.+?)\[(\d+)\]$/);
+    if (indexMatch) {
+      const [, prop, index2] = indexMatch;
+      current = current[prop];
+      if (Array.isArray(current)) {
+        current = current[parseInt(index2, 10)];
+      } else {
+        return fallback;
+      }
+    } else {
+      current = current[part];
+    }
+  }
+  return current !== void 0 ? current : fallback;
+};
+var resolveWildcardPath = (context, path, fallback) => {
+  const wildcardIndex = path.indexOf("[*]");
+  if (wildcardIndex === -1) return fallback;
+  const beforeWildcard = path.slice(0, wildcardIndex);
+  const afterWildcard = path.slice(wildcardIndex + 3);
+  let current = context;
+  if (beforeWildcard) {
+    const parts = beforeWildcard.split(".");
+    for (const part of parts) {
+      if (current === void 0 || current === null) return fallback;
+      current = current[part];
+    }
+  }
+  if (!Array.isArray(current)) return fallback;
+  if (!afterWildcard || afterWildcard === ".") {
+    return current;
+  }
+  const fieldPath = afterWildcard.startsWith(".") ? afterWildcard.slice(1) : afterWildcard;
+  const results = [];
+  for (const item of current) {
+    if (item === null || item === void 0) {
+      results.push(void 0);
+      continue;
+    }
+    let value = item;
+    const fieldParts = fieldPath.split(".");
+    for (const part of fieldParts) {
+      if (value === void 0 || value === null) {
+        value = void 0;
+        break;
+      }
+      value = value[part];
+    }
+    results.push(value);
+  }
+  return results.length > 0 ? results : fallback;
+};
+var resolveDatasetFields = (context, datasetFields) => {
+  if (!context || !datasetFields) return {};
+  const resolved = {};
+  for (const [field, binding] of Object.entries(datasetFields)) {
+    if (typeof binding === "string") {
+      resolved[field] = resolveVariablePath(context, binding);
+    } else if (binding?.variablePath) {
+      resolved[field] = resolveVariablePath(context, binding.variablePath, binding.fallback);
+    }
+  }
+  return resolved;
+};
+var generateChartColors = (count) => {
+  const baseColors = [
+    "rgba(100, 108, 255, 0.6)",
+    "rgba(255, 99, 132, 0.6)",
+    "rgba(54, 162, 235, 0.6)",
+    "rgba(255, 206, 86, 0.6)",
+    "rgba(75, 192, 192, 0.6)",
+    "rgba(153, 102, 255, 0.6)",
+    "rgba(255, 159, 64, 0.6)",
+    "rgba(199, 199, 199, 0.6)"
+  ];
+  const colors2 = [];
+  for (let i2 = 0; i2 < count; i2++) {
+    colors2.push(baseColors[i2 % baseColors.length]);
+  }
+  return colors2;
+};
+var processBarChartWorkflowData = ({ context, datasetFields, parameters = {} }) => {
+  const params = parameters || {};
+  const resolved = resolveDatasetFields(context, datasetFields);
+  const labels = resolved.xAxis || [];
+  const data = resolved.yAxis || [];
+  if (!Array.isArray(labels) || !Array.isArray(data)) {
+    return { labels: [], datasets: [] };
+  }
+  return {
+    labels,
+    datasets: [{
+      label: params.label || "Data",
+      data,
+      backgroundColor: params.backgroundColor || "rgba(100, 108, 255, 0.6)",
+      borderColor: params.borderColor || "rgba(100, 108, 255, 1)",
+      borderWidth: params.borderWidth || 1
+    }]
+  };
+};
+var processLineChartWorkflowData = ({ context, datasetFields, parameters = {} }) => {
+  const params = parameters || {};
+  const resolved = resolveDatasetFields(context, datasetFields);
+  const labels = resolved.xAxis || [];
+  const data = resolved.yAxis || [];
+  if (!Array.isArray(labels) || !Array.isArray(data)) {
+    return { labels: [], datasets: [] };
+  }
+  return {
+    labels,
+    datasets: [{
+      label: params.label || "Data",
+      data,
+      fill: params.fill !== void 0 ? params.fill : false,
+      backgroundColor: params.backgroundColor || "rgba(100, 108, 255, 0.6)",
+      borderColor: params.borderColor || "rgba(100, 108, 255, 1)",
+      borderWidth: params.borderWidth || 2,
+      tension: params.tension || 0.1
+    }]
+  };
+};
+var processPieChartWorkflowData = ({ context, datasetFields, parameters = {} }) => {
+  const params = parameters || {};
+  const resolved = resolveDatasetFields(context, datasetFields);
+  const labels = resolved.label || [];
+  const data = resolved.value || [];
+  if (!Array.isArray(labels) || !Array.isArray(data)) {
+    return { labels: [], datasets: [] };
+  }
+  const colors2 = params.backgroundColor || generateChartColors(data.length);
+  return {
+    labels,
+    datasets: [{
+      data,
+      backgroundColor: colors2,
+      borderColor: params.borderColor || colors2.map((c2) => c2.replace("0.6", "1")),
+      borderWidth: params.borderWidth || 1
+    }]
+  };
+};
+var processRadarChartWorkflowData = ({ context, datasetFields, parameters = {} }) => {
+  return processPieChartWorkflowData({ context, datasetFields, parameters });
+};
+var processPolarAreaChartWorkflowData = ({ context, datasetFields, parameters = {} }) => {
+  return processPieChartWorkflowData({ context, datasetFields, parameters });
+};
+var processScatterChartWorkflowData = ({ context, datasetFields, parameters = {} }) => {
+  const params = parameters || {};
+  const resolved = resolveDatasetFields(context, datasetFields);
+  const xData = resolved.xAxis || [];
+  const yData = resolved.yAxis || [];
+  if (!Array.isArray(xData) || !Array.isArray(yData)) {
+    return { datasets: [] };
+  }
+  const dataPoints = xData.map((x3, i2) => ({ x: x3, y: yData[i2] }));
+  return {
+    datasets: [{
+      label: params.label || "Data",
+      data: dataPoints,
+      backgroundColor: params.backgroundColor || "rgba(100, 108, 255, 0.6)"
+    }]
+  };
+};
+var processBubbleChartWorkflowData = ({ context, datasetFields, parameters = {} }) => {
+  const params = parameters || {};
+  const resolved = resolveDatasetFields(context, datasetFields);
+  const xData = resolved.xAxis || [];
+  const yData = resolved.yAxis || [];
+  const rData = resolved.radius || [];
+  if (!Array.isArray(xData) || !Array.isArray(yData)) {
+    return { datasets: [] };
+  }
+  const dataPoints = xData.map((x3, i2) => ({
+    x: x3,
+    y: yData[i2],
+    r: rData[i2] || 5
+  }));
+  return {
+    datasets: [{
+      label: params.label || "Data",
+      data: dataPoints,
+      backgroundColor: params.backgroundColor || "rgba(100, 108, 255, 0.6)"
+    }]
+  };
+};
+var processTextWidgetWorkflowData = ({ context, datasetFields }) => {
+  const resolved = resolveDatasetFields(context, datasetFields);
+  return { text: resolved.text || "" };
+};
+var processTableWidgetWorkflowData = ({ context, datasetFields }) => {
+  const resolved = resolveDatasetFields(context, datasetFields);
+  return resolved.data || [];
+};
+var processIframeWidgetWorkflowData = ({ context, datasetFields }) => {
+  const resolved = resolveDatasetFields(context, datasetFields);
+  return { url: resolved.url || "" };
+};
+var WORKFLOW_DATA_PROCESSORS = {
+  bar: processBarChartWorkflowData,
+  line: processLineChartWorkflowData,
+  pie: processPieChartWorkflowData,
+  radar: processRadarChartWorkflowData,
+  polarArea: processPolarAreaChartWorkflowData,
+  scatter: processScatterChartWorkflowData,
+  bubble: processBubbleChartWorkflowData,
+  text: processTextWidgetWorkflowData,
+  table: processTableWidgetWorkflowData,
+  iframe: processIframeWidgetWorkflowData
+};
+var processWorkflowDataForWidget = ({ widgetType, context, datasetFields, parameters }) => {
+  const processor = WORKFLOW_DATA_PROCESSORS[widgetType];
+  if (!processor) {
+    return resolveDatasetFields(context, datasetFields);
+  }
+  return processor({ context, datasetFields, parameters });
+};
 export {
   ALL_WIDGET_DATASET_FIELDS,
   BarChartComponent,
@@ -18650,16 +18715,29 @@ export {
   TableWidgetComponent,
   TextWidgetComponent,
   WIDGETS_MAP,
+  WORKFLOW_DATA_PROCESSORS,
   processBarChartQueryResults,
+  processBarChartWorkflowData,
   processBubbleChartQueryResults,
+  processBubbleChartWorkflowData,
   processIframeWidgetQueryResults,
+  processIframeWidgetWorkflowData,
   processLineChartQueryResults,
+  processLineChartWorkflowData,
   processPieChartQueryResults,
+  processPieChartWorkflowData,
   processPolarAreaChartQueryResults,
+  processPolarAreaChartWorkflowData,
   processRadarChartQueryResults,
+  processRadarChartWorkflowData,
   processScatterChartQueryResults,
+  processScatterChartWorkflowData,
   processTableWidgetQueryResults,
-  processTextWidgetQueryResults
+  processTableWidgetWorkflowData,
+  processTextWidgetQueryResults,
+  processTextWidgetWorkflowData,
+  processWorkflowDataForWidget,
+  resolveDatasetFields
 };
 /*! Bundled license information:
 

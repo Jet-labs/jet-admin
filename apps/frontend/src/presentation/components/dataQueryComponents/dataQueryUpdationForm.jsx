@@ -178,21 +178,7 @@ export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
                       value={queryUpdationForm.values.dataQueryTitle}
                     />
                   </div>
-                  <label className="flex items-center space-x-2">
-                    <input
-                      type="checkbox"
-                      name="runOnLoad"
-                      checked={queryUpdationForm.values.runOnLoad}
-                      onChange={queryUpdationForm.handleChange}
-                      className="accent-[#646cff] w-4 h-4"
-                    />
-                    <span className="text-sm font-medium text-slate-700">
-                      {
-                        CONSTANTS.STRINGS
-                          .UPDATE_QUERY_FORM_RUN_ON_LOAD_FIELD_LABEL
-                      }
-                    </span>
-                  </label>
+
                 </ResizablePanel>
                 <ResizableHandle withHandle={true} />
                 <ResizablePanel

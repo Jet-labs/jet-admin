@@ -2,9 +2,11 @@
 id: database-schema
 title: Database Schema
 sidebar_label: Database ERD
-sidebar_position: 2
+sidebar_position: 3
 description: Entity Relationship Diagram (ERD) of the Jet Admin PostgreSQL database.
 ---
+
+
 
 # Database Schema
 

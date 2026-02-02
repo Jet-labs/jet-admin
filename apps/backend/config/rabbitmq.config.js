@@ -87,8 +87,8 @@ async function initializeRabbitMQ() {
     
     return { connection, channel };
   } catch (error) {
-    Logger.log('error', { message: 'rabbitmq.config:failed to connect', params: { error: error.message } });
-    throw error;
+    Logger.log('error', { message: 'rabbitmq.config:failed to connect', params: { error: error.message || "Cannot connect to RabbitMQ" } });
+    throw error || new Error("Failed to connect to RabbitMQ");
   }
 }
 

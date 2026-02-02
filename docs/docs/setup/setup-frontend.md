@@ -29,11 +29,12 @@ npm install --workspaces
 
 ### Environment Configuration
 
-Create a `.env` file in the project root with the following variables:
+Create a `.env` file in the `apps/frontend` directory with the following variables:
 
 ```env
 # API Configuration
-VITE_API_URL=http://localhost:8090/api
+VITE_SERVER_HOST=http://localhost:8090
+VITE_SOCKET_HOST=http://localhost:8090
 
 # Firebase Configuration (used for authentication)
 VITE_FIREBASE_API_KEY=
@@ -46,7 +47,7 @@ VITE_FIREBASE_MEASUREMENT_ID=
 
 # Supabase Configuration (used for file storage)
 VITE_SUPABASE_URL=
-VITE_SUPABASE_ANON_KEY=
+VITE_SUPABASE_KEY=
 ```
 
 :::caution

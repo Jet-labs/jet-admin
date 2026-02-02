@@ -161,6 +161,110 @@ const permissions = [
     permissionTitle: "tenant:database:chart:read",
     permissionDescription: "Permission to read tenant chart",
   },
+  // --- AI Permissions ---
+  {
+    permissionTitle: "tenant:ai:create",
+    permissionDescription: "Permission to create AI resources",
+  },
+  // --- CronJob Permissions ---
+  {
+    permissionTitle: "tenant:cronjob:history:read",
+    permissionDescription: "Permission to read cron job history",
+  },
+  // --- Dashboard Permissions ---
+  {
+    permissionTitle: "tenant:dashboard:clone",
+    permissionDescription: "Permission to clone a dashboard",
+  },
+  // --- DataQuery Permissions ---
+  {
+    permissionTitle: "tenant:query:bulk:create",
+    permissionDescription: "Permission to bulk create queries",
+  },
+  {
+    permissionTitle: "tenant:query:clone",
+    permissionDescription: "Permission to clone a query",
+  },
+  {
+    permissionTitle: "tenant:query:aigenerate",
+    permissionDescription: "Permission to generate query using AI",
+  },
+  // --- Database Permissions ---
+  {
+    permissionTitle: "tenant:database:raw-sql:execute",
+    permissionDescription: "Permission to execute raw SQL",
+  },
+  {
+    permissionTitle: "tenant:database:table:row:delete",
+    permissionDescription: "Permission to delete table rows",
+  },
+  {
+    permissionTitle: "tenant:database:table:row:export",
+    permissionDescription: "Permission to export table rows",
+  },
+  // --- Datasource Permissions ---
+  {
+    permissionTitle: "tenant:datasource:test",
+    permissionDescription: "Permission to test datasource connection",
+  },
+  {
+    permissionTitle: "tenant:datasource:clone",
+    permissionDescription: "Permission to clone a datasource",
+  },
+  // --- Widget Permissions (Replacements for Chart) ---
+  {
+    permissionTitle: "tenant:widget:list",
+    permissionDescription: "Permission to list widgets",
+  },
+  {
+    permissionTitle: "tenant:widget:create",
+    permissionDescription: "Permission to create a widget",
+  },
+  {
+    permissionTitle: "tenant:widget:read",
+    permissionDescription: "Permission to read a widget",
+  },
+  {
+    permissionTitle: "tenant:widget:update",
+    permissionDescription: "Permission to update a widget",
+  },
+  {
+    permissionTitle: "tenant:widget:delete",
+    permissionDescription: "Permission to delete a widget",
+  },
+  {
+    permissionTitle: "tenant:widget:test",
+    permissionDescription: "Permission to test a widget",
+  },
+  {
+    permissionTitle: "tenant:widget:clone",
+    permissionDescription: "Permission to clone a widget",
+  },
+  // --- Workflow Permissions ---
+  {
+    permissionTitle: "tenant:workflow:list",
+    permissionDescription: "Permission to list workflows",
+  },
+  {
+    permissionTitle: "tenant:workflow:create",
+    permissionDescription: "Permission to create a workflow",
+  },
+  {
+    permissionTitle: "tenant:workflow:read",
+    permissionDescription: "Permission to read a workflow",
+  },
+  {
+    permissionTitle: "tenant:workflow:update",
+    permissionDescription: "Permission to update a workflow",
+  },
+  {
+    permissionTitle: "tenant:workflow:delete",
+    permissionDescription: "Permission to delete a workflow",
+  },
+  {
+    permissionTitle: "tenant:workflow:execute",
+    permissionDescription: "Permission to execute a workflow",
+  },
 ];
 
 const roles = [
@@ -218,6 +322,8 @@ const roles = [
   },
   { roleTitle: "TriggerManager", roleDescription: "Manages database triggers" },
   { roleTitle: "TriggerViewer", roleDescription: "Can view database triggers" },
+  { roleTitle: "WorkflowManager", roleDescription: "Manages workflows" },
+  { roleTitle: "WidgetManager", roleDescription: "Manages widgets" },
   // Add an explicit ADMIN role if needed
   { roleTitle: "ADMIN", roleDescription: "Full administrative access" },
 ];
@@ -300,9 +406,23 @@ const rolePermissionsMap = {
     "tenant:database:trigger:read",
     "tenant:database:trigger:delete",
   ],
-  TriggerViewer: [
-    "tenant:database:trigger:list",
-    "tenant:database:trigger:read",
+
+  WorkflowManager: [
+    "tenant:workflow:list",
+    "tenant:workflow:create",
+    "tenant:workflow:read",
+    "tenant:workflow:update",
+    "tenant:workflow:delete",
+    "tenant:workflow:execute",
+  ],
+  WidgetManager: [
+    "tenant:widget:list",
+    "tenant:widget:create",
+    "tenant:widget:read",
+    "tenant:widget:update",
+    "tenant:widget:delete",
+    "tenant:widget:test",
+    "tenant:widget:clone",
   ],
   ADMIN: [
     "tenant:read",
@@ -338,12 +458,35 @@ const rolePermissionsMap = {
     "tenant:database:trigger:create",
     "tenant:database:trigger:read",
     "tenant:database:trigger:delete",
+
     "tenant:permissions:list",
-    "tenant:database:chart:list",
-    "tenant:database:chart:create",
-    "tenant:database:chart:delete",
-    "tenant:database:chart:update",
-    "tenant:database:chart:read",
+    // Consolidated & New Permissions for ADMIN
+    "tenant:ai:create",
+    "tenant:cronjob:history:read",
+    "tenant:dashboard:clone",
+    "tenant:query:bulk:create",
+    "tenant:query:clone",
+    "tenant:query:aigenerate",
+    "tenant:database:raw-sql:execute",
+    "tenant:database:table:row:delete",
+    "tenant:database:table:row:export",
+    "tenant:datasource:test",
+    "tenant:datasource:clone",
+    // Widget
+    "tenant:widget:list",
+    "tenant:widget:create",
+    "tenant:widget:read",
+    "tenant:widget:update",
+    "tenant:widget:delete",
+    "tenant:widget:test",
+    "tenant:widget:clone",
+    // Workflow
+    "tenant:workflow:list",
+    "tenant:workflow:create",
+    "tenant:workflow:read",
+    "tenant:workflow:update",
+    "tenant:workflow:delete",
+    "tenant:workflow:execute",
   ],
 };
 
@@ -355,6 +498,8 @@ const systemUser = {
   email: "admin@example.com",
   isDisabled: false,
 };
+
+
 
 async function main() {
   await prisma.$transaction(
@@ -415,36 +560,24 @@ async function main() {
         rolePermissionData.length
       );
 
-      // 4. Create default tenant with embedded user
-      const defaultTenant = await tx.tblTenants.create({
-        data: {
-          tenantTitle: "Default Tenant",
-          tenantLogoURL: "https://example.com/logo.png",
-          tenantDBURL: "postgresql://localhost:5432/default_tenant",
-          tenantDBType: "postgresql",
-          tblUsers: {
-            create: systemUser,
-          },
-        },
-        include: { tblUsers: true },
+      console.log(
+        "Role-permission mappings created:",
+        rolePermissionData.length
+      );
+
+      // 4. Create System User
+      const existingUser = await tx.tblUsers.findFirst({
+        where: { firebaseID: systemUser.firebaseID },
       });
 
-      const user = defaultTenant.tblUsers;
-
-      // 5. Update creatorID
-      await tx.tblTenants.update({
-        where: { tenantID: defaultTenant.tenantID },
-        data: { creatorID: user.userID },
-      });
-
-      // 6. Create user-tenant relationship
-      await tx.tblUsersTenantsRelationship.create({
-        data: {
-          tenantID: defaultTenant.tenantID,
-          userID: user.userID,
-          role: "ADMIN",
-        },
-      });
+      if (!existingUser) {
+        await tx.tblUsers.create({
+          data: systemUser,
+        });
+        console.log("✅ System user created");
+      } else {
+        console.log("ℹ️ System user already exists");
+      }
 
       console.log("✅ Seed data successfully populated");
     },
