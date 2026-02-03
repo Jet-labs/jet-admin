@@ -3,7 +3,7 @@ name: Deploy Docusaurus to GitHub Pages
 on:
   push:
     branches:
-      - main  # Matches the editUrl in your config
+      - dev  # Matches the editUrl in your config
 
 permissions:
   contents: read
