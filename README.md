@@ -18,6 +18,10 @@
 
 </div>
 
+<a href="https://www.producthunt.com/products/jet-admin-3?embed=true&amp;utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-jet-admin-4" target="_blank" rel="noopener noreferrer"><img alt="Jet Admin - Web-based PostgreSQL tables manager and visualizer | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=958307&amp;theme=light&amp;t=1770205579857"></a>
+
+<a href="https://www.producthunt.com/products/jet-admin-3/reviews/new?utm_source=badge-product_review&utm_medium=badge&utm_source=badge-jet&#0045;admin&#0045;3" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/product_review.svg?product_id=1059394&theme=light" alt="Jet&#0032;Admin - Built&#0032;for&#0032;devs | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
+
 ---
 
 ## 🌟 Overview
