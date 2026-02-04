@@ -1,4 +1,4 @@
-import { WIDGETS_MAP } from "@jet-admin/widgets";
+import { WIDGETS_MAP } from "@jet-admin/widgets-ui";
 import React from "react";
 import { FaPlus } from "react-icons/fa";
 import { Link, useNavigate, useParams } from "react-router-dom";

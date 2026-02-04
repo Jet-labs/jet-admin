@@ -1,3 +1,6 @@
+
+.agent
+
 apps/backend/node_modules
 apps/backend/firebase-key.json
 apps/backend/production.env
@@ -9,6 +12,34 @@ apps/frontend/node_modules
 apps/frontend/.env
 
 docker-compose.yml
-
 node_modules
+
+# Ignore all package folders except the root node_modules
+packages/template-package/node_modules
+packages/template-package/dist
+
+packages/datasource-types/node_modules
+packages/datasource-types/dist
+
+packages/datasources-ui/node_modules
+packages/datasources-ui/dist
+
+packages/datasources-logic/node_modules
+packages/datasources-logic/dist
+
+packages/widget-types/node_modules
+packages/widget-types/dist
+
+packages/widgets/node_modules
+packages/widgets/dist
+
+packages/workflow-edges/node_modules
+packages/workflow-edges/dist
+
+packages/workflow-nodes/node_modules
+packages/workflow-nodes/dist
+
+packages/json-forms-renderers/node_modules
+packages/json-forms-renderers/dist
+
 

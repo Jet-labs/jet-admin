@@ -1,0 +1,173 @@
+# ============================================
+# Jet Admin - Ready-to-Run Docker Compose (Separated Services)
+# ============================================
+# 4 Services: frontend, backend, postgres, rabbitmq
+#
+# Usage:
+#   docker compose -f docker-compose.sample.yml up -d --build
+#
+# Services:
+#   - frontend:  React app served by nginx (port 80)
+#   - backend:   Node.js API server (port 8090)
+#   - postgres:  PostgreSQL database
+#   - rabbitmq:  Message broker
+
+services:
+  # ============================================
+  # Frontend - React App (nginx)
+  # ============================================
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+      args:
+        - VITE_FIREBASE_API_KEY=your_firebase_api_key
+        - VITE_FIREBASE_AUTH_DOMAIN=your_project_id.firebaseapp.com
+        - VITE_FIREBASE_PROJECT_ID=your_project_id
+        - VITE_FIREBASE_STORAGE_BUCKET=your_project_id.firebasestorage.app
+        - VITE_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
+        - VITE_FIREBASE_APP_ID=your_app_id
+        - VITE_FIREBASE_MEASUREMENT_ID=your_measurement_id
+        - VITE_SUPABASE_URL=your_supabase_url
+        - VITE_SUPABASE_KEY=your_supabase_anon_key
+    container_name: jet-admin-frontend
+    ports:
+      - "80:80"  # Main application access point
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - jet-network
+    environment:
+      - VITE_SERVER_HOST=http://localhost:8090
+      - VITE_SOCKET_HOST=http://localhost:8090
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # ============================================
+  # Backend - Node.js API Server
+  # ============================================
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: jet-admin-backend
+    ports:
+      - "8090:8090"  # API direct access (optional, for debugging)
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      # Server Configuration
+      - NODE_ENV=production
+      - PORT=8090
+      
+      # Database Configuration
+      - DATABASE_URL=postgresql://postgres:your_strong_password@postgres:5432/jet_admin_db
+      - SEED_DATABASE=true  # Set to false after first run
+      
+      # RabbitMQ Configuration
+      - RABBITMQ_URL=amqp://jetadmin:your_strong_password@rabbitmq:5672
+      
+      # Authentication Secrets
+      - JWT_ACCESS_TOKEN_SECRET=your_super_secret_access_token_key_change_me
+      - JWT_REFRESH_TOKEN_SECRET=your_super_secret_refresh_token_key_change_me
+      - ACCESS_TOKEN_TIMEOUT=900
+      - REFRESH_TOKEN_TIMEOUT=100h
+      - SESSION_SECRET=your_session_secret_change_me
+      
+      # AI Configuration
+      - GEMINI_API_KEY=your_gemini_api_key
+      
+      # Modules Configuration
+      - ENABLED_MODULES=auth,tenant,database,datasource,dataQuery,workflow,widget,dashboard,userManagement,role,apiKey,cronJob,audit,ai,notification,permission
+      - NODE_ID=docker_node_1
+      
+      # Logging
+      - LOG_LEVEL=info
+      - EXPRESS_REQUEST_SIZE_LIMIT=5mb
+      - CORS_WHITELIST=http://localhost,http://frontend,http://localhost:3000
+    volumes:
+      - backend_logs:/app/apps/backend/logs
+    networks:
+      - jet-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8090/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 30s
+      retries: 3
+
+  # ============================================
+  # PostgreSQL Database
+  # ============================================
+  postgres:
+    image: postgres:15-alpine
+    container_name: jet-admin-postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=your_strong_password
+      - POSTGRES_DB=jet_admin_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"  # Exposed for debugging; remove in production
+    networks:
+      - jet-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d jet_admin_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # ============================================
+  # RabbitMQ Message Broker
+  # ============================================
+  rabbitmq:
+    image: rabbitmq:3-management-alpine
+    container_name: jet-admin-rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=jetadmin
+      - RABBITMQ_DEFAULT_PASS=your_strong_password
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    ports:
+      - "5672:5672"   # AMQP
+      - "15672:15672" # Management UI (http://localhost:15672)
+    networks:
+      - jet-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics -q check_running && rabbitmq-diagnostics -q check_local_alarms"]
+      interval: 30s
+      timeout: 30s
+      retries: 5
+      start_period: 60s
+
+# ============================================
+# Volumes
+# ============================================
+volumes:
+  postgres_data:
+    name: jet-admin-postgres-data
+  rabbitmq_data:
+    name: jet-admin-rabbitmq-data
+  backend_logs:
+    name: jet-admin-backend-logs
+
+# ============================================
+# Networks
+# ============================================
+networks:
+  jet-network:
+    name: jet-admin-network
+    driver: bridge

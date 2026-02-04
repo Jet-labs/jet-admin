@@ -1,4 +1,4 @@
-import { WIDGETS_MAP } from "@jet-admin/widgets";
+import { WIDGETS_MAP } from "@jet-admin/widgets-ui";
 import { CircularProgress } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";

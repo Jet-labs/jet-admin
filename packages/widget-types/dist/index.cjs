@@ -65,6 +65,10 @@ var WIDGET_TYPES = {
   IFRAME_WIDGET: {
     name: "IFrame Widget",
     value: "iframe"
+  },
+  VEGA_LITE: {
+    name: "Vega-Lite Chart",
+    value: "vega-lite"
   }
 };
 var WIDGET_INITIAL_CONFIG = {

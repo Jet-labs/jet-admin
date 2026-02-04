@@ -39,6 +39,10 @@ export const WIDGET_TYPES = {
     name: "IFrame Widget",
     value: "iframe",
   },
+  VEGA_LITE: {
+    name: "Vega-Lite Chart",
+    value: "vega-lite",
+  },
 };
 
 export const WIDGET_INITIAL_CONFIG = {

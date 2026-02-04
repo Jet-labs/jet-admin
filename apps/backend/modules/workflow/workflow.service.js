@@ -9,6 +9,7 @@ const {
   formatAuthContextForLog,
   getCreationContextFromAuthContext,
 } = require("../../utils/auth.context.utils");
+const { processWorkflowDataForWidget } = require("@jet-admin/widgets-logic");
 
 const workflowService = {}
 
@@ -526,7 +527,7 @@ workflowService.getRunStatusForWidget = async ({ instanceID, widgetType, dataset
     }
 
     // Process context data for widget display
-    const { processWorkflowDataForWidget } = require("@jet-admin/widgets");
+
 
     const processedData = processWorkflowDataForWidget({
       widgetType,

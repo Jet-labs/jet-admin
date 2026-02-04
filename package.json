@@ -10,7 +10,8 @@
     "start:f": "cd apps/frontend && npm run dev",
     "start:b": "cd apps/backend && npm run dev-w",
     "start:all": "concurrently \"npm run start:f\" \"npm run start:b\"",
-    "dev:widgets": "cd packages/widgets && npm run dev",
+    "dev:widgets-logic": "cd packages/widgets-logic && npm run dev",
+    "dev:widgets-ui": "cd packages/widgets-ui && npm run dev",
     "dev:widget-types": "cd packages/widget-types && npm run dev",
     "dev:datasources-logic": "cd packages/datasources-logic && npm run dev",
     "dev:datasources-ui": "cd packages/datasources-ui && npm run dev",
@@ -18,7 +19,7 @@
     "dev:workflow-nodes": "cd packages/workflow-nodes && npm run dev",
     "dev:workflow-edges": "cd packages/workflow-edges && npm run dev",
     "dev:json-forms-renderers": "cd packages/json-forms-renderers && npm run dev",
-    "dev:all-packages": "concurrently \"npm run dev:widgets\" \"npm run dev:widget-types\" \"npm run dev:datasources-logic\" \"npm run dev:datasources-ui\" \"npm run dev:datasource-types\" \"npm run dev:workflow-nodes\" \"npm run dev:workflow-edges\" \"npm run dev:json-forms-renderers\"",
+    "dev:all-packages": "concurrently \"npm run dev:widgets-logic\" \"npm run dev:widgets-ui\" \"npm run dev:widget-types\" \"npm run dev:datasources-logic\" \"npm run dev:datasources-ui\" \"npm run dev:datasource-types\" \"npm run dev:workflow-nodes\" \"npm run dev:workflow-edges\" \"npm run dev:json-forms-renderers\"",
     "dev:all": "concurrently \"npm run start:f\" \"npm run start:b\" \"npm run dev:all-packages\"",
     "seed": "cd apps/backend && npm run seed",
     "test": "echo \"Error: no test specified\" && exit 1"

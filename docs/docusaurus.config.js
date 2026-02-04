@@ -38,7 +38,27 @@ const config = {
     defaultLocale: "en",
     locales: ["en"],
   },
-  plugins: [tailwindPlugin],
+
+  plugins: [
+    tailwindPlugin,
+    [
+      "docusaurus-plugin-openapi-docs",
+      {
+        id: "api",
+        docsPluginId: "classic",
+        config: {
+          jetAdmin: {
+            specPath: "../apps/backend/openapi.yaml",
+            outputDir: "docs/api-reference",
+            sidebarOptions: {
+              groupPathsBy: "tag",
+              categoryLinkSource: "tag",
+            },
+          },
+        },
+      },
+    ],
+  ],
   presets: [
     [
       "classic",
@@ -46,46 +66,19 @@ const config = {
       ({
         docs: {
           sidebarPath: "./sidebars.js",
-          // Please change this to your repo.
-          // Remove this to remove the "edit this page" links.
           editUrl: `https://github.com/${organizationName}/${projectName}/tree/main/`,
+          docItemComponent: "@theme/ApiItem",
         },
-        // blog: {
-        //   showReadingTime: true,
-        //   // Please change this to your repo.
-        //   // Remove this to remove the "edit this page" links.
-        //   editUrl: `https://github.com/${organizationName}/${projectName}/tree/main/`,
-        // },
         theme: {
           customCss: "./src/css/custom.css",
         },
       }),
     ],
-    // [
-    //   "classic",
-    //   /** @type {import('@docusaurus/preset-classic').Options} */
-    //   ({
-    //     // (...)
-    //     docs: {
-    //       // (...)
-    //       sidebarPath: './sidebars.js',
-    //       editUrl: `https://github.com/${organizationName}/${projectName}/tree/main/`,
-    //     },
-    //     blog: {
-    //       showReadingTime: true,
-    //       // (...)
-    //       editUrl: `https://github.com/${organizationName}/${projectName}/tree/main/`,
-    //     },
-    //     theme: {
-    //             customCss: './src/css/custom.css',
-    //           },
-    //   }),
-    // ],
   ],
   markdown: {
     mermaid: true,
   },
-  themes: ["@docusaurus/theme-mermaid"],
+  themes: ["@docusaurus/theme-mermaid", "docusaurus-theme-openapi-docs"],
 
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
@@ -110,7 +103,11 @@ const config = {
             position: "left",
             label: "Documentation",
           },
-          // {to: '/blog', label: 'Blog', position: 'left'},
+          {
+            to: '/docs/api-reference',
+            label: 'API Reference',
+            position: 'left',
+          },
           {
             href: "https://github.com/Jet-labs/Jet-admin",
             label: "GitHub",
@@ -128,32 +125,15 @@ const config = {
                 label: "Documentation",
                 to: "/docs/intro",
               },
+              {
+                label: "API Reference",
+                to: "/docs/api-reference",
+              },
             ],
           },
-          // {
-          //   title: 'Community',
-          //   items: [
-          //     {
-          //       label: 'Stack Overflow',
-          //       href: 'https://stackoverflow.com/questions/tagged/docusaurus',
-          //     },
-          //     {
-          //       label: 'Discord',
-          //       href: 'https://discordapp.com/invite/docusaurus',
-          //     },
-          //     {
-          //       label: 'Twitter',
-          //       href: 'https://twitter.com/docusaurus',
-          //     },
-          //   ],
-          // },
           {
             title: "More",
             items: [
-              // {
-              //   label: 'Blog',
-              //   to: '/blog',
-              // },
               {
                 label: "GitHub",
                 href: "https://github.com/Jet-labs/Jet-admin",
@@ -161,7 +141,6 @@ const config = {
             ],
           },
         ],
-        // copyright: `Copyright © ${new Date().getFullYear()} My Project, Inc. Built with Docusaurus.`,
       },
       prism: {
         theme: prismThemes.github,

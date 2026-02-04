@@ -11,7 +11,7 @@ import { CollapseComponent } from "../ui/collapseComponent";
 import { WidgetAdvancedOptions } from "./widgetAdvancedOptions";
 import PropTypes from "prop-types";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
-import { WIDGETS_MAP } from "@jet-admin/widgets";
+import { WIDGETS_MAP } from "@jet-admin/widgets-ui";
 import { WIDGET_TYPES } from "@jet-admin/widget-types";
 // import { WidgetCustomCSSForm } from "./widgetCustomCSSForm";
 

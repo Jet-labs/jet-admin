@@ -24,7 +24,7 @@ COPY packages/datasource-types/package*.json ./packages/datasource-types/
 COPY packages/datasources-logic/package*.json ./packages/datasources-logic/
 COPY packages/template-package/package*.json ./packages/template-package/
 COPY packages/widget-types/package*.json ./packages/widget-types/
-COPY packages/widgets/package*.json ./packages/widgets/
+COPY packages/widgets-logic/package*.json ./packages/widgets-logic/
 
 # Install dependencies
 RUN npm install --legacy-peer-deps

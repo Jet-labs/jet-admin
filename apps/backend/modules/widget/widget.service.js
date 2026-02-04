@@ -2,18 +2,6 @@ const Logger = require("../../utils/logger");
 const { prisma } = require("../../config/prisma.config");
 const { dataQueryService } = require("../dataQuery/dataQuery.service");
 const { workflowService } = require("../workflow/workflow.service");
-const {
-  processTextWidgetQueryResults,
-  processBarChartQueryResults,
-  processLineChartQueryResults,
-  processPieChartQueryResults,
-  processRadarChartQueryResults,
-  processPolarAreaChartQueryResults,
-  processScatterChartQueryResults,
-  processBubbleChartQueryResults,
-  processTableWidgetQueryResults,
-  processIframeWidgetQueryResults,
-} = require("@jet-admin/widgets");
 const { WIDGET_TYPES } = require("@jet-admin/widget-types");
 const { getCreationContextFromAuthContext } = require("../../utils/auth.context.utils");
 const widgetService = {};

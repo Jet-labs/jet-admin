@@ -1,0 +1,2634 @@
+openapi: 3.1.0
+info:
+  title: Jet Admin Backend API
+  version: 1.0.0
+  description: |
+    REST API for Jet Admin backend.
+    
+    ## Authentication
+    Most endpoints require authentication using a Firebase Bearer token.
+    Some endpoints may also be accessed via API Key.
+    
+    ## Authorization
+    Permissions are handled via the `authMiddleware`.
+servers:
+  - url: http://localhost:3000
+    description: Local Development Server
+tags:
+  - name: Authentication
+    description: User authentication and configuration
+  - name: Tenants
+    description: Tenant management
+  - name: Database
+    description: Database schema and raw SQL execution
+  - name: Database Tables
+    description: Table management and row operations
+  - name: Database Triggers
+    description: Database trigger management
+  - name: Datasources
+    description: Datasource connection management
+  - name: Data Queries
+    description: Data query execution and management
+  - name: Workflows
+    description: Workflow design and execution
+  - name: Widgets
+    description: Widget configuration and data
+  - name: Dashboards
+    description: Dashboard management
+  - name: User Management
+    description: Tenant user management
+  - name: Roles
+    description: Role and permission management
+  - name: API Keys
+    description: API Key management
+  - name: Cron Jobs
+    description: Cron job management and history
+  - name: Audit Logs
+    description: System audit logs
+  - name: AI
+    description: AI features
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Firebase ID Token
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: Tenant API Key
+
+  schemas:
+    # Common Schemas
+    UUID:
+      type: string
+      format: uuid
+      example: "123e4567-e89b-12d3-a456-426614174000"
+    
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              example: "INVALID_REQUEST"
+            message:
+              type: string
+              example: "Invalid request parameters"
+
+    # Auth Schemas
+    UserConfigUpdate:
+      type: object
+      properties:
+        config:
+          type: object
+          additionalProperties: true
+          description: "Arbitrary JSON configuration for the user"
+      required:
+        - config
+
+    # Tenant Schemas
+    TenantCreate:
+      type: object
+      properties:
+        tenantTitle:
+          type: string
+          maxLength: 255
+          description: "Name of the tenant"
+        tenantDescription:
+          type: string
+          description: "Description of the tenant"
+        tenantDBURL:
+          type: string
+          description: "Database connection URL"
+      required:
+        - tenantTitle
+        - tenantDBURL
+
+    TenantUpdate:
+      type: object
+      properties:
+        tenantTitle:
+          type: string
+        tenantDescription:
+          type: string
+        tenantDBURL:
+          type: string
+
+    Tenant:
+      allOf:
+        - $ref: '#/components/schemas/TenantCreate'
+        - type: object
+          properties:
+            id:
+              $ref: '#/components/schemas/UUID'
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+
+    # Database Schemas
+    DatabaseSchemaCreate:
+      type: object
+      properties:
+        schemaName:
+          type: string
+          minLength: 1
+          maxLength: 255
+      required:
+        - schemaName
+    
+    RawSqlExecute:
+      type: object
+      properties:
+        sql:
+          type: string
+          minLength: 1
+      required:
+        - sql
+
+    # Table Schemas
+    DatabaseTableCreate:
+      type: object
+      properties:
+        databaseTableName:
+          type: string
+          minLength: 1
+          maxLength: 255
+        columns:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+      required:
+        - databaseTableName
+    
+    DatabaseTableUpdate:
+      type: object
+      properties:
+        columns:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        constraints:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+    
+    BulkRowOperation:
+      type: object
+      properties:
+        databaseTableRowData:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+      required:
+        - databaseTableRowData
+
+    # Trigger Schemas
+    DatabaseTriggerCreate:
+      type: object
+      properties:
+        databaseTableName:
+          type: string
+        databaseTriggerName:
+          type: string
+        triggerTiming:
+          type: string
+        triggerEvents:
+          type: string
+        triggerFunction:
+          type: string
+        triggerCondition:
+          type: string
+      required:
+        - databaseTableName
+        - databaseTriggerName
+        - triggerTiming
+        - triggerEvents
+
+    # Datasource Schemas
+    DatasourceCreate:
+      type: object
+      properties:
+        datasourceTitle:
+          type: string
+          minLength: 1
+          maxLength: 255
+        datasourceType:
+          type: string
+          minLength: 1
+        datasourceOptions:
+          type: object
+          additionalProperties: true
+      required:
+        - datasourceTitle
+        - datasourceType
+        - datasourceOptions
+
+    DatasourceUpdate:
+      type: object
+      properties:
+        datasourceTitle:
+          type: string
+          minLength: 1
+          maxLength: 255
+        datasourceType:
+          type: string
+          minLength: 1
+        datasourceOptions:
+          type: object
+          additionalProperties: true
+
+    Datasource:
+      allOf:
+        - $ref: '#/components/schemas/DatasourceCreate'
+        - type: object
+          properties:
+            id:
+              $ref: '#/components/schemas/UUID'
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+
+    # Data Query Schemas
+    DataQueryCreate:
+      type: object
+      properties:
+        dataQueryTitle:
+          type: string
+          minLength: 1
+          maxLength: 255
+        dataQueryOptions:
+          type: object
+          additionalProperties: true
+        runOnLoad:
+          type: boolean
+      required:
+        - dataQueryTitle
+        - dataQueryOptions
+
+    DataQueryUpdate:
+      type: object
+      properties:
+        dataQueryTitle:
+          type: string
+          minLength: 1
+          maxLength: 255
+        dataQueryOptions:
+          type: object
+          additionalProperties: true
+        runOnLoad:
+          type: boolean
+
+    DataQuery:
+      allOf:
+        - $ref: '#/components/schemas/DataQueryCreate'
+        - type: object
+          properties:
+            id:
+              $ref: '#/components/schemas/UUID'
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+
+    TestDataQuery:
+      type: object
+      properties:
+        dataQuery:
+          type: object
+          additionalProperties: true
+      required:
+        - dataQuery
+
+    AIGenerateQuery:
+      type: object
+      properties:
+        aiPrompt:
+          type: string
+          minLength: 1
+      required:
+        - aiPrompt
+
+    # Workflow Schemas
+    WorkflowCreate:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 255
+        workflowDescription:
+          type: string
+        workflowNodes:
+          type: array
+          items:
+            type: object
+        workflowEdges:
+          type: array
+          items:
+            type: object
+        workflowOptions:
+          type: object
+      required:
+        - title
+
+    WorkflowUpdate:
+      type: object
+      properties:
+        workflowTitle:
+          type: string
+          minLength: 1
+          maxLength: 255
+        workflowDescription:
+          type: string
+        workflowNodes:
+          type: array
+          items:
+            type: object
+        workflowEdges:
+          type: array
+          items:
+            type: object
+        workflowOptions:
+          type: object
+    
+    WorkflowExecute:
+      type: object
+      properties:
+        args:
+          type: object
+    
+    TestWorkflow:
+      type: object
+      properties:
+        nodes:
+          type: array
+          items:
+            type: object
+        edges:
+          type: array
+          items:
+            type: object
+        workflowOptions:
+          type: object
+        args:
+          type: object
+      required:
+        - nodes
+        - edges
+    
+    Workflow:
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/WorkflowCreate'
+        - type: object
+          properties:
+            id:
+              $ref: '#/components/schemas/UUID'
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+
+    # Widget Schemas
+    WidgetCreate:
+      type: object
+      properties:
+        widgetTitle:
+          type: string
+          minLength: 1
+          maxLength: 255
+        widgetDescription:
+          type: string
+        widgetType:
+          type: string
+          minLength: 1
+        widgetConfig:
+          type: object
+      required:
+        - widgetTitle
+        - widgetType
+        - widgetConfig
+
+    WidgetUpdate:
+      type: object
+      properties:
+        widgetTitle:
+          type: string
+          minLength: 1
+          maxLength: 255
+        widgetDescription:
+          type: string
+        widgetType:
+          type: string
+          minLength: 1
+        widgetConfig:
+          type: object
+
+    TestWidgetData:
+      type: object
+      properties:
+        widgetTitle:
+          type: string
+        widgetType:
+          type: string
+        widgetConfig:
+          type: object
+    
+    Widget:
+      allOf:
+        - $ref: '#/components/schemas/WidgetCreate'
+        - type: object
+          properties:
+            id:
+              $ref: '#/components/schemas/UUID'
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+
+    # Dashboard Schemas
+    DashboardCreate:
+      type: object
+      properties:
+        dashboardTitle:
+          type: string
+          minLength: 1
+          maxLength: 255
+        dashboardDescription:
+          type: string
+        dashboardConfig:
+          type: object
+      required:
+        - dashboardTitle
+        - dashboardConfig
+    
+    DashboardUpdate:
+      type: object
+      properties:
+        dashboardTitle:
+          type: string
+          minLength: 1
+          maxLength: 255
+        dashboardDescription:
+          type: string
+        dashboardConfig:
+          type: object
+
+    Dashboard:
+      allOf:
+        - $ref: '#/components/schemas/DashboardCreate'
+        - type: object
+          properties:
+            id:
+              $ref: '#/components/schemas/UUID'
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+
+    # User Management Schemas
+    AddUserToTenant:
+      type: object
+      properties:
+        userEmail:
+          type: string
+          format: email
+        roleIDs:
+          type: array
+          items:
+            $ref: '#/components/schemas/UUID'
+      required:
+        - userEmail
+    
+    UpdateUserRoles:
+      type: object
+      properties:
+        roleIDs:
+          type: array
+          items:
+            $ref: '#/components/schemas/UUID'
+      required:
+        - roleIDs
+
+    # Role Schemas
+    RoleCreate:
+      type: object
+      properties:
+        roleName:
+          type: string
+          minLength: 1
+          maxLength: 255
+        roleDescription:
+          type: string
+        rolePermissions:
+          type: array
+          items:
+            type: string
+      required:
+        - roleName
+        - rolePermissions
+
+    RoleUpdate:
+      type: object
+      properties:
+        roleName:
+          type: string
+          minLength: 1
+          maxLength: 255
+        roleDescription:
+          type: string
+        rolePermissions:
+          type: array
+          items:
+            type: string
+    
+    Role:
+      allOf:
+        - $ref: '#/components/schemas/RoleCreate'
+        - type: object
+          properties:
+            id:
+              $ref: '#/components/schemas/UUID'
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+
+    # API Key Schemas
+    ApiKeyCreate:
+      type: object
+      properties:
+        apiKeyName:
+          type: string
+          minLength: 1
+          maxLength: 255
+        apiKeyDescription:
+          type: string
+        apiKeyPermissions:
+          type: array
+          items:
+            type: string
+        apiKeyExpiry:
+          type: string
+          format: date-time
+      required:
+        - apiKeyName
+
+    ApiKeyUpdate:
+      type: object
+      properties:
+        apiKeyName:
+          type: string
+          minLength: 1
+          maxLength: 255
+        apiKeyDescription:
+          type: string
+        apiKeyPermissions:
+          type: array
+          items:
+            type: string
+        apiKeyExpiry:
+          type: string
+          format: date-time
+
+    ApiKey:
+      allOf:
+        - $ref: '#/components/schemas/ApiKeyCreate'
+        - type: object
+          properties:
+            id:
+              $ref: '#/components/schemas/UUID'
+            key:
+              type: string
+              description: "The API key string (only returned on creation usually, depends on implementation)"
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+    
+    # Cron Job Schemas
+    CronJobCreate:
+      type: object
+      properties:
+        cronJobTitle:
+          type: string
+          minLength: 1
+          maxLength: 255
+        cronJobDescription:
+          type: string
+        cronJobSchedule:
+          type: string
+          example: "0 0 * * *"
+        cronJobEnabled:
+          type: boolean
+          default: true
+        cronJobType:
+          type: string
+          minLength: 1
+        cronJobConfig:
+          type: object
+      required:
+        - cronJobTitle
+        - cronJobSchedule
+        - cronJobType
+        - cronJobConfig
+
+    CronJobUpdate:
+      type: object
+      properties:
+        cronJobTitle:
+          type: string
+          minLength: 1
+          maxLength: 255
+        cronJobDescription:
+          type: string
+        cronJobSchedule:
+          type: string
+        cronJobEnabled:
+          type: boolean
+        cronJobType:
+          type: string
+          minLength: 1
+        cronJobConfig:
+          type: object
+    
+    CronJob:
+      allOf:
+        - $ref: '#/components/schemas/CronJobCreate'
+        - type: object
+          properties:
+            id:
+              $ref: '#/components/schemas/UUID'
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+
+security:
+  - BearerAuth: []
+
+paths:
+  # Authentication Routes
+  /api/v1/auth:
+    get:
+      tags:
+        - Authentication
+      summary: Get User Info
+      description: Retrieves information about the currently authenticated user.
+      responses:
+        '200':
+          description: User information retrieved successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '401':
+          description: Unauthorized
+
+  /api/v1/auth/config/{tenantID}:
+    get:
+      tags:
+        - Authentication
+      summary: Get User Config
+      description: Retrieves user configuration for a specific tenant.
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: User configuration retrieved successfully
+        '404':
+          description: Tenant not found
+    
+    post:
+      tags:
+        - Authentication
+      summary: Update User Config
+      description: Updates user configuration for a specific tenant.
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserConfigUpdate'
+      responses:
+        '200':
+          description: Configuration updated successfully
+
+  # Tenant Routes
+  /api/v1/tenants:
+    get:
+      tags:
+        - Tenants
+      summary: Get All User Tenants
+      description: Retrieves all tenants the user belongs to.
+      responses:
+        '200':
+          description: List of tenants
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Tenant'
+    
+    post:
+      tags:
+        - Tenants
+      summary: Create New Tenant
+      description: Creates a new tenant.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TenantCreate'
+      responses:
+        '201':
+          description: Tenant created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tenant'
+
+  /api/v1/tenants/{tenantID}:
+    get:
+      tags:
+        - Tenants
+      summary: Get Tenant by ID
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Tenant details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Tenant'
+    
+    patch:
+      tags:
+        - Tenants
+      summary: Update Tenant
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TenantUpdate'
+      responses:
+        '200':
+          description: Tenant updated successfully
+    
+    delete:
+      tags:
+        - Tenants
+      summary: Delete Tenant
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Tenant deleted successfully
+
+  /api/v1/tenants/dbtest:
+    patch:
+      tags:
+        - Tenants
+      summary: Test Database Connection
+      description: Tests the database connection string.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tenantDBURL:
+                  type: string
+              required:
+                - tenantDBURL
+      responses:
+        '200':
+          description: Connection successful
+
+  # Database Routes
+  /api/v1/tenants/{tenantID}/database/metadata:
+    get:
+      tags:
+        - Database
+      summary: Get Database Metadata
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Database metadata
+    
+  /api/v1/tenants/{tenantID}/database/schemas:
+    post:
+      tags:
+        - Database
+      summary: Create Database Schema
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DatabaseSchemaCreate'
+      responses:
+        '201':
+          description: Schema created successfully
+
+  /api/v1/tenants/{tenantID}/database/execute-raw-sql:
+    post:
+      tags:
+        - Database
+      summary: Execute Raw SQL
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RawSqlExecute'
+      responses:
+        '200':
+          description: Query executed successfully
+
+  # Database Table Routes
+  /api/v1/tenants/{tenantID}/database/schemas/{databaseSchemaName}/tables:
+    get:
+      tags:
+        - Database Tables
+      summary: Get All Tables
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: databaseSchemaName
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of tables
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+
+    post:
+      tags:
+        - Database Tables
+      summary: Create Table
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: databaseSchemaName
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DatabaseTableCreate'
+      responses:
+        '201':
+          description: Table created successfully
+
+  /api/v1/tenants/{tenantID}/database/schemas/{databaseSchemaName}/tables/{databaseTableName}:
+    get:
+      tags:
+        - Database Tables
+      summary: Get Table Details
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: databaseSchemaName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: databaseTableName
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Table details
+
+    patch:
+      tags:
+        - Database Tables
+      summary: Update Table
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: databaseSchemaName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: databaseTableName
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DatabaseTableUpdate'
+      responses:
+        '200':
+          description: Table updated successfully
+
+    delete:
+      tags:
+        - Database Tables
+      summary: Delete Table
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: databaseSchemaName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: databaseTableName
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Table deleted successfully
+
+  /api/v1/tenants/{tenantID}/database/schemas/{databaseSchemaName}/tables/{databaseTableName}/rows:
+    get:
+      tags:
+        - Database Tables
+      summary: Get Table Rows
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: databaseSchemaName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: databaseTableName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            default: 100
+      responses:
+        '200':
+          description: List of rows
+
+    post:
+      tags:
+        - Database Tables
+      summary: Add Rows
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: databaseSchemaName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: databaseTableName
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkRowOperation'
+      responses:
+        '201':
+          description: Rows added successfully
+
+    patch:
+      tags:
+        - Database Tables
+      summary: Update Rows
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: databaseSchemaName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: databaseTableName
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BulkRowOperation'
+      responses:
+        '200':
+          description: Rows updated successfully
+
+  # Database Trigger Routes
+  /api/v1/tenants/{tenantID}/database/schemas/{databaseSchemaName}/triggers:
+    get:
+      tags:
+        - Database Triggers
+      summary: Get All Triggers
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: databaseSchemaName
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of triggers
+
+    post:
+      tags:
+        - Database Triggers
+      summary: Create Trigger
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: databaseSchemaName
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DatabaseTriggerCreate'
+      responses:
+        '201':
+          description: Trigger created successfully
+
+  /api/v1/tenants/{tenantID}/database/schemas/{databaseSchemaName}/triggers/{databaseTableName}/{databaseTriggerName}:
+    get:
+      tags:
+        - Database Triggers
+      summary: Get Trigger
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: databaseSchemaName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: databaseTableName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: databaseTriggerName
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Trigger details
+
+    delete:
+      tags:
+        - Database Triggers
+      summary: Delete Trigger
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: databaseSchemaName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: databaseTableName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: databaseTriggerName
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Trigger deleted successfully
+
+  # Datasource Routes
+  /api/v1/tenants/{tenantID}/datasources:
+    get:
+      tags:
+        - Datasources
+      summary: Get All Datasources
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: List of datasources
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Datasource'
+    
+    post:
+      tags:
+        - Datasources
+      summary: Create Datasource
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DatasourceCreate'
+      responses:
+        '201':
+          description: Datasource created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Datasource'
+
+  /api/v1/tenants/{tenantID}/datasources/{datasourceID}:
+    get:
+      tags:
+        - Datasources
+      summary: Get Datasource
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: datasourceID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Datasource details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Datasource'
+    
+    patch:
+      tags:
+        - Datasources
+      summary: Update Datasource
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: datasourceID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DatasourceUpdate'
+      responses:
+        '200':
+          description: Datasource updated successfully
+    
+    delete:
+      tags:
+        - Datasources
+      summary: Delete Datasource
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: datasourceID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Datasource deleted successfully
+
+  /api/v1/tenants/{tenantID}/datasources/{datasourceID}/clone:
+    post:
+      tags:
+        - Datasources
+      summary: Clone Datasource
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: datasourceID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Datasource cloned successfully
+
+  /api/v1/tenants/{tenantID}/datasources/test:
+    post:
+      tags:
+        - Datasources
+      summary: Test Datasource Connection
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                datasourceType:
+                  type: string
+                datasourceOptions:
+                  type: object
+              required:
+                - datasourceType
+                - datasourceOptions
+      responses:
+        '200':
+          description: Connection successful
+
+  # Data Query Routes
+  /api/v1/tenants/{tenantID}/queries:
+    get:
+      tags:
+        - Data Queries
+      summary: Get All Data Queries
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: List of data queries
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DataQuery'
+    
+    post:
+      tags:
+        - Data Queries
+      summary: Create Data Query
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DataQueryCreate'
+      responses:
+        '201':
+          description: Data query created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataQuery'
+
+  /api/v1/tenants/{tenantID}/queries/bulk:
+    post:
+      tags:
+        - Data Queries
+      summary: Bulk Create Data Queries
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/DataQueryCreate'
+      responses:
+        '201':
+          description: Bulk creation successful
+
+  /api/v1/tenants/{tenantID}/queries/queryTest:
+    patch:
+      tags:
+        - Data Queries
+      summary: Test Data Query By Data
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TestDataQuery'
+      responses:
+        '200':
+          description: Query executed successfully
+
+  /api/v1/tenants/{tenantID}/queries/aigenerate:
+    patch:
+      tags:
+        - Data Queries
+      summary: Generate Query with AI
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AIGenerateQuery'
+      responses:
+        '200':
+          description: Query generated successfully
+
+  /api/v1/tenants/{tenantID}/queries/{dataQueryID}:
+    get:
+      tags:
+        - Data Queries
+      summary: Get Data Query
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: dataQueryID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Data query details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataQuery'
+    
+    patch:
+      tags:
+        - Data Queries
+      summary: Update Data Query
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: dataQueryID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DataQueryUpdate'
+      responses:
+        '200':
+          description: Data query updated successfully
+    
+    delete:
+      tags:
+        - Data Queries
+      summary: Delete Data Query
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: dataQueryID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Data query deleted successfully
+
+  /api/v1/tenants/{tenantID}/queries/{dataQueryID}/clone:
+    post:
+      tags:
+        - Data Queries
+      summary: Clone Data Query
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: dataQueryID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Data query cloned successfully
+
+  /api/v1/tenants/{tenantID}/queries/{dataQueryID}/queryTest:
+    post:
+      tags:
+        - Data Queries
+      summary: Run Data Query
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: dataQueryID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Query executed successfully
+
+  # Workflow Routes
+  /api/v1/tenants/{tenantID}/workflows:
+    get:
+      tags:
+        - Workflows
+      summary: Get All Workflows
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: List of workflows
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Workflow'
+
+    post:
+      tags:
+        - Workflows
+      summary: Create Workflow
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowCreate'
+      responses:
+        '201':
+          description: Workflow created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workflow'
+
+  /api/v1/tenants/{tenantID}/workflows/{workflowID}:
+    get:
+      tags:
+        - Workflows
+      summary: Get Workflow
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: workflowID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Workflow details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Workflow'
+
+    patch:
+      tags:
+        - Workflows
+      summary: Update Workflow
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: workflowID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowUpdate'
+      responses:
+        '200':
+          description: Workflow updated successfully
+
+    delete:
+      tags:
+        - Workflows
+      summary: Delete Workflow
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: workflowID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Workflow deleted successfully
+
+  /api/v1/tenants/{tenantID}/workflows/{workflowID}/execute:
+    post:
+      tags:
+        - Workflows
+      summary: Execute Workflow
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: workflowID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowExecute'
+      responses:
+        '200':
+          description: Workflow execution started
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  instanceID:
+                    $ref: '#/components/schemas/UUID'
+
+  /api/v1/tenants/{tenantID}/workflows/instances/{instanceID}:
+    get:
+      tags:
+        - Workflows
+      summary: Get Run Status
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: instanceID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Workflow run status
+
+  /api/v1/tenants/{tenantID}/workflows/test:
+    post:
+      tags:
+        - Workflows
+      summary: Test Workflow
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TestWorkflow'
+      responses:
+        '200':
+          description: Test returned successfully
+
+  # Widget Routes
+  /api/v1/tenants/{tenantID}/widgets:
+    get:
+      tags:
+        - Widgets
+      summary: Get All Widgets
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: List of widgets
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Widget'
+
+    post:
+      tags:
+        - Widgets
+      summary: Create Widget
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WidgetCreate'
+      responses:
+        '201':
+          description: Widget created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Widget'
+
+  /api/v1/tenants/{tenantID}/widgets/{widgetID}:
+    get:
+      tags:
+        - Widgets
+      summary: Get Widget
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: widgetID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Widget details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Widget'
+
+    patch:
+      tags:
+        - Widgets
+      summary: Update Widget
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: widgetID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WidgetUpdate'
+      responses:
+        '200':
+          description: Widget updated successfully
+
+    delete:
+      tags:
+        - Widgets
+      summary: Delete Widget
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: widgetID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Widget deleted successfully
+
+  /api/v1/tenants/{tenantID}/widgets/{widgetID}/data:
+    get:
+      tags:
+        - Widgets
+      summary: Get Widget Data
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: widgetID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Widget data
+
+  /api/v1/tenants/{tenantID}/widgets/data:
+    post:
+      tags:
+        - Widgets
+      summary: Get Widget Data (Dynamic)
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TestWidgetData'
+      responses:
+        '200':
+          description: Widget data
+
+  # Dashboard Routes
+  /api/v1/tenants/{tenantID}/dashboards:
+    get:
+      tags:
+        - Dashboards
+      summary: Get All Dashboards
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: List of dashboards
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Dashboard'
+
+    post:
+      tags:
+        - Dashboards
+      summary: Create Dashboard
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DashboardCreate'
+      responses:
+        '201':
+          description: Dashboard created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dashboard'
+
+  /api/v1/tenants/{tenantID}/dashboards/{dashboardID}:
+    get:
+      tags:
+        - Dashboards
+      summary: Get Dashboard
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: dashboardID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Dashboard details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Dashboard'
+
+    patch:
+      tags:
+        - Dashboards
+      summary: Update Dashboard
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: dashboardID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DashboardUpdate'
+      responses:
+        '200':
+          description: Dashboard updated successfully
+
+    delete:
+      tags:
+        - Dashboards
+      summary: Delete Dashboard
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: dashboardID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Dashboard deleted successfully
+
+  # User Management Routes
+  /api/v1/tenants/{tenantID}/users:
+    get:
+      tags:
+        - User Management
+      summary: Get All Tenant Users
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: List of tenant users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+
+    post:
+      tags:
+        - User Management
+      summary: Add User to Tenant
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddUserToTenant'
+      responses:
+        '201':
+          description: User added successfully
+
+  /api/v1/tenants/{tenantID}/users/{tenantUserID}:
+    get:
+      tags:
+        - User Management
+      summary: Get Tenant User
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: tenantUserID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Tenant user details
+
+    delete:
+      tags:
+        - User Management
+      summary: Remove User from Tenant
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: tenantUserID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: User removed successfully
+
+  /api/v1/tenants/{tenantID}/users/{tenantUserID}/roles:
+    patch:
+      tags:
+        - User Management
+      summary: Update User Roles
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: tenantUserID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateUserRoles'
+      responses:
+        '200':
+          description: User roles updated successfully
+
+  # Role Routes
+  /api/v1/tenants/{tenantID}/roles:
+    get:
+      tags:
+        - Roles
+      summary: Get All Roles
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: List of roles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Role'
+
+    post:
+      tags:
+        - Roles
+      summary: Create Role
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleCreate'
+      responses:
+        '201':
+          description: Role created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+
+  /api/v1/tenants/{tenantID}/roles/permissions:
+    get:
+      tags:
+        - Roles
+      summary: Get All Permissions
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: List of available permissions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+
+  /api/v1/tenants/{tenantID}/roles/{roleID}:
+    get:
+      tags:
+        - Roles
+      summary: Get Role
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: roleID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Role details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Role'
+
+    patch:
+      tags:
+        - Roles
+      summary: Update Role
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: roleID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RoleUpdate'
+      responses:
+        '200':
+          description: Role updated successfully
+
+    delete:
+      tags:
+        - Roles
+      summary: Delete Role
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: roleID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Role deleted successfully
+
+  # API Key Routes
+  /api/v1/tenants/{tenantID}/apikeys:
+    get:
+      tags:
+        - API Keys
+      summary: Get All API Keys
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: List of API keys
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ApiKey'
+
+    post:
+      tags:
+        - API Keys
+      summary: Create API Key
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApiKeyCreate'
+      responses:
+        '201':
+          description: API Key created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiKey'
+
+  /api/v1/tenants/{tenantID}/apikeys/{apiKeyID}:
+    get:
+      tags:
+        - API Keys
+      summary: Get API Key
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: apiKeyID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: API Key details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiKey'
+
+    patch:
+      tags:
+        - API Keys
+      summary: Update API Key
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: apiKeyID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApiKeyUpdate'
+      responses:
+        '200':
+          description: API Key updated successfully
+
+    delete:
+      tags:
+        - API Keys
+      summary: Delete API Key
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: apiKeyID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: API Key deleted successfully
+
+  # Cron Job Routes
+  /api/v1/tenants/{tenantID}/cronjobs:
+    get:
+      tags:
+        - Cron Jobs
+      summary: Get All Cron Jobs
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: List of cron jobs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CronJob'
+
+    post:
+      tags:
+        - Cron Jobs
+      summary: Create Cron Job
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CronJobCreate'
+      responses:
+        '201':
+          description: Cron job created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CronJob'
+
+  /api/v1/tenants/{tenantID}/cronjobs/{cronJobID}:
+    get:
+      tags:
+        - Cron Jobs
+      summary: Get Cron Job
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: cronJobID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Cron job details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CronJob'
+
+    patch:
+      tags:
+        - Cron Jobs
+      summary: Update Cron Job
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: cronJobID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CronJobUpdate'
+      responses:
+        '200':
+          description: Cron job updated successfully
+
+    delete:
+      tags:
+        - Cron Jobs
+      summary: Delete Cron Job
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: cronJobID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Cron job deleted successfully
+
+  /api/v1/tenants/{tenantID}/cronjobs/logs/{cronJobID}:
+    get:
+      tags:
+        - Cron Jobs
+      summary: Get Cron Job Logs
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: cronJobID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+        - name: page
+          in: query
+          schema:
+            type: integer
+            default: 1
+        - name: pageSize
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: Cron job execution history
+
+  # Audit Log Routes
+  /api/v1/tenants/{tenantID}/audit:
+    get:
+      tags:
+        - Audit Logs
+      summary: Get Audit Logs
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: List of audit logs
+
+  # AI Routes
+  /api/v1/tenants/{tenantID}/ai/chat_room:
+    get:
+      tags:
+        - AI
+      summary: Create AI Chat Room
+      parameters:
+        - name: tenantID
+          in: path
+          required: true
+          schema:
+            $ref: '#/components/schemas/UUID'
+      responses:
+        '200':
+          description: Chat room created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  chatRoomID:
+                    type: string
+                    format: uuid

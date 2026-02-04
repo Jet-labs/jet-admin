@@ -1,4 +1,4 @@
-import { WIDGETS_MAP } from "@jet-admin/widgets";
+import { WIDGETS_MAP } from "@jet-admin/widgets-ui";
 import PropTypes from "prop-types";
 import React from "react";
 import { FiExternalLink } from "react-icons/fi";

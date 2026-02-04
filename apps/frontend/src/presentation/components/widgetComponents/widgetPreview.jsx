@@ -3,7 +3,7 @@ import React, { useCallback, useRef } from "react";
 import { FiRefreshCcw } from "react-icons/fi";
 import { CONSTANTS } from "../../../constants";
 import PropTypes from "prop-types";
-import { WIDGETS_MAP } from "@jet-admin/widgets";
+import { WIDGETS_MAP } from "@jet-admin/widgets-ui";
 
 export const WidgetPreview = ({
   tenantID,

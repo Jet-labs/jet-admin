@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useMemo, useEffect } from "react";
 
-import { WIDGETS_MAP } from "@jet-admin/widgets";
+import { WIDGETS_MAP } from "@jet-admin/widgets-ui";
 import { useQuery } from "@tanstack/react-query";
 import PropTypes from "prop-types";
 import { CONSTANTS } from "../../../constants";
