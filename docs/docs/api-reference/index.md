@@ -21,6 +21,19 @@ The API is organized around RESTful principles.
 - **Base URL**: `http://localhost:3000/api/v1` (Development)
 - **Response Format**: JSON
 
+## API Specifications
+
+Download the complete API specifications for use in your favorite API tools:
+
+| Specification | Description | Download |
+|---------------|-------------|----------|
+| **OpenAPI 3.1** | Complete REST API specification | [openapi.yaml](/specs/openapi.yaml) |
+| **AsyncAPI 2.6** | WebSocket events specification | [socket-events.yaml](/specs/socket-events.yaml) |
+
+:::tip Import into API Tools
+You can import these specifications into tools like **Postman**, **Insomnia**, **Swagger UI**, or **Stoplight** for interactive API exploration and testing.
+:::
+
 ## Sections
 
 ### [Authentication](/docs/api-reference/authentication)

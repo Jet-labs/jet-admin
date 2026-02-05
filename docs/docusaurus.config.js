@@ -48,7 +48,7 @@ const config = {
         docsPluginId: "classic",
         config: {
           jetAdmin: {
-            specPath: "../apps/backend/openapi.yaml",
+            specPath: "./static/specs/openapi.yaml",
             outputDir: "docs/api-reference",
             sidebarOptions: {
               groupPathsBy: "tag",

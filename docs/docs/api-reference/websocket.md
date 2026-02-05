@@ -13,6 +13,10 @@ The Jet Admin backend provides a real-time WebSocket API using [Socket.IO](https
 - **Widget-Workflow Bridge**: Interactive visualization and control of workflows from the dashboard.
 - **Monitoring**: System logs and metrics (admin only).
 
+:::info AsyncAPI Specification
+The complete WebSocket API is documented using AsyncAPI 2.6  specification. Download the specification file: **[socket-events.yaml](/specs/socket-events.yaml)**
+:::
+
 ## Connection
 
 Connect to the WebSocket server using a Socket.IO client.
