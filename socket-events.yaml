@@ -14,15 +14,15 @@ info:
 
 servers:
   dev:
-    url: http://localhost:3000
-    protocol: socket.io
+    url: ws://localhost:3000
+    protocol: ws
     description: Local Development Server
 
 channels:
   # AI Module Channels
   ai_chat_room_join:
     description: Join an AI chat room for a specific user.
-    publish:
+    subscribe:
       message:
         name: JoinChatRoom
         payload:
@@ -31,10 +31,12 @@ channels:
             firebaseID:
               type: string
               description: User's Firebase ID
+          required:
+            - firebaseID
   
   ai_chat_room_id:
     description: Response sending the Chat Room ID after joining.
-    subscribe:
+    publish:
       message:
         name: ChatRoomID
         payload:
@@ -43,10 +45,12 @@ channels:
             chatRoomID:
               type: string
               format: uuid
+          required:
+            - chatRoomID
 
   ai_chat_user_message:
     description: User sends a message to the AI bot.
-    publish:
+    subscribe:
       message:
         name: UserMessage
         payload:
@@ -67,10 +71,14 @@ channels:
               type: string
             tenantID:
               type: string
+          required:
+            - message
+            - chatRoomID
+            - firebaseID
   
   ai_chat_bot_message:
     description: AI bot responds to the user.
-    subscribe:
+    publish:
       message:
         name: BotMessage
         payload:
@@ -78,11 +86,13 @@ channels:
           properties:
             text:
               type: string
+          required:
+            - text
 
   # Workflow Module Channels
   workflow_run_join:
     description: Join a room to listen for updates on a specific workflow run.
-    publish:
+    subscribe:
       message:
         name: JoinWorkflowRun
         payload:
@@ -93,10 +103,13 @@ channels:
               format: uuid
             firebaseID:
               type: string
+          required:
+            - runId
+            - firebaseID
 
   workflow_node_update:
     description: Real-time update when a workflow node finishes execution.
-    subscribe:
+    publish:
       message:
         name: NodeUpdate
         payload:
@@ -114,10 +127,14 @@ channels:
               type: object
             error:
               type: string
+          required:
+            - instanceID
+            - nodeID
+            - status
 
   workflow_status_update:
     description: Notification when the entire workflow execution finishes.
-    subscribe:
+    publish:
       message:
         name: WorkflowStatusUpdate
         payload:
@@ -131,11 +148,14 @@ channels:
               enum: [COMPLETED, FAILED]
             contextData:
               type: object
+          required:
+            - instanceID
+            - status
 
   # Widget Module Channels (Widget-Workflow Bridge)
   widget_workflow_connect:
     description: Connect a widget to a workflow instance (start new, subscribe, or replay).
-    publish:
+    subscribe:
       message:
         name: ConnectWidget
         payload:
@@ -165,10 +185,16 @@ channels:
               type: object
             parameters:
               type: object
+          required:
+            - widgetID
+            - workflowID
+            - mode
+            - tenantID
+            - firebaseID
 
   widget_workflow_connected:
     description: Confirmation that widget is successfully connected.
-    subscribe:
+    publish:
       message:
         name: WidgetConnected
         payload:
@@ -191,10 +217,15 @@ channels:
               type: object
             workflowMeta:
               type: object
+          required:
+            - widgetID
+            - instanceID
+            - workflowID
+            - mode
 
   widget_send_input:
     description: Send interactive input from a widget to the running workflow.
-    publish:
+    subscribe:
       message:
         name: WidgetInput
         payload:
@@ -210,10 +241,14 @@ channels:
               type: string
             data:
               type: object
+          required:
+            - widgetID
+            - instanceID
+            - inputType
 
   widget_input_received:
     description: Acknowledgment that widget input was received.
-    subscribe:
+    publish:
       message:
         name: InputReceived
         payload:
@@ -229,10 +264,14 @@ channels:
               type: string
             success:
               type: boolean
+          required:
+            - widgetID
+            - instanceID
+            - success
 
   widget_refresh:
     description: Request to re-execute the workflow for a widget.
-    publish:
+    subscribe:
       message:
         name: WidgetRefresh
         payload:
@@ -245,10 +284,13 @@ channels:
               type: object
             tenantID:
               type: string
+          required:
+            - widgetID
+            - tenantID
 
   widget_workflow_disconnect:
     description: Disconnect the widget from the workflow.
-    publish:
+    subscribe:
       message:
         name: DisconnectWidget
         payload:
@@ -257,10 +299,12 @@ channels:
             widgetID:
               type: string
               format: uuid
+          required:
+            - widgetID
   
   widget_workflow_disconnected:
     description: Confirmation of disconnection.
-    subscribe:
+    publish:
       message:
         name: WidgetDisconnected
         payload:
@@ -271,10 +315,13 @@ channels:
               format: uuid
             success:
               type: boolean
+          required:
+            - widgetID
+            - success
 
   widget_workflow_error:
     description: Error notification for widget operations.
-    subscribe:
+    publish:
       message:
         name: WidgetError
         payload:
@@ -290,11 +337,17 @@ channels:
                   type: string
                 message:
                   type: string
+              required:
+                - code
+                - message
+          required:
+            - widgetID
+            - error
 
   # Monitor Module Channels (Namespace: /monitor)
-  /monitor#log:
+  monitor_log:
     description: System monitoring logs streamed via RabbitMQ (Monitor Namespace).
-    subscribe:
+    publish:
       message:
         name: MonitorLog
         payload:
@@ -306,3 +359,7 @@ channels:
               type: object
             timestamp:
               type: integer
+          required:
+            - routingKey
+            - content
+            - timestamp
