@@ -867,6 +867,10 @@ export const CONSTANTS = {
       code: "/tenants/:tenantID/raw-sql-query",
       path: (tenantID) => `/tenants/${tenantID}/raw-sql-query`,
     },
+    DATABASE_CHAT: {
+      code: "/tenants/:tenantID/database-chat",
+      path: (tenantID) => `/tenants/${tenantID}/database-chat`,
+    },
     VIEW_WORKFLOWS: {
       code: "/tenants/:tenantID/workflows",
       path: (tenantID) => `/tenants/${tenantID}/workflows`,
@@ -919,6 +923,51 @@ export const CONSTANTS = {
         databaseTriggerName
       ) =>
         `/tenants/${tenantID}/schemas/${databaseSchemaName}/triggers/${databaseTableName}/${databaseTriggerName}`,
+    },
+    VIEW_DATABASE_VIEWS: {
+      code: "/tenants/:tenantID/schemas/:databaseSchemaName/views",
+      path: (tenantID, databaseSchemaName) =>
+        `/tenants/${tenantID}/schemas/${databaseSchemaName}/views`,
+    },
+    VIEW_DATABASE_VIEW_BY_NAME: {
+      code: "/tenants/:tenantID/schemas/:databaseSchemaName/views/:databaseViewName",
+      path: (tenantID, databaseSchemaName, databaseViewName) =>
+        `/tenants/${tenantID}/schemas/${databaseSchemaName}/views/${databaseViewName}`,
+    },
+    ADD_DATABASE_VIEW: {
+      code: "/tenants/:tenantID/schemas/:databaseSchemaName/views/add",
+      path: (tenantID, databaseSchemaName) =>
+        `/tenants/${tenantID}/schemas/${databaseSchemaName}/views/add`,
+    },
+    VIEW_STORED_PROCEDURES: {
+      code: "/tenants/:tenantID/schemas/:databaseSchemaName/procedures",
+      path: (tenantID, databaseSchemaName) =>
+        `/tenants/${tenantID}/schemas/${databaseSchemaName}/procedures`,
+    },
+    VIEW_STORED_PROCEDURE_BY_NAME: {
+      code: "/tenants/:tenantID/schemas/:databaseSchemaName/procedures/:procedureName",
+      path: (tenantID, databaseSchemaName, procedureName) =>
+        `/tenants/${tenantID}/schemas/${databaseSchemaName}/procedures/${procedureName}`,
+    },
+    ADD_STORED_PROCEDURE: {
+      code: "/tenants/:tenantID/schemas/:databaseSchemaName/procedures/add",
+      path: (tenantID, databaseSchemaName) =>
+        `/tenants/${tenantID}/schemas/${databaseSchemaName}/procedures/add`,
+    },
+    VIEW_FUNCTIONS: {
+      code: "/tenants/:tenantID/schemas/:databaseSchemaName/functions",
+      path: (tenantID, databaseSchemaName) =>
+        `/tenants/${tenantID}/schemas/${databaseSchemaName}/functions`,
+    },
+    VIEW_FUNCTION_BY_NAME: {
+      code: "/tenants/:tenantID/schemas/:databaseSchemaName/functions/:functionName",
+      path: (tenantID, databaseSchemaName, functionName) =>
+        `/tenants/${tenantID}/schemas/${databaseSchemaName}/functions/${functionName}`,
+    },
+    ADD_FUNCTION: {
+      code: "/tenants/:tenantID/schemas/:databaseSchemaName/functions/add",
+      path: (tenantID, databaseSchemaName) =>
+        `/tenants/${tenantID}/schemas/${databaseSchemaName}/functions/add`,
     },
     ADD_DATASOURCE: {
       code: "/tenants/:tenantID/datasources/add",
@@ -1111,19 +1160,6 @@ export const CONSTANTS = {
         `/api/v1/tenants/${tenantID}/users/${tenantUserID}/roles`,
       removeTenantUserByIDAPI: (tenantID, tenantUserID) =>
         `/api/v1/tenants/${tenantID}/users/${tenantUserID}`,
-    },
-    API_KEY: {
-      getAllAPIKeysAPI: (tenantID, page, pageSize) =>
-        `/api/v1/tenants/${tenantID}/apikeys?page=${page}&pageSize=${pageSize}`,
-      createAPIKeyAPI: (tenantID) => `/api/v1/tenants/${tenantID}/apikeys/`,
-      getAPIKeyByIDAPI: (tenantID, apiKeyID) =>
-        `/api/v1/tenants/${tenantID}/apikeys/${apiKeyID}`,
-      updateAPIKeyByIDAPI: (tenantID, apiKeyID) =>
-        `/api/v1/tenants/${tenantID}/apikeys/${apiKeyID}`,
-      updateAPIKeyRolesByIDAPI: (tenantID, apiKeyID) =>
-        `/api/v1/tenants/${tenantID}/apikeys/${apiKeyID}/roles`,
-      deleteAPIKeyByIDAPI: (tenantID, apiKeyID) =>
-        `/api/v1/tenants/${tenantID}/apikeys/${apiKeyID}`,
     },
     CRON_JOB: {
       getAllCronJobsAPI: (tenantID, page, pageSize) =>
@@ -1755,6 +1791,9 @@ export const CONSTANTS = {
       "DATABASE_NOTIFICATION_LAYOUT_SEPARATION",
     DATABASE_CRON_JOB_LAYOUT_SEPARATION: "DATABASE_CRON_JOB_LAYOUT_SEPARATION",
     DATABASE_API_KEY_LAYOUT_SEPARATION: "DATABASE_API_KEY_LAYOUT_SEPARATION",
+    DATABASE_VIEW_LAYOUT_SEPARATION: "DATABASE_VIEW_LAYOUT_SEPARATION",
+    STORED_PROCEDURE_LAYOUT_SEPARATION: "STORED_PROCEDURE_LAYOUT_SEPARATION",
+    DATABASE_FUNCTION_LAYOUT_SEPARATION: "DATABASE_FUNCTION_LAYOUT_SEPARATION",
   },
 
   PG_TRIGGER_FORM_TIMING_OPTIONS: ["BEFORE", "AFTER", "INSTEAD OF"],

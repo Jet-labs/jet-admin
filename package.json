@@ -3,22 +3,12 @@
   "version": "1.1.0",
   "main": "index.js",
   "workspaces": [
-    "apps/*",
-    "packages/*"
+    "apps/*"
   ],
   "scripts": {
     "start:f": "cd apps/frontend && npm run dev",
     "start:b": "cd apps/backend && npm run dev-w",
     "start:all": "concurrently \"npm run start:f\" \"npm run start:b\"",
-    "dev:widgets": "cd packages/widgets && npm run dev",
-    "dev:widget-types": "cd packages/widget-types && npm run dev",
-    "dev:datasources-logic": "cd packages/datasources-logic && npm run dev",
-    "dev:datasources-ui": "cd packages/datasources-ui && npm run dev",
-    "dev:datasource-types": "cd packages/datasource-types && npm run dev",
-    "dev:workflow-nodes": "cd packages/workflow-nodes && npm run dev",
-    "dev:workflow-edges": "cd packages/workflow-edges && npm run dev",
-    "dev:all-packages": "concurrently \"npm run dev:widgets\" \"npm run dev:widget-types\" \"npm run dev:datasources-logic\" \"npm run dev:datasources-ui\" \"npm run dev:datasource-types\" \"npm run dev:workflow-nodes\" \"npm run dev:workflow-edges\"",
-    "dev:all": "concurrently \"npm run start:f\" \"npm run start:b\" \"npm run dev:all-packages\"",
     "seed": "cd apps/backend && npm run seed",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -27,10 +17,5 @@
   "description": "",
   "devDependencies": {
     "concurrently": "^9.1.2"
-  },
-  "dependencies": {
-    "acorn": "^8.14.1",
-    "estree-walker": "^3.0.3",
-    "handlebars": "^4.7.8"
   }
 }

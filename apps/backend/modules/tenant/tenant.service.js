@@ -112,22 +112,7 @@ tenantService.deleteUserTenantByID = async ({ userID, tenantID }) => {
     });
 
     const tenantDeletionTransaction = await prisma.$transaction([
-      prisma.tblWidgetQueryMappings.deleteMany({
-        where: {
-          OR: [
-            { tblDataQueries: { tenantID: tenantIdToDelete } },
-            { tblWidgets: { tenantID: tenantIdToDelete } },
-          ],
-        },
-      }),
-      prisma.tblAPIKeyRoleMappings.deleteMany({
-        where: {
-          OR: [
-            { tblAPIKeys: { tenantID: tenantIdToDelete } },
-            { tblRoles: { tenantID: tenantIdToDelete } },
-          ],
-        },
-      }),
+
       prisma.tblRolePermissionMappings.deleteMany({
         where: {
           tblRoles: { tenantID: tenantIdToDelete },
@@ -138,42 +123,7 @@ tenantService.deleteUserTenantByID = async ({ userID, tenantID }) => {
           tenantID: tenantIdToDelete,
         },
       }),
-      prisma.tblUserNotifications.deleteMany({
-        where: {
-          tenantID: tenantIdToDelete,
-        },
-      }),
       prisma.tblUserTenantConfigMap.deleteMany({
-        where: {
-          tenantID: tenantIdToDelete,
-        },
-      }),
-      prisma.tblUsersTenantsRelationship.deleteMany({
-        where: {
-          tenantID: tenantIdToDelete,
-        },
-      }),
-      prisma.tblAPIKeys.deleteMany({
-        where: {
-          tenantID: tenantIdToDelete,
-        },
-      }),
-      prisma.tblWidgets.deleteMany({
-        where: {
-          tenantID: tenantIdToDelete,
-        },
-      }),
-      prisma.tblDashboards.deleteMany({
-        where: {
-          tenantID: tenantIdToDelete,
-        },
-      }),
-      prisma.tblDatabaseNotifications.deleteMany({
-        where: {
-          tenantID: tenantIdToDelete,
-        },
-      }),
-      prisma.tblDataQueries.deleteMany({
         where: {
           tenantID: tenantIdToDelete,
         },

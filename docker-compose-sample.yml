@@ -6,9 +6,20 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8090:8090"  # Backend API
-      - "3000:80"    # Frontend
+      - "3000:80"    # Frontend HTTP
+      - "443:443"    # Frontend HTTPS
     image: jet-admin-image
     container_name: jet-admin-container
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8090/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+    volumes:
+      - jet-admin-logs:/apps/backend/logs
+      - ssl-certs:/etc/nginx/ssl
     environment:
       # Server Configuration
       - NODE_ENV=production
@@ -25,11 +36,14 @@ services:
       - EXPRESS_REQUEST_SIZE_LIMIT=5mb
       
       # Database Configuration
+      # DATABASE_URL is required - set your PostgreSQL connection string
       - DATABASE_URL=
-      - SEED_DATABASE=true
+      # SEED_DATABASE: Set to 'true' ONLY for the first container to run migrations and seed data
+      # For additional containers connecting to the same database, keep this as 'false'
+      - SEED_DATABASE=false
       
       # CORS Settings
-      - CORS_WHITELIST=http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173,http://127.0.0.1:3001,http://localhost:3001
+      - CORS_WHITELIST=http://localhost:3000,http://127.0.0.1:3000,http://localhost:5173,http://127.0.0.1:3001,http://localhost:3001,https://localhost,https://localhost:443
       
       # Logging Configuration
       - SYSLOG_HOST=127.0.0.1
@@ -45,3 +59,12 @@ services:
 
       # AI configuration
       - GEMINI_API_KEY=
+
+      # SSL Configuration (optional - for custom domain)
+      - SSL_CERT_CN=localhost
+
+volumes:
+  jet-admin-logs:
+    driver: local
+  ssl-certs:
+    driver: local

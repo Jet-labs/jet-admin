@@ -21,14 +21,15 @@ export const AIChatMessageBubble = React.memo(({ message, sendApproval, isTyping
 
     return (
         <Fade in={true} timeout={300}>
-            <div className={`flex gap-3 mb-6 ${isUser ? 'justify-end' : 'justify-start'}`}>
+            <div className={`flex gap-3 mb-4 ${isUser ? 'justify-end' : 'justify-start'}`}>
                 {!isUser && (
                     <Avatar
                         sx={{
-                            width: 32,
-                            height: 32,
+                            width: 36,
+                            height: 36,
                             bgcolor: '#646cff',
-                            fontSize: '14px'
+                            fontSize: '14px',
+                            borderRadius: '8px'
                         }}
                     >
                         <FaRobot />
@@ -40,13 +41,11 @@ export const AIChatMessageBubble = React.memo(({ message, sendApproval, isTyping
                         className={`
                             px-4 py-3 text-sm leading-relaxed
                             ${isUser
-                                ? 'bg-[#646cff] text-white ml-auto'
-                                : 'bg-gray-100 text-gray-800'
+                            ? 'bg-[#646cff] text-white'
+                            : 'bg-gray-50 text-gray-800 border border-gray-200'
                             }
-
-                            shadow-sm
                         `}
-                        style={{ borderRadius: '6px' }}
+                        style={{ borderRadius: '8px' }}
                     >
                         {isTyping ? (
                             <div className="flex items-center gap-1">
@@ -61,7 +60,7 @@ export const AIChatMessageBubble = React.memo(({ message, sendApproval, isTyping
                                 <AIChatRenderMessage message={message} key={message.timestamp} sendApproval={sendApproval} />
                         )}
                     </div>
-                    <div className={`text-xs text-gray-500 mt-1 ${isUser ? 'text-right' : 'text-left'}`}>
+                    <div className={`text-xs text-gray-400 mt-1.5 ${isUser ? 'text-right' : 'text-left'}`}>
                         {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </div>
                 </div>
@@ -69,10 +68,11 @@ export const AIChatMessageBubble = React.memo(({ message, sendApproval, isTyping
                 {isUser && (
                     <Avatar
                         sx={{
-                            width: 32,
-                            height: 32,
-                            bgcolor: '#6366f1',
-                            fontSize: '14px'
+                            width: 36,
+                            height: 36,
+                            bgcolor: '#374151',
+                            fontSize: '14px',
+                            borderRadius: '8px'
                         }}
                     >
                         <FaUser />

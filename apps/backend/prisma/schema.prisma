@@ -8,28 +8,6 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model tblAPIKeyRoleMappings {
-  apiKeyID   String     @db.Uuid
-  roleID     String     @db.Uuid
-  tblAPIKeys tblAPIKeys @relation(fields: [apiKeyID], references: [apiKeyID], onDelete: Cascade, onUpdate: NoAction)
-  tblRoles   tblRoles   @relation(fields: [roleID], references: [roleID], onDelete: NoAction, onUpdate: NoAction)
-
-  @@id([apiKeyID, roleID])
-}
-
-model tblAPIKeys {
-  apiKeyID              String                  @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  tenantID              String                  @db.Uuid
-  apiKey                String                  @db.VarChar
-  apiKeyTitle           String                  @db.VarChar
-  createdAt             DateTime                @default(now()) @db.Timestamptz(6)
-  isDisabled            Boolean
-  creatorID             String                  @db.Uuid
-  tblAPIKeyRoleMappings tblAPIKeyRoleMappings[]
-  tblUsers              tblUsers                @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblAPIKeysCreatorID")
-  tblTenants            tblTenants              @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblAPIKeysTenantID")
-}
-
 model tblAuditLogs {
   auditLogID String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   userID     String?  @db.Uuid
@@ -42,81 +20,27 @@ model tblAuditLogs {
   error      Json?
 }
 
-model tblCronJobHistory {
-  cronJobHistoryID String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  cronJobID        String      @db.Uuid
-  status           String      @db.VarChar(50)
-  scheduledAt      DateTime?   @db.Timestamptz(6)
-  startTime        DateTime?   @db.Timestamptz(6)
-  endTime          DateTime?   @db.Timestamptz(6)
-  durationMs       Int?
-  result           String?
-  triggerType      String?     @default("SCHEDULED") @db.VarChar(50)
-  createdAt        DateTime    @default(now()) @db.Timestamptz(6)
-  tblCronJobs      tblCronJobs @relation(fields: [cronJobID], references: [cronJobID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblCronJobHistoryCronjobID")
-}
-
-model tblCronJobs {
-  cronJobID          String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  cronJobTitle       String              @db.VarChar
-  cronJobDescription String?
-  cronJobSchedule    String              @db.VarChar
-  isDisabled         Boolean             @default(false)
-  nextRunAt          DateTime?           @db.Timestamptz(6)
-  timeoutSeconds     Int?                @default(300)
-  retryAttempts      Int                 @default(0)
-  retryDelaySeconds  Int                 @default(60)
-  createdAt          DateTime            @default(now()) @db.Timestamptz(6)
-  updatedAt          DateTime            @default(now()) @db.Timestamptz(6)
-  tenantID           String              @db.Uuid
-  dataQueryID        String              @db.Uuid
-  dataQueryArgValues Json?
-  tblCronJobHistory  tblCronJobHistory[]
-  tblDataQueries     tblDataQueries      @relation(fields: [dataQueryID], references: [dataQueryID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblConJobsDataQueryID")
-  tblTenants         tblTenants          @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblCronJobsTenantID")
-}
-
-model tblDashboards {
-  dashboardID          String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  dashboardDescription String?    @db.VarChar
-  tenantID             String     @db.Uuid
-  createdAt            DateTime?  @default(now()) @db.Timestamptz(6)
-  updatedAt            DateTime?  @default(now()) @db.Timestamptz(6)
-  creatorID            String?    @db.Uuid
-  dashboardConfig      Json?
-  dashboardTitle       String     @db.VarChar
-  tblUsers             tblUsers?  @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDashboardCreatorID")
-  tblTenants           tblTenants @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDashboardsTenantIDTenantID")
-}
-
 model tblDataQueries {
-  dataQueryID            String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  tenantID               String                   @db.Uuid
-  createdAt              DateTime                 @default(now()) @db.Timestamptz(6)
-  updatedAt              DateTime                 @default(now()) @db.Timestamptz(6)
-  disabledAt             DateTime?                @db.Timestamptz(6)
-  isDisabled             Boolean?                 @default(false)
-  dataQueryTitle         String                   @default("Untitled") @db.VarChar
-  dataQueryDescription   String?                  @db.VarChar
-  dataQueryOptions       Json?                    @db.Json
-  runOnLoad              Boolean?
-  dataQueryResultSchema  Json?                    @db.Json
-  creatorID              String?                  @db.Uuid
-  datasourceID           String?                  @db.Uuid
-  datasourceType         String                   @default("postgresql") @db.VarChar
-  tblCronJobs            tblCronJobs[]
-  tblDatasources         tblDatasources?          @relation(fields: [datasourceID], references: [datasourceID], onDelete: NoAction, onUpdate: NoAction, map: "fkDatasourceIDDatasourceID")
-  tblUsers               tblUsers?                @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDataQueriesCreatorID")
-  tblTenants             tblTenants               @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTenantIDTenantID")
-  tblWidgetQueryMappings tblWidgetQueryMappings[]
-}
+  dataQueryID           String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantID              String          @db.Uuid
+  createdAt             DateTime        @default(now()) @db.Timestamptz(6)
+  updatedAt             DateTime        @default(now()) @db.Timestamptz(6)
+  disabledAt            DateTime?       @db.Timestamptz(6)
+  isDisabled            Boolean?        @default(false)
+  dataQueryTitle        String          @default("Untitled") @db.VarChar
+  dataQueryDescription  String?         @db.VarChar
+  dataQueryOptions      Json?           @db.Json
+  runOnLoad             Boolean?
+  dataQueryResultSchema Json?           @db.Json
+  creatorID             String?         @db.Uuid
+  datasourceID          String?         @db.Uuid
+  datasourceType        String          @default("postgresql") @db.VarChar
+  createdByApiKeyID     String?         @db.Uuid
+  tblDatasources        tblDatasources? @relation(fields: [datasourceID], references: [datasourceID], onDelete: NoAction, onUpdate: NoAction, map: "fkDatasourceIDDatasourceID")
+  tblUsers              tblUsers?       @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDataQueriesCreatorID")
+  tblTenants            tblTenants      @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTenantIDTenantID")
 
-model tblDatabaseNotifications {
-  databaseNotificationID    String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  createdAt                 DateTime   @default(now()) @db.Timestamptz(6)
-  databaseNotificationTitle String     @db.VarChar
-  tenantID                  String     @db.Uuid
-  tblTenants                tblTenants @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDatabaseNotificationsTenantID")
+  @@index([createdByApiKeyID], map: "idx_tblDataQueries_createdByApiKeyID")
 }
 
 model tblDatasources {
@@ -126,12 +50,15 @@ model tblDatasources {
   createdAt         DateTime         @default(now()) @db.Timestamptz(6)
   updatedAt         DateTime         @default(now()) @db.Timestamptz(6)
   tenantID          String           @db.Uuid
-  creatorID         String           @db.Uuid
+  creatorID         String?          @db.Uuid
   datasourceOptions Json
   datasourceTags    String[]         @db.VarChar
+  createdByApiKeyID String?          @db.Uuid
   tblDataQueries    tblDataQueries[]
   tblTenants        tblTenants       @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDatasourceTblTenantsTenantID")
-  tblUsers          tblUsers         @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDatasourceTblUsersCreatorID")
+  tblUsers          tblUsers?        @relation(fields: [creatorID], references: [userID], onUpdate: NoAction, map: "fkTblDatasourceTblUsersCreatorID")
+
+  @@index([createdByApiKeyID], map: "idx_tblDatasources_createdByApiKeyID")
 }
 
 model tblPermissions {
@@ -155,7 +82,6 @@ model tblRoles {
   roleTitle                 String                      @db.VarChar
   roleDescription           String?                     @db.VarChar
   tenantID                  String?                     @db.Uuid
-  tblAPIKeyRoleMappings     tblAPIKeyRoleMappings[]
   tblRolePermissionMappings tblRolePermissionMappings[]
   tblTenants                tblTenants?                 @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fktblRolesTenantIDTblTenantsTenantID")
   tblUserTenantRoleMappings tblUserTenantRoleMappings[]
@@ -170,7 +96,7 @@ model tblRuntimeConfig {
 
 model tblTenants {
   tenantID                    String                        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  creatorID                   String                        @db.Uuid
+  creatorID                   String?                       @db.Uuid
   isDisabled                  Boolean?                      @default(false)
   createdAt                   DateTime                      @default(now()) @db.Timestamptz(6)
   updatedAt                   DateTime?                     @default(now()) @db.Timestamptz(6)
@@ -180,34 +106,15 @@ model tblTenants {
   tenantLogoURL               String?                       @db.VarChar
   tenantTitle                 String                        @db.VarChar
   tenantDBType                String                        @default("postgresql") @db.VarChar
-  tblAPIKeys                  tblAPIKeys[]
-  tblCronJobs                 tblCronJobs[]
-  tblDashboards               tblDashboards[]
+  createdByApiKeyID           String?                       @db.Uuid
   tblDataQueries              tblDataQueries[]
-  tblDatabaseNotifications    tblDatabaseNotifications[]
   tblDatasources              tblDatasources[]
   tblRoles                    tblRoles[]
-  tblUsers                    tblUsers                      @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fktblTenantstblUsersCreatorID")
-  tblUserNotifications        tblUserNotifications[]
+  tblUsers                    tblUsers?                     @relation(fields: [creatorID], references: [userID], onUpdate: NoAction, map: "fktblTenantstblUsersCreatorID")
   tblUserTenantConfigMap      tblUserTenantConfigMap[]
   tblUsersTenantsRelationship tblUsersTenantsRelationship[]
-  tblWidgets                  tblWidgets[]
-  tblWorkflowInstances        tblWorkflowInstances[]
-  tblWorkflows                tblWorkflows[]
-}
 
-model tblUserNotifications {
-  notificationID String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userID         String      @db.Uuid
-  tenantID       String?     @db.Uuid
-  title          String      @db.VarChar
-  description    String?     @db.VarChar
-  actionType     String?     @db.VarChar
-  action         String?     @db.VarChar
-  actionText     String?     @db.VarChar
-  notifierID     String      @db.VarChar
-  tblTenants     tblTenants? @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblUserNotificationsTenantID")
-  tblUsers       tblUsers    @relation(fields: [userID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblUserNotificationsUserIDUserID")
+  @@index([createdByApiKeyID], map: "idx_tblTenants_createdByApiKeyID")
 }
 
 model tblUserTenantConfigMap {
@@ -245,16 +152,11 @@ model tblUsers {
   disabledAt                  DateTime?                     @db.Timestamptz(6)
   disableReason               String?                       @db.VarChar
   lastSeen                    DateTime?                     @db.Timestamptz(6)
-  tblAPIKeys                  tblAPIKeys[]
-  tblDashboards               tblDashboards[]
   tblDataQueries              tblDataQueries[]
   tblDatasources              tblDatasources[]
   tblTenants                  tblTenants[]
-  tblUserNotifications        tblUserNotifications[]
   tblUserTenantConfigMap      tblUserTenantConfigMap[]
   tblUsersTenantsRelationship tblUsersTenantsRelationship[]
-  tblWidgets                  tblWidgets[]
-  tblWorkflows                tblWorkflows[]
 }
 
 model tblUsersTenantsRelationship {
@@ -269,122 +171,4 @@ model tblUsersTenantsRelationship {
 
   @@id([tenantID, userID], map: "pktblUsersTenantsRelationship")
   @@unique([tenantID, userID], map: "uniquetblUsersTenantsRelationship")
-}
-
-model tblWidgetQueryMappings {
-  widgetID           String         @db.Uuid
-  dataQueryID        String         @db.Uuid
-  parameters         Json?
-  title              String         @db.VarChar
-  executionOrder     Int?
-  datasetFields      Json?
-  dataQueryArgValues Json?
-  tblDataQueries     tblDataQueries @relation(fields: [dataQueryID], references: [dataQueryID], onDelete: Cascade, onUpdate: NoAction, map: "fk_tblWidgetQueryMappings_tblDatabaseQueries")
-  tblWidgets         tblWidgets     @relation(fields: [widgetID], references: [widgetID], onDelete: Cascade, onUpdate: NoAction, map: "fk_tblWidgetQueryMappings_tblDatabaseWidgets")
-
-  @@id([widgetID, dataQueryID, title])
-}
-
-model tblWidgets {
-  widgetID               String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  widgetTitle            String                   @db.VarChar
-  widgetDescription      String?                  @db.VarChar
-  widgetType             String                   @db.VarChar
-  widgetConfig           Json
-  createdAt              DateTime?                @default(now()) @db.Timestamptz(6)
-  updatedAt              DateTime?                @default(now()) @db.Timestamptz(6)
-  tenantID               String                   @db.Uuid
-  creatorID              String?                  @db.Uuid
-  refreshInterval        Int?
-  tblWidgetQueryMappings tblWidgetQueryMappings[]
-  tblUsers               tblUsers?                @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblWidgetsCreatorID")
-  tblTenants             tblTenants               @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblWidgetsTenantIDTenantID")
-}
-
-model tblTenantConfig {
-  tenantConfigID String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  tenantID       String    @db.Uuid
-  allowedModules String[]  @db.VarChar
-  createdAt      DateTime? @default(now()) @db.Timestamptz(6)
-  updatedAt      DateTime? @default(now()) @db.Timestamptz(6)
-}
-
-model tblNodeExecutionLogs {
-  executionLogID       BigInt               @id @default(autoincrement())
-  instanceID           String               @db.Uuid
-  nodeID               String               @db.Uuid
-  eventType            String               @db.VarChar
-  inputData            Json?
-  outputData           Json?
-  errorMessage         Json?
-  createdAt            DateTime             @default(now()) @db.Timestamptz(6)
-  tblWorkflowInstances tblWorkflowInstances @relation(fields: [instanceID], references: [instanceID], onDelete: Cascade, onUpdate: NoAction)
-  tblWorkflowNodes     tblWorkflowNodes     @relation(fields: [nodeID], references: [nodeID], onDelete: NoAction, onUpdate: NoAction)
-
-  @@index([instanceID], map: "idx_tblNodeExecutionLogs_instanceID")
-}
-
-model tblWorkflowEdge {
-  edgeID                                                              String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  workflowID                                                          String           @db.Uuid
-  upstreamNodeID                                                      String           @db.Uuid
-  downstreamNodeID                                                    String           @db.Uuid
-  createdAt                                                           DateTime         @default(now()) @db.Timestamptz(6)
-  updatedAt                                                           DateTime         @default(now()) @db.Timestamptz(6)
-  tblWorkflowNodes_tblWorkflowEdge_downstreamNodeIDTotblWorkflowNodes tblWorkflowNodes @relation("tblWorkflowEdge_downstreamNodeIDTotblWorkflowNodes", fields: [downstreamNodeID], references: [nodeID], onDelete: Cascade, onUpdate: NoAction, map: "tblWorkflowEdge_downstream_fkey")
-  tblWorkflowNodes_tblWorkflowEdge_upstreamNodeIDTotblWorkflowNodes   tblWorkflowNodes @relation("tblWorkflowEdge_upstreamNodeIDTotblWorkflowNodes", fields: [upstreamNodeID], references: [nodeID], onDelete: Cascade, onUpdate: NoAction, map: "tblWorkflowEdge_upstream_fkey")
-  tblWorkflows                                                        tblWorkflows     @relation(fields: [workflowID], references: [workflowID], onDelete: Cascade, onUpdate: NoAction)
-
-  @@index([workflowID], map: "idx_tblWorkflowEdge_workflowID")
-}
-
-model tblWorkflowInstances {
-  instanceID           String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  workflowID           String                 @db.Uuid
-  tenantID             String                 @db.Uuid
-  status               String                 @default("PENDING") @db.VarChar
-  contextData          Json                   @default("{}")
-  version              Int                    @default(1)
-  startedAt            DateTime?              @db.Timestamptz(6)
-  completedAt          DateTime?              @db.Timestamptz(6)
-  createdAt            DateTime               @default(now()) @db.Timestamptz(6)
-  updatedAt            DateTime               @default(now()) @db.Timestamptz(6)
-  tblNodeExecutionLogs tblNodeExecutionLogs[]
-  tblTenants           tblTenants             @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction)
-  tblWorkflows         tblWorkflows           @relation(fields: [workflowID], references: [workflowID], onDelete: NoAction, onUpdate: NoAction)
-
-  @@index([tenantID, status], map: "idx_tblWorkflowInstances_tenantID_status")
-}
-
-model tblWorkflowNodes {
-  nodeID                                                             String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  workflowID                                                         String                 @db.Uuid
-  nodeType                                                           String                 @db.VarChar
-  timeoutSeconds                                                     Int?                   @default(300)
-  retryLimit                                                         Int?                   @default(3)
-  createdAt                                                          DateTime               @default(now()) @db.Timestamptz(6)
-  updatedAt                                                          DateTime               @default(now()) @db.Timestamptz(6)
-  nodeConfig                                                         Json?
-  tblNodeExecutionLogs                                               tblNodeExecutionLogs[]
-  tblWorkflowEdge_tblWorkflowEdge_downstreamNodeIDTotblWorkflowNodes tblWorkflowEdge[]      @relation("tblWorkflowEdge_downstreamNodeIDTotblWorkflowNodes")
-  tblWorkflowEdge_tblWorkflowEdge_upstreamNodeIDTotblWorkflowNodes   tblWorkflowEdge[]      @relation("tblWorkflowEdge_upstreamNodeIDTotblWorkflowNodes")
-  tblWorkflows                                                       tblWorkflows           @relation(fields: [workflowID], references: [workflowID], onDelete: Cascade, onUpdate: NoAction)
-
-  @@index([workflowID], map: "idx_tblWorkflowNodes_workflowID")
-}
-
-model tblWorkflows {
-  workflowID           String                 @id(map: "tblWorflows_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  title                String                 @db.VarChar
-  tenantID             String                 @db.Uuid
-  creatorID            String?                @db.Uuid
-  isDisabled           Boolean?
-  disabledAt           DateTime?              @db.Timestamptz(6)
-  createdAt            DateTime               @default(now()) @db.Timestamptz(6)
-  updatedAt            DateTime               @default(now()) @db.Timestamptz(6)
-  tblWorkflowEdge      tblWorkflowEdge[]
-  tblWorkflowInstances tblWorkflowInstances[]
-  tblWorkflowNodes     tblWorkflowNodes[]
-  tblUsers             tblUsers?              @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "tblWorkflowsCreatorID")
-  tblTenants           tblTenants             @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "tblWorkflowsTenantID")
 }

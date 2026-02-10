@@ -6,8 +6,7 @@ const { authMiddleware } = require("../auth/auth.middleware");
 let databaseRouter,
   userManagementRouter,
   tenantRoleRouter,
-  auditLogRouter,
-  aiRouter;
+  auditLogRouter
 const { isModuleEnabled } = require("../../config/module.config");
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
@@ -29,12 +28,7 @@ if (isModuleEnabled(constants.MODULES.ROLE)) {
   });
   tenantRoleRouter = require("../tenantRole/tenantRole.v1.route");
 }
-if (isModuleEnabled(constants.MODULES.AI)) {
-  Logger.log("success", {
-    message: `${constants.MODULES.AI} module imported`,
-  });
-  aiRouter = require("../ai/ai.v1.routes");
-}
+
 auditLogRouter = require("../audit/audit.v1.routes");
 
 const { param, body } = require("express-validator");
@@ -87,18 +81,6 @@ router.patch(
   authMiddleware.checkUserPermissions(["tenant:update"]),
   tenantController.updateTenant
 );
-
-// Nested AI routes
-if (isModuleEnabled(constants.MODULES.AI)) {
-  Logger.log("success", { message: `${constants.MODULES.AI} module enabled` });
-  router.use(
-    "/:tenantID/ai",
-    param("tenantID").isUUID().withMessage("tenantID must be a uuid"),
-    authMiddleware.checkUserPermissions(["tenant:ai"]),
-    tenantMiddleware.poolProvider,
-    aiRouter
-  );
-}
 
 // Nested database routes
 if (isModuleEnabled(constants.MODULES.DATABASE)) {

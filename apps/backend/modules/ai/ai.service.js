@@ -5,653 +5,317 @@ const {
 } = require("@google/generative-ai");
 const Logger = require("../../utils/logger");
 const environmentVariables = require("../../environment");
-const { stringUtil } = require("../../utils/string.util");
 
 const aiService = {};
+// Using Flash for speed and lower cost in the Planner phase
+const AI_MODEL = 'gemini-flash-latest'; // Fast, supports JSON mode, 1M input tokens
 
-aiService.generateAIPromptForChatVisualization = async ({ aiPrompt }) => {
+/**
+ * PHASE 1: THE PLANNER
+ * Determines intent (Chat vs Data), generates SQL, and assigns confidence.
+ */
+aiService.generateQueryPlan = async ({ userPrompt, schemaContext, conversationHistory = [] }) => {
   try {
-    if (!aiPrompt) {
-      Logger.log("error", {
-        message: "aiService:generateAIPromptForChatVisualization:failure",
-        params: {
-          aiPrompt,
-          error: "AI Prompt is missing.",
-        },
-      });
-      throw new Error("AI Prompt is missing.");
-    }
     const apiKey = environmentVariables.GEMINI_API_KEY;
-    if (!apiKey) {
-      Logger.log("error", {
-        message: "aiService:generateAIPromptForChatVisualization:failure",
-        params: {
-          aiPromptLength: aiPrompt?.length,
-          error: "GEMINI_API_KEY environment variable not set.",
-        },
-      });
-      throw new Error("Server configuration error: Missing Gemini API Key.");
-    }
-    // --- Initialize Gemini Client ---
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
-      model: `gemini-2.0-flash`,
-      safetySettings: [
-        {
-          category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-      ],
+      model: AI_MODEL,
+      // Force JSON mode for reliability
+      generationConfig: { responseMimeType: "application/json" }
     });
 
-    Logger.log("info", {
-      message: "aiService:generateAIPromptForChatVisualization:calling_gemini",
-      params: { aiPromptLength: aiPrompt?.length },
-    });
+    const historyStr = conversationHistory.slice(-6).map(h => `User: ${h.user}\nAI: ${h.assistant}`).join("\n");
 
-    // --- Call Gemini API ---
-    const result = await model.generateContent(aiPrompt);
-    Logger.log("warning", {
-      message: "aiService:generateAIPromptForChatVisualization:result",
-      params: { result },
-    });
-    const response = await result.response;
+    const systemPrompt = `
+      You are an expert Data & SQL Assistant for a PostgreSQL database. 
+      Your goal is to analyze the user's request and decide if it requires a database query or just a conversational response.
+      
+      DATABASE SCHEMA:
+      ${schemaContext}
 
-    // --- Extract and Validate Query ---
-    if (
-      !response ||
-      !response.candidates ||
-      response.candidates.length === 0 ||
-      !response.candidates[0].content ||
-      !response.candidates[0].content.parts ||
-      response.candidates[0].content.parts.length === 0
-    ) {
-      Logger.log("warning", {
-        message:
-          "aiService:generateAIPromptForChatVisualization:gemini_empty_response",
-        params: { aiPromptLength: aiPrompt?.length, response },
-      });
-      throw new Error(
-        "AI model returned an empty or invalid response structure."
-      );
-    }
+      PREVIOUS CONTEXT:
+      ${historyStr}
 
-    // Check for safety blocks
-    if (response.candidates[0].finishReason !== "STOP") {
-      Logger.log("warning", {
-        message:
-          "aiService:generateAIPromptForChatVisualization:gemini_blocked",
-        params: {
-          aiPromptLength: aiPrompt?.length,
-          finishReason: response.candidates[0].finishReason,
-          safetyRatings: response.candidates[0].safetyRatings,
-        },
-      });
-      // You might want specific error messages based on safetyRatings if available
-      throw new Error(
-        `AI model stopped generation due to safety settings or other limit (Reason: ${response.candidates[0].finishReason}).`
-      );
-    }
+      USER PROMPT: "${userPrompt}"
 
-    // Extract the text, trim whitespace
-    const chatResponse = response.candidates[0].content.parts[0].text?.trim();
+      CRITICAL SQL RULES (CASE SENSITIVITY):
+      1. PostgreSQL treats unquoted identifiers as lowercase. 
+      2. You MUST double-quote ("") ANY table or column name that contains uppercase letters.
+      3. Look at the SCHEMA exactly. 
+         - If schema says "tblBookings", using tblBookings will FAIL. You MUST generate: SELECT * FROM "tblBookings"
+         - If schema says "createdAt", using createdAt will FAIL. You MUST generate: WHERE "createdAt" > ...
+      4. Only use single quotes ('') for string values (e.g., WHERE status = 'COMPLETED').
 
-    if (!chatResponse) {
-      Logger.log("warning", {
-        message:
-          "aiService:generateAIPromptForChatVisualization:gemini_no_text",
-        params: { aiPromptLength: aiPrompt?.length },
-      });
-      throw new Error("AI model returned response with no text content.");
-    }
+      INSTRUCTIONS:
+      1. Classify INTENT: 
+         - "CHAT": General greeting, thank you, or questions unrelated to the database data.
+         - "QUERY": User asks for data, specific records, analysis, or insights from the DB.
+      
+      2. If INTENT is "QUERY":
+         - Generate a read-only PostgreSQL query (SELECT/WITH/EXPLAIN only).
+         - LIMIT 100 unless the user asks for a count or specific number.
+         - Double check every identifier against the schema for case sensitivity.
+      
+      3. Calculate CONFIDENCE (0.0 to 1.0):
+         - 1.0 = I found the exact tables/columns and mapped them perfectly.
+         - 0.5 = I am guessing the column names.
+      
+      4. Suggest VISUALIZATION:
+         - Should this data be charted? (true/false)
+         - Suggested Type: 'bar', 'line', 'pie', 'scatter', 'area', or null.
 
-    return chatResponse;
+      OUTPUT JSON FORMAT:
+      {
+        "intent": "CHAT" | "QUERY",
+        "sql": "SELECT ... " | null,
+        "conversational_response": "..." (If intent is CHAT, or a polite intro if QUERY),
+        "confidence": 0.0 - 1.0,
+        "visualization_needed": boolean,
+        "suggested_chart_type": string | null,
+        "reasoning": "Brief explanation of why you chose this table/column and chart type"
+      }
+    `;
+
+    const result = await model.generateContent(systemPrompt);
+    const text = result.response.candidates[0].content.parts[0].text;
+    return JSON.parse(text);
+
   } catch (error) {
-    // Log API errors or other failures
-    Logger.log("error", {
-      message: "aiService:generateAIPromptForChatVisualization:failure",
-      params: {
-        aiPromptLength: aiPrompt?.length,
-        error,
-      },
-    });
-    // Re-throw the original error or a more user-friendly one
-    throw new Error(
-      `Failed to generate database query using AI: ${error.message}`
-    );
-  }
-};
-
-aiService.generateRechartsJSXFromQueryResult = async ({ aiPrompt }) => {
-  try {
-    if (!aiPrompt) {
-      Logger.log("error", {
-        message: "aiService:generateRechartsJSXFromQueryResult:failure",
-        params: {
-          aiPrompt,
-          error: "AI Prompt is missing.",
-        },
-      });
-      throw new Error("AI Prompt is missing.");
-    }
-    const apiKey = environmentVariables.GEMINI_API_KEY;
-    if (!apiKey) {
-      Logger.log("error", {
-        message: "aiService:generateRechartsJSXFromQueryResult:failure",
-        params: {
-          aiPromptLength: aiPrompt?.length,
-          error: "GEMINI_API_KEY environment variable not set.",
-        },
-      });
-      throw new Error("Server configuration error: Missing Gemini API Key.");
-    }
-    // --- Initialize Gemini Client ---
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash",
-      safetySettings: [
-        {
-          category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-      ],
-    });
-
-    Logger.log("info", {
-      message: "aiService:generateRechartsJSXFromQueryResult:calling_gemini",
-      params: { aiPromptLength: aiPrompt?.length },
-    });
-
-    // --- Call Gemini API ---
-    const result = await model.generateContent(aiPrompt);
-    Logger.log("warning", {
-      message: "aiService:generateRechartsJSXFromQueryResult:result",
-      params: { result },
-    });
-    const response = await result.response;
-
-    // --- Extract and Validate Query ---
-    if (
-      !response ||
-      !response.candidates ||
-      response.candidates.length === 0 ||
-      !response.candidates[0].content ||
-      !response.candidates[0].content.parts ||
-      response.candidates[0].content.parts.length === 0
-    ) {
-      Logger.log("warning", {
-        message:
-          "aiService:generateRechartsJSXFromQueryResult:gemini_empty_response",
-        params: { aiPromptLength: aiPrompt?.length, response },
-      });
-      throw new Error(
-        "AI model returned an empty or invalid response structure."
-      );
-    }
-
-    // Check for safety blocks
-    if (response.candidates[0].finishReason !== "STOP") {
-      Logger.log("warning", {
-        message:
-          "aiService:generateRechartsJSXFromQueryResult:gemini_blocked",
-        params: {
-          aiPromptLength: aiPrompt?.length,
-          finishReason: response.candidates[0].finishReason,
-          safetyRatings: response.candidates[0].safetyRatings,
-        },
-      });
-      // You might want specific error messages based on safetyRatings if available
-      throw new Error(
-        `AI model stopped generation due to safety settings or other limit (Reason: ${response.candidates[0].finishReason}).`
-      );
-    }
-
-    // Extract the text, trim whitespace
-    const rechartsJSX = response.candidates[0].content.parts[0].text?.trim();
-
-    if (!rechartsJSX) {
-      Logger.log("warning", {
-        message:
-          "aiService:generateRechartsJSXFromQueryResult:gemini_no_text",
-        params: { aiPromptLength: aiPrompt?.length },
-      });
-      throw new Error("AI model returned response with no text content.");
-    }
-
-    return rechartsJSX;
-  } catch (error) {
-    // Log API errors or other failures
-    Logger.log("error", {
-      message: "aiService:generateRechartsJSXFromQueryResult:failure",
-      params: {
-        aiPromptLength: aiPrompt?.length,
-        error,
-      },
-    });
-    // Re-throw the original error or a more user-friendly one
-    throw new Error(
-      `Failed to generate database query using AI: ${error.message}`
-    );
+    Logger.log("error", { message: "aiService:generateQueryPlan:fail", error: error.message });
+    throw error;
   }
 };
 
 /**
- *
- * @param {object} param0
- * @param {string} param0.aiPrompt
- * @returns
+ * PHASE 2: THE ANALYST
+ * Combines Insights and Chart Generation into a SINGLE call.
  */
-aiService.generateAIPromptBasedQuery = async ({ aiPrompt }) => {
+aiService.analyzeAndVisualize = async ({ userPrompt, dataResults, chartType }) => {
   try {
-    if (!aiPrompt) {
-      Logger.log("error", {
-        message: "aiService:generateAIPromptBasedQuery:failure",
-        params: {
-          aiPrompt,
-          error: "AI Prompt is missing.",
-        },
-      });
-      throw new Error("AI Prompt is missing.");
-    }
+    if (!dataResults || dataResults.rows.length === 0) return null;
+
     const apiKey = environmentVariables.GEMINI_API_KEY;
-    if (!apiKey) {
-      Logger.log("error", {
-        message: "aiService:generateAIPromptBasedQuery:failure",
-        params: {
-          aiPromptLength: aiPrompt?.length,
-          error: "GEMINI_API_KEY environment variable not set.",
-        },
-      });
-      throw new Error("Server configuration error: Missing Gemini API Key.");
-    }
-    // --- Initialize Gemini Client ---
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash",
-      safetySettings: [
-        {
-          category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-      ],
-    });
+    const model = genAI.getGenerativeModel({ model: AI_MODEL, generationConfig: { responseMimeType: "application/json" } });
 
-    Logger.log("info", {
-      message: "aiService:generateAIPromptBasedQuery:calling_gemini",
-      params: { aiPromptLength: aiPrompt?.length },
-    });
+    // We only send a sample to keep tokens low, but enough for context
+    const sampleData = dataResults.rows.slice(0, 50);
 
-    // --- Call Gemini API ---
-    const result = await model.generateContent(aiPrompt);
-    Logger.log('warning', {
-      message: "aiService:generateAIPromptBasedQuery:result",
-      params: { result },
-    });
-    const response = await result.response;
+    const prompt = `
+      You are a Data Analyst. Analyze the dataset below and provide insights AND a chart configuration.
 
-    // --- Extract and Validate Query ---
-    if (
-      !response ||
-      !response.candidates ||
-      response.candidates.length === 0 ||
-      !response.candidates[0].content ||
-      !response.candidates[0].content.parts ||
-      response.candidates[0].content.parts.length === 0
-    ) {
-      Logger.log("warning", {
-        message:
-          "aiService:generateAIPromptBasedQuery:gemini_empty_response",
-        params: { aiPromptLength: aiPrompt?.length, response },
-      });
-      throw new Error(
-        "AI model returned an empty or invalid response structure."
-      );
-    }
+      USER QUESTION: ${userPrompt}
+      DATA COLUMNS: ${JSON.stringify(dataResults.columns)}
+      ROW COUNT: ${dataResults.rowCount}
+      SAMPLE DATA: ${JSON.stringify(sampleData)}
+      PREFERRED CHART: ${chartType}
 
-    // Check for safety blocks
-    if (response.candidates[0].finishReason !== "STOP") {
-      Logger.log("warning", {
-        message:
-          "aiService:generateAIPromptBasedQuery:gemini_blocked",
-        params: {
-          aiPromptLength: aiPrompt?.length,
-          finishReason: response.candidates[0].finishReason,
-          safetyRatings: response.candidates[0].safetyRatings,
-        },
-      });
-      // You might want specific error messages based on safetyRatings if available
-      throw new Error(
-        `AI model stopped generation due to safety settings or other limit (Reason: ${response.candidates[0].finishReason}).`
-      );
-    }
+      TASK:
+      1. INSIGHTS: Provide 2-3 bullet points of actionable business intelligence in Markdown. Use emojis (📈, 📉, ⚠️).
+      2. CHART CONFIG: Provide the Recharts configuration.
+         - Identify the best X-axis key (usually a date or category).
+         - Identify the best Data keys (numeric values).
+         - Pick professional colors.
 
-    // Extract the text, trim whitespace
-    const dataQuery = response.candidates[0].content.parts[0].text?.trim();
+      OUTPUT JSON FORMAT:
+      {
+        "insights_markdown": "### Key Findings\n\n* 📈 ...\n* ⚠️ ...",
+        "chart_config": {
+          "type": "${chartType || 'bar'}",
+          "xAxisKey": "exact_column_name_from_data",
+          "dataKeys": ["col1", "col2"],
+          "colors": ["#8884d8", "#82ca9d", "#ffc658"],
+          "title": "Chart Title"
+        }
+      }
+    `;
 
-    if (!dataQuery) {
-      Logger.log("warning", {
-        message: "aiService:generateAIPromptBasedQuery:gemini_no_text",
-        params: { aiPromptLength: aiPrompt?.length },
-      });
-      throw new Error("AI model returned response with no text content.");
-    }
+    const result = await model.generateContent(prompt);
+    return JSON.parse(result.response.candidates[0].content.parts[0].text);
 
-    // Check if the AI refused based on our instruction
-    if (dataQuery === "QUERY_GENERATION_FAILED") {
-      Logger.log("warning", {
-        message: "aiService:generateAIPromptBasedQuery:generation_failed_flag",
-        params: { aiPromptLength: aiPrompt?.length },
-      });
-      throw new Error(
-        "AI determined the request could not be safely converted to a SQL query based on the provided schema and rules."
-      );
-    }
-    return stringUtil.removeSQLMarkdownFencesRegex(dataQuery);
   } catch (error) {
-    // Log API errors or other failures
-    Logger.log("error", {
-      message: "aiService:generateAIPromptBasedQuery:failure",
-      params: {
-        aiPromptLength: aiPrompt?.length,
-        error,
-      },
-    });
-    // Re-throw the original error or a more user-friendly one
-    throw new Error(
-      `Failed to generate database query using AI: ${error.message}`
-    );
+    Logger.log("error", { message: "aiService:analyzeAndVisualize:fail", error: error.message });
+    return null; // Fail gracefully, user still gets the table
   }
 };
 
-aiService.generateAIPromptBasedChart = async ({ aiPrompt }) => {
+/**
+ * STREAMING VERSION: Yields chunks as they arrive, then final parsed JSON
+ * @param {boolean} readOnlyMode - If true, prompts AI to generate analysis for write queries
+ * @yields {{ type: 'chunk', data: string } | { type: 'complete', data: object }}
+ */
+aiService.generateQueryPlanStream = async function* ({ userPrompt, schemaContext, conversationHistory = [], readOnlyMode = true }) {
   try {
-    if (!aiPrompt) {
-      Logger.log("error", {
-        message: "aiService:generateAIPromptBasedChart:failure",
-        params: {
-          aiPrompt,
-          error: "AI Prompt is missing.",
-        },
-      });
-      throw new Error("AI Prompt is missing.");
-    }
     const apiKey = environmentVariables.GEMINI_API_KEY;
-    if (!apiKey) {
-      Logger.log("error", {
-        message: "aiService:generateAIPromptBasedChart:failure",
-        params: {
-          aiPromptLength: aiPrompt?.length,
-          error: "GEMINI_API_KEY environment variable not set.",
-        },
-      });
-      throw new Error("Server configuration error: Missing Gemini API Key.");
-    }
-    // --- Initialize Gemini Client ---
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash",
-      safetySettings: [
-        {
-          category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-      ],
+      model: AI_MODEL,
+      generationConfig: { responseMimeType: "application/json" }
     });
 
-    Logger.log("info", {
-      message: "aiService:generateAIPromptBasedChart:calling_gemini",
-      params: { aiPromptLength: aiPrompt?.length },
-    });
+    const historyStr = conversationHistory.slice(-6).map(h => `User: ${h.user}\nAI: ${h.assistant}`).join("\n");
 
-    // --- Call Gemini API ---
-    const result = await model.generateContent(aiPrompt);
-    Logger.log("warning", {
-      message: "aiService:generateAIPromptBasedChart:result",
-      params: { result },
-    });
-    const response = await result.response;
+    // Add read-only mode instructions if active
+    const readOnlyInstructions = readOnlyMode ? `
+      READ-ONLY MODE IS ACTIVE:
+      - If the user requests a WRITE operation (INSERT, UPDATE, DELETE, DROP, CREATE, ALTER, etc.):
+        1. Still generate the SQL they requested in "sql" field
+        2. Set "intent" to "WRITE" 
+        3. IMPORTANT: Also generate an "affected_data_query" - a SELECT query that shows what data would be affected
+           Example: For "DELETE FROM users WHERE status = 'inactive'", generate:
+           affected_data_query: "SELECT * FROM users WHERE status = 'inactive' LIMIT 50"
+        4. In "reasoning", explain what the query would do to the data
+      - READ queries (SELECT, WITH, EXPLAIN) work normally
+    ` : `
+      FULL ACCESS MODE:
+      - All queries (read and write) can be executed
+      - Generate the appropriate SQL for the user's request
+    `;
 
-    // --- Extract and Validate Query ---
-    if (
-      !response ||
-      !response.candidates ||
-      response.candidates.length === 0 ||
-      !response.candidates[0].content ||
-      !response.candidates[0].content.parts ||
-      response.candidates[0].content.parts.length === 0
-    ) {
-      Logger.log("warning", {
-        message: "aiService:generateAIPromptBasedChart:gemini_empty_response",
-        params: { aiPromptLength: aiPrompt?.length, response },
-      });
-      throw new Error(
-        "AI model returned an empty or invalid response structure."
-      );
+    const systemPrompt = `
+      You are an expert Data & SQL Assistant for a PostgreSQL database. 
+      Your goal is to analyze the user's request and decide if it requires a database query or just a conversational response.
+      
+      DATABASE SCHEMA:
+      ${schemaContext}
+
+      PREVIOUS CONTEXT:
+      ${historyStr}
+
+      USER PROMPT: "${userPrompt}"
+
+      ${readOnlyInstructions}
+
+      CRITICAL SQL RULES (CASE SENSITIVITY):
+      1. PostgreSQL treats unquoted identifiers as lowercase. 
+      2. You MUST double-quote ("") ANY table or column name that contains uppercase letters.
+      3. Look at the SCHEMA exactly. 
+         - If schema says "tblBookings", using tblBookings will FAIL. You MUST generate: SELECT * FROM "tblBookings"
+         - If schema says "createdAt", using createdAt will FAIL. You MUST generate: WHERE "createdAt" > ...
+      4. Only use single quotes ('') for string values (e.g., WHERE status = 'COMPLETED').
+
+      INSTRUCTIONS:
+      1. Classify INTENT: 
+         - "CHAT": General greeting, thank you, or questions unrelated to the database data.
+         - "QUERY": User asks for data, specific records, analysis, or insights from the DB (READ operation).
+         - "WRITE": User asks to INSERT, UPDATE, DELETE, CREATE, DROP, ALTER data (WRITE operation).
+      
+      2. If INTENT is "QUERY" or "WRITE":
+         - Generate the appropriate PostgreSQL query.
+         - For QUERY: LIMIT 100 unless the user asks for a count or specific number.
+         - For WRITE: Generate both the write query AND an affected_data_query (SELECT to preview affected rows)
+         - Double check every identifier against the schema for case sensitivity.
+      
+      3. Calculate CONFIDENCE (0.0 to 1.0):
+         - 1.0 = I found the exact tables/columns and mapped them perfectly.
+         - 0.5 = I am guessing the column names.
+      
+      4. Suggest VISUALIZATION:
+         - Should this data be charted? (true/false)
+         - Suggested Type: 'bar', 'line', 'pie', 'scatter', 'area', or null.
+
+      OUTPUT JSON FORMAT:
+      {
+        "intent": "CHAT" | "QUERY" | "WRITE",
+        "sql": "SELECT/INSERT/UPDATE/DELETE ... " | null,
+        "affected_data_query": "SELECT ... " | null (only for WRITE intent - shows what rows would be affected),
+        "conversational_response": "..." (If intent is CHAT, or a polite intro if QUERY/WRITE),
+        "confidence": 0.0 - 1.0,
+        "visualization_needed": boolean,
+        "suggested_chart_type": string | null,
+        "reasoning": "Brief explanation of what this query does and why you chose this table/column"
+      }
+    `;
+
+    const result = await model.generateContentStream(systemPrompt);
+    let fullText = "";
+
+    for await (const chunk of result.stream) {
+      const chunkText = chunk.text();
+      if (chunkText) {
+        fullText += chunkText;
+        yield { type: 'chunk', data: chunkText };
+      }
     }
 
-    // Check for safety blocks
-    if (response.candidates[0].finishReason !== "STOP") {
-      Logger.log("warning", {
-        message: "aiService:generateAIPromptBasedChart:gemini_blocked",
-        params: {
-          aiPromptLength: aiPrompt?.length,
-          finishReason: response.candidates[0].finishReason,
-          safetyRatings: response.candidates[0].safetyRatings,
-        },
-      });
-      // You might want specific error messages based on safetyRatings if available
-      throw new Error(
-        `AI model stopped generation due to safety settings or other limit (Reason: ${response.candidates[0].finishReason}).`
-      );
-    }
+    // Parse the complete JSON at the end
+    const parsed = JSON.parse(fullText);
+    yield { type: 'complete', data: parsed };
 
-    // Extract the text, trim whitespace
-    const databaseChartData =
-      response.candidates[0].content.parts[0].text?.trim();
-
-    if (!databaseChartData) {
-      Logger.log("warning", {
-        message: "aiService:generateAIPromptBasedChart:gemini_no_text",
-        params: { aiPromptLength: aiPrompt?.length },
-      });
-      throw new Error("AI model returned response with no text content.");
-    }
-
-    // // Check if the AI refused based on our instruction
-    // if (databaseChartData === "QUERY_GENERATION_FAILED") {
-    //   Logger.log("warning", {
-    //     message: "aiService:generateAIPromptBasedChart:generation_failed_flag",
-    //     params: { aiPromptLength: aiPrompt?.length },
-    //   });
-    //   throw new Error(
-    //     "AI determined the request could not be safely converted to a SQL query based on the provided schema and rules."
-    //   );
-    // }
-    return databaseChartData;
   } catch (error) {
-    // Log API errors or other failures
-    Logger.log("error", {
-      message: "aiService:generateAIPromptBasedChart:failure",
-      params: {
-        aiPromptLength: aiPrompt?.length,
-        error,
-      },
-    });
-    // Re-throw the original error or a more user-friendly one
-    throw new Error(
-      `Failed to generate database query using AI: ${error.message}`
-    );
+    Logger.log("error", { message: "aiService:generateQueryPlanStream:fail", error: error.message });
+    throw error;
   }
 };
 
-aiService.generateAIPromptBasedChartStyle = async ({ aiPrompt }) => {
+/**
+ * STREAMING VERSION: Yields analysis chunks as they arrive
+ * @yields {{ type: 'chunk', data: string } | { type: 'complete', data: object }}
+ */
+aiService.analyzeAndVisualizeStream = async function* ({ userPrompt, dataResults, chartType }) {
   try {
-    if (!aiPrompt) {
-      Logger.log("error", {
-        message: "aiService:generateAIPromptBasedChartStyle:failure",
-        params: {
-          aiPrompt,
-          error: "AI Prompt is missing.",
-        },
-      });
-      throw new Error("AI Prompt is missing.");
+    if (!dataResults || dataResults.rows.length === 0) {
+      yield { type: 'complete', data: null };
+      return;
     }
+
     const apiKey = environmentVariables.GEMINI_API_KEY;
-    if (!apiKey) {
-      Logger.log("error", {
-        message: "aiService:generateAIPromptBasedChartStyle:failure",
-        params: {
-          aiPromptLength: aiPrompt?.length,
-          error: "GEMINI_API_KEY environment variable not set.",
-        },
-      });
-      throw new Error("Server configuration error: Missing Gemini API Key.");
-    }
-    // --- Initialize Gemini Client ---
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({
-      model: "gemini-2.0-flash",
-      safetySettings: [
-        {
-          category: HarmCategory.HARM_CATEGORY_HARASSMENT,
-          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
-          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
-          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-        {
-          category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
-          threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
-        },
-      ],
+    const model = genAI.getGenerativeModel({ 
+      model: AI_MODEL,
+      generationConfig: { responseMimeType: "application/json" } 
     });
 
-    Logger.log("info", {
-      message: "aiService:generateAIPromptBasedChartStyle:calling_gemini",
-      params: { aiPromptLength: aiPrompt?.length },
-    });
+    const sampleData = dataResults.rows.slice(0, 50);
 
-    // --- Call Gemini API ---
-    const result = await model.generateContent(aiPrompt);
-    Logger.log("warning", {
-      message: "aiService:generateAIPromptBasedChartStyle:result",
-      params: { result },
-    });
-    const response = await result.response;
+    const prompt = `
+      You are a Data Analyst. Analyze the dataset below and provide insights AND a chart configuration.
 
-    // --- Extract and Validate Query ---
-    if (
-      !response ||
-      !response.candidates ||
-      response.candidates.length === 0 ||
-      !response.candidates[0].content ||
-      !response.candidates[0].content.parts ||
-      response.candidates[0].content.parts.length === 0
-    ) {
-      Logger.log("warning", {
-        message:
-          "aiService:generateAIPromptBasedChartStyle:gemini_empty_response",
-        params: { aiPromptLength: aiPrompt?.length, response },
-      });
-      throw new Error(
-        "AI model returned an empty or invalid response structure."
-      );
+      USER QUESTION: ${userPrompt}
+      DATA COLUMNS: ${JSON.stringify(dataResults.columns)}
+      ROW COUNT: ${dataResults.rowCount}
+      SAMPLE DATA: ${JSON.stringify(sampleData)}
+      PREFERRED CHART: ${chartType}
+
+      TASK:
+      1. INSIGHTS: Provide 2-3 bullet points of actionable business intelligence in Markdown. Use emojis (📈, 📉, ⚠️).
+      2. CHART CONFIG: Provide the Recharts configuration.
+         - Identify the best X-axis key (usually a date or category).
+         - Identify the best Data keys (numeric values).
+         - Pick professional colors.
+
+      OUTPUT JSON FORMAT:
+      {
+        "insights_markdown": "### Key Findings\\n\\n* 📈 ...\\n* ⚠️ ...",
+        "chart_config": {
+          "type": "${chartType || 'bar'}",
+          "xAxisKey": "exact_column_name_from_data",
+          "dataKeys": ["col1", "col2"],
+          "colors": ["#8884d8", "#82ca9d", "#ffc658"],
+          "title": "Chart Title"
+        }
+      }
+    `;
+
+    const result = await model.generateContentStream(prompt);
+    let fullText = "";
+
+    for await (const chunk of result.stream) {
+      const chunkText = chunk.text();
+      if (chunkText) {
+        fullText += chunkText;
+        yield { type: 'chunk', data: chunkText };
+      }
     }
 
-    // Check for safety blocks
-    if (response.candidates[0].finishReason !== "STOP") {
-      Logger.log("warning", {
-        message: "aiService:generateAIPromptBasedChartStyle:gemini_blocked",
-        params: {
-          aiPromptLength: aiPrompt?.length,
-          finishReason: response.candidates[0].finishReason,
-          safetyRatings: response.candidates[0].safetyRatings,
-        },
-      });
-      // You might want specific error messages based on safetyRatings if available
-      throw new Error(
-        `AI model stopped generation due to safety settings or other limit (Reason: ${response.candidates[0].finishReason}).`
-      );
-    }
+    // Parse the complete JSON at the end
+    const parsed = JSON.parse(fullText);
+    yield { type: 'complete', data: parsed };
 
-    // Extract the text, trim whitespace
-    const databaseChartData =
-      response.candidates[0].content.parts[0].text?.trim();
-
-    if (!databaseChartData) {
-      Logger.log("warning", {
-        message: "aiService:generateAIPromptBasedChartStyle:gemini_no_text",
-        params: { aiPromptLength: aiPrompt?.length },
-      });
-      throw new Error("AI model returned response with no text content.");
-    }
-    return databaseChartData;
   } catch (error) {
-    // Log API errors or other failures
-    Logger.log("error", {
-      message: "aiService:generateAIPromptBasedChartStyle:failure",
-      params: {
-        aiPromptLength: aiPrompt?.length,
-        error,
-      },
-    });
-    // Re-throw the original error or a more user-friendly one
-    throw new Error(
-      `Failed to generate database query using AI: ${error.message}`
-    );
+    Logger.log("error", { message: "aiService:analyzeAndVisualizeStream:fail", error: error.message });
+    yield { type: 'complete', data: null }; // Fail gracefully
   }
 };
+
 module.exports = { aiService };

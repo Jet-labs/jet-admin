@@ -11,7 +11,7 @@ const RawSqlQueryPage = () => {
 
   return (
     <div className="flex w-full h-full flex-col justify-start items-stretch overflow-hidden">
-      <PGSQLQueryExecutor tenantID={tenantID} />
+      <PGSQLQueryExecutor tenantID={tenantID} initialQuery={null} />
     </div>
   );
 };

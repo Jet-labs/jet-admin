@@ -1,13 +1,49 @@
+# Dependencies
 node_modules
 **/node_modules
+
+# Environment files (built at runtime in container)
 **/.env
 **/*.env
-**/Dockerfile
-**/docker-compose.yml
-.git
 **/production.env
 **/development.env
+
+# Docker files (not needed inside container)
+**/Dockerfile
+**/docker-compose.yml
+**/docker-compose*.yml
+.dockerignore
+
+# Build outputs (rebuilt in container)
 **/dist
 **/build
+
+# Development files
+.git
+.gitignore
 **/.DS_Store
 **/.vscode
+**/.idea
+
+# Documentation (not needed in container)
+docs/
+*.md
+!README.md
+
+# Test files
+**/*.test.js
+**/*.spec.js
+**/tests
+**/coverage
+
+# Logs
+**/logs
+**/*.log
+npm-debug.log*
+
+# Misc
+.editorconfig
+.eslintcache
+*.swp
+*.swo
+Thumbs.db

@@ -2164,33 +2164,5 @@ END;
 $$ LANGUAGE plpgsql;`;
 };
 
-postgreSQLQueryUtil.createAutoupdateTriggerOnDataQueriesTable = ({
-  databaseSchemaName = "public",
-}) => {
-  const quotedSchemaName = `"${databaseSchemaName}"`;
-
-  return `CREATE TRIGGER triggerUpdateTblDataQueriesUpdatedAtColumn
-BEFORE UPDATE ON ${quotedSchemaName}."tblDataQueries"
-FOR EACH ROW
-EXECUTE FUNCTION ${quotedSchemaName}.updateTblDataQueriesUpdatedAtColumn();`;
-};
-
-postgreSQLQueryUtil.checkIfTblDataQueriesTableExist = ({
-  databaseSchemaName = "public",
-}) => {
-  // Ensure schema name is properly quoted if it contains spaces or mixed cases
-  const quotedSchemaName = `'${databaseSchemaName}'`;
-
-  return `
-    -- Check if the table 'tblDataQueries' exists in the schema
-    SELECT EXISTS (
-      SELECT 1
-      FROM pg_tables
-      WHERE schemaname = ${quotedSchemaName}
-        AND tablename = 'tblDataQueries'
-    ) AS isTableExists;
-  `;
-};
-
 
 module.exports = { postgreSQLQueryUtil, postgreSQLParserUtil };
