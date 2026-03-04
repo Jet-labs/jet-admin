@@ -4,6 +4,45 @@ const { auditService } = require("./audit.service"); // Adjust path as needed
 
 /** @typedef {import('./audit.type').AuditLogEvent} AuditLogEvent */
 
+const SENSITIVE_KEYS = [
+  "password",
+  "token",
+  "access_token",
+  "refresh_token",
+  "secret",
+  "authorization",
+  "cookie",
+  "key",
+  "apiKey",
+];
+
+/**
+ * Recursively filters sensitive keys from an object or array.
+ * @param {any} data - The data to filter.
+ * @returns {any} - The filtered data.
+ */
+function filterSensitiveKeys(data) {
+  if (data === null || typeof data !== "object") {
+    return data;
+  }
+
+  if (Array.isArray(data)) {
+    return data.map(filterSensitiveKeys);
+  }
+
+  const filtered = {};
+  for (const key in data) {
+    if (Object.prototype.hasOwnProperty.call(data, key)) {
+      if (SENSITIVE_KEYS.some((sk) => key.toLowerCase().includes(sk.toLowerCase()))) {
+        filtered[key] = "[FILTERED]";
+      } else {
+        filtered[key] = filterSensitiveKeys(data[key]);
+      }
+    }
+  }
+  return filtered;
+}
+
 // Helper to safely get JSON payload (request or response body)
 // Handles truncation and basic filtering
 function safeGetPayload(payload) {
@@ -12,8 +51,26 @@ function safeGetPayload(payload) {
   }
 
   try {
+    let processedPayload = payload;
+
+    // Attempt to parse JSON string back to object for consistent logging and filtering
+    if (typeof payload === "string") {
+      try {
+        processedPayload = JSON.parse(payload);
+      } catch (e) {
+        // If not valid JSON, we'll keep it as a string
+      }
+    }
+
+    // Apply sensitive key filtering if it's an object or array
+    if (typeof processedPayload === "object" && processedPayload !== null) {
+      processedPayload = filterSensitiveKeys(processedPayload);
+    }
+
     const payloadString =
-      typeof payload === "string" ? payload : JSON.stringify(payload);
+      typeof processedPayload === "string"
+        ? processedPayload
+        : JSON.stringify(processedPayload);
 
     // Define max size to log to prevent excessive database usage
     const MAX_PAYLOAD_SIZE = 2000; // Adjust as needed
@@ -24,30 +81,7 @@ function safeGetPayload(payload) {
       };
     }
 
-    // TODO: Implement more sophisticated filtering for sensitive keys
-    // Example:
-    // if (typeof payload === 'object' && payload !== null) {
-    //     const filteredPayload = { ...payload };
-    //     const sensitiveKeys = ['password', 'token', 'access_token', 'refresh_token']; // Add keys here
-    //     sensitiveKeys.forEach(key => {
-    //         if (filteredPayload.hasOwnProperty(key)) {
-    //             filteredPayload[key] = '[FILTERED]';
-    //         }
-    //     });
-    //     return filteredPayload;
-    // }
-
-    // Attempt to parse JSON string back to object for consistent logging
-    if (typeof payload === "string") {
-      try {
-        return JSON.parse(payload);
-      } catch (e) {
-        // If not valid JSON, return the string (truncated if needed)
-        return payloadString;
-      }
-    }
-
-    return payload; // Return object directly if it wasn't a string
+    return processedPayload;
   } catch (error) {
     console.error("Error processing payload for logging:", error);
     return { _error: "Failed to process payload" };
@@ -112,7 +146,7 @@ auditLogMiddleware.audit = (req, res, next) => {
     method: req.method,
     url: req.originalUrl,
     ip: req.ip, // Consider using 'x-forwarded-for' if behind a proxy
-    headers: { ...req.headers }, // Clone headers (be mindful of size/sensitive data)
+    headers: filterSensitiveKeys({ ...req.headers }), // Clone and filter headers
     body: safeGetPayload(req.body), // Capture request body if parsed
     // Assuming user and tenant IDs are attached to req by auth middleware
     // userId: req.user?.id,
@@ -128,7 +162,7 @@ auditLogMiddleware.audit = (req, res, next) => {
       statusCode: res.statusCode,
       // Process the captured body here
       body: safeGetPayload(capturedResponseBody),
-      headers: res.getHeaders(), // Capture response headers
+      headers: filterSensitiveKeys(res.getHeaders()), // Capture and filter response headers
     };
 
     /** @type {AuditLogEvent} */
@@ -167,4 +201,6 @@ auditLogMiddleware.audit = (req, res, next) => {
 
 module.exports = {
   auditLogMiddleware,
+  _filterSensitiveKeys: filterSensitiveKeys,
+  _safeGetPayload: safeGetPayload,
 };
