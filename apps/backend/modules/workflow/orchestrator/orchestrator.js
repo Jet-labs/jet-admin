@@ -154,9 +154,9 @@ async function handleTaskResult(result) {
       );
     }
     
-    // 6. Queue next nodes
-    for (const nextNode of nextNodes) {
-      await addNodeJob({
+    // 6. Queue next nodes concurrently
+    await Promise.all(nextNodes.map(nextNode =>
+      addNodeJob({
         instanceID,
         nodeID: nextNode.nodeID,
         nodeType: nextNode.nodeType,
@@ -166,8 +166,8 @@ async function handleTaskResult(result) {
         isTestRun,
       }, {
         delay: queueDelay || 0,
-      });
-    }
+      })
+    ));
     
     // If no next nodes and not an end node, might be a dead end
     if (nextNodes.length === 0) {
