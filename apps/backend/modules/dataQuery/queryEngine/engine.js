@@ -144,7 +144,7 @@ class QueryEngine {
       });
 
       // Resolve input variable from runtimeArgs
-      const value = eval(`runtimeArgs.${block.expression}`);
+      const value = block.expression.split('.').reduce((o, i) => o && o[i], runtimeArgs);
 
       Logger.log("info", {
         message: "QueryEngine:resolveTemplate:resolveVariable",
