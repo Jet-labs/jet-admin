@@ -4,6 +4,41 @@ const { auditService } = require("./audit.service"); // Adjust path as needed
 
 /** @typedef {import('./audit.type').AuditLogEvent} AuditLogEvent */
 
+const SENSITIVE_KEYS = [
+  "password",
+  "token",
+  "access_token",
+  "refresh_token",
+  "secret",
+  "authorization",
+  "cookie",
+  "apikey",
+];
+
+/**
+ * Recursively filters sensitive keys from an object or array.
+ * @param {any} obj - The object or array to filter.
+ * @returns {any} The filtered object or array.
+ */
+function filterSensitiveKeys(obj) {
+  if (Array.isArray(obj)) {
+    return obj.map((item) => filterSensitiveKeys(item));
+  } else if (obj !== null && typeof obj === "object") {
+    const filtered = {};
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        if (SENSITIVE_KEYS.some((sk) => key.toLowerCase().includes(sk))) {
+          filtered[key] = "[FILTERED]";
+        } else {
+          filtered[key] = filterSensitiveKeys(obj[key]);
+        }
+      }
+    }
+    return filtered;
+  }
+  return obj;
+}
+
 // Helper to safely get JSON payload (request or response body)
 // Handles truncation and basic filtering
 function safeGetPayload(payload) {
@@ -12,8 +47,24 @@ function safeGetPayload(payload) {
   }
 
   try {
+    let processedPayload = payload;
+
+    // Attempt to parse JSON string back to object for consistent filtering
+    if (typeof payload === "string") {
+      try {
+        processedPayload = JSON.parse(payload);
+      } catch (e) {
+        // If not valid JSON, keep as string
+      }
+    }
+
+    // Apply sophisticated filtering for sensitive keys
+    processedPayload = filterSensitiveKeys(processedPayload);
+
     const payloadString =
-      typeof payload === "string" ? payload : JSON.stringify(payload);
+      typeof processedPayload === "string"
+        ? processedPayload
+        : JSON.stringify(processedPayload);
 
     // Define max size to log to prevent excessive database usage
     const MAX_PAYLOAD_SIZE = 2000; // Adjust as needed
@@ -24,30 +75,7 @@ function safeGetPayload(payload) {
       };
     }
 
-    // TODO: Implement more sophisticated filtering for sensitive keys
-    // Example:
-    // if (typeof payload === 'object' && payload !== null) {
-    //     const filteredPayload = { ...payload };
-    //     const sensitiveKeys = ['password', 'token', 'access_token', 'refresh_token']; // Add keys here
-    //     sensitiveKeys.forEach(key => {
-    //         if (filteredPayload.hasOwnProperty(key)) {
-    //             filteredPayload[key] = '[FILTERED]';
-    //         }
-    //     });
-    //     return filteredPayload;
-    // }
-
-    // Attempt to parse JSON string back to object for consistent logging
-    if (typeof payload === "string") {
-      try {
-        return JSON.parse(payload);
-      } catch (e) {
-        // If not valid JSON, return the string (truncated if needed)
-        return payloadString;
-      }
-    }
-
-    return payload; // Return object directly if it wasn't a string
+    return processedPayload;
   } catch (error) {
     console.error("Error processing payload for logging:", error);
     return { _error: "Failed to process payload" };
@@ -112,7 +140,7 @@ auditLogMiddleware.audit = (req, res, next) => {
     method: req.method,
     url: req.originalUrl,
     ip: req.ip, // Consider using 'x-forwarded-for' if behind a proxy
-    headers: { ...req.headers }, // Clone headers (be mindful of size/sensitive data)
+    headers: safeGetPayload(req.headers), // Filter sensitive headers
     body: safeGetPayload(req.body), // Capture request body if parsed
     // Assuming user and tenant IDs are attached to req by auth middleware
     // userId: req.user?.id,
@@ -128,7 +156,7 @@ auditLogMiddleware.audit = (req, res, next) => {
       statusCode: res.statusCode,
       // Process the captured body here
       body: safeGetPayload(capturedResponseBody),
-      headers: res.getHeaders(), // Capture response headers
+      headers: safeGetPayload(res.getHeaders()), // Filter sensitive headers
     };
 
     /** @type {AuditLogEvent} */
