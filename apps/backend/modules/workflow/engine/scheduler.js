@@ -6,6 +6,7 @@
 const stateRepository = require("./state.repository");
 const { v4: uuidv4 } = require("uuid");
 const Logger = require("../../../utils/logger");
+const { resolveStringWithContext } = require("../workers/workerSDK");
 
 class WorkflowEngine {
   constructor() {
@@ -127,6 +128,26 @@ class WorkflowEngine {
   }
 
   /**
+   * Recursively interpolate node configuration values using context
+   */
+  interpolateConfig(config, context) {
+    if (typeof config === "string") {
+      return resolveStringWithContext(context, config);
+    }
+    if (Array.isArray(config)) {
+      return config.map(item => this.interpolateConfig(item, context));
+    }
+    if (config !== null && typeof config === "object") {
+      const result = {};
+      for (const [key, value] of Object.entries(config)) {
+        result[key] = this.interpolateConfig(value, context);
+      }
+      return result;
+    }
+    return config;
+  }
+
+  /**
    * Execute a single node logic
    */
   async runNode(runId, nodeId) {
@@ -143,15 +164,16 @@ class WorkflowEngine {
         throw new Error(`No handler registered for node type: ${nodeType}`);
       }
 
-      // Resolve Inputs (TODO: Implement robust interpolator)
-      // For now, pass whole context
+      // Resolve Inputs using robust interpolator
       const executionContext = {
         ...state.context,
         results: state.results
       };
 
+      const interpolatedConfig = this.interpolateConfig(nodeData.config, executionContext);
+
       // Execute Handler
-      const output = await handler.execute(nodeData.config, executionContext);
+      const output = await handler.execute(interpolatedConfig, executionContext);
 
       // Update State (Success)
       state.results[nodeId] = output;
