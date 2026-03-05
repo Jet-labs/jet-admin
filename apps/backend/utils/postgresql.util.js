@@ -1391,6 +1391,16 @@ postgreSQLQueryUtil.databaseTableBulkRowExport = ({
   }
 };
 
+// Helper function to safely quote identifiers for case sensitivity
+const quoteIdentifier = (identifier) => {
+  if (!identifier) return identifier;
+  // Quote identifiers that contain special characters, spaces, or are reserved keywords
+  const needsQuoting =
+    /[^a-zA-Z0-9_]/.test(identifier) ||
+    identifier.toUpperCase() !== identifier;
+  return needsQuoting ? `"${identifier}"` : identifier;
+};
+
 // Helper function to sanitize identifiers (schema/table names)
 function sanitizeIdentifier(identifier) {
   if (!/^[\w\d_]+$/.test(identifier)) {
@@ -1651,16 +1661,6 @@ postgreSQLQueryUtil.createDatabaseTableQuery = ({
     );
   }
 
-  // Helper function to safely quote identifiers for case sensitivity
-  const quoteIdentifier = (identifier) => {
-    if (!identifier) return identifier;
-    // Quote identifiers that contain special characters, spaces, or are reserved keywords
-    const needsQuoting =
-      /[^a-zA-Z0-9_]/.test(identifier) ||
-      identifier.toUpperCase() !== identifier;
-    return needsQuoting ? `"${identifier}"` : identifier;
-  };
-
   // Combine schema name and table name
   const fullTableName = `${quoteIdentifier(
     databaseSchemaName
@@ -1815,14 +1815,6 @@ postgreSQLQueryUtil.updateDatabaseTableByNameQuery = ({
   currentTableData,
   updatedTableData,
 }) => {
-  const quoteIdentifier = (identifier) => {
-    if (!identifier) return identifier;
-    const needsQuoting =
-      /[^a-zA-Z0-9_]/.test(identifier) ||
-      identifier.toUpperCase() !== identifier;
-    return needsQuoting ? `"${identifier}"` : identifier;
-  };
-
   const fullTableName = `${quoteIdentifier(
     databaseSchemaName
   )}.${quoteIdentifier(currentTableData.databaseTableName)}`;
@@ -2037,16 +2029,6 @@ postgreSQLQueryUtil.deleteDatabaseTableQuery = ({
   if (!databaseTableName) {
     throw new Error("Invalid input: 'databaseTableName' is required.");
   }
-
-  // Helper function to safely quote identifiers for case sensitivity
-  const quoteIdentifier = (identifier) => {
-    if (!identifier) return identifier;
-    // Quote identifiers that contain special characters, spaces, or are reserved keywords
-    const needsQuoting =
-      /[^a-zA-Z0-9_]/.test(identifier) ||
-      identifier.toUpperCase() !== identifier;
-    return needsQuoting ? `"${identifier}"` : identifier;
-  };
 
   // Combine schema name and table name
   const fullTableName = `${quoteIdentifier(
