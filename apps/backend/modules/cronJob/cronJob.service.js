@@ -6,7 +6,6 @@ const {
   tenantAwarePostgreSQLPoolManager,
 } = require("../../config/tenant-aware-pgpool-manager.config");
 const constants = require("../../constants");
-// const constants = require("../../constants"); // Include if needed
 
 const cronJobService = {};
 
