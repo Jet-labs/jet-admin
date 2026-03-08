@@ -2,8 +2,8 @@
  * JavaScript Node Handler
  * Executes user-provided JavaScript code in a sandbox
  */
-const { VM } = require('vm2');
 const { ERROR_HANDLING, NEXT_HANDLE } = require('./constants');
+const { createWorkflowVm } = require('./workflowVm');
 
 async function execute(nodeConfig, context, helpers) {
   const { 
@@ -39,11 +39,9 @@ async function execute(nodeConfig, context, helpers) {
     };
     
     // Create VM with timeout
-    const vm = new VM({
-      timeout: timeoutSeconds * 1000,
+    const vm = createWorkflowVm({
+      timeoutMs: timeoutSeconds * 1000,
       sandbox,
-      eval: false,
-      wasm: false,
     });
     
     // Wrap code to return last expression

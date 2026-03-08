@@ -4,7 +4,7 @@
  */
 const { registerTaskWorker, addResult, addNodeJob, QUEUE_NAMES } = require('../../../config/queue.config');
 const { getHandler } = require('./handlers');
-const { resolveFromContext, resolveStringWithContext } = require('./workerSDK');
+const { resolveFromContext, resolveStringWithContext } = require('./contextResolver');
 const Logger = require('../../../utils/logger');
 
 /**

@@ -27,7 +27,7 @@ sequenceDiagram
     Note right of FE: Sends queryID + runtime args
     API->>QE: runDataQueryByID(id, args)
     QE->>QE: Fetch Query & Datasource Config
-    QE->>QE: Resolve Template Variables ({{args.x}})
+    QE->>QE: Resolve Template Variables ({{limit}}, {{user.id}}, {{args.id}})
     QE->>DL: Get DataSource Adapter
     DL->>DL: Instantiate Adapter (new PostgreSQLDataSource)
     DL->>DB: Connect & Execute Query
@@ -56,7 +56,7 @@ The heart of the system is the **QueryEngine** class.
 
 ### Responsibilities:
 1.  **Fetching**: Retrieving the query definition and datasource credentials (via injected fetchers).
-2.  **Interpolation**: Replacing template variables (e.g., `{{args.limit}}`) with actual runtime values.
+2.  **Interpolation**: Replacing template variables (e.g., `{{limit}}`, `{{user.id}}`, legacy `{{args.id}}`) with actual runtime values.
 3.  **Delegation**: Loading the correct "Driver" from the Shared Registry and asking it to execute.
 
 ### Code Spotlight: `engine.js`
@@ -85,13 +85,14 @@ async executeQuery(dataQueryID, runtimeArgs) {
 }
 ```
 
-The **Template Resolution** uses a recursive text replacement strategy:
+The **Template Resolution** uses a recursive text replacement strategy with safe object-path lookup:
 ```javascript
 async resolveStringTemplate(template, runtimeArgs, ...) {
     const blocks = extractTemplateBlocks(template); // Finds {{...}}
     for (const block of blocks) {
-        // SAFETY WARNING: This uses eval() to resolve paths like "args.user.id"
-        const value = eval(`runtimeArgs.${block.expression}`);
+        const value = getValueByPath(runtimeArgs, block.expression, {
+            allowedRoots: ["runtimeArgs", "args"],
+        });
         result = result.replace(block.fullMatch, value);
     }
     return result;
@@ -190,7 +191,7 @@ The frontend logic is heavily **schema-driven**. Instead of hardcoding forms for
 
 2.  **`DataQueryTestingForm.jsx`**:
     - The "Run" button.
-    - Handles "Prompt for Arguments": If the query needs inputs (e.g., `{{args.id}}`), it opens a modal (`DataQueryArgsForm`) to ask the user for values before sending the request.
+    - Handles "Prompt for Arguments": If the query needs inputs (e.g., `{{id}}`, `{{user.id}}`, or legacy `{{args.id}}`), it opens a modal (`DataQueryArgsForm`) to ask the user for values before sending the request.
     - Calls `testDataQueryByIDAPI` or `testDataQueryByDataAPI`.
 
 ### Query Execution Flow (Frontend)

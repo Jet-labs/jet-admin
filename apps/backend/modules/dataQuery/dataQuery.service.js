@@ -12,8 +12,12 @@ const { aiService } = require("../ai/ai.service");
 const { isUUID } = require("validator");
 const { v4: uuid } = require("uuid");
 const dataQueryService = {};
-const { keyValueTypeArrayToObject } = require("../../utils/json.util");
-const { QueryEngine } = require("./queryEngine/engine");
+const {
+  createQueryEngine,
+  buildDataQueryExecutionArgs,
+  executeDataQuery,
+  defaultDatasourceFetcher,
+} = require("./queryEngine/queryExecution.adapter");
 const { getCreationContextFromAuthContext } = require("../../utils/auth.context.utils");
 
 dataQueryService.getDataQueriesWithDatasource = async ({
@@ -394,31 +398,11 @@ dataQueryService.runDataQueryByID = async ({
       throw new Error(`Database query with ID ${dataQueryID} not found`);
     }
 
-    const queryRunner = new QueryEngine(
-      async (queryId) => {
-        return await prisma.tblDataQueries.findFirst({
-          where: {
-            dataQueryID: queryId,
-          },
-        });
-      },
-      async (datasourceID) => {
-        return await prisma.tblDatasources.findFirst({
-          where: {
-            datasourceID: datasourceID,
-          },
-        });
-      }
+    const queryRunner = createQueryEngine();
+    const { mappedArgsToValues, kvtObject } = buildDataQueryExecutionArgs(
+      dataQuery.dataQueryOptions?.args,
+      argValues
     );
-
-    const mappedArgsToValues =
-      argValues && dataQuery.dataQueryOptions.args
-        ? dataQuery.dataQueryOptions.args.map((arg) => ({
-            ...arg,
-            value: argValues[arg.key],
-          }))
-        : [];
-    const kvtObject = keyValueTypeArrayToObject(mappedArgsToValues);
 
     Logger.log("info", {
       message: "dataQueryService:runDataQueryByID:queryRunner.run",
@@ -433,7 +417,11 @@ dataQueryService.runDataQueryByID = async ({
       },
     });
 
-    const results = await queryRunner.executeQuery(dataQueryID, kvtObject);
+    const results = await executeDataQuery({
+      engine: queryRunner,
+      dataQueryID,
+      executionArgs: kvtObject,
+    });
 
     Logger.log("success", {
       message: "dataQueryService:runDataQueryByID:success",
@@ -504,35 +492,25 @@ dataQueryService.runDataQueryByData = async ({
       },
     });
 
-    const queryRunner = new QueryEngine(
-      async (queryId) => {
+    const queryRunner = createQueryEngine({
+      queryFetcher: async (queryId) => {
         if (queryId == tempQueryID) {
           return processedDataQuery;
-        } else {
-          return await prisma.tblDataQueries.findFirst({
-            where: {
-              dataQueryID: queryId,
-            },
-          });
         }
-      },
-      async (datasourceID) => {
-        return await prisma.tblDatasources.findFirst({
+
+        return prisma.tblDataQueries.findFirst({
           where: {
-            datasourceID: datasourceID,
+            dataQueryID: queryId,
           },
         });
-      }
-    );
+      },
+      datasourceFetcher: defaultDatasourceFetcher,
+    });
 
-    const mappedArgsToValues =
-      argValues && processedDataQuery.dataQueryOptions.args
-        ? processedDataQuery.dataQueryOptions.args.map((arg) => ({
-            ...arg,
-            value: argValues[arg.key],
-          }))
-        : [];
-    const kvtObject = keyValueTypeArrayToObject(mappedArgsToValues);
+    const { mappedArgsToValues, kvtObject } = buildDataQueryExecutionArgs(
+      processedDataQuery.dataQueryOptions?.args,
+      argValues
+    );
 
     Logger.log("info", {
       message: "dataQueryService:runDataQueryByData:queryRunner.run",
@@ -547,7 +525,11 @@ dataQueryService.runDataQueryByData = async ({
       },
     });
 
-    const results = await queryRunner.executeQuery(tempQueryID, kvtObject);
+    const results = await executeDataQuery({
+      engine: queryRunner,
+      dataQueryID: tempQueryID,
+      executionArgs: kvtObject,
+    });
 
     Logger.log("success", {
       message: "dataQueryService:runDataQueryByData:success",

@@ -84,7 +84,7 @@ export const DashboardWidgetList = ({ tenantID }) => {
   };
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-3">
+    <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto border-t border-border p-3">
       <span className="text-sm font-semibold text-foreground">
         {CONSTANTS.STRINGS.DASHBOARD_WIDGET_LIST_WIDGETS_TITLE}
       </span>
@@ -100,7 +100,7 @@ export const DashboardWidgetList = ({ tenantID }) => {
                 <div
                   key={key}
                   id={key}
-                  className="flex items-center justify-between gap-2 rounded-md border border-border bg-muted/50 px-1 py-0"
+                  className="flex items-center justify-between gap-2 rounded-md border border-border bg-muted/50 px-3 py-2"
                 >
                   <div className="flex min-w-0 items-center">
                     <div

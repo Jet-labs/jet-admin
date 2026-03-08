@@ -6,7 +6,7 @@ import "react-resizable/css/styles.css";
 import { useComponentSize } from "../../../logic/hooks/useComponentSize";
 import { DashboardWidget } from "./dashboardWidget";
 
-import { Button } from "@jet-admin/ui";
+import { Button, Card } from "@jet-admin/ui";
 export const DashboardRenderWidget = ({
   widget,
   tenantID,
@@ -28,10 +28,11 @@ export const DashboardRenderWidget = ({
   const [isMouseHover, setIsMouseHover] = useState(false);
 
   return (
-    <div
-      className={`!h-full !w-full flex-grow relative  ${
-        isMouseHover ? "border border-primary" : "border border-slate-200"
-      }`}
+    <Card
+      className={`!h-full !w-full flex-grow relative overflow-hidden border bg-background/95 transition-all duration-200 ${isMouseHover
+        ? "border-primary shadow-lg shadow-primary/10 ring-1 ring-primary/20"
+        : "border-slate-200/80 shadow-sm"
+        } ${editable ? "hover:-translate-y-0.5" : ""}`}
       onMouseEnter={
         editable
           ? () => {
@@ -56,27 +57,29 @@ export const DashboardRenderWidget = ({
     >
       {handleDelete && isMouseHover && responsive && editable && (
         <div
-          className="!flex-row justify-end !items-center !w-full  absolute top-0 left-0 z-50"
-          style={{}}
+          className="absolute right-2 top-2 z-50"
         >
           <Button
             onClick={() => {
               handleDelete(index);
             }}
-            className="p-1 rounded-none m-0"
+            variant="destructive-ghost"
+            size="icon"
+            className="h-7 w-7 rounded-md border border-red-100 bg-white/95 shadow-sm"
             onMouseDown={(e) => {
               e.stopPropagation();
             }}
             onTouchStart={(e) => {
               e.stopPropagation();
             }}
+            aria-label="Remove widget"
           >
-            <FaTimes className="!text-xs text-white" />
+            <FaTimes className="!text-[10px]" />
           </Button>
         </div>
       )}
       <div
-        className="!flex-row justify-center !items-center !w-full !h-full"
+        className="!flex-row justify-center !items-center !w-full !h-full bg-gradient-to-br from-background via-background to-slate-50"
         ref={ref}
       >
         <DashboardWidget
@@ -86,6 +89,6 @@ export const DashboardRenderWidget = ({
           width={size.width}
         />
       </div>
-    </div>
+    </Card>
   );
 };

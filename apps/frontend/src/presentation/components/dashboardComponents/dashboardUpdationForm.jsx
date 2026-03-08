@@ -20,6 +20,7 @@ import { DashboardCloneForm } from "./dashboardCloneForm";
 import { DashboardDeletionForm } from "./dashboardDeletionForm";
 import { DashboardDropzone } from "./dashboardDropzone";
 import { DashboardEditor } from "./dashboardEditor";
+import { appendWidgetToDashboardConfig } from "./dashboardLayoutUtils";
 import { DashboardWidgetList } from "./dashboardWidgetList";
 
 import { Button, Spinner } from "@jet-admin/ui";
@@ -112,6 +113,22 @@ export const DashboardUpdationForm = ({ tenantID, dashboardID }) => {
     }
   }, [dashboard]);
 
+  const handleAddWidgetToCanvas = (widgetID) => {
+    const nextDashboardConfig = appendWidgetToDashboardConfig(
+      dashboardUpdationForm.values.dashboardConfig,
+      widgetID
+    );
+
+    dashboardUpdationForm.setFieldValue(
+      "dashboardConfig.widgets",
+      nextDashboardConfig.widgets
+    );
+    dashboardUpdationForm.setFieldValue(
+      "dashboardConfig.layouts",
+      nextDashboardConfig.layouts
+    );
+  };
+
   return (
     <div className="flex h-full w-full flex-col items-center bg-background">
       <div className="flex w-full items-start justify-between gap-3 border-b border-border bg-background p-3">
@@ -166,7 +183,11 @@ export const DashboardUpdationForm = ({ tenantID, dashboardID }) => {
               className="flex h-full w-full flex-col overflow-hidden bg-background"
             >
               <DashboardEditor dashboardEditorForm={dashboardUpdationForm} />
-              <DashboardWidgetList tenantID={tenantID} />
+              <DashboardWidgetList
+                tenantID={tenantID}
+                placedWidgets={dashboardUpdationForm.values.dashboardConfig.widgets}
+                onAddWidget={handleAddWidgetToCanvas}
+              />
             </form>
           </ResizablePanel>
           <ResizableHandle withHandle={true} />

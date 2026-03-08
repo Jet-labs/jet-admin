@@ -2,8 +2,8 @@
  * Condition Node Handler
  * Evaluates conditions and returns the appropriate branch handle
  */
-const { VM } = require('vm2');
 const { ERROR_HANDLING, NEXT_HANDLE } = require('./constants');
+const { createWorkflowVm } = require('./workflowVm');
 
 async function execute(nodeConfig, context, helpers) {
   const { 
@@ -21,7 +21,7 @@ async function execute(nodeConfig, context, helpers) {
       
       // Create sandbox for condition evaluation
       const sandbox = { ctx: context };
-      const vm = new VM({ timeout: 5000, sandbox });
+      const vm = createWorkflowVm({ timeoutMs: 5000, sandbox });
       
       try {
         // Wrap condition in boolean check

@@ -83,6 +83,35 @@ describe('QueryEngine', () => {
 
       expect(result).toBe('SELECT * FROM users WHERE id = 789');
     });
+
+    it('should preserve legacy args-prefixed template paths', async () => {
+      const template = 'SELECT * FROM users WHERE id = {{args.user.id}}';
+      const runtimeArgs = { user: { id: 654 } };
+
+      const result = await queryEngine.resolveStringTemplate(template, runtimeArgs, 'test-query');
+
+      expect(result).toBe('SELECT * FROM users WHERE id = 654');
+    });
+
+    it('should resolve bracket notation and array indexes safely', async () => {
+      const template = 'SELECT * FROM {{filters[0].table}} WHERE user_id = {{["user-id"]}}';
+      const runtimeArgs = {
+        filters: [{ table: 'customers' }],
+        'user-id': 321,
+      };
+
+      const result = await queryEngine.resolveStringTemplate(template, runtimeArgs, 'test-query');
+
+      expect(result).toBe('SELECT * FROM customers WHERE user_id = 321');
+    });
+
+    it('should not execute arbitrary expressions in template blocks', async () => {
+      const template = 'SELECT {{constructor.constructor("return 1")()}}';
+
+      const result = await queryEngine.resolveStringTemplate(template, {}, 'test-query');
+
+      expect(result).toBe('SELECT undefined');
+    });
   });
 
   describe('executeQuery', () => {

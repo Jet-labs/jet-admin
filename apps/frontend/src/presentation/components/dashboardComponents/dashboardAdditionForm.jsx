@@ -10,6 +10,7 @@ import {
 } from "../ui/resizable";
 import { DashboardDropzone } from "./dashboardDropzone";
 import { DashboardEditor } from "./dashboardEditor";
+import { appendWidgetToDashboardConfig } from "./dashboardLayoutUtils";
 import { DashboardWidgetList } from "./dashboardWidgetList";
 import { formValidations } from "../../../utils/formValidation";
 import PropTypes from "prop-types";
@@ -61,6 +62,23 @@ export const DashboardAdditionForm = ({ tenantID }) => {
       addDashboard(values);
     },
   });
+
+  const handleAddWidgetToCanvas = (widgetID) => {
+    const nextDashboardConfig = appendWidgetToDashboardConfig(
+      dashboardAdditionForm.values.dashboardConfig,
+      widgetID
+    );
+
+    dashboardAdditionForm.setFieldValue(
+      "dashboardConfig.widgets",
+      nextDashboardConfig.widgets
+    );
+    dashboardAdditionForm.setFieldValue(
+      "dashboardConfig.layouts",
+      nextDashboardConfig.layouts
+    );
+  };
+
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="flex h-full w-full flex-col items-center bg-background">
@@ -92,7 +110,11 @@ export const DashboardAdditionForm = ({ tenantID }) => {
               className="flex h-full w-full flex-col overflow-hidden bg-background"
             >
               <DashboardEditor dashboardEditorForm={dashboardAdditionForm} />
-              <DashboardWidgetList tenantID={tenantID} />
+              <DashboardWidgetList
+                tenantID={tenantID}
+                placedWidgets={dashboardAdditionForm.values.dashboardConfig.widgets}
+                onAddWidget={handleAddWidgetToCanvas}
+              />
             </form>
           </ResizablePanel>
           <ResizableHandle withHandle={true} />

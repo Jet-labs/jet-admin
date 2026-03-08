@@ -2,22 +2,8 @@
  * Data Query Node Handler
  * Executes database queries using the QueryEngine
  */
-const { QueryEngine } = require('../../../dataQuery/queryEngine/engine');
-const { prisma } = require('../../../../config/prisma.config');
+const { createQueryEngine } = require('../../../dataQuery/queryEngine/queryExecution.adapter');
 const { ERROR_HANDLING, NEXT_HANDLE } = require('./constants');
-
-// Query and datasource fetchers for QueryEngine
-const queryFetcher = async (id) => {
-  return prisma.tblDataQueries.findUnique({
-    where: { dataQueryID: id },
-  });
-};
-
-const datasourceFetcher = async (id) => {
-  return prisma.tblDatasources.findUnique({
-    where: { datasourceID: id },
-  });
-};
 
 async function execute(nodeConfig, context, helpers) {
   const { resolveStringWithContext } = helpers;
@@ -50,7 +36,7 @@ async function execute(nodeConfig, context, helpers) {
   
   try {
     // Execute query using QueryEngine
-    const engine = new QueryEngine(queryFetcher, datasourceFetcher);
+    const engine = createQueryEngine();
     const result = await engine.executeQuery(dataQueryID, resolvedArgs);
     
     return {

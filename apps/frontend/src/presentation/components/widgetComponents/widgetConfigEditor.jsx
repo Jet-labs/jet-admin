@@ -35,6 +35,8 @@ export const WidgetConfigEditor = ({
   workflowContext,
   workflowLogs,
   isRunningWorkflow,
+  initialWorkflowID,
+  initialWorkflowTitle,
   onTestWorkflow,
   onClearLogs,
 }) => {
@@ -43,11 +45,13 @@ export const WidgetConfigEditor = ({
     workflowContext: PropTypes.object,
     workflowLogs: PropTypes.array,
     isRunningWorkflow: PropTypes.bool,
+    initialWorkflowID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    initialWorkflowTitle: PropTypes.string,
     onTestWorkflow: PropTypes.func,
     onClearLogs: PropTypes.func,
   };
 
-  const { workflows } = useWidgetsState();
+  const { workflows, isLoadingWorkflows } = useWidgetsState();
 
   // Editor mode state
   const isVegaLite = widgetEditorForm.values.widgetType === 'vega-lite';
@@ -96,9 +100,16 @@ export const WidgetConfigEditor = ({
   // Get selected workflow details
   const selectedWorkflow = useMemo(() => {
     const workflowID = widgetEditorForm.values.workflowID;
-    if (!workflowID || !workflows) return null;
+    if (workflowID == null || !workflows?.length) return null;
     return workflows.find(w => String(w.workflowID) === String(workflowID));
   }, [widgetEditorForm.values.workflowID, workflows]);
+
+  const workflowValue = widgetEditorForm.values.workflowID != null
+    ? String(widgetEditorForm.values.workflowID)
+    : "";
+  const selectedWorkflowTitle = selectedWorkflow?.title
+    || (workflowValue && String(initialWorkflowID) === workflowValue ? initialWorkflowTitle : undefined);
+  const workflowSelectKey = `workflow-select_${isLoadingWorkflows ? 'loading' : 'ready'}_${workflows?.length || 0}_${workflowValue || 'empty'}`;
 
   // Handle workflow change — clear parent context
   const handleWorkflowChange = (value) => {
@@ -138,11 +149,15 @@ export const WidgetConfigEditor = ({
           {CONSTANTS.STRINGS.WIDGET_EDITOR_FORM_WORKFLOW_LABEL}
         </Label>
         <Select
-          value={widgetEditorForm.values.workflowID ? String(widgetEditorForm.values.workflowID) : ""}
+          key={workflowSelectKey}
+          value={workflowValue}
+          disabled={isLoadingWorkflows && !workflows?.length}
           onValueChange={handleWorkflowChange}
         >
           <SelectTrigger className="text-xs">
-            <SelectValue placeholder="Select an option" />
+            <SelectValue placeholder={isLoadingWorkflows ? "Loading workflows..." : "Select an option"}>
+              {selectedWorkflowTitle}
+            </SelectValue>
           </SelectTrigger>
           <SelectContent>
             {workflows?.map((workflow) => (
@@ -155,8 +170,8 @@ export const WidgetConfigEditor = ({
       </div>
 
       {/* Row 4: Test Workflow + Settings buttons */}
-      <div className="flex flex-row justify-start items-center gap-2">
-        {selectedWorkflow && onTestWorkflow && (
+      {selectedWorkflow && onTestWorkflow && <div className="flex flex-row justify-start items-center gap-2">
+
           <Button
             type="button"
             size="sm"
@@ -171,73 +186,74 @@ export const WidgetConfigEditor = ({
             )}
             {isRunningWorkflow ? CONSTANTS.STRINGS.TEST_WORKFLOW_BUTTON_RUNNING : CONSTANTS.STRINGS.TEST_WORKFLOW_BUTTON}
           </Button>
-        )}
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="h-8 text-xs"
-          onClick={() => setIsSettingsDialogOpen(true)}
-        >
-          <FiSettings className="inline-block h-3 w-3 mr-2" />
-          {CONSTANTS.STRINGS.WIDGET_EDITOR_FORM_SETTINGS_BUTTON}
-        </Button>
-        <Dialog open={isSettingsDialogOpen} onOpenChange={setIsSettingsDialogOpen}>
-          <DialogContent className="max-w-lg">
-            <DialogHeader>
-              <DialogTitle>
-                {CONSTANTS.STRINGS.WIDGET_EDITOR_FORM_SETTINGS_BUTTON}
-              </DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div className="space-y-1.5">
-                <Label className="text-xs font-medium text-foreground">
-                  {`${CONSTANTS.STRINGS.WIDGET_EDITOR_FORM_REFRESH_INTERVAL_LABEL} (ms)`}
-                </Label>
-                <Input
-                  type="number"
-                  name="widgetConfig.refetchInterval"
-                  className="text-sm"
-                  onChange={widgetEditorForm.handleChange}
-                  value={widgetEditorForm.values.widgetConfig?.refetchInterval || ""}
-                />
-              </div>
-              <div className="border-t border-border pt-4">
-                <Label className="text-xs font-medium text-foreground">
-                  Advanced Options
-                </Label>
-                <div className="mt-2 max-h-[50vh] overflow-y-auto pr-1">
-                  <WidgetAdvancedOptions
-                    widgetForm={widgetEditorForm}
-                    parentWidgetType={widgetEditorForm.values.widgetType}
-                  />
-                </div>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
+
+
       </div>
+      }
 
       {isVegaLite && (
-        <div className="flex items-center gap-4 border-y border-border py-2">
-          <div className="flex flex-row items-center gap-2">
-            <span className="text-xs font-medium text-muted-foreground">Visual Editor</span>
-            <Switch className="h-[18px] w-[32px] [&>span]:h-3.5 [&>span]:w-3.5 data-[state=checked]:[&>span]:translate-x-3.5" checked={currentMode === 'visual'} onCheckedChange={(checked) => handleModeSwitch(checked ? 'visual' : 'raw')} />
-          </div>
-          
-          {/* Render the ShelfBuilder modal trigger button if in visual mode */}
-          {currentMode === 'visual' && !showParseWarning && (
-            <div className="flex-1 flex justify-end">
-              <ShelfBuilder
-                widgetEditorForm={widgetEditorForm}
-                workflowContext={workflowContext}
-                workflows={workflows}
-              />
-            </div>
-          )}
+        <div className="flex flex-row items-center gap-2">
+          <span className="text-xs font-medium text-muted-foreground">Visual Editor</span>
+          <Switch className="h-[18px] w-[32px] [&>span]:h-3.5 [&>span]:w-3.5 data-[state=checked]:[&>span]:translate-x-3.5" checked={currentMode === 'visual'} onCheckedChange={(checked) => handleModeSwitch(checked ? 'visual' : 'raw')} />
         </div>
       )}
 
+      {isVegaLite && (
+        <div className="flex flex-row items-center justify-stretch gap-3">
+          {/* Render the ShelfBuilder modal trigger button if in visual mode */}
+          {currentMode === 'visual' && !showParseWarning && (
+            <ShelfBuilder
+              widgetEditorForm={widgetEditorForm}
+              workflowContext={workflowContext}
+              workflows={workflows}
+            />
+          )}
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="h-8 text-xs"
+            onClick={() => setIsSettingsDialogOpen(true)}
+          >
+            <FiSettings className="inline-block h-3 w-3 mr-2" />
+            {CONSTANTS.STRINGS.WIDGET_EDITOR_FORM_SETTINGS_BUTTON}
+          </Button>
+          <Dialog open={isSettingsDialogOpen} onOpenChange={setIsSettingsDialogOpen}>
+            <DialogContent className="max-w-lg">
+              <DialogHeader>
+                <DialogTitle>
+                  {CONSTANTS.STRINGS.WIDGET_EDITOR_FORM_SETTINGS_BUTTON}
+                </DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-medium text-foreground">
+                    {`${CONSTANTS.STRINGS.WIDGET_EDITOR_FORM_REFRESH_INTERVAL_LABEL} (ms)`}
+                  </Label>
+                  <Input
+                    type="number"
+                    name="widgetConfig.refetchInterval"
+                    className="text-sm"
+                    onChange={widgetEditorForm.handleChange}
+                    value={widgetEditorForm.values.widgetConfig?.refetchInterval || ""}
+                  />
+                </div>
+                <div className="border-t border-border pt-4">
+                  <Label className="text-xs font-medium text-foreground">
+                    Advanced Options
+                  </Label>
+                  <div className="mt-2 max-h-[50vh] overflow-y-auto pr-1">
+                    <WidgetAdvancedOptions
+                      widgetForm={widgetEditorForm}
+                      parentWidgetType={widgetEditorForm.values.widgetType}
+                    />
+                  </div>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
+      )}
       {/* Parse Warning Banner */}
       {showParseWarning && (
         <div className="my-2 shrink-0 rounded-md border border-amber-200 bg-amber-50 px-4 py-2 dark:border-amber-900/40 dark:bg-amber-950/20">

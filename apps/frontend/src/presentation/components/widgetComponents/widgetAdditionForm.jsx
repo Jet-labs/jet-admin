@@ -7,6 +7,7 @@ import {
 } from "../../../data/apis/widget";
 import { formValidations } from "../../../utils/formValidation";
 import { displayError, displaySuccess } from "../../../utils/notification";
+import { FiRefreshCcw } from "react-icons/fi";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -157,7 +158,7 @@ export const WidgetAdditionForm = ({ tenantID }) => {
         <ResizableHandle withHandle={true} />
         <ResizablePanel defaultSize={45} className="relative">
           {/* Execution Mode Toggle */}
-          <div className="absolute right-3 top-3 z-10 flex items-center gap-2 rounded-md border border-border bg-background/95 p-1.5 shadow-sm">
+          <div className="flex items-center border-b border-border flex-row justify-end gap-2 bg-background/95 p-1.5">
             <div className="flex items-center gap-1.5">
               <Switch
                 className="h-[18px] w-[32px] [&>span]:h-3.5 [&>span]:w-3.5 data-[state=checked]:[&>span]:translate-x-3.5"
@@ -165,14 +166,28 @@ export const WidgetAdditionForm = ({ tenantID }) => {
                 onCheckedChange={(checked) => setExecutionMode(checked ? WIDGET_EXECUTION_MODES.ASYNC : WIDGET_EXECUTION_MODES.SYNC)}
               />
               <Label className="cursor-pointer text-xs text-muted-foreground">{executionMode === WIDGET_EXECUTION_MODES.ASYNC ? "Real-time" : "Sync"}</Label>
+
             </div>
 
             {isLive && (
-              <div className="flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-1 text-xs font-medium text-emerald-600">
+              <div className="flex items-center gap-1 rounded-full bg-emerald-500/10 px-1 text-xs font-medium text-emerald-600">
                 <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span>Live</span>
               </div>
             )}
+            <Button
+              type="button"
+              variant='ghost'
+              size="icon"
+              className="h-8 w-8 text-slate-500 hover:text-slate-700 bg-white"
+              onClick={_handleFetchWidgetData}
+            >
+              {isPreviewLoading ? (
+                <Spinner size={14} />
+              ) : (
+                <FiRefreshCcw className="h-3.5 w-3.5" />
+              )}
+            </Button>
           </div>
           <WidgetPreview
             widgetTitle={addWidgetForm.values.widgetTitle}

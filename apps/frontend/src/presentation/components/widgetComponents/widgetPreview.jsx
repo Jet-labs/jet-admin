@@ -1,10 +1,9 @@
-import React, { useCallback, useRef } from "react";
-import { FiRefreshCcw } from "react-icons/fi";
-import { CONSTANTS } from "../../../constants";
-import PropTypes from "prop-types";
 import { WIDGETS_MAP } from "@jet-admin/widgets-ui";
+import PropTypes from "prop-types";
+import { useCallback, useRef } from "react";
+import { CONSTANTS } from "../../../constants";
 
-import { Button, Spinner } from "@jet-admin/ui";
+import { Spinner } from "@jet-admin/ui";
 /**
  * Resolve a dotted path like "nodeOutput.rows" against an object.
  * Returns undefined if any part is missing.
@@ -195,21 +194,6 @@ export const WidgetPreview = ({
 
   return (
     <div className="h-full w-full flex flex-col widget-editor-zone">
-      <div className="we-preview-toolbar">
-        <Button
-          type="button"
-          variant="outline"
-          size="icon"
-          className="h-8 w-8 text-slate-500 hover:text-slate-700 bg-white"
-          onClick={refreshData}
-        >
-          {isRefreshingData ? (
-            <Spinner size={14} />
-          ) : (
-              <FiRefreshCcw className="h-3.5 w-3.5" />
-          )}
-        </Button>
-      </div>
       {isFetchingData || isRefreshingData ? (
         <div className="w-full h-full flex flex-col justify-center items-center" style={{ background: 'var(--we-bg-primary)' }}>
           <Spinner size={16} />

@@ -8,6 +8,7 @@ import { FiSettings, FiChevronDown, FiChevronRight, FiDatabase } from 'react-ico
 import { MdOutlineAutoGraph } from 'react-icons/md';
 
 import { Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
+import { CONSTANTS } from '../../../constants';
 const PRIMARY_SHELVES = ['x', 'y', 'color', 'size'];
 const SECONDARY_SHELVES = ['row', 'column', 'shape', 'opacity', 'detail', 'text'];
 
@@ -155,11 +156,11 @@ export const ShelfBuilder = ({
         onClick={() => setIsOpen(true)}
         type="button"
         variant="outline"
-        size="icon"
-        className="h-8 w-8 hover:!text-indigo-600 ml-auto bg-white border-slate-200 text-slate-600 shadow-sm"
-        title="Map Data Fields"
+        size="sm"
+        className="h-8 text-xs"
       >
-        <MdOutlineAutoGraph className="w-4 h-4" />
+        <MdOutlineAutoGraph className="inline-block h-3 w-3 mr-2" />
+        {CONSTANTS.STRINGS.WIDGET_DATASET_FIELD_MAPPING_BUTTON}
       </Button>
 
       {isOpen && (

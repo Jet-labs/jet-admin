@@ -112,8 +112,8 @@ async function addNodeJob(jobData, options = {}) {
   const message = {
     ...jobData,
     timestamp: Date.now(),
-    attempts: 0,
-    maxAttempts: 1,
+    attempts: jobData.attempts ?? 0,
+    maxAttempts: jobData.maxAttempts ?? 3,
   };
 
   Logger.log('info', {

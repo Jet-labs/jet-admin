@@ -1,6 +1,7 @@
 // src/engine.js
-const { extractTemplateBlocks, resolveArgs } = require("./parsers");
+const { extractTemplateBlocks } = require("./parsers");
 const Logger = require("../../../utils/logger");
+const { getValueByPath } = require("../../../utils/objectPath.util");
 const { DATASOURCE_TYPES } = require("@jet-admin/datasource-types");
 const { dataSourceRegistry } = require("@jet-admin/datasources-logic");
 
@@ -143,8 +144,10 @@ class QueryEngine {
         params: { dataQueryID, block },
       });
 
-      // Resolve input variable from runtimeArgs
-      const value = eval(`runtimeArgs.${block.expression}`);
+      // Resolve input variable from runtimeArgs using safe path traversal
+      const value = getValueByPath(runtimeArgs, block.expression, {
+        allowedRoots: ["runtimeArgs", "args"],
+      });
 
       Logger.log("info", {
         message: "QueryEngine:resolveTemplate:resolveVariable",

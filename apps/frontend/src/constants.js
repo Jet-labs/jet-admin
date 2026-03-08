@@ -623,6 +623,22 @@ export const CONSTANTS = {
     DASHBOARD_WIDGET_LIST_TITLE: "Widgets",
     DASHBOARD_WIDGET_LIST_WIDGETS_TITLE: "Widgets",
     DASHBOARD_WIDGET_LIST_QUERIES_TITLE: "Queries",
+    DASHBOARD_WIDGET_LIST_HELPER_TEXT:
+      "Drag a widget into the canvas or click Add. You can place the same widget more than once.",
+    DASHBOARD_WIDGET_LIST_SEARCH_PLACEHOLDER: "Search widgets",
+    DASHBOARD_WIDGET_LIST_NO_MATCHING_WIDGETS: "No matching widgets found",
+
+    DASHBOARD_DROPZONE_TITLE: "Canvas",
+    DASHBOARD_DROPZONE_HELPER_TEXT:
+      "Drag widgets into the canvas, drag placed widgets to reposition them, and resize them from the corners.",
+    DASHBOARD_DROPZONE_SELECTION_HINT:
+      "Select a widget on the canvas to fine-tune its position and size.",
+    DASHBOARD_DROPZONE_SELECTION_HELPER:
+      "Fine-tuning applies to the current responsive breakpoint only.",
+    DASHBOARD_DROPZONE_EMPTY_MESSAGE:
+      "Drag a widget here to start building your dashboard",
+    DASHBOARD_DROPZONE_EMPTY_HELPER:
+      "Widgets snap to the responsive grid so layouts stay aligned across screen sizes.",
 
     DASHBOARD_WIDGET_CUSTOM_CSS_BUTTON: "Custom CSS",
     DASHBOARD_WIDGET_CUSTOM_CSS_FORM_TITLE: "Custom CSS",
@@ -664,6 +680,7 @@ export const CONSTANTS = {
     DASHBOARD_EDITOR_FORM_DESCRIPTION_FIELD_PLACEHOLDER:
       "Descripton (Optional)",
 
+    WIDGET_DATASET_FIELD_MAPPING_BUTTON: "Mappings",
     WIDGET_DATASET_FIELD_MAPPING_TITLE: "Dataset field options",
     WIDGET_DATASET_FIELD_MAPPING_NO_META: "Dataset metadata not available",
     WIDGET_DATASET_FIELD_MAPPING_CONFIRM: "Save changes",

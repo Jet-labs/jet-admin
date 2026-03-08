@@ -10,6 +10,9 @@ const {
   getCreationContextFromAuthContext,
 } = require("../../utils/auth.context.utils");
 const { processWorkflowDataForWidget } = require("@jet-admin/widgets-logic");
+const {
+  buildWorkflowGraphPersistencePayload,
+} = require("./workflow.persistence.mapper");
 
 const workflowService = {}
 
@@ -111,36 +114,24 @@ workflowService.createWorkflow = async ({ userID, tenantID, title, nodes, edges,
           workflowOptions: workflowOptions || {},
         },
       });
-      await tx.tblWorkflowNodes.createMany({
-        data: nodes.map((node) => ({
-          nodeID: node.id, // Use frontend node ID
-          workflowID: workflow.workflowID,
-          nodeType: node.type,
-          nodeConfig: {
-            ...node.data,
-            position: node.position,
-            width: node.width,
-            height: node.height,
-            measured: node.measured,
-          },
-        })),
+      const { nodeCreateManyData, edgeCreateManyData } = buildWorkflowGraphPersistencePayload({
+        workflowID: workflow.workflowID,
+        nodes,
+        edges,
       });
-      await tx.tblWorkflowEdge.createMany({
-        data: edges.map((edge) => ({
-          workflowID: workflow.workflowID,
-          upstreamNodeID: edge.source,
-          downstreamNodeID: edge.target,
-          sourceHandle: edge.sourceHandle || null,
-          targetHandle: edge.targetHandle || null,
-          edgeType: edge.type || 'smoothstep',
-          edgeConfig: {
-            label: edge.label,
-            style: edge.style,
-            animated: edge.animated,
-            data: edge.data,
-          },
-        })),
-      });
+
+      if (nodeCreateManyData.length > 0) {
+        await tx.tblWorkflowNodes.createMany({
+          data: nodeCreateManyData,
+        });
+      }
+
+      if (edgeCreateManyData.length > 0) {
+        await tx.tblWorkflowEdge.createMany({
+          data: edgeCreateManyData,
+        });
+      }
+
       return workflow;
     });
 
@@ -211,41 +202,23 @@ workflowService.updateWorkflow = async ({ userID, tenantID, workflowID, title, n
         where: { workflowID: workflowID },
       });
 
+      const { nodeCreateManyData, edgeCreateManyData } = buildWorkflowGraphPersistencePayload({
+        workflowID: workflow.workflowID,
+        nodes,
+        edges,
+      });
+
       // Create new nodes
-      if (nodes && nodes.length > 0) {
+      if (nodeCreateManyData.length > 0) {
         await tx.tblWorkflowNodes.createMany({
-          data: nodes.map((node) => ({
-            nodeID: node.id,
-            workflowID: workflow.workflowID,
-            nodeType: node.type,
-            nodeConfig: {
-              ...node.data,
-              position: node.position,
-              width: node.width,
-              height: node.height,
-              measured: node.measured,
-            },
-          })),
+          data: nodeCreateManyData,
         });
       }
 
       // Create new edges
-      if (edges && edges.length > 0) {
+      if (edgeCreateManyData.length > 0) {
         await tx.tblWorkflowEdge.createMany({
-          data: edges.map((edge) => ({
-            workflowID: workflow.workflowID,
-            upstreamNodeID: edge.source,
-            downstreamNodeID: edge.target,
-            sourceHandle: edge.sourceHandle || null,
-            targetHandle: edge.targetHandle || null,
-            edgeType: edge.type || 'smoothstep',
-            edgeConfig: {
-              label: edge.label,
-              style: edge.style,
-              animated: edge.animated,
-              data: edge.data,
-            },
-          })),
+          data: edgeCreateManyData,
         });
       }
 
