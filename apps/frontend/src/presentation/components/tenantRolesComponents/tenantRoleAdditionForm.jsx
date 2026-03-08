@@ -1,10 +1,7 @@
 import { useFormik } from "formik";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 
-import {
-  CircularProgress
-} from "@mui/material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import React, { useCallback } from "react";
 import { addTenantRoleAPI } from "../../../data/apis/tenantRole";
@@ -12,8 +9,10 @@ import { displayError, displaySuccess } from "../../../utils/notification";
 import { TenantPermissionSelectionInput } from "./tenantPermissionSelectionInput";
 import { formValidations } from "../../../utils/formValidation";
 
+import { Button, Spinner, Input, Label } from "@jet-admin/ui";
 export const TenantRoleAdditionForm = () => {
   const { tenantID } = useParams();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { isPending: isAddingTenantRole, mutate: addTenantRole } = useMutation({
     mutationFn: ({ roleTitle, roleDescription, permissionIDs }) =>
@@ -50,7 +49,7 @@ export const TenantRoleAdditionForm = () => {
       const {
         target: { value },
       } = event;
-      console.log({ value });
+      addTenantRoleForm.setFieldTouched("permissionIDs", true, false);
       addTenantRoleForm.setFieldValue(
         "permissionIDs",
         typeof value === "string" ? value.split(",") : value
@@ -60,88 +59,96 @@ export const TenantRoleAdditionForm = () => {
   );
 
   return (
-    <section className="max-w-3xl w-full h-full">
-      <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-        <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl ">
+    <section className="w-full max-w-2xl space-y-6">
+      <header className="space-y-1">
+        <h1 className="text-xl font-bold text-foreground md:text-2xl">
           {CONSTANTS.STRINGS.TENANT_ROLE_ADDITION_TITLE}
         </h1>
-        {addTenantRoleForm && (
-          <form
-            className="space-y-4 md:space-y-6"
-            onSubmit={addTenantRoleForm.handleSubmit}
-          >
-            <div>
-              <label
-                htmlFor="roleTitle"
-                className="block mb-1 text-sm font-medium text-slate-500"
-              >
-                {
-                  CONSTANTS.STRINGS
-                    .TENANT_ROLE_ADDITION_FORM_ROLE_NAME_FIELD_LABEL
-                }
-              </label>
-              <input
-                type="roleTitle"
-                name="roleTitle"
-                id="roleTitle"
-                className=" placeholder:text-slate-400 bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:border-slate-700 block w-full px-2.5 py-1.5 "
-                placeholder={
-                  CONSTANTS.STRINGS
-                    .TENANT_ROLE_ADDITION_FORM_ROLE_NAME_FIELD_PLACEHOLDER
-                }
-                required={true}
-                onChange={addTenantRoleForm.handleChange}
-                onBlur={addTenantRoleForm.handleBlur}
-                value={addTenantRoleForm.values.roleTitle}
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="roleDescription"
-                className="block mb-1 text-sm font-medium text-slate-500"
-              >
-                {
-                  CONSTANTS.STRINGS
-                    .TENANT_ROLE_ADDITION_FORM_ROLE_DESCRIPTION_FIELD_LABEL
-                }
-              </label>
-              <input
-                type="roleDescription"
-                name="roleDescription"
-                id="roleDescription"
-                className=" placeholder:text-slate-400 bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:border-slate-700 block w-full px-2.5 py-1.5 "
-                placeholder={
-                  CONSTANTS.STRINGS
-                    .TENANT_ROLE_ADDITION_FORM_ROLE_DESCRIPTION_FIELD_PLACEHOLDER
-                }
-                required={true}
-                onChange={addTenantRoleForm.handleChange}
-                onBlur={addTenantRoleForm.handleBlur}
-                value={addTenantRoleForm.values.roleDescription}
-              />
-            </div>
-
-            <TenantPermissionSelectionInput
-              value={addTenantRoleForm.values.permissionIDs}
-              onChange={_handleOnRolePermissionsSelectionChange}
+        <p className="text-sm text-muted-foreground">
+          Create a reusable role and assign the permissions it should grant.
+        </p>
+      </header>
+      {addTenantRoleForm && (
+        <form className="space-y-4" onSubmit={addTenantRoleForm.handleSubmit}>
+          <div className="space-y-1.5">
+            <Label htmlFor="roleTitle">
+              {CONSTANTS.STRINGS.TENANT_ROLE_ADDITION_FORM_ROLE_NAME_FIELD_LABEL}
+            </Label>
+            <Input
+              type="text"
+              name="roleTitle"
+              id="roleTitle"
+              placeholder={
+                CONSTANTS.STRINGS
+                  .TENANT_ROLE_ADDITION_FORM_ROLE_NAME_FIELD_PLACEHOLDER
+              }
+              required={true}
+              onChange={addTenantRoleForm.handleChange}
+              onBlur={addTenantRoleForm.handleBlur}
+              value={addTenantRoleForm.values.roleTitle}
             />
+            {addTenantRoleForm.touched.roleTitle &&
+              addTenantRoleForm.errors.roleTitle && (
+                <p className="text-xs text-red-500">
+                  {addTenantRoleForm.errors.roleTitle}
+                </p>
+              )}
+          </div>
 
-            <div className="flex flex-row justify-end items-center w-full">
-              <button
-                type="submit"
-                disabled={isAddingTenantRole}
-                className="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none focus:ring-blue-300 "
-              >
-                {isAddingTenantRole && (
-                  <CircularProgress className="!mr-3" size={16} color="white" />
-                )}
-                {CONSTANTS.STRINGS.TENANT_ROLE_ADDITION_FORM_SUBMIT_BUTTON}
-              </button>
-            </div>
-          </form>
-        )}
-      </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="roleDescription">
+              {
+                CONSTANTS.STRINGS
+                  .TENANT_ROLE_ADDITION_FORM_ROLE_DESCRIPTION_FIELD_LABEL
+              }
+            </Label>
+            <Input
+              type="text"
+              name="roleDescription"
+              id="roleDescription"
+              placeholder={
+                CONSTANTS.STRINGS
+                  .TENANT_ROLE_ADDITION_FORM_ROLE_DESCRIPTION_FIELD_PLACEHOLDER
+              }
+              required={true}
+              onChange={addTenantRoleForm.handleChange}
+              onBlur={addTenantRoleForm.handleBlur}
+              value={addTenantRoleForm.values.roleDescription}
+            />
+            {addTenantRoleForm.touched.roleDescription &&
+              addTenantRoleForm.errors.roleDescription && (
+                <p className="text-xs text-red-500">
+                  {addTenantRoleForm.errors.roleDescription}
+                </p>
+              )}
+          </div>
+
+          <TenantPermissionSelectionInput
+            label={
+              CONSTANTS.STRINGS
+                .TENANT_ROLE_ADDITION_FORM_ROLE_PERMISSIONS_FIELD_LABEL
+            }
+            helperText="Select the tenant permissions that members with this role should receive."
+            value={addTenantRoleForm.values.permissionIDs}
+            onChange={_handleOnRolePermissionsSelectionChange}
+            error={
+              addTenantRoleForm.touched.permissionIDs
+                ? addTenantRoleForm.errors.permissionIDs
+                : undefined
+            }
+          />
+
+          <div className="flex flex-wrap items-center justify-end gap-2 pt-2">
+            <Button type="button" variant="outline" onClick={() => navigate(-1)}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isAddingTenantRole}>
+              {isAddingTenantRole && <Spinner className="mr-2" size={16} />}
+              {CONSTANTS.STRINGS.TENANT_ROLE_ADDITION_FORM_SUBMIT_BUTTON}
+            </Button>
+          </div>
+        </form>
+      )}
     </section>
   );
 };

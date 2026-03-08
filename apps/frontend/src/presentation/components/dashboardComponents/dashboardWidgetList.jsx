@@ -8,10 +8,12 @@ import { CONSTANTS } from "../../../constants";
 import { useDashboardsState } from "../../../logic/contexts/dashboardsContext";
 import { NoEntityUI } from "../ui/noEntityUI";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
+import { Button } from "@jet-admin/ui";
 
 export const DashboardWidgetList = ({ tenantID }) => {
   DashboardWidgetList.propTypes = {
-    tenantID: PropTypes.number.isRequired,
+    tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+      .isRequired,
   };
   const { isLoadingWidgets, loadWidgetsError, widgets } = useDashboardsState();
 
@@ -30,7 +32,9 @@ export const DashboardWidgetList = ({ tenantID }) => {
       clone.style.transform = "translateX(-9999px)";
       clone.style.position = "absolute";
       clone.style.boxShadow = "0 4px 8px rgba(0, 0, 0, 0.1)";
-      clone.style.background = "#e2e8f0"; // Slightly darker than original
+      clone.style.background = "hsl(var(--muted))";
+      clone.style.border = "1px solid hsl(var(--border))";
+      clone.style.borderRadius = "0.5rem";
 
       // Add to DOM temporarily
       document.body.appendChild(clone);
@@ -46,28 +50,45 @@ export const DashboardWidgetList = ({ tenantID }) => {
   };
 
   const _renderWidgetIcon = (widgetType) => {
-    return WIDGETS_MAP[widgetType].icon({
-      className: "!text-slate-700 !text-xl !mr-3",
+    const widgetConfig = WIDGETS_MAP[widgetType];
+    if (!widgetConfig || !widgetConfig.icon) {
+      return (
+        <span className="mr-3 text-sm text-muted-foreground">
+          📊
+        </span>
+      );
+    }
+
+    return widgetConfig.icon({
+      className: "mr-3 h-4 w-4 text-foreground",
     });
   };
 
   const _renderWidgetLinkIcon = (widgetID) => {
     return (
-      <Link
-        to={CONSTANTS.ROUTES.UPDATE_WIDGET_BY_ID.path(tenantID, widgetID)}
-        target="_blank"
+      <Button
+        asChild
+        type="button"
+        variant="ghost"
+        size="icon"
+        className="shrink-0 text-muted-foreground hover:text-foreground"
       >
-        <FiExternalLink className="text-[#646cff] !text-sm ml-2" />
-      </Link>
+        <Link
+          to={CONSTANTS.ROUTES.UPDATE_WIDGET_BY_ID.path(tenantID, widgetID)}
+          target="_blank"
+        >
+          <FiExternalLink className="h-4 w-4" />
+        </Link>
+      </Button>
     );
   };
 
   return (
-    <div className="flex flex-col justify-start items-stretch w-full h-full gap-2 overflow-y-auto p-2">
-      <span className="text-[#646cff] font-semibold text-sm">
+    <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto p-3">
+      <span className="text-sm font-semibold text-foreground">
         {CONSTANTS.STRINGS.DASHBOARD_WIDGET_LIST_WIDGETS_TITLE}
       </span>
-      <div className="flex flex-col justify-start items-stretch w-full gap-2">
+      <div className="flex w-full flex-1 flex-col gap-2">
         <ReactQueryLoadingErrorWrapper
           isLoading={isLoadingWidgets}
           error={loadWidgetsError}
@@ -79,18 +100,18 @@ export const DashboardWidgetList = ({ tenantID }) => {
                 <div
                   key={key}
                   id={key}
-                  className="bg-slate-200 flex flex-row justify-between p-2 rounded items-center"
+                  className="flex items-center justify-between gap-2 rounded-md border border-border bg-muted/50 px-1 py-0"
                 >
-                  <div className="flex flex-row justify-start items-center">
+                  <div className="flex min-w-0 items-center">
                     <div
                       draggable
                       onDragStart={(e) => _handleDragStart(e, key)}
                       className="cursor-grab"
                     >
-                      <GoGrabber className="text-slate-700 mr-2 !text-xl" />
+                      <GoGrabber className="mr-2 h-4 w-4 text-muted-foreground" />
                     </div>
                     <div>{_renderWidgetIcon(widget.widgetType)}</div>
-                    <span className="text-xs text-slate-700 font-medium">
+                    <span className="truncate text-sm font-medium text-foreground">
                       {widget.widgetTitle}
                     </span>
                   </div>
@@ -100,7 +121,7 @@ export const DashboardWidgetList = ({ tenantID }) => {
             })
           ) : (
             <NoEntityUI
-              message={CONSTANTS.STRINGS.QUERY_DRAWER_LIST_NO_QUERY}
+                message={CONSTANTS.STRINGS.WIDGET_DRAWER_LIST_NO_WIDGET}
             />
           )}
         </ReactQueryLoadingErrorWrapper>

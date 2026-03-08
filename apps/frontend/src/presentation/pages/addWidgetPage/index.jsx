@@ -4,7 +4,12 @@ import { useParams } from "react-router-dom";
 
 const AddWidgetPage = () => {
   const { tenantID } = useParams();
-  return <WidgetAdditionForm tenantID={tenantID} />;
+
+  return (
+    <div className="flex h-full w-full flex-col overflow-hidden bg-background">
+      <WidgetAdditionForm tenantID={tenantID} />
+    </div>
+  );
 };
 
 export default AddWidgetPage;

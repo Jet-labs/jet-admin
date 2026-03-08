@@ -1,11 +1,7 @@
-import {
-  CircularProgress
-} from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import PropTypes from "prop-types";
 import React, { useEffect } from "react";
-import { MdHistory } from "react-icons/md";
 import { Link } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 import {
@@ -18,19 +14,19 @@ import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapp
 import { CronJobDeletionForm } from "./cronJobDeletionForm";
 import { CronJobEditor } from "./cronJobEditor";
 
+import { Button, Spinner } from "@jet-admin/ui";
 export const CronJobUpdationForm = ({ tenantID, cronJobID }) => {
   CronJobUpdationForm.propTypes = {
-    tenantID: PropTypes.number.isRequired,
-    cronJobID: PropTypes.number.isRequired,
+    tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+      .isRequired,
+    cronJobID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+      .isRequired,
   };
   const queryClient = useQueryClient();
   const {
     isLoading: isLoadingCronJob,
     data: cronJob,
     error: loadCronJobError,
-    isFetching: isFetchingCronJob,
-    isRefetching: isRefetechingCronJob,
-    refetch: refetchCronJob,
   } = useQuery({
     queryKey: [
       CONSTANTS.REACT_QUERY_KEYS.DATABASE_CRON_JOBS(tenantID),
@@ -90,61 +86,59 @@ export const CronJobUpdationForm = ({ tenantID, cronJobID }) => {
   }, [cronJob]);
 
   return (
-    <section className="max-w-3xl w-full">
-      <div className="w-full px-3 py-2 flex flex-row justify-between items-center">
-        <div className="flex flex-col justify-start items-start">
-          <h1 className="text-lg font-bold leading-tight tracking-tight text-slate-700">
-            {CONSTANTS.STRINGS.UPDATE_CRON_JOB_FORM_TITLE}
-          </h1>
-
-          {cronJob && (
-            <span className="text-xs text-[#646cff] mt-2">{`Job ID: ${cronJob.cronJobID}`}</span>
-          )}
-        </div>
-        <div className="flex flex-row justify-end items-center">
-          <Link
-            to={CONSTANTS.ROUTES.VIEW_CRON_JOB_HISTORY_BY_ID.path(
-              tenantID,
-              cronJobID
-            )}
-            className="p-1 hover:bg-[#646cff]/10 bg-transparent m-0 flex rounded flex-row justify-center items-center outline-none focus:outline-none"
-          >
-            <MdHistory className="text-[#646cff] h-5 w-5" />
-          </Link>
-        </div>
+    <section className="w-full bg-background">
+      <div className="border-b border-border bg-background p-3">
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+          {CONSTANTS.STRINGS.UPDATE_CRON_JOB_FORM_TITLE}
+        </h1>
       </div>
       <ReactQueryLoadingErrorWrapper
         isLoading={isLoadingCronJob}
-        isFetching={isFetchingCronJob}
-        isRefetching={isRefetechingCronJob}
-        refetch={refetchCronJob}
         error={loadCronJobError}
       >
-        <form
-          className="space-y-3 md:space-y-4 mt-2 p-3"
-          onSubmit={cronJobUpdationForm.handleSubmit}
-        >
-          <CronJobEditor
-            tenantID={tenantID}
-            cronJobEditorForm={cronJobUpdationForm}
-            isLoadingCronJobEditorForm={isUpdatingCronJob}
-          />
-
-          <div className="flex justify-end">
-            <CronJobDeletionForm tenantID={tenantID} cronJobID={cronJobID} />
-            <button
-              type="submit"
-              className="flex ml-2 flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:outline-none "
-              disabled={isUpdatingCronJob}
-            >
-              {isUpdatingCronJob ? (
-                <CircularProgress size={16} color="inherit" />
-              ) : (
-                CONSTANTS.STRINGS.UPDATE_CRON_JOB_SUBMIT_BUTTON_TEXT
+        <div className="mx-auto w-full max-w-2xl space-y-4 p-4 md:p-8">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="space-y-1">
+              {cronJob && (
+                <span className="text-xs text-muted-foreground">{`Job ID: ${cronJob.cronJobID}`}</span>
               )}
-            </button>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-end gap-2">
+              <Button asChild type="button" variant="outline">
+                <Link
+                  to={CONSTANTS.ROUTES.VIEW_CRON_JOB_HISTORY_BY_ID.path(
+                    tenantID,
+                    cronJobID
+                  )}
+                >
+                  {CONSTANTS.STRINGS.VIEW_CRON_JOB_HISTORY_BUTTON_TEXT}
+                </Link>
+              </Button>
+              <CronJobDeletionForm tenantID={tenantID} cronJobID={cronJobID} />
+              <Button
+                type="submit"
+                form="cron-job-updation-form"
+                disabled={isUpdatingCronJob}
+              >
+                {isUpdatingCronJob && <Spinner className="mr-2" size={16} />}
+                {CONSTANTS.STRINGS.UPDATE_CRON_JOB_SUBMIT_BUTTON_TEXT}
+              </Button>
+            </div>
           </div>
-        </form>
+
+          <form
+            id="cron-job-updation-form"
+            className="space-y-4"
+            onSubmit={cronJobUpdationForm.handleSubmit}
+          >
+            <CronJobEditor
+              tenantID={tenantID}
+              cronJobEditorForm={cronJobUpdationForm}
+              isLoadingCronJobEditorForm={isUpdatingCronJob}
+            />
+          </form>
+        </div>
       </ReactQueryLoadingErrorWrapper>
     </section>
   );

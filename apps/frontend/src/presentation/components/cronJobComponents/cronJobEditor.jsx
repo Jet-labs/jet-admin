@@ -4,6 +4,16 @@ import { CONSTANTS } from "../../../constants";
 import { CronJobScheduler } from "./cronJobScheduler";
 import { useCronJobsState } from "../../../logic/contexts/cronJobsContext";
 import PropTypes from "prop-types";
+import {
+  Input,
+  Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@jet-admin/ui";
+
 
 export const CronJobEditor = ({ cronJobEditorForm }) => {
   CronJobEditor.propTypes = {
@@ -27,19 +37,16 @@ export const CronJobEditor = ({ cronJobEditorForm }) => {
   }, [dataQueries, cronJobEditorForm.values]);
 
   return (
-    <div className="w-full flex flex-col justify-start items-stretch gap-2">
-      <div>
-        <label
-          htmlFor="cronJobTitle"
-          className="block mb-1 text-xs font-medium text-slate-500"
-        >
+    <div className="w-full space-y-4">
+      <div className="space-y-1.5">
+        <Label htmlFor="cronJobTitle">
           {CONSTANTS.STRINGS.CRON_JOB_EDITOR_FORM_TITLE_FIELD_LABEL}
-        </label>
-        <input
+        </Label>
+        <Input
           type="text"
           name="cronJobTitle"
           id="cronJobTitle"
-          className=" placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:outline-none focus:border-slate-400 block w-full px-1.5 py-1"
+          className="w-full"
           placeholder={
             CONSTANTS.STRINGS.CRON_JOB_EDITOR_FORM_TITLE_FIELD_PLACEHOLDER
           }
@@ -49,51 +56,69 @@ export const CronJobEditor = ({ cronJobEditorForm }) => {
           value={cronJobEditorForm.values.cronJobTitle}
         />
       </div>
-      <div>
-        <label
-          htmlFor="cronJobTitle"
-          className="block mb-1 text-xs font-medium text-slate-500"
-        >
-          {CONSTANTS.STRINGS.CRON_JOB_EDITOR_FORM_QUERY_ID_FIELD_LABEL}
-        </label>
-        <select
-          name={`dataQueryID`}
-          id={`dataQueryID`}
-          value={cronJobEditorForm.values.dataQueryID || ""}
+      <div className="space-y-1.5">
+        <Label htmlFor="cronJobDescription">
+          {CONSTANTS.STRINGS.CRON_JOB_EDITOR_FORM_DESCRIPTION_FIELD_LABEL}
+        </Label>
+        <Input
+          type="text"
+          name="cronJobDescription"
+          id="cronJobDescription"
+          className="w-full"
+          placeholder={
+            CONSTANTS.STRINGS.CRON_JOB_EDITOR_FORM_DESCRIPTION_FIELD_PLACEHOLDER
+          }
           onChange={cronJobEditorForm.handleChange}
           onBlur={cronJobEditorForm.handleBlur}
-          className={`placeholder:text-slate-400 text-xs bg-slate-50 border ${"border-slate-300"} text-slate-700 rounded focus:outline-none focus:border-slate-400 block w-full py-1 px-1.5`}
+          value={cronJobEditorForm.values.cronJobDescription}
+        />
+      </div>
+      <div className="space-y-1.5">
+        <Label htmlFor="dataQueryID">
+          {CONSTANTS.STRINGS.CRON_JOB_EDITOR_FORM_QUERY_ID_FIELD_LABEL}
+        </Label>
+        <Select
+          value={
+            cronJobEditorForm.values.dataQueryID
+              ? String(cronJobEditorForm.values.dataQueryID)
+              : ""
+          }
+          onValueChange={(val) =>
+            cronJobEditorForm.setFieldValue("dataQueryID", val ? Number(val) : null)
+          }
         >
-          <option value="" disabled selected>
-            Select query dataset
-          </option>
-          {dataQueries?.map((dataQuery) => (
-            <option
+          <SelectTrigger id="dataQueryID">
+            <SelectValue placeholder="Select query dataset" />
+          </SelectTrigger>
+          <SelectContent>
+            {dataQueries?.map((dataQuery) => (
+              <SelectItem
               key={`database_query_item_${dataQuery.dataQueryID}`}
-              value={dataQuery.dataQueryID}
-            >
-              {dataQuery.dataQueryTitle}
-            </option>
-          ))}
-        </select>
+                value={String(dataQuery.dataQueryID)}
+              >
+                {dataQuery.dataQueryTitle}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
       {selectedQuery?.dataQueryOptions?.args?.length > 0 && (
-        <div>
-          <label className="block mb-1 text-xs font-medium text-slate-500">
+        <div className="space-y-2">
+          <Label>
             {CONSTANTS.STRINGS.CRON_JOB_EDITOR_FORM_QUERY_ARGUMENTS_LABEL}
-          </label>
+          </Label>
           <div className="space-y-2">
             {selectedQuery.dataQueryOptions.args.map((arg) => {
               const argName = arg.key;
               const key = `dataQueryArgValues.${argName}`;
               return (
                 <div key={key}>
-                  <input
+                  <Input
                     type="text"
                     name={key}
                     required={true}
                     id={key}
-                    className="placeholder:text-slate-400 text-xs w-full bg-slate-50 border border-slate-300 text-slate-700 rounded focus:outline-none focus:border-slate-400 block px-2.5 py-1.5"
+                    className="w-full"
                     placeholder={`Value for ${argName}`}
                     value={
                       cronJobEditorForm.values.dataQueryArgValues?.[argName] ||
@@ -108,10 +133,10 @@ export const CronJobEditor = ({ cronJobEditorForm }) => {
           </div>
         </div>
       )}
-      <div>
-        <label className="block mb-1 text-xs font-medium text-slate-500">
+      <div className="space-y-1.5">
+        <Label>
           {CONSTANTS.STRINGS.CRON_JOB_EDITOR_FORM_SCHEDULE_FIELD_LABEL}
-        </label>
+        </Label>
         <CronJobScheduler
           value={cronJobEditorForm.values.cronJobSchedule}
           handleChange={_handleOnScheduleChange}

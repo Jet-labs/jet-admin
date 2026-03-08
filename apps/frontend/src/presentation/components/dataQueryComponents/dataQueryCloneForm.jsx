@@ -1,4 +1,3 @@
-import { CircularProgress } from "@mui/material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import PropTypes from "prop-types";
 import React from "react";
@@ -8,6 +7,8 @@ import { CONSTANTS } from "../../../constants";
 import { cloneDataQueryByIDAPI } from "../../../data/apis/dataQuery";
 import { useGlobalUI } from "../../../logic/contexts/globalUIContext";
 import { displayError, displaySuccess } from "../../../utils/notification";
+
+import { Button, Spinner } from "@jet-admin/ui";
 
 export const DataQueryCloneForm = ({ tenantID, dataQueryID }) => {
   DataQueryCloneForm.propTypes = {
@@ -45,25 +46,26 @@ export const DataQueryCloneForm = ({ tenantID, dataQueryID }) => {
       message: CONSTANTS.STRINGS.CLONE_QUERY_DIALOG_MESSAGE,
       confirmText: "Clone",
       cancelText: "Cancel",
-      confirmButtonClass: "!bg-[#646cff]",
+      confirmButtonClass: "!bg-primary",
     });
     cloneDataQuery();
   };
 
   return (
     <>
-      <button
+      <Button
         onClick={_handleCloneQuery}
         disabled={isCloningDataQuery}
         type="button"
-        className="flex flex-row items-center justify-center rounded bg-[#646cff]/10 mr-2 px-3 py-1.5 text-xs text-[#646cff]/50 hover:bg-[#646cff]/20 outline-none focus:outline-none hover:border-[#646cff]"
+        variant="primary-ghost"
+        size="icon"
       >
         {isCloningDataQuery ? (
-          <CircularProgress size={16} color="white" />
+          <Spinner size={16} />
         ) : (
-          <FaRegClone className="text-xl text-[#646cff] hover:text-[#646cff]" />
+            <FaRegClone className="size-4 text-primary" />
         )}
-      </button>
+      </Button>
     </>
   );
 };

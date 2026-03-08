@@ -119,7 +119,7 @@ export const AuditLogsGrid = ({ tenantID,  }) => {
                     minWidth: "auto !important",
                     width: "auto !important",
                     flex: "0 0 auto !important",
-                    color: "#646cff !important",
+                    color: "hsl(var(--primary))",
                     padding: "0.25rem !important",
                   },
                 }}

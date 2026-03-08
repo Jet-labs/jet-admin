@@ -6,6 +6,7 @@ import { CONSTANTS } from "../../../../constants";
 import { useDatabaseNotificationsState } from "../../../../logic/contexts/databaseNotificationsContext";
 import { NoEntityUI } from "../../ui/noEntityUI";
 
+import { Button } from "@jet-admin/ui";
 export const DatabaseNotificationDrawerList = () => {
   const { tenantID } = useParams();
   const navigate = useNavigate();
@@ -22,13 +23,13 @@ export const DatabaseNotificationDrawerList = () => {
 
   return (
     <div className="bg-white h-[calc(100vh-48px)] overflow-hidden p-2 w-full">
-      <button
+      <Button
         onClick={_navigateToAddNotification}
-        className="flex mb-2 flex-row items-center justify-center rounded bg-[#646cff]/10 px-3 py-1.5 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50 w-full outline-none focus:outline-none"
+        variant="primary-ghost" className="w-full"
       >
-        <FaPlus className="!w-4 !h-4 !text-[#646cff] mr-1" />
+        <FaPlus className="!w-4 !h-4 !text-primary mr-1" />
         {CONSTANTS.STRINGS.ADD_NOTIFICATION_BUTTON_TEXT}
-      </button>
+      </Button>
 
       {isLoadingDatabaseNotifications || isFetchingDatabaseNotifications ? (
         <div role="status" className="animate-pulse">

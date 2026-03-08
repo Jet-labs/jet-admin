@@ -5,7 +5,9 @@ import { DashboardUpdationForm } from "../../components/dashboardComponents/dash
 const UpdateDashboardPage = () => {
   const { tenantID, dashboardID } = useParams();
   return (
-    <DashboardUpdationForm tenantID={tenantID} dashboardID={dashboardID} />
+    <div className="flex h-full w-full flex-col overflow-hidden bg-background">
+      <DashboardUpdationForm tenantID={tenantID} dashboardID={dashboardID} />
+    </div>
   );
 };
 

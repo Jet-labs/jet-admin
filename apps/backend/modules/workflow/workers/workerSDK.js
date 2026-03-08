@@ -2,7 +2,7 @@
  * Worker SDK
  * Abstraction layer for dumb workers - handles queue connection and result publishing
  */
-const { getChannel, addResult, QUEUE_NAMES } = require('../../../config/rabbitmq.config');
+const { registerTaskWorker, addResult, QUEUE_NAMES } = require('../../../config/queue.config');
 const Logger = require('../../../utils/logger');
 
 /**
@@ -97,44 +97,28 @@ function resolveStringWithContext(ctx, str) {
 }
 
 /**
- * Create a worker for a specific node type using RabbitMQ
+ * Create a worker for a specific node type using in-memory queue
  * @param {string} nodeType - The node type this worker handles
  * @param {Function} handler - async (nodeConfig, context) => { output, nextHandle, queueDelay }
  */
 async function createWorker(nodeType, handler) {
-  const channel = await getChannel();
-  
-  // Set prefetch to limit concurrent processing
-  await channel.prefetch(5);
-  
   Logger.log('info', { message: `worker:${nodeType}:starting consumer` });
-  
-  channel.consume(QUEUE_NAMES.TASK, async (msg) => {
-    if (!msg) return;
-    
-    let jobData;
-    try {
-      jobData = JSON.parse(msg.content.toString());
-    } catch (parseError) {
-      Logger.log('error', { message: `worker:${nodeType}:invalidMessage`, params: { error: parseError.message } });
-      channel.nack(msg, false, false);
-      return;
-    }
-    
-    const { instanceID, nodeID, nodeConfig, context, workflowID } = jobData;
-    
+
+  registerTaskWorker(async (jobData) => {
     // Only process jobs for this node type
     if (jobData.nodeType !== nodeType) {
-      // Reject and requeue - not for this worker
-      channel.nack(msg, false, true);
+  // Not for this worker — in a single-process model this shouldn't happen
+  // when using the unified taskWorker, but kept for safety
       return;
     }
-    
+
+    const { instanceID, nodeID, nodeConfig, context, workflowID } = jobData;
+
     Logger.log('info', {
       message: `worker:${nodeType}:processing`,
       params: { instanceID, nodeID },
     });
-    
+
     try {
       // Execute handler (PURE FUNCTION - no DB access!)
       const result = await handler(nodeConfig, context, {
@@ -143,7 +127,7 @@ async function createWorker(nodeType, handler) {
         workflowID,
         resolveFromContext: (path) => resolveFromContext(context, path),
       });
-      
+
       // Send result to orchestrator
       await addResult({
         instanceID,
@@ -153,21 +137,18 @@ async function createWorker(nodeType, handler) {
         nextHandle: result.nextHandle || 'output',
         queueDelay: result.queueDelay || 0,
       });
-      
+
       Logger.log('success', {
         message: `worker:${nodeType}:completed`,
         params: { instanceID, nodeID },
       });
-      
-      // Acknowledge the message
-      channel.ack(msg);
-      
+
     } catch (error) {
       Logger.log('error', {
         message: `worker:${nodeType}:failed`,
         params: { instanceID, nodeID, error: error.message },
       });
-      
+
       // Send error result
       await addResult({
         instanceID,
@@ -177,17 +158,12 @@ async function createWorker(nodeType, handler) {
         nextHandle: 'error',
         error: error.message,
       });
-      
-      // Reject without requeue (error result already sent)
-      channel.nack(msg, false, false);
     }
-  }, {
-    noAck: false,
   });
-  
+
   Logger.log('info', { message: `worker:${nodeType}:started` });
-  
-  return { channel };
+
+  return {};
 }
 
 /**

@@ -1,4 +1,3 @@
-import { CircularProgress } from "@mui/material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import React from "react";
@@ -11,9 +10,11 @@ import { displayError, displaySuccess } from "../../../utils/notification";
 import { DatabaseTableEditor } from "./databaseTableEditor";
 import PropTypes from "prop-types";
 
+import { Button, Spinner } from "@jet-admin/ui";
 export const DatabaseTableAdditionForm = ({ tenantID, databaseSchemaName }) => {
   DatabaseTableAdditionForm.propTypes = {
-    tenantID: PropTypes.number.isRequired,
+    tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+      .isRequired,
     databaseSchemaName: PropTypes.string.isRequired,
   };
   const queryClient = useQueryClient();
@@ -88,13 +89,14 @@ export const DatabaseTableAdditionForm = ({ tenantID, databaseSchemaName }) => {
   });
 
   return (
-    <section className="max-w-3xl w-full">
-      <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl  p-3">
-        {CONSTANTS.STRINGS.ADD_TABLE_FORM_TITLE}
-      </h1>
-      <form
-        className="space-y-3 md:space-y-4 p-3"
-        onSubmit={tableAdditionForm.handleSubmit}
+    <div className="flex w-full h-full flex-col items-center overflow-y-auto p-4 md:p-8">
+      <section className="max-w-2xl w-full">
+        <h1 className="text-2xl font-semibold tracking-tight mb-4">
+          {CONSTANTS.STRINGS.ADD_TABLE_FORM_TITLE}
+        </h1>
+        <form
+          className="space-y-3 md:space-y-4"
+          onSubmit={tableAdditionForm.handleSubmit}
       >
         {tableAdditionForm && (
           <DatabaseTableEditor
@@ -103,19 +105,15 @@ export const DatabaseTableAdditionForm = ({ tenantID, databaseSchemaName }) => {
           />
         )}
         <div className="w-full flex flex-row justify-end">
-          <button
-            type="submit"
-            disabled={isAddingDatabaseTable}
-            className="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none "
-          >
+            <Button type="submit" disabled={isAddingDatabaseTable}>
             {isAddingDatabaseTable && (
-              <CircularProgress className="!mr-3" size={16} color="white" />
+                <Spinner className="mr-2" size={16} />
             )}
             {CONSTANTS.STRINGS.ADD_TABLE_FORM_SUBMIT_BUTTON}
-          </button>
+            </Button>
         </div>
-      </form>
-      <div className="w-full h-full overflow-y-auto"></div>
-    </section>
+        </form>
+      </section>
+    </div>
   );
 };

@@ -1,9 +1,9 @@
-import { CircularProgress } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import moment from "moment";
 import { useState } from "react";
-import { FaCog } from "react-icons/fa";
+import { Settings, Trash2 } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { Badge, Button, Spinner } from "@jet-admin/ui";
 import { CONSTANTS } from "../../../constants";
 import {
   getTenantUserByIDAPI,
@@ -20,8 +20,10 @@ import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapp
 
 export const TenantUserUpdationForm = ({ tenantID, tenantUserID }) => {
   TenantUserUpdationForm.propTypes = {
-    tenantID: PropTypes.number.isRequired,
-    tenantUserID: PropTypes.number.isRequired,
+    tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+      .isRequired,
+    tenantUserID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+      .isRequired,
   };
   const navigate = useNavigate();
   const { showConfirmation } = useGlobalUI();
@@ -30,11 +32,8 @@ export const TenantUserUpdationForm = ({ tenantID, tenantUserID }) => {
   const queryClient = useQueryClient();
   const {
     isLoading: isLoadingTenantUser,
-    isFetching: isFetchingTenantUser,
-    isRefetching: isRefetchingTenantUser,
     data: tenantUser,
     error: tenantUserError,
-    refetch: refetchTenantUser,
   } = useQuery({
     queryKey: [CONSTANTS.REACT_QUERY_KEYS.TENANT_USERS(tenantID), tenantUserID],
     queryFn: () => {
@@ -123,133 +122,160 @@ export const TenantUserUpdationForm = ({ tenantID, tenantUserID }) => {
   };
 
   return (
-    <section className="max-w-3xl w-full h-full">
-      <ReactQueryLoadingErrorWrapper
-        isLoading={isLoadingTenantUser}
-        isFetching={isFetchingTenantUser}
-        isRefetching={isRefetchingTenantUser}
-        refetch={refetchTenantUser}
-        error={tenantUserError}
-      >
-        {tenantUser && (
-          <>
-            <TenantRoleSelectionDialog
-              tenantID={tenantID}
-              isUserTenantAdmin={tenantUser.isTenantAdmin}
-              isTenantRoleSelectDialogOpen={isTenantRoleSelectDialogOpen}
-              handleCloseTenantRoleSelectDialog={
-                _handleCloseTenantRoleSelectDialog
-              }
-              initialSelectedTenantRoles={tenantUser.roles.map((r) => r.roleID)}
-              handleSubmitTenantRoleSelectDialog={
-                _handleSubmitTenantRoleSelectDialog
-              }
-            />
-            <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl p-3">
-              {CONSTANTS.STRINGS.UPDATE_TENANT_USER_BY_ID_FORM_TITLE}
-            </h1>
+    <ReactQueryLoadingErrorWrapper
+      isLoading={isLoadingTenantUser}
+      error={tenantUserError}
+    >
+      {tenantUser && (
+        <>
+          <TenantRoleSelectionDialog
+            tenantID={tenantID}
+            isUserTenantAdmin={tenantUser.isTenantAdmin}
+            isTenantRoleSelectDialogOpen={isTenantRoleSelectDialogOpen}
+            handleCloseTenantRoleSelectDialog={
+              _handleCloseTenantRoleSelectDialog
+            }
+            initialSelectedTenantRoles={tenantUser.roles?.map((r) => r.roleID) || []}
+            handleSubmitTenantRoleSelectDialog={
+              _handleSubmitTenantRoleSelectDialog
+            }
+          />
 
-            <div className="flex flex-col justify-start items-stretch w-full px-3">
-              <span className="text-slate-700 font-semibold mt-4">
-                {CONSTANTS.STRINGS.UPDATE_TENANT_USER_BY_ID_PROFILE_TITLE}
-              </span>
-              <span className="text-slate-500 text-xs font-light mt-2">
-                {CONSTANTS.STRINGS.UPDATE_TENANT_USER_BY_ID_EMAIL_LABEL}
-              </span>
-              <span className="text-slate-700 font-medium">
-                {tenantUser.email}
-              </span>
-              <span className="!text-slate-600 font-normal text-xs mt-2">
-                {tenantUser.isTenantAdmin ===
-                CONSTANTS.ROLES.PRIMARY.ADMIN.value
-                  ? `Admin from: ${moment(tenantUser.tenantUserFrom).format(
-                      "MMM Do YY"
-                    )}`
-                  : `Member from: ${moment(tenantUser.tenantUserFrom).format(
-                      "MMM Do YY"
-                    )}`}
-              </span>
-              <div className="flex flex-row justify-between items-center mt-10 mb-2 w-full">
-                <span className="text-slate-700 font-semibold  w-full ">
-                  {
-                    CONSTANTS.STRINGS
-                      .UPDATE_TENANT_USER_BY_ID_ASSIGNED_ROLES_TITLE
-                  }
-                </span>
-                <button
-                  onClick={_handleOpenTenantRoleSelectDialog}
-                  disabled={isUpdatingTenantUserRoles}
-                  className="!outline-none !hover:outline-none  items-center text-nowrap w-fit inline-flex rounded bg-[#646cff]/10 px-3 py-1 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50"
-                >
-                  {isUpdatingTenantUserRoles ? (
-                    <CircularProgress
-                      size={16}
-                      className="mr-2 !text-[#646cff]"
-                    />
-                  ) : (
-                    <FaCog className="mr-2 h-4 w-4 " />
-                  )}
-                  {CONSTANTS.STRINGS.UPDATE_TENANT_USER_BY_ID_MANAGE_ROLES}
-                </button>
-              </div>
+          <section className="max-w-2xl w-full space-y-6">
+            <header className="space-y-1">
+              <h1 className="text-xl font-bold text-foreground md:text-2xl">
+                {CONSTANTS.STRINGS.UPDATE_TENANT_USER_BY_ID_FORM_TITLE}
+              </h1>
+            </header>
 
-              {tenantUser.isTenantAdmin ? (
-                <NoEntityUI
-                  message={
-                    CONSTANTS.STRINGS
-                      .UPDATE_TENANT_USER_BY_ID_USER_ADMIN_NO_ROLES
-                  }
-                />
-              ) : tenantUser?.roles && tenantUser.roles.length > 0 ? (
-                tenantUser.roles.map((tenantUserRole) => {
-                  return (
-                    <div
-                      className="border border-slate-200 rounded mb-2 p-2 flex flex-row justify-between items-center"
-                      key={`user_tenant_select_role_${tenantUserRole.roleID}`}
+            <div className="space-y-6">
+              <section className="space-y-3">
+                <h2 className="text-lg font-semibold">
+                  {CONSTANTS.STRINGS.UPDATE_TENANT_USER_BY_ID_PROFILE_TITLE}
+                </h2>
+
+                <div className="space-y-2">
+                  <div className="space-y-1.5">
+                    <p className="text-xs text-muted-foreground">
+                      {CONSTANTS.STRINGS.UPDATE_TENANT_USER_BY_ID_EMAIL_LABEL}
+                    </p>
+                    <p className="break-all text-sm font-medium text-foreground">
+                      {tenantUser.email}
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge
+                      variant={tenantUser.isTenantAdmin ? "outline" : "warning"}
+                      className={
+                        tenantUser.isTenantAdmin
+                          ? "border-primary/50 bg-primary/10 text-primary"
+                          : undefined
+                      }
                     >
-                      <div className="flex flex-col justify-start items-start">
-                        <Link className=" underline font-semibold text-xs">
-                          {tenantUserRole.roleTitle}
-                        </Link>
-                        <span className="text-slate-500 font-light text-xs mt-1">
-                          {tenantUserRole.roleDescription}
-                        </span>
-                      </div>
+                      {tenantUser.isTenantAdmin
+                        ? CONSTANTS.ROLES.PRIMARY.ADMIN.name
+                        : CONSTANTS.ROLES.PRIMARY.MEMBER.name}
+                    </Badge>
+                    <span className="text-xs text-muted-foreground">
+                      {`${tenantUser.isTenantAdmin ? "Admin" : "Member"} since ${moment(
+                        tenantUser.tenantUserFrom
+                      ).format("MMM D, YYYY")}`}
+                    </span>
+                  </div>
+                </div>
+              </section>
+
+              <section className="space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <h2 className="text-lg font-semibold">
+                    {
+                      CONSTANTS.STRINGS
+                        .UPDATE_TENANT_USER_BY_ID_ASSIGNED_ROLES_TITLE
+                    }
+                  </h2>
+                  <Button
+                    onClick={_handleOpenTenantRoleSelectDialog}
+                    disabled={isUpdatingTenantUserRoles}
+                    size="sm"
+                    variant="primary-ghost"
+                  >
+                    {isUpdatingTenantUserRoles ? (
+                      <Spinner size={16} className="mr-2" />
+                    ) : (
+                      <Settings className="mr-2 h-4 w-4" />
+                    )}
+                    {CONSTANTS.STRINGS.UPDATE_TENANT_USER_BY_ID_MANAGE_ROLES}
+                  </Button>
+                </div>
+
+                {tenantUser.isTenantAdmin ? (
+                  <NoEntityUI
+                    message={
+                      CONSTANTS.STRINGS
+                        .UPDATE_TENANT_USER_BY_ID_USER_ADMIN_NO_ROLES
+                    }
+                  />
+                ) : tenantUser.roles?.length ? (
+                  <div className="space-y-2">
+                    {tenantUser.roles.map((tenantUserRole) => {
+                      return (
+                        <div
+                          className="rounded-md border border-border bg-background p-3"
+                          key={`user_tenant_select_role_${tenantUserRole.roleID}`}
+                        >
+                          <div className="space-y-1">
+                            <Link
+                              to={CONSTANTS.ROUTES.UPDATE_TENANT_ROLE_BY_ID.path(
+                                tenantID,
+                                tenantUserRole.roleID
+                              )}
+                              className="text-sm font-medium text-primary hover:underline"
+                            >
+                              {tenantUserRole.roleTitle}
+                            </Link>
+                            <p className="text-xs text-muted-foreground">
+                              {tenantUserRole.roleDescription}
+                            </p>
+                          </div>
+                        </div>
+                      );
+                    })}
                     </div>
-                  );
-                })
-              ) : (
-                <NoEntityUI
-                  message={
-                    tenantUser.isTenantAdmin
-                      ? CONSTANTS.STRINGS
-                          .UPDATE_TENANT_USER_BY_ID_USER_ADMIN_NO_ROLES
-                      : CONSTANTS.STRINGS.UPDATE_TENANT_USER_BY_ID_NO_ROLES
-                  }
-                />
-              )}
-              <div className="flex flex-row justify-end items-center mt-10">
-                <button
+                  ) : (
+                    <NoEntityUI
+                      message={
+                      CONSTANTS.STRINGS.UPDATE_TENANT_USER_BY_ID_NO_ROLES
+                    }
+                  />
+                )}
+              </section>
+
+              <div className="flex flex-wrap justify-end gap-2 pt-2">
+                <Button type="button" variant="outline" onClick={() => navigate(-1)}>
+                  Back
+                </Button>
+                <Button
                   onClick={_handleRemoveUserFromTenant}
                   disabled={isRemovingTenantUserFromTenant}
-                  className="!outline-none !hover:outline-none  items-center text-nowrap w-fit inline-flex rounded bg-[#FFD3C7FF]/10 px-3 py-1 text-sm text-[#ff7664] hover:border-[#ff7664] hover:bg-[#FFD3C7FF]/20 focus:ring-2 focus:ring-[#ff7664]/50"
+                  type="button"
+                  variant="destructive-ghost"
                 >
                   {isRemovingTenantUserFromTenant ? (
-                    <CircularProgress
-                      size={16}
-                      className="mr-2 !text-[#ff7664]"
-                    />
-                  ) : null}
+                    <Spinner size={16} className="mr-2" />
+                  ) : (
+                    <Trash2 className="mr-2 h-4 w-4" />
+                  )}
                   {
                     CONSTANTS.STRINGS
                       .UPDATE_TENANT_USER_BY_ID_REMOVE_USER_FROM_TENANT
                   }
-                </button>
+                </Button>
               </div>
             </div>
-          </>
-        )}
-      </ReactQueryLoadingErrorWrapper>
-    </section>
+          </section>
+        </>
+      )}
+    </ReactQueryLoadingErrorWrapper>
   );
 };

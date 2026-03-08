@@ -10,6 +10,15 @@ import { getDatasourceTypeByValue } from "@jet-admin/datasource-types";
 import { CONSTANTS } from "../../../constants";
 import { customJSONFormRenderers } from "../ui/jsonFormCustomRenderer";
 import { useDataQueriesState } from "../../../logic/contexts/dataQueriesContext";
+import {
+  Label,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@jet-admin/ui";
+
 
 export const DataQueryEditor = ({
   dataQueryEditorForm,
@@ -18,8 +27,8 @@ export const DataQueryEditor = ({
 }) => {
   DataQueryEditor.propTypes = {
     dataQueryEditorForm: PropTypes.object.isRequired,
-    tenantID: PropTypes.number,
-    dataQueryID: PropTypes.number,
+    tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    dataQueryID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   };
   const uniqueKey = dataQueryID
     ? `dataQueryEditor_${tenantID}_${dataQueryID}`
@@ -38,10 +47,10 @@ export const DataQueryEditor = ({
   );
 
   const _handleDatasourceTypeChange = useCallback(
-    (event) => {
-      dataQueryEditorForm.setFieldValue("datasourceID", event.target.value);
+    (val) => {
+      dataQueryEditorForm.setFieldValue("datasourceID", val);
       const selectedDatasource = datasources.find(
-        (datasource) => datasource.value === event.target.value
+        (datasource) => datasource.value === val
       );
       dataQueryEditorForm.setFieldValue(
         "datasourceType",
@@ -54,48 +63,41 @@ export const DataQueryEditor = ({
   return (
     <>
       {/* JSON Forms for datasourceOptions */}
-      <div className="w-full">
-        <label
+      <div className="space-y-1">
+        <Label
           htmlFor="datasourceID"
-          className={`block mb-1 text-xs font-medium text-slate-500 ${dataQueryEditorForm.errors.datasourceID
-              ? "text-red-500"
-              : "text-slate-500"
-            }}`}
+          className="text-sm font-medium leading-none"
         >
           {CONSTANTS.STRINGS.DATASOURCE_EDITOR_FORM_TYPE_FIELD_LABEL}
-          {dataQueryEditorForm.errors.datasourceID ? (
-            <span className="text-red-500 text-xs">
-              {dataQueryEditorForm.errors.datasourceID}
-            </span>
-          ) : null}
-        </label>
+        </Label>
 
-        <select
-          name="datasourceID"
-          id="datasourceID"
-          className=" placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:border-slate-700 block w-full px-2.5 py-1.5 "
-          onChange={_handleDatasourceTypeChange}
-          onBlur={dataQueryEditorForm.handleBlur}
-          value={dataQueryEditorForm.values.datasourceID}
-        >
-          <option value="" disabled selected>
-            Select datasource
-          </option>
-          {datasources?.map((datasource) => (
-            <option key={datasource.value} value={datasource.value}>
-              {datasource.label}
-            </option>
-          ))}
-        </select>
+        <Select value={dataQueryEditorForm.values.datasourceID} onValueChange={_handleDatasourceTypeChange}>
+          <SelectTrigger>
+            <SelectValue placeholder="Select datasource" />
+          </SelectTrigger>
+          <SelectContent>
+            {datasources?.map((datasource) => (
+              <SelectItem key={datasource.value} value={datasource.value}>
+                {datasource.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        {dataQueryEditorForm.errors.datasourceID && (
+          <span className="text-destructive text-xs">
+            {dataQueryEditorForm.errors.datasourceID}
+          </span>
+        )}
       </div>
 
       <>
         {DATASOURCE_UI_COMPONENTS[dataQueryEditorForm.values.datasourceType] &&
           currentDatasourceType?.queryConfigForm && (
+          <div className="mt-4 border-t border-border pt-4">
             <JsonForms
               key={uniqueKey}
-            schema={currentDatasourceType.queryConfigForm.schema}
-            uischema={currentDatasourceType.queryConfigForm.uischema}
+              schema={currentDatasourceType.queryConfigForm.schema}
+              uischema={currentDatasourceType.queryConfigForm.uischema}
               data={dataQueryEditorForm.values.dataQueryOptions}
               renderers={[...materialRenderers, ...customJSONFormRenderers]}
               cells={materialCells}
@@ -103,6 +105,7 @@ export const DataQueryEditor = ({
               validationMode="ValidateAndShow"
               onChange={_handleDatasourceOptionsChange}
             />
+          </div>
           )}
       </>
     </>

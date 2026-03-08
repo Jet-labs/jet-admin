@@ -1,4 +1,3 @@
-import { CircularProgress } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import React, { useEffect } from "react";
@@ -17,6 +16,7 @@ import { formValidations } from "../../../utils/formValidation";
 import PropTypes from "prop-types";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 
+import { Button, Spinner } from "@jet-admin/ui";
 export const DatabaseNotificationUpdationForm = ({
   tenantID,
   databaseNotificationID,
@@ -88,7 +88,7 @@ export const DatabaseNotificationUpdationForm = ({
           CONSTANTS.STRINGS.UPDATE_NOTIFICATION_FORM_UPDATE_DIALOG_MESSAGE,
         confirmText: "Update",
         cancelText: "Cancel",
-        confirmButtonClass: "!bg-[#646cff]",
+        confirmButtonClass: "!bg-primary",
       });
       updateDatabaseNotification(values);
     },
@@ -114,7 +114,7 @@ export const DatabaseNotificationUpdationForm = ({
         </h1>
 
         {databaseNotification && (
-          <span className="text-xs text-[#646cff] mt-2">{`Notification ID: ${databaseNotification.databaseNotificationID}`}</span>
+          <span className="text-xs text-primary mt-2">{`Notification ID: ${databaseNotification.databaseNotificationID}`}</span>
         )}
       </div>
 
@@ -138,16 +138,16 @@ export const DatabaseNotificationUpdationForm = ({
               databaseNotificationID={databaseNotificationID}
             />
 
-            <button
+            <Button
               type="submit"
               disabled={isUpdatingDatabaseNotification}
-              className="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none "
+              size="sm"
             >
               {isUpdatingDatabaseNotification && (
-                <CircularProgress className="!mr-3" size={16} color="white" />
+                <Spinner className="mr-3" size={16} />
               )}
               {CONSTANTS.STRINGS.UPDATE_NOTIFICATION_FORM_SUBMIT_BUTTON}
-            </button>
+            </Button>
           </div>
         </form>
       </ReactQueryLoadingErrorWrapper>

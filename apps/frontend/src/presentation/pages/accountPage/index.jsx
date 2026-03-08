@@ -16,6 +16,7 @@ import { AccountNotificationList } from "../../components/accountComponents/acco
 import React from "react";
 
 
+import { Button } from "@jet-admin/ui";
 const AccountPage = () => {
   const { user, firebaseUserState } = useAuthState();
   const { signOut, resetPassword } = useAuthActions();
@@ -94,23 +95,23 @@ const AccountPage = () => {
                 </div>
               </div>
               <div className="flex flex-col sm:flex-row gap-3 mt-6 pt-5 border-t border-slate-200">
-                <button
+                <Button
                   type="button"
-                  className="flex items-center justify-center px-4 py-2 text-xs font-medium text-[#646cff] bg-slate-50 border border-slate-200 rounded hover:bg-slate-100 focus:outline-none focus:ring-1 focus:ring-[#646cff] focus:ring-opacity-30 transition-colors"
+                  variant="outline" className="text-xs"
                   onClick={_handleResetPassword}
                 >
                   <FaKey className="mr-2 opacity-70" size={14} />
                   Reset Password
-                </button>
+                </Button>
 
-                <button
+                <Button
                   type="button"
                   className="flex items-center justify-center px-4 py-2 text-xs font-medium text-slate-600 bg-slate-50 border border-slate-200 rounded  hover:bg-slate-100 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:ring-opacity-30 transition-colors"
                   onClick={_handleSignOut}
                 >
                   <FaSignOutAlt className="mr-2 opacity-70" size={14} />
                   {CONSTANTS.STRINGS.ACCOUNT_PAGE_LOGOUT_BUTTON || "Sign Out"}
-                </button>
+                </Button>
               </div>
               <AccountNotificationList />
             </>

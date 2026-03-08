@@ -1,15 +1,10 @@
-import {
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-} from "@mui/material";
 import { useFormik } from "formik";
 import PropTypes from "prop-types";
 import React, { useCallback } from "react";
 import { WIDGET_DATASET_ADVANCED_OPTIONS } from "@jet-admin/widget-types";
 import { CONSTANTS } from "../../../constants";
 
+import { Button, Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
 export const WidgetDatasetAdvancedOptions = ({
   open,
   onClose,
@@ -84,44 +79,53 @@ export const WidgetDatasetAdvancedOptions = ({
       switch (type) {
         case "boolean":
           return (
-            <select
-              {...commonProps}
-              defaultValue={defaultValue == true ? "true" : "false"}
-              className="placeholder:text-slate-400 text-xs bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:outline-none focus:border-slate-400 block w-full px-1.5 py-1"
-            >
-              <option value={"true"} className="text-slate-500 text-xs">
-                Yes
-              </option>
-              <option value={"false"} className="text-slate-500 text-xs">
-                No
-              </option>
-            </select>
+            <Select value={commonProps.value !== undefined ? String(commonProps.value) : "false"} onValueChange={(val) => {
+              const value = type === "number" ? +val : type === "boolean" ? val === "true" : val;
+              datasetAdvancedOptionsForm.setFieldValue(datasetKey, value);
+            }}>
+              <SelectTrigger className="text-xs">
+                <SelectValue placeholder="Select an option" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={"true"} className="text-slate-500 text-xs">
+                  Yes
+                </SelectItem>
+                <SelectItem value={"false"} className="text-slate-500 text-xs">
+                  No
+                </SelectItem>
+              </SelectContent>
+            </Select>
           );
 
         case "color":
-          return <input type="color" {...commonProps} />;
+          return <Input type="color" {...commonProps} />;
 
         case "select":
           return (
-            <select
-              {...commonProps}
-              className="placeholder:text-slate-400 text-xs bg-slate-50 border border-slate-300 text-slate-700 rounded focus:outline-none focus:border-slate-400 block w-full px-1.5 py-1"
-            >
-              {selectOptions.map((opt) => (
-                <option
-                  key={opt}
-                  value={opt}
-                  className="text-slate-500 text-xs"
-                >
-                  {opt.charAt(0).toUpperCase() + opt.slice(1)}
-                </option>
-              ))}
-            </select>
+            <Select value={commonProps.value !== undefined ? String(commonProps.value) : undefined} onValueChange={(val) => {
+              const value = type === "number" ? +val : val;
+              datasetAdvancedOptionsForm.setFieldValue(datasetKey, value);
+            }}>
+              <SelectTrigger className="text-xs">
+                <SelectValue placeholder="Select an option" />
+              </SelectTrigger>
+              <SelectContent>
+                {selectOptions.map((opt) => (
+                  <SelectItem
+                    key={opt}
+                    value={opt}
+                    className="text-slate-500 text-xs"
+                  >
+                    {opt.charAt(0).toUpperCase() + opt.slice(1)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           );
 
         default:
           return (
-            <input
+            <Input
               {...commonProps}
               className={`placeholder:text-slate-400 w-full text-xs bg-slate-50 border border-slate-300 text-slate-700 rounded block py-1 px-1.5 focus:outline-none focus:border-slate-400`}
               type={type}
@@ -134,42 +138,46 @@ export const WidgetDatasetAdvancedOptions = ({
   );
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle className="!p-4 !pb-0">
-        {CONSTANTS.STRINGS.WIDGET_DATASET_ADV_TITLE}
-      </DialogTitle>
-      <DialogContent className="!p-4 !space-y-4">
-        {WIDGET_DATASET_ADVANCED_OPTIONS.filter((option) =>
-          option.relevantWidgets.includes(parentWidgetType)
-        ).map((option) => (
-          <div key={option.key} className="col-span-2">
-            <label className="block mb-2 text-xs font-medium text-slate-600">
-              {option.name}
-              <span className="text-slate-400 text-[10px] block">
-                {option.description}
-              </span>
-            </label>
-            {datasetAdvancedOptionsForm && renderOption(option)}
-          </div>
-        ))}
-      </DialogContent>
-      <DialogActions className="!p-4">
-        <button
-          onClick={onClose}
-          type="button"
-          className={`px-2.5 py-1.5 text-sm !text-slate-600 border-0 hover:border-0 !border-slate-300 bg-slate-200 hover:!bg-slate-300 rounded  hover:outline-none  outline-none `}
-        >
-          {CONSTANTS.STRINGS.WIDGET_DATASET_ADV_CANCEL}
-        </button>
+    <Dialog open={open} onOpenChange={(v) => { if (!v) onClose(); }}>
+      <DialogContent className="max-w-sm p-4">
+        <DialogHeader className="space-y-1">
+          <DialogTitle className="text-sm font-semibold">
+            {CONSTANTS.STRINGS.WIDGET_DATASET_ADV_TITLE}
+          </DialogTitle>
+        </DialogHeader>
+        <div className="space-y-4">
+          {WIDGET_DATASET_ADVANCED_OPTIONS.filter((option) =>
+            option.relevantWidgets.includes(parentWidgetType)
+          ).map((option) => (
+            <div key={option.key} className="col-span-2">
+              <label className="block mb-2 text-xs font-medium text-slate-600">
+                {option.name}
+                <span className="text-slate-400 text-[10px] block">
+                  {option.description}
+                </span>
+              </label>
+              {datasetAdvancedOptionsForm && renderOption(option)}
+            </div>
+          ))}
+        </div>
+        <DialogFooter className="gap-2">
+          <Button
+            onClick={onClose}
+            type="button"
+            variant="secondary"
+          >
+            {CONSTANTS.STRINGS.WIDGET_DATASET_ADV_CANCEL}
+          </Button>
 
-        <button
-          type="button"
-          onClick={datasetAdvancedOptionsForm.handleSubmit}
-          className={`px-2.5 py-1.5 text-white text-sm bg-[#646cff] rounded hover:outline-none hover:border-0 border-0 outline-none `}
-        >
-          {CONSTANTS.STRINGS.WIDGET_DATASET_ADV_CONFIRM}
-        </button>
-      </DialogActions>
+          <Button
+            type="button"
+            onClick={datasetAdvancedOptionsForm.handleSubmit}
+            
+          >
+            {CONSTANTS.STRINGS.WIDGET_DATASET_ADV_CONFIRM}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
     </Dialog>
   );
 };

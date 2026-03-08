@@ -3,13 +3,10 @@ import { useParams } from "react-router-dom";
 import { APIKeyAdditionForm } from "../../components/apiKeyComponents/apiKeyAdditionForm";
 
 const AddAPIKeyPage = () => {
-  const { tenantID} = useParams();
-  console.log({tenantID:tenantID})
+  const { tenantID } = useParams();
   return (
-    <div className="flex w-full h-full overflow-y-auto flex-col justify-start items-center">
-      <APIKeyAdditionForm
-        tenantID={tenantID}
-      />
+    <div className="flex h-full w-full flex-col overflow-y-auto bg-background">
+      <APIKeyAdditionForm tenantID={tenantID} />
     </div>
   );
 };

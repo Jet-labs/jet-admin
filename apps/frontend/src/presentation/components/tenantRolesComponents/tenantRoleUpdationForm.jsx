@@ -1,8 +1,7 @@
 import { useFormik } from "formik";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 
-import { CircularProgress } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import React, { useCallback, useEffect } from "react";
 import {
@@ -15,17 +14,16 @@ import { TenantPermissionSelectionInput } from "./tenantPermissionSelectionInput
 import { formValidations } from "../../../utils/formValidation";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 
+import { Button, Spinner, Input, Label } from "@jet-admin/ui";
 export const TenantRoleUpdationForm = () => {
   const { tenantID, tenantRoleID } = useParams();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const {
     isLoading: isLoadingTenantRoleByID,
     data: tenantRole,
     error: loadTenantRoleByIDError,
-    isFetching: isFetchingTenantRoleByID,
-    isRefetching: isRefetechingTenantRoleByID,
-    refetch: refetchTenantRoleByID,
   } = useQuery({
     queryKey: [CONSTANTS.REACT_QUERY_KEYS.TENANT_ROLES(tenantID), tenantRoleID],
     queryFn: () =>
@@ -86,7 +84,7 @@ export const TenantRoleUpdationForm = () => {
       const {
         target: { value },
       } = event;
-      console.log({ value });
+      updateTenantRoleByIDForm.setFieldTouched("permissionIDs", true, false);
       updateTenantRoleByIDForm.setFieldValue(
         "permissionIDs",
         typeof value === "string" ? value.split(",") : value
@@ -96,104 +94,115 @@ export const TenantRoleUpdationForm = () => {
   );
 
   return (
-    <section className="max-w-3xl w-full h-full">
-      <ReactQueryLoadingErrorWrapper
-        isLoading={isLoadingTenantRoleByID}
-        isFetching={isFetchingTenantRoleByID}
-        isRefetching={isRefetechingTenantRoleByID}
-        refetch={refetchTenantRoleByID}
-        error={loadTenantRoleByIDError}
-      >
-        <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-          <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl ">
+    <ReactQueryLoadingErrorWrapper
+      isLoading={isLoadingTenantRoleByID}
+      error={loadTenantRoleByIDError}
+    >
+      <section className="w-full max-w-2xl space-y-6">
+        <header className="space-y-1">
+          <h1 className="text-xl font-bold text-foreground md:text-2xl">
             {CONSTANTS.STRINGS.TENANT_ROLE_UPDATION_TITLE}
           </h1>
-          {updateTenantRoleByIDForm && tenantRoleID && (
-            <form
-              className="space-y-4 md:space-y-6"
-              onSubmit={updateTenantRoleByIDForm.handleSubmit}
-            >
-              <div>
-                <label
-                  htmlFor="roleTitle"
-                  className="block mb-1 text-sm font-medium text-slate-500"
-                >
-                  {
-                    CONSTANTS.STRINGS
-                      .TENANT_ROLE_UPDATION_FORM_ROLE_NAME_FIELD_LABEL
-                  }
-                </label>
-                <input
-                  type="roleTitle"
-                  name="roleTitle"
-                  id="roleTitle"
-                  className=" placeholder:text-slate-400 bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:border-slate-700 block w-full px-2.5 py-1.5 "
-                  placeholder={
-                    CONSTANTS.STRINGS
-                      .TENANT_ROLE_UPDATION_FORM_ROLE_NAME_FIELD_PLACEHOLDER
-                  }
-                  required={true}
-                  onChange={updateTenantRoleByIDForm.handleChange}
-                  onBlur={updateTenantRoleByIDForm.handleBlur}
-                  value={updateTenantRoleByIDForm.values.roleTitle}
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="roleDescription"
-                  className="block mb-1 text-sm font-medium text-slate-500"
-                >
-                  {
-                    CONSTANTS.STRINGS
-                      .TENANT_ROLE_UPDATION_FORM_ROLE_DESCRIPTION_FIELD_LABEL
-                  }
-                </label>
-                <input
-                  type="roleDescription"
-                  name="roleDescription"
-                  id="roleDescription"
-                  className=" placeholder:text-slate-400 bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:border-slate-700 block w-full px-2.5 py-1.5 "
-                  placeholder={
-                    CONSTANTS.STRINGS
-                      .TENANT_ROLE_UPDATION_FORM_ROLE_DESCRIPTION_FIELD_PLACEHOLDER
-                  }
-                  required={true}
-                  onChange={updateTenantRoleByIDForm.handleChange}
-                  onBlur={updateTenantRoleByIDForm.handleBlur}
-                  value={updateTenantRoleByIDForm.values.roleDescription}
-                />
-              </div>
-
-              <TenantPermissionSelectionInput
-                value={updateTenantRoleByIDForm.values.permissionIDs}
-                onChange={_handleOnRolePermissionsSelectionChange}
-              />
-
-              <div className="flex flex-row justify-end items-center w-full">
-                <TenantRoleDeletionForm
-                  tenantID={tenantID}
-                  tenantRoleID={tenantRoleID}
-                />
-                <button
-                  type="submit"
-                  disabled={isUpdatingTenantRoleByID}
-                  className="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none focus:ring-blue-300 "
-                >
-                  {isUpdatingTenantRoleByID && (
-                    <CircularProgress
-                      className="!mr-3"
-                      size={16}
-                      color="white"
-                    />
-                  )}
-                  {CONSTANTS.STRINGS.TENANT_ROLE_UPDATION_FORM_SUBMIT_BUTTON}
-                </button>
-              </div>
-            </form>
+          {tenantRoleID && (
+            <p className="text-xs text-muted-foreground">
+              {`Role ID: ${tenantRoleID}`}
+            </p>
           )}
-        </div>
-      </ReactQueryLoadingErrorWrapper>
-    </section>
+          <p className="text-sm text-muted-foreground">
+            Update the role details and the permissions it grants to members.
+          </p>
+        </header>
+        {updateTenantRoleByIDForm && tenantRoleID && (
+          <form
+            className="space-y-4"
+            onSubmit={updateTenantRoleByIDForm.handleSubmit}
+          >
+            <div className="space-y-1.5">
+              <Label htmlFor="roleTitle">
+                {CONSTANTS.STRINGS.TENANT_ROLE_UPDATION_FORM_ROLE_NAME_FIELD_LABEL}
+              </Label>
+              <Input
+                type="text"
+                name="roleTitle"
+                id="roleTitle"
+                placeholder={
+                  CONSTANTS.STRINGS
+                    .TENANT_ROLE_UPDATION_FORM_ROLE_NAME_FIELD_PLACEHOLDER
+                }
+                required={true}
+                onChange={updateTenantRoleByIDForm.handleChange}
+                onBlur={updateTenantRoleByIDForm.handleBlur}
+                value={updateTenantRoleByIDForm.values.roleTitle}
+              />
+              {updateTenantRoleByIDForm.touched.roleTitle &&
+                updateTenantRoleByIDForm.errors.roleTitle && (
+                  <p className="text-xs text-red-500">
+                    {updateTenantRoleByIDForm.errors.roleTitle}
+                  </p>
+                )}
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="roleDescription">
+                {
+                  CONSTANTS.STRINGS
+                    .TENANT_ROLE_UPDATION_FORM_ROLE_DESCRIPTION_FIELD_LABEL
+                }
+              </Label>
+              <Input
+                type="text"
+                name="roleDescription"
+                id="roleDescription"
+                placeholder={
+                  CONSTANTS.STRINGS
+                    .TENANT_ROLE_UPDATION_FORM_ROLE_DESCRIPTION_FIELD_PLACEHOLDER
+                }
+                required={true}
+                onChange={updateTenantRoleByIDForm.handleChange}
+                onBlur={updateTenantRoleByIDForm.handleBlur}
+                value={updateTenantRoleByIDForm.values.roleDescription}
+              />
+              {updateTenantRoleByIDForm.touched.roleDescription &&
+                updateTenantRoleByIDForm.errors.roleDescription && (
+                  <p className="text-xs text-red-500">
+                    {updateTenantRoleByIDForm.errors.roleDescription}
+                  </p>
+                )}
+            </div>
+
+            <TenantPermissionSelectionInput
+              label={
+                CONSTANTS.STRINGS
+                  .TENANT_ROLE_UPDATION_FORM_ROLE_PERMISSIONS_FIELD_LABEL
+              }
+              helperText="Adjust the tenant permissions that this role should include."
+              value={updateTenantRoleByIDForm.values.permissionIDs}
+              onChange={_handleOnRolePermissionsSelectionChange}
+              error={
+                updateTenantRoleByIDForm.touched.permissionIDs
+                  ? updateTenantRoleByIDForm.errors.permissionIDs
+                  : undefined
+              }
+            />
+
+            <div className="flex flex-wrap items-center justify-end gap-2 pt-2">
+              <TenantRoleDeletionForm
+                tenantID={tenantID}
+                tenantRoleID={tenantRoleID}
+              />
+              <Button type="button" variant="outline" onClick={() => navigate(-1)}>
+                Cancel
+              </Button>
+              <Button type="submit" disabled={isUpdatingTenantRoleByID}>
+                {isUpdatingTenantRoleByID && (
+                  <Spinner className="mr-2" size={16} />
+                )}
+                {CONSTANTS.STRINGS.TENANT_ROLE_UPDATION_FORM_SUBMIT_BUTTON}
+              </Button>
+            </div>
+          </form>
+        )}
+      </section>
+    </ReactQueryLoadingErrorWrapper>
   );
 };

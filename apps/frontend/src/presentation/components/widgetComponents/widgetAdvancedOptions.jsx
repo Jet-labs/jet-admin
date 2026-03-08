@@ -1,6 +1,8 @@
 import React, { useCallback } from "react";
 import PropTypes from "prop-types";
 import { WIDGET_ADVANCED_OPTIONS } from "@jet-admin/widget-types";
+import { Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
+
 
 export const WidgetAdvancedOptions = ({ widgetForm, parentWidgetType }) => {
   WidgetAdvancedOptions.propTypes = {
@@ -51,44 +53,53 @@ export const WidgetAdvancedOptions = ({ widgetForm, parentWidgetType }) => {
       switch (type) {
         case "boolean":
           return (
-            <select
-              {...commonProps}
-              defaultValue={defaultValue == true ? "true" : "false"}
-              className="placeholder:text-slate-400 text-xs bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:outline-none focus:border-slate-400 block w-full px-1.5 py-1"
-            >
-              <option value={"true"} className="text-slate-500 text-xs">
-                Yes
-              </option>
-              <option value={"false"} className="text-slate-500 text-xs">
-                No
-              </option>
-            </select>
+            <Select value={commonProps.value !== undefined ? String(commonProps.value) : "false"} onValueChange={(val) => {
+              const value = type === "number" ? +val : type === "boolean" ? val === "true" : val;
+              widgetForm.setFieldValue(key, value);
+            }}>
+              <SelectTrigger className="text-xs">
+                <SelectValue placeholder="Select an option" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={"true"} className="text-slate-500 text-xs">
+                  Yes
+                </SelectItem>
+                <SelectItem value={"false"} className="text-slate-500 text-xs">
+                  No
+                </SelectItem>
+              </SelectContent>
+            </Select>
           );
 
         case "color":
-          return <input type="color" {...commonProps} />;
+          return <Input type="color" {...commonProps} />;
 
         case "select":
           return (
-            <select
-              {...commonProps}
-              className="placeholder:text-slate-400 text-xs bg-slate-50 border border-slate-300 text-slate-700 rounded focus:outline-none focus:border-slate-400 block w-full px-1.5 py-1"
-            >
-              {selectOptions.map((opt) => (
-                <option
-                  key={opt}
-                  value={opt}
-                  className="text-slate-500 text-xs"
-                >
-                  {opt.charAt(0).toUpperCase() + opt.slice(1)}
-                </option>
-              ))}
-            </select>
+            <Select value={commonProps.value !== undefined ? String(commonProps.value) : undefined} onValueChange={(val) => {
+              const value = type === "number" ? +val : val;
+              widgetForm.setFieldValue(key, value);
+            }}>
+              <SelectTrigger className="text-xs">
+                <SelectValue placeholder="Select an option" />
+              </SelectTrigger>
+              <SelectContent>
+                {selectOptions.map((opt) => (
+                  <SelectItem
+                    key={opt}
+                    value={opt}
+                    className="text-slate-500 text-xs"
+                  >
+                    {opt.charAt(0).toUpperCase() + opt.slice(1)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           );
 
         default:
           return (
-            <input
+            <Input
               {...commonProps}
               className={`placeholder:text-slate-400 w-full text-xs bg-slate-50 border border-slate-300 text-slate-700 rounded block py-1 px-1.5 focus:outline-none focus:border-slate-400`}
               type={type}

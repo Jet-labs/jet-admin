@@ -3,6 +3,8 @@ import "react-js-cron/dist/styles.css";
 import { Cron } from "react-js-cron";
 import { useState } from "react";
 import PropTypes from "prop-types";
+import { Checkbox, Input, Label } from "@jet-admin/ui";
+
 
 export const CronJobScheduler = ({
   key,
@@ -25,43 +27,39 @@ export const CronJobScheduler = ({
   const [humanize, setHumanize] = useState(true);
 
   return (
-    <div className="w-full border border-slate-300 rounded-md">
-      {/* Humanize Toggle */}
-      <div className="p-3 w-full">
-        <label className="flex items-center space-x-3 text-sm font-medium">
-          <input
-            type="checkbox"
+    <div className="w-full space-y-4">
+      <div className="w-full">
+        <label className="flex items-center space-x-3 text-sm font-medium text-foreground">
+          <Checkbox
             checked={humanize}
-            onChange={(e) => setHumanize(e.target.checked)}
-            className="toggle toggle-primary"
+            onCheckedChange={(checked) => setHumanize(checked)}
           />
-          <span className="text-xs text-slate-700">Humanize values</span>
+          <span className="text-xs text-muted-foreground">Humanize values</span>
         </label>
       </div>
 
-      {/* Raw Cron Input */}
-      <div className="p-3 w-full">
-        <span className="text-xs text-slate-700">
+      <div className="w-full space-y-1.5">
+        <Label htmlFor="cron-job-scheduler">Raw input (Cron job format)</Label>
+        <span className="text-xs text-muted-foreground">
           Raw input (Cron job format)
         </span>
-        <input
+        <Input
           type="text"
           name="cron-job-scheduler"
+          id="cron-job-scheduler"
           value={value}
           onChange={(e) => handleChange(e.target.value)}
-          className=" placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:outline-none focus:border-slate-400 block w-full px-1.5 py-1"
+          className="w-full"
         />
       </div>
 
-      {/* Divider */}
-      <div className="my-5 w-full text-center text-xs text-gray-500 border-t border-gray-200 relative">
-        <span className="bg-white px-2 absolute -top-2 left-1/2 transform -translate-x-1/2">
+      <div className="relative my-2 w-full border-t border-dashed border-border text-center text-xs text-muted-foreground">
+        <span className="absolute left-1/2 -top-2 -translate-x-1/2 bg-background px-2">
           Or
         </span>
       </div>
 
-      {/* Cron UI */}
-      <div className="p-3 w-full">
+      <div className="w-full overflow-x-auto rounded-md border border-border bg-background p-3 [&_.react-js-cron]:!w-full [&_.react-js-cron-field]:!rounded-md [&_.react-js-cron-field]:!border-border [&_.react-js-cron-field]:!bg-background [&_.react-js-cron-field]:!text-foreground [&_.react-js-cron-field]:!text-xs">
         <Cron
           key={key ? key : "cron-job-scheduler"}
           value={value}

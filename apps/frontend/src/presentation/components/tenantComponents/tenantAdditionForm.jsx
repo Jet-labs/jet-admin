@@ -1,4 +1,3 @@
-import { CircularProgress } from "@mui/material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import { CONSTANTS } from "../../../constants";
@@ -9,6 +8,7 @@ import { useTenantActions } from "../../../logic/contexts/tenantContext";
 import { TenantEditor } from "./tenantEditor";
 import { formValidations } from "../../../utils/formValidation";
 import React from "react";
+import { Button, Spinner } from "@jet-admin/ui";
 export const TenantAdditionForm = () => {
   const queryClient = useQueryClient();
   const { saveTenantLocallyAndReload } = useTenantActions();
@@ -45,28 +45,27 @@ export const TenantAdditionForm = () => {
   });
 
   return (
-    <div className="flex w-full h-full flex-col justify-start items-center overflow-hidden">
-      <section className="max-w-3xl w-full">
-        <div className="p-6 space-y-4 md:space-y-6 sm:p-8">
-          <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl ">
+    <div className="flex w-full h-full flex-col items-center overflow-y-auto p-4 md:p-6 bg-background text-foreground">
+      <section className="max-w-2xl w-full">
+        <div className="space-y-4">
+          <h1 className="text-2xl font-semibold tracking-tight">
             {CONSTANTS.STRINGS.ADD_TENANT_FORM_TITLE}
           </h1>
           <form
-            className="space-y-4 md:space-y-6"
+            className="space-y-4"
             onSubmit={addTenantForm.handleSubmit}
           >
             <TenantEditor tenantEditorForm={addTenantForm} />
 
-            <button
+            <Button
               type="submit"
               disabled={isCreatingNewTenant}
-              className="flex flex-row justify-center items-center px-3 py-1.5 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none focus:ring-blue-300 "
             >
               {isCreatingNewTenant && (
-                <CircularProgress className="!mr-3" size={16} color="white" />
+                <Spinner className="mr-2" size={16} />
               )}
               {CONSTANTS.STRINGS.ADD_TENANT_FORM_SUBMIT_BUTTON}
-            </button>
+            </Button>
           </form>
         </div>
       </section>

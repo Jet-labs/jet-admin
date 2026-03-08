@@ -2,11 +2,11 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 import { FaCog, FaPlus, FaStoreAlt } from "react-icons/fa";
-import { CircularProgress } from "@mui/material";
 import { TenantLogo } from "./tenantLogo";
 import moment from "moment";
 import PropTypes from "prop-types";
 
+import { Button, Spinner } from "@jet-admin/ui";
 export const TenantStats = ({ tenants }) => {
   TenantStats.propTypes = {
     tenants: PropTypes.array.isRequired,
@@ -16,7 +16,7 @@ export const TenantStats = ({ tenants }) => {
   if (!tenants) {
     return (
       <div className="flex justify-center items-center h-full">
-        <CircularProgress size={16} className="!text-[#646cff]" />
+        <Spinner size={16} className="text-primary" />
       </div>
     );
   }
@@ -35,23 +35,23 @@ export const TenantStats = ({ tenants }) => {
         <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl ">
           {CONSTANTS.STRINGS.TENANTS_STATS_TITLE}
         </h1>
-        <button
+        <Button
           onClick={handleAddTenant}
-          className="flex flex-row items-center justify-center rounded bg-[#646cff]/10 px-3 py-1.5 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50 w-fit outline-none focus:outline-none"
+          variant="primary-ghost" className="w-fit"
         >
           <FaPlus className="mr-2" />
           {CONSTANTS.STRINGS.TENANTS_STATS_ADD_TENANT_BUTTON}
-        </button>
+        </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3 p-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2 p-3">
         {tenants.map((tenant) => (
           <div
             key={tenant.tenantID}
-            className="bg-white  rounded border border-slate-200 p-4 cursor-pointer hover:border-[#646cff] "
+            className="bg-card rounded border border-border p-3 cursor-pointer hover:border-primary "
             onClick={() => handleTenantClick(tenant.tenantID)}
           >
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex justify-between items-center mb-3">
               <div className="flex items-center">
                 <div className="flex-shrink-0 w-8 h-8 rounded border border-slate-300 bg-slate-100 flex justify-center items-center">
                   {tenant.tenantLogoURL ? (
@@ -64,21 +64,21 @@ export const TenantStats = ({ tenants }) => {
                     <FaStoreAlt className="w-5 h-5 text-slate-500" />
                   )}
                 </div>
-                <h2 className="text-base font-semibold text-slate-700 ml-2 hover:text-[#646cff]">
+                <h2 className="text-base font-semibold text-slate-700 ml-2 hover:text-primary">
                   {tenant.tenantTitle}
                 </h2>
               </div>
-              <button
+              <Button
                 onClick={(e) => {
                   e.stopPropagation();
                   navigate(
                     CONSTANTS.ROUTES.UPDATE_TENANT.path(tenant.tenantID)
                   );
                 }}
-                className="text-gray-500 hover:text-[#646cff] p-1 rounded-md bg-transparent"
+                variant="ghost" size="icon" className="text-gray-500 hover:text-primary"
               >
                 <FaCog />
-              </button>
+              </Button>
             </div>
 
             <div className="flex justify-between text-xs text-gray-500">

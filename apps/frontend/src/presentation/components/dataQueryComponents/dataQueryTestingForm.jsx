@@ -1,4 +1,3 @@
-import { CircularProgress } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { CONSTANTS } from "../../../constants";
@@ -6,6 +5,8 @@ import { testDataQueryByDataAPI, testDataQueryByIDAPI } from "../../../data/apis
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { DataQueryArgsForm } from "./dataQueryArgsForm";
 import PropTypes from "prop-types";
+
+import { Button, Spinner } from "@jet-admin/ui";
 
 export const DataQueryTestingForm = ({
   tenantID,
@@ -20,10 +21,10 @@ export const DataQueryTestingForm = ({
 }) => {
   DataQueryTestingForm.propTypes = {
     tenantID: PropTypes.number.isRequired,
-    dataQueryID: PropTypes.number.isRequired,
+    dataQueryID: PropTypes.number,
     setDataQueryTestResult: PropTypes.func.isRequired,
-    datasourceID: PropTypes.string.isRequired,
-    datasourceType: PropTypes.string.isRequired,
+    datasourceID: PropTypes.string,
+    datasourceType: PropTypes.string,
     dataQueryOptions: PropTypes.object.isRequired,
     dataQuery: PropTypes.object.isRequired,
   };
@@ -76,7 +77,6 @@ export const DataQueryTestingForm = ({
   };
 
   const _handleOnArgFormCompleted = (dataQueryArgValues) => {
-    console.log('dataQueryArgValues', dataQueryArgValues);
     setIsArgsFormOpen(false);
     testDataQuery({
       argValues: dataQueryArgValues,
@@ -93,17 +93,18 @@ export const DataQueryTestingForm = ({
           dataQueryArgs={dataQueryOptions?.args}
         />
       ) : null}
-      <button
+      <Button
         onClick={_handleTestQuery}
         disabled={isTestingDataQuery}
         type="button"
-        className="flex flex-row items-center justify-center rounded bg-[#646cff]/10 mr-2 px-3 py-1.5 text-xs text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50 outline-none focus:outline-none"
+        variant="primary-ghost"
+
       >
-        {isTestingDataQuery && (
-          <CircularProgress className="!mr-3" size={16} color="white" />
-        )}
+        {isTestingDataQuery ? (
+          <Spinner className="mr-2" size={16} />
+        ) : null}
         {CONSTANTS.STRINGS.TEST_QUERY_FORM_TEST_BUTTON}
-      </button>
+      </Button>
     </>
   );
 };

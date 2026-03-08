@@ -9,12 +9,18 @@ const { z } = require("../../utils/validation.utils");
 // ============================================================
 
 const createTriggerSchema = z.object({
+  databaseSchemaName: z.string().optional(),
   databaseTableName: z.string().min(1, "databaseTableName is required"),
   databaseTriggerName: z.string().min(1, "databaseTriggerName is required"),
   triggerTiming: z.string().min(1, "triggerTiming is required"),
-  triggerEvents: z.string().min(1, "triggerEvents is required"),
-  triggerFunction: z.string().optional(),
-  triggerCondition: z.string().optional(),
+  triggerEvents: z.array(z.string()).min(1, "triggerEvents is required"),
+  triggerFunctionName: z.string().optional(),
+  whenCondition: z.string().optional(),
+  forEach: z.string().optional(),
+  referencingOld: z.string().optional(),
+  referencingNew: z.string().optional(),
+  deferrable: z.boolean().optional(),
+  initiallyDeferred: z.boolean().optional(),
 }).passthrough();
 
 // ============================================================

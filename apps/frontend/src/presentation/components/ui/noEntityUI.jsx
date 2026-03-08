@@ -9,7 +9,7 @@ export const NoEntityUI = ({ message }) => {
   return (
     <div className=" bg-transparent p-5 py-2 w-full flex flex-col items-center rounded  justify-center  opacity-50">
       <img src={emptyIcon} alt="Empty" className="w-12 h-12" />
-      <span className="!text-[#646cff] text-xs font-normal text-center w-full mt-3">
+      <span className="!text-primary text-xs font-normal text-center w-full mt-3">
         {message}
       </span>
     </div>

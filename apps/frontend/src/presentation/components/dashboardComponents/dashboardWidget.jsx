@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo, useEffect } from "react";
+import React, { useCallback, useMemo, useRef } from "react";
 
 import { WIDGETS_MAP } from "@jet-admin/widgets-ui";
 import { useQuery } from "@tanstack/react-query";
@@ -9,18 +9,55 @@ import {
   getWidgetDataByIDAPI,
 } from "../../../data/apis/widget";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
-// Use the merged hook
-import { useWidgetRun, WIDGET_EXECUTION_MODES } from "../widgetComponents/useWidgetRun";
+import {
+  useWidgetRun,
+  WIDGET_EXECUTION_MODES,
+} from "../widgetComponents/useWidgetRun";
+
+const resolvePath = (obj, path) => {
+  if (!obj || !path) return undefined;
+
+  const parts = path.split(".");
+  let current = obj;
+
+  for (const part of parts) {
+    if (current === undefined || current === null) return undefined;
+    current = current[part];
+  }
+
+  return current;
+};
+
+const extractWidgetData = (rawData) => {
+  if (Array.isArray(rawData)) return rawData;
+
+  if (rawData && typeof rawData === "object") {
+    if (rawData.$schema) return rawData;
+    if (Array.isArray(rawData.data)) return rawData.data;
+    if (Array.isArray(rawData.rows)) return rawData.rows;
+    if (Array.isArray(rawData.items)) return rawData.items;
+    if (Array.isArray(rawData.values)) return rawData.values;
+  }
+
+  return undefined;
+};
+
+const getChartData = (data) => {
+  if (data?.workflowInstances?.data) return data.workflowInstances.data;
+  if (data?.data) return data.data;
+  return data;
+};
 
 export const DashboardWidget = ({ tenantID, widgetID, width, height }) => {
   DashboardWidget.propTypes = {
-    tenantID: PropTypes.number.isRequired,
-    widgetID: PropTypes.number.isRequired,
+    tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    widgetID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
   };
 
-  // Fetch widget configuration
+  const widgetRef = useRef(null);
+
   const {
     isLoading: isLoadingWidget,
     data: widget,
@@ -32,87 +69,164 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height }) => {
     refetchOnWindowFocus: false,
   });
 
-  // Fetch widget data (triggers workflow execution for workflow mode)
+  const executionMode = useMemo(() => {
+    if (widget?.workflowConfig?.mode === "polling") {
+      return WIDGET_EXECUTION_MODES.SYNC;
+    }
+
+    return WIDGET_EXECUTION_MODES.ASYNC;
+  }, [widget]);
+
   const {
     isLoading: isLoadingWidgetData,
     data: widgetData,
     error: loadWidgetDataError,
     refetch: refetchWidgetData,
   } = useQuery({
-    queryKey: [CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID), widgetID, "data"],
-    queryFn: () => getWidgetDataByIDAPI({ tenantID, widgetID }),
+    queryKey: [
+      CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID),
+      widgetID,
+      "data",
+      executionMode,
+    ],
+    queryFn: () => getWidgetDataByIDAPI({ tenantID, widgetID, executionMode }),
     refetchOnWindowFocus: false,
-    // Disable automatic refetch if we are going to use the hook to manage it?
-    // Actually, stick to React Query for initial load, passthrough to hook as 'initialData'
+    enabled: !!widget,
   });
 
-  // Determine Execution Mode (Default to ASYNC/Live for workflows)
-  const executionMode = useMemo(() => {
-    if (widget?.workflowConfig?.mode === 'polling') return WIDGET_EXECUTION_MODES.SYNC; // Or legacy polling
-    return WIDGET_EXECUTION_MODES.ASYNC;
-  }, [widget]);
-
-  // Use the merged hook for execution management (Socket + Data merging)
   const {
     data: finalData,
-    isLoading: isWorkflowRunning,
+    isRunning: isWorkflowRunning,
     isLive,
     workflowStatus,
     resolveVariable,
-    // On Dashboard, we might assume the "Initial Fetch" above triggered the execution
-    // So we pass the `widgetData` result (which contains instanceID) to the hook
+    context: workflowContext,
   } = useWidgetRun({
     tenantID,
     widgetID,
-    widgetFetchedData: widgetData, // Pass the Initial Data
+    widgetFetchedData: widgetData,
     executionMode,
-    // Workflow Params for Socket
     workflowID: widget?.workflowID,
     widgetType: widget?.widgetType,
     datasetFields: widget?.workflowConfig?.datasetFields,
     parameters: widget?.workflowConfig?.parameters,
   });
 
-  // Debug: Log immediately on every render to see if component renders at all
-  console.log(`[DashboardWidget RENDER] widgetID=${widgetID}`, { finalData, wsProcessedData: finalData?.workflowInstances?.data });
+  const handleOnWidgetInit = useCallback((widgetView) => {
+    widgetRef.current = widgetView;
+  }, []);
 
-  useEffect(() => {
-    console.log(`[DashboardWidget useEffect] widgetID=${widgetID}`, finalData, isWorkflowRunning, isLive, workflowStatus);
-  }, [finalData, isWorkflowRunning, isLive, workflowStatus, widgetID]);
+  const widgetRender = useMemo(() => {
+    if (!widget) {
+      return null;
+    }
 
+    if (widget.widgetConfig?.vegaSpec) {
+      const WidgetComponent = WIDGETS_MAP["vega-lite"]?.component;
 
-  // Extract data for display
-  const displayData = useMemo(() => {
-    // If hook gives us data (merged or socket), use it
-    if (finalData?.workflowInstances?.data) return finalData.workflowInstances.data;
-    if (finalData?.data) return finalData.data;
+      if (!WidgetComponent) {
+        return { errorMessage: "VegaWidget not available" };
+      }
 
-    // Fallback to query data directly if hook hasn't processed it yet
-    return widgetData?.data;
-  }, [finalData, widgetData]);
+      let specToRender = {};
 
+      try {
+        specToRender =
+          typeof widget.widgetConfig.vegaSpec === "string"
+            ? JSON.parse(widget.widgetConfig.vegaSpec)
+            : JSON.parse(JSON.stringify(widget.widgetConfig.vegaSpec));
+      } catch {
+        return { errorMessage: "Invalid Vega Spec JSON" };
+      }
+
+      let vegaData = [];
+      let dataResolved = false;
+
+      if (
+        specToRender?.data &&
+        typeof specToRender.data.values === "string"
+      ) {
+        const ctxMatch = specToRender.data.values.match(/\{\{ctx\.([^}]+)\}\}/);
+
+        if (ctxMatch && workflowContext) {
+          const extractedData = extractWidgetData(
+            resolvePath(workflowContext, ctxMatch[1])
+          );
+
+          if (extractedData !== undefined) {
+            vegaData = extractedData;
+            dataResolved = true;
+          } else {
+            dataResolved = true;
+          }
+        }
+      }
+
+      if (!dataResolved) {
+        const extractedData = extractWidgetData(getChartData(finalData));
+
+        if (extractedData !== undefined) {
+          vegaData = extractedData;
+        }
+      }
+
+      if (vegaData && vegaData.$schema) {
+        specToRender = vegaData;
+      } else {
+        specToRender.data = {
+          ...(specToRender.data || {}),
+          values: Array.isArray(vegaData) ? vegaData : [],
+        };
+      }
+
+      return {
+        Component: WidgetComponent,
+        data: JSON.parse(JSON.stringify(specToRender)),
+        widgetType: "vega-lite",
+      };
+    }
+
+    const WidgetComponent = WIDGETS_MAP[widget.widgetType]?.component;
+
+    if (!WidgetComponent) {
+      return {
+        errorMessage: CONSTANTS.STRINGS.WIDGET_TYPE_INVALID_ERROR,
+      };
+    }
+
+    return {
+      Component: WidgetComponent,
+      data: getChartData(finalData),
+      widgetType: widget.widgetType,
+    };
+  }, [finalData, widget, workflowContext]);
+
+  const RenderedWidgetComponent = widgetRender?.Component;
 
   return (
     <div
       className="flex flex-col items-center justify-center overflow-hidden relative"
       style={{
-        width: width,
-        height: height,
+        width,
+        height,
       }}
     >
       <ReactQueryLoadingErrorWrapper
-        isLoading={isLoadingWidget || (isLoadingWidgetData && !widgetData)}
+        isLoading={isLoadingWidget || (!!widget && isLoadingWidgetData && !widgetData)}
         isFetching={isLoadingWidget || isLoadingWidgetData}
         error={loadWidgetError || loadWidgetDataError}
-        refetch={() => { refetchWidget(); refetchWidgetData(); }}
+        refetch={() => {
+          refetchWidget();
+          refetchWidgetData();
+        }}
       >
-        {/* WebSocket connection indicator */}
         {isLive && (
-          <div className={`absolute top-1 left-1 z-10 w-2 h-2 rounded-full bg-green-500`}
-            title="Live Connection" />
+          <div
+            className="absolute top-1 left-1 z-10 w-2 h-2 rounded-full bg-green-500"
+            title="Live Connection"
+          />
         )}
 
-        {/* Workflow loading indicator */}
         {isWorkflowRunning && (
           <div className="absolute top-1 right-1 z-10 flex items-center gap-1 bg-blue-100 text-blue-700 px-2 py-0.5 rounded text-xs">
             <div className="animate-spin h-3 w-3 border-2 border-blue-500 border-t-transparent rounded-full" />
@@ -120,18 +234,29 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height }) => {
           </div>
         )}
 
-        {widget &&
-          WIDGETS_MAP[widget.widgetType]?.component({
-            widgetTitle: widget.widgetTitle,
-            widgetConfig: widget.widgetConfig,
-            data: displayData,
-            refetchInterval: widget.widgetConfig?.refetchInterval,
-            // Pass advanced props
-            isLoadingWorkflows: isWorkflowRunning,
-            isConnected: isLive,
-            workflowStatus: workflowStatus,
-            resolveVariable: resolveVariable,
-          })}
+        {widgetRender?.errorMessage ? (
+          <div className="h-full w-full p-3 flex justify-center items-center">
+            <span style={{ color: "#dc2626", fontSize: "12px" }}>
+              {widgetRender.errorMessage}
+            </span>
+          </div>
+        ) : null}
+
+        {RenderedWidgetComponent ? (
+          <RenderedWidgetComponent
+            widgetTitle={widget.widgetTitle}
+            widgetType={widgetRender.widgetType}
+            widgetConfig={widget.widgetConfig}
+            data={widgetRender.data}
+            onWidgetInit={handleOnWidgetInit}
+            refetchInterval={widget.refreshInterval}
+            refreshData={refetchWidgetData}
+            isLoadingWorkflows={isWorkflowRunning}
+            isConnected={isLive}
+            workflowStatus={workflowStatus}
+            resolveVariable={resolveVariable}
+          />
+        ) : null}
       </ReactQueryLoadingErrorWrapper>
     </div>
   );

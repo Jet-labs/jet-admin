@@ -194,9 +194,6 @@ const constants = {
     SUCCESS: "SUCCESS",
     FAILURE: "FAILURE",
   },
-
-  // RabbitMQ reconnection interval (5 minutes in milliseconds)
-  RABBITMQ_RECONNECT_INTERVAL_MS: 5 * 60 * 1000,
 };
 
 module.exports = constants;

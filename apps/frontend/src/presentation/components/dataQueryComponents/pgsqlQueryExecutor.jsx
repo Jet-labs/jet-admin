@@ -1,4 +1,3 @@
-import { CircularProgress } from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import PropTypes from "prop-types";
 import React, { useState } from "react";
@@ -16,6 +15,7 @@ import {
 import { DATASOURCE_UI_COMPONENTS } from "@jet-admin/datasources-ui";
 import { DATASOURCE_TYPES } from "@jet-admin/datasource-types";
 
+import { Button, Spinner } from "@jet-admin/ui";
 export const PGSQLQueryExecutor = ({ tenantID }) => {
   PGSQLQueryExecutor.propTypes = {
     tenantID: PropTypes.number.isRequired,
@@ -92,22 +92,18 @@ export const PGSQLQueryExecutor = ({ tenantID }) => {
               </div>
 
               <div className="flex justify-end">
-                <button
+                <Button
                   type="button"
                   onClick={handleExecuteQuery}
                   disabled={isExecuting || !sqlQuery.trim()}
-                  className="flex flex-row justify-center items-center px-2.5 !cursor-pointer py-1.5 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#747bff] focus:ring-4 focus:outline-none"
+                  size="sm"
                 >
                   {isExecuting && (
-                    <CircularProgress
-                      className="!mr-3"
-                      size={16}
-                      color="inherit"
-                    />
+                    <Spinner className="mr-3" size={16} />
                   )}
                   {!isExecuting && <FaPlay className="mr-2" size={12} />}
                   {isExecuting ? "Executing..." : "Execute Query"}
-                </button>
+                </Button>
               </div>
             </div>
           </ResizablePanel>

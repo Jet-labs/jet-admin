@@ -5,12 +5,15 @@ import { WidgetUpdationForm } from "../../components/widgetComponents/widgetUpda
 const UpdateWidgetPage = () => {
   const { tenantID, widgetID } = useParams();
   const uniqueKey = `updateWidgetPage_${tenantID}_${widgetID}`;
+
   return (
-    <WidgetUpdationForm
-      key={`widgetUpdationForm_${uniqueKey}`}
-      tenantID={tenantID}
-      widgetID={widgetID}
-    />
+    <div className="flex h-full w-full flex-col overflow-hidden bg-background">
+      <WidgetUpdationForm
+        key={`widgetUpdationForm_${uniqueKey}`}
+        tenantID={tenantID}
+        widgetID={widgetID}
+      />
+    </div>
   );
 };
 

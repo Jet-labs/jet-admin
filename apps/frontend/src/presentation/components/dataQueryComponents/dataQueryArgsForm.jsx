@@ -1,14 +1,10 @@
-import {
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-} from "@mui/material";
 import { useFormik } from "formik";
 import React, { useEffect } from "react";
 import { CONSTANTS } from "../../../constants";
 import { formValidations } from "../../../utils/formValidation";
 import PropTypes from "prop-types";
+
+import { Button, Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, Input } from "@jet-admin/ui";
 
 export const DataQueryArgsForm = ({
   onDecline,
@@ -41,78 +37,64 @@ export const DataQueryArgsForm = ({
     }
   }, [dataQueryArgs]);
 
-  console.log("dataQueryArgsForm.values", dataQueryArgsForm.values);
   return (
-    <Dialog
-      open={open}
-      onClose={onDecline}
-      PaperProps={{
-        className: "rounded shadow-xl w-full max-w-lg", // Tailwind classes for the dialog container
-      }}
-      BackdropProps={{
-        className: "bg-black/50", // Tailwind class for the backdrop
-      }}
-      fullWidth
-      maxWidth="sm"
-    >
-      <DialogTitle className="!p-4 !pb-0">
-        {CONSTANTS.STRINGS.DATA_QUERY_ARGS_FORM_TITLE}
-      </DialogTitle>
-      <DialogContent className="!p-4 !space-y-4">
-        <span className="text-sm font-normal text-gray-600">
-          {CONSTANTS.STRINGS.DATA_QUERY_ARGS_FORM_DESCRIPTION}
-        </span>
+    <Dialog open={open} onOpenChange={(v) => { if (!v) onDecline(); }}>
+      <DialogContent className="max-w-sm p-4 md:p-6">
+        <DialogHeader>
+          <DialogTitle className="text-lg font-semibold tracking-tight">
+            {CONSTANTS.STRINGS.DATA_QUERY_ARGS_FORM_TITLE}
+          </DialogTitle>
+        </DialogHeader>
         <div className="space-y-4">
-          {dataQueryArgs.map((arg) => (
-            <div key={arg.key} className="space-y-1">
-              <label
-                htmlFor={arg.key}
-                className="text-xs font-light text-gray-500"
-              >
-                {arg.key}
-              </label>
-              <input
-                id={arg.key}
-                name={arg.key}
-                value={dataQueryArgsForm.values[arg]?.value}
-                onChange={dataQueryArgsForm.handleChange}
-                onBlur={dataQueryArgsForm.handleBlur}
-                autoComplete="off"
-                className="w-full rounded border p-2.5 text-sm text-gray-900 focus:border-[#646cff] focus:ring-2 focus:ring-[#646cff]/50 bg-white outline-none"
-              />
-              {dataQueryArgsForm.errors[arg.key] && (
-                <span className="text-red-500 text-xs">
-                  {dataQueryArgsForm.errors[arg.key]}
-                </span>
-              )}
-            </div>
-          ))}
+          <p className="text-sm text-muted-foreground">
+            {CONSTANTS.STRINGS.DATA_QUERY_ARGS_FORM_DESCRIPTION}
+          </p>
+          <div className="space-y-4">
+            {dataQueryArgs.map((arg) => (
+              <div key={arg.key} className="space-y-1">
+                <label
+                  htmlFor={arg.key}
+                  className="text-xs font-medium text-muted-foreground"
+                >
+                  {arg.key}
+                </label>
+                <Input
+                  id={arg.key}
+                  name={arg.key}
+                  value={dataQueryArgsForm.values[arg.key]}
+                  onChange={dataQueryArgsForm.handleChange}
+                  onBlur={dataQueryArgsForm.handleBlur}
+                  autoComplete="off"
+                />
+                {dataQueryArgsForm.errors[arg.key] && (
+                  <span className="text-destructive text-xs">
+                    {dataQueryArgsForm.errors[arg.key]}
+                  </span>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
-      </DialogContent>
-      <DialogActions className="!p-4">
-        <button
-          onClick={onDecline}
-          type="button"
-          className={`px-2.5 py-1.5 text-sm !text-slate-600 border-0 hover:border-0 !border-slate-300 bg-slate-200 hover:!bg-slate-300 rounded  hover:outline-none  outline-none `}
-        >
-          {CONSTANTS.STRINGS.DATA_QUERY_ARGS_FORM_CANCEL_BUTTON}
-        </button>
+        <DialogFooter className="gap-2 sm:gap-3 mt-4">
+          <Button
+            onClick={onDecline}
+            type="button"
+            variant="outline"
+          >
+            {CONSTANTS.STRINGS.DATA_QUERY_ARGS_FORM_CANCEL_BUTTON}
+          </Button>
 
-        <button
-          type="button"
-          onClick={() => onAccepted(dataQueryArgsForm.values)}
-          disabled={dataQueryArgs.some(
-            (arg) => !dataQueryArgsForm.values[arg.key]
-          )}
-          className={`px-2.5 py-1.5 text-white text-sm bg-[#646cff] rounded hover:outline-none hover:border-0 border-0 outline-none ${
-            dataQueryArgs.some((arg) => !dataQueryArgsForm.values[arg.key])
-              ? "opacity-50 cursor-not-allowed"
-              : ""
-          }`}
-        >
-          {CONSTANTS.STRINGS.DATA_QUERY_ARGS_FORM_CONFIRM_BUTTON}
-        </button>
-      </DialogActions>
+          <Button
+            type="button"
+            onClick={() => onAccepted(dataQueryArgsForm.values)}
+            disabled={dataQueryArgs.some(
+              (arg) => !dataQueryArgsForm.values[arg.key]
+            )}
+          >
+            {CONSTANTS.STRINGS.DATA_QUERY_ARGS_FORM_CONFIRM_BUTTON}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
     </Dialog>
   );
 };

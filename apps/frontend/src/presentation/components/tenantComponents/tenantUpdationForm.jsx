@@ -1,4 +1,4 @@
-import { Avatar, CircularProgress, Divider } from "@mui/material";
+import { UserPlus } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import React, { useEffect, useState } from "react";
@@ -8,7 +8,7 @@ import {
   updateTenantAPI,
 } from "../../../data/apis/tenant";
 
-import PersonAddIcon from "@mui/icons-material/PersonAdd";
+
 import moment from "moment";
 import { useTenantActions } from "../../../logic/contexts/tenantContext";
 import { formValidations } from "../../../utils/formValidation";
@@ -21,6 +21,7 @@ import { TenantDeletionForm } from "./tenantDeletionForm";
 import { Link } from "react-router-dom";
 import { MdOutlineLockPerson } from "react-icons/md";
 
+import { Button, Separator, Spinner } from "@jet-admin/ui";
 export const TenantUpdationForm = ({ tenantID }) => {
   TenantUpdationForm.propTypes = {
     tenantID: PropTypes.number.isRequired,
@@ -102,8 +103,9 @@ export const TenantUpdationForm = ({ tenantID }) => {
   const _handleCloseAddTenantUserDialog = () => {
     setIsAddTenantUserDialogOpen(false);
   };
+
   return (
-    <div className="flex w-full   flex-col justify-start items-center overflow-y-auto">
+    <div className="flex w-full h-full flex-col items-center overflow-y-auto p-4 md:p-6 bg-background text-foreground">
 
       <ReactQueryLoadingErrorWrapper
         isLoading={isLoadingTenant}
@@ -111,19 +113,19 @@ export const TenantUpdationForm = ({ tenantID }) => {
         error={tenantError}
       >
         {tenant && (
-          <section className="w-2/3 sm:w-full md:w-full lg:w-2/3">
+          <section className="max-w-2xl w-full">
             <TenantUserAdditionForm
               tenantID={tenant.tenantID}
               onClose={_handleCloseAddTenantUserDialog}
               open={isAddTenantUserDialogOpen}
             />
-            <div className="p-3">
+            <div className="space-y-4 mt-3">
               <div className="flex flex-row justify-between items-center w-full">
                 <div className="flex flex-col justify-start items-start">
-                  <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl ">
+                  <h1 className="text-2xl font-semibold tracking-tight">
                     {CONSTANTS.STRINGS.UPDATE_TENANT_FORM_TITLE}
                   </h1>
-                  <span className="text-sm font-normal  text-slate-700">
+                  <span className="text-sm font-normal text-muted-foreground">
                     {`Tenant id: ${tenant.tenantID}`}
                   </span>
                 </div>
@@ -131,23 +133,23 @@ export const TenantUpdationForm = ({ tenantID }) => {
                 <Link
                   to={CONSTANTS.ROUTES.VIEW_AUDIT_LOGS.path(tenantID)}
                   key={CONSTANTS.ROUTES.VIEW_AUDIT_LOGS.path(tenantID)}
-                  className={`flex items-center rounded mb-2 w-full p-2 hover:underline transition duration-75 group flex-row !justify-end text-sm font-normal`}
+                  className={`flex items-center rounded-md mb-2 p-2 hover:bg-muted transition duration-75 group flex-row text-sm font-medium`}
                 >
                   <MdOutlineLockPerson className={`!text-sm`} />
-                  <span className={`ml-1`}>
+                  <span className={`ml-2`}>
                     {CONSTANTS.STRINGS.MAIN_DRAWER_AUDIT_LOGS_TITLE}
                   </span>
                 </Link>
               </div>
 
-              <div className="flex flex-row justify-between items-center mt-4 w-full">
+              <div className="flex flex-row justify-between items-center w-full">
                 <div className="flex flex-row justify-start items-center">
                   <div className="flex flex-col justify-start items-start">
-                    <span className="!text-slate-600 font-semibold text-sm">
+                    <span className="text-sm font-semibold">
                       Created by{" "}
                       {tenant.creator ? tenant.creator.email : "Deleted User"}
                     </span>
-                    <span className="!text-slate-600 font-normal text-xs ">
+                    <span className="text-xs font-normal text-muted-foreground">
                       {`Tenant created: ${moment(tenant.createdAt).format(
                         "MMM Do YY"
                       )}`}
@@ -156,51 +158,45 @@ export const TenantUpdationForm = ({ tenantID }) => {
                 </div>
               </div>
               <form
-                className="space-y-4 md:space-y-6 mt-4"
+                className="space-y-4"
                 onSubmit={(e) => {
                   e.preventDefault(), updateTenantForm.handleSubmit();
                 }}
               >
                 <TenantEditor tenantEditorForm={updateTenantForm} />
                 <div className="flex flex-row justify-start items-center w-full">
-                  <button
+                  <Button
                     type="submit"
                     disabled={isUpdatingTenant}
-                    className="flex flex-row justify-center items-center px-3 py-1.5 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none focus:ring-blue-300 "
                   >
                     {isUpdatingTenant && (
-                      <CircularProgress
-                        className="!mr-3"
-                        size={16}
-                        color="white"
-                      />
+                      <Spinner className="mr-2" size={16} />
                     )}
                     {CONSTANTS.STRINGS.UPDATE_TENANT_FORM_SUBMIT_BUTTON}
-                  </button>
-                  <TenantDeletionForm tenantID={tenantID} />
+                  </Button>
+                  <div className="ml-4">
+                    <TenantDeletionForm tenantID={tenantID} />
+                  </div>
                 </div>
-
-                {/* {JSON.stringify(tenant.relationships)} */}
               </form>
-              <div className="mt-6 flex flex-col justify-start items-stretch w-full">
-                <span className="!text-slate-700 text-lg font-bold w-full mb-3 mt-4">
+
+              <div className="flex flex-col justify-start items-stretch w-full pt-4 border-t border-border">
+                <span className="text-lg font-bold w-full mb-3">
                   {CONSTANTS.STRINGS.UPDATE_TENANT_MEMBERS_TITLE}
                 </span>
                 {tenant.relationships?.map((relationship, index) => {
                   return (
-                    <>
+                    <React.Fragment key={relationship.id || index}>
                       <div className="flex flex-row justify-between items-center mb-3 w-full">
                         <div className="flex flex-row justify-start items-center">
-                          <Avatar
-                            alt={relationship.tblUsers.email}
-                            src="/broken-image.jpg"
-                            sx={{ width: 32, height: 32 }}
-                          ></Avatar>
-                          <div className="flex flex-col justify-start items-start ml-2">
-                            <span className="!text-slate-600 font-semibold text-sm">
+                          <div className="w-8 h-8 rounded-full bg-muted border border-border flex items-center justify-center text-xs font-medium shrink-0">
+                            {relationship.tblUsers.email?.charAt(0)?.toUpperCase() || "?"}
+                          </div>
+                          <div className="flex flex-col justify-start items-start ml-3">
+                            <span className="text-sm font-semibold">
                               {relationship.tblUsers.email}
                             </span>
-                            <span className="!text-slate-600 font-normal text-xs ">
+                            <span className="text-xs font-normal text-muted-foreground">
                               {relationship.role ===
                               CONSTANTS.ROLES.PRIMARY.ADMIN.value
                                 ? `Admin from: ${moment(
@@ -214,19 +210,20 @@ export const TenantUpdationForm = ({ tenantID }) => {
                         </div>
                       </div>
                       {tenant.relationships.length - 1 > index && (
-                        <Divider className="!w-full !mb-2" />
+                        <Separator className="w-full mb-3" />
                       )}
-                    </>
+                    </React.Fragment>
                   );
                 })}
-                <button
+                <Button
                   type="button"
                   onClick={_handleOpenAddTenantUserDialog}
-                  className="w-fit py-1 px-2 mt-8 text-sm flex flex-row items-center font-medium text-slate-600 focus:outline-none bg-white rounded border border-gray-200 hover:bg-gray-100 hover:text-[#646cff]"
+                  variant="outline"
+                  className="mt-4 w-min"
                 >
-                  <PersonAddIcon className="!text-base !me-2" />
+                  <UserPlus className="w-4 h-4 me-2" />
                   {CONSTANTS.STRINGS.UPDATE_TENANT_ADD_MEMBERS_BUTTON}
-                </button>
+                </Button>
               </div>
             </div>
           </section>

@@ -3,11 +3,11 @@ import { useParams } from "react-router-dom";
 import React, { useState, useCallback, useRef } from "react";
 import PropTypes from "prop-types";
 import { useMutation } from "@tanstack/react-query";
-import { CircularProgress } from "@mui/material";
 import { executeWorkflowAPI } from "../../../data/apis/workflow";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { WorkflowConsole } from "./workflowConsole";
 
+import { Button, Spinner } from "@jet-admin/ui";
 export const WorkflowTestingPanel = ({
   selectedWorkflowForTesting,
   setSelectedWorkflowForTesting,
@@ -181,26 +181,29 @@ export const WorkflowTestingPanel = ({
       >
         <div className="p-2 h-full flex flex-col">
           <div className="flex flex-row justify-between items-center mb-2">
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size="icon"
+              className="h-7 w-7"
               onClick={_handleClose}
-              className="focus:outline-none text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 py-1 px-1 rounded border border-slate-300 transition-colors w-fit"
             >
-              <IoClose className="text-base text-slate-700" />
-            </button>
+              <IoClose className="h-4 w-4 text-slate-700" />
+            </Button>
             
             {selectedWorkflowForTesting && (
-              <button
+              <Button
                 onClick={_handleTestWorkflow}
                 disabled={isExecuting || isRunning}
                 type="button"
-                className="flex flex-row items-center justify-center rounded bg-[#646cff]/10 px-3 py-1.5 text-xs text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50 outline-none focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                size="sm"
+                variant="primary-ghost"
               >
                 {(isExecuting || isRunning) && (
-                  <CircularProgress className="!mr-2" size={14} color="inherit" />
+                  <Spinner className="mr-2" size={14} />
                 )}
                 {isExecuting ? "Starting..." : isRunning ? "Running..." : "Test Workflow"}
-              </button>
+              </Button>
             )}
           </div>
           

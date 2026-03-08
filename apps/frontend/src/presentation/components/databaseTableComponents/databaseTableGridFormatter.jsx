@@ -2,7 +2,7 @@ import { BiCalendar, BiLink, BiUnlink } from "react-icons/bi";
 import { Link } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 
-import { Box, InputBase, MenuItem, Select } from "@mui/material"; // Import necessary MUI components
+
 import moment from "moment";
 import React, { useCallback, useState } from "react";
 import ReactJson from "react-json-view";
@@ -14,6 +14,8 @@ import { PostgreSQLUtils } from "../../../utils/postgre";
 import { EditCellWrapper } from "../ui/editCellWrapper";
 import { DatabaseTableGridJSONEditor } from "./databaseTableGridJSONEditor";
 import { DatabaseTableGridCellForeignKeyPopup } from "./databaseTableGridCellForeignKeyPopup";
+import { Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
+
 
 /**
  * Returns width for different field types
@@ -124,7 +126,7 @@ const getFieldFormatting = ({
     case CONSTANTS.JS_DATA_TYPES.DATE:
       return (
         <div className="space-x-2 w-fit flex h-full flex-row justify-start items-center">
-          <BiCalendar className="text-[#646cff] flex-shrink-0" />
+          <BiCalendar className="text-primary flex-shrink-0" />
           <span className={commonTextStyle}>
             {cellValue
               ? foreignKeyReference
@@ -234,19 +236,9 @@ const JsonEditCell = ({ params }) => {
   return (
     <>
       {/* Optional: Render something minimal in the cell itself while popup is open */}
-      <Box
-        sx={{
-          display: "flex",
-          alignItems: "center",
-          width: "100%",
-          height: "100%",
-          pl: 1,
-          fontStyle: "italic",
-          color: "grey",
-        }}
-      >
+      <div className="flex items-center w-full h-full pl-2 italic text-gray-400">
         Editing JSON...
-      </Box>
+      </div>
       <DatabaseTableGridJSONEditor
         title={`Edit "${params.field}"`}
         open={isPopupOpen}
@@ -455,8 +447,8 @@ export const getFormattedTableColumns = ({
           };
 
           // Handler specifically for boolean Select component
-          const handleSelectChange = (event) => {
-            let value = event.target.value;
+          const handleSelectChange = (val) => {
+            let value = val;
             if (value === "true") value = true;
             else if (value === "false") value = false;
             else value = null; // Assume any other value means null (if nullable)
@@ -469,42 +461,17 @@ export const getFormattedTableColumns = ({
 
           // --- Determine the editor component based on type ---
           let editor;
-          // Common props for InputBase components (excluding onChange which varies)
-          // Use params.value which might have been processed by valueGetter to be a Date object
           const initialValue = params.value;
-          const commonInputProps = {
-            // value: initialValue ?? '', // This won't work directly for Date objects in input defaultValue
-            autoFocus: true, // Focus the input when editing starts
-            fullWidth: true, // Make input take available width
-            sx: {
-              // Styling for the input within the cell
-              height: "100%",
-              boxSizing: "border-box",
-              padding: "0 8px", // Add some horizontal padding
-              fontSize: "inherit", // Inherit font size from cell
-              border: "none", // Remove default borders
-              "& .MuiInputBase-input": {
-                // Target the actual input element
-                padding: 0, // Remove default input padding
-                height: "100%",
-                boxSizing: "border-box",
-              },
-              "&.Mui-focused": {
-                // Optional: remove outline on focus if desired
-                // outline: 'none',
-                // boxShadow: 'none',
-              },
-            },
-          };
+          const commonInputClassName = "w-full h-full box-border px-2 text-inherit border-none outline-none bg-transparent";
 
           // Switch based on the determined JS type
           switch (convertedType) {
             case "number":
-              // Use 'value' prop for controlled number input if needed, or defaultValue
               editor = (
-                <InputBase
-                  {...commonInputProps}
+                <Input
+                  className={commonInputClassName}
                   type="number"
+                  autoFocus
                   defaultValue={initialValue ?? ""}
                   onChange={handleChange}
                 />
@@ -512,59 +479,26 @@ export const getFormattedTableColumns = ({
               break;
 
             case "boolean":
-              // Using Select for boolean: true, false, (optional: null)
               editor = (
-                <Select
-                  // Use initialValue directly for boolean comparison
-                  value={
+                <Select value={
                     initialValue === null || initialValue === undefined
                       ? "null"
                       : String(initialValue)
-                  }
-                  onChange={handleSelectChange}
-                  autoFocus
-                  fullWidth
-                  variant="standard" // Simplest variant, looks clean in a cell
-                  disableUnderline // Remove the underline for cleaner look
-                  sx={{
-                    height: "100%",
-                    boxSizing: "border-box",
-                    fontSize: "inherit",
-                    // Target the displayed value element for alignment and padding
-                    "& .MuiSelect-select": {
-                      height: "100% !important", // Ensure it takes full height
-                      display: "flex",
-                      alignItems: "center",
-                      paddingLeft: "8px",
-                      paddingRight: "8px !important", // Override default padding
-                      paddingTop: "0",
-                      paddingBottom: "0",
-                      boxSizing: "border-box",
-                    },
-                    // Remove default icon padding if needed
-                    "& .MuiSelect-icon": {
-                      right: 0,
-                    },
-                  }}
-                >
-                  {/* Provide options for boolean values */}
-                  <MenuItem value="true" sx={{ fontSize: "inherit" }}>
-                    true
-                  </MenuItem>
-                  <MenuItem value="false" sx={{ fontSize: "inherit" }}>
-                    false
-                  </MenuItem>
-                  {/* Add option for null ONLY if the column is nullable in the DB */}
-                  {/* {column.isNullable && <MenuItem value="null" sx={{ fontSize: 'inherit' }}>(null)</MenuItem>} */}
-                </Select>
+                  } onValueChange={handleSelectChange}>
+      <SelectTrigger className="w-full h-full border-none bg-transparent">
+        <SelectValue placeholder="Select an option" />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="true">true</SelectItem>
+                  <SelectItem value="false">false</SelectItem>
+      </SelectContent>
+    </Select>
               );
               break;
 
             case "date": {
-              // Format Date object from initialValue (processed by valueGetter) for input type="date"
               let dateValueStr = "";
               try {
-                // initialValue should be a Date object here thanks to valueGetter
                 if (
                   initialValue instanceof Date &&
                   !isNaN(initialValue.getTime())
@@ -574,11 +508,11 @@ export const getFormattedTableColumns = ({
               } catch (e) {
                 console.error("Error formatting date for input:", e);
               }
-              // Use defaultValue for uncontrolled input, pass specific handler
               editor = (
-                <InputBase
-                  {...commonInputProps}
+                <Input
+                  className={commonInputClassName}
                   type="date"
+                  autoFocus
                   defaultValue={dateValueStr}
                   onChange={handleDateChange}
                 />
@@ -587,16 +521,13 @@ export const getFormattedTableColumns = ({
             }
 
             case "datetime": {
-              // Format Date object from initialValue (processed by valueGetter) for input type="datetime-local"
               let dateTimeValueStr = "";
               try {
-                // initialValue should be a Date object here
                 if (
                   initialValue instanceof Date &&
                   !isNaN(initialValue.getTime())
                 ) {
-                  // Convert to local time string suitable for datetime-local
-                  const tzoffset = initialValue.getTimezoneOffset() * 60000; //offset in milliseconds
+                  const tzoffset = initialValue.getTimezoneOffset() * 60000;
                   const localISOTime = new Date(
                     initialValue.getTime() - tzoffset
                   )
@@ -607,11 +538,11 @@ export const getFormattedTableColumns = ({
               } catch (e) {
                 console.error("Error formatting datetime for input:", e);
               }
-              // Use defaultValue for uncontrolled input, pass specific handler
               editor = (
-                <InputBase
-                  {...commonInputProps}
+                <Input
+                  className={commonInputClassName}
                   type="datetime-local"
+                  autoFocus
                   defaultValue={dateTimeValueStr}
                   onChange={handleDateTimeChange}
                 />
@@ -620,18 +551,16 @@ export const getFormattedTableColumns = ({
             }
 
             case "object":
-              // Display JSON as a string in a multiline input (textarea)
-              // initialValue should be an object/array here thanks to valueGetter (if it was a valid string initially)
               editor = <JsonEditCell params={params} />;
               break;
 
             case "string":
-            default: // Default to text input for strings or unknown types
-              // Use defaultValue for uncontrolled input
+            default:
               editor = (
-                <InputBase
-                  {...commonInputProps}
+                <Input
+                  className={commonInputClassName}
                   type="text"
+                  autoFocus
                   defaultValue={initialValue ?? ""}
                   onChange={handleChange}
                 />

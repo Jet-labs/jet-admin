@@ -12,7 +12,6 @@ import { Breadcrumbs } from "../ui/breadCrumbs";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import { UserAvatar } from "../ui/userAvatar";
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "../ui/resizable";
-import { AIChatButton } from "../aiChatComponents/aiChatButton";
 export const ProtectedLayout = () => {
   const { firebaseUserState } = useAuthState();
   const { tenantID } = useParams();
@@ -41,8 +40,8 @@ export const ProtectedLayout = () => {
       error={firebaseUserState.error}
       loadingContainerClass="h-screen w-screen bg-white flex flex-col justify-center items-center"
     >
-      <div className="flex h-screen w-screen flex-col justify-start items-stretch overflow-hidden">
-        <nav className="w-full  border-b-2 border-[#646cff] bg-white">
+      <div className="flex h-full w-full flex-col justify-start items-stretch overflow-hidden">
+        <nav className="w-full  border-b-2 border-primary bg-white">
           <div className="px-3 py-2">
             <div className="flex items-center justify-between">
               <div className="flex items-center justify-start rtl:justify-end">
@@ -57,7 +56,7 @@ export const ProtectedLayout = () => {
 
 
               <div className="flex flex-row justify-end items-center gap-2">
-                {/* <AIChatButton /> */}
+
                 <UserAvatar />
               </div>
             </div>
@@ -68,14 +67,14 @@ export const ProtectedLayout = () => {
           autoSaveId={
             CONSTANTS.RESIZABLE_PANEL_KEYS.MAIN_DRAWER_LIST_SEPARATION
           }
-          className={"h-full"}
+          className="flex-1 overflow-hidden w-full"
         >
           <ResizablePanel defaultSize={20} minSize={15} maxSize={30}>
             <MainDrawerList />
           </ResizablePanel>
           <ResizableHandle withHandle={true} />
           <ResizablePanel defaultSize={80}>
-            <div className="w-full h-[calc(100vh-50px)] overflow-y-auto bg-white">
+            <div className="w-full h-full overflow-hidden bg-background">
               <Outlet />
             </div>
           </ResizablePanel>

@@ -28,8 +28,8 @@ import { SiQuantconnect } from "react-icons/si";
 import { FaCode, FaCodeBranch, FaPlay, FaStop } from "react-icons/fa";
 import { TbLayoutDistributeHorizontal, TbRepeat } from "react-icons/tb";
 import { VscJson, VscTerminal } from "react-icons/vsc";
-import { IoMdTime } from "react-icons/io";
 import { TbBraces } from "react-icons/tb";
+import { IoMdTime } from "react-icons/io";
 import { useWorkflowState, useWorkflowActions } from "../../../logic/contexts/workflowContext";
 import { WorkflowNodeConfigPanel } from "./workflowNodeConfigPanel";
 import { WorkflowSchemaPanel } from "./workflowSchemaPanel";
@@ -42,6 +42,7 @@ import { useParams } from "react-router-dom";
 import { useWorkflowRun } from "./useWorkflowRun";
 import { useEffect } from "react";
 
+import { Button, Checkbox, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
 // Dagre graph for auto-layout
 const dagreGraph = new dagre.graphlib.Graph();
 dagreGraph.setDefaultEdgeLabel(() => ({}));
@@ -105,13 +106,15 @@ const FitViewButton = () => {
     const { fitView } = useReactFlow();
     return (
         <Panel position="top-right">
-            <button
+            <Button
+                type="button"
+                variant="outline"
+                size="sm"
                 onClick={() => fitView({ padding: 0.2, maxZoom: 1.5, duration: 300 })}
-                className="px-2 py-1 text-xs bg-white border border-slate-200 rounded shadow-sm hover:bg-slate-50 transition-colors"
                 title="Fit View"
             >
                 Fit View
-            </button>
+            </Button>
         </Panel>
     );
 };
@@ -151,8 +154,6 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
         }
     }, [isTestRunning]);
 
-
-
     // 1. Handle Node Changes (Dragging, selecting, deleting)
     const onNodesChange = useCallback(
         (changes) => {
@@ -181,7 +182,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                 type: isErrorEdge ? 'error' : currentEdgeType,
                 style: {
                     strokeWidth: 2,
-                    stroke: isErrorEdge ? '#ef4444' : '#94a3b8',
+                    stroke: isErrorEdge ? 'hsl(var(--destructive))' : 'hsl(var(--muted-foreground))',
                 },
             };
             const updatedEdges = addEdge(newEdge, values.edges);
@@ -241,8 +242,6 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
     }, []);
 
     const updateNodeData = useCallback((nodeId, newData) => {
-        console.log("updateNodeData", nodeId, newData);
-
         // Validate outputVariable uniqueness if it's being set
         if (newData.outputVariable) {
             const duplicate = values.nodes.find(n =>
@@ -257,8 +256,6 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
 
         const updatedNodes = values.nodes.map(node => {
             if (node.id === nodeId) {
-                // Ensure label update propagates if strictly managed
-                // NOTE: ReactFlow handles internal data updates but for formik state we need this
                 return { ...node, data: { ...node.data, ...newData } };
             }
             return node;
@@ -292,11 +289,6 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
         setFieldValue("edges", updatedEdges);
     }, [values.edges, setFieldValue]);
 
-    // Reset node execution status
-    // const resetNodeExecutionStatus = useCallback(() => {
-    //     setNodeExecutionStatus({});
-    // }, []);
-
     // Get workflow input args from options
     const workflowArgs = useMemo(() => {
         return values.workflowOptions?.args?.filter(arg => arg.key) || [];
@@ -321,8 +313,6 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
             executeTestRun({});
         }
     }, [workflowArgs, executeTestRun]);
-
-
 
 
     // Handle input modal submit
@@ -362,169 +352,174 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                         className="!w-full !h-full relative"
                     >
                         {/* Sidebar Controls */}
-                        <ResizablePanel defaultSize={20} className="flex flex-col h-full overflow-hidden pb-20">
+                        <ResizablePanel defaultSize={20} className="flex flex-col h-full overflow-hidden">
 
-                            <div className="flex-1 overflow-y-auto space-y-3 p-3 flex flex-col justify-start items-stretch">
-
-
-                            <div>
-                                <label htmlFor="title" className="block mb-1 text-xs font-medium text-slate-500">
-                                    {CONSTANTS.STRINGS.ADD_WORKFLOW_FORM_NAME_FIELD_LABEL}
-                                </label>
-                                <input
-                                    type="text"
-                                    name="title"
-                                    id="title"
-                                    className="placeholder:text-slate-400 text-sm bg-white border border-slate-300 text-slate-700 rounded focus:ring-1 focus:ring-slate-400 block w-full px-2.5 py-1.5 mb-2"
-                                    placeholder={CONSTANTS.STRINGS.ADD_WORKFLOW_FORM_NAME_FIELD_PLACEHOLDER}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    value={values.title}
-                                />
-                                {errors.title && (
-                                    <p className="text-red-500 text-xs mt-1">{errors.title}</p>
-                                )}
-                            </div>
-
-                            <div className="flex flex-col gap-2">
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Nodes</p>
-                                {Object.values(WORKFLOW_NODES_MAP)
-                                    .filter(node => {
-                                        // Hide dataQuery node if no queries available
-                                        if (node.value === 'dataQuery' && (!dataQueries || dataQueries.length === 0)) {
-                                            return false;
-                                        }
-                                        return true;
-                                    })
-                                    .map((node) => (
-                                    <button
-                                        key={node.value}
-                                        type="button"
-                                        onClick={() => onAddNode(node.value)}
-                                        className="px-3 py-2 text-left text-sm text-slate-700 bg-slate-100 rounded hover:bg-[#646cff]/10 transition-colors border-none hover:border-none"
-                                    >
-                                            {/* Icon mapping for node types */}
-                                            {node.value === 'start' && <FaPlay className="inline-block h-3.5 w-3.5 mr-2 text-green-500" />}
-                                            {node.value === 'dataQuery' && <SiQuantconnect className="inline-block h-4 w-4 mr-2 text-blue-500" />}
-                                            {node.value === 'javascript' && <FaCode className="inline-block h-4 w-4 mr-2 text-yellow-500" />}
-                                            {node.value === 'condition' && <FaCodeBranch className="inline-block h-4 w-4 mr-2 text-purple-500" />}
-                                            {node.value === 'loop' && <TbRepeat className="inline-block h-4 w-4 mr-2 text-cyan-500" />}
-                                            {node.value === 'delay' && <IoMdTime className="inline-block h-4 w-4 mr-2 text-amber-500" />}
-                                            {node.value === 'end' && <FaStop className="inline-block h-3.5 w-3.5 mr-2 text-red-500" />}
-                                        {node.label}
-                                    </button>
-                                ))}
-                            </div>
-
-                            {/* Settings Section */}
-                            <div className="flex flex-col gap-2">
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Settings</p>
+                            <div className="flex-1 overflow-y-auto space-y-4 p-4 flex flex-col justify-start items-stretch bg-background">
                                 <div>
-                                    <label className="text-[10px] text-slate-500 mb-1 block">Edge Style</label>
-                                    <select
-                                        value={values.edgeType || 'smoothstep'}
-                                        onChange={(e) => {
-                                            setFieldValue("edgeType", e.target.value);
-                                            updateAllEdgesType(e.target.value);
-                                        }}
-                                        className="w-full px-2 py-1.5 text-xs text-slate-700 bg-white border border-slate-200 rounded focus:outline-none focus:border-[#646cff]"
-                                    >
-                                        <option value="default">Bezier (Curved)</option>
-                                        <option value="straight">Straight</option>
-                                        <option value="step">Step (Sharp corners)</option>
-                                        <option value="smoothstep">Smooth Step (Rounded corners)</option>
-                                        <option value="simplebezier">Simple Bezier</option>
-                                    </select>
-                                </div>
-                                <div className="flex items-center justify-between">
-                                    <label className="text-[10px] text-slate-500">Snap to Grid</label>
-                                    <input
-                                        type="checkbox"
-                                        checked={values.snapToGrid ?? true}
-                                        onChange={(e) => setFieldValue("snapToGrid", e.target.checked)}
-                                        className="w-4 h-4 text-[#646cff] rounded border-slate-300 focus:ring-[#646cff]"
+                                    <label htmlFor="title" className="block mb-1.5 text-xs font-medium text-muted-foreground">
+                                        {CONSTANTS.STRINGS.ADD_WORKFLOW_FORM_NAME_FIELD_LABEL}
+                                    </label>
+                                    <Input
+                                        type="text"
+                                        name="title"
+                                        id="title"
+                                        className="w-full"
+                                        placeholder={CONSTANTS.STRINGS.ADD_WORKFLOW_FORM_NAME_FIELD_PLACEHOLDER}
+                                        onChange={handleChange}
+                                        onBlur={handleBlur}
+                                        value={values.title}
                                     />
+                                    {errors.title && (
+                                        <p className="text-destructive text-xs mt-1">{errors.title}</p>
+                                    )}
                                 </div>
-                            </div>
 
-                                {/* Input Arguments Section */}
+                                <div className="flex flex-col gap-1.5">
+                                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider mb-0.5">Nodes</p>
+                                    {Object.values(WORKFLOW_NODES_MAP)
+                                        .filter(node => {
+                                            if (node.value === 'dataQuery' && (!dataQueries || dataQueries.length === 0)) {
+                                                return false;
+                                            }
+                                            return true;
+                                        })
+                                        .map((node) => (
+                                            <Button
+                                                key={node.value}
+                                                type="button"
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => onAddNode(node.value)}
+                                                className="justify-start bg-background hover:bg-muted font-medium border-border"
+                                            >
+                                                {node.value === 'start' && <FaPlay className="size-3.5 mr-2 text-emerald-500" />}
+                                                {node.value === 'dataQuery' && <SiQuantconnect className="size-4 mr-2 text-blue-500" />}
+                                                {node.value === 'javascript' && <FaCode className="size-4 mr-2 text-amber-500" />}
+                                                {node.value === 'condition' && <FaCodeBranch className="size-4 mr-2 text-indigo-500" />}
+                                                {node.value === 'loop' && <TbRepeat className="size-4 mr-2 text-cyan-500" />}
+                                                {node.value === 'delay' && <IoMdTime className="size-4 mr-2 text-orange-500" />}
+                                                {node.value === 'end' && <FaStop className="size-3.5 mr-2 text-destructive" />}
+                                                {node.label}
+                                            </Button>
+                                        ))}
+                                </div>
+
+                                <div className="flex flex-col gap-2">
+                                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Settings</p>
+                                    <div>
+                                        <label className="text-[10px] text-muted-foreground mb-1 block font-medium">Edge Style</label>
+                                        <Select
+                                            value={values.edgeType || 'smoothstep'}
+                                            onValueChange={(val) => {
+                                                setFieldValue("edgeType", val);
+                                                updateAllEdgesType(val);
+                                            }}
+                                        >
+                                            <SelectTrigger className="text-sm h-8">
+                                                <SelectValue placeholder="Select style" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="default">Bezier (Curved)</SelectItem>
+                                                <SelectItem value="straight">Straight</SelectItem>
+                                                <SelectItem value="step">Step (Sharp)</SelectItem>
+                                                <SelectItem value="smoothstep">Smooth Step</SelectItem>
+                                                <SelectItem value="simplebezier">Simple Bezier</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="flex items-center justify-between">
+                                        <label className="text-[10px] text-muted-foreground font-medium">Snap to Grid</label>
+                                        <Checkbox
+                                            checked={values.snapToGrid ?? true}
+                                            onCheckedChange={(checked) => setFieldValue("snapToGrid", checked)}
+                                        />
+                                    </div>
+                                </div>
+
                                 <WorkflowInputArgsPanel workflowForm={workflowEditorForm} />
 
-                            {/* Actions Section */}
-                            <div className="flex flex-col gap-2">
-                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Actions</p>
+                                <div className="flex flex-col gap-2">
+                                    <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider">Actions</p>
                                     <div className="flex flex-row gap-2">
-                                        <button
+                                        <Button
                                             type="button"
                                             onClick={onTestRunClick}
                                             disabled={values.nodes.length === 0 || isTestRunning}
-                                            className="flex-1 px-3 py-2 text-left text-sm text-white bg-green-600 rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center border-none hover:border-none"
+                                            size="sm"
+                                            className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white border-none shadow-sm"
                                         >
-                                            <FaPlay className="inline-block h-3 w-3 mr-2" />
+                                            <FaPlay className="size-3 mr-2" />
                                             {isTestRunning ? "Running..." : "Test Run"}
-                                        </button>
+                                        </Button>
                                         {isTestRunning && (
-                                            <button
+                                            <Button
                                                 type="button"
                                                 onClick={stopTestRun}
-                                                className="px-3 py-2 text-sm text-white bg-red-600 rounded hover:bg-red-700 transition-colors flex items-center border-none hover:border-none"
+                                                variant="destructive"
+                                                size="icon"
+                                                className="h-8 w-8"
                                                 title="Stop Test"
                                             >
-                                                <FaStop className="inline-block h-3 w-3" />
-                                            </button>
+                                                <FaStop className="size-3" />
+                                            </Button>
                                         )}
                                     </div>
-                            </div>
+                                </div>
 
-                                {/* Utilities - Minimal */}
-                                <div className="flex flex-row flex-wrap gap-1">
-                                    <button
+                                <div className="flex flex-row flex-wrap gap-1.5 pt-2 border-t border-border mt-2">
+                                    <Button
                                         type="button"
                                         onClick={() => onAutoLayout("TB")}
                                         disabled={values.nodes.length === 0}
                                         title="Auto-layout"
-                                        className="p-1.5 text-slate-500 bg-white border border-slate-200 rounded hover:bg-slate-100 hover:text-slate-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                        variant="outline"
+                                        size="sm"
+                                        className="h-8 px-2 text-muted-foreground hover:text-foreground"
                                     >
-                                        <TbLayoutDistributeHorizontal className="h-3.5 w-3.5" />
-                                    </button>
-                                <button
-                                    type="button"
-                                    onClick={() => setShowSchemaPanel(true)}
+                                        <TbLayoutDistributeHorizontal className="size-4" />
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        onClick={() => setShowSchemaPanel(true)}
                                         title="View Schema"
-                                        className="p-1.5 text-slate-500 bg-white border border-slate-200 rounded hover:bg-slate-100 hover:text-slate-700 transition-colors"
-                                >
-                                        <VscJson className="h-3.5 w-3.5" />
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => setShowConsole(!showConsole)}
+                                        variant="outline"
+                                        size="sm"
+                                        className="h-8 px-2 text-muted-foreground hover:text-foreground"
+                                    >
+                                        <VscJson className="size-4" />
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        onClick={() => setShowConsole(!showConsole)}
                                         title={showConsole ? 'Hide Console' : 'Show Console'}
-                                        className={`p-1.5 text-slate-500 bg-white border rounded hover:bg-slate-100 hover:text-slate-700 transition-colors flex items-center gap-1 ${showConsole ? 'border-[#646cff] text-[#646cff]' : 'border-slate-200'}`}
-                                >
-                                        <VscTerminal className="h-3.5 w-3.5" />
-                                    {consoleLogs.length > 0 && (
-                                            <span className="px-1 py-0.5 text-[8px] bg-slate-200 text-slate-600 rounded-full leading-none">
-                                            {consoleLogs.length}
-                                        </span>
-                                    )}
-                                </button>
-                                    <button
+                                        variant="outline"
+                                        size="sm"
+                                        className={`h-8 px-2 flex items-center gap-1.5 transition-colors ${showConsole ? 'border-primary text-primary bg-primary/5' : 'text-muted-foreground hover:text-foreground'}`}
+                                    >
+                                        <VscTerminal className="size-4" />
+                                        {consoleLogs.length > 0 && (
+                                            <span className="px-1 py-0.5 text-[9px] font-bold bg-muted text-muted-foreground rounded-full leading-none min-w-[16px] text-center">
+                                                {consoleLogs.length}
+                                            </span>
+                                        )}
+                                    </Button>
+                                    <Button
                                         type="button"
                                         onClick={() => setShowContextPanel(!showContextPanel)}
                                         title={showContextPanel ? 'Hide Context' : 'Show Context'}
-                                        className={`p-1.5 text-slate-500 bg-white border rounded hover:bg-slate-100 hover:text-slate-700 transition-colors flex items-center gap-1 ${showContextPanel ? 'border-[#646cff] text-[#646cff]' : 'border-slate-200'}`}
+                                        variant="outline"
+                                        size="sm"
+                                        className={`h-8 px-2 flex items-center gap-1.5 transition-colors ${showContextPanel ? 'border-primary text-primary bg-primary/5' : 'text-muted-foreground hover:text-foreground'}`}
                                     >
-                                        <TbBraces className="h-3.5 w-3.5" />
+                                        <TbBraces className="size-4" />
                                         {Object.keys(workflowContext).filter(k => !k.startsWith('__')).length > 0 && (
-                                            <span className="px-1 py-0.5 text-[8px] bg-slate-200 text-slate-600 rounded-full leading-none">
+                                            <span className="px-1 py-0.5 text-[9px] font-bold bg-muted text-muted-foreground rounded-full leading-none min-w-[16px] text-center">
                                                 {Object.keys(workflowContext).filter(k => !k.startsWith('__')).length}
                                             </span>
                                         )}
-                                    </button>
+                                    </Button>
+                                </div>
                             </div>
-                            </div>
-
-
                         </ResizablePanel>
 
                         <ResizableHandle withHandle />
@@ -538,7 +533,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                             >
                                 {/* ReactFlow Canvas */}
                                 <ResizablePanel defaultSize={showConsole || showContextPanel ? 70 : 100} minSize={30}>
-                                    <div className="h-full w-full relative">
+                                    <div className="h-full w-full relative bg-muted/30">
                                         <ReactFlow
                                             nodes={values.nodes}
                                             edges={values.edges}
@@ -554,21 +549,21 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                                 animated: false,
                                                 style: {
                                                     strokeWidth: 2,
-                                                    stroke: '#94a3b8',
+                                                    stroke: 'hsl(var(--muted-foreground))',
                                                 },
                                             }}
                                             connectionLineType={ConnectionLineType.SmoothStep}
-                                            connectionLineStyle={{ stroke: '#646cff', strokeWidth: 2 }}
+                                            connectionLineStyle={{ stroke: 'hsl(var(--primary))', strokeWidth: 2 }}
                                             snapToGrid={values.snapToGrid ?? true}
                                             snapGrid={[20, 20]}
                                             fitView
                                             fitViewOptions={{ padding: 0.2, maxZoom: 0.8 }}
-                                            className="bg-slate-100"
+                                            className="bg-transparent"
                                             proOptions={{ hideAttribution: true }}
                                         >
                                             <Controls />
                                             <MiniMap />
-                                            <Background variant="dots" gap={12} size={1} />
+                                            <Background variant="dots" gap={20} size={1} color="hsl(var(--border))" />
                                             <FitViewButton />
                                         </ReactFlow>
 
@@ -609,7 +604,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                                             logs={consoleLogs}
                                                             isRunning={isTestRunning}
                                                             onClear={clearLogs}
-                                                            className="h-full rounded-none"
+                                                            className="h-full rounded-none border-t-0 border-l-0"
                                                         />
                                                     </ResizablePanel>
                                                 )}
@@ -625,7 +620,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                                         <WorkflowContextPanel
                                                             context={workflowContext}
                                                             isRunning={isTestRunning}
-                                                            className="h-full rounded-none"
+                                                            className="h-full rounded-none border-t-0 border-r-0"
                                                         />
                                                     </ResizablePanel>
                                                 )}

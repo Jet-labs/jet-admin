@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { FaPlus, FaTrash } from "react-icons/fa";
 import { IoSettingsOutline } from "react-icons/io5";
 
+import { Button, Checkbox, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
 /**
  * Panel for editing workflow input parameter schema (workflowOptions.args).
  * Allows users to define the expected input parameters for a workflow.
@@ -43,14 +44,16 @@ export const WorkflowInputArgsPanel = ({ workflowForm }) => {
             Input Parameters
           </span>
         </div>
-        <button
+        <Button
           type="button"
+          variant="ghost"
+          size="sm"
           onClick={_handleAddArg}
-          className="flex bg-white flex-row items-center gap-1 text-[10px] text-[#646cff] hover:bg-[#646cff]/10 px-1.5 py-0.5 rounded focus:outline-none border-none hover:border-none"
+          className="h-6 px-2 text-[10px] text-primary hover:bg-primary/10 hover:text-primary"
         >
-          <FaPlus className="w-2.5 h-2.5" />
+          <FaPlus className="w-2.5 h-2.5 mr-1" />
           Add
-        </button>
+        </Button>
       </div>
 
       {args.length === 0 ? (
@@ -62,39 +65,40 @@ export const WorkflowInputArgsPanel = ({ workflowForm }) => {
           {args.map((arg, index) => (
             <div key={index} className="flex flex-col gap-1.5 p-2 bg-slate-50 rounded border border-slate-200">
               <div className="flex flex-row gap-2 items-center">
-                <input
+                <Input
                   type="text"
                   placeholder="Name"
                   className="placeholder:text-slate-400 text-xs flex-1 min-w-0 bg-white border border-slate-300 text-slate-700 rounded focus:outline-none focus:border-slate-400 px-2 py-1"
                   value={arg.key || ""}
                   onChange={(e) => _handleUpdateArg(index, "key", e.target.value)}
                 />
-                <button
+                <Button
                   type="button"
+                  variant="ghost"
+                  size="icon"
                   onClick={() => _handleRemoveArg(index)}
-                  className="p-1 bg-red-100 text-red-500 hover:bg-red-50 rounded focus:outline-none flex-shrink-0 border-none hover:border-none"
+                  className="h-6 w-6 bg-red-100 text-red-500 hover:bg-red-50 hover:text-red-600 flex-shrink-0"
                 >
                   <FaTrash className="w-2.5 h-2.5" />
-                </button>
+                </Button>
               </div>
               <div className="flex flex-row gap-2 items-center">
-                <select
-                  className="text-xs bg-white border border-slate-300 text-slate-700 rounded focus:outline-none focus:border-slate-400 px-2 py-1 flex-1 min-w-0"
-                  value={arg.type || "string"}
-                  onChange={(e) => _handleUpdateArg(index, "type", e.target.value)}
-                >
-                  <option value="string">String</option>
-                  <option value="number">Number</option>
-                  <option value="boolean">Boolean</option>
-                  <option value="object">Object</option>
-                  <option value="array">Array</option>
-                </select>
+                <Select value={arg.type || "string"} onValueChange={(val) => _handleUpdateArg(index, "type", val)}>
+                  <SelectTrigger className="text-xs flex-1 min-w-0">
+                    <SelectValue placeholder="Select type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="string">String</SelectItem>
+                    <SelectItem value="number">Number</SelectItem>
+                    <SelectItem value="boolean">Boolean</SelectItem>
+                    <SelectItem value="object">Object</SelectItem>
+                    <SelectItem value="array">Array</SelectItem>
+                  </SelectContent>
+                </Select>
                 <label className="flex items-center gap-1 text-[10px] text-slate-600 flex-shrink-0">
-                  <input
-                    type="checkbox"
+                  <Checkbox
                     checked={arg.required || false}
-                    onChange={(e) => _handleUpdateArg(index, "required", e.target.checked)}
-                    className="w-3 h-3 text-[#646cff] rounded border-slate-300 focus:ring-[#646cff]"
+                    onCheckedChange={(checked) => _handleUpdateArg(index, "required", checked)}
                   />
                   Required
                 </label>

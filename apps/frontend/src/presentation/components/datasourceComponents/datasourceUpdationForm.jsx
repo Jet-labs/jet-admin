@@ -13,22 +13,23 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "../ui/resizable";
-import { CircularProgress } from "@mui/material";
 import { DATASOURCE_UI_COMPONENTS } from "@jet-admin/datasources-ui";
 import { DATASOURCE_TYPES } from "@jet-admin/datasource-types";
 import { DatasourceEditor } from "./datasourceEditor";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import { DatasourceTestingForm } from "./datasourceTestingForm";
 import { DatasourceDeletionForm } from "./datasourceDeletionForm";
-import { DatasourceCloneForm } from "./dataQueryCloneForm";
+import { DatasourceCloneForm } from "./datasourceCloneForm";
 
+import { Button, Spinner } from "@jet-admin/ui";
 // --- Original Metadata (only for datasourceOptions) ---
 const datasourceOptionsMetadata =
   DATASOURCE_TYPES.POSTGRESQL.formConfig;
 
 export const DatasourceUpdationForm = ({ tenantID, datasourceID }) => {
   DatasourceUpdationForm.propTypes = {
-    tenantID: PropTypes.number.isRequired,
+    tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+      .isRequired,
     datasourceID: PropTypes.string.isRequired,
   };
 
@@ -39,9 +40,6 @@ export const DatasourceUpdationForm = ({ tenantID, datasourceID }) => {
     isLoading: isLoadingDatasource,
     data: datasource,
     error: loadDatasourceError,
-    isFetching: isFetchingDatasource,
-    isRefetching: isRefetechingDatasource,
-    refetch: refetchDatasource,
   } = useQuery({
     queryKey: [CONSTANTS.REACT_QUERY_KEYS.DATASOURCES(tenantID), datasourceID],
     queryFn: () =>
@@ -51,9 +49,8 @@ export const DatasourceUpdationForm = ({ tenantID, datasourceID }) => {
       }),
     refetchOnWindowFocus: false,
   });
-  console.log({ datasource });
 
-  const { isPending: isAddingDatasource, mutate: updateDatasource } =
+  const { isPending: isUpdatingDatasource, mutate: updateDatasource } =
     useMutation({
       mutationFn: (data) => {
         // 'data' here will be the complete form object from Formik
@@ -97,20 +94,20 @@ export const DatasourceUpdationForm = ({ tenantID, datasourceID }) => {
     setDatasourceTestResult(undefined);
   }, [datasourceID]);
 
-
-
-  console.log("datasourceTestResult", datasourceTestResult);
-
   return (
-    <div className="w-full flex flex-col justify-start items-center h-full">
-      <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl text-start w-full p-3">
-        {CONSTANTS.STRINGS.UPDATE_DATASOURCE_FORM_TITLE}
-      </h1>
+    <div className="h-full w-full bg-background">
+      <div className="border-b border-border bg-background p-3">
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+          {CONSTANTS.STRINGS.UPDATE_DATASOURCE_FORM_TITLE}
+        </h1>
+        {datasource && (
+          <span className="mt-1 block text-xs text-muted-foreground">
+            {`Datasource ID: ${datasource.datasourceID}`}
+          </span>
+        )}
+      </div>
       <ReactQueryLoadingErrorWrapper
         isLoading={isLoadingDatasource}
-        isFetching={isFetchingDatasource}
-        isRefetching={isRefetechingDatasource}
-        refetch={refetchDatasource}
         error={loadDatasourceError}
       >
         <ResizablePanelGroup
@@ -118,18 +115,18 @@ export const DatasourceUpdationForm = ({ tenantID, datasourceID }) => {
           autoSaveId={
             CONSTANTS.RESIZABLE_PANEL_KEYS.QUERY_ADDITION_FORM_RESULT_SEPARATION
           }
-          className={"!w-full !h-full border-t border-gray-200"}
+          className={"!w-full !h-full"}
         >
           <ResizablePanel
             defaultSize={20}
-            className="!overflow-y-auto h-full   p-3 "
+            className="!overflow-y-auto h-full p-3"
           >
             <form
-              className="space-y-3 md:space-y-4 w-full"
+              className="space-y-4 w-full"
               onSubmit={datasourceUpdationForm.handleSubmit}
             >
               <DatasourceEditor datasourceEditorForm={datasourceUpdationForm} key={`datasourceEditor_${datasource?.datasourceID}`} />
-              <div className="flex flex-row justify-end items-center">
+              <div className="flex flex-row justify-end items-center gap-3">
                 <DatasourceCloneForm
                   tenantID={tenantID}
                   datasourceID={datasourceID}
@@ -148,20 +145,15 @@ export const DatasourceUpdationForm = ({ tenantID, datasourceID }) => {
                   setDatasourceTestResult={setDatasourceTestResult}
                   key={`datasourceTestingForm_${datasource?.datasourceID}`}
                 />
-                <button
+                <Button
                   type="submit"
-                  disabled={isAddingDatasource}
-                  className="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none"
+                  disabled={isUpdatingDatasource}
                 >
-                  {isAddingDatasource && (
-                    <CircularProgress
-                      className="!mr-3"
-                      size={16}
-                      color="white"
-                    />
+                  {isUpdatingDatasource && (
+                    <Spinner className="mr-2" size={16} />
                   )}
                   {CONSTANTS.STRINGS.UPDATE_DATASOURCE_FORM_SUBMIT_BUTTON}
-                </button>
+                </Button>
               </div>
             </form>
           </ResizablePanel>

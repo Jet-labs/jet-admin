@@ -12,7 +12,7 @@
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator {
-  color: #646cff;
+  color: hsl(var(--primary));
   color-scheme: light;
 }
 
@@ -45,7 +45,7 @@ input[type="range"]:focus {
 /***** Chrome, Safari, Opera and Edge Chromium styles *****/
 /* slider track */
 input[type="range"]::-webkit-slider-runnable-track {
-   background-color: #646cff5e;
+   background-color: hsl(var(--primary) / 0.4);
    border-radius: 0.5rem;
    height: 0.5rem;  
 }
@@ -57,7 +57,7 @@ input[type="range"]::-webkit-slider-thumb {
    margin-top: -4px;
 
    /*custom styles*/
-   background-color: #646cff;
+   background-color: hsl(var(--primary));
    height: 1rem;
    width: 1rem;
    border-radius: 50%;
@@ -132,12 +132,12 @@ input[type="range"]:focus::-moz-range-thumb {
   position: relative;
 }
 
-.react-grid-item.react-grid-placeholder { background: #646cff !important; }
+.react-grid-item.react-grid-placeholder { background: hsl(var(--primary)) !important; }
 
 .react-grid-placeholder {
-  background: #646cff3a !important;
+  background: hsl(var(--primary) / 0.25) !important;
   /* Tailwind blue-500 tint */
-  border: 2px dashed #646cffb4;
+  border: 2px dashed hsl(var(--primary) / 0.75);
   border-radius: 4px;
   /* Match widget card radius */
   transition: all 0.15s ease;

@@ -4,6 +4,12 @@ import Editor from '@monaco-editor/react';
 import { FaTimes, FaCopy, FaCheck } from 'react-icons/fa';
 import { useState } from 'react';
 
+import { Button } from "@jet-admin/ui";
+
+/**
+ * WorkflowSchemaPanel - Panel to display the JSON schema of the current workflow.
+ * Standardized for semantic design tokens and dark mode support.
+ */
 export const WorkflowSchemaPanel = ({ values, onClose }) => {
     const [copied, setCopied] = useState(false);
 
@@ -45,49 +51,53 @@ export const WorkflowSchemaPanel = ({ values, onClose }) => {
     };
 
     return (
-        <div className="fixed left-0 top-0 h-full w-[500px] bg-white shadow-xl border-r border-slate-200 z-[100] flex flex-col">
+        <div className="fixed left-0 top-0 h-full w-[500px] bg-background shadow-2xl border-r border-border z-[100] flex flex-col">
             {/* Header */}
-            <div className="flex justify-between items-center p-3 border-b border-slate-100 bg-slate-50">
-                <div className="flex items-center gap-2">
-                    <h3 className="font-bold text-slate-700">Workflow Schema</h3>
-                    <span className="text-[10px] text-slate-400 bg-slate-200 px-1.5 py-0.5 rounded">
+            <div className="flex justify-between items-center px-4 py-3 border-b border-border bg-muted/30">
+                <div className="flex items-center gap-3">
+                    <h3 className="font-semibold text-foreground tracking-tight">Workflow Schema</h3>
+                    <span className="text-[10px] text-muted-foreground bg-muted font-bold px-2 py-0.5 rounded-full uppercase tracking-wider border border-border/50">
                         JSON
                     </span>
                 </div>
-                <div className="flex items-center gap-1">
-                    <button
+                <div className="flex items-center gap-2">
+                    <Button
                         onClick={handleCopy}
                         type='button'
-                        className="bg-white text-slate-400 hover:text-slate-600 font-bold p-1.5 hover:bg-slate-100 rounded transition-colors"
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-muted-foreground hover:text-foreground"
                         title={copied ? 'Copied!' : 'Copy to clipboard'}
                     >
                         {copied ? (
-                            <FaCheck className="h-3.5 w-3.5 text-green-500" />
+                            <FaCheck className="size-4 text-emerald-500" />
                         ) : (
-                            <FaCopy className="h-3.5 w-3.5" />
+                                <FaCopy className="size-4" />
                         )}
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                         onClick={onClose}
                         type='button'
-                        className="bg-white text-slate-400 hover:text-slate-600 font-bold p-1.5 hover:bg-slate-100 rounded transition-colors"
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-muted-foreground hover:text-foreground"
                         title="Close"
                     >
-                        <FaTimes className="h-4 w-4" />
-                    </button>
+                        <FaTimes className="size-4" />
+                    </Button>
                 </div>
             </div>
 
             {/* Stats Bar */}
-            <div className="flex items-center gap-4 px-3 py-2 bg-slate-50 border-b border-slate-100 text-[10px] text-slate-500">
+            <div className="flex items-center gap-6 px-4 py-2 bg-muted/20 border-b border-border text-[10px] text-muted-foreground font-medium uppercase tracking-wide">
                 <span>
-                    <strong className="text-slate-600">{values.nodes?.length || 0}</strong> nodes
+                    <strong className="text-foreground font-extrabold">{values.nodes?.length || 0}</strong> Nodes
                 </span>
                 <span>
-                    <strong className="text-slate-600">{values.edges?.length || 0}</strong> edges
+                    <strong className="text-foreground font-extrabold">{values.edges?.length || 0}</strong> Edges
                 </span>
                 <span>
-                    <strong className="text-slate-600">{formattedJson.length}</strong> chars
+                    <strong className="text-foreground font-extrabold">{formattedJson.length}</strong> Characters
                 </span>
             </div>
 
@@ -103,7 +113,7 @@ export const WorkflowSchemaPanel = ({ values, onClose }) => {
             </div>
 
             {/* Footer */}
-            <div className="px-3 py-2 bg-slate-50 border-t border-slate-100 text-[10px] text-slate-400">
+            <div className="px-4 py-2 bg-muted/20 border-t border-border text-[10px] text-muted-foreground/60 font-medium italic">
                 Read-only view • Use copy button to export schema
             </div>
         </div>

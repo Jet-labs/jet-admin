@@ -10,19 +10,20 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "../ui/resizable";
-import { CircularProgress } from "@mui/material";
 import { DATASOURCE_UI_COMPONENTS } from "@jet-admin/datasources-ui";
 import { DATASOURCE_TYPES } from "@jet-admin/datasource-types";
 import { DatasourceEditor } from "./datasourceEditor";
 import { DatasourceTestingForm } from "./datasourceTestingForm";
 
+import { Button, Spinner } from "@jet-admin/ui";
 // --- Original Metadata (only for datasourceOptions) ---
 const datasourceOptionsMetadata =
   DATASOURCE_TYPES.POSTGRESQL.formConfig;
 
 export const DatasourceAdditionForm = ({ tenantID }) => {
   DatasourceAdditionForm.propTypes = {
-    tenantID: PropTypes.number.isRequired,
+    tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+      .isRequired,
   };
 
   const queryClient = useQueryClient();
@@ -58,36 +59,35 @@ export const DatasourceAdditionForm = ({ tenantID }) => {
       datasourceOptions: datasourceOptionsMetadata.initialData, // Initialize nested object
     },
     onSubmit: (data) => {
-      console.log(data);
       addDatasource(data);
     },
   });
-  console.log(datasourceAdditionForm);
-  console.log(DATASOURCE_TYPES, DATASOURCE_UI_COMPONENTS);
 
   return (
-    <div className="w-full flex flex-col justify-start items-center h-full">
-      <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl text-start w-full p-3">
-        {CONSTANTS.STRINGS.ADD_DATASOURCE_FORM_TITLE}
-      </h1>
+    <div className="h-full w-full bg-background">
+      <div className="border-b border-border bg-background p-3">
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+          {CONSTANTS.STRINGS.ADD_DATASOURCE_FORM_TITLE}
+        </h1>
+      </div>
 
       <ResizablePanelGroup
         direction="vertical"
         autoSaveId={
           CONSTANTS.RESIZABLE_PANEL_KEYS.QUERY_ADDITION_FORM_RESULT_SEPARATION
         }
-        className={"!w-full !h-full border-t border-gray-200"}
+        className={"!w-full !h-full"}
       >
         <ResizablePanel
           defaultSize={20}
-          className="!overflow-y-auto h-full   p-3 "
+          className="!overflow-y-auto h-full p-3"
         >
           <form
-            className="space-y-3 md:space-y-4 w-full"
+            className="space-y-4 w-full"
             onSubmit={datasourceAdditionForm.handleSubmit}
           >
             <DatasourceEditor datasourceEditorForm={datasourceAdditionForm} />
-            <div className="flex flex-row justify-end items-center">
+            <div className="flex flex-row justify-end items-center gap-3">
               <DatasourceTestingForm
                 tenantID={tenantID}
                 datasourceType={datasourceAdditionForm.values.datasourceType}
@@ -96,16 +96,15 @@ export const DatasourceAdditionForm = ({ tenantID }) => {
                 }
                 setDatasourceTestResult={setDatasourceTestResult}
               />
-              <button
+              <Button
                 type="submit"
                 disabled={isAddingDatasource}
-                className="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none"
               >
                 {isAddingDatasource && (
-                  <CircularProgress className="!mr-3" size={16} color="white" />
+                  <Spinner className="mr-2" size={16} />
                 )}
                 {CONSTANTS.STRINGS.ADD_DATASOURCE_BUTTON_TEXT}
-              </button>
+              </Button>
             </div>
           </form>
         </ResizablePanel>

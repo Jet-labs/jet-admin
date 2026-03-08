@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Button } from "@jet-admin/ui";
 // import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 
 const PrivacyPolicy = () => {
@@ -15,13 +16,13 @@ const PrivacyPolicy = () => {
     const isExpanded = expandedSections[id];
     return (
       <div key={id} className="mb-4">
-        <button
+        <Button
           onClick={() => toggleSection(id)}
           className="flex justify-between items-center w-full text-left font-semibold text-lg bg-slate-100 p-2 rounded"
         >
           {title}
           {/* {isExpanded ? <FaChevronUp size={20} /> : <FaChevronDown size={20} />} */}
-        </button>
+        </Button>
         {isExpanded && <div className="mt-2 pl-4">{content}</div>}
       </div>
     );

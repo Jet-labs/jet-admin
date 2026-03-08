@@ -1607,13 +1607,13 @@ postgreSQLQueryUtil.createDatabaseTrigger = ({
   }
 
   return `
-    CREATE TRIGGER ${databaseTriggerName}
+    CREATE ${deferrableClause ? "CONSTRAINT " : ""}TRIGGER "${databaseTriggerName}"
     ${triggerTiming.toUpperCase()} ${formattedEvents}
-    ON ${databaseSchemaName}.${databaseTableName}
+    ON "${databaseSchemaName}"."${databaseTableName}"
+    ${deferrableClause}
     FOR EACH ${forEach.toUpperCase()}
     ${referencingClause}
     ${whenClause}
-    ${deferrableClause}
     EXECUTE FUNCTION ${triggerFunctionName}();
   `.trim();
 };

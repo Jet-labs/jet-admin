@@ -1,4 +1,3 @@
-import { CircularProgress } from "@mui/material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import React from "react";
@@ -11,9 +10,11 @@ import { APIKeyEditor } from "./apiKeyEditor";
 import { APIKeyRoleSelectionDialog } from "./apiKeyRoleSelectionDialog";
 import PropTypes from "prop-types";
 
+import { Button, Spinner } from "@jet-admin/ui";
 export const APIKeyAdditionForm = ({ tenantID }) => {
   APIKeyAdditionForm.propTypes = {
-    tenantID: PropTypes.number.isRequired,
+    tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+      .isRequired,
   };
   const queryClient = useQueryClient();
 
@@ -47,39 +48,37 @@ export const APIKeyAdditionForm = ({ tenantID }) => {
   });
 
   return (
-    <section className="max-w-3xl w-full">
-      <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl  p-3">
-        {CONSTANTS.STRINGS.ADD_API_KEY_FORM_TITLE}
-      </h1>
+    <section className="w-full bg-background">
+      <div className="border-b border-border bg-background p-3">
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+          {CONSTANTS.STRINGS.ADD_API_KEY_FORM_TITLE}
+        </h1>
+      </div>
 
-      <form
-        className="space-y-3 md:space-y-4 mt-2 p-3"
-        onSubmit={apiKeyAdditionForm.handleSubmit}
-      >
-        <APIKeyEditor
-          tenantID={tenantID}
-          apiKeyEditorForm={apiKeyAdditionForm}
-          isLoadingAPIKeyEditorForm={isAddingAPIKey}
-        />
-
-        <div className="flex justify-end">
-          <APIKeyRoleSelectionDialog
+      <div className="mx-auto w-full max-w-2xl p-4 md:p-8">
+        <form
+          className="space-y-4"
+          onSubmit={apiKeyAdditionForm.handleSubmit}
+        >
+          <APIKeyEditor
             tenantID={tenantID}
             apiKeyEditorForm={apiKeyAdditionForm}
+            isLoadingAPIKeyEditorForm={isAddingAPIKey}
           />
-          <button
-            type="submit"
-            className="flex ml-2 flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none "
-            disabled={isAddingAPIKey}
-          >
-            {isAddingAPIKey ? (
-              <CircularProgress size={16} color="inherit" />
-            ) : (
-              CONSTANTS.STRINGS.ADD_API_KEY_FORM_SUBMIT
-            )}
-          </button>
-        </div>
-      </form>
+
+          <div className="flex flex-wrap justify-end gap-2">
+            <APIKeyRoleSelectionDialog
+              tenantID={tenantID}
+              apiKeyEditorForm={apiKeyAdditionForm}
+              isLoadingAPIKeyEditorForm={isAddingAPIKey}
+            />
+            <Button type="submit" disabled={isAddingAPIKey}>
+              {isAddingAPIKey && <Spinner className="mr-2" size={16} />}
+              {CONSTANTS.STRINGS.ADD_API_KEY_FORM_SUBMIT}
+            </Button>
+          </div>
+        </form>
+      </div>
     </section>
   );
 };

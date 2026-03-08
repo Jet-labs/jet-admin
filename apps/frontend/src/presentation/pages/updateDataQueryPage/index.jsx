@@ -3,13 +3,12 @@ import { useParams } from "react-router-dom";
 import { DataQueryUpdationForm } from "../../components/dataQueryComponents/dataQueryUpdationForm";
 
 const UpdateDataQueryPage = () => {
-  const { tenantID, databaseSchemaName, dataQueryID } = useParams();
+  const { tenantID, dataQueryID } = useParams();
+
   return (
-    <DataQueryUpdationForm
-      tenantID={tenantID}
-      databaseSchemaName={databaseSchemaName}
-      dataQueryID={dataQueryID}
-    />
+    <div className="flex h-full w-full flex-col overflow-hidden bg-background">
+      <DataQueryUpdationForm tenantID={tenantID} dataQueryID={dataQueryID} />
+    </div>
   );
 };
 

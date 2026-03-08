@@ -32,38 +32,28 @@ export const DatabaseSchemaDrawerList = () => {
   return (
     <aside
       id="logo-sidebar"
-      className="h-[calc(100vh-50px)] overflow-y-auto transition-transform bg-white border-r border-slate-200"
+      className="h-full overflow-y-auto transition-transform bg-background border-r border-border"
       aria-label="Sidebar"
     >
-      <div className=" bg-white p-2 w-full overflow-y-auto h-full">
+      <div className="p-2 w-full overflow-y-auto h-full">
         {drawerList?.map((item) => {
           const isCurrentPage = location.pathname.includes(item.to);
 
           return (
-            <Link to={item.to} key={item.text} className="focus:outline-none ">
+            <Link to={item.to} key={item.text} className="focus:outline-none block mb-2">
               <div
-                className={`flex flex-col items-center justify-center w-full rounded mb-2 p-3 ${
+                className={`flex flex-col items-center justify-center w-full rounded-md p-3 transition-colors ${
                   isCurrentPage
-                    ? "bg-[#eaebff]"
-                    : "bg-gray-100 hover:bg-[#eaebff]"
+                  ? "bg-primary/10 text-primary"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
                 }`}
               >
-                <div
-                  className={`flex flex-col items-center justify-center ${
-                    isCurrentPage ? "text-[#646cff]" : "text-gray-600"
-                  }`}
-                >
+                <div className="flex flex-col items-center justify-center">
                   {item.icon}
                 </div>
-                {
-                  <p
-                    className={`mt-1 text-xs font-semibold ${
-                      isCurrentPage ? "text-[#646cff]" : "text-gray-600"
-                    }`}
-                  >
-                    {item.text}
-                  </p>
-                }
+                <p className="mt-2 text-xs font-medium">
+                  {item.text}
+                </p>
               </div>
             </Link>
           );

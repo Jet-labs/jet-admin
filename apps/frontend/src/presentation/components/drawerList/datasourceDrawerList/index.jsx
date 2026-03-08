@@ -7,6 +7,8 @@ import { useDatasourcesState } from "../../../../logic/contexts/datasourceContex
 import { getDatasourceTypeByValue } from "@jet-admin/datasource-types";
 import { DatasourceIcon } from "../../datasourceComponents/datasourceIcon";
 
+import { Button } from "@jet-admin/ui";
+
 export const DatasourceDrawerList = () => {
   const {
     isLoadingDatasources,
@@ -16,27 +18,31 @@ export const DatasourceDrawerList = () => {
   const routeParam = useParams();
   const { tenantID } = useParams();
   const navigate = useNavigate();
+
   const _navigateToAddMoreDatasource = () => {
     navigate(CONSTANTS.ROUTES.ADD_DATASOURCE.path(tenantID));
   };
+
   return (
-    <div className=" bg-white   h-[calc(100vh-48px)] overflow-hidden p-2 w-full">
-      <button
+    <div className="bg-background flex h-full w-full flex-col gap-3 overflow-hidden p-3">
+      <Button
         onClick={_navigateToAddMoreDatasource}
-        className="flex mb-2 flex-row items-center justify-center rounded bg-[#646cff]/10 px-3 py-1.5 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50 w-full outline-none focus:outline-none"
+        variant="primary-ghost"
+        className="w-full justify-start"
       >
-        <FaPlus className="!w-4 !h-4 !text-[#646cff] mr-1" />
+        <FaPlus className="w-4 h-4 mr-2" />
         {CONSTANTS.STRINGS.ADD_DATASOURCE_BUTTON_TEXT}
-      </button>
+      </Button>
+
       {isLoadingDatasources || isFetchingDatasources ? (
-        <div role="status" className=" animate-pulse w-full">
-          <div className="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
-          <div className="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
-          <div className="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
-          <div className="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
+        <div role="status" className="animate-pulse w-full space-y-2">
+          <div className="h-9 bg-muted rounded-md w-full" />
+          <div className="h-9 bg-muted rounded-md w-full" />
+          <div className="h-9 bg-muted rounded-md w-full" />
+          <div className="h-9 bg-muted rounded-md w-full" />
         </div>
       ) : datasources && datasources.length > 0 ? (
-          <div className="h-full w-full overflow-y-auto pb-10">
+          <div className="flex-1 w-full overflow-y-auto pb-10 space-y-1">
           {datasources.map((datasource) => {
             const key = `datasource_${datasource.datasourceID}`;
             const isActive =
@@ -50,28 +56,26 @@ export const DatasourceDrawerList = () => {
                   datasource.datasourceID
                 )}
                 key={key}
-                className="block mb-2 focus:outline-none "
+                className="block focus:outline-none"
               >
                 <div
-                  className={`flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 ${
-                    isActive ? "bg-[#eaebff]" : "bg-white text-gray-700"
+                  className={`flex items-center gap-2 rounded-md px-3 py-2 transition-colors ${isActive
+                    ? "bg-primary/10 text-primary"
+                    : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   }`}
                 >
-                  <div className="!w-[16px] flex-shrink-0">
+                  <div className="flex-shrink-0">
                     <DatasourceIcon
                       icon={datasourceTypeConfig?.icon}
-                      iconColor={isActive ? "#646cff" : datasourceTypeConfig?.iconColor}
+                      iconColor={isActive ? "currentColor" : datasourceTypeConfig?.iconColor}
                       size={16}
                     />
                   </div>
 
                   <span
-                    className={`font-medium text-sm truncate ${
-                      isActive ? "font-bold" : ""
-                    } `}
+                    className={`text-sm truncate ${isActive ? "font-semibold" : "font-medium"}`}
                   >
-                    {/* {StringUtils.truncateName(datasource.datasourceTitle, 15)} */}
-                    {`${datasource.datasourceTitle}`}
+                    {datasource.datasourceTitle}
                   </span>
                 </div>
               </Link>
@@ -79,14 +83,12 @@ export const DatasourceDrawerList = () => {
           })}
         </div>
       ) : (
-        <div className=" text-gray-500 dark:text-gray-400">
+            <div className="flex flex-1 items-center justify-center p-4 text-muted-foreground">
           <NoEntityUI
             message={CONSTANTS.STRINGS.DATASOURCE_DRAWER_LIST_NO_DATASOURCE}
           />
         </div>
       )}
-
-      {/* Datasource List */}
     </div>
   );
 };

@@ -1,7 +1,9 @@
 import React, { useRef } from "react";
 import { CONSTANTS } from "../../../constants";
-import FileUploadIcon from "@mui/icons-material/FileUpload";
+import { Upload } from "lucide-react";
 import PropTypes from "prop-types";
+import { Input } from "@jet-admin/ui";
+
 
 export const FileUpload = ({
   title,
@@ -36,7 +38,7 @@ export const FileUpload = ({
 
       <div className="relative">
         {/* Hidden file input */}
-        <input
+        <Input
           ref={fileInputRef}
           type="file"
           id="logo"
@@ -61,7 +63,7 @@ export const FileUpload = ({
           `}
           onClick={!isUploadingLogo ? handleButtonClick : undefined}
         >
-          <FileUploadIcon className="w-5 h-5 text-slate-500" />
+          <Upload className="w-5 h-5 text-slate-500" />
           <span className="text-sm text-slate-400 font-medium">
             {isUploadingLogo ? "Uploading..." : "Choose File"}
           </span>

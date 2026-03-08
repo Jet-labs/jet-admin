@@ -3,6 +3,7 @@ import { FaPlus } from "react-icons/fa";
 import { FaXmark } from "react-icons/fa6";
 import PropTypes from "prop-types";
 
+import { Button, Input } from "@jet-admin/ui";
 const LocalEditableChip = ({ value, onChange, onDelete, type }) => {
   LocalEditableChip.propTypes = {
     value: PropTypes.string.isRequired,
@@ -13,20 +14,20 @@ const LocalEditableChip = ({ value, onChange, onDelete, type }) => {
   return (
     <div className="w-fit">
       <div className="flex items-center justify-between rounded px-2 h-8 border border-gray-300 bg-white">
-        <input
+        <Input
           type={type}
           placeholder="Add value here"
           className="w-fit p-0 border-none bg-transparent focus:ring-0 outline-none hover:outline-none border-0 hover:border-0 text-slate-700 placeholder:text-slate-500 text-xs"
           value={value}
           onChange={(e) => onChange(e.target.value)}
         />
-        <button
+        <Button
           onClick={onDelete}
           type="button"
           className="p-1 bg-transparent rounded-full outline-none hover:outline-none border-0 hover:border-0 ml-2 focus:outline-none focus:border-0"
         >
           <FaXmark className="text-sm text-slate-700" />
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -42,20 +43,20 @@ const LocalInput = ({ handleAddValue, type }) => {
   return (
     <div className="w-fit">
       <div className="flex items-center justify-between rounded px-2 h-8 border border-gray-300 bg-gray-100">
-        <input
+        <Input
           type={type}
           placeholder="Add value here"
           className="w-fit p-0 border-none bg-transparent focus:ring-0 outline-none hover:outline-none border-0 hover:border-0 text-slate-700 placeholder:text-slate-500 text-xs"
           value={newValue}
           onChange={(e) => setNewValue(e.target.value)}
         />
-        <button
+        <Button
           onClick={() => handleAddValue(newValue)}
           type="button"
           className="p-1 bg-transparent rounded-full outline-none hover:outline-none border-0 hover:border-0 ml-2 focus:outline-none focus:border-0"
         >
           <FaPlus className="text-xs text-slate-700" />
-        </button>
+        </Button>
       </div>
     </div>
   );

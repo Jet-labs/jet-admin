@@ -1,4 +1,3 @@
-import { Checkbox, CircularProgress } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import { useQueryClient } from "@tanstack/react-query";
 import { useDebounce } from "@uidotdev/usehooks";
@@ -37,6 +36,7 @@ import { DatabaseTableRowsExportForm } from "./databaseTableRowsExportForm";
 import { DatabaseTableStatistics } from "./databaseTableStatistics";
 import { AppliedFilters, AppliedFiltersBadge, AppliedFiltersCompact } from "./databaseTableAppliedFilters";
 
+import { Button, Checkbox, Spinner } from "@jet-admin/ui";
 export const DatabaseTableGrid = ({
   tenantID,
   databaseSchemaName,
@@ -587,9 +587,9 @@ export const DatabaseTableGrid = ({
               {databaseTableColumnFilters &&
               databaseTableColumnFilters.length > 0 ? null : (
                 <div className="flex flex-row justify-start items-center gap-2">
-                  <button
+                  <Button
                     onClick={_handleToggleDatabaseTableGridDensity}
-                    className="!outline-none !hover:outline-none flex items-center rounded bg-[#646cff]/10 px-3 py-1 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50"
+                    variant="primary-ghost" size="sm"
                   >
                     {databaseTableGridDensity === "compact" ? (
                       <MdOutlineDensitySmall className="mr-2 h-4 w-4" />
@@ -600,7 +600,7 @@ export const DatabaseTableGrid = ({
                     )}
 
                     {`${capitalize(databaseTableGridDensity)} view`}
-                  </button>
+                  </Button>
                 </div>
               )}
                 <div className="flex flex-row justify-end items-center gap-2">
@@ -612,104 +612,96 @@ export const DatabaseTableGrid = ({
                   />
                 {databaseTableColumnFilters &&
                 databaseTableColumnFilters.length > 0 ? null : (
-                  <button
+                  <Button
                     onClick={_handleAddDatabaseTableBlankRow}
-                    className="!outline-none !hover:outline-none flex items-center rounded bg-[#646cff]/10 px-3 py-1 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50"
+                    variant="primary-ghost" size="sm"
                   >
                     <FaPlus className="mr-2 h-4 w-4" />
 
                     {CONSTANTS.STRINGS.DATABASE_TABLE_VIEW_ADD_ROW}
-                  </button>
+                  </Button>
                 )}
 
-                <button
+                <Button
                   onClick={_handleOpenDatabaseTableColumnFilterMenu}
-                  className="!outline-none !hover:outline-none flex items-center rounded bg-[#646cff]/10 px-3 py-1 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50"
+                  variant="primary-ghost" size="sm"
                 >
                   <FaPlus className="mr-2 h-4 w-4" />
                   {CONSTANTS.STRINGS.DATABASE_TABLE_VIEW_ADD_FILTER}
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => {
                     invalidateDatabaseTableRows();
                     reloadDatabaseTableRows();
                   }}
-                  className="!outline-none !hover:outline-none flex items-center rounded bg-[#646cff]/10 px-1 py-1 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50"
+                  variant="primary-ghost" size="sm"
                 >
                   <MdOutlineRefresh
                     className={`h-5 w-5 ${
                       isFetchingDatabaseTableRows ? "animate-spin" : ""
                     }`}
                   />
-                </button>
+                </Button>
               </div>
             </div>
           ) : null}
           {databaseTableRowChangeCount > 0 && (
             <div className="w-full flex flex-row bg-[#ffe7a4] justify-start items-center gap-2 p-2 border-b border-slate-200">
-              <button
+              <Button
                 onClick={_handleCommitDatabaseTableRowChanges}
                 disabled={isBulkUpdatingDatabaseTableRows} // Disable button during loading
                 className={`!outline-none !hover:outline-none flex items-center rounded px-2 py-0.5 text-xs ${
                   isBulkUpdatingDatabaseTableRows
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-white text-[#646cff] border-[#646cff] hover:border-[#646cff] hover:bg-[#ebecff]"
+                    : "bg-white text-primary border-primary hover:border-primary hover:bg-[#ebecff]"
                 }`}
               >
                 {isBulkUpdatingDatabaseTableRows ? (
                   <>
                     Saving your changes...
-                    <CircularProgress
-                      size={16}
-                      color="inherit"
-                      className="!ml-2"
-                    />
+                    <Spinner size={16} className="ml-2" />
                   </>
                 ) : (
                   `Save ${databaseTableRowChangeCount} row changes`
                 )}
-              </button>
+              </Button>
               {!isBulkUpdatingDatabaseTableRows && (
-                <button
+                <Button
                   onClick={_handleClearDatabaseTableRowChanges}
                   className="!outline-none !hover:outline-none flex items-center rounded bg-white px-2 py-0.5 text-xs text-[#ff6e64] border border-[#ff6e64] hover:bg-[#ffebe9] hover:border-[#ff6e64]"
                 >
                   Discard changes
-                </button>
+                </Button>
               )}
             </div>
           )}
           {databaseTableNewRows && databaseTableNewRows.length > 0 && (
             <div className="w-full flex flex-row bg-[#ffe7a4] justify-start items-center gap-2 p-2 border-b border-slate-200">
-              <button
+              <Button
                 onClick={_handleCommitAddDatabaseTableRow}
                 disabled={isBulkAddingDatabaseTableRows} // Disable button during loading
                 className={`!outline-none !hover:outline-none flex items-center rounded px-2 py-0.5 text-xs ${
                   isBulkAddingDatabaseTableRows
                     ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-white text-[#646cff] border-[#646cff] hover:border-[#646cff] hover:bg-[#ebecff]"
+                    : "bg-white text-primary border-primary hover:border-primary hover:bg-[#ebecff]"
                 }`}
               >
                 {isBulkAddingDatabaseTableRows ? (
                   <>
                     Saving your changes...
-                    <CircularProgress
-                      size={16}
-                      color="inherit"
-                      className="!ml-2"
-                    />
+                    <Spinner size={16} className="ml-2" />
                   </>
                 ) : (
                   `Save ${databaseTableNewRows.length} new row`
                 )}
-              </button>
+              </Button>
               {!isBulkAddingDatabaseTableRows && (
-                <button
+                <Button
                   onClick={_handleClearAddDatabaseTableRow}
                   className="!outline-none !hover:outline-none flex items-center rounded bg-white px-2 py-0.5 text-xs text-[#ff6e64] border border-[#ff6e64] hover:bg-[#ffebe9] hover:border-[#ff6e64]"
                 >
                   Discard changes
-                </button>
+                </Button>
               )}
             </div>
           )}
@@ -718,10 +710,10 @@ export const DatabaseTableGrid = ({
               <div>
                 <Checkbox
                   checked={isAllRowSelectChecked}
-                  onChange={(_, checked) => {
+                  onCheckedChange={(checked) => {
                     _handleToggleAllRowSelectCheckbox(checked);
                   }}
-                  className="!p-0 text-[#646cff] hover:bg-[#646cff]/10 focus:outline-none focus:ring-2 focus:ring-[#646cff]/50"
+                  className="mr-2"
                 />
                 <span className="text-sm font-medium mr-2 text-slate-700">
                   Select all {databaseTableRowCount} rows
@@ -824,7 +816,7 @@ export const DatabaseTableGrid = ({
                   minWidth: "auto !important",
                   width: "auto !important",
                   flex: "0 0 auto !important",
-                  color: "#646cff !important",
+                  color: "hsl(var(--primary))",
                   padding: "0.25rem !important",
                 },
               }}

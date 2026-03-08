@@ -1,4 +1,3 @@
-import { CircularProgress } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import PropTypes from "prop-types";
@@ -23,10 +22,13 @@ import { DashboardDropzone } from "./dashboardDropzone";
 import { DashboardEditor } from "./dashboardEditor";
 import { DashboardWidgetList } from "./dashboardWidgetList";
 
+import { Button, Spinner } from "@jet-admin/ui";
 export const DashboardUpdationForm = ({ tenantID, dashboardID }) => {
   DashboardUpdationForm.propTypes = {
-    tenantID: PropTypes.number.isRequired,
-    dashboardID: PropTypes.number.isRequired,
+    tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+      .isRequired,
+    dashboardID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+      .isRequired,
   };
   const queryClient = useQueryClient();
   const { showConfirmation } = useGlobalUI();
@@ -35,9 +37,6 @@ export const DashboardUpdationForm = ({ tenantID, dashboardID }) => {
     isLoading: isLoadingDashboard,
     data: dashboard,
     error: loadDashboardError,
-    isFetching: isFetchingDashboard,
-    isRefetching: isRefetechingDashboard,
-    refetch: refetchDashboard,
   } = useQuery({
     queryKey: [CONSTANTS.REACT_QUERY_KEYS.DASHBOARDS(tenantID), dashboardID],
     queryFn: () =>
@@ -89,7 +88,7 @@ export const DashboardUpdationForm = ({ tenantID, dashboardID }) => {
         message: CONSTANTS.STRINGS.UPDATE_DASHBOARD_FORM_UPDATE_DIALOG_MESSAGE,
         confirmText: "Update",
         cancelText: "Cancel",
-        confirmButtonClass: "!bg-[#646cff]",
+        confirmButtonClass: "!bg-primary",
       });
       updateDashboard(values);
     },
@@ -114,25 +113,43 @@ export const DashboardUpdationForm = ({ tenantID, dashboardID }) => {
   }, [dashboard]);
 
   return (
-    <div className="w-full flex flex-col justify-start items-center h-full">
-      <div className="flex flex-row justify-between items-center w-full">
-        <div className="w-full px-3 py-2 border-b border-gray-200 flex flex-col justify-center items-start">
-          <h1 className="text-lg font-bold leading-tight tracking-tight text-slate-700">
+    <div className="flex h-full w-full flex-col items-center bg-background">
+      <div className="flex w-full items-start justify-between gap-3 border-b border-border bg-background p-3">
+        <div className="flex flex-col items-start gap-1">
+          <h1 className="text-lg font-semibold text-foreground">
             {CONSTANTS.STRINGS.UPDATE_DASHBOARD_FORM_TITLE}
           </h1>
 
           {dashboard && (
-            <span className="text-xs text-[#646cff] mt-2">{`Dashboard ID: ${dashboard.dashboardID} `}</span>
+            <span className="text-xs text-muted-foreground">{`Dashboard ID: ${dashboard.dashboardID}`}</span>
           )}
+        </div>
+
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <Button
+            type="submit"
+            form="dashboard-updation-form"
+            disabled={isUpdatingDashboard}
+          >
+            {isUpdatingDashboard && <Spinner className="mr-2" size={16} />}
+            {CONSTANTS.STRINGS.UPDATE_DASHBOARD_BUTTON_TEXT}
+          </Button>
+          <DashboardCloneForm
+            key={`dashboardCloneForm_${dashboard?.dashboardID}`}
+            tenantID={tenantID}
+            dashboardID={dashboardID}
+          />
+          <DashboardDeletionForm
+            key={`dashboardDeletionForm_${dashboard?.dashboardID}`}
+            tenantID={tenantID}
+            dashboardID={dashboardID}
+          />
         </div>
       </div>
 
       <ReactQueryLoadingErrorWrapper
         isLoading={isLoadingDashboard}
-        isFetching={isFetchingDashboard}
         error={loadDashboardError}
-        refetch={refetchDashboard}
-        isRefetching={isRefetechingDashboard}
       >
         <ResizablePanelGroup
           direction="horizontal"
@@ -140,47 +157,20 @@ export const DashboardUpdationForm = ({ tenantID, dashboardID }) => {
             CONSTANTS.RESIZABLE_PANEL_KEYS
               .DASHBOARD_UPDATION_FORM_RESULT_SEPARATION
           }
-          className={"!w-full !h-full border-t border-gray-200"}
+          className="!h-full !w-full"
         >
-          <ResizablePanel defaultSize={20}>
+          <ResizablePanel defaultSize={20} className="overflow-hidden bg-background">
             <form
+              id="dashboard-updation-form"
               onSubmit={dashboardUpdationForm.handleSubmit}
-              className="w-full h-full"
+              className="flex h-full w-full flex-col overflow-hidden bg-background"
             >
-              <div className="w-full h-full flex flex-col justify-start items-stretch">
-                <DashboardEditor dashboardEditorForm={dashboardUpdationForm} />
-                <DashboardWidgetList tenantID={tenantID} />
-                <div className="flex flex-row justify-around items-center p-2">
-                  <button
-                    type="submit"
-                    disabled={isUpdatingDashboard}
-                    className="flex flex-row items-center justify-center rounded bg-[#646cff] px-3 py-1 text-sm text-white  focus:ring-2 focus:ring-[#646cff]/50 w-full outline-none focus:outline-none"
-                  >
-                    {isUpdatingDashboard && (
-                      <CircularProgress
-                        className="!mr-3"
-                        size={16}
-                        color="white"
-                      />
-                    )}
-                    {CONSTANTS.STRINGS.UPDATE_DASHBOARD_BUTTON_TEXT}
-                  </button>
-                  <DashboardCloneForm
-                    key={`dashboardCloneForm_${dashboard?.dashboardID}`}
-                    tenantID={tenantID}
-                    dashboardID={dashboardID}
-                  />
-                  <DashboardDeletionForm
-                    key={`dashboardDeletionForm_${dashboard?.dashboardID}`}
-                    tenantID={tenantID}
-                    dashboardID={dashboardID}
-                  />
-                </div>
-              </div>
+              <DashboardEditor dashboardEditorForm={dashboardUpdationForm} />
+              <DashboardWidgetList tenantID={tenantID} />
             </form>
           </ResizablePanel>
           <ResizableHandle withHandle={true} />
-          <ResizablePanel defaultSize={80} className="">
+          <ResizablePanel defaultSize={80} className="overflow-hidden bg-background">
             {dashboardUpdationForm && dashboardUpdationForm.values && (
               <DashboardDropzone
                 tenantID={tenantID}

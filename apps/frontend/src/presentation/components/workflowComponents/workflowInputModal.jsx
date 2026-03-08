@@ -2,6 +2,7 @@ import React, { useState, useMemo, useCallback } from "react";
 import PropTypes from "prop-types";
 import { FaPlay, FaTimes } from "react-icons/fa";
 
+import { Button, Checkbox, Textarea, Input } from "@jet-admin/ui";
 /**
  * Modal to prompt for workflow input parameters before test run.
  * Renders form fields based on the args schema defined in workflowOptions.
@@ -93,25 +94,23 @@ export const WorkflowInputModal = ({ args, onSubmit, onClose }) => {
     if (!key) return null;
 
     const baseClass =
-      "w-full px-2.5 py-1.5 text-sm bg-white border rounded focus:outline-none focus:ring-1 focus:ring-[#646cff] focus:border-[#646cff]";
+      "w-full px-2.5 py-1.5 text-sm bg-white border rounded focus:outline-none focus:ring-1 focus:ring-primary focus:border-primary";
     const errorClass = errors[key] ? "border-red-400" : "border-slate-300";
 
     switch (type) {
       case "boolean":
         return (
           <label className="flex items-center gap-2 cursor-pointer">
-            <input
-              type="checkbox"
+            <Checkbox
               checked={values[key] || false}
-              onChange={(e) => handleChange(key, e.target.checked, type)}
-              className="w-4 h-4 text-[#646cff] rounded border-slate-300 focus:ring-[#646cff]"
+              onCheckedChange={(checked) => handleChange(key, checked, type)}
             />
             <span className="text-sm text-slate-600">True</span>
           </label>
         );
       case "number":
         return (
-          <input
+          <Input
             type="number"
             value={values[key] || ""}
             onChange={(e) => handleChange(key, e.target.value, type)}
@@ -122,7 +121,7 @@ export const WorkflowInputModal = ({ args, onSubmit, onClose }) => {
       case "object":
       case "array":
         return (
-          <textarea
+          <Textarea
             value={values[key] || ""}
             onChange={(e) => handleChange(key, e.target.value, type)}
             placeholder={type === "array" ? '["item1", "item2"]' : '{"key": "value"}'}
@@ -132,7 +131,7 @@ export const WorkflowInputModal = ({ args, onSubmit, onClose }) => {
         );
       default:
         return (
-          <input
+          <Input
             type="text"
             value={values[key] || ""}
             onChange={(e) => handleChange(key, e.target.value, type)}
@@ -151,13 +150,15 @@ export const WorkflowInputModal = ({ args, onSubmit, onClose }) => {
           <h3 className="text-sm font-semibold text-slate-700">
             Workflow Input Parameters
           </h3>
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="icon"
             onClick={onClose}
-            className="p-1 text-slate-400 hover:text-slate-600 focus:outline-none"
+            className="h-8 w-8 text-slate-400 hover:text-slate-600"
           >
             <FaTimes className="w-4 h-4" />
-          </button>
+          </Button>
         </div>
 
         {/* Body */}
@@ -186,21 +187,23 @@ export const WorkflowInputModal = ({ args, onSubmit, onClose }) => {
 
           {/* Footer */}
           <div className="flex items-center justify-end gap-2 px-4 py-3 border-t border-slate-200 bg-slate-50">
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size="sm"
               onClick={onClose}
-              className="px-3 py-1.5 text-sm text-slate-600 bg-white border border-slate-300 rounded hover:bg-slate-50 focus:outline-none"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button
               type='button'
+              size="sm"
               onClick={handleSubmit}
-              className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-white bg-green-600 rounded hover:bg-green-700 focus:outline-none"
+              className="bg-green-600 hover:bg-green-700 text-white"
             >
-              <FaPlay className="w-3 h-3" />
+              <FaPlay className="w-3 h-3 mr-1.5" />
               Run Workflow
-            </button>
+            </Button>
           </div>
         </form>
       </div>

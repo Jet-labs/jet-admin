@@ -1,12 +1,8 @@
-import { CircularProgress } from "@mui/material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import React, { useState } from "react";
 import "react-data-grid/lib/styles.css";
-// import { addQueryAPI } from "../../../api/queries";
 import { CONSTANTS } from "../../../constants";
-
-// import { ArrayInput } from "../../ArrayInputComponent";
 import { createDataQueryAPI } from "../../../data/apis/dataQuery";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { DataQueryTestingForm } from "./dataQueryTestingForm";
@@ -21,9 +17,12 @@ import PropTypes from "prop-types";
 import { DataQueryEditor } from "./dataQueryEditor";
 import { DATASOURCE_UI_COMPONENTS } from "@jet-admin/datasources-ui";
 
+import { Button, Spinner, Input, Label } from "@jet-admin/ui";
+
 export const DataQueryAdditionForm = ({ tenantID }) => {
   DataQueryAdditionForm.propTypes = {
-    tenantID: PropTypes.number.isRequired,
+    tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+      .isRequired,
   };
   const queryClient = useQueryClient();
   const [dataQueryTestResult, setDataQueryTestResult] = useState();
@@ -64,16 +63,18 @@ export const DataQueryAdditionForm = ({ tenantID }) => {
   });
 
   return (
-    <div className="w-full flex flex-col justify-start items-center h-full">
-      <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl text-start w-full p-3">
-        {CONSTANTS.STRINGS.ADD_QUERY_FORM_TITLE}
-      </h1>
+    <div className="flex h-full w-full flex-col items-center bg-background">
+      <div className="w-full border-b border-border bg-background px-3 py-2">
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground text-start">
+          {CONSTANTS.STRINGS.ADD_QUERY_FORM_TITLE}
+        </h1>
+      </div>
       <ResizablePanelGroup
         direction="vertical"
         autoSaveId={
           CONSTANTS.RESIZABLE_PANEL_KEYS.QUERY_ADDITION_FORM_RESULT_SEPARATION
         }
-        className={"!w-full !h-full border-t border-gray-200"}
+        className={"!w-full !h-full"}
       >
         <ResizablePanel defaultSize={20}>
           <form
@@ -90,25 +91,18 @@ export const DataQueryAdditionForm = ({ tenantID }) => {
             >
               <ResizablePanel
                 defaultSize={20}
-                className="space-y-3 md:space-y-4  p-3"
+                className="space-y-4 p-3 !overflow-y-auto"
               >
-                <div>
-                  <label
+                <div className="space-y-1">
+                  <Label
                     htmlFor="dataQueryTitle"
-                    className="block mb-1 text-xs font-medium text-slate-500"
+                    className="text-sm font-medium leading-none"
                   >
                     {CONSTANTS.STRINGS.ADD_QUERY_FORM_NAME_FIELD_LABEL}
-                  </label>
-                  {queryAdditionForm.errors.dataQueryTitle && (
-                    <span className="text-red-500 text-xs">
-                      {queryAdditionForm.errors.dataQueryTitle}
-                    </span>
-                  )}
-                  <input
-                    type="dataQueryTitle"
+                  </Label>
+                  <Input
                     name="dataQueryTitle"
                     id="dataQueryTitle"
-                    className=" placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:border-slate-700 block w-full px-2.5 py-1.5 "
                     placeholder={
                       CONSTANTS.STRINGS.ADD_QUERY_FORM_NAME_FIELD_PLACEHOLDER
                     }
@@ -117,16 +111,21 @@ export const DataQueryAdditionForm = ({ tenantID }) => {
                     onBlur={queryAdditionForm.handleBlur}
                     value={queryAdditionForm.values.dataQueryTitle}
                   />
+                  {queryAdditionForm.errors.dataQueryTitle && (
+                    <span className="text-destructive text-xs">
+                      {queryAdditionForm.errors.dataQueryTitle}
+                    </span>
+                  )}
                 </div>
 
               </ResizablePanel>
               <ResizableHandle withHandle={true} />
               <ResizablePanel
                 defaultSize={80}
-                className="space-y-3 md:space-y-4 p-3 h-full w-full !overflow-y-auto"
+                className="space-y-4 p-3 h-full w-full !overflow-y-auto"
               >
                 <DataQueryEditor dataQueryEditorForm={queryAdditionForm} />
-                <div className="w-full flex flex-row justify-end">
+                <div className="w-full flex flex-row justify-end items-center gap-3">
                   <DataQueryAIGeneratePrompt
                     tenantID={tenantID}
                     onAccepted={(aiGeneratedQuery) => {
@@ -144,20 +143,12 @@ export const DataQueryAdditionForm = ({ tenantID }) => {
                     setDataQueryTestResult={setDataQueryTestResult}
                     dataQuery={queryAdditionForm.values}
                   />
-                  <button
-                    type="submit"
-                    disabled={isAddingDataQuery}
-                    className="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none "
-                  >
+                  <Button type="submit" disabled={isAddingDataQuery}>
                     {isAddingDataQuery && (
-                      <CircularProgress
-                        className="!mr-3"
-                        size={16}
-                        color="white"
-                      />
+                      <Spinner className="mr-2" size={16} />
                     )}
                     {CONSTANTS.STRINGS.ADD_QUERY_FORM_SUBMIT_BUTTON}
-                  </button>
+                  </Button>
                 </div>
               </ResizablePanel>
             </ResizablePanelGroup>

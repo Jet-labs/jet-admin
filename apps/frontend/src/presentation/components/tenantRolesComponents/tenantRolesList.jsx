@@ -5,10 +5,15 @@ import { CONSTANTS } from "../../../constants";
 import { useRoleManagementState } from "../../../logic/contexts/roleManagementContext";
 import { NoEntityUI } from "../ui/noEntityUI";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
+import { Badge } from "@jet-admin/ui";
 
 export const TenantRolesList = () => {
-  const { tenantRoles, isLoadingTenantRoles, isFetchingTenantRoles } =
-    useRoleManagementState();
+  const {
+    tenantRoles,
+    tenantRolesError,
+    isLoadingTenantRoles,
+    isFetchingTenantRoles,
+  } = useRoleManagementState();
   const apiRef = useGridApiRef();
   const navigate = useNavigate();
   const { tenantID } = useParams();
@@ -18,7 +23,7 @@ export const TenantRolesList = () => {
       field: "roleID",
       display: "flex",
       // width: 300,
-      headerClassName: "bg-white text-slate-700 font-semibold",
+      headerClassName: "bg-muted text-foreground font-semibold",
       flex: 1,
       headerName: "Role ID",
     },
@@ -26,7 +31,7 @@ export const TenantRolesList = () => {
       field: "roleTitle",
       display: "flex",
       // width: 300,
-      headerClassName: "bg-white text-slate-700 font-semibold",
+      headerClassName: "bg-muted text-foreground font-semibold",
       flex: 1,
       headerName: "Role Name",
     },
@@ -34,7 +39,7 @@ export const TenantRolesList = () => {
       field: "roleDescription",
       display: "flex",
       // width: 300,
-      headerClassName: "bg-white text-slate-700 font-semibold",
+      headerClassName: "bg-muted text-foreground font-semibold",
       flex: 1,
       headerName: "Role Description",
     },
@@ -42,18 +47,21 @@ export const TenantRolesList = () => {
       field: "tenantID",
       display: "flex",
       // width: 300,
-      headerClassName: "bg-white text-slate-700 font-semibold",
+      headerClassName: "bg-muted text-foreground font-semibold",
       flex: 1,
       headerName: "Role type",
       renderCell: (params) => {
         return params.value ? (
-          <span className="p-1 border-orange-300 border bg-orange-100 rounded text-orange-700 text-xs font-semibold">
+          <Badge variant="warning">
             Custom role
-          </span>
+          </Badge>
         ) : (
-          <span className="p-1 border-[#646cffaf] border bg-[#f8f8ff] rounded text-[#646cffaf] text-xs font-semibold">
+            <Badge
+              variant="outline"
+              className="border-primary/50 bg-primary/10 text-primary"
+            >
             Global role
-          </span>
+            </Badge>
         );
       },
     },
@@ -72,16 +80,16 @@ export const TenantRolesList = () => {
   return (
     <ReactQueryLoadingErrorWrapper
       isLoading={isLoadingTenantRoles}
-      isFetching={isFetchingTenantRoles}
+      error={tenantRolesError}
     >
-      {tenantRoles?.roles ? (
-        <div className="flex flex-col w-full flex-grow h-full overflow-y-auto justify-between items-stretch text-sm font-medium text-slate-700">
+      {tenantRoles?.roles?.length ? (
+        <div className="flex h-full w-full flex-grow flex-col items-stretch justify-between overflow-y-auto text-sm font-medium text-foreground">
           <DataGrid
             apiRef={apiRef}
             rows={tenantRoles.roles}
             columns={columns}
-            density="standard"
-            loading={isLoadingTenantRoles}
+            density="compact"
+            loading={isLoadingTenantRoles || isFetchingTenantRoles}
             getRowId={(row) => _getRowID(row)}
             sx={{
               [`& .${gridClasses.cell}:focus, & .${gridClasses.cell}:focus-within`]:
@@ -92,22 +100,11 @@ export const TenantRolesList = () => {
                 {
                   outline: "none",
                 },
-              "& .MuiDataGrid-columnHeader": {},
+              "--unstable_DataGrid-radius": "0",
               "& .MuiDataGrid-row": {
                 "&:hover": {
                   cursor: "pointer",
                 },
-              },
-              "& .MuiDataGrid-columnHeaderTitle": {
-                color: "#334155 !important",
-                fontWeight: "700 !important",
-              },
-              // "& .MuiDataGrid-columnSeparator": {
-              //   color: "#64748b !important",
-              // },
-              "--unstable_DataGrid-radius": "0",
-              "& .MuiDataGrid-root": {
-                borderRadius: 0,
               },
               "& .MuiIconButton-root": {
                 outline: "none",
@@ -117,29 +114,7 @@ export const TenantRolesList = () => {
                 lineHeight: "1.25rem",
                 fontWeight: "400",
               },
-              "& .MuiCheckbox-root": {
-                padding: "4px",
-              },
-              "& .MuiDataGrid-columnHeaderCheckbox": {
-                minWidth: "auto !important",
-                width: "auto !important",
-                flex: "0 0 auto !important",
-                padding: "0.25rem !important",
-                "& .MuiDataGrid-columnHeaderTitleContainer": {
-                  width: "auto",
-                  minWidth: "auto",
-                  flex: "none",
-                },
-              },
-              "& .MuiDataGrid-cellCheckbox": {
-                minWidth: "auto !important",
-                width: "auto !important",
-                flex: "0 0 auto !important",
-                color: "#646cff !important",
-                padding: "0.25rem !important",
-              },
             }}
-            // showCellVerticalBorder
             className="!border-0"
             onRowClick={(params) => {
               _handleRowClick(params.id);
@@ -161,8 +136,8 @@ export const TenantRolesList = () => {
           />
         </div>
       ) : (
-        <div className="!w-full !p-2">
-          <NoEntityUI message={CONSTANTS.ERROR_CODES.SERVER_ERROR.message} />
+          <div className="w-full p-2">
+            <NoEntityUI message="No roles found" />
         </div>
       )}
     </ReactQueryLoadingErrorWrapper>

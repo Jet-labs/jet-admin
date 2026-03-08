@@ -1,9 +1,9 @@
 import React, { useRef } from "react";
 import { CONSTANTS } from "../../../constants";
-import FileUploadIcon from "@mui/icons-material/FileUpload";
-import { CircularProgress } from "@mui/material";
+import { Upload } from "lucide-react";
 import PropTypes from "prop-types";
 
+import { Spinner, Input } from "@jet-admin/ui";
 export const LogoUpload = ({ isUploadingLogo, uploadError, onLogoUpload }) => {
   LogoUpload.propTypes = {
     isUploadingLogo: PropTypes.bool.isRequired,
@@ -25,7 +25,7 @@ export const LogoUpload = ({ isUploadingLogo, uploadError, onLogoUpload }) => {
     <div className="space-y-2">
       <div className="relative flex flex-row justify-start items-center">
         {/* Hidden file input */}
-        <input
+        <Input
           ref={fileInputRef}
           type="file"
           id="logo"
@@ -52,9 +52,9 @@ export const LogoUpload = ({ isUploadingLogo, uploadError, onLogoUpload }) => {
           onClick={!isUploadingLogo ? handleButtonClick : undefined}
         >
           {isUploadingLogo ? (
-            <CircularProgress size={16} className="!text-[#646cff]" />
+            <Spinner size={16} className="text-primary" />
           ) : (
-            <FileUploadIcon className="w-5 h-5 text-slate-500" />
+              <Upload className="w-5 h-5 text-slate-500" />
           )}
 
           {/* Show selected file name */}

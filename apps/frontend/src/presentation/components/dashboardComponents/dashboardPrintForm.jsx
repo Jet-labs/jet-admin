@@ -3,6 +3,7 @@ import { IoMdDownload } from "react-icons/io";
 import { displayError } from "../../../utils/notification";
 import PropTypes from "prop-types";
 
+import { Button } from "@jet-admin/ui";
 export const DashboardPrintForm = ({ dashboardID }) => {
   DashboardPrintForm.propTypes = {
     dashboardID: PropTypes.number.isRequired,
@@ -121,11 +122,11 @@ export const DashboardPrintForm = ({ dashboardID }) => {
   };
 
   return (
-    <button
+    <Button
       onClick={_handlePrint}
-      className="p-1 hover:bg-[#646cff]/10 bg-transparent m-0 flex flex-row justify-center items-center rounded text-xs text-[#646cff] hover:border-[#646cff] hover:border outline-none focus:outline-none"
+      variant="ghost" size="icon" className="text-primary hover:bg-primary/10"
     >
-      <IoMdDownload className="text-[#646cff] h-4 w-4" />
-    </button>
+      <IoMdDownload className="text-primary h-4 w-4" />
+    </Button>
   );
 };

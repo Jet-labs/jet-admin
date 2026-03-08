@@ -224,28 +224,35 @@ widgetController.cloneWidgetByID = async (req, res) => {
  * @param {import("express").Response} res
  */
 widgetController.getWidgetDataByID = async (req, res) => {
-  const { user, dbPool } = req;
+  const { user } = req;
   const { tenantID, widgetID } = req.params;
-  const { executionMode } = req.query; // Extract from query params
+  const { executionMode } = req.query;
+  const authContext = getServiceAuthContext(req);
 
-  Logger.log("info", "widgetController:getWidgetDataByID:init", {
-    userID: user.userID,
-    tenantID,
-    widgetID,
+  Logger.log("info", {
+    message: "widgetController:getWidgetDataByID:init",
+    params: {
+      userID: user.userID,
+      tenantID,
+      widgetID,
+      executionMode,
+    },
   });
 
   try {
     const widgetData = await widgetService.getWidgetDataByID({
-      userID: user.userID,
+      authContext,
       tenantID,
-      dbPool,
       widgetID,
+      executionMode,
     });
 
-    Logger.log("success", "widgetController:getWidgetDataByID:success", {
-      widgetID,
-      widgetData,
-      userID: user.userID,
+    Logger.log("success", {
+      message: "widgetController:getWidgetDataByID:success",
+      params: {
+        widgetID,
+        userID: user.userID,
+      },
     });
 
     return expressUtils.sendResponse(res, true, {
@@ -253,10 +260,13 @@ widgetController.getWidgetDataByID = async (req, res) => {
       message: "Widget data retrieved successfully",
     });
   } catch (error) {
-    Logger.log("error", "widgetController:getWidgetDataByID:catch-1", {
-      error,
-      stack: error.stack,
-      params: { widgetID, userID: user.userID },
+    Logger.log("error", {
+      message: "widgetController:getWidgetDataByID:catch-1",
+      params: {
+        error,
+        widgetID,
+        userID: user.userID,
+      },
     });
     return expressUtils.sendResponse(
       res,
@@ -273,10 +283,11 @@ widgetController.getWidgetDataByID = async (req, res) => {
  * @param {import("express").Response} res
  */
 widgetController.getWidgetDataUsingWidget = async (req, res) => {
-  const { user, dbPool } = req;
+  const { user } = req;
   const { tenantID } = req.params;
   const widget = req.body;
-  const { executionMode } = req.query; // Also check query params for consistency, or body if preferred. Using query for consistency.
+  const { executionMode } = req.query;
+  const authContext = getServiceAuthContext(req);
 
   Logger.log("info", {
     message: "widgetController:getWidgetDataUsingWidget:init",
@@ -290,9 +301,8 @@ widgetController.getWidgetDataUsingWidget = async (req, res) => {
 
   try {
     const widgetData = await widgetService.getWidgetDataUsingWidget({
-      userID: user.userID,
+      authContext,
       tenantID,
-      dbPool,
       widget,
       executionMode,
     });
@@ -300,7 +310,6 @@ widgetController.getWidgetDataUsingWidget = async (req, res) => {
     Logger.log("success", {
       message: "widgetController:getWidgetDataUsingWidget:success",
       params: {
-        widget,
         widgetData,
         userID: user.userID,
       },
@@ -315,8 +324,7 @@ widgetController.getWidgetDataUsingWidget = async (req, res) => {
       message: "widgetController:getWidgetDataUsingWidget:catch-1",
       params: {
         error,
-        stack: error.stack,
-        params: { widget, userID: user.userID },
+        userID: user.userID,
       },
     });
     return expressUtils.sendResponse(

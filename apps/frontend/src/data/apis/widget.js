@@ -159,11 +159,18 @@ export const updateWidgetByIDAPI = async ({
   }
 };
 
-export const getWidgetDataByIDAPI = async ({ tenantID, widgetID }) => {
+export const getWidgetDataByIDAPI = async ({
+  tenantID,
+  widgetID,
+  executionMode,
+}) => {
   try {
-    const url =
+    let url =
       CONSTANTS.SERVER_HOST +
       CONSTANTS.APIS.DATABASE.getWidgetDataByIDAPI(tenantID, widgetID);
+    if (executionMode) {
+      url += `?executionMode=${executionMode}`;
+    }
     const bearerToken = await firebaseAuth.currentUser.getIdToken();
     if (bearerToken) {
       const response = await axios.get(url, {
@@ -186,11 +193,14 @@ export const getWidgetDataByIDAPI = async ({ tenantID, widgetID }) => {
   }
 };
 
-export const getWidgetDataUsingWidgetAPI = async ({ tenantID, widgetData }) => {
+export const getWidgetDataUsingWidgetAPI = async ({ tenantID, widgetData, executionMode }) => {
   try {
-    const url =
+    let url =
       CONSTANTS.SERVER_HOST +
       CONSTANTS.APIS.DATABASE.getWidgetDataUsingWidgetAPI(tenantID);
+    if (executionMode) {
+      url += `?executionMode=${executionMode}`;
+    }
     const bearerToken = await firebaseAuth.currentUser.getIdToken();
     if (bearerToken) {
       const response = await axios.post(

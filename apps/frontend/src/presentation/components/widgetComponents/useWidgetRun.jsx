@@ -1,7 +1,7 @@
 
 import { useState, useCallback, useMemo, useEffect, useRef } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { getWidgetDataUsingWidgetAPI, getWidgetDataByIDAPI } from "../../../data/apis/widget";
+import { getWidgetDataUsingWidgetAPI } from "../../../data/apis/widget";
 import { displayError } from "../../../utils/notification";
 import { useSocketState } from "../../../logic/contexts/socketContext";
 
@@ -42,26 +42,49 @@ export const useWidgetRun = ({
   const [logs, setLogs] = useState([]);
   
   // --- Socket State ---
-  const { socket, isConnected: isSocketConnected } = useSocketState();
+  const { socket } = useSocketState();
   const [connectionState, setConnectionState] = useState(CONNECTION_STATES.DISCONNECTED);
-  const [socketError, setSocketError] = useState(null);
   const [wsProcessedData, setWsProcessedData] = useState(null);
   const [wsContext, setWsContext] = useState({});
 
   // Refs for callbacks
-  const mountedRef = useRef(true);
+  const hydratedInstanceRef = useRef(null);
 
   // --- Helpers ---
-  const addLog = useCallback((type, title, message) => {
-    setLogs(prev => [...prev, { type, title, message, timestamp: Date.now() }]);
+  const addLog = useCallback((type, label, message, extra = {}) => {
+    setLogs(prev => [...prev, { type, label, message, timestamp: Date.now(), ...extra }]);
   }, []);
+
+  const clearLogs = useCallback(() => {
+    setLogs([]);
+  }, []);
+
+  useEffect(() => {
+    const fetchedInstance = widgetFetchedData?.workflowInstances;
+
+    if (!fetchedInstance?.instanceID) {
+      return;
+    }
+
+    if (hydratedInstanceRef.current === fetchedInstance.instanceID) {
+      return;
+    }
+
+    hydratedInstanceRef.current = fetchedInstance.instanceID;
+    setLocalData(widgetFetchedData);
+    setInstanceID(fetchedInstance.instanceID);
+    setWorkflowStatus(
+      fetchedInstance.status || (fetchedInstance.data ? 'COMPLETED' : 'PENDING')
+    );
+
+    if (fetchedInstance.data) {
+      setWsProcessedData(fetchedInstance.data);
+    }
+  }, [widgetFetchedData]);
 
   // --- 1. API Execution (Start Workflow / Fetch Data) ---
   const { isPending: isFetching, mutate: fetchWidgetData } = useMutation({
     mutationFn: (config) => {
-      // If widgetID is present and we're just "running" existing, we might use ID API
-      // But for "Preview" or "Run with new config", we use the Config API.
-      // We'll stick to Config API for consistency in this hook for now, or assume config passed in.
        return getWidgetDataUsingWidgetAPI({
         tenantID,
         widgetData: config,
@@ -80,7 +103,7 @@ export const useWidgetRun = ({
         if (instance.data) {
            setLocalData(data);
            setWorkflowStatus(instance.status);
-           setWsProcessedData(instance.data); // Treat as processed data
+          setWsProcessedData(instance.data);
            addLog('success', 'Execution Completed', `Workflow finished with status: ${instance.status}`);
         } else {
            // ASYNC Mode -> Wait for Socket
@@ -103,90 +126,62 @@ export const useWidgetRun = ({
     },
   });
 
-  useEffect(() => {
-    console.log("useWidgetRun: {instanceID, workflowStatus }", { instanceID, workflowStatus });
-  }, [instanceID, workflowStatus]);
-
   // --- 2. Socket Connection Logic ---
-  console.log('[useWidgetRun] shouldConnect?', {
-    hasInstanceID: !!instanceID,
-    isAsync: executionMode === WIDGET_EXECUTION_MODES.ASYNC,
-    isSocketConnected,
-    workflowStatus,
-  });
   // Connect if:
   // 1. We have an instanceID
   // 2. We are in ASYNC mode
-  // 3. Workflow is not yet complete/failed (or we want to replay)
+  // 3. Workflow is not yet complete/failed
   // 4. Socket is available
-  // Determine connection need
   const shouldConnect = !!instanceID && 
             executionMode === WIDGET_EXECUTION_MODES.ASYNC && 
     socket &&
             workflowStatus !== 'COMPLETED' && 
-            workflowStatus !== 'FAILED';
-  console.log('[useWidgetRun] shouldConnect?', shouldConnect);
+    workflowStatus !== 'FAILED';
 
   // Connect Effect
   useEffect(() => {
-    console.log('[useWidgetRun] useEffect: shouldConnect?', shouldConnect);
     if (!shouldConnect || !socket) return;
-    console.log('[useWidgetRun] useEffect: connecting to workflow via socket');
 
     const targetWidgetID = widgetID ? String(widgetID) : `preview_${tenantID}_${Date.now()}`;
     
-    // Connect Payload
+    // === 1. Widget-specific channel (for processed data + context updates) ===
     const payload = {
       widgetID: targetWidgetID,
-      workflowID: workflowID, // Might be null if just subscribing to known instance, but bridge handles it?
+      workflowID,
       tenantID,
-      mode: 'subscribe', // We usually subscribe to the instance we just started
-      instanceID: instanceID,
+      mode: 'subscribe',
+      instanceID,
       widgetType,
       datasetFields,
       parameters
     };
 
     setConnectionState(CONNECTION_STATES.CONNECTING);
-    console.log('[useWidgetRun] connecting to workflow via socket', payload);
     socket.emit('widget_workflow_connect', payload);
 
-    // Handlers
+    // Widget-specific handlers
     const handleConnected = (data) => {
-      console.log('[useWidgetRun] handleConnected', data);
-       if (data.widgetID !== targetWidgetID) return;
-      console.log('[useWidgetRun] connected to workflow via socket', data);
+      if (data.widgetID !== targetWidgetID) return;
        setConnectionState(CONNECTION_STATES.CONNECTED);
        if (data.initialContext) setWsContext(data.initialContext);
        if (data.workflowStatus) setWorkflowStatus(data.workflowStatus);
+      addLog('info', 'Connected', 'Joined workflow execution room');
     };
 
     const handleContextUpdate = (data) => {
-      console.log('[useWidgetRun] handleContextUpdate received', {
-        dataWidgetID: data.widgetID,
-        targetWidgetID,
-        matches: data.widgetID === targetWidgetID
-      });
-       if (data.widgetID !== targetWidgetID) return;
-      console.log('[useWidgetRun] context update via socket (MATCHED)', data);
+      if (data.widgetID !== targetWidgetID) return;
        const { update } = data;
        
-       if (update.processedData) {
-         console.log(`[useWidgetRun] SETTING wsProcessedData for widgetID=${widgetID} targetWidgetID=${targetWidgetID}`, update.processedData);
-         setWsProcessedData(update.processedData);
-       } else {
-         console.log('[useWidgetRun] handleContextUpdate: NO processedData in update', update);
+      if (update.processedData) {
+        setWsProcessedData(update.processedData);
        }
-       if (update.contextSnapshot) {
-         console.log('[useWidgetRun] handleContextUpdate: contextSnapshot', update.contextSnapshot);
+      if (update.contextSnapshot) {
          setWsContext(update.contextSnapshot);
        }
     };
 
-    const handleStatus = (data) => {
-      console.log('[useWidgetRun] handleStatus', data);
-       if (data.widgetID !== targetWidgetID) return;
-      console.log('[useWidgetRun] status update via socket', data);
+    const handleWidgetStatus = (data) => {
+      if (data.widgetID !== targetWidgetID) return;
        setWorkflowStatus(data.status);
        if (data.processedData) setWsProcessedData(data.processedData);
        if (data.finalContext) setWsContext(data.finalContext);
@@ -197,78 +192,99 @@ export const useWidgetRun = ({
     };
 
     const handleError = (data) => {
-      console.log('[useWidgetRun] handleError', data);
-       if (data.widgetID !== targetWidgetID) return;
-      console.log('[useWidgetRun] error via socket', data);
-       setConnectionState(CONNECTION_STATES.ERROR);
-       setSocketError(data.error);
+      if (data.widgetID !== targetWidgetID) return;
+      setConnectionState(CONNECTION_STATES.ERROR);
        addLog('error', 'Socket Error', data.error);
     };
 
     const handleDisconnect = (data) => {
-      console.log('[useWidgetRun] handleDisconnect', data);
-        if (data.widgetID !== targetWidgetID) return;
-      console.log('[useWidgetRun] disconnected from workflow via socket', data);
+      if (data.widgetID !== targetWidgetID) return;
         setConnectionState(CONNECTION_STATES.DISCONNECTED);
     };
 
-    // Attach
+    // === 2. Workflow execution channel (for per-node logs) ===
+    socket.emit('workflow_run_join', { runId: instanceID });
+
+    const handleNodeUpdate = (nodeData) => {
+      const nodeId = nodeData.nodeID;
+      if (nodeId && nodeData.status) {
+        const nodeName = nodeData.nodeType || nodeId;
+
+        if (nodeData.status === 'success') {
+          addLog('node_complete', `Node: ${nodeName}`, 'Completed successfully', {
+            nodeId,
+            output: nodeData.output
+          });
+        } else if (nodeData.status === 'error' || nodeData.status === 'failed') {
+          addLog('node_error', `Node: ${nodeName}`, 'Execution failed', {
+            nodeId,
+            error: nodeData.error
+          });
+        } else if (nodeData.status === 'running' || nodeData.status === 'started') {
+          addLog('node_start', `Node: ${nodeName}`, 'Started execution', {
+            nodeId
+          });
+        }
+      }
+    };
+
+    const handleWorkflowStatus = (statusData) => {
+      // Update context with full contextData from completion
+      if (statusData.contextData) {
+        setWsContext(statusData.contextData);
+      }
+
+      if (statusData.status === 'COMPLETED') {
+        setWorkflowStatus('COMPLETED');
+        addLog('workflow_complete', 'Workflow Complete', 'All nodes executed successfully');
+      } else if (statusData.status === 'FAILED') {
+        setWorkflowStatus('FAILED');
+        addLog('workflow_error', 'Workflow Failed', 'Execution terminated with errors');
+      } else if (statusData.status === 'STOPPED' || statusData.status === 'CANCELLED') {
+        setWorkflowStatus('FAILED');
+        addLog('info', 'Workflow Stopped', 'Execution was stopped');
+      }
+    };
+
+    // Attach all listeners
     socket.on('widget_workflow_connected', handleConnected);
     socket.on('widget_context_update', handleContextUpdate);
-    socket.on('widget_workflow_status', handleStatus);
+    socket.on('widget_workflow_status', handleWidgetStatus);
     socket.on('widget_workflow_error', handleError);
     socket.on('widget_workflow_disconnected', handleDisconnect);
+    socket.on('workflow_node_update', handleNodeUpdate);
+    socket.on('workflow_status_update', handleWorkflowStatus);
 
     // Cleanup
     return () => {
       socket.off('widget_workflow_connected', handleConnected);
       socket.off('widget_context_update', handleContextUpdate);
-      socket.off('widget_workflow_status', handleStatus);
+      socket.off('widget_workflow_status', handleWidgetStatus);
       socket.off('widget_workflow_error', handleError);
       socket.off('widget_workflow_disconnected', handleDisconnect);
+      socket.off('workflow_node_update', handleNodeUpdate);
+      socket.off('workflow_status_update', handleWorkflowStatus);
       
       socket.emit('widget_workflow_disconnect', { widgetID: targetWidgetID });
     };
 
   }, [shouldConnect, socket, instanceID, tenantID, widgetID, workflowID, widgetType, datasetFields, parameters]);
 
-
-  const finalData = wsProcessedData ? {
-    ...localData,
-    workflowInstances: {
-      ...localData?.workflowInstances,
-      data: wsProcessedData,
-      status: workflowStatus
+  // --- 3. Data Resolution ---
+  const finalData = useMemo(() => {
+    // Priority: Live Socket Data > Local Sync Data > Initial/Fetched Data
+    if (wsProcessedData) {
+      return {
+        ...localData,
+        workflowInstances: {
+          ...localData?.workflowInstances,
+          data: wsProcessedData,
+          status: workflowStatus
+        }
+      };
     }
-  } : localData || widgetFetchedData;
-
-  // // --- 3. Data Resolution ---
-  // const finalData = useMemo(() => {
-  //   console.log('[useWidgetRun] finalData useMemo recalculating', {
-  //     wsProcessedData,
-  //     localData,
-  //     widgetFetchedData,
-  //     workflowStatus,
-  //     widgetID
-  //   });
-  //   // Priority: Live Socket Data > Local Sync Data > Initial/Fetched Data
-  //   if (wsProcessedData) {
-  //      // Merge into widget structure expectations
-  //     const result = {
-  //        ...localData,
-  //        workflowInstances: {
-  //          ...localData?.workflowInstances,
-  //          data: wsProcessedData,
-  //          status: workflowStatus
-  //        }
-  //      };
-  //     console.log('[useWidgetRun] finalData with wsProcessedData:', result);
-  //     return result;
-  //   }
-  //   const fallback = localData || widgetFetchedData;
-  //   console.log('[useWidgetRun] finalData fallback:', fallback);
-  //   return fallback;
-  // }, [wsProcessedData, localData, widgetFetchedData, workflowStatus]);
+    return localData || widgetFetchedData;
+  }, [wsProcessedData, localData, widgetFetchedData, workflowStatus]);
 
   // --- 4. Actions ---
   const runWidget = useCallback((formValues) => {
@@ -280,17 +296,11 @@ export const useWidgetRun = ({
     fetchWidgetData(formValues);
   }, [fetchWidgetData]);
 
-  useEffect(() => {
-    console.log('[useWidgetRun] useEffect: processedData:', wsProcessedData);
-  }, [wsProcessedData]);
-
   // Resolve Variable (from useWidgetWorkflowConnection)
   const resolveVariable = useCallback((path, fallback) => {
-      // Simple resolution logic for context
       if (!path) return fallback;
       const cleanPath = path.replace('ctx.', '');
-      
-      // Basic dot notation support
+
       const parts = cleanPath.split('.');
       let current = wsContext;
       for (const part of parts) {
@@ -303,17 +313,18 @@ export const useWidgetRun = ({
 
   // --- 5. Return ---
   // Only show loading for initial API fetch, NOT during real-time socket streaming
-  // This allows the chart to render and update in real-time during workflow execution
   const isLoading = isFetching && !wsProcessedData;
+  const isRunning = isFetching || (workflowStatus === 'LOADING') || (workflowStatus === 'PENDING');
 
   return {
     // Data
     data: finalData,
-    processedData: wsProcessedData, // Direct access if needed
+    processedData: wsProcessedData,
     context: wsContext,
     
     // Status
     isLoading,
+    isRunning,
     isLive: connectionState === CONNECTION_STATES.CONNECTED,
     workflowStatus,
     connectionState,
@@ -321,6 +332,7 @@ export const useWidgetRun = ({
     
     // Actions
     runWidget,
+    clearLogs,
     resolveVariable,
   };
 };

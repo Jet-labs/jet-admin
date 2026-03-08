@@ -4,8 +4,9 @@ import { DatabaseTableUpdationForm } from "../../components/databaseTableCompone
 
 const UpdateDatabaseTablePage = () => {
   const { tenantID, databaseSchemaName, databaseTableName } = useParams();
+
   return (
-    <div className="flex w-full h-full overflow-y-auto flex-col justify-start items-center">
+    <div className="flex h-full w-full flex-col overflow-hidden bg-background">
       <DatabaseTableUpdationForm
         tenantID={tenantID}
         databaseSchemaName={databaseSchemaName}

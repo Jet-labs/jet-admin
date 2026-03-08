@@ -17,6 +17,7 @@ export const DatabaseTableLayout = () => {
       <div className="flex h-full w-full flex-col justify-start items-stretch overflow-hidden">
         <ResizablePanelGroup
           direction="horizontal"
+          className="h-full w-full"
           autoSaveId={
             CONSTANTS.RESIZABLE_PANEL_KEYS.DATABASE_TABLE_LAYOUT_SEPARATION
           }

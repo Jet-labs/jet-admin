@@ -7,33 +7,39 @@ import { DatasourceIcon } from "../../datasourceComponents/datasourceIcon";
 import { getDatasourceTypeByValue } from "@jet-admin/datasource-types";
 import React from "react";
 
+import { Button } from "@jet-admin/ui";
+
 export const DataQueryDrawerList = () => {
   const { isLoadingDataQueries, dataQueries, isFetchingDataQueries } =
     useDataQueriesState();
   const routeParam = useParams();
   const { tenantID } = useParams();
   const navigate = useNavigate();
+
   const _navigateToAddMoreQuery = () => {
     navigate(CONSTANTS.ROUTES.ADD_DATA_QUERY.path(tenantID));
   };
+
   return (
-    <div className=" bg-white   h-[calc(100vh-48px)] overflow-hidden p-2 w-full">
-      <button
+    <div className="bg-background h-full overflow-hidden p-3 w-full flex flex-col gap-3">
+      <Button
         onClick={_navigateToAddMoreQuery}
-        className="flex mb-2 flex-row items-center justify-center rounded bg-[#646cff]/10 px-3 py-1.5 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50 w-full outline-none focus:outline-none"
+        variant="primary-ghost"
+        className="w-full justify-start"
       >
-        <FaPlus className="!w-4 !h-4 !text-[#646cff] mr-1" />
+        <FaPlus className="size-4 mr-2" />
         {CONSTANTS.STRINGS.ADD_QUERY_BUTTON_TEXT}
-      </button>
+      </Button>
+
       {isLoadingDataQueries || isFetchingDataQueries ? (
-        <div role="status" className=" animate-pulse w-full">
-          <div className="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
-          <div className="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
-          <div className="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
-          <div className="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
+        <div role="status" className="animate-pulse w-full space-y-2">
+          <div className="h-9 bg-muted rounded w-full" />
+          <div className="h-9 bg-muted rounded w-full" />
+          <div className="h-9 bg-muted rounded w-full" />
+          <div className="h-9 bg-muted rounded w-full" />
         </div>
       ) : dataQueries && dataQueries.length > 0 ? (
-          <div className="h-full w-full overflow-y-auto pb-10">
+          <div className="flex-1 w-full overflow-y-auto pb-10 space-y-1">
           {dataQueries.map((dataQuery) => {
             const key = `dataQuery_${dataQuery.dataQueryID}`;
             const isActive = routeParam?.dataQueryID == dataQuery.dataQueryID;
@@ -46,28 +52,27 @@ export const DataQueryDrawerList = () => {
                   dataQuery.dataQueryID
                 )}
                 key={key}
-                className="block mb-2 focus:outline-none "
+                className="block focus:outline-none"
               >
                 <div
-                  className={`flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 ${
-                    isActive ? "bg-[#eaebff]" : "bg-white text-gray-700"
+                  className={`flex items-center gap-2 px-3 py-2 rounded-md transition-colors ${isActive
+                      ? "bg-primary/10 text-primary"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   }`}
                 >
-                  <div className="!w-[16px] flex-shrink-0">
+                  <div className="size-4 flex-shrink-0">
                     <DatasourceIcon
                       icon={datasourceConfig?.icon}
-                      iconColor={isActive ? "#646cff" : datasourceConfig?.iconColor}
+                      iconColor={isActive ? "currentColor" : datasourceConfig?.iconColor}
                       size={16}
                     />
                   </div>
 
                   <span
-                    className={`font-medium text-sm truncate ${
-                      isActive ? "font-bold" : ""
-                    } `}
+                    className={`text-sm truncate ${isActive ? "font-semibold" : "font-medium"
+                      }`}
                   >
-                    {/* {StringUtils.truncateName(dataQuery.dataQueryTitle, 15)} */}
-                    {`${dataQuery.dataQueryTitle}`}
+                    {dataQuery.dataQueryTitle}
                   </span>
                 </div>
               </Link>
@@ -75,12 +80,10 @@ export const DataQueryDrawerList = () => {
           })}
         </div>
       ) : (
-        <div className=" text-gray-500 dark:text-gray-400">
+            <div className="flex-1 flex items-center justify-center p-4">
           <NoEntityUI message={CONSTANTS.STRINGS.QUERY_DRAWER_LIST_NO_QUERY} />
         </div>
       )}
-
-      {/* Query List */}
     </div>
   );
 };

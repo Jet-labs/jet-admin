@@ -1,0 +1,386 @@
+import React, { useMemo, useState, useCallback, useRef, useEffect } from 'react';
+import PropTypes from 'prop-types';
+import { FieldPill } from './fieldPill';
+import { inferFieldsFromData } from '@jet-admin/widgets-logic';
+import { extractWorkflowSchema } from './variableExplorer';
+import { FiSearch, FiDatabase, FiPlus, FiZap } from 'react-icons/fi';
+import { BiGitMerge } from 'react-icons/bi';
+import { MdOutput } from 'react-icons/md';
+
+import { Button, Input } from "@jet-admin/ui";
+/**
+ * Recursively walk context and collect all array paths.
+ */
+const collectArrayPaths = (obj, prefix = 'ctx', depth = 0, maxDepth = 4) => {
+  const results = [];
+  if (!obj || typeof obj !== 'object' || depth > maxDepth) return results;
+
+  for (const key of Object.keys(obj)) {
+    const val = obj[key];
+    const fullPath = `${prefix}.${key}`;
+
+    if (Array.isArray(val) && val.length > 0 && typeof val[0] === 'object') {
+      results.push({
+        path: `{{${fullPath}}}`,
+        label: fullPath.replace(/^ctx\./, ''),
+        sampleKeys: Object.keys(val[0]),
+        rowCount: val.length,
+      });
+    } else if (val && typeof val === 'object' && !Array.isArray(val)) {
+      results.push(...collectArrayPaths(val, fullPath, depth + 1, maxDepth));
+    }
+  }
+  return results;
+};
+
+/**
+ * DataFieldPanel — Left sidebar showing workflow data fields.
+ * Tableau-style data panel with auto-discovery and suggestions.
+ * Uses scoped CSS classes to prevent dark-theme bleed.
+ */
+export const DataFieldPanel = ({
+  workflowContext,
+  dataSource,
+  onDataSourceChange,
+  onFieldClick,
+  workflow,
+  className = '',
+}) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [manualField, setManualField] = useState('');
+  const [showManualAdd, setShowManualAdd] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const suggestionsRef = useRef(null);
+
+  // Close suggestions on click outside
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (suggestionsRef.current && !suggestionsRef.current.contains(e.target)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // Schema suggestions (static)
+  const schemaSuggestions = useMemo(() => {
+    if (!workflow) return [];
+    const schema = extractWorkflowSchema(workflow);
+    const suggestions = [];
+
+    for (const nodeOut of schema.nodeOutputs) {
+      suggestions.push({
+        path: nodeOut.path,
+        label: nodeOut.name,
+        description: nodeOut.description,
+        category: 'node',
+        nodeTitle: nodeOut.nodeTitle,
+        nodeType: nodeOut.nodeType,
+      });
+    }
+
+    for (const wfOut of schema.workflowOutputs) {
+      suggestions.push({
+        path: wfOut.path,
+        label: wfOut.name,
+        description: wfOut.description,
+        category: 'output',
+      });
+    }
+
+    return suggestions;
+  }, [workflow]);
+
+  // Runtime ctx array paths
+  const ctxArrayPaths = useMemo(() => {
+    if (!workflowContext) return [];
+    return collectArrayPaths(workflowContext);
+  }, [workflowContext]);
+
+  // All suggestions combined
+  const allSuggestions = useMemo(() => {
+    const seen = new Set();
+    const combined = [];
+
+    for (const arr of ctxArrayPaths) {
+      if (!seen.has(arr.path)) {
+        seen.add(arr.path);
+        combined.push({
+          ...arr,
+          source: 'runtime',
+          description: `${arr.rowCount} rows, fields: ${arr.sampleKeys.slice(0, 4).join(', ')}${arr.sampleKeys.length > 4 ? '...' : ''}`,
+        });
+      }
+    }
+
+    for (const s of schemaSuggestions) {
+      if (!seen.has(s.path)) {
+        seen.add(s.path);
+        combined.push({ ...s, source: 'schema' });
+      }
+    }
+
+    return combined;
+  }, [ctxArrayPaths, schemaSuggestions]);
+
+  // Resolve fields from selected data source
+  const fields = useMemo(() => {
+    if (!workflowContext || !dataSource) return [];
+
+    const match = dataSource.match(/\{\{ctx\.([^}]+)\}\}/);
+    if (!match) return [];
+
+    const path = match[1];
+    const parts = path.split('.');
+    let current = workflowContext;
+
+    for (const part of parts) {
+      if (current === undefined || current === null) break;
+      const arrMatch = part.match(/^(.+)\[(\d+)\]$/);
+      if (arrMatch) {
+        current = current[arrMatch[1]]?.[parseInt(arrMatch[2])];
+      } else {
+        current = current[part];
+      }
+    }
+
+    if (Array.isArray(current)) {
+      return inferFieldsFromData(current);
+    }
+
+    if (current && typeof current === 'object' && !Array.isArray(current)) {
+      return Object.keys(current).map(key => ({
+        name: key,
+        type: typeof current[key] === 'number' ? 'quantitative' : 'nominal',
+        icon: typeof current[key] === 'number' ? '#' : 'Abc',
+      }));
+    }
+
+    return [];
+  }, [workflowContext, dataSource]);
+
+  // Filter fields
+  const filteredFields = useMemo(() => {
+    if (!searchTerm) return fields;
+    const lower = searchTerm.toLowerCase();
+    return fields.filter(f => f.name.toLowerCase().includes(lower));
+  }, [fields, searchTerm]);
+
+  // Categorize
+  const quantFields = useMemo(() => filteredFields.filter(f => f.type === 'quantitative'), [filteredFields]);
+  const catFields = useMemo(() => filteredFields.filter(f => f.type === 'nominal' || f.type === 'ordinal'), [filteredFields]);
+  const tempFields = useMemo(() => filteredFields.filter(f => f.type === 'temporal'), [filteredFields]);
+
+  const handleSelectSuggestion = useCallback((suggestion) => {
+    onDataSourceChange?.(suggestion.path);
+    setShowSuggestions(false);
+  }, [onDataSourceChange]);
+
+  const handleAddManualField = useCallback(() => {
+    if (!manualField.trim()) return;
+    if (onFieldClick) {
+      onFieldClick({ name: manualField.trim(), type: 'nominal', icon: 'Abc' });
+    }
+    setManualField('');
+    setShowManualAdd(false);
+  }, [manualField, onFieldClick]);
+
+  const getCategoryIcon = (cat) => {
+    switch (cat) {
+      case 'node': return <BiGitMerge className="w-3 h-3 shrink-0 text-emerald-600" />;
+      case 'output': return <MdOutput className="w-3 h-3 shrink-0 text-fuchsia-600" />;
+      case 'runtime': return <FiZap className="w-3 h-3 shrink-0 text-amber-600" />;
+      default: return <FiDatabase className="w-3 h-3 shrink-0 text-slate-400" />;
+    }
+  };
+
+  const renderFieldGroup = (groupFields, label, colorClass) => {
+    if (groupFields.length === 0) return null;
+    return (
+      <div className="mb-4">
+        <div className={`text-[10px] font-bold uppercase tracking-widest mb-2 px-1 ${colorClass}`}>
+          {label} ({groupFields.length})
+        </div>
+        <div className="flex flex-col gap-1.5 px-1">
+          {groupFields.map((field) => (
+            <FieldPill
+              key={field.name}
+              field={field}
+              onClick={() => onFieldClick?.(field)}
+              className="w-full justify-start hover:scale-[1.02] transition-transform"
+            />
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className={`flex flex-col h-full bg-white ${className}`}>
+      {/* Header */}
+      <div className="p-3 border-b border-slate-100 bg-slate-50/50">
+        <div className="flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">
+          <FiDatabase className="w-3.5 h-3.5 text-slate-400" />
+          <span>Data Source</span>
+        </div>
+
+        {/* Data source picker with suggestions */}
+        <div className="relative" ref={suggestionsRef}>
+          <Input
+            type="text"
+            value={dataSource || ''}
+            onChange={(e) => onDataSourceChange?.(e.target.value)}
+            onFocus={() => setShowSuggestions(true)}
+            placeholder="Select or type a data path..."
+            className="w-full px-2.5 py-1.5 text-xs text-slate-700 bg-white border border-slate-200 rounded focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 font-mono"
+            title="Workflow data source path"
+          />
+
+          {/* Suggestions dropdown */}
+          {showSuggestions && allSuggestions.length > 0 && (
+            <div className="absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-md shadow-xl z-50 max-h-60 overflow-y-auto w-80">
+              <div className="px-3 py-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 bg-slate-50 sticky top-0">
+                Available Variables ({allSuggestions.length})
+              </div>
+              {allSuggestions.map((s, i) => (
+                <div
+                  key={`${s.path}-${i}`}
+                  onClick={() => handleSelectSuggestion(s)}
+                  className={`w-full text-left px-3 py-2 text-xs border-b border-slate-50 flex items-start gap-2.5 transition-colors cursor-pointer ${dataSource === s.path ? 'bg-indigo-50 border-l-2 border-l-indigo-500' : 'bg-white hover:bg-slate-50'}`}
+                >
+                  <div className="mt-0.5">{getCategoryIcon(s.source || s.category)}</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[11px] font-medium text-slate-700 font-mono truncate">
+                      {s.label}
+                    </div>
+                    <div className="text-[10px] text-slate-500 truncate mt-0.5" title={s.description}>
+                      {s.description}
+                    </div>
+                    {s.nodeTitle && (
+                      <div className="text-[9px] text-emerald-600 mt-1 uppercase tracking-wider font-semibold">
+                        from: {s.nodeTitle}
+                      </div>
+                    )}
+                  </div>
+                  {s.source === 'runtime' && (
+                    <span className="text-[9px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded uppercase tracking-wider shrink-0">LIVE</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Show selected source info */}
+        {dataSource && fields.length > 0 && (
+          <div className="mt-2 flex items-center gap-1.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-1 rounded w-fit border border-emerald-100">
+            <FiZap className="w-3 h-3" />
+            {fields.length} fields detected
+          </div>
+        )}
+      </div>
+
+      {/* Search */}
+      {fields.length > 5 && (
+        <div className="px-3 py-2 border-b border-slate-100 bg-white">
+          <div className="flex items-center gap-2 bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 focus-within:ring-1 focus-within:ring-indigo-400 focus-within:border-indigo-400 transition-shadow">
+            <FiSearch className="w-3.5 h-3.5 text-slate-400" />
+            <Input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Filter fields..."
+              className="flex-1 text-xs bg-transparent outline-none text-slate-600 placeholder:text-slate-400"
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Field List */}
+      <div className="flex-1 overflow-y-auto p-3">
+        {fields.length > 0 ? (
+          <>
+            {renderFieldGroup(quantFields, 'Measures', 'text-emerald-600')}
+            {renderFieldGroup(catFields, 'Dimensions', 'text-blue-600')}
+            {renderFieldGroup(tempFields, 'Temporal', 'text-amber-600')}
+          </>
+        ) : (
+          <div className="flex flex-col items-center justify-center h-full py-8 text-center px-4">
+            <FiDatabase className="w-8 h-8 mb-3 text-slate-200" />
+            <p className="text-xs text-slate-500 leading-relaxed mb-4">
+              {dataSource
+                ? 'Run the workflow to detect fields from the data'
+                : 'Choose a data source above or type a ctx path'}
+            </p>
+            {!dataSource && allSuggestions.length > 0 && (
+              <Button
+                type="button"
+                size="sm"
+                onClick={() => setShowSuggestions(true)}
+                className="h-7 px-3 text-[10px] font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 uppercase tracking-wider"
+              >
+                Browse {allSuggestions.length} Variables
+              </Button>
+            )}
+          </div>
+        )}
+
+        {/* Manual field add */}
+        <div className="mt-4 pt-4 border-t border-slate-100">
+          {showManualAdd ? (
+            <div className="flex flex-col gap-2">
+              <Input
+                type="text"
+                value={manualField}
+                onChange={(e) => setManualField(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleAddManualField()}
+                placeholder="Type field_name & press Enter..."
+                className="w-full px-2.5 py-1.5 text-xs font-mono text-slate-700 bg-white border border-slate-300 rounded focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 shadow-sm"
+                autoFocus
+              />
+              <div className="flex items-center gap-2 justify-end">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowManualAdd(false)}
+                  className="h-6 px-2 text-xs text-slate-500 hover:text-slate-700 font-medium"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={handleAddManualField}
+                  className="h-6 px-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm"
+                >
+                  Add Field
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowManualAdd(true)}
+              className="w-full h-auto py-2 text-[11px] font-bold uppercase tracking-wider text-slate-500 bg-slate-50 border-dashed border-slate-300 hover:bg-slate-100 hover:border-slate-400 hover:text-slate-600"
+            >
+              <FiPlus className="w-3.5 h-3.5 mr-1" />
+              <span>Add Field Manually</span>
+            </Button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+DataFieldPanel.propTypes = {
+  workflowContext: PropTypes.object,
+  dataSource: PropTypes.string,
+  onDataSourceChange: PropTypes.func,
+  onFieldClick: PropTypes.func,
+  workflow: PropTypes.object,
+  className: PropTypes.string,
+};

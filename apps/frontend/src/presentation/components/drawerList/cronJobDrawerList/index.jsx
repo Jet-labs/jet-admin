@@ -6,6 +6,7 @@ import { CONSTANTS } from "../../../../constants";
 import { useCronJobsState } from "../../../../logic/contexts/cronJobsContext";
 import { NoEntityUI } from "../../ui/noEntityUI";
 
+import { Button } from "@jet-admin/ui";
 export const CronJobDrawerList = () => {
   const { tenantID } = useParams();
   const navigate = useNavigate();
@@ -18,23 +19,24 @@ export const CronJobDrawerList = () => {
   };
 
   return (
-    <div className="bg-white h-[calc(100vh-48px)] overflow-hidden p-2 w-full">
-      <button
+    <div className="bg-background flex h-full w-full flex-col gap-3 overflow-hidden p-3">
+      <Button
         onClick={_navigateToAddNotification}
-        className="flex mb-2 flex-row items-center justify-center rounded bg-[#646cff]/10 px-3 py-1.5 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50 w-full outline-none focus:outline-none"
+        variant="primary-ghost"
+        className="w-full justify-start"
       >
-        <FaPlus className="!w-4 !h-4 !text-[#646cff] mr-1" />
+        <FaPlus className="mr-2 h-4 w-4" />
         {CONSTANTS.STRINGS.ADD_CRON_JOB_BUTTON_TEXT}
-      </button>
+      </Button>
 
       {isLoadingCronJobs || isFetchingCronJobs ? (
-        <div role="status" className="animate-pulse">
-          <div className="h-8 bg-gray-200 rounded mb-2"></div>
-          <div className="h-8 bg-gray-200 rounded mb-2"></div>
-          <div className="h-8 bg-gray-200 rounded mb-2"></div>
+        <div role="status" className="animate-pulse w-full space-y-2">
+          <div className="h-9 rounded-md bg-muted" />
+          <div className="h-9 rounded-md bg-muted" />
+          <div className="h-9 rounded-md bg-muted" />
         </div>
       ) : cronJobs && cronJobs.length > 0 ? (
-          <div className="h-full w-full overflow-y-auto pb-10">
+          <div className="flex-1 w-full overflow-y-auto pb-10 space-y-1">
           {cronJobs.map((cronJob) => {
             const key = `cronJob_${cronJob.cronJobID}`;
             const isActive = routeParam?.cronJobID == cronJob.cronJobID;
@@ -46,28 +48,23 @@ export const CronJobDrawerList = () => {
                   cronJob.cronJobID
                 )}
                 key={key}
-                className="block mb-2 focus:outline-none "
+                className="block focus:outline-none"
               >
                 <div
-                  className={`flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 ${
-                    isActive ? "bg-[#eaebff]" : "bg-white text-gray-700"
+                  className={`flex items-center gap-2 rounded-md px-3 py-2 transition-colors ${isActive
+                      ? "bg-primary/10 text-primary"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   }`}
                 >
-                  <div className="!w-[16px]">
-                    <RiCalendarScheduleLine
-                      className={`w-[16px] h-[16px] ${
-                        isActive ? "text-primary" : "text-slate-600"
-                      }`}
-                    />
+                  <div className="flex-shrink-0">
+                    <RiCalendarScheduleLine className="h-4 w-4" />
                   </div>
 
                   <span
-                    className={`font-medium text-sm truncate ${
-                      isActive ? "font-bold" : ""
-                    } `}
+                    className={`truncate text-sm ${isActive ? "font-semibold" : "font-medium"
+                      }`}
                   >
-                    {/* {StringUtils.truncateName(cronJob.cronJobTitle, 15)} */}
-                    {`${cronJob.cronJobTitle}`}
+                    {cronJob.cronJobTitle}
                   </span>
                 </div>
               </Link>
@@ -75,7 +72,7 @@ export const CronJobDrawerList = () => {
           })}
         </div>
       ) : (
-        <div className=" text-gray-500 dark:text-gray-400">
+            <div className="flex flex-1 items-center justify-center p-4 text-muted-foreground">
           <NoEntityUI
             message={CONSTANTS.STRINGS.CRON_JOB_DRAWER_LIST_NO_CRON_JOB_FOUND}
           />

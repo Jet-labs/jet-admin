@@ -1,25 +1,25 @@
+import React from "react";
 import { useFormik } from "formik";
 import PropTypes from "prop-types";
 import { CONSTANTS } from "../../../constants";
 import { formValidations } from "../../../utils/formValidation";
 import { WorkflowEditor } from "./workflowEditor";
-import { WorkflowNodesProvider } from "@jet-admin/workflow-nodes";
-import { useWorkflowState } from "../../../logic/contexts/workflowContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createWorkflowAPI } from "../../../data/apis/workflow";
 import { displayError, displaySuccess } from "../../../utils/notification";
-import { CircularProgress } from "@mui/material";
+
+import { Button, Spinner } from "@jet-admin/ui";
 
 export const WorkflowAdditionForm = ({ tenantID }) => {
   WorkflowAdditionForm.propTypes = {
-    tenantID: PropTypes.number.isRequired,
+    tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+      .isRequired,
   };
   const queryClient = useQueryClient();
 
   const {
     isPending: isAddingWorkflow,
     mutate: addWorkflow,
-    error: addWorkflowError,
   } = useMutation(
     {
       mutationFn: (data) => {
@@ -52,36 +52,35 @@ export const WorkflowAdditionForm = ({ tenantID }) => {
     },
     validationSchema: formValidations.workflowAdditionFormValidationSchema,
     onSubmit: (values) => {
-      //   addWorkflow(values);
       addWorkflow(values);
-      console.log(values);
     },
   });
 
 
-  return <div className="w-full flex flex-col justify-start items-center h-full">
-    <div className="w-full p-3 border-b border-slate-200 flex flex-row justify-between items-center">
-      <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl text-start">
-        {CONSTANTS.STRINGS.ADD_WORKFLOW_FORM_TITLE}
-      </h1>
-      <button
-        type="button"
-        onClick={workflowAdditionForm.handleSubmit}
-        disabled={isAddingWorkflow}
-        className="flex flex-row items-center justify-center rounded bg-[#646cff] px-3 py-1 text-sm text-white  focus:ring-2 focus:ring-[#646cff]/50  outline-none focus:outline-none"
-      >
-        {isAddingWorkflow && (
-          <CircularProgress className="!mr-3" size={16} color="white" />
-        )}
-        {CONSTANTS.STRINGS.ADD_WORKFLOW_BUTTON_TEXT}
-      </button>
-    </div>
+  return (
+    <div className="flex h-full w-full flex-col items-center bg-background">
+      <div className="w-full p-3 border-b border-border flex flex-row justify-between items-center bg-background">
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground text-start">
+          {CONSTANTS.STRINGS.ADD_WORKFLOW_FORM_TITLE}
+        </h1>
+        <Button
+          type="button"
+          onClick={workflowAdditionForm.handleSubmit}
+          disabled={isAddingWorkflow}
+        >
+          {isAddingWorkflow && (
+            <Spinner className="mr-2" size={16} />
+          )}
+          {CONSTANTS.STRINGS.ADD_WORKFLOW_BUTTON_TEXT}
+        </Button>
+      </div>
 
-    <form
-      className="w-full"
-      onSubmit={workflowAdditionForm.handleSubmit}
-    >
-      <WorkflowEditor workflowEditorForm={workflowAdditionForm} />
-    </form>
-  </div>
-}
+      <form
+        className="w-full flex-1 overflow-hidden"
+        onSubmit={workflowAdditionForm.handleSubmit}
+      >
+        <WorkflowEditor workflowEditorForm={workflowAdditionForm} />
+      </form>
+    </div>
+  );
+};

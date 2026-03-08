@@ -1,15 +1,8 @@
-import CloseIcon from "@mui/icons-material/Close";
-import {
-  CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  IconButton,
-} from "@mui/material";
+import { X } from "lucide-react";
 import PropTypes from "prop-types";
 import React from "react";
 
+import { Button, Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, Spinner } from "@jet-admin/ui";
 export const ConfirmationDialog = ({
   onDecline,
   onAccepted,
@@ -31,43 +24,46 @@ export const ConfirmationDialog = ({
     confirmText: PropTypes.string,
   };
   return (
-    <Dialog
-      open={open}
-      onClose={onDecline}
-      aria-labelledby="alert-dialog-title"
-      aria-describedby="alert-dialog-description"
-    >
-      {isLoading ? (
-        <DialogContent className="!flex !flex-row !justify-start !items-center !p-2">
-          {loadingText && (
-            <span className="!text-sm font-semibold text-slate-700">
-              {loadingText}
-            </span>
-          )}
-          <CircularProgress size={16} className="!ml-3" />
-        </DialogContent>
-      ) : (
-        <>
-          <DialogTitle className="!p-3 !text-sm !flex flex-row justify-between items-center w-full !font-semibold">
-            {title}
-            <IconButton aria-label="close" onClick={onDecline}>
-              <CloseIcon className="!text-base !text-slate-600" />
-            </IconButton>
-          </DialogTitle>
-          <DialogContent className="!px-3">
-            <span className="!font-normal !text-sm">{message}</span>
-          </DialogContent>
-          <DialogActions className="!p-3 !pt-1">
-            <button
-              type="button"
-              onClick={onAccepted}
-              className="px-3 py-2 text-xs font-medium text-center text-white bg-blue-700 rounded hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
-            >
-              {confirmText ? confirmText : "Confirm"}
-            </button>
-          </DialogActions>
-        </>
-      )}
+    <Dialog open={open} onOpenChange={(v) => { if (!v) onDecline(); }}>
+      <DialogContent className="max-w-sm p-4">
+        {isLoading ? (
+          <div className="flex flex-row justify-start items-center p-2">
+            {loadingText && (
+              <span className="text-sm font-semibold text-slate-700">
+                {loadingText}
+              </span>
+            )}
+            <Spinner size={16} className="ml-3" />
+          </div>
+        ) : (
+          <>
+              <DialogHeader className="space-y-1">
+                <DialogTitle className="text-sm font-semibold flex flex-row justify-between items-center w-full">
+                  {title}
+                  <Button
+                    aria-label="close"
+                    onClick={onDecline}
+                    className="rounded-sm opacity-70 hover:opacity-100 outline-none border-0 bg-transparent p-0"
+                  >
+                    <X className="h-4 w-4 text-slate-600" />
+                  </Button>
+                </DialogTitle>
+              </DialogHeader>
+              <div>
+                <span className="font-normal text-sm">{message}</span>
+              </div>
+              <DialogFooter>
+                <Button
+                  type="button"
+                  onClick={onAccepted}
+                  className="px-3 py-2 text-xs font-medium text-center text-white bg-blue-700 rounded hover:bg-blue-800 focus:outline-none"
+                >
+                  {confirmText ? confirmText : "Confirm"}
+                </Button>
+            </DialogFooter>
+          </>
+        )}
+      </DialogContent>
     </Dialog>
   );
 };

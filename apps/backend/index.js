@@ -204,7 +204,7 @@ httpServer.listen(port, async () => {
     Logger.log('error', { message: 'Failed to init monitor socket', params: { error: err.message } });
   }
 
-  // Start workflow workers (if RabbitMQ is available)
+  // Start workflow workers (in-memory queue)
   try {
     const { startWorkflowWorkers } = require("./modules/workflow/workflowWorkers");
     await startWorkflowWorkers();

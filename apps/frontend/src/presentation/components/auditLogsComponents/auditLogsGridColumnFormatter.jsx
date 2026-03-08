@@ -127,7 +127,7 @@ export const getFormattedAuditLogColumns = () => {
         renderCell: (params) => {
           return (
             <div className="space-x-2 w-fit flex h-full flex-row justify-start items-center">
-              <BiCalendar className="text-[#646cff] flex-shrink-0" />
+              <BiCalendar className="text-primary flex-shrink-0" />
               <span className="text-justify break-all overflow-hidden text-ellipsis whitespace-pre-wrap h-full flex items-center">
                 {params.value
                   ? moment(params.value).toDate().toISOString()
@@ -156,7 +156,7 @@ export const getFormattedAuditLogColumns = () => {
                 "w-full flex h-full flex-row justify-start items-center"
               }
             >
-              <span className="px-2 py-0.5 rounded text-sm font-medium w-min bg-[#646cff]/10 text-[#646cff]  flex  flex-row justify-start items-center p-2">
+              <span className="px-2 py-0.5 rounded text-sm font-medium w-min bg-primary/10 text-primary  flex  flex-row justify-start items-center p-2">
                 {params.value}
               </span>
             </div>
@@ -177,7 +177,7 @@ export const getFormattedAuditLogColumns = () => {
         },
         renderCell: (params) => {
           let chipStyle =
-            "px-2 py-0.5 rounded text-sm font-medium w-min bg-[#646cff]/10 text-[#646cff]  flex  flex-row justify-start items-center p-2";
+            "px-2 py-0.5 rounded text-sm font-medium w-min bg-primary/10 text-primary  flex  flex-row justify-start items-center p-2";
           switch (params.value) {
             case "GET":
               chipStyle += " bg-green-100 text-green-800";

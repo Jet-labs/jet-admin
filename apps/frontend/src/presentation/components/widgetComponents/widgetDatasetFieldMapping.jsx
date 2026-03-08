@@ -1,9 +1,3 @@
-import {
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle
-} from "@mui/material";
 import { useFormik } from "formik";
 import PropTypes from "prop-types";
 import React, { useState, useMemo, useCallback } from "react";
@@ -13,6 +7,7 @@ import { VariablePathPicker } from "./variablePathPicker";
 import { VariableExplorer, extractWorkflowSchema } from "./variableExplorer";
 import { FiInfo, FiAlertCircle } from "react-icons/fi";
 
+import { Button, Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@jet-admin/ui";
 /**
  * Enhanced Widget Dataset Field Mapping with Variable Explorer
  * Uses workflow schema (no execution required) to show available variable paths
@@ -135,12 +130,15 @@ export const WidgetDatasetFieldMapping = ({
   }, []);
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle className="!p-4 !pb-2 !text-base !font-medium">
-        {CONSTANTS.STRINGS.WIDGET_DATASET_FIELD_MAPPING_TITLE || "Dataset field options"}
-      </DialogTitle>
+    <Dialog open={open} onOpenChange={(v) => { if (!v) onClose(); }}>
+      <DialogContent className="max-w-sm p-4">
+        <DialogHeader className="space-y-1">
+          <DialogTitle className="text-sm font-medium">
+            {CONSTANTS.STRINGS.WIDGET_DATASET_FIELD_MAPPING_TITLE || "Dataset field options"}
+          </DialogTitle>
+        </DialogHeader>
 
-      <DialogContent className="!p-4 !pt-2">
+        <div>
         {/* Info banner */}
         <div className="flex items-start gap-2 text-xs text-slate-600 bg-slate-50 p-2.5 rounded border border-slate-200 mb-4">
           <FiInfo className="w-3.5 h-3.5 text-slate-400 flex-shrink-0 mt-0.5" />
@@ -221,25 +219,26 @@ export const WidgetDatasetFieldMapping = ({
               )}
           </div>
         )}
+        </div>
+
+        <DialogFooter className="gap-2">
+          <Button
+            onClick={onClose}
+            type="button"
+            variant="secondary"
+          >
+            {CONSTANTS.STRINGS.WIDGET_DATASET_FIELD_MAPPING_CANCEL || "Discard"}
+          </Button>
+
+          <Button
+            type="button"
+            onClick={datasetFieldMappingForm.handleSubmit}
+            
+          >
+            {CONSTANTS.STRINGS.WIDGET_DATASET_FIELD_MAPPING_CONFIRM || "Save changes"}
+          </Button>
+        </DialogFooter>
       </DialogContent>
-
-      <DialogActions className="!p-4 !pt-2">
-        <button
-          onClick={onClose}
-          type="button"
-          className="px-2.5 py-1.5 text-sm text-slate-600 bg-slate-200 hover:bg-slate-300 rounded outline-none border-0"
-        >
-          {CONSTANTS.STRINGS.WIDGET_DATASET_FIELD_MAPPING_CANCEL || "Discard"}
-        </button>
-
-        <button
-          type="button"
-          onClick={datasetFieldMappingForm.handleSubmit}
-          className="px-2.5 py-1.5 text-white text-sm bg-[#646cff] hover:bg-[#5558dd] rounded outline-none border-0"
-        >
-          {CONSTANTS.STRINGS.WIDGET_DATASET_FIELD_MAPPING_CONFIRM || "Save changes"}
-        </button>
-      </DialogActions>
     </Dialog>
   );
 };

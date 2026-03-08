@@ -1,4 +1,3 @@
-import { CircularProgress } from "@mui/material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import { CONSTANTS } from "../../../constants";
@@ -18,9 +17,11 @@ import React from "react";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 
+import { Button, Spinner } from "@jet-admin/ui";
 export const DashboardAdditionForm = ({ tenantID }) => {
   DashboardAdditionForm.propTypes = {
-    tenantID: PropTypes.number.isRequired,
+    tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+      .isRequired,
   };
   const queryClient = useQueryClient();
   const { isPending: isAddingDashboard, mutate: addDashboard } = useMutation({
@@ -62,47 +63,40 @@ export const DashboardAdditionForm = ({ tenantID }) => {
   });
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="w-full flex flex-col justify-start items-center h-full">
-        <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl text-start w-full p-3">
-          {CONSTANTS.STRINGS.ADD_DASHBOARD_FORM_TITLE}
-        </h1>
+      <div className="flex h-full w-full flex-col items-center bg-background">
+        <div className="flex w-full items-center justify-between gap-3 border-b border-border bg-background p-3">
+          <h1 className="text-lg font-semibold text-foreground">
+            {CONSTANTS.STRINGS.ADD_DASHBOARD_FORM_TITLE}
+          </h1>
+          <Button
+            type="submit"
+            form="dashboard-addition-form"
+            disabled={isAddingDashboard}
+          >
+            {isAddingDashboard && <Spinner className="mr-2" size={16} />}
+            {CONSTANTS.STRINGS.ADD_DASHBOARD_BUTTON_TEXT}
+          </Button>
+        </div>
         <ResizablePanelGroup
           direction="horizontal"
           autoSaveId={
             CONSTANTS.RESIZABLE_PANEL_KEYS
               .DASHBOARD_ADDITION_FORM_RESULT_SEPARATION
           }
-          className={"!w-full !h-full border-t border-gray-200"}
+          className="!h-full !w-full"
         >
-          <ResizablePanel defaultSize={20}>
+          <ResizablePanel defaultSize={20} className="overflow-hidden bg-background">
             <form
+              id="dashboard-addition-form"
               onSubmit={dashboardAdditionForm.handleSubmit}
-              className="w-full h-full"
+              className="flex h-full w-full flex-col overflow-hidden bg-background"
             >
-              <div className="w-full h-full flex flex-col justify-start items-stretch">
-                <DashboardEditor dashboardEditorForm={dashboardAdditionForm} />
-                <DashboardWidgetList tenantID={tenantID} />
-                <div className="flex flex-row justify-around items-center p-2">
-                  <button
-                    type="submit"
-                    disabled={isAddingDashboard}
-                    className="flex flex-row items-center justify-center rounded bg-[#646cff] px-3 py-1 text-sm text-white  focus:ring-2 focus:ring-[#646cff]/50 w-full outline-none focus:outline-none"
-                  >
-                    {isAddingDashboard && (
-                      <CircularProgress
-                        className="!mr-3"
-                        size={16}
-                        color="white"
-                      />
-                    )}
-                    {CONSTANTS.STRINGS.ADD_DASHBOARD_BUTTON_TEXT}
-                  </button>
-                </div>
-              </div>
+              <DashboardEditor dashboardEditorForm={dashboardAdditionForm} />
+              <DashboardWidgetList tenantID={tenantID} />
             </form>
           </ResizablePanel>
           <ResizableHandle withHandle={true} />
-          <ResizablePanel defaultSize={80} className="">
+          <ResizablePanel defaultSize={80} className="overflow-hidden bg-background">
             {dashboardAdditionForm && dashboardAdditionForm.values && (
               <DashboardDropzone
                 tenantID={tenantID}

@@ -4,8 +4,9 @@ import { useParams } from "react-router-dom";
 
 const AddDatabaseTablePage = () => {
   const { tenantID, databaseSchemaName } = useParams();
+
   return (
-    <div className="flex w-full h-full overflow-y-auto flex-col justify-start items-center">
+    <div className="flex h-full w-full flex-col overflow-hidden bg-background">
       <DatabaseTableAdditionForm
         tenantID={tenantID}
         databaseSchemaName={databaseSchemaName}

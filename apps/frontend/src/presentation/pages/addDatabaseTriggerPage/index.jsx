@@ -4,8 +4,9 @@ import { DatabaseTriggerAdditionForm } from "../../components/databaseTriggerCom
 
 const AddDatabaseTriggerPage = () => {
   const { tenantID, databaseSchemaName } = useParams();
+
   return (
-    <div className="flex w-full h-full overflow-y-auto flex-col justify-start items-center">
+    <div className="flex h-full w-full flex-col overflow-hidden bg-background">
       <DatabaseTriggerAdditionForm
         tenantID={tenantID}
         databaseSchemaName={databaseSchemaName}

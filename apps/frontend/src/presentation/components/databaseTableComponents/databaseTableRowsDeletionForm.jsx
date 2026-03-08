@@ -1,6 +1,3 @@
-import {
-  CircularProgress
-} from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { CONSTANTS } from "../../../constants";
 import { databaseTableBulkRowDeletionAPI } from "../../../data/apis/databaseTable";
@@ -9,6 +6,7 @@ import { displayError, displaySuccess } from "../../../utils/notification";
 import PropTypes from "prop-types";
 import React from "react";
 
+import { Button, Spinner } from "@jet-admin/ui";
 export const DatabaseTableRowsDeletionForm = ({
   tenantID,
   databaseSchemaName,
@@ -70,19 +68,16 @@ export const DatabaseTableRowsDeletionForm = ({
 
   return (
     <>
-      <button
+      <Button
+        variant="destructive-outline"
+        size="sm"
         onClick={_handleBulkDeleteDatabaseTableRows}
-        disabled={isBulkDeletingDatabaseTableRows} // Disable button during loading
-        className={`!outline-none !hover:outline-none flex items-center rounded px-2 py-0.5 text-xs ${
-          isBulkDeletingDatabaseTableRows
-            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-            : "!outline-none !hover:outline-none flex items-center rounded bg-white px-2 py-0.5 text-xs text-[#ff6e64] border border-[#ff6e64] hover:bg-[#ffebe9] hover:border-[#ff6e64]"
-        }`}
+        disabled={isBulkDeletingDatabaseTableRows}
       >
         {isBulkDeletingDatabaseTableRows ? (
           <>
             Deleting selected rows...
-            <CircularProgress size={16} color="inherit" className="!ml-2" />
+            <Spinner size={16} className="ml-2" />
           </>
         ) : (
           `Delete ${
@@ -91,7 +86,7 @@ export const DatabaseTableRowsDeletionForm = ({
               : rowSelectionModel?.length
           } ${rowSelectionModel?.length == 1 ? "row" : "rows"}`
         )}
-      </button>
+      </Button>
     </>
   );
 };

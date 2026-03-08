@@ -50,7 +50,7 @@ export const CodeEditorField = ({
   };
 
   return (
-    <div className={`${rounded ? "rounded-sm" : ""} ${outlined ? "border border-slate-200 focus:border-[#646cff]/10" : ""} overflow-hidden min-w-[300px]`}>
+    <div className={`${rounded ? "rounded-sm" : ""} ${outlined ? "border border-slate-200 focus:border-primary/10" : ""} overflow-hidden min-w-[300px]`}>
       <Editor
         height={height}
         defaultLanguage={language} // Set the language

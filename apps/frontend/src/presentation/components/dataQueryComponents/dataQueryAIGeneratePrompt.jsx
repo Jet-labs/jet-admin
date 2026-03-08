@@ -1,11 +1,3 @@
-import {
-  CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-} from "@mui/material";
-import { styled } from "@mui/material/styles";
 import { useMutation } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { FaMagic } from "react-icons/fa";
@@ -15,40 +7,7 @@ import { displayError } from "../../../utils/notification";
 import { CodeBlock } from "../ui/codeBlock";
 import PropTypes from "prop-types";
 
-// Styled components to override MUI defaults
-const StyledDialog = styled(Dialog)(() => ({
-  "& .MuiDialog-paper": {
-    borderRadius: 4, // Keep original border radius
-    border: "1px solid rgba(99, 102, 241, 0.2)",
-    boxShadow: "0 0 20px rgba(79, 70, 229, 0.15)",
-    background: "transparent",
-    overflow: "hidden",
-    position: "relative",
-  },
-}));
-
-const StyledDialogTitle = styled(DialogTitle)(() => ({
-  padding: "16px 16px 0 16px",
-  fontWeight: 500,
-  position: "relative",
-  zIndex: 10,
-  color: "#333",
-  background: "transparent",
-}));
-
-const StyledDialogContent = styled(DialogContent)(() => ({
-  padding: "16px",
-  position: "relative",
-  zIndex: 10,
-  background: "transparent",
-}));
-
-const StyledDialogActions = styled(DialogActions)(() => ({
-  padding: "16px",
-  position: "relative",
-  zIndex: 10,
-  background: "transparent",
-}));
+import { Button, Dialog, DialogContent, DialogHeader, DialogTitle, Spinner, Textarea } from "@jet-admin/ui";
 
 export const DataQueryAIGeneratePrompt = ({ tenantID, onAccepted }) => {
   DataQueryAIGeneratePrompt.propTypes = {
@@ -80,203 +39,104 @@ export const DataQueryAIGeneratePrompt = ({ tenantID, onAccepted }) => {
 
   return (
     <>
-      <button
+      <Button
         type="button"
+        size="sm"
         onClick={() => setIsAIPromptDialogOpen(true)}
-        className="
-        flex mr-2 flex-row justify-center items-center
-        px-3 py-2 text-xs font-medium text-center text-white
-        bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500
-        rounded border-none shadow-md
-        transform transition-all duration-300 ease-in-out
-        hover:scale-105 hover:shadow-lg hover:from-indigo-500 hover:via-purple-500 hover:to-pink-400
-        focus:outline-none
-        relative overflow-hidden group
-    "
+        className="bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-500 hover:from-indigo-500 hover:via-purple-500 hover:to-pink-400 text-white border-none shadow-sm transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
       >
-        <span className="absolute inset-0 w-full h-full bg-gradient-to-r from-indigo-500/30 via-purple-500/30 to-pink-400/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-        <FaMagic className="text-sm mr-1 animate-pulse" />
+        <FaMagic className="mr-2 size-3.5 animate-pulse" />
         {CONSTANTS.STRINGS.DATA_QUERY_AI_PROMPT_BUTTON}
-      </button>
+      </Button>
 
-      <StyledDialog
-        open={isAIPromptDialogOpen}
-        onClose={() => setIsAIPromptDialogOpen(false)}
-        BackdropProps={{
-          style: {
-            // backgroundColor: "rgba(255, 255, 255, 0.8)",
-            // backdropFilter: "blur(8px)",
-          },
-        }}
-        fullWidth
-        maxWidth="sm"
-      >
-        {/* Sci-Fi Animated Background - Light Theme without lines */}
-        <div
-          style={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            overflow: "hidden",
-            zIndex: 1,
-            background: "linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)",
-          }}
-        >
-          {/* Glow effect */}
-          <div
-            style={{
-              position: "absolute",
-              top: "30%",
-              left: "10%",
-              width: "80%",
-              height: "40%",
-              borderRadius: "50%",
-              background:
-                "radial-gradient(circle, rgba(99, 102, 241, 0.07) 0%, transparent 70%)",
-              filter: "blur(30px)",
-              animation: "pulse 8s infinite alternate",
-            }}
-          />
+      <Dialog open={isAIPromptDialogOpen} onOpenChange={(v) => { if (!v) setIsAIPromptDialogOpen(false); }}>
+        <DialogContent className="max-w-md p-0 overflow-hidden border border-border">
+          <div className="p-6 space-y-4">
+            <DialogHeader>
+              <DialogTitle className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 font-semibold text-lg">
+                {CONSTANTS.STRINGS.DATA_QUERY_AI_PROMPT_FORM_TITLE}
+              </DialogTitle>
+            </DialogHeader>
 
-          {/* Animated overlay */}
-          <div
-            style={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              background:
-                "linear-gradient(135deg, rgba(99, 102, 241, 0.03) 0%, rgba(168, 85, 247, 0.03) 100%)",
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                {CONSTANTS.STRINGS.DATA_QUERY_AI_PROMPT_FORM_DESCRIPTION}
+              </p>
 
-              transition: "opacity 0.5s ease",
-            }}
-          />
-        </div>
+              <div className="space-y-1">
+                <Textarea
+                  id="aiPrompt"
+                  name="aiPrompt"
+                  rows="4"
+                  required
+                  value={aiPrompt}
+                  onChange={(e) => setAiPrompt(e.target.value)}
+                  autoComplete="off"
+                  className="w-full resize-none"
+                  placeholder="Describe what you want to query..."
+                />
+              </div>
 
-        <StyledDialogTitle>
-          <div className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 font-medium">
-            {CONSTANTS.STRINGS.DATA_QUERY_AI_PROMPT_FORM_TITLE}
-          </div>
-        </StyledDialogTitle>
-
-        <StyledDialogContent>
-          <span className="text-sm font-normal text-gray-600">
-            {CONSTANTS.STRINGS.DATA_QUERY_AI_PROMPT_FORM_DESCRIPTION}
-          </span>
-
-          <div className="space-y-4 mt-4">
-            <textarea
-              id="aiPrompt"
-              name="aiPrompt"
-              rows="4"
-              required
-              value={aiPrompt}
-              onChange={(e) => setAiPrompt(e.target.value)}
-              autoComplete="off"
-              className="w-full rounded border border-indigo-200 p-2.5 text-sm text-gray-800 bg-white/70 backdrop-blur-md outline-none transition-all duration-200 shadow-sm focus:border-indigo-400 focus:ring-2 focus:ring-indigo-400/30 focus:shadow-indigo-500/30"
-              placeholder="Describe what you want to query..."
-              style={{
-                backdropFilter: "blur(4px)",
-                boxShadow: "0 0 10px rgba(99, 102, 241, 0.1)",
-              }}
-            />
-          </div>
-
-          {aiGeneratedQuery && (
-            <div className="mt-4 transition-all duration-300">
-              <CodeBlock code={aiGeneratedQuery} language="pgsql" />
+              {aiGeneratedQuery && (
+                <div className="mt-4 rounded-md border border-border overflow-hidden">
+                  <CodeBlock code={aiGeneratedQuery} language="pgsql" />
+                </div>
+              )}
             </div>
-          )}
-        </StyledDialogContent>
 
-        <StyledDialogActions className="justify-end space-x-2">
-          <button
-            onClick={() => setIsAIPromptDialogOpen(false)}
-            type="button"
-            className="px-2.5 py-1.5 text-sm text-gray-700 border border-gray-200 bg-gray-100 hover:bg-gray-200 rounded transition-all duration-200"
-            style={{
-              boxShadow: "0 0 10px rgba(0, 0, 0, 0.05)",
-            }}
-          >
-            {CONSTANTS.STRINGS.CHART_DATASET_CHART_DOWNLOAD_FORM_CANCEL}
-          </button>
+            <div className="flex justify-end items-center gap-3 mt-6">
+              <Button
+                onClick={() => setIsAIPromptDialogOpen(false)}
+                type="button"
+                variant="outline"
+                size="sm"
+              >
+                {CONSTANTS.STRINGS.CHART_DATASET_CHART_DOWNLOAD_FORM_CANCEL}
+              </Button>
 
-          {aiGeneratedQuery && (
-            <button
-              type="button"
-              onClick={() => {
-                onAccepted(aiGeneratedQuery);
-                setIsAIPromptDialogOpen(false);
-              }}
-              className="px-2.5 py-1.5 text-sm text-white bg-emerald-500 rounded hover:bg-emerald-600 transition-all duration-200 flex items-center"
-              style={{
-                boxShadow: "0 0 15px rgba(16, 185, 129, 0.2)",
-              }}
-            >
-              <span>
-                {
-                  CONSTANTS.STRINGS
-                    .DATA_QUERY_AI_PROMPT_ACCEPT_FORM_CONFIRM_BUTTON
-                }
-              </span>
-            </button>
-          )}
+              <div className="flex items-center gap-2">
+                {aiGeneratedQuery && (
+                  <Button
+                    type="button"
+                    variant="primary-ghost"
+                    size="sm"
+                    onClick={() => {
+                      onAccepted(aiGeneratedQuery);
+                      setIsAIPromptDialogOpen(false);
+                    }}
+                    className="text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+                  >
+                    {CONSTANTS.STRINGS.DATA_QUERY_AI_PROMPT_ACCEPT_FORM_CONFIRM_BUTTON}
+                  </Button>
+                )}
 
-          <button
-            type="button"
-            onClick={() => generateAIPromptBasedQuery({ aiPrompt })}
-            className="px-2.5 py-1.5 text-sm text-white bg-gradient-to-r from-indigo-600 to-purple-600 flex flex-row items-center rounded hover:from-indigo-500 hover:to-purple-500 transition-all duration-200"
-            style={{
-              boxShadow: "0 0 15px rgba(99, 102, 241, 0.2)",
-            }}
-          >
-            {isGeneratingAIPromptBasedQuery ? (
-              <div className="flex items-center">
-                <CircularProgress className="mr-2" size={18} color="inherit" />
-                <span>Generating...</span>
+                <Button
+                  type="button"
+                  size="sm"
+                  onClick={() => generateAIPromptBasedQuery({ aiPrompt })}
+                  className="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white border-none"
+                >
+                  {isGeneratingAIPromptBasedQuery ? (
+                    <>
+                      <Spinner className="mr-2" size={16} />
+                      <span>Generating...</span>
+                    </>
+                  ) : (
+                    <>
+                      <FaMagic className="mr-2 size-3.5" />
+                      <span>
+                          {aiGeneratedQuery
+                            ? CONSTANTS.STRINGS.DATA_QUERY_AI_PROMPT_FORM_REGENERATE_BUTTON
+                            : CONSTANTS.STRINGS.DATA_QUERY_AI_PROMPT_FORM_GENERATE_BUTTON}
+                        </span>
+                    </>
+                  )}
+                </Button>
               </div>
-            ) : aiGeneratedQuery ? (
-              <div className="flex items-center">
-                <FaMagic className="mr-2" />
-                <span>
-                  {
-                    CONSTANTS.STRINGS
-                      .DATA_QUERY_AI_PROMPT_FORM_REGENERATE_BUTTON
-                  }
-                </span>
-              </div>
-            ) : (
-              <div className="flex items-center">
-                <FaMagic className="mr-2" />
-                <span>
-                  {CONSTANTS.STRINGS.DATA_QUERY_AI_PROMPT_FORM_GENERATE_BUTTON}
-                </span>
-              </div>
-            )}
-          </button>
-        </StyledDialogActions>
-
-        {/* Add global CSS animation */}
-        <style>{`
-          @keyframes pulse {
-            0% {
-              opacity: 0.4;
-              transform: scale(1);
-            }
-            50% {
-              opacity: 0.6;
-              transform: scale(1.1);
-            }
-            100% {
-              opacity: 0.4;
-              transform: scale(1);
-            }
-          }
-        `}</style>
-      </StyledDialog>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

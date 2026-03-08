@@ -5,6 +5,7 @@ import { useDatabaseTablesState } from "../../../../logic/contexts/databaseTable
 import { NoEntityUI } from "../../ui/noEntityUI";
 import React from "react";
 
+import { Button } from "@jet-admin/ui";
 export const DatabaseTableDrawerList = () => {
   const { isLoadingDatabaseTables, isFetchingDatabaseTables, databaseTables } =
     useDatabaseTablesState();
@@ -19,14 +20,14 @@ export const DatabaseTableDrawerList = () => {
   };
 
   return (
-    <div className=" bg-white   h-[calc(100vh-48px)] overflow-hidden p-2 w-full">
-      <button
+    <div className="bg-background h-full overflow-hidden p-2 w-full flex flex-col items-stretch">
+      <Button
         onClick={_navigateToAddMoreTable}
-        className="flex mb-2 flex-row items-center justify-center rounded bg-[#646cff]/10 px-3 py-1.5 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50 w-full outline-none focus:outline-none"
+        variant="primary-ghost" className="w-full mb-2"
       >
-        <FaPlus className="!w-4 !h-4 !text-[#646cff] mr-1" />
+        <FaPlus className="!w-4 !h-4 !text-primary mr-1" />
         {CONSTANTS.STRINGS.ADD_TABLE_BUTTON_TEXT}
-      </button>
+      </Button>
 
       {isLoadingDatabaseTables || isFetchingDatabaseTables ? (
         <div role="status" className=" animate-pulse w-full">
@@ -54,16 +55,11 @@ export const DatabaseTableDrawerList = () => {
                 className="block mb-2 focus:outline-none "
               >
                 <div
-                  className={`flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 ${
-                    isActive ? "bg-[#eaebff]" : "bg-white text-gray-700"
+                  className={`flex items-center gap-2 px-2 py-1.5 rounded-md transition-colors ${isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   }`}
                 >
-                  <div className="!w-[16px]">
-                    <FaTable
-                      className={`w-[16px] h-[16px] ${
-                        isActive ? "text-primary" : "text-slate-600"
-                      }`}
-                    />
+                  <div className="!w-4">
+                    <FaTable className="w-4 h-4" />
                   </div>
 
                   <span
@@ -80,7 +76,7 @@ export const DatabaseTableDrawerList = () => {
           })}
         </div>
       ) : (
-        <div className=" text-gray-500 dark:text-gray-400">
+            <div className="text-muted-foreground text-center p-4">
           <NoEntityUI message={CONSTANTS.STRINGS.TABLE_DRAWER_LIST_NO_TABLE} />
         </div>
       )}

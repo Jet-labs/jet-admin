@@ -32,7 +32,7 @@ export const DatabaseTableStats = ({ databaseTables }) => {
         {/* Total Tables */}
         <div className="bg-white rounded border border-slate-200 p-4 flex flex-col justify-start items-start space-x-4">
           <div className="flex flex-row justify-start items-center">
-            <FaDatabase className="text-lg text-[#646cff]" />
+            <FaDatabase className="text-lg text-primary" />
             <p className="text-sm text-slate-500 ml-2">
               {CONSTANTS.STRINGS.DATABASE_TABLES_STATS_TOTAL_TABLES_LABEL}
             </p>
@@ -44,7 +44,7 @@ export const DatabaseTableStats = ({ databaseTables }) => {
         {/* Total Columns */}
         <div className="bg-white rounded border border-slate-200 p-4 flex flex-col justify-start items-start space-x-4">
           <div className="flex flex-row justify-start items-center">
-            <FaColumns className="text-lg text-[#646cff]" />
+            <FaColumns className="text-lg text-primary" />
             <p className="text-sm text-slate-500 ml-2">
               {CONSTANTS.STRINGS.DATABASE_TABLES_STATS_TOTAL_COLUMNS_LABEL}
             </p>
@@ -56,7 +56,7 @@ export const DatabaseTableStats = ({ databaseTables }) => {
         {/* Tables with Primary Keys */}
         <div className="bg-white rounded border border-slate-200 p-4 flex flex-col justify-start items-start space-x-4">
           <div className="flex flex-row justify-start items-center">
-            <FaKey className="text-lg text-[#646cff]" />
+            <FaKey className="text-lg text-primary" />
             <p className="text-sm text-slate-500 ml-2">
               {
                 CONSTANTS.STRINGS
@@ -71,7 +71,7 @@ export const DatabaseTableStats = ({ databaseTables }) => {
         {/* Total Constraints */}
         <div className="bg-white rounded border border-slate-200 p-4 flex flex-col justify-start items-start space-x-4">
           <div className="flex flex-row justify-start items-center">
-            <FaLink className="text-lg text-[#646cff]" />
+            <FaLink className="text-lg text-primary" />
             <p className="text-sm text-slate-500 ml-2">
               {CONSTANTS.STRINGS.DATABASE_TABLES_STATS_TOTAL_CONSTRAINTS_LABEL}
             </p>

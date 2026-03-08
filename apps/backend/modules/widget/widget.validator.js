@@ -16,10 +16,10 @@ const createWidgetSchema = z.object({
 }).passthrough();
 
 const updateWidgetSchema = z.object({
-  widgetTitle: z.string().min(1, "widgetTitle is required").max(255),
+  widgetTitle: z.string().min(1).max(255).optional(),
   widgetDescription: z.string().optional(),
-  widgetType: z.string().min(1, "widgetType is required"),
-  widgetConfig: z.object({}).passthrough(),
+  widgetType: z.string().min(1).optional(),
+  widgetConfig: z.object({}).passthrough().optional(),
 }).passthrough();
 
 const testWidgetDataSchema = z.object({

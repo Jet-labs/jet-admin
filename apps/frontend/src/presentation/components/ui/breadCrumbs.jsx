@@ -23,11 +23,11 @@ export const Breadcrumbs = () => {
           <>
             <Link
               to={url}
-              className="text-xs text-[#646cff]/80 hover:text-[#646cff] transition duration-150"
+              className="text-xs text-primary/80 hover:text-primary transition duration-150"
             >
                 {segment.length > 8 ? segment.slice(0, 8) + "..." : segment}
             </Link>
-            <FiChevronRight className="text-[#646cff]/80 mx-1" />
+            <FiChevronRight className="text-primary/80 mx-1" />
           </>
         )}
       </div>
@@ -38,12 +38,12 @@ export const Breadcrumbs = () => {
     <div className="flex items-center bg-slate-100 p-1 rounded  mx-3">
       <a
         href="/"
-        className="text-xs text-[#646cff]/80 hover:text-[#646cff] transition duration-150"
+        className="text-xs text-primary/80 hover:text-primary transition duration-150"
       >
         Home
       </a>
       {segments.length > 0 && (
-        <FiChevronRight className="text-[#646cff]/80 mx-1" />
+        <FiChevronRight className="text-primary/80 mx-1" />
       )}
       {breadcrumbs}
     </div>

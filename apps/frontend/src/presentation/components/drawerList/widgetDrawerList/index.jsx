@@ -6,6 +6,7 @@ import { CONSTANTS } from "../../../../constants";
 import { useWidgetsState } from "../../../../logic/contexts/widgetsContext";
 import { NoEntityUI } from "../../ui/noEntityUI";
 
+import { Button } from "@jet-admin/ui";
 export const WidgetDrawerList = () => {
   const { isLoadingWidgets, widgets, isFetchingWidgets } = useWidgetsState();
   const routeParam = useParams();
@@ -15,30 +16,41 @@ export const WidgetDrawerList = () => {
     navigate(CONSTANTS.ROUTES.ADD_WIDGET.path(tenantID));
   };
   const _renderWidgetIcon = (widgetType, isActive) => {
-    return WIDGETS_MAP[widgetType].icon({
+    const widgetConfig = WIDGETS_MAP[widgetType];
+    if (!widgetConfig || !widgetConfig.icon) {
+      // Fallback for legacy widget types that no longer exist
+      return (
+        <span className={`text-xl ${isActive ? "text-primary" : "text-muted-foreground"}`}>
+          📊
+        </span>
+      );
+    }
+    return widgetConfig.icon({
       className: `!text-xl ${
-        isActive ? "!text-[#646cff] " : "!text-slate-700 "
+        isActive ? "!text-primary" : "!text-muted-foreground"
       }`,
     });
   };
+
   return (
-    <div className=" bg-white   h-[calc(100vh-48px)] overflow-hidden p-2 w-full">
-      <button
+    <div className="bg-background flex h-full w-full flex-col gap-3 overflow-hidden p-3">
+      <Button
         onClick={_navigateToAddMoreWidget}
-        className="flex mb-2 flex-row items-center justify-center rounded bg-[#646cff]/10 px-3 py-1.5 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50 w-full outline-none focus:outline-none"
+        variant="primary-ghost"
+        className="w-full justify-start"
       >
-        <FaPlus className="!w-4 !h-4 !text-[#646cff] mr-1" />
+        <FaPlus className="!w-4 !h-4 !text-primary mr-1" />
         {CONSTANTS.STRINGS.ADD_WIDGET_BUTTON_TEXT}
-      </button>
+      </Button>
       {isLoadingWidgets || isFetchingWidgets ? (
-        <div role="status" className=" animate-pulse w-full">
-          <div className="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
-          <div className="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
-          <div className="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
-          <div className="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
+        <div role="status" className="animate-pulse w-full space-y-2">
+          <div className="h-9 bg-muted rounded-md w-full" />
+          <div className="h-9 bg-muted rounded-md w-full" />
+          <div className="h-9 bg-muted rounded-md w-full" />
+          <div className="h-9 bg-muted rounded-md w-full" />
         </div>
       ) : widgets && widgets.length > 0 ? (
-          <div className="h-full w-full overflow-y-auto pb-10">
+          <div className="flex-1 h-full w-full overflow-y-auto pb-10 space-y-1">
           {widgets.map((widget) => {
             const key = `widget_${widget.widgetID}`;
             const isActive = routeParam?.widgetID == widget.widgetID;
@@ -50,21 +62,20 @@ export const WidgetDrawerList = () => {
                   widget.widgetID
                 )}
                 key={key}
-                className="block mb-2 focus:outline-none "
+                className="block focus:outline-none"
               >
                 <div
-                  className={`flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 ${
-                    isActive ? "bg-[#eaebff]" : "bg-white text-gray-700"
+                  className={`flex items-center gap-2 rounded-md px-3 py-2 transition-colors ${isActive
+                      ? "bg-primary/10 text-primary"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   }`}
                 >
                   {_renderWidgetIcon(widget.widgetType, isActive)}
 
                   <span
-                    className={`font-medium text-sm truncate ${
-                      isActive ? "font-bold" : ""
-                    } `}
+                    className={`text-sm truncate ${isActive ? "font-semibold" : "font-medium"
+                      }`}
                   >
-                    {/* {StringUtils.truncateName(widget.widgetTitle, 15)} */}
                     {`${widget.widgetTitle}`}
                   </span>
                 </div>
@@ -73,7 +84,7 @@ export const WidgetDrawerList = () => {
           })}
         </div>
       ) : (
-        <div className=" text-gray-500 dark:text-gray-400">
+            <div className="flex flex-1 items-center justify-center p-4 text-muted-foreground">
           <NoEntityUI
             message={CONSTANTS.STRINGS.WIDGET_DRAWER_LIST_NO_WIDGET}
           />

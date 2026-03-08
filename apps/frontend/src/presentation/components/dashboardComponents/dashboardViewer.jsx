@@ -53,7 +53,7 @@ export const DashboardViewer = ({ tenantID, dashboardID }) => {
           )}
 
           {dashboard && (
-            <span className="text-xs text-[#646cff] mt-2">{`Dashboard ID: ${dashboard.dashboardID} `}</span>
+            <span className="text-xs text-primary mt-2">{`Dashboard ID: ${dashboard.dashboardID} `}</span>
           )}
         </div>
         <div className="flex flex-row justify-end items-center">

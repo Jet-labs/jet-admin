@@ -1,10 +1,9 @@
 // DrawerLinkItem.jsx
-import { capitalize } from "@mui/material";
 import { Link, useLocation } from "react-router-dom";
 // MainDrawerList.jsx (Updated)
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import SettingsIcon from "@mui/icons-material/Settings";
+import { ChevronDown, ChevronUp, Settings } from "lucide-react";
+
+const capitalize = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
 import { useQuery } from "@tanstack/react-query";
 import React, { useState } from "react";
 import { BsServer } from "react-icons/bs";
@@ -31,6 +30,14 @@ import PropTypes from "prop-types";
 import { GoWorkflow } from "react-icons/go";
 import { LuWorkflow } from "react-icons/lu";
 
+import {
+  Button,
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent,
+  ScrollArea,
+} from "@jet-admin/ui";
 // eslint-disable-next-line no-unused-vars
 const DrawerLinkItem = ({ item, tenantID }) => {
   DrawerLinkItem.propTypes = {
@@ -43,22 +50,17 @@ const DrawerLinkItem = ({ item, tenantID }) => {
   return (
     <Link
       to={item.path}
-      className={`flex items-center ${
-        isActive ? "bg-[#eaebff]" : "bg-slate-100"
-      } rounded w-full p-2 text-slate-700 transition duration-75 group bg-slate-200  hover:bg-slate-100  flex-row !justify-start`}
+      className={`flex items-center rounded-md w-full p-2.5 transition duration-75 group flex-row !justify-start ${isActive
+        ? "bg-primary/10 text-primary"
+        : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+        }`}
     >
       <item.icon
         className={`!w-5 !h-5 ${
-          isActive ? "!text-[#646cff]" : "!text-slate-700"
-        }`}
+          isActive ? "!text-primary" : "!text-slate-600"
+          } group-hover:text-slate-900`}
       />
-      <span
-        className={`font-semibold text-sm ml-2 ${
-          isActive ? "!text-[#646cff]" : "!text-slate-700"
-        }`}
-      >
-        {capitalize(item.title)}
-      </span>
+      <span className="font-semibold text-sm ml-3">{capitalize(item.title)}</span>
     </Link>
   );
 };
@@ -74,21 +76,16 @@ const DrawerSubMenuItem = ({ subItem, tenantID }) => {
   return (
     <Link
       to={subItem.path}
-      className={`flex items-center ${
-        isActive ? "bg-[#eaebff]" : "bg-slate-100"
-      } rounded mb-2 w-full p-2 text-slate-700 transition duration-75 group hover:bg-[#eaebff]  flex-row justify-start `}
+      className={`flex items-center rounded-md mb-1 w-full p-2 transition duration-75 flex-row justify-start group ${isActive
+        ? "bg-primary/10 text-primary"
+        : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+        }`}
     >
       <subItem.icon
-        fontSize="small"
-        className={`${isActive ? "!text-[#646cff]" : "!text-slate-700"}`}
+        className={`!w-4 !h-4 ${isActive ? "!text-primary" : "!text-slate-500"
+          } group-hover:text-slate-900`}
       />
-      <span
-        className={` font-semisolid text-sm ml-1 ${
-          isActive ? "!text-[#646cff]" : "!text-slate-700"
-        }`}
-      >
-        {capitalize(subItem.name)}
-      </span>
+      <span className="font-medium text-sm ml-3">{capitalize(subItem.name)}</span>
     </Link>
   );
 };
@@ -110,31 +107,23 @@ const DrawerCollapsibleItem = ({
     tenantID: PropTypes.number.isRequired,
   };
   return (
-    <div>
-      <button
-        type="button"
-        className="w-full hover:border-none border-none text-slate-900 bg-slate-200 justify-between hover:bg-slate-100 focus:outline-none  font-medium rounded text-sm px-1 py-2 text-center inline-flex items-center"
-        onClick={() => setExpanded()}
-      >
-        <item.icon className="!w-5 !h-5 !text-slate-600 ml-1" />
-        <span className="flex-1 ms-2 text-left font-semibold rtl:text-right whitespace-nowrap text-slate-700">
-          {item.title}
-        </span>
-        {isExpanded ? (
-          <KeyboardArrowUpIcon fontSize="small" />
-        ) : (
-          <KeyboardArrowDownIcon fontSize="small" />
-        )}
-      </button>
-      {isExpanded && (
-        <ul className=" space-y-2 rounded mt-2">
+    <AccordionItem value={item.expandedStateKey} className="border-none">
+      <AccordionTrigger className="w-full hover:no-underline hover:bg-slate-100 rounded-md p-2.5 text-slate-700 data-[state=open]:text-slate-900 transition-colors">
+        <div className="flex items-center">
+          <item.icon className="!w-5 !h-5 !text-slate-600" />
+          <span className="flex-1 ms-3 text-left font-semibold whitespace-nowrap">
+            {item.title}
+          </span>
+        </div>
+      </AccordionTrigger>
+      <AccordionContent className="pb-0 pt-1">
+        <ul className="space-y-1 ml-6 border-l pl-2 border-slate-200">
           <li>
             {isLoadingMetadata || isFetchingMetadata ? (
-              <div role="status" className=" animate-pulse">
-                <div className="h-8 bg-gray-200 rounded    mb-2"></div>
-                <div className="h-8 bg-gray-200 rounded    mb-2"></div>
-                <div className="h-8 bg-gray-200 rounded    mb-2"></div>
-                <div className="h-8 bg-gray-200 rounded    mb-2"></div>
+              <div role="status" className="animate-pulse">
+                <div className="h-8 bg-slate-200 rounded mb-2 w-full"></div>
+                <div className="h-8 bg-slate-200 rounded mb-2 w-full"></div>
+                <div className="h-8 bg-slate-200 rounded w-[80%]"></div>
               </div>
             ) : (
               item.subItems.map((subItem, subIndex) => (
@@ -146,18 +135,19 @@ const DrawerCollapsibleItem = ({
               ))
             )}
             {item.addButton && (
-              <button
+              <Button
                 onClick={item.addButton.onClick}
-                className="flex mt-2 flex-row items-center justify-center rounded bg-[#646cff]/10 px-3 py-1.5 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50 w-full outline-none focus:outline-none"
+                variant="primary-ghost"
+                className="w-full mt-2 justify-start px-2 py-1.5 h-auto text-sm"
               >
-                <item.addButton.icon className="!w-4 !h-4 !text-[#646cff] mr-1" />
+                <item.addButton.icon className="!w-3.5 !h-3.5 mr-2" />
                 {item.addButton.text}
-              </button>
+              </Button>
             )}
           </li>
         </ul>
-      )}
-    </div>
+      </AccordionContent>
+    </AccordionItem>
   );
 };
 
@@ -168,10 +158,10 @@ export const MainDrawerList = () => {
   const { tenantID } = useParams();
   const [ref] = useComponentSize();
 
-  const [menuItemExpandedState, setMenuItemExpandedState] = useState({
-    databaseSchema: false,
-    userManagement: false,
-  });
+  const [menuItemExpandedState, setMenuItemExpandedState] = useState([
+    "databaseSchema",
+    "userManagement",
+  ]);
 
   const {
     isLoading: isLoadingDatabaseMetadata,
@@ -291,66 +281,66 @@ export const MainDrawerList = () => {
   return (
     <aside
       id="logo-sidebar"
-      className=" w-full h-[calc(100vh-50px)] overflow-y-auto transition-transform bg-white  flex flex-col justify-start items-stretch gap-2 "
+      className="w-full h-[calc(100vh-50px)] overflow-hidden transition-transform bg-white flex flex-col justify-start items-stretch"
       aria-label="Sidebar"
       ref={ref}
     >
-      <div className="h-full p-2 overflow-y-auto bg-white flex flex-col justify-start items-stretch gap-2">
+      <div className="p-3 bg-white flex flex-col justify-start items-stretch z-10 sticky top-0 border-b border-transparent">
         {isLoadingTenants ? (
           <div
             role="status"
-            className=" animate-pulse w-full flex flex-row justify-start items-end"
+            className="animate-pulse w-full flex flex-row justify-start items-end"
           >
-            <div className="h-10 bg-gray-200 w-10 rounded-md"></div>
+            <div className="h-10 bg-slate-200 w-10 rounded-md"></div>
             <div className="flex flex-col justify-start items-start flex-grow ms-2">
-              <div className="h-2 bg-gray-200 rounded    mb-2 w-16"></div>
-              <div className="h-2 bg-gray-200 rounded    mb-2 w-full"></div>
-              <div className="h-2 bg-gray-200 rounded    mb-0 w-full"></div>
+              <div className="h-2 bg-slate-200 rounded mb-2 w-16"></div>
+              <div className="h-2 bg-slate-200 rounded mb-2 w-full"></div>
+              <div className="h-2 bg-slate-200 rounded mb-0 w-full"></div>
             </div>
           </div>
         ) : tenants && tenants.length > 0 ? (
-          <div className="flex flex-row justify-around items-center w-full">
+            <div className="flex flex-row justify-around items-center w-full gap-2">
             <TenantSelectionDropdown />
-            {
-              <button
+              <Button
                 onClick={_handleNavigateToEditTenantPage}
-                className="ml-2 text-slate-900 bg-white justify-between hover:bg-slate-100 border border-slate-300 focus:ring-4 focus:outline-none focus:ring-slate-100 font-medium rounded text-sm p-2 text-center inline-flex items-center"
+                variant="outline"
+                className="h-10 w-10 rounded-md flex justify-center items-center hover:bg-slate-100 p-2.5"
               >
-                <SettingsIcon className="!w-6 !h-6 !text-slate-600" />
-              </button>
-            }
+                <Settings className="w-8 h-8 text-slate-600" />
+              </Button>
           </div>
         ) : (
           <>
-            <button
+                <Button
               onClick={_handleNavigateToAddTenantPage}
-                  className="flex flex-row items-center justify-center rounded bg-[#646cff] px-3 py-1.5 text-sm text-white hover:bg-[#646cff]/90 focus:ring-2 focus:ring-[#646cff]/50 w-full outline-none focus:outline-none"
+                  className="w-full"
             >
               {CONSTANTS.STRINGS.ADD_TENANT_FORM_TITLE}
-              <FaPlus className="!w-4 !h-4 !text-white ml-1" />
-            </button>
+                  <FaPlus className="!w-4 !h-4 !text-white ml-2" />
+                </Button>
             <NoEntityUI
               message={CONSTANTS.STRINGS.NO_TENANT_CREATED_TILL_NOW}
             />
           </>
         )}
+      </div>
 
+      <ScrollArea className="flex-1 w-full p-3 pt-1">
         {tenantID ? (
-          <>
+          <Accordion
+            type="multiple"
+            value={menuItemExpandedState}
+            onValueChange={setMenuItemExpandedState}
+            className="w-full flex flex-col space-y-1"
+          >
             {drawerListItems.map((item, index) => {
               if (item.type === "collapsible") {
                 return (
                   <DrawerCollapsibleItem
                     key={index}
                     item={item}
-                    isExpanded={menuItemExpandedState[item.expandedStateKey]}
-                    setExpanded={() =>
-                      setMenuItemExpandedState((prevState) => ({
-                        ...prevState,
-                        [item.expandedStateKey]:
-                          !prevState[item.expandedStateKey],
-                      }))
-                    }
+                    isExpanded={menuItemExpandedState.includes(item.expandedStateKey)}
+                    setExpanded={() => { }}
                     isLoadingMetadata={isLoadingDatabaseMetadata}
                     isFetchingMetadata={isFetchingDatabaseMetadata}
                     tenantID={tenantID}
@@ -363,9 +353,9 @@ export const MainDrawerList = () => {
               }
               return null;
             })}
-          </>
+          </Accordion>
         ) : null}
-      </div>
+      </ScrollArea>
     </aside>
   );
 };

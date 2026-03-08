@@ -12,18 +12,19 @@ import {
 export const CronJobLayout = () => {
   return (
     <CronJobsContextProvider>
-      <div className="flex h-full w-full flex-col justify-start items-stretch overflow-hidden">
+      <div className="flex h-full w-full flex-col overflow-hidden bg-background">
         <ResizablePanelGroup
           direction="horizontal"
           autoSaveId={
             CONSTANTS.RESIZABLE_PANEL_KEYS.DATABASE_CRON_JOB_LAYOUT_SEPARATION
           }
+          className="h-full w-full"
         >
           <ResizablePanel defaultSize={20}>
             <CronJobDrawerList />
           </ResizablePanel>
           <ResizableHandle withHandle={true} />
-          <ResizablePanel defaultSize={80}>
+          <ResizablePanel defaultSize={80} className="overflow-hidden bg-background">
             <Outlet />
           </ResizablePanel>
         </ResizablePanelGroup>

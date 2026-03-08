@@ -50,6 +50,7 @@ export const CONSTANTS = {
     WIDGET_INPUT_RECEIVED: "widget_input_received",
   },
   STRINGS: {
+    UPDATING: "Updating...",
     ADD_WORKFLOW_FORM_WORKFLOW_ADDITION_SUCCESS: "Workflow added successfully!",
     WORKFLOW_EDITOR_DATA_QUERY_TITLE_LABEL: "Query name",
     WORKFLOW_EDITOR_DATA_QUERY_TITLE_PLACEHOLDER: "Your query's name",
@@ -690,7 +691,14 @@ export const CONSTANTS = {
     USER_NOTIFICATIONS_TITLE: "Notifications",
 
     WIDGET_EDITOR_FORM_NAME_FIELD_LABEL: "Widget name",
+    WIDGET_EDITOR_FORM_WORKFLOW_LABEL: "Workflow",
     WIDGET_EDITOR_FORM_NAME_FIELD_PLACEHOLDER: "Your widget's name",
+    WIDGET_EDITOR_FORM_WORKFLOW_PLACEHOLDER: "Select workflow",
+    TEST_WORKFLOW_BUTTON: "Test workflow",
+    TEST_WORKFLOW_BUTTON_RUNNING: "Running...",
+    TEST_WORKFLOW_BUTTON_STOP: "Stop",
+    WIDGET_EDITOR_FORM_SETTINGS_BUTTON: "Settings",
+    WIDGET_EDITOR_FORM_DATASOURCE_LABEL: "Datasource",
     WIDGET_EDITOR_FORM_TYPE_FIELD_LABEL: "Widget type",
     WIDGET_EDITOR_FORM_ADVANCED_BUTTON: "Advanced config",
     WIDGET_EDITOR_FORM_TITLE_ENABLED_FIELD_LABEL: "Title enabled",
@@ -1578,6 +1586,12 @@ export const CONSTANTS = {
     _text: {
       name: "_text",
       value: "Array of values (e.g., text[])",
+      js_type: "array",
+      normalizedType: "String",
+    },
+    _varchar: {
+      name: "_varchar",
+      value: "Array of varchar values (e.g., varchar[])",
       js_type: "array",
       normalizedType: "String",
     },

@@ -1,4 +1,3 @@
-import { CircularProgress } from "@mui/material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MdDeleteOutline } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
@@ -9,10 +8,13 @@ import { displayError, displaySuccess } from "../../../utils/notification";
 import PropTypes from "prop-types";
 import React from "react";
 
+import { Button, Spinner } from "@jet-admin/ui";
 export const DashboardDeletionForm = ({ tenantID, dashboardID }) => {
   DashboardDeletionForm.propTypes = {
-    tenantID: PropTypes.number.isRequired,
-    dashboardID: PropTypes.number.isRequired,
+    tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+      .isRequired,
+    dashboardID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+      .isRequired,
   };
   const navigate = useNavigate();
   const { showConfirmation } = useGlobalUI();
@@ -49,19 +51,20 @@ export const DashboardDeletionForm = ({ tenantID, dashboardID }) => {
   };
 
   return (
-    <>
-      <button
-        onClick={_handleDeleteDashboard}
-        disabled={isDeletingDashboard}
-        type="button"
-        className="flex flex-row items-center justify-center rounded bg-red-50 ms-2 px-1 py-1 text-xs text-red-400 hover:bg-red-100 focus:ring-2 focus:ring-red-400 outline-none focus:outline-none hover:border-red-400"
-      >
-        {isDeletingDashboard ? (
-          <CircularProgress size={16} color="white" />
-        ) : (
-          <MdDeleteOutline className="text-xl text-red-400 hover:text-red-500" />
-        )}
-      </button>
-    </>
+    <Button
+      variant="destructive-ghost"
+      size="icon"
+      onClick={_handleDeleteDashboard}
+      disabled={isDeletingDashboard}
+      type="button"
+      className="shrink-0"
+      aria-label="Delete dashboard"
+    >
+      {isDeletingDashboard ? (
+        <Spinner size={16} />
+      ) : (
+        <MdDeleteOutline className="h-4 w-4" />
+      )}
+    </Button>
   );
 };

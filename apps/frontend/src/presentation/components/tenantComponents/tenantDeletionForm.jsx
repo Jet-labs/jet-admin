@@ -1,4 +1,3 @@
-import { CircularProgress } from "@mui/material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
@@ -8,6 +7,7 @@ import PropTypes from "prop-types";
 import React from "react";
 import { deleteUserTenantByIDAPI } from "../../../data/apis/tenant";
 
+import { Button, Spinner } from "@jet-admin/ui";
 export const TenantDeletionForm = ({ tenantID }) => {
   TenantDeletionForm.propTypes = {
     tenantID: PropTypes.number.isRequired,
@@ -44,19 +44,14 @@ export const TenantDeletionForm = ({ tenantID }) => {
 
   return (
     <>
-      <button
-        onClick={_handleDeleteTenant}
-        disabled={isDeletingTenant}
-        type="button"
-        className="flex flex-row items-center justify-center rounded bg-red-50 ms-2 px-3 py-1.5 text-xs font-medium text-center text-red-400 hover:bg-red-100 focus:ring-2 focus:ring-red-400 outline-none focus:outline-none hover:border-red-400"
-      >
+      <Button variant="destructive-ghost" onClick={_handleDeleteTenant} disabled={isDeletingTenant} type="button">
         {isDeletingTenant ? (
-          <CircularProgress className="mr-2" size={16} color="white" />
+          <Spinner className="mr-2" size={16} />
         ) : null}
         {isDeletingTenant
           ? "Deleting..."
           : CONSTANTS.STRINGS.DELETE_TENANT_CONFIRM_BUTTON}
-      </button>
+      </Button>
     </>
   );
 };

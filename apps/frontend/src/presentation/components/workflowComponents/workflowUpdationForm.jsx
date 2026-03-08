@@ -1,3 +1,4 @@
+import React from "react";
 import { useFormik } from "formik";
 import PropTypes from "prop-types";
 import { CONSTANTS } from "../../../constants";
@@ -6,8 +7,9 @@ import { WorkflowEditor } from "./workflowEditor";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { getWorkflowByIDAPI, updateWorkflowAPI } from "../../../data/apis/workflow";
 import { displayError, displaySuccess } from "../../../utils/notification";
-import { CircularProgress } from "@mui/material";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
+
+import { Button, Spinner } from "@jet-admin/ui";
 
 export const WorkflowUpdationForm = ({ tenantID, workflowID }) => {
   WorkflowUpdationForm.propTypes = {
@@ -20,9 +22,6 @@ export const WorkflowUpdationForm = ({ tenantID, workflowID }) => {
     isLoading: isLoadingWorkflow,
     data: workflow,
     error: loadWorkflowError,
-    isFetching: isFetchingWorkflow,
-    isRefetching: isRefetechingWorkflow,
-    refetch: refetchWorkflow,
   } = useQuery({
     queryKey: [CONSTANTS.REACT_QUERY_KEYS.WORKFLOWS(tenantID), workflowID],
     queryFn: () => getWorkflowByIDAPI({ tenantID, workflowID }),
@@ -32,7 +31,6 @@ export const WorkflowUpdationForm = ({ tenantID, workflowID }) => {
   const {
     isPending: isUpdatingWorkflow,
     mutate: updateWorkflow,
-    error: updateWorkflowError,
   } = useMutation(
     {
       mutationFn: (data) => {
@@ -69,40 +67,44 @@ export const WorkflowUpdationForm = ({ tenantID, workflowID }) => {
     enableReinitialize: true,
     onSubmit: (values) => {
       updateWorkflow(values);
-      console.log(values);
     },
   });
 
-  return <div className="w-full flex flex-col justify-start items-center h-full">
-    <div className="w-full p-3 border-b border-slate-200 flex flex-row justify-between items-center">
-      <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl text-start">
-        {CONSTANTS.STRINGS.UPDATE_WORKFLOW_FORM_TITLE}
-      </h1>
-      <button
-        type="button"
-        onClick={workflowUpdationForm.handleSubmit}
-        disabled={isUpdatingWorkflow}
-        className="flex flex-row items-center justify-center rounded bg-[#646cff] px-3 py-1 text-sm text-white  focus:ring-2 focus:ring-[#646cff]/50  outline-none focus:outline-none"
+  return (
+    <div className="flex h-full w-full flex-col items-center bg-background">
+      <div className="flex w-full flex-row items-start justify-between border-b border-border bg-background p-3">
+        <div className="flex flex-col">
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground text-start">
+            {CONSTANTS.STRINGS.UPDATE_WORKFLOW_FORM_TITLE}
+          </h1>
+          {workflow && (
+            <span className="mt-1 text-xs text-muted-foreground">
+              {`Workflow ID: ${workflow.workflowID}`}
+            </span>
+          )}
+        </div>
+        <Button
+          type="button"
+          onClick={workflowUpdationForm.handleSubmit}
+          disabled={isUpdatingWorkflow}
+        >
+          {isUpdatingWorkflow && (
+            <Spinner className="mr-2" size={16} />
+          )}
+          {CONSTANTS.STRINGS.UPDATE_WORKFLOW_BUTTON_TEXT}
+        </Button>
+      </div>
+      <ReactQueryLoadingErrorWrapper
+        isLoading={isLoadingWorkflow}
+        error={loadWorkflowError}
       >
-        {isUpdatingWorkflow && (
-          <CircularProgress className="!mr-3" size={16} color="white" />
-        )}
-        {CONSTANTS.STRINGS.UPDATE_WORKFLOW_BUTTON_TEXT}
-      </button>
+        <form
+          className="w-full flex-1 overflow-hidden"
+          onSubmit={workflowUpdationForm.handleSubmit}
+        >
+          <WorkflowEditor workflowEditorForm={workflowUpdationForm} />
+        </form>
+      </ReactQueryLoadingErrorWrapper>
     </div>
-    <ReactQueryLoadingErrorWrapper
-      isLoading={isLoadingWorkflow}
-      isFetching={isFetchingWorkflow}
-      isRefetching={isRefetechingWorkflow}
-      refetch={refetchWorkflow}
-      error={loadWorkflowError}
-    ><form
-      className="w-full h-full "
-      onSubmit={workflowUpdationForm.handleSubmit}
-    >
-        <WorkflowEditor workflowEditorForm={workflowUpdationForm} />
-      </form></ReactQueryLoadingErrorWrapper>
-
-
-  </div>
-}
+  );
+};

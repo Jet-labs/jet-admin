@@ -1,11 +1,6 @@
 import React from "react";
 import { FaRobot, FaUser } from "react-icons/fa";
 
-// eslint-disable-next-line no-unused-vars
-import {
-    Avatar,
-    Fade,
-} from "@mui/material";
 import PropTypes from "prop-types";
 import { AIChatRenderMessage } from "./aiChatRenderMessage";
 
@@ -20,66 +15,48 @@ export const AIChatMessageBubble = React.memo(({ message, sendApproval, isTyping
     const isUser = message.type === 'user';
 
     return (
-        <Fade in={true} timeout={300}>
-            <div className={`flex gap-3 mb-6 ${isUser ? 'justify-end' : 'justify-start'}`}>
-                {!isUser && (
-                    <Avatar
-                        sx={{
-                            width: 32,
-                            height: 32,
-                            bgcolor: '#646cff',
-                            fontSize: '14px'
-                        }}
-                    >
-                        <FaRobot />
-                    </Avatar>
-                )}
-
-                <div className={`max-w-[80%] ${isUser ? 'order-first' : ''}`}>
-                    <div
-                        className={`
-                            px-4 py-3 text-sm leading-relaxed
-                            ${isUser
-                                ? 'bg-[#646cff] text-white ml-auto'
-                                : 'bg-gray-100 text-gray-800'
-                            }
-
-                            shadow-sm
-                        `}
-                        style={{ borderRadius: '6px' }}
-                    >
-                        {isTyping ? (
-                            <div className="flex items-center gap-1">
-                                <div className="flex gap-1">
-                                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                                    <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-                                </div>
-                                <span className="ml-2 text-xs text-gray-500">AI is typing...</span>
-                            </div>
-                        ) : (
-                                <AIChatRenderMessage message={message} key={message.timestamp} sendApproval={sendApproval} />
-                        )}
-                    </div>
-                    <div className={`text-xs text-gray-500 mt-1 ${isUser ? 'text-right' : 'text-left'}`}>
-                        {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                    </div>
+        <div className={`flex gap-3 mb-6 animate-in fade-in duration-300 ${isUser ? 'justify-end' : 'justify-start'}`}>
+            {!isUser && (
+                <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-sm shrink-0">
+                    <FaRobot />
                 </div>
+            )}
 
-                {isUser && (
-                    <Avatar
-                        sx={{
-                            width: 32,
-                            height: 32,
-                            bgcolor: '#6366f1',
-                            fontSize: '14px'
-                        }}
-                    >
-                        <FaUser />
-                    </Avatar>
-                )}
+            <div className={`max-w-[80%] ${isUser ? 'order-first' : ''}`}>
+                <div
+                    className={`
+                        px-4 py-3 text-sm leading-relaxed rounded-md
+                        ${isUser
+                            ? 'bg-primary text-white ml-auto'
+                            : 'bg-gray-100 text-gray-800'
+                        }
+                        shadow-sm
+                    `}
+                >
+                    {isTyping ? (
+                        <div className="flex items-center gap-1">
+                            <div className="flex gap-1">
+                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                            </div>
+                            <span className="ml-2 text-xs text-gray-500">AI is typing...</span>
+                        </div>
+                    ) : (
+                        <AIChatRenderMessage message={message} key={message.timestamp} sendApproval={sendApproval} />
+                    )}
+                </div>
+                <div className={`text-xs text-gray-500 mt-1 ${isUser ? 'text-right' : 'text-left'}`}>
+                    {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </div>
             </div>
-        </Fade>
+
+            {isUser && (
+                <div className="w-8 h-8 rounded-full bg-[#6366f1] flex items-center justify-center text-white text-sm shrink-0">
+                    <FaUser />
+                </div>
+            )}
+        </div>
     );
 });
 

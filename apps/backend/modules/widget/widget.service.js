@@ -310,6 +310,10 @@ const _executeWorkflowMode = async ({ widget, tenantID, executionMode = 'ASYNC' 
           widgetType: widget.widgetType,
           datasetFields: workflowConfig.datasetFields,
           parameters: workflowConfig.parameters,
+          // For Vega widgets, pass the full workflowConfig
+          workflowConfig: workflowConfig,
+          // NEW: Pass vegaSpec from widgetConfig for new architecture
+          vegaSpec: widget.widgetConfig?.vegaSpec,
         });
 
         return {
@@ -564,11 +568,11 @@ widgetService.updateWidgetByID = async ({
         ...(widgetType != undefined && { widgetType }),
         ...(widgetConfig != undefined && { widgetConfig }),
         ...(workflowConfig != undefined && { workflowConfig }),
-        tblWorkflows: {
-          connect: {
-            workflowID: workflowID,
+        ...(workflowID != undefined && {
+          tblWorkflows: {
+            connect: { workflowID },
           },
-        },
+        }),
       },
     });
 

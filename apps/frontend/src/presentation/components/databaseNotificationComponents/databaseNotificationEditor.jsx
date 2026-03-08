@@ -1,6 +1,8 @@
 import { CONSTANTS } from "../../../constants";
 import PropTypes from "prop-types";
 import React from "react";
+import { Input } from "@jet-admin/ui";
+
 
 export const DatabaseNotificationEditor = ({
   databaseNotificationEditorForm,
@@ -17,7 +19,7 @@ export const DatabaseNotificationEditor = ({
         >
           {CONSTANTS.STRINGS.NOTIFICATION_EDITOR_FORM_NAME_FIELD_LABEL}
         </label>
-        <input
+        <Input
           type="text"
           name="databaseNotificationTitle"
           id="databaseNotificationTitle"

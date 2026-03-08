@@ -91,9 +91,9 @@ export const getFormattedCronJobHistoryColumns = () => {
         },
         renderCell: (params) => {
           return (
-            <div className="space-x-2 w-fit flex h-full flex-row justify-start items-center">
-              <BiCalendar className="text-[#646cff] flex-shrink-0" />
-              <span className="text-justify break-all overflow-hidden text-ellipsis whitespace-pre-wrap h-full flex items-center">
+            <div className="flex h-full w-fit flex-row items-center gap-2 text-muted-foreground">
+              <BiCalendar className="h-4 w-4 flex-shrink-0 text-primary" />
+              <span className="flex h-full items-center overflow-hidden text-ellipsis break-all whitespace-pre-wrap text-xs text-foreground">
                 {params.value
                   ? moment(params.value).toDate().toISOString()
                   : ""}
@@ -116,9 +116,9 @@ export const getFormattedCronJobHistoryColumns = () => {
         },
         renderCell: (params) => {
           return (
-            <div className="space-x-2 w-fit flex h-full flex-row justify-start items-center">
-              <BiCalendar className="text-[#646cff] flex-shrink-0" />
-              <span className="text-justify break-all overflow-hidden text-ellipsis whitespace-pre-wrap h-full flex items-center">
+            <div className="flex h-full w-fit flex-row items-center gap-2 text-muted-foreground">
+              <BiCalendar className="h-4 w-4 flex-shrink-0 text-primary" />
+              <span className="flex h-full items-center overflow-hidden text-ellipsis break-all whitespace-pre-wrap text-xs text-foreground">
                 {params.value
                   ? moment(params.value).toDate().toISOString()
                   : ""}
@@ -141,9 +141,9 @@ export const getFormattedCronJobHistoryColumns = () => {
         },
         renderCell: (params) => {
           return (
-            <div className="space-x-2 w-fit flex h-full flex-row justify-start items-center">
-              <BiCalendar className="text-[#646cff] flex-shrink-0" />
-              <span className="text-justify break-all overflow-hidden text-ellipsis whitespace-pre-wrap h-full flex items-center">
+            <div className="flex h-full w-fit flex-row items-center gap-2 text-muted-foreground">
+              <BiCalendar className="h-4 w-4 flex-shrink-0 text-primary" />
+              <span className="flex h-full items-center overflow-hidden text-ellipsis break-all whitespace-pre-wrap text-xs text-foreground">
                 {params.value
                   ? moment(params.value).toDate().toISOString()
                   : ""}
@@ -166,7 +166,7 @@ export const getFormattedCronJobHistoryColumns = () => {
         },
         renderCell: (params) => {
           return (
-            <div className="max-h-32 overflow-auto rounded !text-slate-700 p-2">
+            <div className="max-h-32 overflow-auto rounded-md border border-border bg-muted/20 p-2 text-foreground">
               <ReactJson
                 src={params.value}
                 theme="rjv-default"

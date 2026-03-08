@@ -6,6 +6,7 @@ import "react-resizable/css/styles.css";
 import { useComponentSize } from "../../../logic/hooks/useComponentSize";
 import { DashboardWidget } from "./dashboardWidget";
 
+import { Button } from "@jet-admin/ui";
 export const DashboardRenderWidget = ({
   widget,
   tenantID,
@@ -29,7 +30,7 @@ export const DashboardRenderWidget = ({
   return (
     <div
       className={`!h-full !w-full flex-grow relative  ${
-        isMouseHover ? "border border-[#646cff]" : "border border-slate-200"
+        isMouseHover ? "border border-primary" : "border border-slate-200"
       }`}
       onMouseEnter={
         editable
@@ -58,11 +59,11 @@ export const DashboardRenderWidget = ({
           className="!flex-row justify-end !items-center !w-full  absolute top-0 left-0 z-50"
           style={{}}
         >
-          <button
+          <Button
             onClick={() => {
               handleDelete(index);
             }}
-            className="p-1 rounded-none m-0 bg-[#646cff]"
+            className="p-1 rounded-none m-0"
             onMouseDown={(e) => {
               e.stopPropagation();
             }}
@@ -71,7 +72,7 @@ export const DashboardRenderWidget = ({
             }}
           >
             <FaTimes className="!text-xs text-white" />
-          </button>
+          </Button>
         </div>
       )}
       <div

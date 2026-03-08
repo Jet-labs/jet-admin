@@ -1,12 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { FaPlus, FaTimes } from "react-icons/fa";
-import { Menu, MenuItem } from "@mui/material";
 import { CONSTANTS } from "../../../constants";
 import { getDatabaseMetadataAPI } from "../../../data/apis/database";
 import PropTypes from "prop-types";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 
+import { Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
 const MultipleColumnSelectDropdownForForeignKeyConstraint = ({
   tableEditorForm,
   fkIndex,
@@ -17,18 +17,26 @@ const MultipleColumnSelectDropdownForForeignKeyConstraint = ({
   };
   // State for dropdown visibility
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null);
+  const dropdownRef = useRef(null);
 
-  // Toggle dropdown visibility
-  const _handleDropdownOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-    setIsDropdownOpen(true);
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    if (isDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isDropdownOpen]);
+
+  const _handleDropdownToggle = () => {
+    setIsDropdownOpen((prev) => !prev);
   };
 
-  const _handleDropdownClose = () => {
-    setAnchorEl(null);
-    setIsDropdownOpen(false);
-  };
+
 
   // Handle toggling column selection in foreign key constraint
   const toggleColumnInForeignKey = (fkIndex, databaseTableColumnName) => {
@@ -59,17 +67,18 @@ const MultipleColumnSelectDropdownForForeignKeyConstraint = ({
   };
 
   return (
-    <div className="relative w-full flex flex-col justify-start items-stretch">
+    <div ref={dropdownRef} className="relative w-full flex flex-col justify-start items-stretch">
       {/* Dropdown Trigger */}
-      <div className="flex flex-row flex-wrap justify-start items-start gap-2 w-full border p-2 rounded border-[#9a9fff] border-dashed bg-[#f5f5ff]">
-        <button
+      <div className="flex flex-row flex-wrap justify-start items-start gap-2 w-full border p-2 rounded border-primary/20 border-dashed bg-primary/5">
+        <Button
           type="button"
-          onClick={_handleDropdownOpen}
-          className="inline-flex outline-none hover:outline-none flex-row justify-center items-center bg-slate-50 border text-xs border-slate-300 text-slate-700 rounded focus:border-slate-700 px-2.5 py-1"
+          variant="outline" size="sm"
+          onClick={_handleDropdownToggle}
+          className="inline-flex items-center"
         >
           <FaPlus className="h-3 w-3 mr-1" />
           {CONSTANTS.STRINGS.TABLE_EDITOR_FORM_FOREIGN_KEY_COLUMN_LABEL}
-        </button>
+        </Button>
 
         {/* Display selected databaseTableColumns */}
         {tableEditorForm.values.databaseTableConstraints.foreignKeys[
@@ -85,50 +94,38 @@ const MultipleColumnSelectDropdownForForeignKeyConstraint = ({
       </div>
 
       {/* Dropdown Menu */}
-      <Menu
-        id="foreign-key-column-menu"
-        anchorEl={anchorEl}
-        open={isDropdownOpen}
-        onClose={_handleDropdownClose}
-        MenuListProps={{
-          "aria-labelledby": "foreign-key-column-button",
-        }}
-        sx={{
-          padding: "0px",
-          "& .MuiMenu-list": {
-            padding: "0px !important",
-          },
-        }}
-      >
-        {tableEditorForm.values.databaseTableColumns.map((column, index) => (
-          <MenuItem
-            key={column.databaseTableColumnName}
-            className="!flex !flex-row !justify-start !items-center !p-1.5 !w-full"
-          >
-            <input
-              type="checkbox"
-              id={`option-${index}`}
-              value={column.databaseTableColumnName}
-              checked={tableEditorForm.values.databaseTableConstraints.foreignKeys[
-                fkIndex
-              ].databaseTableColumns.includes(column.databaseTableColumnName)}
-              onChange={() =>
-                toggleColumnInForeignKey(
-                  fkIndex,
-                  column.databaseTableColumnName
-                )
-              }
-              className="h-4 w-4 text-indigo-600  border-gray-300 rounded"
-            />
-            <label
-              htmlFor={`option-${index}`}
-              className="ml-3 block text-sm text-gray-900"
+      {isDropdownOpen && (
+        <div className="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded shadow-lg max-h-60 overflow-y-auto">
+          {tableEditorForm.values.databaseTableColumns.map((column, index) => (
+            <div
+              key={column.databaseTableColumnName}
+              className="flex flex-row justify-start items-center p-1.5 w-full hover:bg-gray-50"
             >
-              {column.databaseTableColumnName}
-            </label>
-          </MenuItem>
-        ))}
-      </Menu>
+              <input
+                type="checkbox"
+                id={`option-${index}`}
+                value={column.databaseTableColumnName}
+                checked={tableEditorForm.values.databaseTableConstraints.foreignKeys[
+                  fkIndex
+                ].databaseTableColumns.includes(column.databaseTableColumnName)}
+                onChange={() =>
+                  toggleColumnInForeignKey(
+                    fkIndex,
+                    column.databaseTableColumnName
+                  )
+                }
+                className="h-4 w-4 text-indigo-600 border-gray-300 rounded"
+              />
+              <label
+                htmlFor={`option-${index}`}
+                className="ml-3 block text-sm text-gray-900"
+              >
+                {column.databaseTableColumnName}
+              </label>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
@@ -145,18 +142,25 @@ const MultipleRefColumnSelectDropdownForForeignKeyConstraint = ({
   };
   // State for dropdown visibility
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null);
+  const dropdownRef = useRef(null);
 
-  // Toggle dropdown visibility
-  const _handleDropdownOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-    setIsDropdownOpen(true);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    if (isDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isDropdownOpen]);
+
+  const _handleDropdownToggle = () => {
+    setIsDropdownOpen((prev) => !prev);
   };
 
-  const _handleDropdownClose = () => {
-    setAnchorEl(null);
-    setIsDropdownOpen(false);
-  };
+
 
   // Handle toggling column selection in foreign key constraint
   const toggleRefColumnInForeignKey = (fkIndex, databaseTableColumnName) => {
@@ -187,20 +191,21 @@ const MultipleRefColumnSelectDropdownForForeignKeyConstraint = ({
   };
 
   return (
-    <div className="relative w-full flex flex-col justify-start items-stretch">
+    <div ref={dropdownRef} className="relative w-full flex flex-col justify-start items-stretch">
       {/* Dropdown Trigger */}
-      <div className="flex flex-row flex-wrap justify-start items-start gap-2 w-full border p-2 rounded border-[#9a9fff] border-dashed bg-[#f5f5ff]">
-        <button
+      <div className="flex flex-row flex-wrap justify-start items-start gap-2 w-full border p-2 rounded border-primary/20 border-dashed bg-primary/5">
+        <Button
           type="button"
-          onClick={_handleDropdownOpen}
-          className="inline-flex outline-none hover:outline-none flex-row justify-center items-center bg-slate-50 border text-xs border-slate-300 text-slate-700 rounded focus:border-slate-700 px-2.5 py-1"
+          variant="outline" size="sm"
+          onClick={_handleDropdownToggle}
+          className="inline-flex items-center"
         >
           <FaPlus className="h-3 w-3 mr-1" />
           {
             CONSTANTS.STRINGS
               .TABLE_EDITOR_FORM_FOREIGN_KEY_REFERENCE_COLUMN_LABEL
           }
-        </button>
+        </Button>
 
         {/* Display selected databaseTableColumns */}
         {tableEditorForm.values.databaseTableConstraints.foreignKeys[
@@ -216,50 +221,38 @@ const MultipleRefColumnSelectDropdownForForeignKeyConstraint = ({
       </div>
 
       {/* Dropdown Menu */}
-      <Menu
-        id="foreign-key-column-menu"
-        anchorEl={anchorEl}
-        open={isDropdownOpen}
-        onClose={_handleDropdownClose}
-        MenuListProps={{
-          "aria-labelledby": "foreign-key-column-button",
-        }}
-        sx={{
-          padding: "0px",
-          "& .MuiMenu-list": {
-            padding: "0px !important",
-          },
-        }}
-      >
-        {referencedTable.databaseTableColumns.map((column, index) => (
-          <MenuItem
-            key={column.databaseTableColumnName}
-            className="!flex !flex-row !justify-start !items-center !p-1.5 !w-full"
-          >
-            <input
-              type="checkbox"
-              id={`option-${index}`}
-              value={column.databaseTableColumnName}
-              checked={tableEditorForm.values.databaseTableConstraints.foreignKeys[
-                fkIndex
-              ].referencedColumns.includes(column.databaseTableColumnName)}
-              onChange={() =>
-                toggleRefColumnInForeignKey(
-                  fkIndex,
-                  column.databaseTableColumnName
-                )
-              }
-              className="h-4 w-4 text-indigo-600  border-gray-300 rounded"
-            />
-            <label
-              htmlFor={`option-${index}`}
-              className="ml-3 block text-sm text-gray-900"
+      {isDropdownOpen && (
+        <div className="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded shadow-lg max-h-60 overflow-y-auto">
+          {referencedTable.databaseTableColumns.map((column, index) => (
+            <div
+              key={column.databaseTableColumnName}
+              className="flex flex-row justify-start items-center p-1.5 w-full hover:bg-gray-50"
             >
-              {column.databaseTableColumnName}
-            </label>
-          </MenuItem>
-        ))}
-      </Menu>
+              <input
+                type="checkbox"
+                id={`option-${index}`}
+                value={column.databaseTableColumnName}
+                checked={tableEditorForm.values.databaseTableConstraints.foreignKeys[
+                  fkIndex
+                ].referencedColumns.includes(column.databaseTableColumnName)}
+                onChange={() =>
+                  toggleRefColumnInForeignKey(
+                    fkIndex,
+                    column.databaseTableColumnName
+                  )
+                }
+                className="h-4 w-4 text-indigo-600 border-gray-300 rounded"
+              />
+              <label
+                htmlFor={`option-${index}`}
+                className="ml-3 block text-sm text-gray-900"
+              >
+                {column.databaseTableColumnName}
+              </label>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };
@@ -269,17 +262,25 @@ const PrimaryKeyConstraintSelector = ({ tableEditorForm }) => {
     tableEditorForm: PropTypes.object.isRequired,
   };
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const [anchorEl, setAnchorEl] = useState(null);
+  const dropdownRef = useRef(null);
 
-  const _handleDropdownOpen = (event) => {
-    setAnchorEl(event.currentTarget);
-    setIsDropdownOpen(true);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    if (isDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isDropdownOpen]);
+
+  const _handleDropdownToggle = () => {
+    setIsDropdownOpen((prev) => !prev);
   };
 
-  const _handleDropdownClose = () => {
-    setAnchorEl(null);
-    setIsDropdownOpen(false);
-  };
+
 
   const toggleColumnInPrimaryKey = (columnName) => {
     const primaryKey = [
@@ -304,16 +305,17 @@ const PrimaryKeyConstraintSelector = ({ tableEditorForm }) => {
       <span className="block mb-1 text-xs font-medium text-slate-500">
         {CONSTANTS.STRINGS.TABLE_EDITOR_FORM_PRIMARY_KEY_TITLE}
       </span>
-      <div className="relative w-full flex flex-col justify-start items-stretch">
-        <div className="flex flex-row flex-wrap justify-start items-start gap-2 w-full border p-2 rounded border-[#9a9fff] border-dashed bg-[#f5f5ff]">
-          <button
+      <div ref={dropdownRef} className="relative w-full flex flex-col justify-start items-stretch">
+        <div className="flex flex-row flex-wrap justify-start items-start gap-2 w-full border p-2 rounded border-primary/20 border-dashed bg-primary/5">
+          <Button
             type="button"
-            onClick={_handleDropdownOpen}
-            className="inline-flex outline-none hover:outline-none flex-row justify-center items-center bg-slate-50 border text-xs border-slate-300 text-slate-700 rounded focus:border-slate-700 px-2.5 py-1"
+            variant="outline" size="sm"
+            onClick={_handleDropdownToggle}
+            className="inline-flex items-center"
           >
             <FaPlus className="h-3 w-3 mr-1" />
             {CONSTANTS.STRINGS.TABLE_EDITOR_FORM_PRIMARY_KEY_COLUMN_LABEL}
-          </button>
+          </Button>
 
           {tableEditorForm.values.databaseTableConstraints.primaryKey?.map(
             (column, index) => (
@@ -327,47 +329,35 @@ const PrimaryKeyConstraintSelector = ({ tableEditorForm }) => {
           )}
         </div>
 
-        <Menu
-          id="primary-key-column-menu"
-          anchorEl={anchorEl}
-          open={isDropdownOpen}
-          onClose={_handleDropdownClose}
-          MenuListProps={{
-            "aria-labelledby": "primary-key-column-button",
-          }}
-          sx={{
-            padding: "0px",
-            "& .MuiMenu-list": {
-              padding: "0px !important",
-            },
-          }}
-        >
-          {tableEditorForm.values.databaseTableColumns.map((column, index) => (
-            <MenuItem
-              key={column.databaseTableColumnName}
-              className="!flex !flex-row !justify-start !items-center !p-1.5 !w-full"
-            >
-              <input
-                type="checkbox"
-                id={`pk-option-${index}`}
-                value={column.databaseTableColumnName}
-                checked={tableEditorForm.values.databaseTableConstraints.primaryKey.includes(
-                  column.databaseTableColumnName
-                )}
-                onChange={() =>
-                  toggleColumnInPrimaryKey(column.databaseTableColumnName)
-                }
-                className="h-4 w-4 text-indigo-600  border-gray-300 rounded"
-              />
-              <label
-                htmlFor={`pk-option-${index}`}
-                className="ml-3 block text-sm text-gray-900"
+        {isDropdownOpen && (
+          <div className="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded shadow-lg max-h-60 overflow-y-auto">
+            {tableEditorForm.values.databaseTableColumns.map((column, index) => (
+              <div
+                key={column.databaseTableColumnName}
+                className="flex flex-row justify-start items-center p-1.5 w-full hover:bg-gray-50"
               >
-                {column.databaseTableColumnName}
-              </label>
-            </MenuItem>
-          ))}
-        </Menu>
+                <input
+                  type="checkbox"
+                  id={`pk-option-${index}`}
+                  value={column.databaseTableColumnName}
+                  checked={tableEditorForm.values.databaseTableConstraints.primaryKey.includes(
+                    column.databaseTableColumnName
+                  )}
+                  onChange={() =>
+                    toggleColumnInPrimaryKey(column.databaseTableColumnName)
+                  }
+                  className="h-4 w-4 text-indigo-600 border-gray-300 rounded"
+                />
+                <label
+                  htmlFor={`pk-option-${index}`}
+                  className="ml-3 block text-sm text-gray-900"
+                >
+                  {column.databaseTableColumnName}
+                </label>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
@@ -379,20 +369,32 @@ const UniqueConstraintSelector = ({ tableEditorForm }) => {
   };
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [activeConstraintIndex, setActiveConstraintIndex] = useState(null);
-  const [anchorEl, setAnchorEl] = useState(null);
+  const dropdownRef = useRef(null);
 
-  const _handleDropdownOpen = (event, index) => {
-    console.log({ event, index });
-    setAnchorEl(event.currentTarget);
-    setIsDropdownOpen(true);
-    setActiveConstraintIndex(index);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsDropdownOpen(false);
+        setActiveConstraintIndex(null);
+      }
+    };
+    if (isDropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [isDropdownOpen]);
+
+  const _handleDropdownToggle = (index) => {
+    if (isDropdownOpen && activeConstraintIndex === index) {
+      setIsDropdownOpen(false);
+      setActiveConstraintIndex(null);
+    } else {
+      setIsDropdownOpen(true);
+      setActiveConstraintIndex(index);
+    }
   };
 
-  const _handleDropdownClose = () => {
-    setAnchorEl(null);
-    setIsDropdownOpen(false);
-    setActiveConstraintIndex(null);
-  };
+
 
   const _handleAddConstraint = () => {
     const newConstraints = [
@@ -451,18 +453,19 @@ const UniqueConstraintSelector = ({ tableEditorForm }) => {
               index === 0 ? "mt-1" : "mt-3"
             }`}
           >
-            <div className="flex w-full flex-wrap gap-2 p-2 rounded border border-[#9a9fff] border-dashed bg-[#f5f5ff] mr-2">
-              <button
+            <div className="flex w-full flex-wrap gap-2 p-2 rounded border border-primary/20 border-dashed bg-primary/5 mr-2">
+              <Button
                 type="button"
-                onClick={(event) => _handleDropdownOpen(event, index)}
-                className="inline-flex outline-none hover:outline-none flex-row justify-center items-center bg-slate-50 border text-xs border-slate-300 text-slate-700 rounded focus:border-slate-700 px-2.5 py-1"
+                variant="outline" size="sm"
+                onClick={() => _handleDropdownToggle(index)}
+                className="inline-flex items-center"
               >
                 <FaPlus className="h-3 w-3 mr-1" />
                 {
                   CONSTANTS.STRINGS
                     .TABLE_EDITOR_FORM_ADD_UNIQUE_CONSTRAINT_COLUMN_LABEL
                 }
-              </button>
+              </Button>
 
               {constraint?.databaseTableColumns?.map((column, colIndex) => (
                 <span
@@ -474,67 +477,56 @@ const UniqueConstraintSelector = ({ tableEditorForm }) => {
               ))}
             </div>
             <div className="col-span-1 flex items-center flex-row justify-end">
-              <button
+              <Button
                 type="button"
+                variant="destructive-ghost" size="icon"
                 onClick={() => _handleDeleteConstraint(index)}
-                className="hover:text-red-400  bg-white p-1 text-slate-700 border-0 hover:border-0"
               >
                 <FaTimes className="text-sm" />
-              </button>
+              </Button>
             </div>
 
-            <Menu
-              anchorEl={anchorEl}
-              open={isDropdownOpen && activeConstraintIndex === index}
-              onClose={_handleDropdownClose}
-              MenuListProps={{
-                "aria-labelledby": "primary-key-column-button",
-              }}
-              sx={{
-                padding: "0px",
-                "& .MuiMenu-list": {
-                  padding: "0px !important",
-                },
-              }}
-            >
-              {tableEditorForm.values.databaseTableColumns.map((column) => (
-                <MenuItem
-                  key={column.databaseTableColumnName}
-                  className="!flex !flex-row !justify-start !items-center !p-1.5 !w-full"
-                  disableRipple
-                >
-                  <label className="flex items-center space-x-3 cursor-pointer w-full">
-                    <input
-                      type="checkbox"
-                      checked={constraint.databaseTableColumns.includes(
-                        column.databaseTableColumnName
-                      )}
-                      onChange={() =>
-                        toggleColumnInUniqueConstraint(
-                          index,
+            {isDropdownOpen && activeConstraintIndex === index && (
+              <div className="absolute z-50 mt-1 w-full bg-white border border-gray-200 rounded shadow-lg max-h-60 overflow-y-auto">
+                {tableEditorForm.values.databaseTableColumns.map((column) => (
+                  <div
+                    key={column.databaseTableColumnName}
+                    className="flex flex-row justify-start items-center p-1.5 w-full hover:bg-gray-50"
+                  >
+                    <label className="flex items-center space-x-3 cursor-pointer w-full">
+                      <input
+                        type="checkbox"
+                        checked={constraint.databaseTableColumns.includes(
                           column.databaseTableColumnName
-                        )
-                      }
-                      className="h-4 w-4 text-blue-600 rounded border-gray-300 "
-                    />
-                    <span className="text-sm text-gray-700">
-                      {column.databaseTableColumnName}
-                    </span>
-                  </label>
-                </MenuItem>
-              ))}
-            </Menu>
+                        )}
+                        onChange={() =>
+                          toggleColumnInUniqueConstraint(
+                            index,
+                            column.databaseTableColumnName
+                          )
+                        }
+                        className="h-4 w-4 text-blue-600 rounded border-gray-300"
+                      />
+                      <span className="text-sm text-gray-700">
+                        {column.databaseTableColumnName}
+                      </span>
+                    </label>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )
       )}
       <div className=" w-full flex flex-row justify-end items-center mt-2">
-        <button
+        <Button
           type="button"
+          variant="ghost" size="sm"
           onClick={_handleAddConstraint}
-          className="flex flex-row justify-center items-center px-0 py-1  text-xs font-medium text-center bg-white text-[#646cff]  rounded   focus:outline-none border-0  "
+          className="text-primary"
         >
           {CONSTANTS.STRINGS.TABLE_EDITOR_FORM_ADD_UNIQUE_CONSTRAINT_BUTTON}
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -607,7 +599,7 @@ const ForeignKeyConstraintSelector = ({
               <div className="grid grid-cols-5 gap-2 p-2">
                 {/* Column Name */}
                 <div className="col-span-4">
-                  <input
+                  <Input
                     type="text"
                     id={`databaseTableConstraints.foreignKeys[${index}].constraintName`}
                     name={`databaseTableConstraints.foreignKeys[${index}].constraintName`}
@@ -620,7 +612,7 @@ const ForeignKeyConstraintSelector = ({
                     }
                     onChange={tableEditorForm.handleChange}
                     onBlur={tableEditorForm.handleBlur}
-                    className="placeholder:text-slate-400 text-xs bg-slate-50 border border-slate-300 text-slate-700 rounded focus:border-slate-700 block w-full px-2.5  h-8"
+                    className="h-8 text-xs"
                   />
                   {tableEditorForm.errors?.databaseTableConstraints
                     ?.foreignKeys?.[index]?.constraintName && (
@@ -633,13 +625,13 @@ const ForeignKeyConstraintSelector = ({
                   )}
                 </div>
                 <div className="col-span-1 flex items-center flex-row justify-end">
-                  <button
+                  <Button
                     type="button"
+                    variant="destructive-ghost" size="icon"
                     onClick={() => _handleDeleteForeignKey(index)}
-                    className="hover:text-red-400  bg-white p-1 text-slate-700 border-0 hover:border-0"
                   >
                     <FaTimes className="text-sm" />
-                  </button>
+                  </Button>
                 </div>
 
                 <div className="col-span-5">
@@ -658,19 +650,15 @@ const ForeignKeyConstraintSelector = ({
                   )}
                 </div>
                 <div className="col-span-1">
-                  <select
-                    required
-                    id={`databaseTableConstraints.foreignKeys[${index}].constraintSchema`}
-                    name={`databaseTableConstraints.foreignKeys[${index}].constraintSchema`}
-                    value={
+                  <Select value={
                       tableEditorForm.values.databaseTableConstraints
                         .foreignKeys[index].constraintSchema
-                    }
-                    onChange={tableEditorForm.handleChange}
-                    onBlur={tableEditorForm.handleBlur}
-                    className="bg-slate-50 border text-xs border-slate-300 text-slate-700 rounded focus:border-slate-700 block w-full px-2.5 h-8"
-                  >
-                    <option
+                    } onValueChange={(val) => tableEditorForm.setFieldValue(`databaseTableConstraints.foreignKeys[${index}].constraintSchema`, val)}>
+                    <SelectTrigger className="text-xs">
+                      <SelectValue placeholder="Select an option" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem
                       key={
                         CONSTANTS.STRINGS
                           .TABLE_EDITOR_FORM_FOREIGN_KEY_SCHEMA_LABEL
@@ -682,17 +670,18 @@ const ForeignKeyConstraintSelector = ({
                         CONSTANTS.STRINGS
                           .TABLE_EDITOR_FORM_FOREIGN_KEY_SCHEMA_LABEL
                       }
-                    </option>
+                      </SelectItem>
                     {databaseMetadata?.schemas?.map((schema) => (
-                      <option
+                      <SelectItem
                         key={schema.databaseSchemaName}
                         value={schema.databaseSchemaName}
                         className="text-xs"
                       >
                         {schema.databaseSchemaName}
-                      </option>
+                      </SelectItem>
                     ))}
-                  </select>
+                    </SelectContent>
+                  </Select>
                   {tableEditorForm.errors?.databaseTableConstraints
                     ?.foreignKeys?.[index]?.constraintSchema && (
                     <span className="text-red-500 text-xs">
@@ -705,19 +694,15 @@ const ForeignKeyConstraintSelector = ({
                 </div>
                 {
                   <div className="col-span-4">
-                    <select
-                      required
-                      id={`databaseTableConstraints.foreignKeys[${index}].referencedTable`}
-                      name={`databaseTableConstraints.foreignKeys[${index}].referencedTable`}
-                      value={
+                    <Select value={
                         tableEditorForm.values.databaseTableConstraints
                           .foreignKeys[index].referencedTable
-                      }
-                      onChange={tableEditorForm.handleChange}
-                      onBlur={tableEditorForm.handleBlur}
-                      className="bg-slate-50 border text-xs border-slate-300 text-slate-700 rounded focus:border-slate-700 block w-full px-2.5 h-8"
-                    >
-                      <option
+                      } onValueChange={(val) => tableEditorForm.setFieldValue(`databaseTableConstraints.foreignKeys[${index}].referencedTable`, val)}>
+                      <SelectTrigger className="text-xs">
+                        <SelectValue placeholder="Select an option" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem
                         key={
                           CONSTANTS.STRINGS
                             .TABLE_EDITOR_FORM_FOREIGN_KEY_REFERENCE_TABLE_PLACEHOLDER
@@ -728,17 +713,18 @@ const ForeignKeyConstraintSelector = ({
                           CONSTANTS.STRINGS
                             .TABLE_EDITOR_FORM_FOREIGN_KEY_REFERENCE_TABLE_PLACEHOLDER
                         }
-                      </option>
+                        </SelectItem>
                       {selectedSchema?.tables?.map((table) => (
-                        <option
+                        <SelectItem
                           key={table.databaseTableName}
                           value={table.databaseTableName}
                           className="text-xs"
                         >
                           {table.databaseTableName}
-                        </option>
+                        </SelectItem>
                       ))}
-                    </select>
+                      </SelectContent>
+                    </Select>
                     {tableEditorForm.errors?.databaseTableConstraints
                       ?.foreignKeys?.[index]?.referencedTable && (
                       <span className="text-red-500 text-xs">
@@ -769,19 +755,15 @@ const ForeignKeyConstraintSelector = ({
                   </div>
                 )}
                 <div className="col-span-1">
-                  <select
-                    required
-                    id={`databaseTableConstraints.foreignKeys[${index}].onDelete`}
-                    name={`databaseTableConstraints.foreignKeys[${index}].onDelete`}
-                    value={
+                  <Select value={
                       tableEditorForm.values.databaseTableConstraints
                         .foreignKeys[index].onDelete
-                    }
-                    onChange={tableEditorForm.handleChange}
-                    onBlur={tableEditorForm.handleBlur}
-                    className="bg-slate-50 border text-xs border-slate-300 text-slate-700 rounded focus:border-slate-700 block w-full px-2.5 h-8"
-                  >
-                    <option
+                    } onValueChange={(val) => tableEditorForm.setFieldValue(`databaseTableConstraints.foreignKeys[${index}].onDelete`, val)}>
+                    <SelectTrigger className="text-xs">
+                      <SelectValue placeholder="Select an option" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem
                       key={
                         CONSTANTS.STRINGS
                           .TABLE_EDITOR_FORM_FOREIGN_KEY_ON_DELETE_LABEL
@@ -792,13 +774,14 @@ const ForeignKeyConstraintSelector = ({
                         CONSTANTS.STRINGS
                           .TABLE_EDITOR_FORM_FOREIGN_KEY_ON_DELETE_LABEL
                       }
-                    </option>
+                      </SelectItem>
                     {CONSTANTS.TABLE_FOREIGN_KEY_ACTIONS.map((action) => (
-                      <option key={action} value={action} className="text-xs">
+                      <SelectItem key={action} value={action} className="text-xs">
                         {action}
-                      </option>
+                      </SelectItem>
                     ))}
-                  </select>
+                    </SelectContent>
+                  </Select>
                   {tableEditorForm.errors?.databaseTableConstraints
                     ?.foreignKeys?.[index]?.onDelete && (
                     <span className="text-red-500 text-xs">
@@ -810,19 +793,15 @@ const ForeignKeyConstraintSelector = ({
                   )}
                 </div>
                 <div className="col-span-1">
-                  <select
-                    required
-                    id={`databaseTableConstraints.foreignKeys[${index}].onUpdate`}
-                    name={`databaseTableConstraints.foreignKeys[${index}].onUpdate`}
-                    value={
+                  <Select value={
                       tableEditorForm.values.databaseTableConstraints
                         .foreignKeys[index].onUpdate
-                    }
-                    onChange={tableEditorForm.handleChange}
-                    onBlur={tableEditorForm.handleBlur}
-                    className="bg-slate-50 border text-xs border-slate-300 text-slate-700 rounded focus:border-slate-700 block w-full px-2.5 h-8"
-                  >
-                    <option
+                    } onValueChange={(val) => tableEditorForm.setFieldValue(`databaseTableConstraints.foreignKeys[${index}].onUpdate`, val)}>
+                    <SelectTrigger className="text-xs">
+                      <SelectValue placeholder="Select an option" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem
                       key={
                         CONSTANTS.STRINGS
                           .TABLE_EDITOR_FORM_FOREIGN_KEY_ON_UPDATE_LABEL
@@ -833,13 +812,14 @@ const ForeignKeyConstraintSelector = ({
                         CONSTANTS.STRINGS
                           .TABLE_EDITOR_FORM_FOREIGN_KEY_ON_UPDATE_LABEL
                       }
-                    </option>
+                      </SelectItem>
                     {CONSTANTS.TABLE_FOREIGN_KEY_ACTIONS.map((action) => (
-                      <option key={action} value={action} className="text-xs">
+                      <SelectItem key={action} value={action} className="text-xs">
                         {action}
-                      </option>
+                      </SelectItem>
                     ))}
-                  </select>
+                    </SelectContent>
+                  </Select>
                   {tableEditorForm.errors?.databaseTableConstraints
                     ?.foreignKeys?.[index]?.onUpdate && (
                     <span className="text-red-500 text-xs">
@@ -856,13 +836,14 @@ const ForeignKeyConstraintSelector = ({
         }
       )}
       <div className=" w-full flex flex-row justify-end items-center mt-2">
-        <button
+        <Button
           type="button"
+          variant="ghost" size="sm"
           onClick={_handleAddForeignKey}
-          className="flex flex-row justify-center items-center px-0 py-1  text-xs font-medium text-center bg-white text-[#646cff]  rounded   focus:outline-none border-0  "
+          className="text-primary"
         >
           {CONSTANTS.STRINGS.TABLE_EDITOR_FORM_ADD_FOREIGN_KEY_BUTTON}
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -878,7 +859,7 @@ const ExcludeConstraintSelector = ({ tableEditorForm }) => {
         {CONSTANTS.STRINGS.TABLE_EDITOR_FORM_EXCLUDE_TITLE}
       </span>
       <div className="w-full">
-        <input
+        <Input
           type="text"
           id="databaseTableConstraints.exclude"
           name="databaseTableConstraints.exclude"
@@ -886,7 +867,7 @@ const ExcludeConstraintSelector = ({ tableEditorForm }) => {
           value={tableEditorForm.values.databaseTableConstraints.exclude}
           onChange={tableEditorForm.handleChange}
           onBlur={tableEditorForm.handleBlur}
-          className="placeholder:text-slate-400 text-xs bg-slate-50 border border-slate-300 text-slate-700 rounded focus:border-slate-700 block w-full px-2.5 py-1.5"
+          className="h-8 text-xs"
         />
         {tableEditorForm.errors?.databaseTableConstraints?.exclude && (
           <span className="text-red-500 text-xs">
@@ -902,6 +883,7 @@ const ColumnSelector = ({ tableEditorForm }) => {
   ColumnSelector.propTypes = {
     tableEditorForm: PropTypes.object.isRequired,
   };
+
   const _handleAddColumn = () => {
     tableEditorForm.setFieldValue("databaseTableColumns", [
       ...tableEditorForm.values.databaseTableColumns,
@@ -942,7 +924,7 @@ const ColumnSelector = ({ tableEditorForm }) => {
             <div className="grid grid-cols-5 gap-2 p-2">
               {/* Column Name */}
               <div className="col-span-1">
-                <input
+                <Input
                   required
                   type="text"
                   id={`databaseTableColumns[${index}].databaseTableColumnName`}
@@ -968,30 +950,28 @@ const ColumnSelector = ({ tableEditorForm }) => {
                   </span>
                 )}
               </div>
+
               {/* Data Type */}
               <div className="col-span-1">
-                <select
-                  required
-                  id={`databaseTableColumns[${index}].databaseTableColumnType`}
-                  name={`databaseTableColumns[${index}].databaseTableColumnType`}
-                  value={
+                <Select value={
                     tableEditorForm.values.databaseTableColumns[index]
                       .databaseTableColumnType
-                  }
-                  onChange={tableEditorForm.handleChange}
-                  onBlur={tableEditorForm.handleBlur}
-                  className="bg-slate-50 border text-xs border-slate-300 text-slate-700 rounded focus:border-slate-700 block w-full px-2.5 h-8"
-                >
-                  {Object.keys(CONSTANTS.POSTGRE_SQL_DATA_TYPES).map((type) => (
-                    <option
+                  } onValueChange={(val) => tableEditorForm.setFieldValue(`databaseTableColumns[${index}].databaseTableColumnType`, val)}>
+                  <SelectTrigger className="text-xs">
+                    <SelectValue placeholder="Select an option" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {Object.keys(CONSTANTS.POSTGRE_SQL_DATA_TYPES).map((type) => (
+                      <SelectItem
                       key={type}
                       value={CONSTANTS.POSTGRE_SQL_DATA_TYPES[type].name}
                       className="text-xs"
                     >
                       {CONSTANTS.POSTGRE_SQL_DATA_TYPES[type].name}
-                    </option>
+                      </SelectItem>
                   ))}
-                </select>
+                  </SelectContent>
+                </Select>
                 {tableEditorForm.errors?.databaseTableColumns?.[index]
                   ?.databaseTableColumnType && (
                   <span className="text-red-500 text-xs">
@@ -1005,7 +985,7 @@ const ColumnSelector = ({ tableEditorForm }) => {
 
               {/* Default Value */}
               <div className="col-span-1">
-                <input
+                <Input
                   type="text"
                   id={`databaseTableColumns[${index}].defaultValue`}
                   name={`databaseTableColumns[${index}].defaultValue`}
@@ -1019,7 +999,7 @@ const ColumnSelector = ({ tableEditorForm }) => {
                   }
                   onChange={tableEditorForm.handleChange}
                   onBlur={tableEditorForm.handleBlur}
-                  className="placeholder:text-slate-400 text-xs bg-slate-50 border border-slate-300 text-slate-700 rounded focus:border-slate-700 block w-full px-2.5 h-8"
+                  className="h-8 text-xs"
                 />
                 {tableEditorForm.errors?.databaseTableColumns?.[index]
                   ?.defaultValue && (
@@ -1033,7 +1013,7 @@ const ColumnSelector = ({ tableEditorForm }) => {
               </div>
               {/* Check Expression */}
               <div className="col-span-1">
-                <input
+                <Input
                   type="text"
                   id={`databaseTableColumns[${index}].check`}
                   name={`databaseTableColumns[${index}].check`}
@@ -1045,7 +1025,7 @@ const ColumnSelector = ({ tableEditorForm }) => {
                   }
                   onChange={tableEditorForm.handleChange}
                   onBlur={tableEditorForm.handleBlur}
-                  className="placeholder:text-slate-400 bg-slate-50 text-xs border border-slate-300 text-slate-700 rounded focus:border-slate-700 block w-full px-2.5 h-8"
+                  className="h-8 text-xs"
                 />
                 {tableEditorForm.errors?.databaseTableColumns?.[index]
                   ?.check && (
@@ -1055,13 +1035,13 @@ const ColumnSelector = ({ tableEditorForm }) => {
                 )}
               </div>
               <div className="col-span-1 flex items-center flex-row justify-end">
-                <button
+                <Button
                   type="button"
+                  variant="destructive-ghost" size="icon"
                   onClick={() => _handleDeleteColumn(index)}
-                  className="hover:text-red-400  bg-white p-1 text-slate-700 border-0 hover:border-0"
                 >
                   <FaTimes className="text-sm" />
-                </button>
+                </Button>
               </div>
               {/* Unique Checkbox */}
               <div className="col-span-1 flex items-center">
@@ -1078,7 +1058,7 @@ const ColumnSelector = ({ tableEditorForm }) => {
                       e.target.checked
                     )
                   }
-                  className="mr-2 accent-[#646cff]"
+                  className="mr-2 accent-primary"
                 />
                 <label
                   htmlFor={`databaseTableColumns[${index}].unique`}
@@ -1106,7 +1086,7 @@ const ColumnSelector = ({ tableEditorForm }) => {
                       e.target.checked
                     )
                   }
-                  className="mr-2 accent-[#646cff]"
+                  className="mr-2 accent-primary"
                 />
                 <label
                   htmlFor={`databaseTableColumns[${index}].primaryKey`}
@@ -1133,7 +1113,7 @@ const ColumnSelector = ({ tableEditorForm }) => {
                       e.target.checked
                     )
                   }
-                  className="mr-2  accent-[#646cff]"
+                  className="mr-2  accent-primary"
                 />
                 <label
                   htmlFor={`databaseTableColumns[${index}].notNull`}
@@ -1150,13 +1130,14 @@ const ColumnSelector = ({ tableEditorForm }) => {
         );
       })}
       <div className=" w-full flex flex-row justify-end items-center mt-2">
-        <button
-          onClick={_handleAddColumn}
+        <Button
           type="button"
-          className="flex flex-row justify-center items-center px-0 py-1  text-xs font-medium text-center bg-white text-[#646cff]  rounded   focus:outline-none border-0  "
+          variant="ghost" size="sm"
+          onClick={_handleAddColumn}
+          className="text-primary"
         >
           {CONSTANTS.STRINGS.TABLE_EDITOR_FORM_ADD_COLUMN_BUTTON}
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -1172,7 +1153,7 @@ const CheckConstraintSelector = ({ tableEditorForm }) => {
         {CONSTANTS.STRINGS.TABLE_EDITOR_FORM_CHECK_TITLE || "Check Constraint"}
       </span>
       <div className="w-full">
-        <input
+        <Input
           type="text"
           id="databaseTableConstraints.check"
           name="databaseTableConstraints.check"
@@ -1180,7 +1161,7 @@ const CheckConstraintSelector = ({ tableEditorForm }) => {
           value={tableEditorForm.values.databaseTableConstraints.check}
           onChange={tableEditorForm.handleChange}
           onBlur={tableEditorForm.handleBlur}
-          className="placeholder:text-slate-400 text-xs bg-slate-50 border border-slate-300 text-slate-700 rounded focus:border-slate-700 block w-full px-2.5 py-1.5"
+          className="h-8 text-xs"
         />
         {tableEditorForm.errors?.databaseTableConstraints?.check && (
           <span className="text-red-500 text-xs">
@@ -1212,18 +1193,18 @@ export const DatabaseTableEditor = ({ tenantID, tableEditorForm }) => {
 
   return (
     <>
-      <div>
+      <div className="h-full">
         <label
           htmlFor="databaseTableName"
           className="block mb-1 text-xs font-medium text-slate-500"
         >
           {CONSTANTS.STRINGS.TABLE_EDITOR_FORM_NAME_FIELD_LABEL}
         </label>
-        <input
+        <Input
           type="databaseTableName"
           name="databaseTableName"
           id="databaseTableName"
-          className=" placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:border-slate-700 block w-full px-2.5 py-1.5 "
+          className="h-8 text-sm"
           placeholder={
             CONSTANTS.STRINGS.TABLE_EDITOR_FORM_NAME_FIELD_PLACEHOLDER
           }
@@ -1241,7 +1222,7 @@ export const DatabaseTableEditor = ({ tenantID, tableEditorForm }) => {
           onChange={(e) => {
             tableEditorForm?.setFieldValue("ifNotExists", e.target.checked);
           }}
-          className="mr-2 w-4 h-4 text-white bg-transparent border-white rounded  accent-[#646cff]"
+          className="mr-2 w-4 h-4 text-white bg-transparent border-white rounded  accent-primary"
         />
         <label
           htmlFor="ifNotExists"

@@ -7,6 +7,7 @@ import {
     FaLayerGroup,
 } from "react-icons/fa";
 import PropTypes from "prop-types";
+import { Button } from "@jet-admin/ui";
 
 /**
  * Applied Filters Display Component
@@ -121,13 +122,12 @@ export const AppliedFilters = ({
                         </span>
                     </>
                 )}
-                <button
+                <Button
                     onClick={() => onRemove(filter.index)}
                     className="ml-1 p-0.5 rounded-full hover:bg-blue-200 transition-colors"
-                    title="Remove filter"
                 >
                     <FaTimes className="h-3 w-3" />
-                </button>
+                </Button>
             </div>
         );
     };
@@ -178,13 +178,12 @@ export const AppliedFilters = ({
                 <FaFilter className="h-3 w-3" />
                 <span className="font-medium">Search:</span>
                 <span className="font-semibold">{debouncedSearchTerm}</span>
-                <button
+                <Button
                     onClick={onClearSearch}
                     className="ml-1 p-0.5 rounded-full hover:bg-green-200 transition-colors"
-                    title="Clear search"
                 >
                     <FaTimes className="h-3 w-3" />
-                </button>
+                </Button>
             </div>
         );
     };
@@ -195,11 +194,11 @@ export const AppliedFilters = ({
     if (!hasFilters && !hasSearch) return null;
 
     return (
-        <div className="w-full bg-white border-b border-gray-200 shadow-sm">
+        <div className="w-full bg-background border-b border-border shadow-sm animate-in fade-in slide-in-from-top-2 duration-200">
             <div className="px-4 py-3">
                 <div className="flex flex-wrap items-center gap-3">
                     {/* Header */}
-                    <div className="flex items-center gap-2 text-gray-600">
+                    <div className="flex items-center gap-2 text-muted-foreground">
                         <FaFilter className="h-4 w-4" />
                         <span className="text-sm font-semibold">Active Filters:</span>
                     </div>
@@ -222,25 +221,25 @@ export const AppliedFilters = ({
                     {/* Action Buttons */}
                     <div className="ml-auto flex items-center gap-2">
                         {onEditFilters && (
-                            <button
+                            <Button
                                 onClick={onEditFilters}
-                                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-[#646cff] hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors"
-                                title="Edit filters"
+                                variant="ghost" size="sm"
+                                className="inline-flex items-center gap-1.5 text-primary hover:text-primary hover:bg-primary/10"
                             >
                                 <FaEdit className="h-3.5 w-3.5" />
                                 <span>Edit</span>
-                            </button>
+                            </Button>
                         )}
 
                         {(hasFilters || hasSearch) && (
-                            <button
+                            <Button
                                 onClick={onClearAllFilters}
-                                className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg transition-colors"
-                                title="Clear all filters"
+                                variant="destructive-ghost" size="sm"
+                                className="inline-flex items-center gap-1.5"
                             >
                                 <FaTrash className="h-3.5 w-3.5" />
                                 <span>Clear All</span>
-                            </button>
+                            </Button>
                         )}
                     </div>
                 </div>
@@ -255,19 +254,6 @@ export const AppliedFilters = ({
                 )}
             </div>
 
-            {/* CSS Animation */}
-            <style jsx>{`
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateY(-10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
         </div>
     );
 };
@@ -299,42 +285,40 @@ export const AppliedFiltersCompact = ({
     if (!hasFilters && !hasSearch) return null;
 
     return (
-        <div className="inline-flex items-center gap-2 px-3 py-1 bg-[#646cff]/10  rounded text-sm border border-transparent">
-            <FaFilter className="h-4 w-4 text-[#646cff]" />
+        <div className="inline-flex items-center gap-2 px-3 py-1 bg-primary/10 rounded text-sm border border-transparent">
+            <FaFilter className="h-4 w-4 text-primary" />
             <div className="flex items-center gap-2">
                 {hasFilters && (
-                    <span className="font-medium text-[#646cff] text-sm">
+                    <span className="font-medium text-primary text-sm">
                         {filterCount} filter{filterCount !== 1 ? "s" : ""}
                     </span>
                 )}
                 {hasFilters && hasSearch && (
-                    <span className="text-[#646cff]">•</span>
+                    <span className="text-primary">•</span>
                 )}
                 {hasSearch && (
-                    <span className="font-medium text-[#646cff] text-sm">
-                        Search: "{debouncedSearchTerm.substring(0, 20)}
-                        {debouncedSearchTerm.length > 20 ? "..." : ""}"
+                    <span className="font-medium text-primary text-sm">
+                        Search: &quot;{debouncedSearchTerm.substring(0, 20)}
+                        {debouncedSearchTerm.length > 20 ? "..." : ""}&quot;
                     </span>
                 )}
             </div>
 
             <div className="flex items-center gap-1 ml-2">
                 {onEditFilters && (
-                    <button
+                    <Button
                         onClick={onEditFilters}
-                        className="p-0 me-1 text-[#646cff] hover:bg-[#646cff]/10 rounded transition-colors bg-transparent outline-none hover:outline-none border-0 hover:border-0"
-                        title="Edit filters"
+                        variant="ghost" size="icon" className="h-6 w-6 me-1 text-primary hover:bg-primary/10"
                     >
                         <FaEdit className="h-3.5 w-3.5" />
-                    </button>
+                    </Button>
                 )}
-                <button
+                <Button
                     onClick={onClearAllFilters}
-                    className="p-0 text-red-400 hover:bg-red-100 rounded transition-colors outline-none hover:outline-none border-0 hover:border-0 bg-transparent "
-                    title="Clear all"
+                    variant="destructive-ghost" size="icon" className="h-6 w-6 text-red-400 hover:text-red-500 hover:bg-red-100"
                 >
                     <FaTimes className="h-3.5 w-3.5" />
-                </button>
+                </Button>
             </div>
         </div>
     );
@@ -389,12 +373,12 @@ export const AppliedFiltersBadge = ({
                         <div className="p-4 border-b border-gray-200 bg-gray-50">
                             <div className="flex items-center justify-between">
                                 <h3 className="font-semibold text-gray-800">Active Filters</h3>
-                                <button
+                                <Button
                                     onClick={() => setIsExpanded(false)}
                                     className="p-1 hover:bg-gray-200 rounded"
                                 >
                                     <FaTimes className="h-4 w-4 text-gray-600" />
-                                </button>
+                                </Button>
                             </div>
                         </div>
 
@@ -444,7 +428,7 @@ export const AppliedFiltersBadge = ({
 
                         <div className="p-3 border-t border-gray-200 bg-gray-50 flex gap-2">
                             {onEditFilters && (
-                                <button
+                                <Button
                                     onClick={() => {
                                         onEditFilters();
                                         setIsExpanded(false);
@@ -452,9 +436,9 @@ export const AppliedFiltersBadge = ({
                                     className="flex-1 px-3 py-2 text-sm font-medium text-[#646cff] bg-white border border-blue-300 hover:bg-blue-50 rounded-lg transition-colors"
                                 >
                                     Edit Filters
-                                </button>
+                                </Button>
                             )}
-                            <button
+                            <Button
                                 onClick={() => {
                                     onClearAllFilters();
                                     setIsExpanded(false);
@@ -462,7 +446,7 @@ export const AppliedFiltersBadge = ({
                                 className="flex-1 px-3 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
                             >
                                 Clear All
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 </>

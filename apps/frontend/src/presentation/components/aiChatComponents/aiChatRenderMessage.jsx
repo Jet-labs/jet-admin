@@ -10,6 +10,7 @@ import { AIChatMarkdownRenderer } from "./aiChatMarkdownRenderer";
 // eslint-disable-next-line no-unused-vars
 import {ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell, LineChart, Line, ScatterChart, Scatter, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, AreaChart, Area, ComposedChart} from 'recharts'
 
+import { Button } from "@jet-admin/ui";
 export const AIChatRenderMessage = React.memo(({ message, sendApproval }) => {
     // PropTypes should be defined outside the component
     AIChatRenderMessage.propTypes = {
@@ -102,15 +103,15 @@ export const AIChatRenderMessage = React.memo(({ message, sendApproval }) => {
 
                     {/* Action buttons */}
                     <div className="flex gap-2">
-                        <button onClick={_handleApprovePrompt} className="px-3 py-1 text-xs bg-green-500 hover:bg-green-600 text-white  transition-colors" style={{ borderRadius: '6px' }}>
+                        <Button onClick={_handleApprovePrompt} className="px-3 py-1 text-xs bg-green-500 hover:bg-green-600 text-white  transition-colors" style={{ borderRadius: '6px' }}>
                             Approve
-                        </button>
-                        <button className="px-3 py-1 text-xs bg-red-500 hover:bg-red-600 text-white  transition-colors" style={{ borderRadius: '6px' }}>
+                        </Button>
+                        <Button className="px-3 py-1 text-xs bg-red-500 hover:bg-red-600 text-white  transition-colors" style={{ borderRadius: '6px' }}>
                             Reject
-                        </button>
-                        <button onClick={_handleSelectQueryForTesting} className="px-3 py-1 text-xs bg-yellow-500 hover:bg-yellow-600 text-white  transition-colors" style={{ borderRadius: '6px' }}>
+                        </Button>
+                        <Button onClick={_handleSelectQueryForTesting} className="px-3 py-1 text-xs bg-yellow-500 hover:bg-yellow-600 text-white  transition-colors" style={{ borderRadius: '6px' }}>
                             Test query
-                        </button>
+                        </Button>
                         {selectedQueryForTesting && <DataQueryTestingPanel selectedQueryForTesting={selectedQueryForTesting} setSelectedQueryForTesting={_handleDeselectQueryForTesting} />}
                         
                     </div>

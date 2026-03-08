@@ -1,9 +1,9 @@
 import { WIDGETS_MAP } from "@jet-admin/widgets-ui";
-import { CircularProgress } from "@mui/material";
+// import './widgetEditor.css';
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import PropTypes from "prop-types";
-import React, { useCallback, useEffect, useState, useMemo } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { CONSTANTS } from "../../../constants";
 import {
   getWidgetByIDAPI,
@@ -19,32 +19,36 @@ import {
 } from "../ui/resizable";
 import { WidgetCloneForm } from "./widgetCloneForm";
 import { WidgetDeletionForm } from "./widgetDeletionForm";
-import { WidgetEditor } from "./widgetEditor";
+import { WidgetConfigEditor } from "./widgetConfigEditor";
 import { WidgetPreview } from "./widgetPreview";
 import { useWidgetRun, WIDGET_EXECUTION_MODES } from "./useWidgetRun";
-import { Switch, FormControlLabel } from "@mui/material";
 
+import { Button, Label, Spinner, Switch } from "@jet-admin/ui";
 const initialValues = {
   widgetTitle: "",
-  widgetType: CONSTANTS.WIDGET_TYPES.TEXT_WIDGET.value,
+  widgetType: "vega-lite",
   workflowID: null,
   workflowConfig: {},// For workflow mode - single workflow object
   widgetConfig: {
     containerCss: {},
     widgetCss: {},
     containerTailwindCss: "",
-    widgetTailwindCss: "text-slate-700",
+    widgetTailwindCss: "text-foreground",
     refetchInterval: 0,
   },
 };
 
 export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
   WidgetUpdationForm.propTypes = {
-    tenantID: PropTypes.number.isRequired,
-    widgetID: PropTypes.number.isRequired,
+    tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+      .isRequired,
+    widgetID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+      .isRequired,
   };
 
   const [executionMode, setExecutionMode] = useState(WIDGET_EXECUTION_MODES.ASYNC);
+  const queryClient = useQueryClient();
+  const autoRunKeyRef = useRef(null);
 
 
 
@@ -60,31 +64,10 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
     },
   });
 
-  // New Hook for Widget Execution/Preview
-  const {
-    data: previewData,
-    isLoading: isPreviewLoading,
-    runWidget,
-    isLive,
-    workflowStatus
-  } = useWidgetRun({
-    tenantID,
-    widgetID,
-    executionMode,
-    // Pass config for socket
-    workflowID: updateWidgetForm?.values?.workflowID,
-    widgetType: updateWidgetForm?.values?.widgetType,
-    datasetFields: updateWidgetForm?.values?.workflowConfig?.datasetFields,
-    parameters: updateWidgetForm?.values?.workflowConfig?.parameters,
-  });
-
   const {
     isLoading: isLoadingWidget,
     data: widget,
     error: loadWidgetError,
-    isFetching: isFetchingWidget,
-    isRefetching: isRefetechingWidget,
-    refetch: refetchWidget,
   } = useQuery({
     queryKey: [CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID), widgetID],
     queryFn: () =>
@@ -95,8 +78,27 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
     refetchOnWindowFocus: false,
   });
 
-  console.log({ widget });
-  console.log('[widgetUpdationForm] previewData from hook:', previewData);
+  // Single source of truth for Widget Execution/Preview
+  const {
+    data: previewData,
+    context: workflowContext,
+    logs: workflowLogs,
+    isLoading: isPreviewLoading,
+    isRunning: isRunningWorkflow,
+    runWidget,
+    clearLogs,
+    isLive,
+  } = useWidgetRun({
+    tenantID,
+    widgetID,
+    executionMode,
+    widgetFetchedData: widget,
+    // Pass config for socket
+    workflowID: updateWidgetForm?.values?.workflowID,
+    widgetType: updateWidgetForm?.values?.widgetType,
+    datasetFields: updateWidgetForm?.values?.workflowConfig?.datasetFields,
+    parameters: updateWidgetForm?.values?.workflowConfig?.parameters,
+  });
 
   const { isPending: isUpdatingWidget, mutate: updateWidget } = useMutation({
     mutationFn: (data) => {
@@ -140,19 +142,67 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
     }
   }, [widget]);
 
+  useEffect(() => {
+    const workflowID = updateWidgetForm?.values?.workflowID;
+    const currentWidgetID = widget?.widgetID || widgetID;
+
+    if (!workflowID || !currentWidgetID) {
+      autoRunKeyRef.current = null;
+      return;
+    }
+
+    const autoRunKey = `${currentWidgetID}_${workflowID}`;
+    if (autoRunKeyRef.current === autoRunKey) {
+      return;
+    }
+
+    autoRunKeyRef.current = autoRunKey;
+    runWidget(updateWidgetForm.values);
+  }, [updateWidgetForm.values, widget, widgetID, runWidget]);
+
 
 
   return (
-    <div className="w-full flex flex-col justify-start items-center h-full">
-      <h1 className="text-xl font-bold leading-tight tracking-tight text-slate-700 md:text-2xl text-start w-full p-3">
-        {CONSTANTS.STRINGS.UPDATE_WIDGET_FORM_TITLE}
-      </h1>
+    <div className="flex h-full w-full flex-col items-center bg-background">
+      <div className="flex w-full items-start justify-between border-b border-border bg-background p-3">
+        <div className="flex flex-col">
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+            {CONSTANTS.STRINGS.UPDATE_WIDGET_FORM_TITLE}
+          </h1>
+          {widget && (
+            <span className="mt-1 text-xs text-muted-foreground">
+              {`Widget ID: ${widget.widgetID}`}
+            </span>
+          )}
+        </div>
+        <div className="flex flex-row justify-end items-center gap-2">
+          <WidgetCloneForm
+            key={`widgetCloneForm_${widgetID}`}
+            tenantID={tenantID}
+            widgetID={widgetID}
+          />
+          <WidgetDeletionForm
+            key={`widgetDeletionForm_${widgetID}`}
+            tenantID={tenantID}
+            widgetID={widgetID}
+          />
+          <Button
+            type="button"
+            onClick={updateWidgetForm.handleSubmit}
+            disabled={isUpdatingWidget}
+          >
+            {isUpdatingWidget && (
+              <Spinner className="mr-3" size={16} />
+            )}
+            {CONSTANTS.STRINGS.UPDATE_WIDGET_FORM_SUBMIT_BUTTON}
+          </Button>
+
+        </div>
+
+      </div>
 
       <ReactQueryLoadingErrorWrapper
         isLoading={isLoadingWidget}
-        isFetching={isFetchingWidget}
-        isRefetching={isRefetechingWidget}
-        refetch={refetchWidget}
         error={loadWidgetError}
       >
         <ResizablePanelGroup
@@ -161,65 +211,44 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
             CONSTANTS.RESIZABLE_PANEL_KEYS
               .WIDGET_UPDATION_FORM_RESULT_SEPARATION
           }
-          className={"!w-full !h-full border-t border-gray-200"}
+          className={"!w-full !h-full"}
         >
-          <ResizablePanel defaultSize={20}>
+          <ResizablePanel defaultSize={35}>
             <form
-              className="w-full h-full p-2 flex flex-col justify-start items-stretch gap-2 overflow-y-auto"
+              className="flex h-full w-full flex-col items-stretch gap-2 overflow-y-auto bg-background p-3"
+
               onSubmit={updateWidgetForm.handleSubmit}
             >
               {updateWidgetForm && (
-                <WidgetEditor
-                  key={`widgetEditor_${widgetID}`}
+                <WidgetConfigEditor
+                  key={`widgetConfigEditor_${widgetID}`}
                   widgetEditorForm={updateWidgetForm}
+                  workflowContext={workflowContext}
+                  workflowLogs={workflowLogs}
+                  isRunningWorkflow={isRunningWorkflow}
+                  onTestWorkflow={_handleFetchWidgetData}
+                  onClearLogs={clearLogs}
                 />
               )}
-              <div className="flex flex-row justify-around items-center">
-                <button
-                  type="submit"
-                  disabled={isUpdatingWidget}
-                  className="flex flex-row items-center justify-center rounded bg-[#646cff] px-3 py-1 text-sm text-white  focus:ring-2 focus:ring-[#646cff]/50 w-full outline-none focus:outline-none"
-                >
-                  {isUpdatingWidget && (
-                    <CircularProgress
-                      className="!mr-3"
-                      size={16}
-                      color="white"
-                    />
-                  )}
-                  {CONSTANTS.STRINGS.UPDATE_WIDGET_FORM_SUBMIT_BUTTON}
-                </button>
-                <WidgetCloneForm
-                  key={`widgetCloneForm_${widgetID}`}
-                  tenantID={tenantID}
-                  widgetID={widgetID}
-                />
-                <WidgetDeletionForm
-                  key={`widgetDeletionForm_${widgetID}`}
-                  tenantID={tenantID}
-                  widgetID={widgetID}
-                />
-              </div>
+
             </form>
           </ResizablePanel>
           <ResizableHandle withHandle={true} />
-          <ResizablePanel defaultSize={80}>
+          <ResizablePanel defaultSize={65} className="relative">
             {/* Execution Mode Toggle */}
-            <div className="absolute top-2 right-2 z-10 flex items-center gap-2 bg-white/80 p-1 rounded shadow-sm">
-              <FormControlLabel
-                control={
-                  <Switch
-                    size="small"
-                    checked={executionMode === WIDGET_EXECUTION_MODES.ASYNC}
-                    onChange={(e) => setExecutionMode(e.target.checked ? WIDGET_EXECUTION_MODES.ASYNC : WIDGET_EXECUTION_MODES.SYNC)}
-                  />
-                }
-                label={<span className="text-xs">{executionMode === WIDGET_EXECUTION_MODES.ASYNC ? "Real-time" : "Sync"}</span>}
-              />
+            <div className="absolute right-3 top-3 z-10 flex items-center gap-2 rounded-md border border-border bg-background/95 p-1.5 shadow-sm">
+              <div className="flex items-center gap-1.5">
+                <Switch
+                  className="h-[18px] w-[32px] [&>span]:h-3.5 [&>span]:w-3.5 data-[state=checked]:[&>span]:translate-x-3.5"
+                  checked={executionMode === WIDGET_EXECUTION_MODES.ASYNC}
+                  onCheckedChange={(checked) => setExecutionMode(checked ? WIDGET_EXECUTION_MODES.ASYNC : WIDGET_EXECUTION_MODES.SYNC)}
+                />
+                <Label className="cursor-pointer text-xs text-muted-foreground">{executionMode === WIDGET_EXECUTION_MODES.ASYNC ? "Real-time" : "Sync"}</Label>
+              </div>
 
               {isLive && (
-                <div className="flex items-center gap-1 px-2 py-1 rounded text-xs bg-green-100 text-green-700">
-                  <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+                <div className="flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-1 text-xs font-medium text-emerald-600">
+                  <div className="h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                   <span>Live</span>
                 </div>
               )}
@@ -235,6 +264,7 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
               isFetchingData={isPreviewLoading}
               isRefreshingData={isPreviewLoading}
               data={previewData}
+              workflowContext={workflowContext}
             />
           </ResizablePanel>
         </ResizablePanelGroup>

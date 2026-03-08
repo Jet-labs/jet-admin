@@ -17,7 +17,7 @@ export const AccountNotificationList = () => {
         return (
           <div
             key={key}
-            className="p-2  border-slate-200 border rounded flex flex-col justify-start items-start gap-1 border-l-2 border-l-[#646cff]"
+            className="p-2  border-slate-200 border rounded flex flex-col justify-start items-start gap-1 border-l-2 border-l-primary"
           >
             <span className="text-slate-600 text-sm font-medium">
               {notification.title}

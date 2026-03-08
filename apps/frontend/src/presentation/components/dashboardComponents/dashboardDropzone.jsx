@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { cloneDeep } from "lodash";
 import { Responsive, WidthProvider } from "react-grid-layout";
 import "react-grid-layout/css/styles.css";
@@ -17,7 +17,8 @@ export const DashboardDropzone = ({
   setLayouts,
 }) => {
   DashboardDropzone.propTypes = {
-    tenantID: PropTypes.number.isRequired,
+    tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+      .isRequired,
     widgets: PropTypes.array.isRequired,
     setWidgets: PropTypes.func.isRequired,
     layouts: PropTypes.object.isRequired,
@@ -52,7 +53,6 @@ export const DashboardDropzone = ({
 
   const onDrop = (currentLayout, layoutItem, _ev) => {
     const widget = _ev.dataTransfer.getData("widget");
-    console.log("widget", widget);
     const _widgets = [...widgets, widget];
     setWidgets(_widgets);
 
@@ -99,9 +99,9 @@ export const DashboardDropzone = ({
 
     setLayouts(_layouts);
   };
-  const scaleLayouts = (layouts, scaleFactor) => {
-    const _layouts = cloneDeep(layouts);
-    console.log("layouts:before", layouts);
+
+  const scaleLayouts = useCallback((currentLayouts, scaleFactor) => {
+    const _layouts = cloneDeep(currentLayouts);
     Object.keys(_layouts).forEach((bp) => {
       _layouts[bp] = _layouts[bp].map((item) => ({
         ...item,
@@ -109,9 +109,8 @@ export const DashboardDropzone = ({
         x: Math.round(item.x * scaleFactor),
       }));
     });
-    console.log("layouts:after", _layouts);
     return _layouts;
-  };
+  }, []);
 
   useEffect(() => {
     if (!containerRef.current) return;
@@ -134,10 +133,13 @@ export const DashboardDropzone = ({
 
     observer.observe(containerRef.current);
     return () => observer.disconnect();
-  }, [setLayouts, layouts, widgets, containerRef, scaleLayouts]);
+  }, [layouts, scaleLayouts, setLayouts]);
 
   return (
-    <div ref={containerRef} className="w-full h-full min-h-full overflow-y-auto bg-slate-100">
+    <div
+      ref={containerRef}
+      className="h-full min-h-full w-full overflow-y-auto bg-muted/30 p-2"
+    >
       <ResponsiveReactGridLayout
         style={{ minHeight: "100%" }}
         draggableCancel=".cancelSelectorName"
@@ -153,7 +155,6 @@ export const DashboardDropzone = ({
         cols={{ lg: 24, md: 18, sm: 12, xs: 8, xxs: 4 }} // More columns = finer control
         rowHeight={16} // Smaller height = finer control vertically
         allowOverlap={false}
-
       >
         {widgets.map((widget, index) => (
           <div key={widget}>

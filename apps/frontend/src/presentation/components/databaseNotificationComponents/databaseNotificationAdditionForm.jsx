@@ -1,4 +1,3 @@
-import { CircularProgress } from "@mui/material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import React from "react";
@@ -10,6 +9,7 @@ import { formValidations } from "../../../utils/formValidation";
 import { DatabaseNotificationEditor } from "./databaseNotificationEditor";
 import PropTypes from "prop-types";
 
+import { Button, Spinner } from "@jet-admin/ui";
 export const DatabaseNotificationAdditionForm = ({
   tenantID,
   databaseSchemaName,
@@ -68,17 +68,13 @@ export const DatabaseNotificationAdditionForm = ({
         />
 
         <div className="flex justify-end">
-          <button
-            type="submit"
-            className="flex flex-row justify-center items-center px-3 py-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none "
-            disabled={isAddingDatabaseNotification}
-          >
+          <Button type="submit" size="sm" disabled={isAddingDatabaseNotification}>
             {isAddingDatabaseNotification ? (
-              <CircularProgress size={16} color="inherit" />
+              <Spinner size={16} />
             ) : (
               CONSTANTS.STRINGS.ADD_NOTIFICATION_FORM_SUBMIT
             )}
-          </button>
+          </Button>
         </div>
       </form>
     </section>

@@ -154,7 +154,7 @@ const TenantLayoutLandingPage = () => {
             {tenantCards.map((card, index) => (
               <div
                 key={index}
-                className="bg-white rounded border border-gray-200 p-6 cursor-pointer hover:border-[#646cff]"
+                className="bg-white rounded border border-gray-200 p-6 cursor-pointer hover:border-primary"
                 onClick={card.action}
               >
                 <div className="flex justify-between items-center mb-4">

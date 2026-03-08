@@ -1,21 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { FaMagic, FaSpinner, FaRobot, FaCode, FaImage } from "react-icons/fa";
-import {
-    AppBar,
-    Avatar,
-    Box,
-    Dialog,
-    DialogContent,
-    FormControl,
-    IconButton,
-    ListItemIcon,
-    ListItemText,
-    MenuItem,
-    Select,
-    Slide,
-    Toolbar,
-    Typography,
-} from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import { IoClose, IoSend, } from "react-icons/io5";
 import { useParams } from "react-router-dom";
@@ -25,10 +9,7 @@ import { sendUserMessageToAIAPI } from "../../../data/apis/ai";
 import { displayError } from "../../../utils/notification";
 import { AIChatMessageBubble } from "./aiChatMessageBubble";
 
-const Transition = React.forwardRef(function Transition(props, ref) {
-    return <Slide direction="up" ref={ref} {...props} />;
-});
-
+import { Button, Textarea, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
 export const AIChatButton = () => {
     const { tenantID } = useParams();
     const [isAIChatOpen, setIsAIChatOpen] = useState(false);
@@ -124,74 +105,42 @@ export const AIChatButton = () => {
 
     return (
         <>
-            <Dialog
-                fullScreen
-                open={isAIChatOpen}
-                onClose={_handleCloseAIChat}
-                slots={{ transition: Transition }}
-                PaperProps={{
-                    sx: {
-                        bgcolor: '#ffffff',
-                    }
-                }}
-            >
-                <AppBar
-                    sx={{
-                        position: 'relative',
-                        bgcolor: '#ffffff',
-                        color: '#1f2937',
-                        boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-                        borderBottom: '1px solid #e5e7eb'
-                    }}
-                >
-                    <Toolbar sx={{ justifyContent: 'space-between' }}>
+            {isAIChatOpen && (
+                <div className="fixed inset-0 z-50 flex flex-col bg-white animate-in slide-in-from-bottom duration-300">
+                    {/* AppBar */}
+                    <div className="relative bg-white text-gray-800 shadow-sm border-b border-gray-200">
+                        <div className="flex items-center justify-between px-4 py-2">
                         <div className="flex items-center gap-3">
                             <div className="flex items-center gap-2">
-                                <Avatar
-                                    sx={{
-                                        width: 28,
-                                        height: 28,
-                                        fontSize: '12px'
-                                    }}
-                                    src={logo}
-                                />
-                                <Typography variant="h6" component="div" sx={{ fontWeight: 600, fontSize: '1.1rem' }}>
+                                    <img src={logo} alt="logo" className="w-7 h-7 rounded-full" />
+                                    <span className="font-semibold text-lg">
                                     {`${CONSTANTS.APP_NAME} AI Assistant`}
-                                </Typography>
+                                    </span>
                                 <div className="flex items-center gap-2 ml-3">
-                                    <selectedModeData.icon className={`text-sm ${selectedModeData.color}`} />
-                                    <span className="text-xs bg-gray-100 px-2 py-1  font-medium" style={{ borderRadius: '6px' }}>
+                                    <span className="text-xs bg-gray-100 px-2 py-1 font-medium rounded-md">
                                         {selectedModeData.label}
                                     </span>
                                 </div>
                                 {isTyping && (
                                     <div className="flex items-center gap-1 ml-2">
-                                        <div className="w-1.5 h-1.5 bg-green-500  animate-pulse" style={{ borderRadius: '6px' }}></div>
+                                            <div className="w-1.5 h-1.5 bg-green-500 animate-pulse rounded-md"></div>
                                         <span className="text-xs text-green-600 font-medium">Active</span>
                                     </div>
                                 )}
                             </div>
                         </div>
-                        <IconButton
-                            edge="start"
+                            <Button
                             onClick={_handleCloseAIChat}
                             aria-label="close"
-                            sx={{ color: '#6b7280' }}
+                                variant="ghost" size="icon" className="rounded-full"
                         >
                             <IoClose size={20} />
-                        </IconButton>
-                    </Toolbar>
-                </AppBar>
+                            </Button>
+                        </div>
+                    </div>
 
-                <DialogContent
-                    className="!p-0 flex flex-col h-full"
-                    sx={{
-                        bgcolor: '#fafafa',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        height: '100%'
-                    }}
-                >
+                    {/* Content */}
+                    <div className="flex-1 flex flex-col bg-gray-50 overflow-hidden">
                     {/* Messages Area */}
                     <div className="flex-1 overflow-y-auto px-4 py-6">
                         <div className="max-w-4xl mx-auto">
@@ -224,87 +173,28 @@ export const AIChatButton = () => {
                     </div>
 
                     {/* Enhanced Input Area */}
-                    <Box sx={{ p: 2, bgcolor: '#ffffff', borderTop: '1px solid #e5e7eb' }}>
+                        <div className="p-2 bg-white border-t border-gray-200">
                         <div className="max-w-4xl mx-auto">
-                            {/* Mode Selection and Settings Bar */}
-
+                                {/* Mode Selection */}
                             <div className="mb-3 flex items-center justify-end gap-3">
-                                <FormControl size="small" disabled={isInputDisabled}>
-                                    <Select
-                                        value={selectedMode}
-                                        onChange={(e) => handleModeSelect(modes.find(m => m.id === e.target.value))}
-                                        displayEmpty
-                                        sx={{
-                                            minWidth: 180,
-                                            '& .MuiSelect-select': {
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                gap: 1,
-                                                py: 1
-                                            },
-                                            '& .MuiOutlinedInput-notchedOutline': {
-                                                borderColor: '#e5e7eb',
-                                                borderRadius: '6px'
-                                            },
-                                            '&:hover .MuiOutlinedInput-notchedOutline': {
-                                                borderColor: '#9ca3af'
-                                            },
-                                            '&:focus .MuiOutlinedInput-notchedOutline': {
-                                                borderColor: '#9ca3af'
-                                            }
-                                        }}
-                                        renderValue={(value) => {
-                                            const mode = modes.find(m => m.id === value);
-                                            if (!mode) return null;
-
-                                            return (
-                                                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                                                    <mode.icon style={{ color: mode.color, fontSize: '14px' }} />
-                                                    <Typography variant="body2" sx={{ color: '#374151' }}>
-                                                        {mode.label}
-                                                    </Typography>
-                                                </Box>
-                                            );
-                                        }}
-                                    >
+                                    <Select value={selectedMode} onValueChange={(val) => handleModeSelect(modes.find(m => m.id === val))} disabled={isInputDisabled}>
+                                      <SelectTrigger className="min-w-[180px] text-sm">
+                                        <SelectValue />
+                                      </SelectTrigger>
+                                      <SelectContent>
                                         {modes.map((mode) => (
-                                            <MenuItem key={mode.id} value={mode.id}>
-                                                <ListItemIcon sx={{ minWidth: '28px !important' }}>
-                                                    <mode.icon style={{ color: mode.color, fontSize: '14px' }} />
-                                                </ListItemIcon>
-                                                <ListItemText
-                                                    primary={mode.label}
-                                                    sx={{
-                                                        '& .MuiTypography-root': {
-                                                            fontSize: '0.875rem',
-                                                            color: '#374151'
-                                                        }
-                                                    }}
-                                                />
-                                            </MenuItem>
+                                          <SelectItem key={mode.id} value={mode.id}>
+                                            {mode.label}
+                                          </SelectItem>
                                         ))}
+                                      </SelectContent>
                                     </Select>
-                                </FormControl>
-
-                                {/* Settings Button */}
-                                {/* <button
-                                    onClick={handleSettings}
-                                    className="p-2.5 bg-white border !border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-colors duration-200"
-                                    title="Settings"
-                                    disabled={isInputDisabled}
-                                    style={{ borderRadius: '6px', borderColor: "#e5e7eb", borderWidth: 1 }}
-                                >
-                                    <IoSettings className="text-base text-gray-600" />
-                                </button> */}
                             </div>
 
                             {/* Main Input Container */}
-                            <div style={{ borderRadius: '6px' }} className="relative flex flex-row items-center justify-between gap-2 bg-white  border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 p-2">
-                                {/* Left Utility Buttons */}
-
-
+                                <div className="relative flex flex-row items-center justify-between gap-2 bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 p-2 rounded-md">
                                 {/* Text Input */}
-                                <textarea
+                                <Textarea
                                     ref={inputRef}
                                     value={input}
                                     onChange={(e) => setInput(e.target.value)}
@@ -326,24 +216,23 @@ export const AIChatButton = () => {
                                 />
 
                                 {/* Send Button */}
-                                <button
+                                <Button
                                     onClick={_handleSendUserMessage}
                                     disabled={!input.trim() || isInputDisabled}
                                     className={`
-                                        p-2.5  transition-all duration-200 shrink-0
+                                        p-2.5 transition-all duration-200 shrink-0 rounded-md
                                         ${(!input.trim() || isInputDisabled)
                                             ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                                        : 'bg-[#646cff] text-white hover:bg-[#4f56df] shadow-sm hover:shadow-md'
+                                        : 'bg-primary text-white hover:bg-primary/85 shadow-sm hover:shadow-md'
                                         }
                                     `}
-                                    style={{ borderRadius: '6px' }}
                                 >
                                     {isTyping ? (
                                         <FaSpinner className="animate-spin text-sm" />
                                     ) : (
                                         <IoSend className="text-sm" />
                                     )}
-                                </button>
+                                </Button>
                             </div>
 
                             {/* Help Text and Mode Indicator */}
@@ -355,8 +244,7 @@ export const AIChatButton = () => {
                                             {selectedModeData.label} mode active
                                         </span>
                                     )}
-                                </div>
-
+                                    </div>
                             </div>
 
                             {/* Mode-specific hints */}
@@ -368,20 +256,21 @@ export const AIChatButton = () => {
                                 </div>
                             )}
                         </div>
-                    </Box>
-                </DialogContent>
-            </Dialog>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Enhanced Trigger Button */}
-            <button
+            <Button
                 onClick={_handleOpenAIChat}
                 type="button"
                 style={{ zIndex: 1000 }}
-                className="absolute bottom-4 right-4 group overflow-hidden w-auto flex flex-row items-center justify-center rounded-lg bg-gradient-to-r from-[#646cff] via-[#7c3aed] to-[#646cff] px-4 py-2.5 text-sm font-medium text-white hover:from-[#5a5cf8] hover:via-[#6d28d9] hover:to-[#5a5cf8] focus:ring-2 focus:ring-[#646cff]/50 outline-none focus:outline-none transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/20 before:via-transparent before:to-white/20 before:translate-x-[-100%] hover:before:translate-x-[100%] before:transition-transform before:duration-700 before:ease-out"
+                className="absolute bottom-4 right-4 group overflow-hidden w-auto flex flex-row items-center justify-center rounded-lg bg-gradient-to-r from-primary via-[#7c3aed] to-primary px-4 py-2.5 text-sm font-medium text-white hover:from-primary/90 hover:via-[#6d28d9] hover:to-primary/90 focus:ring-2 focus:ring-primary/50 outline-none focus:outline-none transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 before:absolute before:inset-0 before:bg-gradient-to-r before:from-white/20 before:via-transparent before:to-white/20 before:translate-x-[-100%] hover:before:translate-x-[100%] before:transition-transform before:duration-700 before:ease-out"
             >
                 <FaMagic className="text-sm mr-2 group-hover:animate-pulse relative z-10" />
                 <span className="relative z-10">Ask AI Assistant</span>
-            </button>
+            </Button>
         </>
     );
 };

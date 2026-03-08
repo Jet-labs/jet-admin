@@ -1,8 +1,8 @@
-import { CircularProgress } from "@mui/material";
 import PropTypes from "prop-types";
 import React from "react";
 import { ErrorDisplay } from "./errorDisplay";
 
+import { Spinner } from "@jet-admin/ui";
 export const ReactQueryLoadingErrorWrapper = ({
   isLoading,
   error,
@@ -20,7 +20,7 @@ export const ReactQueryLoadingErrorWrapper = ({
     <div
       className={`h-full w-full flex justify-center items-center ${loadingContainerClass}`}
     >
-      <CircularProgress className="!text-[#646cff]" size={16} />
+      <Spinner className="text-primary" size={16} />
     </div>
   ) : error ? (
     <div className="h-full w-full flex flex-col justify-center items-center">

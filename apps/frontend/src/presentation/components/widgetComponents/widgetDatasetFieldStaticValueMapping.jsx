@@ -1,6 +1,8 @@
 import { CONSTANTS } from "../../../constants";
 import React from "react";
 import PropTypes from "prop-types";
+import { Input } from "@jet-admin/ui";
+
 
 export const WidgetDatasetFieldStaticValueMapping = ({
   datasetIndex,
@@ -23,7 +25,7 @@ export const WidgetDatasetFieldStaticValueMapping = ({
           >
             {CONSTANTS.STRINGS.WIDGET_EDITOR_FORM_DATASET_FIELD_TEXT_LABEL}
           </label>
-          <input
+          <Input
             type="text"
             name={`widgetForm.dataQueries[${datasetIndex}].staticValues.text`}
             id={`widgetForm.dataQueries[${datasetIndex}].staticValues.text`}

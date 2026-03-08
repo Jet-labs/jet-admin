@@ -3,9 +3,11 @@ import { VscJson, VscChevronRight, VscChevronDown } from 'react-icons/vsc';
 import { FiCopy, FiCheck } from 'react-icons/fi';
 import PropTypes from 'prop-types';
 
+import { Button } from "@jet-admin/ui";
+
 /**
  * Collapsible JSON node for rendering nested objects/arrays
- * Uses light theme styling
+ * Standardized for semantic design tokens and dark mode support.
  */
 const JsonNode = ({ name, value, depth = 0 }) => {
   const [isExpanded, setIsExpanded] = useState(depth < 2);
@@ -25,28 +27,28 @@ const JsonNode = ({ name, value, depth = 0 }) => {
   // Render primitive values
   if (!isObject) {
     let displayValue;
-    let colorClass = 'text-slate-700';
+    let colorClass = 'text-foreground/80';
     
     if (typeof value === 'string') {
       displayValue = `"${value}"`;
-      colorClass = 'text-emerald-600';
+      colorClass = 'text-emerald-500 font-medium';
     } else if (typeof value === 'number') {
       displayValue = String(value);
-      colorClass = 'text-amber-600';
+      colorClass = 'text-amber-500 font-medium';
     } else if (typeof value === 'boolean') {
       displayValue = String(value);
-      colorClass = 'text-purple-600';
+      colorClass = 'text-indigo-500 font-medium';
     } else if (value === null) {
       displayValue = 'null';
-      colorClass = 'text-slate-400';
+      colorClass = 'text-muted-foreground/60 italic';
     } else {
       displayValue = String(value);
     }
 
     return (
-      <div className="flex items-center py-0.5" style={{ paddingLeft: `${depth * 16}px` }}>
+      <div className="flex items-center py-0.5 group" style={{ paddingLeft: `${depth * 16}px` }}>
         {name && (
-          <span className="text-blue-600 mr-1">{name}:</span>
+          <span className="text-blue-500 font-medium mr-1.5">{name}:</span>
         )}
         <span className={colorClass}>{displayValue}</span>
       </div>
@@ -61,47 +63,49 @@ const JsonNode = ({ name, value, depth = 0 }) => {
   return (
     <div>
       <div 
-        className="flex items-center py-0.5 cursor-pointer hover:bg-slate-100 rounded group"
+        className="flex items-center py-0.5 cursor-pointer hover:bg-muted/50 rounded-sm transition-colors group"
         style={{ paddingLeft: `${depth * 16}px` }}
         onClick={() => !isEmpty && setIsExpanded(!isExpanded)}
       >
         {!isEmpty && (
           isExpanded 
-            ? <VscChevronDown className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-            : <VscChevronRight className="w-3.5 h-3.5 text-slate-400 shrink-0" />
+            ? <VscChevronDown className="size-3.5 text-muted-foreground shrink-0" />
+            : <VscChevronRight className="size-3.5 text-muted-foreground shrink-0" />
         )}
-        {isEmpty && <span className="w-3.5" />}
+        {isEmpty && <span className="size-3.5 shrink-0" />}
         
         {name && (
-          <span className="text-blue-600 ml-1 mr-1">{name}:</span>
+          <span className="text-blue-500 font-semibold ml-1 mr-1.5">{name}:</span>
         )}
         
         {isEmpty ? (
-          <span className="text-slate-400">{brackets[0]}{brackets[1]}</span>
+          <span className="text-muted-foreground/50 font-mono">{brackets[0]}{brackets[1]}</span>
         ) : !isExpanded ? (
-            <span className="text-slate-400">
+            <span className="text-muted-foreground font-mono">
             {brackets[0]}...{brackets[1]} 
-              <span className="text-xs text-slate-400 ml-1">{typeLabel}</span>
+              <span className="text-[10px] text-muted-foreground font-sans ml-2 opacity-60 uppercase tracking-tighter">{typeLabel}</span>
           </span>
         ) : (
-              <span className="text-slate-400">
+              <span className="text-muted-foreground font-mono">
             {brackets[0]}
-                <span className="text-xs text-slate-400 ml-1">{typeLabel}</span>
+                <span className="text-[10px] text-muted-foreground font-sans ml-2 opacity-60 uppercase tracking-tighter">{typeLabel}</span>
           </span>
         )}
 
         {/* Copy button */}
-        <button
+        <Button
           onClick={handleCopy}
-          className="ml-2 p-1 opacity-0 group-hover:opacity-100 text-slate-400 hover:text-slate-600 transition-opacity"
+          variant="ghost"
+          size="icon"
+          className="ml-2 h-5 w-5 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-foreground transition-all duration-200"
           title="Copy value"
         >
-          {copied ? <FiCheck className="w-3 h-3 text-green-500" /> : <FiCopy className="w-3 h-3" />}
-        </button>
+          {copied ? <FiCheck className="size-3 text-emerald-500" /> : <FiCopy className="size-3" />}
+        </Button>
       </div>
 
       {isExpanded && !isEmpty && (
-        <div>
+        <div className="border-l border-border/10 ml-1.5">
           {keys.map((key) => (
             <JsonNode 
               key={key} 
@@ -110,7 +114,7 @@ const JsonNode = ({ name, value, depth = 0 }) => {
               depth={depth + 1} 
             />
           ))}
-          <div style={{ paddingLeft: `${depth * 16}px` }} className="text-slate-400">
+          <div style={{ paddingLeft: `${depth * 16}px` }} className="text-muted-foreground/50 font-mono py-0.5">
             {brackets[1]}
           </div>
         </div>
@@ -127,7 +131,7 @@ JsonNode.propTypes = {
 
 /**
  * WorkflowContextPanel - Panel to display workflow context during test runs
- * Uses light theme to match project styling
+ * Standardized for semantic design tokens and dark mode support.
  */
 export const WorkflowContextPanel = ({ 
   context = {}, 
@@ -154,47 +158,47 @@ export const WorkflowContextPanel = ({
   };
 
   return (
-    <div className={`flex flex-col bg-white overflow-hidden ${className}`}>
+    <div className={`flex flex-col bg-background overflow-hidden ${className}`}>
       {/* Header */}
-      <div className="flex items-center justify-between px-2 py-1.5 bg-slate-50 border-b border-slate-200">
+      <div className="flex items-center justify-between px-3 py-2 bg-muted/30 border-b border-border">
         <div className="flex items-center gap-2">
-          <VscJson className="w-4 h-4 text-slate-500" />
-          <span className="text-sm font-medium text-slate-700">Context</span>
+          <VscJson className="size-4 text-muted-foreground" />
+          <span className="text-sm font-semibold text-foreground">Context</span>
           {isRunning && (
-            <span className="flex items-center gap-1 text-xs text-blue-600">
-              <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
+            <span className="flex items-center gap-1.5 text-xs text-blue-500 font-medium">
+              <span className="size-1.5 bg-blue-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
               Live
             </span>
           )}
           {!isEmpty && (
-            <span className="text-xs text-slate-400">
-              ({contextKeys.length} variable{contextKeys.length !== 1 ? 's' : ''})
+            <span className="text-[10px] text-muted-foreground/60 font-bold uppercase tracking-wider">
+              {contextKeys.length} {contextKeys.length !== 1 ? 'Variables' : 'Variable'}
             </span>
           )}
         </div>
         <div className="flex items-center gap-1">
-          {(
-            <button
-              onClick={handleCopyAll}
-              type='button'
-              disabled={isEmpty}
-              className="p-1 text-slate-400 bg-white hover:text-slate-600 hover:bg-slate-100 rounded transition-colors flex items-center gap-1"
-              title="Copy all context"
-            >
-              {copied ? <FiCheck className="w-3 h-3 text-green-500" /> : <FiCopy className="w-3 h-3" />}
-            </button>
-          )}
+          <Button
+            onClick={handleCopyAll}
+            type='button'
+            disabled={isEmpty}
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 text-muted-foreground hover:text-foreground"
+            title="Copy all context"
+          >
+            {copied ? <FiCheck className="size-3.5 text-emerald-500" /> : <FiCopy className="size-3.5" />}
+          </Button>
         </div>
       </div>
 
       {/* Context tree */}
-      <div className="flex-1 overflow-y-auto p-3 font-mono text-xs bg-slate-50/50">
+      <div className="flex-1 overflow-y-auto p-4 font-mono text-xs bg-background/50">
         {isEmpty ? (
-          <div className="flex items-center justify-center h-full text-slate-400">
+          <div className="flex items-center justify-center h-full text-muted-foreground/50 italic text-center px-4">
             <span>No context data yet. Run the workflow to see variables.</span>
           </div>
         ) : (
-          <div className="space-y-0.5">
+            <div className="space-y-1">
             {contextKeys.map((key) => (
               <JsonNode key={key} name={key} value={displayContext[key]} />
             ))}
@@ -204,7 +208,7 @@ export const WorkflowContextPanel = ({
 
       {/* Footer */}
       {!isEmpty && (
-        <div className="px-4 py-2 bg-slate-50 border-t border-slate-200 text-xs text-slate-500">
+        <div className="px-4 py-2 bg-muted/20 border-t border-border text-[10px] text-muted-foreground/70 font-medium italic">
           <span>Context contains results from completed nodes</span>
         </div>
       )}
@@ -219,4 +223,3 @@ WorkflowContextPanel.propTypes = {
 };
 
 export default WorkflowContextPanel;
-

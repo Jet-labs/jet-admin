@@ -4,7 +4,12 @@ import { useParams } from "react-router-dom";
 
 const AddDataQueryPage = () => {
   const { tenantID } = useParams();
-  return <DataQueryAdditionForm tenantID={tenantID} />;
+
+  return (
+    <div className="flex h-full w-full flex-col overflow-hidden bg-background">
+      <DataQueryAdditionForm tenantID={tenantID} />
+    </div>
+  );
 };
 
 export default AddDataQueryPage;

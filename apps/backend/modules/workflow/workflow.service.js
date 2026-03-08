@@ -505,9 +505,11 @@ workflowService.stopTestWorkflow = async ({ instanceID }) => {
  * @param {string} params.widgetType - Widget type (bar, line, pie, etc.)
  * @param {object} params.datasetFields - Field mappings { xAxis: "{{ctx.data[*].date}}", yAxis: "..." }
  * @param {object} params.parameters - Additional chart parameters
+ * @param {object} params.workflowConfig - Full workflow config (for Vega widgets)
+ * @param {object} params.vegaSpec - Vega spec from widgetConfig (new architecture)
  * @returns {Promise<object>} Workflow status with processed data
  */
-workflowService.getRunStatusForWidget = async ({ instanceID, widgetType, datasetFields, parameters }) => {
+workflowService.getRunStatusForWidget = async ({ instanceID, widgetType, datasetFields, parameters, workflowConfig, vegaSpec }) => {
   Logger.log("info", {
     message: "workflowService:getRunStatusForWidget:params",
     params: { instanceID, widgetType },
@@ -534,6 +536,8 @@ workflowService.getRunStatusForWidget = async ({ instanceID, widgetType, dataset
       context: runStatus.contextData,
       datasetFields,
       parameters,
+      // Merge vegaSpec into workflowConfig for new architecture
+      workflowConfig: vegaSpec ? { ...workflowConfig, vegaSpec } : workflowConfig,
     });
 
     Logger.log("success", {

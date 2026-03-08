@@ -5,6 +5,7 @@ import hljs from "highlight.js";
 import "highlight.js/styles/atom-one-light.css";
 import PropTypes from "prop-types";
 
+import { Button } from "@jet-admin/ui";
 export const CodeBlock = ({
   code,
   language = "plaintext",
@@ -184,7 +185,7 @@ export const CodeBlock = ({
           </span>
         </div>
         <div className="flex space-x-2">
-          <button
+          <Button
             onClick={toggleExpand}
             className={`text-xs py-1 px-2 rounded flex items-center space-x-1 ${
               theme === "dark"
@@ -194,8 +195,8 @@ export const CodeBlock = ({
           >
             {expanded ? <FiMinimize size={14} /> : <FiMaximize size={14} />}
             <span>{expanded ? "Collapse" : "Expand"}</span>
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={copyToClipboard}
             className={`text-xs py-1 px-2 rounded flex items-center space-x-1 ${
               theme === "dark"
@@ -209,7 +210,7 @@ export const CodeBlock = ({
               <FiCopy size={14} />
             )}
             <span>{copied ? "Copied!" : "Copy"}</span>
-          </button>
+          </Button>
         </div>
       </div>
       <div

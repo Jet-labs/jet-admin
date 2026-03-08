@@ -6,6 +6,8 @@ import { useDatabaseTriggersState } from "../../../../logic/contexts/databaseTri
 import { NoEntityUI } from "../../ui/noEntityUI";
 import React from "react";
 
+import { Button } from "@jet-admin/ui";
+
 export const DatabaseTriggerDrawerList = () => {
   const {
     isLoadingDatabaseTriggers,
@@ -21,23 +23,24 @@ export const DatabaseTriggerDrawerList = () => {
     );
   };
   return (
-    <div className=" bg-white   h-[calc(100vh-48px)] overflow-hidden p-2 w-full">
-      <button
+    <div className="bg-background h-[calc(100vh-48px)] overflow-hidden p-2 w-full">
+      <Button
         onClick={_navigateToAddMoreTrigger}
-        className="flex mb-2 flex-row items-center justify-center rounded bg-[#646cff]/10 px-3 py-1.5 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50 w-full outline-none focus:outline-none"
+        variant="primary-ghost"
+        className="w-full mb-2"
       >
-        <FaPlus className="!w-4 !h-4 !text-[#646cff] mr-1" />
+        <FaPlus className="w-4 h-4 mr-2" />
         {CONSTANTS.STRINGS.ADD_TRIGGER_BUTTON_TEXT}
-      </button>
+      </Button>
 
       {/* Trigger List */}
 
       {isLoadingDatabaseTriggers || isFetchingDatabaseTriggers ? (
-        <div role="status" className=" animate-pulse w-full">
-          <div className="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
-          <div className="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
-          <div className="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
-          <div className="h-6 bg-gray-200 rounded   mb-2 w-full"></div>
+        <div role="status" className="animate-pulse w-full space-y-2">
+          <div className="h-8 bg-muted rounded w-full"></div>
+          <div className="h-8 bg-muted rounded w-full"></div>
+          <div className="h-8 bg-muted rounded w-full"></div>
+          <div className="h-8 bg-muted rounded w-full"></div>
         </div>
       ) : databaseTriggers && databaseTriggers.length > 0 ? (
           <div className="h-full w-full overflow-y-auto pb-10">
@@ -57,29 +60,24 @@ export const DatabaseTriggerDrawerList = () => {
                   databaseTrigger.databaseTableName,
                   databaseTrigger.databaseTriggerName
                 )}
-                // to={"/"}
                 key={key}
-                className="block mb-2 focus:outline-none "
+                className="block mb-1 focus:outline-none"
               >
                 <div
-                  className={`flex items-center gap-2 px-2 py-1 rounded hover:bg-gray-100 ${
-                    isActive ? "bg-[#eaebff]" : "bg-white text-gray-700"
+                  className={`flex items-center px-2 py-1.5 rounded-md transition-colors ${isActive
+                    ? "bg-primary/10 text-primary"
+                    : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
                   }`}
                 >
-                  <div className="!w-[16px]">
-                    <LuDatabaseZap
-                      className={`w-[16px] h-[16px] ${
-                        isActive ? "text-primary" : "text-slate-600"
+                  <LuDatabaseZap
+                    className={`w-4 h-4 mr-2 shrink-0 ${isActive ? "text-primary" : "text-muted-foreground"
                       }`}
-                    />
-                  </div>
+                  />
 
                   <span
-                    className={`font-medium text-sm truncate ${
-                      isActive ? "font-bold" : ""
+                    className={`text-sm truncate ${isActive ? "font-medium" : ""
                     } `}
                   >
-                    {/* {StringUtils.truncateName(databaseTrigger.databaseTriggerName, 15)} */}
                     {`${databaseTrigger.databaseTableName}.${databaseTrigger.databaseTriggerName}`}
                   </span>
                 </div>
@@ -88,7 +86,7 @@ export const DatabaseTriggerDrawerList = () => {
           })}
         </div>
       ) : (
-        <div className=" text-gray-500 dark:text-gray-400">
+            <div className="text-muted-foreground mt-4">
           <NoEntityUI
             message={CONSTANTS.STRINGS.TRIGGER_DRAWER_LIST_NO_TRIGGER}
           />

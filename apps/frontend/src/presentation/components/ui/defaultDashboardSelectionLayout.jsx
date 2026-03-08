@@ -15,9 +15,9 @@ import { LuPinOff } from "react-icons/lu";
 import { MdOutlineSpaceDashboard } from "react-icons/md";
 import { ReactQueryLoadingErrorWrapper } from "./reactQueryLoadingErrorWrapper";
 import { DashboardRenderWidget } from "../dashboardComponents/dashboardRenderWidget";
-import { CircularProgress } from "@mui/material";
 import { AiOutlineFullscreen } from "react-icons/ai";
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
+import { Button, Spinner, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
 export const DefaultDashboardSelectionLayout = ({
@@ -97,45 +97,41 @@ export const DefaultDashboardSelectionLayout = ({
               )}
 
               {dashboard && (
-                <span className="text-xs text-[#646cff] mt-2">{`Dashboard ID: ${dashboard.dashboardID} `}</span>
+                <span className="text-xs text-primary mt-2">{`Dashboard ID: ${dashboard.dashboardID} `}</span>
               )}
             </div>
             <div className="flex flex-row justify-center items-center gap-2">
               {isUpdatingUserConfig ? (
-                <CircularProgress size={16} className="!text-[#646cff]" />
+                <Spinner size={16} className="text-primary" />
               ) : (
                 <>
-                  <select
-                    className="p-1 text-xs text-gray-700 bg-white border border-gray-300 rounded focus:outline-none focus:border-blue-500"
-                    value={pinnedDashboardID}
-                    onChange={(e) =>
-                      _handleSetDefaultDashboard(e.target.value)
-                    }
-                  >
-                    <option value="" disabled selected>
-                      Select a dashboard
-                    </option>
-                    {dashboards?.map((dashboard) => (
-                      <option
-                        key={dashboard.dashboardID}
-                        value={dashboard.dashboardID}
-                      >
-                        {dashboard.dashboardTitle}
-                      </option>
-                    ))}
-                  </select>
-                  <button
+                    <Select value={String(pinnedDashboardID)} onValueChange={(val) => _handleSetDefaultDashboard(val)}>
+                      <SelectTrigger className="text-xs">
+                        <SelectValue placeholder="Select a dashboard" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {dashboards?.map((dashboard) => (
+                        <SelectItem
+                          key={dashboard.dashboardID}
+                          value={String(dashboard.dashboardID)}
+                        >
+                          {dashboard.dashboardTitle}
+                        </SelectItem>
+                      ))}
+                      </SelectContent>
+                    </Select>
+                    <Button
                     onClick={() => _handleSetDefaultDashboard(null)}
-                    className="!outline-none !hover:outline-none  items-center text-nowrap w-fit inline-flex rounded bg-[#646cff]/10 px-3 py-1.5 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50"
+                    variant="primary-ghost" className="w-fit text-nowrap"
                   >
-                    <LuPinOff className="!w-3.5 !h-3.5 !text-[#646cff]" />
-                  </button>
-                    <button
+                    <LuPinOff className="!w-3.5 !h-3.5 !text-primary" />
+                    </Button>
+                    <Button
                       onClick={fullScreenHandle.enter}
-                      className="!outline-none !hover:outline-none  items-center text-nowrap w-fit inline-flex rounded bg-[#646cff]/10 px-3 py-1.5 text-sm text-[#646cff] hover:bg-[#646cff]/20 focus:ring-2 focus:ring-[#646cff]/50"
+                      variant="primary-ghost" className="w-fit text-nowrap"
                     >
-                      <AiOutlineFullscreen className="text-[#646cff] h-4 w-4" />
-                    </button>
+                      <AiOutlineFullscreen className="text-primary h-4 w-4" />
+                    </Button>
                 </>
               )}
             </div>
@@ -199,8 +195,8 @@ export const DefaultDashboardSelectionLayout = ({
           <div className="h-full w-full flex justify-center items-center p-6">
             <div className="bg-white p-8 max-w-md text-center">
               <div className="flex justify-center mb-4">
-                <div className="bg-[#646cff]/10 p-4 rounded-full">
-                  <MdOutlineSpaceDashboard className="text-[#646cff] text-4xl" />
+                <div className="bg-primary/10 p-4 rounded-full">
+                  <MdOutlineSpaceDashboard className="text-primary text-4xl" />
                 </div>
               </div>
               <h2 className="text-xl font-bold text-slate-700 mb-2">
@@ -214,27 +210,23 @@ export const DefaultDashboardSelectionLayout = ({
               </p>
               <div className="flex flex-row justify-center items-center gap-2">
                 {isUpdatingUserConfig ? (
-                  <CircularProgress size={16} className="!text-[#646cff]" />
+                    <Spinner size={16} className="text-primary" />
                 ) : (
-                  <select
-                    className="p-1 text-xs text-gray-700 bg-white border border-gray-300 rounded focus:outline-none focus:border-blue-500"
-                    value={pinnedDashboardID}
-                    onChange={(e) =>
-                      _handleSetDefaultDashboard(e.target.value)
-                    }
-                  >
-                    <option value="" disabled selected>
-                      Select a dashboard
-                    </option>
-                    {dashboards?.map((dashboard) => (
-                      <option
-                        key={dashboard.dashboardID}
-                        value={dashboard.dashboardID}
-                      >
-                        {dashboard.dashboardTitle}
-                      </option>
-                    ))}
-                  </select>
+                      <Select value={String(pinnedDashboardID || '')} onValueChange={(val) => _handleSetDefaultDashboard(val)}>
+                        <SelectTrigger className="text-xs">
+                          <SelectValue placeholder="Select a dashboard" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {dashboards?.map((dashboard) => (
+                        <SelectItem
+                          key={dashboard.dashboardID}
+                          value={String(dashboard.dashboardID)}
+                        >
+                          {dashboard.dashboardTitle}
+                        </SelectItem>
+                      ))}
+                        </SelectContent>
+                      </Select>
                 )}
               </div>
             </div>

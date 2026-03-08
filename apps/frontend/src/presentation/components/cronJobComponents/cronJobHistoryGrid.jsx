@@ -12,8 +12,10 @@ import { getFormattedCronJobHistoryColumns } from "./cronJobHistoryGridColumnFor
 
 export const CronJobHistoryGrid = ({ tenantID, cronJobID }) => {
   CronJobHistoryGrid.propTypes = {
-    tenantID: PropTypes.number.isRequired,
-    cronJobID: PropTypes.number.isRequired,
+    tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+      .isRequired,
+    cronJobID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+      .isRequired,
   };
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(20);
@@ -25,8 +27,6 @@ export const CronJobHistoryGrid = ({ tenantID, cronJobID }) => {
     data: cronJobHistory,
     error: loadCronJobHistoryError,
     isFetching: isFetchingCronJobHistory,
-    isPreviousData: isPreviousCronJobHistoryData,
-    refetch: refetchCronJobHistory,
   } = useQuery({
     queryKey: [
       CONSTANTS.REACT_QUERY_KEYS.DATABASE_CRON_JOBS(tenantID),
@@ -71,34 +71,32 @@ export const CronJobHistoryGrid = ({ tenantID, cronJobID }) => {
     <ReactQueryLoadingErrorWrapper
       isLoading={isLoadingCronJobHistory}
       error={loadCronJobHistoryError}
-      isFetching={isFetchingCronJobHistory}
-      isPreviousData={isPreviousCronJobHistoryData}
-      refetch={refetchCronJobHistory}
+      loadingContainerClass="flex-1"
     >
-      <div
-        className={`w-full h-full !overflow-y-hidden flex flex-col justify-start items-stretch`}
-      >
+      <div className="flex h-full w-full flex-col overflow-hidden bg-background">
         {cronJobHistory ? (
-          <div className="flex flex-col w-full flex-grow h-full overflow-y-auto justify-between items-stretch text-sm font-medium">
-            <div className="w-full px-3 py-2 border-b border-gray-200 flex flex-col justify-center items-start">
-              <h1 className="text-lg font-bold leading-tight tracking-tight text-slate-700">
+          <div className="flex h-full w-full flex-col overflow-hidden text-sm font-medium">
+            <div className="border-b border-border px-3 py-3">
+              <h1 className="text-lg font-semibold text-foreground">
                 {CONSTANTS.STRINGS.VIEW_CRON_JOB_HISTORY_TITLE}
               </h1>
 
               {cronJobID && (
-                <span className="text-xs text-[#646cff] mt-2">{`Job ID: ${cronJobID} `}</span>
+                <span className="mt-1 block text-xs text-muted-foreground">{`Job ID: ${cronJobID}`}</span>
               )}
             </div>
-            <div className="flex flex-col w-full flex-grow h-full overflow-y-auto justify-between items-stretch text-sm font-medium">
+            <div className="flex h-full w-full flex-col overflow-hidden p-3">
+              {columns?.length ? (
               <DataGrid
                 ref={datagridRef}
                 apiRef={datagridAPIRef}
                 rows={cronJobHistory.cronJobHistory}
                 columns={columns}
-                loading={isLoadingCronJobHistory}
+                  loading={isLoadingCronJobHistory || isFetchingCronJobHistory}
                 getRowId={(row) => _getRowID(row)} // Custom row ID getter
                 sx={{
-                  "--unstable_DataGrid-radius": "0",
+                  border: 0,
+                  "--unstable_DataGrid-radius": "0.5rem",
                   "& .MuiDataGrid-root": {
                     borderRadius: 0,
                   },
@@ -128,12 +126,15 @@ export const CronJobHistoryGrid = ({ tenantID, cronJobID }) => {
                     minWidth: "auto !important",
                     width: "auto !important",
                     flex: "0 0 auto !important",
-                    color: "#646cff !important",
+                    color: "hsl(var(--primary))",
                     padding: "0.25rem !important",
+                  },
+                  "& .MuiDataGrid-columnHeaders": {
+                    backgroundColor: "hsl(var(--muted) / 0.5)",
                   },
                 }}
                 showCellVerticalBorder
-                className="!border-0"
+                  className="bg-background"
                 disableRowSelectionOnClick
                 disableColumnFilter
                 // onSortModelChange={(model) => {
@@ -157,15 +158,20 @@ export const CronJobHistoryGrid = ({ tenantID, cronJobID }) => {
                   page: newPage,
                   pageSize: newPageSize,
                 }) => {
-                  setPage(newPage + 1); // Convert to 1-based for API
+                  setPage(newPage + 1);
                   setPageSize(newPageSize);
                 }}
                 hideFooterSelectedRowCount
               />
+              ) : (
+                <div className="flex h-full items-center justify-center rounded-lg border border-dashed border-border bg-muted/20 p-6">
+                  <NoEntityUI message="No scheduled job history is available yet." />
+                </div>
+              )}
             </div>
           </div>
         ) : (
-          <div className="!w-full !p-2">
+            <div className="p-3">
             <NoEntityUI message={CONSTANTS.ERROR_CODES.SERVER_ERROR.message} />
           </div>
         )}

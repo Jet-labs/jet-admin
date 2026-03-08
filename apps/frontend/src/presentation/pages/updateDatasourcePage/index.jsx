@@ -5,12 +5,12 @@ import { DatasourceUpdationForm } from "../../components/datasourceComponents/da
 
 
 const UpdateDatasourcePage = () => {
-    const { tenantID, datasourceID } = useParams();
+  const { tenantID, datasourceID } = useParams();
+
   return (
-    <DatasourceUpdationForm
-      tenantID={tenantID}
-      datasourceID={datasourceID}
-    />
+    <div className="flex h-full w-full flex-col overflow-hidden bg-background">
+      <DatasourceUpdationForm tenantID={tenantID} datasourceID={datasourceID} />
+    </div>
   );
 };
 

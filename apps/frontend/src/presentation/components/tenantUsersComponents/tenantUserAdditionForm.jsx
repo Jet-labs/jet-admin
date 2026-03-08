@@ -1,23 +1,29 @@
-import {
-  CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-} from "@mui/material";
 import { useFormik } from "formik";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import PropTypes from "prop-types";
+import React from "react";
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  Input,
+  Label,
+  Spinner,
+} from "@jet-admin/ui";
 import { CONSTANTS } from "../../../constants";
 import { addUserToTenantAPI } from "../../../data/apis/userManagement";
 import { formValidations } from "../../../utils/formValidation";
 import { displayError, displaySuccess } from "../../../utils/notification";
-import React from "react";
 
 export const TenantUserAdditionForm = ({ tenantID, open, onClose }) => {
   TenantUserAdditionForm.propTypes = {
-    tenantID: PropTypes.number.isRequired,
+    tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+      .isRequired,
     open: PropTypes.bool.isRequired,
     onClose: PropTypes.func.isRequired,
   };
@@ -51,71 +57,61 @@ export const TenantUserAdditionForm = ({ tenantID, open, onClose }) => {
   return (
     <Dialog
       open={open}
-      onClose={onClose}
-      aria-labelledby="alert-dialog-title"
-      aria-describedby="alert-dialog-description"
+      onOpenChange={(isOpen) => {
+        if (!isOpen) onClose();
+      }}
     >
-      <>
-        <DialogTitle className="!p-4 !pb-0 ">
-          {CONSTANTS.STRINGS.ADD_MEMBER_TO_TENANT_DIALOG_TITLE}
-        </DialogTitle>
-        <DialogContent className="!p-4 !space-y-4">
-          <span className="text-sm font-normal text-gray-600">
-            {CONSTANTS.STRINGS.ADD_MEMBER_TO_TENANT_DIALOG_DESCRIPTION}
-          </span>
-          <form
-            className="space-y-4 md:space-y-6"
-            // onSubmit={addUserToTenantForm.handleSubmit}
-          >
-            <div>
-              <label
-                htmlFor="tenantUserEmail"
-                className="block text-xs text-slate-500 mb-1"
-              >
-                {
-                  CONSTANTS.STRINGS
-                    .ADD_MEMBER_TO_TENANT_DIALOG_FORM_MEMBER_EMAIL_LABEL
-                }
-              </label>
-              <input
-                type="tenantUserEmail"
-                name="tenantUserEmail"
-                id="tenantUserEmail"
-                className=" placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:border-slate-700 block w-full px-2.5 py-1.5 "
-                placeholder={
-                  CONSTANTS.STRINGS
-                    .ADD_MEMBER_TO_TENANT_DIALOG_FORM_MEMBER_EMAIL_PLACEHOLDER
-                }
-                required={true}
-                onChange={addUserToTenantForm.handleChange}
-                onBlur={addUserToTenantForm.handleBlur}
-                value={addUserToTenantForm.values.tenantUserEmail}
-              />
-            </div>
-          </form>
-        </DialogContent>
-        <DialogActions className="!p-4">
-          <button
-            onClick={onClose}
-            type="button"
-            className={`px-2.5 py-1.5 text-sm !text-slate-600 border-0 hover:border-0 !border-slate-300 bg-slate-200 hover:!bg-slate-300 rounded  hover:outline-none  outline-none `}
-          >
-            {CONSTANTS.STRINGS.ADD_MEMBER_TO_TENANT_DIALOG_FORM_CANCEL_BUTTON}
-          </button>
+      <DialogContent className="max-w-md p-4">
+        <form className="space-y-4" onSubmit={addUserToTenantForm.handleSubmit}>
+          <DialogHeader className="space-y-1">
+            <DialogTitle className="text-sm font-semibold">
+              {CONSTANTS.STRINGS.ADD_MEMBER_TO_TENANT_DIALOG_TITLE}
+            </DialogTitle>
+            <DialogDescription>
+              {CONSTANTS.STRINGS.ADD_MEMBER_TO_TENANT_DIALOG_DESCRIPTION}
+            </DialogDescription>
+          </DialogHeader>
 
-          <button
-            onClick={addUserToTenantForm.handleSubmit}
-            disabled={isAddingMemberToTenant}
-            className={`px-2.5 py-1.5 text-white text-sm bg-[#646cff] rounded hover:outline-none hover:border-0 border-0 outline-none flex flex-row items-center justify-center`}
-          >
-            {isAddingMemberToTenant ? (
-              <CircularProgress className="!text-white" size={16} />
-            ) : (
-              CONSTANTS.STRINGS.ADD_MEMBER_TO_TENANT_DIALOG_FORM_SUBMIT_BUTTON
-            )}
-          </button>
-        </DialogActions>
-      </>
+          <div className="space-y-1.5">
+            <Label htmlFor="tenantUserEmail">
+              {
+                CONSTANTS.STRINGS
+                  .ADD_MEMBER_TO_TENANT_DIALOG_FORM_MEMBER_EMAIL_LABEL
+              }
+            </Label>
+            <Input
+              type="email"
+              name="tenantUserEmail"
+              id="tenantUserEmail"
+              placeholder={
+                CONSTANTS.STRINGS
+                  .ADD_MEMBER_TO_TENANT_DIALOG_FORM_MEMBER_EMAIL_PLACEHOLDER
+              }
+              required={true}
+              onChange={addUserToTenantForm.handleChange}
+              onBlur={addUserToTenantForm.handleBlur}
+              value={addUserToTenantForm.values.tenantUserEmail}
+            />
+            {addUserToTenantForm.touched.tenantUserEmail &&
+              addUserToTenantForm.errors.tenantUserEmail && (
+                <p className="text-xs text-red-500">
+                  {addUserToTenantForm.errors.tenantUserEmail}
+                </p>
+              )}
+          </div>
+
+          <DialogFooter className="gap-2">
+            <Button onClick={onClose} type="button" variant="outline">
+              {CONSTANTS.STRINGS.ADD_MEMBER_TO_TENANT_DIALOG_FORM_CANCEL_BUTTON}
+            </Button>
+
+            <Button type="submit" disabled={isAddingMemberToTenant}>
+              {isAddingMemberToTenant && <Spinner className="mr-2" size={16} />}
+              {CONSTANTS.STRINGS.ADD_MEMBER_TO_TENANT_DIALOG_FORM_SUBMIT_BUTTON}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
     </Dialog>
   );
 };

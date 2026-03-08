@@ -1,4 +1,3 @@
-import { CircularProgress } from "@mui/material";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { MdDeleteOutline } from "react-icons/md";
 import { useNavigate } from "react-router-dom";
@@ -9,6 +8,7 @@ import { displayError, displaySuccess } from "../../../utils/notification";
 import React from "react";
 import PropTypes from "prop-types";
 
+import { Button, Spinner } from "@jet-admin/ui";
 export const DatabaseNotificationDeletionForm = ({
   tenantID,
   databaseNotificationID,
@@ -55,18 +55,13 @@ export const DatabaseNotificationDeletionForm = ({
 
   return (
     <>
-      <button
-        onClick={_handleDeleteNotification}
-        disabled={isDeletingDatabaseNotification}
-        type="button"
-        className="flex flex-row items-center justify-center rounded bg-red-50 mr-2 px-3 py-1.5 text-xs text-red-400 hover:bg-red-100 focus:ring-2 focus:ring-red-400 outline-none focus:outline-none hover:border-red-400"
-      >
+      <Button variant="destructive-ghost" size="sm" onClick={_handleDeleteNotification} disabled={isDeletingDatabaseNotification} type="button"  className="mr-2">
         {isDeletingDatabaseNotification ? (
-          <CircularProgress size={16} color="white" />
+          <Spinner size={16} />
         ) : (
-          <MdDeleteOutline className="text-xl text-red-400 hover:text-red-500" />
+            <MdDeleteOutline className="text-xl" />
         )}
-      </button>
+      </Button>
     </>
   );
 };

@@ -1,14 +1,9 @@
 // GlobalUIContext.jsx
-import {
-  CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-} from "@mui/material";
 import React, { createContext, useCallback, useContext, useState } from "react";
 import PropTypes from "prop-types";
+import { Loader2 } from "lucide-react";
 
+import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, Button } from "@jet-admin/ui";
 const GlobalUIContext = createContext();
 
 export const GlobalUIProvider = ({ children }) => {
@@ -85,45 +80,47 @@ export const GlobalUIProvider = ({ children }) => {
       {children}
 
       {/* Confirmation Dialog */}
-      <Dialog
+      <AlertDialog
         open={dialogState.open && dialogState.type === "confirmation"}
-        onClose={handleReject}
-        fullWidth
-        maxWidth="xs"
+        onOpenChange={(open) => {
+          if (!open) handleReject();
+        }}
       >
-        <DialogTitle className="font-semibold text-slate-700 !text-lg !p-4 !pb-0">
-          {dialogState.title}
-        </DialogTitle>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{dialogState.title}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {dialogState.message}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
 
-        <DialogContent className="!p-4">
-          <p className="text-slate-600 !text-sm">{dialogState.message}</p>
-        </DialogContent>
+          <AlertDialogFooter>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleReject}
+              disabled={dialogState.isLoading}
+              className={dialogState.cancelButtonClass}
+            >
+              {dialogState.cancelText}
+            </Button>
 
-        <DialogActions className="!p-4">
-          <button
-            onClick={handleReject}
-            disabled={dialogState.isLoading}
-            className={`px-2.5 py-1.5 text-sm !text-slate-600 border-0 hover:border-0 !border-slate-300 bg-slate-200 hover:!bg-slate-300 rounded  hover:outline-none  outline-none ${dialogState.cancelButtonClass}`}
-          >
-            {dialogState.cancelText}
-          </button>
-
-          <button
-            onClick={handleConfirm}
-            disabled={dialogState.isLoading}
-            className={`px-2.5 py-1.5 text-white text-sm bg-red-500 rounded hover:bg-red-600 hover:outline-none hover:border-0 border-0 outline-none ${dialogState.confirmButtonClass}`}
-          >
-            {dialogState.isLoading ? (
-              <CircularProgress
-                size={16}
-                className="!text-white !align-middle"
-              />
-            ) : (
-              dialogState.confirmText
-            )}
-          </button>
-        </DialogActions>
-      </Dialog>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleConfirm}
+              disabled={dialogState.isLoading}
+              className={dialogState.confirmButtonClass}
+            >
+              {dialogState.isLoading ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : (
+                dialogState.confirmText
+              )}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </GlobalUIContext.Provider>
   );
 };

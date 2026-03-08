@@ -15,8 +15,9 @@ const ViewDatabaseTriggerPage = () => {
     databaseTableName,
     databaseTriggerName,
   } = useParams();
+
   return (
-    <div className="flex w-full h-full flex-col justify-start items-center overflow-y-auto">
+    <div className="flex h-full w-full flex-col overflow-hidden bg-background">
       {databaseTriggerName && (
         <DatabaseTriggerView
           key={`trigger_${tenantID}.${databaseSchemaName}.${databaseTriggerName}`}

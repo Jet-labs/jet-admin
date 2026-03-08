@@ -14,16 +14,17 @@ import {
 export const WidgetLayout = () => {
   return (
     <WidgetsContextProvider>
-      <div className="flex h-full w-full flex-col justify-start items-stretch overflow-hidden">
+      <div className="flex h-full w-full flex-col overflow-hidden bg-background">
         <ResizablePanelGroup
           direction="horizontal"
           autoSaveId={CONSTANTS.RESIZABLE_PANEL_KEYS.WIDGET_LAYOUT_SEPARATION}
+          className="h-full w-full"
         >
           <ResizablePanel defaultSize={20}>
             <WidgetDrawerList />
           </ResizablePanel>
           <ResizableHandle withHandle={true} />
-          <ResizablePanel defaultSize={80}>
+          <ResizablePanel defaultSize={80} className="overflow-hidden bg-background">
             <Outlet />
           </ResizablePanel>
         </ResizablePanelGroup>

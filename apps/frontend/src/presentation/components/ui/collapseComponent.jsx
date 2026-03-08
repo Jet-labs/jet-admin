@@ -1,9 +1,9 @@
-import Collapse from "@mui/material/Collapse";
 import React, { useState } from "react";
 import { BiChevronDown, BiChevronUp } from "react-icons/bi";
 import { CONSTANTS } from "../../../constants";
 import PropTypes from "prop-types";
 
+import { Button } from "@jet-admin/ui";
 export const CollapseComponent = ({
   showButtonText,
   hideButtonText,
@@ -26,24 +26,28 @@ export const CollapseComponent = ({
     <div
       className={`flex flex-col justify-start items-stretch ${containerClass}`}
     >
-      <button
+      <Button
         onClick={handleToggle}
         type="button"
-        className="p-0 text-xs m-0 inline-flex bg-transparent text-[#646cff] hover:text-[#646cff] outline-none focus:outline-none hover:outline-none border-0 focus:border-0 hover:border-0"
+        variant="ghost" className="p-0 m-0 text-primary hover:text-primary"
       >
         {isOpen ? (
-          <BiChevronUp className="!text-base mr-1" />
+          <BiChevronUp className="text-base mr-1" />
         ) : (
-          <BiChevronDown className="!text-base mr-1" />
+            <BiChevronDown className="text-base mr-1" />
         )}
         {isOpen
           ? hideButtonText ||
             CONSTANTS.STRINGS.HIDE_QUERY_META_CONTENT_BUTTON_TEXT
           : showButtonText ||
             CONSTANTS.STRINGS.SHOW_QUERY_META_CONTENT_BUTTON_TEXT}
-      </button>
+      </Button>
 
-      <Collapse in={isOpen}>{content()}</Collapse>
+      <div
+        className={`grid transition-all duration-200 ease-in-out ${isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
+      >
+        <div className="overflow-hidden">{content()}</div>
+      </div>
     </div>
   );
 };

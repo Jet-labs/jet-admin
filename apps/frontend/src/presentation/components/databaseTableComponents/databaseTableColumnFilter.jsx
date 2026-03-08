@@ -10,6 +10,7 @@ import { CONSTANTS } from "../../../constants";
 import { PostgreSQLUtils } from "../../../utils/postgre";
 import PropTypes from "prop-types";
 
+import { Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
 // Operator definitions based on field types
 const OPERATORS_BY_TYPE = {
   string: [
@@ -110,24 +111,23 @@ const FilterRule = ({
     return availableOperators.find((op) => op.value === rule.operator);
   }, [availableOperators, rule.operator]);
 
-  const handleFieldChange = (e) => {
+  const handleFieldChange = (val) => {
     onUpdate(index, {
       ...rule,
-      field: e.target.value,
+      field: val,
       operator: "",
       value: "",
     });
   };
 
-  const handleOperatorChange = (e) => {
-    const newOperator = e.target.value;
+  const handleOperatorChange = (val) => {
     const operatorDef = availableOperators.find(
-      (op) => op.value === newOperator
+      (op) => op.value === val
     );
 
     onUpdate(index, {
       ...rule,
-      operator: newOperator,
+      operator: val,
       value: operatorDef?.requiresValue ? rule.value : null,
     });
   };
@@ -142,7 +142,7 @@ const FilterRule = ({
     // Multi-value input (for IN, NOT IN)
     if (selectedOperator.multiValue) {
       return (
-        <input
+        <Input
           type="text"
           value={Array.isArray(rule.value) ? rule.value.join(", ") : rule.value}
           onChange={(e) => {
@@ -150,7 +150,7 @@ const FilterRule = ({
             handleValueChange(values);
           }}
           placeholder="Enter values separated by commas"
-          className="w-full rounded border p-2 text-sm text-gray-900 focus:border-[#646cff] focus:ring-2 focus:ring-[#646cff]/50 bg-white outline-none"
+          className="w-full rounded border p-2 text-sm text-gray-900 focus:border-primary focus:ring-2 focus:ring-primary/50 bg-white outline-none"
         />
       );
     }
@@ -162,7 +162,7 @@ const FilterRule = ({
         : ["", ""];
       return (
         <div className="flex gap-2">
-          <input
+          <Input
             type={
               normalizedFieldType === CONSTANTS.DATA_TYPES.DATETIME
                 ? "datetime-local"
@@ -173,10 +173,10 @@ const FilterRule = ({
             value={min}
             onChange={(e) => handleValueChange([e.target.value, max])}
             placeholder="Min"
-            className="w-full rounded border p-2 text-sm text-gray-900 focus:border-[#646cff] focus:ring-2 focus:ring-[#646cff]/50 bg-white outline-none"
+            className="w-full rounded border p-2 text-sm text-gray-900 focus:border-primary focus:ring-2 focus:ring-primary/50 bg-white outline-none"
           />
           <span className="flex items-center text-gray-500">and</span>
-          <input
+          <Input
             type={
               normalizedFieldType === CONSTANTS.DATA_TYPES.DATETIME
                 ? "datetime-local"
@@ -187,7 +187,7 @@ const FilterRule = ({
             value={max}
             onChange={(e) => handleValueChange([min, e.target.value])}
             placeholder="Max"
-            className="w-full rounded border p-2 text-sm text-gray-900 focus:border-[#646cff] focus:ring-2 focus:ring-[#646cff]/50 bg-white outline-none"
+            className="w-full rounded border p-2 text-sm text-gray-900 focus:border-primary focus:ring-2 focus:ring-primary/50 bg-white outline-none"
           />
         </div>
       );
@@ -196,27 +196,27 @@ const FilterRule = ({
     // Boolean input
     if (normalizedFieldType === CONSTANTS.DATA_TYPES.BOOLEAN) {
       return (
-        <select
-          value={rule.value}
-          onChange={(e) => handleValueChange(e.target.value === "true")}
-          className="w-full appearance-none rounded border p-2 pr-8 text-sm text-gray-900 focus:border-[#646cff] focus:ring-2 focus:ring-[#646cff]/50 bg-white outline-none"
-        >
-          <option value="">Select...</option>
-          <option value="true">True</option>
-          <option value="false">False</option>
-        </select>
+        <Select value={rule.value != null ? String(rule.value) : ""} onValueChange={(val) => handleValueChange(val === "true")}>
+          <SelectTrigger className="text-sm">
+            <SelectValue placeholder="Select..." />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="true">True</SelectItem>
+            <SelectItem value="false">False</SelectItem>
+          </SelectContent>
+        </Select>
       );
     }
 
     // Number input
     if (normalizedFieldType === CONSTANTS.DATA_TYPES.NUMBER) {
       return (
-        <input
+        <Input
           type="number"
           value={rule.value}
           onChange={(e) => handleValueChange(e.target.value)}
           placeholder="Enter number"
-          className="w-full rounded border p-2 text-sm text-gray-900 focus:border-[#646cff] focus:ring-2 focus:ring-[#646cff]/50 bg-white outline-none"
+          className="w-full rounded border p-2 text-sm text-gray-900 focus:border-primary focus:ring-2 focus:ring-primary/50 bg-white outline-none"
         />
       );
     }
@@ -224,23 +224,23 @@ const FilterRule = ({
     // DateTime input
     if (normalizedFieldType === CONSTANTS.DATA_TYPES.DATETIME) {
       return (
-        <input
+        <Input
           type="datetime-local"
           value={rule.value}
           onChange={(e) => handleValueChange(e.target.value)}
-          className="w-full rounded border p-2 text-sm text-gray-900 focus:border-[#646cff] focus:ring-2 focus:ring-[#646cff]/50 bg-white outline-none"
+          className="w-full rounded border p-2 text-sm text-gray-900 focus:border-primary focus:ring-2 focus:ring-primary/50 bg-white outline-none"
         />
       );
     }
 
     // Default text input
     return (
-      <input
+      <Input
         type="text"
         value={rule.value}
         onChange={(e) => handleValueChange(e.target.value)}
         placeholder="Enter value"
-        className="w-full rounded border p-2 text-sm text-gray-900 focus:border-[#646cff] focus:ring-2 focus:ring-[#646cff]/50 bg-white outline-none"
+        className="w-full rounded border p-2 text-sm text-gray-900 focus:border-primary focus:ring-2 focus:ring-primary/50 bg-white outline-none"
       />
     );
   };
@@ -250,48 +250,47 @@ const FilterRule = ({
       <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
         {/* Field Select */}
         <div className="relative">
-          <select
-            value={rule.field}
-            onChange={handleFieldChange}
-            className="w-full rounded border py-1 px-2 pr-8 text-sm text-gray-900 focus:border-[#646cff] focus:ring-2 focus:ring-[#646cff]/50 bg-white outline-none"
-          >
-            <option value="">Select Field</option>
-            {databaseTableColumns?.map((column) => (
-              <option
+          <Select value={rule.field} onValueChange={handleFieldChange}>
+            <SelectTrigger className="text-sm">
+              <SelectValue placeholder="Select Field" />
+            </SelectTrigger>
+            <SelectContent>
+              {databaseTableColumns?.map((column) => (
+                <SelectItem
                 key={column.databaseTableColumnName}
                 value={column.databaseTableColumnName}
               >
                 {column.databaseTableColumnName}
-              </option>
+                </SelectItem>
             ))}
-          </select>
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Operator Select */}
         <div className="relative">
-          <select
-            value={rule.operator}
-            onChange={handleOperatorChange}
-            disabled={!rule.field}
-            className="w-full rounded border py-1 px-2  pr-8 text-sm text-gray-900 focus:border-[#646cff] focus:ring-2 focus:ring-[#646cff]/50 bg-white outline-none disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <option value="">Select Operator</option>
-            {availableOperators.map((op) => (
-              <option key={op.value} value={op.value}>
+          <Select value={rule.operator} onValueChange={handleOperatorChange} disabled={!rule.field}>
+            <SelectTrigger className="text-sm">
+              <SelectValue placeholder="Select Operator" />
+            </SelectTrigger>
+            <SelectContent>
+              {availableOperators.map((op) => (
+                <SelectItem key={op.value} value={op.value}>
                 {op.label}
-              </option>
+                </SelectItem>
             ))}
-          </select>
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Remove Button */}
-        <button
+        <Button
           onClick={() => onRemove(index)}
-          className="flex items-center justify-center gap-2 rounded border-0 bg-red-50 px-2 py-1 text-sm font-medium text-red-400 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-400/50 "
+          variant="destructive-ghost" className="gap-2"
         >
           <FaTrash className="h-3 w-3" />
           <span className="hidden md:inline">Remove</span>
-        </button>
+        </Button>
       </div>
 
       {/* Value Input */}
@@ -319,8 +318,8 @@ const FilterGroup = ({
   databaseTableColumns,
   isRoot = false,
 }) => {
-  const handleCombinatorChange = (e) => {
-    onUpdate(groupIndex, { ...group, combinator: e.target.value });
+  const handleCombinatorChange = (val) => {
+    onUpdate(groupIndex, { ...group, combinator: val });
   };
 
   const handleAddRule = () => {
@@ -367,14 +366,15 @@ const FilterGroup = ({
         <div className="flex items-center gap-2">
           {!isRoot && <FaLayerGroup className="text-blue-500" />}
           <div className="relative">
-            <select
-              value={group.combinator}
-              onChange={handleCombinatorChange}
-              className="w-full appearance-none rounded border p-2.5 py-1 pr-8 text-sm text-gray-900 focus:border-[#646cff] focus:ring-2 focus:ring-[#646cff]/50 bg-white outline-none"
-            >
-              <option value="AND">AND</option>
-              <option value="OR">OR</option>
-            </select>
+            <Select value={group.combinator} onValueChange={handleCombinatorChange}>
+              <SelectTrigger className="text-sm">
+                <SelectValue placeholder="Select an option" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="AND">AND</SelectItem>
+                <SelectItem value="OR">OR</SelectItem>
+              </SelectContent>
+            </Select>
             <FaChevronDown className="pointer-events-none absolute right-2 top-2.5 h-3 w-3 text-gray-400" />
           </div>
           <span className="text-sm text-gray-600">
@@ -383,12 +383,12 @@ const FilterGroup = ({
           </span>
         </div>
         {!isRoot && (
-          <button
+          <Button
             onClick={() => onRemove(groupIndex)}
-            className="rounded p-1 text-red-400 hover:bg-red-100 focus:outline-none bg-transparent hover:outline-none hover:border-none"
+            variant="ghost" size="icon" className="h-6 w-6 text-red-400 hover:text-red-500 hover:bg-red-100"
           >
             <FaTimes className="h-4 w-4" />
-          </button>
+          </Button>
         )}
       </div>
 
@@ -425,20 +425,20 @@ const FilterGroup = ({
 
       {/* Add Rule/Group Buttons */}
       <div className="flex gap-2">
-        <button
+        <Button
           onClick={handleAddRule}
-          className="flex items-center gap-2 rounded border border-[#646cff] bg-white px-2 py-1 text-sm font-medium text-[#646cff] hover:bg-[#646cff]/10 focus:outline-none focus:ring-2 focus:ring-[#646cff]/50"
+          variant="primary-outline" size="sm" className="gap-2"
         >
           <FaPlus className="h-3 w-3" />
           Add Rule
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={handleAddGroup}
-          className="flex items-center gap-2 rounded border border-blue-500 bg-white px-2 py-1 text-sm font-medium text-blue-500 hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-blue-500/50"
+          variant="primary-outline" size="sm" className="gap-2"
         >
           <FaLayerGroup className="h-3 w-3" />
           Add Group
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -684,12 +684,12 @@ export const DatabaseTableColumnFilter = ({
               Create complex filter conditions with groups and nested logic
             </p>
           </div>
-          <button
+          <Button
             onClick={handleCloseDatabaseTableColumnFiltersMenu}
-            className="rounded p-1 text-slate-600 hover:text-slate-900 hover:bg-slate-100 focus:outline-none bg-transparent"
+            variant="ghost" size="icon" className="h-6 w-6"
           >
             <FaTimes className="h-4 w-4" />
-          </button>
+          </Button>
         </div>
 
         {/* Content - Scrollable */}
@@ -718,22 +718,21 @@ export const DatabaseTableColumnFilter = ({
 
         {/* Footer */}
         <div className="border-t p-4 bg-gray-50 flex gap-2">
-          <button
+          <Button
             onClick={handleClearAll}
-            className="flex-1 rounded border border-gray-300 bg-white py-1.5 px-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-gray-400/50"
+            variant="destructive-ghost"
+            className="flex-1"
           >
             Clear All
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={handleApplyFilters}
+            variant="default"
             disabled={!isValid}
-            className={`flex-1 rounded border py-1.5 px-2.5 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-[#646cff]/50 ${isValid
-              ? "border-[#646cff] bg-[#646cff] text-white hover:bg-[#535bf7]"
-              : "border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed"
-            }`}
+            className="flex-1"
           >
             Apply Filters
-          </button>
+          </Button>
         </div>
       </div>
     </div>

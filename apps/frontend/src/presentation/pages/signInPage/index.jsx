@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 
-import { CircularProgress } from "@mui/material";
 import { useFormik } from "formik";
 import logo from "../../../assets/logo.png";
 import {
@@ -10,6 +9,7 @@ import {
   useAuthState,
 } from "../../../logic/contexts/authContext";
 import { formValidations } from "../../../utils/formValidation";
+import { Button, Spinner, Input } from "@jet-admin/ui";
 const SignInPage = () => {
   const { firebaseUserState, signInState } = useAuthState();
   const { googleSignIn, emailSignIn } = useAuthActions();
@@ -59,7 +59,7 @@ const SignInPage = () => {
                   >
                     {CONSTANTS.STRINGS.SIGN_IN_FORM_EMAIL_FIELD_LABEL}
                   </label>
-                  <input
+                  <Input
                     type="email"
                     name="email"
                     id="email"
@@ -80,7 +80,7 @@ const SignInPage = () => {
                   >
                     {CONSTANTS.STRINGS.SIGN_IN_FORM_PASSWORD_FIELD_LABEL}
                   </label>
-                  <input
+                  <Input
                     type="password"
                     name="password"
                     id="password"
@@ -93,20 +93,20 @@ const SignInPage = () => {
                 </div>
                 {signInState && signInState.isLoading ? (
                   <div className="w-full flex flex-row justify-center items-center">
-                    <CircularProgress className="!text-[#646cff]" size={16} />
+                    <Spinner className="text-primary" size={16} />
                   </div>
                 ) : (
-                  <button
+                  <Button
                     type="submit"
                     className=" px-3 py-2 w-full text-xs font-medium text-center text-white bg-blue-700 rounded hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 "
                   >
                     {CONSTANTS.STRINGS.SIGN_IN_FORM_SUBMIT_BUTTON}
-                  </button>
+                  </Button>
                 )}
                 <div className="py-3 flex items-center text-sm text-slate-400 before:flex-1 before:border-t before:border-gray-200 before:me-6 after:flex-1 after:border-t after:border-gray-200 after:ms-6">
                   Or
                 </div>
-                <button
+                <Button
                   type="button"
                   onClick={googleSignIn}
                   className="text-white bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded text-sm px-5 py-1.5 text-center inline-flex justify-center items-center  me-2 mb-2 w-full"
@@ -125,7 +125,7 @@ const SignInPage = () => {
                     />
                   </svg>
                   {CONSTANTS.STRINGS.SIGN_IN_FORM_GOOGLE_SIGN_IN_LABEL}
-                </button>
+                </Button>
 
                 {signInState && signInState.error && (
                   <div

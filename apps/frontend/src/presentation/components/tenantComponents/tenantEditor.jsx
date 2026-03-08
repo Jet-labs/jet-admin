@@ -6,10 +6,10 @@ import { TenantLogo } from "./tenantLogo";
 import { testTenantDatabaseConnectionAPI } from "../../../data/apis/tenant";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
-import { CircularProgress } from "@mui/material";
 import PropTypes from "prop-types";
 import React from "react";
 
+import { Button, Spinner, Input, Label } from "@jet-admin/ui";
 export const TenantEditor = ({ tenantEditorForm }) => {
   TenantEditor.propTypes = {
     tenantEditorForm: PropTypes.object.isRequired,
@@ -75,13 +75,13 @@ export const TenantEditor = ({ tenantEditorForm }) => {
 
   return (
     <>
-      <div className="flex flex-row justify-start items-stretch mt-4">
+      <div className="flex flex-row justify-start items-stretch mt-3">
         {tenantEditorForm?.values?.tenantLogoURL ? (
           <TenantLogo
             src={tenantEditorForm.values.tenantLogoURL}
             height={100}
             width={100}
-            className="!w-12 !h-12 !rounded !border-slate-300 !border mr-3"
+            className="!w-10 !h-10 !rounded border !border-slate-300 mr-2"
           />
         ) : null}
         <LogoUpload
@@ -91,21 +91,15 @@ export const TenantEditor = ({ tenantEditorForm }) => {
         />
       </div>
 
-      <div>
-        <label
-          htmlFor="tenantTitle"
-          className="block mb-1 text-sm font-medium text-slate-500"
-        >
+      <div className="space-y-1.5">
+        <Label htmlFor="tenantTitle">
           {CONSTANTS.STRINGS.TENANT_EDITOR_FORM_NAME_FIELD_LABEL}
-        </label>
-        <input
-          type="tenantTitle"
+        </Label>
+        <Input
+          type="text"
           name="tenantTitle"
           id="tenantTitle"
-          className=" placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:outline-none focus:border-slate-400 block w-full px-1.5 py-1"
-          placeholder={
-            CONSTANTS.STRINGS.TENANT_EDITOR_FORM_NAME_FIELD_PLACEHOLDER
-          }
+          placeholder={CONSTANTS.STRINGS.TENANT_EDITOR_FORM_NAME_FIELD_PLACEHOLDER}
           required={true}
           onChange={tenantEditorForm.handleChange}
           onBlur={tenantEditorForm.handleBlur}
@@ -113,29 +107,26 @@ export const TenantEditor = ({ tenantEditorForm }) => {
         />
       </div>
 
-      <div>
-        <div className="flex flex-row justify-between items-center w-full mb-1 ">
+      <div className="space-y-1.5">
+        <div className="flex flex-row justify-between items-center w-full mb-1">
           <div className="flex flex-row justify-start items-center">
-            <label
-              htmlFor="tenantDBURL"
-              className="block text-sm font-medium text-slate-500"
-            >
+            <Label htmlFor="tenantDBURL">
               {CONSTANTS.STRINGS.TENANT_EDITOR_FORM_DB_FIELD_LABEL}
-            </label>
+            </Label>
 
             {tenantDatabaseConnectionResult !== null && (
               <>
                 {tenantDatabaseConnectionResult ? (
-                  <div className="flex flex-row justify-start items-center  border-green-500 rounded-full px-1 border ml-2">
-                    <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                    <span className="text-[10px] ml-1 text-green-500 font-semibold">
+                  <div className="flex flex-row justify-start items-center ml-2 border-green-500/50 rounded-full px-2 py-0.5 border bg-green-500/10">
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+                    <span className="text-[10px] ml-1.5 text-green-700 dark:text-green-500 font-semibold leading-none">
                       Connected
                     </span>
                   </div>
                 ) : (
-                  <div className="flex flex-row justify-start items-center  border-orange-500 rounded-full px-1 border ml-2">
-                    <div className="w-2 h-2 rounded-full bg-orange-500"></div>
-                    <span className="text-[10px] ml-1 text-orange-500 font-semibold">
+                    <div className="flex flex-row justify-start items-center ml-2 border-orange-500/50 rounded-full px-2 py-0.5 border bg-orange-500/10">
+                      <div className="w-1.5 h-1.5 rounded-full bg-orange-500"></div>
+                      <span className="text-[10px] ml-1.5 text-orange-700 dark:text-orange-500 font-semibold leading-none">
                       Not connected
                     </span>
                   </div>
@@ -144,25 +135,23 @@ export const TenantEditor = ({ tenantEditorForm }) => {
             )}
           </div>
 
-          <button
+          <Button
             onClick={testTenantDatabaseConnection}
             type="button"
-            className="p-0 m-0 text-xs text-[#646cff] inline-flex items-center bg-transparent focus:outline-none hover:outline-none border-none focus:border-none hover:border-none"
+            variant="ghost"
+            className="h-auto p-1.5 text-xs text-primary"
           >
             {isTestingTenantDatabaseConnection && (
-              <CircularProgress size={12} className="!text-[#646cff] mr-2" />
+              <Spinner size={12} className="mr-2" />
             )}
             {CONSTANTS.STRINGS.TENANT_EDITOR_FORM_DB_URL_TEST}
-          </button>
+          </Button>
         </div>
-        <input
-          type="tenantDBURL"
+        <Input
+          type="text"
           name="tenantDBURL"
           id="tenantDBURL"
-          className=" placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:outline-none focus:border-slate-400 block w-full px-1.5 py-1"
-          placeholder={
-            CONSTANTS.STRINGS.TENANT_EDITOR_FORM_DB_FIELD_PLACEHOLDER
-          }
+          placeholder={CONSTANTS.STRINGS.TENANT_EDITOR_FORM_DB_FIELD_PLACEHOLDER}
           required={true}
           onChange={tenantEditorForm.handleChange}
           onBlur={tenantEditorForm.handleBlur}

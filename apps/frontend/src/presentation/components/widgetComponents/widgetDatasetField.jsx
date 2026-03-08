@@ -8,6 +8,7 @@ import { WidgetDatasetFieldMapping } from "./widgetDatasetFieldMapping";
 import PropTypes from "prop-types";
 import { WidgetDatasetAdvancedOptions } from "./widgetDatasetAdvancedOptions";
 
+import { Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
 /**
  * @param {object} param0
  * @param {number} param0.index
@@ -61,7 +62,7 @@ export const WidgetDatasetField = ({
     >
       {/* Dataset Title */}
       <div>
-        <input
+        <Input
           type="text"
           name={'workflowConfig.title'}
           id={'workflowConfig.title'}
@@ -85,32 +86,26 @@ export const WidgetDatasetField = ({
       {/* Workflow Selection */}
       <div className="flex flex-row gap-2 w-full">
 
-        <select
-          name={'workflowID'}
-          id={'workflowID'}
-          value={widgetForm.values.workflowID || ""}
-          onChange={(e) => {
-            widgetForm.handleChange(e);
+        <Select value={widgetForm.values.workflowID || ""} onValueChange={(val) => {
+          widgetForm.setFieldValue('workflowID', val);
           // Reset workflow params when changing workflow
-            widgetForm.setFieldValue('workflowConfig.workflowArgValues', {});
-            widgetForm.setFieldValue('workflowConfig.datasetFields', {});
-          }}
-          onBlur={widgetForm.handleBlur}
-          className={`placeholder:text-slate-400 text-xs bg-slate-50 border ${hasWorkflowIdError ? "border-red-300" : "border-slate-300"
-            } text-slate-700 rounded focus:outline-none focus:border-slate-400 py-1 px-1.5 w-full`}
-        >
-          <option value="" disabled>
-            Select workflow
-          </option>
-          {workflows?.map((workflow) => (
-            <option
-              key={`workflow_item_${workflow.workflowID}`}
-              value={workflow.workflowID}
-            >
-              {workflow.title}
-            </option>
-          ))}
-        </select>
+          widgetForm.setFieldValue('workflowConfig.workflowArgValues', {});
+          widgetForm.setFieldValue('workflowConfig.datasetFields', {});
+        }}>
+          <SelectTrigger className={`text-xs ${hasWorkflowIdError ? "border-red-300" : ""}`}>
+            <SelectValue placeholder="Select workflow" />
+          </SelectTrigger>
+          <SelectContent>
+            {workflows?.map((workflow) => (
+              <SelectItem
+                key={`workflow_item_${workflow.workflowID}`}
+                value={String(workflow.workflowID)}
+              >
+                {workflow.title}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
 
       </div>
       {hasWorkflowIdError && (
@@ -123,38 +118,36 @@ export const WidgetDatasetField = ({
       <div className="grid grid-cols-3 gap-2">
 
 
-        <button
+        <Button
           type="button"
+          variant="outline"
           onClick={() => setShowArgumentsOptions(true)}
           disabled={!selectedWorkflow?.workflowOptions?.args?.length}
-          className=" disabled:text-slate-400 disabled:cursor-not-allowed disabled:hover:text-slate-400 disabled:hover:border-slate-300 disabled:hover:bg-transparent focus:outline-none text-xs font-normal hover:text-[#646cff] text-slate-700 flex flex-col gap-1 justify-start items-center bg-slate-100 hover:bg-[#646cff]/10 py-1 px-2 rounded border hover:border-[#646cff] border-slate-300 transition-colors w-full"
+          className="h-auto py-2 flex-col gap-1 bg-slate-100 text-slate-700 hover:bg-primary/10 hover:border-primary hover:text-primary text-xs font-normal"
         >
-          <BiSitemap className=" text-2xl" />
-
+          <BiSitemap className="text-2xl" />
           {CONSTANTS.STRINGS.WIDGET_EDITOR_FORM_DATASET_ARGUMENTS_LABEL}
-        </button>
+        </Button>
 
-        <button
+        <Button
           type="button"
+          variant="outline"
           onClick={() => setShowFieldMappingOptions(true)}
           disabled={!selectedWorkflow}
-          className=" disabled:text-slate-400 disabled:cursor-not-allowed disabled:hover:text-slate-400 disabled:hover:border-slate-300 disabled:hover:bg-transparent focus:outline-none text-xs font-normal hover:text-[#646cff] text-slate-700 flex flex-col gap-1 justify-start items-center bg-slate-100 hover:bg-[#646cff]/10   py-1 px-2 rounded border hover:border-[#646cff] border-slate-300 transition-colors w-full"
+          className="h-auto py-2 flex-col gap-1 bg-slate-100 text-slate-700 hover:bg-primary/10 hover:border-primary hover:text-primary text-xs font-normal"
         >
-          <BiSitemap className=" text-2xl" />
-
-          {
-            CONSTANTS.STRINGS
-              .WIDGET_EDITOR_FORM_DATASET_FIELD_MAPPINGS_LABEL
-          }
-        </button>
-        <button
+          <BiSitemap className="text-2xl" />
+          {CONSTANTS.STRINGS.WIDGET_EDITOR_FORM_DATASET_FIELD_MAPPINGS_LABEL}
+        </Button>
+        <Button
           type="button"
+          variant="outline"
           onClick={() => setShowAdvancedOptions(true)}
-          className="focus:outline-none text-xs font-normal hover:text-[#646cff] text-slate-700 flex flex-col gap-1 justify-start items-center bg-slate-100 hover:bg-[#646cff]/10   py-1 px-2 rounded border hover:border-[#646cff] border-slate-300 transition-colors w-full"
+          className="h-auto py-2 flex-col gap-1 bg-slate-100 text-slate-700 hover:bg-primary/10 hover:border-primary hover:text-primary text-xs font-normal"
         >
-          <IoIosColorFilter className=" text-2xl" />
+          <IoIosColorFilter className="text-2xl" />
           {CONSTANTS.STRINGS.WIDGET_EDITOR_FORM_DATASET_UI_CONFIG_LABEL}
-        </button>
+        </Button>
       </div>
 
       <WidgetDatasetAdvancedOptions
@@ -202,13 +195,15 @@ export const WidgetDatasetField = ({
         <div className="flex flex-row justify-end items-center gap-2">
 
           {selectedWorkflow && (
-            <button
+            <Button
               type="button"
+              variant="outline"
+              size="sm"
               onClick={_handleTestWorkflow}
-              className="focus:outline-none text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 py-1 px-2 rounded border border-slate-300 transition-colors w-fit"
+              className="h-7 px-2 text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 border-slate-300"
             >
               Test Workflow
-            </button>
+            </Button>
           )}
 
         </div>

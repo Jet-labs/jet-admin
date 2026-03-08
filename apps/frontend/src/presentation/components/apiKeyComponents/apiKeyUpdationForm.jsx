@@ -1,4 +1,3 @@
-import { CircularProgress } from "@mui/material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useFormik } from "formik";
 import React, { useEffect } from "react";
@@ -19,10 +18,13 @@ import { CodeBlock } from "../ui/codeBlock";
 import PropTypes from "prop-types";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 
+import { Button, Spinner } from "@jet-admin/ui";
 export const APIKeyUpdationForm = ({ tenantID, apiKeyID }) => {
   APIKeyUpdationForm.propTypes = {
-    tenantID: PropTypes.number.isRequired,
-    apiKeyID: PropTypes.number.isRequired,
+    tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+      .isRequired,
+    apiKeyID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+      .isRequired,
   };
   const queryClient = useQueryClient();
   const { showConfirmation } = useGlobalUI();
@@ -31,11 +33,8 @@ export const APIKeyUpdationForm = ({ tenantID, apiKeyID }) => {
     isLoading: isLoadingAPIKey,
     data: apiKey,
     error: loadAPIKeyError,
-    isFetching: isFetchingAPIKey,
-    isRefetching: isRefetechingAPIKey,
-    refetch: refetchAPIKey,
   } = useQuery({
-    queryKey: [CONSTANTS.REACT_QUERY_KEYS.QUERIES(tenantID), apiKeyID],
+    queryKey: [CONSTANTS.REACT_QUERY_KEYS.DATABASE_API_KEYS(tenantID), apiKeyID],
     queryFn: () =>
       getAPIKeyByIDAPI({
         tenantID,
@@ -58,7 +57,7 @@ export const APIKeyUpdationForm = ({ tenantID, apiKeyID }) => {
         CONSTANTS.STRINGS.UPDATE_API_KEY_FORM_API_KEY_UPDATION_SUCCESS
       );
       queryClient.invalidateQueries([
-        CONSTANTS.REACT_QUERY_KEYS.QUERIES(tenantID),
+        CONSTANTS.REACT_QUERY_KEYS.DATABASE_API_KEYS(tenantID),
       ]);
     },
     onError: (error) => {
@@ -80,7 +79,7 @@ export const APIKeyUpdationForm = ({ tenantID, apiKeyID }) => {
         message: CONSTANTS.STRINGS.UPDATE_API_KEY_FORM_UPDATE_DIALOG_MESSAGE,
         confirmText: "Update",
         cancelText: "Cancel",
-        confirmButtonClass: "!bg-[#646cff]",
+        confirmButtonClass: "!bg-primary",
       });
       updateAPIKey(values);
     },
@@ -94,7 +93,6 @@ export const APIKeyUpdationForm = ({ tenantID, apiKeyID }) => {
         "apiKeyTitle",
         apiKey.apiKeyTitle || CONSTANTS.STRINGS.UNTITLED
       );
-      console.log(apiKey.roles);
       apiKeyUpdationForm.setFieldValue(
         "roleIDs",
         apiKey.roles?.map((r) => r.roleID) || []
@@ -103,54 +101,57 @@ export const APIKeyUpdationForm = ({ tenantID, apiKeyID }) => {
   }, [apiKey]);
 
   return (
-    <section className="max-w-3xl w-full">
-      <div className="w-full px-3 py-2  flex flex-col justify-center items-start">
-        <h1 className="text-lg font-bold leading-tight tracking-tight text-slate-700 text-start ">
+    <section className="w-full bg-background">
+      <div className="border-b border-border bg-background p-3">
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
           {CONSTANTS.STRINGS.UPDATE_API_KEY_FORM_TITLE}
         </h1>
-
-        {apiKey && (
-          <span className="text-xs text-[#646cff] mt-2">{`API Key ID: ${apiKey.apiKeyID}`}</span>
-        )}
       </div>
       <ReactQueryLoadingErrorWrapper
         isLoading={isLoadingAPIKey}
-        isFetching={isFetchingAPIKey}
-        isRefetching={isRefetechingAPIKey}
-        refetch={refetchAPIKey}
         error={loadAPIKeyError}
       >
-        <form
-          className="space-y-3 md:space-y-4 mt-5 p-3"
-          onSubmit={apiKeyUpdationForm.handleSubmit}
-        >
-          {apiKey && <CodeBlock code={`${apiKey.apiKey}`} className="w-full" />}
-          <APIKeyEditor
-            tenantID={tenantID}
-            apiKeyEditorForm={apiKeyUpdationForm}
-            isLoadingAPIKeyEditorForm={
-              isUpdatingAPIKey || isFetchingAPIKey || isLoadingAPIKey
-            }
-          />
-          <div className="w-full flex flex-row justify-end mt-10">
-            <APIKeyDeletionForm tenantID={tenantID} apiKeyID={apiKeyID} />
-            <APIKeyRoleSelectionDialog
+        <div className="mx-auto w-full max-w-2xl space-y-4 p-4 md:p-8">
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="space-y-1">
+              {apiKey && (
+                <span className="text-xs text-muted-foreground">{`API Key ID: ${apiKey.apiKeyID}`}</span>
+              )}
+            </div>
+
+            <div className="flex flex-wrap items-center justify-end gap-2">
+              <APIKeyDeletionForm tenantID={tenantID} apiKeyID={apiKeyID} />
+              <APIKeyRoleSelectionDialog
+                tenantID={tenantID}
+                apiKeyEditorForm={apiKeyUpdationForm}
+                isLoadingAPIKeyEditorForm={isUpdatingAPIKey || isLoadingAPIKey}
+              />
+              <Button
+                type="submit"
+                form="api-key-updation-form"
+                disabled={isUpdatingAPIKey}
+              >
+                {isUpdatingAPIKey && <Spinner className="mr-2" size={16} />}
+                {CONSTANTS.STRINGS.UPDATE_API_KEY_FORM_SUBMIT_BUTTON}
+              </Button>
+            </div>
+          </div>
+
+          <form
+            id="api-key-updation-form"
+            className="space-y-4"
+            onSubmit={apiKeyUpdationForm.handleSubmit}
+          >
+            {apiKey && <CodeBlock code={`${apiKey.apiKey}`} className="w-full" />}
+            <APIKeyEditor
               tenantID={tenantID}
               apiKeyEditorForm={apiKeyUpdationForm}
+              isLoadingAPIKeyEditorForm={
+                isUpdatingAPIKey || isLoadingAPIKey
+              }
             />
-
-            <button
-              type="submit"
-              disabled={isUpdatingAPIKey}
-              className="flex flex-row justify-center items-center px-3 py-2 ml-2 text-xs font-medium text-center text-white bg-[#646cff] rounded hover:bg-[#646cff] focus:ring-4 focus:outline-none "
-            >
-              {isUpdatingAPIKey && (
-                <CircularProgress className="!mr-3" size={16} color="white" />
-              )}
-              {CONSTANTS.STRINGS.UPDATE_API_KEY_FORM_SUBMIT_BUTTON}
-            </button>
-          </div>
-        </form>
+          </form>
+        </div>
       </ReactQueryLoadingErrorWrapper>
     </section>
   );

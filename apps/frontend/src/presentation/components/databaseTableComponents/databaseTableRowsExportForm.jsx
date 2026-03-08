@@ -1,10 +1,3 @@
-import {
-  CircularProgress,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle
-} from "@mui/material";
 import { useMutation } from "@tanstack/react-query";
 import React, { useCallback, useState } from "react";
 import { CONSTANTS } from "../../../constants";
@@ -12,6 +5,7 @@ import { databaseTableBulkRowExportAPI } from "../../../data/apis/databaseTable"
 import { displayError, displaySuccess } from "../../../utils/notification";
 import PropTypes from "prop-types";
 
+import { Button, Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, Label, RadioGroup, RadioGroupItem, Spinner } from "@jet-admin/ui";
 export const DatabaseTableRowsExportForm = ({
   tenantID,
   databaseSchemaName,
@@ -63,7 +57,7 @@ export const DatabaseTableRowsExportForm = ({
     setIsExportRowsConfirmationOpen(true);
   const _handleCloseExportRowsConfirmation = () =>
     setIsExportRowsConfirmationOpen(false);
-  const _handleFormatChange = (event) => setExportFormat(event.target.value);
+  const _handleFormatChange = (value) => setExportFormat(value);
   const _handleExportRows = useCallback(
     () => bulkExportDatabaseTableRows({ exportFormat }),
     [exportFormat]
@@ -71,19 +65,16 @@ export const DatabaseTableRowsExportForm = ({
 
   return (
     <>
-      <button
+      <Button
+        variant="primary-outline" size="sm"
         onClick={_handleOpenExportRowsConfirmation}
         disabled={isBulkExportingDatabaseTableRows}
-        className={`flex items-center rounded px-2 py-0.5 text-xs mr-2 ${
-          isBulkExportingDatabaseTableRows
-            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-            : "bg-white text-[#646cff] border border-[#646cff] hover:bg-[#e8e9ff]"
-        }`}
+        className="mr-2"
       >
         {isBulkExportingDatabaseTableRows ? (
           <>
             Exporting selected rows...
-            <CircularProgress size={16} color="inherit" className="ml-2" />
+            <Spinner size={16} className="ml-2" />
           </>
         ) : (
           `Export ${
@@ -92,73 +83,46 @@ export const DatabaseTableRowsExportForm = ({
               : rowSelectionModel?.length
           } ${rowSelectionModel?.length === 1 ? "row" : "rows"}`
         )}
-      </button>
+      </Button>
 
-      <Dialog
-        open={isExportRowsConfirmationOpen}
-        onClose={_handleCloseExportRowsConfirmation}
-        fullWidth
-        maxWidth="xs"
-      >
-        <DialogTitle className="flex justify-between items-center text-lg !p-4 !pb-0">
-          {CONSTANTS.STRINGS.ROW_EXPORT_CONFIRMATION_TITLE}
-        </DialogTitle>
-
-        <DialogContent className="!p-4">
+      <Dialog open={isExportRowsConfirmationOpen} onOpenChange={(v) => { if (!v) _handleCloseExportRowsConfirmation(); }}>
+        <DialogContent className="max-w-xs p-4">
+          <DialogHeader className="space-y-1">
+            <DialogTitle className="text-sm font-semibold">
+              {CONSTANTS.STRINGS.ROW_EXPORT_CONFIRMATION_TITLE}
+            </DialogTitle>
+          </DialogHeader>
           <div className="space-y-4">
             <label className="block text-sm font-medium text-gray-700">
               {CONSTANTS.STRINGS.ROW_EXPORT_CONFIRMATION_BODY}
             </label>
 
-            <div className="space-y-2">
+            <RadioGroup value={exportFormat} onValueChange={_handleFormatChange} className="space-y-2">
               {["json", "csv", "xlsx"].map((format) => (
-                <label
-                  key={format}
-                  className="flex items-center space-x-2 cursor-pointer"
-                >
-                  <input
-                    type="radio"
-                    name="export-format"
-                    value={format}
-                    checked={exportFormat === format}
-                    onChange={_handleFormatChange}
-                    className="sr-only"
-                  />
-                  <span
-                    className={`${
-                      exportFormat === format
-                        ? "bg-blue-600 border-transparent"
-                        : "bg-white border-gray-300"
-                    } border-2 rounded-full h-4 w-4 flex items-center justify-center`}
-                  >
-                    {exportFormat === format && (
-                      <span className="rounded-full bg-white h-2 w-2" />
-                    )}
-                  </span>
-                  <span className="text-sm text-gray-700">
+                <div key={format} className="flex items-center space-x-2">
+                  <RadioGroupItem value={format} id={`export-format-${format}`} />
+                  <Label htmlFor={`export-format-${format}`} className="text-sm text-gray-700 cursor-pointer">
                     {format.toUpperCase()}
-                  </span>
-                </label>
+                  </Label>
+                </div>
               ))}
-            </div>
+            </RadioGroup>
           </div>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="ghost"
+              onClick={_handleCloseExportRowsConfirmation}
+            >
+              {CONSTANTS.STRINGS.ROW_EXPORT_CONFIRMATION_CANCEL_BUTTON}
+            </Button>
+
+            <Button
+              onClick={_handleExportRows}
+            >
+              {CONSTANTS.STRINGS.ROW_EXPORT_CONFIRMATION_BUTTON}
+            </Button>
+          </DialogFooter>
         </DialogContent>
-
-        <DialogActions className="p-4">
-          <button
-            onClick={_handleCloseExportRowsConfirmation}
-            className="px-2.5 py-1.5 text-sm text-slate-600 bg-slate-200 hover:bg-slate-300 rounded"
-          >
-            {CONSTANTS.STRINGS.ROW_EXPORT_CONFIRMATION_CANCEL_BUTTON}
-          </button>
-
-          <button
-            onClick={_handleExportRows}
-            className="px-2.5 py-1.5 text-sm text-white bg-[#646cff] rounded"
-          >
-            {CONSTANTS.STRINGS.ROW_EXPORT_CONFIRMATION_BUTTON}
-          </button>
-        </DialogActions>
       </Dialog>
     </>
   );

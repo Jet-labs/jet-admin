@@ -21,7 +21,7 @@ const APIKeysContextProvider = ({ children }) => {
     isRefetching: isRefetechingAPIKeys,
     refetch: refetchAPIKeys,
   } = useQuery({
-    queryKey: [CONSTANTS.REACT_QUERY_KEYS.DATABASE_NOTIFICATIONS(tenantID)],
+    queryKey: [CONSTANTS.REACT_QUERY_KEYS.DATABASE_API_KEYS(tenantID)],
     queryFn: () => getAllAPIKeysAPI({ tenantID }),
     refetchOnWindowFocus: false,
   });

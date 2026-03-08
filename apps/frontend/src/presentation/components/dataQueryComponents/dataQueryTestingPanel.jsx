@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import PropTypes from "prop-types";
 import { DATASOURCE_UI_COMPONENTS } from "@jet-admin/datasources-ui";
 
+import { Button } from "@jet-admin/ui";
 export const DataQueryTestingPanel = ({
   selectedQueryForTesting,
   setSelectedQueryForTesting,
@@ -42,13 +43,13 @@ export const DataQueryTestingPanel = ({
         }}
       >
         <div className="p-2 h-full">
-          <button
+          <Button
             type="button"
             onClick={_handleClose}
             className=" focus:outline-none  text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 py-1 px-1 rounded border border-slate-300 transition-colors w-fit"
           >
             <IoClose className="text-base text-slate-700" />
-          </button>
+          </Button>
           {selectedQueryForTesting && (
             <div className="w-full flex flex-col justify-start items-stretch h-full flex-grow">
               <div className="w-full flex flex-row justify-end mt-2">

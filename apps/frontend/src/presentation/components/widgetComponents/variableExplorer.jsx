@@ -4,6 +4,7 @@ import { FiChevronRight, FiChevronDown, FiCopy, FiCheck } from "react-icons/fi";
 import { BiGitMerge } from "react-icons/bi";
 import { MdInput, MdOutput } from "react-icons/md";
 
+import { Button, Input } from "@jet-admin/ui";
 /**
  * Get icon for variable category
  */
@@ -41,27 +42,31 @@ const VariableItem = ({ variable, onSelect, isSelected }) => {
   
   return (
     <div
-      className={`flex items-center gap-2 py-1.5 px-2 cursor-pointer bg-white hover:bg-slate-50 rounded text-xs group ${
-        isSelected ? 'bg-blue-50 border-l-2 border-[#646cff]' : ''
-      }`}
+      className={`flex items-center gap-2 py-1.5 px-2 cursor-pointer rounded text-xs group`}
+      style={{
+        background: isSelected ? 'var(--we-bg-accent-light, #eef2ff)' : 'var(--we-bg-primary, #fff)',
+        borderLeft: isSelected ? '2px solid var(--we-bg-accent, #4f46e5)' : 'none',
+      }}
       onClick={handleClick}
     >
       {/* Variable name */}
-      <span className="font-medium text-slate-700 truncate flex-1">
+      <span className="font-medium truncate flex-1" style={{ color: 'var(--we-text-primary, #1e293b)' }}>
         {variable.name}
       </span>
       
       {/* Node title if available */}
       {variable.nodeTitle && (
-        <span className="text-[10px] text-slate-400 truncate max-w-[80px]">
+        <span className="text-[10px] truncate max-w-[80px]" style={{ color: 'var(--we-text-muted, #94a3b8)' }}>
           {variable.nodeTitle}
         </span>
       )}
       
       {/* Copy button */}
-      <button
+      <Button
         onClick={handleCopy}
-        className="p-0.5 hover:bg-slate-200 rounded opacity-0 group-hover:opacity-100 transition-opacity"
+        variant="ghost"
+        size="icon"
+        className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity"
         title="Copy path"
         type="button"
       >
@@ -70,7 +75,7 @@ const VariableItem = ({ variable, onSelect, isSelected }) => {
         ) : (
           <FiCopy className="w-3 h-3 text-slate-400" />
         )}
-      </button>
+      </Button>
     </div>
   );
 };
@@ -102,11 +107,11 @@ const VariableCategory = ({
   if (!variables || variables.length === 0) return null;
   
   return (
-    <div className="mb-1 bg-white">
-      <button
-        type="button"
+    <div className="mb-1" style={{ background: 'var(--we-bg-primary, #fff)' }}>
+      <div
         onClick={() => setIsExpanded(!isExpanded)}
-        className="flex items-center gap-1.5 w-full px-2 py-1.5 bg-slate-50 hover:bg-slate-100 rounded text-left border border-slate-200"
+        className="flex items-center gap-1.5 w-full px-2 py-1.5 rounded text-left cursor-pointer"
+        style={{ background: 'var(--we-bg-secondary, #f8fafc)', border: '1px solid var(--we-border, #e2e8f0)' }}
       >
         {isExpanded ? (
           <FiChevronDown className="w-3 h-3 text-slate-500" />
@@ -114,16 +119,16 @@ const VariableCategory = ({
           <FiChevronRight className="w-3 h-3 text-slate-500" />
         )}
         {getCategoryIcon(category)}
-        <span className="text-[11px] font-medium text-slate-600 uppercase tracking-wide flex-1">
+        <span className="text-[11px] font-medium uppercase tracking-wide flex-1" style={{ color: 'var(--we-text-secondary, #475569)' }}>
           {title}
         </span>
-        <span className="text-[10px] text-slate-500 bg-white px-1.5 py-0.5 rounded border border-slate-200">
+        <span className="text-[10px] px-1.5 py-0.5 rounded" style={{ color: 'var(--we-text-muted, #94a3b8)', background: 'var(--we-bg-primary, #fff)', border: '1px solid var(--we-border, #e2e8f0)' }}>
           {variables.length}
         </span>
-      </button>
+      </div>
       
       {isExpanded && (
-        <div className="ml-3 mt-1 border-l border-slate-200 pl-2 bg-white">
+        <div className="ml-3 mt-1 pl-2" style={{ borderLeft: '1px solid var(--we-border, #e2e8f0)', background: 'var(--we-bg-primary, #fff)' }}>
           {variables.map((variable) => (
             <VariableItem
               key={variable.path}
@@ -319,21 +324,22 @@ export const VariableExplorer = ({
     schema.workflowOutputs.length > 0;
   
   return (
-    <div className={`flex flex-col border border-slate-200 rounded bg-white ${className}`}>
+    <div className={`flex flex-col rounded ${className}`} style={{ border: '1px solid var(--we-border, #e2e8f0)', background: 'var(--we-bg-primary, #fff)' }}>
       {/* Header */}
-      <div className="flex items-center justify-between px-3 py-2 border-b border-slate-200 bg-slate-50 rounded-t">
-        <h3 className="text-xs font-medium text-slate-600">{title}</h3>
+      <div className="flex items-center justify-between px-3 py-2 rounded-t" style={{ borderBottom: '1px solid var(--we-border, #e2e8f0)', background: 'var(--we-bg-secondary, #f8fafc)' }}>
+        <h3 className="text-xs font-medium" style={{ color: 'var(--we-text-secondary, #475569)' }}>{title}</h3>
       </div>
       
       {/* Search */}
       {showSearch && hasVariables && (
-        <div className="px-2 py-2 border-b border-slate-100">
-          <input
+        <div className="px-2 py-2" style={{ borderBottom: '1px solid var(--we-border, #e2e8f0)' }}>
+          <Input
             type="text"
             placeholder="Search variables..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full px-2 py-1 text-xs bg-slate-50 border border-slate-200 rounded focus:outline-none focus:border-slate-400 text-slate-700 placeholder:text-slate-400"
+            className="we-input w-full"
+            style={{ fontSize: '12px' }}
           />
         </div>
       )}
@@ -341,9 +347,9 @@ export const VariableExplorer = ({
       {/* Variables tree */}
       <div className="flex-1 overflow-auto max-h-64 py-2 px-1">
         {!hasVariables ? (
-          <div className="text-center py-4 text-slate-400 text-xs">
+          <div className="text-center py-4 text-xs" style={{ color: 'var(--we-text-muted, #94a3b8)' }}>
             <p>No variables defined</p>
-            <p className="mt-1 text-[10px]">Add workflow inputs or nodes with output variables</p>
+            <p className="mt-1" style={{ fontSize: '10px' }}>Add workflow inputs or nodes with output variables</p>
           </div>
         ) : (
           <>

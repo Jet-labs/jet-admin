@@ -23,10 +23,8 @@ const ViewDatabaseTablePage = () => {
     }
   }
 
-  console.log({ parsedFilterQuery });
-
   return (
-    <div className="flex flex-col justify-start items-stretch w-full h-full ">
+    <div className="flex h-full w-full flex-col overflow-hidden bg-background">
       {databaseTableName && (
         <DatabaseTableGrid
           key={`${tenantID}.${databaseSchemaName}.${databaseTableName}`}

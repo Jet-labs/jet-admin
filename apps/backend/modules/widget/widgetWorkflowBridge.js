@@ -49,6 +49,10 @@ const widgetWorkflowBridge = {
       widgetType: metadata.widgetType || metadata.widgetConfig?.widgetType,
       datasetFields: metadata.datasetFields || metadata.widgetConfig?.datasetFields,
       parameters: metadata.parameters || metadata.widgetConfig?.parameters,
+      // Store full workflowConfig for Vega widgets
+      workflowConfig: metadata.workflowConfig,
+      // NEW: Direct vegaSpec for new architecture
+      vegaSpec: metadata.widgetConfig?.vegaSpec || metadata.vegaSpec,
       ...metadata,
     });
 
@@ -164,19 +168,45 @@ const widgetWorkflowBridge = {
    * @returns {object} Processed data ready for chart display
    */
   processContextForWidget(context, widgetConfig) {
-    const { widgetType, datasetFields, parameters } = widgetConfig;
+    const { widgetType, datasetFields, parameters, workflowConfig, vegaSpec } = widgetConfig;
+
+    // NEW: If vegaSpec is provided directly, use new universal processor
+    if (vegaSpec) {
+      try {
+        return processWorkflowDataForWidget({
+          widgetType: 'vega-lite', // Default to vega-lite for new architecture
+          context,
+          workflowConfig: { vegaSpec, ...workflowConfig },
+        });
+      } catch (error) {
+        Logger.log('error', {
+          message: 'widgetWorkflowBridge:processContextForWidget:vegaSpec:error',
+          params: { error: error.message },
+        });
+        return null;
+      }
+    }
+
+    // LEGACY: Vega widgets don't use datasetFields - they use workflowConfig directly
+    const isVegaWidget = widgetType === 'vega' || widgetType === 'vega-lite';
     
-    if (!widgetType || !datasetFields || Object.keys(datasetFields).length === 0) {
+    if (!widgetType) {
       return null; // No processing needed
     }
 
-    try {
+    // For non-Vega widgets, require datasetFields
+    if (!isVegaWidget && (!datasetFields || Object.keys(datasetFields).length === 0)) {
+      return null;
+    }
 
+    try {
       return processWorkflowDataForWidget({
         widgetType,
         context,
         datasetFields,
         parameters,
+        // For Vega widgets, pass the full workflowConfig
+        workflowConfig: isVegaWidget ? workflowConfig : undefined,
       });
     } catch (error) {
       Logger.log('error', {
@@ -198,13 +228,9 @@ const widgetWorkflowBridge = {
     const widgets = this.getWidgetsForInstance(instanceID);
     
     if (widgets.length === 0) {
-      Logger.log('error', {
-        message: 'widgetWorkflowBridge:noWidgetsToNotify',
-        params: { 
-          instanceID,
-          registeredInstances: Array.from(instanceWidgets.keys()),
-          totalConnections: widgetConnections.size,
-        },
+      Logger.log('info', {
+        message: 'widgetWorkflowBridge:noWidgetsForInstance',
+        params: { instanceID },
       });
       return;
     }
@@ -226,6 +252,8 @@ const widgetWorkflowBridge = {
           widgetType: connection.widgetType,
           datasetFields: connection.datasetFields,
           parameters: connection.parameters,
+          workflowConfig: connection.workflowConfig,
+          vegaSpec: connection.vegaSpec,
         });
       }
 
@@ -268,6 +296,8 @@ const widgetWorkflowBridge = {
           widgetType: connection.widgetType,
           datasetFields: connection.datasetFields,
           parameters: connection.parameters,
+          workflowConfig: connection.workflowConfig,
+          vegaSpec: connection.vegaSpec,
         });
       }
 
