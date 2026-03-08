@@ -1,6 +1,7 @@
 // Custom Text Input Renderer
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Input, Textarea } from '@jet-admin/ui';
 
 export const CustomTextInput = (props) => {
   const { data, path, handleChange, label, description, errors, uischema, enabled } = props;
@@ -18,7 +19,7 @@ export const CustomTextInput = (props) => {
         {label || description} {errors && errors.length > 0 && errors}
       </label>
       {isMulti ? (
-        <textarea
+        <Textarea
           id={path}
           name={path}
           disabled={isDisabled}
@@ -37,7 +38,7 @@ export const CustomTextInput = (props) => {
           rows={uischema?.options?.rows || 3}
         />
       ) : (
-        <input
+          <Input
           type={uischema?.options?.format === "password" ? "password" : "text"}
           id={path}
           name={path}

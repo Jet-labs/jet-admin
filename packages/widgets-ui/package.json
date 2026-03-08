@@ -15,7 +15,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "esbuild src/index.js --bundle --outfile=dist/index.mjs --loader:.js=jsx --format=esm --sourcemap --external:react --external:react-dom --external:@mui/material --external:@emotion/react --external:@emotion/styled --external:@mui/x-data-grid && esbuild src/index.js --bundle --outfile=dist/index.cjs --loader:.js=jsx --format=cjs --sourcemap --external:react --external:react-dom --external:@mui/material --external:@emotion/react --external:@emotion/styled --external:@mui/x-data-grid",
+    "build": "esbuild src/index.js --bundle --outfile=dist/index.mjs --loader:.js=jsx --format=esm --sourcemap --packages=external && esbuild src/index.js --bundle --outfile=dist/index.cjs --loader:.js=jsx --format=cjs --sourcemap --packages=external ",
     "dev": "npm run build -- --watch",
     "lint": "eslint .",
     "test": "jest"
@@ -51,8 +51,6 @@
     "@mui/x-data-grid": "^8.2.0",
     "react-data-grid": "^7.0.0-beta.52",
     "@jet-admin/widget-types": "^1.0.0",
-    "react-chartjs-2": "^5.3.0",
-    "chartjs-plugin-autocolors": "^0.3.1",
     "vega": "^5.28.0",
     "vega-lite": "^5.18.0",
     "vega-embed": "^6.25.0"

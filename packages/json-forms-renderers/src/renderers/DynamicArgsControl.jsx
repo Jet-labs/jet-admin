@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import { TbVariable } from 'react-icons/tb';
+import { Button, Input } from '@jet-admin/ui';
 
 export const DynamicArgsControl = (props) => {
   const { data, path, handleChange, uischema, errors } = props;
@@ -166,7 +167,7 @@ const ArgInputWithVariablePicker = ({ argName, value, onChange, availableVariabl
           {argName}
         </label>
         <div className="flex items-center gap-1">
-          <input
+          <Input
             ref={inputRef}
             type="text"
             id={`arg-${argName}`}
@@ -176,7 +177,7 @@ const ArgInputWithVariablePicker = ({ argName, value, onChange, availableVariabl
             onChange={(e) => onChange(e.target.value)}
           />
           <div className="relative" ref={dropdownRef}>
-            <button
+            <Button
               type="button"
               onClick={() => setShowDropdown(!showDropdown)}
               className={`flex-shrink-0 p-1.5 rounded transition-colors border border-slate-200 bg-slate-50 ${
@@ -187,7 +188,7 @@ const ArgInputWithVariablePicker = ({ argName, value, onChange, availableVariabl
               title="Insert variable from previous node"
             >
               <TbVariable className="w-4 h-4" />
-            </button>
+            </Button>
             {showDropdown && (
               <div className="absolute right-0 top-full mt-1 w-64 bg-white border border-slate-200 rounded shadow-lg z-50 max-h-64 overflow-y-auto">
                 {availableVariables.length === 0 ? (
@@ -205,7 +206,7 @@ const ArgInputWithVariablePicker = ({ argName, value, onChange, availableVariabl
                             📥 Workflow Inputs
                           </div>
                           {inputVariables.map((variable, idx) => (
-                            <button
+                            <Button
                               key={`input-${idx}`}
                               type="button"
                               onClick={() => insertVariable(variable.contextPath)}
@@ -217,7 +218,7 @@ const ArgInputWithVariablePicker = ({ argName, value, onChange, availableVariabl
                               <div className="text-[10px] text-slate-400 truncate">
                                 type: {variable.type || 'any'}
                               </div>
-                            </button>
+                            </Button>
                           ))}
                         </>
                       )}
@@ -229,7 +230,7 @@ const ArgInputWithVariablePicker = ({ argName, value, onChange, availableVariabl
                             📤 Upstream Node Outputs
                           </div>
                           {nodeVariables.map((variable, idx) => (
-                            <button
+                            <Button
                             key={`node-${idx}`}
                             type="button"
                             onClick={() => insertVariable(variable.contextPath)}
@@ -241,7 +242,7 @@ const ArgInputWithVariablePicker = ({ argName, value, onChange, availableVariabl
                             <div className="text-[10px] text-slate-400 truncate">
                               from: {variable.nodeTitle}
                             </div>
-                          </button>
+                            </Button>
                         ))}
                         </>
                       )}

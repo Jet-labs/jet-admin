@@ -29,9 +29,8 @@ services:
       - VITE_SUPABASE_KEY=${VITE_SUPABASE_KEY}
       - PORT=8090
       
-      # Database and Messaging (MUST BE PROVIDED)
+      # Database (MUST BE PROVIDED)
       - DATABASE_URL=${DATABASE_URL}
-      - RABBITMQ_URL=${RABBITMQ_URL}
       - SEED_DATABASE=${SEED_DATABASE:-false}
       
       # Authentication

@@ -1,6 +1,7 @@
 // Custom Checkbox Input Renderer
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Checkbox } from '@jet-admin/ui';
 
 export const CustomCheckboxInput = (props) => {
   const {
@@ -14,20 +15,17 @@ export const CustomCheckboxInput = (props) => {
     uischema,
   } = props;
 
-  const onToggle = (ev) => {
-    handleChange(path, ev.target.checked);
+  const onToggle = (checked) => {
+    handleChange(path, checked);
   };
 
   return (
     <div className="flex items-center mb-3">
-      <input
-        type="checkbox"
+      <Checkbox
         id={path}
-        name={path}
         checked={!!data}
         disabled={!enabled}
-        onChange={onToggle}
-        className="h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+        onCheckedChange={onToggle}
       />
       <label htmlFor={path} className="ml-2 text-sm font-medium text-slate-700">
         {label || description || uischema.label}

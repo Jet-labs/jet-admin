@@ -1,4 +1,3 @@
-
 {
   "name": "@jet-admin/template-package",
   "version": "1.0.0",
@@ -16,7 +15,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "esbuild src/index.js --bundle --outfile=dist/index.mjs --format=esm --sourcemap && esbuild src/index.js --bundle --outfile=dist/index.cjs --format=cjs --sourcemap",
+    "build": "esbuild src/index.js --bundle --outfile=dist/index.mjs --format=esm --sourcemap --packages=external && esbuild src/index.js --bundle --outfile=dist/index.cjs --format=cjs --sourcemap --packages=external",
     "dev": "npm run build -- --watch",
     "lint": "eslint .",
     "test": "jest"

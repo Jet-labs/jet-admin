@@ -1,6 +1,7 @@
 // Custom Number Input Renderer
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Input } from '@jet-admin/ui';
 
 export const CustomNumberInput = (props) => {
   const {
@@ -48,7 +49,7 @@ export const CustomNumberInput = (props) => {
       {errors && errors.length > 0 && (
         <span className="text-red-500 text-xs">{errors}</span>
       )}
-      <input
+      <Input
         type="number"
         id={path}
         name={path}

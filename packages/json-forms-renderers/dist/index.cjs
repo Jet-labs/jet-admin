@@ -91,6 +91,7 @@ var import_react26 = require("@jsonforms/react");
 // src/renderers/CustomNumberInput.jsx
 var import_react = __toESM(require("react"));
 var import_prop_types = __toESM(require("prop-types"));
+var import_ui = require("@jet-admin/ui");
 var CustomNumberInput = (props) => {
   const {
     data,
@@ -124,7 +125,7 @@ var CustomNumberInput = (props) => {
     " ",
     errors && errors.length > 0 && errors
   ), errors && errors.length > 0 && /* @__PURE__ */ import_react.default.createElement("span", { className: "text-red-500 text-xs" }, errors), /* @__PURE__ */ import_react.default.createElement(
-    "input",
+    import_ui.Input,
     {
       type: "number",
       id: path,
@@ -153,6 +154,7 @@ CustomNumberInput.propTypes = {
 // src/renderers/CustomTextInput.jsx
 var import_react2 = __toESM(require("react"));
 var import_prop_types2 = __toESM(require("prop-types"));
+var import_ui2 = require("@jet-admin/ui");
 var CustomTextInput = (props) => {
   const { data, path, handleChange, label, description, errors, uischema, enabled } = props;
   const isMulti = uischema?.options?.multi;
@@ -167,7 +169,7 @@ var CustomTextInput = (props) => {
     " ",
     errors && errors.length > 0 && errors
   ), isMulti ? /* @__PURE__ */ import_react2.default.createElement(
-    "textarea",
+    import_ui2.Textarea,
     {
       id: path,
       name: path,
@@ -179,7 +181,7 @@ var CustomTextInput = (props) => {
       rows: uischema?.options?.rows || 3
     }
   ) : /* @__PURE__ */ import_react2.default.createElement(
-    "input",
+    import_ui2.Input,
     {
       type: uischema?.options?.format === "password" ? "password" : "text",
       id: path,
@@ -207,6 +209,7 @@ CustomTextInput.propTypes = {
 var import_react3 = __toESM(require("react"));
 var import_prop_types3 = __toESM(require("prop-types"));
 var import_tb = require("react-icons/tb");
+var import_ui3 = require("@jet-admin/ui");
 var CustomSelectInput = (props) => {
   const {
     data,
@@ -258,20 +261,15 @@ var CustomSelectInput = (props) => {
     label || description,
     " ",
     errors && errors.length > 0 && errors
-  ), /* @__PURE__ */ import_react3.default.createElement("div", { className: `flex items-center gap-2 ${showRefreshButton ? "" : ""}` }, /* @__PURE__ */ import_react3.default.createElement(
-    "select",
+  ), /* @__PURE__ */ import_react3.default.createElement("div", { className: `flex items-center gap-2 ${showRefreshButton ? "" : ""}` }, /* @__PURE__ */ import_react3.default.createElement(import_ui3.Select, { value: data || "", onValueChange: (val) => handleChange(path, val), disabled: isDisabled }, /* @__PURE__ */ import_react3.default.createElement(
+    import_ui3.SelectTrigger,
     {
       id: path,
-      name: path,
-      disabled: isDisabled,
-      className: `placeholder:text-slate-400 text-sm bg-slate-50 border focus:border-slate-700 ${errors && errors.length > 0 ? "border-red-500 focus:border-red-500" : "border-slate-200"} text-slate-700 rounded block w-full px-2.5 py-1.5 h-[34px] disabled:opacity-50 disabled:cursor-not-allowed`,
-      onChange: (ev) => handleChange(path, ev.target.value),
-      value: data || ""
+      className: `text-sm ${errors && errors.length > 0 ? "border-red-500" : ""}`
     },
-    !data && /* @__PURE__ */ import_react3.default.createElement("option", { value: "", disabled: true }, uischema?.options?.placeholder || "Select an option"),
-    options.map((optionValue) => /* @__PURE__ */ import_react3.default.createElement("option", { key: optionValue, value: optionValue }, getDisplayName(optionValue)))
-  ), showRefreshButton && onRefresh && /* @__PURE__ */ import_react3.default.createElement(
-    "button",
+    /* @__PURE__ */ import_react3.default.createElement(import_ui3.SelectValue, { placeholder: uischema?.options?.placeholder || "Select an option" })
+  ), /* @__PURE__ */ import_react3.default.createElement(import_ui3.SelectContent, null, options.map((optionValue) => /* @__PURE__ */ import_react3.default.createElement(import_ui3.SelectItem, { key: optionValue, value: optionValue }, getDisplayName(optionValue))))), showRefreshButton && onRefresh && /* @__PURE__ */ import_react3.default.createElement(
+    import_ui3.Button,
     {
       type: "button",
       onClick: handleRefreshClick,
@@ -297,6 +295,7 @@ CustomSelectInput.propTypes = {
 // src/renderers/CustomCheckboxInput.jsx
 var import_react4 = __toESM(require("react"));
 var import_prop_types4 = __toESM(require("prop-types"));
+var import_ui4 = require("@jet-admin/ui");
 var CustomCheckboxInput = (props) => {
   const {
     data,
@@ -308,19 +307,16 @@ var CustomCheckboxInput = (props) => {
     enabled,
     uischema
   } = props;
-  const onToggle = (ev) => {
-    handleChange(path, ev.target.checked);
+  const onToggle = (checked) => {
+    handleChange(path, checked);
   };
   return /* @__PURE__ */ import_react4.default.createElement("div", { className: "flex items-center mb-3" }, /* @__PURE__ */ import_react4.default.createElement(
-    "input",
+    import_ui4.Checkbox,
     {
-      type: "checkbox",
       id: path,
-      name: path,
       checked: !!data,
       disabled: !enabled,
-      onChange: onToggle,
-      className: "h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+      onCheckedChange: onToggle
     }
   ), /* @__PURE__ */ import_react4.default.createElement("label", { htmlFor: path, className: "ml-2 text-sm font-medium text-slate-700" }, label || description || uischema.label), errors && errors.length > 0 && /* @__PURE__ */ import_react4.default.createElement("p", { className: "text-red-500 text-xs mt-1 ml-2" }, errors));
 };
@@ -610,6 +606,7 @@ CustomCodeJavascriptControl.propTypes = {
 // src/renderers/CustomSuggestionInput.jsx
 var import_react9 = __toESM(require("react"));
 var import_prop_types7 = __toESM(require("prop-types"));
+var import_ui5 = require("@jet-admin/ui");
 var CustomSuggestionInput = (props) => {
   const { data, path, handleChange, label, description, errors, uischema, enabled } = props;
   const { suggestions, placeholder } = uischema.options || {};
@@ -627,7 +624,7 @@ var CustomSuggestionInput = (props) => {
     },
     /* @__PURE__ */ import_react9.default.createElement("span", null, label || description, " ", errors && errors.length > 0 && errors),
     suggestions && suggestions.length > 0 && /* @__PURE__ */ import_react9.default.createElement(
-      "button",
+      import_ui5.Button,
       {
         type: "button",
         onClick: () => setIsOpen(!isOpen),
@@ -637,7 +634,7 @@ var CustomSuggestionInput = (props) => {
       "Map +"
     )
   ), /* @__PURE__ */ import_react9.default.createElement(
-    "input",
+    import_ui5.Input,
     {
       type: "text",
       id: path,
@@ -648,7 +645,7 @@ var CustomSuggestionInput = (props) => {
       onChange: (ev) => handleChange(path, ev.target.value),
       value: data || ""
     }
-  ), isOpen && suggestions && /* @__PURE__ */ import_react9.default.createElement("div", { className: "absolute right-0 top-6 w-48 bg-white border border-slate-200 shadow-xl rounded z-[50] max-h-40 overflow-y-auto" }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "p-2 border-b border-slate-100 flex justify-between items-center bg-slate-50" }, /* @__PURE__ */ import_react9.default.createElement("span", { className: "text-[10px] font-semibold text-slate-500" }, "Pick a node"), /* @__PURE__ */ import_react9.default.createElement("button", { type: "button", onClick: () => setIsOpen(false), className: "text-slate-400 hover:text-slate-600" }, "\xD7")), suggestions.length === 0 ? /* @__PURE__ */ import_react9.default.createElement("div", { className: "px-2 py-1 text-[10px] text-slate-400 italic" }, "No suggestions") : suggestions.map((item, idx) => /* @__PURE__ */ import_react9.default.createElement(
+  ), isOpen && suggestions && /* @__PURE__ */ import_react9.default.createElement("div", { className: "absolute right-0 top-6 w-48 bg-white border border-slate-200 shadow-xl rounded z-[50] max-h-40 overflow-y-auto" }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "p-2 border-b border-slate-100 flex justify-between items-center bg-slate-50" }, /* @__PURE__ */ import_react9.default.createElement("span", { className: "text-[10px] font-semibold text-slate-500" }, "Pick a node"), /* @__PURE__ */ import_react9.default.createElement(import_ui5.Button, { type: "button", onClick: () => setIsOpen(false), className: "text-slate-400 hover:text-slate-600" }, "\xD7")), suggestions.length === 0 ? /* @__PURE__ */ import_react9.default.createElement("div", { className: "px-2 py-1 text-[10px] text-slate-400 italic" }, "No suggestions") : suggestions.map((item, idx) => /* @__PURE__ */ import_react9.default.createElement(
     "div",
     {
       key: idx,
@@ -673,6 +670,7 @@ CustomSuggestionInput.propTypes = {
 var import_react10 = __toESM(require("react"));
 var import_prop_types8 = __toESM(require("prop-types"));
 var import_tb2 = require("react-icons/tb");
+var import_ui6 = require("@jet-admin/ui");
 var DynamicArgsControl = (props) => {
   const { data, path, handleChange, uischema, errors } = props;
   const args = uischema?.options?.args || [];
@@ -785,7 +783,7 @@ var ArgInputWithVariablePicker = ({ argName, value, onChange, availableVariables
   const inputVariables = availableVariables.filter((v) => v.category === "input");
   const nodeVariables = availableVariables.filter((v) => v.category === "node");
   return /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex flex-row justify-between items-center gap-2" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react10.default.createElement("label", { className: "block mb-1 text-[10px] font-medium text-slate-400" }, argName), /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center gap-1" }, /* @__PURE__ */ import_react10.default.createElement(
-    "input",
+    import_ui6.Input,
     {
       ref: inputRef,
       type: "text",
@@ -796,7 +794,7 @@ var ArgInputWithVariablePicker = ({ argName, value, onChange, availableVariables
       onChange: (e) => onChange(e.target.value)
     }
   ), /* @__PURE__ */ import_react10.default.createElement("div", { className: "relative", ref: dropdownRef }, /* @__PURE__ */ import_react10.default.createElement(
-    "button",
+    import_ui6.Button,
     {
       type: "button",
       onClick: () => setShowDropdown(!showDropdown),
@@ -805,7 +803,7 @@ var ArgInputWithVariablePicker = ({ argName, value, onChange, availableVariables
     },
     /* @__PURE__ */ import_react10.default.createElement(import_tb2.TbVariable, { className: "w-4 h-4" })
   ), showDropdown && /* @__PURE__ */ import_react10.default.createElement("div", { className: "absolute right-0 top-full mt-1 w-64 bg-white border border-slate-200 rounded shadow-lg z-50 max-h-64 overflow-y-auto" }, availableVariables.length === 0 ? /* @__PURE__ */ import_react10.default.createElement("div", { className: "px-2 py-3 text-xs text-slate-400 text-center" }, "No variables available yet.", /* @__PURE__ */ import_react10.default.createElement("br", null), /* @__PURE__ */ import_react10.default.createElement("span", { className: "text-[10px]" }, "Add workflow inputs or connect upstream nodes.")) : /* @__PURE__ */ import_react10.default.createElement(import_react10.default.Fragment, null, inputVariables.length > 0 && /* @__PURE__ */ import_react10.default.createElement(import_react10.default.Fragment, null, /* @__PURE__ */ import_react10.default.createElement("div", { className: "px-2 py-1.5 text-[10px] font-semibold text-green-600 uppercase tracking-wider border-b border-slate-100 bg-green-50" }, "\u{1F4E5} Workflow Inputs"), inputVariables.map((variable, idx) => /* @__PURE__ */ import_react10.default.createElement(
-    "button",
+    import_ui6.Button,
     {
       key: `input-${idx}`,
       type: "button",
@@ -815,7 +813,7 @@ var ArgInputWithVariablePicker = ({ argName, value, onChange, availableVariables
     /* @__PURE__ */ import_react10.default.createElement("div", { className: "text-xs font-medium text-slate-700 font-mono" }, variable.contextPath),
     /* @__PURE__ */ import_react10.default.createElement("div", { className: "text-[10px] text-slate-400 truncate" }, "type: ", variable.type || "any")
   ))), nodeVariables.length > 0 && /* @__PURE__ */ import_react10.default.createElement(import_react10.default.Fragment, null, /* @__PURE__ */ import_react10.default.createElement("div", { className: "px-2 py-1.5 text-[10px] font-semibold text-blue-600 uppercase tracking-wider border-b border-slate-100 bg-blue-50" }, "\u{1F4E4} Upstream Node Outputs"), nodeVariables.map((variable, idx) => /* @__PURE__ */ import_react10.default.createElement(
-    "button",
+    import_ui6.Button,
     {
       key: `node-${idx}`,
       type: "button",
@@ -839,6 +837,7 @@ var import_react11 = __toESM(require("react"));
 var import_prop_types9 = __toESM(require("prop-types"));
 var import_react12 = require("@jsonforms/react");
 var import_md = require("react-icons/md");
+var import_ui7 = require("@jet-admin/ui");
 var CustomKeyValueArrayRenderer = ({
   data,
   path,
@@ -894,7 +893,7 @@ var CustomKeyValueArrayRenderer = ({
       renderers
     }
   )), /* @__PURE__ */ import_react11.default.createElement(
-    "button",
+    import_ui7.Button,
     {
       type: "button",
       onClick: () => handleRemoveItem(index),
@@ -902,7 +901,7 @@ var CustomKeyValueArrayRenderer = ({
     },
     /* @__PURE__ */ import_react11.default.createElement(import_md.MdDeleteOutline, null)
   )))), /* @__PURE__ */ import_react11.default.createElement(
-    "button",
+    import_ui7.Button,
     {
       type: "button",
       onClick: handleAddItem,
@@ -929,6 +928,7 @@ var import_react13 = __toESM(require("react"));
 var import_prop_types10 = __toESM(require("prop-types"));
 var import_react14 = require("@jsonforms/react");
 var import_md2 = require("react-icons/md");
+var import_ui8 = require("@jet-admin/ui");
 var CustomKeyValueTypeArrayRenderer = ({
   data,
   path,
@@ -998,7 +998,7 @@ var CustomKeyValueTypeArrayRenderer = ({
       renderers
     }
   )), /* @__PURE__ */ import_react13.default.createElement(
-    "button",
+    import_ui8.Button,
     {
       type: "button",
       onClick: () => handleRemoveItem(index),
@@ -1006,7 +1006,7 @@ var CustomKeyValueTypeArrayRenderer = ({
     },
     /* @__PURE__ */ import_react13.default.createElement(import_md2.MdDeleteOutline, null)
   )))), /* @__PURE__ */ import_react13.default.createElement(
-    "button",
+    import_ui8.Button,
     {
       type: "button",
       onClick: handleAddItem,
@@ -1033,6 +1033,7 @@ var import_react15 = __toESM(require("react"));
 var import_prop_types11 = __toESM(require("prop-types"));
 var import_react16 = require("@jsonforms/react");
 var import_md3 = require("react-icons/md");
+var import_ui9 = require("@jet-admin/ui");
 var CustomKeyTypeArrayRenderer = ({
   data,
   path,
@@ -1088,7 +1089,7 @@ var CustomKeyTypeArrayRenderer = ({
       renderers
     }
   )), /* @__PURE__ */ import_react15.default.createElement(
-    "button",
+    import_ui9.Button,
     {
       type: "button",
       onClick: () => handleRemoveItem(index),
@@ -1096,7 +1097,7 @@ var CustomKeyTypeArrayRenderer = ({
     },
     /* @__PURE__ */ import_react15.default.createElement(import_md3.MdDeleteOutline, null)
   )))), /* @__PURE__ */ import_react15.default.createElement(
-    "button",
+    import_ui9.Button,
     {
       type: "button",
       onClick: handleAddItem,
@@ -1122,6 +1123,7 @@ CustomKeyTypeArrayRenderer.propTypes = {
 var import_react17 = __toESM(require("react"));
 var import_prop_types12 = __toESM(require("prop-types"));
 var import_md4 = require("react-icons/md");
+var import_ui10 = require("@jet-admin/ui");
 var CustomStringArrayRenderer = (props) => {
   const { data, path, handleChange, label, uischema, enabled, visible } = props;
   const arrayData = Array.isArray(data) ? data : [];
@@ -1141,7 +1143,7 @@ var CustomStringArrayRenderer = (props) => {
     return null;
   }
   return /* @__PURE__ */ import_react17.default.createElement("div", { className: "p-3 border border-slate-200 rounded bg-white mb-3" }, /* @__PURE__ */ import_react17.default.createElement("label", { className: "block mb-1 text-sm font-medium text-slate-700" }, label || uischema?.label || "Items"), /* @__PURE__ */ import_react17.default.createElement("div", { className: "gap-2" }, arrayData.map((item, index) => /* @__PURE__ */ import_react17.default.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2 mb-2" }, /* @__PURE__ */ import_react17.default.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ import_react17.default.createElement(
-    "input",
+    import_ui10.Input,
     {
       type: "text",
       value: item || "",
@@ -1151,7 +1153,7 @@ var CustomStringArrayRenderer = (props) => {
       className: "w-full placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-200 text-slate-700 rounded focus:border-slate-400 focus:outline-none px-2.5 py-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
     }
   )), /* @__PURE__ */ import_react17.default.createElement(
-    "button",
+    import_ui10.Button,
     {
       type: "button",
       onClick: () => handleRemoveItem(index),
@@ -1160,7 +1162,7 @@ var CustomStringArrayRenderer = (props) => {
     },
     /* @__PURE__ */ import_react17.default.createElement(import_md4.MdDeleteOutline, null)
   )))), arrayData.length === 0 && /* @__PURE__ */ import_react17.default.createElement("div", { className: "text-xs text-slate-400 italic py-2" }, "No items added yet."), /* @__PURE__ */ import_react17.default.createElement(
-    "button",
+    import_ui10.Button,
     {
       type: "button",
       onClick: handleAddItem,
@@ -1184,6 +1186,7 @@ CustomStringArrayRenderer.propTypes = {
 var import_react18 = __toESM(require("react"));
 var import_prop_types13 = __toESM(require("prop-types"));
 var import_md5 = require("react-icons/md");
+var import_ui11 = require("@jet-admin/ui");
 var CustomFieldOperatorValueArrayRenderer = ({
   data,
   path,
@@ -1223,7 +1226,7 @@ var CustomFieldOperatorValueArrayRenderer = ({
     handleChange(path, newItems);
   };
   return /* @__PURE__ */ import_react18.default.createElement("div", { className: "p-3 border border-slate-200 rounded bg-white mb-3" }, /* @__PURE__ */ import_react18.default.createElement("label", { className: "block mb-2 text-sm font-medium text-slate-700" }, label || uischema.label || "Conditions"), errors && errors.length > 0 && /* @__PURE__ */ import_react18.default.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ import_react18.default.createElement("div", { className: "space-y-2" }, items.map((item, index) => /* @__PURE__ */ import_react18.default.createElement("div", { key: `${path}-${index}`, className: "flex items-center gap-2" }, /* @__PURE__ */ import_react18.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react18.default.createElement(
-    "input",
+    import_ui11.Input,
     {
       type: "text",
       placeholder: "Field",
@@ -1232,17 +1235,8 @@ var CustomFieldOperatorValueArrayRenderer = ({
       onChange: (e) => handleItemChange(index, "field", e.target.value),
       className: "w-full px-2.5 py-1.5 text-sm bg-slate-50 border border-slate-200 rounded text-slate-700 placeholder:text-slate-400 focus:border-slate-700 disabled:opacity-50"
     }
-  )), /* @__PURE__ */ import_react18.default.createElement("div", { className: "w-36" }, /* @__PURE__ */ import_react18.default.createElement(
-    "select",
-    {
-      value: item.operator || "==",
-      disabled: isDisabled,
-      onChange: (e) => handleItemChange(index, "operator", e.target.value),
-      className: "w-full px-2.5 py-1.5 text-sm bg-slate-50 border border-slate-200 rounded text-slate-700 focus:border-slate-700 disabled:opacity-50"
-    },
-    operatorOptions.map((op) => /* @__PURE__ */ import_react18.default.createElement("option", { key: op, value: op }, op))
-  )), /* @__PURE__ */ import_react18.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react18.default.createElement(
-    "input",
+  )), /* @__PURE__ */ import_react18.default.createElement("div", { className: "w-36" }, /* @__PURE__ */ import_react18.default.createElement(import_ui11.Select, { value: item.operator || "==", onValueChange: (val) => handleItemChange(index, "operator", val), disabled: isDisabled }, /* @__PURE__ */ import_react18.default.createElement(import_ui11.SelectTrigger, { className: "text-sm" }, /* @__PURE__ */ import_react18.default.createElement(import_ui11.SelectValue, null)), /* @__PURE__ */ import_react18.default.createElement(import_ui11.SelectContent, null, operatorOptions.map((op) => /* @__PURE__ */ import_react18.default.createElement(import_ui11.SelectItem, { key: op, value: op }, op))))), /* @__PURE__ */ import_react18.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react18.default.createElement(
+    import_ui11.Input,
     {
       type: "text",
       placeholder: "Value",
@@ -1252,7 +1246,7 @@ var CustomFieldOperatorValueArrayRenderer = ({
       className: "w-full px-2.5 py-1.5 text-sm bg-slate-50 border border-slate-200 rounded text-slate-700 placeholder:text-slate-400 focus:border-slate-700 disabled:opacity-50"
     }
   )), /* @__PURE__ */ import_react18.default.createElement(
-    "button",
+    import_ui11.Button,
     {
       type: "button",
       onClick: () => handleRemoveItem(index),
@@ -1261,7 +1255,7 @@ var CustomFieldOperatorValueArrayRenderer = ({
     },
     /* @__PURE__ */ import_react18.default.createElement(import_md5.MdDeleteOutline, null)
   )))), /* @__PURE__ */ import_react18.default.createElement(
-    "button",
+    import_ui11.Button,
     {
       type: "button",
       onClick: handleAddItem,
@@ -1428,6 +1422,7 @@ CustomVerticalLayout.propTypes = {
 var import_react24 = __toESM(require("react"));
 var import_prop_types17 = __toESM(require("prop-types"));
 var import_react25 = require("@jsonforms/react");
+var import_ui12 = require("@jet-admin/ui");
 var CustomTabRenderer = (props) => {
   const { uischema, schema, path, enabled, renderers, cells } = props;
   const categories = uischema.elements || [];
@@ -1437,7 +1432,7 @@ var CustomTabRenderer = (props) => {
   }
   const activeCategory = categories[activeTab];
   return /* @__PURE__ */ import_react24.default.createElement("div", { className: "custom-tabs-container" }, /* @__PURE__ */ import_react24.default.createElement("div", { className: "flex border-slate-300" }, categories.map((category, index) => /* @__PURE__ */ import_react24.default.createElement(
-    "button",
+    import_ui12.Button,
     {
       key: category.label || `tab-${index}`,
       className: `px-4 mr-2 py-2 text-sm font-medium rounded ${index === activeTab ? "text-[#646cff] border-slate-200" : "text-slate-700"} focus:outline-none bg-white`,

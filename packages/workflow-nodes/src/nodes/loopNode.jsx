@@ -6,6 +6,7 @@ import { workflowNodeRenderers } from '../jsonFormsRenderers';
 import { VscDebugDisconnect } from 'react-icons/vsc';
 import { TbRepeat } from 'react-icons/tb';
 import { IoMdArrowDropright } from 'react-icons/io';
+import { Button } from '@jet-admin/ui';
 
 // ============================================================================
 // Error handling options
@@ -253,13 +254,13 @@ export const LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
           </div>
         </div>
 
-        <button
+        <Button
           type="button"
           onClick={handleSave}
           className="px-3 py-1.5 text-sm text-white bg-[#646cff] rounded hover:bg-[#5558dd] focus:ring-4 focus:outline-none focus:ring-[#646cff]/30"
         >
           Save
-        </button>
+        </Button>
       </div>
     </div>
   );

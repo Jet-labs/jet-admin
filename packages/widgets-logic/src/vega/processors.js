@@ -109,3 +109,86 @@ export const processVegaLiteWorkflowData = ({ context, workflowConfig }) => {
 
   return spec;
 };
+
+/**
+ * Process workflow context data for Vega widget
+ * 
+ * @param {object} params
+ * @param {object} params.context - Workflow context data
+ * @param {object} params.workflowConfig - Widget workflow configuration
+ * @returns {object} Complete Vega specification
+ */
+export const processVegaWorkflowData = ({ context, workflowConfig }) => {
+  const {
+    vegaSpec,
+    dataSource,
+    dataSources,
+    transforms,
+    width,
+    height
+  } = workflowConfig || {};
+
+  if (!vegaSpec) {
+    return {
+      $schema: "https://vega.github.io/schema/vega/v5.json",
+      description: "No specification provided",
+      data: [],
+      marks: []
+    };
+  }
+
+  // Build complete spec
+  const spec = {
+    $schema: "https://vega.github.io/schema/vega/v5.json",
+    width: width || "container",
+    height: height || "container",
+    autosize: { type: "fit", contains: "padding" },
+    ...vegaSpec
+  };
+
+  // Single data source mode (Vega uses 'data' array, usually objects with 'name' and 'values')
+  if (dataSource) {
+    const rawData = resolveVariablePath(context, dataSource, []);
+    const data = applyTransforms(rawData, transforms);
+
+    // In Vega, data is an array of data objects. We need to find the main data or append a new one.
+    // If spec.data is not defined, create it.
+    if (!spec.data) spec.data = [];
+
+    // Check if a data entry with name 'table' or 'source' exists, otherwise add one
+    // Convention: use 'source' or 'table' as default data name if not specified in spec
+    const dataName = 'source';
+    const existingDataIndex = spec.data.findIndex(d => d.name === dataName);
+
+    if (existingDataIndex >= 0) {
+      spec.data[existingDataIndex].values = Array.isArray(data) ? data : [];
+    } else {
+      spec.data.push({
+        name: dataName,
+        values: Array.isArray(data) ? data : []
+      });
+    }
+  }
+
+  // Multiple data sources mode
+  if (dataSources && typeof dataSources === 'object') {
+    if (!spec.data) spec.data = [];
+
+    for (const [name, path] of Object.entries(dataSources)) {
+      const resolved = resolveVariablePath(context, path, []);
+      const values = Array.isArray(resolved) ? resolved : [];
+
+      const existingDataIndex = spec.data.findIndex(d => d.name === name);
+      if (existingDataIndex >= 0) {
+        spec.data[existingDataIndex].values = values;
+      } else {
+        spec.data.push({
+          name,
+          values
+        });
+      }
+    }
+  }
+
+  return spec;
+};

@@ -5,6 +5,7 @@ import { useWorkflowNodes } from '../context';
 import { workflowNodeRenderers } from '../jsonFormsRenderers';
 import { VscDebugDisconnect } from 'react-icons/vsc';
 import { IoMdTime } from 'react-icons/io';
+import { Button } from '@jet-admin/ui';
 
 // ============================================================================
 // DelayNodeConfigurator - JSON Forms based configuration
@@ -216,13 +217,13 @@ export const DelayNodeConfigurator = ({ data, onChange, nodeId }) => {
           </div>
         </div>
 
-        <button
+        <Button
           type="button"
           onClick={handleSave}
           className="px-3 py-1.5 text-sm text-white bg-[#646cff] rounded hover:bg-[#5558dd] focus:ring-4 focus:outline-none focus:ring-[#646cff]/30"
         >
           Save
-        </button>
+        </Button>
       </div>
     </div>
   );

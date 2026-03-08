@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { TbRefresh } from 'react-icons/tb';
+import { Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@jet-admin/ui';
 
 export const CustomSelectInput = (props) => {
   const {
@@ -64,31 +65,23 @@ export const CustomSelectInput = (props) => {
         {label || description} {errors && errors.length > 0 && errors}
       </label>
       <div className={`flex items-center gap-2 ${showRefreshButton ? '' : ''}`}>
-        <select
-          id={path}
-          name={path}
-          disabled={isDisabled}
-          className={`placeholder:text-slate-400 text-sm bg-slate-50 border focus:border-slate-700 ${
-            errors && errors.length > 0
-              ? "border-red-500 focus:border-red-500"
-              : "border-slate-200"
-            } text-slate-700 rounded block w-full px-2.5 py-1.5 h-[34px] disabled:opacity-50 disabled:cursor-not-allowed`}
-          onChange={(ev) => handleChange(path, ev.target.value)}
-          value={data || ""}
-        >
-          {!data && (
-            <option value="" disabled>
-              {uischema?.options?.placeholder || "Select an option"}
-            </option>
-          )}
-          {options.map((optionValue) => (
-            <option key={optionValue} value={optionValue}>
-              {getDisplayName(optionValue)}
-            </option>
-          ))}
-        </select>
+        <Select value={data || ""} onValueChange={(val) => handleChange(path, val)} disabled={isDisabled}>
+          <SelectTrigger
+            id={path}
+            className={`text-sm ${errors && errors.length > 0 ? "border-red-500" : ""}`}
+          >
+            <SelectValue placeholder={uischema?.options?.placeholder || "Select an option"} />
+          </SelectTrigger>
+          <SelectContent>
+            {options.map((optionValue) => (
+              <SelectItem key={optionValue} value={optionValue}>
+                {getDisplayName(optionValue)}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         {showRefreshButton && onRefresh && (
-          <button
+          <Button
             type="button"
             onClick={handleRefreshClick}
             disabled={isRefreshing || isDisabled}
@@ -96,7 +89,7 @@ export const CustomSelectInput = (props) => {
             title="Refresh list"
           >
             <TbRefresh className={`w-5 h-5 ${isRefreshing ? 'animate-spin' : ''}`} />
-          </button>
+          </Button>
         )}
       </div>
     </div>

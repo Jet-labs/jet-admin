@@ -18,13 +18,14 @@
     "react-icons": "^5.5.0"
   },
   "scripts": {
-    "build": "esbuild src/index.js --bundle --outfile=dist/index.mjs --loader:.js=jsx --format=esm --sourcemap --external:react --external:react-dom --external:reactflow && esbuild src/index.js --bundle --outfile=dist/index.cjs --loader:.js=jsx --format=cjs --sourcemap --external:react --external:react-dom --external:reactflow",
+    "build": "esbuild src/index.js --bundle --outfile=dist/index.mjs --loader:.js=jsx --format=esm --sourcemap --packages=external && esbuild src/index.js --bundle --outfile=dist/index.cjs --loader:.js=jsx --format=cjs --sourcemap --packages=external ",
     "dev": "npm run build -- --watch"
   },
   "peerDependencies": {
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "reactflow": "^11.11.4"
+    "reactflow": "^11.11.4",
+    "@jet-admin/ui": "^1.0.0"
   },
   "devDependencies": {
     "esbuild": "^0.25.0"

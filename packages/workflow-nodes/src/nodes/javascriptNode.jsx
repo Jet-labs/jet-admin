@@ -8,6 +8,7 @@ import { IoMdTime } from 'react-icons/io';
 import { TbRefresh } from 'react-icons/tb';
 import { BiErrorCircle } from 'react-icons/bi';
 import { VscDebugDisconnect } from 'react-icons/vsc';
+import { Button } from '@jet-admin/ui';
 
 // ============================================================================
 // Error handling options
@@ -277,13 +278,13 @@ export const JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
           </div>
         </div>
 
-        <button
+        <Button
           type="button"
           onClick={handleSave}
           className="px-3 py-1.5 text-sm text-white bg-[#646cff] rounded hover:bg-[#5558dd] focus:ring-4 focus:outline-none focus:ring-[#646cff]/30"
         >
           {strings?.WORKFLOW_EDITOR_JAVASCRIPT_NODE_SAVE_BUTTON || 'Save'}
-        </button>
+        </Button>
       </div>
     </div>
   );

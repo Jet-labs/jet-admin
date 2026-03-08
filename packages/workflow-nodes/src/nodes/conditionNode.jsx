@@ -7,6 +7,7 @@ import { TbLogicAnd } from 'react-icons/tb';
 import { VscDebugDisconnect } from 'react-icons/vsc';
 import { FaPlus, FaTrash } from 'react-icons/fa';
 import { IoMdArrowDropdown, IoMdArrowDropright, IoMdArrowDropup } from 'react-icons/io';
+import { Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea } from '@jet-admin/ui';
 
 // ============================================================================
 // Error handling options
@@ -88,14 +89,14 @@ const ConditionBranchEditor = ({ branches, onChange, workflowNodes, currentNodeI
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <label className="text-xs font-medium text-slate-500">Condition Branches</label>
-        <button
+        <Button
           type="button"
           onClick={addBranch}
           className="flex items-center gap-1 px-2 py-1 text-xs bg-white text-[#646cff] hover:bg-[#646cff]/10 rounded transition-colors border border-slate-200"
         >
           <FaPlus className="w-2.5 h-2.5" />
           Add Branch
-        </button>
+        </Button>
       </div>
 
       {availableVariables.length > 0 && (
@@ -124,7 +125,7 @@ const ConditionBranchEditor = ({ branches, onChange, workflowNodes, currentNodeI
                 />
               </div>
               <div className="flex items-center gap-1">
-                <button
+                <Button
                   type="button"
                   onClick={() => moveBranch(index, -1)}
                   disabled={index === 0}
@@ -132,8 +133,8 @@ const ConditionBranchEditor = ({ branches, onChange, workflowNodes, currentNodeI
                   title="Move up"
                 >
                   <IoMdArrowDropup className="w-3 h-3" />
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
                   onClick={() => moveBranch(index, 1)}
                   disabled={index === branches.length - 1}
@@ -141,8 +142,8 @@ const ConditionBranchEditor = ({ branches, onChange, workflowNodes, currentNodeI
                   title="Move down"
                 >
                   <IoMdArrowDropdown className="w-3 h-3" />
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
                   onClick={() => removeBranch(index)}
                   disabled={branches.length <= 1}
@@ -150,32 +151,33 @@ const ConditionBranchEditor = ({ branches, onChange, workflowNodes, currentNodeI
                   title="Remove branch"
                 >
                   <FaTrash className="w-3 h-3" />
-                </button>
+                </Button>
               </div>
             </div>
 
             {/* Condition Type */}
             <div className="mb-2">
-              <select
-                value={branch.conditionType}
-                onChange={(e) => updateBranch(index, 'conditionType', e.target.value)}
-                className="w-full text-xs text-slate-700 p-1.5 border border-slate-200 rounded bg-white focus:outline-none focus:border-[#646cff]"
-              >
-                <option value={CONDITION_TYPES.EXPRESSION}>JavaScript Expression</option>
-                <option value={CONDITION_TYPES.EQUALS}>Equals (==)</option>
-                <option value={CONDITION_TYPES.NOT_EQUALS}>Not Equals (!=)</option>
-                <option value={CONDITION_TYPES.CONTAINS}>Contains</option>
-                <option value={CONDITION_TYPES.GREATER_THAN}>Greater Than (&gt;)</option>
-                <option value={CONDITION_TYPES.LESS_THAN}>Less Than (&lt;)</option>
-                <option value={CONDITION_TYPES.IS_EMPTY}>Is Empty</option>
-                <option value={CONDITION_TYPES.IS_NOT_EMPTY}>Is Not Empty</option>
-                <option value={CONDITION_TYPES.REGEX}>Regex Match</option>
-              </select>
+              <Select value={branch.conditionType} onValueChange={(val) => updateBranch(index, 'conditionType', val)}>
+                <SelectTrigger className="text-xs">
+                  <SelectValue placeholder="Select condition type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={CONDITION_TYPES.EXPRESSION}>JavaScript Expression</SelectItem>
+                  <SelectItem value={CONDITION_TYPES.EQUALS}>Equals (==)</SelectItem>
+                  <SelectItem value={CONDITION_TYPES.NOT_EQUALS}>Not Equals (!=)</SelectItem>
+                  <SelectItem value={CONDITION_TYPES.CONTAINS}>Contains</SelectItem>
+                  <SelectItem value={CONDITION_TYPES.GREATER_THAN}>Greater Than (&gt;)</SelectItem>
+                  <SelectItem value={CONDITION_TYPES.LESS_THAN}>Less Than (&lt;)</SelectItem>
+                  <SelectItem value={CONDITION_TYPES.IS_EMPTY}>Is Empty</SelectItem>
+                  <SelectItem value={CONDITION_TYPES.IS_NOT_EMPTY}>Is Not Empty</SelectItem>
+                  <SelectItem value={CONDITION_TYPES.REGEX}>Regex Match</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
 
             {/* Condition inputs based on type */}
             {branch.conditionType === CONDITION_TYPES.EXPRESSION ? (
-              <textarea
+              <Textarea
                 value={branch.expression || ''}
                 onChange={(e) => updateBranch(index, 'expression', e.target.value)}
                 placeholder="ctx.value === true"
@@ -184,7 +186,7 @@ const ConditionBranchEditor = ({ branches, onChange, workflowNodes, currentNodeI
               />
             ) : branch.conditionType === CONDITION_TYPES.IS_EMPTY ||
               branch.conditionType === CONDITION_TYPES.IS_NOT_EMPTY ? (
-              <input
+                  <Input
                 type="text"
                 value={branch.leftOperand || ''}
                 onChange={(e) => updateBranch(index, 'leftOperand', e.target.value)}
@@ -193,14 +195,14 @@ const ConditionBranchEditor = ({ branches, onChange, workflowNodes, currentNodeI
               />
             ) : (
               <div className="flex gap-2">
-                <input
+                    <Input
                   type="text"
                   value={branch.leftOperand || ''}
                   onChange={(e) => updateBranch(index, 'leftOperand', e.target.value)}
                   placeholder="ctx.variableName"
                       className="flex-1 text-xs text-slate-700 p-2 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff]"
                 />
-                <input
+                    <Input
                   type="text"
                   value={branch.rightOperand || ''}
                   onChange={(e) => updateBranch(index, 'rightOperand', e.target.value)}
@@ -431,13 +433,13 @@ export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
           </div>
         </div>
 
-        <button
+        <Button
           type="button"
           onClick={handleSave}
           className="px-3 py-1.5 text-sm text-white bg-[#646cff] rounded hover:bg-[#5558dd] focus:ring-4 focus:outline-none focus:ring-[#646cff]/30"
         >
           {strings?.WORKFLOW_EDITOR_CONDITION_NODE_SAVE_BUTTON || 'Save'}
-        </button>
+        </Button>
       </div>
     </div>
   );

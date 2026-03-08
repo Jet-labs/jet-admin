@@ -1,136 +1,113 @@
-// chartConfig.ts
-import { faker } from "@faker-js/faker";
-import {
-  CategoryScale,
-  Chart as ChartJS,
-  Legend,
-  Title,
-  Tooltip,
-} from "chart.js";
-import {
-  BarElement,
-  LinearScale,
-  PointElement,
-  LineElement,
-  RadialLinearScale,
-  ArcElement,
-  Filler,
-} from "chart.js";
-import {WIDGET_TYPES} from "@jet-admin/widget-types";
+// Widget config for Vega widgets
+// Legacy Chart.js registration has been removed
 
+/**
+ * Register widgets - no-op since we no longer use Chart.js
+ */
 export const registerWidgets = () => {
-  ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    BarElement,
-    PointElement,
-    LineElement,
-    RadialLinearScale,
-    ArcElement,
-    Title,
-    Tooltip,
-    Legend,
-    Filler
-  );
+  // No-op - Chart.js widgets have been removed
 };
 
+/**
+ * Get demo data for widget types
+ * @param {string} type - Widget type
+ * @returns {object} Demo data for the widget
+ */
 export const getDemoData = (type) => {
-    
-  const labels = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-  ];
-
-  const commonDatasetProps = {
-    label: "Dataset 1",
-    data: Array.from({ length: 7 }, () =>
-      faker.number.int({ min: -1000, max: 1000 })
-    ),
-    borderColor: "rgb(255, 99, 132)",
-    backgroundColor: "rgba(255, 99, 132, 0.5)",
-  };
-
   switch (type) {
-    case WIDGET_TYPES.BAR_CHART.value:
+    case 'vega':
       return {
-        labels,
-        datasets: [
-          commonDatasetProps,
+        $schema: "https://vega.github.io/schema/vega/v5.json",
+        description: "A simple bar chart with embedded data.",
+        width: 400,
+        height: 200,
+        padding: 5,
+        data: [
           {
-            ...commonDatasetProps,
-            label: "Dataset 2",
-            backgroundColor: "rgba(75, 192, 192, 0.5)",
-          },
+            name: "table",
+            values: [
+              { category: "A", amount: 28 },
+              { category: "B", amount: 55 },
+              { category: "C", amount: 43 },
+              { category: "D", amount: 91 },
+              { category: "E", amount: 81 },
+              { category: "F", amount: 53 },
+              { category: "G", amount: 19 },
+              { category: "H", amount: 87 }
+            ]
+          }
         ],
-      };
-    case WIDGET_TYPES.LINE_CHART.value:
-      return {
-        labels,
-        datasets: [
-          { ...commonDatasetProps, fill: false },
+        signals: [
           {
-            ...commonDatasetProps,
-            label: "Dataset 2",
-            borderColor: "rgb(53, 162, 235)",
-            backgroundColor: "rgba(53, 162, 235, 0.5)",
-          },
+            name: "tooltip",
+            value: {},
+            on: [
+              { events: "rect:mouseover", update: "datum" },
+              { events: "rect:mouseout", update: "{}" }
+            ]
+          }
         ],
-      };
-    case WIDGET_TYPES.PIE_CHART.value:
-    case WIDGET_TYPES.RADAR_CHART.value:
-    case WIDGET_TYPES.POLAR_AREA.value:
-      return {
-        labels,
-        datasets: [commonDatasetProps],
-      };
-    case WIDGET_TYPES.BUBBLE_CHART.value:
-      return {
-        labels,
-        datasets: [
+        scales: [
           {
-            label: "Dataset 1",
-            data: labels.map(() => ({
-              x: faker.number.int({ min: -1000, max: 1000 }),
-              y: faker.number.int({ min: -1000, max: 1000 }),
-              r: faker.number.int({ min: 5, max: 20 }),
-            })),
-            borderColor: "rgb(255, 99, 132)",
-            backgroundColor: "rgba(255, 99, 132, 0.5)",
+            name: "xscale",
+            type: "band",
+            domain: { data: "table", field: "category" },
+            range: "width",
+            padding: 0.05,
+            round: true
           },
-        ],
-      };
-    case WIDGET_TYPES.SCATTER_CHART.value:
-      return {
-        labels,
-        datasets: [
           {
-            label: "Dataset 1",
-            data: labels.map(() => ({
-              x: faker.number.int({ min: -1000, max: 1000 }),
-              y: faker.number.int({ min: -1000, max: 1000 }),
-            })),
-            borderColor: "rgb(255, 99, 132)",
-            backgroundColor: "rgba(255, 99, 132, 0.5)",
-          },
+            name: "yscale",
+            domain: { data: "table", field: "amount" },
+            nice: true,
+            range: "height"
+          }
         ],
+        axes: [
+          { orient: "bottom", scale: "xscale" },
+          { orient: "left", scale: "yscale" }
+        ],
+        marks: [
+          {
+            type: "rect",
+            from: { data: "table" },
+            encode: {
+              enter: {
+                x: { scale: "xscale", field: "category" },
+                width: { scale: "xscale", band: 1 },
+                y: { scale: "yscale", field: "amount" },
+                y2: { scale: "yscale", value: 0 }
+              },
+              update: {
+                fill: { value: "steelblue" }
+              },
+              hover: {
+                fill: { value: "red" }
+              }
+            }
+          }
+        ]
       };
-    case WIDGET_TYPES.TEXT_WIDGET.value:
-      return { text: "This is a text widget" };
-    case WIDGET_TYPES.TABLE_WIDGET.value:
-      return [
-        [
-          { column1: "value1", column2: "value2" },
-          { column1: "value1", column2: "value2" },
-        ],
-      ];
-    case WIDGET_TYPES.IFRAME_WIDGET.value:
-      return { url: "https://www.google.com" };
+    case 'vega-lite':
+      return {
+        $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+        description: "A simple bar chart with embedded data.",
+        data: {
+          values: [
+            { category: "A", value: 28 },
+            { category: "B", value: 55 },
+            { category: "C", value: 43 },
+            { category: "D", value: 91 },
+            { category: "E", value: 81 }
+          ]
+        },
+        mark: "bar",
+        encoding: {
+          x: { field: "category", type: "nominal", axis: { labelAngle: 0 } },
+          y: { field: "value", type: "quantitative" }
+        }
+      };
     default:
-      return { labels, datasets: [] };
+      return {};
   }
 };

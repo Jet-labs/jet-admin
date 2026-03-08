@@ -20,7 +20,6 @@ NODE_ENV=${NODE_ENV}
 PORT=${PORT:-8090}
 DATABASE_URL=${DATABASE_URL}
 SESSION_SECRET=${SESSION_SECRET:-supersecret}
-RABBITMQ_URL=${RABBITMQ_URL}
 GEMINI_API_KEY=${GEMINI_API_KEY}
 ENABLED_MODULES=${ENABLED_MODULES:-auth,tenant,database,datasource,dataQuery,workflow,widget,dashboard,userManagement,role,apiKey,cronJob,audit,ai,notification,permission}
 NODE_ID=${NODE_ID:-docker_node_1}
@@ -44,22 +43,6 @@ set +a
 # Wait for Dependencies
 # ============================================
 echo "[2/3] Waiting for dependencies..."
-
-# Wait for RabbitMQ
-if [ -n "$RABBITMQ_URL" ]; then
-    RABBIT_HOST=$(echo "$RABBITMQ_URL" | sed -E 's|.*@([^:/]+).*|\1|')
-    RABBIT_PORT=$(echo "$RABBITMQ_URL" | sed -E 's|.*:([0-9]+)/?.*|\1|')
-    [ -z "$RABBIT_PORT" ] && RABBIT_PORT=5672
-    
-    echo "  Waiting for RabbitMQ at $RABBIT_HOST:$RABBIT_PORT..."
-    timeout=60
-    while ! nc -z "$RABBIT_HOST" "$RABBIT_PORT" 2>/dev/null; do
-        timeout=$((timeout - 1))
-        [ $timeout -le 0 ] && echo "  WARNING: RabbitMQ not available, continuing..." && break
-        sleep 1
-    done
-    [ $timeout -gt 0 ] && echo "  RabbitMQ is ready"
-fi
 
 # Wait for PostgreSQL
 if [ -n "$DATABASE_URL" ]; then

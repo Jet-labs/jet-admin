@@ -1,7 +1,7 @@
 # ============================================
 # Jet Admin - Ready-to-Run Docker Compose (Separated Services)
 # ============================================
-# 4 Services: frontend, backend, postgres, rabbitmq
+# 3 Services: frontend, backend, postgres
 #
 # Usage:
 #   docker compose -f docker-compose.sample.yml up -d --build
@@ -10,7 +10,6 @@
 #   - frontend:  React app served by nginx (port 80)
 #   - backend:   Node.js API server (port 8090)
 #   - postgres:  PostgreSQL database
-#   - rabbitmq:  Message broker
 
 services:
   # ============================================
@@ -61,8 +60,6 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
     environment:
       # Server Configuration
       - NODE_ENV=production
@@ -71,9 +68,6 @@ services:
       # Database Configuration
       - DATABASE_URL=postgresql://postgres:your_strong_password@postgres:5432/jet_admin_db
       - SEED_DATABASE=true  # Set to false after first run
-      
-      # RabbitMQ Configuration
-      - RABBITMQ_URL=amqp://jetadmin:your_strong_password@rabbitmq:5672
       
       # Authentication Secrets
       - JWT_ACCESS_TOKEN_SECRET=your_super_secret_access_token_key_change_me
@@ -129,38 +123,12 @@ services:
       retries: 5
       start_period: 10s
 
-  # ============================================
-  # RabbitMQ Message Broker
-  # ============================================
-  rabbitmq:
-    image: rabbitmq:3-management-alpine
-    container_name: jet-admin-rabbitmq
-    environment:
-      - RABBITMQ_DEFAULT_USER=jetadmin
-      - RABBITMQ_DEFAULT_PASS=your_strong_password
-    volumes:
-      - rabbitmq_data:/var/lib/rabbitmq
-    ports:
-      - "5672:5672"   # AMQP
-      - "15672:15672" # Management UI (http://localhost:15672)
-    networks:
-      - jet-network
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "rabbitmq-diagnostics -q check_running && rabbitmq-diagnostics -q check_local_alarms"]
-      interval: 30s
-      timeout: 30s
-      retries: 5
-      start_period: 60s
-
 # ============================================
 # Volumes
 # ============================================
 volumes:
   postgres_data:
     name: jet-admin-postgres-data
-  rabbitmq_data:
-    name: jet-admin-rabbitmq-data
   backend_logs:
     name: jet-admin-backend-logs
 

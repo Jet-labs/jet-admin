@@ -10,6 +10,7 @@ import { TbRefresh } from 'react-icons/tb';
 import { BiErrorCircle } from 'react-icons/bi';
 import { VscDebugDisconnect } from 'react-icons/vsc';
 import { FaPlay } from 'react-icons/fa';
+import { Button } from '@jet-admin/ui';
 
 // ============================================================================
 // Error handling options
@@ -299,16 +300,16 @@ export const DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
         </div>
 
         <div className="flex justify-between items-center gap-2 pt-2 border-t border-slate-100">
-          <button
+          <Button
             type="button"
             onClick={handleSave}
             className="px-3 py-1.5 text-sm text-white bg-[#646cff] rounded hover:bg-[#5558dd] focus:ring-4 focus:outline-none focus:ring-[#646cff]/30"
           >
             {strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_SAVE_BUTTON || 'Save'}
-          </button>
+          </Button>
 
           {onQueryTest && formData.dataQueryID && (
-            <button
+            <Button
               type="button"
               onClick={handleOpenTest}
               className="px-3 py-1.5 text-sm text-slate-600 bg-slate-100 rounded hover:bg-slate-200 border border-slate-200 flex items-center gap-1.5"
@@ -316,7 +317,7 @@ export const DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
             >
               <FaPlay className="w-3 h-3 text-slate-500" />
               Test Query
-            </button>
+            </Button>
           )}
         </div>
       </div>

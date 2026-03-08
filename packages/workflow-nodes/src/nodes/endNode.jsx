@@ -6,6 +6,7 @@ import { workflowNodeRenderers } from '../jsonFormsRenderers';
 import { VscDebugStop } from 'react-icons/vsc';
 import { FaCheck, FaTimes, FaExclamationTriangle, FaPlus, FaTrash } from 'react-icons/fa';
 import { IoMdArrowDropleft } from 'react-icons/io';
+import { Button, Input } from '@jet-admin/ui';
 
 // ============================================================================
 // End Status Types
@@ -45,14 +46,14 @@ const OutputParameterEditor = ({ parameters, onChange, availableVariables }) => 
     <div className="space-y-3">
       <div className="flex items-center justify-between">
         <label className="text-xs font-medium text-slate-500">Output Parameters</label>
-        <button
+        <Button
           type="button"
           onClick={addParameter}
           className="flex items-center gap-1 px-2 py-1 text-xs bg-white text-[#646cff] hover:bg-[#646cff]/10 rounded transition-colors border border-slate-200"
         >
           <FaPlus className="w-2.5 h-2.5" />
           Add Output
-        </button>
+        </Button>
       </div>
 
       <p className="text-[10px] text-slate-400">
@@ -73,7 +74,7 @@ const OutputParameterEditor = ({ parameters, onChange, availableVariables }) => 
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <IoMdArrowDropleft className="w-3 h-3 text-red-500" />
-                  <input
+                  <Input
                     type="text"
                     value={param.name}
                     onChange={(e) => updateParameter(index, 'name', e.target.value.replace(/[^a-zA-Z0-9_]/g, ''))}
@@ -81,20 +82,20 @@ const OutputParameterEditor = ({ parameters, onChange, availableVariables }) => 
                     placeholder="outputName"
                   />
                 </div>
-                <button
+                <Button
                   type="button"
                   onClick={() => removeParameter(index)}
                   className="p-1 bg-white text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
                   title="Remove output"
                 >
                   <FaTrash className="w-3 h-3" />
-                </button>
+                </Button>
               </div>
 
               {/* Source Variable */}
               <div>
                 <label className="text-[10px] text-slate-400">Source Variable</label>
-                <input
+                <Input
                   type="text"
                   value={param.sourceVariable}
                   onChange={(e) => updateParameter(index, 'sourceVariable', e.target.value)}
@@ -112,7 +113,7 @@ const OutputParameterEditor = ({ parameters, onChange, availableVariables }) => 
               {/* Description */}
               <div className="mt-2">
                 <label className="text-[10px] text-slate-400">Description</label>
-                <input
+                <Input
                   type="text"
                   value={param.description}
                   onChange={(e) => updateParameter(index, 'description', e.target.value)}
@@ -279,13 +280,13 @@ export const EndNodeConfigurator = ({ data, onChange, nodeId }) => {
           </div>
         </div>
 
-        <button
+        <Button
           type="button"
           onClick={handleSave}
           className="px-3 py-1.5 text-sm text-white bg-[#646cff] rounded hover:bg-[#5558dd] focus:ring-4 focus:outline-none focus:ring-[#646cff]/30"
         >
           Save
-        </button>
+        </Button>
       </div>
     </div>
   );

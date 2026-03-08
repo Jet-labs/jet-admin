@@ -15,7 +15,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "esbuild src/index.js --bundle --outfile=dist/index.mjs --loader:.js=jsx --format=esm --sourcemap --external:react --external:react-dom --external:@mui/material --external:@emotion/react --external:@emotion/styled --external:@mui/x-data-grid && esbuild src/index.js --bundle --outfile=dist/index.cjs --loader:.js=jsx --format=cjs --sourcemap --external:react --external:react-dom --external:@mui/material --external:@emotion/react --external:@emotion/styled --external:@mui/x-data-grid",
+    "build": "esbuild src/index.js --bundle --outfile=dist/index.mjs --loader:.js=jsx --format=esm --sourcemap --packages=external && esbuild src/index.js --bundle --outfile=dist/index.cjs --loader:.js=jsx --format=cjs --sourcemap --packages=external ",
     "dev": "npm run build -- --watch",
     "lint": "eslint .",
     "test": "jest"
@@ -34,13 +34,9 @@
     "jest": "^29.x.x",
     "rollup": "^4.x.x"
   },
-  "peerDependencies": {
-    
-  },
+  "peerDependencies": {},
   "publishConfig": {
     "access": "restricted"
   },
-  "dependencies": {
-    
-  }
+  "dependencies": {}
 }

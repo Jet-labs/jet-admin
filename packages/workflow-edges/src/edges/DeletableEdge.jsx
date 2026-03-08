@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { BaseEdge, EdgeLabelRenderer, getBezierPath, getSmoothStepPath, getStraightPath, getSimpleBezierPath } from 'reactflow';
 import { useWorkflowEdge } from '../context';
+import { Button, Input } from '@jet-admin/ui';
 
 /**
  * Base Deletable Edge component that supports all edge path types
@@ -96,7 +97,7 @@ export default function DeletableEdge({
           className="nodrag nopan"
         >
           {isEditing ? (
-            <input
+            <Input
               autoFocus
               value={edgeLabel}
               onChange={onLabelChange}
@@ -107,13 +108,13 @@ export default function DeletableEdge({
             />
           ) : (
             <div className="flex items-center gap-1 group">
-                <button
+                <Button
                     className="w-5 h-5 bg-white border border-slate-200 rounded-full flex items-center justify-center cursor-pointer shadow-sm hover:bg-red-50 hover:border-red-200 transition-colors text-slate-400 hover:text-red-500 text-[10px]"
                     onClick={onDeleteClick}
                     title="Delete Edge"
                 >
                     ✂
-                </button>
+                </Button>
                 <div 
                     onClick={onEdgeClick}
                     className={`px-1.5 py-0.5 rounded bg-white border border-slate-200 text-[10px] text-slate-500 shadow-sm cursor-text hover:border-blue-300 transition-colors ${!edgeLabel ? 'opacity-50 hover:opacity-100' : ''}`}

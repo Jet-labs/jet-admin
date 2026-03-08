@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { JsonFormsDispatch } from '@jsonforms/react';
+import { Button } from '@jet-admin/ui';
 
 export const CustomTabRenderer = (props) => {
   const { uischema, schema, path, enabled, renderers, cells } = props;
@@ -20,7 +21,7 @@ export const CustomTabRenderer = (props) => {
       {/* Tab Headers */}
       <div className="flex border-slate-300">
         {categories.map((category, index) => (
-          <button
+          <Button
             key={category.label || `tab-${index}`}
             className={`px-4 mr-2 py-2 text-sm font-medium rounded ${
               index === activeTab
@@ -31,7 +32,7 @@ export const CustomTabRenderer = (props) => {
             type="button"
           >
             {category.label}
-          </button>
+          </Button>
         ))}
       </div>
 

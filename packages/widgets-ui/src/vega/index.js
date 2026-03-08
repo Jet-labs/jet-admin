@@ -1,13 +1,14 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
+import vegaEmbed from 'vega-embed';
 
 /**
- * Vega-Lite Widget Component
- * Renders Vega-Lite specifications using vega-embed
+ * Vega/Vega-Lite Widget Component
+ * Renders Vega and Vega-Lite specifications using vega-embed
  * 
  * Note: Requires vega, vega-lite, and vega-embed packages
  */
-export const VegaLiteWidget = ({ 
-  data,              // Processed Vega-Lite spec from processor
+export const VegaWidget = ({
+  data,              // Processed Vega/Vega-Lite spec from processor
   widgetConfig,      // Widget-level config (showActions, renderer, theme)
   onSignal,          // Callback for selections/interactions
   onError,           // Error handler
@@ -39,10 +40,6 @@ export const VegaLiteWidget = ({
         setLoading(true);
         setError(null);
 
-        // Dynamically import vega-embed (lazy loading)
-        const vegaEmbed = await import('vega-embed');
-        const embed = vegaEmbed.default;
-
         // Dispose previous view if exists
         if (viewRef.current) {
           viewRef.current.finalize();
@@ -60,7 +57,8 @@ export const VegaLiteWidget = ({
           }
         };
 
-        const result = await embed(containerRef.current, data, embedOptions);
+        const result = await vegaEmbed(containerRef.current, data, embedOptions);
+
         viewRef.current = result.view;
         setLoading(false);
 
@@ -92,56 +90,86 @@ export const VegaLiteWidget = ({
     };
   }, [data, widgetConfig, onSignal, onWidgetInit, handleError]);
 
-  // Loading state
-  if (loading && !error) {
-    return (
-      <div 
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: '100%',
-          color: '#888',
-          fontSize: '14px'
-        }}
-      >
-        Loading visualization...
-      </div>
-    );
-  }
-
-  // Error state
-  if (error) {
-    return (
-      <div 
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: '100%',
-          color: '#ef4444',
-          fontSize: '14px',
-          padding: '16px',
-          textAlign: 'center'
-        }}
-      >
-        <span>Visualization Error: {error}</span>
-      </div>
-    );
-  }
-
   return (
-    <div 
-      ref={containerRef} 
-      style={{ 
-        width: '100%', 
-        height: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center'
-      }} 
-    />
+    <div style={{ width: '100%', height: '100%', position: 'relative' }}>
+      {loading && !error && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 10,
+            color: '#94a3b8',
+            fontSize: '13px',
+            pointerEvents: 'none',
+          }}
+        >
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '8px 16px',
+            borderRadius: '6px',
+            backgroundColor: 'rgba(241, 245, 249, 0.9)',
+          }}>
+            <svg width="16" height="16" viewBox="0 0 24 24" style={{ animation: 'spin 1s linear infinite' }}>
+              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="31.4 31.4" strokeLinecap="round" />
+            </svg>
+            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+            Loading visualization…
+          </div>
+        </div>
+      )}
+
+      {error && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px',
+            textAlign: 'center',
+            zIndex: 20,
+            pointerEvents: 'none',
+          }}
+        >
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '8px 16px',
+            borderRadius: '6px',
+            backgroundColor: 'rgba(254, 242, 242, 0.95)',
+            color: '#dc2626',
+            fontSize: '13px',
+            border: '1px solid rgba(220, 38, 38, 0.2)',
+          }}>
+            <span>⚠</span>
+            <span>{error}</span>
+          </div>
+        </div>
+      )}
+
+      <div
+        ref={containerRef}
+        style={{
+          width: '100%',
+          height: '100%',
+          visibility: error ? 'hidden' : 'visible'
+        }}
+      />
+    </div>
   );
 };
 
-export default VegaLiteWidget;
+export default VegaWidget;

@@ -3,6 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { JsonFormsDispatch } from '@jsonforms/react';
 import { MdDeleteOutline } from 'react-icons/md';
+import { Button } from '@jet-admin/ui';
 
 export const CustomKeyTypeArrayRenderer = ({
   data,
@@ -78,24 +79,24 @@ export const CustomKeyTypeArrayRenderer = ({
               />
             </div>
 
-            <button
+            <Button
               type="button"
               onClick={() => handleRemoveItem(index)}
               className="mt-2 p-2 rounded bg-red-100 text-red-400 focus:outline-none hover:border-red-400"
             >
               <MdDeleteOutline />
-            </button>
+            </Button>
           </div>
         ))}
       </div>
 
-      <button
+      <Button
         type="button"
         onClick={handleAddItem}
         className="mt-3 px-2 py-1 bg-white text-[#646cff] text-xs rounded hover:border-[#646cff] focus:outline-none border border-slate-200"
       >
         Add Item
-      </button>
+      </Button>
     </div>
   );
 };

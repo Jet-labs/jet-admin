@@ -7,6 +7,7 @@ import {
 // src/renderers/CustomNumberInput.jsx
 import React from "react";
 import PropTypes from "prop-types";
+import { Input } from "@jet-admin/ui";
 var CustomNumberInput = (props) => {
   const {
     data,
@@ -40,7 +41,7 @@ var CustomNumberInput = (props) => {
     " ",
     errors && errors.length > 0 && errors
   ), errors && errors.length > 0 && /* @__PURE__ */ React.createElement("span", { className: "text-red-500 text-xs" }, errors), /* @__PURE__ */ React.createElement(
-    "input",
+    Input,
     {
       type: "number",
       id: path,
@@ -69,6 +70,7 @@ CustomNumberInput.propTypes = {
 // src/renderers/CustomTextInput.jsx
 import React2 from "react";
 import PropTypes2 from "prop-types";
+import { Input as Input2, Textarea } from "@jet-admin/ui";
 var CustomTextInput = (props) => {
   const { data, path, handleChange, label, description, errors, uischema, enabled } = props;
   const isMulti = uischema?.options?.multi;
@@ -83,7 +85,7 @@ var CustomTextInput = (props) => {
     " ",
     errors && errors.length > 0 && errors
   ), isMulti ? /* @__PURE__ */ React2.createElement(
-    "textarea",
+    Textarea,
     {
       id: path,
       name: path,
@@ -95,7 +97,7 @@ var CustomTextInput = (props) => {
       rows: uischema?.options?.rows || 3
     }
   ) : /* @__PURE__ */ React2.createElement(
-    "input",
+    Input2,
     {
       type: uischema?.options?.format === "password" ? "password" : "text",
       id: path,
@@ -123,6 +125,7 @@ CustomTextInput.propTypes = {
 import React3, { useState } from "react";
 import PropTypes3 from "prop-types";
 import { TbRefresh } from "react-icons/tb";
+import { Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
 var CustomSelectInput = (props) => {
   const {
     data,
@@ -174,20 +177,15 @@ var CustomSelectInput = (props) => {
     label || description,
     " ",
     errors && errors.length > 0 && errors
-  ), /* @__PURE__ */ React3.createElement("div", { className: `flex items-center gap-2 ${showRefreshButton ? "" : ""}` }, /* @__PURE__ */ React3.createElement(
-    "select",
+  ), /* @__PURE__ */ React3.createElement("div", { className: `flex items-center gap-2 ${showRefreshButton ? "" : ""}` }, /* @__PURE__ */ React3.createElement(Select, { value: data || "", onValueChange: (val) => handleChange(path, val), disabled: isDisabled }, /* @__PURE__ */ React3.createElement(
+    SelectTrigger,
     {
       id: path,
-      name: path,
-      disabled: isDisabled,
-      className: `placeholder:text-slate-400 text-sm bg-slate-50 border focus:border-slate-700 ${errors && errors.length > 0 ? "border-red-500 focus:border-red-500" : "border-slate-200"} text-slate-700 rounded block w-full px-2.5 py-1.5 h-[34px] disabled:opacity-50 disabled:cursor-not-allowed`,
-      onChange: (ev) => handleChange(path, ev.target.value),
-      value: data || ""
+      className: `text-sm ${errors && errors.length > 0 ? "border-red-500" : ""}`
     },
-    !data && /* @__PURE__ */ React3.createElement("option", { value: "", disabled: true }, uischema?.options?.placeholder || "Select an option"),
-    options.map((optionValue) => /* @__PURE__ */ React3.createElement("option", { key: optionValue, value: optionValue }, getDisplayName(optionValue)))
-  ), showRefreshButton && onRefresh && /* @__PURE__ */ React3.createElement(
-    "button",
+    /* @__PURE__ */ React3.createElement(SelectValue, { placeholder: uischema?.options?.placeholder || "Select an option" })
+  ), /* @__PURE__ */ React3.createElement(SelectContent, null, options.map((optionValue) => /* @__PURE__ */ React3.createElement(SelectItem, { key: optionValue, value: optionValue }, getDisplayName(optionValue))))), showRefreshButton && onRefresh && /* @__PURE__ */ React3.createElement(
+    Button,
     {
       type: "button",
       onClick: handleRefreshClick,
@@ -213,6 +211,7 @@ CustomSelectInput.propTypes = {
 // src/renderers/CustomCheckboxInput.jsx
 import React4 from "react";
 import PropTypes4 from "prop-types";
+import { Checkbox } from "@jet-admin/ui";
 var CustomCheckboxInput = (props) => {
   const {
     data,
@@ -224,19 +223,16 @@ var CustomCheckboxInput = (props) => {
     enabled,
     uischema
   } = props;
-  const onToggle = (ev) => {
-    handleChange(path, ev.target.checked);
+  const onToggle = (checked) => {
+    handleChange(path, checked);
   };
   return /* @__PURE__ */ React4.createElement("div", { className: "flex items-center mb-3" }, /* @__PURE__ */ React4.createElement(
-    "input",
+    Checkbox,
     {
-      type: "checkbox",
       id: path,
-      name: path,
       checked: !!data,
       disabled: !enabled,
-      onChange: onToggle,
-      className: "h-4 w-4 text-indigo-600 border-gray-300 rounded focus:ring-indigo-500"
+      onCheckedChange: onToggle
     }
   ), /* @__PURE__ */ React4.createElement("label", { htmlFor: path, className: "ml-2 text-sm font-medium text-slate-700" }, label || description || uischema.label), errors && errors.length > 0 && /* @__PURE__ */ React4.createElement("p", { className: "text-red-500 text-xs mt-1 ml-2" }, errors));
 };
@@ -526,6 +522,7 @@ CustomCodeJavascriptControl.propTypes = {
 // src/renderers/CustomSuggestionInput.jsx
 import React7, { useState as useState2 } from "react";
 import PropTypes7 from "prop-types";
+import { Button as Button2, Input as Input3 } from "@jet-admin/ui";
 var CustomSuggestionInput = (props) => {
   const { data, path, handleChange, label, description, errors, uischema, enabled } = props;
   const { suggestions, placeholder } = uischema.options || {};
@@ -543,7 +540,7 @@ var CustomSuggestionInput = (props) => {
     },
     /* @__PURE__ */ React7.createElement("span", null, label || description, " ", errors && errors.length > 0 && errors),
     suggestions && suggestions.length > 0 && /* @__PURE__ */ React7.createElement(
-      "button",
+      Button2,
       {
         type: "button",
         onClick: () => setIsOpen(!isOpen),
@@ -553,7 +550,7 @@ var CustomSuggestionInput = (props) => {
       "Map +"
     )
   ), /* @__PURE__ */ React7.createElement(
-    "input",
+    Input3,
     {
       type: "text",
       id: path,
@@ -564,7 +561,7 @@ var CustomSuggestionInput = (props) => {
       onChange: (ev) => handleChange(path, ev.target.value),
       value: data || ""
     }
-  ), isOpen && suggestions && /* @__PURE__ */ React7.createElement("div", { className: "absolute right-0 top-6 w-48 bg-white border border-slate-200 shadow-xl rounded z-[50] max-h-40 overflow-y-auto" }, /* @__PURE__ */ React7.createElement("div", { className: "p-2 border-b border-slate-100 flex justify-between items-center bg-slate-50" }, /* @__PURE__ */ React7.createElement("span", { className: "text-[10px] font-semibold text-slate-500" }, "Pick a node"), /* @__PURE__ */ React7.createElement("button", { type: "button", onClick: () => setIsOpen(false), className: "text-slate-400 hover:text-slate-600" }, "\xD7")), suggestions.length === 0 ? /* @__PURE__ */ React7.createElement("div", { className: "px-2 py-1 text-[10px] text-slate-400 italic" }, "No suggestions") : suggestions.map((item, idx) => /* @__PURE__ */ React7.createElement(
+  ), isOpen && suggestions && /* @__PURE__ */ React7.createElement("div", { className: "absolute right-0 top-6 w-48 bg-white border border-slate-200 shadow-xl rounded z-[50] max-h-40 overflow-y-auto" }, /* @__PURE__ */ React7.createElement("div", { className: "p-2 border-b border-slate-100 flex justify-between items-center bg-slate-50" }, /* @__PURE__ */ React7.createElement("span", { className: "text-[10px] font-semibold text-slate-500" }, "Pick a node"), /* @__PURE__ */ React7.createElement(Button2, { type: "button", onClick: () => setIsOpen(false), className: "text-slate-400 hover:text-slate-600" }, "\xD7")), suggestions.length === 0 ? /* @__PURE__ */ React7.createElement("div", { className: "px-2 py-1 text-[10px] text-slate-400 italic" }, "No suggestions") : suggestions.map((item, idx) => /* @__PURE__ */ React7.createElement(
     "div",
     {
       key: idx,
@@ -589,6 +586,7 @@ CustomSuggestionInput.propTypes = {
 import React8, { useState as useState3, useRef as useRef2, useEffect as useEffect2, useMemo as useMemo2 } from "react";
 import PropTypes8 from "prop-types";
 import { TbVariable } from "react-icons/tb";
+import { Button as Button3, Input as Input4 } from "@jet-admin/ui";
 var DynamicArgsControl = (props) => {
   const { data, path, handleChange, uischema, errors } = props;
   const args = uischema?.options?.args || [];
@@ -701,7 +699,7 @@ var ArgInputWithVariablePicker = ({ argName, value, onChange, availableVariables
   const inputVariables = availableVariables.filter((v) => v.category === "input");
   const nodeVariables = availableVariables.filter((v) => v.category === "node");
   return /* @__PURE__ */ React8.createElement("div", { className: "flex flex-row justify-between items-center gap-2" }, /* @__PURE__ */ React8.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React8.createElement("label", { className: "block mb-1 text-[10px] font-medium text-slate-400" }, argName), /* @__PURE__ */ React8.createElement("div", { className: "flex items-center gap-1" }, /* @__PURE__ */ React8.createElement(
-    "input",
+    Input4,
     {
       ref: inputRef,
       type: "text",
@@ -712,7 +710,7 @@ var ArgInputWithVariablePicker = ({ argName, value, onChange, availableVariables
       onChange: (e) => onChange(e.target.value)
     }
   ), /* @__PURE__ */ React8.createElement("div", { className: "relative", ref: dropdownRef }, /* @__PURE__ */ React8.createElement(
-    "button",
+    Button3,
     {
       type: "button",
       onClick: () => setShowDropdown(!showDropdown),
@@ -721,7 +719,7 @@ var ArgInputWithVariablePicker = ({ argName, value, onChange, availableVariables
     },
     /* @__PURE__ */ React8.createElement(TbVariable, { className: "w-4 h-4" })
   ), showDropdown && /* @__PURE__ */ React8.createElement("div", { className: "absolute right-0 top-full mt-1 w-64 bg-white border border-slate-200 rounded shadow-lg z-50 max-h-64 overflow-y-auto" }, availableVariables.length === 0 ? /* @__PURE__ */ React8.createElement("div", { className: "px-2 py-3 text-xs text-slate-400 text-center" }, "No variables available yet.", /* @__PURE__ */ React8.createElement("br", null), /* @__PURE__ */ React8.createElement("span", { className: "text-[10px]" }, "Add workflow inputs or connect upstream nodes.")) : /* @__PURE__ */ React8.createElement(React8.Fragment, null, inputVariables.length > 0 && /* @__PURE__ */ React8.createElement(React8.Fragment, null, /* @__PURE__ */ React8.createElement("div", { className: "px-2 py-1.5 text-[10px] font-semibold text-green-600 uppercase tracking-wider border-b border-slate-100 bg-green-50" }, "\u{1F4E5} Workflow Inputs"), inputVariables.map((variable, idx) => /* @__PURE__ */ React8.createElement(
-    "button",
+    Button3,
     {
       key: `input-${idx}`,
       type: "button",
@@ -731,7 +729,7 @@ var ArgInputWithVariablePicker = ({ argName, value, onChange, availableVariables
     /* @__PURE__ */ React8.createElement("div", { className: "text-xs font-medium text-slate-700 font-mono" }, variable.contextPath),
     /* @__PURE__ */ React8.createElement("div", { className: "text-[10px] text-slate-400 truncate" }, "type: ", variable.type || "any")
   ))), nodeVariables.length > 0 && /* @__PURE__ */ React8.createElement(React8.Fragment, null, /* @__PURE__ */ React8.createElement("div", { className: "px-2 py-1.5 text-[10px] font-semibold text-blue-600 uppercase tracking-wider border-b border-slate-100 bg-blue-50" }, "\u{1F4E4} Upstream Node Outputs"), nodeVariables.map((variable, idx) => /* @__PURE__ */ React8.createElement(
-    "button",
+    Button3,
     {
       key: `node-${idx}`,
       type: "button",
@@ -755,6 +753,7 @@ import React9 from "react";
 import PropTypes9 from "prop-types";
 import { JsonFormsDispatch } from "@jsonforms/react";
 import { MdDeleteOutline } from "react-icons/md";
+import { Button as Button4 } from "@jet-admin/ui";
 var CustomKeyValueArrayRenderer = ({
   data,
   path,
@@ -810,7 +809,7 @@ var CustomKeyValueArrayRenderer = ({
       renderers
     }
   )), /* @__PURE__ */ React9.createElement(
-    "button",
+    Button4,
     {
       type: "button",
       onClick: () => handleRemoveItem(index),
@@ -818,7 +817,7 @@ var CustomKeyValueArrayRenderer = ({
     },
     /* @__PURE__ */ React9.createElement(MdDeleteOutline, null)
   )))), /* @__PURE__ */ React9.createElement(
-    "button",
+    Button4,
     {
       type: "button",
       onClick: handleAddItem,
@@ -845,6 +844,7 @@ import React10 from "react";
 import PropTypes10 from "prop-types";
 import { JsonFormsDispatch as JsonFormsDispatch2 } from "@jsonforms/react";
 import { MdDeleteOutline as MdDeleteOutline2 } from "react-icons/md";
+import { Button as Button5 } from "@jet-admin/ui";
 var CustomKeyValueTypeArrayRenderer = ({
   data,
   path,
@@ -914,7 +914,7 @@ var CustomKeyValueTypeArrayRenderer = ({
       renderers
     }
   )), /* @__PURE__ */ React10.createElement(
-    "button",
+    Button5,
     {
       type: "button",
       onClick: () => handleRemoveItem(index),
@@ -922,7 +922,7 @@ var CustomKeyValueTypeArrayRenderer = ({
     },
     /* @__PURE__ */ React10.createElement(MdDeleteOutline2, null)
   )))), /* @__PURE__ */ React10.createElement(
-    "button",
+    Button5,
     {
       type: "button",
       onClick: handleAddItem,
@@ -949,6 +949,7 @@ import React11 from "react";
 import PropTypes11 from "prop-types";
 import { JsonFormsDispatch as JsonFormsDispatch3 } from "@jsonforms/react";
 import { MdDeleteOutline as MdDeleteOutline3 } from "react-icons/md";
+import { Button as Button6 } from "@jet-admin/ui";
 var CustomKeyTypeArrayRenderer = ({
   data,
   path,
@@ -1004,7 +1005,7 @@ var CustomKeyTypeArrayRenderer = ({
       renderers
     }
   )), /* @__PURE__ */ React11.createElement(
-    "button",
+    Button6,
     {
       type: "button",
       onClick: () => handleRemoveItem(index),
@@ -1012,7 +1013,7 @@ var CustomKeyTypeArrayRenderer = ({
     },
     /* @__PURE__ */ React11.createElement(MdDeleteOutline3, null)
   )))), /* @__PURE__ */ React11.createElement(
-    "button",
+    Button6,
     {
       type: "button",
       onClick: handleAddItem,
@@ -1038,6 +1039,7 @@ CustomKeyTypeArrayRenderer.propTypes = {
 import React12 from "react";
 import PropTypes12 from "prop-types";
 import { MdDeleteOutline as MdDeleteOutline4 } from "react-icons/md";
+import { Button as Button7, Input as Input5 } from "@jet-admin/ui";
 var CustomStringArrayRenderer = (props) => {
   const { data, path, handleChange, label, uischema, enabled, visible } = props;
   const arrayData = Array.isArray(data) ? data : [];
@@ -1057,7 +1059,7 @@ var CustomStringArrayRenderer = (props) => {
     return null;
   }
   return /* @__PURE__ */ React12.createElement("div", { className: "p-3 border border-slate-200 rounded bg-white mb-3" }, /* @__PURE__ */ React12.createElement("label", { className: "block mb-1 text-sm font-medium text-slate-700" }, label || uischema?.label || "Items"), /* @__PURE__ */ React12.createElement("div", { className: "gap-2" }, arrayData.map((item, index) => /* @__PURE__ */ React12.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2 mb-2" }, /* @__PURE__ */ React12.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ React12.createElement(
-    "input",
+    Input5,
     {
       type: "text",
       value: item || "",
@@ -1067,7 +1069,7 @@ var CustomStringArrayRenderer = (props) => {
       className: "w-full placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-200 text-slate-700 rounded focus:border-slate-400 focus:outline-none px-2.5 py-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
     }
   )), /* @__PURE__ */ React12.createElement(
-    "button",
+    Button7,
     {
       type: "button",
       onClick: () => handleRemoveItem(index),
@@ -1076,7 +1078,7 @@ var CustomStringArrayRenderer = (props) => {
     },
     /* @__PURE__ */ React12.createElement(MdDeleteOutline4, null)
   )))), arrayData.length === 0 && /* @__PURE__ */ React12.createElement("div", { className: "text-xs text-slate-400 italic py-2" }, "No items added yet."), /* @__PURE__ */ React12.createElement(
-    "button",
+    Button7,
     {
       type: "button",
       onClick: handleAddItem,
@@ -1100,6 +1102,7 @@ CustomStringArrayRenderer.propTypes = {
 import React13 from "react";
 import PropTypes13 from "prop-types";
 import { MdDeleteOutline as MdDeleteOutline5 } from "react-icons/md";
+import { Button as Button8, Input as Input6, Select as Select2, SelectContent as SelectContent2, SelectItem as SelectItem2, SelectTrigger as SelectTrigger2, SelectValue as SelectValue2 } from "@jet-admin/ui";
 var CustomFieldOperatorValueArrayRenderer = ({
   data,
   path,
@@ -1139,7 +1142,7 @@ var CustomFieldOperatorValueArrayRenderer = ({
     handleChange(path, newItems);
   };
   return /* @__PURE__ */ React13.createElement("div", { className: "p-3 border border-slate-200 rounded bg-white mb-3" }, /* @__PURE__ */ React13.createElement("label", { className: "block mb-2 text-sm font-medium text-slate-700" }, label || uischema.label || "Conditions"), errors && errors.length > 0 && /* @__PURE__ */ React13.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ React13.createElement("div", { className: "space-y-2" }, items.map((item, index) => /* @__PURE__ */ React13.createElement("div", { key: `${path}-${index}`, className: "flex items-center gap-2" }, /* @__PURE__ */ React13.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React13.createElement(
-    "input",
+    Input6,
     {
       type: "text",
       placeholder: "Field",
@@ -1148,17 +1151,8 @@ var CustomFieldOperatorValueArrayRenderer = ({
       onChange: (e) => handleItemChange(index, "field", e.target.value),
       className: "w-full px-2.5 py-1.5 text-sm bg-slate-50 border border-slate-200 rounded text-slate-700 placeholder:text-slate-400 focus:border-slate-700 disabled:opacity-50"
     }
-  )), /* @__PURE__ */ React13.createElement("div", { className: "w-36" }, /* @__PURE__ */ React13.createElement(
-    "select",
-    {
-      value: item.operator || "==",
-      disabled: isDisabled,
-      onChange: (e) => handleItemChange(index, "operator", e.target.value),
-      className: "w-full px-2.5 py-1.5 text-sm bg-slate-50 border border-slate-200 rounded text-slate-700 focus:border-slate-700 disabled:opacity-50"
-    },
-    operatorOptions.map((op) => /* @__PURE__ */ React13.createElement("option", { key: op, value: op }, op))
-  )), /* @__PURE__ */ React13.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React13.createElement(
-    "input",
+  )), /* @__PURE__ */ React13.createElement("div", { className: "w-36" }, /* @__PURE__ */ React13.createElement(Select2, { value: item.operator || "==", onValueChange: (val) => handleItemChange(index, "operator", val), disabled: isDisabled }, /* @__PURE__ */ React13.createElement(SelectTrigger2, { className: "text-sm" }, /* @__PURE__ */ React13.createElement(SelectValue2, null)), /* @__PURE__ */ React13.createElement(SelectContent2, null, operatorOptions.map((op) => /* @__PURE__ */ React13.createElement(SelectItem2, { key: op, value: op }, op))))), /* @__PURE__ */ React13.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React13.createElement(
+    Input6,
     {
       type: "text",
       placeholder: "Value",
@@ -1168,7 +1162,7 @@ var CustomFieldOperatorValueArrayRenderer = ({
       className: "w-full px-2.5 py-1.5 text-sm bg-slate-50 border border-slate-200 rounded text-slate-700 placeholder:text-slate-400 focus:border-slate-700 disabled:opacity-50"
     }
   )), /* @__PURE__ */ React13.createElement(
-    "button",
+    Button8,
     {
       type: "button",
       onClick: () => handleRemoveItem(index),
@@ -1177,7 +1171,7 @@ var CustomFieldOperatorValueArrayRenderer = ({
     },
     /* @__PURE__ */ React13.createElement(MdDeleteOutline5, null)
   )))), /* @__PURE__ */ React13.createElement(
-    "button",
+    Button8,
     {
       type: "button",
       onClick: handleAddItem,
@@ -1344,6 +1338,7 @@ CustomVerticalLayout.propTypes = {
 import React17, { useState as useState4 } from "react";
 import PropTypes17 from "prop-types";
 import { JsonFormsDispatch as JsonFormsDispatch6 } from "@jsonforms/react";
+import { Button as Button9 } from "@jet-admin/ui";
 var CustomTabRenderer = (props) => {
   const { uischema, schema, path, enabled, renderers, cells } = props;
   const categories = uischema.elements || [];
@@ -1353,7 +1348,7 @@ var CustomTabRenderer = (props) => {
   }
   const activeCategory = categories[activeTab];
   return /* @__PURE__ */ React17.createElement("div", { className: "custom-tabs-container" }, /* @__PURE__ */ React17.createElement("div", { className: "flex border-slate-300" }, categories.map((category, index) => /* @__PURE__ */ React17.createElement(
-    "button",
+    Button9,
     {
       key: category.label || `tab-${index}`,
       className: `px-4 mr-2 py-2 text-sm font-medium rounded ${index === activeTab ? "text-[#646cff] border-slate-200" : "text-slate-700"} focus:outline-none bg-white`,

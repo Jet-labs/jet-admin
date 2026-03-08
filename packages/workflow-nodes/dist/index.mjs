@@ -1,5 +1,5 @@
 // src/nodes/conditionNode.jsx
-import React4, { memo, useState, useEffect, useMemo, useCallback } from "react";
+import React2, { memo, useState, useEffect, useMemo, useCallback } from "react";
 import { Handle, Position } from "reactflow";
 import { JsonForms } from "@jsonforms/react";
 
@@ -101,207 +101,12 @@ import {
   jetFormsBaseRenderers
 } from "@jet-admin/json-forms-renderers";
 
-// ../../node_modules/react-icons/lib/iconBase.mjs
-import React3 from "react";
-
-// ../../node_modules/react-icons/lib/iconContext.mjs
-import React2 from "react";
-var DefaultContext = {
-  color: void 0,
-  size: void 0,
-  className: void 0,
-  style: void 0,
-  attr: void 0
-};
-var IconContext = React2.createContext && /* @__PURE__ */ React2.createContext(DefaultContext);
-
-// ../../node_modules/react-icons/lib/iconBase.mjs
-var _excluded = ["attr", "size", "title"];
-function _objectWithoutProperties(source, excluded) {
-  if (source == null) return {};
-  var target = _objectWithoutPropertiesLoose(source, excluded);
-  var key, i;
-  if (Object.getOwnPropertySymbols) {
-    var sourceSymbolKeys = Object.getOwnPropertySymbols(source);
-    for (i = 0; i < sourceSymbolKeys.length; i++) {
-      key = sourceSymbolKeys[i];
-      if (excluded.indexOf(key) >= 0) continue;
-      if (!Object.prototype.propertyIsEnumerable.call(source, key)) continue;
-      target[key] = source[key];
-    }
-  }
-  return target;
-}
-function _objectWithoutPropertiesLoose(source, excluded) {
-  if (source == null) return {};
-  var target = {};
-  for (var key in source) {
-    if (Object.prototype.hasOwnProperty.call(source, key)) {
-      if (excluded.indexOf(key) >= 0) continue;
-      target[key] = source[key];
-    }
-  }
-  return target;
-}
-function _extends() {
-  _extends = Object.assign ? Object.assign.bind() : function(target) {
-    for (var i = 1; i < arguments.length; i++) {
-      var source = arguments[i];
-      for (var key in source) {
-        if (Object.prototype.hasOwnProperty.call(source, key)) {
-          target[key] = source[key];
-        }
-      }
-    }
-    return target;
-  };
-  return _extends.apply(this, arguments);
-}
-function ownKeys(e, r) {
-  var t = Object.keys(e);
-  if (Object.getOwnPropertySymbols) {
-    var o = Object.getOwnPropertySymbols(e);
-    r && (o = o.filter(function(r2) {
-      return Object.getOwnPropertyDescriptor(e, r2).enumerable;
-    })), t.push.apply(t, o);
-  }
-  return t;
-}
-function _objectSpread(e) {
-  for (var r = 1; r < arguments.length; r++) {
-    var t = null != arguments[r] ? arguments[r] : {};
-    r % 2 ? ownKeys(Object(t), true).forEach(function(r2) {
-      _defineProperty(e, r2, t[r2]);
-    }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function(r2) {
-      Object.defineProperty(e, r2, Object.getOwnPropertyDescriptor(t, r2));
-    });
-  }
-  return e;
-}
-function _defineProperty(obj, key, value) {
-  key = _toPropertyKey(key);
-  if (key in obj) {
-    Object.defineProperty(obj, key, { value, enumerable: true, configurable: true, writable: true });
-  } else {
-    obj[key] = value;
-  }
-  return obj;
-}
-function _toPropertyKey(t) {
-  var i = _toPrimitive(t, "string");
-  return "symbol" == typeof i ? i : i + "";
-}
-function _toPrimitive(t, r) {
-  if ("object" != typeof t || !t) return t;
-  var e = t[Symbol.toPrimitive];
-  if (void 0 !== e) {
-    var i = e.call(t, r || "default");
-    if ("object" != typeof i) return i;
-    throw new TypeError("@@toPrimitive must return a primitive value.");
-  }
-  return ("string" === r ? String : Number)(t);
-}
-function Tree2Element(tree) {
-  return tree && tree.map((node, i) => /* @__PURE__ */ React3.createElement(node.tag, _objectSpread({
-    key: i
-  }, node.attr), Tree2Element(node.child)));
-}
-function GenIcon(data) {
-  return (props) => /* @__PURE__ */ React3.createElement(IconBase, _extends({
-    attr: _objectSpread({}, data.attr)
-  }, props), Tree2Element(data.child));
-}
-function IconBase(props) {
-  var elem = (conf) => {
-    var {
-      attr,
-      size,
-      title
-    } = props, svgProps = _objectWithoutProperties(props, _excluded);
-    var computedSize = size || conf.size || "1em";
-    var className;
-    if (conf.className) className = conf.className;
-    if (props.className) className = (className ? className + " " : "") + props.className;
-    return /* @__PURE__ */ React3.createElement("svg", _extends({
-      stroke: "currentColor",
-      fill: "currentColor",
-      strokeWidth: "0"
-    }, conf.attr, attr, svgProps, {
-      className,
-      style: _objectSpread(_objectSpread({
-        color: props.color || conf.color
-      }, conf.style), props.style),
-      height: computedSize,
-      width: computedSize,
-      xmlns: "http://www.w3.org/2000/svg"
-    }), title && /* @__PURE__ */ React3.createElement("title", null, title), props.children);
-  };
-  return IconContext !== void 0 ? /* @__PURE__ */ React3.createElement(IconContext.Consumer, null, (conf) => elem(conf)) : elem(DefaultContext);
-}
-
-// ../../node_modules/react-icons/tb/index.mjs
-function TbLogicAnd(props) {
-  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 24 24", "fill": "none", "stroke": "currentColor", "strokeWidth": "2", "strokeLinecap": "round", "strokeLinejoin": "round" }, "child": [{ "tag": "path", "attr": { "d": "M22 12h-5" }, "child": [] }, { "tag": "path", "attr": { "d": "M2 9h5" }, "child": [] }, { "tag": "path", "attr": { "d": "M2 15h5" }, "child": [] }, { "tag": "path", "attr": { "d": "M9 5c6 0 8 3.5 8 7s-2 7 -8 7h-2v-14h2z" }, "child": [] }] })(props);
-}
-function TbRefresh(props) {
-  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 24 24", "fill": "none", "stroke": "currentColor", "strokeWidth": "2", "strokeLinecap": "round", "strokeLinejoin": "round" }, "child": [{ "tag": "path", "attr": { "d": "M20 11a8.1 8.1 0 0 0 -15.5 -2m-.5 -4v4h4" }, "child": [] }, { "tag": "path", "attr": { "d": "M4 13a8.1 8.1 0 0 0 15.5 2m.5 4v-4h-4" }, "child": [] }] })(props);
-}
-function TbRepeat(props) {
-  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 24 24", "fill": "none", "stroke": "currentColor", "strokeWidth": "2", "strokeLinecap": "round", "strokeLinejoin": "round" }, "child": [{ "tag": "path", "attr": { "d": "M4 12v-3a3 3 0 0 1 3 -3h13m-3 -3l3 3l-3 3" }, "child": [] }, { "tag": "path", "attr": { "d": "M20 12v3a3 3 0 0 1 -3 3h-13m3 3l-3 -3l3 -3" }, "child": [] }] })(props);
-}
-
-// ../../node_modules/react-icons/vsc/index.mjs
-function VscDebugDisconnect(props) {
-  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 16 16", "fill": "currentColor" }, "child": [{ "tag": "path", "attr": { "fillRule": "evenodd", "clipRule": "evenodd", "d": "M13.617 3.844a2.87 2.87 0 0 0-.451-.868l1.354-1.36L13.904 1l-1.36 1.354a2.877 2.877 0 0 0-.868-.452 3.073 3.073 0 0 0-2.14.075 3.03 3.03 0 0 0-.991.664L7 4.192l4.327 4.328 1.552-1.545c.287-.287.508-.618.663-.992a3.074 3.074 0 0 0 .075-2.14zm-.889 1.804a2.15 2.15 0 0 1-.471.705l-.93.93-3.09-3.09.93-.93a2.15 2.15 0 0 1 .704-.472 2.134 2.134 0 0 1 1.689.007c.264.114.494.271.69.472.2.195.358.426.472.69a2.134 2.134 0 0 1 .007 1.688zm-4.824 4.994l1.484-1.545-.616-.622-1.49 1.551-1.86-1.859 1.491-1.552L6.291 6 4.808 7.545l-.616-.615-1.551 1.545a3 3 0 0 0-.663.998 3.023 3.023 0 0 0-.233 1.169c0 .332.05.656.15.97.105.31.258.597.459.862L1 13.834l.615.615 1.36-1.353c.265.2.552.353.862.458.314.1.638.15.97.15.406 0 .796-.077 1.17-.232.378-.155.71-.376.998-.663l1.545-1.552-.616-.615zm-2.262 2.023a2.16 2.16 0 0 1-.834.164c-.301 0-.586-.057-.855-.17a2.278 2.278 0 0 1-.697-.466 2.28 2.28 0 0 1-.465-.697 2.167 2.167 0 0 1-.17-.854 2.16 2.16 0 0 1 .642-1.545l.93-.93 3.09 3.09-.93.93a2.22 2.22 0 0 1-.711.478z" }, "child": [] }] })(props);
-}
-function VscDebugStart(props) {
-  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 16 16", "fill": "currentColor" }, "child": [{ "tag": "path", "attr": { "fillRule": "evenodd", "clipRule": "evenodd", "d": "M4.25 3l1.166-.624 8 5.333v1.248l-8 5.334-1.166-.624V3zm1.5 1.401v7.864l5.898-3.932L5.75 4.401z" }, "child": [] }] })(props);
-}
-function VscDebugStop(props) {
-  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 16 16", "fill": "currentColor" }, "child": [{ "tag": "path", "attr": { "fillRule": "evenodd", "clipRule": "evenodd", "d": "M13 1.99976L14 2.99976V12.9998L13 13.9998H3L2 12.9998L2 2.99976L3 1.99976H13ZM12.7461 3.25057L3.25469 3.25057L3.25469 12.7504H12.7461V3.25057Z" }, "child": [] }] })(props);
-}
-
-// ../../node_modules/react-icons/fa/index.mjs
-function FaJs(props) {
-  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 448 512" }, "child": [{ "tag": "path", "attr": { "d": "M0 32v448h448V32H0zm243.8 349.4c0 43.6-25.6 63.5-62.9 63.5-33.7 0-53.2-17.4-63.2-38.5l34.3-20.7c6.6 11.7 12.6 21.6 27.1 21.6 13.8 0 22.6-5.4 22.6-26.5V237.7h42.1v143.7zm99.6 63.5c-39.1 0-64.4-18.6-76.7-43l34.3-19.8c9 14.7 20.8 25.6 41.5 25.6 17.4 0 28.6-8.7 28.6-20.8 0-14.4-11.4-19.5-30.7-28l-10.5-4.5c-30.4-12.9-50.5-29.2-50.5-63.5 0-31.6 24.1-55.6 61.6-55.6 26.8 0 46 9.3 59.8 33.7L368 290c-7.2-12.9-15-18-27.1-18-12.3 0-20.1 7.8-20.1 18 0 12.6 7.8 17.7 25.9 25.6l10.5 4.5c35.8 15.3 55.9 31 55.9 66.2 0 37.8-29.8 58.6-69.7 58.6z" }, "child": [] }] })(props);
-}
-function FaCheck(props) {
-  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 512 512" }, "child": [{ "tag": "path", "attr": { "d": "M173.898 439.404l-166.4-166.4c-9.997-9.997-9.997-26.206 0-36.204l36.203-36.204c9.997-9.998 26.207-9.998 36.204 0L192 312.69 432.095 72.596c9.997-9.997 26.207-9.997 36.204 0l36.203 36.204c9.997 9.997 9.997 26.206 0 36.204l-294.4 294.401c-9.998 9.997-26.207 9.997-36.204-.001z" }, "child": [] }] })(props);
-}
-function FaExclamationTriangle(props) {
-  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 576 512" }, "child": [{ "tag": "path", "attr": { "d": "M569.517 440.013C587.975 472.007 564.806 512 527.94 512H48.054c-36.937 0-59.999-40.055-41.577-71.987L246.423 23.985c18.467-32.009 64.72-31.951 83.154 0l239.94 416.028zM288 354c-25.405 0-46 20.595-46 46s20.595 46 46 46 46-20.595 46-46-20.595-46-46-46zm-43.673-165.346l7.418 136c.347 6.364 5.609 11.346 11.982 11.346h48.546c6.373 0 11.635-4.982 11.982-11.346l7.418-136c.375-6.874-5.098-12.654-11.982-12.654h-63.383c-6.884 0-12.356 5.78-11.981 12.654z" }, "child": [] }] })(props);
-}
-function FaPlay(props) {
-  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 448 512" }, "child": [{ "tag": "path", "attr": { "d": "M424.4 214.7L72.4 6.6C43.8-10.3 0 6.1 0 47.9V464c0 37.5 40.7 60.1 72.4 41.3l352-208c31.4-18.5 31.5-64.1 0-82.6z" }, "child": [] }] })(props);
-}
-function FaPlus(props) {
-  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 448 512" }, "child": [{ "tag": "path", "attr": { "d": "M416 208H272V64c0-17.67-14.33-32-32-32h-32c-17.67 0-32 14.33-32 32v144H32c-17.67 0-32 14.33-32 32v32c0 17.67 14.33 32 32 32h144v144c0 17.67 14.33 32 32 32h32c17.67 0 32-14.33 32-32V304h144c17.67 0 32-14.33 32-32v-32c0-17.67-14.33-32-32-32z" }, "child": [] }] })(props);
-}
-function FaTimes(props) {
-  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 352 512" }, "child": [{ "tag": "path", "attr": { "d": "M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.2 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.2 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z" }, "child": [] }] })(props);
-}
-function FaTrash(props) {
-  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 448 512" }, "child": [{ "tag": "path", "attr": { "d": "M432 32H312l-9.4-18.7A24 24 0 0 0 281.1 0H166.8a23.72 23.72 0 0 0-21.4 13.3L136 32H16A16 16 0 0 0 0 48v32a16 16 0 0 0 16 16h416a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16zM53.2 467a48 48 0 0 0 47.9 45h245.8a48 48 0 0 0 47.9-45L416 128H32z" }, "child": [] }] })(props);
-}
-
-// ../../node_modules/react-icons/io/index.mjs
-function IoMdArrowDropdown(props) {
-  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 512 512" }, "child": [{ "tag": "path", "attr": { "d": "M128 192l128 128 128-128z" }, "child": [] }] })(props);
-}
-function IoMdArrowDropleft(props) {
-  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 512 512" }, "child": [{ "tag": "path", "attr": { "d": "M320 128L192 256l128 128z" }, "child": [] }] })(props);
-}
-function IoMdArrowDropright(props) {
-  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 512 512" }, "child": [{ "tag": "path", "attr": { "d": "M192 128l128 128-128 128z" }, "child": [] }] })(props);
-}
-function IoMdArrowDropup(props) {
-  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 512 512" }, "child": [{ "tag": "path", "attr": { "d": "M128 320l128-128 128 128z" }, "child": [] }] })(props);
-}
-function IoMdTime(props) {
-  return GenIcon({ "tag": "svg", "attr": { "viewBox": "0 0 512 512" }, "child": [{ "tag": "g", "attr": { "fillOpacity": ".9" }, "child": [{ "tag": "path", "attr": { "d": "M255.8 48C141 48 48 141.2 48 256s93 208 207.8 208c115 0 208.2-93.2 208.2-208S370.8 48 255.8 48zm.2 374.4c-91.9 0-166.4-74.5-166.4-166.4S164.1 89.6 256 89.6 422.4 164.1 422.4 256 347.9 422.4 256 422.4z" }, "child": [] }, { "tag": "path", "attr": { "d": "M266.4 152h-31.2v124.8l109.2 65.5 15.6-25.6-93.6-55.5V152z" }, "child": [] }] }] })(props);
-}
-
 // src/nodes/conditionNode.jsx
+import { TbLogicAnd } from "react-icons/tb";
+import { VscDebugDisconnect } from "react-icons/vsc";
+import { FaPlus, FaTrash } from "react-icons/fa";
+import { IoMdArrowDropdown, IoMdArrowDropright, IoMdArrowDropup } from "react-icons/io";
+import { Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea } from "@jet-admin/ui";
 var ERROR_HANDLING_OPTIONS2 = {
   FAIL_WORKFLOW: "fail_workflow",
   CONTINUE_DEFAULT: "continue_default"
@@ -355,22 +160,22 @@ var ConditionBranchEditor = ({ branches, onChange, workflowNodes, currentNodeId 
       variable: n.data.outputVariable
     }));
   }, [workflowNodes, currentNodeId]);
-  return /* @__PURE__ */ React4.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React4.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React4.createElement("label", { className: "text-xs font-medium text-slate-500" }, "Condition Branches"), /* @__PURE__ */ React4.createElement(
-    "button",
+  return /* @__PURE__ */ React2.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React2.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React2.createElement("label", { className: "text-xs font-medium text-slate-500" }, "Condition Branches"), /* @__PURE__ */ React2.createElement(
+    Button,
     {
       type: "button",
       onClick: addBranch,
       className: "flex items-center gap-1 px-2 py-1 text-xs bg-white text-[#646cff] hover:bg-[#646cff]/10 rounded transition-colors border border-slate-200"
     },
-    /* @__PURE__ */ React4.createElement(FaPlus, { className: "w-2.5 h-2.5" }),
+    /* @__PURE__ */ React2.createElement(FaPlus, { className: "w-2.5 h-2.5" }),
     "Add Branch"
-  )), availableVariables.length > 0 && /* @__PURE__ */ React4.createElement("p", { className: "text-[10px] text-slate-400" }, "Available: ", availableVariables.map((v) => `ctx.${v.variable}`).join(", ")), /* @__PURE__ */ React4.createElement("div", { className: "space-y-2" }, branches.map((branch, index) => /* @__PURE__ */ React4.createElement(
+  )), availableVariables.length > 0 && /* @__PURE__ */ React2.createElement("p", { className: "text-[10px] text-slate-400" }, "Available: ", availableVariables.map((v) => `ctx.${v.variable}`).join(", ")), /* @__PURE__ */ React2.createElement("div", { className: "space-y-2" }, branches.map((branch, index) => /* @__PURE__ */ React2.createElement(
     "div",
     {
       key: branch.id,
       className: "border border-slate-200 rounded p-2 bg-slate-50"
     },
-    /* @__PURE__ */ React4.createElement("div", { className: "flex items-center justify-between mb-2" }, /* @__PURE__ */ React4.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React4.createElement("span", { className: "w-5 h-5 flex items-center justify-center bg-purple-100 text-purple-600 text-[10px] font-bold rounded" }, index + 1), /* @__PURE__ */ React4.createElement(
+    /* @__PURE__ */ React2.createElement("div", { className: "flex items-center justify-between mb-2" }, /* @__PURE__ */ React2.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React2.createElement("span", { className: "w-5 h-5 flex items-center justify-center bg-purple-100 text-purple-600 text-[10px] font-bold rounded" }, index + 1), /* @__PURE__ */ React2.createElement(
       "input",
       {
         type: "text",
@@ -379,8 +184,8 @@ var ConditionBranchEditor = ({ branches, onChange, workflowNodes, currentNodeId 
         className: "text-xs font-medium text-slate-700 bg-transparent border-none outline-none w-24",
         placeholder: "Branch name"
       }
-    )), /* @__PURE__ */ React4.createElement("div", { className: "flex items-center gap-1" }, /* @__PURE__ */ React4.createElement(
-      "button",
+    )), /* @__PURE__ */ React2.createElement("div", { className: "flex items-center gap-1" }, /* @__PURE__ */ React2.createElement(
+      Button,
       {
         type: "button",
         onClick: () => moveBranch(index, -1),
@@ -388,9 +193,9 @@ var ConditionBranchEditor = ({ branches, onChange, workflowNodes, currentNodeId 
         className: "p-1 bg-white text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded disabled:opacity-30 transition-colors",
         title: "Move up"
       },
-      /* @__PURE__ */ React4.createElement(IoMdArrowDropup, { className: "w-3 h-3" })
-    ), /* @__PURE__ */ React4.createElement(
-      "button",
+      /* @__PURE__ */ React2.createElement(IoMdArrowDropup, { className: "w-3 h-3" })
+    ), /* @__PURE__ */ React2.createElement(
+      Button,
       {
         type: "button",
         onClick: () => moveBranch(index, 1),
@@ -398,9 +203,9 @@ var ConditionBranchEditor = ({ branches, onChange, workflowNodes, currentNodeId 
         className: "p-1 bg-white text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded disabled:opacity-30 transition-colors",
         title: "Move down"
       },
-      /* @__PURE__ */ React4.createElement(IoMdArrowDropdown, { className: "w-3 h-3" })
-    ), /* @__PURE__ */ React4.createElement(
-      "button",
+      /* @__PURE__ */ React2.createElement(IoMdArrowDropdown, { className: "w-3 h-3" })
+    ), /* @__PURE__ */ React2.createElement(
+      Button,
       {
         type: "button",
         onClick: () => removeBranch(index),
@@ -408,27 +213,11 @@ var ConditionBranchEditor = ({ branches, onChange, workflowNodes, currentNodeId 
         className: "p-1 bg-white text-slate-400 hover:text-red-500 hover:bg-red-50 rounded disabled:opacity-30 transition-colors",
         title: "Remove branch"
       },
-      /* @__PURE__ */ React4.createElement(FaTrash, { className: "w-3 h-3" })
+      /* @__PURE__ */ React2.createElement(FaTrash, { className: "w-3 h-3" })
     ))),
-    /* @__PURE__ */ React4.createElement("div", { className: "mb-2" }, /* @__PURE__ */ React4.createElement(
-      "select",
-      {
-        value: branch.conditionType,
-        onChange: (e) => updateBranch(index, "conditionType", e.target.value),
-        className: "w-full text-xs text-slate-700 p-1.5 border border-slate-200 rounded bg-white focus:outline-none focus:border-[#646cff]"
-      },
-      /* @__PURE__ */ React4.createElement("option", { value: CONDITION_TYPES.EXPRESSION }, "JavaScript Expression"),
-      /* @__PURE__ */ React4.createElement("option", { value: CONDITION_TYPES.EQUALS }, "Equals (==)"),
-      /* @__PURE__ */ React4.createElement("option", { value: CONDITION_TYPES.NOT_EQUALS }, "Not Equals (!=)"),
-      /* @__PURE__ */ React4.createElement("option", { value: CONDITION_TYPES.CONTAINS }, "Contains"),
-      /* @__PURE__ */ React4.createElement("option", { value: CONDITION_TYPES.GREATER_THAN }, "Greater Than (>)"),
-      /* @__PURE__ */ React4.createElement("option", { value: CONDITION_TYPES.LESS_THAN }, "Less Than (<)"),
-      /* @__PURE__ */ React4.createElement("option", { value: CONDITION_TYPES.IS_EMPTY }, "Is Empty"),
-      /* @__PURE__ */ React4.createElement("option", { value: CONDITION_TYPES.IS_NOT_EMPTY }, "Is Not Empty"),
-      /* @__PURE__ */ React4.createElement("option", { value: CONDITION_TYPES.REGEX }, "Regex Match")
-    )),
-    branch.conditionType === CONDITION_TYPES.EXPRESSION ? /* @__PURE__ */ React4.createElement(
-      "textarea",
+    /* @__PURE__ */ React2.createElement("div", { className: "mb-2" }, /* @__PURE__ */ React2.createElement(Select, { value: branch.conditionType, onValueChange: (val) => updateBranch(index, "conditionType", val) }, /* @__PURE__ */ React2.createElement(SelectTrigger, { className: "text-xs" }, /* @__PURE__ */ React2.createElement(SelectValue, { placeholder: "Select condition type" })), /* @__PURE__ */ React2.createElement(SelectContent, null, /* @__PURE__ */ React2.createElement(SelectItem, { value: CONDITION_TYPES.EXPRESSION }, "JavaScript Expression"), /* @__PURE__ */ React2.createElement(SelectItem, { value: CONDITION_TYPES.EQUALS }, "Equals (==)"), /* @__PURE__ */ React2.createElement(SelectItem, { value: CONDITION_TYPES.NOT_EQUALS }, "Not Equals (!=)"), /* @__PURE__ */ React2.createElement(SelectItem, { value: CONDITION_TYPES.CONTAINS }, "Contains"), /* @__PURE__ */ React2.createElement(SelectItem, { value: CONDITION_TYPES.GREATER_THAN }, "Greater Than (>)"), /* @__PURE__ */ React2.createElement(SelectItem, { value: CONDITION_TYPES.LESS_THAN }, "Less Than (<)"), /* @__PURE__ */ React2.createElement(SelectItem, { value: CONDITION_TYPES.IS_EMPTY }, "Is Empty"), /* @__PURE__ */ React2.createElement(SelectItem, { value: CONDITION_TYPES.IS_NOT_EMPTY }, "Is Not Empty"), /* @__PURE__ */ React2.createElement(SelectItem, { value: CONDITION_TYPES.REGEX }, "Regex Match")))),
+    branch.conditionType === CONDITION_TYPES.EXPRESSION ? /* @__PURE__ */ React2.createElement(
+      Textarea,
       {
         value: branch.expression || "",
         onChange: (e) => updateBranch(index, "expression", e.target.value),
@@ -436,8 +225,8 @@ var ConditionBranchEditor = ({ branches, onChange, workflowNodes, currentNodeId 
         className: "w-full text-xs text-slate-700 p-2 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff] resize-none",
         rows: 2
       }
-    ) : branch.conditionType === CONDITION_TYPES.IS_EMPTY || branch.conditionType === CONDITION_TYPES.IS_NOT_EMPTY ? /* @__PURE__ */ React4.createElement(
-      "input",
+    ) : branch.conditionType === CONDITION_TYPES.IS_EMPTY || branch.conditionType === CONDITION_TYPES.IS_NOT_EMPTY ? /* @__PURE__ */ React2.createElement(
+      Input,
       {
         type: "text",
         value: branch.leftOperand || "",
@@ -445,8 +234,8 @@ var ConditionBranchEditor = ({ branches, onChange, workflowNodes, currentNodeId 
         placeholder: "ctx.variableName",
         className: "w-full text-xs text-slate-700 p-2 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff]"
       }
-    ) : /* @__PURE__ */ React4.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React4.createElement(
-      "input",
+    ) : /* @__PURE__ */ React2.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React2.createElement(
+      Input,
       {
         type: "text",
         value: branch.leftOperand || "",
@@ -454,8 +243,8 @@ var ConditionBranchEditor = ({ branches, onChange, workflowNodes, currentNodeId 
         placeholder: "ctx.variableName",
         className: "flex-1 text-xs text-slate-700 p-2 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff]"
       }
-    ), /* @__PURE__ */ React4.createElement(
-      "input",
+    ), /* @__PURE__ */ React2.createElement(
+      Input,
       {
         type: "text",
         value: branch.rightOperand || "",
@@ -464,7 +253,7 @@ var ConditionBranchEditor = ({ branches, onChange, workflowNodes, currentNodeId 
         className: "flex-1 text-xs p-2 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff]"
       }
     ))
-  ))), /* @__PURE__ */ React4.createElement("div", { className: "border border-dashed border-slate-300 rounded p-2 bg-slate-50/50" }, /* @__PURE__ */ React4.createElement("div", { className: "flex items-center gap-2 text-xs text-slate-500" }, /* @__PURE__ */ React4.createElement("span", { className: "w-5 h-5 flex items-center justify-center bg-slate-200 text-slate-600 text-[10px] font-bold rounded" }, "\u2205"), /* @__PURE__ */ React4.createElement("span", { className: "font-medium" }, "Default (else)"), /* @__PURE__ */ React4.createElement("span", { className: "text-slate-400" }, "- Used when no conditions match"))));
+  ))), /* @__PURE__ */ React2.createElement("div", { className: "border border-dashed border-slate-300 rounded p-2 bg-slate-50/50" }, /* @__PURE__ */ React2.createElement("div", { className: "flex items-center gap-2 text-xs text-slate-500" }, /* @__PURE__ */ React2.createElement("span", { className: "w-5 h-5 flex items-center justify-center bg-slate-200 text-slate-600 text-[10px] font-bold rounded" }, "\u2205"), /* @__PURE__ */ React2.createElement("span", { className: "font-medium" }, "Default (else)"), /* @__PURE__ */ React2.createElement("span", { className: "text-slate-400" }, "- Used when no conditions match"))));
 };
 var ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
   const { strings, workflowNodes } = useWorkflowNodes();
@@ -604,7 +393,7 @@ var ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
   const handleSave = useCallback(() => {
     onChange(formData);
   }, [onChange, formData]);
-  return /* @__PURE__ */ React4.createElement("div", { className: "w-full h-full" }, /* @__PURE__ */ React4.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React4.createElement(
+  return /* @__PURE__ */ React2.createElement("div", { className: "w-full h-full" }, /* @__PURE__ */ React2.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React2.createElement(
     JsonForms,
     {
       schema,
@@ -613,7 +402,7 @@ var ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
       renderers: jetFormsRenderers,
       onChange: handleFormChange
     }
-  ), /* @__PURE__ */ React4.createElement("div", { className: "border-t border-slate-100 pt-4" }, /* @__PURE__ */ React4.createElement(
+  ), /* @__PURE__ */ React2.createElement("div", { className: "border-t border-slate-100 pt-4" }, /* @__PURE__ */ React2.createElement(
     ConditionBranchEditor,
     {
       branches: formData.branches,
@@ -621,8 +410,8 @@ var ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
       workflowNodes,
       currentNodeId: nodeId
     }
-  )), /* @__PURE__ */ React4.createElement("div", { className: "p-2.5 bg-slate-50 border border-slate-200 rounded text-[10px] text-slate-600 space-y-2" }, /* @__PURE__ */ React4.createElement("div", { className: "font-semibold text-slate-700 text-xs" }, "\u{1F4D8} Condition Expressions"), /* @__PURE__ */ React4.createElement("div", null, /* @__PURE__ */ React4.createElement("span", { className: "font-medium text-slate-700" }, "Expression Examples:"), /* @__PURE__ */ React4.createElement("div", { className: "ml-3 mt-0.5 text-slate-500 font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ React4.createElement("div", null, /* @__PURE__ */ React4.createElement("code", { className: "bg-white px-1 rounded" }, "ctx.queryResult.length > 0")), /* @__PURE__ */ React4.createElement("div", null, /* @__PURE__ */ React4.createElement("code", { className: "bg-white px-1 rounded" }, 'ctx.input.status === "active"')), /* @__PURE__ */ React4.createElement("div", null, /* @__PURE__ */ React4.createElement("code", { className: "bg-white px-1 rounded" }, 'ctx.userData?.role === "admin"')))), /* @__PURE__ */ React4.createElement("div", null, /* @__PURE__ */ React4.createElement("span", { className: "font-medium text-slate-700" }, "Evaluation:"), /* @__PURE__ */ React4.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, "Branches are evaluated top-to-bottom. First matching branch is taken. If none match, ", /* @__PURE__ */ React4.createElement("strong", null, "Default (else)"), " is used.")), /* @__PURE__ */ React4.createElement("div", null, /* @__PURE__ */ React4.createElement("span", { className: "font-medium text-slate-700" }, "Handles:"), /* @__PURE__ */ React4.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, "Each branch creates a ", /* @__PURE__ */ React4.createElement("strong", null, "purple"), " output handle. ", /* @__PURE__ */ React4.createElement("strong", null, "Gray"), " = Default, ", /* @__PURE__ */ React4.createElement("strong", null, "Red"), " = Error."))), /* @__PURE__ */ React4.createElement(
-    "button",
+  )), /* @__PURE__ */ React2.createElement("div", { className: "p-2.5 bg-slate-50 border border-slate-200 rounded text-[10px] text-slate-600 space-y-2" }, /* @__PURE__ */ React2.createElement("div", { className: "font-semibold text-slate-700 text-xs" }, "\u{1F4D8} Condition Expressions"), /* @__PURE__ */ React2.createElement("div", null, /* @__PURE__ */ React2.createElement("span", { className: "font-medium text-slate-700" }, "Expression Examples:"), /* @__PURE__ */ React2.createElement("div", { className: "ml-3 mt-0.5 text-slate-500 font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ React2.createElement("div", null, /* @__PURE__ */ React2.createElement("code", { className: "bg-white px-1 rounded" }, "ctx.queryResult.length > 0")), /* @__PURE__ */ React2.createElement("div", null, /* @__PURE__ */ React2.createElement("code", { className: "bg-white px-1 rounded" }, 'ctx.input.status === "active"')), /* @__PURE__ */ React2.createElement("div", null, /* @__PURE__ */ React2.createElement("code", { className: "bg-white px-1 rounded" }, 'ctx.userData?.role === "admin"')))), /* @__PURE__ */ React2.createElement("div", null, /* @__PURE__ */ React2.createElement("span", { className: "font-medium text-slate-700" }, "Evaluation:"), /* @__PURE__ */ React2.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, "Branches are evaluated top-to-bottom. First matching branch is taken. If none match, ", /* @__PURE__ */ React2.createElement("strong", null, "Default (else)"), " is used.")), /* @__PURE__ */ React2.createElement("div", null, /* @__PURE__ */ React2.createElement("span", { className: "font-medium text-slate-700" }, "Handles:"), /* @__PURE__ */ React2.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, "Each branch creates a ", /* @__PURE__ */ React2.createElement("strong", null, "purple"), " output handle. ", /* @__PURE__ */ React2.createElement("strong", null, "Gray"), " = Default, ", /* @__PURE__ */ React2.createElement("strong", null, "Red"), " = Error."))), /* @__PURE__ */ React2.createElement(
+    Button,
     {
       type: "button",
       onClick: handleSave,
@@ -669,12 +458,12 @@ var ConditionNode = memo(({ data, isConnectable }) => {
         return "condition";
     }
   };
-  return /* @__PURE__ */ React4.createElement("div", { className: `
+  return /* @__PURE__ */ React2.createElement("div", { className: `
       bg-white border rounded
       min-w-[280px] max-w-[350px]
       transition-all duration-150
       ${isDisabled ? "border-slate-200 opacity-50" : "border-slate-200 hover:border-purple-400 hover:shadow-md"}
-    ` }, /* @__PURE__ */ React4.createElement("div", { className: "flex items-stretch" }, /* @__PURE__ */ React4.createElement(
+    ` }, /* @__PURE__ */ React2.createElement("div", { className: "flex items-stretch" }, /* @__PURE__ */ React2.createElement(
     "div",
     {
       style: {
@@ -686,24 +475,24 @@ var ConditionNode = memo(({ data, isConnectable }) => {
           ${isDisabled ? "bg-slate-50 border-slate-100" : "bg-purple-50 border-purple-100"}
         `
     },
-    /* @__PURE__ */ React4.createElement(TbLogicAnd, { className: `w-5 h-5 ${isDisabled ? "text-slate-400" : "text-purple-500"}` })
-  ), /* @__PURE__ */ React4.createElement("div", { className: "flex-1 px-3 py-2 min-w-0" }, /* @__PURE__ */ React4.createElement("div", { className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ React4.createElement("span", { className: `text-xs font-semibold truncate ${isDisabled ? "text-slate-400 line-through" : "text-slate-700"}` }, data?.title || "Condition"), isDisabled && /* @__PURE__ */ React4.createElement("span", { className: "inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded border border-orange-200" }, /* @__PURE__ */ React4.createElement(VscDebugDisconnect, { className: "w-2.5 h-2.5" }), "Skip")), /* @__PURE__ */ React4.createElement("div", { className: `text-[10px] mt-0.5 ${isDisabled ? "text-slate-300" : "text-slate-400"}` }, branchCount, " branch", branchCount !== 1 ? "es" : "", " + default"), /* @__PURE__ */ React4.createElement("div", { className: "mt-1 space-y-0.5" }, branches.slice(0, 3).map((branch, index) => /* @__PURE__ */ React4.createElement(
+    /* @__PURE__ */ React2.createElement(TbLogicAnd, { className: `w-5 h-5 ${isDisabled ? "text-slate-400" : "text-purple-500"}` })
+  ), /* @__PURE__ */ React2.createElement("div", { className: "flex-1 px-3 py-2 min-w-0" }, /* @__PURE__ */ React2.createElement("div", { className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ React2.createElement("span", { className: `text-xs font-semibold truncate ${isDisabled ? "text-slate-400 line-through" : "text-slate-700"}` }, data?.title || "Condition"), isDisabled && /* @__PURE__ */ React2.createElement("span", { className: "inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded border border-orange-200" }, /* @__PURE__ */ React2.createElement(VscDebugDisconnect, { className: "w-2.5 h-2.5" }), "Skip")), /* @__PURE__ */ React2.createElement("div", { className: `text-[10px] mt-0.5 ${isDisabled ? "text-slate-300" : "text-slate-400"}` }, branchCount, " branch", branchCount !== 1 ? "es" : "", " + default"), /* @__PURE__ */ React2.createElement("div", { className: "mt-1 space-y-0.5" }, branches.slice(0, 3).map((branch, index) => /* @__PURE__ */ React2.createElement(
     "div",
     {
       key: branch.id,
       className: `flex items-center gap-1 text-[9px] ${isDisabled ? "text-slate-300" : "text-slate-500"}`
     },
-    /* @__PURE__ */ React4.createElement(IoMdArrowDropright, { className: "w-3 h-3 text-purple-400 flex-shrink-0" }),
-    /* @__PURE__ */ React4.createElement("span", { className: "truncate font-medium" }, branch.name, ":"),
-    /* @__PURE__ */ React4.createElement("span", { className: "truncate font-mono opacity-75" }, getConditionPreview(branch))
-  )), branches.length > 3 && /* @__PURE__ */ React4.createElement("div", { className: `text-[9px] ${isDisabled ? "text-slate-300" : "text-slate-400"}` }, "+", branches.length - 3, " more..."))), /* @__PURE__ */ React4.createElement("div", { className: "flex flex-col items-center justify-center px-2 border-l border-slate-100 min-w-[50px]" }, branches.slice(0, 4).map((branch, index) => /* @__PURE__ */ React4.createElement(
+    /* @__PURE__ */ React2.createElement(IoMdArrowDropright, { className: "w-3 h-3 text-purple-400 flex-shrink-0" }),
+    /* @__PURE__ */ React2.createElement("span", { className: "truncate font-medium" }, branch.name, ":"),
+    /* @__PURE__ */ React2.createElement("span", { className: "truncate font-mono opacity-75" }, getConditionPreview(branch))
+  )), branches.length > 3 && /* @__PURE__ */ React2.createElement("div", { className: `text-[9px] ${isDisabled ? "text-slate-300" : "text-slate-400"}` }, "+", branches.length - 3, " more..."))), /* @__PURE__ */ React2.createElement("div", { className: "flex flex-col items-center justify-center px-2 border-l border-slate-100 min-w-[50px]" }, branches.slice(0, 4).map((branch, index) => /* @__PURE__ */ React2.createElement(
     "div",
     {
       key: branch.id,
       className: `w-2 h-2 rounded-full mb-0.5 ${isDisabled ? "bg-slate-300" : "bg-purple-400"}`,
       title: branch.name
     }
-  )), branches.length > 4 && /* @__PURE__ */ React4.createElement("span", { className: "text-[8px] text-slate-400" }, "+", branches.length - 4), /* @__PURE__ */ React4.createElement("div", { className: `w-2 h-2 rounded-full mt-1 ${isDisabled ? "bg-slate-300" : "bg-slate-400"}`, title: "Default" }))), /* @__PURE__ */ React4.createElement(
+  )), branches.length > 4 && /* @__PURE__ */ React2.createElement("span", { className: "text-[8px] text-slate-400" }, "+", branches.length - 4), /* @__PURE__ */ React2.createElement("div", { className: `w-2 h-2 rounded-full mt-1 ${isDisabled ? "bg-slate-300" : "bg-slate-400"}`, title: "Default" }))), /* @__PURE__ */ React2.createElement(
     Handle,
     {
       type: "target",
@@ -717,7 +506,7 @@ var ConditionNode = memo(({ data, isConnectable }) => {
         top: "-5px"
       }
     }
-  ), branches.map((branch, index) => /* @__PURE__ */ React4.createElement(
+  ), branches.map((branch, index) => /* @__PURE__ */ React2.createElement(
     Handle,
     {
       key: branch.id,
@@ -734,7 +523,7 @@ var ConditionNode = memo(({ data, isConnectable }) => {
         bottom: "-5px"
       }
     }
-  )), /* @__PURE__ */ React4.createElement(
+  )), /* @__PURE__ */ React2.createElement(
     Handle,
     {
       type: "source",
@@ -750,7 +539,7 @@ var ConditionNode = memo(({ data, isConnectable }) => {
         bottom: "-5px"
       }
     }
-  ), /* @__PURE__ */ React4.createElement(
+  ), /* @__PURE__ */ React2.createElement(
     Handle,
     {
       type: "source",
@@ -771,16 +560,17 @@ var ConditionNode = memo(({ data, isConnectable }) => {
 });
 
 // src/nodes/dataQueryNode.jsx
-import React5, { memo as memo2, useState as useState2, useEffect as useEffect2, useMemo as useMemo2, useCallback as useCallback2 } from "react";
+import React3, { memo as memo2, useState as useState2, useEffect as useEffect2, useMemo as useMemo2, useCallback as useCallback2 } from "react";
 import { Handle as Handle2, Position as Position2 } from "reactflow";
 import { JsonForms as JsonForms2 } from "@jsonforms/react";
-
-// ../../node_modules/react-icons/si/index.mjs
-function SiQuantconnect(props) {
-  return GenIcon({ "tag": "svg", "attr": { "role": "img", "viewBox": "0 0 24 24" }, "child": [{ "tag": "path", "attr": { "d": "M23.0673 16.6635a12.1084 12.1084 0 0 1-6.404 6.4046A12.0185 12.0185 0 0 1 12.0002 24v-2.7975a8.63 8.63 0 0 0 3.5454-.7466 9.4574 9.4574 0 0 0 2.9836-1.9273 11.3659 11.3659 0 0 0 1.9273-2.922 9.1472 9.1472 0 0 0 .7465-3.6064 8.6298 8.6298 0 0 0-.7465-3.5454 8.9285 8.9285 0 0 0-4.9109-4.9122 9.5282 9.5282 0 0 0-7.091 0 9.4798 9.4798 0 0 0-4.9108 4.9122A9.7584 9.7584 0 0 0 2.7977 12H.0003A12.0115 12.0115 0 0 1 .932 7.3375 12.093 12.093 0 0 1 7.336.9328a12.121 12.121 0 0 1 9.326 0 11.5066 11.5066 0 0 1 3.7923 2.609 11.4988 11.4988 0 0 1 2.613 3.7963 12.1232 12.1232 0 0 1 0 9.3254zM11.998 9.8868V7.0892a4.7884 4.7884 0 0 0-3.4826 1.4296 4.7089 4.7089 0 0 0-1.4911 3.482 4.609 4.609 0 0 0 1.4911 3.4779c1.8316 1.923 4.8752 1.9972 6.7983.1656a4.7631 4.7631 0 0 0 .1656-.1656 4.34 4.34 0 0 0 1.4296-3.4786h-2.7976a2.0583 2.0583 0 0 1-.6215 1.4918 2.0189 2.0189 0 0 1-1.4918.6221c-1.1653-.0051-2.1088-.9485-2.114-2.114a2.0199 2.0199 0 0 1 .6216-1.4917 2.0637 2.0637 0 0 1 1.4924-.6215zm5.972 8.0798a7.0439 7.0439 0 0 0 1.806-2.6759 7.4712 7.4712 0 0 0 .6838-3.2953 7.655 7.655 0 0 0-.6837-3.2953 8.453 8.453 0 0 0-4.4767-4.4767 7.4678 7.4678 0 0 0-3.2953-.6836v2.7976a5.3066 5.3066 0 0 1 3.979 1.6784 5.4031 5.4031 0 0 1 1.6784 3.979c-.0338 3.1246-2.5943 5.6303-5.719 5.5964-3.077-.0333-5.5632-2.5195-5.5965-5.5964H3.5484a8.4 8.4 0 0 0 .616 3.298 9.2912 9.2912 0 0 0 4.5397 4.5381 9.0414 9.0414 0 0 0 6.59 0 7.9963 7.9963 0 0 0 2.6758-1.8643z" }, "child": [] }] })(props);
-}
-
-// src/nodes/dataQueryNode.jsx
+import { SiQuantconnect } from "react-icons/si";
+import { MdOutlineDeleteOutline } from "react-icons/md";
+import { IoMdTime } from "react-icons/io";
+import { TbRefresh } from "react-icons/tb";
+import { BiErrorCircle } from "react-icons/bi";
+import { VscDebugDisconnect as VscDebugDisconnect2 } from "react-icons/vsc";
+import { FaPlay } from "react-icons/fa";
+import { Button as Button2 } from "@jet-admin/ui";
 var ERROR_HANDLING_OPTIONS3 = {
   FAIL_WORKFLOW: "fail_workflow",
   CONTINUE: "continue",
@@ -1001,7 +791,7 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
       onQueryTest(formData.dataQueryID);
     }
   }, [onQueryTest, formData.dataQueryID]);
-  return /* @__PURE__ */ React5.createElement("div", { className: "w-full h-full" }, /* @__PURE__ */ React5.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React5.createElement(
+  return /* @__PURE__ */ React3.createElement("div", { className: "w-full h-full" }, /* @__PURE__ */ React3.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React3.createElement(
     JsonForms2,
     {
       schema,
@@ -1010,23 +800,23 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
       renderers: jetFormsRenderers,
       onChange: handleFormChange
     }
-  ), /* @__PURE__ */ React5.createElement("div", { className: "p-2.5 bg-slate-50 border border-slate-200 rounded text-[10px] text-slate-600 space-y-2" }, /* @__PURE__ */ React5.createElement("div", { className: "font-semibold text-slate-700 text-xs" }, "\u{1F4D8} Query Arguments"), /* @__PURE__ */ React5.createElement("div", null, /* @__PURE__ */ React5.createElement("span", { className: "font-medium text-slate-700" }, "Argument Format:"), /* @__PURE__ */ React5.createElement("div", { className: "ml-3 mt-0.5 text-slate-500 font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ React5.createElement("div", null, /* @__PURE__ */ React5.createElement("code", { className: "bg-white px-1 rounded" }, "{{ctx.input.userId}}"), " \u2192 pass input value"), /* @__PURE__ */ React5.createElement("div", null, /* @__PURE__ */ React5.createElement("code", { className: "bg-white px-1 rounded" }, "{{ctx.queryResult.id}}"), " \u2192 from previous query"), /* @__PURE__ */ React5.createElement("div", null, /* @__PURE__ */ React5.createElement("code", { className: "bg-white px-1 rounded" }, "id_{{ctx.input.id}}"), " \u2192 string interpolation"))), /* @__PURE__ */ React5.createElement("div", null, /* @__PURE__ */ React5.createElement("span", { className: "font-medium text-slate-700" }, "Access Result:"), /* @__PURE__ */ React5.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, "Result stored in ", /* @__PURE__ */ React5.createElement("code", { className: "bg-white px-1 py-0.5 rounded font-mono" }, "ctx.{outputVariable}"), " for use in next nodes.")), /* @__PURE__ */ React5.createElement("div", null, /* @__PURE__ */ React5.createElement("span", { className: "font-medium text-slate-700" }, "Handles:"), /* @__PURE__ */ React5.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, /* @__PURE__ */ React5.createElement("strong", null, "Green:"), " Query succeeded \u2192 ", /* @__PURE__ */ React5.createElement("strong", null, "Red:"), " Query failed (use for error handling)"))), /* @__PURE__ */ React5.createElement("div", { className: "flex justify-between items-center gap-2 pt-2 border-t border-slate-100" }, /* @__PURE__ */ React5.createElement(
-    "button",
+  ), /* @__PURE__ */ React3.createElement("div", { className: "p-2.5 bg-slate-50 border border-slate-200 rounded text-[10px] text-slate-600 space-y-2" }, /* @__PURE__ */ React3.createElement("div", { className: "font-semibold text-slate-700 text-xs" }, "\u{1F4D8} Query Arguments"), /* @__PURE__ */ React3.createElement("div", null, /* @__PURE__ */ React3.createElement("span", { className: "font-medium text-slate-700" }, "Argument Format:"), /* @__PURE__ */ React3.createElement("div", { className: "ml-3 mt-0.5 text-slate-500 font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ React3.createElement("div", null, /* @__PURE__ */ React3.createElement("code", { className: "bg-white px-1 rounded" }, "{{ctx.input.userId}}"), " \u2192 pass input value"), /* @__PURE__ */ React3.createElement("div", null, /* @__PURE__ */ React3.createElement("code", { className: "bg-white px-1 rounded" }, "{{ctx.queryResult.id}}"), " \u2192 from previous query"), /* @__PURE__ */ React3.createElement("div", null, /* @__PURE__ */ React3.createElement("code", { className: "bg-white px-1 rounded" }, "id_{{ctx.input.id}}"), " \u2192 string interpolation"))), /* @__PURE__ */ React3.createElement("div", null, /* @__PURE__ */ React3.createElement("span", { className: "font-medium text-slate-700" }, "Access Result:"), /* @__PURE__ */ React3.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, "Result stored in ", /* @__PURE__ */ React3.createElement("code", { className: "bg-white px-1 py-0.5 rounded font-mono" }, "ctx.{outputVariable}"), " for use in next nodes.")), /* @__PURE__ */ React3.createElement("div", null, /* @__PURE__ */ React3.createElement("span", { className: "font-medium text-slate-700" }, "Handles:"), /* @__PURE__ */ React3.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, /* @__PURE__ */ React3.createElement("strong", null, "Green:"), " Query succeeded \u2192 ", /* @__PURE__ */ React3.createElement("strong", null, "Red:"), " Query failed (use for error handling)"))), /* @__PURE__ */ React3.createElement("div", { className: "flex justify-between items-center gap-2 pt-2 border-t border-slate-100" }, /* @__PURE__ */ React3.createElement(
+    Button2,
     {
       type: "button",
       onClick: handleSave,
       className: "px-3 py-1.5 text-sm text-white bg-[#646cff] rounded hover:bg-[#5558dd] focus:ring-4 focus:outline-none focus:ring-[#646cff]/30"
     },
     strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_SAVE_BUTTON || "Save"
-  ), onQueryTest && formData.dataQueryID && /* @__PURE__ */ React5.createElement(
-    "button",
+  ), onQueryTest && formData.dataQueryID && /* @__PURE__ */ React3.createElement(
+    Button2,
     {
       type: "button",
       onClick: handleOpenTest,
       className: "px-3 py-1.5 text-sm text-slate-600 bg-slate-100 rounded hover:bg-slate-200 border border-slate-200 flex items-center gap-1.5",
       title: "Test this query"
     },
-    /* @__PURE__ */ React5.createElement(FaPlay, { className: "w-3 h-3 text-slate-500" }),
+    /* @__PURE__ */ React3.createElement(FaPlay, { className: "w-3 h-3 text-slate-500" }),
     "Test Query"
   ))));
 };
@@ -1063,23 +853,23 @@ var DataQueryNode = memo2(({ id, data, isConnectable }) => {
   };
   const StatusIndicator2 = () => {
     if (executionStatus === "running") {
-      return /* @__PURE__ */ React5.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center animate-spin" }, /* @__PURE__ */ React5.createElement(TbRefresh, { className: "w-3 h-3 text-white" }));
+      return /* @__PURE__ */ React3.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center animate-spin" }, /* @__PURE__ */ React3.createElement(TbRefresh, { className: "w-3 h-3 text-white" }));
     }
     if (executionStatus === "completed") {
-      return /* @__PURE__ */ React5.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center" }, /* @__PURE__ */ React5.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React5.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" })));
+      return /* @__PURE__ */ React3.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center" }, /* @__PURE__ */ React3.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React3.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" })));
     }
     if (executionStatus === "failed") {
-      return /* @__PURE__ */ React5.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center" }, /* @__PURE__ */ React5.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React5.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M6 18L18 6M6 6l12 12" })));
+      return /* @__PURE__ */ React3.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center" }, /* @__PURE__ */ React3.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React3.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M6 18L18 6M6 6l12 12" })));
     }
     return null;
   };
-  return /* @__PURE__ */ React5.createElement("div", { className: `
+  return /* @__PURE__ */ React3.createElement("div", { className: `
       relative bg-white border rounded
       min-w-[340px] max-w-[400px]
       transition-all duration-150
       ${isDisabled ? "border-slate-200 opacity-50" : getStatusStyles2()}
       ${!data.dataQueryID ? "!border-red-400 !bg-red-50" : ""}
-    ` }, /* @__PURE__ */ React5.createElement(StatusIndicator2, null), /* @__PURE__ */ React5.createElement("div", { className: "flex items-stretch" }, /* @__PURE__ */ React5.createElement(
+    ` }, /* @__PURE__ */ React3.createElement(StatusIndicator2, null), /* @__PURE__ */ React3.createElement("div", { className: "flex items-stretch" }, /* @__PURE__ */ React3.createElement(
     "div",
     {
       style: {
@@ -1091,8 +881,8 @@ var DataQueryNode = memo2(({ id, data, isConnectable }) => {
           ${isDisabled ? "bg-slate-50 border-slate-100" : executionStatus === "running" ? "bg-blue-100 border-blue-200" : executionStatus === "completed" ? "bg-green-50 border-green-100" : executionStatus === "failed" ? "bg-red-50 border-red-100" : "bg-blue-50 border-blue-100"}}
         `
     },
-    /* @__PURE__ */ React5.createElement(SiQuantconnect, { className: `w-5 h-5 ${isDisabled ? "text-slate-400" : executionStatus === "running" ? "text-blue-600" : executionStatus === "completed" ? "text-green-600" : executionStatus === "failed" ? "text-red-600" : "text-blue-500"}` })
-  ), /* @__PURE__ */ React5.createElement("div", { className: "flex-1 px-3 py-2 min-w-0" }, /* @__PURE__ */ React5.createElement("div", { className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ React5.createElement("span", { className: `text-xs font-semibold truncate ${isDisabled ? "text-slate-400 line-through" : "text-slate-700"}` }, data?.title || "Untitled"), isDisabled && /* @__PURE__ */ React5.createElement("span", { className: "inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded border border-orange-200" }, /* @__PURE__ */ React5.createElement(VscDebugDisconnect, { className: "w-2.5 h-2.5" }), "Skip")), /* @__PURE__ */ React5.createElement("div", { className: `text-sm truncate mt-0.5 ${isDisabled ? "text-slate-300" : "text-slate-500"}` }, selectedQueryTitle.length > 20 ? `${String(selectedQueryTitle).substring(0, 20)}...` : selectedQueryTitle)), /* @__PURE__ */ React5.createElement("div", { className: "flex flex-col items-center justify-center px-2 border-l border-slate-100" }, /* @__PURE__ */ React5.createElement("div", { className: `w-2 h-2 rounded-full mb-1 ${isDisabled ? "bg-slate-300" : "bg-green-400"}`, title: "Success" }), /* @__PURE__ */ React5.createElement("div", { className: `w-2 h-2 rounded-full ${isDisabled ? "bg-slate-300" : "bg-red-400"}`, title: "Error" }))), /* @__PURE__ */ React5.createElement(
+    /* @__PURE__ */ React3.createElement(SiQuantconnect, { className: `w-5 h-5 ${isDisabled ? "text-slate-400" : executionStatus === "running" ? "text-blue-600" : executionStatus === "completed" ? "text-green-600" : executionStatus === "failed" ? "text-red-600" : "text-blue-500"}` })
+  ), /* @__PURE__ */ React3.createElement("div", { className: "flex-1 px-3 py-2 min-w-0" }, /* @__PURE__ */ React3.createElement("div", { className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ React3.createElement("span", { className: `text-xs font-semibold truncate ${isDisabled ? "text-slate-400 line-through" : "text-slate-700"}` }, data?.title || "Untitled"), isDisabled && /* @__PURE__ */ React3.createElement("span", { className: "inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded border border-orange-200" }, /* @__PURE__ */ React3.createElement(VscDebugDisconnect2, { className: "w-2.5 h-2.5" }), "Skip")), /* @__PURE__ */ React3.createElement("div", { className: `text-sm truncate mt-0.5 ${isDisabled ? "text-slate-300" : "text-slate-500"}` }, selectedQueryTitle.length > 20 ? `${String(selectedQueryTitle).substring(0, 20)}...` : selectedQueryTitle)), /* @__PURE__ */ React3.createElement("div", { className: "flex flex-col items-center justify-center px-2 border-l border-slate-100" }, /* @__PURE__ */ React3.createElement("div", { className: `w-2 h-2 rounded-full mb-1 ${isDisabled ? "bg-slate-300" : "bg-green-400"}`, title: "Success" }), /* @__PURE__ */ React3.createElement("div", { className: `w-2 h-2 rounded-full ${isDisabled ? "bg-slate-300" : "bg-red-400"}`, title: "Error" }))), /* @__PURE__ */ React3.createElement(
     Handle2,
     {
       type: "target",
@@ -1106,7 +896,7 @@ var DataQueryNode = memo2(({ id, data, isConnectable }) => {
         top: "-5px"
       }
     }
-  ), /* @__PURE__ */ React5.createElement(
+  ), /* @__PURE__ */ React3.createElement(
     Handle2,
     {
       type: "source",
@@ -1122,7 +912,7 @@ var DataQueryNode = memo2(({ id, data, isConnectable }) => {
         bottom: "-5px"
       }
     }
-  ), /* @__PURE__ */ React5.createElement(
+  ), /* @__PURE__ */ React3.createElement(
     Handle2,
     {
       type: "source",
@@ -1142,9 +932,15 @@ var DataQueryNode = memo2(({ id, data, isConnectable }) => {
 });
 
 // src/nodes/javascriptNode.jsx
-import React6, { memo as memo3, useState as useState3, useEffect as useEffect3, useMemo as useMemo3, useCallback as useCallback3 } from "react";
+import React4, { memo as memo3, useState as useState3, useEffect as useEffect3, useMemo as useMemo3, useCallback as useCallback3 } from "react";
 import { Handle as Handle3, Position as Position3 } from "reactflow";
 import { JsonForms as JsonForms3 } from "@jsonforms/react";
+import { FaJs } from "react-icons/fa";
+import { IoMdTime as IoMdTime2 } from "react-icons/io";
+import { TbRefresh as TbRefresh2 } from "react-icons/tb";
+import { BiErrorCircle as BiErrorCircle2 } from "react-icons/bi";
+import { VscDebugDisconnect as VscDebugDisconnect3 } from "react-icons/vsc";
+import { Button as Button3 } from "@jet-admin/ui";
 var ERROR_HANDLING_OPTIONS4 = {
   FAIL_WORKFLOW: "fail_workflow",
   CONTINUE: "continue",
@@ -1342,7 +1138,7 @@ var JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
   const handleSave = useCallback3(() => {
     onChange(formData);
   }, [onChange, formData]);
-  return /* @__PURE__ */ React6.createElement("div", { className: "w-full h-full" }, /* @__PURE__ */ React6.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React6.createElement(
+  return /* @__PURE__ */ React4.createElement("div", { className: "w-full h-full" }, /* @__PURE__ */ React4.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React4.createElement(
     JsonForms3,
     {
       schema,
@@ -1351,8 +1147,8 @@ var JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
       renderers: jetFormsRenderers,
       onChange: handleFormChange
     }
-  ), /* @__PURE__ */ React6.createElement("div", { className: "p-2.5 bg-slate-50 border border-slate-200 rounded text-[10px] text-slate-600 space-y-2" }, /* @__PURE__ */ React6.createElement("div", { className: "font-semibold text-slate-700 text-xs" }, "\u{1F4D8} Writing JavaScript Code"), /* @__PURE__ */ React6.createElement("div", null, /* @__PURE__ */ React6.createElement("span", { className: "font-medium text-slate-700" }, "Access Context:"), /* @__PURE__ */ React6.createElement("div", { className: "ml-3 mt-0.5 text-slate-500 font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ React6.createElement("div", null, /* @__PURE__ */ React6.createElement("code", { className: "bg-white px-1 rounded" }, "ctx.input.paramName"), " \u2192 workflow input"), /* @__PURE__ */ React6.createElement("div", null, /* @__PURE__ */ React6.createElement("code", { className: "bg-white px-1 rounded" }, "ctx.queryResult"), " \u2192 previous node output"), /* @__PURE__ */ React6.createElement("div", null, /* @__PURE__ */ React6.createElement("code", { className: "bg-white px-1 rounded" }, "ctx.item"), " \u2192 current loop item"))), /* @__PURE__ */ React6.createElement("div", null, /* @__PURE__ */ React6.createElement("span", { className: "font-medium text-slate-700" }, "Return Value:"), /* @__PURE__ */ React6.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, "Use ", /* @__PURE__ */ React6.createElement("code", { className: "bg-white px-1 py-0.5 rounded font-mono" }, "return yourValue;"), " to store result in output variable.")), /* @__PURE__ */ React6.createElement("div", null, /* @__PURE__ */ React6.createElement("span", { className: "font-medium text-slate-700" }, "Available Globals:"), /* @__PURE__ */ React6.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, /* @__PURE__ */ React6.createElement("code", { className: "bg-white px-1 rounded font-mono text-[9px]" }, "JSON, Math, Date, Array, Object, String, Number, Boolean, parseInt, parseFloat"))), /* @__PURE__ */ React6.createElement("div", { className: "text-amber-600 bg-amber-50 border border-amber-200 rounded p-1.5 mt-2" }, /* @__PURE__ */ React6.createElement("strong", null, "\u26A0\uFE0F Note:"), " Code runs in a sandbox. No network access, filesystem, or require().")), /* @__PURE__ */ React6.createElement(
-    "button",
+  ), /* @__PURE__ */ React4.createElement("div", { className: "p-2.5 bg-slate-50 border border-slate-200 rounded text-[10px] text-slate-600 space-y-2" }, /* @__PURE__ */ React4.createElement("div", { className: "font-semibold text-slate-700 text-xs" }, "\u{1F4D8} Writing JavaScript Code"), /* @__PURE__ */ React4.createElement("div", null, /* @__PURE__ */ React4.createElement("span", { className: "font-medium text-slate-700" }, "Access Context:"), /* @__PURE__ */ React4.createElement("div", { className: "ml-3 mt-0.5 text-slate-500 font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ React4.createElement("div", null, /* @__PURE__ */ React4.createElement("code", { className: "bg-white px-1 rounded" }, "ctx.input.paramName"), " \u2192 workflow input"), /* @__PURE__ */ React4.createElement("div", null, /* @__PURE__ */ React4.createElement("code", { className: "bg-white px-1 rounded" }, "ctx.queryResult"), " \u2192 previous node output"), /* @__PURE__ */ React4.createElement("div", null, /* @__PURE__ */ React4.createElement("code", { className: "bg-white px-1 rounded" }, "ctx.item"), " \u2192 current loop item"))), /* @__PURE__ */ React4.createElement("div", null, /* @__PURE__ */ React4.createElement("span", { className: "font-medium text-slate-700" }, "Return Value:"), /* @__PURE__ */ React4.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, "Use ", /* @__PURE__ */ React4.createElement("code", { className: "bg-white px-1 py-0.5 rounded font-mono" }, "return yourValue;"), " to store result in output variable.")), /* @__PURE__ */ React4.createElement("div", null, /* @__PURE__ */ React4.createElement("span", { className: "font-medium text-slate-700" }, "Available Globals:"), /* @__PURE__ */ React4.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, /* @__PURE__ */ React4.createElement("code", { className: "bg-white px-1 rounded font-mono text-[9px]" }, "JSON, Math, Date, Array, Object, String, Number, Boolean, parseInt, parseFloat"))), /* @__PURE__ */ React4.createElement("div", { className: "text-amber-600 bg-amber-50 border border-amber-200 rounded p-1.5 mt-2" }, /* @__PURE__ */ React4.createElement("strong", null, "\u26A0\uFE0F Note:"), " Code runs in a sandbox. No network access, filesystem, or require().")), /* @__PURE__ */ React4.createElement(
+    Button3,
     {
       type: "button",
       onClick: handleSave,
@@ -1385,23 +1181,23 @@ var JavascriptNode = memo3(({ id, data, isConnectable }) => {
   };
   const StatusIndicator2 = () => {
     if (executionStatus === "running") {
-      return /* @__PURE__ */ React6.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center animate-spin" }, /* @__PURE__ */ React6.createElement(TbRefresh, { className: "w-3 h-3 text-white" }));
+      return /* @__PURE__ */ React4.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center animate-spin" }, /* @__PURE__ */ React4.createElement(TbRefresh2, { className: "w-3 h-3 text-white" }));
     }
     if (executionStatus === "completed") {
-      return /* @__PURE__ */ React6.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center" }, /* @__PURE__ */ React6.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React6.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" })));
+      return /* @__PURE__ */ React4.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center" }, /* @__PURE__ */ React4.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React4.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" })));
     }
     if (executionStatus === "failed") {
-      return /* @__PURE__ */ React6.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center" }, /* @__PURE__ */ React6.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React6.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M6 18L18 6M6 6l12 12" })));
+      return /* @__PURE__ */ React4.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center" }, /* @__PURE__ */ React4.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React4.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M6 18L18 6M6 6l12 12" })));
     }
     return null;
   };
-  return /* @__PURE__ */ React6.createElement("div", { className: `
+  return /* @__PURE__ */ React4.createElement("div", { className: `
       relative bg-white border rounded
       min-w-[340px] max-w-[400px]
       transition-all duration-150
       ${isDisabled ? "border-slate-200 opacity-50" : getStatusStyles2()}
       ${!data.code ? "!border-red-400 !bg-red-50" : ""}
-    ` }, /* @__PURE__ */ React6.createElement(StatusIndicator2, null), /* @__PURE__ */ React6.createElement("div", { className: "flex items-stretch" }, /* @__PURE__ */ React6.createElement(
+    ` }, /* @__PURE__ */ React4.createElement(StatusIndicator2, null), /* @__PURE__ */ React4.createElement("div", { className: "flex items-stretch" }, /* @__PURE__ */ React4.createElement(
     "div",
     {
       style: {
@@ -1413,8 +1209,8 @@ var JavascriptNode = memo3(({ id, data, isConnectable }) => {
           ${isDisabled ? "bg-slate-50 border-slate-100" : executionStatus === "running" ? "bg-blue-100 border-blue-200" : executionStatus === "completed" ? "bg-green-50 border-green-100" : executionStatus === "failed" ? "bg-red-50 border-red-100" : "bg-yellow-50 border-yellow-100"}
         `
     },
-    /* @__PURE__ */ React6.createElement(FaJs, { className: `w-5 h-5 ${isDisabled ? "text-slate-400" : executionStatus === "running" ? "text-blue-600" : executionStatus === "completed" ? "text-green-600" : executionStatus === "failed" ? "text-red-600" : "text-yellow-500"}` })
-  ), /* @__PURE__ */ React6.createElement("div", { className: "flex-1 px-3 py-2 min-w-0" }, /* @__PURE__ */ React6.createElement("div", { className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ React6.createElement("span", { className: `text-xs font-semibold truncate ${isDisabled ? "text-slate-400 line-through" : "text-slate-700"}` }, data?.title || "Untitled Script"), isDisabled && /* @__PURE__ */ React6.createElement("span", { className: "inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded border border-orange-200" }, /* @__PURE__ */ React6.createElement(VscDebugDisconnect, { className: "w-2.5 h-2.5" }), "Skip")), /* @__PURE__ */ React6.createElement("div", { className: `text-[10px] font-mono truncate mt-0.5 ${isDisabled ? "text-slate-300" : "text-slate-400"}` }, codePreview)), /* @__PURE__ */ React6.createElement("div", { className: "flex flex-col items-center justify-center px-2 border-l border-slate-100" }, /* @__PURE__ */ React6.createElement("div", { className: `w-2 h-2 rounded-full mb-1 ${isDisabled ? "bg-slate-300" : "bg-green-400"}`, title: "Success" }), /* @__PURE__ */ React6.createElement("div", { className: `w-2 h-2 rounded-full ${isDisabled ? "bg-slate-300" : "bg-red-400"}`, title: "Error" }))), /* @__PURE__ */ React6.createElement(
+    /* @__PURE__ */ React4.createElement(FaJs, { className: `w-5 h-5 ${isDisabled ? "text-slate-400" : executionStatus === "running" ? "text-blue-600" : executionStatus === "completed" ? "text-green-600" : executionStatus === "failed" ? "text-red-600" : "text-yellow-500"}` })
+  ), /* @__PURE__ */ React4.createElement("div", { className: "flex-1 px-3 py-2 min-w-0" }, /* @__PURE__ */ React4.createElement("div", { className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ React4.createElement("span", { className: `text-xs font-semibold truncate ${isDisabled ? "text-slate-400 line-through" : "text-slate-700"}` }, data?.title || "Untitled Script"), isDisabled && /* @__PURE__ */ React4.createElement("span", { className: "inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded border border-orange-200" }, /* @__PURE__ */ React4.createElement(VscDebugDisconnect3, { className: "w-2.5 h-2.5" }), "Skip")), /* @__PURE__ */ React4.createElement("div", { className: `text-[10px] font-mono truncate mt-0.5 ${isDisabled ? "text-slate-300" : "text-slate-400"}` }, codePreview)), /* @__PURE__ */ React4.createElement("div", { className: "flex flex-col items-center justify-center px-2 border-l border-slate-100" }, /* @__PURE__ */ React4.createElement("div", { className: `w-2 h-2 rounded-full mb-1 ${isDisabled ? "bg-slate-300" : "bg-green-400"}`, title: "Success" }), /* @__PURE__ */ React4.createElement("div", { className: `w-2 h-2 rounded-full ${isDisabled ? "bg-slate-300" : "bg-red-400"}`, title: "Error" }))), /* @__PURE__ */ React4.createElement(
     Handle3,
     {
       type: "target",
@@ -1428,7 +1224,7 @@ var JavascriptNode = memo3(({ id, data, isConnectable }) => {
         top: "-5px"
       }
     }
-  ), /* @__PURE__ */ React6.createElement(
+  ), /* @__PURE__ */ React4.createElement(
     Handle3,
     {
       type: "source",
@@ -1444,7 +1240,7 @@ var JavascriptNode = memo3(({ id, data, isConnectable }) => {
         bottom: "-5px"
       }
     }
-  ), /* @__PURE__ */ React6.createElement(
+  ), /* @__PURE__ */ React4.createElement(
     Handle3,
     {
       type: "source",
@@ -1464,9 +1260,11 @@ var JavascriptNode = memo3(({ id, data, isConnectable }) => {
 });
 
 // src/nodes/startNode.jsx
-import React7, { memo as memo4, useState as useState4, useEffect as useEffect4, useMemo as useMemo4, useCallback as useCallback4 } from "react";
+import React5, { memo as memo4, useState as useState4, useEffect as useEffect4, useMemo as useMemo4, useCallback as useCallback4 } from "react";
 import { Handle as Handle4, Position as Position4 } from "reactflow";
 import { JsonForms as JsonForms4 } from "@jsonforms/react";
+import { VscDebugStart } from "react-icons/vsc";
+import { Button as Button4 } from "@jet-admin/ui";
 var StartNodeConfigurator = ({ data, onChange, nodeId }) => {
   const { strings } = useWorkflowNodes();
   const [formData, setFormData] = useState4({
@@ -1519,7 +1317,7 @@ var StartNodeConfigurator = ({ data, onChange, nodeId }) => {
   const handleSave = useCallback4(() => {
     onChange(formData);
   }, [onChange, formData]);
-  return /* @__PURE__ */ React7.createElement("div", { className: "w-full h-full" }, /* @__PURE__ */ React7.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React7.createElement(
+  return /* @__PURE__ */ React5.createElement("div", { className: "w-full h-full" }, /* @__PURE__ */ React5.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React5.createElement(
     JsonForms4,
     {
       schema,
@@ -1528,8 +1326,8 @@ var StartNodeConfigurator = ({ data, onChange, nodeId }) => {
       renderers: jetFormsRenderers,
       onChange: handleFormChange
     }
-  ), /* @__PURE__ */ React7.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React7.createElement("div", { className: "p-2.5 bg-slate-50 border border-slate-200 rounded text-[10px] text-slate-600 space-y-2" }, /* @__PURE__ */ React7.createElement("div", { className: "font-semibold text-slate-700 text-xs" }, "\u{1F4D8} How This Works"), /* @__PURE__ */ React7.createElement("div", null, /* @__PURE__ */ React7.createElement("span", { className: "font-medium text-slate-700" }, "Triggers:"), /* @__PURE__ */ React7.createElement("ul", { className: "ml-3 mt-0.5 space-y-0.5 list-disc list-inside text-slate-500" }, /* @__PURE__ */ React7.createElement("li", null, 'Manual: Click "Test Workflow" button'), /* @__PURE__ */ React7.createElement("li", null, "API: POST /api/v1/workflows/:id/run"), /* @__PURE__ */ React7.createElement("li", null, "Widget: Link workflow to a widget"))), /* @__PURE__ */ React7.createElement("div", null, /* @__PURE__ */ React7.createElement("span", { className: "font-medium text-slate-700" }, "Input Parameters:"), /* @__PURE__ */ React7.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, "Define inputs in the ", /* @__PURE__ */ React7.createElement("strong", null, '"Input Parameters"'), " panel (right side). Access them in other nodes using: ", /* @__PURE__ */ React7.createElement("code", { className: "bg-white px-1 py-0.5 rounded border border-slate-200 font-mono" }, "{{ctx.input.paramName}}"))), /* @__PURE__ */ React7.createElement("div", null, /* @__PURE__ */ React7.createElement("span", { className: "font-medium text-slate-700" }, "Variable Format:"), /* @__PURE__ */ React7.createElement("div", { className: "ml-3 mt-0.5 text-slate-500 font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ React7.createElement("div", null, /* @__PURE__ */ React7.createElement("code", { className: "bg-white px-1 rounded" }, "{{ctx.input.userId}}"), " \u2192 input parameter"), /* @__PURE__ */ React7.createElement("div", null, /* @__PURE__ */ React7.createElement("code", { className: "bg-white px-1 rounded" }, "{{ctx.queryResult}}"), " \u2192 previous node output"), /* @__PURE__ */ React7.createElement("div", null, /* @__PURE__ */ React7.createElement("code", { className: "bg-white px-1 rounded" }, "id_{{ctx.input.id}}"), " \u2192 string interpolation"))))), /* @__PURE__ */ React7.createElement(
-    "button",
+  ), /* @__PURE__ */ React5.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React5.createElement("div", { className: "p-2.5 bg-slate-50 border border-slate-200 rounded text-[10px] text-slate-600 space-y-2" }, /* @__PURE__ */ React5.createElement("div", { className: "font-semibold text-slate-700 text-xs" }, "\u{1F4D8} How This Works"), /* @__PURE__ */ React5.createElement("div", null, /* @__PURE__ */ React5.createElement("span", { className: "font-medium text-slate-700" }, "Triggers:"), /* @__PURE__ */ React5.createElement("ul", { className: "ml-3 mt-0.5 space-y-0.5 list-disc list-inside text-slate-500" }, /* @__PURE__ */ React5.createElement("li", null, 'Manual: Click "Test Workflow" button'), /* @__PURE__ */ React5.createElement("li", null, "API: POST /api/v1/workflows/:id/run"), /* @__PURE__ */ React5.createElement("li", null, "Widget: Link workflow to a widget"))), /* @__PURE__ */ React5.createElement("div", null, /* @__PURE__ */ React5.createElement("span", { className: "font-medium text-slate-700" }, "Input Parameters:"), /* @__PURE__ */ React5.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, "Define inputs in the ", /* @__PURE__ */ React5.createElement("strong", null, '"Input Parameters"'), " panel (right side). Access them in other nodes using: ", /* @__PURE__ */ React5.createElement("code", { className: "bg-white px-1 py-0.5 rounded border border-slate-200 font-mono" }, "{{ctx.input.paramName}}"))), /* @__PURE__ */ React5.createElement("div", null, /* @__PURE__ */ React5.createElement("span", { className: "font-medium text-slate-700" }, "Variable Format:"), /* @__PURE__ */ React5.createElement("div", { className: "ml-3 mt-0.5 text-slate-500 font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ React5.createElement("div", null, /* @__PURE__ */ React5.createElement("code", { className: "bg-white px-1 rounded" }, "{{ctx.input.userId}}"), " \u2192 input parameter"), /* @__PURE__ */ React5.createElement("div", null, /* @__PURE__ */ React5.createElement("code", { className: "bg-white px-1 rounded" }, "{{ctx.queryResult}}"), " \u2192 previous node output"), /* @__PURE__ */ React5.createElement("div", null, /* @__PURE__ */ React5.createElement("code", { className: "bg-white px-1 rounded" }, "id_{{ctx.input.id}}"), " \u2192 string interpolation"))))), /* @__PURE__ */ React5.createElement(
+    Button4,
     {
       type: "button",
       onClick: handleSave,
@@ -1557,25 +1355,25 @@ var StartNode = memo4(({ id, data, isConnectable }) => {
   };
   const StatusIndicator2 = () => {
     if (executionStatus === "running") {
-      return /* @__PURE__ */ React7.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center animate-spin z-10" }, /* @__PURE__ */ React7.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React7.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" })));
+      return /* @__PURE__ */ React5.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center animate-spin z-10" }, /* @__PURE__ */ React5.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React5.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" })));
     }
     if (executionStatus === "completed") {
-      return /* @__PURE__ */ React7.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ React7.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React7.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" })));
+      return /* @__PURE__ */ React5.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ React5.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React5.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" })));
     }
     if (executionStatus === "failed") {
-      return /* @__PURE__ */ React7.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ React7.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React7.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M6 18L18 6M6 6l12 12" })));
+      return /* @__PURE__ */ React5.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ React5.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React5.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M6 18L18 6M6 6l12 12" })));
     }
     return null;
   };
-  return /* @__PURE__ */ React7.createElement("div", { className: `
+  return /* @__PURE__ */ React5.createElement("div", { className: `
       relative bg-white border rounded
       min-w-[280px] max-w-[350px]
       transition-all duration-150
       ${getStatusStyles2()}
-    ` }, /* @__PURE__ */ React7.createElement(StatusIndicator2, null), /* @__PURE__ */ React7.createElement("div", { className: "flex items-stretch" }, /* @__PURE__ */ React7.createElement("div", { style: {
+    ` }, /* @__PURE__ */ React5.createElement(StatusIndicator2, null), /* @__PURE__ */ React5.createElement("div", { className: "flex items-stretch" }, /* @__PURE__ */ React5.createElement("div", { style: {
     borderTopLeftRadius: "0.25rem",
     borderBottomLeftRadius: "0.25rem"
-  }, className: `flex flex-col items-center justify-center px-3 py-3 border-r ${executionStatus === "running" ? "bg-blue-100 border-blue-200" : executionStatus === "completed" ? "bg-green-100 border-green-200" : executionStatus === "failed" ? "bg-red-50 border-red-100" : "bg-green-50 border-green-100"}` }, /* @__PURE__ */ React7.createElement(VscDebugStart, { className: `w-5 h-5 ${executionStatus === "running" ? "text-blue-600" : executionStatus === "completed" ? "text-green-600" : executionStatus === "failed" ? "text-red-600" : "text-green-500"}` })), /* @__PURE__ */ React7.createElement("div", { className: "flex-1 px-3 py-2 min-w-0" }, /* @__PURE__ */ React7.createElement("div", { className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ React7.createElement("span", { className: "text-xs font-semibold truncate text-slate-700" }, data?.title || "Start")), /* @__PURE__ */ React7.createElement("div", { className: "text-[10px] mt-0.5 text-slate-400" }, "Workflow entry point")), /* @__PURE__ */ React7.createElement("div", { className: "flex flex-col items-center justify-center px-2 border-l border-slate-100" }, /* @__PURE__ */ React7.createElement("div", { className: "w-2 h-2 rounded-full bg-green-400", title: "Output" }))), /* @__PURE__ */ React7.createElement(
+  }, className: `flex flex-col items-center justify-center px-3 py-3 border-r ${executionStatus === "running" ? "bg-blue-100 border-blue-200" : executionStatus === "completed" ? "bg-green-100 border-green-200" : executionStatus === "failed" ? "bg-red-50 border-red-100" : "bg-green-50 border-green-100"}` }, /* @__PURE__ */ React5.createElement(VscDebugStart, { className: `w-5 h-5 ${executionStatus === "running" ? "text-blue-600" : executionStatus === "completed" ? "text-green-600" : executionStatus === "failed" ? "text-red-600" : "text-green-500"}` })), /* @__PURE__ */ React5.createElement("div", { className: "flex-1 px-3 py-2 min-w-0" }, /* @__PURE__ */ React5.createElement("div", { className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ React5.createElement("span", { className: "text-xs font-semibold truncate text-slate-700" }, data?.title || "Start")), /* @__PURE__ */ React5.createElement("div", { className: "text-[10px] mt-0.5 text-slate-400" }, "Workflow entry point")), /* @__PURE__ */ React5.createElement("div", { className: "flex flex-col items-center justify-center px-2 border-l border-slate-100" }, /* @__PURE__ */ React5.createElement("div", { className: "w-2 h-2 rounded-full bg-green-400", title: "Output" }))), /* @__PURE__ */ React5.createElement(
     Handle4,
     {
       type: "source",
@@ -1594,9 +1392,13 @@ var StartNode = memo4(({ id, data, isConnectable }) => {
 });
 
 // src/nodes/loopNode.jsx
-import React8, { memo as memo5, useState as useState5, useEffect as useEffect5, useMemo as useMemo5, useCallback as useCallback5 } from "react";
+import React6, { memo as memo5, useState as useState5, useEffect as useEffect5, useMemo as useMemo5, useCallback as useCallback5 } from "react";
 import { Handle as Handle5, Position as Position5 } from "reactflow";
 import { JsonForms as JsonForms5 } from "@jsonforms/react";
+import { VscDebugDisconnect as VscDebugDisconnect4 } from "react-icons/vsc";
+import { TbRepeat } from "react-icons/tb";
+import { IoMdArrowDropright as IoMdArrowDropright2 } from "react-icons/io";
+import { Button as Button5 } from "@jet-admin/ui";
 var ERROR_HANDLING_OPTIONS5 = {
   FAIL_WORKFLOW: "fail_workflow",
   CONTINUE: "continue",
@@ -1779,7 +1581,7 @@ var LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
   const handleSave = useCallback5(() => {
     onChange(formData);
   }, [onChange, formData]);
-  return /* @__PURE__ */ React8.createElement("div", { className: "w-full h-full" }, /* @__PURE__ */ React8.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React8.createElement(
+  return /* @__PURE__ */ React6.createElement("div", { className: "w-full h-full" }, /* @__PURE__ */ React6.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React6.createElement(
     JsonForms5,
     {
       schema,
@@ -1788,8 +1590,8 @@ var LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
       renderers: jetFormsRenderers,
       onChange: handleFormChange
     }
-  ), /* @__PURE__ */ React8.createElement("div", { className: "p-2.5 bg-slate-50 border border-slate-200 rounded text-[10px] text-slate-600 space-y-2" }, /* @__PURE__ */ React8.createElement("div", { className: "font-semibold text-slate-700 text-xs" }, "\u{1F4D8} Loop Configuration"), /* @__PURE__ */ React8.createElement("div", null, /* @__PURE__ */ React8.createElement("span", { className: "font-medium text-slate-700" }, "Source Array Format:"), /* @__PURE__ */ React8.createElement("div", { className: "ml-3 mt-0.5 text-slate-500 font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ React8.createElement("div", null, /* @__PURE__ */ React8.createElement("code", { className: "bg-white px-1 rounded" }, "{{ctx.queryResult}}"), " \u2192 array from previous node"), /* @__PURE__ */ React8.createElement("div", null, /* @__PURE__ */ React8.createElement("code", { className: "bg-white px-1 rounded" }, "{{ctx.input.items}}"), " \u2192 array from input"))), /* @__PURE__ */ React8.createElement("div", null, /* @__PURE__ */ React8.createElement("span", { className: "font-medium text-slate-700" }, "Inside Loop Body:"), /* @__PURE__ */ React8.createElement("div", { className: "ml-3 mt-0.5 text-slate-500 font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ React8.createElement("div", null, /* @__PURE__ */ React8.createElement("code", { className: "bg-white px-1 rounded" }, "ctx.item"), " \u2192 current array element"), /* @__PURE__ */ React8.createElement("div", null, /* @__PURE__ */ React8.createElement("code", { className: "bg-white px-1 rounded" }, "ctx.index"), " \u2192 current iteration index (0-based)"))), /* @__PURE__ */ React8.createElement("div", null, /* @__PURE__ */ React8.createElement("span", { className: "font-medium text-slate-700" }, "Handles:"), /* @__PURE__ */ React8.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, /* @__PURE__ */ React8.createElement("strong", null, "Loop (cyan):"), " Executes for each item \u2192 ", /* @__PURE__ */ React8.createElement("strong", null, "Completed (green):"), " After all iterations"))), /* @__PURE__ */ React8.createElement(
-    "button",
+  ), /* @__PURE__ */ React6.createElement("div", { className: "p-2.5 bg-slate-50 border border-slate-200 rounded text-[10px] text-slate-600 space-y-2" }, /* @__PURE__ */ React6.createElement("div", { className: "font-semibold text-slate-700 text-xs" }, "\u{1F4D8} Loop Configuration"), /* @__PURE__ */ React6.createElement("div", null, /* @__PURE__ */ React6.createElement("span", { className: "font-medium text-slate-700" }, "Source Array Format:"), /* @__PURE__ */ React6.createElement("div", { className: "ml-3 mt-0.5 text-slate-500 font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ React6.createElement("div", null, /* @__PURE__ */ React6.createElement("code", { className: "bg-white px-1 rounded" }, "{{ctx.queryResult}}"), " \u2192 array from previous node"), /* @__PURE__ */ React6.createElement("div", null, /* @__PURE__ */ React6.createElement("code", { className: "bg-white px-1 rounded" }, "{{ctx.input.items}}"), " \u2192 array from input"))), /* @__PURE__ */ React6.createElement("div", null, /* @__PURE__ */ React6.createElement("span", { className: "font-medium text-slate-700" }, "Inside Loop Body:"), /* @__PURE__ */ React6.createElement("div", { className: "ml-3 mt-0.5 text-slate-500 font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ React6.createElement("div", null, /* @__PURE__ */ React6.createElement("code", { className: "bg-white px-1 rounded" }, "ctx.item"), " \u2192 current array element"), /* @__PURE__ */ React6.createElement("div", null, /* @__PURE__ */ React6.createElement("code", { className: "bg-white px-1 rounded" }, "ctx.index"), " \u2192 current iteration index (0-based)"))), /* @__PURE__ */ React6.createElement("div", null, /* @__PURE__ */ React6.createElement("span", { className: "font-medium text-slate-700" }, "Handles:"), /* @__PURE__ */ React6.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, /* @__PURE__ */ React6.createElement("strong", null, "Loop (cyan):"), " Executes for each item \u2192 ", /* @__PURE__ */ React6.createElement("strong", null, "Completed (green):"), " After all iterations"))), /* @__PURE__ */ React6.createElement(
+    Button5,
     {
       type: "button",
       onClick: handleSave,
@@ -1803,13 +1605,13 @@ var LoopNode = memo5(({ data, isConnectable }) => {
   const isDisabled = data?.isDisabled ?? false;
   const sourceVariable = data?.sourceVariable || "ctx.array";
   const itemVariable = data?.itemVariable || "item";
-  return /* @__PURE__ */ React8.createElement("div", { className: `
+  return /* @__PURE__ */ React6.createElement("div", { className: `
       bg-white border rounded
       min-w-[280px] max-w-[350px]
       transition-all duration-150
       ${isDisabled ? "border-slate-200 opacity-50" : "border-slate-200 hover:border-cyan-400 hover:shadow-md"}
       ${!data.sourceVariable ? "!border-red-400 !bg-red-50" : ""}
-    ` }, /* @__PURE__ */ React8.createElement("div", { className: "flex items-stretch" }, /* @__PURE__ */ React8.createElement(
+    ` }, /* @__PURE__ */ React6.createElement("div", { className: "flex items-stretch" }, /* @__PURE__ */ React6.createElement(
     "div",
     {
       style: {
@@ -1821,8 +1623,8 @@ var LoopNode = memo5(({ data, isConnectable }) => {
           ${isDisabled ? "bg-slate-50 border-slate-100" : "bg-cyan-50 border-cyan-100"}
         `
     },
-    /* @__PURE__ */ React8.createElement(TbRepeat, { className: `w-5 h-5 ${isDisabled ? "text-slate-400" : "text-cyan-500"}` })
-  ), /* @__PURE__ */ React8.createElement("div", { className: "flex-1 px-3 py-2 min-w-0" }, /* @__PURE__ */ React8.createElement("div", { className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ React8.createElement("span", { className: `text-xs font-semibold truncate ${isDisabled ? "text-slate-400 line-through" : "text-slate-700"}` }, data?.title || "Loop"), isDisabled && /* @__PURE__ */ React8.createElement("span", { className: "inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded border border-orange-200" }, /* @__PURE__ */ React8.createElement(VscDebugDisconnect, { className: "w-2.5 h-2.5" }), "Skip")), /* @__PURE__ */ React8.createElement("div", { className: `text-[10px] font-mono mt-0.5 ${isDisabled ? "text-slate-300" : "text-slate-400"}` }, "for (", itemVariable, " in ", sourceVariable.length > 20 ? sourceVariable.substring(0, 20) + "..." : sourceVariable, ")")), /* @__PURE__ */ React8.createElement("div", { className: "flex flex-col items-center justify-center px-2 border-l border-slate-100" }, /* @__PURE__ */ React8.createElement("div", { className: `w-2 h-2 rounded-full mb-1 ${isDisabled ? "bg-slate-300" : "bg-cyan-400"}`, title: "Loop Body" }), /* @__PURE__ */ React8.createElement("div", { className: `w-2 h-2 rounded-full ${isDisabled ? "bg-slate-300" : "bg-green-400"}`, title: "Completed" }))), /* @__PURE__ */ React8.createElement(
+    /* @__PURE__ */ React6.createElement(TbRepeat, { className: `w-5 h-5 ${isDisabled ? "text-slate-400" : "text-cyan-500"}` })
+  ), /* @__PURE__ */ React6.createElement("div", { className: "flex-1 px-3 py-2 min-w-0" }, /* @__PURE__ */ React6.createElement("div", { className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ React6.createElement("span", { className: `text-xs font-semibold truncate ${isDisabled ? "text-slate-400 line-through" : "text-slate-700"}` }, data?.title || "Loop"), isDisabled && /* @__PURE__ */ React6.createElement("span", { className: "inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded border border-orange-200" }, /* @__PURE__ */ React6.createElement(VscDebugDisconnect4, { className: "w-2.5 h-2.5" }), "Skip")), /* @__PURE__ */ React6.createElement("div", { className: `text-[10px] font-mono mt-0.5 ${isDisabled ? "text-slate-300" : "text-slate-400"}` }, "for (", itemVariable, " in ", sourceVariable.length > 20 ? sourceVariable.substring(0, 20) + "..." : sourceVariable, ")")), /* @__PURE__ */ React6.createElement("div", { className: "flex flex-col items-center justify-center px-2 border-l border-slate-100" }, /* @__PURE__ */ React6.createElement("div", { className: `w-2 h-2 rounded-full mb-1 ${isDisabled ? "bg-slate-300" : "bg-cyan-400"}`, title: "Loop Body" }), /* @__PURE__ */ React6.createElement("div", { className: `w-2 h-2 rounded-full ${isDisabled ? "bg-slate-300" : "bg-green-400"}`, title: "Completed" }))), /* @__PURE__ */ React6.createElement(
     Handle5,
     {
       type: "target",
@@ -1836,7 +1638,7 @@ var LoopNode = memo5(({ data, isConnectable }) => {
         top: "-5px"
       }
     }
-  ), /* @__PURE__ */ React8.createElement(
+  ), /* @__PURE__ */ React6.createElement(
     Handle5,
     {
       type: "source",
@@ -1852,7 +1654,7 @@ var LoopNode = memo5(({ data, isConnectable }) => {
         bottom: "-5px"
       }
     }
-  ), /* @__PURE__ */ React8.createElement(
+  ), /* @__PURE__ */ React6.createElement(
     Handle5,
     {
       type: "source",
@@ -1872,9 +1674,12 @@ var LoopNode = memo5(({ data, isConnectable }) => {
 });
 
 // src/nodes/delayNode.jsx
-import React9, { memo as memo6, useState as useState6, useEffect as useEffect6, useMemo as useMemo6, useCallback as useCallback6 } from "react";
+import React7, { memo as memo6, useState as useState6, useEffect as useEffect6, useMemo as useMemo6, useCallback as useCallback6 } from "react";
 import { Handle as Handle6, Position as Position6 } from "reactflow";
 import { JsonForms as JsonForms6 } from "@jsonforms/react";
+import { VscDebugDisconnect as VscDebugDisconnect5 } from "react-icons/vsc";
+import { IoMdTime as IoMdTime3 } from "react-icons/io";
+import { Button as Button6 } from "@jet-admin/ui";
 var DelayNodeConfigurator = ({ data, onChange, nodeId }) => {
   const { strings } = useWorkflowNodes();
   const [formData, setFormData] = useState6({
@@ -2034,7 +1839,7 @@ var DelayNodeConfigurator = ({ data, onChange, nodeId }) => {
   const handleSave = useCallback6(() => {
     onChange(formData);
   }, [onChange, formData]);
-  return /* @__PURE__ */ React9.createElement("div", { className: "w-full h-full" }, /* @__PURE__ */ React9.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React9.createElement(
+  return /* @__PURE__ */ React7.createElement("div", { className: "w-full h-full" }, /* @__PURE__ */ React7.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React7.createElement(
     JsonForms6,
     {
       schema,
@@ -2043,8 +1848,8 @@ var DelayNodeConfigurator = ({ data, onChange, nodeId }) => {
       renderers: jetFormsRenderers,
       onChange: handleFormChange
     }
-  ), /* @__PURE__ */ React9.createElement("div", { className: "p-2.5 bg-slate-50 border border-slate-200 rounded text-[10px] text-slate-600 space-y-2" }, /* @__PURE__ */ React9.createElement("div", { className: "font-semibold text-slate-700 text-xs" }, "\u{1F4D8} Delay Types"), /* @__PURE__ */ React9.createElement("div", null, /* @__PURE__ */ React9.createElement("span", { className: "font-medium text-slate-700" }, "Fixed Duration:"), /* @__PURE__ */ React9.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, "Set exact wait time using minutes, seconds, and milliseconds.")), /* @__PURE__ */ React9.createElement("div", null, /* @__PURE__ */ React9.createElement("span", { className: "font-medium text-slate-700" }, "From Variable:"), /* @__PURE__ */ React9.createElement("div", { className: "ml-3 mt-0.5 text-slate-500 font-mono text-[9px]" }, /* @__PURE__ */ React9.createElement("code", { className: "bg-white px-1 rounded" }, "{{ctx.waitTime}}"), " \u2192 value in milliseconds")), /* @__PURE__ */ React9.createElement("div", { className: "text-green-600 bg-green-50 border border-green-200 rounded p-1.5 mt-2" }, /* @__PURE__ */ React9.createElement("strong", null, "\u2713 Non-blocking:"), " Delay uses queue scheduling. Workflow resources are released during wait.")), /* @__PURE__ */ React9.createElement(
-    "button",
+  ), /* @__PURE__ */ React7.createElement("div", { className: "p-2.5 bg-slate-50 border border-slate-200 rounded text-[10px] text-slate-600 space-y-2" }, /* @__PURE__ */ React7.createElement("div", { className: "font-semibold text-slate-700 text-xs" }, "\u{1F4D8} Delay Types"), /* @__PURE__ */ React7.createElement("div", null, /* @__PURE__ */ React7.createElement("span", { className: "font-medium text-slate-700" }, "Fixed Duration:"), /* @__PURE__ */ React7.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, "Set exact wait time using minutes, seconds, and milliseconds.")), /* @__PURE__ */ React7.createElement("div", null, /* @__PURE__ */ React7.createElement("span", { className: "font-medium text-slate-700" }, "From Variable:"), /* @__PURE__ */ React7.createElement("div", { className: "ml-3 mt-0.5 text-slate-500 font-mono text-[9px]" }, /* @__PURE__ */ React7.createElement("code", { className: "bg-white px-1 rounded" }, "{{ctx.waitTime}}"), " \u2192 value in milliseconds")), /* @__PURE__ */ React7.createElement("div", { className: "text-green-600 bg-green-50 border border-green-200 rounded p-1.5 mt-2" }, /* @__PURE__ */ React7.createElement("strong", null, "\u2713 Non-blocking:"), " Delay uses queue scheduling. Workflow resources are released during wait.")), /* @__PURE__ */ React7.createElement(
+    Button6,
     {
       type: "button",
       onClick: handleSave,
@@ -2074,12 +1879,12 @@ var DelayNode = memo6(({ data, isConnectable }) => {
     if (ms > 0) parts.push(`${ms}ms`);
     return parts.length > 0 ? parts.join(" ") : "0s";
   };
-  return /* @__PURE__ */ React9.createElement("div", { className: `
+  return /* @__PURE__ */ React7.createElement("div", { className: `
       bg-white border rounded
       min-w-[280px] max-w-[350px]
       transition-all duration-150
       ${isDisabled ? "border-slate-200 opacity-50" : "border-slate-200 hover:border-amber-400 hover:shadow-md"}
-    ` }, /* @__PURE__ */ React9.createElement("div", { className: "flex items-stretch" }, /* @__PURE__ */ React9.createElement(
+    ` }, /* @__PURE__ */ React7.createElement("div", { className: "flex items-stretch" }, /* @__PURE__ */ React7.createElement(
     "div",
     {
       style: {
@@ -2091,8 +1896,8 @@ var DelayNode = memo6(({ data, isConnectable }) => {
           ${isDisabled ? "bg-slate-50 border-slate-100" : "bg-amber-50 border-amber-100"}
         `
     },
-    /* @__PURE__ */ React9.createElement(IoMdTime, { className: `w-5 h-5 ${isDisabled ? "text-slate-400" : "text-amber-500"}` })
-  ), /* @__PURE__ */ React9.createElement("div", { className: "flex-1 px-3 py-2 min-w-0" }, /* @__PURE__ */ React9.createElement("div", { className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ React9.createElement("span", { className: `text-xs font-semibold truncate ${isDisabled ? "text-slate-400 line-through" : "text-slate-700"}` }, data?.title || "Delay"), isDisabled && /* @__PURE__ */ React9.createElement("span", { className: "inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded border border-orange-200" }, /* @__PURE__ */ React9.createElement(VscDebugDisconnect, { className: "w-2.5 h-2.5" }), "Skip")), /* @__PURE__ */ React9.createElement("div", { className: `text-[10px] font-mono mt-0.5 ${isDisabled ? "text-slate-300" : "text-slate-400"}` }, "wait ", getDelayDisplay())), /* @__PURE__ */ React9.createElement("div", { className: "flex flex-col items-center justify-center px-2 border-l border-slate-100" }, /* @__PURE__ */ React9.createElement("div", { className: `w-2 h-2 rounded-full ${isDisabled ? "bg-slate-300" : "bg-amber-400"}`, title: "After Delay" }))), /* @__PURE__ */ React9.createElement(
+    /* @__PURE__ */ React7.createElement(IoMdTime3, { className: `w-5 h-5 ${isDisabled ? "text-slate-400" : "text-amber-500"}` })
+  ), /* @__PURE__ */ React7.createElement("div", { className: "flex-1 px-3 py-2 min-w-0" }, /* @__PURE__ */ React7.createElement("div", { className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ React7.createElement("span", { className: `text-xs font-semibold truncate ${isDisabled ? "text-slate-400 line-through" : "text-slate-700"}` }, data?.title || "Delay"), isDisabled && /* @__PURE__ */ React7.createElement("span", { className: "inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded border border-orange-200" }, /* @__PURE__ */ React7.createElement(VscDebugDisconnect5, { className: "w-2.5 h-2.5" }), "Skip")), /* @__PURE__ */ React7.createElement("div", { className: `text-[10px] font-mono mt-0.5 ${isDisabled ? "text-slate-300" : "text-slate-400"}` }, "wait ", getDelayDisplay())), /* @__PURE__ */ React7.createElement("div", { className: "flex flex-col items-center justify-center px-2 border-l border-slate-100" }, /* @__PURE__ */ React7.createElement("div", { className: `w-2 h-2 rounded-full ${isDisabled ? "bg-slate-300" : "bg-amber-400"}`, title: "After Delay" }))), /* @__PURE__ */ React7.createElement(
     Handle6,
     {
       type: "target",
@@ -2106,7 +1911,7 @@ var DelayNode = memo6(({ data, isConnectable }) => {
         top: "-5px"
       }
     }
-  ), /* @__PURE__ */ React9.createElement(
+  ), /* @__PURE__ */ React7.createElement(
     Handle6,
     {
       type: "source",
@@ -2125,9 +1930,13 @@ var DelayNode = memo6(({ data, isConnectable }) => {
 });
 
 // src/nodes/endNode.jsx
-import React10, { memo as memo7, useState as useState7, useEffect as useEffect7, useMemo as useMemo7, useCallback as useCallback7 } from "react";
+import React8, { memo as memo7, useState as useState7, useEffect as useEffect7, useMemo as useMemo7, useCallback as useCallback7 } from "react";
 import { Handle as Handle7, Position as Position7 } from "reactflow";
 import { JsonForms as JsonForms7 } from "@jsonforms/react";
+import { VscDebugStop } from "react-icons/vsc";
+import { FaCheck, FaTimes, FaExclamationTriangle, FaPlus as FaPlus2, FaTrash as FaTrash2 } from "react-icons/fa";
+import { IoMdArrowDropleft } from "react-icons/io";
+import { Button as Button7, Input as Input2 } from "@jet-admin/ui";
 var END_STATUS = {
   SUCCESS: "success",
   FAILURE: "failure",
@@ -2152,23 +1961,23 @@ var OutputParameterEditor = ({ parameters, onChange, availableVariables }) => {
     const updated = parameters.filter((_, i) => i !== index);
     onChange(updated);
   };
-  return /* @__PURE__ */ React10.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React10.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React10.createElement("label", { className: "text-xs font-medium text-slate-500" }, "Output Parameters"), /* @__PURE__ */ React10.createElement(
-    "button",
+  return /* @__PURE__ */ React8.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React8.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React8.createElement("label", { className: "text-xs font-medium text-slate-500" }, "Output Parameters"), /* @__PURE__ */ React8.createElement(
+    Button7,
     {
       type: "button",
       onClick: addParameter,
       className: "flex items-center gap-1 px-2 py-1 text-xs bg-white text-[#646cff] hover:bg-[#646cff]/10 rounded transition-colors border border-slate-200"
     },
-    /* @__PURE__ */ React10.createElement(FaPlus, { className: "w-2.5 h-2.5" }),
+    /* @__PURE__ */ React8.createElement(FaPlus2, { className: "w-2.5 h-2.5" }),
     "Add Output"
-  )), /* @__PURE__ */ React10.createElement("p", { className: "text-[10px] text-slate-400" }, "Define outputs that will be returned when the workflow completes."), parameters.length === 0 ? /* @__PURE__ */ React10.createElement("div", { className: "text-xs text-slate-400 italic py-3 text-center border border-dashed border-slate-200 rounded" }, "No output parameters defined. Workflow will complete with no output.") : /* @__PURE__ */ React10.createElement("div", { className: "space-y-2" }, parameters.map((param, index) => /* @__PURE__ */ React10.createElement(
+  )), /* @__PURE__ */ React8.createElement("p", { className: "text-[10px] text-slate-400" }, "Define outputs that will be returned when the workflow completes."), parameters.length === 0 ? /* @__PURE__ */ React8.createElement("div", { className: "text-xs text-slate-400 italic py-3 text-center border border-dashed border-slate-200 rounded" }, "No output parameters defined. Workflow will complete with no output.") : /* @__PURE__ */ React8.createElement("div", { className: "space-y-2" }, parameters.map((param, index) => /* @__PURE__ */ React8.createElement(
     "div",
     {
       key: param.id,
       className: "border border-slate-200 rounded p-2 bg-slate-50"
     },
-    /* @__PURE__ */ React10.createElement("div", { className: "flex items-center justify-between mb-2" }, /* @__PURE__ */ React10.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React10.createElement(IoMdArrowDropleft, { className: "w-3 h-3 text-red-500" }), /* @__PURE__ */ React10.createElement(
-      "input",
+    /* @__PURE__ */ React8.createElement("div", { className: "flex items-center justify-between mb-2" }, /* @__PURE__ */ React8.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React8.createElement(IoMdArrowDropleft, { className: "w-3 h-3 text-red-500" }), /* @__PURE__ */ React8.createElement(
+      Input2,
       {
         type: "text",
         value: param.name,
@@ -2176,18 +1985,18 @@ var OutputParameterEditor = ({ parameters, onChange, availableVariables }) => {
         className: "text-xs font-mono font-medium text-slate-700 bg-white border border-slate-200 rounded px-2 py-1 w-28 focus:outline-none focus:border-[#646cff]",
         placeholder: "outputName"
       }
-    )), /* @__PURE__ */ React10.createElement(
-      "button",
+    )), /* @__PURE__ */ React8.createElement(
+      Button7,
       {
         type: "button",
         onClick: () => removeParameter(index),
         className: "p-1 bg-white text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors",
         title: "Remove output"
       },
-      /* @__PURE__ */ React10.createElement(FaTrash, { className: "w-3 h-3" })
+      /* @__PURE__ */ React8.createElement(FaTrash2, { className: "w-3 h-3" })
     )),
-    /* @__PURE__ */ React10.createElement("div", null, /* @__PURE__ */ React10.createElement("label", { className: "text-[10px] text-slate-400" }, "Source Variable"), /* @__PURE__ */ React10.createElement(
-      "input",
+    /* @__PURE__ */ React8.createElement("div", null, /* @__PURE__ */ React8.createElement("label", { className: "text-[10px] text-slate-400" }, "Source Variable"), /* @__PURE__ */ React8.createElement(
+      Input2,
       {
         type: "text",
         value: param.sourceVariable,
@@ -2195,9 +2004,9 @@ var OutputParameterEditor = ({ parameters, onChange, availableVariables }) => {
         placeholder: "ctx.result or a value",
         className: "w-full text-xs text-slate-700 p-1.5 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff]"
       }
-    ), availableVariables.length > 0 && /* @__PURE__ */ React10.createElement("p", { className: "text-[9px] text-slate-400 mt-0.5" }, "Available: ", availableVariables.slice(0, 5).map((v) => `ctx.${v.variable}`).join(", "), availableVariables.length > 5 && "...")),
-    /* @__PURE__ */ React10.createElement("div", { className: "mt-2" }, /* @__PURE__ */ React10.createElement("label", { className: "text-[10px] text-slate-400" }, "Description"), /* @__PURE__ */ React10.createElement(
-      "input",
+    ), availableVariables.length > 0 && /* @__PURE__ */ React8.createElement("p", { className: "text-[9px] text-slate-400 mt-0.5" }, "Available: ", availableVariables.slice(0, 5).map((v) => `ctx.${v.variable}`).join(", "), availableVariables.length > 5 && "...")),
+    /* @__PURE__ */ React8.createElement("div", { className: "mt-2" }, /* @__PURE__ */ React8.createElement("label", { className: "text-[10px] text-slate-400" }, "Description"), /* @__PURE__ */ React8.createElement(
+      Input2,
       {
         type: "text",
         value: param.description,
@@ -2291,7 +2100,7 @@ var EndNodeConfigurator = ({ data, onChange, nodeId }) => {
   const handleSave = useCallback7(() => {
     onChange(formData);
   }, [onChange, formData]);
-  return /* @__PURE__ */ React10.createElement("div", { className: "w-full h-full" }, /* @__PURE__ */ React10.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React10.createElement(
+  return /* @__PURE__ */ React8.createElement("div", { className: "w-full h-full" }, /* @__PURE__ */ React8.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React8.createElement(
     JsonForms7,
     {
       schema,
@@ -2300,15 +2109,15 @@ var EndNodeConfigurator = ({ data, onChange, nodeId }) => {
       renderers: jetFormsRenderers,
       onChange: handleFormChange
     }
-  ), /* @__PURE__ */ React10.createElement("div", { className: "border-t border-slate-100 pt-4" }, /* @__PURE__ */ React10.createElement(
+  ), /* @__PURE__ */ React8.createElement("div", { className: "border-t border-slate-100 pt-4" }, /* @__PURE__ */ React8.createElement(
     OutputParameterEditor,
     {
       parameters: formData.outputParameters,
       onChange: handleParametersChange,
       availableVariables
     }
-  )), /* @__PURE__ */ React10.createElement("div", { className: "p-2.5 bg-slate-50 border border-slate-200 rounded text-[10px] text-slate-600 space-y-2" }, /* @__PURE__ */ React10.createElement("div", { className: "font-semibold text-slate-700 text-xs" }, "\u{1F4D8} Workflow Output"), /* @__PURE__ */ React10.createElement("div", null, /* @__PURE__ */ React10.createElement("span", { className: "font-medium text-slate-700" }, "Source Variable Format:"), /* @__PURE__ */ React10.createElement("div", { className: "ml-3 mt-0.5 text-slate-500 font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ React10.createElement("div", null, /* @__PURE__ */ React10.createElement("code", { className: "bg-white px-1 rounded" }, "{{ctx.queryResult}}"), " \u2192 from previous node"), /* @__PURE__ */ React10.createElement("div", null, /* @__PURE__ */ React10.createElement("code", { className: "bg-white px-1 rounded" }, "{{ctx.processedData}}"), " \u2192 from script node"))), /* @__PURE__ */ React10.createElement("div", null, /* @__PURE__ */ React10.createElement("span", { className: "font-medium text-slate-700" }, "Completion Status:"), /* @__PURE__ */ React10.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, /* @__PURE__ */ React10.createElement("strong", null, "Success:"), " Normal completion \u2022 ", /* @__PURE__ */ React10.createElement("strong", null, "Failure:"), " Ended with error \u2022 ", /* @__PURE__ */ React10.createElement("strong", null, "Cancelled:"), " Manual stop")), /* @__PURE__ */ React10.createElement("div", null, /* @__PURE__ */ React10.createElement("span", { className: "font-medium text-slate-700" }, "Multiple End Nodes:"), /* @__PURE__ */ React10.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, "You can have multiple End nodes for different outcomes (e.g., success/failure branches)."))), /* @__PURE__ */ React10.createElement(
-    "button",
+  )), /* @__PURE__ */ React8.createElement("div", { className: "p-2.5 bg-slate-50 border border-slate-200 rounded text-[10px] text-slate-600 space-y-2" }, /* @__PURE__ */ React8.createElement("div", { className: "font-semibold text-slate-700 text-xs" }, "\u{1F4D8} Workflow Output"), /* @__PURE__ */ React8.createElement("div", null, /* @__PURE__ */ React8.createElement("span", { className: "font-medium text-slate-700" }, "Source Variable Format:"), /* @__PURE__ */ React8.createElement("div", { className: "ml-3 mt-0.5 text-slate-500 font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ React8.createElement("div", null, /* @__PURE__ */ React8.createElement("code", { className: "bg-white px-1 rounded" }, "{{ctx.queryResult}}"), " \u2192 from previous node"), /* @__PURE__ */ React8.createElement("div", null, /* @__PURE__ */ React8.createElement("code", { className: "bg-white px-1 rounded" }, "{{ctx.processedData}}"), " \u2192 from script node"))), /* @__PURE__ */ React8.createElement("div", null, /* @__PURE__ */ React8.createElement("span", { className: "font-medium text-slate-700" }, "Completion Status:"), /* @__PURE__ */ React8.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, /* @__PURE__ */ React8.createElement("strong", null, "Success:"), " Normal completion \u2022 ", /* @__PURE__ */ React8.createElement("strong", null, "Failure:"), " Ended with error \u2022 ", /* @__PURE__ */ React8.createElement("strong", null, "Cancelled:"), " Manual stop")), /* @__PURE__ */ React8.createElement("div", null, /* @__PURE__ */ React8.createElement("span", { className: "font-medium text-slate-700" }, "Multiple End Nodes:"), /* @__PURE__ */ React8.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, "You can have multiple End nodes for different outcomes (e.g., success/failure branches)."))), /* @__PURE__ */ React8.createElement(
+    Button7,
     {
       type: "button",
       onClick: handleSave,
@@ -2387,24 +2196,24 @@ var EndNode = memo7(({ id, data, isConnectable }) => {
   };
   const ExecutionIndicator = () => {
     if (executionStatus === "running") {
-      return /* @__PURE__ */ React10.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center animate-spin z-10" }, /* @__PURE__ */ React10.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React10.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" })));
+      return /* @__PURE__ */ React8.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center animate-spin z-10" }, /* @__PURE__ */ React8.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React8.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" })));
     }
     if (executionStatus === "completed") {
-      return /* @__PURE__ */ React10.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ React10.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React10.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" })));
+      return /* @__PURE__ */ React8.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ React8.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React8.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" })));
     }
     if (executionStatus === "failed") {
-      return /* @__PURE__ */ React10.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ React10.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React10.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M6 18L18 6M6 6l12 12" })));
+      return /* @__PURE__ */ React8.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ React8.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React8.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M6 18L18 6M6 6l12 12" })));
     }
     return null;
   };
   const statusConfig = getStatusConfig();
   const StatusIcon = statusConfig.icon;
-  return /* @__PURE__ */ React10.createElement("div", { className: `
+  return /* @__PURE__ */ React8.createElement("div", { className: `
       relative bg-white border rounded
       min-w-[280px] max-w-[350px]
       transition-all duration-150
       ${getExecutionStatusStyles()} ${statusConfig.hoverBorder} hover:shadow-md
-    ` }, /* @__PURE__ */ React10.createElement(ExecutionIndicator, null), /* @__PURE__ */ React10.createElement(
+    ` }, /* @__PURE__ */ React8.createElement(ExecutionIndicator, null), /* @__PURE__ */ React8.createElement(
     Handle7,
     {
       type: "target",
@@ -2418,7 +2227,7 @@ var EndNode = memo7(({ id, data, isConnectable }) => {
         top: "-5px"
       }
     }
-  ), /* @__PURE__ */ React10.createElement("div", { className: "flex items-stretch" }, /* @__PURE__ */ React10.createElement(
+  ), /* @__PURE__ */ React8.createElement("div", { className: "flex items-stretch" }, /* @__PURE__ */ React8.createElement(
     "div",
     {
       style: {
@@ -2430,12 +2239,12 @@ var EndNode = memo7(({ id, data, isConnectable }) => {
             ${executionStatus === "running" ? "bg-blue-100 border-blue-200" : executionStatus === "completed" ? "bg-green-100 border-green-200" : executionStatus === "failed" ? "bg-red-50 border-red-100" : `${statusConfig.bgColor} ${statusConfig.borderColor}`}
           `
     },
-    /* @__PURE__ */ React10.createElement(StatusIcon, { className: `w-5 h-5 ${executionStatus === "running" ? "text-blue-600" : executionStatus === "completed" ? "text-green-600" : executionStatus === "failed" ? "text-red-600" : statusConfig.textColor}` })
-  ), /* @__PURE__ */ React10.createElement("div", { className: "flex-1 px-3 py-2 min-w-0" }, /* @__PURE__ */ React10.createElement("div", { className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ React10.createElement("span", { className: "text-xs font-semibold truncate text-slate-700" }, data?.title || "End"), /* @__PURE__ */ React10.createElement("span", { className: `text-xs font-medium px-1.5 py-0.5 rounded border ${statusConfig.bgColor} ${statusConfig.textColor} ${statusConfig.borderColor}` }, statusConfig.label)), /* @__PURE__ */ React10.createElement("div", { className: "text-[10px] mt-0.5 text-slate-400" }, outputCount === 0 ? "No outputs defined" : `${outputCount} output${outputCount !== 1 ? "s" : ""}: ${outputParams.slice(0, 3).map((p) => p.name).join(", ")}${outputCount > 3 ? "..." : ""}`)), /* @__PURE__ */ React10.createElement("div", { className: "flex flex-col items-center justify-center px-2 border-l border-slate-100" }, /* @__PURE__ */ React10.createElement("div", { className: `w-2 h-2 rounded-full`, style: { backgroundColor: statusConfig.handleColor }, title: statusConfig.label }))));
+    /* @__PURE__ */ React8.createElement(StatusIcon, { className: `w-5 h-5 ${executionStatus === "running" ? "text-blue-600" : executionStatus === "completed" ? "text-green-600" : executionStatus === "failed" ? "text-red-600" : statusConfig.textColor}` })
+  ), /* @__PURE__ */ React8.createElement("div", { className: "flex-1 px-3 py-2 min-w-0" }, /* @__PURE__ */ React8.createElement("div", { className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ React8.createElement("span", { className: "text-xs font-semibold truncate text-slate-700" }, data?.title || "End"), /* @__PURE__ */ React8.createElement("span", { className: `text-xs font-medium px-1.5 py-0.5 rounded border ${statusConfig.bgColor} ${statusConfig.textColor} ${statusConfig.borderColor}` }, statusConfig.label)), /* @__PURE__ */ React8.createElement("div", { className: "text-[10px] mt-0.5 text-slate-400" }, outputCount === 0 ? "No outputs defined" : `${outputCount} output${outputCount !== 1 ? "s" : ""}: ${outputParams.slice(0, 3).map((p) => p.name).join(", ")}${outputCount > 3 ? "..." : ""}`)), /* @__PURE__ */ React8.createElement("div", { className: "flex flex-col items-center justify-center px-2 border-l border-slate-100" }, /* @__PURE__ */ React8.createElement("div", { className: `w-2 h-2 rounded-full`, style: { backgroundColor: statusConfig.handleColor }, title: statusConfig.label }))));
 });
 
 // src/map.js
-import React11 from "react";
+import React9 from "react";
 var WORKFLOW_NODE_TYPES = {
   START: { value: "start", label: "Start" },
   DATA_QUERY: { value: "dataQuery", label: "Data Query" },
@@ -2932,16 +2741,17 @@ var WORKFLOW_NODES_MAP = {
 };
 
 // src/StatusIndicator.jsx
-import React12 from "react";
+import React10 from "react";
+import { TbRefresh as TbRefresh3 } from "react-icons/tb";
 var StatusIndicator = ({ executionStatus }) => {
   if (executionStatus === "running") {
-    return /* @__PURE__ */ React12.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center animate-spin z-10" }, /* @__PURE__ */ React12.createElement(TbRefresh, { className: "w-3 h-3 text-white" }));
+    return /* @__PURE__ */ React10.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center animate-spin z-10" }, /* @__PURE__ */ React10.createElement(TbRefresh3, { className: "w-3 h-3 text-white" }));
   }
   if (executionStatus === "completed") {
-    return /* @__PURE__ */ React12.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ React12.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React12.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" })));
+    return /* @__PURE__ */ React10.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ React10.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React10.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" })));
   }
   if (executionStatus === "failed") {
-    return /* @__PURE__ */ React12.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ React12.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React12.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M6 18L18 6M6 6l12 12" })));
+    return /* @__PURE__ */ React10.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ React10.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React10.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M6 18L18 6M6 6l12 12" })));
   }
   return null;
 };

@@ -2,6 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { MdDeleteOutline } from 'react-icons/md';
+import { Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@jet-admin/ui';
 
 export const CustomFieldOperatorValueArrayRenderer = ({
   data,
@@ -52,7 +53,7 @@ export const CustomFieldOperatorValueArrayRenderer = ({
           <div key={`${path}-${index}`} className="flex items-center gap-2">
             {/* Field */}
             <div className="flex-1">
-              <input
+              <Input
                 type="text"
                 placeholder="Field"
                 value={item.field || ""}
@@ -63,20 +64,20 @@ export const CustomFieldOperatorValueArrayRenderer = ({
             </div>
             {/* Operator */}
             <div className="w-36">
-              <select
-                value={item.operator || "=="}
-                disabled={isDisabled}
-                onChange={(e) => handleItemChange(index, "operator", e.target.value)}
-                className="w-full px-2.5 py-1.5 text-sm bg-slate-50 border border-slate-200 rounded text-slate-700 focus:border-slate-700 disabled:opacity-50"
-              >
-                {operatorOptions.map((op) => (
-                  <option key={op} value={op}>{op}</option>
-                ))}
-              </select>
+              <Select value={item.operator || "=="} onValueChange={(val) => handleItemChange(index, "operator", val)} disabled={isDisabled}>
+                <SelectTrigger className="text-sm">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {operatorOptions.map((op) => (
+                    <SelectItem key={op} value={op}>{op}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             {/* Value */}
             <div className="flex-1">
-              <input
+              <Input
                 type="text"
                 placeholder="Value"
                 value={item.value || ""}
@@ -86,26 +87,26 @@ export const CustomFieldOperatorValueArrayRenderer = ({
               />
             </div>
             {/* Delete Button */}
-            <button
+            <Button
               type="button"
               onClick={() => handleRemoveItem(index)}
               disabled={isDisabled}
               className="p-2 rounded bg-red-100 text-red-400 focus:outline-none hover:bg-red-200 disabled:opacity-50"
             >
               <MdDeleteOutline />
-            </button>
+            </Button>
           </div>
         ))}
       </div>
 
-      <button
+      <Button
         type="button"
         onClick={handleAddItem}
         disabled={isDisabled}
         className="mt-3 px-2 py-1 bg-white text-[#646cff] text-xs rounded hover:border-[#646cff] focus:outline-none border border-slate-200 disabled:opacity-50"
       >
         Add Condition
-      </button>
+      </Button>
     </div>
   );
 };

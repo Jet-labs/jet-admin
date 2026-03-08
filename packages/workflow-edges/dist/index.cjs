@@ -57,6 +57,7 @@ var WorkflowEdgeContext = (0, import_react.createContext)({
 var useWorkflowEdge = () => (0, import_react.useContext)(WorkflowEdgeContext);
 
 // src/edges/DeletableEdge.jsx
+var import_ui = require("@jet-admin/ui");
 function DeletableEdge({
   id,
   sourceX,
@@ -135,7 +136,7 @@ function DeletableEdge({
       className: "nodrag nopan"
     },
     isEditing ? /* @__PURE__ */ import_react2.default.createElement(
-      "input",
+      import_ui.Input,
       {
         autoFocus: true,
         value: edgeLabel,
@@ -146,7 +147,7 @@ function DeletableEdge({
         placeholder: "Name edge"
       }
     ) : /* @__PURE__ */ import_react2.default.createElement("div", { className: "flex items-center gap-1 group" }, /* @__PURE__ */ import_react2.default.createElement(
-      "button",
+      import_ui.Button,
       {
         className: "w-5 h-5 bg-white border border-slate-200 rounded-full flex items-center justify-center cursor-pointer shadow-sm hover:bg-red-50 hover:border-red-200 transition-colors text-slate-400 hover:text-red-500 text-[10px]",
         onClick: onDeleteClick,

@@ -2,6 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { MdDeleteOutline } from 'react-icons/md';
+import { Button, Input } from '@jet-admin/ui';
 
 export const CustomStringArrayRenderer = (props) => {
   const { data, path, handleChange, label, uischema, enabled, visible } = props;
@@ -37,7 +38,7 @@ export const CustomStringArrayRenderer = (props) => {
         {arrayData.map((item, index) => (
           <div key={`${path}-${index}`} className="flex items-center space-x-2 mb-2">
             <div className="flex-grow">
-              <input
+              <Input
                 type="text"
                 value={item || ''}
                 onChange={(e) => handleItemChange(index, e.target.value)}
@@ -46,14 +47,14 @@ export const CustomStringArrayRenderer = (props) => {
                 className="w-full placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-200 text-slate-700 rounded focus:border-slate-400 focus:outline-none px-2.5 py-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
               />
             </div>
-            <button
+            <Button
               type="button"
               onClick={() => handleRemoveItem(index)}
               disabled={!enabled}
               className="p-2 rounded bg-red-100 text-red-400 focus:outline-none hover:border-red-400 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <MdDeleteOutline />
-            </button>
+            </Button>
           </div>
         ))}
       </div>
@@ -64,14 +65,14 @@ export const CustomStringArrayRenderer = (props) => {
         </div>
       )}
 
-      <button
+      <Button
         type="button"
         onClick={handleAddItem}
         disabled={!enabled}
         className="mt-3 px-2 py-1 bg-white text-[#646cff] text-xs rounded hover:border-[#646cff] focus:outline-none border border-slate-200 disabled:opacity-50 disabled:cursor-not-allowed"
       >
         Add Item
-      </button>
+      </Button>
     </div>
   );
 };
