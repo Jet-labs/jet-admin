@@ -1,8 +1,4 @@
 {
   "label": "Data Query",
-  "position": 2,
-  "link": {
-    "type": "generated-index",
-    "description": "Query your data with SQL or JavaScript."
-  }
+  "position": 2
 }

@@ -5,273 +5,250 @@ title: Backend Architecture
 
 # Backend Architecture
 
-## Overview
+Jet Admin's backend is a modular Node.js application that combines API routing, multi-tenant authorization, Prisma persistence, realtime sockets, cron startup, and an in-process workflow runtime.
 
-The backend is a modular Node.js application built with Express, Prisma ORM, and Firebase authentication. It follows a layered architecture pattern designed for scalability, maintainability, and multi-tenant support.
+## Architectural goals
 
-## Architecture Diagram
+The backend is organized to support:
+
+- **tenant-scoped access control**,
+- **feature modularity** through per-domain modules,
+- **reusable configuration surfaces** under `config/`,
+- **mixed execution styles**: synchronous REST, realtime sockets, and asynchronous workflow jobs,
+- **incremental extensibility** without splitting the repository into separate deployable services.
+
+## Runtime overview
 
 ```mermaid
-flowchart LR  
-    %% Define styles for different node types
-    classDef entryNode fill:#4CAF50,color:white,stroke:#2E7D32,stroke-width:2px,rounded
-    classDef configNode fill:#2196F3,color:white,stroke:#0D47A1,stroke-width:2px,rounded
-    classDef featureNode fill:#FF9800,color:black,stroke:#E65100,stroke-width:2px,rounded
-    classDef dbNode fill:#673AB7,color:white,stroke:#311B92,stroke-width:2px,rounded
-    classDef utilNode fill:#009688,color:white,stroke:#00695C,stroke-width:2px,rounded
-    classDef scriptNode fill:#795548,color:white,stroke:#3E2723,stroke-width:2px,rounded
-    classDef module fill:#FFECB3,stroke:#FFA000,stroke-width:1px,rounded,color:black
-    
-    %% Style for subgraphs
-    classDef sectionStyle fill:#F5F5F5,stroke:#BDBDBD,stroke-width:3px,color:#212121,stroke-dasharray:5 5
-    
-    %% Entry section
-    subgraph Entry["🚀 Entry Layer"]
-        direction TB
-        A[index.js] -->|loads| B[environment.js]
-        A -->|configures| C[Express Server]
-        C -->|uses| D[package.json]
-    end
-    
-    %% Configuration section
-    subgraph Configuration["⚙️ Configuration Layer"]
-        direction TB
-        E[config/] --> F[express-app.config.js]
-        E --> G[firebase.config.js]
-        E --> H[winston.config.js]
-        E --> I[tenant-aware-pgpool-manager.config.js]
-        E --> J[prisma.config.js]
-    end
-    
-    %% Connect Entry to Configuration
-    C -->|initializes| E
-    
-    %% Feature Modules section
-    subgraph FeatureModules["🧩 Feature Modules"]
-        direction TB
-        K[modules/] --> L[auth/]
-        K --> M[tenant/]
-        K --> N[database*/]
-        K --> O[userManagement/]
-        K --> n1[databaseTable/]
-        
-        subgraph AuthModule["Auth Module"]
-            direction TB
-            L1[Controller/Service/Routes/Middleware]
-        end
-        
-        subgraph TenantModule["Tenant Module"]
-            direction TB
-            M1[Controller/Service/Routes/Middleware]
-        end
-        
-        subgraph DatabaseModule["Database Module"]
-            direction TB
-            N1[Controller/Service/Processor/Models]
-        end
-        
-        subgraph DbTableModule["Database Table Module"]
-            direction TB
-            n2[Controller/Service/Routes/Middleware]
-        end
-        
-        L --> L1
-        M --> M1
-        N --> N1
-        n1 --> n2
-    end
-    
-    %% Connect Entry to FeatureModules
-    C -->|routes to| K
-    
-    %% Database Layer section
-    subgraph DatabaseLayer["💾 Database Layer"]
-        direction TB
-        P[Prisma Client] --> Q[(PostgreSQL)]
-        P --> R[prisma/schema.prisma]
-        P --> S[prisma/migrations/]
-        T[scripts/dev/] -->|seeds| Q
-    end
-    
-    %% Connect Configuration to Database
-    J --> P
-    
-    %% Utilities section
-    subgraph Utilities["🛠️ Utilities"]
-        direction TB
-        U[utils/] --> V[logger.js]
-        U --> W[error.util.js]
-        U --> X[crypto.util.js]
-        U --> Y[postgresql.util.js]
-        U --> Z[time.util.js]
-    end
-    
-    %% Cross-module connections
-    L1 --> P
-    M1 --> P
-    N1 --> Y
-    N1 --> I
-    n2 --> Y
-    n2 --> I
-    O --> P
-    I -->|pool manager for each tenant| Q
-    
-    %% Apply styles
-    class A,B,C,D entryNode
-    class E,F,G,H,I,J configNode
-    class K,L,M,N,O,n1 featureNode
-    class L1,M1,N1,n2 module
-    class P,Q,R,S dbNode
-    class T scriptNode
-    class U,V,W,X,Y,Z utilNode
-    
-    %% Apply styles to subgraphs
-    class Entry,Configuration,FeatureModules,DatabaseLayer,Utilities,AuthModule,TenantModule,DatabaseModule,DbTableModule sectionStyle
+flowchart TB
+    Entry[index.js] --> Env[environment.js]
+    Entry --> Express[express-app.config.js]
+    Entry --> HTTP[http-server.config.js]
+    Entry --> Socket[socket.io server]
+
+    Express --> AuthRoutes[/api/v1/auth]
+    Express --> TenantRoutes[/api/v1/tenants]
+
+    TenantRoutes --> FeatureModules[tenant nested modules]
+    FeatureModules --> Database[database / datasource / queries]
+    FeatureModules --> Dashboards[dashboard / widget]
+    FeatureModules --> Admin[user management / roles / api keys]
+    FeatureModules --> Workflow[workflow]
+
+    AuthRoutes --> Prisma[(PostgreSQL via Prisma)]
+    FeatureModules --> Prisma
+
+    Entry --> Cron[node-cron startup]
+    Entry --> Workers[workflowWorkers.js]
+    Workers --> Queue[fastq in-memory queue adapter]
+    Workers --> Orchestrator[result consumer]
+    Workers --> TaskWorker[node executor]
+    Orchestrator --> Prisma
+    TaskWorker --> External[external systems / datasources / vm2]
+    Orchestrator --> Socket
 ```
 
-## Core Architecture Components
+## Entry point and application boot
 
-### Application Entry Point
+The main process starts in `apps/backend/index.js`.
 
-The application initializes through `index.js`, which:
-- Loads environment variables
-- Configures the Express application
-- Sets up logging
-- Initializes Firebase connection
-- Starts the HTTP server
+At startup it:
 
-### Configuration Layer
+1. loads environment variables from `apps/backend/.env` through `environment.js`,
+2. initializes the Express app and HTTP server,
+3. mounts top-level routes such as `/health`, `/monitor`, `/api/v1/auth`, and `/api/v1/tenants`,
+4. attaches Socket.IO listeners for AI chat, workflow execution rooms, and widget-workflow events,
+5. schedules cron jobs,
+6. starts workflow workers using the active queue adapter,
+7. registers graceful shutdown handling.
 
-Located in the `config` directory:
+## Configuration layer
 
-- **express-app.config.js**: Configures the Express application, middleware, and routes
-- **firebase.config.js**: Initializes Firebase for authentication services
-- **prisma.config.js**: Sets up the Prisma client for database operations
-- **tenant-aware-pgpool-manager.config.js**: Manages database connection pools for multi-tenant support
-- **winston.config.js**: Configures the Winston logging service
+Most operational behavior is centralized under `apps/backend/config/`.
 
-### Middleware Layer
+Important configuration files include:
 
-Key middleware components:
+| File | Responsibility |
+| --- | --- |
+| `express-app.config.js` | Express instance, CORS, body parsing, trust proxy, request-size limits, Morgan logging. |
+| `http-server.config.js` | Wraps the Express app in a Node HTTP server. |
+| `socket.io.js` | Creates the Socket.IO server and applies socket auth middleware. |
+| `prisma.config.js` | Exposes the Prisma client used by service modules. |
+| `queue.config.js` | Active in-memory workflow queue implementation using `fastq`. |
+| `rabbitmq.config.js` | Legacy/alternate AMQP-oriented queue implementation retained in the repo. |
+| `module.config.js` | Enables/disables feature modules through `ENABLED_MODULES`. |
 
-- **Authentication Middleware** (`auth.middleware.js`): Validates Firebase authentication
-- **Tenant Middleware** (`tenant.middleware.js`): Handles tenant context for multi-tenant operations
-- **Database Middleware** (`database.middleware.js`): Manages database connections and transactions
-- **Error Handling** (`utils/error.util.js`): Provides centralized error handling
-- **Logging** (`utils/logger.js`): Implements application-wide logging
+## Environment model
 
-### Module Layer
+`apps/backend/environment.js` reads `.env` from the backend app directory and exposes a normalized config object.
 
-The application's functionality is organized into modular components in the `modules` directory:
+Commonly used variables include:
 
-**Core Modules:**
-- **auth**: Authentication and authorization mechanisms
-- **tenant**: Multi-tenancy implementation
-- **tenantRole**: Role-based access control
-- **userManagement**: User operations and profile management
+- `NODE_ENV`, `NODE_ID`, `PORT`
+- `ENABLED_MODULES`
+- `DATABASE_URL`
+- `CORS_WHITELIST`
+- `EXPRESS_REQUEST_SIZE_LIMIT`
+- `GEMINI_API_KEY`
+- `LOG_LEVEL`, `LOG_RETENTION`, `LOG_FILE_SIZE`
+- `SYSLOG_HOST`, `SYSLOG_PORT`, `SYSLOG_PROTOCOL`, `SYSLOG_LEVEL`
 
-**Database Modules:**
-- **database**: Core database operations
-- **databaseChart**: Chart generation and visualization
-- **dashboard**: Dashboard configuration and management
-- **dataQuery**: Query execution and management
-- **databaseTable**: Table operations and schema management
-- **databaseTrigger**: Event-driven database triggers
+## Routing and module composition
 
-**Module Structure:**
-Each module follows a consistent structure:
-- **Controller** (`*.controller.js`): Handles HTTP requests and responses
-- **Service** (`*.service.js`): Contains business logic
-- **Routes** (`*.v1.routes.js`): Defines API endpoints
-- **Middleware** (`*.middleware.js`): Module-specific request processing
+The backend is not split into microservices. Instead, it uses a **modular monolith** layout where feature areas own their controller/service/route/middleware files.
 
-### Data Access Layer
+### Top-level routes
 
-- **Prisma ORM**: Object-Relational Mapping for PostgreSQL (used by core, queries, chart, dashboard modules)
-  - `prisma/schema.prisma`: Database schema definition
-  - `prisma/migrations`: Database migration files
-- **Node PG**: Postgres SQL node client (used by database, databaseTable & databaseTrigger module)
-  - `config/tenant-aware-pgpool-manager.config.js`: Manages database connections per tenant/schema.prisma
-  - `utils/postgresql.util.js`: Contains raw database queries used by pg client
-- **PostgreSQL**: Persistent data storage
+- `/api/v1/auth` for current-user and user-config endpoints
+- `/api/v1/tenants` for tenant CRUD and tenant-scoped feature routing
 
-### Utility Layer
+### Tenant-scoped nested routes
 
-Located in the `utils` directory:
-- **Error Handling** (`error.util.js`): Custom error classes and error handling functions
-- **Logging** (`logger.js`): Logging utility for application events
-- **String Utilities**: Functions for string manipulation and validation
-- **Date Utilities**: Date formatting and manipulation
-- **Security Utilities**: Encryption and hashing functions
+`tenant.v1.routes.js` mounts the feature modules under `/:tenantID/...`, including:
 
-### Scripts
+- `database`
+- `datasources`
+- `queries`
+- `workflows`
+- `widgets`
+- `dashboards`
+- `users`
+- `roles`
+- `apikeys`
+- `cronjobs`
+- `audit`
+- `ai`
 
-- **Database Seeding** (`scripts/seed.js`): Initializes database with seed data
-- **Development Tools** (`scripts/dev/`): Utilities for development workflows
-  - Module generation templates
-  - Test data generators
+This structure keeps most business operations explicitly tenant-bound.
 
-## Authentication Flow
+## Common module shape
 
-1. Client submits credentials to Firebase Authentication
-2. Firebase returns firebase token to client
-3. Client includes firebase in Authorization header for subsequent requests
-4. Authentication middleware validates the token
-5. Tenant middleware establishes tenant context
-6. Role-based access control enforces permissions
+Most backend modules follow a stable pattern:
 
-## Request Processing Pipeline
+| File type | Role |
+| --- | --- |
+| `*.controller.js` | Request/response orchestration and HTTP formatting. |
+| `*.service.js` | Business logic and persistence coordination. |
+| `*.v1.routes.js` / `*.v1.route.js` | Endpoint registration. |
+| `*.middleware.js` | Auth, validation, policy, and resource-specific checks. |
+| `*.validator.js` | Input schemas used by validation helpers. |
 
-1. Request received by Express server
-2. Global middleware processes request:
-   - Logging
-   - CORS handling
-   - Body parsing
-   - Authentication
-3. Tenant middleware establishes tenant context
-4. Route-specific middleware applies:
-   - Parameter validation
-   - Resource-specific checks
-5. Controller processes the request
-6. Service layer implements business logic
-7. Prisma client interacts with PostgreSQL database
-8. Response flows back through the layers
-9. Error handling middleware catches exceptions
+This consistency is important when adding new modules or tracing a request path.
 
-## Multi-tenancy Architecture
+## Authentication and authorization
 
-The system implements a multi-tenant architecture with:
+Authentication and authorization are centered in `modules/auth/`.
 
-- **Tenant Isolation**: Each tenant's data is logically separated
-- **Tenant-Aware Connection Pooling**: Optimized database connections per tenant
-- **Role-Based Access Control**: Permissions scoped to tenant contexts
-- **Tenant Middleware**: Automatically applies tenant context to requests
+### Authentication modes
 
-## Error Handling Strategy
+The HTTP middleware supports two authorization styles:
 
-The application implements a hierarchical error handling approach:
+1. **Firebase bearer tokens** using `Authorization: Bearer <id-token>`
+2. **API key auth** using `Authorization: api_key <key>`
 
-- **Custom Error Classes**: Extend standard Error for specific scenarios
-- **Service-Level Error Handling**: Business logic validation and error generation
-- **Controller-Level Error Handling**: HTTP-specific error handling
-- **Global Error Middleware**: Catches unhandled errors
-- **Structured Error Responses**: Consistent error format for API clients
+Sockets are authenticated separately using Firebase ID tokens passed in the handshake.
 
-## Logging Architecture
+### Authorization model
 
-- **Winston Logger**: Configured for different environments
-- **Log Levels**: Debug, Info, Warning, Error
-- **Log Destinations**:
-  - Console (development)
-  - Files (rotation based on size and retention policy)
-  - Syslog (production)
-- **Context Enrichment**: Adds request ID, tenant ID, and user information to logs
+Authorization is **tenant-scoped RBAC**:
 
-## Security Architecture
+- the request must resolve a valid tenant context,
+- roles are loaded through Prisma relations,
+- permissions are evaluated against the requested action,
+- tenant `ADMIN` short-circuits deeper permission checks,
+- API keys are evaluated against their own mapped permissions.
 
-- **Authentication**: Firebase
-- **Authorization**: Role-based access control
-- **Data Validation**: Input validation at controller level
-- **CORS Protection**: Whitelist-based approach
-- **Rate Limiting**: Prevents abuse
-- **Environment Isolation**: Configuration-based security settings
+## Request lifecycle
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Express
+    participant Auth
+    participant Route
+    participant Service
+    participant Prisma
+
+    Client->>Express: HTTP request
+    Express->>Auth: authProvider / permission middleware
+    Auth-->>Route: authContext + tenant validation
+    Route->>Service: validated command
+    Service->>Prisma: read/write
+    Prisma-->>Service: persisted data
+    Service-->>Route: result
+    Route-->>Client: JSON response
+```
+
+Validation is typically applied before controllers using shared helpers such as `validate()` and `validateAll()`.
+
+## Data access strategy
+
+Jet Admin uses more than one data-access style:
+
+### 1. Application persistence
+
+Prisma is used for the application's own metadata and control-plane data, such as:
+
+- tenants,
+- users,
+- roles and permissions,
+- API keys,
+- workflows and workflow instances,
+- dashboard and widget metadata.
+
+### 2. Tenant-connected data systems
+
+For tenant-facing operational data access, modules may use datasource logic or database utilities to interact with external systems and tenant-specific resources.
+
+This distinction is important:
+
+- **Prisma/PostgreSQL** stores Jet Admin platform state.
+- **Datasource/database modules** interact with data systems managed or queried by Jet Admin.
+
+## Realtime architecture
+
+Socket.IO is used for features that need live interaction rather than polling.
+
+Current realtime usage includes:
+
+- AI chat events,
+- workflow run room subscription and status updates,
+- widget-workflow bridge events,
+- monitor socket initialization for operational visibility.
+
+The backend emits workflow node updates and overall workflow status updates as runs advance.
+
+## Workflow runtime integration
+
+The workflow engine runs inside the backend process today.
+
+Important pieces:
+
+- `workflowWorkers.js` starts the queue, result consumer, and task worker.
+- `queue.config.js` implements the active `workflow.tasks` and `workflow.results` channels in memory.
+- `orchestrator/orchestrator.js` performs the check-decide-act loop.
+- `workers/taskWorker.js` resolves node handlers by `nodeType` and publishes results.
+
+### Queue note
+
+Although `amqplib` and `rabbitmq.config.js` still exist in the repository, the current startup path explicitly initializes the **in-memory queue adapter**, not RabbitMQ.
+
+## Observability and operational behavior
+
+The backend includes several lightweight operational surfaces:
+
+- `/health` for health checks,
+- `/monitor` for monitor UI access,
+- structured logging through the internal logger,
+- optional syslog-oriented configuration,
+- graceful shutdown for workflow worker cleanup.
+
+## Architectural summary
+
+The backend should be understood as a **tenant-aware modular monolith** with three major execution planes:
+
+1. **REST APIs** for CRUD and administrative operations,
+2. **Socket events** for live collaboration and execution feedback,
+3. **In-process asynchronous workflow execution** backed by `fastq` queues.
+
+That combination is the backbone of the current Jet Admin platform.

@@ -1,56 +1,111 @@
 ---
 sidebar_position: 3
+title: Datasources
+description: Connect Jet Admin to external databases, APIs, and services through the datasource system.
 ---
+
 # Datasources
--------------
 
-A datasource is configuration that allows you to connect to a data source. It is a way to connect to a data source and retrieve data from it, store data in it or perform other operations on it. A datasource can be a database, an API, or a file.
+Datasources are Jet Admin's connection layer to systems outside the platform. They define how the application authenticates with and communicates with databases, APIs, SaaS products, messaging systems, and other external services.
 
-## Supported Datasources
+## What a datasource is
 
-### Relational Databases
-- **PostgreSQL**: Fully supported.
-- **MySQL**: Coming soon.
-- **MSSQL**: Coming soon.
-- **CockroachDB**: Distributed SQL database compatible with PostgreSQL.
-- **SQLite**: Self-contained, high-reliability, embedded, SQL database engine.
-- **Oracle**: Multi-model database management system.
+A datasource record usually captures:
 
-### NoSQL / Others
-- **MongoDB**: NoSQL document database.
-- **Firestore**: Flexible, scalable database for mobile, web, and server development from Firebase.
-- **Neo4j**: Graph database management system.
+- the datasource type,
+- connection credentials or connection metadata,
+- connector-specific configuration,
+- the execution contract used by higher-level features such as queries, widgets, and workflows.
 
-### APIs & Services
-- **REST API**: Connect to any HTTP/HTTPS endpoint.
-- **Stripe**: Payment processing platform.
-- **Slack**: Messaging program specifically designed for output.
-- **Twilio**: Communication APIs for SMS and Voice.
-- **SendGrid**: Email delivery service.
-- **Notion**: All-in-one workspace for notes, tasks, wikis, and databases.
-- **Jira**: Issue tracking and project management tool.
-- **Google Analytics**: Web analytics service offered by Google.
+## Supported platform shape
 
-## Datasource Management
+The current monorepo implements datasource functionality across multiple packages:
 
-Datasources can be managed from the Datasources page. You can add, update, delete and test datasources from this page.
+- `@jet-admin/datasource-types` for canonical datasource metadata,
+- `@jet-admin/datasources-logic` for backend connector logic,
+- `@jet-admin/datasources-ui` for frontend configuration forms.
 
-### 1. Add Datasource
+This package split is important because Jet Admin does not treat datasource support as a single hard-coded screen. It is an extensible subsystem.
 
-Click on the `Add datasource` button to add a new datasource. You will be presented with a form to fill in the details of the datasource.
+## Datasource categories in the current codebase
 
-![Add Datasource](/img/create_datasource.png)
+The repository includes support or definitions for a broad set of datasource types, including examples such as:
 
-### 2. Update Datasource
+### Relational and analytical data stores
 
-Click on the `Update` button to update an existing datasource. You will be presented with a form to fill in the details of the datasource.
+- PostgreSQL
+- MySQL
+- MSSQL
+- CockroachDB
+- SQLite
+- Oracle
+- BigQuery
 
-![Update Datasource](/img/update_datasource.png)
+### NoSQL and document/graph stores
 
-### 3. Delete Datasource
+- MongoDB
+- Firestore
+- Neo4j
+- Supabase
 
-Click on the `Delete` button to delete an existing datasource.
+### APIs and external services
 
-### 4. Test Datasource
+- REST API
+- Slack
+- Stripe
+- SendGrid
+- Twilio
+- Notion
+- Jira
+- Google Analytics
 
-Click on the `Test` button to test the connection to the datasource.
+The exact operational maturity of each connector can differ, but the current codebase is clearly structured around a large datasource catalog.
+
+## Current backend capabilities
+
+The datasource API currently supports:
+
+- list datasources,
+- create datasource,
+- get a datasource,
+- update datasource,
+- clone datasource,
+- delete datasource,
+- test datasource connectivity.
+
+These operations are tenant-scoped and are consumed by the frontend management screens.
+
+## Why datasources matter
+
+Datasources are upstream dependencies for several other Jet Admin features:
+
+- **queries** execute against datasource connections,
+- **widgets** often visualize datasource-backed results,
+- **workflows** can trigger datasource-backed operations,
+- **dashboards** surface the results of those higher-level features.
+
+## Datasource lifecycle
+
+A typical datasource workflow looks like this:
+
+1. create a datasource,
+2. choose the connector type,
+3. fill in connector-specific settings,
+4. test the connection,
+5. save it for reuse by queries, widgets, and workflows,
+6. clone it when a similar environment/configuration is needed.
+
+## Security and ownership
+
+Datasource configuration is tenant-scoped application metadata. The platform stores the configuration needed to connect, but the underlying external system remains tenant-managed or third-party managed.
+
+That separation is important when reasoning about platform data flow:
+
+- Jet Admin owns the datasource definition record,
+- the tenant or third party owns the external data system itself.
+
+## Related docs
+
+- [Dashboards](../dashboard/overview)
+- [Workflow Engine](/docs/features/workflow)
+- [Packages overview](../../developer/packages-overview)

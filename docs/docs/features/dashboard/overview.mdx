@@ -1,14 +1,83 @@
 ---
 sidebar_position: 7
+title: Dashboards
+description: Build tenant-scoped dashboards from widgets, layouts, and shared data assets.
 ---
+
 # Dashboards
--------------
+
+Dashboards are the main presentation surface in Jet Admin. They assemble widgets into configurable layouts so a tenant can expose data, KPIs, tables, and operational views in one place.
 
 ![Dashboard Index](/img/dashboard-index.png)
 
-![Query](/img/dashboards.png)
+## What dashboards provide
 
-Features
-- [x] Drag and drop graphs and tables (query objects)
-- [x] Use query objects directly as table widgets
-- [x] Responsive layout with adjustable layout for each screen size
+- tenant-scoped dashboard records,
+- configurable widget layouts,
+- responsive presentation across screen sizes,
+- duplication workflows through dashboard cloning,
+- integration with datasources, queries, and widget definitions.
+
+![Dashboard Overview](/img/dashboards.png)
+
+## How dashboards fit the platform
+
+At a high level, dashboards sit on top of several other systems:
+
+- **datasources** provide external connectivity,
+- **queries** retrieve or transform data,
+- **widgets** define how that data is visualized,
+- **dashboards** compose those widgets into a usable page.
+
+This means dashboards are primarily an orchestration and presentation layer rather than a storage or execution layer by themselves.
+
+## Current backend capabilities
+
+The dashboard API currently supports the following operations:
+
+- list dashboards,
+- create dashboard,
+- get a single dashboard,
+- clone dashboard,
+- update dashboard,
+- delete dashboard.
+
+Those operations are mounted from the tenant-scoped backend route layer, so dashboard access is evaluated inside a tenant context.
+
+## Frontend experience
+
+From the frontend, dashboards are used as configurable workspace screens.
+
+Typical user flows include:
+
+1. create a dashboard,
+2. choose or configure widgets,
+3. arrange them in the dashboard layout,
+4. save and iterate on the dashboard over time,
+5. clone an existing dashboard when a similar view is needed.
+
+## Relationship to widgets
+
+Widgets are the building blocks of a dashboard.
+
+The current codebase separates widget concerns into shared packages:
+
+- `@jet-admin/widget-types`
+- `@jet-admin/widgets-logic`
+- `@jet-admin/widgets-ui`
+
+This lets dashboard pages stay focused on composition while widget-specific configuration and logic live in the package layer.
+
+## Typical use cases
+
+- operational reporting,
+- KPI monitoring,
+- internal admin views,
+- data table workspaces,
+- lightweight tenant-specific portals.
+
+## Related docs
+
+- [Datasources](../datasource/overview)
+- [Packages overview](../../developer/packages-overview)
+- [Data flow](../../concepts/data-flow)

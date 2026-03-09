@@ -1,42 +1,44 @@
 ---
 sidebar_position: 5
+title: Frontend Local Development
+description: Run the React/Vite frontend with Firebase, Supabase, and backend connectivity.
 ---
 
 # Frontend Local Development
 
-This guide will walk you through setting up the frontend environment for development.
+This guide covers the current setup for `apps/frontend`.
 
 ## Prerequisites
 
-Before deploying the frontend, ensure you have:
+Before you start, make sure you have:
 
-- Node.js (v16 or higher) and npm installed
-- Access to the project repository
-- Necessary environment variables and API keys
+- **Node.js 18+** and **npm**
+- a running backend or reachable backend host
+- Firebase project values for client authentication
+- Supabase values if you are using the asset/storage integrations
 
-## Local Development Environment
+## 1. Install dependencies
 
-### Installation
-
-Clone the repository and install dependencies:
+From the repository root:
 
 ```bash
 git clone <repository_url>
 cd jet-admin
 npm install
-npm install --workspaces
 ```
 
-### Environment Configuration
+## 2. Create the frontend environment file
 
-Create a `.env` file in the `apps/frontend` directory with the following variables:
+Create `apps/frontend/.env`.
+
+The frontend code currently expects the following variables:
 
 ```env
-# API Configuration
+# Backend hosts
 VITE_SERVER_HOST=http://localhost:8090
 VITE_SOCKET_HOST=http://localhost:8090
 
-# Firebase Configuration (used for authentication)
+# Firebase client SDK
 VITE_FIREBASE_API_KEY=
 VITE_FIREBASE_AUTH_DOMAIN=
 VITE_FIREBASE_PROJECT_ID=
@@ -45,49 +47,107 @@ VITE_FIREBASE_MESSAGING_SENDER_ID=
 VITE_FIREBASE_APP_ID=
 VITE_FIREBASE_MEASUREMENT_ID=
 
-# Supabase Configuration (used for file storage)
+# Supabase
 VITE_SUPABASE_URL=
-VITE_SUPABASE_KEY=
+VITE_SUPABASE_ANON_KEY=
 ```
 
 :::caution
-Never commit `.env` files to your repository. Add them to your `.gitignore` file.
+The current code uses `VITE_SUPABASE_ANON_KEY`, not `VITE_SUPABASE_KEY`.
 :::
 
-### Running for Development
+## 3. Understand runtime host resolution
 
-Start the development server:
+The frontend can read API/socket hosts from either environment variables or `window.JET_ADMIN_CONFIG`.
+
+Resolution order is:
+
+1. `window.JET_ADMIN_CONFIG.SERVER_HOST` / `SOCKET_HOST`
+2. `VITE_SERVER_HOST` / `VITE_SOCKET_HOST`
+3. default `http://localhost:8090`
+
+This is why the project can also be deployed with a generated `public/config.js` or container entrypoint override.
+
+## 4. Start the frontend
+
+From the repository root:
 
 ```bash
 npm run start:f
 ```
 
-This will launch the application on `http://localhost:5173` with hot module replacement enabled.
+Vite will start the app on `http://localhost:5173` by default.
+
+## What the frontend initializes
+
+At runtime, the frontend composes several providers before rendering feature routes:
+
+- `QueryClientProvider`
+- `AuthContextProvider`
+- `GlobalUIProvider`
+- `TenantContextProvider`
+- `SocketContextProvider`
+- `RootRouter`
+
+This means the app expects auth, tenant, and socket context to be available across most protected screens.
+
+## Authentication behavior in development
+
+The frontend uses Firebase client authentication for:
+
+- Google sign-in,
+- email/password sign-in,
+- email/password sign-up,
+- password reset.
+
+Once a user is authenticated, API modules typically call `currentUser.getIdToken()` and send the token to the backend as a bearer token.
+
+## Socket behavior in development
+
+The socket client connects to `VITE_SOCKET_HOST` (or `window.JET_ADMIN_CONFIG.SOCKET_HOST`) and authenticates with the current Firebase token.
+
+This is required for live workflow execution updates and other realtime features.
 
 ## Building for Production
 
-Create a production build:
+From `apps/frontend`:
 
 ```bash
 npm run build
 ```
 
-This creates optimized assets in the `dist` directory. You can test the production build locally:
+To preview the build locally:
 
 ```bash
 npm run preview
 ```
 
-## Performance Optimization
+## Working with shared packages
 
-### Build Optimization
+If your frontend changes depend on workspace packages, run the package watch process from the root:
 
-For optimal performance, consider these build optimizations:
+```bash
+npm run dev:all-packages
+```
 
-1. **Code Splitting**
+Or run the full combined development flow:
 
-   Vite handles code splitting automatically, but you can further optimize by using dynamic imports:
+```bash
+npm run dev:all
+```
 
-   ```jsx
-   const Dashboard = React.lazy(() => import('./pages/Dashboard'));
-   ```
+## Troubleshooting
+
+Common setup issues:
+
+- wrong backend URL in `VITE_SERVER_HOST`
+- missing Firebase client values
+- using `VITE_SUPABASE_KEY` instead of `VITE_SUPABASE_ANON_KEY`
+- CORS mismatch because the backend does not allow `http://localhost:5173`
+- socket auth failures when Firebase config and backend Firebase credentials do not belong to the same project
+
+## Related docs
+
+- [Frontend architecture](../architecture/frontend-architecture)
+- [Data flow](../concepts/data-flow)
+- [Backend local development](./setup-backend)

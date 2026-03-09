@@ -18,6 +18,8 @@ This guide covers deployment strategies for Jet Admin, ranging from simple singl
 7. [Configuration Reference](#configuration-reference)
 8. [Maintenance & Troubleshooting](#maintenance--troubleshooting)
 
+## Architecture Overview
+
 ```mermaid
 graph TD
     Client[Browser Client]

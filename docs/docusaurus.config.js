@@ -39,26 +39,7 @@ const config = {
     locales: ["en"],
   },
 
-  plugins: [
-    tailwindPlugin,
-    [
-      "docusaurus-plugin-openapi-docs",
-      {
-        id: "api",
-        docsPluginId: "classic",
-        config: {
-          jetAdmin: {
-            specPath: "./static/specs/openapi.yaml",
-            outputDir: "docs/api-reference",
-            sidebarOptions: {
-              groupPathsBy: "tag",
-              categoryLinkSource: "tag",
-            },
-          },
-        },
-      },
-    ],
-  ],
+  plugins: [tailwindPlugin],
   presets: [
     [
       "classic",
@@ -67,7 +48,6 @@ const config = {
         docs: {
           sidebarPath: "./sidebars.js",
           editUrl: `https://github.com/${organizationName}/${projectName}/tree/main/`,
-          docItemComponent: "@theme/ApiItem",
         },
         theme: {
           customCss: "./src/css/custom.css",
@@ -78,7 +58,7 @@ const config = {
   markdown: {
     mermaid: true,
   },
-  themes: ["@docusaurus/theme-mermaid", "docusaurus-theme-openapi-docs"],
+  themes: ["@docusaurus/theme-mermaid"],
 
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */

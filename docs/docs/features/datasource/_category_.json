@@ -1,8 +1,4 @@
 {
   "label": "Datasources",
-  "position": 1,
-  "link": {
-    "type": "generated-index",
-    "description": "Connect and manage your data sources."
-  }
+  "position": 1
 }

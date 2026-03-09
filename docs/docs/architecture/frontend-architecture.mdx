@@ -1,299 +1,225 @@
 ---
 sidebar_position: 2
+title: Frontend Architecture
 ---
 
 # Frontend Architecture
 
-This document provides a comprehensive overview of the frontend architecture, explaining the project structure, design patterns, and key components.
+The frontend is a React 18 application built with Vite and organized around provider composition, tenant-aware routing, domain APIs, and reusable workspace packages.
 
-## Architecture Overview
+## Architectural goals
 
-The frontend follows a clean, domain-driven architecture with clear separation of concerns across multiple layers:
+The current frontend emphasizes:
 
-1. **Data Layer**: Handles API communication and data modeling
-2. **Logic Layer**: Contains business logic and state management
-3. **Presentation Layer**: Manages UI components and pages
-4. **Utility Layer**: Provides shared helper functions
+- **feature-oriented navigation** around tenants and tenant resources,
+- **shared runtime context** for auth, tenant state, UI state, and sockets,
+- **server-state fetching** with TanStack React Query,
+- **reusable package-driven UI** for workflows, widgets, datasources, and forms,
+- **realtime interactivity** for workflows and operational surfaces.
 
-This layered approach improves maintainability, testability, and scalability of the application.
+## Runtime composition
 
-## Project Structure
+The application renders `App` and then hands control to `presentation/components/composer`.
 
-```
-apps/frontend/
-└── src/
-    ├── App.jsx                # Main application component
-    ├── main.jsx               # Application entry point
-    ├── constants.js           # Application constants
-    ├── assets/                # Static resources
-    ├── config/                # Configuration files
-    │   ├── firebase.js        # Firebase configuration
-    │   └── supabase.js        # Supabase configuration
-    ├── data/                  # Data layer
-    │   ├── apis/              # API services
-    │   └── models/            # Data models
-    ├── logic/                 # Business logic
-    │   ├── contexts/          # React context providers
-    │   └── hooks/             # Custom React hooks
-    ├── presentation/          # UI layer
-    │   ├── components/        # Reusable UI components
-    │   └── pages/             # Application pages
-    └── utils/                 # Utility functions
+That composer is the real runtime shell.
+
+```mermaid
+flowchart TB
+    App[App] --> Composer[Composer]
+    Composer --> Query[QueryClientProvider]
+    Query --> Auth[AuthContextProvider]
+    Auth --> UI[GlobalUIProvider]
+    UI --> Tenant[TenantContextProvider]
+    Tenant --> Socket[SocketContextProvider]
+    Socket --> Router[RootRouter]
+    Router --> Pages[Feature pages + layouts]
+    Socket --> Toasts[ToastContainer]
 ```
 
-## Data Layer
+This provider order matters because later layers depend on the earlier ones.
 
-The data layer handles all communication with external services and defines data structures.
+## Project structure
 
-### API Services (`data/apis/`)
+The frontend source lives in `apps/frontend/src` and is broadly divided into these areas:
 
-API services encapsulate all backend communication, organized by domain:
+| Area | Responsibility |
+| --- | --- |
+| `config/` | Firebase and Supabase initialization. |
+| `constants.js` | Route definitions, API path builders, event names, and runtime host configuration. |
+| `data/` | API modules and socket helpers that talk to the backend. |
+| `logic/` | Context providers and reusable hooks. |
+| `presentation/` | Routes, layouts, pages, and view components. |
+| `utils/` | Helper utilities used across the app. |
 
-| API Module | Purpose |
-|------------|---------|
-| `auth.js` | Authentication operations |
-| `database.js` | Core database operations |
-| `databaseChart.js` | Chart management |
-| `dashboard.js` | Dashboard management |
-| `dataQuery.js` | Query operations |
-| `databaseTable.js` | Table management |
-| `databaseTrigger.js` | Trigger operations |
-| `tenant.js` | Tenant management |
-| `tenantRole.js` | Role management |
-| `userManagement.js` | User administration |
+## Configuration model
 
-Each API module follows a consistent pattern:
+The frontend reads runtime configuration from two places:
 
-```javascript
-// Example API module pattern
-import { apiClient } from '../../utils/axios';
+1. `import.meta.env.*` values during Vite development/build time
+2. `window.JET_ADMIN_CONFIG` at runtime for deploy-time overrides
 
-export const SomeEntityAPI = {
-  getAll: async (params) => {
-    return apiClient.get('/endpoint', { params });
-  },
-  
-  getById: async (id) => {
-    return apiClient.get(`/endpoint/${id}`);
-  },
-  
-  create: async (data) => {
-    return apiClient.post('/endpoint', data);
-  },
-  
-  update: async (id, data) => {
-    return apiClient.put(`/endpoint/${id}`, data);
-  },
-  
-  delete: async (id) => {
-    return apiClient.delete(`/endpoint/${id}`);
-  }
-};
-```
+`constants.js` resolves the API and socket hosts with the following precedence:
 
-### Data Models (`data/models/`)
+1. `window.JET_ADMIN_CONFIG.SERVER_HOST` / `SOCKET_HOST`
+2. `VITE_SERVER_HOST` / `VITE_SOCKET_HOST`
+3. local defaults (`http://localhost:8090`)
 
-Data models define the structure and relationships of entities used throughout the application:
+This makes the frontend easier to package behind a static server while still changing backend endpoints per environment.
 
-- `databaseChart.js` - Chart data structure
-- `dashboard.js` - Dashboard configuration
-- `databaseMetadata.js` - Database metadata
-- `dataQuery.js` - Query structure
-- `databaseSchema.js` - Schema definition
-- `databaseTable.js` - Table structure
-- `databaseTableColumn.js` - Table column definition
-- `databaseTableContraint.js` - Table constraints
-- `databaseTrigger.js` - Trigger definition
-- `tenant.js` - Tenant information
-- `tenantPermission.js` - Permission structure
-- `tenantRole.js` - Role definition
-- `tenantUser.js` - User within tenant
-- `user.js` - User profile
+## Authentication model in the frontend
 
-Models typically include type definitions and utility methods for data validation and transformation.
+`logic/contexts/authContext.jsx` is the main auth coordinator.
 
-## Logic Layer
+It combines Firebase client auth with backend profile loading.
 
-The logic layer contains business logic and state management.
+### Supported user flows
 
-### Context Providers (`logic/contexts/`)
+- Google sign-in
+- email/password sign-up
+- email/password sign-in
+- password reset
+- sign-out
+- user-config read/update per tenant
 
-The application uses React Context for state management, with specialized contexts for different domains:
+### How requests are authenticated
 
-| Context | Purpose |
-|---------|---------|
-| `authContext.jsx` | User authentication state |
-| `databaseChartsContext.jsx` | Chart state management |
-| `dashboardsContext.jsx` | Dashboard state management |
-| `dataQueriesContext.jsx` | Query state management |
-| `databaseTablesContext.jsx` | Table state management |
-| `databaseTriggersContext.jsx` | Trigger state management |
-| `globalUIContext.jsx` | Application-wide UI state |
-| `roleManagementContext.jsx` | Role management |
-| `tenantContext.jsx` | Current tenant state |
-| `userManagementContext.jsx` | User management |
+Most API modules request a fresh Firebase ID token from the current user and send it as `Authorization: Bearer <token>`.
 
-Each context follows a similar pattern:
+The frontend does **not** implement a separate cookie-based backend session model.
 
-```jsx
-// Example context pattern
-import React, { createContext, useContext, useState } from 'react';
-import { SomeEntityAPI } from '../../data/apis/someEntity';
+## Socket architecture
 
-const SomeEntityContext = createContext();
+`logic/contexts/socketContext.jsx` opens the main Socket.IO connection after Firebase auth state resolves.
 
-export const useSomeEntity = () => useContext(SomeEntityContext);
+Key behaviors:
 
-export const SomeEntityProvider = ({ children }) => {
-  const [entities, setEntities] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+- it fetches the current user's Firebase ID token before connecting,
+- it sends that token in the socket handshake,
+- it refreshes the token during reconnect flows,
+- it exposes the socket instance to feature components.
 
-  const fetchEntities = async () => {
-    setLoading(true);
-    try {
-      const response = await SomeEntityAPI.getAll();
-      setEntities(response.data);
-      setError(null);
-    } catch (err) {
-      setError(err);
-    } finally {
-      setLoading(false);
-    }
-  };
+This enables workflow live updates and other event-driven features without duplicating connection logic in every page.
 
-  // Additional CRUD operations...
+## Routing model
 
-  const value = {
-    entities,
-    loading,
-    error,
-    fetchEntities,
-    // Other methods...
-  };
+The route tree is defined in `presentation/components/routes/rootRouter.jsx` and follows a nested layout approach.
 
-  return (
-    <SomeEntityContext.Provider value={value}>
-      {children}
-    </SomeEntityContext.Provider>
-  );
-};
-```
+Major route areas include:
 
-### Custom Hooks (`logic/hooks/`)
+- sign-in and sign-up
+- tenant selection and tenant settings
+- database schemas, tables, triggers, and SQL views
+- datasources and data queries
+- widgets and dashboards
+- workflows
+- API keys, cron jobs, notifications, and audit logs
+- user management and role management
 
-Custom hooks encapsulate reusable logic:
+This route shape mirrors the backend's tenant-scoped API layout.
 
-- `useComponentSize.jsx` - Tracks component dimensions
-- `useFirebaseUpload.jsx` - Handles file uploads to Firebase
-- `useSupabseUpload.jsx` - Handles file uploads to Supabase
+## State strategy
 
-## Presentation Layer
+The frontend does not rely on a single monolithic client store.
 
-The presentation layer contains all UI components organized by purpose.
+Instead, state is split into the most appropriate layer:
 
-### Components (`presentation/components/`)
+### Server state
 
-Components are organized into categories:
+Handled primarily with **TanStack React Query**:
 
-- `composer/` - Components for building complex UIs
-- `drawerList/` - Navigation drawer components
-- `layouts/` - Page layout components
-- `routes/` - Routing components
-- `ui/` - Basic UI elements
+- backend fetches,
+- mutation lifecycles,
+- cache invalidation,
+- loading and error management.
 
-### Pages (`presentation/pages/`)
+### Session and platform context
 
-Each page represents a distinct view in the application:
+Handled with **React Context**:
 
-- `accountPage/` - User account management
-- `addDatabaseChartPage/` - Chart creation interface
-- `addDashboardPage/` - Dashboard creation
-- `addDataQueryPage/` - Query creation
-- `addDatabaseTablePage/` - Table creation
-- `addDatabaseTriggerPage/` - Trigger creation
+- current user and auth actions,
+- current tenant and tenant-scoped preferences,
+- global UI state,
+- shared socket lifecycle.
 
-## Utility Layer
+### Local view state
 
-The utility layer provides shared helper functions:
+Kept inside feature pages and domain-specific components.
 
-- `axios.js` - API client configuration with interceptors
-- `error.js` - Error handling utilities
-- `notification.js` - Toast notification helpers
-- `postgre.js` - PostgreSQL-specific utilities
-- `string.js` - String manipulation helpers
+This split keeps data-fetching concerns separate from cross-cutting UI/runtime concerns.
 
-## Authentication & Authorization
+## Package-driven UI architecture
 
-The application supports dual authentication methods:
+The frontend is tightly integrated with the workspace packages.
 
-1. **Firebase Authentication**
-   - Configuration in `config/firebase.js`
-   - Used for user authentication and management
+Important examples:
 
-The `authContext.jsx` manages the authentication state and provides:
-- User authentication status
-- Login/logout methods
-- Role-based access control
+- `@jet-admin/workflow-nodes` and `@jet-admin/workflow-edges` provide workflow-builder primitives,
+- `@jet-admin/widgets-ui` and `@jet-admin/widget-types` support dashboard/widget configuration,
+- `@jet-admin/datasources-ui` and `@jet-admin/datasource-types` support datasource editors,
+- `@jet-admin/json-forms-renderers` extends JSON Forms,
+- `@jet-admin/ui` supplies shared design-system style building blocks.
 
-## State Management
+This package model reduces duplication across feature surfaces and keeps specialized UI logic out of the app shell.
 
-The application uses a context-based state management approach instead of a global state store:
+## UI and interaction stack
 
-1. **UI State**:
-   - Managed through `globalUIContext.jsx`
-   - Controls theme, sidebar state, modal visibility, etc.
+The frontend currently mixes several UI technologies depending on the feature:
 
-2. **Domain State**:
-   - Each domain has its dedicated context
-   - Provides domain-specific CRUD operations
+- **MUI** for many application-level surfaces and controls
+- **Emotion** for component styling integration
+- **Tailwind CSS** for utility-driven layout/styling
+- **Radix UI packages** for headless primitives
+- **React Flow** for visual workflow editing
+- **JSON Forms** for schema-driven editors
+- **Monaco Editor** and **CodeMirror** for code/query editing
+- **React Grid Layout** for dashboard arrangement
 
-3. **Authentication State**:
-   - Managed through `authContext.jsx`
-   - Holds user information and authentication status
+## Data access layer
 
-4. **Tenant State**:
-   - Managed through `tenantContext.jsx`
-   - Controls current tenant information and settings
+`data/apis/` contains domain-specific modules that build URLs from `constants.js`, attach bearer tokens, and normalize responses.
 
-This context-based approach allows for:
-- Modular state management
-- Localized state updates
-- Reduced prop drilling
-- Component-specific optimization
+Feature-specific API modules exist for areas such as:
 
-## Technology Stack
+- auth
+- tenants
+- datasources
+- queries
+- widgets
+- dashboards
+- workflows
+- roles
+- users
+- API keys
+- AI
 
-The architecture leverages several key technologies:
+This keeps backend contract details close to the features that consume them.
 
-1. **UI Framework**: Material UI (v6)
-2. **State Management**: React Context API + React Query
-3. **Form Handling**: Formik + Yup
-4. **Data Fetching**: Axios + TanStack Query
-5. **Styling**: Tailwind CSS + Emotion
-6. **Code Editing**: CodeMirror + Monaco Editor
-7. **Visualization**: React ChartJS
+## Design patterns used
 
-## Design Patterns
+### Provider composition
 
-The architecture implements several design patterns:
+The root composer builds a deterministic dependency chain for the whole app.
 
-1. **Provider Pattern**:
-   - Used in context providers to share state
-   - Follows React's composition model
+### Feature routing
 
-2. **Repository Pattern**:
-   - API services abstract data access
-   - Centralizes data fetching logic
+Pages are grouped by domain and mounted under nested layouts rather than treated as a flat route list.
 
-3. **Adapter Pattern**:
-   - Utility functions adapt external libraries
-   - Creates consistent interfaces
+### Package extension points
 
-4. **Container/Presentation Pattern**:
-   - Separates logic from UI
-   - Improves component reusability
+Specialized feature systems such as workflows, widgets, and datasource forms are extended through shared packages instead of only app-local components.
 
-5. **Custom Hook Pattern**:
-   - Extracts reusable logic
-   - Simplifies component implementation
+### Context + query split
+
+Cross-cutting app state lives in React Context, while fetch-heavy backend state lives in React Query.
+
+## Practical summary
+
+The frontend should be understood as a **tenant-aware React shell** that composes:
+
+- provider-managed runtime state,
+- package-driven domain components,
+- nested feature routes,
+- realtime sockets,
+- backend API modules authenticated with Firebase tokens.
+
+That structure is what keeps Jet Admin's large feature surface manageable in a single SPA.

@@ -39,21 +39,21 @@ You can import these specifications into tools like **Postman**, **Insomnia**, *
 ### [Authentication](/docs/api-reference/authentication)
 Learn how to authenticate your requests using Firebase Tokens or API Keys.
 
-### [REST Endpoints](/docs/api-reference/category/jet-admin-api)
-Explore the full list of available REST endpoints, grouped by module.
-
 ### [WebSocket API](/docs/api-reference/websocket)
 Real-time API for AI chat, workflow streaming, and interactive widgets.
+
+### OpenAPI Specification Download
+Use the downloadable `openapi.yaml` file above with tools such as Postman, Insomnia, Swagger UI, or Stoplight for endpoint exploration.
 
 ## Error Handling
 
 The API uses standard HTTP status codes to indicate success or failure. Error responses typically follow this format:
 
-\`\`\`json
+```json
 {
   "error": {
     "code": "INVALID_REQUEST",
     "message": "The provided parameters are invalid."
   }
 }
-\`\`\`
+```

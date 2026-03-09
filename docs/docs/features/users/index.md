@@ -1,194 +1,90 @@
 # Users
 
-## Table of Contents
-- [Authentication System Documentation](#authentication-system-documentation)
-  - [Table of Contents](#table-of-contents)
-  - [System Overview ](#system-overview-)
-  - [Core Components ](#core-components-)
-    - [Firebase Configuration ](#firebase-configuration-)
-    - [Authentication Flow ](#authentication-flow-)
-  - [Implementation Details ](#implementation-details-)
-    - [Middleware Setup ](#middleware-setup-)
-    - [User Management ](#user-management-)
-  - [Environment Configuration ](#environment-configuration-)
-  - [Security Considerations ](#security-considerations-)
-  - [Protected Routes ](#protected-routes-)
-  - [Production Deployment ](#production-deployment-)
+The user system in Jet Admin combines **Firebase-based authentication** with backend-managed user and tenant records.
 
----
+This page focuses on the current implementation rather than older session/cookie-based descriptions.
 
-## System Overview <a name="system-overview"></a>
+## What the user system covers
 
-Our authentication system integrates Firebase Authentication with custom backend services to provide secure user management. Key features include:
+The broader user feature set spans:
 
-- Firebase authentication
-- Automatic user profile creation
-- Session management with access/refresh tokens
-- Role-based access control integration
+- sign-in and sign-up through Firebase,
+- backend verification of Firebase bearer tokens,
+- user profile retrieval in the backend,
+- tenant membership and role assignment,
+- tenant-scoped user administration,
+- per-tenant user configuration endpoints.
 
-```mermaid
-sequenceDiagram
-    Client->>Firebase: Login with credentials
-    Firebase-->>Client: Returns Firebase token
-    Client->>Backend: API request with Firebase token
-    Backend->>Firebase Admin: Verify token
-    Firebase Admin-->>Backend: Token verification result
-    Backend->>Database: Get/Create user profile
-    Backend-->>Client: User data & session info
-```
+## Authentication architecture
 
----
+The current auth flow is:
 
-## Core Components <a name="core-components"></a>
+1. the frontend authenticates with Firebase,
+2. Firebase returns an ID token,
+3. the frontend sends that token as `Authorization: Bearer ...`,
+4. the backend verifies the token with Firebase Admin,
+5. the backend resolves the corresponding application user,
+6. protected tenant routes continue with RBAC checks.
 
-### Firebase Configuration <a name="firebase-configuration"></a>
+This is the central identity flow used by the frontend application today.
 
-**Backend Setup:**
-```json
-// firebase-key.json
-{
-  "type": "service_account",
-  "project_id": "your-project-id",
-  "private_key": "your-private-key",
-  "client_email": "firebase-adminsdk@your-project.iam.gserviceaccount.com"
-}
-```
+## Frontend responsibilities
 
-**Frontend Setup (`.env`):**
-```env
-VITE_FIREBASE_API_KEY=your-api-key
-VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=your-project-id
-```
+On the frontend, the auth layer is centered around `AuthContextProvider` and the Firebase client SDK.
 
-:::warning Security Notice
-- Never commit service account credentials to version control
-- Store secrets in environment variables
-- Rotate keys regularly
-:::
+It is responsible for behavior such as:
 
-### Authentication Flow <a name="authentication-flow"></a>
+- tracking the authenticated user,
+- retrieving fresh ID tokens for API calls,
+- exposing auth state to the route tree,
+- supporting socket authentication through the current Firebase token.
 
-1. Client-side Firebase authentication
-2. Firebase token verification in backend middleware
-3. User profile synchronization
-4. Session management with dual tokens
+## Backend responsibilities
 
----
+On the backend, the auth module handles:
 
-## Implementation Details <a name="implementation-details"></a>
+- token verification,
+- current-user resolution,
+- current-user info retrieval,
+- get/update user configuration by tenant.
 
-### Middleware Setup <a name="middleware-setup"></a>
+Separately, tenant user-management routes handle administrative user actions.
 
-**Token Verification:**
-```javascript
-authMiddleware.authProvider = async (req, res, next) => {
-  const idToken = req.headers.authorization?.split("Bearer ")[1];
-  try {
-    const decodedIdToken = await firebaseApp.auth().verifyIdToken(idToken);
-    req.user = await authService.getUserFromFirebaseID(decodedIdToken.uid);
-    next();
-  } catch (error) {
-    handleAuthError(res, error);
-  }
-};
-```
+## Current backend capabilities
 
-### User Management <a name="user-management"></a>
+The user-management area currently supports operations such as:
 
-**Profile Creation:**
-```javascript
-authService.createUser = async ({ email, firebaseID }) => {
-  return prisma.tblUsers.create({
-    data: {
-      email,
-      firebaseID,
-      isActive: true,
-      lastLogin: new Date()
-    }
-  });
-};
-```
+- list users,
+- get user,
+- add user,
+- assign roles,
+- delete user.
 
----
+These capabilities are tenant-scoped and work together with the roles/permissions subsystem.
 
-## Environment Configuration <a name="environment-configuration"></a>
+## Important clarification about sessions
 
-**Essential Variables:**
-```env
-# Network Security
-CORS_WHITELIST="http://localhost:3000,https://prod-domain.com"
-```
+Older docs may describe access tokens, refresh tokens, or cookie-based session handling as the primary runtime model. That is not the main architecture reflected in the current codebase.
 
----
+The active flow is centered on Firebase-issued bearer tokens verified by the backend.
 
-## Security Considerations <a name="security-considerations"></a>
+## User records vs identity provider
 
-1. **Token Security**
-   - 15-minute access token lifetime
-   - 100-hour refresh token rotation
-   - HTTP-only cookies for token storage
+It helps to separate two concepts:
 
-2. **Firebase Best Practices**
-   - Enable multi-factor authentication
-   - Implement password complexity policies
-   - Regular security rule audits
+- **Firebase** is the identity provider,
+- **Jet Admin database records** store platform-specific user metadata, tenant relationships, and authorization mappings.
 
-3. **CORS Configuration**
-```javascript
-app.use(cors({
-  origin: process.env.CORS_WHITELIST.split(','),
-  methods: ['GET', 'POST', 'PUT', 'DELETE']
-}));
-```
+That distinction explains why a valid Firebase identity is necessary but not sufficient for full access: the backend still needs to understand the user's tenant relationships and roles.
 
----
+## Realtime behavior
 
-## Protected Routes <a name="protected-routes"></a>
+Socket connections reuse the authenticated user context by supplying the Firebase token during the socket handshake.
 
-**Route Protection Example:**
-```javascript
-router.get("/", authMiddleware.authProvider, authController.getUserInfo);
+This is especially important for features that depend on live execution status, such as workflow runs.
 
-router.get(
-  "/config/:tenantID",
-  authMiddleware.authProvider,
-  authController.getUserConfig
-);
+## Related docs
 
-router.post(
-  "/config/:tenantID",
-  authMiddleware.authProvider,
-  authController.updateUserConfig
-);
-```
-
-**Error Handling:**
-| Error Code          | Description                     |
-|---------------------|---------------------------------|
-| 401 Unauthorized    | Missing or invalid token        |
-| 403 Forbidden       | Insufficient permissions        |
-| 429 Too Many Requests| Rate limit exceeded            |
-
----
-
-## Production Deployment <a name="production-deployment"></a>
-
-**Docker Configuration:**
-```bash
-docker run -p 8090:8090 \
-  -e FIREBASE_PROJECT_ID="$PROD_FIREBASE_ID" \
-  -e CORS_WHITELIST="https://prod-domain.com" \
-  backend-image
-```
-
-**Security Checklist:**
-- [ ] Enable HTTPS with HSTS headers
-- [ ] Configure Firebase Security Rules
-- [ ] Set up monitoring for auth attempts
-- [ ] Implement rate limiting
-
----
-
-
-This documentation maintains consistency with the authorization system structure while highlighting authentication-specific implementations and security considerations.
+- [Roles & Permissions](/docs/features/roles)
+- [Frontend local development](/docs/setup/setup-frontend)
+- [Backend architecture](/docs/architecture/backend-architecture)

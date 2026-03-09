@@ -22,11 +22,11 @@ The complete WebSocket API is documented using AsyncAPI 2.6  specification. Down
 Connect to the WebSocket server using a Socket.IO client.
 
 ### Base URL
-\`\`\`javascript
+```javascript
 const socket = io('http://localhost:3000');
 // or for monitoring namespace
 const monitorSocket = io('http://localhost:3000/monitor');
-\`\`\`
+```
 
 ### Authentication
 Authentication is handled via the handshake. Ensure you pass the `Authorization` header or query parameter as required by the implementation (typically a Bearer token or API key).
@@ -39,27 +39,27 @@ Authentication is handled via the handshake. Ensure you pass the `Authorization`
 Join a chat room to start or resume a conversation.
 
 **Payload:**
-\`\`\`json
+```json
 {
   "firebaseID": "user-firebase-uid"
 }
-\`\`\`
+```
 
 ### `ai_chat_room_id` (Receive)
 Confirmation of joining the room.
 
 **Payload:**
-\`\`\`json
+```json
 {
   "chatRoomID": "uuid-string"
 }
-\`\`\`
+```
 
 ### `ai_chat_user_message` (Emit)
 Send a message to the AI.
 
 **Payload:**
-\`\`\`json
+```json
 {
   "message": {
     "text": "Show me sales for last month",
@@ -69,17 +69,17 @@ Send a message to the AI.
   "firebaseID": "user-firebase-uid",
   "tenantID": "tenant-uuid"
 }
-\`\`\`
+```
 
 ### `ai_chat_bot_message` (Receive)
 Receive a response from the AI.
 
 **Payload:**
-\`\`\`json
+```json
 {
   "text": "Here is the sales data..."
 }
-\`\`\`
+```
 
 ---
 
@@ -89,18 +89,18 @@ Receive a response from the AI.
 Subscribe to updates for a specific workflow run.
 
 **Payload:**
-\`\`\`json
+```json
 {
   "runId": "uuid-string",
   "firebaseID": "user-firebase-uid"
 }
-\`\`\`
+```
 
 ### `workflow_node_update` (Receive)
 Triggered when a workflow node completes execution.
 
 **Payload:**
-\`\`\`json
+```json
 {
   "instanceID": "uuid-string",
   "nodeID": "string",
@@ -108,19 +108,19 @@ Triggered when a workflow node completes execution.
   "output": { ... },
   "error": "Error message if failed"
 }
-\`\`\`
+```
 
 ### `workflow_status_update` (Receive)
 Triggered when the workflow finishes.
 
 **Payload:**
-\`\`\`json
+```json
 {
   "instanceID": "uuid-string",
   "status": "COMPLETED" | "FAILED",
   "contextData": { ... }
 }
-\`\`\`
+```
 
 ---
 
@@ -132,7 +132,7 @@ Used for widgets that interact directly with workflows.
 Connect a widget to a workflow instance.
 
 **Payload:**
-\`\`\`json
+```json
 {
   "widgetID": "uuid",
   "workflowID": "uuid",
@@ -140,32 +140,32 @@ Connect a widget to a workflow instance.
   "inputParams": { ... },
   "widgetType": "bar" | "line" | ...
 }
-\`\`\`
+```
 
 ### `widget_workflow_connected` (Receive)
 Confirmation of connection.
 
 **Payload:**
-\`\`\`json
+```json
 {
   "widgetID": "uuid",
   "instanceID": "uuid",
   "mode": "execute",
   "initialContext": { ... }
 }
-\`\`\`
+```
 
 ### `widget_send_input` (Emit)
 Send user input (e.g., form submit) from the widget to the workflow.
 
 **Payload:**
-\`\`\`json
+```json
 {
   "widgetID": "uuid",
   "inputType": "form_submit",
   "data": { ... }
 }
-\`\`\`
+```
 
 ### `widget_input_received` (Receive)
 Acknowledgment of input.
@@ -178,10 +178,10 @@ Acknowledgment of input.
 Stream of system logs (requires admin permissions).
 
 **Payload:**
-\`\`\`json
+```json
 {
   "routingKey": "log.info",
   "content": { ... },
   "timestamp": 1234567890
 }
-\`\`\`
+```

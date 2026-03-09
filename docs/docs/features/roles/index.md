@@ -1,226 +1,91 @@
 # Roles & Permissions
 
-## Table of Contents
-- [Authorization System Documentation](#authorization-system-documentation)
-  - [Table of Contents](#table-of-contents)
-  - [System Overview ](#system-overview-)
-  - [Core Components ](#core-components-)
-    - [Permissions ](#permissions-)
-    - [Roles ](#roles-)
-    - [Database Schema ](#database-schema-)
-  - [Authorization Process ](#authorization-process-)
-    - [Workflow Diagram ](#workflow-diagram-)
-    - [Implementation Details ](#implementation-details-)
-  - [Usage Examples ](#usage-examples-)
-  - [Special Cases ](#special-cases-)
+Jet Admin uses a tenant-aware **role-based access control (RBAC)** model. Authentication answers **who** the caller is; roles and permissions answer **what** that caller can do inside a tenant.
 
----
+## Core model
 
-## System Overview <a name="system-overview"></a>
+The authorization system is built around these concepts:
 
-```mermaid
-%%{init: {'theme':'neutral'}}%%
-graph TD
-    subgraph ER Diagram
-        Users[tblUsers] -->|1:M| UsersTenantsRelationship[tblUsersTenantsRelationship]
-        Tenants[tblTenants] -->|1:M| UsersTenantsRelationship
-        UsersTenantsRelationship -->|M:M| UserTenantRoleMappings[tblUserTenantRoleMappings]
-        UserTenantRoleMappings --> Roles[tblRoles]
-        Roles -->|M:M| RolePermissionMappings[tblRolePermissionMappings]
-        RolePermissionMappings --> Permissions[tblPermissions]
-    end
-```
+- **users** authenticated through Firebase-backed identity,
+- **tenants** as the isolation boundary for most product data,
+- **roles** attached to users within a tenant,
+- **permissions** attached to roles,
+- **middleware checks** on protected backend routes.
 
-Our authorization system implements a granular, role-based access control (RBAC) model with tenant isolation. Key features include:
+## Tenant-aware RBAC
 
-- Multi-tenant architecture with tenant-specific permissions
-- Hierarchical permission structure
-- Global and tenant-scoped roles
-- Admin override capabilities
-- Wildcard permission matching
+The current backend structure mounts most business functionality under tenant-scoped routes, and permission checks are evaluated in that tenant context.
 
----
+This means a user can:
 
-## Core Components <a name="core-components"></a>
+- have access in one tenant,
+- have different permissions in another tenant,
+- be denied from actions outside their assigned tenant roles.
 
-### Permissions <a name="permissions"></a>
+## Current backend capabilities
 
-![Policy Editor](/img/policy_editor.png)
+The roles API currently supports:
 
-**Structure:**
-```typescript
-// Standard format
-"scope:resource:action"
+- list roles,
+- create role,
+- get role,
+- patch role,
+- delete role,
+- list available permissions.
 
-// Examples
-"tenant:database:table:create"
-"tenant:role:manage"
-"user:read"
-```
+User-management flows then assign those roles to tenant users.
 
-**Types:**
-1. **Global Permissions**
-   - `tenant:create`
-   - `user:read`
+## Request authorization flow
 
-2. **Tenant-Specific Permissions**
-   - `tenant:database:table:create`
-   - `tenant:role:manage`
+At a high level, protected route access works like this:
 
-**Hierarchy:**
-```
-tenant
-  ├── role
-  │   ├── create
-  │   ├── read
-  │   └── update
-  ├── database
-  │   ├── table
-  │   └── query
-  └── member
-      ├── add
-      └── remove
-```
+1. the backend authenticates the request,
+2. tenant context is resolved from the route,
+3. the authorization layer loads user-role mappings,
+4. role-permission mappings are evaluated,
+5. the request proceeds only if the required permissions are satisfied.
 
-### Roles <a name="roles"></a>
+## Authentication modes that feed authorization
 
-![Role Index](/img/role-index.png)
+The current backend supports two main auth entry paths:
 
-**Types:**
-| Global Roles (tenantID=null)      | Tenant-Specific Roles          |
-|-----------------------------------|---------------------------------|
-| DATABASE_DEVELOPER                | Custom roles defined per tenant|
-| DATA_ANALYST                      |                                |
-| QUERY_MANAGER                     |                                |
-| SUPPORT_AGENT                     |                                |
+- **Firebase bearer tokens** for user-driven frontend requests,
+- **API key auth** for programmatic access where supported.
 
-**Role-Permission Mapping:**
-```sql
--- DATABASE_DEVELOPER
-'metadata:read', 'schema:create', 'table:create'
+Both paths still flow into permission-aware backend logic where tenant-scoped authorization is required.
 
--- DATA_ANALYST 
-'metadata:read', 'table:read', 'stats:read'
-```
+## Admin bypass behavior
 
-### Database Schema <a name="database-schema"></a>
+The current implementation includes an important shortcut: a tenant user with the `ADMIN` role can bypass the normal permission evaluation path.
 
-```prisma
-model tblPermissions {
-  permissionID              Int
-  permissionTitle            String
-  permissionDescription     String?
-}
+That behavior is useful operationally, but it is also important to keep in mind when debugging authorization outcomes.
 
-model tblRoles {
-  roleID                    Int
-  roleTitle                  String
-  tenantID                  Int?
-}
+## Permission design
 
-model tblRolePermissionMappings {
-  roleID       Int
-  permissionID Int
-}
-```
+Permissions are modeled as explicit capabilities rather than page-level booleans.
 
----
+In practice, routes can require capabilities for areas such as:
 
-## Authorization Process <a name="authorization-process"></a>
+- roles,
+- users,
+- datasources,
+- dashboards,
+- workflows,
+- other tenant-managed resources.
 
-### Workflow Diagram <a name="workflow-diagram"></a>
+This makes the system more maintainable than hard-coding access rules into each UI screen.
 
-```mermaid
-%%{init: {'theme':'neutral'}}%%
-graph TD
-    A[API Request] --> B{User/Tenant Valid?}
-    B -->|Yes| C{User has Admin Role?}
-    B -->|No| D[Access Denied]
-    C -->|Yes| E[Immediate Access]
-    C -->|No| F[Check Permissions]
-    F --> G{Has Required\nPermissions?}
-    G -->|Yes| E
-    G -->|No| D
-```
+## Operational guidance
 
-### Implementation Details <a name="implementation-details"></a>
+Use roles when you want to:
 
-**1. Authentication Middleware**
-```javascript
-authMiddleware.authProvider = async function (req, res, next) {
-  // Firebase token verification
-  const decodedIdToken = await firebaseApp.auth().verifyIdToken(idToken);
-  req.user = await authService.getUserFromFirebaseID(decodedIdToken.uid);
-  next();
-};
-```
+- delegate feature access safely,
+- separate admin and non-admin capabilities,
+- keep tenant teams isolated,
+- expose only the parts of the platform relevant to a given team.
 
-**2. Permission Check Middleware**
-```javascript
-authMiddleware.checkUserPermissions = (requiredPermissions, options) => {
-  return async (req, res, next) => {
-    const permissionCheck = await authService.checkUserPermissions({
-      userID: user.userID,
-      tenantID: tenantID,
-      requiredPermissions,
-    });
-    
-    permissionCheck.permission ? next() : res.sendStatus(403);
-  };
-};
-```
+## Related docs
 
-**3. Permission Verification Service**
-```javascript
-authService.checkUserPermissions = async ({ userID, tenantID }) => {
-  if (userTenant?.role === "ADMIN") return { permission: true };
-  
-  const roleMappings = await fetchUserRolesAndPermissions(userID, tenantID);
-  return checkPermissions(extractUserPermissions(roleMappings));
-};
-```
-
----
-
-## Usage Examples <a name="usage-examples"></a>
-
-**Route Protection**
-```javascript
-// Single permission check
-router.post("/tables",
-  authMiddleware.checkUserPermissions(["tenant:database:table:create"]),
-  controller.createTable
-);
-
-// Multiple permissions (ALL)
-router.post("/complex-op",
-  authMiddleware.checkUserPermissions(["perm1", "perm2"], { requireAll: true }),
-  controller.complexOp
-);
-
-// Multiple permissions (ANY)
-router.get("/reports",
-  authMiddleware.checkUserPermissions(["perm3", "perm4"], { requireAll: false }),
-  controller.getReports
-);
-```
-
----
-
-## Special Cases <a name="special-cases"></a>
-
-1. **Admin Privileges**
-   - Bypass all permission checks
-   - Managed through `tblUsersTenantsRelationship.role`
-
-2. **Wildcard Support**
-   - `tenant:database:*` matches all database permissions
-   - `tenant:*:create` matches create actions in any tenant resource
-
-3. **Tenant Isolation**
-   - Permissions only valid within assigned tenant context
-   - Global permissions apply across all tenants
-
-4. **Role Management**
-   - Requires `tenant:role:manage` permission
-   - Only tenant admins can modify role assignments
+- [Users](/docs/features/users)
+- [Backend architecture](/docs/architecture/backend-architecture)
+- [Data flow](/docs/concepts/data-flow)

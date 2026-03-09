@@ -3,6 +3,6 @@
   "position": 5,
   "link": {
     "type": "generated-index",
-    "description": "Deep dive into the system design and architecture."
+    "description": "Understand the current frontend, backend, and runtime architecture of Jet Admin."
   }
 }

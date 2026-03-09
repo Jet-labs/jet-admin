@@ -142,7 +142,7 @@ Dynamic arguments are processed before query execution.
 Pauses workflow execution for a set period.
 
 - **Handler**: `delayHandler.js`
-- **Mechanism**: Non-blocking. The node returns a `queueDelay` property, causing the Orchestrator to schedule the *next* node's job into a RabbitMQ delayed queue/exchange.
+- **Mechanism**: Non-blocking. The node returns a `queueDelay` property, causing the Orchestrator to delay scheduling of the next node job in the active queue runtime.
 
 #### Configuration Properties
 

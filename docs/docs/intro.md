@@ -3,68 +3,113 @@ id: intro
 title: Introduction
 sidebar_label: Introduction
 sidebar_position: 1
-description: Overview of the Jet Admin project, technology stack, and high-level architecture.
+description: Practical overview of the Jet Admin monorepo, platform architecture, and feature surface.
 ---
 
-# Jet Admin CodeWiki
+# Jet Admin
 
-Welcome to the technical documentation for **Jet Admin**, a comprehensive web-based PostgreSQL management and visualization platform. This documentation is designed to help developers understand the codebase, architecture, and modules in extreme detail.
+Jet Admin is a multi-tenant internal tooling platform that combines:
 
-## Project Overview
+- a React frontend for application authoring and operations,
+- an Express + Prisma backend for API, auth, tenancy, and persistence,
+- a shared package layer for widgets, datasources, workflow nodes, and UI primitives,
+- a visual workflow engine with real-time execution updates.
 
-**Jet Admin** allows users to:
-- Manage PostgreSQL databases (DML/DDL operations).
-- Visualise data using drag-and-drop dashboards.
-- Build and execute complex workflows.
-- Manage teams with granular role-based access control.
+This documentation is organized to explain the system from four angles:
 
-The project is structured as a **Monorepo** using NPM Workspaces.
+1. **Setup** — how to run the monorepo locally.
+2. **Features** — what product areas exist and what they do.
+3. **Core concepts** — how data, auth, tenancy, and workflows behave.
+4. **Architecture** — how the frontend, backend, packages, and runtime fit together.
 
-## Technology Stack
+## What the platform includes
 
-### Frontend (`apps/frontend`)
-- **Framework:** [React](https://reactjs.org/) (Vite)
-- **UI Library:** [Material UI (MUI)](https://mui.com/)
-- **State Management:** `react-query`, `Context API`
-- **Editor:** Monaco Editor, React Flow (for workflows)
-- **Styling:** Tailwind CSS + Emotion
+At the repository level, the current implementation supports these major capabilities:
 
-### Backend (`apps/backend`)
-- **Runtime:** [Node.js](https://nodejs.org/)
-- **Framework:** [Express.js](https://expressjs.com/)
-- **ORM:** [Prisma](https://www.prisma.io/)
-- **Database:** PostgreSQL
-- **Real-time:** Socket.io
-- **Queue/Messaging:** `amqplib` (RabbitMQ)
+- **Authentication and tenant-aware access control** powered by Firebase identity plus backend RBAC.
+- **Tenant-scoped administration** for users, roles, permissions, and API keys.
+- **Database and datasource management** for tenant-owned integrations and data access.
+- **Data-query and widget-driven dashboards** for visualization and operational views.
+- **Workflow authoring and execution** with DAG scheduling, retries, and live status updates.
+- **Realtime features** through Socket.IO for workflow runs, AI chat, and widget-workflow coordination.
+- **Developer extensibility** through internal workspace packages in `packages/`.
 
-### Shared Packages (`packages/`)
-- `widgets`: Shared UI widgets for dashboards.
-- `workflow-nodes`: Logic for workflow execution nodes.
-- `datasources`: Connectors for different database types.
+## Monorepo structure
 
-## High-Level Architecture
+Jet Admin uses **npm workspaces** from the repository root:
+
+| Path | Purpose |
+| --- | --- |
+| `apps/frontend` | Vite + React application used by operators and builders. |
+| `apps/backend` | Express API, Prisma access layer, socket server, cron startup, and workflow workers. |
+| `packages/*` | Reusable internal packages for datasources, widgets, workflow nodes/edges, forms, and UI. |
+| `docs` | This Docusaurus documentation site plus generated API reference. |
+
+## Technology map
+
+### Frontend
+
+- React 18 + Vite
+- React Router with nested layouts
+- TanStack React Query + React Context
+- MUI, Emotion, Tailwind CSS, and internal `@jet-admin/ui`
+- Firebase client SDK
+- Supabase client for asset-oriented integrations
+- Socket.IO client
+- React Flow, JSON Forms, Monaco Editor, CodeMirror
+
+### Backend
+
+- Node.js + Express
+- Prisma + PostgreSQL
+- Firebase Admin authentication verification
+- Socket.IO server
+- `fastq`-based in-memory workflow queues for the active workflow runtime
+- `vm2` sandbox execution for scriptable workflow nodes
+- `node-cron`, Winston logging, and optional syslog forwarding
+
+### Shared packages
+
+- Datasource packages: metadata, UI, and execution logic
+- Widget packages: types, configuration UI, and processing logic
+- Workflow packages: visual nodes and custom edges
+- Supporting packages: JSON Forms renderers, shared UI, and template utilities
+
+## High-level runtime view
 
 ```mermaid
-graph TD
-    User["User / Browser"] -->|HTTP/HTTPS| Frontend["Frontend App (Vite)"]
-    User -->|WebSocket| Frontend
-    
-    Frontend -->|REST API| Backend["Backend API (Express)"]
-    Frontend -->|Socket.io| Backend
-    
-    Backend -->|Prisma| DB[("PostgreSQL Database")]
-    Backend -->|AMQP| Queue["Message Queue (RabbitMQ)"]
-    
-    Backend -->|Execute| WorkflowEngine["Workflow Orchestrator"]
-    WorkflowEngine -->|Read/Write| DB
-    WorkflowEngine -->|http| ExternalAPIs["External APIs"]
+flowchart LR
+    Browser[Browser] -->|HTTP| Frontend[React frontend]
+    Browser -->|WebSocket| Frontend
+
+    Frontend -->|REST API| Backend[Express backend]
+    Frontend -->|Socket.IO| Backend
+
+    Backend -->|Prisma| AppDB[(PostgreSQL)]
+    Backend -->|Tenant DB access / datasource logic| ExternalSystems[External databases and APIs]
+
+    Backend -->|start workers| WorkflowRuntime[Workflow orchestrator + task worker]
+    WorkflowRuntime -->|task queue / result queue| InMemoryQueue[fastq in-memory queues]
+    WorkflowRuntime --> AppDB
+    WorkflowRuntime -->|events| Realtime[Socket updates]
 ```
 
-## Directory Structure
+:::info Workflow runtime note
+The repository still contains a legacy/alternate `rabbitmq.config.js`, but the current workflow startup path initializes the in-memory queue adapter from `apps/backend/config/queue.config.js`.
+:::
 
-| Directory | Description |
-| :--- | :--- |
-| `apps/frontend` | The main React application source code. |
-| `apps/backend` | The Node.js API server and background workers. |
-| `packages/*` | Shared internal libraries used by both apps. |
-| `docs` | This Docusaurus documentation site. |
+## How to read this documentation
+
+- Start with [Backend setup](./setup/setup-backend) and [Frontend setup](./setup/setup-frontend) if you want to run the project.
+- Read [Backend architecture](./architecture/backend-architecture) and [Frontend architecture](./architecture/frontend-architecture) for the current implementation model.
+- Read [Data flow](./concepts/data-flow) and [Workflow architecture](./concepts/workflow-architecture) for the execution model.
+- Use [Packages overview](./developer/packages-overview) when working in shared workspaces.
+
+## Current documentation principles
+
+This doc set is intentionally aligned to the current code on disk:
+
+- auth docs describe **Firebase token verification and API-key auth**, not cookie-session flows,
+- workflow docs describe the **current in-memory queue runtime**,
+- setup docs use the **actual environment variables referenced by the code**,
+- feature docs focus on the feature surface that is visibly implemented in routes, services, contexts, and packages.

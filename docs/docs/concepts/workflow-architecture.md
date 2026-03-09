@@ -2,246 +2,274 @@
 sidebar_position: 2
 ---
 
-# 🏗️ Architecture Deep Dive
+# Workflow Architecture
 
-This document provides a comprehensive technical overview of the Jet Admin Workflow Engine. It covers the architecture, execution flow, core components, and implementation details for both backend and frontend.
+This page documents the **current** Jet Admin workflow runtime: a DAG-oriented execution engine that runs inside the backend process and uses an in-memory queue adapter built on `fastq`.
 
-## 1. High-Level Architecture
+## High-level model
 
-The workflow engine is designed as an **event-driven, distributed system** using **RabbitMQ** for decoupling the Orchestrator from the Task Workers. This allows for scalability and robust failure handling.
+The workflow engine follows a **check-decide-act** loop:
+
+1. **check** what node just finished,
+2. **decide** which downstream nodes are eligible,
+3. **act** by queuing the next node jobs or completing the run.
 
 ```mermaid
-graph TD
-    User[User / Frontend] -- Start/Test Workflow --> API[Workflow Service]
-    
-    subgraph "Backend"
-        API -- "Create Instance" --> DB[(PostgreSQL)]
-        API -- "Queue Start Node" --> Queue_Tasks[Queue: workflow.tasks]
-        
-        subgraph "Pattern: Check-Decide-Act"
-            Orchestrator[Orchestrator Worker] -- "1. Read Result" --> Queue_Results[Queue: workflow.results]
-            Orchestrator -- "2. Update State" --> DB
-            Orchestrator -- "3. Calculate Next" --> DAG[DAG Scheduler]
-            Orchestrator -- "4. Queue Job" --> Queue_Tasks
-        end
-        
-        subgraph "Pattern: Worker Pool"
-            TaskWorker[Task Worker] -- "1. Consume Job" --> Queue_Tasks
-            TaskWorker -- "2. Execute Logic" --> Handlers[Node Handlers]
-            TaskWorker -- "3. Publish Result" --> Queue_Results
-        end
-    end
-    
-    Handlers -- "Run Code" --> VM[VM2 Sandbox]
-    Handlers -- "Run Query" --> QueryEngine[Query Engine]
+flowchart LR
+    User[User / frontend] --> API[Workflow service]
+    API --> DB[(Workflow instance in PostgreSQL)]
+    API --> Tasks[workflow.tasks]
+
+    Tasks --> Worker[Task worker]
+    Worker --> Handlers[Node handlers]
+    Handlers --> Results[workflow.results]
+
+    Results --> Orchestrator[Orchestrator]
+    Orchestrator --> DB
+    Orchestrator --> Scheduler[DAG scheduler]
+    Scheduler --> Tasks
+    Orchestrator --> Socket[Socket updates]
 ```
 
-## 2. Core Components
+## Important runtime clarification
 
-### 2.1 Workflow Service (`workflow.service.js`)
-The entry point for all workflow operations. It handles CRUD for workflow definitions and triggers executions.
+The repository still contains RabbitMQ-related code, but the currently started runtime path is:
 
-- **`executeWorkflow`**: Starts a production run. Creates a `tblWorkflowInstances` record and queues the Start Node.
-- **`testWorkflow`**: Starts a test run. Instead of reading from the DB, it places the *in-memory* node/edge definition into the execution context (`__workflowDefinition`), allowing users to test unsaved changes.
+- `workflowWorkers.js`
+- `queue.config.js`
+- `startResultsConsumer()`
+- `startTaskWorker()`
 
-### 2.2 Orchestrator (`orchestrator.js`)
-The "Brain" of the engine. It consumes **Execution Results** and decides what to do next.
+That means the active runtime is **not currently a distributed RabbitMQ worker topology**. It is an **in-process queue-backed workflow runtime**.
 
-**Key Responsibilities:**
-1.  **Consume Results**: Listens to `workflow.results`.
-2.  **Update State**: Updates the workflow instance context with the output of the completed node. Uses **optimistic locking** to prevent race conditions.
-3.  **Determine Next Step**:
-    *   If `isTestRun`: Uses in-memory graph from context.
-    *   If Production: Calls `dagScheduler` to find downstream nodes from the DB.
-4.  **Dispatch Jobs**: Pushes new jobs to `workflow.tasks` for the next nodes.
-5.  **Completion**: If a terminal node (End Node) is reached, marks the instance as `COMPLETED`.
+## Core runtime components
 
-### 2.3 Task Worker (`taskWorker.js`)
-The "Muscle" of the engine. It consumes **Task Jobs** and executes the specific logic for that node type.
+### Workflow service
 
-**Key Responsibilities:**
-1.  **Consume Tasks**: Listens to `workflow.tasks`.
-2.  **Route to Handler**: Based on `nodeType` (e.g., `javascript`, `dataQuery`), delegates to the specific handler in `handlers/`.
-3.  **Execute**: Runs the handler logic. This is **stateless**—it receives everything it needs (config + context) in the job payload.
-4.  **Retry Logic**: Handles retries with exponential backoff using specific **delayed queues** (e.g., `workflow.tasks_delayed_5000`).
-5.  **Publish Result**: Sends success/error payload to `workflow.results`.
+`workflow.service.js` is the API-facing service layer for workflow definition CRUD and run orchestration.
 
-### 2.4 State Manager (`stateManager.js`)
-Handles all database interactions for execution state.
-- **Optimistic Locking**: When updating context, it checks `version`. If the version in DB has changed, it retries. This ensures that parallel branches updating the context don't overwrite each other's data.
+Important operations include:
 
-## 3. Data Structures
+- `executeWorkflow` — starts a persisted workflow run,
+- `testWorkflow` — starts an unsaved test run from client-provided nodes and edges,
+- `stopTestWorkflow` — removes a test instance,
+- run-status retrieval for standard UI and widget-driven views.
 
-### 3.1 Context (`ctx`)
-The `contextData` generic JSON field in `tblWorkflowInstances` holds the state.
-- **`input`**: Initial arguments passed to the workflow.
-- **Node Outputs**: Each node's output is stored under its `nodeID`.
-  ```json
-  {
-    "input": { "userId": 123 },
-    "node_abc123": { "success": true, "data": [...] },
-    "node_xyz789": { "jsResult": 42 }
-  }
-  ```
+### Workflow workers bootstrap
 
-### 3.2 Job Payload
-Message sent to `workflow.tasks`:
+`workflowWorkers.js` initializes the active queue runtime and starts:
+
+- the task worker,
+- the results consumer/orchestrator loop,
+- graceful queue shutdown hooks.
+
+### Queue adapter
+
+`apps/backend/config/queue.config.js` provides queue semantics using `fastq` and `EventEmitter`.
+
+It exposes queue-like operations such as:
+
+- `initializeQueue`
+- `closeQueue`
+- `addNodeJob`
+- `addResult`
+- `registerTaskWorker`
+- `registerResultsWorker`
+- `publishToMonitor`
+
+The public shape intentionally mirrors the older AMQP-oriented abstraction so the workflow layer stays decoupled from the transport implementation.
+
+### Task worker
+
+`workers/taskWorker.js` is responsible for executing node jobs.
+
+It:
+
+1. receives a task payload,
+2. resolves the handler from `nodeType`,
+3. executes the handler with workflow context helpers,
+4. publishes either success or error results,
+5. retries failed jobs with exponential backoff by re-enqueuing them with delay.
+
+### Orchestrator
+
+`orchestrator/orchestrator.js` is the coordination layer.
+
+It:
+
+1. consumes node results,
+2. updates workflow instance state and context,
+3. emits node/status websocket updates,
+4. determines downstream nodes using the DAG,
+5. queues additional work or marks the workflow as complete.
+
+### State manager and scheduler
+
+The workflow engine separates responsibilities:
+
+- **state management** persists context and execution state,
+- **DAG scheduling** decides which next edges/nodes should fire,
+- **workers** remain focused on isolated node execution.
+
+## Execution lifecycle
+
+```mermaid
+sequenceDiagram
+    participant Client
+    participant Service as workflow.service
+    participant DB as tblWorkflowInstances
+    participant Queue as queue.config
+    participant Worker as taskWorker
+    participant Orch as orchestrator
+
+    Client->>Service: executeWorkflow / testWorkflow
+    Service->>DB: create instance + initial context
+    Service->>Queue: add start node job
+    Queue->>Worker: deliver task
+    Worker->>Worker: run node handler
+    Worker->>Queue: add result
+    Queue->>Orch: deliver result
+    Orch->>DB: merge output + update status
+    Orch->>Queue: enqueue next node(s)
+    Orch-->>Client: emit socket updates
+```
+
+## Production runs vs test runs
+
+The engine supports two important modes.
+
+### Production run
+
+- workflow definition is read from persisted records,
+- node/edge graph comes from the database,
+- the run behaves like a normal saved workflow execution.
+
+### Test run
+
+- the frontend can send unsaved nodes and edges,
+- those definitions are stored in context using internal markers such as `__workflowDefinition` and `__isTestRun`,
+- the orchestrator resolves downstream nodes from the in-memory graph instead of reloading from the database,
+- this enables iteration in the editor before saving the workflow.
+
+## Context model
+
+The workflow instance stores a mutable JSON context that acts as shared execution state.
+
+Typical contents include:
+
+- `input` for initial arguments,
+- per-node outputs keyed by node ID,
+- internal metadata for test runs,
+- current execution status and supporting state used by downstream nodes.
+
+Conceptually, the context evolves like this:
+
 ```json
 {
-  "instanceID": "uuid",
-  "nodeID": "uuid",
-  "nodeType": "javascript",
-  "nodeConfig": { "code": "return 1+1" },
-  "context": { ... }, // Snapshot of context at dispatch time
-  "workflowID": "uuid"
+  "input": { "customerId": 42 },
+  "startNode": { "success": true },
+  "fetchDataNode": { "rows": [{ "id": 1 }] },
+  "transformNode": { "count": 1 }
 }
 ```
 
-### 3.3 Result Payload
-Message sent to `workflow.results`:
-```json
-{
-  "instanceID": "uuid",
-  "nodeID": "uuid",
-  "status": "success", // or 'error'
-  "output": { "result": 2 },
-  "nextHandle": "success" // Which output handle to follow (e.g., 'true', 'false', 'error')
-}
-```
+## Node execution model
 
-## 4. Implementation Details & Code Samples
+Each task job typically contains enough information for stateless execution:
 
-### 4.1 Orchestrator Logic
-The core "Check-Decide-Act" loop in `orchestrator.js`:
+- workflow instance ID,
+- workflow ID,
+- node ID,
+- node type,
+- node configuration,
+- context snapshot,
+- retry metadata.
 
-```javascript
-// orchestrator.js
-async function handleTaskResult(result) {
-  const { instanceID, nodeID, status, output, nextHandle } = result;
+The worker then dispatches to a handler that knows how to execute that node type.
 
-  // 1. Update Context (State)
-  const updatedInstance = await stateManager.updateContext(
-    instanceID, 
-    { [nodeID]: output }, // Merge new output into context
-    instance.version
-  );
+Examples of node behavior include:
 
-  // 2. Calculate Next Nodes (Decision)
-  const nextNodes = await dagScheduler.calculateNextNodes(
-    instance.workflowID,
-    nodeID,
-    nextHandle // Follow specific handle (e.g., 'success')
-  );
+- JavaScript execution,
+- data-query or datasource-driven actions,
+- control-flow decisions,
+- integration actions,
+- widget-aware workflow bridging.
 
-  // 3. Queue Next Jobs (Action)
-  for (const nextNode of nextNodes) {
-    await addNodeJob({
-      instanceID,
-      nodeID: nextNode.nodeID,
-      nodeType: nextNode.nodeType,
-      nodeConfig: nextNode.nodeConfig,
-      context: updatedInstance.contextData,
-    });
-  }
-}
-```
+## Realtime feedback
 
-### 4.2 Node Handler (Backend)
-Example of the JavaScript Node Execution in `handlers/javascriptHandler.js`. Note the use of `vm2` for sandboxing.
+Workflow execution is tightly integrated with Socket.IO.
 
-```javascript
-// handlers/javascriptHandler.js
-const { VM } = require('vm2');
+The orchestrator emits updates for:
 
-async function execute(nodeConfig, context) {
-  const { code, outputVariable } = nodeConfig;
-  
-  // Create sandbox with access to context
-  const sandbox = {
-    ctx: context,
-    console: { log: () => {} }, // Security: disable console
-    // ... allow safe globals like Math, JSON
-  };
+- individual node status changes,
+- overall workflow status changes,
+- widget-workflow integration state where applicable.
 
-  const vm = new VM({ timeout: 1000, sandbox });
-  
-  try {
-    // Run user code
-    const result = vm.run(code);
-    
-    return {
-      output: { [outputVariable]: result },
-      nextHandle: 'success'
-    };
-  } catch (error) {
-    return {
-      output: { error: error.message },
-      nextHandle: 'error' // Follow 'error' edge
-    };
-  }
-}
-```
+This is what allows the frontend to subscribe to a run and show near-live progress without polling every internal step.
 
-### 4.3 Node Component (Frontend)
-The frontend uses **JSON Forms** to render the configuration panel. This allows for declarative UI definitions.
+## Retry behavior
 
-```jsx
-// packages/workflow-nodes/src/nodes/javascriptNode.jsx
-export const JavascriptNodeConfigurator = ({ data, onChange }) => {
-  // Define Schema for JSON Forms
-  const schema = {
-    type: 'object',
-    properties: {
-      code: { 
-        type: 'string', 
-        format: 'code-javascript',
-        title: 'Network Code' 
-      },
-      timeoutSeconds: { type: 'integer', default: 30 }
-    }
-  };
+Retries are implemented in the current queue adapter using delayed re-enqueueing rather than broker-managed delayed queues.
 
-  return (
-    <JsonForms
-      schema={schema}
-      data={data}
-      onChange={({ data }) => onChange(data)}
-      renderers={workflowNodeRenderers} // Custom renderers
-    />
-  );
-};
-```
+In practice this means:
 
-## 5. Adding a New Node Type
+- failed tasks can be retried with exponential backoff,
+- delays are implemented with in-process timers,
+- queue names such as `workflow.tasks.dlq` are preserved for compatibility even though the runtime is in-memory.
 
-To add a new node type (e.g., `slackNode`):
+## Frontend relationship
 
-1.  **Frontend (`packages/workflow-nodes`)**:
-    *   Create `slackNode.jsx` with `SlackNode` (visual) and `SlackNodeConfigurator` (config form).
-    *   Register in `nodeTypes` map.
+The workflow UI depends on several frontend/package pieces:
 
-2.  **Backend Handler (`apps/backend/modules/workflow/workers/handlers`)**:
-    *   Create `slackHandler.js`:
-        ```javascript
-        async function execute(config, context) {
-          /* call slack api */ 
-          return { output: { sent: true }, nextHandle: 'success' };
-        }
-        module.exports = { execute };
-        ```
-    *   Register in `handlers/index.js`.
+- React Flow for graph editing,
+- `@jet-admin/workflow-nodes` for node definitions and editors,
+- `@jet-admin/workflow-edges` for custom edge rendering,
+- JSON Forms-based configuration surfaces,
+- socket subscriptions for live run feedback.
 
-3.  **Queue**: No changes needed! The `taskWorker` dynamically loads the handler based on the `nodeType` string.
+## Extending the workflow engine
 
-## 6. Error Handling & Retries
+Adding a new node type usually requires work in two places.
 
-*   **User Errors**: Caught in the handler. The handler returns `nextHandle: 'error'`, allowing the workflow to proceed down an "Error" path (if defined).
-*   **System Errors (Crashes)**: Caught by `taskWorker`.
-    *   **Retry**: If `attempts < maxAttempts`, the message is sent to a **Delayed Queue** (RabbitMQ `x-message-ttl`).
-    *   **Dead Letter**: After max retries, it moves to `workflow.tasks.dlq`.
+### Frontend/package side
 
-## 7. Development Tips
+- add the node definition and visual/configuration UI in `packages/workflow-nodes`,
+- register the node so it appears in the editor and inspector UI.
 
-*   **Test Mode**: When you run "Test" in the UI, the backend **does not** create DB nodes. It relies entirely on the JSON payload you send. This is crucial for rapid iteration.
-*   **Context usage**: Always use `ctx.` to access data from previous nodes.
-*   **Logs**: Execution logs are stored in `tblNodeExecutionLogs`. This is what populates the "Console" in the UI.
+### Backend side
+
+- add the corresponding execution handler under the workflow worker handlers,
+- ensure the handler returns the expected result shape,
+- support any required validation or helper resolution.
+
+The queue/orchestrator layer usually does not need structural changes because it dispatches dynamically by `nodeType`.
+
+## Operational trade-offs of the current design
+
+### Advantages
+
+- simple local development,
+- fewer moving parts than a broker-based distributed system,
+- fast feedback for editor test runs,
+- low cognitive overhead while the feature set evolves.
+
+### Constraints
+
+- queue state is process-local,
+- horizontal scaling semantics are more limited,
+- delayed retries are timer-based,
+- resilience characteristics differ from a dedicated broker topology.
+
+## Summary
+
+Jet Admin's workflow engine is currently a **backend-embedded orchestration runtime** with:
+
+- persisted workflow state in PostgreSQL,
+- in-memory task/result queues,
+- dynamic node handlers,
+- DAG scheduling,
+- retry support,
+- realtime socket updates,
+- explicit support for unsaved test execution.
+
+That is the model to use when reasoning about the present codebase.

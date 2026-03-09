@@ -1,52 +1,65 @@
+---
+sidebar_position: 4
+title: Backend Local Development
+description: Run the Express backend, Prisma migrations, and workflow runtime locally.
+---
+
 # Backend Local Development
 
-This guide will walk you through setting up the backend environment for development.
+This guide covers the current local setup for `apps/backend`.
+
+The backend includes:
+
+- the Express API,
+- Prisma-backed persistence,
+- Socket.IO,
+- cron startup,
+- the active in-memory workflow worker runtime.
 
 ## Prerequisites
 
-Before you begin, ensure you have the following installed:
+Before you start, make sure you have:
 
-- **Node.js** (v18 or higher) & **npm** - [Download from nodejs.org](https://nodejs.org/)
-- **PostgreSQL** database (local or remote access)
+- **Node.js 18+** and **npm**
+- access to a PostgreSQL database for `DATABASE_URL`
+- Firebase service-account credentials for backend token verification
 
-## Local Development Setup
+## 1. Install dependencies
 
-   ```bash
-   git clone <repository_url>
-   cd jet-admin
-   ```
+From the repository root:
 
-2. **Install dependencies**
+```bash
+git clone <repository_url>
+cd jet-admin
+npm install
+```
 
-   ```bash
-   npm install
-   npm install --workspaces
-   ```
+## 2. Create the backend environment file
 
-### Environment Configuration
+Create `apps/backend/.env`.
 
-Create a `.env` file in the `apps/backend` directory with the following variables:
+These are the main variables referenced by `apps/backend/environment.js`:
 
 ```dotenv
-# Server Configuration
+# Runtime
 NODE_ENV=development
 PORT=8090
-EXPRESS_REQUEST_SIZE_LIMIT="5mb"
-
-# Database Configuration
-DATABASE_URL="postgresql://user:pass@localhost:5432/db?schema=public"
-
-
-# Node Identification
 NODE_ID="dev_node_1"
 
-# AI configuration
-GEMINI_API_KEY=""
+# Module enablement
+ENABLED_MODULES=AUTH,TENANT,DATABASE,DATASOURCE,DATAQUERY,DASHBOARD,WIDGET,USERMANAGEMENT,ROLE,APIKEY,CRONJOB,NOTIFICATION,PERMISSION,WORKFLOW,AI
 
-# CORS Settings
+# Persistence
+DATABASE_URL="postgresql://user:pass@localhost:5432/db?schema=public"
+
+# Request handling
+EXPRESS_REQUEST_SIZE_LIMIT="5mb"
 CORS_WHITELIST="http://localhost:3000,http://localhost:5173,http://127.0.0.1:3000,http://127.0.0.1:3001,http://localhost:3001"
 
-# Logging Configuration
+# Integrations
+GEMINI_API_KEY=""
+
+# Logging / syslog
 SYSLOG_HOST=127.0.0.1
 SYSLOG_PORT=514
 SYSLOG_PROTOCOL=udp4
@@ -56,74 +69,121 @@ LOG_RETENTION=7
 LOG_FILE_SIZE=1
 ```
 
-:::caution
-Be sure to replace the placeholder values with your actual configurations, especially the `DATABASE_URL` for security purposes.
+:::tip
+`ENABLED_MODULES` is optional. If you omit it, the backend falls back to a minimal default module list. For realistic local development, it is usually better to set the modules you actually want to exercise.
 :::
 
-### Firebase Configuration
+## 3. Add Firebase service-account credentials
 
-Generate Firebase key from Firebase console and rename the file to `firebase-key.json` in the root directory with the following structure:
+The backend verifies Firebase ID tokens, so you need a service-account key file.
+
+Place `firebase-key.json` at the repository root:
 
 ```json
 {
-    "type": "",
-    "project_id": "",
-    "private_key_id": "",
-    "private_key": "",
-    "client_email": "",
-    "client_id": "",
-    "auth_uri": "",
-    "token_uri": "",
-    "auth_provider_x509_cert_url": "",
-    "client_x509_cert_url": "",
-    "universe_domain": ""
+  "type": "service_account",
+  "project_id": "...",
+  "private_key_id": "...",
+  "private_key": "...",
+  "client_email": "...",
+  "client_id": "...",
+  "auth_uri": "...",
+  "token_uri": "...",
+  "auth_provider_x509_cert_url": "...",
+  "client_x509_cert_url": "...",
+  "universe_domain": "..."
 }
 ```
 
 :::warning
-Fill in your actual Firebase credentials. Never commit this file to your repository.
+Never commit real Firebase credentials to source control.
 :::
 
-### Database Setup
+## 4. Run Prisma migrations
 
-We use Prisma as our ORM for database management. Set up your database with these commands:
+From `apps/backend`:
 
 ```bash
-# Navigate to backend app
 cd apps/backend
-
-# Create database schema
 npx prisma migrate dev
-
-# Open visual database editor (optional)
-npx prisma studio
-
-# Return to root
-cd ../..
 ```
 
-The first command applies migrations based on your schema definition in `prisma/schema.prisma`, while the second opens a visual interface to manage your database at `http://localhost:5555`.
+Optional Prisma helpers already exist in `apps/backend/package.json`, for example:
 
-### Running the Application
+```bash
+npm run prisma-studio-dev-w
+```
 
-Start the development server with hot-reload enabled:
+## 5. Start the backend
+
+From the repository root:
 
 ```bash
 npm run start:b
 ```
 
-Your API will be available at `http://localhost:8090`.
+This runs `apps/backend` in watch mode using `nodemon`.
+
+The backend defaults to `http://localhost:8090`.
+
+Useful routes after startup:
+
+- `GET /health`
+- `GET /monitor`
+- `/api/v1/auth`
+- `/api/v1/tenants`
+
+## What starts with the backend
+
+When the backend boots successfully it will attempt to:
+
+- initialize Express + HTTP server,
+- attach Socket.IO,
+- schedule cron jobs,
+- initialize the monitor socket,
+- start workflow workers using the in-memory queue adapter.
+
+## Local development tips
+
+### Start the full stack
+
+If you want the frontend and backend together:
+
+```bash
+npm run start:all
+```
+
+If you also need package watch mode:
+
+```bash
+npm run dev:all
+```
+
+### Seed data
+
+If the project requires local seed data:
+
+```bash
+npm run seed
+```
 
 ## Troubleshooting
 
-If you encounter issues during setup or deployment, check the following:
+If startup fails, check these first:
 
-- Ensure PostgreSQL is running and accessible
-- Verify environment variables are correctly set
-- Check network connectivity for external services
-- Review logs for specific error messages
+- `DATABASE_URL` points to a reachable PostgreSQL instance
+- `apps/backend/.env` exists and is being read
+- `firebase-key.json` is present and valid
+- `ENABLED_MODULES` does not reference modules you intentionally removed
+- the frontend origin is included in `CORS_WHITELIST`
+
+### Common gotchas
+
+- Workflow docs in older materials may refer to RabbitMQ, but the active local runtime uses the in-memory queue adapter.
+- Some features depend on external services or tenant datasource configuration and will not be fully usable with only the base database configured.
 
 ## Additional Resources
 
-- [Prisma Documentation](https://www.prisma.io/docs/)
-- [Node.js Best Practices](https://github.com/goldbergyoni/nodebestpractices)
+- [Prisma documentation](https://www.prisma.io/docs/)
+- [Backend architecture](../architecture/backend-architecture)
+- [Workflow architecture](../concepts/workflow-architecture)

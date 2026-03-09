@@ -14,17 +14,17 @@ Most endpoints require a valid Firebase ID token passed in the `Authorization` h
 
 ### Header Format
 
-\`\`\`http
+```http
 Authorization: Bearer <FIREBASE_ID_TOKEN>
-\`\`\`
+```
 
 ### How to obtain a token
 
 1.  Sign in using the client SDK (Frontend).
 2.  Retrieve the ID Token:
-    \`\`\`javascript
+    ```javascript
     const token = await auth().currentUser.getIdToken();
-    \`\`\`
+    ```
 3.  Include this token in all API requests.
 
 ### Permissions
@@ -39,13 +39,13 @@ For server-to-server communication or external integrations, you can use an API 
 
 ### Header Format
 
-\`\`\`http
+```http
 x-api-key: <YOUR_API_KEY>
-\`\`\`
+```
 
 ### Managing API Keys
 
-You can generate and manage API Keys via the **Tenant Settings > API Keys** section in the Jet Admin dashboard, or via the [API Key Endpoints](/docs/api-reference/api-keys).
+You can generate and manage API Keys via the **Tenant Settings > API Keys** section in the Jet Admin dashboard and then use those keys for supported backend endpoints.
 
 > **Note**: API Keys have specific permissions scopes assigned to them. Ensure your key has the necessary permissions for the endpoints you are calling.
 
