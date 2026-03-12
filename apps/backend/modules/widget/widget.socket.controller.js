@@ -34,9 +34,9 @@ const widgetSocketController = {
    * @param {string} params.instanceID - Instance ID for subscribe/replay mode
    * @param {string} params.tenantID - Tenant ID
    * @param {string} params.firebaseID - User's Firebase ID
-   * @param {string} params.widgetType - Widget type for data processing (bar, line, pie, etc.)
-   * @param {object} params.datasetFields - Dataset field mappings for data processing
-   * @param {object} params.parameters - Additional chart parameters
+   * @param {string} params.widgetType - Widget type identifier
+   * @param {object} params.widgetConfig - Opaque widget configuration blob
+   * @param {object} params.workflowConfig - Workflow binding configuration
    */
   async onWidgetWorkflowConnect({ 
     socket, 
@@ -47,14 +47,14 @@ const widgetSocketController = {
     instanceID = null,
     tenantID,
     firebaseID,
-    // Widget configuration for real-time data processing
+    // Generic widget configuration (opaque — only widgets-logic knows internals)
     widgetType,
-    datasetFields,
-    parameters,
+    widgetConfig,
+    workflowConfig,
   }) {
     Logger.log('info', {
       message: 'widgetSocketController:onWidgetWorkflowConnect',
-      params: { widgetID, workflowID, mode, tenantID, widgetType, hasDatasetFields: !!datasetFields },
+      params: { widgetID, workflowID, mode, tenantID, widgetType, hasWidgetConfig: !!widgetConfig, hasWorkflowConfig: !!workflowConfig },
     });
 
     try {
@@ -86,8 +86,8 @@ const widgetSocketController = {
             tenantID,
             firebaseID,
             widgetType,
-            datasetFields,
-            parameters,
+            widgetConfig,
+            workflowConfig,
           });
           
           Logger.log('info', {
@@ -146,11 +146,11 @@ const widgetSocketController = {
           
           // Process initial context for widget if config provided
           let processedData = null;
-          if (widgetType && datasetFields) {
+          if (widgetType && widgetConfig) {
             processedData = widgetWorkflowBridge.processContextForWidget(initialContext, {
               widgetType,
-              datasetFields,
-              parameters,
+              widgetConfig,
+              workflowConfig,
             });
           }
           
@@ -176,16 +176,15 @@ const widgetSocketController = {
           throw new Error(`Unknown mode: ${mode}`);
       }
 
-      // Register widget for live updates with configuration for data processing
+      // Register widget for live updates with generic configuration
       widgetWorkflowBridge.registerWidget(widgetID, responseInstanceID, socket, {
         workflowID,
         mode,
         tenantID,
         firebaseID,
-        // Widget configuration for real-time data processing
         widgetType,
-        datasetFields,
-        parameters,
+        widgetConfig,
+        workflowConfig,
       });
 
       // Send connection confirmation

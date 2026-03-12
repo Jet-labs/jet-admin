@@ -99,7 +99,7 @@ const OutputParameterEditor = ({ parameters, onChange, availableVariables }) => 
                   type="text"
                   value={param.sourceVariable}
                   onChange={(e) => updateParameter(index, 'sourceVariable', e.target.value)}
-                  placeholder="ctx.result or a value"
+                  placeholder="{{ctx.result}} or a literal value"
                   className="w-full text-xs text-slate-700 p-1.5 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff]"
                 />
                 {availableVariables.length > 0 && (

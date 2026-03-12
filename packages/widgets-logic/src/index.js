@@ -3,64 +3,48 @@
  * 
  * Pure JavaScript functions for transforming workflow context data into widget-compatible formats.
  * No React or UI dependencies - Node.js compatible.
+ * 
+ * IMPORTANT: Template resolution ({{ctx.*}}) is the backend's responsibility.
+ * This package expects widgetConfig (including vegaSpec) to be already resolved before being passed in.
  */
 
-import { resolveDatasetFields } from './utils/pathResolvers';
-
-// Import Vega processors only
-import { processVegaLiteWorkflowData, processVegaWorkflowData } from './vega/processors';
-
-// Import universal spec interpolator
-import { processWidgetSpec, interpolateSpec } from './utils/specInterpolator';
+// Import Vega builder
+import { buildRenderableSpec } from './vega/builder';
 
 /**
- * Map of widget type to processor function
- * Only Vega and Vega-Lite are supported
- */
-const WIDGET_PROCESSORS = {
-  'vega-lite': processVegaLiteWorkflowData,
-  'vega': processVegaWorkflowData,
-};
-
-/**
- * Process workflow context data based on widget type
+ * Process workflow context data based on widget type.
+ * 
+ * This is the ONLY function that knows about widget-type-specific config fields.
+ * The backend widget module passes widgetConfig as an already-resolved opaque blob —
+ * this function extracts what it needs based on widgetType.
+ * 
+ * Extracts spec from widgetConfig (e.g. widgetConfig.vegaSpec for Vega widgets),
+ * which should already be template-resolved by the backend, and builds a renderable spec.
  * 
  * @param {object} params
- * @param {string} params.widgetType - Widget type (vega-lite, vega)
- * @param {object} params.context - Workflow context data
- * @param {object} params.datasetFields - Field mappings from workflowConfig
- * @param {object} params.parameters - Additional chart parameters
- * @param {object} params.workflowConfig - Full workflow config
+ * @param {string} params.widgetType - Widget type ('vega-lite', 'vega', or future types)
+ * @param {object} [params.widgetConfig] - Already-resolved widget config blob (contains type-specific fields)
  * @returns {object} Processed data ready for widget rendering
  */
-export const processWorkflowDataForWidget = ({ widgetType, context, datasetFields, parameters, workflowConfig }) => {
-  // If vegaSpec is provided directly in workflowConfig, use the universal processor
-  if (workflowConfig?.vegaSpec) {
-    return processWidgetSpec({
-      vegaSpec: workflowConfig.vegaSpec,
-      context,
-      options: workflowConfig.options
+export const processWorkflowDataForWidget = ({ widgetType, widgetConfig }) => {
+  // Extract widget-type-specific spec from widgetConfig
+  // For Vega/Vega-Lite widgets, this is widgetConfig.vegaSpec
+  // Future widget types can add their own extraction here
+  const vegaSpec = widgetConfig?.vegaSpec;
+
+  if (vegaSpec) {
+    return buildRenderableSpec({
+      vegaSpec,
+      widgetType: widgetType || 'vega-lite',
     });
   }
 
-  // Use type-specific processors for Vega/Vega-Lite
-  const processor = WIDGET_PROCESSORS[widgetType];
-  
-  if (!processor) {
-    // Unknown widget type, return resolved fields as-is
-    return resolveDatasetFields(context, datasetFields);
-  }
-
-  // Vega-Lite and Vega use workflowConfig directly
-  return processor({ context, workflowConfig });
+  return null;
 };
 
-// Export universal processor for direct use
-export { processWidgetSpec, interpolateSpec };
+// Export the buildRenderableSpec for direct use
+export { buildRenderableSpec };
 
 // Export Visual Chart Builder logic
 export * from './vega/chartSpecGenerator';
 export * from './vega/chartSpecParser';
-
-// Export utilities
-export { resolveDatasetFields };

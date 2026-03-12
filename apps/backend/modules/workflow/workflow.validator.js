@@ -3,6 +3,10 @@
  */
 
 const { z, schemas } = require("../../utils/validation.utils");
+const {
+  collectTemplateViolations,
+  MUSTACHE_ONLY_TEMPLATE_MESSAGE,
+} = require("../../utils/templateEngine/validator");
 
 // ============================================================
 // Request Body Schemas
@@ -11,58 +15,83 @@ const { z, schemas } = require("../../utils/validation.utils");
 const addCustomIssue = (ctx, path, message) => {
   ctx.addIssue({
     code: z.ZodIssueCode.custom,
-    path: [path],
+    path: Array.isArray(path) ? path : [path],
     message,
   });
 };
 
+const addWorkflowTemplateIssues = (data, ctx) => {
+  if (!data.nodes) return;
+
+  const rootPath = ["nodes"];
+  const issues = [];
+
+  data.nodes.forEach((node, index) => {
+    const nodeType = node?.type ?? node?.nodeType;
+    const nodeData = node?.data ?? node?.nodeConfig ?? {};
+    const nodePath = [...rootPath, index, "data"];
+
+    switch (nodeType) {
+      case "dataQuery":
+        collectTemplateViolations(nodeData?.args, [...nodePath, "args"], issues);
+        break;
+      case "loop":
+        collectTemplateViolations(nodeData?.sourceVariable, [...nodePath, "sourceVariable"], issues);
+        break;
+      case "delay":
+        collectTemplateViolations(nodeData?.delayVariable, [...nodePath, "delayVariable"], issues);
+        collectTemplateViolations(nodeData?.untilTime, [...nodePath, "untilTime"], issues);
+        break;
+      case "end":
+        (nodeData?.outputParameters || []).forEach((param, paramIndex) => {
+          collectTemplateViolations(
+            param?.sourceVariable,
+            [...nodePath, "outputParameters", paramIndex, "sourceVariable"],
+            issues
+          );
+        });
+        break;
+      default:
+        break;
+    }
+  });
+
+  for (const issue of issues) {
+    addCustomIssue(ctx, issue.path, issue.message);
+  }
+};
+
 const createWorkflowSchema = z.object({
-  title: z.string().min(1, "workflow title is required").max(255).optional(),
-  workflowTitle: z.string().min(1, "workflowTitle is required").max(255).optional(),
+  title: z.string().min(1, "workflow title is required").max(255),
   workflowDescription: z.string().optional(),
   nodes: z.array(z.any()).optional(),
   edges: z.array(z.any()).optional(),
-  workflowNodes: z.array(z.any()).optional(),
-  workflowEdges: z.array(z.any()).optional(),
   workflowOptions: z.object({}).passthrough().optional(),
 }).passthrough().superRefine((data, ctx) => {
-  if (!data.title && !data.workflowTitle) {
-    addCustomIssue(ctx, "title", "title is required");
-  }
+  addWorkflowTemplateIssues(data, ctx);
 });
 
 const updateWorkflowSchema = z.object({
   title: z.string().min(1, "workflow title is required").max(255).optional(),
-  workflowTitle: z.string().min(1, "workflowTitle is required").max(255).optional(),
   workflowDescription: z.string().optional(),
   nodes: z.array(z.any()).optional(),
   edges: z.array(z.any()).optional(),
-  workflowNodes: z.array(z.any()).optional(),
-  workflowEdges: z.array(z.any()).optional(),
   workflowOptions: z.object({}).passthrough().optional(),
-}).passthrough();
+}).passthrough().superRefine((data, ctx) => {
+  addWorkflowTemplateIssues(data, ctx);
+});
 
 const executeWorkflowSchema = z.object({
   inputParams: z.object({}).passthrough().optional(),
-  args: z.object({}).passthrough().optional(),
 }).passthrough();
 
 const testWorkflowSchema = z.object({
-  nodes: z.array(z.any()).optional(),
-  edges: z.array(z.any()).optional(),
-  workflowNodes: z.array(z.any()).optional(),
-  workflowEdges: z.array(z.any()).optional(),
+  nodes: z.array(z.any()),
+  edges: z.array(z.any()),
   workflowOptions: z.object({}).passthrough().optional(),
   inputParams: z.object({}).passthrough().optional(),
-  args: z.object({}).passthrough().optional(),
 }).passthrough().superRefine((data, ctx) => {
-  if (!data.nodes && !data.workflowNodes) {
-    addCustomIssue(ctx, "nodes", "nodes are required");
-  }
-
-  if (!data.edges && !data.workflowEdges) {
-    addCustomIssue(ctx, "edges", "edges are required");
-  }
+  addWorkflowTemplateIssues(data, ctx);
 });
 
 // ============================================================

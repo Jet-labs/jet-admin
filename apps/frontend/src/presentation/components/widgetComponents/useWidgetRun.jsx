@@ -32,8 +32,8 @@ export const useWidgetRun = ({
   // Socket/Workflow specific params
   workflowID = null,
   widgetType = null,
-  datasetFields = null,
-  parameters = null,
+  widgetConfig = null,
+  workflowConfig = null,
 }) => {
   // --- Local State ---
   const [localData, setLocalData] = useState(null);
@@ -152,8 +152,8 @@ export const useWidgetRun = ({
       mode: 'subscribe',
       instanceID,
       widgetType,
-      datasetFields,
-      parameters
+      widgetConfig,
+      workflowConfig
     };
 
     setConnectionState(CONNECTION_STATES.CONNECTING);
@@ -268,7 +268,7 @@ export const useWidgetRun = ({
       socket.emit('widget_workflow_disconnect', { widgetID: targetWidgetID });
     };
 
-  }, [shouldConnect, socket, instanceID, tenantID, widgetID, workflowID, widgetType, datasetFields, parameters]);
+  }, [shouldConnect, socket, instanceID, tenantID, widgetID, workflowID, widgetType, widgetConfig, workflowConfig]);
 
   // --- 3. Data Resolution ---
   const finalData = useMemo(() => {
@@ -296,20 +296,6 @@ export const useWidgetRun = ({
     fetchWidgetData(formValues);
   }, [fetchWidgetData]);
 
-  // Resolve Variable (from useWidgetWorkflowConnection)
-  const resolveVariable = useCallback((path, fallback) => {
-      if (!path) return fallback;
-      const cleanPath = path.replace('ctx.', '');
-
-      const parts = cleanPath.split('.');
-      let current = wsContext;
-      for (const part of parts) {
-         if (current === undefined || current === null) return fallback;
-         current = current[part];
-      }
-      return current !== undefined ? current : fallback;
-  }, [wsContext]);
-
 
   // --- 5. Return ---
   // Only show loading for initial API fetch, NOT during real-time socket streaming
@@ -333,6 +319,6 @@ export const useWidgetRun = ({
     // Actions
     runWidget,
     clearLogs,
-    resolveVariable,
   };
 };
+

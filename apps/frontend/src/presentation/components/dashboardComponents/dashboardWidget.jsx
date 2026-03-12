@@ -16,34 +16,6 @@ import {
 } from "../widgetComponents/useWidgetRun";
 import { Badge, Button } from "@jet-admin/ui";
 
-const resolvePath = (obj, path) => {
-  if (!obj || !path) return undefined;
-
-  const parts = path.split(".");
-  let current = obj;
-
-  for (const part of parts) {
-    if (current === undefined || current === null) return undefined;
-    current = current[part];
-  }
-
-  return current;
-};
-
-const extractWidgetData = (rawData) => {
-  if (Array.isArray(rawData)) return rawData;
-
-  if (rawData && typeof rawData === "object") {
-    if (rawData.$schema) return rawData;
-    if (Array.isArray(rawData.data)) return rawData.data;
-    if (Array.isArray(rawData.rows)) return rawData.rows;
-    if (Array.isArray(rawData.items)) return rawData.items;
-    if (Array.isArray(rawData.values)) return rawData.values;
-  }
-
-  return undefined;
-};
-
 const getChartData = (data) => {
   if (data?.workflowInstances?.data) return data.workflowInstances.data;
   if (data?.data) return data.data;
@@ -120,7 +92,6 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height }) => {
     isRunning: isWorkflowRunning,
     isLive,
     workflowStatus,
-    resolveVariable,
     context: workflowContext,
   } = useWidgetRun({
     tenantID,
@@ -129,8 +100,8 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height }) => {
     executionMode,
     workflowID: widget?.workflowID,
     widgetType: widget?.widgetType,
-    datasetFields: widget?.workflowConfig?.datasetFields,
-    parameters: widget?.workflowConfig?.parameters,
+    widgetConfig: widget?.widgetConfig,
+    workflowConfig: widget?.workflowConfig,
   });
 
   const handleOnWidgetInit = useCallback((widgetView) => {
@@ -142,72 +113,9 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height }) => {
       return null;
     }
 
-    if (widget.widgetConfig?.vegaSpec) {
-      const WidgetComponent = WIDGETS_MAP["vega-lite"]?.component;
-
-      if (!WidgetComponent) {
-        return { errorMessage: "VegaWidget not available" };
-      }
-
-      let specToRender = {};
-
-      try {
-        specToRender =
-          typeof widget.widgetConfig.vegaSpec === "string"
-            ? JSON.parse(widget.widgetConfig.vegaSpec)
-            : JSON.parse(JSON.stringify(widget.widgetConfig.vegaSpec));
-      } catch {
-        return { errorMessage: "Invalid Vega Spec JSON" };
-      }
-
-      let vegaData = [];
-      let dataResolved = false;
-
-      if (
-        specToRender?.data &&
-        typeof specToRender.data.values === "string"
-      ) {
-        const ctxMatch = specToRender.data.values.match(/\{\{ctx\.([^}]+)\}\}/);
-
-        if (ctxMatch && workflowContext) {
-          const extractedData = extractWidgetData(
-            resolvePath(workflowContext, ctxMatch[1])
-          );
-
-          if (extractedData !== undefined) {
-            vegaData = extractedData;
-            dataResolved = true;
-          } else {
-            dataResolved = true;
-          }
-        }
-      }
-
-      if (!dataResolved) {
-        const extractedData = extractWidgetData(getChartData(finalData));
-
-        if (extractedData !== undefined) {
-          vegaData = extractedData;
-        }
-      }
-
-      if (vegaData && vegaData.$schema) {
-        specToRender = vegaData;
-      } else {
-        specToRender.data = {
-          ...(specToRender.data || {}),
-          values: Array.isArray(vegaData) ? vegaData : [],
-        };
-      }
-
-      return {
-        Component: WidgetComponent,
-        data: JSON.parse(JSON.stringify(specToRender)),
-        widgetType: "vega-lite",
-      };
-    }
-
-    const WidgetComponent = WIDGETS_MAP[widget.widgetType]?.component;
+    // Resolve the widget component from the map
+    const resolvedType = widget.widgetType || 'vega-lite';
+    const WidgetComponent = WIDGETS_MAP[resolvedType]?.component;
 
     if (!WidgetComponent) {
       return {
@@ -215,12 +123,13 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height }) => {
       };
     }
 
+    // processedData from backend is the complete spec — just pass it through
     return {
       Component: WidgetComponent,
       data: getChartData(finalData),
-      widgetType: widget.widgetType,
+      widgetType: resolvedType,
     };
-  }, [finalData, widget, workflowContext]);
+  }, [finalData, widget]);
 
   const RenderedWidgetComponent = widgetRender?.Component;
   const WidgetIcon = widget ? WIDGETS_MAP[widgetRender?.widgetType || widget.widgetType]?.icon : null;
@@ -340,7 +249,6 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height }) => {
               isLoadingWorkflows={isWorkflowRunning}
               isConnected={isLive}
               workflowStatus={workflowStatus}
-              resolveVariable={resolveVariable}
             />
           </div>
         ) : null}

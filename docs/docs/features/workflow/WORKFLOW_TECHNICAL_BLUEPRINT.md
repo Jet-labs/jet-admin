@@ -100,9 +100,9 @@ The Workflow Module implements an **Event-Driven, DAG-Based Workflow Orchestrati
 │  │  │  - publish      │  │  ┌───────────┐ ┌───────────┐ ┌───────────┐  │ │ │
 │  │  │    results      │──┼──┤ condition │ │   loop    │ │   delay   │  │ │ │
 │  │  │                 │  │  └───────────┘ └───────────┘ └───────────┘  │ │ │
-│  │  │  workerSDK.js   │  │  ┌───────────┐                              │ │ │
-│  │  │  - context      │  │  │    end    │ (Terminal Node)              │ │ │
-│  │  │    resolution   │  │  └───────────┘                              │ │ │
+│  │  │  resolveTemplate│  │  ┌───────────┐                              │ │ │
+│  │  │  helper inject  │  │  │    end    │ (Terminal Node)              │ │ │
+│  │  │    + widgets    │  │  └───────────┘                              │ │ │
 │  │  └─────────────────┘  └─────────────────────────────────────────────┘ │ │
 │  └───────────────────────────────────────────────────────────────────────┘ │
 │                                    │                                        │
@@ -232,16 +232,14 @@ interface WorkflowContext {
 
 ### 2.4 Variable Resolution
 
-The `workerSDK.js` provides two key resolution functions:
+Workflow runtime now injects a single shared resolver into handlers:
 
-1. **`resolveFromContext(ctx, path)`**: Navigates context using dot/bracket notation
-   - Input: `"ctx.input.userId"` or `"ctx[\"queryResult\"].rows[0]"`
-   - Supports nested access and array indices
-
-2. **`resolveStringWithContext(ctx, str)`**: Mustache-style template resolution
+1. **`resolveTemplate(template, ctx, options)`**: Generic template resolution for strings, arrays, and objects
    - **Single variable** `"{{ctx.input.id}}"` → Preserves original type
    - **String interpolation** `"prefix_{{ctx.input.id}}_suffix"` → Returns string
+   - **Nested objects/arrays** are resolved recursively
    - **Literal** `"hardcoded"` → Returns as-is
+   - **Raw paths** like `"ctx.input.id"` are not resolved for workflow template fields; use `{{ctx...}}`
 
 ---
 
@@ -258,7 +256,7 @@ The `workerSDK.js` provides two key resolution functions:
 | **stateManager** | `modules/workflow/orchestrator/stateManager.js` | Instance state CRUD operations | prisma |
 | **dagScheduler** | `modules/workflow/orchestrator/dagScheduler.js` | Graph traversal, next node calculation | prisma |
 | **taskWorker** | `modules/workflow/workers/taskWorker.js` | Task queue consumer, handler dispatch | rabbitmq.config, handlers |
-| **workerSDK** | `modules/workflow/workers/workerSDK.js` | Context resolution utilities | rabbitmq.config |
+| **workerSDK** | `modules/workflow/workers/workerSDK.js` | Widget binding compatibility barrel | rabbitmq.config |
 | **handlers/** | `modules/workflow/workers/handlers/` | Node-type-specific execution logic | vm2, QueryEngine |
 | **rabbitmq.config** | `config/rabbitmq.config.js` | Message queue connection & operations | amqplib |
 
@@ -374,8 +372,8 @@ The `workerSDK.js` provides two key resolution functions:
 │ Helpers Object Passed to Handlers:                                          │
 │   {                                                                         │
 │     instanceID, nodeID, workflowID,                                         │
-│     resolveFromContext: (path) => resolveFromContext(context, path),        │
-│     resolveStringWithContext: (str) => resolveStringWithContext(context,str)│
+│     resolveTemplate: (template, meta) =>                                    │
+│       resolveTemplate(template, context, WORKFLOW_TEMPLATE_OPTIONS, meta)   │
 │   }                                                                         │
 │                                                                             │
 │ Retry Logic:                                                                │
@@ -408,7 +406,7 @@ The `workerSDK.js` provides two key resolution functions:
 │ Config: { dataQueryID, args, outputVariable, errorHandling }                │
 │                                                                             │
 │ Calls:                                                                      │
-│   ├─► resolveStringWithContext() for each arg value                         │
+│   ├─► resolveTemplate(args)                                                 │
 │   ├─► QueryEngine.executeQuery(dataQueryID, resolvedArgs)                   │
 │   │     └─► Fetches query from DB, executes against datasource              │
 │                                                                             │
@@ -452,6 +450,7 @@ The `workerSDK.js` provides two key resolution functions:
 │ loopHandler.execute(nodeConfig, context, helpers)                           │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │ Config: { sourceVariable, itemVariable, indexVariable, outputVariable }     │
+│ Template Example: sourceVariable = "{{ctx.queryResult}}"                    │
 │                                                                             │
 │ Note: Loop body execution is orchestrator's responsibility (not implemented)│
 │                                                                             │
@@ -463,6 +462,7 @@ The `workerSDK.js` provides two key resolution functions:
 │ delayHandler.execute(nodeConfig, context, helpers)                          │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │ Config: { delayType, delayMinutes, delaySeconds, delayMs, delayVariable }   │
+│ Template Example: delayVariable = "{{ctx.waitTime}}"                        │
 │                                                                             │
 │ Key Feature: Returns queueDelay instead of blocking                         │
 │              Next node is queued with TTL = totalDelayMs                    │
@@ -477,11 +477,13 @@ The `workerSDK.js` provides two key resolution functions:
 │ endHandler.execute(nodeConfig, context, helpers)                            │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │ Config: { status, outputParameters: [{ name, sourceVariable }] }            │
+│ Recommended Format: sourceVariable = "{{ctx.queryResult}}"                  │
 │                                                                             │
 │ Purpose: Terminal node - collects final outputs                             │
 │                                                                             │
 │ Calls:                                                                      │
-│   └─► resolveFromContext(sourceVariable) for each output parameter          │
+│   └─► resolveTemplate(sourceVariable) for each output parameter             │
+│       (workflow template fields require {{ctx...}} syntax)                  │
 │                                                                             │
 │ Output: { output: { status, workflowOutput: {...}, completedAt },           │
 │           nextHandle: null }  // Terminal - no next node                    │

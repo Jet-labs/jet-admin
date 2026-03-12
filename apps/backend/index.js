@@ -124,10 +124,10 @@ socketIO.on("connection", async (socket) => {
         instanceID: data.instanceID,
         tenantID: data.tenantID,
         firebaseID: firebase_id,
-        // Widget configuration for real-time data processing
+        // Generic widget configuration (opaque — only widgets-logic knows internals)
         widgetType: data.widgetType,
-        datasetFields: data.datasetFields,
-        parameters: data.parameters,
+        widgetConfig: data.widgetConfig,
+        workflowConfig: data.workflowConfig,
       });
     }
   );

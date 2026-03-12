@@ -1,0 +1,308 @@
+FAIL __tests__/unit/workflow/workflow.service.test.js
+  ● Test suite failed to run
+
+    Cannot find module '../../../modules/workflow/workflowRuns.model' from '__tests__/unit/workflow/workflow.service.test.js'
+
+    [0m [90m  5 |[39m
+     [90m  6 |[39m [90m// Mock dependencies[39m
+    [31m[1m>[22m[39m[90m  7 |[39m jest[33m.[39mmock([32m'../../../modules/workflow/workflowRuns.model'[39m[33m,[39m () [33m=>[39m ({
+     [90m    |[39m      [31m[1m^[22m[39m
+     [90m  8 |[39m   workflowRunModel[33m:[39m {
+     [90m  9 |[39m     findUnique[33m:[39m jest[33m.[39mfn()[33m,[39m
+     [90m 10 |[39m   }[0m
+
+      at Resolver._throwModNotFoundError (../../node_modules/jest-resolve/build/resolver.js:427:11)
+      at Object.mock (__tests__/unit/workflow/workflow.service.test.js:7:6)
+
+FAIL __tests__/unit/dataQuery/dataQuery.validator.test.js
+  DataQuery Schema Validation with Templates
+    createDataQuerySchema
+      √ should pass validation for valid single-expression template in dataQueryOptions (8 ms)
+      √ should pass validation for raw strings without templates
+      × should fail validation when dataQueryOptions contains mixed string + template expressions (2 ms)
+      × should fail validation when dataQueryOptions contains multiple templates in one string
+      × should handle nested dataQueryOptions recursively (1 ms)
+
+  ● DataQuery Schema Validation with Templates › createDataQuerySchema › should fail validation when dataQueryOptions contains mixed string + template expressions
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: false
+    Received: true
+
+    [0m [90m 40 |[39m
+     [90m 41 |[39m       [36mconst[39m result [33m=[39m createDataQuerySchema[33m.[39msafeParse(invalidPayload)[33m;[39m
+    [31m[1m>[22m[39m[90m 42 |[39m       expect(result[33m.[39msuccess)[33m.[39mtoBe([36mfalse[39m)[33m;[39m
+     [90m    |[39m                              [31m[1m^[22m[39m
+     [90m 43 |[39m       
+     [90m 44 |[39m       [36mconst[39m issues [33m=[39m result[33m.[39merror[33m.[39missues[33m;[39m
+     [90m 45 |[39m       expect(issues[33m.[39msome(i [33m=>[39m i[33m.[39mcode [33m===[39m z[33m.[39m[33mZodIssueCode[39m[33m.[39mcustom [33m&&[39m i[33m.[39mmessage[33m.[39mincludes([32m'must exist continuously'[39m)))[33m.[39mtoBe([36mtrue[39m)[33m;[39m[0m
+
+      at Object.toBe (__tests__/unit/dataQuery/dataQuery.validator.test.js:42:30)
+
+  ● DataQuery Schema Validation with Templates › createDataQuerySchema › should fail validation when dataQueryOptions contains multiple templates in one string
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: false
+    Received: true
+
+    [0m [90m 56 |[39m
+     [90m 57 |[39m       [36mconst[39m result [33m=[39m createDataQuerySchema[33m.[39msafeParse(invalidPayload)[33m;[39m
+    [31m[1m>[22m[39m[90m 58 |[39m       expect(result[33m.[39msuccess)[33m.[39mtoBe([36mfalse[39m)[33m;[39m
+     [90m    |[39m                              [31m[1m^[22m[39m
+     [90m 59 |[39m       
+     [90m 60 |[39m       [36mconst[39m issues [33m=[39m result[33m.[39merror[33m.[39missues[33m;[39m
+     [90m 61 |[39m       expect(issues[33m.[39msome(i [33m=>[39m i[33m.[39mcode [33m===[39m z[33m.[39m[33mZodIssueCode[39m[33m.[39mcustom [33m&&[39m i[33m.[39mmessage[33m.[39mincludes([32m'must exist continuously'[39m)))[33m.[39mtoBe([36mtrue[39m)[33m;[39m[0m
+
+      at Object.toBe (__tests__/unit/dataQuery/dataQuery.validator.test.js:58:30)
+
+  ● DataQuery Schema Validation with Templates › createDataQuerySchema › should handle nested dataQueryOptions recursively
+
+    expect(received).toBe(expected) // Object.is equality
+
+    Expected: false
+    Received: true
+
+    [0m [90m 74 |[39m
+     [90m 75 |[39m       [36mconst[39m result [33m=[39m createDataQuerySchema[33m.[39msafeParse(invalidPayload)[33m;[39m
+    [31m[1m>[22m[39m[90m 76 |[39m       expect(result[33m.[39msuccess)[33m.[39mtoBe([36mfalse[39m)[33m;[39m
+     [90m    |[39m                              [31m[1m^[22m[39m
+     [90m 77 |[39m       
+     [90m 78 |[39m       [36mconst[39m issues [33m=[39m result[33m.[39merror[33m.[39missues[33m;[39m
+     [90m 79 |[39m       expect(issues[33m.[39msome(i [33m=>[39m i[33m.[39mpath[33m.[39mincludes([32m'filters'[39m) [33m&&[39m i[33m.[39mpath[33m.[39mincludes([32m'1'[39m) [33m&&[39m i[33m.[39mpath[33m.[39mincludes([32m'badField'[39m)))[33m.[39mtoBe([36mtrue[39m)[33m;[39m[0m
+
+      at Object.toBe (__tests__/unit/dataQuery/dataQuery.validator.test.js:76:30)
+
+  console.log
+    setting path for environment... D:\PROJECTS\PERSONAL\jet-admin\apps\backend\.env
+
+      at Object.log (environment.js:5:9)
+
+  console.log
+    setting up environment variables...
+
+      at Object.log (environment.js:6:9)
+
+  console.log
+    environment variables set-----------------------------
+
+      at Object.log (environment.js:38:9)
+
+  console.log
+    {
+      NODE_ENV: 'test',
+      NODE_ID: 'prod_node_1',
+      PORT: '8090',
+      ENABLED_MODULES: [
+        'auth',           'tenant',
+        'database',       'datasource',
+        'dataQuery',      'workflow',
+        'widget',         'dashboard',
+        'userManagement', 'role',
+        'apiKey',         'cronJob',
+        'audit',          'ai',
+        'notification',   'permission'
+      ],
+      DATABASE_URL: 'postgresql://raghav227996399:qo9rgmetwNz1@ep-floral-rice-a1hsh5op-pooler.ap-southeast-1.aws.neon.tech/main?sslmode=require',
+      GEMINI_API_KEY: 'AIzaSyBz550zzfMU2E5u39x3qt5KXzhnuRPxR7o',
+      SYSLOG_HOST: '127.0.0.1',
+      SYSLOG_PORT: '514',
+      SYSLOG_PROTOCOL: 'udp4',
+      LOG_RETENTION: '7',
+      SYSLOG_LEVEL: 'warning',
+      LOG_LEVEL: 'info',
+      LOG_FILE_SIZE: '1',
+      EXPRESS_REQUEST_SIZE_LIMIT: '5mb',
+      CORS_WHITELIST: [
+        'http://localhost:3000',
+        'http://localhost:5173',
+        'http://localhost:5174',
+        'http://127.0.0.1:3000',
+        'http://127.0.0.1:3001',
+        'http://localhost:3001'
+      ]
+    }
+
+      at Object.log (environment.js:39:9)
+
+  console.log
+    setting path for environment... D:\PROJECTS\PERSONAL\jet-admin\apps\backend\.env
+
+      at Object.log (environment.js:5:9)
+
+  console.log
+    setting up environment variables...
+
+      at Object.log (environment.js:6:9)
+
+  console.log
+    environment variables set-----------------------------
+
+      at Object.log (environment.js:38:9)
+
+  console.log
+    {
+      NODE_ENV: 'test',
+      NODE_ID: 'prod_node_1',
+      PORT: '8090',
+      ENABLED_MODULES: [
+        'auth',           'tenant',
+        'database',       'datasource',
+        'dataQuery',      'workflow',
+        'widget',         'dashboard',
+        'userManagement', 'role',
+        'apiKey',         'cronJob',
+        'audit',          'ai',
+        'notification',   'permission'
+      ],
+      DATABASE_URL: 'postgresql://raghav227996399:qo9rgmetwNz1@ep-floral-rice-a1hsh5op-pooler.ap-southeast-1.aws.neon.tech/main?sslmode=require',
+      GEMINI_API_KEY: 'AIzaSyBz550zzfMU2E5u39x3qt5KXzhnuRPxR7o',
+      SYSLOG_HOST: '127.0.0.1',
+      SYSLOG_PORT: '514',
+      SYSLOG_PROTOCOL: 'udp4',
+      LOG_RETENTION: '7',
+      SYSLOG_LEVEL: 'warning',
+      LOG_LEVEL: 'info',
+      LOG_FILE_SIZE: '1',
+      EXPRESS_REQUEST_SIZE_LIMIT: '5mb',
+      CORS_WHITELIST: [
+        'http://localhost:3000',
+        'http://localhost:5173',
+        'http://localhost:5174',
+        'http://127.0.0.1:3000',
+        'http://127.0.0.1:3001',
+        'http://localhost:3001'
+      ]
+    }
+
+      at Object.log (environment.js:39:9)
+
+FAIL __tests__/unit/widget/widgetWorkflowBridge.test.js
+  WidgetWorkflowBridge
+    registerWidget
+      × should store generic widgetConfig and convert instanceID to string (7 ms)
+      × should clean up old instance mapping when re-registered to a new instance (1 ms)
+    processContextForWidget
+      × should resolve templates in generic widgetConfig and delegate processing
+      × should return null if no widgetConfig is provided without throwing
+    emitContextUpdate
+      × should pass correctly shaped generic config to processing function (1 ms)
+
+  ● WidgetWorkflowBridge › registerWidget › should store generic widgetConfig and convert instanceID to string
+
+    TypeError: widgetWorkflowBridge.getStats is not a function
+
+    [0m [90m 26 |[39m     }[33m;[39m
+     [90m 27 |[39m     [90m// Force clear internal state (it's a singleton)[39m
+    [31m[1m>[22m[39m[90m 28 |[39m     [36mconst[39m stats [33m=[39m widgetWorkflowBridge[33m.[39mgetStats()[33m;[39m
+     [90m    |[39m                                        [31m[1m^[22m[39m
+     [90m 29 |[39m     [36mfor[39m ([36mconst[39m conn [36mof[39m stats[33m.[39mconnections) {
+     [90m 30 |[39m       widgetWorkflowBridge[33m.[39munregisterWidget(conn[33m.[39mwidgetID)[33m;[39m
+     [90m 31 |[39m     }[0m
+
+      at Object.getStats (__tests__/unit/widget/widgetWorkflowBridge.test.js:28:40)
+
+  ● WidgetWorkflowBridge › registerWidget › should clean up old instance mapping when re-registered to a new instance
+
+    TypeError: widgetWorkflowBridge.getStats is not a function
+
+    [0m [90m 26 |[39m     }[33m;[39m
+     [90m 27 |[39m     [90m// Force clear internal state (it's a singleton)[39m
+    [31m[1m>[22m[39m[90m 28 |[39m     [36mconst[39m stats [33m=[39m widgetWorkflowBridge[33m.[39mgetStats()[33m;[39m
+     [90m    |[39m                                        [31m[1m^[22m[39m
+     [90m 29 |[39m     [36mfor[39m ([36mconst[39m conn [36mof[39m stats[33m.[39mconnections) {
+     [90m 30 |[39m       widgetWorkflowBridge[33m.[39munregisterWidget(conn[33m.[39mwidgetID)[33m;[39m
+     [90m 31 |[39m     }[0m
+
+      at Object.getStats (__tests__/unit/widget/widgetWorkflowBridge.test.js:28:40)
+
+  ● WidgetWorkflowBridge › processContextForWidget › should resolve templates in generic widgetConfig and delegate processing
+
+    TypeError: widgetWorkflowBridge.getStats is not a function
+
+    [0m [90m 26 |[39m     }[33m;[39m
+     [90m 27 |[39m     [90m// Force clear internal state (it's a singleton)[39m
+    [31m[1m>[22m[39m[90m 28 |[39m     [36mconst[39m stats [33m=[39m widgetWorkflowBridge[33m.[39mgetStats()[33m;[39m
+     [90m    |[39m                                        [31m[1m^[22m[39m
+     [90m 29 |[39m     [36mfor[39m ([36mconst[39m conn [36mof[39m stats[33m.[39mconnections) {
+     [90m 30 |[39m       widgetWorkflowBridge[33m.[39munregisterWidget(conn[33m.[39mwidgetID)[33m;[39m
+     [90m 31 |[39m     }[0m
+
+      at Object.getStats (__tests__/unit/widget/widgetWorkflowBridge.test.js:28:40)
+
+  ● WidgetWorkflowBridge › processContextForWidget › should return null if no widgetConfig is provided without throwing
+
+    TypeError: widgetWorkflowBridge.getStats is not a function
+
+    [0m [90m 26 |[39m     }[33m;[39m
+     [90m 27 |[39m     [90m// Force clear internal state (it's a singleton)[39m
+    [31m[1m>[22m[39m[90m 28 |[39m     [36mconst[39m stats [33m=[39m widgetWorkflowBridge[33m.[39mgetStats()[33m;[39m
+     [90m    |[39m                                        [31m[1m^[22m[39m
+     [90m 29 |[39m     [36mfor[39m ([36mconst[39m conn [36mof[39m stats[33m.[39mconnections) {
+     [90m 30 |[39m       widgetWorkflowBridge[33m.[39munregisterWidget(conn[33m.[39mwidgetID)[33m;[39m
+     [90m 31 |[39m     }[0m
+
+      at Object.getStats (__tests__/unit/widget/widgetWorkflowBridge.test.js:28:40)
+
+  ● WidgetWorkflowBridge › emitContextUpdate › should pass correctly shaped generic config to processing function
+
+    TypeError: widgetWorkflowBridge.getStats is not a function
+
+    [0m [90m 26 |[39m     }[33m;[39m
+     [90m 27 |[39m     [90m// Force clear internal state (it's a singleton)[39m
+    [31m[1m>[22m[39m[90m 28 |[39m     [36mconst[39m stats [33m=[39m widgetWorkflowBridge[33m.[39mgetStats()[33m;[39m
+     [90m    |[39m                                        [31m[1m^[22m[39m
+     [90m 29 |[39m     [36mfor[39m ([36mconst[39m conn [36mof[39m stats[33m.[39mconnections) {
+     [90m 30 |[39m       widgetWorkflowBridge[33m.[39munregisterWidget(conn[33m.[39mwidgetID)[33m;[39m
+     [90m 31 |[39m     }[0m
+
+      at Object.getStats (__tests__/unit/widget/widgetWorkflowBridge.test.js:28:40)
+
+FAIL __tests__/unit/widget/widget.socket.controller.test.js
+  WidgetSocketController
+    onWidgetWorkflowConnect
+      × should handle execute mode by executing workflow and registering widget (650 ms)
+      × should handle subscribe/replay mode by getting status and emitting immediately (76 ms)
+
+  ● WidgetSocketController › onWidgetWorkflowConnect › should handle execute mode by executing workflow and registering widget
+
+    expect(jest.fn()).toHaveBeenCalledWith(...expected)
+
+    Expected: "workflow-1", "tenant-1", {"firebaseID": "firebase-1", "inputParams": {"some": "input"}, "triggeredBy": "widget-1"}
+
+    Number of calls: 0
+
+    [0m [90m 48 |[39m       })[33m;[39m
+     [90m 49 |[39m
+    [31m[1m>[22m[39m[90m 50 |[39m       expect(workflowService[33m.[39mexecuteWorkflow)[33m.[39mtoHaveBeenCalledWith([32m'workflow-1'[39m[33m,[39m [32m'tenant-1'[39m[33m,[39m {
+     [90m    |[39m                                               [31m[1m^[22m[39m
+     [90m 51 |[39m         triggeredBy[33m:[39m [32m'widget-1'[39m[33m,[39m
+     [90m 52 |[39m         inputParams[33m:[39m { some[33m:[39m [32m'input'[39m }[33m,[39m
+     [90m 53 |[39m         firebaseID[33m:[39m [32m'firebase-1'[39m[33m,[39m[0m
+
+      at Object.toHaveBeenCalledWith (__tests__/unit/widget/widget.socket.controller.test.js:50:47)
+
+  ● WidgetSocketController › onWidgetWorkflowConnect › should handle subscribe/replay mode by getting status and emitting immediately
+
+    expect(jest.fn()).toHaveBeenCalledWith(...expected)
+
+    Expected: "widget-1", "instance-456", {"emit": [Function mockConstructor], "id": "socket-123"}, ObjectContaining {"widgetConfig": {"the": "config"}, "widgetType": "pie-chart", "workflowConfig": {"the": "workflow"}}
+
+    Number of calls: 0
+
+    [0m [90m 85 |[39m
+     [90m 86 |[39m       [90m// Assert registration happened with generic config[39m
+    [31m[1m>[22m[39m[90m 87 |[39m       expect(widgetWorkflowBridge[33m.[39mregisterWidget)[33m.[39mtoHaveBeenCalledWith(
+     [90m    |[39m                                                   [31m[1m^[22m[39m
+     [90m 88 |[39m         [32m'widget-1'[39m[33m,[39m
+     [90m 89 |[39m         [32m'instance-456'[39m[33m,[39m
+     [90m 90 |[39m         mockSocket[33m,[39m[0m
+
+      at Object.toHaveBeenCalledWith (__tests__/unit/widget/widget.socket.controller.test.js:87:51)
+
+Test Suites: 4 failed, 4 total
+Tests:       10 failed, 2 passed, 12 total
+Snapshots:   0 total
+Time:        2.151 s
+Ran all test suites matching /dataQuery.validator.test.js|workflow.service.test.js|widgetWorkflowBridge.test.js|widget.socket.controller.test.js/i.

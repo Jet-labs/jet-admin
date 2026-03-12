@@ -27,7 +27,7 @@ import {
 import { SiQuantconnect } from "react-icons/si";
 import { FaCode, FaCodeBranch, FaPlay, FaStop } from "react-icons/fa";
 import { TbLayoutDistributeHorizontal, TbRepeat } from "react-icons/tb";
-import { VscJson, VscTerminal } from "react-icons/vsc";
+import { VscClearAll, VscJson, VscTerminal } from "react-icons/vsc";
 import { TbBraces } from "react-icons/tb";
 import { IoMdTime } from "react-icons/io";
 import { useWorkflowState, useWorkflowActions } from "../../../logic/contexts/workflowContext";
@@ -137,7 +137,8 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
         context: workflowContext,
         startTestRun,
         stopRun: stopTestRun,
-        clearLogs
+        clearLogs,
+        clearRunState
     } = useWorkflowRun({ tenantID });
 
     // UI State only
@@ -293,6 +294,13 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
     const workflowArgs = useMemo(() => {
         return values.workflowOptions?.args?.filter(arg => arg.key) || [];
     }, [values.workflowOptions?.args]);
+
+    const hasRunState = useMemo(() => {
+        return Boolean(testResult)
+            || consoleLogs.length > 0
+            || Object.keys(nodeExecutionStatus).length > 0
+            || Object.keys(workflowContext).length > 0;
+    }, [testResult, consoleLogs, nodeExecutionStatus, workflowContext]);
 
     // Execute test run wrapper
     const executeTestRun = useCallback((inputParams) => {
@@ -464,6 +472,18 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                             </Button>
                                         )}
                                     </div>
+                                    <Button
+                                        type="button"
+                                        onClick={clearRunState}
+                                        disabled={isTestRunning || !hasRunState}
+                                        variant="outline"
+                                        size="sm"
+                                        className="w-full"
+                                        title="Clear test run state"
+                                    >
+                                        <VscClearAll className="size-4 mr-2" />
+                                        Clear
+                                    </Button>
                                 </div>
 
                                 <div className="flex flex-row flex-wrap gap-1.5 pt-2 border-t border-border mt-2">

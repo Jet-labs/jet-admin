@@ -3,14 +3,33 @@ const Logger = require("./logger");
 
 const errorUtils = {};
 
+const formatValidationIssue = (issue = {}) => {
+  const path = Array.isArray(issue.path)
+    ? issue.path.join(".")
+    : issue.path || issue.param || "";
+  const message = issue.message || issue.msg || "Validation failed";
+
+  return path ? `${path}: ${message}` : message;
+};
+
 errorUtils.extractError = (error) => {
   let errorResponse = { ...constants.ERROR_CODES.SERVER_ERROR };
 
   try {
     if (!error) return errorResponse;
 
+    if (Array.isArray(error)) {
+      errorResponse = {
+        code: "VALIDATION_ERROR",
+        message: error.map(formatValidationIssue).join("; "),
+        details: {
+          issues: error,
+        },
+      };
+    }
+
     // Handle JavaScript errors (TypeError, ReferenceError, etc.)
-    if (error instanceof Error) {
+    else if (error instanceof Error) {
       errorResponse = {
         code: error.code || "INTERNAL_ERROR",
         message: error.message,

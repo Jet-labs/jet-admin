@@ -252,6 +252,121 @@ import React5, { useEffect, useMemo, useRef } from "react";
 import PropTypes5 from "prop-types";
 import Editor from "@monaco-editor/react";
 import GithubTheme from "monaco-themes/themes/GitHub Light.json";
+
+// src/renderers/templateCompletion.js
+var ROOT_COMPLETIONS = [
+  {
+    label: "args",
+    detail: "Configured query arguments"
+  },
+  {
+    label: "runtimeArgs",
+    detail: "Runtime query arguments"
+  }
+];
+var IDENTIFIER_REGEX = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
+var getUniqueQueryArgs = (queryArgs = []) => {
+  const seen = /* @__PURE__ */ new Set();
+  return queryArgs.filter((queryArg) => typeof queryArg?.key === "string" && queryArg.key.trim()).map((queryArg) => ({
+    key: queryArg.key.trim(),
+    type: queryArg.type
+  })).filter((queryArg) => {
+    if (seen.has(queryArg.key)) {
+      return false;
+    }
+    seen.add(queryArg.key);
+    return true;
+  });
+};
+var buildAccessExpression = (rootLabel, key) => {
+  if (IDENTIFIER_REGEX.test(key)) {
+    return `${rootLabel}.${key}`;
+  }
+  return `${rootLabel}["${key.replaceAll('"', '\\"')}"]`;
+};
+var getTemplateCompletionContext = (model, position) => {
+  const textBeforeCursor = model.getValueInRange({
+    startLineNumber: position.lineNumber,
+    startColumn: 1,
+    endLineNumber: position.lineNumber,
+    endColumn: position.column
+  });
+  const lastOpenIndex = textBeforeCursor.lastIndexOf("{{");
+  const lastCloseIndex = textBeforeCursor.lastIndexOf("}}");
+  if (lastOpenIndex === -1 || lastCloseIndex > lastOpenIndex) {
+    return null;
+  }
+  return {
+    expression: textBeforeCursor.slice(lastOpenIndex + 2),
+    range: {
+      startLineNumber: position.lineNumber,
+      endLineNumber: position.lineNumber,
+      startColumn: lastOpenIndex + 3,
+      endColumn: position.column
+    }
+  };
+};
+var buildTemplateSuggestions = ({ monaco, context, queryArgs = [] }) => {
+  if (!context) {
+    return [];
+  }
+  const normalizedExpression = context.expression.replace(/^\s*/, "");
+  const normalizedQueryArgs = getUniqueQueryArgs(queryArgs);
+  const templateSuggestions = [];
+  const pushRootSuggestions = (partial = "") => {
+    ROOT_COMPLETIONS.filter(
+      (rootCompletion) => rootCompletion.label.toLowerCase().startsWith(partial.toLowerCase())
+    ).forEach((rootCompletion) => {
+      templateSuggestions.push({
+        label: rootCompletion.label,
+        kind: monaco.languages.CompletionItemKind.Variable,
+        insertText: `${rootCompletion.label}.`,
+        detail: rootCompletion.detail,
+        command: {
+          id: "editor.action.triggerSuggest",
+          title: "Trigger suggest"
+        },
+        range: context.range,
+        sortText: `0-${rootCompletion.label}`
+      });
+    });
+  };
+  const pushQueryArgSuggestions = (rootLabel, partial = "") => {
+    normalizedQueryArgs.filter((queryArg) => queryArg.key.toLowerCase().startsWith(partial.toLowerCase())).forEach((queryArg) => {
+      templateSuggestions.push({
+        label: queryArg.key,
+        kind: monaco.languages.CompletionItemKind.Field,
+        insertText: buildAccessExpression(rootLabel, queryArg.key),
+        detail: queryArg.type ? `Query arg (${queryArg.type})` : "Configured query arg",
+        documentation: `Insert ${buildAccessExpression(rootLabel, queryArg.key)}`,
+        range: context.range,
+        sortText: `0-${rootLabel}-${queryArg.key}`
+      });
+    });
+  };
+  if (!normalizedExpression) {
+    pushRootSuggestions();
+    return templateSuggestions;
+  }
+  const dotAccessMatch = normalizedExpression.match(/^(args|runtimeArgs)(?:\.([A-Za-z0-9_$-]*))?$/);
+  if (dotAccessMatch) {
+    if (dotAccessMatch[2] === void 0) {
+      pushRootSuggestions(dotAccessMatch[1]);
+      return templateSuggestions;
+    }
+    pushQueryArgSuggestions(dotAccessMatch[1], dotAccessMatch[2]);
+    return templateSuggestions;
+  }
+  const bracketAccessMatch = normalizedExpression.match(/^(args|runtimeArgs)\[(?:["']?([^"'\]]*))?$/);
+  if (bracketAccessMatch) {
+    pushQueryArgSuggestions(bracketAccessMatch[1], bracketAccessMatch[2] || "");
+    return templateSuggestions;
+  }
+  pushRootSuggestions(normalizedExpression);
+  return templateSuggestions;
+};
+
+// src/renderers/CustomCodePgsqlControl.jsx
 var CustomCodePgsqlControl = ({
   data,
   path,
@@ -262,7 +377,7 @@ var CustomCodePgsqlControl = ({
   enabled,
   uischema
 }) => {
-  const { databaseMetadata } = uischema.options || {};
+  const { databaseMetadata, queryArgs = [] } = uischema.options || {};
   const tablesMap = useMemo(() => {
     if (!databaseMetadata?.schemas) return {};
     const map = {};
@@ -274,12 +389,16 @@ var CustomCodePgsqlControl = ({
     return map;
   }, [databaseMetadata]);
   const schemaRef = useRef(tablesMap);
+  const queryArgsRef = useRef(queryArgs);
   useEffect(() => {
     schemaRef.current = tablesMap;
   }, [tablesMap]);
+  useEffect(() => {
+    queryArgsRef.current = queryArgs;
+  }, [queryArgs]);
   const handleEditorWillMount = (monaco) => {
     monaco.languages.registerCompletionItemProvider("sql", {
-      triggerCharacters: [".", " "],
+      triggerCharacters: [".", " ", "{", "[", '"', "'"],
       provideCompletionItems: (model, pos) => {
         const text = model.getValueInRange({
           startLineNumber: 1,
@@ -294,6 +413,16 @@ var CustomCodePgsqlControl = ({
           startColumn: wordInfo.startColumn,
           endColumn: wordInfo.endColumn
         };
+        const templateContext = getTemplateCompletionContext(model, pos);
+        if (templateContext) {
+          return {
+            suggestions: buildTemplateSuggestions({
+              monaco,
+              context: templateContext,
+              queryArgs: queryArgsRef.current
+            })
+          };
+        }
         const suggestions = [];
         const tableMatch = text.match(/(\b\w+)\.$/);
         if (tableMatch) {
@@ -407,7 +536,7 @@ CustomCodePgsqlControl.propTypes = {
 };
 
 // src/renderers/CustomCodeJavascriptControl.jsx
-import React6 from "react";
+import React6, { useEffect as useEffect2, useRef as useRef2 } from "react";
 import PropTypes6 from "prop-types";
 import Editor2 from "@monaco-editor/react";
 import GithubTheme2 from "monaco-themes/themes/GitHub Light.json";
@@ -421,14 +550,28 @@ var CustomCodeJavascriptControl = ({
   enabled,
   uischema
 }) => {
-  const { placeholder, hint } = uischema.options || {};
+  const { placeholder, hint, queryArgs = [] } = uischema.options || {};
   const rows = uischema.options?.rows || 10;
   const height = rows * 20 + "px";
+  const queryArgsRef = useRef2(queryArgs);
+  useEffect2(() => {
+    queryArgsRef.current = queryArgs;
+  }, [queryArgs]);
   const handleEditorWillMount = (monaco) => {
     monaco.editor.defineTheme("github-light", GithubTheme2);
     monaco.languages.registerCompletionItemProvider("javascript", {
-      triggerCharacters: ["."],
+      triggerCharacters: [".", "{", "[", '"', "'", " "],
       provideCompletionItems: (model, position) => {
+        const templateContext = getTemplateCompletionContext(model, position);
+        if (templateContext) {
+          return {
+            suggestions: buildTemplateSuggestions({
+              monaco,
+              context: templateContext,
+              queryArgs: queryArgsRef.current
+            })
+          };
+        }
         const wordInfo = model.getWordUntilPosition(position);
         const range = {
           startLineNumber: position.lineNumber,
@@ -583,7 +726,7 @@ CustomSuggestionInput.propTypes = {
 };
 
 // src/renderers/DynamicArgsControl.jsx
-import React8, { useState as useState3, useRef as useRef2, useEffect as useEffect2, useMemo as useMemo2 } from "react";
+import React8, { useState as useState3, useRef as useRef3, useEffect as useEffect3, useMemo as useMemo2 } from "react";
 import PropTypes8 from "prop-types";
 import { TbVariable } from "react-icons/tb";
 import { Button as Button3, Input as Input4 } from "@jet-admin/ui";
@@ -667,9 +810,9 @@ var DynamicArgsControl = (props) => {
 };
 var ArgInputWithVariablePicker = ({ argName, value, onChange, availableVariables }) => {
   const [showDropdown, setShowDropdown] = useState3(false);
-  const inputRef = useRef2(null);
-  const dropdownRef = useRef2(null);
-  useEffect2(() => {
+  const inputRef = useRef3(null);
+  const dropdownRef = useRef3(null);
+  useEffect3(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setShowDropdown(false);
@@ -1480,7 +1623,18 @@ var checkboxTester = (uischema, schema) => {
 };
 var codePgsqlTester = rankWith(
   100,
-  and(isControl, formatIs("code-pgsql"))
+  and(
+    isControl,
+    (uischema, rootSchema) => {
+      try {
+        const currentSchema = Resolve.schema(rootSchema, uischema.scope, rootSchema);
+        return ["code-pgsql", "code-sql", "code-mysql"].includes(currentSchema?.format);
+      } catch (e) {
+        console.warn(`Error resolving schema for scope ${uischema.scope} in codePgsqlTester:`, e);
+        return false;
+      }
+    }
+  )
 );
 var codeJavascriptTester = rankWith(
   100,

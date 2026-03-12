@@ -2,7 +2,11 @@ const {
   createWorkflowSchema,
   executeWorkflowSchema,
   testWorkflowSchema,
+  updateWorkflowSchema,
 } = require('../../../modules/workflow/workflow.validator');
+const {
+  MUSTACHE_ONLY_TEMPLATE_MESSAGE,
+} = require('../../../utils/templateEngine/validator');
 
 describe('workflow.validator', () => {
   it('accepts canonical create payloads', () => {
@@ -15,38 +19,119 @@ describe('workflow.validator', () => {
     expect(result.success).toBe(true);
   });
 
-  it('accepts legacy create payload aliases', () => {
-    const result = createWorkflowSchema.safeParse({
-      workflowTitle: 'Legacy Workflow',
-      workflowNodes: [{ id: 'n1' }],
-      workflowEdges: [],
-    });
-
-    expect(result.success).toBe(true);
-  });
-
-  it('rejects create payloads without either title field', () => {
+  it('rejects create payloads without title field', () => {
     const result = createWorkflowSchema.safeParse({
       nodes: [],
       edges: [],
     });
 
     expect(result.success).toBe(false);
-    expect(result.error.issues[0].message).toBe('title is required');
   });
 
-  it('accepts canonical and legacy execute payload fields', () => {
-    expect(executeWorkflowSchema.safeParse({ inputParams: { customerID: 1 } }).success).toBe(true);
-    expect(executeWorkflowSchema.safeParse({ args: { customerID: 1 } }).success).toBe(true);
+  it('rejects raw ctx paths in workflow template fields for create payloads', () => {
+    const result = createWorkflowSchema.safeParse({
+      title: 'My Workflow',
+      nodes: [{
+        id: 'n1',
+        type: 'dataQuery',
+        data: {
+          args: {
+            customerID: 'ctx.input.customerID',
+          },
+        },
+      }],
+      edges: [],
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.error.issues).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        path: ['nodes', 0, 'data', 'args', 'customerID'],
+        message: MUSTACHE_ONLY_TEMPLATE_MESSAGE,
+      }),
+    ]));
   });
 
-  it('accepts legacy workflow graph aliases for test workflow payloads', () => {
-    const result = testWorkflowSchema.safeParse({
-      workflowNodes: [{ id: 'n1' }],
-      workflowEdges: [{ source: 'n1', target: 'n2' }],
-      args: { test: true },
+  it('rejects raw ctx paths in update payloads for loop and end nodes', () => {
+    const result = updateWorkflowSchema.safeParse({
+      nodes: [
+        {
+          id: 'loop-1',
+          type: 'loop',
+          data: { sourceVariable: 'ctx.items' },
+        },
+        {
+          id: 'end-1',
+          type: 'end',
+          data: {
+            outputParameters: [{ name: 'drivers', sourceVariable: 'ctx.drivers' }],
+          },
+        },
+      ],
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.error.issues).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        path: ['nodes', 0, 'data', 'sourceVariable'],
+        message: MUSTACHE_ONLY_TEMPLATE_MESSAGE,
+      }),
+      expect.objectContaining({
+        path: ['nodes', 1, 'data', 'outputParameters', 0, 'sourceVariable'],
+        message: MUSTACHE_ONLY_TEMPLATE_MESSAGE,
+      }),
+    ]));
+  });
+
+  it('keeps raw ctx expressions allowed in non-template nodes', () => {
+    const result = createWorkflowSchema.safeParse({
+      title: 'My Workflow',
+      nodes: [
+        {
+          id: 'condition-1',
+          type: 'condition',
+          data: {
+            branches: [{ id: 'b1', condition: 'ctx.input.total > 100' }],
+          },
+        },
+        {
+          id: 'js-1',
+          type: 'javascript',
+          data: {
+            code: 'return ctx.input.customerID;',
+          },
+        },
+      ],
+      edges: [],
     });
 
     expect(result.success).toBe(true);
+  });
+
+  it('accepts canonical execute payload fields', () => {
+    expect(executeWorkflowSchema.safeParse({ inputParams: { customerID: 1 } }).success).toBe(true);
+  });
+
+  it('rejects raw ctx paths in test workflow payloads', () => {
+    const result = testWorkflowSchema.safeParse({
+      nodes: [{
+        id: 'delay-1',
+        type: 'delay',
+        data: { delayVariable: 'ctx.waitTime', untilTime: 'ctx.targetTime' },
+      }],
+      edges: [],
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.error.issues).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        path: ['nodes', 0, 'data', 'delayVariable'],
+        message: MUSTACHE_ONLY_TEMPLATE_MESSAGE,
+      }),
+      expect.objectContaining({
+        path: ['nodes', 0, 'data', 'untilTime'],
+        message: MUSTACHE_ONLY_TEMPLATE_MESSAGE,
+      }),
+    ]));
   });
 });

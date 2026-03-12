@@ -308,20 +308,14 @@ const _executeWorkflowMode = async ({ widget, tenantID, executionMode = 'ASYNC' 
         const result = await workflowService.getRunStatusForWidget({
           instanceID,
           widgetType: widget.widgetType,
-          datasetFields: workflowConfig.datasetFields,
-          parameters: workflowConfig.parameters,
-          // For Vega widgets, pass the full workflowConfig
           workflowConfig: workflowConfig,
-          // NEW: Pass vegaSpec from widgetConfig for new architecture
-          vegaSpec: widget.widgetConfig?.vegaSpec,
+          widgetConfig: widget.widgetConfig,
         });
 
         return {
           title: workflowConfig.title,
           instanceID,
           workflowID: widget.workflowID,
-          datasetFields: workflowConfig.datasetFields,
-          parameters: workflowConfig.parameters,
           status: result?.status || 'UNKNOWN',
           // Return the full processed data
           data: result?.data,
@@ -342,8 +336,6 @@ const _executeWorkflowMode = async ({ widget, tenantID, executionMode = 'ASYNC' 
       title: workflowConfig.title,
       instanceID,
       workflowID: widget.workflowID,
-      datasetFields: workflowConfig.datasetFields,
-      parameters: workflowConfig.parameters,
       status: "PENDING",
     };
   } catch (error) {
@@ -355,8 +347,6 @@ const _executeWorkflowMode = async ({ widget, tenantID, executionMode = 'ASYNC' 
     return {
       title: workflowConfig.title,
       workflowID: widget.workflowID,
-      datasetFields: workflowConfig.datasetFields,
-      parameters: workflowConfig.parameters,
       status: "ERROR",
       error: error.message,
     };

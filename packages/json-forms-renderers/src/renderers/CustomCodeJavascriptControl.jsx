@@ -1,8 +1,12 @@
 // Custom Code JavaScript Control Renderer with Monaco Editor
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import Editor from '@monaco-editor/react';
 import GithubTheme from 'monaco-themes/themes/GitHub Light.json';
+import {
+  buildTemplateSuggestions,
+  getTemplateCompletionContext,
+} from './templateCompletion.js';
 
 export const CustomCodeJavascriptControl = ({
   data,
@@ -14,9 +18,14 @@ export const CustomCodeJavascriptControl = ({
   enabled,
   uischema,
 }) => {
-  const { placeholder, hint } = uischema.options || {};
+  const { placeholder, hint, queryArgs = [] } = uischema.options || {};
   const rows = uischema.options?.rows || 10;
   const height = rows * 20 + 'px'; // Approximate line height
+  const queryArgsRef = useRef(queryArgs);
+
+  useEffect(() => {
+    queryArgsRef.current = queryArgs;
+  }, [queryArgs]);
 
   const handleEditorWillMount = (monaco) => {
     // Define GitHub Light theme
@@ -24,8 +33,19 @@ export const CustomCodeJavascriptControl = ({
     
     // Add custom completions for workflow context
     monaco.languages.registerCompletionItemProvider('javascript', {
-      triggerCharacters: ['.'],
+      triggerCharacters: ['.', '{', '[', '"', "'", ' '],
       provideCompletionItems: (model, position) => {
+        const templateContext = getTemplateCompletionContext(model, position);
+        if (templateContext) {
+          return {
+            suggestions: buildTemplateSuggestions({
+              monaco,
+              context: templateContext,
+              queryArgs: queryArgsRef.current,
+            }),
+          };
+        }
+
         const wordInfo = model.getWordUntilPosition(position);
         const range = {
           startLineNumber: position.lineNumber,

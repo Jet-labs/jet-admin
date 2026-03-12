@@ -10,9 +10,46 @@ const {
   getCreationContextFromAuthContext,
 } = require("../../utils/auth.context.utils");
 const { processWorkflowDataForWidget } = require("@jet-admin/widgets-logic");
-const {
-  buildWorkflowGraphPersistencePayload,
-} = require("./workflow.persistence.mapper");
+const { resolveTemplate } = require("../../utils/templateEngine/resolver");
+
+function mapWorkflowNodeForPersistence(node, workflowID) {
+  return {
+    nodeID: node.id,
+    workflowID,
+    nodeType: node.type,
+    nodeConfig: {
+      ...node.data,
+      position: node.position,
+      width: node.width,
+      height: node.height,
+      measured: node.measured,
+    },
+  };
+}
+
+function mapWorkflowEdgeForPersistence(edge, workflowID) {
+  return {
+    workflowID,
+    upstreamNodeID: edge.source,
+    downstreamNodeID: edge.target,
+    sourceHandle: edge.sourceHandle || null,
+    targetHandle: edge.targetHandle || null,
+    edgeType: edge.type || 'smoothstep',
+    edgeConfig: {
+      label: edge.label,
+      style: edge.style,
+      animated: edge.animated,
+      data: edge.data,
+    },
+  };
+}
+
+function buildWorkflowGraphPersistencePayload({ workflowID, nodes = [], edges = [] }) {
+  return {
+    nodeCreateManyData: nodes.map((node) => mapWorkflowNodeForPersistence(node, workflowID)),
+    edgeCreateManyData: edges.map((edge) => mapWorkflowEdgeForPersistence(edge, workflowID)),
+  };
+}
 
 const workflowService = {}
 
@@ -471,18 +508,16 @@ workflowService.stopTestWorkflow = async ({ instanceID }) => {
 
 /**
  * Get the status of a workflow run and process context data for widget display.
- * Transforms contextData according to widgetType and datasetFields.
+ * Widget-type-agnostic: accepts widgetConfig as opaque blob, delegates to widgets-logic.
  * 
  * @param {object} params
  * @param {string} params.instanceID - Workflow instance ID
- * @param {string} params.widgetType - Widget type (bar, line, pie, etc.)
- * @param {object} params.datasetFields - Field mappings { xAxis: "{{ctx.data[*].date}}", yAxis: "..." }
- * @param {object} params.parameters - Additional chart parameters
- * @param {object} params.workflowConfig - Full workflow config (for Vega widgets)
- * @param {object} params.vegaSpec - Vega spec from widgetConfig (new architecture)
+ * @param {string} params.widgetType - Widget type ('vega-lite', 'vega', or future types)
+ * @param {object} params.workflowConfig - Workflow binding config
+ * @param {object} params.widgetConfig - Opaque widget config blob (templates not yet resolved)
  * @returns {Promise<object>} Workflow status with processed data
  */
-workflowService.getRunStatusForWidget = async ({ instanceID, widgetType, datasetFields, parameters, workflowConfig, vegaSpec }) => {
+workflowService.getRunStatusForWidget = async ({ instanceID, widgetType, workflowConfig, widgetConfig }) => {
   Logger.log("info", {
     message: "workflowService:getRunStatusForWidget:params",
     params: { instanceID, widgetType },
@@ -501,16 +536,23 @@ workflowService.getRunStatusForWidget = async ({ instanceID, widgetType, dataset
       return runStatus;
     }
 
-    // Process context data for widget display
+    if (!widgetConfig) {
+      Logger.log("info", {
+        message: "workflowService:getRunStatusForWidget:noWidgetConfig",
+        params: { instanceID },
+      });
+      return runStatus;
+    }
 
+    // Resolve templates in widgetConfig generically
+    const resolvedWidgetConfig = resolveTemplate(widgetConfig, { ctx: runStatus.contextData }, {
+      preserveSingleExpressionType: true,
+    });
 
+    // Delegate to widgets-logic for final spec shape
     const processedData = processWorkflowDataForWidget({
-      widgetType,
-      context: runStatus.contextData,
-      datasetFields,
-      parameters,
-      // Merge vegaSpec into workflowConfig for new architecture
-      workflowConfig: vegaSpec ? { ...workflowConfig, vegaSpec } : workflowConfig,
+      widgetType: widgetType || 'vega-lite',
+      widgetConfig: resolvedWidgetConfig,
     });
 
     Logger.log("success", {
@@ -531,6 +573,10 @@ workflowService.getRunStatusForWidget = async ({ instanceID, widgetType, dataset
   }
 };
 
-module.exports = { workflowService };
+module.exports = { 
+  workflowService,
+  // Exported for testing
+  buildWorkflowGraphPersistencePayload,
+};
 
 

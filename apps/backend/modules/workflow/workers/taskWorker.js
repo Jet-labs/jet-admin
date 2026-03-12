@@ -4,7 +4,12 @@
  */
 const { registerTaskWorker, addResult, addNodeJob, QUEUE_NAMES } = require('../../../config/queue.config');
 const { getHandler } = require('./handlers');
-const { resolveFromContext, resolveStringWithContext } = require('./contextResolver');
+const { resolveTemplate: sharedResolveTemplate } = require('../../../utils/templateEngine');
+
+const WORKFLOW_TEMPLATE_OPTIONS = {
+  allowedRoots: ['ctx'],
+  preserveSingleExpressionType: true,
+};
 const Logger = require('../../../utils/logger');
 
 /**
@@ -30,8 +35,12 @@ async function startTaskWorker() {
         instanceID,
         nodeID,
         workflowID,
-        resolveFromContext: (path) => resolveFromContext(context, path),
-        resolveStringWithContext: (str) => resolveStringWithContext(context, str),
+        resolveTemplate: (template, meta = {}) => sharedResolveTemplate(
+          template,
+          context,
+          WORKFLOW_TEMPLATE_OPTIONS,
+          { module: 'workflow', instanceID, workflowID, nodeID, ...meta }
+        ),
       });
 
       // Send result to orchestrator

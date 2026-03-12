@@ -100,6 +100,7 @@ export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
       updateDataQuery(values);
     },
   });
+  console.log("queryUpdationForm", queryUpdationForm.values);
 
   // Reset test result when switching to a different data query
   React.useEffect(() => {
@@ -181,7 +182,7 @@ export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
                   className="space-y-4 p-3 h-full w-full !overflow-y-auto"
                 >
                   <DataQueryEditor
-                    key={`dataQueryEditor_${dataQuery?.dataQueryID}`}
+                    key={`dataQueryEditor_${dataQuery?.dataQueryID ? dataQuery.dataQueryID : "new"}`}
                     dataQueryEditorForm={queryUpdationForm}
                     tenantID={tenantID}
                     dataQueryID={dataQueryID}
@@ -202,8 +203,8 @@ export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
                       tenantID={tenantID}
                       dataQueryID={dataQueryID}
                       datasourceID={dataQuery?.datasourceID}
-                      datasourceType={dataQuery?.datasourceType}
-                      dataQueryOptions={dataQuery?.dataQueryOptions}
+                      datasourceType={queryUpdationForm.values?.datasourceType}
+                      dataQueryOptions={queryUpdationForm.values?.dataQueryOptions}
                       setDataQueryTestResult={setDataQueryTestResult}
                       dataQuery={queryUpdationForm.values}
                     />

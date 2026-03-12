@@ -27,7 +27,7 @@ sequenceDiagram
     Note right of FE: Sends queryID + runtime args
     API->>QE: runDataQueryByID(id, args)
     QE->>QE: Fetch Query & Datasource Config
-    QE->>QE: Resolve Template Variables ({{limit}}, {{user.id}}, {{args.id}})
+    QE->>QE: Resolve Template Variables ({{args.limit}}, {{args.user.id}}, {{runtimeArgs.id}})
     QE->>DL: Get DataSource Adapter
     DL->>DL: Instantiate Adapter (new PostgreSQLDataSource)
     DL->>DB: Connect & Execute Query
@@ -56,7 +56,7 @@ The heart of the system is the **QueryEngine** class.
 
 ### Responsibilities:
 1.  **Fetching**: Retrieving the query definition and datasource credentials (via injected fetchers).
-2.  **Interpolation**: Replacing template variables (e.g., `{{limit}}`, `{{user.id}}`, legacy `{{args.id}}`) with actual runtime values.
+2.  **Interpolation**: Replacing template variables (e.g., `{{args.limit}}`, `{{args.user.id}}`, `{{runtimeArgs.id}}`) with actual runtime values.
 3.  **Delegation**: Loading the correct "Driver" from the Shared Registry and asking it to execute.
 
 ### Code Spotlight: `engine.js`
@@ -191,7 +191,7 @@ The frontend logic is heavily **schema-driven**. Instead of hardcoding forms for
 
 2.  **`DataQueryTestingForm.jsx`**:
     - The "Run" button.
-    - Handles "Prompt for Arguments": If the query needs inputs (e.g., `{{id}}`, `{{user.id}}`, or legacy `{{args.id}}`), it opens a modal (`DataQueryArgsForm`) to ask the user for values before sending the request.
+    - Handles "Prompt for Arguments": If the query needs inputs (e.g., `{{args.id}}`, `{{args.user.id}}`, or `{{runtimeArgs.id}}`), it opens a modal (`DataQueryArgsForm`) to ask the user for values before sending the request.
     - Calls `testDataQueryByIDAPI` or `testDataQueryByDataAPI`.
 
 ### Query Execution Flow (Frontend)

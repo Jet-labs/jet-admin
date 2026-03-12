@@ -3,7 +3,7 @@ import {
   materialRenderers,
 } from "@jsonforms/material-renderers";
 import { JsonForms } from "@jsonforms/react";
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import PropTypes from "prop-types";
 import { DATASOURCE_UI_COMPONENTS } from "@jet-admin/datasources-ui";
 import { getDatasourceTypeByValue } from "@jet-admin/datasource-types";
@@ -18,6 +18,49 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@jet-admin/ui";
+
+const injectQueryArgsIntoUiSchema = (uiSchema, queryArgs) => {
+  if (!uiSchema || typeof uiSchema !== "object") {
+    return uiSchema;
+  }
+
+  if (Array.isArray(uiSchema)) {
+    return uiSchema.map((childUiSchema) =>
+      injectQueryArgsIntoUiSchema(childUiSchema, queryArgs)
+    );
+  }
+
+  const nextUiSchema = {
+    ...uiSchema,
+    ...(uiSchema.type === "Control"
+      ? {
+        options: {
+          ...(uiSchema.options || {}),
+          queryArgs,
+        },
+      }
+      : {}),
+  };
+
+  if (Array.isArray(uiSchema.elements)) {
+    nextUiSchema.elements = uiSchema.elements.map((childUiSchema) =>
+      injectQueryArgsIntoUiSchema(childUiSchema, queryArgs)
+    );
+  }
+
+  if (uiSchema.detail) {
+    nextUiSchema.detail = injectQueryArgsIntoUiSchema(uiSchema.detail, queryArgs);
+  }
+
+  if (uiSchema.options?.detail) {
+    nextUiSchema.options = {
+      ...(nextUiSchema.options || {}),
+      detail: injectQueryArgsIntoUiSchema(uiSchema.options.detail, queryArgs),
+    };
+  }
+
+  return nextUiSchema;
+};
 
 
 export const DataQueryEditor = ({
@@ -37,10 +80,22 @@ export const DataQueryEditor = ({
 
   // Get the current datasource type config
   const currentDatasourceType = getDatasourceTypeByValue(dataQueryEditorForm.values.datasourceType);
+  const queryConfigUiSchema = useMemo(
+    () =>
+      injectQueryArgsIntoUiSchema(
+        currentDatasourceType?.queryConfigForm?.uischema,
+        dataQueryEditorForm.values.dataQueryOptions?.args || []
+      ),
+    [
+      currentDatasourceType?.queryConfigForm?.uischema,
+      dataQueryEditorForm.values.dataQueryOptions?.args,
+    ]
+  );
 
   // This handler specifically updates the 'datasourceOptions' part of Formik's state
   const _handleDatasourceOptionsChange = useCallback(
     ({ data }) => {
+      console.log("data", data);
       dataQueryEditorForm.setFieldValue("dataQueryOptions", data);
     },
     [dataQueryEditorForm]
@@ -97,7 +152,7 @@ export const DataQueryEditor = ({
             <JsonForms
               key={uniqueKey}
               schema={currentDatasourceType.queryConfigForm.schema}
-              uischema={currentDatasourceType.queryConfigForm.uischema}
+              uischema={queryConfigUiSchema}
               data={dataQueryEditorForm.values.dataQueryOptions}
               renderers={[...materialRenderers, ...customJSONFormRenderers]}
               cells={materialCells}

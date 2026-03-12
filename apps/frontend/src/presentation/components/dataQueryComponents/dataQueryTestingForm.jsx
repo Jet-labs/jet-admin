@@ -29,6 +29,17 @@ export const DataQueryTestingForm = ({
     dataQuery: PropTypes.object.isRequired,
   };
   const [isArgsFormOpen, setIsArgsFormOpen] = useState(false);
+  console.log({
+    tenantID,
+    dataQueryID,
+    setDataQueryTestResult,
+    // eslint-disable-next-line no-unused-vars
+    datasourceID,
+    // eslint-disable-next-line no-unused-vars
+    datasourceType,
+    dataQueryOptions,
+    dataQuery,
+  });
 
   const { isPending: isTestingDataQuery, mutate: testDataQuery } = useMutation({
     mutationFn: ({ argValues }) => {

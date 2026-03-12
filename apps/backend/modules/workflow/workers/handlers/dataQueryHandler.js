@@ -6,7 +6,7 @@ const { createQueryEngine } = require('../../../dataQuery/queryEngine/queryExecu
 const { ERROR_HANDLING, NEXT_HANDLE } = require('./constants');
 
 async function execute(nodeConfig, context, helpers) {
-  const { resolveStringWithContext } = helpers;
+  const { resolveTemplate } = helpers;
   const { 
     dataQueryID, 
     args = {}, 
@@ -23,15 +23,7 @@ async function execute(nodeConfig, context, helpers) {
   // - Single variable: "{{ctx.input.id}}" -> preserves type
   // - String interpolation: "id_{{ctx.input.id}}" -> returns string
   // - Literal values: "hardcoded" -> returns as-is
-  const resolvedArgs = {};
-  for (const [key, value] of Object.entries(args)) {
-    if (typeof value === 'string') {
-      resolvedArgs[key] = resolveStringWithContext(value);
-    } else {
-      // Non-string values (numbers, booleans, objects) pass through as-is
-      resolvedArgs[key] = value;
-    }
-  }
+  const resolvedArgs = resolveTemplate(args, { nodeType: 'dataQuery' });
 
   
   try {

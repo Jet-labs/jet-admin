@@ -45,6 +45,38 @@ describe('validation.utils', () => {
         );
     });
 
+    it('validate preserves exact validation issues in the response payload', () => {
+        const middleware = validate(
+            z.object({
+                sourceVariable: z.string().min(1, 'Use mustache syntax like {{ctx.input.customerID}} instead of a raw ctx.input.customerID path'),
+            })
+        );
+        const req = global.testUtils.createMockRequest({
+            body: { sourceVariable: '' },
+        });
+        const res = global.testUtils.createMockResponse();
+        const next = global.testUtils.createMockNext();
+
+        middleware(req, res, next);
+
+        expect(next).not.toHaveBeenCalled();
+        expect(res.status).toHaveBeenCalledWith(400);
+        expect(res.json).toHaveBeenCalledWith({
+            success: false,
+            error: {
+                code: 'VALIDATION_ERROR',
+                message: 'sourceVariable: Use mustache syntax like {{ctx.input.customerID}} instead of a raw ctx.input.customerID path',
+                details: {
+                    issues: [{
+                        path: 'sourceVariable',
+                        message: 'Use mustache syntax like {{ctx.input.customerID}} instead of a raw ctx.input.customerID path',
+                        type: 'too_small',
+                    }],
+                },
+            },
+        });
+    });
+
     it('validateAll parses params and query sources together', () => {
         const middleware = validateAll({
             params: z.object({ tenantID: schemas.uuidSchema }),

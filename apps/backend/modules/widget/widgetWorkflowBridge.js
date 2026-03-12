@@ -9,6 +9,7 @@
 const Logger = require('../../utils/logger');
 const { socketIO } = require('../../config/socket.io');
 const { processWorkflowDataForWidget } = require('@jet-admin/widgets-logic');
+const { resolveTemplate } = require('../../utils/templateEngine/resolver');
 
 // In-memory store for widget-workflow connections
 // In production, consider Redis for horizontal scaling
@@ -35,24 +36,20 @@ const widgetWorkflowBridge = {
         instanceID, 
         socketId: socket.id, 
         hasWidgetType: !!metadata.widgetType,
-        hasDatasetFields: !!metadata.datasetFields,
+        metadata,
       },
     });
 
-    // Store widget connection with configuration for data processing
+    // Store widget connection with generic configuration for data processing
+    // widgetConfig is an opaque blob — only widgets-logic knows its internals
     widgetConnections.set(widgetID, {
       instanceID,
       socketId: socket.id,
       status: 'connected',
       connectedAt: new Date().toISOString(),
-      // Widget configuration for real-time data processing
-      widgetType: metadata.widgetType || metadata.widgetConfig?.widgetType,
-      datasetFields: metadata.datasetFields || metadata.widgetConfig?.datasetFields,
-      parameters: metadata.parameters || metadata.widgetConfig?.parameters,
-      // Store full workflowConfig for Vega widgets
+      widgetType: metadata.widgetType,
+      widgetConfig: metadata.widgetConfig,
       workflowConfig: metadata.workflowConfig,
-      // NEW: Direct vegaSpec for new architecture
-      vegaSpec: metadata.widgetConfig?.vegaSpec || metadata.vegaSpec,
       ...metadata,
     });
 
@@ -81,17 +78,17 @@ const widgetWorkflowBridge = {
   },
 
   /**
-   * Update widget configuration (e.g., when datasetFields change)
+   * Update widget configuration
    * @param {string} widgetID - Widget ID
-   * @param {object} config - New configuration
+   * @param {object} config - New configuration { widgetType, widgetConfig, workflowConfig }
    */
   updateWidgetConfig(widgetID, config) {
     const connection = widgetConnections.get(widgetID);
     if (!connection) return false;
 
     if (config.widgetType) connection.widgetType = config.widgetType;
-    if (config.datasetFields) connection.datasetFields = config.datasetFields;
-    if (config.parameters) connection.parameters = config.parameters;
+    if (config.widgetConfig) connection.widgetConfig = config.widgetConfig;
+    if (config.workflowConfig) connection.workflowConfig = config.workflowConfig;
 
     return true;
   },
@@ -162,51 +159,47 @@ const widgetWorkflowBridge = {
   },
 
   /**
-   * Process context data for a widget based on its configuration
+   * Process context data for a widget based on its configuration.
+   * 
+   * Widget-type-agnostic pipeline:
+   * 1. Resolve all {{ctx.*}} templates in widgetConfig using backend template engine
+   * 2. Delegate to widgets-logic processWorkflowDataForWidget (which extracts type-specific fields)
+   * 3. Return complete, renderable processedData
+   * 
    * @param {object} context - Raw workflow context
-   * @param {object} widgetConfig - Widget configuration
-   * @returns {object} Processed data ready for chart display
+   * @param {object} config - Generic widget configuration { widgetType, widgetConfig, workflowConfig }
+   * @returns {object} Processed data ready for rendering, or null
    */
-  processContextForWidget(context, widgetConfig) {
-    const { widgetType, datasetFields, parameters, workflowConfig, vegaSpec } = widgetConfig;
+  processContextForWidget(context, config) {
+    const { widgetType, widgetConfig, workflowConfig } = config;
+    Logger.log('info', {
+      message: 'widgetWorkflowBridge:processContextForWidget',
+      params: { widgetType, hasWidgetConfig: !!widgetConfig, hasWorkflowConfig: !!workflowConfig },
+    });
 
-    // NEW: If vegaSpec is provided directly, use new universal processor
-    if (vegaSpec) {
-      try {
-        return processWorkflowDataForWidget({
-          widgetType: 'vega-lite', // Default to vega-lite for new architecture
-          context,
-          workflowConfig: { vegaSpec, ...workflowConfig },
-        });
-      } catch (error) {
-        Logger.log('error', {
-          message: 'widgetWorkflowBridge:processContextForWidget:vegaSpec:error',
-          params: { error: error.message },
-        });
-        return null;
-      }
-    }
-
-    // LEGACY: Vega widgets don't use datasetFields - they use workflowConfig directly
-    const isVegaWidget = widgetType === 'vega' || widgetType === 'vega-lite';
-    
-    if (!widgetType) {
-      return null; // No processing needed
-    }
-
-    // For non-Vega widgets, require datasetFields
-    if (!isVegaWidget && (!datasetFields || Object.keys(datasetFields).length === 0)) {
+    if (!widgetConfig) {
+      Logger.log('info', {
+        message: 'widgetWorkflowBridge:processContextForWidget:noWidgetConfig',
+        params: { widgetType },
+      });
       return null;
     }
 
     try {
+      // Step 1: Resolve all {{ctx.*}} templates in widgetConfig using the backend template engine
+      // This is a deep resolve — handles nested objects, arrays, strings
+      const resolvedWidgetConfig = resolveTemplate(widgetConfig, { ctx: context }, {
+        preserveSingleExpressionType: true,
+      });
+      Logger.log('info', {
+        message: 'widgetWorkflowBridge:processContextForWidget:resolvedWidgetConfig',
+        params: { widgetType, resolvedWidgetConfig },
+      });
+
+      // Step 2: Delegate to widgets-logic (sole owner of widget-type-specific logic)
       return processWorkflowDataForWidget({
-        widgetType,
-        context,
-        datasetFields,
-        parameters,
-        // For Vega widgets, pass the full workflowConfig
-        workflowConfig: isVegaWidget ? workflowConfig : undefined,
+        widgetType: widgetType || 'vega-lite',
+        widgetConfig: resolvedWidgetConfig,
       });
     } catch (error) {
       Logger.log('error', {
@@ -241,19 +234,25 @@ const widgetWorkflowBridge = {
     });
 
     const contextSnapshot = update.contextSnapshot;
+    Logger.log('info', {
+      message: 'widgetWorkflowBridge:emitContextUpdate:contextSnapshot',
+      params: { instanceID, hasContextSnapshot: !!contextSnapshot },
+    });
 
     for (const widgetID of widgets) {
       const connection = widgetConnections.get(widgetID);
+      Logger.log('info', {
+        message: 'widgetWorkflowBridge:emitContextUpdate:widget',
+        params: { widgetID, connection },
+      });
       
-      // Process context for this widget if it has configuration
+      // Process context for this widget using generic config
       let processedData = null;
       if (connection && contextSnapshot) {
         processedData = this.processContextForWidget(contextSnapshot, {
           widgetType: connection.widgetType,
-          datasetFields: connection.datasetFields,
-          parameters: connection.parameters,
+          widgetConfig: connection.widgetConfig,
           workflowConfig: connection.workflowConfig,
-          vegaSpec: connection.vegaSpec,
         });
       }
 
@@ -289,15 +288,13 @@ const widgetWorkflowBridge = {
     for (const widgetID of widgets) {
       const connection = widgetConnections.get(widgetID);
       
-      // Process final context for this widget
+      // Process final context for this widget using generic config
       let processedData = null;
       if (connection && finalContext) {
         processedData = this.processContextForWidget(finalContext, {
           widgetType: connection.widgetType,
-          datasetFields: connection.datasetFields,
-          parameters: connection.parameters,
+          widgetConfig: connection.widgetConfig,
           workflowConfig: connection.workflowConfig,
-          vegaSpec: connection.vegaSpec,
         });
       }
 
@@ -345,7 +342,7 @@ const widgetWorkflowBridge = {
         status: conn.status,
         connectedAt: conn.connectedAt,
         widgetType: conn.widgetType,
-        hasDatasetFields: !!conn.datasetFields,
+        hasWidgetConfig: !!conn.widgetConfig,
       })),
     };
   },

@@ -28,7 +28,7 @@ export const WorkflowNodeConfigPanel = ({ node, onChange, onClose, onDelete }) =
     if (!node) return null;
 
     return (
-        <div className="fixed right-0 top-0 h-full w-[400px] bg-background shadow-2xl border-l border-border z-[100] flex flex-col">
+        <div className="fixed right-0 top-0 h-full w-[400px] bg-background shadow-2xl border-l border-border z-[1000] flex flex-col">
             {/* Header */}
             <div className="flex justify-between items-center px-4 py-3 border-b border-border bg-muted/30">
                 <h3 className="font-semibold text-foreground tracking-tight">

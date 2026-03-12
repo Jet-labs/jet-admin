@@ -1,9 +1,13 @@
 // src/engine.js
-const { extractTemplateBlocks } = require("./parsers");
 const Logger = require("../../../utils/logger");
-const { getValueByPath } = require("../../../utils/objectPath.util");
+const { resolveTemplate } = require("../../../utils/templateEngine");
 const { DATASOURCE_TYPES } = require("@jet-admin/datasource-types");
 const { dataSourceRegistry } = require("@jet-admin/datasources-logic");
+
+const QUERY_TEMPLATE_OPTIONS = {
+  allowedRoots: ["runtimeArgs", "args"],
+  preserveSingleExpressionType: true,
+};
 
 class QueryEngine {
   constructor(queryFetcher, datasourceFetcher) {
@@ -98,71 +102,24 @@ class QueryEngine {
   }
 
   async resolveTemplate(template, runtimeArgs, dataQueryID) {
-    if (typeof template === "object") {
-      return this.resolveObjectTemplate(template, runtimeArgs, dataQueryID);
-    }
-
-    return this.resolveStringTemplate(template, runtimeArgs, dataQueryID);
-  }
-
-  async resolveObjectTemplate(template, runtimeArgs, dataQueryID) {
     Logger.log("info", {
-      message: "QueryEngine:resolveObjectTemplate:start",
+      message: "QueryEngine:resolveTemplate:start",
       params: { dataQueryID, template },
     });
 
-    const resolvedObj = {};
-    for (const [key, value] of Object.entries(template)) {
-      resolvedObj[key] = await this.resolveTemplate(
-        value,
-        runtimeArgs,
-        dataQueryID
-      );
-    }
+    const resolvedTemplate = resolveTemplate(
+      template,
+      runtimeArgs,
+      QUERY_TEMPLATE_OPTIONS,
+      { dataQueryID, module: "dataQuery" }
+    );
 
     Logger.log("info", {
-      message: "QueryEngine:resolveObjectTemplate:done",
-      params: { dataQueryID, resolvedObj },
+      message: "QueryEngine:resolveTemplate:done",
+      params: { dataQueryID, resolvedTemplate },
     });
 
-    return resolvedObj;
-  }
-
-  async resolveStringTemplate(template, runtimeArgs, dataQueryID) {
-    const blocks = extractTemplateBlocks(template);
-
-    Logger.log("info", {
-      message: "QueryEngine:resolveStringTemplate:blocksExtracted",
-      // params: { dataQueryID, template, runtimeArgs, blocks },
-    });
-
-    let result = template;
-
-    for (const block of blocks) {
-      Logger.log("info", {
-        message: "QueryEngine:resolveTemplate:enterBlock",
-        params: { dataQueryID, block },
-      });
-
-      // Resolve input variable from runtimeArgs using safe path traversal
-      const value = getValueByPath(runtimeArgs, block.expression, {
-        allowedRoots: ["runtimeArgs", "args"],
-      });
-
-      Logger.log("info", {
-        message: "QueryEngine:resolveTemplate:resolveVariable",
-        // params: { dataQueryID, block, value },
-      });
-
-      result = result.replace(block.fullMatch, value);
-
-      Logger.log("info", {
-        message: "QueryEngine:resolveTemplate:resolvedVariable",
-        params: { dataQueryID, block, result },
-      });
-    }
-
-    return result;
+    return resolvedTemplate;
   }
 }
 

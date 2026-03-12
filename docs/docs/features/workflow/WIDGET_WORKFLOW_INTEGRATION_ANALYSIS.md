@@ -660,7 +660,7 @@ interface WidgetDatasetFieldBinding {
 ### 7.3 Variable Resolution Engine (workerSDK Extension)
 
 ```javascript
-// Extended resolveFromContext for widget variable bindings
+// Extended widget variable resolver for workflow-backed bindings
 
 /**
  * Resolves a variable path from workflow context for widget consumption

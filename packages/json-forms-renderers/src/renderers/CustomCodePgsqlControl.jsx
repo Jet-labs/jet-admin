@@ -3,6 +3,10 @@ import React, { useEffect, useMemo, useRef } from 'react';
 import PropTypes from 'prop-types';
 import Editor from '@monaco-editor/react';
 import GithubTheme from 'monaco-themes/themes/GitHub Light.json';
+import {
+  buildTemplateSuggestions,
+  getTemplateCompletionContext,
+} from './templateCompletion.js';
 
 export const CustomCodePgsqlControl = ({
   data,
@@ -14,7 +18,7 @@ export const CustomCodePgsqlControl = ({
   enabled,
   uischema,
 }) => {
-  const { databaseMetadata } = uischema.options || {};
+  const { databaseMetadata, queryArgs = [] } = uischema.options || {};
   
   // Build schema for autocompletion
   const tablesMap = useMemo(() => {
@@ -30,13 +34,17 @@ export const CustomCodePgsqlControl = ({
   }, [databaseMetadata]);
 
   const schemaRef = useRef(tablesMap);
+  const queryArgsRef = useRef(queryArgs);
   useEffect(() => {
     schemaRef.current = tablesMap;
   }, [tablesMap]);
+  useEffect(() => {
+    queryArgsRef.current = queryArgs;
+  }, [queryArgs]);
 
   const handleEditorWillMount = (monaco) => {
     monaco.languages.registerCompletionItemProvider("sql", {
-      triggerCharacters: [".", " "],
+      triggerCharacters: [".", " ", "{", "[", '"', "'"],
       provideCompletionItems: (model, pos) => {
         const text = model.getValueInRange({
           startLineNumber: 1,
@@ -51,6 +59,18 @@ export const CustomCodePgsqlControl = ({
           startColumn: wordInfo.startColumn,
           endColumn: wordInfo.endColumn,
         };
+        const templateContext = getTemplateCompletionContext(model, pos);
+
+        if (templateContext) {
+          return {
+            suggestions: buildTemplateSuggestions({
+              monaco,
+              context: templateContext,
+              queryArgs: queryArgsRef.current,
+            }),
+          };
+        }
+
         const suggestions = [];
         const tableMatch = text.match(/(\b\w+)\.$/);
         if (tableMatch) {

@@ -336,6 +336,121 @@ var import_react5 = __toESM(require("react"));
 var import_prop_types5 = __toESM(require("prop-types"));
 var import_react6 = __toESM(require("@monaco-editor/react"));
 var import_GitHub_Light = __toESM(require("monaco-themes/themes/GitHub Light.json"));
+
+// src/renderers/templateCompletion.js
+var ROOT_COMPLETIONS = [
+  {
+    label: "args",
+    detail: "Configured query arguments"
+  },
+  {
+    label: "runtimeArgs",
+    detail: "Runtime query arguments"
+  }
+];
+var IDENTIFIER_REGEX = /^[A-Za-z_$][A-Za-z0-9_$]*$/;
+var getUniqueQueryArgs = (queryArgs = []) => {
+  const seen = /* @__PURE__ */ new Set();
+  return queryArgs.filter((queryArg) => typeof queryArg?.key === "string" && queryArg.key.trim()).map((queryArg) => ({
+    key: queryArg.key.trim(),
+    type: queryArg.type
+  })).filter((queryArg) => {
+    if (seen.has(queryArg.key)) {
+      return false;
+    }
+    seen.add(queryArg.key);
+    return true;
+  });
+};
+var buildAccessExpression = (rootLabel, key) => {
+  if (IDENTIFIER_REGEX.test(key)) {
+    return `${rootLabel}.${key}`;
+  }
+  return `${rootLabel}["${key.replaceAll('"', '\\"')}"]`;
+};
+var getTemplateCompletionContext = (model, position) => {
+  const textBeforeCursor = model.getValueInRange({
+    startLineNumber: position.lineNumber,
+    startColumn: 1,
+    endLineNumber: position.lineNumber,
+    endColumn: position.column
+  });
+  const lastOpenIndex = textBeforeCursor.lastIndexOf("{{");
+  const lastCloseIndex = textBeforeCursor.lastIndexOf("}}");
+  if (lastOpenIndex === -1 || lastCloseIndex > lastOpenIndex) {
+    return null;
+  }
+  return {
+    expression: textBeforeCursor.slice(lastOpenIndex + 2),
+    range: {
+      startLineNumber: position.lineNumber,
+      endLineNumber: position.lineNumber,
+      startColumn: lastOpenIndex + 3,
+      endColumn: position.column
+    }
+  };
+};
+var buildTemplateSuggestions = ({ monaco, context, queryArgs = [] }) => {
+  if (!context) {
+    return [];
+  }
+  const normalizedExpression = context.expression.replace(/^\s*/, "");
+  const normalizedQueryArgs = getUniqueQueryArgs(queryArgs);
+  const templateSuggestions = [];
+  const pushRootSuggestions = (partial = "") => {
+    ROOT_COMPLETIONS.filter(
+      (rootCompletion) => rootCompletion.label.toLowerCase().startsWith(partial.toLowerCase())
+    ).forEach((rootCompletion) => {
+      templateSuggestions.push({
+        label: rootCompletion.label,
+        kind: monaco.languages.CompletionItemKind.Variable,
+        insertText: `${rootCompletion.label}.`,
+        detail: rootCompletion.detail,
+        command: {
+          id: "editor.action.triggerSuggest",
+          title: "Trigger suggest"
+        },
+        range: context.range,
+        sortText: `0-${rootCompletion.label}`
+      });
+    });
+  };
+  const pushQueryArgSuggestions = (rootLabel, partial = "") => {
+    normalizedQueryArgs.filter((queryArg) => queryArg.key.toLowerCase().startsWith(partial.toLowerCase())).forEach((queryArg) => {
+      templateSuggestions.push({
+        label: queryArg.key,
+        kind: monaco.languages.CompletionItemKind.Field,
+        insertText: buildAccessExpression(rootLabel, queryArg.key),
+        detail: queryArg.type ? `Query arg (${queryArg.type})` : "Configured query arg",
+        documentation: `Insert ${buildAccessExpression(rootLabel, queryArg.key)}`,
+        range: context.range,
+        sortText: `0-${rootLabel}-${queryArg.key}`
+      });
+    });
+  };
+  if (!normalizedExpression) {
+    pushRootSuggestions();
+    return templateSuggestions;
+  }
+  const dotAccessMatch = normalizedExpression.match(/^(args|runtimeArgs)(?:\.([A-Za-z0-9_$-]*))?$/);
+  if (dotAccessMatch) {
+    if (dotAccessMatch[2] === void 0) {
+      pushRootSuggestions(dotAccessMatch[1]);
+      return templateSuggestions;
+    }
+    pushQueryArgSuggestions(dotAccessMatch[1], dotAccessMatch[2]);
+    return templateSuggestions;
+  }
+  const bracketAccessMatch = normalizedExpression.match(/^(args|runtimeArgs)\[(?:["']?([^"'\]]*))?$/);
+  if (bracketAccessMatch) {
+    pushQueryArgSuggestions(bracketAccessMatch[1], bracketAccessMatch[2] || "");
+    return templateSuggestions;
+  }
+  pushRootSuggestions(normalizedExpression);
+  return templateSuggestions;
+};
+
+// src/renderers/CustomCodePgsqlControl.jsx
 var CustomCodePgsqlControl = ({
   data,
   path,
@@ -346,7 +461,7 @@ var CustomCodePgsqlControl = ({
   enabled,
   uischema
 }) => {
-  const { databaseMetadata } = uischema.options || {};
+  const { databaseMetadata, queryArgs = [] } = uischema.options || {};
   const tablesMap = (0, import_react5.useMemo)(() => {
     if (!databaseMetadata?.schemas) return {};
     const map = {};
@@ -358,12 +473,16 @@ var CustomCodePgsqlControl = ({
     return map;
   }, [databaseMetadata]);
   const schemaRef = (0, import_react5.useRef)(tablesMap);
+  const queryArgsRef = (0, import_react5.useRef)(queryArgs);
   (0, import_react5.useEffect)(() => {
     schemaRef.current = tablesMap;
   }, [tablesMap]);
+  (0, import_react5.useEffect)(() => {
+    queryArgsRef.current = queryArgs;
+  }, [queryArgs]);
   const handleEditorWillMount = (monaco) => {
     monaco.languages.registerCompletionItemProvider("sql", {
-      triggerCharacters: [".", " "],
+      triggerCharacters: [".", " ", "{", "[", '"', "'"],
       provideCompletionItems: (model, pos) => {
         const text = model.getValueInRange({
           startLineNumber: 1,
@@ -378,6 +497,16 @@ var CustomCodePgsqlControl = ({
           startColumn: wordInfo.startColumn,
           endColumn: wordInfo.endColumn
         };
+        const templateContext = getTemplateCompletionContext(model, pos);
+        if (templateContext) {
+          return {
+            suggestions: buildTemplateSuggestions({
+              monaco,
+              context: templateContext,
+              queryArgs: queryArgsRef.current
+            })
+          };
+        }
         const suggestions = [];
         const tableMatch = text.match(/(\b\w+)\.$/);
         if (tableMatch) {
@@ -505,14 +634,28 @@ var CustomCodeJavascriptControl = ({
   enabled,
   uischema
 }) => {
-  const { placeholder, hint } = uischema.options || {};
+  const { placeholder, hint, queryArgs = [] } = uischema.options || {};
   const rows = uischema.options?.rows || 10;
   const height = rows * 20 + "px";
+  const queryArgsRef = (0, import_react7.useRef)(queryArgs);
+  (0, import_react7.useEffect)(() => {
+    queryArgsRef.current = queryArgs;
+  }, [queryArgs]);
   const handleEditorWillMount = (monaco) => {
     monaco.editor.defineTheme("github-light", import_GitHub_Light2.default);
     monaco.languages.registerCompletionItemProvider("javascript", {
-      triggerCharacters: ["."],
+      triggerCharacters: [".", "{", "[", '"', "'", " "],
       provideCompletionItems: (model, position) => {
+        const templateContext = getTemplateCompletionContext(model, position);
+        if (templateContext) {
+          return {
+            suggestions: buildTemplateSuggestions({
+              monaco,
+              context: templateContext,
+              queryArgs: queryArgsRef.current
+            })
+          };
+        }
         const wordInfo = model.getWordUntilPosition(position);
         const range = {
           startLineNumber: position.lineNumber,
@@ -1557,7 +1700,18 @@ var checkboxTester = (uischema, schema) => {
 };
 var codePgsqlTester = (0, import_core.rankWith)(
   100,
-  (0, import_core.and)(import_core.isControl, (0, import_core.formatIs)("code-pgsql"))
+  (0, import_core.and)(
+    import_core.isControl,
+    (uischema, rootSchema) => {
+      try {
+        const currentSchema = import_core.Resolve.schema(rootSchema, uischema.scope, rootSchema);
+        return ["code-pgsql", "code-sql", "code-mysql"].includes(currentSchema?.format);
+      } catch (e) {
+        console.warn(`Error resolving schema for scope ${uischema.scope} in codePgsqlTester:`, e);
+        return false;
+      }
+    }
+  )
 );
 var codeJavascriptTester = (0, import_core.rankWith)(
   100,

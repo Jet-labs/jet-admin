@@ -219,7 +219,7 @@ export const testWorkflowAPI = async ({ tenantID, nodes, edges, inputParams = {}
       throw CONSTANTS.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND;
     }
   } catch (error) {
-    throw error;
+    throw error?.response?.data?.error || error;
   }
 };
 

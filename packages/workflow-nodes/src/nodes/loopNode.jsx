@@ -81,7 +81,7 @@ export const LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
         sourceVariable: {
           type: 'string',
           title: 'Source Array',
-          description: 'Variable containing the array to iterate (e.g., ctx.queryResult)',
+          description: 'Template resolving to the array to iterate (e.g., {{ctx.queryResult}})',
         },
         itemVariable: {
           type: 'string',
@@ -166,7 +166,7 @@ export const LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
             {
               type: 'Control',
               scope: '#/properties/sourceVariable',
-              options: { placeholder: 'ctx.queryResult', hint: contextHint },
+              options: { placeholder: '{{ctx.queryResult}}', hint: contextHint },
             },
             {
               type: 'Control',
@@ -273,7 +273,7 @@ export const LoopNode = memo(({ data, isConnectable }) => {
   const { strings } = useWorkflowNodes();
 
   const isDisabled = data?.isDisabled ?? false;
-  const sourceVariable = data?.sourceVariable || 'ctx.array';
+  const sourceVariable = data?.sourceVariable || '{{ctx.array}}';
   const itemVariable = data?.itemVariable || 'item';
 
   return (

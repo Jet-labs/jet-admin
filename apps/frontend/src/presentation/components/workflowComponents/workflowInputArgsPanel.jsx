@@ -68,7 +68,7 @@ export const WorkflowInputArgsPanel = ({ workflowForm }) => {
                 <Input
                   type="text"
                   placeholder="Name"
-                  className="placeholder:text-slate-400 text-xs flex-1 min-w-0 bg-white border border-slate-300 text-slate-700 rounded focus:outline-none focus:border-slate-400 px-2 py-1"
+                  className=""
                   value={arg.key || ""}
                   onChange={(e) => _handleUpdateArg(index, "key", e.target.value)}
                 />

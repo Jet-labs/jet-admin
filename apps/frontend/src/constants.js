@@ -1217,8 +1217,6 @@ export const CONSTANTS = {
     DATABASE: {
       getDatabaseMetadataAPI: (tenantID) =>
         `/api/v1/tenants/${tenantID}/database/metadata`,
-      executeRawSQLQueryAPI: (tenantID) =>
-        `/api/v1/tenants/${tenantID}/database/execute-raw-sql`,
       createDatabaseSchemaAPI: (tenantID) =>
         `/api/v1/tenants/${tenantID}/database/schemas`,
       getAllDatabaseTablesAPI: (tenantID, databaseSchemaName) =>

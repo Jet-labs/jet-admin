@@ -93,8 +93,8 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
     // Pass config for socket
     workflowID: updateWidgetForm?.values?.workflowID,
     widgetType: updateWidgetForm?.values?.widgetType,
-    datasetFields: updateWidgetForm?.values?.workflowConfig?.datasetFields,
-    parameters: updateWidgetForm?.values?.workflowConfig?.parameters,
+    widgetConfig: updateWidgetForm?.values?.widgetConfig,
+    workflowConfig: updateWidgetForm?.values?.workflowConfig,
   });
 
   const { isPending: isUpdatingWidget, mutate: updateWidget } = useMutation({

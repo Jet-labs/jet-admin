@@ -85,12 +85,12 @@ export const DelayNodeConfigurator = ({ data, onChange, nodeId }) => {
         delayVariable: {
           type: 'string',
           title: 'Delay Variable',
-          description: 'Context variable containing delay in ms (e.g., ctx.waitTime)',
+          description: 'Template resolving to delay in ms (e.g., {{ctx.waitTime}})',
         },
         untilTime: {
           type: 'string',
           title: 'Until Time',
-          description: 'Wait until this time (ISO format or ctx variable)',
+          description: 'Wait until this time (ISO string or template like {{ctx.targetTime}})',
         },
         isDisabled: {
           type: 'boolean',
@@ -128,13 +128,13 @@ export const DelayNodeConfigurator = ({ data, onChange, nodeId }) => {
       delayElements.push({
         type: 'Control',
         scope: '#/properties/delayVariable',
-        options: { placeholder: 'ctx.waitTime (in milliseconds)' },
+        options: { placeholder: '{{ctx.waitTime}} (in milliseconds)' },
       });
     } else if (formData.delayType === 'until') {
       delayElements.push({
         type: 'Control',
         scope: '#/properties/untilTime',
-        options: { placeholder: '2024-12-31T23:59:59Z or ctx.targetTime' },
+        options: { placeholder: '2024-12-31T23:59:59Z or {{ctx.targetTime}}' },
       });
     }
 
@@ -241,7 +241,7 @@ export const DelayNode = memo(({ data, isConnectable }) => {
   // Calculate total delay for display
   const getDelayDisplay = () => {
     if (delayType === 'dynamic') {
-      return data?.delayVariable || 'ctx.delay';
+      return data?.delayVariable || '{{ctx.delay}}';
     }
     if (delayType === 'until') {
       const time = data?.untilTime || '';

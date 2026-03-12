@@ -38,7 +38,7 @@ The `DataQueryAIGeneratePrompt` component allows users to describe their intent 
 - **Output:** SQL determines populated into the Monaco Editor.
 
 ### Argument Binding
-The editor provides a UI to input **Test Values** for dynamic arguments (e.g. `{{id}}`).
+The editor provides a UI to input **Test Values** for dynamic arguments (e.g. `{{args.id}}`).
 - The `DataQueryArgsForm` dynamically renders input fields for every variable detected in the query string.
 
 ### Result Visualization

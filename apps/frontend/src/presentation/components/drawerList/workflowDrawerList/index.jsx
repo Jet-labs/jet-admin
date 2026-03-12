@@ -1,5 +1,6 @@
 import React from "react";
 import { FaPlus } from "react-icons/fa";
+import { LuWorkflow } from "react-icons/lu";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../../constants";
 import { useWorkflowState } from "../../../../logic/contexts/workflowContext";
@@ -58,7 +59,7 @@ export const WorkflowDrawerList = () => {
                     }`}
                 >
                   <div className="size-4 flex-shrink-0">
-                    <FaPlus
+                    <LuWorkflow
                       className={`size-4 ${isActive ? "text-primary" : "text-muted-foreground"}`}
                     />
                   </div>

@@ -3,10 +3,7 @@
  * Handles API requests for workflow execution.
  */
 const { workflowService } = require("./workflow.service");
-const {
-  normalizeWorkflowGraphPayload,
-  normalizeWorkflowInputParams,
-} = require("./workflow.request.mapper");
+
 const Logger = require("../../utils/logger");
 const { expressUtils } = require("../../utils/express.utils");
 const { getServiceAuthContext } = require("../../utils/auth.context.utils");
@@ -62,9 +59,7 @@ workflowController.createWorkflow = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID } = req.params;
-    const { title, nodes, edges, workflowOptions } = normalizeWorkflowGraphPayload(req.body, {
-      defaultEmptyGraph: true,
-    });
+    const { title, nodes = [], edges = [], workflowOptions } = req.body;
     const authContext = getServiceAuthContext(req);
     Logger.log("info", { message: "WorkflowController:createWorkflow:params", params: { userID: user.userID, tenantID, title, nodes, edges, workflowOptions, authContext } });
     const workflow = await workflowService.createWorkflow({ userID: user.userID, tenantID, title, nodes, edges, workflowOptions, authContext });
@@ -85,9 +80,7 @@ workflowController.updateWorkflow = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID, workflowID } = req.params;
-    const { title, nodes, edges, workflowOptions } = normalizeWorkflowGraphPayload(req.body, {
-      defaultEmptyGraph: true,
-    });
+    const { title, nodes = [], edges = [], workflowOptions } = req.body;
     const authContext = getServiceAuthContext(req);
     Logger.log("info", { message: "WorkflowController:updateWorkflow:params", params: { userID: user.userID, tenantID, workflowID, title, nodes, edges, workflowOptions, authContext } });
     const workflow = await workflowService.updateWorkflow({ userID: user.userID, tenantID, workflowID, title, nodes, edges, workflowOptions, authContext });
@@ -128,7 +121,7 @@ workflowController.executeWorkflow = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID, workflowID } = req.params;
-    const inputParams = normalizeWorkflowInputParams(req.body);
+    const inputParams = req.body.inputParams || {};
     const authContext = getServiceAuthContext(req);
 
     Logger.log("info", { message: "WorkflowController:executeWorkflow:params", params: { workflowID, tenantID, authContext } });
@@ -175,8 +168,8 @@ workflowController.getRunStatus = async (req, res) => {
 workflowController.testWorkflow = async (req, res) => {
   try {
     const { tenantID } = req.params;
-    const { nodes, edges } = normalizeWorkflowGraphPayload(req.body);
-    const inputParams = normalizeWorkflowInputParams(req.body);
+    const { nodes, edges } = req.body;
+    const inputParams = req.body.inputParams || {};
     const authContext = getServiceAuthContext(req);
 
     if (!Array.isArray(nodes) || !Array.isArray(edges)) {

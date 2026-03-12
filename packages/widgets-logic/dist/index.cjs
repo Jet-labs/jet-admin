@@ -28,6 +28,7 @@ __export(index_exports, {
   POSITIONAL_CHANNELS: () => POSITIONAL_CHANNELS,
   RETINAL_CHANNELS: () => RETINAL_CHANNELS,
   TEXT_CHANNELS: () => TEXT_CHANNELS,
+  buildRenderableSpec: () => buildRenderableSpec,
   generateVegaLiteSpec: () => generateVegaLiteSpec,
   getDefaultChartConfig: () => getDefaultChartConfig,
   getDefaultShelfSpec: () => getDefaultShelfSpec,
@@ -36,302 +37,25 @@ __export(index_exports, {
   getFieldTypeIcon: () => getFieldTypeIcon,
   inferFieldsFromData: () => inferFieldsFromData,
   inferMarkType: () => inferMarkType,
-  interpolateSpec: () => interpolateSpec,
   isSpecParseable: () => isSpecParseable,
   parseVegaLiteSpec: () => parseVegaLiteSpec,
-  processWidgetSpec: () => processWidgetSpec,
-  processWorkflowDataForWidget: () => processWorkflowDataForWidget,
-  resolveDatasetFields: () => resolveDatasetFields
+  processWorkflowDataForWidget: () => processWorkflowDataForWidget
 });
 module.exports = __toCommonJS(index_exports);
 
-// src/utils/pathResolvers.js
-var resolveVariablePath = (context, pathExpr, fallback = void 0) => {
-  if (!pathExpr || !context) return fallback;
-  let cleanPath = pathExpr;
-  const mustacheMatch = pathExpr.match(/^\{\{(.+?)\}\}$/);
-  if (mustacheMatch) {
-    cleanPath = mustacheMatch[1];
-  }
-  if (cleanPath.startsWith("ctx.")) {
-    cleanPath = cleanPath.slice(4);
-  }
-  if (cleanPath.includes("[*]")) {
-    return resolveWildcardPath(context, cleanPath, fallback);
-  }
-  const parts = cleanPath.split(".");
-  let current = context;
-  for (const part of parts) {
-    if (current === void 0 || current === null) {
-      return fallback;
-    }
-    const indexMatch = part.match(/^(.+?)\[(\d+)\]$/);
-    if (indexMatch) {
-      const [, prop, index] = indexMatch;
-      current = current[prop];
-      if (Array.isArray(current)) {
-        current = current[parseInt(index, 10)];
-      } else {
-        return fallback;
-      }
-    } else {
-      current = current[part];
-    }
-  }
-  return current !== void 0 ? current : fallback;
-};
-var resolveWildcardPath = (context, path, fallback) => {
-  const wildcardIndex = path.indexOf("[*]");
-  if (wildcardIndex === -1) return fallback;
-  const beforeWildcard = path.slice(0, wildcardIndex);
-  const afterWildcard = path.slice(wildcardIndex + 3);
-  let current = context;
-  if (beforeWildcard) {
-    const parts = beforeWildcard.split(".");
-    for (const part of parts) {
-      if (current === void 0 || current === null) return fallback;
-      current = current[part];
-    }
-  }
-  if (!Array.isArray(current)) return fallback;
-  if (!afterWildcard || afterWildcard === ".") {
-    return current;
-  }
-  const fieldPath = afterWildcard.startsWith(".") ? afterWildcard.slice(1) : afterWildcard;
-  const results = [];
-  for (const item of current) {
-    if (item === null || item === void 0) {
-      results.push(void 0);
-      continue;
-    }
-    let value = item;
-    const fieldParts = fieldPath.split(".");
-    for (const part of fieldParts) {
-      if (value === void 0 || value === null) {
-        value = void 0;
-        break;
-      }
-      value = value[part];
-    }
-    results.push(value);
-  }
-  return results.length > 0 ? results : fallback;
-};
-var resolveDatasetFields = (context, datasetFields) => {
-  if (!context || !datasetFields) return {};
-  const resolved = {};
-  for (const [field, binding] of Object.entries(datasetFields)) {
-    if (typeof binding === "string") {
-      resolved[field] = resolveVariablePath(context, binding);
-    } else if (binding?.variablePath) {
-      resolved[field] = resolveVariablePath(context, binding.variablePath, binding.fallback);
-    }
-  }
-  return resolved;
-};
-
-// src/vega/processors.js
-var applyTransforms = (data, transforms) => {
-  if (!transforms || !Array.isArray(transforms) || !Array.isArray(data)) {
-    return data;
-  }
-  let result = [...data];
-  for (const transform of transforms) {
-    try {
-      switch (transform.type) {
-        case "filter":
-          if (transform.field && transform.value !== void 0) {
-            result = result.filter((row) => row[transform.field] === transform.value);
-          } else if (transform.field && transform.gte !== void 0) {
-            result = result.filter((row) => row[transform.field] >= transform.gte);
-          } else if (transform.field && transform.lte !== void 0) {
-            result = result.filter((row) => row[transform.field] <= transform.lte);
-          }
-          break;
-        case "calculate":
-          if (transform.field && transform.as) {
-            result = result.map((row) => ({
-              ...row,
-              [transform.as]: row[transform.field]
-            }));
-          }
-          break;
-        case "sort":
-          if (transform.field) {
-            result.sort((a, b) => {
-              const valA = a[transform.field];
-              const valB = b[transform.field];
-              const comparison = valA > valB ? 1 : valA < valB ? -1 : 0;
-              return transform.order === "descending" ? -comparison : comparison;
-            });
-          }
-          break;
-      }
-    } catch (err) {
-      console.error("Transform error:", err);
-    }
-  }
-  return result;
-};
-var processVegaLiteWorkflowData = ({ context, workflowConfig }) => {
-  const {
-    vegaSpec,
-    dataSource,
-    dataSources,
-    transforms,
-    width,
-    height
-  } = workflowConfig || {};
-  if (!vegaSpec) {
-    return {
-      $schema: "https://vega.github.io/schema/vega-lite/v5.json",
-      description: "No specification provided",
-      data: { values: [] },
-      mark: "point"
-    };
-  }
+// src/vega/builder.js
+var buildRenderableSpec = ({ vegaSpec, widgetType = "vega-lite" }) => {
+  if (!vegaSpec) return null;
+  const isVegaLite = widgetType !== "vega";
+  const schemaUrl = isVegaLite ? "https://vega.github.io/schema/vega-lite/v5.json" : "https://vega.github.io/schema/vega/v5.json";
   const spec = {
-    $schema: "https://vega.github.io/schema/vega-lite/v5.json",
-    width: width || "container",
-    height: height || "container",
+    $schema: schemaUrl,
+    width: "container",
+    height: "container",
     autosize: { type: "fit", contains: "padding" },
     ...vegaSpec
   };
-  if (dataSource) {
-    const rawData = resolveVariablePath(context, dataSource, []);
-    const data = applyTransforms(rawData, transforms);
-    spec.data = { values: Array.isArray(data) ? data : [] };
-  }
-  if (dataSources && typeof dataSources === "object") {
-    spec.datasets = {};
-    for (const [name, path] of Object.entries(dataSources)) {
-      const resolved = resolveVariablePath(context, path, []);
-      spec.datasets[name] = Array.isArray(resolved) ? resolved : [];
-    }
-  }
   return spec;
-};
-var processVegaWorkflowData = ({ context, workflowConfig }) => {
-  const {
-    vegaSpec,
-    dataSource,
-    dataSources,
-    transforms,
-    width,
-    height
-  } = workflowConfig || {};
-  if (!vegaSpec) {
-    return {
-      $schema: "https://vega.github.io/schema/vega/v5.json",
-      description: "No specification provided",
-      data: [],
-      marks: []
-    };
-  }
-  const spec = {
-    $schema: "https://vega.github.io/schema/vega/v5.json",
-    width: width || "container",
-    height: height || "container",
-    autosize: { type: "fit", contains: "padding" },
-    ...vegaSpec
-  };
-  if (dataSource) {
-    const rawData = resolveVariablePath(context, dataSource, []);
-    const data = applyTransforms(rawData, transforms);
-    if (!spec.data) spec.data = [];
-    const dataName = "source";
-    const existingDataIndex = spec.data.findIndex((d) => d.name === dataName);
-    if (existingDataIndex >= 0) {
-      spec.data[existingDataIndex].values = Array.isArray(data) ? data : [];
-    } else {
-      spec.data.push({
-        name: dataName,
-        values: Array.isArray(data) ? data : []
-      });
-    }
-  }
-  if (dataSources && typeof dataSources === "object") {
-    if (!spec.data) spec.data = [];
-    for (const [name, path] of Object.entries(dataSources)) {
-      const resolved = resolveVariablePath(context, path, []);
-      const values = Array.isArray(resolved) ? resolved : [];
-      const existingDataIndex = spec.data.findIndex((d) => d.name === name);
-      if (existingDataIndex >= 0) {
-        spec.data[existingDataIndex].values = values;
-      } else {
-        spec.data.push({
-          name,
-          values
-        });
-      }
-    }
-  }
-  return spec;
-};
-
-// src/utils/specInterpolator.js
-var EXPRESSION_REGEX = /\{\{([^}]+)\}\}/g;
-var hasExpressions = (str) => {
-  if (typeof str !== "string") return false;
-  return /\{\{[^}]+\}\}/.test(str);
-};
-var interpolateString = (str, context) => {
-  if (!hasExpressions(str)) {
-    return str;
-  }
-  EXPRESSION_REGEX.lastIndex = 0;
-  const trimmed = str.trim();
-  const singleMatch = trimmed.match(/^\{\{([^}]+)\}\}$/);
-  if (singleMatch) {
-    const path = singleMatch[1].trim();
-    return resolveVariablePath(context, path);
-  }
-  return str.replace(EXPRESSION_REGEX, (match, path) => {
-    const value = resolveVariablePath(context, path.trim());
-    if (value === null || value === void 0) {
-      return "";
-    }
-    if (typeof value === "object") {
-      return JSON.stringify(value);
-    }
-    return String(value);
-  });
-};
-var interpolateSpec = (spec, context) => {
-  if (spec === null || spec === void 0) {
-    return spec;
-  }
-  if (typeof spec === "string") {
-    return interpolateString(spec, context);
-  }
-  if (Array.isArray(spec)) {
-    return spec.map((item) => interpolateSpec(item, context));
-  }
-  if (typeof spec === "object") {
-    const result = {};
-    for (const [key, value] of Object.entries(spec)) {
-      result[key] = interpolateSpec(value, context);
-    }
-    return result;
-  }
-  return spec;
-};
-var processWidgetSpec = ({ vegaSpec, context, options = {} }) => {
-  if (!vegaSpec) {
-    return null;
-  }
-  const contextWrapper = {
-    ctx: context,
-    ...context
-    // Also allow direct access to context properties
-  };
-  const processedSpec = interpolateSpec(vegaSpec, contextWrapper);
-  return {
-    ...processedSpec,
-    // Ensure width/height are responsive if not specified
-    ...processedSpec.width === void 0 && { width: "container" },
-    ...processedSpec.height === void 0 && { height: "container" }
-  };
 };
 
 // src/vega/chartSpecGenerator.js
@@ -810,23 +534,15 @@ var isSpecParseable = (spec) => {
 };
 
 // src/index.js
-var WIDGET_PROCESSORS = {
-  "vega-lite": processVegaLiteWorkflowData,
-  "vega": processVegaWorkflowData
-};
-var processWorkflowDataForWidget = ({ widgetType, context, datasetFields, parameters, workflowConfig }) => {
-  if (workflowConfig?.vegaSpec) {
-    return processWidgetSpec({
-      vegaSpec: workflowConfig.vegaSpec,
-      context,
-      options: workflowConfig.options
+var processWorkflowDataForWidget = ({ widgetType, widgetConfig }) => {
+  const vegaSpec = widgetConfig?.vegaSpec;
+  if (vegaSpec) {
+    return buildRenderableSpec({
+      vegaSpec,
+      widgetType: widgetType || "vega-lite"
     });
   }
-  const processor = WIDGET_PROCESSORS[widgetType];
-  if (!processor) {
-    return resolveDatasetFields(context, datasetFields);
-  }
-  return processor({ context, workflowConfig });
+  return null;
 };
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
@@ -839,6 +555,7 @@ var processWorkflowDataForWidget = ({ widgetType, context, datasetFields, parame
   POSITIONAL_CHANNELS,
   RETINAL_CHANNELS,
   TEXT_CHANNELS,
+  buildRenderableSpec,
   generateVegaLiteSpec,
   getDefaultChartConfig,
   getDefaultShelfSpec,
@@ -847,11 +564,8 @@ var processWorkflowDataForWidget = ({ widgetType, context, datasetFields, parame
   getFieldTypeIcon,
   inferFieldsFromData,
   inferMarkType,
-  interpolateSpec,
   isSpecParseable,
   parseVegaLiteSpec,
-  processWidgetSpec,
-  processWorkflowDataForWidget,
-  resolveDatasetFields
+  processWorkflowDataForWidget
 });
 //# sourceMappingURL=index.cjs.map

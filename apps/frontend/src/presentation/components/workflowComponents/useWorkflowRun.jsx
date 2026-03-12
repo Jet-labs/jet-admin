@@ -2,6 +2,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { CONSTANTS } from "../../../constants";
 import { testWorkflowAPI, executeWorkflowAPI, stopTestWorkflowAPI } from "../../../data/apis/workflow";
+import { extractError } from "../../../utils/error";
 
 /**
  * Custom hook to handle workflow execution (both test and saved runs).
@@ -56,7 +57,6 @@ export const useWorkflowRun = ({ tenantID }) => {
              // Get socket from context (we need to access it directly)
             // Note: In a real app we might use a SocketContext, but here we import dynamically to match existing pattern
             const socketModule = await import("socket.io-client");
-            const { constant: constantsToCheck } = await import("../../../constants"); // redundant but keeping safe
             const { firebaseAuth } = await import("../../../config/firebase");
 
             const bearerToken = await firebaseAuth.currentUser?.getIdToken();
@@ -180,17 +180,26 @@ export const useWorkflowRun = ({ tenantID }) => {
         }
     }, []);
 
+    const clearRunState = useCallback(() => {
+        disconnectSocket();
+        setIsRunning(false);
+        setResult(null);
+        resetNodeExecutionStatus();
+        clearLogs();
+        clearContext();
+        instanceIdRef.current = null;
+        isTestRunRef.current = false;
+        isStoppingRef.current = false;
+    }, [disconnectSocket, resetNodeExecutionStatus, clearLogs, clearContext]);
+
     /**
      * Start a Test Run (In-Memory)
      */
     const startTestRun = useCallback(async ({ nodes, edges, inputParams }) => {
         // Reset stopping guard for new run
         isStoppingRef.current = false;
+        clearRunState();
         setIsRunning(true);
-        setResult(null);
-        resetNodeExecutionStatus();
-        clearLogs();
-        clearContext();
         isTestRunRef.current = true;
 
         addLog('start', 'Test Run Started', `Running workflow with ${nodes.length} nodes`);
@@ -222,11 +231,11 @@ export const useWorkflowRun = ({ tenantID }) => {
             await subscribeToInstance(instanceID, nodes);
 
         } catch (error) {
-            addLog('workflow_error', 'Error', error.message);
+            addLog('workflow_error', 'Error', extractError(error) || error?.message || String(error));
             setIsRunning(false);
             resetNodeExecutionStatus();
         }
-    }, [tenantID, resetNodeExecutionStatus, clearLogs, clearContext, addLog, subscribeToInstance]);
+    }, [tenantID, clearRunState, resetNodeExecutionStatus, addLog, subscribeToInstance]);
 
     /**
      * Start a Saved Run (Database)
@@ -234,11 +243,8 @@ export const useWorkflowRun = ({ tenantID }) => {
     const startSavedRun = useCallback(async ({ workflowID, nodes, inputParams }) => {
         // Reset stopping guard for new run
         isStoppingRef.current = false;
+        clearRunState();
         setIsRunning(true);
-        setResult(null);
-        resetNodeExecutionStatus();
-        clearLogs();
-        clearContext();
         isTestRunRef.current = false;
 
         addLog('start', 'Run Started', `Executing saved workflow ${workflowID}`);
@@ -263,7 +269,7 @@ export const useWorkflowRun = ({ tenantID }) => {
             setIsRunning(false);
             resetNodeExecutionStatus();
         }
-    }, [tenantID, resetNodeExecutionStatus, clearLogs, clearContext, addLog, subscribeToInstance]);
+    }, [tenantID, clearRunState, resetNodeExecutionStatus, addLog, subscribeToInstance]);
 
     /**
      * Stop the current run
@@ -312,6 +318,7 @@ export const useWorkflowRun = ({ tenantID }) => {
         startTestRun,
         startSavedRun,
         stopRun,
-        clearLogs
+        clearLogs,
+        clearRunState
     };
 };

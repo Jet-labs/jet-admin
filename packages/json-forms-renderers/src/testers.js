@@ -112,7 +112,18 @@ export const checkboxTester = (uischema, schema) => {
 // ============================================================================
 export const codePgsqlTester = rankWith(
   100,
-  and(isControl, formatIs("code-pgsql"))
+  and(
+    isControl,
+    (uischema, rootSchema) => {
+      try {
+        const currentSchema = Resolve.schema(rootSchema, uischema.scope, rootSchema);
+        return ['code-pgsql', 'code-sql', 'code-mysql'].includes(currentSchema?.format);
+      } catch (e) {
+        console.warn(`Error resolving schema for scope ${uischema.scope} in codePgsqlTester:`, e);
+        return false;
+      }
+    }
+  )
 );
 
 // ============================================================================

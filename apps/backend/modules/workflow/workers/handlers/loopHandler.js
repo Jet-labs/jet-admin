@@ -5,7 +5,7 @@
 const { ERROR_HANDLING, NEXT_HANDLE } = require('./constants');
 
 async function execute(nodeConfig, context, helpers) {
-  const { resolveStringWithContext } = helpers;
+  const { resolveTemplate } = helpers;
   const { 
     sourceVariable, 
     itemVariable = 'item', 
@@ -19,7 +19,7 @@ async function execute(nodeConfig, context, helpers) {
     // e.g., "{{ctx.input.items}}" or "{{ctx.previousNode.data}}"
     let items;
     if (typeof sourceVariable === 'string') {
-      items = resolveStringWithContext(sourceVariable);
+      items = resolveTemplate(sourceVariable, { nodeType: 'loop' });
     } else {
       items = sourceVariable;
     }

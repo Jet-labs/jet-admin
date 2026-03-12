@@ -601,44 +601,6 @@ postgreSQLParserUtil.generateFilterQuery = (filterModel) => {
   }
 };
 
-postgreSQLParserUtil.processDataQuery = ({
-  dataQueryString,
-  dataQueryArgValues,
-}) => {
-  // Validate input
-  if (typeof dataQueryString !== "string") {
-    throw new TypeError("The 'dataQueryString' parameter must be a string.");
-  }
-  if (dataQueryArgValues && typeof dataQueryArgValues !== "object") {
-    throw new TypeError(
-      "The 'dataQueryArgValues' parameter must be an object or undefined."
-    );
-  }
-
-  const paramNames = [];
-  const processedQuery = dataQueryString.replace(/\$\{(\w+)\}/g, (_, name) => {
-    // Ensure the placeholder name is valid
-    if (!/^\w+$/.test(name)) {
-      throw new Error(`Invalid placeholder name: \${${name}}`);
-    }
-    paramNames.push(name);
-    return `$${paramNames.length}`; // Replace with positional parameter
-  });
-
-  // Extract values for placeholders
-  const values = paramNames.map((name) => {
-    if (
-      !dataQueryArgValues ||
-      !Object.prototype.hasOwnProperty.call(dataQueryArgValues, name)
-    ) {
-      throw new Error(`Missing value for placeholder: \${${name}}`);
-    }
-    return dataQueryArgValues[name];
-  });
-
-  return { query: processedQuery, values };
-};
-
 const postgreSQLQueryUtil = {};
 
 postgreSQLQueryUtil.getDatabaseMetadataQuery = () => {

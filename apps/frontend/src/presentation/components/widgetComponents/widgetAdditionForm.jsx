@@ -90,8 +90,8 @@ export const WidgetAdditionForm = ({ tenantID }) => {
     // Pass config for socket connection if available in form
     workflowID: addWidgetForm?.values?.workflowID,
     widgetType: addWidgetForm?.values?.widgetType,
-    datasetFields: addWidgetForm?.values?.workflowConfig?.datasetFields,
-    parameters: addWidgetForm?.values?.workflowConfig?.parameters,
+    widgetConfig: addWidgetForm?.values?.widgetConfig,
+    workflowConfig: addWidgetForm?.values?.workflowConfig,
   });
 
   const _handleFetchWidgetData = useCallback(() => {

@@ -110,12 +110,12 @@ Executes a server-side Data Query (SQL, REST, etc.) defined in the Jet Admin app
 | Property | Type | Default | Required | Description |
 |----------|------|---------|----------|-------------|
 | `dataQueryID` | string | - | Yes | UUID of the `tblDataQueries` record to execute. |
-| `args` | object | `{}` | No | Map of query arguments. Values starting with `ctx.` are dynamically resolved from context. |
+| `args` | object | `{}` | No | Map of query arguments. Mustache values like `{{ctx.input.id}}` are dynamically resolved from context. |
 | `outputVariable` | string | `queryResult` | No | Variable name for the storage of the query result (e.g., rows, status). |
 
 #### Context Resolution
 Dynamic arguments are processed before query execution.
-- If an argument value is `"ctx.input.id"`, it is replaced with the actual value `123`.
+- If an argument value is `"{{ctx.input.id}}"`, it is replaced with the actual value `123`.
 - Literal values (e.g., `"approved"`) remain as strings.
 
 #### JSON Structure
@@ -126,7 +126,7 @@ Dynamic arguments are processed before query execution.
   "data": {
     "dataQueryID": "dq_abc123",
     "args": {
-      "user_id": "ctx.input.id",
+      "user_id": "{{ctx.input.id}}",
       "status": "pending"
     }
   }

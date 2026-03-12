@@ -32,19 +32,19 @@ describe('QueryEngine', () => {
 
   describe('resolveTemplate', () => {
     it('should resolve string template with simple variables', async () => {
-      const template = 'SELECT * FROM users WHERE id = {{userId}}';
+      const template = 'SELECT * FROM users WHERE id = {{args.userId}}';
       const runtimeArgs = { userId: 123 };
 
-      const result = await queryEngine.resolveStringTemplate(template, runtimeArgs, 'test-query');
+      const result = await queryEngine.resolveTemplate(template, runtimeArgs, 'test-query');
 
       expect(result).toBe('SELECT * FROM users WHERE id = 123');
     });
 
     it('should resolve string template with multiple variables', async () => {
-      const template = 'SELECT * FROM {{tableName}} WHERE id = {{userId}}';
+      const template = 'SELECT * FROM {{args.tableName}} WHERE id = {{args.userId}}';
       const runtimeArgs = { tableName: 'customers', userId: 456 };
 
-      const result = await queryEngine.resolveStringTemplate(template, runtimeArgs, 'test-query');
+      const result = await queryEngine.resolveTemplate(template, runtimeArgs, 'test-query');
 
       expect(result).toBe('SELECT * FROM customers WHERE id = 456');
     });
@@ -52,34 +52,53 @@ describe('QueryEngine', () => {
     it('should resolve object template recursively', async () => {
       const template = {
         query: 'SELECT * FROM users',
-        limit: '{{pageSize}}',
+        limit: '{{args.pageSize}}',
         filters: {
-          name: '{{userName}}'
+          name: '{{args.userName}}'
         }
       };
       const runtimeArgs = { pageSize: 10, userName: 'John' };
 
-      const result = await queryEngine.resolveObjectTemplate(template, runtimeArgs, 'test-query');
+      const result = await queryEngine.resolveTemplate(template, runtimeArgs, 'test-query');
 
       expect(result.query).toBe('SELECT * FROM users');
-      expect(result.limit).toBe('10');
+      expect(result.limit).toBe(10);
       expect(result.filters.name).toBe('John');
+    });
+
+    it('should preserve array/object shapes when recursively resolving template values', async () => {
+      const template = {
+        ids: '{{args.ids}}',
+        filters: ['{{args.status}}', { user: '{{args.user}}' }],
+      };
+      const runtimeArgs = {
+        ids: [1, 2],
+        status: 'active',
+        user: { id: 7 },
+      };
+
+      const result = await queryEngine.resolveTemplate(template, runtimeArgs, 'test-query');
+
+      expect(result).toEqual({
+        ids: [1, 2],
+        filters: ['active', { user: { id: 7 } }],
+      });
     });
 
     it('should handle template without variables', async () => {
       const template = 'SELECT * FROM users';
       const runtimeArgs = {};
 
-      const result = await queryEngine.resolveStringTemplate(template, runtimeArgs, 'test-query');
+      const result = await queryEngine.resolveTemplate(template, runtimeArgs, 'test-query');
 
       expect(result).toBe('SELECT * FROM users');
     });
 
     it('should handle nested object access in template', async () => {
-      const template = 'SELECT * FROM users WHERE id = {{user.id}}';
+      const template = 'SELECT * FROM users WHERE id = {{args.user.id}}';
       const runtimeArgs = { user: { id: 789 } };
 
-      const result = await queryEngine.resolveStringTemplate(template, runtimeArgs, 'test-query');
+      const result = await queryEngine.resolveTemplate(template, runtimeArgs, 'test-query');
 
       expect(result).toBe('SELECT * FROM users WHERE id = 789');
     });
@@ -88,29 +107,38 @@ describe('QueryEngine', () => {
       const template = 'SELECT * FROM users WHERE id = {{args.user.id}}';
       const runtimeArgs = { user: { id: 654 } };
 
-      const result = await queryEngine.resolveStringTemplate(template, runtimeArgs, 'test-query');
+      const result = await queryEngine.resolveTemplate(template, runtimeArgs, 'test-query');
 
       expect(result).toBe('SELECT * FROM users WHERE id = 654');
     });
 
     it('should resolve bracket notation and array indexes safely', async () => {
-      const template = 'SELECT * FROM {{filters[0].table}} WHERE user_id = {{["user-id"]}}';
+      const template = 'SELECT * FROM {{args.filters[0].table}} WHERE user_id = {{args["user-id"]}}';
       const runtimeArgs = {
         filters: [{ table: 'customers' }],
         'user-id': 321,
       };
 
-      const result = await queryEngine.resolveStringTemplate(template, runtimeArgs, 'test-query');
+      const result = await queryEngine.resolveTemplate(template, runtimeArgs, 'test-query');
 
       expect(result).toBe('SELECT * FROM customers WHERE user_id = 321');
+    });
+
+    it('should not resolve query templates without an allowed root prefix', async () => {
+      const template = 'SELECT * FROM users WHERE id = {{userId}}';
+      const runtimeArgs = { userId: 123 };
+
+      const result = await queryEngine.resolveTemplate(template, runtimeArgs, 'test-query');
+
+      expect(result).toBe('SELECT * FROM users WHERE id = ');
     });
 
     it('should not execute arbitrary expressions in template blocks', async () => {
       const template = 'SELECT {{constructor.constructor("return 1")()}}';
 
-      const result = await queryEngine.resolveStringTemplate(template, {}, 'test-query');
+      const result = await queryEngine.resolveTemplate(template, {}, 'test-query');
 
-      expect(result).toBe('SELECT undefined');
+      expect(result).toBe('SELECT ');
     });
   });
 

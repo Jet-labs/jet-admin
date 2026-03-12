@@ -86,7 +86,6 @@ const APIKeyLayoutLandingPage = lazy(() =>
   import("../../pages/apiKeyLayoutLandingPage")
 );
 const UpdateAPIKeyPage = lazy(() => import("../../pages/updateAPIKeyPage"));
-const RawSqlQueryPage = lazy(() => import("../../pages/rawSqlQueryPage"));
 const AddCronJobPage = lazy(() => import("../../pages/addCronJobPage"));
 const UpdateCronJobPage = lazy(() => import("../../pages/updateCronJobPage"));
 const ViewCronJobHistoryPage = lazy(() =>
@@ -321,11 +320,6 @@ const router = createBrowserRouter([
               },
             ],
           },
-          {
-            path: CONSTANTS.ROUTES.RAW_SQL_QUERY.code,
-            element: <RawSqlQueryPage />,
-          },
-
           {
             element: <WorkflowLayout />,
             children: [

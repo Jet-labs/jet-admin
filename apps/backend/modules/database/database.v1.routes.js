@@ -25,13 +25,6 @@ router.post(
   databaseController.createDatabaseSchema
 );
 
-router.post(
-  "/execute-raw-sql",
-  validate(executeRawSqlSchema, "body"),
-  authMiddleware.checkUserPermissions(["tenant:database:raw-sql:execute"]),
-  databaseController.executeRawSQLQuery
-);
-
 router.use(
   "/schemas/:databaseSchemaName/tables",
   authMiddleware.checkUserPermissions(["tenant:database:table"]),

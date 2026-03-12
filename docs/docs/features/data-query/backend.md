@@ -29,7 +29,7 @@ flowchart TB
 
 ## Variable Interpolation
 
-Queries support dynamic arguments using `{{variable}}` syntax.
+Queries support dynamic arguments using rooted paths like `{{args.variable}}` or `{{runtimeArgs.variable}}`.
 
 1.  **Frontend** sends `argValues` (e.g., `{ "limit": 10 }`).
 2.  **Parser** scans the query string for mapped arguments.

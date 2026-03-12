@@ -1,0 +1,21 @@
+FAIL __tests__/unit/dataQuery/dataQuery.validator.test.js
+  ● Test suite failed to run
+
+    Cannot find module '../../../../modules/dataQuery/dataQuery.validator' from '__tests__/unit/dataQuery/dataQuery.validator.test.js'
+
+    [0m [90m 1 |[39m [36mconst[39m {
+     [90m 2 |[39m   createDataQuerySchema[33m,[39m
+    [31m[1m>[22m[39m[90m 3 |[39m } [33m=[39m require([32m'../../../../modules/dataQuery/dataQuery.validator'[39m)[33m;[39m
+     [90m   |[39m     [31m[1m^[22m[39m
+     [90m 4 |[39m [36mconst[39m { z } [33m=[39m require([32m'../../../../utils/validation.utils'[39m)[33m;[39m
+     [90m 5 |[39m
+     [90m 6 |[39m describe([32m'DataQuery Schema Validation with Templates'[39m[33m,[39m () [33m=>[39m {[0m
+
+      at Resolver._throwModNotFoundError (../../node_modules/jest-resolve/build/resolver.js:427:11)
+      at Object.require (__tests__/unit/dataQuery/dataQuery.validator.test.js:3:5)
+
+Test Suites: 1 failed, 1 total
+Tests:       0 total
+Snapshots:   0 total
+Time:        0.29 s
+Ran all test suites matching /dataQuery.validator.test.js/i.
