@@ -33,6 +33,10 @@ var WIDGET_TYPES = {
   VEGA: {
     name: "Vega Chart",
     value: "vega"
+  },
+  BUTTON: {
+    name: "Button",
+    value: "button"
   }
 };
 var WIDGET_INITIAL_CONFIG = {
@@ -49,6 +53,11 @@ var WIDGET_INITIAL_CONFIG = {
       renderer: "svg",
       theme: void 0
     }
+  },
+  button: {
+    text: "Click Me",
+    variant: "default",
+    size: "default"
   }
 };
 var WIDGET_ADVANCED_OPTIONS = [

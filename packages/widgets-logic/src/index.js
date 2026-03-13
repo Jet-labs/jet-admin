@@ -1,50 +1,51 @@
 /**
  * Widget Logic Package
  * 
- * Pure JavaScript functions for transforming workflow context data into widget-compatible formats.
+ * Pure JavaScript functions and classes for transforming workflow context data into widget-compatible formats.
  * No React or UI dependencies - Node.js compatible.
- * 
- * IMPORTANT: Template resolution ({{ctx.*}}) is the backend's responsibility.
- * This package expects widgetConfig (including vegaSpec) to be already resolved before being passed in.
  */
 
-// Import Vega builder
-import { buildRenderableSpec } from './vega/builder';
+import { WIDGET_TYPES } from '@jet-admin/widget-types';
+import { VegaWidgetBuilder } from './vega/builder';
+
+export { BaseWidgetBuilder } from './core/baseWidgetBuilder';
+export { VegaWidgetBuilder } from './vega/builder';
 
 /**
- * Process workflow context data based on widget type.
- * 
- * This is the ONLY function that knows about widget-type-specific config fields.
- * The backend widget module passes widgetConfig as an already-resolved opaque blob —
- * this function extracts what it needs based on widgetType.
- * 
- * Extracts spec from widgetConfig (e.g. widgetConfig.vegaSpec for Vega widgets),
- * which should already be template-resolved by the backend, and builds a renderable spec.
+ * Registry mapping widget types to their builder instances.
+ * Future widget types should register their builder here.
+ */
+export const WIDGET_PROCESSORS_MAP = {
+  [WIDGET_TYPES.VEGA_LITE.value]: new VegaWidgetBuilder(),
+  [WIDGET_TYPES.VEGA.value]: new VegaWidgetBuilder()
+};
+
+/**
+ * Register a builder instance for a new widget type.
+ * @param {string} widgetType - The unique identifier for the widget type
+ * @param {BaseWidgetBuilder} builderInstance - An instance of a class extending BaseWidgetBuilder
+ */
+export const registerWidgetProcessor = (widgetType, builderInstance) => {
+  WIDGET_PROCESSORS_MAP[widgetType] = builderInstance;
+};
+
+/**
+ * Process workflow context data based on widget type utilizing the registered builder.
  * 
  * @param {object} params
- * @param {string} params.widgetType - Widget type ('vega-lite', 'vega', or future types)
- * @param {object} [params.widgetConfig] - Already-resolved widget config blob (contains type-specific fields)
+ * @param {string} params.widgetType - Widget type identifier
+ * @param {object} [params.widgetConfig] - Already-resolved widget config blob
  * @returns {object} Processed data ready for widget rendering
  */
 export const processWorkflowDataForWidget = ({ widgetType, widgetConfig }) => {
-  // Extract widget-type-specific spec from widgetConfig
-  // For Vega/Vega-Lite widgets, this is widgetConfig.vegaSpec
-  // Future widget types can add their own extraction here
-  const vegaSpec = widgetConfig?.vegaSpec;
-
-  if (vegaSpec) {
-    return buildRenderableSpec({
-      vegaSpec,
-      widgetType: widgetType || 'vega-lite',
-    });
+  const processor = WIDGET_PROCESSORS_MAP[widgetType];
+  
+  if (processor && typeof processor.buildRender === 'function') {
+    return processor.buildRender({ widgetType, widgetConfig });
   }
 
-  return null;
+  // Return the raw widgetConfig if no specific processor is matched
+  return widgetConfig || null;
 };
 
-// Export the buildRenderableSpec for direct use
-export { buildRenderableSpec };
-
-// Export Visual Chart Builder logic
-export * from './vega/chartSpecGenerator';
-export * from './vega/chartSpecParser';
+// Export Visual Chart Builder logic is now in @jet-admin/widgets-ui

@@ -154,7 +154,13 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
     }
 
     autoRunKeyRef.current = autoRunKey;
-    runWidget(updateWidgetForm.values);
+
+    const widgetTypeBaseConfig = WIDGETS_MAP[updateWidgetForm.values.widgetType];
+    const shouldAutoRun = updateWidgetForm.values.workflowConfig?.workflowAutoRun ?? widgetTypeBaseConfig?.defaultAutoRun ?? false;
+
+    if (shouldAutoRun) {
+      runWidget(updateWidgetForm.values);
+    }
   }, [updateWidgetForm.values, widget, widgetID, runWidget]);
 
 
@@ -278,6 +284,8 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
               isRefreshingData={isPreviewLoading}
               data={previewData}
               workflowContext={workflowContext}
+              runWorkflow={_handleFetchWidgetData}
+              isRunningWorkflow={isRunningWorkflow}
             />
           </ResizablePanel>
         </ResizablePanelGroup>

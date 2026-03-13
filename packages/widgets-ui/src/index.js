@@ -4,6 +4,7 @@
 
 // Vega visualization (primary widget type)
 export { VegaWidget } from "./vega/index";
+export { VegaConfigEditor } from "./vega/vegaConfigEditor";
 
 // Widget map and configuration
 export * from "./widget.map";

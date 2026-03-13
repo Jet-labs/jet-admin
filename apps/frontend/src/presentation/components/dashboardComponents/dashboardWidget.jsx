@@ -84,7 +84,7 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height }) => {
     ],
     queryFn: () => getWidgetDataByIDAPI({ tenantID, widgetID, executionMode }),
     refetchOnWindowFocus: false,
-    enabled: !!widget,
+    enabled: !!widget && (widget?.workflowConfig?.workflowAutoRun ?? WIDGETS_MAP[widget.widgetType]?.defaultAutoRun ?? false) === true,
   });
 
   const {
@@ -93,6 +93,7 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height }) => {
     isLive,
     workflowStatus,
     context: workflowContext,
+    runWidget,
   } = useWidgetRun({
     tenantID,
     widgetID,
@@ -103,6 +104,18 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height }) => {
     widgetConfig: widget?.widgetConfig,
     workflowConfig: widget?.workflowConfig,
   });
+
+  const runWorkflow = useCallback(() => {
+    if (widget) {
+      runWidget({
+        widgetTitle: widget.widgetTitle,
+        widgetType: widget.widgetType,
+        widgetConfig: widget.widgetConfig,
+        workflowID: widget.workflowID,
+        workflowConfig: widget.workflowConfig,
+      });
+    }
+  }, [runWidget, widget]);
 
   const handleOnWidgetInit = useCallback((widgetView) => {
     widgetRef.current = widgetView;
@@ -249,6 +262,7 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height }) => {
               isLoadingWorkflows={isWorkflowRunning}
               isConnected={isLive}
               workflowStatus={workflowStatus}
+              runWorkflow={runWorkflow}
             />
           </div>
         ) : null}

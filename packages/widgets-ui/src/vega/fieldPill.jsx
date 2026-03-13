@@ -1,6 +1,6 @@
 import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { getFieldTypeIcon } from '@jet-admin/widgets-logic';
+import { getFieldTypeIcon } from './chartSpecGenerator';
 
 import { Button } from "@jet-admin/ui";
 /**

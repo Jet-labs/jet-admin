@@ -31,6 +31,8 @@ export const WidgetPreview = ({
   refreshData,
   widgetConfig,
   workflowContext,
+  runWorkflow,
+  isRunningWorkflow,
 }) => {
   WidgetPreview.propTypes = {
     tenantID: PropTypes.number.isRequired,
@@ -44,6 +46,8 @@ export const WidgetPreview = ({
     refreshData: PropTypes.func.isRequired,
     widgetConfig: PropTypes.object,
     workflowContext: PropTypes.object,
+    runWorkflow: PropTypes.func,
+    isRunningWorkflow: PropTypes.bool,
   };
 
   const uniqueKey = `widgetPreview_${tenantID}_${widgetID}`;
@@ -85,6 +89,8 @@ export const WidgetPreview = ({
         refetchInterval={refetchInterval}
         refreshData={refreshData}
         widgetConfig={widgetConfig}
+        runWorkflow={runWorkflow}
+        isLoadingWorkflows={isRunningWorkflow}
       />
     );
   };

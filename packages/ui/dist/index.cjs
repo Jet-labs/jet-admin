@@ -56,6 +56,7 @@ __export(index_exports, {
   CardHeader: () => CardHeader,
   CardTitle: () => CardTitle,
   Checkbox: () => Checkbox,
+  CollapseComponent: () => CollapseComponent,
   Dialog: () => Dialog,
   DialogClose: () => DialogClose,
   DialogContent: () => DialogContent,
@@ -1028,4 +1029,51 @@ var TooltipContent = React21.forwardRef(
   )
 );
 TooltipContent.displayName = TooltipPrimitive.Content.displayName;
+
+// src/components/collapseComponent.jsx
+var import_react = __toESM(require("react"));
+var import_bi = require("react-icons/bi");
+var import_prop_types = __toESM(require("prop-types"));
+var import_ui = require("@jet-admin/ui");
+var CollapseComponent = ({
+  showButtonText,
+  hideButtonText,
+  containerClass,
+  content
+}) => {
+  CollapseComponent.propTypes = {
+    showButtonText: import_prop_types.default.string,
+    hideButtonText: import_prop_types.default.string,
+    containerClass: import_prop_types.default.string,
+    content: import_prop_types.default.func.isRequired
+  };
+  const [isOpen, setIsOpen] = (0, import_react.useState)(false);
+  const handleToggle = () => {
+    setIsOpen(!isOpen);
+  };
+  return /* @__PURE__ */ import_react.default.createElement(
+    "div",
+    {
+      className: `flex flex-col justify-start items-stretch ${containerClass}`
+    },
+    /* @__PURE__ */ import_react.default.createElement(
+      import_ui.Button,
+      {
+        onClick: handleToggle,
+        type: "button",
+        variant: "ghost",
+        className: "p-0 m-0 text-primary hover:text-primary"
+      },
+      isOpen ? /* @__PURE__ */ import_react.default.createElement(import_bi.BiChevronUp, { className: "text-base mr-1" }) : /* @__PURE__ */ import_react.default.createElement(import_bi.BiChevronDown, { className: "text-base mr-1" }),
+      isOpen ? hideButtonText || "Hide" : showButtonText || "Show"
+    ),
+    /* @__PURE__ */ import_react.default.createElement(
+      "div",
+      {
+        className: `grid transition-all duration-200 ease-in-out ${isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`
+      },
+      /* @__PURE__ */ import_react.default.createElement("div", { className: "overflow-hidden" }, content())
+    )
+  );
+};
 //# sourceMappingURL=index.cjs.map

@@ -3,12 +3,20 @@ import PropTypes from 'prop-types';
 import { DataFieldPanel } from './dataFieldPanel';
 import { EncodingShelf } from './encodingShelf';
 import { MarkSelector } from './markSelector';
-import { generateVegaLiteSpec, getDefaultShelfSpec, inferMarkType, COLOR_SCHEMES } from '@jet-admin/widgets-logic';
+import {
+  generateVegaLiteSpec,
+  getDefaultShelfSpec,
+  inferMarkType,
+  COLOR_SCHEMES,
+} from "./chartSpecGenerator";
 import { FiSettings, FiChevronDown, FiChevronRight, FiDatabase } from 'react-icons/fi';
 import { MdOutlineAutoGraph } from 'react-icons/md';
 
 import { Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
-import { CONSTANTS } from '../../../constants';
+// Widget-specific string constants (inlined since this is a shared package)
+const VEGA_STRINGS = {
+  WIDGET_DATASET_FIELD_MAPPING_BUTTON: "Mappings",
+};
 const PRIMARY_SHELVES = ['x', 'y', 'color', 'size'];
 const SECONDARY_SHELVES = ['row', 'column', 'shape', 'opacity', 'detail', 'text'];
 
@@ -160,7 +168,7 @@ export const ShelfBuilder = ({
         className="h-8 text-xs"
       >
         <MdOutlineAutoGraph className="inline-block h-3 w-3 mr-2" />
-        {CONSTANTS.STRINGS.WIDGET_DATASET_FIELD_MAPPING_BUTTON}
+        {VEGA_STRINGS.WIDGET_DATASET_FIELD_MAPPING_BUTTON}
       </Button>
 
       {isOpen && (

@@ -12,6 +12,10 @@ export const WIDGET_TYPES = {
     name: "Vega Chart",
     value: "vega",
   },
+  BUTTON: {
+    name: "Button",
+    value: "button",
+  },
 };
 
 export const WIDGET_INITIAL_CONFIG = {
@@ -28,6 +32,11 @@ export const WIDGET_INITIAL_CONFIG = {
       renderer: "svg",
       theme: undefined,
     },
+  },
+  button: {
+    text: "Click Me",
+    variant: "default",
+    size: "default",
   },
 };
 

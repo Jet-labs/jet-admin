@@ -5,12 +5,12 @@
 const { registerTaskWorker, addResult, addNodeJob, QUEUE_NAMES } = require('../../../config/queue.config');
 const { getHandler } = require('./handlers');
 const { resolveTemplate: sharedResolveTemplate } = require('../../../utils/templateEngine');
-
+const Logger = require('../../../utils/logger');
 const WORKFLOW_TEMPLATE_OPTIONS = {
   allowedRoots: ['ctx'],
   preserveSingleExpressionType: true,
 };
-const Logger = require('../../../utils/logger');
+
 
 /**
  * Start the main task worker that handles all node types

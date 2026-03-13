@@ -1,7 +1,7 @@
 import React, { useMemo, useState, useCallback, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { FieldPill } from './fieldPill';
-import { inferFieldsFromData } from '@jet-admin/widgets-logic';
+import { inferFieldsFromData } from './chartSpecGenerator';
 import { extractWorkflowSchema } from './variableExplorer';
 import { FiSearch, FiDatabase, FiPlus, FiZap } from 'react-icons/fi';
 import { BiGitMerge } from 'react-icons/bi';

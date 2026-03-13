@@ -909,6 +909,53 @@ var TooltipContent = React21.forwardRef(
   )
 );
 TooltipContent.displayName = TooltipPrimitive.Content.displayName;
+
+// src/components/collapseComponent.jsx
+import React22, { useState } from "react";
+import { BiChevronDown, BiChevronUp } from "react-icons/bi";
+import PropTypes from "prop-types";
+import { Button as Button2 } from "@jet-admin/ui";
+var CollapseComponent = ({
+  showButtonText,
+  hideButtonText,
+  containerClass,
+  content
+}) => {
+  CollapseComponent.propTypes = {
+    showButtonText: PropTypes.string,
+    hideButtonText: PropTypes.string,
+    containerClass: PropTypes.string,
+    content: PropTypes.func.isRequired
+  };
+  const [isOpen, setIsOpen] = useState(false);
+  const handleToggle = () => {
+    setIsOpen(!isOpen);
+  };
+  return /* @__PURE__ */ React22.createElement(
+    "div",
+    {
+      className: `flex flex-col justify-start items-stretch ${containerClass}`
+    },
+    /* @__PURE__ */ React22.createElement(
+      Button2,
+      {
+        onClick: handleToggle,
+        type: "button",
+        variant: "ghost",
+        className: "p-0 m-0 text-primary hover:text-primary"
+      },
+      isOpen ? /* @__PURE__ */ React22.createElement(BiChevronUp, { className: "text-base mr-1" }) : /* @__PURE__ */ React22.createElement(BiChevronDown, { className: "text-base mr-1" }),
+      isOpen ? hideButtonText || "Hide" : showButtonText || "Show"
+    ),
+    /* @__PURE__ */ React22.createElement(
+      "div",
+      {
+        className: `grid transition-all duration-200 ease-in-out ${isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`
+      },
+      /* @__PURE__ */ React22.createElement("div", { className: "overflow-hidden" }, content())
+    )
+  );
+};
 export {
   Accordion,
   AccordionContent,
@@ -937,6 +984,7 @@ export {
   CardHeader,
   CardTitle,
   Checkbox,
+  CollapseComponent,
   Dialog,
   DialogClose,
   DialogContent,

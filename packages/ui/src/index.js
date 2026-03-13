@@ -24,3 +24,4 @@ export { Switch } from './components/switch';
 export { Tabs, TabsList, TabsTrigger, TabsContent } from './components/tabs';
 export { Textarea } from './components/textarea';
 export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './components/tooltip';
+export { CollapseComponent } from './components/collapseComponent';

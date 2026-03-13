@@ -1,0 +1,52 @@
+import React, { useState } from "react";
+import { BiChevronDown, BiChevronUp } from "react-icons/bi";
+import PropTypes from "prop-types";
+import { Button } from "@jet-admin/ui";
+
+export const CollapseComponent = ({
+  showButtonText,
+  hideButtonText,
+  containerClass,
+  content,
+}) => {
+  CollapseComponent.propTypes = {
+    showButtonText: PropTypes.string,
+    hideButtonText: PropTypes.string,
+    containerClass: PropTypes.string,
+    content: PropTypes.func.isRequired,
+  };
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleToggle = () => {
+    setIsOpen(!isOpen);
+  };
+
+  return (
+    <div
+      className={`flex flex-col justify-start items-stretch ${containerClass}`}
+    >
+      <Button
+        onClick={handleToggle}
+        type="button"
+        variant="ghost" className="p-0 m-0 text-primary hover:text-primary"
+      >
+        {isOpen ? (
+          <BiChevronUp className="text-base mr-1" />
+        ) : (
+            <BiChevronDown className="text-base mr-1" />
+        )}
+        {isOpen
+          ? hideButtonText ||
+            'Hide'
+          : showButtonText ||
+            'Show'}
+      </Button>
+
+      <div
+        className={`grid transition-all duration-200 ease-in-out ${isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"}`}
+      >
+        <div className="overflow-hidden">{content()}</div>
+      </div>
+    </div>
+  );
+};

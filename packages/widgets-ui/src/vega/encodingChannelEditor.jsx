@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { FiChevronDown, FiChevronRight } from 'react-icons/fi';
-import { CollapseComponent } from '../ui/collapseComponent';
+import { CollapseComponent } from '@jet-admin/ui';
 
 import { Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
 const ENCODING_TYPES = [

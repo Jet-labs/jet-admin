@@ -113,7 +113,14 @@ export const WidgetAdditionForm = ({ tenantID }) => {
     }
 
     autoRunWorkflowRef.current = String(workflowID);
-    runWidget(addWidgetForm.values);
+    
+    // Only auto-run if workflowAutoRun is not explicitly false (or explicitly true for buttons)
+    const widgetTypeBaseConfig = WIDGETS_MAP[addWidgetForm.values.widgetType];
+    const shouldAutoRun = addWidgetForm.values.workflowConfig?.workflowAutoRun ?? widgetTypeBaseConfig?.defaultAutoRun ?? false;
+
+    if (shouldAutoRun) {
+      runWidget(addWidgetForm.values);
+    }
   }, [addWidgetForm.values, runWidget]);
 
   return (
@@ -198,6 +205,8 @@ export const WidgetAdditionForm = ({ tenantID }) => {
             isRefreshingData={isPreviewLoading}
             data={previewData}
             workflowContext={workflowContext}
+            runWorkflow={_handleFetchWidgetData}
+            isRunningWorkflow={isRunningWorkflow}
           />
         </ResizablePanel>
       </ResizablePanelGroup>

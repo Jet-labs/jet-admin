@@ -4,7 +4,7 @@ import { ChartTypeSelector } from './chartTypeSelector';
 import { EncodingChannelEditor } from './encodingChannelEditor';
 import { VariablePathPicker } from './variablePathPicker';
 import { CollapseComponent } from '../ui/collapseComponent';
-import { generateVegaLiteSpec, getDefaultChartConfig } from '@jet-admin/widgets-logic';
+import { generateVegaLiteSpec, getDefaultChartConfig } from './chartSpecGenerator';
 import { Input, Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@jet-admin/ui";
 
 

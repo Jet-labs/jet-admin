@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
 import { FieldPill } from './fieldPill';
-import { FIELD_TYPES, AGGREGATE_TYPES } from '@jet-admin/widgets-logic';
+import { FIELD_TYPES, AGGREGATE_TYPES } from './chartSpecGenerator';
 
 import { Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
 const CHANNEL_LABELS = {
