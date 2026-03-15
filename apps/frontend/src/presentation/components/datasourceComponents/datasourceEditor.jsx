@@ -1,15 +1,14 @@
 import {
-    materialCells,
-    materialRenderers,
+  materialCells,
+  materialRenderers,
 } from "@jsonforms/material-renderers";
 import { JsonForms } from "@jsonforms/react";
-import React from "react";
+import React, { useCallback, useRef } from "react";
 import PropTypes from "prop-types";
 import { DATASOURCE_UI_COMPONENTS } from "@jet-admin/datasources-ui";
 import { DATASOURCE_TYPES, getDatasourceTypeByValue } from "@jet-admin/datasource-types";
 import { CONSTANTS } from "../../../constants";
 import { customJSONFormRenderers } from "../ui/jsonFormCustomRenderer";
-import { useCallback } from "react";
 import { DatasourceIcon } from "./datasourceIcon";
 import { Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
 
@@ -18,13 +17,40 @@ export const DatasourceEditor = ({ datasourceEditorForm }) => {
   DatasourceEditor.propTypes = {
     datasourceEditorForm: PropTypes.object.isRequired,
   };
-  // This handler specifically updates the 'datasourceOptions' part of Formik's state
+
+  // Track whether JsonForms has completed its initial render cycle.
+  // JsonForms fires onChange during mount while it resolves conditional
+  // visibility rules (e.g. connectionOption toggling group visibility).
+  // We skip those spurious updates so the server-fetched datasourceOptions
+  // are never overwritten before the user touches anything.
+  const isJsonFormsInitialized = useRef(false);
+
   const handleDatasourceOptionsChange = useCallback(({ data }) => {
-    // Update only the 'datasourceOptions' field in Formik's state
-    datasourceEditorForm.setFieldValue("datasourceOptions", data);
-    // You could also attempt to map JSON Forms errors to Formik's errors for 'datasourceOptions'
-    // but often Yup handles it sufficiently for overall form validity.
+    if (!isJsonFormsInitialized.current) {
+      // First onChange is always the internal init pass — mark as done
+      // and bail out without touching Formik state.
+      isJsonFormsInitialized.current = true;
+      return;
+    }
+
+    // Deep-equality guard: only update Formik if the data actually changed.
+    // This is a cheap safety net for any further re-renders that fire onChange
+    // with identical data (e.g. parent re-renders propagating down).
+    if (
+      JSON.stringify(data) !==
+      JSON.stringify(datasourceEditorForm.values.datasourceOptions)
+    ) {
+      datasourceEditorForm.setFieldValue("datasourceOptions", data);
+    }
   }, [datasourceEditorForm]);
+
+  // Reset the init flag whenever the datasource type changes so JsonForms
+  // re-initialises cleanly for the new schema without polluting Formik state.
+  const previousDatasourceType = useRef(datasourceEditorForm.values.datasourceType);
+  if (previousDatasourceType.current !== datasourceEditorForm.values.datasourceType) {
+    previousDatasourceType.current = datasourceEditorForm.values.datasourceType;
+    isJsonFormsInitialized.current = false;
+  }
 
   const currentDatasourceType = getDatasourceTypeByValue(datasourceEditorForm.values.datasourceType);
 
@@ -109,11 +135,9 @@ export const DatasourceEditor = ({ datasourceEditorForm }) => {
           <JsonForms
             schema={currentDatasourceType.formConfig.schema}
             uischema={currentDatasourceType.formConfig.uischema}
-            // Pass only the 'datasourceOptions' part of Formik's values to JsonForms
             data={datasourceEditorForm.values.datasourceOptions}
             renderers={[...materialRenderers, ...customJSONFormRenderers]}
             cells={materialCells}
-            // This onChange updates only the 'datasourceOptions' in Formik
             onChange={handleDatasourceOptionsChange}
           />
         </div>

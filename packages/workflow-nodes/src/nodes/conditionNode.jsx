@@ -384,7 +384,7 @@ export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
   }, [onChange, formData]);
 
   return (
-    <div className="w-full h-full">
+    <div className="w-full">
       <div className="space-y-4">
         {/* Basic settings via JSON Forms */}
         <JsonForms

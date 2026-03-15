@@ -184,7 +184,7 @@ export const DelayNodeConfigurator = ({ data, onChange, nodeId }) => {
   }, [onChange, formData]);
 
   return (
-    <div className="w-full h-full">
+    <div className="w-full">
       <div className="space-y-3">
         <JsonForms
           schema={schema}

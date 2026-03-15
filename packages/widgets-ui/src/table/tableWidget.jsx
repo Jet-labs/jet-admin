@@ -93,6 +93,20 @@ export const TableWidget = ({
 
   // Empty / No data state
   if (!rows || rows.length === 0) {
+    if (isLoadingWorkflows) {
+      return (
+        <div className="flex flex-col w-full h-full items-center justify-center text-muted-foreground text-sm p-6 relative">
+          <div className="absolute inset-0 z-10 flex items-center justify-center bg-slate-50/90 backdrop-blur-[1px]">
+            <div className="flex items-center gap-2 rounded-md bg-slate-100/90 px-4 py-2 text-sm text-slate-500 shadow-sm">
+              <svg width="16" height="16" viewBox="0 0 24 24" className="animate-spin">
+                <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="31.4 31.4" strokeLinecap="round" />
+              </svg>
+              Loading data…
+            </div>
+          </div>
+        </div>
+      );
+    }
     return (
       <div className="flex flex-col w-full h-full items-center justify-center text-muted-foreground text-sm p-6">
         <p>No data available.</p>
@@ -104,7 +118,18 @@ export const TableWidget = ({
   }
 
   return (
-    <div className="flex flex-col w-full h-full min-h-0 overflow-hidden">
+    <div className="flex flex-col w-full h-full min-h-0 overflow-hidden relative">
+      {isLoadingWorkflows && (
+        <div className="absolute inset-0 z-20 flex items-center justify-center bg-slate-50/50 backdrop-blur-[1px]">
+          <div className="flex items-center gap-2 rounded-md bg-slate-100/90 px-4 py-2 text-sm text-slate-500 shadow-sm">
+            <svg width="16" height="16" viewBox="0 0 24 24" className="animate-spin">
+              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" fill="none" strokeDasharray="31.4 31.4" strokeLinecap="round" />
+            </svg>
+            Updating data…
+          </div>
+        </div>
+      )}
+
       {/* Table */}
       <div className="flex-1 overflow-auto min-h-0">
         <table className="w-full text-sm border-collapse">

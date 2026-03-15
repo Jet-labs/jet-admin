@@ -50,6 +50,8 @@ export const DatasourceUpdationForm = ({ tenantID, datasourceID }) => {
     refetchOnWindowFocus: false,
   });
 
+  console.log("datasource", datasource);
+
   const { isPending: isUpdatingDatasource, mutate: updateDatasource } =
     useMutation({
       mutationFn: (data) => {
@@ -80,6 +82,8 @@ export const DatasourceUpdationForm = ({ tenantID, datasourceID }) => {
     datasourceType: datasource?.datasourceType || "postgresql",
     datasourceOptions: datasource?.datasourceOptions || datasourceOptionsMetadata.data,
   }), [datasource]);
+
+  console.log("initialValues", initialValues);
 
   const datasourceUpdationForm = useFormik({
     initialValues,

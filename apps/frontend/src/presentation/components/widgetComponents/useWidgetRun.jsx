@@ -214,6 +214,9 @@ export const useWidgetRun = ({
     socket.emit('workflow_run_join', { runId: instanceID });
 
     const handleNodeUpdate = (nodeData) => {
+      // Filter by instanceID to avoid cross-talk on multi-widget dashboards
+      if (nodeData.instanceID !== instanceID) return;
+
       const nodeId = nodeData.nodeID;
       if (nodeId && nodeData.status) {
         const nodeName = nodeData.nodeType || nodeId;
@@ -237,6 +240,9 @@ export const useWidgetRun = ({
     };
 
     const handleWorkflowStatus = (statusData) => {
+      // Filter by instanceID to avoid cross-talk on multi-widget dashboards
+      if (statusData.instanceID !== instanceID) return;
+
       // Update context with full contextData from completion
       if (statusData.contextData) {
         setWsContext(statusData.contextData);

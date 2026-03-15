@@ -60,6 +60,15 @@
           },
           "required": ["key", "type"]
         }
+      },
+      "contentType": {
+        "type": "string",
+        "enum": [
+          "application/json",
+          "application/xml",
+          "text/plain"
+        ],
+        "default": "application/json"
       }
     },
     "required": [
@@ -84,6 +93,10 @@
               {
                 "type": "Control",
                 "scope": "#/properties/method"
+              },
+              {
+                "type": "Control",
+                "scope": "#/properties/contentType"
               }
             ]
           },

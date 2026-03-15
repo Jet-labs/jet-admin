@@ -19,7 +19,7 @@ async function startTaskWorker() {
   Logger.log('info', { message: 'taskWorker:starting consumer' });
 
   registerTaskWorker(async (jobData) => {
-    const { instanceID, nodeID, nodeType, nodeConfig, context, workflowID, attempts = 0, maxAttempts = 3 } = jobData;
+    const { instanceID, nodeID, nodeType, nodeConfig, context, workflowID, attempts = 0, maxAttempts = 3, isTestRun = false } = jobData;
 
     Logger.log('info', {
       message: 'taskWorker:processing',
@@ -27,17 +27,29 @@ async function startTaskWorker() {
     });
 
     try {
+      // DATA RELIABILITY: For non-test runs, fetch the absolute latest context from the database.
+      // This ensures that parallel upstream data is ALWAYS visible, even if the job was queued
+      // slightly before a concurrent write finished, or if this is a retry.
+      let currentContext = context;
+      if (!isTestRun && instanceID) {
+        const { stateManager } = require('../orchestrator/stateManager');
+        const freshInstance = await stateManager.getInstance(instanceID);
+        if (freshInstance) {
+          currentContext = freshInstance.contextData;
+        }
+      }
+
       // Get handler for this node type
       const handler = getHandler(nodeType);
 
-      // Execute handler
-      const result = await handler.execute(nodeConfig, context, {
+      // Execute handler with the latest context
+      const result = await handler.execute(nodeConfig, currentContext, {
         instanceID,
         nodeID,
         workflowID,
         resolveTemplate: (template, meta = {}) => sharedResolveTemplate(
           template,
-          context,
+          currentContext,
           WORKFLOW_TEMPLATE_OPTIONS,
           { module: 'workflow', instanceID, workflowID, nodeID, ...meta }
         ),

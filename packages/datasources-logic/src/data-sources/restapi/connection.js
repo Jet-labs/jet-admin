@@ -7,7 +7,7 @@ import { Logger } from "../../utils/logger";
 export const restAPITestConnection = async ({ datasourceOptions }) => {
   const {
     baseUrl,
-    method,
+    method = "GET",
     timeout,
     authType,
     username,

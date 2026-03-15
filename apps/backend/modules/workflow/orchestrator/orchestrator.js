@@ -62,7 +62,7 @@ async function handleTaskResult(result) {
 
     contextUpdate[`__node_${nodeID}`] = { output, status, outputVariable };
 
-    const updatedInstance = await stateManager.updateContext(
+    let updatedInstance = await stateManager.updateContext(
       instanceID,
       contextUpdate,
       instance.version
@@ -133,13 +133,48 @@ async function handleTaskResult(result) {
         const resultHandle = nextHandle || 'output';
         return edgeHandle === resultHandle;
       });
-      nextNodes = edges.map(e => workflowDefinition.nodes[e.downstreamNodeID]).filter(Boolean);
+      const candidateNodes = edges.map(e => workflowDefinition.nodes[e.downstreamNodeID]).filter(Boolean);
+
+      // Apply barrier check for test-run path (uses contextData fallback)
+      const readyChecks = await Promise.all(
+        candidateNodes.map(async (candidateNode) => {
+          const incomingEdges = workflowDefinition.edges.filter(
+            e => e.downstreamNodeID === candidateNode.nodeID
+          );
+          const joinMode = candidateNode.nodeConfig?.joinMode || 'all';
+          const ready = await dagScheduler.isNodeReadyToExecute({
+            incomingEdges,
+            instanceID,
+            joinMode,
+            isTestRun: true,
+            contextData: updatedInstance.contextData,
+          });
+          return ready ? candidateNode : null;
+        })
+      );
+      nextNodes = readyChecks.filter(Boolean);
     } else {
       nextNodes = await dagScheduler.calculateNextNodes(
         instance.workflowID,
         nodeID,
-        nextHandle
+        nextHandle,
+        instanceID
       );
+
+      // DATA CONCURRENCY FIX: If we found next nodes (meaning we likely passed a barrier),
+      // we must reload the instance to ensure we have the absolute latest contextData.
+      // Parallel branches might have completed their atomic merges milliseconds after 
+      // our own updateContext but before the next node is queued.
+      if (nextNodes.length > 0) {
+        const freshInstance = await stateManager.getInstance(instanceID);
+        if (freshInstance) {
+          Logger.log('info', {
+            message: 'orchestrator:contextRefetchedAfterJoin',
+            params: { instanceID, nodeID }
+          });
+          updatedInstance = freshInstance;
+        }
+      }
     }
 
     // 6. Queue next nodes

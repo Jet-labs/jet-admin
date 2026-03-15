@@ -12,7 +12,8 @@ export const VegaWidget = ({
   widgetConfig,      // Widget-level config (showActions, renderer, theme)
   onSignal,          // Callback for selections/interactions
   onError,           // Error handler
-  onWidgetInit       // Callback when widget initializes
+  onWidgetInit,      // Callback when widget initializes
+  isLoadingWorkflows // Boolean indicating if a workflow is currently running
 }) => {
   const containerRef = useRef(null);
   const viewRef = useRef(null);
@@ -28,6 +29,13 @@ export const VegaWidget = ({
   useEffect(() => {
     if (!containerRef.current) return;
     
+    // If workflow is loading, don't attempt to render chart which could throw error
+    if (isLoadingWorkflows) {
+      setLoading(true);
+      setError(null);
+      return;
+    }
+
     // If no data/spec provided, show placeholder
     if (!data || !data.$schema) {
       setLoading(false);
@@ -88,11 +96,11 @@ export const VegaWidget = ({
         viewRef.current = null;
       }
     };
-  }, [data, widgetConfig, onSignal, onWidgetInit, handleError]);
+  }, [data, widgetConfig, onSignal, onWidgetInit, handleError, isLoadingWorkflows]);
 
   return (
     <div style={{ width: '100%', height: '100%', position: 'relative' }}>
-      {loading && !error && (
+      {(loading || isLoadingWorkflows) && !error && (
         <div
           style={{
             position: 'absolute',
@@ -126,7 +134,7 @@ export const VegaWidget = ({
         </div>
       )}
 
-      {error && (
+      {error && !isLoadingWorkflows && (
         <div
           style={{
             position: 'absolute',
@@ -165,7 +173,7 @@ export const VegaWidget = ({
         style={{
           width: '100%',
           height: '100%',
-          visibility: error ? 'hidden' : 'visible'
+          visibility: (error || isLoadingWorkflows) ? 'hidden' : 'visible'
         }}
       />
     </div>

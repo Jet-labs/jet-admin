@@ -375,17 +375,6 @@ var formConfig_default2 = {
         type: "string",
         description: "Base URL of the REST API (e.g., https://api.example.com )"
       },
-      method: {
-        type: "string",
-        enum: [
-          "GET",
-          "POST",
-          "PUT",
-          "DELETE",
-          "PATCH"
-        ],
-        default: "GET"
-      },
       timeout: {
         type: "integer",
         description: "Request timeout in seconds",
@@ -472,10 +461,6 @@ var formConfig_default2 = {
           ]
         }
       },
-      body: {
-        type: "string",
-        description: "Request body (for POST/PUT/PATCH)"
-      },
       contentType: {
         type: "string",
         enum: [
@@ -495,8 +480,7 @@ var formConfig_default2 = {
       }
     },
     required: [
-      "baseUrl",
-      "method"
+      "baseUrl"
     ]
   },
   uischema: {
@@ -512,10 +496,6 @@ var formConfig_default2 = {
               {
                 type: "Control",
                 scope: "#/properties/baseUrl"
-              },
-              {
-                type: "Control",
-                scope: "#/properties/method"
               },
               {
                 type: "Control",
@@ -658,29 +638,6 @@ var formConfig_default2 = {
           },
           {
             type: "Category",
-            label: "Body",
-            rule: {
-              effect: "SHOW",
-              condition: {
-                scope: "#/properties/method",
-                schema: {
-                  enum: [
-                    "POST",
-                    "PUT",
-                    "PATCH"
-                  ]
-                }
-              }
-            },
-            elements: [
-              {
-                type: "Control",
-                scope: "#/properties/body"
-              }
-            ]
-          },
-          {
-            type: "Category",
             label: "Advanced",
             elements: [
               {
@@ -784,6 +741,15 @@ var queryConfig_default2 = {
           },
           required: ["key", "type"]
         }
+      },
+      contentType: {
+        type: "string",
+        enum: [
+          "application/json",
+          "application/xml",
+          "text/plain"
+        ],
+        default: "application/json"
       }
     },
     required: [
@@ -808,6 +774,10 @@ var queryConfig_default2 = {
               {
                 type: "Control",
                 scope: "#/properties/method"
+              },
+              {
+                type: "Control",
+                scope: "#/properties/contentType"
               }
             ]
           },

@@ -29,10 +29,10 @@ export const DashboardRenderWidget = ({
 
   return (
     <Card
-      className={`!h-full !w-full flex-grow relative overflow-hidden border bg-background/95 transition-all duration-200 ${isMouseHover
-        ? "border-primary shadow-lg shadow-primary/10 ring-1 ring-primary/20"
+      className={`!h-full !w-full flex-grow relative rounded-none overflow-hidden border bg-background/95 transition-all duration-200 ${isMouseHover
+        ? "border-primary"
         : "border-slate-200/80 shadow-sm"
-        } ${editable ? "hover:-translate-y-0.5" : ""}`}
+        }`}
       onMouseEnter={
         editable
           ? () => {
@@ -57,15 +57,15 @@ export const DashboardRenderWidget = ({
     >
       {handleDelete && isMouseHover && responsive && editable && (
         <div
-          className="absolute right-2 top-2 z-50"
+          className="absolute right-0 top-0 z-50"
         >
           <Button
             onClick={() => {
               handleDelete(index);
             }}
-            variant="destructive-ghost"
+            variant='destructive-ghost'
             size="icon"
-            className="h-7 w-7 rounded-md border border-red-100 bg-white/95 shadow-sm"
+            className="rounded-none p-0 bg-primary/10 text-primary h-6 w-6"
             onMouseDown={(e) => {
               e.stopPropagation();
             }}
@@ -79,7 +79,7 @@ export const DashboardRenderWidget = ({
         </div>
       )}
       <div
-        className="!flex-row justify-center !items-center !w-full !h-full bg-gradient-to-br from-background via-background to-slate-50"
+        className="!flex-row justify-center !items-center !w-full !h-full"
         ref={ref}
       >
         <DashboardWidget

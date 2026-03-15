@@ -393,7 +393,7 @@ var ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
   const handleSave = useCallback(() => {
     onChange(formData);
   }, [onChange, formData]);
-  return /* @__PURE__ */ React2.createElement("div", { className: "w-full h-full" }, /* @__PURE__ */ React2.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React2.createElement(
+  return /* @__PURE__ */ React2.createElement("div", { className: "w-full" }, /* @__PURE__ */ React2.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React2.createElement(
     JsonForms,
     {
       schema,
@@ -791,7 +791,7 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
       onQueryTest(formData.dataQueryID);
     }
   }, [onQueryTest, formData.dataQueryID]);
-  return /* @__PURE__ */ React3.createElement("div", { className: "w-full h-full" }, /* @__PURE__ */ React3.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React3.createElement(
+  return /* @__PURE__ */ React3.createElement("div", { className: "w-full" }, /* @__PURE__ */ React3.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React3.createElement(
     JsonForms2,
     {
       schema,
@@ -800,7 +800,7 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
       renderers: jetFormsRenderers,
       onChange: handleFormChange
     }
-  ), /* @__PURE__ */ React3.createElement("div", { className: "p-2.5 bg-slate-50 border border-slate-200 rounded text-[10px] text-slate-600 space-y-2" }, /* @__PURE__ */ React3.createElement("div", { className: "font-semibold text-slate-700 text-xs" }, "\u{1F4D8} Query Arguments"), /* @__PURE__ */ React3.createElement("div", null, /* @__PURE__ */ React3.createElement("span", { className: "font-medium text-slate-700" }, "Argument Format:"), /* @__PURE__ */ React3.createElement("div", { className: "ml-3 mt-0.5 text-slate-500 font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ React3.createElement("div", null, /* @__PURE__ */ React3.createElement("code", { className: "bg-white px-1 rounded" }, "{{ctx.input.userId}}"), " \u2192 pass input value"), /* @__PURE__ */ React3.createElement("div", null, /* @__PURE__ */ React3.createElement("code", { className: "bg-white px-1 rounded" }, "{{ctx.queryResult.id}}"), " \u2192 from previous query"), /* @__PURE__ */ React3.createElement("div", null, /* @__PURE__ */ React3.createElement("code", { className: "bg-white px-1 rounded" }, "id_{{ctx.input.id}}"), " \u2192 string interpolation"))), /* @__PURE__ */ React3.createElement("div", null, /* @__PURE__ */ React3.createElement("span", { className: "font-medium text-slate-700" }, "Access Result:"), /* @__PURE__ */ React3.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, "Result stored in ", /* @__PURE__ */ React3.createElement("code", { className: "bg-white px-1 py-0.5 rounded font-mono" }, "ctx.{outputVariable}"), " for use in next nodes.")), /* @__PURE__ */ React3.createElement("div", null, /* @__PURE__ */ React3.createElement("span", { className: "font-medium text-slate-700" }, "Handles:"), /* @__PURE__ */ React3.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, /* @__PURE__ */ React3.createElement("strong", null, "Green:"), " Query succeeded \u2192 ", /* @__PURE__ */ React3.createElement("strong", null, "Red:"), " Query failed (use for error handling)"))), /* @__PURE__ */ React3.createElement("div", { className: "flex justify-between items-center gap-2 pt-2 border-t border-slate-100" }, /* @__PURE__ */ React3.createElement(
+  ), /* @__PURE__ */ React3.createElement("div", { className: "p-2.5 bg-slate-50 border border-slate-200 rounded text-[10px] text-slate-600 space-y-2" }, /* @__PURE__ */ React3.createElement("div", { className: "font-semibold text-slate-700 text-xs" }, "\u{1F4D8} Query Arguments"), /* @__PURE__ */ React3.createElement("div", null, /* @__PURE__ */ React3.createElement("span", { className: "font-medium text-slate-700" }, "Argument Format:"), /* @__PURE__ */ React3.createElement("div", { className: "ml-3 mt-0.5 text-slate-500 font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ React3.createElement("div", null, /* @__PURE__ */ React3.createElement("code", { className: "bg-white px-1 rounded" }, "{{ctx.input.userId}}"), " \u2192 pass input value"), /* @__PURE__ */ React3.createElement("div", null, /* @__PURE__ */ React3.createElement("code", { className: "bg-white px-1 rounded" }, "{{ctx.queryResult.id}}"), " \u2192 from previous query"), /* @__PURE__ */ React3.createElement("div", null, /* @__PURE__ */ React3.createElement("code", { className: "bg-white px-1 rounded" }, "id_{{ctx.input.id}}"), " \u2192 string interpolation"))), /* @__PURE__ */ React3.createElement("div", null, /* @__PURE__ */ React3.createElement("span", { className: "font-medium text-slate-700" }, "Access Result:"), /* @__PURE__ */ React3.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, "Result stored in ", /* @__PURE__ */ React3.createElement("code", { className: "bg-white px-1 py-0.5 rounded font-mono" }, "ctx.{outputVariable}"), " for use in next nodes.")), /* @__PURE__ */ React3.createElement("div", null, /* @__PURE__ */ React3.createElement("span", { className: "font-medium text-slate-700" }, "Handles:"), /* @__PURE__ */ React3.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, /* @__PURE__ */ React3.createElement("strong", null, "Green:"), " Query succeeded \u2192 ", /* @__PURE__ */ React3.createElement("strong", null, "Red:"), " Query failed (use for error handling)"))), /* @__PURE__ */ React3.createElement("div", { className: "flex justify-between items-center gap-2" }, /* @__PURE__ */ React3.createElement(
     Button2,
     {
       type: "button",
@@ -1138,7 +1138,7 @@ var JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
   const handleSave = useCallback3(() => {
     onChange(formData);
   }, [onChange, formData]);
-  return /* @__PURE__ */ React4.createElement("div", { className: "w-full h-full" }, /* @__PURE__ */ React4.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React4.createElement(
+  return /* @__PURE__ */ React4.createElement("div", { className: "w-full" }, /* @__PURE__ */ React4.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React4.createElement(
     JsonForms3,
     {
       schema,
@@ -1457,7 +1457,7 @@ var LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
         sourceVariable: {
           type: "string",
           title: "Source Array",
-          description: "Variable containing the array to iterate (e.g., ctx.queryResult)"
+          description: "Template resolving to the array to iterate (e.g., {{ctx.queryResult}})"
         },
         itemVariable: {
           type: "string",
@@ -1537,7 +1537,7 @@ var LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
             {
               type: "Control",
               scope: "#/properties/sourceVariable",
-              options: { placeholder: "ctx.queryResult", hint: contextHint }
+              options: { placeholder: "{{ctx.queryResult}}", hint: contextHint }
             },
             {
               type: "Control",
@@ -1581,7 +1581,7 @@ var LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
   const handleSave = useCallback5(() => {
     onChange(formData);
   }, [onChange, formData]);
-  return /* @__PURE__ */ React6.createElement("div", { className: "w-full h-full" }, /* @__PURE__ */ React6.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React6.createElement(
+  return /* @__PURE__ */ React6.createElement("div", { className: "w-full" }, /* @__PURE__ */ React6.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React6.createElement(
     JsonForms5,
     {
       schema,
@@ -1603,7 +1603,7 @@ var LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
 var LoopNode = memo5(({ data, isConnectable }) => {
   const { strings } = useWorkflowNodes();
   const isDisabled = data?.isDisabled ?? false;
-  const sourceVariable = data?.sourceVariable || "ctx.array";
+  const sourceVariable = data?.sourceVariable || "{{ctx.array}}";
   const itemVariable = data?.itemVariable || "item";
   return /* @__PURE__ */ React6.createElement("div", { className: `
       bg-white border rounded
@@ -1751,12 +1751,12 @@ var DelayNodeConfigurator = ({ data, onChange, nodeId }) => {
         delayVariable: {
           type: "string",
           title: "Delay Variable",
-          description: "Context variable containing delay in ms (e.g., ctx.waitTime)"
+          description: "Template resolving to delay in ms (e.g., {{ctx.waitTime}})"
         },
         untilTime: {
           type: "string",
           title: "Until Time",
-          description: "Wait until this time (ISO format or ctx variable)"
+          description: "Wait until this time (ISO string or template like {{ctx.targetTime}})"
         },
         isDisabled: {
           type: "boolean",
@@ -1790,13 +1790,13 @@ var DelayNodeConfigurator = ({ data, onChange, nodeId }) => {
       delayElements.push({
         type: "Control",
         scope: "#/properties/delayVariable",
-        options: { placeholder: "ctx.waitTime (in milliseconds)" }
+        options: { placeholder: "{{ctx.waitTime}} (in milliseconds)" }
       });
     } else if (formData.delayType === "until") {
       delayElements.push({
         type: "Control",
         scope: "#/properties/untilTime",
-        options: { placeholder: "2024-12-31T23:59:59Z or ctx.targetTime" }
+        options: { placeholder: "2024-12-31T23:59:59Z or {{ctx.targetTime}}" }
       });
     }
     return {
@@ -1839,7 +1839,7 @@ var DelayNodeConfigurator = ({ data, onChange, nodeId }) => {
   const handleSave = useCallback6(() => {
     onChange(formData);
   }, [onChange, formData]);
-  return /* @__PURE__ */ React7.createElement("div", { className: "w-full h-full" }, /* @__PURE__ */ React7.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React7.createElement(
+  return /* @__PURE__ */ React7.createElement("div", { className: "w-full" }, /* @__PURE__ */ React7.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React7.createElement(
     JsonForms6,
     {
       schema,
@@ -1864,7 +1864,7 @@ var DelayNode = memo6(({ data, isConnectable }) => {
   const delayType = data?.delayType || "fixed";
   const getDelayDisplay = () => {
     if (delayType === "dynamic") {
-      return data?.delayVariable || "ctx.delay";
+      return data?.delayVariable || "{{ctx.delay}}";
     }
     if (delayType === "until") {
       const time = data?.untilTime || "";
@@ -2001,7 +2001,7 @@ var OutputParameterEditor = ({ parameters, onChange, availableVariables }) => {
         type: "text",
         value: param.sourceVariable,
         onChange: (e) => updateParameter(index, "sourceVariable", e.target.value),
-        placeholder: "ctx.result or a value",
+        placeholder: "{{ctx.result}} or a literal value",
         className: "w-full text-xs text-slate-700 p-1.5 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff]"
       }
     ), availableVariables.length > 0 && /* @__PURE__ */ React8.createElement("p", { className: "text-[9px] text-slate-400 mt-0.5" }, "Available: ", availableVariables.slice(0, 5).map((v) => `ctx.${v.variable}`).join(", "), availableVariables.length > 5 && "...")),

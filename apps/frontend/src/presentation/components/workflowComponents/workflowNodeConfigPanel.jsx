@@ -28,7 +28,7 @@ export const WorkflowNodeConfigPanel = ({ node, onChange, onClose, onDelete }) =
     if (!node) return null;
 
     return (
-        <div className="fixed right-0 top-0 h-full w-[400px] bg-background shadow-2xl border-l border-border z-[1000] flex flex-col">
+        <div className="fixed right-0 top-0 h-full w-[400px] bg-background shadow-2xl border-l border-border z-[1000] flex flex-col pb-4">
             {/* Header */}
             <div className="flex justify-between items-center px-4 py-3 border-b border-border bg-muted/30">
                 <h3 className="font-semibold text-foreground tracking-tight">
@@ -61,6 +61,31 @@ export const WorkflowNodeConfigPanel = ({ node, onChange, onClose, onDelete }) =
             {/* Configurator Content */}
             <div className="flex-1 overflow-y-auto p-5 bg-background">
                 <NodeConfigurator data={node.data} onChange={(newData) => onChange(node.id, newData)} nodeId={node.id} />
+
+                {/* Advanced Settings — Join Mode */}
+                {node.type !== 'start' && node.type !== 'end' && (
+                    <details className="mt-3 border border-border rounded-lg">
+                        <summary className="cursor-pointer px-4 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground select-none">
+                            Advanced Settings
+                        </summary>
+                        <div className="px-4 py-3 border-t border-border space-y-2">
+                            <label className="block text-xs font-medium text-muted-foreground">
+                                Join Mode
+                                <span className="block text-[10px] text-muted-foreground/70 mt-0.5">
+                                    When this node has multiple upstream parents
+                                </span>
+                            </label>
+                            <select
+                                value={node.data?.joinMode || 'all'}
+                                onChange={(e) => onChange(node.id, { ...node.data, joinMode: e.target.value })}
+                                className="w-full rounded-md border border-border bg-background px-3 py-1.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                            >
+                                <option value="all">Wait for All (default)</option>
+                                <option value="any">Trigger on Any</option>
+                            </select>
+                        </div>
+                    </details>
+                )}
             </div>
 
             {/* Delete Confirmation Modal Overlay */}

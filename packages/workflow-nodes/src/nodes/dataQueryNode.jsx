@@ -261,7 +261,7 @@ export const DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
   }, [onQueryTest, formData.dataQueryID]);
 
   return (
-    <div className="w-full h-full">
+    <div className="w-full">
       <div className="space-y-3">
         <JsonForms
           schema={schema}
@@ -299,7 +299,7 @@ export const DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
           </div>
         </div>
 
-        <div className="flex justify-between items-center gap-2 pt-2 border-t border-slate-100">
+        <div className="flex justify-between items-center gap-2">
           <Button
             type="button"
             onClick={handleSave}

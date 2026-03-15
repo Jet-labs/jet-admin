@@ -28,8 +28,10 @@ var init_vega = __esm({
       // Callback for selections/interactions
       onError,
       // Error handler
-      onWidgetInit
+      onWidgetInit,
       // Callback when widget initializes
+      isLoadingWorkflows
+      // Boolean indicating if a workflow is currently running
     }) => {
       const containerRef = useRef(null);
       const viewRef = useRef(null);
@@ -42,6 +44,11 @@ var init_vega = __esm({
       }, [onError]);
       useEffect(() => {
         if (!containerRef.current) return;
+        if (isLoadingWorkflows) {
+          setLoading(true);
+          setError(null);
+          return;
+        }
         if (!data || !data.$schema) {
           setLoading(false);
           setError("No visualization spec provided");
@@ -89,8 +96,8 @@ var init_vega = __esm({
             viewRef.current = null;
           }
         };
-      }, [data, widgetConfig, onSignal, onWidgetInit, handleError]);
-      return /* @__PURE__ */ React.createElement("div", { style: { width: "100%", height: "100%", position: "relative" } }, loading && !error && /* @__PURE__ */ React.createElement(
+      }, [data, widgetConfig, onSignal, onWidgetInit, handleError, isLoadingWorkflows]);
+      return /* @__PURE__ */ React.createElement("div", { style: { width: "100%", height: "100%", position: "relative" } }, (loading || isLoadingWorkflows) && !error && /* @__PURE__ */ React.createElement(
         "div",
         {
           style: {
@@ -116,7 +123,7 @@ var init_vega = __esm({
           borderRadius: "6px",
           backgroundColor: "rgba(241, 245, 249, 0.9)"
         } }, /* @__PURE__ */ React.createElement("svg", { width: "16", height: "16", viewBox: "0 0 24 24", style: { animation: "spin 1s linear infinite" } }, /* @__PURE__ */ React.createElement("circle", { cx: "12", cy: "12", r: "10", stroke: "currentColor", strokeWidth: "3", fill: "none", strokeDasharray: "31.4 31.4", strokeLinecap: "round" })), /* @__PURE__ */ React.createElement("style", null, `@keyframes spin { to { transform: rotate(360deg); } }`), "Loading visualization\u2026")
-      ), error && /* @__PURE__ */ React.createElement(
+      ), error && !isLoadingWorkflows && /* @__PURE__ */ React.createElement(
         "div",
         {
           style: {
@@ -152,7 +159,7 @@ var init_vega = __esm({
           style: {
             width: "100%",
             height: "100%",
-            visibility: error ? "hidden" : "visible"
+            visibility: error || isLoadingWorkflows ? "hidden" : "visible"
           }
         }
       ));
@@ -218,9 +225,12 @@ var init_tableWidget = __esm({
       const isBackendPaginated = paginationConfig && totalRows > rows.length;
       const displayRows = isBackendPaginated ? rows : paginationConfig ? rows.slice((currentPage - 1) * pageSize, currentPage * pageSize) : rows;
       if (!rows || rows.length === 0) {
+        if (isLoadingWorkflows) {
+          return /* @__PURE__ */ React10.createElement("div", { className: "flex flex-col w-full h-full items-center justify-center text-muted-foreground text-sm p-6 relative" }, /* @__PURE__ */ React10.createElement("div", { className: "absolute inset-0 z-10 flex items-center justify-center bg-slate-50/90 backdrop-blur-[1px]" }, /* @__PURE__ */ React10.createElement("div", { className: "flex items-center gap-2 rounded-md bg-slate-100/90 px-4 py-2 text-sm text-slate-500 shadow-sm" }, /* @__PURE__ */ React10.createElement("svg", { width: "16", height: "16", viewBox: "0 0 24 24", className: "animate-spin" }, /* @__PURE__ */ React10.createElement("circle", { cx: "12", cy: "12", r: "10", stroke: "currentColor", strokeWidth: "3", fill: "none", strokeDasharray: "31.4 31.4", strokeLinecap: "round" })), "Loading data\u2026")));
+        }
         return /* @__PURE__ */ React10.createElement("div", { className: "flex flex-col w-full h-full items-center justify-center text-muted-foreground text-sm p-6" }, /* @__PURE__ */ React10.createElement("p", null, "No data available."), /* @__PURE__ */ React10.createElement("p", { className: "text-xs mt-1" }, "Ensure the data array template resolves to a non-empty array."));
       }
-      return /* @__PURE__ */ React10.createElement("div", { className: "flex flex-col w-full h-full min-h-0 overflow-hidden" }, /* @__PURE__ */ React10.createElement("div", { className: "flex-1 overflow-auto min-h-0" }, /* @__PURE__ */ React10.createElement("table", { className: "w-full text-sm border-collapse" }, /* @__PURE__ */ React10.createElement("thead", { className: "sticky top-0 z-10 bg-muted/60 backdrop-blur-sm" }, /* @__PURE__ */ React10.createElement("tr", null, activeColumns.map((col, idx) => /* @__PURE__ */ React10.createElement(
+      return /* @__PURE__ */ React10.createElement("div", { className: "flex flex-col w-full h-full min-h-0 overflow-hidden relative" }, isLoadingWorkflows && /* @__PURE__ */ React10.createElement("div", { className: "absolute inset-0 z-20 flex items-center justify-center bg-slate-50/50 backdrop-blur-[1px]" }, /* @__PURE__ */ React10.createElement("div", { className: "flex items-center gap-2 rounded-md bg-slate-100/90 px-4 py-2 text-sm text-slate-500 shadow-sm" }, /* @__PURE__ */ React10.createElement("svg", { width: "16", height: "16", viewBox: "0 0 24 24", className: "animate-spin" }, /* @__PURE__ */ React10.createElement("circle", { cx: "12", cy: "12", r: "10", stroke: "currentColor", strokeWidth: "3", fill: "none", strokeDasharray: "31.4 31.4", strokeLinecap: "round" })), "Updating data\u2026")), /* @__PURE__ */ React10.createElement("div", { className: "flex-1 overflow-auto min-h-0" }, /* @__PURE__ */ React10.createElement("table", { className: "w-full text-sm border-collapse" }, /* @__PURE__ */ React10.createElement("thead", { className: "sticky top-0 z-10 bg-muted/60 backdrop-blur-sm" }, /* @__PURE__ */ React10.createElement("tr", null, activeColumns.map((col, idx) => /* @__PURE__ */ React10.createElement(
         "th",
         {
           key: idx,
@@ -2929,7 +2939,8 @@ var WIDGETS_MAP = {
         showActions: false,
         renderer: "svg",
         theme: void 0
-      }
+      },
+      showHeader: true
     }
   },
   "vega": {
@@ -2948,7 +2959,8 @@ var WIDGETS_MAP = {
         showActions: false,
         renderer: "svg",
         theme: void 0
-      }
+      },
+      showHeader: true
     }
   },
   "button": {
@@ -2965,7 +2977,8 @@ var WIDGETS_MAP = {
     sampleConfig: {
       text: "Click Me",
       variant: "default",
-      size: "default"
+      size: "default",
+      showHeader: true
     }
   },
   "table": {
@@ -2986,7 +2999,8 @@ var WIDGETS_MAP = {
         enabled: false,
         pageParam: "page",
         totalTemplate: "{{ctx.total}}"
-      }
+      },
+      showHeader: true
     }
   }
 };

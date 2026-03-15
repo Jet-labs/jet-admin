@@ -6,17 +6,6 @@
                 "type": "string",
                 "description": "Base URL of the REST API (e.g., https://api.example.com )"
             },
-            "method": {
-                "type": "string",
-                "enum": [
-                    "GET",
-                    "POST",
-                    "PUT",
-                    "DELETE",
-                    "PATCH"
-                ],
-                "default": "GET"
-            },
             "timeout": {
                 "type": "integer",
                 "description": "Request timeout in seconds",
@@ -103,10 +92,6 @@
                     ]
                 }
             },
-            "body": {
-                "type": "string",
-                "description": "Request body (for POST/PUT/PATCH)"
-            },
             "contentType": {
                 "type": "string",
                 "enum": [
@@ -126,8 +111,7 @@
             }
         },
         "required": [
-            "baseUrl",
-            "method"
+            "baseUrl"
         ]
     },
     "uischema": {
@@ -143,10 +127,6 @@
                             {
                                 "type": "Control",
                                 "scope": "#/properties/baseUrl"
-                            },
-                            {
-                                "type": "Control",
-                                "scope": "#/properties/method"
                             },
                             {
                                 "type": "Control",
@@ -284,29 +264,6 @@
                                         ]
                                     }
                                 }
-                            }
-                        ]
-                    },
-                    {
-                        "type": "Category",
-                        "label": "Body",
-                        "rule": {
-                            "effect": "SHOW",
-                            "condition": {
-                                "scope": "#/properties/method",
-                                "schema": {
-                                    "enum": [
-                                        "POST",
-                                        "PUT",
-                                        "PATCH"
-                                    ]
-                                }
-                            }
-                        },
-                        "elements": [
-                            {
-                                "type": "Control",
-                                "scope": "#/properties/body"
                             }
                         ]
                     },

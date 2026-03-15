@@ -44,39 +44,37 @@ stateManager.getInstance = async (instanceID) => {
 };
 
 /**
- * Update instance context with optimistic locking and retry
+ * Update instance context with ATOMIC JSON merge.
+ * Uses PostgreSQL's `jsonb || jsonb` operator to avoid read-modify-write races
+ * when multiple nodes complete concurrently.
  * @param {string} instanceID 
  * @param {Object} contextUpdate - Data to merge into context
- * @param {number} expectedVersion - Expected version for optimistic lock (optional, will use current if not provided)
- * @returns {Promise<Object>} Updated instance (or throws on max retries exceeded)
+ * @param {number} expectedVersion - (unused, kept for API compat)
+ * @returns {Promise<Object>} Updated instance
  */
 stateManager.updateContext = async (instanceID, contextUpdate, expectedVersion = null) => {
-  const instance = await prisma.tblWorkflowInstances.findUnique({
-    where: { instanceID },
-  });
+  // Atomic merge: contextData = contextData || $update
+  // This prevents one node's write from overwriting another's.
+  const [updated] = await prisma.$queryRawUnsafe(
+    `UPDATE "tblWorkflowInstances"
+     SET "contextData" = "contextData" || $1::jsonb,
+         "updatedAt" = NOW()
+     WHERE "instanceID" = $2::uuid
+     RETURNING *`,
+    JSON.stringify(contextUpdate),
+    instanceID
+  );
 
-  if (!instance) {
+  if (!updated) {
     throw new Error(`Instance ${instanceID} not found`);
   }
 
-  // Merge context
-  const updatedContext = {
-    ...instance.contextData,
-    ...contextUpdate,
-  };
+  // Parse contextData back if it comes as string from raw query
+  if (typeof updated.contextData === 'string') {
+    updated.contextData = JSON.parse(updated.contextData);
+  }
 
-  // Direct update without version check
-  const result = await prisma.tblWorkflowInstances.update({
-    where: {
-      instanceID,
-    },
-    data: {
-      contextData: updatedContext,
-      updatedAt: new Date(),
-    },
-  });
-
-  return result;
+  return updated;
 };
 
 /**
