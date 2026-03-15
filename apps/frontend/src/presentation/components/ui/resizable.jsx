@@ -15,7 +15,12 @@ const ResizablePanelGroup = ({ className, ...props }) => {
   );
 };
 
-const ResizablePanel = ResizablePrimitive.Panel;
+const ResizablePanel = ({ className, ...props }) => {
+  ResizablePanel.propTypes = {
+    className: PropTypes.string,
+  };
+  return <ResizablePrimitive.Panel className={className} {...props} />;
+};
 
 const ResizableHandle = ({ withHandle, className, ...props }) => {
   ResizableHandle.propTypes = {

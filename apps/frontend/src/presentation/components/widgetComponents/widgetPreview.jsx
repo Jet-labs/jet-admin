@@ -34,6 +34,11 @@ export const WidgetPreview = ({
   runWorkflow,
   isRunningWorkflow,
 }) => {
+  console.log("WidgetPreview", {
+    widgetType,
+    data,
+    widgetConfig
+  });
   WidgetPreview.propTypes = {
     tenantID: PropTypes.number.isRequired,
     widgetID: PropTypes.number.isRequired,
@@ -96,14 +101,14 @@ export const WidgetPreview = ({
   };
 
   return (
-    <div className="h-full w-full flex flex-col widget-editor-zone">
+    <div className="h-full w-full flex flex-col min-h-0 widget-editor-zone">
       {isFetchingData || isRefreshingData ? (
-        <div className="w-full h-full flex flex-col justify-center items-center" style={{ background: 'var(--we-bg-primary)' }}>
+        <div className="w-full h-full flex flex-col justify-center items-center flex-1 min-h-0" style={{ background: 'var(--we-bg-primary)' }}>
           <Spinner size={16} />
         </div>
       ) : (
         <div
-            className="h-full w-full overflow-auto"
+            className="h-full w-full flex flex-col flex-1 min-h-0 overflow-hidden"
             style={{ background: 'var(--we-bg-primary)' }}
           key={uniqueKey}
           id={uniqueKey}

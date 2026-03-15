@@ -161,15 +161,476 @@ var init_vega = __esm({
   }
 });
 
-// src/button/buttonConfigEditor.jsx
-import React11 from "react";
+// src/table/tableWidget.jsx
+import React10, { useMemo as useMemo5, useState as useState8 } from "react";
+import PropTypes9 from "prop-types";
+import { Button as Button9 } from "@jet-admin/ui";
+import {
+  MdChevronLeft,
+  MdChevronRight,
+  MdFirstPage,
+  MdLastPage
+} from "react-icons/md";
+var TableWidget;
+var init_tableWidget = __esm({
+  "src/table/tableWidget.jsx"() {
+    TableWidget = ({
+      widgetConfig,
+      data: processedData,
+      runWorkflow,
+      isLoadingWorkflows
+    }) => {
+      const tableData = useMemo5(() => {
+        if (processedData && typeof processedData === "object") {
+          if (Array.isArray(processedData.data)) return processedData;
+        }
+        if (Array.isArray(processedData)) {
+          return { data: processedData, columns: [], pagination: { enabled: false } };
+        }
+        return { data: [], columns: [], pagination: { enabled: false } };
+      }, [processedData]);
+      const rows = tableData.data;
+      const activeColumns = useMemo5(() => {
+        const configColumns = tableData.columns?.length ? tableData.columns : widgetConfig?.columns?.length ? widgetConfig.columns : [];
+        if (configColumns.length > 0) return configColumns;
+        if (rows.length > 0 && typeof rows[0] === "object" && rows[0] !== null) {
+          return Object.keys(rows[0]).map((k) => ({ key: k, label: k }));
+        }
+        return [];
+      }, [tableData.columns, widgetConfig?.columns, rows]);
+      const paginationConfig = tableData.pagination?.enabled ? tableData.pagination : widgetConfig?.pagination?.enabled ? widgetConfig.pagination : null;
+      const [currentPage, setCurrentPage] = useState8(1);
+      const [pageSize, setPageSize] = useState8(10);
+      const totalRows = paginationConfig?.totalRows ?? rows.length;
+      const totalPages = paginationConfig ? Math.max(1, Math.ceil(totalRows / pageSize)) : 1;
+      const handlePageChange = (newPage) => {
+        if (newPage < 1 || newPage > totalPages) return;
+        setCurrentPage(newPage);
+        if (paginationConfig && runWorkflow) {
+          runWorkflow({
+            inputParams: {
+              [paginationConfig.pageParam || "page"]: newPage,
+              [paginationConfig.pageSizeParam || "limit"]: pageSize
+            }
+          });
+        }
+      };
+      const isBackendPaginated = paginationConfig && totalRows > rows.length;
+      const displayRows = isBackendPaginated ? rows : paginationConfig ? rows.slice((currentPage - 1) * pageSize, currentPage * pageSize) : rows;
+      if (!rows || rows.length === 0) {
+        return /* @__PURE__ */ React10.createElement("div", { className: "flex flex-col w-full h-full items-center justify-center text-muted-foreground text-sm p-6" }, /* @__PURE__ */ React10.createElement("p", null, "No data available."), /* @__PURE__ */ React10.createElement("p", { className: "text-xs mt-1" }, "Ensure the data array template resolves to a non-empty array."));
+      }
+      return /* @__PURE__ */ React10.createElement("div", { className: "flex flex-col w-full h-full min-h-0 overflow-hidden" }, /* @__PURE__ */ React10.createElement("div", { className: "flex-1 overflow-auto min-h-0" }, /* @__PURE__ */ React10.createElement("table", { className: "w-full text-sm border-collapse" }, /* @__PURE__ */ React10.createElement("thead", { className: "sticky top-0 z-10 bg-muted/60 backdrop-blur-sm" }, /* @__PURE__ */ React10.createElement("tr", null, activeColumns.map((col, idx) => /* @__PURE__ */ React10.createElement(
+        "th",
+        {
+          key: idx,
+          className: "text-left px-3 py-2 text-xs font-medium text-muted-foreground border-b whitespace-nowrap select-none"
+        },
+        col.label || col.key
+      )))), /* @__PURE__ */ React10.createElement("tbody", null, displayRows.map((row, rowIdx) => /* @__PURE__ */ React10.createElement(
+        "tr",
+        {
+          key: rowIdx,
+          className: "border-b last:border-b-0 hover:bg-muted/30 transition-colors"
+        },
+        activeColumns.map((col, colIdx) => /* @__PURE__ */ React10.createElement(
+          "td",
+          {
+            key: colIdx,
+            className: "px-3 py-2 text-sm text-foreground whitespace-nowrap"
+          },
+          row[col.key] != null ? String(row[col.key]) : "\u2014"
+        ))
+      ))))), paginationConfig && /* @__PURE__ */ React10.createElement("div", { className: "flex items-center justify-between px-3 py-2 border-t bg-muted/20 gap-4 flex-shrink-0" }, /* @__PURE__ */ React10.createElement("span", { className: "text-xs text-muted-foreground" }, totalRows, " total row", totalRows !== 1 ? "s" : ""), /* @__PURE__ */ React10.createElement("div", { className: "flex items-center gap-1" }, /* @__PURE__ */ React10.createElement("span", { className: "text-xs text-muted-foreground mr-2" }, "Page ", currentPage, " of ", totalPages), /* @__PURE__ */ React10.createElement(
+        Button9,
+        {
+          variant: "ghost",
+          size: "icon",
+          className: "h-7 w-7",
+          onClick: () => handlePageChange(1),
+          disabled: currentPage === 1 || isLoadingWorkflows
+        },
+        /* @__PURE__ */ React10.createElement(MdFirstPage, { className: "text-base" })
+      ), /* @__PURE__ */ React10.createElement(
+        Button9,
+        {
+          variant: "ghost",
+          size: "icon",
+          className: "h-7 w-7",
+          onClick: () => handlePageChange(currentPage - 1),
+          disabled: currentPage === 1 || isLoadingWorkflows
+        },
+        /* @__PURE__ */ React10.createElement(MdChevronLeft, { className: "text-base" })
+      ), /* @__PURE__ */ React10.createElement(
+        Button9,
+        {
+          variant: "ghost",
+          size: "icon",
+          className: "h-7 w-7",
+          onClick: () => handlePageChange(currentPage + 1),
+          disabled: currentPage >= totalPages || isLoadingWorkflows
+        },
+        /* @__PURE__ */ React10.createElement(MdChevronRight, { className: "text-base" })
+      ), /* @__PURE__ */ React10.createElement(
+        Button9,
+        {
+          variant: "ghost",
+          size: "icon",
+          className: "h-7 w-7",
+          onClick: () => handlePageChange(totalPages),
+          disabled: currentPage >= totalPages || isLoadingWorkflows
+        },
+        /* @__PURE__ */ React10.createElement(MdLastPage, { className: "text-base" })
+      ))));
+    };
+    TableWidget.propTypes = {
+      widgetConfig: PropTypes9.object,
+      data: PropTypes9.oneOfType([PropTypes9.array, PropTypes9.object]),
+      runWorkflow: PropTypes9.func,
+      isLoadingWorkflows: PropTypes9.bool
+    };
+  }
+});
+
+// src/table/tableConfigEditor.jsx
+import React11, { useMemo as useMemo6 } from "react";
 import PropTypes10 from "prop-types";
-import { Input as Input6, Label as Label2, Select as Select4, SelectContent as SelectContent4, SelectItem as SelectItem4, SelectTrigger as SelectTrigger4, SelectValue as SelectValue4 } from "@jet-admin/ui";
+import { Input as Input5, Label as Label4, Switch as Switch2, Button as Button10, Select as Select3, SelectContent as SelectContent3, SelectItem as SelectItem3, SelectTrigger as SelectTrigger3, SelectValue as SelectValue3 } from "@jet-admin/ui";
+import { MdDeleteOutline, MdAdd, MdArrowUpward, MdArrowDownward, MdAutoAwesome } from "react-icons/md";
+import { FiZap as FiZap2, FiInfo } from "react-icons/fi";
+var collectArrayPaths2, collectScalarPaths, TableConfigEditor;
+var init_tableConfigEditor = __esm({
+  "src/table/tableConfigEditor.jsx"() {
+    collectArrayPaths2 = (obj, prefix = "ctx", depth = 0, maxDepth = 4) => {
+      const results = [];
+      if (!obj || typeof obj !== "object" || depth > maxDepth) return results;
+      for (const key of Object.keys(obj)) {
+        if (key.startsWith("__")) continue;
+        const val = obj[key];
+        const fullPath = `${prefix}.${key}`;
+        if (Array.isArray(val) && val.length > 0 && typeof val[0] === "object") {
+          results.push({
+            path: `{{${fullPath}}}`,
+            label: fullPath.replace(/^ctx\./, ""),
+            sampleKeys: Object.keys(val[0]),
+            rowCount: val.length
+          });
+        } else if (val && typeof val === "object" && !Array.isArray(val)) {
+          results.push(...collectArrayPaths2(val, fullPath, depth + 1, maxDepth));
+        }
+      }
+      return results;
+    };
+    collectScalarPaths = (obj, prefix = "ctx", depth = 0, maxDepth = 3) => {
+      const results = [];
+      if (!obj || typeof obj !== "object" || depth > maxDepth) return results;
+      for (const key of Object.keys(obj)) {
+        if (key.startsWith("__")) continue;
+        const val = obj[key];
+        const fullPath = `${prefix}.${key}`;
+        if (typeof val === "number") {
+          results.push({ path: `{{${fullPath}}}`, label: fullPath.replace(/^ctx\./, ""), value: val });
+        } else if (val && typeof val === "object" && !Array.isArray(val)) {
+          results.push(...collectScalarPaths(val, fullPath, depth + 1, maxDepth));
+        }
+      }
+      return results;
+    };
+    TableConfigEditor = ({ widgetEditorForm, workflowContext, workflows, selectedWorkflow }) => {
+      const config = widgetEditorForm.values.widgetConfig || {};
+      const columns = config.columns || [];
+      const pagination = config.pagination || {
+        enabled: false,
+        pageParam: "page",
+        pageSizeParam: "limit",
+        totalTemplate: "{{ctx.total}}"
+      };
+      const workflowArgs = useMemo6(() => {
+        if (!selectedWorkflow) return [];
+        try {
+          const schema = selectedWorkflow.workflowInputSchema || selectedWorkflow.tblWorkflowVersions?.[0]?.workflowInputSchema || selectedWorkflow.inputSchema;
+          if (!schema) return [];
+          const parsed = typeof schema === "string" ? JSON.parse(schema) : schema;
+          if (Array.isArray(parsed)) return parsed;
+          if (parsed.properties) {
+            return Object.entries(parsed.properties).map(([key, def]) => ({
+              name: key,
+              type: def.type || "string",
+              description: def.description || ""
+            }));
+          }
+          return [];
+        } catch {
+          return [];
+        }
+      }, [selectedWorkflow]);
+      const ctxArrayPaths = useMemo6(() => {
+        if (!workflowContext) return [];
+        return collectArrayPaths2(workflowContext);
+      }, [workflowContext]);
+      const ctxScalarPaths = useMemo6(() => {
+        if (!workflowContext) return [];
+        return collectScalarPaths(workflowContext);
+      }, [workflowContext]);
+      const currentArrayInfo = useMemo6(() => {
+        const template = config.dataArrayTemplate;
+        if (!template || !workflowContext) return null;
+        const match = ctxArrayPaths.find((a) => a.path === template);
+        return match || null;
+      }, [config.dataArrayTemplate, workflowContext, ctxArrayPaths]);
+      const handleAddColumn = () => {
+        widgetEditorForm.setFieldValue("widgetConfig.columns", [
+          ...columns,
+          { label: "New Column", key: "new_key" }
+        ]);
+      };
+      const handleAutoPopulateColumns = () => {
+        if (!currentArrayInfo) return;
+        const newColumns = currentArrayInfo.sampleKeys.map((key) => ({
+          label: key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+          key
+        }));
+        widgetEditorForm.setFieldValue("widgetConfig.columns", newColumns);
+      };
+      const handleUpdateColumn = (index, field, value) => {
+        const updated = [...columns];
+        updated[index] = { ...updated[index], [field]: value };
+        widgetEditorForm.setFieldValue("widgetConfig.columns", updated);
+      };
+      const handleRemoveColumn = (index) => {
+        const updated = [...columns];
+        updated.splice(index, 1);
+        widgetEditorForm.setFieldValue("widgetConfig.columns", updated);
+      };
+      const handleMoveColumn = (index, direction) => {
+        const newIndex = index + direction;
+        if (newIndex < 0 || newIndex >= columns.length) return;
+        const updated = [...columns];
+        const [moved] = updated.splice(index, 1);
+        updated.splice(newIndex, 0, moved);
+        widgetEditorForm.setFieldValue("widgetConfig.columns", updated);
+      };
+      const workflowArgValues = widgetEditorForm.values.workflowConfig?.workflowArgValues || {};
+      const handleArgValueChange = (argName, value) => {
+        widgetEditorForm.setFieldValue("workflowConfig.workflowArgValues", {
+          ...workflowArgValues,
+          [argName]: value
+        });
+      };
+      const handlePaginationToggle = (checked) => {
+        widgetEditorForm.setFieldValue("widgetConfig.pagination", {
+          ...pagination,
+          enabled: checked
+        });
+      };
+      const handlePaginationChange = (field, value) => {
+        widgetEditorForm.setFieldValue("widgetConfig.pagination", {
+          ...pagination,
+          [field]: value
+        });
+      };
+      const paginationArgNames = pagination.enabled ? [pagination.pageParam, pagination.pageSizeParam].filter(Boolean) : [];
+      const generalArgs = workflowArgs.filter(
+        (arg) => !paginationArgNames.includes(arg.name)
+      );
+      return /* @__PURE__ */ React11.createElement("div", { className: "space-y-5" }, /* @__PURE__ */ React11.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React11.createElement(Label4, { className: "text-xs font-medium text-foreground" }, "Data Array Source"), ctxArrayPaths.length > 0 ? /* @__PURE__ */ React11.createElement(React11.Fragment, null, /* @__PURE__ */ React11.createElement(
+        Select3,
+        {
+          value: config.dataArrayTemplate || "",
+          onValueChange: (val) => widgetEditorForm.setFieldValue("widgetConfig.dataArrayTemplate", val)
+        },
+        /* @__PURE__ */ React11.createElement(SelectTrigger3, { className: "text-xs font-mono" }, /* @__PURE__ */ React11.createElement(SelectValue3, { placeholder: "Select a data array from context\u2026" })),
+        /* @__PURE__ */ React11.createElement(SelectContent3, null, ctxArrayPaths.map((arr, idx) => /* @__PURE__ */ React11.createElement(SelectItem3, { key: idx, value: arr.path }, /* @__PURE__ */ React11.createElement("span", { className: "font-mono" }, arr.label), /* @__PURE__ */ React11.createElement("span", { className: "text-muted-foreground ml-2" }, "(", arr.rowCount, " rows, ", arr.sampleKeys.length, " fields)"))))
+      ), /* @__PURE__ */ React11.createElement("p", { className: "text-[0.6rem] text-muted-foreground" }, "Or type a custom template path below."), /* @__PURE__ */ React11.createElement(
+        Input5,
+        {
+          type: "text",
+          className: "text-xs font-mono",
+          value: config.dataArrayTemplate || "",
+          onChange: (e) => widgetEditorForm.setFieldValue(
+            "widgetConfig.dataArrayTemplate",
+            e.target.value
+          ),
+          placeholder: "{{ctx.query_result}}"
+        }
+      )) : /* @__PURE__ */ React11.createElement(React11.Fragment, null, /* @__PURE__ */ React11.createElement(
+        Input5,
+        {
+          type: "text",
+          className: "text-sm font-mono",
+          value: config.dataArrayTemplate || "",
+          onChange: (e) => widgetEditorForm.setFieldValue(
+            "widgetConfig.dataArrayTemplate",
+            e.target.value
+          ),
+          placeholder: "{{ctx.data}}"
+        }
+      ), /* @__PURE__ */ React11.createElement("p", { className: "text-[0.65rem] text-muted-foreground flex items-start gap-1" }, /* @__PURE__ */ React11.createElement(FiInfo, { className: "w-3 h-3 mt-0.5 shrink-0" }), "Run the workflow to discover available data arrays from context."))), generalArgs.length > 0 && /* @__PURE__ */ React11.createElement("div", { className: "space-y-2 border-t pt-4" }, /* @__PURE__ */ React11.createElement(Label4, { className: "text-xs font-medium text-foreground" }, "Workflow Input Arguments"), /* @__PURE__ */ React11.createElement("p", { className: "text-[0.6rem] text-muted-foreground" }, "Set default values for the workflow inputs. Pagination args are configured in the Pagination section below."), /* @__PURE__ */ React11.createElement("div", { className: "space-y-2" }, generalArgs.map((arg) => /* @__PURE__ */ React11.createElement("div", { key: arg.name, className: "flex items-end gap-2" }, /* @__PURE__ */ React11.createElement("div", { className: "flex-1 space-y-1" }, /* @__PURE__ */ React11.createElement(Label4, { className: "text-[0.65rem] font-mono" }, arg.name), /* @__PURE__ */ React11.createElement(
+        Input5,
+        {
+          value: workflowArgValues[arg.name] ?? "",
+          onChange: (e) => handleArgValueChange(arg.name, e.target.value),
+          className: "h-7 text-xs",
+          placeholder: arg.description || `Value for ${arg.name}`
+        }
+      )), /* @__PURE__ */ React11.createElement("span", { className: "text-[0.6rem] text-muted-foreground pb-2" }, arg.type))))), /* @__PURE__ */ React11.createElement("div", { className: "space-y-2 pt-4" }, /* @__PURE__ */ React11.createElement("div", { className: "flex justify-between items-center" }, /* @__PURE__ */ React11.createElement(Label4, { className: "text-xs font-medium text-foreground" }, "Columns"), /* @__PURE__ */ React11.createElement("div", { className: "flex gap-1" }, currentArrayInfo && /* @__PURE__ */ React11.createElement(
+        Button10,
+        {
+          type: "button",
+          variant: "outline",
+          size: "sm",
+          onClick: handleAutoPopulateColumns,
+          className: "h-7 text-xs px-2",
+          title: "Auto-detect columns from data"
+        },
+        /* @__PURE__ */ React11.createElement(MdAutoAwesome, { className: "mr-1 text-amber-500" }),
+        " Auto-detect"
+      ), /* @__PURE__ */ React11.createElement(
+        Button10,
+        {
+          type: "button",
+          variant: "outline",
+          size: "sm",
+          onClick: handleAddColumn,
+          className: "h-7 text-xs px-2"
+        },
+        /* @__PURE__ */ React11.createElement(MdAdd, { className: "mr-1" }),
+        " Add"
+      ))), currentArrayInfo && columns.length === 0 && /* @__PURE__ */ React11.createElement("div", { className: "flex items-center gap-2 text-[0.65rem] text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2" }, /* @__PURE__ */ React11.createElement(FiZap2, { className: "w-3.5 h-3.5 shrink-0" }), /* @__PURE__ */ React11.createElement("span", null, /* @__PURE__ */ React11.createElement("strong", null, currentArrayInfo.sampleKeys.length), " fields detected from live data. Click ", /* @__PURE__ */ React11.createElement("strong", null, "Auto-detect"), " to populate columns.")), columns.length === 0 && !currentArrayInfo ? /* @__PURE__ */ React11.createElement("div", { className: "text-center p-4 border border-dashed rounded-md text-muted-foreground text-xs" }, "No columns defined. Columns will be auto-detected from the first row's keys at render time.") : columns.length > 0 ? /* @__PURE__ */ React11.createElement("div", { className: "space-y-2" }, columns.map((col, idx) => /* @__PURE__ */ React11.createElement(
+        "div",
+        {
+          key: idx,
+          className: "flex items-end gap-1.5 p-2 border rounded-md bg-muted/30"
+        },
+        /* @__PURE__ */ React11.createElement("div", { className: "flex flex-col gap-0.5 pb-0.5" }, /* @__PURE__ */ React11.createElement(
+          Button10,
+          {
+            type: "button",
+            variant: "ghost",
+            size: "icon",
+            className: "h-5 w-5 text-muted-foreground hover:text-foreground",
+            onClick: () => handleMoveColumn(idx, -1),
+            disabled: idx === 0,
+            title: "Move up"
+          },
+          /* @__PURE__ */ React11.createElement(MdArrowUpward, { className: "text-xs" })
+        ), /* @__PURE__ */ React11.createElement(
+          Button10,
+          {
+            type: "button",
+            variant: "ghost",
+            size: "icon",
+            className: "h-5 w-5 text-muted-foreground hover:text-foreground",
+            onClick: () => handleMoveColumn(idx, 1),
+            disabled: idx === columns.length - 1,
+            title: "Move down"
+          },
+          /* @__PURE__ */ React11.createElement(MdArrowDownward, { className: "text-xs" })
+        )),
+        /* @__PURE__ */ React11.createElement("div", { className: "flex-1 space-y-1" }, /* @__PURE__ */ React11.createElement(Label4, { className: "text-[0.65rem]" }, "Header Label"), /* @__PURE__ */ React11.createElement(
+          Input5,
+          {
+            value: col.label,
+            onChange: (e) => handleUpdateColumn(idx, "label", e.target.value),
+            className: "h-7 text-xs",
+            placeholder: "User Name"
+          }
+        )),
+        /* @__PURE__ */ React11.createElement("div", { className: "flex-1 space-y-1" }, /* @__PURE__ */ React11.createElement(Label4, { className: "text-[0.65rem]" }, "Data Key"), /* @__PURE__ */ React11.createElement(
+          Input5,
+          {
+            value: col.key,
+            onChange: (e) => handleUpdateColumn(idx, "key", e.target.value),
+            className: "h-7 text-xs font-mono",
+            placeholder: "user_name"
+          }
+        )),
+        /* @__PURE__ */ React11.createElement(
+          Button10,
+          {
+            type: "button",
+            variant: "ghost",
+            size: "icon",
+            className: "h-7 w-7 text-destructive",
+            onClick: () => handleRemoveColumn(idx),
+            title: "Remove column"
+          },
+          /* @__PURE__ */ React11.createElement(MdDeleteOutline, null)
+        )
+      ))) : null), /* @__PURE__ */ React11.createElement("div", { className: "space-y-3 border-t pt-4" }, /* @__PURE__ */ React11.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React11.createElement(Label4, { className: "text-xs font-medium text-foreground" }, "Pagination"), /* @__PURE__ */ React11.createElement(
+        Switch2,
+        {
+          checked: pagination.enabled,
+          onCheckedChange: handlePaginationToggle
+        }
+      )), pagination.enabled && /* @__PURE__ */ React11.createElement("div", { className: "space-y-3 bg-muted/30 p-3 rounded-md border mt-1" }, /* @__PURE__ */ React11.createElement("div", { className: "text-[0.65rem] text-muted-foreground bg-background border rounded p-2.5 space-y-1.5" }, /* @__PURE__ */ React11.createElement("p", { className: "font-medium text-foreground text-[0.7rem]" }, "How pagination works:"), /* @__PURE__ */ React11.createElement("ol", { className: "list-decimal list-inside space-y-1" }, /* @__PURE__ */ React11.createElement("li", null, "Your workflow must accept ", /* @__PURE__ */ React11.createElement("strong", null, "page"), " and ", /* @__PURE__ */ React11.createElement("strong", null, "page size"), " as input arguments (e.g. use them in a SQL ", /* @__PURE__ */ React11.createElement("code", { className: "bg-muted px-1 rounded" }, "LIMIT / OFFSET"), ")."), /* @__PURE__ */ React11.createElement("li", null, "Map those argument names below. When the user changes pages, the table will re-run the workflow with these values \u2014 ", /* @__PURE__ */ React11.createElement("em", null, "overriding"), " any defaults set above."), /* @__PURE__ */ React11.createElement("li", null, "Set a ", /* @__PURE__ */ React11.createElement("strong", null, "Total Rows"), " template so the paginator can calculate total pages."))), /* @__PURE__ */ React11.createElement("div", { className: "grid grid-cols-2 gap-3" }, /* @__PURE__ */ React11.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React11.createElement(Label4, { className: "text-[0.65rem]" }, "Page Argument Name"), workflowArgs.length > 0 ? /* @__PURE__ */ React11.createElement(
+        Select3,
+        {
+          value: pagination.pageParam || "",
+          onValueChange: (val) => handlePaginationChange("pageParam", val)
+        },
+        /* @__PURE__ */ React11.createElement(SelectTrigger3, { className: "h-7 text-xs font-mono" }, /* @__PURE__ */ React11.createElement(SelectValue3, { placeholder: "Select arg\u2026" })),
+        /* @__PURE__ */ React11.createElement(SelectContent3, null, workflowArgs.map((arg) => /* @__PURE__ */ React11.createElement(SelectItem3, { key: arg.name, value: arg.name }, arg.name)))
+      ) : /* @__PURE__ */ React11.createElement(
+        Input5,
+        {
+          value: pagination.pageParam || "",
+          onChange: (e) => handlePaginationChange("pageParam", e.target.value),
+          placeholder: "page",
+          className: "h-7 text-xs font-mono"
+        }
+      ), /* @__PURE__ */ React11.createElement("p", { className: "text-[0.6rem] text-muted-foreground" }, "Workflow input that receives the page number.")), /* @__PURE__ */ React11.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React11.createElement(Label4, { className: "text-[0.65rem]" }, "Page Size Argument Name"), workflowArgs.length > 0 ? /* @__PURE__ */ React11.createElement(
+        Select3,
+        {
+          value: pagination.pageSizeParam || "",
+          onValueChange: (val) => handlePaginationChange("pageSizeParam", val)
+        },
+        /* @__PURE__ */ React11.createElement(SelectTrigger3, { className: "h-7 text-xs font-mono" }, /* @__PURE__ */ React11.createElement(SelectValue3, { placeholder: "Select arg\u2026" })),
+        /* @__PURE__ */ React11.createElement(SelectContent3, null, workflowArgs.map((arg) => /* @__PURE__ */ React11.createElement(SelectItem3, { key: arg.name, value: arg.name }, arg.name)))
+      ) : /* @__PURE__ */ React11.createElement(
+        Input5,
+        {
+          value: pagination.pageSizeParam || "",
+          onChange: (e) => handlePaginationChange("pageSizeParam", e.target.value),
+          placeholder: "limit",
+          className: "h-7 text-xs font-mono"
+        }
+      ), /* @__PURE__ */ React11.createElement("p", { className: "text-[0.6rem] text-muted-foreground" }, "Workflow input that receives rows per page."))), /* @__PURE__ */ React11.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React11.createElement(Label4, { className: "text-[0.65rem]" }, "Total Rows (Template)"), ctxScalarPaths.length > 0 ? /* @__PURE__ */ React11.createElement(
+        Select3,
+        {
+          value: pagination.totalTemplate || "",
+          onValueChange: (val) => handlePaginationChange("totalTemplate", val)
+        },
+        /* @__PURE__ */ React11.createElement(SelectTrigger3, { className: "h-7 text-xs font-mono" }, /* @__PURE__ */ React11.createElement(SelectValue3, { placeholder: "Select or type a template\u2026" })),
+        /* @__PURE__ */ React11.createElement(SelectContent3, null, ctxScalarPaths.map((s, idx) => /* @__PURE__ */ React11.createElement(SelectItem3, { key: idx, value: s.path }, /* @__PURE__ */ React11.createElement("span", { className: "font-mono" }, s.label), /* @__PURE__ */ React11.createElement("span", { className: "text-muted-foreground ml-2" }, "= ", s.value))))
+      ) : /* @__PURE__ */ React11.createElement(
+        Input5,
+        {
+          value: pagination.totalTemplate || "",
+          onChange: (e) => handlePaginationChange("totalTemplate", e.target.value),
+          placeholder: "{{ctx.total_count}}",
+          className: "h-7 text-xs font-mono"
+        }
+      ), /* @__PURE__ */ React11.createElement("p", { className: "text-[0.6rem] text-muted-foreground" }, "Context template that resolves to the total number of records.")), paginationArgNames.length > 0 && generalArgs.length > 0 && /* @__PURE__ */ React11.createElement("div", { className: "text-[0.6rem] text-muted-foreground bg-background border rounded px-2.5 py-1.5 flex items-start gap-1.5" }, /* @__PURE__ */ React11.createElement(FiInfo, { className: "w-3 h-3 mt-0.5 shrink-0 text-primary" }), /* @__PURE__ */ React11.createElement("span", null, "The pagination args (", /* @__PURE__ */ React11.createElement("code", { className: "bg-muted px-0.5 rounded" }, paginationArgNames.join(", ")), ') are hidden from "Workflow Input Arguments" above to avoid conflict. On page change, they will ', /* @__PURE__ */ React11.createElement("em", null, "override"), " any base values.")))), /* @__PURE__ */ React11.createElement("div", { className: "h-8 shrink-0" }));
+    };
+    TableConfigEditor.propTypes = {
+      widgetEditorForm: PropTypes10.object.isRequired,
+      workflowContext: PropTypes10.object,
+      workflows: PropTypes10.array,
+      selectedWorkflow: PropTypes10.object
+    };
+  }
+});
+
+// src/button/buttonConfigEditor.jsx
+import React12 from "react";
+import PropTypes11 from "prop-types";
+import { Input as Input6, Label as Label5, Select as Select4, SelectContent as SelectContent4, SelectItem as SelectItem4, SelectTrigger as SelectTrigger4, SelectValue as SelectValue4 } from "@jet-admin/ui";
 var ButtonConfigEditor;
 var init_buttonConfigEditor = __esm({
   "src/button/buttonConfigEditor.jsx"() {
     ButtonConfigEditor = ({ widgetEditorForm }) => {
-      return /* @__PURE__ */ React11.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React11.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React11.createElement(Label2, { className: "text-xs font-medium text-foreground" }, "Button Text"), /* @__PURE__ */ React11.createElement(
+      return /* @__PURE__ */ React12.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React12.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React12.createElement(Label5, { className: "text-xs font-medium text-foreground" }, "Button Text"), /* @__PURE__ */ React12.createElement(
         Input6,
         {
           type: "text",
@@ -178,34 +639,34 @@ var init_buttonConfigEditor = __esm({
           onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.text", e.target.value),
           placeholder: "Click Me"
         }
-      )), /* @__PURE__ */ React11.createElement("div", { className: "grid grid-cols-2 gap-4" }, /* @__PURE__ */ React11.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React11.createElement(Label2, { className: "text-xs font-medium text-foreground" }, "Variant"), /* @__PURE__ */ React11.createElement(
+      )), /* @__PURE__ */ React12.createElement("div", { className: "grid grid-cols-2 gap-4" }, /* @__PURE__ */ React12.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React12.createElement(Label5, { className: "text-xs font-medium text-foreground" }, "Variant"), /* @__PURE__ */ React12.createElement(
         Select4,
         {
           value: widgetEditorForm.values.widgetConfig?.variant || "default",
           onValueChange: (val) => widgetEditorForm.setFieldValue("widgetConfig.variant", val)
         },
-        /* @__PURE__ */ React11.createElement(SelectTrigger4, { className: "text-xs" }, /* @__PURE__ */ React11.createElement(SelectValue4, { placeholder: "Select variant" })),
-        /* @__PURE__ */ React11.createElement(SelectContent4, null, /* @__PURE__ */ React11.createElement(SelectItem4, { value: "default" }, "Default"), /* @__PURE__ */ React11.createElement(SelectItem4, { value: "destructive" }, "Destructive"), /* @__PURE__ */ React11.createElement(SelectItem4, { value: "outline" }, "Outline"), /* @__PURE__ */ React11.createElement(SelectItem4, { value: "secondary" }, "Secondary"), /* @__PURE__ */ React11.createElement(SelectItem4, { value: "ghost" }, "Ghost"), /* @__PURE__ */ React11.createElement(SelectItem4, { value: "link" }, "Link"))
-      )), /* @__PURE__ */ React11.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React11.createElement(Label2, { className: "text-xs font-medium text-foreground" }, "Size"), /* @__PURE__ */ React11.createElement(
+        /* @__PURE__ */ React12.createElement(SelectTrigger4, { className: "text-xs" }, /* @__PURE__ */ React12.createElement(SelectValue4, { placeholder: "Select variant" })),
+        /* @__PURE__ */ React12.createElement(SelectContent4, null, /* @__PURE__ */ React12.createElement(SelectItem4, { value: "default" }, "Default"), /* @__PURE__ */ React12.createElement(SelectItem4, { value: "destructive" }, "Destructive"), /* @__PURE__ */ React12.createElement(SelectItem4, { value: "outline" }, "Outline"), /* @__PURE__ */ React12.createElement(SelectItem4, { value: "secondary" }, "Secondary"), /* @__PURE__ */ React12.createElement(SelectItem4, { value: "ghost" }, "Ghost"), /* @__PURE__ */ React12.createElement(SelectItem4, { value: "link" }, "Link"))
+      )), /* @__PURE__ */ React12.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React12.createElement(Label5, { className: "text-xs font-medium text-foreground" }, "Size"), /* @__PURE__ */ React12.createElement(
         Select4,
         {
           value: widgetEditorForm.values.widgetConfig?.size || "default",
           onValueChange: (val) => widgetEditorForm.setFieldValue("widgetConfig.size", val)
         },
-        /* @__PURE__ */ React11.createElement(SelectTrigger4, { className: "text-xs" }, /* @__PURE__ */ React11.createElement(SelectValue4, { placeholder: "Select size" })),
-        /* @__PURE__ */ React11.createElement(SelectContent4, null, /* @__PURE__ */ React11.createElement(SelectItem4, { value: "default" }, "Default"), /* @__PURE__ */ React11.createElement(SelectItem4, { value: "sm" }, "Small"), /* @__PURE__ */ React11.createElement(SelectItem4, { value: "lg" }, "Large"), /* @__PURE__ */ React11.createElement(SelectItem4, { value: "icon" }, "Icon"))
+        /* @__PURE__ */ React12.createElement(SelectTrigger4, { className: "text-xs" }, /* @__PURE__ */ React12.createElement(SelectValue4, { placeholder: "Select size" })),
+        /* @__PURE__ */ React12.createElement(SelectContent4, null, /* @__PURE__ */ React12.createElement(SelectItem4, { value: "default" }, "Default"), /* @__PURE__ */ React12.createElement(SelectItem4, { value: "sm" }, "Small"), /* @__PURE__ */ React12.createElement(SelectItem4, { value: "lg" }, "Large"), /* @__PURE__ */ React12.createElement(SelectItem4, { value: "icon" }, "Icon"))
       ))));
     };
     ButtonConfigEditor.propTypes = {
-      widgetEditorForm: PropTypes10.object.isRequired
+      widgetEditorForm: PropTypes11.object.isRequired
     };
   }
 });
 
 // src/button/buttonWidget.jsx
-import React12 from "react";
-import PropTypes11 from "prop-types";
-import { Button as Button9, Spinner } from "@jet-admin/ui";
+import React13 from "react";
+import PropTypes12 from "prop-types";
+import { Button as Button11, Spinner } from "@jet-admin/ui";
 var ButtonWidget;
 var init_buttonWidget = __esm({
   "src/button/buttonWidget.jsx"() {
@@ -224,24 +685,24 @@ var init_buttonWidget = __esm({
       const text = widgetConfig?.text || "Click Me";
       const variant = widgetConfig?.variant || "default";
       const size = widgetConfig?.size || "default";
-      return /* @__PURE__ */ React12.createElement("div", { className: "flex w-full h-full items-center justify-center p-4 text-center" }, /* @__PURE__ */ React12.createElement(
-        Button9,
+      return /* @__PURE__ */ React13.createElement("div", { className: "flex w-full h-full items-center justify-center p-4 text-center" }, /* @__PURE__ */ React13.createElement(
+        Button11,
         {
           variant,
           size,
           onClick: runWorkflow,
           disabled: isLoadingWorkflows
         },
-        isLoadingWorkflows && /* @__PURE__ */ React12.createElement(Spinner, { className: "mr-2 h-4 w-4" }),
+        isLoadingWorkflows && /* @__PURE__ */ React13.createElement(Spinner, { className: "mr-2 h-4 w-4" }),
         text
       ));
     };
     ButtonWidget.propTypes = {
-      widgetTitle: PropTypes11.string,
-      widgetType: PropTypes11.string,
-      widgetConfig: PropTypes11.object,
-      runWorkflow: PropTypes11.func,
-      isLoadingWorkflows: PropTypes11.bool
+      widgetTitle: PropTypes12.string,
+      widgetType: PropTypes12.string,
+      widgetConfig: PropTypes12.object,
+      runWorkflow: PropTypes12.func,
+      isLoadingWorkflows: PropTypes12.bool
     };
   }
 });
@@ -259,12 +720,25 @@ var init_button = __esm({
   }
 });
 
+// src/table/index.js
+var table_exports = {};
+__export(table_exports, {
+  TableConfigEditor: () => TableConfigEditor,
+  TableWidget: () => TableWidget
+});
+var init_table = __esm({
+  "src/table/index.js"() {
+    init_tableWidget();
+    init_tableConfigEditor();
+  }
+});
+
 // src/index.js
 init_vega();
 
 // src/vega/vegaConfigEditor.jsx
-import React10, { useState as useState7 } from "react";
-import PropTypes9 from "prop-types";
+import React9, { useState as useState7 } from "react";
+import PropTypes8 from "prop-types";
 import { FiAlertTriangle, FiSettings as FiSettings2 } from "react-icons/fi";
 
 // src/vega/chartSpecParser.js
@@ -437,12 +911,12 @@ var parseStyle = (spec) => {
 // src/vega/vegaConfigEditor.jsx
 import {
   Button as Button8,
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  Input as Input5,
-  Label,
+  Dialog as Dialog2,
+  DialogContent as DialogContent2,
+  DialogHeader as DialogHeader2,
+  DialogTitle as DialogTitle2,
+  Input as Input4,
+  Label as Label3,
   Switch
 } from "@jet-admin/ui";
 
@@ -1571,7 +2045,7 @@ var FieldPill = ({
           e.stopPropagation();
           onRemove();
         },
-        className: "ml-auto h-4 w-4 rounded-full hover:bg-black/10 text-xs text-slate-500",
+        className: "ml-auto h-4 w-4 rounded-full hover:bg-black/10 text-xs text-muted-foreground",
         title: "Remove"
       },
       "\xD7"
@@ -1596,7 +2070,7 @@ FieldPill.propTypes = {
 import { FiSearch, FiDatabase, FiPlus, FiZap } from "react-icons/fi";
 import { BiGitMerge as BiGitMerge2 } from "react-icons/bi";
 import { MdOutput as MdOutput2 } from "react-icons/md";
-import { Button as Button4, Input as Input2 } from "@jet-admin/ui";
+import { Button as Button4, Input as Input2, Label } from "@jet-admin/ui";
 var collectArrayPaths = (obj, prefix = "ctx", depth = 0, maxDepth = 4) => {
   const results = [];
   if (!obj || typeof obj !== "object" || depth > maxDepth) return results;
@@ -1759,7 +2233,7 @@ var DataFieldPanel = ({
       }
     ))));
   };
-  return /* @__PURE__ */ React5.createElement("div", { className: `flex flex-col h-full bg-white ${className}` }, /* @__PURE__ */ React5.createElement("div", { className: "p-3 border-b border-slate-100 bg-slate-50/50" }, /* @__PURE__ */ React5.createElement("div", { className: "flex items-center gap-2 text-xs font-bold text-slate-500 uppercase tracking-widest mb-2" }, /* @__PURE__ */ React5.createElement(FiDatabase, { className: "w-3.5 h-3.5 text-slate-400" }), /* @__PURE__ */ React5.createElement("span", null, "Data Source")), /* @__PURE__ */ React5.createElement("div", { className: "relative", ref: suggestionsRef }, /* @__PURE__ */ React5.createElement(
+  return /* @__PURE__ */ React5.createElement("div", { className: `flex flex-col h-full bg-background ${className}` }, /* @__PURE__ */ React5.createElement("div", { className: "p-2.5 border-b border-border bg-muted/30" }, /* @__PURE__ */ React5.createElement("div", { className: "flex items-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5" }, /* @__PURE__ */ React5.createElement(FiDatabase, { className: "w-3.5 h-3.5 text-muted-foreground" }), /* @__PURE__ */ React5.createElement("span", null, "Data Source")), /* @__PURE__ */ React5.createElement("div", { className: "relative", ref: suggestionsRef }, /* @__PURE__ */ React5.createElement(
     Input2,
     {
       type: "text",
@@ -1767,40 +2241,40 @@ var DataFieldPanel = ({
       onChange: (e) => onDataSourceChange?.(e.target.value),
       onFocus: () => setShowSuggestions(true),
       placeholder: "Select or type a data path...",
-      className: "w-full px-2.5 py-1.5 text-xs text-slate-700 bg-white border border-slate-200 rounded focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400 font-mono",
+      className: "w-full text-xs font-mono",
       title: "Workflow data source path"
     }
-  ), showSuggestions && allSuggestions.length > 0 && /* @__PURE__ */ React5.createElement("div", { className: "absolute left-0 right-0 top-full mt-1 bg-white border border-slate-200 rounded-md shadow-xl z-50 max-h-60 overflow-y-auto w-80" }, /* @__PURE__ */ React5.createElement("div", { className: "px-3 py-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest border-b border-slate-100 bg-slate-50 sticky top-0" }, "Available Variables (", allSuggestions.length, ")"), allSuggestions.map((s, i) => /* @__PURE__ */ React5.createElement(
+  ), showSuggestions && allSuggestions.length > 0 && /* @__PURE__ */ React5.createElement("div", { className: "absolute left-0 right-0 top-full mt-1 bg-background border border-border rounded-md shadow-xl z-50 max-h-60 overflow-y-auto w-80" }, /* @__PURE__ */ React5.createElement("div", { className: "px-3 py-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest border-b border-border bg-muted sticky top-0" }, "Available Variables (", allSuggestions.length, ")"), allSuggestions.map((s, i) => /* @__PURE__ */ React5.createElement(
     "div",
     {
       key: `${s.path}-${i}`,
       onClick: () => handleSelectSuggestion(s),
-      className: `w-full text-left px-3 py-2 text-xs border-b border-slate-50 flex items-start gap-2.5 transition-colors cursor-pointer ${dataSource === s.path ? "bg-indigo-50 border-l-2 border-l-indigo-500" : "bg-white hover:bg-slate-50"}`
+      className: `w-full text-left px-3 py-1.5 text-xs border-b border-border/50 flex items-start gap-2 transition-colors cursor-pointer ${dataSource === s.path ? "bg-primary/5 border-l-2 border-l-primary" : "bg-background hover:bg-muted"}`
     },
     /* @__PURE__ */ React5.createElement("div", { className: "mt-0.5" }, getCategoryIcon2(s.source || s.category)),
-    /* @__PURE__ */ React5.createElement("div", { className: "flex-1 min-w-0" }, /* @__PURE__ */ React5.createElement("div", { className: "text-[11px] font-medium text-slate-700 font-mono truncate" }, s.label), /* @__PURE__ */ React5.createElement("div", { className: "text-[10px] text-slate-500 truncate mt-0.5", title: s.description }, s.description), s.nodeTitle && /* @__PURE__ */ React5.createElement("div", { className: "text-[9px] text-emerald-600 mt-1 uppercase tracking-wider font-semibold" }, "from: ", s.nodeTitle)),
+    /* @__PURE__ */ React5.createElement("div", { className: "flex-1 min-w-0" }, /* @__PURE__ */ React5.createElement("div", { className: "text-[11px] font-medium text-foreground font-mono truncate" }, s.label), /* @__PURE__ */ React5.createElement("div", { className: "text-[10px] text-muted-foreground truncate mt-0.5", title: s.description }, s.description), s.nodeTitle && /* @__PURE__ */ React5.createElement("div", { className: "text-[9px] text-emerald-600 mt-1 uppercase tracking-wider font-semibold" }, "from: ", s.nodeTitle)),
     s.source === "runtime" && /* @__PURE__ */ React5.createElement("span", { className: "text-[9px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded uppercase tracking-wider shrink-0" }, "LIVE")
-  )))), dataSource && fields.length > 0 && /* @__PURE__ */ React5.createElement("div", { className: "mt-2 flex items-center gap-1.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-1 rounded w-fit border border-emerald-100" }, /* @__PURE__ */ React5.createElement(FiZap, { className: "w-3 h-3" }), fields.length, " fields detected")), fields.length > 5 && /* @__PURE__ */ React5.createElement("div", { className: "px-3 py-2 border-b border-slate-100 bg-white" }, /* @__PURE__ */ React5.createElement("div", { className: "flex items-center gap-2 bg-slate-50 border border-slate-200 rounded px-2.5 py-1.5 focus-within:ring-1 focus-within:ring-indigo-400 focus-within:border-indigo-400 transition-shadow" }, /* @__PURE__ */ React5.createElement(FiSearch, { className: "w-3.5 h-3.5 text-slate-400" }), /* @__PURE__ */ React5.createElement(
+  )))), dataSource && fields.length > 0 && /* @__PURE__ */ React5.createElement("div", { className: "mt-1.5 flex items-center gap-1.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded w-fit border border-emerald-100" }, /* @__PURE__ */ React5.createElement(FiZap, { className: "w-3 h-3" }), fields.length, " fields detected")), fields.length > 5 && /* @__PURE__ */ React5.createElement("div", { className: "px-2.5 py-1.5 border-b border-border bg-background" }, /* @__PURE__ */ React5.createElement("div", { className: "flex items-center gap-2 bg-muted/50 border border-border rounded px-2 py-1 focus-within:ring-1 focus-within:ring-ring focus-within:border-ring transition-shadow" }, /* @__PURE__ */ React5.createElement(FiSearch, { className: "w-3.5 h-3.5 text-muted-foreground" }), /* @__PURE__ */ React5.createElement(
     Input2,
     {
       type: "text",
       value: searchTerm,
       onChange: (e) => setSearchTerm(e.target.value),
       placeholder: "Filter fields...",
-      className: "flex-1 text-xs bg-transparent outline-none text-slate-600 placeholder:text-slate-400"
+      className: "flex-1 text-xs bg-transparent outline-none text-foreground placeholder:text-muted-foreground border-none shadow-none focus-visible:ring-0 h-6 p-0"
     }
-  ))), /* @__PURE__ */ React5.createElement("div", { className: "flex-1 overflow-y-auto p-3" }, fields.length > 0 ? /* @__PURE__ */ React5.createElement(React5.Fragment, null, renderFieldGroup(quantFields, "Measures", "text-emerald-600"), renderFieldGroup(catFields, "Dimensions", "text-blue-600"), renderFieldGroup(tempFields, "Temporal", "text-amber-600")) : /* @__PURE__ */ React5.createElement("div", { className: "flex flex-col items-center justify-center h-full py-8 text-center px-4" }, /* @__PURE__ */ React5.createElement(FiDatabase, { className: "w-8 h-8 mb-3 text-slate-200" }), /* @__PURE__ */ React5.createElement("p", { className: "text-xs text-slate-500 leading-relaxed mb-4" }, dataSource ? "Run the workflow to detect fields from the data" : "Choose a data source above or type a ctx path"), !dataSource && allSuggestions.length > 0 && /* @__PURE__ */ React5.createElement(
+  ))), /* @__PURE__ */ React5.createElement("div", { className: "flex-1 overflow-y-auto p-2.5 min-h-0" }, fields.length > 0 ? /* @__PURE__ */ React5.createElement(React5.Fragment, null, renderFieldGroup(quantFields, "Measures", "text-emerald-600"), renderFieldGroup(catFields, "Dimensions", "text-blue-600"), renderFieldGroup(tempFields, "Temporal", "text-amber-600")) : /* @__PURE__ */ React5.createElement("div", { className: "flex flex-col items-center justify-center h-full py-6 text-center px-3" }, /* @__PURE__ */ React5.createElement(FiDatabase, { className: "w-8 h-8 mb-2 text-muted-foreground/30" }), /* @__PURE__ */ React5.createElement("p", { className: "text-xs text-muted-foreground leading-relaxed mb-3" }, dataSource ? "Run the workflow to detect fields from the data" : "Choose a data source above or type a ctx path"), !dataSource && allSuggestions.length > 0 && /* @__PURE__ */ React5.createElement(
     Button4,
     {
       type: "button",
       size: "sm",
       onClick: () => setShowSuggestions(true),
-      className: "h-7 px-3 text-[10px] font-semibold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 border border-indigo-100 uppercase tracking-wider"
+      className: "h-7 px-3 text-[10px] font-semibold text-primary bg-primary/5 hover:bg-primary/10 border border-primary/20 uppercase tracking-wider"
     },
     "Browse ",
     allSuggestions.length,
     " Variables"
-  )), /* @__PURE__ */ React5.createElement("div", { className: "mt-4 pt-4 border-t border-slate-100" }, showManualAdd ? /* @__PURE__ */ React5.createElement("div", { className: "flex flex-col gap-2" }, /* @__PURE__ */ React5.createElement(
+  )), /* @__PURE__ */ React5.createElement("div", { className: "mt-3 pt-3 border-t border-border" }, showManualAdd ? /* @__PURE__ */ React5.createElement("div", { className: "flex flex-col gap-2" }, /* @__PURE__ */ React5.createElement(
     Input2,
     {
       type: "text",
@@ -1808,7 +2282,7 @@ var DataFieldPanel = ({
       onChange: (e) => setManualField(e.target.value),
       onKeyDown: (e) => e.key === "Enter" && handleAddManualField(),
       placeholder: "Type field_name & press Enter...",
-      className: "w-full px-2.5 py-1.5 text-xs font-mono text-slate-700 bg-white border border-slate-300 rounded focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 shadow-sm",
+      className: "w-full text-xs font-mono",
       autoFocus: true
     }
   ), /* @__PURE__ */ React5.createElement("div", { className: "flex items-center gap-2 justify-end" }, /* @__PURE__ */ React5.createElement(
@@ -1818,7 +2292,7 @@ var DataFieldPanel = ({
       variant: "ghost",
       size: "sm",
       onClick: () => setShowManualAdd(false),
-      className: "h-6 px-2 text-xs text-slate-500 hover:text-slate-700 font-medium"
+      className: "h-6 px-2 text-xs text-muted-foreground hover:text-foreground font-medium"
     },
     "Cancel"
   ), /* @__PURE__ */ React5.createElement(
@@ -1827,7 +2301,7 @@ var DataFieldPanel = ({
       type: "button",
       size: "sm",
       onClick: handleAddManualField,
-      className: "h-6 px-2 text-xs font-semibold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm"
+      className: "h-6 px-2 text-xs font-semibold"
     },
     "Add Field"
   ))) : /* @__PURE__ */ React5.createElement(
@@ -1836,7 +2310,7 @@ var DataFieldPanel = ({
       type: "button",
       variant: "outline",
       onClick: () => setShowManualAdd(true),
-      className: "w-full h-auto py-2 text-[11px] font-bold uppercase tracking-wider text-slate-500 bg-slate-50 border-dashed border-slate-300 hover:bg-slate-100 hover:border-slate-400 hover:text-slate-600"
+      className: "w-full h-auto py-1.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground bg-muted/30 border-dashed border-border hover:bg-muted hover:text-foreground"
     },
     /* @__PURE__ */ React5.createElement(FiPlus, { className: "w-3.5 h-3.5 mr-1" }),
     /* @__PURE__ */ React5.createElement("span", null, "Add Field Manually")
@@ -1936,9 +2410,9 @@ var EncodingShelf = ({
   }, [value, onChange]);
   const isEmpty = !value || !value.field;
   const shelfClass = [
-    "flex items-center w-full min-h-[36px] bg-white border border-slate-200 rounded p-1 gap-2 transition-colors",
-    isEmpty ? "border-dashed border-slate-300 bg-slate-50/50" : "",
-    isDragOver ? "border-indigo-400 bg-indigo-50/50 shadow-inner" : "",
+    "flex items-center w-full min-h-[36px] bg-background border border-border rounded-md p-1 gap-2 transition-colors",
+    isEmpty ? "border-dashed border-border bg-muted/30" : "",
+    isDragOver ? "border-primary bg-primary/5 shadow-inner" : "",
     className
   ].filter(Boolean).join(" ");
   return /* @__PURE__ */ React6.createElement(
@@ -1950,11 +2424,11 @@ var EncodingShelf = ({
       onDrop: handleDrop,
       className: shelfClass
     },
-    /* @__PURE__ */ React6.createElement("div", { className: "flex items-center justify-start w-24 shrink-0 px-2 py-1 text-[11px] font-bold text-slate-400 uppercase tracking-widest gap-2 border-r border-slate-100" }, /* @__PURE__ */ React6.createElement("span", { className: "text-slate-300 text-sm" }, icon), /* @__PURE__ */ React6.createElement("span", { className: "truncate" }, label)),
-    /* @__PURE__ */ React6.createElement("div", { className: "flex-1 flex flex-wrap items-center gap-2 min-w-0 pr-1" }, isEmpty ? /* @__PURE__ */ React6.createElement("span", { className: "text-xs text-slate-400 italic px-2" }, isDragOver ? "Release to assign" : "Drop a field here") : /* @__PURE__ */ React6.createElement(React6.Fragment, null, /* @__PURE__ */ React6.createElement(
+    /* @__PURE__ */ React6.createElement("div", { className: "flex items-center justify-start w-24 shrink-0 px-2 py-1 text-[11px] font-bold text-muted-foreground uppercase tracking-widest gap-2 border-r border-border" }, /* @__PURE__ */ React6.createElement("span", { className: "text-muted-foreground/50 text-sm" }, icon), /* @__PURE__ */ React6.createElement("span", { className: "truncate" }, label)),
+    /* @__PURE__ */ React6.createElement("div", { className: "flex-1 flex flex-wrap items-center gap-2 min-w-0 pr-1" }, isEmpty ? /* @__PURE__ */ React6.createElement("span", { className: "text-xs text-muted-foreground italic px-2" }, isDragOver ? "Release to assign" : "Drop a field here") : /* @__PURE__ */ React6.createElement(React6.Fragment, null, /* @__PURE__ */ React6.createElement(
       FieldPill,
       {
-        field: value,
+        field: { ...value, name: value.field },
         onRemove,
         isCompact: true
       }
@@ -1965,7 +2439,7 @@ var EncodingShelf = ({
         variant: "ghost",
         size: "icon",
         onClick: handleSortToggle,
-        className: "ml-auto h-6 w-6 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 text-xs",
+        className: "ml-auto h-6 w-6 text-muted-foreground hover:text-primary hover:bg-primary/5 text-xs",
         title: `Sort: ${value.sort || "default"}`
       },
       value.sort === "ascending" ? "\u2191" : value.sort === "descending" ? "\u2193" : "\u2195"
@@ -2030,7 +2504,7 @@ MarkSelector.propTypes = {
 // src/vega/shelfBuilder.jsx
 import { FiSettings, FiChevronDown as FiChevronDown2, FiChevronRight as FiChevronRight2, FiDatabase as FiDatabase2 } from "react-icons/fi";
 import { MdOutlineAutoGraph } from "react-icons/md";
-import { Button as Button7, Input as Input3, Select as Select2, SelectContent as SelectContent2, SelectItem as SelectItem2, SelectTrigger as SelectTrigger2, SelectValue as SelectValue2 } from "@jet-admin/ui";
+import { Button as Button7, Input as Input3, Label as Label2, Select as Select2, SelectContent as SelectContent2, SelectItem as SelectItem2, SelectTrigger as SelectTrigger2, SelectValue as SelectValue2, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@jet-admin/ui";
 var VEGA_STRINGS = {
   WIDGET_DATASET_FIELD_MAPPING_BUTTON: "Mappings"
 };
@@ -2139,10 +2613,9 @@ var ShelfBuilder = ({
     return () => clearTimeout(timer);
   }, [shelfSpec]);
   const isWorkflowSelected = !!selectedWorkflow;
-  return /* @__PURE__ */ React8.createElement(React8.Fragment, null, /* @__PURE__ */ React8.createElement(
+  return /* @__PURE__ */ React8.createElement(React8.Fragment, null, /* @__PURE__ */ React8.createElement(Dialog, { open: isOpen, onOpenChange: setIsOpen }, /* @__PURE__ */ React8.createElement(DialogTrigger, { asChild: true }, /* @__PURE__ */ React8.createElement(
     Button7,
     {
-      onClick: () => setIsOpen(true),
       type: "button",
       variant: "outline",
       size: "sm",
@@ -2150,17 +2623,7 @@ var ShelfBuilder = ({
     },
     /* @__PURE__ */ React8.createElement(MdOutlineAutoGraph, { className: "inline-block h-3 w-3 mr-2" }),
     VEGA_STRINGS.WIDGET_DATASET_FIELD_MAPPING_BUTTON
-  ), isOpen && /* @__PURE__ */ React8.createElement("div", { className: "fixed inset-0 z-[100] flex items-center justify-center bg-slate-800/40 backdrop-blur-sm p-4 sm:p-6" }, /* @__PURE__ */ React8.createElement("div", { className: "bg-white rounded shadow-2xl w-full max-w-6xl h-[85vh] flex flex-col overflow-hidden relative border border-slate-200" }, /* @__PURE__ */ React8.createElement("div", { className: "flex items-center justify-between px-5 py-4 border-b border-slate-100 bg-white shrink-0" }, /* @__PURE__ */ React8.createElement("div", { className: "flex items-center gap-2 text-slate-800" }, /* @__PURE__ */ React8.createElement(MdOutlineAutoGraph, { className: "w-5 h-5 text-indigo-500" }), /* @__PURE__ */ React8.createElement("h3", { className: "text-base font-bold" }, "Visual Chart Editor")), /* @__PURE__ */ React8.createElement(
-    Button7,
-    {
-      onClick: () => setIsOpen(false),
-      type: "button",
-      variant: "ghost",
-      size: "icon",
-      className: "h-8 w-8 text-slate-400 hover:text-slate-600 hover:bg-slate-100"
-    },
-    /* @__PURE__ */ React8.createElement("svg", { className: "w-5 h-5", fill: "none", stroke: "currentColor", viewBox: "0 0 24 24" }, /* @__PURE__ */ React8.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: "2", d: "M6 18L18 6M6 6l12 12" }))
-  )), /* @__PURE__ */ React8.createElement("div", { className: "flex-1 overflow-hidden bg-slate-50/50 flex p-5 gap-5" }, !isWorkflowSelected ? /* @__PURE__ */ React8.createElement("div", { className: "flex flex-col items-center justify-center w-full h-full text-center border-2 border-dashed border-slate-300 rounded bg-white" }, /* @__PURE__ */ React8.createElement(FiDatabase2, { className: "w-10 h-10 mb-3 text-slate-300" }), /* @__PURE__ */ React8.createElement("p", { className: "text-sm font-semibold text-slate-600 mb-1" }, "No Data Source Selected"), /* @__PURE__ */ React8.createElement("p", { className: "text-xs text-slate-400" }, "Select a Workflow in the configuration panel to start building your chart.")) : /* @__PURE__ */ React8.createElement(React8.Fragment, null, /* @__PURE__ */ React8.createElement("div", { className: "flex flex-col w-64 shrink-0 bg-white border border-slate-100 rounded shadow-sm overflow-hidden h-full" }, /* @__PURE__ */ React8.createElement("div", { className: "p-3 border-b border-slate-100 bg-white" }, /* @__PURE__ */ React8.createElement(Select2, { value: shelfSpec.dataSource || "", onValueChange: (val) => handleDataSourceChange(val) }, /* @__PURE__ */ React8.createElement(SelectTrigger2, { className: "text-xs font-medium" }, /* @__PURE__ */ React8.createElement(SelectValue2, { placeholder: "Select Data Input" })), /* @__PURE__ */ React8.createElement(SelectContent2, { className: "z-[200]" }, selectedWorkflow && /* @__PURE__ */ React8.createElement(SelectItem2, { value: "workflow" }, "Workflow Output"), workflowContext && Object.keys(workflowContext).map((key) => /* @__PURE__ */ React8.createElement(SelectItem2, { key, value: `{{ctx.${key}}}` }, `ctx.${key}`))))), /* @__PURE__ */ React8.createElement("div", { className: "flex-1 overflow-y-auto outline-none" }, /* @__PURE__ */ React8.createElement(
+  )), /* @__PURE__ */ React8.createElement(DialogContent, { className: "max-w-6xl w-[95vw] h-[85vh] max-h-[85vh] flex flex-col p-0 gap-0 overflow-hidden bg-background border-border shadow-2xl" }, /* @__PURE__ */ React8.createElement(DialogHeader, { className: "flex flex-row items-center px-4 py-3 border-b border-border bg-background shrink-0 space-y-0" }, /* @__PURE__ */ React8.createElement("div", { className: "flex items-center gap-2 text-foreground" }, /* @__PURE__ */ React8.createElement(MdOutlineAutoGraph, { className: "w-5 h-5 text-primary" }), /* @__PURE__ */ React8.createElement(DialogTitle, { className: "text-base font-bold m-0 p-0 text-left" }, "Visual Chart Editor"))), /* @__PURE__ */ React8.createElement("div", { className: "flex-1 overflow-hidden bg-muted/30 flex p-3 gap-3 min-h-0" }, !isWorkflowSelected ? /* @__PURE__ */ React8.createElement("div", { className: "flex flex-col items-center justify-center w-full h-full text-center border-2 border-dashed border-border rounded bg-background" }, /* @__PURE__ */ React8.createElement(FiDatabase2, { className: "w-10 h-10 mb-3 text-muted-foreground/40" }), /* @__PURE__ */ React8.createElement("p", { className: "text-sm font-semibold text-foreground mb-1" }, "No Data Source Selected"), /* @__PURE__ */ React8.createElement("p", { className: "text-xs text-muted-foreground" }, "Select a Workflow in the configuration panel to start building your chart.")) : /* @__PURE__ */ React8.createElement(React8.Fragment, null, /* @__PURE__ */ React8.createElement("div", { className: "flex flex-col w-56 shrink-0 bg-background border border-border rounded-md overflow-hidden min-h-0 h-full" }, /* @__PURE__ */ React8.createElement("div", { className: "p-2 border-b border-border bg-background" }, /* @__PURE__ */ React8.createElement(Select2, { value: shelfSpec.dataSource || "", onValueChange: (val) => handleDataSourceChange(val) }, /* @__PURE__ */ React8.createElement(SelectTrigger2, { className: "text-xs font-medium" }, /* @__PURE__ */ React8.createElement(SelectValue2, { placeholder: "Select Data Input" })), /* @__PURE__ */ React8.createElement(SelectContent2, { className: "z-[200]" }, selectedWorkflow && /* @__PURE__ */ React8.createElement(SelectItem2, { value: "workflow" }, "Workflow Output"), workflowContext && Object.keys(workflowContext).map((key) => /* @__PURE__ */ React8.createElement(SelectItem2, { key, value: `{{ctx.${key}}}` }, `ctx.${key}`))))), /* @__PURE__ */ React8.createElement("div", { className: "flex-1 overflow-hidden outline-none min-h-0" }, /* @__PURE__ */ React8.createElement(
     DataFieldPanel,
     {
       workflowContext,
@@ -2170,7 +2633,7 @@ var ShelfBuilder = ({
       workflow: selectedWorkflow,
       className: "h-full"
     }
-  ))), /* @__PURE__ */ React8.createElement("div", { className: "flex-1 flex flex-col h-full overflow-y-auto pr-2 gap-1.5" }, /* @__PURE__ */ React8.createElement("label", { className: "text-[11px] font-bold text-slate-400 uppercase tracking-widest px-1 mb-1" }, "Encoding Shelves"), /* @__PURE__ */ React8.createElement("div", { className: "bg-white border border-slate-100 rounded shadow-sm p-4 flex flex-col gap-4" }, PRIMARY_SHELVES.map((ch) => /* @__PURE__ */ React8.createElement(
+  ))), /* @__PURE__ */ React8.createElement("div", { className: "flex-1 flex flex-col h-full overflow-y-auto min-h-0 pr-1 gap-1.5" }, /* @__PURE__ */ React8.createElement(Label2, { className: "text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-1" }, "Encoding Shelves"), /* @__PURE__ */ React8.createElement("div", { className: "bg-background border border-border rounded-md p-3 flex flex-col gap-3" }, PRIMARY_SHELVES.map((ch) => /* @__PURE__ */ React8.createElement(
     EncodingShelf,
     {
       key: ch,
@@ -2179,15 +2642,15 @@ var ShelfBuilder = ({
       onChange: (val) => handleChannelChange(ch, val),
       onRemove: () => handleChannelRemove(ch)
     }
-  ))), /* @__PURE__ */ React8.createElement("div", { className: "bg-white border border-slate-100 rounded shadow-sm mt-3" }, /* @__PURE__ */ React8.createElement(
+  ))), /* @__PURE__ */ React8.createElement("div", { className: "bg-background border border-border rounded-md mt-2" }, /* @__PURE__ */ React8.createElement(
     "div",
     {
       onClick: () => setShowSecondary(!showSecondary),
-      className: "w-full flex items-center justify-start p-3 border-b border-slate-100 hover:bg-slate-50 transition-colors focus:outline-none bg-white font-medium cursor-pointer"
+      className: "w-full flex items-center justify-start p-2.5 border-b border-border hover:bg-muted transition-colors focus:outline-none bg-background font-medium cursor-pointer"
     },
-    showSecondary ? /* @__PURE__ */ React8.createElement(FiChevronDown2, { className: "w-4 h-4 mr-2 text-slate-400" }) : /* @__PURE__ */ React8.createElement(FiChevronRight2, { className: "w-4 h-4 mr-2 text-slate-400" }),
-    /* @__PURE__ */ React8.createElement("span", { className: "text-[11px] font-bold uppercase tracking-wider text-slate-600" }, "More Encoding Channels ", /* @__PURE__ */ React8.createElement("span", { className: "text-indigo-500 ml-1" }, "(", SECONDARY_SHELVES.filter((ch) => shelfSpec.encoding[ch]?.field).length, " active)"))
-  ), showSecondary && /* @__PURE__ */ React8.createElement("div", { className: "p-4 pt-3 flex flex-col gap-4 border-t border-slate-100 bg-slate-50/50" }, SECONDARY_SHELVES.map((ch) => /* @__PURE__ */ React8.createElement(
+    showSecondary ? /* @__PURE__ */ React8.createElement(FiChevronDown2, { className: "w-4 h-4 mr-2 text-muted-foreground" }) : /* @__PURE__ */ React8.createElement(FiChevronRight2, { className: "w-4 h-4 mr-2 text-muted-foreground" }),
+    /* @__PURE__ */ React8.createElement("span", { className: "text-[10px] font-bold uppercase tracking-wider text-foreground" }, "More Channels ", /* @__PURE__ */ React8.createElement("span", { className: "text-primary ml-1" }, "(", SECONDARY_SHELVES.filter((ch) => shelfSpec.encoding[ch]?.field).length, " active)"))
+  ), showSecondary && /* @__PURE__ */ React8.createElement("div", { className: "p-3 pt-2 flex flex-col gap-3 border-t border-border bg-muted/30" }, SECONDARY_SHELVES.map((ch) => /* @__PURE__ */ React8.createElement(
     EncodingShelf,
     {
       key: ch,
@@ -2196,37 +2659,36 @@ var ShelfBuilder = ({
       onChange: (val) => handleChannelChange(ch, val),
       onRemove: () => handleChannelRemove(ch)
     }
-  ))))), /* @__PURE__ */ React8.createElement("div", { className: "flex flex-col w-72 shrink-0 h-full overflow-y-auto pl-2 gap-1.5" }, /* @__PURE__ */ React8.createElement(
+  ))))), /* @__PURE__ */ React8.createElement("div", { className: "flex flex-col w-64 shrink-0 h-full overflow-y-auto min-h-0 pl-1 gap-1.5 pb-4" }, /* @__PURE__ */ React8.createElement(
     "div",
     {
       onClick: () => setShowStyle(!showStyle),
-      className: "flex items-center gap-2 p-1 text-slate-500 hover:text-slate-800 focus:outline-none transition-colors mb-1 bg-transparent cursor-pointer"
+      className: "flex items-center gap-2 p-1 text-muted-foreground hover:text-foreground focus:outline-none transition-colors bg-transparent cursor-pointer"
     },
     showStyle ? /* @__PURE__ */ React8.createElement(FiChevronDown2, { className: "w-4 h-4" }) : /* @__PURE__ */ React8.createElement(FiChevronRight2, { className: "w-4 h-4" }),
-    /* @__PURE__ */ React8.createElement("span", { className: "text-[11px] font-bold uppercase tracking-widest" }, "Chart Style & Settings")
-  ), showStyle && /* @__PURE__ */ React8.createElement("div", { className: "bg-white border border-slate-100 rounded shadow-sm p-4 space-y-6" }, /* @__PURE__ */ React8.createElement("div", null, /* @__PURE__ */ React8.createElement("label", { className: "block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2" }, "Marks"), /* @__PURE__ */ React8.createElement("div", { className: "bg-slate-50 border border-slate-100 rounded p-2" }, /* @__PURE__ */ React8.createElement(MarkSelector, { value: shelfSpec.mark || "auto", onChange: handleMarkChange }), shelfSpec.mark === "auto" && /* @__PURE__ */ React8.createElement("div", { className: "text-[10px] text-slate-400 italic p-1.5 text-center mt-1.5" }, "Auto-resolved to: ", /* @__PURE__ */ React8.createElement("span", { className: "font-semibold text-slate-600 not-italic ml-1" }, resolvedMark)))), /* @__PURE__ */ React8.createElement("div", { className: "border-t border-slate-100 pt-5 space-y-4" }, /* @__PURE__ */ React8.createElement("label", { className: "block text-[11px] font-bold text-slate-400 uppercase tracking-widest" }, "Appearance"), /* @__PURE__ */ React8.createElement("div", null, /* @__PURE__ */ React8.createElement("label", { className: "block text-[10px] font-semibold text-slate-500 uppercase tracking-wide mb-1.5" }, "Chart Title"), /* @__PURE__ */ React8.createElement(
+    /* @__PURE__ */ React8.createElement("span", { className: "text-[10px] font-bold uppercase tracking-widest" }, "Chart Style & Settings")
+  ), showStyle && /* @__PURE__ */ React8.createElement("div", { className: "bg-background border border-border rounded-md p-3 space-y-4" }, /* @__PURE__ */ React8.createElement("div", null, /* @__PURE__ */ React8.createElement(Label2, { className: "block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5" }, "Marks"), /* @__PURE__ */ React8.createElement("div", { className: "bg-muted/30 border border-border rounded-md p-2" }, /* @__PURE__ */ React8.createElement(MarkSelector, { value: shelfSpec.mark || "auto", onChange: handleMarkChange }), shelfSpec.mark === "auto" && /* @__PURE__ */ React8.createElement("div", { className: "text-[10px] text-muted-foreground italic p-1 text-center mt-1" }, "Auto-resolved to: ", /* @__PURE__ */ React8.createElement("span", { className: "font-semibold text-foreground not-italic ml-1" }, resolvedMark)))), /* @__PURE__ */ React8.createElement("div", { className: "border-t border-border pt-3 space-y-3" }, /* @__PURE__ */ React8.createElement(Label2, { className: "block text-[10px] font-bold text-muted-foreground uppercase tracking-widest" }, "Appearance"), /* @__PURE__ */ React8.createElement("div", null, /* @__PURE__ */ React8.createElement(Label2, { className: "block text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1" }, "Chart Title"), /* @__PURE__ */ React8.createElement(
     Input3,
     {
       type: "text",
       value: shelfSpec.config?.title || "",
       onChange: (e) => handleConfigChange("title", e.target.value),
       placeholder: "Untitled Chart",
-      className: "w-full px-2.5 py-1.5 text-xs text-slate-700 bg-white border border-slate-200 rounded focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400"
+      className: "w-full text-xs"
     }
-  )), /* @__PURE__ */ React8.createElement("div", null, /* @__PURE__ */ React8.createElement("label", { className: "block text-[10px] font-semibold text-slate-500 uppercase tracking-wide mb-1.5" }, "Color Palette"), /* @__PURE__ */ React8.createElement(Select2, { value: shelfSpec.config?.colorScheme || "tableau10", onValueChange: (val) => handleConfigChange("colorScheme", val) }, /* @__PURE__ */ React8.createElement(SelectTrigger2, { className: "text-xs" }, /* @__PURE__ */ React8.createElement(SelectValue2, { placeholder: "Select an option" })), /* @__PURE__ */ React8.createElement(SelectContent2, { className: "z-[200]" }, COLOR_SCHEMES.map((s) => /* @__PURE__ */ React8.createElement(SelectItem2, { key: s, value: s }, s))))), /* @__PURE__ */ React8.createElement("div", { className: "grid grid-cols-2 gap-3" }, /* @__PURE__ */ React8.createElement("div", null, /* @__PURE__ */ React8.createElement("label", { className: "block text-[10px] font-semibold text-slate-500 uppercase tracking-wide mb-1.5" }, "Width"), /* @__PURE__ */ React8.createElement(Select2, { value: shelfSpec.config?.width === "container" ? "container" : "custom", onValueChange: (val) => handleConfigChange("width", val === "container" ? "container" : 400) }, /* @__PURE__ */ React8.createElement(SelectTrigger2, { className: "text-xs" }, /* @__PURE__ */ React8.createElement(SelectValue2, { placeholder: "Select an option" })), /* @__PURE__ */ React8.createElement(SelectContent2, { className: "z-[200]" }, /* @__PURE__ */ React8.createElement(SelectItem2, { value: "container" }, "Fill"), /* @__PURE__ */ React8.createElement(SelectItem2, { value: "custom" }, "Fixed")))), /* @__PURE__ */ React8.createElement("div", null, /* @__PURE__ */ React8.createElement("label", { className: "block text-[10px] font-semibold text-slate-500 uppercase tracking-wide mb-1.5" }, "Height"), /* @__PURE__ */ React8.createElement(
+  )), /* @__PURE__ */ React8.createElement("div", null, /* @__PURE__ */ React8.createElement(Label2, { className: "block text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1" }, "Color Palette"), /* @__PURE__ */ React8.createElement(Select2, { value: shelfSpec.config?.colorScheme || "tableau10", onValueChange: (val) => handleConfigChange("colorScheme", val) }, /* @__PURE__ */ React8.createElement(SelectTrigger2, { className: "text-xs" }, /* @__PURE__ */ React8.createElement(SelectValue2, { placeholder: "Select an option" })), /* @__PURE__ */ React8.createElement(SelectContent2, { className: "z-[200]" }, COLOR_SCHEMES.map((s) => /* @__PURE__ */ React8.createElement(SelectItem2, { key: s, value: s }, s))))), /* @__PURE__ */ React8.createElement("div", { className: "grid grid-cols-2 gap-2" }, /* @__PURE__ */ React8.createElement("div", null, /* @__PURE__ */ React8.createElement(Label2, { className: "block text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1" }, "Width"), /* @__PURE__ */ React8.createElement(Select2, { value: shelfSpec.config?.width === "container" ? "container" : "custom", onValueChange: (val) => handleConfigChange("width", val === "container" ? "container" : 400) }, /* @__PURE__ */ React8.createElement(SelectTrigger2, { className: "text-xs" }, /* @__PURE__ */ React8.createElement(SelectValue2, { placeholder: "Select an option" })), /* @__PURE__ */ React8.createElement(SelectContent2, { className: "z-[200]" }, /* @__PURE__ */ React8.createElement(SelectItem2, { value: "container" }, "Fill"), /* @__PURE__ */ React8.createElement(SelectItem2, { value: "custom" }, "Fixed")))), /* @__PURE__ */ React8.createElement("div", null, /* @__PURE__ */ React8.createElement(Label2, { className: "block text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1" }, "Height"), /* @__PURE__ */ React8.createElement(
     Input3,
     {
       type: "number",
       value: shelfSpec.config?.height || 300,
       onChange: (e) => handleConfigChange("height", parseInt(e.target.value) || 300),
-      className: "w-full px-2.5 py-1.5 text-xs text-slate-700 bg-white border border-slate-200 rounded focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400"
+      className: "w-full text-xs"
     }
-  )))))))), /* @__PURE__ */ React8.createElement("div", { className: "flex items-center justify-end px-5 py-3 border-t border-slate-100 bg-white shrink-0" }, /* @__PURE__ */ React8.createElement(
+  )))))))), /* @__PURE__ */ React8.createElement(DialogFooter, { className: "px-4 py-2.5 border-t border-border bg-background shrink-0" }, /* @__PURE__ */ React8.createElement(
     Button7,
     {
       type: "button",
-      onClick: () => setIsOpen(false),
-      className: "px-6 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-sm"
+      onClick: () => setIsOpen(false)
     },
     "Done"
   )))));
@@ -2235,78 +2697,6 @@ ShelfBuilder.propTypes = {
   widgetEditorForm: PropTypes7.object.isRequired,
   workflowContext: PropTypes7.object,
   workflows: PropTypes7.array
-};
-
-// src/vega/widgetAdvancedOptions.jsx
-import React9, { useCallback as useCallback8 } from "react";
-import PropTypes8 from "prop-types";
-import { WIDGET_ADVANCED_OPTIONS } from "@jet-admin/widget-types";
-import { Input as Input4, Select as Select3, SelectContent as SelectContent3, SelectItem as SelectItem3, SelectTrigger as SelectTrigger3, SelectValue as SelectValue3 } from "@jet-admin/ui";
-var WidgetAdvancedOptions = ({ widgetForm, parentWidgetType }) => {
-  WidgetAdvancedOptions.propTypes = {
-    widgetForm: PropTypes8.object.isRequired,
-    parentWidgetType: PropTypes8.string.isRequired
-  };
-  const renderOption = useCallback8(
-    (option) => {
-      const {
-        key,
-        type,
-        description,
-        options: selectOptions,
-        // eslint-disable-next-line no-unused-vars
-        ...rest
-      } = option;
-      if (!option.relevantWidgets.includes(parentWidgetType)) return null;
-      const formValue = key.split(".").reduce((acc, part) => acc?.[part], widgetForm.values);
-      const defaultValue = option.defaultValue;
-      const commonProps = {
-        key,
-        className: "w-full text-xs p-1.5 bg-slate-50 border border-slate-300 rounded",
-        value: formValue ? formValue : type === "boolean" ? "false" : defaultValue,
-        onChange: (e) => {
-          const value = type === "number" ? +e.target.value : type === "boolean" ? e.target.value === "true" : e.target.value;
-          widgetForm.setFieldValue(key, value);
-        }
-      };
-      switch (type) {
-        case "boolean":
-          return /* @__PURE__ */ React9.createElement(Select3, { value: commonProps.value !== void 0 ? String(commonProps.value) : "false", onValueChange: (val) => {
-            const value = type === "number" ? +val : type === "boolean" ? val === "true" : val;
-            widgetForm.setFieldValue(key, value);
-          } }, /* @__PURE__ */ React9.createElement(SelectTrigger3, { className: "text-xs" }, /* @__PURE__ */ React9.createElement(SelectValue3, { placeholder: "Select an option" })), /* @__PURE__ */ React9.createElement(SelectContent3, null, /* @__PURE__ */ React9.createElement(SelectItem3, { value: "true", className: "text-slate-500 text-xs" }, "Yes"), /* @__PURE__ */ React9.createElement(SelectItem3, { value: "false", className: "text-slate-500 text-xs" }, "No")));
-        case "color":
-          return /* @__PURE__ */ React9.createElement(Input4, { type: "color", ...commonProps });
-        case "select":
-          return /* @__PURE__ */ React9.createElement(Select3, { value: commonProps.value !== void 0 ? String(commonProps.value) : void 0, onValueChange: (val) => {
-            const value = type === "number" ? +val : val;
-            widgetForm.setFieldValue(key, value);
-          } }, /* @__PURE__ */ React9.createElement(SelectTrigger3, { className: "text-xs" }, /* @__PURE__ */ React9.createElement(SelectValue3, { placeholder: "Select an option" })), /* @__PURE__ */ React9.createElement(SelectContent3, null, selectOptions.map((opt) => /* @__PURE__ */ React9.createElement(
-            SelectItem3,
-            {
-              key: opt,
-              value: opt,
-              className: "text-slate-500 text-xs"
-            },
-            opt.charAt(0).toUpperCase() + opt.slice(1)
-          ))));
-        default:
-          return /* @__PURE__ */ React9.createElement(
-            Input4,
-            {
-              ...commonProps,
-              className: `placeholder:text-slate-400 w-full text-xs bg-slate-50 border border-slate-300 text-slate-700 rounded block py-1 px-1.5 focus:outline-none focus:border-slate-400`,
-              type,
-              placeholder: description
-            }
-          );
-      }
-    },
-    [widgetForm]
-  );
-  return /* @__PURE__ */ React9.createElement("div", { className: "grid grid-cols-2 gap-4 p-0 mt-2" }, WIDGET_ADVANCED_OPTIONS.filter(
-    (option) => option.relevantWidgets.includes(parentWidgetType)
-  ).map((option) => /* @__PURE__ */ React9.createElement("div", { key: option.key, className: "col-span-2" }, /* @__PURE__ */ React9.createElement("label", { className: "block mb-2 text-xs font-medium text-slate-600" }, option.name, /* @__PURE__ */ React9.createElement("span", { className: "text-slate-400 text-[10px] block" }, option.description)), widgetForm && renderOption(option))));
 };
 
 // src/vega/vegaConfigEditor.jsx
@@ -2353,14 +2743,14 @@ var VegaConfigEditor = ({
     widgetEditorForm.setFieldValue("widgetConfig.editorMode", "visual");
     setShowParseWarning(false);
   };
-  return /* @__PURE__ */ React10.createElement(React10.Fragment, null, isVegaLite && /* @__PURE__ */ React10.createElement("div", { className: "flex flex-row items-center gap-2 mb-3" }, /* @__PURE__ */ React10.createElement("span", { className: "text-xs font-medium text-muted-foreground" }, "Visual Editor"), /* @__PURE__ */ React10.createElement(Switch, { className: "h-[18px] w-[32px] [&>span]:h-3.5 [&>span]:w-3.5 data-[state=checked]:[&>span]:translate-x-3.5", checked: currentMode === "visual", onCheckedChange: (checked) => handleModeSwitch(checked ? "visual" : "raw") })), isVegaLite && /* @__PURE__ */ React10.createElement("div", { className: "flex flex-row items-center justify-stretch gap-3 mb-3" }, currentMode === "visual" && !showParseWarning && /* @__PURE__ */ React10.createElement(
+  return /* @__PURE__ */ React9.createElement("div", { className: "bg-background border border-border rounded-md p-3 flex flex-col gap-3" }, isVegaLite && /* @__PURE__ */ React9.createElement("div", { className: "flex flex-row items-center gap-2" }, /* @__PURE__ */ React9.createElement("span", { className: "text-xs font-medium text-muted-foreground" }, "Visual Editor"), /* @__PURE__ */ React9.createElement(Switch, { className: "h-[18px] w-[32px] [&>span]:h-3.5 [&>span]:w-3.5 data-[state=checked]:[&>span]:translate-x-3.5", checked: currentMode === "visual", onCheckedChange: (checked) => handleModeSwitch(checked ? "visual" : "raw") })), isVegaLite && /* @__PURE__ */ React9.createElement("div", { className: "flex flex-row items-center justify-stretch gap-3" }, currentMode === "visual" && !showParseWarning && /* @__PURE__ */ React9.createElement(
     ShelfBuilder,
     {
       widgetEditorForm,
       workflowContext,
       workflows
     }
-  ), /* @__PURE__ */ React10.createElement(
+  ), /* @__PURE__ */ React9.createElement(
     Button8,
     {
       type: "button",
@@ -2369,10 +2759,10 @@ var VegaConfigEditor = ({
       className: "h-8 text-xs",
       onClick: () => setIsSettingsDialogOpen(true)
     },
-    /* @__PURE__ */ React10.createElement(FiSettings2, { className: "inline-block h-3 w-3 mr-2" }),
+    /* @__PURE__ */ React9.createElement(FiSettings2, { className: "inline-block h-3 w-3 mr-2" }),
     VEGA_STRINGS2.WIDGET_EDITOR_FORM_SETTINGS_BUTTON
-  ), /* @__PURE__ */ React10.createElement(Dialog, { open: isSettingsDialogOpen, onOpenChange: setIsSettingsDialogOpen }, /* @__PURE__ */ React10.createElement(DialogContent, { className: "max-w-lg" }, /* @__PURE__ */ React10.createElement(DialogHeader, null, /* @__PURE__ */ React10.createElement(DialogTitle, null, VEGA_STRINGS2.WIDGET_EDITOR_FORM_SETTINGS_BUTTON)), /* @__PURE__ */ React10.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React10.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React10.createElement(Label, { className: "text-xs font-medium text-foreground" }, `${VEGA_STRINGS2.WIDGET_EDITOR_FORM_REFRESH_INTERVAL_LABEL} (ms)`), /* @__PURE__ */ React10.createElement(
-    Input5,
+  ), /* @__PURE__ */ React9.createElement(Dialog2, { open: isSettingsDialogOpen, onOpenChange: setIsSettingsDialogOpen }, /* @__PURE__ */ React9.createElement(DialogContent2, { className: "max-w-lg" }, /* @__PURE__ */ React9.createElement(DialogHeader2, null, /* @__PURE__ */ React9.createElement(DialogTitle2, null, VEGA_STRINGS2.WIDGET_EDITOR_FORM_SETTINGS_BUTTON)), /* @__PURE__ */ React9.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React9.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React9.createElement(Label3, { className: "text-xs font-medium text-foreground" }, `${VEGA_STRINGS2.WIDGET_EDITOR_FORM_REFRESH_INTERVAL_LABEL} (ms)`), /* @__PURE__ */ React9.createElement(
+    Input4,
     {
       type: "number",
       name: "widgetConfig.refetchInterval",
@@ -2380,13 +2770,7 @@ var VegaConfigEditor = ({
       onChange: widgetEditorForm.handleChange,
       value: widgetEditorForm.values.widgetConfig?.refetchInterval || ""
     }
-  )), /* @__PURE__ */ React10.createElement("div", { className: "border-t border-border pt-4" }, /* @__PURE__ */ React10.createElement(Label, { className: "text-xs font-medium text-foreground" }, "Advanced Options"), /* @__PURE__ */ React10.createElement("div", { className: "mt-2 max-h-[50vh] overflow-y-auto pr-1" }, /* @__PURE__ */ React10.createElement(
-    WidgetAdvancedOptions,
-    {
-      widgetForm: widgetEditorForm,
-      parentWidgetType: widgetEditorForm.values.widgetType
-    }
-  ))))))), showParseWarning && /* @__PURE__ */ React10.createElement("div", { className: "my-2 shrink-0 rounded-md border border-amber-200 bg-amber-50 px-4 py-2 dark:border-amber-900/40 dark:bg-amber-950/20" }, /* @__PURE__ */ React10.createElement("div", { className: "flex items-start gap-2 text-xs" }, /* @__PURE__ */ React10.createElement(FiAlertTriangle, { className: "mt-0.5 h-4 w-4 shrink-0 text-amber-600" }), /* @__PURE__ */ React10.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React10.createElement("h4", { className: "mb-1 font-semibold text-amber-900 dark:text-amber-200" }, "Cannot fully parse chart config"), /* @__PURE__ */ React10.createElement("p", { className: "mb-2 text-amber-800 dark:text-amber-300" }, "Switching to Visual mode may cause you to lose manual modifications:"), /* @__PURE__ */ React10.createElement("ul", { className: "mb-3 list-disc pl-4 text-amber-800 dark:text-amber-300" }, parseWarningsList.map((w, i) => /* @__PURE__ */ React10.createElement("li", { key: i, className: "mb-0.5" }, w))), /* @__PURE__ */ React10.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React10.createElement(Button8, { type: "button", variant: "outline", size: "sm", onClick: () => setShowParseWarning(false), className: "h-7 text-xs" }, "Cancel"), /* @__PURE__ */ React10.createElement(Button8, { type: "button", size: "sm", onClick: confirmModeSwitch, className: "h-7 text-xs bg-amber-600 hover:bg-amber-700 text-white dark:bg-amber-700 dark:hover:bg-amber-600" }, "Switch & Overwrite"))))), !showParseWarning && currentMode === "raw" && /* @__PURE__ */ React10.createElement("div", { className: "min-h-[300px] flex-1 overflow-auto rounded-md border border-border bg-background" }, /* @__PURE__ */ React10.createElement(
+  )), /* @__PURE__ */ React9.createElement("div", { className: "border-t border-border pt-4" }, /* @__PURE__ */ React9.createElement(Label3, { className: "text-xs text-muted-foreground italic" }, "Additional options moved to Widget Settings.")))))), showParseWarning && /* @__PURE__ */ React9.createElement("div", { className: "my-2 shrink-0 rounded-md border border-amber-200 bg-amber-50 px-4 py-2 dark:border-amber-900/40 dark:bg-amber-950/20" }, /* @__PURE__ */ React9.createElement("div", { className: "flex items-start gap-2 text-xs" }, /* @__PURE__ */ React9.createElement(FiAlertTriangle, { className: "mt-0.5 h-4 w-4 shrink-0 text-amber-600" }), /* @__PURE__ */ React9.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React9.createElement("h4", { className: "mb-1 font-semibold text-amber-900 dark:text-amber-200" }, "Cannot fully parse chart config"), /* @__PURE__ */ React9.createElement("p", { className: "mb-2 text-amber-800 dark:text-amber-300" }, "Switching to Visual mode may cause you to lose manual modifications:"), /* @__PURE__ */ React9.createElement("ul", { className: "mb-3 list-disc pl-4 text-amber-800 dark:text-amber-300" }, parseWarningsList.map((w, i) => /* @__PURE__ */ React9.createElement("li", { key: i, className: "mb-0.5" }, w))), /* @__PURE__ */ React9.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React9.createElement(Button8, { type: "button", variant: "outline", size: "sm", onClick: () => setShowParseWarning(false), className: "h-7 text-xs" }, "Cancel"), /* @__PURE__ */ React9.createElement(Button8, { type: "button", size: "sm", onClick: confirmModeSwitch, className: "h-7 text-xs bg-amber-600 hover:bg-amber-700 text-white dark:bg-amber-700 dark:hover:bg-amber-600" }, "Switch & Overwrite"))))), !showParseWarning && currentMode === "raw" && /* @__PURE__ */ React9.createElement("div", { className: "min-h-[300px] flex-1 overflow-auto rounded-md border border-border bg-background" }, /* @__PURE__ */ React9.createElement(
     VegaSpecEditor,
     {
       value: widgetEditorForm.values.widgetConfig?.vegaSpec,
@@ -2397,14 +2781,18 @@ var VegaConfigEditor = ({
   )));
 };
 VegaConfigEditor.propTypes = {
-  widgetEditorForm: PropTypes9.object.isRequired,
-  workflowContext: PropTypes9.object,
-  workflows: PropTypes9.array,
-  selectedWorkflow: PropTypes9.object
+  widgetEditorForm: PropTypes8.object.isRequired,
+  workflowContext: PropTypes8.object,
+  workflows: PropTypes8.array,
+  selectedWorkflow: PropTypes8.object
 };
 
+// src/index.js
+init_tableWidget();
+init_tableConfigEditor();
+
 // src/widget.map.js
-import React13 from "react";
+import React14 from "react";
 import { FaChartBar as FaChartBar2 } from "react-icons/fa";
 
 // src/widget.config.js
@@ -2510,15 +2898,19 @@ var getDemoData = (type) => {
 };
 
 // src/widget.map.js
-import { WIDGET_TYPES, WIDGET_INITIAL_CONFIG } from "@jet-admin/widget-types";
+import { WIDGET_TYPES } from "@jet-admin/widget-types";
 init_buttonConfigEditor();
-import { MdOutlineSmartButton } from "react-icons/md";
+init_tableConfigEditor();
+import { MdOutlineSmartButton, MdOutlineTableChart } from "react-icons/md";
 registerWidgets();
-var LazyVegaWidget = React13.lazy(
+var LazyVegaWidget = React14.lazy(
   () => Promise.resolve().then(() => (init_vega(), vega_exports)).then((module) => ({ default: module.VegaWidget }))
 );
-var LazyButtonWidget = React13.lazy(
+var LazyButtonWidget = React14.lazy(
   () => Promise.resolve().then(() => (init_button(), button_exports)).then((module) => ({ default: module.ButtonWidget }))
+);
+var LazyTableWidget = React14.lazy(
+  () => Promise.resolve().then(() => (init_table(), table_exports)).then((module) => ({ default: module.TableWidget }))
 );
 var WIDGETS_MAP = {
   "vega-lite": {
@@ -2528,11 +2920,17 @@ var WIDGETS_MAP = {
     defaultAutoRun: true,
     description: "Declarative visualization grammar",
     component: ({ data, ...props }) => {
-      return /* @__PURE__ */ React13.createElement(React13.Suspense, { fallback: /* @__PURE__ */ React13.createElement("div", { className: "flex justify-center items-center h-full text-xs text-slate-400" }, "Loading chart...") }, /* @__PURE__ */ React13.createElement(LazyVegaWidget, { data, ...props }));
+      return /* @__PURE__ */ React14.createElement(React14.Suspense, { fallback: /* @__PURE__ */ React14.createElement("div", { className: "flex justify-center items-center h-full text-xs text-slate-400" }, "Loading chart...") }, /* @__PURE__ */ React14.createElement(LazyVegaWidget, { data, ...props }));
     },
     configEditor: VegaConfigEditor,
-    icon: ({ className }) => /* @__PURE__ */ React13.createElement(FaChartBar2, { className: `!text-lg ${className}` }),
-    sampleConfig: WIDGET_INITIAL_CONFIG["vega-lite"] || {}
+    icon: ({ className }) => /* @__PURE__ */ React14.createElement(FaChartBar2, { className: `!text-lg ${className}` }),
+    sampleConfig: {
+      options: {
+        showActions: false,
+        renderer: "svg",
+        theme: void 0
+      }
+    }
   },
   "vega": {
     label: "Vega",
@@ -2541,11 +2939,17 @@ var WIDGETS_MAP = {
     defaultAutoRun: true,
     description: "Low-level visualization grammar",
     component: ({ data, ...props }) => {
-      return /* @__PURE__ */ React13.createElement(React13.Suspense, { fallback: /* @__PURE__ */ React13.createElement("div", { className: "flex justify-center items-center h-full text-xs text-slate-400" }, "Loading chart...") }, /* @__PURE__ */ React13.createElement(LazyVegaWidget, { data, ...props }));
+      return /* @__PURE__ */ React14.createElement(React14.Suspense, { fallback: /* @__PURE__ */ React14.createElement("div", { className: "flex justify-center items-center h-full text-xs text-slate-400" }, "Loading chart...") }, /* @__PURE__ */ React14.createElement(LazyVegaWidget, { data, ...props }));
     },
     configEditor: VegaConfigEditor,
-    icon: ({ className }) => /* @__PURE__ */ React13.createElement(FaChartBar2, { className: `!text-lg ${className}` }),
-    sampleConfig: WIDGET_INITIAL_CONFIG.vega || {}
+    icon: ({ className }) => /* @__PURE__ */ React14.createElement(FaChartBar2, { className: `!text-lg ${className}` }),
+    sampleConfig: {
+      options: {
+        showActions: false,
+        renderer: "svg",
+        theme: void 0
+      }
+    }
   },
   "button": {
     label: "Button",
@@ -2554,14 +2958,41 @@ var WIDGETS_MAP = {
     defaultAutoRun: false,
     description: "Trigger a workflow",
     component: ({ data, ...props }) => {
-      return /* @__PURE__ */ React13.createElement(React13.Suspense, { fallback: /* @__PURE__ */ React13.createElement("div", { className: "flex justify-center items-center h-full text-xs text-slate-400" }, "Loading button...") }, /* @__PURE__ */ React13.createElement(LazyButtonWidget, { data, ...props }));
+      return /* @__PURE__ */ React14.createElement(React14.Suspense, { fallback: /* @__PURE__ */ React14.createElement("div", { className: "flex justify-center items-center h-full text-xs text-slate-400" }, "Loading button...") }, /* @__PURE__ */ React14.createElement(LazyButtonWidget, { data, ...props }));
     },
     configEditor: ButtonConfigEditor,
-    icon: ({ className }) => /* @__PURE__ */ React13.createElement(MdOutlineSmartButton, { className: `!text-lg ${className}` }),
-    sampleConfig: WIDGET_INITIAL_CONFIG.button || {}
+    icon: ({ className }) => /* @__PURE__ */ React14.createElement(MdOutlineSmartButton, { className: `!text-lg ${className}` }),
+    sampleConfig: {
+      text: "Click Me",
+      variant: "default",
+      size: "default"
+    }
+  },
+  "table": {
+    label: "Data Table",
+    value: WIDGET_TYPES.TABLE.value,
+    datasetFields: [],
+    defaultAutoRun: true,
+    description: "Tabular data display with pagination",
+    component: ({ data, ...props }) => {
+      return /* @__PURE__ */ React14.createElement(React14.Suspense, { fallback: /* @__PURE__ */ React14.createElement("div", { className: "flex justify-center items-center h-full text-xs text-slate-400" }, "Loading table...") }, /* @__PURE__ */ React14.createElement(LazyTableWidget, { data, ...props }));
+    },
+    configEditor: TableConfigEditor,
+    icon: ({ className }) => /* @__PURE__ */ React14.createElement(MdOutlineTableChart, { className: `!text-lg ${className}` }),
+    sampleConfig: {
+      dataArrayTemplate: "{{ctx.data}}",
+      columns: [],
+      pagination: {
+        enabled: false,
+        pageParam: "page",
+        totalTemplate: "{{ctx.total}}"
+      }
+    }
   }
 };
 export {
+  TableConfigEditor,
+  TableWidget,
   VegaConfigEditor,
   VegaWidget,
   WIDGETS_MAP,

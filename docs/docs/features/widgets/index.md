@@ -1,68 +1,58 @@
 ---
 sidebar_position: 1
-title: Widget Module
-sidebar_label: Widget & Bridge
-description: Manages Widgets and their real-time data connection via the Bridge.
+title: Overview & Configuration
+description: Visualize data using customizable UI components called Widgets.
 ---
 
-# Widgets
+# Widgets Overview
 
-The **Widget Module** (`apps/backend/modules/widget`) is responsible for defining data visualizations and connecting them to data sources (SQL Queries or Workflows).
+**Widgets** are the individual building blocks placed on a Dashboard. They are responsible for fetching data and presenting it visually to the user.
 
-## Architecture
+![Charts Preview](/img/charts.png)
 
-The module has two distinct execution modes handled by `widget.service.js`:
+## Types of Widgets
 
-1.  **Query Mode:** Direct execution of SQL queries via `dataQueryService`.
-2.  **Workflow Mode:** Triggering a workflow via `workflowService` and streaming results.
+Jet Admin includes a rich library of ready-to-use widgets:
 
-## Real-time Data Bridge
+### Data Visualizations (Charts)
+Powered by Chart.js, these widgets are perfect for analytical reporting.
+- **Bar / Line Charts:** For comparing categorical data or viewing trends over time. (Requires `xAxis` and `yAxis` fields).
+- **Pie / Polar Area Charts:** For showing proportional relationships or market distribution. (Requires `label` and `value` fields).
+- **Radar / Scatter / Bubble:** Advanced charts for multivariate analysis.
 
-The `widgetWorkflowBridge.js` is a critical component that enables real-time charts. It acts as a middleware between the **Workflow Orchestrator** and the **Frontend Widgets**.
+### Data Displays
+- **Data Table:** Render thousands of rows of query results with sorting, pagination, and filtering out-of-the-box.
+- **Text / Markdown:** Display static headers, instructions, or dynamic markdown content.
+- **Custom HTML / iFrame:** Embed external applications directly into your dashboard.
 
-### Bridge Data Flow
+## Configuring a Widget
 
-```mermaid
-sequenceDiagram
-    participant Orch as Orchestrator
-    participant Bridge as WidgetWorkflowBridge
-    participant Socket as Socket.io
-    participant Widget as Frontend Widget
+After dragging a widget onto your [Dashboard](../dashboard/overview.mdx), you must configure it to display data. 
 
-    Note over Orch: Workflow Running...
-    Orch->>Bridge: emitContextUpdate(instanceID, context)
-    
-    activate Bridge
-    Bridge->>Bridge: Find Widgets subscribed to instanceID
-    
-    loop For Each Widget
-        Bridge->>Bridge: Process Data (Transform JSON -> Chart Format)
-        Bridge->>Socket: emit('widget_context_update', processedData)
-    end
-    deactivate Bridge
-    
-    Socket->>Widget: Re-render Chart
-```
+### 1. Data Source Selection
+A widget needs to know where to get its data. You can bind a widget to two sources:
+- **Direct Query:** Connect the widget directly to a saved [Data Query](../data-query/overview.mdx) (e.g., a "Get Users" SQL statement). The query executes, and the raw rows are returned to the widget.
+- **Workflow (The Bridge):** Connect the widget to a full [Workflow](../workflow/overview.mdx). This is the recommended approach for complex data that requires transformation (e.g., formatting dates or aggregating totals in JavaScript) before charting.
 
-### Key Functions
+### 2. Parameter Mapping
+If your underlying Query or Workflow requires parameters (e.g., it filters by `{{args.status}}`), the Widget configuration panel will dynamically generate input fields for those parameters. 
 
-#### `registerWidget(widgetID, instanceID, socket, metadata)`
-Maps a connected frontend widget to a running workflow instance. Stores `metadata` (like which fields to plot) in memory.
+You can hardcode these values (e.g., always pass `"active"`), or in future updates, bind them to other interactive UI elements on the dashboard.
 
-#### `processContextForWidget(context, widgetConfig)`
-Transforms raw workflow variables (e.g. `[ { x: 1, y: 10 }, { x: 2, y: 20 } ]`) into the specific format required by the widget type (e.g. Bar Chart needs separate label/value arrays). This transformation happens on the **Server Side** to reduce frontend payload size.
+### 3. Field Mapping
+Once data is returned, you must tell the widget how to read it.
+- For a **Bar Chart**, you map the "X Axis Field" to a column returned by your query (e.g., `month`), and the "Y Axis Field" to the value (e.g., `revenue`).
+- For a **Table**, columns are auto-generated from the JSON keys, but you can hide or format specific columns.
 
-## Widget Service API
+### 4. UI Customization
+You can tweak the visual presentation:
+- Change chart colors, hide legends, or adjust axes limits.
+- Enable auto-refresh intervals for real-time operational displays.
 
-### `getWidgetDataByID`
+## Real-Time Updates (WebSockets)
 
-**Params:** `{ widgetID, executionMode: 'ASYNC' | 'SYNC' }`
+Jet Admin widgets are inherently real-time. When a widget runs a long-running Workflow, it subscribes to a WebSocket channel linked to that specific execution instance.
 
-- **Async Mode (Default):**
-    1. Triggers `workflowService.executeWorkflow`.
-    2. Returns `{ status: "PENDING", instanceID: "..." }`.
-    3. Frontend subscribes to `instanceID` via Socket.
-- **Sync Mode:**
-    1. Triggers workflow.
-    2. Polles internal status until `COMPLETED`.
-    3. Returns full payload `{ status: "COMPLETED", data: [...] }`.
+As the workflow progresses through its backend nodes, the platform streams the final transformed data directly to the widget, which animates and re-renders instantly without needing a page refresh.
+
+Read more about this architecture in the [Widget-Workflow Bridge](./widget-workflow-bridge) documentation.

@@ -6,6 +6,10 @@
 export { VegaWidget } from "./vega/index";
 export { VegaConfigEditor } from "./vega/vegaConfigEditor";
 
+// Table widget
+export { TableWidget } from "./table/tableWidget";
+export { TableConfigEditor } from "./table/tableConfigEditor";
+
 // Widget map and configuration
 export * from "./widget.map";
 export { getDemoData, registerWidgets } from "./widget.config";

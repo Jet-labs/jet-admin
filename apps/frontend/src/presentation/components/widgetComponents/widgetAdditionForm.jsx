@@ -17,7 +17,10 @@ import { WidgetConfigEditor } from "./widgetConfigEditor";
 import { WidgetPreview } from "./widgetPreview";
 import PropTypes from "prop-types";
 import { WIDGET_TYPES } from "@jet-admin/widget-types";
+import { WIDGETS_MAP } from "@jet-admin/widgets-ui";
 import { useWidgetRun, WIDGET_EXECUTION_MODES } from "./useWidgetRun";
+import { WorkflowConsole } from "../workflowComponents/workflowConsole";
+import { WorkflowContextPanel } from "../workflowComponents/workflowContextPanel";
 
 import { Button, Label, Spinner, Switch } from "@jet-admin/ui";
 const defaultWidgetType = WIDGET_TYPES.VEGA_LITE.value;
@@ -44,6 +47,9 @@ export const WidgetAdditionForm = ({ tenantID }) => {
   const queryClient = useQueryClient();
   const [executionMode, setExecutionMode] = useState(WIDGET_EXECUTION_MODES.ASYNC);
   const autoRunWorkflowRef = useRef(null);
+
+  const [showConsole, setShowConsole] = useState(false);
+  const [showContextPanel, setShowContextPanel] = useState(false);
 
   const { isPending: isAddingWidget, mutate: addWidget } = useMutation({
     mutationFn: (data) => {
@@ -101,6 +107,13 @@ export const WidgetAdditionForm = ({ tenantID }) => {
   }, [addWidgetForm, runWidget]);
 
   useEffect(() => {
+    if (isRunningWorkflow) {
+      setShowConsole(true);
+      setShowContextPanel(true);
+    }
+  }, [isRunningWorkflow]);
+
+  useEffect(() => {
     const workflowID = addWidgetForm?.values?.workflowID;
 
     if (!workflowID) {
@@ -136,16 +149,22 @@ export const WidgetAdditionForm = ({ tenantID }) => {
       </div>
 
       <ResizablePanelGroup
-        direction="horizontal"
-        autoSaveId={
-          CONSTANTS.RESIZABLE_PANEL_KEYS.WIDGET_ADDITION_FORM_RESULT_SEPARATION
-        }
-        className={"!w-full !h-full"}
+        direction="vertical"
+        autoSaveId="widget-addition-canvas-terminal-split"
+        className="!h-full !w-full"
       >
+        <ResizablePanel defaultSize={showConsole || showContextPanel ? 65 : 100} minSize={30}>
+          <ResizablePanelGroup
+            direction="horizontal"
+            autoSaveId={
+              CONSTANTS.RESIZABLE_PANEL_KEYS.WIDGET_ADDITION_FORM_RESULT_SEPARATION
+            }
+            className={"!w-full !h-full"}
+          >
         <ResizablePanel defaultSize={55}>
           <form
             id="widget-addition-form"
-            className="flex h-full w-full flex-col items-stretch gap-2 overflow-y-auto bg-background p-3"
+            className="flex h-full w-full flex-col items-stretch gap-2 overflow-y-auto bg-background p-3 pb-10"
             onSubmit={addWidgetForm.handleSubmit}
           >
             {addWidgetForm && (
@@ -157,15 +176,19 @@ export const WidgetAdditionForm = ({ tenantID }) => {
                 isRunningWorkflow={isRunningWorkflow}
                 onTestWorkflow={_handleFetchWidgetData}
                 onClearLogs={clearLogs}
+                showConsole={showConsole}
+                setShowConsole={setShowConsole}
+                showContextPanel={showContextPanel}
+                setShowContextPanel={setShowContextPanel}
               />
             )}
 
           </form>
         </ResizablePanel>
         <ResizableHandle withHandle={true} />
-        <ResizablePanel defaultSize={45} className="relative">
+        <ResizablePanel defaultSize={45} className="relative flex flex-col min-h-0">
           {/* Execution Mode Toggle */}
-          <div className="flex items-center border-b border-border flex-row justify-end gap-2 bg-background/95 p-1.5">
+          <div className="flex items-center border-b border-border flex-row justify-end gap-2 bg-background/95 p-1.5 shrink-0">
             <div className="flex items-center gap-1.5">
               <Switch
                 className="h-[18px] w-[32px] [&>span]:h-3.5 [&>span]:w-3.5 data-[state=checked]:[&>span]:translate-x-3.5"
@@ -196,19 +219,65 @@ export const WidgetAdditionForm = ({ tenantID }) => {
               )}
             </Button>
           </div>
-          <WidgetPreview
-            widgetTitle={addWidgetForm.values.widgetTitle}
-            widgetType={addWidgetForm.values.widgetType}
-            widgetConfig={addWidgetForm.values.widgetConfig}
-            refreshData={_handleFetchWidgetData}
-            isFetchingData={isPreviewLoading}
-            isRefreshingData={isPreviewLoading}
-            data={previewData}
-            workflowContext={workflowContext}
-            runWorkflow={_handleFetchWidgetData}
-            isRunningWorkflow={isRunningWorkflow}
-          />
+          <div className="flex-1 min-h-0 w-full relative">
+            <WidgetPreview
+              widgetTitle={addWidgetForm.values.widgetTitle}
+              widgetType={addWidgetForm.values.widgetType}
+              widgetConfig={addWidgetForm.values.widgetConfig}
+              refreshData={_handleFetchWidgetData}
+              isFetchingData={isPreviewLoading}
+              isRefreshingData={isPreviewLoading}
+              data={previewData}
+              workflowContext={workflowContext}
+              runWorkflow={_handleFetchWidgetData}
+              isRunningWorkflow={isRunningWorkflow}
+            />
+          </div>
         </ResizablePanel>
+      </ResizablePanelGroup>
+        </ResizablePanel>
+
+        {/* Terminal Section - Console and Context */}
+        {(showConsole || showContextPanel) && (
+          <>
+            <ResizableHandle withHandle />
+            <ResizablePanel defaultSize={35} minSize={15} maxSize={60}>
+              <ResizablePanelGroup
+                direction="horizontal"
+                autoSaveId="widget-addition-console-context-split"
+                className="!h-full"
+              >
+                {/* Console Panel */}
+                {showConsole && (
+                  <ResizablePanel defaultSize={showContextPanel ? 50 : 100} minSize={25}>
+                    <WorkflowConsole
+                      logs={workflowLogs || []}
+                      isRunning={isRunningWorkflow}
+                      onClear={clearLogs}
+                      className="h-full rounded-none border-t-0 border-l-0"
+                    />
+                  </ResizablePanel>
+                )}
+
+                {/* Resize Handle between Console and Context */}
+                {showConsole && showContextPanel && (
+                  <ResizableHandle withHandle />
+                )}
+
+                {/* Context Panel */}
+                {showContextPanel && (
+                  <ResizablePanel defaultSize={showConsole ? 50 : 100} minSize={25}>
+                    <WorkflowContextPanel
+                      context={workflowContext || {}}
+                      isRunning={isRunningWorkflow}
+                      className="h-full rounded-none border-t-0 border-r-0"
+                    />
+                  </ResizablePanel>
+                )}
+              </ResizablePanelGroup>
+            </ResizablePanel>
+          </>
+        )}
       </ResizablePanelGroup>
     </div>
   );

@@ -44,10 +44,38 @@ var VegaWidgetBuilder = class extends BaseWidgetBuilder {
   }
 };
 
+// src/table/builder.js
+var TableWidgetBuilder = class extends BaseWidgetBuilder {
+  /**
+   * Build a renderable props object from widgetConfig.
+   * 
+   * @param {object} params
+   * @param {string} params.widgetType - Widget type ('table')
+   * @param {object} params.widgetConfig - The resolved widget config
+   * @returns {object} Processed props for the TableWidget
+   */
+  buildRender({ widgetType = "table", widgetConfig }) {
+    if (!widgetConfig) return null;
+    const data = Array.isArray(widgetConfig.dataArrayTemplate) ? widgetConfig.dataArrayTemplate : [];
+    const totalRows = typeof widgetConfig.pagination?.totalTemplate === "number" ? widgetConfig.pagination.totalTemplate : data.length;
+    return {
+      data,
+      columns: widgetConfig.columns || [],
+      pagination: {
+        enabled: widgetConfig.pagination?.enabled || false,
+        pageParam: widgetConfig.pagination?.pageParam || "page",
+        pageSizeParam: widgetConfig.pagination?.pageSizeParam || "limit",
+        totalRows
+      }
+    };
+  }
+};
+
 // src/index.js
 var WIDGET_PROCESSORS_MAP = {
   [WIDGET_TYPES.VEGA_LITE.value]: new VegaWidgetBuilder(),
-  [WIDGET_TYPES.VEGA.value]: new VegaWidgetBuilder()
+  [WIDGET_TYPES.VEGA.value]: new VegaWidgetBuilder(),
+  [WIDGET_TYPES.TABLE.value]: new TableWidgetBuilder()
 };
 var registerWidgetProcessor = (widgetType, builderInstance) => {
   WIDGET_PROCESSORS_MAP[widgetType] = builderInstance;
@@ -61,6 +89,7 @@ var processWorkflowDataForWidget = ({ widgetType, widgetConfig }) => {
 };
 export {
   BaseWidgetBuilder,
+  TableWidgetBuilder,
   VegaWidgetBuilder,
   WIDGET_PROCESSORS_MAP,
   processWorkflowDataForWidget,

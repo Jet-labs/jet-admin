@@ -53,7 +53,6 @@
     background-image: radial-gradient(var(--ifm-color-emphasis-200) 1px, transparent 1px);
     background-size: 32px 32px;
     opacity: 0.5;
-    mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
   }
   
   [data-theme='dark'] .heroBackgroundPattern {

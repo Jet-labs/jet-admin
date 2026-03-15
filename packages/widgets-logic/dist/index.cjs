@@ -20,6 +20,7 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var index_exports = {};
 __export(index_exports, {
   BaseWidgetBuilder: () => BaseWidgetBuilder,
+  TableWidgetBuilder: () => TableWidgetBuilder,
   VegaWidgetBuilder: () => VegaWidgetBuilder,
   WIDGET_PROCESSORS_MAP: () => WIDGET_PROCESSORS_MAP,
   processWorkflowDataForWidget: () => processWorkflowDataForWidget,
@@ -71,10 +72,38 @@ var VegaWidgetBuilder = class extends BaseWidgetBuilder {
   }
 };
 
+// src/table/builder.js
+var TableWidgetBuilder = class extends BaseWidgetBuilder {
+  /**
+   * Build a renderable props object from widgetConfig.
+   * 
+   * @param {object} params
+   * @param {string} params.widgetType - Widget type ('table')
+   * @param {object} params.widgetConfig - The resolved widget config
+   * @returns {object} Processed props for the TableWidget
+   */
+  buildRender({ widgetType = "table", widgetConfig }) {
+    if (!widgetConfig) return null;
+    const data = Array.isArray(widgetConfig.dataArrayTemplate) ? widgetConfig.dataArrayTemplate : [];
+    const totalRows = typeof widgetConfig.pagination?.totalTemplate === "number" ? widgetConfig.pagination.totalTemplate : data.length;
+    return {
+      data,
+      columns: widgetConfig.columns || [],
+      pagination: {
+        enabled: widgetConfig.pagination?.enabled || false,
+        pageParam: widgetConfig.pagination?.pageParam || "page",
+        pageSizeParam: widgetConfig.pagination?.pageSizeParam || "limit",
+        totalRows
+      }
+    };
+  }
+};
+
 // src/index.js
 var WIDGET_PROCESSORS_MAP = {
   [import_widget_types.WIDGET_TYPES.VEGA_LITE.value]: new VegaWidgetBuilder(),
-  [import_widget_types.WIDGET_TYPES.VEGA.value]: new VegaWidgetBuilder()
+  [import_widget_types.WIDGET_TYPES.VEGA.value]: new VegaWidgetBuilder(),
+  [import_widget_types.WIDGET_TYPES.TABLE.value]: new TableWidgetBuilder()
 };
 var registerWidgetProcessor = (widgetType, builderInstance) => {
   WIDGET_PROCESSORS_MAP[widgetType] = builderInstance;
@@ -89,6 +118,7 @@ var processWorkflowDataForWidget = ({ widgetType, widgetConfig }) => {
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   BaseWidgetBuilder,
+  TableWidgetBuilder,
   VegaWidgetBuilder,
   WIDGET_PROCESSORS_MAP,
   processWorkflowDataForWidget,

@@ -78,9 +78,12 @@ export const useWidgetRun = ({
     );
 
     if (fetchedInstance.data) {
+      console.log("fetchedInstance.data", fetchedInstance.data);
       setWsProcessedData(fetchedInstance.data);
     }
   }, [widgetFetchedData]);
+
+  const [currentInputParams, setCurrentInputParams] = useState({});
 
   // --- 1. API Execution (Start Workflow / Fetch Data) ---
   const { isPending: isFetching, mutate: fetchWidgetData } = useMutation({
@@ -88,7 +91,8 @@ export const useWidgetRun = ({
        return getWidgetDataUsingWidgetAPI({
         tenantID,
         widgetData: config,
-        executionMode, 
+         executionMode,
+         inputParams: config.inputParams || {},
       });
     },
     onSuccess: (response) => {
@@ -103,6 +107,7 @@ export const useWidgetRun = ({
         if (instance.data) {
            setLocalData(data);
            setWorkflowStatus(instance.status);
+          console.log("fetchWidgetData:instance.data", instance.data);
           setWsProcessedData(instance.data);
            addLog('success', 'Execution Completed', `Workflow finished with status: ${instance.status}`);
         } else {
@@ -153,7 +158,8 @@ export const useWidgetRun = ({
       instanceID,
       widgetType,
       widgetConfig,
-      workflowConfig
+      workflowConfig,
+      inputParams: currentInputParams,
     };
 
     setConnectionState(CONNECTION_STATES.CONNECTING);
@@ -173,6 +179,7 @@ export const useWidgetRun = ({
        const { update } = data;
        
       if (update.processedData) {
+        console.log("handleContextUpdate:update.processedData", update.processedData);
         setWsProcessedData(update.processedData);
        }
       if (update.contextSnapshot) {
@@ -183,6 +190,7 @@ export const useWidgetRun = ({
     const handleWidgetStatus = (data) => {
       if (data.widgetID !== targetWidgetID) return;
        setWorkflowStatus(data.status);
+      console.log("handleWidgetStatus:data.processedData", data?.processedData);
        if (data.processedData) setWsProcessedData(data.processedData);
        if (data.finalContext) setWsContext(data.finalContext);
        
@@ -287,13 +295,15 @@ export const useWidgetRun = ({
   }, [wsProcessedData, localData, widgetFetchedData, workflowStatus]);
 
   // --- 4. Actions ---
-  const runWidget = useCallback((formValues) => {
+  const runWidget = useCallback((formValues, opts = {}) => {
     setLogs([]);
     setLocalData(null);
     setWsProcessedData(null);
     setInstanceID(null);
     setWorkflowStatus('LOADING');
-    fetchWidgetData(formValues);
+    const params = opts.inputParams || {};
+    setCurrentInputParams(params);
+    fetchWidgetData({ ...formValues, inputParams: params });
   }, [fetchWidgetData]);
 
 

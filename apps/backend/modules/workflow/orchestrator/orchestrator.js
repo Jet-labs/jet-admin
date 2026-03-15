@@ -45,7 +45,6 @@ async function handleTaskResult(result) {
       isTest: isTestRun,
     });
 
-    // 3. Update context with node output
     let contextUpdate = {};
     if (outputVariable && output) {
       if (output[outputVariable] !== undefined) {
@@ -54,6 +53,13 @@ async function handleTaskResult(result) {
         contextUpdate[outputVariable] = output;
       }
     }
+
+    // Natively inject the terminal output into the context so it becomes
+    // a single source of truth for both live widget streaming and database storage
+    if (output?.workflowOutput) {
+      contextUpdate.output = output.workflowOutput;
+    }
+
     contextUpdate[`__node_${nodeID}`] = { output, status, outputVariable };
 
     const updatedInstance = await stateManager.updateContext(
@@ -99,19 +105,19 @@ async function handleTaskResult(result) {
       await stateManager.completeInstance(
         instanceID,
         finalStatus === 'success' ? 'COMPLETED' : 'FAILED',
-        { ...updatedInstance.contextData, output: output?.workflowOutput }
+        updatedInstance.contextData
       );
 
       socketIO.to(instanceID).emit(constants.SOCKET_EMIT_EVENTS.WORKFLOW_STATUS_UPDATE, {
         instanceID,
         status: finalStatus === 'success' ? 'COMPLETED' : 'FAILED',
-        contextData: { ...updatedInstance.contextData, output: output?.workflowOutput },
+        contextData: updatedInstance.contextData,
       });
 
       widgetWorkflowBridge.emitWorkflowStatus(
         instanceID,
         finalStatus === 'success' ? 'COMPLETED' : 'FAILED',
-        { ...updatedInstance.contextData, output: output?.workflowOutput }
+        updatedInstance.contextData
       );
 
       Logger.log('success', { message: 'orchestrator:workflowCompleted', params: { instanceID } });

@@ -486,7 +486,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                     </Button>
                                 </div>
 
-                                <div className="flex flex-row flex-wrap gap-1.5 pt-2 border-t border-border mt-2">
+                                <div className="flex flex-row flex-wrap gap-1.5 mt-2">
                                     <Button
                                         type="button"
                                         onClick={() => onAutoLayout("TB")}
@@ -494,7 +494,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                         title="Auto-layout"
                                         variant="outline"
                                         size="sm"
-                                        className="h-8 px-2 text-muted-foreground hover:text-foreground"
+                                        className="px-2 text-muted-foreground hover:text-foreground"
                                     >
                                         <TbLayoutDistributeHorizontal className="size-4" />
                                     </Button>
@@ -504,7 +504,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                         title="View Schema"
                                         variant="outline"
                                         size="sm"
-                                        className="h-8 px-2 text-muted-foreground hover:text-foreground"
+                                        className="px-2 text-muted-foreground hover:text-foreground"
                                     >
                                         <VscJson className="size-4" />
                                     </Button>
@@ -514,7 +514,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                         title={showConsole ? 'Hide Console' : 'Show Console'}
                                         variant="outline"
                                         size="sm"
-                                        className={`h-8 px-2 flex items-center gap-1.5 transition-colors ${showConsole ? 'border-primary text-primary bg-primary/5' : 'text-muted-foreground hover:text-foreground'}`}
+                                        className={`px-2 flex items-center gap-1.5 transition-colors ${showConsole ? 'border-primary text-primary bg-primary/5' : 'text-muted-foreground hover:text-foreground'}`}
                                     >
                                         <VscTerminal className="size-4" />
                                         {consoleLogs.length > 0 && (
@@ -529,7 +529,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                         title={showContextPanel ? 'Hide Context' : 'Show Context'}
                                         variant="outline"
                                         size="sm"
-                                        className={`h-8 px-2 flex items-center gap-1.5 transition-colors ${showContextPanel ? 'border-primary text-primary bg-primary/5' : 'text-muted-foreground hover:text-foreground'}`}
+                                        className={`px-2 flex items-center gap-1.5 transition-colors ${showContextPanel ? 'border-primary text-primary bg-primary/5' : 'text-muted-foreground hover:text-foreground'}`}
                                     >
                                         <TbBraces className="size-4" />
                                         {Object.keys(workflowContext).filter(k => !k.startsWith('__')).length > 0 && (

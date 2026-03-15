@@ -12,7 +12,7 @@ import {
 import { FiSettings, FiChevronDown, FiChevronRight, FiDatabase } from 'react-icons/fi';
 import { MdOutlineAutoGraph } from 'react-icons/md';
 
-import { Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
+import { Button, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@jet-admin/ui";
 // Widget-specific string constants (inlined since this is a shared package)
 const VEGA_STRINGS = {
   WIDGET_DATASET_FIELD_MAPPING_BUTTON: "Mappings",
@@ -160,52 +160,42 @@ export const ShelfBuilder = ({
 
   return (
     <>
-      <Button
-        onClick={() => setIsOpen(true)}
-        type="button"
-        variant="outline"
-        size="sm"
-        className="h-8 text-xs"
-      >
-        <MdOutlineAutoGraph className="inline-block h-3 w-3 mr-2" />
-        {VEGA_STRINGS.WIDGET_DATASET_FIELD_MAPPING_BUTTON}
-      </Button>
+      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+        <DialogTrigger asChild>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="h-8 text-xs"
+          >
+            <MdOutlineAutoGraph className="inline-block h-3 w-3 mr-2" />
+            {VEGA_STRINGS.WIDGET_DATASET_FIELD_MAPPING_BUTTON}
+          </Button>
+        </DialogTrigger>
 
-      {isOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-800/40 backdrop-blur-sm p-4 sm:p-6">
-          <div className="bg-white rounded shadow-2xl w-full max-w-6xl h-[85vh] flex flex-col overflow-hidden relative border border-slate-200">
-            
-            {/* Modal Header */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-slate-100 bg-white shrink-0">
-              <div className="flex items-center gap-2 text-slate-800">
-                <MdOutlineAutoGraph className="w-5 h-5 text-indigo-500" />
-                <h3 className="text-base font-bold">Visual Chart Editor</h3>
-              </div>
-              <Button 
-                onClick={() => setIsOpen(false)} 
-                type="button"
-                variant="ghost"
-                size="icon"
-                className="h-8 w-8 text-slate-400 hover:text-slate-600 hover:bg-slate-100"
-              >
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-              </Button>
+        <DialogContent className="max-w-6xl w-[95vw] h-[85vh] max-h-[85vh] flex flex-col p-0 gap-0 overflow-hidden bg-background border-border shadow-2xl">
+          {/* Modal Header */}
+          <DialogHeader className="flex flex-row items-center px-4 py-3 border-b border-border bg-background shrink-0 space-y-0">
+            <div className="flex items-center gap-2 text-foreground">
+              <MdOutlineAutoGraph className="w-5 h-5 text-primary" />
+              <DialogTitle className="text-base font-bold m-0 p-0 text-left">Visual Chart Editor</DialogTitle>
             </div>
+          </DialogHeader>
 
-            {/* Modal Body */}
-            <div className="flex-1 overflow-hidden bg-slate-50/50 flex p-5 gap-5">
+          {/* Modal Body */}
+          <div className="flex-1 overflow-hidden bg-muted/30 flex p-3 gap-3 min-h-0">
               
               {!isWorkflowSelected ? (
-                <div className="flex flex-col items-center justify-center w-full h-full text-center border-2 border-dashed border-slate-300 rounded bg-white">
-                  <FiDatabase className="w-10 h-10 mb-3 text-slate-300" />
-                  <p className="text-sm font-semibold text-slate-600 mb-1">No Data Source Selected</p>
-                  <p className="text-xs text-slate-400">Select a Workflow in the configuration panel to start building your chart.</p>
+                <div className="flex flex-col items-center justify-center w-full h-full text-center border-2 border-dashed border-border rounded bg-background">
+                  <FiDatabase className="w-10 h-10 mb-3 text-muted-foreground/40" />
+                  <p className="text-sm font-semibold text-foreground mb-1">No Data Source Selected</p>
+                  <p className="text-xs text-muted-foreground">Select a Workflow in the configuration panel to start building your chart.</p>
                 </div>
               ) : (
                 <>
                   {/* PANE 1: Data Dictionary */}
-                  <div className="flex flex-col w-64 shrink-0 bg-white border border-slate-100 rounded shadow-sm overflow-hidden h-full">
-                    <div className="p-3 border-b border-slate-100 bg-white">
+                  <div className="flex flex-col w-56 shrink-0 bg-background border border-border rounded-md overflow-hidden min-h-0 h-full">
+                    <div className="p-2 border-b border-border bg-background">
                       <Select value={shelfSpec.dataSource || ''} onValueChange={(val) => handleDataSourceChange(val)}>
                         <SelectTrigger className="text-xs font-medium">
                           <SelectValue placeholder="Select Data Input" />
@@ -218,7 +208,7 @@ export const ShelfBuilder = ({
                         </SelectContent>
                       </Select>
                     </div>
-                    <div className="flex-1 overflow-y-auto outline-none">
+                    <div className="flex-1 overflow-hidden outline-none min-h-0">
                       <DataFieldPanel
                         workflowContext={workflowContext}
                         dataSource={shelfSpec.dataSource}
@@ -231,11 +221,11 @@ export const ShelfBuilder = ({
                   </div>
 
                   {/* PANE 2: Encoding Shelves */}
-                  <div className="flex-1 flex flex-col h-full overflow-y-auto pr-2 gap-1.5">
-                    <label className="text-[11px] font-bold text-slate-400 uppercase tracking-widest px-1 mb-1">Encoding Shelves</label>
+                  <div className="flex-1 flex flex-col h-full overflow-y-auto min-h-0 pr-1 gap-1.5">
+                    <Label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-1">Encoding Shelves</Label>
                     
                     {/* Core Shelves */}
-                    <div className="bg-white border border-slate-100 rounded shadow-sm p-4 flex flex-col gap-4">
+                    <div className="bg-background border border-border rounded-md p-3 flex flex-col gap-3">
                       {PRIMARY_SHELVES.map(ch => (
                         <EncodingShelf
                           key={ch}
@@ -248,19 +238,19 @@ export const ShelfBuilder = ({
                     </div>
 
                     {/* Dynamic Secondary Shelves */}
-                    <div className="bg-white border border-slate-100 rounded shadow-sm mt-3">
+                    <div className="bg-background border border-border rounded-md mt-2">
                       <div
                         onClick={() => setShowSecondary(!showSecondary)}
-                        className="w-full flex items-center justify-start p-3 border-b border-slate-100 hover:bg-slate-50 transition-colors focus:outline-none bg-white font-medium cursor-pointer"
+                        className="w-full flex items-center justify-start p-2.5 border-b border-border hover:bg-muted transition-colors focus:outline-none bg-background font-medium cursor-pointer"
                       >
-                        {showSecondary ? <FiChevronDown className="w-4 h-4 mr-2 text-slate-400" /> : <FiChevronRight className="w-4 h-4 mr-2 text-slate-400" />}
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-600">
-                          More Encoding Channels <span className="text-indigo-500 ml-1">({SECONDARY_SHELVES.filter(ch => shelfSpec.encoding[ch]?.field).length} active)</span>
+                        {showSecondary ? <FiChevronDown className="w-4 h-4 mr-2 text-muted-foreground" /> : <FiChevronRight className="w-4 h-4 mr-2 text-muted-foreground" />}
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-foreground">
+                          More Channels <span className="text-primary ml-1">({SECONDARY_SHELVES.filter(ch => shelfSpec.encoding[ch]?.field).length} active)</span>
                         </span>
                       </div>
                       
                       {showSecondary && (
-                        <div className="p-4 pt-3 flex flex-col gap-4 border-t border-slate-100 bg-slate-50/50">
+                        <div className="p-3 pt-2 flex flex-col gap-3 border-t border-border bg-muted/30">
                           {SECONDARY_SHELVES.map(ch => (
                             <EncodingShelf
                               key={ch}
@@ -276,43 +266,43 @@ export const ShelfBuilder = ({
                   </div>
 
                   {/* PANE 3: Marks & Configuration */}
-                  <div className="flex flex-col w-72 shrink-0 h-full overflow-y-auto pl-2 gap-1.5">
+                  <div className="flex flex-col w-64 shrink-0 h-full overflow-y-auto min-h-0 pl-1 gap-1.5 pb-4">
                     <div
                       onClick={() => setShowStyle(!showStyle)}
-                      className="flex items-center gap-2 p-1 text-slate-500 hover:text-slate-800 focus:outline-none transition-colors mb-1 bg-transparent cursor-pointer"
+                      className="flex items-center gap-2 p-1 text-muted-foreground hover:text-foreground focus:outline-none transition-colors bg-transparent cursor-pointer"
                     >
                       {showStyle ? <FiChevronDown className="w-4 h-4" /> : <FiChevronRight className="w-4 h-4" />}
-                      <span className="text-[11px] font-bold uppercase tracking-widest">Chart Style & Settings</span>
+                      <span className="text-[10px] font-bold uppercase tracking-widest">Chart Style & Settings</span>
                     </div>
                     
                     {showStyle && (
-                      <div className="bg-white border border-slate-100 rounded shadow-sm p-4 space-y-6">
+                      <div className="bg-background border border-border rounded-md p-3 space-y-4">
                         <div>
-                          <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-2">Marks</label>
-                          <div className="bg-slate-50 border border-slate-100 rounded p-2">
+                          <Label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">Marks</Label>
+                          <div className="bg-muted/30 border border-border rounded-md p-2">
                             <MarkSelector value={shelfSpec.mark || 'auto'} onChange={handleMarkChange} />
                             {shelfSpec.mark === 'auto' && (
-                              <div className="text-[10px] text-slate-400 italic p-1.5 text-center mt-1.5">
-                                Auto-resolved to: <span className="font-semibold text-slate-600 not-italic ml-1">{resolvedMark}</span>
+                              <div className="text-[10px] text-muted-foreground italic p-1 text-center mt-1">
+                                Auto-resolved to: <span className="font-semibold text-foreground not-italic ml-1">{resolvedMark}</span>
                               </div>
                             )}
                           </div>
                         </div>
 
-                        <div className="border-t border-slate-100 pt-5 space-y-4">
-                          <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-widest">Appearance</label>
+                        <div className="border-t border-border pt-3 space-y-3">
+                          <Label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Appearance</Label>
                           <div>
-                            <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Chart Title</label>
+                            <Label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1">Chart Title</Label>
                             <Input
                               type="text"
                               value={shelfSpec.config?.title || ''}
                               onChange={(e) => handleConfigChange('title', e.target.value)}
                               placeholder="Untitled Chart"
-                              className="w-full px-2.5 py-1.5 text-xs text-slate-700 bg-white border border-slate-200 rounded focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400"
+                              className="w-full text-xs"
                             />
                           </div>
                           <div>
-                            <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Color Palette</label>
+                            <Label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1">Color Palette</Label>
                             <Select value={shelfSpec.config?.colorScheme || 'tableau10'} onValueChange={(val) => handleConfigChange('colorScheme', val)}>
                               <SelectTrigger className="text-xs">
                                 <SelectValue placeholder="Select an option" />
@@ -322,9 +312,9 @@ export const ShelfBuilder = ({
                               </SelectContent>
                             </Select>
                           </div>
-                          <div className="grid grid-cols-2 gap-3">
+                          <div className="grid grid-cols-2 gap-2">
                             <div>
-                              <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Width</label>
+                              <Label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1">Width</Label>
                               <Select value={shelfSpec.config?.width === 'container' ? 'container' : 'custom'} onValueChange={(val) => handleConfigChange('width', val === 'container' ? 'container' : 400)}>
                                 <SelectTrigger className="text-xs">
                                   <SelectValue placeholder="Select an option" />
@@ -336,12 +326,12 @@ export const ShelfBuilder = ({
                               </Select>
                             </div>
                             <div>
-                              <label className="block text-[10px] font-semibold text-slate-500 uppercase tracking-wide mb-1.5">Height</label>
+                              <Label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1">Height</Label>
                               <Input
                                 type="number"
                                 value={shelfSpec.config?.height || 300}
                                 onChange={(e) => handleConfigChange('height', parseInt(e.target.value) || 300)}
-                                className="w-full px-2.5 py-1.5 text-xs text-slate-700 bg-white border border-slate-200 rounded focus:outline-none focus:border-indigo-400 focus:ring-1 focus:ring-indigo-400"
+                                className="w-full text-xs"
                               />
                             </div>
                           </div>
@@ -354,19 +344,16 @@ export const ShelfBuilder = ({
             </div>
 
             {/* Modal Footer */}
-            <div className="flex items-center justify-end px-5 py-3 border-t border-slate-100 bg-white shrink-0">
+            <DialogFooter className="px-4 py-2.5 border-t border-border bg-background shrink-0">
                <Button
                 type="button"
                 onClick={() => setIsOpen(false)}
-                className="px-6 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold shadow-sm"
               >
                 Done
               </Button>
-            </div>
-
-          </div>
-        </div>
-      )}
+            </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };

@@ -26,20 +26,18 @@ graph TD
     Frontend["Frontend Container (Nginx)"]
     Backend["Backend Container (Node.js)"]
     DB[(PostgreSQL)]
-    MQ((RabbitMQ))
 
     Client -->|HTTP Port 80| Frontend
     Client -->|API/WS Port 8090| Backend
-    
+
     Backend --> DB
-    Backend --> MQ
 ```
 
 ### Key Components
 - **Frontend Container**: Nginx serving React static files on Port 80.
 - **Backend Container**: Node.js Express API listening on Port 8090. Client connects directly.
 - **PostgreSQL**: Database for data storage.
-- **RabbitMQ**: Message broker for task queues.
+- **In-Memory Queue**: fastq-based workflow task queue (no external broker needed).
 
 ---
 
@@ -70,7 +68,6 @@ Understanding the purpose of each file helps in customizing the deployment.
   - `frontend`: Port 80.
   - `backend`: Port 8090.
   - `postgres`: Database.
-  - `rabbitmq`: Message queue.
 - **Networking**: Creates `jet-network` to allow internal communication (e.g., `http://backend:8090`).
 
 ### 4. `nginx.frontend.conf`
@@ -84,9 +81,10 @@ Understanding the purpose of each file helps in customizing the deployment.
 ### 5. `docker-entrypoint.backend.sh`
 - **Purpose**: Script that runs every time the **backend container** starts.
 - **Actions**:
-  - Waits for Postgres and RabbitMQ to be ready.
+  - Waits for Postgres to be ready.
   - Runs database migrations (`prisma migrate`).
   - Seeds database (if `SEED_DATABASE=true`).
+  - Initializes in-memory workflow queues (fastq).
   - Starts the application.
 
 ### 6. `docker-entrypoint.frontend.sh`
@@ -142,28 +140,16 @@ docker compose up -d --build
 
 To handle more concurrent users or workflows, you can scale the Backend service horizontally.
 
-### 1. Requirements
-- **Redis**: Required for Socket.IO to broadcast events across multiple backend nodes.
-- **Load Balancer**: Nginx (already included) must be configured to distribute traffic.
+### Important Note on Queue Architecture
 
-### 2. Configuration for Scaling
+Jet Admin uses an **in-memory queue** (fastq) for workflow execution, not RabbitMQ. This means:
 
-**Add Redis Service**:
-Add a Redis container to `docker-compose.sample.yml` and configure backend ENV:
-```yaml
-environment:
-  - SOCKET_ADAPTER=redis
-  - REDIS_URL=redis://redis:6379
-```
+- ✅ **Simpler deployment** - No external message broker needed
+- ✅ **Faster local development** - Fewer dependencies
+- ✅ **Good for single-instance** deployments
+- ⚠️ **Queue state is process-local** - Tasks don't distribute across multiple backend instances
 
-**Scale Command**:
-```bash
-# Run 3 instances of backend
-docker compose up -d --scale backend=3
-```
-
-**Nginx Update**:
-Update `nginx.frontend.conf` upstream block to include all backend instances (Docker internal DNS usually handles `backend` round-robin automatically).
+For horizontal scaling with distributed queues, you would need to implement a Redis-backed or external queue system.
 
 ---
 
@@ -192,7 +178,6 @@ Deploy the backend as a Node.js service on EC2, DigitalOcean Droplet, or Heroku.
 **External Dependencies**:
 You must provide connection strings to external services:
 - `DATABASE_URL` -> Managed RDS / Cloud SQL.
-- `RABBITMQ_URL` -> Amazon MQ / CloudAMQP.
 
 ---
 
@@ -214,7 +199,8 @@ Deploy containers using an orchestrator like Kubernetes (EKS/GKE) or Amazon ECS.
 - **Env Vars**: Injected via Secrets (DB credentials).
 
 **Data Layer**:
-- **Do NOT** run Postgres/RabbitMQ in containers for production cloud. Use managed services (AWS RDS, AWS MQ) for backups, patching, and HA.
+- **Do NOT** run Postgres in containers for production cloud. Use managed services (AWS RDS, Cloud SQL) for backups, patching, and HA.
+- The in-memory queue runs inside each backend instance - no external queue service needed.
 
 ---
 
@@ -234,8 +220,8 @@ Set these in `docker-compose.yml` or `.env`.
 | Variable | Description |
 |----------|-------------|
 | `DATABASE_URL` | Postgres connection string |
-| `RABBITMQ_URL` | RabbitMQ connection string |
 | `JWT_ACCESS_TOKEN_SECRET` | Secret for signing tokens |
+| `ENCRYPTION_KEY` | 32-byte key for credential encryption |
 
 ---
 

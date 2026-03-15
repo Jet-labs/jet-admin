@@ -71,7 +71,7 @@
 /* Button Refinements */
 .button {
   font-weight: 600;
-  transition: all 0.2sease;
+  transition: all 0.2s ease;
 }
 
 .button--primary {

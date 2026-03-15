@@ -8,6 +8,7 @@ export default {
     "../../packages/workflow-edges/src/**/*.{js,jsx}",
     "../../packages/json-forms-renderers/src/**/*.{js,jsx}",
     "../../packages/widgets/src/**/*.{js,jsx}",
+    "../../packages/widgets-ui/src/**/*.{js,jsx}",
     "../../packages/ui/src/**/*.{js,jsx}",
   ],
   theme: {

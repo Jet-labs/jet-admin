@@ -106,9 +106,9 @@ export const EncodingShelf = ({
   const isEmpty = !value || !value.field;
 
   const shelfClass = [
-    'flex items-center w-full min-h-[36px] bg-white border border-slate-200 rounded p-1 gap-2 transition-colors',
-    isEmpty ? 'border-dashed border-slate-300 bg-slate-50/50' : '',
-    isDragOver ? 'border-indigo-400 bg-indigo-50/50 shadow-inner' : '',
+    'flex items-center w-full min-h-[36px] bg-background border border-border rounded-md p-1 gap-2 transition-colors',
+    isEmpty ? 'border-dashed border-border bg-muted/30' : '',
+    isDragOver ? 'border-primary bg-primary/5 shadow-inner' : '',
     className,
   ].filter(Boolean).join(' ');
 
@@ -121,22 +121,22 @@ export const EncodingShelf = ({
       className={shelfClass}
     >
       {/* Channel label */}
-      <div className="flex items-center justify-start w-24 shrink-0 px-2 py-1 text-[11px] font-bold text-slate-400 uppercase tracking-widest gap-2 border-r border-slate-100">
-        <span className="text-slate-300 text-sm">{icon}</span>
+      <div className="flex items-center justify-start w-24 shrink-0 px-2 py-1 text-[11px] font-bold text-muted-foreground uppercase tracking-widest gap-2 border-r border-border">
+        <span className="text-muted-foreground/50 text-sm">{icon}</span>
         <span className="truncate">{label}</span>
       </div>
 
       {/* Content area */}
       <div className="flex-1 flex flex-wrap items-center gap-2 min-w-0 pr-1">
         {isEmpty ? (
-          <span className="text-xs text-slate-400 italic px-2">
+          <span className="text-xs text-muted-foreground italic px-2">
             {isDragOver ? 'Release to assign' : 'Drop a field here'}
           </span>
         ) : (
           <>
             {/* Field Pill */}
             <FieldPill
-              field={value}
+              field={{ ...value, name: value.field }}
               onRemove={onRemove}
               isCompact
             />
@@ -174,7 +174,7 @@ export const EncodingShelf = ({
               variant="ghost"
               size="icon"
               onClick={handleSortToggle}
-              className="ml-auto h-6 w-6 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 text-xs"
+              className="ml-auto h-6 w-6 text-muted-foreground hover:text-primary hover:bg-primary/5 text-xs"
               title={`Sort: ${value.sort || 'default'}`}
             >
               {value.sort === 'ascending' ? '↑' : value.sort === 'descending' ? '↓' : '↕'}

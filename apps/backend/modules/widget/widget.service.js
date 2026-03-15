@@ -280,14 +280,19 @@ const _waitForWorkflowCompletion = async (instanceID, timeoutMs = 30000) => {
  * @param {string} params.executionMode - 'ASYNC' (default) or 'SYNC'
  * @returns {Promise<object>} Workflow instance info or full data
  */
-const _executeWorkflowMode = async ({ widget, tenantID, executionMode = 'ASYNC' }) => {
+const _executeWorkflowMode = async ({ widget, tenantID, executionMode = 'ASYNC', inputParams = {} }) => {
   const workflowConfig = widget.workflowConfig;
 
   try {
+    const finalInputParams = {
+      ...(workflowConfig.workflowArgValues || {}),
+      ...inputParams,
+    };
+
     const { instanceID } = await workflowService.executeWorkflow({
       workflowID: widget.workflowID,
       tenantID,
-      inputParams: workflowConfig.workflowArgValues || {},
+      inputParams: finalInputParams,
     });
 
     Logger.log("info", {
@@ -367,6 +372,7 @@ widgetService.getWidgetDataByID = async ({
   tenantID,
   widgetID,
   executionMode = 'ASYNC',
+  inputParams = {},
 }) => {
   Logger.log("info", {
     message: "widgetService:getWidgetDataByID:params",
@@ -374,6 +380,7 @@ widgetService.getWidgetDataByID = async ({
       authContext,
       tenantID,
       widgetID,
+      inputParams,
     },
   });
 
@@ -408,7 +415,7 @@ widgetService.getWidgetDataByID = async ({
       },
     });
 
-    const workflowInstance = await _executeWorkflowMode({ widget, authContext, tenantID, executionMode });
+    const workflowInstance = await _executeWorkflowMode({ widget, authContext, tenantID, executionMode, inputParams });
 
     Logger.log("success", {
       message: "widgetService:getWidgetDataByID:workflowMode:success",
@@ -449,20 +456,22 @@ widgetService.getWidgetDataUsingWidget = async ({
   tenantID,
   widget,
   executionMode = 'ASYNC',
+  inputParams = {},
 }) => {
   Logger.log("info", {
     message: "widgetService:getWidgetDataUsingWidget:params",
     params: {
       authContext,
       tenantID,
-      widget, 
+      widget,
+      inputParams,
     },
   });
 
   try {
     // Workflow Mode: Execute single workflow
     const workflowInstance = await _executeWorkflowMode({
-      widget, authContext, tenantID, executionMode
+      widget, authContext, tenantID, executionMode, inputParams
     });
 
     return {

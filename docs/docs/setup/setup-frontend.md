@@ -1,153 +1,66 @@
 ---
-sidebar_position: 5
-title: Frontend Local Development
-description: Run the React/Vite frontend with Firebase, Supabase, and backend connectivity.
+sidebar_position: 3
+title: Local Frontend Setup
+description: Run the React 18 SPA locally for UI development.
 ---
 
-# Frontend Local Development
+# Local Frontend Setup
 
-This guide covers the current setup for `apps/frontend`.
+If you are building new Frontend UI Pages, Dashboard widgets, or testing component interaction, you will need to run the `apps/frontend` Vite server locally.
 
 ## Prerequisites
 
-Before you start, make sure you have:
+- **Node.js 18+** installed.
+- **Backend Running:** The frontend requires the backend API to function. Follow the [Backend Setup](./setup-backend) guide first.
+- **Firebase Project:** You must have a client-side configuration block for Firebase Authentication.
 
-- **Node.js 18+** and **npm**
-- a running backend or reachable backend host
-- Firebase project values for client authentication
-- Supabase values if you are using the asset/storage integrations
+## 1. Installation
 
-## 1. Install dependencies
-
-From the repository root:
-
+From the Mono-Repository root:
 ```bash
-git clone <repository_url>
-cd jet-admin
 npm install
 ```
 
-## 2. Create the frontend environment file
+## 2. Environment Variables
 
-Create `apps/frontend/.env`.
-
-The frontend code currently expects the following variables:
+Navigate to `apps/frontend/` and create an `.env` file based on `.env.sample`.
 
 ```env
-# Backend hosts
+# Point these towards your local backend
 VITE_SERVER_HOST=http://localhost:8090
 VITE_SOCKET_HOST=http://localhost:8090
 
-# Firebase client SDK
-VITE_FIREBASE_API_KEY=
-VITE_FIREBASE_AUTH_DOMAIN=
-VITE_FIREBASE_PROJECT_ID=
-VITE_FIREBASE_STORAGE_BUCKET=
-VITE_FIREBASE_MESSAGING_SENDER_ID=
-VITE_FIREBASE_APP_ID=
-VITE_FIREBASE_MEASUREMENT_ID=
-
-# Supabase
-VITE_SUPABASE_URL=
-VITE_SUPABASE_ANON_KEY=
+# Firebase Client Configuration (From Firebase Console)
+VITE_FIREBASE_API_KEY="AIzaSy..."
+VITE_FIREBASE_AUTH_DOMAIN="your-app.firebaseapp.com"
+VITE_FIREBASE_PROJECT_ID="your-app-id"
+VITE_FIREBASE_STORAGE_BUCKET="your-app.appspot.com"
+VITE_FIREBASE_MESSAGING_SENDER_ID="12345"
+VITE_FIREBASE_APP_ID="1:123:web:abc"
 ```
 
-:::caution
-The current code uses `VITE_SUPABASE_ANON_KEY`, not `VITE_SUPABASE_KEY`.
-:::
+### Note on Configuration Resolution
+Jet Admin's frontend resolves its Backend/Socket hosts dynamically.
+1. It first checks `window.JET_ADMIN_CONFIG.SERVER_HOST` (used for production Docker deployments).
+2. If omitted, it falls back to the `VITE_SERVER_HOST` defined locally during Vite's `npm run dev`.
 
-## 3. Understand runtime host resolution
+## 3. Starting the Development Server
 
-The frontend can read API/socket hosts from either environment variables or `window.JET_ADMIN_CONFIG`.
-
-Resolution order is:
-
-1. `window.JET_ADMIN_CONFIG.SERVER_HOST` / `SOCKET_HOST`
-2. `VITE_SERVER_HOST` / `VITE_SOCKET_HOST`
-3. default `http://localhost:8090`
-
-This is why the project can also be deployed with a generated `public/config.js` or container entrypoint override.
-
-## 4. Start the frontend
-
-From the repository root:
-
+From the repository root workspace, start the frontend Vite watcher:
 ```bash
 npm run start:f
 ```
 
-Vite will start the app on `http://localhost:5173` by default.
+Vite will spin up the application quickly and heavily utilize Hot Module Replacement (HMR).
 
-## What the frontend initializes
+Navigate to `http://localhost:5173` in your browser.
 
-At runtime, the frontend composes several providers before rendering feature routes:
+## 4. Developing Shared Packages
 
-- `QueryClientProvider`
-- `AuthContextProvider`
-- `GlobalUIProvider`
-- `TenantContextProvider`
-- `SocketContextProvider`
-- `RootRouter`
+If you modify files inside the `packages/` directory (for example, building a new Chart Widget inside `@jet-admin/widgets-ui`), the frontend will not immediately see these changes unless the package is rebuilt.
 
-This means the app expects auth, tenant, and socket context to be available across most protected screens.
-
-## Authentication behavior in development
-
-The frontend uses Firebase client authentication for:
-
-- Google sign-in,
-- email/password sign-in,
-- email/password sign-up,
-- password reset.
-
-Once a user is authenticated, API modules typically call `currentUser.getIdToken()` and send the token to the backend as a bearer token.
-
-## Socket behavior in development
-
-The socket client connects to `VITE_SOCKET_HOST` (or `window.JET_ADMIN_CONFIG.SOCKET_HOST`) and authenticates with the current Firebase token.
-
-This is required for live workflow execution updates and other realtime features.
-
-## Building for Production
-
-From `apps/frontend`:
-
-```bash
-npm run build
-```
-
-To preview the build locally:
-
-```bash
-npm run preview
-```
-
-## Working with shared packages
-
-If your frontend changes depend on workspace packages, run the package watch process from the root:
-
+To solve this, open a new terminal at the repository root and run:
 ```bash
 npm run dev:all-packages
 ```
-
-Or run the full combined development flow:
-
-```bash
-npm run dev:all
-```
-
-## Troubleshooting
-
-Common setup issues:
-
-- wrong backend URL in `VITE_SERVER_HOST`
-- missing Firebase client values
-- using `VITE_SUPABASE_KEY` instead of `VITE_SUPABASE_ANON_KEY`
-- CORS mismatch because the backend does not allow `http://localhost:5173`
-- socket auth failures when Firebase config and backend Firebase credentials do not belong to the same project
-
-## Related docs
-
-- [Frontend architecture](../architecture/frontend-architecture)
-- [Data flow](../concepts/data-flow)
-- [Backend local development](./setup-backend)
+This triggers a background Typescript watcher on all `packages/`, meaning any change saved will instantly propagate and trigger a Vite HMR reload on the frontend.

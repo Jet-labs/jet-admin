@@ -23,6 +23,8 @@ import { WidgetDeletionForm } from "./widgetDeletionForm";
 import { WidgetConfigEditor } from "./widgetConfigEditor";
 import { WidgetPreview } from "./widgetPreview";
 import { useWidgetRun, WIDGET_EXECUTION_MODES } from "./useWidgetRun";
+import { WorkflowConsole } from "../workflowComponents/workflowConsole";
+import { WorkflowContextPanel } from "../workflowComponents/workflowContextPanel";
 
 import { Button, Label, Spinner, Switch } from "@jet-admin/ui";
 const initialValues = {
@@ -50,6 +52,9 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
   const [executionMode, setExecutionMode] = useState(WIDGET_EXECUTION_MODES.ASYNC);
   const queryClient = useQueryClient();
   const autoRunKeyRef = useRef(null);
+
+  const [showConsole, setShowConsole] = useState(false);
+  const [showContextPanel, setShowContextPanel] = useState(false);
 
   const updateWidgetForm = useFormik({
     initialValues: initialValues,
@@ -140,6 +145,13 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
   }, [widget]);
 
   useEffect(() => {
+    if (isRunningWorkflow) {
+      setShowConsole(true);
+      setShowContextPanel(true);
+    }
+  }, [isRunningWorkflow]);
+
+  useEffect(() => {
     const workflowID = updateWidgetForm?.values?.workflowID;
     const currentWidgetID = widget?.widgetID || widgetID;
 
@@ -209,17 +221,22 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
         error={loadWidgetError}
       >
         <ResizablePanelGroup
-          direction="horizontal"
-          autoSaveId={
-            CONSTANTS.RESIZABLE_PANEL_KEYS
-              .WIDGET_UPDATION_FORM_RESULT_SEPARATION
-          }
-          className={"!w-full !h-full"}
+          direction="vertical"
+          autoSaveId="widget-updation-canvas-terminal-split"
+          className="!h-full !w-full"
         >
-          <ResizablePanel defaultSize={35}>
+          <ResizablePanel defaultSize={showConsole || showContextPanel ? 65 : 100} minSize={30}>
+            <ResizablePanelGroup
+              direction="horizontal"
+              autoSaveId={
+                CONSTANTS.RESIZABLE_PANEL_KEYS
+                  .WIDGET_UPDATION_FORM_RESULT_SEPARATION
+              }
+              className={"!w-full !h-full"}
+            >
+          <ResizablePanel defaultSize={35} className="!overflow-y-auto !pb-10">
             <form
-              className="flex h-full w-full flex-col items-stretch gap-2 overflow-y-auto bg-background p-3"
-
+              className="flex w-full flex-col items-stretch gap-2 bg-background p-3"
               onSubmit={updateWidgetForm.handleSubmit}
             >
               {updateWidgetForm && (
@@ -233,15 +250,19 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
                   initialWorkflowTitle={widget?.workflow?.title || ""}
                   onTestWorkflow={_handleFetchWidgetData}
                   onClearLogs={clearLogs}
+                  showConsole={showConsole}
+                  setShowConsole={setShowConsole}
+                  showContextPanel={showContextPanel}
+                  setShowContextPanel={setShowContextPanel}
                 />
               )}
 
             </form>
           </ResizablePanel>
           <ResizableHandle withHandle={true} />
-          <ResizablePanel defaultSize={65} className="relative">
+          <ResizablePanel defaultSize={65} className="relative flex flex-col min-h-0">
             {/* Execution Mode Toggle */}
-            <div className="flex items-center border-b border-border flex-row justify-end gap-2 bg-background/95 p-1.5">
+            <div className="flex items-center border-b border-border flex-row justify-end gap-2 bg-background/95 p-1.5 shrink-0">
               <div className="flex items-center gap-1.5">
                 <Switch
                   className="h-[18px] w-[32px] [&>span]:h-3.5 [&>span]:w-3.5 data-[state=checked]:[&>span]:translate-x-3.5"
@@ -272,6 +293,7 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
                 )}
               </Button>
             </div>
+            <div className="flex-1 min-h-0 w-full relative">
             <WidgetPreview
               key={`{widgetPreview_${widgetID}}`}
               widgetID={widgetID}
@@ -287,7 +309,52 @@ export const WidgetUpdationForm = ({ tenantID, widgetID }) => {
               runWorkflow={_handleFetchWidgetData}
               isRunningWorkflow={isRunningWorkflow}
             />
+            </div>
           </ResizablePanel>
+        </ResizablePanelGroup>
+          </ResizablePanel>
+  
+          {/* Terminal Section - Console and Context */}
+          {(showConsole || showContextPanel) && (
+            <>
+              <ResizableHandle withHandle />
+              <ResizablePanel defaultSize={35} minSize={15} maxSize={60}>
+                <ResizablePanelGroup
+                  direction="horizontal"
+                  autoSaveId="widget-updation-console-context-split"
+                  className="!h-full"
+                >
+                  {/* Console Panel */}
+                  {showConsole && (
+                    <ResizablePanel defaultSize={showContextPanel ? 50 : 100} minSize={25}>
+                      <WorkflowConsole
+                        logs={workflowLogs || []}
+                        isRunning={isRunningWorkflow}
+                        onClear={clearLogs}
+                        className="h-full rounded-none border-t-0 border-l-0"
+                      />
+                    </ResizablePanel>
+                  )}
+  
+                  {/* Resize Handle between Console and Context */}
+                  {showConsole && showContextPanel && (
+                    <ResizableHandle withHandle />
+                  )}
+  
+                  {/* Context Panel */}
+                  {showContextPanel && (
+                    <ResizablePanel defaultSize={showConsole ? 50 : 100} minSize={25}>
+                      <WorkflowContextPanel
+                        context={workflowContext || {}}
+                        isRunning={isRunningWorkflow}
+                        className="h-full rounded-none border-t-0 border-r-0"
+                      />
+                    </ResizablePanel>
+                  )}
+                </ResizablePanelGroup>
+              </ResizablePanel>
+            </>
+          )}
         </ResizablePanelGroup>
       </ReactQueryLoadingErrorWrapper>
     </div>

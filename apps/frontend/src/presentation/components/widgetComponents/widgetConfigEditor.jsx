@@ -8,6 +8,8 @@ import { WorkflowConsole } from "../workflowComponents/workflowConsole";
 import { VscTerminal } from "react-icons/vsc";
 
 import { WIDGETS_MAP } from "@jet-admin/widgets-ui";
+import { WidgetAdvancedOptions } from "./widgetAdvancedOptions";
+import { TbBraces } from "react-icons/tb";
 
 import {
   Button,
@@ -32,6 +34,10 @@ export const WidgetConfigEditor = ({
   initialWorkflowTitle,
   onTestWorkflow,
   onClearLogs,
+  showConsole,
+  setShowConsole,
+  showContextPanel,
+  setShowContextPanel,
 }) => {
   WidgetConfigEditor.propTypes = {
     widgetEditorForm: PropTypes.object.isRequired,
@@ -42,6 +48,10 @@ export const WidgetConfigEditor = ({
     initialWorkflowTitle: PropTypes.string,
     onTestWorkflow: PropTypes.func,
     onClearLogs: PropTypes.func,
+    showConsole: PropTypes.bool,
+    setShowConsole: PropTypes.func,
+    showContextPanel: PropTypes.bool,
+    setShowContextPanel: PropTypes.func,
   };
 
   const { workflows, isLoadingWorkflows } = useWidgetsState();
@@ -71,7 +81,7 @@ export const WidgetConfigEditor = ({
   };
 
   return (
-    <div className="flex h-full w-full flex-col gap-3 overflow-hidden">
+    <div className="flex h-full w-full flex-col gap-3">
       <div className="space-y-1.5">
         <Label
           htmlFor="widgetTitle"
@@ -141,6 +151,20 @@ export const WidgetConfigEditor = ({
         </div>
       )}
 
+      {/* Show Header toggle */}
+      <div className="flex items-center gap-2">
+        <Checkbox
+          id="showHeader"
+          checked={widgetEditorForm.values.widgetConfig?.showHeader ?? true}
+          onCheckedChange={(checked) =>
+            widgetEditorForm.setFieldValue('widgetConfig.showHeader', !!checked)
+          }
+        />
+        <Label htmlFor="showHeader" className="text-xs text-muted-foreground cursor-pointer">
+          Show widget header (with refresh button)
+        </Label>
+      </div>
+
       <div className="space-y-1.5">
         <Label
           htmlFor="workflowConfig.workflowAutoRun"
@@ -163,14 +187,14 @@ export const WidgetConfigEditor = ({
       </div>
 
       {/* Row 4: Test Workflow + Settings buttons */}
-      {selectedWorkflow && onTestWorkflow && <div className="flex flex-row justify-start items-center gap-2">
+      {selectedWorkflow && onTestWorkflow && <div className="flex flex-row justify-between items-center gap-2">
 
           <Button
             type="button"
             size="sm"
             onClick={onTestWorkflow}
             disabled={isRunningWorkflow}
-            className="text-xs"
+          className="text-xs w-full"
           >
             {isRunningWorkflow ? (
               <Spinner size={12} className="mr-2" />
@@ -180,6 +204,38 @@ export const WidgetConfigEditor = ({
             {isRunningWorkflow ? CONSTANTS.STRINGS.TEST_WORKFLOW_BUTTON_RUNNING : CONSTANTS.STRINGS.TEST_WORKFLOW_BUTTON}
           </Button>
 
+        <div className="flex flex-row gap-1.5">
+          <Button
+            type="button"
+            onClick={() => setShowConsole(!showConsole)}
+            title={showConsole ? 'Hide Console' : 'Show Console'}
+            variant="outline"
+            size="sm"
+            className={`px-2 flex items-center gap-1.5 transition-colors ${showConsole ? 'border-primary text-primary bg-primary/5' : 'text-muted-foreground hover:text-foreground'}`}
+          >
+            <VscTerminal className="size-4" />
+            {workflowLogs && workflowLogs.length > 0 && (
+              <span className="px-1 py-0.5 text-[9px] font-bold bg-muted text-muted-foreground rounded-full leading-none min-w-[16px] text-center">
+                {workflowLogs.length}
+              </span>
+            )}
+          </Button>
+          <Button
+            type="button"
+            onClick={() => setShowContextPanel(!showContextPanel)}
+            title={showContextPanel ? 'Hide Context' : 'Show Context'}
+            variant="outline"
+            size="sm"
+            className={`px-2 flex items-center gap-1.5 transition-colors ${showContextPanel ? 'border-primary text-primary bg-primary/5' : 'text-muted-foreground hover:text-foreground'}`}
+          >
+            <TbBraces className="size-4" />
+            {workflowContext && Object.keys(workflowContext).filter(k => !k.startsWith('__')).length > 0 && (
+              <span className="px-1 py-0.5 text-[9px] font-bold bg-muted text-muted-foreground rounded-full leading-none min-w-[16px] text-center">
+                {Object.keys(workflowContext).filter(k => !k.startsWith('__')).length}
+              </span>
+            )}
+          </Button>
+        </div>
 
       </div>
       }
@@ -196,52 +252,13 @@ export const WidgetConfigEditor = ({
         />
       )}
 
-      {/* ═══════════════════════════════════════════
-          SECTION 3: WORKFLOW TERMINAL (docked footer)
-          ═══════════════════════════════════════════ */}
-      {selectedWorkflow && ((workflowLogs && workflowLogs.length > 0) || workflowContext) && (
-        <div
-          className="relative z-20 mt-4 flex shrink-0 flex-col overflow-hidden rounded-md border border-border bg-background shadow-sm"
-          style={{ maxHeight: '35vh' }}
-        >
-          {/* Terminal header */}
-          <div className="flex shrink-0 items-center justify-between border-b border-border bg-muted px-3 py-2">
-            <span className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
-              <VscTerminal className="h-4 w-4 text-muted-foreground" /> Workflow Terminal
-            </span>
-            <Button 
-              type="button" 
-              variant="outline"
-              size="sm"
-              className="h-6 px-2 text-[10px] font-medium" 
-              onClick={onClearLogs}
-            >
-              Clear
-            </Button>
-          </div>
-          
-          {/* Terminal body */}
-          <div className="flex-1 overflow-auto flex flex-col">
-            <WorkflowConsole
-              logs={workflowLogs || []}
-              isRunning={isRunningWorkflow}
-              onClear={onClearLogs}
-              className="flex-1 rounded-none border-none shadow-none"
-            />
-            {workflowContext && (
-              <div className="shrink-0 border-t border-border bg-muted p-3">
-                <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-semibold text-foreground">Workflow Context (ctx)</span>
-                  <span className="text-[10px] text-muted-foreground">Use these paths in your Vega spec</span>
-                </div>
-                <pre className="max-h-32 overflow-auto rounded border border-border bg-background p-2 font-mono text-[10px] text-muted-foreground shadow-inner">
-                  {JSON.stringify(workflowContext, null, 2)}
-                </pre>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
+      {/* Widget Advanced Options Generic Form */}
+      <WidgetAdvancedOptions
+        widgetForm={widgetEditorForm}
+        parentWidgetType={widgetType}
+      />
+
+
     </div>
   );
 };

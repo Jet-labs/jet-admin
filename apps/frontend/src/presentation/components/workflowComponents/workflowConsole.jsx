@@ -15,11 +15,13 @@ export const WorkflowConsole = ({
   onClear,
   className = '',
 }) => {
-  const logsEndRef = useRef(null);
+  const scrollContainerRef = useRef(null);
 
-  // Auto-scroll to bottom when new logs arrive
+  // Auto-scroll to bottom when new logs arrive, using local container scroll to prevent page-level leaps
   useEffect(() => {
-    logsEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = scrollContainerRef.current.scrollHeight;
+    }
   }, [logs]);
 
   // Get icon and color for log type
@@ -59,7 +61,7 @@ export const WorkflowConsole = ({
   return (
     <div className={`flex flex-col bg-background overflow-hidden ${className}`}>
       {/* Header */}
-      <div className="flex items-center justify-between px-3 py-2 bg-muted/30 border-b border-border">
+      <div className="flex items-center justify-between px-3 py-1 bg-muted/30 border-b border-border">
         <div className="flex items-center gap-2">
           <VscTerminal className="size-4 text-muted-foreground" />
           <span className="text-sm font-semibold text-foreground">Console</span>
@@ -87,7 +89,7 @@ export const WorkflowConsole = ({
       </div>
 
       {/* Logs area */}
-      <div className="flex-1 overflow-y-auto p-3 font-mono text-xs bg-background/50">
+      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-3 font-mono text-xs bg-background/50">
         {logs.length === 0 ? (
           <div className="flex items-center justify-center h-full text-muted-foreground/60">
             <span>No logs yet. Click "Test Run" to start.</span>
@@ -138,7 +140,6 @@ export const WorkflowConsole = ({
                 </div>
               );
             })}
-            <div ref={logsEndRef} />
           </div>
         )}
       </div>

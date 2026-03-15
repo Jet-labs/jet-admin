@@ -1,10 +1,11 @@
 import React from "react";
 import { FaChartBar } from "react-icons/fa";
 import { getDemoData, registerWidgets } from "./widget.config";
-import { WIDGET_TYPES, WIDGET_INITIAL_CONFIG } from "@jet-admin/widget-types";
+import { WIDGET_TYPES } from "@jet-admin/widget-types";
 import { VegaConfigEditor } from "./vega/vegaConfigEditor";
 import { ButtonConfigEditor } from "./button/buttonConfigEditor";
-import { MdOutlineSmartButton } from "react-icons/md";
+import { TableConfigEditor } from "./table/tableConfigEditor";
+import { MdOutlineSmartButton, MdOutlineTableChart } from "react-icons/md";
 
 
 // Register widgets
@@ -17,6 +18,10 @@ const LazyVegaWidget = React.lazy(() =>
 
 const LazyButtonWidget = React.lazy(() =>
   import("./button/index.js").then(module => ({ default: module.ButtonWidget }))
+);
+
+const LazyTableWidget = React.lazy(() =>
+  import("./table/index.js").then(module => ({ default: module.TableWidget }))
 );
 
 
@@ -37,7 +42,14 @@ export const WIDGETS_MAP = {
     },
     configEditor: VegaConfigEditor,
     icon: ({ className }) => <FaChartBar className={`!text-lg ${className}`} />,
-    sampleConfig: WIDGET_INITIAL_CONFIG["vega-lite"] || {},
+    sampleConfig: {
+      options: {
+        showActions: false,
+        renderer: "svg",
+        theme: undefined,
+      },
+      showHeader: true,
+    },
   },
   'vega': {
     label: "Vega",
@@ -54,7 +66,14 @@ export const WIDGETS_MAP = {
     },
     configEditor: VegaConfigEditor,
     icon: ({ className }) => <FaChartBar className={`!text-lg ${className}`} />,
-    sampleConfig: WIDGET_INITIAL_CONFIG.vega || {},
+    sampleConfig: {
+      options: {
+        showActions: false,
+        renderer: "svg",
+        theme: undefined,
+      },
+      showHeader: true,
+    },
   },
   'button': {
     label: "Button",
@@ -71,7 +90,38 @@ export const WIDGETS_MAP = {
     },
     configEditor: ButtonConfigEditor,
     icon: ({ className }) => <MdOutlineSmartButton className={`!text-lg ${className}`} />,
-    sampleConfig: WIDGET_INITIAL_CONFIG.button || {},
+    sampleConfig: {
+      text: "Click Me",
+      variant: "default",
+      size: "default",
+      showHeader: true,
+    },
+  },
+  'table': {
+    label: "Data Table",
+    value: WIDGET_TYPES.TABLE.value,
+    datasetFields: [],
+    defaultAutoRun: true,
+    description: "Tabular data display with pagination",
+    component: ({ data, ...props }) => {
+      return (
+        <React.Suspense fallback={<div className="flex justify-center items-center h-full text-xs text-slate-400">Loading table...</div>}>
+          <LazyTableWidget data={data} {...props} />
+        </React.Suspense>
+      );
+    },
+    configEditor: TableConfigEditor,
+    icon: ({ className }) => <MdOutlineTableChart className={`!text-lg ${className}`} />,
+    sampleConfig: {
+      dataArrayTemplate: "{{ctx.data}}",
+      columns: [],
+      pagination: {
+        enabled: false,
+        pageParam: "page",
+        totalTemplate: "{{ctx.total}}",
+      },
+      showHeader: true,
+    },
   },
 };
 

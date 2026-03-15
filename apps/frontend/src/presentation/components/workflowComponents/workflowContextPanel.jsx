@@ -160,7 +160,7 @@ export const WorkflowContextPanel = ({
   return (
     <div className={`flex flex-col bg-background overflow-hidden ${className}`}>
       {/* Header */}
-      <div className="flex items-center justify-between px-3 py-2 bg-muted/30 border-b border-border">
+      <div className="flex items-center justify-between px-3 py-1 bg-muted/30 border-b border-border">
         <div className="flex items-center gap-2">
           <VscJson className="size-4 text-muted-foreground" />
           <span className="text-sm font-semibold text-foreground">Context</span>

@@ -15,7 +15,6 @@ import {
 
 import { VegaSpecEditor } from "./vegaSpecEditor";
 import { ShelfBuilder } from "./shelfBuilder";
-import { WidgetAdvancedOptions } from "./widgetAdvancedOptions";
 
 const VEGA_STRINGS = {
   WIDGET_EDITOR_FORM_SETTINGS_BUTTON: "Settings",
@@ -73,16 +72,16 @@ export const VegaConfigEditor = ({
   };
 
   return (
-    <>
+    <div className="bg-background border border-border rounded-md p-3 flex flex-col gap-3">
       {isVegaLite && (
-        <div className="flex flex-row items-center gap-2 mb-3">
+        <div className="flex flex-row items-center gap-2">
           <span className="text-xs font-medium text-muted-foreground">Visual Editor</span>
           <Switch className="h-[18px] w-[32px] [&>span]:h-3.5 [&>span]:w-3.5 data-[state=checked]:[&>span]:translate-x-3.5" checked={currentMode === 'visual'} onCheckedChange={(checked) => handleModeSwitch(checked ? 'visual' : 'raw')} />
         </div>
       )}
 
       {isVegaLite && (
-        <div className="flex flex-row items-center justify-stretch gap-3 mb-3">
+        <div className="flex flex-row items-center justify-stretch gap-3">
           {currentMode === 'visual' && !showParseWarning && (
             <ShelfBuilder
               widgetEditorForm={widgetEditorForm}
@@ -121,15 +120,9 @@ export const VegaConfigEditor = ({
                   />
                 </div>
                 <div className="border-t border-border pt-4">
-                  <Label className="text-xs font-medium text-foreground">
-                    Advanced Options
+                  <Label className="text-xs text-muted-foreground italic">
+                    Additional options moved to Widget Settings.
                   </Label>
-                  <div className="mt-2 max-h-[50vh] overflow-y-auto pr-1">
-                    <WidgetAdvancedOptions
-                      widgetForm={widgetEditorForm}
-                      parentWidgetType={widgetEditorForm.values.widgetType}
-                    />
-                  </div>
                 </div>
               </div>
             </DialogContent>
@@ -172,7 +165,7 @@ export const VegaConfigEditor = ({
           />
         </div>
       )}
-    </>
+    </div>
   );
 };
 

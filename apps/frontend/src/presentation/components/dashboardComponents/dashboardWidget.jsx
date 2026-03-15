@@ -82,7 +82,7 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height }) => {
       "data",
       executionMode,
     ],
-    queryFn: () => getWidgetDataByIDAPI({ tenantID, widgetID, executionMode }),
+    queryFn: () => getWidgetDataByIDAPI({ tenantID, widgetID, executionMode, inputParams: {} }),
     refetchOnWindowFocus: false,
     enabled: !!widget && (widget?.workflowConfig?.workflowAutoRun ?? WIDGETS_MAP[widget.widgetType]?.defaultAutoRun ?? false) === true,
   });
@@ -105,7 +105,7 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height }) => {
     workflowConfig: widget?.workflowConfig,
   });
 
-  const runWorkflow = useCallback(() => {
+  const runWorkflow = useCallback((opts = {}) => {
     if (widget) {
       runWidget({
         widgetTitle: widget.widgetTitle,
@@ -113,7 +113,7 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height }) => {
         widgetConfig: widget.widgetConfig,
         workflowID: widget.workflowID,
         workflowConfig: widget.workflowConfig,
-      });
+      }, opts);
     }
   }, [runWidget, widget]);
 
@@ -152,6 +152,7 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height }) => {
     widget?.refreshInterval && widget.refreshInterval > 0
       ? `${widget.refreshInterval}s refresh`
       : null;
+  const showHeader = widget?.widgetConfig?.showHeader ?? true;
 
   return (
     <div
@@ -171,7 +172,7 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height }) => {
           refetchWidgetData();
         }}
       >
-        {widget && (
+        {widget && showHeader && (
           <div className="border-b border-slate-200/80 bg-gradient-to-r from-slate-50 to-background px-4 py-3">
             <div className="flex items-start justify-between gap-3">
               {/* <div className="min-w-0 space-y-1">

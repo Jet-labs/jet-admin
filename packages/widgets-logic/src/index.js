@@ -7,9 +7,11 @@
 
 import { WIDGET_TYPES } from '@jet-admin/widget-types';
 import { VegaWidgetBuilder } from './vega/builder';
+import { TableWidgetBuilder } from './table/builder';
 
 export { BaseWidgetBuilder } from './core/baseWidgetBuilder';
 export { VegaWidgetBuilder } from './vega/builder';
+export { TableWidgetBuilder } from './table/builder';
 
 /**
  * Registry mapping widget types to their builder instances.
@@ -17,7 +19,8 @@ export { VegaWidgetBuilder } from './vega/builder';
  */
 export const WIDGET_PROCESSORS_MAP = {
   [WIDGET_TYPES.VEGA_LITE.value]: new VegaWidgetBuilder(),
-  [WIDGET_TYPES.VEGA.value]: new VegaWidgetBuilder()
+  [WIDGET_TYPES.VEGA.value]: new VegaWidgetBuilder(),
+  [WIDGET_TYPES.TABLE.value]: new TableWidgetBuilder(),
 };
 
 /**

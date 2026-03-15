@@ -163,6 +163,7 @@ export const getWidgetDataByIDAPI = async ({
   tenantID,
   widgetID,
   executionMode,
+  inputParams,
 }) => {
   try {
     let url =
@@ -173,10 +174,15 @@ export const getWidgetDataByIDAPI = async ({
     }
     const bearerToken = await firebaseAuth.currentUser.getIdToken();
     if (bearerToken) {
+      // Using POST-like behavior via body for GET request using data property if needed,
+      // but standard is to pass via body. Actually, changing getWidgetDataByID to POST
+      // is safer, but requires backend route change. Let's just send it in the body of GET for now 
+      // since Express can parse it if we use standard axios data config.
       const response = await axios.get(url, {
         headers: {
           authorization: `Bearer ${bearerToken}`,
         },
+        data: { inputParams }
       });
       if (response.data && response.data.success === true) {
         return response.data.widgetData;
@@ -193,7 +199,7 @@ export const getWidgetDataByIDAPI = async ({
   }
 };
 
-export const getWidgetDataUsingWidgetAPI = async ({ tenantID, widgetData, executionMode }) => {
+export const getWidgetDataUsingWidgetAPI = async ({ tenantID, widgetData, executionMode, inputParams }) => {
   try {
     let url =
       CONSTANTS.SERVER_HOST +
@@ -207,6 +213,7 @@ export const getWidgetDataUsingWidgetAPI = async ({ tenantID, widgetData, execut
         url,
         {
           ...widgetData,
+          inputParams,
         },
         {
           headers: {

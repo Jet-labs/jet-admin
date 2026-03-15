@@ -18,18 +18,20 @@ The module is built around an event-driven **Check-Decide-Act** loop pattern, ha
 flowchart TB
     API["WorkflowController"] -->|Start/Test| Service["WorkflowService"]
     Service -->|Initialize| Orch["Orchestrator"]
-    
-    subgraph "Orchestration Loop"
-        Orch -->|1. Queue Job| MQ["RabbitMQ / Internal Queue"]
-        MQ -->|2. Consume| Worker["Worker Node"]
-        Worker -->|3. Execute| Logic["Node Logic (HTTP/JS/DB)"]
+
+    subgraph "Orchestration Loop (In-Memory)"
+        Orch -->|1. Queue Job| MQ["In-Memory Queue (fastq)"]
+        MQ -->|2. Consume| Worker["Task Worker"]
+        Worker -->|3. Execute| Logic["Node Handler (HTTP/JS/DB)"]
         Logic -->|4. Return Result| ResultQueue["Results Queue"]
         ResultQueue -->|5. Consume| Orch
     end
-    
+
     Orch -->|Update State| DB[("PostgreSQL")]
     Orch -->|Emit Events| Socket["Socket.io"]
 ```
+
+**Note:** Jet Admin uses an **in-memory queue (fastq)** for workflow execution, not RabbitMQ. This provides simpler deployment with no external broker required.
 
 ## Key Components
 

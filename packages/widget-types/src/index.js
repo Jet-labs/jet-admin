@@ -16,49 +16,79 @@ export const WIDGET_TYPES = {
     name: "Button",
     value: "button",
   },
+  TABLE: {
+    name: "Data Table",
+    value: "table",
+  },
 };
 
-export const WIDGET_INITIAL_CONFIG = {
+// Advanced options for Vega widgets (using JSON Schema + UI Schema for jsonforms)
+export const WIDGET_ADVANCED_OPTIONS = {
+  "vega": {
+    schema: {
+      type: "object",
+      properties: {
+        showActions: {
+          type: "boolean",
+          title: "Show Actions",
+          description: "Show Vega embed action buttons",
+          default: false,
+        },
+        renderer: {
+          type: "string",
+          title: "Renderer",
+          enum: ["svg", "canvas"],
+          description: "Rendering engine for the chart",
+        },
+      },
+    },
+    uischema: {
+      type: "VerticalLayout",
+      elements: [
+        {
+          type: "Control",
+          scope: "#/properties/showActions",
+        },
+        {
+          type: "Control",
+          scope: "#/properties/renderer",
+        },
+      ],
+    },
+  },
   "vega-lite": {
-    options: {
-      showActions: false,
-      renderer: "svg",
-      theme: undefined,
+    schema: {
+      type: "object",
+      properties: {
+        showActions: {
+          type: "boolean",
+          title: "Show Actions",
+          description: "Show Vega embed action buttons",
+          default: false,
+        },
+        renderer: {
+          type: "string",
+          title: "Renderer",
+          enum: ["svg", "canvas"],
+          description: "Rendering engine for the chart",
+        },
+      },
     },
-  },
-  vega: {
-    options: {
-      showActions: false,
-      renderer: "svg",
-      theme: undefined,
+    uischema: {
+      type: "VerticalLayout",
+      elements: [
+        {
+          type: "Control",
+          scope: "#/properties/showActions",
+        },
+        {
+          type: "Control",
+          scope: "#/properties/renderer",
+        },
+      ],
     },
-  },
-  button: {
-    text: "Click Me",
-    variant: "default",
-    size: "default",
   },
 };
-
-// Advanced options for Vega widgets (minimal set)
-export const WIDGET_ADVANCED_OPTIONS = [
-  {
-    name: "Show Actions",
-    key: "widgetConfig.options.showActions",
-    type: "boolean",
-    description: "Show Vega embed action buttons",
-    relevantWidgets: ["vega", "vega-lite"],
-    defaultValue: false,
-  },
-  {
-    name: "Renderer",
-    key: "widgetConfig.options.renderer",
-    type: "select",
-    description: "Rendering engine for the chart",
-    options: ["svg", "canvas"],
-    relevantWidgets: ["vega", "vega-lite"],
-  },
-];
 
 // No dataset-specific advanced options for Vega widgets
 export const WIDGET_DATASET_ADVANCED_OPTIONS = [];

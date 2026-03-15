@@ -33,14 +33,20 @@ flowchart LR
 
 ## Important runtime clarification
 
-The repository still contains RabbitMQ-related code, but the currently started runtime path is:
+**Jet Admin uses an in-memory queue (fastq), not RabbitMQ.**
 
-- `workflowWorkers.js`
-- `queue.config.js`
-- `startResultsConsumer()`
-- `startTaskWorker()`
+The workflow runtime is initialized from:
+- `apps/backend/config/queue.config.js` - In-memory queue using fastq
+- `apps/backend/workers/workflowWorkers.js` - Worker initialization
+- `apps/backend/workers/taskWorker.js` - Task processor
+- `apps/backend/workers/resultsConsumer.js` - Results orchestrator
 
-That means the active runtime is **not currently a distributed RabbitMQ worker topology**. It is an **in-process queue-backed workflow runtime**.
+This means:
+- ✅ **No external broker needed** - Everything runs in-process
+- ✅ **Simpler deployment** - No RabbitMQ container or service required
+- ✅ **Faster development** - Direct function calls, no network overhead
+- ⚠️ **Process-local queues** - Queue state is lost on restart
+- ⚠️ **Limited horizontal scaling** - Tasks don't distribute across instances
 
 ## Core runtime components
 
