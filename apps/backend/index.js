@@ -17,6 +17,8 @@ const {
 expressApp.use(cookieParser());
 const path = require('path');
 
+Logger.log("success", { message: "public folder path", params: { path: path.join(__dirname, 'public') } });
+
 // Monitor UI Route
 expressApp.get('/monitor', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'monitor.html'));
@@ -208,7 +210,6 @@ httpServer.listen(port, async () => {
   try {
     const { startWorkflowWorkers } = require("./modules/workflow/workflowWorkers");
     await startWorkflowWorkers();
-    Logger.log("success", { message: "workflow workers started" });
   } catch (error) {
     Logger.log("warning", { message: "workflow workers not started", params: { error: error.message } });
   }

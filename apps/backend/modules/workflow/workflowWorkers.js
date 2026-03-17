@@ -20,11 +20,11 @@ async function startWorkflowWorkers() {
     // Initialize in-memory queues
     await initializeQueue();
 
-    // Start the orchestrator (results consumer)
-    orchestratorWorker = await startResultsConsumer();
-
     // Start the task worker (processes node jobs)
     taskWorker = await startTaskWorker();
+
+    // Start the orchestrator (results consumer)
+    orchestratorWorker = await startResultsConsumer();
 
     Logger.log('success', { message: 'workflowWorkers:started' });
 

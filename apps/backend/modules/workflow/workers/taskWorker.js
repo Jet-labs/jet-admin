@@ -1,112 +1,177 @@
 /**
  * Task Worker
- * Main worker that processes all node types using in-memory queue
+ * Consumes node execution jobs from the queue, runs the appropriate handler,
+ * and reports results back to the orchestrator via the results queue.
+ *
+ * Key improvements vs previous version:
+ *  - Context is only refetched from DB when the job is tagged as a join node
+ *    (i.e., it has multiple incoming edges). Sequential nodes already carry
+ *    the latest context in their job payload — no extra DB read needed.
+ *  - A per-node execution timeout (default: 30s for most nodes, configurable
+ *    via nodeConfig.timeoutSeconds) wraps every handler.execute() call.
+ *  - registerTaskWorker is now awaited (pg-boss is async).
  */
-const { registerTaskWorker, addResult, addNodeJob, QUEUE_NAMES } = require('../../../config/queue.config');
+
+const { registerTaskWorker, addResult, addNodeJob } = require('../../../config/queue.config');
 const { getHandler } = require('./handlers');
 const { resolveTemplate: sharedResolveTemplate } = require('../../../utils/templateEngine');
+const { stateManager } = require('../orchestrator/stateManager');
 const Logger = require('../../../utils/logger');
+
 const WORKFLOW_TEMPLATE_OPTIONS = {
   allowedRoots: ['ctx'],
   preserveSingleExpressionType: true,
 };
 
+// Default timeout applied to every node unless nodeConfig overrides it
+const DEFAULT_NODE_TIMEOUT_MS = 30_000;
+
+// ─── Startup ──────────────────────────────────────────────────────────────────
 
 /**
- * Start the main task worker that handles all node types
+ * Register the task worker with the queue.
+ * Must be awaited — pg-boss.work() returns a Promise.
  */
 async function startTaskWorker() {
-  Logger.log('info', { message: 'taskWorker:starting consumer' });
+  Logger.log('info', { message: 'taskWorker:starting' });
 
-  registerTaskWorker(async (jobData) => {
-    const { instanceID, nodeID, nodeType, nodeConfig, context, workflowID, attempts = 0, maxAttempts = 3, isTestRun = false } = jobData;
+  await registerTaskWorker(async (jobData) => {
+    await _processJob(jobData);
+  });
 
-    Logger.log('info', {
-      message: 'taskWorker:processing',
-      params: { instanceID, nodeID, nodeType, attempt: attempts + 1 },
-    });
+  Logger.log('success', { message: 'taskWorker:started' });
+}
 
-    try {
-      // DATA RELIABILITY: For non-test runs, fetch the absolute latest context from the database.
-      // This ensures that parallel upstream data is ALWAYS visible, even if the job was queued
-      // slightly before a concurrent write finished, or if this is a retry.
-      let currentContext = context;
-      if (!isTestRun && instanceID) {
-        const { stateManager } = require('../orchestrator/stateManager');
-        const freshInstance = await stateManager.getInstance(instanceID);
-        if (freshInstance) {
-          currentContext = freshInstance.contextData;
-        }
-      }
+// ─── Job processor ────────────────────────────────────────────────────────────
 
-      // Get handler for this node type
-      const handler = getHandler(nodeType);
+async function _processJob(jobData) {
+  const {
+    instanceID,
+    nodeID,
+    nodeType,
+    nodeConfig,
+    context,
+    workflowID,
+    attempts = 0,
+    maxAttempts = 3,
+    isTestRun = false,
+    isJoinNode = false,  // ← set by orchestrator/dagScheduler
+  } = jobData;
 
-      // Execute handler with the latest context
-      const result = await handler.execute(nodeConfig, currentContext, {
+  Logger.log('info', {
+    message: 'taskWorker:processing',
+    params: { instanceID, nodeID, nodeType, attempt: attempts + 1, isJoinNode },
+  });
+
+  try {
+    // ── Context freshness ──────────────────────────────────────────────────
+    // For join nodes: parallel branches may have written to contextData after
+    // this job was queued. We must refetch to guarantee we see all upstream
+    // outputs before executing the join's handler.
+    //
+    // For sequential nodes (isJoinNode === false): the job payload context is
+    // always complete — there's only one writer — so we skip the extra query.
+    let currentContext = context;
+
+    // taskWorker.js — join node context refresh
+    if (!isTestRun && instanceID && isJoinNode) {
+      // assembleContext folds NODE_COMPLETED + INPUT_SET + SYSTEM_SET log rows
+      // getInstance() no longer carries contextData — that column was removed
+      currentContext = await stateManager.assembleContext(instanceID);
+      Logger.log('info', { message: 'taskWorker:contextRefetchedForJoinNode', params: { instanceID, nodeID } });
+    }
+
+    // ── Handler lookup ─────────────────────────────────────────────────────
+    const handler = getHandler(nodeType);
+
+    const timeoutMs = (nodeConfig?.timeoutSeconds ?? DEFAULT_NODE_TIMEOUT_MS / 1000) * 1000;
+
+    // ── Timed execution ────────────────────────────────────────────────────
+    const result = await _withTimeout(
+      handler.execute(nodeConfig, currentContext, {
         instanceID,
         nodeID,
         workflowID,
-        resolveTemplate: (template, meta = {}) => sharedResolveTemplate(
-          template,
-          currentContext,
-          WORKFLOW_TEMPLATE_OPTIONS,
-          { module: 'workflow', instanceID, workflowID, nodeID, ...meta }
-        ),
+        resolveTemplate: (template, meta = {}) =>
+          sharedResolveTemplate(template, currentContext, WORKFLOW_TEMPLATE_OPTIONS, {
+            module: 'workflow',
+            instanceID,
+            workflowID,
+            nodeID,
+            ...meta,
+          }),
+      }),
+      timeoutMs,
+      `Node ${nodeID} (${nodeType}) timed out after ${timeoutMs}ms`
+    );
+
+    // ── Report success ─────────────────────────────────────────────────────
+    await addResult({
+      instanceID,
+      nodeID,
+      nodeType,
+      outputVariable: nodeConfig?.outputVariable,
+      status: 'success',
+      output: result.output,
+      nextHandle: result.nextHandle ?? 'output',
+      queueDelay: result.queueDelay ?? 0,
+      nodeAttempt: attempts + 1,   // ← ADDED: which execution attempt this is
+    });
+
+    Logger.log('success', { message: 'taskWorker:completed', params: { instanceID, nodeID, nodeType } });
+  } catch (execError) {
+    Logger.log('error', {
+      message: 'taskWorker:failed',
+      params: { instanceID, nodeID, nodeType, error: execError.message, attempt: attempts + 1 },
+    });
+
+    if (attempts + 1 < maxAttempts) {
+      // Exponential backoff retry
+      const delayMs = Math.pow(2, attempts) * 1000;
+
+      Logger.log('info', {
+        message: 'taskWorker:retrying',
+        params: { instanceID, nodeID, delayMs, nextAttempt: attempts + 2 },
       });
 
-      // Send result to orchestrator
+      await addNodeJob(
+        { ...jobData, attempts: attempts + 1 },
+        { delay: delayMs }
+      );
+    } else {
+      // Max retries exhausted — report error to orchestrator
       await addResult({
         instanceID,
         nodeID,
         nodeType,
-        outputVariable: nodeConfig?.outputVariable,
-        status: 'success',
-        output: result.output,
-        nextHandle: result.nextHandle || 'output',
-        queueDelay: result.queueDelay || 0,
+        status: 'error',
+        output: null,
+        nextHandle: 'error',
+        taskError: execError.message,
+        nodeAttempt: attempts + 1,  // ← ADDED: records which attempt finally failed
       });
-
-      Logger.log('success', {
-        message: 'taskWorker:completed',
-        params: { instanceID, nodeID, nodeType },
-      });
-
-    } catch (error) {
-      Logger.log('error', {
-        message: 'taskWorker:failed',
-        params: { instanceID, nodeID, nodeType, error: error.message, attempt: attempts + 1 },
-      });
-
-      // Check if we should retry
-      if (attempts + 1 < maxAttempts) {
-        const retryData = { ...jobData, attempts: attempts + 1 };
-
-        // Exponential backoff delay
-        const delay = Math.pow(2, attempts) * 1000;
-
-        Logger.log('info', {
-          message: 'taskWorker:retrying',
-          params: { instanceID, nodeID, delay, nextAttempt: attempts + 2 },
-        });
-
-        // Re-push with delay
-        await addNodeJob(retryData, { delay });
-      } else {
-        // Max retries exceeded, send error result
-        await addResult({
-          instanceID,
-          nodeID,
-          status: 'error',
-          output: null,
-          nextHandle: 'error',
-          error: error.message,
-        });
-      }
     }
-  });
+  }
+}
 
-  Logger.log('info', { message: 'taskWorker:started' });
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+/**
+ * Race a promise against a timeout.
+ *
+ * @template T
+ * @param {Promise<T>} promise
+ * @param {number} ms
+ * @param {string} [message]
+ * @returns {Promise<T>}
+ */
+function _withTimeout(promise, ms, message = `Operation timed out after ${ms}ms`) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) =>
+      setTimeout(() => reject(new Error(message)), ms)
+    ),
+  ]);
 }
 
 module.exports = { startTaskWorker };

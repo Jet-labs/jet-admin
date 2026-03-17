@@ -194,6 +194,16 @@ const constants = {
     SUCCESS: "SUCCESS",
     FAILURE: "FAILURE",
   },
+
+  WORKFLOW_LOG_EVENT_TYPES: {
+    INPUT_SET: 'INPUT_SET',       // workflow input params — nodeID null
+    NODE_COMPLETED: 'NODE_COMPLETED',  // node ran successfully — carries output payload
+    NODE_FAILED: 'NODE_FAILED',     // node execution failed — carries errorMessage
+    NODE_DISPATCHED: 'NODE_DISPATCHED', // orchestrator queued this node — no payload
+    // written by the CAS winner before addNodeJob
+    // loser checks this on retry to avoid re-dispatch
+    SYSTEM_SET: 'SYSTEM_SET',      // orchestrator metadata — nodeID null
+  }
 };
 
 module.exports = constants;

@@ -1,113 +1,99 @@
 /**
  * DAG Scheduler
- * Calculates next nodes based on workflow graph and completed node handle
+ * Graph traversal engine — given a completed node and its output handle,
+ * determines which downstream nodes are ready to execute next.
+ *
+ * Unified log model change
+ * ─────────────────────────
+ * The barrier check previously queried tblNodeExecutionLogs for rows with
+ * eventType = 'TASK_COMPLETED'. That table no longer exists.
+ *
+ * It now calls stateManager.getCompletedNodeIDs(instanceID, upstreamNodeIDs)
+ * which queries tblWorkflowInstanceLogs WHERE eventType = 'NODE_COMPLETED'.
+ * Semantics are identical — the set of completed upstream node IDs is the
+ * same data, just stored in one table instead of two.
+ *
+ * Everything else (outgoing edge lookup, candidate node fetch, batched
+ * incoming edge query, barrier logic) is unchanged.
  */
+
 const { prisma } = require('../../../config/prisma.config');
+const { stateManager } = require('./stateManager');
 const Logger = require('../../../utils/logger');
 
 const dagScheduler = {};
 
-/**
- * Get the start node of a workflow
- * @param {string} workflowID 
- * @returns {Promise<Object>} Start node
- */
+// ─── Simple lookups ───────────────────────────────────────────────────────────
+
 dagScheduler.getStartNode = async (workflowID) => {
-  const nodes = await prisma.tblWorkflowNodes.findMany({
-    where: { workflowID },
+  const startNode = await prisma.tblWorkflowNodes.findFirst({
+    where: { workflowID, nodeType: 'start' },
   });
-  
-  // Find node with type 'start'
-  const startNode = nodes.find(n => n.nodeType === 'start');
+
   if (!startNode) {
-    throw new Error(`No start node found for workflow ${workflowID}`);
+    throw new Error(`dagScheduler.getStartNode: no start node found for workflow ${workflowID}`);
   }
-  
+
   return startNode;
 };
 
-/**
- * Get all nodes for a workflow
- * @param {string} workflowID 
- * @returns {Promise<Array>}
- */
 dagScheduler.getWorkflowNodes = async (workflowID) => {
-  return prisma.tblWorkflowNodes.findMany({
-    where: { workflowID },
-  });
+  return prisma.tblWorkflowNodes.findMany({ where: { workflowID } });
 };
 
-/**
- * Get all edges for a workflow
- * @param {string} workflowID 
- * @returns {Promise<Array>}
- */
 dagScheduler.getWorkflowEdges = async (workflowID) => {
-  return prisma.tblWorkflowEdge.findMany({
-    where: { workflowID },
-  });
+  return prisma.tblWorkflowEdge.findMany({ where: { workflowID } });
 };
 
-/**
- * Get all incoming edges to a specific node
- * @param {string} workflowID 
- * @param {string} nodeID - The downstream node to check
- * @returns {Promise<Array>} Array of incoming edges
- */
-dagScheduler.getIncomingEdges = async (workflowID, nodeID) => {
-  return prisma.tblWorkflowEdge.findMany({
-    where: {
-      workflowID,
-      downstreamNodeID: nodeID,
-    },
-  });
-};
+// ─── Barrier check ────────────────────────────────────────────────────────────
 
 /**
- * Check if a node is ready to execute based on its upstream dependencies.
- * Queries tblNodeExecutionLogs (append-only) to determine which upstream
- * parents have completed — this is race-condition-free because logs are
- * INSERT-committed before any context update.
+ * Determine whether a node is ready to execute by checking its upstream deps.
  *
- * Supports two join modes:
- *   - 'all' (default): waits for ALL upstream parents to complete
- *   - 'any': fires as soon as ANY upstream parent completes
- * 
- * @param {Object} params
- * @param {Array} params.incomingEdges - All edges targeting this node
- * @param {string} params.instanceID - Workflow instance ID
- * @param {string} params.joinMode - 'all' or 'any' (default: 'all')
- * @param {boolean} params.isTestRun - Whether this is a test run
- * @param {Object} params.contextData - Fallback context for test runs
- * @returns {Promise<boolean>} Whether the node is ready to execute
+ * For real runs: completedNodeIDs is a Set built from tblWorkflowInstanceLogs
+ * NODE_COMPLETED rows — passed in from calculateNextNodes to avoid per-node
+ * DB queries (one batched fetch covers all candidates).
+ *
+ * For test runs: falls back to contextData.__node_<id> key presence because
+ * test runs store frontend UUID strings in nodeID, which don't match the DB
+ * UUID primary keys used in the barrier query.
+ *
+ * @param {object} params
+ * @param {object[]}    params.incomingEdges
+ * @param {string}      params.instanceID
+ * @param {'all'|'any'} params.joinMode
+ * @param {boolean}     params.isTestRun
+ * @param {object}      params.contextData      — test-run fallback only
+ * @param {Set<string>} params.completedNodeIDs — real-run barrier set
+ * @returns {boolean}
  */
-dagScheduler.isNodeReadyToExecute = async ({ incomingEdges, instanceID, joinMode = 'all', isTestRun = false, contextData = {} }) => {
-  // If no incoming edges (e.g., start node) or single parent, always ready
-  if (!incomingEdges || incomingEdges.length <= 1) {
-    return true;
+dagScheduler.isNodeReadyToExecute = ({
+  incomingEdges,
+  instanceID,
+  joinMode = 'all',
+  isTestRun = false,
+  contextData = {},
+  completedNodeIDs = new Set(),
+}) => {
+  // Single-parent (or no parent) nodes are always ready
+  if (!incomingEdges || incomingEdges.length <= 1) return true;
+
+  if (!['all', 'any'].includes(joinMode)) {
+    Logger.log('warning', {
+      message: 'dagScheduler:unknownJoinMode — defaulting to "all"',
+      params: { instanceID, joinMode },
+    });
+    joinMode = 'all';
   }
 
-  const upstreamNodeIDs = incomingEdges.map(e => e.upstreamNodeID);
+  const upstreamNodeIDs = incomingEdges.map((e) => e.upstreamNodeID);
 
-  // For test runs, fall back to contextData check (logs use nodeUUID)
   if (isTestRun) {
-    const isParentComplete = (nodeID) => contextData[`__node_${nodeID}`] != null;
+    const done = (id) => contextData[`__node_${id}`] != null;
     return joinMode === 'any'
-      ? upstreamNodeIDs.some(isParentComplete)
-      : upstreamNodeIDs.every(isParentComplete);
+      ? upstreamNodeIDs.some(done)
+      : upstreamNodeIDs.every(done);
   }
-
-  // For real runs: query committed execution logs (append-only, no race)
-  const completedLogs = await prisma.tblNodeExecutionLogs.findMany({
-    where: {
-      instanceID,
-      eventType: 'TASK_COMPLETED',
-      nodeID: { in: upstreamNodeIDs },
-    },
-    select: { nodeID: true },
-  });
-
-  const completedNodeIDs = new Set(completedLogs.map(log => log.nodeID));
 
   Logger.log('info', {
     message: 'dagScheduler:barrierCheck',
@@ -115,106 +101,124 @@ dagScheduler.isNodeReadyToExecute = async ({ incomingEdges, instanceID, joinMode
       instanceID,
       joinMode,
       upstreamNodes: upstreamNodeIDs,
-      completedUpstream: [...completedNodeIDs],
+      completedUpstream: [...completedNodeIDs].filter((id) => upstreamNodeIDs.includes(id)),
     },
   });
 
-  if (joinMode === 'any') {
-    return upstreamNodeIDs.some(id => completedNodeIDs.has(id));
-  }
-
-  // Default: 'all' — wait for every upstream parent
-  return upstreamNodeIDs.every(id => completedNodeIDs.has(id));
+  return joinMode === 'any'
+    ? upstreamNodeIDs.some((id) => completedNodeIDs.has(id))
+    : upstreamNodeIDs.every((id) => completedNodeIDs.has(id));
 };
 
+// ─── Next-node resolution ─────────────────────────────────────────────────────
+
 /**
- * Calculate next nodes to execute based on completed node and output handle.
- * Applies join/barrier logic: downstream nodes with multiple parents are only
- * returned when all (or any, per joinMode config) upstream parents have completed.
- * 
- * @param {string} workflowID 
- * @param {string} completedNodeID - The node that just completed
- * @param {string} outputHandle - The output handle used
- * @param {string} instanceID - Workflow instance ID (for barrier check via execution logs)
- * @returns {Promise<Array>} Array of next nodes to execute
+ * Calculate nodes ready to execute after completedNodeID finishes on
+ * handle outputHandle.
+ *
+ * DB query plan (4 queries regardless of fan-out width):
+ *   1. Outgoing edges from completedNodeID
+ *   2. Candidate node records
+ *   3. ALL incoming edges for ALL candidates (batched)
+ *   4. stateManager.getCompletedNodeIDs — queries tblWorkflowInstanceLogs
+ *      NODE_COMPLETED rows for all upstream node IDs (replaces the old
+ *      tblNodeExecutionLogs TASK_COMPLETED query)
+ *
+ * @param {string} workflowID
+ * @param {string} completedNodeID
+ * @param {string} [outputHandle='output']
+ * @param {string} [instanceID]
+ * @returns {Promise<object[]>} Nodes tagged with _isJoinNode boolean
  */
-dagScheduler.calculateNextNodes = async (workflowID, completedNodeID, outputHandle = 'output', instanceID = null) => {
+dagScheduler.calculateNextNodes = async (
+  workflowID,
+  completedNodeID,
+  outputHandle = 'output',
+  instanceID = null
+) => {
   Logger.log('info', {
     message: 'dagScheduler:calculateNextNodes',
     params: { workflowID, completedNodeID, outputHandle, instanceID },
   });
-  
-  // Get all edges from the completed node
-  const edges = await prisma.tblWorkflowEdge.findMany({
-    where: {
-      workflowID,
-      upstreamNodeID: completedNodeID,
-    },
-  });
-  
-  // Filter edges by sourceHandle matching the outputHandle from the completed node
-  const filteredEdges = edges.filter(e => {
-    const edgeHandle = e.sourceHandle || 'output';
-    const resultHandle = outputHandle || 'output';
-    return edgeHandle === resultHandle;
+
+  // ── 1. Outgoing edges filtered by sourceHandle ───────────────────────────
+  const outgoingEdges = await prisma.tblWorkflowEdge.findMany({
+    where: { workflowID, upstreamNodeID: completedNodeID },
   });
 
-  const downstreamNodeIDs = filteredEdges.map(e => e.downstreamNodeID);
-  
-  if (downstreamNodeIDs.length === 0) {
-    Logger.log('info', { message: 'dagScheduler:noDownstreamNodes', params: { completedNodeID } });
+  const matchingEdges = outgoingEdges.filter(
+    (e) => (e.sourceHandle || 'output') === (outputHandle || 'output')
+  );
+
+  if (matchingEdges.length === 0) {
+    Logger.log('info', { message: 'dagScheduler:noDownstreamEdges', params: { completedNodeID } });
     return [];
   }
-  
-  // Get node details
+
+  const downstreamNodeIDs = matchingEdges.map((e) => e.downstreamNodeID);
+
+  // ── 2. Candidate node records ────────────────────────────────────────────
   const candidateNodes = await prisma.tblWorkflowNodes.findMany({
-    where: {
-      nodeID: { in: downstreamNodeIDs },
-    },
+    where: { nodeID: { in: downstreamNodeIDs } },
   });
 
-  // Apply join/barrier check: filter out nodes whose upstream deps aren't all met
-  const readyNodes = [];
-  for (const node of candidateNodes) {
-    const incomingEdges = await dagScheduler.getIncomingEdges(workflowID, node.nodeID);
-    const joinMode = node.nodeConfig?.joinMode || 'all';
+  if (candidateNodes.length === 0) return [];
 
-    const ready = await dagScheduler.isNodeReadyToExecute({
+  // ── 3. ALL incoming edges for ALL candidates — single batched query ───────
+  const allIncomingEdges = await prisma.tblWorkflowEdge.findMany({
+    where: { workflowID, downstreamNodeID: { in: downstreamNodeIDs } },
+  });
+
+  const incomingEdgesByNode = new Map();
+  for (const edge of allIncomingEdges) {
+    if (!incomingEdgesByNode.has(edge.downstreamNodeID)) {
+      incomingEdgesByNode.set(edge.downstreamNodeID, []);
+    }
+    incomingEdgesByNode.get(edge.downstreamNodeID).push(edge);
+  }
+
+  // ── 4. Completed node IDs from unified log — single batched query ─────────
+  // Collect every upstreamNodeID referenced by any incoming edge
+  const allUpstreamNodeIDs = [...new Set(allIncomingEdges.map((e) => e.upstreamNodeID))];
+
+  // stateManager.getCompletedNodeIDs queries tblWorkflowInstanceLogs
+  // WHERE eventType = 'NODE_COMPLETED' AND nodeID IN (allUpstreamNodeIDs)
+  const completedNodeIDs = instanceID && allUpstreamNodeIDs.length > 0
+    ? await stateManager.getCompletedNodeIDs(instanceID, allUpstreamNodeIDs)
+    : new Set();
+
+  // ── 5. Barrier check for each candidate ──────────────────────────────────
+  const readyNodes = [];
+
+  for (const node of candidateNodes) {
+    const incomingEdges = incomingEdgesByNode.get(node.nodeID) ?? [];
+    const joinMode = node.nodeConfig?.joinMode ?? 'all';
+    const isJoinNode = incomingEdges.length > 1;
+
+    const ready = dagScheduler.isNodeReadyToExecute({
       incomingEdges,
       instanceID,
       joinMode,
+      isTestRun: false,
+      completedNodeIDs,
     });
 
     if (ready) {
-      readyNodes.push(node);
+      readyNodes.push({ ...node, _isJoinNode: isJoinNode });
     } else {
       Logger.log('info', {
-        message: 'dagScheduler:nodeNotReady (waiting for upstream)',
-        params: { nodeID: node.nodeID, joinMode },
+        message: 'dagScheduler:nodeNotReady',
+        params: { nodeID: node.nodeID, joinMode, waitingFor: 'upstream deps' },
       });
     }
   }
-  
+
   Logger.log('info', {
     message: 'dagScheduler:nextNodes',
-    params: { count: readyNodes.length, nodeIDs: readyNodes.map(n => n.nodeID) },
+    params: { count: readyNodes.length, nodeIDs: readyNodes.map((n) => n.nodeID) },
   });
-  
-  return readyNodes;
-};
 
-/**
- * Check if a workflow has reached an end state (no more nodes to execute)
- * @param {string} workflowID 
- * @param {string} completedNodeID 
- * @returns {Promise<boolean>}
- */
-dagScheduler.isTerminalNode = async (workflowID, completedNodeID) => {
-  const node = await prisma.tblWorkflowNodes.findUnique({
-    where: { nodeID: completedNodeID },
-  });
-  
-  return node?.nodeType === 'end';
+  return readyNodes;
 };
 
 module.exports = { dagScheduler };

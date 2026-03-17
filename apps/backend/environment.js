@@ -16,6 +16,7 @@ const environmentVariables = {
     ? process.env.ENABLED_MODULES.split(",")
     : [constants.MODULES.AUTH, constants.MODULES.TENANT],
   DATABASE_URL: process.env.DATABASE_URL,
+  UNPOOLED_DATABASE_URL: process.env.UNPOOLED_DATABASE_URL,
   GEMINI_API_KEY: process.env.GEMINI_API_KEY,
   SYSLOG_HOST: process.env.SYSLOG_HOST || "127.0.0.1",
   SYSLOG_PORT: process.env.SYSLOG_PORT || 514,
