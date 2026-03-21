@@ -7,6 +7,7 @@ description: Frontend components for rendering dynamic grid layouts.
 
 # Dashboard UI
 
+
 The Dashboard frontend (`apps/frontend/src/presentation/components/dashboardComponents`) uses **React Grid Layout** to provide a draggable, resizable canvas.
 
 ## Component Hierarchy

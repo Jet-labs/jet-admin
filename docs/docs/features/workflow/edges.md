@@ -4,6 +4,8 @@ sidebar_position: 4
 
 # 🔗 Edge Reference
 
+
+
 Edges define the causal and data flow relationships between nodes in the workflow graph. In Jet Admin, edges are more than just visual lines; they carry semantic meaning regarding execution paths (Success, Error, Branching).
 
 ## Edge Types

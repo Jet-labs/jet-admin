@@ -8,6 +8,11 @@ description: Complete guide to Widgets in Jet Admin. Widget types, configuration
 
 # Widgets - Complete Guide
 
+
+![Placeholder for Demo](/img/placeholder-widgets-overview.png)
+
+
+
 <div align="center">
 
 ### 📊 Data Visualization Components

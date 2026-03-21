@@ -1,5 +1,10 @@
 # Roles & Permissions
 
+
+![Placeholder for Demo](/img/placeholder-roles-index.png)
+
+
+
 Jet Admin uses a tenant-aware **role-based access control (RBAC)** model. Authentication answers **who** the caller is; roles and permissions answer **what** that caller can do inside a tenant.
 
 ## Core model

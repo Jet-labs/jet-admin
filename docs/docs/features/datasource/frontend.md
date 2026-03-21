@@ -6,6 +6,7 @@ description: Step-by-step guide on how to configure and manage your external Dat
 
 # Managing Connections (Datasource UI)
 
+
 The **Datasources UI** provides a centralized interface for adding, editing, and testing connections to your external systems. Connecting your data is the foundational step before building any internal tools, dashboards, or automation workflows in Jet Admin.
 
 ## Creating a New Datasource

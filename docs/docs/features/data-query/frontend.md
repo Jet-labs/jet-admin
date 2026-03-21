@@ -7,6 +7,7 @@ description: The SQL/API Query Editor interface.
 
 # DataQuery UI
 
+
 The **DataQuery Editor** (`apps/frontend/src/presentation/components/dataQueryComponents/dataQueryEditor.jsx`) is a sophisticated IDE-like environment for writing and testing queries.
 
 ## Component Architecture

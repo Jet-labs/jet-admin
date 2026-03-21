@@ -8,6 +8,7 @@ description: Complete overview of Jet Admin's actual features, modules, and capa
 
 # Jet Admin Platform Overview
 
+
 <div align="center">
 
 <img src="/img/logo.png" alt="Jet Admin Logo" width="200"/>

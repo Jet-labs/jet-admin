@@ -1,5 +1,10 @@
 # Users
 
+
+![Placeholder for Demo](/img/placeholder-users-index.png)
+
+
+
 The user system in Jet Admin combines **Firebase-based authentication** with backend-managed user and tenant records.
 
 This page focuses on the current implementation rather than older session/cookie-based descriptions.

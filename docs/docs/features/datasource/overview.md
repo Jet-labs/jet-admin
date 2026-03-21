@@ -8,6 +8,11 @@ description: Comprehensive guide to connecting and managing data sources in Jet 
 
 # Datasources - Complete Guide
 
+
+![Placeholder for Demo](/img/placeholder-datasource-overview.png)
+
+
+
 <div align="center">
 
 ### 🔌 Connect Your Data in Minutes

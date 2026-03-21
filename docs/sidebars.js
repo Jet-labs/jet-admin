@@ -36,6 +36,7 @@ const sidebars = {
       label: '🏛️ Architecture',
       collapsed: true,
       items: [
+        'architecture/system-overview',
         'architecture/backend-architecture',
         'architecture/frontend-architecture',
         'architecture/database-schema',
@@ -92,10 +93,34 @@ const sidebars = {
         },
         {
           type: 'category',
-          label: 'User Management',
+          label: 'User & Tenant Management',
           items: [
+            'features/tenant/tenant-overview',
+            'features/tenant/api-keys',
             'features/users/index',
             'features/roles/index',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Database Management',
+          items: [
+            'features/database/tables-schemas',
+            'features/database/triggers-notifications',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'Automation',
+          items: [
+            'features/cron-jobs/cron-jobs',
+          ],
+        },
+        {
+          type: 'category',
+          label: 'System & Security',
+          items: [
+            'features/audit/audit-overview',
           ],
         },
       ],
@@ -108,8 +133,10 @@ const sidebars = {
       collapsed: true,
       items: [
         'concepts/data-flow',
-        'concepts/workflow-architecture',
         'concepts/multi-tenancy',
+        'concepts/workflow-architecture',
+        'concepts/workflow-engine',
+        'concepts/widget-workflow-integration',
       ],
     },
 

@@ -8,6 +8,7 @@ description: Core architecture of the Jet Admin Workflow Engine.
 
 # Workflow Module
 
+
 The **Workflow Module** (`apps/backend/modules/workflow`) is the heart of automation in Jet Admin. It allows users to define business logic using a visual node-based editor and execute it asynchronously.
 
 ## Architecture

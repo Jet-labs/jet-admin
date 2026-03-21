@@ -7,6 +7,7 @@ description: Manages Dashboard creation, layout configuration, and cloning.
 
 # Dashboard Module
 
+
 The **Dashboard Module** (`apps/backend/modules/dashboard`) handles the lifecycle of Dashboards, which are containers for Widgets.
 
 ## Data Model

@@ -8,6 +8,11 @@ description: Complete guide to Data Queries in Jet Admin. Every field, parameter
 
 # Data Queries - Complete Guide
 
+
+![Placeholder for Demo](/img/placeholder-data-query-overview.png)
+
+
+
 <div align="center">
 
 ### 📝 Build and Execute Queries
