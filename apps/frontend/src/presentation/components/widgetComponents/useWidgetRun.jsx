@@ -217,6 +217,11 @@ export const useWidgetRun = ({
       // Filter by instanceID to avoid cross-talk on multi-widget dashboards
       if (nodeData.instanceID !== instanceID) return;
 
+      // Update context with real-time assembled context from orchestrator
+      if (nodeData.contextData) {
+        setWsContext(nodeData.contextData);
+      }
+
       const nodeId = nodeData.nodeID;
       if (nodeId && nodeData.status) {
         const nodeName = nodeData.nodeType || nodeId;

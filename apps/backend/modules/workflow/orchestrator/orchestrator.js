@@ -292,18 +292,39 @@ function _buildLogPayload({ nodeID, nodeType, outputVariable, output, status }) 
   return payload;
 }
 
+/**
+ * Strip internal/orchestrator keys from a context object before sending
+ * to the frontend. Keys prefixed with __ are internal bookkeeping
+ * (__node_*, __isTestRun, __workflowDefinition, __recoveryError, etc.)
+ *
+ * @param {object} context - Raw assembled context
+ * @returns {object} User-facing context with only domain keys
+ */
+function _stripInternalKeys(context) {
+  if (!context) return {};
+  return Object.fromEntries(
+    Object.entries(context).filter(([key]) => !key.startsWith('__'))
+  );
+}
+
 function _emitNodeProgress(instanceID, { nodeID, outputVariable, output, status, taskError, contextData }) {
+  // Build user-facing context (strip __node_*, __isTestRun, etc.)
+  const userContext = _stripInternalKeys(contextData);
+
+  // Emit to the workflow instance room — any subscriber gets real-time context
   socketIO.to(instanceID).emit(constants.SOCKET_EMIT_EVENTS.WORKFLOW_NODE_UPDATE, {
     instanceID, nodeID, status, output, error: taskError,
+    contextData: userContext,
   });
 
+  // Emit to registered widgets (processed data pipeline)
   widgetWorkflowBridge.emitContextUpdate(instanceID, {
     type: 'NODE_COMPLETE',
     nodeID,
     outputVariable,
     value: output?.[outputVariable] ?? output,
     status,
-    contextSnapshot: contextData,
+    contextSnapshot: userContext,
   });
 }
 
@@ -312,13 +333,15 @@ async function _finalizeWorkflow(instanceID, { output, currentContext }) {
 
   await stateManager.completeInstance(instanceID, finalStatus);
 
+  const userContext = _stripInternalKeys(currentContext);
+
   socketIO.to(instanceID).emit(constants.SOCKET_EMIT_EVENTS.WORKFLOW_STATUS_UPDATE, {
     instanceID,
     status: finalStatus,
-    contextData: currentContext,
+    contextData: userContext,
   });
 
-  widgetWorkflowBridge.emitWorkflowStatus(instanceID, finalStatus, currentContext);
+  widgetWorkflowBridge.emitWorkflowStatus(instanceID, finalStatus, userContext);
 
   Logger.log('success', { message: 'orchestrator:workflowCompleted', params: { instanceID } });
 }

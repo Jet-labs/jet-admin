@@ -68,6 +68,13 @@ const constants = {
     WIDGET_WORKFLOW_ERROR: "widget_workflow_error",
     WIDGET_WORKFLOW_DISCONNECTED: "widget_workflow_disconnected",
     WIDGET_INPUT_RECEIVED: "widget_input_received",
+    // Agent events (server → client)
+    AGENT_THINKING: "agent:thinking",
+    AGENT_APPROVAL_REQUIRED: "agent:approval_required",
+    AGENT_RESPONSE: "agent:response",
+    AGENT_ERROR: "agent:error",
+    AGENT_WIDGET_PROMOTED: "agent:widget_promoted",
+    AGENT_CANCELLED: "agent:cancelled",
   },
 
   SOCKET_RECEIVE_EVENTS: {
@@ -78,6 +85,13 @@ const constants = {
     WIDGET_SEND_INPUT: "widget_send_input",
     WIDGET_REFRESH: "widget_refresh",
     WIDGET_WORKFLOW_DISCONNECT: "widget_workflow_disconnect",
+    // Agent events (client → server)
+    AGENT_USER_MESSAGE: "agent:user_message",
+    AGENT_DATASOURCE_APPROVAL: "agent:datasource_approval",
+    AGENT_QUERY_APPROVAL: "agent:query_approval",
+    AGENT_PROMOTE_TO_WIDGET: "agent:promote_to_widget",
+    AGENT_FOLLOW_UP: "agent:follow_up",
+    AGENT_CANCEL: "agent:cancel",
   },
 
   SAMPLE_PLAN: {

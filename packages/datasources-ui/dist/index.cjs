@@ -40,62 +40,50 @@ var import_material2 = require("@mui/material");
 var import_react5 = __toESM(require("react"));
 
 // src/components/common/queryResponseJSONTab.js
-var import_codemirror_extensions_langs = require("@uiw/codemirror-extensions-langs");
-var import_codemirror_theme_github = require("@uiw/codemirror-theme-github");
-var import_react_codemirror = __toESM(require("@uiw/react-codemirror"));
-var import_prop_types = __toESM(require("prop-types"));
 var import_react = __toESM(require("react"));
+var import_ui = require("@jet-admin/ui");
+var import_prop_types = __toESM(require("prop-types"));
 var QueryResponseJSONTab = ({ data }) => {
   QueryResponseJSONTab.propTypes = {
     data: import_prop_types.default.object
   };
   return /* @__PURE__ */ import_react.default.createElement("div", { className: "w-100 flex-grow h-full overflow-y-auto pb-5" }, /* @__PURE__ */ import_react.default.createElement(
-    import_react_codemirror.default,
+    import_ui.CodeEditor,
     {
       value: JSON.stringify(data, null, 2),
-      extensions: [(0, import_codemirror_extensions_langs.loadLanguage)("json")],
-      theme: import_codemirror_theme_github.githubLight,
-      style: {
-        width: "100%",
-        borderWidth: 0,
-        borderBottomWidth: 1,
-        outline: "none"
-      },
-      className: "border-slate-300 focus:border-slate-300 focus:outline-slate-300 flex-grow non-focusable-code-editor !h-full"
+      language: "json",
+      readOnly: true,
+      showHeader: false,
+      height: "100%",
+      className: "rounded-none border-b border-t-0 border-x-0 !h-full border-slate-300"
     }
   ));
 };
 
 // src/components/common/queryResponseRawTab.js
-var import_codemirror_theme_github2 = require("@uiw/codemirror-theme-github");
-var import_react_codemirror2 = __toESM(require("@uiw/react-codemirror"));
 var import_react2 = __toESM(require("react"));
+var import_ui2 = require("@jet-admin/ui");
 var import_prop_types2 = __toESM(require("prop-types"));
 var QueryResponseRAWTab = ({ data }) => {
   QueryResponseRAWTab.propTypes = {
     data: import_prop_types2.default.object
   };
   return /* @__PURE__ */ import_react2.default.createElement("div", { className: "w-100 flex-grow h-full overflow-y-auto " }, /* @__PURE__ */ import_react2.default.createElement(
-    import_react_codemirror2.default,
+    import_ui2.CodeEditor,
     {
       value: JSON.stringify(data, null, 2),
-      theme: import_codemirror_theme_github2.githubLight,
-      style: {
-        width: "100%",
-        borderWidth: 0,
-        borderBottomWidth: 1,
-        outline: "none"
-      },
-      className: "border-slate-300 focus:border-slate-300 focus:outline-slate-300 flex-grow non-focusable-code-editor !h-full"
+      language: "json",
+      readOnly: true,
+      showHeader: false,
+      height: "100%",
+      className: "rounded-none border-b border-t-0 border-x-0 !h-full border-slate-300"
     }
   ));
 };
 
 // src/components/common/queryResponseSchemaTab.js
-var import_codemirror_extensions_langs2 = require("@uiw/codemirror-extensions-langs");
-var import_codemirror_theme_github3 = require("@uiw/codemirror-theme-github");
-var import_react_codemirror3 = __toESM(require("@uiw/react-codemirror"));
 var import_react3 = __toESM(require("react"));
+var import_ui3 = require("@jet-admin/ui");
 var import_styles = require("react-data-grid/lib/styles.css");
 var import_to_json_schema = __toESM(require("to-json-schema"));
 var import_prop_types3 = __toESM(require("prop-types"));
@@ -107,18 +95,14 @@ var QueryResponseSchemaTab = ({ data }) => {
     data ? data : { arrays: { mode: "all" } }
   );
   return /* @__PURE__ */ import_react3.default.createElement("div", { className: "w-100 flex-grow h-full overflow-y-auto " }, /* @__PURE__ */ import_react3.default.createElement(
-    import_react_codemirror3.default,
+    import_ui3.CodeEditor,
     {
       value: JSON.stringify(dataSchema, null, 2),
-      theme: import_codemirror_theme_github3.githubLight,
-      extensions: [(0, import_codemirror_extensions_langs2.loadLanguage)("json")],
-      style: {
-        width: "100%",
-        borderWidth: 0,
-        borderBottomWidth: 1,
-        outline: "none"
-      },
-      className: "border-slate-300 focus:border-slate-300 focus:outline-slate-300 flex-grow non-focusable-code-editor !h-full"
+      language: "json",
+      readOnly: true,
+      showHeader: false,
+      height: "100%",
+      className: "rounded-none border-b border-t-0 border-x-0 !h-full border-slate-300"
     }
   ));
 };

@@ -20,6 +20,8 @@ const NEXT_HANDLE = {
   // For loop nodes
   LOOP: 'loop',
   DONE: 'done',
+  // For delay & start nodes
+  OUTPUT: 'output',
 };
 
 // Node execution status (for logging)

@@ -16,6 +16,18 @@ const orchestrator = require('../workflow/orchestrator/orchestrator');
 /**
  * Widget Socket Controller
  */
+
+/**
+ * Strip internal orchestrator keys (prefixed with __) from context
+ * before sending to the frontend.
+ */
+function _stripInternalKeys(context) {
+  if (!context) return {};
+  return Object.fromEntries(
+    Object.entries(context).filter(([key]) => !key.startsWith('__'))
+  );
+}
+
 const widgetSocketController = {
 
   /**
@@ -121,7 +133,10 @@ const widgetSocketController = {
           }
 
           responseInstanceID = instanceID;
-          initialContext = instance.contextData;
+          // Assemble context from log entries and strip internal keys
+          const assembledCtx = await stateManager.assembleContext(instanceID);
+          initialContext = _stripInternalKeys(assembledCtx);
+          workflowMeta = { status: instance.status };
           
           Logger.log('info', {
             message: 'widgetSocketController:subscribedToInstance',
@@ -136,13 +151,15 @@ const widgetSocketController = {
             throw new Error('instanceID is required for replay mode');
           }
 
-          const instance = await stateManager.getInstance(instanceID);
-          if (!instance) {
+          const replayInstance = await stateManager.getInstance(instanceID);
+          if (!replayInstance) {
             throw new Error(`Instance ${instanceID} not found`);
           }
 
           responseInstanceID = instanceID;
-          initialContext = instance.contextData;
+          // Assemble context from log entries and strip internal keys
+          const replayCtx = await stateManager.assembleContext(instanceID);
+          initialContext = _stripInternalKeys(replayCtx);
           
           // Process initial context for widget if config provided
           let processedData = null;
@@ -158,16 +175,16 @@ const widgetSocketController = {
           socket.emit('widget_workflow_connected', {
             widgetID,
             instanceID: responseInstanceID,
-            workflowID: instance.workflowID,
+            workflowID: replayInstance.workflowID,
             mode: 'replay',
             initialContext,
             processedData,
-            workflowStatus: instance.status,
+            workflowStatus: replayInstance.status,
           });
           
           Logger.log('info', {
             message: 'widgetSocketController:replayMode',
-            params: { widgetID, instanceID, status: instance.status },
+            params: { widgetID, instanceID, status: replayInstance.status },
           });
           return; // Don't register for live updates
         }

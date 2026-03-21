@@ -3,6 +3,7 @@ const constants = require("../../../constants");
 const Logger = require("../../../utils/logger");
 const {v4: uuid } = require("uuid");
 const { aiController } = require("../ai.controller");
+const { agentController } = require("../agent/agentController");
 const { Socket } = require("socket.io");
 
 
@@ -117,6 +118,83 @@ aiSocketController.unsubscribeUserFromChatRoom = async ({
        });
      }
    };
-  
 
-module.exports = { aiSocketController };
+// ============================================================
+// Agent Socket Handlers
+// ============================================================
+
+/**
+ * Handle agent user message — starts or continues an agent session
+ */
+aiSocketController.onAgentUserMessage = async ({
+  socket,
+  chatRoomID,
+  tenantID,
+  userID,
+  message,
+}) => {
+  await agentController.handleUserMessage({ socket, chatRoomID, tenantID, userID, message });
+};
+
+/**
+ * Handle datasource approval from user
+ */
+aiSocketController.onAgentDatasourceApproval = async ({
+  socket,
+  chatRoomID,
+  tenantID,
+  userID,
+  approvedIDs,
+}) => {
+  await agentController.handleDatasourceApproval({ socket, chatRoomID, tenantID, userID, approvedIDs });
+};
+
+/**
+ * Handle query approval from user
+ */
+aiSocketController.onAgentQueryApproval = async ({
+  socket,
+  chatRoomID,
+  tenantID,
+  userID,
+}) => {
+  await agentController.handleQueryApproval({ socket, chatRoomID, tenantID, userID });
+};
+
+/**
+ * Handle promote to widget request
+ */
+aiSocketController.onAgentPromoteToWidget = async ({
+  socket,
+  chatRoomID,
+  tenantID,
+  userID,
+  widgetTitle,
+}) => {
+  await agentController.handlePromoteToWidget({ socket, chatRoomID, tenantID, userID, widgetTitle });
+};
+
+/**
+ * Handle follow-up question
+ */
+aiSocketController.onAgentFollowUp = async ({
+  socket,
+  chatRoomID,
+  tenantID,
+  userID,
+  message,
+}) => {
+  await agentController.handleFollowUp({ socket, chatRoomID, tenantID, userID, message });
+};
+
+/**
+ * Handle agent cancellation
+ */
+aiSocketController.onAgentCancel = async ({
+  socket,
+  chatRoomID,
+}) => {
+  agentController.handleCancel({ socket, chatRoomID });
+};
+
+module.exports = { aiSocketController };

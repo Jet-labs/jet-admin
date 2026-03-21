@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { CodeEditorField } from "../ui/codeEditorField";
+import { CodeEditor } from "@jet-admin/ui";
 import PropTypes from "prop-types";
 import { CONSTANTS } from "../../../constants";
 
@@ -50,19 +50,24 @@ export const DatabaseTableGridJSONEditor = ({
           </DialogTitle>
         </DialogHeader>
         <div>
-          <CodeEditorField
-            code={JSON.stringify(jsonValue, null, 2)}
-            setCode={(newValue) => {
-              try {
-                const parsedValue = JSON.parse(newValue);
-                setJsonValue(parsedValue);
-              } catch (error) {
-                console.error("Invalid JSON:", error);
-              }
-            }}
-            language="json"
-            height="400px"
-          />
+          <div className="border border-border focus-within:ring-1 focus-within:ring-ring rounded-md overflow-hidden min-w-[300px]">
+            <CodeEditor
+              value={JSON.stringify(jsonValue, null, 2)}
+              onChange={(newValue) => {
+                try {
+                  const parsedValue = JSON.parse(newValue);
+                  setJsonValue(parsedValue);
+                } catch (error) {
+                  // Wait for valid JSON
+                }
+              }}
+              language="json"
+              height={400}
+              className="border-0 shadow-none rounded-none"
+              showHeader={false}
+              showLineNumbers={false}
+            />
+          </div>
         </div>
         <DialogFooter className="gap-2">
           <Button

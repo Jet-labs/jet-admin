@@ -92,12 +92,10 @@ export const useWorkflowRun = ({ tenantID }) => {
                         [nodeId]: status,
                     }));
 
-                    // Update workflow context with node output
-                    if (data.output !== undefined) {
-                        setContext(prev => ({
-                            ...prev,
-                            [nodeId]: data.output,
-                        }));
+                    // Update workflow context with assembled context from orchestrator
+                    // This gives a flat, consistent shape: { input: {}, queryResult: [...], ... }
+                    if (data.contextData) {
+                        setContext(data.contextData);
                     }
 
                     // Log the node update

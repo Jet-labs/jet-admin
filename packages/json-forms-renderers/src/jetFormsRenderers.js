@@ -3,8 +3,7 @@ import {
   JetTextControl,
   JetSelectControl,
   JetCheckboxControl,
-  JetCodePgsqlControl,
-  JetCodeJavascriptControl,
+  JetCodeEditorControl,
   JetSuggestionControl,
   JetDynamicArgsControl,
   JetKeyValueArrayControl,
@@ -23,8 +22,7 @@ import {
   textInputTester,
   selectInputTester,
   checkboxTester,
-  codePgsqlTester,
-  codeJavascriptTester,
+  codeEditorTester,
   suggestionInputTester,
   dynamicArgsTester,
   keyValueArrayTester,
@@ -64,8 +62,7 @@ export const jetFormsBaseRenderers = [
  */
 export const jetFormsRenderers = [
   { tester: suggestionInputTester, renderer: JetSuggestionControl },
-  { tester: codePgsqlTester, renderer: JetCodePgsqlControl },
-  { tester: codeJavascriptTester, renderer: JetCodeJavascriptControl },
+  { tester: codeEditorTester, renderer: JetCodeEditorControl },
   { tester: dynamicArgsTester, renderer: JetDynamicArgsControl },
   ...jetFormsBaseRenderers,
 ];

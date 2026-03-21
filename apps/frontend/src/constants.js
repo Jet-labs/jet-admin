@@ -32,6 +32,15 @@ export const CONSTANTS = {
     AI_CHAT_ROOM_DISCONNECT: "ai_chat_room_disconnect",
     AI_CHAT_ROOM_ID: "ai_chat_room_id",
     AI_CHAT_USER_MESSAGE: "ai_chat_user_message",
+
+    // Agentic AI events
+    AGENT_USER_MESSAGE: "agent:user_message",
+    AGENT_DATASOURCE_APPROVAL: "agent:datasource_approval",
+    AGENT_QUERY_APPROVAL: "agent:query_approval",
+    AGENT_PROMOTE_TO_WIDGET: "agent:promote_to_widget",
+    AGENT_FOLLOW_UP: "agent:follow_up",
+    AGENT_CANCEL: "agent:cancel",
+
     // Widget-Workflow integration events (send to server)
     WIDGET_WORKFLOW_CONNECT: "widget_workflow_connect",
     WIDGET_SEND_INPUT: "widget_send_input",
@@ -41,6 +50,15 @@ export const CONSTANTS = {
 
   SOCKET_RECEIVE_EVENTS: {
     AI_CHAT_BOT_MESSAGE: "ai_chat_bot_message",
+
+    // Agentic AI events
+    AGENT_THINKING: "agent:thinking",
+    AGENT_APPROVAL_REQUIRED: "agent:approval_required",
+    AGENT_RESPONSE: "agent:response",
+    AGENT_ERROR: "agent:error",
+    AGENT_WIDGET_PROMOTED: "agent:widget_promoted",
+    AGENT_CANCELLED: "agent:cancelled",
+
     // Widget-Workflow integration events (receive from server)
     WIDGET_WORKFLOW_CONNECTED: "widget_workflow_connected",
     WIDGET_CONTEXT_UPDATE: "widget_context_update",

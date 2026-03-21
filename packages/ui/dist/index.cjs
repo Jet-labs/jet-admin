@@ -56,6 +56,7 @@ __export(index_exports, {
   CardHeader: () => CardHeader,
   CardTitle: () => CardTitle,
   Checkbox: () => Checkbox,
+  CodeEditor: () => CodeEditor,
   CollapseComponent: () => CollapseComponent,
   Dialog: () => Dialog,
   DialogClose: () => DialogClose,
@@ -1076,4 +1077,509 @@ var CollapseComponent = ({
     )
   );
 };
+
+// src/components/code-editor.jsx
+var React23 = __toESM(require("react"));
+var import_react2 = __toESM(require("@monaco-editor/react"));
+
+// src/components/github-light.json
+var github_light_default = {
+  base: "vs",
+  inherit: true,
+  rules: [
+    {
+      background: "ffffff",
+      token: ""
+    },
+    {
+      foreground: "6a737d",
+      token: "comment"
+    },
+    {
+      foreground: "6a737d",
+      token: "punctuation.definition.comment"
+    },
+    {
+      foreground: "6a737d",
+      token: "string.comment"
+    },
+    {
+      foreground: "005cc5",
+      token: "constant"
+    },
+    {
+      foreground: "005cc5",
+      token: "entity.name.constant"
+    },
+    {
+      foreground: "005cc5",
+      token: "variable.other.constant"
+    },
+    {
+      foreground: "005cc5",
+      token: "variable.language"
+    },
+    {
+      foreground: "6f42c1",
+      token: "entity"
+    },
+    {
+      foreground: "6f42c1",
+      token: "entity.name"
+    },
+    {
+      foreground: "24292e",
+      token: "variable.parameter.function"
+    },
+    {
+      foreground: "22863a",
+      token: "entity.name.tag"
+    },
+    {
+      foreground: "d73a49",
+      token: "keyword"
+    },
+    {
+      foreground: "d73a49",
+      token: "storage"
+    },
+    {
+      foreground: "d73a49",
+      token: "storage.type"
+    },
+    {
+      foreground: "24292e",
+      token: "storage.modifier.package"
+    },
+    {
+      foreground: "24292e",
+      token: "storage.modifier.import"
+    },
+    {
+      foreground: "24292e",
+      token: "storage.type.java"
+    },
+    {
+      foreground: "032f62",
+      token: "string"
+    },
+    {
+      foreground: "032f62",
+      token: "punctuation.definition.string"
+    },
+    {
+      foreground: "032f62",
+      token: "string punctuation.section.embedded source"
+    },
+    {
+      foreground: "005cc5",
+      token: "support"
+    },
+    {
+      foreground: "005cc5",
+      token: "meta.property-name"
+    },
+    {
+      foreground: "e36209",
+      token: "variable"
+    },
+    {
+      foreground: "24292e",
+      token: "variable.other"
+    },
+    {
+      foreground: "b31d28",
+      fontStyle: "bold italic underline",
+      token: "invalid.broken"
+    },
+    {
+      foreground: "b31d28",
+      fontStyle: "bold italic underline",
+      token: "invalid.deprecated"
+    },
+    {
+      foreground: "fafbfc",
+      background: "b31d28",
+      fontStyle: "italic underline",
+      token: "invalid.illegal"
+    },
+    {
+      foreground: "fafbfc",
+      background: "d73a49",
+      fontStyle: "italic underline",
+      token: "carriage-return"
+    },
+    {
+      foreground: "b31d28",
+      fontStyle: "bold italic underline",
+      token: "invalid.unimplemented"
+    },
+    {
+      foreground: "b31d28",
+      token: "message.error"
+    },
+    {
+      foreground: "24292e",
+      token: "string source"
+    },
+    {
+      foreground: "005cc5",
+      token: "string variable"
+    },
+    {
+      foreground: "032f62",
+      token: "source.regexp"
+    },
+    {
+      foreground: "032f62",
+      token: "string.regexp"
+    },
+    {
+      foreground: "032f62",
+      token: "string.regexp.character-class"
+    },
+    {
+      foreground: "032f62",
+      token: "string.regexp constant.character.escape"
+    },
+    {
+      foreground: "032f62",
+      token: "string.regexp source.ruby.embedded"
+    },
+    {
+      foreground: "032f62",
+      token: "string.regexp string.regexp.arbitrary-repitition"
+    },
+    {
+      foreground: "22863a",
+      fontStyle: "bold",
+      token: "string.regexp constant.character.escape"
+    },
+    {
+      foreground: "005cc5",
+      token: "support.constant"
+    },
+    {
+      foreground: "005cc5",
+      token: "support.variable"
+    },
+    {
+      foreground: "005cc5",
+      token: "meta.module-reference"
+    },
+    {
+      foreground: "735c0f",
+      token: "markup.list"
+    },
+    {
+      foreground: "005cc5",
+      fontStyle: "bold",
+      token: "markup.heading"
+    },
+    {
+      foreground: "005cc5",
+      fontStyle: "bold",
+      token: "markup.heading entity.name"
+    },
+    {
+      foreground: "22863a",
+      token: "markup.quote"
+    },
+    {
+      foreground: "24292e",
+      fontStyle: "italic",
+      token: "markup.italic"
+    },
+    {
+      foreground: "24292e",
+      fontStyle: "bold",
+      token: "markup.bold"
+    },
+    {
+      foreground: "005cc5",
+      token: "markup.raw"
+    },
+    {
+      foreground: "b31d28",
+      background: "ffeef0",
+      token: "markup.deleted"
+    },
+    {
+      foreground: "b31d28",
+      background: "ffeef0",
+      token: "meta.diff.header.from-file"
+    },
+    {
+      foreground: "b31d28",
+      background: "ffeef0",
+      token: "punctuation.definition.deleted"
+    },
+    {
+      foreground: "22863a",
+      background: "f0fff4",
+      token: "markup.inserted"
+    },
+    {
+      foreground: "22863a",
+      background: "f0fff4",
+      token: "meta.diff.header.to-file"
+    },
+    {
+      foreground: "22863a",
+      background: "f0fff4",
+      token: "punctuation.definition.inserted"
+    },
+    {
+      foreground: "e36209",
+      background: "ffebda",
+      token: "markup.changed"
+    },
+    {
+      foreground: "e36209",
+      background: "ffebda",
+      token: "punctuation.definition.changed"
+    },
+    {
+      foreground: "f6f8fa",
+      background: "005cc5",
+      token: "markup.ignored"
+    },
+    {
+      foreground: "f6f8fa",
+      background: "005cc5",
+      token: "markup.untracked"
+    },
+    {
+      foreground: "6f42c1",
+      fontStyle: "bold",
+      token: "meta.diff.range"
+    },
+    {
+      foreground: "005cc5",
+      token: "meta.diff.header"
+    },
+    {
+      foreground: "005cc5",
+      fontStyle: "bold",
+      token: "meta.separator"
+    },
+    {
+      foreground: "005cc5",
+      token: "meta.output"
+    },
+    {
+      foreground: "586069",
+      token: "brackethighlighter.tag"
+    },
+    {
+      foreground: "586069",
+      token: "brackethighlighter.curly"
+    },
+    {
+      foreground: "586069",
+      token: "brackethighlighter.round"
+    },
+    {
+      foreground: "586069",
+      token: "brackethighlighter.square"
+    },
+    {
+      foreground: "586069",
+      token: "brackethighlighter.angle"
+    },
+    {
+      foreground: "586069",
+      token: "brackethighlighter.quote"
+    },
+    {
+      foreground: "b31d28",
+      token: "brackethighlighter.unmatched"
+    },
+    {
+      foreground: "b31d28",
+      token: "sublimelinter.mark.error"
+    },
+    {
+      foreground: "e36209",
+      token: "sublimelinter.mark.warning"
+    },
+    {
+      foreground: "959da5",
+      token: "sublimelinter.gutter-mark"
+    },
+    {
+      foreground: "032f62",
+      fontStyle: "underline",
+      token: "constant.other.reference.link"
+    },
+    {
+      foreground: "032f62",
+      fontStyle: "underline",
+      token: "string.other.link"
+    }
+  ],
+  colors: {
+    "editor.foreground": "#24292e",
+    "editor.background": "#ffffff",
+    "editor.selectionBackground": "#c8c8fa",
+    "editor.inactiveSelectionBackground": "#fafbfc",
+    "editor.lineHighlightBackground": "#fafbfc",
+    "editorCursor.foreground": "#24292e",
+    "editorWhitespace.foreground": "#959da5",
+    "editorIndentGuide.background": "#959da5",
+    "editorIndentGuide.activeBackground": "#24292e",
+    "editor.selectionHighlightBorder": "#fafbfc"
+  }
+};
+
+// src/components/code-editor.jsx
+var import_lucide_react8 = require("lucide-react");
+var CodeEditor = React23.forwardRef(({
+  value,
+  defaultValue,
+  onChange,
+  language = "json",
+  height = 300,
+  disabled = false,
+  readOnly = false,
+  theme = "github-light",
+  className,
+  title,
+  titleIcon,
+  showHeader = true,
+  showFormatButton = true,
+  showExpandButton = true,
+  showLineNumbers = true,
+  headerExtra,
+  headerLeft,
+  status,
+  // "valid" | "error" | null
+  statusMessage,
+  footerHint,
+  onMount,
+  beforeMount,
+  editorOptions = {},
+  ...props
+}, ref) => {
+  const [isExpanded, setIsExpanded] = React23.useState(false);
+  const internalEditorRef = React23.useRef(null);
+  const monacoRef = React23.useRef(null);
+  const isReadOnly = disabled || readOnly;
+  const handleEditorWillMount = (monaco) => {
+    monaco.editor.defineTheme("github-light", github_light_default);
+    if (beforeMount) {
+      beforeMount(monaco);
+    }
+  };
+  const handleEditorDidMount = (editor, monaco) => {
+    internalEditorRef.current = editor;
+    monacoRef.current = monaco;
+    if (typeof ref === "function") {
+      ref({ editor, monaco });
+    } else if (ref) {
+      ref.current = { editor, monaco };
+    }
+    if (onMount) {
+      onMount(editor, monaco);
+    }
+  };
+  const handleFormat = () => {
+    if (internalEditorRef.current) {
+      internalEditorRef.current.getAction("editor.action.formatDocument")?.run();
+    }
+  };
+  React23.useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === "Escape" && isExpanded) {
+        setIsExpanded(false);
+      }
+    };
+    if (isExpanded) {
+      document.addEventListener("keydown", handleEsc);
+    }
+    return () => document.removeEventListener("keydown", handleEsc);
+  }, [isExpanded]);
+  return /* @__PURE__ */ React23.createElement(
+    "div",
+    {
+      className: cn(
+        "flex flex-col overflow-hidden rounded-md border text-sm shadow-sm transition-colors",
+        status === "error" ? "border-destructive/50 ring-1 ring-destructive/20" : "border-border hover:border-border/80",
+        isExpanded ? "fixed inset-4 z-50 rounded-lg shadow-2xl ring-1 ring-border/50 bg-background" : "relative bg-background",
+        className
+      ),
+      ...props
+    },
+    showHeader && /* @__PURE__ */ React23.createElement("div", { className: "flex min-h-[36px] flex-wrap items-center justify-between gap-2 border-b border-border bg-muted/40 px-3 py-1.5" }, /* @__PURE__ */ React23.createElement("div", { className: "flex items-center gap-3" }, (title || titleIcon) && /* @__PURE__ */ React23.createElement("div", { className: "flex items-center gap-1.5 font-medium text-foreground" }, titleIcon ? titleIcon : /* @__PURE__ */ React23.createElement(import_lucide_react8.Code, { className: "h-3.5 w-3.5 text-primary" }), title && /* @__PURE__ */ React23.createElement("span", { className: "text-xs" }, title)), status && /* @__PURE__ */ React23.createElement("span", { className: cn(
+      "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide",
+      status === "valid" ? "bg-green-100 text-green-700 border border-green-200" : status === "error" ? "bg-red-100 text-red-700 border border-red-200" : ""
+    ) }, status === "valid" ? /* @__PURE__ */ React23.createElement(import_lucide_react8.CheckCircle2, { className: "h-3 w-3" }) : /* @__PURE__ */ React23.createElement(import_lucide_react8.AlertTriangle, { className: "h-3 w-3" }), status === "valid" ? "Valid" : "Invalid"), headerLeft), /* @__PURE__ */ React23.createElement("div", { className: "flex items-center gap-1.5" }, headerExtra, showFormatButton && !isReadOnly && /* @__PURE__ */ React23.createElement(
+      "button",
+      {
+        type: "button",
+        onClick: handleFormat,
+        className: "inline-flex h-6 items-center gap-1.5 rounded-sm border border-transparent px-2 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground hover:border-border/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+        title: "Format Code (Shift+Alt+F)"
+      },
+      /* @__PURE__ */ React23.createElement(import_lucide_react8.Braces, { className: "h-3 w-3" }),
+      "Format"
+    ), showExpandButton && /* @__PURE__ */ React23.createElement(
+      "button",
+      {
+        type: "button",
+        onClick: () => setIsExpanded(!isExpanded),
+        className: "inline-flex h-6 w-6 items-center justify-center rounded-sm border border-transparent text-muted-foreground transition-colors hover:bg-muted hover:text-foreground hover:border-border/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring",
+        title: isExpanded ? "Exit fullscreen (Esc)" : "Fullscreen"
+      },
+      isExpanded ? /* @__PURE__ */ React23.createElement(import_lucide_react8.Minimize2, { className: "h-3 w-3" }) : /* @__PURE__ */ React23.createElement(import_lucide_react8.Maximize2, { className: "h-3 w-3" })
+    ))),
+    /* @__PURE__ */ React23.createElement("div", { className: "relative flex-1" }, /* @__PURE__ */ React23.createElement(
+      import_react2.default,
+      {
+        height: isExpanded ? "calc(100vh - 80px)" : height,
+        language,
+        value,
+        defaultValue,
+        onChange,
+        beforeMount: handleEditorWillMount,
+        onMount: handleEditorDidMount,
+        theme: theme === "github-light" ? "github-light" : "vs",
+        options: {
+          readOnly: isReadOnly,
+          minimap: { enabled: isExpanded },
+          fontSize: 12,
+          fontFamily: "ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace",
+          lineNumbers: showLineNumbers ? "on" : "off",
+          scrollBeyondLastLine: false,
+          wordWrap: "on",
+          wrappingStrategy: "advanced",
+          automaticLayout: true,
+          formatOnPaste: true,
+          formatOnType: true,
+          tabSize: 2,
+          insertSpaces: true,
+          quickSuggestions: { other: true, comments: false, strings: true },
+          suggestOnTriggerCharacters: true,
+          acceptSuggestionOnEnter: "on",
+          snippetSuggestions: "inline",
+          padding: { top: 8, bottom: 8 },
+          folding: true,
+          foldingStrategy: "indentation",
+          showFoldingControls: "always",
+          bracketPairColorization: { enabled: true },
+          lineNumbersMinChars: 3,
+          glyphMargin: false,
+          overviewRulerLanes: 0,
+          scrollbar: {
+            verticalScrollbarSize: 8,
+            horizontalScrollbarSize: 8
+          },
+          ...editorOptions
+        }
+      }
+    ), footerHint && /* @__PURE__ */ React23.createElement("div", { className: "absolute bottom-2 right-4 z-10 pointer-events-none rounded-md border border-border/50 bg-background/95 px-2 py-1 text-[10px] text-muted-foreground shadow-sm backdrop-blur-sm" }, footerHint)),
+    status === "error" && statusMessage && /* @__PURE__ */ React23.createElement("div", { className: "flex items-start gap-2 border-t border-destructive/20 bg-destructive/5 px-3 py-2 text-[11px] text-destructive" }, /* @__PURE__ */ React23.createElement(import_lucide_react8.AlertTriangle, { className: "mt-0.5 h-3.5 w-3.5 shrink-0" }), /* @__PURE__ */ React23.createElement("span", { className: "font-medium whitespace-pre-wrap leading-relaxed" }, statusMessage))
+  );
+});
+CodeEditor.displayName = "CodeEditor";
 //# sourceMappingURL=index.cjs.map

@@ -1,46 +1,75 @@
-// eslint-disable-next-line no-unused-vars
 import { Socket } from "socket.io-client";
 import { CONSTANTS } from "../../constants";
 
 /**
- * 
+ * Sends a message to the agentic AI backend.
  * @param {Socket} socket 
- * @param {function} onConnected
+ * @param {Object} payload 
+ * @param {string} payload.chatRoomID
+ * @param {string} payload.tenantID
+ * @param {string} payload.message
  */
-export const connectToAIChatSocket = async(socket) => {
-    try{
-        await socket.emit(CONSTANTS.SOCKET_EMIT_EVENTS.AI_CHAT_ROOM_JOIN);
-    }catch(error){
-        console.log(error);
-        throw error;
-    }
-};
-
-/**
- * 
- * @param {Socket} socket 
- * @param {string} onDisconnect
- */
-export const disconnectFromAIChatSocket = async(socket) => {
+export const sendAgentUserMessage = async(socket, payload) => {
     try {
-      await socket.emit(CONSTANTS.SOCKET_EMIT_EVENTS.AI_CHAT_ROOM_DISCONNECT);
+      await socket.emit(CONSTANTS.SOCKET_EMIT_EVENTS.AGENT_USER_MESSAGE, payload);
     } catch (error) {
-      console.log(error);
+      console.error(error);
       throw error;
     }
 };
 
 /**
- * 
+ * Sends datasource approval to the agent.
  * @param {Socket} socket 
- * @param {string} message 
- * @param {string} roomId 
+ * @param {Object} payload 
  */
-export const sendAIChatMessage = async(socket, message, roomId) => {
+export const sendAgentDatasourceApproval = async(socket, payload) => {
     try {
-      await socket.emit(CONSTANTS.SOCKET_EMIT_EVENTS.AI_CHAT_USER_MESSAGE, { message, roomId });
+      await socket.emit(CONSTANTS.SOCKET_EMIT_EVENTS.AGENT_DATASOURCE_APPROVAL, payload);
     } catch (error) {
-      console.log(error);
+      console.error(error);
       throw error;
     }
 };
+
+/**
+ * Sends query execution approval to the agent.
+ * @param {Socket} socket 
+ * @param {Object} payload 
+ */
+export const sendAgentQueryApproval = async(socket, payload) => {
+    try {
+      await socket.emit(CONSTANTS.SOCKET_EMIT_EVENTS.AGENT_QUERY_APPROVAL, payload);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+};
+
+/**
+ * Sends request to promote agent thread to a widget.
+ * @param {Socket} socket 
+ * @param {Object} payload 
+ */
+export const sendAgentPromoteToWidget = async(socket, payload) => {
+    try {
+      await socket.emit(CONSTANTS.SOCKET_EMIT_EVENTS.AGENT_PROMOTE_TO_WIDGET, payload);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+};
+
+/**
+ * Cancels an ongoing agent request.
+ * @param {Socket} socket 
+ * @param {Object} payload 
+ */
+export const sendAgentCancel = async(socket, payload) => {
+    try {
+      await socket.emit(CONSTANTS.SOCKET_EMIT_EVENTS.AGENT_CANCEL, payload);
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+};

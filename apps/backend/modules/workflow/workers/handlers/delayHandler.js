@@ -33,9 +33,11 @@ async function execute(nodeConfig, context, helpers) {
     
     // KEY: Return queueDelay - next node will be queued with this delay
     // This is NON-BLOCKING - no thread waiting!
+    // NOTE: nextHandle must be 'output' to match the delay node's
+    //       React Flow Handle id="output" (sourceHandle on edges).
     return {
       output,
-      nextHandle: NEXT_HANDLE.SUCCESS,
+      nextHandle: NEXT_HANDLE.OUTPUT,
       queueDelay: totalDelayMs,
     };
   } catch (error) {

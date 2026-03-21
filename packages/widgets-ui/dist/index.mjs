@@ -171,7 +171,7 @@ var init_vega = __esm({
 // src/table/tableWidget.jsx
 import React10, { useMemo as useMemo5, useState as useState8 } from "react";
 import PropTypes9 from "prop-types";
-import { Button as Button9 } from "@jet-admin/ui";
+import { Button as Button8 } from "@jet-admin/ui";
 import {
   MdChevronLeft,
   MdChevronRight,
@@ -252,7 +252,7 @@ var init_tableWidget = __esm({
           row[col.key] != null ? String(row[col.key]) : "\u2014"
         ))
       ))))), paginationConfig && /* @__PURE__ */ React10.createElement("div", { className: "flex items-center justify-between px-3 py-2 border-t bg-muted/20 gap-4 flex-shrink-0" }, /* @__PURE__ */ React10.createElement("span", { className: "text-xs text-muted-foreground" }, totalRows, " total row", totalRows !== 1 ? "s" : ""), /* @__PURE__ */ React10.createElement("div", { className: "flex items-center gap-1" }, /* @__PURE__ */ React10.createElement("span", { className: "text-xs text-muted-foreground mr-2" }, "Page ", currentPage, " of ", totalPages), /* @__PURE__ */ React10.createElement(
-        Button9,
+        Button8,
         {
           variant: "ghost",
           size: "icon",
@@ -262,7 +262,7 @@ var init_tableWidget = __esm({
         },
         /* @__PURE__ */ React10.createElement(MdFirstPage, { className: "text-base" })
       ), /* @__PURE__ */ React10.createElement(
-        Button9,
+        Button8,
         {
           variant: "ghost",
           size: "icon",
@@ -272,7 +272,7 @@ var init_tableWidget = __esm({
         },
         /* @__PURE__ */ React10.createElement(MdChevronLeft, { className: "text-base" })
       ), /* @__PURE__ */ React10.createElement(
-        Button9,
+        Button8,
         {
           variant: "ghost",
           size: "icon",
@@ -282,7 +282,7 @@ var init_tableWidget = __esm({
         },
         /* @__PURE__ */ React10.createElement(MdChevronRight, { className: "text-base" })
       ), /* @__PURE__ */ React10.createElement(
-        Button9,
+        Button8,
         {
           variant: "ghost",
           size: "icon",
@@ -305,7 +305,7 @@ var init_tableWidget = __esm({
 // src/table/tableConfigEditor.jsx
 import React11, { useMemo as useMemo6 } from "react";
 import PropTypes10 from "prop-types";
-import { Input as Input5, Label as Label4, Switch as Switch2, Button as Button10, Select as Select3, SelectContent as SelectContent3, SelectItem as SelectItem3, SelectTrigger as SelectTrigger3, SelectValue as SelectValue3 } from "@jet-admin/ui";
+import { Input as Input5, Label as Label4, Switch as Switch2, Button as Button9, Select as Select3, SelectContent as SelectContent3, SelectItem as SelectItem3, SelectTrigger as SelectTrigger3, SelectValue as SelectValue3 } from "@jet-admin/ui";
 import { MdDeleteOutline, MdAdd, MdArrowUpward, MdArrowDownward, MdAutoAwesome } from "react-icons/md";
 import { FiZap as FiZap2, FiInfo } from "react-icons/fi";
 var collectArrayPaths2, collectScalarPaths, TableConfigEditor;
@@ -484,7 +484,7 @@ var init_tableConfigEditor = __esm({
           placeholder: arg.description || `Value for ${arg.name}`
         }
       )), /* @__PURE__ */ React11.createElement("span", { className: "text-[0.6rem] text-muted-foreground pb-2" }, arg.type))))), /* @__PURE__ */ React11.createElement("div", { className: "space-y-2 pt-4" }, /* @__PURE__ */ React11.createElement("div", { className: "flex justify-between items-center" }, /* @__PURE__ */ React11.createElement(Label4, { className: "text-xs font-medium text-foreground" }, "Columns"), /* @__PURE__ */ React11.createElement("div", { className: "flex gap-1" }, currentArrayInfo && /* @__PURE__ */ React11.createElement(
-        Button10,
+        Button9,
         {
           type: "button",
           variant: "outline",
@@ -496,7 +496,7 @@ var init_tableConfigEditor = __esm({
         /* @__PURE__ */ React11.createElement(MdAutoAwesome, { className: "mr-1 text-amber-500" }),
         " Auto-detect"
       ), /* @__PURE__ */ React11.createElement(
-        Button10,
+        Button9,
         {
           type: "button",
           variant: "outline",
@@ -513,7 +513,7 @@ var init_tableConfigEditor = __esm({
           className: "flex items-end gap-1.5 p-2 border rounded-md bg-muted/30"
         },
         /* @__PURE__ */ React11.createElement("div", { className: "flex flex-col gap-0.5 pb-0.5" }, /* @__PURE__ */ React11.createElement(
-          Button10,
+          Button9,
           {
             type: "button",
             variant: "ghost",
@@ -525,7 +525,7 @@ var init_tableConfigEditor = __esm({
           },
           /* @__PURE__ */ React11.createElement(MdArrowUpward, { className: "text-xs" })
         ), /* @__PURE__ */ React11.createElement(
-          Button10,
+          Button9,
           {
             type: "button",
             variant: "ghost",
@@ -556,7 +556,7 @@ var init_tableConfigEditor = __esm({
           }
         )),
         /* @__PURE__ */ React11.createElement(
-          Button10,
+          Button9,
           {
             type: "button",
             variant: "ghost",
@@ -676,7 +676,7 @@ var init_buttonConfigEditor = __esm({
 // src/button/buttonWidget.jsx
 import React13 from "react";
 import PropTypes12 from "prop-types";
-import { Button as Button11, Spinner } from "@jet-admin/ui";
+import { Button as Button10, Spinner } from "@jet-admin/ui";
 var ButtonWidget;
 var init_buttonWidget = __esm({
   "src/button/buttonWidget.jsx"() {
@@ -696,7 +696,7 @@ var init_buttonWidget = __esm({
       const variant = widgetConfig?.variant || "default";
       const size = widgetConfig?.size || "default";
       return /* @__PURE__ */ React13.createElement("div", { className: "flex w-full h-full items-center justify-center p-4 text-center" }, /* @__PURE__ */ React13.createElement(
-        Button11,
+        Button10,
         {
           variant,
           size,
@@ -920,7 +920,7 @@ var parseStyle = (spec) => {
 
 // src/vega/vegaConfigEditor.jsx
 import {
-  Button as Button8,
+  Button as Button7,
   Dialog as Dialog2,
   DialogContent as DialogContent2,
   DialogHeader as DialogHeader2,
@@ -931,11 +931,15 @@ import {
 } from "@jet-admin/ui";
 
 // src/vega/vegaSpecEditor.jsx
-import React3, { useState as useState3, useCallback as useCallback3, useMemo as useMemo2, useRef as useRef2, useEffect as useEffect2 } from "react";
+import React3, { useState as useState3, useCallback as useCallback3, useRef as useRef2, useEffect as useEffect2, useMemo as useMemo2 } from "react";
 import PropTypes2 from "prop-types";
-import { FaCode, FaChartBar, FaChartLine, FaChartPie, FaExpand, FaCompress, FaCheckCircle, FaExclamationTriangle } from "react-icons/fa";
+import {
+  FaCode,
+  FaChartBar,
+  FaChartLine,
+  FaChartPie
+} from "react-icons/fa";
 import { BiScatterChart } from "react-icons/bi";
-import Editor from "@monaco-editor/react";
 
 // src/vega/variableExplorer.jsx
 import React2, { useState as useState2, useMemo, useCallback as useCallback2 } from "react";
@@ -1213,202 +1217,308 @@ VariableExplorer.propTypes = {
 };
 
 // src/vega/vegaSpecEditor.jsx
-import { Button as Button2 } from "@jet-admin/ui";
+import { CodeEditor } from "@jet-admin/ui";
 var VEGA_TEMPLATES = {
-  "empty": {
-    name: "Empty Spec",
+  empty: {
+    name: "Empty",
     icon: FaCode,
     spec: {
-      "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-      "description": "Custom visualization",
-      "data": {
-        "values": [
-          { "x": 1, "y": 10 },
-          { "x": 2, "y": 20 },
-          { "x": 3, "y": 15 }
-        ]
-      },
-      "mark": "point",
-      "encoding": {
-        "x": { "field": "x", "type": "quantitative" },
-        "y": { "field": "y", "type": "quantitative" }
+      $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+      description: "Custom visualization",
+      data: { values: [{ x: 1, y: 10 }, { x: 2, y: 20 }, { x: 3, y: 15 }] },
+      mark: "point",
+      encoding: {
+        x: { field: "x", type: "quantitative" },
+        y: { field: "y", type: "quantitative" }
       }
     }
   },
-  "bar": {
-    name: "Bar Chart",
+  bar: {
+    name: "Bar",
     icon: FaChartBar,
     spec: {
-      "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-      "description": "A bar chart with sample data",
-      "data": {
-        "values": [
-          { "category": "Electronics", "value": 450 },
-          { "category": "Clothing", "value": 320 },
-          { "category": "Food", "value": 280 },
-          { "category": "Books", "value": 190 },
-          { "category": "Sports", "value": 230 }
+      $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+      data: {
+        values: [
+          { category: "Electronics", value: 450 },
+          { category: "Clothing", value: 320 },
+          { category: "Food", value: 280 },
+          { category: "Books", value: 190 },
+          { category: "Sports", value: 230 }
         ]
       },
-      "mark": "bar",
-      "encoding": {
-        "x": { "field": "category", "type": "nominal", "axis": { "labelAngle": -45 } },
-        "y": { "field": "value", "type": "quantitative", "title": "Sales" },
-        "color": { "field": "category", "type": "nominal", "legend": null }
+      mark: "bar",
+      encoding: {
+        x: { field: "category", type: "nominal", axis: { labelAngle: -45 } },
+        y: { field: "value", type: "quantitative", title: "Sales" },
+        color: { field: "category", type: "nominal", legend: null }
       }
     }
   },
-  "line": {
-    name: "Line Chart",
+  line: {
+    name: "Line",
     icon: FaChartLine,
     spec: {
-      "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-      "description": "A line chart with sample time series data",
-      "data": {
-        "values": [
-          { "date": "2024-01-01", "value": 100 },
-          { "date": "2024-02-01", "value": 150 },
-          { "date": "2024-03-01", "value": 120 },
-          { "date": "2024-04-01", "value": 200 },
-          { "date": "2024-05-01", "value": 180 },
-          { "date": "2024-06-01", "value": 250 }
+      $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+      data: {
+        values: [
+          { date: "2024-01-01", value: 100 },
+          { date: "2024-02-01", value: 150 },
+          { date: "2024-03-01", value: 120 },
+          { date: "2024-04-01", value: 200 },
+          { date: "2024-05-01", value: 180 },
+          { date: "2024-06-01", value: 250 }
         ]
       },
-      "mark": { "type": "line", "point": true },
-      "encoding": {
-        "x": { "field": "date", "type": "temporal", "title": "Date" },
-        "y": { "field": "value", "type": "quantitative", "title": "Value" }
+      mark: { type: "line", point: true },
+      encoding: {
+        x: { field: "date", type: "temporal", title: "Date" },
+        y: { field: "value", type: "quantitative", title: "Value" }
       }
     }
   },
-  "pie": {
-    name: "Pie Chart",
+  pie: {
+    name: "Pie",
     icon: FaChartPie,
     spec: {
-      "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-      "description": "A donut chart with sample data",
-      "data": {
-        "values": [
-          { "category": "Desktop", "value": 45 },
-          { "category": "Mobile", "value": 35 },
-          { "category": "Tablet", "value": 15 },
-          { "category": "Other", "value": 5 }
+      $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+      data: {
+        values: [
+          { category: "Desktop", value: 45 },
+          { category: "Mobile", value: 35 },
+          { category: "Tablet", value: 15 },
+          { category: "Other", value: 5 }
         ]
       },
-      "mark": { "type": "arc", "innerRadius": 50 },
-      "encoding": {
-        "theta": { "field": "value", "type": "quantitative" },
-        "color": { "field": "category", "type": "nominal", "title": "Device" }
+      mark: { type: "arc", innerRadius: 50 },
+      encoding: {
+        theta: { field: "value", type: "quantitative" },
+        color: { field: "category", type: "nominal", title: "Device" }
       }
     }
   },
-  "scatter": {
-    name: "Scatter Plot",
+  scatter: {
+    name: "Scatter",
     icon: BiScatterChart,
     spec: {
-      "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-      "description": "A scatter plot with sample data",
-      "data": {
-        "values": [
-          { "x": 10, "y": 28, "size": 5, "category": "A" },
-          { "x": 25, "y": 55, "size": 8, "category": "B" },
-          { "x": 40, "y": 43, "size": 12, "category": "A" },
-          { "x": 55, "y": 91, "size": 6, "category": "C" },
-          { "x": 70, "y": 81, "size": 10, "category": "B" },
-          { "x": 85, "y": 53, "size": 15, "category": "C" }
+      $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+      data: {
+        values: [
+          { x: 10, y: 28, size: 5, category: "A" },
+          { x: 25, y: 55, size: 8, category: "B" },
+          { x: 40, y: 43, size: 12, category: "A" },
+          { x: 55, y: 91, size: 6, category: "C" },
+          { x: 70, y: 81, size: 10, category: "B" },
+          { x: 85, y: 53, size: 15, category: "C" }
         ]
       },
-      "mark": "circle",
-      "encoding": {
-        "x": { "field": "x", "type": "quantitative", "title": "X Axis" },
-        "y": { "field": "y", "type": "quantitative", "title": "Y Axis" },
-        "size": { "field": "size", "type": "quantitative" },
-        "color": { "field": "category", "type": "nominal" }
+      mark: "circle",
+      encoding: {
+        x: { field: "x", type: "quantitative", title: "X Axis" },
+        y: { field: "y", type: "quantitative", title: "Y Axis" },
+        size: { field: "size", type: "quantitative" },
+        color: { field: "category", type: "nominal" }
       }
     }
   },
-  "heatmap": {
+  heatmap: {
     name: "Heatmap",
     icon: FaChartBar,
     spec: {
-      "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
-      "description": "A heatmap with sample data",
-      "data": {
-        "values": [
-          { "row": "Mon", "column": "Morning", "value": 10 },
-          { "row": "Mon", "column": "Afternoon", "value": 25 },
-          { "row": "Mon", "column": "Evening", "value": 15 },
-          { "row": "Tue", "column": "Morning", "value": 20 },
-          { "row": "Tue", "column": "Afternoon", "value": 30 },
-          { "row": "Tue", "column": "Evening", "value": 22 },
-          { "row": "Wed", "column": "Morning", "value": 15 },
-          { "row": "Wed", "column": "Afternoon", "value": 28 },
-          { "row": "Wed", "column": "Evening", "value": 18 }
+      $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+      data: {
+        values: [
+          { row: "Mon", column: "Morning", value: 10 },
+          { row: "Mon", column: "Afternoon", value: 25 },
+          { row: "Mon", column: "Evening", value: 15 },
+          { row: "Tue", column: "Morning", value: 20 },
+          { row: "Tue", column: "Afternoon", value: 30 },
+          { row: "Tue", column: "Evening", value: 22 },
+          { row: "Wed", column: "Morning", value: 15 },
+          { row: "Wed", column: "Afternoon", value: 28 },
+          { row: "Wed", column: "Evening", value: 18 }
         ]
       },
-      "mark": "rect",
-      "encoding": {
-        "x": { "field": "column", "type": "ordinal", "title": "Time" },
-        "y": { "field": "row", "type": "ordinal", "title": "Day" },
-        "color": { "field": "value", "type": "quantitative", "scale": { "scheme": "blues" }, "title": "Activity" }
+      mark: "rect",
+      encoding: {
+        x: { field: "column", type: "ordinal", title: "Time" },
+        y: { field: "row", type: "ordinal", title: "Day" },
+        color: {
+          field: "value",
+          type: "quantitative",
+          scale: { scheme: "blues" },
+          title: "Activity"
+        }
       }
     }
   }
 };
-var getNestedKeys = (obj, prefix = "", maxDepth = 4, currentDepth = 0) => {
-  if (!obj || typeof obj !== "object" || currentDepth >= maxDepth) {
-    return [];
-  }
+var getNestedKeys = (obj, prefix = "", maxDepth = 4, depth = 0) => {
+  if (!obj || typeof obj !== "object" || depth >= maxDepth) return [];
   const keys = [];
   for (const key in obj) {
-    if (obj.hasOwnProperty(key)) {
-      const fullPath = prefix ? `${prefix}.${key}` : key;
-      keys.push(fullPath);
-      if (typeof obj[key] === "object" && obj[key] !== null) {
-        if (Array.isArray(obj[key]) && obj[key].length > 0) {
-          keys.push(...getNestedKeys(obj[key][0], `${fullPath}[0]`, maxDepth, currentDepth + 1));
-        } else {
-          keys.push(...getNestedKeys(obj[key], fullPath, maxDepth, currentDepth + 1));
-        }
-      }
+    if (!Object.prototype.hasOwnProperty.call(obj, key)) continue;
+    const full = prefix ? `${prefix}.${key}` : key;
+    keys.push(full);
+    if (typeof obj[key] === "object" && obj[key] !== null) {
+      keys.push(
+        ...Array.isArray(obj[key]) && obj[key].length > 0 ? getNestedKeys(obj[key][0], `${full}[0]`, maxDepth, depth + 1) : getNestedKeys(obj[key], full, maxDepth, depth + 1)
+      );
     }
   }
   return keys;
 };
 var getValueByPath = (obj, path) => {
   if (!obj || !path) return void 0;
-  const parts = path.split(".");
-  let current = obj;
-  for (const part of parts) {
-    const arrayMatch = part.match(/^(.+)\[(\d+)\]$/);
-    if (arrayMatch) {
-      const [, key, index] = arrayMatch;
-      current = current?.[key]?.[parseInt(index)];
-    } else {
-      current = current?.[part];
-    }
-    if (current === void 0) break;
+  let cur = obj;
+  for (const part of path.split(".")) {
+    const m = part.match(/^(.+)\[(\d+)\]$/);
+    cur = m ? cur?.[m[1]]?.[parseInt(m[2])] : cur?.[part];
+    if (cur === void 0) break;
   }
-  return current;
+  return cur;
 };
 var getValuePreview = (obj, path) => {
-  const value = getValueByPath(obj, path);
-  if (value === void 0) return "undefined";
-  if (value === null) return "null";
-  const type = Array.isArray(value) ? "array" : typeof value;
-  switch (type) {
-    case "string":
-      return `"${value.slice(0, 30)}${value.length > 30 ? "..." : ""}"`;
-    case "number":
-    case "boolean":
-      return String(value);
-    case "array":
-      return `Array(${value.length})`;
-    case "object":
-      const keys = Object.keys(value).slice(0, 3);
-      return `{${keys.join(", ")}${Object.keys(value).length > 3 ? "..." : ""}}`;
-    default:
-      return type;
+  const v = getValueByPath(obj, path);
+  if (v === void 0) return "undefined";
+  if (v === null) return "null";
+  if (Array.isArray(v)) return `Array(${v.length})`;
+  if (typeof v === "object") {
+    const k = Object.keys(v).slice(0, 3);
+    return `{${k.join(", ")}${Object.keys(v).length > 3 ? "\u2026" : ""}}`;
+  }
+  if (typeof v === "string") return `"${v.slice(0, 30)}${v.length > 30 ? "\u2026" : ""}"`;
+  return String(v);
+};
+var S = {
+  // header bar
+  header: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 6,
+    padding: "5px 8px",
+    borderBottom: "1px solid var(--we-border)",
+    background: "var(--we-bg-secondary, #f8f9fa)",
+    borderRadius: "6px 6px 0 0",
+    flexWrap: "wrap",
+    minHeight: 34
+  },
+  headerLeft: {
+    display: "flex",
+    alignItems: "center",
+    gap: 6,
+    flexWrap: "wrap",
+    minWidth: 0
+  },
+  headerRight: {
+    display: "flex",
+    alignItems: "center",
+    gap: 4,
+    flexShrink: 0
+  },
+  // tiny pill badges
+  badge: (color) => ({
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 3,
+    padding: "1px 6px",
+    borderRadius: 999,
+    fontSize: 10,
+    fontWeight: 600,
+    letterSpacing: "0.02em",
+    lineHeight: 1.6,
+    color: color === "green" ? "#15803d" : color === "red" ? "#dc2626" : "var(--we-text-accent)",
+    background: color === "green" ? "#f0fdf4" : color === "red" ? "#fef2f2" : "var(--we-bg-accent-light)",
+    border: `1px solid ${color === "green" ? "#bbf7d0" : color === "red" ? "#fecaca" : "var(--we-border-accent)"}`
+  }),
+  // compressed icon button
+  iconBtn: {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: 24,
+    height: 24,
+    padding: 0,
+    border: "1px solid #d1d5db",
+    borderRadius: 5,
+    background: "#fff",
+    color: "#6b7280",
+    cursor: "pointer",
+    fontSize: 11,
+    transition: "all 0.12s",
+    flexShrink: 0
+  },
+  // compressed text button
+  textBtn: {
+    display: "inline-flex",
+    alignItems: "center",
+    gap: 4,
+    height: 24,
+    padding: "0 8px",
+    border: "1px solid transparent",
+    borderRadius: 4,
+    background: "transparent",
+    color: "hsl(var(--muted-foreground))",
+    cursor: "pointer",
+    fontSize: 11,
+    fontWeight: 500,
+    transition: "all 0.12s",
+    flexShrink: 0,
+    whiteSpace: "nowrap"
+  },
+  // template grid
+  templateGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fill, minmax(72px, 1fr))",
+    gap: 4,
+    padding: "6px 8px",
+    borderBottom: "1px solid var(--we-border)",
+    background: "var(--we-bg-secondary, #f8f9fa)"
+  },
+  templateBtn: (active) => ({
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    gap: 3,
+    padding: "5px 4px",
+    border: `1px solid ${active ? "var(--we-bg-accent, #6366f1)" : "#e2e4e9"}`,
+    borderRadius: 6,
+    background: active ? "var(--we-bg-accent-light, #eef2ff)" : "#fff",
+    color: active ? "var(--we-text-accent, #4f46e5)" : "#6b7280",
+    cursor: "pointer",
+    fontSize: 10,
+    fontWeight: 500,
+    transition: "all 0.12s",
+    lineHeight: 1.2
+  }),
+  // error strip
+  errorStrip: {
+    display: "flex",
+    alignItems: "flex-start",
+    gap: 6,
+    padding: "5px 8px",
+    background: "#fef2f2",
+    borderTop: "1px solid #fecaca",
+    fontSize: 11,
+    color: "#dc2626",
+    borderRadius: "0 0 6px 6px"
+  },
+  // ctx hint
+  ctxHint: {
+    position: "absolute",
+    bottom: 6,
+    right: 8,
+    padding: "2px 7px",
+    background: "rgba(255,255,255,0.93)",
+    backdropFilter: "blur(4px)",
+    border: "1px solid #e5e7eb",
+    borderRadius: 5,
+    fontSize: 10,
+    color: "#9ca3af",
+    pointerEvents: "none",
+    boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
+    zIndex: 10
   }
 };
 var VegaSpecEditor = ({
@@ -1417,39 +1527,45 @@ var VegaSpecEditor = ({
   onError,
   workflowContext = null,
   workflow = null,
-  placeholder = "Enter Vega-Lite JSON spec...",
-  disabled = false,
-  theme = "light"
+  disabled = false
 }) => {
-  const [isExpanded, setIsExpanded] = useState3(false);
   const [showTemplates, setShowTemplates] = useState3(false);
   const [parseError, setParseError] = useState3(null);
-  const editorRef = useRef2(null);
   const monacoRef = useRef2(null);
   const valueRef = useRef2(value);
+  const isInternalChange = useRef2(false);
   useEffect2(() => {
     valueRef.current = value;
   }, [value]);
-  const getJsonString = (val) => {
-    if (!val) return "";
+  const toJson = (v) => {
+    if (!v) return "";
     try {
-      return JSON.stringify(val, null, 2);
+      return JSON.stringify(v, null, 2);
     } catch {
       return "";
     }
   };
-  const [internalValue, setInternalValue] = useState3(() => getJsonString(value));
-  useEffect2(() => {
-    const newJsonString = getJsonString(value);
-    if (editorRef.current && newJsonString !== internalValue) {
-      setInternalValue(newJsonString);
-      editorRef.current.setValue(newJsonString);
+  const valueString = useMemo2(() => toJson(value), [value]);
+  const handleEditorChange = useCallback3((newValue) => {
+    isInternalChange.current = true;
+    if (!newValue?.trim()) {
+      setParseError(null);
+      onChange(null);
+      isInternalChange.current = false;
+      return;
     }
-  }, [value]);
-  const handleEditorDidMount = useCallback3((editor, monaco) => {
-    editorRef.current = editor;
-    monacoRef.current = monaco;
-  }, []);
+    try {
+      const parsed = JSON.parse(newValue);
+      setParseError(null);
+      onChange(parsed);
+    } catch (err) {
+      setParseError(err.message);
+      if (onError) onError(err);
+    }
+    requestAnimationFrame(() => {
+      isInternalChange.current = false;
+    });
+  }, [onChange, onError]);
   useEffect2(() => {
     if (!monacoRef.current) return;
     const monaco = monacoRef.current;
@@ -1457,7 +1573,7 @@ var VegaSpecEditor = ({
     const disposable = monaco.languages.registerCompletionItemProvider("json", {
       triggerCharacters: [".", "{"],
       provideCompletionItems: (model, position) => {
-        const textUntilPosition = model.getValueInRange({
+        const lineText = model.getValueInRange({
           startLineNumber: position.lineNumber,
           startColumn: 1,
           endLineNumber: position.lineNumber,
@@ -1471,7 +1587,7 @@ var VegaSpecEditor = ({
           endColumn: word.endColumn
         };
         const suggestions = [];
-        const bracketMatch = textUntilPosition.match(/\{\{([a-zA-Z0-9_]*)$/);
+        const bracketMatch = lineText.match(/\{\{([a-zA-Z0-9_]*)$/);
         if (bracketMatch) {
           const partial = bracketMatch[1].toLowerCase();
           if ("ctx".startsWith(partial)) {
@@ -1484,210 +1600,113 @@ var VegaSpecEditor = ({
             });
           }
           if (schema) {
-            const addSchemaItems = (items, kind, prefix) => {
-              items.forEach((item) => {
-                const pathWithoutBraces = item.path.replace(/\{\{|\}\}/g, "");
-                if (pathWithoutBraces.toLowerCase().includes(partial)) {
-                  suggestions.push({
-                    label: item.name,
-                    kind,
-                    detail: `${prefix}: ${item.type} ${item.nodeTitle ? `(from ${item.nodeTitle})` : ""}`,
-                    insertText: pathWithoutBraces,
-                    range
-                  });
-                }
-              });
-            };
-            addSchemaItems(schema.inputs, monaco.languages.CompletionItemKind.Property, "Input");
-            addSchemaItems(schema.nodeOutputs, monaco.languages.CompletionItemKind.Variable, "Node Output");
-            addSchemaItems(schema.workflowOutputs, monaco.languages.CompletionItemKind.Event, "Workflow Output");
+            const add = (items, kind, pfx) => items.forEach((item) => {
+              const p = item.path.replace(/\{\{|\}\}/g, "");
+              if (p.toLowerCase().includes(partial))
+                suggestions.push({
+                  label: item.name,
+                  kind,
+                  detail: `${pfx}: ${item.type}${item.nodeTitle ? ` (${item.nodeTitle})` : ""}`,
+                  insertText: p,
+                  range
+                });
+            });
+            add(schema.inputs, monaco.languages.CompletionItemKind.Property, "Input");
+            add(schema.nodeOutputs, monaco.languages.CompletionItemKind.Variable, "Node Output");
+            add(schema.workflowOutputs, monaco.languages.CompletionItemKind.Event, "Workflow Output");
           }
         }
         if (workflowContext) {
-          const ctxMatch = textUntilPosition.match(/\{\{ctx\.([a-zA-Z0-9_\[\]\.]*) $/);
+          const ctxMatch = lineText.match(/\{\{ctx\.([a-zA-Z0-9_\[\].]*)$/);
           if (ctxMatch) {
-            const partialKey = ctxMatch[1];
-            const availableKeys = getNestedKeys(workflowContext, "", 4);
-            availableKeys.filter((key) => key.toLowerCase().includes(partialKey.toLowerCase())).forEach((key) => {
-              suggestions.push({
-                label: key,
+            const partial = ctxMatch[1];
+            getNestedKeys(workflowContext, "", 4).filter((k) => k.toLowerCase().includes(partial.toLowerCase())).forEach(
+              (k) => suggestions.push({
+                label: k,
                 kind: monaco.languages.CompletionItemKind.Variable,
-                detail: getValuePreview(workflowContext, key),
-                insertText: key,
+                detail: getValuePreview(workflowContext, k),
+                insertText: k,
                 range,
-                documentation: `Value: ${getValuePreview(workflowContext, key)}`
-              });
-            });
+                documentation: `Value: ${getValuePreview(workflowContext, k)}`
+              })
+            );
           }
         }
         return { suggestions };
       }
     });
-    return () => {
-      disposable.dispose();
-    };
+    return () => disposable.dispose();
   }, [workflowContext, workflow]);
-  const handleEditorChange = useCallback3((newValue) => {
-    setInternalValue(newValue);
-    if (!newValue || !newValue.trim()) {
-      setParseError(null);
-      onChange(null);
-      return;
-    }
-    try {
-      const parsed = JSON.parse(newValue);
-      setParseError(null);
-      onChange(parsed);
-    } catch (err) {
-      setParseError(err.message);
-      if (onError) onError(err);
-    }
-  }, [onChange, onError]);
-  const applyTemplate = useCallback3((templateKey) => {
-    const template = VEGA_TEMPLATES[templateKey];
-    if (template) {
-      onChange(template.spec);
-      setShowTemplates(false);
+  const applyTemplate = useCallback3((key) => {
+    const t = VEGA_TEMPLATES[key];
+    if (t) {
+      onChange(t.spec);
       setParseError(null);
     }
   }, [onChange]);
-  const formatDocument = useCallback3(() => {
-    if (editorRef.current) {
-      editorRef.current.getAction("editor.action.formatDocument").run();
-    }
-  }, []);
-  return /* @__PURE__ */ React3.createElement(
-    "div",
+  const contextVarCount = workflowContext ? Object.keys(workflowContext).length : 0;
+  const hasError = Boolean(parseError);
+  const headerExtra = /* @__PURE__ */ React3.createElement(
+    "button",
     {
-      className: `flex flex-col gap-3 ${isExpanded ? "fixed inset-4 z-50 p-4" : ""}`,
-      style: isExpanded ? {
-        background: "var(--we-bg-primary)",
-        borderRadius: "var(--we-radius-lg)",
-        boxShadow: "0 25px 50px -12px rgba(0,0,0,0.25)"
-      } : void 0
+      type: "button",
+      style: {
+        ...S.textBtn,
+        ...showTemplates ? { background: "hsl(var(--accent))", color: "hsl(var(--accent-foreground))" } : {}
+      },
+      className: "hover:bg-muted hover:text-foreground",
+      onClick: () => setShowTemplates((v) => !v)
     },
-    /* @__PURE__ */ React3.createElement("div", { className: "flex flex-row justify-between items-center gap-2 pb-2", style: { borderBottom: "1px solid var(--we-border)" } }, /* @__PURE__ */ React3.createElement("div", { className: "flex items-center gap-3" }, /* @__PURE__ */ React3.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React3.createElement(FaCode, { style: { color: "var(--we-bg-accent)", fontSize: "16px" } }), /* @__PURE__ */ React3.createElement("span", { style: { fontSize: "13px", fontWeight: 600, color: "var(--we-text-primary)" } }, "Vega-Lite Spec")), !parseError ? /* @__PURE__ */ React3.createElement("div", { className: "flex items-center gap-1", style: { color: "#16a34a" } }, /* @__PURE__ */ React3.createElement(FaCheckCircle, { size: 14 }), /* @__PURE__ */ React3.createElement("span", { style: { fontSize: "11px", fontWeight: 500 } }, "Valid")) : /* @__PURE__ */ React3.createElement("div", { className: "flex items-center gap-1", style: { color: "#dc2626" } }, /* @__PURE__ */ React3.createElement(FaExclamationTriangle, { size: 14 }), /* @__PURE__ */ React3.createElement("span", { style: { fontSize: "11px", fontWeight: 500 } }, "Invalid")), workflowContext && Object.keys(workflowContext).length > 0 && /* @__PURE__ */ React3.createElement("div", { style: {
-      padding: "2px 8px",
-      background: "var(--we-bg-accent-light)",
-      border: "1px solid var(--we-border-accent)",
-      borderRadius: "var(--we-radius-sm)",
-      fontSize: "11px",
-      color: "var(--we-text-accent)",
-      fontWeight: 500
-    } }, Object.keys(workflowContext).length, " context vars")), /* @__PURE__ */ React3.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React3.createElement(
-      Button2,
-      {
-        type: "button",
-        variant: "outline",
-        size: "sm",
-        onClick: formatDocument,
-        className: "h-7 px-2 text-xs bg-white text-slate-600 hover:text-slate-800 hover:bg-slate-50 border-slate-200",
-        title: "Format JSON (Shift+Alt+F)"
-      },
-      "Format"
-    ), /* @__PURE__ */ React3.createElement(
-      Button2,
-      {
-        type: "button",
-        variant: "outline",
-        size: "sm",
-        onClick: () => setShowTemplates(!showTemplates),
-        className: "h-7 px-2 text-xs bg-white text-slate-600 hover:text-slate-800 hover:bg-slate-50 border-slate-200"
-      },
-      "Templates"
-    ), /* @__PURE__ */ React3.createElement(
-      Button2,
-      {
-        type: "button",
-        variant: "outline",
-        size: "icon",
-        onClick: () => setIsExpanded(!isExpanded),
-        className: "h-7 w-7 bg-white text-slate-600 hover:text-slate-800 hover:bg-slate-50 border-slate-200",
-        title: isExpanded ? "Exit fullscreen" : "Fullscreen"
-      },
-      isExpanded ? /* @__PURE__ */ React3.createElement(FaCompress, { size: 12 }) : /* @__PURE__ */ React3.createElement(FaExpand, { size: 12 })
-    ))),
-    showTemplates && /* @__PURE__ */ React3.createElement("div", { className: "grid grid-cols-3 md:grid-cols-6 gap-2 p-3", style: {
-      background: "var(--we-bg-secondary)",
-      borderRadius: "var(--we-radius)",
-      border: "1px solid var(--we-border)"
-    } }, Object.entries(VEGA_TEMPLATES).map(([key, template]) => {
-      const Icon = template.icon;
-      return /* @__PURE__ */ React3.createElement(
-        Button2,
-        {
-          key,
-          type: "button",
-          variant: "outline",
-          onClick: () => applyTemplate(key),
-          className: "h-auto py-3 flex-col gap-1.5 bg-white border-slate-200 hover:border-primary hover:bg-slate-50 transition-all font-normal"
-        },
-        /* @__PURE__ */ React3.createElement(Icon, { className: "text-xl text-slate-400" }),
-        /* @__PURE__ */ React3.createElement("span", { className: "text-[11px] font-medium text-slate-600" }, template.name)
-      );
-    })),
-    /* @__PURE__ */ React3.createElement("div", { className: "relative rounded-lg overflow-hidden", style: {
-      border: `1px solid ${parseError ? "#fca5a5" : "var(--we-border-strong)"}`,
-      ...parseError ? { boxShadow: "0 0 0 1px #fecaca" } : {}
-    } }, /* @__PURE__ */ React3.createElement(
-      Editor,
-      {
-        height: isExpanded ? "calc(100vh - 200px)" : "400px",
-        defaultLanguage: "json",
-        defaultValue: internalValue,
-        onChange: handleEditorChange,
-        onMount: handleEditorDidMount,
-        theme: "vs",
-        options: {
-          readOnly: disabled,
-          minimap: { enabled: isExpanded },
-          fontSize: 13,
-          lineNumbers: "on",
-          scrollBeyondLastLine: false,
-          wordWrap: "on",
-          wrappingStrategy: "advanced",
-          automaticLayout: true,
-          formatOnPaste: true,
-          formatOnType: true,
-          tabSize: 2,
-          insertSpaces: true,
-          quickSuggestions: {
-            "other": true,
-            "comments": false,
-            "strings": true
-          },
-          suggestOnTriggerCharacters: true,
-          acceptSuggestionOnEnter: "on",
-          snippetSuggestions: "inline",
-          padding: { top: 8, bottom: 8 },
-          folding: true,
-          foldingStrategy: "indentation",
-          showFoldingControls: "always",
-          bracketPairColorization: {
-            enabled: true
-          }
-        }
-      }
-    ), workflowContext && /* @__PURE__ */ React3.createElement("div", { className: "absolute bottom-2 right-2 px-2 py-1 rounded pointer-events-none", style: {
-      background: "rgba(255,255,255,0.95)",
-      backdropFilter: "blur(4px)",
-      border: "1px solid var(--we-border)",
-      boxShadow: "var(--we-shadow-sm)",
-      fontSize: "11px"
-    } }, /* @__PURE__ */ React3.createElement("span", { style: { color: "var(--we-text-muted)" } }, "Type "), /* @__PURE__ */ React3.createElement("code", { style: {
-      background: "var(--we-bg-tertiary)",
-      padding: "1px 4px",
-      borderRadius: "3px",
-      fontFamily: "monospace",
-      color: "var(--we-text-primary)"
-    } }, "{{ctx."), /* @__PURE__ */ React3.createElement("span", { style: { color: "var(--we-text-muted)" } }, " for suggestions"))),
-    parseError && /* @__PURE__ */ React3.createElement("div", { className: "flex items-start gap-2 p-2.5 rounded", style: {
-      fontSize: "12px",
-      color: "#dc2626",
-      background: "#fef2f2",
-      border: "1px solid #fecaca"
-    } }, /* @__PURE__ */ React3.createElement(FaExclamationTriangle, { className: "mt-0.5 flex-shrink-0" }), /* @__PURE__ */ React3.createElement("div", null, /* @__PURE__ */ React3.createElement("strong", { style: { fontWeight: 600 } }, "Parse Error:"), " ", parseError))
+    /* @__PURE__ */ React3.createElement(FaChartBar, { size: 9 }),
+    "Templates"
   );
+  const headerLeft = contextVarCount > 0 ? /* @__PURE__ */ React3.createElement("span", { style: S.badge("accent") }, contextVarCount, " ctx vars") : null;
+  return /* @__PURE__ */ React3.createElement("div", { className: "flex flex-col" }, showTemplates && /* @__PURE__ */ React3.createElement("div", { style: S.templateGrid, className: "border border-b-0 rounded-t-md" }, Object.entries(VEGA_TEMPLATES).map(([key, tpl]) => {
+    const Icon = tpl.icon;
+    return /* @__PURE__ */ React3.createElement(
+      "button",
+      {
+        key,
+        type: "button",
+        style: S.templateBtn(false),
+        onClick: () => {
+          applyTemplate(key);
+          setShowTemplates(false);
+        },
+        onMouseEnter: (e) => {
+          e.currentTarget.style.borderColor = "var(--we-bg-accent, #6366f1)";
+          e.currentTarget.style.background = "var(--we-bg-accent-light, #eef2ff)";
+          e.currentTarget.style.color = "var(--we-text-accent, #4f46e5)";
+        },
+        onMouseLeave: (e) => {
+          e.currentTarget.style.borderColor = "#e2e4e9";
+          e.currentTarget.style.background = "#fff";
+          e.currentTarget.style.color = "#6b7280";
+        }
+      },
+      /* @__PURE__ */ React3.createElement(Icon, { size: 14 }),
+      tpl.name
+    );
+  })), /* @__PURE__ */ React3.createElement(
+    CodeEditor,
+    {
+      value: valueString,
+      onChange: handleEditorChange,
+      language: "json",
+      disabled,
+      title: "Vega-Lite",
+      titleIcon: /* @__PURE__ */ React3.createElement(FaCode, { style: { color: "var(--we-bg-accent, #6366f1)", fontSize: 13 } }),
+      status: hasError ? "error" : "valid",
+      statusMessage: parseError ? `Parse error: ${parseError}` : null,
+      headerLeft,
+      headerExtra,
+      className: showTemplates ? "rounded-t-none" : "",
+      onMount: (e, m) => {
+        monacoRef.current = m;
+      },
+      footerHint: workflowContext ? /* @__PURE__ */ React3.createElement(React3.Fragment, null, "Type ", /* @__PURE__ */ React3.createElement("code", { className: "font-mono bg-muted px-1 rounded-sm" }, "{{ctx."), " for suggestions") : null
+    }
+  ));
 };
 VegaSpecEditor.propTypes = {
   value: PropTypes2.object,
@@ -1997,7 +2016,7 @@ var getFieldTypeIcon = (type) => {
 };
 
 // src/vega/fieldPill.jsx
-import { Button as Button3 } from "@jet-admin/ui";
+import { Button as Button2 } from "@jet-admin/ui";
 var getTypeClass = (type) => {
   switch (type) {
     case "quantitative":
@@ -2046,7 +2065,7 @@ var FieldPill = ({
     /* @__PURE__ */ React4.createElement("span", { className: "truncate" }, field.name),
     field.aggregate && field.aggregate !== "none" && /* @__PURE__ */ React4.createElement("span", { className: "text-[9px] uppercase tracking-wider bg-white/50 px-1 rounded ml-1 font-bold", title: `Aggregate: ${field.aggregate}` }, field.aggregate.slice(0, 3)),
     onRemove && /* @__PURE__ */ React4.createElement(
-      Button3,
+      Button2,
       {
         type: "button",
         variant: "ghost",
@@ -2080,7 +2099,7 @@ FieldPill.propTypes = {
 import { FiSearch, FiDatabase, FiPlus, FiZap } from "react-icons/fi";
 import { BiGitMerge as BiGitMerge2 } from "react-icons/bi";
 import { MdOutput as MdOutput2 } from "react-icons/md";
-import { Button as Button4, Input as Input2, Label } from "@jet-admin/ui";
+import { Button as Button3, Input as Input2, Label } from "@jet-admin/ui";
 var collectArrayPaths = (obj, prefix = "ctx", depth = 0, maxDepth = 4) => {
   const results = [];
   if (!obj || typeof obj !== "object" || depth > maxDepth) return results;
@@ -2274,7 +2293,7 @@ var DataFieldPanel = ({
       className: "flex-1 text-xs bg-transparent outline-none text-foreground placeholder:text-muted-foreground border-none shadow-none focus-visible:ring-0 h-6 p-0"
     }
   ))), /* @__PURE__ */ React5.createElement("div", { className: "flex-1 overflow-y-auto p-2.5 min-h-0" }, fields.length > 0 ? /* @__PURE__ */ React5.createElement(React5.Fragment, null, renderFieldGroup(quantFields, "Measures", "text-emerald-600"), renderFieldGroup(catFields, "Dimensions", "text-blue-600"), renderFieldGroup(tempFields, "Temporal", "text-amber-600")) : /* @__PURE__ */ React5.createElement("div", { className: "flex flex-col items-center justify-center h-full py-6 text-center px-3" }, /* @__PURE__ */ React5.createElement(FiDatabase, { className: "w-8 h-8 mb-2 text-muted-foreground/30" }), /* @__PURE__ */ React5.createElement("p", { className: "text-xs text-muted-foreground leading-relaxed mb-3" }, dataSource ? "Run the workflow to detect fields from the data" : "Choose a data source above or type a ctx path"), !dataSource && allSuggestions.length > 0 && /* @__PURE__ */ React5.createElement(
-    Button4,
+    Button3,
     {
       type: "button",
       size: "sm",
@@ -2296,7 +2315,7 @@ var DataFieldPanel = ({
       autoFocus: true
     }
   ), /* @__PURE__ */ React5.createElement("div", { className: "flex items-center gap-2 justify-end" }, /* @__PURE__ */ React5.createElement(
-    Button4,
+    Button3,
     {
       type: "button",
       variant: "ghost",
@@ -2306,7 +2325,7 @@ var DataFieldPanel = ({
     },
     "Cancel"
   ), /* @__PURE__ */ React5.createElement(
-    Button4,
+    Button3,
     {
       type: "button",
       size: "sm",
@@ -2315,7 +2334,7 @@ var DataFieldPanel = ({
     },
     "Add Field"
   ))) : /* @__PURE__ */ React5.createElement(
-    Button4,
+    Button3,
     {
       type: "button",
       variant: "outline",
@@ -2338,7 +2357,7 @@ DataFieldPanel.propTypes = {
 // src/vega/encodingShelf.jsx
 import React6, { useState as useState5, useCallback as useCallback6, useRef as useRef4 } from "react";
 import PropTypes5 from "prop-types";
-import { Button as Button5, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
+import { Button as Button4, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
 var CHANNEL_LABELS = {
   x: "X Axis",
   y: "Y Axis",
@@ -2443,7 +2462,7 @@ var EncodingShelf = ({
         isCompact: true
       }
     ), /* @__PURE__ */ React6.createElement(Select, { value: value.type || "nominal", onValueChange: (val) => handleTypeChange(val) }, /* @__PURE__ */ React6.createElement(SelectTrigger, { className: "h-6 px-1.5 py-0.5 text-[11px]", title: "Data type" }, /* @__PURE__ */ React6.createElement(SelectValue, { placeholder: "Select type" })), /* @__PURE__ */ React6.createElement(SelectContent, { className: "z-[200]" }, FIELD_TYPES.map((t) => /* @__PURE__ */ React6.createElement(SelectItem, { key: t, value: t }, t.charAt(0).toUpperCase() + t.slice(1))))), (value.type === "quantitative" || value.aggregate) && /* @__PURE__ */ React6.createElement(Select, { value: value.aggregate || "none", onValueChange: (val) => handleAggChange(val) }, /* @__PURE__ */ React6.createElement(SelectTrigger, { className: "h-6 px-1.5 py-0.5 text-[11px]", title: "Aggregation" }, /* @__PURE__ */ React6.createElement(SelectValue, { placeholder: "Select agg" })), /* @__PURE__ */ React6.createElement(SelectContent, { className: "z-[200]" }, /* @__PURE__ */ React6.createElement(SelectItem, { value: "none" }, "no agg"), AGGREGATE_TYPES.map((a) => /* @__PURE__ */ React6.createElement(SelectItem, { key: a, value: a }, a)))), /* @__PURE__ */ React6.createElement(
-      Button5,
+      Button4,
       {
         type: "button",
         variant: "ghost",
@@ -2473,7 +2492,7 @@ EncodingShelf.propTypes = {
 // src/vega/markSelector.jsx
 import React7 from "react";
 import PropTypes6 from "prop-types";
-import { Button as Button6 } from "@jet-admin/ui";
+import { Button as Button5 } from "@jet-admin/ui";
 var MARK_OPTIONS = [
   { key: "auto", label: "Auto", icon: "\u2726", desc: "Best fit based on field types" },
   { key: "bar", label: "Bar", icon: "\u25A5", desc: "Compare categories" },
@@ -2490,7 +2509,7 @@ var MarkSelector = ({ value, onChange, className = "" }) => {
   return /* @__PURE__ */ React7.createElement("div", { className: `flex flex-wrap gap-1 w-full ${className}` }, MARK_OPTIONS.map((opt) => {
     const isSelected = value === opt.key;
     return /* @__PURE__ */ React7.createElement(
-      Button6,
+      Button5,
       {
         key: opt.key,
         type: "button",
@@ -2514,7 +2533,7 @@ MarkSelector.propTypes = {
 // src/vega/shelfBuilder.jsx
 import { FiSettings, FiChevronDown as FiChevronDown2, FiChevronRight as FiChevronRight2, FiDatabase as FiDatabase2 } from "react-icons/fi";
 import { MdOutlineAutoGraph } from "react-icons/md";
-import { Button as Button7, Input as Input3, Label as Label2, Select as Select2, SelectContent as SelectContent2, SelectItem as SelectItem2, SelectTrigger as SelectTrigger2, SelectValue as SelectValue2, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@jet-admin/ui";
+import { Button as Button6, Input as Input3, Label as Label2, Select as Select2, SelectContent as SelectContent2, SelectItem as SelectItem2, SelectTrigger as SelectTrigger2, SelectValue as SelectValue2, Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@jet-admin/ui";
 var VEGA_STRINGS = {
   WIDGET_DATASET_FIELD_MAPPING_BUTTON: "Mappings"
 };
@@ -2624,7 +2643,7 @@ var ShelfBuilder = ({
   }, [shelfSpec]);
   const isWorkflowSelected = !!selectedWorkflow;
   return /* @__PURE__ */ React8.createElement(React8.Fragment, null, /* @__PURE__ */ React8.createElement(Dialog, { open: isOpen, onOpenChange: setIsOpen }, /* @__PURE__ */ React8.createElement(DialogTrigger, { asChild: true }, /* @__PURE__ */ React8.createElement(
-    Button7,
+    Button6,
     {
       type: "button",
       variant: "outline",
@@ -2695,7 +2714,7 @@ var ShelfBuilder = ({
       className: "w-full text-xs"
     }
   )))))))), /* @__PURE__ */ React8.createElement(DialogFooter, { className: "px-4 py-2.5 border-t border-border bg-background shrink-0" }, /* @__PURE__ */ React8.createElement(
-    Button7,
+    Button6,
     {
       type: "button",
       onClick: () => setIsOpen(false)
@@ -2761,7 +2780,7 @@ var VegaConfigEditor = ({
       workflows
     }
   ), /* @__PURE__ */ React9.createElement(
-    Button8,
+    Button7,
     {
       type: "button",
       variant: "outline",
@@ -2780,7 +2799,7 @@ var VegaConfigEditor = ({
       onChange: widgetEditorForm.handleChange,
       value: widgetEditorForm.values.widgetConfig?.refetchInterval || ""
     }
-  )), /* @__PURE__ */ React9.createElement("div", { className: "border-t border-border pt-4" }, /* @__PURE__ */ React9.createElement(Label3, { className: "text-xs text-muted-foreground italic" }, "Additional options moved to Widget Settings.")))))), showParseWarning && /* @__PURE__ */ React9.createElement("div", { className: "my-2 shrink-0 rounded-md border border-amber-200 bg-amber-50 px-4 py-2 dark:border-amber-900/40 dark:bg-amber-950/20" }, /* @__PURE__ */ React9.createElement("div", { className: "flex items-start gap-2 text-xs" }, /* @__PURE__ */ React9.createElement(FiAlertTriangle, { className: "mt-0.5 h-4 w-4 shrink-0 text-amber-600" }), /* @__PURE__ */ React9.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React9.createElement("h4", { className: "mb-1 font-semibold text-amber-900 dark:text-amber-200" }, "Cannot fully parse chart config"), /* @__PURE__ */ React9.createElement("p", { className: "mb-2 text-amber-800 dark:text-amber-300" }, "Switching to Visual mode may cause you to lose manual modifications:"), /* @__PURE__ */ React9.createElement("ul", { className: "mb-3 list-disc pl-4 text-amber-800 dark:text-amber-300" }, parseWarningsList.map((w, i) => /* @__PURE__ */ React9.createElement("li", { key: i, className: "mb-0.5" }, w))), /* @__PURE__ */ React9.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React9.createElement(Button8, { type: "button", variant: "outline", size: "sm", onClick: () => setShowParseWarning(false), className: "h-7 text-xs" }, "Cancel"), /* @__PURE__ */ React9.createElement(Button8, { type: "button", size: "sm", onClick: confirmModeSwitch, className: "h-7 text-xs bg-amber-600 hover:bg-amber-700 text-white dark:bg-amber-700 dark:hover:bg-amber-600" }, "Switch & Overwrite"))))), !showParseWarning && currentMode === "raw" && /* @__PURE__ */ React9.createElement("div", { className: "min-h-[300px] flex-1 overflow-auto rounded-md border border-border bg-background" }, /* @__PURE__ */ React9.createElement(
+  )), /* @__PURE__ */ React9.createElement("div", { className: "border-t border-border pt-4" }, /* @__PURE__ */ React9.createElement(Label3, { className: "text-xs text-muted-foreground italic" }, "Additional options moved to Widget Settings.")))))), showParseWarning && /* @__PURE__ */ React9.createElement("div", { className: "my-2 shrink-0 rounded-md border border-amber-200 bg-amber-50 px-4 py-2 dark:border-amber-900/40 dark:bg-amber-950/20" }, /* @__PURE__ */ React9.createElement("div", { className: "flex items-start gap-2 text-xs" }, /* @__PURE__ */ React9.createElement(FiAlertTriangle, { className: "mt-0.5 h-4 w-4 shrink-0 text-amber-600" }), /* @__PURE__ */ React9.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React9.createElement("h4", { className: "mb-1 font-semibold text-amber-900 dark:text-amber-200" }, "Cannot fully parse chart config"), /* @__PURE__ */ React9.createElement("p", { className: "mb-2 text-amber-800 dark:text-amber-300" }, "Switching to Visual mode may cause you to lose manual modifications:"), /* @__PURE__ */ React9.createElement("ul", { className: "mb-3 list-disc pl-4 text-amber-800 dark:text-amber-300" }, parseWarningsList.map((w, i) => /* @__PURE__ */ React9.createElement("li", { key: i, className: "mb-0.5" }, w))), /* @__PURE__ */ React9.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React9.createElement(Button7, { type: "button", variant: "outline", size: "sm", onClick: () => setShowParseWarning(false), className: "h-7 text-xs" }, "Cancel"), /* @__PURE__ */ React9.createElement(Button7, { type: "button", size: "sm", onClick: confirmModeSwitch, className: "h-7 text-xs bg-amber-600 hover:bg-amber-700 text-white dark:bg-amber-700 dark:hover:bg-amber-600" }, "Switch & Overwrite"))))), !showParseWarning && currentMode === "raw" && /* @__PURE__ */ React9.createElement("div", { className: "min-h-[300px] flex-1 overflow-auto rounded-md border border-border bg-background" }, /* @__PURE__ */ React9.createElement(
     VegaSpecEditor,
     {
       value: widgetEditorForm.values.widgetConfig?.vegaSpec,

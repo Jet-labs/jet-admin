@@ -108,30 +108,22 @@ export const checkboxTester = (uischema, schema) => {
 };
 
 // ============================================================================
-// Code PGSQL Tester (for Monaco Editor SQL)
+// Code Editor Tester (Unified for all Monaco Editor instances)
 // ============================================================================
-export const codePgsqlTester = rankWith(
+export const codeEditorTester = rankWith(
   100,
   and(
     isControl,
     (uischema, rootSchema) => {
       try {
         const currentSchema = Resolve.schema(rootSchema, uischema.scope, rootSchema);
-        return ['code-pgsql', 'code-sql', 'code-mysql'].includes(currentSchema?.format);
+        return typeof currentSchema?.format === 'string' && currentSchema.format.startsWith('code-');
       } catch (e) {
-        console.warn(`Error resolving schema for scope ${uischema.scope} in codePgsqlTester:`, e);
+        console.warn(`Error resolving schema for scope ${uischema.scope} in codeEditorTester:`, e);
         return false;
       }
     }
   )
-);
-
-// ============================================================================
-// Code JavaScript Tester (for Monaco Editor JavaScript)
-// ============================================================================
-export const codeJavascriptTester = rankWith(
-  100,
-  and(isControl, formatIs("code-javascript"))
 );
 
 // ============================================================================

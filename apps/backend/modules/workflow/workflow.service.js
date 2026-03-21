@@ -417,12 +417,19 @@ workflowService.getRunStatus = async (instanceID) => {
       executionLogID: log.executionLogID.toString(),
     }));
 
+    // Assemble context from unified log and strip internal keys
+    const { stateManager: sm } = require("./orchestrator/stateManager");
+    const fullContext = await sm.assembleContext(instanceID);
+    const contextData = Object.fromEntries(
+      Object.entries(fullContext).filter(([key]) => !key.startsWith('__'))
+    );
+
     return {
       instanceID: instance.instanceID,
       workflowID: instance.workflowID,
       workflowTitle: instance.tblWorkflows?.title,
       status: instance.status,
-      contextData: instance.contextData,
+      contextData,
       startedAt: instance.startedAt,
       completedAt: instance.completedAt,
       logs: logs,

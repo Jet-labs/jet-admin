@@ -1,6 +1,5 @@
-import { githubLight } from "@uiw/codemirror-theme-github";
-import CodeMirror from "@uiw/react-codemirror";
 import React from "react";
+import { CodeEditor } from "@jet-admin/ui";
 import PropTypes from "prop-types";
 
 export const QueryResponseRAWTab = ({ data }) => {
@@ -9,17 +8,13 @@ export const QueryResponseRAWTab = ({ data }) => {
   };
   return (
     <div className="w-100 flex-grow h-full overflow-y-auto ">
-      <CodeMirror
+      <CodeEditor
         value={JSON.stringify(data, null, 2)}
-        // height="400px"
-        theme={githubLight}
-        style={{
-          width: "100%",
-          borderWidth: 0,
-          borderBottomWidth: 1,
-          outline: "none",
-        }}
-        className="border-slate-300 focus:border-slate-300 focus:outline-slate-300 flex-grow non-focusable-code-editor !h-full"
+        language="json"
+        readOnly
+        showHeader={false}
+        height="100%"
+        className="rounded-none border-b border-t-0 border-x-0 !h-full border-slate-300"
       />
     </div>
   );

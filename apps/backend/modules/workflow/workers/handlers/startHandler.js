@@ -15,7 +15,7 @@ async function execute(nodeConfig, context, helpers) {
   
   return {
     output,
-    nextHandle: 'output',
+    nextHandle: NEXT_HANDLE.OUTPUT,
   };
 }
 

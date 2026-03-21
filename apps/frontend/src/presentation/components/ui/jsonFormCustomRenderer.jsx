@@ -30,7 +30,7 @@ export {
   JetTextControl,
   JetSelectControl,
   JetCheckboxControl,
-  JetCodePgsqlControl,
+  JetCodeEditorControl,
   JetSuggestionControl,
   JetDynamicArgsControl,
   JetKeyValueArrayControl,

@@ -10,11 +10,12 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "../ui/resizable";
+import { AIChatButton } from "../aiChatComponents/aiChatButton";
 
 export const DashboardLayout = () => {
   return (
     <DashboardsContextProvider>
-      <div className="flex h-full w-full flex-col overflow-hidden bg-background">
+      <div className="flex h-full w-full flex-col overflow-hidden bg-background relative">
         <ResizablePanelGroup
           direction="horizontal"
           autoSaveId={
@@ -30,7 +31,11 @@ export const DashboardLayout = () => {
             <Outlet />
           </ResizablePanel>
         </ResizablePanelGroup>
+
+        {/* Global Agent Chat UI */}
+        {/* <AIChatButton /> */}
       </div>
     </DashboardsContextProvider>
   );
 };
+

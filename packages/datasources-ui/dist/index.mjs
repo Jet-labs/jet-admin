@@ -7,62 +7,50 @@ import { Tab, Tabs } from "@mui/material";
 import React5, { useState } from "react";
 
 // src/components/common/queryResponseJSONTab.js
-import { loadLanguage } from "@uiw/codemirror-extensions-langs";
-import { githubLight } from "@uiw/codemirror-theme-github";
-import CodeMirror from "@uiw/react-codemirror";
-import PropTypes from "prop-types";
 import React from "react";
+import { CodeEditor } from "@jet-admin/ui";
+import PropTypes from "prop-types";
 var QueryResponseJSONTab = ({ data }) => {
   QueryResponseJSONTab.propTypes = {
     data: PropTypes.object
   };
   return /* @__PURE__ */ React.createElement("div", { className: "w-100 flex-grow h-full overflow-y-auto pb-5" }, /* @__PURE__ */ React.createElement(
-    CodeMirror,
+    CodeEditor,
     {
       value: JSON.stringify(data, null, 2),
-      extensions: [loadLanguage("json")],
-      theme: githubLight,
-      style: {
-        width: "100%",
-        borderWidth: 0,
-        borderBottomWidth: 1,
-        outline: "none"
-      },
-      className: "border-slate-300 focus:border-slate-300 focus:outline-slate-300 flex-grow non-focusable-code-editor !h-full"
+      language: "json",
+      readOnly: true,
+      showHeader: false,
+      height: "100%",
+      className: "rounded-none border-b border-t-0 border-x-0 !h-full border-slate-300"
     }
   ));
 };
 
 // src/components/common/queryResponseRawTab.js
-import { githubLight as githubLight2 } from "@uiw/codemirror-theme-github";
-import CodeMirror2 from "@uiw/react-codemirror";
 import React2 from "react";
+import { CodeEditor as CodeEditor2 } from "@jet-admin/ui";
 import PropTypes2 from "prop-types";
 var QueryResponseRAWTab = ({ data }) => {
   QueryResponseRAWTab.propTypes = {
     data: PropTypes2.object
   };
   return /* @__PURE__ */ React2.createElement("div", { className: "w-100 flex-grow h-full overflow-y-auto " }, /* @__PURE__ */ React2.createElement(
-    CodeMirror2,
+    CodeEditor2,
     {
       value: JSON.stringify(data, null, 2),
-      theme: githubLight2,
-      style: {
-        width: "100%",
-        borderWidth: 0,
-        borderBottomWidth: 1,
-        outline: "none"
-      },
-      className: "border-slate-300 focus:border-slate-300 focus:outline-slate-300 flex-grow non-focusable-code-editor !h-full"
+      language: "json",
+      readOnly: true,
+      showHeader: false,
+      height: "100%",
+      className: "rounded-none border-b border-t-0 border-x-0 !h-full border-slate-300"
     }
   ));
 };
 
 // src/components/common/queryResponseSchemaTab.js
-import { loadLanguage as loadLanguage2 } from "@uiw/codemirror-extensions-langs";
-import { githubLight as githubLight3 } from "@uiw/codemirror-theme-github";
-import CodeMirror3 from "@uiw/react-codemirror";
 import React3 from "react";
+import { CodeEditor as CodeEditor3 } from "@jet-admin/ui";
 import "react-data-grid/lib/styles.css";
 import jsonSchemaGenerator from "to-json-schema";
 import PropTypes3 from "prop-types";
@@ -74,18 +62,14 @@ var QueryResponseSchemaTab = ({ data }) => {
     data ? data : { arrays: { mode: "all" } }
   );
   return /* @__PURE__ */ React3.createElement("div", { className: "w-100 flex-grow h-full overflow-y-auto " }, /* @__PURE__ */ React3.createElement(
-    CodeMirror3,
+    CodeEditor3,
     {
       value: JSON.stringify(dataSchema, null, 2),
-      theme: githubLight3,
-      extensions: [loadLanguage2("json")],
-      style: {
-        width: "100%",
-        borderWidth: 0,
-        borderBottomWidth: 1,
-        outline: "none"
-      },
-      className: "border-slate-300 focus:border-slate-300 focus:outline-slate-300 flex-grow non-focusable-code-editor !h-full"
+      language: "json",
+      readOnly: true,
+      showHeader: false,
+      height: "100%",
+      className: "rounded-none border-b border-t-0 border-x-0 !h-full border-slate-300"
     }
   ));
 };

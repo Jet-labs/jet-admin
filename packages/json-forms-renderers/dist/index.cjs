@@ -30,8 +30,9 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var index_exports = {};
 __export(index_exports, {
   CustomCheckboxInput: () => CustomCheckboxInput,
-  CustomCodeJavascriptControl: () => CustomCodeJavascriptControl,
-  CustomCodePgsqlControl: () => CustomCodePgsqlControl,
+  CustomCodeEditorControl: () => CustomCodeEditorControl,
+  CustomCodeJavascriptControl: () => CustomCodeEditorControl,
+  CustomCodePgsqlControl: () => CustomCodeEditorControl,
   CustomFieldOperatorValueArrayRenderer: () => CustomFieldOperatorValueArrayRenderer,
   CustomGroupLayout: () => CustomGroupLayout,
   CustomKeyTypeArrayRenderer: () => CustomKeyTypeArrayRenderer,
@@ -47,8 +48,9 @@ __export(index_exports, {
   CustomVerticalLayout: () => CustomVerticalLayout,
   DynamicArgsControl: () => DynamicArgsControl,
   JetCheckboxControl: () => JetCheckboxControl,
-  JetCodeJavascriptControl: () => JetCodeJavascriptControl,
-  JetCodePgsqlControl: () => JetCodePgsqlControl,
+  JetCodeEditorControl: () => JetCodeEditorControl,
+  JetCodeJavascriptControl: () => JetCodeEditorControl,
+  JetCodePgsqlControl: () => JetCodeEditorControl,
   JetDynamicArgsControl: () => JetDynamicArgsControl,
   JetFieldOperatorValueArrayControl: () => JetFieldOperatorValueArrayControl,
   JetGroupLayout: () => JetGroupLayout,
@@ -64,8 +66,9 @@ __export(index_exports, {
   JetTextControl: () => JetTextControl,
   JetVerticalLayout: () => JetVerticalLayout,
   checkboxTester: () => checkboxTester,
-  codeJavascriptTester: () => codeJavascriptTester,
-  codePgsqlTester: () => codePgsqlTester,
+  codeEditorTester: () => codeEditorTester,
+  codeJavascriptTester: () => codeEditorTester,
+  codePgsqlTester: () => codeEditorTester,
   dynamicArgsTester: () => dynamicArgsTester,
   fieldOperatorValueArrayTester: () => fieldOperatorValueArrayTester,
   groupLayoutTester: () => groupLayoutTester,
@@ -86,7 +89,7 @@ __export(index_exports, {
 module.exports = __toCommonJS(index_exports);
 
 // src/renderers/index.js
-var import_react26 = require("@jsonforms/react");
+var import_react23 = require("@jsonforms/react");
 
 // src/renderers/CustomNumberInput.jsx
 var import_react = __toESM(require("react"));
@@ -331,11 +334,10 @@ CustomCheckboxInput.propTypes = {
   uischema: import_prop_types4.default.object.isRequired
 };
 
-// src/renderers/CustomCodePgsqlControl.jsx
+// src/renderers/CustomCodeEditorControl.jsx
 var import_react5 = __toESM(require("react"));
 var import_prop_types5 = __toESM(require("prop-types"));
-var import_react6 = __toESM(require("@monaco-editor/react"));
-var import_GitHub_Light = __toESM(require("monaco-themes/themes/GitHub Light.json"));
+var import_ui5 = require("@jet-admin/ui");
 
 // src/renderers/templateCompletion.js
 var ROOT_COMPLETIONS = [
@@ -450,8 +452,8 @@ var buildTemplateSuggestions = ({ monaco, context, queryArgs = [] }) => {
   return templateSuggestions;
 };
 
-// src/renderers/CustomCodePgsqlControl.jsx
-var CustomCodePgsqlControl = ({
+// src/renderers/CustomCodeEditorControl.jsx
+var CustomCodeEditorControl = ({
   data,
   path,
   label,
@@ -459,11 +461,28 @@ var CustomCodePgsqlControl = ({
   errors,
   handleChange,
   enabled,
-  uischema
+  uischema,
+  schema
 }) => {
-  const { databaseMetadata, queryArgs = [] } = uischema.options || {};
+  const {
+    databaseMetadata,
+    queryArgs = [],
+    height = "140px",
+    placeholder,
+    hint
+  } = uischema.options || {};
+  const format = schema?.format || "";
+  const language = (0, import_react5.useMemo)(() => {
+    if (["code-pgsql", "code-sql", "code-mysql"].includes(format)) return "sql";
+    if (format === "code-javascript") return "javascript";
+    if (format === "code-json") return "json";
+    if (format === "code-html") return "html";
+    if (format === "code-css") return "css";
+    if (format.startsWith("code-")) return format.replace("code-", "");
+    return "javascript";
+  }, [format]);
   const tablesMap = (0, import_react5.useMemo)(() => {
-    if (!databaseMetadata?.schemas) return {};
+    if (language !== "sql" || !databaseMetadata?.schemas) return {};
     const map = {};
     databaseMetadata.schemas.forEach((schemaItem) => {
       schemaItem.tables?.forEach((t) => {
@@ -471,7 +490,7 @@ var CustomCodePgsqlControl = ({
       });
     });
     return map;
-  }, [databaseMetadata]);
+  }, [databaseMetadata, language]);
   const schemaRef = (0, import_react5.useRef)(tablesMap);
   const queryArgsRef = (0, import_react5.useRef)(queryArgs);
   (0, import_react5.useEffect)(() => {
@@ -480,294 +499,228 @@ var CustomCodePgsqlControl = ({
   (0, import_react5.useEffect)(() => {
     queryArgsRef.current = queryArgs;
   }, [queryArgs]);
-  const handleEditorWillMount = (monaco) => {
-    monaco.languages.registerCompletionItemProvider("sql", {
-      triggerCharacters: [".", " ", "{", "[", '"', "'"],
-      provideCompletionItems: (model, pos) => {
-        const text = model.getValueInRange({
-          startLineNumber: 1,
-          startColumn: 1,
-          endLineNumber: pos.lineNumber,
-          endColumn: pos.column
-        });
-        const wordInfo = model.getWordUntilPosition(pos);
-        const range = {
-          startLineNumber: pos.lineNumber,
-          endLineNumber: pos.lineNumber,
-          startColumn: wordInfo.startColumn,
-          endColumn: wordInfo.endColumn
-        };
-        const templateContext = getTemplateCompletionContext(model, pos);
-        if (templateContext) {
-          return {
-            suggestions: buildTemplateSuggestions({
-              monaco,
-              context: templateContext,
-              queryArgs: queryArgsRef.current
-            })
+  const handleBeforeMount = (monaco) => {
+    if (language === "sql") {
+      monaco.languages.registerCompletionItemProvider("sql", {
+        triggerCharacters: [".", " ", "{", "[", '"', "'"],
+        provideCompletionItems: (model, pos) => {
+          const text = model.getValueInRange({
+            startLineNumber: 1,
+            startColumn: 1,
+            endLineNumber: pos.lineNumber,
+            endColumn: pos.column
+          });
+          const wordInfo = model.getWordUntilPosition(pos);
+          const range = {
+            startLineNumber: pos.lineNumber,
+            endLineNumber: pos.lineNumber,
+            startColumn: wordInfo.startColumn,
+            endColumn: wordInfo.endColumn
           };
+          const templateContext = getTemplateCompletionContext(model, pos);
+          if (templateContext) {
+            return {
+              suggestions: buildTemplateSuggestions({
+                monaco,
+                context: templateContext,
+                queryArgs: queryArgsRef.current
+              })
+            };
+          }
+          const suggestions = [];
+          const tableMatch = text.match(/(\\b\\w+)\\.$/);
+          if (tableMatch) {
+            const cols = schemaRef.current[tableMatch[1]] || [];
+            cols.forEach(
+              (col) => suggestions.push({
+                label: col,
+                kind: monaco.languages.CompletionItemKind.Field,
+                insertText: col,
+                detail: `Column of ${tableMatch[1]}`,
+                range
+              })
+            );
+          } else {
+            Object.keys(schemaRef.current).forEach(
+              (tbl) => suggestions.push({
+                label: tbl,
+                kind: monaco.languages.CompletionItemKind.Class,
+                insertText: tbl,
+                detail: "Table",
+                range
+              })
+            );
+            const sqlKeywords = [
+              "SELECT",
+              "FROM",
+              "WHERE",
+              "JOIN",
+              "LEFT JOIN",
+              "RIGHT JOIN",
+              "INNER JOIN",
+              "ON",
+              "GROUP BY",
+              "ORDER BY",
+              "ASC",
+              "DESC",
+              "AS",
+              "DISTINCT",
+              "LIMIT",
+              "OFFSET",
+              "INSERT INTO",
+              "VALUES",
+              "UPDATE",
+              "SET",
+              "DELETE",
+              "CREATE TABLE",
+              "ALTER TABLE",
+              "DROP TABLE",
+              "INDEX",
+              "COUNT",
+              "SUM",
+              "AVG",
+              "MAX",
+              "MIN",
+              "AND",
+              "OR",
+              "NOT",
+              "NULL",
+              "IS"
+            ];
+            sqlKeywords.forEach(
+              (kw) => suggestions.push({
+                label: kw,
+                kind: monaco.languages.CompletionItemKind.Keyword,
+                insertText: kw,
+                range
+              })
+            );
+          }
+          return { suggestions };
         }
-        const suggestions = [];
-        const tableMatch = text.match(/(\b\w+)\.$/);
-        if (tableMatch) {
-          const cols = schemaRef.current[tableMatch[1]] || [];
-          cols.forEach(
-            (col) => suggestions.push({
-              label: col,
-              kind: monaco.languages.CompletionItemKind.Field,
-              insertText: col,
-              detail: `Column of ${tableMatch[1]}`,
+      });
+    }
+    if (language === "javascript") {
+      monaco.languages.registerCompletionItemProvider("javascript", {
+        triggerCharacters: [".", "{", "[", '"', "'", " "],
+        provideCompletionItems: (model, position) => {
+          const templateContext = getTemplateCompletionContext(model, position);
+          if (templateContext) {
+            return {
+              suggestions: buildTemplateSuggestions({
+                monaco,
+                context: templateContext,
+                queryArgs: queryArgsRef.current
+              })
+            };
+          }
+          const wordInfo = model.getWordUntilPosition(position);
+          const range = {
+            startLineNumber: position.lineNumber,
+            endLineNumber: position.lineNumber,
+            startColumn: wordInfo.startColumn,
+            endColumn: wordInfo.endColumn
+          };
+          const suggestions = [];
+          const textBefore = model.getValueInRange({
+            startLineNumber: position.lineNumber,
+            startColumn: 1,
+            endLineNumber: position.lineNumber,
+            endColumn: position.column
+          });
+          if (textBefore.endsWith("ctx.")) {
+            suggestions.push({
+              label: "/* Available context variables */",
+              kind: monaco.languages.CompletionItemKind.Text,
+              insertText: "",
+              detail: "Access results from previous nodes using ctx.variableName",
               range
-            })
-          );
-        } else {
-          Object.keys(schemaRef.current).forEach(
-            (tbl) => suggestions.push({
-              label: tbl,
-              kind: monaco.languages.CompletionItemKind.Class,
-              insertText: tbl,
-              detail: "Table",
-              range
-            })
-          );
-          const sqlKeywords = [
-            "SELECT",
-            "FROM",
-            "WHERE",
-            "JOIN",
-            "LEFT JOIN",
-            "RIGHT JOIN",
-            "INNER JOIN",
-            "ON",
-            "GROUP BY",
-            "ORDER BY",
-            "ASC",
-            "DESC",
-            "AS",
-            "DISTINCT",
-            "LIMIT",
-            "OFFSET",
-            "INSERT INTO",
-            "VALUES",
-            "UPDATE",
-            "SET",
-            "DELETE",
-            "CREATE TABLE",
-            "ALTER TABLE",
-            "DROP TABLE",
-            "INDEX",
-            "COUNT",
-            "SUM",
-            "AVG",
-            "MAX",
-            "MIN",
-            "AND",
-            "OR",
-            "NOT",
-            "NULL",
-            "IS"
+            });
+          }
+          const jsKeywords = [
+            { label: "return", detail: "Return statement" },
+            { label: "const", detail: "Constant declaration" },
+            { label: "let", detail: "Variable declaration" },
+            { label: "ctx", detail: "Workflow context object" },
+            { label: "console.log", detail: "Log to console" },
+            { label: "JSON.stringify", detail: "Convert to JSON string" },
+            { label: "JSON.parse", detail: "Parse JSON string" },
+            { label: "Array.isArray", detail: "Check if array" },
+            { label: "Object.keys", detail: "Get object keys" },
+            { label: "Object.values", detail: "Get object values" }
           ];
-          sqlKeywords.forEach(
-            (kw) => suggestions.push({
-              label: kw,
+          jsKeywords.forEach((kw) => {
+            suggestions.push({
+              label: kw.label,
               kind: monaco.languages.CompletionItemKind.Keyword,
-              insertText: kw,
+              insertText: kw.label,
+              detail: kw.detail,
               range
-            })
-          );
+            });
+          });
+          return { suggestions };
         }
-        return { suggestions };
-      }
-    });
-    monaco.editor.defineTheme("github-light", import_GitHub_Light.default);
+      });
+    }
   };
+  const hasErrors = errors && errors.length > 0;
   return /* @__PURE__ */ import_react5.default.createElement("div", { className: "mb-3" }, /* @__PURE__ */ import_react5.default.createElement(
     "label",
     {
       htmlFor: path,
-      className: `block mb-1 text-xs font-medium ${errors && errors.length > 0 ? "text-red-500" : "text-slate-500"}`
+      className: `block mb-1 text-xs font-medium ${hasErrors ? "text-red-500" : "text-slate-500"}`
     },
     label || description,
     " ",
-    errors && errors.length > 0 && errors
-  ), /* @__PURE__ */ import_react5.default.createElement("div", { className: "border border-slate-200 rounded p-1" }, /* @__PURE__ */ import_react5.default.createElement(
-    import_react6.default,
+    hasErrors && errors
+  ), hint && /* @__PURE__ */ import_react5.default.createElement("p", { className: "text-[10px] text-slate-400 mb-1" }, hint), /* @__PURE__ */ import_react5.default.createElement(
+    import_ui5.CodeEditor,
     {
-      height: uischema.options?.height || "140px",
-      defaultLanguage: "sql",
-      value: data || "",
+      value: data || placeholder || "",
       onChange: (val) => handleChange(path, val || ""),
-      beforeMount: handleEditorWillMount,
-      options: {
-        readOnly: !enabled,
-        minimap: { enabled: false },
-        fontSize: 12,
-        wordWrap: "on"
-      },
-      theme: "github-light"
+      language,
+      height,
+      disabled: !enabled,
+      showHeader: false,
+      beforeMount: handleBeforeMount,
+      status: hasErrors ? "error" : null
     }
-  )));
+  ));
 };
-CustomCodePgsqlControl.propTypes = {
+CustomCodeEditorControl.propTypes = {
   data: import_prop_types5.default.string,
   path: import_prop_types5.default.string.isRequired,
   handleChange: import_prop_types5.default.func.isRequired,
   enabled: import_prop_types5.default.bool.isRequired,
   uischema: import_prop_types5.default.object,
+  schema: import_prop_types5.default.object,
   label: import_prop_types5.default.string,
   description: import_prop_types5.default.string,
   errors: import_prop_types5.default.arrayOf(import_prop_types5.default.string)
 };
 
-// src/renderers/CustomCodeJavascriptControl.jsx
-var import_react7 = __toESM(require("react"));
-var import_prop_types6 = __toESM(require("prop-types"));
-var import_react8 = __toESM(require("@monaco-editor/react"));
-var import_GitHub_Light2 = __toESM(require("monaco-themes/themes/GitHub Light.json"));
-var CustomCodeJavascriptControl = ({
-  data,
-  path,
-  label,
-  description,
-  errors,
-  handleChange,
-  enabled,
-  uischema
-}) => {
-  const { placeholder, hint, queryArgs = [] } = uischema.options || {};
-  const rows = uischema.options?.rows || 10;
-  const height = rows * 20 + "px";
-  const queryArgsRef = (0, import_react7.useRef)(queryArgs);
-  (0, import_react7.useEffect)(() => {
-    queryArgsRef.current = queryArgs;
-  }, [queryArgs]);
-  const handleEditorWillMount = (monaco) => {
-    monaco.editor.defineTheme("github-light", import_GitHub_Light2.default);
-    monaco.languages.registerCompletionItemProvider("javascript", {
-      triggerCharacters: [".", "{", "[", '"', "'", " "],
-      provideCompletionItems: (model, position) => {
-        const templateContext = getTemplateCompletionContext(model, position);
-        if (templateContext) {
-          return {
-            suggestions: buildTemplateSuggestions({
-              monaco,
-              context: templateContext,
-              queryArgs: queryArgsRef.current
-            })
-          };
-        }
-        const wordInfo = model.getWordUntilPosition(position);
-        const range = {
-          startLineNumber: position.lineNumber,
-          endLineNumber: position.lineNumber,
-          startColumn: wordInfo.startColumn,
-          endColumn: wordInfo.endColumn
-        };
-        const suggestions = [];
-        const textBefore = model.getValueInRange({
-          startLineNumber: position.lineNumber,
-          startColumn: 1,
-          endLineNumber: position.lineNumber,
-          endColumn: position.column
-        });
-        if (textBefore.endsWith("ctx.")) {
-          suggestions.push({
-            label: "/* Available context variables */",
-            kind: monaco.languages.CompletionItemKind.Text,
-            insertText: "",
-            detail: "Access results from previous nodes using ctx.variableName",
-            range
-          });
-        }
-        const jsKeywords = [
-          { label: "return", detail: "Return statement" },
-          { label: "const", detail: "Constant declaration" },
-          { label: "let", detail: "Variable declaration" },
-          { label: "ctx", detail: "Workflow context object" },
-          { label: "console.log", detail: "Log to console" },
-          { label: "JSON.stringify", detail: "Convert to JSON string" },
-          { label: "JSON.parse", detail: "Parse JSON string" },
-          { label: "Array.isArray", detail: "Check if array" },
-          { label: "Object.keys", detail: "Get object keys" },
-          { label: "Object.values", detail: "Get object values" }
-        ];
-        jsKeywords.forEach((kw) => {
-          suggestions.push({
-            label: kw.label,
-            kind: monaco.languages.CompletionItemKind.Keyword,
-            insertText: kw.label,
-            detail: kw.detail,
-            range
-          });
-        });
-        return { suggestions };
-      }
-    });
-  };
-  return /* @__PURE__ */ import_react7.default.createElement("div", { className: "mb-3" }, /* @__PURE__ */ import_react7.default.createElement(
-    "label",
-    {
-      htmlFor: path,
-      className: `block mb-1 text-xs font-medium ${errors && errors.length > 0 ? "text-red-500" : "text-slate-500"}`
-    },
-    label || description,
-    " ",
-    errors && errors.length > 0 && errors
-  ), hint && /* @__PURE__ */ import_react7.default.createElement("p", { className: "text-[10px] text-slate-400 mb-1" }, hint), /* @__PURE__ */ import_react7.default.createElement("div", { className: "border border-slate-200 rounded p-1" }, /* @__PURE__ */ import_react7.default.createElement(
-    import_react8.default,
-    {
-      height,
-      defaultLanguage: "javascript",
-      value: data || placeholder || "",
-      onChange: (val) => handleChange(path, val || ""),
-      beforeMount: handleEditorWillMount,
-      options: {
-        readOnly: !enabled,
-        minimap: { enabled: false },
-        fontSize: 12,
-        wordWrap: "on",
-        lineNumbers: "on",
-        scrollBeyondLastLine: false,
-        tabSize: 2,
-        automaticLayout: true
-      },
-      theme: "github-light"
-    }
-  )));
-};
-CustomCodeJavascriptControl.propTypes = {
-  data: import_prop_types6.default.string,
-  path: import_prop_types6.default.string.isRequired,
-  handleChange: import_prop_types6.default.func.isRequired,
-  enabled: import_prop_types6.default.bool.isRequired,
-  uischema: import_prop_types6.default.object,
-  label: import_prop_types6.default.string,
-  description: import_prop_types6.default.string,
-  errors: import_prop_types6.default.arrayOf(import_prop_types6.default.string)
-};
-
 // src/renderers/CustomSuggestionInput.jsx
-var import_react9 = __toESM(require("react"));
-var import_prop_types7 = __toESM(require("prop-types"));
-var import_ui5 = require("@jet-admin/ui");
+var import_react6 = __toESM(require("react"));
+var import_prop_types6 = __toESM(require("prop-types"));
+var import_ui6 = require("@jet-admin/ui");
 var CustomSuggestionInput = (props) => {
   const { data, path, handleChange, label, description, errors, uischema, enabled } = props;
   const { suggestions, placeholder } = uischema.options || {};
-  const [isOpen, setIsOpen] = (0, import_react9.useState)(false);
+  const [isOpen, setIsOpen] = (0, import_react6.useState)(false);
   const handleSelect = (value) => {
     const currentVal = data || "";
     handleChange(path, currentVal + value);
     setIsOpen(false);
   };
-  return /* @__PURE__ */ import_react9.default.createElement("div", { className: "relative mb-3" }, /* @__PURE__ */ import_react9.default.createElement(
+  return /* @__PURE__ */ import_react6.default.createElement("div", { className: "relative mb-3" }, /* @__PURE__ */ import_react6.default.createElement(
     "label",
     {
       htmlFor: path,
       className: `block mb-1 text-xs font-medium ${errors && errors.length > 0 ? "text-red-500" : "text-slate-500"} flex justify-between items-center`
     },
-    /* @__PURE__ */ import_react9.default.createElement("span", null, label || description, " ", errors && errors.length > 0 && errors),
-    suggestions && suggestions.length > 0 && /* @__PURE__ */ import_react9.default.createElement(
-      import_ui5.Button,
+    /* @__PURE__ */ import_react6.default.createElement("span", null, label || description, " ", errors && errors.length > 0 && errors),
+    suggestions && suggestions.length > 0 && /* @__PURE__ */ import_react6.default.createElement(
+      import_ui6.Button,
       {
         type: "button",
         onClick: () => setIsOpen(!isOpen),
@@ -776,8 +729,8 @@ var CustomSuggestionInput = (props) => {
       },
       "Map +"
     )
-  ), /* @__PURE__ */ import_react9.default.createElement(
-    import_ui5.Input,
+  ), /* @__PURE__ */ import_react6.default.createElement(
+    import_ui6.Input,
     {
       type: "text",
       id: path,
@@ -788,7 +741,7 @@ var CustomSuggestionInput = (props) => {
       onChange: (ev) => handleChange(path, ev.target.value),
       value: data || ""
     }
-  ), isOpen && suggestions && /* @__PURE__ */ import_react9.default.createElement("div", { className: "absolute right-0 top-6 w-48 bg-white border border-slate-200 shadow-xl rounded z-[50] max-h-40 overflow-y-auto" }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "p-2 border-b border-slate-100 flex justify-between items-center bg-slate-50" }, /* @__PURE__ */ import_react9.default.createElement("span", { className: "text-[10px] font-semibold text-slate-500" }, "Pick a node"), /* @__PURE__ */ import_react9.default.createElement(import_ui5.Button, { type: "button", onClick: () => setIsOpen(false), className: "text-slate-400 hover:text-slate-600" }, "\xD7")), suggestions.length === 0 ? /* @__PURE__ */ import_react9.default.createElement("div", { className: "px-2 py-1 text-[10px] text-slate-400 italic" }, "No suggestions") : suggestions.map((item, idx) => /* @__PURE__ */ import_react9.default.createElement(
+  ), isOpen && suggestions && /* @__PURE__ */ import_react6.default.createElement("div", { className: "absolute right-0 top-6 w-48 bg-white border border-slate-200 shadow-xl rounded z-[50] max-h-40 overflow-y-auto" }, /* @__PURE__ */ import_react6.default.createElement("div", { className: "p-2 border-b border-slate-100 flex justify-between items-center bg-slate-50" }, /* @__PURE__ */ import_react6.default.createElement("span", { className: "text-[10px] font-semibold text-slate-500" }, "Pick a node"), /* @__PURE__ */ import_react6.default.createElement(import_ui6.Button, { type: "button", onClick: () => setIsOpen(false), className: "text-slate-400 hover:text-slate-600" }, "\xD7")), suggestions.length === 0 ? /* @__PURE__ */ import_react6.default.createElement("div", { className: "px-2 py-1 text-[10px] text-slate-400 italic" }, "No suggestions") : suggestions.map((item, idx) => /* @__PURE__ */ import_react6.default.createElement(
     "div",
     {
       key: idx,
@@ -799,21 +752,21 @@ var CustomSuggestionInput = (props) => {
   ))));
 };
 CustomSuggestionInput.propTypes = {
-  data: import_prop_types7.default.string,
-  path: import_prop_types7.default.string.isRequired,
-  handleChange: import_prop_types7.default.func.isRequired,
-  label: import_prop_types7.default.string,
-  description: import_prop_types7.default.string,
-  errors: import_prop_types7.default.arrayOf(import_prop_types7.default.string),
-  uischema: import_prop_types7.default.object.isRequired,
-  enabled: import_prop_types7.default.bool
+  data: import_prop_types6.default.string,
+  path: import_prop_types6.default.string.isRequired,
+  handleChange: import_prop_types6.default.func.isRequired,
+  label: import_prop_types6.default.string,
+  description: import_prop_types6.default.string,
+  errors: import_prop_types6.default.arrayOf(import_prop_types6.default.string),
+  uischema: import_prop_types6.default.object.isRequired,
+  enabled: import_prop_types6.default.bool
 };
 
 // src/renderers/DynamicArgsControl.jsx
-var import_react10 = __toESM(require("react"));
-var import_prop_types8 = __toESM(require("prop-types"));
+var import_react7 = __toESM(require("react"));
+var import_prop_types7 = __toESM(require("prop-types"));
 var import_tb2 = require("react-icons/tb");
-var import_ui6 = require("@jet-admin/ui");
+var import_ui7 = require("@jet-admin/ui");
 var DynamicArgsControl = (props) => {
   const { data, path, handleChange, uischema, errors } = props;
   const args = uischema?.options?.args || [];
@@ -825,7 +778,7 @@ var DynamicArgsControl = (props) => {
   const handleArgChange = (argKey, value) => {
     handleChange(path, { ...argsData, [argKey]: value });
   };
-  const getUpstreamNodeIds = (0, import_react10.useMemo)(() => {
+  const getUpstreamNodeIds = (0, import_react7.useMemo)(() => {
     if (!currentNodeId || !workflowEdges || workflowEdges.length === 0) {
       return /* @__PURE__ */ new Set();
     }
@@ -878,9 +831,9 @@ var DynamicArgsControl = (props) => {
   if (args.length === 0) {
     return null;
   }
-  return /* @__PURE__ */ import_react10.default.createElement("div", { className: "border border-slate-200 rounded p-3 mt-2 bg-white" }, /* @__PURE__ */ import_react10.default.createElement("label", { className: "block mb-2 text-xs font-medium text-slate-500" }, "Arguments"), /* @__PURE__ */ import_react10.default.createElement("div", { className: "space-y-2" }, args.map((arg, index) => {
+  return /* @__PURE__ */ import_react7.default.createElement("div", { className: "border border-slate-200 rounded p-3 mt-2 bg-white" }, /* @__PURE__ */ import_react7.default.createElement("label", { className: "block mb-2 text-xs font-medium text-slate-500" }, "Arguments"), /* @__PURE__ */ import_react7.default.createElement("div", { className: "space-y-2" }, args.map((arg, index) => {
     const argName = arg.key;
-    return /* @__PURE__ */ import_react10.default.createElement(
+    return /* @__PURE__ */ import_react7.default.createElement(
       ArgInputWithVariablePicker,
       {
         key: `arg-${index}`,
@@ -890,13 +843,13 @@ var DynamicArgsControl = (props) => {
         availableVariables
       }
     );
-  })), errors && errors.length > 0 && /* @__PURE__ */ import_react10.default.createElement("span", { className: "text-red-500 text-xs mt-1" }, errors));
+  })), errors && errors.length > 0 && /* @__PURE__ */ import_react7.default.createElement("span", { className: "text-red-500 text-xs mt-1" }, errors));
 };
 var ArgInputWithVariablePicker = ({ argName, value, onChange, availableVariables }) => {
-  const [showDropdown, setShowDropdown] = (0, import_react10.useState)(false);
-  const inputRef = (0, import_react10.useRef)(null);
-  const dropdownRef = (0, import_react10.useRef)(null);
-  (0, import_react10.useEffect)(() => {
+  const [showDropdown, setShowDropdown] = (0, import_react7.useState)(false);
+  const inputRef = (0, import_react7.useRef)(null);
+  const dropdownRef = (0, import_react7.useRef)(null);
+  (0, import_react7.useEffect)(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setShowDropdown(false);
@@ -925,8 +878,8 @@ var ArgInputWithVariablePicker = ({ argName, value, onChange, availableVariables
   };
   const inputVariables = availableVariables.filter((v) => v.category === "input");
   const nodeVariables = availableVariables.filter((v) => v.category === "node");
-  return /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex flex-row justify-between items-center gap-2" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react10.default.createElement("label", { className: "block mb-1 text-[10px] font-medium text-slate-400" }, argName), /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center gap-1" }, /* @__PURE__ */ import_react10.default.createElement(
-    import_ui6.Input,
+  return /* @__PURE__ */ import_react7.default.createElement("div", { className: "flex flex-row justify-between items-center gap-2" }, /* @__PURE__ */ import_react7.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react7.default.createElement("label", { className: "block mb-1 text-[10px] font-medium text-slate-400" }, argName), /* @__PURE__ */ import_react7.default.createElement("div", { className: "flex items-center gap-1" }, /* @__PURE__ */ import_react7.default.createElement(
+    import_ui7.Input,
     {
       ref: inputRef,
       type: "text",
@@ -936,51 +889,51 @@ var ArgInputWithVariablePicker = ({ argName, value, onChange, availableVariables
       value,
       onChange: (e) => onChange(e.target.value)
     }
-  ), /* @__PURE__ */ import_react10.default.createElement("div", { className: "relative", ref: dropdownRef }, /* @__PURE__ */ import_react10.default.createElement(
-    import_ui6.Button,
+  ), /* @__PURE__ */ import_react7.default.createElement("div", { className: "relative", ref: dropdownRef }, /* @__PURE__ */ import_react7.default.createElement(
+    import_ui7.Button,
     {
       type: "button",
       onClick: () => setShowDropdown(!showDropdown),
       className: `flex-shrink-0 p-1.5 rounded transition-colors border border-slate-200 bg-slate-50 ${availableVariables.length > 0 ? "text-blue-500 hover:text-blue-700 hover:bg-blue-50" : "text-slate-400 hover:text-slate-500 hover:bg-slate-100"}`,
       title: "Insert variable from previous node"
     },
-    /* @__PURE__ */ import_react10.default.createElement(import_tb2.TbVariable, { className: "w-4 h-4" })
-  ), showDropdown && /* @__PURE__ */ import_react10.default.createElement("div", { className: "absolute right-0 top-full mt-1 w-64 bg-white border border-slate-200 rounded shadow-lg z-50 max-h-64 overflow-y-auto" }, availableVariables.length === 0 ? /* @__PURE__ */ import_react10.default.createElement("div", { className: "px-2 py-3 text-xs text-slate-400 text-center" }, "No variables available yet.", /* @__PURE__ */ import_react10.default.createElement("br", null), /* @__PURE__ */ import_react10.default.createElement("span", { className: "text-[10px]" }, "Add workflow inputs or connect upstream nodes.")) : /* @__PURE__ */ import_react10.default.createElement(import_react10.default.Fragment, null, inputVariables.length > 0 && /* @__PURE__ */ import_react10.default.createElement(import_react10.default.Fragment, null, /* @__PURE__ */ import_react10.default.createElement("div", { className: "px-2 py-1.5 text-[10px] font-semibold text-green-600 uppercase tracking-wider border-b border-slate-100 bg-green-50" }, "\u{1F4E5} Workflow Inputs"), inputVariables.map((variable, idx) => /* @__PURE__ */ import_react10.default.createElement(
-    import_ui6.Button,
+    /* @__PURE__ */ import_react7.default.createElement(import_tb2.TbVariable, { className: "w-4 h-4" })
+  ), showDropdown && /* @__PURE__ */ import_react7.default.createElement("div", { className: "absolute right-0 top-full mt-1 w-64 bg-white border border-slate-200 rounded shadow-lg z-50 max-h-64 overflow-y-auto" }, availableVariables.length === 0 ? /* @__PURE__ */ import_react7.default.createElement("div", { className: "px-2 py-3 text-xs text-slate-400 text-center" }, "No variables available yet.", /* @__PURE__ */ import_react7.default.createElement("br", null), /* @__PURE__ */ import_react7.default.createElement("span", { className: "text-[10px]" }, "Add workflow inputs or connect upstream nodes.")) : /* @__PURE__ */ import_react7.default.createElement(import_react7.default.Fragment, null, inputVariables.length > 0 && /* @__PURE__ */ import_react7.default.createElement(import_react7.default.Fragment, null, /* @__PURE__ */ import_react7.default.createElement("div", { className: "px-2 py-1.5 text-[10px] font-semibold text-green-600 uppercase tracking-wider border-b border-slate-100 bg-green-50" }, "\u{1F4E5} Workflow Inputs"), inputVariables.map((variable, idx) => /* @__PURE__ */ import_react7.default.createElement(
+    import_ui7.Button,
     {
       key: `input-${idx}`,
       type: "button",
       onClick: () => insertVariable(variable.contextPath),
       className: "w-full bg-white text-left px-2 py-1.5 hover:bg-green-50 hover:border-none border-none rounded-none transition-colors border-b border-slate-50"
     },
-    /* @__PURE__ */ import_react10.default.createElement("div", { className: "text-xs font-medium text-slate-700 font-mono" }, variable.contextPath),
-    /* @__PURE__ */ import_react10.default.createElement("div", { className: "text-[10px] text-slate-400 truncate" }, "type: ", variable.type || "any")
-  ))), nodeVariables.length > 0 && /* @__PURE__ */ import_react10.default.createElement(import_react10.default.Fragment, null, /* @__PURE__ */ import_react10.default.createElement("div", { className: "px-2 py-1.5 text-[10px] font-semibold text-blue-600 uppercase tracking-wider border-b border-slate-100 bg-blue-50" }, "\u{1F4E4} Upstream Node Outputs"), nodeVariables.map((variable, idx) => /* @__PURE__ */ import_react10.default.createElement(
-    import_ui6.Button,
+    /* @__PURE__ */ import_react7.default.createElement("div", { className: "text-xs font-medium text-slate-700 font-mono" }, variable.contextPath),
+    /* @__PURE__ */ import_react7.default.createElement("div", { className: "text-[10px] text-slate-400 truncate" }, "type: ", variable.type || "any")
+  ))), nodeVariables.length > 0 && /* @__PURE__ */ import_react7.default.createElement(import_react7.default.Fragment, null, /* @__PURE__ */ import_react7.default.createElement("div", { className: "px-2 py-1.5 text-[10px] font-semibold text-blue-600 uppercase tracking-wider border-b border-slate-100 bg-blue-50" }, "\u{1F4E4} Upstream Node Outputs"), nodeVariables.map((variable, idx) => /* @__PURE__ */ import_react7.default.createElement(
+    import_ui7.Button,
     {
       key: `node-${idx}`,
       type: "button",
       onClick: () => insertVariable(variable.contextPath),
       className: "w-full bg-white text-left px-2 py-1.5 hover:bg-blue-50 hover:border-none border-none rounded-none transition-colors border-b border-slate-50 last:border-b-0"
     },
-    /* @__PURE__ */ import_react10.default.createElement("div", { className: "text-xs font-medium text-slate-700 font-mono" }, variable.contextPath),
-    /* @__PURE__ */ import_react10.default.createElement("div", { className: "text-[10px] text-slate-400 truncate" }, "from: ", variable.nodeTitle)
+    /* @__PURE__ */ import_react7.default.createElement("div", { className: "text-xs font-medium text-slate-700 font-mono" }, variable.contextPath),
+    /* @__PURE__ */ import_react7.default.createElement("div", { className: "text-[10px] text-slate-400 truncate" }, "from: ", variable.nodeTitle)
   )))))))));
 };
 DynamicArgsControl.propTypes = {
-  data: import_prop_types8.default.object,
-  path: import_prop_types8.default.string.isRequired,
-  handleChange: import_prop_types8.default.func.isRequired,
-  uischema: import_prop_types8.default.object.isRequired,
-  errors: import_prop_types8.default.arrayOf(import_prop_types8.default.string)
+  data: import_prop_types7.default.object,
+  path: import_prop_types7.default.string.isRequired,
+  handleChange: import_prop_types7.default.func.isRequired,
+  uischema: import_prop_types7.default.object.isRequired,
+  errors: import_prop_types7.default.arrayOf(import_prop_types7.default.string)
 };
 
 // src/renderers/CustomKeyValueArrayRenderer.jsx
-var import_react11 = __toESM(require("react"));
-var import_prop_types9 = __toESM(require("prop-types"));
-var import_react12 = require("@jsonforms/react");
+var import_react8 = __toESM(require("react"));
+var import_prop_types8 = __toESM(require("prop-types"));
+var import_react9 = require("@jsonforms/react");
 var import_md = require("react-icons/md");
-var import_ui7 = require("@jet-admin/ui");
+var import_ui8 = require("@jet-admin/ui");
 var CustomKeyValueArrayRenderer = ({
   data,
   path,
@@ -1007,8 +960,8 @@ var CustomKeyValueArrayRenderer = ({
     const newItems = items.filter((_, i) => i !== index);
     handleChange(path, newItems);
   };
-  return /* @__PURE__ */ import_react11.default.createElement("div", { className: "p-3 border border-slate-200 rounded bg-white mb-3" }, /* @__PURE__ */ import_react11.default.createElement("label", { className: "block mb-1 text-sm font-medium text-slate-700" }, label || uischema.label || "Items"), errors && errors.length > 0 && /* @__PURE__ */ import_react11.default.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ import_react11.default.createElement("div", { className: "gap-2" }, items.map((item, index) => /* @__PURE__ */ import_react11.default.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ import_react11.default.createElement(
-    import_react12.JsonFormsDispatch,
+  return /* @__PURE__ */ import_react8.default.createElement("div", { className: "p-3 border border-slate-200 rounded bg-white mb-3" }, /* @__PURE__ */ import_react8.default.createElement("label", { className: "block mb-1 text-sm font-medium text-slate-700" }, label || uischema.label || "Items"), errors && errors.length > 0 && /* @__PURE__ */ import_react8.default.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ import_react8.default.createElement("div", { className: "gap-2" }, items.map((item, index) => /* @__PURE__ */ import_react8.default.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2" }, /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ import_react8.default.createElement(
+    import_react9.JsonFormsDispatch,
     {
       uischema: {
         type: "Control",
@@ -1021,8 +974,8 @@ var CustomKeyValueArrayRenderer = ({
       enabled,
       renderers
     }
-  )), /* @__PURE__ */ import_react11.default.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ import_react11.default.createElement(
-    import_react12.JsonFormsDispatch,
+  )), /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ import_react8.default.createElement(
+    import_react9.JsonFormsDispatch,
     {
       uischema: {
         type: "Control",
@@ -1035,16 +988,16 @@ var CustomKeyValueArrayRenderer = ({
       enabled,
       renderers
     }
-  )), /* @__PURE__ */ import_react11.default.createElement(
-    import_ui7.Button,
+  )), /* @__PURE__ */ import_react8.default.createElement(
+    import_ui8.Button,
     {
       type: "button",
       onClick: () => handleRemoveItem(index),
       className: "mt-2 p-2 rounded bg-red-100 text-red-400 focus:outline-none hover:border-red-400"
     },
-    /* @__PURE__ */ import_react11.default.createElement(import_md.MdDeleteOutline, null)
-  )))), /* @__PURE__ */ import_react11.default.createElement(
-    import_ui7.Button,
+    /* @__PURE__ */ import_react8.default.createElement(import_md.MdDeleteOutline, null)
+  )))), /* @__PURE__ */ import_react8.default.createElement(
+    import_ui8.Button,
     {
       type: "button",
       onClick: handleAddItem,
@@ -1054,24 +1007,24 @@ var CustomKeyValueArrayRenderer = ({
   ));
 };
 CustomKeyValueArrayRenderer.propTypes = {
-  data: import_prop_types9.default.arrayOf(import_prop_types9.default.object),
-  path: import_prop_types9.default.string.isRequired,
-  handleChange: import_prop_types9.default.func.isRequired,
-  schema: import_prop_types9.default.object.isRequired,
-  uischema: import_prop_types9.default.object.isRequired,
-  label: import_prop_types9.default.string,
-  description: import_prop_types9.default.string,
-  errors: import_prop_types9.default.arrayOf(import_prop_types9.default.string),
-  enabled: import_prop_types9.default.bool,
-  renderers: import_prop_types9.default.arrayOf(import_prop_types9.default.object).isRequired
+  data: import_prop_types8.default.arrayOf(import_prop_types8.default.object),
+  path: import_prop_types8.default.string.isRequired,
+  handleChange: import_prop_types8.default.func.isRequired,
+  schema: import_prop_types8.default.object.isRequired,
+  uischema: import_prop_types8.default.object.isRequired,
+  label: import_prop_types8.default.string,
+  description: import_prop_types8.default.string,
+  errors: import_prop_types8.default.arrayOf(import_prop_types8.default.string),
+  enabled: import_prop_types8.default.bool,
+  renderers: import_prop_types8.default.arrayOf(import_prop_types8.default.object).isRequired
 };
 
 // src/renderers/CustomKeyValueTypeArrayRenderer.jsx
-var import_react13 = __toESM(require("react"));
-var import_prop_types10 = __toESM(require("prop-types"));
-var import_react14 = require("@jsonforms/react");
+var import_react10 = __toESM(require("react"));
+var import_prop_types9 = __toESM(require("prop-types"));
+var import_react11 = require("@jsonforms/react");
 var import_md2 = require("react-icons/md");
-var import_ui8 = require("@jet-admin/ui");
+var import_ui9 = require("@jet-admin/ui");
 var CustomKeyValueTypeArrayRenderer = ({
   data,
   path,
@@ -1098,8 +1051,8 @@ var CustomKeyValueTypeArrayRenderer = ({
     const newItems = items.filter((_, i) => i !== index);
     handleChange(path, newItems);
   };
-  return /* @__PURE__ */ import_react13.default.createElement("div", { className: "p-3 border border-slate-200 rounded bg-white mb-3" }, /* @__PURE__ */ import_react13.default.createElement("label", { className: "block mb-1 text-sm font-medium text-slate-700" }, label || uischema.label || "Items"), errors && errors.length > 0 && /* @__PURE__ */ import_react13.default.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ import_react13.default.createElement("div", { className: "gap-2" }, items.map((item, index) => /* @__PURE__ */ import_react13.default.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ import_react13.default.createElement(
-    import_react14.JsonFormsDispatch,
+  return /* @__PURE__ */ import_react10.default.createElement("div", { className: "p-3 border border-slate-200 rounded bg-white mb-3" }, /* @__PURE__ */ import_react10.default.createElement("label", { className: "block mb-1 text-sm font-medium text-slate-700" }, label || uischema.label || "Items"), errors && errors.length > 0 && /* @__PURE__ */ import_react10.default.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ import_react10.default.createElement("div", { className: "gap-2" }, items.map((item, index) => /* @__PURE__ */ import_react10.default.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ import_react10.default.createElement(
+    import_react11.JsonFormsDispatch,
     {
       uischema: {
         type: "Control",
@@ -1112,8 +1065,8 @@ var CustomKeyValueTypeArrayRenderer = ({
       enabled,
       renderers
     }
-  )), /* @__PURE__ */ import_react13.default.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ import_react13.default.createElement(
-    import_react14.JsonFormsDispatch,
+  )), /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ import_react10.default.createElement(
+    import_react11.JsonFormsDispatch,
     {
       uischema: {
         type: "Control",
@@ -1126,8 +1079,8 @@ var CustomKeyValueTypeArrayRenderer = ({
       enabled,
       renderers
     }
-  )), /* @__PURE__ */ import_react13.default.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ import_react13.default.createElement(
-    import_react14.JsonFormsDispatch,
+  )), /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ import_react10.default.createElement(
+    import_react11.JsonFormsDispatch,
     {
       uischema: {
         type: "Control",
@@ -1140,16 +1093,16 @@ var CustomKeyValueTypeArrayRenderer = ({
       enabled,
       renderers
     }
-  )), /* @__PURE__ */ import_react13.default.createElement(
-    import_ui8.Button,
+  )), /* @__PURE__ */ import_react10.default.createElement(
+    import_ui9.Button,
     {
       type: "button",
       onClick: () => handleRemoveItem(index),
       className: "mt-2 p-2 rounded bg-red-100 text-red-400 focus:outline-none hover:border-red-400"
     },
-    /* @__PURE__ */ import_react13.default.createElement(import_md2.MdDeleteOutline, null)
-  )))), /* @__PURE__ */ import_react13.default.createElement(
-    import_ui8.Button,
+    /* @__PURE__ */ import_react10.default.createElement(import_md2.MdDeleteOutline, null)
+  )))), /* @__PURE__ */ import_react10.default.createElement(
+    import_ui9.Button,
     {
       type: "button",
       onClick: handleAddItem,
@@ -1159,24 +1112,24 @@ var CustomKeyValueTypeArrayRenderer = ({
   ));
 };
 CustomKeyValueTypeArrayRenderer.propTypes = {
-  data: import_prop_types10.default.arrayOf(import_prop_types10.default.object),
-  path: import_prop_types10.default.string.isRequired,
-  handleChange: import_prop_types10.default.func.isRequired,
-  schema: import_prop_types10.default.object.isRequired,
-  uischema: import_prop_types10.default.object.isRequired,
-  label: import_prop_types10.default.string,
-  description: import_prop_types10.default.string,
-  errors: import_prop_types10.default.arrayOf(import_prop_types10.default.string),
-  enabled: import_prop_types10.default.bool,
-  renderers: import_prop_types10.default.arrayOf(import_prop_types10.default.object).isRequired
+  data: import_prop_types9.default.arrayOf(import_prop_types9.default.object),
+  path: import_prop_types9.default.string.isRequired,
+  handleChange: import_prop_types9.default.func.isRequired,
+  schema: import_prop_types9.default.object.isRequired,
+  uischema: import_prop_types9.default.object.isRequired,
+  label: import_prop_types9.default.string,
+  description: import_prop_types9.default.string,
+  errors: import_prop_types9.default.arrayOf(import_prop_types9.default.string),
+  enabled: import_prop_types9.default.bool,
+  renderers: import_prop_types9.default.arrayOf(import_prop_types9.default.object).isRequired
 };
 
 // src/renderers/CustomKeyTypeArrayRenderer.jsx
-var import_react15 = __toESM(require("react"));
-var import_prop_types11 = __toESM(require("prop-types"));
-var import_react16 = require("@jsonforms/react");
+var import_react12 = __toESM(require("react"));
+var import_prop_types10 = __toESM(require("prop-types"));
+var import_react13 = require("@jsonforms/react");
 var import_md3 = require("react-icons/md");
-var import_ui9 = require("@jet-admin/ui");
+var import_ui10 = require("@jet-admin/ui");
 var CustomKeyTypeArrayRenderer = ({
   data,
   path,
@@ -1203,8 +1156,8 @@ var CustomKeyTypeArrayRenderer = ({
     const newItems = items.filter((_, i) => i !== index);
     handleChange(path, newItems);
   };
-  return /* @__PURE__ */ import_react15.default.createElement("div", { className: "p-3 border mt-3 border-slate-200 rounded bg-white mb-3" }, /* @__PURE__ */ import_react15.default.createElement("label", { className: "block mb-1 text-sm font-medium text-slate-700" }, label || uischema.label || "Items"), errors && errors.length > 0 && /* @__PURE__ */ import_react15.default.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ import_react15.default.createElement("div", { className: "flex flex-col gap-2" }, items.map((item, index) => /* @__PURE__ */ import_react15.default.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2" }, /* @__PURE__ */ import_react15.default.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ import_react15.default.createElement(
-    import_react16.JsonFormsDispatch,
+  return /* @__PURE__ */ import_react12.default.createElement("div", { className: "p-3 border mt-3 border-slate-200 rounded bg-white mb-3" }, /* @__PURE__ */ import_react12.default.createElement("label", { className: "block mb-1 text-sm font-medium text-slate-700" }, label || uischema.label || "Items"), errors && errors.length > 0 && /* @__PURE__ */ import_react12.default.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ import_react12.default.createElement("div", { className: "flex flex-col gap-2" }, items.map((item, index) => /* @__PURE__ */ import_react12.default.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2" }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ import_react12.default.createElement(
+    import_react13.JsonFormsDispatch,
     {
       uischema: {
         type: "Control",
@@ -1217,8 +1170,8 @@ var CustomKeyTypeArrayRenderer = ({
       enabled,
       renderers
     }
-  )), /* @__PURE__ */ import_react15.default.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ import_react15.default.createElement(
-    import_react16.JsonFormsDispatch,
+  )), /* @__PURE__ */ import_react12.default.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ import_react12.default.createElement(
+    import_react13.JsonFormsDispatch,
     {
       uischema: {
         type: "Control",
@@ -1231,16 +1184,16 @@ var CustomKeyTypeArrayRenderer = ({
       enabled,
       renderers
     }
-  )), /* @__PURE__ */ import_react15.default.createElement(
-    import_ui9.Button,
+  )), /* @__PURE__ */ import_react12.default.createElement(
+    import_ui10.Button,
     {
       type: "button",
       onClick: () => handleRemoveItem(index),
       className: "mt-2 p-2 rounded bg-red-100 text-red-400 focus:outline-none hover:border-red-400"
     },
-    /* @__PURE__ */ import_react15.default.createElement(import_md3.MdDeleteOutline, null)
-  )))), /* @__PURE__ */ import_react15.default.createElement(
-    import_ui9.Button,
+    /* @__PURE__ */ import_react12.default.createElement(import_md3.MdDeleteOutline, null)
+  )))), /* @__PURE__ */ import_react12.default.createElement(
+    import_ui10.Button,
     {
       type: "button",
       onClick: handleAddItem,
@@ -1250,23 +1203,23 @@ var CustomKeyTypeArrayRenderer = ({
   ));
 };
 CustomKeyTypeArrayRenderer.propTypes = {
-  data: import_prop_types11.default.arrayOf(import_prop_types11.default.object),
-  path: import_prop_types11.default.string.isRequired,
-  handleChange: import_prop_types11.default.func.isRequired,
-  schema: import_prop_types11.default.object.isRequired,
-  uischema: import_prop_types11.default.object.isRequired,
-  label: import_prop_types11.default.string,
-  description: import_prop_types11.default.string,
-  errors: import_prop_types11.default.arrayOf(import_prop_types11.default.string),
-  enabled: import_prop_types11.default.bool,
-  renderers: import_prop_types11.default.arrayOf(import_prop_types11.default.object).isRequired
+  data: import_prop_types10.default.arrayOf(import_prop_types10.default.object),
+  path: import_prop_types10.default.string.isRequired,
+  handleChange: import_prop_types10.default.func.isRequired,
+  schema: import_prop_types10.default.object.isRequired,
+  uischema: import_prop_types10.default.object.isRequired,
+  label: import_prop_types10.default.string,
+  description: import_prop_types10.default.string,
+  errors: import_prop_types10.default.arrayOf(import_prop_types10.default.string),
+  enabled: import_prop_types10.default.bool,
+  renderers: import_prop_types10.default.arrayOf(import_prop_types10.default.object).isRequired
 };
 
 // src/renderers/CustomStringArrayRenderer.jsx
-var import_react17 = __toESM(require("react"));
-var import_prop_types12 = __toESM(require("prop-types"));
+var import_react14 = __toESM(require("react"));
+var import_prop_types11 = __toESM(require("prop-types"));
 var import_md4 = require("react-icons/md");
-var import_ui10 = require("@jet-admin/ui");
+var import_ui11 = require("@jet-admin/ui");
 var CustomStringArrayRenderer = (props) => {
   const { data, path, handleChange, label, uischema, enabled, visible } = props;
   const arrayData = Array.isArray(data) ? data : [];
@@ -1285,8 +1238,8 @@ var CustomStringArrayRenderer = (props) => {
   if (visible === false) {
     return null;
   }
-  return /* @__PURE__ */ import_react17.default.createElement("div", { className: "p-3 border border-slate-200 rounded bg-white mb-3" }, /* @__PURE__ */ import_react17.default.createElement("label", { className: "block mb-1 text-sm font-medium text-slate-700" }, label || uischema?.label || "Items"), /* @__PURE__ */ import_react17.default.createElement("div", { className: "gap-2" }, arrayData.map((item, index) => /* @__PURE__ */ import_react17.default.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2 mb-2" }, /* @__PURE__ */ import_react17.default.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ import_react17.default.createElement(
-    import_ui10.Input,
+  return /* @__PURE__ */ import_react14.default.createElement("div", { className: "p-3 border border-slate-200 rounded bg-white mb-3" }, /* @__PURE__ */ import_react14.default.createElement("label", { className: "block mb-1 text-sm font-medium text-slate-700" }, label || uischema?.label || "Items"), /* @__PURE__ */ import_react14.default.createElement("div", { className: "gap-2" }, arrayData.map((item, index) => /* @__PURE__ */ import_react14.default.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2 mb-2" }, /* @__PURE__ */ import_react14.default.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ import_react14.default.createElement(
+    import_ui11.Input,
     {
       type: "text",
       value: item || "",
@@ -1295,17 +1248,17 @@ var CustomStringArrayRenderer = (props) => {
       placeholder: "Enter value...",
       className: "w-full placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-200 text-slate-700 rounded focus:border-slate-400 focus:outline-none px-2.5 py-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
     }
-  )), /* @__PURE__ */ import_react17.default.createElement(
-    import_ui10.Button,
+  )), /* @__PURE__ */ import_react14.default.createElement(
+    import_ui11.Button,
     {
       type: "button",
       onClick: () => handleRemoveItem(index),
       disabled: !enabled,
       className: "p-2 rounded bg-red-100 text-red-400 focus:outline-none hover:border-red-400 disabled:opacity-50 disabled:cursor-not-allowed"
     },
-    /* @__PURE__ */ import_react17.default.createElement(import_md4.MdDeleteOutline, null)
-  )))), arrayData.length === 0 && /* @__PURE__ */ import_react17.default.createElement("div", { className: "text-xs text-slate-400 italic py-2" }, "No items added yet."), /* @__PURE__ */ import_react17.default.createElement(
-    import_ui10.Button,
+    /* @__PURE__ */ import_react14.default.createElement(import_md4.MdDeleteOutline, null)
+  )))), arrayData.length === 0 && /* @__PURE__ */ import_react14.default.createElement("div", { className: "text-xs text-slate-400 italic py-2" }, "No items added yet."), /* @__PURE__ */ import_react14.default.createElement(
+    import_ui11.Button,
     {
       type: "button",
       onClick: handleAddItem,
@@ -1316,20 +1269,20 @@ var CustomStringArrayRenderer = (props) => {
   ));
 };
 CustomStringArrayRenderer.propTypes = {
-  data: import_prop_types12.default.array,
-  path: import_prop_types12.default.string.isRequired,
-  handleChange: import_prop_types12.default.func.isRequired,
-  label: import_prop_types12.default.string,
-  uischema: import_prop_types12.default.object,
-  enabled: import_prop_types12.default.bool,
-  visible: import_prop_types12.default.bool
+  data: import_prop_types11.default.array,
+  path: import_prop_types11.default.string.isRequired,
+  handleChange: import_prop_types11.default.func.isRequired,
+  label: import_prop_types11.default.string,
+  uischema: import_prop_types11.default.object,
+  enabled: import_prop_types11.default.bool,
+  visible: import_prop_types11.default.bool
 };
 
 // src/renderers/CustomFieldOperatorValueArrayRenderer.jsx
-var import_react18 = __toESM(require("react"));
-var import_prop_types13 = __toESM(require("prop-types"));
+var import_react15 = __toESM(require("react"));
+var import_prop_types12 = __toESM(require("prop-types"));
 var import_md5 = require("react-icons/md");
-var import_ui11 = require("@jet-admin/ui");
+var import_ui12 = require("@jet-admin/ui");
 var CustomFieldOperatorValueArrayRenderer = ({
   data,
   path,
@@ -1368,8 +1321,8 @@ var CustomFieldOperatorValueArrayRenderer = ({
     newItems[index] = { ...newItems[index], [field]: value };
     handleChange(path, newItems);
   };
-  return /* @__PURE__ */ import_react18.default.createElement("div", { className: "p-3 border border-slate-200 rounded bg-white mb-3" }, /* @__PURE__ */ import_react18.default.createElement("label", { className: "block mb-2 text-sm font-medium text-slate-700" }, label || uischema.label || "Conditions"), errors && errors.length > 0 && /* @__PURE__ */ import_react18.default.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ import_react18.default.createElement("div", { className: "space-y-2" }, items.map((item, index) => /* @__PURE__ */ import_react18.default.createElement("div", { key: `${path}-${index}`, className: "flex items-center gap-2" }, /* @__PURE__ */ import_react18.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react18.default.createElement(
-    import_ui11.Input,
+  return /* @__PURE__ */ import_react15.default.createElement("div", { className: "p-3 border border-slate-200 rounded bg-white mb-3" }, /* @__PURE__ */ import_react15.default.createElement("label", { className: "block mb-2 text-sm font-medium text-slate-700" }, label || uischema.label || "Conditions"), errors && errors.length > 0 && /* @__PURE__ */ import_react15.default.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ import_react15.default.createElement("div", { className: "space-y-2" }, items.map((item, index) => /* @__PURE__ */ import_react15.default.createElement("div", { key: `${path}-${index}`, className: "flex items-center gap-2" }, /* @__PURE__ */ import_react15.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react15.default.createElement(
+    import_ui12.Input,
     {
       type: "text",
       placeholder: "Field",
@@ -1378,8 +1331,8 @@ var CustomFieldOperatorValueArrayRenderer = ({
       onChange: (e) => handleItemChange(index, "field", e.target.value),
       className: "w-full px-2.5 py-1.5 text-sm bg-slate-50 border border-slate-200 rounded text-slate-700 placeholder:text-slate-400 focus:border-slate-700 disabled:opacity-50"
     }
-  )), /* @__PURE__ */ import_react18.default.createElement("div", { className: "w-36" }, /* @__PURE__ */ import_react18.default.createElement(import_ui11.Select, { value: item.operator || "==", onValueChange: (val) => handleItemChange(index, "operator", val), disabled: isDisabled }, /* @__PURE__ */ import_react18.default.createElement(import_ui11.SelectTrigger, { className: "text-sm" }, /* @__PURE__ */ import_react18.default.createElement(import_ui11.SelectValue, null)), /* @__PURE__ */ import_react18.default.createElement(import_ui11.SelectContent, null, operatorOptions.map((op) => /* @__PURE__ */ import_react18.default.createElement(import_ui11.SelectItem, { key: op, value: op }, op))))), /* @__PURE__ */ import_react18.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react18.default.createElement(
-    import_ui11.Input,
+  )), /* @__PURE__ */ import_react15.default.createElement("div", { className: "w-36" }, /* @__PURE__ */ import_react15.default.createElement(import_ui12.Select, { value: item.operator || "==", onValueChange: (val) => handleItemChange(index, "operator", val), disabled: isDisabled }, /* @__PURE__ */ import_react15.default.createElement(import_ui12.SelectTrigger, { className: "text-sm" }, /* @__PURE__ */ import_react15.default.createElement(import_ui12.SelectValue, null)), /* @__PURE__ */ import_react15.default.createElement(import_ui12.SelectContent, null, operatorOptions.map((op) => /* @__PURE__ */ import_react15.default.createElement(import_ui12.SelectItem, { key: op, value: op }, op))))), /* @__PURE__ */ import_react15.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react15.default.createElement(
+    import_ui12.Input,
     {
       type: "text",
       placeholder: "Value",
@@ -1388,17 +1341,17 @@ var CustomFieldOperatorValueArrayRenderer = ({
       onChange: (e) => handleItemChange(index, "value", e.target.value),
       className: "w-full px-2.5 py-1.5 text-sm bg-slate-50 border border-slate-200 rounded text-slate-700 placeholder:text-slate-400 focus:border-slate-700 disabled:opacity-50"
     }
-  )), /* @__PURE__ */ import_react18.default.createElement(
-    import_ui11.Button,
+  )), /* @__PURE__ */ import_react15.default.createElement(
+    import_ui12.Button,
     {
       type: "button",
       onClick: () => handleRemoveItem(index),
       disabled: isDisabled,
       className: "p-2 rounded bg-red-100 text-red-400 focus:outline-none hover:bg-red-200 disabled:opacity-50"
     },
-    /* @__PURE__ */ import_react18.default.createElement(import_md5.MdDeleteOutline, null)
-  )))), /* @__PURE__ */ import_react18.default.createElement(
-    import_ui11.Button,
+    /* @__PURE__ */ import_react15.default.createElement(import_md5.MdDeleteOutline, null)
+  )))), /* @__PURE__ */ import_react15.default.createElement(
+    import_ui12.Button,
     {
       type: "button",
       onClick: handleAddItem,
@@ -1409,20 +1362,20 @@ var CustomFieldOperatorValueArrayRenderer = ({
   ));
 };
 CustomFieldOperatorValueArrayRenderer.propTypes = {
-  data: import_prop_types13.default.arrayOf(import_prop_types13.default.object),
-  path: import_prop_types13.default.string.isRequired,
-  handleChange: import_prop_types13.default.func.isRequired,
-  schema: import_prop_types13.default.object.isRequired,
-  uischema: import_prop_types13.default.object.isRequired,
-  label: import_prop_types13.default.string,
-  errors: import_prop_types13.default.arrayOf(import_prop_types13.default.string),
-  enabled: import_prop_types13.default.bool
+  data: import_prop_types12.default.arrayOf(import_prop_types12.default.object),
+  path: import_prop_types12.default.string.isRequired,
+  handleChange: import_prop_types12.default.func.isRequired,
+  schema: import_prop_types12.default.object.isRequired,
+  uischema: import_prop_types12.default.object.isRequired,
+  label: import_prop_types12.default.string,
+  errors: import_prop_types12.default.arrayOf(import_prop_types12.default.string),
+  enabled: import_prop_types12.default.bool
 };
 
 // src/renderers/CustomGroupLayout.jsx
-var import_react19 = __toESM(require("react"));
-var import_prop_types14 = __toESM(require("prop-types"));
-var import_react20 = require("@jsonforms/react");
+var import_react16 = __toESM(require("react"));
+var import_prop_types13 = __toESM(require("prop-types"));
+var import_react17 = require("@jsonforms/react");
 var CustomGroupLayout = (props) => {
   const { uischema, schema, path, visible, enabled, renderers, cells } = props;
   const elements = uischema.elements || [];
@@ -1431,8 +1384,8 @@ var CustomGroupLayout = (props) => {
   if (!visible) {
     return null;
   }
-  return /* @__PURE__ */ import_react19.default.createElement("div", { className: `border border-slate-200 rounded p-3 mt-2 bg-white ${customClass}` }, uischema.label && /* @__PURE__ */ import_react19.default.createElement("h3", { className: "text-xs font-medium text-slate-500 mb-2" }, uischema.label), /* @__PURE__ */ import_react19.default.createElement("div", { className: "flex flex-col gap-2" }, elements.map((element, index) => /* @__PURE__ */ import_react19.default.createElement(
-    import_react20.JsonFormsDispatch,
+  return /* @__PURE__ */ import_react16.default.createElement("div", { className: `border border-slate-200 rounded p-3 mt-2 bg-white ${customClass}` }, uischema.label && /* @__PURE__ */ import_react16.default.createElement("h3", { className: "text-xs font-medium text-slate-500 mb-2" }, uischema.label), /* @__PURE__ */ import_react16.default.createElement("div", { className: "flex flex-col gap-2" }, elements.map((element, index) => /* @__PURE__ */ import_react16.default.createElement(
+    import_react17.JsonFormsDispatch,
     {
       key: index,
       uischema: element,
@@ -1445,18 +1398,18 @@ var CustomGroupLayout = (props) => {
   ))));
 };
 CustomGroupLayout.propTypes = {
-  uischema: import_prop_types14.default.object.isRequired,
-  schema: import_prop_types14.default.object.isRequired,
-  path: import_prop_types14.default.string.isRequired,
-  visible: import_prop_types14.default.bool.isRequired,
-  enabled: import_prop_types14.default.bool.isRequired,
-  renderers: import_prop_types14.default.arrayOf(import_prop_types14.default.object).isRequired,
-  cells: import_prop_types14.default.arrayOf(import_prop_types14.default.object)
+  uischema: import_prop_types13.default.object.isRequired,
+  schema: import_prop_types13.default.object.isRequired,
+  path: import_prop_types13.default.string.isRequired,
+  visible: import_prop_types13.default.bool.isRequired,
+  enabled: import_prop_types13.default.bool.isRequired,
+  renderers: import_prop_types13.default.arrayOf(import_prop_types13.default.object).isRequired,
+  cells: import_prop_types13.default.arrayOf(import_prop_types13.default.object)
 };
 
 // src/renderers/CustomRadioInput.jsx
-var import_react21 = __toESM(require("react"));
-var import_prop_types15 = __toESM(require("prop-types"));
+var import_react18 = __toESM(require("react"));
+var import_prop_types14 = __toESM(require("prop-types"));
 var CustomRadioInput = (props) => {
   const {
     data,
@@ -1487,7 +1440,7 @@ var CustomRadioInput = (props) => {
     }
     return optionValue.charAt(0).toUpperCase() + optionValue.slice(1).replace(/([A-Z])/g, " $1");
   };
-  return /* @__PURE__ */ import_react21.default.createElement("div", { className: "mb-3" }, /* @__PURE__ */ import_react21.default.createElement(
+  return /* @__PURE__ */ import_react18.default.createElement("div", { className: "mb-3" }, /* @__PURE__ */ import_react18.default.createElement(
     "label",
     {
       className: `block mb-2 text-xs font-medium ${errors && errors.length > 0 ? "text-red-500" : "text-slate-500"}`
@@ -1495,13 +1448,13 @@ var CustomRadioInput = (props) => {
     label || description,
     " ",
     errors && errors.length > 0 && errors
-  ), /* @__PURE__ */ import_react21.default.createElement("div", { className: `flex ${orientation === "vertical" ? "flex-col gap-2" : "flex-row flex-wrap gap-4"}` }, options.map((optionValue) => /* @__PURE__ */ import_react21.default.createElement(
+  ), /* @__PURE__ */ import_react18.default.createElement("div", { className: `flex ${orientation === "vertical" ? "flex-col gap-2" : "flex-row flex-wrap gap-4"}` }, options.map((optionValue) => /* @__PURE__ */ import_react18.default.createElement(
     "label",
     {
       key: optionValue,
       className: `flex items-center gap-2 cursor-pointer ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`
     },
-    /* @__PURE__ */ import_react21.default.createElement(
+    /* @__PURE__ */ import_react18.default.createElement(
       "input",
       {
         type: "radio",
@@ -1513,33 +1466,33 @@ var CustomRadioInput = (props) => {
         className: "w-4 h-4 text-indigo-600 bg-slate-50 border-slate-300 focus:ring-indigo-500 focus:ring-2"
       }
     ),
-    /* @__PURE__ */ import_react21.default.createElement("span", { className: `text-sm ${data === optionValue ? "text-slate-700 font-medium" : "text-slate-600"}` }, getDisplayName(optionValue))
+    /* @__PURE__ */ import_react18.default.createElement("span", { className: `text-sm ${data === optionValue ? "text-slate-700 font-medium" : "text-slate-600"}` }, getDisplayName(optionValue))
   ))));
 };
 CustomRadioInput.propTypes = {
-  data: import_prop_types15.default.string,
-  path: import_prop_types15.default.string.isRequired,
-  handleChange: import_prop_types15.default.func.isRequired,
-  label: import_prop_types15.default.string,
-  description: import_prop_types15.default.string,
-  errors: import_prop_types15.default.arrayOf(import_prop_types15.default.string),
-  schema: import_prop_types15.default.object.isRequired,
-  uischema: import_prop_types15.default.object.isRequired,
-  enabled: import_prop_types15.default.bool
+  data: import_prop_types14.default.string,
+  path: import_prop_types14.default.string.isRequired,
+  handleChange: import_prop_types14.default.func.isRequired,
+  label: import_prop_types14.default.string,
+  description: import_prop_types14.default.string,
+  errors: import_prop_types14.default.arrayOf(import_prop_types14.default.string),
+  schema: import_prop_types14.default.object.isRequired,
+  uischema: import_prop_types14.default.object.isRequired,
+  enabled: import_prop_types14.default.bool
 };
 
 // src/renderers/CustomVerticalLayout.jsx
-var import_react22 = __toESM(require("react"));
-var import_prop_types16 = __toESM(require("prop-types"));
-var import_react23 = require("@jsonforms/react");
+var import_react19 = __toESM(require("react"));
+var import_prop_types15 = __toESM(require("prop-types"));
+var import_react20 = require("@jsonforms/react");
 var CustomVerticalLayout = (props) => {
   const { uischema, schema, path, visible, enabled, renderers, cells } = props;
   const elements = uischema.elements || [];
   if (!visible) {
     return null;
   }
-  return /* @__PURE__ */ import_react22.default.createElement("div", { className: "flex flex-col" }, elements.map((element, index) => /* @__PURE__ */ import_react22.default.createElement(
-    import_react23.JsonFormsDispatch,
+  return /* @__PURE__ */ import_react19.default.createElement("div", { className: "flex flex-col" }, elements.map((element, index) => /* @__PURE__ */ import_react19.default.createElement(
+    import_react20.JsonFormsDispatch,
     {
       key: index,
       uischema: element,
@@ -1552,30 +1505,30 @@ var CustomVerticalLayout = (props) => {
   )));
 };
 CustomVerticalLayout.propTypes = {
-  uischema: import_prop_types16.default.object.isRequired,
-  schema: import_prop_types16.default.object.isRequired,
-  path: import_prop_types16.default.string.isRequired,
-  visible: import_prop_types16.default.bool.isRequired,
-  enabled: import_prop_types16.default.bool.isRequired,
-  renderers: import_prop_types16.default.arrayOf(import_prop_types16.default.object).isRequired,
-  cells: import_prop_types16.default.arrayOf(import_prop_types16.default.object)
+  uischema: import_prop_types15.default.object.isRequired,
+  schema: import_prop_types15.default.object.isRequired,
+  path: import_prop_types15.default.string.isRequired,
+  visible: import_prop_types15.default.bool.isRequired,
+  enabled: import_prop_types15.default.bool.isRequired,
+  renderers: import_prop_types15.default.arrayOf(import_prop_types15.default.object).isRequired,
+  cells: import_prop_types15.default.arrayOf(import_prop_types15.default.object)
 };
 
 // src/renderers/CustomTabRenderer.jsx
-var import_react24 = __toESM(require("react"));
-var import_prop_types17 = __toESM(require("prop-types"));
-var import_react25 = require("@jsonforms/react");
-var import_ui12 = require("@jet-admin/ui");
+var import_react21 = __toESM(require("react"));
+var import_prop_types16 = __toESM(require("prop-types"));
+var import_react22 = require("@jsonforms/react");
+var import_ui13 = require("@jet-admin/ui");
 var CustomTabRenderer = (props) => {
   const { uischema, schema, path, enabled, renderers, cells } = props;
   const categories = uischema.elements || [];
-  const [activeTab, setActiveTab] = (0, import_react24.useState)(0);
+  const [activeTab, setActiveTab] = (0, import_react21.useState)(0);
   if (!categories || categories.length === 0) {
     return null;
   }
   const activeCategory = categories[activeTab];
-  return /* @__PURE__ */ import_react24.default.createElement("div", { className: "custom-tabs-container" }, /* @__PURE__ */ import_react24.default.createElement("div", { className: "flex border-slate-300" }, categories.map((category, index) => /* @__PURE__ */ import_react24.default.createElement(
-    import_ui12.Button,
+  return /* @__PURE__ */ import_react21.default.createElement("div", { className: "custom-tabs-container" }, /* @__PURE__ */ import_react21.default.createElement("div", { className: "flex border-slate-300" }, categories.map((category, index) => /* @__PURE__ */ import_react21.default.createElement(
+    import_ui13.Button,
     {
       key: category.label || `tab-${index}`,
       className: `px-4 mr-2 py-2 text-sm font-medium rounded ${index === activeTab ? "text-[#646cff] border-slate-200" : "text-slate-700"} focus:outline-none bg-white`,
@@ -1583,8 +1536,8 @@ var CustomTabRenderer = (props) => {
       type: "button"
     },
     category.label
-  ))), /* @__PURE__ */ import_react24.default.createElement("div", { className: "p-3 border mt-3 border-slate-200 rounded bg-white flex flex-col gap-2" }, activeCategory?.elements.map((element, i) => /* @__PURE__ */ import_react24.default.createElement(
-    import_react25.JsonFormsDispatch,
+  ))), /* @__PURE__ */ import_react21.default.createElement("div", { className: "p-3 border mt-3 border-slate-200 rounded bg-white flex flex-col gap-2" }, activeCategory?.elements.map((element, i) => /* @__PURE__ */ import_react21.default.createElement(
+    import_react22.JsonFormsDispatch,
     {
       key: i,
       uischema: element,
@@ -1597,35 +1550,34 @@ var CustomTabRenderer = (props) => {
   ))));
 };
 CustomTabRenderer.propTypes = {
-  uischema: import_prop_types17.default.shape({
-    type: import_prop_types17.default.string.isRequired,
-    elements: import_prop_types17.default.arrayOf(import_prop_types17.default.object).isRequired
+  uischema: import_prop_types16.default.shape({
+    type: import_prop_types16.default.string.isRequired,
+    elements: import_prop_types16.default.arrayOf(import_prop_types16.default.object).isRequired
   }).isRequired,
-  schema: import_prop_types17.default.object.isRequired,
-  path: import_prop_types17.default.string.isRequired,
-  enabled: import_prop_types17.default.bool.isRequired,
-  renderers: import_prop_types17.default.arrayOf(import_prop_types17.default.object).isRequired,
-  cells: import_prop_types17.default.arrayOf(import_prop_types17.default.object)
+  schema: import_prop_types16.default.object.isRequired,
+  path: import_prop_types16.default.string.isRequired,
+  enabled: import_prop_types16.default.bool.isRequired,
+  renderers: import_prop_types16.default.arrayOf(import_prop_types16.default.object).isRequired,
+  cells: import_prop_types16.default.arrayOf(import_prop_types16.default.object)
 };
 
 // src/renderers/index.js
-var JetNumberControl = (0, import_react26.withJsonFormsControlProps)(CustomNumberInput);
-var JetTextControl = (0, import_react26.withJsonFormsControlProps)(CustomTextInput);
-var JetSelectControl = (0, import_react26.withJsonFormsControlProps)(CustomSelectInput);
-var JetCheckboxControl = (0, import_react26.withJsonFormsControlProps)(CustomCheckboxInput);
-var JetCodePgsqlControl = (0, import_react26.withJsonFormsControlProps)(CustomCodePgsqlControl);
-var JetCodeJavascriptControl = (0, import_react26.withJsonFormsControlProps)(CustomCodeJavascriptControl);
-var JetSuggestionControl = (0, import_react26.withJsonFormsControlProps)(CustomSuggestionInput);
-var JetDynamicArgsControl = (0, import_react26.withJsonFormsControlProps)(DynamicArgsControl);
-var JetKeyValueArrayControl = (0, import_react26.withJsonFormsControlProps)(CustomKeyValueArrayRenderer);
-var JetKeyValueTypeArrayControl = (0, import_react26.withJsonFormsControlProps)(CustomKeyValueTypeArrayRenderer);
-var JetKeyTypeArrayControl = (0, import_react26.withJsonFormsControlProps)(CustomKeyTypeArrayRenderer);
-var JetStringArrayControl = (0, import_react26.withJsonFormsControlProps)(CustomStringArrayRenderer);
-var JetFieldOperatorValueArrayControl = (0, import_react26.withJsonFormsControlProps)(CustomFieldOperatorValueArrayRenderer);
-var JetGroupLayout = (0, import_react26.withJsonFormsLayoutProps)(CustomGroupLayout);
-var JetRadioControl = (0, import_react26.withJsonFormsControlProps)(CustomRadioInput);
-var JetVerticalLayout = (0, import_react26.withJsonFormsLayoutProps)(CustomVerticalLayout);
-var JetTabLayout = (0, import_react26.withJsonFormsLayoutProps)(CustomTabRenderer);
+var JetNumberControl = (0, import_react23.withJsonFormsControlProps)(CustomNumberInput);
+var JetTextControl = (0, import_react23.withJsonFormsControlProps)(CustomTextInput);
+var JetSelectControl = (0, import_react23.withJsonFormsControlProps)(CustomSelectInput);
+var JetCheckboxControl = (0, import_react23.withJsonFormsControlProps)(CustomCheckboxInput);
+var JetCodeEditorControl = (0, import_react23.withJsonFormsControlProps)(CustomCodeEditorControl);
+var JetSuggestionControl = (0, import_react23.withJsonFormsControlProps)(CustomSuggestionInput);
+var JetDynamicArgsControl = (0, import_react23.withJsonFormsControlProps)(DynamicArgsControl);
+var JetKeyValueArrayControl = (0, import_react23.withJsonFormsControlProps)(CustomKeyValueArrayRenderer);
+var JetKeyValueTypeArrayControl = (0, import_react23.withJsonFormsControlProps)(CustomKeyValueTypeArrayRenderer);
+var JetKeyTypeArrayControl = (0, import_react23.withJsonFormsControlProps)(CustomKeyTypeArrayRenderer);
+var JetStringArrayControl = (0, import_react23.withJsonFormsControlProps)(CustomStringArrayRenderer);
+var JetFieldOperatorValueArrayControl = (0, import_react23.withJsonFormsControlProps)(CustomFieldOperatorValueArrayRenderer);
+var JetGroupLayout = (0, import_react23.withJsonFormsLayoutProps)(CustomGroupLayout);
+var JetRadioControl = (0, import_react23.withJsonFormsControlProps)(CustomRadioInput);
+var JetVerticalLayout = (0, import_react23.withJsonFormsLayoutProps)(CustomVerticalLayout);
+var JetTabLayout = (0, import_react23.withJsonFormsLayoutProps)(CustomTabRenderer);
 
 // src/testers.js
 var import_core = require("@jsonforms/core");
@@ -1698,24 +1650,20 @@ var checkboxTester = (uischema, schema) => {
   }
   return -1;
 };
-var codePgsqlTester = (0, import_core.rankWith)(
+var codeEditorTester = (0, import_core.rankWith)(
   100,
   (0, import_core.and)(
     import_core.isControl,
     (uischema, rootSchema) => {
       try {
         const currentSchema = import_core.Resolve.schema(rootSchema, uischema.scope, rootSchema);
-        return ["code-pgsql", "code-sql", "code-mysql"].includes(currentSchema?.format);
+        return typeof currentSchema?.format === "string" && currentSchema.format.startsWith("code-");
       } catch (e) {
-        console.warn(`Error resolving schema for scope ${uischema.scope} in codePgsqlTester:`, e);
+        console.warn(`Error resolving schema for scope ${uischema.scope} in codeEditorTester:`, e);
         return false;
       }
     }
   )
-);
-var codeJavascriptTester = (0, import_core.rankWith)(
-  100,
-  (0, import_core.and)(import_core.isControl, (0, import_core.formatIs)("code-javascript"))
 );
 var suggestionInputTester = (0, import_core.rankWith)(
   50,
@@ -1869,8 +1817,7 @@ var jetFormsBaseRenderers = [
 ];
 var jetFormsRenderers = [
   { tester: suggestionInputTester, renderer: JetSuggestionControl },
-  { tester: codePgsqlTester, renderer: JetCodePgsqlControl },
-  { tester: codeJavascriptTester, renderer: JetCodeJavascriptControl },
+  { tester: codeEditorTester, renderer: JetCodeEditorControl },
   { tester: dynamicArgsTester, renderer: JetDynamicArgsControl },
   ...jetFormsBaseRenderers
 ];

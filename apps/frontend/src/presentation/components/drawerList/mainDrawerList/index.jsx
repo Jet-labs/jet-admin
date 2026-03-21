@@ -158,11 +158,6 @@ export const MainDrawerList = () => {
   const { tenantID } = useParams();
   const [ref] = useComponentSize();
 
-  const [menuItemExpandedState, setMenuItemExpandedState] = useState([
-    "databaseSchema",
-    "userManagement",
-  ]);
-
   const {
     isLoading: isLoadingDatabaseMetadata,
     isFetching: isFetchingDatabaseMetadata,
@@ -194,6 +189,7 @@ export const MainDrawerList = () => {
       title: CONSTANTS.STRINGS.MAIN_DRAWER_DATABASE_TITLE,
       icon: BsServer,
       expandedStateKey: "databaseSchema",
+      isExpanded: false,
       subItems:
         databaseMetadata?.schemas?.map((schema) => ({
           name: capitalize(schema.databaseSchemaName),
@@ -263,6 +259,7 @@ export const MainDrawerList = () => {
       title: CONSTANTS.STRINGS.MAIN_DRAWER_USER_MANAGEMENT_TITLE,
       icon: FaUserCog,
       expandedStateKey: "userManagement",
+      isExpanded: true,
       subItems: [
         {
           name: "Users",
@@ -277,6 +274,12 @@ export const MainDrawerList = () => {
       ],
     },
   ];
+
+  const [menuItemExpandedState, setMenuItemExpandedState] = useState(() =>
+    drawerListItems
+      .filter((item) => item.type === "collapsible" && item.isExpanded)
+      .map((item) => item.expandedStateKey)
+  );
 
   return (
     <aside

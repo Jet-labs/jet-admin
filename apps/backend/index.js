@@ -169,6 +169,83 @@ socketIO.on("connection", async (socket) => {
     }
   );
 
+  // ============================================================
+  // Agent Socket Handlers
+  // ============================================================
+  socket.on(
+    constants.SOCKET_RECEIVE_EVENTS.AGENT_USER_MESSAGE,
+    async (data) => {
+      await aiSocketController.onAgentUserMessage({
+        socket,
+        chatRoomID: data.chatRoomID,
+        tenantID: data.tenantID,
+        userID: data.userID,
+        message: data.message,
+      });
+    }
+  );
+
+  socket.on(
+    constants.SOCKET_RECEIVE_EVENTS.AGENT_DATASOURCE_APPROVAL,
+    async (data) => {
+      await aiSocketController.onAgentDatasourceApproval({
+        socket,
+        chatRoomID: data.chatRoomID,
+        tenantID: data.tenantID,
+        userID: data.userID,
+        approvedIDs: data.approvedIDs,
+      });
+    }
+  );
+
+  socket.on(
+    constants.SOCKET_RECEIVE_EVENTS.AGENT_QUERY_APPROVAL,
+    async (data) => {
+      await aiSocketController.onAgentQueryApproval({
+        socket,
+        chatRoomID: data.chatRoomID,
+        tenantID: data.tenantID,
+        userID: data.userID,
+      });
+    }
+  );
+
+  socket.on(
+    constants.SOCKET_RECEIVE_EVENTS.AGENT_PROMOTE_TO_WIDGET,
+    async (data) => {
+      await aiSocketController.onAgentPromoteToWidget({
+        socket,
+        chatRoomID: data.chatRoomID,
+        tenantID: data.tenantID,
+        userID: data.userID,
+        widgetTitle: data.widgetTitle,
+      });
+    }
+  );
+
+  socket.on(
+    constants.SOCKET_RECEIVE_EVENTS.AGENT_FOLLOW_UP,
+    async (data) => {
+      await aiSocketController.onAgentFollowUp({
+        socket,
+        chatRoomID: data.chatRoomID,
+        tenantID: data.tenantID,
+        userID: data.userID,
+        message: data.message,
+      });
+    }
+  );
+
+  socket.on(
+    constants.SOCKET_RECEIVE_EVENTS.AGENT_CANCEL,
+    async (data) => {
+      await aiSocketController.onAgentCancel({
+        socket,
+        chatRoomID: data.chatRoomID,
+      });
+    }
+  );
+
   Logger.log("success", {
     message: "user connected to socket",
     params: { firebase_id },
