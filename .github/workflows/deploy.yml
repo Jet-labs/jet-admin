@@ -32,7 +32,7 @@ jobs:
           node-version: 20
 
       - name: Install Dependencies
-        run: npm install
+        run: npm install --legacy-peer-deps
 
       - name: Build Site
         # This will compile your Tailwind CSS and React code
