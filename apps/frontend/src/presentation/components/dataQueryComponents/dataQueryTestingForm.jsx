@@ -42,18 +42,18 @@ export const DataQueryTestingForm = ({
   });
 
   const { isPending: isTestingDataQuery, mutate: testDataQuery } = useMutation({
-    mutationFn: ({ argValues }) => {
+    mutationFn: ({ inputArgs }) => {
       if (dataQuery) {
         return testDataQueryByDataAPI({
           tenantID,
           dataQuery,
-          argValues,
+          inputArgs,
         });
       } else {
         return testDataQueryByIDAPI({
           tenantID,
           dataQueryID,
-          argValues,
+          inputArgs,
         });
       }
     },
@@ -75,7 +75,7 @@ export const DataQueryTestingForm = ({
     ) {
       _handleOpenArgsForm();
     } else {
-      testDataQuery({ argValues: null });
+      testDataQuery({ inputArgs: null });
     }
   };
 
@@ -90,7 +90,7 @@ export const DataQueryTestingForm = ({
   const _handleOnArgFormCompleted = (dataQueryArgValues) => {
     setIsArgsFormOpen(false);
     testDataQuery({
-      argValues: dataQueryArgValues,
+      inputArgs: dataQueryArgValues,
     });
   };
 

@@ -46,7 +46,11 @@ const updateDataQuerySchema = z.object({
 
 const testDataQuerySchema = z.object({
   dataQuery: z.object({}).passthrough(),
-  // argValues: z.object({}).optional(),
+  inputArgs: z.object({}).passthrough().optional(),
+}).passthrough();
+
+const runDataQueryByIDSchema = z.object({
+  inputArgs: z.object({}).passthrough().optional(),
 }).passthrough();
 
 const aiGenerateSchema = z.object({
@@ -69,6 +73,7 @@ module.exports = {
   createDataQuerySchema,
   updateDataQuerySchema,
   testDataQuerySchema,
+  runDataQueryByIDSchema,
   aiGenerateSchema,
   dataQueryIdParamSchema,
 };

@@ -193,7 +193,7 @@ export const useWorkflowRun = ({ tenantID }) => {
     /**
      * Start a Test Run (In-Memory)
      */
-    const startTestRun = useCallback(async ({ nodes, edges, inputParams }) => {
+    const startTestRun = useCallback(async ({ nodes, edges, inputArgs }) => {
         // Reset stopping guard for new run
         isStoppingRef.current = false;
         clearRunState();
@@ -208,7 +208,7 @@ export const useWorkflowRun = ({ tenantID }) => {
                 tenantID,
                 nodes,
                 edges,
-                inputParams,
+                inputArgs,
             });
 
             const instanceID = result.instanceID;
@@ -238,7 +238,7 @@ export const useWorkflowRun = ({ tenantID }) => {
     /**
      * Start a Saved Run (Database)
      */
-    const startSavedRun = useCallback(async ({ workflowID, nodes, inputParams }) => {
+    const startSavedRun = useCallback(async ({ workflowID, nodes, inputArgs }) => {
         // Reset stopping guard for new run
         isStoppingRef.current = false;
         clearRunState();
@@ -252,7 +252,7 @@ export const useWorkflowRun = ({ tenantID }) => {
             const result = await executeWorkflowAPI({
                 tenantID,
                 workflowID,
-                inputParams,
+                inputArgs,
             });
 
             const instanceID = result.instanceID;

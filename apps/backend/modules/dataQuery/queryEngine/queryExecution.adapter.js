@@ -21,14 +21,14 @@ function createQueryEngine({
   return new QueryEngine(queryFetcher, datasourceFetcher);
 }
 
-function buildDataQueryExecutionArgs(argDefinitions = [], argValues = {}) {
+function buildDataQueryExecutionArgs(argDefinitions = [], inputArgs = {}) {
   const normalizedArgDefinitions = Array.isArray(argDefinitions)
     ? argDefinitions
     : [];
 
   const mappedArgsToValues = normalizedArgDefinitions.map((arg) => ({
     ...arg,
-    value: argValues?.[arg.key],
+    value: inputArgs?.[arg.key],
   }));
 
   return {
@@ -41,12 +41,12 @@ async function executeDataQuery({
   engine,
   dataQueryID,
   argDefinitions = [],
-  argValues = {},
+  inputArgs = {},
   executionArgs,
 }) {
   const activeEngine = engine || createQueryEngine();
   const runtimeArgs =
-    executionArgs ?? buildDataQueryExecutionArgs(argDefinitions, argValues).kvtObject;
+    executionArgs ?? buildDataQueryExecutionArgs(argDefinitions, inputArgs).kvtObject;
 
   return activeEngine.executeQuery(dataQueryID, runtimeArgs);
 }

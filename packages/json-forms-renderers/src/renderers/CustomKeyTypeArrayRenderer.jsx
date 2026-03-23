@@ -70,7 +70,9 @@ export const CustomKeyTypeArrayRenderer = ({
                   type: "Control",
                   scope: "#/properties/type",
                   label: "Value Type",
-                  options: uischema.options?.typeOptions,
+                  options: {
+                    ...uischema.options?.typeOptions,
+                  },
                 }}
                 schema={itemSchema}
                 path={`${path}.${index}`}

@@ -24,8 +24,8 @@
                 "string",
                 "number",
                 "boolean",
-                "array (, separated)",
-                "object (JSON stringified)"
+                "array",
+                "object"
               ],
               "default": "string"
             }
@@ -62,6 +62,15 @@
                 "scope": "#/properties/type"
               }
             ]
+          },
+          "typeOptions": {
+            "enumLabels": {
+              "string": "String",
+              "number": "Number",
+              "boolean": "Boolean",
+              "array": "Array",
+              "object": "Object (JSON)"
+            }
           }
         }
       }

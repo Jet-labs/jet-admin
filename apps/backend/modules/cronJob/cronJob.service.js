@@ -1,7 +1,7 @@
 const Logger = require("../../utils/logger"); // Adjust path as needed
 const cron = require("node-cron");
 const { prisma } = require("../../config/prisma.config"); // Adjust path as needed
-const { dataQueryService } = require("../dataQuery/dataQuery.service");
+const { workflowService } = require("../workflow/workflow.service");
 const {
   tenantAwarePostgreSQLPoolManager,
 } = require("../../config/tenant-aware-pgpool-manager.config");
@@ -17,8 +17,8 @@ const cronJobService = {};
  * @param {string} param0.cronJobTitle
  * @param {string} [param0.cronJobDescription]
  * @param {string} param0.cronJobSchedule
- * @param {number} param0.dataQueryID
- * @param {object} [param0.dataQueryArgValues]
+ * @param {string} param0.workflowID
+ * @param {object} [param0.workflowConfig]
  * @param {boolean} [param0.isDisabled]
  * @param {number} [param0.timeoutSeconds]
  * @param {number} [param0.retryAttempts]
@@ -31,8 +31,8 @@ cronJobService.createCronJob = async ({
   tenantID,
   cronJobDescription,
   cronJobSchedule,
-  dataQueryID,
-  dataQueryArgValues,
+  workflowID,
+  workflowConfig,
   isDisabled,
   timeoutSeconds,
   retryAttempts,
@@ -47,8 +47,8 @@ cronJobService.createCronJob = async ({
       tenantID,
       cronJobDescription,
       cronJobSchedule,
-      dataQueryID,
-      dataQueryArgValues,
+      workflowID,
+      workflowConfig,
       isDisabled,
       timeoutSeconds,
       retryAttempts,
@@ -63,15 +63,15 @@ cronJobService.createCronJob = async ({
         tenantID,
         cronJobDescription,
         cronJobSchedule,
-        dataQueryID,
-        dataQueryArgValues,
+        workflowID,
+        workflowConfig,
         isDisabled,
         timeoutSeconds,
         retryAttempts,
         retryDelaySeconds,
       },
       include: {
-        tblDataQueries: true,
+        tblWorkflows: true,
       },
     });
 
@@ -82,8 +82,8 @@ cronJobService.createCronJob = async ({
         tenantID,
         cronJobDescription,
         cronJobSchedule,
-        dataQueryID,
-        dataQueryArgValues,
+        workflowID,
+        workflowConfig,
         isDisabled,
         timeoutSeconds,
         retryAttempts,
@@ -103,8 +103,8 @@ cronJobService.createCronJob = async ({
         tenantID,
         cronJobDescription,
         cronJobSchedule,
-        dataQueryID,
-        dataQueryArgValues,
+        workflowID,
+        workflowConfig,
         isDisabled,
         timeoutSeconds,
         retryAttempts,
@@ -171,7 +171,7 @@ cronJobService.getAllCronJobsForScheduler = async () => {
         isDisabled: false,
       },
       include: {
-        tblDataQueries: true,
+        tblWorkflows: true,
       },
       orderBy: {
         createdAt: "desc", // Or order by title, etc.
@@ -265,7 +265,7 @@ cronJobService.updateCronJobByID = async ({
       },
       data: updateData,
       include: {
-        tblDataQueries: true,
+        tblWorkflows: true,
       },
     });
 
@@ -348,17 +348,16 @@ cronJobService.runCronJob = async ({ cronJob }) => {
     const dbPool = await tenantAwarePostgreSQLPoolManager.getPool(
       cronJob.tenantID
     );
-    const queryRunResult = await dataQueryService.runDataQueryByID({
-      userID: cronJob.cronJobID,
+    const workflowRunResult = await workflowService.executeWorkflow({
+      workflowID: cronJob.workflowID,
       tenantID: cronJob.tenantID,
-      dataQueryID: cronJob.dataQueryID,
-      argValues: cronJob.dataQueryArgValues,
+      inputArgs: cronJob.workflowConfig?.inputArgs || cronJob.workflowConfig?.workflowArgValues || {},
     });
 
     await prisma.tblCronJobHistory.create({
       data: {
         cronJobID: cronJob.cronJobID,
-        result: JSON.stringify(queryRunResult),
+        result: JSON.stringify(workflowRunResult || { message: "Workflow started" }),
         triggerType: "SCHEDULED",
         status: constants.CRON_JOB_STATUS.SUCCESS,
         scheduledAt: startTime,
@@ -457,9 +456,9 @@ cronJobService.deleteScheduledCronJob = async ({ cronJobID }) => {
         scheduledCronJobs[cronJobID].stop();
         Logger.log("info", {
           message: "cronJobService:deleteScheduledCronJob:stopped",
-          params: { pmJobID },
+          params: { cronJobID },
         });
-        delete scheduledCronJobs[pmJobID];
+        delete scheduledCronJobs[cronJobID];
         global.scheduledCronJobs = scheduledCronJobs;
       }
     }
@@ -570,7 +569,7 @@ cronJobService.getCronJobHistoryByID = async ({
   } catch (error) {
     Logger.log("error", {
       message: "cronJobService:getCronJobHistoryByID:failure",
-      params: { userID, tenantID, cronJobID, page, pageSize, error },
+      params: { userID, tenantID, cronJobID, error },
     });
     throw error;
   }

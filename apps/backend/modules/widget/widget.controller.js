@@ -227,7 +227,7 @@ widgetController.getWidgetDataByID = async (req, res) => {
   const { user } = req;
   const { tenantID, widgetID } = req.params;
   const { executionMode } = req.query;
-  const inputParams = req.body?.inputParams || {};
+  const inputArgs = req.body?.inputArgs || {};
   const authContext = getServiceAuthContext(req);
 
   Logger.log("info", {
@@ -237,7 +237,7 @@ widgetController.getWidgetDataByID = async (req, res) => {
       tenantID,
       widgetID,
       executionMode,
-      inputParams,
+      inputArgs,
     },
   });
 
@@ -247,7 +247,7 @@ widgetController.getWidgetDataByID = async (req, res) => {
       tenantID,
       widgetID,
       executionMode,
-      inputParams,
+      inputArgs,
     });
 
     Logger.log("success", {
@@ -290,7 +290,7 @@ widgetController.getWidgetDataUsingWidget = async (req, res) => {
   const { tenantID } = req.params;
   const widget = req.body;
   const { executionMode } = req.query;
-  const inputParams = req.body?.inputParams || {};
+  const inputArgs = req.body?.inputArgs || {};
   const authContext = getServiceAuthContext(req);
 
   Logger.log("info", {
@@ -300,7 +300,7 @@ widgetController.getWidgetDataUsingWidget = async (req, res) => {
       tenantID,
       widget,
       executionMode,
-      inputParams,
+      inputArgs,
     },
   });
 
@@ -310,7 +310,7 @@ widgetController.getWidgetDataUsingWidget = async (req, res) => {
       tenantID,
       widget,
       executionMode,
-      inputParams,
+      inputArgs,
     });
 
     Logger.log("success", {

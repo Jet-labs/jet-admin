@@ -243,7 +243,7 @@ export const generateAIPromptBasedQueryAPI = async ({ tenantID, aiPrompt }) => {
 export const testDataQueryByIDAPI = async ({
   tenantID,
   dataQueryID,
-  argValues,
+  inputArgs,
 }) => {
   try {
     const url =
@@ -253,7 +253,7 @@ export const testDataQueryByIDAPI = async ({
     if (bearerToken) {
       const response = await axios.post(
         url,
-        { argValues },
+        { inputArgs },
         {
           headers: {
             authorization: `Bearer ${bearerToken}`,
@@ -278,7 +278,7 @@ export const testDataQueryByIDAPI = async ({
 export const testDataQueryByDataAPI = async ({
   tenantID,
   dataQuery,
-  argValues,
+  inputArgs,
 }) => {
   try {
     const url =
@@ -288,7 +288,7 @@ export const testDataQueryByDataAPI = async ({
     if (bearerToken) {
       const response = await axios.patch(
         url,
-        { dataQuery, argValues },
+        { dataQuery, inputArgs },
         {
           headers: {
             authorization: `Bearer ${bearerToken}`,

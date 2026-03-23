@@ -82,14 +82,14 @@ const updateWorkflowSchema = z.object({
 });
 
 const executeWorkflowSchema = z.object({
-  inputParams: z.object({}).passthrough().optional(),
+  inputArgs: z.object({}).passthrough().optional(),
 }).passthrough();
 
 const testWorkflowSchema = z.object({
   nodes: z.array(z.any()),
   edges: z.array(z.any()),
   workflowOptions: z.object({}).passthrough().optional(),
-  inputParams: z.object({}).passthrough().optional(),
+  inputArgs: z.object({}).passthrough().optional(),
 }).passthrough().superRefine((data, ctx) => {
   addWorkflowTemplateIssues(data, ctx);
 });

@@ -264,8 +264,8 @@ var queryConfig_default = {
                 "string",
                 "number",
                 "boolean",
-                "array (, separated)",
-                "object (JSON stringified)"
+                "array",
+                "object"
               ],
               default: "string"
             }
@@ -319,6 +319,15 @@ var queryConfig_default = {
                 scope: "#/properties/type"
               }
             ]
+          },
+          typeOptions: {
+            enumLabels: {
+              string: "String",
+              number: "Number",
+              boolean: "Boolean",
+              array: "Array",
+              object: "Object (JSON)"
+            }
           }
         }
       }
@@ -707,8 +716,8 @@ var queryConfig_default2 = {
                 "string",
                 "number",
                 "boolean",
-                "array (, separated)",
-                "object (JSON stringified)"
+                "array",
+                "object"
               ],
               default: "string"
             }
@@ -841,6 +850,15 @@ var queryConfig_default2 = {
                 scope: "#/properties/type"
               }
             ]
+          },
+          typeOptions: {
+            enumLabels: {
+              string: "String",
+              number: "Number",
+              boolean: "Boolean",
+              array: "Array",
+              object: "Object (JSON)"
+            }
           }
         }
       }
@@ -925,8 +943,8 @@ var queryConfig_default3 = {
                 "string",
                 "number",
                 "boolean",
-                "array (, separated)",
-                "object (JSON stringified)"
+                "array",
+                "object"
               ],
               default: "string"
             }
@@ -962,6 +980,15 @@ var queryConfig_default3 = {
                 scope: "#/properties/type"
               }
             ]
+          },
+          typeOptions: {
+            enumLabels: {
+              string: "String",
+              number: "Number",
+              boolean: "Boolean",
+              array: "Array",
+              object: "Object (JSON)"
+            }
           }
         }
       }
@@ -1138,7 +1165,7 @@ var queryConfig_default4 = {
             key: { type: "string" },
             type: {
               type: "string",
-              enum: ["string", "number", "boolean", "array (, separated)", "object (JSON stringified)"],
+              enum: ["string", "number", "boolean", "array", "object"],
               default: "string"
             }
           },
@@ -1245,6 +1272,15 @@ var queryConfig_default4 = {
               { type: "Control", scope: "#/properties/key" },
               { type: "Control", scope: "#/properties/type" }
             ]
+          },
+          typeOptions: {
+            enumLabels: {
+              string: "String",
+              number: "Number",
+              boolean: "Boolean",
+              array: "Array",
+              object: "Object (JSON)"
+            }
           }
         }
       }
@@ -1516,8 +1552,8 @@ var queryConfig_default5 = {
                 "string",
                 "number",
                 "boolean",
-                "array (, separated)",
-                "object (JSON stringified)"
+                "array",
+                "object"
               ],
               default: "string"
             }
@@ -1571,6 +1607,15 @@ var queryConfig_default5 = {
                 scope: "#/properties/type"
               }
             ]
+          },
+          typeOptions: {
+            enumLabels: {
+              string: "String",
+              number: "Number",
+              boolean: "Boolean",
+              array: "Array",
+              object: "Object (JSON)"
+            }
           }
         }
       }
@@ -4187,8 +4232,8 @@ var queryConfig_default12 = {
                 "string",
                 "number",
                 "boolean",
-                "array (, separated)",
-                "object (JSON stringified)"
+                "array",
+                "object"
               ],
               default: "string"
             }
@@ -4242,6 +4287,15 @@ var queryConfig_default12 = {
                 scope: "#/properties/type"
               }
             ]
+          },
+          typeOptions: {
+            enumLabels: {
+              string: "String",
+              number: "Number",
+              boolean: "Boolean",
+              array: "Array",
+              object: "Object (JSON)"
+            }
           }
         }
       }

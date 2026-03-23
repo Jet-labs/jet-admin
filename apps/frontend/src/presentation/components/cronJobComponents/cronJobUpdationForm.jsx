@@ -64,8 +64,8 @@ export const CronJobUpdationForm = ({ tenantID, cronJobID }) => {
       cronJobTitle: "",
       cronJobDescription: "",
       cronJobSchedule: "",
-      dataQueryID: "",
-      dataQueryArgValues: {},
+      workflowID: "",
+      workflowConfig: { inputArgs: {} },
     },
     validationSchema: formValidations.cronJobUpdationFormValidationSchema,
     onSubmit: (data) => {
@@ -79,8 +79,8 @@ export const CronJobUpdationForm = ({ tenantID, cronJobID }) => {
         cronJobTitle: cronJob.cronJobTitle,
         cronJobDescription: cronJob.cronJobDescription,
         cronJobSchedule: cronJob.cronJobSchedule,
-        dataQueryID: cronJob.dataQueryID,
-        dataQueryArgValues: cronJob.dataQueryArgValues,
+        workflowID: cronJob.workflowID,
+        workflowConfig: cronJob.workflowConfig || { inputArgs: {} },
       });
     }
   }, [cronJob]);

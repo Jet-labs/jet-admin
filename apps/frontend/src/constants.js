@@ -847,21 +847,21 @@ export const CONSTANTS = {
     DELETE_CRON_JOB_DIALOG_MESSAGE:
       "Are you sure you want to delete this item? This action cannot be undone.",
 
-    CRON_JOB_EDITOR_FORM_TITLE_FIELD_LABEL: "Cron job title",
+    CRON_JOB_EDITOR_FORM_TITLE_FIELD_LABEL: "Scheduled job title",
 
-    CRON_JOB_EDITOR_FORM_TITLE_FIELD_PLACEHOLDER: "Your Cron job's title",
+    CRON_JOB_EDITOR_FORM_TITLE_FIELD_PLACEHOLDER: "Your scheduled job's title",
 
     CRON_JOB_EDITOR_FORM_QUERY_ID_FIELD_LABEL: "Select query",
 
     CRON_JOB_EDITOR_FORM_SCHEDULE_FIELD_LABEL: "Select schedule",
 
-    CRON_JOB_EDITOR_FORM_DESCRIPTION_FIELD_LABEL: "Cron job description",
+    CRON_JOB_EDITOR_FORM_DESCRIPTION_FIELD_LABEL: "Scheduled job description",
     CRON_JOB_EDITOR_FORM_DESCRIPTION_FIELD_PLACEHOLDER:
-      "Your Cron job's description",
+      "Your scheduled job's description",
 
-    CRON_JOB_EDITOR_FORM_CRON_EXPRESSION_FIELD_LABEL: "Cron expression",
+    CRON_JOB_EDITOR_FORM_CRON_EXPRESSION_FIELD_LABEL: "Schedule (Cron) expression",
     CRON_JOB_EDITOR_FORM_CRON_EXPRESSION_FIELD_PLACEHOLDER:
-      "Your Cron job's cron expression",
+      "Your scheduled job's cron expression",
 
     CRON_JOB_EDITOR_FORM_QUERY_ARGUMENTS_LABEL: "Arguments",
 

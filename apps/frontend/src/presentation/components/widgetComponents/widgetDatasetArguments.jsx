@@ -4,7 +4,7 @@ import { CONSTANTS } from "../../../constants";
 import { formValidations } from "../../../utils/formValidation";
 import PropTypes from "prop-types";
 
-import { Button, Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, Input } from "@jet-admin/ui";
+import { Button, Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, InputArgsForm } from "@jet-admin/ui";
 /**
  * Reusable component for configuring input arguments for both queries and workflows.
  * Works with dataQueryOptions.args for queries and workflowOptions.args for workflows.
@@ -30,7 +30,7 @@ export const WidgetDatasetArguments = ({
   const args = selectedWorkflow?.workflowOptions?.args || []
 
   // Get the field name for storing values based on type
-  const valuesFieldName = "workflowArgValues"
+  const valuesFieldName = "inputArgs"
 
   const datasetArgumentsForm = useFormik({
     initialValues: {
@@ -40,9 +40,18 @@ export const WidgetDatasetArguments = ({
     validationSchema: formValidations.datasetArgumentsFormValidationSchema(args),
     enableReinitialize: true,
     onSubmit: (values) => {
+      const finalArgs = { ...values[valuesFieldName] };
+      args.forEach(arg => {
+         if (arg.type === 'object') {
+            const val = finalArgs[arg.key];
+            if (typeof val === 'string' && val.trim() !== '') {
+               try { finalArgs[arg.key] = JSON.parse(val); } catch(e) {}
+            }
+         }
+      });
       widgetForm.setFieldValue(
         `workflows[${datasetIndex}].${valuesFieldName}`,
-        values[valuesFieldName]
+        finalArgs
       );
       onClose();
     },
@@ -73,33 +82,11 @@ export const WidgetDatasetArguments = ({
               <label className="block mb-2 text-xs font-normal text-slate-500">
                 {label}
               </label>
-              <div className="space-y-2">
-                {args.map((arg, argIndex) => {
-                  const argName = arg.key;
-                  return (
-                    <div key={`arg-${argIndex}`}>
-                      <label className="block mb-1 text-xs text-slate-600">
-                        {argName}
-                        {arg.required && <span className="text-red-500 ml-0.5">*</span>}
-                        {arg.type && <span className="text-slate-400 ml-1">({arg.type})</span>}
-                      </label>
-                      <Input
-                        type="text"
-                        id={`arg-${argName}`}
-                        className="placeholder:text-slate-400 text-xs w-full bg-slate-50 border border-slate-300 text-slate-700 rounded focus:outline-none focus:border-slate-400 block px-2.5 py-1.5"
-                        placeholder={`Value for ${argName}`}
-                        value={
-                          datasetArgumentsForm.values[valuesFieldName]?.[argName] || ""
-                        }
-                        onChange={(e) =>
-                          _handleUpdateDatasetQueryArgs(argName, e.target.value)
-                        }
-                        onBlur={datasetArgumentsForm.handleBlur}
-                      />
-                    </div>
-                  );
-                })}
-              </div>
+              <InputArgsForm
+                args={args}
+                values={datasetArgumentsForm.values[valuesFieldName] || {}}
+                onChange={(key, value) => _handleUpdateDatasetQueryArgs(key, value)}
+              />
             </div>
           ) : (
             <p className="text-xs text-slate-500 italic">

@@ -24,7 +24,7 @@
  *
  * eventType constants (WORKFLOW_LOG_EVENT_TYPES)
  * ──────────────────────────────────────
- *   INPUT_SET      payload carries { input: inputParams }, nodeID null
+ *   INPUT_SET      payload carries { input: inputArgs }, nodeID null
  *   NODE_COMPLETED payload carries node output + __node_<id> sentinel
  *   NODE_FAILED    payload empty, errorMessage carries the error text
  *   SYSTEM_SET     payload carries orchestrator metadata keys
@@ -121,10 +121,10 @@ stateManager.logEventBulk = async (events) => {
  * Returns { instance, initialContext } so the caller can pass initialContext
  * directly into the first job payload without a round-trip assembleContext call.
  *
- * @param {{ workflowID: string, tenantID: string, inputParams?: object, isTest?: boolean }}
+ * @param {{ workflowID: string, tenantID: string, inputArgs?: object, isTest?: boolean }}
  * @returns {Promise<{ instance: object, initialContext: object }>}
  */
-stateManager.createInstance = async ({ workflowID, tenantID, inputParams = {}, isTest = false }) => {
+stateManager.createInstance = async ({ workflowID, tenantID, inputArgs = {}, isTest = false }) => {
   Logger.log('info', {
     message: 'stateManager:createInstance',
     params: { workflowID, tenantID, isTest },
@@ -140,7 +140,7 @@ stateManager.createInstance = async ({ workflowID, tenantID, inputParams = {}, i
     },
   });
 
-  const inputPayload = { input: inputParams };
+  const inputPayload = { input: inputArgs };
 
   // Use logEvent instead of raw Prisma so all writes go through one path
   await stateManager.logEvent({

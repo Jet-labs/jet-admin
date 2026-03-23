@@ -163,7 +163,7 @@ export const getWidgetDataByIDAPI = async ({
   tenantID,
   widgetID,
   executionMode,
-  inputParams,
+  inputArgs,
 }) => {
   try {
     let url =
@@ -182,7 +182,7 @@ export const getWidgetDataByIDAPI = async ({
         headers: {
           authorization: `Bearer ${bearerToken}`,
         },
-        data: { inputParams }
+        data: { inputArgs }
       });
       if (response.data && response.data.success === true) {
         return response.data.widgetData;
@@ -199,7 +199,7 @@ export const getWidgetDataByIDAPI = async ({
   }
 };
 
-export const getWidgetDataUsingWidgetAPI = async ({ tenantID, widgetData, executionMode, inputParams }) => {
+export const getWidgetDataUsingWidgetAPI = async ({ tenantID, widgetData, executionMode, inputArgs }) => {
   try {
     let url =
       CONSTANTS.SERVER_HOST +
@@ -213,7 +213,7 @@ export const getWidgetDataUsingWidgetAPI = async ({ tenantID, widgetData, execut
         url,
         {
           ...widgetData,
-          inputParams,
+          inputArgs,
         },
         {
           headers: {

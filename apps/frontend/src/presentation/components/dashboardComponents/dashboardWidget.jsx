@@ -82,7 +82,7 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height }) => {
       "data",
       executionMode,
     ],
-    queryFn: () => getWidgetDataByIDAPI({ tenantID, widgetID, executionMode, inputParams: {} }),
+    queryFn: () => getWidgetDataByIDAPI({ tenantID, widgetID, executionMode, inputArgs: {} }),
     refetchOnWindowFocus: false,
     enabled: !!widget && (widget?.workflowConfig?.workflowAutoRun ?? WIDGETS_MAP[widget.widgetType]?.defaultAutoRun ?? false) === true,
   });

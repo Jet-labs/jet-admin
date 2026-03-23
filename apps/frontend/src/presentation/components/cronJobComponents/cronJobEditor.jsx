@@ -12,6 +12,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  InputArgsForm
 } from "@jet-admin/ui";
 
 
@@ -19,22 +20,22 @@ export const CronJobEditor = ({ cronJobEditorForm }) => {
   CronJobEditor.propTypes = {
     cronJobEditorForm: PropTypes.object.isRequired,
   };
-  const { dataQueries } = useCronJobsState();
+  const { workflows } = useCronJobsState();
   const _handleOnScheduleChange = useCallback(
     (value) => {
       cronJobEditorForm?.setFieldValue("cronJobSchedule", value);
     },
     [cronJobEditorForm]
   );
-  const selectedQuery = useMemo(() => {
-    return dataQueries
-      ? dataQueries.find(
-          (q) =>
-          q.dataQueryID ==
-          cronJobEditorForm.values?.dataQueryID
+  const selectedWorkflow = useMemo(() => {
+    return workflows
+      ? workflows.find(
+          (w) =>
+          String(w.workflowID) ===
+          String(cronJobEditorForm.values?.workflowID)
         )
       : null;
-  }, [dataQueries, cronJobEditorForm.values]);
+  }, [workflows, cronJobEditorForm.values]);
 
   return (
     <div className="w-full space-y-4">
@@ -74,63 +75,49 @@ export const CronJobEditor = ({ cronJobEditorForm }) => {
         />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="dataQueryID">
-          {CONSTANTS.STRINGS.CRON_JOB_EDITOR_FORM_QUERY_ID_FIELD_LABEL}
+        <Label htmlFor="workflowID">
+          Workflow
         </Label>
         <Select
           value={
-            cronJobEditorForm.values.dataQueryID
-              ? String(cronJobEditorForm.values.dataQueryID)
+            cronJobEditorForm.values.workflowID
+              ? String(cronJobEditorForm.values.workflowID)
               : ""
           }
           onValueChange={(val) =>
-            cronJobEditorForm.setFieldValue("dataQueryID", val ? Number(val) : null)
+            cronJobEditorForm.setFieldValue("workflowID", val)
           }
         >
-          <SelectTrigger id="dataQueryID">
-            <SelectValue placeholder="Select query dataset" />
+          <SelectTrigger id="workflowID">
+            <SelectValue placeholder="Select workflow" />
           </SelectTrigger>
           <SelectContent>
-            {dataQueries?.map((dataQuery) => (
+            {workflows?.map((workflow) => (
               <SelectItem
-              key={`database_query_item_${dataQuery.dataQueryID}`}
-                value={String(dataQuery.dataQueryID)}
+              key={`workflow_item_${workflow.workflowID}`}
+                value={String(workflow.workflowID)}
               >
-                {dataQuery.dataQueryTitle}
+                {workflow.title}
               </SelectItem>
             ))}
           </SelectContent>
         </Select>
       </div>
-      {selectedQuery?.dataQueryOptions?.args?.length > 0 && (
+      {selectedWorkflow?.workflowOptions?.args?.length > 0 && (
         <div className="space-y-2">
           <Label>
-            {CONSTANTS.STRINGS.CRON_JOB_EDITOR_FORM_QUERY_ARGUMENTS_LABEL}
+            Workflow Arguments
           </Label>
-          <div className="space-y-2">
-            {selectedQuery.dataQueryOptions.args.map((arg) => {
-              const argName = arg.key;
-              const key = `dataQueryArgValues.${argName}`;
-              return (
-                <div key={key}>
-                  <Input
-                    type="text"
-                    name={key}
-                    required={true}
-                    id={key}
-                    className="w-full"
-                    placeholder={`Value for ${argName}`}
-                    value={
-                      cronJobEditorForm.values.dataQueryArgValues?.[argName] ||
-                      ""
-                    }
-                    onChange={cronJobEditorForm.handleChange}
-                    onBlur={cronJobEditorForm.handleBlur}
-                  />
-                </div>
-              );
-            })}
-          </div>
+          <InputArgsForm
+            args={selectedWorkflow.workflowOptions.args}
+            values={cronJobEditorForm.values.workflowConfig?.inputArgs || {}}
+            onChange={(key, value) =>
+              cronJobEditorForm.setFieldValue(
+                `workflowConfig.inputArgs.${key}`,
+                value
+              )
+            }
+          />
         </div>
       )}
       <div className="space-y-1.5">

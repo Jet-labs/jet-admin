@@ -224,18 +224,18 @@ dataQueryController.generateAIPromptBasedQuery = async (req, res) => {
 dataQueryController.runDataQueryByID = async (req, res) => {
   try {
     const { user } = req;
-    const { argValues } = req.body;
+    const { inputArgs } = req.body;
     const { dataQueryID, tenantID } = req.params;
     Logger.log("info", {
       message: "dataQueryController:runDataQueryByID:params",
-      params: { userID: user.userID, tenantID, dataQueryID, argValues },
+      params: { userID: user.userID, tenantID, dataQueryID, inputArgs },
     });
 
     const dataQueryResult = await dataQueryService.runDataQueryByID({
       userID: user.userID,
       tenantID,
       dataQueryID,
-      argValues,
+      inputArgs,
     });
 
     Logger.log("success", {
@@ -265,18 +265,18 @@ dataQueryController.runDataQueryByID = async (req, res) => {
 dataQueryController.runDataQueryByData = async (req, res) => {
   try {
     const { user } = req;
-    const { argValues, dataQuery } = req.body;
+    const { inputArgs, dataQuery } = req.body;
     const { tenantID } = req.params;
     Logger.log("info", {
       message: "dataQueryController:runDataQueryByData:params",
-      params: { userID: user.userID, tenantID, dataQuery, argValues, body: req.body },
+      params: { userID: user.userID, tenantID, dataQuery, inputArgs, body: req.body },
     });
 
     const dataQueryResult = await dataQueryService.runDataQueryByData({
       userID: user.userID,
       tenantID,
       dataQuery,
-      argValues,
+      inputArgs,
     });
 
     Logger.log("success", {

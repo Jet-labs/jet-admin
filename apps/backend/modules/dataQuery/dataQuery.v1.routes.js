@@ -7,6 +7,7 @@ const {
   createDataQuerySchema,
   updateDataQuerySchema,
   testDataQuerySchema,
+  runDataQueryByIDSchema,
   aiGenerateSchema,
   dataQueryIdParamSchema,
 } = require("./dataQuery.validator");
@@ -64,7 +65,10 @@ router.get(
 
 router.post(
   "/:dataQueryID/queryTest",
-  validate(dataQueryIdParamSchema, "params"),
+  validateAll({
+    params: dataQueryIdParamSchema,
+    body: runDataQueryByIDSchema,
+  }),
   authMiddleware.checkUserPermissions(["tenant:query:test"]),
   dataQueryController.runDataQueryByID
 );

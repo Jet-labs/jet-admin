@@ -129,14 +129,14 @@ formValidations.cronJobAdditionFormValidationSchema = Yup.object().shape({
   cronJobTitle: Yup.string().required("Cron job title is required"),
   cronJobDescription: Yup.string().optional(),
   cronJobSchedule: Yup.string().required("Cron schedule is required"),
-  dataQueryID: Yup.string().required("Database query is required"),
+  workflowID: Yup.string().required("Workflow is required"),
 });
 
 formValidations.cronJobUpdationFormValidationSchema = Yup.object().shape({
   cronJobTitle: Yup.string().required("Cron job title is required"),
   cronJobDescription: Yup.string().optional(),
   cronJobSchedule: Yup.string().required("Cron schedule is required"),
-  dataQueryID: Yup.string().required("Database query is required"),
+  workflowID: Yup.string().required("Workflow is required"),
 });
 
 formValidations.dataQueryArgsFormValidationSchema = (dataQueryArgs) =>

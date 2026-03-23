@@ -3,7 +3,7 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import { CONSTANTS } from "../../constants";
 import { getAllCronJobsAPI } from "../../data/apis/cronJob";
-import { getAllDataQueriesAPI } from "../../data/apis/dataQuery";
+import { getAllWorkflowsAPI } from "../../data/apis/workflow";
 import PropTypes from "prop-types";
 
 const CronJobsStateContext = React.createContext(undefined);
@@ -28,15 +28,15 @@ const CronJobsContextProvider = ({ children }) => {
   });
 
   const {
-    isLoading: isLoadingDataQueries,
-    data: dataQueries,
-    error: loadDataQueriesError,
-    isFetching: isFetchingDataQueries,
-    isRefetching: isRefetechingDataQueries,
-    refetch: refetchDataQueries,
+    isLoading: isLoadingWorkflows,
+    data: workflows,
+    error: loadWorkflowsError,
+    isFetching: isFetchingWorkflows,
+    isRefetching: isRefetechingWorkflows,
+    refetch: refetchWorkflows,
   } = useQuery({
-    queryKey: [CONSTANTS.REACT_QUERY_KEYS.QUERIES(tenantID)],
-    queryFn: () => getAllDataQueriesAPI({ tenantID }),
+    queryKey: [CONSTANTS.REACT_QUERY_KEYS.WORKFLOWS(tenantID)],
+    queryFn: () => getAllWorkflowsAPI({ tenantID }),
     refetchOnWindowFocus: false,
   });
 
@@ -46,17 +46,17 @@ const CronJobsContextProvider = ({ children }) => {
         cronJobs,
         isLoadingCronJobs,
         isFetchingCronJobs,
-        dataQueries,
-        isLoadingDataQueries,
-        isFetchingDataQueries,
-        loadDataQueriesError,
+        workflows,
+        isLoadingWorkflows,
+        isFetchingWorkflows,
+        loadWorkflowsError,
         loadCronJobsError,
         isRefetechingCronJobs,
-        isRefetechingDataQueries,
+        isRefetechingWorkflows,
       }}
     >
       <CronJobsActionsContext.Provider
-        value={{ refetchCronJobs, refetchDataQueries }}
+        value={{ refetchCronJobs, refetchWorkflows }}
       >
         {children}
       </CronJobsActionsContext.Provider>

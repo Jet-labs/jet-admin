@@ -352,18 +352,18 @@ workflowService.deleteWorkflow = async ({ userID, tenantID, workflowID, authCont
  * @param {object} param0
  * @param {string} param0.workflowID
  * @param {string} param0.tenantID
- * @param {object} param0.inputParams - Input parameters for workflow
+ * @param {object} param0.inputArgs - Input parameters for workflow
  * @returns {Promise<{instanceID: string}>}
  */
-workflowService.executeWorkflow = async ({ workflowID, tenantID, inputParams = {} }) => {
+workflowService.executeWorkflow = async ({ workflowID, tenantID, inputArgs = {} }) => {
   Logger.log("info", {
     message: "workflowService:executeWorkflow:params",
-    params: { workflowID, tenantID, inputParams },
+    params: { workflowID, tenantID, inputArgs },
   });
 
   try {
     // Start workflow (async - returns immediately)
-    const result = await startWorkflow({ workflowID, tenantID, inputParams });
+    const result = await startWorkflow({ workflowID, tenantID, inputArgs });
 
     Logger.log("success", {
       message: "workflowService:executeWorkflow:started",
@@ -451,10 +451,10 @@ workflowService.getRunStatus = async (instanceID) => {
  * @param {string} param0.tenantID
  * @param {Array} param0.nodes - In-memory nodes from frontend
  * @param {Array} param0.edges - In-memory edges from frontend
- * @param {object} param0.inputParams - Input parameters for workflow
+ * @param {object} param0.inputArgs - Input parameters for workflow
  * @returns {Promise<{instanceID: string, isTest: boolean}>}
  */
-workflowService.testWorkflow = async ({ tenantID, nodes, edges, inputParams = {} }) => {
+workflowService.testWorkflow = async ({ tenantID, nodes, edges, inputArgs = {} }) => {
   const { startTestWorkflow } = require("./orchestrator/orchestrator");
 
   Logger.log("info", {
@@ -463,7 +463,7 @@ workflowService.testWorkflow = async ({ tenantID, nodes, edges, inputParams = {}
   });
 
   try {
-    const result = await startTestWorkflow({ nodes, edges, tenantID, inputParams });
+    const result = await startTestWorkflow({ nodes, edges, tenantID, inputArgs });
 
     Logger.log("success", {
       message: "workflowService:testWorkflow:started",

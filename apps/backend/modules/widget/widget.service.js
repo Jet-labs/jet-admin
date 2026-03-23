@@ -280,19 +280,19 @@ const _waitForWorkflowCompletion = async (instanceID, timeoutMs = 30000) => {
  * @param {string} params.executionMode - 'ASYNC' (default) or 'SYNC'
  * @returns {Promise<object>} Workflow instance info or full data
  */
-const _executeWorkflowMode = async ({ widget, tenantID, executionMode = 'ASYNC', inputParams = {} }) => {
+const _executeWorkflowMode = async ({ widget, tenantID, executionMode = 'ASYNC', inputArgs = {} }) => {
   const workflowConfig = widget.workflowConfig;
 
   try {
     const finalInputParams = {
-      ...(workflowConfig.workflowArgValues || {}),
-      ...inputParams,
+      ...(workflowConfig.inputArgs || workflowConfig.workflowArgValues || {}),
+      ...inputArgs,
     };
 
     const { instanceID } = await workflowService.executeWorkflow({
       workflowID: widget.workflowID,
       tenantID,
-      inputParams: finalInputParams,
+      inputArgs: finalInputParams,
     });
 
     Logger.log("info", {
@@ -372,7 +372,7 @@ widgetService.getWidgetDataByID = async ({
   tenantID,
   widgetID,
   executionMode = 'ASYNC',
-  inputParams = {},
+  inputArgs = {},
 }) => {
   Logger.log("info", {
     message: "widgetService:getWidgetDataByID:params",
@@ -380,7 +380,7 @@ widgetService.getWidgetDataByID = async ({
       authContext,
       tenantID,
       widgetID,
-      inputParams,
+      inputArgs,
     },
   });
 
@@ -415,7 +415,7 @@ widgetService.getWidgetDataByID = async ({
       },
     });
 
-    const workflowInstance = await _executeWorkflowMode({ widget, authContext, tenantID, executionMode, inputParams });
+    const workflowInstance = await _executeWorkflowMode({ widget, authContext, tenantID, executionMode, inputArgs });
 
     Logger.log("success", {
       message: "widgetService:getWidgetDataByID:workflowMode:success",
@@ -456,7 +456,7 @@ widgetService.getWidgetDataUsingWidget = async ({
   tenantID,
   widget,
   executionMode = 'ASYNC',
-  inputParams = {},
+  inputArgs = {},
 }) => {
   Logger.log("info", {
     message: "widgetService:getWidgetDataUsingWidget:params",
@@ -464,14 +464,14 @@ widgetService.getWidgetDataUsingWidget = async ({
       authContext,
       tenantID,
       widget,
-      inputParams,
+      inputArgs,
     },
   });
 
   try {
     // Workflow Mode: Execute single workflow
     const workflowInstance = await _executeWorkflowMode({
-      widget, authContext, tenantID, executionMode, inputParams
+      widget, authContext, tenantID, executionMode, inputArgs
     });
 
     return {

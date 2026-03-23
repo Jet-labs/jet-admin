@@ -89,7 +89,7 @@ export const WidgetDatasetField = ({
         <Select value={widgetForm.values.workflowID || ""} onValueChange={(val) => {
           widgetForm.setFieldValue('workflowID', val);
           // Reset workflow params when changing workflow
-          widgetForm.setFieldValue('workflowConfig.workflowArgValues', {});
+          widgetForm.setFieldValue('workflowConfig.inputArgs', {});
           widgetForm.setFieldValue('workflowConfig.datasetFields', {});
         }}>
           <SelectTrigger className={`text-xs ${hasWorkflowIdError ? "border-red-300" : ""}`}>
@@ -178,8 +178,8 @@ export const WidgetDatasetField = ({
         datasetIndex={index}
         widgetForm={widgetForm}
         initialValues={{
-          workflowArgValues:
-            widgetForm.values.workflowConfig?.workflowArgValues,
+          inputArgs:
+            widgetForm.values.workflowConfig?.inputArgs,
         }}
         selectedWorkflow={selectedWorkflow}
       />

@@ -92,7 +92,7 @@ export const useWidgetRun = ({
         tenantID,
         widgetData: config,
          executionMode,
-         inputParams: config.inputParams || {},
+         inputArgs: config.inputArgs || {},
       });
     },
     onSuccess: (response) => {
@@ -159,7 +159,7 @@ export const useWidgetRun = ({
       widgetType,
       widgetConfig,
       workflowConfig,
-      inputParams: currentInputParams,
+      inputArgs: currentInputParams,
     };
 
     setConnectionState(CONNECTION_STATES.CONNECTING);
@@ -312,9 +312,9 @@ export const useWidgetRun = ({
     setWsProcessedData(null);
     setInstanceID(null);
     setWorkflowStatus('LOADING');
-    const params = opts.inputParams || {};
+    const params = opts.inputArgs || {};
     setCurrentInputParams(params);
-    fetchWidgetData({ ...formValues, inputParams: params });
+    fetchWidgetData({ ...formValues, inputArgs: params });
   }, [fetchWidgetData]);
 
 

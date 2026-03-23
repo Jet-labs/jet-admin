@@ -355,14 +355,14 @@ dataQueryService.generateAIPromptBasedQuery = async ({
  * @param {number} param0.userID
  * @param {string} param0.tenantID
  * @param {number} param0.dataQueryID
- * @param {object} param0.argValues
+ * @param {object} param0.inputArgs
  * @returns {Promise<object>}
  */
 dataQueryService.runDataQueryByID = async ({
   userID,
   tenantID,
   dataQueryID,
-  argValues,
+  inputArgs,
 }) => {
   Logger.log("info", {
     message: "dataQueryService:runDataQueryByID:params",
@@ -370,7 +370,7 @@ dataQueryService.runDataQueryByID = async ({
       userID,
       tenantID,
       dataQueryID,
-      argValues,
+      inputArgs,
     },
   });
 
@@ -401,7 +401,7 @@ dataQueryService.runDataQueryByID = async ({
     const queryRunner = createQueryEngine();
     const { mappedArgsToValues, kvtObject } = buildDataQueryExecutionArgs(
       dataQuery.dataQueryOptions?.args,
-      argValues
+      inputArgs
     );
 
     Logger.log("info", {
@@ -410,7 +410,7 @@ dataQueryService.runDataQueryByID = async ({
         userID,
         tenantID,
         dataQueryID,
-        argValues,
+        inputArgs,
         args: dataQuery.dataQueryOptions.args,
         mappedArgsToValues,
         kvtObject,
@@ -453,14 +453,14 @@ dataQueryService.runDataQueryByID = async ({
  * @param {number} param0.userID
  * @param {string} param0.tenantID
  * @param {number} param0.dataQueryID
- * @param {object} param0.argValues
+ * @param {object} param0.inputArgs
  * @returns {Promise<object>}
  */
 dataQueryService.runDataQueryByData = async ({
   userID,
   tenantID,
   dataQuery,
-  argValues,
+  inputArgs,
 }) => {
   const tempQueryID = uuid();
   Logger.log("info", {
@@ -468,7 +468,7 @@ dataQueryService.runDataQueryByData = async ({
     params: {
       userID,
       tenantID,
-      argValues,
+      inputArgs,
       dataQuery,
       tempQueryID,
     },
@@ -509,7 +509,7 @@ dataQueryService.runDataQueryByData = async ({
 
     const { mappedArgsToValues, kvtObject } = buildDataQueryExecutionArgs(
       processedDataQuery.dataQueryOptions?.args,
-      argValues
+      inputArgs
     );
 
     Logger.log("info", {
@@ -518,7 +518,7 @@ dataQueryService.runDataQueryByData = async ({
         userID,
         tenantID,
         tempQueryID,
-        argValues,
+        inputArgs,
         args: processedDataQuery.dataQueryOptions.args,
         mappedArgsToValues,
         kvtObject,

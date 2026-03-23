@@ -137,6 +137,7 @@ const sidebars = {
         'concepts/workflow-architecture',
         'concepts/workflow-engine',
         'concepts/widget-workflow-integration',
+        'concepts/input-lifecycle',
       ],
     },
 

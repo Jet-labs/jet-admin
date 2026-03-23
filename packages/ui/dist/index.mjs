@@ -1461,6 +1461,224 @@ var CodeEditor = React23.forwardRef(({
   );
 });
 CodeEditor.displayName = "CodeEditor";
+
+// src/components/array-input.jsx
+import React24 from "react";
+import PropTypes2 from "prop-types";
+import { Trash2, Plus } from "lucide-react";
+function ArrayInput({
+  value,
+  onChange,
+  disabled = false,
+  placeholder = "Value",
+  itemType = "string",
+  maxItems,
+  minItems
+}) {
+  const currentArray = Array.isArray(value) ? value : [];
+  const handleItemChange = (index, newValue) => {
+    const newArray = [...currentArray];
+    newArray[index] = newValue;
+    onChange(newArray);
+  };
+  const handleRemoveItem = (index) => {
+    const newArray = currentArray.filter((_, i) => i !== index);
+    onChange(newArray);
+  };
+  const handleAddItem = () => {
+    if (maxItems !== void 0 && currentArray.length >= maxItems) return;
+    const defaultValue = itemType === "number" ? 0 : itemType === "object" ? "{}" : "";
+    onChange([...currentArray, defaultValue]);
+  };
+  const canAdd = maxItems === void 0 || currentArray.length < maxItems;
+  const canRemove = minItems === void 0 || currentArray.length > minItems;
+  const renderItem = (item, index) => {
+    if (itemType === "object") {
+      const displayValue = typeof item === "object" && item !== null ? JSON.stringify(item, null, 2) : typeof item === "string" ? item : JSON.stringify(item);
+      return /* @__PURE__ */ React24.createElement("div", { key: index, className: "flex gap-2 w-full" }, /* @__PURE__ */ React24.createElement("div", { className: "flex-1 min-w-0" }, /* @__PURE__ */ React24.createElement(
+        CodeEditor,
+        {
+          language: "json",
+          height: 80,
+          showHeader: false,
+          showExpandButton: false,
+          showFormatButton: false,
+          showLineNumbers: false,
+          value: displayValue,
+          onChange: (val) => handleItemChange(index, val),
+          disabled
+        }
+      )), /* @__PURE__ */ React24.createElement(
+        Button,
+        {
+          type: "button",
+          variant: "ghost",
+          size: "icon",
+          className: "h-8 w-8 text-slate-500 hover:text-red-500 flex-shrink-0 mt-1",
+          onClick: () => handleRemoveItem(index),
+          disabled: disabled || !canRemove
+        },
+        /* @__PURE__ */ React24.createElement(Trash2, { className: "h-4 w-4" })
+      ));
+    }
+    return /* @__PURE__ */ React24.createElement("div", { key: index, className: "flex items-center gap-2 w-full" }, /* @__PURE__ */ React24.createElement(
+      Input,
+      {
+        className: "flex-1 text-xs",
+        type: itemType === "number" ? "number" : "text",
+        placeholder,
+        value: typeof item === "string" || typeof item === "number" ? item : JSON.stringify(item),
+        onChange: (e) => {
+          const val = itemType === "number" ? e.target.value === "" ? "" : Number(e.target.value) : e.target.value;
+          handleItemChange(index, val);
+        },
+        disabled
+      }
+    ), /* @__PURE__ */ React24.createElement(
+      Button,
+      {
+        type: "button",
+        variant: "ghost",
+        size: "icon",
+        className: "h-8 w-8 text-slate-500 hover:text-red-500 flex-shrink-0",
+        onClick: () => handleRemoveItem(index),
+        disabled: disabled || !canRemove
+      },
+      /* @__PURE__ */ React24.createElement(Trash2, { className: "h-4 w-4" })
+    ));
+  };
+  return /* @__PURE__ */ React24.createElement("div", { className: "space-y-2 w-full" }, currentArray.length > 0 ? /* @__PURE__ */ React24.createElement("div", { className: "space-y-2" }, currentArray.map(renderItem)) : /* @__PURE__ */ React24.createElement("p", { className: "text-xs text-slate-400 italic" }, "No items added to array."), /* @__PURE__ */ React24.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React24.createElement(
+    Button,
+    {
+      type: "button",
+      variant: "outline",
+      size: "sm",
+      className: "flex-1 text-xs h-8",
+      onClick: handleAddItem,
+      disabled: disabled || !canAdd
+    },
+    /* @__PURE__ */ React24.createElement(Plus, { className: "mr-2 h-3.5 w-3.5" }),
+    "Add Item"
+  ), /* @__PURE__ */ React24.createElement(Badge, { variant: "secondary", className: "text-[10px] px-1.5 py-0.5 h-5" }, currentArray.length, maxItems !== void 0 ? ` / ${maxItems}` : "")));
+}
+ArrayInput.propTypes = {
+  value: PropTypes2.array,
+  onChange: PropTypes2.func.isRequired,
+  disabled: PropTypes2.bool,
+  placeholder: PropTypes2.string,
+  itemType: PropTypes2.oneOf(["string", "number", "object"]),
+  maxItems: PropTypes2.number,
+  minItems: PropTypes2.number
+};
+
+// src/components/input-args-form.jsx
+import React25 from "react";
+import PropTypes3 from "prop-types";
+function InputArgsForm({
+  args = [],
+  values = {},
+  onChange,
+  errors = {},
+  disabled = false,
+  className
+}) {
+  if (!Array.isArray(args) || args.length === 0) {
+    return /* @__PURE__ */ React25.createElement("p", { className: "text-xs text-slate-400 italic" }, "No input parameters defined.");
+  }
+  const renderField = (arg) => {
+    const argName = arg.key;
+    const argType = arg.type || "string";
+    const value = values[argName];
+    switch (argType) {
+      case "boolean":
+        return /* @__PURE__ */ React25.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React25.createElement(
+          Checkbox,
+          {
+            id: `input-arg-${argName}`,
+            checked: !!value,
+            onCheckedChange: (checked) => onChange(argName, checked),
+            disabled
+          }
+        ), /* @__PURE__ */ React25.createElement(
+          Label2,
+          {
+            htmlFor: `input-arg-${argName}`,
+            className: "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          },
+          argName,
+          arg.required && /* @__PURE__ */ React25.createElement("span", { className: "text-red-500 ml-1" }, "*"),
+          /* @__PURE__ */ React25.createElement("span", { className: "text-muted-foreground ml-1" }, "(", argType, ")")
+        ));
+      case "array":
+        return /* @__PURE__ */ React25.createElement(React25.Fragment, null, /* @__PURE__ */ React25.createElement(Label2, { htmlFor: `input-arg-${argName}`, className: "text-xs" }, argName, " ", arg.required && /* @__PURE__ */ React25.createElement("span", { className: "text-red-500" }, "*"), " ", /* @__PURE__ */ React25.createElement("span", { className: "text-muted-foreground" }, "(", argType, ")")), /* @__PURE__ */ React25.createElement(
+          ArrayInput,
+          {
+            value: Array.isArray(value) ? value : [],
+            onChange: (val) => onChange(argName, val),
+            placeholder: `Add ${argName} item...`,
+            disabled
+          }
+        ));
+      case "object":
+        return /* @__PURE__ */ React25.createElement(React25.Fragment, null, /* @__PURE__ */ React25.createElement(Label2, { htmlFor: `input-arg-${argName}`, className: "text-xs" }, argName, " ", arg.required && /* @__PURE__ */ React25.createElement("span", { className: "text-red-500" }, "*"), " ", /* @__PURE__ */ React25.createElement("span", { className: "text-muted-foreground" }, "(", argType, ")")), /* @__PURE__ */ React25.createElement(
+          CodeEditor,
+          {
+            language: "json",
+            height: 120,
+            title: "JSON Input",
+            value: typeof value === "object" && value !== null ? JSON.stringify(value, null, 2) : value || "",
+            onChange: (val) => onChange(argName, val),
+            disabled
+          }
+        ));
+      case "number":
+        return /* @__PURE__ */ React25.createElement(React25.Fragment, null, /* @__PURE__ */ React25.createElement(Label2, { htmlFor: `input-arg-${argName}`, className: "text-xs" }, argName, " ", arg.required && /* @__PURE__ */ React25.createElement("span", { className: "text-red-500" }, "*"), " ", /* @__PURE__ */ React25.createElement("span", { className: "text-muted-foreground" }, "(", argType, ")")), /* @__PURE__ */ React25.createElement(
+          Input,
+          {
+            type: "number",
+            id: `input-arg-${argName}`,
+            className: "w-full text-xs",
+            placeholder: `Value for ${argName}`,
+            value: value ?? "",
+            onChange: (e) => onChange(
+              argName,
+              e.target.value === "" ? "" : Number(e.target.value)
+            ),
+            disabled
+          }
+        ));
+      // string & default
+      default:
+        return /* @__PURE__ */ React25.createElement(React25.Fragment, null, /* @__PURE__ */ React25.createElement(Label2, { htmlFor: `input-arg-${argName}`, className: "text-xs" }, argName, " ", arg.required && /* @__PURE__ */ React25.createElement("span", { className: "text-red-500" }, "*"), " ", argType !== "string" && /* @__PURE__ */ React25.createElement("span", { className: "text-muted-foreground" }, "(", argType, ")")), /* @__PURE__ */ React25.createElement(
+          Input,
+          {
+            type: "text",
+            id: `input-arg-${argName}`,
+            className: "w-full text-xs",
+            placeholder: `Value for ${argName}`,
+            value: value || "",
+            onChange: (e) => onChange(argName, e.target.value),
+            disabled
+          }
+        ));
+    }
+  };
+  return /* @__PURE__ */ React25.createElement("div", { className: className || "space-y-3" }, args.map((arg) => /* @__PURE__ */ React25.createElement("div", { key: arg.key, className: "space-y-1" }, renderField(arg), errors[arg.key] && /* @__PURE__ */ React25.createElement("span", { className: "text-destructive text-xs" }, errors[arg.key]))));
+}
+InputArgsForm.propTypes = {
+  args: PropTypes3.arrayOf(
+    PropTypes3.shape({
+      key: PropTypes3.string.isRequired,
+      type: PropTypes3.string,
+      required: PropTypes3.bool
+    })
+  ).isRequired,
+  values: PropTypes3.object,
+  onChange: PropTypes3.func.isRequired,
+  errors: PropTypes3.object,
+  disabled: PropTypes3.bool,
+  className: PropTypes3.string
+};
 export {
   Accordion,
   AccordionContent,
@@ -1477,6 +1695,7 @@ export {
   AlertDialogPortal,
   AlertDialogTitle,
   AlertDialogTrigger,
+  ArrayInput,
   Avatar,
   AvatarFallback,
   AvatarImage,
@@ -1516,6 +1735,7 @@ export {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
   Input,
+  InputArgsForm,
   Label2 as Label,
   Popover,
   PopoverContent,

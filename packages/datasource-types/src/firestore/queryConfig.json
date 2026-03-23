@@ -63,7 +63,7 @@
             "key": { "type": "string" },
             "type": {
               "type": "string",
-              "enum": ["string", "number", "boolean", "array (, separated)", "object (JSON stringified)"],
+              "enum": ["string", "number", "boolean", "array", "object"],
               "default": "string"
             }
           },
@@ -170,6 +170,15 @@
               { "type": "Control", "scope": "#/properties/key" },
               { "type": "Control", "scope": "#/properties/type" }
             ]
+          },
+          "typeOptions": {
+            "enumLabels": {
+              "string": "String",
+              "number": "Number",
+              "boolean": "Boolean",
+              "array": "Array",
+              "object": "Object (JSON)"
+            }
           }
         }
       }

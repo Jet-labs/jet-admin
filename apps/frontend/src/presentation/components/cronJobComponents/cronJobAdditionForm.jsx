@@ -40,8 +40,8 @@ export const CronJobAdditionForm = ({ tenantID }) => {
       cronJobTitle: "",
       cronJobDescription: "",
       cronJobSchedule: "* * * * *",
-      dataQueryID: "",
-      dataQueryArgValues: {},
+      workflowID: "",
+      workflowConfig: { inputArgs: {} },
     },
     validationSchema: formValidations.cronJobAdditionFormValidationSchema,
     onSubmit: (data) => {

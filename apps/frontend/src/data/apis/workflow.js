@@ -158,7 +158,7 @@ export const deleteWorkflowAPI = async ({ tenantID, workflowID }) => {
 /**
  * Execute a saved workflow by ID
  */
-export const executeWorkflowAPI = async ({ tenantID, workflowID, inputParams = {} }) => {
+export const executeWorkflowAPI = async ({ tenantID, workflowID, inputArgs = {} }) => {
   try {
     const url =
       CONSTANTS.SERVER_HOST +
@@ -167,7 +167,7 @@ export const executeWorkflowAPI = async ({ tenantID, workflowID, inputParams = {
     if (bearerToken) {
       const response = await axios.post(
         url,
-        { inputParams },
+        { inputArgs },
         {
           headers: {
             authorization: `Bearer ${bearerToken}`,
@@ -192,7 +192,7 @@ export const executeWorkflowAPI = async ({ tenantID, workflowID, inputParams = {
 /**
  * Test run a workflow without saving (uses in-memory nodes/edges)
  */
-export const testWorkflowAPI = async ({ tenantID, nodes, edges, inputParams = {} }) => {
+export const testWorkflowAPI = async ({ tenantID, nodes, edges, inputArgs = {} }) => {
   try {
     const url =
       CONSTANTS.SERVER_HOST +
@@ -201,7 +201,7 @@ export const testWorkflowAPI = async ({ tenantID, nodes, edges, inputParams = {}
     if (bearerToken) {
       const response = await axios.post(
         url,
-        { nodes, edges, inputParams },
+        { nodes, edges, inputArgs },
         {
           headers: {
             authorization: `Bearer ${bearerToken}`,

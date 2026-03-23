@@ -76,7 +76,7 @@ export const WidgetConfigEditor = ({
   // Handle workflow change — clear parent context
   const handleWorkflowChange = (value) => {
     widgetEditorForm.setFieldValue('workflowID', value);
-    widgetEditorForm.setFieldValue('workflowConfig.workflowArgValues', {});
+    widgetEditorForm.setFieldValue('workflowConfig.inputArgs', {});
     if (onClearLogs) onClearLogs();
   };
 

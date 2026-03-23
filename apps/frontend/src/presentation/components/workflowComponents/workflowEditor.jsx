@@ -303,11 +303,11 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
     }, [testResult, consoleLogs, nodeExecutionStatus, workflowContext]);
 
     // Execute test run wrapper
-    const executeTestRun = useCallback((inputParams) => {
+    const executeTestRun = useCallback((inputArgs) => {
         startTestRun({
             nodes: values.nodes,
             edges: values.edges,
-            inputParams
+            inputArgs
         });
     }, [startTestRun, values.nodes, values.edges]);
 
@@ -324,9 +324,9 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
 
 
     // Handle input modal submit
-    const handleInputModalSubmit = useCallback((inputParams) => {
+    const handleInputModalSubmit = useCallback((inputArgs) => {
         setShowInputModal(false);
-        executeTestRun(inputParams);
+        executeTestRun(inputArgs);
     }, [executeTestRun]);
 
     // Query testing callback for node configurators

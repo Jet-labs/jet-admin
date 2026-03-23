@@ -46,11 +46,11 @@ export const WorkflowTestingPanel = ({
 
   // Execute workflow mutation
   const { isPending: isExecuting, mutate: executeWorkflow } = useMutation({
-    mutationFn: ({ inputParams }) => {
+    mutationFn: ({ inputArgs }) => {
       return executeWorkflowAPI({
         tenantID,
         workflowID: selectedWorkflowForTesting.workflowID,
-        inputParams,
+        inputArgs,
       });
     },
     retry: false,
@@ -154,8 +154,8 @@ export const WorkflowTestingPanel = ({
     setIsRunning(true);
     
     // For now, start with empty params - you could add a dialog for args similar to DataQueryArgsForm
-    const inputParams = {};
-    executeWorkflow({ inputParams });
+    const inputArgs = {};
+    executeWorkflow({ inputArgs });
   };
 
   return (

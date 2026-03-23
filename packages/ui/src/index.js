@@ -26,3 +26,5 @@ export { Textarea } from './components/textarea';
 export { Tooltip, TooltipTrigger, TooltipContent, TooltipProvider } from './components/tooltip';
 export { CollapseComponent } from './components/collapseComponent';
 export { CodeEditor } from './components/code-editor';
+export { ArrayInput } from './components/array-input';
+export { InputArgsForm } from './components/input-args-form';

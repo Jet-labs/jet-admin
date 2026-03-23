@@ -80,10 +80,10 @@ model tblCronJobs {
   createdAt          DateTime            @default(now()) @db.Timestamptz(6)
   updatedAt          DateTime            @default(now()) @db.Timestamptz(6)
   tenantID           String              @db.Uuid
-  dataQueryID        String              @db.Uuid
-  dataQueryArgValues Json?
+  workflowID         String              @db.Uuid
+  workflowConfig     Json?
   tblCronJobHistory  tblCronJobHistory[]
-  tblDataQueries     tblDataQueries      @relation(fields: [dataQueryID], references: [dataQueryID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblConJobsDataQueryID")
+  tblWorkflows       tblWorkflows        @relation(fields: [workflowID], references: [workflowID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblCronJobsWorkflowID")
   tblTenants         tblTenants          @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblCronJobsTenantID")
 }
 
@@ -120,7 +120,6 @@ model tblDataQueries {
   datasourceID          String?         @db.Uuid
   datasourceType        String          @default("postgresql") @db.VarChar
   createdByApiKeyID     String?         @db.Uuid
-  tblCronJobs           tblCronJobs[]
   tblDatasources        tblDatasources? @relation(fields: [datasourceID], references: [datasourceID], onDelete: NoAction, onUpdate: NoAction, map: "fkDatasourceIDDatasourceID")
   tblAPIKeys            tblAPIKeys?     @relation(fields: [createdByApiKeyID], references: [apiKeyID], onUpdate: NoAction, map: "fkTblDataQueriesCreatedByApiKeyID")
   tblUsers              tblUsers?       @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDataQueriesCreatorID")
@@ -390,6 +389,7 @@ model tblWorkflows {
   updatedAt            DateTime               @default(now()) @db.Timestamptz(6)
   workflowOptions      Json?                  @default("{}")
   createdByApiKeyID    String?                @db.Uuid
+  tblCronJobs          tblCronJobs[]
   tblWidgets           tblWidgets[]
   tblWorkflowEdge      tblWorkflowEdge[]
   tblWorkflowInstances tblWorkflowInstances[]
