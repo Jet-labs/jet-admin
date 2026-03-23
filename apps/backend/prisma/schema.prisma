@@ -80,11 +80,11 @@ model tblCronJobs {
   createdAt          DateTime            @default(now()) @db.Timestamptz(6)
   updatedAt          DateTime            @default(now()) @db.Timestamptz(6)
   tenantID           String              @db.Uuid
-  workflowID         String              @db.Uuid
+  workflowID         String?             @db.Uuid
   workflowConfig     Json?
   tblCronJobHistory  tblCronJobHistory[]
-  tblWorkflows       tblWorkflows        @relation(fields: [workflowID], references: [workflowID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblCronJobsWorkflowID")
   tblTenants         tblTenants          @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblCronJobsTenantID")
+  tblWorkflows       tblWorkflows?       @relation(fields: [workflowID], references: [workflowID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblCronJobsWorkflowID")
 }
 
 model tblDashboards {
