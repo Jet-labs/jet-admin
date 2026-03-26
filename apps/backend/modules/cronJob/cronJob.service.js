@@ -6,7 +6,8 @@ const {
   tenantAwarePostgreSQLPoolManager,
 } = require("../../config/tenant-aware-pgpool-manager.config");
 const constants = require("../../constants");
-// const constants = require("../../constants"); // Include if needed
+const { resolveInputs } = require("../../utils/inputArgs.util");
+const { extractWorkflowDefinitions } = require("../../utils/definitionProvider.util");
 
 const cronJobService = {};
 
@@ -348,10 +349,44 @@ cronJobService.runCronJob = async ({ cronJob }) => {
     const dbPool = await tenantAwarePostgreSQLPoolManager.getPool(
       cronJob.tenantID
     );
+
+    // Resolve & validate inputs through the unified pipeline
+    const rawInputArgs = cronJob.workflowConfig?.inputArgs || {};
+    let definitions = [];
+    if (cronJob.tblWorkflows) {
+      definitions = extractWorkflowDefinitions(cronJob.tblWorkflows);
+    }
+    const { resolved, errors, valid } = await resolveInputs({
+      type: 'cron',
+      id: !cronJob.tblWorkflows ? cronJob.cronJobID : undefined,
+      definitions: definitions.length > 0 ? definitions : undefined,
+      runtimeValues: rawInputArgs,
+    });
+
+    if (!valid) {
+      Logger.log("error", {
+        message: "cronJobService:runCronJob:inputValidationFailed",
+        params: { cronJobID: cronJob.cronJobID, errors },
+      });
+      await prisma.tblCronJobHistory.create({
+        data: {
+          cronJobID: cronJob.cronJobID,
+          result: JSON.stringify({ message: "Input validation failed", errors }),
+          triggerType: "SCHEDULED",
+          status: constants.CRON_JOB_STATUS.FAILURE,
+          scheduledAt: startTime,
+          startTime: startTime,
+          endTime: new Date(),
+          durationMs: new Date() - startTime,
+        },
+      });
+      throw new Error(`Cron job input validation failed: ${JSON.stringify(errors)}`);
+    }
+
     const workflowRunResult = await workflowService.executeWorkflow({
       workflowID: cronJob.workflowID,
       tenantID: cronJob.tenantID,
-      inputArgs: cronJob.workflowConfig?.inputArgs || cronJob.workflowConfig?.workflowArgValues || {},
+      inputArgs: resolved,
     });
 
     await prisma.tblCronJobHistory.create({

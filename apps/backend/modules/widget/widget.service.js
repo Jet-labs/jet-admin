@@ -4,8 +4,9 @@ const { dataQueryService } = require("../dataQuery/dataQuery.service");
 const { workflowService } = require("../workflow/workflow.service");
 const { WIDGET_TYPES } = require("@jet-admin/widget-types");
 const { getCreationContextFromAuthContext } = require("../../utils/auth.context.utils");
+const { resolveInputs } = require("../../utils/inputArgs.util");
+const { extractWorkflowDefinitions } = require("../../utils/definitionProvider.util");
 const widgetService = {};
-
 /**
  *
  * @param {object} param0
@@ -284,15 +285,40 @@ const _executeWorkflowMode = async ({ widget, tenantID, executionMode = 'ASYNC',
   const workflowConfig = widget.workflowConfig;
 
   try {
-    const finalInputParams = {
-      ...(workflowConfig.inputArgs || workflowConfig.workflowArgValues || {}),
+    const mergedInputParams = {
+      ...(workflowConfig.inputArgs || {}),
       ...inputArgs,
     };
+
+    // Resolve & validate merged inputs through the unified pipeline
+    let definitions = [];
+    if (widget.tblWorkflows) {
+      definitions = extractWorkflowDefinitions(widget.tblWorkflows);
+    }
+    const { resolved, errors, valid } = await resolveInputs({
+      type: 'widget',
+      id: !widget.tblWorkflows ? widget.widgetID : undefined,
+      definitions: definitions.length > 0 ? definitions : undefined,
+      runtimeValues: mergedInputParams,
+    });
+
+    if (!valid) {
+      Logger.log("error", {
+        message: "widgetService:_executeWorkflowMode:inputValidationFailed",
+        params: { workflowID: widget.workflowID, errors },
+      });
+      return {
+        title: workflowConfig.title,
+        workflowID: widget.workflowID,
+        status: "ERROR",
+        error: `Input validation failed: ${JSON.stringify(errors)}`,
+      };
+    }
 
     const { instanceID } = await workflowService.executeWorkflow({
       workflowID: widget.workflowID,
       tenantID,
-      inputArgs: finalInputParams,
+      inputArgs: resolved,
     });
 
     Logger.log("info", {

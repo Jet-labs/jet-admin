@@ -53,7 +53,7 @@ const widgetPromoter = {
       widgetConfig,
       workflowID: workflow.workflowID,
       workflowConfig: {
-        workflowArgValues: {},
+        inputArgs: {},
         title: widgetTitle,
       },
     });

@@ -19,6 +19,8 @@ const {
   defaultDatasourceFetcher,
 } = require("./queryEngine/queryExecution.adapter");
 const { getCreationContextFromAuthContext } = require("../../utils/auth.context.utils");
+const { resolveInputs } = require("../../utils/inputArgs.util");
+const { extractQueryDefinitions } = require("../../utils/definitionProvider.util");
 
 dataQueryService.getDataQueriesWithDatasource = async ({
   userID,
@@ -398,11 +400,23 @@ dataQueryService.runDataQueryByID = async ({
       throw new Error(`Database query with ID ${dataQueryID} not found`);
     }
 
+    // Resolve & validate inputs through the unified pipeline
+    const definitions = extractQueryDefinitions(dataQuery);
+    const { resolved, errors, valid } = await resolveInputs({
+      type: 'query',
+      definitions,
+      runtimeValues: inputArgs || {},
+    });
+
+    if (!valid) {
+      Logger.log("error", {
+        message: "dataQueryService:runDataQueryByID:inputValidationFailed",
+        params: { dataQueryID, errors },
+      });
+      throw new Error(`Query input validation failed: ${JSON.stringify(errors)}`);
+    }
+
     const queryRunner = createQueryEngine();
-    const { mappedArgsToValues, kvtObject } = buildDataQueryExecutionArgs(
-      dataQuery.dataQueryOptions?.args,
-      inputArgs
-    );
 
     Logger.log("info", {
       message: "dataQueryService:runDataQueryByID:queryRunner.run",
@@ -411,16 +425,15 @@ dataQueryService.runDataQueryByID = async ({
         tenantID,
         dataQueryID,
         inputArgs,
-        args: dataQuery.dataQueryOptions.args,
-        mappedArgsToValues,
-        kvtObject,
+        args: dataQuery.dataQueryOptions?.args,
+        resolvedInputs: resolved,
       },
     });
 
     const results = await executeDataQuery({
       engine: queryRunner,
       dataQueryID,
-      executionArgs: kvtObject,
+      executionArgs: resolved,
     });
 
     Logger.log("success", {
@@ -507,10 +520,21 @@ dataQueryService.runDataQueryByData = async ({
       datasourceFetcher: defaultDatasourceFetcher,
     });
 
-    const { mappedArgsToValues, kvtObject } = buildDataQueryExecutionArgs(
-      processedDataQuery.dataQueryOptions?.args,
-      inputArgs
-    );
+    // Resolve & validate inputs through the unified pipeline
+    const definitions = extractQueryDefinitions(processedDataQuery);
+    const { resolved, errors, valid } = await resolveInputs({
+      type: 'query',
+      definitions,
+      runtimeValues: inputArgs || {},
+    });
+
+    if (!valid) {
+      Logger.log("error", {
+        message: "dataQueryService:runDataQueryByData:inputValidationFailed",
+        params: { tempQueryID, errors },
+      });
+      throw new Error(`Query input validation failed: ${JSON.stringify(errors)}`);
+    }
 
     Logger.log("info", {
       message: "dataQueryService:runDataQueryByData:queryRunner.run",
@@ -519,16 +543,15 @@ dataQueryService.runDataQueryByData = async ({
         tenantID,
         tempQueryID,
         inputArgs,
-        args: processedDataQuery.dataQueryOptions.args,
-        mappedArgsToValues,
-        kvtObject,
+        args: processedDataQuery.dataQueryOptions?.args,
+        resolvedInputs: resolved,
       },
     });
 
     const results = await executeDataQuery({
       engine: queryRunner,
       dataQueryID: tempQueryID,
-      executionArgs: kvtObject,
+      executionArgs: resolved,
     });
 
     Logger.log("success", {

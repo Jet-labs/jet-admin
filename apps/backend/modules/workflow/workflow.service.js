@@ -11,6 +11,8 @@ const {
 } = require("../../utils/auth.context.utils");
 const { processWorkflowDataForWidget } = require("@jet-admin/widgets-logic");
 const { resolveTemplate } = require("../../utils/templateEngine/resolver");
+const { resolveInputs } = require("../../utils/inputArgs.util");
+const { extractWorkflowDefinitions } = require("../../utils/definitionProvider.util");
 
 function mapWorkflowNodeForPersistence(node, workflowID) {
   return {
@@ -362,8 +364,25 @@ workflowService.executeWorkflow = async ({ workflowID, tenantID, inputArgs = {} 
   });
 
   try {
-    // Start workflow (async - returns immediately)
-    const result = await startWorkflow({ workflowID, tenantID, inputArgs });
+    // Resolve & validate inputs through the unified pipeline
+    const workflow = await prisma.tblWorkflows.findUnique({ where: { workflowID } });
+    const definitions = workflow ? extractWorkflowDefinitions(workflow) : [];
+    const { resolved, errors, valid } = await resolveInputs({
+      type: 'workflow',
+      definitions,
+      runtimeValues: inputArgs,
+    });
+
+    if (!valid) {
+      Logger.log("error", {
+        message: "workflowService:executeWorkflow:inputValidationFailed",
+        params: { workflowID, errors },
+      });
+      throw new Error(`Workflow input validation failed: ${JSON.stringify(errors)}`);
+    }
+
+    // Start workflow with resolved inputs
+    const result = await startWorkflow({ workflowID, tenantID, inputArgs: resolved });
 
     Logger.log("success", {
       message: "workflowService:executeWorkflow:started",
