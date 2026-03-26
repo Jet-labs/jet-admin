@@ -1,8 +1,14 @@
-# Jet-Admin Input Lifecycle Architecture
+---
+id: input-lifecycle
+title: Unified Input Lifecycle
+sidebar_position: 4
+---
 
-# Core Principle
+# Unified Input Lifecycle
 
-All execution in Jet-Admin follows this model:
+All execution within Jet-Admin follows a centralized, contract-driven input lifecycle architecture. This standardizes how execution contracts are defined, how input values are resolved, and how templates are safely evaluated.
+
+## Core Principle
 
 ```text
 Execution Contract (Input Definitions)
@@ -13,399 +19,286 @@ Resolved Execution Inputs
 ```
 
 Where:
-
-**Execution Contract** → defines what inputs exist
-**Input Providers** → supply values
-**Resolver** → prepares inputs for execution
+*   **Execution Contract**: Defines what inputs exist and their expected types.
+*   **Input Providers**: Supply the raw runtime values.
+*   **Resolver**: A unified pipeline that prepares and validates inputs for execution.
 
 ---
 
-# Core Concepts
+## 1. Execution Contract
 
-# 1 Execution Contract
+The Execution Contract defines the exact inputs required to execute a unit (Workflow, Query, Cron Job, etc.).
 
-Defines required inputs for execution.
-
-Examples:
-
-| Executable | Contract          |
+| Executable | Contract Storage |
 | ---------- | ----------------- |
-| Workflow   | workflow inputs   |
-| Query      | query parameters  |
-| Datasource | connection config |
+| Workflow   | `workflowOptions.args` |
+| Data Query | `dataQueryOptions.args` |
 
-Contract defines:
-
+Each required input is defined as an `InputDefinition`:
 ```ts
-InputDefinition {
-  key:string
-  required:boolean
-  default?:any
-  supportsTemplate:boolean
-  definitionSource: "native" | "derived"
+{
+  key: string;
+  type: "string" | "number" | "boolean" | "object" | "array";
+  required: boolean;
+  default?: any;
+  supportsTemplate: boolean;
+  definitionSource: "native" | "derived";
 }
 ```
 
-Contract answers:
-**What inputs are required to execute this unit?**
+### Definition Sources
+Definitions are extracted via the `DefinitionProvider` utility. There are two origins for definitions:
+1.  **Native**: Defined directly on the executable (e.g., Workflow inputs, Data Query parameters).
+2.  **Derived**: Inherited from another executable.
+    *   **Node**: Inherits from its linked Query.
+    *   **Widget**: Inherits from its linked Workflow.
+    *   **Cron Job**: Inherits from its linked Workflow.
 
 ---
 
-# 2 Input Providers
+## 2. Input Providers
 
-Provide values matching execution contract.
+Input Providers supply the raw, unvalidated values (often called `inputArgs`) that attempt to satisfy the Execution Contract.
 
-Providers:
-
-| Provider    | Supplies        |
+| Provider / Trigger | Supplies Input Values To |
 | ----------- | --------------- |
-| Widget      | workflow inputs |
-| Cron        | workflow inputs |
-| Manual Run  | workflow inputs |
-| Node Config | query inputs    |
-
-Provider answers:
-**Where do input values come from?**
+| Widget Config | Workflow Execution |
+| Cron Job Config | Workflow Execution |
+| API / Manual Run | Workflow / Query Execution |
+| Node Config | Data Query Execution |
 
 ---
 
-# 3 Input Resolver
+## 3. The Two-Stage Resolution Pipeline
 
-Transforms values into execution-ready inputs.
+Jet-Admin uses a mandatory **Two-Stage Pipeline** to resolve, validate, and safely inject values. This pipeline completely eliminates fragmented module-specific input logic.
 
-Resolver responsibilities:
-- Resolve templates (if allowed)
-- Apply defaults
-- Validate required fields
-- Produce final inputs
+### Stage 1: The InputResolver Pipeline
+All runtimes invoke the centralized `resolveInputs()` pipeline before execution begins.
 
-Resolver answers:
-**What are the final execution inputs?**
+**Pipeline Execution Order:**
+1.  **Fetch Definitions**: Derives the canonical `InputDefinition[]` from the target entity.
+2.  **Resolve Templates**: If `supportsTemplate` is true, evaluates context references (e.g. `{{ctx.input.userId}}` → `123`).
+3.  **Apply Defaults**: Injects default values if the runtime value is missing.
+4.  **Coerce Types**: Safely coerces the value to the declared type (e.g. string `"123"` to integer `123`).
+5.  **Validate Required**: Ensures all `required: true` fields are populated.
+
+*Failure at Stage 1 immediately aborts execution and throws a precise validation error.*
+
+### Stage 2: Engine-Specific Injection
+Once the `InputResolver` returns a safe, validated, and typed set of `resolvedInputs`, the specific execution engine takes over.
+
+For example, a **Data Query**:
+The `QueryEngine` receives the `resolvedInputs` and performs a secondary `resolveTemplate` sweep directly against the SQL query body, safely injecting the typed execution arguments into the database driver.
 
 ---
 
-# Complete Input Flow
+## System Data Flow
 
 ```mermaid
 graph TD
-  Executable --> DefinitionProvider
-  DefinitionProvider --> InputDefinitions
+    A[Caller provides runtimeValues] --> B{Definitions Provided?}
+    B -->|Yes| D[Use Inline Definitions]
+    B -->|No| C[DefinitionProvider.getInputDefinitions]
+    C --> D
+    D --> E[For each definition]
+    
+    subgraph STAGE 1: InputResolver Pipeline
+        E --> F{supportsTemplate?}
+        F -->|Yes + contextData| G[TemplateResolver]
+        F -->|No| H[Use raw value]
+        G --> H
+        H --> I{value missing?}
+        I -->|Yes + has default| J[Apply default]
+        I -->|No| K[coerceValue]
+        J --> K
+        K --> L{required + missing?}
+        L -->|Yes| M[Throw Validation Error]
+        L -->|No| N[Add to resolvedInputs]
+    end
+    
+    N --> O[Execution Engine Run]
 
-  InputProvider --> InputValues
-
-  InputDefinitions --> InputResolver
-  InputValues --> InputResolver
-
-  InputResolver --> ResolvedInputs
-  ResolvedInputs --> ExecutionContext
-  ExecutionContext --> ExecutionEngine
+    subgraph STAGE 2: Engine Execution
+        O --> P[Engine specific Injection<br/>e.g. QueryEngine SQL Template]
+    end
 ```
+
+## Architectural Rules
+To maintain system integrity, the following rules are strictly enforced across the backend and frontend:
+1.  **Definitions Determine Behavior**: Modules do not guess input shapes; they blindly follow the Definitions.
+2.  **Centralized Resolution**: Runtimes (Workflows, Queries) must NOT resolve templates or validate inputs independently. They must use the `resolveInputs()` pipeline.
+3.  **Execution Receives Safe Inputs**: Execution functions (like `startWorkflow` or `executeDataQuery`) assume `inputArgs` are already fully validated by the pipeline.
 
 ---
 
-# Definition Sources
+## Execution Scenarios
 
-Jet-Admin has 2 definition origins:
+This section outlines the chronological function invocations and Mermaid sequence diagrams for different execution scenarios across Jet-Admin, specifically highlighting the **Unified Input Lifecycle** (Stage 1 and Stage 2 resolution).
 
-| Source  | Meaning                           |
-| ------- | --------------------------------- |
-| Native  | defined by executable             |
-| Derived | inherited from another executable |
+### Scenario 1: Testing an Unsaved Data Query
+When a user clicks "Run" in the Data Query editor before saving.
 
-Examples:
-
-Native:
-- Workflow inputs
-- Query parameters
-
-Derived:
-- QueryNode → Query inputs
-- Widget → Workflow inputs
-- Cron → Workflow inputs
-
----
-
-# Definition Fetching Strategy
-
-Definitions must be fetched based on: **Executable Type** (NOT module).
-
-Correct mapping:
-
-| Executable | Definition source |
-| ---------- | ----------------- |
-| Workflow   | workflow config   |
-| Query      | query config      |
-| Node       | mapped query      |
-| Widget     | mapped workflow   |
-| Cron       | mapped workflow   |
-
-Backend strategy:
-
-```ts
-getInputDefinitions(type, id) {
-  switch(type) {
-    case 'workflow': return workflowInputs;
-    case 'query': return queryInputs;
-    case 'node': return queryInputs;
-    case 'widget': return workflowInputs;
-    case 'cron': return workflowInputs;
-  }
-}
-```
-
-This becomes the single definition entrypoint.
-
----
-
-# Frontend Input Lifecycle
-
-Frontend follows the same pattern, but handles two distinct scenarios:
-
-**Scenario 1: Executing Saved Entities**
-```mermaid
-graph TD
-  ExecutableSelected["Executable Selected (with ID)"] --> FetchDefinitionsAPI["Fetch Definitions API"]
-  FetchDefinitionsAPI --> InputDefinitions["Input Definitions"]
-  InputDefinitions --> BuildInputForm["Build Input Form"]
-  BuildInputForm --> CollectValues["Collect Values"]
-  CollectValues --> SendValuesToBackend["Send Values to Backend"]
-```
-
-**Scenario 2: Creating or Testing Unsaved Entities**
-When the frontend is drafting a new query or workflow, there is no ID to fetch against.
-```mermaid
-graph TD
-  DraftEntity["Draft Entity in UI"] --> ExtractDefinitions["Extract Definitions from UI State"]
-  ExtractDefinitions --> BuildInputForm["Build Input Form"]
-  BuildInputForm --> CollectValues["Collect Values"]
-  CollectValues --> SendDefinitionsAndValuesToBackend["Send Definitions + Values to Backend"]
-```
-
-Frontend responsibilities:
-- Render inputs (from API for saved, from UI state for drafted)
-- Allow template if supported
-- Validate required
-- Collect values
-
----
-
-# Input Value Types (Jet-Admin current support)
-
-Currently only 2 types exist:
-
-| Type     | Meaning           |
-| -------- | ----------------- |
-| Literal  | fixed value       |
-| Template | context reference |
-
-Examples:
-
-Literal:
-```text
-tenant1
-10
-true
-```
-
-Template:
-```text
-{{ctx.node1.userId}}
-{{ctx.inputs.email}}
-```
-
-Definition controls allowance:
-```ts
-supportsTemplate:boolean
-```
-
----
-
-# Resolution Flow
-
-Resolver pipeline:
-
-```text
-Fetch definitions
-Merge runtime values
-Resolve templates (if supported)
-Apply defaults
-Validate required
-Return resolved inputs
-```
-
-Example:
-
-Definition:
-```json
-{
- "key": "userId",
- "required": true,
- "supportsTemplate": true
-}
-```
-
-Input:
-```json
-{
- "userId": "{{ctx.node1.id}}"
-}
-```
-
-Resolver Output:
-```json
-{
- "userId": 123
-}
-```
-
----
-
-# Node Input Flow
-
-Node inputs follow derived definition pattern.
-
-Flow:
+**Chronological Invocation:**
+1. `dataQuery.controller.js: testDataQuery(req, res)`
+2. `dataQuery.service.js: runDataQueryByData(tempQuery, inputArgs)`
+3. `definitionProvider.util.js: extractQueryDefinitions(tempQuery)` (Extracts `dataQueryOptions.args` directly from the payload request)
+4. `inputArgs.util.js: resolveInputs(type: 'query', definitions, runtimeValues)` — **(Stage 1 Pipeline)**
+   * Resolves templates against context (if provided)
+   * Applies default values
+   * Coerces to declared types (e.g. string `"123"` to integer `123`)
+   * Validates required fields
+5. `queryExecution.adapter.js: executeDataQuery({ executionArgs: resolved })`
+6. `engine.js (QueryEngine): run(executionArgs)`
+7. `engine.js (QueryEngine): resolveTemplate(queryBody, executionArgs)` — **(Stage 2 Pipeline)**
+   * Injects the *validated* arguments directly into the SQL string or JSON body.
+8. `[Specific DB Adapter]: execute()`
 
 ```mermaid
-graph TD
-  QuerySelectedInNode["Query selected in node"] --> FetchQueryDefinitions["Fetch query definitions"]
-  FetchQueryDefinitions --> ConfigureNodeInputs["Configure node inputs"]
-  ConfigureNodeInputs --> AllowTemplateValues["Allow template values"]
-  AllowTemplateValues --> StoreNodeArgs["Store node args"]
-  StoreNodeArgs --> ResolveDuringExecution["Resolve during execution"]
-```
+sequenceDiagram
+    participant UI as Frontend Editor
+    participant API as DataQuery Controller
+    participant Svc as DataQuery Service
+    participant Def as Definition Provider
+    participant Pipe as InputResolver Pipeline
+    participant Eng as Query Engine
 
-Node inputs are Execution wiring. Not execution contract.
+    UI->>API: POST /test (tempQuery, inputArgs)
+    API->>Svc: runDataQueryByData()
+    Svc->>Def: extractQueryDefinitions(tempQuery)
+    Def-->>Svc: definitions[]
+    Svc->>Pipe: resolveInputs(definitions, inputArgs)
+    Note over Pipe: STAGE 1:<br/>Apply Defaults<br/>Coerce Types<br/>Validate Required
+    Pipe-->>Svc: { resolved, valid }
+    Svc->>Eng: executeDataQuery(resolvedArgs)
+    Eng->>Eng: resolveTemplate(queryBody, resolvedArgs)
+    Note over Eng: STAGE 2:<br/>Inject safe values<br/>into SQL queries
+    Eng-->>Svc: Query Results
+    Svc-->>API: Results
+    API-->>UI: Display Data
+```
 
 ---
 
-# Widget Input Flow
+### Scenario 2: Running a Saved Data Query
+When a query is executed via its API endpoint or triggered standalone.
 
-Widgets supply workflow inputs.
-
-Flow:
+**Chronological Invocation:**
+1. `dataQuery.controller.js: runDataQuery(req, res)`
+2. `dataQuery.service.js: runDataQueryByID(dataQueryID, inputArgs)`
+3. `prisma.tblDataQueries.findUnique(dataQueryID)` (Fetches the saved query config)
+4. `definitionProvider.util.js: extractQueryDefinitions(savedQuery)`
+5. `inputArgs.util.js: resolveInputs(type: 'query', definitions, runtimeValues)` — **(Stage 1 Pipeline)**
+6. `queryExecution.adapter.js: executeDataQuery({ executionArgs: resolved })`
+7. `engine.js (QueryEngine): run(executionArgs)`
+8. `engine.js (QueryEngine): resolveTemplate(queryBody, executionArgs)` — **(Stage 2 Pipeline)**
 
 ```mermaid
-graph TD
-  WorkflowSelected["Workflow selected"] --> FetchWorkflowInputDefinitions["Fetch workflow input definitions"]
-  FetchWorkflowInputDefinitions --> RenderWidgetInputUI["Render widget input UI"]
-  RenderWidgetInputUI --> StoreValues["Store values"]
-  StoreValues --> PassToWorkflowExecution["Pass to workflow execution"]
-```
+sequenceDiagram
+    participant Client
+    participant API as DataQuery Controller
+    participant DB as Prisma (DB)
+    participant Pipe as InputResolver Pipeline
+    participant Eng as Query Engine
 
-Widgets are Workflow input providers. Not execution units.
+    Client->>API: POST /:dataQueryID/run (inputArgs)
+    API->>DB: findUnique(dataQueryID)
+    DB-->>API: Saved Query Config
+    API->>Pipe: resolveInputs(query.args, inputArgs)
+    Pipe-->>API: { resolved, valid }
+    API->>Eng: executeDataQuery(resolved)
+    Eng->>Eng: resolveTemplate(queryBody, resolved)
+    Eng-->>API: Query Results
+    API-->>Client: Results
+```
 
 ---
 
-# Cron Input Flow
+### Scenario 3: Testing/Running a Workflow (with Query & JS Nodes)
+When a workflow triggers, evaluating a Data Query node followed by a Javascript logic node.
 
-Cron supplies workflow inputs.
+**Chronological Invocation:**
+*(Workflow Initialisation)*
+1. `workflow.controller.js: testWorkflow()` / `executeWorkflow()`
+2. `workflow.service.js: testWorkflow()` / `executeWorkflow(inputArgs)`
+3. `inputArgs.util.js: resolveInputs()` *(For `executeWorkflow` only: validates initial workflow-level arguments against `workflowOptions.args`)*
+4. `orchestrator.js: startWorkflow()` (Stores validated inputs in initial state)
 
-Flow:
+*(Node 1: Data Query Node)*
+5. `taskWorker.js: processTask(dataQueryNode)`
+6. `resolver.js: resolveTemplate(nodeConfig, workflowContext)` — **(Stage 1 for Nodes)**
+   * Resolves dynamic mappings like `{{ctx.input.userId}}` into actual values based on the current workflow state.
+7. `dataQueryHandler.js: process()`
+8. `dataQuery.service.js: runDataQueryByID(nodeConfig.dataQueryID, resolvedNodeArgs)`
+   * *→ Falls back into Scenario 2 flow.*
+   * Calls `resolveInputs` against query definitions to ensure the node passed the correct data types.
+   * **Stage 2**: `QueryEngine.resolveTemplate` injects data into SQL.
+9. `orchestrator.js: handleTaskResult()` (Saves query result to state, triggers next node)
+
+*(Node 2: Javascript Node)*
+10. `taskWorker.js: processTask(jsNode)`
+11. `resolver.js: resolveTemplate(nodeConfig, workflowContext)` (Injects previous query results into the JS node variables)
+12. `jsHandler.js: process()` (Executes the sandboxed JS code via `isolated-vm`)
+13. `orchestrator.js: handleTaskResult()` (Saves JS output, ends workflow)
 
 ```mermaid
-graph TD
-  WorkflowSelected["Workflow selected"] --> FetchWorkflowDefinitions["Fetch workflow definitions"]
-  FetchWorkflowDefinitions --> StoreCronArgs["Store cron args"]
-  StoreCronArgs --> SchedulerTriggersExecution["Scheduler triggers execution"]
-  SchedulerTriggersExecution --> PassValuesToWorkflow["Pass values to workflow"]
-```
+sequenceDiagram
+    participant API as Workflow Service
+    participant Orch as Orchestrator
+    participant Worker as Task Worker
+    participant Handler as Query/JS Handler
+    participant DSvc as DataQuery Service
 
-Cron is Scheduled input provider.
+    API->>Orch: startWorkflow(validatedInputArgs)
+    Orch->>Worker: Dispatch Query Node
+    Note over Worker: STAGE 1 (Node config):<br/>resolveTemplate(nodeConfig, ctx)
+    Worker->>Handler: process(resolvedNodeArgs)
+    Handler->>DSvc: runDataQueryByID(resolvedNodeArgs)
+    Note over DSvc: STAGE 1 (Query config):<br/>resolveInputs(queryArgs, nodeArgs)
+    Note over DSvc: STAGE 2 (SQL Query):<br/>engine.resolveTemplate(sql, args)
+    DSvc-->>Handler: Query Results
+    Handler-->>Orch: Task Result
+    Orch->>Worker: Dispatch JS Node
+    Note over Worker: resolveTemplate(jsCode, ctx)
+    Worker->>Handler: process(resolvedJsParams)
+    Handler->>Handler: executeSandbox(JS)
+    Handler-->>Orch: JS Result
+    Orch-->>API: Workflow Completed
+```
 
 ---
 
-# Backend Resolution Flow
+### Scenario 4: Cron Job Triggering a Workflow
+When `node-cron` fires on a schedule.
 
-Final backend pipeline:
+**Chronological Invocation:**
+1. `node-cron` trigger fires.
+2. `cronJob.service.js: runCronJob({ cronJob })`
+3. `definitionProvider.util.js: extractWorkflowDefinitions(cronJob.tblWorkflows)` (Gets required workflow inputs).
+4. `inputArgs.util.js: resolveInputs(runtimeValues: cronJob.workflowConfig.inputArgs)`
+   * Applies defaults and guarantees the static cron payload is valid for the linked workflow.
+   * If invalid, creates a `FAILED` history record immediately.
+5. `workflow.service.js: executeWorkflow(workflowID, resolvedArgs)`
+   * `executeWorkflow` safely re-verifies via `resolveInputs` (idempotent step).
+6. `orchestrator.js: startWorkflow()` → Starts regular workflow execution (matches Scenario 3).
 
 ```mermaid
-graph TD
-  ExecutionRequest["Execution Request"] --> IdentifyExecutableType["Identify Executable Type"]
-  IdentifyExecutableType --> FetchDefinitions["Fetch Definitions"]
-  IdentifyExecutableType --> FetchInputValues["Fetch Input Values"]
-  FetchDefinitions --> ResolveTemplates["Resolve Templates"]
-  FetchInputValues --> ResolveTemplates
-  ResolveTemplates --> ApplyDefaults["Apply Defaults"]
-  ApplyDefaults --> Validate["Validate"]
-  Validate --> ExecutionContext["Execution Context"]
-  ExecutionContext --> Execution["Execution"]
+sequenceDiagram
+    participant Cron as node-cron Process
+    participant CSvc as CronJob Service
+    participant Pipe as InputResolver Pipeline
+    participant DB as Cron History (DB)
+    participant WSvc as Workflow Service
+
+    Cron->>CSvc: Timer Triggered
+    CSvc->>Pipe: resolveInputs(wfDefinitions, cron.inputArgs)
+    alt Validation Failed
+        Pipe-->>CSvc: { valid: false, errors }
+        CSvc->>DB: create(status: FAILED, errorMsg)
+    else Validation Passed
+        Pipe-->>CSvc: { valid: true, resolved }
+        CSvc->>WSvc: executeWorkflow(resolved)
+        WSvc-->>CSvc: instanceID
+        CSvc->>DB: create(status: SUCCESS, instanceID)
+    end
 ```
-
----
-
-# Final System Responsibilities
-
-### DefinitionProvider
-Responsible for:
-- Fetching definitions
-- Handling native/derived logic
-- Providing contract
-
-### InputResolver
-Responsible for:
-- Applying values
-- Resolving templates
-- Validating inputs
-
-### TemplateResolver
-Responsible for:
-- Parsing templates
-- Resolving context references
-- Returning final values
-
----
-
-# Final Architecture Rules
-
-These rules must be enforced:
-
-1. **Rule 1**: Definitions determine behavior. NOT modules.
-2. **Rule 2**: Resolver handles all template logic. Modules must NOT resolve templates.
-3. **Rule 3**: Execution always receives resolved inputs. Never raw args.
-4. **Rule 4**: Definitions fetched by executable type. Never by module.
-
----
-
-# Final Architecture Model
-
-This is the final simplified system:
-
-```mermaid
-graph TD
-  ExecutionContract["Execution Contract"] --> InputResolver["Input Resolver"]
-  InputProviderValues["Input Provider Values"] --> InputResolver
-  InputResolver --> ExecutionInputs["Execution Inputs"]
-  ExecutionInputs --> ExecutionEngine["Execution Engine"]
-```
-
-This is the Jet-Admin input lifecycle.
-
----
-
-# Why this architecture works
-
-This model gives:
-- Consistent input behavior
-- Predictable execution
-- Reusable workflows
-- Clean frontend rendering
-- Centralized validation
-- Future extensibility
-
----
-
-# Final mental model (the one to remember)
-
-Jet-Admin is not:
-- Query system
-- Workflow system
-- Widget system
-
-It is: **Execution platform driven by contracts and providers**
-
-Where:
-- Executables define inputs.
-- Providers supply values.
-- Resolver prepares execution.
-- Execution runs.
