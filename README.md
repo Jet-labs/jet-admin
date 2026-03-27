@@ -1,307 +1,546 @@
 <div align="center">
 
-<img src="docs/static/img/logo.png" alt="Jet Admin Logo" width="140"/>
+<img src="docs/static/img/logo.png" alt="Jet Admin Logo" width="120"/>
 
-# Jet Admin
+# ⚡ Jet Admin
 
-### 🚀 Open-Source Analytics Platform & Internal Tools Builder
+### Open Source Analytics Platform & Internal Tools Builder
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
-[![Docker](https://img.shields.io/badge/Docker-Ready-2496ED?style=flat-square&logo=docker&logoColor=white)](docker-compose.cloud.yml)
-[![React](https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=white)](apps/frontend)
-[![Node.js](https://img.shields.io/badge/Node.js-Backend-339933?style=flat-square&logo=node.js&logoColor=white)](apps/backend)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)](CONTRIBUTING.md)
+<p align="center">
+  <img src="https://img.shields.io/badge/Node.js-18+-339933?style=flat-square&logo=nodedotjs&logoColor=white"/>
+  <img src="https://img.shields.io/badge/React-18-61DAFB?style=flat-square&logo=react&logoColor=white"/>
+  <img src="https://img.shields.io/badge/PostgreSQL-14+-4169E1?style=flat-square&logo=postgresql&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Prisma-ORM-2D3748?style=flat-square&logo=prisma&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Docker-Ready-2496ED?style=flat-square&logo=docker&logoColor=white"/>
+  <img src="https://img.shields.io/badge/License-MIT-22c55e?style=flat-square"/>
+  <img src="https://img.shields.io/github/stars/Jet-labs/jet-admin?style=flat-square&logo=github"/>
+  <img src="https://img.shields.io/github/issues/Jet-labs/jet-admin?style=flat-square"/>
+</p>
 
-**Connect your data sources · Build powerful queries · Design workflow automations · Visualize with widgets & dashboards**
+**Connect data sources · Build workflows · Create dashboards · Automate operations**
 
-[📖 Documentation](https://jet-labs.github.io/jet-admin/) · [🎯 Live Demo](#demo) · [⚡ Quick Start](#-quick-start) · [🤝 Contributing](docs/contributing.md)
-
-<br/>
-
-<a href="https://www.producthunt.com/products/jet-admin-3?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-jet-admin-4" target="_blank" rel="noopener noreferrer">
-  <img alt="Jet Admin - Web-based PostgreSQL tables manager and visualizer | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=958307&theme=light&t=1770205579857">
-</a>
+[🚀 Quick Start](#-quick-start) •
+[🏗️ Architecture](#-architecture) •
+[✨ Features](#-features) •
+[🔧 Development Guide](#-development-guide) •
+[🤝 Contributing](#-contributing)
 
 </div>
 
 ---
 
-## 🌟 Overview
+## 📌 Project Overview
 
-**Jet Admin** is a comprehensive open-source analytics platform that evolved from a PostgreSQL database manager into a full-featured internal tools builder. Empower your team to connect multiple data sources, create reusable queries, build visual workflow automations, and design interactive dashboards with customizable widgets.
+**Jet Admin** is a modular, open-source internal tools platform that allows engineering and operations teams to connect data sources, build automation workflows, and create powerful dashboards — all from a single extensible system.
 
-<div align="center">
+Unlike traditional BI tools, Jet Admin is designed around a **workflow execution engine** with a plugin-based datasource architecture. This makes it suitable not just for querying data, but for building automated pipelines, internal operations tools, and multi-step data processing flows.
 
-### 💡 What You Can Build
+> **The system evolved from a PostgreSQL admin tool into a full internal automation platform.**
 
-</div>
+### Why Jet Admin?
 
-<table>
-<tr>
-<td width="25%" align="center">
-  <h4>📊 BI Dashboards</h4>
-  Real-time KPI monitoring and data visualization
-</td>
-<td width="25%" align="center">
-  <h4>🔄 Data Pipelines</h4>
-  Visual workflow builder with conditional logic
-</td>
-<td width="25%" align="center">
-  <h4>🛠️ Admin Tools</h4>
-  CRUD interfaces for your databases
-</td>
-<td width="25%" align="center">
-  <h4>📈 Analytics Reports</h4>
-  Query-based charts and data tables
-</td>
-</tr>
-</table>
+| Capability | Jet Admin | Traditional BI |
+|---|---|---|
+| Workflow Automation | ✅ Node-based engine | ❌ |
+| Plugin Datasources | ✅ 25+ connectors | ⚠️ Limited |
+| Internal Tool Builder | ✅ Full widget system | ❌ |
+| Self-Hostable | ✅ Docker ready | ⚠️ |
+| AI Query Support | ✅ Built-in | ❌ |
+| Multi-Tenancy | ✅ RBAC + Isolation | ⚠️ |
 
 ---
 
-## ✨ Key Features
+## ✨ Features
 
-### 🔌 Multi-Datasource Support
-**25+ Integrations** with extensible connector architecture
+### 🔌 Data Source Integration
 
-<table>
-<tr>
-<th width="33%">💾 Databases</th>
-<th width="33%">☁️ Cloud Services</th>
-<th width="33%">🔗 APIs & Messaging</th>
-</tr>
-<tr>
-<td>
+Jet Admin supports 25+ datasource connectors through its package-driven plugin system.
 
-- PostgreSQL
-- MySQL
-- MongoDB
-- MS SQL Server
-- SQLite
-- CockroachDB
-- Oracle
-- Redis
-- Neo4j
+**Databases**
+- PostgreSQL · MySQL · MongoDB · SQLite · SQL Server · Redis · Neo4j
 
-</td>
-<td>
+**Cloud & SaaS**
+- BigQuery · Supabase · Firestore · Elasticsearch · AWS S3
 
-- Google BigQuery
-- Google Sheets
-- Google Analytics
-- Firestore
-- Supabase
-- Airtable
-- Amazon S3
-- Elasticsearch
-- Kafka
+**APIs & Services**
+- REST · GraphQL · Slack · Stripe · Twilio · SendGrid
 
-</td>
-<td>
+---
 
-- REST API
-- GraphQL
-- Slack
-- Twilio
-- SendGrid
-- Stripe
-- Jira
-- Notion
-- RabbitMQ
+### 🔄 Workflow Automation Engine
 
-</td>
-</tr>
-</table>
-
-### 📝 Powerful Data Query Engine
-
-<table>
-<tr>
-<td width="50%">
-
-**🎯 Smart Queries**
-- Parameterized queries with dynamic variables
-- SQL & NoSQL native support
-- Real-time testing panel
-- AI-assisted generation
-
-</td>
-<td width="50%">
-
-**⚡ High Performance**
-- Query result caching
-- Optimized execution
-- Batch processing
-- Error handling
-
-</td>
-</tr>
-</table>
-
-### 🔄 Visual Workflow Builder
-
-Build complex automation pipelines with drag-and-drop simplicity:
+A visual node-based execution system for building multi-step automation pipelines.
 
 ```
-┌─────────────────────────────────────────────────────────┐
-│  🟢 Start → 🔷 Query → 📜 Script → 🔀 Condition        │
-│                                      ├─ True → 🔴 End   │
-│                                      └─ False → 🔁 Loop │
-└─────────────────────────────────────────────────────────┘
+Start → Query → Transform → Condition → Loop → Notify → End
 ```
 
-<details>
-<summary><b>View All Node Types</b></summary>
+**Capabilities:**
+- ✅ Visual node-based builder
+- ✅ Conditional branching logic
+- ✅ Loop and iterator nodes
+- ✅ Context-driven data passing
+- ✅ Worker-based execution model
+- ✅ Scheduled and triggered workflows
+- ✅ Template variable resolution
 
-| Node | Description |
-|------|-------------|
-| 🟢 **Start** | Entry point with input argument definitions |
-| 🔷 **Data Query** | Execute any configured data query |
-| 📜 **JavaScript** | Custom JS code execution with full context access |
-| 🔀 **Condition** | Branch logic based on expressions |
-| 🔁 **Loop** | Iterate over arrays with nested execution |
-| ⏱️ **Delay** | Pause execution for specified duration |
-| 🔴 **End** | Terminal node with output mapping |
+---
 
-</details>
+### 📊 Dashboard & Widget System
 
-### 📊 Rich Widget System
+**Charts:** Bar · Line · Pie · Radar · Scatter · Bubble
 
-Create stunning visualizations connected to your workflows:
+**Data Widgets:** Tables · Text · Markdown · HTML · Custom widgets
 
-<table>
-<tr>
-<td width="33%" align="center">
+**Features:** Real-time updates · Export support · Responsive layouts · Drag-and-drop builder
 
-**📈 Chart Types**
+---
 
-Bar · Line · Pie · Radar  
-Bubble · Scatter · Polar
+### 🏢 Enterprise Features
 
-</td>
-<td width="33%" align="center">
+**Security:** Multi-tenancy · RBAC · API authentication · Audit logs
 
-**📋 Data Displays**
-
-Tables · Text · Markdown  
-Custom HTML · iFrames
-
-</td>
-<td width="33%" align="center">
-
-**🎨 Features**
-
-Real-time updates  
-Custom styling · Multi-dataset  
-Auto-refresh · Export
-
-</td>
-</tr>
-</table>
-
-### 🖥️ Dashboard Builder
-
-- 🎨 **Drag-and-drop Layout** - Grid-based widget positioning
-- 📱 **Responsive Design** - Adapts to all screen sizes
-- 📑 **Template System** - Clone and reuse dashboards
-- 🖨️ **Export to PDF** - Generate professional reports
-
-### 👥 Enterprise-Ready Multi-Tenancy
-
-<table>
-<tr>
-<td width="50%">
-
-**🔒 Security**
-- Complete tenant isolation
-- Role-based access control (RBAC)
-- API key authentication
-- Audit logging
-
-</td>
-<td width="50%">
-
-**👤 User Management**
-- Invite team members
-- Granular permissions
-- SSO support
-- Activity tracking
-
-</td>
-</tr>
-</table>
-
-### 🎁 Additional Capabilities
-
-<table>
-<tr>
-<td width="50%">
-
-- ⏰ **Cron Jobs** - Schedule recurring workflows
-- 📋 **Table Manager** - Direct CRUD operations
-- 🔔 **Real-time Notifications** - WebSocket updates
-- 🤖 **AI Chat Assistant** - Query generation helper
-
-</td>
-<td width="50%">
-
-- 🎣 **Database Triggers** - React to database events
-- 📊 **Data Transformations** - ETL pipelines
-- 🔍 **Search & Filter** - Advanced data exploration
-- 📤 **Import/Export** - Data migration tools
-
-</td>
-</tr>
-</table>
+**User Management:** Team invites · Permissions · Activity tracking
 
 ---
 
 ## 🏗️ Architecture
 
-<div align="center">
+### High-Level System Design
 
 ```mermaid
-graph TB
-    subgraph Frontend["🎨 Frontend (React)"]
-        DB[Dashboard Builder]
-        WE[Workflow Editor]
-        WC[Widget Config]
-        QE[Query Editor]
-    end
-    
-    subgraph Backend["⚙️ Backend (Node.js)"]
-        API[REST API / WebSocket]
-        MS[Module System]
-        WEE[Workflow Execution Engine]
-    end
-    
-    subgraph Data["💾 Data Layer"]
-        P[Prisma ORM]
-        DC[Datasource Connectors]
-    end
-    
-    Frontend --> API
-    API --> MS
-    MS --> WEE
-    WEE --> P
-    WEE --> DC
+graph TD
+    A[Frontend - React] -->|REST / WebSocket| B[API Gateway]
+    B --> C[Module System]
+    C --> D[Workflow Engine]
+    D --> E[Execution Workers]
+    E --> F[Datasource Connectors]
+    F --> G[(PostgreSQL / External DBs)]
+    C --> H[Widget System]
+    C --> I[Dashboard Engine]
 ```
 
-</div>
+### Monorepo Structure
 
-<details>
-<summary><b>Tech Stack Details</b></summary>
+```
+jet-admin/
+├── apps/
+│   ├── backend/              # Node.js API + Workflow Engine
+│   │   ├── config/
+│   │   ├── modules/
+│   │   │   ├── datasource/
+│   │   │   ├── dataQuery/
+│   │   │   ├── workflow/
+│   │   │   ├── widget/
+│   │   │   └── dashboard/
+│   │   ├── prisma/
+│   │   └── utils/
+│   └── frontend/             # React Application
+│       └── src/
+│           ├── data/          # API layer
+│           ├── logic/         # Hooks, state, contexts
+│           └── presentation/  # UI components only
+│
+├── packages/
+│   ├── datasource-types/      # Shared connector contracts
+│   ├── datasources-logic/     # Connector implementations
+│   ├── widgets/               # Widget definitions
+│   └── workflow-nodes/        # Node type definitions
+│
+└── docker-compose.cloud.yml
+```
 
-| Layer | Technology |
-|-------|------------|
-| **Frontend** | React 18 · Vite · TailwindCSS · React Query · React Flow |
-| **Backend** | Node.js · Express.js · Socket.IO |
-| **ORM** | Prisma |
-| **Authentication** | Firebase Auth |
-| **Message Queue** | RabbitMQ |
-| **Containerization** | Docker · Docker Compose |
+---
 
-</details>
+## ⚙️ Backend Architecture
+
+The backend uses a **feature-module architecture** instead of a traditional layered monolith. Each feature is fully isolated with its own controller, service, repository, and execution logic.
+
+```
+modules/
+├── datasource/
+│   ├── controller.js
+│   ├── service.js
+│   ├── repository.js
+│   └── validation.js
+├── workflow/
+│   ├── controller.js
+│   ├── service.js
+│   ├── engine.js          ← Workflow execution
+│   ├── workers/           ← Node workers
+│   └── repository.js
+└── dataQuery/
+    ├── controller.js
+    ├── service.js
+    └── repository.js
+```
+
+**Design principles enforced:**
+- ✅ Feature isolation — modules do not directly call each other
+- ✅ Low coupling — changes in one module don't cascade
+- ✅ High cohesion — all logic for a feature lives in its module
+- ✅ Clear ownership — every file has a single responsibility
+
+---
+
+## 🔄 Workflow Execution Lifecycle
+
+```mermaid
+sequenceDiagram
+    participant U as User
+    participant E as Workflow Engine
+    participant R as Input Resolver
+    participant W as Worker
+    participant C as Context Store
+
+    U->>E: Trigger Workflow
+    E->>E: Load Node Definitions
+    E->>R: Resolve Node Inputs
+    R->>C: Read Context Variables
+    C-->>R: Return Values
+    R-->>E: Resolved Inputs
+    E->>W: Execute Worker(node, inputs)
+    W-->>E: Return Result
+    E->>C: Write Output to Context
+    E->>E: Determine Next Nodes
+    E-->>U: Execution Complete
+```
+
+---
+
+## 🧠 Execution Design Principles
+
+The workflow engine enforces a strict contract between nodes, workers, and the engine.
+
+### Node Responsibilities
+
+| A Node MUST define | A Node MUST NOT do |
+|---|---|
+| Input schema | Execute business logic |
+| Output schema | Mutate workflow context |
+| UI configuration | Access the database directly |
+| Worker reference | Call other modules |
+| Validation rules | Resolve template variables |
+
+> **Execution happens exclusively in workers. Nodes are metadata only.**
+
+---
+
+## ⚡ Worker Architecture
+
+Workers are the execution units of the workflow engine. This separation is intentional — it enables testability, strategy replacement, and future distributed execution.
+
+```
+Node Definition
+      ↓
+Input Resolution (Engine)
+      ↓
+Worker Execution
+      ↓
+Result Returned
+      ↓
+Context Updated (Engine)
+      ↓
+Next Nodes Triggered
+```
+
+**Worker contract:**
+
+```js
+// ✅ Correct worker pattern
+export async function executeQueryWorker(node, resolvedInputs, context) {
+  const result = await queryService.execute(
+    resolvedInputs.queryId,
+    resolvedInputs.params
+  );
+  return { result }; // Engine writes this to context
+}
+```
+
+**Rules workers must follow:**
+- ✅ Return deterministic output
+- ✅ Accept only pre-resolved inputs
+- ❌ Never mutate context directly
+- ❌ Never call the workflow engine
+- ❌ Never resolve template variables internally
+
+---
+
+## 🧩 Context Resolution Model
+
+Workflow execution is driven by a **context-propagation model**. Each node reads from context and writes results back through the engine.
+
+**Context structure:**
+
+```js
+context = {
+  input: { customerId: 15 },
+  node_query_1: { result: [...] },
+  node_filter_2: { filtered: [...] }
+}
+```
+
+**Input types supported:**
+
+| Type | Example |
+|---|---|
+| Literal | `"value": 25` |
+| Template | `"value": "{{node_query_1.result}}"` |
+
+**Resolution flow:**
+
+```
+Detect Input Type
+       ↓
+If Literal → Return Value Immediately
+       ↓
+If Template → Parse Reference
+       ↓
+Resolve from Context
+       ↓
+Return Evaluated Value to Worker
+```
+
+> **Resolution always happens before worker execution — never inside workers.**
+
+---
+
+## 🔌 Plugin Architecture
+
+Extensibility is achieved through **package-driven plugins**. The core system never depends on plugin implementations. Plugins depend on core contracts.
+
+```
+packages/
+├── datasources-logic/
+│   ├── postgres/
+│   ├── mysql/
+│   ├── mongodb/
+│   └── ...
+├── workflow-nodes/
+│   ├── queryNode/
+│   ├── transformNode/
+│   └── conditionNode/
+└── widgets/
+    ├── barChart/
+    ├── table/
+    └── ...
+```
+
+### Creating a Datasource Connector
+
+Every connector must implement the standard contract:
+
+```js
+export class PostgresConnector {
+  async connect(config) { /* ... */ }
+  async disconnect() { /* ... */ }
+  async execute(query, params) { /* normalized result */ }
+  async validate(config) { /* boolean */ }
+  async healthCheck() { /* status */ }
+}
+```
+
+**Rules:**
+- ✅ Return normalized results only
+- ✅ Handle connection errors internally
+- ❌ No workflow logic inside connectors
+- ❌ No cross-connector dependencies
+
+### Creating a Workflow Node
+
+```js
+export const QueryNode = {
+  type: "dataQuery",
+  name: "Execute Query",
+  inputs: {
+    queryId: { type: "string", required: true },
+    params:  { type: "object" }
+  },
+  outputs: {
+    result: "array"
+  },
+  worker: executeQueryWorker,
+  uiConfig: { /* form schema */ }
+};
+```
+
+### Creating a Widget
+
+```js
+export const BarChartWidget = {
+  type: "barChart",
+  configSchema: { /* JSON Schema */ },
+  render(data, config) {
+    return <BarChart data={data} options={config} />;
+  }
+};
+```
+
+---
+
+## 📘 Example Workflow Definition
+
+```json
+{
+  "id": "sales-report-workflow",
+  "name": "Monthly Sales Report",
+  "nodes": [
+    { "id": "start",    "type": "start" },
+    { "id": "query_1",  "type": "dataQuery",    "inputs": { "queryId": "fetchOrders" } },
+    { "id": "filter_2", "type": "transform",    "inputs": { "data": "{{query_1.result}}", "filter": "last30days" } },
+    { "id": "agg_3",    "type": "aggregate",    "inputs": { "data": "{{filter_2.filtered}}", "field": "revenue" } },
+    { "id": "chart_4",  "type": "generateChart","inputs": { "data": "{{agg_3.aggregated}}", "type": "bar" } },
+    { "id": "end",      "type": "end" }
+  ],
+  "edges": [
+    { "from": "start",   "to": "query_1"  },
+    { "from": "query_1", "to": "filter_2" },
+    { "from": "filter_2","to": "agg_3"    },
+    { "from": "agg_3",   "to": "chart_4"  },
+    { "from": "chart_4", "to": "end"      }
+  ]
+}
+```
+
+---
+
+## 🧪 Coding Standards
+
+### Naming Conventions
+
+| Category | Convention | Example |
+|---|---|---|
+| Functions | camelCase | `executeWorkflow()` |
+| Classes | PascalCase | `WorkflowEngine` |
+| Constants | UPPER_SNAKE | `MAX_RETRY_COUNT` |
+| Files | kebab-case | `workflow-engine.js` |
+| DB columns | snake_case (Prisma mapped) | `created_at` |
+
+### Function Rules
+
+```js
+// ✅ Good — single responsibility, deterministic
+async function resolveNodeInputs(node, context) {
+  return node.inputs.map(input => resolveInput(input, context));
+}
+
+// ❌ Bad — mixed responsibilities
+async function resolveAndExecuteAndStore(node, context) {
+  const inputs = resolve(node, context);   // resolution
+  const result = await execute(inputs);    // execution
+  await db.save(result);                   // storage
+}
+```
+
+### Error Handling
+
+```js
+// ✅ Correct — errors propagate with context
+try {
+  await executeWorker(node, resolvedInputs);
+} catch (error) {
+  logger.error({ nodeId: node.id, executionId, error });
+  throw new WorkflowExecutionError(node.id, executionId, error.message);
+}
+
+// ❌ Wrong — swallowed error, silent failure
+try {
+  await executeWorker(node, resolvedInputs);
+} catch (e) {
+  return null;
+}
+```
+
+### Database Practices
+
+```
+Rule:  Controller → Service → Repository → DB
+Never: Controller → DB directly
+Never: Worker → DB directly
+Always: Use Prisma models only
+Always: Wrap multi-step operations in transactions
+```
+
+---
+
+## 🎨 Frontend Architecture
+
+Frontend is organized into **three strict layers** that must never be mixed:
+
+```
+src/
+├── data/           # API calls, models, transformers
+├── logic/          # Hooks, state, contexts
+└── presentation/   # UI components only (no logic)
+```
+
+```js
+// ✅ Correct — component uses hook, hook uses service
+const WorkflowList = () => {
+  const { workflows } = useWorkflows();          // logic layer
+  return workflows.map(w => <WorkflowCard w={w} />);
+};
+
+// ❌ Wrong — component calls API directly
+const WorkflowList = () => {
+  const [workflows, setWorkflows] = useState([]);
+  useEffect(() => { axios.get('/api/workflows').then(setWorkflows); }, []);
+};
+```
+
+---
+
+## ❌ Anti-Patterns (Do NOT do this)
+
+| Anti-Pattern | Why it's wrong |
+|---|---|
+| Business logic in controllers | Breaks testability and reuse |
+| Workers mutating context | Breaks execution determinism |
+| Nodes executing DB logic | Breaks separation of concerns |
+| Template resolution inside workers | Engine responsibility, not worker |
+| Cross-module direct calls | Creates hidden coupling |
+| Hardcoded datasource logic | Breaks plugin isolation |
+| Swallowing errors silently | Hides failures during debugging |
+
+---
+
+## ⚙️ Engineering Philosophy
+
+Jet Admin enforces these design decisions deliberately:
+
+| Decision | Reason |
+|---|---|
+| Workers execute, nodes define | Enables strategy replacement and testability |
+| Context is read-only for workers | Prevents hidden mutations and execution chaos |
+| Inputs resolved before execution | Ensures predictable, deterministic worker behavior |
+| Plugins are packages, not inline code | Enables independent versioning and release |
+| Module isolation enforced | Prevents cascading failures and coupling |
+
+> **These are not opinions — they are guarantees the system depends on.**
+
+---
+
+## 📈 Scaling Strategy
+
+The architecture is designed to support distributed execution in future iterations:
+
+```
+Current:   Synchronous Worker Execution
+Next:      Queue-based worker dispatch (RabbitMQ ready)
+Future:    Distributed workflow runners + execution snapshots
+```
+
+**Why workers remain pure matters:** Stateless workers can be picked up by any runner — local, queued, or distributed — without code changes.
+
+---
+
+## 🔐 Security Model
+
+- **Multi-tenancy:** All queries scoped to tenant context
+- **RBAC:** Role-based permissions enforced at service layer
+- **Credential storage:** Datasource secrets encrypted at rest
+- **Query validation:** All user-supplied queries validated before execution
+- **Execution sandboxing:** Workers run in isolated execution contexts
 
 ---
 
@@ -309,283 +548,161 @@ graph TB
 
 ### Prerequisites
 
-<table>
-<tr>
-<td>
+- Node.js 18+
+- PostgreSQL 14+
+- Docker (recommended)
+- Firebase project (for auth)
 
-- ✅ Node.js 18+
-- ✅ PostgreSQL 14+
-- ✅ Docker & Docker Compose
-
-</td>
-<td>
-
-- ✅ Firebase project
-- ✅ Git
-- ✅ 4GB+ RAM recommended
-
-</td>
-</tr>
-</table>
-
-### 🐳 Option 1: Docker Deployment (Recommended)
+### Docker Setup (Recommended)
 
 ```bash
-# Clone the repository
 git clone https://github.com/Jet-labs/jet-admin.git
 cd jet-admin
-
-# Configure environment
 cp .env.docker.example .env.docker
-# Edit .env.docker with your configuration
-
-# Start all services
 docker-compose -f docker-compose.cloud.yml up -d
 ```
 
-🎉 **Access the application at** `http://localhost:3000`
+Access: `http://localhost:3000`
 
-### 🛠️ Option 2: Manual Setup
+### Manual Setup
 
-<details>
-<summary><b>Backend Setup</b></summary>
-
+**Backend:**
 ```bash
 cd apps/backend
-
-# Install dependencies
 npm install
-
-# Configure environment
 cp .env.example .env
-# Edit .env with your database and Firebase credentials
-
-# Run database migrations
 npx prisma migrate dev
-
-# Seed initial data (optional)
-npm run seed
-
-# Start the backend
 npm run dev
 ```
 
-</details>
-
-<details>
-<summary><b>Frontend Setup</b></summary>
-
+**Frontend:**
 ```bash
 cd apps/frontend
-
-# Install dependencies
 npm install
-
-# Configure environment
-cp public/config.example.js public/config.js
-# Edit config.js with your API endpoint
-
-# Start the frontend
 npm run dev
 ```
 
-</details>
+### Environment Variables
 
-<details>
-<summary><b>Environment Configuration</b></summary>
-
-**Backend (.env)**
+**Backend `.env`:**
 ```env
-DATABASE_URL=postgresql://user:password@localhost:5432/jetadmin
-FIREBASE_PROJECT_ID=your-firebase-project
-FIREBASE_PRIVATE_KEY=your-private-key
-FIREBASE_CLIENT_EMAIL=your-client-email
-RABBITMQ_URL=amqp://localhost:5672
-JWT_SECRET=your-jwt-secret
+DATABASE_URL=postgresql://user:pass@localhost:5432/jetadmin
+JWT_SECRET=your_jwt_secret
+FIREBASE_PROJECT_ID=your_project_id
+RABBITMQ_URL=amqp://localhost
+API_PORT=4000
 ```
 
-**Frontend (public/config.js)**
-```javascript
-window.JET_CONFIG = {
-  API_URL: 'http://localhost:4000',
-  FIREBASE_CONFIG: {
-    apiKey: 'your-api-key',
-    authDomain: 'your-project.firebaseapp.com',
-    projectId: 'your-project-id'
-  }
-};
+**Frontend `.env`:**
+```env
+VITE_API_URL=http://localhost:4000
+VITE_FIREBASE_CONFIG={"apiKey":"..."}
 ```
-
-</details>
 
 ---
 
-## 📁 Project Structure
+## 🤝 Contributing
+
+### Branch Naming
 
 ```
-jet-admin/
-├── 📱 apps/
-│   ├── backend/                 # Node.js Express API
-│   │   ├── config/              # App configurations
-│   │   ├── modules/             # Feature modules
-│   │   │   ├── datasource/      # Data source management
-│   │   │   ├── dataQuery/       # Query engine
-│   │   │   ├── workflow/        # Workflow execution engine
-│   │   │   ├── widget/          # Widget management
-│   │   │   └── dashboard/       # Dashboard management
-│   │   ├── prisma/              # Database schema & migrations
-│   │   └── utils/               # Shared utilities
-│   │
-│   └── frontend/                # React SPA
-│       ├── src/
-│       │   ├── data/            # API clients & models
-│       │   ├── logic/           # Contexts & hooks
-│       │   └── presentation/    # UI components & pages
-│       └── public/              # Static assets
-│
-├── 📦 packages/                 # Shared packages (monorepo)
-│   ├── datasource-types/        # Datasource form configs
-│   ├── datasources-logic/       # Datasource connectors
-│   ├── widgets/                 # Widget implementations
-│   └── workflow-nodes/          # Workflow node components
-│
-├── 📚 docs/                     # Docusaurus documentation
-├── 🐳 docker-compose.cloud.yml  # Docker deployment
-└── 📄 Dockerfile.*              # Container definitions
+feature/workflow-loop-node
+fix/context-resolution-bug
+docs/plugin-development-guide
+refactor/worker-execution-pattern
+```
+
+### Commit Format
+
+```
+feat: add loop execution node
+fix: resolve context variable mutation issue
+docs: add datasource connector guide
+refactor: extract worker strategy pattern
+test: add workflow engine unit tests
+```
+
+### Pull Request Checklist
+
+- [ ] No business logic in controllers
+- [ ] Workers don't mutate context
+- [ ] Modules remain isolated
+- [ ] Error handling follows established pattern
+- [ ] No console.log statements
+- [ ] No unused imports
+- [ ] Code follows naming conventions
+- [ ] Tests added for new features
+
+### Development Process
+
+```
+1. Fork the repository
+2. Create a feature branch
+3. Implement changes following coding standards
+4. Write/update tests
+5. Open a PR with description of changes
+6. Address review feedback
 ```
 
 ---
 
 ## 📚 Documentation
 
-<div align="center">
-
-### 📖 [**Full Documentation →**](https://jet-labs.github.io/jet-admin/)
-
-</div>
-
-<table>
-<tr>
-<th>🎯 Getting Started</th>
-<th>🏛️ Architecture</th>
-<th>✨ Features</th>
-</tr>
-<tr>
-<td>
-
-- [Introduction](https://jet-labs.github.io/jet-admin/docs/intro)
-- [Docker Deployment](https://jet-labs.github.io/jet-admin/docs/setup/docker-deployment)
-- [Backend Setup](https://jet-labs.github.io/jet-admin/docs/setup/setup-backend)
-- [Frontend Setup](https://jet-labs.github.io/jet-admin/docs/setup/setup-frontend)
-
-</td>
-<td>
-
-- [Backend Architecture](https://jet-labs.github.io/jet-admin/docs/architecture/backend-architecture)
-- [Frontend Architecture](https://jet-labs.github.io/jet-admin/docs/architecture/frontend-architecture)
-- [Database Schema](https://jet-labs.github.io/jet-admin/docs/architecture/database-schema)
-- [Data Flow](https://jet-labs.github.io/jet-admin/docs/concepts/data-flow)
-
-</td>
-<td>
-
-- [Datasources](https://jet-labs.github.io/jet-admin/docs/features/datasource/overview)
-- [Data Queries](https://jet-labs.github.io/jet-admin/docs/features/data-query/overview)
-- [Workflows](https://jet-labs.github.io/jet-admin/docs/features/workflow/overview)
-- [Widgets & Charts](https://jet-labs.github.io/jet-admin/docs/features/widgets/charts)
-- [Dashboards](https://jet-labs.github.io/jet-admin/docs/features/dashboard/overview)
-
-</td>
-</tr>
-</table>
+| Document | Description |
+|---|---|
+| [Workflow Engine](docs/workflow-engine.md) | Execution lifecycle, context model, design decisions |
+| [Node Spec](docs/node-spec.md) | Node definition contract, worker patterns |
+| [Plugin Development](docs/plugin-development.md) | Building datasource connectors and widget plugins |
+| [Execution Context](docs/execution-context.md) | Context model, template resolution, immutability rules |
+| [Worker Design](docs/worker-design.md) | Worker architecture, strategy patterns, scaling |
+| [Contribution Rules](docs/contribution-rules.md) | Coding standards, PR process, anti-patterns |
 
 ---
 
-## 🤝 Contributing
+## 📈 Roadmap
 
-<div align="center">
+- [ ] Workflow versioning and rollback
+- [ ] Visual execution debugger
+- [ ] Distributed worker execution
+- [ ] AI-powered workflow builder
+- [ ] Plugin marketplace
+- [ ] Real-time execution tracing
+- [ ] Partial workflow resume
+- [ ] Execution snapshots
 
-**We ❤️ contributions from the community!**
+---
 
-[![Contributors](https://img.shields.io/github/contributors/Jet-labs/jet-admin?style=flat-square)](https://github.com/Jet-labs/jet-admin/graphs/contributors)
-[![Issues](https://img.shields.io/github/issues/Jet-labs/jet-admin?style=flat-square)](https://github.com/Jet-labs/jet-admin/issues)
-[![Pull Requests](https://img.shields.io/github/issues-pr/Jet-labs/jet-admin?style=flat-square)](https://github.com/Jet-labs/jet-admin/pulls)
+## 🛠️ Tech Stack
 
-</div>
-
-### How to Contribute
-
-1. **🍴 Fork** the repository
-2. **🌿 Create** a feature branch (`git checkout -b feature/amazing-feature`)
-3. **💾 Commit** your changes (`git commit -m 'Add amazing feature'`)
-4. **📤 Push** to the branch (`git push origin feature/amazing-feature`)
-5. **🎉 Open** a Pull Request
-
-### 🎯 Areas We Need Help
-
-<table>
-<tr>
-<td width="50%">
-
-**🔌 New Connectors**
-Add support for more databases and APIs
-
-**📊 Widget Types**
-Create new visualization components
-
-</td>
-<td width="50%">
-
-**🔄 Workflow Nodes**
-Implement additional automation nodes
-
-**📖 Documentation**
-Improve guides and examples
-
-</td>
-</tr>
-</table>
-
-Check out our [**Contributing Guide**](https://jet-labs.github.io/jet-admin/docs/contributing) for detailed information.
+| Layer | Technology |
+|---|---|
+| Frontend | React 18, Tailwind CSS, React Flow, React Query |
+| Backend | Node.js, Express, Prisma ORM |
+| Database | PostgreSQL |
+| Auth | Firebase |
+| Messaging | RabbitMQ |
+| Charts | Chart.js |
+| Realtime | Socket.IO |
+| Infra | Docker, Linux |
 
 ---
 
 ## 📜 License
 
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+MIT License — see [LICENSE](LICENSE) for details.
 
 ---
 
-## 🙏 Acknowledgments
+## 🙏 Acknowledgements
 
-Built with amazing open-source technologies:
-
-<div align="center">
-
-[![React](https://img.shields.io/badge/React-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org/)
-[![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
-[![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)](https://www.prisma.io/)
-[![React Flow](https://img.shields.io/badge/React_Flow-FF6B6B?style=for-the-badge&logo=react&logoColor=white)](https://reactflow.dev/)
-[![Chart.js](https://img.shields.io/badge/Chart.js-FF6384?style=for-the-badge&logo=chart.js&logoColor=white)](https://www.chartjs.org/)
-
-</div>
+Built with: React · Node.js · Prisma · React Flow · Chart.js · Socket.IO · PostgreSQL
 
 ---
 
 <div align="center">
 
-### ⭐ Star this repo if you find it useful!
+**⭐ Star this repo if it helps you**
 
-<a href="https://github.com/Jet-labs/jet-admin/stargazers">
-  <img src="https://img.shields.io/github/stars/Jet-labs/jet-admin?style=social" alt="Star on GitHub">
-</a>
-
-**[🐛 Report Bug](https://github.com/Jet-labs/jet-admin/issues)** · 
-**[💡 Request Feature](https://github.com/Jet-labs/jet-admin/issues)** · 
-**[💬 Join Discussions](https://github.com/Jet-labs/jet-admin/discussions)**
-
----
-
-**Made with ❤️ by the Jet Labs Team**
+[Report a Bug](https://github.com/Jet-labs/jet-admin/issues) · [Request a Feature](https://github.com/Jet-labs/jet-admin/issues) · [Discussions](https://github.com/Jet-labs/jet-admin/discussions)
 
 </div>
