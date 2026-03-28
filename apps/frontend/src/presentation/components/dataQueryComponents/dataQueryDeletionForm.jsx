@@ -40,12 +40,13 @@ export const DataQueryDeletionForm = ({ tenantID, dataQueryID }) => {
     });
 
   const _handleDeleteQuery = async () => {
-    await showConfirmation({
+    const confirmed = await showConfirmation({
       title: CONSTANTS.STRINGS.DELETE_QUERY_DIALOG_TITLE,
       message: CONSTANTS.STRINGS.DELETE_QUERY_DIALOG_MESSAGE,
       confirmText: "Delete",
       cancelText: "Cancel",
     });
+    if (!confirmed) return;
     deleteDataQuery();
   };
 
@@ -53,13 +54,14 @@ export const DataQueryDeletionForm = ({ tenantID, dataQueryID }) => {
     <>
       <Button
         variant="destructive-ghost"
-        size="icon"
+        size="sm"
+        square
         onClick={_handleDeleteQuery}
         disabled={isDeletingDataQuery}
         type="button"
       >
         {isDeletingDataQuery ? (
-          <Spinner size={16} />
+          <Spinner size={14} />
         ) : (
             <MdDeleteOutline className="size-4" />
         )}

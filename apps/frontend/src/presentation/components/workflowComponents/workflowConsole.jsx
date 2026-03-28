@@ -78,7 +78,8 @@ export const WorkflowConsole = ({
               onClick={onClear}
               type='button'
               variant="ghost"
-              size="icon"
+              size="sm"
+              square
               className="h-7 w-7 text-muted-foreground hover:text-foreground"
               title="Clear logs"
             >

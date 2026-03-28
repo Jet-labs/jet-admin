@@ -177,7 +177,8 @@ export const TableWidget = ({
             </span>
             <Button
               variant="ghost"
-              size="icon"
+              size="sm"
+              square
               className="h-7 w-7"
               onClick={() => handlePageChange(1)}
               disabled={currentPage === 1 || isLoadingWorkflows}
@@ -186,7 +187,8 @@ export const TableWidget = ({
             </Button>
             <Button
               variant="ghost"
-              size="icon"
+              size="sm"
+              square
               className="h-7 w-7"
               onClick={() => handlePageChange(currentPage - 1)}
               disabled={currentPage === 1 || isLoadingWorkflows}
@@ -195,7 +197,8 @@ export const TableWidget = ({
             </Button>
             <Button
               variant="ghost"
-              size="icon"
+              size="sm"
+              square
               className="h-7 w-7"
               onClick={() => handlePageChange(currentPage + 1)}
               disabled={currentPage >= totalPages || isLoadingWorkflows}
@@ -204,7 +207,8 @@ export const TableWidget = ({
             </Button>
             <Button
               variant="ghost"
-              size="icon"
+              size="sm"
+              square
               className="h-7 w-7"
               onClick={() => handlePageChange(totalPages)}
               disabled={currentPage >= totalPages || isLoadingWorkflows}

@@ -38,7 +38,8 @@ export const WorkflowNodeConfigPanel = ({ node, onChange, onClose, onDelete }) =
                     <Button
                         onClick={() => setShowDeleteConfirm(true)}
                         variant="destructive-ghost"
-                        size="icon"
+                        size="sm"
+                        square
                         className="h-8 w-8 text-muted-foreground hover:text-destructive"
                         title="Delete node"
                         type='button'
@@ -49,7 +50,8 @@ export const WorkflowNodeConfigPanel = ({ node, onChange, onClose, onDelete }) =
                         onClick={onClose}
                         type='button'
                         variant="ghost"
-                        size="icon"
+                        size="sm"
+                        square
                         className="h-8 w-8 text-muted-foreground hover:text-foreground"
                         title="Close"
                     >

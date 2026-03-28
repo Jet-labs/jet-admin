@@ -385,7 +385,8 @@ const FilterGroup = ({
         {!isRoot && (
           <Button
             onClick={() => onRemove(groupIndex)}
-            variant="ghost" size="icon" className="h-6 w-6 text-red-400 hover:text-red-500 hover:bg-red-100"
+            variant="ghost" size="sm"
+            square className="h-6 w-6 text-red-400 hover:text-red-500 hover:bg-red-100"
           >
             <FaTimes className="h-4 w-4" />
           </Button>
@@ -686,7 +687,8 @@ export const DatabaseTableColumnFilter = ({
           </div>
           <Button
             onClick={handleCloseDatabaseTableColumnFiltersMenu}
-            variant="ghost" size="icon" className="h-6 w-6"
+            variant="ghost" size="sm"
+            square className="h-6 w-6"
           >
             <FaTimes className="h-4 w-4" />
           </Button>

@@ -1,4 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 import { useGlobalUI } from "../../../logic/contexts/globalUIContext";
@@ -33,25 +34,30 @@ export const TenantDeletionForm = ({ tenantID }) => {
   });
 
   const _handleDeleteTenant = async () => {
-    await showConfirmation({
+    const confirmed = await showConfirmation({
       title: CONSTANTS.STRINGS.DELETE_TENANT_CONFIRMATION_TITLE,
       message: CONSTANTS.STRINGS.DELETE_TENANT_CONFIRMATION_DESCRIPTION,
       confirmText: "Delete",
       cancelText: "Cancel",
     });
+    if (!confirmed) return;
     deleteTenant();
   };
 
   return (
-    <>
-      <Button variant="destructive-ghost" onClick={_handleDeleteTenant} disabled={isDeletingTenant} type="button">
-        {isDeletingTenant ? (
-          <Spinner className="mr-2" size={16} />
-        ) : null}
-        {isDeletingTenant
-          ? "Deleting..."
-          : CONSTANTS.STRINGS.DELETE_TENANT_CONFIRM_BUTTON}
-      </Button>
-    </>
+    <Button
+      variant="destructive-ghost"
+      size="sm"
+      square
+      onClick={_handleDeleteTenant}
+      disabled={isDeletingTenant}
+      type="button"
+    >
+      {isDeletingTenant ? (
+        <Spinner size={14} />
+      ) : (
+        <Trash2 className="h-4 w-4" />
+      )}
+    </Button>
   );
 };

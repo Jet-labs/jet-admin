@@ -36,6 +36,10 @@ import { DatabaseTableRowsExportForm } from "./databaseTableRowsExportForm";
 import { DatabaseTableStatistics } from "./databaseTableStatistics";
 import { AppliedFilters, AppliedFiltersBadge, AppliedFiltersCompact } from "./databaseTableAppliedFilters";
 
+import { DatabaseTableGridJSONEditor } from "./databaseTableGridJSONEditor";
+import { DatabaseTableGridCellForeignKeyPopup } from "./databaseTableGridCellForeignKeyPopup";
+import { DATAGRID_SX } from "../../../shared/dataGridTheme";
+
 import { Button, Checkbox, Spinner } from "@jet-admin/ui";
 export const DatabaseTableGrid = ({
   tenantID,
@@ -652,14 +656,14 @@ export const DatabaseTableGrid = ({
                 disabled={isBulkUpdatingDatabaseTableRows} // Disable button during loading
                 className={`!outline-none !hover:outline-none flex items-center rounded px-2 py-0.5 text-xs ${
                   isBulkUpdatingDatabaseTableRows
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-white text-primary border-primary hover:border-primary hover:bg-[#ebecff]"
+                    ? "bg-slate-300 text-slate-500 cursor-not-allowed"
+                    : "bg-amber-100 text-amber-800 border-amber-300 hover:border-amber-400 hover:bg-amber-200"
                 }`}
               >
                 {isBulkUpdatingDatabaseTableRows ? (
                   <>
                     Saving your changes...
-                    <Spinner size={16} className="ml-2" />
+                    <Spinner size={14} className="ml-2" />
                   </>
                 ) : (
                   `Save ${databaseTableRowChangeCount} row changes`
@@ -668,7 +672,7 @@ export const DatabaseTableGrid = ({
               {!isBulkUpdatingDatabaseTableRows && (
                 <Button
                   onClick={_handleClearDatabaseTableRowChanges}
-                  className="!outline-none !hover:outline-none flex items-center rounded bg-white px-2 py-0.5 text-xs text-[#ff6e64] border border-[#ff6e64] hover:bg-[#ffebe9] hover:border-[#ff6e64]"
+                  className="!outline-none !hover:outline-none flex items-center rounded bg-white px-2 py-0.5 text-xs text-destructive border border-destructive hover:bg-destructive/10"
                 >
                   Discard changes
                 </Button>
@@ -682,14 +686,14 @@ export const DatabaseTableGrid = ({
                 disabled={isBulkAddingDatabaseTableRows} // Disable button during loading
                 className={`!outline-none !hover:outline-none flex items-center rounded px-2 py-0.5 text-xs ${
                   isBulkAddingDatabaseTableRows
-                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                    : "bg-white text-primary border-primary hover:border-primary hover:bg-[#ebecff]"
+                    ? "bg-slate-300 text-slate-500 cursor-not-allowed"
+                    : "bg-amber-100 text-amber-800 border-amber-300 hover:border-amber-400 hover:bg-amber-200"
                 }`}
               >
                 {isBulkAddingDatabaseTableRows ? (
                   <>
                     Saving your changes...
-                    <Spinner size={16} className="ml-2" />
+                    <Spinner size={14} className="ml-2" />
                   </>
                 ) : (
                   `Save ${databaseTableNewRows.length} new row`
@@ -698,7 +702,7 @@ export const DatabaseTableGrid = ({
               {!isBulkAddingDatabaseTableRows && (
                 <Button
                   onClick={_handleClearAddDatabaseTableRow}
-                  className="!outline-none !hover:outline-none flex items-center rounded bg-white px-2 py-0.5 text-xs text-[#ff6e64] border border-[#ff6e64] hover:bg-[#ffebe9] hover:border-[#ff6e64]"
+                  className="!outline-none !hover:outline-none flex items-center rounded bg-white px-2 py-0.5 text-xs text-destructive border border-destructive hover:bg-destructive/10"
                 >
                   Discard changes
                 </Button>
@@ -775,7 +779,6 @@ export const DatabaseTableGrid = ({
               processRowUpdate={_handleDataGridRowUpdate}
               experimentalFeatures={{ newEditingApi: true }}
               getRowId={(row) => _getRowID(row)} // Custom row ID getter
-              // className="fill-grid border-t border-slate-200"
               getCellClassName={(params) => {
                 const rowId = _getRowID(params.row);
                 const isChanged =
@@ -785,41 +788,7 @@ export const DatabaseTableGrid = ({
                 const isNewRow = params.row.__is__new__row;
                 return isChanged || isNewRow ? "changed-cell" : "";
               }}
-              sx={{
-                "--unstable_DataGrid-radius": "0",
-                "& .MuiDataGrid-root": {
-                  borderRadius: 0,
-                },
-                "& .MuiIconButton-root": {
-                  outline: "none",
-                },
-                "& .MuiDataGrid-cell": {
-                  fontSize: "0.875rem",
-                  lineHeight: "1.25rem",
-                  fontWeight: "400",
-                },
-                "& .MuiCheckbox-root": {
-                  padding: "4px",
-                },
-                "& .MuiDataGrid-columnHeaderCheckbox": {
-                  minWidth: "auto !important",
-                  width: "auto !important",
-                  flex: "0 0 auto !important",
-                  padding: "0.25rem !important",
-                  "& .MuiDataGrid-columnHeaderTitleContainer": {
-                    width: "auto",
-                    minWidth: "auto",
-                    flex: "none",
-                  },
-                },
-                "& .MuiDataGrid-cellCheckbox": {
-                  minWidth: "auto !important",
-                  width: "auto !important",
-                  flex: "0 0 auto !important",
-                  color: "hsl(var(--primary))",
-                  padding: "0.25rem !important",
-                },
-              }}
+              sx={DATAGRID_SX}
               onRowSelectionModelChange={
                 _handleMultipleSelectedRowsQueryBuilder
               }

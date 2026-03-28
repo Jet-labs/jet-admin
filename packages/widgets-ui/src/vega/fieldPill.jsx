@@ -71,7 +71,8 @@ export const FieldPill = ({
         <Button
           type="button"
           variant="ghost"
-          size="icon"
+          size="sm"
+          square
           onClick={(e) => { e.stopPropagation(); onRemove(); }}
           className="ml-auto h-4 w-4 rounded-full hover:bg-black/10 text-xs text-muted-foreground"
           title="Remove"

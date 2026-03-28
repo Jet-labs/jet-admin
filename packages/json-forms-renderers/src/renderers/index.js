@@ -17,6 +17,7 @@ export { CustomKeyValueTypeArrayRenderer } from './CustomKeyValueTypeArrayRender
 export { CustomKeyTypeArrayRenderer } from './CustomKeyTypeArrayRenderer.jsx';
 export { CustomStringArrayRenderer } from './CustomStringArrayRenderer.jsx';
 export { CustomFieldOperatorValueArrayRenderer } from './CustomFieldOperatorValueArrayRenderer.jsx';
+export { CustomGenericObjectArrayRenderer } from './CustomGenericObjectArrayRenderer.jsx';
 export { CustomGroupLayout } from './CustomGroupLayout.jsx';
 export { CustomRadioInput } from './CustomRadioInput.jsx';
 export { CustomVerticalLayout } from './CustomVerticalLayout.jsx';
@@ -35,6 +36,7 @@ import { CustomKeyValueTypeArrayRenderer } from './CustomKeyValueTypeArrayRender
 import { CustomKeyTypeArrayRenderer } from './CustomKeyTypeArrayRenderer.jsx';
 import { CustomStringArrayRenderer } from './CustomStringArrayRenderer.jsx';
 import { CustomFieldOperatorValueArrayRenderer } from './CustomFieldOperatorValueArrayRenderer.jsx';
+import { CustomGenericObjectArrayRenderer } from './CustomGenericObjectArrayRenderer.jsx';
 import { CustomGroupLayout } from './CustomGroupLayout.jsx';
 import { CustomRadioInput } from './CustomRadioInput.jsx';
 import { CustomVerticalLayout } from './CustomVerticalLayout.jsx';
@@ -53,6 +55,7 @@ export const JetKeyValueTypeArrayControl = withJsonFormsControlProps(CustomKeyVa
 export const JetKeyTypeArrayControl = withJsonFormsControlProps(CustomKeyTypeArrayRenderer);
 export const JetStringArrayControl = withJsonFormsControlProps(CustomStringArrayRenderer);
 export const JetFieldOperatorValueArrayControl = withJsonFormsControlProps(CustomFieldOperatorValueArrayRenderer);
+export const JetGenericObjectArrayControl = withJsonFormsControlProps(CustomGenericObjectArrayRenderer);
 export const JetGroupLayout = withJsonFormsLayoutProps(CustomGroupLayout);
 export const JetRadioControl = withJsonFormsControlProps(CustomRadioInput);
 export const JetVerticalLayout = withJsonFormsLayoutProps(CustomVerticalLayout);

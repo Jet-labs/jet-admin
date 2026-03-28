@@ -1,4 +1,4 @@
-import { DataGrid, gridClasses, useGridApiRef } from "@mui/x-data-grid";
+import { DataGrid, useGridApiRef } from "@mui/x-data-grid";
 import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
@@ -6,6 +6,7 @@ import { useRoleManagementState } from "../../../logic/contexts/roleManagementCo
 import { NoEntityUI } from "../ui/noEntityUI";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import { Badge } from "@jet-admin/ui";
+import { DATAGRID_SX } from "../../../shared/dataGridTheme";
 
 export const TenantRolesList = () => {
   const {
@@ -21,55 +22,33 @@ export const TenantRolesList = () => {
   const columns = [
     {
       field: "roleID",
-      display: "flex",
-      // width: 300,
-      headerClassName: "bg-muted text-foreground font-semibold",
       flex: 1,
       headerName: "Role ID",
     },
     {
       field: "roleTitle",
-      display: "flex",
-      // width: 300,
-      headerClassName: "bg-muted text-foreground font-semibold",
       flex: 1,
       headerName: "Role Name",
     },
     {
       field: "roleDescription",
-      display: "flex",
-      // width: 300,
-      headerClassName: "bg-muted text-foreground font-semibold",
-      flex: 1,
+      flex: 2,
       headerName: "Role Description",
     },
     {
       field: "tenantID",
-      display: "flex",
-      // width: 300,
-      headerClassName: "bg-muted text-foreground font-semibold",
+      headerName: "Role Type",
       flex: 1,
-      headerName: "Role type",
-      renderCell: (params) => {
-        return params.value ? (
-          <Badge variant="warning">
-            Custom role
-          </Badge>
-        ) : (
-            <Badge
-              variant="outline"
-              className="border-primary/50 bg-primary/10 text-primary"
-            >
-            Global role
-            </Badge>
-        );
-      },
+      renderCell: ({ value }) => (
+        <Badge
+          variant={value ? "warning" : "outline"}
+          className={!value ? "border-primary/30 bg-primary/5 text-primary" : ""}
+        >
+          {value ? "Custom Role" : "Global Role"}
+        </Badge>
+      ),
     },
   ];
-
-  const _getRowID = (row) => {
-    return row.roleID;
-  };
 
   const _handleRowClick = (tenantRoleID) => {
     navigate(
@@ -83,61 +62,24 @@ export const TenantRolesList = () => {
       error={tenantRolesError}
     >
       {tenantRoles?.roles?.length ? (
-        <div className="flex h-full w-full flex-grow flex-col items-stretch justify-between overflow-y-auto text-sm font-medium text-foreground">
+        <div className="flex h-full w-full flex-col overflow-hidden bg-background">
           <DataGrid
             apiRef={apiRef}
             rows={tenantRoles.roles}
             columns={columns}
-            density="compact"
             loading={isLoadingTenantRoles || isFetchingTenantRoles}
-            getRowId={(row) => _getRowID(row)}
-            sx={{
-              [`& .${gridClasses.cell}:focus, & .${gridClasses.cell}:focus-within`]:
-                {
-                  outline: "none",
-                },
-              [`& .${gridClasses.columnHeader}:focus, & .${gridClasses.columnHeader}:focus-within`]:
-                {
-                  outline: "none",
-                },
-              "--unstable_DataGrid-radius": "0",
-              "& .MuiDataGrid-row": {
-                "&:hover": {
-                  cursor: "pointer",
-                },
-              },
-              "& .MuiIconButton-root": {
-                outline: "none",
-              },
-              "& .MuiDataGrid-cell": {
-                fontSize: "0.875rem",
-                lineHeight: "1.25rem",
-                fontWeight: "400",
-              },
-            }}
+            getRowId={(row) => row.roleID}
+            sx={DATAGRID_SX}
+            getRowHeight={() => "auto"}
             className="!border-0"
-            onRowClick={(params) => {
-              _handleRowClick(params.id);
-            }}
-            // paginationMode="server"
-            //   rowCount={
-            //     databaseTableStatistics
-            //       ? parseInt(databaseTableStatistics.databaseTableRowCount)
-            //       : 0
-            //   }
-            // pageSizeOptions={[20, 50, 100]}
-            // paginationModel={{ page: page - 1, pageSize }}
-            // onPaginationModelChange={({ page: newPage, pageSize: newPageSize }) => {
-            //   setPage(newPage + 1); // Convert to 1-based for API
-            //   setPageSize(newPageSize);
-            // }}
+            onRowClick={(params) => _handleRowClick(params.id)}
             hideFooterPagination
             hideFooterSelectedRowCount
           />
         </div>
       ) : (
-          <div className="w-full p-2">
-            <NoEntityUI message="No roles found" />
+        <div className="w-full p-2">
+          <NoEntityUI message="No roles found" />
         </div>
       )}
     </ReactQueryLoadingErrorWrapper>

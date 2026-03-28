@@ -464,7 +464,8 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                                 type="button"
                                                 onClick={stopTestRun}
                                                 variant="destructive"
-                                                size="icon"
+                                                size="sm"
+                                                square
                                                 className="h-8 w-8"
                                                 title="Stop Test"
                                             >

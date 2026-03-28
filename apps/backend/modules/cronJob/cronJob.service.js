@@ -2,9 +2,6 @@ const Logger = require("../../utils/logger"); // Adjust path as needed
 const cron = require("node-cron");
 const { prisma } = require("../../config/prisma.config"); // Adjust path as needed
 const { workflowService } = require("../workflow/workflow.service");
-const {
-  tenantAwarePostgreSQLPoolManager,
-} = require("../../config/tenant-aware-pgpool-manager.config");
 const constants = require("../../constants");
 const { resolveInputs } = require("../../utils/inputArgs.util");
 const { extractWorkflowDefinitions } = require("../../utils/definitionProvider.util");
@@ -300,19 +297,20 @@ cronJobService.deleteCronJobByID = async ({ userID, tenantID, cronJobID }) => {
   });
 
   try {
-    // Prisma will cascade delete history based on the schema relation (onDelete: Cascade)
+    // Delete history first, then the job inside a transaction
     const deletedCronJob = await prisma.$transaction(async (tx) => {
       await tx.tblCronJobHistory.deleteMany({
         where: {
           cronJobID: cronJobID,
         },
       });
-      await tx.tblCronJobs.delete({
+      const deleted = await tx.tblCronJobs.delete({
         where: {
           cronJobID: cronJobID,
           tenantID: tenantID,
         },
       });
+      return deleted;
     });
     Logger.log("info", {
       message: "cronJobService:deleteCronJobByID:deleted",
@@ -323,7 +321,7 @@ cronJobService.deleteCronJobByID = async ({ userID, tenantID, cronJobID }) => {
       message: "cronJobService:deleteCronJobByID:success",
       params: { userID, tenantID, cronJobID },
     });
-    return deletedCronJob; // Return the object that was deleted
+    return deletedCronJob;
   } catch (error) {
     Logger.log("error", {
       message: "cronJobService:deleteCronJobByID:failure",
@@ -346,10 +344,6 @@ cronJobService.runCronJob = async ({ cronJob }) => {
   });
   const startTime = new Date();
   try {
-    const dbPool = await tenantAwarePostgreSQLPoolManager.getPool(
-      cronJob.tenantID
-    );
-
     // Resolve & validate inputs through the unified pipeline
     const rawInputArgs = cronJob.workflowConfig?.inputArgs || {};
     let definitions = [];
@@ -368,18 +362,7 @@ cronJobService.runCronJob = async ({ cronJob }) => {
         message: "cronJobService:runCronJob:inputValidationFailed",
         params: { cronJobID: cronJob.cronJobID, errors },
       });
-      await prisma.tblCronJobHistory.create({
-        data: {
-          cronJobID: cronJob.cronJobID,
-          result: JSON.stringify({ message: "Input validation failed", errors }),
-          triggerType: "SCHEDULED",
-          status: constants.CRON_JOB_STATUS.FAILURE,
-          scheduledAt: startTime,
-          startTime: startTime,
-          endTime: new Date(),
-          durationMs: new Date() - startTime,
-        },
-      });
+      // Don't create history here — the catch block will handle it
       throw new Error(`Cron job input validation failed: ${JSON.stringify(errors)}`);
     }
 
@@ -416,7 +399,7 @@ cronJobService.runCronJob = async ({ cronJob }) => {
     await prisma.tblCronJobHistory.create({
       data: {
         cronJobID: cronJob.cronJobID,
-        result: JSON.stringify(error),
+        result: JSON.stringify({ message: error.message, stack: error.stack }),
         triggerType: "SCHEDULED",
         status: constants.CRON_JOB_STATUS.FAILURE,
         scheduledAt: startTime,
@@ -438,27 +421,35 @@ cronJobService.scheduleCronJobOnChange = async ({ cronJob }) => {
   try {
     Logger.log("info", {
       message: "cronJobService:scheduleCronJobOnChange:init",
-      params: { cronJob },
+      params: { cronJobID: cronJob.cronJobID, isDisabled: cronJob.isDisabled },
     });
-    const scheduledCronJobs = global.scheduledCronJobs;
-    if (scheduledCronJobs) {
-      if (scheduledCronJobs[cronJob.cronJobID]) {
-        scheduledCronJobs[cronJob.cronJobID].stop();
-        Logger.log("info", {
-          message: "cronJobService:scheduleCronJobOnChange:stopped",
-          params: { cronJobID: cronJob.cronJobID },
-        });
-        delete scheduledCronJobs[cronJob.cronJobID];
-        global.scheduledCronJobs = scheduledCronJobs;
-      }
-    } else {
+
+    // Initialize global map if needed
+    if (!global.scheduledCronJobs) {
       global.scheduledCronJobs = {};
+    }
+
+    const scheduledCronJobs = global.scheduledCronJobs;
+
+    // Always stop existing schedule first
+    if (scheduledCronJobs[cronJob.cronJobID]) {
+      scheduledCronJobs[cronJob.cronJobID].stop();
       Logger.log("info", {
-        message:
-          "cronJobService:scheduleCronJobOnChange:scheduledCronJobs created",
+        message: "cronJobService:scheduleCronJobOnChange:stopped",
         params: { cronJobID: cronJob.cronJobID },
       });
+      delete scheduledCronJobs[cronJob.cronJobID];
     }
+
+    // If disabled, do NOT schedule a new job
+    if (cronJob.isDisabled) {
+      Logger.log("info", {
+        message: "cronJobService:scheduleCronJobOnChange:disabled, skipping schedule",
+        params: { cronJobID: cronJob.cronJobID },
+      });
+      return;
+    }
+
     const job = cron.schedule(
       cronJob.cronJobSchedule,
       () => cronJobService.runCronJob({ cronJob }),

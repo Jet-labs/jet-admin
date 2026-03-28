@@ -75,7 +75,8 @@ export const TenantStats = ({ tenants }) => {
                     CONSTANTS.ROUTES.UPDATE_TENANT.path(tenant.tenantID)
                   );
                 }}
-                variant="ghost" size="icon" className="text-gray-500 hover:text-primary"
+                variant="ghost" size="sm"
+                square className="text-gray-500 hover:text-primary"
               >
                 <FaCog />
               </Button>

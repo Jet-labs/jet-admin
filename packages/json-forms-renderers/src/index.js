@@ -21,6 +21,7 @@ export {
   CustomKeyTypeArrayRenderer,
   CustomStringArrayRenderer,
   CustomFieldOperatorValueArrayRenderer,
+  CustomGenericObjectArrayRenderer,
   
   // Layout Renderers
   CustomGroupLayout,
@@ -48,6 +49,7 @@ export {
   JetKeyTypeArrayControl,
   JetStringArrayControl,
   JetFieldOperatorValueArrayControl,
+  JetGenericObjectArrayControl,
   
   // Layout Components
   JetGroupLayout,
@@ -72,6 +74,7 @@ export {
   keyTypeArrayTester,
   stringArrayTester,
   fieldOperatorValueArrayTester,
+  genericObjectArrayTester,
   groupLayoutTester,
   verticalLayoutTester,
   tabRendererTester,

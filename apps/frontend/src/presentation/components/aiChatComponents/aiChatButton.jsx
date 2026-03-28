@@ -231,7 +231,8 @@ export const AIChatButton = () => {
                                     <p className="text-xs text-gray-500">Analytics & Automation</p>
                                 </div>
                             </div>
-                            <Button onClick={_handleCloseAIChat} variant="ghost" size="icon" className="rounded-full">
+                            <Button onClick={_handleCloseAIChat} variant="ghost" size="sm"
+                                square className="rounded-full">
                                 <IoClose size={20} />
                             </Button>
                         </div>

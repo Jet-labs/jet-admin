@@ -19,6 +19,26 @@ import {
   SelectValue,
 } from "@jet-admin/ui";
 
+function Section({ title, description, children }) {
+  return (
+    <div className="rounded border border-border bg-card p-4 space-y-3">
+      {(title || description) && (
+        <div>
+          {title && (
+            <p className="text-[10px] font-mono font-semibold uppercase tracking-widest text-muted-foreground mb-0.5">
+              {title}
+            </p>
+          )}
+          {description && (
+            <p className="text-[11px] text-muted-foreground">{description}</p>
+          )}
+        </div>
+      )}
+      {children}
+    </div>
+  );
+}
+
 const injectQueryArgsIntoUiSchema = (uiSchema, queryArgs) => {
   if (!uiSchema || typeof uiSchema !== "object") {
     return uiSchema;
@@ -116,39 +136,36 @@ export const DataQueryEditor = ({
   );
 
   return (
-    <>
+    <div className="space-y-4">
       {/* JSON Forms for datasourceOptions */}
-      <div className="space-y-1">
-        <Label
-          htmlFor="datasourceID"
-          className="text-sm font-medium leading-none"
-        >
-          {CONSTANTS.STRINGS.DATASOURCE_EDITOR_FORM_TYPE_FIELD_LABEL}
-        </Label>
+      <Section title="Identity">
+        <div className="space-y-1.5">
+          <Label htmlFor="datasourceID">
+            {CONSTANTS.STRINGS.DATASOURCE_EDITOR_FORM_TYPE_FIELD_LABEL} <span className="text-destructive">*</span>
+          </Label>
 
-        <Select value={dataQueryEditorForm.values.datasourceID} onValueChange={_handleDatasourceTypeChange}>
-          <SelectTrigger>
-            <SelectValue placeholder="Select datasource" />
-          </SelectTrigger>
-          <SelectContent>
-            {datasources?.map((datasource) => (
-              <SelectItem key={datasource.value} value={datasource.value}>
-                {datasource.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        {dataQueryEditorForm.errors.datasourceID && (
-          <span className="text-destructive text-xs">
-            {dataQueryEditorForm.errors.datasourceID}
-          </span>
-        )}
-      </div>
-
-      <>
+          <Select value={dataQueryEditorForm.values.datasourceID} onValueChange={_handleDatasourceTypeChange}>
+            <SelectTrigger>
+              <SelectValue placeholder="Select datasource" />
+            </SelectTrigger>
+            <SelectContent>
+              {datasources?.map((datasource) => (
+                <SelectItem key={datasource.value} value={datasource.value}>
+                  {datasource.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          {dataQueryEditorForm.errors.datasourceID && (
+            <p className="text-xs text-red-500">
+              {dataQueryEditorForm.errors.datasourceID}
+            </p>
+          )}
+        </div>
+      </Section>
         {DATASOURCE_UI_COMPONENTS[dataQueryEditorForm.values.datasourceType] &&
           currentDatasourceType?.queryConfigForm && (
-          <div className="mt-4 border-t border-border pt-4">
+        <Section title="Query Details">
             <JsonForms
               key={uniqueKey}
               schema={currentDatasourceType.queryConfigForm.schema}
@@ -160,9 +177,8 @@ export const DataQueryEditor = ({
               validationMode="ValidateAndShow"
               onChange={_handleDatasourceOptionsChange}
             />
-          </div>
-          )}
-      </>
-    </>
+          </Section>
+        )}
+    </div>
   );
 };

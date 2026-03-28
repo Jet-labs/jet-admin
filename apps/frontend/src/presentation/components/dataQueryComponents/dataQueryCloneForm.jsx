@@ -41,13 +41,14 @@ export const DataQueryCloneForm = ({ tenantID, dataQueryID }) => {
   );
 
   const _handleCloneQuery = async () => {
-    await showConfirmation({
+    const confirmed = await showConfirmation({
       title: CONSTANTS.STRINGS.CLONE_QUERY_DIALOG_TITLE,
       message: CONSTANTS.STRINGS.CLONE_QUERY_DIALOG_MESSAGE,
       confirmText: "Clone",
       cancelText: "Cancel",
       confirmButtonClass: "!bg-primary",
     });
+    if (!confirmed) return;
     cloneDataQuery();
   };
 
@@ -58,10 +59,11 @@ export const DataQueryCloneForm = ({ tenantID, dataQueryID }) => {
         disabled={isCloningDataQuery}
         type="button"
         variant="primary-ghost"
-        size="icon"
+        size="sm"
+        square
       >
         {isCloningDataQuery ? (
-          <Spinner size={16} />
+          <Spinner size={14} />
         ) : (
             <FaRegClone className="size-4 text-primary" />
         )}

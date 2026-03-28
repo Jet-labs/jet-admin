@@ -7,7 +7,7 @@ import {
 // src/renderers/CustomNumberInput.jsx
 import React from "react";
 import PropTypes from "prop-types";
-import { Input } from "@jet-admin/ui";
+import { Input, Label } from "@jet-admin/ui";
 var CustomNumberInput = (props) => {
   const {
     data,
@@ -31,30 +31,29 @@ var CustomNumberInput = (props) => {
     }
   };
   const step = uischema.options?.step || schema.multipleOf || (schema.type === "integer" ? 1 : "any");
+  const hasErrors = errors && errors.length > 0;
   return /* @__PURE__ */ React.createElement("div", { className: "mb-3" }, /* @__PURE__ */ React.createElement(
-    "label",
+    Label,
     {
       htmlFor: path,
-      className: `block mb-1 text-xs font-medium ${errors && errors.length > 0 ? "text-red-500" : "text-slate-500"}`
+      className: `block mb-1 text-xs font-medium ${hasErrors ? "text-red-500" : "text-muted-foreground"}`
     },
-    label || description,
-    " ",
-    errors && errors.length > 0 && errors
-  ), errors && errors.length > 0 && /* @__PURE__ */ React.createElement("span", { className: "text-red-500 text-xs" }, errors), /* @__PURE__ */ React.createElement(
+    label || description
+  ), /* @__PURE__ */ React.createElement(
     Input,
     {
       type: "number",
       id: path,
       name: path,
-      className: `placeholder:text-slate-400 text-sm bg-slate-50 border focus:border-slate-700 ${errors && errors.length > 0 ? "border-red-500 focus:border-red-500" : "border-slate-200"} text-slate-700 rounded block w-full px-2.5 py-1.5`,
-      placeholder: errors && errors.length > 0 ? errors : uischema?.options?.placeholder || "",
+      className: hasErrors ? "border-red-500 focus:border-red-500" : "",
+      placeholder: hasErrors ? errors : uischema?.options?.placeholder || "",
       onChange: handleInputChange,
       value: data === void 0 || data === null ? "" : data,
       min: schema.minimum,
       max: schema.maximum,
       step
     }
-  ));
+  ), hasErrors && /* @__PURE__ */ React.createElement("p", { className: "text-xs text-red-500 mt-1" }, errors));
 };
 CustomNumberInput.propTypes = {
   data: PropTypes.number,
@@ -70,28 +69,27 @@ CustomNumberInput.propTypes = {
 // src/renderers/CustomTextInput.jsx
 import React2 from "react";
 import PropTypes2 from "prop-types";
-import { Input as Input2, Textarea } from "@jet-admin/ui";
+import { Input as Input2, Textarea, Label as Label2 } from "@jet-admin/ui";
 var CustomTextInput = (props) => {
   const { data, path, handleChange, label, description, errors, uischema, enabled } = props;
   const isMulti = uischema?.options?.multi;
   const isDisabled = enabled === false;
+  const hasErrors = errors && errors.length > 0;
   return /* @__PURE__ */ React2.createElement("div", { className: "mb-3" }, /* @__PURE__ */ React2.createElement(
-    "label",
+    Label2,
     {
       htmlFor: path,
-      className: `block mb-1 text-xs font-medium ${errors && errors.length > 0 ? "text-red-500" : "text-slate-500"}`
+      className: `block mb-1 text-xs font-medium ${hasErrors ? "text-red-500" : "text-muted-foreground"}`
     },
-    label || description,
-    " ",
-    errors && errors.length > 0 && errors
+    label || description
   ), isMulti ? /* @__PURE__ */ React2.createElement(
     Textarea,
     {
       id: path,
       name: path,
       disabled: isDisabled,
-      className: `placeholder:text-slate-400 text-sm bg-slate-50 border focus:border-slate-700 ${errors && errors.length > 0 ? "border-red-500 focus:border-red-500" : "border-slate-200"} text-slate-700 rounded block w-full px-2.5 py-1.5 disabled:opacity-50 disabled:cursor-not-allowed`,
-      placeholder: errors && errors.length > 0 ? errors : uischema?.options?.placeholder || "",
+      className: hasErrors ? "border-red-500 focus:border-red-500" : "",
+      placeholder: hasErrors ? errors : uischema?.options?.placeholder || "",
       onChange: (ev) => handleChange(path, ev.target.value),
       value: data || "",
       rows: uischema?.options?.rows || 3
@@ -103,12 +101,12 @@ var CustomTextInput = (props) => {
       id: path,
       name: path,
       disabled: isDisabled,
-      className: `placeholder:text-slate-400 text-sm bg-slate-50 border focus:border-slate-700 ${errors && errors.length > 0 ? "border-red-500 focus:border-red-500" : "border-slate-200"} text-slate-700 rounded block w-full px-2.5 py-1.5 disabled:opacity-50 disabled:cursor-not-allowed`,
-      placeholder: errors && errors.length > 0 ? errors : uischema?.options?.placeholder || "",
+      className: hasErrors ? "border-red-500 focus:border-red-500" : "",
+      placeholder: hasErrors ? errors : uischema?.options?.placeholder || "",
       onChange: (ev) => handleChange(path, ev.target.value),
       value: data || ""
     }
-  ));
+  ), hasErrors && /* @__PURE__ */ React2.createElement("p", { className: "text-xs text-red-500 mt-1" }, errors));
 };
 CustomTextInput.propTypes = {
   data: PropTypes2.string,
@@ -124,8 +122,8 @@ CustomTextInput.propTypes = {
 // src/renderers/CustomSelectInput.jsx
 import React3, { useState } from "react";
 import PropTypes3 from "prop-types";
-import { TbRefresh } from "react-icons/tb";
-import { Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
+import { RefreshCw } from "lucide-react";
+import { Button, Label as Label3, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
 var CustomSelectInput = (props) => {
   const {
     data,
@@ -168,33 +166,34 @@ var CustomSelectInput = (props) => {
       }
     }
   };
+  const hasErrors = errors && errors.length > 0;
   return /* @__PURE__ */ React3.createElement("div", { className: "mb-3" }, /* @__PURE__ */ React3.createElement(
-    "label",
+    Label3,
     {
       htmlFor: path,
-      className: `block mb-1 text-xs font-medium ${errors && errors.length > 0 ? "text-red-500" : "text-slate-500"}`
+      className: `block mb-1 text-xs font-medium ${hasErrors ? "text-red-500" : "text-muted-foreground"}`
     },
-    label || description,
-    " ",
-    errors && errors.length > 0 && errors
-  ), /* @__PURE__ */ React3.createElement("div", { className: `flex items-center gap-2 ${showRefreshButton ? "" : ""}` }, /* @__PURE__ */ React3.createElement(Select, { value: data || "", onValueChange: (val) => handleChange(path, val), disabled: isDisabled }, /* @__PURE__ */ React3.createElement(
+    label || description
+  ), /* @__PURE__ */ React3.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React3.createElement(Select, { value: data || "", onValueChange: (val) => handleChange(path, val), disabled: isDisabled }, /* @__PURE__ */ React3.createElement(
     SelectTrigger,
     {
       id: path,
-      className: `text-sm ${errors && errors.length > 0 ? "border-red-500" : ""}`
+      className: `text-sm ${hasErrors ? "border-red-500" : ""}`
     },
     /* @__PURE__ */ React3.createElement(SelectValue, { placeholder: uischema?.options?.placeholder || "Select an option" })
   ), /* @__PURE__ */ React3.createElement(SelectContent, null, options.map((optionValue) => /* @__PURE__ */ React3.createElement(SelectItem, { key: optionValue, value: optionValue }, getDisplayName(optionValue))))), showRefreshButton && onRefresh && /* @__PURE__ */ React3.createElement(
     Button,
     {
       type: "button",
+      variant: "outline",
+      size: "sm",
+      square: true,
       onClick: handleRefreshClick,
       disabled: isRefreshing || isDisabled,
-      className: "flex-shrink-0 bg-slate-50 p-1.5 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed border border-slate-200",
       title: "Refresh list"
     },
-    /* @__PURE__ */ React3.createElement(TbRefresh, { className: `w-5 h-5 ${isRefreshing ? "animate-spin" : ""}` })
-  )));
+    /* @__PURE__ */ React3.createElement(RefreshCw, { className: `w-4 h-4 ${isRefreshing ? "animate-spin" : ""}` })
+  )), hasErrors && /* @__PURE__ */ React3.createElement("p", { className: "text-xs text-red-500 mt-1" }, errors));
 };
 CustomSelectInput.propTypes = {
   data: PropTypes3.string,
@@ -211,7 +210,7 @@ CustomSelectInput.propTypes = {
 // src/renderers/CustomCheckboxInput.jsx
 import React4 from "react";
 import PropTypes4 from "prop-types";
-import { Checkbox } from "@jet-admin/ui";
+import { Checkbox, Label as Label4 } from "@jet-admin/ui";
 var CustomCheckboxInput = (props) => {
   const {
     data,
@@ -234,7 +233,7 @@ var CustomCheckboxInput = (props) => {
       disabled: !enabled,
       onCheckedChange: onToggle
     }
-  ), /* @__PURE__ */ React4.createElement("label", { htmlFor: path, className: "ml-2 text-sm font-medium text-slate-700" }, label || description || uischema.label), errors && errors.length > 0 && /* @__PURE__ */ React4.createElement("p", { className: "text-red-500 text-xs mt-1 ml-2" }, errors));
+  ), /* @__PURE__ */ React4.createElement(Label4, { htmlFor: path, className: "ml-2 text-sm font-medium text-foreground" }, label || description || uischema.label), errors && errors.length > 0 && /* @__PURE__ */ React4.createElement("p", { className: "text-red-500 text-xs mt-1 ml-2" }, errors));
 };
 CustomCheckboxInput.propTypes = {
   data: PropTypes4.bool,
@@ -250,7 +249,7 @@ CustomCheckboxInput.propTypes = {
 // src/renderers/CustomCodeEditorControl.jsx
 import React5, { useEffect, useMemo, useRef } from "react";
 import PropTypes5 from "prop-types";
-import { CodeEditor } from "@jet-admin/ui";
+import { CodeEditor, Label as Label5 } from "@jet-admin/ui";
 
 // src/renderers/templateCompletion.js
 var ROOT_COMPLETIONS = [
@@ -442,6 +441,7 @@ var CustomCodeEditorControl = ({
           }
           const suggestions = [];
           const tableMatch = text.match(/(\\b\\w+)\\.$/);
+          ;
           if (tableMatch) {
             const cols = schemaRef.current[tableMatch[1]] || [];
             cols.forEach(
@@ -578,15 +578,13 @@ var CustomCodeEditorControl = ({
   };
   const hasErrors = errors && errors.length > 0;
   return /* @__PURE__ */ React5.createElement("div", { className: "mb-3" }, /* @__PURE__ */ React5.createElement(
-    "label",
+    Label5,
     {
       htmlFor: path,
-      className: `block mb-1 text-xs font-medium ${hasErrors ? "text-red-500" : "text-slate-500"}`
+      className: `block mb-1 text-xs font-medium ${hasErrors ? "text-red-500" : "text-muted-foreground"}`
     },
-    label || description,
-    " ",
-    hasErrors && errors
-  ), hint && /* @__PURE__ */ React5.createElement("p", { className: "text-[10px] text-slate-400 mb-1" }, hint), /* @__PURE__ */ React5.createElement(
+    label || description
+  ), hint && /* @__PURE__ */ React5.createElement("p", { className: "text-[10px] text-muted-foreground mb-1" }, hint), /* @__PURE__ */ React5.createElement(
     CodeEditor,
     {
       value: data || placeholder || "",
@@ -598,7 +596,7 @@ var CustomCodeEditorControl = ({
       beforeMount: handleBeforeMount,
       status: hasErrors ? "error" : null
     }
-  ));
+  ), hasErrors && /* @__PURE__ */ React5.createElement("p", { className: "text-xs text-red-500 mt-1" }, errors));
 };
 CustomCodeEditorControl.propTypes = {
   data: PropTypes5.string,
@@ -615,30 +613,32 @@ CustomCodeEditorControl.propTypes = {
 // src/renderers/CustomSuggestionInput.jsx
 import React6, { useState as useState2 } from "react";
 import PropTypes6 from "prop-types";
-import { Button as Button2, Input as Input3 } from "@jet-admin/ui";
+import { Button as Button2, Input as Input3, Label as Label6 } from "@jet-admin/ui";
 var CustomSuggestionInput = (props) => {
   const { data, path, handleChange, label, description, errors, uischema, enabled } = props;
   const { suggestions, placeholder } = uischema.options || {};
   const [isOpen, setIsOpen] = useState2(false);
+  const hasErrors = errors && errors.length > 0;
   const handleSelect = (value) => {
     const currentVal = data || "";
     handleChange(path, currentVal + value);
     setIsOpen(false);
   };
   return /* @__PURE__ */ React6.createElement("div", { className: "relative mb-3" }, /* @__PURE__ */ React6.createElement(
-    "label",
+    Label6,
     {
       htmlFor: path,
-      className: `block mb-1 text-xs font-medium ${errors && errors.length > 0 ? "text-red-500" : "text-slate-500"} flex justify-between items-center`
+      className: `block mb-1 text-xs font-medium ${hasErrors ? "text-red-500" : "text-muted-foreground"} flex justify-between items-center`
     },
-    /* @__PURE__ */ React6.createElement("span", null, label || description, " ", errors && errors.length > 0 && errors),
+    /* @__PURE__ */ React6.createElement("span", null, label || description),
     suggestions && suggestions.length > 0 && /* @__PURE__ */ React6.createElement(
       Button2,
       {
         type: "button",
+        variant: "ghost",
+        size: "sm",
         onClick: () => setIsOpen(!isOpen),
-        disabled: !enabled,
-        className: "text-[10px] bg-slate-100 text-purple-600 px-1.5 py-0.5 rounded border border-transparent hover:border-purple-200"
+        disabled: !enabled
       },
       "Map +"
     )
@@ -649,16 +649,16 @@ var CustomSuggestionInput = (props) => {
       id: path,
       name: path,
       disabled: !enabled,
-      className: `placeholder:text-slate-400 text-sm bg-slate-50 border focus:border-slate-700 ${errors && errors.length > 0 ? "border-red-500 focus:border-red-500" : "border-slate-200"} text-slate-700 rounded block w-full px-2.5 py-1.5`,
+      className: hasErrors ? "border-red-500 focus:border-red-500" : "",
       placeholder: errors || placeholder || "",
       onChange: (ev) => handleChange(path, ev.target.value),
       value: data || ""
     }
-  ), isOpen && suggestions && /* @__PURE__ */ React6.createElement("div", { className: "absolute right-0 top-6 w-48 bg-white border border-slate-200 shadow-xl rounded z-[50] max-h-40 overflow-y-auto" }, /* @__PURE__ */ React6.createElement("div", { className: "p-2 border-b border-slate-100 flex justify-between items-center bg-slate-50" }, /* @__PURE__ */ React6.createElement("span", { className: "text-[10px] font-semibold text-slate-500" }, "Pick a node"), /* @__PURE__ */ React6.createElement(Button2, { type: "button", onClick: () => setIsOpen(false), className: "text-slate-400 hover:text-slate-600" }, "\xD7")), suggestions.length === 0 ? /* @__PURE__ */ React6.createElement("div", { className: "px-2 py-1 text-[10px] text-slate-400 italic" }, "No suggestions") : suggestions.map((item, idx) => /* @__PURE__ */ React6.createElement(
+  ), hasErrors && /* @__PURE__ */ React6.createElement("p", { className: "text-xs text-red-500 mt-1" }, errors), isOpen && suggestions && /* @__PURE__ */ React6.createElement("div", { className: "absolute right-0 top-6 w-48 bg-background border border-border shadow-xl rounded z-[50] max-h-40 overflow-y-auto" }, /* @__PURE__ */ React6.createElement("div", { className: "p-2 border-b border-border flex justify-between items-center bg-muted/50" }, /* @__PURE__ */ React6.createElement("span", { className: "text-[10px] font-semibold text-muted-foreground" }, "Pick a node"), /* @__PURE__ */ React6.createElement(Button2, { type: "button", variant: "ghost", size: "sm", onClick: () => setIsOpen(false) }, "\xD7")), suggestions.length === 0 ? /* @__PURE__ */ React6.createElement("div", { className: "px-2 py-1 text-[10px] text-muted-foreground italic" }, "No suggestions") : suggestions.map((item, idx) => /* @__PURE__ */ React6.createElement(
     "div",
     {
       key: idx,
-      className: "px-2 py-1.5 text-xs hover:bg-purple-50 cursor-pointer truncate text-slate-700 border-b border-slate-50 last:border-0",
+      className: "px-2 py-1.5 text-xs hover:bg-primary/5 cursor-pointer truncate text-foreground border-b border-border/50 last:border-0",
       onClick: () => handleSelect(item.value)
     },
     item.label
@@ -678,8 +678,8 @@ CustomSuggestionInput.propTypes = {
 // src/renderers/DynamicArgsControl.jsx
 import React7, { useState as useState3, useRef as useRef2, useEffect as useEffect2, useMemo as useMemo2 } from "react";
 import PropTypes7 from "prop-types";
-import { TbVariable } from "react-icons/tb";
-import { Button as Button3, Input as Input4 } from "@jet-admin/ui";
+import { Variable } from "lucide-react";
+import { Button as Button3, Input as Input4, Label as Label7 } from "@jet-admin/ui";
 var DynamicArgsControl = (props) => {
   const { data, path, handleChange, uischema, errors } = props;
   const args = uischema?.options?.args || [];
@@ -744,7 +744,7 @@ var DynamicArgsControl = (props) => {
   if (args.length === 0) {
     return null;
   }
-  return /* @__PURE__ */ React7.createElement("div", { className: "border border-slate-200 rounded p-3 mt-2 bg-white" }, /* @__PURE__ */ React7.createElement("label", { className: "block mb-2 text-xs font-medium text-slate-500" }, "Arguments"), /* @__PURE__ */ React7.createElement("div", { className: "space-y-2" }, args.map((arg, index) => {
+  return /* @__PURE__ */ React7.createElement("div", { className: "border border-border rounded p-3 mt-2 bg-background" }, /* @__PURE__ */ React7.createElement(Label7, { className: "block mb-2 text-xs font-medium text-muted-foreground" }, "Arguments"), /* @__PURE__ */ React7.createElement("div", { className: "space-y-2" }, args.map((arg, index) => {
     const argName = arg.key;
     return /* @__PURE__ */ React7.createElement(
       ArgInputWithVariablePicker,
@@ -756,7 +756,7 @@ var DynamicArgsControl = (props) => {
         availableVariables
       }
     );
-  })), errors && errors.length > 0 && /* @__PURE__ */ React7.createElement("span", { className: "text-red-500 text-xs mt-1" }, errors));
+  })), errors && errors.length > 0 && /* @__PURE__ */ React7.createElement("p", { className: "text-red-500 text-xs mt-1" }, errors));
 };
 var ArgInputWithVariablePicker = ({ argName, value, onChange, availableVariables }) => {
   const [showDropdown, setShowDropdown] = useState3(false);
@@ -791,13 +791,12 @@ var ArgInputWithVariablePicker = ({ argName, value, onChange, availableVariables
   };
   const inputVariables = availableVariables.filter((v) => v.category === "input");
   const nodeVariables = availableVariables.filter((v) => v.category === "node");
-  return /* @__PURE__ */ React7.createElement("div", { className: "flex flex-row justify-between items-center gap-2" }, /* @__PURE__ */ React7.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React7.createElement("label", { className: "block mb-1 text-[10px] font-medium text-slate-400" }, argName), /* @__PURE__ */ React7.createElement("div", { className: "flex items-center gap-1" }, /* @__PURE__ */ React7.createElement(
+  return /* @__PURE__ */ React7.createElement("div", { className: "flex flex-row justify-between items-center gap-2" }, /* @__PURE__ */ React7.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React7.createElement(Label7, { className: "block mb-1 text-[10px] font-medium text-muted-foreground" }, argName), /* @__PURE__ */ React7.createElement("div", { className: "flex items-center gap-1" }, /* @__PURE__ */ React7.createElement(
     Input4,
     {
       ref: inputRef,
       type: "text",
       id: `arg-${argName}`,
-      className: "placeholder:text-slate-400 text-xs w-full bg-slate-50 border border-slate-200 text-slate-700 rounded focus:outline-none focus:border-slate-400 block px-2.5 py-1.5",
       placeholder: `Value for ${argName}`,
       value,
       onChange: (e) => onChange(e.target.value)
@@ -806,31 +805,35 @@ var ArgInputWithVariablePicker = ({ argName, value, onChange, availableVariables
     Button3,
     {
       type: "button",
+      variant: "outline",
+      size: "sm",
+      square: true,
       onClick: () => setShowDropdown(!showDropdown),
-      className: `flex-shrink-0 p-1.5 rounded transition-colors border border-slate-200 bg-slate-50 ${availableVariables.length > 0 ? "text-blue-500 hover:text-blue-700 hover:bg-blue-50" : "text-slate-400 hover:text-slate-500 hover:bg-slate-100"}`,
       title: "Insert variable from previous node"
     },
-    /* @__PURE__ */ React7.createElement(TbVariable, { className: "w-4 h-4" })
-  ), showDropdown && /* @__PURE__ */ React7.createElement("div", { className: "absolute right-0 top-full mt-1 w-64 bg-white border border-slate-200 rounded shadow-lg z-50 max-h-64 overflow-y-auto" }, availableVariables.length === 0 ? /* @__PURE__ */ React7.createElement("div", { className: "px-2 py-3 text-xs text-slate-400 text-center" }, "No variables available yet.", /* @__PURE__ */ React7.createElement("br", null), /* @__PURE__ */ React7.createElement("span", { className: "text-[10px]" }, "Add workflow inputs or connect upstream nodes.")) : /* @__PURE__ */ React7.createElement(React7.Fragment, null, inputVariables.length > 0 && /* @__PURE__ */ React7.createElement(React7.Fragment, null, /* @__PURE__ */ React7.createElement("div", { className: "px-2 py-1.5 text-[10px] font-semibold text-green-600 uppercase tracking-wider border-b border-slate-100 bg-green-50" }, "\u{1F4E5} Workflow Inputs"), inputVariables.map((variable, idx) => /* @__PURE__ */ React7.createElement(
+    /* @__PURE__ */ React7.createElement(Variable, { className: "w-4 h-4" })
+  ), showDropdown && /* @__PURE__ */ React7.createElement("div", { className: "absolute right-0 top-full mt-1 w-64 bg-background border border-border rounded shadow-lg z-50 max-h-64 overflow-y-auto" }, availableVariables.length === 0 ? /* @__PURE__ */ React7.createElement("div", { className: "px-2 py-3 text-xs text-muted-foreground text-center" }, "No variables available yet.", /* @__PURE__ */ React7.createElement("br", null), /* @__PURE__ */ React7.createElement("span", { className: "text-[10px]" }, "Add workflow inputs or connect upstream nodes.")) : /* @__PURE__ */ React7.createElement(React7.Fragment, null, inputVariables.length > 0 && /* @__PURE__ */ React7.createElement(React7.Fragment, null, /* @__PURE__ */ React7.createElement("div", { className: "px-2 py-1.5 text-[10px] font-semibold text-primary uppercase tracking-wider border-b border-border bg-primary/5" }, "\u{1F4E5} Workflow Inputs"), inputVariables.map((variable, idx) => /* @__PURE__ */ React7.createElement(
     Button3,
     {
       key: `input-${idx}`,
       type: "button",
+      variant: "ghost",
       onClick: () => insertVariable(variable.contextPath),
-      className: "w-full bg-white text-left px-2 py-1.5 hover:bg-green-50 hover:border-none border-none rounded-none transition-colors border-b border-slate-50"
+      className: "w-full text-left px-2 py-1.5 hover:bg-primary/5 rounded-none border-b border-border/50"
     },
-    /* @__PURE__ */ React7.createElement("div", { className: "text-xs font-medium text-slate-700 font-mono" }, variable.contextPath),
-    /* @__PURE__ */ React7.createElement("div", { className: "text-[10px] text-slate-400 truncate" }, "type: ", variable.type || "any")
-  ))), nodeVariables.length > 0 && /* @__PURE__ */ React7.createElement(React7.Fragment, null, /* @__PURE__ */ React7.createElement("div", { className: "px-2 py-1.5 text-[10px] font-semibold text-blue-600 uppercase tracking-wider border-b border-slate-100 bg-blue-50" }, "\u{1F4E4} Upstream Node Outputs"), nodeVariables.map((variable, idx) => /* @__PURE__ */ React7.createElement(
+    /* @__PURE__ */ React7.createElement("div", { className: "text-xs font-medium text-foreground font-mono" }, variable.contextPath),
+    /* @__PURE__ */ React7.createElement("div", { className: "text-[10px] text-muted-foreground truncate" }, "type: ", variable.type || "any")
+  ))), nodeVariables.length > 0 && /* @__PURE__ */ React7.createElement(React7.Fragment, null, /* @__PURE__ */ React7.createElement("div", { className: "px-2 py-1.5 text-[10px] font-semibold text-primary uppercase tracking-wider border-b border-border bg-primary/5" }, "\u{1F4E4} Upstream Node Outputs"), nodeVariables.map((variable, idx) => /* @__PURE__ */ React7.createElement(
     Button3,
     {
       key: `node-${idx}`,
       type: "button",
+      variant: "ghost",
       onClick: () => insertVariable(variable.contextPath),
-      className: "w-full bg-white text-left px-2 py-1.5 hover:bg-blue-50 hover:border-none border-none rounded-none transition-colors border-b border-slate-50 last:border-b-0"
+      className: "w-full text-left px-2 py-1.5 hover:bg-primary/5 rounded-none border-b border-border/50 last:border-b-0"
     },
-    /* @__PURE__ */ React7.createElement("div", { className: "text-xs font-medium text-slate-700 font-mono" }, variable.contextPath),
-    /* @__PURE__ */ React7.createElement("div", { className: "text-[10px] text-slate-400 truncate" }, "from: ", variable.nodeTitle)
+    /* @__PURE__ */ React7.createElement("div", { className: "text-xs font-medium text-foreground font-mono" }, variable.contextPath),
+    /* @__PURE__ */ React7.createElement("div", { className: "text-[10px] text-muted-foreground truncate" }, "from: ", variable.nodeTitle)
   )))))))));
 };
 DynamicArgsControl.propTypes = {
@@ -845,8 +848,8 @@ DynamicArgsControl.propTypes = {
 import React8 from "react";
 import PropTypes8 from "prop-types";
 import { JsonFormsDispatch } from "@jsonforms/react";
-import { MdDeleteOutline } from "react-icons/md";
-import { Button as Button4 } from "@jet-admin/ui";
+import { Trash2 } from "lucide-react";
+import { Button as Button4, Label as Label8 } from "@jet-admin/ui";
 var CustomKeyValueArrayRenderer = ({
   data,
   path,
@@ -873,7 +876,7 @@ var CustomKeyValueArrayRenderer = ({
     const newItems = items.filter((_, i) => i !== index);
     handleChange(path, newItems);
   };
-  return /* @__PURE__ */ React8.createElement("div", { className: "p-3 border border-slate-200 rounded bg-white mb-3" }, /* @__PURE__ */ React8.createElement("label", { className: "block mb-1 text-sm font-medium text-slate-700" }, label || uischema.label || "Items"), errors && errors.length > 0 && /* @__PURE__ */ React8.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ React8.createElement("div", { className: "gap-2" }, items.map((item, index) => /* @__PURE__ */ React8.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2" }, /* @__PURE__ */ React8.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ React8.createElement(
+  return /* @__PURE__ */ React8.createElement("div", { className: "p-3 border border-border rounded bg-background mb-3" }, /* @__PURE__ */ React8.createElement(Label8, { className: "block mb-1 text-sm font-medium text-foreground" }, label || uischema.label || "Items"), errors && errors.length > 0 && /* @__PURE__ */ React8.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ React8.createElement("div", { className: "gap-2" }, items.map((item, index) => /* @__PURE__ */ React8.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2" }, /* @__PURE__ */ React8.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ React8.createElement(
     JsonFormsDispatch,
     {
       uischema: {
@@ -905,16 +908,20 @@ var CustomKeyValueArrayRenderer = ({
     Button4,
     {
       type: "button",
-      onClick: () => handleRemoveItem(index),
-      className: "mt-2 p-2 rounded bg-red-100 text-red-400 focus:outline-none hover:border-red-400"
+      variant: "destructive-ghost",
+      size: "sm",
+      square: true,
+      onClick: () => handleRemoveItem(index)
     },
-    /* @__PURE__ */ React8.createElement(MdDeleteOutline, null)
+    /* @__PURE__ */ React8.createElement(Trash2, { className: "w-4 h-4" })
   )))), /* @__PURE__ */ React8.createElement(
     Button4,
     {
       type: "button",
+      variant: "primary-ghost",
+      size: "sm",
       onClick: handleAddItem,
-      className: "mt-3 px-2 py-1 bg-white text-[#646cff] text-xs rounded hover:border-[#646cff] focus:outline-none border border-slate-200"
+      className: "mt-3"
     },
     "Add Item"
   ));
@@ -936,8 +943,8 @@ CustomKeyValueArrayRenderer.propTypes = {
 import React9 from "react";
 import PropTypes9 from "prop-types";
 import { JsonFormsDispatch as JsonFormsDispatch2 } from "@jsonforms/react";
-import { MdDeleteOutline as MdDeleteOutline2 } from "react-icons/md";
-import { Button as Button5 } from "@jet-admin/ui";
+import { Trash2 as Trash22 } from "lucide-react";
+import { Button as Button5, Label as Label9 } from "@jet-admin/ui";
 var CustomKeyValueTypeArrayRenderer = ({
   data,
   path,
@@ -964,7 +971,7 @@ var CustomKeyValueTypeArrayRenderer = ({
     const newItems = items.filter((_, i) => i !== index);
     handleChange(path, newItems);
   };
-  return /* @__PURE__ */ React9.createElement("div", { className: "p-3 border border-slate-200 rounded bg-white mb-3" }, /* @__PURE__ */ React9.createElement("label", { className: "block mb-1 text-sm font-medium text-slate-700" }, label || uischema.label || "Items"), errors && errors.length > 0 && /* @__PURE__ */ React9.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ React9.createElement("div", { className: "gap-2" }, items.map((item, index) => /* @__PURE__ */ React9.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2" }, /* @__PURE__ */ React9.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ React9.createElement(
+  return /* @__PURE__ */ React9.createElement("div", { className: "p-3 border border-border rounded bg-background mb-3" }, /* @__PURE__ */ React9.createElement(Label9, { className: "block mb-1 text-sm font-medium text-foreground" }, label || uischema.label || "Items"), errors && errors.length > 0 && /* @__PURE__ */ React9.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ React9.createElement("div", { className: "gap-2" }, items.map((item, index) => /* @__PURE__ */ React9.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2" }, /* @__PURE__ */ React9.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ React9.createElement(
     JsonFormsDispatch2,
     {
       uischema: {
@@ -1010,16 +1017,20 @@ var CustomKeyValueTypeArrayRenderer = ({
     Button5,
     {
       type: "button",
-      onClick: () => handleRemoveItem(index),
-      className: "mt-2 p-2 rounded bg-red-100 text-red-400 focus:outline-none hover:border-red-400"
+      variant: "destructive-ghost",
+      size: "sm",
+      square: true,
+      onClick: () => handleRemoveItem(index)
     },
-    /* @__PURE__ */ React9.createElement(MdDeleteOutline2, null)
+    /* @__PURE__ */ React9.createElement(Trash22, { className: "w-4 h-4" })
   )))), /* @__PURE__ */ React9.createElement(
     Button5,
     {
       type: "button",
+      variant: "primary-ghost",
+      size: "sm",
       onClick: handleAddItem,
-      className: "mt-3 px-2 py-1 bg-white text-[#646cff] text-xs rounded hover:border-[#646cff] focus:outline-none border border-slate-200"
+      className: "mt-3"
     },
     "Add Item"
   ));
@@ -1041,8 +1052,8 @@ CustomKeyValueTypeArrayRenderer.propTypes = {
 import React10 from "react";
 import PropTypes10 from "prop-types";
 import { JsonFormsDispatch as JsonFormsDispatch3 } from "@jsonforms/react";
-import { MdDeleteOutline as MdDeleteOutline3 } from "react-icons/md";
-import { Button as Button6 } from "@jet-admin/ui";
+import { Trash2 as Trash23 } from "lucide-react";
+import { Button as Button6, Label as Label10 } from "@jet-admin/ui";
 var CustomKeyTypeArrayRenderer = ({
   data,
   path,
@@ -1069,7 +1080,7 @@ var CustomKeyTypeArrayRenderer = ({
     const newItems = items.filter((_, i) => i !== index);
     handleChange(path, newItems);
   };
-  return /* @__PURE__ */ React10.createElement("div", { className: "p-3 border mt-3 border-slate-200 rounded bg-white mb-3" }, /* @__PURE__ */ React10.createElement("label", { className: "block mb-1 text-sm font-medium text-slate-700" }, label || uischema.label || "Items"), errors && errors.length > 0 && /* @__PURE__ */ React10.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ React10.createElement("div", { className: "flex flex-col gap-2" }, items.map((item, index) => /* @__PURE__ */ React10.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2" }, /* @__PURE__ */ React10.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ React10.createElement(
+  return /* @__PURE__ */ React10.createElement("div", { className: "p-3 border mt-3 border-border rounded bg-background mb-3" }, /* @__PURE__ */ React10.createElement(Label10, { className: "block mb-1 text-sm font-medium text-foreground" }, label || uischema.label || "Items"), errors && errors.length > 0 && /* @__PURE__ */ React10.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ React10.createElement("div", { className: "flex flex-col gap-2" }, items.map((item, index) => /* @__PURE__ */ React10.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2" }, /* @__PURE__ */ React10.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ React10.createElement(
     JsonFormsDispatch3,
     {
       uischema: {
@@ -1103,16 +1114,20 @@ var CustomKeyTypeArrayRenderer = ({
     Button6,
     {
       type: "button",
-      onClick: () => handleRemoveItem(index),
-      className: "mt-2 p-2 rounded bg-red-100 text-red-400 focus:outline-none hover:border-red-400"
+      variant: "destructive-ghost",
+      size: "sm",
+      square: true,
+      onClick: () => handleRemoveItem(index)
     },
-    /* @__PURE__ */ React10.createElement(MdDeleteOutline3, null)
+    /* @__PURE__ */ React10.createElement(Trash23, { className: "w-4 h-4" })
   )))), /* @__PURE__ */ React10.createElement(
     Button6,
     {
       type: "button",
+      variant: "primary-ghost",
+      size: "sm",
       onClick: handleAddItem,
-      className: "mt-3 px-2 py-1 bg-white text-[#646cff] text-xs rounded hover:border-[#646cff] focus:outline-none border border-slate-200"
+      className: "mt-3"
     },
     "Add Item"
   ));
@@ -1133,8 +1148,8 @@ CustomKeyTypeArrayRenderer.propTypes = {
 // src/renderers/CustomStringArrayRenderer.jsx
 import React11 from "react";
 import PropTypes11 from "prop-types";
-import { MdDeleteOutline as MdDeleteOutline4 } from "react-icons/md";
-import { Button as Button7, Input as Input5 } from "@jet-admin/ui";
+import { Trash2 as Trash24 } from "lucide-react";
+import { Button as Button7, Input as Input5, Label as Label11 } from "@jet-admin/ui";
 var CustomStringArrayRenderer = (props) => {
   const { data, path, handleChange, label, uischema, enabled, visible } = props;
   const arrayData = Array.isArray(data) ? data : [];
@@ -1153,32 +1168,35 @@ var CustomStringArrayRenderer = (props) => {
   if (visible === false) {
     return null;
   }
-  return /* @__PURE__ */ React11.createElement("div", { className: "p-3 border border-slate-200 rounded bg-white mb-3" }, /* @__PURE__ */ React11.createElement("label", { className: "block mb-1 text-sm font-medium text-slate-700" }, label || uischema?.label || "Items"), /* @__PURE__ */ React11.createElement("div", { className: "gap-2" }, arrayData.map((item, index) => /* @__PURE__ */ React11.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2 mb-2" }, /* @__PURE__ */ React11.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ React11.createElement(
+  return /* @__PURE__ */ React11.createElement("div", { className: "p-3 border border-border rounded bg-background mb-3" }, /* @__PURE__ */ React11.createElement(Label11, { className: "block mb-1 text-sm font-medium text-foreground" }, label || uischema?.label || "Items"), /* @__PURE__ */ React11.createElement("div", { className: "gap-2" }, arrayData.map((item, index) => /* @__PURE__ */ React11.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2 mb-2" }, /* @__PURE__ */ React11.createElement("div", { className: "flex-grow" }, /* @__PURE__ */ React11.createElement(
     Input5,
     {
       type: "text",
       value: item || "",
       onChange: (e) => handleItemChange(index, e.target.value),
       disabled: !enabled,
-      placeholder: "Enter value...",
-      className: "w-full placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-200 text-slate-700 rounded focus:border-slate-400 focus:outline-none px-2.5 py-1.5 disabled:opacity-50 disabled:cursor-not-allowed"
+      placeholder: "Enter value..."
     }
   )), /* @__PURE__ */ React11.createElement(
     Button7,
     {
       type: "button",
+      variant: "destructive-ghost",
+      size: "sm",
+      square: true,
       onClick: () => handleRemoveItem(index),
-      disabled: !enabled,
-      className: "p-2 rounded bg-red-100 text-red-400 focus:outline-none hover:border-red-400 disabled:opacity-50 disabled:cursor-not-allowed"
+      disabled: !enabled
     },
-    /* @__PURE__ */ React11.createElement(MdDeleteOutline4, null)
-  )))), arrayData.length === 0 && /* @__PURE__ */ React11.createElement("div", { className: "text-xs text-slate-400 italic py-2" }, "No items added yet."), /* @__PURE__ */ React11.createElement(
+    /* @__PURE__ */ React11.createElement(Trash24, { className: "w-4 h-4" })
+  )))), arrayData.length === 0 && /* @__PURE__ */ React11.createElement("div", { className: "text-xs text-muted-foreground italic py-2" }, "No items added yet."), /* @__PURE__ */ React11.createElement(
     Button7,
     {
       type: "button",
+      variant: "primary-ghost",
+      size: "sm",
       onClick: handleAddItem,
       disabled: !enabled,
-      className: "mt-3 px-2 py-1 bg-white text-[#646cff] text-xs rounded hover:border-[#646cff] focus:outline-none border border-slate-200 disabled:opacity-50 disabled:cursor-not-allowed"
+      className: "mt-3"
     },
     "Add Item"
   ));
@@ -1196,8 +1214,8 @@ CustomStringArrayRenderer.propTypes = {
 // src/renderers/CustomFieldOperatorValueArrayRenderer.jsx
 import React12 from "react";
 import PropTypes12 from "prop-types";
-import { MdDeleteOutline as MdDeleteOutline5 } from "react-icons/md";
-import { Button as Button8, Input as Input6, Select as Select2, SelectContent as SelectContent2, SelectItem as SelectItem2, SelectTrigger as SelectTrigger2, SelectValue as SelectValue2 } from "@jet-admin/ui";
+import { Trash2 as Trash25 } from "lucide-react";
+import { Button as Button8, Input as Input6, Label as Label12, Select as Select2, SelectContent as SelectContent2, SelectItem as SelectItem2, SelectTrigger as SelectTrigger2, SelectValue as SelectValue2 } from "@jet-admin/ui";
 var CustomFieldOperatorValueArrayRenderer = ({
   data,
   path,
@@ -1236,7 +1254,7 @@ var CustomFieldOperatorValueArrayRenderer = ({
     newItems[index] = { ...newItems[index], [field]: value };
     handleChange(path, newItems);
   };
-  return /* @__PURE__ */ React12.createElement("div", { className: "p-3 border border-slate-200 rounded bg-white mb-3" }, /* @__PURE__ */ React12.createElement("label", { className: "block mb-2 text-sm font-medium text-slate-700" }, label || uischema.label || "Conditions"), errors && errors.length > 0 && /* @__PURE__ */ React12.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ React12.createElement("div", { className: "space-y-2" }, items.map((item, index) => /* @__PURE__ */ React12.createElement("div", { key: `${path}-${index}`, className: "flex items-center gap-2" }, /* @__PURE__ */ React12.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React12.createElement(
+  return /* @__PURE__ */ React12.createElement("div", { className: "p-3 border border-border rounded bg-background mb-3" }, /* @__PURE__ */ React12.createElement(Label12, { className: "block mb-2 text-sm font-medium text-foreground" }, label || uischema.label || "Conditions"), errors && errors.length > 0 && /* @__PURE__ */ React12.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ React12.createElement("div", { className: "space-y-2" }, items.map((item, index) => /* @__PURE__ */ React12.createElement("div", { key: `${path}-${index}`, className: "flex items-center gap-2" }, /* @__PURE__ */ React12.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React12.createElement(
     Input6,
     {
       type: "text",
@@ -1244,7 +1262,7 @@ var CustomFieldOperatorValueArrayRenderer = ({
       value: item.field || "",
       disabled: isDisabled,
       onChange: (e) => handleItemChange(index, "field", e.target.value),
-      className: "w-full px-2.5 py-1.5 text-sm bg-slate-50 border border-slate-200 rounded text-slate-700 placeholder:text-slate-400 focus:border-slate-700 disabled:opacity-50"
+      className: errors && errors.length > 0 ? "border-red-500" : ""
     }
   )), /* @__PURE__ */ React12.createElement("div", { className: "w-36" }, /* @__PURE__ */ React12.createElement(Select2, { value: item.operator || "==", onValueChange: (val) => handleItemChange(index, "operator", val), disabled: isDisabled }, /* @__PURE__ */ React12.createElement(SelectTrigger2, { className: "text-sm" }, /* @__PURE__ */ React12.createElement(SelectValue2, null)), /* @__PURE__ */ React12.createElement(SelectContent2, null, operatorOptions.map((op) => /* @__PURE__ */ React12.createElement(SelectItem2, { key: op, value: op }, op))))), /* @__PURE__ */ React12.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React12.createElement(
     Input6,
@@ -1253,25 +1271,28 @@ var CustomFieldOperatorValueArrayRenderer = ({
       placeholder: "Value",
       value: item.value || "",
       disabled: isDisabled,
-      onChange: (e) => handleItemChange(index, "value", e.target.value),
-      className: "w-full px-2.5 py-1.5 text-sm bg-slate-50 border border-slate-200 rounded text-slate-700 placeholder:text-slate-400 focus:border-slate-700 disabled:opacity-50"
+      onChange: (e) => handleItemChange(index, "value", e.target.value)
     }
   )), /* @__PURE__ */ React12.createElement(
     Button8,
     {
       type: "button",
+      variant: "destructive-ghost",
+      size: "sm",
+      square: true,
       onClick: () => handleRemoveItem(index),
-      disabled: isDisabled,
-      className: "p-2 rounded bg-red-100 text-red-400 focus:outline-none hover:bg-red-200 disabled:opacity-50"
+      disabled: isDisabled
     },
-    /* @__PURE__ */ React12.createElement(MdDeleteOutline5, null)
+    /* @__PURE__ */ React12.createElement(Trash25, { className: "w-4 h-4" })
   )))), /* @__PURE__ */ React12.createElement(
     Button8,
     {
       type: "button",
+      variant: "primary-ghost",
+      size: "sm",
       onClick: handleAddItem,
       disabled: isDisabled,
-      className: "mt-3 px-2 py-1 bg-white text-[#646cff] text-xs rounded hover:border-[#646cff] focus:outline-none border border-slate-200 disabled:opacity-50"
+      className: "mt-3"
     },
     "Add Condition"
   ));
@@ -1287,20 +1308,102 @@ CustomFieldOperatorValueArrayRenderer.propTypes = {
   enabled: PropTypes12.bool
 };
 
-// src/renderers/CustomGroupLayout.jsx
+// src/renderers/CustomGenericObjectArrayRenderer.jsx
 import React13 from "react";
 import PropTypes13 from "prop-types";
 import { JsonFormsDispatch as JsonFormsDispatch4 } from "@jsonforms/react";
+import { Trash2 as Trash26 } from "lucide-react";
+import { Button as Button9, Label as Label13 } from "@jet-admin/ui";
+var CustomGenericObjectArrayRenderer = ({
+  data,
+  path,
+  handleChange,
+  schema,
+  uischema,
+  errors,
+  label,
+  enabled,
+  renderers
+}) => {
+  const items = data || [];
+  const itemSchema = schema.items;
+  const propertyKeys = itemSchema?.properties ? Object.keys(itemSchema.properties) : [];
+  const handleAddItem = () => {
+    const newItem = itemSchema.properties ? Object.fromEntries(
+      Object.entries(itemSchema.properties).map(([key, propSchema]) => [
+        key,
+        propSchema.default !== void 0 ? propSchema.default : ""
+      ])
+    ) : {};
+    handleChange(path, [...items, newItem]);
+  };
+  const handleRemoveItem = (index) => {
+    const newItems = items.filter((_, i) => i !== index);
+    handleChange(path, newItems);
+  };
+  if (propertyKeys.length === 0) {
+    return null;
+  }
+  return /* @__PURE__ */ React13.createElement("div", { className: "p-3 border border-border rounded bg-background mb-3" }, /* @__PURE__ */ React13.createElement(Label13, { className: "block mb-1 text-sm font-medium text-foreground" }, label || uischema.label || "Items"), errors && errors.length > 0 && /* @__PURE__ */ React13.createElement("p", { className: "text-red-500 text-xs mb-2" }, errors), /* @__PURE__ */ React13.createElement("div", { className: "flex flex-col gap-2" }, items.map((item, index) => /* @__PURE__ */ React13.createElement("div", { key: `${path}-${index}`, className: "flex items-center space-x-2" }, propertyKeys.map((propKey) => /* @__PURE__ */ React13.createElement("div", { key: propKey, className: "flex-grow" }, /* @__PURE__ */ React13.createElement(
+    JsonFormsDispatch4,
+    {
+      uischema: {
+        type: "Control",
+        scope: `#/properties/${propKey}`,
+        label: propKey.charAt(0).toUpperCase() + propKey.slice(1)
+      },
+      schema: itemSchema,
+      path: `${path}.${index}`,
+      enabled,
+      renderers
+    }
+  ))), /* @__PURE__ */ React13.createElement(
+    Button9,
+    {
+      type: "button",
+      variant: "destructive-ghost",
+      size: "sm",
+      square: true,
+      onClick: () => handleRemoveItem(index)
+    },
+    /* @__PURE__ */ React13.createElement(Trash26, { className: "w-4 h-4" })
+  )))), items.length === 0 && /* @__PURE__ */ React13.createElement("div", { className: "text-xs text-muted-foreground italic py-2" }, "No items added yet."), /* @__PURE__ */ React13.createElement(
+    Button9,
+    {
+      type: "button",
+      variant: "primary-ghost",
+      size: "sm",
+      onClick: handleAddItem,
+      className: "mt-3"
+    },
+    "Add Item"
+  ));
+};
+CustomGenericObjectArrayRenderer.propTypes = {
+  data: PropTypes13.arrayOf(PropTypes13.object),
+  path: PropTypes13.string.isRequired,
+  handleChange: PropTypes13.func.isRequired,
+  schema: PropTypes13.object.isRequired,
+  uischema: PropTypes13.object.isRequired,
+  label: PropTypes13.string,
+  errors: PropTypes13.arrayOf(PropTypes13.string),
+  enabled: PropTypes13.bool,
+  renderers: PropTypes13.arrayOf(PropTypes13.object).isRequired
+};
+
+// src/renderers/CustomGroupLayout.jsx
+import React14 from "react";
+import PropTypes14 from "prop-types";
+import { JsonFormsDispatch as JsonFormsDispatch5 } from "@jsonforms/react";
 var CustomGroupLayout = (props) => {
   const { uischema, schema, path, visible, enabled, renderers, cells } = props;
   const elements = uischema.elements || [];
   const customClass = uischema.options?.customClass || "";
-  console.log("[CustomGroupLayout] Rendering group:", uischema.label, "visible:", visible);
   if (!visible) {
     return null;
   }
-  return /* @__PURE__ */ React13.createElement("div", { className: `border border-slate-200 rounded p-3 mt-2 bg-white ${customClass}` }, uischema.label && /* @__PURE__ */ React13.createElement("h3", { className: "text-xs font-medium text-slate-500 mb-2" }, uischema.label), /* @__PURE__ */ React13.createElement("div", { className: "flex flex-col gap-2" }, elements.map((element, index) => /* @__PURE__ */ React13.createElement(
-    JsonFormsDispatch4,
+  return /* @__PURE__ */ React14.createElement("div", { className: `border border-border rounded p-3 mt-2 bg-background ${customClass}` }, uischema.label && /* @__PURE__ */ React14.createElement("h3", { className: "text-xs font-medium text-muted-foreground mb-2" }, uischema.label), /* @__PURE__ */ React14.createElement("div", { className: "flex flex-col gap-2" }, elements.map((element, index) => /* @__PURE__ */ React14.createElement(
+    JsonFormsDispatch5,
     {
       key: index,
       uischema: element,
@@ -1313,18 +1416,19 @@ var CustomGroupLayout = (props) => {
   ))));
 };
 CustomGroupLayout.propTypes = {
-  uischema: PropTypes13.object.isRequired,
-  schema: PropTypes13.object.isRequired,
-  path: PropTypes13.string.isRequired,
-  visible: PropTypes13.bool.isRequired,
-  enabled: PropTypes13.bool.isRequired,
-  renderers: PropTypes13.arrayOf(PropTypes13.object).isRequired,
-  cells: PropTypes13.arrayOf(PropTypes13.object)
+  uischema: PropTypes14.object.isRequired,
+  schema: PropTypes14.object.isRequired,
+  path: PropTypes14.string.isRequired,
+  visible: PropTypes14.bool.isRequired,
+  enabled: PropTypes14.bool.isRequired,
+  renderers: PropTypes14.arrayOf(PropTypes14.object).isRequired,
+  cells: PropTypes14.arrayOf(PropTypes14.object)
 };
 
 // src/renderers/CustomRadioInput.jsx
-import React14 from "react";
-import PropTypes14 from "prop-types";
+import React15 from "react";
+import PropTypes15 from "prop-types";
+import { Label as Label14, RadioGroup, RadioGroupItem } from "@jet-admin/ui";
 var CustomRadioInput = (props) => {
   const {
     data,
@@ -1355,59 +1459,55 @@ var CustomRadioInput = (props) => {
     }
     return optionValue.charAt(0).toUpperCase() + optionValue.slice(1).replace(/([A-Z])/g, " $1");
   };
-  return /* @__PURE__ */ React14.createElement("div", { className: "mb-3" }, /* @__PURE__ */ React14.createElement(
-    "label",
+  const hasErrors = errors && errors.length > 0;
+  return /* @__PURE__ */ React15.createElement("div", { className: "mb-3" }, /* @__PURE__ */ React15.createElement(
+    Label14,
     {
-      className: `block mb-2 text-xs font-medium ${errors && errors.length > 0 ? "text-red-500" : "text-slate-500"}`
+      className: `block mb-2 text-xs font-medium ${hasErrors ? "text-red-500" : "text-muted-foreground"}`
     },
-    label || description,
-    " ",
-    errors && errors.length > 0 && errors
-  ), /* @__PURE__ */ React14.createElement("div", { className: `flex ${orientation === "vertical" ? "flex-col gap-2" : "flex-row flex-wrap gap-4"}` }, options.map((optionValue) => /* @__PURE__ */ React14.createElement(
-    "label",
+    label || description
+  ), /* @__PURE__ */ React15.createElement(
+    RadioGroup,
     {
-      key: optionValue,
-      className: `flex items-center gap-2 cursor-pointer ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}`
+      value: data || "",
+      onValueChange: (val) => handleChange(path, val),
+      disabled: isDisabled,
+      className: `flex ${orientation === "vertical" ? "flex-col gap-2" : "flex-row flex-wrap gap-4"}`
     },
-    /* @__PURE__ */ React14.createElement(
-      "input",
+    options.map((optionValue) => /* @__PURE__ */ React15.createElement("div", { key: optionValue, className: "flex items-center gap-2" }, /* @__PURE__ */ React15.createElement(RadioGroupItem, { value: optionValue, id: `${path}-${optionValue}` }), /* @__PURE__ */ React15.createElement(
+      Label14,
       {
-        type: "radio",
-        name: path,
-        value: optionValue,
-        checked: data === optionValue,
-        disabled: isDisabled,
-        onChange: (ev) => handleChange(path, ev.target.value),
-        className: "w-4 h-4 text-indigo-600 bg-slate-50 border-slate-300 focus:ring-indigo-500 focus:ring-2"
-      }
-    ),
-    /* @__PURE__ */ React14.createElement("span", { className: `text-sm ${data === optionValue ? "text-slate-700 font-medium" : "text-slate-600"}` }, getDisplayName(optionValue))
-  ))));
+        htmlFor: `${path}-${optionValue}`,
+        className: `text-sm ${data === optionValue ? "text-foreground font-medium" : "text-muted-foreground"}`
+      },
+      getDisplayName(optionValue)
+    )))
+  ), hasErrors && /* @__PURE__ */ React15.createElement("p", { className: "text-xs text-red-500 mt-1" }, errors));
 };
 CustomRadioInput.propTypes = {
-  data: PropTypes14.string,
-  path: PropTypes14.string.isRequired,
-  handleChange: PropTypes14.func.isRequired,
-  label: PropTypes14.string,
-  description: PropTypes14.string,
-  errors: PropTypes14.arrayOf(PropTypes14.string),
-  schema: PropTypes14.object.isRequired,
-  uischema: PropTypes14.object.isRequired,
-  enabled: PropTypes14.bool
+  data: PropTypes15.string,
+  path: PropTypes15.string.isRequired,
+  handleChange: PropTypes15.func.isRequired,
+  label: PropTypes15.string,
+  description: PropTypes15.string,
+  errors: PropTypes15.arrayOf(PropTypes15.string),
+  schema: PropTypes15.object.isRequired,
+  uischema: PropTypes15.object.isRequired,
+  enabled: PropTypes15.bool
 };
 
 // src/renderers/CustomVerticalLayout.jsx
-import React15 from "react";
-import PropTypes15 from "prop-types";
-import { JsonFormsDispatch as JsonFormsDispatch5 } from "@jsonforms/react";
+import React16 from "react";
+import PropTypes16 from "prop-types";
+import { JsonFormsDispatch as JsonFormsDispatch6 } from "@jsonforms/react";
 var CustomVerticalLayout = (props) => {
   const { uischema, schema, path, visible, enabled, renderers, cells } = props;
   const elements = uischema.elements || [];
   if (!visible) {
     return null;
   }
-  return /* @__PURE__ */ React15.createElement("div", { className: "flex flex-col" }, elements.map((element, index) => /* @__PURE__ */ React15.createElement(
-    JsonFormsDispatch5,
+  return /* @__PURE__ */ React16.createElement("div", { className: "flex flex-col" }, elements.map((element, index) => /* @__PURE__ */ React16.createElement(
+    JsonFormsDispatch6,
     {
       key: index,
       uischema: element,
@@ -1420,20 +1520,20 @@ var CustomVerticalLayout = (props) => {
   )));
 };
 CustomVerticalLayout.propTypes = {
-  uischema: PropTypes15.object.isRequired,
-  schema: PropTypes15.object.isRequired,
-  path: PropTypes15.string.isRequired,
-  visible: PropTypes15.bool.isRequired,
-  enabled: PropTypes15.bool.isRequired,
-  renderers: PropTypes15.arrayOf(PropTypes15.object).isRequired,
-  cells: PropTypes15.arrayOf(PropTypes15.object)
+  uischema: PropTypes16.object.isRequired,
+  schema: PropTypes16.object.isRequired,
+  path: PropTypes16.string.isRequired,
+  visible: PropTypes16.bool.isRequired,
+  enabled: PropTypes16.bool.isRequired,
+  renderers: PropTypes16.arrayOf(PropTypes16.object).isRequired,
+  cells: PropTypes16.arrayOf(PropTypes16.object)
 };
 
 // src/renderers/CustomTabRenderer.jsx
-import React16, { useState as useState4 } from "react";
-import PropTypes16 from "prop-types";
-import { JsonFormsDispatch as JsonFormsDispatch6 } from "@jsonforms/react";
-import { Button as Button9 } from "@jet-admin/ui";
+import React17, { useState as useState4 } from "react";
+import PropTypes17 from "prop-types";
+import { JsonFormsDispatch as JsonFormsDispatch7 } from "@jsonforms/react";
+import { Button as Button10 } from "@jet-admin/ui";
 var CustomTabRenderer = (props) => {
   const { uischema, schema, path, enabled, renderers, cells } = props;
   const categories = uischema.elements || [];
@@ -1442,17 +1542,18 @@ var CustomTabRenderer = (props) => {
     return null;
   }
   const activeCategory = categories[activeTab];
-  return /* @__PURE__ */ React16.createElement("div", { className: "custom-tabs-container" }, /* @__PURE__ */ React16.createElement("div", { className: "flex border-slate-300" }, categories.map((category, index) => /* @__PURE__ */ React16.createElement(
-    Button9,
+  return /* @__PURE__ */ React17.createElement("div", { className: "custom-tabs-container" }, /* @__PURE__ */ React17.createElement("div", { className: "flex border-border" }, categories.map((category, index) => /* @__PURE__ */ React17.createElement(
+    Button10,
     {
       key: category.label || `tab-${index}`,
-      className: `px-4 mr-2 py-2 text-sm font-medium rounded ${index === activeTab ? "text-[#646cff] border-slate-200" : "text-slate-700"} focus:outline-none bg-white`,
+      variant: "ghost",
+      className: `px-4 mr-2 py-2 text-sm font-medium rounded ${index === activeTab ? "text-primary bg-primary/5" : "text-foreground"}`,
       onClick: () => setActiveTab(index),
       type: "button"
     },
     category.label
-  ))), /* @__PURE__ */ React16.createElement("div", { className: "p-3 border mt-3 border-slate-200 rounded bg-white flex flex-col gap-2" }, activeCategory?.elements.map((element, i) => /* @__PURE__ */ React16.createElement(
-    JsonFormsDispatch6,
+  ))), /* @__PURE__ */ React17.createElement("div", { className: "p-3 border mt-3 border-border rounded bg-background flex flex-col gap-2" }, activeCategory?.elements.map((element, i) => /* @__PURE__ */ React17.createElement(
+    JsonFormsDispatch7,
     {
       key: i,
       uischema: element,
@@ -1465,15 +1566,15 @@ var CustomTabRenderer = (props) => {
   ))));
 };
 CustomTabRenderer.propTypes = {
-  uischema: PropTypes16.shape({
-    type: PropTypes16.string.isRequired,
-    elements: PropTypes16.arrayOf(PropTypes16.object).isRequired
+  uischema: PropTypes17.shape({
+    type: PropTypes17.string.isRequired,
+    elements: PropTypes17.arrayOf(PropTypes17.object).isRequired
   }).isRequired,
-  schema: PropTypes16.object.isRequired,
-  path: PropTypes16.string.isRequired,
-  enabled: PropTypes16.bool.isRequired,
-  renderers: PropTypes16.arrayOf(PropTypes16.object).isRequired,
-  cells: PropTypes16.arrayOf(PropTypes16.object)
+  schema: PropTypes17.object.isRequired,
+  path: PropTypes17.string.isRequired,
+  enabled: PropTypes17.bool.isRequired,
+  renderers: PropTypes17.arrayOf(PropTypes17.object).isRequired,
+  cells: PropTypes17.arrayOf(PropTypes17.object)
 };
 
 // src/renderers/index.js
@@ -1489,6 +1590,7 @@ var JetKeyValueTypeArrayControl = withJsonFormsControlProps(CustomKeyValueTypeAr
 var JetKeyTypeArrayControl = withJsonFormsControlProps(CustomKeyTypeArrayRenderer);
 var JetStringArrayControl = withJsonFormsControlProps(CustomStringArrayRenderer);
 var JetFieldOperatorValueArrayControl = withJsonFormsControlProps(CustomFieldOperatorValueArrayRenderer);
+var JetGenericObjectArrayControl = withJsonFormsControlProps(CustomGenericObjectArrayRenderer);
 var JetGroupLayout = withJsonFormsLayoutProps(CustomGroupLayout);
 var JetRadioControl = withJsonFormsControlProps(CustomRadioInput);
 var JetVerticalLayout = withJsonFormsLayoutProps(CustomVerticalLayout);
@@ -1714,6 +1816,20 @@ var groupLayoutTester = rankWith(100, uiTypeIs("Group"));
 var verticalLayoutTester = (uischema) => {
   return uischema.type === "VerticalLayout" ? 10 : -1;
 };
+var genericObjectArrayTester = (uischema, rootSchema) => {
+  if (uischema.type !== "Control") return -1;
+  try {
+    const schemaAtScope = Resolve.schema(rootSchema, uischema.scope, rootSchema);
+    if (!schemaAtScope || schemaAtScope.type !== "array") return -1;
+    const itemSchema = schemaAtScope.items;
+    if (itemSchema?.type === "object" && itemSchema?.properties) {
+      return 20;
+    }
+    return -1;
+  } catch (e) {
+    return -1;
+  }
+};
 var tabRendererTester = (uischema) => {
   if (uischema.type === "Categorization") {
     return 50;
@@ -1734,6 +1850,7 @@ var jetFormsBaseRenderers = [
   { tester: keyTypeArrayTester, renderer: JetKeyTypeArrayControl },
   { tester: stringArrayTester, renderer: JetStringArrayControl },
   { tester: fieldOperatorValueArrayTester, renderer: JetFieldOperatorValueArrayControl },
+  { tester: genericObjectArrayTester, renderer: JetGenericObjectArrayControl },
   { tester: groupLayoutTester, renderer: JetGroupLayout },
   { tester: verticalLayoutTester, renderer: JetVerticalLayout }
 ];
@@ -1749,6 +1866,7 @@ export {
   CustomCodeEditorControl as CustomCodeJavascriptControl,
   CustomCodeEditorControl as CustomCodePgsqlControl,
   CustomFieldOperatorValueArrayRenderer,
+  CustomGenericObjectArrayRenderer,
   CustomGroupLayout,
   CustomKeyTypeArrayRenderer,
   CustomKeyValueArrayRenderer,
@@ -1768,6 +1886,7 @@ export {
   JetCodeEditorControl as JetCodePgsqlControl,
   JetDynamicArgsControl,
   JetFieldOperatorValueArrayControl,
+  JetGenericObjectArrayControl,
   JetGroupLayout,
   JetKeyTypeArrayControl,
   JetKeyValueArrayControl,
@@ -1786,6 +1905,7 @@ export {
   codeEditorTester as codePgsqlTester,
   dynamicArgsTester,
   fieldOperatorValueArrayTester,
+  genericObjectArrayTester,
   groupLayoutTester,
   jetFormsBaseRenderers,
   jetFormsRenderers,

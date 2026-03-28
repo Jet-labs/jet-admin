@@ -65,7 +65,8 @@ export const WorkflowSchemaPanel = ({ values, onClose }) => {
                         onClick={handleCopy}
                         type='button'
                         variant="ghost"
-                        size="icon"
+                        size="sm"
+                        square
                         className="h-8 w-8 text-muted-foreground hover:text-foreground"
                         title={copied ? 'Copied!' : 'Copy to clipboard'}
                     >
@@ -79,7 +80,8 @@ export const WorkflowSchemaPanel = ({ values, onClose }) => {
                         onClick={onClose}
                         type='button'
                         variant="ghost"
-                        size="icon"
+                        size="sm"
+                        square
                         className="h-8 w-8 text-muted-foreground hover:text-foreground"
                         title="Close"
                     >

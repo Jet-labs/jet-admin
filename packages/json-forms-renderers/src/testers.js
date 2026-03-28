@@ -318,6 +318,24 @@ export const verticalLayoutTester = (uischema) => {
 };
 
 // ============================================================================
+// Generic Object Array Tester (fallback for any object array)
+// ============================================================================
+export const genericObjectArrayTester = (uischema, rootSchema) => {
+  if (uischema.type !== "Control") return -1;
+  try {
+    const schemaAtScope = Resolve.schema(rootSchema, uischema.scope, rootSchema);
+    if (!schemaAtScope || schemaAtScope.type !== "array") return -1;
+    const itemSchema = schemaAtScope.items;
+    if (itemSchema?.type === "object" && itemSchema?.properties) {
+      return 20; // Lower than all specific array testers
+    }
+    return -1;
+  } catch (e) {
+    return -1;
+  }
+};
+
+// ============================================================================
 // Tab Renderer Tester (Categorization)
 // ============================================================================
 export const tabRendererTester = (uischema) => {

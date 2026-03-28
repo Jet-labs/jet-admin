@@ -43,7 +43,8 @@ export const DatabaseTableGridCellForeignKeyPopup = ({
                 to={foreignKeyReferenceLink()}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="bg-slate-100 p-1.5 rounded cursor-pointer hover:bg-slate-200"
+                onClick={(e) => e.stopPropagation()}
+                className="bg-slate-100 p-1.5 rounded cursor-pointer hover:bg-slate-200 text-slate-600 transition-colors"
             >
                 <BiLink size={14} />
             </Link>
@@ -51,15 +52,26 @@ export const DatabaseTableGridCellForeignKeyPopup = ({
             <Popover open={isPopupOpen} onOpenChange={setIsPopupOpen}>
                 <PopoverTrigger asChild>
                     <Button
+                        variant="ghost"
+                        size="sm"
+                        square
                         onClick={(e) => e.stopPropagation()}
-                        className="bg-slate-100 p-1.5 me-2 rounded cursor-pointer hover:bg-slate-200"
+                        className="bg-slate-100 p-1.5 me-2 rounded cursor-pointer hover:bg-slate-200 h-7 w-7 text-slate-600 border-0 outline-none hover:text-slate-800"
                         aria-haspopup="true"
                         aria-expanded={isPopupOpen}
                     >
                         <AiOutlineEye size={14} />
                     </Button>
                 </PopoverTrigger>
-                <PopoverContent align="end" className="w-96 p-2">
+                <PopoverContent 
+                    align="end" 
+                    className="w-96 p-2"
+                    onInteractOutside={(e) => {
+                        // Prevent the popover from immediately closing if user interacts with portals
+                        // inside the nested DataGrid (like slider/menus/selects)
+                        e.preventDefault();
+                    }}
+                >
                     <DatabaseTableGrid
                         tenantID={tenantID}
                         databaseSchemaName={databaseSchemaName}

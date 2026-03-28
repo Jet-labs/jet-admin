@@ -45,30 +45,42 @@ export const TenantAdditionForm = () => {
   });
 
   return (
-    <div className="flex w-full h-full flex-col items-center overflow-y-auto p-4 md:p-6 bg-background text-foreground">
-      <section className="max-w-2xl w-full">
-        <div className="space-y-4">
-          <h1 className="text-2xl font-semibold tracking-tight">
+    <div className="flex w-full h-full flex-col overflow-hidden bg-background">
+      <div className="flex items-center justify-between border-b border-border bg-background px-4 py-3 shrink-0">
+        <div>
+          <h1 className="text-base font-semibold tracking-tight text-foreground">
             {CONSTANTS.STRINGS.ADD_TENANT_FORM_TITLE}
           </h1>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            Create a new tenant with a dedicated database and brand identity.
+          </p>
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-y-auto p-4 md:p-8">
+        <section className="mx-auto max-w-2xl w-full">
           <form
             className="space-y-4"
             onSubmit={addTenantForm.handleSubmit}
+            noValidate
           >
             <TenantEditor tenantEditorForm={addTenantForm} />
 
-            <Button
-              type="submit"
-              disabled={isCreatingNewTenant}
-            >
-              {isCreatingNewTenant && (
-                <Spinner className="mr-2" size={16} />
-              )}
-              {CONSTANTS.STRINGS.ADD_TENANT_FORM_SUBMIT_BUTTON}
-            </Button>
+            <div className="flex justify-end pt-2">
+              <Button
+                type="submit"
+                size="sm"
+                disabled={isCreatingNewTenant}
+              >
+                {isCreatingNewTenant && (
+                  <Spinner className="mr-2" size={14} />
+                )}
+                {CONSTANTS.STRINGS.ADD_TENANT_FORM_SUBMIT_BUTTON}
+              </Button>
+            </div>
           </form>
-        </div>
-      </section>
+        </section>
+      </div>
     </div>
   );
 };

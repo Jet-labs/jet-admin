@@ -6,7 +6,6 @@ const { expressApp } = require("./config/express-app.config");
 const { httpServer } = require("./config/http-server.config");
 const Logger = require("./utils/logger");
 const { cronJobService } = require("./modules/cronJob/cronJob.service");
-const { stringUtils } = require("@jet-admin/template-package");
 const { socketIO } = require("./config/socket.io");
 const { isModuleEnabled } = require("./config/module.config");
 const { widgetSocketController } = require("./modules/widget/widget.socket.controller");
@@ -272,7 +271,6 @@ httpServer.listen(port, async () => {
     message: "server started listening",
     params: { port },
   });
-  console.log("truncate name", stringUtils.truncateName("Hello World", 5));
   cronJobService.scheduleAllCronJobs();
 
   // Initialize Monitor Socket

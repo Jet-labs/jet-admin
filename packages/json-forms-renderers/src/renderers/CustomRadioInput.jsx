@@ -1,6 +1,7 @@
 // Custom Radio Input Renderer
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Label, RadioGroup, RadioGroupItem } from '@jet-admin/ui';
 
 export const CustomRadioInput = (props) => {
   const {
@@ -38,36 +39,38 @@ export const CustomRadioInput = (props) => {
     return optionValue.charAt(0).toUpperCase() + optionValue.slice(1).replace(/([A-Z])/g, ' $1');
   };
 
+  const hasErrors = errors && errors.length > 0;
+
   return (
     <div className="mb-3">
-      <label
+      <Label
         className={`block mb-2 text-xs font-medium ${
-          errors && errors.length > 0 ? "text-red-500" : "text-slate-500"
+          hasErrors ? "text-red-500" : "text-muted-foreground"
         }`}
       >
-        {label || description} {errors && errors.length > 0 && errors}
-      </label>
-      <div className={`flex ${orientation === 'vertical' ? 'flex-col gap-2' : 'flex-row flex-wrap gap-4'}`}>
+        {label || description}
+      </Label>
+      <RadioGroup
+        value={data || ""}
+        onValueChange={(val) => handleChange(path, val)}
+        disabled={isDisabled}
+        className={`flex ${orientation === 'vertical' ? 'flex-col gap-2' : 'flex-row flex-wrap gap-4'}`}
+      >
         {options.map((optionValue) => (
-          <label
-            key={optionValue}
-            className={`flex items-center gap-2 cursor-pointer ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}`}
-          >
-            <input
-              type="radio"
-              name={path}
-              value={optionValue}
-              checked={data === optionValue}
-              disabled={isDisabled}
-              onChange={(ev) => handleChange(path, ev.target.value)}
-              className="w-4 h-4 text-indigo-600 bg-slate-50 border-slate-300 focus:ring-indigo-500 focus:ring-2"
-            />
-            <span className={`text-sm ${data === optionValue ? 'text-slate-700 font-medium' : 'text-slate-600'}`}>
+          <div key={optionValue} className="flex items-center gap-2">
+            <RadioGroupItem value={optionValue} id={`${path}-${optionValue}`} />
+            <Label
+              htmlFor={`${path}-${optionValue}`}
+              className={`text-sm ${data === optionValue ? 'text-foreground font-medium' : 'text-muted-foreground'}`}
+            >
               {getDisplayName(optionValue)}
-            </span>
-          </label>
+            </Label>
+          </div>
         ))}
-      </div>
+      </RadioGroup>
+      {hasErrors && (
+        <p className="text-xs text-red-500 mt-1">{errors}</p>
+      )}
     </div>
   );
 };

@@ -3,6 +3,7 @@ import { FaTimes } from "react-icons/fa";
 import PropTypes from "prop-types";
 
 import { Button } from "@jet-admin/ui";
+
 /**
  * Helper component to wrap the editor input and add a cancel button.
  */
@@ -28,12 +29,15 @@ export const EditCellWrapper = React.memo(({ children, params }) => {
       </div>
       <Button
         type="button"
+        variant="ghost"
+        size="sm"
+        square
         onClick={handleCancel}
         aria-label="cancel editing"
         tabIndex={-1}
-        className="p-1 rounded hover:bg-gray-100 text-gray-500 hover:text-gray-700 transition-colors"
+        className="h-6 w-6 ml-1 text-slate-400 hover:text-destructive hover:bg-destructive/10 shrink-0"
       >
-        <FaTimes style={{ fontSize: "0.8rem" }} />
+        <FaTimes className="text-[10px]" />
       </Button>
     </div>
   );

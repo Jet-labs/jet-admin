@@ -75,7 +75,8 @@ export const WorkflowInputArgsPanel = ({ workflowForm }) => {
                 <Button
                   type="button"
                   variant="ghost"
-                  size="icon"
+                  size="sm"
+                  square
                   onClick={() => _handleRemoveArg(index)}
                   className="h-6 w-6 bg-red-100 text-red-500 hover:bg-red-50 hover:text-red-600 flex-shrink-0"
                 >

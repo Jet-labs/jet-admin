@@ -3,7 +3,7 @@ import React8 from "react";
 import { DATASOURCE_TYPES } from "@jet-admin/datasource-types";
 
 // src/components/common/queryResponseView.js
-import { Tab, Tabs } from "@mui/material";
+import { Button } from "@jet-admin/ui";
 import React5, { useState } from "react";
 
 // src/components/common/queryResponseJSONTab.js
@@ -176,71 +176,26 @@ var QueryResponseTableTab = ({
 // src/components/common/queryResponseView.js
 import PropTypes5 from "prop-types";
 var QueryResponseView = ({ queryResult }) => {
-  QueryResponseView.propTypes = {
-    queryResult: PropTypes5.object
-  };
-  console.log("queryResult", queryResult);
   const [tab, setTab] = useState(0);
-  const _handleTabChange = (event, newTab) => {
-    setTab(newTab);
-  };
-  return /* @__PURE__ */ React5.createElement(React5.Fragment, null, /* @__PURE__ */ React5.createElement(
-    Tabs,
+  console.log("queryResult", queryResult);
+  return /* @__PURE__ */ React5.createElement("div", { className: "flex flex-col h-full overflow-hidden p-4" }, /* @__PURE__ */ React5.createElement("div", { className: "flex items-center" }, ["Table", "JSON", "Raw", "Data Schema"].map((label, index) => /* @__PURE__ */ React5.createElement(
+    Button,
     {
-      value: tab,
-      onChange: _handleTabChange,
-      className: "!w-full !border-b !border-gray-200",
-      sx: {
-        "& .MuiTabs-indicator": {
-          background: "#646cff !important"
-        }
-      }
+      key: label,
+      variant: "ghost",
+      className: `px-4 mr-2 py-2 text-sm font-medium rounded transition-colors ${index === tab ? "text-primary bg-primary/5" : "text-foreground hover:bg-slate-100"}`,
+      onClick: () => setTab(index),
+      type: "button"
     },
-    /* @__PURE__ */ React5.createElement(
-      Tab,
-      {
-        label: "Table",
-        disableRipple: true,
-        disableFocusRipple: true,
-        disableTouchRipple: true,
-        className: `!outline-none !border-0 hover:!outline-none hover:!border-0 focus:!outline-none !font-medium !text-sm !normal-case ${tab === 0 ? "!text-[#646cff]" : "!text-slate-700"}`
-      }
-    ),
-    /* @__PURE__ */ React5.createElement(
-      Tab,
-      {
-        label: "JSON",
-        disableRipple: true,
-        disableFocusRipple: true,
-        disableTouchRipple: true,
-        className: `!outline-none !border-0 hover:!outline-none hover:!border-0 focus:!outline-none !font-medium !text-sm !normal-case ${tab === 1 ? "!text-[#646cff]" : "!text-slate-700"}`
-      }
-    ),
-    /* @__PURE__ */ React5.createElement(
-      Tab,
-      {
-        label: "Raw",
-        disableRipple: true,
-        disableFocusRipple: true,
-        disableTouchRipple: true,
-        className: `!outline-none !border-0 hover:!outline-none hover:!border-0 focus:!outline-none !font-medium !text-sm !normal-case ${tab === 2 ? "!text-[#646cff]" : "!text-slate-700"}`
-      }
-    ),
-    /* @__PURE__ */ React5.createElement(
-      Tab,
-      {
-        label: "Data Schema",
-        disableRipple: true,
-        disableFocusRipple: true,
-        disableTouchRipple: true,
-        className: `!outline-none !border-0 hover:!outline-none hover:!border-0 focus:!outline-none !font-medium !text-sm !normal-case ${tab === 3 ? "!text-[#646cff]" : "!text-slate-700"}`
-      }
-    )
-  ), /* @__PURE__ */ React5.createElement("div", { className: "w-100  h-full overflow-y-auto pb-5" }, tab === 0 && /* @__PURE__ */ React5.createElement(QueryResponseTableTab, { data: queryResult ? queryResult : "" }), tab === 1 && /* @__PURE__ */ React5.createElement(QueryResponseJSONTab, { data: queryResult ? queryResult : "" }), tab === 2 && /* @__PURE__ */ React5.createElement(QueryResponseRAWTab, { data: queryResult ? queryResult : "" }), tab === 3 && /* @__PURE__ */ React5.createElement(QueryResponseSchemaTab, { data: queryResult ? queryResult : {} })));
+    label
+  ))), /* @__PURE__ */ React5.createElement("div", { className: "p-3 border mt-3 border-border rounded bg-background flex flex-col gap-2 overflow-y-auto flex-1" }, tab === 0 && /* @__PURE__ */ React5.createElement(QueryResponseTableTab, { data: queryResult ? queryResult : "" }), tab === 1 && /* @__PURE__ */ React5.createElement(QueryResponseJSONTab, { data: queryResult ? queryResult : "" }), tab === 2 && /* @__PURE__ */ React5.createElement(QueryResponseRAWTab, { data: queryResult ? queryResult : "" }), tab === 3 && /* @__PURE__ */ React5.createElement(QueryResponseSchemaTab, { data: queryResult ? queryResult : {} })));
+};
+QueryResponseView.propTypes = {
+  queryResult: PropTypes5.object
 };
 
 // src/components/common/webViewQueryResponseView.js
-import { Tab as Tab2, Tabs as Tabs2 } from "@mui/material";
+import { Tab, Tabs } from "@mui/material";
 import React7, { useState as useState2 } from "react";
 import PropTypes7 from "prop-types";
 
@@ -281,7 +236,7 @@ var WebViewQueryResponseView = ({ queryResult }) => {
     setTab(newTab);
   };
   return /* @__PURE__ */ React7.createElement(React7.Fragment, null, /* @__PURE__ */ React7.createElement(
-    Tabs2,
+    Tabs,
     {
       value: tab,
       onChange: _handleTabChange,
@@ -293,7 +248,7 @@ var WebViewQueryResponseView = ({ queryResult }) => {
       }
     },
     /* @__PURE__ */ React7.createElement(
-      Tab2,
+      Tab,
       {
         label: "Web View",
         disableRipple: true,
@@ -303,7 +258,7 @@ var WebViewQueryResponseView = ({ queryResult }) => {
       }
     ),
     /* @__PURE__ */ React7.createElement(
-      Tab2,
+      Tab,
       {
         label: "JSON",
         disableRipple: true,
@@ -313,7 +268,7 @@ var WebViewQueryResponseView = ({ queryResult }) => {
       }
     ),
     /* @__PURE__ */ React7.createElement(
-      Tab2,
+      Tab,
       {
         label: "Raw",
         disableRipple: true,
@@ -323,7 +278,7 @@ var WebViewQueryResponseView = ({ queryResult }) => {
       }
     ),
     /* @__PURE__ */ React7.createElement(
-      Tab2,
+      Tab,
       {
         label: "Data Schema",
         disableRipple: true,

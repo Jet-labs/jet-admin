@@ -1,8 +1,8 @@
 // Dynamic Args Control - Renders dynamic argument fields for workflow nodes
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { TbVariable } from 'react-icons/tb';
-import { Button, Input } from '@jet-admin/ui';
+import { Variable } from 'lucide-react';
+import { Button, Input, Label } from '@jet-admin/ui';
 
 export const DynamicArgsControl = (props) => {
   const { data, path, handleChange, uischema, errors } = props;
@@ -93,10 +93,10 @@ export const DynamicArgsControl = (props) => {
   }
 
   return (
-    <div className="border border-slate-200 rounded p-3 mt-2 bg-white">
-      <label className="block mb-2 text-xs font-medium text-slate-500">
+    <div className="border border-border rounded p-3 mt-2 bg-background">
+      <Label className="block mb-2 text-xs font-medium text-muted-foreground">
         Arguments
-      </label>
+      </Label>
       <div className="space-y-2">
         {args.map((arg, index) => {
           const argName = arg.key;
@@ -112,7 +112,7 @@ export const DynamicArgsControl = (props) => {
         })}
       </div>
       {errors && errors.length > 0 && (
-        <span className="text-red-500 text-xs mt-1">{errors}</span>
+        <p className="text-red-500 text-xs mt-1">{errors}</p>
       )}
     </div>
   );
@@ -163,15 +163,14 @@ const ArgInputWithVariablePicker = ({ argName, value, onChange, availableVariabl
   return (
     <div className="flex flex-row justify-between items-center gap-2">
       <div className="flex-1">
-        <label className="block mb-1 text-[10px] font-medium text-slate-400">
+        <Label className="block mb-1 text-[10px] font-medium text-muted-foreground">
           {argName}
-        </label>
+        </Label>
         <div className="flex items-center gap-1">
           <Input
             ref={inputRef}
             type="text"
             id={`arg-${argName}`}
-            className="placeholder:text-slate-400 text-xs w-full bg-slate-50 border border-slate-200 text-slate-700 rounded focus:outline-none focus:border-slate-400 block px-2.5 py-1.5"
             placeholder={`Value for ${argName}`}
             value={value}
             onChange={(e) => onChange(e.target.value)}
@@ -179,20 +178,18 @@ const ArgInputWithVariablePicker = ({ argName, value, onChange, availableVariabl
           <div className="relative" ref={dropdownRef}>
             <Button
               type="button"
+              variant="outline"
+              size="sm"
+              square
               onClick={() => setShowDropdown(!showDropdown)}
-              className={`flex-shrink-0 p-1.5 rounded transition-colors border border-slate-200 bg-slate-50 ${
-                availableVariables.length > 0 
-                  ? 'text-blue-500 hover:text-blue-700 hover:bg-blue-50' 
-                  : 'text-slate-400 hover:text-slate-500 hover:bg-slate-100'
-              }`}
               title="Insert variable from previous node"
             >
-              <TbVariable className="w-4 h-4" />
+              <Variable className="w-4 h-4" />
             </Button>
             {showDropdown && (
-              <div className="absolute right-0 top-full mt-1 w-64 bg-white border border-slate-200 rounded shadow-lg z-50 max-h-64 overflow-y-auto">
+              <div className="absolute right-0 top-full mt-1 w-64 bg-background border border-border rounded shadow-lg z-50 max-h-64 overflow-y-auto">
                 {availableVariables.length === 0 ? (
-                  <div className="px-2 py-3 text-xs text-slate-400 text-center">
+                  <div className="px-2 py-3 text-xs text-muted-foreground text-center">
                     No variables available yet.
                     <br />
                     <span className="text-[10px]">Add workflow inputs or connect upstream nodes.</span>
@@ -202,20 +199,21 @@ const ArgInputWithVariablePicker = ({ argName, value, onChange, availableVariabl
                       {/* Input Parameters Section */}
                       {inputVariables.length > 0 && (
                         <>
-                          <div className="px-2 py-1.5 text-[10px] font-semibold text-green-600 uppercase tracking-wider border-b border-slate-100 bg-green-50">
+                          <div className="px-2 py-1.5 text-[10px] font-semibold text-primary uppercase tracking-wider border-b border-border bg-primary/5">
                             📥 Workflow Inputs
                           </div>
                           {inputVariables.map((variable, idx) => (
                             <Button
                               key={`input-${idx}`}
                               type="button"
+                              variant="ghost"
                               onClick={() => insertVariable(variable.contextPath)}
-                              className="w-full bg-white text-left px-2 py-1.5 hover:bg-green-50 hover:border-none border-none rounded-none transition-colors border-b border-slate-50"
+                              className="w-full text-left px-2 py-1.5 hover:bg-primary/5 rounded-none border-b border-border/50"
                             >
-                              <div className="text-xs font-medium text-slate-700 font-mono">
+                              <div className="text-xs font-medium text-foreground font-mono">
                                 {variable.contextPath}
                               </div>
-                              <div className="text-[10px] text-slate-400 truncate">
+                              <div className="text-[10px] text-muted-foreground truncate">
                                 type: {variable.type || 'any'}
                               </div>
                             </Button>
@@ -226,20 +224,21 @@ const ArgInputWithVariablePicker = ({ argName, value, onChange, availableVariabl
                       {/* Node Outputs Section */}
                       {nodeVariables.length > 0 && (
                         <>
-                          <div className="px-2 py-1.5 text-[10px] font-semibold text-blue-600 uppercase tracking-wider border-b border-slate-100 bg-blue-50">
+                          <div className="px-2 py-1.5 text-[10px] font-semibold text-primary uppercase tracking-wider border-b border-border bg-primary/5">
                             📤 Upstream Node Outputs
                           </div>
                           {nodeVariables.map((variable, idx) => (
                             <Button
                             key={`node-${idx}`}
                             type="button"
+                            variant="ghost"
                             onClick={() => insertVariable(variable.contextPath)}
-                            className="w-full bg-white text-left px-2 py-1.5 hover:bg-blue-50 hover:border-none border-none rounded-none transition-colors border-b border-slate-50 last:border-b-0"
+                            className="w-full text-left px-2 py-1.5 hover:bg-primary/5 rounded-none border-b border-border/50 last:border-b-0"
                           >
-                            <div className="text-xs font-medium text-slate-700 font-mono">
+                            <div className="text-xs font-medium text-foreground font-mono">
                               {variable.contextPath}
                             </div>
-                            <div className="text-[10px] text-slate-400 truncate">
+                            <div className="text-[10px] text-muted-foreground truncate">
                               from: {variable.nodeTitle}
                             </div>
                             </Button>
@@ -264,4 +263,3 @@ DynamicArgsControl.propTypes = {
   uischema: PropTypes.object.isRequired,
   errors: PropTypes.arrayOf(PropTypes.string),
 };
-

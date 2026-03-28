@@ -89,31 +89,40 @@ export const DatabaseTableAdditionForm = ({ tenantID, databaseSchemaName }) => {
   });
 
   return (
-    <div className="flex w-full h-full flex-col items-center overflow-y-auto p-4 md:p-8">
-      <section className="max-w-2xl w-full">
-        <h1 className="text-2xl font-semibold tracking-tight mb-4">
-          {CONSTANTS.STRINGS.ADD_TABLE_FORM_TITLE}
-        </h1>
-        <form
-          className="space-y-3 md:space-y-4"
-          onSubmit={tableAdditionForm.handleSubmit}
-      >
-        {tableAdditionForm && (
-          <DatabaseTableEditor
-            tableEditorForm={tableAdditionForm}
-            tenantID={tenantID}
-          />
-        )}
-        <div className="w-full flex flex-row justify-end">
-            <Button type="submit" disabled={isAddingDatabaseTable}>
-            {isAddingDatabaseTable && (
-                <Spinner className="mr-2" size={16} />
-            )}
-            {CONSTANTS.STRINGS.ADD_TABLE_FORM_SUBMIT_BUTTON}
-            </Button>
+    <div className="flex h-full w-full flex-col overflow-hidden bg-background">
+      <div className="flex items-center justify-between border-b border-border bg-background px-4 py-3 flex-shrink-0">
+        <div>
+          <h1 className="text-base font-semibold tracking-tight text-foreground">
+            {CONSTANTS.STRINGS.ADD_TABLE_FORM_TITLE}
+          </h1>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            Create a new database table and define its schema columns.
+          </p>
         </div>
-        </form>
-      </section>
+      </div>
+      
+      <div className="flex flex-1 flex-col items-center overflow-y-auto p-4 md:p-6">
+        <section className="w-full max-w-2xl">
+          <form
+            noValidate
+            className="space-y-6"
+            onSubmit={tableAdditionForm.handleSubmit}
+          >
+            {tableAdditionForm && (
+              <DatabaseTableEditor
+                tableEditorForm={tableAdditionForm}
+                tenantID={tenantID}
+              />
+            )}
+            <div className="flex justify-end">
+              <Button type="submit" disabled={isAddingDatabaseTable}>
+                {isAddingDatabaseTable && <Spinner size={14} />}
+                {CONSTANTS.STRINGS.ADD_TABLE_FORM_SUBMIT_BUTTON}
+              </Button>
+            </div>
+          </form>
+        </section>
+      </div>
     </div>
   );
 };

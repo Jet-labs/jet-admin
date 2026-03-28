@@ -19,15 +19,16 @@ export const CustomTabRenderer = (props) => {
   return (
     <div className="custom-tabs-container">
       {/* Tab Headers */}
-      <div className="flex border-slate-300">
+      <div className="flex border-border">
         {categories.map((category, index) => (
           <Button
             key={category.label || `tab-${index}`}
+            variant="ghost"
             className={`px-4 mr-2 py-2 text-sm font-medium rounded ${
               index === activeTab
-                ? "text-[#646cff] border-slate-200"
-                : "text-slate-700"
-            } focus:outline-none bg-white`}
+                ? "text-primary bg-primary/5"
+                : "text-foreground"
+            }`}
             onClick={() => setActiveTab(index)}
             type="button"
           >
@@ -37,7 +38,7 @@ export const CustomTabRenderer = (props) => {
       </div>
 
       {/* Tab Content */}
-      <div className="p-3 border mt-3 border-slate-200 rounded bg-white flex flex-col gap-2">
+      <div className="p-3 border mt-3 border-border rounded bg-background flex flex-col gap-2">
         {activeCategory?.elements.map((element, i) => (
           <JsonFormsDispatch
             key={i}

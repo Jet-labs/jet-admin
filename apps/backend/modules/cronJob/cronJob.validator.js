@@ -1,8 +1,16 @@
 /**
  * CronJob Validation Schemas
+ * Aligned with Prisma schema fields
  */
 
 const { z, schemas } = require("../../utils/validation.utils");
+const cron = require("node-cron");
+
+// Custom cron schedule validation using node-cron
+const cronScheduleValidation = z.string().refine(
+  (val) => cron.validate(val),
+  { message: "Invalid cron schedule expression" }
+);
 
 // ============================================================
 // Request Body Schemas
@@ -11,19 +19,25 @@ const { z, schemas } = require("../../utils/validation.utils");
 const createCronJobSchema = z.object({
   cronJobTitle: z.string().min(1, "cronJobTitle is required").max(255),
   cronJobDescription: z.string().optional(),
-  cronJobSchedule: schemas.cronScheduleSchema,
-  cronJobEnabled: z.boolean().optional().default(true),
-  cronJobType: z.string().min(1, "cronJobType is required"),
-  cronJobConfig: z.object({}).passthrough(),
+  cronJobSchedule: cronScheduleValidation,
+  workflowID: z.string().uuid("workflowID must be a valid UUID"),
+  workflowConfig: z.object({}).passthrough().optional(),
+  isDisabled: z.boolean().optional().default(false),
+  timeoutSeconds: z.number().int().min(0).optional(),
+  retryAttempts: z.number().int().min(0).optional(),
+  retryDelaySeconds: z.number().int().min(0).optional(),
 }).passthrough();
 
 const updateCronJobSchema = z.object({
   cronJobTitle: z.string().min(1).max(255).optional(),
   cronJobDescription: z.string().optional(),
-  cronJobSchedule: schemas.cronScheduleSchema.optional(),
-  cronJobEnabled: z.boolean().optional(),
-  cronJobType: z.string().optional(),
-  cronJobConfig: z.object({}).passthrough().optional(),
+  cronJobSchedule: cronScheduleValidation.optional(),
+  workflowID: z.string().uuid("workflowID must be a valid UUID").optional(),
+  workflowConfig: z.object({}).passthrough().optional(),
+  isDisabled: z.boolean().optional(),
+  timeoutSeconds: z.number().int().min(0).optional().nullable(),
+  retryAttempts: z.number().int().min(0).optional().nullable(),
+  retryDelaySeconds: z.number().int().min(0).optional().nullable(),
 }).passthrough();
 
 // ============================================================

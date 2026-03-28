@@ -172,7 +172,8 @@ export const EncodingShelf = ({
             <Button
               type="button"
               variant="ghost"
-              size="icon"
+                size="sm"
+                square
               onClick={handleSortToggle}
               className="ml-auto h-6 w-6 text-muted-foreground hover:text-primary hover:bg-primary/5 text-xs"
               title={`Sort: ${value.sort || 'default'}`}

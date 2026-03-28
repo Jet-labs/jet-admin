@@ -65,7 +65,8 @@ const VariableItem = ({ variable, onSelect, isSelected }) => {
       <Button
         onClick={handleCopy}
         variant="ghost"
-        size="icon"
+        size="sm"
+        square
         className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity"
         title="Copy path"
         type="button"

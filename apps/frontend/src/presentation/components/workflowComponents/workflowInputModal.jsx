@@ -104,7 +104,8 @@ export const WorkflowInputModal = ({ args, onSubmit, onClose }) => {
           <Button
             type="button"
             variant="ghost"
-            size="icon"
+            size="sm"
+            square
             onClick={onClose}
             className="h-8 w-8 text-slate-400 hover:text-slate-600"
           >

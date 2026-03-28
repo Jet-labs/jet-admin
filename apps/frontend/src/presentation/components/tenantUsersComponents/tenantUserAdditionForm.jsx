@@ -20,6 +20,11 @@ import { addUserToTenantAPI } from "../../../data/apis/userManagement";
 import { formValidations } from "../../../utils/formValidation";
 import { displayError, displaySuccess } from "../../../utils/notification";
 
+function FieldError({ message }) {
+  if (!message) return null;
+  return <p className="text-xs text-red-500">{message}</p>;
+}
+
 export const TenantUserAdditionForm = ({ tenantID, open, onClose }) => {
   TenantUserAdditionForm.propTypes = {
     tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
@@ -39,7 +44,6 @@ export const TenantUserAdditionForm = ({ tenantID, open, onClose }) => {
         onClose();
       },
       onError: (error) => {
-        console.log({ error });
         displayError(error);
       },
     });
@@ -61,53 +65,64 @@ export const TenantUserAdditionForm = ({ tenantID, open, onClose }) => {
         if (!isOpen) onClose();
       }}
     >
-      <DialogContent className="max-w-md p-4">
-        <form className="space-y-4" onSubmit={addUserToTenantForm.handleSubmit}>
-          <DialogHeader className="space-y-1">
-            <DialogTitle className="text-sm font-semibold">
+      <DialogContent className="max-w-md p-0 overflow-hidden border-none shadow-2xl">
+        <form
+          className="flex flex-col bg-background"
+          onSubmit={addUserToTenantForm.handleSubmit}
+          noValidate
+        >
+          <DialogHeader className="p-4 border-b border-border bg-muted/20">
+            <DialogTitle className="text-base font-semibold uppercase font-mono text-[10px] tracking-widest text-muted-foreground mb-1">
               {CONSTANTS.STRINGS.ADD_MEMBER_TO_TENANT_DIALOG_TITLE}
             </DialogTitle>
-            <DialogDescription>
+            <DialogDescription className="text-xs text-muted-foreground mt-0">
               {CONSTANTS.STRINGS.ADD_MEMBER_TO_TENANT_DIALOG_DESCRIPTION}
             </DialogDescription>
           </DialogHeader>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="tenantUserEmail">
-              {
-                CONSTANTS.STRINGS
-                  .ADD_MEMBER_TO_TENANT_DIALOG_FORM_MEMBER_EMAIL_LABEL
-              }
-            </Label>
-            <Input
-              type="email"
-              name="tenantUserEmail"
-              id="tenantUserEmail"
-              placeholder={
-                CONSTANTS.STRINGS
-                  .ADD_MEMBER_TO_TENANT_DIALOG_FORM_MEMBER_EMAIL_PLACEHOLDER
-              }
-              required={true}
-              onChange={addUserToTenantForm.handleChange}
-              onBlur={addUserToTenantForm.handleBlur}
-              value={addUserToTenantForm.values.tenantUserEmail}
-            />
-            {addUserToTenantForm.touched.tenantUserEmail &&
-              addUserToTenantForm.errors.tenantUserEmail && (
-                <p className="text-xs text-red-500">
-                  {addUserToTenantForm.errors.tenantUserEmail}
-                </p>
-              )}
+          <div className="p-4 space-y-4">
+            <div className="space-y-1.5">
+              <Label htmlFor="tenantUserEmail">
+                {
+                  CONSTANTS.STRINGS
+                    .ADD_MEMBER_TO_TENANT_DIALOG_FORM_MEMBER_EMAIL_LABEL
+                }{" "}
+                <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                type="email"
+                name="tenantUserEmail"
+                id="tenantUserEmail"
+                placeholder={
+                  CONSTANTS.STRINGS
+                    .ADD_MEMBER_TO_TENANT_DIALOG_FORM_MEMBER_EMAIL_PLACEHOLDER
+                }
+                required
+                onChange={addUserToTenantForm.handleChange}
+                onBlur={addUserToTenantForm.handleBlur}
+                value={addUserToTenantForm.values.tenantUserEmail}
+              />
+              <FieldError message={addUserToTenantForm.touched.tenantUserEmail && addUserToTenantForm.errors.tenantUserEmail} />
+            </div>
           </div>
 
-          <DialogFooter className="gap-2">
-            <Button onClick={onClose} type="button" variant="outline">
-              {CONSTANTS.STRINGS.ADD_MEMBER_TO_TENANT_DIALOG_FORM_CANCEL_BUTTON}
+          <DialogFooter className="p-4 border-t border-border bg-muted/5 gap-2">
+            <Button
+              onClick={onClose}
+              type="button"
+              variant="outline"
+              size="sm"
+            >
+              Cancel
             </Button>
 
-            <Button type="submit" disabled={isAddingMemberToTenant}>
-              {isAddingMemberToTenant && <Spinner className="mr-2" size={16} />}
-              {CONSTANTS.STRINGS.ADD_MEMBER_TO_TENANT_DIALOG_FORM_SUBMIT_BUTTON}
+            <Button
+              type="submit"
+              size="sm"
+              disabled={isAddingMemberToTenant}
+            >
+              {isAddingMemberToTenant && <Spinner className="mr-2" size={14} />}
+              Add Member
             </Button>
           </DialogFooter>
         </form>

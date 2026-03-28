@@ -49,7 +49,8 @@ export const WidgetDeletionForm = ({ tenantID, widgetID }) => {
 
   return (
     <>
-      <Button variant="destructive-ghost" size="icon" onClick={_handleDeleteWidget} disabled={isDeletingWidget} type="button">
+      <Button variant="destructive-ghost" size="sm"
+        square onClick={_handleDeleteWidget} disabled={isDeletingWidget} type="button">
         {isDeletingWidget ? (
           <Spinner size={16} />
         ) : (

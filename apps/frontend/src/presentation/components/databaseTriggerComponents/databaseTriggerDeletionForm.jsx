@@ -64,7 +64,8 @@ export const DatabaseTriggerDeletionForm = ({
 
   return (
     <>
-      <Button variant="destructive-ghost" size="icon" onClick={_handleDeleteDashboard} disabled={isDeletingDatabaseTrigger} type="button" className="ms-2">
+      <Button variant="destructive-ghost" size="sm"
+        square onClick={_handleDeleteDashboard} disabled={isDeletingDatabaseTrigger} type="button" className="ms-2">
         {isDeletingDatabaseTrigger ? (
           <Spinner size={16} />
         ) : (

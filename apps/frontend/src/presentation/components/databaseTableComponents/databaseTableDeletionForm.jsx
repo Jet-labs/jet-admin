@@ -48,20 +48,22 @@ export const DatabaseTableDeletionForm = ({
     });
 
   const _handleDeleteDatabaseTable = async () => {
-    await showConfirmation({
+    const confirmed = await showConfirmation({
       title: CONSTANTS.STRINGS.DATABASE_TABLE_DELETION_DIALOG_TITLE,
       message: CONSTANTS.STRINGS.DATABASE_TABLE_DELETION_DIALOG_MESSAGE,
       confirmText: "Delete",
       cancelText: "Cancel",
     });
+    if (!confirmed) return;
     deleteDatabaseTable();
   };
 
   return (
     <>
-      <Button variant="destructive-ghost" size="icon" onClick={_handleDeleteDatabaseTable} disabled={isDeletingDatabaseTable} type="button">
+      <Button variant="destructive-ghost" size="sm"
+        square onClick={_handleDeleteDatabaseTable} disabled={isDeletingDatabaseTable} type="button">
         {isDeletingDatabaseTable ? (
-          <Spinner size={16} />
+          <Spinner size={14} />
         ) : (
             <MdDeleteOutline className="size-4" />
         )}

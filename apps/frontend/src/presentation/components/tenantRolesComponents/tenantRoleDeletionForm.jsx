@@ -43,30 +43,30 @@ export const TenantRoleDeletionForm = ({ tenantID, tenantRoleID }) => {
     });
 
   const _handleDeleteTenantRole = async () => {
-    await showConfirmation({
+    const confirmed = await showConfirmation({
       title: CONSTANTS.STRINGS.TENANT_ROLE_DELETION_DIALOG_TITLE,
       message: CONSTANTS.STRINGS.TENANT_ROLE_DELETION_DIALOG_MESSAGE,
       confirmText: "Delete",
       cancelText: "Cancel",
     });
+    if (!confirmed) return;
     deleteTenantRole();
   };
 
   return (
-    <>
-      <Button
-        variant="destructive-ghost"
-        onClick={_handleDeleteTenantRole}
-        disabled={isDeletingTenantRole}
-        type="button"
-      >
-        {isDeletingTenantRole ? (
-          <Spinner className="mr-2" size={16} />
-        ) : (
-            <Trash2 className="mr-2 h-4 w-4" />
-        )}
-        {isDeletingTenantRole ? "Deleting..." : "Delete role"}
-      </Button>
-    </>
+    <Button
+      variant="destructive-ghost"
+      size="sm"
+      square
+      onClick={_handleDeleteTenantRole}
+      disabled={isDeletingTenantRole}
+      type="button"
+    >
+      {isDeletingTenantRole ? (
+        <Spinner size={14} />
+      ) : (
+        <Trash2 className="h-4 w-4" />
+      )}
+    </Button>
   );
 };

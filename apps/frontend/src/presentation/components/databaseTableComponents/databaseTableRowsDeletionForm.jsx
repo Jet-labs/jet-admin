@@ -54,7 +54,7 @@ export const DatabaseTableRowsDeletionForm = ({
   });
 
   const _handleBulkDeleteDatabaseTableRows = async () => {
-    await showConfirmation({
+    const confirmed = await showConfirmation({
       title:
         CONSTANTS.STRINGS.DATABASE_TABLE_VIEW_CHANGES_DELETE_ROWS_DIALOG_TITLE,
       message:
@@ -63,6 +63,7 @@ export const DatabaseTableRowsDeletionForm = ({
       confirmText: "Delete",
       cancelText: "Cancel",
     });
+    if (!confirmed) return;
     bulkDeleteDatabaseTableRows();
   };
 
@@ -77,7 +78,7 @@ export const DatabaseTableRowsDeletionForm = ({
         {isBulkDeletingDatabaseTableRows ? (
           <>
             Deleting selected rows...
-            <Spinner size={16} className="ml-2" />
+            <Spinner size={14} className="ml-2" />
           </>
         ) : (
           `Delete ${

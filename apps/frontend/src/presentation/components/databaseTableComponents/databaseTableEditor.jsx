@@ -6,7 +6,43 @@ import { getDatabaseMetadataAPI } from "../../../data/apis/database";
 import PropTypes from "prop-types";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 
-import { Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
+import {
+  Button,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+  Label,
+  Checkbox
+} from "@jet-admin/ui";
+
+function Section({ title, description, children }) {
+  return (
+    <div className="rounded-lg border border-border bg-card p-4 space-y-3">
+      {(title || description) && (
+        <div>
+          {title && (
+            <p className="mb-0.5 font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+              {title}
+            </p>
+          )}
+          {description && (
+            <p className="text-[11px] text-muted-foreground">{description}</p>
+          )}
+        </div>
+      )}
+      {children}
+    </div>
+  );
+}
+
+function FieldError({ message }) {
+  if (!message) return null;
+  return <p className="text-xs text-red-500">{message}</p>;
+}
+
 const MultipleColumnSelectDropdownForForeignKeyConstraint = ({
   tableEditorForm,
   fkIndex,
@@ -479,7 +515,8 @@ const UniqueConstraintSelector = ({ tableEditorForm }) => {
             <div className="col-span-1 flex items-center flex-row justify-end">
               <Button
                 type="button"
-                variant="destructive-ghost" size="icon"
+                variant="destructive-ghost" size="sm"
+                square
                 onClick={() => _handleDeleteConstraint(index)}
               >
                 <FaTimes className="text-sm" />
@@ -627,7 +664,8 @@ const ForeignKeyConstraintSelector = ({
                 <div className="col-span-1 flex items-center flex-row justify-end">
                   <Button
                     type="button"
-                    variant="destructive-ghost" size="icon"
+                    variant="destructive-ghost" size="sm"
+                    square
                     onClick={() => _handleDeleteForeignKey(index)}
                   >
                     <FaTimes className="text-sm" />
@@ -1037,7 +1075,8 @@ const ColumnSelector = ({ tableEditorForm }) => {
               <div className="col-span-1 flex items-center flex-row justify-end">
                 <Button
                   type="button"
-                  variant="destructive-ghost" size="icon"
+                  variant="destructive-ghost" size="sm"
+                  square
                   onClick={() => _handleDeleteColumn(index)}
                 >
                   <FaTimes className="text-sm" />
@@ -1192,78 +1231,71 @@ export const DatabaseTableEditor = ({ tenantID, tableEditorForm }) => {
   });
 
   return (
-    <>
-      <div className="h-full">
-        <label
-          htmlFor="databaseTableName"
-          className="block mb-1 text-xs font-medium text-slate-500"
-        >
-          {CONSTANTS.STRINGS.TABLE_EDITOR_FORM_NAME_FIELD_LABEL}
-        </label>
-        <Input
-          type="databaseTableName"
-          name="databaseTableName"
-          id="databaseTableName"
-          className="h-8 text-sm"
-          placeholder={
-            CONSTANTS.STRINGS.TABLE_EDITOR_FORM_NAME_FIELD_PLACEHOLDER
-          }
-          required={true}
-          onChange={tableEditorForm.handleChange}
-          onBlur={tableEditorForm.handleBlur}
-          value={tableEditorForm.values.databaseTableName}
-        />
-      </div>
-      <div className="flex flex-row justify-start items-center">
-        <input
-          id="ifNotExists"
-          type="checkbox"
-          checked={tableEditorForm.values["ifNotExists"]}
-          onChange={(e) => {
-            tableEditorForm?.setFieldValue("ifNotExists", e.target.checked);
-          }}
-          className="mr-2 w-4 h-4 text-white bg-transparent border-white rounded  accent-primary"
-        />
-        <label
-          htmlFor="ifNotExists"
-          className="text-xs font-medium text-slate-500 "
-        >
-          {CONSTANTS.STRINGS.TABLE_EDITOR_FORM_IF_NOT_EXIST_FIELD_LABEL}
-        </label>
-      </div>
-
-      <ColumnSelector tableEditorForm={tableEditorForm} />
-
-      <ReactQueryLoadingErrorWrapper
-        isLoading={isLoadingDatabaseMetadata}
-        isFetching={isFetchingDatabaseMetadata}
-        isRefetching={isRefetchingDatabaseMetadata}
-        error={databaseMetadataError}
-        refetch={refetchDatabaseMetadata}
-      >
-        {databaseMetadata && databaseMetadata.schemas?.length > 0 && (
-          <ForeignKeyConstraintSelector
-            tableEditorForm={tableEditorForm}
-            databaseMetadata={databaseMetadata}
+    <div className="space-y-4">
+      <Section title="Identity" description="Basic information about this table.">
+        <div className="space-y-1.5">
+          <Label htmlFor="databaseTableName">
+            {CONSTANTS.STRINGS.TABLE_EDITOR_FORM_NAME_FIELD_LABEL} <span className="text-destructive">*</span>
+          </Label>
+          <Input
+            id="databaseTableName"
+            name="databaseTableName"
+            required
+            onChange={tableEditorForm.handleChange}
+            onBlur={tableEditorForm.handleBlur}
+            value={tableEditorForm.values.databaseTableName ?? ""}
           />
-        )}
-      </ReactQueryLoadingErrorWrapper>
+          <FieldError message={tableEditorForm.touched.databaseTableName && tableEditorForm.errors.databaseTableName} />
+        </div>
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="ifNotExists"
+            checked={tableEditorForm.values["ifNotExists"]}
+            onCheckedChange={(checked) => {
+              tableEditorForm?.setFieldValue("ifNotExists", checked);
+            }}
+          />
+          <Label htmlFor="ifNotExists">
+            {CONSTANTS.STRINGS.TABLE_EDITOR_FORM_IF_NOT_EXIST_FIELD_LABEL}
+          </Label>
+        </div>
+      </Section>
+
+      <Section title="Columns" description="Define the columns for this table.">
+        <ColumnSelector tableEditorForm={tableEditorForm} />
+      </Section>
+
+      <Section title="Foreign Keys" description="Configure table relationships.">
+        <ReactQueryLoadingErrorWrapper
+          isLoading={isLoadingDatabaseMetadata}
+          isFetching={isFetchingDatabaseMetadata}
+          isRefetching={isRefetchingDatabaseMetadata}
+          error={databaseMetadataError}
+          refetch={refetchDatabaseMetadata}
+        >
+          {databaseMetadata && databaseMetadata.schemas?.length > 0 && (
+            <ForeignKeyConstraintSelector
+              tableEditorForm={tableEditorForm}
+              databaseMetadata={databaseMetadata}
+            />
+          )}
+        </ReactQueryLoadingErrorWrapper>
+      </Section>
 
       {/* Table Constraints Section */}
-      <div className="mt-6">
+      <Section title="Constraints" description="Manage table-level rules and assertions.">
         {/* Unique Constraint */}
         <UniqueConstraintSelector tableEditorForm={tableEditorForm} />
 
         {/* Primary Key Constraint */}
         <PrimaryKeyConstraintSelector tableEditorForm={tableEditorForm} />
-        {/* Check Constraint */}
-
+        
         {/* Exclude Constraint */}
         <ExcludeConstraintSelector tableEditorForm={tableEditorForm} />
 
         {/* Check Constraint */}
         <CheckConstraintSelector tableEditorForm={tableEditorForm} />
-      </div>
-    </>
+      </Section>
+    </div>
   );
 };

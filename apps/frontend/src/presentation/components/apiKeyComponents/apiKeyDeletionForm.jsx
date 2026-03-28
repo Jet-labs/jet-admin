@@ -51,7 +51,8 @@ export const APIKeyDeletionForm = ({ tenantID, apiKeyID }) => {
   return (
     <Button
       variant="destructive-ghost"
-      size="icon"
+      size="sm"
+      square
       onClick={_handleDeleteNotification}
       disabled={isDeletingAPIKey}
       type="button"

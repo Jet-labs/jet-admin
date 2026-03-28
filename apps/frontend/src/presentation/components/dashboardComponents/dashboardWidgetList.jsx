@@ -70,7 +70,8 @@ export const DashboardWidgetList = ({ tenantID }) => {
         asChild
         type="button"
         variant="ghost"
-        size="icon"
+        size="sm"
+        square
         className="shrink-0 text-muted-foreground hover:text-foreground"
       >
         <Link

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import PropTypes from 'prop-types';
-import { CodeEditor } from '@jet-admin/ui';
+import { CodeEditor, Label } from '@jet-admin/ui';
 import {
   buildTemplateSuggestions,
   getTemplateCompletionContext,
@@ -95,7 +95,7 @@ export const CustomCodeEditorControl = ({
           }
 
           const suggestions = [];
-          const tableMatch = text.match(/(\\b\\w+)\\.$/);
+          const tableMatch = text.match(/(\\b\\w+)\\.$/);;
           if (tableMatch) {
             const cols = schemaRef.current[tableMatch[1]] || [];
             cols.forEach((col) =>
@@ -217,17 +217,17 @@ export const CustomCodeEditorControl = ({
 
   return (
     <div className="mb-3">
-      <label
+      <Label
         htmlFor={path}
         className={`block mb-1 text-xs font-medium ${
-          hasErrors ? 'text-red-500' : 'text-slate-500'
+          hasErrors ? 'text-red-500' : 'text-muted-foreground'
         }`}
       >
-        {label || description} {hasErrors && errors}
-      </label>
+        {label || description}
+      </Label>
       
       {hint && (
-        <p className="text-[10px] text-slate-400 mb-1">{hint}</p>
+        <p className="text-[10px] text-muted-foreground mb-1">{hint}</p>
       )}
       
       <CodeEditor
@@ -240,6 +240,9 @@ export const CustomCodeEditorControl = ({
         beforeMount={handleBeforeMount}
         status={hasErrors ? "error" : null}
       />
+      {hasErrors && (
+        <p className="text-xs text-red-500 mt-1">{errors}</p>
+      )}
     </div>
   );
 };

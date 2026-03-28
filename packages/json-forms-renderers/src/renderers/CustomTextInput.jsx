@@ -1,35 +1,32 @@
 // Custom Text Input Renderer
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Input, Textarea } from '@jet-admin/ui';
+import { Input, Textarea, Label } from '@jet-admin/ui';
 
 export const CustomTextInput = (props) => {
   const { data, path, handleChange, label, description, errors, uischema, enabled } = props;
   const isMulti = uischema?.options?.multi;
   const isDisabled = enabled === false;
+  const hasErrors = errors && errors.length > 0;
 
   return (
     <div className="mb-3">
-      <label
+      <Label
         htmlFor={path}
         className={`block mb-1 text-xs font-medium ${
-          errors && errors.length > 0 ? "text-red-500" : "text-slate-500"
+          hasErrors ? "text-red-500" : "text-muted-foreground"
         }`}
       >
-        {label || description} {errors && errors.length > 0 && errors}
-      </label>
+        {label || description}
+      </Label>
       {isMulti ? (
         <Textarea
           id={path}
           name={path}
           disabled={isDisabled}
-          className={`placeholder:text-slate-400 text-sm bg-slate-50 border focus:border-slate-700 ${
-            errors && errors.length > 0
-              ? "border-red-500 focus:border-red-500"
-              : "border-slate-200"
-          } text-slate-700 rounded block w-full px-2.5 py-1.5 disabled:opacity-50 disabled:cursor-not-allowed`}
+          className={hasErrors ? "border-red-500 focus:border-red-500" : ""}
           placeholder={
-            errors && errors.length > 0
+            hasErrors
               ? errors
               : uischema?.options?.placeholder || ""
           }
@@ -43,19 +40,18 @@ export const CustomTextInput = (props) => {
           id={path}
           name={path}
           disabled={isDisabled}
-          className={`placeholder:text-slate-400 text-sm bg-slate-50 border focus:border-slate-700 ${
-            errors && errors.length > 0
-              ? "border-red-500 focus:border-red-500"
-              : "border-slate-200"
-          } text-slate-700 rounded block w-full px-2.5 py-1.5 disabled:opacity-50 disabled:cursor-not-allowed`}
+          className={hasErrors ? "border-red-500 focus:border-red-500" : ""}
           placeholder={
-            errors && errors.length > 0
+            hasErrors
               ? errors
               : uischema?.options?.placeholder || ""
           }
           onChange={(ev) => handleChange(path, ev.target.value)}
           value={data || ""}
         />
+      )}
+      {hasErrors && (
+        <p className="text-xs text-red-500 mt-1">{errors}</p>
       )}
     </div>
   );

@@ -208,7 +208,8 @@ export const WidgetAdditionForm = ({ tenantID }) => {
             <Button
               type="button"
               variant='ghost'
-              size="icon"
+                  size="sm"
+                  square
               className="h-8 w-8 text-slate-500 hover:text-slate-700 bg-white"
               onClick={_handleFetchWidgetData}
             >

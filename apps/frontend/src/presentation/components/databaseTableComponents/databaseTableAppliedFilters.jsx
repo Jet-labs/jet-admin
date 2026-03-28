@@ -308,14 +308,16 @@ export const AppliedFiltersCompact = ({
                 {onEditFilters && (
                     <Button
                         onClick={onEditFilters}
-                        variant="ghost" size="icon" className="h-6 w-6 me-1 text-primary hover:bg-primary/10"
+                        variant="ghost" size="sm"
+                        square className="h-6 w-6 me-1 text-primary hover:bg-primary/10"
                     >
                         <FaEdit className="h-3.5 w-3.5" />
                     </Button>
                 )}
                 <Button
                     onClick={onClearAllFilters}
-                    variant="destructive-ghost" size="icon" className="h-6 w-6 text-red-400 hover:text-red-500 hover:bg-red-100"
+                    variant="destructive-ghost" size="sm"
+                    square className="h-6 w-6 text-red-400 hover:text-red-500 hover:bg-red-100"
                 >
                     <FaTimes className="h-3.5 w-3.5" />
                 </Button>

@@ -204,48 +204,56 @@ export const DatabaseTableUpdationForm = ({
   }, [databaseTable]);
 
   return (
-    <div className="flex w-full h-full flex-col items-center overflow-y-auto p-4 md:p-8">
-      <section className="max-w-2xl w-full">
-        <h1 className="text-2xl font-semibold tracking-tight mb-3">
-          {CONSTANTS.STRINGS.UPDATE_TABLE_FORM_TITLE}
-        </h1>
-        <ReactQueryLoadingErrorWrapper
-          isLoading={isLoadingDatabaseTable || isLoadingDatabaseMetadata}
-          error={loadDatabaseTableError}
-        >
-          <form
-            className="space-y-3 md:space-y-4"
-            onSubmit={tableUpdationForm.handleSubmit}
+    <div className="flex h-full w-full flex-col overflow-hidden bg-background">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-background px-4 py-3 flex-shrink-0">
+        <div>
+          <h1 className="text-base font-semibold tracking-tight text-foreground">
+            {CONSTANTS.STRINGS.UPDATE_TABLE_FORM_TITLE}
+          </h1>
+          <p className="mt-0.5 font-mono text-xs text-muted-foreground">
+            Schema: {databaseSchemaName} • Table: {databaseTableName}
+          </p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <DatabaseTableDeletionForm
+            tenantID={tenantID}
+            databaseSchemaName={databaseSchemaName}
+            databaseTableName={databaseTableName}
+          />
+          <Button
+            size="sm"
+            type="submit"
+            form="database-table-update-form"
+            disabled={isUpdatingDatabaseTable}
           >
-            {tableUpdationForm && (
-              <DatabaseTableEditor
-                tenantID={tenantID}
-                tableEditorForm={tableUpdationForm}
-              />
-            )}
-            <div className="w-full flex flex-row items-center justify-end gap-3">
-              <DatabaseTableDeletionForm
-                tenantID={tenantID}
-                databaseSchemaName={databaseSchemaName}
-                databaseTableName={databaseTableName}
-              />
-              <Button
-                type="submit"
-                disabled={isUpdatingDatabaseTable}
-              >
-                {isUpdatingDatabaseTable ? (
-                  <>
-                    <Spinner className="mr-2" size={16} />
-                    {CONSTANTS.STRINGS.UPDATING || "Updating..."}
-                  </>
-                ) : (
-                  CONSTANTS.STRINGS.UPDATE_TABLE_FORM_SUBMIT_BUTTON
-                )}
-              </Button>
-            </div>
-          </form>
-        </ReactQueryLoadingErrorWrapper>
-      </section>
+            {isUpdatingDatabaseTable && <Spinner size={14} />}
+            {CONSTANTS.STRINGS.UPDATE_TABLE_FORM_SUBMIT_BUTTON}
+          </Button>
+        </div>
+      </div>
+
+      <div className="flex flex-1 flex-col items-center overflow-y-auto p-4 md:p-6">
+        <section className="w-full max-w-2xl">
+          <ReactQueryLoadingErrorWrapper
+            isLoading={isLoadingDatabaseTable || isLoadingDatabaseMetadata}
+            error={loadDatabaseTableError}
+          >
+            <form
+              id="database-table-update-form"
+              noValidate
+              className="space-y-6"
+              onSubmit={tableUpdationForm.handleSubmit}
+            >
+              {tableUpdationForm && (
+                <DatabaseTableEditor
+                  tenantID={tenantID}
+                  tableEditorForm={tableUpdationForm}
+                />
+              )}
+            </form>
+          </ReactQueryLoadingErrorWrapper>
+        </section>
+      </div>
     </div>
   );
 };

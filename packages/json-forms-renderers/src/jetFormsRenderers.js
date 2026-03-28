@@ -11,6 +11,7 @@ import {
   JetKeyTypeArrayControl,
   JetStringArrayControl,
   JetFieldOperatorValueArrayControl,
+  JetGenericObjectArrayControl,
   JetGroupLayout,
   JetVerticalLayout,
   JetTabLayout,
@@ -30,6 +31,7 @@ import {
   keyTypeArrayTester,
   stringArrayTester,
   fieldOperatorValueArrayTester,
+  genericObjectArrayTester,
   groupLayoutTester,
   verticalLayoutTester,
   tabRendererTester,
@@ -52,6 +54,7 @@ export const jetFormsBaseRenderers = [
   { tester: keyTypeArrayTester, renderer: JetKeyTypeArrayControl },
   { tester: stringArrayTester, renderer: JetStringArrayControl },
   { tester: fieldOperatorValueArrayTester, renderer: JetFieldOperatorValueArrayControl },
+  { tester: genericObjectArrayTester, renderer: JetGenericObjectArrayControl },
   { tester: groupLayoutTester, renderer: JetGroupLayout },
   { tester: verticalLayoutTester, renderer: JetVerticalLayout },
 ];

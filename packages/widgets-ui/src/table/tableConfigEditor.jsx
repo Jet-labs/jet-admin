@@ -330,7 +330,8 @@ export const TableConfigEditor = ({ widgetEditorForm, workflowContext, workflows
                   <Button
                     type="button"
                     variant="ghost"
-                    size="icon"
+                    size="sm"
+                    square
                     className="h-5 w-5 text-muted-foreground hover:text-foreground"
                     onClick={() => handleMoveColumn(idx, -1)}
                     disabled={idx === 0}
@@ -341,7 +342,8 @@ export const TableConfigEditor = ({ widgetEditorForm, workflowContext, workflows
                   <Button
                     type="button"
                     variant="ghost"
-                    size="icon"
+                    size="sm"
+                    square
                     className="h-5 w-5 text-muted-foreground hover:text-foreground"
                     onClick={() => handleMoveColumn(idx, 1)}
                     disabled={idx === columns.length - 1}
@@ -376,7 +378,8 @@ export const TableConfigEditor = ({ widgetEditorForm, workflowContext, workflows
                 <Button
                   type="button"
                   variant="ghost"
-                  size="icon"
+                  size="sm"
+                  square
                   className="h-7 w-7 text-destructive"
                   onClick={() => handleRemoveColumn(idx)}
                   title="Remove column"

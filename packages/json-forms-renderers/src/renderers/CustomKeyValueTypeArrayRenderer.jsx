@@ -2,8 +2,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { JsonFormsDispatch } from '@jsonforms/react';
-import { MdDeleteOutline } from 'react-icons/md';
-import { Button } from '@jet-admin/ui';
+import { Trash2 } from 'lucide-react';
+import { Button, Label } from '@jet-admin/ui';
 
 export const CustomKeyValueTypeArrayRenderer = ({
   data,
@@ -37,10 +37,10 @@ export const CustomKeyValueTypeArrayRenderer = ({
   };
 
   return (
-    <div className="p-3 border border-slate-200 rounded bg-white mb-3">
-      <label className="block mb-1 text-sm font-medium text-slate-700">
+    <div className="p-3 border border-border rounded bg-background mb-3">
+      <Label className="block mb-1 text-sm font-medium text-foreground">
         {label || uischema.label || "Items"}
-      </label>
+      </Label>
       {errors && errors.length > 0 && (
         <p className="text-red-500 text-xs mb-2">{errors}</p>
       )}
@@ -95,10 +95,12 @@ export const CustomKeyValueTypeArrayRenderer = ({
             </div>
             <Button
               type="button"
+              variant="destructive-ghost"
+              size="sm"
+              square
               onClick={() => handleRemoveItem(index)}
-              className="mt-2 p-2 rounded bg-red-100 text-red-400 focus:outline-none hover:border-red-400"
             >
-              <MdDeleteOutline />
+              <Trash2 className="w-4 h-4" />
             </Button>
           </div>
         ))}
@@ -106,8 +108,10 @@ export const CustomKeyValueTypeArrayRenderer = ({
 
       <Button
         type="button"
+        variant="primary-ghost"
+        size="sm"
         onClick={handleAddItem}
-        className="mt-3 px-2 py-1 bg-white text-[#646cff] text-xs rounded hover:border-[#646cff] focus:outline-none border border-slate-200"
+        className="mt-3"
       >
         Add Item
       </Button>

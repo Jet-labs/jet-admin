@@ -55,7 +55,8 @@ export const WidgetCloneForm = ({ tenantID, widgetID }) => {
       <Button
         type="button"
         variant="primary-ghost"
-        size="icon"
+        size="sm"
+        square
         onClick={_handleCloneWidget}
         disabled={isCloningWidget}
       >

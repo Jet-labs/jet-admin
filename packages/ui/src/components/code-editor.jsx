@@ -83,10 +83,10 @@ const CodeEditor = React.forwardRef(({
   return (
     <div
       className={cn(
-        "flex flex-col overflow-hidden rounded-md border text-sm shadow-sm transition-colors",
+        "flex flex-col overflow-hidden rounded border text-sm shadow-sm transition-colors",
         status === "error" ? "border-destructive/50 ring-1 ring-destructive/20" : "border-border hover:border-border/80",
         isExpanded
-          ? "fixed inset-4 z-50 rounded-lg shadow-2xl ring-1 ring-border/50 bg-background"
+          ? "fixed inset-4 z-50 rounded shadow-2xl ring-1 ring-border/50 bg-background"
           : "relative bg-background",
         className
       )}
@@ -128,7 +128,7 @@ const CodeEditor = React.forwardRef(({
               <button
                 type="button"
                 onClick={handleFormat}
-                className="inline-flex h-6 items-center gap-1.5 rounded-sm border border-transparent px-2 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground hover:border-border/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                className="inline-flex h-6 items-center gap-1.5 rounded border border-transparent px-2 text-[11px] font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground hover:border-border/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 title="Format Code (Shift+Alt+F)"
               >
                 <Braces className="h-3 w-3" />
@@ -140,7 +140,7 @@ const CodeEditor = React.forwardRef(({
               <button
                 type="button"
                 onClick={() => setIsExpanded(!isExpanded)}
-                className="inline-flex h-6 w-6 items-center justify-center rounded-sm border border-transparent text-muted-foreground transition-colors hover:bg-muted hover:text-foreground hover:border-border/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                className="inline-flex h-6 w-6 items-center justify-center rounded border border-transparent text-muted-foreground transition-colors hover:bg-muted hover:text-foreground hover:border-border/50 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                 title={isExpanded ? "Exit fullscreen (Esc)" : "Fullscreen"}
               >
                 {isExpanded ? <Minimize2 className="h-3 w-3" /> : <Maximize2 className="h-3 w-3" />}
@@ -197,7 +197,7 @@ const CodeEditor = React.forwardRef(({
 
         {/* Footer Hint Overlay */}
         {footerHint && (
-          <div className="absolute bottom-2 right-4 z-10 pointer-events-none rounded-md border border-border/50 bg-background/95 px-2 py-1 text-[10px] text-muted-foreground shadow-sm backdrop-blur-sm">
+          <div className="absolute bottom-2 right-4 z-10 pointer-events-none rounded border border-border/50 bg-background/95 px-2 py-1 text-[10px] text-muted-foreground shadow-sm backdrop-blur-sm">
             {footerHint}
           </div>
         )}

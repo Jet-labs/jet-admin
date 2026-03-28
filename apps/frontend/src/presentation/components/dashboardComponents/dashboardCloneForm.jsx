@@ -58,7 +58,8 @@ export const DashboardCloneForm = ({ tenantID, dashboardID }) => {
       disabled={isCloningDashboard}
       type="button"
       variant="primary-ghost"
-      size="icon"
+      size="sm"
+      square
       className="shrink-0"
       aria-label="Clone dashboard"
     >

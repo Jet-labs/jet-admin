@@ -64,10 +64,15 @@ export const DataQueryAdditionForm = ({ tenantID }) => {
 
   return (
     <div className="flex h-full w-full flex-col items-center bg-background">
-      <div className="w-full border-b border-border bg-background px-3 py-2">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground text-start">
-          {CONSTANTS.STRINGS.ADD_QUERY_FORM_TITLE}
-        </h1>
+      <div className="w-full flex items-center justify-between border-b border-border bg-background px-4 py-3">
+        <div>
+          <h1 className="text-base font-semibold tracking-tight text-foreground">
+            {CONSTANTS.STRINGS.ADD_QUERY_FORM_TITLE}
+          </h1>
+          <p className="mt-0.5 text-xs text-muted-foreground">
+            Configure a new data query connection.
+          </p>
+        </div>
       </div>
       <ResizablePanelGroup
         direction="vertical"
@@ -76,29 +81,20 @@ export const DataQueryAdditionForm = ({ tenantID }) => {
         }
         className={"!w-full !h-full"}
       >
-        <ResizablePanel defaultSize={20}>
-          <form
-            className="w-full h-full"
-            onSubmit={queryAdditionForm.handleSubmit}
-          >
-            <ResizablePanelGroup
-              direction="horizontal"
-              autoSaveId={
-                CONSTANTS.RESIZABLE_PANEL_KEYS
-                  .QUERY_ADDITION_FORM_QUERY_EDITOR_SEPARATION
-              }
-              className={"!w-full !h-full"}
+        <ResizablePanel defaultSize={20} className="!overflow-y-auto h-full p-3 md:p-6">
+          <div className="mx-auto w-full max-w-2xl">
+            <form
+              className="space-y-4 w-full"
+              onSubmit={queryAdditionForm.handleSubmit}
+              noValidate
             >
-              <ResizablePanel
-                defaultSize={20}
-                className="space-y-4 p-3 !overflow-y-auto"
-              >
-                <div className="space-y-1">
-                  <Label
-                    htmlFor="dataQueryTitle"
-                    className="text-sm font-medium leading-none"
-                  >
-                    {CONSTANTS.STRINGS.ADD_QUERY_FORM_NAME_FIELD_LABEL}
+              <div className="rounded border border-border bg-card p-4 space-y-3">
+                <p className="text-[10px] font-mono font-semibold uppercase tracking-widest text-muted-foreground mb-0.5">
+                  General
+                </p>
+                <div className="space-y-1.5">
+                  <Label htmlFor="dataQueryTitle">
+                    {CONSTANTS.STRINGS.ADD_QUERY_FORM_NAME_FIELD_LABEL} <span className="text-destructive">*</span>
                   </Label>
                   <Input
                     name="dataQueryTitle"
@@ -112,55 +108,60 @@ export const DataQueryAdditionForm = ({ tenantID }) => {
                     value={queryAdditionForm.values.dataQueryTitle}
                   />
                   {queryAdditionForm.errors.dataQueryTitle && (
-                    <span className="text-destructive text-xs">
+                    <p className="text-xs text-red-500">
                       {queryAdditionForm.errors.dataQueryTitle}
-                    </span>
+                    </p>
                   )}
                 </div>
+              </div>
 
-              </ResizablePanel>
-              <ResizableHandle withHandle={true} />
-              <ResizablePanel
-                defaultSize={80}
-                className="space-y-4 p-3 h-full w-full !overflow-y-auto"
-              >
-                <DataQueryEditor dataQueryEditorForm={queryAdditionForm} />
-                <div className="w-full flex flex-row justify-end items-center gap-3">
-                  <DataQueryAIGeneratePrompt
-                    tenantID={tenantID}
-                    onAccepted={(aiGeneratedQuery) => {
-                      queryAdditionForm.setFieldValue(
-                        "dataQueryOptions",
-                        aiGeneratedQuery
-                      );
-                    }}
-                  />
-                  <DataQueryTestingForm
-                    tenantID={tenantID}
-                    datasourceID={queryAdditionForm.values.datasourceID}
-                    datasourceType={queryAdditionForm.values.datasourceType}
-                    dataQueryOptions={queryAdditionForm.values.dataQueryOptions}
-                    setDataQueryTestResult={setDataQueryTestResult}
-                    dataQuery={queryAdditionForm.values}
-                  />
-                  <Button type="submit" disabled={isAddingDataQuery}>
-                    {isAddingDataQuery && (
-                      <Spinner className="mr-2" size={16} />
-                    )}
-                    {CONSTANTS.STRINGS.ADD_QUERY_FORM_SUBMIT_BUTTON}
-                  </Button>
-                </div>
-              </ResizablePanel>
-            </ResizablePanelGroup>
-          </form>
+              <DataQueryEditor dataQueryEditorForm={queryAdditionForm} />
+
+              <div className="w-full flex justify-end items-center gap-2 mt-4">
+                <DataQueryAIGeneratePrompt
+                  tenantID={tenantID}
+                  onAccepted={(aiGeneratedQuery) => {
+                    queryAdditionForm.setFieldValue(
+                      "dataQueryOptions",
+                      aiGeneratedQuery
+                    );
+                  }}
+                />
+                <DataQueryTestingForm
+                  tenantID={tenantID}
+                  datasourceID={queryAdditionForm.values.datasourceID}
+                  datasourceType={queryAdditionForm.values.datasourceType}
+                  dataQueryOptions={queryAdditionForm.values.dataQueryOptions}
+                  setDataQueryTestResult={setDataQueryTestResult}
+                  dataQuery={queryAdditionForm.values}
+                />
+                <Button type="submit" size="sm" disabled={isAddingDataQuery}>
+                  {isAddingDataQuery && (
+                    <Spinner size={14} />
+                  )}
+                  {CONSTANTS.STRINGS.ADD_QUERY_FORM_SUBMIT_BUTTON}
+                </Button>
+              </div>
+            </form>
+          </div>
         </ResizablePanel>
         <ResizableHandle withHandle={true} />
         <ResizablePanel defaultSize={80}>
+          <div className="flex h-full w-full flex-col overflow-hidden bg-background">
+            <div className="flex items-center justify-between border-b border-border bg-slate-50 px-4 py-2 flex-shrink-0">
+              <span className="text-xs font-semibold text-slate-700">
+                Query Test Result
+              </span>
+
+            </div>
+            <div className="flex-1 overflow-auto">
           {DATASOURCE_UI_COMPONENTS[
             queryAdditionForm.values.datasourceType
           ]?.queryResponseView({
             queryResult: dataQueryTestResult,
           })}
+            </div>
+          </div>
         </ResizablePanel>
       </ResizablePanelGroup>
     </div>

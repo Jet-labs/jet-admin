@@ -96,7 +96,8 @@ const JsonNode = ({ name, value, depth = 0 }) => {
         <Button
           onClick={handleCopy}
           variant="ghost"
-          size="icon"
+          size="sm"
+          square
           className="ml-2 h-5 w-5 opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-foreground transition-all duration-200"
           title="Copy value"
         >
@@ -182,7 +183,8 @@ export const WorkflowContextPanel = ({
             type='button'
             disabled={isEmpty}
             variant="ghost"
-            size="icon"
+            size="sm"
+            square
             className="h-7 w-7 text-muted-foreground hover:text-foreground"
             title="Copy all context"
           >

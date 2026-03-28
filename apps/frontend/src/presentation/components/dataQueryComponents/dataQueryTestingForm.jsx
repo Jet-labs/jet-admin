@@ -18,6 +18,7 @@ export const DataQueryTestingForm = ({
   datasourceType,
   dataQueryOptions,
   dataQuery,
+  size = "sm"
 }) => {
   DataQueryTestingForm.propTypes = {
     tenantID: PropTypes.number.isRequired,
@@ -109,10 +110,10 @@ export const DataQueryTestingForm = ({
         disabled={isTestingDataQuery}
         type="button"
         variant="primary-ghost"
-
+        size={size}
       >
         {isTestingDataQuery ? (
-          <Spinner className="mr-2" size={16} />
+          <Spinner size={14} />
         ) : null}
         {CONSTANTS.STRINGS.TEST_QUERY_FORM_TEST_BUTTON}
       </Button>

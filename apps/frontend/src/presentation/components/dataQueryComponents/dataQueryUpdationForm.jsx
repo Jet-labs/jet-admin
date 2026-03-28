@@ -100,7 +100,6 @@ export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
       updateDataQuery(values);
     },
   });
-  console.log("queryUpdationForm", queryUpdationForm.values);
 
   // Reset test result when switching to a different data query
   React.useEffect(() => {
@@ -109,16 +108,51 @@ export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
 
   return (
     <div className="flex h-full w-full flex-col items-center bg-background">
-      <div className="w-full px-3 py-2 border-b border-border flex flex-col justify-center items-start">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground text-start ">
-          {CONSTANTS.STRINGS.UPDATE_QUERY_FORM_TITLE}
-        </h1>
+      <div className="flex w-full flex-wrap items-center justify-between gap-3 border-b border-border bg-background px-4 py-3">
+        <div>
+          <h1 className="text-base font-semibold tracking-tight text-foreground">
+            {CONSTANTS.STRINGS.UPDATE_QUERY_FORM_TITLE}
+          </h1>
+          {dataQuery && (
+            <p className="mt-0.5 font-mono text-xs text-muted-foreground">
+              ID: {dataQuery.dataQueryID}
+            </p>
+          )}
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <DataQueryCloneForm
+            key={`dataQueryCloneForm_${dataQuery?.dataQueryID}`}
+            tenantID={tenantID}
+            dataQueryID={dataQueryID}
+          />
+          <DataQueryDeletionForm
+            key={`dataQueryDeletionForm_${dataQuery?.dataQueryID}`}
+            tenantID={tenantID}
+            dataQueryID={dataQueryID}
+          />
+          <DataQueryTestingForm
+            key={`dataQueryTestingForm_${dataQuery?.dataQueryID}`}
+            tenantID={tenantID}
+            dataQueryID={dataQueryID}
+            datasourceID={dataQuery?.datasourceID}
+            datasourceType={queryUpdationForm.values?.datasourceType}
+            dataQueryOptions={queryUpdationForm.values?.dataQueryOptions}
+            setDataQueryTestResult={setDataQueryTestResult}
+            dataQuery={queryUpdationForm.values}
+          />
 
-        {dataQuery && (
-          <span className="text-xs text-muted-foreground mt-1">{`Query ID: ${
-            dataQuery.dataQueryID
-          }`}</span>
-        )}
+          <Button
+            type="submit"
+            form="dataquery-update-form"
+            size="sm"
+            disabled={isUpdatingDataQuery}
+          >
+            {isUpdatingDataQuery && (
+              <Spinner size={14} />
+            )}
+            {CONSTANTS.STRINGS.UPDATE_QUERY_FORM_SUBMIT_BUTTON}
+          </Button>
+        </div>
       </div>
 
       <ReactQueryLoadingErrorWrapper
@@ -132,29 +166,21 @@ export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
           }
           className={"!w-full !h-full"}
         >
-          <ResizablePanel defaultSize={20}>
-            <form
-              className="w-full h-full "
-              onSubmit={queryUpdationForm.handleSubmit}
-            >
-              <ResizablePanelGroup
-                direction="horizontal"
-                autoSaveId={
-                  CONSTANTS.RESIZABLE_PANEL_KEYS
-                    .QUERY_ADDITION_FORM_QUERY_EDITOR_SEPARATION
-                }
-                className={"!w-full !h-full"}
+          <ResizablePanel defaultSize={20} className="!overflow-y-auto h-full p-3 md:p-6">
+            <div className="mx-auto w-full max-w-2xl">
+              <form
+                id="dataquery-update-form"
+                className="space-y-4 w-full"
+                onSubmit={queryUpdationForm.handleSubmit}
+                noValidate
               >
-                <ResizablePanel
-                  defaultSize={20}
-                  className="space-y-4 p-3 !overflow-y-auto"
-                >
-                  <div className="space-y-1">
-                    <Label
-                      htmlFor="dataQueryTitle"
-                      className="text-sm font-medium leading-none"
-                    >
-                      {CONSTANTS.STRINGS.UPDATE_QUERY_FORM_NAME_FIELD_LABEL}
+                <div className="rounded border border-border bg-card p-4 space-y-3">
+                  <p className="text-[10px] font-mono font-semibold uppercase tracking-widest text-muted-foreground mb-0.5">
+                    General
+                  </p>
+                  <div className="space-y-1.5">
+                    <Label htmlFor="dataQueryTitle">
+                      {CONSTANTS.STRINGS.UPDATE_QUERY_FORM_NAME_FIELD_LABEL} <span className="text-destructive">*</span>
                     </Label>
                     <Input
                       name="dataQueryTitle"
@@ -169,68 +195,38 @@ export const DataQueryUpdationForm = ({ tenantID, dataQueryID }) => {
                       value={queryUpdationForm.values.dataQueryTitle}
                     />
                     {queryUpdationForm.errors.dataQueryTitle && (
-                      <span className="text-destructive text-xs">
+                      <p className="text-xs text-red-500">
                         {queryUpdationForm.errors.dataQueryTitle}
-                      </span>
+                      </p>
                     )}
                   </div>
+                </div>
 
-                </ResizablePanel>
-                <ResizableHandle withHandle={true} />
-                <ResizablePanel
-                  defaultSize={80}
-                  className="space-y-4 p-3 h-full w-full !overflow-y-auto"
-                >
-                  <DataQueryEditor
-                    key={`dataQueryEditor_${dataQuery?.dataQueryID ? dataQuery.dataQueryID : "new"}`}
-                    dataQueryEditorForm={queryUpdationForm}
-                    tenantID={tenantID}
-                    dataQueryID={dataQueryID}
-                  />
-                  <div className="w-full flex flex-row justify-end items-center gap-3">
-                    <DataQueryCloneForm
-                      key={`dataQueryCloneForm_${dataQuery?.dataQueryID}`}
-                      tenantID={tenantID}
-                      dataQueryID={dataQueryID}
-                    />
-                    <DataQueryDeletionForm
-                      key={`dataQueryDeletionForm_${dataQuery?.dataQueryID}`}
-                      tenantID={tenantID}
-                      dataQueryID={dataQueryID}
-                    />
-                    <DataQueryTestingForm
-                      key={`dataQueryTestingForm_${dataQuery?.dataQueryID}`}
-                      tenantID={tenantID}
-                      dataQueryID={dataQueryID}
-                      datasourceID={dataQuery?.datasourceID}
-                      datasourceType={queryUpdationForm.values?.datasourceType}
-                      dataQueryOptions={queryUpdationForm.values?.dataQueryOptions}
-                      setDataQueryTestResult={setDataQueryTestResult}
-                      dataQuery={queryUpdationForm.values}
-                    />
-
-                    <Button
-                      type="submit"
-                      disabled={isUpdatingDataQuery}
-                    >
-                      {isUpdatingDataQuery && (
-                        <Spinner className="mr-2" size={16} />
-                      )}
-                      {CONSTANTS.STRINGS.UPDATE_QUERY_FORM_SUBMIT_BUTTON}
-                    </Button>
-                  </div>
-                </ResizablePanel>
-              </ResizablePanelGroup>
-            </form>
+                <DataQueryEditor
+                  key={`dataQueryEditor_${dataQuery?.dataQueryID ? dataQuery.dataQueryID : "new"}`}
+                  dataQueryEditorForm={queryUpdationForm}
+                  tenantID={tenantID}
+                  dataQueryID={dataQueryID}
+                />
+              </form>
+            </div>
           </ResizablePanel>
           <ResizableHandle withHandle={true} />
           <ResizablePanel defaultSize={80}>
-            <div className="w-full h-full">
+            <div className="flex h-full w-full flex-col overflow-hidden bg-background">
+              <div className="flex items-center justify-between border-b border-border bg-slate-50 px-4 py-2 flex-shrink-0">
+                <span className="text-xs font-semibold text-slate-700">
+                  Query Test Result
+                </span>
+
+              </div>
+              <div className="flex-1 overflow-auto">
               {DATASOURCE_UI_COMPONENTS[
                 dataQuery?.datasourceType
               ]?.queryResponseView({
                 queryResult: dataQueryTestResult,
               })}
+            </div>
             </div>
 
           </ResizablePanel>

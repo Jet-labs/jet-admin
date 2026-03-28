@@ -208,7 +208,8 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height }) => {
                 <Button
                   type="button"
                   variant="ghost"
-                  size="icon"
+                  size="sm"
+                  square
                   className="h-6 w-6 text-slate-500 hover:bg-slate-100 hover:text-slate-700"
                   onClick={() => {
                     refetchWidgetData();

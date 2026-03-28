@@ -40,12 +40,13 @@ export const DatasourceDeletionForm = ({ tenantID, datasourceID }) => {
     });
 
   const _handleDeleteDatasource = async () => {
-    await showConfirmation({
+    const confirmed = await showConfirmation({
       title: CONSTANTS.STRINGS.DELETE_DATASOURCE_DIALOG_TITLE,
       message: CONSTANTS.STRINGS.DELETE_DATASOURCE_DIALOG_MESSAGE,
       confirmText: "Delete",
       cancelText: "Cancel",
     });
+    if (!confirmed) return;
     deleteDatasource();
   };
 
@@ -53,13 +54,14 @@ export const DatasourceDeletionForm = ({ tenantID, datasourceID }) => {
     <>
       <Button
         variant="destructive-ghost"
-        size="icon"
+        size="sm"
+        square
         onClick={_handleDeleteDatasource}
         disabled={isDeletingDatasource}
         type="button"
       >
         {isDeletingDatasource ? (
-          <Spinner size={16} />
+          <Spinner size={14} />
         ) : (
             <MdDeleteOutline className="size-4" />
         )}

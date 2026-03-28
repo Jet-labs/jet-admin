@@ -78,7 +78,7 @@ export const DataQueryAIGeneratePrompt = ({ tenantID, onAccepted }) => {
               </div>
 
               {aiGeneratedQuery && (
-                <div className="mt-4 rounded-md border border-border overflow-hidden">
+                <div className="mt-4 rounded border border-border overflow-hidden">
                   <CodeBlock code={aiGeneratedQuery} language="pgsql" />
                 </div>
               )}

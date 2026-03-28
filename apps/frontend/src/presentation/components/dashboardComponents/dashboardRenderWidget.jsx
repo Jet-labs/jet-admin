@@ -64,7 +64,8 @@ export const DashboardRenderWidget = ({
               handleDelete(index);
             }}
             variant='destructive-ghost'
-            size="icon"
+            size="sm"
+            square
             className="rounded-none p-0 bg-primary/10 text-primary h-6 w-6"
             onMouseDown={(e) => {
               e.stopPropagation();

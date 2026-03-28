@@ -70,7 +70,8 @@ export function ArrayInput({
           <Button
             type="button"
             variant="ghost"
-            size="icon"
+            size="sm"
+            square
             className="h-8 w-8 text-slate-500 hover:text-red-500 flex-shrink-0 mt-1"
             onClick={() => handleRemoveItem(index)}
             disabled={disabled || !canRemove}
@@ -107,7 +108,8 @@ export function ArrayInput({
         <Button
           type="button"
           variant="ghost"
-          size="icon"
+          size="sm"
+          square
           className="h-8 w-8 text-slate-500 hover:text-red-500 flex-shrink-0"
           onClick={() => handleRemoveItem(index)}
           disabled={disabled || !canRemove}

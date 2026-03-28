@@ -53,7 +53,8 @@ export const DashboardDeletionForm = ({ tenantID, dashboardID }) => {
   return (
     <Button
       variant="destructive-ghost"
-      size="icon"
+      size="sm"
+      square
       onClick={_handleDeleteDashboard}
       disabled={isDeletingDashboard}
       type="button"

@@ -1,8 +1,8 @@
 // Custom Select Input Renderer
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
-import { TbRefresh } from 'react-icons/tb';
-import { Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@jet-admin/ui';
+import { RefreshCw } from 'lucide-react';
+import { Button, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@jet-admin/ui';
 
 export const CustomSelectInput = (props) => {
   const {
@@ -54,21 +54,23 @@ export const CustomSelectInput = (props) => {
     }
   };
 
+  const hasErrors = errors && errors.length > 0;
+
   return (
     <div className="mb-3">
-      <label
+      <Label
         htmlFor={path}
         className={`block mb-1 text-xs font-medium ${
-          errors && errors.length > 0 ? "text-red-500" : "text-slate-500"
+          hasErrors ? "text-red-500" : "text-muted-foreground"
         }`}
       >
-        {label || description} {errors && errors.length > 0 && errors}
-      </label>
-      <div className={`flex items-center gap-2 ${showRefreshButton ? '' : ''}`}>
+        {label || description}
+      </Label>
+      <div className="flex items-center gap-2">
         <Select value={data || ""} onValueChange={(val) => handleChange(path, val)} disabled={isDisabled}>
           <SelectTrigger
             id={path}
-            className={`text-sm ${errors && errors.length > 0 ? "border-red-500" : ""}`}
+            className={`text-sm ${hasErrors ? "border-red-500" : ""}`}
           >
             <SelectValue placeholder={uischema?.options?.placeholder || "Select an option"} />
           </SelectTrigger>
@@ -83,15 +85,20 @@ export const CustomSelectInput = (props) => {
         {showRefreshButton && onRefresh && (
           <Button
             type="button"
+            variant="outline"
+            size="sm"
+            square
             onClick={handleRefreshClick}
             disabled={isRefreshing || isDisabled}
-            className="flex-shrink-0 bg-slate-50 p-1.5 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed border border-slate-200"
             title="Refresh list"
           >
-            <TbRefresh className={`w-5 h-5 ${isRefreshing ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
           </Button>
         )}
       </div>
+      {hasErrors && (
+        <p className="text-xs text-red-500 mt-1">{errors}</p>
+      )}
     </div>
   );
 };
@@ -107,4 +114,3 @@ CustomSelectInput.propTypes = {
   uischema: PropTypes.object.isRequired,
   enabled: PropTypes.bool,
 };
-

@@ -41,13 +41,14 @@ export const DatasourceCloneForm = ({ tenantID, datasourceID }) => {
   );
 
   const _handleCloneDatasource = async () => {
-    await showConfirmation({
+    const confirmed = await showConfirmation({
       title: CONSTANTS.STRINGS.CLONE_DIALOG_TITLE || "Clone Datasource",
       message: CONSTANTS.STRINGS.CLONE_DIALOG_MESSAGE || "Are you sure you want to clone this datasource?",
       confirmText: "Clone",
       cancelText: "Cancel",
       confirmButtonClass: "!bg-primary",
     });
+    if (!confirmed) return;
     cloneDatasource();
   };
 
@@ -58,10 +59,11 @@ export const DatasourceCloneForm = ({ tenantID, datasourceID }) => {
         disabled={isCloningDatasource}
         type="button"
         variant="primary-ghost"
-        size="icon"
+        size="sm"
+        square
       >
         {isCloningDatasource ? (
-          <Spinner size={16} />
+          <Spinner size={14} />
         ) : (
             <FaRegClone className="size-4 text-primary" />
         )}

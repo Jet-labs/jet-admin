@@ -124,7 +124,8 @@ export const DashboardPrintForm = ({ dashboardID }) => {
   return (
     <Button
       onClick={_handlePrint}
-      variant="ghost" size="icon" className="text-primary hover:bg-primary/10"
+      variant="ghost" size="sm"
+      square className="text-primary hover:bg-primary/10"
     >
       <IoMdDownload className="text-primary h-4 w-4" />
     </Button>

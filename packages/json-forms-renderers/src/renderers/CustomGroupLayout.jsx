@@ -9,16 +9,14 @@ export const CustomGroupLayout = (props) => {
 
   const customClass = uischema.options?.customClass || "";
 
-  console.log('[CustomGroupLayout] Rendering group:', uischema.label, 'visible:', visible);
-
   if (!visible) {
     return null;
   }
 
   return (
-    <div className={`border border-slate-200 rounded p-3 mt-2 bg-white ${customClass}`}>
+    <div className={`border border-border rounded p-3 mt-2 bg-background ${customClass}`}>
       {uischema.label && (
-        <h3 className="text-xs font-medium text-slate-500 mb-2">
+        <h3 className="text-xs font-medium text-muted-foreground mb-2">
           {uischema.label}
         </h3>
       )}

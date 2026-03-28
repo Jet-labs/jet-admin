@@ -184,7 +184,8 @@ export const WorkflowTestingPanel = ({
             <Button
               type="button"
               variant="outline"
-              size="icon"
+              size="sm"
+              square
               className="h-7 w-7"
               onClick={_handleClose}
             >

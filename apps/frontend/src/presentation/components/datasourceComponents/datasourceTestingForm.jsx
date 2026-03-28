@@ -12,6 +12,7 @@ export const DatasourceTestingForm = ({
   datasourceType,
   datasourceOptions,
   setDatasourceTestResult,
+  size = "sm"
 }) => {
   DatasourceTestingForm.propTypes = {
     tenantID: PropTypes.number.isRequired,
@@ -51,10 +52,10 @@ export const DatasourceTestingForm = ({
         disabled={isTestingDatasource}
         type="button"
         variant="primary-ghost"
-
+        size={size}
       >
         {isTestingDatasource ? (
-          <Spinner className="mr-2" size={16} />
+          <Spinner size={14} />
         ) : null}
         {CONSTANTS.STRINGS.TEST_DATASOURCE_FORM_TEST_BUTTON}
       </Button>

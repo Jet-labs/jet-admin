@@ -11,6 +11,7 @@ export class CronJob {
     timeoutSeconds,
     retryAttempts,
     retryDelaySeconds,
+    tenantID,
     createdAt,
     updatedAt,
   }) {
@@ -25,6 +26,7 @@ export class CronJob {
     this.timeoutSeconds = timeoutSeconds;
     this.retryAttempts = retryAttempts;
     this.retryDelaySeconds = retryDelaySeconds;
+    this.tenantID = tenantID;
     this.createdAt = createdAt;
     this.updatedAt = updatedAt;
   }

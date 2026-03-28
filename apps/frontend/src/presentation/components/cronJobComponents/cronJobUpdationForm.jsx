@@ -13,8 +13,8 @@ import { displayError, displaySuccess } from "../../../utils/notification";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import { CronJobDeletionForm } from "./cronJobDeletionForm";
 import { CronJobEditor } from "./cronJobEditor";
-
 import { Button, Spinner } from "@jet-admin/ui";
+
 export const CronJobUpdationForm = ({ tenantID, cronJobID }) => {
   CronJobUpdationForm.propTypes = {
     tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
@@ -22,7 +22,9 @@ export const CronJobUpdationForm = ({ tenantID, cronJobID }) => {
     cronJobID: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
       .isRequired,
   };
+
   const queryClient = useQueryClient();
+
   const {
     isLoading: isLoadingCronJob,
     data: cronJob,
@@ -32,22 +34,17 @@ export const CronJobUpdationForm = ({ tenantID, cronJobID }) => {
       CONSTANTS.REACT_QUERY_KEYS.DATABASE_CRON_JOBS(tenantID),
       cronJobID,
     ],
-    queryFn: () =>
-      getCronJobByIDAPI({
-        tenantID,
-        cronJobID,
-      }),
+    queryFn: () => getCronJobByIDAPI({ tenantID, cronJobID }),
     refetchOnWindowFocus: false,
   });
 
   const { isPending: isUpdatingCronJob, mutate: updateCronJob } = useMutation({
-    mutationFn: (data) => {
-      return updateCronJobAPI({
+    mutationFn: (data) =>
+      updateCronJobAPI({
         tenantID,
         cronJobID,
         cronJobData: data,
-      });
-    },
+      }),
     retry: false,
     onSuccess: () => {
       displaySuccess(CONSTANTS.STRINGS.CRON_JOB_UPDATED_SUCCESS);
@@ -59,13 +56,18 @@ export const CronJobUpdationForm = ({ tenantID, cronJobID }) => {
       displayError(error);
     },
   });
+
   const cronJobUpdationForm = useFormik({
     initialValues: {
       cronJobTitle: "",
       cronJobDescription: "",
-      cronJobSchedule: "",
+      cronJobSchedule: "* * * * *",
       workflowID: "",
       workflowConfig: { inputArgs: {} },
+      isDisabled: false,
+      timeoutSeconds: "",
+      retryAttempts: "",
+      retryDelaySeconds: "",
     },
     validationSchema: formValidations.cronJobUpdationFormValidationSchema,
     onSubmit: (data) => {
@@ -73,64 +75,77 @@ export const CronJobUpdationForm = ({ tenantID, cronJobID }) => {
     },
   });
 
+  // Populate form once the remote data arrives.
+  // Using `setValues` directly — it is stable and safe to omit from deps.
   useEffect(() => {
-    if (cronJob && cronJob.cronJobID) {
+    if (cronJob?.cronJobID) {
       cronJobUpdationForm.setValues({
-        cronJobTitle: cronJob.cronJobTitle,
-        cronJobDescription: cronJob.cronJobDescription,
-        cronJobSchedule: cronJob.cronJobSchedule,
-        workflowID: cronJob.workflowID,
-        workflowConfig: cronJob.workflowConfig || { inputArgs: {} },
+        cronJobTitle: cronJob.cronJobTitle ?? "",
+        cronJobDescription: cronJob.cronJobDescription ?? "",
+        cronJobSchedule: cronJob.cronJobSchedule ?? "* * * * *",
+        workflowID: cronJob.workflowID ?? "",
+        workflowConfig: cronJob.workflowConfig ?? { inputArgs: {} },
+        isDisabled: cronJob.isDisabled ?? false,
+        timeoutSeconds: cronJob.timeoutSeconds ?? "",
+        retryAttempts: cronJob.retryAttempts ?? "",
+        retryDelaySeconds: cronJob.retryDelaySeconds ?? "",
       });
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cronJob]);
 
   return (
     <section className="w-full bg-background">
-      <div className="border-b border-border bg-background p-3">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
-          {CONSTANTS.STRINGS.UPDATE_CRON_JOB_FORM_TITLE}
-        </h1>
+      {/* ── Page header ─────────────────────────────────────────────── */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-background px-4 py-3">
+        <div>
+          <h1 className="text-base font-semibold tracking-tight text-foreground">
+            {CONSTANTS.STRINGS.UPDATE_CRON_JOB_FORM_TITLE}
+          </h1>
+          {cronJob?.cronJobID && (
+            <p className="mt-0.5 font-mono text-xs text-muted-foreground">
+              Job ID: {cronJob.cronJobID}
+            </p>
+          )}
+        </div>
+
+        {/* ── Header actions ────────────────────────────────────────── */}
+        <div className="flex flex-wrap items-center gap-2">
+          <Button asChild type="button" variant="outline" size="sm">
+            <Link
+              to={CONSTANTS.ROUTES.VIEW_CRON_JOB_HISTORY_BY_ID.path(
+                tenantID,
+                cronJobID
+              )}
+            >
+              {CONSTANTS.STRINGS.VIEW_CRON_JOB_HISTORY_BUTTON_TEXT}
+            </Link>
+          </Button>
+
+          <CronJobDeletionForm tenantID={tenantID} cronJobID={cronJobID} />
+
+          <Button
+            type="submit"
+            size="sm"
+            form="cron-job-updation-form"
+            disabled={isUpdatingCronJob}
+          >
+            {isUpdatingCronJob && <Spinner className="mr-2" size={14} />}
+            {CONSTANTS.STRINGS.UPDATE_CRON_JOB_SUBMIT_BUTTON_TEXT}
+          </Button>
+        </div>
       </div>
+
+      {/* ── Form body ───────────────────────────────────────────────── */}
       <ReactQueryLoadingErrorWrapper
         isLoading={isLoadingCronJob}
         error={loadCronJobError}
       >
-        <div className="mx-auto w-full max-w-2xl space-y-4 p-4 md:p-8">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div className="space-y-1">
-              {cronJob && (
-                <span className="text-xs text-muted-foreground">{`Job ID: ${cronJob.cronJobID}`}</span>
-              )}
-            </div>
-
-            <div className="flex flex-wrap items-center justify-end gap-2">
-              <Button asChild type="button" variant="outline">
-                <Link
-                  to={CONSTANTS.ROUTES.VIEW_CRON_JOB_HISTORY_BY_ID.path(
-                    tenantID,
-                    cronJobID
-                  )}
-                >
-                  {CONSTANTS.STRINGS.VIEW_CRON_JOB_HISTORY_BUTTON_TEXT}
-                </Link>
-              </Button>
-              <CronJobDeletionForm tenantID={tenantID} cronJobID={cronJobID} />
-              <Button
-                type="submit"
-                form="cron-job-updation-form"
-                disabled={isUpdatingCronJob}
-              >
-                {isUpdatingCronJob && <Spinner className="mr-2" size={16} />}
-                {CONSTANTS.STRINGS.UPDATE_CRON_JOB_SUBMIT_BUTTON_TEXT}
-              </Button>
-            </div>
-          </div>
-
+        <div className="mx-auto w-full max-w-2xl p-4 md:p-6">
           <form
             id="cron-job-updation-form"
-            className="space-y-4"
             onSubmit={cronJobUpdationForm.handleSubmit}
+            noValidate
           >
             <CronJobEditor
               tenantID={tenantID}

@@ -48,7 +48,8 @@ export const DatabaseTableStatistics = ({
       <div className="!flex !flex-row justify-start items-center">
         <span className="!text-sm !font-normal !text-slate-500">{`Total records : ${databaseTableRowCount}`}</span>
           <Button
-            variant="ghost" size="icon"
+            variant="ghost" size="sm"
+            square
           onClick={_navigateToTableUpdate}
             className="ml-2 h-8 w-8"
         >
