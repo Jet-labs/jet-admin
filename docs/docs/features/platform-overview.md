@@ -364,7 +364,7 @@ graph TB
 | **Firebase Admin** | Authentication |
 | **Socket.IO** | WebSocket server |
 | **fastq** | In-memory queue |
-| **vm2** | Code sandboxing |
+| **isolated-vm** | Code sandboxing |
 | **node-cron** | Job scheduling |
 | **Winston** | Logging |
 

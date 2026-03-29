@@ -375,7 +375,7 @@ async function execute(nodeConfig, context, helpers) {
 |---|---|---|
 | `start` | `startHandler.js` | Passes through; returns `{ started: true, inputReceived: ctx.input }` |
 | `end` | `endHandler.js` | Collects `outputParameters` from context; `nextHandle: null` (terminal) |
-| `javascript` | `javascriptHandler.js` | Runs user code in `vm2` sandbox; IIFE wrapper so `return` works; `async/await` supported |
+| `javascript` | `javascriptHandler.js` | Runs user code in `isolated-vm` sandbox; IIFE wrapper so `return` works; synchronous only |
 | `dataQuery` | `dataQueryHandler.js` | Calls `QueryEngine.executeQuery(dataQueryID, resolvedArgs)`; args resolved via template engine |
 | `condition` | `conditionHandler.js` | Evaluates branches in order; returns first truthy branch ID as `nextHandle` |
 | `delay` | `delayHandler.js` | Returns `queueDelay: N ms`; non-blocking — next node is re-queued with delay |
@@ -390,7 +390,7 @@ Handlers resolve `{{ctx.*}}` expressions via `sharedResolveTemplate`. Two modes:
 
 ### JavaScript node sandbox
 
-User code runs inside `vm2` with a configurable timeout (default 30 s). The sandbox exposes only `ctx` (the current workflow context). `eval` and `wasm` are disabled. Async code is raced against the same timeout.
+User code runs inside `isolated-vm` with a configurable timeout (default 30 s). The sandbox exposes only `ctx` (the current workflow context).
 
 ```js
 // Both forms work inside the javascript node
@@ -570,7 +570,7 @@ Because `queue.config.js` exposes a stable interface (`addNodeJob`, `addResult`,
 | `queue.config.js` | fastq in-process queues; `addNodeJob`; `addResult`; `registerTaskWorker/ResultsWorker` |
 | `handlers/startHandler.js` | Start node — passes input through |
 | `handlers/endHandler.js` | End node — collects `outputParameters`; terminal |
-| `handlers/javascriptHandler.js` | JS execution in `vm2` sandbox with timeout |
+| `handlers/javascriptHandler.js` | JS execution in `isolated-vm` sandbox with timeout |
 | `handlers/dataQueryHandler.js` | QueryEngine adapter; template-resolved args |
 | `handlers/conditionHandler.js` | Branch evaluation — returns first truthy branch as `nextHandle` |
 | `handlers/delayHandler.js` | Non-blocking delay via `queueDelay` return value |

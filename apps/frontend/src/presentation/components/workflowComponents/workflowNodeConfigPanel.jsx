@@ -4,7 +4,19 @@ import { useWorkflowNodes } from '@jet-admin/workflow-nodes';
 import { useNodes } from 'reactflow';
 import { FaTimes, FaTrash } from 'react-icons/fa';
 
-import { Button } from "@jet-admin/ui";
+import {
+    Button,
+    Accordion,
+    AccordionItem,
+    AccordionTrigger,
+    AccordionContent,
+    Select,
+    SelectTrigger,
+    SelectValue,
+    SelectContent,
+    SelectItem,
+    Label
+} from "@jet-admin/ui";
 
 /**
  * WorkflowNodeConfigPanel - Side panel for configuring selected workflow nodes.
@@ -30,7 +42,7 @@ export const WorkflowNodeConfigPanel = ({ node, onChange, onClose, onDelete }) =
     return (
         <div className="fixed right-0 top-0 h-full w-[400px] bg-background shadow-2xl border-l border-border z-[1000] flex flex-col pb-4">
             {/* Header */}
-            <div className="flex justify-between items-center px-4 py-3 border-b border-border bg-muted/30">
+            <div className="flex justify-between items-center px-4 py-2 border-b border-border bg-muted/30">
                 <h3 className="font-semibold text-foreground tracking-tight">
                     {WORKFLOW_NODES_MAP[node.type]?.label || 'Node Configuration'}
                 </h3>
@@ -66,34 +78,40 @@ export const WorkflowNodeConfigPanel = ({ node, onChange, onClose, onDelete }) =
 
                 {/* Advanced Settings — Join Mode */}
                 {node.type !== 'start' && node.type !== 'end' && (
-                    <details className="mt-3 border border-border rounded-lg">
-                        <summary className="cursor-pointer px-4 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground select-none">
-                            Advanced Settings
-                        </summary>
-                        <div className="px-4 py-3 border-t border-border space-y-2">
-                            <label className="block text-xs font-medium text-muted-foreground">
-                                Join Mode
-                                <span className="block text-[10px] text-muted-foreground/70 mt-0.5">
-                                    When this node has multiple upstream parents
-                                </span>
-                            </label>
-                            <select
-                                value={node.data?.joinMode || 'all'}
-                                onChange={(e) => onChange(node.id, { ...node.data, joinMode: e.target.value })}
-                                className="w-full rounded-md border border-border bg-background px-3 py-1.5 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-                            >
-                                <option value="all">Wait for All (default)</option>
-                                <option value="any">Trigger on Any</option>
-                            </select>
-                        </div>
-                    </details>
+                    <Accordion type="single" collapsible className="mt-3 border border-border rounded bg-background">
+                        <AccordionItem value="advanced" className="border-none">
+                            <AccordionTrigger className="px-4 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:no-underline data-[state=open]:border-b data-[state=open]:border-border">
+                                Advanced Settings
+                            </AccordionTrigger>
+                            <AccordionContent className="px-4 py-3 space-y-2">
+                                <Label className="block text-xs font-medium text-muted-foreground">
+                                    Join Mode
+                                    <span className="block text-[10px] text-muted-foreground/70 mt-0.5 font-normal">
+                                        When this node has multiple upstream parents
+                                    </span>
+                                </Label>
+                                <Select
+                                    value={node.data?.joinMode || 'all'}
+                                    onValueChange={(value) => onChange(node.id, { ...node.data, joinMode: value })}
+                                >
+                                    <SelectTrigger className="w-full rounded border border-border bg-background px-3 py-1.5 h-auto text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring">
+                                        <SelectValue placeholder="Select join mode" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">Wait for All (default)</SelectItem>
+                                        <SelectItem value="any">Trigger on Any</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
                 )}
             </div>
 
             {/* Delete Confirmation Modal Overlay */}
             {showDeleteConfirm && (
                 <div className="absolute inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50 p-6">
-                    <div className="bg-background rounded-lg shadow-2xl border border-border p-6 w-full max-w-sm animate-in fade-in zoom-in duration-200">
+                    <div className="bg-background rounded shadow-2xl border border-border p-6 w-full max-w-sm animate-in fade-in zoom-in duration-200">
                         <h4 className="font-bold text-foreground text-lg mb-2">Delete Node?</h4>
                         <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
                             This will remove the node and all its connections. This action cannot be undone.

@@ -1,7 +1,6 @@
 // src/nodes/conditionNode.jsx
-import React2, { memo, useState, useEffect, useMemo, useCallback } from "react";
+import React2, { memo, useState, useEffect, useCallback, useMemo } from "react";
 import { Handle, Position } from "reactflow";
-import { JsonForms } from "@jsonforms/react";
 
 // src/context.jsx
 import React, { createContext, useContext } from "react";
@@ -78,6 +77,472 @@ var useNodeExecutionStatus = (nodeId) => {
   return nodeExecutionStatus[nodeId] || NODE_EXECUTION_STATUS.IDLE;
 };
 
+// src/nodes/conditionNode.jsx
+import {
+  Button,
+  Input,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue
+} from "@jet-admin/ui";
+import { FaPlus, FaTrash } from "react-icons/fa";
+import { VscDebugDisconnect } from "react-icons/vsc";
+var OPERATORS = [
+  { value: "equals", label: "Equals", symbol: "=", needsRight: true },
+  { value: "not_equals", label: "Not Equals", symbol: "\u2260", needsRight: true },
+  { value: "contains", label: "Contains", symbol: "\u2283", needsRight: true },
+  { value: "not_contains", label: "Doesn't Contain", symbol: "\u2284", needsRight: true },
+  { value: "starts_with", label: "Starts With", symbol: "\u21A6", needsRight: true },
+  { value: "ends_with", label: "Ends With", symbol: "\u21A4", needsRight: true },
+  { value: "greater_than", label: "Greater Than", symbol: ">", needsRight: true },
+  { value: "less_than", label: "Less Than", symbol: "<", needsRight: true },
+  { value: "greater_or_equal", label: "\u2265 Or Equal", symbol: "\u2265", needsRight: true },
+  { value: "less_or_equal", label: "\u2264 Or Equal", symbol: "\u2264", needsRight: true },
+  { value: "is_empty", label: "Is Empty", symbol: "\u2205", needsRight: false },
+  { value: "is_not_empty", label: "Is Not Empty", symbol: "\u2260\u2205", needsRight: false },
+  { value: "matches_regex", label: "Matches Regex", symbol: "~", needsRight: true },
+  // expression operator uses raw JS (ctx.variable, no mustache)
+  { value: "expression", label: "JS Expression", symbol: "{ }", needsRight: false, isExpression: true }
+];
+var OP_MAP = Object.fromEntries(OPERATORS.map((o) => [o.value, o]));
+var uid = (prefix = "id") => `${prefix}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+var makeCondition = () => ({
+  id: uid("c"),
+  leftValue: "",
+  operator: "equals",
+  rightValue: ""
+});
+var makeBranch = (label = "Branch") => ({
+  id: uid("b"),
+  label,
+  conditionLogic: "AND",
+  conditions: [makeCondition()]
+});
+function migrateBranches(raw = []) {
+  if (!raw.length) return [makeBranch("Yes"), makeBranch("No")];
+  return raw.map((b) => {
+    if (Array.isArray(b.conditions)) return b;
+    const expr = b.condition || b.expression || (b.conditionType !== "expression" && b.leftOperand ? buildLegacyExpr(b) : null) || "true";
+    return {
+      id: b.id || uid("b"),
+      label: b.name || b.label || "Branch",
+      conditionLogic: "AND",
+      conditions: [{
+        id: uid("c"),
+        leftValue: expr,
+        operator: "expression",
+        rightValue: ""
+      }]
+    };
+  });
+}
+function buildLegacyExpr(b) {
+  const L = b.leftOperand || "?";
+  const R = JSON.stringify(b.rightOperand ?? "");
+  switch (b.conditionType) {
+    case "equals":
+      return `String(${L}) === String(${R})`;
+    case "not_equals":
+      return `String(${L}) !== String(${R})`;
+    case "contains":
+      return `String(${L}).includes(${R})`;
+    case "greater_than":
+      return `Number(${L}) > Number(${R})`;
+    case "less_than":
+      return `Number(${L}) < Number(${R})`;
+    case "is_empty":
+      return `(${L} == null || ${L} === '')`;
+    case "is_not_empty":
+      return `!(${L} == null || ${L} === '')`;
+    case "regex":
+      return `new RegExp(${R}).test(String(${L}))`;
+    default:
+      return "true";
+  }
+}
+function conditionSummary(cond) {
+  if (!cond) return "";
+  if (cond.operator === "expression") {
+    const expr = cond.leftValue || "";
+    return expr.length > 24 ? expr.slice(0, 24) + "\u2026" : expr;
+  }
+  const op = OP_MAP[cond.operator];
+  const left = (cond.leftValue || "?").replace(/^\{\{|\}\}$/g, "");
+  const right = (cond.rightValue || "").replace(/^\{\{|\}\}$/g, "");
+  const sym = op?.symbol || "=";
+  const str = op?.needsRight === false ? `${left} ${sym}` : `${left} ${sym} ${right}`;
+  return str.length > 28 ? str.slice(0, 28) + "\u2026" : str;
+}
+function ConditionRow({ condition, onChange, onDelete, canDelete }) {
+  const op = OP_MAP[condition.operator] || OP_MAP["equals"];
+  const update = (patch) => onChange({ ...condition, ...patch });
+  return /* @__PURE__ */ React2.createElement("div", { className: "flex items-center gap-1.5" }, op.isExpression ? (
+    /* JS Expression mode: raw JS, ctx.variable (no mustache) */
+    /* @__PURE__ */ React2.createElement(
+      Input,
+      {
+        value: condition.leftValue,
+        onChange: (e) => update({ leftValue: e.target.value }),
+        placeholder: "ctx.score > 80 && ctx.status === 'active'",
+        className: "flex-1 h-7 text-xs font-mono px-2",
+        title: "Raw JavaScript \u2014 use ctx.variable (no curly braces)"
+      }
+    )
+  ) : /* @__PURE__ */ React2.createElement(React2.Fragment, null, /* @__PURE__ */ React2.createElement(
+    Input,
+    {
+      value: condition.leftValue,
+      onChange: (e) => update({ leftValue: e.target.value }),
+      placeholder: "{{ctx.field}}",
+      className: "flex-1 min-w-0 h-7 text-xs font-mono px-2"
+    }
+  ), /* @__PURE__ */ React2.createElement(
+    Select,
+    {
+      value: condition.operator,
+      onValueChange: (val) => update({ operator: val, rightValue: "" })
+    },
+    /* @__PURE__ */ React2.createElement(SelectTrigger, { className: "w-[136px] h-7 text-xs shrink-0" }, /* @__PURE__ */ React2.createElement(SelectValue, null)),
+    /* @__PURE__ */ React2.createElement(SelectContent, null, OPERATORS.map((o) => /* @__PURE__ */ React2.createElement(SelectItem, { key: o.value, value: o.value, className: "text-xs" }, /* @__PURE__ */ React2.createElement("span", { className: "font-mono text-slate-400 mr-1.5 text-[10px]" }, o.symbol), o.label)))
+  ), op.needsRight !== false && /* @__PURE__ */ React2.createElement(
+    Input,
+    {
+      value: condition.rightValue,
+      onChange: (e) => update({ rightValue: e.target.value }),
+      placeholder: "value or {{ctx.x}}",
+      className: "flex-1 min-w-0 h-7 text-xs px-2"
+    }
+  )), /* @__PURE__ */ React2.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: onDelete,
+      disabled: !canDelete,
+      className: "h-7 w-7 shrink-0 flex items-center justify-center rounded text-slate-300 hover:text-red-400 hover:bg-red-50 disabled:opacity-20 transition-colors",
+      title: "Remove condition"
+    },
+    /* @__PURE__ */ React2.createElement(FaTrash, { className: "w-2.5 h-2.5" })
+  ));
+}
+function AndOrDivider({ logic, onToggle }) {
+  return /* @__PURE__ */ React2.createElement("div", { className: "flex items-center gap-2 my-0.5" }, /* @__PURE__ */ React2.createElement("div", { className: "h-px flex-1 bg-slate-100" }), /* @__PURE__ */ React2.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: onToggle,
+      title: `Click to switch to ${logic === "AND" ? "OR" : "AND"}`,
+      className: `
+          text-[9px] font-bold px-2 py-0.5 rounded border tracking-wider
+          transition-colors select-none
+          ${logic === "AND" ? "bg-indigo-50 text-indigo-600 border-indigo-200 hover:bg-indigo-100" : "bg-amber-50  text-amber-600  border-amber-200  hover:bg-amber-100"}
+        `
+    },
+    logic
+  ), /* @__PURE__ */ React2.createElement("div", { className: "h-px flex-1 bg-slate-100" }));
+}
+function BranchEditor({ branch, onChange }) {
+  const updateField = (patch) => onChange({ ...branch, ...patch });
+  const updateCondition = (idx, updated) => {
+    const conditions = [...branch.conditions];
+    conditions[idx] = updated;
+    onChange({ ...branch, conditions });
+  };
+  const deleteCondition = (idx) => {
+    onChange({ ...branch, conditions: branch.conditions.filter((_, i) => i !== idx) });
+  };
+  const addCondition = () => {
+    onChange({ ...branch, conditions: [...branch.conditions, makeCondition()] });
+  };
+  const toggleLogic = () => updateField({ conditionLogic: branch.conditionLogic === "AND" ? "OR" : "AND" });
+  return /* @__PURE__ */ React2.createElement("div", { className: "space-y-3 p-3" }, /* @__PURE__ */ React2.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React2.createElement("span", { className: "text-[10px] font-medium text-slate-400 w-10 shrink-0" }, "Label"), /* @__PURE__ */ React2.createElement(
+    Input,
+    {
+      value: branch.label,
+      onChange: (e) => updateField({ label: e.target.value }),
+      placeholder: "Yes / No / Match\u2026",
+      className: "flex-1 h-7 text-xs"
+    }
+  )), /* @__PURE__ */ React2.createElement("div", { className: "flex items-center justify-between pt-1" }, /* @__PURE__ */ React2.createElement("span", { className: "text-[10px] font-semibold text-slate-400 uppercase tracking-widest" }, "Conditions"), branch.conditions.length > 1 && /* @__PURE__ */ React2.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: toggleLogic,
+      className: `
+              text-[9px] font-bold px-2 py-0.5 rounded border transition-colors
+              ${branch.conditionLogic === "AND" ? "bg-indigo-50 text-indigo-600 border-indigo-200" : "bg-amber-50  text-amber-600  border-amber-200"}
+            `
+    },
+    branch.conditionLogic
+  )), /* @__PURE__ */ React2.createElement("div", { className: "space-y-1" }, branch.conditions.map((cond, idx) => /* @__PURE__ */ React2.createElement(React2.Fragment, { key: cond.id }, /* @__PURE__ */ React2.createElement(
+    ConditionRow,
+    {
+      condition: cond,
+      onChange: (updated) => updateCondition(idx, updated),
+      onDelete: () => deleteCondition(idx),
+      canDelete: branch.conditions.length > 1
+    }
+  ), idx < branch.conditions.length - 1 && /* @__PURE__ */ React2.createElement(AndOrDivider, { logic: branch.conditionLogic, onToggle: toggleLogic })))), /* @__PURE__ */ React2.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: addCondition,
+      className: "flex items-center gap-1 text-[10px] text-indigo-500 hover:text-indigo-700 transition-colors"
+    },
+    /* @__PURE__ */ React2.createElement(FaPlus, { className: "w-2.5 h-2.5" }),
+    "Add condition"
+  ));
+}
+var ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
+  const { strings } = useWorkflowNodes();
+  const [title, setTitle] = useState(data?.title || "Condition");
+  const [description, setDescription] = useState(data?.description || "");
+  const [branches, setBranches] = useState(() => migrateBranches(data?.branches));
+  const [activeIdx, setActiveIdx] = useState(0);
+  const [errorHandling, setErrorHandling] = useState(data?.errorHandling || "fail_workflow");
+  useEffect(() => {
+    if (!data) return;
+    setTitle(data.title || "Condition");
+    setDescription(data.description || "");
+    setBranches(migrateBranches(data.branches));
+    setActiveIdx(0);
+    setErrorHandling(data.errorHandling || "fail_workflow");
+  }, [data]);
+  const addBranch = useCallback(() => {
+    const label = branches.length === 0 ? "Yes" : branches.length === 1 ? "No" : `Branch ${branches.length + 1}`;
+    const next = [...branches, makeBranch(label)];
+    setBranches(next);
+    setActiveIdx(next.length - 1);
+  }, [branches]);
+  const removeBranch = useCallback((idx) => {
+    if (branches.length <= 1) return;
+    const next = branches.filter((_, i) => i !== idx);
+    setBranches(next);
+    setActiveIdx((prev) => Math.min(prev, next.length - 1));
+  }, [branches]);
+  const updateBranch = useCallback((idx, updated) => {
+    setBranches((prev) => {
+      const copy = [...prev];
+      copy[idx] = updated;
+      return copy;
+    });
+  }, []);
+  const handleSave = useCallback(() => {
+    onChange({ title, description, branches, errorHandling });
+  }, [onChange, title, description, branches, errorHandling]);
+  const activeBranch = branches[activeIdx];
+  return /* @__PURE__ */ React2.createElement("div", { className: "w-full space-y-4" }, /* @__PURE__ */ React2.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React2.createElement("label", { className: "text-[10px] font-semibold uppercase tracking-widest text-slate-400" }, "Task Name"), /* @__PURE__ */ React2.createElement(
+    Input,
+    {
+      value: title,
+      onChange: (e) => setTitle(e.target.value),
+      placeholder: "e.g. Is Severity High?",
+      className: "h-8 text-sm"
+    }
+  )), /* @__PURE__ */ React2.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React2.createElement("label", { className: "text-[10px] font-semibold uppercase tracking-widest text-slate-400" }, "Description"), /* @__PURE__ */ React2.createElement(
+    "textarea",
+    {
+      value: description,
+      onChange: (e) => setDescription(e.target.value),
+      rows: 2,
+      placeholder: "What does this condition check?",
+      className: "w-full text-xs text-slate-600 border border-slate-200 rounded px-2.5 py-1.5 resize-none focus:outline-none focus:border-indigo-400 transition-colors"
+    }
+  )), /* @__PURE__ */ React2.createElement("div", { className: "border border-slate-200 rounded overflow-hidden" }, /* @__PURE__ */ React2.createElement("div", { className: "flex items-center bg-slate-50 border-b border-slate-200 overflow-x-auto" }, branches.map((branch, idx) => /* @__PURE__ */ React2.createElement(
+    "div",
+    {
+      key: branch.id,
+      className: `
+                group flex items-center gap-1.5 px-3 py-2.5 cursor-pointer
+                text-xs font-medium border-r border-slate-200
+                whitespace-nowrap transition-all select-none
+                ${activeIdx === idx ? "bg-white text-indigo-600 shadow-[inset_0_-2px_0_#6366f1]" : "text-slate-500 hover:text-slate-700 hover:bg-white/60"}
+              `,
+      onClick: () => setActiveIdx(idx)
+    },
+    /* @__PURE__ */ React2.createElement(
+      "span",
+      {
+        className: `
+                  w-4 h-4 rounded-full flex items-center justify-center
+                  text-[9px] font-bold shrink-0 transition-colors
+                  ${activeIdx === idx ? "bg-indigo-100 text-indigo-600" : "bg-slate-200 text-slate-500 group-hover:bg-slate-300"}
+                `
+      },
+      idx + 1
+    ),
+    /* @__PURE__ */ React2.createElement("span", { className: "truncate max-w-[80px]" }, branch.label || `Branch ${idx + 1}`),
+    branches.length > 1 && /* @__PURE__ */ React2.createElement(
+      "button",
+      {
+        type: "button",
+        onClick: (e) => {
+          e.stopPropagation();
+          removeBranch(idx);
+        },
+        className: "ml-0.5 w-3.5 h-3.5 flex items-center justify-center text-slate-300 hover:text-red-400 rounded opacity-0 group-hover:opacity-100 transition-all"
+      },
+      "\xD7"
+    )
+  )), /* @__PURE__ */ React2.createElement(
+    "button",
+    {
+      type: "button",
+      onClick: addBranch,
+      className: "px-3 py-2.5 text-xs text-indigo-500 hover:text-indigo-700 hover:bg-white/60 transition-colors flex items-center gap-1 whitespace-nowrap"
+    },
+    /* @__PURE__ */ React2.createElement(FaPlus, { className: "w-2.5 h-2.5" }),
+    "Add branch"
+  )), activeBranch ? /* @__PURE__ */ React2.createElement(
+    BranchEditor,
+    {
+      key: activeBranch.id,
+      branch: activeBranch,
+      onChange: (updated) => updateBranch(activeIdx, updated)
+    }
+  ) : /* @__PURE__ */ React2.createElement("div", { className: "p-4 text-xs text-slate-400 text-center" }, "No branches yet \u2014 click ", /* @__PURE__ */ React2.createElement("strong", null, "Add branch"), " above.")), /* @__PURE__ */ React2.createElement("div", { className: "flex items-center gap-2.5 px-3 py-2 bg-slate-50 border border-dashed border-slate-300 rounded text-xs text-slate-500" }, /* @__PURE__ */ React2.createElement("span", { className: "w-5 h-5 rounded-full bg-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-500 shrink-0" }, "\u2205"), /* @__PURE__ */ React2.createElement("span", null, /* @__PURE__ */ React2.createElement("span", { className: "font-semibold text-slate-600" }, "else"), " ", "\u2014 taken when none of the branches above match")), /* @__PURE__ */ React2.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React2.createElement("label", { className: "text-[10px] font-semibold uppercase tracking-widest text-slate-400" }, "On Error"), /* @__PURE__ */ React2.createElement(Select, { value: errorHandling, onValueChange: setErrorHandling }, /* @__PURE__ */ React2.createElement(SelectTrigger, { className: "h-8 text-xs" }, /* @__PURE__ */ React2.createElement(SelectValue, null)), /* @__PURE__ */ React2.createElement(SelectContent, null, /* @__PURE__ */ React2.createElement(SelectItem, { value: "fail_workflow", className: "text-xs" }, "Fail Workflow"), /* @__PURE__ */ React2.createElement(SelectItem, { value: "continue", className: "text-xs" }, "Continue to Default Branch")))), /* @__PURE__ */ React2.createElement("div", { className: "p-3 bg-indigo-50 border border-indigo-100 rounded text-[10px] text-indigo-700 space-y-1.5" }, /* @__PURE__ */ React2.createElement("div", { className: "font-semibold text-xs text-indigo-800" }, "\u{1F4A1} Writing Conditions"), /* @__PURE__ */ React2.createElement("div", null, "Use ", /* @__PURE__ */ React2.createElement("code", { className: "bg-white px-1 rounded font-mono border border-indigo-100" }, "{{ctx.field}}"), " in the left and right value inputs \u2014 e.g.", " ", /* @__PURE__ */ React2.createElement("code", { className: "bg-white px-1 rounded font-mono border border-indigo-100" }, "{{ctx.input.severity}}"), "."), /* @__PURE__ */ React2.createElement("div", null, "The right side can also be a plain literal like", " ", /* @__PURE__ */ React2.createElement("code", { className: "bg-white px-1 rounded font-mono border border-indigo-100" }, "High"), " or", " ", /* @__PURE__ */ React2.createElement("code", { className: "bg-white px-1 rounded font-mono border border-indigo-100" }, "3"), "."), /* @__PURE__ */ React2.createElement("div", null, "For complex multi-field logic, use the ", /* @__PURE__ */ React2.createElement("strong", null, "JS Expression"), " operator \u2014 it runs raw JavaScript where ", /* @__PURE__ */ React2.createElement("code", { className: "bg-white px-1 rounded font-mono border border-indigo-100" }, "ctx.field"), " is a direct variable (no curly braces)."), /* @__PURE__ */ React2.createElement("div", null, "Branches are evaluated ", /* @__PURE__ */ React2.createElement("strong", null, "top \u2192 bottom"), "; the first matching branch wins.")), /* @__PURE__ */ React2.createElement(
+    Button,
+    {
+      type: "button",
+      onClick: handleSave,
+      className: "w-full py-2 text-sm font-semibold text-white bg-indigo-600 rounded hover:bg-indigo-700 focus:ring-4 focus:outline-none focus:ring-indigo-300 transition-colors"
+    },
+    strings?.WORKFLOW_EDITOR_CONDITION_NODE_SAVE_BUTTON || "Save Condition"
+  ));
+};
+var ConditionNode = memo(({ data, isConnectable }) => {
+  const isDisabled = data?.isDisabled ?? false;
+  const branches = useMemo(() => migrateBranches(data?.branches || []), [data?.branches]);
+  const totalSlots = branches.length + 2;
+  const handleLeft = (i) => `${100 / (totalSlots + 1) * (i + 1)}%`;
+  return /* @__PURE__ */ React2.createElement(
+    "div",
+    {
+      className: `
+        bg-white rounded border shadow-sm
+        min-w-[260px] max-w-[340px]
+        transition-all duration-150
+        ${isDisabled ? "border-slate-200 opacity-50" : "border-slate-200 hover:border-indigo-400 hover:shadow-md"}
+      `
+    },
+    /* @__PURE__ */ React2.createElement(
+      "div",
+      {
+        className: `
+          flex items-center gap-2.5 px-3 py-2.5 border-b rounded-t
+          ${isDisabled ? "bg-slate-50 border-slate-100" : "bg-indigo-50 border-indigo-100"}
+        `
+      },
+      /* @__PURE__ */ React2.createElement(
+        "svg",
+        {
+          width: "14",
+          height: "14",
+          viewBox: "0 0 14 14",
+          className: `shrink-0 ${isDisabled ? "text-slate-400" : "text-indigo-500"}`,
+          fill: "currentColor"
+        },
+        /* @__PURE__ */ React2.createElement("path", { d: "M7 0 L14 7 L7 14 L0 7 Z" })
+      ),
+      /* @__PURE__ */ React2.createElement(
+        "span",
+        {
+          className: `
+            text-xs font-semibold truncate flex-1
+            ${isDisabled ? "text-slate-400 line-through" : "text-indigo-900"}
+          `
+        },
+        data?.title || "Condition"
+      ),
+      isDisabled && /* @__PURE__ */ React2.createElement("span", { className: "inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded border border-orange-200 shrink-0" }, /* @__PURE__ */ React2.createElement(VscDebugDisconnect, { className: "w-2.5 h-2.5" }), "Skip")
+    ),
+    /* @__PURE__ */ React2.createElement("div", { className: "px-3 py-2 space-y-1.5" }, branches.slice(0, 6).map((branch, idx) => {
+      const firstCond = branch.conditions?.[0];
+      const extra = (branch.conditions?.length ?? 0) - 1;
+      const summary = firstCond ? conditionSummary(firstCond) : "";
+      return /* @__PURE__ */ React2.createElement("div", { key: branch.id, className: "flex items-start gap-2 text-[10px]" }, /* @__PURE__ */ React2.createElement(
+        "div",
+        {
+          className: `mt-0.5 w-1.5 h-1.5 rounded-full shrink-0 ${isDisabled ? "bg-slate-300" : "bg-indigo-400"}`
+        }
+      ), /* @__PURE__ */ React2.createElement("span", { className: `font-semibold shrink-0 ${isDisabled ? "text-slate-400" : "text-slate-700"}` }, branch.label || `Branch ${idx + 1}`), /* @__PURE__ */ React2.createElement("span", { className: `truncate font-mono ${isDisabled ? "text-slate-300" : "text-slate-400"}` }, summary, extra > 0 && /* @__PURE__ */ React2.createElement("span", { className: "ml-1 text-slate-300 font-sans" }, "+", extra)));
+    }), branches.length > 6 && /* @__PURE__ */ React2.createElement("div", { className: "text-[9px] text-slate-400 pl-3.5" }, "+", branches.length - 6, " more branches"), /* @__PURE__ */ React2.createElement("div", { className: "flex items-center gap-2 text-[10px] pt-1.5 mt-0.5 border-t border-slate-100" }, /* @__PURE__ */ React2.createElement("div", { className: "w-1.5 h-1.5 rounded-full bg-slate-300 shrink-0" }), /* @__PURE__ */ React2.createElement("span", { className: "font-semibold text-slate-400" }, "else"), /* @__PURE__ */ React2.createElement("span", { className: "text-slate-300" }, "default path"))),
+    /* @__PURE__ */ React2.createElement("div", { className: "relative h-5 border-t border-slate-100 mt-1" }, branches.map((branch, idx) => /* @__PURE__ */ React2.createElement(
+      "span",
+      {
+        key: branch.id,
+        className: `
+              absolute bottom-1 transform -translate-x-1/2
+              text-[8px] font-medium leading-none truncate max-w-[44px] text-center
+              ${isDisabled ? "text-slate-300" : "text-indigo-400"}
+            `,
+        style: { left: handleLeft(idx) }
+      },
+      (branch.label || "").slice(0, 6)
+    )), /* @__PURE__ */ React2.createElement(
+      "span",
+      {
+        className: "absolute bottom-1 transform -translate-x-1/2 text-[8px] font-medium text-slate-300 leading-none",
+        style: { left: handleLeft(branches.length) }
+      },
+      "else"
+    ), /* @__PURE__ */ React2.createElement(
+      "span",
+      {
+        className: "absolute bottom-1 transform -translate-x-1/2 text-[8px] font-medium text-red-300 leading-none",
+        style: { left: handleLeft(branches.length + 1) }
+      },
+      "error"
+    )),
+    /* @__PURE__ */ React2.createElement(
+      Handle,
+      {
+        type: "target",
+        position: Position.Top,
+        isConnectable,
+        style: { width: 10, height: 10, backgroundColor: isDisabled ? "#cbd5e1" : "#6366f1", border: "2px solid white", top: -5 }
+      }
+    ),
+    branches.map((branch, idx) => /* @__PURE__ */ React2.createElement(
+      Handle,
+      {
+        key: branch.id,
+        type: "source",
+        position: Position.Bottom,
+        id: branch.id,
+        isConnectable,
+        style: { left: handleLeft(idx), width: 10, height: 10, backgroundColor: isDisabled ? "#cbd5e1" : "#6366f1", border: "2px solid white", bottom: -5 }
+      }
+    )),
+    /* @__PURE__ */ React2.createElement(
+      Handle,
+      {
+        type: "source",
+        position: Position.Bottom,
+        id: "default",
+        isConnectable,
+        style: { left: handleLeft(branches.length), width: 10, height: 10, backgroundColor: isDisabled ? "#cbd5e1" : "#94a3b8", border: "2px solid white", bottom: -5 }
+      }
+    ),
+    /* @__PURE__ */ React2.createElement(
+      Handle,
+      {
+        type: "source",
+        position: Position.Bottom,
+        id: "error",
+        isConnectable,
+        style: { left: handleLeft(branches.length + 1), width: 10, height: 10, backgroundColor: isDisabled ? "#cbd5e1" : "#ef4444", border: "2px solid white", bottom: -5 }
+      }
+    )
+  );
+});
+
+// src/nodes/dataQueryNode.jsx
+import React3, { memo as memo2, useState as useState2, useEffect as useEffect2, useMemo as useMemo2, useCallback as useCallback2 } from "react";
+import { Handle as Handle2, Position as Position2 } from "reactflow";
+import { JsonForms } from "@jsonforms/react";
+
 // src/jsonFormsRenderers.jsx
 import { jetFormsRenderers } from "@jet-admin/json-forms-renderers";
 import {
@@ -101,468 +566,7 @@ import {
   jetFormsBaseRenderers
 } from "@jet-admin/json-forms-renderers";
 
-// src/nodes/conditionNode.jsx
-import { TbLogicAnd } from "react-icons/tb";
-import { VscDebugDisconnect } from "react-icons/vsc";
-import { FaPlus, FaTrash } from "react-icons/fa";
-import { IoMdArrowDropdown, IoMdArrowDropright, IoMdArrowDropup } from "react-icons/io";
-import { Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue, Textarea } from "@jet-admin/ui";
-var ERROR_HANDLING_OPTIONS2 = {
-  FAIL_WORKFLOW: "fail_workflow",
-  CONTINUE_DEFAULT: "continue_default"
-};
-var CONDITION_TYPES = {
-  EXPRESSION: "expression",
-  EQUALS: "equals",
-  NOT_EQUALS: "not_equals",
-  CONTAINS: "contains",
-  GREATER_THAN: "greater_than",
-  LESS_THAN: "less_than",
-  IS_EMPTY: "is_empty",
-  IS_NOT_EMPTY: "is_not_empty",
-  REGEX: "regex"
-};
-var ConditionBranchEditor = ({ branches, onChange, workflowNodes, currentNodeId }) => {
-  const addBranch = () => {
-    const newBranch = {
-      id: `branch_${Date.now()}`,
-      name: `Branch ${branches.length + 1}`,
-      conditionType: CONDITION_TYPES.EXPRESSION,
-      expression: "true",
-      leftOperand: "",
-      rightOperand: ""
-    };
-    onChange([...branches, newBranch]);
-  };
-  const updateBranch = (index, field, value) => {
-    const updated = [...branches];
-    updated[index] = { ...updated[index], [field]: value };
-    onChange(updated);
-  };
-  const removeBranch = (index) => {
-    if (branches.length <= 1) return;
-    const updated = branches.filter((_, i) => i !== index);
-    onChange(updated);
-  };
-  const moveBranch = (index, direction) => {
-    if (direction === -1 && index === 0 || direction === 1 && index === branches.length - 1) return;
-    const updated = [...branches];
-    const temp = updated[index];
-    updated[index] = updated[index + direction];
-    updated[index + direction] = temp;
-    onChange(updated);
-  };
-  const availableVariables = useMemo(() => {
-    if (!workflowNodes) return [];
-    return workflowNodes.filter((n) => n.id !== currentNodeId && n.data?.outputVariable).map((n) => ({
-      nodeId: n.id,
-      nodeTitle: n.data?.title || n.type,
-      variable: n.data.outputVariable
-    }));
-  }, [workflowNodes, currentNodeId]);
-  return /* @__PURE__ */ React2.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React2.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React2.createElement("label", { className: "text-xs font-medium text-slate-500" }, "Condition Branches"), /* @__PURE__ */ React2.createElement(
-    Button,
-    {
-      type: "button",
-      onClick: addBranch,
-      className: "flex items-center gap-1 px-2 py-1 text-xs bg-white text-[#646cff] hover:bg-[#646cff]/10 rounded transition-colors border border-slate-200"
-    },
-    /* @__PURE__ */ React2.createElement(FaPlus, { className: "w-2.5 h-2.5" }),
-    "Add Branch"
-  )), availableVariables.length > 0 && /* @__PURE__ */ React2.createElement("p", { className: "text-[10px] text-slate-400" }, "Available: ", availableVariables.map((v) => `ctx.${v.variable}`).join(", ")), /* @__PURE__ */ React2.createElement("div", { className: "space-y-2" }, branches.map((branch, index) => /* @__PURE__ */ React2.createElement(
-    "div",
-    {
-      key: branch.id,
-      className: "border border-slate-200 rounded p-2 bg-slate-50"
-    },
-    /* @__PURE__ */ React2.createElement("div", { className: "flex items-center justify-between mb-2" }, /* @__PURE__ */ React2.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React2.createElement("span", { className: "w-5 h-5 flex items-center justify-center bg-purple-100 text-purple-600 text-[10px] font-bold rounded" }, index + 1), /* @__PURE__ */ React2.createElement(
-      "input",
-      {
-        type: "text",
-        value: branch.name,
-        onChange: (e) => updateBranch(index, "name", e.target.value),
-        className: "text-xs font-medium text-slate-700 bg-transparent border-none outline-none w-24",
-        placeholder: "Branch name"
-      }
-    )), /* @__PURE__ */ React2.createElement("div", { className: "flex items-center gap-1" }, /* @__PURE__ */ React2.createElement(
-      Button,
-      {
-        type: "button",
-        onClick: () => moveBranch(index, -1),
-        disabled: index === 0,
-        className: "p-1 bg-white text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded disabled:opacity-30 transition-colors",
-        title: "Move up"
-      },
-      /* @__PURE__ */ React2.createElement(IoMdArrowDropup, { className: "w-3 h-3" })
-    ), /* @__PURE__ */ React2.createElement(
-      Button,
-      {
-        type: "button",
-        onClick: () => moveBranch(index, 1),
-        disabled: index === branches.length - 1,
-        className: "p-1 bg-white text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded disabled:opacity-30 transition-colors",
-        title: "Move down"
-      },
-      /* @__PURE__ */ React2.createElement(IoMdArrowDropdown, { className: "w-3 h-3" })
-    ), /* @__PURE__ */ React2.createElement(
-      Button,
-      {
-        type: "button",
-        onClick: () => removeBranch(index),
-        disabled: branches.length <= 1,
-        className: "p-1 bg-white text-slate-400 hover:text-red-500 hover:bg-red-50 rounded disabled:opacity-30 transition-colors",
-        title: "Remove branch"
-      },
-      /* @__PURE__ */ React2.createElement(FaTrash, { className: "w-3 h-3" })
-    ))),
-    /* @__PURE__ */ React2.createElement("div", { className: "mb-2" }, /* @__PURE__ */ React2.createElement(Select, { value: branch.conditionType, onValueChange: (val) => updateBranch(index, "conditionType", val) }, /* @__PURE__ */ React2.createElement(SelectTrigger, { className: "text-xs" }, /* @__PURE__ */ React2.createElement(SelectValue, { placeholder: "Select condition type" })), /* @__PURE__ */ React2.createElement(SelectContent, null, /* @__PURE__ */ React2.createElement(SelectItem, { value: CONDITION_TYPES.EXPRESSION }, "JavaScript Expression"), /* @__PURE__ */ React2.createElement(SelectItem, { value: CONDITION_TYPES.EQUALS }, "Equals (==)"), /* @__PURE__ */ React2.createElement(SelectItem, { value: CONDITION_TYPES.NOT_EQUALS }, "Not Equals (!=)"), /* @__PURE__ */ React2.createElement(SelectItem, { value: CONDITION_TYPES.CONTAINS }, "Contains"), /* @__PURE__ */ React2.createElement(SelectItem, { value: CONDITION_TYPES.GREATER_THAN }, "Greater Than (>)"), /* @__PURE__ */ React2.createElement(SelectItem, { value: CONDITION_TYPES.LESS_THAN }, "Less Than (<)"), /* @__PURE__ */ React2.createElement(SelectItem, { value: CONDITION_TYPES.IS_EMPTY }, "Is Empty"), /* @__PURE__ */ React2.createElement(SelectItem, { value: CONDITION_TYPES.IS_NOT_EMPTY }, "Is Not Empty"), /* @__PURE__ */ React2.createElement(SelectItem, { value: CONDITION_TYPES.REGEX }, "Regex Match")))),
-    branch.conditionType === CONDITION_TYPES.EXPRESSION ? /* @__PURE__ */ React2.createElement(
-      Textarea,
-      {
-        value: branch.expression || "",
-        onChange: (e) => updateBranch(index, "expression", e.target.value),
-        placeholder: "ctx.value === true",
-        className: "w-full text-xs text-slate-700 p-2 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff] resize-none",
-        rows: 2
-      }
-    ) : branch.conditionType === CONDITION_TYPES.IS_EMPTY || branch.conditionType === CONDITION_TYPES.IS_NOT_EMPTY ? /* @__PURE__ */ React2.createElement(
-      Input,
-      {
-        type: "text",
-        value: branch.leftOperand || "",
-        onChange: (e) => updateBranch(index, "leftOperand", e.target.value),
-        placeholder: "ctx.variableName",
-        className: "w-full text-xs text-slate-700 p-2 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff]"
-      }
-    ) : /* @__PURE__ */ React2.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ React2.createElement(
-      Input,
-      {
-        type: "text",
-        value: branch.leftOperand || "",
-        onChange: (e) => updateBranch(index, "leftOperand", e.target.value),
-        placeholder: "ctx.variableName",
-        className: "flex-1 text-xs text-slate-700 p-2 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff]"
-      }
-    ), /* @__PURE__ */ React2.createElement(
-      Input,
-      {
-        type: "text",
-        value: branch.rightOperand || "",
-        onChange: (e) => updateBranch(index, "rightOperand", e.target.value),
-        placeholder: "value",
-        className: "flex-1 text-xs p-2 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff]"
-      }
-    ))
-  ))), /* @__PURE__ */ React2.createElement("div", { className: "border border-dashed border-slate-300 rounded p-2 bg-slate-50/50" }, /* @__PURE__ */ React2.createElement("div", { className: "flex items-center gap-2 text-xs text-slate-500" }, /* @__PURE__ */ React2.createElement("span", { className: "w-5 h-5 flex items-center justify-center bg-slate-200 text-slate-600 text-[10px] font-bold rounded" }, "\u2205"), /* @__PURE__ */ React2.createElement("span", { className: "font-medium" }, "Default (else)"), /* @__PURE__ */ React2.createElement("span", { className: "text-slate-400" }, "- Used when no conditions match"))));
-};
-var ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
-  const { strings, workflowNodes } = useWorkflowNodes();
-  const [formData, setFormData] = useState({
-    title: data?.title || "Condition",
-    description: data?.description || "",
-    branches: data?.branches || [
-      {
-        id: "branch_default",
-        name: "Branch 1",
-        conditionType: CONDITION_TYPES.EXPRESSION,
-        expression: "true",
-        leftOperand: "",
-        rightOperand: ""
-      }
-    ],
-    evaluationMode: data?.evaluationMode || "first_match",
-    errorHandling: data?.errorHandling || ERROR_HANDLING_OPTIONS2.FAIL_WORKFLOW,
-    isDisabled: data?.isDisabled ?? false
-  });
-  useEffect(() => {
-    if (data) {
-      setFormData({
-        title: data.title || "Condition",
-        description: data.description || "",
-        branches: data.branches || [
-          {
-            id: "branch_default",
-            name: "Branch 1",
-            conditionType: CONDITION_TYPES.EXPRESSION,
-            expression: "true",
-            leftOperand: "",
-            rightOperand: ""
-          }
-        ],
-        evaluationMode: data.evaluationMode || "first_match",
-        errorHandling: data.errorHandling || ERROR_HANDLING_OPTIONS2.FAIL_WORKFLOW,
-        isDisabled: data.isDisabled ?? false
-      });
-    }
-  }, [data]);
-  const schema = useMemo(() => {
-    return {
-      type: "object",
-      properties: {
-        title: {
-          type: "string",
-          title: strings?.WORKFLOW_EDITOR_CONDITION_TITLE_LABEL || "Node Title"
-        },
-        description: {
-          type: "string",
-          title: strings?.WORKFLOW_EDITOR_NODE_DESCRIPTION_LABEL || "Description"
-        },
-        evaluationMode: {
-          type: "string",
-          title: "Evaluation Mode",
-          enum: ["first_match", "all_matches"]
-        },
-        errorHandling: {
-          type: "string",
-          title: strings?.WORKFLOW_EDITOR_ERROR_HANDLING_LABEL || "Error Behavior",
-          enum: Object.values(ERROR_HANDLING_OPTIONS2)
-        },
-        isDisabled: {
-          type: "boolean",
-          title: strings?.WORKFLOW_EDITOR_IS_DISABLED_LABEL || "Skip this node",
-          default: false
-        }
-      }
-    };
-  }, [strings]);
-  const uischema = useMemo(() => {
-    return {
-      type: "Categorization",
-      elements: [
-        {
-          type: "Category",
-          label: strings?.WORKFLOW_EDITOR_TAB_GENERAL || "General",
-          elements: [
-            {
-              type: "Control",
-              scope: "#/properties/title",
-              options: {
-                placeholder: strings?.WORKFLOW_EDITOR_CONDITION_TITLE_PLACEHOLDER || "Enter node title"
-              }
-            },
-            {
-              type: "Control",
-              scope: "#/properties/description",
-              options: {
-                placeholder: strings?.WORKFLOW_EDITOR_NODE_DESCRIPTION_PLACEHOLDER || "Describe this condition...",
-                multi: true,
-                rows: 2
-              }
-            }
-          ]
-        },
-        {
-          type: "Category",
-          label: strings?.WORKFLOW_EDITOR_TAB_ADVANCED || "Advanced",
-          elements: [
-            {
-              type: "Control",
-              scope: "#/properties/evaluationMode",
-              options: {
-                enumLabels: {
-                  "first_match": "First Match (stop at first true)",
-                  "all_matches": "All Matches (execute all true branches)"
-                }
-              }
-            },
-            {
-              type: "Control",
-              scope: "#/properties/errorHandling",
-              options: {
-                enumLabels: {
-                  [ERROR_HANDLING_OPTIONS2.FAIL_WORKFLOW]: "Fail Workflow on Error",
-                  [ERROR_HANDLING_OPTIONS2.CONTINUE_DEFAULT]: "Continue to Default Branch on Error"
-                }
-              }
-            },
-            {
-              type: "Control",
-              scope: "#/properties/isDisabled"
-            }
-          ]
-        }
-      ]
-    };
-  }, [strings]);
-  const handleFormChange = useCallback(({ data: newData }) => {
-    setFormData((prev) => ({ ...prev, ...newData }));
-  }, []);
-  const handleBranchesChange = useCallback((newBranches) => {
-    setFormData((prev) => ({ ...prev, branches: newBranches }));
-  }, []);
-  const handleSave = useCallback(() => {
-    onChange(formData);
-  }, [onChange, formData]);
-  return /* @__PURE__ */ React2.createElement("div", { className: "w-full" }, /* @__PURE__ */ React2.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React2.createElement(
-    JsonForms,
-    {
-      schema,
-      uischema,
-      data: formData,
-      renderers: jetFormsRenderers,
-      onChange: handleFormChange
-    }
-  ), /* @__PURE__ */ React2.createElement("div", { className: "border-t border-slate-100 pt-4" }, /* @__PURE__ */ React2.createElement(
-    ConditionBranchEditor,
-    {
-      branches: formData.branches,
-      onChange: handleBranchesChange,
-      workflowNodes,
-      currentNodeId: nodeId
-    }
-  )), /* @__PURE__ */ React2.createElement("div", { className: "p-2.5 bg-slate-50 border border-slate-200 rounded text-[10px] text-slate-600 space-y-2" }, /* @__PURE__ */ React2.createElement("div", { className: "font-semibold text-slate-700 text-xs" }, "\u{1F4D8} Condition Expressions"), /* @__PURE__ */ React2.createElement("div", null, /* @__PURE__ */ React2.createElement("span", { className: "font-medium text-slate-700" }, "Expression Examples:"), /* @__PURE__ */ React2.createElement("div", { className: "ml-3 mt-0.5 text-slate-500 font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ React2.createElement("div", null, /* @__PURE__ */ React2.createElement("code", { className: "bg-white px-1 rounded" }, "ctx.queryResult.length > 0")), /* @__PURE__ */ React2.createElement("div", null, /* @__PURE__ */ React2.createElement("code", { className: "bg-white px-1 rounded" }, 'ctx.input.status === "active"')), /* @__PURE__ */ React2.createElement("div", null, /* @__PURE__ */ React2.createElement("code", { className: "bg-white px-1 rounded" }, 'ctx.userData?.role === "admin"')))), /* @__PURE__ */ React2.createElement("div", null, /* @__PURE__ */ React2.createElement("span", { className: "font-medium text-slate-700" }, "Evaluation:"), /* @__PURE__ */ React2.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, "Branches are evaluated top-to-bottom. First matching branch is taken. If none match, ", /* @__PURE__ */ React2.createElement("strong", null, "Default (else)"), " is used.")), /* @__PURE__ */ React2.createElement("div", null, /* @__PURE__ */ React2.createElement("span", { className: "font-medium text-slate-700" }, "Handles:"), /* @__PURE__ */ React2.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, "Each branch creates a ", /* @__PURE__ */ React2.createElement("strong", null, "purple"), " output handle. ", /* @__PURE__ */ React2.createElement("strong", null, "Gray"), " = Default, ", /* @__PURE__ */ React2.createElement("strong", null, "Red"), " = Error."))), /* @__PURE__ */ React2.createElement(
-    Button,
-    {
-      type: "button",
-      onClick: handleSave,
-      className: "px-3 py-1.5 text-sm text-white bg-[#646cff] rounded hover:bg-[#5558dd] focus:ring-4 focus:outline-none focus:ring-[#646cff]/30"
-    },
-    strings?.WORKFLOW_EDITOR_CONDITION_NODE_SAVE_BUTTON || "Save"
-  )));
-};
-var ConditionNode = memo(({ data, isConnectable }) => {
-  const { strings } = useWorkflowNodes();
-  const isDisabled = data?.isDisabled ?? false;
-  const branches = data?.branches || [];
-  const branchCount = branches.length;
-  const getHandlePosition = (index, total) => {
-    const totalHandles = total + 1;
-    const spacing = 100 / (totalHandles + 1);
-    return spacing * (index + 1);
-  };
-  const getConditionPreview = (branch) => {
-    if (branch.conditionType === CONDITION_TYPES.EXPRESSION) {
-      const expr = branch.expression || "true";
-      return expr.length > 20 ? expr.substring(0, 20) + "..." : expr;
-    }
-    const left = branch.leftOperand || "?";
-    const right = branch.rightOperand || "?";
-    switch (branch.conditionType) {
-      case CONDITION_TYPES.EQUALS:
-        return `${left} == ${right}`;
-      case CONDITION_TYPES.NOT_EQUALS:
-        return `${left} != ${right}`;
-      case CONDITION_TYPES.CONTAINS:
-        return `${left} contains ${right}`;
-      case CONDITION_TYPES.GREATER_THAN:
-        return `${left} > ${right}`;
-      case CONDITION_TYPES.LESS_THAN:
-        return `${left} < ${right}`;
-      case CONDITION_TYPES.IS_EMPTY:
-        return `${left} is empty`;
-      case CONDITION_TYPES.IS_NOT_EMPTY:
-        return `${left} is not empty`;
-      case CONDITION_TYPES.REGEX:
-        return `${left} matches ${right}`;
-      default:
-        return "condition";
-    }
-  };
-  return /* @__PURE__ */ React2.createElement("div", { className: `
-      bg-white border rounded
-      min-w-[280px] max-w-[350px]
-      transition-all duration-150
-      ${isDisabled ? "border-slate-200 opacity-50" : "border-slate-200 hover:border-purple-400 hover:shadow-md"}
-    ` }, /* @__PURE__ */ React2.createElement("div", { className: "flex items-stretch" }, /* @__PURE__ */ React2.createElement(
-    "div",
-    {
-      style: {
-        borderTopLeftRadius: "0.25rem",
-        borderBottomLeftRadius: "0.25rem"
-      },
-      className: `
-          flex flex-col items-center justify-center px-3 py-3 border-r
-          ${isDisabled ? "bg-slate-50 border-slate-100" : "bg-purple-50 border-purple-100"}
-        `
-    },
-    /* @__PURE__ */ React2.createElement(TbLogicAnd, { className: `w-5 h-5 ${isDisabled ? "text-slate-400" : "text-purple-500"}` })
-  ), /* @__PURE__ */ React2.createElement("div", { className: "flex-1 px-3 py-2 min-w-0" }, /* @__PURE__ */ React2.createElement("div", { className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ React2.createElement("span", { className: `text-xs font-semibold truncate ${isDisabled ? "text-slate-400 line-through" : "text-slate-700"}` }, data?.title || "Condition"), isDisabled && /* @__PURE__ */ React2.createElement("span", { className: "inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded border border-orange-200" }, /* @__PURE__ */ React2.createElement(VscDebugDisconnect, { className: "w-2.5 h-2.5" }), "Skip")), /* @__PURE__ */ React2.createElement("div", { className: `text-[10px] mt-0.5 ${isDisabled ? "text-slate-300" : "text-slate-400"}` }, branchCount, " branch", branchCount !== 1 ? "es" : "", " + default"), /* @__PURE__ */ React2.createElement("div", { className: "mt-1 space-y-0.5" }, branches.slice(0, 3).map((branch, index) => /* @__PURE__ */ React2.createElement(
-    "div",
-    {
-      key: branch.id,
-      className: `flex items-center gap-1 text-[9px] ${isDisabled ? "text-slate-300" : "text-slate-500"}`
-    },
-    /* @__PURE__ */ React2.createElement(IoMdArrowDropright, { className: "w-3 h-3 text-purple-400 flex-shrink-0" }),
-    /* @__PURE__ */ React2.createElement("span", { className: "truncate font-medium" }, branch.name, ":"),
-    /* @__PURE__ */ React2.createElement("span", { className: "truncate font-mono opacity-75" }, getConditionPreview(branch))
-  )), branches.length > 3 && /* @__PURE__ */ React2.createElement("div", { className: `text-[9px] ${isDisabled ? "text-slate-300" : "text-slate-400"}` }, "+", branches.length - 3, " more..."))), /* @__PURE__ */ React2.createElement("div", { className: "flex flex-col items-center justify-center px-2 border-l border-slate-100 min-w-[50px]" }, branches.slice(0, 4).map((branch, index) => /* @__PURE__ */ React2.createElement(
-    "div",
-    {
-      key: branch.id,
-      className: `w-2 h-2 rounded-full mb-0.5 ${isDisabled ? "bg-slate-300" : "bg-purple-400"}`,
-      title: branch.name
-    }
-  )), branches.length > 4 && /* @__PURE__ */ React2.createElement("span", { className: "text-[8px] text-slate-400" }, "+", branches.length - 4), /* @__PURE__ */ React2.createElement("div", { className: `w-2 h-2 rounded-full mt-1 ${isDisabled ? "bg-slate-300" : "bg-slate-400"}`, title: "Default" }))), /* @__PURE__ */ React2.createElement(
-    Handle,
-    {
-      type: "target",
-      position: Position.Top,
-      isConnectable,
-      style: {
-        width: "10px",
-        height: "10px",
-        backgroundColor: isDisabled ? "#cbd5e1" : "#a855f7",
-        border: "none",
-        top: "-5px"
-      }
-    }
-  ), branches.map((branch, index) => /* @__PURE__ */ React2.createElement(
-    Handle,
-    {
-      key: branch.id,
-      type: "source",
-      position: Position.Bottom,
-      id: branch.id,
-      isConnectable,
-      style: {
-        left: `${getHandlePosition(index, branchCount)}%`,
-        width: "10px",
-        height: "10px",
-        backgroundColor: isDisabled ? "#cbd5e1" : "#a855f7",
-        border: "none",
-        bottom: "-5px"
-      }
-    }
-  )), /* @__PURE__ */ React2.createElement(
-    Handle,
-    {
-      type: "source",
-      position: Position.Bottom,
-      id: "default",
-      isConnectable,
-      style: {
-        left: `${getHandlePosition(branchCount, branchCount)}%`,
-        width: "10px",
-        height: "10px",
-        backgroundColor: isDisabled ? "#cbd5e1" : "#94a3b8",
-        border: "none",
-        bottom: "-5px"
-      }
-    }
-  ), /* @__PURE__ */ React2.createElement(
-    Handle,
-    {
-      type: "source",
-      position: Position.Bottom,
-      id: "error",
-      isConnectable,
-      style: {
-        right: "10px",
-        left: "auto",
-        width: "10px",
-        height: "10px",
-        backgroundColor: isDisabled ? "#cbd5e1" : "#ef4444",
-        border: "none",
-        bottom: "-5px"
-      }
-    }
-  ));
-});
-
 // src/nodes/dataQueryNode.jsx
-import React3, { memo as memo2, useState as useState2, useEffect as useEffect2, useMemo as useMemo2, useCallback as useCallback2 } from "react";
-import { Handle as Handle2, Position as Position2 } from "reactflow";
-import { JsonForms as JsonForms2 } from "@jsonforms/react";
 import { SiQuantconnect } from "react-icons/si";
 import { MdOutlineDeleteOutline } from "react-icons/md";
 import { IoMdTime } from "react-icons/io";
@@ -571,7 +575,7 @@ import { BiErrorCircle } from "react-icons/bi";
 import { VscDebugDisconnect as VscDebugDisconnect2 } from "react-icons/vsc";
 import { FaPlay } from "react-icons/fa";
 import { Button as Button2 } from "@jet-admin/ui";
-var ERROR_HANDLING_OPTIONS3 = {
+var ERROR_HANDLING_OPTIONS2 = {
   FAIL_WORKFLOW: "fail_workflow",
   CONTINUE: "continue",
   RETRY_THEN_CONTINUE: "retry_then_continue",
@@ -588,7 +592,7 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
     timeoutSeconds: data?.timeoutSeconds ?? 300,
     retryLimit: data?.retryLimit ?? 0,
     retryDelaySeconds: data?.retryDelaySeconds ?? 5,
-    errorHandling: data?.errorHandling || ERROR_HANDLING_OPTIONS3.FAIL_WORKFLOW,
+    errorHandling: data?.errorHandling || ERROR_HANDLING_OPTIONS2.FAIL_WORKFLOW,
     isDisabled: data?.isDisabled ?? false
   });
   useEffect2(() => {
@@ -602,7 +606,7 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
         timeoutSeconds: data.timeoutSeconds ?? 300,
         retryLimit: data.retryLimit ?? 0,
         retryDelaySeconds: data.retryDelaySeconds ?? 5,
-        errorHandling: data.errorHandling || ERROR_HANDLING_OPTIONS3.FAIL_WORKFLOW,
+        errorHandling: data.errorHandling || ERROR_HANDLING_OPTIONS2.FAIL_WORKFLOW,
         isDisabled: data.isDisabled ?? false
       });
     }
@@ -665,7 +669,7 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
         errorHandling: {
           type: "string",
           title: strings.WORKFLOW_EDITOR_ERROR_HANDLING_LABEL || "Error Behavior",
-          enum: Object.values(ERROR_HANDLING_OPTIONS3)
+          enum: Object.values(ERROR_HANDLING_OPTIONS2)
         },
         isDisabled: {
           type: "boolean",
@@ -764,10 +768,10 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
               scope: "#/properties/errorHandling",
               options: {
                 enumLabels: {
-                  [ERROR_HANDLING_OPTIONS3.FAIL_WORKFLOW]: "Fail Workflow",
-                  [ERROR_HANDLING_OPTIONS3.CONTINUE]: "Continue (ignore error)",
-                  [ERROR_HANDLING_OPTIONS3.RETRY_THEN_CONTINUE]: "Retry, then Continue",
-                  [ERROR_HANDLING_OPTIONS3.RETRY_THEN_FAIL]: "Retry, then Fail"
+                  [ERROR_HANDLING_OPTIONS2.FAIL_WORKFLOW]: "Fail Workflow",
+                  [ERROR_HANDLING_OPTIONS2.CONTINUE]: "Continue (ignore error)",
+                  [ERROR_HANDLING_OPTIONS2.RETRY_THEN_CONTINUE]: "Retry, then Continue",
+                  [ERROR_HANDLING_OPTIONS2.RETRY_THEN_FAIL]: "Retry, then Fail"
                 }
               }
             },
@@ -792,7 +796,7 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
     }
   }, [onQueryTest, formData.dataQueryID]);
   return /* @__PURE__ */ React3.createElement("div", { className: "w-full" }, /* @__PURE__ */ React3.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React3.createElement(
-    JsonForms2,
+    JsonForms,
     {
       schema,
       uischema,
@@ -934,14 +938,14 @@ var DataQueryNode = memo2(({ id, data, isConnectable }) => {
 // src/nodes/javascriptNode.jsx
 import React4, { memo as memo3, useState as useState3, useEffect as useEffect3, useMemo as useMemo3, useCallback as useCallback3 } from "react";
 import { Handle as Handle3, Position as Position3 } from "reactflow";
-import { JsonForms as JsonForms3 } from "@jsonforms/react";
+import { JsonForms as JsonForms2 } from "@jsonforms/react";
 import { FaJs } from "react-icons/fa";
 import { IoMdTime as IoMdTime2 } from "react-icons/io";
 import { TbRefresh as TbRefresh2 } from "react-icons/tb";
 import { BiErrorCircle as BiErrorCircle2 } from "react-icons/bi";
 import { VscDebugDisconnect as VscDebugDisconnect3 } from "react-icons/vsc";
 import { Button as Button3 } from "@jet-admin/ui";
-var ERROR_HANDLING_OPTIONS4 = {
+var ERROR_HANDLING_OPTIONS3 = {
   FAIL_WORKFLOW: "fail_workflow",
   CONTINUE: "continue",
   RETRY_THEN_CONTINUE: "retry_then_continue",
@@ -957,7 +961,7 @@ var JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
     timeoutSeconds: data?.timeoutSeconds ?? 30,
     retryLimit: data?.retryLimit ?? 0,
     retryDelaySeconds: data?.retryDelaySeconds ?? 5,
-    errorHandling: data?.errorHandling || ERROR_HANDLING_OPTIONS4.FAIL_WORKFLOW,
+    errorHandling: data?.errorHandling || ERROR_HANDLING_OPTIONS3.FAIL_WORKFLOW,
     isDisabled: data?.isDisabled ?? false
   });
   useEffect3(() => {
@@ -970,7 +974,7 @@ var JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
         timeoutSeconds: data.timeoutSeconds ?? 30,
         retryLimit: data.retryLimit ?? 0,
         retryDelaySeconds: data.retryDelaySeconds ?? 5,
-        errorHandling: data.errorHandling || ERROR_HANDLING_OPTIONS4.FAIL_WORKFLOW,
+        errorHandling: data.errorHandling || ERROR_HANDLING_OPTIONS3.FAIL_WORKFLOW,
         isDisabled: data.isDisabled ?? false
       });
     }
@@ -1033,7 +1037,7 @@ var JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
         errorHandling: {
           type: "string",
           title: strings?.WORKFLOW_EDITOR_ERROR_HANDLING_LABEL || "Error Behavior",
-          enum: Object.values(ERROR_HANDLING_OPTIONS4)
+          enum: Object.values(ERROR_HANDLING_OPTIONS3)
         },
         isDisabled: {
           type: "boolean",
@@ -1116,10 +1120,10 @@ var JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
               scope: "#/properties/errorHandling",
               options: {
                 enumLabels: {
-                  [ERROR_HANDLING_OPTIONS4.FAIL_WORKFLOW]: "Fail Workflow",
-                  [ERROR_HANDLING_OPTIONS4.CONTINUE]: "Continue (ignore error)",
-                  [ERROR_HANDLING_OPTIONS4.RETRY_THEN_CONTINUE]: "Retry, then Continue",
-                  [ERROR_HANDLING_OPTIONS4.RETRY_THEN_FAIL]: "Retry, then Fail"
+                  [ERROR_HANDLING_OPTIONS3.FAIL_WORKFLOW]: "Fail Workflow",
+                  [ERROR_HANDLING_OPTIONS3.CONTINUE]: "Continue (ignore error)",
+                  [ERROR_HANDLING_OPTIONS3.RETRY_THEN_CONTINUE]: "Retry, then Continue",
+                  [ERROR_HANDLING_OPTIONS3.RETRY_THEN_FAIL]: "Retry, then Fail"
                 }
               }
             },
@@ -1139,7 +1143,7 @@ var JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
     onChange(formData);
   }, [onChange, formData]);
   return /* @__PURE__ */ React4.createElement("div", { className: "w-full" }, /* @__PURE__ */ React4.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React4.createElement(
-    JsonForms3,
+    JsonForms2,
     {
       schema,
       uischema,
@@ -1262,7 +1266,7 @@ var JavascriptNode = memo3(({ id, data, isConnectable }) => {
 // src/nodes/startNode.jsx
 import React5, { memo as memo4, useState as useState4, useEffect as useEffect4, useMemo as useMemo4, useCallback as useCallback4 } from "react";
 import { Handle as Handle4, Position as Position4 } from "reactflow";
-import { JsonForms as JsonForms4 } from "@jsonforms/react";
+import { JsonForms as JsonForms3 } from "@jsonforms/react";
 import { VscDebugStart } from "react-icons/vsc";
 import { Button as Button4 } from "@jet-admin/ui";
 var StartNodeConfigurator = ({ data, onChange, nodeId }) => {
@@ -1318,7 +1322,7 @@ var StartNodeConfigurator = ({ data, onChange, nodeId }) => {
     onChange(formData);
   }, [onChange, formData]);
   return /* @__PURE__ */ React5.createElement("div", { className: "w-full h-full" }, /* @__PURE__ */ React5.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React5.createElement(
-    JsonForms4,
+    JsonForms3,
     {
       schema,
       uischema,
@@ -1394,12 +1398,12 @@ var StartNode = memo4(({ id, data, isConnectable }) => {
 // src/nodes/loopNode.jsx
 import React6, { memo as memo5, useState as useState5, useEffect as useEffect5, useMemo as useMemo5, useCallback as useCallback5 } from "react";
 import { Handle as Handle5, Position as Position5 } from "reactflow";
-import { JsonForms as JsonForms5 } from "@jsonforms/react";
+import { JsonForms as JsonForms4 } from "@jsonforms/react";
 import { VscDebugDisconnect as VscDebugDisconnect4 } from "react-icons/vsc";
 import { TbRepeat } from "react-icons/tb";
-import { IoMdArrowDropright as IoMdArrowDropright2 } from "react-icons/io";
+import { IoMdArrowDropright } from "react-icons/io";
 import { Button as Button5 } from "@jet-admin/ui";
-var ERROR_HANDLING_OPTIONS5 = {
+var ERROR_HANDLING_OPTIONS4 = {
   FAIL_WORKFLOW: "fail_workflow",
   CONTINUE: "continue",
   SKIP_ITEM: "skip_item"
@@ -1415,7 +1419,7 @@ var LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
     maxIterations: data?.maxIterations ?? 1e3,
     batchSize: data?.batchSize ?? 1,
     delayBetweenItems: data?.delayBetweenItems ?? 0,
-    errorHandling: data?.errorHandling || ERROR_HANDLING_OPTIONS5.FAIL_WORKFLOW,
+    errorHandling: data?.errorHandling || ERROR_HANDLING_OPTIONS4.FAIL_WORKFLOW,
     isDisabled: data?.isDisabled ?? false
   });
   useEffect5(() => {
@@ -1429,7 +1433,7 @@ var LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
         maxIterations: data.maxIterations ?? 1e3,
         batchSize: data.batchSize ?? 1,
         delayBetweenItems: data.delayBetweenItems ?? 0,
-        errorHandling: data.errorHandling || ERROR_HANDLING_OPTIONS5.FAIL_WORKFLOW,
+        errorHandling: data.errorHandling || ERROR_HANDLING_OPTIONS4.FAIL_WORKFLOW,
         isDisabled: data.isDisabled ?? false
       });
     }
@@ -1498,7 +1502,7 @@ var LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
         errorHandling: {
           type: "string",
           title: "Error Behavior",
-          enum: Object.values(ERROR_HANDLING_OPTIONS5)
+          enum: Object.values(ERROR_HANDLING_OPTIONS4)
         },
         isDisabled: {
           type: "boolean",
@@ -1563,9 +1567,9 @@ var LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
               scope: "#/properties/errorHandling",
               options: {
                 enumLabels: {
-                  [ERROR_HANDLING_OPTIONS5.FAIL_WORKFLOW]: "Fail Workflow",
-                  [ERROR_HANDLING_OPTIONS5.CONTINUE]: "Continue to next item",
-                  [ERROR_HANDLING_OPTIONS5.SKIP_ITEM]: "Skip failed item"
+                  [ERROR_HANDLING_OPTIONS4.FAIL_WORKFLOW]: "Fail Workflow",
+                  [ERROR_HANDLING_OPTIONS4.CONTINUE]: "Continue to next item",
+                  [ERROR_HANDLING_OPTIONS4.SKIP_ITEM]: "Skip failed item"
                 }
               }
             },
@@ -1582,7 +1586,7 @@ var LoopNodeConfigurator = ({ data, onChange, nodeId }) => {
     onChange(formData);
   }, [onChange, formData]);
   return /* @__PURE__ */ React6.createElement("div", { className: "w-full" }, /* @__PURE__ */ React6.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React6.createElement(
-    JsonForms5,
+    JsonForms4,
     {
       schema,
       uischema,
@@ -1676,7 +1680,7 @@ var LoopNode = memo5(({ data, isConnectable }) => {
 // src/nodes/delayNode.jsx
 import React7, { memo as memo6, useState as useState6, useEffect as useEffect6, useMemo as useMemo6, useCallback as useCallback6 } from "react";
 import { Handle as Handle6, Position as Position6 } from "reactflow";
-import { JsonForms as JsonForms6 } from "@jsonforms/react";
+import { JsonForms as JsonForms5 } from "@jsonforms/react";
 import { VscDebugDisconnect as VscDebugDisconnect5 } from "react-icons/vsc";
 import { IoMdTime as IoMdTime3 } from "react-icons/io";
 import { Button as Button6 } from "@jet-admin/ui";
@@ -1840,7 +1844,7 @@ var DelayNodeConfigurator = ({ data, onChange, nodeId }) => {
     onChange(formData);
   }, [onChange, formData]);
   return /* @__PURE__ */ React7.createElement("div", { className: "w-full" }, /* @__PURE__ */ React7.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React7.createElement(
-    JsonForms6,
+    JsonForms5,
     {
       schema,
       uischema,
@@ -1932,7 +1936,7 @@ var DelayNode = memo6(({ data, isConnectable }) => {
 // src/nodes/endNode.jsx
 import React8, { memo as memo7, useState as useState7, useEffect as useEffect7, useMemo as useMemo7, useCallback as useCallback7 } from "react";
 import { Handle as Handle7, Position as Position7 } from "reactflow";
-import { JsonForms as JsonForms7 } from "@jsonforms/react";
+import { JsonForms as JsonForms6 } from "@jsonforms/react";
 import { VscDebugStop } from "react-icons/vsc";
 import { FaCheck, FaTimes, FaExclamationTriangle, FaPlus as FaPlus2, FaTrash as FaTrash2 } from "react-icons/fa";
 import { IoMdArrowDropleft } from "react-icons/io";
@@ -2101,7 +2105,7 @@ var EndNodeConfigurator = ({ data, onChange, nodeId }) => {
     onChange(formData);
   }, [onChange, formData]);
   return /* @__PURE__ */ React8.createElement("div", { className: "w-full h-full" }, /* @__PURE__ */ React8.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React8.createElement(
-    JsonForms7,
+    JsonForms6,
     {
       schema,
       uischema,

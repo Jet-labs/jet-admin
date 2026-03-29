@@ -44,7 +44,7 @@ Jet Admin's backend is built on a modern, battle-tested technology stack:
 | **Queue** | fastq | In-memory task queue for workflows |
 | **Validation** | Joi / Custom | Request validation |
 | **Logging** | Winston | Structured logging |
-| **Sandboxing** | vm2 | Secure code execution |
+| **Sandboxing** | isolated-vm | Secure code execution |
 
 ---
 

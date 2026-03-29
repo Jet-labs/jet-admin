@@ -7,7 +7,7 @@
  */
 
 const { ERROR_HANDLING, NEXT_HANDLE } = require('./constants');
-const { createWorkflowVm } = require('./workflowVm');
+const { runInSandbox } = require('./workflowVm');
 
 /**
  * @param {object} nodeConfig
@@ -33,20 +33,10 @@ async function execute(nodeConfig, context) {
   const timeoutMs = timeoutSeconds * 1000;
 
   try {
-    const vm = createWorkflowVm({ sandbox: { ctx: context }, timeoutMs });
-
-    // Wrap in IIFE so the user can use `return` freely
-    let result = vm.run(`(function() { ${code} })()`);
-
-    // Handle async results — race against the same timeout
-    if (result != null && typeof result.then === 'function') {
-      result = await Promise.race([
-        result,
-        new Promise((_, reject) =>
-          setTimeout(() => reject(new Error(`Async code timed out after ${timeoutMs}ms`)), timeoutMs)
-        ),
-      ]);
-    }
+    const result = runInSandbox(
+      { sandbox: { ctx: context }, timeoutMs },
+      `(function() { ${code} })()`
+    );
 
     return {
       output: { [outputVariable]: result, success: true },

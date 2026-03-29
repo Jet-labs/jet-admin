@@ -25,10 +25,10 @@ describe('workflow handler sandboxing', () => {
     });
   });
 
-  it('condition handler falls back when eval-like expressions are blocked', async () => {
+  it('condition handler falls back when accessing host globals (process)', async () => {
     const result = await conditionHandler.execute(
       {
-        branches: [{ id: 'unsafe', condition: 'eval("1 + 1")' }],
+        branches: [{ id: 'unsafe', condition: 'process.env.NODE_ENV === "test"' }],
         defaultBranch: 'default-branch',
       },
       {},
@@ -58,10 +58,10 @@ describe('workflow handler sandboxing', () => {
     });
   });
 
-  it('javascript handler blocks eval inside the sandbox', async () => {
+  it('javascript handler blocks access to node process inside the sandbox', async () => {
     const result = await javascriptHandler.execute(
       {
-        code: 'return eval("1 + 1");',
+        code: 'return process.pid;',
         outputVariable: 'value',
       },
       {},

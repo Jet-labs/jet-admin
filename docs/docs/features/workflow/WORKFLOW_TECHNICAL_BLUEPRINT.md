@@ -259,7 +259,7 @@ Workflow runtime now injects a single shared resolver into handlers:
 | **dagScheduler** | `modules/workflow/orchestrator/dagScheduler.js` | Graph traversal, next node calculation | prisma |
 | **taskWorker** | `modules/workflow/workers/taskWorker.js` | Task queue consumer, handler dispatch | rabbitmq.config, handlers |
 | **workerSDK** | `modules/workflow/workers/workerSDK.js` | Widget binding compatibility barrel | rabbitmq.config |
-| **handlers/** | `modules/workflow/workers/handlers/` | Node-type-specific execution logic | vm2, QueryEngine |
+| **handlers/** | `modules/workflow/workers/handlers/` | Node-type-specific execution logic | isolated-vm, QueryEngine |
 | **rabbitmq.config** | `config/rabbitmq.config.js` | Message queue connection & operations | amqplib |
 
 ### 3.2 Frontend Modules
@@ -424,7 +424,7 @@ Workflow runtime now injects a single shared resolver into handlers:
 │ Config: { code, outputVariable, timeoutSeconds, errorHandling }             │
 │                                                                             │
 │ Calls:                                                                      │
-│   └─► vm2.VM.run(wrappedCode) with sandbox { ctx: context, console, ... }   │
+│   └─► runInSandbox(wrappedCode) with sandbox { ctx: context, console, ... } │
 │                                                                             │
 │ Sandbox Globals: JSON, Math, Date, Array, Object, String, Number, Boolean,  │
 │                  parseInt, parseFloat, isNaN, isFinite                      │
