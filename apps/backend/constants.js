@@ -55,6 +55,7 @@ const constants = {
   },
 
   SOCKET_EMIT_EVENTS: {
+    WORKFLOW_DATA_COLLECTION_REQUEST: 'workflow_data_collection_request',
     AI_CHAT_ROOM_JOIN: "ai_chat_room_join",
     AI_CHAT_ROOM_DISCONNECT: "ai_chat_room_disconnect",
     AI_CHAT_ROOM_ID: "ai_chat_room_id",
@@ -217,6 +218,7 @@ const constants = {
     // written by the CAS winner before addNodeJob
     // loser checks this on retry to avoid re-dispatch
     SYSTEM_SET: 'SYSTEM_SET',      // orchestrator metadata — nodeID null
+    NODE_SUSPENDED: 'NODE_SUSPENDED', // node is suspended — carries payload
   }
 };
 

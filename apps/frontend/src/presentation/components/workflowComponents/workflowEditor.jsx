@@ -13,6 +13,7 @@ import ReactFlow, {
 } from "reactflow";
 import "reactflow/dist/style.css"; // Ensure styles are imported
 import dagre from "dagre";
+import { WorkflowDataCollectionModal } from "./workflowDataCollectionModal";
 
 import { v4 as uuidv4 } from "uuid";
 import PropTypes from "prop-types";
@@ -30,6 +31,7 @@ import { TbLayoutDistributeHorizontal, TbRepeat } from "react-icons/tb";
 import { VscClearAll, VscJson, VscTerminal } from "react-icons/vsc";
 import { TbBraces } from "react-icons/tb";
 import { IoMdTime } from "react-icons/io";
+import { MdOutlineInput } from "react-icons/md";
 import { useWorkflowState, useWorkflowActions } from "../../../logic/contexts/workflowContext";
 import { WorkflowNodeConfigPanel } from "./workflowNodeConfigPanel";
 import { WorkflowSchemaPanel } from "./workflowSchemaPanel";
@@ -138,7 +140,9 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
         startTestRun,
         stopRun: stopTestRun,
         clearLogs,
-        clearRunState
+        clearRunState,
+        dataCollectionRequest,
+        submitCollectedData,  
     } = useWorkflowRun({ tenantID });
 
     // UI State only
@@ -146,6 +150,9 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
     const [showContextPanel, setShowContextPanel] = useState(false);
     const [selectedQueryForTesting, setSelectedQueryForTesting] = useState(null);
     const [showInputModal, setShowInputModal] = useState(false);
+    const [isSubmittingCollection, setIsSubmittingCollection] = useState(false);
+    const [isDataCollectionModalOpen, setIsDataCollectionModalOpen] = useState(false);
+
 
     // Auto-show console/context when run starts
     useEffect(() => {
@@ -154,6 +161,23 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
             setShowContextPanel(true);
         }
     }, [isTestRunning]);
+
+    // Auto-show data collection modal when request arrives
+    useEffect(() => {
+        if (dataCollectionRequest) {
+            setIsDataCollectionModalOpen(true);
+        }
+    }, [dataCollectionRequest]);
+
+    const handleDataCollectionSubmit = useCallback(async (submittedData) => {
+        setIsSubmittingCollection(true);
+        try {
+            await submitCollectedData(submittedData);
+        } finally {
+            setIsSubmittingCollection(false);
+        }
+    }, [submitCollectedData]);
+
 
     // 1. Handle Node Changes (Dragging, selecting, deleting)
     const onNodesChange = useCallback(
@@ -407,6 +431,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                                 {node.value === 'loop' && <TbRepeat className="size-4 mr-2 text-cyan-500" />}
                                                 {node.value === 'delay' && <IoMdTime className="size-4 mr-2 text-orange-500" />}
                                                 {node.value === 'end' && <FaStop className="size-3.5 mr-2 text-destructive" />}
+                                                {node.value === 'dataCollection' && <MdOutlineInput className="size-4 mr-2 text-violet-500" />}
                                                 {node.label}
                                             </Button>
                                         ))}
@@ -485,6 +510,18 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                         <VscClearAll className="size-4 mr-2" />
                                         Clear
                                     </Button>
+                                    {dataCollectionRequest && !isDataCollectionModalOpen && (
+                                        <Button
+                                            type="button"
+                                            onClick={() => setIsDataCollectionModalOpen(true)}
+                                            variant="outline"
+                                            size="sm"
+                                            className="w-full bg-violet-600/10 text-violet-600 border-violet-600/30 hover:bg-violet-600/20 active:bg-violet-600/30 animate-pulse font-medium shadow-sm transition-all"
+                                        >
+                                            <MdOutlineInput className="size-4 mr-2" />
+                                            Input Required
+                                        </Button>
+                                    )}
                                 </div>
 
                                 <div className="flex flex-row flex-wrap gap-1.5 mt-2">
@@ -667,6 +704,14 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                             args={workflowArgs}
                             onSubmit={handleInputModalSubmit}
                             onClose={() => setShowInputModal(false)}
+                        />
+                    )}
+                    {dataCollectionRequest && isDataCollectionModalOpen && (
+                        <WorkflowDataCollectionModal
+                            request={dataCollectionRequest}
+                            onSubmit={handleDataCollectionSubmit}
+                            onDismiss={() => setIsDataCollectionModalOpen(false)}
+                            isSubmitting={isSubmittingCollection}
                         />
                     )}
 

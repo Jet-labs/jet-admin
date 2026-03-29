@@ -3,6 +3,7 @@ import { useState, useRef, useCallback, useEffect } from "react";
 import { CONSTANTS } from "../../../constants";
 import { testWorkflowAPI, executeWorkflowAPI, stopTestWorkflowAPI } from "../../../data/apis/workflow";
 import { extractError } from "../../../utils/error";
+import { submitDataCollectionAPI } from "../../../data/apis/workflow";
 
 /**
  * Custom hook to handle workflow execution (both test and saved runs).
@@ -21,6 +22,7 @@ export const useWorkflowRun = ({ tenantID }) => {
     const instanceIdRef = useRef(null);
     const isTestRunRef = useRef(false);
     const isStoppingRef = useRef(false); // Guard to prevent race conditions when stopping
+    const [dataCollectionRequest, setDataCollectionRequest] = useState(null);
 
     // Helper to add log entry
     const addLog = useCallback((type, label, message, extra = {}) => {
@@ -118,6 +120,15 @@ export const useWorkflowRun = ({ tenantID }) => {
                 }
             });
 
+            // Listen for data collection requests
+            socket.on("workflow_data_collection_request", (data) => {
+                if (isStoppingRef.current) return;
+                // data = { instanceID, nodeID, collectionRequestID, collectionType, collectionConfig }
+                const nodeName = getNodeName(data.nodeID);
+                addLog('info', `Node: ${nodeName}`, 'Waiting for input');
+                setDataCollectionRequest(data);
+            });
+
             // Listen for workflow status update (completion/failure/stopped)
             socket.on("workflow_status_update", (data) => {
                 // Ignore events if we're stopping
@@ -185,6 +196,7 @@ export const useWorkflowRun = ({ tenantID }) => {
         resetNodeExecutionStatus();
         clearLogs();
         clearContext();
+        setDataCollectionRequest(null);
         instanceIdRef.current = null;
         isTestRunRef.current = false;
         isStoppingRef.current = false;
@@ -300,6 +312,18 @@ export const useWorkflowRun = ({ tenantID }) => {
         isStoppingRef.current = false; // Reset for next run
     }, [addLog, tenantID, disconnectSocket]);
 
+    const submitCollectedData = useCallback(async (submittedData) => {
+        if (!dataCollectionRequest) return;
+        const { collectionRequestID } = dataCollectionRequest;
+        try {
+            await submitDataCollectionAPI({ tenantID, collectionRequestID, submittedData });
+            addLog('info', 'Data submitted', 'Workflow is resuming');
+            setDataCollectionRequest(null);
+        } catch (error) {
+            addLog('workflow_error', 'Submission failed', error?.message || String(error));
+        }
+    }, [dataCollectionRequest, tenantID, addLog]);
+
     // Cleanup on unmount
     useEffect(() => {
         return () => {
@@ -311,12 +335,14 @@ export const useWorkflowRun = ({ tenantID }) => {
         isRunning,
         result,
         nodeExecutionStatus,
+        dataCollectionRequest,
         logs,
         context,
+        clearRunState,
         startTestRun,
         startSavedRun,
         stopRun,
         clearLogs,
-        clearRunState
+        submitCollectedData,  
     };
 };

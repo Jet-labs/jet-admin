@@ -6,6 +6,7 @@ import { StartNode, StartNodeConfigurator } from './nodes/startNode';
 import { LoopNode, LoopNodeConfigurator } from './nodes/loopNode';
 import { DelayNode, DelayNodeConfigurator } from './nodes/delayNode';
 import { EndNode, EndNodeConfigurator } from './nodes/endNode';
+import { DataCollectionNode, DataCollectionNodeConfigurator } from './nodes/dataCollectionNode';
 
 export const WORKFLOW_NODE_TYPES = {
     START: { value: 'start', label: 'Start' },
@@ -15,9 +16,29 @@ export const WORKFLOW_NODE_TYPES = {
     LOOP: { value: 'loop', label: 'Loop' },
     DELAY: { value: 'delay', label: 'Delay' },
     END: { value: 'end', label: 'End' },
+    DATA_COLLECTION: { value: 'dataCollection', label: 'Data Collection' },
 };
 
 export const WORKFLOW_NODES_MAP = {
+    [WORKFLOW_NODE_TYPES.DATA_COLLECTION.value]: {
+        label: WORKFLOW_NODE_TYPES.DATA_COLLECTION.label,
+        value: WORKFLOW_NODE_TYPES.DATA_COLLECTION.value,
+        component: DataCollectionNode,
+        configurator: DataCollectionNodeConfigurator,
+        defaultValue: {
+            title: 'Input required',
+            description: '',
+            collectionType: 'form',
+            fields: [
+                { id: 'f1', key: 'response', label: 'Response', fieldType: 'text', required: true, placeholder: '', options: '' },
+            ],
+            formSchema: { type: 'object', properties: { response: { type: 'string', title: 'Response' } }, required: ['response'] },
+            formUischema: { type: 'VerticalLayout', elements: [{ type: 'Control', scope: '#/properties/response' }] },
+            outputVariable: 'collectedData',
+            expiryMinutes: 60,
+            isDisabled: false,
+        },
+    },
     [WORKFLOW_NODE_TYPES.DATA_QUERY.value]: {
         label: WORKFLOW_NODE_TYPES.DATA_QUERY.label,
         value: WORKFLOW_NODE_TYPES.DATA_QUERY.value,

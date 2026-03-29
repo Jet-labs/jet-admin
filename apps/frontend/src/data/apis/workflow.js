@@ -331,3 +331,52 @@ export const getWorkflowRunStatusForWidgetAPI = async ({
   }
 };
 
+/**
+ * Submit user-collected data to resume a suspended workflow node.
+ *
+ * @param {{ tenantID, collectionRequestID, submittedData }} params
+ */
+export const submitDataCollectionAPI = async ({ tenantID, collectionRequestID, submittedData }) => {
+  try {
+    const url =
+      CONSTANTS.SERVER_HOST +
+      CONSTANTS.APIS.WORKFLOW.submitDataCollectionAPI(tenantID, collectionRequestID);
+    const bearerToken = await firebaseAuth.currentUser.getIdToken();
+    if (bearerToken) {
+      const response = await axios.post(
+        url,
+        { submittedData },
+        { headers: { authorization: `Bearer ${bearerToken}` } }
+      );
+      if (response.data?.success) return response.data;
+      throw response.data?.error || CONSTANTS.ERROR_CODES.SERVER_ERROR;
+    }
+    throw CONSTANTS.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND;
+  } catch (error) {
+    throw error?.response?.data?.error || error;
+  }
+};
+
+/**
+ * Fetch a data-collection request (used on page-refresh to recover form state).
+ *
+ * @param {{ tenantID, collectionRequestID }} params
+ */
+export const getDataCollectionRequestAPI = async ({ tenantID, collectionRequestID }) => {
+  try {
+    const url =
+      CONSTANTS.SERVER_HOST +
+      CONSTANTS.APIS.WORKFLOW.getDataCollectionRequestAPI(tenantID, collectionRequestID);
+    const bearerToken = await firebaseAuth.currentUser.getIdToken();
+    if (bearerToken) {
+      const response = await axios.get(url, {
+        headers: { authorization: `Bearer ${bearerToken}` },
+      });
+      if (response.data?.success) return response.data;
+      throw response.data?.error || CONSTANTS.ERROR_CODES.SERVER_ERROR;
+    }
+    throw CONSTANTS.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND;
+  } catch (error) {
+    throw error;
+  }
+};

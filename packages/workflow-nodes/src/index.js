@@ -10,4 +10,5 @@ export * from './map';
 export * from './jsonFormsRenderers';
 export * from './StatusIndicator';
 export * from './constants';
+export * from './nodes/dataCollectionNode';
 

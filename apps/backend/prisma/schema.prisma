@@ -345,19 +345,20 @@ model tblWorkflowEdge {
 }
 
 model tblWorkflowInstances {
-  instanceID              String                    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  workflowID              String?                   @db.Uuid
-  tenantID                String                    @db.Uuid
-  status                  String                    @default("PENDING") @db.VarChar
-  version                 Int                       @default(1)
-  startedAt               DateTime?                 @db.Timestamptz(6)
-  completedAt             DateTime?                 @db.Timestamptz(6)
-  createdAt               DateTime                  @default(now()) @db.Timestamptz(6)
-  updatedAt               DateTime                  @default(now()) @db.Timestamptz(6)
-  isTest                  Boolean                   @default(false)
-  tblWorkflowInstanceLogs tblWorkflowInstanceLogs[]
-  tblTenants              tblTenants                @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction)
-  tblWorkflows            tblWorkflows?             @relation(fields: [workflowID], references: [workflowID], onDelete: NoAction, onUpdate: NoAction)
+  instanceID                        String                              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  workflowID                        String?                             @db.Uuid
+  tenantID                          String                              @db.Uuid
+  status                            String                              @default("PENDING") @db.VarChar
+  version                           Int                                 @default(1)
+  startedAt                         DateTime?                           @db.Timestamptz(6)
+  completedAt                       DateTime?                           @db.Timestamptz(6)
+  createdAt                         DateTime                            @default(now()) @db.Timestamptz(6)
+  updatedAt                         DateTime                            @default(now()) @db.Timestamptz(6)
+  isTest                            Boolean                             @default(false)
+  tblWorkflowDataCollectionRequests tblWorkflowDataCollectionRequests[]
+  tblWorkflowInstanceLogs           tblWorkflowInstanceLogs[]
+  tblTenants                        tblTenants                          @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction)
+  tblWorkflows                      tblWorkflows?                       @relation(fields: [workflowID], references: [workflowID], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([tenantID, status], map: "idx_tblWorkflowInstances_tenantID_status")
 }
@@ -416,4 +417,22 @@ model tblWorkflowInstanceLogs {
 
   @@index([instanceID, eventType, nodeID], map: "idx_tblWorkflowInstanceLogs_barrier")
   @@index([instanceID, logID], map: "idx_tblWorkflowInstanceLogs_instance_seq")
+}
+
+model tblWorkflowDataCollectionRequests {
+  collectionRequestID  String               @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  instanceID           String               @db.Uuid
+  nodeID               String               @db.VarChar
+  nodeAttempt          Int?
+  status               String               @default("PENDING") @db.VarChar(50)
+  collectionType       String               @default("form") @db.VarChar(50)
+  collectionConfig     Json                 @default("{}")
+  submittedData        Json?
+  expiresAt            DateTime?            @db.Timestamptz(6)
+  createdAt            DateTime             @default(now()) @db.Timestamptz(6)
+  updatedAt            DateTime             @default(now()) @db.Timestamptz(6)
+  tblWorkflowInstances tblWorkflowInstances @relation(fields: [instanceID], references: [instanceID], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([instanceID, status], map: "idx_tblWfDataCollection_instance_status")
+  @@index([status, expiresAt], map: "idx_tblWfDataCollection_status_expiry")
 }

@@ -273,6 +273,103 @@ stateManager.getCompletedNodeIDs = async (instanceID, nodeIDs) => {
   return new Set(rows.map((r) => r.nodeID));
 };
 
+// ─── Data Collection helpers ──────────────────────────────────────────────
+
+/**
+ * Create a new PENDING data-collection request record.
+ *
+ * @param {{ instanceID, nodeID, nodeAttempt, collectionType, collectionConfig, expiresAt }}
+ * @returns {Promise<object>} Prisma row including collectionRequestID
+ */
+stateManager.createDataCollectionRequest = async ({
+  instanceID,
+  nodeID,
+  nodeAttempt,
+  collectionType,
+  collectionConfig,
+  expiresAt,
+}) => {
+  Logger.log('info', {
+    message: 'stateManager:createDataCollectionRequest',
+    params: { instanceID, nodeID, collectionType },
+  });
+
+  return prisma.tblWorkflowDataCollectionRequests.create({
+    data: {
+      instanceID,
+      nodeID: String(nodeID),
+      nodeAttempt: nodeAttempt ?? null,
+      status: 'PENDING',
+      collectionType: collectionType || 'form',
+      collectionConfig: collectionConfig ?? {},
+      expiresAt: expiresAt ?? null,
+    },
+  });
+};
+
+/**
+ * Find a PENDING request for a specific node (used for idempotency on replay).
+ *
+ * @param {string} instanceID
+ * @param {string} nodeID
+ * @returns {Promise<object|null>}
+ */
+stateManager.getPendingRequestForNode = async (instanceID, nodeID) => {
+  return prisma.tblWorkflowDataCollectionRequests.findFirst({
+    where: { instanceID, nodeID: String(nodeID), status: 'PENDING' },
+    orderBy: { createdAt: 'desc' },
+  });
+};
+
+/**
+ * Fetch a request by its primary key.
+ *
+ * @param {string} collectionRequestID
+ * @returns {Promise<object|null>}
+ */
+stateManager.getDataCollectionRequest = async (collectionRequestID) => {
+  return prisma.tblWorkflowDataCollectionRequests.findUnique({
+    where: { collectionRequestID },
+  });
+};
+
+/**
+ * Mark a request COMPLETED and store the user-submitted data.
+ *
+ * @param {string} collectionRequestID
+ * @param {object} submittedData
+ * @returns {Promise<object>}
+ */
+stateManager.completeDataCollectionRequest = async (collectionRequestID, submittedData) => {
+  Logger.log('info', {
+    message: 'stateManager:completeDataCollectionRequest',
+    params: { collectionRequestID },
+  });
+
+  return prisma.tblWorkflowDataCollectionRequests.update({
+    where: { collectionRequestID },
+    data: {
+      status: 'COMPLETED',
+      submittedData: submittedData ?? {},
+      updatedAt: new Date(),
+    },
+  });
+};
+
+/**
+ * Return all PENDING requests for an instance (used by getRunStatus to let
+ * a frontend that refreshed know it needs to show a collection form).
+ *
+ * @param {string} instanceID
+ * @returns {Promise<object[]>}
+ */
+stateManager.getPendingDataCollectionRequests = async (instanceID) => {
+  return prisma.tblWorkflowDataCollectionRequests.findMany({
+    where: { instanceID, status: 'PENDING' },
+    orderBy: { createdAt: 'asc' },
+  });
+};
+
 // ─── Completion ───────────────────────────────────────────────────────────────
 
 /**

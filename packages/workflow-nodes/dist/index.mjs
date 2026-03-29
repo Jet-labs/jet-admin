@@ -103,7 +103,6 @@ var OPERATORS = [
   { value: "is_empty", label: "Is Empty", symbol: "\u2205", needsRight: false },
   { value: "is_not_empty", label: "Is Not Empty", symbol: "\u2260\u2205", needsRight: false },
   { value: "matches_regex", label: "Matches Regex", symbol: "~", needsRight: true },
-  // expression operator uses raw JS (ctx.variable, no mustache)
   { value: "expression", label: "JS Expression", symbol: "{ }", needsRight: false, isExpression: true }
 ];
 var OP_MAP = Object.fromEntries(OPERATORS.map((o) => [o.value, o]));
@@ -129,12 +128,7 @@ function migrateBranches(raw = []) {
       id: b.id || uid("b"),
       label: b.name || b.label || "Branch",
       conditionLogic: "AND",
-      conditions: [{
-        id: uid("c"),
-        leftValue: expr,
-        operator: "expression",
-        rightValue: ""
-      }]
+      conditions: [{ id: uid("c"), leftValue: expr, operator: "expression", rightValue: "" }]
     };
   });
 }
@@ -178,18 +172,15 @@ function conditionSummary(cond) {
 function ConditionRow({ condition, onChange, onDelete, canDelete }) {
   const op = OP_MAP[condition.operator] || OP_MAP["equals"];
   const update = (patch) => onChange({ ...condition, ...patch });
-  return /* @__PURE__ */ React2.createElement("div", { className: "flex items-center gap-1.5" }, op.isExpression ? (
-    /* JS Expression mode: raw JS, ctx.variable (no mustache) */
-    /* @__PURE__ */ React2.createElement(
-      Input,
-      {
-        value: condition.leftValue,
-        onChange: (e) => update({ leftValue: e.target.value }),
-        placeholder: "ctx.score > 80 && ctx.status === 'active'",
-        className: "flex-1 h-7 text-xs font-mono px-2",
-        title: "Raw JavaScript \u2014 use ctx.variable (no curly braces)"
-      }
-    )
+  return /* @__PURE__ */ React2.createElement("div", { className: "flex items-center gap-1.5" }, op.isExpression ? /* @__PURE__ */ React2.createElement(
+    Input,
+    {
+      value: condition.leftValue,
+      onChange: (e) => update({ leftValue: e.target.value }),
+      placeholder: "ctx.score > 80 && ctx.status === 'active'",
+      className: "flex-1 h-7 text-xs font-mono px-2",
+      title: "Raw JavaScript \u2014 use ctx.variable (no curly braces)"
+    }
   ) : /* @__PURE__ */ React2.createElement(React2.Fragment, null, /* @__PURE__ */ React2.createElement(
     Input,
     {
@@ -198,15 +189,7 @@ function ConditionRow({ condition, onChange, onDelete, canDelete }) {
       placeholder: "{{ctx.field}}",
       className: "flex-1 min-w-0 h-7 text-xs font-mono px-2"
     }
-  ), /* @__PURE__ */ React2.createElement(
-    Select,
-    {
-      value: condition.operator,
-      onValueChange: (val) => update({ operator: val, rightValue: "" })
-    },
-    /* @__PURE__ */ React2.createElement(SelectTrigger, { className: "w-[136px] h-7 text-xs shrink-0" }, /* @__PURE__ */ React2.createElement(SelectValue, null)),
-    /* @__PURE__ */ React2.createElement(SelectContent, null, OPERATORS.map((o) => /* @__PURE__ */ React2.createElement(SelectItem, { key: o.value, value: o.value, className: "text-xs" }, /* @__PURE__ */ React2.createElement("span", { className: "font-mono text-slate-400 mr-1.5 text-[10px]" }, o.symbol), o.label)))
-  ), op.needsRight !== false && /* @__PURE__ */ React2.createElement(
+  ), /* @__PURE__ */ React2.createElement(Select, { value: condition.operator, onValueChange: (val) => update({ operator: val, rightValue: "" }) }, /* @__PURE__ */ React2.createElement(SelectTrigger, { className: "w-[136px] h-7 text-xs shrink-0" }, /* @__PURE__ */ React2.createElement(SelectValue, null)), /* @__PURE__ */ React2.createElement(SelectContent, null, OPERATORS.map((o) => /* @__PURE__ */ React2.createElement(SelectItem, { key: o.value, value: o.value, className: "text-xs" }, /* @__PURE__ */ React2.createElement("span", { className: "font-mono text-muted-foreground mr-1.5 text-[10px]" }, o.symbol), o.label)))), op.needsRight !== false && /* @__PURE__ */ React2.createElement(
     Input,
     {
       value: condition.rightValue,
@@ -220,14 +203,14 @@ function ConditionRow({ condition, onChange, onDelete, canDelete }) {
       type: "button",
       onClick: onDelete,
       disabled: !canDelete,
-      className: "h-7 w-7 shrink-0 flex items-center justify-center rounded text-slate-300 hover:text-red-400 hover:bg-red-50 disabled:opacity-20 transition-colors",
+      className: "h-7 w-7 shrink-0 flex items-center justify-center rounded text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10 disabled:opacity-20 transition-colors",
       title: "Remove condition"
     },
     /* @__PURE__ */ React2.createElement(FaTrash, { className: "w-2.5 h-2.5" })
   ));
 }
 function AndOrDivider({ logic, onToggle }) {
-  return /* @__PURE__ */ React2.createElement("div", { className: "flex items-center gap-2 my-0.5" }, /* @__PURE__ */ React2.createElement("div", { className: "h-px flex-1 bg-slate-100" }), /* @__PURE__ */ React2.createElement(
+  return /* @__PURE__ */ React2.createElement("div", { className: "flex items-center gap-2 my-0.5" }, /* @__PURE__ */ React2.createElement("div", { className: "h-px flex-1 bg-border" }), /* @__PURE__ */ React2.createElement(
     "button",
     {
       type: "button",
@@ -236,11 +219,11 @@ function AndOrDivider({ logic, onToggle }) {
       className: `
           text-[9px] font-bold px-2 py-0.5 rounded border tracking-wider
           transition-colors select-none
-          ${logic === "AND" ? "bg-indigo-50 text-indigo-600 border-indigo-200 hover:bg-indigo-100" : "bg-amber-50  text-amber-600  border-amber-200  hover:bg-amber-100"}
+          ${logic === "AND" ? "bg-primary/10 text-primary border-primary/30 hover:bg-primary/15" : "bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100"}
         `
     },
     logic
-  ), /* @__PURE__ */ React2.createElement("div", { className: "h-px flex-1 bg-slate-100" }));
+  ), /* @__PURE__ */ React2.createElement("div", { className: "h-px flex-1 bg-border" }));
 }
 function BranchEditor({ branch, onChange }) {
   const updateField = (patch) => onChange({ ...branch, ...patch });
@@ -256,7 +239,7 @@ function BranchEditor({ branch, onChange }) {
     onChange({ ...branch, conditions: [...branch.conditions, makeCondition()] });
   };
   const toggleLogic = () => updateField({ conditionLogic: branch.conditionLogic === "AND" ? "OR" : "AND" });
-  return /* @__PURE__ */ React2.createElement("div", { className: "space-y-3 p-3" }, /* @__PURE__ */ React2.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React2.createElement("span", { className: "text-[10px] font-medium text-slate-400 w-10 shrink-0" }, "Label"), /* @__PURE__ */ React2.createElement(
+  return /* @__PURE__ */ React2.createElement("div", { className: "space-y-3 p-3" }, /* @__PURE__ */ React2.createElement("div", { className: "flex items-center gap-2" }, /* @__PURE__ */ React2.createElement("span", { className: "text-[10px] font-medium text-muted-foreground w-10 shrink-0" }, "Label"), /* @__PURE__ */ React2.createElement(
     Input,
     {
       value: branch.label,
@@ -264,14 +247,14 @@ function BranchEditor({ branch, onChange }) {
       placeholder: "Yes / No / Match\u2026",
       className: "flex-1 h-7 text-xs"
     }
-  )), /* @__PURE__ */ React2.createElement("div", { className: "flex items-center justify-between pt-1" }, /* @__PURE__ */ React2.createElement("span", { className: "text-[10px] font-semibold text-slate-400 uppercase tracking-widest" }, "Conditions"), branch.conditions.length > 1 && /* @__PURE__ */ React2.createElement(
+  )), /* @__PURE__ */ React2.createElement("div", { className: "flex items-center justify-between pt-1" }, /* @__PURE__ */ React2.createElement("span", { className: "text-[10px] font-semibold text-muted-foreground uppercase tracking-widest" }, "Conditions"), branch.conditions.length > 1 && /* @__PURE__ */ React2.createElement(
     "button",
     {
       type: "button",
       onClick: toggleLogic,
       className: `
               text-[9px] font-bold px-2 py-0.5 rounded border transition-colors
-              ${branch.conditionLogic === "AND" ? "bg-indigo-50 text-indigo-600 border-indigo-200" : "bg-amber-50  text-amber-600  border-amber-200"}
+              ${branch.conditionLogic === "AND" ? "bg-primary/10 text-primary border-primary/30" : "bg-amber-50 text-amber-600 border-amber-200"}
             `
     },
     branch.conditionLogic
@@ -288,7 +271,7 @@ function BranchEditor({ branch, onChange }) {
     {
       type: "button",
       onClick: addCondition,
-      className: "flex items-center gap-1 text-[10px] text-indigo-500 hover:text-indigo-700 transition-colors"
+      className: "flex items-center gap-1 text-[10px] text-primary hover:text-primary/80 transition-colors"
     },
     /* @__PURE__ */ React2.createElement(FaPlus, { className: "w-2.5 h-2.5" }),
     "Add condition"
@@ -332,7 +315,7 @@ var ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
     onChange({ title, description, branches, errorHandling });
   }, [onChange, title, description, branches, errorHandling]);
   const activeBranch = branches[activeIdx];
-  return /* @__PURE__ */ React2.createElement("div", { className: "w-full space-y-4" }, /* @__PURE__ */ React2.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React2.createElement("label", { className: "text-[10px] font-semibold uppercase tracking-widest text-slate-400" }, "Task Name"), /* @__PURE__ */ React2.createElement(
+  return /* @__PURE__ */ React2.createElement("div", { className: "w-full space-y-4" }, /* @__PURE__ */ React2.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React2.createElement("p", { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground" }, "Task Name"), /* @__PURE__ */ React2.createElement(
     Input,
     {
       value: title,
@@ -340,24 +323,24 @@ var ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
       placeholder: "e.g. Is Severity High?",
       className: "h-8 text-sm"
     }
-  )), /* @__PURE__ */ React2.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React2.createElement("label", { className: "text-[10px] font-semibold uppercase tracking-widest text-slate-400" }, "Description"), /* @__PURE__ */ React2.createElement(
+  )), /* @__PURE__ */ React2.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React2.createElement("p", { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground" }, "Description"), /* @__PURE__ */ React2.createElement(
     "textarea",
     {
       value: description,
       onChange: (e) => setDescription(e.target.value),
       rows: 2,
       placeholder: "What does this condition check?",
-      className: "w-full text-xs text-slate-600 border border-slate-200 rounded px-2.5 py-1.5 resize-none focus:outline-none focus:border-indigo-400 transition-colors"
+      className: "w-full text-xs text-foreground border border-border rounded-md px-2.5 py-1.5 resize-none focus:outline-none focus:ring-2 focus:ring-ring bg-background transition-colors"
     }
-  )), /* @__PURE__ */ React2.createElement("div", { className: "border border-slate-200 rounded overflow-hidden" }, /* @__PURE__ */ React2.createElement("div", { className: "flex items-center bg-slate-50 border-b border-slate-200 overflow-x-auto" }, branches.map((branch, idx) => /* @__PURE__ */ React2.createElement(
+  )), /* @__PURE__ */ React2.createElement("div", { className: "rounded-lg border border-border overflow-hidden" }, /* @__PURE__ */ React2.createElement("div", { className: "flex items-center bg-muted/50 border-b border-border overflow-x-auto" }, branches.map((branch, idx) => /* @__PURE__ */ React2.createElement(
     "div",
     {
       key: branch.id,
       className: `
                 group flex items-center gap-1.5 px-3 py-2.5 cursor-pointer
-                text-xs font-medium border-r border-slate-200
+                text-xs font-medium border-r border-border
                 whitespace-nowrap transition-all select-none
-                ${activeIdx === idx ? "bg-white text-indigo-600 shadow-[inset_0_-2px_0_#6366f1]" : "text-slate-500 hover:text-slate-700 hover:bg-white/60"}
+                ${activeIdx === idx ? "bg-background text-primary shadow-[inset_0_-2px_0_hsl(var(--primary))]" : "text-muted-foreground hover:text-foreground hover:bg-background/60"}
               `,
       onClick: () => setActiveIdx(idx)
     },
@@ -367,7 +350,7 @@ var ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
         className: `
                   w-4 h-4 rounded-full flex items-center justify-center
                   text-[9px] font-bold shrink-0 transition-colors
-                  ${activeIdx === idx ? "bg-indigo-100 text-indigo-600" : "bg-slate-200 text-slate-500 group-hover:bg-slate-300"}
+                  ${activeIdx === idx ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground group-hover:bg-muted/80"}
                 `
       },
       idx + 1
@@ -381,7 +364,7 @@ var ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
           e.stopPropagation();
           removeBranch(idx);
         },
-        className: "ml-0.5 w-3.5 h-3.5 flex items-center justify-center text-slate-300 hover:text-red-400 rounded opacity-0 group-hover:opacity-100 transition-all"
+        className: "ml-0.5 w-3.5 h-3.5 flex items-center justify-center text-muted-foreground/30 hover:text-destructive rounded opacity-0 group-hover:opacity-100 transition-all"
       },
       "\xD7"
     )
@@ -390,7 +373,7 @@ var ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
     {
       type: "button",
       onClick: addBranch,
-      className: "px-3 py-2.5 text-xs text-indigo-500 hover:text-indigo-700 hover:bg-white/60 transition-colors flex items-center gap-1 whitespace-nowrap"
+      className: "px-3 py-2.5 text-xs text-primary hover:text-primary/80 hover:bg-background/60 transition-colors flex items-center gap-1 whitespace-nowrap"
     },
     /* @__PURE__ */ React2.createElement(FaPlus, { className: "w-2.5 h-2.5" }),
     "Add branch"
@@ -401,15 +384,7 @@ var ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
       branch: activeBranch,
       onChange: (updated) => updateBranch(activeIdx, updated)
     }
-  ) : /* @__PURE__ */ React2.createElement("div", { className: "p-4 text-xs text-slate-400 text-center" }, "No branches yet \u2014 click ", /* @__PURE__ */ React2.createElement("strong", null, "Add branch"), " above.")), /* @__PURE__ */ React2.createElement("div", { className: "flex items-center gap-2.5 px-3 py-2 bg-slate-50 border border-dashed border-slate-300 rounded text-xs text-slate-500" }, /* @__PURE__ */ React2.createElement("span", { className: "w-5 h-5 rounded-full bg-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-500 shrink-0" }, "\u2205"), /* @__PURE__ */ React2.createElement("span", null, /* @__PURE__ */ React2.createElement("span", { className: "font-semibold text-slate-600" }, "else"), " ", "\u2014 taken when none of the branches above match")), /* @__PURE__ */ React2.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ React2.createElement("label", { className: "text-[10px] font-semibold uppercase tracking-widest text-slate-400" }, "On Error"), /* @__PURE__ */ React2.createElement(Select, { value: errorHandling, onValueChange: setErrorHandling }, /* @__PURE__ */ React2.createElement(SelectTrigger, { className: "h-8 text-xs" }, /* @__PURE__ */ React2.createElement(SelectValue, null)), /* @__PURE__ */ React2.createElement(SelectContent, null, /* @__PURE__ */ React2.createElement(SelectItem, { value: "fail_workflow", className: "text-xs" }, "Fail Workflow"), /* @__PURE__ */ React2.createElement(SelectItem, { value: "continue", className: "text-xs" }, "Continue to Default Branch")))), /* @__PURE__ */ React2.createElement("div", { className: "p-3 bg-indigo-50 border border-indigo-100 rounded text-[10px] text-indigo-700 space-y-1.5" }, /* @__PURE__ */ React2.createElement("div", { className: "font-semibold text-xs text-indigo-800" }, "\u{1F4A1} Writing Conditions"), /* @__PURE__ */ React2.createElement("div", null, "Use ", /* @__PURE__ */ React2.createElement("code", { className: "bg-white px-1 rounded font-mono border border-indigo-100" }, "{{ctx.field}}"), " in the left and right value inputs \u2014 e.g.", " ", /* @__PURE__ */ React2.createElement("code", { className: "bg-white px-1 rounded font-mono border border-indigo-100" }, "{{ctx.input.severity}}"), "."), /* @__PURE__ */ React2.createElement("div", null, "The right side can also be a plain literal like", " ", /* @__PURE__ */ React2.createElement("code", { className: "bg-white px-1 rounded font-mono border border-indigo-100" }, "High"), " or", " ", /* @__PURE__ */ React2.createElement("code", { className: "bg-white px-1 rounded font-mono border border-indigo-100" }, "3"), "."), /* @__PURE__ */ React2.createElement("div", null, "For complex multi-field logic, use the ", /* @__PURE__ */ React2.createElement("strong", null, "JS Expression"), " operator \u2014 it runs raw JavaScript where ", /* @__PURE__ */ React2.createElement("code", { className: "bg-white px-1 rounded font-mono border border-indigo-100" }, "ctx.field"), " is a direct variable (no curly braces)."), /* @__PURE__ */ React2.createElement("div", null, "Branches are evaluated ", /* @__PURE__ */ React2.createElement("strong", null, "top \u2192 bottom"), "; the first matching branch wins.")), /* @__PURE__ */ React2.createElement(
-    Button,
-    {
-      type: "button",
-      onClick: handleSave,
-      className: "w-full py-2 text-sm font-semibold text-white bg-indigo-600 rounded hover:bg-indigo-700 focus:ring-4 focus:outline-none focus:ring-indigo-300 transition-colors"
-    },
-    strings?.WORKFLOW_EDITOR_CONDITION_NODE_SAVE_BUTTON || "Save Condition"
-  ));
+  ) : /* @__PURE__ */ React2.createElement("div", { className: "p-4 text-xs text-muted-foreground text-center" }, "No branches yet \u2014 click ", /* @__PURE__ */ React2.createElement("strong", null, "Add branch"), " above.")), /* @__PURE__ */ React2.createElement("div", { className: "flex items-center gap-2.5 px-3 py-2 bg-muted/30 border border-dashed border-border rounded-lg text-xs text-muted-foreground" }, /* @__PURE__ */ React2.createElement("span", { className: "w-5 h-5 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold shrink-0" }, "\u2205"), /* @__PURE__ */ React2.createElement("span", null, /* @__PURE__ */ React2.createElement("span", { className: "font-semibold text-foreground" }, "else"), " ", "\u2014 taken when none of the branches above match")), /* @__PURE__ */ React2.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React2.createElement("p", { className: "font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground" }, "On Error"), /* @__PURE__ */ React2.createElement(Select, { value: errorHandling, onValueChange: setErrorHandling }, /* @__PURE__ */ React2.createElement(SelectTrigger, { className: "h-8 text-xs" }, /* @__PURE__ */ React2.createElement(SelectValue, null)), /* @__PURE__ */ React2.createElement(SelectContent, null, /* @__PURE__ */ React2.createElement(SelectItem, { value: "fail_workflow", className: "text-xs" }, "Fail Workflow"), /* @__PURE__ */ React2.createElement(SelectItem, { value: "continue", className: "text-xs" }, "Continue to Default Branch")))), /* @__PURE__ */ React2.createElement("div", { className: "p-3 rounded-lg border border-primary/20 bg-primary/5 text-[10px] text-primary/80 space-y-1.5" }, /* @__PURE__ */ React2.createElement("div", { className: "font-semibold text-xs text-primary" }, "\u{1F4A1} Writing Conditions"), /* @__PURE__ */ React2.createElement("div", null, "Use ", /* @__PURE__ */ React2.createElement("code", { className: "bg-background px-1 rounded border border-border font-mono" }, "{{ctx.field}}"), " in left and right inputs \u2014 e.g.", " ", /* @__PURE__ */ React2.createElement("code", { className: "bg-background px-1 rounded border border-border font-mono" }, "{{ctx.input.severity}}"), "."), /* @__PURE__ */ React2.createElement("div", null, "The right side can also be a plain literal like", " ", /* @__PURE__ */ React2.createElement("code", { className: "bg-background px-1 rounded border border-border font-mono" }, "High"), " or", " ", /* @__PURE__ */ React2.createElement("code", { className: "bg-background px-1 rounded border border-border font-mono" }, "3"), "."), /* @__PURE__ */ React2.createElement("div", null, "For complex logic, use ", /* @__PURE__ */ React2.createElement("strong", null, "JS Expression"), " \u2014 raw JS where", " ", /* @__PURE__ */ React2.createElement("code", { className: "bg-background px-1 rounded border border-border font-mono" }, "ctx.field"), " is a direct variable (no braces)."), /* @__PURE__ */ React2.createElement("div", null, "Branches are evaluated ", /* @__PURE__ */ React2.createElement("strong", null, "top \u2192 bottom"), "; first match wins.")), /* @__PURE__ */ React2.createElement(Button, { type: "button", onClick: handleSave, className: "w-full" }, strings?.WORKFLOW_EDITOR_CONDITION_NODE_SAVE_BUTTON || "Save Condition"));
 };
 var ConditionNode = memo(({ data, isConnectable }) => {
   const isDisabled = data?.isDisabled ?? false;
@@ -445,56 +420,24 @@ var ConditionNode = memo(({ data, isConnectable }) => {
         },
         /* @__PURE__ */ React2.createElement("path", { d: "M7 0 L14 7 L7 14 L0 7 Z" })
       ),
-      /* @__PURE__ */ React2.createElement(
-        "span",
-        {
-          className: `
-            text-xs font-semibold truncate flex-1
-            ${isDisabled ? "text-slate-400 line-through" : "text-indigo-900"}
-          `
-        },
-        data?.title || "Condition"
-      ),
+      /* @__PURE__ */ React2.createElement("span", { className: `text-xs font-semibold truncate flex-1 ${isDisabled ? "text-slate-400 line-through" : "text-indigo-900"}` }, data?.title || "Condition"),
       isDisabled && /* @__PURE__ */ React2.createElement("span", { className: "inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded border border-orange-200 shrink-0" }, /* @__PURE__ */ React2.createElement(VscDebugDisconnect, { className: "w-2.5 h-2.5" }), "Skip")
     ),
     /* @__PURE__ */ React2.createElement("div", { className: "px-3 py-2 space-y-1.5" }, branches.slice(0, 6).map((branch, idx) => {
       const firstCond = branch.conditions?.[0];
       const extra = (branch.conditions?.length ?? 0) - 1;
       const summary = firstCond ? conditionSummary(firstCond) : "";
-      return /* @__PURE__ */ React2.createElement("div", { key: branch.id, className: "flex items-start gap-2 text-[10px]" }, /* @__PURE__ */ React2.createElement(
-        "div",
-        {
-          className: `mt-0.5 w-1.5 h-1.5 rounded-full shrink-0 ${isDisabled ? "bg-slate-300" : "bg-indigo-400"}`
-        }
-      ), /* @__PURE__ */ React2.createElement("span", { className: `font-semibold shrink-0 ${isDisabled ? "text-slate-400" : "text-slate-700"}` }, branch.label || `Branch ${idx + 1}`), /* @__PURE__ */ React2.createElement("span", { className: `truncate font-mono ${isDisabled ? "text-slate-300" : "text-slate-400"}` }, summary, extra > 0 && /* @__PURE__ */ React2.createElement("span", { className: "ml-1 text-slate-300 font-sans" }, "+", extra)));
+      return /* @__PURE__ */ React2.createElement("div", { key: branch.id, className: "flex items-start gap-2 text-[10px]" }, /* @__PURE__ */ React2.createElement("div", { className: `mt-0.5 w-1.5 h-1.5 rounded-full shrink-0 ${isDisabled ? "bg-slate-300" : "bg-indigo-400"}` }), /* @__PURE__ */ React2.createElement("span", { className: `font-semibold shrink-0 ${isDisabled ? "text-slate-400" : "text-slate-700"}` }, branch.label || `Branch ${idx + 1}`), /* @__PURE__ */ React2.createElement("span", { className: `truncate font-mono ${isDisabled ? "text-slate-300" : "text-slate-400"}` }, summary, extra > 0 && /* @__PURE__ */ React2.createElement("span", { className: "ml-1 text-slate-300 font-sans" }, "+", extra)));
     }), branches.length > 6 && /* @__PURE__ */ React2.createElement("div", { className: "text-[9px] text-slate-400 pl-3.5" }, "+", branches.length - 6, " more branches"), /* @__PURE__ */ React2.createElement("div", { className: "flex items-center gap-2 text-[10px] pt-1.5 mt-0.5 border-t border-slate-100" }, /* @__PURE__ */ React2.createElement("div", { className: "w-1.5 h-1.5 rounded-full bg-slate-300 shrink-0" }), /* @__PURE__ */ React2.createElement("span", { className: "font-semibold text-slate-400" }, "else"), /* @__PURE__ */ React2.createElement("span", { className: "text-slate-300" }, "default path"))),
     /* @__PURE__ */ React2.createElement("div", { className: "relative h-5 border-t border-slate-100 mt-1" }, branches.map((branch, idx) => /* @__PURE__ */ React2.createElement(
       "span",
       {
         key: branch.id,
-        className: `
-              absolute bottom-1 transform -translate-x-1/2
-              text-[8px] font-medium leading-none truncate max-w-[44px] text-center
-              ${isDisabled ? "text-slate-300" : "text-indigo-400"}
-            `,
+        className: `absolute bottom-1 transform -translate-x-1/2 text-[8px] font-medium leading-none truncate max-w-[44px] text-center ${isDisabled ? "text-slate-300" : "text-indigo-400"}`,
         style: { left: handleLeft(idx) }
       },
       (branch.label || "").slice(0, 6)
-    )), /* @__PURE__ */ React2.createElement(
-      "span",
-      {
-        className: "absolute bottom-1 transform -translate-x-1/2 text-[8px] font-medium text-slate-300 leading-none",
-        style: { left: handleLeft(branches.length) }
-      },
-      "else"
-    ), /* @__PURE__ */ React2.createElement(
-      "span",
-      {
-        className: "absolute bottom-1 transform -translate-x-1/2 text-[8px] font-medium text-red-300 leading-none",
-        style: { left: handleLeft(branches.length + 1) }
-      },
-      "error"
-    )),
+    )), /* @__PURE__ */ React2.createElement("span", { className: "absolute bottom-1 transform -translate-x-1/2 text-[8px] font-medium text-slate-300 leading-none", style: { left: handleLeft(branches.length) } }, "else"), /* @__PURE__ */ React2.createElement("span", { className: "absolute bottom-1 transform -translate-x-1/2 text-[8px] font-medium text-red-300 leading-none", style: { left: handleLeft(branches.length + 1) } }, "error")),
     /* @__PURE__ */ React2.createElement(
       Handle,
       {
@@ -568,10 +511,7 @@ import {
 
 // src/nodes/dataQueryNode.jsx
 import { SiQuantconnect } from "react-icons/si";
-import { MdOutlineDeleteOutline } from "react-icons/md";
-import { IoMdTime } from "react-icons/io";
 import { TbRefresh } from "react-icons/tb";
-import { BiErrorCircle } from "react-icons/bi";
 import { VscDebugDisconnect as VscDebugDisconnect2 } from "react-icons/vsc";
 import { FaPlay } from "react-icons/fa";
 import { Button as Button2 } from "@jet-admin/ui";
@@ -619,85 +559,24 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
     return {
       type: "object",
       properties: {
-        // General Tab
-        title: {
-          type: "string",
-          title: strings.WORKFLOW_EDITOR_DATA_QUERY_TITLE_LABEL || "Node Title"
-        },
-        description: {
-          type: "string",
-          title: strings.WORKFLOW_EDITOR_NODE_DESCRIPTION_LABEL || "Description"
-        },
-        dataQueryID: {
-          type: "string",
-          title: strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_LABEL || "Data Query",
-          enum: queryEnums.length > 0 ? queryEnums : [""]
-        },
-        args: {
-          type: "object",
-          title: strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_ARGUMENTS_LABEL || "Arguments"
-        },
-        // Output Tab
-        outputVariable: {
-          type: "string",
-          title: strings.WORKFLOW_EDITOR_OUTPUT_VARIABLE_LABEL || "Output Variable Name",
-          description: "Variable name to store result (accessible as {{ctx.{name}}})",
-          pattern: "^[a-zA-Z_][a-zA-Z0-9_]*$"
-        },
-        // Execution Settings Tab
-        timeoutSeconds: {
-          type: "integer",
-          title: strings.WORKFLOW_EDITOR_TIMEOUT_LABEL || "Timeout (seconds)",
-          minimum: 1,
-          maximum: 3600,
-          default: 300
-        },
-        retryLimit: {
-          type: "integer",
-          title: strings.WORKFLOW_EDITOR_RETRY_LIMIT_LABEL || "Retry Attempts",
-          minimum: 0,
-          maximum: 10,
-          default: 0
-        },
-        retryDelaySeconds: {
-          type: "integer",
-          title: strings.WORKFLOW_EDITOR_RETRY_DELAY_LABEL || "Retry Delay (seconds)",
-          minimum: 1,
-          maximum: 300,
-          default: 5
-        },
-        errorHandling: {
-          type: "string",
-          title: strings.WORKFLOW_EDITOR_ERROR_HANDLING_LABEL || "Error Behavior",
-          enum: Object.values(ERROR_HANDLING_OPTIONS2)
-        },
-        isDisabled: {
-          type: "boolean",
-          title: strings.WORKFLOW_EDITOR_IS_DISABLED_LABEL || "Skip this node",
-          default: false
-        }
+        title: { type: "string", title: strings.WORKFLOW_EDITOR_DATA_QUERY_TITLE_LABEL || "Node Title" },
+        description: { type: "string", title: strings.WORKFLOW_EDITOR_NODE_DESCRIPTION_LABEL || "Description" },
+        dataQueryID: { type: "string", title: strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_LABEL || "Data Query", enum: queryEnums.length > 0 ? queryEnums : [""] },
+        args: { type: "object", title: strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_ARGUMENTS_LABEL || "Arguments" },
+        outputVariable: { type: "string", title: strings.WORKFLOW_EDITOR_OUTPUT_VARIABLE_LABEL || "Output Variable Name", pattern: "^[a-zA-Z_][a-zA-Z0-9_]*$" },
+        timeoutSeconds: { type: "integer", title: strings.WORKFLOW_EDITOR_TIMEOUT_LABEL || "Timeout (seconds)", minimum: 1, maximum: 3600, default: 300 },
+        retryLimit: { type: "integer", title: strings.WORKFLOW_EDITOR_RETRY_LIMIT_LABEL || "Retry Attempts", minimum: 0, maximum: 10, default: 0 },
+        retryDelaySeconds: { type: "integer", title: strings.WORKFLOW_EDITOR_RETRY_DELAY_LABEL || "Retry Delay (seconds)", minimum: 1, maximum: 300, default: 5 },
+        errorHandling: { type: "string", title: strings.WORKFLOW_EDITOR_ERROR_HANDLING_LABEL || "Error Behavior", enum: Object.values(ERROR_HANDLING_OPTIONS2) },
+        isDisabled: { type: "boolean", title: strings.WORKFLOW_EDITOR_IS_DISABLED_LABEL || "Skip this node", default: false }
       },
       required: ["dataQueryID"]
     };
   }, [dataQueries, strings]);
   const uischema = useMemo2(() => {
     const generalElements = [
-      {
-        type: "Control",
-        scope: "#/properties/title",
-        options: {
-          placeholder: strings.WORKFLOW_EDITOR_DATA_QUERY_TITLE_PLACEHOLDER || "Enter node title"
-        }
-      },
-      {
-        type: "Control",
-        scope: "#/properties/description",
-        options: {
-          placeholder: strings.WORKFLOW_EDITOR_NODE_DESCRIPTION_PLACEHOLDER || "Describe what this node does...",
-          multi: true,
-          rows: 2
-        }
-      },
+      { type: "Control", scope: "#/properties/title", options: { placeholder: strings.WORKFLOW_EDITOR_DATA_QUERY_TITLE_PLACEHOLDER || "Enter node title" } },
+      { type: "Control", scope: "#/properties/description", options: { placeholder: strings.WORKFLOW_EDITOR_NODE_DESCRIPTION_PLACEHOLDER || "Describe what this node does...", multi: true, rows: 2 } },
       {
         type: "Control",
         scope: "#/properties/dataQueryID",
@@ -716,53 +595,21 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
       generalElements.push({
         type: "Control",
         scope: "#/properties/args",
-        options: {
-          isDynamicArgs: true,
-          args: selectedQuery.dataQueryOptions.args,
-          workflowNodes,
-          workflowEdges,
-          workflowInputArgs,
-          currentNodeId: nodeId
-        }
+        options: { isDynamicArgs: true, args: selectedQuery.dataQueryOptions.args, workflowNodes, workflowEdges, workflowInputArgs, currentNodeId: nodeId }
       });
     }
     return {
       type: "Categorization",
       elements: [
-        {
-          type: "Category",
-          label: strings.WORKFLOW_EDITOR_TAB_GENERAL || "General",
-          elements: generalElements
-        },
-        {
-          type: "Category",
-          label: strings.WORKFLOW_EDITOR_TAB_OUTPUT || "Output",
-          elements: [
-            {
-              type: "Control",
-              scope: "#/properties/outputVariable",
-              options: {
-                placeholder: "e.g., queryResult, userData, orderList"
-              }
-            }
-          ]
-        },
+        { type: "Category", label: strings.WORKFLOW_EDITOR_TAB_GENERAL || "General", elements: generalElements },
+        { type: "Category", label: strings.WORKFLOW_EDITOR_TAB_OUTPUT || "Output", elements: [{ type: "Control", scope: "#/properties/outputVariable", options: { placeholder: "e.g., queryResult, userData, orderList" } }] },
         {
           type: "Category",
           label: strings.WORKFLOW_EDITOR_TAB_ADVANCED || "Advanced",
           elements: [
-            {
-              type: "Control",
-              scope: "#/properties/timeoutSeconds"
-            },
-            {
-              type: "Control",
-              scope: "#/properties/retryLimit"
-            },
-            {
-              type: "Control",
-              scope: "#/properties/retryDelaySeconds"
-            },
+            { type: "Control", scope: "#/properties/timeoutSeconds" },
+            { type: "Control", scope: "#/properties/retryLimit" },
+            { type: "Control", scope: "#/properties/retryDelaySeconds" },
             {
               type: "Control",
               scope: "#/properties/errorHandling",
@@ -775,15 +622,12 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
                 }
               }
             },
-            {
-              type: "Control",
-              scope: "#/properties/isDisabled"
-            }
+            { type: "Control", scope: "#/properties/isDisabled" }
           ]
         }
       ]
     };
-  }, [dataQueries, strings, selectedQuery]);
+  }, [dataQueries, strings, selectedQuery, workflowNodes, workflowEdges, workflowInputArgs, nodeId, onRefreshDataQueries]);
   const handleFormChange = useCallback2(({ data: newData }) => {
     setFormData(newData);
   }, []);
@@ -791,41 +635,12 @@ var DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
     onChange(formData);
   }, [onChange, formData]);
   const handleOpenTest = useCallback2(() => {
-    if (onQueryTest && formData.dataQueryID) {
-      onQueryTest(formData.dataQueryID);
-    }
+    if (onQueryTest && formData.dataQueryID) onQueryTest(formData.dataQueryID);
   }, [onQueryTest, formData.dataQueryID]);
-  return /* @__PURE__ */ React3.createElement("div", { className: "w-full" }, /* @__PURE__ */ React3.createElement("div", { className: "space-y-3" }, /* @__PURE__ */ React3.createElement(
-    JsonForms,
-    {
-      schema,
-      uischema,
-      data: formData,
-      renderers: jetFormsRenderers,
-      onChange: handleFormChange
-    }
-  ), /* @__PURE__ */ React3.createElement("div", { className: "p-2.5 bg-slate-50 border border-slate-200 rounded text-[10px] text-slate-600 space-y-2" }, /* @__PURE__ */ React3.createElement("div", { className: "font-semibold text-slate-700 text-xs" }, "\u{1F4D8} Query Arguments"), /* @__PURE__ */ React3.createElement("div", null, /* @__PURE__ */ React3.createElement("span", { className: "font-medium text-slate-700" }, "Argument Format:"), /* @__PURE__ */ React3.createElement("div", { className: "ml-3 mt-0.5 text-slate-500 font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ React3.createElement("div", null, /* @__PURE__ */ React3.createElement("code", { className: "bg-white px-1 rounded" }, "{{ctx.input.userId}}"), " \u2192 pass input value"), /* @__PURE__ */ React3.createElement("div", null, /* @__PURE__ */ React3.createElement("code", { className: "bg-white px-1 rounded" }, "{{ctx.queryResult.id}}"), " \u2192 from previous query"), /* @__PURE__ */ React3.createElement("div", null, /* @__PURE__ */ React3.createElement("code", { className: "bg-white px-1 rounded" }, "id_{{ctx.input.id}}"), " \u2192 string interpolation"))), /* @__PURE__ */ React3.createElement("div", null, /* @__PURE__ */ React3.createElement("span", { className: "font-medium text-slate-700" }, "Access Result:"), /* @__PURE__ */ React3.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, "Result stored in ", /* @__PURE__ */ React3.createElement("code", { className: "bg-white px-1 py-0.5 rounded font-mono" }, "ctx.{outputVariable}"), " for use in next nodes.")), /* @__PURE__ */ React3.createElement("div", null, /* @__PURE__ */ React3.createElement("span", { className: "font-medium text-slate-700" }, "Handles:"), /* @__PURE__ */ React3.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, /* @__PURE__ */ React3.createElement("strong", null, "Green:"), " Query succeeded \u2192 ", /* @__PURE__ */ React3.createElement("strong", null, "Red:"), " Query failed (use for error handling)"))), /* @__PURE__ */ React3.createElement("div", { className: "flex justify-between items-center gap-2" }, /* @__PURE__ */ React3.createElement(
-    Button2,
-    {
-      type: "button",
-      onClick: handleSave,
-      className: "px-3 py-1.5 text-sm text-white bg-[#646cff] rounded hover:bg-[#5558dd] focus:ring-4 focus:outline-none focus:ring-[#646cff]/30"
-    },
-    strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_SAVE_BUTTON || "Save"
-  ), onQueryTest && formData.dataQueryID && /* @__PURE__ */ React3.createElement(
-    Button2,
-    {
-      type: "button",
-      onClick: handleOpenTest,
-      className: "px-3 py-1.5 text-sm text-slate-600 bg-slate-100 rounded hover:bg-slate-200 border border-slate-200 flex items-center gap-1.5",
-      title: "Test this query"
-    },
-    /* @__PURE__ */ React3.createElement(FaPlay, { className: "w-3 h-3 text-slate-500" }),
-    "Test Query"
-  ))));
+  return /* @__PURE__ */ React3.createElement("div", { className: "w-full space-y-3" }, /* @__PURE__ */ React3.createElement(JsonForms, { schema, uischema, data: formData, renderers: jetFormsRenderers, onChange: handleFormChange }), /* @__PURE__ */ React3.createElement("div", { className: "rounded-lg border border-border bg-muted/30 p-3 text-[10px] text-muted-foreground space-y-2" }, /* @__PURE__ */ React3.createElement("div", { className: "font-semibold text-xs text-foreground" }, "\u{1F4D8} Query Arguments"), /* @__PURE__ */ React3.createElement("div", null, /* @__PURE__ */ React3.createElement("span", { className: "font-medium text-foreground" }, "Argument Format:"), /* @__PURE__ */ React3.createElement("div", { className: "ml-3 mt-0.5 font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ React3.createElement("div", null, /* @__PURE__ */ React3.createElement("code", { className: "bg-background px-1 rounded border border-border" }, "{{ctx.input.userId}}"), " \u2192 pass input value"), /* @__PURE__ */ React3.createElement("div", null, /* @__PURE__ */ React3.createElement("code", { className: "bg-background px-1 rounded border border-border" }, "{{ctx.queryResult.id}}"), " \u2192 from previous query"), /* @__PURE__ */ React3.createElement("div", null, /* @__PURE__ */ React3.createElement("code", { className: "bg-background px-1 rounded border border-border" }, "id_{{ctx.input.id}}"), " \u2192 string interpolation"))), /* @__PURE__ */ React3.createElement("div", null, /* @__PURE__ */ React3.createElement("span", { className: "font-medium text-foreground" }, "Access Result:"), /* @__PURE__ */ React3.createElement("div", { className: "ml-3 mt-0.5" }, "Stored in ", /* @__PURE__ */ React3.createElement("code", { className: "bg-background px-1 py-0.5 rounded border border-border font-mono" }, "ctx.{outputVariable}"), " for use in next nodes."))), /* @__PURE__ */ React3.createElement("div", { className: "flex items-center gap-2" }, onQueryTest && formData.dataQueryID && /* @__PURE__ */ React3.createElement(Button2, { type: "button", variant: "outline", size: "sm", onClick: handleOpenTest, className: "flex items-center gap-1.5" }, /* @__PURE__ */ React3.createElement(FaPlay, { className: "h-3 w-3" }), "Test Query"), /* @__PURE__ */ React3.createElement(Button2, { type: "button", onClick: handleSave, className: "flex-1" }, strings.WORKFLOW_EDITOR_DATA_QUERY_NODE_SAVE_BUTTON || "Save")));
 };
 var DataQueryNode = memo2(({ id, data, isConnectable }) => {
-  const { dataQueries, strings, nodeExecutionStatus } = useWorkflowNodes();
+  const { dataQueries, nodeExecutionStatus } = useWorkflowNodes();
   const [selectedQueryTitle, setSelectedQueryTitle] = useState2("Select Query");
   const executionStatus = nodeExecutionStatus?.[id] || "idle";
   useEffect2(() => {
@@ -837,10 +652,6 @@ var DataQueryNode = memo2(({ id, data, isConnectable }) => {
     }
   }, [data.dataQueryID, dataQueries]);
   const isDisabled = data?.isDisabled ?? false;
-  const hasRetry = (data?.retryLimit ?? 0) > 0;
-  const hasCustomTimeout = (data?.timeoutSeconds ?? 300) !== 300;
-  const argCount = data.args ? Object.keys(data.args).length : 0;
-  const outputVar = data.outputVariable || "queryResult";
   const getStatusStyles2 = () => {
     switch (executionStatus) {
       case "running":
@@ -856,83 +667,19 @@ var DataQueryNode = memo2(({ id, data, isConnectable }) => {
     }
   };
   const StatusIndicator2 = () => {
-    if (executionStatus === "running") {
-      return /* @__PURE__ */ React3.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center animate-spin" }, /* @__PURE__ */ React3.createElement(TbRefresh, { className: "w-3 h-3 text-white" }));
-    }
-    if (executionStatus === "completed") {
-      return /* @__PURE__ */ React3.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center" }, /* @__PURE__ */ React3.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React3.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" })));
-    }
-    if (executionStatus === "failed") {
-      return /* @__PURE__ */ React3.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center" }, /* @__PURE__ */ React3.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React3.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M6 18L18 6M6 6l12 12" })));
-    }
+    if (executionStatus === "running") return /* @__PURE__ */ React3.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center animate-spin" }, /* @__PURE__ */ React3.createElement(TbRefresh, { className: "w-3 h-3 text-white" }));
+    if (executionStatus === "completed") return /* @__PURE__ */ React3.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center" }, /* @__PURE__ */ React3.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React3.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" })));
+    if (executionStatus === "failed") return /* @__PURE__ */ React3.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center" }, /* @__PURE__ */ React3.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React3.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M6 18L18 6M6 6l12 12" })));
     return null;
   };
-  return /* @__PURE__ */ React3.createElement("div", { className: `
-      relative bg-white border rounded
-      min-w-[340px] max-w-[400px]
-      transition-all duration-150
-      ${isDisabled ? "border-slate-200 opacity-50" : getStatusStyles2()}
-      ${!data.dataQueryID ? "!border-red-400 !bg-red-50" : ""}
-    ` }, /* @__PURE__ */ React3.createElement(StatusIndicator2, null), /* @__PURE__ */ React3.createElement("div", { className: "flex items-stretch" }, /* @__PURE__ */ React3.createElement(
+  return /* @__PURE__ */ React3.createElement("div", { className: `relative bg-white border rounded min-w-[340px] max-w-[400px] transition-all duration-150 ${isDisabled ? "border-slate-200 opacity-50" : getStatusStyles2()} ${!data.dataQueryID ? "!border-red-400 !bg-red-50" : ""}` }, /* @__PURE__ */ React3.createElement(StatusIndicator2, null), /* @__PURE__ */ React3.createElement("div", { className: "flex items-stretch" }, /* @__PURE__ */ React3.createElement(
     "div",
     {
-      style: {
-        borderTopLeftRadius: "0.25rem",
-        borderBottomLeftRadius: "0.25rem"
-      },
-      className: `
-          flex flex-col items-center justify-center px-3 py-3 border-r
-          ${isDisabled ? "bg-slate-50 border-slate-100" : executionStatus === "running" ? "bg-blue-100 border-blue-200" : executionStatus === "completed" ? "bg-green-50 border-green-100" : executionStatus === "failed" ? "bg-red-50 border-red-100" : "bg-blue-50 border-blue-100"}}
-        `
+      style: { borderTopLeftRadius: "0.25rem", borderBottomLeftRadius: "0.25rem" },
+      className: `flex flex-col items-center justify-center px-3 py-3 border-r ${isDisabled ? "bg-slate-50 border-slate-100" : executionStatus === "running" ? "bg-blue-100 border-blue-200" : executionStatus === "completed" ? "bg-green-50 border-green-100" : executionStatus === "failed" ? "bg-red-50 border-red-100" : "bg-blue-50 border-blue-100"}`
     },
     /* @__PURE__ */ React3.createElement(SiQuantconnect, { className: `w-5 h-5 ${isDisabled ? "text-slate-400" : executionStatus === "running" ? "text-blue-600" : executionStatus === "completed" ? "text-green-600" : executionStatus === "failed" ? "text-red-600" : "text-blue-500"}` })
-  ), /* @__PURE__ */ React3.createElement("div", { className: "flex-1 px-3 py-2 min-w-0" }, /* @__PURE__ */ React3.createElement("div", { className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ React3.createElement("span", { className: `text-xs font-semibold truncate ${isDisabled ? "text-slate-400 line-through" : "text-slate-700"}` }, data?.title || "Untitled"), isDisabled && /* @__PURE__ */ React3.createElement("span", { className: "inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded border border-orange-200" }, /* @__PURE__ */ React3.createElement(VscDebugDisconnect2, { className: "w-2.5 h-2.5" }), "Skip")), /* @__PURE__ */ React3.createElement("div", { className: `text-sm truncate mt-0.5 ${isDisabled ? "text-slate-300" : "text-slate-500"}` }, selectedQueryTitle.length > 20 ? `${String(selectedQueryTitle).substring(0, 20)}...` : selectedQueryTitle)), /* @__PURE__ */ React3.createElement("div", { className: "flex flex-col items-center justify-center px-2 border-l border-slate-100" }, /* @__PURE__ */ React3.createElement("div", { className: `w-2 h-2 rounded-full mb-1 ${isDisabled ? "bg-slate-300" : "bg-green-400"}`, title: "Success" }), /* @__PURE__ */ React3.createElement("div", { className: `w-2 h-2 rounded-full ${isDisabled ? "bg-slate-300" : "bg-red-400"}`, title: "Error" }))), /* @__PURE__ */ React3.createElement(
-    Handle2,
-    {
-      type: "target",
-      position: Position2.Top,
-      isConnectable,
-      style: {
-        width: "10px",
-        height: "10px",
-        backgroundColor: isDisabled ? "#cbd5e1" : "#3b82f6",
-        border: "none",
-        top: "-5px"
-      }
-    }
-  ), /* @__PURE__ */ React3.createElement(
-    Handle2,
-    {
-      type: "source",
-      position: Position2.Bottom,
-      id: "success",
-      isConnectable,
-      style: {
-        left: "35%",
-        width: "10px",
-        height: "10px",
-        backgroundColor: isDisabled ? "#cbd5e1" : "#22c55e",
-        border: "none",
-        bottom: "-5px"
-      }
-    }
-  ), /* @__PURE__ */ React3.createElement(
-    Handle2,
-    {
-      type: "source",
-      position: Position2.Bottom,
-      id: "error",
-      isConnectable,
-      style: {
-        left: "65%",
-        width: "10px",
-        height: "10px",
-        backgroundColor: isDisabled ? "#cbd5e1" : "#ef4444",
-        border: "none",
-        bottom: "-5px"
-      }
-    }
-  ));
+  ), /* @__PURE__ */ React3.createElement("div", { className: "flex-1 px-3 py-2 min-w-0" }, /* @__PURE__ */ React3.createElement("div", { className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ React3.createElement("span", { className: `text-xs font-semibold truncate ${isDisabled ? "text-slate-400 line-through" : "text-slate-700"}` }, data?.title || "Untitled"), isDisabled && /* @__PURE__ */ React3.createElement("span", { className: "inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded border border-orange-200" }, /* @__PURE__ */ React3.createElement(VscDebugDisconnect2, { className: "w-2.5 h-2.5" }), "Skip")), /* @__PURE__ */ React3.createElement("div", { className: `text-sm truncate mt-0.5 ${isDisabled ? "text-slate-300" : "text-slate-500"}` }, selectedQueryTitle.length > 20 ? `${String(selectedQueryTitle).substring(0, 20)}...` : selectedQueryTitle)), /* @__PURE__ */ React3.createElement("div", { className: "flex flex-col items-center justify-center px-2 border-l border-slate-100" }, /* @__PURE__ */ React3.createElement("div", { className: `w-2 h-2 rounded-full mb-1 ${isDisabled ? "bg-slate-300" : "bg-green-400"}`, title: "Success" }), /* @__PURE__ */ React3.createElement("div", { className: `w-2 h-2 rounded-full ${isDisabled ? "bg-slate-300" : "bg-red-400"}`, title: "Error" }))), /* @__PURE__ */ React3.createElement(Handle2, { type: "target", position: Position2.Top, isConnectable, style: { width: "10px", height: "10px", backgroundColor: isDisabled ? "#cbd5e1" : "#3b82f6", border: "none", top: "-5px" } }), /* @__PURE__ */ React3.createElement(Handle2, { type: "source", position: Position2.Bottom, id: "success", isConnectable, style: { left: "35%", width: "10px", height: "10px", backgroundColor: isDisabled ? "#cbd5e1" : "#22c55e", border: "none", bottom: "-5px" } }), /* @__PURE__ */ React3.createElement(Handle2, { type: "source", position: Position2.Bottom, id: "error", isConnectable, style: { left: "65%", width: "10px", height: "10px", backgroundColor: isDisabled ? "#cbd5e1" : "#ef4444", border: "none", bottom: "-5px" } }));
 });
 
 // src/nodes/javascriptNode.jsx
@@ -940,9 +687,9 @@ import React4, { memo as memo3, useState as useState3, useEffect as useEffect3, 
 import { Handle as Handle3, Position as Position3 } from "reactflow";
 import { JsonForms as JsonForms2 } from "@jsonforms/react";
 import { FaJs } from "react-icons/fa";
-import { IoMdTime as IoMdTime2 } from "react-icons/io";
+import { IoMdTime } from "react-icons/io";
 import { TbRefresh as TbRefresh2 } from "react-icons/tb";
-import { BiErrorCircle as BiErrorCircle2 } from "react-icons/bi";
+import { BiErrorCircle } from "react-icons/bi";
 import { VscDebugDisconnect as VscDebugDisconnect3 } from "react-icons/vsc";
 import { Button as Button3 } from "@jet-admin/ui";
 var ERROR_HANDLING_OPTIONS3 = {
@@ -1283,45 +1030,27 @@ var StartNodeConfigurator = ({ data, onChange, nodeId }) => {
       });
     }
   }, [data]);
-  const schema = useMemo4(() => {
-    return {
-      type: "object",
-      properties: {
-        title: {
-          type: "string",
-          title: "Node Title"
-        },
-        description: {
-          type: "string",
-          title: "Description"
-        }
-      }
-    };
-  }, []);
-  const uischema = useMemo4(() => {
-    return {
-      type: "VerticalLayout",
-      elements: [
-        {
-          type: "Control",
-          scope: "#/properties/title",
-          options: { placeholder: "Enter node title" }
-        },
-        {
-          type: "Control",
-          scope: "#/properties/description",
-          options: { placeholder: "Describe this workflow...", multi: true, rows: 2 }
-        }
-      ]
-    };
-  }, []);
+  const schema = useMemo4(() => ({
+    type: "object",
+    properties: {
+      title: { type: "string", title: "Node Title" },
+      description: { type: "string", title: "Description" }
+    }
+  }), []);
+  const uischema = useMemo4(() => ({
+    type: "VerticalLayout",
+    elements: [
+      { type: "Control", scope: "#/properties/title", options: { placeholder: "Enter node title" } },
+      { type: "Control", scope: "#/properties/description", options: { placeholder: "Describe this workflow...", multi: true, rows: 2 } }
+    ]
+  }), []);
   const handleFormChange = useCallback4(({ data: newData }) => {
     setFormData((prev) => ({ ...prev, ...newData }));
   }, []);
   const handleSave = useCallback4(() => {
     onChange(formData);
   }, [onChange, formData]);
-  return /* @__PURE__ */ React5.createElement("div", { className: "w-full h-full" }, /* @__PURE__ */ React5.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ React5.createElement(
+  return /* @__PURE__ */ React5.createElement("div", { className: "w-full space-y-4" }, /* @__PURE__ */ React5.createElement(
     JsonForms3,
     {
       schema,
@@ -1330,18 +1059,10 @@ var StartNodeConfigurator = ({ data, onChange, nodeId }) => {
       renderers: jetFormsRenderers,
       onChange: handleFormChange
     }
-  ), /* @__PURE__ */ React5.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React5.createElement("div", { className: "p-2.5 bg-slate-50 border border-slate-200 rounded text-[10px] text-slate-600 space-y-2" }, /* @__PURE__ */ React5.createElement("div", { className: "font-semibold text-slate-700 text-xs" }, "\u{1F4D8} How This Works"), /* @__PURE__ */ React5.createElement("div", null, /* @__PURE__ */ React5.createElement("span", { className: "font-medium text-slate-700" }, "Triggers:"), /* @__PURE__ */ React5.createElement("ul", { className: "ml-3 mt-0.5 space-y-0.5 list-disc list-inside text-slate-500" }, /* @__PURE__ */ React5.createElement("li", null, 'Manual: Click "Test Workflow" button'), /* @__PURE__ */ React5.createElement("li", null, "API: POST /api/v1/workflows/:id/run"), /* @__PURE__ */ React5.createElement("li", null, "Widget: Link workflow to a widget"))), /* @__PURE__ */ React5.createElement("div", null, /* @__PURE__ */ React5.createElement("span", { className: "font-medium text-slate-700" }, "Input Parameters:"), /* @__PURE__ */ React5.createElement("div", { className: "ml-3 mt-0.5 text-slate-500" }, "Define inputs in the ", /* @__PURE__ */ React5.createElement("strong", null, '"Input Parameters"'), " panel (right side). Access them in other nodes using: ", /* @__PURE__ */ React5.createElement("code", { className: "bg-white px-1 py-0.5 rounded border border-slate-200 font-mono" }, "{{ctx.input.paramName}}"))), /* @__PURE__ */ React5.createElement("div", null, /* @__PURE__ */ React5.createElement("span", { className: "font-medium text-slate-700" }, "Variable Format:"), /* @__PURE__ */ React5.createElement("div", { className: "ml-3 mt-0.5 text-slate-500 font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ React5.createElement("div", null, /* @__PURE__ */ React5.createElement("code", { className: "bg-white px-1 rounded" }, "{{ctx.input.userId}}"), " \u2192 input parameter"), /* @__PURE__ */ React5.createElement("div", null, /* @__PURE__ */ React5.createElement("code", { className: "bg-white px-1 rounded" }, "{{ctx.queryResult}}"), " \u2192 previous node output"), /* @__PURE__ */ React5.createElement("div", null, /* @__PURE__ */ React5.createElement("code", { className: "bg-white px-1 rounded" }, "id_{{ctx.input.id}}"), " \u2192 string interpolation"))))), /* @__PURE__ */ React5.createElement(
-    Button4,
-    {
-      type: "button",
-      onClick: handleSave,
-      className: "px-3 py-1.5 text-sm text-white bg-[#646cff] rounded hover:bg-[#5558dd] focus:ring-4 focus:outline-none focus:ring-[#646cff]/30"
-    },
-    "Save"
-  )));
+  ), /* @__PURE__ */ React5.createElement("div", { className: "rounded-lg border border-border bg-muted/30 p-3 text-[10px] text-muted-foreground space-y-2" }, /* @__PURE__ */ React5.createElement("div", { className: "font-semibold text-xs text-foreground" }, "\u{1F4D8} How This Works"), /* @__PURE__ */ React5.createElement("div", null, /* @__PURE__ */ React5.createElement("span", { className: "font-medium text-foreground" }, "Triggers:"), /* @__PURE__ */ React5.createElement("ul", { className: "ml-3 mt-0.5 space-y-0.5 list-disc list-inside text-muted-foreground" }, /* @__PURE__ */ React5.createElement("li", null, 'Manual: Click "Test Workflow" button'), /* @__PURE__ */ React5.createElement("li", null, "API: POST /api/v1/workflows/:id/run"), /* @__PURE__ */ React5.createElement("li", null, "Widget: Link workflow to a widget"))), /* @__PURE__ */ React5.createElement("div", null, /* @__PURE__ */ React5.createElement("span", { className: "font-medium text-foreground" }, "Input Parameters:"), /* @__PURE__ */ React5.createElement("div", { className: "ml-3 mt-0.5 text-muted-foreground" }, "Define inputs in the ", /* @__PURE__ */ React5.createElement("strong", null, '"Input Parameters"'), " panel (right side). Access them using:", " ", /* @__PURE__ */ React5.createElement("code", { className: "bg-background px-1 py-0.5 rounded border border-border font-mono" }, "{{ctx.input.paramName}}"))), /* @__PURE__ */ React5.createElement("div", null, /* @__PURE__ */ React5.createElement("span", { className: "font-medium text-foreground" }, "Variable Format:"), /* @__PURE__ */ React5.createElement("div", { className: "ml-3 mt-0.5 font-mono text-[9px] space-y-0.5 text-muted-foreground" }, /* @__PURE__ */ React5.createElement("div", null, /* @__PURE__ */ React5.createElement("code", { className: "bg-background px-1 rounded border border-border" }, "{{ctx.input.userId}}"), " \u2192 input parameter"), /* @__PURE__ */ React5.createElement("div", null, /* @__PURE__ */ React5.createElement("code", { className: "bg-background px-1 rounded border border-border" }, "{{ctx.queryResult}}"), " \u2192 previous node output"), /* @__PURE__ */ React5.createElement("div", null, /* @__PURE__ */ React5.createElement("code", { className: "bg-background px-1 rounded border border-border" }, "id_{{ctx.input.id}}"), " \u2192 string interpolation")))), /* @__PURE__ */ React5.createElement(Button4, { type: "button", onClick: handleSave, className: "w-full" }, "Save"));
 };
 var StartNode = memo4(({ id, data, isConnectable }) => {
-  const { strings, nodeExecutionStatus } = useWorkflowNodes();
+  const { nodeExecutionStatus } = useWorkflowNodes();
   const executionStatus = nodeExecutionStatus?.[id] || "idle";
   const getStatusStyles2 = () => {
     switch (executionStatus) {
@@ -1358,39 +1079,26 @@ var StartNode = memo4(({ id, data, isConnectable }) => {
     }
   };
   const StatusIndicator2 = () => {
-    if (executionStatus === "running") {
-      return /* @__PURE__ */ React5.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center animate-spin z-10" }, /* @__PURE__ */ React5.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React5.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" })));
-    }
-    if (executionStatus === "completed") {
-      return /* @__PURE__ */ React5.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ React5.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React5.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" })));
-    }
-    if (executionStatus === "failed") {
-      return /* @__PURE__ */ React5.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ React5.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React5.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M6 18L18 6M6 6l12 12" })));
-    }
+    if (executionStatus === "running") return /* @__PURE__ */ React5.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center animate-spin z-10" }, /* @__PURE__ */ React5.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React5.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 2, d: "M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" })));
+    if (executionStatus === "completed") return /* @__PURE__ */ React5.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ React5.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React5.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" })));
+    if (executionStatus === "failed") return /* @__PURE__ */ React5.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ React5.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React5.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M6 18L18 6M6 6l12 12" })));
     return null;
   };
-  return /* @__PURE__ */ React5.createElement("div", { className: `
-      relative bg-white border rounded
-      min-w-[280px] max-w-[350px]
-      transition-all duration-150
-      ${getStatusStyles2()}
-    ` }, /* @__PURE__ */ React5.createElement(StatusIndicator2, null), /* @__PURE__ */ React5.createElement("div", { className: "flex items-stretch" }, /* @__PURE__ */ React5.createElement("div", { style: {
-    borderTopLeftRadius: "0.25rem",
-    borderBottomLeftRadius: "0.25rem"
-  }, className: `flex flex-col items-center justify-center px-3 py-3 border-r ${executionStatus === "running" ? "bg-blue-100 border-blue-200" : executionStatus === "completed" ? "bg-green-100 border-green-200" : executionStatus === "failed" ? "bg-red-50 border-red-100" : "bg-green-50 border-green-100"}` }, /* @__PURE__ */ React5.createElement(VscDebugStart, { className: `w-5 h-5 ${executionStatus === "running" ? "text-blue-600" : executionStatus === "completed" ? "text-green-600" : executionStatus === "failed" ? "text-red-600" : "text-green-500"}` })), /* @__PURE__ */ React5.createElement("div", { className: "flex-1 px-3 py-2 min-w-0" }, /* @__PURE__ */ React5.createElement("div", { className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ React5.createElement("span", { className: "text-xs font-semibold truncate text-slate-700" }, data?.title || "Start")), /* @__PURE__ */ React5.createElement("div", { className: "text-[10px] mt-0.5 text-slate-400" }, "Workflow entry point")), /* @__PURE__ */ React5.createElement("div", { className: "flex flex-col items-center justify-center px-2 border-l border-slate-100" }, /* @__PURE__ */ React5.createElement("div", { className: "w-2 h-2 rounded-full bg-green-400", title: "Output" }))), /* @__PURE__ */ React5.createElement(
+  return /* @__PURE__ */ React5.createElement("div", { className: `relative bg-white border rounded min-w-[280px] max-w-[350px] transition-all duration-150 ${getStatusStyles2()}` }, /* @__PURE__ */ React5.createElement(StatusIndicator2, null), /* @__PURE__ */ React5.createElement("div", { className: "flex items-stretch" }, /* @__PURE__ */ React5.createElement(
+    "div",
+    {
+      style: { borderTopLeftRadius: "0.25rem", borderBottomLeftRadius: "0.25rem" },
+      className: `flex flex-col items-center justify-center px-3 py-3 border-r ${executionStatus === "running" ? "bg-blue-100 border-blue-200" : executionStatus === "completed" ? "bg-green-100 border-green-200" : executionStatus === "failed" ? "bg-red-50 border-red-100" : "bg-green-50 border-green-100"}`
+    },
+    /* @__PURE__ */ React5.createElement(VscDebugStart, { className: `w-5 h-5 ${executionStatus === "running" ? "text-blue-600" : executionStatus === "completed" ? "text-green-600" : executionStatus === "failed" ? "text-red-600" : "text-green-500"}` })
+  ), /* @__PURE__ */ React5.createElement("div", { className: "flex-1 px-3 py-2 min-w-0" }, /* @__PURE__ */ React5.createElement("div", { className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ React5.createElement("span", { className: "text-xs font-semibold truncate text-slate-700" }, data?.title || "Start")), /* @__PURE__ */ React5.createElement("div", { className: "text-[10px] mt-0.5 text-slate-400" }, "Workflow entry point")), /* @__PURE__ */ React5.createElement("div", { className: "flex flex-col items-center justify-center px-2 border-l border-slate-100" }, /* @__PURE__ */ React5.createElement("div", { className: "w-2 h-2 rounded-full bg-green-400", title: "Output" }))), /* @__PURE__ */ React5.createElement(
     Handle4,
     {
       type: "source",
       position: Position4.Bottom,
       id: "output",
       isConnectable,
-      style: {
-        width: "10px",
-        height: "10px",
-        backgroundColor: "#22c55e",
-        border: "none",
-        bottom: "-5px"
-      }
+      style: { width: "10px", height: "10px", backgroundColor: "#22c55e", border: "none", bottom: "-5px" }
     }
   ));
 });
@@ -1682,7 +1390,7 @@ import React7, { memo as memo6, useState as useState6, useEffect as useEffect6, 
 import { Handle as Handle6, Position as Position6 } from "reactflow";
 import { JsonForms as JsonForms5 } from "@jsonforms/react";
 import { VscDebugDisconnect as VscDebugDisconnect5 } from "react-icons/vsc";
-import { IoMdTime as IoMdTime3 } from "react-icons/io";
+import { IoMdTime as IoMdTime2 } from "react-icons/io";
 import { Button as Button6 } from "@jet-admin/ui";
 var DelayNodeConfigurator = ({ data, onChange, nodeId }) => {
   const { strings } = useWorkflowNodes();
@@ -1900,7 +1608,7 @@ var DelayNode = memo6(({ data, isConnectable }) => {
           ${isDisabled ? "bg-slate-50 border-slate-100" : "bg-amber-50 border-amber-100"}
         `
     },
-    /* @__PURE__ */ React7.createElement(IoMdTime3, { className: `w-5 h-5 ${isDisabled ? "text-slate-400" : "text-amber-500"}` })
+    /* @__PURE__ */ React7.createElement(IoMdTime2, { className: `w-5 h-5 ${isDisabled ? "text-slate-400" : "text-amber-500"}` })
   ), /* @__PURE__ */ React7.createElement("div", { className: "flex-1 px-3 py-2 min-w-0" }, /* @__PURE__ */ React7.createElement("div", { className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ React7.createElement("span", { className: `text-xs font-semibold truncate ${isDisabled ? "text-slate-400 line-through" : "text-slate-700"}` }, data?.title || "Delay"), isDisabled && /* @__PURE__ */ React7.createElement("span", { className: "inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded border border-orange-200" }, /* @__PURE__ */ React7.createElement(VscDebugDisconnect5, { className: "w-2.5 h-2.5" }), "Skip")), /* @__PURE__ */ React7.createElement("div", { className: `text-[10px] font-mono mt-0.5 ${isDisabled ? "text-slate-300" : "text-slate-400"}` }, "wait ", getDelayDisplay())), /* @__PURE__ */ React7.createElement("div", { className: "flex flex-col items-center justify-center px-2 border-l border-slate-100" }, /* @__PURE__ */ React7.createElement("div", { className: `w-2 h-2 rounded-full ${isDisabled ? "bg-slate-300" : "bg-amber-400"}`, title: "After Delay" }))), /* @__PURE__ */ React7.createElement(
     Handle6,
     {
@@ -2248,7 +1956,342 @@ var EndNode = memo7(({ id, data, isConnectable }) => {
 });
 
 // src/map.js
+import React11 from "react";
+
+// src/nodes/dataCollectionNode.jsx
+import React10, { memo as memo8, useState as useState8, useEffect as useEffect8, useCallback as useCallback8, useMemo as useMemo8 } from "react";
+import { Handle as Handle8, Position as Position8 } from "reactflow";
+import { v4 as uuidv4 } from "uuid";
+
+// src/StatusIndicator.jsx
 import React9 from "react";
+import { TbRefresh as TbRefresh3 } from "react-icons/tb";
+var StatusIndicator = ({ executionStatus }) => {
+  if (executionStatus === "running") {
+    return /* @__PURE__ */ React9.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center animate-spin z-10" }, /* @__PURE__ */ React9.createElement(TbRefresh3, { className: "w-3 h-3 text-white" }));
+  }
+  if (executionStatus === "completed") {
+    return /* @__PURE__ */ React9.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ React9.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React9.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" })));
+  }
+  if (executionStatus === "failed") {
+    return /* @__PURE__ */ React9.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ React9.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React9.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M6 18L18 6M6 6l12 12" })));
+  }
+  return null;
+};
+var getStatusStyles = (executionStatus, defaultHoverColor = "blue-400") => {
+  switch (executionStatus) {
+    case "running":
+      return "border-blue-400 ring-2 ring-blue-300 ring-opacity-50 animate-pulse";
+    case "completed":
+      return "border-green-400 ring-2 ring-green-300 ring-opacity-50";
+    case "failed":
+      return "border-red-400 ring-2 ring-red-300 ring-opacity-50";
+    case "skipped":
+      return "border-orange-300 opacity-60";
+    default:
+      return `border-slate-200 hover:border-${defaultHoverColor} hover:shadow-md`;
+  }
+};
+var getIconColor = (executionStatus, defaultColor) => {
+  switch (executionStatus) {
+    case "running":
+      return "text-blue-600";
+    case "completed":
+      return "text-green-600";
+    case "failed":
+      return "text-red-600";
+    default:
+      return defaultColor;
+  }
+};
+var getStatusBgColor = (executionStatus, defaultBg) => {
+  switch (executionStatus) {
+    case "running":
+      return "bg-blue-100 border-blue-200";
+    case "completed":
+      return "bg-green-50 border-green-100";
+    case "failed":
+      return "bg-red-50 border-red-100";
+    default:
+      return defaultBg;
+  }
+};
+
+// src/nodes/dataCollectionNode.jsx
+import { FaWpforms, FaPlus as FaPlus3, FaTrash as FaTrash3 } from "react-icons/fa";
+import { MdOutlineInput } from "react-icons/md";
+import { VscDebugDisconnect as VscDebugDisconnect6 } from "react-icons/vsc";
+import {
+  Button as Button8,
+  Input as Input3,
+  Select as Select2,
+  SelectContent as SelectContent2,
+  SelectItem as SelectItem2,
+  SelectTrigger as SelectTrigger2,
+  SelectValue as SelectValue2,
+  Checkbox,
+  Label
+} from "@jet-admin/ui";
+var FIELD_TYPES = [
+  { value: "text", label: "Text", schemaType: "string" },
+  { value: "textarea", label: "Long text", schemaType: "string" },
+  { value: "number", label: "Number", schemaType: "number" },
+  { value: "boolean", label: "Checkbox", schemaType: "boolean" },
+  { value: "select", label: "Dropdown", schemaType: "string" }
+];
+var COLLECTION_TYPES = [
+  { value: "form", label: "UI Form" },
+  { value: "api", label: "API call (coming soon)", disabled: true }
+];
+function buildSchemas(fields) {
+  const properties = {};
+  const required = [];
+  const elements = [];
+  for (const f of fields) {
+    if (!f.key) continue;
+    const ft = FIELD_TYPES.find((t) => t.value === f.fieldType) || FIELD_TYPES[0];
+    const schemaProp = { type: ft.schemaType, title: f.label || f.key };
+    if (f.fieldType === "select" && f.options) {
+      schemaProp.enum = f.options.split(",").map((o) => o.trim()).filter(Boolean);
+    }
+    properties[f.key] = schemaProp;
+    if (f.required) required.push(f.key);
+    const uiControl = { type: "Control", scope: `#/properties/${f.key}` };
+    if (f.fieldType === "textarea") uiControl.options = { multi: true, rows: 3 };
+    if (f.placeholder) uiControl.options = { ...uiControl.options ?? {}, placeholder: f.placeholder };
+    elements.push(uiControl);
+  }
+  return {
+    formSchema: {
+      type: "object",
+      properties,
+      ...required.length ? { required } : {}
+    },
+    formUischema: { type: "VerticalLayout", elements }
+  };
+}
+var makeField = () => ({
+  id: uuidv4(),
+  key: "",
+  label: "",
+  fieldType: "text",
+  required: false,
+  placeholder: "",
+  options: ""
+  // comma-separated, for select type only
+});
+var DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
+  const [title, setTitle] = useState8(data?.title ?? "Input required");
+  const [description, setDescription] = useState8(data?.description ?? "");
+  const [collectionType, setCollectionType] = useState8(data?.collectionType ?? "form");
+  const [fields, setFields] = useState8(data?.fields ?? [makeField()]);
+  const [outputVariable, setOutputVariable] = useState8(data?.outputVariable ?? "collectedData");
+  const [expiryMinutes, setExpiryMinutes] = useState8(data?.expiryMinutes ?? 60);
+  useEffect8(() => {
+    if (!data) return;
+    setTitle(data.title ?? "Input required");
+    setDescription(data.description ?? "");
+    setCollectionType(data.collectionType ?? "form");
+    setFields(data.fields ?? [makeField()]);
+    setOutputVariable(data.outputVariable ?? "collectedData");
+    setExpiryMinutes(data.expiryMinutes ?? 60);
+  }, [data]);
+  const addField = useCallback8(() => setFields((prev) => [...prev, makeField()]), []);
+  const removeField = useCallback8((id) => setFields((prev) => prev.filter((f) => f.id !== id)), []);
+  const updateField = useCallback8((id, patch) => setFields((prev) => prev.map((f) => f.id === id ? { ...f, ...patch } : f)), []);
+  const handleSave = useCallback8(() => {
+    const { formSchema, formUischema } = buildSchemas(fields);
+    onChange({
+      title,
+      description,
+      collectionType,
+      fields,
+      formSchema,
+      formUischema,
+      outputVariable,
+      expiryMinutes: Number(expiryMinutes) || 60
+    });
+  }, [title, description, collectionType, fields, outputVariable, expiryMinutes, onChange]);
+  return /* @__PURE__ */ React10.createElement("div", { className: "w-full space-y-5" }, /* @__PURE__ */ React10.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React10.createElement(Label, { className: "text-[10px] font-bold uppercase tracking-wider text-muted-foreground" }, "Modal title"), /* @__PURE__ */ React10.createElement(
+    Input3,
+    {
+      value: title,
+      onChange: (e) => setTitle(e.target.value),
+      placeholder: "Input required",
+      className: "h-8 text-sm"
+    }
+  )), /* @__PURE__ */ React10.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React10.createElement(Label, { className: "text-[10px] font-bold uppercase tracking-wider text-muted-foreground" }, "Instructions"), /* @__PURE__ */ React10.createElement(
+    "textarea",
+    {
+      value: description,
+      onChange: (e) => setDescription(e.target.value),
+      rows: 2,
+      placeholder: "Tell the user what to fill in...",
+      className: "w-full text-xs text-foreground border border-border rounded-md px-2.5 py-1.5 resize-none focus:outline-none focus:ring-2 focus:ring-ring bg-background transition-colors"
+    }
+  )), /* @__PURE__ */ React10.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React10.createElement(Label, { className: "text-[10px] font-bold uppercase tracking-wider text-muted-foreground" }, "Collection method"), /* @__PURE__ */ React10.createElement(Select2, { value: collectionType, onValueChange: setCollectionType }, /* @__PURE__ */ React10.createElement(SelectTrigger2, { className: "h-8 text-xs" }, /* @__PURE__ */ React10.createElement(SelectValue2, null)), /* @__PURE__ */ React10.createElement(SelectContent2, null, COLLECTION_TYPES.map((t) => /* @__PURE__ */ React10.createElement(SelectItem2, { key: t.value, value: t.value, disabled: t.disabled, className: "text-xs" }, t.label))))), collectionType === "form" && /* @__PURE__ */ React10.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ React10.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ React10.createElement(Label, { className: "text-[10px] font-bold uppercase tracking-wider text-muted-foreground" }, "Form fields"), /* @__PURE__ */ React10.createElement(
+    Button8,
+    {
+      type: "button",
+      variant: "ghost",
+      size: "sm",
+      onClick: addField,
+      className: "h-6 px-2 text-[10px] text-primary hover:bg-primary/10"
+    },
+    /* @__PURE__ */ React10.createElement(FaPlus3, { className: "w-2.5 h-2.5 mr-1" }),
+    " Add field"
+  )), fields.length === 0 && /* @__PURE__ */ React10.createElement("p", { className: "text-[10px] text-muted-foreground italic" }, "No fields yet."), fields.map((field, idx) => /* @__PURE__ */ React10.createElement(
+    "div",
+    {
+      key: field.id,
+      className: "rounded-md border border-border p-3 bg-muted/20 space-y-2"
+    },
+    /* @__PURE__ */ React10.createElement("div", { className: "flex gap-2 items-center" }, /* @__PURE__ */ React10.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React10.createElement(Label, { className: "text-[9px] text-muted-foreground" }, "Key"), /* @__PURE__ */ React10.createElement(
+      Input3,
+      {
+        value: field.key,
+        onChange: (e) => updateField(field.id, { key: e.target.value.replace(/\s/g, "_") }),
+        placeholder: "field_name",
+        className: "h-7 text-xs font-mono"
+      }
+    )), /* @__PURE__ */ React10.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React10.createElement(Label, { className: "text-[9px] text-muted-foreground" }, "Label"), /* @__PURE__ */ React10.createElement(
+      Input3,
+      {
+        value: field.label,
+        onChange: (e) => updateField(field.id, { label: e.target.value }),
+        placeholder: "Display label",
+        className: "h-7 text-xs"
+      }
+    )), /* @__PURE__ */ React10.createElement(
+      Button8,
+      {
+        type: "button",
+        variant: "destructive-ghost",
+        size: "sm",
+        square: true,
+        onClick: () => removeField(field.id),
+        className: "h-7 w-7 mt-4 flex-shrink-0",
+        disabled: fields.length === 1
+      },
+      /* @__PURE__ */ React10.createElement(FaTrash3, { className: "w-2.5 h-2.5" })
+    )),
+    /* @__PURE__ */ React10.createElement("div", { className: "flex gap-2 items-center" }, /* @__PURE__ */ React10.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React10.createElement(Label, { className: "text-[9px] text-muted-foreground" }, "Type"), /* @__PURE__ */ React10.createElement(
+      Select2,
+      {
+        value: field.fieldType,
+        onValueChange: (val) => updateField(field.id, { fieldType: val })
+      },
+      /* @__PURE__ */ React10.createElement(SelectTrigger2, { className: "h-7 text-xs" }, /* @__PURE__ */ React10.createElement(SelectValue2, null)),
+      /* @__PURE__ */ React10.createElement(SelectContent2, null, FIELD_TYPES.map((t) => /* @__PURE__ */ React10.createElement(SelectItem2, { key: t.value, value: t.value, className: "text-xs" }, t.label)))
+    )), /* @__PURE__ */ React10.createElement("div", { className: "flex-1" }, /* @__PURE__ */ React10.createElement(Label, { className: "text-[9px] text-muted-foreground" }, "Placeholder"), /* @__PURE__ */ React10.createElement(
+      Input3,
+      {
+        value: field.placeholder,
+        onChange: (e) => updateField(field.id, { placeholder: e.target.value }),
+        placeholder: "Optional hint",
+        className: "h-7 text-xs"
+      }
+    )), /* @__PURE__ */ React10.createElement("label", { className: "flex items-center gap-1 text-[10px] text-muted-foreground flex-shrink-0 mt-4" }, /* @__PURE__ */ React10.createElement(
+      Checkbox,
+      {
+        checked: field.required,
+        onCheckedChange: (v) => updateField(field.id, { required: v })
+      }
+    ), "Req.")),
+    field.fieldType === "select" && /* @__PURE__ */ React10.createElement("div", null, /* @__PURE__ */ React10.createElement(Label, { className: "text-[9px] text-muted-foreground" }, "Options ", /* @__PURE__ */ React10.createElement("span", { className: "text-muted-foreground/50" }, "(comma-separated)")), /* @__PURE__ */ React10.createElement(
+      Input3,
+      {
+        value: field.options,
+        onChange: (e) => updateField(field.id, { options: e.target.value }),
+        placeholder: "Option A, Option B, Option C",
+        className: "h-7 text-xs"
+      }
+    ))
+  ))), /* @__PURE__ */ React10.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React10.createElement(Label, { className: "text-[10px] font-bold uppercase tracking-wider text-muted-foreground" }, "Output variable"), /* @__PURE__ */ React10.createElement(
+    Input3,
+    {
+      value: outputVariable,
+      onChange: (e) => setOutputVariable(e.target.value.replace(/\s/g, "")),
+      placeholder: "collectedData",
+      className: "h-8 text-xs font-mono"
+    }
+  ), /* @__PURE__ */ React10.createElement("p", { className: "text-[10px] text-muted-foreground" }, "Access via", " ", /* @__PURE__ */ React10.createElement("code", { className: "bg-muted px-1 rounded font-mono" }, `{{ctx.${outputVariable || "collectedData"}}}`))), /* @__PURE__ */ React10.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ React10.createElement(Label, { className: "text-[10px] font-bold uppercase tracking-wider text-muted-foreground" }, "Expiry (minutes) \u2014 0 = never"), /* @__PURE__ */ React10.createElement(
+    Input3,
+    {
+      type: "number",
+      value: expiryMinutes,
+      min: 0,
+      onChange: (e) => setExpiryMinutes(e.target.value),
+      className: "h-8 text-xs w-28"
+    }
+  )), /* @__PURE__ */ React10.createElement("div", { className: "rounded-lg border border-primary/20 bg-primary/5 p-3 text-[10px] text-primary/80 space-y-1" }, /* @__PURE__ */ React10.createElement("div", { className: "font-semibold text-xs text-primary" }, "Suspend & resume"), /* @__PURE__ */ React10.createElement("div", null, "When this node runs, the workflow ", /* @__PURE__ */ React10.createElement("strong", null, "pauses"), " and a form modal appears in the execution panel. The DAG only advances once the user clicks ", /* @__PURE__ */ React10.createElement("em", null, "Submit & continue"), "."), /* @__PURE__ */ React10.createElement("div", null, "Field values land in", " ", /* @__PURE__ */ React10.createElement("code", { className: "bg-background px-1 rounded border border-border font-mono" }, `ctx.${outputVariable || "collectedData"}`), " ", "as a plain object.")), /* @__PURE__ */ React10.createElement(Button8, { type: "button", onClick: handleSave, className: "w-full" }, "Save"));
+};
+var DataCollectionNode = memo8(({ id, data, isConnectable }) => {
+  const { nodeExecutionStatus } = useWorkflowNodes();
+  const executionStatus = nodeExecutionStatus?.[id] || "idle";
+  const isDisabled = data?.isDisabled ?? false;
+  const fieldCount = (data?.fields ?? []).filter((f) => f.key).length;
+  const isSuspended = executionStatus === "suspended";
+  const borderClass = isSuspended ? "border-amber-400 ring-2 ring-amber-300 ring-opacity-60 animate-pulse" : getStatusStyles(executionStatus, "violet-400");
+  return /* @__PURE__ */ React10.createElement("div", { className: `
+      relative bg-white border rounded
+      min-w-[300px] max-w-[380px]
+      transition-all duration-150
+      ${isDisabled ? "border-slate-200 opacity-50" : borderClass}
+    ` }, /* @__PURE__ */ React10.createElement(StatusIndicator, { executionStatus }), /* @__PURE__ */ React10.createElement("div", { className: "flex items-stretch" }, /* @__PURE__ */ React10.createElement(
+    "div",
+    {
+      style: { borderTopLeftRadius: "0.25rem", borderBottomLeftRadius: "0.25rem" },
+      className: `
+            flex flex-col items-center justify-center px-3 py-3 border-r
+            ${isDisabled ? "bg-slate-50 border-slate-100" : isSuspended ? "bg-amber-100 border-amber-200" : executionStatus === "running" ? "bg-blue-100 border-blue-200" : executionStatus === "completed" ? "bg-green-50 border-green-100" : executionStatus === "failed" ? "bg-red-50 border-red-100" : "bg-violet-50 border-violet-100"}
+          `
+    },
+    isSuspended ? /* @__PURE__ */ React10.createElement(MdOutlineInput, { className: "w-5 h-5 text-amber-600" }) : /* @__PURE__ */ React10.createElement(FaWpforms, { className: `w-5 h-5 ${isDisabled ? "text-slate-400" : executionStatus === "running" ? "text-blue-600" : executionStatus === "completed" ? "text-green-600" : executionStatus === "failed" ? "text-red-600" : "text-violet-500"}` })
+  ), /* @__PURE__ */ React10.createElement("div", { className: "flex-1 px-3 py-2 min-w-0" }, /* @__PURE__ */ React10.createElement("div", { className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ React10.createElement("span", { className: `text-xs font-semibold truncate
+              ${isDisabled ? "text-slate-400 line-through" : "text-slate-700"}` }, data?.title || "Data collection"), isSuspended && /* @__PURE__ */ React10.createElement("span", { className: "inline-flex items-center gap-1 text-[9px] font-medium text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded border border-amber-200 whitespace-nowrap" }, "\u23F8 Waiting"), isDisabled && !isSuspended && /* @__PURE__ */ React10.createElement("span", { className: "inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded border border-orange-200" }, /* @__PURE__ */ React10.createElement(VscDebugDisconnect6, { className: "w-2.5 h-2.5" }), "Skip")), /* @__PURE__ */ React10.createElement("div", { className: `text-[10px] mt-0.5 ${isDisabled ? "text-slate-300" : "text-slate-400"}` }, fieldCount > 0 ? `${fieldCount} field${fieldCount !== 1 ? "s" : ""} \xB7 saves to ctx.${data?.outputVariable || "collectedData"}` : "No fields defined yet")), /* @__PURE__ */ React10.createElement("div", { className: "flex flex-col items-center justify-center px-2 border-l border-slate-100" }, /* @__PURE__ */ React10.createElement(
+    "div",
+    {
+      className: `w-2 h-2 rounded-full mb-1
+            ${isSuspended ? "bg-amber-400 animate-pulse" : isDisabled ? "bg-slate-300" : "bg-violet-400"}`,
+      title: "Output (after submission)"
+    }
+  ), /* @__PURE__ */ React10.createElement(
+    "div",
+    {
+      className: `w-2 h-2 rounded-full ${isDisabled ? "bg-slate-300" : "bg-red-400"}`,
+      title: "Error"
+    }
+  ))), /* @__PURE__ */ React10.createElement(
+    Handle8,
+    {
+      type: "target",
+      position: Position8.Top,
+      isConnectable,
+      style: { width: 10, height: 10, backgroundColor: isDisabled ? "#cbd5e1" : "#8b5cf6", border: "none", top: -5 }
+    }
+  ), /* @__PURE__ */ React10.createElement(
+    Handle8,
+    {
+      type: "source",
+      position: Position8.Bottom,
+      id: "output",
+      isConnectable,
+      style: { left: "35%", width: 10, height: 10, backgroundColor: isDisabled ? "#cbd5e1" : "#8b5cf6", border: "none", bottom: -5 }
+    }
+  ), /* @__PURE__ */ React10.createElement(
+    Handle8,
+    {
+      type: "source",
+      position: Position8.Bottom,
+      id: "error",
+      isConnectable,
+      style: { left: "65%", width: 10, height: 10, backgroundColor: isDisabled ? "#cbd5e1" : "#ef4444", border: "none", bottom: -5 }
+    }
+  ));
+});
+
+// src/map.js
 var WORKFLOW_NODE_TYPES = {
   START: { value: "start", label: "Start" },
   DATA_QUERY: { value: "dataQuery", label: "Data Query" },
@@ -2256,9 +2299,29 @@ var WORKFLOW_NODE_TYPES = {
   CONDITION: { value: "condition", label: "Condition" },
   LOOP: { value: "loop", label: "Loop" },
   DELAY: { value: "delay", label: "Delay" },
-  END: { value: "end", label: "End" }
+  END: { value: "end", label: "End" },
+  DATA_COLLECTION: { value: "dataCollection", label: "Data Collection" }
 };
 var WORKFLOW_NODES_MAP = {
+  [WORKFLOW_NODE_TYPES.DATA_COLLECTION.value]: {
+    label: WORKFLOW_NODE_TYPES.DATA_COLLECTION.label,
+    value: WORKFLOW_NODE_TYPES.DATA_COLLECTION.value,
+    component: DataCollectionNode,
+    configurator: DataCollectionNodeConfigurator,
+    defaultValue: {
+      title: "Input required",
+      description: "",
+      collectionType: "form",
+      fields: [
+        { id: "f1", key: "response", label: "Response", fieldType: "text", required: true, placeholder: "", options: "" }
+      ],
+      formSchema: { type: "object", properties: { response: { type: "string", title: "Response" } }, required: ["response"] },
+      formUischema: { type: "VerticalLayout", elements: [{ type: "Control", scope: "#/properties/response" }] },
+      outputVariable: "collectedData",
+      expiryMinutes: 60,
+      isDisabled: false
+    }
+  },
   [WORKFLOW_NODE_TYPES.DATA_QUERY.value]: {
     label: WORKFLOW_NODE_TYPES.DATA_QUERY.label,
     value: WORKFLOW_NODE_TYPES.DATA_QUERY.value,
@@ -2743,63 +2806,11 @@ var WORKFLOW_NODES_MAP = {
     }
   }
 };
-
-// src/StatusIndicator.jsx
-import React10 from "react";
-import { TbRefresh as TbRefresh3 } from "react-icons/tb";
-var StatusIndicator = ({ executionStatus }) => {
-  if (executionStatus === "running") {
-    return /* @__PURE__ */ React10.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center animate-spin z-10" }, /* @__PURE__ */ React10.createElement(TbRefresh3, { className: "w-3 h-3 text-white" }));
-  }
-  if (executionStatus === "completed") {
-    return /* @__PURE__ */ React10.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ React10.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React10.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" })));
-  }
-  if (executionStatus === "failed") {
-    return /* @__PURE__ */ React10.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ React10.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React10.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M6 18L18 6M6 6l12 12" })));
-  }
-  return null;
-};
-var getStatusStyles = (executionStatus, defaultHoverColor = "blue-400") => {
-  switch (executionStatus) {
-    case "running":
-      return "border-blue-400 ring-2 ring-blue-300 ring-opacity-50 animate-pulse";
-    case "completed":
-      return "border-green-400 ring-2 ring-green-300 ring-opacity-50";
-    case "failed":
-      return "border-red-400 ring-2 ring-red-300 ring-opacity-50";
-    case "skipped":
-      return "border-orange-300 opacity-60";
-    default:
-      return `border-slate-200 hover:border-${defaultHoverColor} hover:shadow-md`;
-  }
-};
-var getIconColor = (executionStatus, defaultColor) => {
-  switch (executionStatus) {
-    case "running":
-      return "text-blue-600";
-    case "completed":
-      return "text-green-600";
-    case "failed":
-      return "text-red-600";
-    default:
-      return defaultColor;
-  }
-};
-var getStatusBgColor = (executionStatus, defaultBg) => {
-  switch (executionStatus) {
-    case "running":
-      return "bg-blue-100 border-blue-200";
-    case "completed":
-      return "bg-green-50 border-green-100";
-    case "failed":
-      return "bg-red-50 border-red-100";
-    default:
-      return defaultBg;
-  }
-};
 export {
   ConditionNode,
   ConditionNodeConfigurator,
+  DataCollectionNode,
+  DataCollectionNodeConfigurator,
   DataQueryNode,
   DataQueryNodeConfigurator,
   DelayNode,

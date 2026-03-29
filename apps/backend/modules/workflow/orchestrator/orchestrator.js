@@ -62,6 +62,9 @@ async function handleTaskResult(result) {
   // at-least-once), the unique index on (instanceID, nodeID, eventType,
   // nodeAttempt) will throw P2002 here and we return early — the CAS loop
   // is never reached, so there is no risk of a duplicate dispatch.
+  // ── In handleTaskResult, replace the Step 1 block with this ──────────────
+
+  // ── Step 1: write the execution log row — exactly once ────────────────────
   try {
     if (status === 'success') {
       const payload = _buildLogPayload({ nodeID, nodeType, outputVariable, output, status });
@@ -74,7 +77,76 @@ async function handleTaskResult(result) {
         payload,
         nodeAttempt,
       });
+
+    } else if (status === 'suspended') {
+      // ── Suspended: workflow is waiting for human input ──────────────────
+      // Check first whether a PENDING request already exists (idempotency on
+      // pg-boss at-least-once re-delivery; avoids duplicate DB records).
+      const existing = await stateManager.getPendingRequestForNode(instanceID, nodeID);
+
+      if (existing) {
+        // Re-emit the socket in case the client missed the first delivery.
+        socketIO.to(instanceID).emit(
+          constants.SOCKET_EMIT_EVENTS.WORKFLOW_DATA_COLLECTION_REQUEST,
+          {
+            instanceID,
+            nodeID,
+            collectionRequestID: existing.collectionRequestID,
+            collectionType: existing.collectionType,
+            collectionConfig: existing.collectionConfig,
+          }
+        );
+        return;
+      }
+
+      // Create the DB record.
+      const config = output ?? {};                // output IS the collectionConfig
+      const expiryMins = config.expiryMinutes ?? 60;
+      const expiresAt = expiryMins > 0
+        ? new Date(Date.now() + expiryMins * 60 * 1000)
+        : null;
+
+      const request = await stateManager.createDataCollectionRequest({
+        instanceID,
+        nodeID,
+        nodeAttempt,
+        collectionType: config.collectionType || 'form',
+        collectionConfig: config,
+        expiresAt,
+      });
+
+      // Write NODE_SUSPENDED to the append-only log (carries the request ID for
+      // audit / replay purposes; is NOT folded into assembled context).
+      await stateManager.logEvent({
+        instanceID,
+        nodeID,
+        eventType: constants.WORKFLOW_LOG_EVENT_TYPES.NODE_SUSPENDED,
+        nodeStatus: 'suspended',
+        payload: { collectionRequestID: request.collectionRequestID },
+        nodeAttempt,
+      });
+
+      // Notify the frontend.
+      socketIO.to(instanceID).emit(
+        constants.SOCKET_EMIT_EVENTS.WORKFLOW_DATA_COLLECTION_REQUEST,
+        {
+          instanceID,
+          nodeID,
+          collectionRequestID: request.collectionRequestID,
+          collectionType: request.collectionType,
+          collectionConfig: request.collectionConfig,
+        }
+      );
+
+      // Do NOT advance the DAG — return here.
+      Logger.log('info', {
+        message: 'orchestrator:nodeSuspended',
+        params: { instanceID, nodeID, collectionRequestID: request.collectionRequestID },
+      });
+      return;
+
     } else {
+      // error path (unchanged)
       await stateManager.logEvent({
         instanceID,
         nodeID,
@@ -87,8 +159,6 @@ async function handleTaskResult(result) {
     }
   } catch (err) {
     if (err?.code === 'P2002') {
-      // Duplicate result delivery — this exact (node, attempt) was already
-      // processed. Safe to discard.
       Logger.log('info', {
         message: 'orchestrator:duplicateResult:discarded',
         params: { instanceID, nodeID, nodeAttempt },

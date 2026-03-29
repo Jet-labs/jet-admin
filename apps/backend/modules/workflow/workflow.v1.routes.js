@@ -14,6 +14,7 @@ const {
   workflowIdParamSchema,
   instanceIdParamSchema,
 } = require("./workflow.validator");
+const dataCollectionRoutes = require("./dataCollection/dataController.route");
 
 // List all workflows
 router.get(
@@ -98,6 +99,12 @@ router.post(
   validate(instanceIdParamSchema, "params"),
   authMiddleware.checkUserPermissions(["tenant:workflow:read"]),
   workflowController.getRunStatusForWidget
+);
+
+router.use(
+  "/data-collection",
+  authMiddleware.checkUserPermissions(["tenant:workflow:read"]),
+  dataCollectionRoutes
 );
 
 module.exports = router;

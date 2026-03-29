@@ -1143,6 +1143,10 @@ export const CONSTANTS = {
         `/api/v1/tenants/${tenantID}/workflows/instances/${instanceID}/stop`,
       getWorkflowRunStatusForWidgetAPI: (tenantID, instanceID) =>
         `/api/v1/tenants/${tenantID}/workflows/instances/${instanceID}/widget`,
+      getDataCollectionRequestAPI: (tenantID, collectionRequestID) =>
+        `/api/v1/tenants/${tenantID}/workflows/data-collection/${collectionRequestID}`,
+      submitDataCollectionAPI: (tenantID, collectionRequestID) =>
+        `/api/v1/tenants/${tenantID}/workflows/data-collection/${collectionRequestID}/submit`,
     },
     AUTH: {
       getUserInfoAPI: () => "/api/v1/auth",

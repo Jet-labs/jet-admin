@@ -31,6 +31,8 @@ var index_exports = {};
 __export(index_exports, {
   ConditionNode: () => ConditionNode,
   ConditionNodeConfigurator: () => ConditionNodeConfigurator,
+  DataCollectionNode: () => DataCollectionNode,
+  DataCollectionNodeConfigurator: () => DataCollectionNodeConfigurator,
   DataQueryNode: () => DataQueryNode,
   DataQueryNodeConfigurator: () => DataQueryNodeConfigurator,
   DelayNode: () => DelayNode,
@@ -2009,7 +2011,332 @@ var EndNode = (0, import_react13.memo)(({ id, data, isConnectable }) => {
 });
 
 // src/map.js
+var import_react17 = __toESM(require("react"));
+
+// src/nodes/dataCollectionNode.jsx
+var import_react16 = __toESM(require("react"));
+var import_reactflow8 = require("reactflow");
+var import_uuid = require("uuid");
+
+// src/StatusIndicator.jsx
 var import_react15 = __toESM(require("react"));
+var import_tb4 = require("react-icons/tb");
+var StatusIndicator = ({ executionStatus }) => {
+  if (executionStatus === "running") {
+    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center animate-spin z-10" }, /* @__PURE__ */ import_react15.default.createElement(import_tb4.TbRefresh, { className: "w-3 h-3 text-white" }));
+  }
+  if (executionStatus === "completed") {
+    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ import_react15.default.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ import_react15.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" })));
+  }
+  if (executionStatus === "failed") {
+    return /* @__PURE__ */ import_react15.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ import_react15.default.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ import_react15.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M6 18L18 6M6 6l12 12" })));
+  }
+  return null;
+};
+var getStatusStyles = (executionStatus, defaultHoverColor = "blue-400") => {
+  switch (executionStatus) {
+    case "running":
+      return "border-blue-400 ring-2 ring-blue-300 ring-opacity-50 animate-pulse";
+    case "completed":
+      return "border-green-400 ring-2 ring-green-300 ring-opacity-50";
+    case "failed":
+      return "border-red-400 ring-2 ring-red-300 ring-opacity-50";
+    case "skipped":
+      return "border-orange-300 opacity-60";
+    default:
+      return `border-slate-200 hover:border-${defaultHoverColor} hover:shadow-md`;
+  }
+};
+var getIconColor = (executionStatus, defaultColor) => {
+  switch (executionStatus) {
+    case "running":
+      return "text-blue-600";
+    case "completed":
+      return "text-green-600";
+    case "failed":
+      return "text-red-600";
+    default:
+      return defaultColor;
+  }
+};
+var getStatusBgColor = (executionStatus, defaultBg) => {
+  switch (executionStatus) {
+    case "running":
+      return "bg-blue-100 border-blue-200";
+    case "completed":
+      return "bg-green-50 border-green-100";
+    case "failed":
+      return "bg-red-50 border-red-100";
+    default:
+      return defaultBg;
+  }
+};
+
+// src/nodes/dataCollectionNode.jsx
+var import_fa5 = require("react-icons/fa");
+var import_md = require("react-icons/md");
+var import_vsc8 = require("react-icons/vsc");
+var import_ui8 = require("@jet-admin/ui");
+var FIELD_TYPES = [
+  { value: "text", label: "Text", schemaType: "string" },
+  { value: "textarea", label: "Long text", schemaType: "string" },
+  { value: "number", label: "Number", schemaType: "number" },
+  { value: "boolean", label: "Checkbox", schemaType: "boolean" },
+  { value: "select", label: "Dropdown", schemaType: "string" }
+];
+var COLLECTION_TYPES = [
+  { value: "form", label: "UI Form" },
+  { value: "api", label: "API call (coming soon)", disabled: true }
+];
+function buildSchemas(fields) {
+  const properties = {};
+  const required = [];
+  const elements = [];
+  for (const f of fields) {
+    if (!f.key) continue;
+    const ft = FIELD_TYPES.find((t) => t.value === f.fieldType) || FIELD_TYPES[0];
+    const schemaProp = { type: ft.schemaType, title: f.label || f.key };
+    if (f.fieldType === "select" && f.options) {
+      schemaProp.enum = f.options.split(",").map((o) => o.trim()).filter(Boolean);
+    }
+    properties[f.key] = schemaProp;
+    if (f.required) required.push(f.key);
+    const uiControl = { type: "Control", scope: `#/properties/${f.key}` };
+    if (f.fieldType === "textarea") uiControl.options = { multi: true, rows: 3 };
+    if (f.placeholder) uiControl.options = { ...uiControl.options ?? {}, placeholder: f.placeholder };
+    elements.push(uiControl);
+  }
+  return {
+    formSchema: {
+      type: "object",
+      properties,
+      ...required.length ? { required } : {}
+    },
+    formUischema: { type: "VerticalLayout", elements }
+  };
+}
+var makeField = () => ({
+  id: (0, import_uuid.v4)(),
+  key: "",
+  label: "",
+  fieldType: "text",
+  required: false,
+  placeholder: "",
+  options: ""
+  // comma-separated, for select type only
+});
+var DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
+  const [title, setTitle] = (0, import_react16.useState)(data?.title ?? "Input required");
+  const [description, setDescription] = (0, import_react16.useState)(data?.description ?? "");
+  const [collectionType, setCollectionType] = (0, import_react16.useState)(data?.collectionType ?? "form");
+  const [fields, setFields] = (0, import_react16.useState)(data?.fields ?? [makeField()]);
+  const [outputVariable, setOutputVariable] = (0, import_react16.useState)(data?.outputVariable ?? "collectedData");
+  const [expiryMinutes, setExpiryMinutes] = (0, import_react16.useState)(data?.expiryMinutes ?? 60);
+  (0, import_react16.useEffect)(() => {
+    if (!data) return;
+    setTitle(data.title ?? "Input required");
+    setDescription(data.description ?? "");
+    setCollectionType(data.collectionType ?? "form");
+    setFields(data.fields ?? [makeField()]);
+    setOutputVariable(data.outputVariable ?? "collectedData");
+    setExpiryMinutes(data.expiryMinutes ?? 60);
+  }, [data]);
+  const addField = (0, import_react16.useCallback)(() => setFields((prev) => [...prev, makeField()]), []);
+  const removeField = (0, import_react16.useCallback)((id) => setFields((prev) => prev.filter((f) => f.id !== id)), []);
+  const updateField = (0, import_react16.useCallback)((id, patch) => setFields((prev) => prev.map((f) => f.id === id ? { ...f, ...patch } : f)), []);
+  const handleSave = (0, import_react16.useCallback)(() => {
+    const { formSchema, formUischema } = buildSchemas(fields);
+    onChange({
+      title,
+      description,
+      collectionType,
+      fields,
+      formSchema,
+      formUischema,
+      outputVariable,
+      expiryMinutes: Number(expiryMinutes) || 60
+    });
+  }, [title, description, collectionType, fields, outputVariable, expiryMinutes, onChange]);
+  return /* @__PURE__ */ import_react16.default.createElement("div", { className: "w-full space-y-5" }, /* @__PURE__ */ import_react16.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react16.default.createElement(import_ui8.Label, { className: "text-[10px] font-bold uppercase tracking-wider text-muted-foreground" }, "Modal title"), /* @__PURE__ */ import_react16.default.createElement(
+    import_ui8.Input,
+    {
+      value: title,
+      onChange: (e) => setTitle(e.target.value),
+      placeholder: "Input required",
+      className: "h-8 text-sm"
+    }
+  )), /* @__PURE__ */ import_react16.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react16.default.createElement(import_ui8.Label, { className: "text-[10px] font-bold uppercase tracking-wider text-muted-foreground" }, "Instructions"), /* @__PURE__ */ import_react16.default.createElement(
+    "textarea",
+    {
+      value: description,
+      onChange: (e) => setDescription(e.target.value),
+      rows: 2,
+      placeholder: "Tell the user what to fill in...",
+      className: "w-full text-xs text-foreground border border-border rounded-md px-2.5 py-1.5 resize-none focus:outline-none focus:ring-2 focus:ring-ring bg-background transition-colors"
+    }
+  )), /* @__PURE__ */ import_react16.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react16.default.createElement(import_ui8.Label, { className: "text-[10px] font-bold uppercase tracking-wider text-muted-foreground" }, "Collection method"), /* @__PURE__ */ import_react16.default.createElement(import_ui8.Select, { value: collectionType, onValueChange: setCollectionType }, /* @__PURE__ */ import_react16.default.createElement(import_ui8.SelectTrigger, { className: "h-8 text-xs" }, /* @__PURE__ */ import_react16.default.createElement(import_ui8.SelectValue, null)), /* @__PURE__ */ import_react16.default.createElement(import_ui8.SelectContent, null, COLLECTION_TYPES.map((t) => /* @__PURE__ */ import_react16.default.createElement(import_ui8.SelectItem, { key: t.value, value: t.value, disabled: t.disabled, className: "text-xs" }, t.label))))), collectionType === "form" && /* @__PURE__ */ import_react16.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react16.default.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ import_react16.default.createElement(import_ui8.Label, { className: "text-[10px] font-bold uppercase tracking-wider text-muted-foreground" }, "Form fields"), /* @__PURE__ */ import_react16.default.createElement(
+    import_ui8.Button,
+    {
+      type: "button",
+      variant: "ghost",
+      size: "sm",
+      onClick: addField,
+      className: "h-6 px-2 text-[10px] text-primary hover:bg-primary/10"
+    },
+    /* @__PURE__ */ import_react16.default.createElement(import_fa5.FaPlus, { className: "w-2.5 h-2.5 mr-1" }),
+    " Add field"
+  )), fields.length === 0 && /* @__PURE__ */ import_react16.default.createElement("p", { className: "text-[10px] text-muted-foreground italic" }, "No fields yet."), fields.map((field, idx) => /* @__PURE__ */ import_react16.default.createElement(
+    "div",
+    {
+      key: field.id,
+      className: "rounded-md border border-border p-3 bg-muted/20 space-y-2"
+    },
+    /* @__PURE__ */ import_react16.default.createElement("div", { className: "flex gap-2 items-center" }, /* @__PURE__ */ import_react16.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react16.default.createElement(import_ui8.Label, { className: "text-[9px] text-muted-foreground" }, "Key"), /* @__PURE__ */ import_react16.default.createElement(
+      import_ui8.Input,
+      {
+        value: field.key,
+        onChange: (e) => updateField(field.id, { key: e.target.value.replace(/\s/g, "_") }),
+        placeholder: "field_name",
+        className: "h-7 text-xs font-mono"
+      }
+    )), /* @__PURE__ */ import_react16.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react16.default.createElement(import_ui8.Label, { className: "text-[9px] text-muted-foreground" }, "Label"), /* @__PURE__ */ import_react16.default.createElement(
+      import_ui8.Input,
+      {
+        value: field.label,
+        onChange: (e) => updateField(field.id, { label: e.target.value }),
+        placeholder: "Display label",
+        className: "h-7 text-xs"
+      }
+    )), /* @__PURE__ */ import_react16.default.createElement(
+      import_ui8.Button,
+      {
+        type: "button",
+        variant: "destructive-ghost",
+        size: "sm",
+        square: true,
+        onClick: () => removeField(field.id),
+        className: "h-7 w-7 mt-4 flex-shrink-0",
+        disabled: fields.length === 1
+      },
+      /* @__PURE__ */ import_react16.default.createElement(import_fa5.FaTrash, { className: "w-2.5 h-2.5" })
+    )),
+    /* @__PURE__ */ import_react16.default.createElement("div", { className: "flex gap-2 items-center" }, /* @__PURE__ */ import_react16.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react16.default.createElement(import_ui8.Label, { className: "text-[9px] text-muted-foreground" }, "Type"), /* @__PURE__ */ import_react16.default.createElement(
+      import_ui8.Select,
+      {
+        value: field.fieldType,
+        onValueChange: (val) => updateField(field.id, { fieldType: val })
+      },
+      /* @__PURE__ */ import_react16.default.createElement(import_ui8.SelectTrigger, { className: "h-7 text-xs" }, /* @__PURE__ */ import_react16.default.createElement(import_ui8.SelectValue, null)),
+      /* @__PURE__ */ import_react16.default.createElement(import_ui8.SelectContent, null, FIELD_TYPES.map((t) => /* @__PURE__ */ import_react16.default.createElement(import_ui8.SelectItem, { key: t.value, value: t.value, className: "text-xs" }, t.label)))
+    )), /* @__PURE__ */ import_react16.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react16.default.createElement(import_ui8.Label, { className: "text-[9px] text-muted-foreground" }, "Placeholder"), /* @__PURE__ */ import_react16.default.createElement(
+      import_ui8.Input,
+      {
+        value: field.placeholder,
+        onChange: (e) => updateField(field.id, { placeholder: e.target.value }),
+        placeholder: "Optional hint",
+        className: "h-7 text-xs"
+      }
+    )), /* @__PURE__ */ import_react16.default.createElement("label", { className: "flex items-center gap-1 text-[10px] text-muted-foreground flex-shrink-0 mt-4" }, /* @__PURE__ */ import_react16.default.createElement(
+      import_ui8.Checkbox,
+      {
+        checked: field.required,
+        onCheckedChange: (v) => updateField(field.id, { required: v })
+      }
+    ), "Req.")),
+    field.fieldType === "select" && /* @__PURE__ */ import_react16.default.createElement("div", null, /* @__PURE__ */ import_react16.default.createElement(import_ui8.Label, { className: "text-[9px] text-muted-foreground" }, "Options ", /* @__PURE__ */ import_react16.default.createElement("span", { className: "text-muted-foreground/50" }, "(comma-separated)")), /* @__PURE__ */ import_react16.default.createElement(
+      import_ui8.Input,
+      {
+        value: field.options,
+        onChange: (e) => updateField(field.id, { options: e.target.value }),
+        placeholder: "Option A, Option B, Option C",
+        className: "h-7 text-xs"
+      }
+    ))
+  ))), /* @__PURE__ */ import_react16.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react16.default.createElement(import_ui8.Label, { className: "text-[10px] font-bold uppercase tracking-wider text-muted-foreground" }, "Output variable"), /* @__PURE__ */ import_react16.default.createElement(
+    import_ui8.Input,
+    {
+      value: outputVariable,
+      onChange: (e) => setOutputVariable(e.target.value.replace(/\s/g, "")),
+      placeholder: "collectedData",
+      className: "h-8 text-xs font-mono"
+    }
+  ), /* @__PURE__ */ import_react16.default.createElement("p", { className: "text-[10px] text-muted-foreground" }, "Access via", " ", /* @__PURE__ */ import_react16.default.createElement("code", { className: "bg-muted px-1 rounded font-mono" }, `{{ctx.${outputVariable || "collectedData"}}}`))), /* @__PURE__ */ import_react16.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react16.default.createElement(import_ui8.Label, { className: "text-[10px] font-bold uppercase tracking-wider text-muted-foreground" }, "Expiry (minutes) \u2014 0 = never"), /* @__PURE__ */ import_react16.default.createElement(
+    import_ui8.Input,
+    {
+      type: "number",
+      value: expiryMinutes,
+      min: 0,
+      onChange: (e) => setExpiryMinutes(e.target.value),
+      className: "h-8 text-xs w-28"
+    }
+  )), /* @__PURE__ */ import_react16.default.createElement("div", { className: "rounded-lg border border-primary/20 bg-primary/5 p-3 text-[10px] text-primary/80 space-y-1" }, /* @__PURE__ */ import_react16.default.createElement("div", { className: "font-semibold text-xs text-primary" }, "Suspend & resume"), /* @__PURE__ */ import_react16.default.createElement("div", null, "When this node runs, the workflow ", /* @__PURE__ */ import_react16.default.createElement("strong", null, "pauses"), " and a form modal appears in the execution panel. The DAG only advances once the user clicks ", /* @__PURE__ */ import_react16.default.createElement("em", null, "Submit & continue"), "."), /* @__PURE__ */ import_react16.default.createElement("div", null, "Field values land in", " ", /* @__PURE__ */ import_react16.default.createElement("code", { className: "bg-background px-1 rounded border border-border font-mono" }, `ctx.${outputVariable || "collectedData"}`), " ", "as a plain object.")), /* @__PURE__ */ import_react16.default.createElement(import_ui8.Button, { type: "button", onClick: handleSave, className: "w-full" }, "Save"));
+};
+var DataCollectionNode = (0, import_react16.memo)(({ id, data, isConnectable }) => {
+  const { nodeExecutionStatus } = useWorkflowNodes();
+  const executionStatus = nodeExecutionStatus?.[id] || "idle";
+  const isDisabled = data?.isDisabled ?? false;
+  const fieldCount = (data?.fields ?? []).filter((f) => f.key).length;
+  const isSuspended = executionStatus === "suspended";
+  const borderClass = isSuspended ? "border-amber-400 ring-2 ring-amber-300 ring-opacity-60 animate-pulse" : getStatusStyles(executionStatus, "violet-400");
+  return /* @__PURE__ */ import_react16.default.createElement("div", { className: `
+      relative bg-white border rounded
+      min-w-[300px] max-w-[380px]
+      transition-all duration-150
+      ${isDisabled ? "border-slate-200 opacity-50" : borderClass}
+    ` }, /* @__PURE__ */ import_react16.default.createElement(StatusIndicator, { executionStatus }), /* @__PURE__ */ import_react16.default.createElement("div", { className: "flex items-stretch" }, /* @__PURE__ */ import_react16.default.createElement(
+    "div",
+    {
+      style: { borderTopLeftRadius: "0.25rem", borderBottomLeftRadius: "0.25rem" },
+      className: `
+            flex flex-col items-center justify-center px-3 py-3 border-r
+            ${isDisabled ? "bg-slate-50 border-slate-100" : isSuspended ? "bg-amber-100 border-amber-200" : executionStatus === "running" ? "bg-blue-100 border-blue-200" : executionStatus === "completed" ? "bg-green-50 border-green-100" : executionStatus === "failed" ? "bg-red-50 border-red-100" : "bg-violet-50 border-violet-100"}
+          `
+    },
+    isSuspended ? /* @__PURE__ */ import_react16.default.createElement(import_md.MdOutlineInput, { className: "w-5 h-5 text-amber-600" }) : /* @__PURE__ */ import_react16.default.createElement(import_fa5.FaWpforms, { className: `w-5 h-5 ${isDisabled ? "text-slate-400" : executionStatus === "running" ? "text-blue-600" : executionStatus === "completed" ? "text-green-600" : executionStatus === "failed" ? "text-red-600" : "text-violet-500"}` })
+  ), /* @__PURE__ */ import_react16.default.createElement("div", { className: "flex-1 px-3 py-2 min-w-0" }, /* @__PURE__ */ import_react16.default.createElement("div", { className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ import_react16.default.createElement("span", { className: `text-xs font-semibold truncate
+              ${isDisabled ? "text-slate-400 line-through" : "text-slate-700"}` }, data?.title || "Data collection"), isSuspended && /* @__PURE__ */ import_react16.default.createElement("span", { className: "inline-flex items-center gap-1 text-[9px] font-medium text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded border border-amber-200 whitespace-nowrap" }, "\u23F8 Waiting"), isDisabled && !isSuspended && /* @__PURE__ */ import_react16.default.createElement("span", { className: "inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded border border-orange-200" }, /* @__PURE__ */ import_react16.default.createElement(import_vsc8.VscDebugDisconnect, { className: "w-2.5 h-2.5" }), "Skip")), /* @__PURE__ */ import_react16.default.createElement("div", { className: `text-[10px] mt-0.5 ${isDisabled ? "text-slate-300" : "text-slate-400"}` }, fieldCount > 0 ? `${fieldCount} field${fieldCount !== 1 ? "s" : ""} \xB7 saves to ctx.${data?.outputVariable || "collectedData"}` : "No fields defined yet")), /* @__PURE__ */ import_react16.default.createElement("div", { className: "flex flex-col items-center justify-center px-2 border-l border-slate-100" }, /* @__PURE__ */ import_react16.default.createElement(
+    "div",
+    {
+      className: `w-2 h-2 rounded-full mb-1
+            ${isSuspended ? "bg-amber-400 animate-pulse" : isDisabled ? "bg-slate-300" : "bg-violet-400"}`,
+      title: "Output (after submission)"
+    }
+  ), /* @__PURE__ */ import_react16.default.createElement(
+    "div",
+    {
+      className: `w-2 h-2 rounded-full ${isDisabled ? "bg-slate-300" : "bg-red-400"}`,
+      title: "Error"
+    }
+  ))), /* @__PURE__ */ import_react16.default.createElement(
+    import_reactflow8.Handle,
+    {
+      type: "target",
+      position: import_reactflow8.Position.Top,
+      isConnectable,
+      style: { width: 10, height: 10, backgroundColor: isDisabled ? "#cbd5e1" : "#8b5cf6", border: "none", top: -5 }
+    }
+  ), /* @__PURE__ */ import_react16.default.createElement(
+    import_reactflow8.Handle,
+    {
+      type: "source",
+      position: import_reactflow8.Position.Bottom,
+      id: "output",
+      isConnectable,
+      style: { left: "35%", width: 10, height: 10, backgroundColor: isDisabled ? "#cbd5e1" : "#8b5cf6", border: "none", bottom: -5 }
+    }
+  ), /* @__PURE__ */ import_react16.default.createElement(
+    import_reactflow8.Handle,
+    {
+      type: "source",
+      position: import_reactflow8.Position.Bottom,
+      id: "error",
+      isConnectable,
+      style: { left: "65%", width: 10, height: 10, backgroundColor: isDisabled ? "#cbd5e1" : "#ef4444", border: "none", bottom: -5 }
+    }
+  ));
+});
+
+// src/map.js
 var WORKFLOW_NODE_TYPES = {
   START: { value: "start", label: "Start" },
   DATA_QUERY: { value: "dataQuery", label: "Data Query" },
@@ -2017,9 +2344,29 @@ var WORKFLOW_NODE_TYPES = {
   CONDITION: { value: "condition", label: "Condition" },
   LOOP: { value: "loop", label: "Loop" },
   DELAY: { value: "delay", label: "Delay" },
-  END: { value: "end", label: "End" }
+  END: { value: "end", label: "End" },
+  DATA_COLLECTION: { value: "dataCollection", label: "Data Collection" }
 };
 var WORKFLOW_NODES_MAP = {
+  [WORKFLOW_NODE_TYPES.DATA_COLLECTION.value]: {
+    label: WORKFLOW_NODE_TYPES.DATA_COLLECTION.label,
+    value: WORKFLOW_NODE_TYPES.DATA_COLLECTION.value,
+    component: DataCollectionNode,
+    configurator: DataCollectionNodeConfigurator,
+    defaultValue: {
+      title: "Input required",
+      description: "",
+      collectionType: "form",
+      fields: [
+        { id: "f1", key: "response", label: "Response", fieldType: "text", required: true, placeholder: "", options: "" }
+      ],
+      formSchema: { type: "object", properties: { response: { type: "string", title: "Response" } }, required: ["response"] },
+      formUischema: { type: "VerticalLayout", elements: [{ type: "Control", scope: "#/properties/response" }] },
+      outputVariable: "collectedData",
+      expiryMinutes: 60,
+      isDisabled: false
+    }
+  },
   [WORKFLOW_NODE_TYPES.DATA_QUERY.value]: {
     label: WORKFLOW_NODE_TYPES.DATA_QUERY.label,
     value: WORKFLOW_NODE_TYPES.DATA_QUERY.value,
@@ -2502,60 +2849,6 @@ var WORKFLOW_NODES_MAP = {
         { type: "Control", scope: "#/properties/status" }
       ]
     }
-  }
-};
-
-// src/StatusIndicator.jsx
-var import_react16 = __toESM(require("react"));
-var import_tb4 = require("react-icons/tb");
-var StatusIndicator = ({ executionStatus }) => {
-  if (executionStatus === "running") {
-    return /* @__PURE__ */ import_react16.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center animate-spin z-10" }, /* @__PURE__ */ import_react16.default.createElement(import_tb4.TbRefresh, { className: "w-3 h-3 text-white" }));
-  }
-  if (executionStatus === "completed") {
-    return /* @__PURE__ */ import_react16.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ import_react16.default.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ import_react16.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" })));
-  }
-  if (executionStatus === "failed") {
-    return /* @__PURE__ */ import_react16.default.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center z-10" }, /* @__PURE__ */ import_react16.default.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ import_react16.default.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M6 18L18 6M6 6l12 12" })));
-  }
-  return null;
-};
-var getStatusStyles = (executionStatus, defaultHoverColor = "blue-400") => {
-  switch (executionStatus) {
-    case "running":
-      return "border-blue-400 ring-2 ring-blue-300 ring-opacity-50 animate-pulse";
-    case "completed":
-      return "border-green-400 ring-2 ring-green-300 ring-opacity-50";
-    case "failed":
-      return "border-red-400 ring-2 ring-red-300 ring-opacity-50";
-    case "skipped":
-      return "border-orange-300 opacity-60";
-    default:
-      return `border-slate-200 hover:border-${defaultHoverColor} hover:shadow-md`;
-  }
-};
-var getIconColor = (executionStatus, defaultColor) => {
-  switch (executionStatus) {
-    case "running":
-      return "text-blue-600";
-    case "completed":
-      return "text-green-600";
-    case "failed":
-      return "text-red-600";
-    default:
-      return defaultColor;
-  }
-};
-var getStatusBgColor = (executionStatus, defaultBg) => {
-  switch (executionStatus) {
-    case "running":
-      return "bg-blue-100 border-blue-200";
-    case "completed":
-      return "bg-green-50 border-green-100";
-    case "failed":
-      return "bg-red-50 border-red-100";
-    default:
-      return defaultBg;
   }
 };
 //# sourceMappingURL=index.cjs.map

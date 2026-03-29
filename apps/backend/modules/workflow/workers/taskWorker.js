@@ -86,12 +86,14 @@ async function _processJob(jobData) {
 
     const timeoutMs = (nodeConfig?.timeoutSeconds ?? DEFAULT_NODE_TIMEOUT_MS / 1000) * 1000;
 
-    // ── Timed execution ────────────────────────────────────────────────────
+    // ── In _processJob, replace the handler.execute() call block ─────────────
+
     const result = await _withTimeout(
       handler.execute(nodeConfig, currentContext, {
         instanceID,
         nodeID,
         workflowID,
+        nodeAttempt: attempts + 1,      // ← ADD: lets dataCollectionHandler store it
         resolveTemplate: (template, meta = {}) =>
           sharedResolveTemplate(template, currentContext, WORKFLOW_TEMPLATE_OPTIONS, {
             module: 'workflow',
@@ -105,18 +107,34 @@ async function _processJob(jobData) {
       `Node ${nodeID} (${nodeType}) timed out after ${timeoutMs}ms`
     );
 
-    // ── Report success ─────────────────────────────────────────────────────
-    await addResult({
-      instanceID,
-      nodeID,
-      nodeType,
-      outputVariable: nodeConfig?.outputVariable,
-      status: 'success',
-      output: result.output,
-      nextHandle: result.nextHandle ?? 'output',
-      queueDelay: result.queueDelay ?? 0,
-      nodeAttempt: attempts + 1,   // ← ADDED: which execution attempt this is
-    });
+    // ── Report result ──────────────────────────────────────────────────────
+    // 'suspended' is a third outcome alongside 'success' and 'error'.
+    // The orchestrator owns creating the DB record and emitting the socket.
+    if (result.suspended) {
+      await addResult({
+        instanceID,
+        nodeID,
+        nodeType,
+        outputVariable: nodeConfig?.outputVariable,
+        status: 'suspended',
+        output: result.output,   // contains the full collectionConfig
+        nextHandle: result.nextHandle ?? 'output',
+        queueDelay: 0,
+        nodeAttempt: attempts + 1,
+      });
+    } else {
+      await addResult({
+        instanceID,
+        nodeID,
+        nodeType,
+        outputVariable: nodeConfig?.outputVariable,
+        status: 'success',
+        output: result.output,
+        nextHandle: result.nextHandle ?? 'output',
+        queueDelay: result.queueDelay ?? 0,
+        nodeAttempt: attempts + 1,
+      });
+    }
 
     Logger.log('success', { message: 'taskWorker:completed', params: { instanceID, nodeID, nodeType } });
   } catch (execError) {
