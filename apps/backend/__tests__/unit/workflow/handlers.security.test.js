@@ -18,7 +18,7 @@ describe('workflow handler sandboxing', () => {
     expect(result).toEqual({
       output: {
         matched: 'high-value',
-        condition: 'ctx.input.total > 100',
+        label: 'high-value',
         success: true,
       },
       nextHandle: 'high-value',

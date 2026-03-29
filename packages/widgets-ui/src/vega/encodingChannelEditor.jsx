@@ -2,8 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { FiChevronDown, FiChevronRight } from 'react-icons/fi';
 import { CollapseComponent } from '@jet-admin/ui';
+import { Button, Input, Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
 
-import { Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
 const ENCODING_TYPES = [
   { value: 'nominal', label: 'Nominal (Category)', desc: 'Discrete, unordered categories' },
   { value: 'ordinal', label: 'Ordinal (Rank)', desc: 'Discrete, ordered categories' },
@@ -30,32 +30,30 @@ export const EncodingChannelEditor = ({
   isOptional = false,
   availableFields = [],
 }) => {
-  // If value is null/undefined and optional, show add button
+  // Optional with no value → show "Add" affordance
   if (!value && isOptional) {
     return (
       <Button
         type="button"
         variant="outline"
         onClick={() => onChange({ field: '', type: 'nominal' })}
-        className="w-full h-auto py-1.5 px-3 border-dashed border-slate-300 text-xs text-slate-500 hover:text-primary hover:border-primary hover:bg-blue-50"
+        className="w-full h-auto py-1.5 px-3 border-dashed text-xs text-muted-foreground hover:text-primary hover:border-primary hover:bg-primary/5"
       >
-        <span>+ Add</span> {label || channelName}
+        + Add {label || channelName}
       </Button>
     );
   }
 
-  // Ensure value exists
   const safeValue = value || { field: '', type: 'nominal' };
-
-  const handleChange = (update) => {
-    onChange({ ...safeValue, ...update });
-  };
+  const handleChange = (update) => onChange({ ...safeValue, ...update });
 
   return (
-    <div className="border border-slate-200 rounded bg-white overflow-hidden shadow-sm">
+    /* ✅ Correct: bg-card / border-border instead of bg-white / border-slate-200 */
+    <div className="rounded-lg border border-border bg-card overflow-hidden shadow-sm">
+
       {/* Header */}
-      <div className="flex items-center justify-between px-3 py-2 bg-slate-50 border-b border-slate-200">
-        <span className="text-xs font-semibold text-slate-700 capitalize">
+      <div className="flex items-center justify-between px-3 py-2 bg-muted/50 border-b border-border">
+        <span className="text-xs font-semibold text-foreground capitalize">
           {label || channelName}
         </span>
         {isOptional && (
@@ -64,7 +62,7 @@ export const EncodingChannelEditor = ({
             variant="ghost"
             size="sm"
             onClick={onRemove}
-            className="h-6 px-2 text-[10px] text-red-500 hover:text-red-600 hover:bg-red-50 hover:underline"
+            className="h-6 px-2 text-[10px] text-destructive hover:text-destructive hover:bg-destructive/10"
           >
             Remove
           </Button>
@@ -72,33 +70,31 @@ export const EncodingChannelEditor = ({
       </div>
 
       <div className="p-3 space-y-3">
-        {/* Field Name Input */}
-        <div>
-          <label className="block text-[10px] font-medium text-slate-500 mb-1">Field Name (Column)</label>
+        {/* Field Name */}
+        <div className="space-y-1">
+          {/* ✅ Correct: Label from @jet-admin/ui instead of raw <label> */}
+          <Label className="text-[10px] font-medium text-muted-foreground">Field Name (Column)</Label>
           <Input
             type="text"
             value={safeValue.field}
             onChange={(e) => handleChange({ field: e.target.value })}
             placeholder="e.g., amount, category..."
             list={`fields-list-${channelName}`}
-            className="w-full px-2 py-1.5 text-xs bg-slate-50 border border-slate-300 rounded focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-shadow"
+            className="text-xs"
           />
-          {/* Native datalist for basic autocomplete if fields known */}
           {availableFields.length > 0 && (
             <datalist id={`fields-list-${channelName}`}>
-              {availableFields.map(f => (
-                <option key={f} value={f} />
-              ))}
+              {availableFields.map(f => <option key={f} value={f} />)}
             </datalist>
           )}
         </div>
 
-        {/* Data Type Selection */}
+        {/* Type + Aggregation */}
         <div className="grid grid-cols-2 gap-2">
-          <div>
-            <label className="block text-[10px] font-medium text-slate-500 mb-1">Data Type</label>
+          <div className="space-y-1">
+            <Label className="text-[10px] font-medium text-muted-foreground">Data Type</Label>
             <Select value={safeValue.type || 'nominal'} onValueChange={(val) => handleChange({ type: val })}>
-              <SelectTrigger className="text-sm">
+              <SelectTrigger className="text-xs">
                 <SelectValue placeholder="Select type" />
               </SelectTrigger>
               <SelectContent>
@@ -109,10 +105,10 @@ export const EncodingChannelEditor = ({
             </Select>
           </div>
 
-          <div>
-            <label className="block text-[10px] font-medium text-slate-500 mb-1">Aggregation</label>
+          <div className="space-y-1">
+            <Label className="text-[10px] font-medium text-muted-foreground">Aggregation</Label>
             <Select value={safeValue.aggregate || 'none'} onValueChange={(val) => handleChange({ aggregate: val === 'none' ? undefined : val })}>
-              <SelectTrigger className="text-sm">
+              <SelectTrigger className="text-xs">
                 <SelectValue placeholder="Select aggregation" />
               </SelectTrigger>
               <SelectContent>
@@ -124,28 +120,27 @@ export const EncodingChannelEditor = ({
           </div>
         </div>
 
-        {/* Advanced Options (Title, Sort) */}
+        {/* Advanced (Title, Sort) */}
         <CollapseComponent
           showButtonText="Advanced Options"
           hideButtonText="Hide Options"
-          className="mt-2 border-t border-slate-100 pt-2"
+          className="mt-2 border-t border-border pt-2"
           containerClass="p-0"
-          buttonClass="text-[10px] text-slate-500 hover:text-slate-700 font-medium flex items-center gap-1 w-full justify-start"
+          buttonClass="text-[10px] text-muted-foreground hover:text-foreground font-medium flex items-center gap-1 w-full justify-start"
           content={() => (
             <div className="grid grid-cols-2 gap-2 mt-2">
-              <div>
-                <label className="block text-[10px] font-medium text-slate-500 mb-1">Axis/Legend Title</label>
+              <div className="space-y-1">
+                <Label className="text-[10px] font-medium text-muted-foreground">Axis/Legend Title</Label>
                 <Input
                   type="text"
                   value={safeValue.title || ''}
                   onChange={(e) => handleChange({ title: e.target.value || undefined })}
                   placeholder="Auto"
-                  className="w-full px-2 py-1 text-xs bg-slate-50 border border-slate-300 rounded focus:border-primary outline-none"
+                  className="text-xs"
                 />
               </div>
-
-              <div>
-                <label className="block text-[10px] font-medium text-slate-500 mb-1">Sort Direction</label>
+              <div className="space-y-1">
+                <Label className="text-[10px] font-medium text-muted-foreground">Sort Direction</Label>
                 <Select value={safeValue.sort || 'none'} onValueChange={(val) => handleChange({ sort: val === 'none' ? undefined : val })}>
                   <SelectTrigger className="text-xs">
                     <SelectValue placeholder="Select sort" />

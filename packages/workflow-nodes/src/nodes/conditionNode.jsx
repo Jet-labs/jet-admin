@@ -9,9 +9,6 @@
  * The "JS Expression" operator is the only exception — it executes raw JS
  * in a vm2 sandbox where `ctx` is a plain variable:
  *   ctx.score > 80 && ctx.active === true
- *
- * This matches the convention used by every other node in the system:
- * template resolution happens first, then the resolved value is compared.
  */
 
 import React, { memo, useState, useEffect, useCallback, useMemo } from 'react';
@@ -45,7 +42,6 @@ const OPERATORS = [
   { value: 'is_empty', label: 'Is Empty', symbol: '∅', needsRight: false },
   { value: 'is_not_empty', label: 'Is Not Empty', symbol: '≠∅', needsRight: false },
   { value: 'matches_regex', label: 'Matches Regex', symbol: '~', needsRight: true },
-  // expression operator uses raw JS (ctx.variable, no mustache)
   { value: 'expression', label: 'JS Expression', symbol: '{ }', needsRight: false, isExpression: true },
 ];
 
@@ -74,10 +70,8 @@ const makeBranch = (label = 'Branch') => ({
 
 function migrateBranches(raw = []) {
   if (!raw.length) return [makeBranch('Yes'), makeBranch('No')];
-
   return raw.map(b => {
     if (Array.isArray(b.conditions)) return b;
-
     const expr =
       b.condition ||
       b.expression ||
@@ -85,17 +79,11 @@ function migrateBranches(raw = []) {
         ? buildLegacyExpr(b)
         : null) ||
       'true';
-
     return {
       id: b.id || uid('b'),
       label: b.name || b.label || 'Branch',
       conditionLogic: 'AND',
-      conditions: [{
-        id: uid('c'),
-        leftValue: expr,
-        operator: 'expression',
-        rightValue: '',
-      }],
+      conditions: [{ id: uid('c'), leftValue: expr, operator: 'expression', rightValue: '' }],
     };
   });
 }
@@ -128,9 +116,7 @@ function conditionSummary(cond) {
   const left = (cond.leftValue || '?').replace(/^\{\{|\}\}$/g, '');
   const right = (cond.rightValue || '').replace(/^\{\{|\}\}$/g, '');
   const sym = op?.symbol || '=';
-  const str = op?.needsRight === false
-    ? `${left} ${sym}`
-    : `${left} ${sym} ${right}`;
+  const str = op?.needsRight === false ? `${left} ${sym}` : `${left} ${sym} ${right}`;
   return str.length > 28 ? str.slice(0, 28) + '…' : str;
 }
 
@@ -138,17 +124,13 @@ function conditionSummary(cond) {
 // Sub-components
 // ═══════════════════════════════════════════════════════════════════════════════
 
-// ─── ConditionRow ─────────────────────────────────────────────────────────────
-
 function ConditionRow({ condition, onChange, onDelete, canDelete }) {
   const op = OP_MAP[condition.operator] || OP_MAP['equals'];
-
   const update = (patch) => onChange({ ...condition, ...patch });
 
   return (
     <div className="flex items-center gap-1.5">
       {op.isExpression ? (
-        /* JS Expression mode: raw JS, ctx.variable (no mustache) */
         <Input
           value={condition.leftValue}
           onChange={e => update({ leftValue: e.target.value })}
@@ -157,34 +139,26 @@ function ConditionRow({ condition, onChange, onDelete, canDelete }) {
           title="Raw JavaScript — use ctx.variable (no curly braces)"
         />
       ) : (
-        <>
-          {/* Left value — {{ctx.variable}} */}
+          <>
           <Input
             value={condition.leftValue}
             onChange={e => update({ leftValue: e.target.value })}
             placeholder="{{ctx.field}}"
             className="flex-1 min-w-0 h-7 text-xs font-mono px-2"
           />
-
-          {/* Operator */}
-          <Select
-            value={condition.operator}
-            onValueChange={val => update({ operator: val, rightValue: '' })}
-          >
+            <Select value={condition.operator} onValueChange={val => update({ operator: val, rightValue: '' })}>
               <SelectTrigger className="w-[136px] h-7 text-xs shrink-0">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
                 {OPERATORS.map(o => (
                   <SelectItem key={o.value} value={o.value} className="text-xs">
-                    <span className="font-mono text-slate-400 mr-1.5 text-[10px]">{o.symbol}</span>
-                    {o.label}
-                  </SelectItem>
-                ))}
+                  <span className="font-mono text-muted-foreground mr-1.5 text-[10px]">{o.symbol}</span>
+                  {o.label}
+                </SelectItem>
+              ))}
               </SelectContent>
             </Select>
-
-            {/* Right value — literal or {{ctx.variable}} */}
             {op.needsRight !== false && (
               <Input
                 value={condition.rightValue}
@@ -195,12 +169,11 @@ function ConditionRow({ condition, onChange, onDelete, canDelete }) {
             )}
           </>
       )}
-
       <button
         type="button"
         onClick={onDelete}
         disabled={!canDelete}
-        className="h-7 w-7 shrink-0 flex items-center justify-center rounded text-slate-300 hover:text-red-400 hover:bg-red-50 disabled:opacity-20 transition-colors"
+        className="h-7 w-7 shrink-0 flex items-center justify-center rounded text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10 disabled:opacity-20 transition-colors"
         title="Remove condition"
       >
         <FaTrash className="w-2.5 h-2.5" />
@@ -209,12 +182,10 @@ function ConditionRow({ condition, onChange, onDelete, canDelete }) {
   );
 }
 
-// ─── AndOrDivider ─────────────────────────────────────────────────────────────
-
 function AndOrDivider({ logic, onToggle }) {
   return (
     <div className="flex items-center gap-2 my-0.5">
-      <div className="h-px flex-1 bg-slate-100" />
+      <div className="h-px flex-1 bg-border" />
       <button
         type="button"
         onClick={onToggle}
@@ -223,19 +194,17 @@ function AndOrDivider({ logic, onToggle }) {
           text-[9px] font-bold px-2 py-0.5 rounded border tracking-wider
           transition-colors select-none
           ${logic === 'AND'
-            ? 'bg-indigo-50 text-indigo-600 border-indigo-200 hover:bg-indigo-100'
-            : 'bg-amber-50  text-amber-600  border-amber-200  hover:bg-amber-100'
+          ? 'bg-primary/10 text-primary border-primary/30 hover:bg-primary/15'
+          : 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100'
           }
         `}
       >
         {logic}
       </button>
-      <div className="h-px flex-1 bg-slate-100" />
+      <div className="h-px flex-1 bg-border" />
     </div>
   );
 }
-
-// ─── BranchEditor ─────────────────────────────────────────────────────────────
 
 function BranchEditor({ branch, onChange }) {
   const updateField = (patch) => onChange({ ...branch, ...patch });
@@ -259,9 +228,8 @@ function BranchEditor({ branch, onChange }) {
 
   return (
     <div className="space-y-3 p-3">
-      {/* Branch label */}
       <div className="flex items-center gap-2">
-        <span className="text-[10px] font-medium text-slate-400 w-10 shrink-0">Label</span>
+        <span className="text-[10px] font-medium text-muted-foreground w-10 shrink-0">Label</span>
         <Input
           value={branch.label}
           onChange={e => updateField({ label: e.target.value })}
@@ -270,9 +238,8 @@ function BranchEditor({ branch, onChange }) {
         />
       </div>
 
-      {/* Conditions header */}
       <div className="flex items-center justify-between pt-1">
-        <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-widest">
+        <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">
           Conditions
         </span>
         {branch.conditions.length > 1 && (
@@ -282,8 +249,8 @@ function BranchEditor({ branch, onChange }) {
             className={`
               text-[9px] font-bold px-2 py-0.5 rounded border transition-colors
               ${branch.conditionLogic === 'AND'
-                ? 'bg-indigo-50 text-indigo-600 border-indigo-200'
-                : 'bg-amber-50  text-amber-600  border-amber-200'
+              ? 'bg-primary/10 text-primary border-primary/30'
+              : 'bg-amber-50 text-amber-600 border-amber-200'
               }
             `}
           >
@@ -292,7 +259,6 @@ function BranchEditor({ branch, onChange }) {
         )}
       </div>
 
-      {/* Condition rows */}
       <div className="space-y-1">
         {branch.conditions.map((cond, idx) => (
           <React.Fragment key={cond.id}>
@@ -312,7 +278,7 @@ function BranchEditor({ branch, onChange }) {
       <button
         type="button"
         onClick={addCondition}
-        className="flex items-center gap-1 text-[10px] text-indigo-500 hover:text-indigo-700 transition-colors"
+        className="flex items-center gap-1 text-[10px] text-primary hover:text-primary/80 transition-colors"
       >
         <FaPlus className="w-2.5 h-2.5" />
         Add condition
@@ -375,10 +341,10 @@ export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
     <div className="w-full space-y-4">
 
       {/* Title */}
-      <div className="space-y-1">
-        <label className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">
+      <div className="space-y-1.5">
+        <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
           Task Name
-        </label>
+        </p>
         <Input
           value={title}
           onChange={e => setTitle(e.target.value)}
@@ -388,34 +354,34 @@ export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
       </div>
 
       {/* Description */}
-      <div className="space-y-1">
-        <label className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">
+      <div className="space-y-1.5">
+        <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
           Description
-        </label>
+        </p>
         <textarea
           value={description}
           onChange={e => setDescription(e.target.value)}
           rows={2}
           placeholder="What does this condition check?"
-          className="w-full text-xs text-slate-600 border border-slate-200 rounded px-2.5 py-1.5 resize-none focus:outline-none focus:border-indigo-400 transition-colors"
+          className="w-full text-xs text-foreground border border-border rounded-md px-2.5 py-1.5 resize-none focus:outline-none focus:ring-2 focus:ring-ring bg-background transition-colors"
         />
       </div>
 
-      {/* ── Branch panel ─────────────────────────────────────────────────── */}
-      <div className="border border-slate-200 rounded overflow-hidden">
+      {/* Branch panel */}
+      <div className="rounded-lg border border-border overflow-hidden">
 
         {/* Tab bar */}
-        <div className="flex items-center bg-slate-50 border-b border-slate-200 overflow-x-auto">
+        <div className="flex items-center bg-muted/50 border-b border-border overflow-x-auto">
           {branches.map((branch, idx) => (
             <div
               key={branch.id}
               className={`
                 group flex items-center gap-1.5 px-3 py-2.5 cursor-pointer
-                text-xs font-medium border-r border-slate-200
+                text-xs font-medium border-r border-border
                 whitespace-nowrap transition-all select-none
                 ${activeIdx === idx
-                  ? 'bg-white text-indigo-600 shadow-[inset_0_-2px_0_#6366f1]'
-                  : 'text-slate-500 hover:text-slate-700 hover:bg-white/60'
+                ? 'bg-background text-primary shadow-[inset_0_-2px_0_hsl(var(--primary))]'
+                : 'text-muted-foreground hover:text-foreground hover:bg-background/60'
                 }
               `}
               onClick={() => setActiveIdx(idx)}
@@ -425,23 +391,21 @@ export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
                   w-4 h-4 rounded-full flex items-center justify-center
                   text-[9px] font-bold shrink-0 transition-colors
                   ${activeIdx === idx
-                    ? 'bg-indigo-100 text-indigo-600'
-                    : 'bg-slate-200 text-slate-500 group-hover:bg-slate-300'
+                  ? 'bg-primary/10 text-primary'
+                  : 'bg-muted text-muted-foreground group-hover:bg-muted/80'
                   }
                 `}
               >
                 {idx + 1}
               </span>
-
               <span className="truncate max-w-[80px]">
                 {branch.label || `Branch ${idx + 1}`}
               </span>
-
               {branches.length > 1 && (
                 <button
                   type="button"
                   onClick={e => { e.stopPropagation(); removeBranch(idx); }}
-                  className="ml-0.5 w-3.5 h-3.5 flex items-center justify-center text-slate-300 hover:text-red-400 rounded opacity-0 group-hover:opacity-100 transition-all"
+                  className="ml-0.5 w-3.5 h-3.5 flex items-center justify-center text-muted-foreground/30 hover:text-destructive rounded opacity-0 group-hover:opacity-100 transition-all"
                 >
                   ×
                 </button>
@@ -452,7 +416,7 @@ export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
           <button
             type="button"
             onClick={addBranch}
-            className="px-3 py-2.5 text-xs text-indigo-500 hover:text-indigo-700 hover:bg-white/60 transition-colors flex items-center gap-1 whitespace-nowrap"
+            className="px-3 py-2.5 text-xs text-primary hover:text-primary/80 hover:bg-background/60 transition-colors flex items-center gap-1 whitespace-nowrap"
           >
             <FaPlus className="w-2.5 h-2.5" />
             Add branch
@@ -467,7 +431,7 @@ export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
               onChange={updated => updateBranch(activeIdx, updated)}
             />
           ) : (
-            <div className="p-4 text-xs text-slate-400 text-center">
+            <div className="p-4 text-xs text-muted-foreground text-center">
               No branches yet — click <strong>Add branch</strong> above.
             </div>
           )
@@ -475,21 +439,21 @@ export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
       </div>
 
       {/* else indicator */}
-      <div className="flex items-center gap-2.5 px-3 py-2 bg-slate-50 border border-dashed border-slate-300 rounded text-xs text-slate-500">
-        <span className="w-5 h-5 rounded-full bg-slate-200 flex items-center justify-center text-[10px] font-bold text-slate-500 shrink-0">
+      <div className="flex items-center gap-2.5 px-3 py-2 bg-muted/30 border border-dashed border-border rounded-lg text-xs text-muted-foreground">
+        <span className="w-5 h-5 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold shrink-0">
           ∅
         </span>
         <span>
-          <span className="font-semibold text-slate-600">else</span>
+          <span className="font-semibold text-foreground">else</span>
           {' '}— taken when none of the branches above match
         </span>
       </div>
 
       {/* Error handling */}
-      <div className="space-y-1">
-        <label className="text-[10px] font-semibold uppercase tracking-widest text-slate-400">
+      <div className="space-y-1.5">
+        <p className="font-mono text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
           On Error
-        </label>
+        </p>
         <Select value={errorHandling} onValueChange={setErrorHandling}>
           <SelectTrigger className="h-8 text-xs">
             <SelectValue />
@@ -502,32 +466,27 @@ export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
       </div>
 
       {/* Help callout */}
-      <div className="p-3 bg-indigo-50 border border-indigo-100 rounded text-[10px] text-indigo-700 space-y-1.5">
-        <div className="font-semibold text-xs text-indigo-800">💡 Writing Conditions</div>
+      <div className="p-3 rounded-lg border border-primary/20 bg-primary/5 text-[10px] text-primary/80 space-y-1.5">
+        <div className="font-semibold text-xs text-primary">💡 Writing Conditions</div>
         <div>
-          Use <code className="bg-white px-1 rounded font-mono border border-indigo-100">{'{{ctx.field}}'}</code> in
-          the left and right value inputs — e.g.{' '}
-          <code className="bg-white px-1 rounded font-mono border border-indigo-100">{'{{ctx.input.severity}}'}</code>.
+          Use <code className="bg-background px-1 rounded border border-border font-mono">{'{{ctx.field}}'}</code> in
+          left and right inputs — e.g.{' '}
+          <code className="bg-background px-1 rounded border border-border font-mono">{'{{ctx.input.severity}}'}</code>.
         </div>
         <div>
           The right side can also be a plain literal like{' '}
-          <code className="bg-white px-1 rounded font-mono border border-indigo-100">High</code> or{' '}
-          <code className="bg-white px-1 rounded font-mono border border-indigo-100">3</code>.
+          <code className="bg-background px-1 rounded border border-border font-mono">High</code> or{' '}
+          <code className="bg-background px-1 rounded border border-border font-mono">3</code>.
         </div>
         <div>
-          For complex multi-field logic, use the <strong>JS Expression</strong> operator —
-          it runs raw JavaScript where <code className="bg-white px-1 rounded font-mono border border-indigo-100">ctx.field</code> is a direct variable (no curly braces).
+          For complex logic, use <strong>JS Expression</strong> — raw JS where{' '}
+          <code className="bg-background px-1 rounded border border-border font-mono">ctx.field</code> is a direct variable (no braces).
         </div>
-        <div>
-          Branches are evaluated <strong>top → bottom</strong>; the first matching branch wins.
-        </div>
+        <div>Branches are evaluated <strong>top → bottom</strong>; first match wins.</div>
       </div>
 
-      <Button
-        type="button"
-        onClick={handleSave}
-        className="w-full py-2 text-sm font-semibold text-white bg-indigo-600 rounded hover:bg-indigo-700 focus:ring-4 focus:outline-none focus:ring-indigo-300 transition-colors"
-      >
+      {/* ✅ Correct: Button variant="default", no raw color overrides */}
+      <Button type="button" onClick={handleSave} className="w-full">
         {strings?.WORKFLOW_EDITOR_CONDITION_NODE_SAVE_BUTTON || 'Save Condition'}
       </Button>
     </div>
@@ -535,14 +494,14 @@ export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// ConditionNode — canvas card
+// ConditionNode — canvas card (unchanged)
 // ═══════════════════════════════════════════════════════════════════════════════
 
 export const ConditionNode = memo(({ data, isConnectable }) => {
   const isDisabled = data?.isDisabled ?? false;
   const branches = useMemo(() => migrateBranches(data?.branches || []), [data?.branches]);
 
-  const totalSlots = branches.length + 2; // +default +error
+  const totalSlots = branches.length + 2;
   const handleLeft = (i) => `${(100 / (totalSlots + 1)) * (i + 1)}%`;
 
   return (
@@ -557,7 +516,6 @@ export const ConditionNode = memo(({ data, isConnectable }) => {
         }
       `}
     >
-      {/* Header */}
       <div
         className={`
           flex items-center gap-2.5 px-3 py-2.5 border-b rounded-t
@@ -571,16 +529,9 @@ export const ConditionNode = memo(({ data, isConnectable }) => {
         >
           <path d="M7 0 L14 7 L7 14 L0 7 Z" />
         </svg>
-
-        <span
-          className={`
-            text-xs font-semibold truncate flex-1
-            ${isDisabled ? 'text-slate-400 line-through' : 'text-indigo-900'}
-          `}
-        >
+        <span className={`text-xs font-semibold truncate flex-1 ${isDisabled ? 'text-slate-400 line-through' : 'text-indigo-900'}`}>
           {data?.title || 'Condition'}
         </span>
-
         {isDisabled && (
           <span className="inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded border border-orange-200 shrink-0">
             <VscDebugDisconnect className="w-2.5 h-2.5" />
@@ -589,18 +540,14 @@ export const ConditionNode = memo(({ data, isConnectable }) => {
         )}
       </div>
 
-      {/* Branch list */}
       <div className="px-3 py-2 space-y-1.5">
         {branches.slice(0, 6).map((branch, idx) => {
           const firstCond = branch.conditions?.[0];
           const extra = (branch.conditions?.length ?? 0) - 1;
           const summary = firstCond ? conditionSummary(firstCond) : '';
-
           return (
             <div key={branch.id} className="flex items-start gap-2 text-[10px]">
-              <div
-                className={`mt-0.5 w-1.5 h-1.5 rounded-full shrink-0 ${isDisabled ? 'bg-slate-300' : 'bg-indigo-400'}`}
-              />
+              <div className={`mt-0.5 w-1.5 h-1.5 rounded-full shrink-0 ${isDisabled ? 'bg-slate-300' : 'bg-indigo-400'}`} />
               <span className={`font-semibold shrink-0 ${isDisabled ? 'text-slate-400' : 'text-slate-700'}`}>
                 {branch.label || `Branch ${idx + 1}`}
               </span>
@@ -611,14 +558,9 @@ export const ConditionNode = memo(({ data, isConnectable }) => {
             </div>
           );
         })}
-
         {branches.length > 6 && (
-          <div className="text-[9px] text-slate-400 pl-3.5">
-            +{branches.length - 6} more branches
-          </div>
+          <div className="text-[9px] text-slate-400 pl-3.5">+{branches.length - 6} more branches</div>
         )}
-
-        {/* else row */}
         <div className="flex items-center gap-2 text-[10px] pt-1.5 mt-0.5 border-t border-slate-100">
           <div className="w-1.5 h-1.5 rounded-full bg-slate-300 shrink-0" />
           <span className="font-semibold text-slate-400">else</span>
@@ -626,72 +568,30 @@ export const ConditionNode = memo(({ data, isConnectable }) => {
         </div>
       </div>
 
-      {/* Handle label strip */}
       <div className="relative h-5 border-t border-slate-100 mt-1">
         {branches.map((branch, idx) => (
           <span
             key={branch.id}
-            className={`
-              absolute bottom-1 transform -translate-x-1/2
-              text-[8px] font-medium leading-none truncate max-w-[44px] text-center
-              ${isDisabled ? 'text-slate-300' : 'text-indigo-400'}
-            `}
+            className={`absolute bottom-1 transform -translate-x-1/2 text-[8px] font-medium leading-none truncate max-w-[44px] text-center ${isDisabled ? 'text-slate-300' : 'text-indigo-400'}`}
             style={{ left: handleLeft(idx) }}
           >
             {(branch.label || '').slice(0, 6)}
           </span>
         ))}
-        <span
-          className="absolute bottom-1 transform -translate-x-1/2 text-[8px] font-medium text-slate-300 leading-none"
-          style={{ left: handleLeft(branches.length) }}
-        >
-          else
-        </span>
-        <span
-          className="absolute bottom-1 transform -translate-x-1/2 text-[8px] font-medium text-red-300 leading-none"
-          style={{ left: handleLeft(branches.length + 1) }}
-        >
-          error
-        </span>
+        <span className="absolute bottom-1 transform -translate-x-1/2 text-[8px] font-medium text-slate-300 leading-none" style={{ left: handleLeft(branches.length) }}>else</span>
+        <span className="absolute bottom-1 transform -translate-x-1/2 text-[8px] font-medium text-red-300 leading-none" style={{ left: handleLeft(branches.length + 1) }}>error</span>
       </div>
 
-      {/* Input handle */}
-      <Handle
-        type="target"
-        position={Position.Top}
-        isConnectable={isConnectable}
-        style={{ width: 10, height: 10, backgroundColor: isDisabled ? '#cbd5e1' : '#6366f1', border: '2px solid white', top: -5 }}
-      />
-
-      {/* Branch handles */}
+      <Handle type="target" position={Position.Top} isConnectable={isConnectable}
+        style={{ width: 10, height: 10, backgroundColor: isDisabled ? '#cbd5e1' : '#6366f1', border: '2px solid white', top: -5 }} />
       {branches.map((branch, idx) => (
-        <Handle
-          key={branch.id}
-          type="source"
-          position={Position.Bottom}
-          id={branch.id}
-          isConnectable={isConnectable}
-          style={{ left: handleLeft(idx), width: 10, height: 10, backgroundColor: isDisabled ? '#cbd5e1' : '#6366f1', border: '2px solid white', bottom: -5 }}
-        />
+        <Handle key={branch.id} type="source" position={Position.Bottom} id={branch.id} isConnectable={isConnectable}
+          style={{ left: handleLeft(idx), width: 10, height: 10, backgroundColor: isDisabled ? '#cbd5e1' : '#6366f1', border: '2px solid white', bottom: -5 }} />
       ))}
-
-      {/* Default handle */}
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        id="default"
-        isConnectable={isConnectable}
-        style={{ left: handleLeft(branches.length), width: 10, height: 10, backgroundColor: isDisabled ? '#cbd5e1' : '#94a3b8', border: '2px solid white', bottom: -5 }}
-      />
-
-      {/* Error handle */}
-      <Handle
-        type="source"
-        position={Position.Bottom}
-        id="error"
-        isConnectable={isConnectable}
-        style={{ left: handleLeft(branches.length + 1), width: 10, height: 10, backgroundColor: isDisabled ? '#cbd5e1' : '#ef4444', border: '2px solid white', bottom: -5 }}
-      />
+      <Handle type="source" position={Position.Bottom} id="default" isConnectable={isConnectable}
+        style={{ left: handleLeft(branches.length), width: 10, height: 10, backgroundColor: isDisabled ? '#cbd5e1' : '#94a3b8', border: '2px solid white', bottom: -5 }} />
+      <Handle type="source" position={Position.Bottom} id="error" isConnectable={isConnectable}
+        style={{ left: handleLeft(branches.length + 1), width: 10, height: 10, backgroundColor: isDisabled ? '#cbd5e1' : '#ef4444', border: '2px solid white', bottom: -5 }} />
     </div>
   );
 });

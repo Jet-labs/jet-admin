@@ -1,5 +1,25 @@
 const ivm = require('isolated-vm');
 
+function createWorkflowVm({ sandbox = {}, timeoutMs = 5000, memoryLimitMb = 128 }) {
+  // A lightweight wrapper to run synchronous expressions, replacing vm2
+  return {
+    run: (code) => {
+      const isolate = new ivm.Isolate({ memoryLimit: memoryLimitMb });
+      try {
+        const context = isolate.createContextSync();
+        const jail = context.global;
+        for (const [key, value] of Object.entries(sandbox)) {
+          jail.setSync(key, new ivm.ExternalCopy(value).copyInto());
+        }
+        const script = isolate.compileScriptSync(code);
+        return script.runSync(context, { timeout: timeoutMs, copy: true });
+      } finally {
+        isolate.dispose();
+      }
+    }
+  };
+}
+
 /**
  * Execute code in an isolated V8 sandbox.
  *
@@ -10,7 +30,7 @@ const ivm = require('isolated-vm');
  * @param {string} code — JavaScript source to execute
  * @returns {*} the script's return value (transferable primitives/plain objects)
  */
-function runInSandbox({ sandbox = {}, timeoutMs = 5000, memoryLimitMb = 128 }, code) {
+async function runInSandbox({ sandbox = {}, timeoutMs = 5000, memoryLimitMb = 128 }, code) {
   const isolate = new ivm.Isolate({ memoryLimit: memoryLimitMb });
   try {
     const context = isolate.createContextSync();
@@ -22,7 +42,7 @@ function runInSandbox({ sandbox = {}, timeoutMs = 5000, memoryLimitMb = 128 }, c
     }
 
     const script = isolate.compileScriptSync(code);
-    const result = script.runSync(context, { timeout: timeoutMs });
+    const result = await script.run(context, { timeout: timeoutMs, promise: true, copy: true });
 
     return result;
   } finally {
@@ -32,4 +52,5 @@ function runInSandbox({ sandbox = {}, timeoutMs = 5000, memoryLimitMb = 128 }, c
 
 module.exports = {
   runInSandbox,
+  createWorkflowVm,
 };

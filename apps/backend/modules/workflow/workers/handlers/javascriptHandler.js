@@ -33,7 +33,7 @@ async function execute(nodeConfig, context) {
   const timeoutMs = timeoutSeconds * 1000;
 
   try {
-    const result = runInSandbox(
+    const result = await runInSandbox(
       { sandbox: { ctx: context }, timeoutMs },
       `(function() { ${code} })()`
     );

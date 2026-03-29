@@ -2,11 +2,8 @@ import React, { useState, useCallback, useMemo } from "react";
 import PropTypes from "prop-types";
 import { FiX, FiCode, FiChevronDown, FiChevronRight } from "react-icons/fi";
 import { VariableExplorer, extractWorkflowSchema } from "./variableExplorer";
-
 import { Button, Input, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@jet-admin/ui";
-/**
- * Transform type options
- */
+
 const TRANSFORM_TYPES = [
   { value: '', label: 'None' },
   { value: 'map', label: 'Map (extract field)' },
@@ -17,9 +14,6 @@ const TRANSFORM_TYPES = [
   { value: 'format', label: 'Format (date, number, etc.)' },
 ];
 
-/**
- * Format type options
- */
 const FORMAT_TYPES = [
   { value: 'date:short', label: 'Date (Short)' },
   { value: 'date:long', label: 'Date (Long)' },
@@ -35,9 +29,6 @@ const FORMAT_TYPES = [
   { value: 'string:truncate', label: 'Truncate (50 chars)' },
 ];
 
-/**
- * Aggregation options
- */
 const AGGREGATION_TYPES = [
   { value: 'sum', label: 'Sum' },
   { value: 'avg', label: 'Average' },
@@ -46,11 +37,6 @@ const AGGREGATION_TYPES = [
   { value: 'max', label: 'Maximum' },
 ];
 
-/**
- * Variable Path Picker Component
- * 
- * Allows users to select a variable path from workflow schema and configure transforms
- */
 export const VariablePathPicker = ({
   value,
   onChange,
@@ -65,46 +51,31 @@ export const VariablePathPicker = ({
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
 
-  // Parse current value
   const parsedValue = useMemo(() => {
     if (!value) return { variablePath: '', transform: null, fallback: undefined };
     if (typeof value === 'string') return { variablePath: value, transform: null, fallback: undefined };
     return value;
   }, [value]);
 
-  // Extract schema for quick suggestions
-  const schema = useMemo(() => {
-    return extractWorkflowSchema(workflow);
-  }, [workflow]);
+  const schema = useMemo(() => extractWorkflowSchema(workflow), [workflow]);
 
-  // All available variables as flat list for suggestions
-  const allVariables = useMemo(() => {
-    return [
-      ...schema.inputs,
-      ...schema.nodeOutputs,
-      ...schema.workflowOutputs,
-    ];
-  }, [schema]);
+  const allVariables = useMemo(() => [
+    ...schema.inputs,
+    ...schema.nodeOutputs,
+    ...schema.workflowOutputs,
+  ], [schema]);
 
-  // Filter suggestions based on current input
   const filteredSuggestions = useMemo(() => {
     const currentPath = parsedValue.variablePath?.toLowerCase() || '';
     if (!currentPath) return allVariables.slice(0, 8);
-
     return allVariables.filter(v =>
       v.path.toLowerCase().includes(currentPath) ||
       v.name.toLowerCase().includes(currentPath)
     ).slice(0, 8);
   }, [allVariables, parsedValue.variablePath]);
 
-  // Handle path change
   const handlePathChange = useCallback((path) => {
-    const newValue = {
-      ...parsedValue,
-      variablePath: path,
-    };
-
-    // If no transforms, just return path string
+    const newValue = { ...parsedValue, variablePath: path };
     if (!newValue.transform && newValue.fallback === undefined) {
       onChange(path);
     } else {
@@ -113,71 +84,53 @@ export const VariablePathPicker = ({
     setShowSuggestions(false);
   }, [parsedValue, onChange]);
 
-  // Handle input change with suggestions
   const handleInputChange = useCallback((e) => {
     handlePathChange(e.target.value);
-    if (e.target.value && allVariables.length > 0) {
-      setShowSuggestions(true);
-    }
+    if (e.target.value && allVariables.length > 0) setShowSuggestions(true);
   }, [handlePathChange, allVariables]);
 
-  // Handle variable select from explorer
   const handleVariableSelect = useCallback((path) => {
     handlePathChange(path);
     setShowExplorer(false);
   }, [handlePathChange]);
 
-  // Handle suggestion click
   const handleSuggestionClick = useCallback((variable) => {
     handlePathChange(variable.path);
   }, [handlePathChange]);
 
-  // Handle transform change
   const handleTransformChange = useCallback((transformUpdate) => {
     const newTransform = parsedValue.transform
       ? { ...parsedValue.transform, ...transformUpdate }
       : transformUpdate;
-
-    // Clean up empty transform
     const cleanTransform = newTransform.type ? newTransform : null;
-
-    onChange({
-      ...parsedValue,
-      transform: cleanTransform,
-    });
+    onChange({ ...parsedValue, transform: cleanTransform });
   }, [parsedValue, onChange]);
 
-  // Handle fallback change
   const handleFallbackChange = useCallback((fallback) => {
-    onChange({
-      ...parsedValue,
-      fallback: fallback || undefined,
-    });
+    onChange({ ...parsedValue, fallback: fallback || undefined });
   }, [parsedValue, onChange]);
 
-  // Handle focus
   const handleInputFocus = useCallback(() => {
-    if (allVariables.length > 0) {
-      setShowSuggestions(true);
-    }
+    if (allVariables.length > 0) setShowSuggestions(true);
     if (onFocus) onFocus();
   }, [allVariables, onFocus]);
 
-  // Handle blur
   const handleInputBlur = useCallback(() => {
-    // Delay to allow click on suggestions
     setTimeout(() => setShowSuggestions(false), 200);
   }, []);
+
+  const hasTransform = !!parsedValue.transform;
 
   return (
     <div className={`flex flex-col gap-2 ${className}`}>
       {label && (
-        <label className="text-xs font-medium text-slate-500">{label}</label>
+        <p className="text-[10px] font-medium text-muted-foreground">{label}</p>
       )}
 
       {/* Path input row */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1.5">
         <div className="flex-1 relative">
+          {/* ✅ Correct: uses shared Input, no raw slate overrides */}
           <Input
             type="text"
             value={parsedValue.variablePath}
@@ -185,7 +138,7 @@ export const VariablePathPicker = ({
             onFocus={handleInputFocus}
             onBlur={handleInputBlur}
             placeholder={placeholder}
-            className="placeholder:text-slate-400 w-full text-xs bg-slate-50 border border-slate-300 text-slate-700 rounded block py-1.5 px-2 pr-8 focus:outline-none focus:border-slate-400"
+            className="w-full text-xs font-mono pr-7"
           />
 
           {parsedValue.variablePath && (
@@ -194,30 +147,30 @@ export const VariablePathPicker = ({
               variant="ghost"
               size="sm"
               square
-              className="absolute right-2 top-1/2 -translate-y-1/2 h-5 w-5 hover:bg-slate-200 text-slate-400 hover:text-slate-600"
+              className="absolute right-1 top-1/2 -translate-y-1/2 h-5 w-5"
               type="button"
             >
               <FiX className="w-3 h-3" />
             </Button>
           )}
 
-          {/* Quick Suggestions Dropdown */}
+          {/* Suggestions dropdown */}
           {showSuggestions && filteredSuggestions.length > 0 && (
-            <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded shadow-lg max-h-48 overflow-auto">
+            <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-background border border-border rounded-md shadow-lg max-h-48 overflow-auto">
               {filteredSuggestions.map((variable) => (
                 <div
                   key={variable.path}
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => handleSuggestionClick(variable)}
-                  className="w-full px-2 py-1.5 text-left text-xs hover:bg-slate-50 flex items-center justify-between gap-2 border-b border-slate-100 last:border-0 cursor-pointer"
+                  className="w-full px-2 py-1.5 text-left text-xs hover:bg-muted flex items-center justify-between gap-2 border-b border-border last:border-0 cursor-pointer transition-colors"
                 >
                   <div className="flex flex-col">
-                    <span className="font-medium text-slate-700">{variable.path}</span>
+                    <span className="font-medium text-foreground font-mono">{variable.path}</span>
                     {variable.nodeTitle && (
-                      <span className="text-[10px] text-slate-400">from {variable.nodeTitle}</span>
+                      <span className="text-[10px] text-muted-foreground">from {variable.nodeTitle}</span>
                     )}
                   </div>
-                  <span className="text-[10px] px-1 py-0.5 bg-slate-100 rounded text-slate-500">
+                  <span className="text-[10px] px-1 py-0.5 bg-muted rounded text-muted-foreground shrink-0">
                     {variable.category === 'input' ? 'input' : variable.category === 'nodeOutput' ? 'node' : 'output'}
                   </span>
                 </div>
@@ -230,16 +183,10 @@ export const VariablePathPicker = ({
         {allVariables.length > 0 && (
           <Button
             type="button"
-            variant="outline"
+            variant={showExplorer ? 'primary-ghost' : 'outline'}
             size="sm"
-            onClick={() => {
-              setShowExplorer(!showExplorer);
-              setShowSuggestions(false);
-            }}
-            className={`h-8 px-2 text-xs border whitespace-nowrap ${showExplorer
-              ? 'bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-100 hover:text-blue-700'
-              : 'bg-white border-slate-300 text-slate-600 hover:bg-slate-50 hover:text-slate-700'
-              }`}
+            onClick={() => { setShowExplorer(!showExplorer); setShowSuggestions(false); }}
+            className="shrink-0"
             title="Browse variables"
           >
             {showExplorer ? <FiChevronDown className="w-3 h-3 mr-1" /> : <FiChevronRight className="w-3 h-3 mr-1" />}
@@ -247,49 +194,43 @@ export const VariablePathPicker = ({
           </Button>
         )}
 
-        {/* Transform button */}
+        {/* Transform toggle */}
         {showTransforms && (
           <Button
             type="button"
-            variant="outline"
+            variant={showAdvanced || hasTransform ? 'primary-ghost' : 'outline'}
             size="sm"
             onClick={() => setShowAdvanced(!showAdvanced)}
-            className={`h-8 px-2 text-xs border whitespace-nowrap ${showAdvanced || parsedValue.transform
-              ? 'bg-blue-50 border-blue-200 text-blue-600 hover:bg-blue-100 hover:text-blue-700'
-              : 'bg-white border-slate-300 text-slate-600 hover:bg-slate-50 hover:text-slate-700'
-              }`}
+            className="shrink-0"
           >
             <FiCode className="w-3 h-3 mr-1" />
             Transform
-            {parsedValue.transform && <span className="w-1.5 h-1.5 bg-blue-500 rounded-full ml-1" />}
+            {hasTransform && <span className="w-1.5 h-1.5 bg-primary rounded-full ml-1" />}
           </Button>
         )}
       </div>
 
-      {/* Variable Explorer Inline */}
+      {/* Variable Explorer inline */}
       {showExplorer && (
-        <div className="border border-slate-200 rounded bg-slate-50">
+        <div className="border border-border rounded-lg overflow-hidden bg-muted/20">
           <VariableExplorer
             workflow={workflow}
             onSelect={handleVariableSelect}
             selectedPath={parsedValue.variablePath}
             showSearch={true}
-            className="border-0"
+            className="border-0 rounded-none"
           />
         </div>
       )}
 
       {/* Transform options */}
       {showAdvanced && (
-        <div className="p-3 bg-slate-50 rounded border border-slate-200 space-y-3">
+        <div className="p-3 rounded-lg border border-border bg-muted/30 space-y-3">
           {/* Transform type */}
           <div>
-            <label className="text-xs text-slate-500 mb-1 block">Transform Type</label>
-            <Select
-              value={parsedValue.transform?.type || ''}
-              onValueChange={(val) => handleTransformChange({ type: val })}
-            >
-              <SelectTrigger className="text-sm w-full px-2 py-1 bg-white border border-slate-300 rounded focus:outline-none focus:border-slate-400 text-slate-700">
+            <p className="text-[10px] text-muted-foreground mb-1">Transform Type</p>
+            <Select value={parsedValue.transform?.type || ''} onValueChange={(val) => handleTransformChange({ type: val })}>
+              <SelectTrigger className="text-xs">
                 <SelectValue placeholder="Select an option" />
               </SelectTrigger>
               <SelectContent>
@@ -300,81 +241,47 @@ export const VariablePathPicker = ({
             </Select>
           </div>
 
-          {/* Map transform options */}
+          {/* Map */}
           {parsedValue.transform?.type === 'map' && (
             <div>
-              <label className="text-xs text-slate-500 mb-1 block">Extract Field Path</label>
-              <Input
-                type="text"
-                value={parsedValue.transform?.mapPath || ''}
-                onChange={(e) => handleTransformChange({ mapPath: e.target.value })}
-                placeholder="e.g., value or nested.field"
-                className="w-full px-2 py-1 text-xs bg-white border border-slate-300 rounded focus:outline-none focus:border-slate-400 text-slate-700 placeholder:text-slate-400"
-              />
+              <p className="text-[10px] text-muted-foreground mb-1">Extract Field Path</p>
+              <Input type="text" value={parsedValue.transform?.mapPath || ''} onChange={(e) => handleTransformChange({ mapPath: e.target.value })} placeholder="e.g., value or nested.field" className="text-xs" />
             </div>
           )}
 
-          {/* Filter transform options */}
+          {/* Filter */}
           {parsedValue.transform?.type === 'filter' && (
             <div>
-              <label className="text-xs text-slate-500 mb-1 block">Filter Condition</label>
-              <Input
-                type="text"
-                value={parsedValue.transform?.filterCondition || ''}
-                onChange={(e) => handleTransformChange({ filterCondition: e.target.value })}
-                placeholder='e.g., item.status === "active"'
-                className="w-full px-2 py-1 text-xs bg-white border border-slate-300 rounded focus:outline-none focus:border-slate-400 text-slate-700 placeholder:text-slate-400"
-              />
+              <p className="text-[10px] text-muted-foreground mb-1">Filter Condition</p>
+              <Input type="text" value={parsedValue.transform?.filterCondition || ''} onChange={(e) => handleTransformChange({ filterCondition: e.target.value })} placeholder='e.g., item.status === "active"' className="text-xs font-mono" />
             </div>
           )}
 
-          {/* Slice transform options */}
+          {/* Slice */}
           {parsedValue.transform?.type === 'slice' && (
-            <div className="flex gap-2">
-              <div className="flex-1">
-                <label className="text-xs text-slate-500 mb-1 block">Start</label>
-                <Input
-                  type="number"
-                  value={parsedValue.transform?.start || 0}
-                  onChange={(e) => handleTransformChange({ start: parseInt(e.target.value) || 0 })}
-                  className="w-full px-2 py-1 text-xs bg-white border border-slate-300 rounded text-slate-700"
-                />
-              </div>
-              <div className="flex-1">
-                <label className="text-xs text-slate-500 mb-1 block">End</label>
-                <Input
-                  type="number"
-                  value={parsedValue.transform?.end || ''}
-                  onChange={(e) => handleTransformChange({ end: parseInt(e.target.value) || undefined })}
-                  placeholder="All"
-                  className="w-full px-2 py-1 text-xs bg-white border border-slate-300 rounded text-slate-700 placeholder:text-slate-400"
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Sort transform options */}
-          {parsedValue.transform?.type === 'sort' && (
-            <div className="flex gap-2">
-              <div className="flex-1">
-                <label className="text-xs text-slate-500 mb-1 block">Sort By</label>
-                <Input
-                  type="text"
-                  value={parsedValue.transform?.sortPath || ''}
-                  onChange={(e) => handleTransformChange({ sortPath: e.target.value })}
-                  placeholder="e.g., value"
-                  className="w-full px-2 py-1 text-xs bg-white border border-slate-300 rounded text-slate-700 placeholder:text-slate-400"
-                />
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <p className="text-[10px] text-muted-foreground mb-1">Start</p>
+                <Input type="number" value={parsedValue.transform?.start || 0} onChange={(e) => handleTransformChange({ start: parseInt(e.target.value) || 0 })} className="text-xs" />
               </div>
               <div>
-                <label className="text-xs text-slate-500 mb-1 block">Order</label>
-                <Select
-                  value={parsedValue.transform?.ascending ? 'asc' : 'desc'}
-                  onValueChange={(val) => handleTransformChange({ ascending: val === 'asc' })}
-                >
-                  <SelectTrigger className="text-sm px-2 py-1 bg-white border border-slate-300 rounded text-slate-700">
-                    <SelectValue placeholder="Select an option" />
-                  </SelectTrigger>
+                <p className="text-[10px] text-muted-foreground mb-1">End</p>
+                <Input type="number" value={parsedValue.transform?.end || ''} onChange={(e) => handleTransformChange({ end: parseInt(e.target.value) || undefined })} placeholder="All" className="text-xs" />
+              </div>
+            </div>
+          )}
+
+          {/* Sort */}
+          {parsedValue.transform?.type === 'sort' && (
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <p className="text-[10px] text-muted-foreground mb-1">Sort By</p>
+                <Input type="text" value={parsedValue.transform?.sortPath || ''} onChange={(e) => handleTransformChange({ sortPath: e.target.value })} placeholder="e.g., value" className="text-xs" />
+              </div>
+              <div>
+                <p className="text-[10px] text-muted-foreground mb-1">Order</p>
+                <Select value={parsedValue.transform?.ascending ? 'asc' : 'desc'} onValueChange={(val) => handleTransformChange({ ascending: val === 'asc' })}>
+                  <SelectTrigger className="text-xs"><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="asc">Ascending</SelectItem>
                     <SelectItem value="desc">Descending</SelectItem>
@@ -384,68 +291,42 @@ export const VariablePathPicker = ({
             </div>
           )}
 
-          {/* Aggregate transform options */}
+          {/* Aggregate */}
           {parsedValue.transform?.type === 'aggregate' && (
-            <div className="flex gap-2">
-              <div className="flex-1">
-                <label className="text-xs text-slate-500 mb-1 block">Aggregation</label>
-                <Select
-                  value={parsedValue.transform?.aggregation || 'sum'}
-                  onValueChange={(val) => handleTransformChange({ aggregation: val })}
-                >
-                  <SelectTrigger className="text-sm w-full px-2 py-1 bg-white border border-slate-300 rounded text-slate-700">
-                    <SelectValue placeholder="Select an option" />
-                  </SelectTrigger>
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <p className="text-[10px] text-muted-foreground mb-1">Aggregation</p>
+                <Select value={parsedValue.transform?.aggregation || 'sum'} onValueChange={(val) => handleTransformChange({ aggregation: val })}>
+                  <SelectTrigger className="text-xs"><SelectValue /></SelectTrigger>
                   <SelectContent>
-                    {AGGREGATION_TYPES.map((a) => (
-                      <SelectItem key={a.value} value={a.value}>{a.label}</SelectItem>
-                    ))}
+                    {AGGREGATION_TYPES.map((a) => <SelectItem key={a.value} value={a.value}>{a.label}</SelectItem>)}
                   </SelectContent>
                 </Select>
               </div>
-              <div className="flex-1">
-                <label className="text-xs text-slate-500 mb-1 block">Field Path</label>
-                <Input
-                  type="text"
-                  value={parsedValue.transform?.path || ''}
-                  onChange={(e) => handleTransformChange({ path: e.target.value })}
-                  placeholder="e.g., amount"
-                  className="w-full px-2 py-1 text-xs bg-white border border-slate-300 rounded text-slate-700 placeholder:text-slate-400"
-                />
+              <div>
+                <p className="text-[10px] text-muted-foreground mb-1">Field Path</p>
+                <Input type="text" value={parsedValue.transform?.path || ''} onChange={(e) => handleTransformChange({ path: e.target.value })} placeholder="e.g., amount" className="text-xs" />
               </div>
             </div>
           )}
 
-          {/* Format transform options */}
+          {/* Format */}
           {parsedValue.transform?.type === 'format' && (
             <div>
-              <label className="text-xs text-slate-500 mb-1 block">Format Type</label>
-              <Select
-                value={parsedValue.transform?.formatType || ''}
-                onValueChange={(val) => handleTransformChange({ formatType: val })}
-              >
-                <SelectTrigger className="text-sm w-full px-2 py-1 bg-white border border-slate-300 rounded text-slate-700">
-                  <SelectValue placeholder="Select format..." />
-                </SelectTrigger>
+              <p className="text-[10px] text-muted-foreground mb-1">Format Type</p>
+              <Select value={parsedValue.transform?.formatType || ''} onValueChange={(val) => handleTransformChange({ formatType: val })}>
+                <SelectTrigger className="text-xs"><SelectValue placeholder="Select format..." /></SelectTrigger>
                 <SelectContent>
-                  {FORMAT_TYPES.map((f) => (
-                    <SelectItem key={f.value} value={f.value}>{f.label}</SelectItem>
-                  ))}
+                  {FORMAT_TYPES.map((f) => <SelectItem key={f.value} value={f.value}>{f.label}</SelectItem>)}
                 </SelectContent>
               </Select>
             </div>
           )}
 
-          {/* Fallback value */}
+          {/* Fallback */}
           <div>
-            <label className="text-xs text-slate-500 mb-1 block">Fallback Value (if path not found)</label>
-            <Input
-              type="text"
-              value={parsedValue.fallback || ''}
-              onChange={(e) => handleFallbackChange(e.target.value)}
-              placeholder="Optional default value"
-              className="w-full px-2 py-1 text-xs bg-white border border-slate-300 rounded focus:outline-none focus:border-slate-400 text-slate-700 placeholder:text-slate-400"
-            />
+            <p className="text-[10px] text-muted-foreground mb-1">Fallback Value (if path not found)</p>
+            <Input type="text" value={parsedValue.fallback || ''} onChange={(e) => handleFallbackChange(e.target.value)} placeholder="Optional default value" className="text-xs" />
           </div>
         </div>
       )}

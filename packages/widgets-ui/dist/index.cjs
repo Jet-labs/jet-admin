@@ -271,7 +271,8 @@ var init_tableWidget = __esm({
         import_ui9.Button,
         {
           variant: "ghost",
-          size: "icon",
+          size: "sm",
+          square: true,
           className: "h-7 w-7",
           onClick: () => handlePageChange(1),
           disabled: currentPage === 1 || isLoadingWorkflows
@@ -281,7 +282,8 @@ var init_tableWidget = __esm({
         import_ui9.Button,
         {
           variant: "ghost",
-          size: "icon",
+          size: "sm",
+          square: true,
           className: "h-7 w-7",
           onClick: () => handlePageChange(currentPage - 1),
           disabled: currentPage === 1 || isLoadingWorkflows
@@ -291,7 +293,8 @@ var init_tableWidget = __esm({
         import_ui9.Button,
         {
           variant: "ghost",
-          size: "icon",
+          size: "sm",
+          square: true,
           className: "h-7 w-7",
           onClick: () => handlePageChange(currentPage + 1),
           disabled: currentPage >= totalPages || isLoadingWorkflows
@@ -301,7 +304,8 @@ var init_tableWidget = __esm({
         import_ui9.Button,
         {
           variant: "ghost",
-          size: "icon",
+          size: "sm",
+          square: true,
           className: "h-7 w-7",
           onClick: () => handlePageChange(totalPages),
           disabled: currentPage >= totalPages || isLoadingWorkflows
@@ -533,7 +537,8 @@ var init_tableConfigEditor = __esm({
           {
             type: "button",
             variant: "ghost",
-            size: "icon",
+            size: "sm",
+            square: true,
             className: "h-5 w-5 text-muted-foreground hover:text-foreground",
             onClick: () => handleMoveColumn(idx, -1),
             disabled: idx === 0,
@@ -545,7 +550,8 @@ var init_tableConfigEditor = __esm({
           {
             type: "button",
             variant: "ghost",
-            size: "icon",
+            size: "sm",
+            square: true,
             className: "h-5 w-5 text-muted-foreground hover:text-foreground",
             onClick: () => handleMoveColumn(idx, 1),
             disabled: idx === columns.length - 1,
@@ -576,7 +582,8 @@ var init_tableConfigEditor = __esm({
           {
             type: "button",
             variant: "ghost",
-            size: "icon",
+            size: "sm",
+            square: true,
             className: "h-7 w-7 text-destructive",
             onClick: () => handleRemoveColumn(idx),
             title: "Remove column"
@@ -964,9 +971,9 @@ var import_ui = require("@jet-admin/ui");
 var getCategoryIcon = (category) => {
   switch (category) {
     case "input":
-      return /* @__PURE__ */ import_react2.default.createElement(import_md.MdInput, { className: "w-3.5 h-3.5 text-green-500" });
+      return /* @__PURE__ */ import_react2.default.createElement(import_md.MdInput, { className: "w-3.5 h-3.5 text-emerald-500" });
     case "nodeOutput":
-      return /* @__PURE__ */ import_react2.default.createElement(import_bi.BiGitMerge, { className: "w-3.5 h-3.5 text-blue-500" });
+      return /* @__PURE__ */ import_react2.default.createElement(import_bi.BiGitMerge, { className: "w-3.5 h-3.5 text-primary" });
     case "workflowOutput":
       return /* @__PURE__ */ import_react2.default.createElement(import_md.MdOutput, { className: "w-3.5 h-3.5 text-purple-500" });
     default:
@@ -982,33 +989,32 @@ var VariableItem = ({ variable, onSelect, isSelected }) => {
     setTimeout(() => setCopied(false), 1500);
   }, [variable.path]);
   const handleClick = (0, import_react2.useCallback)(() => {
-    if (onSelect) {
-      onSelect(variable.path, variable);
-    }
+    if (onSelect) onSelect(variable.path, variable);
   }, [onSelect, variable]);
   return /* @__PURE__ */ import_react2.default.createElement(
     "div",
     {
-      className: `flex items-center gap-2 py-1.5 px-2 cursor-pointer rounded text-xs group`,
-      style: {
-        background: isSelected ? "var(--we-bg-accent-light, #eef2ff)" : "var(--we-bg-primary, #fff)",
-        borderLeft: isSelected ? "2px solid var(--we-bg-accent, #4f46e5)" : "none"
-      },
-      onClick: handleClick
+      onClick: handleClick,
+      className: `
+        flex items-center gap-2 py-1.5 px-2 cursor-pointer rounded text-xs group
+        transition-colors
+        ${isSelected ? "bg-primary/10 text-primary border-l-2 border-primary" : "hover:bg-muted text-foreground"}
+      `
     },
-    /* @__PURE__ */ import_react2.default.createElement("span", { className: "font-medium truncate flex-1", style: { color: "var(--we-text-primary, #1e293b)" } }, variable.name),
-    variable.nodeTitle && /* @__PURE__ */ import_react2.default.createElement("span", { className: "text-[10px] truncate max-w-[80px]", style: { color: "var(--we-text-muted, #94a3b8)" } }, variable.nodeTitle),
+    /* @__PURE__ */ import_react2.default.createElement("span", { className: "font-medium truncate flex-1" }, variable.name),
+    variable.nodeTitle && /* @__PURE__ */ import_react2.default.createElement("span", { className: "text-[10px] truncate max-w-[80px] text-muted-foreground" }, variable.nodeTitle),
     /* @__PURE__ */ import_react2.default.createElement(
       import_ui.Button,
       {
         onClick: handleCopy,
         variant: "ghost",
-        size: "icon",
+        size: "sm",
+        square: true,
         className: "h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity",
         title: "Copy path",
         type: "button"
       },
-      copied ? /* @__PURE__ */ import_react2.default.createElement(import_fi.FiCheck, { className: "w-3 h-3 text-green-500" }) : /* @__PURE__ */ import_react2.default.createElement(import_fi.FiCopy, { className: "w-3 h-3 text-slate-400" })
+      copied ? /* @__PURE__ */ import_react2.default.createElement(import_fi.FiCheck, { className: "w-3 h-3 text-emerald-500" }) : /* @__PURE__ */ import_react2.default.createElement(import_fi.FiCopy, { className: "w-3 h-3 text-muted-foreground" })
     )
   );
 };
@@ -1032,18 +1038,17 @@ var VariableCategory = ({
 }) => {
   const [isExpanded, setIsExpanded] = (0, import_react2.useState)(defaultExpanded);
   if (!variables || variables.length === 0) return null;
-  return /* @__PURE__ */ import_react2.default.createElement("div", { className: "mb-1", style: { background: "var(--we-bg-primary, #fff)" } }, /* @__PURE__ */ import_react2.default.createElement(
+  return /* @__PURE__ */ import_react2.default.createElement("div", { className: "mb-1" }, /* @__PURE__ */ import_react2.default.createElement(
     "div",
     {
       onClick: () => setIsExpanded(!isExpanded),
-      className: "flex items-center gap-1.5 w-full px-2 py-1.5 rounded text-left cursor-pointer",
-      style: { background: "var(--we-bg-secondary, #f8fafc)", border: "1px solid var(--we-border, #e2e8f0)" }
+      className: "flex items-center gap-1.5 w-full px-2 py-1.5 rounded cursor-pointer bg-muted/50 border border-border hover:bg-muted transition-colors"
     },
-    isExpanded ? /* @__PURE__ */ import_react2.default.createElement(import_fi.FiChevronDown, { className: "w-3 h-3 text-slate-500" }) : /* @__PURE__ */ import_react2.default.createElement(import_fi.FiChevronRight, { className: "w-3 h-3 text-slate-500" }),
+    isExpanded ? /* @__PURE__ */ import_react2.default.createElement(import_fi.FiChevronDown, { className: "w-3 h-3 text-muted-foreground" }) : /* @__PURE__ */ import_react2.default.createElement(import_fi.FiChevronRight, { className: "w-3 h-3 text-muted-foreground" }),
     getCategoryIcon(category),
-    /* @__PURE__ */ import_react2.default.createElement("span", { className: "text-[11px] font-medium uppercase tracking-wide flex-1", style: { color: "var(--we-text-secondary, #475569)" } }, title),
-    /* @__PURE__ */ import_react2.default.createElement("span", { className: "text-[10px] px-1.5 py-0.5 rounded", style: { color: "var(--we-text-muted, #94a3b8)", background: "var(--we-bg-primary, #fff)", border: "1px solid var(--we-border, #e2e8f0)" } }, variables.length)
-  ), isExpanded && /* @__PURE__ */ import_react2.default.createElement("div", { className: "ml-3 mt-1 pl-2", style: { borderLeft: "1px solid var(--we-border, #e2e8f0)", background: "var(--we-bg-primary, #fff)" } }, variables.map((variable) => /* @__PURE__ */ import_react2.default.createElement(
+    /* @__PURE__ */ import_react2.default.createElement("span", { className: "text-[11px] font-medium uppercase tracking-wide flex-1 text-muted-foreground" }, title),
+    /* @__PURE__ */ import_react2.default.createElement("span", { className: "text-[10px] px-1.5 py-0.5 rounded bg-background border border-border text-muted-foreground" }, variables.length)
+  ), isExpanded && /* @__PURE__ */ import_react2.default.createElement("div", { className: "ml-3 mt-1 pl-2 border-l border-border" }, variables.map((variable) => /* @__PURE__ */ import_react2.default.createElement(
     VariableItem,
     {
       key: variable.path,
@@ -1063,11 +1068,7 @@ VariableCategory.propTypes = {
 };
 var extractWorkflowSchema = (workflow) => {
   if (!workflow) return { inputs: [], nodeOutputs: [], workflowOutputs: [] };
-  const schema = {
-    inputs: [],
-    nodeOutputs: [],
-    workflowOutputs: []
-  };
+  const schema = { inputs: [], nodeOutputs: [], workflowOutputs: [] };
   const args = workflow.workflowOptions?.args || workflow.inputs || [];
   schema.inputs = args.map((arg) => ({
     path: `{{ctx.input.${arg.name}}}`,
@@ -1126,7 +1127,6 @@ var getNodeOutputType = (nodeType) => {
   switch (nodeType) {
     case "dataQuery":
       return "object";
-    // Usually { rows: [], fields: [] }
     case "javascript":
       return "any";
     case "condition":
@@ -1142,7 +1142,6 @@ var getNodeOutputType = (nodeType) => {
 var VariableExplorer = ({
   workflow,
   context,
-  // Optional: can still show runtime context if available
   onSelect,
   selectedPath = null,
   title = "Workflow Variables",
@@ -1150,44 +1149,32 @@ var VariableExplorer = ({
   className = ""
 }) => {
   const [searchQuery, setSearchQuery] = (0, import_react2.useState)("");
-  const schema = (0, import_react2.useMemo)(() => {
-    return extractWorkflowSchema(workflow);
-  }, [workflow]);
-  const allVariables = (0, import_react2.useMemo)(() => {
-    const variables = {
-      inputs: [...schema.inputs],
-      nodeOutputs: [...schema.nodeOutputs],
-      workflowOutputs: [...schema.workflowOutputs]
-    };
-    return variables;
-  }, [schema]);
+  const schema = (0, import_react2.useMemo)(() => extractWorkflowSchema(workflow), [workflow]);
+  const allVariables = (0, import_react2.useMemo)(() => ({
+    inputs: [...schema.inputs],
+    nodeOutputs: [...schema.nodeOutputs],
+    workflowOutputs: [...schema.workflowOutputs]
+  }), [schema]);
   const filteredVariables = (0, import_react2.useMemo)(() => {
     if (!searchQuery) return allVariables;
-    const lowerQuery = searchQuery.toLowerCase();
+    const q = searchQuery.toLowerCase();
     return {
-      inputs: allVariables.inputs.filter(
-        (v) => v.path.toLowerCase().includes(lowerQuery) || v.name.toLowerCase().includes(lowerQuery)
-      ),
-      nodeOutputs: allVariables.nodeOutputs.filter(
-        (v) => v.path.toLowerCase().includes(lowerQuery) || v.name.toLowerCase().includes(lowerQuery) || v.nodeTitle?.toLowerCase().includes(lowerQuery)
-      ),
-      workflowOutputs: allVariables.workflowOutputs.filter(
-        (v) => v.path.toLowerCase().includes(lowerQuery) || v.name.toLowerCase().includes(lowerQuery)
-      )
+      inputs: allVariables.inputs.filter((v) => v.path.toLowerCase().includes(q) || v.name.toLowerCase().includes(q)),
+      nodeOutputs: allVariables.nodeOutputs.filter((v) => v.path.toLowerCase().includes(q) || v.name.toLowerCase().includes(q) || v.nodeTitle?.toLowerCase().includes(q)),
+      workflowOutputs: allVariables.workflowOutputs.filter((v) => v.path.toLowerCase().includes(q) || v.name.toLowerCase().includes(q))
     };
   }, [allVariables, searchQuery]);
   const hasVariables = schema.inputs.length > 0 || schema.nodeOutputs.length > 0 || schema.workflowOutputs.length > 0;
-  return /* @__PURE__ */ import_react2.default.createElement("div", { className: `flex flex-col rounded ${className}`, style: { border: "1px solid var(--we-border, #e2e8f0)", background: "var(--we-bg-primary, #fff)" } }, /* @__PURE__ */ import_react2.default.createElement("div", { className: "flex items-center justify-between px-3 py-2 rounded-t", style: { borderBottom: "1px solid var(--we-border, #e2e8f0)", background: "var(--we-bg-secondary, #f8fafc)" } }, /* @__PURE__ */ import_react2.default.createElement("h3", { className: "text-xs font-medium", style: { color: "var(--we-text-secondary, #475569)" } }, title)), showSearch && hasVariables && /* @__PURE__ */ import_react2.default.createElement("div", { className: "px-2 py-2", style: { borderBottom: "1px solid var(--we-border, #e2e8f0)" } }, /* @__PURE__ */ import_react2.default.createElement(
+  return /* @__PURE__ */ import_react2.default.createElement("div", { className: `flex flex-col rounded-lg border border-border bg-background ${className}` }, /* @__PURE__ */ import_react2.default.createElement("div", { className: "flex items-center justify-between px-3 py-2 rounded-t-lg border-b border-border bg-muted/50" }, /* @__PURE__ */ import_react2.default.createElement("h3", { className: "text-xs font-medium text-muted-foreground" }, title)), showSearch && hasVariables && /* @__PURE__ */ import_react2.default.createElement("div", { className: "px-2 py-2 border-b border-border" }, /* @__PURE__ */ import_react2.default.createElement(
     import_ui.Input,
     {
       type: "text",
       placeholder: "Search variables...",
       value: searchQuery,
       onChange: (e) => setSearchQuery(e.target.value),
-      className: "we-input w-full",
-      style: { fontSize: "12px" }
+      className: "w-full text-xs"
     }
-  )), /* @__PURE__ */ import_react2.default.createElement("div", { className: "flex-1 overflow-auto max-h-64 py-2 px-1" }, !hasVariables ? /* @__PURE__ */ import_react2.default.createElement("div", { className: "text-center py-4 text-xs", style: { color: "var(--we-text-muted, #94a3b8)" } }, /* @__PURE__ */ import_react2.default.createElement("p", null, "No variables defined"), /* @__PURE__ */ import_react2.default.createElement("p", { className: "mt-1", style: { fontSize: "10px" } }, "Add workflow inputs or nodes with output variables")) : /* @__PURE__ */ import_react2.default.createElement(import_react2.default.Fragment, null, /* @__PURE__ */ import_react2.default.createElement(
+  )), /* @__PURE__ */ import_react2.default.createElement("div", { className: "flex-1 overflow-auto max-h-64 py-2 px-1" }, !hasVariables ? /* @__PURE__ */ import_react2.default.createElement("div", { className: "text-center py-4 text-xs text-muted-foreground" }, /* @__PURE__ */ import_react2.default.createElement("p", null, "No variables defined"), /* @__PURE__ */ import_react2.default.createElement("p", { className: "mt-1 text-[10px]" }, "Add workflow inputs or nodes with output variables")) : /* @__PURE__ */ import_react2.default.createElement(import_react2.default.Fragment, null, /* @__PURE__ */ import_react2.default.createElement(
     VariableCategory,
     {
       category: "input",
@@ -2082,7 +2069,8 @@ var FieldPill = ({
       {
         type: "button",
         variant: "ghost",
-        size: "icon",
+        size: "sm",
+        square: true,
         onClick: (e) => {
           e.stopPropagation();
           onRemove();
@@ -2479,7 +2467,8 @@ var EncodingShelf = ({
       {
         type: "button",
         variant: "ghost",
-        size: "icon",
+        size: "sm",
+        square: true,
         onClick: handleSortToggle,
         className: "ml-auto h-6 w-6 text-muted-foreground hover:text-primary hover:bg-primary/5 text-xs",
         title: `Sort: ${value.sort || "default"}`
