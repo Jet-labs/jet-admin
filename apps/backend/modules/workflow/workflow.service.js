@@ -4,7 +4,7 @@
  */
 const { prisma } = require("../../config/prisma.config");
 const Logger = require("../../utils/logger");
-const { startWorkflow } = require("./orchestrator/orchestrator");
+const { startWorkflow } = require("./workflowEngine/engine");
 const {
   formatAuthContextForLog,
   getCreationContextFromAuthContext,
@@ -437,7 +437,7 @@ workflowService.getRunStatus = async (instanceID) => {
     }));
 
     // Assemble context from unified log and strip internal keys
-    const { stateManager: sm } = require("./orchestrator/stateManager");
+    const { stateManager: sm } = require("./workflowEngine/stateManager");
     const fullContext = await sm.assembleContext(instanceID);
     const contextData = Object.fromEntries(
       Object.entries(fullContext).filter(([key]) => !key.startsWith('__'))
@@ -474,7 +474,7 @@ workflowService.getRunStatus = async (instanceID) => {
  * @returns {Promise<{instanceID: string, isTest: boolean}>}
  */
 workflowService.testWorkflow = async ({ tenantID, nodes, edges, inputArgs = {} }) => {
-  const { startTestWorkflow } = require("./orchestrator/orchestrator");
+  const { startTestWorkflow } = require("./workflowEngine/engine");
 
   Logger.log("info", {
     message: "workflowService:testWorkflow:params",
@@ -507,7 +507,7 @@ workflowService.testWorkflow = async ({ tenantID, nodes, edges, inputArgs = {} }
  * @returns {Promise<{success: boolean}>}
  */
 workflowService.stopTestWorkflow = async ({ instanceID }) => {
-  const { stateManager } = require("./orchestrator/stateManager");
+  const { stateManager } = require("./workflowEngine/stateManager");
 
   Logger.log("info", {
     message: "workflowService:stopTestWorkflow:params",

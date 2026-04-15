@@ -5,7 +5,7 @@
  * Reuses existing datasourceService and DATASOURCE_LOGIC_COMPONENTS
  */
 
-const Logger = require('../../../utils/logger');
+const Logger = require("../../../utils/logger");
 const { datasourceService } = require('../../datasource/datasource.service');
 const { DATASOURCE_LOGIC_COMPONENTS } = require('@jet-admin/datasources-logic');
 const { agentSession } = require('./agentSession');

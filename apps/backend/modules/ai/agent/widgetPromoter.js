@@ -10,7 +10,7 @@
  * The result is indistinguishable from a hand-built widget.
  */
 
-const Logger = require('../../../utils/logger');
+const Logger = require("../../../utils/logger");
 const { agentSession } = require('./agentSession');
 const { dataQueryService } = require('../../dataQuery/dataQuery.service');
 const { workflowService } = require('../../workflow/workflow.service');

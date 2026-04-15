@@ -134,6 +134,10 @@ export const CONSTANTS = {
     MAIN_DRAWER_USER_MANAGEMENT_TITLE: "User management",
     MAIN_DRAWER_AUDIT_LOGS_TITLE: "Audit logs",
     NO_TENANT_CREATED_TILL_NOW: "Please create a tenant",
+    ADD_SUBSCRIPTION_BUTTON_TEXT: "Add subscription",
+    SUBSCRIPTION_DRAWER_LIST_NO_SUBSCRIPTION_FOUND: "No subscriptions found",
+    ADD_WEBHOOK_BUTTON_TEXT: "Add webhook",
+    WEBHOOK_DRAWER_LIST_NO_WEBHOOK_FOUND: "No webhooks found",
     NO_PERMISSION_TO_VIEW_TENANT_TITLE: "Permission denied!",
     NO_PERMISSION_TO_VIEW_TENANT_DESCRIPTION:
       "You do not have permissions to view the tenant details",
@@ -883,6 +887,44 @@ export const CONSTANTS = {
     RAW_QUERY_EXCECUTOR_RESULT_PLACEHOLDER_ERROR: "Error executing query",
 
     VIEW_AUDIT_LOGS_TITLE: "Audit logs",
+
+    ADD_SUBSCRIPTION_FORM_TITLE: "Create new subscription",
+    UPDATE_SUBSCRIPTION_FORM_TITLE: "Update subscription",
+    ADD_SUBSCRIPTION_SUBMIT_BUTTON_TEXT: "Add subscription",
+    UPDATE_SUBSCRIPTION_SUBMIT_BUTTON_TEXT: "Update subscription",
+    SUBSCRIPTION_ADDED_SUCCESS: "Subscription created successfully",
+    SUBSCRIPTION_UPDATED_SUCCESS: "Subscription updated successfully",
+    SUBSCRIPTION_DELETED_SUCCESS: "Subscription deleted successfully",
+    DELETE_SUBSCRIPTION_DIALOG_TITLE: "Delete subscription",
+    DELETE_SUBSCRIPTION_DIALOG_MESSAGE:
+      "Are you sure you want to delete this subscription? This action cannot be undone.",
+    SUBSCRIPTION_EDITOR_FORM_TITLE_FIELD_LABEL: "Subscription name",
+    SUBSCRIPTION_EDITOR_FORM_TITLE_FIELD_PLACEHOLDER: "Your subscription's name",
+    SUBSCRIPTION_EDITOR_FORM_DATASOURCE_FIELD_LABEL: "Target data source",
+    SUBSCRIPTION_EDITOR_FORM_TYPE_FIELD_LABEL: "Subscription type",
+    SUBSCRIPTION_EDITOR_FORM_STATUS_FIELD_LABEL: "Status",
+    SUBSCRIPTION_EDITOR_FORM_CONFIG_FIELD_LABEL: "Configuration (JSON)",
+    SUBSCRIPTION_EDITOR_FORM_CONFIG_FIELD_PLACEHOLDER: "{}",
+    VIEW_CRON_JOB_HISTORY_BUTTON_TEXT: "History",
+
+    ADD_WEBHOOK_FORM_TITLE: "Create new webhook",
+    UPDATE_WEBHOOK_FORM_TITLE: "Update webhook",
+    ADD_WEBHOOK_SUBMIT_BUTTON_TEXT: "Add webhook",
+    UPDATE_WEBHOOK_SUBMIT_BUTTON_TEXT: "Update webhook",
+    WEBHOOK_ADDED_SUCCESS: "Webhook created successfully",
+    WEBHOOK_UPDATED_SUCCESS: "Webhook updated successfully",
+    WEBHOOK_DELETED_SUCCESS: "Webhook deleted successfully",
+    DELETE_WEBHOOK_DIALOG_TITLE: "Delete webhook",
+    DELETE_WEBHOOK_DIALOG_MESSAGE:
+      "Are you sure you want to delete this webhook? This action cannot be undone.",
+    WEBHOOK_EDITOR_FORM_TITLE_FIELD_LABEL: "Webhook name",
+    WEBHOOK_EDITOR_FORM_TITLE_FIELD_PLACEHOLDER: "Your webhook's name",
+    WEBHOOK_EDITOR_FORM_PATH_FIELD_LABEL: "Endpoint path",
+    WEBHOOK_EDITOR_FORM_PATH_FIELD_PLACEHOLDER: "/my-webhook",
+    WEBHOOK_EDITOR_FORM_AUTH_TYPE_FIELD_LABEL: "Authentication type",
+    WEBHOOK_EDITOR_FORM_STATUS_FIELD_LABEL: "Status",
+    WEBHOOK_EDITOR_FORM_AUTH_CONFIG_FIELD_LABEL: "Auth configuration (JSON)",
+    WEBHOOK_EDITOR_FORM_AUTH_CONFIG_FIELD_PLACEHOLDER: "{}",
   },
 
   LOCAL_STORAGE_KEYS: {
@@ -949,6 +991,32 @@ export const CONSTANTS = {
       code: "/tenants/:tenantID/schemas/:databaseSchemaName/tables/add",
       path: (tenantID, databaseSchemaName) =>
         `/tenants/${tenantID}/schemas/${databaseSchemaName}/tables/add`,
+    },
+    VIEW_SUBSCRIPTIONS: {
+      code: "/tenants/:tenantID/subscriptions",
+      path: (tenantID) => `/tenants/${tenantID}/subscriptions`,
+    },
+    ADD_SUBSCRIPTION: {
+      code: "/tenants/:tenantID/subscriptions/add",
+      path: (tenantID) => `/tenants/${tenantID}/subscriptions/add`,
+    },
+    UPDATE_SUBSCRIPTION_BY_ID: {
+      code: "/tenants/:tenantID/subscriptions/:subscriptionID",
+      path: (tenantID, subscriptionID) =>
+        `/tenants/${tenantID}/subscriptions/${subscriptionID}`,
+    },
+    VIEW_WEBHOOKS: {
+      code: "/tenants/:tenantID/webhooks",
+      path: (tenantID) => `/tenants/${tenantID}/webhooks`,
+    },
+    ADD_WEBHOOK: {
+      code: "/tenants/:tenantID/webhooks/add",
+      path: (tenantID) => `/tenants/${tenantID}/webhooks/add`,
+    },
+    UPDATE_WEBHOOK_BY_ID: {
+      code: "/tenants/:tenantID/webhooks/:webhookID",
+      path: (tenantID, webhookID) =>
+        `/tenants/${tenantID}/webhooks/${webhookID}`,
     },
     VIEW_DATABASE_TABLES: {
       code: "/tenants/:tenantID/schemas/:databaseSchemaName/tables",
@@ -1123,6 +1191,26 @@ export const CONSTANTS = {
     AI: {
       sendUserMessageToAIAPI: (tenantID) =>
         `/api/v1/tenants/${tenantID}/ai/user_message`,
+    },
+    WEBHOOK: {
+      getAllWebhooksAPI: (tenantID) => `/api/v1/tenants/${tenantID}/webhooks`,
+      createWebhookAPI: (tenantID) => `/api/v1/tenants/${tenantID}/webhooks`,
+      getWebhookByIDAPI: (tenantID, webhookID) =>
+        `/api/v1/tenants/${tenantID}/webhooks/${webhookID}`,
+      updateWebhookAPI: (tenantID, webhookID) =>
+        `/api/v1/tenants/${tenantID}/webhooks/${webhookID}`,
+      deleteWebhookAPI: (tenantID, webhookID) =>
+        `/api/v1/tenants/${tenantID}/webhooks/${webhookID}`,
+    },
+    SUBSCRIPTION: {
+      getAllSubscriptionsAPI: (tenantID) => `/api/v1/tenants/${tenantID}/subscriptions`,
+      createSubscriptionAPI: (tenantID) => `/api/v1/tenants/${tenantID}/subscriptions`,
+      getSubscriptionByIDAPI: (tenantID, subscriptionID) =>
+        `/api/v1/tenants/${tenantID}/subscriptions/${subscriptionID}`,
+      updateSubscriptionAPI: (tenantID, subscriptionID) =>
+        `/api/v1/tenants/${tenantID}/subscriptions/${subscriptionID}`,
+      deleteSubscriptionAPI: (tenantID, subscriptionID) =>
+        `/api/v1/tenants/${tenantID}/subscriptions/${subscriptionID}`,
     },
     WORKFLOW: {
       getAllWorkflowsAPI: (tenantID) => `/api/v1/tenants/${tenantID}/workflows`,
@@ -1469,6 +1557,8 @@ export const CONSTANTS = {
 
     DATABASE_TRIGGERS: (tenantID, databaseSchemaName) =>
       `${tenantID}-${databaseSchemaName}-DATABASE_TRIGGERS`,
+    SUBSCRIPTIONS: (tenantID) => `${tenantID}-SUBSCRIPTIONS`,
+    WEBHOOKS: (tenantID) => `${tenantID}-WEBHOOKS`,
     DATABASE_TRIGGER_BY_NAME: (
       tenantID,
       databaseSchemaName,
@@ -1497,6 +1587,8 @@ export const CONSTANTS = {
     DATABASE_CRON_JOBS: (tenantID) => `${tenantID}-DATABASE_CRON_JOBS`,
     AUDIT_LOGS: (tenantID) => `${tenantID}-AUDIT_LOGS`,
     DATABASE_NOTIFICATION_DETAILS: "DATABASE_NOTIFICATION_DETAILS",
+    SUBSCRIPTIONS: (tenantID) => `${tenantID}-SUBSCRIPTIONS`,
+    WEBHOOKS: (tenantID) => `${tenantID}-WEBHOOKS`,
   },
 
   DATA_TYPES: {
@@ -1833,6 +1925,8 @@ export const CONSTANTS = {
       "DATABASE_NOTIFICATION_LAYOUT_SEPARATION",
     DATABASE_CRON_JOB_LAYOUT_SEPARATION: "DATABASE_CRON_JOB_LAYOUT_SEPARATION",
     DATABASE_API_KEY_LAYOUT_SEPARATION: "DATABASE_API_KEY_LAYOUT_SEPARATION",
+    WEBHOOK_LAYOUT_SEPARATION: "WEBHOOK_LAYOUT_SEPARATION",
+    SUBSCRIPTION_LAYOUT_SEPARATION: "SUBSCRIPTION_LAYOUT_SEPARATION",
   },
 
   PG_TRIGGER_FORM_TIMING_OPTIONS: ["BEFORE", "AFTER", "INSTEAD OF"],

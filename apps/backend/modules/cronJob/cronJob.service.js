@@ -1,10 +1,6 @@
 const Logger = require("../../utils/logger"); // Adjust path as needed
-const cron = require("node-cron");
 const { prisma } = require("../../config/prisma.config"); // Adjust path as needed
-const { workflowService } = require("../workflow/workflow.service");
 const constants = require("../../constants");
-const { resolveInputs } = require("../../utils/inputArgs.util");
-const { extractWorkflowDefinitions } = require("../../utils/definitionProvider.util");
 
 const cronJobService = {};
 
@@ -331,196 +327,40 @@ cronJobService.deleteCronJobByID = async ({ userID, tenantID, cronJobID }) => {
   }
 };
 
+const { cronJobEngine } = require("./cronJobEngine/engine");
+
 /**
- * Runs a Cron Job immediately.
- * @param {object} param0
- * @param {import("@prisma/client").tblCronJobs & {tblDataQueries: import("@prisma/client").tblDataQueries}} param0.cronJob - The ID of the cron job to run
- * @returns {Promise<object>} The cron job object
+ * Runs a Cron Job immediately — delegates to engine.
  */
 cronJobService.runCronJob = async ({ cronJob }) => {
-  Logger.log("info", {
-    message: "cronJobService:runCronJob:params",
-    params: { cronJob },
-  });
-  const startTime = new Date();
-  try {
-    // Resolve & validate inputs through the unified pipeline
-    const rawInputArgs = cronJob.workflowConfig?.inputArgs || {};
-    let definitions = [];
-    if (cronJob.tblWorkflows) {
-      definitions = extractWorkflowDefinitions(cronJob.tblWorkflows);
-    }
-    const { resolved, errors, valid } = await resolveInputs({
-      type: 'cron',
-      id: !cronJob.tblWorkflows ? cronJob.cronJobID : undefined,
-      definitions: definitions.length > 0 ? definitions : undefined,
-      runtimeValues: rawInputArgs,
-    });
-
-    if (!valid) {
-      Logger.log("error", {
-        message: "cronJobService:runCronJob:inputValidationFailed",
-        params: { cronJobID: cronJob.cronJobID, errors },
-      });
-      // Don't create history here — the catch block will handle it
-      throw new Error(`Cron job input validation failed: ${JSON.stringify(errors)}`);
-    }
-
-    const workflowRunResult = await workflowService.executeWorkflow({
-      workflowID: cronJob.workflowID,
-      tenantID: cronJob.tenantID,
-      inputArgs: resolved,
-    });
-
-    await prisma.tblCronJobHistory.create({
-      data: {
-        cronJobID: cronJob.cronJobID,
-        result: JSON.stringify(workflowRunResult || { message: "Workflow started" }),
-        triggerType: "SCHEDULED",
-        status: constants.CRON_JOB_STATUS.SUCCESS,
-        scheduledAt: startTime,
-        startTime: startTime,
-        endTime: new Date(),
-        durationMs: new Date() - startTime,
-      },
-    });
-
-    Logger.log("success", {
-      message: "cronJobService:runCronJob:success",
-      params: { cronJob },
-    });
-
-    return true;
-  } catch (error) {
-    Logger.log("error", {
-      message: "cronJobService:runCronJob:failure",
-      params: { cronJob, error },
-    });
-    await prisma.tblCronJobHistory.create({
-      data: {
-        cronJobID: cronJob.cronJobID,
-        result: JSON.stringify({ message: error.message, stack: error.stack }),
-        triggerType: "SCHEDULED",
-        status: constants.CRON_JOB_STATUS.FAILURE,
-        scheduledAt: startTime,
-        startTime: startTime,
-        endTime: new Date(),
-        durationMs: new Date() - startTime,
-      },
-    });
-    throw error;
-  }
+  return cronJobEngine.runCronJob({ cronJob });
 };
 
 /**
- *
- * @param {object} param0
- * @param {import("@prisma/client").tblCronJobs} param0.cronJob
+ * Schedule or reschedule a cron job after create/update — delegates to engine.
  */
 cronJobService.scheduleCronJobOnChange = async ({ cronJob }) => {
-  try {
-    Logger.log("info", {
-      message: "cronJobService:scheduleCronJobOnChange:init",
-      params: { cronJobID: cronJob.cronJobID, isDisabled: cronJob.isDisabled },
-    });
-
-    // Initialize global map if needed
-    if (!global.scheduledCronJobs) {
-      global.scheduledCronJobs = {};
-    }
-
-    const scheduledCronJobs = global.scheduledCronJobs;
-
-    // Always stop existing schedule first
-    if (scheduledCronJobs[cronJob.cronJobID]) {
-      scheduledCronJobs[cronJob.cronJobID].stop();
-      Logger.log("info", {
-        message: "cronJobService:scheduleCronJobOnChange:stopped",
-        params: { cronJobID: cronJob.cronJobID },
-      });
-      delete scheduledCronJobs[cronJob.cronJobID];
-    }
-
-    // If disabled, do NOT schedule a new job
-    if (cronJob.isDisabled) {
-      Logger.log("info", {
-        message: "cronJobService:scheduleCronJobOnChange:disabled, skipping schedule",
-        params: { cronJobID: cronJob.cronJobID },
-      });
-      return;
-    }
-
-    const job = cron.schedule(
-      cronJob.cronJobSchedule,
-      () => cronJobService.runCronJob({ cronJob }),
-      {
-        name: `${cronJob.cronJobID}`,
-      }
-    );
-    global.scheduledCronJobs[cronJob.cronJobID] = job;
-    Logger.log("success", {
-      message: "cronJobService:scheduleCronJobOnChange:job scheduled",
-      params: { cronJobID: cronJob.cronJobID },
-    });
-  } catch (error) {
-    Logger.log("error", {
-      message: "cronJobService:scheduleCronJobOnChange:catch-1",
-      params: { error },
-    });
-  }
+  cronJobEngine.schedule({ cronJob });
 };
 
+/**
+ * Unschedule a cron job after deletion — delegates to engine.
+ */
 cronJobService.deleteScheduledCronJob = async ({ cronJobID }) => {
-  try {
-    Logger.log("info", {
-      message: "cronJobService:deleteScheduledCronJob:init",
-      params: { cronJobID },
-    });
-    const scheduledCronJobs = global.scheduledCronJobs;
-    if (scheduledCronJobs) {
-      if (scheduledCronJobs[cronJobID]) {
-        scheduledCronJobs[cronJobID].stop();
-        Logger.log("info", {
-          message: "cronJobService:deleteScheduledCronJob:stopped",
-          params: { cronJobID },
-        });
-        delete scheduledCronJobs[cronJobID];
-        global.scheduledCronJobs = scheduledCronJobs;
-      }
-    }
-
-    Logger.log("success", {
-      message: "cronJobService:deleteScheduledCronJob:job scheduled",
-      params: { cronJobID },
-    });
-  } catch (error) {
-    Logger.log("error", {
-      message: "cronJobService:deleteScheduledCronJob:catch-1",
-      params: { error },
-    });
-  }
+  cronJobEngine.unschedule({ cronJobID });
 };
 
+/**
+ * Schedule all enabled cron jobs on server startup.
+ */
 cronJobService.scheduleAllCronJobs = async () => {
   try {
-    Logger.log("info", {
-      message: "cronJobService:scheduleAllCronJobs:init",
-    });
+    Logger.log("info", { message: "cronJobService:scheduleAllCronJobs:init" });
     const cronJobs = await cronJobService.getAllCronJobsForScheduler();
-
-    const cronJobsSchedulePromise = cronJobs.map((cronJob) => {
-      return cronJobService.scheduleCronJobOnChange({ cronJob });
-    });
-    await Promise.all(cronJobsSchedulePromise);
-    Logger.log("success", {
-      message: "cronJobService:scheduleAllCronJobs:jobs scheduled",
-    });
+    await cronJobEngine.scheduleAll(cronJobs);
     return true;
   } catch (error) {
-    Logger.log("error", {
-      message: "cronJobService:scheduleAllCronJobs:catch-1",
-      params: { error },
-    });
+    Logger.log("error", { message: "cronJobService:scheduleAllCronJobs:catch", params: { error } });
   }
 };
 // --- Job History Service Functions ---

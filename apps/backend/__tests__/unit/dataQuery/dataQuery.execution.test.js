@@ -2,9 +2,10 @@ const {
   createQueryEngine,
   buildDataQueryExecutionArgs,
   executeDataQuery,
-} = require('../../../modules/dataQuery/queryEngine/queryExecution.adapter');
+  defaultDatasourceFetcher,
+} = require('../../../modules/dataQuery/dataQuery.service');
 
-describe('queryExecution.adapter', () => {
+describe('dataQuery execution', () => {
   it('creates a QueryEngine with provided fetchers', () => {
     const queryFetcher = jest.fn();
     const datasourceFetcher = jest.fn();

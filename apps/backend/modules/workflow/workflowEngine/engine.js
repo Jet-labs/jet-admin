@@ -32,12 +32,12 @@
  */
 
 const { v4: uuidv4 } = require('uuid');
-const { registerResultsWorker, addNodeJob } = require('../../../config/queue.config');
+const { registerResultsWorker, addNodeJob } = require("../../../config/queue.config");
 const { stateManager } = require('./stateManager');
 const { dagScheduler } = require('./dagScheduler');
-const Logger = require('../../../utils/logger');
-const { socketIO } = require('../../../config/socket.io');
-const constants = require('../../../constants');
+const Logger = require("../../../utils/logger");
+const { socketIO } = require("../../../config/socket.io");
+const constants = require("../../../constants");
 const { widgetWorkflowBridge } = require('../../widget/widgetWorkflowBridge');
 
 const MAX_CAS_RETRIES = 3;
@@ -320,7 +320,7 @@ async function handleTaskResult(result) {
  * @returns {Promise<boolean>}
  */
 async function _bumpVersion(instanceID, currentVersion) {
-  const { prisma } = require('../../../config/prisma.config');
+  const { prisma } = require("../../../config/prisma.config");
   const result = await prisma.tblWorkflowInstances.updateMany({
     where: {
       instanceID,

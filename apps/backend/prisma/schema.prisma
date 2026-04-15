@@ -137,20 +137,25 @@ model tblDatabaseNotifications {
 }
 
 model tblDatasources {
-  datasourceID      String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  datasourceTitle   String           @db.VarChar
-  datasourceType    String           @db.VarChar
-  createdAt         DateTime         @default(now()) @db.Timestamptz(6)
-  updatedAt         DateTime         @default(now()) @db.Timestamptz(6)
-  tenantID          String           @db.Uuid
-  creatorID         String?          @db.Uuid
-  datasourceOptions Json
-  datasourceTags    String[]         @db.VarChar
-  createdByApiKeyID String?          @db.Uuid
-  tblDataQueries    tblDataQueries[]
-  tblTenants        tblTenants       @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDatasourceTblTenantsTenantID")
-  tblUsers          tblUsers?        @relation(fields: [creatorID], references: [userID], onUpdate: NoAction, map: "fkTblDatasourceTblUsersCreatorID")
-  tblAPIKeys        tblAPIKeys?      @relation(fields: [createdByApiKeyID], references: [apiKeyID], onUpdate: NoAction, map: "fkTblDatasourcesCreatedByApiKeyID")
+  datasourceID          String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  datasourceTitle       String             @db.VarChar
+  datasourceType        String             @db.VarChar
+  createdAt             DateTime           @default(now()) @db.Timestamptz(6)
+  updatedAt             DateTime           @default(now()) @db.Timestamptz(6)
+  tenantID              String             @db.Uuid
+  creatorID             String?            @db.Uuid
+  datasourceOptions     Json
+  datasourceTags        String[]           @db.VarChar
+  createdByApiKeyID     String?            @db.Uuid
+  connectionStatus      String?            @default("inactive") @db.VarChar(32)
+  webhookToken          String?            @unique @db.VarChar(128)
+  webhookSecret         String?            @db.VarChar(255)
+  datasourceDescription String?
+  tblDataQueries        tblDataQueries[]
+  tblTenants            tblTenants         @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "fkTblDatasourceTblTenantsTenantID")
+  tblUsers              tblUsers?          @relation(fields: [creatorID], references: [userID], onUpdate: NoAction, map: "fkTblDatasourceTblUsersCreatorID")
+  tblAPIKeys            tblAPIKeys?        @relation(fields: [createdByApiKeyID], references: [apiKeyID], onUpdate: NoAction, map: "fkTblDatasourcesCreatedByApiKeyID")
+  tblSubscriptions      tblSubscriptions[]
 
   @@index([createdByApiKeyID], map: "idx_tblDatasources_createdByApiKeyID")
 }
@@ -209,11 +214,13 @@ model tblTenants {
   tblDatabaseNotifications                            tblDatabaseNotifications[]
   tblDatasources                                      tblDatasources[]
   tblRoles                                            tblRoles[]
+  tblSubscriptions                                    tblSubscriptions[]
   tblAPIKeys_tblTenants_createdByApiKeyIDTotblAPIKeys tblAPIKeys?                   @relation("tblTenants_createdByApiKeyIDTotblAPIKeys", fields: [createdByApiKeyID], references: [apiKeyID], onUpdate: NoAction, map: "fkTblTenantsCreatedByApiKeyID")
   tblUsers                                            tblUsers?                     @relation(fields: [creatorID], references: [userID], onUpdate: NoAction, map: "fktblTenantstblUsersCreatorID")
   tblUserNotifications                                tblUserNotifications[]
   tblUserTenantConfigMap                              tblUserTenantConfigMap[]
   tblUsersTenantsRelationship                         tblUsersTenantsRelationship[]
+  tblWebhooks                                         tblWebhooks[]
   tblWidgets                                          tblWidgets[]
   tblWorkflowInstances                                tblWorkflowInstances[]
   tblWorkflows                                        tblWorkflows[]
@@ -380,24 +387,26 @@ model tblWorkflowNodes {
 }
 
 model tblWorkflows {
-  workflowID           String                 @id(map: "tblWorflows_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  title                String                 @db.VarChar
-  tenantID             String                 @db.Uuid
-  creatorID            String?                @db.Uuid
-  isDisabled           Boolean?
-  disabledAt           DateTime?              @db.Timestamptz(6)
-  createdAt            DateTime               @default(now()) @db.Timestamptz(6)
-  updatedAt            DateTime               @default(now()) @db.Timestamptz(6)
-  workflowOptions      Json?                  @default("{}")
-  createdByApiKeyID    String?                @db.Uuid
-  tblCronJobs          tblCronJobs[]
-  tblWidgets           tblWidgets[]
-  tblWorkflowEdge      tblWorkflowEdge[]
-  tblWorkflowInstances tblWorkflowInstances[]
-  tblWorkflowNodes     tblWorkflowNodes[]
-  tblAPIKeys           tblAPIKeys?            @relation(fields: [createdByApiKeyID], references: [apiKeyID], onUpdate: NoAction, map: "fkTblWorkflowsCreatedByApiKeyID")
-  tblUsers             tblUsers?              @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "tblWorkflowsCreatorID")
-  tblTenants           tblTenants             @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "tblWorkflowsTenantID")
+  workflowID               String                     @id(map: "tblWorflows_pkey") @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  title                    String                     @db.VarChar
+  tenantID                 String                     @db.Uuid
+  creatorID                String?                    @db.Uuid
+  isDisabled               Boolean?
+  disabledAt               DateTime?                  @db.Timestamptz(6)
+  createdAt                DateTime                   @default(now()) @db.Timestamptz(6)
+  updatedAt                DateTime                   @default(now()) @db.Timestamptz(6)
+  workflowOptions          Json?                      @default("{}")
+  createdByApiKeyID        String?                    @db.Uuid
+  tblCronJobs              tblCronJobs[]
+  tblSubscriptionListeners tblSubscriptionListeners[]
+  tblWebhookListeners      tblWebhookListeners[]
+  tblWidgets               tblWidgets[]
+  tblWorkflowEdge          tblWorkflowEdge[]
+  tblWorkflowInstances     tblWorkflowInstances[]
+  tblWorkflowNodes         tblWorkflowNodes[]
+  tblAPIKeys               tblAPIKeys?                @relation(fields: [createdByApiKeyID], references: [apiKeyID], onUpdate: NoAction, map: "fkTblWorkflowsCreatedByApiKeyID")
+  tblUsers                 tblUsers?                  @relation(fields: [creatorID], references: [userID], onDelete: NoAction, onUpdate: NoAction, map: "tblWorkflowsCreatorID")
+  tblTenants               tblTenants                 @relation(fields: [tenantID], references: [tenantID], onDelete: NoAction, onUpdate: NoAction, map: "tblWorkflowsTenantID")
 
   @@index([createdByApiKeyID], map: "idx_tblWorkflows_createdByApiKeyID")
 }
@@ -435,4 +444,87 @@ model tblWorkflowDataCollectionRequests {
 
   @@index([instanceID, status], map: "idx_tblWfDataCollection_instance_status")
   @@index([status, expiresAt], map: "idx_tblWfDataCollection_status_expiry")
+}
+
+model tblEventDLQ {
+  dlqId        String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  eventId      String?   @db.VarChar(128)
+  tenantID     String?   @db.Uuid
+  datasourceID String?   @db.Uuid
+  rawPayload   Bytes?
+  headers      Json?
+  errorMessage String?
+  retryCount   Int?      @default(0)
+  maxRetries   Int?      @default(3)
+  nextRetryAt  DateTime? @db.Timestamptz(6)
+  resolvedAt   DateTime? @db.Timestamptz(6)
+  createdAt    DateTime? @default(now()) @db.Timestamptz(6)
+
+  @@index([tenantID], map: "idx_tblEventDLQ_tenantID")
+}
+
+model tblSubscriptionListeners {
+  listenerID       String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  subscriptionID   String           @db.Uuid
+  listenerType     String           @default("workflow") @db.VarChar(20)
+  workflowID       String           @db.Uuid
+  filterConfig     Json?            @default("{}") @db.Json
+  isEnabled        Boolean?         @default(true)
+  createdAt        DateTime?        @default(now()) @db.Timestamptz(6)
+  tblSubscriptions tblSubscriptions @relation(fields: [subscriptionID], references: [subscriptionID], onDelete: Cascade, onUpdate: NoAction, map: "fk_tblSubscriptionListeners_subscription")
+  tblWorkflows     tblWorkflows     @relation(fields: [workflowID], references: [workflowID], onDelete: Cascade, onUpdate: NoAction, map: "fk_tblSubscriptionListeners_workflow")
+
+  @@index([subscriptionID], map: "idx_tblSubscriptionListeners_subscriptionID")
+}
+
+model tblSubscriptions {
+  subscriptionID           String                     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantID                 String                     @db.Uuid
+  datasourceID             String                     @db.Uuid
+  subscriptionTitle        String                     @db.VarChar(255)
+  subscriptionType         String                     @db.VarChar(50)
+  subscriptionConfig       Json                       @default("{}") @db.Json
+  status                   String?                    @default("inactive") @db.VarChar(20)
+  errorMessage             String?
+  lastEventAt              DateTime?                  @db.Timestamptz(6)
+  eventCount               BigInt?                    @default(0)
+  createdAt                DateTime?                  @default(now()) @db.Timestamptz(6)
+  updatedAt                DateTime?                  @default(now()) @db.Timestamptz(6)
+  tblSubscriptionListeners tblSubscriptionListeners[]
+  tblDatasources           tblDatasources             @relation(fields: [datasourceID], references: [datasourceID], onDelete: Cascade, onUpdate: NoAction, map: "fk_tblSubscriptions_datasource")
+  tblTenants               tblTenants                 @relation(fields: [tenantID], references: [tenantID], onDelete: Cascade, onUpdate: NoAction, map: "fk_tblSubscriptions_tenant")
+
+  @@index([datasourceID], map: "idx_tblSubscriptions_datasourceID")
+  @@index([tenantID], map: "idx_tblSubscriptions_tenantID")
+}
+
+model tblWebhookListeners {
+  listenerID   String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  webhookID    String       @db.Uuid
+  workflowID   String       @db.Uuid
+  filterConfig Json?        @default("{}") @db.Json
+  isEnabled    Boolean?     @default(true)
+  createdAt    DateTime?    @default(now()) @db.Timestamptz(6)
+  tblWebhooks  tblWebhooks  @relation(fields: [webhookID], references: [webhookID], onDelete: Cascade, onUpdate: NoAction, map: "fk_tblWebhookListeners_webhook")
+  tblWorkflows tblWorkflows @relation(fields: [workflowID], references: [workflowID], onDelete: Cascade, onUpdate: NoAction, map: "fk_tblWebhookListeners_workflow")
+
+  @@index([webhookID], map: "idx_tblWebhookListeners_webhookID")
+}
+
+model tblWebhooks {
+  webhookID           String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  tenantID            String                @db.Uuid
+  webhookTitle        String                @db.VarChar(255)
+  webhookPath         String                @db.VarChar(255)
+  authType            String?               @default("none") @db.VarChar(20)
+  authConfig          Json?                 @default("{}") @db.Json
+  status              String?               @default("active") @db.VarChar(20)
+  lastReceivedAt      DateTime?             @db.Timestamptz(6)
+  eventCount          BigInt?               @default(0)
+  createdAt           DateTime?             @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime?             @default(now()) @db.Timestamptz(6)
+  tblWebhookListeners tblWebhookListeners[]
+  tblTenants          tblTenants            @relation(fields: [tenantID], references: [tenantID], onDelete: Cascade, onUpdate: NoAction, map: "fk_tblWebhooks_tenant")
+
+  @@unique([tenantID, webhookPath], map: "uq_tblWebhooks_tenantID_webhookPath")
 }

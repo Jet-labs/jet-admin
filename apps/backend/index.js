@@ -46,6 +46,11 @@ if (isModuleEnabled(constants.MODULES.TENANT)) {
   );
 }
 
+expressApp.use(
+  "/api/v1/webhooks",
+  require("./modules/webhook/webhook.receiver.routes")
+);
+
 // if (isModuleEnabled(constants.MODULES.WORKFLOW)) {
 //   Logger.log("success", { message: "workflow module enabled" });
 //   expressApp.use(
@@ -281,12 +286,12 @@ httpServer.listen(port, async () => {
     Logger.log('error', { message: 'Failed to init monitor socket', params: { error: err.message } });
   }
 
-  // Start workflow workers (in-memory queue)
+  // Start all listeners (workflow queue, subscription consumers, etc.)
   try {
-    const { startWorkflowWorkers } = require("./modules/workflow/workflowWorkers");
-    await startWorkflowWorkers();
+    const { startAllListeners } = require("./config/startup");
+    await startAllListeners();
   } catch (error) {
-    Logger.log("warning", { message: "workflow workers not started", params: { error: error.message } });
+    Logger.log("warning", { message: "listeners not started", params: { error: error.message } });
   }
 });
 
@@ -294,10 +299,10 @@ httpServer.listen(port, async () => {
 process.on("SIGINT", async () => {
   Logger.log("info", { message: "shutting down server" });
 
-  // Stop workflow workers
+  // Stop all listeners
   try {
-    const { stopWorkflowWorkers } = require("./modules/workflow/workflowWorkers");
-    await stopWorkflowWorkers();
+    const { stopAllListeners } = require("./config/startup");
+    await stopAllListeners();
   } catch (error) {
     // Ignore cleanup errors
   }

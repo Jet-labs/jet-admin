@@ -237,6 +237,18 @@ export const MainDrawerList = () => {
     },
     {
       type: "link",
+      title: "Subscriptions", // We should add to constants, but inline for now
+      icon: TbCloudDataConnection, // Or another icon
+      path: CONSTANTS.ROUTES.VIEW_SUBSCRIPTIONS.path(tenantID),
+    },
+    {
+      type: "link",
+      title: "Webhooks",
+      icon: TbCloudDataConnection,
+      path: CONSTANTS.ROUTES.VIEW_WEBHOOKS.path(tenantID),
+    },
+    {
+      type: "link",
       title: CONSTANTS.STRINGS.MAIN_DRAWER_API_KEYS_TITLE,
       icon: FaKey,
       path: CONSTANTS.ROUTES.VIEW_API_KEYS.path(tenantID),

@@ -1,7 +1,7 @@
 /**
- * Task Worker
+ * Task Listener
  * Consumes node execution jobs from the queue, runs the appropriate handler,
- * and reports results back to the orchestrator via the results queue.
+ * and reports results back to the workflow engine via the results queue.
  *
  * Key improvements vs previous version:
  *  - Context is only refetched from DB when the job is tagged as a join node
@@ -12,11 +12,11 @@
  *  - registerTaskWorker is now awaited (pg-boss is async).
  */
 
-const { registerTaskWorker, addResult, addNodeJob } = require('../../../config/queue.config');
-const { getHandler } = require('./handlers');
-const { resolveTemplate: sharedResolveTemplate } = require('../../../utils/templateEngine');
-const { stateManager } = require('../orchestrator/stateManager');
-const Logger = require('../../../utils/logger');
+const { registerTaskWorker, addResult, addNodeJob } = require("../../../config/queue.config");
+const { getHandler } = require('../handlers');
+const { resolveTemplate: sharedResolveTemplate } = require("../../../utils/templateEngine");
+const { stateManager } = require('../workflowEngine/stateManager');
+const Logger = require("../../../utils/logger");
 
 const WORKFLOW_TEMPLATE_OPTIONS = {
   allowedRoots: ['ctx'],
@@ -32,14 +32,14 @@ const DEFAULT_NODE_TIMEOUT_MS = 30_000;
  * Register the task worker with the queue.
  * Must be awaited — pg-boss.work() returns a Promise.
  */
-async function startTaskWorker() {
-  Logger.log('info', { message: 'taskWorker:starting' });
+async function startTaskListener() {
+  Logger.log('info', { message: 'taskListener:starting' });
 
   await registerTaskWorker(async (jobData) => {
     await _processJob(jobData);
   });
 
-  Logger.log('success', { message: 'taskWorker:started' });
+  Logger.log('success', { message: 'taskListener:started' });
 }
 
 // ─── Job processor ────────────────────────────────────────────────────────────
@@ -192,4 +192,4 @@ function _withTimeout(promise, ms, message = `Operation timed out after ${ms}ms`
   ]);
 }
 
-module.exports = { startTaskWorker };
+module.exports = { startTaskListener };

@@ -2,7 +2,7 @@
  * Data Query Node Handler
  * Executes database queries using the QueryEngine
  */
-const { createQueryEngine } = require('../../../dataQuery/queryEngine/queryExecution.adapter');
+const { createQueryEngine } = require("../../dataQuery/dataQuery.service");
 const { ERROR_HANDLING, NEXT_HANDLE } = require('./constants');
 
 async function execute(nodeConfig, context, helpers) {

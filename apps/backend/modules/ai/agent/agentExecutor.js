@@ -10,7 +10,7 @@
  */
 
 const { OpenAI } = require('openai');
-const Logger = require('../../../utils/logger');
+const Logger = require("../../../utils/logger");
 const environmentVariables = require('../../../environment');
 const { agentSession } = require('./agentSession');
 const { AGENT_TOOL_DECLARATIONS, TOOL_NAMES } = require('./agentTools');

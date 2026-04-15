@@ -246,4 +246,51 @@ export default class KafkaDataSource extends DataSource {
       await admin.disconnect();
     }
   }
+
+  async subscribe(config, onEvent) {
+    const { topic, consumerGroup, fromBeginning = false } = config;
+    const kafka = this.getKafkaClient();
+    const consumer = kafka.consumer({ groupId: consumerGroup || `jet-admin-sub-${Date.now()}` });
+
+    await consumer.connect();
+    await consumer.subscribe({ topic, fromBeginning });
+
+    // Do not await this. It runs continuously.
+    consumer.run({
+      eachMessage: async ({ topic, partition, message }) => {
+        let payload;
+        const msgStr = message.value?.toString();
+        try {
+          payload = JSON.parse(msgStr);
+        } catch {
+          payload = msgStr;
+        }
+
+        const event = {
+          topic,
+          partition,
+          key: message.key?.toString(),
+          payload,
+          timestamp: message.timestamp,
+        };
+
+        if (onEvent) {
+          await onEvent(event);
+        }
+      },
+    }).catch(err => {
+      Logger.log("error", {
+        message: "kafka:KafkaDataSource:subscribe:runError",
+        params: { topic, consumerGroup, error: err.message },
+      });
+    });
+
+    return consumer; // Return consumer as handle
+  }
+
+  async unsubscribe(consumer) {
+    if (consumer) {
+      await consumer.disconnect();
+    }
+  }
 }

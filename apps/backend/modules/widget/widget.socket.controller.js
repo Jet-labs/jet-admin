@@ -7,11 +7,11 @@
  * - Handle interactive inputs
  * - Manage disconnections
  */
-const Logger = require('../../utils/logger');
+const Logger = require("../../utils/logger");
 const { widgetWorkflowBridge } = require('./widgetWorkflowBridge');
 const { workflowService } = require('../workflow/workflow.service');
-const { stateManager } = require('../workflow/orchestrator/stateManager');
-const orchestrator = require('../workflow/orchestrator/orchestrator');
+const { stateManager } = require('../workflow/workflowEngine/stateManager');
+const orchestrator = require('../workflow/workflowEngine/engine');
 
 /**
  * Widget Socket Controller

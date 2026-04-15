@@ -5,9 +5,9 @@
  * the DAG exactly as if the node had completed normally.
  */
 
-const { addResult } = require('../../../config/queue.config');
-const { stateManager } = require('../orchestrator/stateManager');
-const Logger = require('../../../utils/logger');
+const { addResult } = require("../../../config/queue.config");
+const { stateManager } = require('../workflowEngine/stateManager');
+const Logger = require("../../../utils/logger");
 
 const dataCollectionService = {};
 

@@ -39,8 +39,10 @@ var WorkflowNodesContext = createContext(null);
 var WorkflowNodesProvider = ({
   children,
   dataQueries,
+  datasources = [],
   strings = {},
   onRefreshDataQueries,
+  onRefreshDatasources,
   workflowNodes = [],
   workflowEdges = [],
   // Edges for DAG traversal
@@ -55,8 +57,10 @@ var WorkflowNodesProvider = ({
 }) => {
   return /* @__PURE__ */ React.createElement(WorkflowNodesContext.Provider, { value: {
     dataQueries,
+    datasources,
     strings,
     onRefreshDataQueries,
+    onRefreshDatasources,
     workflowNodes,
     workflowEdges,
     workflowInputArgs,
@@ -1956,7 +1960,7 @@ var EndNode = memo7(({ id, data, isConnectable }) => {
 });
 
 // src/map.js
-import React11 from "react";
+import React13 from "react";
 
 // src/nodes/dataCollectionNode.jsx
 import React10, { memo as memo8, useState as useState8, useEffect as useEffect8, useCallback as useCallback8, useMemo as useMemo8 } from "react";
@@ -2291,10 +2295,496 @@ var DataCollectionNode = memo8(({ id, data, isConnectable }) => {
   ));
 });
 
+// src/nodes/connectorPullNode.jsx
+import React11, { memo as memo9, useState as useState9, useEffect as useEffect9, useMemo as useMemo9, useCallback as useCallback9 } from "react";
+import { Handle as Handle9, Position as Position9 } from "reactflow";
+import { JsonForms as JsonForms7 } from "@jsonforms/react";
+import { TbRefresh as TbRefresh4, TbPlugConnected } from "react-icons/tb";
+import { VscDebugDisconnect as VscDebugDisconnect7 } from "react-icons/vsc";
+import { Button as Button9 } from "@jet-admin/ui";
+var ERROR_HANDLING_OPTIONS5 = {
+  FAIL_WORKFLOW: "fail_workflow",
+  CONTINUE: "continue"
+};
+var getConnectorArgs = (datasourceType) => {
+  if (!datasourceType) return [{ key: "payload", type: "object" }];
+  const t = datasourceType.toLowerCase();
+  if (["postgresql", "mysql", "mssql", "oracle", "snowflake", "bigquery", "redshift", "sqlite"].includes(t)) {
+    return [
+      { key: "query", type: "string" },
+      { key: "values", type: "object" }
+    ];
+  }
+  if (["restapi", "api", "http"].includes(t)) {
+    return [
+      { key: "method", type: "string" },
+      { key: "url", type: "string" },
+      { key: "headers", type: "object" },
+      { key: "body", type: "object" },
+      { key: "params", type: "object" }
+    ];
+  }
+  if (t === "graphql") {
+    return [
+      { key: "query", type: "string" },
+      { key: "variables", type: "object" }
+    ];
+  }
+  if (["mongodb", "dynamodb", "elasticsearch"].includes(t)) {
+    return [
+      { key: "collection", type: "string" },
+      { key: "operation", type: "string" },
+      { key: "query", type: "object" }
+    ];
+  }
+  return [{ key: "payload", type: "object" }];
+};
+var ConnectorPullNodeConfigurator = ({ data, onChange, nodeId }) => {
+  const { datasources, strings, onRefreshDatasources, workflowNodes, workflowEdges, workflowInputArgs } = useWorkflowNodes();
+  const [formData, setFormData] = useState9({
+    title: data?.title || "Connector Pull",
+    description: data?.description || "",
+    datasourceID: data?.datasourceID || "",
+    input: data?.input || {},
+    outputVariable: data?.outputVariable || "connectorResult",
+    includeEventMetadata: data?.includeEventMetadata ?? false,
+    timeoutSeconds: data?.timeoutSeconds ?? 300,
+    errorHandling: data?.errorHandling || ERROR_HANDLING_OPTIONS5.FAIL_WORKFLOW,
+    isDisabled: data?.isDisabled ?? false
+  });
+  useEffect9(() => {
+    if (data) {
+      setFormData({
+        title: data.title || "Connector Pull",
+        description: data.description || "",
+        datasourceID: data.datasourceID || "",
+        input: data.input || {},
+        outputVariable: data.outputVariable || "connectorResult",
+        includeEventMetadata: data.includeEventMetadata ?? false,
+        timeoutSeconds: data.timeoutSeconds ?? 300,
+        errorHandling: data.errorHandling || ERROR_HANDLING_OPTIONS5.FAIL_WORKFLOW,
+        isDisabled: data.isDisabled ?? false
+      });
+    }
+  }, [data]);
+  const datasourceEnums = useMemo9(() => {
+    return datasources?.map((ds) => String(ds.datasourceID)) || [""];
+  }, [datasources]);
+  const datasourceEnumLabels = useMemo9(() => {
+    return datasources?.reduce((acc, ds) => {
+      acc[String(ds.datasourceID)] = `${ds.datasourceTitle} (${ds.datasourceType})`;
+      return acc;
+    }, {}) || {};
+  }, [datasources]);
+  const selectedDatasource = useMemo9(() => {
+    return datasources?.find((ds) => String(ds.datasourceID) === String(formData.datasourceID)) || null;
+  }, [datasources, formData.datasourceID]);
+  const dynamicArgs = useMemo9(() => {
+    if (!selectedDatasource) return [{ key: "payload", type: "object" }];
+    return getConnectorArgs(selectedDatasource.datasourceType);
+  }, [selectedDatasource]);
+  const schema = useMemo9(() => ({
+    type: "object",
+    properties: {
+      title: { type: "string", title: "Node Title" },
+      description: { type: "string", title: "Description" },
+      datasourceID: {
+        type: "string",
+        title: "Datasource",
+        enum: datasourceEnums.length > 0 ? datasourceEnums : [""]
+      },
+      input: {
+        type: "object",
+        title: "Input Parameters"
+      },
+      outputVariable: {
+        type: "string",
+        title: "Output Variable Name",
+        pattern: "^[a-zA-Z_][a-zA-Z0-9_]*$",
+        default: "connectorResult"
+      },
+      includeEventMetadata: {
+        type: "boolean",
+        title: "Include Event Metadata",
+        default: false
+      },
+      timeoutSeconds: {
+        type: "integer",
+        title: "Timeout (seconds)",
+        minimum: 1,
+        maximum: 3600,
+        default: 300
+      },
+      errorHandling: {
+        type: "string",
+        title: "Error Behavior",
+        enum: Object.values(ERROR_HANDLING_OPTIONS5)
+      },
+      isDisabled: {
+        type: "boolean",
+        title: "Skip this node",
+        default: false
+      }
+    },
+    required: ["datasourceID"]
+  }), [datasourceEnums]);
+  const uischema = useMemo9(() => ({
+    type: "Categorization",
+    elements: [
+      {
+        type: "Category",
+        label: "General",
+        elements: [
+          { type: "Control", scope: "#/properties/title", options: { placeholder: "e.g., Fetch Orders" } },
+          { type: "Control", scope: "#/properties/description", options: { multi: true, rows: 2, placeholder: "Describe what this connector pull does..." } },
+          {
+            type: "Control",
+            scope: "#/properties/datasourceID",
+            options: {
+              placeholder: "Select a datasource",
+              enumLabels: datasourceEnumLabels,
+              showRefreshButton: !!onRefreshDatasources,
+              onRefresh: onRefreshDatasources
+            }
+          },
+          {
+            type: "Control",
+            scope: "#/properties/input",
+            options: {
+              isDynamicArgs: true,
+              args: dynamicArgs,
+              workflowNodes,
+              workflowEdges,
+              workflowInputArgs,
+              currentNodeId: nodeId
+            }
+          }
+        ]
+      },
+      {
+        type: "Category",
+        label: "Output",
+        elements: [
+          { type: "Control", scope: "#/properties/outputVariable", options: { placeholder: "e.g., connectorResult" } },
+          { type: "Control", scope: "#/properties/includeEventMetadata" }
+        ]
+      },
+      {
+        type: "Category",
+        label: "Advanced",
+        elements: [
+          { type: "Control", scope: "#/properties/timeoutSeconds" },
+          {
+            type: "Control",
+            scope: "#/properties/errorHandling",
+            options: {
+              enumLabels: {
+                [ERROR_HANDLING_OPTIONS5.FAIL_WORKFLOW]: "Fail Workflow",
+                [ERROR_HANDLING_OPTIONS5.CONTINUE]: "Continue (ignore error)"
+              }
+            }
+          },
+          { type: "Control", scope: "#/properties/isDisabled" }
+        ]
+      }
+    ]
+  }), [datasourceEnumLabels, workflowNodes, workflowEdges, workflowInputArgs, nodeId, onRefreshDatasources, dynamicArgs]);
+  const handleFormChange = useCallback9(({ data: newData }) => {
+    setFormData(newData);
+  }, []);
+  const handleSave = useCallback9(() => {
+    onChange(formData);
+  }, [onChange, formData]);
+  return /* @__PURE__ */ React11.createElement("div", { className: "w-full space-y-3" }, /* @__PURE__ */ React11.createElement(JsonForms7, { schema, uischema, data: formData, renderers: jetFormsRenderers, onChange: handleFormChange }), selectedDatasource && /* @__PURE__ */ React11.createElement("div", { className: "rounded-lg border border-teal-200 bg-teal-50 p-2.5 text-[10px] text-teal-800" }, /* @__PURE__ */ React11.createElement("div", { className: "font-semibold text-xs" }, "\u2705 ", selectedDatasource.datasourceTitle), /* @__PURE__ */ React11.createElement("div", { className: "mt-0.5 text-teal-600" }, "Type: ", selectedDatasource.datasourceType)), /* @__PURE__ */ React11.createElement("div", { className: "rounded-lg border border-border bg-muted/30 p-3 text-[10px] text-muted-foreground space-y-2" }, /* @__PURE__ */ React11.createElement("div", { className: "font-semibold text-xs text-foreground" }, "\u{1F50C} Connector Pull"), /* @__PURE__ */ React11.createElement("div", null, /* @__PURE__ */ React11.createElement("span", { className: "font-medium text-foreground" }, "How it works:"), /* @__PURE__ */ React11.createElement("div", { className: "ml-3 mt-0.5 space-y-0.5" }, /* @__PURE__ */ React11.createElement("div", null, "Fetches data from a datasource via the Integration Fabric."), /* @__PURE__ */ React11.createElement("div", null, "Supports all connector types (databases, APIs, etc.)."))), /* @__PURE__ */ React11.createElement("div", null, /* @__PURE__ */ React11.createElement("span", { className: "font-medium text-foreground" }, "Input Format:"), /* @__PURE__ */ React11.createElement("div", { className: "ml-3 mt-0.5 font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ React11.createElement("div", null, /* @__PURE__ */ React11.createElement("code", { className: "bg-background px-1 rounded border border-border" }, "{{ctx.input.userId}}"), " \u2192 pass workflow input"), /* @__PURE__ */ React11.createElement("div", null, /* @__PURE__ */ React11.createElement("code", { className: "bg-background px-1 rounded border border-border" }, "{{ctx.queryResult.id}}"), " \u2192 from previous node"))), /* @__PURE__ */ React11.createElement("div", null, /* @__PURE__ */ React11.createElement("span", { className: "font-medium text-foreground" }, "Result:"), /* @__PURE__ */ React11.createElement("div", { className: "ml-3 mt-0.5" }, "Stored in ", /* @__PURE__ */ React11.createElement("code", { className: "bg-background px-1 py-0.5 rounded border border-border font-mono" }, "ctx.{outputVariable}")))), /* @__PURE__ */ React11.createElement(Button9, { type: "button", onClick: handleSave, className: "w-full" }, "Save"));
+};
+var ConnectorPullNode = memo9(({ id, data, isConnectable }) => {
+  const { nodeExecutionStatus, datasources } = useWorkflowNodes();
+  const executionStatus = nodeExecutionStatus?.[id] || "idle";
+  const isDisabled = data?.isDisabled ?? false;
+  const datasourceLabel = useMemo9(() => {
+    if (!data?.datasourceID) return "Select Datasource";
+    const ds = datasources?.find((d) => String(d.datasourceID) === String(data.datasourceID));
+    return ds ? `${ds.datasourceTitle}` : "Unknown Datasource";
+  }, [data?.datasourceID, datasources]);
+  const datasourceType = useMemo9(() => {
+    if (!data?.datasourceID) return null;
+    const ds = datasources?.find((d) => String(d.datasourceID) === String(data.datasourceID));
+    return ds?.datasourceType || null;
+  }, [data?.datasourceID, datasources]);
+  const getStatusStyles2 = () => {
+    switch (executionStatus) {
+      case "running":
+        return "border-teal-400 ring-2 ring-teal-300 ring-opacity-50 animate-pulse";
+      case "completed":
+        return "border-green-400 ring-2 ring-green-300 ring-opacity-50";
+      case "failed":
+        return "border-red-400 ring-2 ring-red-300 ring-opacity-50";
+      case "skipped":
+        return "border-orange-300 opacity-60";
+      default:
+        return "border-slate-200 hover:border-teal-400 hover:shadow-md";
+    }
+  };
+  const StatusIndicator2 = () => {
+    if (executionStatus === "running") return /* @__PURE__ */ React11.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-teal-500 rounded-full flex items-center justify-center animate-spin" }, /* @__PURE__ */ React11.createElement(TbRefresh4, { className: "w-3 h-3 text-white" }));
+    if (executionStatus === "completed") return /* @__PURE__ */ React11.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center" }, /* @__PURE__ */ React11.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React11.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" })));
+    if (executionStatus === "failed") return /* @__PURE__ */ React11.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center" }, /* @__PURE__ */ React11.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React11.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M6 18L18 6M6 6l12 12" })));
+    return null;
+  };
+  return /* @__PURE__ */ React11.createElement("div", { className: `relative bg-white border rounded min-w-[340px] max-w-[400px] transition-all duration-150 ${isDisabled ? "border-slate-200 opacity-50" : getStatusStyles2()} ${!data.datasourceID ? "!border-red-400 !bg-red-50" : ""}` }, /* @__PURE__ */ React11.createElement(StatusIndicator2, null), /* @__PURE__ */ React11.createElement("div", { className: "flex items-stretch" }, /* @__PURE__ */ React11.createElement(
+    "div",
+    {
+      style: { borderTopLeftRadius: "0.25rem", borderBottomLeftRadius: "0.25rem" },
+      className: `flex flex-col items-center justify-center px-3 py-3 border-r ${isDisabled ? "bg-slate-50 border-slate-100" : executionStatus === "running" ? "bg-teal-100 border-teal-200" : executionStatus === "completed" ? "bg-green-50 border-green-100" : executionStatus === "failed" ? "bg-red-50 border-red-100" : "bg-teal-50 border-teal-100"}`
+    },
+    /* @__PURE__ */ React11.createElement(TbPlugConnected, { className: `w-5 h-5 ${isDisabled ? "text-slate-400" : executionStatus === "running" ? "text-teal-600" : executionStatus === "completed" ? "text-green-600" : executionStatus === "failed" ? "text-red-600" : "text-teal-500"}` })
+  ), /* @__PURE__ */ React11.createElement("div", { className: "flex-1 px-3 py-2 min-w-0" }, /* @__PURE__ */ React11.createElement("div", { className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ React11.createElement("span", { className: `text-xs font-semibold truncate ${isDisabled ? "text-slate-400 line-through" : "text-slate-700"}` }, data?.title || "Connector Pull"), isDisabled && /* @__PURE__ */ React11.createElement("span", { className: "inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded border border-orange-200" }, /* @__PURE__ */ React11.createElement(VscDebugDisconnect7, { className: "w-2.5 h-2.5" }), "Skip")), /* @__PURE__ */ React11.createElement("div", { className: `text-sm truncate mt-0.5 ${isDisabled ? "text-slate-300" : "text-slate-500"}` }, datasourceLabel.length > 24 ? `${datasourceLabel.substring(0, 24)}...` : datasourceLabel), datasourceType && /* @__PURE__ */ React11.createElement("div", { className: `text-[9px] mt-0.5 font-medium ${isDisabled ? "text-slate-300" : "text-teal-500"}` }, datasourceType)), /* @__PURE__ */ React11.createElement("div", { className: "flex flex-col items-center justify-center px-2 border-l border-slate-100" }, /* @__PURE__ */ React11.createElement("div", { className: `w-2 h-2 rounded-full mb-1 ${isDisabled ? "bg-slate-300" : "bg-green-400"}`, title: "Success" }), /* @__PURE__ */ React11.createElement("div", { className: `w-2 h-2 rounded-full ${isDisabled ? "bg-slate-300" : "bg-red-400"}`, title: "Error" }))), /* @__PURE__ */ React11.createElement(Handle9, { type: "target", position: Position9.Top, isConnectable, style: { width: "10px", height: "10px", backgroundColor: isDisabled ? "#cbd5e1" : "#14b8a6", border: "none", top: "-5px" } }), /* @__PURE__ */ React11.createElement(Handle9, { type: "source", position: Position9.Bottom, id: "success", isConnectable, style: { left: "35%", width: "10px", height: "10px", backgroundColor: isDisabled ? "#cbd5e1" : "#22c55e", border: "none", bottom: "-5px" } }), /* @__PURE__ */ React11.createElement(Handle9, { type: "source", position: Position9.Bottom, id: "error", isConnectable, style: { left: "65%", width: "10px", height: "10px", backgroundColor: isDisabled ? "#cbd5e1" : "#ef4444", border: "none", bottom: "-5px" } }));
+});
+
+// src/nodes/connectorPushNode.jsx
+import React12, { memo as memo10, useState as useState10, useEffect as useEffect10, useMemo as useMemo10, useCallback as useCallback10 } from "react";
+import { Handle as Handle10, Position as Position10 } from "reactflow";
+import { JsonForms as JsonForms8 } from "@jsonforms/react";
+import { TbRefresh as TbRefresh5, TbSend } from "react-icons/tb";
+import { VscDebugDisconnect as VscDebugDisconnect8 } from "react-icons/vsc";
+import { Button as Button10 } from "@jet-admin/ui";
+var ERROR_HANDLING_OPTIONS6 = {
+  FAIL_WORKFLOW: "fail_workflow",
+  CONTINUE: "continue"
+};
+var getConnectorArgs2 = (datasourceType) => {
+  if (!datasourceType) return [{ key: "payload", type: "object" }];
+  const t = datasourceType.toLowerCase();
+  if (["postgresql", "mysql", "mssql", "oracle", "snowflake", "bigquery", "redshift", "sqlite"].includes(t)) {
+    return [
+      { key: "query", type: "string" },
+      { key: "values", type: "object" }
+    ];
+  }
+  if (["restapi", "api", "http"].includes(t)) {
+    return [
+      { key: "method", type: "string" },
+      { key: "url", type: "string" },
+      { key: "headers", type: "object" },
+      { key: "body", type: "object" },
+      { key: "params", type: "object" }
+    ];
+  }
+  if (t === "graphql") {
+    return [
+      { key: "query", type: "string" },
+      { key: "variables", type: "object" }
+    ];
+  }
+  if (["mongodb", "dynamodb", "elasticsearch"].includes(t)) {
+    return [
+      { key: "collection", type: "string" },
+      { key: "operation", type: "string" },
+      { key: "query", type: "object" }
+    ];
+  }
+  return [{ key: "payload", type: "object" }];
+};
+var ConnectorPushNodeConfigurator = ({ data, onChange, nodeId }) => {
+  const { datasources, strings, onRefreshDatasources, workflowNodes, workflowEdges, workflowInputArgs } = useWorkflowNodes();
+  const [formData, setFormData] = useState10({
+    title: data?.title || "Connector Push",
+    description: data?.description || "",
+    datasourceID: data?.datasourceID || "",
+    input: data?.input || {},
+    outputVariable: data?.outputVariable || "pushResult",
+    timeoutSeconds: data?.timeoutSeconds ?? 300,
+    errorHandling: data?.errorHandling || ERROR_HANDLING_OPTIONS6.FAIL_WORKFLOW,
+    isDisabled: data?.isDisabled ?? false
+  });
+  useEffect10(() => {
+    if (data) {
+      setFormData({
+        title: data.title || "Connector Push",
+        description: data.description || "",
+        datasourceID: data.datasourceID || "",
+        input: data.input || {},
+        outputVariable: data.outputVariable || "pushResult",
+        timeoutSeconds: data.timeoutSeconds ?? 300,
+        errorHandling: data.errorHandling || ERROR_HANDLING_OPTIONS6.FAIL_WORKFLOW,
+        isDisabled: data.isDisabled ?? false
+      });
+    }
+  }, [data]);
+  const datasourceEnums = useMemo10(() => {
+    return datasources?.map((ds) => String(ds.datasourceID)) || [""];
+  }, [datasources]);
+  const datasourceEnumLabels = useMemo10(() => {
+    return datasources?.reduce((acc, ds) => {
+      acc[String(ds.datasourceID)] = `${ds.datasourceTitle} (${ds.datasourceType})`;
+      return acc;
+    }, {}) || {};
+  }, [datasources]);
+  const selectedDatasource = useMemo10(() => {
+    return datasources?.find((ds) => String(ds.datasourceID) === String(formData.datasourceID)) || null;
+  }, [datasources, formData.datasourceID]);
+  const dynamicArgs = useMemo10(() => {
+    if (!selectedDatasource) return [{ key: "payload", type: "object" }];
+    return getConnectorArgs2(selectedDatasource.datasourceType);
+  }, [selectedDatasource]);
+  const schema = useMemo10(() => ({
+    type: "object",
+    properties: {
+      title: { type: "string", title: "Node Title" },
+      description: { type: "string", title: "Description" },
+      datasourceID: {
+        type: "string",
+        title: "Datasource",
+        enum: datasourceEnums.length > 0 ? datasourceEnums : [""]
+      },
+      input: {
+        type: "object",
+        title: "Payload / Parameters"
+      },
+      outputVariable: {
+        type: "string",
+        title: "Output Variable Name",
+        pattern: "^[a-zA-Z_][a-zA-Z0-9_]*$",
+        default: "pushResult"
+      },
+      timeoutSeconds: {
+        type: "integer",
+        title: "Timeout (seconds)",
+        minimum: 1,
+        maximum: 3600,
+        default: 300
+      },
+      errorHandling: {
+        type: "string",
+        title: "Error Behavior",
+        enum: Object.values(ERROR_HANDLING_OPTIONS6)
+      },
+      isDisabled: {
+        type: "boolean",
+        title: "Skip this node",
+        default: false
+      }
+    },
+    required: ["datasourceID"]
+  }), [datasourceEnums]);
+  const uischema = useMemo10(() => ({
+    type: "Categorization",
+    elements: [
+      {
+        type: "Category",
+        label: "General",
+        elements: [
+          { type: "Control", scope: "#/properties/title", options: { placeholder: "e.g., Send Slack Message" } },
+          { type: "Control", scope: "#/properties/description", options: { multi: true, rows: 2, placeholder: "Describe what this connector push does..." } },
+          {
+            type: "Control",
+            scope: "#/properties/datasourceID",
+            options: {
+              placeholder: "Select a datasource",
+              enumLabels: datasourceEnumLabels,
+              showRefreshButton: !!onRefreshDatasources,
+              onRefresh: onRefreshDatasources
+            }
+          },
+          {
+            type: "Control",
+            scope: "#/properties/input",
+            options: {
+              isDynamicArgs: true,
+              args: dynamicArgs,
+              workflowNodes,
+              workflowEdges,
+              workflowInputArgs,
+              currentNodeId: nodeId
+            }
+          }
+        ]
+      },
+      {
+        type: "Category",
+        label: "Output",
+        elements: [
+          { type: "Control", scope: "#/properties/outputVariable", options: { placeholder: "e.g., pushResult" } }
+        ]
+      },
+      {
+        type: "Category",
+        label: "Advanced",
+        elements: [
+          { type: "Control", scope: "#/properties/timeoutSeconds" },
+          {
+            type: "Control",
+            scope: "#/properties/errorHandling",
+            options: {
+              enumLabels: {
+                [ERROR_HANDLING_OPTIONS6.FAIL_WORKFLOW]: "Fail Workflow",
+                [ERROR_HANDLING_OPTIONS6.CONTINUE]: "Continue (ignore error)"
+              }
+            }
+          },
+          { type: "Control", scope: "#/properties/isDisabled" }
+        ]
+      }
+    ]
+  }), [datasourceEnumLabels, workflowNodes, workflowEdges, workflowInputArgs, nodeId, onRefreshDatasources, dynamicArgs]);
+  const handleFormChange = useCallback10(({ data: newData }) => {
+    setFormData(newData);
+  }, []);
+  const handleSave = useCallback10(() => {
+    onChange(formData);
+  }, [onChange, formData]);
+  return /* @__PURE__ */ React12.createElement("div", { className: "w-full space-y-3" }, /* @__PURE__ */ React12.createElement(JsonForms8, { schema, uischema, data: formData, renderers: jetFormsRenderers, onChange: handleFormChange }), selectedDatasource && /* @__PURE__ */ React12.createElement("div", { className: "rounded-lg border border-purple-200 bg-purple-50 p-2.5 text-[10px] text-purple-800" }, /* @__PURE__ */ React12.createElement("div", { className: "font-semibold text-xs" }, "\u2705 ", selectedDatasource.datasourceTitle), /* @__PURE__ */ React12.createElement("div", { className: "mt-0.5 text-purple-600" }, "Type: ", selectedDatasource.datasourceType)), /* @__PURE__ */ React12.createElement("div", { className: "rounded-lg border border-border bg-muted/30 p-3 text-[10px] text-muted-foreground space-y-2" }, /* @__PURE__ */ React12.createElement("div", { className: "font-semibold text-xs text-foreground" }, "\u{1F4E4} Connector Push"), /* @__PURE__ */ React12.createElement("div", null, /* @__PURE__ */ React12.createElement("span", { className: "font-medium text-foreground" }, "How it works:"), /* @__PURE__ */ React12.createElement("div", { className: "ml-3 mt-0.5 space-y-0.5" }, /* @__PURE__ */ React12.createElement("div", null, "Sends data to a datasource via the Integration Fabric."), /* @__PURE__ */ React12.createElement("div", null, "Use for: DB inserts, API calls, Kafka produce, Slack messages, etc."))), /* @__PURE__ */ React12.createElement("div", null, /* @__PURE__ */ React12.createElement("span", { className: "font-medium text-foreground" }, "Payload Format:"), /* @__PURE__ */ React12.createElement("div", { className: "ml-3 mt-0.5 font-mono text-[9px] space-y-0.5" }, /* @__PURE__ */ React12.createElement("div", null, /* @__PURE__ */ React12.createElement("code", { className: "bg-background px-1 rounded border border-border" }, "{{ctx.connectorResult}}"), " \u2192 forward previous result"), /* @__PURE__ */ React12.createElement("div", null, /* @__PURE__ */ React12.createElement("code", { className: "bg-background px-1 rounded border border-border" }, "{{ctx.input.message}}"), " \u2192 from workflow input")))), /* @__PURE__ */ React12.createElement(Button10, { type: "button", onClick: handleSave, className: "w-full" }, "Save"));
+};
+var ConnectorPushNode = memo10(({ id, data, isConnectable }) => {
+  const { nodeExecutionStatus, datasources } = useWorkflowNodes();
+  const executionStatus = nodeExecutionStatus?.[id] || "idle";
+  const isDisabled = data?.isDisabled ?? false;
+  const datasourceLabel = useMemo10(() => {
+    if (!data?.datasourceID) return "Select Datasource";
+    const ds = datasources?.find((d) => String(d.datasourceID) === String(data.datasourceID));
+    return ds ? `${ds.datasourceTitle}` : "Unknown Datasource";
+  }, [data?.datasourceID, datasources]);
+  const datasourceType = useMemo10(() => {
+    if (!data?.datasourceID) return null;
+    const ds = datasources?.find((d) => String(d.datasourceID) === String(data.datasourceID));
+    return ds?.datasourceType || null;
+  }, [data?.datasourceID, datasources]);
+  const getStatusStyles2 = () => {
+    switch (executionStatus) {
+      case "running":
+        return "border-purple-400 ring-2 ring-purple-300 ring-opacity-50 animate-pulse";
+      case "completed":
+        return "border-green-400 ring-2 ring-green-300 ring-opacity-50";
+      case "failed":
+        return "border-red-400 ring-2 ring-red-300 ring-opacity-50";
+      case "skipped":
+        return "border-orange-300 opacity-60";
+      default:
+        return "border-slate-200 hover:border-purple-400 hover:shadow-md";
+    }
+  };
+  const StatusIndicator2 = () => {
+    if (executionStatus === "running") return /* @__PURE__ */ React12.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-purple-500 rounded-full flex items-center justify-center animate-spin" }, /* @__PURE__ */ React12.createElement(TbRefresh5, { className: "w-3 h-3 text-white" }));
+    if (executionStatus === "completed") return /* @__PURE__ */ React12.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-green-500 rounded-full flex items-center justify-center" }, /* @__PURE__ */ React12.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React12.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M5 13l4 4L19 7" })));
+    if (executionStatus === "failed") return /* @__PURE__ */ React12.createElement("div", { className: "absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center" }, /* @__PURE__ */ React12.createElement("svg", { className: "w-3 h-3 text-white", fill: "none", viewBox: "0 0 24 24", stroke: "currentColor" }, /* @__PURE__ */ React12.createElement("path", { strokeLinecap: "round", strokeLinejoin: "round", strokeWidth: 3, d: "M6 18L18 6M6 6l12 12" })));
+    return null;
+  };
+  return /* @__PURE__ */ React12.createElement("div", { className: `relative bg-white border rounded min-w-[340px] max-w-[400px] transition-all duration-150 ${isDisabled ? "border-slate-200 opacity-50" : getStatusStyles2()} ${!data.datasourceID ? "!border-red-400 !bg-red-50" : ""}` }, /* @__PURE__ */ React12.createElement(StatusIndicator2, null), /* @__PURE__ */ React12.createElement("div", { className: "flex items-stretch" }, /* @__PURE__ */ React12.createElement(
+    "div",
+    {
+      style: { borderTopLeftRadius: "0.25rem", borderBottomLeftRadius: "0.25rem" },
+      className: `flex flex-col items-center justify-center px-3 py-3 border-r ${isDisabled ? "bg-slate-50 border-slate-100" : executionStatus === "running" ? "bg-purple-100 border-purple-200" : executionStatus === "completed" ? "bg-green-50 border-green-100" : executionStatus === "failed" ? "bg-red-50 border-red-100" : "bg-purple-50 border-purple-100"}`
+    },
+    /* @__PURE__ */ React12.createElement(TbSend, { className: `w-5 h-5 ${isDisabled ? "text-slate-400" : executionStatus === "running" ? "text-purple-600" : executionStatus === "completed" ? "text-green-600" : executionStatus === "failed" ? "text-red-600" : "text-purple-500"}` })
+  ), /* @__PURE__ */ React12.createElement("div", { className: "flex-1 px-3 py-2 min-w-0" }, /* @__PURE__ */ React12.createElement("div", { className: "flex items-center justify-between gap-2" }, /* @__PURE__ */ React12.createElement("span", { className: `text-xs font-semibold truncate ${isDisabled ? "text-slate-400 line-through" : "text-slate-700"}` }, data?.title || "Connector Push"), isDisabled && /* @__PURE__ */ React12.createElement("span", { className: "inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded border border-orange-200" }, /* @__PURE__ */ React12.createElement(VscDebugDisconnect8, { className: "w-2.5 h-2.5" }), "Skip")), /* @__PURE__ */ React12.createElement("div", { className: `text-sm truncate mt-0.5 ${isDisabled ? "text-slate-300" : "text-slate-500"}` }, datasourceLabel.length > 24 ? `${datasourceLabel.substring(0, 24)}...` : datasourceLabel), datasourceType && /* @__PURE__ */ React12.createElement("div", { className: `text-[9px] mt-0.5 font-medium ${isDisabled ? "text-slate-300" : "text-purple-500"}` }, datasourceType)), /* @__PURE__ */ React12.createElement("div", { className: "flex flex-col items-center justify-center px-2 border-l border-slate-100" }, /* @__PURE__ */ React12.createElement("div", { className: `w-2 h-2 rounded-full mb-1 ${isDisabled ? "bg-slate-300" : "bg-green-400"}`, title: "Success" }), /* @__PURE__ */ React12.createElement("div", { className: `w-2 h-2 rounded-full ${isDisabled ? "bg-slate-300" : "bg-red-400"}`, title: "Error" }))), /* @__PURE__ */ React12.createElement(Handle10, { type: "target", position: Position10.Top, isConnectable, style: { width: "10px", height: "10px", backgroundColor: isDisabled ? "#cbd5e1" : "#a855f7", border: "none", top: "-5px" } }), /* @__PURE__ */ React12.createElement(Handle10, { type: "source", position: Position10.Bottom, id: "success", isConnectable, style: { left: "35%", width: "10px", height: "10px", backgroundColor: isDisabled ? "#cbd5e1" : "#22c55e", border: "none", bottom: "-5px" } }), /* @__PURE__ */ React12.createElement(Handle10, { type: "source", position: Position10.Bottom, id: "error", isConnectable, style: { left: "65%", width: "10px", height: "10px", backgroundColor: isDisabled ? "#cbd5e1" : "#ef4444", border: "none", bottom: "-5px" } }));
+});
+
 // src/map.js
 var WORKFLOW_NODE_TYPES = {
   START: { value: "start", label: "Start" },
   DATA_QUERY: { value: "dataQuery", label: "Data Query" },
+  CONNECTOR_PULL: { value: "connectorPull", label: "Connector Pull" },
+  CONNECTOR_PUSH: { value: "connectorPush", label: "Connector Push" },
   JAVASCRIPT: { value: "javascript", label: "Javascript" },
   CONDITION: { value: "condition", label: "Condition" },
   LOOP: { value: "loop", label: "Loop" },
@@ -2804,11 +3294,114 @@ var WORKFLOW_NODES_MAP = {
         { type: "Control", scope: "#/properties/status" }
       ]
     }
+  },
+  [WORKFLOW_NODE_TYPES.CONNECTOR_PULL.value]: {
+    label: WORKFLOW_NODE_TYPES.CONNECTOR_PULL.label,
+    value: WORKFLOW_NODE_TYPES.CONNECTOR_PULL.value,
+    component: ConnectorPullNode,
+    configurator: ConnectorPullNodeConfigurator,
+    defaultValue: {
+      title: "Connector Pull",
+      description: "",
+      datasourceID: "",
+      input: {},
+      outputVariable: "connectorResult",
+      includeEventMetadata: false,
+      timeoutSeconds: 300,
+      errorHandling: "fail_workflow",
+      isDisabled: false
+    },
+    schema: {
+      type: "object",
+      properties: {
+        title: { type: "string", title: "Node Title" },
+        description: { type: "string", title: "Description" },
+        datasourceID: { type: "string", title: "Datasource ID" },
+        input: { type: "object", title: "Input Parameters" },
+        outputVariable: { type: "string", title: "Output Variable", pattern: "^[a-zA-Z_][a-zA-Z0-9_]*$", default: "connectorResult" },
+        includeEventMetadata: { type: "boolean", title: "Include Event Metadata", default: false },
+        timeoutSeconds: { type: "integer", title: "Timeout (seconds)", minimum: 1, maximum: 3600, default: 300 },
+        errorHandling: { type: "string", title: "Error Behavior", enum: ["fail_workflow", "continue"], default: "fail_workflow" },
+        isDisabled: { type: "boolean", title: "Skip this node", default: false }
+      },
+      required: ["datasourceID"]
+    },
+    uischema: {
+      type: "Categorization",
+      elements: [
+        { type: "Category", label: "General", elements: [
+          { type: "Control", scope: "#/properties/title" },
+          { type: "Control", scope: "#/properties/description", options: { multi: true, rows: 2 } },
+          { type: "Control", scope: "#/properties/datasourceID" }
+        ] },
+        { type: "Category", label: "Output", elements: [
+          { type: "Control", scope: "#/properties/outputVariable" },
+          { type: "Control", scope: "#/properties/includeEventMetadata" }
+        ] },
+        { type: "Category", label: "Advanced", elements: [
+          { type: "Control", scope: "#/properties/timeoutSeconds" },
+          { type: "Control", scope: "#/properties/errorHandling" },
+          { type: "Control", scope: "#/properties/isDisabled" }
+        ] }
+      ]
+    }
+  },
+  [WORKFLOW_NODE_TYPES.CONNECTOR_PUSH.value]: {
+    label: WORKFLOW_NODE_TYPES.CONNECTOR_PUSH.label,
+    value: WORKFLOW_NODE_TYPES.CONNECTOR_PUSH.value,
+    component: ConnectorPushNode,
+    configurator: ConnectorPushNodeConfigurator,
+    defaultValue: {
+      title: "Connector Push",
+      description: "",
+      datasourceID: "",
+      input: {},
+      outputVariable: "pushResult",
+      timeoutSeconds: 300,
+      errorHandling: "fail_workflow",
+      isDisabled: false
+    },
+    schema: {
+      type: "object",
+      properties: {
+        title: { type: "string", title: "Node Title" },
+        description: { type: "string", title: "Description" },
+        datasourceID: { type: "string", title: "Datasource ID" },
+        input: { type: "object", title: "Payload / Parameters" },
+        outputVariable: { type: "string", title: "Output Variable", pattern: "^[a-zA-Z_][a-zA-Z0-9_]*$", default: "pushResult" },
+        timeoutSeconds: { type: "integer", title: "Timeout (seconds)", minimum: 1, maximum: 3600, default: 300 },
+        errorHandling: { type: "string", title: "Error Behavior", enum: ["fail_workflow", "continue"], default: "fail_workflow" },
+        isDisabled: { type: "boolean", title: "Skip this node", default: false }
+      },
+      required: ["datasourceID"]
+    },
+    uischema: {
+      type: "Categorization",
+      elements: [
+        { type: "Category", label: "General", elements: [
+          { type: "Control", scope: "#/properties/title" },
+          { type: "Control", scope: "#/properties/description", options: { multi: true, rows: 2 } },
+          { type: "Control", scope: "#/properties/datasourceID" }
+        ] },
+        { type: "Category", label: "Output", elements: [
+          { type: "Control", scope: "#/properties/outputVariable" }
+        ] },
+        { type: "Category", label: "Advanced", elements: [
+          { type: "Control", scope: "#/properties/timeoutSeconds" },
+          { type: "Control", scope: "#/properties/errorHandling" },
+          { type: "Control", scope: "#/properties/isDisabled" }
+        ] }
+      ]
+    }
   }
 };
 export {
   ConditionNode,
   ConditionNodeConfigurator,
+  ConnectorPullNode,
+  ConnectorPullNodeConfigurator,
+  ConnectorPushNode,
+  ConnectorPushNodeConfigurator,
   DataCollectionNode,
   DataCollectionNodeConfigurator,
   DataQueryNode,

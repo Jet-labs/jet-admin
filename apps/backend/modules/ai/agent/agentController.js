@@ -4,7 +4,7 @@
  * Routes incoming socket events to the correct handler.
  */
 
-const Logger = require('../../../utils/logger');
+const Logger = require("../../../utils/logger");
 const { agentSession } = require('./agentSession');
 const { datasourceDiscovery } = require('./datasourceDiscovery');
 const { executeTurn, resumeAfterApproval } = require('./agentExecutor');

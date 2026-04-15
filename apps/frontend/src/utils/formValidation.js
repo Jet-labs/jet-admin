@@ -139,6 +139,38 @@ formValidations.cronJobUpdationFormValidationSchema = Yup.object().shape({
   workflowID: Yup.string().required("Workflow is required"),
 });
 
+formValidations.subscriptionAdditionFormValidationSchema = Yup.object().shape({
+  subscriptionTitle: Yup.string().required("Subscription name is required"),
+  datasourceID: Yup.string().required("Data source is required"),
+  subscriptionType: Yup.string().required("Subscription type is required"),
+  status: Yup.string().optional(),
+  subscriptionConfig: Yup.string().optional(),
+});
+
+formValidations.subscriptionUpdationFormValidationSchema = Yup.object().shape({
+  subscriptionTitle: Yup.string().required("Subscription name is required"),
+  datasourceID: Yup.string().required("Data source is required"),
+  subscriptionType: Yup.string().required("Subscription type is required"),
+  status: Yup.string().optional(),
+  subscriptionConfig: Yup.string().optional(),
+});
+
+formValidations.webhookAdditionFormValidationSchema = Yup.object().shape({
+  webhookTitle: Yup.string().required("Webhook name is required"),
+  webhookPath: Yup.string().required("Endpoint path is required"),
+  authType: Yup.string().required("Authentication type is required"),
+  status: Yup.string().optional(),
+  authConfig: Yup.string().optional(),
+});
+
+formValidations.webhookUpdationFormValidationSchema = Yup.object().shape({
+  webhookTitle: Yup.string().required("Webhook name is required"),
+  webhookPath: Yup.string().required("Endpoint path is required"),
+  authType: Yup.string().required("Authentication type is required"),
+  status: Yup.string().optional(),
+  authConfig: Yup.string().optional(),
+});
+
 formValidations.dataQueryArgsFormValidationSchema = (dataQueryArgs) =>
   Yup.object().shape(
     dataQueryArgs.reduce((acc, arg) => {

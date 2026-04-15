@@ -16,6 +16,8 @@ import { APIKeyLayout } from "../layouts/apiKeyLayout";
 import { CronJobLayout } from "../layouts/cronJobLayout";
 import { WorkflowLayout } from "../layouts/workflowLayout";
 import { DatasourceLayout } from "../layouts/datasourceLayout";
+import { SubscriptionLayout } from "../layouts/subscriptionLayout";
+import { WebhookLayout } from "../layouts/webhookLayout";
 const SignInPage = lazy(() => import("../../pages/signInPage"));
 const SignUpPage = lazy(() => import("../../pages/signUpPage"));
 const HomePage = lazy(() => import("../../pages/homePage"));
@@ -112,6 +114,22 @@ const UpdateWorkflowPage = lazy(() =>
 const AddDatasourcePage = lazy(() => import("../../pages/addDatasourcePage"));
 const UpdateDatasourcePage = lazy(() =>
   import("../../pages/updateDatasourcePage")
+);
+
+const SubscriptionLayoutLandingPage = lazy(() =>
+  import("../../pages/subscriptionLayoutLandingPage")
+);
+const AddSubscriptionPage = lazy(() => import("../../pages/addSubscriptionPage"));
+const UpdateSubscriptionPage = lazy(() =>
+  import("../../pages/updateSubscriptionPage")
+);
+
+const WebhookLayoutLandingPage = lazy(() =>
+  import("../../pages/webhookLayoutLandingPage")
+);
+const AddWebhookPage = lazy(() => import("../../pages/addWebhookPage"));
+const UpdateWebhookPage = lazy(() =>
+  import("../../pages/updateWebhookPage")
 );
 
 const router = createBrowserRouter([
@@ -347,6 +365,40 @@ const router = createBrowserRouter([
               {
                 path: CONSTANTS.ROUTES.UPDATE_TENANT_USER_BY_ID.code,
                 element: <UpdateTenantUserByIDPage />,
+              },
+            ],
+          },
+          {
+            element: <SubscriptionLayout />,
+            children: [
+              {
+                path: CONSTANTS.ROUTES.VIEW_SUBSCRIPTIONS.code,
+                element: <SubscriptionLayoutLandingPage />,
+              },
+              {
+                path: CONSTANTS.ROUTES.ADD_SUBSCRIPTION.code,
+                element: <AddSubscriptionPage />,
+              },
+              {
+                path: CONSTANTS.ROUTES.UPDATE_SUBSCRIPTION_BY_ID.code,
+                element: <UpdateSubscriptionPage />,
+              },
+            ],
+          },
+          {
+            element: <WebhookLayout />,
+            children: [
+              {
+                path: CONSTANTS.ROUTES.VIEW_WEBHOOKS.code,
+                element: <WebhookLayoutLandingPage />,
+              },
+              {
+                path: CONSTANTS.ROUTES.ADD_WEBHOOK.code,
+                element: <AddWebhookPage />,
+              },
+              {
+                path: CONSTANTS.ROUTES.UPDATE_WEBHOOK_BY_ID.code,
+                element: <UpdateWebhookPage />,
               },
             ],
           },

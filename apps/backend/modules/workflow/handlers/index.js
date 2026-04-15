@@ -5,7 +5,7 @@ const conditionHandler = require('./conditionHandler');
 const loopHandler = require('./loopHandler');
 const delayHandler = require('./delayHandler');
 const endHandler = require('./endHandler');
-const dataCollectionHandler = require('./dataCollectionHandler');   // ← ADD
+const dataCollectionHandler = require('./dataCollectionHandler');
 
 const handlers = {
   start: startHandler,
@@ -15,7 +15,7 @@ const handlers = {
   loop: loopHandler,
   delay: delayHandler,
   end: endHandler,
-  dataCollection: dataCollectionHandler,                           // ← ADD
+  dataCollection: dataCollectionHandler,
 };
 
 function getHandler(nodeType) {

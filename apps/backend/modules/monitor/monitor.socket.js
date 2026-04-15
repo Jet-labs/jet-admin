@@ -1,6 +1,6 @@
-const { socketIO } = require('../../config/socket.io');
-const { monitorBus } = require('../../config/queue.config');
-const Logger = require('../../utils/logger');
+const { socketIO } = require("../../config/socket.io");
+const { monitorBus } = require("../../config/queue.config");
+const Logger = require("../../utils/logger");
 
 /**
  * Initialize the Monitor Socket Namespace

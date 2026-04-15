@@ -4,7 +4,7 @@
  * Uses the existing runDataQueryByData() — no new infrastructure needed.
  */
 
-const Logger = require('../../../utils/logger');
+const Logger = require("../../../utils/logger");
 const { dataQueryService } = require('../../dataQuery/dataQuery.service');
 const { agentSession } = require('./agentSession');
 

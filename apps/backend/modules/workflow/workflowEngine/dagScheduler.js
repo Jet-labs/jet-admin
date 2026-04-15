@@ -17,9 +17,9 @@
  * incoming edge query, barrier logic) is unchanged.
  */
 
-const { prisma } = require('../../../config/prisma.config');
+const { prisma } = require("../../../config/prisma.config");
 const { stateManager } = require('./stateManager');
-const Logger = require('../../../utils/logger');
+const Logger = require("../../../utils/logger");
 
 const dagScheduler = {};
 

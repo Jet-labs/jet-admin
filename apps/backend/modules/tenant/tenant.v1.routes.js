@@ -21,7 +21,8 @@ let databaseRouter,
   cronjobRouter,
   auditLogRouter,
   aiRouter,
-  workflowRouter;
+  workflowRouter,
+  connectorRouter;
 const { isModuleEnabled } = require("../../config/module.config");
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
@@ -39,6 +40,8 @@ if (isModuleEnabled(constants.MODULES.DATASOURCE)) {
   });
   datasourceRouter = require("../datasource/datasource.v1.routes");
 }
+// Connector module — disabled during architectural transition
+
 if (isModuleEnabled(constants.MODULES.DATAQUERY)) {
   Logger.log("success", {
     message: `${constants.MODULES.DATAQUERY} module imported`,
@@ -228,6 +231,24 @@ if (isModuleEnabled(constants.MODULES.DATASOURCE)) {
     datasourceRouter
   );
 }
+
+// Nested subscription routes
+router.use(
+  "/:tenantID/subscriptions",
+  validate(tenantIdParamSchema, "params"),
+  authMiddleware.checkUserPermissions(["tenant:datasource"]),
+  tenantMiddleware.poolProvider,
+  require("../subscription/subscription.v1.routes")
+);
+
+// Nested webhook config routes
+router.use(
+  "/:tenantID/webhook-configs",
+  validate(tenantIdParamSchema, "params"),
+  authMiddleware.checkUserPermissions(["tenant:datasource"]),
+  tenantMiddleware.poolProvider,
+  require("../webhook/webhook.v1.routes")
+);
 
 // Nested dataQuery routes
 if (isModuleEnabled(constants.MODULES.DATAQUERY)) {

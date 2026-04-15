@@ -1,8 +1,8 @@
-jest.mock('../../../modules/dataQuery/queryEngine/queryExecution.adapter', () => ({
+jest.mock('../../../modules/dataQuery/dataQuery.service', () => ({
   createQueryEngine: jest.fn(),
 }));
 
-const { createQueryEngine } = require('../../../modules/dataQuery/queryEngine/queryExecution.adapter');
+const { createQueryEngine } = require('../../../modules/dataQuery/dataQuery.service');
 const { resolveTemplate } = require('../../../utils/templateEngine');
 
 const WORKFLOW_TEMPLATE_OPTIONS = {

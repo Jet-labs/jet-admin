@@ -1,6 +1,6 @@
 const { dataCollectionService } = require('./dataCollection.service');
-const Logger = require('../../../utils/logger');
-const { expressUtils } = require('../../../utils/express.utils');
+const Logger = require("../../../utils/logger");
+const { expressUtils } = require("../../../utils/express.utils");
 
 const dataCollectionController = {};
 

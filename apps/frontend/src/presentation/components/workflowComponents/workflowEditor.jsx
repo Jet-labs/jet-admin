@@ -33,6 +33,7 @@ import { TbBraces } from "react-icons/tb";
 import { IoMdTime } from "react-icons/io";
 import { MdOutlineInput } from "react-icons/md";
 import { useWorkflowState, useWorkflowActions } from "../../../logic/contexts/workflowContext";
+import { useDatasourcesState, useDatasourcesActions } from "../../../logic/contexts/datasourceContext";
 import { WorkflowNodeConfigPanel } from "./workflowNodeConfigPanel";
 import { WorkflowSchemaPanel } from "./workflowSchemaPanel";
 import { WorkflowConsole } from "./workflowConsole";
@@ -127,6 +128,8 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
     const { tenantID } = useParams();
     const { dataQueries } = useWorkflowState();
     const { refetchDataQueries } = useWorkflowActions();
+    const { datasources } = useDatasourcesState();
+    const { refetchDatasources } = useDatasourcesActions();
     const [selectedNodeId, setSelectedNodeId] = useState(null);
     const [showSchemaPanel, setShowSchemaPanel] = useState(false);
 
@@ -367,8 +370,10 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
     return (
         <WorkflowNodesProvider
             dataQueries={dataQueries}
+            datasources={datasources}
             strings={CONSTANTS.STRINGS}
             onRefreshDataQueries={refetchDataQueries}
+            onRefreshDatasources={refetchDatasources}
             workflowNodes={values.nodes}
             workflowEdges={values.edges}
             workflowInputArgs={workflowArgs}
@@ -426,6 +431,7 @@ export const WorkflowEditor = ({ workflowEditorForm }) => {
                                             >
                                                 {node.value === 'start' && <FaPlay className="size-3.5 mr-2 text-emerald-500" />}
                                                 {node.value === 'dataQuery' && <SiQuantconnect className="size-4 mr-2 text-blue-500" />}
+
                                                 {node.value === 'javascript' && <FaCode className="size-4 mr-2 text-amber-500" />}
                                                 {node.value === 'condition' && <FaCodeBranch className="size-4 mr-2 text-indigo-500" />}
                                                 {node.value === 'loop' && <TbRepeat className="size-4 mr-2 text-cyan-500" />}
