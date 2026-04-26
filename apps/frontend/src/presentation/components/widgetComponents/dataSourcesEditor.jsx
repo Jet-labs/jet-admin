@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@jet-admin/ui";
-import { FiPlus, FiTrash2, FiPlay, FiLoader } from "react-icons/fi";
+import { FiPlus, FiTrash2, FiRefreshCw, FiLoader } from "react-icons/fi";
 
 /**
  * DataSourcesEditor
@@ -135,6 +135,11 @@ export const DataSourcesEditor = ({
           Data Sources
         </Label>
         <div className="flex items-center gap-1.5">
+          {queryResults && (
+            <span className="text-[0.6rem] font-medium text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100">
+              Data loaded
+            </span>
+          )}
           {dataSources.length > 0 && (
             <Button
               type="button"
@@ -147,9 +152,9 @@ export const DataSourcesEditor = ({
               {isTestRunning ? (
                 <FiLoader className="w-3 h-3 animate-spin" />
               ) : (
-                <FiPlay className="w-3 h-3" />
+                <FiRefreshCw className="w-3 h-3" />
               )}
-              Test Run
+              {queryResults ? "Refresh" : "Load Data"}
             </Button>
           )}
         </div>

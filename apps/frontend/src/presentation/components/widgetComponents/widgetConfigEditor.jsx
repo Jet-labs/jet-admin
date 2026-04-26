@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 import { useWidgetsState } from "../../../logic/contexts/widgetsContext";
@@ -29,6 +29,37 @@ import {
 import { WidgetPropertiesEditor } from "./widgetPropertiesEditor";
 import { WidgetEventsEditor } from "./widgetEventsEditor";
 
+/**
+ * Execute all bound data sources and return normalized results.
+ * @param {Array} dataSources - Array of { type, queryID, alias, inputArgValues }
+ * @param {string} tenantID
+ * @returns {Promise<object>} { alias: resultData }
+ */
+const executeDataSources = async (dataSources, tenantID) => {
+  if (!dataSources?.length) return null;
+  const results = {};
+
+  for (const source of dataSources) {
+    if (!source.alias) continue;
+
+    if (source.type === "query" && source.queryID) {
+      try {
+        const result = await testDataQueryByIDAPI({
+          tenantID,
+          dataQueryID: source.queryID,
+          inputArgs: source.inputArgValues || {},
+        });
+        results[source.alias] = result;
+      } catch (err) {
+        results[source.alias] = { error: err.message };
+      }
+    }
+    // Workflow execution can be added here
+  }
+
+  return Object.keys(results).length > 0 ? results : null;
+};
+
 export const WidgetConfigEditor = ({
   widgetEditorForm,
 }) => {
@@ -47,35 +78,38 @@ export const WidgetConfigEditor = ({
   const builder = WIDGET_PROCESSORS_MAP?.[widgetType];
   const dataManifest = builder?.constructor?.dataManifest;
 
-  // Test run state
+  // Data execution state
   const [queryResults, setQueryResults] = useState(null);
   const [isTestRunning, setIsTestRunning] = useState(false);
+  const autoLoadedRef = useRef(false);
 
+  // Auto-load data when widget has existing dataSources on mount/load
+  const dataSources = widgetEditorForm.values.widgetConfig?.dataSources;
+  useEffect(() => {
+    if (
+      !autoLoadedRef.current &&
+      dataSources?.length > 0 &&
+      dataSources.some((s) => s.queryID || s.workflowID) &&
+      tenantID
+    ) {
+      autoLoadedRef.current = true;
+      setIsTestRunning(true);
+      executeDataSources(dataSources, tenantID)
+        .then((results) => {
+          if (results) setQueryResults(results);
+        })
+        .finally(() => setIsTestRunning(false));
+    }
+  }, [dataSources, tenantID]);
+
+  // Manual test run / refresh
   const handleTestRun = useCallback(async () => {
-    const dataSources = widgetEditorForm.values.widgetConfig?.dataSources || [];
-    if (dataSources.length === 0) return;
+    const sources = widgetEditorForm.values.widgetConfig?.dataSources || [];
+    if (sources.length === 0) return;
 
     setIsTestRunning(true);
-    const results = {};
-
     try {
-      for (const source of dataSources) {
-        if (!source.alias) continue;
-
-        if (source.type === "query" && source.queryID) {
-          try {
-            const result = await testDataQueryByIDAPI({
-              tenantID,
-              dataQueryID: source.queryID,
-              inputArgs: source.inputArgValues || {},
-            });
-            results[source.alias] = result;
-          } catch (err) {
-            results[source.alias] = { error: err.message };
-          }
-        }
-        // Workflow test run could be added here in the future
-      }
+      const results = await executeDataSources(sources, tenantID);
       setQueryResults(results);
     } finally {
       setIsTestRunning(false);
@@ -199,4 +233,3 @@ export const WidgetConfigEditor = ({
     </div>
   );
 };
-
