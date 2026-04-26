@@ -202,8 +202,10 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height, stateTree, 
         ) : null}
 
         {RenderedWidgetComponent ? (() => {
-          // For Vega widgets, extract and resolve the vegaSpec as the data prop
+          // Resolve widget data from dataSourceResults
           let widgetData = null;
+
+          // For Vega widgets: extract vegaSpec and resolve template data
           if (resolvedConfig?.vegaSpec) {
             const spec = JSON.parse(JSON.stringify(resolvedConfig.vegaSpec));
             // Resolve template expressions in data.values using dataSourceResults
@@ -229,6 +231,22 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height, stateTree, 
               }
             }
             widgetData = spec;
+          }
+
+          // For Table / generic widgets: resolve data from dataSourceResults via dataMapping
+          if (!widgetData && dataSourceResults && resolvedConfig?.dataMapping?.dataArrayPath) {
+            const arrayPath = resolvedConfig.dataMapping.dataArrayPath;
+            const parts = arrayPath.split('.');
+            let resolved = dataSourceResults;
+            for (const part of parts) {
+              if (resolved == null) break;
+              resolved = resolved[part];
+            }
+            if (Array.isArray(resolved)) {
+              widgetData = resolved;
+            } else if (resolved && typeof resolved === 'object' && Array.isArray(resolved.data)) {
+              widgetData = resolved.data;
+            }
           }
 
           return (

@@ -62,8 +62,9 @@ export const WidgetPreview = ({
     }
 
     // Data can be passed directly from the parent (query results, etc.)
-    // For Vega widgets: if no explicit data, use the vegaSpec from widgetConfig
     let chartData = data?.data || data;
+
+    // For Vega widgets: extract vegaSpec and resolve template data
     if (!chartData && widgetConfig?.vegaSpec) {
       // Clone spec to avoid mutating form state
       const spec = JSON.parse(JSON.stringify(widgetConfig.vegaSpec));
@@ -72,7 +73,7 @@ export const WidgetPreview = ({
       if (spec.data?.values && typeof spec.data.values === 'string' && spec.data.values.includes('{{')) {
         const templateMatch = spec.data.values.match(/\{\{([^}]+)\}\}/);
         if (templateMatch && queryResults) {
-          const path = templateMatch[1]; // e.g. "get_drivers" or "get_drivers.data"
+          const path = templateMatch[1];
           const parts = path.split('.');
           let resolved = queryResults;
           for (const part of parts) {
@@ -91,6 +92,22 @@ export const WidgetPreview = ({
         }
       }
       chartData = spec;
+    }
+
+    // For Table / generic widgets: resolve data from queryResults via dataMapping
+    if (!chartData && queryResults && widgetConfig?.dataMapping?.dataArrayPath) {
+      const arrayPath = widgetConfig.dataMapping.dataArrayPath;
+      const parts = arrayPath.split('.');
+      let resolved = queryResults;
+      for (const part of parts) {
+        if (resolved == null) break;
+        resolved = resolved[part];
+      }
+      if (Array.isArray(resolved)) {
+        chartData = resolved;
+      } else if (resolved && typeof resolved === 'object' && Array.isArray(resolved.data)) {
+        chartData = resolved.data;
+      }
     }
 
     return (
