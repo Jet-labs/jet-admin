@@ -60,7 +60,11 @@ export const WidgetPreview = ({
     }
 
     // Data can be passed directly from the parent (query results, etc.)
-    const chartData = data?.data || data;
+    // For Vega widgets: if no explicit data, use the vegaSpec from widgetConfig
+    let chartData = data?.data || data;
+    if (!chartData && widgetConfig?.vegaSpec) {
+      chartData = widgetConfig.vegaSpec;
+    }
 
     return (
       <WidgetComponent
