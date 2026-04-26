@@ -1,23 +1,10 @@
 import { WIDGETS_MAP } from "@jet-admin/widgets-ui";
 import PropTypes from "prop-types";
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, useState } from "react";
 import { CONSTANTS } from "../../../constants";
+import { FiChevronDown, FiChevronRight, FiCode } from "react-icons/fi";
 
 import { Spinner } from "@jet-admin/ui";
-/**
- * Resolve a dotted path like "nodeOutput.rows" against an object.
- * Returns undefined if any part is missing.
- */
-const resolvePath = (obj, path) => {
-  if (!obj || !path) return undefined;
-  const parts = path.split('.');
-  let current = obj;
-  for (const part of parts) {
-    if (current === undefined || current === null) return undefined;
-    current = current[part];
-  }
-  return current;
-};
 
 export const WidgetPreview = ({
   tenantID,
@@ -30,33 +17,24 @@ export const WidgetPreview = ({
   isRefreshingData,
   refreshData,
   widgetConfig,
-  workflowContext,
-  runWorkflow,
-  isRunningWorkflow,
 }) => {
-  console.log("WidgetPreview", {
-    widgetType,
-    data,
-    widgetConfig
-  });
   WidgetPreview.propTypes = {
-    tenantID: PropTypes.number.isRequired,
-    widgetID: PropTypes.number.isRequired,
-    widgetTitle: PropTypes.string.isRequired,
+    tenantID: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    widgetID: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    widgetTitle: PropTypes.string,
     widgetType: PropTypes.string.isRequired,
-    data: PropTypes.object,
+    data: PropTypes.any,
     refetchInterval: PropTypes.number,
     isFetchingData: PropTypes.bool.isRequired,
     isRefreshingData: PropTypes.bool.isRequired,
     refreshData: PropTypes.func.isRequired,
     widgetConfig: PropTypes.object,
-    workflowContext: PropTypes.object,
-    runWorkflow: PropTypes.func,
-    isRunningWorkflow: PropTypes.bool,
   };
 
   const uniqueKey = `widgetPreview_${tenantID}_${widgetID}`;
   const widgetRef = useRef();
+  const [showDebug, setShowDebug] = useState(false);
+
   const _handleOnWidgetInit = useCallback(
     (ref) => {
       if (widgetRef) {
@@ -68,7 +46,6 @@ export const WidgetPreview = ({
 
   // Determine which component to render
   const resolveComponent = () => {
-    // Resolve the widget component from the map
     const resolvedType = widgetType || 'vega-lite';
     const WidgetComponent = WIDGETS_MAP[resolvedType]?.component;
 
@@ -82,8 +59,8 @@ export const WidgetPreview = ({
       );
     }
 
-    // processedData from backend is the complete spec — just pass it through
-    const chartData = data?.workflowInstances?.data || data?.data || data;
+    // Data can be passed directly from the parent (query results, etc.)
+    const chartData = data?.data || data;
 
     return (
       <WidgetComponent
@@ -94,10 +71,15 @@ export const WidgetPreview = ({
         refetchInterval={refetchInterval}
         refreshData={refreshData}
         widgetConfig={widgetConfig}
-        runWorkflow={runWorkflow}
-        isLoadingWorkflows={isRunningWorkflow}
       />
     );
+  };
+
+  // Build debug info
+  const debugInfo = {
+    widgetType,
+    widgetConfig: widgetConfig || null,
+    dataPassedToWidget: data || null,
   };
 
   return (
@@ -108,14 +90,37 @@ export const WidgetPreview = ({
         </div>
       ) : (
         <div
-            className="h-full w-full flex flex-col flex-1 min-h-0 overflow-hidden"
+            className="flex-1 min-h-0 overflow-hidden flex flex-col"
             style={{ background: 'var(--we-bg-primary)' }}
           key={uniqueKey}
           id={uniqueKey}
         >
-            {resolveComponent()}
+            <div className="flex-1 min-h-0 overflow-hidden">
+              {resolveComponent()}
+            </div>
         </div>
       )}
+
+      {/* Debug Panel */}
+      <div className="shrink-0 border-t border-border bg-zinc-50">
+        <button
+          type="button"
+          onClick={() => setShowDebug(!showDebug)}
+          className="w-full flex items-center gap-1.5 px-3 py-1.5 text-[0.65rem] font-medium text-muted-foreground hover:text-foreground hover:bg-zinc-100 transition-colors"
+        >
+          {showDebug ? <FiChevronDown className="w-3 h-3" /> : <FiChevronRight className="w-3 h-3" />}
+          <FiCode className="w-3 h-3" />
+          <span>Debug: Widget Config</span>
+        </button>
+        {showDebug && (
+          <div className="px-3 pb-3 max-h-64 overflow-auto">
+            <pre className="text-[0.6rem] font-mono leading-relaxed text-zinc-700 bg-zinc-100 border border-zinc-200 rounded p-2 whitespace-pre-wrap break-all">
+              {JSON.stringify(debugInfo, null, 2)}
+            </pre>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
+
