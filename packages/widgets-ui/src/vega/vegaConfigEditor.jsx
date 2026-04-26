@@ -26,6 +26,7 @@ export const VegaConfigEditor = ({
   workflowContext,
   workflows,
   selectedWorkflow,
+  queryResults,
 }) => {
   const isVegaLite = widgetEditorForm.values.widgetType === 'vega-lite';
   const currentMode = widgetEditorForm.values.widgetConfig?.editorMode || (isVegaLite ? 'visual' : 'raw');
@@ -72,7 +73,7 @@ export const VegaConfigEditor = ({
   };
 
   return (
-    <div className="bg-background border border-border rounded-md p-3 flex flex-col gap-3">
+    <div className="bg-white border border-border rounded-md p-3 flex flex-col gap-3">
       {isVegaLite && (
         <div className="flex flex-row items-center gap-2">
           <span className="text-xs font-medium text-muted-foreground">Visual Editor</span>
@@ -87,6 +88,7 @@ export const VegaConfigEditor = ({
               widgetEditorForm={widgetEditorForm}
               workflowContext={workflowContext}
               workflows={workflows}
+              queryResults={queryResults}
             />
           )}
           <Button
@@ -156,7 +158,7 @@ export const VegaConfigEditor = ({
       )}
 
       {!showParseWarning && currentMode === 'raw' && (
-        <div className="min-h-[300px] flex-1 overflow-auto rounded-md border border-border bg-background">
+        <div className="min-h-[300px] flex-1 overflow-auto rounded-md border border-border bg-white">
           <VegaSpecEditor
             value={widgetEditorForm.values.widgetConfig?.vegaSpec}
             onChange={(spec) => widgetEditorForm.setFieldValue('widgetConfig.vegaSpec', spec)}
@@ -174,4 +176,5 @@ VegaConfigEditor.propTypes = {
   workflowContext: PropTypes.object,
   workflows: PropTypes.array,
   selectedWorkflow: PropTypes.object,
+  queryResults: PropTypes.object,
 };

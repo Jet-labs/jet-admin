@@ -242,11 +242,11 @@ var init_tableWidget = __esm({
       const displayRows = isBackendPaginated ? rows : paginationConfig ? rows.slice((currentPage - 1) * pageSize, currentPage * pageSize) : rows;
       if (!rows || rows.length === 0) {
         if (isLoadingWorkflows) {
-          return /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex flex-col w-full h-full items-center justify-center text-muted-foreground text-sm p-6 relative" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "absolute inset-0 z-10 flex items-center justify-center bg-slate-50/90 backdrop-blur-[1px]" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center gap-2 rounded-md bg-slate-100/90 px-4 py-2 text-sm text-slate-500 shadow-sm" }, /* @__PURE__ */ import_react10.default.createElement("svg", { width: "16", height: "16", viewBox: "0 0 24 24", className: "animate-spin" }, /* @__PURE__ */ import_react10.default.createElement("circle", { cx: "12", cy: "12", r: "10", stroke: "currentColor", strokeWidth: "3", fill: "none", strokeDasharray: "31.4 31.4", strokeLinecap: "round" })), "Loading data\u2026")));
+          return /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex flex-col w-full h-full items-center justify-center text-muted-foreground text-sm p-6 relative" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "absolute inset-0 z-10 flex items-center justify-center bg-white/90 backdrop-blur-[1px]" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center gap-2 rounded-md bg-slate-100/90 px-4 py-2 text-sm text-[#1c1c1e] shadow-sm" }, /* @__PURE__ */ import_react10.default.createElement("svg", { width: "16", height: "16", viewBox: "0 0 24 24", className: "animate-spin" }, /* @__PURE__ */ import_react10.default.createElement("circle", { cx: "12", cy: "12", r: "10", stroke: "currentColor", strokeWidth: "3", fill: "none", strokeDasharray: "31.4 31.4", strokeLinecap: "round" })), "Loading data\u2026")));
         }
         return /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex flex-col w-full h-full items-center justify-center text-muted-foreground text-sm p-6" }, /* @__PURE__ */ import_react10.default.createElement("p", null, "No data available."), /* @__PURE__ */ import_react10.default.createElement("p", { className: "text-xs mt-1" }, "Ensure the data array template resolves to a non-empty array."));
       }
-      return /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex flex-col w-full h-full min-h-0 overflow-hidden relative" }, isLoadingWorkflows && /* @__PURE__ */ import_react10.default.createElement("div", { className: "absolute inset-0 z-20 flex items-center justify-center bg-slate-50/50 backdrop-blur-[1px]" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center gap-2 rounded-md bg-slate-100/90 px-4 py-2 text-sm text-slate-500 shadow-sm" }, /* @__PURE__ */ import_react10.default.createElement("svg", { width: "16", height: "16", viewBox: "0 0 24 24", className: "animate-spin" }, /* @__PURE__ */ import_react10.default.createElement("circle", { cx: "12", cy: "12", r: "10", stroke: "currentColor", strokeWidth: "3", fill: "none", strokeDasharray: "31.4 31.4", strokeLinecap: "round" })), "Updating data\u2026")), /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex-1 overflow-auto min-h-0" }, /* @__PURE__ */ import_react10.default.createElement("table", { className: "w-full text-sm border-collapse" }, /* @__PURE__ */ import_react10.default.createElement("thead", { className: "sticky top-0 z-10 bg-muted/60 backdrop-blur-sm" }, /* @__PURE__ */ import_react10.default.createElement("tr", null, activeColumns.map((col, idx) => /* @__PURE__ */ import_react10.default.createElement(
+      return /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex flex-col w-full h-full min-h-0 overflow-hidden relative" }, isLoadingWorkflows && /* @__PURE__ */ import_react10.default.createElement("div", { className: "absolute inset-0 z-20 flex items-center justify-center bg-white/50 backdrop-blur-[1px]" }, /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex items-center gap-2 rounded-md bg-slate-100/90 px-4 py-2 text-sm text-[#1c1c1e] shadow-sm" }, /* @__PURE__ */ import_react10.default.createElement("svg", { width: "16", height: "16", viewBox: "0 0 24 24", className: "animate-spin" }, /* @__PURE__ */ import_react10.default.createElement("circle", { cx: "12", cy: "12", r: "10", stroke: "currentColor", strokeWidth: "3", fill: "none", strokeDasharray: "31.4 31.4", strokeLinecap: "round" })), "Updating data\u2026")), /* @__PURE__ */ import_react10.default.createElement("div", { className: "flex-1 overflow-auto min-h-0" }, /* @__PURE__ */ import_react10.default.createElement("table", { className: "w-full text-sm border-collapse" }, /* @__PURE__ */ import_react10.default.createElement("thead", { className: "sticky top-0 z-10 bg-muted/60 backdrop-blur-sm" }, /* @__PURE__ */ import_react10.default.createElement("tr", null, activeColumns.map((col, idx) => /* @__PURE__ */ import_react10.default.createElement(
         "th",
         {
           key: idx,
@@ -596,7 +596,7 @@ var init_tableConfigEditor = __esm({
           checked: pagination.enabled,
           onCheckedChange: handlePaginationToggle
         }
-      )), pagination.enabled && /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-3 bg-muted/30 p-3 rounded-md border mt-1" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "text-[0.65rem] text-muted-foreground bg-background border rounded p-2.5 space-y-1.5" }, /* @__PURE__ */ import_react11.default.createElement("p", { className: "font-medium text-foreground text-[0.7rem]" }, "How pagination works:"), /* @__PURE__ */ import_react11.default.createElement("ol", { className: "list-decimal list-inside space-y-1" }, /* @__PURE__ */ import_react11.default.createElement("li", null, "Your workflow must accept ", /* @__PURE__ */ import_react11.default.createElement("strong", null, "page"), " and ", /* @__PURE__ */ import_react11.default.createElement("strong", null, "page size"), " as input arguments (e.g. use them in a SQL ", /* @__PURE__ */ import_react11.default.createElement("code", { className: "bg-muted px-1 rounded" }, "LIMIT / OFFSET"), ")."), /* @__PURE__ */ import_react11.default.createElement("li", null, "Map those argument names below. When the user changes pages, the table will re-run the workflow with these values \u2014 ", /* @__PURE__ */ import_react11.default.createElement("em", null, "overriding"), " any defaults set above."), /* @__PURE__ */ import_react11.default.createElement("li", null, "Set a ", /* @__PURE__ */ import_react11.default.createElement("strong", null, "Total Rows"), " template so the paginator can calculate total pages."))), /* @__PURE__ */ import_react11.default.createElement("div", { className: "grid grid-cols-2 gap-3" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.Label, { className: "text-[0.65rem]" }, "Page Argument Name"), workflowArgs.length > 0 ? /* @__PURE__ */ import_react11.default.createElement(
+      )), pagination.enabled && /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-3 bg-muted/30 p-3 rounded-md border mt-1" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "text-[0.65rem] text-muted-foreground bg-white border rounded p-2.5 space-y-1.5" }, /* @__PURE__ */ import_react11.default.createElement("p", { className: "font-medium text-foreground text-[0.7rem]" }, "How pagination works:"), /* @__PURE__ */ import_react11.default.createElement("ol", { className: "list-decimal list-inside space-y-1" }, /* @__PURE__ */ import_react11.default.createElement("li", null, "Your workflow must accept ", /* @__PURE__ */ import_react11.default.createElement("strong", null, "page"), " and ", /* @__PURE__ */ import_react11.default.createElement("strong", null, "page size"), " as input arguments (e.g. use them in a SQL ", /* @__PURE__ */ import_react11.default.createElement("code", { className: "bg-muted px-1 rounded" }, "LIMIT / OFFSET"), ")."), /* @__PURE__ */ import_react11.default.createElement("li", null, "Map those argument names below. When the user changes pages, the table will re-run the workflow with these values \u2014 ", /* @__PURE__ */ import_react11.default.createElement("em", null, "overriding"), " any defaults set above."), /* @__PURE__ */ import_react11.default.createElement("li", null, "Set a ", /* @__PURE__ */ import_react11.default.createElement("strong", null, "Total Rows"), " template so the paginator can calculate total pages."))), /* @__PURE__ */ import_react11.default.createElement("div", { className: "grid grid-cols-2 gap-3" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.Label, { className: "text-[0.65rem]" }, "Page Argument Name"), workflowArgs.length > 0 ? /* @__PURE__ */ import_react11.default.createElement(
         import_ui10.Select,
         {
           value: pagination.pageParam || "",
@@ -644,7 +644,7 @@ var init_tableConfigEditor = __esm({
           placeholder: "{{ctx.total_count}}",
           className: "h-7 text-xs font-mono"
         }
-      ), /* @__PURE__ */ import_react11.default.createElement("p", { className: "text-[0.6rem] text-muted-foreground" }, "Context template that resolves to the total number of records.")), paginationArgNames.length > 0 && generalArgs.length > 0 && /* @__PURE__ */ import_react11.default.createElement("div", { className: "text-[0.6rem] text-muted-foreground bg-background border rounded px-2.5 py-1.5 flex items-start gap-1.5" }, /* @__PURE__ */ import_react11.default.createElement(import_fi5.FiInfo, { className: "w-3 h-3 mt-0.5 shrink-0 text-primary" }), /* @__PURE__ */ import_react11.default.createElement("span", null, "The pagination args (", /* @__PURE__ */ import_react11.default.createElement("code", { className: "bg-muted px-0.5 rounded" }, paginationArgNames.join(", ")), ') are hidden from "Workflow Input Arguments" above to avoid conflict. On page change, they will ', /* @__PURE__ */ import_react11.default.createElement("em", null, "override"), " any base values.")))), /* @__PURE__ */ import_react11.default.createElement("div", { className: "h-8 shrink-0" }));
+      ), /* @__PURE__ */ import_react11.default.createElement("p", { className: "text-[0.6rem] text-muted-foreground" }, "Context template that resolves to the total number of records.")), paginationArgNames.length > 0 && generalArgs.length > 0 && /* @__PURE__ */ import_react11.default.createElement("div", { className: "text-[0.6rem] text-muted-foreground bg-white border rounded px-2.5 py-1.5 flex items-start gap-1.5" }, /* @__PURE__ */ import_react11.default.createElement(import_fi5.FiInfo, { className: "w-3 h-3 mt-0.5 shrink-0 text-primary" }), /* @__PURE__ */ import_react11.default.createElement("span", null, "The pagination args (", /* @__PURE__ */ import_react11.default.createElement("code", { className: "bg-muted px-0.5 rounded" }, paginationArgNames.join(", ")), ') are hidden from "Workflow Input Arguments" above to avoid conflict. On page change, they will ', /* @__PURE__ */ import_react11.default.createElement("em", null, "override"), " any base values.")))), /* @__PURE__ */ import_react11.default.createElement("div", { className: "h-8 shrink-0" }));
     };
     TableConfigEditor.propTypes = {
       widgetEditorForm: import_prop_types10.default.object.isRequired,
@@ -656,15 +656,15 @@ var init_tableConfigEditor = __esm({
 });
 
 // src/button/buttonConfigEditor.jsx
-var import_react12, import_prop_types11, import_ui11, ButtonConfigEditor;
+var import_react13, import_prop_types12, import_ui12, ButtonConfigEditor;
 var init_buttonConfigEditor = __esm({
   "src/button/buttonConfigEditor.jsx"() {
-    import_react12 = __toESM(require("react"));
-    import_prop_types11 = __toESM(require("prop-types"));
-    import_ui11 = require("@jet-admin/ui");
+    import_react13 = __toESM(require("react"));
+    import_prop_types12 = __toESM(require("prop-types"));
+    import_ui12 = require("@jet-admin/ui");
     ButtonConfigEditor = ({ widgetEditorForm }) => {
-      return /* @__PURE__ */ import_react12.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react12.default.createElement(import_ui11.Label, { className: "text-xs font-medium text-foreground" }, "Button Text"), /* @__PURE__ */ import_react12.default.createElement(
-        import_ui11.Input,
+      return /* @__PURE__ */ import_react13.default.createElement("div", { className: "space-y-4" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react13.default.createElement(import_ui12.Label, { className: "text-xs font-medium text-foreground" }, "Button Text"), /* @__PURE__ */ import_react13.default.createElement(
+        import_ui12.Input,
         {
           type: "text",
           className: "text-sm",
@@ -672,37 +672,37 @@ var init_buttonConfigEditor = __esm({
           onChange: (e) => widgetEditorForm.setFieldValue("widgetConfig.text", e.target.value),
           placeholder: "Click Me"
         }
-      )), /* @__PURE__ */ import_react12.default.createElement("div", { className: "grid grid-cols-2 gap-4" }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react12.default.createElement(import_ui11.Label, { className: "text-xs font-medium text-foreground" }, "Variant"), /* @__PURE__ */ import_react12.default.createElement(
-        import_ui11.Select,
+      )), /* @__PURE__ */ import_react13.default.createElement("div", { className: "grid grid-cols-2 gap-4" }, /* @__PURE__ */ import_react13.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react13.default.createElement(import_ui12.Label, { className: "text-xs font-medium text-foreground" }, "Variant"), /* @__PURE__ */ import_react13.default.createElement(
+        import_ui12.Select,
         {
           value: widgetEditorForm.values.widgetConfig?.variant || "default",
           onValueChange: (val) => widgetEditorForm.setFieldValue("widgetConfig.variant", val)
         },
-        /* @__PURE__ */ import_react12.default.createElement(import_ui11.SelectTrigger, { className: "text-xs" }, /* @__PURE__ */ import_react12.default.createElement(import_ui11.SelectValue, { placeholder: "Select variant" })),
-        /* @__PURE__ */ import_react12.default.createElement(import_ui11.SelectContent, null, /* @__PURE__ */ import_react12.default.createElement(import_ui11.SelectItem, { value: "default" }, "Default"), /* @__PURE__ */ import_react12.default.createElement(import_ui11.SelectItem, { value: "destructive" }, "Destructive"), /* @__PURE__ */ import_react12.default.createElement(import_ui11.SelectItem, { value: "outline" }, "Outline"), /* @__PURE__ */ import_react12.default.createElement(import_ui11.SelectItem, { value: "secondary" }, "Secondary"), /* @__PURE__ */ import_react12.default.createElement(import_ui11.SelectItem, { value: "ghost" }, "Ghost"), /* @__PURE__ */ import_react12.default.createElement(import_ui11.SelectItem, { value: "link" }, "Link"))
-      )), /* @__PURE__ */ import_react12.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react12.default.createElement(import_ui11.Label, { className: "text-xs font-medium text-foreground" }, "Size"), /* @__PURE__ */ import_react12.default.createElement(
-        import_ui11.Select,
+        /* @__PURE__ */ import_react13.default.createElement(import_ui12.SelectTrigger, { className: "text-xs" }, /* @__PURE__ */ import_react13.default.createElement(import_ui12.SelectValue, { placeholder: "Select variant" })),
+        /* @__PURE__ */ import_react13.default.createElement(import_ui12.SelectContent, null, /* @__PURE__ */ import_react13.default.createElement(import_ui12.SelectItem, { value: "default" }, "Default"), /* @__PURE__ */ import_react13.default.createElement(import_ui12.SelectItem, { value: "destructive" }, "Destructive"), /* @__PURE__ */ import_react13.default.createElement(import_ui12.SelectItem, { value: "outline" }, "Outline"), /* @__PURE__ */ import_react13.default.createElement(import_ui12.SelectItem, { value: "secondary" }, "Secondary"), /* @__PURE__ */ import_react13.default.createElement(import_ui12.SelectItem, { value: "ghost" }, "Ghost"), /* @__PURE__ */ import_react13.default.createElement(import_ui12.SelectItem, { value: "link" }, "Link"))
+      )), /* @__PURE__ */ import_react13.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react13.default.createElement(import_ui12.Label, { className: "text-xs font-medium text-foreground" }, "Size"), /* @__PURE__ */ import_react13.default.createElement(
+        import_ui12.Select,
         {
           value: widgetEditorForm.values.widgetConfig?.size || "default",
           onValueChange: (val) => widgetEditorForm.setFieldValue("widgetConfig.size", val)
         },
-        /* @__PURE__ */ import_react12.default.createElement(import_ui11.SelectTrigger, { className: "text-xs" }, /* @__PURE__ */ import_react12.default.createElement(import_ui11.SelectValue, { placeholder: "Select size" })),
-        /* @__PURE__ */ import_react12.default.createElement(import_ui11.SelectContent, null, /* @__PURE__ */ import_react12.default.createElement(import_ui11.SelectItem, { value: "default" }, "Default"), /* @__PURE__ */ import_react12.default.createElement(import_ui11.SelectItem, { value: "sm" }, "Small"), /* @__PURE__ */ import_react12.default.createElement(import_ui11.SelectItem, { value: "lg" }, "Large"), /* @__PURE__ */ import_react12.default.createElement(import_ui11.SelectItem, { value: "icon" }, "Icon"))
+        /* @__PURE__ */ import_react13.default.createElement(import_ui12.SelectTrigger, { className: "text-xs" }, /* @__PURE__ */ import_react13.default.createElement(import_ui12.SelectValue, { placeholder: "Select size" })),
+        /* @__PURE__ */ import_react13.default.createElement(import_ui12.SelectContent, null, /* @__PURE__ */ import_react13.default.createElement(import_ui12.SelectItem, { value: "default" }, "Default"), /* @__PURE__ */ import_react13.default.createElement(import_ui12.SelectItem, { value: "sm" }, "Small"), /* @__PURE__ */ import_react13.default.createElement(import_ui12.SelectItem, { value: "lg" }, "Large"), /* @__PURE__ */ import_react13.default.createElement(import_ui12.SelectItem, { value: "icon" }, "Icon"))
       ))));
     };
     ButtonConfigEditor.propTypes = {
-      widgetEditorForm: import_prop_types11.default.object.isRequired
+      widgetEditorForm: import_prop_types12.default.object.isRequired
     };
   }
 });
 
 // src/button/buttonWidget.jsx
-var import_react13, import_prop_types12, import_ui12, ButtonWidget;
+var import_react15, import_prop_types14, import_ui14, ButtonWidget;
 var init_buttonWidget = __esm({
   "src/button/buttonWidget.jsx"() {
-    import_react13 = __toESM(require("react"));
-    import_prop_types12 = __toESM(require("prop-types"));
-    import_ui12 = require("@jet-admin/ui");
+    import_react15 = __toESM(require("react"));
+    import_prop_types14 = __toESM(require("prop-types"));
+    import_ui14 = require("@jet-admin/ui");
     ButtonWidget = ({
       widgetTitle,
       // Title of the widget (optional usage here)
@@ -718,24 +718,24 @@ var init_buttonWidget = __esm({
       const text = widgetConfig?.text || "Click Me";
       const variant = widgetConfig?.variant || "default";
       const size = widgetConfig?.size || "default";
-      return /* @__PURE__ */ import_react13.default.createElement("div", { className: "flex w-full h-full items-center justify-center p-4 text-center" }, /* @__PURE__ */ import_react13.default.createElement(
-        import_ui12.Button,
+      return /* @__PURE__ */ import_react15.default.createElement("div", { className: "flex w-full h-full items-center justify-center p-4 text-center" }, /* @__PURE__ */ import_react15.default.createElement(
+        import_ui14.Button,
         {
           variant,
           size,
           onClick: runWorkflow,
           disabled: isLoadingWorkflows
         },
-        isLoadingWorkflows && /* @__PURE__ */ import_react13.default.createElement(import_ui12.Spinner, { className: "mr-2 h-4 w-4" }),
+        isLoadingWorkflows && /* @__PURE__ */ import_react15.default.createElement(import_ui14.Spinner, { className: "mr-2 h-4 w-4" }),
         text
       ));
     };
     ButtonWidget.propTypes = {
-      widgetTitle: import_prop_types12.default.string,
-      widgetType: import_prop_types12.default.string,
-      widgetConfig: import_prop_types12.default.object,
-      runWorkflow: import_prop_types12.default.func,
-      isLoadingWorkflows: import_prop_types12.default.bool
+      widgetTitle: import_prop_types14.default.string,
+      widgetType: import_prop_types14.default.string,
+      widgetConfig: import_prop_types14.default.object,
+      runWorkflow: import_prop_types14.default.func,
+      isLoadingWorkflows: import_prop_types14.default.bool
     };
   }
 });
@@ -1047,7 +1047,7 @@ var VariableCategory = ({
     isExpanded ? /* @__PURE__ */ import_react2.default.createElement(import_fi.FiChevronDown, { className: "w-3 h-3 text-muted-foreground" }) : /* @__PURE__ */ import_react2.default.createElement(import_fi.FiChevronRight, { className: "w-3 h-3 text-muted-foreground" }),
     getCategoryIcon(category),
     /* @__PURE__ */ import_react2.default.createElement("span", { className: "text-[11px] font-medium uppercase tracking-wide flex-1 text-muted-foreground" }, title),
-    /* @__PURE__ */ import_react2.default.createElement("span", { className: "text-[10px] px-1.5 py-0.5 rounded bg-background border border-border text-muted-foreground" }, variables.length)
+    /* @__PURE__ */ import_react2.default.createElement("span", { className: "text-[10px] px-1.5 py-0.5 rounded bg-white border border-border text-muted-foreground" }, variables.length)
   ), isExpanded && /* @__PURE__ */ import_react2.default.createElement("div", { className: "ml-3 mt-1 pl-2 border-l border-border" }, variables.map((variable) => /* @__PURE__ */ import_react2.default.createElement(
     VariableItem,
     {
@@ -1165,7 +1165,7 @@ var VariableExplorer = ({
     };
   }, [allVariables, searchQuery]);
   const hasVariables = schema.inputs.length > 0 || schema.nodeOutputs.length > 0 || schema.workflowOutputs.length > 0;
-  return /* @__PURE__ */ import_react2.default.createElement("div", { className: `flex flex-col rounded-lg border border-border bg-background ${className}` }, /* @__PURE__ */ import_react2.default.createElement("div", { className: "flex items-center justify-between px-3 py-2 rounded-t-lg border-b border-border bg-muted/50" }, /* @__PURE__ */ import_react2.default.createElement("h3", { className: "text-xs font-medium text-muted-foreground" }, title)), showSearch && hasVariables && /* @__PURE__ */ import_react2.default.createElement("div", { className: "px-2 py-2 border-b border-border" }, /* @__PURE__ */ import_react2.default.createElement(
+  return /* @__PURE__ */ import_react2.default.createElement("div", { className: `flex flex-col rounded-lg border border-border bg-white ${className}` }, /* @__PURE__ */ import_react2.default.createElement("div", { className: "flex items-center justify-between px-3 py-2 rounded-t-lg border-b border-border bg-muted/50" }, /* @__PURE__ */ import_react2.default.createElement("h3", { className: "text-xs font-medium text-muted-foreground" }, title)), showSearch && hasVariables && /* @__PURE__ */ import_react2.default.createElement("div", { className: "px-2 py-2 border-b border-border" }, /* @__PURE__ */ import_react2.default.createElement(
     import_ui.Input,
     {
       type: "text",
@@ -2063,7 +2063,7 @@ var FieldPill = ({
     },
     /* @__PURE__ */ import_react4.default.createElement("span", { className: "opacity-70 font-mono scale-90" }, icon),
     /* @__PURE__ */ import_react4.default.createElement("span", { className: "truncate" }, field.name),
-    field.aggregate && field.aggregate !== "none" && /* @__PURE__ */ import_react4.default.createElement("span", { className: "text-[9px] uppercase tracking-wider bg-white/50 px-1 rounded ml-1 font-bold", title: `Aggregate: ${field.aggregate}` }, field.aggregate.slice(0, 3)),
+    field.aggregate && field.aggregate !== "none" && /* @__PURE__ */ import_react4.default.createElement("span", { className: "text-[9px] uppercase tracking-wider bg-slate-50/50 px-1 rounded ml-1 font-bold", title: `Aggregate: ${field.aggregate}` }, field.aggregate.slice(0, 3)),
     onRemove && /* @__PURE__ */ import_react4.default.createElement(
       import_ui3.Button,
       {
@@ -2122,6 +2122,7 @@ var collectArrayPaths = (obj, prefix = "ctx", depth = 0, maxDepth = 4) => {
 };
 var DataFieldPanel = ({
   workflowContext,
+  queryResults,
   dataSource,
   onDataSourceChange,
   onFieldClick,
@@ -2170,6 +2171,10 @@ var DataFieldPanel = ({
     if (!workflowContext) return [];
     return collectArrayPaths(workflowContext);
   }, [workflowContext]);
+  const queryResultPaths = (0, import_react5.useMemo)(() => {
+    if (!queryResults) return [];
+    return collectArrayPaths(queryResults, "qr");
+  }, [queryResults]);
   const allSuggestions = (0, import_react5.useMemo)(() => {
     const seen = /* @__PURE__ */ new Set();
     const combined = [];
@@ -2183,6 +2188,27 @@ var DataFieldPanel = ({
         });
       }
     }
+    if (queryResults) {
+      for (const alias of Object.keys(queryResults)) {
+        const data = queryResults[alias];
+        const isArray = Array.isArray(data);
+        const arrayData = isArray ? data : data?.data && Array.isArray(data.data) ? data.data : null;
+        if (arrayData && arrayData.length > 0) {
+          const path = isArray ? `{{${alias}}}` : `{{${alias}.data}}`;
+          if (!seen.has(path)) {
+            seen.add(path);
+            combined.push({
+              path,
+              label: `${alias} (Data Source)`,
+              sampleKeys: Object.keys(arrayData[0]),
+              rowCount: arrayData.length,
+              source: "datasource",
+              description: `${arrayData.length} rows, fields: ${Object.keys(arrayData[0]).slice(0, 4).join(", ")}`
+            });
+          }
+        }
+      }
+    }
     for (const s of schemaSuggestions) {
       if (!seen.has(s.path)) {
         seen.add(s.path);
@@ -2190,35 +2216,59 @@ var DataFieldPanel = ({
       }
     }
     return combined;
-  }, [ctxArrayPaths, schemaSuggestions]);
+  }, [ctxArrayPaths, queryResultPaths, schemaSuggestions, queryResults]);
   const fields = (0, import_react5.useMemo)(() => {
-    if (!workflowContext || !dataSource) return [];
-    const match = dataSource.match(/\{\{ctx\.([^}]+)\}\}/);
-    if (!match) return [];
-    const path = match[1];
-    const parts = path.split(".");
-    let current = workflowContext;
-    for (const part of parts) {
-      if (current === void 0 || current === null) break;
-      const arrMatch = part.match(/^(.+)\[(\d+)\]$/);
-      if (arrMatch) {
-        current = current[arrMatch[1]]?.[parseInt(arrMatch[2])];
-      } else {
-        current = current[part];
+    if (workflowContext && dataSource) {
+      const match = dataSource.match(/\{\{ctx\.([^}]+)\}\}/);
+      if (match) {
+        const path = match[1];
+        const parts = path.split(".");
+        let current = workflowContext;
+        for (const part of parts) {
+          if (current === void 0 || current === null) break;
+          const arrMatch = part.match(/^(.+)\[(\d+)\]$/);
+          if (arrMatch) {
+            current = current[arrMatch[1]]?.[parseInt(arrMatch[2])];
+          } else {
+            current = current[part];
+          }
+        }
+        if (Array.isArray(current)) {
+          return inferFieldsFromData(current);
+        }
+        if (current && typeof current === "object" && !Array.isArray(current)) {
+          return Object.keys(current).map((key) => ({
+            name: key,
+            type: typeof current[key] === "number" ? "quantitative" : "nominal",
+            icon: typeof current[key] === "number" ? "#" : "Abc"
+          }));
+        }
       }
     }
-    if (Array.isArray(current)) {
-      return inferFieldsFromData(current);
-    }
-    if (current && typeof current === "object" && !Array.isArray(current)) {
-      return Object.keys(current).map((key) => ({
-        name: key,
-        type: typeof current[key] === "number" ? "quantitative" : "nominal",
-        icon: typeof current[key] === "number" ? "#" : "Abc"
-      }));
+    if (queryResults && dataSource) {
+      const match = dataSource.match(/\{\{([^}]+)\}\}/);
+      if (match) {
+        const fullPath = match[1];
+        const parts = fullPath.split(".");
+        let current = queryResults;
+        for (const part of parts) {
+          if (current === void 0 || current === null) break;
+          current = current[part];
+        }
+        if (Array.isArray(current) && current.length > 0) {
+          return inferFieldsFromData(current);
+        }
+        if (current && typeof current === "object" && !Array.isArray(current)) {
+          return Object.keys(current).map((key) => ({
+            name: key,
+            type: typeof current[key] === "number" ? "quantitative" : "nominal",
+            icon: typeof current[key] === "number" ? "#" : "Abc"
+          }));
+        }
+      }
     }
     return [];
-  }, [workflowContext, dataSource]);
+  }, [workflowContext, queryResults, dataSource]);
   const filteredFields = (0, import_react5.useMemo)(() => {
     if (!searchTerm) return fields;
     const lower = searchTerm.toLowerCase();
@@ -2247,8 +2297,10 @@ var DataFieldPanel = ({
         return /* @__PURE__ */ import_react5.default.createElement(import_md2.MdOutput, { className: "w-3 h-3 shrink-0 text-fuchsia-600" });
       case "runtime":
         return /* @__PURE__ */ import_react5.default.createElement(import_fi2.FiZap, { className: "w-3 h-3 shrink-0 text-amber-600" });
+      case "datasource":
+        return /* @__PURE__ */ import_react5.default.createElement(import_fi2.FiDatabase, { className: "w-3 h-3 shrink-0 text-blue-600" });
       default:
-        return /* @__PURE__ */ import_react5.default.createElement(import_fi2.FiDatabase, { className: "w-3 h-3 shrink-0 text-slate-400" });
+        return /* @__PURE__ */ import_react5.default.createElement(import_fi2.FiDatabase, { className: "w-3 h-3 shrink-0 text-[#1c1c1e]" });
     }
   };
   const renderFieldGroup = (groupFields, label, colorClass) => {
@@ -2263,7 +2315,7 @@ var DataFieldPanel = ({
       }
     ))));
   };
-  return /* @__PURE__ */ import_react5.default.createElement("div", { className: `flex flex-col h-full bg-background ${className}` }, /* @__PURE__ */ import_react5.default.createElement("div", { className: "p-2.5 border-b border-border bg-muted/30" }, /* @__PURE__ */ import_react5.default.createElement("div", { className: "flex items-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5" }, /* @__PURE__ */ import_react5.default.createElement(import_fi2.FiDatabase, { className: "w-3.5 h-3.5 text-muted-foreground" }), /* @__PURE__ */ import_react5.default.createElement("span", null, "Data Source")), /* @__PURE__ */ import_react5.default.createElement("div", { className: "relative", ref: suggestionsRef }, /* @__PURE__ */ import_react5.default.createElement(
+  return /* @__PURE__ */ import_react5.default.createElement("div", { className: `flex flex-col h-full bg-white ${className}` }, /* @__PURE__ */ import_react5.default.createElement("div", { className: "p-2.5 border-b border-border bg-muted/30" }, /* @__PURE__ */ import_react5.default.createElement("div", { className: "flex items-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5" }, /* @__PURE__ */ import_react5.default.createElement(import_fi2.FiDatabase, { className: "w-3.5 h-3.5 text-muted-foreground" }), /* @__PURE__ */ import_react5.default.createElement("span", null, "Data Source")), /* @__PURE__ */ import_react5.default.createElement("div", { className: "relative", ref: suggestionsRef }, /* @__PURE__ */ import_react5.default.createElement(
     import_ui4.Input,
     {
       type: "text",
@@ -2274,17 +2326,17 @@ var DataFieldPanel = ({
       className: "w-full text-xs font-mono",
       title: "Workflow data source path"
     }
-  ), showSuggestions && allSuggestions.length > 0 && /* @__PURE__ */ import_react5.default.createElement("div", { className: "absolute left-0 right-0 top-full mt-1 bg-background border border-border rounded-md shadow-xl z-50 max-h-60 overflow-y-auto w-80" }, /* @__PURE__ */ import_react5.default.createElement("div", { className: "px-3 py-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest border-b border-border bg-muted sticky top-0" }, "Available Variables (", allSuggestions.length, ")"), allSuggestions.map((s, i) => /* @__PURE__ */ import_react5.default.createElement(
+  ), showSuggestions && allSuggestions.length > 0 && /* @__PURE__ */ import_react5.default.createElement("div", { className: "absolute left-0 right-0 top-full mt-1 bg-white border border-border rounded-md shadow-xl z-50 max-h-60 overflow-y-auto w-80" }, /* @__PURE__ */ import_react5.default.createElement("div", { className: "px-3 py-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest border-b border-border bg-muted sticky top-0" }, "Available Variables (", allSuggestions.length, ")"), allSuggestions.map((s, i) => /* @__PURE__ */ import_react5.default.createElement(
     "div",
     {
       key: `${s.path}-${i}`,
       onClick: () => handleSelectSuggestion(s),
-      className: `w-full text-left px-3 py-1.5 text-xs border-b border-border/50 flex items-start gap-2 transition-colors cursor-pointer ${dataSource === s.path ? "bg-primary/5 border-l-2 border-l-primary" : "bg-background hover:bg-muted"}`
+      className: `w-full text-left px-3 py-1.5 text-xs border-b border-border/50 flex items-start gap-2 transition-colors cursor-pointer ${dataSource === s.path ? "bg-primary/5 border-l-2 border-l-primary" : "bg-white hover:bg-muted"}`
     },
     /* @__PURE__ */ import_react5.default.createElement("div", { className: "mt-0.5" }, getCategoryIcon2(s.source || s.category)),
     /* @__PURE__ */ import_react5.default.createElement("div", { className: "flex-1 min-w-0" }, /* @__PURE__ */ import_react5.default.createElement("div", { className: "text-[11px] font-medium text-foreground font-mono truncate" }, s.label), /* @__PURE__ */ import_react5.default.createElement("div", { className: "text-[10px] text-muted-foreground truncate mt-0.5", title: s.description }, s.description), s.nodeTitle && /* @__PURE__ */ import_react5.default.createElement("div", { className: "text-[9px] text-emerald-600 mt-1 uppercase tracking-wider font-semibold" }, "from: ", s.nodeTitle)),
     s.source === "runtime" && /* @__PURE__ */ import_react5.default.createElement("span", { className: "text-[9px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded uppercase tracking-wider shrink-0" }, "LIVE")
-  )))), dataSource && fields.length > 0 && /* @__PURE__ */ import_react5.default.createElement("div", { className: "mt-1.5 flex items-center gap-1.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded w-fit border border-emerald-100" }, /* @__PURE__ */ import_react5.default.createElement(import_fi2.FiZap, { className: "w-3 h-3" }), fields.length, " fields detected")), fields.length > 5 && /* @__PURE__ */ import_react5.default.createElement("div", { className: "px-2.5 py-1.5 border-b border-border bg-background" }, /* @__PURE__ */ import_react5.default.createElement("div", { className: "flex items-center gap-2 bg-muted/50 border border-border rounded px-2 py-1 focus-within:ring-1 focus-within:ring-ring focus-within:border-ring transition-shadow" }, /* @__PURE__ */ import_react5.default.createElement(import_fi2.FiSearch, { className: "w-3.5 h-3.5 text-muted-foreground" }), /* @__PURE__ */ import_react5.default.createElement(
+  )))), dataSource && fields.length > 0 && /* @__PURE__ */ import_react5.default.createElement("div", { className: "mt-1.5 flex items-center gap-1.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded w-fit border border-emerald-100" }, /* @__PURE__ */ import_react5.default.createElement(import_fi2.FiZap, { className: "w-3 h-3" }), fields.length, " fields detected")), fields.length > 5 && /* @__PURE__ */ import_react5.default.createElement("div", { className: "px-2.5 py-1.5 border-b border-border bg-white" }, /* @__PURE__ */ import_react5.default.createElement("div", { className: "flex items-center gap-2 bg-muted/50 border border-border rounded px-2 py-1 focus-within:ring-1 focus-within:ring-ring focus-within:border-ring transition-shadow" }, /* @__PURE__ */ import_react5.default.createElement(import_fi2.FiSearch, { className: "w-3.5 h-3.5 text-muted-foreground" }), /* @__PURE__ */ import_react5.default.createElement(
     import_ui4.Input,
     {
       type: "text",
@@ -2348,6 +2400,7 @@ var DataFieldPanel = ({
 };
 DataFieldPanel.propTypes = {
   workflowContext: import_prop_types4.default.object,
+  queryResults: import_prop_types4.default.object,
   dataSource: import_prop_types4.default.string,
   onDataSourceChange: import_prop_types4.default.func,
   onFieldClick: import_prop_types4.default.func,
@@ -2440,7 +2493,7 @@ var EncodingShelf = ({
   }, [value, onChange]);
   const isEmpty = !value || !value.field;
   const shelfClass = [
-    "flex items-center w-full min-h-[36px] bg-background border border-border rounded-md p-1 gap-2 transition-colors",
+    "flex items-center w-full min-h-[36px] bg-white border border-border rounded-md p-1 gap-2 transition-colors",
     isEmpty ? "border-dashed border-border bg-muted/30" : "",
     isDragOver ? "border-primary bg-primary/5 shadow-inner" : "",
     className
@@ -2518,10 +2571,10 @@ var MarkSelector = ({ value, onChange, className = "" }) => {
         variant: isSelected ? "outline" : "ghost",
         size: "sm",
         onClick: () => onChange(opt.key),
-        className: `h-auto py-1.5 flex-1 min-w-[60px] px-2 text-xs font-medium ${isSelected ? "bg-indigo-50 text-indigo-700 border-indigo-200 shadow-sm hover:text-indigo-800 hover:bg-indigo-100" : "text-slate-600 border-transparent hover:bg-slate-100"}`,
+        className: `h-auto py-1.5 flex-1 min-w-[60px] px-2 text-xs font-medium ${isSelected ? "bg-indigo-50 text-indigo-700 border-indigo-200 shadow-sm hover:text-indigo-800 hover:bg-indigo-100" : "text-[#1c1c1e] border-transparent hover:bg-slate-100"}`,
         title: `${opt.label}: ${opt.desc}`
       },
-      /* @__PURE__ */ import_react7.default.createElement("span", { className: `mr-1.5 ${isSelected ? "text-indigo-500" : "text-slate-400"}` }, opt.icon),
+      /* @__PURE__ */ import_react7.default.createElement("span", { className: `mr-1.5 ${isSelected ? "text-indigo-500" : "text-[#1c1c1e]"}` }, opt.icon),
       /* @__PURE__ */ import_react7.default.createElement("span", { className: "hidden lg:inline" }, opt.label)
     );
   }));
@@ -2544,7 +2597,8 @@ var SECONDARY_SHELVES = ["row", "column", "shape", "opacity", "detail", "text"];
 var ShelfBuilder = ({
   widgetEditorForm,
   workflowContext,
-  workflows
+  workflows,
+  queryResults
 }) => {
   const [shelfSpec, setShelfSpec] = (0, import_react8.useState)(() => {
     let savedSpec = widgetEditorForm.values.widgetConfig?.shelfSpec;
@@ -2643,7 +2697,9 @@ var ShelfBuilder = ({
     }, 200);
     return () => clearTimeout(timer);
   }, [shelfSpec]);
+  const hasDataSources = !!(queryResults && Object.keys(queryResults).length > 0);
   const isWorkflowSelected = !!selectedWorkflow;
+  const hasAnyData = isWorkflowSelected || hasDataSources;
   return /* @__PURE__ */ import_react8.default.createElement(import_react8.default.Fragment, null, /* @__PURE__ */ import_react8.default.createElement(import_ui7.Dialog, { open: isOpen, onOpenChange: setIsOpen }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.DialogTrigger, { asChild: true }, /* @__PURE__ */ import_react8.default.createElement(
     import_ui7.Button,
     {
@@ -2654,17 +2710,18 @@ var ShelfBuilder = ({
     },
     /* @__PURE__ */ import_react8.default.createElement(import_md3.MdOutlineAutoGraph, { className: "inline-block h-3 w-3 mr-2" }),
     VEGA_STRINGS.WIDGET_DATASET_FIELD_MAPPING_BUTTON
-  )), /* @__PURE__ */ import_react8.default.createElement(import_ui7.DialogContent, { className: "max-w-6xl w-[95vw] h-[85vh] max-h-[85vh] flex flex-col p-0 gap-0 overflow-hidden bg-background border-border shadow-2xl" }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.DialogHeader, { className: "flex flex-row items-center px-4 py-3 border-b border-border bg-background shrink-0 space-y-0" }, /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex items-center gap-2 text-foreground" }, /* @__PURE__ */ import_react8.default.createElement(import_md3.MdOutlineAutoGraph, { className: "w-5 h-5 text-primary" }), /* @__PURE__ */ import_react8.default.createElement(import_ui7.DialogTitle, { className: "text-base font-bold m-0 p-0 text-left" }, "Visual Chart Editor"))), /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex-1 overflow-hidden bg-muted/30 flex p-3 gap-3 min-h-0" }, !isWorkflowSelected ? /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex flex-col items-center justify-center w-full h-full text-center border-2 border-dashed border-border rounded bg-background" }, /* @__PURE__ */ import_react8.default.createElement(import_fi3.FiDatabase, { className: "w-10 h-10 mb-3 text-muted-foreground/40" }), /* @__PURE__ */ import_react8.default.createElement("p", { className: "text-sm font-semibold text-foreground mb-1" }, "No Data Source Selected"), /* @__PURE__ */ import_react8.default.createElement("p", { className: "text-xs text-muted-foreground" }, "Select a Workflow in the configuration panel to start building your chart.")) : /* @__PURE__ */ import_react8.default.createElement(import_react8.default.Fragment, null, /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex flex-col w-56 shrink-0 bg-background border border-border rounded-md overflow-hidden min-h-0 h-full" }, /* @__PURE__ */ import_react8.default.createElement("div", { className: "p-2 border-b border-border bg-background" }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.Select, { value: shelfSpec.dataSource || "", onValueChange: (val) => handleDataSourceChange(val) }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectTrigger, { className: "text-xs font-medium" }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectValue, { placeholder: "Select Data Input" })), /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectContent, { className: "z-[200]" }, selectedWorkflow && /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectItem, { value: "workflow" }, "Workflow Output"), workflowContext && Object.keys(workflowContext).map((key) => /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectItem, { key, value: `{{ctx.${key}}}` }, `ctx.${key}`))))), /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex-1 overflow-hidden outline-none min-h-0" }, /* @__PURE__ */ import_react8.default.createElement(
+  )), /* @__PURE__ */ import_react8.default.createElement(import_ui7.DialogContent, { className: "max-w-6xl w-[95vw] h-[85vh] max-h-[85vh] flex flex-col p-0 gap-0 overflow-hidden bg-white border-border shadow-2xl" }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.DialogHeader, { className: "flex flex-row items-center px-4 py-3 border-b border-border bg-white shrink-0 space-y-0" }, /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex items-center gap-2 text-foreground" }, /* @__PURE__ */ import_react8.default.createElement(import_md3.MdOutlineAutoGraph, { className: "w-5 h-5 text-primary" }), /* @__PURE__ */ import_react8.default.createElement(import_ui7.DialogTitle, { className: "text-base font-bold m-0 p-0 text-left" }, "Visual Chart Editor"))), /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex-1 overflow-hidden bg-muted/30 flex p-3 gap-3 min-h-0" }, !hasAnyData ? /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex flex-col items-center justify-center w-full h-full text-center border-2 border-dashed border-border rounded bg-white" }, /* @__PURE__ */ import_react8.default.createElement(import_fi3.FiDatabase, { className: "w-10 h-10 mb-3 text-muted-foreground/40" }), /* @__PURE__ */ import_react8.default.createElement("p", { className: "text-sm font-semibold text-foreground mb-1" }, "No Data Source Selected"), /* @__PURE__ */ import_react8.default.createElement("p", { className: "text-xs text-muted-foreground" }, "Add a Data Source in the Data tab and run a Test, or select a Workflow.")) : /* @__PURE__ */ import_react8.default.createElement(import_react8.default.Fragment, null, /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex flex-col w-56 shrink-0 bg-white border border-border rounded-md overflow-hidden min-h-0 h-full" }, /* @__PURE__ */ import_react8.default.createElement("div", { className: "p-2 border-b border-border bg-white" }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.Select, { value: shelfSpec.dataSource || "", onValueChange: (val) => handleDataSourceChange(val) }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectTrigger, { className: "text-xs font-medium" }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectValue, { placeholder: "Select Data Input" })), /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectContent, { className: "z-[200]" }, selectedWorkflow && /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectItem, { value: "workflow" }, "Workflow Output"), workflowContext && Object.keys(workflowContext).map((key) => /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectItem, { key, value: `{{ctx.${key}}}` }, `ctx.${key}`)), queryResults && Object.keys(queryResults).map((alias) => /* @__PURE__ */ import_react8.default.createElement(import_ui7.SelectItem, { key: `qr-${alias}`, value: `{{${alias}.data}}` }, alias, " (Data Source)"))))), /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex-1 overflow-hidden outline-none min-h-0" }, /* @__PURE__ */ import_react8.default.createElement(
     DataFieldPanel,
     {
       workflowContext,
+      queryResults,
       dataSource: shelfSpec.dataSource,
       onDataSourceChange: handleDataSourceChange,
       onFieldClick: handleFieldQuickAdd,
       workflow: selectedWorkflow,
       className: "h-full"
     }
-  ))), /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex-1 flex flex-col h-full overflow-y-auto min-h-0 pr-1 gap-1.5" }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.Label, { className: "text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-1" }, "Encoding Shelves"), /* @__PURE__ */ import_react8.default.createElement("div", { className: "bg-background border border-border rounded-md p-3 flex flex-col gap-3" }, PRIMARY_SHELVES.map((ch) => /* @__PURE__ */ import_react8.default.createElement(
+  ))), /* @__PURE__ */ import_react8.default.createElement("div", { className: "flex-1 flex flex-col h-full overflow-y-auto min-h-0 pr-1 gap-1.5" }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.Label, { className: "text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-1" }, "Encoding Shelves"), /* @__PURE__ */ import_react8.default.createElement("div", { className: "bg-white border border-border rounded-md p-3 flex flex-col gap-3" }, PRIMARY_SHELVES.map((ch) => /* @__PURE__ */ import_react8.default.createElement(
     EncodingShelf,
     {
       key: ch,
@@ -2673,11 +2730,11 @@ var ShelfBuilder = ({
       onChange: (val) => handleChannelChange(ch, val),
       onRemove: () => handleChannelRemove(ch)
     }
-  ))), /* @__PURE__ */ import_react8.default.createElement("div", { className: "bg-background border border-border rounded-md mt-2" }, /* @__PURE__ */ import_react8.default.createElement(
+  ))), /* @__PURE__ */ import_react8.default.createElement("div", { className: "bg-white border border-border rounded-md mt-2" }, /* @__PURE__ */ import_react8.default.createElement(
     "div",
     {
       onClick: () => setShowSecondary(!showSecondary),
-      className: "w-full flex items-center justify-start p-2.5 border-b border-border hover:bg-muted transition-colors focus:outline-none bg-background font-medium cursor-pointer"
+      className: "w-full flex items-center justify-start p-2.5 border-b border-border hover:bg-muted transition-colors focus:outline-none bg-white font-medium cursor-pointer"
     },
     showSecondary ? /* @__PURE__ */ import_react8.default.createElement(import_fi3.FiChevronDown, { className: "w-4 h-4 mr-2 text-muted-foreground" }) : /* @__PURE__ */ import_react8.default.createElement(import_fi3.FiChevronRight, { className: "w-4 h-4 mr-2 text-muted-foreground" }),
     /* @__PURE__ */ import_react8.default.createElement("span", { className: "text-[10px] font-bold uppercase tracking-wider text-foreground" }, "More Channels ", /* @__PURE__ */ import_react8.default.createElement("span", { className: "text-primary ml-1" }, "(", SECONDARY_SHELVES.filter((ch) => shelfSpec.encoding[ch]?.field).length, " active)"))
@@ -2698,7 +2755,7 @@ var ShelfBuilder = ({
     },
     showStyle ? /* @__PURE__ */ import_react8.default.createElement(import_fi3.FiChevronDown, { className: "w-4 h-4" }) : /* @__PURE__ */ import_react8.default.createElement(import_fi3.FiChevronRight, { className: "w-4 h-4" }),
     /* @__PURE__ */ import_react8.default.createElement("span", { className: "text-[10px] font-bold uppercase tracking-widest" }, "Chart Style & Settings")
-  ), showStyle && /* @__PURE__ */ import_react8.default.createElement("div", { className: "bg-background border border-border rounded-md p-3 space-y-4" }, /* @__PURE__ */ import_react8.default.createElement("div", null, /* @__PURE__ */ import_react8.default.createElement(import_ui7.Label, { className: "block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5" }, "Marks"), /* @__PURE__ */ import_react8.default.createElement("div", { className: "bg-muted/30 border border-border rounded-md p-2" }, /* @__PURE__ */ import_react8.default.createElement(MarkSelector, { value: shelfSpec.mark || "auto", onChange: handleMarkChange }), shelfSpec.mark === "auto" && /* @__PURE__ */ import_react8.default.createElement("div", { className: "text-[10px] text-muted-foreground italic p-1 text-center mt-1" }, "Auto-resolved to: ", /* @__PURE__ */ import_react8.default.createElement("span", { className: "font-semibold text-foreground not-italic ml-1" }, resolvedMark)))), /* @__PURE__ */ import_react8.default.createElement("div", { className: "border-t border-border pt-3 space-y-3" }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.Label, { className: "block text-[10px] font-bold text-muted-foreground uppercase tracking-widest" }, "Appearance"), /* @__PURE__ */ import_react8.default.createElement("div", null, /* @__PURE__ */ import_react8.default.createElement(import_ui7.Label, { className: "block text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1" }, "Chart Title"), /* @__PURE__ */ import_react8.default.createElement(
+  ), showStyle && /* @__PURE__ */ import_react8.default.createElement("div", { className: "bg-white border border-border rounded-md p-3 space-y-4" }, /* @__PURE__ */ import_react8.default.createElement("div", null, /* @__PURE__ */ import_react8.default.createElement(import_ui7.Label, { className: "block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5" }, "Marks"), /* @__PURE__ */ import_react8.default.createElement("div", { className: "bg-muted/30 border border-border rounded-md p-2" }, /* @__PURE__ */ import_react8.default.createElement(MarkSelector, { value: shelfSpec.mark || "auto", onChange: handleMarkChange }), shelfSpec.mark === "auto" && /* @__PURE__ */ import_react8.default.createElement("div", { className: "text-[10px] text-muted-foreground italic p-1 text-center mt-1" }, "Auto-resolved to: ", /* @__PURE__ */ import_react8.default.createElement("span", { className: "font-semibold text-foreground not-italic ml-1" }, resolvedMark)))), /* @__PURE__ */ import_react8.default.createElement("div", { className: "border-t border-border pt-3 space-y-3" }, /* @__PURE__ */ import_react8.default.createElement(import_ui7.Label, { className: "block text-[10px] font-bold text-muted-foreground uppercase tracking-widest" }, "Appearance"), /* @__PURE__ */ import_react8.default.createElement("div", null, /* @__PURE__ */ import_react8.default.createElement(import_ui7.Label, { className: "block text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1" }, "Chart Title"), /* @__PURE__ */ import_react8.default.createElement(
     import_ui7.Input,
     {
       type: "text",
@@ -2715,7 +2772,7 @@ var ShelfBuilder = ({
       onChange: (e) => handleConfigChange("height", parseInt(e.target.value) || 300),
       className: "w-full text-xs"
     }
-  )))))))), /* @__PURE__ */ import_react8.default.createElement(import_ui7.DialogFooter, { className: "px-4 py-2.5 border-t border-border bg-background shrink-0" }, /* @__PURE__ */ import_react8.default.createElement(
+  )))))))), /* @__PURE__ */ import_react8.default.createElement(import_ui7.DialogFooter, { className: "px-4 py-2.5 border-t border-border bg-white shrink-0" }, /* @__PURE__ */ import_react8.default.createElement(
     import_ui7.Button,
     {
       type: "button",
@@ -2727,7 +2784,8 @@ var ShelfBuilder = ({
 ShelfBuilder.propTypes = {
   widgetEditorForm: import_prop_types7.default.object.isRequired,
   workflowContext: import_prop_types7.default.object,
-  workflows: import_prop_types7.default.array
+  workflows: import_prop_types7.default.array,
+  queryResults: import_prop_types7.default.object
 };
 
 // src/vega/vegaConfigEditor.jsx
@@ -2739,7 +2797,8 @@ var VegaConfigEditor = ({
   widgetEditorForm,
   workflowContext,
   workflows,
-  selectedWorkflow
+  selectedWorkflow,
+  queryResults
 }) => {
   const isVegaLite = widgetEditorForm.values.widgetType === "vega-lite";
   const currentMode = widgetEditorForm.values.widgetConfig?.editorMode || (isVegaLite ? "visual" : "raw");
@@ -2774,12 +2833,13 @@ var VegaConfigEditor = ({
     widgetEditorForm.setFieldValue("widgetConfig.editorMode", "visual");
     setShowParseWarning(false);
   };
-  return /* @__PURE__ */ import_react9.default.createElement("div", { className: "bg-background border border-border rounded-md p-3 flex flex-col gap-3" }, isVegaLite && /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex flex-row items-center gap-2" }, /* @__PURE__ */ import_react9.default.createElement("span", { className: "text-xs font-medium text-muted-foreground" }, "Visual Editor"), /* @__PURE__ */ import_react9.default.createElement(import_ui8.Switch, { className: "h-[18px] w-[32px] [&>span]:h-3.5 [&>span]:w-3.5 data-[state=checked]:[&>span]:translate-x-3.5", checked: currentMode === "visual", onCheckedChange: (checked) => handleModeSwitch(checked ? "visual" : "raw") })), isVegaLite && /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex flex-row items-center justify-stretch gap-3" }, currentMode === "visual" && !showParseWarning && /* @__PURE__ */ import_react9.default.createElement(
+  return /* @__PURE__ */ import_react9.default.createElement("div", { className: "bg-white border border-border rounded-md p-3 flex flex-col gap-3" }, isVegaLite && /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex flex-row items-center gap-2" }, /* @__PURE__ */ import_react9.default.createElement("span", { className: "text-xs font-medium text-muted-foreground" }, "Visual Editor"), /* @__PURE__ */ import_react9.default.createElement(import_ui8.Switch, { className: "h-[18px] w-[32px] [&>span]:h-3.5 [&>span]:w-3.5 data-[state=checked]:[&>span]:translate-x-3.5", checked: currentMode === "visual", onCheckedChange: (checked) => handleModeSwitch(checked ? "visual" : "raw") })), isVegaLite && /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex flex-row items-center justify-stretch gap-3" }, currentMode === "visual" && !showParseWarning && /* @__PURE__ */ import_react9.default.createElement(
     ShelfBuilder,
     {
       widgetEditorForm,
       workflowContext,
-      workflows
+      workflows,
+      queryResults
     }
   ), /* @__PURE__ */ import_react9.default.createElement(
     import_ui8.Button,
@@ -2801,7 +2861,7 @@ var VegaConfigEditor = ({
       onChange: widgetEditorForm.handleChange,
       value: widgetEditorForm.values.widgetConfig?.refetchInterval || ""
     }
-  )), /* @__PURE__ */ import_react9.default.createElement("div", { className: "border-t border-border pt-4" }, /* @__PURE__ */ import_react9.default.createElement(import_ui8.Label, { className: "text-xs text-muted-foreground italic" }, "Additional options moved to Widget Settings.")))))), showParseWarning && /* @__PURE__ */ import_react9.default.createElement("div", { className: "my-2 shrink-0 rounded-md border border-amber-200 bg-amber-50 px-4 py-2 dark:border-amber-900/40 dark:bg-amber-950/20" }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex items-start gap-2 text-xs" }, /* @__PURE__ */ import_react9.default.createElement(import_fi4.FiAlertTriangle, { className: "mt-0.5 h-4 w-4 shrink-0 text-amber-600" }), /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react9.default.createElement("h4", { className: "mb-1 font-semibold text-amber-900 dark:text-amber-200" }, "Cannot fully parse chart config"), /* @__PURE__ */ import_react9.default.createElement("p", { className: "mb-2 text-amber-800 dark:text-amber-300" }, "Switching to Visual mode may cause you to lose manual modifications:"), /* @__PURE__ */ import_react9.default.createElement("ul", { className: "mb-3 list-disc pl-4 text-amber-800 dark:text-amber-300" }, parseWarningsList.map((w, i) => /* @__PURE__ */ import_react9.default.createElement("li", { key: i, className: "mb-0.5" }, w))), /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ import_react9.default.createElement(import_ui8.Button, { type: "button", variant: "outline", size: "sm", onClick: () => setShowParseWarning(false), className: "h-7 text-xs" }, "Cancel"), /* @__PURE__ */ import_react9.default.createElement(import_ui8.Button, { type: "button", size: "sm", onClick: confirmModeSwitch, className: "h-7 text-xs bg-amber-600 hover:bg-amber-700 text-white dark:bg-amber-700 dark:hover:bg-amber-600" }, "Switch & Overwrite"))))), !showParseWarning && currentMode === "raw" && /* @__PURE__ */ import_react9.default.createElement("div", { className: "min-h-[300px] flex-1 overflow-auto rounded-md border border-border bg-background" }, /* @__PURE__ */ import_react9.default.createElement(
+  )), /* @__PURE__ */ import_react9.default.createElement("div", { className: "border-t border-border pt-4" }, /* @__PURE__ */ import_react9.default.createElement(import_ui8.Label, { className: "text-xs text-muted-foreground italic" }, "Additional options moved to Widget Settings.")))))), showParseWarning && /* @__PURE__ */ import_react9.default.createElement("div", { className: "my-2 shrink-0 rounded-md border border-amber-200 bg-amber-50 px-4 py-2 dark:border-amber-900/40 dark:bg-amber-950/20" }, /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex items-start gap-2 text-xs" }, /* @__PURE__ */ import_react9.default.createElement(import_fi4.FiAlertTriangle, { className: "mt-0.5 h-4 w-4 shrink-0 text-amber-600" }), /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex-1" }, /* @__PURE__ */ import_react9.default.createElement("h4", { className: "mb-1 font-semibold text-amber-900 dark:text-amber-200" }, "Cannot fully parse chart config"), /* @__PURE__ */ import_react9.default.createElement("p", { className: "mb-2 text-amber-800 dark:text-amber-300" }, "Switching to Visual mode may cause you to lose manual modifications:"), /* @__PURE__ */ import_react9.default.createElement("ul", { className: "mb-3 list-disc pl-4 text-amber-800 dark:text-amber-300" }, parseWarningsList.map((w, i) => /* @__PURE__ */ import_react9.default.createElement("li", { key: i, className: "mb-0.5" }, w))), /* @__PURE__ */ import_react9.default.createElement("div", { className: "flex gap-2" }, /* @__PURE__ */ import_react9.default.createElement(import_ui8.Button, { type: "button", variant: "outline", size: "sm", onClick: () => setShowParseWarning(false), className: "h-7 text-xs" }, "Cancel"), /* @__PURE__ */ import_react9.default.createElement(import_ui8.Button, { type: "button", size: "sm", onClick: confirmModeSwitch, className: "h-7 text-xs bg-amber-600 hover:bg-amber-700 text-white dark:bg-amber-700 dark:hover:bg-amber-600" }, "Switch & Overwrite"))))), !showParseWarning && currentMode === "raw" && /* @__PURE__ */ import_react9.default.createElement("div", { className: "min-h-[300px] flex-1 overflow-auto rounded-md border border-border bg-white" }, /* @__PURE__ */ import_react9.default.createElement(
     VegaSpecEditor,
     {
       value: widgetEditorForm.values.widgetConfig?.vegaSpec,
@@ -2815,7 +2875,8 @@ VegaConfigEditor.propTypes = {
   widgetEditorForm: import_prop_types8.default.object.isRequired,
   workflowContext: import_prop_types8.default.object,
   workflows: import_prop_types8.default.array,
-  selectedWorkflow: import_prop_types8.default.object
+  selectedWorkflow: import_prop_types8.default.object,
+  queryResults: import_prop_types8.default.object
 };
 
 // src/index.js
@@ -2823,7 +2884,7 @@ init_tableWidget();
 init_tableConfigEditor();
 
 // src/widget.map.js
-var import_react14 = __toESM(require("react"));
+var import_react16 = __toESM(require("react"));
 var import_fa2 = require("react-icons/fa");
 
 // src/widget.config.js
@@ -2930,17 +2991,292 @@ var getDemoData = (type) => {
 
 // src/widget.map.js
 var import_widget_types = require("@jet-admin/widget-types");
+
+// src/vega/vegaDataMappingEditor.jsx
+var import_react12 = __toESM(require("react"));
+var import_prop_types11 = __toESM(require("prop-types"));
+var import_ui11 = require("@jet-admin/ui");
+var import_fi6 = require("react-icons/fi");
+var collectArrayPaths3 = (obj, prefix = "", depth = 0, maxDepth = 4) => {
+  const results = [];
+  if (!obj || typeof obj !== "object" || depth > maxDepth) return results;
+  for (const key of Object.keys(obj)) {
+    if (key.startsWith("__")) continue;
+    const val = obj[key];
+    const fullPath = prefix ? `${prefix}.${key}` : key;
+    if (Array.isArray(val) && val.length > 0 && typeof val[0] === "object") {
+      results.push({
+        path: fullPath,
+        label: fullPath,
+        sampleKeys: Object.keys(val[0]),
+        rowCount: val.length
+      });
+    } else if (val && typeof val === "object" && !Array.isArray(val)) {
+      results.push(...collectArrayPaths3(val, fullPath, depth + 1, maxDepth));
+    }
+  }
+  return results;
+};
+var VegaDataMappingEditor = ({ widgetEditorForm, dataManifest, queryResults, boundDataSources }) => {
+  const dataMapping = widgetEditorForm.values.widgetConfig?.dataMapping || {};
+  const dataSources = dataMapping.dataSources || {};
+  const entries = Object.entries(dataSources);
+  const aliasSuggestions = (0, import_react12.useMemo)(() => {
+    if (!boundDataSources?.length) return [];
+    return boundDataSources.filter((s) => s.alias).map((s) => s.alias);
+  }, [boundDataSources]);
+  const arrayPaths = (0, import_react12.useMemo)(() => {
+    const paths = [];
+    if (queryResults) {
+      paths.push(...collectArrayPaths3(queryResults));
+    }
+    if (paths.length === 0 && aliasSuggestions.length > 0) {
+      for (const alias of aliasSuggestions) {
+        paths.push({
+          path: `${alias}.data`,
+          label: `${alias}.data`,
+          rowCount: 0,
+          isSuggestion: true
+        });
+      }
+    }
+    return paths;
+  }, [queryResults, aliasSuggestions]);
+  const updateDataSources = (0, import_react12.useCallback)((newSources) => {
+    widgetEditorForm.setFieldValue("widgetConfig.dataMapping", {
+      ...dataMapping,
+      dataSources: newSources
+    });
+  }, [widgetEditorForm, dataMapping]);
+  const handleAddEntry = (0, import_react12.useCallback)(() => {
+    const key = `source_${entries.length}`;
+    updateDataSources({ ...dataSources, [key]: "" });
+  }, [dataSources, entries.length, updateDataSources]);
+  const handleRemoveEntry = (0, import_react12.useCallback)((keyToRemove) => {
+    const next = { ...dataSources };
+    delete next[keyToRemove];
+    updateDataSources(next);
+  }, [dataSources, updateDataSources]);
+  const handleNameChange = (0, import_react12.useCallback)((oldKey, newKey) => {
+    if (newKey === oldKey) return;
+    const next = {};
+    for (const [k, v] of Object.entries(dataSources)) {
+      next[k === oldKey ? newKey : k] = v;
+    }
+    updateDataSources(next);
+  }, [dataSources, updateDataSources]);
+  const handlePathChange = (0, import_react12.useCallback)((key, path) => {
+    updateDataSources({ ...dataSources, [key]: path });
+  }, [dataSources, updateDataSources]);
+  return /* @__PURE__ */ import_react12.default.createElement("div", { className: "space-y-4 border-t pt-4" }, /* @__PURE__ */ import_react12.default.createElement(import_ui11.Label, { className: "text-xs font-semibold text-foreground" }, "Data Mapping \u2014 Vega Data Sources"), entries.length === 0 && /* @__PURE__ */ import_react12.default.createElement("p", { className: "text-[0.65rem] text-muted-foreground flex items-start gap-1" }, /* @__PURE__ */ import_react12.default.createElement(import_fi6.FiInfo, { className: "w-3 h-3 mt-0.5 shrink-0" }), "No data source mappings yet. Add one to map query results to Vega named data sources."), entries.map(([vegaName, path], idx) => /* @__PURE__ */ import_react12.default.createElement("div", { key: idx, className: "flex items-end gap-2 rounded-md border bg-background/50 p-2" }, /* @__PURE__ */ import_react12.default.createElement("div", { className: "flex-1 space-y-1" }, /* @__PURE__ */ import_react12.default.createElement(import_ui11.Label, { className: "text-[0.6rem] text-muted-foreground" }, "Vega Data Name"), /* @__PURE__ */ import_react12.default.createElement(
+    import_ui11.Input,
+    {
+      type: "text",
+      className: "text-xs font-mono",
+      value: vegaName,
+      onChange: (e) => handleNameChange(vegaName, e.target.value),
+      placeholder: "table"
+    }
+  )), /* @__PURE__ */ import_react12.default.createElement("div", { className: "flex-1 space-y-1" }, /* @__PURE__ */ import_react12.default.createElement(import_ui11.Label, { className: "text-[0.6rem] text-muted-foreground" }, "Query Result Path"), arrayPaths.length > 0 ? /* @__PURE__ */ import_react12.default.createElement(
+    import_ui11.Select,
+    {
+      value: path || "",
+      onValueChange: (val) => handlePathChange(vegaName, val)
+    },
+    /* @__PURE__ */ import_react12.default.createElement(import_ui11.SelectTrigger, { className: "text-xs font-mono" }, /* @__PURE__ */ import_react12.default.createElement(import_ui11.SelectValue, { placeholder: "Select a path\u2026" })),
+    /* @__PURE__ */ import_react12.default.createElement(import_ui11.SelectContent, null, arrayPaths.map((arr, i) => /* @__PURE__ */ import_react12.default.createElement(import_ui11.SelectItem, { key: i, value: arr.path }, /* @__PURE__ */ import_react12.default.createElement("span", { className: "font-mono" }, arr.label), /* @__PURE__ */ import_react12.default.createElement("span", { className: "text-muted-foreground ml-2" }, "(", arr.rowCount, " rows)"))))
+  ) : /* @__PURE__ */ import_react12.default.createElement(
+    import_ui11.Input,
+    {
+      type: "text",
+      className: "text-xs font-mono",
+      value: path || "",
+      onChange: (e) => handlePathChange(vegaName, e.target.value),
+      placeholder: "orders.data"
+    }
+  )), /* @__PURE__ */ import_react12.default.createElement(
+    import_ui11.Button,
+    {
+      type: "button",
+      variant: "ghost",
+      size: "sm",
+      className: "h-8 w-8 shrink-0 text-destructive hover:bg-destructive/10",
+      onClick: () => handleRemoveEntry(vegaName)
+    },
+    /* @__PURE__ */ import_react12.default.createElement(import_fi6.FiTrash2, { className: "w-3.5 h-3.5" })
+  ))), /* @__PURE__ */ import_react12.default.createElement(
+    import_ui11.Button,
+    {
+      type: "button",
+      variant: "outline",
+      size: "sm",
+      className: "w-full text-xs gap-1",
+      onClick: handleAddEntry
+    },
+    /* @__PURE__ */ import_react12.default.createElement(import_fi6.FiPlus, { className: "w-3 h-3" }),
+    "Add Data Source Mapping"
+  ));
+};
+VegaDataMappingEditor.propTypes = {
+  widgetEditorForm: import_prop_types11.default.object.isRequired,
+  dataManifest: import_prop_types11.default.object,
+  queryResults: import_prop_types11.default.object,
+  boundDataSources: import_prop_types11.default.array
+};
+
+// src/widget.map.js
 init_buttonConfigEditor();
 init_tableConfigEditor();
+
+// src/table/tableDataMappingEditor.jsx
+var import_react14 = __toESM(require("react"));
+var import_prop_types13 = __toESM(require("prop-types"));
+var import_ui13 = require("@jet-admin/ui");
+var import_fi7 = require("react-icons/fi");
+var collectArrayPaths4 = (obj, prefix = "", depth = 0, maxDepth = 4) => {
+  const results = [];
+  if (!obj || typeof obj !== "object" || depth > maxDepth) return results;
+  for (const key of Object.keys(obj)) {
+    if (key.startsWith("__")) continue;
+    const val = obj[key];
+    const fullPath = prefix ? `${prefix}.${key}` : key;
+    if (Array.isArray(val) && val.length > 0 && typeof val[0] === "object") {
+      results.push({
+        path: fullPath,
+        label: fullPath,
+        sampleKeys: Object.keys(val[0]),
+        rowCount: val.length
+      });
+    } else if (val && typeof val === "object" && !Array.isArray(val)) {
+      results.push(...collectArrayPaths4(val, fullPath, depth + 1, maxDepth));
+    }
+  }
+  return results;
+};
+var collectScalarPaths2 = (obj, prefix = "", depth = 0, maxDepth = 3) => {
+  const results = [];
+  if (!obj || typeof obj !== "object" || depth > maxDepth) return results;
+  for (const key of Object.keys(obj)) {
+    if (key.startsWith("__")) continue;
+    const val = obj[key];
+    const fullPath = prefix ? `${prefix}.${key}` : key;
+    if (typeof val === "number") {
+      results.push({ path: fullPath, label: fullPath, value: val });
+    } else if (val && typeof val === "object" && !Array.isArray(val)) {
+      results.push(...collectScalarPaths2(val, fullPath, depth + 1, maxDepth));
+    }
+  }
+  return results;
+};
+var TableDataMappingEditor = ({ widgetEditorForm, dataManifest, queryResults, boundDataSources }) => {
+  const dataMapping = widgetEditorForm.values.widgetConfig?.dataMapping || {};
+  const aliasSuggestions = (0, import_react14.useMemo)(() => {
+    if (!boundDataSources?.length) return [];
+    return boundDataSources.filter((s) => s.alias).map((s) => s.alias);
+  }, [boundDataSources]);
+  const arrayPaths = (0, import_react14.useMemo)(() => {
+    const paths = [];
+    if (queryResults) {
+      paths.push(...collectArrayPaths4(queryResults));
+    }
+    if (paths.length === 0 && aliasSuggestions.length > 0) {
+      for (const alias of aliasSuggestions) {
+        paths.push({
+          path: `${alias}.data`,
+          label: `${alias}.data`,
+          sampleKeys: [],
+          rowCount: 0,
+          isSuggestion: true
+        });
+      }
+    }
+    return paths;
+  }, [queryResults, aliasSuggestions]);
+  const scalarPaths = (0, import_react14.useMemo)(() => {
+    const paths = [];
+    if (queryResults) {
+      paths.push(...collectScalarPaths2(queryResults));
+    }
+    if (paths.length === 0 && aliasSuggestions.length > 0) {
+      for (const alias of aliasSuggestions) {
+        paths.push({
+          path: `${alias}.total`,
+          label: `${alias}.total`,
+          value: null,
+          isSuggestion: true
+        });
+      }
+    }
+    return paths;
+  }, [queryResults, aliasSuggestions]);
+  const handleMappingChange = (field, value) => {
+    widgetEditorForm.setFieldValue("widgetConfig.dataMapping", {
+      ...dataMapping,
+      [field]: value
+    });
+  };
+  return /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-4 border-t pt-4" }, /* @__PURE__ */ import_react14.default.createElement(import_ui13.Label, { className: "text-xs font-semibold text-foreground" }, "Data Mapping"), /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react14.default.createElement(import_ui13.Label, { className: "text-xs font-medium text-foreground" }, "Data Array Path"), arrayPaths.length > 0 ? /* @__PURE__ */ import_react14.default.createElement(import_react14.default.Fragment, null, /* @__PURE__ */ import_react14.default.createElement(
+    import_ui13.Select,
+    {
+      value: dataMapping.dataArrayPath || "",
+      onValueChange: (val) => handleMappingChange("dataArrayPath", val)
+    },
+    /* @__PURE__ */ import_react14.default.createElement(import_ui13.SelectTrigger, { className: "text-xs font-mono" }, /* @__PURE__ */ import_react14.default.createElement(import_ui13.SelectValue, { placeholder: "Select a data array from results\u2026" })),
+    /* @__PURE__ */ import_react14.default.createElement(import_ui13.SelectContent, null, arrayPaths.map((arr, idx) => /* @__PURE__ */ import_react14.default.createElement(import_ui13.SelectItem, { key: idx, value: arr.path }, /* @__PURE__ */ import_react14.default.createElement("span", { className: "font-mono" }, arr.label), arr.isSuggestion ? /* @__PURE__ */ import_react14.default.createElement("span", { className: "text-muted-foreground ml-2" }, "(suggested)") : /* @__PURE__ */ import_react14.default.createElement("span", { className: "text-muted-foreground ml-2" }, "(", arr.rowCount, " rows, ", arr.sampleKeys.length, " fields)"))))
+  ), /* @__PURE__ */ import_react14.default.createElement("p", { className: "text-[0.6rem] text-muted-foreground" }, "Or type a custom path below."), /* @__PURE__ */ import_react14.default.createElement(
+    import_ui13.Input,
+    {
+      type: "text",
+      className: "text-xs font-mono",
+      value: dataMapping.dataArrayPath || "",
+      onChange: (e) => handleMappingChange("dataArrayPath", e.target.value),
+      placeholder: "orders.data"
+    }
+  )) : /* @__PURE__ */ import_react14.default.createElement(import_react14.default.Fragment, null, /* @__PURE__ */ import_react14.default.createElement(
+    import_ui13.Input,
+    {
+      type: "text",
+      className: "text-sm font-mono",
+      value: dataMapping.dataArrayPath || "",
+      onChange: (e) => handleMappingChange("dataArrayPath", e.target.value),
+      placeholder: "orders.data"
+    }
+  ), /* @__PURE__ */ import_react14.default.createElement("p", { className: "text-[0.65rem] text-muted-foreground flex items-start gap-1" }, /* @__PURE__ */ import_react14.default.createElement(import_fi7.FiInfo, { className: "w-3 h-3 mt-0.5 shrink-0" }), "Run a Test to discover available data arrays from query results."))), /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react14.default.createElement(import_ui13.Label, { className: "text-xs font-medium text-foreground" }, "Total Count Path ", /* @__PURE__ */ import_react14.default.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), scalarPaths.length > 0 ? /* @__PURE__ */ import_react14.default.createElement(
+    import_ui13.Select,
+    {
+      value: dataMapping.totalCountPath || "",
+      onValueChange: (val) => handleMappingChange("totalCountPath", val)
+    },
+    /* @__PURE__ */ import_react14.default.createElement(import_ui13.SelectTrigger, { className: "text-xs font-mono" }, /* @__PURE__ */ import_react14.default.createElement(import_ui13.SelectValue, { placeholder: "Select a total count field\u2026" })),
+    /* @__PURE__ */ import_react14.default.createElement(import_ui13.SelectContent, null, scalarPaths.map((s, idx) => /* @__PURE__ */ import_react14.default.createElement(import_ui13.SelectItem, { key: idx, value: s.path }, /* @__PURE__ */ import_react14.default.createElement("span", { className: "font-mono" }, s.label), /* @__PURE__ */ import_react14.default.createElement("span", { className: "text-muted-foreground ml-2" }, "= ", s.value))))
+  ) : /* @__PURE__ */ import_react14.default.createElement(
+    import_ui13.Input,
+    {
+      type: "text",
+      className: "text-xs font-mono",
+      value: dataMapping.totalCountPath || "",
+      onChange: (e) => handleMappingChange("totalCountPath", e.target.value),
+      placeholder: "orders.meta.total"
+    }
+  ), /* @__PURE__ */ import_react14.default.createElement("p", { className: "text-[0.6rem] text-muted-foreground" }, "Used for server-side pagination. Leave empty to use the array length.")));
+};
+TableDataMappingEditor.propTypes = {
+  widgetEditorForm: import_prop_types13.default.object.isRequired,
+  dataManifest: import_prop_types13.default.object,
+  queryResults: import_prop_types13.default.object,
+  boundDataSources: import_prop_types13.default.array
+};
+
+// src/widget.map.js
 var import_md6 = require("react-icons/md");
 registerWidgets();
-var LazyVegaWidget = import_react14.default.lazy(
+var LazyVegaWidget = import_react16.default.lazy(
   () => Promise.resolve().then(() => (init_vega(), vega_exports)).then((module2) => ({ default: module2.VegaWidget }))
 );
-var LazyButtonWidget = import_react14.default.lazy(
+var LazyButtonWidget = import_react16.default.lazy(
   () => Promise.resolve().then(() => (init_button(), button_exports)).then((module2) => ({ default: module2.ButtonWidget }))
 );
-var LazyTableWidget = import_react14.default.lazy(
+var LazyTableWidget = import_react16.default.lazy(
   () => Promise.resolve().then(() => (init_table(), table_exports)).then((module2) => ({ default: module2.TableWidget }))
 );
 var WIDGETS_MAP = {
@@ -2951,10 +3287,11 @@ var WIDGETS_MAP = {
     defaultAutoRun: true,
     description: "Declarative visualization grammar",
     component: ({ data, ...props }) => {
-      return /* @__PURE__ */ import_react14.default.createElement(import_react14.default.Suspense, { fallback: /* @__PURE__ */ import_react14.default.createElement("div", { className: "flex justify-center items-center h-full text-xs text-slate-400" }, "Loading chart...") }, /* @__PURE__ */ import_react14.default.createElement(LazyVegaWidget, { data, ...props }));
+      return /* @__PURE__ */ import_react16.default.createElement(import_react16.default.Suspense, { fallback: /* @__PURE__ */ import_react16.default.createElement("div", { className: "flex justify-center items-center h-full text-xs text-[#1c1c1e]" }, "Loading chart...") }, /* @__PURE__ */ import_react16.default.createElement(LazyVegaWidget, { data, ...props }));
     },
     configEditor: VegaConfigEditor,
-    icon: ({ className }) => /* @__PURE__ */ import_react14.default.createElement(import_fa2.FaChartBar, { className: `!text-lg ${className}` }),
+    dataMappingEditor: VegaDataMappingEditor,
+    icon: ({ className }) => /* @__PURE__ */ import_react16.default.createElement(import_fa2.FaChartBar, { className: `!text-lg ${className}` }),
     sampleConfig: {
       options: {
         showActions: false,
@@ -2971,10 +3308,11 @@ var WIDGETS_MAP = {
     defaultAutoRun: true,
     description: "Low-level visualization grammar",
     component: ({ data, ...props }) => {
-      return /* @__PURE__ */ import_react14.default.createElement(import_react14.default.Suspense, { fallback: /* @__PURE__ */ import_react14.default.createElement("div", { className: "flex justify-center items-center h-full text-xs text-slate-400" }, "Loading chart...") }, /* @__PURE__ */ import_react14.default.createElement(LazyVegaWidget, { data, ...props }));
+      return /* @__PURE__ */ import_react16.default.createElement(import_react16.default.Suspense, { fallback: /* @__PURE__ */ import_react16.default.createElement("div", { className: "flex justify-center items-center h-full text-xs text-[#1c1c1e]" }, "Loading chart...") }, /* @__PURE__ */ import_react16.default.createElement(LazyVegaWidget, { data, ...props }));
     },
     configEditor: VegaConfigEditor,
-    icon: ({ className }) => /* @__PURE__ */ import_react14.default.createElement(import_fa2.FaChartBar, { className: `!text-lg ${className}` }),
+    dataMappingEditor: VegaDataMappingEditor,
+    icon: ({ className }) => /* @__PURE__ */ import_react16.default.createElement(import_fa2.FaChartBar, { className: `!text-lg ${className}` }),
     sampleConfig: {
       options: {
         showActions: false,
@@ -2991,10 +3329,11 @@ var WIDGETS_MAP = {
     defaultAutoRun: false,
     description: "Trigger a workflow",
     component: ({ data, ...props }) => {
-      return /* @__PURE__ */ import_react14.default.createElement(import_react14.default.Suspense, { fallback: /* @__PURE__ */ import_react14.default.createElement("div", { className: "flex justify-center items-center h-full text-xs text-slate-400" }, "Loading button...") }, /* @__PURE__ */ import_react14.default.createElement(LazyButtonWidget, { data, ...props }));
+      return /* @__PURE__ */ import_react16.default.createElement(import_react16.default.Suspense, { fallback: /* @__PURE__ */ import_react16.default.createElement("div", { className: "flex justify-center items-center h-full text-xs text-[#1c1c1e]" }, "Loading button...") }, /* @__PURE__ */ import_react16.default.createElement(LazyButtonWidget, { data, ...props }));
     },
     configEditor: ButtonConfigEditor,
-    icon: ({ className }) => /* @__PURE__ */ import_react14.default.createElement(import_md6.MdOutlineSmartButton, { className: `!text-lg ${className}` }),
+    dataMappingEditor: null,
+    icon: ({ className }) => /* @__PURE__ */ import_react16.default.createElement(import_md6.MdOutlineSmartButton, { className: `!text-lg ${className}` }),
     sampleConfig: {
       text: "Click Me",
       variant: "default",
@@ -3009,10 +3348,11 @@ var WIDGETS_MAP = {
     defaultAutoRun: true,
     description: "Tabular data display with pagination",
     component: ({ data, ...props }) => {
-      return /* @__PURE__ */ import_react14.default.createElement(import_react14.default.Suspense, { fallback: /* @__PURE__ */ import_react14.default.createElement("div", { className: "flex justify-center items-center h-full text-xs text-slate-400" }, "Loading table...") }, /* @__PURE__ */ import_react14.default.createElement(LazyTableWidget, { data, ...props }));
+      return /* @__PURE__ */ import_react16.default.createElement(import_react16.default.Suspense, { fallback: /* @__PURE__ */ import_react16.default.createElement("div", { className: "flex justify-center items-center h-full text-xs text-[#1c1c1e]" }, "Loading table...") }, /* @__PURE__ */ import_react16.default.createElement(LazyTableWidget, { data, ...props }));
     },
     configEditor: TableConfigEditor,
-    icon: ({ className }) => /* @__PURE__ */ import_react14.default.createElement(import_md6.MdOutlineTableChart, { className: `!text-lg ${className}` }),
+    dataMappingEditor: TableDataMappingEditor,
+    icon: ({ className }) => /* @__PURE__ */ import_react16.default.createElement(import_md6.MdOutlineTableChart, { className: `!text-lg ${className}` }),
     sampleConfig: {
       dataArrayTemplate: "{{ctx.data}}",
       columns: [],
