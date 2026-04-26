@@ -63,7 +63,14 @@ export const WidgetPreview = ({
     // For Vega widgets: if no explicit data, use the vegaSpec from widgetConfig
     let chartData = data?.data || data;
     if (!chartData && widgetConfig?.vegaSpec) {
-      chartData = widgetConfig.vegaSpec;
+      // Clone spec to avoid mutating form state
+      const spec = JSON.parse(JSON.stringify(widgetConfig.vegaSpec));
+      // If data.values is a template expression like "{{alias}}", replace with
+      // empty array so vega-embed doesn't crash trying to parse it as JSON
+      if (spec.data?.values && typeof spec.data.values === 'string' && spec.data.values.includes('{{')) {
+        spec.data = { values: [] };
+      }
+      chartData = spec;
     }
 
     return (
