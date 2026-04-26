@@ -201,20 +201,51 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height, stateTree, 
           </div>
         ) : null}
 
-        {RenderedWidgetComponent ? (
-          <div className="min-h-0 flex-1 bg-white px-2 pb-2 pt-1">
-            <RenderedWidgetComponent
-              widgetTitle={widget.widgetTitle}
-              widgetType={widgetRender.widgetType}
-              widgetConfig={resolvedConfig}
-              data={null}
-              onWidgetInit={handleOnWidgetInit}
-              refetchInterval={widget.refreshInterval}
-              refreshData={refetchWidget}
-              {...eventHandlers}
-            />
-          </div>
-        ) : null}
+        {RenderedWidgetComponent ? (() => {
+          // For Vega widgets, extract and resolve the vegaSpec as the data prop
+          let widgetData = null;
+          if (resolvedConfig?.vegaSpec) {
+            const spec = JSON.parse(JSON.stringify(resolvedConfig.vegaSpec));
+            // Resolve template expressions in data.values using dataSourceResults
+            if (spec.data?.values && typeof spec.data.values === 'string' && spec.data.values.includes('{{')) {
+              const templateMatch = spec.data.values.match(/\{\{([^}]+)\}\}/);
+              if (templateMatch && dataSourceResults) {
+                const path = templateMatch[1];
+                const parts = path.split('.');
+                let resolved = dataSourceResults;
+                for (const part of parts) {
+                  if (resolved == null) break;
+                  resolved = resolved[part];
+                }
+                if (Array.isArray(resolved)) {
+                  spec.data = { values: resolved };
+                } else if (resolved && typeof resolved === 'object' && Array.isArray(resolved.data)) {
+                  spec.data = { values: resolved.data };
+                } else {
+                  spec.data = { values: [] };
+                }
+              } else {
+                spec.data = { values: [] };
+              }
+            }
+            widgetData = spec;
+          }
+
+          return (
+            <div className="min-h-0 flex-1 bg-white px-2 pb-2 pt-1">
+              <RenderedWidgetComponent
+                widgetTitle={widget.widgetTitle}
+                widgetType={widgetRender.widgetType}
+                widgetConfig={resolvedConfig}
+                data={widgetData}
+                onWidgetInit={handleOnWidgetInit}
+                refetchInterval={widget.refreshInterval}
+                refreshData={refetchWidget}
+                {...eventHandlers}
+              />
+            </div>
+          );
+        })() : null}
       </ReactQueryLoadingErrorWrapper>
     </div>
   );
