@@ -17,6 +17,7 @@ export const WidgetPreview = ({
   isRefreshingData,
   refreshData,
   widgetConfig,
+  queryResults,
 }) => {
   WidgetPreview.propTypes = {
     tenantID: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
@@ -29,6 +30,7 @@ export const WidgetPreview = ({
     isRefreshingData: PropTypes.bool.isRequired,
     refreshData: PropTypes.func.isRequired,
     widgetConfig: PropTypes.object,
+    queryResults: PropTypes.object,
   };
 
   const uniqueKey = `widgetPreview_${tenantID}_${widgetID}`;
@@ -65,10 +67,28 @@ export const WidgetPreview = ({
     if (!chartData && widgetConfig?.vegaSpec) {
       // Clone spec to avoid mutating form state
       const spec = JSON.parse(JSON.stringify(widgetConfig.vegaSpec));
-      // If data.values is a template expression like "{{alias}}", replace with
-      // empty array so vega-embed doesn't crash trying to parse it as JSON
+
+      // Resolve template expressions in data.values using queryResults
       if (spec.data?.values && typeof spec.data.values === 'string' && spec.data.values.includes('{{')) {
-        spec.data = { values: [] };
+        const templateMatch = spec.data.values.match(/\{\{([^}]+)\}\}/);
+        if (templateMatch && queryResults) {
+          const path = templateMatch[1]; // e.g. "get_drivers" or "get_drivers.data"
+          const parts = path.split('.');
+          let resolved = queryResults;
+          for (const part of parts) {
+            if (resolved == null) break;
+            resolved = resolved[part];
+          }
+          if (Array.isArray(resolved)) {
+            spec.data = { values: resolved };
+          } else if (resolved && typeof resolved === 'object' && Array.isArray(resolved.data)) {
+            spec.data = { values: resolved.data };
+          } else {
+            spec.data = { values: [] };
+          }
+        } else {
+          spec.data = { values: [] };
+        }
       }
       chartData = spec;
     }
@@ -91,6 +111,7 @@ export const WidgetPreview = ({
     widgetType,
     widgetConfig: widgetConfig || null,
     dataPassedToWidget: data || null,
+    queryResults: queryResults ? Object.keys(queryResults) : null,
   };
 
   return (

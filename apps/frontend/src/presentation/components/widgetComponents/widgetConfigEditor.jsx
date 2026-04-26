@@ -62,9 +62,13 @@ const executeDataSources = async (dataSources, tenantID) => {
 
 export const WidgetConfigEditor = ({
   widgetEditorForm,
+  queryResults,
+  onQueryResults,
 }) => {
   WidgetConfigEditor.propTypes = {
     widgetEditorForm: PropTypes.object.isRequired,
+    queryResults: PropTypes.object,
+    onQueryResults: PropTypes.func,
   };
 
   const { tenantID } = useParams();
@@ -79,7 +83,6 @@ export const WidgetConfigEditor = ({
   const dataManifest = builder?.constructor?.dataManifest;
 
   // Data execution state
-  const [queryResults, setQueryResults] = useState(null);
   const [isTestRunning, setIsTestRunning] = useState(false);
   const autoLoadedRef = useRef(false);
 
@@ -96,11 +99,11 @@ export const WidgetConfigEditor = ({
       setIsTestRunning(true);
       executeDataSources(dataSources, tenantID)
         .then((results) => {
-          if (results) setQueryResults(results);
+          if (results) onQueryResults?.(results);
         })
         .finally(() => setIsTestRunning(false));
     }
-  }, [dataSources, tenantID]);
+  }, [dataSources, tenantID, onQueryResults]);
 
   // Manual test run / refresh
   const handleTestRun = useCallback(async () => {
@@ -110,11 +113,11 @@ export const WidgetConfigEditor = ({
     setIsTestRunning(true);
     try {
       const results = await executeDataSources(sources, tenantID);
-      setQueryResults(results);
+      onQueryResults?.(results);
     } finally {
       setIsTestRunning(false);
     }
-  }, [widgetEditorForm.values.widgetConfig?.dataSources, tenantID]);
+  }, [widgetEditorForm.values.widgetConfig?.dataSources, tenantID, onQueryResults]);
 
   return (
     <div className="flex h-full w-full flex-col gap-3">
