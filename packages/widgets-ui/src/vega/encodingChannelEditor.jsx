@@ -48,7 +48,7 @@ export const EncodingChannelEditor = ({
   const handleChange = (update) => onChange({ ...safeValue, ...update });
 
   return (
-    /* ✅ Correct: bg-card / border-border instead of bg-white / border-slate-200 */
+    /* ✅ Correct: bg-card / border-border instead of bg-slate-50 / border-slate-200 */
     <div className="rounded-lg border border-border bg-card overflow-hidden shadow-sm">
 
       {/* Header */}

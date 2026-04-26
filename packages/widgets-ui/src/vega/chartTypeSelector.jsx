@@ -88,7 +88,7 @@ export const ChartTypeSelector = ({ value, onChange }) => {
               ${isSelected
                 /* ✅ Correct: semantic primary tokens */
                 ? 'bg-primary/10 border-primary text-primary shadow-sm'
-                : 'bg-background border-border text-muted-foreground hover:bg-muted hover:border-border hover:text-foreground'
+                : 'bg-white border-border text-muted-foreground hover:bg-muted hover:border-border hover:text-foreground'
               }
             `}
           >

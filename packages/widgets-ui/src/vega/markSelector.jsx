@@ -34,11 +34,11 @@ export const MarkSelector = ({ value, onChange, className = '' }) => {
             className={`h-auto py-1.5 flex-1 min-w-[60px] px-2 text-xs font-medium ${
               isSelected 
                 ? 'bg-indigo-50 text-indigo-700 border-indigo-200 shadow-sm hover:text-indigo-800 hover:bg-indigo-100' 
-                : 'text-slate-600 border-transparent hover:bg-slate-100'
+                : 'text-[#1c1c1e] border-transparent hover:bg-slate-100'
             }`}
             title={`${opt.label}: ${opt.desc}`}
           >
-            <span className={`mr-1.5 ${isSelected ? 'text-indigo-500' : 'text-slate-400'}`}>{opt.icon}</span>
+            <span className={`mr-1.5 ${isSelected ? 'text-indigo-500' : 'text-[#1c1c1e]'}`}>{opt.icon}</span>
             <span className="hidden lg:inline">{opt.label}</span>
           </Button>
         );

@@ -156,7 +156,7 @@ export const VariablePathPicker = ({
 
           {/* Suggestions dropdown */}
           {showSuggestions && filteredSuggestions.length > 0 && (
-            <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-background border border-border rounded-md shadow-lg max-h-48 overflow-auto">
+            <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-white border border-border rounded-md shadow-lg max-h-48 overflow-auto">
               {filteredSuggestions.map((variable) => (
                 <div
                   key={variable.path}

@@ -110,7 +110,7 @@ const VariableCategory = ({
         <span className="text-[11px] font-medium uppercase tracking-wide flex-1 text-muted-foreground">
           {title}
         </span>
-        <span className="text-[10px] px-1.5 py-0.5 rounded bg-background border border-border text-muted-foreground">
+        <span className="text-[10px] px-1.5 py-0.5 rounded bg-white border border-border text-muted-foreground">
           {variables.length}
         </span>
       </div>
@@ -259,7 +259,7 @@ export const VariableExplorer = ({
     schema.workflowOutputs.length > 0;
 
   return (
-    <div className={`flex flex-col rounded-lg border border-border bg-background ${className}`}>
+    <div className={`flex flex-col rounded-lg border border-border bg-white ${className}`}>
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-2 rounded-t-lg border-b border-border bg-muted/50">
         <h3 className="text-xs font-medium text-muted-foreground">{title}</h3>

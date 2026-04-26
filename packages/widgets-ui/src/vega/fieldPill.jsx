@@ -61,7 +61,7 @@ export const FieldPill = ({
 
       {/* Aggregate badge */}
       {field.aggregate && field.aggregate !== 'none' && (
-        <span className="text-[9px] uppercase tracking-wider bg-white/50 px-1 rounded ml-1 font-bold" title={`Aggregate: ${field.aggregate}`}>
+        <span className="text-[9px] uppercase tracking-wider bg-slate-50/50 px-1 rounded ml-1 font-bold" title={`Aggregate: ${field.aggregate}`}>
           {field.aggregate.slice(0, 3)}
         </span>
       )}

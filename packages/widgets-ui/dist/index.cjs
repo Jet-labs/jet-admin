@@ -323,7 +323,7 @@ var init_tableWidget = __esm({
 });
 
 // src/table/tableConfigEditor.jsx
-var import_react11, import_prop_types10, import_ui10, import_md5, import_fi5, collectArrayPaths2, collectScalarPaths, TableConfigEditor;
+var import_react11, import_prop_types10, import_ui10, import_md5, import_fi5, resolvePath, TableConfigEditor;
 var init_tableConfigEditor = __esm({
   "src/table/tableConfigEditor.jsx"() {
     import_react11 = __toESM(require("react"));
@@ -331,122 +331,81 @@ var init_tableConfigEditor = __esm({
     import_ui10 = require("@jet-admin/ui");
     import_md5 = require("react-icons/md");
     import_fi5 = require("react-icons/fi");
-    collectArrayPaths2 = (obj, prefix = "ctx", depth = 0, maxDepth = 4) => {
-      const results = [];
-      if (!obj || typeof obj !== "object" || depth > maxDepth) return results;
-      for (const key of Object.keys(obj)) {
-        if (key.startsWith("__")) continue;
-        const val = obj[key];
-        const fullPath = `${prefix}.${key}`;
-        if (Array.isArray(val) && val.length > 0 && typeof val[0] === "object") {
-          results.push({
-            path: `{{${fullPath}}}`,
-            label: fullPath.replace(/^ctx\./, ""),
-            sampleKeys: Object.keys(val[0]),
-            rowCount: val.length
-          });
-        } else if (val && typeof val === "object" && !Array.isArray(val)) {
-          results.push(...collectArrayPaths2(val, fullPath, depth + 1, maxDepth));
-        }
+    resolvePath = (obj, path) => {
+      if (!obj || !path) return void 0;
+      const parts = path.split(".");
+      let current = obj;
+      for (const part of parts) {
+        if (current == null) return void 0;
+        current = current[part];
       }
-      return results;
+      return current;
     };
-    collectScalarPaths = (obj, prefix = "ctx", depth = 0, maxDepth = 3) => {
-      const results = [];
-      if (!obj || typeof obj !== "object" || depth > maxDepth) return results;
-      for (const key of Object.keys(obj)) {
-        if (key.startsWith("__")) continue;
-        const val = obj[key];
-        const fullPath = `${prefix}.${key}`;
-        if (typeof val === "number") {
-          results.push({ path: `{{${fullPath}}}`, label: fullPath.replace(/^ctx\./, ""), value: val });
-        } else if (val && typeof val === "object" && !Array.isArray(val)) {
-          results.push(...collectScalarPaths(val, fullPath, depth + 1, maxDepth));
-        }
-      }
-      return results;
-    };
-    TableConfigEditor = ({ widgetEditorForm, workflowContext, workflows, selectedWorkflow }) => {
+    TableConfigEditor = ({ widgetEditorForm, queryResults }) => {
       const config = widgetEditorForm.values.widgetConfig || {};
       const columns = config.columns || [];
       const pagination = config.pagination || {
         enabled: false,
         pageParam: "page",
-        pageSizeParam: "limit",
-        totalTemplate: "{{ctx.total}}"
+        pageSizeParam: "limit"
       };
-      const workflowArgs = (0, import_react11.useMemo)(() => {
-        if (!selectedWorkflow) return [];
-        try {
-          const schema = selectedWorkflow.workflowInputSchema || selectedWorkflow.tblWorkflowVersions?.[0]?.workflowInputSchema || selectedWorkflow.inputSchema;
-          if (!schema) return [];
-          const parsed = typeof schema === "string" ? JSON.parse(schema) : schema;
-          if (Array.isArray(parsed)) return parsed;
-          if (parsed.properties) {
-            return Object.entries(parsed.properties).map(([key, def]) => ({
-              name: key,
-              type: def.type || "string",
-              description: def.description || ""
-            }));
-          }
-          return [];
-        } catch {
-          return [];
+      const dataArrayPath = config.dataMapping?.dataArrayPath;
+      const discoveredColumns = (0, import_react11.useMemo)(() => {
+        if (!queryResults || !dataArrayPath) return [];
+        const resolved = resolvePath(queryResults, dataArrayPath);
+        if (Array.isArray(resolved) && resolved.length > 0 && typeof resolved[0] === "object") {
+          return Object.keys(resolved[0]).map((key) => ({
+            key,
+            label: key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+            type: typeof resolved[0][key]
+          }));
         }
-      }, [selectedWorkflow]);
-      const ctxArrayPaths = (0, import_react11.useMemo)(() => {
-        if (!workflowContext) return [];
-        return collectArrayPaths2(workflowContext);
-      }, [workflowContext]);
-      const ctxScalarPaths = (0, import_react11.useMemo)(() => {
-        if (!workflowContext) return [];
-        return collectScalarPaths(workflowContext);
-      }, [workflowContext]);
-      const currentArrayInfo = (0, import_react11.useMemo)(() => {
-        const template = config.dataArrayTemplate;
-        if (!template || !workflowContext) return null;
-        const match = ctxArrayPaths.find((a) => a.path === template);
-        return match || null;
-      }, [config.dataArrayTemplate, workflowContext, ctxArrayPaths]);
-      const handleAddColumn = () => {
+        return [];
+      }, [queryResults, dataArrayPath]);
+      const availableKeys = (0, import_react11.useMemo)(() => {
+        return discoveredColumns.map((c) => c.key);
+      }, [discoveredColumns]);
+      const handleAddColumn = (0, import_react11.useCallback)(() => {
         widgetEditorForm.setFieldValue("widgetConfig.columns", [
           ...columns,
-          { label: "New Column", key: "new_key" }
+          { label: "New Column", key: "" }
         ]);
-      };
-      const handleAutoPopulateColumns = () => {
-        if (!currentArrayInfo) return;
-        const newColumns = currentArrayInfo.sampleKeys.map((key) => ({
-          label: key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
-          key
+      }, [widgetEditorForm, columns]);
+      const handleAutoPopulateColumns = (0, import_react11.useCallback)(() => {
+        if (discoveredColumns.length === 0) return;
+        const newColumns = discoveredColumns.map((col) => ({
+          label: col.label,
+          key: col.key
         }));
         widgetEditorForm.setFieldValue("widgetConfig.columns", newColumns);
-      };
-      const handleUpdateColumn = (index, field, value) => {
-        const updated = [...columns];
-        updated[index] = { ...updated[index], [field]: value };
-        widgetEditorForm.setFieldValue("widgetConfig.columns", updated);
-      };
-      const handleRemoveColumn = (index) => {
-        const updated = [...columns];
-        updated.splice(index, 1);
-        widgetEditorForm.setFieldValue("widgetConfig.columns", updated);
-      };
-      const handleMoveColumn = (index, direction) => {
-        const newIndex = index + direction;
-        if (newIndex < 0 || newIndex >= columns.length) return;
-        const updated = [...columns];
-        const [moved] = updated.splice(index, 1);
-        updated.splice(newIndex, 0, moved);
-        widgetEditorForm.setFieldValue("widgetConfig.columns", updated);
-      };
-      const workflowArgValues = widgetEditorForm.values.workflowConfig?.workflowArgValues || {};
-      const handleArgValueChange = (argName, value) => {
-        widgetEditorForm.setFieldValue("workflowConfig.workflowArgValues", {
-          ...workflowArgValues,
-          [argName]: value
-        });
-      };
+      }, [widgetEditorForm, discoveredColumns]);
+      const handleUpdateColumn = (0, import_react11.useCallback)(
+        (index, field, value) => {
+          const updated = [...columns];
+          updated[index] = { ...updated[index], [field]: value };
+          widgetEditorForm.setFieldValue("widgetConfig.columns", updated);
+        },
+        [widgetEditorForm, columns]
+      );
+      const handleRemoveColumn = (0, import_react11.useCallback)(
+        (index) => {
+          const updated = [...columns];
+          updated.splice(index, 1);
+          widgetEditorForm.setFieldValue("widgetConfig.columns", updated);
+        },
+        [widgetEditorForm, columns]
+      );
+      const handleMoveColumn = (0, import_react11.useCallback)(
+        (index, direction) => {
+          const newIndex = index + direction;
+          if (newIndex < 0 || newIndex >= columns.length) return;
+          const updated = [...columns];
+          const [moved] = updated.splice(index, 1);
+          updated.splice(newIndex, 0, moved);
+          widgetEditorForm.setFieldValue("widgetConfig.columns", updated);
+        },
+        [widgetEditorForm, columns]
+      );
       const handlePaginationToggle = (checked) => {
         widgetEditorForm.setFieldValue("widgetConfig.pagination", {
           ...pagination,
@@ -459,51 +418,7 @@ var init_tableConfigEditor = __esm({
           [field]: value
         });
       };
-      const paginationArgNames = pagination.enabled ? [pagination.pageParam, pagination.pageSizeParam].filter(Boolean) : [];
-      const generalArgs = workflowArgs.filter(
-        (arg) => !paginationArgNames.includes(arg.name)
-      );
-      return /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-5" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.Label, { className: "text-xs font-medium text-foreground" }, "Data Array Source"), ctxArrayPaths.length > 0 ? /* @__PURE__ */ import_react11.default.createElement(import_react11.default.Fragment, null, /* @__PURE__ */ import_react11.default.createElement(
-        import_ui10.Select,
-        {
-          value: config.dataArrayTemplate || "",
-          onValueChange: (val) => widgetEditorForm.setFieldValue("widgetConfig.dataArrayTemplate", val)
-        },
-        /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectTrigger, { className: "text-xs font-mono" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectValue, { placeholder: "Select a data array from context\u2026" })),
-        /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectContent, null, ctxArrayPaths.map((arr, idx) => /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectItem, { key: idx, value: arr.path }, /* @__PURE__ */ import_react11.default.createElement("span", { className: "font-mono" }, arr.label), /* @__PURE__ */ import_react11.default.createElement("span", { className: "text-muted-foreground ml-2" }, "(", arr.rowCount, " rows, ", arr.sampleKeys.length, " fields)"))))
-      ), /* @__PURE__ */ import_react11.default.createElement("p", { className: "text-[0.6rem] text-muted-foreground" }, "Or type a custom template path below."), /* @__PURE__ */ import_react11.default.createElement(
-        import_ui10.Input,
-        {
-          type: "text",
-          className: "text-xs font-mono",
-          value: config.dataArrayTemplate || "",
-          onChange: (e) => widgetEditorForm.setFieldValue(
-            "widgetConfig.dataArrayTemplate",
-            e.target.value
-          ),
-          placeholder: "{{ctx.query_result}}"
-        }
-      )) : /* @__PURE__ */ import_react11.default.createElement(import_react11.default.Fragment, null, /* @__PURE__ */ import_react11.default.createElement(
-        import_ui10.Input,
-        {
-          type: "text",
-          className: "text-sm font-mono",
-          value: config.dataArrayTemplate || "",
-          onChange: (e) => widgetEditorForm.setFieldValue(
-            "widgetConfig.dataArrayTemplate",
-            e.target.value
-          ),
-          placeholder: "{{ctx.data}}"
-        }
-      ), /* @__PURE__ */ import_react11.default.createElement("p", { className: "text-[0.65rem] text-muted-foreground flex items-start gap-1" }, /* @__PURE__ */ import_react11.default.createElement(import_fi5.FiInfo, { className: "w-3 h-3 mt-0.5 shrink-0" }), "Run the workflow to discover available data arrays from context."))), generalArgs.length > 0 && /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-2 border-t pt-4" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.Label, { className: "text-xs font-medium text-foreground" }, "Workflow Input Arguments"), /* @__PURE__ */ import_react11.default.createElement("p", { className: "text-[0.6rem] text-muted-foreground" }, "Set default values for the workflow inputs. Pagination args are configured in the Pagination section below."), /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-2" }, generalArgs.map((arg) => /* @__PURE__ */ import_react11.default.createElement("div", { key: arg.name, className: "flex items-end gap-2" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "flex-1 space-y-1" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.Label, { className: "text-[0.65rem] font-mono" }, arg.name), /* @__PURE__ */ import_react11.default.createElement(
-        import_ui10.Input,
-        {
-          value: workflowArgValues[arg.name] ?? "",
-          onChange: (e) => handleArgValueChange(arg.name, e.target.value),
-          className: "h-7 text-xs",
-          placeholder: arg.description || `Value for ${arg.name}`
-        }
-      )), /* @__PURE__ */ import_react11.default.createElement("span", { className: "text-[0.6rem] text-muted-foreground pb-2" }, arg.type))))), /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-2 pt-4" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "flex justify-between items-center" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.Label, { className: "text-xs font-medium text-foreground" }, "Columns"), /* @__PURE__ */ import_react11.default.createElement("div", { className: "flex gap-1" }, currentArrayInfo && /* @__PURE__ */ import_react11.default.createElement(
+      return /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-5" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-2" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "flex justify-between items-center" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.Label, { className: "text-xs font-medium text-foreground" }, "Table Columns"), /* @__PURE__ */ import_react11.default.createElement("div", { className: "flex gap-1" }, discoveredColumns.length > 0 && /* @__PURE__ */ import_react11.default.createElement(
         import_ui10.Button,
         {
           type: "button",
@@ -526,7 +441,7 @@ var init_tableConfigEditor = __esm({
         },
         /* @__PURE__ */ import_react11.default.createElement(import_md5.MdAdd, { className: "mr-1" }),
         " Add"
-      ))), currentArrayInfo && columns.length === 0 && /* @__PURE__ */ import_react11.default.createElement("div", { className: "flex items-center gap-2 text-[0.65rem] text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2" }, /* @__PURE__ */ import_react11.default.createElement(import_fi5.FiZap, { className: "w-3.5 h-3.5 shrink-0" }), /* @__PURE__ */ import_react11.default.createElement("span", null, /* @__PURE__ */ import_react11.default.createElement("strong", null, currentArrayInfo.sampleKeys.length), " fields detected from live data. Click ", /* @__PURE__ */ import_react11.default.createElement("strong", null, "Auto-detect"), " to populate columns.")), columns.length === 0 && !currentArrayInfo ? /* @__PURE__ */ import_react11.default.createElement("div", { className: "text-center p-4 border border-dashed rounded-md text-muted-foreground text-xs" }, "No columns defined. Columns will be auto-detected from the first row's keys at render time.") : columns.length > 0 ? /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-2" }, columns.map((col, idx) => /* @__PURE__ */ import_react11.default.createElement(
+      ))), discoveredColumns.length > 0 && columns.length === 0 && /* @__PURE__ */ import_react11.default.createElement("div", { className: "flex items-center gap-2 text-[0.65rem] text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2" }, /* @__PURE__ */ import_react11.default.createElement(import_fi5.FiZap, { className: "w-3.5 h-3.5 shrink-0" }), /* @__PURE__ */ import_react11.default.createElement("span", null, /* @__PURE__ */ import_react11.default.createElement("strong", null, discoveredColumns.length), " fields detected from loaded data. Click ", /* @__PURE__ */ import_react11.default.createElement("strong", null, "Auto-detect"), " to populate columns.")), !dataArrayPath && columns.length === 0 && /* @__PURE__ */ import_react11.default.createElement("div", { className: "text-center p-4 border border-dashed rounded-md text-muted-foreground text-xs" }, "Configure a Data Array Path in the Data tab first, then come back here to set up columns."), dataArrayPath && discoveredColumns.length === 0 && columns.length === 0 && /* @__PURE__ */ import_react11.default.createElement("div", { className: "text-center p-4 border border-dashed rounded-md text-muted-foreground text-xs" }, "No columns detected. Click ", /* @__PURE__ */ import_react11.default.createElement("strong", null, "Load Data"), " in the Data tab, or add columns manually."), columns.length > 0 && /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-2" }, columns.map((col, idx) => /* @__PURE__ */ import_react11.default.createElement(
         "div",
         {
           key: idx,
@@ -568,7 +483,15 @@ var init_tableConfigEditor = __esm({
             placeholder: "User Name"
           }
         )),
-        /* @__PURE__ */ import_react11.default.createElement("div", { className: "flex-1 space-y-1" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.Label, { className: "text-[0.65rem]" }, "Data Key"), /* @__PURE__ */ import_react11.default.createElement(
+        /* @__PURE__ */ import_react11.default.createElement("div", { className: "flex-1 space-y-1" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.Label, { className: "text-[0.65rem]" }, "Data Key"), availableKeys.length > 0 ? /* @__PURE__ */ import_react11.default.createElement(
+          import_ui10.Select,
+          {
+            value: col.key || "",
+            onValueChange: (val) => handleUpdateColumn(idx, "key", val)
+          },
+          /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectTrigger, { className: "h-7 text-xs font-mono" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectValue, { placeholder: "Select field\u2026" })),
+          /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectContent, null, availableKeys.map((key) => /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectItem, { key, value: key }, key)))
+        ) : /* @__PURE__ */ import_react11.default.createElement(
           import_ui10.Input,
           {
             value: col.key,
@@ -590,21 +513,13 @@ var init_tableConfigEditor = __esm({
           },
           /* @__PURE__ */ import_react11.default.createElement(import_md5.MdDeleteOutline, null)
         )
-      ))) : null), /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-3 border-t pt-4" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.Label, { className: "text-xs font-medium text-foreground" }, "Pagination"), /* @__PURE__ */ import_react11.default.createElement(
+      )))), /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-3 border-t pt-4" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "flex items-center justify-between" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.Label, { className: "text-xs font-medium text-foreground" }, "Pagination"), /* @__PURE__ */ import_react11.default.createElement(
         import_ui10.Switch,
         {
           checked: pagination.enabled,
           onCheckedChange: handlePaginationToggle
         }
-      )), pagination.enabled && /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-3 bg-muted/30 p-3 rounded-md border mt-1" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "text-[0.65rem] text-muted-foreground bg-white border rounded p-2.5 space-y-1.5" }, /* @__PURE__ */ import_react11.default.createElement("p", { className: "font-medium text-foreground text-[0.7rem]" }, "How pagination works:"), /* @__PURE__ */ import_react11.default.createElement("ol", { className: "list-decimal list-inside space-y-1" }, /* @__PURE__ */ import_react11.default.createElement("li", null, "Your workflow must accept ", /* @__PURE__ */ import_react11.default.createElement("strong", null, "page"), " and ", /* @__PURE__ */ import_react11.default.createElement("strong", null, "page size"), " as input arguments (e.g. use them in a SQL ", /* @__PURE__ */ import_react11.default.createElement("code", { className: "bg-muted px-1 rounded" }, "LIMIT / OFFSET"), ")."), /* @__PURE__ */ import_react11.default.createElement("li", null, "Map those argument names below. When the user changes pages, the table will re-run the workflow with these values \u2014 ", /* @__PURE__ */ import_react11.default.createElement("em", null, "overriding"), " any defaults set above."), /* @__PURE__ */ import_react11.default.createElement("li", null, "Set a ", /* @__PURE__ */ import_react11.default.createElement("strong", null, "Total Rows"), " template so the paginator can calculate total pages."))), /* @__PURE__ */ import_react11.default.createElement("div", { className: "grid grid-cols-2 gap-3" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.Label, { className: "text-[0.65rem]" }, "Page Argument Name"), workflowArgs.length > 0 ? /* @__PURE__ */ import_react11.default.createElement(
-        import_ui10.Select,
-        {
-          value: pagination.pageParam || "",
-          onValueChange: (val) => handlePaginationChange("pageParam", val)
-        },
-        /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectTrigger, { className: "h-7 text-xs font-mono" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectValue, { placeholder: "Select arg\u2026" })),
-        /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectContent, null, workflowArgs.map((arg) => /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectItem, { key: arg.name, value: arg.name }, arg.name)))
-      ) : /* @__PURE__ */ import_react11.default.createElement(
+      )), pagination.enabled && /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-3 bg-muted/30 p-3 rounded-md border mt-1" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "grid grid-cols-2 gap-3" }, /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.Label, { className: "text-[0.65rem]" }, "Page Argument Name"), /* @__PURE__ */ import_react11.default.createElement(
         import_ui10.Input,
         {
           value: pagination.pageParam || "",
@@ -612,15 +527,7 @@ var init_tableConfigEditor = __esm({
           placeholder: "page",
           className: "h-7 text-xs font-mono"
         }
-      ), /* @__PURE__ */ import_react11.default.createElement("p", { className: "text-[0.6rem] text-muted-foreground" }, "Workflow input that receives the page number.")), /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.Label, { className: "text-[0.65rem]" }, "Page Size Argument Name"), workflowArgs.length > 0 ? /* @__PURE__ */ import_react11.default.createElement(
-        import_ui10.Select,
-        {
-          value: pagination.pageSizeParam || "",
-          onValueChange: (val) => handlePaginationChange("pageSizeParam", val)
-        },
-        /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectTrigger, { className: "h-7 text-xs font-mono" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectValue, { placeholder: "Select arg\u2026" })),
-        /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectContent, null, workflowArgs.map((arg) => /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectItem, { key: arg.name, value: arg.name }, arg.name)))
-      ) : /* @__PURE__ */ import_react11.default.createElement(
+      ), /* @__PURE__ */ import_react11.default.createElement("p", { className: "text-[0.6rem] text-muted-foreground" }, "Input argument that receives the page number.")), /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.Label, { className: "text-[0.65rem]" }, "Page Size Argument Name"), /* @__PURE__ */ import_react11.default.createElement(
         import_ui10.Input,
         {
           value: pagination.pageSizeParam || "",
@@ -628,29 +535,11 @@ var init_tableConfigEditor = __esm({
           placeholder: "limit",
           className: "h-7 text-xs font-mono"
         }
-      ), /* @__PURE__ */ import_react11.default.createElement("p", { className: "text-[0.6rem] text-muted-foreground" }, "Workflow input that receives rows per page."))), /* @__PURE__ */ import_react11.default.createElement("div", { className: "space-y-1" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.Label, { className: "text-[0.65rem]" }, "Total Rows (Template)"), ctxScalarPaths.length > 0 ? /* @__PURE__ */ import_react11.default.createElement(
-        import_ui10.Select,
-        {
-          value: pagination.totalTemplate || "",
-          onValueChange: (val) => handlePaginationChange("totalTemplate", val)
-        },
-        /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectTrigger, { className: "h-7 text-xs font-mono" }, /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectValue, { placeholder: "Select or type a template\u2026" })),
-        /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectContent, null, ctxScalarPaths.map((s, idx) => /* @__PURE__ */ import_react11.default.createElement(import_ui10.SelectItem, { key: idx, value: s.path }, /* @__PURE__ */ import_react11.default.createElement("span", { className: "font-mono" }, s.label), /* @__PURE__ */ import_react11.default.createElement("span", { className: "text-muted-foreground ml-2" }, "= ", s.value))))
-      ) : /* @__PURE__ */ import_react11.default.createElement(
-        import_ui10.Input,
-        {
-          value: pagination.totalTemplate || "",
-          onChange: (e) => handlePaginationChange("totalTemplate", e.target.value),
-          placeholder: "{{ctx.total_count}}",
-          className: "h-7 text-xs font-mono"
-        }
-      ), /* @__PURE__ */ import_react11.default.createElement("p", { className: "text-[0.6rem] text-muted-foreground" }, "Context template that resolves to the total number of records.")), paginationArgNames.length > 0 && generalArgs.length > 0 && /* @__PURE__ */ import_react11.default.createElement("div", { className: "text-[0.6rem] text-muted-foreground bg-white border rounded px-2.5 py-1.5 flex items-start gap-1.5" }, /* @__PURE__ */ import_react11.default.createElement(import_fi5.FiInfo, { className: "w-3 h-3 mt-0.5 shrink-0 text-primary" }), /* @__PURE__ */ import_react11.default.createElement("span", null, "The pagination args (", /* @__PURE__ */ import_react11.default.createElement("code", { className: "bg-muted px-0.5 rounded" }, paginationArgNames.join(", ")), ') are hidden from "Workflow Input Arguments" above to avoid conflict. On page change, they will ', /* @__PURE__ */ import_react11.default.createElement("em", null, "override"), " any base values.")))), /* @__PURE__ */ import_react11.default.createElement("div", { className: "h-8 shrink-0" }));
+      ), /* @__PURE__ */ import_react11.default.createElement("p", { className: "text-[0.6rem] text-muted-foreground" }, "Input argument that receives rows per page."))))), /* @__PURE__ */ import_react11.default.createElement("div", { className: "h-8 shrink-0" }));
     };
     TableConfigEditor.propTypes = {
       widgetEditorForm: import_prop_types10.default.object.isRequired,
-      workflowContext: import_prop_types10.default.object,
-      workflows: import_prop_types10.default.array,
-      selectedWorkflow: import_prop_types10.default.object
+      queryResults: import_prop_types10.default.object
     };
   }
 });
@@ -2997,7 +2886,7 @@ var import_react12 = __toESM(require("react"));
 var import_prop_types11 = __toESM(require("prop-types"));
 var import_ui11 = require("@jet-admin/ui");
 var import_fi6 = require("react-icons/fi");
-var collectArrayPaths3 = (obj, prefix = "", depth = 0, maxDepth = 4) => {
+var collectArrayPaths2 = (obj, prefix = "", depth = 0, maxDepth = 4) => {
   const results = [];
   if (!obj || typeof obj !== "object" || depth > maxDepth) return results;
   for (const key of Object.keys(obj)) {
@@ -3012,7 +2901,7 @@ var collectArrayPaths3 = (obj, prefix = "", depth = 0, maxDepth = 4) => {
         rowCount: val.length
       });
     } else if (val && typeof val === "object" && !Array.isArray(val)) {
-      results.push(...collectArrayPaths3(val, fullPath, depth + 1, maxDepth));
+      results.push(...collectArrayPaths2(val, fullPath, depth + 1, maxDepth));
     }
   }
   return results;
@@ -3028,7 +2917,7 @@ var VegaDataMappingEditor = ({ widgetEditorForm, dataManifest, queryResults, bou
   const arrayPaths = (0, import_react12.useMemo)(() => {
     const paths = [];
     if (queryResults) {
-      paths.push(...collectArrayPaths3(queryResults));
+      paths.push(...collectArrayPaths2(queryResults));
     }
     if (paths.length === 0 && aliasSuggestions.length > 0) {
       for (const alias of aliasSuggestions) {
@@ -3133,8 +3022,7 @@ var import_react14 = __toESM(require("react"));
 var import_prop_types13 = __toESM(require("prop-types"));
 var import_ui13 = require("@jet-admin/ui");
 var import_fi7 = require("react-icons/fi");
-var import_md6 = require("react-icons/md");
-var collectArrayPaths4 = (obj, prefix = "", depth = 0, maxDepth = 4) => {
+var collectArrayPaths3 = (obj, prefix = "", depth = 0, maxDepth = 4) => {
   const results = [];
   if (!obj || typeof obj !== "object" || depth > maxDepth) return results;
   for (const key of Object.keys(obj)) {
@@ -3149,12 +3037,12 @@ var collectArrayPaths4 = (obj, prefix = "", depth = 0, maxDepth = 4) => {
         rowCount: val.length
       });
     } else if (val && typeof val === "object" && !Array.isArray(val)) {
-      results.push(...collectArrayPaths4(val, fullPath, depth + 1, maxDepth));
+      results.push(...collectArrayPaths3(val, fullPath, depth + 1, maxDepth));
     }
   }
   return results;
 };
-var collectScalarPaths2 = (obj, prefix = "", depth = 0, maxDepth = 3) => {
+var collectScalarPaths = (obj, prefix = "", depth = 0, maxDepth = 3) => {
   const results = [];
   if (!obj || typeof obj !== "object" || depth > maxDepth) return results;
   for (const key of Object.keys(obj)) {
@@ -3164,22 +3052,10 @@ var collectScalarPaths2 = (obj, prefix = "", depth = 0, maxDepth = 3) => {
     if (typeof val === "number") {
       results.push({ path: fullPath, label: fullPath, value: val });
     } else if (val && typeof val === "object" && !Array.isArray(val)) {
-      results.push(
-        ...collectScalarPaths2(val, fullPath, depth + 1, maxDepth)
-      );
+      results.push(...collectScalarPaths(val, fullPath, depth + 1, maxDepth));
     }
   }
   return results;
-};
-var resolvePath = (obj, path) => {
-  if (!obj || !path) return void 0;
-  const parts = path.split(".");
-  let current = obj;
-  for (const part of parts) {
-    if (current == null) return void 0;
-    current = current[part];
-  }
-  return current;
 };
 var TableDataMappingEditor = ({
   widgetEditorForm,
@@ -3188,7 +3064,6 @@ var TableDataMappingEditor = ({
   boundDataSources
 }) => {
   const dataMapping = widgetEditorForm.values.widgetConfig?.dataMapping || {};
-  const columns = widgetEditorForm.values.widgetConfig?.columns || [];
   const aliasSuggestions = (0, import_react14.useMemo)(() => {
     if (!boundDataSources?.length) return [];
     return boundDataSources.filter((s) => s.alias).map((s) => s.alias);
@@ -3196,13 +3071,20 @@ var TableDataMappingEditor = ({
   const arrayPaths = (0, import_react14.useMemo)(() => {
     const paths = [];
     if (queryResults) {
-      paths.push(...collectArrayPaths4(queryResults));
+      paths.push(...collectArrayPaths3(queryResults));
     }
     if (paths.length === 0 && aliasSuggestions.length > 0) {
       for (const alias of aliasSuggestions) {
         paths.push({
           path: `${alias}.data`,
           label: `${alias}.data`,
+          sampleKeys: [],
+          rowCount: 0,
+          isSuggestion: true
+        });
+        paths.push({
+          path: alias,
+          label: alias,
           sampleKeys: [],
           rowCount: 0,
           isSuggestion: true
@@ -3214,7 +3096,7 @@ var TableDataMappingEditor = ({
   const scalarPaths = (0, import_react14.useMemo)(() => {
     const paths = [];
     if (queryResults) {
-      paths.push(...collectScalarPaths2(queryResults));
+      paths.push(...collectScalarPaths(queryResults));
     }
     if (paths.length === 0 && aliasSuggestions.length > 0) {
       for (const alias of aliasSuggestions) {
@@ -3228,76 +3110,12 @@ var TableDataMappingEditor = ({
     }
     return paths;
   }, [queryResults, aliasSuggestions]);
-  const discoveredColumns = (0, import_react14.useMemo)(() => {
-    if (!queryResults || !dataMapping.dataArrayPath) return [];
-    const resolved = resolvePath(queryResults, dataMapping.dataArrayPath);
-    if (Array.isArray(resolved) && resolved.length > 0 && typeof resolved[0] === "object") {
-      return Object.keys(resolved[0]).map((key) => ({
-        key,
-        label: key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
-        type: typeof resolved[0][key]
-      }));
-    }
-    const match = arrayPaths.find((p) => p.path === dataMapping.dataArrayPath);
-    if (match && match.sampleKeys?.length > 0) {
-      return match.sampleKeys.map((key) => ({
-        key,
-        label: key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
-        type: "string"
-      }));
-    }
-    return [];
-  }, [queryResults, dataMapping.dataArrayPath, arrayPaths]);
-  const availableKeys = (0, import_react14.useMemo)(() => {
-    return discoveredColumns.map((c) => c.key);
-  }, [discoveredColumns]);
   const handleMappingChange = (field, value) => {
     widgetEditorForm.setFieldValue("widgetConfig.dataMapping", {
       ...dataMapping,
       [field]: value
     });
   };
-  const handleAddColumn = (0, import_react14.useCallback)(() => {
-    widgetEditorForm.setFieldValue("widgetConfig.columns", [
-      ...columns,
-      { label: "New Column", key: "" }
-    ]);
-  }, [widgetEditorForm, columns]);
-  const handleAutoPopulateColumns = (0, import_react14.useCallback)(() => {
-    if (discoveredColumns.length === 0) return;
-    const newColumns = discoveredColumns.map((col) => ({
-      label: col.label,
-      key: col.key
-    }));
-    widgetEditorForm.setFieldValue("widgetConfig.columns", newColumns);
-  }, [widgetEditorForm, discoveredColumns]);
-  const handleUpdateColumn = (0, import_react14.useCallback)(
-    (index, field, value) => {
-      const updated = [...columns];
-      updated[index] = { ...updated[index], [field]: value };
-      widgetEditorForm.setFieldValue("widgetConfig.columns", updated);
-    },
-    [widgetEditorForm, columns]
-  );
-  const handleRemoveColumn = (0, import_react14.useCallback)(
-    (index) => {
-      const updated = [...columns];
-      updated.splice(index, 1);
-      widgetEditorForm.setFieldValue("widgetConfig.columns", updated);
-    },
-    [widgetEditorForm, columns]
-  );
-  const handleMoveColumn = (0, import_react14.useCallback)(
-    (index, direction) => {
-      const newIndex = index + direction;
-      if (newIndex < 0 || newIndex >= columns.length) return;
-      const updated = [...columns];
-      const [moved] = updated.splice(index, 1);
-      updated.splice(newIndex, 0, moved);
-      widgetEditorForm.setFieldValue("widgetConfig.columns", updated);
-    },
-    [widgetEditorForm, columns]
-  );
   return /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-4 border-t pt-4" }, /* @__PURE__ */ import_react14.default.createElement(import_ui13.Label, { className: "text-xs font-semibold text-foreground" }, "Data Mapping"), /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react14.default.createElement(import_ui13.Label, { className: "text-xs font-medium text-foreground" }, "Data Array Path"), arrayPaths.length > 0 ? /* @__PURE__ */ import_react14.default.createElement(import_react14.default.Fragment, null, /* @__PURE__ */ import_react14.default.createElement(
     import_ui13.Select,
     {
@@ -3313,7 +3131,7 @@ var TableDataMappingEditor = ({
       className: "text-xs font-mono",
       value: dataMapping.dataArrayPath || "",
       onChange: (e) => handleMappingChange("dataArrayPath", e.target.value),
-      placeholder: "orders.data"
+      placeholder: "alias.data"
     }
   )) : /* @__PURE__ */ import_react14.default.createElement(import_react14.default.Fragment, null, /* @__PURE__ */ import_react14.default.createElement(
     import_ui13.Input,
@@ -3322,104 +3140,9 @@ var TableDataMappingEditor = ({
       className: "text-sm font-mono",
       value: dataMapping.dataArrayPath || "",
       onChange: (e) => handleMappingChange("dataArrayPath", e.target.value),
-      placeholder: "orders.data"
+      placeholder: "alias.data"
     }
-  ), /* @__PURE__ */ import_react14.default.createElement("p", { className: "text-[0.65rem] text-muted-foreground flex items-start gap-1" }, /* @__PURE__ */ import_react14.default.createElement(import_fi7.FiInfo, { className: "w-3 h-3 mt-0.5 shrink-0" }), "Click Load Data to discover available data arrays from query results."))), /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-2 border-t pt-4" }, /* @__PURE__ */ import_react14.default.createElement("div", { className: "flex justify-between items-center" }, /* @__PURE__ */ import_react14.default.createElement(import_ui13.Label, { className: "text-xs font-medium text-foreground" }, "Table Columns"), /* @__PURE__ */ import_react14.default.createElement("div", { className: "flex gap-1" }, discoveredColumns.length > 0 && /* @__PURE__ */ import_react14.default.createElement(
-    import_ui13.Button,
-    {
-      type: "button",
-      variant: "outline",
-      size: "sm",
-      onClick: handleAutoPopulateColumns,
-      className: "h-7 text-xs px-2",
-      title: "Auto-detect columns from data"
-    },
-    /* @__PURE__ */ import_react14.default.createElement(import_md6.MdAutoAwesome, { className: "mr-1 text-amber-500" }),
-    " Auto-detect"
-  ), /* @__PURE__ */ import_react14.default.createElement(
-    import_ui13.Button,
-    {
-      type: "button",
-      variant: "outline",
-      size: "sm",
-      onClick: handleAddColumn,
-      className: "h-7 text-xs px-2"
-    },
-    /* @__PURE__ */ import_react14.default.createElement(import_md6.MdAdd, { className: "mr-1" }),
-    " Add"
-  ))), discoveredColumns.length > 0 && columns.length === 0 && /* @__PURE__ */ import_react14.default.createElement("div", { className: "flex items-center gap-2 text-[0.65rem] text-amber-700 bg-amber-50 border border-amber-200 rounded-md px-3 py-2" }, /* @__PURE__ */ import_react14.default.createElement(import_fi7.FiZap, { className: "w-3.5 h-3.5 shrink-0" }), /* @__PURE__ */ import_react14.default.createElement("span", null, /* @__PURE__ */ import_react14.default.createElement("strong", null, discoveredColumns.length), " fields detected from loaded data. Click ", /* @__PURE__ */ import_react14.default.createElement("strong", null, "Auto-detect"), " to populate columns.")), columns.length === 0 && discoveredColumns.length === 0 ? /* @__PURE__ */ import_react14.default.createElement("div", { className: "text-center p-4 border border-dashed rounded-md text-muted-foreground text-xs" }, "No columns defined. Select a data array path first, then click Auto-detect or add columns manually.") : columns.length > 0 ? /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-2" }, columns.map((col, idx) => /* @__PURE__ */ import_react14.default.createElement(
-    "div",
-    {
-      key: idx,
-      className: "flex items-end gap-1.5 p-2 border rounded-md bg-muted/30"
-    },
-    /* @__PURE__ */ import_react14.default.createElement("div", { className: "flex flex-col gap-0.5 pb-0.5" }, /* @__PURE__ */ import_react14.default.createElement(
-      import_ui13.Button,
-      {
-        type: "button",
-        variant: "ghost",
-        size: "sm",
-        square: true,
-        className: "h-5 w-5 text-muted-foreground hover:text-foreground",
-        onClick: () => handleMoveColumn(idx, -1),
-        disabled: idx === 0,
-        title: "Move up"
-      },
-      /* @__PURE__ */ import_react14.default.createElement(import_md6.MdArrowUpward, { className: "text-xs" })
-    ), /* @__PURE__ */ import_react14.default.createElement(
-      import_ui13.Button,
-      {
-        type: "button",
-        variant: "ghost",
-        size: "sm",
-        square: true,
-        className: "h-5 w-5 text-muted-foreground hover:text-foreground",
-        onClick: () => handleMoveColumn(idx, 1),
-        disabled: idx === columns.length - 1,
-        title: "Move down"
-      },
-      /* @__PURE__ */ import_react14.default.createElement(import_md6.MdArrowDownward, { className: "text-xs" })
-    )),
-    /* @__PURE__ */ import_react14.default.createElement("div", { className: "flex-1 space-y-1" }, /* @__PURE__ */ import_react14.default.createElement(import_ui13.Label, { className: "text-[0.65rem]" }, "Header Label"), /* @__PURE__ */ import_react14.default.createElement(
-      import_ui13.Input,
-      {
-        value: col.label,
-        onChange: (e) => handleUpdateColumn(idx, "label", e.target.value),
-        className: "h-7 text-xs",
-        placeholder: "User Name"
-      }
-    )),
-    /* @__PURE__ */ import_react14.default.createElement("div", { className: "flex-1 space-y-1" }, /* @__PURE__ */ import_react14.default.createElement(import_ui13.Label, { className: "text-[0.65rem]" }, "Data Key"), availableKeys.length > 0 ? /* @__PURE__ */ import_react14.default.createElement(
-      import_ui13.Select,
-      {
-        value: col.key || "",
-        onValueChange: (val) => handleUpdateColumn(idx, "key", val)
-      },
-      /* @__PURE__ */ import_react14.default.createElement(import_ui13.SelectTrigger, { className: "h-7 text-xs font-mono" }, /* @__PURE__ */ import_react14.default.createElement(import_ui13.SelectValue, { placeholder: "Select field\u2026" })),
-      /* @__PURE__ */ import_react14.default.createElement(import_ui13.SelectContent, null, availableKeys.map((key) => /* @__PURE__ */ import_react14.default.createElement(import_ui13.SelectItem, { key, value: key }, key)))
-    ) : /* @__PURE__ */ import_react14.default.createElement(
-      import_ui13.Input,
-      {
-        value: col.key,
-        onChange: (e) => handleUpdateColumn(idx, "key", e.target.value),
-        className: "h-7 text-xs font-mono",
-        placeholder: "user_name"
-      }
-    )),
-    /* @__PURE__ */ import_react14.default.createElement(
-      import_ui13.Button,
-      {
-        type: "button",
-        variant: "ghost",
-        size: "sm",
-        square: true,
-        className: "h-7 w-7 text-destructive",
-        onClick: () => handleRemoveColumn(idx),
-        title: "Remove column"
-      },
-      /* @__PURE__ */ import_react14.default.createElement(import_md6.MdDeleteOutline, null)
-    )
-  ))) : null), /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-1.5 border-t pt-4" }, /* @__PURE__ */ import_react14.default.createElement(import_ui13.Label, { className: "text-xs font-medium text-foreground" }, "Total Count Path", " ", /* @__PURE__ */ import_react14.default.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), scalarPaths.length > 0 ? /* @__PURE__ */ import_react14.default.createElement(
+  ), /* @__PURE__ */ import_react14.default.createElement("p", { className: "text-[0.65rem] text-muted-foreground flex items-start gap-1" }, /* @__PURE__ */ import_react14.default.createElement(import_fi7.FiInfo, { className: "w-3 h-3 mt-0.5 shrink-0" }), "Click Load Data to discover available data arrays from query results."))), /* @__PURE__ */ import_react14.default.createElement("div", { className: "space-y-1.5" }, /* @__PURE__ */ import_react14.default.createElement(import_ui13.Label, { className: "text-xs font-medium text-foreground" }, "Total Count Path", " ", /* @__PURE__ */ import_react14.default.createElement("span", { className: "text-muted-foreground font-normal" }, "(optional)")), scalarPaths.length > 0 ? /* @__PURE__ */ import_react14.default.createElement(
     import_ui13.Select,
     {
       value: dataMapping.totalCountPath || "",
@@ -3434,7 +3157,7 @@ var TableDataMappingEditor = ({
       className: "text-xs font-mono",
       value: dataMapping.totalCountPath || "",
       onChange: (e) => handleMappingChange("totalCountPath", e.target.value),
-      placeholder: "orders.meta.total"
+      placeholder: "alias.meta.total"
     }
   ), /* @__PURE__ */ import_react14.default.createElement("p", { className: "text-[0.6rem] text-muted-foreground" }, "Used for server-side pagination. Leave empty to use the array length.")));
 };
@@ -3446,7 +3169,7 @@ TableDataMappingEditor.propTypes = {
 };
 
 // src/widget.map.js
-var import_md7 = require("react-icons/md");
+var import_md6 = require("react-icons/md");
 registerWidgets();
 var LazyVegaWidget = import_react16.default.lazy(
   () => Promise.resolve().then(() => (init_vega(), vega_exports)).then((module2) => ({ default: module2.VegaWidget }))
@@ -3511,7 +3234,7 @@ var WIDGETS_MAP = {
     },
     configEditor: ButtonConfigEditor,
     dataMappingEditor: null,
-    icon: ({ className }) => /* @__PURE__ */ import_react16.default.createElement(import_md7.MdOutlineSmartButton, { className: `!text-lg ${className}` }),
+    icon: ({ className }) => /* @__PURE__ */ import_react16.default.createElement(import_md6.MdOutlineSmartButton, { className: `!text-lg ${className}` }),
     sampleConfig: {
       text: "Click Me",
       variant: "default",
@@ -3530,7 +3253,7 @@ var WIDGETS_MAP = {
     },
     configEditor: TableConfigEditor,
     dataMappingEditor: TableDataMappingEditor,
-    icon: ({ className }) => /* @__PURE__ */ import_react16.default.createElement(import_md7.MdOutlineTableChart, { className: `!text-lg ${className}` }),
+    icon: ({ className }) => /* @__PURE__ */ import_react16.default.createElement(import_md6.MdOutlineTableChart, { className: `!text-lg ${className}` }),
     sampleConfig: {
       dataArrayTemplate: "{{ctx.data}}",
       columns: [],
