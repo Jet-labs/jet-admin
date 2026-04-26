@@ -60,17 +60,54 @@ const collectScalarPaths = (obj, prefix = "", depth = 0, maxDepth = 3) => {
 export const TableDataMappingEditor = ({ widgetEditorForm, dataManifest, queryResults, boundDataSources }) => {
   const dataMapping = widgetEditorForm.values.widgetConfig?.dataMapping || {};
 
+  // Build alias-based suggestions from bound data sources (always available)
+  const aliasSuggestions = useMemo(() => {
+    if (!boundDataSources?.length) return [];
+    return boundDataSources
+      .filter((s) => s.alias)
+      .map((s) => s.alias);
+  }, [boundDataSources]);
+
   // Discover array paths from live query results
   const arrayPaths = useMemo(() => {
-    if (!queryResults) return [];
-    return collectArrayPaths(queryResults);
-  }, [queryResults]);
+    const paths = [];
+    if (queryResults) {
+      paths.push(...collectArrayPaths(queryResults));
+    }
+    // If no discovered paths, generate suggestions from aliases
+    if (paths.length === 0 && aliasSuggestions.length > 0) {
+      for (const alias of aliasSuggestions) {
+        paths.push({
+          path: `${alias}.data`,
+          label: `${alias}.data`,
+          sampleKeys: [],
+          rowCount: 0,
+          isSuggestion: true,
+        });
+      }
+    }
+    return paths;
+  }, [queryResults, aliasSuggestions]);
 
   // Discover scalar (number) paths for total rows
   const scalarPaths = useMemo(() => {
-    if (!queryResults) return [];
-    return collectScalarPaths(queryResults);
-  }, [queryResults]);
+    const paths = [];
+    if (queryResults) {
+      paths.push(...collectScalarPaths(queryResults));
+    }
+    // Suggestions from aliases
+    if (paths.length === 0 && aliasSuggestions.length > 0) {
+      for (const alias of aliasSuggestions) {
+        paths.push({
+          path: `${alias}.total`,
+          label: `${alias}.total`,
+          value: null,
+          isSuggestion: true,
+        });
+      }
+    }
+    return paths;
+  }, [queryResults, aliasSuggestions]);
 
   const handleMappingChange = (field, value) => {
     widgetEditorForm.setFieldValue("widgetConfig.dataMapping", {
@@ -103,9 +140,13 @@ export const TableDataMappingEditor = ({ widgetEditorForm, dataManifest, queryRe
                 {arrayPaths.map((arr, idx) => (
                   <SelectItem key={idx} value={arr.path}>
                     <span className="font-mono">{arr.label}</span>
-                    <span className="text-muted-foreground ml-2">
-                      ({arr.rowCount} rows, {arr.sampleKeys.length} fields)
-                    </span>
+                    {arr.isSuggestion ? (
+                      <span className="text-muted-foreground ml-2">(suggested)</span>
+                    ) : (
+                      <span className="text-muted-foreground ml-2">
+                        ({arr.rowCount} rows, {arr.sampleKeys.length} fields)
+                      </span>
+                    )}
                   </SelectItem>
                 ))}
               </SelectContent>

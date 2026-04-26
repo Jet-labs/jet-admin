@@ -43,11 +43,32 @@ export const VegaDataMappingEditor = ({ widgetEditorForm, dataManifest, queryRes
   const dataSources = dataMapping.dataSources || {};
   const entries = Object.entries(dataSources);
 
-  // Discover array paths from live query results
+  // Build alias-based suggestions from bound data sources
+  const aliasSuggestions = useMemo(() => {
+    if (!boundDataSources?.length) return [];
+    return boundDataSources
+      .filter((s) => s.alias)
+      .map((s) => s.alias);
+  }, [boundDataSources]);
+
+  // Discover array paths from live query results, with alias fallbacks
   const arrayPaths = useMemo(() => {
-    if (!queryResults) return [];
-    return collectArrayPaths(queryResults);
-  }, [queryResults]);
+    const paths = [];
+    if (queryResults) {
+      paths.push(...collectArrayPaths(queryResults));
+    }
+    if (paths.length === 0 && aliasSuggestions.length > 0) {
+      for (const alias of aliasSuggestions) {
+        paths.push({
+          path: `${alias}.data`,
+          label: `${alias}.data`,
+          rowCount: 0,
+          isSuggestion: true,
+        });
+      }
+    }
+    return paths;
+  }, [queryResults, aliasSuggestions]);
 
   const updateDataSources = useCallback((newSources) => {
     widgetEditorForm.setFieldValue("widgetConfig.dataMapping", {
