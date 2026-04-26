@@ -65,7 +65,7 @@ export const WidgetPreview = ({
     let chartData = data?.data || data;
 
     // For Vega widgets: extract vegaSpec and resolve template data
-    if (!chartData && widgetConfig?.vegaSpec) {
+    if (!chartData && resolvedType === 'vega-lite' && widgetConfig?.vegaSpec) {
       // Clone spec to avoid mutating form state
       const spec = JSON.parse(JSON.stringify(widgetConfig.vegaSpec));
 

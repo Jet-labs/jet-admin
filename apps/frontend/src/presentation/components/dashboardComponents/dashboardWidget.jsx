@@ -218,7 +218,7 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height, stateTree, 
           let widgetData = null;
 
           // For Vega widgets: extract vegaSpec and resolve template data
-          if (resolvedConfig?.vegaSpec) {
+          if (widgetRender.widgetType === 'vega-lite' && resolvedConfig?.vegaSpec) {
             const spec = JSON.parse(JSON.stringify(resolvedConfig.vegaSpec));
             // Resolve template expressions in data.values using dataSourceResults
             if (spec.data?.values && typeof spec.data.values === 'string' && spec.data.values.includes('{{')) {
