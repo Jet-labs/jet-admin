@@ -18,4 +18,28 @@ export class BaseWidgetBuilder {
   buildRender({ widgetType, widgetConfig }) {
     throw new Error('buildRender method must be implemented by subclasses.');
   }
+
+  /**
+   * Declares what data inputs this widget type expects.
+   * Subclasses should override this static getter.
+   * @returns {object} Data manifest with supportsMultipleQueries, inputs, etc.
+   */
+  static get dataManifest() {
+    return {
+      supportsMultipleQueries: false,
+      inputs: [],
+    };
+  }
+
+  /**
+   * Transform bound query results using the mapping config into widget-ready data.
+   * Subclasses should override this method.
+   *
+   * @param {object} queryResults - Normalized results: { alias: resultData }
+   * @param {object} mappingConfig - Widget-type-specific mapping config
+   * @returns {object} Widget-ready data
+   */
+  mapQueryResults(queryResults, mappingConfig) {
+    return queryResults;
+  }
 }

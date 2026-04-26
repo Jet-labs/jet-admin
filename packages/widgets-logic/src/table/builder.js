@@ -1,4 +1,5 @@
 import { BaseWidgetBuilder } from '../core/baseWidgetBuilder';
+import { getByPath } from '../core/utils';
 
 /**
  * Table Widget Builder
@@ -41,6 +42,30 @@ export class TableWidgetBuilder extends BaseWidgetBuilder {
         pageSizeParam: widgetConfig.pagination?.pageSizeParam || "limit",
         totalRows,
       }
+    };
+  }
+
+  static get dataManifest() {
+    return {
+      supportsMultipleQueries: false,
+      inputs: [
+        { name: 'dataArray', type: 'array', required: true, description: 'Array of row objects' },
+        { name: 'totalCount', type: 'scalar', required: false, description: 'Total rows for pagination' },
+      ],
+    };
+  }
+
+  /**
+   * Map normalized query results to table-ready data.
+   * @param {object} queryResults - { alias: resultData }
+   * @param {object} mappingConfig - { dataArrayPath, totalCountPath }
+   * @returns {object} { dataArray, totalCount }
+   */
+  mapQueryResults(queryResults, mappingConfig) {
+    if (!mappingConfig) return { dataArray: [], totalCount: 0 };
+    return {
+      dataArray: getByPath(queryResults, mappingConfig.dataArrayPath) || [],
+      totalCount: getByPath(queryResults, mappingConfig.totalCountPath) || 0,
     };
   }
 }

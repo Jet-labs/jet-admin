@@ -12,6 +12,7 @@ import { TableWidgetBuilder } from './table/builder';
 export { BaseWidgetBuilder } from './core/baseWidgetBuilder';
 export { VegaWidgetBuilder } from './vega/builder';
 export { TableWidgetBuilder } from './table/builder';
+export { getByPath } from './core/utils';
 
 /**
  * Registry mapping widget types to their builder instances.
