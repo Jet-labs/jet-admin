@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 import { useWidgetsState } from "../../../logic/contexts/widgetsContext";
 import { testDataQueryByIDAPI } from "../../../data/apis/dataQuery";
+import { executeWorkflowAPI } from "../../../data/apis/workflow";
 
 import PropTypes from "prop-types";
 
@@ -31,7 +32,8 @@ import { WidgetEventsEditor } from "./widgetEventsEditor";
 
 /**
  * Execute all bound data sources and return normalized results.
- * @param {Array} dataSources - Array of { type, queryID, alias, inputArgValues }
+ * Supports both data queries and workflows.
+ * @param {Array} dataSources - Array of { type, queryID/workflowID, alias, inputArgValues }
  * @param {string} tenantID
  * @returns {Promise<object>} { alias: resultData }
  */
@@ -51,10 +53,24 @@ const executeDataSources = async (dataSources, tenantID) => {
         });
         results[source.alias] = result;
       } catch (err) {
-        results[source.alias] = { error: err.message };
+        results[source.alias] = { error: err.message || String(err) };
       }
     }
-    // Workflow execution can be added here
+
+    if (source.type === "workflow" && source.workflowID) {
+      try {
+        const result = await executeWorkflowAPI({
+          tenantID,
+          workflowID: source.workflowID,
+          inputArgs: source.inputArgValues || {},
+        });
+        // executeWorkflowAPI returns { success, context, ... }
+        // Store the full context so users can traverse it via dataMapping paths
+        results[source.alias] = result.context || result;
+      } catch (err) {
+        results[source.alias] = { error: err.message || String(err) };
+      }
+    }
   }
 
   return Object.keys(results).length > 0 ? results : null;

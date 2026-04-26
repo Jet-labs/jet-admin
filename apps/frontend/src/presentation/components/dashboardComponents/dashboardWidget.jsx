@@ -13,6 +13,7 @@ import { Badge, Button } from "@jet-admin/ui";
 import { resolveConfig } from "../../../logic/evaluationEngine";
 import { dispatchEvent, createEventHandlers } from "../../../logic/actionDispatcher";
 import { testDataQueryByIDAPI } from "../../../data/apis/dataQuery";
+import { executeWorkflowAPI } from "../../../data/apis/workflow";
 import { WIDGET_PROCESSORS_MAP } from "@jet-admin/widgets-logic";
 
 export const DashboardWidget = ({ tenantID, widgetID, width, height, stateTree, onQueryResult }) => {
@@ -87,10 +88,21 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height, stateTree, 
             });
             results[source.alias] = result;
           } catch (err) {
-            results[source.alias] = { error: err.message };
+            results[source.alias] = { error: err.message || String(err) };
           }
         }
-        // Workflow sources are handled via widgetWorkflowBridge socket (existing)
+        if (source.type === "workflow" && source.workflowID) {
+          try {
+            const result = await executeWorkflowAPI({
+              tenantID,
+              workflowID: source.workflowID,
+              inputArgs: source.inputArgValues || {},
+            });
+            results[source.alias] = result.context || result;
+          } catch (err) {
+            results[source.alias] = { error: err.message || String(err) };
+          }
+        }
       }
       if (!cancelled) setDataSourceResults(results);
     };
