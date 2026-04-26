@@ -1,4 +1,5 @@
 import { WIDGETS_MAP } from "@jet-admin/widgets-ui";
+import { resolveWidgetData } from "@jet-admin/widgets-logic";
 import PropTypes from "prop-types";
 import { useCallback, useRef, useState } from "react";
 import { CONSTANTS } from "../../../constants";
@@ -64,50 +65,13 @@ export const WidgetPreview = ({
     // Data can be passed directly from the parent (query results, etc.)
     let chartData = data?.data || data;
 
-    // For Vega widgets: extract vegaSpec and resolve template data
-    if (!chartData && resolvedType === 'vega-lite' && widgetConfig?.vegaSpec) {
-      // Clone spec to avoid mutating form state
-      const spec = JSON.parse(JSON.stringify(widgetConfig.vegaSpec));
-
-      // Resolve template expressions in data.values using queryResults
-      if (spec.data?.values && typeof spec.data.values === 'string' && spec.data.values.includes('{{')) {
-        const templateMatch = spec.data.values.match(/\{\{([^}]+)\}\}/);
-        if (templateMatch && queryResults) {
-          const path = templateMatch[1];
-          const parts = path.split('.');
-          let resolved = queryResults;
-          for (const part of parts) {
-            if (resolved == null) break;
-            resolved = resolved[part];
-          }
-          if (Array.isArray(resolved)) {
-            spec.data = { values: resolved };
-          } else if (resolved && typeof resolved === 'object' && Array.isArray(resolved.data)) {
-            spec.data = { values: resolved.data };
-          } else {
-            spec.data = { values: [] };
-          }
-        } else {
-          spec.data = { values: [] };
-        }
-      }
-      chartData = spec;
-    }
-
-    // For Table / generic widgets: resolve data from queryResults via dataMapping
-    if (!chartData && queryResults && widgetConfig?.dataMapping?.dataArrayPath) {
-      const arrayPath = widgetConfig.dataMapping.dataArrayPath;
-      const parts = arrayPath.split('.');
-      let resolved = queryResults;
-      for (const part of parts) {
-        if (resolved == null) break;
-        resolved = resolved[part];
-      }
-      if (Array.isArray(resolved)) {
-        chartData = resolved;
-      } else if (resolved && typeof resolved === 'object' && Array.isArray(resolved.data)) {
-        chartData = resolved.data;
-      }
+    // Resolve data from queryResults via the widget type's builder
+    if (!chartData && queryResults) {
+      chartData = resolveWidgetData({
+        widgetType: resolvedType,
+        widgetConfig,
+        queryResults,
+      });
     }
 
     return (

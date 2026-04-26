@@ -62,4 +62,38 @@ export class VegaWidgetBuilder extends BaseWidgetBuilder {
     }
     return { vegaData };
   }
+
+  /**
+   * Resolve the data prop for VegaWidget from widgetConfig + queryResults.
+   * Clones the vegaSpec and resolves {{template}} expressions in data.values.
+   *
+   * @param {object} widgetConfig - The full widget configuration
+   * @param {object|null} queryResults - Executed query/workflow results
+   * @returns {object|null} Complete Vega spec with resolved data, or null
+   */
+  resolveData(widgetConfig, queryResults) {
+    if (!widgetConfig?.vegaSpec) return null;
+
+    // Clone spec to avoid mutating form/config state
+    const spec = JSON.parse(JSON.stringify(widgetConfig.vegaSpec));
+
+    // Resolve template expressions in data.values (e.g. "{{alias}}" or "{{alias.data}}")
+    if (spec.data?.values && typeof spec.data.values === 'string' && spec.data.values.includes('{{')) {
+      const templateMatch = spec.data.values.match(/\{\{([^}]+)\}\}/);
+      if (templateMatch && queryResults) {
+        const resolved = getByPath(queryResults, templateMatch[1]);
+        if (Array.isArray(resolved)) {
+          spec.data = { values: resolved };
+        } else if (resolved && typeof resolved === 'object' && Array.isArray(resolved.data)) {
+          spec.data = { values: resolved.data };
+        } else {
+          spec.data = { values: [] };
+        }
+      } else {
+        spec.data = { values: [] };
+      }
+    }
+
+    return spec;
+  }
 }

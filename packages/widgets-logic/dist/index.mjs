@@ -1,6 +1,19 @@
 // src/index.js
 import { WIDGET_TYPES } from "@jet-admin/widget-types";
 
+// src/core/utils.js
+var getByPath = (obj, path) => {
+  if (!obj || !path) return void 0;
+  const normalized = path.replace(/\[(\d+)\]/g, ".$1");
+  const parts = normalized.split(".");
+  let current = obj;
+  for (const part of parts) {
+    if (current === void 0 || current === null) return void 0;
+    current = current[part];
+  }
+  return current;
+};
+
 // src/core/baseWidgetBuilder.js
 var BaseWidgetBuilder = class {
   /**
@@ -15,6 +28,48 @@ var BaseWidgetBuilder = class {
    */
   buildRender({ widgetType, widgetConfig }) {
     throw new Error("buildRender method must be implemented by subclasses.");
+  }
+  /**
+   * Declares what data inputs this widget type expects.
+   * Subclasses should override this static getter.
+   * @returns {object} Data manifest with supportsMultipleQueries, inputs, etc.
+   */
+  static get dataManifest() {
+    return {
+      supportsMultipleQueries: false,
+      inputs: []
+    };
+  }
+  /**
+   * Transform bound query results using the mapping config into widget-ready data.
+   * Subclasses should override this method.
+   *
+   * @param {object} queryResults - Normalized results: { alias: resultData }
+   * @param {object} mappingConfig - Widget-type-specific mapping config
+   * @returns {object} Widget-ready data
+   */
+  mapQueryResults(queryResults, mappingConfig) {
+    return queryResults;
+  }
+  /**
+   * Resolve the data prop for the widget component from widgetConfig + queryResults.
+   * 
+   * This is the STANDARD entry point called by the rendering layer (WidgetPreview,
+   * DashboardWidget) to get the data to pass to the widget component.
+   * Each widget type implements its own resolution logic.
+   *
+   * @param {object} widgetConfig - The full widget configuration
+   * @param {object|null} queryResults - Executed query/workflow results: { alias: data }
+   * @returns {any} Data ready for the widget component's `data` prop, or null
+   */
+  resolveData(widgetConfig, queryResults) {
+    if (!queryResults || !widgetConfig?.dataMapping?.dataArrayPath) return null;
+    const resolved = getByPath(queryResults, widgetConfig.dataMapping.dataArrayPath);
+    if (Array.isArray(resolved)) return resolved;
+    if (resolved && typeof resolved === "object" && Array.isArray(resolved.data)) {
+      return resolved.data;
+    }
+    return null;
   }
 };
 
@@ -40,6 +95,57 @@ var VegaWidgetBuilder = class extends BaseWidgetBuilder {
       autosize: { type: "fit", contains: "padding" },
       ...vegaSpec
     };
+    return spec;
+  }
+  static get dataManifest() {
+    return {
+      supportsMultipleQueries: true,
+      dynamicInputs: true,
+      inputs: [
+        { name: "default", type: "array", required: true, description: "Primary data source" }
+      ]
+    };
+  }
+  /**
+   * Map normalized query results to vega-ready named data sources.
+   * @param {object} queryResults - { alias: resultData }
+   * @param {object} mappingConfig - { dataSources: { vegaName: "alias.path" } }
+   * @returns {object} { vegaData: { name: [...] } }
+   */
+  mapQueryResults(queryResults, mappingConfig) {
+    if (!mappingConfig?.dataSources) return { vegaData: {} };
+    const vegaData = {};
+    for (const [vegaName, path] of Object.entries(mappingConfig.dataSources)) {
+      vegaData[vegaName] = getByPath(queryResults, path) || [];
+    }
+    return { vegaData };
+  }
+  /**
+   * Resolve the data prop for VegaWidget from widgetConfig + queryResults.
+   * Clones the vegaSpec and resolves {{template}} expressions in data.values.
+   *
+   * @param {object} widgetConfig - The full widget configuration
+   * @param {object|null} queryResults - Executed query/workflow results
+   * @returns {object|null} Complete Vega spec with resolved data, or null
+   */
+  resolveData(widgetConfig, queryResults) {
+    if (!widgetConfig?.vegaSpec) return null;
+    const spec = JSON.parse(JSON.stringify(widgetConfig.vegaSpec));
+    if (spec.data?.values && typeof spec.data.values === "string" && spec.data.values.includes("{{")) {
+      const templateMatch = spec.data.values.match(/\{\{([^}]+)\}\}/);
+      if (templateMatch && queryResults) {
+        const resolved = getByPath(queryResults, templateMatch[1]);
+        if (Array.isArray(resolved)) {
+          spec.data = { values: resolved };
+        } else if (resolved && typeof resolved === "object" && Array.isArray(resolved.data)) {
+          spec.data = { values: resolved.data };
+        } else {
+          spec.data = { values: [] };
+        }
+      } else {
+        spec.data = { values: [] };
+      }
+    }
     return spec;
   }
 };
@@ -69,6 +175,28 @@ var TableWidgetBuilder = class extends BaseWidgetBuilder {
       }
     };
   }
+  static get dataManifest() {
+    return {
+      supportsMultipleQueries: false,
+      inputs: [
+        { name: "dataArray", type: "array", required: true, description: "Array of row objects" },
+        { name: "totalCount", type: "scalar", required: false, description: "Total rows for pagination" }
+      ]
+    };
+  }
+  /**
+   * Map normalized query results to table-ready data.
+   * @param {object} queryResults - { alias: resultData }
+   * @param {object} mappingConfig - { dataArrayPath, totalCountPath }
+   * @returns {object} { dataArray, totalCount }
+   */
+  mapQueryResults(queryResults, mappingConfig) {
+    if (!mappingConfig) return { dataArray: [], totalCount: 0 };
+    return {
+      dataArray: getByPath(queryResults, mappingConfig.dataArrayPath) || [],
+      totalCount: getByPath(queryResults, mappingConfig.totalCountPath) || 0
+    };
+  }
 };
 
 // src/index.js
@@ -87,12 +215,22 @@ var processWorkflowDataForWidget = ({ widgetType, widgetConfig }) => {
   }
   return widgetConfig || null;
 };
+var resolveWidgetData = ({ widgetType, widgetConfig, queryResults }) => {
+  if (!queryResults || !widgetConfig) return null;
+  const processor = WIDGET_PROCESSORS_MAP[widgetType];
+  if (processor && typeof processor.resolveData === "function") {
+    return processor.resolveData(widgetConfig, queryResults);
+  }
+  return null;
+};
 export {
   BaseWidgetBuilder,
   TableWidgetBuilder,
   VegaWidgetBuilder,
   WIDGET_PROCESSORS_MAP,
+  getByPath,
   processWorkflowDataForWidget,
-  registerWidgetProcessor
+  registerWidgetProcessor,
+  resolveWidgetData
 };
 //# sourceMappingURL=index.mjs.map

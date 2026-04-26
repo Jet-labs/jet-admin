@@ -52,4 +52,26 @@ export const processWorkflowDataForWidget = ({ widgetType, widgetConfig }) => {
   return widgetConfig || null;
 };
 
-// Export Visual Chart Builder logic is now in @jet-admin/widgets-ui
+/**
+ * Resolve the data prop for a widget component from widgetConfig + queryResults.
+ * 
+ * This is the STANDARD entry point for all rendering layers (WidgetPreview,
+ * DashboardWidget). It delegates to the widget type's builder.resolveData()
+ * method, so no widget-type-specific conditionals are needed in the UI layer.
+ *
+ * @param {object} params
+ * @param {string} params.widgetType - Widget type identifier
+ * @param {object} params.widgetConfig - The full widget configuration
+ * @param {object|null} params.queryResults - Executed query/workflow results
+ * @returns {any} Data ready for the widget component's `data` prop, or null
+ */
+export const resolveWidgetData = ({ widgetType, widgetConfig, queryResults }) => {
+  if (!queryResults || !widgetConfig) return null;
+
+  const processor = WIDGET_PROCESSORS_MAP[widgetType];
+  if (processor && typeof processor.resolveData === 'function') {
+    return processor.resolveData(widgetConfig, queryResults);
+  }
+
+  return null;
+};

@@ -14,7 +14,7 @@ import { resolveConfig } from "../../../logic/evaluationEngine";
 import { dispatchEvent, createEventHandlers } from "../../../logic/actionDispatcher";
 import { testDataQueryByIDAPI } from "../../../data/apis/dataQuery";
 import { executeWorkflowAPI } from "../../../data/apis/workflow";
-import { WIDGET_PROCESSORS_MAP } from "@jet-admin/widgets-logic";
+import { resolveWidgetData } from "@jet-admin/widgets-logic";
 
 export const DashboardWidget = ({ tenantID, widgetID, width, height, stateTree, onQueryResult }) => {
   DashboardWidget.propTypes = {
@@ -214,52 +214,12 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height, stateTree, 
         ) : null}
 
         {RenderedWidgetComponent ? (() => {
-          // Resolve widget data from dataSourceResults
-          let widgetData = null;
-
-          // For Vega widgets: extract vegaSpec and resolve template data
-          if (widgetRender.widgetType === 'vega-lite' && resolvedConfig?.vegaSpec) {
-            const spec = JSON.parse(JSON.stringify(resolvedConfig.vegaSpec));
-            // Resolve template expressions in data.values using dataSourceResults
-            if (spec.data?.values && typeof spec.data.values === 'string' && spec.data.values.includes('{{')) {
-              const templateMatch = spec.data.values.match(/\{\{([^}]+)\}\}/);
-              if (templateMatch && dataSourceResults) {
-                const path = templateMatch[1];
-                const parts = path.split('.');
-                let resolved = dataSourceResults;
-                for (const part of parts) {
-                  if (resolved == null) break;
-                  resolved = resolved[part];
-                }
-                if (Array.isArray(resolved)) {
-                  spec.data = { values: resolved };
-                } else if (resolved && typeof resolved === 'object' && Array.isArray(resolved.data)) {
-                  spec.data = { values: resolved.data };
-                } else {
-                  spec.data = { values: [] };
-                }
-              } else {
-                spec.data = { values: [] };
-              }
-            }
-            widgetData = spec;
-          }
-
-          // For Table / generic widgets: resolve data from dataSourceResults via dataMapping
-          if (!widgetData && dataSourceResults && resolvedConfig?.dataMapping?.dataArrayPath) {
-            const arrayPath = resolvedConfig.dataMapping.dataArrayPath;
-            const parts = arrayPath.split('.');
-            let resolved = dataSourceResults;
-            for (const part of parts) {
-              if (resolved == null) break;
-              resolved = resolved[part];
-            }
-            if (Array.isArray(resolved)) {
-              widgetData = resolved;
-            } else if (resolved && typeof resolved === 'object' && Array.isArray(resolved.data)) {
-              widgetData = resolved.data;
-            }
-          }
+          // Resolve widget data via the standardized builder pipeline
+          const widgetData = resolveWidgetData({
+            widgetType: widgetRender.widgetType,
+            widgetConfig: resolvedConfig,
+            queryResults: dataSourceResults,
+          });
 
           return (
             <div className="min-h-0 flex-1 bg-white px-2 pb-2 pt-1">

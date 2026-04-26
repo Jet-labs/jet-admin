@@ -1,3 +1,5 @@
+import { getByPath } from './utils';
+
 /**
  * Base Widget Builder
  * 
@@ -41,5 +43,27 @@ export class BaseWidgetBuilder {
    */
   mapQueryResults(queryResults, mappingConfig) {
     return queryResults;
+  }
+
+  /**
+   * Resolve the data prop for the widget component from widgetConfig + queryResults.
+   * 
+   * This is the STANDARD entry point called by the rendering layer (WidgetPreview,
+   * DashboardWidget) to get the data to pass to the widget component.
+   * Each widget type implements its own resolution logic.
+   *
+   * @param {object} widgetConfig - The full widget configuration
+   * @param {object|null} queryResults - Executed query/workflow results: { alias: data }
+   * @returns {any} Data ready for the widget component's `data` prop, or null
+   */
+  resolveData(widgetConfig, queryResults) {
+    // Default: use dataMapping.dataArrayPath to resolve from queryResults
+    if (!queryResults || !widgetConfig?.dataMapping?.dataArrayPath) return null;
+    const resolved = getByPath(queryResults, widgetConfig.dataMapping.dataArrayPath);
+    if (Array.isArray(resolved)) return resolved;
+    if (resolved && typeof resolved === 'object' && Array.isArray(resolved.data)) {
+      return resolved.data;
+    }
+    return null;
   }
 }
