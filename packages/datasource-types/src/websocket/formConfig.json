@@ -1,0 +1,26 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "connectionName": { "type": "string", "minLength": 3 },
+      "url": { "type": "string", "description": "WebSocket server URL (ws:// or wss://)" },
+      "headers": { "type": "string", "description": "Custom headers as JSON object string" },
+      "reconnect": { "type": "boolean", "default": true },
+      "reconnectIntervalMs": { "type": "integer", "default": 5000 }
+    },
+    "required": ["connectionName", "url"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      { "type": "Control", "scope": "#/properties/connectionName", "label": "Connection Name" },
+      { "type": "Control", "scope": "#/properties/url", "label": "WebSocket URL", "options": { "placeholder": "wss://example.com/ws" } },
+      { "type": "Control", "scope": "#/properties/headers", "label": "Custom Headers (JSON)", "options": { "multi": true, "rows": 2 } },
+      { "type": "HorizontalLayout", "elements": [
+        { "type": "Control", "scope": "#/properties/reconnect", "label": "Auto-Reconnect" },
+        { "type": "Control", "scope": "#/properties/reconnectIntervalMs", "label": "Reconnect Interval (ms)" }
+      ]}
+    ]
+  },
+  "data": { "connectionName": "MyWebSocket", "url": "", "headers": "{}", "reconnect": true, "reconnectIntervalMs": 5000 }
+}

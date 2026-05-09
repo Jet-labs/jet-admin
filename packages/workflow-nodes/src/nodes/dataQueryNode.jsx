@@ -129,20 +129,20 @@ export const DataQueryNodeConfigurator = ({ data, onChange, nodeId }) => {
       <JsonForms schema={schema} uischema={uischema} data={formData} renderers={workflowNodeRenderers} onChange={handleFormChange} />
 
       {/* Help callout */}
-      <div className="rounded-lg border border-border bg-muted/30 p-3 text-[10px] text-muted-foreground space-y-2">
+      <div className="rounded-md border border-border bg-muted/30 p-3 text-[10px] text-muted-foreground space-y-2">
         <div className="font-semibold text-xs text-foreground">📘 Query Arguments</div>
         <div>
           <span className="font-medium text-foreground">Argument Format:</span>
           <div className="ml-3 mt-0.5 font-mono text-[9px] space-y-0.5">
-            <div><code className="bg-background px-1 rounded border border-border">{'{{ctx.input.userId}}'}</code> → pass input value</div>
-            <div><code className="bg-background px-1 rounded border border-border">{'{{ctx.queryResult.id}}'}</code> → from previous query</div>
-            <div><code className="bg-background px-1 rounded border border-border">{'id_{{ctx.input.id}}'}</code> → string interpolation</div>
+            <div><code className="bg-brand-dark px-1 rounded-sm border border-border">{'{{ctx.input.userId}}'}</code> → pass input value</div>
+            <div><code className="bg-brand-dark px-1 rounded-sm border border-border">{'{{ctx.queryResult.id}}'}</code> → from previous query</div>
+            <div><code className="bg-brand-dark px-1 rounded-sm border border-border">{'id_{{ctx.input.id}}'}</code> → string interpolation</div>
           </div>
         </div>
         <div>
           <span className="font-medium text-foreground">Access Result:</span>
           <div className="ml-3 mt-0.5">
-            Stored in <code className="bg-background px-1 py-0.5 rounded border border-border font-mono">{'ctx.{outputVariable}'}</code> for use in next nodes.
+            Stored in <code className="bg-brand-dark px-1 py-0.5 rounded-sm border border-border font-mono">{'ctx.{outputVariable}'}</code> for use in next nodes.
           </div>
         </div>
       </div>
@@ -187,7 +187,7 @@ export const DataQueryNode = memo(({ id, data, isConnectable }) => {
       case 'completed': return 'border-green-400 ring-2 ring-green-300 ring-opacity-50';
       case 'failed': return 'border-red-400 ring-2 ring-red-300 ring-opacity-50';
       case 'skipped': return 'border-orange-300 opacity-60';
-      default: return 'border-slate-200 hover:border-blue-400 hover:shadow-md';
+      default: return 'border-brand-border hover:border-blue-400 hover:shadow-md';
     }
   };
 
@@ -215,35 +215,35 @@ export const DataQueryNode = memo(({ id, data, isConnectable }) => {
   };
 
   return (
-    <div className={`relative bg-white border rounded min-w-[340px] max-w-[400px] transition-all duration-150 ${isDisabled ? 'border-slate-200 opacity-50' : getStatusStyles()} ${!data.dataQueryID ? '!border-red-400 !bg-red-50' : ''}`}>
+    <div className={`relative bg-brand-black border rounded-sm min-w-[340px] max-w-[400px] transition-all duration-150 ${isDisabled ? 'border-brand-border opacity-50' : getStatusStyles()} ${!data.dataQueryID ? '!border-red-400 !bg-red-50' : ''}`}>
       <StatusIndicator />
       <div className="flex items-stretch">
         <div style={{ borderTopLeftRadius: '0.25rem', borderBottomLeftRadius: '0.25rem' }}
-          className={`flex flex-col items-center justify-center px-3 py-3 border-r ${isDisabled ? 'bg-slate-50 border-slate-100' :
-              executionStatus === 'running' ? 'bg-blue-100 border-blue-200' :
-                executionStatus === 'completed' ? 'bg-green-50 border-green-100' :
-                  executionStatus === 'failed' ? 'bg-red-50 border-red-100' :
-                  'bg-blue-50 border-blue-100'
+          className={`flex flex-col items-center justify-center px-3 py-3 border-r ${isDisabled ? 'bg-brand-dark border-brand-border' :
+              executionStatus === 'running' ? 'bg-blue-950/40 border-blue-800' :
+                executionStatus === 'completed' ? 'bg-green-950/40 border-green-800' :
+                  executionStatus === 'failed' ? 'bg-red-950/40 border-red-800' :
+                  'bg-blue-950/40 border-blue-800'
             }`}
         >
-          <SiQuantconnect className={`w-5 h-5 ${isDisabled ? 'text-slate-400' : executionStatus === 'running' ? 'text-blue-600' : executionStatus === 'completed' ? 'text-green-600' : executionStatus === 'failed' ? 'text-red-600' : 'text-blue-500'}`} />
+          <SiQuantconnect className={`w-5 h-5 ${isDisabled ? 'text-brand-text-primary' : executionStatus === 'running' ? 'text-blue-600' : executionStatus === 'completed' ? 'text-green-600' : executionStatus === 'failed' ? 'text-red-600' : 'text-blue-500'}`} />
         </div>
         <div className="flex-1 px-3 py-2 min-w-0">
           <div className="flex items-center justify-between gap-2">
-            <span className={`text-xs font-semibold truncate ${isDisabled ? 'text-slate-400 line-through' : 'text-slate-700'}`}>{data?.title || 'Untitled'}</span>
+            <span className={`text-xs font-semibold truncate ${isDisabled ? 'text-brand-text-primary line-through' : 'text-brand-text-primary'}`}>{data?.title || 'Untitled'}</span>
             {isDisabled && (
-              <span className="inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded border border-orange-200">
+              <span className="inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded-sm border border-orange-800">
                 <VscDebugDisconnect className="w-2.5 h-2.5" />Skip
               </span>
             )}
           </div>
-          <div className={`text-sm truncate mt-0.5 ${isDisabled ? 'text-slate-300' : 'text-slate-500'}`}>
+          <div className={`text-sm truncate mt-0.5 ${isDisabled ? 'text-brand-text-primary' : 'text-brand-text-primary'}`}>
             {selectedQueryTitle.length > 20 ? `${String(selectedQueryTitle).substring(0, 20)}...` : selectedQueryTitle}
           </div>
         </div>
-        <div className="flex flex-col items-center justify-center px-2 border-l border-slate-100">
-          <div className={`w-2 h-2 rounded-full mb-1 ${isDisabled ? 'bg-slate-300' : 'bg-green-400'}`} title="Success" />
-          <div className={`w-2 h-2 rounded-full ${isDisabled ? 'bg-slate-300' : 'bg-red-400'}`} title="Error" />
+        <div className="flex flex-col items-center justify-center px-2 border-l border-brand-border">
+          <div className={`w-2 h-2 rounded-full mb-1 ${isDisabled ? 'bg-brand-black' : 'bg-green-400'}`} title="Success" />
+          <div className={`w-2 h-2 rounded-full ${isDisabled ? 'bg-brand-black' : 'bg-red-400'}`} title="Error" />
         </div>
       </div>
       <Handle type="target" position={Position.Top} isConnectable={isConnectable} style={{ width: '10px', height: '10px', backgroundColor: isDisabled ? '#cbd5e1' : '#3b82f6', border: 'none', top: '-5px' }} />

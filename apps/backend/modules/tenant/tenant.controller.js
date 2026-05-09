@@ -14,7 +14,7 @@ const tenantController = {};
  */
 tenantController.getUserTenantByID = async (req, res) => {
   try {
-    const { user, dbPool } = req;
+    const { user } = req;
     const { tenantID } = req.params;
     const authContext = getServiceAuthContext(req);
     Logger.log("info", {
@@ -24,7 +24,6 @@ tenantController.getUserTenantByID = async (req, res) => {
     const tenant = await tenantService.getUserTenantByID({
       userID: user.userID,
       tenantID: tenantID,
-      dbPool,
       authContext,
     });
     Logger.log("success", {
@@ -49,7 +48,7 @@ tenantController.getUserTenantByID = async (req, res) => {
  */
 tenantController.deleteUserTenantByID = async (req, res) => {
   try {
-    const { user, dbPool } = req;
+    const { user } = req;
     const { tenantID } = req.params;
     Logger.log("info", {
       message: "tenantController:deleteUserTenantByID:params",
@@ -58,7 +57,7 @@ tenantController.deleteUserTenantByID = async (req, res) => {
     await tenantService.deleteUserTenantByID({
       userID: user.userID,
       tenantID: tenantID,
-      dbPool,
+      tenantID: tenantID,
     });
     Logger.log("success", {
       message: "tenantController:deleteUserTenantByID:success",
@@ -113,7 +112,7 @@ tenantController.getAllUserTenants = async (req, res) => {
 tenantController.createNewTenant = async (req, res) => {
   try {
     const { user } = req;
-    const { tenantTitle, tenantLogoURL, tenantDBType, tenantDBURL } = req.body;
+    const { tenantTitle, tenantLogoURL } = req.body;
     const authContext = getServiceAuthContext(req);
     Logger.log("info", {
       message: "tenantController:createNewTenant:params",
@@ -121,8 +120,6 @@ tenantController.createNewTenant = async (req, res) => {
         userID: user.userID,
         tenantTitle,
         tenantLogoURL,
-        tenantDBType,
-        tenantDBURL,
         authContext,
       },
     });
@@ -130,8 +127,6 @@ tenantController.createNewTenant = async (req, res) => {
       userID: user.userID,
       tenantTitle,
       tenantLogoURL,
-      tenantDBType,
-      tenantDBURL,
       authContext,
     });
     Logger.log("success", {
@@ -148,37 +143,7 @@ tenantController.createNewTenant = async (req, res) => {
   }
 };
 
-/**
- *
- * @param {import("express").Request} req
- * @param {import("express").Response} res
- * @returns
- */
-tenantController.testTenantDatabaseConnection = async (req, res) => {
-  try {
-    const { user } = req;
-    const { tenantDBURL } = req.body;
-    Logger.log("info", {
-      message: "tenantController:testTenantDatabaseConnection:params",
-      params: { userID: user.userID, tenantDBURL },
-    });
-    const connectionResult = await tenantService.testTenantDatabaseConnection({
-      userID: user.userID,
-      tenantDBURL,
-    });
-    Logger.log("success", {
-      message: "tenantController:testTenantDatabaseConnection:connectionResult",
-      params: { connectionResult },
-    });
-    return expressUtils.sendResponse(res, true, { connectionResult });
-  } catch (error) {
-    Logger.log("error", {
-      message: "tenantController:testTenantDatabaseConnection:catch-1",
-      params: { error },
-    });
-    return expressUtils.sendResponse(res, false, {}, error);
-  }
-};
+
 
 /**
  *
@@ -190,7 +155,7 @@ tenantController.updateTenant = async (req, res) => {
   try {
     const { user } = req;
     const { tenantID } = req.params;
-    const { tenantTitle, tenantLogoURL, tenantDBURL } = req.body;
+    const { tenantTitle, tenantLogoURL } = req.body;
     Logger.log("info", {
       message: "tenantController:updateTenant:params",
       params: {
@@ -205,8 +170,6 @@ tenantController.updateTenant = async (req, res) => {
       tenantID: tenantID,
       tenantTitle,
       tenantLogoURL,
-      tenantDBURL,
-      tenantDBType: constants.SUPPORTED_DATABASES.postgresql.value,
     });
     Logger.log("success", {
       message: "tenantController:updateTenant:updatedTenant",

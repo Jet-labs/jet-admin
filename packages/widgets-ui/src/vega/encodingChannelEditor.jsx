@@ -48,8 +48,8 @@ export const EncodingChannelEditor = ({
   const handleChange = (update) => onChange({ ...safeValue, ...update });
 
   return (
-    /* ✅ Correct: bg-card / border-border instead of bg-white / border-slate-200 */
-    <div className="rounded-lg border border-border bg-card overflow-hidden shadow-sm">
+    /* ✅ Correct: bg-card / border-border instead of bg-brand-black / border-brand-border */
+    <div className="rounded-md border border-border bg-card overflow-hidden shadow-sm">
 
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-2 bg-muted/50 border-b border-border">
@@ -124,7 +124,7 @@ export const EncodingChannelEditor = ({
         <CollapseComponent
           showButtonText="Advanced Options"
           hideButtonText="Hide Options"
-          className="mt-2 border-t border-border pt-2"
+          className="mt-2"
           containerClass="p-0"
           buttonClass="text-[10px] text-muted-foreground hover:text-foreground font-medium flex items-center gap-1 w-full justify-start"
           content={() => (

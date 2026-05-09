@@ -10,7 +10,7 @@ const {
     tenantIdParamSchema,
 } = require("./tenant.validator");
 
-let databaseRouter,
+let 
   datasourceRouter,
   dataQueryRouter,
   widgetRouter,
@@ -21,19 +21,12 @@ let databaseRouter,
   cronjobRouter,
   auditLogRouter,
   aiRouter,
-  workflowRouter,
-  connectorRouter;
+  workflowRouter;
 const { isModuleEnabled } = require("../../config/module.config");
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
 const { auditLogMiddleware } = require("../audit/audit.middleware");
 
-if (isModuleEnabled(constants.MODULES.DATABASE)) {
-  Logger.log("success", {
-    message: `${constants.MODULES.DATABASE} module imported`,
-  });
-  databaseRouter = require("../database/database.v1.routes");
-}
 if (isModuleEnabled(constants.MODULES.DATASOURCE)) {
   Logger.log("success", {
     message: `${constants.MODULES.DATASOURCE} module imported`,
@@ -90,12 +83,7 @@ if (isModuleEnabled(constants.MODULES.CRONJOB)) {
   });
   cronjobRouter = require("../cronJob/cronJob.v1.routes");
 }
-if (isModuleEnabled(constants.MODULES.AI)) {
-  Logger.log("success", {
-    message: `${constants.MODULES.AI} module imported`,
-  });
-  aiRouter = require("../ai/ai.v1.routes");
-}
+
 auditLogRouter = require("../audit/audit.v1.routes");
 
 // Tenant routes
@@ -109,7 +97,6 @@ router.get(
   "/:tenantID",
     validate(tenantIdParamSchema, "params"),
   authMiddleware.checkUserPermissions(["tenant:read"]),
-  tenantMiddleware.poolProvider,
   tenantController.getUserTenantByID
 );
 
@@ -117,7 +104,6 @@ router.delete(
   "/:tenantID",
     validate(tenantIdParamSchema, "params"),
   authMiddleware.checkUserPermissions(["tenant:delete"]),
-  tenantMiddleware.poolProvider,
   tenantController.deleteUserTenantByID
 );
 
@@ -128,7 +114,7 @@ router.post(
   tenantController.createNewTenant
 );
 
-router.patch("/dbtest", tenantController.testTenantDatabaseConnection);
+
 
 router.patch(
   "/:tenantID",
@@ -140,31 +126,6 @@ router.patch(
   tenantController.updateTenant
 );
 
-// Nested AI routes
-if (isModuleEnabled(constants.MODULES.AI)) {
-  Logger.log("success", { message: `${constants.MODULES.AI} module enabled` });
-  router.use(
-    "/:tenantID/ai",
-      validate(tenantIdParamSchema, "params"),
-    authMiddleware.checkUserPermissions(["tenant:ai"]),
-    tenantMiddleware.poolProvider,
-    aiRouter
-  );
-}
-
-// Nested database routes
-if (isModuleEnabled(constants.MODULES.DATABASE)) {
-  Logger.log("success", {
-    message: `${constants.MODULES.DATABASE} module enabled`,
-  });
-  router.use(
-    "/:tenantID/database",
-      validate(tenantIdParamSchema, "params"),
-    authMiddleware.checkUserPermissions(["tenant:database"]),
-    tenantMiddleware.poolProvider,
-    databaseRouter
-  );
-}
 // Nested user management routes
 if (isModuleEnabled(constants.MODULES.USERMANAGEMENT)) {
   Logger.log("success", {
@@ -213,7 +174,6 @@ if (isModuleEnabled(constants.MODULES.CRONJOB)) {
     "/:tenantID/cronjobs",
       validate(tenantIdParamSchema, "params"),
     authMiddleware.checkUserPermissions(["tenant:cronjobs"]),
-    tenantMiddleware.poolProvider,
     cronjobRouter
   );
 }
@@ -227,27 +187,16 @@ if (isModuleEnabled(constants.MODULES.DATASOURCE)) {
     "/:tenantID/datasources",
       validate(tenantIdParamSchema, "params"),
     authMiddleware.checkUserPermissions(["tenant:datasource"]),
-    tenantMiddleware.poolProvider,
     datasourceRouter
   );
 }
 
-// Nested subscription routes
+// Nested listener routes (unified listener system)
 router.use(
-  "/:tenantID/subscriptions",
+  "/:tenantID/listeners",
   validate(tenantIdParamSchema, "params"),
   authMiddleware.checkUserPermissions(["tenant:datasource"]),
-  tenantMiddleware.poolProvider,
-  require("../subscription/subscription.v1.routes")
-);
-
-// Nested webhook config routes
-router.use(
-  "/:tenantID/webhook-configs",
-  validate(tenantIdParamSchema, "params"),
-  authMiddleware.checkUserPermissions(["tenant:datasource"]),
-  tenantMiddleware.poolProvider,
-  require("../webhook/webhook.v1.routes")
+  require("../listener/listener.v1.routes")
 );
 
 // Nested dataQuery routes
@@ -259,7 +208,6 @@ if (isModuleEnabled(constants.MODULES.DATAQUERY)) {
     "/:tenantID/queries",
       validate(tenantIdParamSchema, "params"),
     authMiddleware.checkUserPermissions(["tenant:query"]),
-    tenantMiddleware.poolProvider,
     dataQueryRouter
   );
 }
@@ -273,7 +221,6 @@ if (isModuleEnabled(constants.MODULES.WORKFLOW)) {
     "/:tenantID/workflows",
       validate(tenantIdParamSchema, "params"),
     authMiddleware.checkUserPermissions(["tenant:workflow"]),
-    tenantMiddleware.poolProvider,
     workflowRouter
   );
 }
@@ -287,7 +234,6 @@ if (isModuleEnabled(constants.MODULES.WIDGET)) {
     "/:tenantID/widgets",
       validate(tenantIdParamSchema, "params"),
     authMiddleware.checkUserPermissions(["tenant:widget"]),
-    tenantMiddleware.poolProvider,
     widgetRouter
   );
 }
@@ -301,7 +247,6 @@ if (isModuleEnabled(constants.MODULES.DASHBOARD)) {
     "/:tenantID/dashboards",
       validate(tenantIdParamSchema, "params"),
     authMiddleware.checkUserPermissions(["tenant:dashboard"]),
-    tenantMiddleware.poolProvider,
     dashboardRouter
   );
 }

@@ -7,7 +7,7 @@ globalUtil.seedTenantData = async () => {
     const tenants = await prisma.tblTenants.findMany();
     const tenantsToDBURLMap = {};
     for (let i = 0; i < tenants.length; i++) {
-      tenantsToDBURLMap[tenants[i].tenantID] = tenants[i].tenantDBURL;
+      tenantsToDBURLMap[tenants[i].tenantID] = null;
     }
     global.tenantsToDBURLMap = tenantsToDBURLMap;
     Logger.log("success", {

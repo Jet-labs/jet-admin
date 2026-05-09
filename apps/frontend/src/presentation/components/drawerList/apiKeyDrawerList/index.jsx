@@ -3,7 +3,7 @@ import { FaPlus } from "react-icons/fa";
 import { IoKeyOutline } from "react-icons/io5";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../../constants";
-import { useAPIKeysState } from "../../../../logic/contexts/apiKeysContext";
+import { useAPIKeys } from "../../../../logic/hooks/useAPIKeys";
 import { NoEntityUI } from "../../ui/noEntityUI";
 
 import { Button } from "@jet-admin/ui";
@@ -11,14 +11,14 @@ export const APIKeyDrawerList = () => {
   const { tenantID } = useParams();
   const navigate = useNavigate();
   const routeParam = useParams();
-  const { isLoadingAPIKeys, apiKeys, isFetchingAPIKeys } = useAPIKeysState();
+  const { isLoadingAPIKeys, apiKeys, isFetchingAPIKeys } = useAPIKeys(tenantID);
 
   const _navigateToAddNotification = () => {
     navigate(CONSTANTS.ROUTES.ADD_API_KEY.path(tenantID));
   };
 
   return (
-    <div className="bg-background flex h-full w-full flex-col gap-3 overflow-hidden p-3">
+    <div className="bg-brand-dark flex h-full w-full flex-col gap-3 overflow-hidden p-3">
       <Button
         onClick={_navigateToAddNotification}
         variant="primary-ghost"

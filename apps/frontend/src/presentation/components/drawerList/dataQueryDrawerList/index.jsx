@@ -1,7 +1,7 @@
 import { FaPlus } from "react-icons/fa";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../../constants";
-import { useDataQueriesState } from "../../../../logic/contexts/dataQueriesContext";
+import { useDataQueries } from "../../../../logic/hooks/useDataQueries";
 import { NoEntityUI } from "../../ui/noEntityUI";
 import { DatasourceIcon } from "../../datasourceComponents/datasourceIcon";
 import { getDatasourceTypeByValue } from "@jet-admin/datasource-types";
@@ -10,10 +10,10 @@ import React from "react";
 import { Button } from "@jet-admin/ui";
 
 export const DataQueryDrawerList = () => {
-  const { isLoadingDataQueries, dataQueries, isFetchingDataQueries } =
-    useDataQueriesState();
-  const routeParam = useParams();
   const { tenantID } = useParams();
+  const { isLoadingDataQueries, dataQueries, isFetchingDataQueries } = useDataQueries(tenantID);
+  const routeParam = useParams();
+
   const navigate = useNavigate();
 
   const _navigateToAddMoreQuery = () => {
@@ -21,7 +21,7 @@ export const DataQueryDrawerList = () => {
   };
 
   return (
-    <div className="bg-background h-full overflow-hidden p-3 w-full flex flex-col gap-3">
+    <div className="bg-brand-dark h-full overflow-hidden p-3 w-full flex flex-col gap-3">
       <Button
         onClick={_navigateToAddMoreQuery}
         variant="primary-ghost"
@@ -33,10 +33,10 @@ export const DataQueryDrawerList = () => {
 
       {isLoadingDataQueries || isFetchingDataQueries ? (
         <div role="status" className="animate-pulse w-full space-y-2">
-          <div className="h-9 bg-muted rounded w-full" />
-          <div className="h-9 bg-muted rounded w-full" />
-          <div className="h-9 bg-muted rounded w-full" />
-          <div className="h-9 bg-muted rounded w-full" />
+          <div className="h-9 bg-muted rounded-sm w-full" />
+          <div className="h-9 bg-muted rounded-sm w-full" />
+          <div className="h-9 bg-muted rounded-sm w-full" />
+          <div className="h-9 bg-muted rounded-sm w-full" />
         </div>
       ) : dataQueries && dataQueries.length > 0 ? (
           <div className="flex-1 w-full overflow-y-auto pb-10 space-y-1">

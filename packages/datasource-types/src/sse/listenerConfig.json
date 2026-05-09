@@ -1,0 +1,17 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "eventTypes": { "type": "string", "description": "Comma-separated SSE event types to listen for (leave empty for all)" },
+      "parseAsJSON": { "type": "boolean", "default": true }
+    }
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      { "type": "Control", "scope": "#/properties/eventTypes", "label": "Event Types (comma-separated)", "options": { "placeholder": "message, update, error" } },
+      { "type": "Control", "scope": "#/properties/parseAsJSON", "label": "Parse data as JSON" }
+    ]
+  },
+  "data": { "eventTypes": "", "parseAsJSON": true }
+}

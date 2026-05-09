@@ -95,9 +95,9 @@ export const CronJobUpdationForm = ({ tenantID, cronJobID }) => {
   }, [cronJob]);
 
   return (
-    <section className="w-full bg-background">
+    <section className="w-full bg-brand-dark">
       {/* ── Page header ─────────────────────────────────────────────── */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-background px-4 py-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-brand-dark px-4 py-3">
         <div>
           <h1 className="text-base font-semibold tracking-tight text-foreground">
             {CONSTANTS.STRINGS.UPDATE_CRON_JOB_FORM_TITLE}
@@ -126,7 +126,6 @@ export const CronJobUpdationForm = ({ tenantID, cronJobID }) => {
 
           <Button
             type="submit"
-            size="sm"
             form="cron-job-updation-form"
             disabled={isUpdatingCronJob}
           >

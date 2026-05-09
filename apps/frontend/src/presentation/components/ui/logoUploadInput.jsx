@@ -42,8 +42,8 @@ export const LogoUpload = ({ isUploadingLogo, uploadError, onLogoUpload }) => {
             flex items-center justify-center cursor-pointer  !h-12 !w-12
             ${
               uploadError
-                ? "border-red-400 bg-red-50 hover:bg-red-100"
-                : "border-slate-300 bg-slate-100 hover:bg-slate-200"
+                ? "border-red-400 bg-red-950/40 hover:bg-red-950/40"
+                : "border-brand-border bg-brand-border-dark hover:bg-brand-black"
             }
                 rounded
             transition-colors duration-150
@@ -54,13 +54,13 @@ export const LogoUpload = ({ isUploadingLogo, uploadError, onLogoUpload }) => {
           {isUploadingLogo ? (
             <Spinner size={16} className="text-primary" />
           ) : (
-              <Upload className="w-5 h-5 text-slate-500" />
+              <Upload className="w-5 h-5 text-brand-text-primary" />
           )}
 
           {/* Show selected file name */}
         </div>
         {fileInputRef.current?.files?.[0] && (
-          <span className="ml-2 text-sm text-slate-500">
+          <span className="ml-2 text-sm text-brand-text-primary">
             {fileInputRef.current.files[0].name}
           </span>
         )}

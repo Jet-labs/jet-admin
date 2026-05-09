@@ -157,7 +157,7 @@ export const DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
                     onChange={e => setDescription(e.target.value)}
                     rows={2}
                     placeholder="Tell the user what to fill in..."
-                    className="w-full text-xs text-foreground border border-border rounded-md px-2.5 py-1.5 resize-none focus:outline-none focus:ring-2 focus:ring-ring bg-background transition-colors"
+                    className="w-full text-xs text-foreground border border-border rounded-md px-2.5 py-1.5 resize-none focus:outline-none focus:ring-2 focus:ring-ring bg-brand-dark transition-colors"
                 />
             </div>
 
@@ -293,7 +293,7 @@ export const DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
                 />
                 <p className="text-[10px] text-muted-foreground">
                     Access via{' '}
-                    <code className="bg-muted px-1 rounded font-mono">
+                    <code className="bg-muted px-1 rounded-sm font-mono">
                         {`{{ctx.${outputVariable || 'collectedData'}}}`}
                     </code>
                 </p>
@@ -314,7 +314,7 @@ export const DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
             </div>
 
             {/* Help callout */}
-            <div className="rounded-lg border border-primary/20 bg-primary/5 p-3 text-[10px] text-primary/80 space-y-1">
+            <div className="rounded-md border border-primary/20 bg-primary/5 p-3 text-[10px] text-primary/80 space-y-1">
                 <div className="font-semibold text-xs text-primary">Suspend &amp; resume</div>
                 <div>
                     When this node runs, the workflow <strong>pauses</strong> and a form
@@ -323,7 +323,7 @@ export const DataCollectionNodeConfigurator = ({ data, onChange, nodeId }) => {
                 </div>
                 <div>
                     Field values land in{' '}
-                    <code className="bg-background px-1 rounded border border-border font-mono">
+                    <code className="bg-brand-dark px-1 rounded-sm border border-border font-mono">
                         {`ctx.${outputVariable || 'collectedData'}`}
                     </code>{' '}
                     as a plain object.
@@ -355,10 +355,10 @@ export const DataCollectionNode = memo(({ id, data, isConnectable }) => {
 
     return (
         <div className={`
-      relative bg-white border rounded
+      relative bg-brand-black border rounded
       min-w-[300px] max-w-[380px]
       transition-all duration-150
-      ${isDisabled ? 'border-slate-200 opacity-50' : borderClass}
+      ${isDisabled ? 'border-brand-border opacity-50' : borderClass}
     `}>
             <StatusIndicator executionStatus={executionStatus} />
 
@@ -368,17 +368,17 @@ export const DataCollectionNode = memo(({ id, data, isConnectable }) => {
                     style={{ borderTopLeftRadius: '0.25rem', borderBottomLeftRadius: '0.25rem' }}
                     className={`
             flex flex-col items-center justify-center px-3 py-3 border-r
-            ${isDisabled ? 'bg-slate-50 border-slate-100' :
-                            isSuspended ? 'bg-amber-100 border-amber-200' :
-                                executionStatus === 'running' ? 'bg-blue-100 border-blue-200' :
-                                    executionStatus === 'completed' ? 'bg-green-50 border-green-100' :
-                                        executionStatus === 'failed' ? 'bg-red-50 border-red-100' :
+            ${isDisabled ? 'bg-brand-dark border-brand-border' :
+                            isSuspended ? 'bg-amber-100 border-amber-800' :
+                                executionStatus === 'running' ? 'bg-blue-950/40 border-blue-800' :
+                                    executionStatus === 'completed' ? 'bg-green-950/40 border-green-800' :
+                                        executionStatus === 'failed' ? 'bg-red-950/40 border-red-800' :
                                             'bg-violet-50 border-violet-100'}
           `}
                 >
                     {isSuspended
                         ? <MdOutlineInput className="w-5 h-5 text-amber-600" />
-                        : <FaWpforms className={`w-5 h-5 ${isDisabled ? 'text-slate-400' :
+                        : <FaWpforms className={`w-5 h-5 ${isDisabled ? 'text-brand-text-primary' :
                                 executionStatus === 'running' ? 'text-blue-600' :
                                     executionStatus === 'completed' ? 'text-green-600' :
                                         executionStatus === 'failed' ? 'text-red-600' :
@@ -391,22 +391,22 @@ export const DataCollectionNode = memo(({ id, data, isConnectable }) => {
                 <div className="flex-1 px-3 py-2 min-w-0">
                     <div className="flex items-center justify-between gap-2">
                         <span className={`text-xs font-semibold truncate
-              ${isDisabled ? 'text-slate-400 line-through' : 'text-slate-700'}`}>
+              ${isDisabled ? 'text-brand-text-primary line-through' : 'text-brand-text-primary'}`}>
                             {data?.title || 'Data collection'}
                         </span>
                         {isSuspended && (
-                            <span className="inline-flex items-center gap-1 text-[9px] font-medium text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded border border-amber-200 whitespace-nowrap">
+                            <span className="inline-flex items-center gap-1 text-[9px] font-medium text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-sm border border-amber-800 whitespace-nowrap">
                                 ⏸ Waiting
                             </span>
                         )}
                         {isDisabled && !isSuspended && (
-                            <span className="inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded border border-orange-200">
+                            <span className="inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded-sm border border-orange-800">
                                 <VscDebugDisconnect className="w-2.5 h-2.5" />
                                 Skip
                             </span>
                         )}
                     </div>
-                    <div className={`text-[10px] mt-0.5 ${isDisabled ? 'text-slate-300' : 'text-slate-400'}`}>
+                    <div className={`text-[10px] mt-0.5 ${isDisabled ? 'text-brand-text-primary' : 'text-brand-text-primary'}`}>
                         {fieldCount > 0
                             ? `${fieldCount} field${fieldCount !== 1 ? 's' : ''} · saves to ctx.${data?.outputVariable || 'collectedData'}`
                             : 'No fields defined yet'}
@@ -414,11 +414,11 @@ export const DataCollectionNode = memo(({ id, data, isConnectable }) => {
                 </div>
 
                 {/* Right handle indicators */}
-                <div className="flex flex-col items-center justify-center px-2 border-l border-slate-100">
+                <div className="flex flex-col items-center justify-center px-2 border-l border-brand-border">
                     <div className={`w-2 h-2 rounded-full mb-1
-            ${isSuspended ? 'bg-amber-400 animate-pulse' : isDisabled ? 'bg-slate-300' : 'bg-violet-400'}`}
+            ${isSuspended ? 'bg-amber-400 animate-pulse' : isDisabled ? 'bg-brand-black' : 'bg-violet-400'}`}
                         title="Output (after submission)" />
-                    <div className={`w-2 h-2 rounded-full ${isDisabled ? 'bg-slate-300' : 'bg-red-400'}`}
+                    <div className={`w-2 h-2 rounded-full ${isDisabled ? 'bg-brand-black' : 'bg-red-400'}`}
                         title="Error" />
                 </div>
             </div>

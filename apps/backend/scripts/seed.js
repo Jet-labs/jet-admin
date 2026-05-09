@@ -161,11 +161,6 @@ const permissions = [
     permissionTitle: "tenant:database:chart:read",
     permissionDescription: "Permission to read tenant chart",
   },
-  // --- AI Permissions ---
-  {
-    permissionTitle: "tenant:ai:create",
-    permissionDescription: "Permission to create AI resources",
-  },
   // --- CronJob Permissions ---
   {
     permissionTitle: "tenant:cronjob:history:read",

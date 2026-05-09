@@ -93,7 +93,7 @@ export const DynamicArgsControl = (props) => {
   }
 
   return (
-    <div className="border border-border rounded p-3 mt-2 bg-background">
+    <div className="border border-border rounded-sm p-3 mt-2 bg-brand-dark">
       <Label className="block mb-2 text-xs font-medium text-muted-foreground">
         Arguments
       </Label>
@@ -187,7 +187,7 @@ const ArgInputWithVariablePicker = ({ argName, value, onChange, availableVariabl
               <Variable className="w-4 h-4" />
             </Button>
             {showDropdown && (
-              <div className="absolute right-0 top-full mt-1 w-64 bg-background border border-border rounded shadow-lg z-50 max-h-64 overflow-y-auto">
+              <div className="absolute right-0 top-full mt-1 w-64 bg-brand-dark border border-border rounded-sm shadow-lg z-50 max-h-64 overflow-y-auto">
                 {availableVariables.length === 0 ? (
                   <div className="px-2 py-3 text-xs text-muted-foreground text-center">
                     No variables available yet.

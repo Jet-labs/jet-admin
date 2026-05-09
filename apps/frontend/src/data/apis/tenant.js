@@ -56,8 +56,6 @@ export const getAllUserTenantsAPI = async () => {
 export const createNewTenantAPI = async ({
   tenantTitle,
   tenantLogoURL,
-  tenantDBURL,
-  tenantDBType,
 }) => {
   try {
     const url =
@@ -66,7 +64,7 @@ export const createNewTenantAPI = async ({
     if (bearerToken) {
       const response = await axios.post(
         url,
-        { tenantTitle, tenantLogoURL, tenantDBURL, tenantDBType },
+        { tenantTitle, tenantLogoURL },
         {
           headers: { authorization: `Bearer ${bearerToken}` },
         }
@@ -86,41 +84,12 @@ export const createNewTenantAPI = async ({
   }
 };
 
-export const testTenantDatabaseConnectionAPI = async ({ tenantDBURL }) => {
-  try {
-    const url =
-      CONSTANTS.SERVER_HOST +
-      CONSTANTS.APIS.TENANT.testTenantDatabaseConnectionAPI();
-    const bearerToken = await firebaseAuth.currentUser.getIdToken();
-    if (bearerToken) {
-      const response = await axios.patch(
-        url,
-        { tenantDBURL },
-        {
-          headers: { authorization: `Bearer ${bearerToken}` },
-        }
-      );
-      if (response.data && response.data.success === true) {
-        return Boolean(response.data.connectionResult);
-      } else if (response.data.error) {
-        throw response.data.error;
-      } else {
-        throw CONSTANTS.ERROR_CODES.SERVER_ERROR;
-      }
-    } else {
-      throw CONSTANTS.ERROR_CODES.USER_AUTH_TOKEN_NOT_FOUND;
-    }
-  } catch (error) {
-    throw error;
-  }
-};
+
 
 export const updateTenantAPI = async ({
   tenantID,
   tenantTitle,
   tenantLogoURL,
-  tenantDBURL,
-  tenantDBType,
 }) => {
   try {
     const url =
@@ -129,7 +98,7 @@ export const updateTenantAPI = async ({
     if (bearerToken) {
       const response = await axios.patch(
         url,
-        { tenantTitle, tenantLogoURL, tenantDBURL, tenantDBType },
+        { tenantTitle, tenantLogoURL },
         {
           headers: { authorization: `Bearer ${bearerToken}` },
         }

@@ -13,7 +13,7 @@ import {
   getUserTenantByIDAPI,
   updateTenantAPI,
 } from "../../../data/apis/tenant";
-import { useTenantActions } from "../../../logic/contexts/tenantContext";
+import { useTenantActions } from "../../../logic/hooks/useTenant";
 import { formValidations } from "../../../utils/formValidation";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { TenantUserAdditionForm } from "../tenantUsersComponents/tenantUserAdditionForm";
@@ -23,7 +23,7 @@ import { TenantDeletionForm } from "./tenantDeletionForm";
 
 function Section({ title, description, children }) {
   return (
-    <div className="rounded-lg border border-border bg-card p-4 space-y-3">
+    <div className="rounded-md border border-border bg-card p-4 space-y-3">
       {(title || description) && (
         <div className="mb-2">
           {title && (
@@ -68,13 +68,11 @@ export const TenantUpdationForm = ({ tenantID }) => {
       tenantID,
       tenantTitle,
       tenantLogoURL,
-      tenantDBURL,
     }) =>
       updateTenantAPI({
         tenantID,
         tenantTitle,
         tenantLogoURL,
-        tenantDBURL,
       }),
     retry: false,
     onSuccess: (tenant) => {
@@ -92,20 +90,17 @@ export const TenantUpdationForm = ({ tenantID }) => {
       tenantID: tenant ? tenant.tenantID : "",
       tenantTitle: tenant ? tenant.tenantTitle : "",
       tenantLogoURL: tenant ? tenant.tenantLogoURL : "",
-      tenantDBURL: tenant ? tenant.tenantDBURL : "",
     },
     validationSchema: formValidations.updateTenantFormValidationSchema,
     onSubmit: ({
       tenantID,
       tenantTitle,
       tenantLogoURL,
-      tenantDBURL,
     }) => {
       updateTenant({
         tenantID,
         tenantTitle,
         tenantLogoURL,
-        tenantDBURL,
       });
     },
   });
@@ -115,7 +110,6 @@ export const TenantUpdationForm = ({ tenantID }) => {
       updateTenantForm.setFieldValue("tenantID", tenant.tenantID);
       updateTenantForm.setFieldValue("tenantTitle", tenant.tenantTitle);
       updateTenantForm.setFieldValue("tenantLogoURL", tenant.tenantLogoURL);
-      updateTenantForm.setFieldValue("tenantDBURL", tenant.tenantDBURL);
     }
   }, [tenant]);
 
@@ -127,7 +121,7 @@ export const TenantUpdationForm = ({ tenantID }) => {
   };
 
   return (
-    <div className="flex w-full h-full flex-col overflow-hidden bg-background">
+    <div className="flex w-full h-full flex-col overflow-hidden bg-brand-dark">
       <ReactQueryLoadingErrorWrapper
         isLoading={isLoadingTenant}
         isFetching={isFetchingTenant}
@@ -135,7 +129,7 @@ export const TenantUpdationForm = ({ tenantID }) => {
       >
         {tenant && (
           <>
-            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-background px-4 py-3 shrink-0">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-brand-dark px-4 py-3 shrink-0">
               <div>
                 <h1 className="text-base font-semibold tracking-tight text-foreground">
                   {CONSTANTS.STRINGS.UPDATE_TENANT_FORM_TITLE}
@@ -154,7 +148,6 @@ export const TenantUpdationForm = ({ tenantID }) => {
                 <TenantDeletionForm tenantID={tenantID} />
                 <Button
                   type="submit"
-                  size="sm"
                   form="update-tenant-form"
                   disabled={isUpdatingTenant}
                 >
@@ -164,7 +157,7 @@ export const TenantUpdationForm = ({ tenantID }) => {
               </div>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-4 md:p-8">
+            <div className="flex-1 overflow-y-auto p-4 md:p-6">
               <section className="mx-auto max-w-2xl w-full">
                 <TenantUserAdditionForm
                   tenantID={tenant.tenantID}

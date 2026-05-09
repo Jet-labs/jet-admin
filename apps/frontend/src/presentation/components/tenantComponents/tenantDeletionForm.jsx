@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
-import { useGlobalUI } from "../../../logic/contexts/globalUIContext";
+import { useGlobalUI } from "../../../logic/stores/useUIStore";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import PropTypes from "prop-types";
 import React from "react";

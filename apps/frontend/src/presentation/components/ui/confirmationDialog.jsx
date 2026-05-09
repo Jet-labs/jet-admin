@@ -29,7 +29,7 @@ export const ConfirmationDialog = ({
         {isLoading ? (
           <div className="flex flex-row justify-start items-center p-2">
             {loadingText && (
-              <span className="text-sm font-semibold text-slate-700">
+              <span className="text-sm font-semibold text-brand-text-primary">
                 {loadingText}
               </span>
             )}
@@ -43,9 +43,11 @@ export const ConfirmationDialog = ({
                   <Button
                     aria-label="close"
                     onClick={onDecline}
-                    className="rounded-sm opacity-70 hover:opacity-100 outline-none border-0 bg-transparent p-0"
+                    variant="ghost"
+                    size="icon"
+                    className="p-0 opacity-70 hover:opacity-100"
                   >
-                    <X className="h-4 w-4 text-slate-600" />
+                    <X className="h-4 w-4 text-brand-text-primary" />
                   </Button>
                 </DialogTitle>
               </DialogHeader>
@@ -56,7 +58,7 @@ export const ConfirmationDialog = ({
                 <Button
                   type="button"
                   onClick={onAccepted}
-                  className="px-3 py-2 text-xs font-medium text-center text-white bg-blue-700 rounded hover:bg-blue-800 focus:outline-none"
+                  size="sm"
                 >
                   {confirmText ? confirmText : "Confirm"}
                 </Button>

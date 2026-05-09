@@ -7,7 +7,7 @@ import logo from "../../../assets/logo.png";
 import {
   useAuthActions,
   useAuthState,
-} from "../../../logic/contexts/authContext";
+} from "../../../logic/hooks/useAuth";
 import { formValidations } from "../../../utils/formValidation";
 import { Button, Spinner, Input } from "@jet-admin/ui";
 const SignInPage = () => {
@@ -33,7 +33,7 @@ const SignInPage = () => {
   }, [firebaseUserState]);
 
   return (
-    <div className="bg-slate-50 flex h-screen w-screen flex-col justify-center items-center overflow-hidden">
+    <div className="bg-brand-dark flex h-screen w-screen flex-col justify-center items-center overflow-hidden">
       <section className=" md:w-2/3 sm:w-full w-full">
         <div className="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
           <div className="flex flex-row justify-center items-center mb-6">
@@ -43,9 +43,9 @@ const SignInPage = () => {
             </span>
           </div>
 
-          <div className="w-full bg-white rounded shadow  md:mt-0 sm:max-w-md xl:p-0">
+          <div className="w-full bg-brand-black rounded-sm shadow  md:mt-0 sm:max-w-md xl:p-0">
             <div className="p-5">
-              <h1 className="text-lg font-bold leading-tight tracking-tight text-slate-900 md:text-lg mb-3">
+              <h1 className="text-lg font-bold leading-tight tracking-tight text-brand-text-primary md:text-lg mb-3">
                 {CONSTANTS.STRINGS.SIGN_IN_FORM_TITLE}
               </h1>
               <form
@@ -55,7 +55,7 @@ const SignInPage = () => {
                 <div>
                   <label
                     htmlFor="email"
-                    className="block mb-1 text-sm font-medium text-slate-500 "
+                    className="block mb-1 text-sm font-medium text-brand-text-primary "
                   >
                     {CONSTANTS.STRINGS.SIGN_IN_FORM_EMAIL_FIELD_LABEL}
                   </label>
@@ -63,7 +63,7 @@ const SignInPage = () => {
                     type="email"
                     name="email"
                     id="email"
-                    className=" placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:outline-none focus:border-slate-400 block w-full px-1.5 py-1.5"
+                    className=" placeholder:text-brand-text-primary text-sm bg-brand-dark border border-brand-border text-brand-text-primary rounded-sm  focus:outline-none focus:border-brand-border block w-full px-1.5 py-1.5"
                     placeholder={
                       CONSTANTS.STRINGS.SIGN_IN_FORM_EMAIL_FIELD_PLACEHOLDER
                     }
@@ -76,7 +76,7 @@ const SignInPage = () => {
                 <div>
                   <label
                     htmlFor="password"
-                    className="block mb-1 text-sm font-medium text-slate-500 "
+                    className="block mb-1 text-sm font-medium text-brand-text-primary "
                   >
                     {CONSTANTS.STRINGS.SIGN_IN_FORM_PASSWORD_FIELD_LABEL}
                   </label>
@@ -84,7 +84,7 @@ const SignInPage = () => {
                     type="password"
                     name="password"
                     id="password"
-                    className=" placeholder:text-slate-400 text-sm bg-slate-50 border border-slate-300 text-slate-700 rounded  focus:outline-none focus:border-slate-400 block w-full px-1.5 py-1.5"
+                    className=" placeholder:text-brand-text-primary text-sm bg-brand-dark border border-brand-border text-brand-text-primary rounded-sm  focus:outline-none focus:border-brand-border block w-full px-1.5 py-1.5"
                     required={true}
                     onChange={emailSignInForm.handleChange}
                     onBlur={emailSignInForm.handleBlur}
@@ -98,18 +98,18 @@ const SignInPage = () => {
                 ) : (
                   <Button
                     type="submit"
-                    className=" px-3 py-2 w-full text-xs font-medium text-center text-white bg-blue-700 rounded hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 "
+                    className=" px-3 py-2 w-full text-xs font-medium text-center text-brand-text-primary bg-brand-green rounded-sm hover:bg-brand-green/90 focus:ring-4 focus:outline-none focus:ring-brand-green-border "
                   >
                     {CONSTANTS.STRINGS.SIGN_IN_FORM_SUBMIT_BUTTON}
                   </Button>
                 )}
-                <div className="py-3 flex items-center text-sm text-slate-400 before:flex-1 before:border-t before:border-gray-200 before:me-6 after:flex-1 after:border-t after:border-gray-200 after:ms-6">
+                <div className="py-3 flex items-center text-sm text-brand-text-primary before:flex-1 before:border-t before:border-brand-border before:me-6 after:flex-1 after:border-t after:border-brand-border after:ms-6">
                   Or
                 </div>
                 <Button
                   type="button"
                   onClick={googleSignIn}
-                  className="text-white bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded text-sm px-5 py-1.5 text-center inline-flex justify-center items-center  me-2 mb-2 w-full"
+                  className="text-brand-text-primary bg-[#4285F4] hover:bg-[#4285F4]/90 focus:ring-4 focus:outline-none focus:ring-[#4285F4]/50 font-medium rounded-sm text-sm px-5 py-1.5 text-center inline-flex justify-center items-center  me-2 mb-2 w-full"
                 >
                   <svg
                     className="w-4 h-4 me-2"
@@ -129,7 +129,7 @@ const SignInPage = () => {
 
                 {signInState && signInState.error && (
                   <div
-                    className="p-4 mb-4 text-sm text-red-800 rounded bg-red-50"
+                    className="p-4 mb-4 text-sm text-red-400 rounded-sm bg-red-950/40"
                     role="alert"
                   >
                     <span className="font-medium">Sign in error!</span>
@@ -138,7 +138,7 @@ const SignInPage = () => {
                   </div>
                 )}
 
-                <p className="text-sm font-light text-slate-500 ">
+                <p className="text-sm font-light text-brand-text-primary ">
                   {CONSTANTS.STRINGS.SIGN_IN_FORM_TO_SIGN_UP_MESSAGE}
                   <Link
                     to={CONSTANTS.ROUTES.SIGN_UP.path()}

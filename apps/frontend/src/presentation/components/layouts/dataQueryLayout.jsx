@@ -3,7 +3,7 @@ import { Outlet } from "react-router-dom";
 // import logo from "../../../assets/logo.png";
 
 import { CONSTANTS } from "../../../constants";
-import { DataQueriesContextProvider } from "../../../logic/contexts/dataQueriesContext";
+
 import { DataQueryDrawerList } from "../drawerList/dataQueryDrawerList";
 import {
   ResizableHandle,
@@ -13,8 +13,7 @@ import {
 
 export const DataQueryLayout = () => {
   return (
-    <DataQueriesContextProvider>
-      <div className="flex h-full w-full flex-col overflow-hidden bg-background">
+    <div className="flex h-full w-full flex-col overflow-hidden bg-brand-dark">
         <ResizablePanelGroup
           direction="horizontal"
           autoSaveId={
@@ -26,11 +25,10 @@ export const DataQueryLayout = () => {
             <DataQueryDrawerList />
           </ResizablePanel>
           <ResizableHandle withHandle={true} />
-          <ResizablePanel defaultSize={80} className="overflow-hidden bg-background">
+          <ResizablePanel defaultSize={80} className="overflow-hidden bg-brand-dark">
             <Outlet />
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>
-    </DataQueriesContextProvider>
   );
 };

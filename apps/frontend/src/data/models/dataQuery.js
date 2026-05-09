@@ -8,7 +8,6 @@ export class DataQuery {
     disabledAt,
     isDisabled,
     dataQueryTitle,
-    databaseSchemaName,
     dataQueryOptions,
     datasourceID,
     datasourceType,
@@ -21,7 +20,6 @@ export class DataQuery {
     this.updatedAt = updatedAt;
     this.disabledAt = disabledAt;
     this.isDisabled = isDisabled;
-    this.databaseSchemaName = databaseSchemaName;
     this.dataQueryTitle = dataQueryTitle;
     this.runOnLoad = runOnLoad;
     this.dataQueryResultSchema = dataQueryResultSchema;

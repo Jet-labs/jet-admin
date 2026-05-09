@@ -1,0 +1,18 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "subjects": { "type": "string", "description": "Comma-separated NATS subjects to subscribe to (supports wildcards: * and >)" },
+      "queueGroup": { "type": "string", "description": "Optional queue group for load balancing" }
+    },
+    "required": ["subjects"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      { "type": "Control", "scope": "#/properties/subjects", "label": "Subjects (comma-separated)", "options": { "placeholder": "orders.*, events.>" } },
+      { "type": "Control", "scope": "#/properties/queueGroup", "label": "Queue Group (optional)", "options": { "placeholder": "jet-workers" } }
+    ]
+  },
+  "data": { "subjects": "", "queueGroup": "" }
+}

@@ -14,6 +14,8 @@ export const DashboardRenderWidget = ({
   handleDelete,
   responsive = true,
   editable = true,
+  stateTree,
+  onQueryResult,
 }) => {
   DashboardRenderWidget.propTypes = {
     widget: PropTypes.string.isRequired,
@@ -22,6 +24,8 @@ export const DashboardRenderWidget = ({
     handleDelete: PropTypes.func,
     responsive: PropTypes.bool,
     editable: PropTypes.bool,
+    stateTree: PropTypes.object,
+    onQueryResult: PropTypes.func,
   };
   const widgetID = String(widget).split("_")[1];
   const [ref, size] = useComponentSize();
@@ -29,9 +33,9 @@ export const DashboardRenderWidget = ({
 
   return (
     <Card
-      className={`!h-full !w-full flex-grow relative rounded-none overflow-hidden border bg-background/95 transition-all duration-200 ${isMouseHover
+      className={`!h-full !w-full flex-grow relative rounded-none overflow-hidden border bg-brand-dark/95 transition-all duration-200 ${isMouseHover
         ? "border-primary"
-        : "border-slate-200/80 shadow-sm"
+        : "border-brand-border/80 shadow-sm"
         }`}
       onMouseEnter={
         editable
@@ -88,6 +92,8 @@ export const DashboardRenderWidget = ({
           tenantID={tenantID}
           height={size.height}
           width={size.width}
+          stateTree={stateTree}
+          onQueryResult={onQueryResult}
         />
       </div>
     </Card>

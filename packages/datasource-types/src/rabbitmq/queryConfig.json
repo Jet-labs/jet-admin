@@ -16,6 +16,12 @@
         "type": "string",
         "description": "Exchange name (optional, for publish)"
       },
+      "exchangeType": {
+        "type": "string",
+        "description": "Exchange type (direct, topic, fanout, headers)",
+        "enum": ["direct", "topic", "fanout", "headers"],
+        "default": "direct"
+      },
       "routingKey": {
         "type": "string",
         "description": "Routing key (optional)"
@@ -131,6 +137,7 @@
             "type": "HorizontalLayout",
             "elements": [
               { "type": "Control", "scope": "#/properties/exchange", "label": "Exchange" },
+              { "type": "Control", "scope": "#/properties/exchangeType", "label": "Exchange Type" },
               { "type": "Control", "scope": "#/properties/routingKey", "label": "Routing Key" }
             ]
           },
@@ -204,6 +211,7 @@
     "operation": "publish",
     "queue": "my-queue",
     "exchange": "",
+    "exchangeType": "direct",
     "routingKey": "",
     "message": "{\n  \"type\": \"order\",\n  \"data\": {}\n}",
     "messageCount": 1,

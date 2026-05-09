@@ -159,7 +159,7 @@ export const WorkflowContextPanel = ({
   };
 
   return (
-    <div className={`flex flex-col bg-background overflow-hidden ${className}`}>
+    <div className={`flex flex-col bg-brand-dark overflow-hidden ${className}`}>
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-1 bg-muted/30 border-b border-border">
         <div className="flex items-center gap-2">
@@ -167,7 +167,7 @@ export const WorkflowContextPanel = ({
           <span className="text-sm font-semibold text-foreground">Context</span>
           {isRunning && (
             <span className="flex items-center gap-1.5 text-xs text-blue-500 font-medium">
-              <span className="size-1.5 bg-blue-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
+              <span className="size-1.5 bg-blue-950/400 rounded-full animate-pulse shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
               Live
             </span>
           )}
@@ -194,7 +194,7 @@ export const WorkflowContextPanel = ({
       </div>
 
       {/* Context tree */}
-      <div className="flex-1 overflow-y-auto p-4 font-mono text-xs bg-background/50">
+      <div className="flex-1 overflow-y-auto p-4 font-mono text-xs bg-brand-dark/50">
         {isEmpty ? (
           <div className="flex items-center justify-center h-full text-muted-foreground/50 italic text-center px-4">
             <span>No context data yet. Run the workflow to see variables.</span>

@@ -1,18 +1,19 @@
-import React, { useMemo } from "react";
-import { FaPlay } from "react-icons/fa";
+import React, { useState, useCallback, useEffect, useRef } from "react";
+import { useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
-import { useWidgetsState } from "../../../logic/contexts/widgetsContext";
+import { useWorkflows } from "../../../logic/hooks/useWorkflows";
+import { useDataQueries } from "../../../logic/hooks/useDataQueries";
+import { testDataQueryByIDAPI } from "../../../data/apis/dataQuery";
+import { executeWorkflowAPI } from "../../../data/apis/workflow";
 
 import PropTypes from "prop-types";
-import { WorkflowConsole } from "../workflowComponents/workflowConsole";
-import { VscTerminal } from "react-icons/vsc";
 
 import { WIDGETS_MAP } from "@jet-admin/widgets-ui";
+import { WIDGET_PROCESSORS_MAP } from "@jet-admin/widgets-logic";
 import { WidgetAdvancedOptions } from "./widgetAdvancedOptions";
-import { TbBraces } from "react-icons/tb";
+import { DataSourcesEditor } from "./dataSourcesEditor";
 
 import {
-  Button,
   Checkbox,
   Input,
   Label,
@@ -21,67 +22,123 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  Spinner,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
 } from "@jet-admin/ui";
-// import './widgetEditor.css';
+
+import { WidgetPropertiesEditor } from "./widgetPropertiesEditor";
+import { WidgetEventsEditor } from "./widgetEventsEditor";
+
+/**
+ * Execute all bound data sources and return normalized results.
+ * Supports both data queries and workflows.
+ * @param {Array} dataSources - Array of { type, queryID/workflowID, alias, inputArgValues }
+ * @param {string} tenantID
+ * @returns {Promise<object>} { alias: resultData }
+ */
+const executeDataSources = async (dataSources, tenantID) => {
+  if (!dataSources?.length) return null;
+  const results = {};
+
+  for (const source of dataSources) {
+    if (!source.alias) continue;
+
+    if (source.type === "query" && source.queryID) {
+      try {
+        const result = await testDataQueryByIDAPI({
+          tenantID,
+          dataQueryID: source.queryID,
+          inputArgs: source.inputArgValues || {},
+        });
+        results[source.alias] = result;
+      } catch (err) {
+        results[source.alias] = { error: err.message || String(err) };
+      }
+    }
+
+    if (source.type === "workflow" && source.workflowID) {
+      try {
+        const result = await executeWorkflowAPI({
+          tenantID,
+          workflowID: source.workflowID,
+          inputArgs: source.inputArgValues || {},
+        });
+        // executeWorkflowAPI returns { success, context, ... }
+        // Store the full context so users can traverse it via dataMapping paths
+        results[source.alias] = result.context || result;
+      } catch (err) {
+        results[source.alias] = { error: err.message || String(err) };
+      }
+    }
+  }
+
+  return Object.keys(results).length > 0 ? results : null;
+};
 
 export const WidgetConfigEditor = ({
   widgetEditorForm,
-  workflowContext,
-  workflowLogs,
-  isRunningWorkflow,
-  initialWorkflowID,
-  initialWorkflowTitle,
-  onTestWorkflow,
-  onClearLogs,
-  showConsole,
-  setShowConsole,
-  showContextPanel,
-  setShowContextPanel,
+  dataSourceResults,
+  onDataSourceResults,
 }) => {
   WidgetConfigEditor.propTypes = {
     widgetEditorForm: PropTypes.object.isRequired,
-    workflowContext: PropTypes.object,
-    workflowLogs: PropTypes.array,
-    isRunningWorkflow: PropTypes.bool,
-    initialWorkflowID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    initialWorkflowTitle: PropTypes.string,
-    onTestWorkflow: PropTypes.func,
-    onClearLogs: PropTypes.func,
-    showConsole: PropTypes.bool,
-    setShowConsole: PropTypes.func,
-    showContextPanel: PropTypes.bool,
-    setShowContextPanel: PropTypes.func,
+    dataSourceResults: PropTypes.object,
+    onDataSourceResults: PropTypes.func,
   };
 
-  const { workflows, isLoadingWorkflows } = useWidgetsState();
+  const { tenantID } = useParams();
+  const { workflows } = useWorkflows(tenantID);
+  const { dataQueries } = useDataQueries(tenantID);
 
   const widgetType = widgetEditorForm.values.widgetType;
   const ConfigEditorComponent = WIDGETS_MAP[widgetType]?.configEditor;
 
-  // Get selected workflow details
-  const selectedWorkflow = useMemo(() => {
-    const workflowID = widgetEditorForm.values.workflowID;
-    if (workflowID == null || !workflows?.length) return null;
-    return workflows.find(w => String(w.workflowID) === String(workflowID));
-  }, [widgetEditorForm.values.workflowID, workflows]);
+  // Get the data manifest from the builder
+  const builder = WIDGET_PROCESSORS_MAP?.[widgetType];
+  const dataManifest = builder?.constructor?.dataManifest;
 
-  const workflowValue = widgetEditorForm.values.workflowID != null
-    ? String(widgetEditorForm.values.workflowID)
-    : "";
-  const selectedWorkflowTitle = selectedWorkflow?.title
-    || (workflowValue && String(initialWorkflowID) === workflowValue ? initialWorkflowTitle : undefined);
-  const workflowSelectKey = `workflow-select_${isLoadingWorkflows ? 'loading' : 'ready'}_${workflows?.length || 0}_${workflowValue || 'empty'}`;
+  // Data execution state
+  const [isTestRunning, setIsTestRunning] = useState(false);
+  const autoLoadedRef = useRef(false);
 
-  // Handle workflow change — clear parent context
-  const handleWorkflowChange = (value) => {
-    widgetEditorForm.setFieldValue('workflowID', value);
-    widgetEditorForm.setFieldValue('workflowConfig.inputArgs', {});
-    if (onClearLogs) onClearLogs();
-  };
+  // Auto-load data when widget has existing dataSources on mount/load
+  const dataSources = widgetEditorForm.values.widgetConfig?.dataSources;
+  useEffect(() => {
+    if (
+      !autoLoadedRef.current &&
+      dataSources?.length > 0 &&
+      dataSources.some((s) => s.queryID || s.workflowID) &&
+      tenantID
+    ) {
+      autoLoadedRef.current = true;
+      setIsTestRunning(true);
+      executeDataSources(dataSources, tenantID)
+        .then((results) => {
+          if (results) onDataSourceResults?.(results);
+        })
+        .finally(() => setIsTestRunning(false));
+    }
+  }, [dataSources, tenantID, onDataSourceResults]);
+
+  // Manual test run / refresh
+  const handleTestRun = useCallback(async () => {
+    const sources = widgetEditorForm.values.widgetConfig?.dataSources || [];
+    if (sources.length === 0) return;
+
+    setIsTestRunning(true);
+    try {
+      const results = await executeDataSources(sources, tenantID);
+      onDataSourceResults?.(results);
+    } finally {
+      setIsTestRunning(false);
+    }
+  }, [widgetEditorForm.values.widgetConfig?.dataSources, tenantID, onDataSourceResults]);
 
   return (
     <div className="flex h-full w-full flex-col gap-3">
+      {/* Widget Name */}
       <div className="space-y-1.5">
         <Label
           htmlFor="widgetTitle"
@@ -102,72 +159,10 @@ export const WidgetConfigEditor = ({
         />
       </div>
 
-      {/* Row 2: Workflow selector — inline label + select */}
+      {/* Widget Type */}
       <div className="space-y-1.5">
         <Label
-          htmlFor="workflowID"
-          className="text-xs font-medium text-foreground"
-        >
-          {CONSTANTS.STRINGS.WIDGET_EDITOR_FORM_WORKFLOW_LABEL}
-        </Label>
-        <Select
-          key={workflowSelectKey}
-          value={workflowValue}
-          disabled={isLoadingWorkflows && !workflows?.length}
-          onValueChange={handleWorkflowChange}
-        >
-          <SelectTrigger className="text-xs">
-            <SelectValue placeholder={isLoadingWorkflows ? "Loading workflows..." : "Select an option"}>
-              {selectedWorkflowTitle}
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            {workflows?.map((workflow) => (
-            <SelectItem key={workflow.workflowID} value={String(workflow.workflowID)}>
-              {workflow.title}
-            </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Auto-run toggle — minimal inline */}
-      {selectedWorkflow && (
-        <div className="flex items-center gap-2">
-          <Checkbox
-            id="workflowAutoRun"
-            checked={
-              widgetEditorForm.values.workflowConfig?.workflowAutoRun
-              ?? WIDGETS_MAP[widgetType]?.defaultAutoRun
-              ?? false
-            }
-            onCheckedChange={(checked) =>
-              widgetEditorForm.setFieldValue('workflowConfig.workflowAutoRun', !!checked)
-            }
-          />
-          <Label htmlFor="workflowAutoRun" className="text-xs text-muted-foreground cursor-pointer">
-            Auto-run workflow on load
-          </Label>
-        </div>
-      )}
-
-      {/* Show Header toggle */}
-      <div className="flex items-center gap-2">
-        <Checkbox
-          id="showHeader"
-          checked={widgetEditorForm.values.widgetConfig?.showHeader ?? true}
-          onCheckedChange={(checked) =>
-            widgetEditorForm.setFieldValue('widgetConfig.showHeader', !!checked)
-          }
-        />
-        <Label htmlFor="showHeader" className="text-xs text-muted-foreground cursor-pointer">
-          Show widget header (with refresh button)
-        </Label>
-      </div>
-
-      <div className="space-y-1.5">
-        <Label
-          htmlFor="workflowConfig.workflowAutoRun"
+          htmlFor="widgetType"
           className="text-xs font-medium text-foreground"
         >
           Select widget type
@@ -186,79 +181,66 @@ export const WidgetConfigEditor = ({
         </Select>
       </div>
 
-      {/* Row 4: Test Workflow + Settings buttons */}
-      {selectedWorkflow && onTestWorkflow && <div className="flex flex-row justify-between items-center gap-2">
-
-          <Button
-            type="button"
-            size="sm"
-            onClick={onTestWorkflow}
-            disabled={isRunningWorkflow}
-          className="text-xs w-full"
-          >
-            {isRunningWorkflow ? (
-              <Spinner size={12} className="mr-2" />
-            ) : (
-              <FaPlay className="inline-block h-3 w-3 mr-2" />
-            )}
-            {isRunningWorkflow ? CONSTANTS.STRINGS.TEST_WORKFLOW_BUTTON_RUNNING : CONSTANTS.STRINGS.TEST_WORKFLOW_BUTTON}
-          </Button>
-
-        <div className="flex flex-row gap-1.5">
-          <Button
-            type="button"
-            onClick={() => setShowConsole(!showConsole)}
-            title={showConsole ? 'Hide Console' : 'Show Console'}
-            variant="outline"
-            size="sm"
-            className={`px-2 flex items-center gap-1.5 transition-colors ${showConsole ? 'border-primary text-primary bg-primary/5' : 'text-muted-foreground hover:text-foreground'}`}
-          >
-            <VscTerminal className="size-4" />
-            {workflowLogs && workflowLogs.length > 0 && (
-              <span className="px-1 py-0.5 text-[9px] font-bold bg-muted text-muted-foreground rounded-full leading-none min-w-[16px] text-center">
-                {workflowLogs.length}
-              </span>
-            )}
-          </Button>
-          <Button
-            type="button"
-            onClick={() => setShowContextPanel(!showContextPanel)}
-            title={showContextPanel ? 'Hide Context' : 'Show Context'}
-            variant="outline"
-            size="sm"
-            className={`px-2 flex items-center gap-1.5 transition-colors ${showContextPanel ? 'border-primary text-primary bg-primary/5' : 'text-muted-foreground hover:text-foreground'}`}
-          >
-            <TbBraces className="size-4" />
-            {workflowContext && Object.keys(workflowContext).filter(k => !k.startsWith('__')).length > 0 && (
-              <span className="px-1 py-0.5 text-[9px] font-bold bg-muted text-muted-foreground rounded-full leading-none min-w-[16px] text-center">
-                {Object.keys(workflowContext).filter(k => !k.startsWith('__')).length}
-              </span>
-            )}
-          </Button>
-        </div>
-
+      {/* Show Header toggle */}
+      <div className="flex items-center gap-2">
+        <Checkbox
+          id="showHeader"
+          checked={widgetEditorForm.values.widgetConfig?.properties?.showHeader ?? true}
+          onCheckedChange={(checked) =>
+            widgetEditorForm.setFieldValue('widgetConfig.properties.showHeader', !!checked)
+          }
+        />
+        <Label htmlFor="showHeader" className="text-xs text-muted-foreground cursor-pointer">
+          Show widget header (with refresh button)
+        </Label>
       </div>
-      }
 
       {/* ═══════════════════════════════════════════
-          SECTION 2: MAIN BODY — Type-Specific Config Editor
+          TABBED EDITOR: Data / Properties / Events
           ═══════════════════════════════════════════ */}
-      {ConfigEditorComponent && (
-        <ConfigEditorComponent
-          widgetEditorForm={widgetEditorForm}
-          workflowContext={workflowContext}
-          workflows={workflows}
-          selectedWorkflow={selectedWorkflow}
-        />
-      )}
+      <Tabs defaultValue="data" className="w-full">
+        <TabsList className="w-full grid grid-cols-3">
+          <TabsTrigger value="data" className="text-xs">Data</TabsTrigger>
+          <TabsTrigger value="properties" className="text-xs">Properties</TabsTrigger>
+          <TabsTrigger value="events" className="text-xs">Events</TabsTrigger>
+        </TabsList>
 
-      {/* Widget Advanced Options Generic Form */}
-      <WidgetAdvancedOptions
-        widgetForm={widgetEditorForm}
-        parentWidgetType={widgetType}
-      />
+        <TabsContent value="data" className="mt-3 space-y-3">
+          {/* Generic Data Sources Editor */}
+          <DataSourcesEditor
+            widgetEditorForm={widgetEditorForm}
+            dataQueries={dataQueries || []}
+            workflows={workflows || []}
+            dataSourceResults={dataSourceResults}
+            onTestRun={handleTestRun}
+            isTestRunning={isTestRunning}
+          />
+        </TabsContent>
 
+        <TabsContent value="properties" className="mt-3 space-y-3">
+          {/* Type-Specific Config Editor (chart options, table columns, etc.) */}
+          {ConfigEditorComponent && (
+            <ConfigEditorComponent
+              widgetEditorForm={widgetEditorForm}
+              dataSourceResults={dataSourceResults}
+              workflowContext={dataSourceResults}
+            />
+          )}
 
+          {/* Widget Advanced Options Generic Form */}
+          <WidgetAdvancedOptions
+            widgetForm={widgetEditorForm}
+            parentWidgetType={widgetType}
+          />
+
+          {/* Custom Properties Editor */}
+          <WidgetPropertiesEditor widgetEditorForm={widgetEditorForm} />
+        </TabsContent>
+
+        <TabsContent value="events" className="mt-3">
+          <WidgetEventsEditor widgetEditorForm={widgetEditorForm} />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 };

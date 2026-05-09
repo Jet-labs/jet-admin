@@ -30,7 +30,7 @@ export function InputArgsForm({
 }) {
   if (!Array.isArray(args) || args.length === 0) {
     return (
-      <p className="text-xs text-slate-400 italic">
+      <p className="text-xs text-[#1c1c1e] italic">
         No input parameters defined.
       </p>
     );

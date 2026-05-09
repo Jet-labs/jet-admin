@@ -30,6 +30,7 @@ export const ShelfBuilder = ({
   widgetEditorForm,
   workflowContext,
   workflows,
+  queryResults,
 }) => {
 
   // Initialize shelf spec from form or defaults
@@ -155,8 +156,10 @@ export const ShelfBuilder = ({
     return () => clearTimeout(timer);
   }, [shelfSpec]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Quick fallback if no workflow selected
+  // Quick fallback if no data source available
+  const hasDataSources = !!(queryResults && Object.keys(queryResults).length > 0);
   const isWorkflowSelected = !!selectedWorkflow;
+  const hasAnyData = isWorkflowSelected || hasDataSources;
 
   return (
     <>
@@ -173,9 +176,9 @@ export const ShelfBuilder = ({
           </Button>
         </DialogTrigger>
 
-        <DialogContent className="max-w-6xl w-[95vw] h-[85vh] max-h-[85vh] flex flex-col p-0 gap-0 overflow-hidden bg-background border-border shadow-2xl">
+        <DialogContent className="max-w-6xl w-[95vw] h-[85vh] max-h-[85vh] flex flex-col p-0 gap-0 overflow-hidden bg-brand-dark border-border shadow-2xl">
           {/* Modal Header */}
-          <DialogHeader className="flex flex-row items-center px-4 py-3 border-b border-border bg-background shrink-0 space-y-0">
+          <DialogHeader className="flex flex-row items-center px-4 py-3 border-b border-border bg-brand-dark shrink-0 space-y-0">
             <div className="flex items-center gap-2 text-foreground">
               <MdOutlineAutoGraph className="w-5 h-5 text-primary" />
               <DialogTitle className="text-base font-bold m-0 p-0 text-left">Visual Chart Editor</DialogTitle>
@@ -185,17 +188,17 @@ export const ShelfBuilder = ({
           {/* Modal Body */}
           <div className="flex-1 overflow-hidden bg-muted/30 flex p-3 gap-3 min-h-0">
               
-              {!isWorkflowSelected ? (
-                <div className="flex flex-col items-center justify-center w-full h-full text-center border-2 border-dashed border-border rounded bg-background">
+              {!hasAnyData ? (
+                <div className="flex flex-col items-center justify-center w-full h-full text-center border-2 border-dashed border-border rounded-sm bg-brand-dark">
                   <FiDatabase className="w-10 h-10 mb-3 text-muted-foreground/40" />
                   <p className="text-sm font-semibold text-foreground mb-1">No Data Source Selected</p>
-                  <p className="text-xs text-muted-foreground">Select a Workflow in the configuration panel to start building your chart.</p>
+                  <p className="text-xs text-muted-foreground">Add a Data Source in the Data tab and run a Test, or select a Workflow.</p>
                 </div>
               ) : (
                 <>
                   {/* PANE 1: Data Dictionary */}
-                  <div className="flex flex-col w-56 shrink-0 bg-background border border-border rounded-md overflow-hidden min-h-0 h-full">
-                    <div className="p-2 border-b border-border bg-background">
+                  <div className="flex flex-col w-56 shrink-0 bg-brand-dark border border-border rounded-md overflow-hidden min-h-0 h-full">
+                    <div className="p-2 border-b border-border bg-brand-dark">
                       <Select value={shelfSpec.dataSource || ''} onValueChange={(val) => handleDataSourceChange(val)}>
                         <SelectTrigger className="text-xs font-medium">
                           <SelectValue placeholder="Select Data Input" />
@@ -205,12 +208,16 @@ export const ShelfBuilder = ({
                           {workflowContext && Object.keys(workflowContext).map(key => (
                             <SelectItem key={key} value={`{{ctx.${key}}}`}>{`ctx.${key}`}</SelectItem>
                           ))}
+                          {queryResults && Object.keys(queryResults).map(alias => (
+                            <SelectItem key={`qr-${alias}`} value={`{{${alias}.data}}`}>{alias} (Data Source)</SelectItem>
+                          ))}
                         </SelectContent>
                       </Select>
                     </div>
                     <div className="flex-1 overflow-hidden outline-none min-h-0">
                       <DataFieldPanel
                         workflowContext={workflowContext}
+                        queryResults={queryResults}
                         dataSource={shelfSpec.dataSource}
                         onDataSourceChange={handleDataSourceChange}
                         onFieldClick={handleFieldQuickAdd}
@@ -225,7 +232,7 @@ export const ShelfBuilder = ({
                     <Label className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest px-1">Encoding Shelves</Label>
                     
                     {/* Core Shelves */}
-                    <div className="bg-background border border-border rounded-md p-3 flex flex-col gap-3">
+                    <div className="bg-brand-dark border border-border rounded-md p-3 flex flex-col gap-3">
                       {PRIMARY_SHELVES.map(ch => (
                         <EncodingShelf
                           key={ch}
@@ -238,10 +245,10 @@ export const ShelfBuilder = ({
                     </div>
 
                     {/* Dynamic Secondary Shelves */}
-                    <div className="bg-background border border-border rounded-md mt-2">
+                    <div className="bg-brand-dark border border-border rounded-md mt-2">
                       <div
                         onClick={() => setShowSecondary(!showSecondary)}
-                        className="w-full flex items-center justify-start p-2.5 border-b border-border hover:bg-muted transition-colors focus:outline-none bg-background font-medium cursor-pointer"
+                        className="w-full flex items-center justify-start p-2.5 border-b border-border hover:bg-muted transition-colors focus:outline-none bg-brand-dark font-medium cursor-pointer"
                       >
                         {showSecondary ? <FiChevronDown className="w-4 h-4 mr-2 text-muted-foreground" /> : <FiChevronRight className="w-4 h-4 mr-2 text-muted-foreground" />}
                         <span className="text-[10px] font-bold uppercase tracking-wider text-foreground">
@@ -250,7 +257,7 @@ export const ShelfBuilder = ({
                       </div>
                       
                       {showSecondary && (
-                        <div className="p-3 pt-2 flex flex-col gap-3 border-t border-border bg-muted/30">
+                        <div className="p-3 flex flex-col gap-3 bg-muted/30">
                           {SECONDARY_SHELVES.map(ch => (
                             <EncodingShelf
                               key={ch}
@@ -276,7 +283,7 @@ export const ShelfBuilder = ({
                     </div>
                     
                     {showStyle && (
-                      <div className="bg-background border border-border rounded-md p-3 space-y-4">
+                      <div className="bg-brand-dark border border-border rounded-md p-3 space-y-4">
                         <div>
                           <Label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-1.5">Marks</Label>
                           <div className="bg-muted/30 border border-border rounded-md p-2">
@@ -289,7 +296,7 @@ export const ShelfBuilder = ({
                           </div>
                         </div>
 
-                        <div className="border-t border-border pt-3 space-y-3">
+                        <div className="mt-2 space-y-3">
                           <Label className="block text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Appearance</Label>
                           <div>
                             <Label className="block text-[10px] font-medium text-muted-foreground uppercase tracking-wide mb-1">Chart Title</Label>
@@ -344,7 +351,7 @@ export const ShelfBuilder = ({
             </div>
 
             {/* Modal Footer */}
-            <DialogFooter className="px-4 py-2.5 border-t border-border bg-background shrink-0">
+            <DialogFooter className="px-4 py-2.5 bg-brand-dark shrink-0 mt-2">
                <Button
                 type="button"
                 onClick={() => setIsOpen(false)}
@@ -362,4 +369,5 @@ ShelfBuilder.propTypes = {
   widgetEditorForm: PropTypes.object.isRequired,
   workflowContext: PropTypes.object,
   workflows: PropTypes.array,
+  queryResults: PropTypes.object,
 };

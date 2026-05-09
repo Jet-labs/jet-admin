@@ -35,7 +35,7 @@ export const WIDGETS_MAP = {
     description: "Declarative visualization grammar",
     component: ({ data, ...props }) => {
       return (
-        <React.Suspense fallback={<div className="flex justify-center items-center h-full text-xs text-slate-400">Loading chart...</div>}>
+        <React.Suspense fallback={<div className="flex justify-center items-center h-full text-xs text-brand-text-primary">Loading chart...</div>}>
           <LazyVegaWidget data={data} {...props} />
         </React.Suspense>
       );
@@ -59,7 +59,7 @@ export const WIDGETS_MAP = {
     description: "Low-level visualization grammar",
     component: ({ data, ...props }) => {
       return (
-        <React.Suspense fallback={<div className="flex justify-center items-center h-full text-xs text-slate-400">Loading chart...</div>}>
+        <React.Suspense fallback={<div className="flex justify-center items-center h-full text-xs text-brand-text-primary">Loading chart...</div>}>
           <LazyVegaWidget data={data} {...props} />
         </React.Suspense>
       );
@@ -83,7 +83,7 @@ export const WIDGETS_MAP = {
     description: "Trigger a workflow",
     component: ({ data, ...props }) => {
       return (
-        <React.Suspense fallback={<div className="flex justify-center items-center h-full text-xs text-slate-400">Loading button...</div>}>
+        <React.Suspense fallback={<div className="flex justify-center items-center h-full text-xs text-brand-text-primary">Loading button...</div>}>
           <LazyButtonWidget data={data} {...props} />
         </React.Suspense>
       );
@@ -105,7 +105,7 @@ export const WIDGETS_MAP = {
     description: "Tabular data display with pagination",
     component: ({ data, ...props }) => {
       return (
-        <React.Suspense fallback={<div className="flex justify-center items-center h-full text-xs text-slate-400">Loading table...</div>}>
+        <React.Suspense fallback={<div className="flex justify-center items-center h-full text-xs text-brand-text-primary">Loading table...</div>}>
           <LazyTableWidget data={data} {...props} />
         </React.Suspense>
       );

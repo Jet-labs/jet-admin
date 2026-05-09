@@ -59,14 +59,10 @@ const widgetSocketController = {
     instanceID = null,
     tenantID,
     firebaseID,
-    // Generic widget configuration (opaque — only widgets-logic knows internals)
-    widgetType,
-    widgetConfig,
-    workflowConfig,
   }) {
     Logger.log('info', {
       message: 'widgetSocketController:onWidgetWorkflowConnect',
-      params: { widgetID, workflowID, mode, tenantID, widgetType, hasWidgetConfig: !!widgetConfig, hasWorkflowConfig: !!workflowConfig },
+      params: { widgetID, workflowID, mode, tenantID },
     });
 
     try {
@@ -97,9 +93,6 @@ const widgetSocketController = {
             mode,
             tenantID,
             firebaseID,
-            widgetType,
-            widgetConfig,
-            workflowConfig,
           });
           
           Logger.log('info', {
@@ -161,24 +154,13 @@ const widgetSocketController = {
           const replayCtx = await stateManager.assembleContext(instanceID);
           initialContext = _stripInternalKeys(replayCtx);
           
-          // Process initial context for widget if config provided
-          let processedData = null;
-          if (widgetType && widgetConfig) {
-            processedData = widgetWorkflowBridge.processContextForWidget(initialContext, {
-              widgetType,
-              widgetConfig,
-              workflowConfig,
-            });
-          }
-          
-          // Emit immediately and don't register for live updates
+          // Emit raw context — frontend handles all resolution
           socket.emit('widget_workflow_connected', {
             widgetID,
             instanceID: responseInstanceID,
             workflowID: replayInstance.workflowID,
             mode: 'replay',
             initialContext,
-            processedData,
             workflowStatus: replayInstance.status,
           });
           
@@ -199,9 +181,6 @@ const widgetSocketController = {
         mode,
         tenantID,
         firebaseID,
-        widgetType,
-        widgetConfig,
-        workflowConfig,
       });
 
       // Send connection confirmation

@@ -7,14 +7,14 @@ import {
   getAPIKeyByIDAPI,
   updateAPIKeyByIDAPI,
 } from "../../../data/apis/apiKey";
-import { useGlobalUI } from "../../../logic/contexts/globalUIContext";
+import { useGlobalUI } from "../../../logic/stores/useUIStore";
 import { displayError, displaySuccess } from "../../../utils/notification";
 import { APIKeyDeletionForm } from "./apiKeyDeletionForm";
 
 import { APIKeyEditor } from "./apiKeyEditor";
 import { formValidations } from "../../../utils/formValidation";
 import { APIKeyRoleSelectionDialog } from "./apiKeyRoleSelectionDialog";
-import { CodeBlock } from "../ui/codeBlock";
+import { Codeblock } from "../ui/codeblock";
 import PropTypes from "prop-types";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 
@@ -101,8 +101,8 @@ export const APIKeyUpdationForm = ({ tenantID, apiKeyID }) => {
   }, [apiKey]);
 
   return (
-    <section className="w-full bg-background">
-      <div className="border-b border-border bg-background p-3">
+    <section className="w-full bg-brand-dark">
+      <div className="border-b border-border bg-brand-dark px-4 py-3">
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">
           {CONSTANTS.STRINGS.UPDATE_API_KEY_FORM_TITLE}
         </h1>
@@ -111,7 +111,7 @@ export const APIKeyUpdationForm = ({ tenantID, apiKeyID }) => {
         isLoading={isLoadingAPIKey}
         error={loadAPIKeyError}
       >
-        <div className="mx-auto w-full max-w-2xl space-y-4 p-4 md:p-8">
+        <div className="mx-auto w-full max-w-2xl space-y-4 p-4 md:p-6">
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div className="space-y-1">
               {apiKey && (
@@ -142,7 +142,7 @@ export const APIKeyUpdationForm = ({ tenantID, apiKeyID }) => {
             className="space-y-4"
             onSubmit={apiKeyUpdationForm.handleSubmit}
           >
-            {apiKey && <CodeBlock code={`${apiKey.apiKey}`} className="w-full" />}
+            {apiKey && <Codeblock code={`${apiKey.apiKey}`} className="w-full" />}
             <APIKeyEditor
               tenantID={tenantID}
               apiKeyEditorForm={apiKeyUpdationForm}

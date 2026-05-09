@@ -1,0 +1,389 @@
+/**
+ * Listener Controller
+ * Express request handlers for the listener API.
+ */
+const { listenerService } = require('./listener.service');
+const Logger = require('../../utils/logger');
+const { expressUtils } = require('../../utils/express.utils');
+const { getServiceAuthContext } = require('../../utils/auth.context.utils');
+
+const listenerController = {
+  // ─── Listeners ──────────────────────────────────────────────────────────
+
+  async getAllListeners(req, res) {
+    try {
+      const { user } = req;
+      const { tenantID } = req.params;
+      const authContext = getServiceAuthContext(req);
+
+      Logger.log("info", {
+        message: "listenerController:getAllListeners:params",
+        params: { userID: user.userID, tenantID, authContext },
+      });
+
+      const listeners = await listenerService.getAllListeners({ tenantID });
+
+      Logger.log("success", {
+        message: "listenerController:getAllListeners:success",
+        params: { listenersCount: listeners.length },
+      });
+
+      return expressUtils.sendResponse(res, true, {
+        listeners,
+        message: "Listeners fetched successfully.",
+      });
+    } catch (error) {
+      Logger.log("error", {
+        message: "listenerController:getAllListeners:error",
+        params: { error },
+      });
+      return expressUtils.sendResponse(res, false, {}, error);
+    }
+  },
+
+  async getListenerByID(req, res) {
+    try {
+      const { user } = req;
+      const { tenantID, listenerID } = req.params;
+
+      Logger.log("info", {
+        message: "listenerController:getListenerByID:params",
+        params: { userID: user.userID, tenantID, listenerID },
+      });
+
+      const listener = await listenerService.getListenerByID({ tenantID, listenerID });
+      if (!listener) {
+        return expressUtils.sendResponse(res, false, {}, new Error('Listener not found'));
+      }
+
+      Logger.log("success", {
+        message: "listenerController:getListenerByID:success",
+        params: { listener },
+      });
+
+      return expressUtils.sendResponse(res, true, {
+        listener,
+        message: "Listener fetched successfully.",
+      });
+    } catch (error) {
+      Logger.log("error", {
+        message: "listenerController:getListenerByID:error",
+        params: { error },
+      });
+      return expressUtils.sendResponse(res, false, {}, error);
+    }
+  },
+
+  async createListener(req, res) {
+    try {
+      const { user } = req;
+      const { tenantID } = req.params;
+      const authContext = getServiceAuthContext(req);
+      const data = req.body;
+
+      Logger.log("info", {
+        message: "listenerController:createListener:params",
+        params: { userID: user.userID, tenantID, authContext, data },
+      });
+
+      const listener = await listenerService.createListener({ tenantID, data });
+
+      Logger.log("success", {
+        message: "listenerController:createListener:success",
+        params: { listener },
+      });
+
+      return expressUtils.sendResponse(res, true, {
+        listener,
+        message: "Listener created successfully.",
+      });
+    } catch (error) {
+      Logger.log("error", {
+        message: "listenerController:createListener:error",
+        params: { error },
+      });
+      return expressUtils.sendResponse(res, false, {}, error);
+    }
+  },
+
+  async updateListener(req, res) {
+    try {
+      const { user } = req;
+      const { tenantID, listenerID } = req.params;
+      const data = req.body;
+
+      Logger.log("info", {
+        message: "listenerController:updateListener:params",
+        params: { userID: user.userID, tenantID, listenerID, data },
+      });
+
+      const listener = await listenerService.updateListener({ tenantID, listenerID, data });
+      if (!listener) {
+        return expressUtils.sendResponse(res, false, {}, new Error('Listener not found'));
+      }
+
+      Logger.log("success", {
+        message: "listenerController:updateListener:success",
+        params: { listener },
+      });
+
+      return expressUtils.sendResponse(res, true, {
+        listener,
+        message: "Listener updated successfully.",
+      });
+    } catch (error) {
+      Logger.log("error", {
+        message: "listenerController:updateListener:error",
+        params: { error },
+      });
+      return expressUtils.sendResponse(res, false, {}, error);
+    }
+  },
+
+  async deleteListener(req, res) {
+    try {
+      const { user } = req;
+      const { tenantID, listenerID } = req.params;
+
+      Logger.log("info", {
+        message: "listenerController:deleteListener:params",
+        params: { userID: user.userID, tenantID, listenerID },
+      });
+
+      const result = await listenerService.deleteListener({ tenantID, listenerID });
+      if (!result) {
+        return expressUtils.sendResponse(res, false, {}, new Error('Listener not found'));
+      }
+
+      Logger.log("success", {
+        message: "listenerController:deleteListener:success",
+        params: { result },
+      });
+
+      return expressUtils.sendResponse(res, true, {
+        message: "Listener deleted successfully.",
+      });
+    } catch (error) {
+      Logger.log("error", {
+        message: "listenerController:deleteListener:error",
+        params: { error },
+      });
+      return expressUtils.sendResponse(res, false, {}, error);
+    }
+  },
+
+  // ─── Lifecycle ──────────────────────────────────────────────────────────
+
+  async activateListener(req, res) {
+    try {
+      const { user } = req;
+      const { tenantID, listenerID } = req.params;
+
+      Logger.log("info", {
+        message: "listenerController:activateListener:params",
+        params: { userID: user.userID, tenantID, listenerID },
+      });
+
+      const listener = await listenerService.activateListener({ tenantID, listenerID });
+      if (!listener) {
+        return expressUtils.sendResponse(res, false, {}, new Error('Listener not found'));
+      }
+
+      Logger.log("success", {
+        message: "listenerController:activateListener:success",
+        params: { listener },
+      });
+
+      return expressUtils.sendResponse(res, true, {
+        listener,
+        message: "Listener activated successfully.",
+      });
+    } catch (error) {
+      Logger.log("error", {
+        message: "listenerController:activateListener:error",
+        params: { error },
+      });
+      return expressUtils.sendResponse(res, false, {}, error);
+    }
+  },
+
+  async deactivateListener(req, res) {
+    try {
+      const { user } = req;
+      const { tenantID, listenerID } = req.params;
+
+      Logger.log("info", {
+        message: "listenerController:deactivateListener:params",
+        params: { userID: user.userID, tenantID, listenerID },
+      });
+
+      const listener = await listenerService.deactivateListener({ tenantID, listenerID });
+      if (!listener) {
+        return expressUtils.sendResponse(res, false, {}, new Error('Listener not found'));
+      }
+
+      Logger.log("success", {
+        message: "listenerController:deactivateListener:success",
+        params: { listener },
+      });
+
+      return expressUtils.sendResponse(res, true, {
+        listener,
+        message: "Listener deactivated successfully.",
+      });
+    } catch (error) {
+      Logger.log("error", {
+        message: "listenerController:deactivateListener:error",
+        params: { error },
+      });
+      return expressUtils.sendResponse(res, false, {}, error);
+    }
+  },
+
+  // ─── Actions ────────────────────────────────────────────────────────────
+
+  async addAction(req, res) {
+    try {
+      const { user } = req;
+      const { tenantID, listenerID } = req.params;
+      const data = req.body;
+
+      Logger.log("info", {
+        message: "listenerController:addAction:params",
+        params: { userID: user.userID, tenantID, listenerID, data },
+      });
+
+      const action = await listenerService.addAction({ tenantID, listenerID, data });
+      if (!action) {
+        return expressUtils.sendResponse(res, false, {}, new Error('Listener not found'));
+      }
+
+      Logger.log("success", {
+        message: "listenerController:addAction:success",
+        params: { action },
+      });
+
+      return expressUtils.sendResponse(res, true, {
+        action,
+        message: "Listener action added successfully.",
+      });
+    } catch (error) {
+      Logger.log("error", {
+        message: "listenerController:addAction:error",
+        params: { error },
+      });
+      return expressUtils.sendResponse(res, false, {}, error);
+    }
+  },
+
+  async updateAction(req, res) {
+    try {
+      const { user } = req;
+      const { tenantID, listenerID, actionID } = req.params;
+      const data = req.body;
+
+      Logger.log("info", {
+        message: "listenerController:updateAction:params",
+        params: { userID: user.userID, tenantID, listenerID, actionID, data },
+      });
+
+      const action = await listenerService.updateAction({ tenantID, listenerID, actionID, data });
+      if (!action) {
+        return expressUtils.sendResponse(res, false, {}, new Error('Listener not found'));
+      }
+
+      Logger.log("success", {
+        message: "listenerController:updateAction:success",
+        params: { action },
+      });
+
+      return expressUtils.sendResponse(res, true, {
+        action,
+        message: "Listener action updated successfully.",
+      });
+    } catch (error) {
+      Logger.log("error", {
+        message: "listenerController:updateAction:error",
+        params: { error },
+      });
+      return expressUtils.sendResponse(res, false, {}, error);
+    }
+  },
+
+  async deleteAction(req, res) {
+    try {
+      const { user } = req;
+      const { tenantID, listenerID, actionID } = req.params;
+
+      Logger.log("info", {
+        message: "listenerController:deleteAction:params",
+        params: { userID: user.userID, tenantID, listenerID, actionID },
+      });
+
+      const result = await listenerService.deleteAction({ tenantID, listenerID, actionID });
+      if (!result) {
+        return expressUtils.sendResponse(res, false, {}, new Error('Listener not found'));
+      }
+
+      Logger.log("success", {
+        message: "listenerController:deleteAction:success",
+        params: { result },
+      });
+
+      return expressUtils.sendResponse(res, true, {
+        message: "Listener action deleted successfully.",
+      });
+    } catch (error) {
+      Logger.log("error", {
+        message: "listenerController:deleteAction:error",
+        params: { error },
+      });
+      return expressUtils.sendResponse(res, false, {}, error);
+    }
+  },
+
+  // ─── Status ─────────────────────────────────────────────────────────────
+
+  async getConnectionStatus(req, res) {
+    try {
+      const status = listenerService.getConnectionStatus();
+      
+      Logger.log("success", {
+        message: "listenerController:getConnectionStatus:success",
+        params: { status },
+      });
+
+      return expressUtils.sendResponse(res, true, {
+        status,
+        message: "Connection status fetched successfully.",
+      });
+    } catch (error) {
+      Logger.log("error", {
+        message: "listenerController:getConnectionStatus:error",
+        params: { error },
+      });
+      return expressUtils.sendResponse(res, false, {}, error);
+    }
+  },
+
+  async updateTestScript(req, res) {
+    try {
+      const { listenerID } = req.params;
+      const { transformScript, sessionID } = req.body;
+
+      listenerService.updateTestScript(listenerID, sessionID, transformScript);
+
+      return expressUtils.sendResponse(res, true, {
+        message: "Test script updated successfully.",
+      });
+    } catch (error) {
+      Logger.log("error", {
+        message: "listenerController:updateTestScript:error",
+        params: { error },
+      });
+      return expressUtils.sendResponse(res, false, {}, error);
+    }
+  },
+};
+
+module.exports = listenerController;

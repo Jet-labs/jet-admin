@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useTenantState } from "../../../logic/contexts/tenantContext";
+import { useTenantState } from "../../../logic/hooks/useTenant";
 import { useNavigate } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 import { TenantStats } from "../../components/tenantComponents/tenantStats";
@@ -26,7 +26,7 @@ const HomePage = () => {
   ]);
 
   return (
-    <div className=" bg-gray-50 h-full w-full">
+    <div className=" bg-brand-dark h-full w-full">
       {tenants && <TenantStats tenants={tenants} />}
     </div>
   );

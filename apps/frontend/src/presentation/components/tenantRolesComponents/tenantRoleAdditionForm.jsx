@@ -13,7 +13,7 @@ import { Button, Spinner, Input, Label } from "@jet-admin/ui";
 
 function Section({ title, description, children }) {
   return (
-    <div className="rounded-lg border border-border bg-card p-4 space-y-3">
+    <div className="rounded-md border border-border bg-card p-4 space-y-3">
       {(title || description) && (
         <div className="mb-2">
           {title && (
@@ -88,8 +88,8 @@ export const TenantRoleAdditionForm = () => {
   );
 
   return (
-    <div className="flex w-full h-full flex-col overflow-hidden bg-background">
-      <div className="flex items-center justify-between border-b border-border bg-background px-4 py-3 shrink-0">
+    <div className="flex w-full h-full flex-col overflow-hidden bg-brand-dark">
+      <div className="flex items-center justify-between border-b border-border bg-brand-dark px-4 py-3 shrink-0">
         <div>
           <h1 className="text-base font-semibold tracking-tight text-foreground">
             {CONSTANTS.STRINGS.TENANT_ROLE_ADDITION_TITLE}
@@ -100,7 +100,7 @@ export const TenantRoleAdditionForm = () => {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 md:p-8">
+      <div className="flex-1 overflow-y-auto p-4 md:p-6">
         <section className="mx-auto max-w-2xl w-full">
           <form
             className="space-y-6"
@@ -174,7 +174,7 @@ export const TenantRoleAdditionForm = () => {
               <Button type="button" variant="outline" size="sm" onClick={() => navigate(-1)}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={isAddingTenantRole} size="sm">
+              <Button type="submit" disabled={isAddingTenantRole}>
                 {isAddingTenantRole && <Spinner className="mr-2" size={14} />}
                 Create Role
               </Button>

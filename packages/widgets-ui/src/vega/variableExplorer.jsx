@@ -36,7 +36,7 @@ const VariableItem = ({ variable, onSelect, isSelected }) => {
     <div
       onClick={handleClick}
       className={`
-        flex items-center gap-2 py-1.5 px-2 cursor-pointer rounded text-xs group
+        flex items-center gap-2 py-1.5 px-2 cursor-pointer rounded-sm text-xs group
         transition-colors
         ${isSelected
           ? 'bg-primary/10 text-primary border-l-2 border-primary'
@@ -55,9 +55,8 @@ const VariableItem = ({ variable, onSelect, isSelected }) => {
       <Button
         onClick={handleCopy}
         variant="ghost"
-        size="sm"
-        square
-        className="h-5 w-5 opacity-0 group-hover:opacity-100 transition-opacity"
+        size="icon"
+        className="h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
         title="Copy path"
         type="button"
       >
@@ -100,7 +99,7 @@ const VariableCategory = ({
       {/* Category header */}
       <div
         onClick={() => setIsExpanded(!isExpanded)}
-        className="flex items-center gap-1.5 w-full px-2 py-1.5 rounded cursor-pointer bg-muted/50 border border-border hover:bg-muted transition-colors"
+        className="flex items-center gap-1.5 w-full px-2 py-1.5 rounded-sm cursor-pointer bg-muted/50 border border-border hover:bg-muted transition-colors"
       >
         {isExpanded
           ? <FiChevronDown className="w-3 h-3 text-muted-foreground" />
@@ -110,7 +109,7 @@ const VariableCategory = ({
         <span className="text-[11px] font-medium uppercase tracking-wide flex-1 text-muted-foreground">
           {title}
         </span>
-        <span className="text-[10px] px-1.5 py-0.5 rounded bg-background border border-border text-muted-foreground">
+        <span className="text-[10px] px-1.5 py-0.5 rounded-sm bg-brand-dark border border-border text-muted-foreground">
           {variables.length}
         </span>
       </div>
@@ -259,7 +258,7 @@ export const VariableExplorer = ({
     schema.workflowOutputs.length > 0;
 
   return (
-    <div className={`flex flex-col rounded-lg border border-border bg-background ${className}`}>
+    <div className={`flex flex-col rounded-md border border-border bg-brand-dark ${className}`}>
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-2 rounded-t-lg border-b border-border bg-muted/50">
         <h3 className="text-xs font-medium text-muted-foreground">{title}</h3>

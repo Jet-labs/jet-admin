@@ -48,14 +48,14 @@ export const APIKeyAdditionForm = ({ tenantID }) => {
   });
 
   return (
-    <section className="w-full bg-background">
-      <div className="border-b border-border bg-background p-3">
+    <section className="w-full bg-brand-dark">
+      <div className="border-b border-border bg-brand-dark px-4 py-3">
         <h1 className="text-2xl font-semibold tracking-tight text-foreground">
           {CONSTANTS.STRINGS.ADD_API_KEY_FORM_TITLE}
         </h1>
       </div>
 
-      <div className="mx-auto w-full max-w-2xl p-4 md:p-8">
+      <div className="mx-auto w-full max-w-2xl p-4 md:p-6">
         <form
           className="space-y-4"
           onSubmit={apiKeyAdditionForm.handleSubmit}

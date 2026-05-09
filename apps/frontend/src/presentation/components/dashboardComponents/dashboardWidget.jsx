@@ -1,55 +1,33 @@
-import React, { useCallback, useMemo, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { WIDGETS_MAP } from "@jet-admin/widgets-ui";
 import { useQuery } from "@tanstack/react-query";
 import PropTypes from "prop-types";
-import { FiActivity, FiClock, FiRefreshCw, FiWifi } from "react-icons/fi";
+import { FiClock, FiRefreshCw } from "react-icons/fi";
 import { CONSTANTS } from "../../../constants";
 import {
   getWidgetByIDAPI,
-  getWidgetDataByIDAPI,
 } from "../../../data/apis/widget";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
-import {
-  useWidgetRun,
-  WIDGET_EXECUTION_MODES,
-} from "../widgetComponents/useWidgetRun";
 import { Badge, Button } from "@jet-admin/ui";
+import { resolveConfig } from "../../../logic/evaluationEngine";
+import { dispatchEvent, createEventHandlers } from "../../../logic/actionDispatcher";
+import { testDataQueryByIDAPI } from "../../../data/apis/dataQuery";
+import { executeWorkflowAPI } from "../../../data/apis/workflow";
+import { resolveWidgetData } from "@jet-admin/widgets-logic";
 
-const getChartData = (data) => {
-  if (data?.workflowInstances?.data) return data.workflowInstances.data;
-  if (data?.data) return data.data;
-  return data;
-};
-
-const WORKFLOW_STATUS_META = {
-  LOADING: {
-    label: "Starting",
-    variant: "secondary",
-  },
-  PENDING: {
-    label: "Running",
-    variant: "secondary",
-  },
-  COMPLETED: {
-    label: "Ready",
-    variant: "success",
-  },
-  FAILED: {
-    label: "Failed",
-    variant: "destructive",
-  },
-};
-
-export const DashboardWidget = ({ tenantID, widgetID, width, height }) => {
+export const DashboardWidget = ({ tenantID, widgetID, width, height, stateTree, onQueryResult }) => {
   DashboardWidget.propTypes = {
     tenantID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     widgetID: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
+    stateTree: PropTypes.object,
+    onQueryResult: PropTypes.func,
   };
 
   const widgetRef = useRef(null);
+  const onLoadFiredRef = useRef(false);
 
   const {
     isLoading: isLoadingWidget,
@@ -62,71 +40,94 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height }) => {
     refetchOnWindowFocus: false,
   });
 
-  const executionMode = useMemo(() => {
-    if (widget?.workflowConfig?.mode === "polling") {
-      return WIDGET_EXECUTION_MODES.SYNC;
-    }
-
-    return WIDGET_EXECUTION_MODES.ASYNC;
-  }, [widget]);
-
-  const {
-    isLoading: isLoadingWidgetData,
-    data: widgetData,
-    error: loadWidgetDataError,
-    refetch: refetchWidgetData,
-  } = useQuery({
-    queryKey: [
-      CONSTANTS.REACT_QUERY_KEYS.WIDGETS(tenantID),
-      widgetID,
-      "data",
-      executionMode,
-    ],
-    queryFn: () => getWidgetDataByIDAPI({ tenantID, widgetID, executionMode, inputArgs: {} }),
-    refetchOnWindowFocus: false,
-    enabled: !!widget && (widget?.workflowConfig?.workflowAutoRun ?? WIDGETS_MAP[widget.widgetType]?.defaultAutoRun ?? false) === true,
-  });
-
-  const {
-    data: finalData,
-    isRunning: isWorkflowRunning,
-    isLive,
-    workflowStatus,
-    context: workflowContext,
-    runWidget,
-  } = useWidgetRun({
-    tenantID,
-    widgetID,
-    widgetFetchedData: widgetData,
-    executionMode,
-    workflowID: widget?.workflowID,
-    widgetType: widget?.widgetType,
-    widgetConfig: widget?.widgetConfig,
-    workflowConfig: widget?.workflowConfig,
-  });
-
-  const runWorkflow = useCallback((opts = {}) => {
-    if (widget) {
-      runWidget({
-        widgetTitle: widget.widgetTitle,
-        widgetType: widget.widgetType,
-        widgetConfig: widget.widgetConfig,
-        workflowID: widget.workflowID,
-        workflowConfig: widget.workflowConfig,
-      }, opts);
-    }
-  }, [runWidget, widget]);
-
   const handleOnWidgetInit = useCallback((widgetView) => {
     widgetRef.current = widgetView;
   }, []);
+
+  // Dispatch context for event handlers
+  const dispatchContext = useMemo(() => ({
+    tenantID,
+    stateTree: stateTree || {},
+    onQueryResult: onQueryResult || (() => {}),
+  }), [tenantID, stateTree, onQueryResult]);
+
+  // Create event handlers from widget config
+  const eventHandlers = useMemo(() => {
+    if (!widget?.widgetConfig) return {};
+    return createEventHandlers(widget.widgetConfig, dispatchContext);
+  }, [widget?.widgetConfig, dispatchContext]);
+
+  // Fire onLoad event once when widget is loaded
+  useEffect(() => {
+    if (widget && !onLoadFiredRef.current) {
+      onLoadFiredRef.current = true;
+      if (widget.widgetConfig?.events?.onLoad) {
+        dispatchEvent("onLoad", widget.widgetConfig, dispatchContext);
+      }
+    }
+  }, [widget, dispatchContext]);
+
+  // ── Data Source Execution Pipeline ──
+  // Execute bound data sources when widget loads (new path)
+  const [dataSourceResults, setDataSourceResults] = useState(null);
+
+  useEffect(() => {
+    if (!widget?.widgetConfig?.dataSources?.length) return;
+
+    let cancelled = false;
+    const executeSources = async () => {
+      const results = {};
+      for (const source of widget.widgetConfig.dataSources) {
+        if (!source.alias) continue;
+        if (source.type === "query" && source.queryID) {
+          try {
+            const result = await testDataQueryByIDAPI({
+              tenantID,
+              dataQueryID: source.queryID,
+              inputArgs: source.inputArgValues || {},
+            });
+            results[source.alias] = result;
+          } catch (err) {
+            results[source.alias] = { error: err.message || String(err) };
+          }
+        }
+        if (source.type === "workflow" && source.workflowID) {
+          try {
+            const result = await executeWorkflowAPI({
+              tenantID,
+              workflowID: source.workflowID,
+              inputArgs: source.inputArgValues || {},
+            });
+            results[source.alias] = result.context || result;
+          } catch (err) {
+            results[source.alias] = { error: err.message || String(err) };
+          }
+        }
+      }
+      if (!cancelled) setDataSourceResults(results);
+    };
+
+    executeSources();
+    return () => { cancelled = true; };
+  }, [widget?.widgetConfig?.dataSources, tenantID]);
+
+  // Enrich stateTree with data source results so template expressions can resolve
+  const enrichedStateTree = useMemo(() => ({
+    ...stateTree,
+    ...(dataSourceResults || {}),
+  }), [stateTree, dataSourceResults]);
+
+  // Resolve widget config expressions against enriched state tree
+  const resolvedConfig = useMemo(() => {
+    if (!widget?.widgetConfig || !enrichedStateTree) return widget?.widgetConfig;
+    return resolveConfig(widget.widgetConfig, enrichedStateTree);
+  }, [widget?.widgetConfig, enrichedStateTree]);
 
   const widgetRender = useMemo(() => {
     if (!widget) {
       return null;
     }
 
-    // Resolve the widget component from the map
     const resolvedType = widget.widgetType || 'vega-lite';
     const WidgetComponent = WIDGETS_MAP[resolvedType]?.component;
 
@@ -136,23 +137,18 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height }) => {
       };
     }
 
-    // processedData from backend is the complete spec — just pass it through
     return {
       Component: WidgetComponent,
-      data: getChartData(finalData),
       widgetType: resolvedType,
     };
-  }, [finalData, widget]);
+  }, [widget]);
 
   const RenderedWidgetComponent = widgetRender?.Component;
-  const WidgetIcon = widget ? WIDGETS_MAP[widgetRender?.widgetType || widget.widgetType]?.icon : null;
-  const workflowStatusMeta = WORKFLOW_STATUS_META[workflowStatus] || null;
-  const widgetDescription = widget?.widgetDescription?.trim();
   const refreshLabel =
     widget?.refreshInterval && widget.refreshInterval > 0
       ? `${widget.refreshInterval}s refresh`
       : null;
-  const showHeader = widget?.widgetConfig?.showHeader ?? true;
+  const showHeader = resolvedConfig?.properties?.showHeader ?? true;
 
   return (
     <div
@@ -163,44 +159,30 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height }) => {
       }}
     >
       <ReactQueryLoadingErrorWrapper
-        isLoading={isLoadingWidget || (!!widget && isLoadingWidgetData && !widgetData)}
-        isFetching={isLoadingWidget || isLoadingWidgetData}
-        error={loadWidgetError || loadWidgetDataError}
+        isLoading={isLoadingWidget}
+        isFetching={isLoadingWidget}
+        error={loadWidgetError}
         loadingContainerClass="bg-gradient-to-br from-background to-slate-50"
         refetch={() => {
           refetchWidget();
-          refetchWidgetData();
         }}
       >
         {widget && showHeader && (
-          <div className="border-b border-slate-200/80 bg-gradient-to-r from-slate-50 to-background px-3 py-1.5">
+          <div className="border-b border-brand-border/80 bg-gradient-to-r from-slate-50 to-background px-3 py-1.5">
             <div className="flex items-center justify-between gap-3">
               <div className="min-w-0 space-y-1">
                 <div className="flex items-center gap-2">
-                  {/* {WidgetIcon ? (
-                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-                      <WidgetIcon className="text-base" />
-                    </div>
-                  ) : null} */}
                   <div className="min-w-0">
-                    <div className="truncate text-xs font-semibold text-slate-800">
+                    <div className="truncate text-xs font-semibold text-brand-text-primary">
                       {widget.widgetTitle}
                     </div>
-                    {/* <div className="truncate text-[11px] uppercase tracking-[0.18em] text-slate-400">
-                      {widgetRender?.widgetType || widget.widgetType}
-                    </div> */}
                   </div>
                 </div>
-                {/* {widgetDescription ? (
-                  <p className="line-clamp-2 text-xs text-slate-500">
-                    {widgetDescription}
-                  </p>
-                ) : null} */}
               </div>
 
               <div className="flex shrink-0 items-center gap-2">
                 {refreshLabel ? (
-                  <Badge variant="outline" className="gap-1 border-slate-200 text-[11px] text-slate-500">
+                  <Badge variant="outline" className="gap-1 border-brand-border text-[11px] text-brand-text-primary">
                     <FiClock className="text-[11px]" />
                     {refreshLabel}
                   </Badge>
@@ -210,66 +192,51 @@ export const DashboardWidget = ({ tenantID, widgetID, width, height }) => {
                   variant="ghost"
                   size="sm"
                   square
-                  className="h-6 w-6 text-slate-500 hover:bg-slate-100 hover:text-slate-700"
+                  className="h-6 w-6 text-brand-text-primary hover:bg-brand-border-dark hover:text-brand-text-primary"
                   onClick={() => {
-                    refetchWidgetData();
+                    refetchWidget();
                   }}
                   aria-label="Refresh widget"
                 >
-                  <FiRefreshCw className={isLoadingWidgetData ? "animate-spin h-3.5 w-3.5" : " h-3.5 w-3.5"} />
+                  <FiRefreshCw className={isLoadingWidget ? "animate-spin h-3.5 w-3.5" : " h-3.5 w-3.5"} />
                 </Button>
               </div>
             </div>
-
-            {/* <div className="mt-3 flex flex-wrap items-center gap-2">
-              {isLive ? (
-                <Badge variant="success" className="gap-1 text-[11px]">
-                  <FiWifi className="text-[11px]" />
-                  Live
-                </Badge>
-              ) : null}
-              {isWorkflowRunning ? (
-                <Badge variant="secondary" className="gap-1 text-[11px] text-blue-700">
-                  <FiActivity className="animate-pulse text-[11px]" />
-                  Running
-                </Badge>
-              ) : null}
-              {workflowStatusMeta ? (
-                <Badge variant={workflowStatusMeta.variant} className="text-[11px]">
-                  {workflowStatusMeta.label}
-                </Badge>
-              ) : null}
-            </div> */}
           </div>
         )}
 
         {widgetRender?.errorMessage ? (
           <div className="flex h-full w-full items-center justify-center p-4">
-            <span className="rounded border border-red-100 bg-red-50 px-3 py-2 text-center text-xs text-red-600">
+            <span className="rounded-sm border border-red-100 bg-red-950/40 px-3 py-2 text-center text-xs text-red-600">
               {widgetRender.errorMessage}
             </span>
           </div>
         ) : null}
 
-        {RenderedWidgetComponent ? (
-          <div className="min-h-0 flex-1 bg-background px-2 pb-2 pt-1">
-            <RenderedWidgetComponent
-              widgetTitle={widget.widgetTitle}
-              widgetType={widgetRender.widgetType}
-              widgetConfig={widget.widgetConfig}
-              data={widgetRender.data}
-              onWidgetInit={handleOnWidgetInit}
-              refetchInterval={widget.refreshInterval}
-              refreshData={refetchWidgetData}
-              isLoadingWorkflows={isWorkflowRunning}
-              isConnected={isLive}
-              workflowStatus={workflowStatus}
-              runWorkflow={runWorkflow}
-            />
-          </div>
-        ) : null}
+        {RenderedWidgetComponent ? (() => {
+          // Resolve widget data via the standardized builder pipeline
+          const widgetData = resolveWidgetData({
+            widgetType: widgetRender.widgetType,
+            widgetConfig: resolvedConfig,
+            dataSourceResults: dataSourceResults,
+          });
+
+          return (
+            <div className="min-h-0 flex-1 bg-brand-dark px-2 pb-2 pt-1">
+              <RenderedWidgetComponent
+                widgetTitle={widget.widgetTitle}
+                widgetType={widgetRender.widgetType}
+                widgetConfig={resolvedConfig}
+                data={widgetData}
+                onWidgetInit={handleOnWidgetInit}
+                refetchInterval={widget.refreshInterval}
+                refreshData={refetchWidget}
+                {...eventHandlers}
+              />
+            </div>
+          );
+        })() : null}
       </ReactQueryLoadingErrorWrapper>
     </div>
   );
 };
-

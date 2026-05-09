@@ -45,7 +45,14 @@ export default class RabbitMQDataSource extends DataSource {
     
     try {
       connection = await amqp.connect(this.buildConnectionUrl());
+      connection.on("error", (err) => {
+        Logger.log("error", { message: "rabbitmq:connection:error", params: { error: err.message, datasourceID: this.config.datasourceID } });
+      });
+
       channel = await connection.createChannel();
+      channel.on("error", (err) => {
+        Logger.log("error", { message: "rabbitmq:channel:error", params: { error: err.message, datasourceID: this.config.datasourceID } });
+      });
       
       let result;
       
@@ -105,7 +112,8 @@ export default class RabbitMQDataSource extends DataSource {
     };
 
     if (exchange) {
-      await channel.assertExchange(exchange, "direct", { durable: true });
+      const exchangeType = dataQueryOptions.exchangeType || "direct";
+      await channel.assertExchange(exchange, exchangeType, { durable: true });
       channel.publish(exchange, routingKey || queue, buffer, options);
     } else {
       await channel.assertQueue(queue, {
@@ -192,5 +200,88 @@ export default class RabbitMQDataSource extends DataSource {
   async deleteQueue(channel, queue) {
     const result = await channel.deleteQueue(queue);
     return { success: true, messageCount: result.messageCount, queue };
+  }
+
+  async subscribe(config, onEvent) {
+    const exchange = config.exchange;
+    const routingKey = config.routingKey || "#";
+    const queueName = config.queue || "";
+    const prefetch = config.prefetch || 10;
+
+    if (!exchange) {
+      throw new Error("Exchange is required for RabbitMQ listener");
+    }
+
+    Logger.log("info", {
+      message: "rabbitmq:subscribe:start",
+      params: { exchange, routingKey, queueName, datasourceID: this.config.datasourceID },
+    });
+
+    const connection = await amqp.connect(this.buildConnectionUrl());
+    connection.on("error", (err) => {
+      Logger.log("error", { message: "rabbitmq:connection:error", params: { error: err.message, datasourceID: this.config.datasourceID } });
+    });
+
+    const channel = await connection.createChannel();
+    channel.on("error", (err) => {
+      Logger.log("error", { message: "rabbitmq:channel:error", params: { error: err.message, datasourceID: this.config.datasourceID } });
+    });
+    
+    await channel.prefetch(prefetch);
+    
+    // Using topic exchange by default to support wildcards like * and #, but allow override
+    const exchangeType = config.exchangeType || "topic";
+    await channel.assertExchange(exchange, exchangeType, { durable: true }); 
+
+    const q = await channel.assertQueue(queueName, { 
+      exclusive: !queueName // if no queue name provided, it's exclusive to this connection
+    });
+    
+    await channel.bindQueue(q.queue, exchange, routingKey);
+
+    const { consumerTag } = await channel.consume(q.queue, (msg) => {
+      if (msg !== null) {
+        let content;
+        try {
+          content = JSON.parse(msg.content.toString());
+        } catch {
+          content = msg.content.toString();
+        }
+        
+        onEvent({
+          exchange,
+          routingKey: msg.fields.routingKey,
+          payload: content,
+        });
+        
+        channel.ack(msg);
+      }
+    });
+
+    return { connection, channel, consumerTag };
+  }
+
+  async unsubscribe(handle) {
+    if (!handle) return;
+    
+    Logger.log("info", {
+      message: "rabbitmq:unsubscribe",
+      params: { datasourceID: this.config.datasourceID },
+    });
+
+    try {
+      if (handle.channel) {
+        await handle.channel.cancel(handle.consumerTag);
+        await handle.channel.close();
+      }
+      if (handle.connection) {
+        await handle.connection.close();
+      }
+    } catch (e) {
+      Logger.log("error", {
+        message: "rabbitmq:unsubscribe:error",
+        params: { error: e.message },
+      });
+    }
   }
 }

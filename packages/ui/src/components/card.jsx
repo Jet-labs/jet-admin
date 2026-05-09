@@ -1,11 +1,13 @@
 import * as React from "react";
 import { cn } from "../lib/utils";
 
-const Card = React.forwardRef(({ className, ...props }, ref) => (
+const Card = React.forwardRef(({ className, variant = "default", ...props }, ref) => (
   <div
     ref={ref}
     className={cn(
-      "rounded border bg-card text-card-foreground shadow-sm",
+      "rounded-md bg-brand-dark border border-brand-border text-brand-text-primary",
+      variant === "glass" && "bg-brand-dark/80 backdrop-blur-xl saturate-150",
+      variant === "pastel" && "bg-brand-border-dark",
       className
     )}
     {...props}
@@ -26,7 +28,7 @@ const CardTitle = React.forwardRef(({ className, ...props }, ref) => (
   <h3
     ref={ref}
     className={cn(
-      "text-2xl font-semibold leading-none tracking-tight",
+      "text-[24px] font-normal leading-[1.33] tracking-[-0.16px] text-brand-text-primary",
       className
     )}
     {...props}
@@ -37,7 +39,7 @@ CardTitle.displayName = "CardTitle";
 const CardDescription = React.forwardRef(({ className, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn("text-sm text-muted-foreground", className)}
+    className={cn("text-[14px] font-normal text-brand-text-muted leading-[1.5]", className)}
     {...props}
   />
 ));
@@ -58,4 +60,3 @@ const CardFooter = React.forwardRef(({ className, ...props }, ref) => (
 CardFooter.displayName = "CardFooter";
 
 export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent };
-

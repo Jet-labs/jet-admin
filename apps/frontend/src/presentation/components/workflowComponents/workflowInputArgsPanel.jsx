@@ -39,8 +39,8 @@ export const WorkflowInputArgsPanel = ({ workflowForm }) => {
     <div className="flex flex-col gap-2">
       <div className="flex flex-row justify-between items-center">
         <div className="flex flex-row items-center gap-2">
-          <IoSettingsOutline className="text-slate-500 text-sm" />
-          <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+          <IoSettingsOutline className="text-brand-text-primary text-sm" />
+          <span className="text-[10px] font-bold text-brand-text-primary uppercase tracking-wider">
             Input Parameters
           </span>
         </div>
@@ -57,13 +57,13 @@ export const WorkflowInputArgsPanel = ({ workflowForm }) => {
       </div>
 
       {args.length === 0 ? (
-        <p className="text-[10px] text-slate-400 italic">
+        <p className="text-[10px] text-brand-text-primary italic">
           No input parameters defined.
         </p>
       ) : (
         <div className="space-y-2">
           {args.map((arg, index) => (
-            <div key={index} className="flex flex-col gap-1.5 p-2 bg-slate-50 rounded border border-slate-200">
+            <div key={index} className="flex flex-col gap-1.5 p-2 bg-brand-dark rounded-sm border border-brand-border">
               <div className="flex flex-row gap-2 items-center">
                 <Input
                   type="text"
@@ -74,11 +74,11 @@ export const WorkflowInputArgsPanel = ({ workflowForm }) => {
                 />
                 <Button
                   type="button"
-                  variant="ghost"
-                  size="sm"
+                  variant="outline"
+                  size="icon"
                   square
                   onClick={() => _handleRemoveArg(index)}
-                  className="h-6 w-6 bg-red-100 text-red-500 hover:bg-red-50 hover:text-red-600 flex-shrink-0"
+                  className=""
                 >
                   <FaTrash className="w-2.5 h-2.5" />
                 </Button>
@@ -96,7 +96,7 @@ export const WorkflowInputArgsPanel = ({ workflowForm }) => {
                     <SelectItem value="array">Array</SelectItem>
                   </SelectContent>
                 </Select>
-                <label className="flex items-center gap-1 text-[10px] text-slate-600 flex-shrink-0">
+                <label className="flex items-center gap-1 text-[10px] text-brand-text-primary flex-shrink-0">
                   <Checkbox
                     checked={arg.required || false}
                     onCheckedChange={(checked) => _handleUpdateArg(index, "required", checked)}

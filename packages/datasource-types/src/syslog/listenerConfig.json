@@ -1,0 +1,30 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "severityFilter": {
+        "type": "string",
+        "enum": ["all", "emergency", "alert", "critical", "error", "warning", "notice", "info", "debug"],
+        "default": "all",
+        "description": "Only forward messages at or above this severity"
+      },
+      "facilityFilter": {
+        "type": "string",
+        "description": "Comma-separated syslog facility names to include (leave empty for all)"
+      },
+      "hostnameFilter": {
+        "type": "string",
+        "description": "Regex pattern to filter by hostname"
+      }
+    }
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      { "type": "Control", "scope": "#/properties/severityFilter", "label": "Min Severity" },
+      { "type": "Control", "scope": "#/properties/facilityFilter", "label": "Facility Filter", "options": { "placeholder": "kern, auth, local0" } },
+      { "type": "Control", "scope": "#/properties/hostnameFilter", "label": "Hostname Filter (regex)", "options": { "placeholder": "web-server-.*" } }
+    ]
+  },
+  "data": { "severityFilter": "all", "facilityFilter": "", "hostnameFilter": "" }
+}

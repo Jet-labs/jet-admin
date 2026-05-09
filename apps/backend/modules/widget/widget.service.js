@@ -1,11 +1,6 @@
 const Logger = require("../../utils/logger");
 const { prisma } = require("../../config/prisma.config");
-const { dataQueryService } = require("../dataQuery/dataQuery.service");
-const { workflowService } = require("../workflow/workflow.service");
-const { WIDGET_TYPES } = require("@jet-admin/widget-types");
 const { getCreationContextFromAuthContext } = require("../../utils/auth.context.utils");
-const { resolveInputs } = require("../../utils/inputArgs.util");
-const { extractWorkflowDefinitions } = require("../../utils/definitionProvider.util");
 const widgetService = {};
 /**
  *
@@ -27,9 +22,6 @@ widgetService.getAllWidgets = async ({ authContext, tenantID }) => {
     const widgets = await prisma.tblWidgets.findMany({
       where: {
         tenantID: tenantID,
-      },
-      include: {
-        tblWorkflows: true,
       },
     });
     Logger.log("success", {
@@ -70,11 +62,7 @@ widgetService.createWidget = async ({
   widgetDescription,
   widgetType,
   widgetConfig,
-  workflowID,
-  workflowConfig,
 }) => {
-  // Determine mode: workflow mode if workflowSources provided, otherwise query mode
-
   Logger.log("info", {
     message: "widgetService:createWidget:params",
     params: {
@@ -84,8 +72,6 @@ widgetService.createWidget = async ({
       widgetDescription,
       widgetType,
       widgetConfig,
-      workflowID,
-      workflowConfig,
     },
   });
 
@@ -100,8 +86,6 @@ widgetService.createWidget = async ({
         widgetConfig,
         creatorID,
         createdByApiKeyID,
-        workflowID,
-        workflowConfig,
       },
     });
 
@@ -113,8 +97,6 @@ widgetService.createWidget = async ({
         widgetTitle,
         widgetDescription,
         widgetConfig,
-        workflowID,
-        workflowConfig,
       },
     });
     return widget;
@@ -154,9 +136,6 @@ widgetService.getWidgetByID = async ({ authContext, tenantID, widgetID }) => {
         tenantID: tenantID,
         widgetID: widgetID,
       },
-      include: {
-        tblWorkflows: true,
-      }
     });
     Logger.log("success", {
       message: "widgetService:getWidgetByID:success",
@@ -223,8 +202,6 @@ widgetService.cloneWidgetByID = async ({ authContext, tenantID, widgetID, }) => 
         widgetConfig: widget.widgetConfig,
         creatorID: creatorID,
         createdByApiKeyID: createdByApiKeyID,
-        workflowID: widget.workflowID,
-        workflowConfig: widget.workflowConfig,
       },
     });
     Logger.log("success", {
@@ -249,277 +226,7 @@ widgetService.cloneWidgetByID = async ({ authContext, tenantID, widgetID, }) => 
 };
 
 /**
- * Helper to wait for workflow completion (polling)
- * @param {string} instanceID
- * @param {number} timeoutMs
- * @returns {Promise<string>} Final status
- */
-const _waitForWorkflowCompletion = async (instanceID, timeoutMs = 30000) => {
-  const startTime = Date.now();
-
-  while (Date.now() - startTime < timeoutMs) {
-    const status = await workflowService.getRunStatus(instanceID);
-    if (!status) throw new Error("Instance not found");
-
-    if (status.status === 'COMPLETED' || status.status === 'FAILED') {
-      return status.status;
-    }
-
-    // Wait 500ms
-    await new Promise(resolve => setTimeout(resolve, 500));
-  }
-
-  throw new Error("Workflow execution timed out");
-};
-
-/**
- * Execute workflow for Workflow Mode widgets (non-persisted/preview widgets)
- * @param {object} params
- * @param {object} params.widget - Widget config with workflowSource object
- * @param {object} params.authContext - User ID
- * @param {string} params.tenantID - Tenant ID
- * @param {string} params.executionMode - 'ASYNC' (default) or 'SYNC'
- * @returns {Promise<object>} Workflow instance info or full data
- */
-const _executeWorkflowMode = async ({ widget, tenantID, executionMode = 'ASYNC', inputArgs = {} }) => {
-  const workflowConfig = widget.workflowConfig;
-
-  try {
-    const mergedInputParams = {
-      ...(workflowConfig.inputArgs || {}),
-      ...inputArgs,
-    };
-
-    // Resolve & validate merged inputs through the unified pipeline
-    let definitions = [];
-    if (widget.tblWorkflows) {
-      definitions = extractWorkflowDefinitions(widget.tblWorkflows);
-    }
-    const { resolved, errors, valid } = await resolveInputs({
-      type: 'widget',
-      id: !widget.tblWorkflows ? widget.widgetID : undefined,
-      definitions: definitions.length > 0 ? definitions : undefined,
-      runtimeValues: mergedInputParams,
-    });
-
-    if (!valid) {
-      Logger.log("error", {
-        message: "widgetService:_executeWorkflowMode:inputValidationFailed",
-        params: { workflowID: widget.workflowID, errors },
-      });
-      return {
-        title: workflowConfig.title,
-        workflowID: widget.workflowID,
-        status: "ERROR",
-        error: `Input validation failed: ${JSON.stringify(errors)}`,
-      };
-    }
-
-    const { instanceID } = await workflowService.executeWorkflow({
-      workflowID: widget.workflowID,
-      tenantID,
-      inputArgs: resolved,
-    });
-
-    Logger.log("info", {
-      message: "widgetService:_executeWorkflowMode:started",
-      params: {
-        workflowID: widget.workflowID,
-        instanceID,
-        executionMode,
-      },
-    });
-
-    // Handle SYNC execution mode
-    if (executionMode === 'SYNC') {
-      try {
-        await _waitForWorkflowCompletion(instanceID);
-
-        // Fetch processed data
-        const result = await workflowService.getRunStatusForWidget({
-          instanceID,
-          widgetType: widget.widgetType,
-          workflowConfig: workflowConfig,
-          widgetConfig: widget.widgetConfig,
-        });
-
-        return {
-          title: workflowConfig.title,
-          instanceID,
-          workflowID: widget.workflowID,
-          status: result?.status || 'UNKNOWN',
-          // Return the full processed data
-          data: result?.data,
-          message: "Workflow execution completed synchronously",
-        };
-      } catch (waitError) {
-        Logger.log("error", {
-          message: "widgetService:_executeWorkflowMode:sync-timeout",
-          params: { instanceID, error: waitError.message },
-        });
-        // Fallback to returning instanceID with error/timeout status (or let it fail)
-        throw waitError;
-      }
-    }
-
-    // Default ASYNC: Return ID immediately
-    return {
-      title: workflowConfig.title,
-      instanceID,
-      workflowID: widget.workflowID,
-      status: "PENDING",
-    };
-  } catch (error) {
-    Logger.log("error", {
-      message: "widgetService:_executeWorkflowMode:error",
-      params: { workflowID: widget.workflowID, error: error.message },
-    });
-
-    return {
-      title: workflowConfig.title,
-      workflowID: widget.workflowID,
-      status: "ERROR",
-      error: error.message,
-    };
-  }
-};
-
-/**
- * Service function to retrieve and process database widget data.
- * Routes to Query Mode or Workflow Mode based on widget configuration.
- * @param {Object} params
- * @param {object} params.authContext - ID of the requesting user
- * @param {string} params.tenantID - Tenant ID
- * @param {string} params.widgetID - Database widget ID
- * @returns {Promise<Object>} Processed widget data with metadata and workflow instances
- */
-widgetService.getWidgetDataByID = async ({
-  authContext,
-  tenantID,
-  widgetID,
-  executionMode = 'ASYNC',
-  inputArgs = {},
-}) => {
-  Logger.log("info", {
-    message: "widgetService:getWidgetDataByID:params",
-    params: {
-      authContext,
-      tenantID,
-      widgetID,
-      inputArgs,
-    },
-  });
-
-  try {
-    // 1. Fetch widget configuration with related queries and workflows
-    let widget = await prisma.tblWidgets.findUnique({
-      where: { widgetID: widgetID },
-      include: {
-        tblWorkflows: true,
-      },
-    });
-
-    if (!widget) {
-      Logger.log("error", {
-        message: "widgetService:getWidgetDataByID:widget-not-found",
-        params: {
-          widgetID,
-          authContext,
-        },
-      });
-      throw new Error(`Widget ${widgetID} not found`);
-    }
-
-    Logger.log("info", {
-      message: "widgetService:getWidgetDataByID:widget",
-      params: {
-        authContext,
-        tenantID,
-        widgetID,
-        dataQueriesCount: widget.dataQueries?.length,
-        workflowSourcesCount: widget.workflowSources?.length,
-      },
-    });
-
-    const workflowInstance = await _executeWorkflowMode({ widget, authContext, tenantID, executionMode, inputArgs });
-
-    Logger.log("success", {
-      message: "widgetService:getWidgetDataByID:workflowMode:success",
-      params: { authContext, tenantID, widgetID },
-    });
-
-    return {
-      widgetID: widget.widgetID,
-      widgetTitle: widget.widgetTitle,
-      lastUpdated: widget.updatedAt,
-      workflowInstances: workflowInstance,
-    };
-
-  } catch (error) {
-    Logger.log("error", {
-      message: "widgetService:getWidgetDataByID:catch-1",
-      params: {
-        error,
-        widgetID,
-        authContext,
-      },
-    });
-    throw error;
-  }
-};
-
-/**
- * Service function to preview widget data using widget config (non-persisted).
- * Routes to Query Mode or Workflow Mode based on widget configuration.
- * @param {Object} params
- * @param {object} params.authContext - ID of the requesting user
- * @param {string} params.tenantID - Tenant ID
- * @param {object} params.widget - Widget configuration object
- * @returns {Promise<Object>} Processed widget data with metadata
- */
-widgetService.getWidgetDataUsingWidget = async ({
-  authContext,
-  tenantID,
-  widget,
-  executionMode = 'ASYNC',
-  inputArgs = {},
-}) => {
-  Logger.log("info", {
-    message: "widgetService:getWidgetDataUsingWidget:params",
-    params: {
-      authContext,
-      tenantID,
-      widget,
-      inputArgs,
-    },
-  });
-
-  try {
-    // Workflow Mode: Execute single workflow
-    const workflowInstance = await _executeWorkflowMode({
-      widget, authContext, tenantID, executionMode, inputArgs
-    });
-
-    return {
-      widgetTitle: widget.widgetTitle,
-      lastUpdated: widget.updatedAt,
-      workflowInstances: workflowInstance,
-    };
-  } catch (error) {
-    Logger.log("error", {
-      message: "widgetService:getWidgetDataUsingWidget:catch-1",
-      params: {
-        error,
-        authContext,
-      },
-    });
-    throw error;
-  }
-};
-
-/**
- * Updates an existing database widget and its associated query and workflow mappings.
- * Enforces mutual exclusivity: either query mappings OR workflow mapping, not both.
+ * Updates an existing database widget.
  *
  * @param {Object} params - Update parameters
  * @param {number} params.widgetID - ID of the widget to update (REQUIRED)
@@ -529,8 +236,6 @@ widgetService.getWidgetDataUsingWidget = async ({
  * @param {string} [params.widgetDescription] - New widget description
  * @param {string} [params.widgetType] - Widget type identifier
  * @param {JSON} [params.widgetConfig] - Widget configuration data
- * @param {Array<Object>} [params.dataQueries] - Array of query mappings (Query Mode)
- * @param {Array<Object>} [params.workflowSources] - Array with single workflow mapping (Workflow Mode)
  *
  * @returns {Promise<boolean>} True if update succeeded
  * @throws {Error} If database operation fails
@@ -543,12 +248,7 @@ widgetService.updateWidgetByID = async ({
   widgetDescription,
   widgetType,
   widgetConfig,
-  workflowID,
-  workflowConfig,
 }) => {
-  // Determine mode: workflow mode if workflowSources provided, otherwise query mode
-
-
   Logger.log("info", {
     message: "widgetService:updateWidgetByID:params",
     params: {
@@ -559,8 +259,6 @@ widgetService.updateWidgetByID = async ({
       widgetDescription,
       widgetType,
       widgetConfig,
-      workflowID,
-      workflowConfig,
     },
   });
 
@@ -592,12 +290,6 @@ widgetService.updateWidgetByID = async ({
         ...(widgetDescription != undefined && { widgetDescription }),
         ...(widgetType != undefined && { widgetType }),
         ...(widgetConfig != undefined && { widgetConfig }),
-        ...(workflowConfig != undefined && { workflowConfig }),
-        ...(workflowID != undefined && {
-          tblWorkflows: {
-            connect: { workflowID },
-          },
-        }),
       },
     });
 
@@ -611,8 +303,6 @@ widgetService.updateWidgetByID = async ({
         widgetDescription,
         widgetType,
         widgetConfig,
-        workflowID,
-        workflowConfig,
       },
     });
     return updatedWidget;

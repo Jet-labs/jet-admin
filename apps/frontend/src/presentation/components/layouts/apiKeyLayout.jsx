@@ -1,7 +1,7 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
-import { APIKeysContextProvider } from "../../../logic/contexts/apiKeysContext";
+
 import { APIKeyDrawerList } from "../drawerList/apiKeyDrawerList";
 import {
   ResizableHandle,
@@ -11,8 +11,7 @@ import {
 
 export const APIKeyLayout = () => {
   return (
-    <APIKeysContextProvider>
-      <div className="flex h-full w-full flex-col overflow-hidden bg-background">
+    <div className="flex h-full w-full flex-col overflow-hidden bg-brand-dark">
         <ResizablePanelGroup
           direction="horizontal"
           autoSaveId={
@@ -24,11 +23,10 @@ export const APIKeyLayout = () => {
             <APIKeyDrawerList />
           </ResizablePanel>
           <ResizableHandle withHandle={true} />
-          <ResizablePanel defaultSize={80} className="overflow-hidden bg-background">
+          <ResizablePanel defaultSize={80} className="overflow-hidden bg-brand-dark">
             <Outlet />
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>
-    </APIKeysContextProvider>
   );
 };

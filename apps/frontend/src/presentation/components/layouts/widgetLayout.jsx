@@ -3,7 +3,7 @@ import { Outlet } from "react-router-dom";
 // import logo from "../../../assets/logo.png";
 
 import { CONSTANTS } from "../../../constants";
-import { WidgetsContextProvider } from "../../../logic/contexts/widgetsContext";
+
 import { WidgetDrawerList } from "../drawerList/widgetDrawerList";
 import {
   ResizableHandle,
@@ -13,8 +13,7 @@ import {
 
 export const WidgetLayout = () => {
   return (
-    <WidgetsContextProvider>
-      <div className="flex h-full w-full flex-col overflow-hidden bg-background">
+    <div className="flex h-full w-full flex-col overflow-hidden bg-brand-dark">
         <ResizablePanelGroup
           direction="horizontal"
           autoSaveId={CONSTANTS.RESIZABLE_PANEL_KEYS.WIDGET_LAYOUT_SEPARATION}
@@ -24,11 +23,10 @@ export const WidgetLayout = () => {
             <WidgetDrawerList />
           </ResizablePanel>
           <ResizableHandle withHandle={true} />
-          <ResizablePanel defaultSize={80} className="overflow-hidden bg-background">
+          <ResizablePanel defaultSize={80} className="overflow-hidden bg-brand-dark">
             <Outlet />
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>
-    </WidgetsContextProvider>
   );
 };

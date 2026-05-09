@@ -1,0 +1,17 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "operation": { "type": "string", "enum": ["send_message"], "default": "send_message" },
+      "message": { "type": "string", "description": "Message payload to send" }
+    },
+    "required": ["operation", "message"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      { "type": "Control", "scope": "#/properties/message", "label": "Message", "options": { "multi": true } }
+    ]
+  },
+  "data": { "operation": "send_message", "message": "" }
+}

@@ -88,7 +88,7 @@ export const TenantRoleSelectionInput = ({
                 return (
                   <span
                     key={role.roleID}
-                    className="px-2 py-1 bg-primary/10 text-primary rounded text-xs font-medium"
+                    className="px-2 py-1 bg-primary/10 text-primary rounded-sm text-xs font-medium"
                   >
                     {role.roleTitle}
                   </span>
@@ -99,7 +99,7 @@ export const TenantRoleSelectionInput = ({
             )}
           </Button>
           {isOpen && tenantRoles.roles && (
-            <div className="absolute z-50 mt-1 w-full bg-background border border-border rounded-md shadow-lg max-h-60 overflow-y-auto">
+            <div className="absolute z-50 mt-1 w-full bg-brand-dark border border-border rounded-md shadow-lg max-h-60 overflow-y-auto">
               {tenantRoles.roles.map((tenantRole) => (
                 <div
                   key={tenantRole.roleID}

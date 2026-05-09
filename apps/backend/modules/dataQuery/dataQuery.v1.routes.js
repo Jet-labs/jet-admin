@@ -49,13 +49,6 @@ router.patch(
   dataQueryController.runDataQueryByData
 );
 
-router.patch(
-  "/aigenerate",
-  validate(aiGenerateSchema, "body"),
-  authMiddleware.checkUserPermissions(["tenant:query:aigenerate"]),
-  dataQueryController.generateAIPromptBasedQuery
-);
-
 router.get(
   "/:dataQueryID",
   validate(dataQueryIdParamSchema, "params"),

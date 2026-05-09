@@ -31,6 +31,9 @@ import NotionDataSource from "./notion/datasource";
 import JiraDataSource from "./jira/datasource";
 import GoogleAnalyticsDataSource from "./googleanalytics/datasource";
 
+// Listeners
+import SyslogDataSource from "./syslog/datasource";
+
 const dataSources = {
   postgresql: PostgreSQLDataSource,
   restapi: RestAPIDataSource,
@@ -62,6 +65,9 @@ const dataSources = {
   notion: NotionDataSource,
   jira: JiraDataSource,
   googleanalytics: GoogleAnalyticsDataSource,
+  
+  // Listeners
+  syslog: SyslogDataSource,
 };
 
 export default {

@@ -12,7 +12,6 @@ import {
   ResizablePanelGroup,
 } from "../ui/resizable";
 import { formValidations } from "../../../utils/formValidation";
-import { DataQueryAIGeneratePrompt } from "./dataQueryAIGeneratePrompt";
 import PropTypes from "prop-types";
 import { DataQueryEditor } from "./dataQueryEditor";
 import { DATASOURCE_UI_COMPONENTS } from "@jet-admin/datasources-ui";
@@ -63,8 +62,8 @@ export const DataQueryAdditionForm = ({ tenantID }) => {
   });
 
   return (
-    <div className="flex h-full w-full flex-col items-center bg-background">
-      <div className="w-full flex items-center justify-between border-b border-border bg-background px-4 py-3">
+    <div className="flex h-full w-full flex-col items-center bg-brand-dark">
+      <div className="w-full flex items-center justify-between border-b border-border bg-brand-dark px-4 py-3">
         <div>
           <h1 className="text-base font-semibold tracking-tight text-foreground">
             {CONSTANTS.STRINGS.ADD_QUERY_FORM_TITLE}
@@ -88,7 +87,7 @@ export const DataQueryAdditionForm = ({ tenantID }) => {
               onSubmit={queryAdditionForm.handleSubmit}
               noValidate
             >
-              <div className="rounded border border-border bg-card p-4 space-y-3">
+              <div className="rounded-sm border border-border bg-card p-4 space-y-3">
                 <p className="text-[10px] font-mono font-semibold uppercase tracking-widest text-muted-foreground mb-0.5">
                   General
                 </p>
@@ -115,18 +114,9 @@ export const DataQueryAdditionForm = ({ tenantID }) => {
                 </div>
               </div>
 
-              <DataQueryEditor dataQueryEditorForm={queryAdditionForm} />
+              <DataQueryEditor dataQueryEditorForm={queryAdditionForm} tenantID={tenantID} />
 
               <div className="w-full flex justify-end items-center gap-2 mt-4">
-                <DataQueryAIGeneratePrompt
-                  tenantID={tenantID}
-                  onAccepted={(aiGeneratedQuery) => {
-                    queryAdditionForm.setFieldValue(
-                      "dataQueryOptions",
-                      aiGeneratedQuery
-                    );
-                  }}
-                />
                 <DataQueryTestingForm
                   tenantID={tenantID}
                   datasourceID={queryAdditionForm.values.datasourceID}
@@ -135,7 +125,7 @@ export const DataQueryAdditionForm = ({ tenantID }) => {
                   setDataQueryTestResult={setDataQueryTestResult}
                   dataQuery={queryAdditionForm.values}
                 />
-                <Button type="submit" size="sm" disabled={isAddingDataQuery}>
+                <Button type="submit" disabled={isAddingDataQuery}>
                   {isAddingDataQuery && (
                     <Spinner size={14} />
                   )}
@@ -147,9 +137,9 @@ export const DataQueryAdditionForm = ({ tenantID }) => {
         </ResizablePanel>
         <ResizableHandle withHandle={true} />
         <ResizablePanel defaultSize={80}>
-          <div className="flex h-full w-full flex-col overflow-hidden bg-background">
-            <div className="flex items-center justify-between border-b border-border bg-slate-50 px-4 py-2 flex-shrink-0">
-              <span className="text-xs font-semibold text-slate-700">
+          <div className="flex h-full w-full flex-col overflow-hidden bg-brand-dark">
+            <div className="flex items-center justify-between border-b border-border bg-brand-dark px-4 py-2 flex-shrink-0">
+              <span className="text-xs font-semibold text-brand-text-primary">
                 Query Test Result
               </span>
 

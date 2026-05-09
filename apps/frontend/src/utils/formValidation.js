@@ -28,13 +28,11 @@ formValidations.emailSignInFormValidationSchema = Yup.object().shape({
 
 formValidations.addTenantFormValidationSchema = Yup.object().shape({
   tenantTitle: Yup.string().required("Tenant name is required").trim(),
-  tenantDBURL: Yup.string("Must be a valid URL"),
 });
 
 formValidations.updateTenantFormValidationSchema = Yup.object().shape({
   tenantID: Yup.string().required("Tenant ID is required"),
   tenantTitle: Yup.string().required("Tenant name is required").trim(),
-  tenantDBURL: Yup.string("Must be a valid URL"),
 });
 
 formValidations.addUserToTenantFormValidationSchema = Yup.object().shape({
@@ -55,13 +53,6 @@ formValidations.updateTenantRoleFormValidationSchema = Yup.object().shape({
   roleTitle: Yup.string().required("Role name is required").trim(),
   roleDescription: Yup.string().required("Role description is required").trim(),
   permissionIDs: Yup.array().of(Yup.string()),
-});
-
-formValidations.addSchemaFormValidationSchema = Yup.object().shape({
-  databaseSchemaName: Yup.string()
-    .required("Schema name is required")
-    .trim() // Removes leading/trailing whitespace
-    .min(1, "Schema name cannot be empty"),
 });
 
 formValidations.addDashboardFormValidationSchema = Yup.object().shape({
@@ -252,99 +243,14 @@ formValidations.datasetAdvancedOptionsFormValidationSchema = Yup.object().shape(
   }
 );
 
-formValidations.tableAdditionFormValidationSchema = Yup.object().shape({
-  databaseTableName: Yup.string().required("Table name is required"),
-  databaseTableColumns: Yup.array().of(
-    Yup.object().shape({
-      databaseTableColumnName: Yup.string().required("Column name is required"),
-      databaseTableColumnType: Yup.string().required("Data type is required"),
-    })
-  ),
-  databaseTableConstraints: Yup.object().shape({
-    foreignKeys: Yup.array().of(
-      Yup.object().shape({
-        referencedTable: Yup.string().required("Reference table is required"),
-        referencedColumns: Yup.array().min(
-          1,
-          "At least one reference column required"
-        ),
-      })
-    ),
-  }),
-});
-
-formValidations.tableUpdationFormValidationSchema = Yup.object().shape({
-  databaseTableName: Yup.string().required("Table name is required"),
-  databaseTableColumns: Yup.array().of(
-    Yup.object().shape({
-      databaseTableColumnName: Yup.string().required("Column name is required"),
-      databaseTableColumnType: Yup.string().required("Data type is required"),
-    })
-  ),
-  databaseTableConstraints: Yup.object().shape({
-    foreignKeys: Yup.array().of(
-      Yup.object().shape({
-        referencedTable: Yup.string().required("Reference table is required"),
-        referencedColumns: Yup.array().min(
-          1,
-          "At least one reference column required"
-        ),
-      })
-    ),
-  }),
-});
-
-formValidations.triggerAdditionFormValidationSchema = Yup.object().shape({
-  databaseTriggerName: Yup.string().required("Trigger name is required"),
-  databaseTableName: Yup.string().required("Table name is required"),
-  triggerFunctionName: Yup.string().required("Function name is required"),
-  triggerEvents: Yup.array()
-    .min(1, "At least one event must be selected")
-    .required("Trigger events are required"),
-  triggerTiming: Yup.string().required("Trigger timing is required"),
-  forEach: Yup.string().required("For each option is required"),
-});
-
 formValidations.addWidgetFormValidationSchema = Yup.object().shape({
   widgetTitle: Yup.string().required("Widget name is required"),
   widgetType: Yup.string().required("Widget type is required"),
-  dataSourceMode: Yup.string().default("query"),
-  dataQueries: Yup.array().when("dataSourceMode", {
-    is: (val) => val === "query" || !val,
-    then: () => Yup.array().of(
-      Yup.object().shape({
-        dataQueryID: Yup.string().required("Query is required"),
-        title: Yup.string()
-          .required("Alias is required")
-          .test("unique-alias", "Alias must be unique", function (value) {
-            const aliases = this.parent.parent ? this.parent.parent.map((q) => q.title) : [];
-            return aliases.filter((a) => a === value).length <= 1;
-          }),
-      })
-    ).min(1, "At least 1 query required"),
-    otherwise: () => Yup.array().optional(),
-  }),
-  workflowSource: Yup.object().when("dataSourceMode", {
-    is: "workflow",
-    then: () => Yup.object().shape({
-      workflowID: Yup.string().required("Workflow is required"),
-    }).required("Workflow is required"),
-    otherwise: () => Yup.object().nullable().optional(),
-  }),
 });
 
 formValidations.updateWidgetFormValidationSchema = Yup.object().shape({
   widgetTitle: Yup.string().required("Widget name is required"),
   widgetType: Yup.string().required("Widget type is required"),
-  dataSourceMode: Yup.string().default("query"),
-
-  workflowSource: Yup.object().when("dataSourceMode", {
-    is: "workflow",
-    then: () => Yup.object().shape({
-      workflowID: Yup.string().required("Workflow is required"),
-    }).required("Workflow is required"),
-    otherwise: () => Yup.object().nullable().optional(),
-  }),
 });
 
 formValidations.datasourceAdditionFormValidationSchema = Yup.object().shape({

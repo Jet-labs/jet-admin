@@ -29,26 +29,8 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 // src/index.js
 var index_exports = {};
 __export(index_exports, {
-  CONNECTOR_MANIFESTS: () => CONNECTOR_MANIFESTS,
-  Connector: () => Connector,
-  ConnectorInstancePool: () => ConnectorInstancePool,
-  ConnectorMode: () => ConnectorMode,
-  ConnectorRegistry: () => ConnectorRegistry,
   DATASOURCE_LOGIC_COMPONENTS: () => DATASOURCE_LOGIC_COMPONENTS,
-  DeadLetterQueue: () => DeadLetterQueue,
-  EventBus: () => EventBus,
-  LifecycleManager: () => LifecycleManager,
-  bootstrapConnectorRegistry: () => bootstrapConnectorRegistry,
-  connectorInstancePool: () => connectorInstancePool,
-  connectorRegistry: () => connectorRegistry,
-  createConnectorEvent: () => createConnectorEvent,
-  createConnectorFromDataSource: () => createConnectorFromDataSource,
-  createConnectorHandle: () => createConnectorHandle,
-  dataSourceRegistry: () => data_sources_default,
-  deadLetterQueue: () => deadLetterQueue,
-  eventBus: () => eventBus,
-  isBootstrapped: () => isBootstrapped,
-  lifecycleManager: () => lifecycleManager
+  dataSourceRegistry: () => data_sources_default
 });
 module.exports = __toCommonJS(index_exports);
 var import_datasource_types = require("@jet-admin/datasource-types");
@@ -318,16 +300,22 @@ var DataSource = class {
   async execute(query, context) {
     throw new Error("execute() method must be implemented");
   }
+  async subscribe(config, onEvent) {
+    throw new Error("subscribe() not supported by this datasource type");
+  }
+  async unsubscribe(handle) {
+    throw new Error("unsubscribe() not supported by this datasource type");
+  }
 };
 
 // src/data-sources/postgresql/datasource.js
 var PostgreSQLDataSource = class extends DataSource {
-  async execute(dataQueryOptions, context) {
+  async execute(dataQueryOptions2, context) {
     Logger.log("info", {
       message: "postgresql:PostgreSQLDataSource:execute:params",
-      params: { dataQueryOptions, config: this.config }
+      params: { dataQueryOptions: dataQueryOptions2, config: this.config }
     });
-    const { query } = dataQueryOptions;
+    const { query } = dataQueryOptions2;
     const client = new import_pg2.Client({
       connectionString: this.config.datasourceOptions?.connectionString,
       ...this.config.datasourceOptions?.connectionData
@@ -350,12 +338,67 @@ var PostgreSQLDataSource = class extends DataSource {
       await client.end();
     }
   }
+  async subscribe(config, onEvent) {
+    const channels = (config.channels || "").split(",").map((c) => c.trim()).filter(Boolean);
+    if (!channels.length) {
+      throw new Error("No channels specified for PostgreSQL listener");
+    }
+    Logger.log("info", {
+      message: "postgresql:subscribe:start",
+      params: { channels, datasourceID: this.config.datasourceID }
+    });
+    const client = new import_pg2.Client({
+      connectionString: this.config.datasourceOptions?.connectionString,
+      ...this.config.datasourceOptions?.connectionData
+    });
+    await client.connect();
+    client.on("notification", (msg) => {
+      let payload = msg.payload;
+      if (payload) {
+        try {
+          payload = JSON.parse(msg.payload);
+        } catch {
+        }
+      }
+      onEvent({
+        channel: msg.channel,
+        payload
+      });
+    });
+    for (const channel of channels) {
+      const escapedChannel = channel.replace(/"/g, '""');
+      await client.query(`LISTEN "${escapedChannel}"`);
+    }
+    return { client, channels };
+  }
+  async unsubscribe(handle) {
+    if (!handle || !handle.client) return;
+    Logger.log("info", {
+      message: "postgresql:unsubscribe",
+      params: { datasourceID: this.config.datasourceID }
+    });
+    try {
+      for (const channel of handle.channels || []) {
+        try {
+          const escapedChannel = channel.replace(/"/g, '""');
+          await handle.client.query(`UNLISTEN "${escapedChannel}"`);
+        } catch (e) {
+        }
+      }
+      await handle.client.end();
+    } catch (e) {
+      Logger.log("error", {
+        message: "postgresql:unsubscribe:error",
+        params: { error: e.message }
+      });
+    }
+  }
 };
 
 // src/data-sources/restapi/datasource.js
 var import_axios = __toESM(require("axios"));
 var RestAPIDataSource = class extends DataSource {
-  async execute(dataQueryOptions, context) {
+  async execute(dataQueryOptions2, context) {
     const {
       method,
       apiEndpoint,
@@ -363,11 +406,11 @@ var RestAPIDataSource = class extends DataSource {
       body: queryBody,
       queryParams = [],
       contentType: queryContentType
-    } = dataQueryOptions;
+    } = dataQueryOptions2;
     Logger.log("info", {
       message: "restapi:RestAPIDataSource:execute:rawOptions",
       params: {
-        dataQueryOptions
+        dataQueryOptions: dataQueryOptions2
       }
     });
     const datasourceOptions = this.config.datasourceOptions || {};
@@ -466,12 +509,12 @@ var RestAPIDataSource = class extends DataSource {
 // src/data-sources/weburl/datasource.js
 var import_node_fetch2 = __toESM(require("node-fetch"));
 var WebURLDataSource = class extends DataSource {
-  async execute(dataQueryOptions, context) {
+  async execute(dataQueryOptions2, context) {
     Logger.log("info", {
       message: "weburl:WebURLDataSource:execute:params",
-      params: { dataQueryOptions, config: this.config }
+      params: { dataQueryOptions: dataQueryOptions2, config: this.config }
     });
-    const { action, args } = dataQueryOptions;
+    const { action, args } = dataQueryOptions2;
     const { url, timeout } = this.config.datasourceOptions;
     try {
       const opts = {
@@ -542,12 +585,12 @@ var FirestoreDataSource = class extends DataSource {
     this.db = (0, import_firestore.getFirestore)(this.app);
     return this.db;
   }
-  async execute(dataQueryOptions, context) {
+  async execute(dataQueryOptions2, context) {
     Logger.log("info", {
       message: "firestore:FirestoreDataSource:execute:params",
-      params: { dataQueryOptions, datasourceID: this.config.datasourceID }
+      params: { dataQueryOptions: dataQueryOptions2, datasourceID: this.config.datasourceID }
     });
-    const { operation, collectionPath, documentId, data, where, orderBy, limit } = dataQueryOptions;
+    const { operation, collectionPath, documentId, data, where, orderBy, limit } = dataQueryOptions2;
     try {
       const db = await this.getFirestoreDb();
       let result;
@@ -637,17 +680,78 @@ var FirestoreDataSource = class extends DataSource {
       return value;
     }
   }
+  async subscribe(config, onEvent) {
+    const { collection, documentId } = config;
+    if (!collection) {
+      throw new Error("Collection is required for Firestore listener");
+    }
+    Logger.log("info", {
+      message: "firestore:subscribe:start",
+      params: { collection, documentId, datasourceID: this.config.datasourceID }
+    });
+    const db = await this.getFirestoreDb();
+    let target;
+    if (documentId) {
+      target = db.collection(collection).doc(documentId);
+    } else {
+      target = db.collection(collection);
+    }
+    const unsubscribeFn = target.onSnapshot(
+      (snapshot) => {
+        if (documentId) {
+          onEvent({
+            collection,
+            documentId,
+            exists: snapshot.exists,
+            payload: snapshot.data() || null
+          });
+        } else {
+          snapshot.docChanges().forEach((change) => {
+            onEvent({
+              collection,
+              documentId: change.doc.id,
+              type: change.type,
+              // 'added', 'modified', 'removed'
+              payload: change.doc.data()
+            });
+          });
+        }
+      },
+      (error) => {
+        Logger.log("error", {
+          message: "firestore:subscribe:error",
+          params: { error: error.message }
+        });
+      }
+    );
+    return { unsubscribeFn };
+  }
+  async unsubscribe(handle) {
+    if (!handle || !handle.unsubscribeFn) return;
+    Logger.log("info", {
+      message: "firestore:unsubscribe",
+      params: { datasourceID: this.config.datasourceID }
+    });
+    try {
+      handle.unsubscribeFn();
+    } catch (e) {
+      Logger.log("error", {
+        message: "firestore:unsubscribe:error",
+        params: { error: e.message }
+      });
+    }
+  }
 };
 
 // src/data-sources/mysql/datasource.js
 var import_promise = __toESM(require("mysql2/promise"));
 var MySQLDataSource = class extends DataSource {
-  async execute(dataQueryOptions, context) {
+  async execute(dataQueryOptions2, context) {
     Logger.log("info", {
       message: "mysql:MySQLDataSource:execute:params",
-      params: { dataQueryOptions, config: this.config }
+      params: { dataQueryOptions: dataQueryOptions2, config: this.config }
     });
-    const { query } = dataQueryOptions;
+    const { query } = dataQueryOptions2;
     const datasourceOptions = this.config.datasourceOptions || {};
     let connectionConfig;
     if (datasourceOptions.connectionString) {
@@ -693,13 +797,13 @@ var MySQLDataSource = class extends DataSource {
 // src/data-sources/mongodb/datasource.js
 var import_mongodb = require("mongodb");
 var MongoDBDataSource = class extends DataSource {
-  async execute(dataQueryOptions, context) {
+  async execute(dataQueryOptions2, context) {
     Logger.log("info", {
       message: "mongodb:MongoDBDataSource:execute:params",
-      params: { dataQueryOptions, datasourceID: this.config.datasourceID }
+      params: { dataQueryOptions: dataQueryOptions2, datasourceID: this.config.datasourceID }
     });
     const datasourceOptions = this.config.datasourceOptions || {};
-    const { operation, collection, filter, projection, sort, limit, skip, document, pipeline, options } = dataQueryOptions;
+    const { operation, collection, filter, projection, sort, limit, skip, document, pipeline, options } = dataQueryOptions2;
     let connectionString;
     let dbName;
     if (datasourceOptions.connectionString) {
@@ -862,6 +966,82 @@ var MongoDBDataSource = class extends DataSource {
     const count = await col.countDocuments(this.parseJSON(filter));
     return { count };
   }
+  async subscribe(config, onEvent) {
+    const datasourceOptions = this.config.datasourceOptions || {};
+    let connectionString;
+    let dbName;
+    if (datasourceOptions.connectionString) {
+      connectionString = datasourceOptions.connectionString;
+      const urlMatch = connectionString.match(/\/([^/?]+)(\?|$)/);
+      dbName = urlMatch ? urlMatch[1] : "test";
+    } else {
+      const details = datasourceOptions.connectionDetails || datasourceOptions;
+      const { host, port, database, username, password, authSource, ssl, replicaSet } = details;
+      dbName = database || datasourceOptions.database;
+      let authPart = "";
+      if (username && password) {
+        authPart = `${encodeURIComponent(username)}:${encodeURIComponent(password)}@`;
+      }
+      const params = new URLSearchParams();
+      if (authSource) params.append("authSource", authSource);
+      if (ssl) params.append("ssl", "true");
+      if (replicaSet) params.append("replicaSet", replicaSet);
+      const queryString = params.toString() ? `?${params.toString()}` : "";
+      connectionString = `mongodb://${authPart}${host || "localhost"}:${port || 27017}/${dbName}${queryString}`;
+    }
+    const collectionName = config.collection;
+    const operationTypes = config.operationTypes || [];
+    Logger.log("info", {
+      message: "mongodb:subscribe:start",
+      params: { collectionName, operationTypes, datasourceID: this.config.datasourceID }
+    });
+    const client = new import_mongodb.MongoClient(connectionString);
+    await client.connect();
+    const db = client.db(dbName);
+    const target = collectionName ? db.collection(collectionName) : db;
+    let pipeline = [];
+    if (operationTypes.length > 0) {
+      pipeline.push({ $match: { operationType: { $in: operationTypes } } });
+    }
+    const changeStream = target.watch(pipeline);
+    changeStream.on("change", (next) => {
+      onEvent({
+        operationType: next.operationType,
+        collection: next.ns?.coll,
+        documentKey: next.documentKey,
+        fullDocument: next.fullDocument,
+        updateDescription: next.updateDescription,
+        payload: next
+      });
+    });
+    changeStream.on("error", (error) => {
+      Logger.log("error", {
+        message: "mongodb:subscribe:changeStreamError",
+        params: { error: error.message }
+      });
+    });
+    return { client, changeStream };
+  }
+  async unsubscribe(handle) {
+    if (!handle) return;
+    Logger.log("info", {
+      message: "mongodb:unsubscribe",
+      params: { datasourceID: this.config.datasourceID }
+    });
+    try {
+      if (handle.changeStream) {
+        await handle.changeStream.close();
+      }
+      if (handle.client) {
+        await handle.client.close();
+      }
+    } catch (e) {
+      Logger.log("error", {
+        message: "mongodb:unsubscribe:error",
+        params: { error: e.message }
+      });
+    }
+  }
 };
 
 // src/data-sources/googlesheets/datasource.js
@@ -898,10 +1078,10 @@ var GoogleSheetsDataSource = class extends DataSource {
     this.sheets = import_googleapis.google.sheets({ version: "v4", auth });
     return this.sheets;
   }
-  async execute(dataQueryOptions, context) {
+  async execute(dataQueryOptions2, context) {
     Logger.log("info", {
       message: "googlesheets:GoogleSheetsDataSource:execute:params",
-      params: { dataQueryOptions, datasourceID: this.config.datasourceID }
+      params: { dataQueryOptions: dataQueryOptions2, datasourceID: this.config.datasourceID }
     });
     const {
       operation,
@@ -913,7 +1093,7 @@ var GoogleSheetsDataSource = class extends DataSource {
       insertDataOption,
       majorDimension,
       includeHeaders
-    } = dataQueryOptions;
+    } = dataQueryOptions2;
     const datasourceOptions = this.config.datasourceOptions || {};
     const finalSpreadsheetId = spreadsheetId || datasourceOptions.defaultSpreadsheetId;
     if (!finalSpreadsheetId) {
@@ -1056,13 +1236,15 @@ var GoogleSheetsDataSource = class extends DataSource {
 
 // src/data-sources/graphql/datasource.js
 var import_axios2 = __toESM(require("axios"));
+var import_graphql_ws = require("graphql-ws");
+var import_ws = __toESM(require("ws"));
 var GraphQLDataSource = class extends DataSource {
-  async execute(dataQueryOptions, context) {
+  async execute(dataQueryOptions2, context) {
     Logger.log("info", {
       message: "graphql:GraphQLDataSource:execute:params",
-      params: { dataQueryOptions, datasourceID: this.config.datasourceID }
+      params: { dataQueryOptions: dataQueryOptions2, datasourceID: this.config.datasourceID }
     });
-    const { query, variables, operationName } = dataQueryOptions;
+    const { query, variables, operationName } = dataQueryOptions2;
     const datasourceOptions = this.config.datasourceOptions || {};
     const {
       endpoint,
@@ -1172,6 +1354,98 @@ var GraphQLDataSource = class extends DataSource {
     `;
     return await this.execute({ query: introspectionQuery });
   }
+  async subscribe(config, onEvent) {
+    const datasourceOptions = this.config.datasourceOptions || {};
+    const endpoint = datasourceOptions.endpoint;
+    if (!endpoint) {
+      throw new Error("GraphQL endpoint is required for subscriptions");
+    }
+    let wsEndpoint = endpoint.replace(/^http/, "ws");
+    if (datasourceOptions.wsEndpoint) {
+      wsEndpoint = datasourceOptions.wsEndpoint;
+    }
+    const { subscription, variables } = config;
+    if (!subscription) {
+      throw new Error("GraphQL subscription query is required");
+    }
+    Logger.log("info", {
+      message: "graphql:subscribe:start",
+      params: { wsEndpoint, datasourceID: this.config.datasourceID }
+    });
+    let parsedVariables = {};
+    if (variables) {
+      try {
+        parsedVariables = typeof variables === "string" ? JSON.parse(variables) : variables;
+      } catch (e) {
+        Logger.log("warn", {
+          message: "graphql:subscribe:variableParseError",
+          params: { error: e.message }
+        });
+      }
+    }
+    const connectionParams = {};
+    if (datasourceOptions.authType === "bearer" && datasourceOptions.bearerToken) {
+      connectionParams.Authorization = `Bearer ${datasourceOptions.bearerToken}`;
+    } else if (datasourceOptions.authType === "apiKey" && datasourceOptions.apiKey?.value) {
+      connectionParams[datasourceOptions.apiKey.headerName || "x-api-key"] = datasourceOptions.apiKey.value;
+    }
+    if (datasourceOptions.headers && Array.isArray(datasourceOptions.headers)) {
+      datasourceOptions.headers.forEach((header) => {
+        if (header.key && header.value) {
+          connectionParams[header.key] = header.value;
+        }
+      });
+    }
+    const client = (0, import_graphql_ws.createClient)({
+      url: wsEndpoint,
+      webSocketImpl: import_ws.default,
+      connectionParams: Object.keys(connectionParams).length > 0 ? connectionParams : void 0
+    });
+    const unsubscribeFn = client.subscribe(
+      {
+        query: subscription,
+        variables: parsedVariables
+      },
+      {
+        next: (data) => {
+          onEvent({ payload: data.data || data });
+        },
+        error: (error) => {
+          Logger.log("error", {
+            message: "graphql:subscribe:error",
+            params: { error }
+          });
+        },
+        complete: () => {
+          Logger.log("info", {
+            message: "graphql:subscribe:complete",
+            params: { datasourceID: this.config.datasourceID }
+          });
+        }
+      }
+    );
+    return { client, unsubscribeFn };
+  }
+  async unsubscribe(handle) {
+    if (!handle) return;
+    Logger.log("info", {
+      message: "graphql:unsubscribe",
+      params: { datasourceID: this.config.datasourceID }
+    });
+    try {
+      if (handle.unsubscribeFn) {
+        handle.unsubscribeFn();
+      }
+      if (handle.client) {
+        await handle.client.dispose();
+      }
+    } catch (e) {
+      Logger.log("error", {
+        message: "graphql:unsubscribe:error",
+        params: { error: e.message }
+      });
+    }
+  }
 };
 
 // src/data-sources/rabbitmq/datasource.js
@@ -1189,10 +1463,10 @@ var RabbitMQDataSource = class extends DataSource {
     const heartbeat = details.heartbeat ? `?heartbeat=${details.heartbeat}` : "";
     return `${protocol}://${auth}${details.host || "localhost"}:${details.port || 5672}/${vhost}${heartbeat}`;
   }
-  async execute(dataQueryOptions, context) {
+  async execute(dataQueryOptions2, context) {
     Logger.log("info", {
       message: "rabbitmq:RabbitMQDataSource:execute:params",
-      params: { dataQueryOptions, datasourceID: this.config.datasourceID }
+      params: { dataQueryOptions: dataQueryOptions2, datasourceID: this.config.datasourceID }
     });
     const {
       operation,
@@ -1205,12 +1479,18 @@ var RabbitMQDataSource = class extends DataSource {
       storeDestination,
       queueOptions = {},
       messageOptions = {}
-    } = dataQueryOptions;
+    } = dataQueryOptions2;
     let connection;
     let channel;
     try {
       connection = await import_amqplib.default.connect(this.buildConnectionUrl());
+      connection.on("error", (err) => {
+        Logger.log("error", { message: "rabbitmq:connection:error", params: { error: err.message, datasourceID: this.config.datasourceID } });
+      });
       channel = await connection.createChannel();
+      channel.on("error", (err) => {
+        Logger.log("error", { message: "rabbitmq:channel:error", params: { error: err.message, datasourceID: this.config.datasourceID } });
+      });
       let result;
       switch (operation) {
         case "publish":
@@ -1263,7 +1543,8 @@ var RabbitMQDataSource = class extends DataSource {
       ...messageOptions.expiration ? { expiration: messageOptions.expiration } : {}
     };
     if (exchange) {
-      await channel.assertExchange(exchange, "direct", { durable: true });
+      const exchangeType = dataQueryOptions.exchangeType || "direct";
+      await channel.assertExchange(exchange, exchangeType, { durable: true });
       channel.publish(exchange, routingKey || queue, buffer, options);
     } else {
       await channel.assertQueue(queue, {
@@ -1334,6 +1615,73 @@ var RabbitMQDataSource = class extends DataSource {
     const result = await channel.deleteQueue(queue);
     return { success: true, messageCount: result.messageCount, queue };
   }
+  async subscribe(config, onEvent) {
+    const exchange = config.exchange;
+    const routingKey = config.routingKey || "#";
+    const queueName = config.queue || "";
+    const prefetch = config.prefetch || 10;
+    if (!exchange) {
+      throw new Error("Exchange is required for RabbitMQ listener");
+    }
+    Logger.log("info", {
+      message: "rabbitmq:subscribe:start",
+      params: { exchange, routingKey, queueName, datasourceID: this.config.datasourceID }
+    });
+    const connection = await import_amqplib.default.connect(this.buildConnectionUrl());
+    connection.on("error", (err) => {
+      Logger.log("error", { message: "rabbitmq:connection:error", params: { error: err.message, datasourceID: this.config.datasourceID } });
+    });
+    const channel = await connection.createChannel();
+    channel.on("error", (err) => {
+      Logger.log("error", { message: "rabbitmq:channel:error", params: { error: err.message, datasourceID: this.config.datasourceID } });
+    });
+    await channel.prefetch(prefetch);
+    const exchangeType = config.exchangeType || "topic";
+    await channel.assertExchange(exchange, exchangeType, { durable: true });
+    const q = await channel.assertQueue(queueName, {
+      exclusive: !queueName
+      // if no queue name provided, it's exclusive to this connection
+    });
+    await channel.bindQueue(q.queue, exchange, routingKey);
+    const { consumerTag } = await channel.consume(q.queue, (msg) => {
+      if (msg !== null) {
+        let content;
+        try {
+          content = JSON.parse(msg.content.toString());
+        } catch {
+          content = msg.content.toString();
+        }
+        onEvent({
+          exchange,
+          routingKey: msg.fields.routingKey,
+          payload: content
+        });
+        channel.ack(msg);
+      }
+    });
+    return { connection, channel, consumerTag };
+  }
+  async unsubscribe(handle) {
+    if (!handle) return;
+    Logger.log("info", {
+      message: "rabbitmq:unsubscribe",
+      params: { datasourceID: this.config.datasourceID }
+    });
+    try {
+      if (handle.channel) {
+        await handle.channel.cancel(handle.consumerTag);
+        await handle.channel.close();
+      }
+      if (handle.connection) {
+        await handle.connection.close();
+      }
+    } catch (e) {
+      Logger.log("error", {
+        message: "rabbitmq:unsubscribe:error",
+        params: { error: e.message }
+      });
+    }
+  }
 };
 
 // src/data-sources/kafka/datasource.js
@@ -1361,10 +1709,10 @@ var KafkaDataSource = class extends DataSource {
     }
     return new import_kafkajs.Kafka(config);
   }
-  async execute(dataQueryOptions, context) {
+  async execute(dataQueryOptions2, context) {
     Logger.log("info", {
       message: "kafka:KafkaDataSource:execute:params",
-      params: { dataQueryOptions, datasourceID: this.config.datasourceID }
+      params: { dataQueryOptions: dataQueryOptions2, datasourceID: this.config.datasourceID }
     });
     const {
       operation,
@@ -1378,7 +1726,7 @@ var KafkaDataSource = class extends DataSource {
       consumeMode = "preview",
       storeDestination,
       topicConfig
-    } = dataQueryOptions;
+    } = dataQueryOptions2;
     const kafka = this.getKafkaClient();
     try {
       let result;
@@ -1544,6 +1892,45 @@ var KafkaDataSource = class extends DataSource {
       await admin.disconnect();
     }
   }
+  async subscribe(config, onEvent) {
+    const { topic, consumerGroup, fromBeginning = false } = config;
+    const kafka = this.getKafkaClient();
+    const consumer = kafka.consumer({ groupId: consumerGroup || `jet-admin-sub-${Date.now()}` });
+    await consumer.connect();
+    await consumer.subscribe({ topic, fromBeginning });
+    consumer.run({
+      eachMessage: async ({ topic: topic2, partition, message }) => {
+        let payload;
+        const msgStr = message.value?.toString();
+        try {
+          payload = JSON.parse(msgStr);
+        } catch {
+          payload = msgStr;
+        }
+        const event = {
+          topic: topic2,
+          partition,
+          key: message.key?.toString(),
+          payload,
+          timestamp: message.timestamp
+        };
+        if (onEvent) {
+          await onEvent(event);
+        }
+      }
+    }).catch((err) => {
+      Logger.log("error", {
+        message: "kafka:KafkaDataSource:subscribe:runError",
+        params: { topic, consumerGroup, error: err.message }
+      });
+    });
+    return consumer;
+  }
+  async unsubscribe(consumer) {
+    if (consumer) {
+      await consumer.disconnect();
+    }
+  }
 };
 
 // src/data-sources/redis/datasource.js
@@ -1571,17 +1958,17 @@ var RedisDataSource = class extends DataSource {
       tls: details.tls ? {} : void 0
     });
   }
-  async execute(dataQueryOptions, context) {
+  async execute(dataQueryOptions2, context) {
     Logger.log("info", {
       message: "redis:RedisDataSource:execute:params",
-      params: { dataQueryOptions, datasourceID: this.config.datasourceID }
+      params: { dataQueryOptions: dataQueryOptions2, datasourceID: this.config.datasourceID }
     });
     const redis = this.getRedisClient();
     try {
-      const result = await this.executeOperation(redis, dataQueryOptions, context);
+      const result = await this.executeOperation(redis, dataQueryOptions2, context);
       Logger.log("info", {
         message: "redis:RedisDataSource:execute:success",
-        params: { operation: dataQueryOptions.operation }
+        params: { operation: dataQueryOptions2.operation }
       });
       return result;
     } catch (error) {
@@ -1589,7 +1976,7 @@ var RedisDataSource = class extends DataSource {
         message: "redis:RedisDataSource:execute:catch",
         params: { error: error.message }
       });
-      throw new Error(`Redis ${dataQueryOptions.operation} failed: ${error.message}`);
+      throw new Error(`Redis ${dataQueryOptions2.operation} failed: ${error.message}`);
     } finally {
       redis.disconnect();
     }
@@ -1766,17 +2153,121 @@ var RedisDataSource = class extends DataSource {
         throw new Error(`Unknown operation: ${operation}`);
     }
   }
+  async subscribe(config, onEvent) {
+    const redis = this.getRedisClient();
+    const subType = config.subscriptionType || "pubsub";
+    Logger.log("info", {
+      message: "redis:subscribe:start",
+      params: { subType, datasourceID: this.config.datasourceID }
+    });
+    if (subType === "pubsub") {
+      const channels = (config.channels || "").split(",").map((c) => c.trim()).filter(Boolean);
+      if (!channels.length) {
+        redis.disconnect();
+        throw new Error("No channels specified for Redis pubsub listener");
+      }
+      await redis.subscribe(...channels);
+      redis.on("message", (channel, message) => {
+        let parsed = message;
+        try {
+          parsed = JSON.parse(message);
+        } catch {
+        }
+        onEvent({ channel, payload: parsed });
+      });
+      return { type: "pubsub", client: redis };
+    } else if (subType === "stream") {
+      const stream = config.stream;
+      const group = config.consumerGroup;
+      const consumer = config.consumerName || "jet-listener-1";
+      if (!stream || !group) {
+        redis.disconnect();
+        throw new Error("Stream and consumerGroup required for Redis stream listener");
+      }
+      try {
+        await redis.xgroup("CREATE", stream, group, "$", "MKSTREAM");
+      } catch (e) {
+        if (!e.message.includes("BUSYGROUP")) {
+          redis.disconnect();
+          throw e;
+        }
+      }
+      let isRunning = true;
+      const poll = async () => {
+        while (isRunning) {
+          try {
+            const result = await redis.xreadgroup(
+              "GROUP",
+              group,
+              consumer,
+              "BLOCK",
+              5e3,
+              "COUNT",
+              10,
+              "STREAMS",
+              stream,
+              ">"
+            );
+            if (result && result.length > 0) {
+              const messages = result[0][1];
+              for (const [id, fields] of messages) {
+                const data = {};
+                for (let i = 0; i < fields.length; i += 2) {
+                  let val = fields[i + 1];
+                  try {
+                    val = JSON.parse(val);
+                  } catch {
+                  }
+                  data[fields[i]] = val;
+                }
+                onEvent({ stream, id, payload: data });
+                await redis.xack(stream, group, id);
+              }
+            }
+          } catch (e) {
+            if (isRunning) {
+              Logger.log("error", {
+                message: "redis:stream:poll:error",
+                params: { error: e.message }
+              });
+              await new Promise((r) => setTimeout(r, 5e3));
+            }
+          }
+        }
+      };
+      poll();
+      return { type: "stream", client: redis, stop: () => {
+        isRunning = false;
+      } };
+    }
+    redis.disconnect();
+    throw new Error(`Unknown Redis subscription type: ${subType}`);
+  }
+  async unsubscribe(handle) {
+    if (!handle) return;
+    Logger.log("info", {
+      message: "redis:unsubscribe",
+      params: { type: handle.type, datasourceID: this.config.datasourceID }
+    });
+    if (handle.type === "pubsub") {
+      await handle.client.unsubscribe();
+      handle.client.disconnect();
+    } else if (handle.type === "stream") {
+      handle.stop();
+      handle.client.disconnect();
+    }
+  }
 };
 
 // src/data-sources/mssql/datasource.js
 var import_mssql = __toESM(require("mssql"));
 var MSSQLDataSource = class extends DataSource {
-  async execute(dataQueryOptions, context) {
+  async execute(dataQueryOptions2, context) {
     Logger.log("info", {
       message: "mssql:MSSQLDataSource:execute:params",
-      params: { dataQueryOptions, config: this.config }
+      params: { dataQueryOptions: dataQueryOptions2, config: this.config }
     });
-    const { query } = dataQueryOptions;
+    const { query } = dataQueryOptions2;
     const datasourceOptions = this.config.datasourceOptions;
     let config;
     if (datasourceOptions?.connectionString) {
@@ -1820,10 +2311,10 @@ var MSSQLDataSource = class extends DataSource {
 // src/data-sources/supabase/datasource.js
 var import_supabase_js = require("@supabase/supabase-js");
 var SupabaseDataSource = class extends DataSource {
-  async execute(dataQueryOptions, context) {
+  async execute(dataQueryOptions2, context) {
     Logger.log("info", {
       message: "supabase:SupabaseDataSource:execute:params",
-      params: { dataQueryOptions }
+      params: { dataQueryOptions: dataQueryOptions2 }
     });
     const {
       queryType,
@@ -1836,7 +2327,7 @@ var SupabaseDataSource = class extends DataSource {
       limit,
       orderBy,
       ascending
-    } = dataQueryOptions;
+    } = dataQueryOptions2;
     const datasourceOptions = this.config.datasourceOptions;
     const supabase = (0, import_supabase_js.createClient)(
       datasourceOptions.projectUrl,
@@ -1919,12 +2410,12 @@ var SupabaseDataSource = class extends DataSource {
 // src/data-sources/bigquery/datasource.js
 var import_bigquery = require("@google-cloud/bigquery");
 var BigQueryDataSource = class extends DataSource {
-  async execute(dataQueryOptions, context) {
+  async execute(dataQueryOptions2, context) {
     Logger.log("info", {
       message: "bigquery:BigQueryDataSource:execute:params",
-      params: { dataQueryOptions }
+      params: { dataQueryOptions: dataQueryOptions2 }
     });
-    const { query, useLegacySql, args } = dataQueryOptions;
+    const { query, useLegacySql, args } = dataQueryOptions2;
     const datasourceOptions = this.config.datasourceOptions;
     let bigquery;
     if (datasourceOptions?.credentials) {
@@ -1974,10 +2465,10 @@ var BigQueryDataSource = class extends DataSource {
 // src/data-sources/airtable/datasource.js
 var import_airtable = __toESM(require("airtable"));
 var AirtableDataSource = class extends DataSource {
-  async execute(dataQueryOptions, context) {
+  async execute(dataQueryOptions2, context) {
     Logger.log("info", {
       message: "airtable:AirtableDataSource:execute:params",
-      params: { dataQueryOptions }
+      params: { dataQueryOptions: dataQueryOptions2 }
     });
     const {
       operation,
@@ -1989,7 +2480,7 @@ var AirtableDataSource = class extends DataSource {
       sortField,
       sortDirection,
       view
-    } = dataQueryOptions;
+    } = dataQueryOptions2;
     const datasourceOptions = this.config.datasourceOptions;
     import_airtable.default.configure({
       apiKey: datasourceOptions.apiKey
@@ -2074,10 +2565,10 @@ var AirtableDataSource = class extends DataSource {
 // src/data-sources/s3/datasource.js
 var import_client_s3 = require("@aws-sdk/client-s3");
 var S3DataSource = class extends DataSource {
-  async execute(dataQueryOptions, context) {
+  async execute(dataQueryOptions2, context) {
     Logger.log("info", {
       message: "s3:S3DataSource:execute:params",
-      params: { dataQueryOptions }
+      params: { dataQueryOptions: dataQueryOptions2 }
     });
     const {
       operation,
@@ -2088,7 +2579,7 @@ var S3DataSource = class extends DataSource {
       contentType,
       maxKeys,
       responseType
-    } = dataQueryOptions;
+    } = dataQueryOptions2;
     const datasourceOptions = this.config.datasourceOptions;
     const targetBucket = bucket || datasourceOptions.bucket;
     const config = {
@@ -2231,10 +2722,10 @@ var ElasticsearchDataSource = class extends DataSource {
     }
     return new import_elasticsearch.Client(clientConfig);
   }
-  async execute(dataQueryOptions, context) {
+  async execute(dataQueryOptions2, context) {
     Logger.log("info", {
       message: "elasticsearch:ElasticsearchDataSource:execute:params",
-      params: { dataQueryOptions }
+      params: { dataQueryOptions: dataQueryOptions2 }
     });
     const {
       operation,
@@ -2245,7 +2736,7 @@ var ElasticsearchDataSource = class extends DataSource {
       size,
       from,
       sort
-    } = dataQueryOptions;
+    } = dataQueryOptions2;
     const client = this.getClient();
     try {
       let result;
@@ -2359,10 +2850,10 @@ var StripeDataSource = class extends DataSource {
     }
     return new import_stripe.default(datasourceOptions?.secretKey, config);
   }
-  async execute(dataQueryOptions, context) {
+  async execute(dataQueryOptions2, context) {
     Logger.log("info", {
       message: "stripe:StripeDataSource:execute:params",
-      params: { dataQueryOptions }
+      params: { dataQueryOptions: dataQueryOptions2 }
     });
     const {
       resource,
@@ -2372,7 +2863,7 @@ var StripeDataSource = class extends DataSource {
       limit,
       startingAfter,
       expand
-    } = dataQueryOptions;
+    } = dataQueryOptions2;
     const stripe = this.getStripeClient();
     try {
       let result;
@@ -2457,12 +2948,12 @@ var StripeDataSource = class extends DataSource {
 // src/data-sources/oracle/datasource.js
 var import_oracledb = __toESM(require("oracledb"));
 var OracleDataSource = class extends DataSource {
-  async execute(dataQueryOptions, context) {
+  async execute(dataQueryOptions2, context) {
     Logger.log("info", {
       message: "oracle:OracleDataSource:execute:params",
-      params: { dataQueryOptions }
+      params: { dataQueryOptions: dataQueryOptions2 }
     });
-    const { query } = dataQueryOptions;
+    const { query } = dataQueryOptions2;
     const datasourceOptions = this.config.datasourceOptions;
     let connection;
     try {
@@ -2499,12 +2990,12 @@ var OracleDataSource = class extends DataSource {
 // src/data-sources/sqlite/datasource.js
 var import_better_sqlite3 = __toESM(require("better-sqlite3"));
 var SQLiteDataSource = class extends DataSource {
-  async execute(dataQueryOptions, context) {
+  async execute(dataQueryOptions2, context) {
     Logger.log("info", {
       message: "sqlite:SQLiteDataSource:execute:params",
-      params: { dataQueryOptions }
+      params: { dataQueryOptions: dataQueryOptions2 }
     });
-    const { query } = dataQueryOptions;
+    const { query } = dataQueryOptions2;
     const datasourceOptions = this.config.datasourceOptions;
     let db;
     try {
@@ -2535,12 +3026,12 @@ var SQLiteDataSource = class extends DataSource {
 // src/data-sources/cockroachdb/datasource.js
 var import_pg3 = require("pg");
 var CockroachDBDataSource = class extends DataSource {
-  async execute(dataQueryOptions, context) {
+  async execute(dataQueryOptions2, context) {
     Logger.log("info", {
       message: "cockroachdb:CockroachDBDataSource:execute:params",
-      params: { dataQueryOptions }
+      params: { dataQueryOptions: dataQueryOptions2 }
     });
-    const { query } = dataQueryOptions;
+    const { query } = dataQueryOptions2;
     const datasourceOptions = this.config.datasourceOptions;
     const client = new import_pg3.Client({
       connectionString: datasourceOptions?.connectionString,
@@ -2565,12 +3056,12 @@ var CockroachDBDataSource = class extends DataSource {
 // src/data-sources/neo4j/datasource.js
 var import_neo4j_driver = __toESM(require("neo4j-driver"));
 var Neo4jDataSource = class extends DataSource {
-  async execute(dataQueryOptions, context) {
+  async execute(dataQueryOptions2, context) {
     Logger.log("info", {
       message: "neo4j:Neo4jDataSource:execute:params",
-      params: { dataQueryOptions }
+      params: { dataQueryOptions: dataQueryOptions2 }
     });
-    const { query, args } = dataQueryOptions;
+    const { query, args } = dataQueryOptions2;
     const datasourceOptions = this.config.datasourceOptions;
     const driver = import_neo4j_driver.default.driver(
       datasourceOptions?.uri,
@@ -2604,12 +3095,12 @@ var Neo4jDataSource = class extends DataSource {
 // src/data-sources/twilio/datasource.js
 var import_twilio = __toESM(require("twilio"));
 var TwilioDataSource = class extends DataSource {
-  async execute(dataQueryOptions, context) {
+  async execute(dataQueryOptions2, context) {
     Logger.log("info", {
       message: "twilio:TwilioDataSource:execute:params",
-      params: { dataQueryOptions }
+      params: { dataQueryOptions: dataQueryOptions2 }
     });
-    const { resource, operation, resourceSid, params, limit } = dataQueryOptions;
+    const { resource, operation, resourceSid, params, limit } = dataQueryOptions2;
     const datasourceOptions = this.config.datasourceOptions;
     const client = (0, import_twilio.default)(datasourceOptions?.accountSid, datasourceOptions?.authToken);
     const parsedParams = params ? typeof params === "string" ? JSON.parse(params) : params : {};
@@ -2664,12 +3155,12 @@ var TwilioDataSource = class extends DataSource {
 var import_mail = __toESM(require("@sendgrid/mail"));
 var import_client = __toESM(require("@sendgrid/client"));
 var SendGridDataSource = class extends DataSource {
-  async execute(dataQueryOptions, context) {
+  async execute(dataQueryOptions2, context) {
     Logger.log("info", {
       message: "sendgrid:SendGridDataSource:execute:params",
-      params: { dataQueryOptions }
+      params: { dataQueryOptions: dataQueryOptions2 }
     });
-    const { resource, operation, params, startDate, endDate } = dataQueryOptions;
+    const { resource, operation, params, startDate, endDate } = dataQueryOptions2;
     const datasourceOptions = this.config.datasourceOptions;
     import_client.default.setApiKey(datasourceOptions?.apiKey);
     import_mail.default.setApiKey(datasourceOptions?.apiKey);
@@ -2739,12 +3230,12 @@ var SendGridDataSource = class extends DataSource {
 // src/data-sources/slack/datasource.js
 var import_web_api = require("@slack/web-api");
 var SlackDataSource = class extends DataSource {
-  async execute(dataQueryOptions, context) {
+  async execute(dataQueryOptions2, context) {
     Logger.log("info", {
       message: "slack:SlackDataSource:execute:params",
-      params: { dataQueryOptions }
+      params: { dataQueryOptions: dataQueryOptions2 }
     });
-    const { resource, operation, channelId, userId, message, limit } = dataQueryOptions;
+    const { resource, operation, channelId, userId, message, limit } = dataQueryOptions2;
     const datasourceOptions = this.config.datasourceOptions;
     const client = new import_web_api.WebClient(datasourceOptions?.botToken);
     try {
@@ -2789,12 +3280,12 @@ var SlackDataSource = class extends DataSource {
 // src/data-sources/notion/datasource.js
 var import_client2 = require("@notionhq/client");
 var NotionDataSource = class extends DataSource {
-  async execute(dataQueryOptions, context) {
+  async execute(dataQueryOptions2, context) {
     Logger.log("info", {
       message: "notion:NotionDataSource:execute:params",
-      params: { dataQueryOptions }
+      params: { dataQueryOptions: dataQueryOptions2 }
     });
-    const { resource, operation, databaseId, pageId, filter, sorts, searchQuery, pageSize } = dataQueryOptions;
+    const { resource, operation, databaseId, pageId, filter, sorts, searchQuery, pageSize } = dataQueryOptions2;
     const datasourceOptions = this.config.datasourceOptions;
     const notion = new import_client2.Client({ auth: datasourceOptions?.apiToken });
     try {
@@ -2860,12 +3351,12 @@ var JiraDataSource = class extends DataSource {
     const datasourceOptions = this.config.datasourceOptions;
     return Buffer.from(`${datasourceOptions?.email}:${datasourceOptions?.apiToken}`).toString("base64");
   }
-  async execute(dataQueryOptions, context) {
+  async execute(dataQueryOptions2, context) {
     Logger.log("info", {
       message: "jira:JiraDataSource:execute:params",
-      params: { dataQueryOptions }
+      params: { dataQueryOptions: dataQueryOptions2 }
     });
-    const { resource, operation, jql, issueKey, projectKey, fields, maxResults, startAt } = dataQueryOptions;
+    const { resource, operation, jql, issueKey, projectKey, fields, maxResults, startAt } = dataQueryOptions2;
     const datasourceOptions = this.config.datasourceOptions;
     const auth = this.getAuthHeader();
     const baseUrl = datasourceOptions?.host;
@@ -2946,12 +3437,12 @@ var JiraDataSource = class extends DataSource {
 // src/data-sources/googleanalytics/datasource.js
 var import_data = require("@google-analytics/data");
 var GoogleAnalyticsDataSource = class extends DataSource {
-  async execute(dataQueryOptions, context) {
+  async execute(dataQueryOptions2, context) {
     Logger.log("info", {
       message: "googleanalytics:GoogleAnalyticsDataSource:execute:params",
-      params: { dataQueryOptions }
+      params: { dataQueryOptions: dataQueryOptions2 }
     });
-    const { reportType, dateRanges, dimensions, metrics, limit } = dataQueryOptions;
+    const { reportType, dateRanges, dimensions, metrics, limit } = dataQueryOptions2;
     const datasourceOptions = this.config.datasourceOptions;
     let clientConfig = {};
     if (datasourceOptions?.credentials) {
@@ -3008,6 +3499,55 @@ var GoogleAnalyticsDataSource = class extends DataSource {
   }
 };
 
+// src/data-sources/syslog/datasource.js
+var import_dgram = __toESM(require("dgram"));
+var SyslogDataSource = class extends DataSource {
+  async execute(dataQueryOptions2, context) {
+    throw new Error("Syslog is a listener-only datasource.");
+  }
+  async subscribe(config, onEvent) {
+    const dsOptions = this.config.datasourceOptions || {};
+    const port = dsOptions.port || config.port || 514;
+    const address = dsOptions.address || config.address || "0.0.0.0";
+    Logger.log("info", {
+      message: "syslog:subscribe:start",
+      params: { port, address, datasourceID: this.config.datasourceID }
+    });
+    const server = import_dgram.default.createSocket("udp4");
+    server.on("message", (msg, rinfo) => {
+      const messageStr = msg.toString();
+      onEvent({ source: `${rinfo.address}:${rinfo.port}`, payload: messageStr });
+    });
+    server.on("error", (error) => {
+      Logger.log("error", {
+        message: "syslog:subscribe:error",
+        params: { error: error.message }
+      });
+      server.close();
+    });
+    return new Promise((resolve, reject) => {
+      server.bind(port, address, () => {
+        resolve({ server });
+      });
+    });
+  }
+  async unsubscribe(handle) {
+    if (!handle || !handle.server) return;
+    Logger.log("info", {
+      message: "syslog:unsubscribe",
+      params: { datasourceID: this.config.datasourceID }
+    });
+    try {
+      handle.server.close();
+    } catch (e) {
+      Logger.log("error", {
+        message: "syslog:unsubscribe:error",
+        params: { error: e.message }
+      });
+    }
+  }
+};
+
 // src/data-sources/index.js
 var dataSources = {
   postgresql: PostgreSQLDataSource,
@@ -3039,7 +3579,9 @@ var dataSources = {
   slack: SlackDataSource,
   notion: NotionDataSource,
   jira: JiraDataSource,
-  googleanalytics: GoogleAnalyticsDataSource
+  googleanalytics: GoogleAnalyticsDataSource,
+  // Listeners
+  syslog: SyslogDataSource
 };
 var data_sources_default = {
   getDataSource(type) {
@@ -4180,6 +4722,11 @@ var googleanalyticsTestConnection = async ({ datasourceOptions }) => {
   }
 };
 
+// src/data-sources/syslog/connection.js
+var syslogTestConnection = async ({ datasourceOptions }) => {
+  return { success: true };
+};
+
 // src/data-sources/manifests.js
 var postgresqlManifest = {
   name: "PostgreSQL",
@@ -4943,1630 +5490,6 @@ function getManifestForType(datasourceType) {
   };
 }
 
-// src/connectors/contracts.js
-var import_crypto = require("crypto");
-var ConnectorMode = Object.freeze({
-  /** On-demand fetch (query, REST GET). Replaces DataSource.execute() */
-  PULL: "PULL",
-  /** Write / trigger action (REST POST, DB insert, send message) */
-  PUSH: "PUSH",
-  /** Continuous real-time feed (SSE, WebSocket, MQTT). Returns async iterator */
-  STREAM: "STREAM",
-  /** Durable event subscription (Kafka consumer, CDC, webhooks) */
-  SUBSCRIBE: "SUBSCRIBE",
-  /** Large dataset processing (S3 files, CSV import). Chunked with progress */
-  BATCH: "BATCH",
-  /** Inbound push from third-party — receive only (Stripe, GitHub webhooks) */
-  WEBHOOK: "WEBHOOK"
-});
-function createConnectorEvent(fields) {
-  return {
-    eventId: (0, import_crypto.randomUUID)(),
-    connectorType: fields.connectorType,
-    connectorInstanceId: fields.connectorInstanceId,
-    tenantId: fields.tenantId,
-    mode: fields.mode,
-    topic: fields.topic ?? null,
-    eventType: fields.eventType ?? null,
-    producedAt: /* @__PURE__ */ new Date(),
-    originatedAt: fields.originatedAt ?? null,
-    payload: fields.payload,
-    payloadSchemaId: fields.payloadSchemaId ?? null,
-    sequenceNumber: fields.sequenceNumber ?? null,
-    partitionKey: fields.partitionKey ?? null,
-    correlationId: fields.correlationId ?? null,
-    headers: fields.headers ?? {},
-    isPartial: fields.isPartial ?? false,
-    error: fields.error ?? null
-  };
-}
-function createConnectorHandle(fields) {
-  return {
-    handleId: fields.handleId,
-    connectorType: fields.connectorType,
-    tenantId: fields.tenantId,
-    status: "connected",
-    connectedAt: /* @__PURE__ */ new Date(),
-    lastHealthCheck: null,
-    metadata: fields.metadata ?? {},
-    config: fields.config ?? null
-  };
-}
-var Connector = class {
-  /**
-   * @param {ConnectorManifest} manifest
-   */
-  constructor(manifest) {
-    if (!manifest || !manifest.name || !manifest.modes) {
-      throw new Error("Connector requires a manifest with name and modes");
-    }
-    this._manifest = Object.freeze({ ...manifest });
-  }
-  /** @returns {ConnectorManifest} */
-  get manifest() {
-    return this._manifest;
-  }
-  /**
-   * Check if this connector supports a given mode.
-   * @param {string} mode - ConnectorMode value
-   * @returns {boolean}
-   */
-  supportsMode(mode) {
-    return this._manifest.modes.includes(mode);
-  }
-  // ── Lifecycle Methods (must be implemented by subclasses) ────────────────
-  /**
-   * Called when tenant activates this connector instance.
-   * Validate config, open persistent connections.
-   *
-   * @param {Object} config - { datasourceOptions, ... }
-   * @param {Object} ctx    - { tenantId, instanceId, eventBus }
-   * @returns {Promise<ConnectorHandle>}
-   */
-  async connect(_config, _ctx) {
-    throw new Error(`${this._manifest.name}: connect() not implemented`);
-  }
-  /**
-   * Verify credentials / connectivity without persisting state.
-   *
-   * @param {Object} config - { datasourceOptions, ... }
-   * @returns {Promise<ConnectionTestResult>}
-   */
-  async testConnection(_config) {
-    throw new Error(`${this._manifest.name}: testConnection() not implemented`);
-  }
-  /**
-   * Called on graceful shutdown or config change.
-   *
-   * @param {ConnectorHandle} handle
-   * @returns {Promise<void>}
-   */
-  async disconnect(_handle) {
-    throw new Error(`${this._manifest.name}: disconnect() not implemented`);
-  }
-  /**
-   * Called when config changes while connector is live.
-   * Default: disconnect + reconnect.
-   *
-   * @param {ConnectorHandle} handle
-   * @param {Object} newConfig
-   * @returns {Promise<void>}
-   */
-  async reconfigure(_handle, _newConfig) {
-    return null;
-  }
-  /**
-   * Health probe. Fabric calls this on schedule.
-   *
-   * @param {ConnectorHandle} handle
-   * @returns {Promise<HealthStatus>}
-   */
-  async healthCheck(_handle) {
-    return { status: "healthy" };
-  }
-  // ── Mode Handlers (implement only what manifest.modes declares) ─────────
-  /**
-   * PULL: synchronous fetch — replaces DataSource.execute()
-   *
-   * @param {ConnectorHandle} handle
-   * @param {Object} input  - mode-specific input (query, params, etc.)
-   * @param {Object} [ctx]  - execution context
-   * @returns {Promise<ConnectorEvent[]>}
-   */
-  async pull(_handle, _input, _ctx) {
-    throw new Error(`${this._manifest.name}: pull() not implemented`);
-  }
-  /**
-   * PUSH: write / trigger action
-   *
-   * @param {ConnectorHandle} handle
-   * @param {Object} input  - { payload, topic, ... }
-   * @param {Object} [ctx]
-   * @returns {Promise<Object>} push result
-   */
-  async push(_handle, _input, _ctx) {
-    throw new Error(`${this._manifest.name}: push() not implemented`);
-  }
-  /**
-   * STREAM: open a long-lived async iterator
-   *
-   * @param {ConnectorHandle} handle
-   * @param {Object} input  - { topics, qos, ... }
-   * @param {Object} [ctx]
-   * @returns {AsyncIterable<ConnectorEvent>}
-   */
-  async *stream(_handle, _input, _ctx) {
-    throw new Error(`${this._manifest.name}: stream() not implemented`);
-  }
-  /**
-   * SUBSCRIBE: register a durable subscription.
-   * Fabric calls onEvent when messages arrive.
-   *
-   * @param {ConnectorHandle} handle
-   * @param {Object} input   - subscription parameters
-   * @param {Function} onEvent - callback(ConnectorEvent)
-   * @param {Object} [ctx]
-   * @returns {Promise<Object>} subscription handle
-   */
-  async subscribe(_handle, _input, _onEvent, _ctx) {
-    throw new Error(`${this._manifest.name}: subscribe() not implemented`);
-  }
-  /**
-   * BATCH: process a large dataset in chunks.
-   * Returns an async iterator of { events: ConnectorEvent[], checkpointToken }
-   *
-   * @param {ConnectorHandle} handle
-   * @param {Object} input  - batch parameters
-   * @param {Object} [ctx]
-   * @returns {AsyncIterable<Object>}
-   */
-  async *batch(_handle, _input, _ctx) {
-    throw new Error(`${this._manifest.name}: batch() not implemented`);
-  }
-  /**
-   * WEBHOOK: process an inbound webhook payload.
-   * Called by the WebhookReceiver for each inbound POST.
-   *
-   * @param {Buffer} rawPayload   - raw request body
-   * @param {Object.<string, string>} headers - request headers
-   * @param {string} secret       - HMAC secret for verification
-   * @returns {Promise<ConnectorEvent[]>}
-   */
-  async processWebhookPayload(_rawPayload, _headers, _secret) {
-    throw new Error(
-      `${this._manifest.name}: processWebhookPayload() not implemented`
-    );
-  }
-};
-
-// src/connectors/registry.js
-var ConnectorRegistry = class {
-  constructor() {
-    this._connectors = /* @__PURE__ */ new Map();
-  }
-  /**
-   * Register a connector definition.
-   *
-   * @param {string} type - connector type key (e.g. 'postgresql', 'mqtt')
-   * @param {ConnectorDefinition} definition
-   */
-  register(type, definition) {
-    if (!type || typeof type !== "string") {
-      throw new Error("ConnectorRegistry: type must be a non-empty string");
-    }
-    if (!definition) {
-      throw new Error(`ConnectorRegistry: definition required for type '${type}'`);
-    }
-    const normalizedType = type.toLowerCase();
-    if (this._connectors.has(normalizedType)) {
-      Logger.log("warning", {
-        message: "ConnectorRegistry:register:overwrite",
-        params: { type: normalizedType }
-      });
-    }
-    this._connectors.set(normalizedType, definition);
-    Logger.log("info", {
-      message: "ConnectorRegistry:register:success",
-      params: {
-        type: normalizedType,
-        modes: definition.manifest?.modes ?? [],
-        tags: definition.manifest?.semanticTags ?? []
-      }
-    });
-  }
-  /**
-   * Get a connector definition by type.
-   *
-   * @param {string} type
-   * @returns {ConnectorDefinition}
-   * @throws {Error} if type not found
-   */
-  getConnector(type) {
-    const def = this._connectors.get(type.toLowerCase());
-    if (!def) {
-      throw new Error(`ConnectorRegistry: unknown connector type '${type}'`);
-    }
-    return def;
-  }
-  /**
-   * Check if a connector type is registered.
-   *
-   * @param {string} type
-   * @returns {boolean}
-   */
-  hasConnector(type) {
-    return this._connectors.has(type.toLowerCase());
-  }
-  /**
-   * Query connectors by supported mode.
-   *
-   * @param {string} mode - ConnectorMode value
-   * @returns {ConnectorDefinition[]}
-   */
-  findByMode(mode) {
-    return [...this._connectors.values()].filter(
-      (d) => d.manifest?.modes?.includes(mode)
-    );
-  }
-  /**
-   * Query connectors by semantic tag.
-   *
-   * @param {string} tag - e.g. 'database', 'iot', 'messaging'
-   * @returns {ConnectorDefinition[]}
-   */
-  findBySemanticTag(tag) {
-    return [...this._connectors.values()].filter(
-      (d) => d.manifest?.semanticTags?.includes(tag)
-    );
-  }
-  /**
-   * Returns the full capability matrix — used by frontend connector picker
-   * and API discovery endpoint.
-   *
-   * @returns {Object.<string, { modes: string[], tags: string[], authSchemes: string[] }>}
-   */
-  getCapabilityMatrix() {
-    const matrix = {};
-    for (const [type, def] of this._connectors.entries()) {
-      matrix[type] = {
-        name: def.manifest?.name ?? type,
-        modes: def.manifest?.modes ?? [],
-        tags: def.manifest?.semanticTags ?? [],
-        authSchemes: def.manifest?.authSchemes ?? [],
-        version: def.manifest?.version ?? "1.0.0"
-      };
-    }
-    return matrix;
-  }
-  /**
-   * List all registered connector types.
-   *
-   * @returns {string[]}
-   */
-  listTypes() {
-    return [...this._connectors.keys()];
-  }
-  /**
-   * Get total number of registered connectors.
-   *
-   * @returns {number}
-   */
-  get size() {
-    return this._connectors.size;
-  }
-  /**
-   * Iterate over all registered connectors.
-   *
-   * @returns {IterableIterator<[string, ConnectorDefinition]>}
-   */
-  [Symbol.iterator]() {
-    return this._connectors.entries();
-  }
-};
-var connectorRegistry = new ConnectorRegistry();
-
-// src/connectors/pool.js
-var ConnectorInstancePool = class {
-  constructor() {
-    this._handles = /* @__PURE__ */ new Map();
-  }
-  /**
-   * Build the composite key for a handle.
-   * @param {string} tenantId
-   * @param {string} instanceId
-   * @returns {string}
-   */
-  _key(tenantId, instanceId) {
-    return `${tenantId}:${instanceId}`;
-  }
-  /**
-   * Store a handle in the pool.
-   *
-   * @param {string} tenantId
-   * @param {string} instanceId
-   * @param {import('./contracts').ConnectorHandle} handle
-   */
-  store(tenantId, instanceId, handle) {
-    const key = this._key(tenantId, instanceId);
-    if (this._handles.has(key)) {
-      Logger.log("warning", {
-        message: "ConnectorInstancePool:store:overwrite",
-        params: { tenantId, instanceId }
-      });
-    }
-    this._handles.set(key, handle);
-    Logger.log("info", {
-      message: "ConnectorInstancePool:store:success",
-      params: {
-        tenantId,
-        instanceId,
-        connectorType: handle.connectorType,
-        status: handle.status
-      }
-    });
-  }
-  /**
-   * Get a handle from the pool.
-   *
-   * @param {string} tenantId
-   * @param {string} instanceId
-   * @returns {import('./contracts').ConnectorHandle|null}
-   */
-  get(tenantId, instanceId) {
-    return this._handles.get(this._key(tenantId, instanceId)) ?? null;
-  }
-  /**
-   * Get a handle, throwing if not found.
-   *
-   * @param {string} tenantId
-   * @param {string} instanceId
-   * @returns {import('./contracts').ConnectorHandle}
-   * @throws {Error}
-   */
-  getOrThrow(tenantId, instanceId) {
-    const handle = this.get(tenantId, instanceId);
-    if (!handle) {
-      throw new Error(
-        `ConnectorInstancePool: no active handle for tenant=${tenantId}, instance=${instanceId}`
-      );
-    }
-    return handle;
-  }
-  /**
-   * Remove a handle from the pool.
-   *
-   * @param {string} tenantId
-   * @param {string} instanceId
-   * @returns {boolean} true if handle was found and removed
-   */
-  remove(tenantId, instanceId) {
-    const key = this._key(tenantId, instanceId);
-    const existed = this._handles.delete(key);
-    if (existed) {
-      Logger.log("info", {
-        message: "ConnectorInstancePool:remove:success",
-        params: { tenantId, instanceId }
-      });
-    }
-    return existed;
-  }
-  /**
-   * Update the status of a handle.
-   *
-   * @param {string} tenantId
-   * @param {string} instanceId
-   * @param {'connecting'|'connected'|'degraded'|'disconnected'} status
-   */
-  updateStatus(tenantId, instanceId, status) {
-    const handle = this.get(tenantId, instanceId);
-    if (handle) {
-      handle.status = status;
-    }
-  }
-  /**
-   * Get all handles for a tenant.
-   *
-   * @param {string} tenantId
-   * @returns {import('./contracts').ConnectorHandle[]}
-   */
-  getByTenant(tenantId) {
-    const prefix = `${tenantId}:`;
-    const handles = [];
-    for (const [key, handle] of this._handles) {
-      if (key.startsWith(prefix)) {
-        handles.push(handle);
-      }
-    }
-    return handles;
-  }
-  /**
-   * Get all handles of a given connector type.
-   *
-   * @param {string} connectorType
-   * @returns {import('./contracts').ConnectorHandle[]}
-   */
-  getByType(connectorType) {
-    return [...this._handles.values()].filter(
-      (h) => h.connectorType === connectorType
-    );
-  }
-  /**
-   * Check if a handle exists for the given tenant + instance.
-   *
-   * @param {string} tenantId
-   * @param {string} instanceId
-   * @returns {boolean}
-   */
-  has(tenantId, instanceId) {
-    return this._handles.has(this._key(tenantId, instanceId));
-  }
-  /**
-   * Clear all handles. Used during shutdown.
-   */
-  clear() {
-    const count = this._handles.size;
-    this._handles.clear();
-    Logger.log("info", {
-      message: "ConnectorInstancePool:clear",
-      params: { removedCount: count }
-    });
-  }
-  /**
-   * Total number of active handles.
-   * @returns {number}
-   */
-  get size() {
-    return this._handles.size;
-  }
-  /**
-   * Get pool statistics.
-   *
-   * @returns {{ total: number, byStatus: Object.<string, number>, byType: Object.<string, number> }}
-   */
-  getStats() {
-    const byStatus = {};
-    const byType = {};
-    for (const handle of this._handles.values()) {
-      byStatus[handle.status] = (byStatus[handle.status] || 0) + 1;
-      byType[handle.connectorType] = (byType[handle.connectorType] || 0) + 1;
-    }
-    return {
-      total: this._handles.size,
-      byStatus,
-      byType
-    };
-  }
-};
-var connectorInstancePool = new ConnectorInstancePool();
-
-// src/connectors/lifecycle.js
-var LifecycleManager = class {
-  /**
-   * @param {Object} [deps] - injectable dependencies
-   * @param {import('./registry').ConnectorRegistry} [deps.registry]
-   * @param {import('./pool').ConnectorInstancePool} [deps.pool]
-   * @param {import('./event-bus').EventBus} [deps.eventBus]
-   */
-  constructor(deps = {}) {
-    this._registry = deps.registry ?? connectorRegistry;
-    this._pool = deps.pool ?? connectorInstancePool;
-    this._eventBus = deps.eventBus ?? null;
-    this._healthTimers = /* @__PURE__ */ new Map();
-  }
-  /**
-   * Activate a connector — call connect() and store the handle.
-   *
-   * @param {string} tenantId
-   * @param {Object} instanceConfig
-   * @param {string} instanceConfig.instanceId  - datasourceID
-   * @param {string} instanceConfig.type        - connector type (e.g. 'postgresql')
-   * @param {Object} instanceConfig.config      - { datasourceOptions, ... }
-   * @param {string[]} [instanceConfig.modes]   - which modes to activate
-   * @returns {Promise<import('./contracts').ConnectorHandle>}
-   */
-  async activateConnector(tenantId, instanceConfig) {
-    const { instanceId, type, config, modes } = instanceConfig;
-    Logger.log("info", {
-      message: "LifecycleManager:activateConnector:start",
-      params: { tenantId, instanceId, type, modes }
-    });
-    const existing = this._pool.get(tenantId, instanceId);
-    if (existing && existing.status === "connected") {
-      Logger.log("warning", {
-        message: "LifecycleManager:activateConnector:alreadyActive",
-        params: { tenantId, instanceId }
-      });
-      return existing;
-    }
-    const definition = this._registry.getConnector(type);
-    if (!definition.connectorClass) {
-      throw new Error(
-        `LifecycleManager: connector type '${type}' has no connectorClass registered`
-      );
-    }
-    const connector = new definition.connectorClass(definition.manifest);
-    this._pool.store(tenantId, instanceId, {
-      handleId: instanceId,
-      connectorType: type,
-      tenantId,
-      status: "connecting",
-      connectedAt: null,
-      metadata: {}
-    });
-    try {
-      const handle = await connector.connect(config, {
-        tenantId,
-        instanceId,
-        modes: modes ?? definition.manifest.modes,
-        eventBus: this._eventBus
-      });
-      const normalizedHandle = {
-        handleId: instanceId,
-        connectorType: type,
-        tenantId,
-        status: "connected",
-        connectedAt: /* @__PURE__ */ new Date(),
-        lastHealthCheck: null,
-        ...handle,
-        // Store the connector instance for later use (pull, push, etc.)
-        metadata: {
-          ...handle.metadata,
-          _connectorInstance: connector
-        },
-        config
-      };
-      this._pool.store(tenantId, instanceId, normalizedHandle);
-      Logger.log("success", {
-        message: "LifecycleManager:activateConnector:success",
-        params: { tenantId, instanceId, type, status: "connected" }
-      });
-      return normalizedHandle;
-    } catch (error) {
-      this._pool.updateStatus(tenantId, instanceId, "disconnected");
-      Logger.log("error", {
-        message: "LifecycleManager:activateConnector:failed",
-        params: { tenantId, instanceId, type, error: error.message }
-      });
-      throw error;
-    }
-  }
-  /**
-   * Deactivate a connector — call disconnect() and remove from pool.
-   *
-   * @param {string} tenantId
-   * @param {string} instanceId
-   * @returns {Promise<void>}
-   */
-  async deactivateConnector(tenantId, instanceId) {
-    Logger.log("info", {
-      message: "LifecycleManager:deactivateConnector:start",
-      params: { tenantId, instanceId }
-    });
-    const handle = this._pool.get(tenantId, instanceId);
-    if (!handle) {
-      Logger.log("warning", {
-        message: "LifecycleManager:deactivateConnector:notFound",
-        params: { tenantId, instanceId }
-      });
-      return;
-    }
-    this._cancelHealthCheck(handle.handleId);
-    try {
-      const connector = handle.metadata?._connectorInstance;
-      if (connector && typeof connector.disconnect === "function") {
-        await connector.disconnect(handle);
-      }
-    } catch (error) {
-      Logger.log("error", {
-        message: "LifecycleManager:deactivateConnector:disconnectError",
-        params: { tenantId, instanceId, error: error.message }
-      });
-    }
-    this._pool.remove(tenantId, instanceId);
-    Logger.log("success", {
-      message: "LifecycleManager:deactivateConnector:success",
-      params: { tenantId, instanceId }
-    });
-  }
-  /**
-   * Reconfigure a connector without full disconnect if supported.
-   *
-   * @param {string} tenantId
-   * @param {string} instanceId
-   * @param {Object} newConfig
-   * @returns {Promise<void>}
-   */
-  async reconfigureConnector(tenantId, instanceId, newConfig) {
-    Logger.log("info", {
-      message: "LifecycleManager:reconfigureConnector:start",
-      params: { tenantId, instanceId }
-    });
-    const handle = this._pool.get(tenantId, instanceId);
-    if (!handle) {
-      throw new Error(
-        `LifecycleManager: no active handle for instance ${instanceId}`
-      );
-    }
-    const connector = handle.metadata?._connectorInstance;
-    if (connector && typeof connector.reconfigure === "function") {
-      const result = await connector.reconfigure(handle, newConfig);
-      if (result !== null) {
-        handle.config = newConfig;
-        Logger.log("success", {
-          message: "LifecycleManager:reconfigureConnector:hotReconfigure",
-          params: { tenantId, instanceId }
-        });
-        return;
-      }
-    }
-    const type = handle.connectorType;
-    await this.deactivateConnector(tenantId, instanceId);
-    await this.activateConnector(tenantId, {
-      instanceId,
-      type,
-      config: newConfig
-    });
-    Logger.log("success", {
-      message: "LifecycleManager:reconfigureConnector:coldReconfigure",
-      params: { tenantId, instanceId }
-    });
-  }
-  /**
-   * Test a connector's connection without activating it.
-   *
-   * @param {string} type - connector type
-   * @param {Object} config - { datasourceOptions, ... }
-   * @returns {Promise<import('./contracts').ConnectionTestResult>}
-   */
-  async testConnection(type, config) {
-    const definition = this._registry.getConnector(type);
-    if (typeof definition.testConnection === "function") {
-      return definition.testConnection(config);
-    }
-    if (definition.connectorClass) {
-      const connector = new definition.connectorClass(definition.manifest);
-      return connector.testConnection(config);
-    }
-    throw new Error(
-      `LifecycleManager: no testConnection available for type '${type}'`
-    );
-  }
-  /**
-   * Execute a pull operation on an active connector.
-   *
-   * @param {string} tenantId
-   * @param {string} instanceId
-   * @param {Object} input - mode-specific input
-   * @param {Object} [ctx]
-   * @returns {Promise<import('./contracts').ConnectorEvent[]>}
-   */
-  async executePull(tenantId, instanceId, input, ctx) {
-    const handle = this._pool.getOrThrow(tenantId, instanceId);
-    const connector = handle.metadata?._connectorInstance;
-    if (!connector || typeof connector.pull !== "function") {
-      throw new Error(
-        `Connector ${handle.connectorType} does not support PULL mode`
-      );
-    }
-    return connector.pull(handle, input, ctx);
-  }
-  /**
-   * Execute a push operation on an active connector.
-   *
-   * @param {string} tenantId
-   * @param {string} instanceId
-   * @param {Object} input
-   * @param {Object} [ctx]
-   * @returns {Promise<Object>}
-   */
-  async executePush(tenantId, instanceId, input, ctx) {
-    const handle = this._pool.getOrThrow(tenantId, instanceId);
-    const connector = handle.metadata?._connectorInstance;
-    if (!connector || typeof connector.push !== "function") {
-      throw new Error(
-        `Connector ${handle.connectorType} does not support PUSH mode`
-      );
-    }
-    return connector.push(handle, input, ctx);
-  }
-  /**
-   * Get pool statistics.
-   * @returns {Object}
-   */
-  getStats() {
-    return this._pool.getStats();
-  }
-  /**
-   * Shutdown — deactivate all connected connectors.
-   * @returns {Promise<void>}
-   */
-  async shutdown() {
-    Logger.log("info", {
-      message: "LifecycleManager:shutdown:start",
-      params: { activeConnections: this._pool.size }
-    });
-    for (const [id, timer] of this._healthTimers) {
-      clearInterval(timer);
-    }
-    this._healthTimers.clear();
-    const allHandles = [...this._pool._handles.values()];
-    const disconnectPromises = allHandles.map(async (handle) => {
-      try {
-        await this.deactivateConnector(handle.tenantId, handle.handleId);
-      } catch (err) {
-        Logger.log("error", {
-          message: "LifecycleManager:shutdown:disconnectError",
-          params: { handleId: handle.handleId, error: err.message }
-        });
-      }
-    });
-    await Promise.allSettled(disconnectPromises);
-    Logger.log("success", {
-      message: "LifecycleManager:shutdown:complete"
-    });
-  }
-  /**
-   * Cancel a health check timer for a handle.
-   * @param {string} handleId
-   * @private
-   */
-  _cancelHealthCheck(handleId) {
-    const timer = this._healthTimers.get(handleId);
-    if (timer) {
-      clearInterval(timer);
-      this._healthTimers.delete(handleId);
-    }
-  }
-};
-var lifecycleManager = new LifecycleManager();
-
-// src/connectors/event-bus.js
-var import_events = require("events");
-function matchesFilter(event, filter) {
-  if (filter.tenantId && event.tenantId !== filter.tenantId) {
-    return false;
-  }
-  if (filter.connectorType?.length > 0 && !filter.connectorType.includes(event.connectorType)) {
-    return false;
-  }
-  if (filter.connectorInstanceId?.length > 0 && !filter.connectorInstanceId.includes(event.connectorInstanceId)) {
-    return false;
-  }
-  if (filter.mode?.length > 0 && !filter.mode.includes(event.mode)) {
-    return false;
-  }
-  if (filter.eventType?.length > 0 && !filter.eventType.includes(event.eventType)) {
-    return false;
-  }
-  if (filter.topic) {
-    if (filter.topic instanceof RegExp) {
-      if (!filter.topic.test(event.topic ?? "")) return false;
-    } else if (event.topic !== filter.topic) {
-      return false;
-    }
-  }
-  return true;
-}
-var _subIdCounter = 0;
-var EventBus = class {
-  constructor() {
-    this._subscriptions = /* @__PURE__ */ new Map();
-    this._emitter = new import_events.EventEmitter();
-    this._emitter.setMaxListeners(100);
-    this._publishedCount = 0;
-    this._emitter.on("connector_event", (event) => {
-      this._dispatch(event);
-    });
-  }
-  /**
-   * Publish a single ConnectorEvent. All matching subscribers are notified.
-   *
-   * @param {import('./contracts').ConnectorEvent} event
-   * @returns {Promise<void>}
-   */
-  async publish(event) {
-    this._publishedCount++;
-    this._emitter.emit("connector_event", event);
-  }
-  /**
-   * Publish a batch of events.
-   *
-   * @param {import('./contracts').ConnectorEvent[]} events
-   * @returns {Promise<void>}
-   */
-  async publishBatch(events) {
-    for (const event of events) {
-      await this.publish(event);
-    }
-  }
-  /**
-   * Subscribe to events matching a filter.
-   *
-   * @param {EventFilter} filter
-   * @param {Function} handler - async (event: ConnectorEvent) => void
-   * @param {Object} [options]
-   * @param {string} [options.deliveryGuarantee]
-   * @returns {EventSubscription}
-   */
-  subscribe(filter, handler, options = {}) {
-    const subscriptionId = `sub_${++_subIdCounter}_${Date.now()}`;
-    const subscription = {
-      subscriptionId,
-      filter: filter ?? {},
-      handler,
-      deliveryGuarantee: options.deliveryGuarantee ?? "at-most-once"
-    };
-    this._subscriptions.set(subscriptionId, subscription);
-    Logger.log("info", {
-      message: "EventBus:subscribe",
-      params: {
-        subscriptionId,
-        filter,
-        totalSubscriptions: this._subscriptions.size
-      }
-    });
-    return subscription;
-  }
-  /**
-   * Unsubscribe by subscription ID.
-   *
-   * @param {string} subscriptionId
-   * @returns {boolean}
-   */
-  unsubscribe(subscriptionId) {
-    const removed = this._subscriptions.delete(subscriptionId);
-    if (removed) {
-      Logger.log("info", {
-        message: "EventBus:unsubscribe",
-        params: { subscriptionId }
-      });
-    }
-    return removed;
-  }
-  /**
-   * Request-response pattern over the event bus.
-   * Publishes an event and waits for a response matching the correlationId.
-   *
-   * @param {import('./contracts').ConnectorEvent} requestEvent
-   * @param {number} timeoutMs
-   * @returns {Promise<import('./contracts').ConnectorEvent>}
-   */
-  async request(requestEvent, timeoutMs = 3e4) {
-    const correlationId = requestEvent.correlationId ?? requestEvent.eventId;
-    return new Promise((resolve, reject) => {
-      const timeout = setTimeout(() => {
-        this.unsubscribe(sub.subscriptionId);
-        reject(new Error(`EventBus request timed out after ${timeoutMs}ms`));
-      }, timeoutMs);
-      const sub = this.subscribe(
-        { tenantId: requestEvent.tenantId },
-        async (event) => {
-          if (event.correlationId === correlationId && event.eventId !== requestEvent.eventId) {
-            clearTimeout(timeout);
-            this.unsubscribe(sub.subscriptionId);
-            resolve(event);
-          }
-        }
-      );
-      this.publish({ ...requestEvent, correlationId });
-    });
-  }
-  /**
-   * Dispatch an event to all matching subscriptions.
-   *
-   * @param {import('./contracts').ConnectorEvent} event
-   * @private
-   */
-  _dispatch(event) {
-    for (const [, subscription] of this._subscriptions) {
-      if (matchesFilter(event, subscription.filter)) {
-        try {
-          const result = subscription.handler(event);
-          if (result && typeof result.catch === "function") {
-            result.catch((err) => {
-              Logger.log("error", {
-                message: "EventBus:dispatch:handlerError",
-                params: {
-                  subscriptionId: subscription.subscriptionId,
-                  eventId: event.eventId,
-                  error: err.message
-                }
-              });
-            });
-          }
-        } catch (err) {
-          Logger.log("error", {
-            message: "EventBus:dispatch:syncHandlerError",
-            params: {
-              subscriptionId: subscription.subscriptionId,
-              eventId: event.eventId,
-              error: err.message
-            }
-          });
-        }
-      }
-    }
-  }
-  /**
-   * Listen to raw events (bypasses filter subscriptions).
-   * Useful for monitoring / debugging.
-   *
-   * @param {Function} listener - (event: ConnectorEvent) => void
-   */
-  onAny(listener) {
-    this._emitter.on("connector_event", listener);
-  }
-  /**
-   * Remove an onAny listener.
-   * @param {Function} listener
-   */
-  offAny(listener) {
-    this._emitter.off("connector_event", listener);
-  }
-  /**
-   * Get bus statistics.
-   *
-   * @returns {{ publishedCount: number, subscriptionCount: number }}
-   */
-  getStats() {
-    return {
-      publishedCount: this._publishedCount,
-      subscriptionCount: this._subscriptions.size
-    };
-  }
-  /**
-   * Clear all subscriptions. Used during shutdown.
-   */
-  clear() {
-    this._subscriptions.clear();
-    this._emitter.removeAllListeners("connector_event");
-    this._emitter.on("connector_event", (event) => {
-      this._dispatch(event);
-    });
-    Logger.log("info", { message: "EventBus:clear" });
-  }
-};
-var eventBus = new EventBus();
-
-// src/connectors/dlq.js
-var import_crypto2 = require("crypto");
-var DeadLetterQueue = class {
-  /**
-   * @param {Object} [options]
-   * @param {number} [options.maxRetries=3]
-   * @param {number} [options.baseRetryDelayMs=5000]
-   */
-  constructor(options = {}) {
-    this._entries = /* @__PURE__ */ new Map();
-    this._maxRetries = options.maxRetries ?? 3;
-    this._baseRetryDelayMs = options.baseRetryDelayMs ?? 5e3;
-  }
-  /**
-   * Push a failed event/payload to the DLQ.
-   *
-   * @param {Object} params
-   * @param {string} [params.eventId]
-   * @param {string} [params.tenantId]
-   * @param {string} [params.datasourceId]
-   * @param {*}      [params.rawPayload]
-   * @param {Object} [params.headers]
-   * @param {string} params.errorMessage
-   * @returns {DLQEntry}
-   */
-  push(params) {
-    const dlqId = (0, import_crypto2.randomUUID)();
-    const retryCount = 0;
-    const nextRetryAt = new Date(
-      Date.now() + this._baseRetryDelayMs
-    );
-    const entry = {
-      dlqId,
-      eventId: params.eventId ?? null,
-      tenantId: params.tenantId ?? null,
-      datasourceId: params.datasourceId ?? null,
-      rawPayload: params.rawPayload ?? null,
-      headers: params.headers ?? null,
-      errorMessage: params.errorMessage,
-      retryCount,
-      maxRetries: this._maxRetries,
-      nextRetryAt,
-      resolvedAt: null,
-      createdAt: /* @__PURE__ */ new Date()
-    };
-    this._entries.set(dlqId, entry);
-    Logger.log("warning", {
-      message: "DeadLetterQueue:push",
-      params: {
-        dlqId,
-        eventId: entry.eventId,
-        tenantId: entry.tenantId,
-        error: entry.errorMessage
-      }
-    });
-    return entry;
-  }
-  /**
-   * Get a DLQ entry by ID.
-   *
-   * @param {string} dlqId
-   * @returns {DLQEntry|null}
-   */
-  get(dlqId) {
-    return this._entries.get(dlqId) ?? null;
-  }
-  /**
-   * Get all unresolved entries for a tenant.
-   *
-   * @param {string} tenantId
-   * @returns {DLQEntry[]}
-   */
-  getByTenant(tenantId) {
-    return [...this._entries.values()].filter(
-      (e) => e.tenantId === tenantId && !e.resolvedAt
-    );
-  }
-  /**
-   * Get all entries due for retry (nextRetryAt <= now, not resolved, under max retries).
-   *
-   * @returns {DLQEntry[]}
-   */
-  getRetryable() {
-    const now = /* @__PURE__ */ new Date();
-    return [...this._entries.values()].filter(
-      (e) => !e.resolvedAt && e.retryCount < e.maxRetries && e.nextRetryAt && e.nextRetryAt <= now
-    );
-  }
-  /**
-   * Mark an entry as being retried. Increments retryCount, calculates next retry.
-   *
-   * @param {string} dlqId
-   * @returns {DLQEntry|null}
-   */
-  markRetried(dlqId) {
-    const entry = this._entries.get(dlqId);
-    if (!entry) return null;
-    entry.retryCount++;
-    const delay = this._baseRetryDelayMs * Math.pow(2, entry.retryCount);
-    entry.nextRetryAt = new Date(Date.now() + delay);
-    Logger.log("info", {
-      message: "DeadLetterQueue:markRetried",
-      params: {
-        dlqId,
-        retryCount: entry.retryCount,
-        nextRetryAt: entry.nextRetryAt
-      }
-    });
-    return entry;
-  }
-  /**
-   * Resolve an entry (successfully retried or manually discarded).
-   *
-   * @param {string} dlqId
-   * @returns {boolean}
-   */
-  resolve(dlqId) {
-    const entry = this._entries.get(dlqId);
-    if (!entry) return false;
-    entry.resolvedAt = /* @__PURE__ */ new Date();
-    Logger.log("info", {
-      message: "DeadLetterQueue:resolve",
-      params: { dlqId }
-    });
-    return true;
-  }
-  /**
-   * Discard an entry (remove from DLQ entirely).
-   *
-   * @param {string} dlqId
-   * @returns {boolean}
-   */
-  discard(dlqId) {
-    return this._entries.delete(dlqId);
-  }
-  /**
-   * Get DLQ statistics.
-   *
-   * @returns {{ total: number, unresolved: number, retryable: number, exhausted: number }}
-   */
-  getStats() {
-    let unresolved = 0;
-    let retryable = 0;
-    let exhausted = 0;
-    const now = /* @__PURE__ */ new Date();
-    for (const entry of this._entries.values()) {
-      if (!entry.resolvedAt) {
-        unresolved++;
-        if (entry.retryCount >= entry.maxRetries) {
-          exhausted++;
-        } else if (entry.nextRetryAt && entry.nextRetryAt <= now) {
-          retryable++;
-        }
-      }
-    }
-    return {
-      total: this._entries.size,
-      unresolved,
-      retryable,
-      exhausted
-    };
-  }
-  /**
-   * Clear all entries. Used during testing/shutdown.
-   */
-  clear() {
-    this._entries.clear();
-  }
-  /**
-   * Total entries in the DLQ.
-   * @returns {number}
-   */
-  get size() {
-    return this._entries.size;
-  }
-};
-var deadLetterQueue = new DeadLetterQueue();
-
-// src/connectors/wrapper-factory.js
-function createConnectorFromDataSource({
-  type,
-  DataSourceClass,
-  testConnectionFn,
-  manifest
-}) {
-  const resolvedManifest = {
-    name: type,
-    version: "1.0.0",
-    modes: ["PULL"],
-    semanticTags: [],
-    authSchemes: [],
-    ...manifest
-  };
-  class WrappedConnector extends Connector {
-    constructor() {
-      super(resolvedManifest);
-      this._type = type;
-    }
-    /**
-     * Create a "connection" — for PULL-only connectors, this simply
-     * stores the config. The actual DB/API connection happens per-query
-     * in execute(), which is the existing DataSource behavior.
-     *
-     * For stateful connectors (Kafka, Redis, MQTT), this will be
-     * overridden in Phase 3 to open persistent connections.
-     */
-    async connect(config, ctx) {
-      Logger.log("info", {
-        message: `WrappedConnector:${type}:connect`,
-        params: { tenantId: ctx?.tenantId, instanceId: ctx?.instanceId }
-      });
-      const dsInstance = new DataSourceClass(config);
-      return createConnectorHandle({
-        handleId: ctx?.instanceId || config?.datasourceID,
-        connectorType: type,
-        tenantId: ctx?.tenantId,
-        metadata: {
-          _dsInstance: dsInstance,
-          _config: config
-        },
-        config
-      });
-    }
-    /**
-     * Test connection — delegates to legacy testConnectionFn.
-     */
-    async testConnection(config) {
-      if (!testConnectionFn) {
-        try {
-          const dsInstance = new DataSourceClass(config);
-          return { ok: true, status: 200, statusText: "No test available" };
-        } catch (error) {
-          return { ok: false, error: error.message };
-        }
-      }
-      return testConnectionFn(config.datasourceOptions || config);
-    }
-    /**
-     * Disconnect — no-op for PULL-only connectors.
-     * Overridden for stateful connectors (Kafka, Redis) in later phases.
-     */
-    async disconnect(handle) {
-      Logger.log("info", {
-        message: `WrappedConnector:${type}:disconnect`,
-        params: { handleId: handle?.handleId }
-      });
-    }
-    /**
-     * PULL mode — wraps DataSource.execute() and returns ConnectorEvent[].
-     *
-     * @param {import('./contracts').ConnectorHandle} handle
-     * @param {Object} input - dataQueryOptions (query, method, etc.)
-     * @param {Object} [ctx]
-     * @returns {Promise<import('./contracts').ConnectorEvent[]>}
-     */
-    async pull(handle, input, ctx) {
-      const dsInstance = handle.metadata?._dsInstance;
-      if (!dsInstance) {
-        throw new Error(
-          `WrappedConnector:${type}: no DataSource instance in handle. Was connect() called?`
-        );
-      }
-      Logger.log("info", {
-        message: `WrappedConnector:${type}:pull`,
-        params: {
-          handleId: handle.handleId,
-          inputKeys: Object.keys(input || {})
-        }
-      });
-      const rawResult = await dsInstance.execute(input, ctx);
-      const event = createConnectorEvent({
-        connectorType: type,
-        connectorInstanceId: handle.handleId,
-        tenantId: handle.tenantId,
-        mode: "PULL",
-        eventType: "query.result",
-        payload: rawResult
-      });
-      return [event];
-    }
-    /**
-     * PUSH mode — for write-capable datasources.
-     * Delegates to DataSource.execute() with the write operation.
-     */
-    async push(handle, input, ctx) {
-      if (!this.supportsMode("PUSH")) {
-        throw new Error(`WrappedConnector:${type}: PUSH mode not supported`);
-      }
-      const dsInstance = handle.metadata?._dsInstance;
-      if (!dsInstance) {
-        throw new Error(
-          `WrappedConnector:${type}: no DataSource instance in handle`
-        );
-      }
-      const rawResult = await dsInstance.execute(input, ctx);
-      return {
-        success: true,
-        result: rawResult
-      };
-    }
-    /**
-     * Health check — for PULL-only connectors, delegates to testConnection.
-     */
-    async healthCheck(handle) {
-      if (!testConnectionFn) {
-        return { status: "healthy" };
-      }
-      try {
-        const config = handle.metadata?._config || handle.config;
-        const result = await testConnectionFn(
-          config?.datasourceOptions || config
-        );
-        return {
-          status: result.ok ? "healthy" : "unhealthy",
-          message: result.statusText || result.error
-        };
-      } catch (error) {
-        return {
-          status: "unhealthy",
-          shouldReconnect: true,
-          message: error.message
-        };
-      }
-    }
-  }
-  Object.defineProperty(WrappedConnector, "name", {
-    value: `${type.charAt(0).toUpperCase() + type.slice(1)}Connector`,
-    configurable: true
-  });
-  return WrappedConnector;
-}
-
-// src/connectors/connector-manifests.js
-var CONNECTOR_MANIFESTS = {
-  // ═══════════════════════════════════════════════════════════════════════════
-  // SQL DATABASES — PULL + PUSH (read/write)
-  // ═══════════════════════════════════════════════════════════════════════════
-  postgresql: {
-    name: "PostgreSQL",
-    version: "1.0.0",
-    modes: ["PULL", "PUSH"],
-    semanticTags: ["database", "sql", "relational"],
-    authSchemes: ["connectionString", "basic"]
-  },
-  mysql: {
-    name: "MySQL",
-    version: "1.0.0",
-    modes: ["PULL", "PUSH"],
-    semanticTags: ["database", "sql", "relational"],
-    authSchemes: ["basic"]
-  },
-  mssql: {
-    name: "Microsoft SQL Server",
-    version: "1.0.0",
-    modes: ["PULL", "PUSH"],
-    semanticTags: ["database", "sql", "relational"],
-    authSchemes: ["basic"]
-  },
-  oracle: {
-    name: "Oracle",
-    version: "1.0.0",
-    modes: ["PULL", "PUSH"],
-    semanticTags: ["database", "sql", "relational"],
-    authSchemes: ["basic"]
-  },
-  sqlite: {
-    name: "SQLite",
-    version: "1.0.0",
-    modes: ["PULL", "PUSH"],
-    semanticTags: ["database", "sql", "embedded"],
-    authSchemes: ["none"]
-  },
-  cockroachdb: {
-    name: "CockroachDB",
-    version: "1.0.0",
-    modes: ["PULL", "PUSH"],
-    semanticTags: ["database", "sql", "distributed"],
-    authSchemes: ["connectionString", "basic"]
-  },
-  supabase: {
-    name: "Supabase",
-    version: "1.0.0",
-    modes: ["PULL", "PUSH"],
-    semanticTags: ["database", "sql", "baas"],
-    authSchemes: ["connectionString", "apiKey"]
-  },
-  bigquery: {
-    name: "BigQuery",
-    version: "1.0.0",
-    modes: ["PULL"],
-    semanticTags: ["database", "sql", "analytics", "warehouse"],
-    authSchemes: ["oauth2", "serviceAccount"]
-  },
-  // ═══════════════════════════════════════════════════════════════════════════
-  // NOSQL / DOCUMENT DATABASES
-  // ═══════════════════════════════════════════════════════════════════════════
-  mongodb: {
-    name: "MongoDB",
-    version: "1.0.0",
-    modes: ["PULL", "PUSH"],
-    semanticTags: ["database", "nosql", "document"],
-    authSchemes: ["connectionString", "basic"]
-  },
-  firestore: {
-    name: "Firestore",
-    version: "1.0.0",
-    modes: ["PULL", "PUSH"],
-    semanticTags: ["database", "nosql", "document", "baas"],
-    authSchemes: ["serviceAccount"]
-  },
-  neo4j: {
-    name: "Neo4j",
-    version: "1.0.0",
-    modes: ["PULL", "PUSH"],
-    semanticTags: ["database", "nosql", "graph"],
-    authSchemes: ["basic"]
-  },
-  elasticsearch: {
-    name: "Elasticsearch",
-    version: "1.0.0",
-    modes: ["PULL"],
-    semanticTags: ["database", "search", "analytics"],
-    authSchemes: ["basic", "apiKey"]
-  },
-  airtable: {
-    name: "Airtable",
-    version: "1.0.0",
-    modes: ["PULL", "PUSH"],
-    semanticTags: ["database", "spreadsheet", "saas"],
-    authSchemes: ["apiKey"]
-  },
-  googlesheets: {
-    name: "Google Sheets",
-    version: "1.0.0",
-    modes: ["PULL", "PUSH"],
-    semanticTags: ["spreadsheet", "saas"],
-    authSchemes: ["oauth2", "serviceAccount"]
-  },
-  // ═══════════════════════════════════════════════════════════════════════════
-  // APIS & SERVICES
-  // ═══════════════════════════════════════════════════════════════════════════
-  restapi: {
-    name: "REST API",
-    version: "1.0.0",
-    modes: ["PULL", "PUSH"],
-    semanticTags: ["api", "http"],
-    authSchemes: ["none", "basic", "bearer", "apiKey", "oauth2"]
-  },
-  graphql: {
-    name: "GraphQL",
-    version: "1.0.0",
-    modes: ["PULL", "PUSH"],
-    semanticTags: ["api", "graphql"],
-    authSchemes: ["none", "bearer", "apiKey"]
-  },
-  weburl: {
-    name: "Web URL",
-    version: "1.0.0",
-    modes: ["PULL"],
-    semanticTags: ["web", "scraping"],
-    authSchemes: ["none"]
-  },
-  stripe: {
-    name: "Stripe",
-    version: "1.0.0",
-    modes: ["PULL"],
-    semanticTags: ["finance", "payments", "saas"],
-    authSchemes: ["apiKey"]
-  },
-  twilio: {
-    name: "Twilio",
-    version: "1.0.0",
-    modes: ["PULL", "PUSH"],
-    semanticTags: ["communication", "sms", "saas"],
-    authSchemes: ["apiKey"]
-  },
-  sendgrid: {
-    name: "SendGrid",
-    version: "1.0.0",
-    modes: ["PULL", "PUSH"],
-    semanticTags: ["communication", "email", "saas"],
-    authSchemes: ["apiKey"]
-  },
-  slack: {
-    name: "Slack",
-    version: "1.0.0",
-    modes: ["PULL", "PUSH"],
-    semanticTags: ["communication", "messaging", "saas"],
-    authSchemes: ["oauth2", "apiKey"]
-  },
-  notion: {
-    name: "Notion",
-    version: "1.0.0",
-    modes: ["PULL", "PUSH"],
-    semanticTags: ["productivity", "saas"],
-    authSchemes: ["apiKey"]
-  },
-  jira: {
-    name: "Jira",
-    version: "1.0.0",
-    modes: ["PULL", "PUSH"],
-    semanticTags: ["productivity", "project-management", "saas"],
-    authSchemes: ["basic", "apiKey"]
-  },
-  googleanalytics: {
-    name: "Google Analytics",
-    version: "1.0.0",
-    modes: ["PULL"],
-    semanticTags: ["analytics", "saas"],
-    authSchemes: ["oauth2", "serviceAccount"]
-  },
-  // ═══════════════════════════════════════════════════════════════════════════
-  // MESSAGING & CACHE
-  // ═══════════════════════════════════════════════════════════════════════════
-  kafka: {
-    name: "Kafka",
-    version: "1.0.0",
-    modes: ["PULL", "PUSH"],
-    // STREAM + SUBSCRIBE added in Phase 3
-    semanticTags: ["messaging", "streaming", "iot"],
-    authSchemes: ["none", "sasl"]
-  },
-  rabbitmq: {
-    name: "RabbitMQ",
-    version: "1.0.0",
-    modes: ["PULL", "PUSH"],
-    // SUBSCRIBE added in Phase 3
-    semanticTags: ["messaging", "queue"],
-    authSchemes: ["basic"]
-  },
-  redis: {
-    name: "Redis",
-    version: "1.0.0",
-    modes: ["PULL", "PUSH"],
-    // SUBSCRIBE added in Phase 3
-    semanticTags: ["cache", "messaging", "nosql"],
-    authSchemes: ["none", "basic"]
-  },
-  // ═══════════════════════════════════════════════════════════════════════════
-  // STORAGE
-  // ═══════════════════════════════════════════════════════════════════════════
-  s3: {
-    name: "AWS S3",
-    version: "1.0.0",
-    modes: ["PULL", "PUSH"],
-    // BATCH added in Phase 4
-    semanticTags: ["storage", "cloud"],
-    authSchemes: ["apiKey"]
-  }
-};
-
-// src/connectors/bootstrap.js
-var DATASOURCE_MAP = {
-  postgresql: { DataSourceClass: PostgreSQLDataSource, testConnectionFn: postgresqlTestConnection },
-  mysql: { DataSourceClass: MySQLDataSource, testConnectionFn: mysqlTestConnection },
-  mssql: { DataSourceClass: MSSQLDataSource, testConnectionFn: mssqlTestConnection },
-  oracle: { DataSourceClass: OracleDataSource, testConnectionFn: oracleTestConnection },
-  sqlite: { DataSourceClass: SQLiteDataSource, testConnectionFn: sqliteTestConnection },
-  cockroachdb: { DataSourceClass: CockroachDBDataSource, testConnectionFn: cockroachdbTestConnection },
-  supabase: { DataSourceClass: SupabaseDataSource, testConnectionFn: supabaseTestConnection },
-  bigquery: { DataSourceClass: BigQueryDataSource, testConnectionFn: bigqueryTestConnection },
-  mongodb: { DataSourceClass: MongoDBDataSource, testConnectionFn: mongodbTestConnection },
-  firestore: { DataSourceClass: FirestoreDataSource, testConnectionFn: firestoreTestConnection },
-  neo4j: { DataSourceClass: Neo4jDataSource, testConnectionFn: neo4jTestConnection },
-  elasticsearch: { DataSourceClass: ElasticsearchDataSource, testConnectionFn: elasticsearchTestConnection },
-  airtable: { DataSourceClass: AirtableDataSource, testConnectionFn: airtableTestConnection },
-  googlesheets: { DataSourceClass: GoogleSheetsDataSource, testConnectionFn: googlesheetsTestConnection },
-  restapi: { DataSourceClass: RestAPIDataSource, testConnectionFn: restAPITestConnection },
-  graphql: { DataSourceClass: GraphQLDataSource, testConnectionFn: graphqlTestConnection },
-  weburl: { DataSourceClass: WebURLDataSource, testConnectionFn: webURLTestConnection },
-  stripe: { DataSourceClass: StripeDataSource, testConnectionFn: stripeTestConnection },
-  twilio: { DataSourceClass: TwilioDataSource, testConnectionFn: twilioTestConnection },
-  sendgrid: { DataSourceClass: SendGridDataSource, testConnectionFn: sendgridTestConnection },
-  slack: { DataSourceClass: SlackDataSource, testConnectionFn: slackTestConnection },
-  notion: { DataSourceClass: NotionDataSource, testConnectionFn: notionTestConnection },
-  jira: { DataSourceClass: JiraDataSource, testConnectionFn: jiraTestConnection },
-  googleanalytics: { DataSourceClass: GoogleAnalyticsDataSource, testConnectionFn: googleanalyticsTestConnection },
-  kafka: { DataSourceClass: KafkaDataSource, testConnectionFn: kafkaTestConnection },
-  rabbitmq: { DataSourceClass: RabbitMQDataSource, testConnectionFn: rabbitmqTestConnection },
-  redis: { DataSourceClass: RedisDataSource, testConnectionFn: redisTestConnection },
-  s3: { DataSourceClass: S3DataSource, testConnectionFn: s3TestConnection }
-};
-var _bootstrapped = false;
-function bootstrapConnectorRegistry() {
-  if (_bootstrapped) {
-    Logger.log("info", {
-      message: "bootstrapConnectorRegistry:alreadyBootstrapped",
-      params: { registrySize: connectorRegistry.size }
-    });
-    return {
-      registered: connectorRegistry.size,
-      types: connectorRegistry.listTypes()
-    };
-  }
-  Logger.log("info", {
-    message: "bootstrapConnectorRegistry:start",
-    params: { datasourceCount: Object.keys(DATASOURCE_MAP).length }
-  });
-  const registered = [];
-  for (const [type, { DataSourceClass, testConnectionFn }] of Object.entries(DATASOURCE_MAP)) {
-    const manifest = CONNECTOR_MANIFESTS[type];
-    if (!manifest) {
-      Logger.log("warning", {
-        message: "bootstrapConnectorRegistry:noManifest",
-        params: { type }
-      });
-      continue;
-    }
-    const ConnectorClass = createConnectorFromDataSource({
-      type,
-      DataSourceClass,
-      testConnectionFn,
-      manifest
-    });
-    connectorRegistry.register(type, {
-      connectorClass: ConnectorClass,
-      manifest,
-      // Keep legacy functions for backward compat
-      testConnection: testConnectionFn
-    });
-    registered.push(type);
-  }
-  _bootstrapped = true;
-  Logger.log("success", {
-    message: "bootstrapConnectorRegistry:complete",
-    params: {
-      registered: registered.length,
-      types: registered
-    }
-  });
-  return {
-    registered: registered.length,
-    types: registered
-  };
-}
-function isBootstrapped() {
-  return _bootstrapped;
-}
-
 // src/index.js
 function _buildGetDatasourceInfo(datasourceType) {
   return async ({ datasourceOptions } = {}) => {
@@ -6752,29 +5675,18 @@ var DATASOURCE_LOGIC_COMPONENTS = {
       return await googleanalyticsTestConnection({ datasourceOptions });
     },
     getDatasourceInfo: _buildGetDatasourceInfo("googleanalytics")
+  },
+  // Listeners
+  [import_datasource_types.DATASOURCE_TYPES.SYSLOG.value]: {
+    testConnection: async ({ datasourceOptions }) => {
+      return await syslogTestConnection({ datasourceOptions });
+    },
+    getDatasourceInfo: _buildGetDatasourceInfo("syslog")
   }
 };
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  CONNECTOR_MANIFESTS,
-  Connector,
-  ConnectorInstancePool,
-  ConnectorMode,
-  ConnectorRegistry,
   DATASOURCE_LOGIC_COMPONENTS,
-  DeadLetterQueue,
-  EventBus,
-  LifecycleManager,
-  bootstrapConnectorRegistry,
-  connectorInstancePool,
-  connectorRegistry,
-  createConnectorEvent,
-  createConnectorFromDataSource,
-  createConnectorHandle,
-  dataSourceRegistry,
-  deadLetterQueue,
-  eventBus,
-  isBootstrapped,
-  lifecycleManager
+  dataSourceRegistry
 });
 //# sourceMappingURL=index.cjs.map

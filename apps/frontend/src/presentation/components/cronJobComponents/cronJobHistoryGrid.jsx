@@ -84,7 +84,7 @@ export const CronJobHistoryGrid = ({ tenantID, cronJobID }) => {
       error={loadCronJobHistoryError}
       loadingContainerClass="flex-1"
     >
-      <div className="flex h-full w-full flex-col overflow-hidden bg-background">
+      <div className="flex h-full w-full flex-col overflow-hidden bg-brand-dark">
         {/* ── Header ──────────────────────────────────────────────────── */}
         <div className="flex items-start justify-between border-b border-border px-4 py-3">
           <div>
@@ -99,7 +99,7 @@ export const CronJobHistoryGrid = ({ tenantID, cronJobID }) => {
           </div>
 
           {!isLoadingCronJobHistory && !isNaN(total) && total > 0 && (
-            <span className="rounded border border-border bg-muted/40 px-2 py-0.5 font-mono text-xs text-muted-foreground">
+            <span className="rounded-sm border border-border bg-muted/40 px-2 py-0.5 font-mono text-xs text-muted-foreground">
               {total.toLocaleString()} run{total !== 1 ? "s" : ""}
             </span>
           )}
@@ -108,7 +108,7 @@ export const CronJobHistoryGrid = ({ tenantID, cronJobID }) => {
         {/* ── Body ────────────────────────────────────────────────────── */}
         <div className="flex h-full w-full flex-col overflow-hidden p-3">
           {!cronJobHistory ? (
-            <div className="flex h-full items-center justify-center rounded-lg border border-dashed border-border bg-muted/20 p-6">
+            <div className="flex h-full items-center justify-center rounded-md border border-dashed border-border bg-muted/20 p-6">
               <NoEntityUI message={CONSTANTS.ERROR_CODES.SERVER_ERROR.message} />
             </div>
           ) : hasData ? (
@@ -119,7 +119,7 @@ export const CronJobHistoryGrid = ({ tenantID, cronJobID }) => {
                 getRowId={(row) => row.cronJobHistoryID}
 
                 showCellVerticalBorder
-                className="bg-background"
+                className="bg-brand-dark"
                 disableRowSelectionOnClick
                 disableColumnFilter
                 paginationMode="server"
@@ -142,7 +142,7 @@ export const CronJobHistoryGrid = ({ tenantID, cronJobID }) => {
                 }}
               />
             ) : (
-              <div className="flex h-full items-center justify-center rounded-lg border border-dashed border-border bg-muted/20 p-6">
+              <div className="flex h-full items-center justify-center rounded-md border border-dashed border-border bg-muted/20 p-6">
               <NoEntityUI message="No execution history yet. This job hasn't run." />
             </div>
           )}

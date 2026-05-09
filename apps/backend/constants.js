@@ -1,6 +1,5 @@
 const constants = {
   MODULES: {
-    AI: "ai",
     AUTH: "auth",
     TENANT: "tenant",
     DATABASE: "database",
@@ -15,6 +14,7 @@ const constants = {
     NOTIFICATION: "notification",
     PERMISSION: "permission",
     WORKFLOW: "workflow",
+    LISTENER: "listener",
   },
   STRINGS: {
     USER_TENANT_ADDITION_NOTIFICATION_TITLE: "Tenant addition notification",
@@ -43,23 +43,8 @@ const constants = {
     },
   },
 
-  SUPPORTED_DATABASES: {
-    postgresql: {
-      name: "PostgreSQL",
-      value: "postgresql",
-    },
-    mysql: {
-      name: "MySQL",
-      value: "mysql",
-    },
-  },
-
   SOCKET_EMIT_EVENTS: {
     WORKFLOW_DATA_COLLECTION_REQUEST: 'workflow_data_collection_request',
-    AI_CHAT_ROOM_JOIN: "ai_chat_room_join",
-    AI_CHAT_ROOM_DISCONNECT: "ai_chat_room_disconnect",
-    AI_CHAT_ROOM_ID: "ai_chat_room_id",
-    AI_CHAT_BOT_MESSAGE: "ai_chat_bot_message",
     WORKFLOW_NODE_UPDATE: "workflow_node_update",
     WORKFLOW_STATUS_UPDATE: "workflow_status_update",
     // Widget-Workflow integration events
@@ -69,30 +54,15 @@ const constants = {
     WIDGET_WORKFLOW_ERROR: "widget_workflow_error",
     WIDGET_WORKFLOW_DISCONNECTED: "widget_workflow_disconnected",
     WIDGET_INPUT_RECEIVED: "widget_input_received",
-    // Agent events (server → client)
-    AGENT_THINKING: "agent:thinking",
-    AGENT_APPROVAL_REQUIRED: "agent:approval_required",
-    AGENT_RESPONSE: "agent:response",
-    AGENT_ERROR: "agent:error",
-    AGENT_WIDGET_PROMOTED: "agent:widget_promoted",
-    AGENT_CANCELLED: "agent:cancelled",
   },
 
   SOCKET_RECEIVE_EVENTS: {
-    AI_CHAT_USER_MESSAGE: "ai_chat_user_message",
     WORKFLOW_RUN_JOIN: "workflow_run_join",
     // Widget-Workflow integration events
     WIDGET_WORKFLOW_CONNECT: "widget_workflow_connect",
     WIDGET_SEND_INPUT: "widget_send_input",
     WIDGET_REFRESH: "widget_refresh",
     WIDGET_WORKFLOW_DISCONNECT: "widget_workflow_disconnect",
-    // Agent events (client → server)
-    AGENT_USER_MESSAGE: "agent:user_message",
-    AGENT_DATASOURCE_APPROVAL: "agent:datasource_approval",
-    AGENT_QUERY_APPROVAL: "agent:query_approval",
-    AGENT_PROMOTE_TO_WIDGET: "agent:promote_to_widget",
-    AGENT_FOLLOW_UP: "agent:follow_up",
-    AGENT_CANCEL: "agent:cancel",
   },
 
   SAMPLE_PLAN: {

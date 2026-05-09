@@ -9,7 +9,7 @@ import { DATASOURCE_UI_COMPONENTS } from "@jet-admin/datasources-ui";
 import { getDatasourceTypeByValue } from "@jet-admin/datasource-types";
 import { CONSTANTS } from "../../../constants";
 import { customJSONFormRenderers } from "../ui/jsonFormCustomRenderer";
-import { useDataQueriesState } from "../../../logic/contexts/dataQueriesContext";
+import { useDatasourceOptions } from "../../../logic/hooks/useDatasourceOptions";
 import {
   Label,
   Select,
@@ -21,7 +21,7 @@ import {
 
 function Section({ title, description, children }) {
   return (
-    <div className="rounded border border-border bg-card p-4 space-y-3">
+    <div className="rounded-sm border border-border bg-card p-4 space-y-3">
       {(title || description) && (
         <div>
           {title && (
@@ -96,7 +96,7 @@ export const DataQueryEditor = ({
   const uniqueKey = dataQueryID
     ? `dataQueryEditor_${tenantID}_${dataQueryID}`
     : `dataQueryEditor_${tenantID}`;
-  const { datasources } = useDataQueriesState();
+  const { datasources } = useDatasourceOptions(tenantID);
 
   // Get the current datasource type config
   const currentDatasourceType = getDatasourceTypeByValue(dataQueryEditorForm.values.datasourceType);

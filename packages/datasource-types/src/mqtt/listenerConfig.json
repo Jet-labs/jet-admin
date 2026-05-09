@@ -1,0 +1,18 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "topics": { "type": "string", "description": "Comma-separated MQTT topics to subscribe to (supports wildcards: # and +)" },
+      "qos": { "type": "integer", "enum": [0, 1, 2], "default": 0, "description": "Quality of Service level" }
+    },
+    "required": ["topics"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      { "type": "Control", "scope": "#/properties/topics", "label": "Topics (comma-separated)", "options": { "placeholder": "sensors/+/temperature, alerts/#" } },
+      { "type": "Control", "scope": "#/properties/qos", "label": "QoS Level" }
+    ]
+  },
+  "data": { "topics": "", "qos": 0 }
+}

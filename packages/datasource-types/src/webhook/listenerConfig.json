@@ -1,0 +1,35 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "pathSuffix": {
+        "type": "string",
+        "description": "Custom URL path suffix for this listener's webhook endpoint"
+      },
+      "responseStatusCode": {
+        "type": "integer",
+        "description": "HTTP status code to respond with",
+        "default": 200
+      },
+      "responseBody": {
+        "type": "string",
+        "description": "Static response body to send back to the caller",
+        "default": "{\"ok\":true}"
+      }
+    }
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      { "type": "Control", "scope": "#/properties/pathSuffix", "label": "Endpoint Path Suffix", "options": { "placeholder": "e.g. stripe-events" } },
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          { "type": "Control", "scope": "#/properties/responseStatusCode", "label": "Response Status" },
+          { "type": "Control", "scope": "#/properties/responseBody", "label": "Response Body" }
+        ]
+      }
+    ]
+  },
+  "data": { "pathSuffix": "", "responseStatusCode": 200, "responseBody": "{\"ok\":true}" }
+}

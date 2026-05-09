@@ -20,9 +20,8 @@ import { SiQuantconnect } from "react-icons/si";
 import { TbCloudDataConnection } from "react-icons/tb";
 import { useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../../constants";
-import { getDatabaseMetadataAPI } from "../../../../data/apis/database";
-import { useAuthState } from "../../../../logic/contexts/authContext";
-import { useTenantState } from "../../../../logic/contexts/tenantContext";
+import { useAuthState } from "../../../../logic/hooks/useAuth";
+import { useTenantState } from "../../../../logic/hooks/useTenant";
 import { useComponentSize } from "../../../../logic/hooks/useComponentSize";
 import { TenantSelectionDropdown } from "../../tenantComponents/tenantSelectionDropdown";
 import { NoEntityUI } from "../../ui/noEntityUI";
@@ -52,13 +51,13 @@ const DrawerLinkItem = ({ item, tenantID }) => {
       to={item.path}
       className={`flex items-center rounded-md w-full p-2.5 transition duration-75 group flex-row !justify-start ${isActive
         ? "bg-primary/10 text-primary"
-        : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
+        : "text-brand-text-primary hover:bg-brand-border-dark hover:text-brand-text-primary"
         }`}
     >
       <item.icon
         className={`!w-5 !h-5 ${
-          isActive ? "!text-primary" : "!text-slate-600"
-          } group-hover:text-slate-900`}
+          isActive ? "!text-primary" : "!text-brand-text-primary"
+          } group-hover:text-brand-text-primary`}
       />
       <span className="font-semibold text-sm ml-3">{capitalize(item.title)}</span>
     </Link>
@@ -78,12 +77,12 @@ const DrawerSubMenuItem = ({ subItem, tenantID }) => {
       to={subItem.path}
       className={`flex items-center rounded-md mb-1 w-full p-2 transition duration-75 flex-row justify-start group ${isActive
         ? "bg-primary/10 text-primary"
-        : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+        : "text-brand-text-primary hover:bg-brand-border-dark hover:text-brand-text-primary"
         }`}
     >
       <subItem.icon
-        className={`!w-4 !h-4 ${isActive ? "!text-primary" : "!text-slate-500"
-          } group-hover:text-slate-900`}
+        className={`!w-4 !h-4 ${isActive ? "!text-primary" : "!text-brand-text-primary"
+          } group-hover:text-brand-text-primary`}
       />
       <span className="font-medium text-sm ml-3">{capitalize(subItem.name)}</span>
     </Link>
@@ -94,46 +93,34 @@ const DrawerCollapsibleItem = ({
   item,
   isExpanded,
   setExpanded,
-  isLoadingMetadata,
-  isFetchingMetadata,
   tenantID,
 }) => {
   DrawerCollapsibleItem.propTypes = {
     item: PropTypes.object.isRequired,
     isExpanded: PropTypes.bool.isRequired,
     setExpanded: PropTypes.func.isRequired,
-    isLoadingMetadata: PropTypes.bool.isRequired,
-    isFetchingMetadata: PropTypes.bool.isRequired,
     tenantID: PropTypes.number.isRequired,
   };
   return (
     <AccordionItem value={item.expandedStateKey} className="border-none">
-      <AccordionTrigger className="w-full hover:no-underline hover:bg-slate-100 rounded-md p-2.5 text-slate-700 data-[state=open]:text-slate-900 transition-colors">
+      <AccordionTrigger className="w-full hover:no-underline hover:bg-brand-border-dark rounded-md p-2.5 text-brand-text-primary data-[state=open]:text-brand-text-primary transition-colors">
         <div className="flex items-center">
-          <item.icon className="!w-5 !h-5 !text-slate-600" />
+          <item.icon className="!w-5 !h-5 !text-brand-text-primary" />
           <span className="flex-1 ms-3 text-left font-semibold whitespace-nowrap">
             {item.title}
           </span>
         </div>
       </AccordionTrigger>
       <AccordionContent className="pb-0 pt-1">
-        <ul className="space-y-1 ml-6 border-l pl-2 border-slate-200">
+        <ul className="space-y-1 ml-6 border-l pl-2 border-brand-border">
           <li>
-            {isLoadingMetadata || isFetchingMetadata ? (
-              <div role="status" className="animate-pulse">
-                <div className="h-8 bg-slate-200 rounded mb-2 w-full"></div>
-                <div className="h-8 bg-slate-200 rounded mb-2 w-full"></div>
-                <div className="h-8 bg-slate-200 rounded w-[80%]"></div>
-              </div>
-            ) : (
-              item.subItems.map((subItem, subIndex) => (
-                <DrawerSubMenuItem
-                  key={subIndex}
-                  subItem={subItem}
-                  tenantID={tenantID}
-                />
-              ))
-            )}
+            {item.subItems.map((subItem, subIndex) => (
+              <DrawerSubMenuItem
+                key={subIndex}
+                subItem={subItem}
+                tenantID={tenantID}
+              />
+            ))}
             {item.addButton && (
               <Button
                 onClick={item.addButton.onClick}
@@ -158,17 +145,6 @@ export const MainDrawerList = () => {
   const { tenantID } = useParams();
   const [ref] = useComponentSize();
 
-  const {
-    isLoading: isLoadingDatabaseMetadata,
-    isFetching: isFetchingDatabaseMetadata,
-    data: databaseMetadata,
-  } = useQuery({
-    queryKey: [CONSTANTS.REACT_QUERY_KEYS.DATABASE_METADATA(tenantID)],
-    queryFn: () => getDatabaseMetadataAPI({ tenantID: tenantID }),
-    enabled: Boolean(user),
-    refetchOnWindowFocus: false,
-  });
-
   const _handleNavigateToEditTenantPage = () => {
     if (tenantID) {
       navigate(CONSTANTS.ROUTES.UPDATE_TENANT.path(tenantID));
@@ -178,33 +154,9 @@ export const MainDrawerList = () => {
     navigate(CONSTANTS.ROUTES.ADD_TENANT.path());
   };
 
-  const _navigateToAddDatabaseSchema = () => {
-    navigate(CONSTANTS.ROUTES.ADD_SCHEMA.path(tenantID));
-  };
 
   // Define the drawer list items as an array of objects
   const drawerListItems = [
-    {
-      type: "collapsible",
-      title: CONSTANTS.STRINGS.MAIN_DRAWER_DATABASE_TITLE,
-      icon: BsServer,
-      expandedStateKey: "databaseSchema",
-      isExpanded: false,
-      subItems:
-        databaseMetadata?.schemas?.map((schema) => ({
-          name: capitalize(schema.databaseSchemaName),
-          path: CONSTANTS.ROUTES.VIEW_SCHEMA.path(
-            tenantID,
-            schema.databaseSchemaName
-          ),
-          icon: MdOutlineSchema,
-        })) || [],
-      addButton: {
-        text: CONSTANTS.STRINGS.MAIN_DRAWER_ADD_DATABASE_SCHEMA_BUTTON,
-        onClick: _navigateToAddDatabaseSchema,
-        icon: FaPlus,
-      },
-    },
     {
       type: "link",
       title: CONSTANTS.STRINGS.MAIN_DRAWER_DATASOURCE_TITLE,
@@ -237,15 +189,9 @@ export const MainDrawerList = () => {
     },
     {
       type: "link",
-      title: "Subscriptions", // We should add to constants, but inline for now
-      icon: TbCloudDataConnection, // Or another icon
-      path: CONSTANTS.ROUTES.VIEW_SUBSCRIPTIONS.path(tenantID),
-    },
-    {
-      type: "link",
-      title: "Webhooks",
+      title: CONSTANTS.STRINGS.MAIN_DRAWER_LISTENERS_TITLE,
       icon: TbCloudDataConnection,
-      path: CONSTANTS.ROUTES.VIEW_WEBHOOKS.path(tenantID),
+      path: CONSTANTS.ROUTES.VIEW_LISTENERS.path(tenantID),
     },
     {
       type: "link",
@@ -296,21 +242,21 @@ export const MainDrawerList = () => {
   return (
     <aside
       id="logo-sidebar"
-      className="w-full h-[calc(100vh-50px)] overflow-hidden transition-transform bg-white flex flex-col justify-start items-stretch"
+      className="w-full h-[calc(100vh-50px)] overflow-hidden transition-transform bg-brand-black flex flex-col justify-start items-stretch"
       aria-label="Sidebar"
       ref={ref}
     >
-      <div className="p-3 bg-white flex flex-col justify-start items-stretch z-10 sticky top-0 border-b border-transparent">
+      <div className="p-3 bg-brand-black flex flex-col justify-start items-stretch z-10 sticky top-0 border-b border-transparent">
         {isLoadingTenants ? (
           <div
             role="status"
             className="animate-pulse w-full flex flex-row justify-start items-end"
           >
-            <div className="h-10 bg-slate-200 w-10 rounded-md"></div>
+            <div className="h-10 bg-brand-black w-10 rounded-md"></div>
             <div className="flex flex-col justify-start items-start flex-grow ms-2">
-              <div className="h-2 bg-slate-200 rounded mb-2 w-16"></div>
-              <div className="h-2 bg-slate-200 rounded mb-2 w-full"></div>
-              <div className="h-2 bg-slate-200 rounded mb-0 w-full"></div>
+              <div className="h-2 bg-brand-black rounded-sm mb-2 w-16"></div>
+              <div className="h-2 bg-brand-black rounded-sm mb-2 w-full"></div>
+              <div className="h-2 bg-brand-black rounded-sm mb-0 w-full"></div>
             </div>
           </div>
         ) : tenants && tenants.length > 0 ? (
@@ -319,9 +265,9 @@ export const MainDrawerList = () => {
               <Button
                 onClick={_handleNavigateToEditTenantPage}
                 variant="outline"
-                className="h-10 w-10 rounded-md flex justify-center items-center hover:bg-slate-100 p-2.5"
+                className="h-10 w-10 rounded-md flex justify-center items-center hover:bg-brand-border-dark p-2.5"
               >
-                <Settings className="w-8 h-8 text-slate-600" />
+                <Settings className="w-8 h-8 text-brand-text-primary" />
               </Button>
           </div>
         ) : (
@@ -331,7 +277,7 @@ export const MainDrawerList = () => {
                   className="w-full"
             >
               {CONSTANTS.STRINGS.ADD_TENANT_FORM_TITLE}
-                  <FaPlus className="!w-4 !h-4 !text-white ml-2" />
+                  <FaPlus className="!w-4 !h-4 !text-brand-text-primary ml-2" />
                 </Button>
             <NoEntityUI
               message={CONSTANTS.STRINGS.NO_TENANT_CREATED_TILL_NOW}
@@ -356,8 +302,6 @@ export const MainDrawerList = () => {
                     item={item}
                     isExpanded={menuItemExpandedState.includes(item.expandedStateKey)}
                     setExpanded={() => { }}
-                    isLoadingMetadata={isLoadingDatabaseMetadata}
-                    isFetchingMetadata={isFetchingDatabaseMetadata}
                     tenantID={tenantID}
                   />
                 );

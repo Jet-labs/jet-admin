@@ -5,7 +5,7 @@ import { APIKeyAdditionForm } from "../../components/apiKeyComponents/apiKeyAddi
 const AddAPIKeyPage = () => {
   const { tenantID } = useParams();
   return (
-    <div className="flex h-full w-full flex-col overflow-y-auto bg-background">
+    <div className="flex h-full w-full flex-col overflow-y-auto bg-brand-dark">
       <APIKeyAdditionForm tenantID={tenantID} />
     </div>
   );

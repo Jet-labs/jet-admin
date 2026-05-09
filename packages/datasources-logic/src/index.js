@@ -36,6 +36,9 @@ import { notionTestConnection } from "./data-sources/notion/connection";
 import { jiraTestConnection } from "./data-sources/jira/connection";
 import { googleanalyticsTestConnection } from "./data-sources/googleanalytics/connection";
 
+// Listeners
+import { syslogTestConnection } from "./data-sources/syslog/connection";
+
 // AI Agent — Datasource manifest registry
 import { getManifestForType } from "./data-sources/manifests";
 
@@ -233,5 +236,13 @@ export const DATASOURCE_LOGIC_COMPONENTS = {
       return await googleanalyticsTestConnection({ datasourceOptions });
     },
     getDatasourceInfo: _buildGetDatasourceInfo("googleanalytics"),
+  },
+  
+  // Listeners
+  [DATASOURCE_TYPES.SYSLOG.value]: {
+    testConnection: async ({ datasourceOptions }) => {
+      return await syslogTestConnection({ datasourceOptions });
+    },
+    getDatasourceInfo: _buildGetDatasourceInfo("syslog"),
   },
 };

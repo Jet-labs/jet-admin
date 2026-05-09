@@ -35,20 +35,21 @@ export const DataQueryTestingPanel = ({
         }}
       ></div>
       <div
-        className={`fixed right-0 top-0 h-full w-1/3 bg-white transform transition-transform duration-300 ease-in-out  ${
+        className={`fixed right-0 top-0 h-full w-1/3 bg-brand-black transform transition-transform duration-300 ease-in-out  ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
         style={{
           zIndex: 1100,
         }}
       >
-        <div className="p-2 h-full">
+        <div className="p-4 h-full">
           <Button
             type="button"
             onClick={_handleClose}
-            className=" focus:outline-none  text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 py-1 px-1 rounded border border-slate-300 transition-colors w-fit"
+            variant="outline"
+            size="icon"
           >
-            <IoClose className="text-base text-slate-700" />
+            <IoClose className="text-base text-brand-text-primary" />
           </Button>
           {selectedQueryForTesting && (
             <div className="w-full flex flex-col justify-start items-stretch h-full flex-grow">
@@ -64,7 +65,7 @@ export const DataQueryTestingPanel = ({
                   setDataQueryTestResult={setDataQueryTestResult}
                 />
               </div>
-              <div className="w-full !h-[calc(100%-50px)] mt-3 border-t border-t-slate-200">
+              <div className="w-full !h-[calc(100%-50px)] mt-3 border-t border-t-brand-border">
                 {DATASOURCE_UI_COMPONENTS[
                   selectedQueryForTesting?.datasourceType
                 ]?.queryResponseView({

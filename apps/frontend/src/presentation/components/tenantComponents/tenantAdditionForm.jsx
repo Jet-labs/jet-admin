@@ -4,7 +4,7 @@ import { CONSTANTS } from "../../../constants";
 import { createNewTenantAPI } from "../../../data/apis/tenant";
 import { displayError, displaySuccess } from "../../../utils/notification";
 
-import { useTenantActions } from "../../../logic/contexts/tenantContext";
+import { useTenantActions } from "../../../logic/hooks/useTenant";
 import { TenantEditor } from "./tenantEditor";
 import { formValidations } from "../../../utils/formValidation";
 import React from "react";
@@ -15,8 +15,8 @@ export const TenantAdditionForm = () => {
 
   const { isPending: isCreatingNewTenant, mutate: createNewTenant } =
     useMutation({
-      mutationFn: ({ tenantTitle, tenantLogoURL, tenantDBURL }) =>
-        createNewTenantAPI({ tenantTitle, tenantLogoURL, tenantDBURL }),
+      mutationFn: ({ tenantTitle, tenantLogoURL }) =>
+        createNewTenantAPI({ tenantTitle, tenantLogoURL }),
       retry: false,
       onSuccess: (tenant) => {
         saveTenantLocallyAndReload(tenant);
@@ -32,21 +32,19 @@ export const TenantAdditionForm = () => {
     initialValues: {
       tenantTitle: "",
       tenantLogoURL: "",
-      tenantDBURL: "",
     },
     validationSchema: formValidations.addTenantFormValidationSchema,
-    onSubmit: ({ tenantTitle, tenantLogoURL, tenantDBURL }) => {
-      createNewTenant({
+    onSubmit: ({ tenantTitle, tenantLogoURL }) => {
+      updateTenant({
         tenantTitle,
         tenantLogoURL,
-        tenantDBURL,
       });
     },
   });
 
   return (
-    <div className="flex w-full h-full flex-col overflow-hidden bg-background">
-      <div className="flex items-center justify-between border-b border-border bg-background px-4 py-3 shrink-0">
+    <div className="flex w-full h-full flex-col overflow-hidden bg-brand-dark">
+      <div className="flex items-center justify-between border-b border-border bg-brand-dark px-4 py-3 shrink-0">
         <div>
           <h1 className="text-base font-semibold tracking-tight text-foreground">
             {CONSTANTS.STRINGS.ADD_TENANT_FORM_TITLE}
@@ -57,7 +55,7 @@ export const TenantAdditionForm = () => {
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 md:p-8">
+      <div className="flex-1 overflow-y-auto p-4 md:p-6">
         <section className="mx-auto max-w-2xl w-full">
           <form
             className="space-y-4"
@@ -69,7 +67,6 @@ export const TenantAdditionForm = () => {
             <div className="flex justify-end pt-2">
               <Button
                 type="submit"
-                size="sm"
                 disabled={isCreatingNewTenant}
               >
                 {isCreatingNewTenant && (

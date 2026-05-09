@@ -2,7 +2,8 @@ import React from "react";
 import { useCallback, useMemo } from "react";
 import { CONSTANTS } from "../../../constants";
 import { CronJobScheduler } from "./cronJobScheduler";
-import { useCronJobsState } from "../../../logic/contexts/cronJobsContext";
+import { useWorkflows } from "../../../logic/hooks/useWorkflows";
+import { useParams } from "react-router-dom";
 import PropTypes from "prop-types";
 import {
   Input,
@@ -21,7 +22,7 @@ import {
 /** Wraps a form section with a consistent heading + card look. */
 function Section({ title, description, children }) {
   return (
-    <div className="rounded-lg border border-border bg-card p-4 space-y-3">
+    <div className="rounded-md border border-border bg-card p-4 space-y-3">
       {(title || description) && (
         <div>
           {title && (
@@ -51,7 +52,8 @@ export const CronJobEditor = ({ cronJobEditorForm }) => {
     cronJobEditorForm: PropTypes.object.isRequired,
   };
 
-  const { workflows } = useCronJobsState();
+  const { tenantID } = useParams();
+  const { workflows } = useWorkflows(tenantID);
 
   const _handleOnScheduleChange = useCallback(
     (value) => {
@@ -232,7 +234,7 @@ export const CronJobEditor = ({ cronJobEditorForm }) => {
       </Section>
 
       {/* ── Active toggle ─────────────────────────────────────────────────── */}
-      <div className="flex items-center justify-between rounded-lg border border-border bg-card px-4 py-3">
+      <div className="flex items-center justify-between rounded-md border border-border bg-card px-4 py-3">
         <div>
           <p className="text-sm font-medium leading-none">Active</p>
           <p className="mt-1 text-[11px] text-muted-foreground">

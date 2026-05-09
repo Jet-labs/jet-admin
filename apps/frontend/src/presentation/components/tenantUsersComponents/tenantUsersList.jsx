@@ -3,21 +3,21 @@ import React from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Badge } from "@jet-admin/ui";
 import { CONSTANTS } from "../../../constants";
-import { useUserManagementState } from "../../../logic/contexts/userManagementContext";
+import { useTenantUsers } from "../../../logic/hooks/useTenantUsers";
 import { NoEntityUI } from "../ui/noEntityUI";
 import { ReactQueryLoadingErrorWrapper } from "../ui/reactQueryLoadingErrorWrapper";
 import { DATAGRID_SX } from "../../../shared/dataGridTheme";
 
 export const TenantUsersList = () => {
+  const { tenantID } = useParams();
   const {
     tenantUsers,
     tenantUsersError,
     isLoadingTenantUsers,
     isFetchingTenantUsers,
-  } = useUserManagementState();
+  } = useTenantUsers(tenantID);
   const apiRef = useGridApiRef();
   const navigate = useNavigate();
-  const { tenantID } = useParams();
 
   const columns = [
     {
@@ -73,7 +73,7 @@ export const TenantUsersList = () => {
       error={tenantUsersError}
     >
       {tenantUsers?.users?.length ? (
-        <div className="flex h-full w-full flex-col overflow-hidden bg-background">
+        <div className="flex h-full w-full flex-col overflow-hidden bg-brand-dark">
           <DataGrid
             apiRef={apiRef}
             rows={tenantUsers.users}

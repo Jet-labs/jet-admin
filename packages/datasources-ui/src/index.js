@@ -5,7 +5,7 @@ import { WebViewQueryResponseView } from "./components/common/webViewQueryRespon
 
 // Generic test result UI for all datasources
 const GenericDatasourceTestResultUI = ({ connectionResult }) => {
-  let connectionResultClass = "bg-slate-100 !border-slate-400 text-slate-700";
+  let connectionResultClass = "bg-slate-100 !border-slate-200 text-[#1c1c1e]";
   let connectionResultText = "Connection not tested";
   console.log("connectionResult", connectionResult);
 
@@ -16,7 +16,7 @@ const GenericDatasourceTestResultUI = ({ connectionResult }) => {
     connectionResultClass = "bg-red-100 !border-red-400 text-red-700";
     connectionResultText = connectionResult?.error || "Connection failed";
   } else if (connectionResult === undefined) {
-    connectionResultClass = "bg-slate-100 !border-slate-400 text-slate-700";
+    connectionResultClass = "bg-slate-100 !border-slate-200 text-[#1c1c1e]";
     connectionResultText = "Connection not tested";
   } else {
     connectionResultClass = "bg-orange-100 !border-orange-400 text-orange-700";
@@ -85,4 +85,11 @@ export const DATASOURCE_UI_COMPONENTS = {
   [DATASOURCE_TYPES.NOTION.value]: createGenericDatasourceUI(),
   [DATASOURCE_TYPES.JIRA.value]: createGenericDatasourceUI(),
   [DATASOURCE_TYPES.GOOGLEANALYTICS.value]: createGenericDatasourceUI(),
+  // Listener-capable new datasources
+  [DATASOURCE_TYPES.WEBHOOK.value]: createGenericDatasourceUI(),
+  [DATASOURCE_TYPES.MQTT.value]: createGenericDatasourceUI(),
+  [DATASOURCE_TYPES.WEBSOCKET.value]: createGenericDatasourceUI(),
+  [DATASOURCE_TYPES.SSE.value]: createGenericDatasourceUI(),
+  [DATASOURCE_TYPES.SYSLOG.value]: createGenericDatasourceUI(),
+  [DATASOURCE_TYPES.NATS.value]: createGenericDatasourceUI(),
 };

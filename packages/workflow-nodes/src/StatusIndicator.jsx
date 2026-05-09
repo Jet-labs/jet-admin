@@ -51,7 +51,7 @@ export const getStatusStyles = (executionStatus, defaultHoverColor = 'blue-400')
     case 'skipped':
       return 'border-orange-300 opacity-60';
     default:
-      return `border-slate-200 hover:border-${defaultHoverColor} hover:shadow-md`;
+      return `border-brand-border hover:border-${defaultHoverColor} hover:shadow-md`;
   }
 };
 
@@ -77,17 +77,17 @@ export const getIconColor = (executionStatus, defaultColor) => {
 /**
  * Returns background color class based on execution status
  * @param {string} executionStatus - The execution status
- * @param {string} defaultBg - The default background class (e.g., 'bg-blue-50 border-blue-100')
+ * @param {string} defaultBg - The default background class (e.g., 'bg-blue-950/40 border-blue-800')
  * @returns {string} Tailwind CSS background classes
  */
 export const getStatusBgColor = (executionStatus, defaultBg) => {
   switch (executionStatus) {
     case 'running':
-      return 'bg-blue-100 border-blue-200';
+      return 'bg-blue-950/40 border-blue-800';
     case 'completed':
-      return 'bg-green-50 border-green-100';
+      return 'bg-green-950/40 border-green-800';
     case 'failed':
-      return 'bg-red-50 border-red-100';
+      return 'bg-red-950/40 border-red-800';
     default:
       return defaultBg;
   }

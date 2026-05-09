@@ -4,57 +4,51 @@ import { cva } from "class-variance-authority";
 import { cn } from "../lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  "inline-flex items-center justify-center gap-1.5 whitespace-nowrap font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-green-border focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-95",
   {
     variants: {
       variant: {
         default:
-          "bg-primary text-primary-foreground hover:bg-primary/90",
-        destructive:
-          "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        "destructive-ghost":
-          "bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-600",
-        "primary-ghost":
-          "bg-primary/10 text-primary hover:bg-primary/20",
-        "primary-outline":
-          "border border-primary bg-background text-primary hover:bg-primary/10",
-        outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
+          "bg-brand-green text-brand-black font-semibold border border-transparent hover:bg-brand-green/90",
         secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+          "bg-brand-border-dark text-brand-text-primary border border-brand-border hover:bg-brand-border hover:border-brand-border-mid",
+        green:
+          "bg-brand-green text-brand-black font-semibold border border-transparent hover:bg-brand-green/90",
+        destructive:
+          "bg-red-600 text-white hover:bg-red-700 border border-transparent",
+        white:
+          "bg-brand-text-primary text-brand-black hover:opacity-90 border border-transparent",
+        outline:
+          "bg-transparent border border-brand-border text-brand-text-primary hover:bg-white/5 hover:border-brand-border-mid",
         ghost:
-          "hover:bg-accent hover:text-accent-foreground",
+          "bg-transparent text-brand-text-primary hover:bg-white/5",
         link:
-          "text-primary underline-offset-4 hover:underline",
+          "text-brand-green-link hover:text-brand-green underline-offset-4 hover:underline",
+        pill:
+          "bg-brand-border-dark text-brand-text-primary border border-brand-border hover:border-brand-border-mid",
       },
       size: {
-        default: "h-7 px-3",
-        sm: "h-7 px-2.5 text-xs",
-        lg: "h-10 px-5 text-base",
-      },
-      square: {
-        true: "px-0",
+        default: "px-[14px] py-[5px] text-[13px] rounded-sm",
+        sm: "px-[10px] py-[3px] text-[12px] rounded-sm",
+        lg: "px-[20px] py-[8px] text-[14px] rounded-sm",
+        icon: "h-[28px] w-[28px] rounded-sm",
+        circle: "h-[36px] w-[36px] p-0 rounded-pill",
+        pill: "px-[24px] py-[5px] text-[13px] rounded-pill",
       },
     },
-    compoundVariants: [
-      { square: true, size: "default", className: "w-7" },
-      { square: true, size: "sm", className: "w-7" },
-      { square: true, size: "lg", className: "w-10" },
-    ],
     defaultVariants: {
       variant: "default",
       size: "default",
-      square: false,
     },
   }
 );
 
 const Button = React.forwardRef(
-  ({ className, variant, size, square, asChild = false, ...props }, ref) => {
+  ({ className, variant, size, asChild = false, ...props }, ref) => {
     const Comp = asChild ? Slot : "button";
     return (
       <Comp
-        className={cn(buttonVariants({ variant, size, square, className }))}
+        className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
         {...props}
       />

@@ -40,6 +40,7 @@ const collectArrayPaths = (obj, prefix = 'ctx', depth = 0, maxDepth = 4) => {
  */
 export const DataFieldPanel = ({
   workflowContext,
+  queryResults,
   dataSource,
   onDataSourceChange,
   onFieldClick,
@@ -98,6 +99,12 @@ export const DataFieldPanel = ({
     return collectArrayPaths(workflowContext);
   }, [workflowContext]);
 
+  // Query result array paths
+  const queryResultPaths = useMemo(() => {
+    if (!queryResults) return [];
+    return collectArrayPaths(queryResults, 'qr');
+  }, [queryResults]);
+
   // All suggestions combined
   const allSuggestions = useMemo(() => {
     const seen = new Set();
@@ -114,6 +121,29 @@ export const DataFieldPanel = ({
       }
     }
 
+    // Add query result paths
+    if (queryResults) {
+      for (const alias of Object.keys(queryResults)) {
+        const data = queryResults[alias];
+        const isArray = Array.isArray(data);
+        const arrayData = isArray ? data : (data?.data && Array.isArray(data.data) ? data.data : null);
+        if (arrayData && arrayData.length > 0) {
+          const path = isArray ? `{{${alias}}}` : `{{${alias}.data}}`;
+          if (!seen.has(path)) {
+            seen.add(path);
+            combined.push({
+              path,
+              label: `${alias} (Data Source)`,
+              sampleKeys: Object.keys(arrayData[0]),
+              rowCount: arrayData.length,
+              source: 'datasource',
+              description: `${arrayData.length} rows, fields: ${Object.keys(arrayData[0]).slice(0, 4).join(', ')}`,
+            });
+          }
+        }
+      }
+    }
+
     for (const s of schemaSuggestions) {
       if (!seen.has(s.path)) {
         seen.add(s.path);
@@ -122,43 +152,70 @@ export const DataFieldPanel = ({
     }
 
     return combined;
-  }, [ctxArrayPaths, schemaSuggestions]);
+  }, [ctxArrayPaths, queryResultPaths, schemaSuggestions, queryResults]);
 
   // Resolve fields from selected data source
   const fields = useMemo(() => {
-    if (!workflowContext || !dataSource) return [];
+    // Try resolving from workflowContext (legacy path)
+    if (workflowContext && dataSource) {
+      const match = dataSource.match(/\{\{ctx\.([^}]+)\}\}/);
+      if (match) {
+        const path = match[1];
+        const parts = path.split('.');
+        let current = workflowContext;
 
-    const match = dataSource.match(/\{\{ctx\.([^}]+)\}\}/);
-    if (!match) return [];
+        for (const part of parts) {
+          if (current === undefined || current === null) break;
+          const arrMatch = part.match(/^(.+)\[(\d+)\]$/);
+          if (arrMatch) {
+            current = current[arrMatch[1]]?.[parseInt(arrMatch[2])];
+          } else {
+            current = current[part];
+          }
+        }
 
-    const path = match[1];
-    const parts = path.split('.');
-    let current = workflowContext;
-
-    for (const part of parts) {
-      if (current === undefined || current === null) break;
-      const arrMatch = part.match(/^(.+)\[(\d+)\]$/);
-      if (arrMatch) {
-        current = current[arrMatch[1]]?.[parseInt(arrMatch[2])];
-      } else {
-        current = current[part];
+        if (Array.isArray(current)) {
+          return inferFieldsFromData(current);
+        }
+        if (current && typeof current === 'object' && !Array.isArray(current)) {
+          return Object.keys(current).map(key => ({
+            name: key,
+            type: typeof current[key] === 'number' ? 'quantitative' : 'nominal',
+            icon: typeof current[key] === 'number' ? '#' : 'Abc',
+          }));
+        }
       }
     }
 
-    if (Array.isArray(current)) {
-      return inferFieldsFromData(current);
-    }
+    // Try resolving from queryResults (new data source path)
+    if (queryResults && dataSource) {
+      // Match patterns like {{alias.data}} or {{alias}}
+      const match = dataSource.match(/\{\{([^}]+)\}\}/);
+      if (match) {
+        const fullPath = match[1];
+        const parts = fullPath.split('.');
+        let current = queryResults;
 
-    if (current && typeof current === 'object' && !Array.isArray(current)) {
-      return Object.keys(current).map(key => ({
-        name: key,
-        type: typeof current[key] === 'number' ? 'quantitative' : 'nominal',
-        icon: typeof current[key] === 'number' ? '#' : 'Abc',
-      }));
+        for (const part of parts) {
+          if (current === undefined || current === null) break;
+          current = current[part];
+        }
+
+        if (Array.isArray(current) && current.length > 0) {
+          return inferFieldsFromData(current);
+        }
+        if (current && typeof current === 'object' && !Array.isArray(current)) {
+          return Object.keys(current).map(key => ({
+            name: key,
+            type: typeof current[key] === 'number' ? 'quantitative' : 'nominal',
+            icon: typeof current[key] === 'number' ? '#' : 'Abc',
+          }));
+        }
+      }
     }
 
     return [];
-  }, [workflowContext, dataSource]);
+  }, [workflowContext, queryResults, dataSource]);
 
   // Filter fields
   const filteredFields = useMemo(() => {
@@ -191,7 +248,8 @@ export const DataFieldPanel = ({
       case 'node': return <BiGitMerge className="w-3 h-3 shrink-0 text-emerald-600" />;
       case 'output': return <MdOutput className="w-3 h-3 shrink-0 text-fuchsia-600" />;
       case 'runtime': return <FiZap className="w-3 h-3 shrink-0 text-amber-600" />;
-      default: return <FiDatabase className="w-3 h-3 shrink-0 text-slate-400" />;
+      case 'datasource': return <FiDatabase className="w-3 h-3 shrink-0 text-blue-600" />;
+      default: return <FiDatabase className="w-3 h-3 shrink-0 text-brand-text-primary" />;
     }
   };
 
@@ -217,7 +275,7 @@ export const DataFieldPanel = ({
   };
 
   return (
-    <div className={`flex flex-col h-full bg-background ${className}`}>
+    <div className={`flex flex-col h-full bg-brand-dark ${className}`}>
       {/* Header */}
       <div className="p-2.5 border-b border-border bg-muted/30">
         <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1.5">
@@ -239,7 +297,7 @@ export const DataFieldPanel = ({
 
           {/* Suggestions dropdown */}
           {showSuggestions && allSuggestions.length > 0 && (
-            <div className="absolute left-0 right-0 top-full mt-1 bg-background border border-border rounded-md shadow-xl z-50 max-h-60 overflow-y-auto w-80">
+            <div className="absolute left-0 right-0 top-full mt-1 bg-brand-dark border border-border rounded-md shadow-xl z-50 max-h-60 overflow-y-auto w-80">
               <div className="px-3 py-1.5 text-[10px] font-bold text-muted-foreground uppercase tracking-widest border-b border-border bg-muted sticky top-0">
                 Available Variables ({allSuggestions.length})
               </div>
@@ -247,7 +305,7 @@ export const DataFieldPanel = ({
                 <div
                   key={`${s.path}-${i}`}
                   onClick={() => handleSelectSuggestion(s)}
-                  className={`w-full text-left px-3 py-1.5 text-xs border-b border-border/50 flex items-start gap-2 transition-colors cursor-pointer ${dataSource === s.path ? 'bg-primary/5 border-l-2 border-l-primary' : 'bg-background hover:bg-muted'}`}
+                  className={`w-full text-left px-3 py-1.5 text-xs border-b border-border/50 flex items-start gap-2 transition-colors cursor-pointer ${dataSource === s.path ? 'bg-primary/5 border-l-2 border-l-primary' : 'bg-brand-dark hover:bg-muted'}`}
                 >
                   <div className="mt-0.5">{getCategoryIcon(s.source || s.category)}</div>
                   <div className="flex-1 min-w-0">
@@ -264,7 +322,7 @@ export const DataFieldPanel = ({
                     )}
                   </div>
                   {s.source === 'runtime' && (
-                    <span className="text-[9px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded uppercase tracking-wider shrink-0">LIVE</span>
+                    <span className="text-[9px] font-bold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded-sm uppercase tracking-wider shrink-0">LIVE</span>
                   )}
                 </div>
               ))}
@@ -274,7 +332,7 @@ export const DataFieldPanel = ({
 
         {/* Show selected source info */}
         {dataSource && fields.length > 0 && (
-          <div className="mt-1.5 flex items-center gap-1.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded w-fit border border-emerald-100">
+          <div className="mt-1.5 flex items-center gap-1.5 text-[10px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-sm w-fit border border-emerald-100">
             <FiZap className="w-3 h-3" />
             {fields.length} fields detected
           </div>
@@ -283,8 +341,8 @@ export const DataFieldPanel = ({
 
       {/* Search */}
       {fields.length > 5 && (
-        <div className="px-2.5 py-1.5 border-b border-border bg-background">
-          <div className="flex items-center gap-2 bg-muted/50 border border-border rounded px-2 py-1 focus-within:ring-1 focus-within:ring-ring focus-within:border-ring transition-shadow">
+        <div className="px-2.5 py-1.5 border-b border-border bg-brand-dark">
+          <div className="flex items-center gap-2 bg-muted/50 border border-border rounded-sm px-2 py-1 focus-within:ring-1 focus-within:ring-ring focus-within:border-ring transition-shadow">
             <FiSearch className="w-3.5 h-3.5 text-muted-foreground" />
             <Input
               type="text"
@@ -327,7 +385,7 @@ export const DataFieldPanel = ({
         )}
 
         {/* Manual field add */}
-        <div className="mt-3 pt-3 border-t border-border">
+        <div className="mt-3">
           {showManualAdd ? (
             <div className="flex flex-col gap-2">
               <Input
@@ -378,6 +436,7 @@ export const DataFieldPanel = ({
 
 DataFieldPanel.propTypes = {
   workflowContext: PropTypes.object,
+  queryResults: PropTypes.object,
   dataSource: PropTypes.string,
   onDataSourceChange: PropTypes.func,
   onFieldClick: PropTypes.func,

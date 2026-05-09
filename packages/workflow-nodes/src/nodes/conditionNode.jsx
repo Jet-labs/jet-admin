@@ -173,7 +173,7 @@ function ConditionRow({ condition, onChange, onDelete, canDelete }) {
         type="button"
         onClick={onDelete}
         disabled={!canDelete}
-        className="h-7 w-7 shrink-0 flex items-center justify-center rounded text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10 disabled:opacity-20 transition-colors"
+        className="h-7 w-7 shrink-0 flex items-center justify-center rounded-sm text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10 disabled:opacity-20 transition-colors"
         title="Remove condition"
       >
         <FaTrash className="w-2.5 h-2.5" />
@@ -191,11 +191,11 @@ function AndOrDivider({ logic, onToggle }) {
         onClick={onToggle}
         title={`Click to switch to ${logic === 'AND' ? 'OR' : 'AND'}`}
         className={`
-          text-[9px] font-bold px-2 py-0.5 rounded border tracking-wider
+          text-[9px] font-bold px-2 py-0.5 rounded-sm border tracking-wider
           transition-colors select-none
           ${logic === 'AND'
           ? 'bg-primary/10 text-primary border-primary/30 hover:bg-primary/15'
-          : 'bg-amber-50 text-amber-600 border-amber-200 hover:bg-amber-100'
+          : 'bg-amber-950/40 text-amber-600 border-amber-800 hover:bg-amber-100'
           }
         `}
       >
@@ -247,10 +247,10 @@ function BranchEditor({ branch, onChange }) {
             type="button"
             onClick={toggleLogic}
             className={`
-              text-[9px] font-bold px-2 py-0.5 rounded border transition-colors
+              text-[9px] font-bold px-2 py-0.5 rounded-sm border transition-colors
               ${branch.conditionLogic === 'AND'
               ? 'bg-primary/10 text-primary border-primary/30'
-              : 'bg-amber-50 text-amber-600 border-amber-200'
+              : 'bg-amber-950/40 text-amber-600 border-amber-800'
               }
             `}
           >
@@ -363,12 +363,12 @@ export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
           onChange={e => setDescription(e.target.value)}
           rows={2}
           placeholder="What does this condition check?"
-          className="w-full text-xs text-foreground border border-border rounded-md px-2.5 py-1.5 resize-none focus:outline-none focus:ring-2 focus:ring-ring bg-background transition-colors"
+          className="w-full text-xs text-foreground border border-border rounded-md px-2.5 py-1.5 resize-none focus:outline-none focus:ring-2 focus:ring-ring bg-brand-dark transition-colors"
         />
       </div>
 
       {/* Branch panel */}
-      <div className="rounded-lg border border-border overflow-hidden">
+      <div className="rounded-md border border-border overflow-hidden">
 
         {/* Tab bar */}
         <div className="flex items-center bg-muted/50 border-b border-border overflow-x-auto">
@@ -380,8 +380,8 @@ export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
                 text-xs font-medium border-r border-border
                 whitespace-nowrap transition-all select-none
                 ${activeIdx === idx
-                ? 'bg-background text-primary shadow-[inset_0_-2px_0_hsl(var(--primary))]'
-                : 'text-muted-foreground hover:text-foreground hover:bg-background/60'
+                ? 'bg-brand-dark text-primary shadow-[inset_0_-2px_0_hsl(var(--primary))]'
+                : 'text-muted-foreground hover:text-foreground hover:bg-brand-dark/60'
                 }
               `}
               onClick={() => setActiveIdx(idx)}
@@ -405,7 +405,7 @@ export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
                 <button
                   type="button"
                   onClick={e => { e.stopPropagation(); removeBranch(idx); }}
-                  className="ml-0.5 w-3.5 h-3.5 flex items-center justify-center text-muted-foreground/30 hover:text-destructive rounded opacity-0 group-hover:opacity-100 transition-all"
+                  className="ml-0.5 w-3.5 h-3.5 flex items-center justify-center text-muted-foreground/30 hover:text-destructive rounded-sm opacity-0 group-hover:opacity-100 transition-all"
                 >
                   ×
                 </button>
@@ -416,7 +416,7 @@ export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
           <button
             type="button"
             onClick={addBranch}
-            className="px-3 py-2.5 text-xs text-primary hover:text-primary/80 hover:bg-background/60 transition-colors flex items-center gap-1 whitespace-nowrap"
+            className="px-3 py-2.5 text-xs text-primary hover:text-primary/80 hover:bg-brand-dark/60 transition-colors flex items-center gap-1 whitespace-nowrap"
           >
             <FaPlus className="w-2.5 h-2.5" />
             Add branch
@@ -439,7 +439,7 @@ export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
       </div>
 
       {/* else indicator */}
-      <div className="flex items-center gap-2.5 px-3 py-2 bg-muted/30 border border-dashed border-border rounded-lg text-xs text-muted-foreground">
+      <div className="flex items-center gap-2.5 px-3 py-2 bg-muted/30 border border-dashed border-border rounded-md text-xs text-muted-foreground">
         <span className="w-5 h-5 rounded-full bg-muted flex items-center justify-center text-[10px] font-bold shrink-0">
           ∅
         </span>
@@ -466,21 +466,21 @@ export const ConditionNodeConfigurator = ({ data, onChange, nodeId }) => {
       </div>
 
       {/* Help callout */}
-      <div className="p-3 rounded-lg border border-primary/20 bg-primary/5 text-[10px] text-primary/80 space-y-1.5">
+      <div className="p-3 rounded-md border border-primary/20 bg-primary/5 text-[10px] text-primary/80 space-y-1.5">
         <div className="font-semibold text-xs text-primary">💡 Writing Conditions</div>
         <div>
-          Use <code className="bg-background px-1 rounded border border-border font-mono">{'{{ctx.field}}'}</code> in
+          Use <code className="bg-brand-dark px-1 rounded-sm border border-border font-mono">{'{{ctx.field}}'}</code> in
           left and right inputs — e.g.{' '}
-          <code className="bg-background px-1 rounded border border-border font-mono">{'{{ctx.input.severity}}'}</code>.
+          <code className="bg-brand-dark px-1 rounded-sm border border-border font-mono">{'{{ctx.input.severity}}'}</code>.
         </div>
         <div>
           The right side can also be a plain literal like{' '}
-          <code className="bg-background px-1 rounded border border-border font-mono">High</code> or{' '}
-          <code className="bg-background px-1 rounded border border-border font-mono">3</code>.
+          <code className="bg-brand-dark px-1 rounded-sm border border-border font-mono">High</code> or{' '}
+          <code className="bg-brand-dark px-1 rounded-sm border border-border font-mono">3</code>.
         </div>
         <div>
           For complex logic, use <strong>JS Expression</strong> — raw JS where{' '}
-          <code className="bg-background px-1 rounded border border-border font-mono">ctx.field</code> is a direct variable (no braces).
+          <code className="bg-brand-dark px-1 rounded-sm border border-border font-mono">ctx.field</code> is a direct variable (no braces).
         </div>
         <div>Branches are evaluated <strong>top → bottom</strong>; first match wins.</div>
       </div>
@@ -507,33 +507,33 @@ export const ConditionNode = memo(({ data, isConnectable }) => {
   return (
     <div
       className={`
-        bg-white rounded border shadow-sm
+        bg-brand-black rounded-sm border shadow-sm
         min-w-[260px] max-w-[340px]
         transition-all duration-150
         ${isDisabled
-          ? 'border-slate-200 opacity-50'
-        : 'border-slate-200 hover:border-indigo-400 hover:shadow-md'
+          ? 'border-brand-border opacity-50'
+        : 'border-brand-border hover:border-indigo-400 hover:shadow-md'
         }
       `}
     >
       <div
         className={`
           flex items-center gap-2.5 px-3 py-2.5 border-b rounded-t
-          ${isDisabled ? 'bg-slate-50 border-slate-100' : 'bg-indigo-50 border-indigo-100'}
+          ${isDisabled ? 'bg-brand-dark border-brand-border' : 'bg-indigo-950/40 border-indigo-800'}
         `}
       >
         <svg
           width="14" height="14" viewBox="0 0 14 14"
-          className={`shrink-0 ${isDisabled ? 'text-slate-400' : 'text-indigo-500'}`}
+          className={`shrink-0 ${isDisabled ? 'text-brand-text-primary' : 'text-indigo-500'}`}
           fill="currentColor"
         >
           <path d="M7 0 L14 7 L7 14 L0 7 Z" />
         </svg>
-        <span className={`text-xs font-semibold truncate flex-1 ${isDisabled ? 'text-slate-400 line-through' : 'text-indigo-900'}`}>
+        <span className={`text-xs font-semibold truncate flex-1 ${isDisabled ? 'text-brand-text-primary line-through' : 'text-indigo-300'}`}>
           {data?.title || 'Condition'}
         </span>
         {isDisabled && (
-          <span className="inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded border border-orange-200 shrink-0">
+          <span className="inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded-sm border border-orange-800 shrink-0">
             <VscDebugDisconnect className="w-2.5 h-2.5" />
             Skip
           </span>
@@ -547,38 +547,38 @@ export const ConditionNode = memo(({ data, isConnectable }) => {
           const summary = firstCond ? conditionSummary(firstCond) : '';
           return (
             <div key={branch.id} className="flex items-start gap-2 text-[10px]">
-              <div className={`mt-0.5 w-1.5 h-1.5 rounded-full shrink-0 ${isDisabled ? 'bg-slate-300' : 'bg-indigo-400'}`} />
-              <span className={`font-semibold shrink-0 ${isDisabled ? 'text-slate-400' : 'text-slate-700'}`}>
+              <div className={`mt-0.5 w-1.5 h-1.5 rounded-full shrink-0 ${isDisabled ? 'bg-brand-black' : 'bg-indigo-400'}`} />
+              <span className={`font-semibold shrink-0 ${isDisabled ? 'text-brand-text-primary' : 'text-brand-text-primary'}`}>
                 {branch.label || `Branch ${idx + 1}`}
               </span>
-              <span className={`truncate font-mono ${isDisabled ? 'text-slate-300' : 'text-slate-400'}`}>
+              <span className={`truncate font-mono ${isDisabled ? 'text-brand-text-primary' : 'text-brand-text-primary'}`}>
                 {summary}
-                {extra > 0 && <span className="ml-1 text-slate-300 font-sans">+{extra}</span>}
+                {extra > 0 && <span className="ml-1 text-brand-text-primary font-sans">+{extra}</span>}
               </span>
             </div>
           );
         })}
         {branches.length > 6 && (
-          <div className="text-[9px] text-slate-400 pl-3.5">+{branches.length - 6} more branches</div>
+          <div className="text-[9px] text-brand-text-primary pl-3.5">+{branches.length - 6} more branches</div>
         )}
-        <div className="flex items-center gap-2 text-[10px] pt-1.5 mt-0.5 border-t border-slate-100">
-          <div className="w-1.5 h-1.5 rounded-full bg-slate-300 shrink-0" />
-          <span className="font-semibold text-slate-400">else</span>
-          <span className="text-slate-300">default path</span>
+        <div className="flex items-center gap-2 text-[10px] pt-1.5 mt-0.5 border-t border-brand-border">
+          <div className="w-1.5 h-1.5 rounded-full bg-brand-black shrink-0" />
+          <span className="font-semibold text-brand-text-primary">else</span>
+          <span className="text-brand-text-primary">default path</span>
         </div>
       </div>
 
-      <div className="relative h-5 border-t border-slate-100 mt-1">
+      <div className="relative h-5 border-t border-brand-border mt-1">
         {branches.map((branch, idx) => (
           <span
             key={branch.id}
-            className={`absolute bottom-1 transform -translate-x-1/2 text-[8px] font-medium leading-none truncate max-w-[44px] text-center ${isDisabled ? 'text-slate-300' : 'text-indigo-400'}`}
+            className={`absolute bottom-1 transform -translate-x-1/2 text-[8px] font-medium leading-none truncate max-w-[44px] text-center ${isDisabled ? 'text-brand-text-primary' : 'text-indigo-400'}`}
             style={{ left: handleLeft(idx) }}
           >
             {(branch.label || '').slice(0, 6)}
           </span>
         ))}
-        <span className="absolute bottom-1 transform -translate-x-1/2 text-[8px] font-medium text-slate-300 leading-none" style={{ left: handleLeft(branches.length) }}>else</span>
+        <span className="absolute bottom-1 transform -translate-x-1/2 text-[8px] font-medium text-brand-text-primary leading-none" style={{ left: handleLeft(branches.length) }}>else</span>
         <span className="absolute bottom-1 transform -translate-x-1/2 text-[8px] font-medium text-red-300 leading-none" style={{ left: handleLeft(branches.length + 1) }}>error</span>
       </div>
 

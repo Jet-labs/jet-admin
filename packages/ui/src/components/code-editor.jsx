@@ -12,7 +12,7 @@ const CodeEditor = React.forwardRef(({
   height = 300,
   disabled = false,
   readOnly = false,
-  theme = "github-light",
+  theme = "vs-dark",
   className,
   title,
   titleIcon,
@@ -86,8 +86,8 @@ const CodeEditor = React.forwardRef(({
         "flex flex-col overflow-hidden rounded border text-sm shadow-sm transition-colors",
         status === "error" ? "border-destructive/50 ring-1 ring-destructive/20" : "border-border hover:border-border/80",
         isExpanded
-          ? "fixed inset-4 z-50 rounded shadow-2xl ring-1 ring-border/50 bg-background"
-          : "relative bg-background",
+          ? "fixed inset-4 z-50 rounded shadow-2xl ring-1 ring-border/50 bg-brand-dark"
+          : "relative bg-brand-dark",
         className
       )}
       {...props}
@@ -108,8 +108,8 @@ const CodeEditor = React.forwardRef(({
             {status && (
               <span className={cn(
                 "inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold tracking-wide",
-                status === "valid" ? "bg-green-100 text-green-700 border border-green-200" :
-                status === "error" ? "bg-red-100 text-red-700 border border-red-200" : ""
+                status === "valid" ? "bg-green-950/40 text-green-400 border border-green-800" :
+                status === "error" ? "bg-red-950/40 text-red-400 border border-red-800" : ""
               )}>
                 {status === "valid" ? <CheckCircle2 className="h-3 w-3" /> : <AlertTriangle className="h-3 w-3" />}
                 {status === "valid" ? "Valid" : "Invalid"}
@@ -160,7 +160,7 @@ const CodeEditor = React.forwardRef(({
           onChange={onChange}
           beforeMount={handleEditorWillMount}
           onMount={handleEditorDidMount}
-          theme={theme === "github-light" ? "github-light" : "vs"}
+          theme={"vs-dark"}
           options={{
             readOnly: isReadOnly,
             minimap: { enabled: isExpanded },
@@ -197,7 +197,7 @@ const CodeEditor = React.forwardRef(({
 
         {/* Footer Hint Overlay */}
         {footerHint && (
-          <div className="absolute bottom-2 right-4 z-10 pointer-events-none rounded border border-border/50 bg-background/95 px-2 py-1 text-[10px] text-muted-foreground shadow-sm backdrop-blur-sm">
+          <div className="absolute bottom-2 right-4 z-10 pointer-events-none rounded border border-brand-border bg-brand-dark/95 px-2 py-1 text-[10px] text-brand-text-muted shadow-sm backdrop-blur-sm">
             {footerHint}
           </div>
         )}

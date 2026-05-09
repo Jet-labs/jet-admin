@@ -5,7 +5,7 @@ import { FaRegClone } from "react-icons/fa6";
 import { useNavigate } from "react-router-dom";
 import { CONSTANTS } from "../../../constants";
 import { cloneDashboardByIDAPI } from "../../../data/apis/dashboard";
-import { useGlobalUI } from "../../../logic/contexts/globalUIContext";
+import { useGlobalUI } from "../../../logic/stores/useUIStore";
 import { displayError, displaySuccess } from "../../../utils/notification";
 
 import { Button, Spinner } from "@jet-admin/ui";
@@ -54,10 +54,10 @@ export const DashboardCloneForm = ({ tenantID, dashboardID }) => {
 
   return (
     <Button
+      variant="outline"
       onClick={_handleCloneDashboard}
       disabled={isCloningDashboard}
       type="button"
-      variant="primary-ghost"
       size="sm"
       square
       className="shrink-0"

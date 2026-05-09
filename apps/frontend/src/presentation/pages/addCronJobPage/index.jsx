@@ -5,7 +5,7 @@ import { CronJobAdditionForm } from "../../components/cronJobComponents/cronJobA
 const AddCronJobPage = () => {
   const { tenantID } = useParams();
   return (
-    <div className="flex h-full w-full flex-col overflow-y-auto bg-background">
+    <div className="flex h-full w-full flex-col overflow-y-auto bg-brand-dark">
       <CronJobAdditionForm tenantID={tenantID} />
     </div>
   );

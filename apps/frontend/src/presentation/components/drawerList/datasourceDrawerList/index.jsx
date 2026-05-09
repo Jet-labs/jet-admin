@@ -3,20 +3,21 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../../constants";
 import { NoEntityUI } from "../../ui/noEntityUI";
 import React from "react";
-import { useDatasourcesState } from "../../../../logic/contexts/datasourceContext";
+import { useDatasources } from "../../../../logic/hooks/useDatasources";
 import { getDatasourceTypeByValue } from "@jet-admin/datasource-types";
 import { DatasourceIcon } from "../../datasourceComponents/datasourceIcon";
 
 import { Button } from "@jet-admin/ui";
 
 export const DatasourceDrawerList = () => {
+  const { tenantID } = useParams();
   const {
     isLoadingDatasources,
     datasources,
     isFetchingDatasources,
-  } = useDatasourcesState();
+  } = useDatasources(tenantID);
   const routeParam = useParams();
-  const { tenantID } = useParams();
+
   const navigate = useNavigate();
 
   const _navigateToAddMoreDatasource = () => {
@@ -24,7 +25,7 @@ export const DatasourceDrawerList = () => {
   };
 
   return (
-    <div className="bg-background flex h-full w-full flex-col gap-3 overflow-hidden p-3">
+    <div className="bg-brand-dark flex h-full w-full flex-col gap-3 overflow-hidden p-3">
       <Button
         onClick={_navigateToAddMoreDatasource}
         variant="primary-ghost"

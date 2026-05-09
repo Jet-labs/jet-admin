@@ -71,8 +71,8 @@ export const WorkflowUpdationForm = ({ tenantID, workflowID }) => {
   });
 
   return (
-    <div className="flex h-full w-full flex-col items-center bg-background">
-      <div className="flex w-full flex-row items-start justify-between border-b border-border bg-background p-3">
+    <div className="flex h-full w-full flex-col items-center bg-brand-dark">
+      <div className="flex w-full flex-row items-start justify-between border-b border-border bg-brand-dark px-4 py-3">
         <div className="flex flex-col">
           <h1 className="text-2xl font-semibold tracking-tight text-foreground text-start">
             {CONSTANTS.STRINGS.UPDATE_WORKFLOW_FORM_TITLE}

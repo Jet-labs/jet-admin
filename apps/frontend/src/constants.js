@@ -28,19 +28,6 @@ export const CONSTANTS = {
   },
 
   SOCKET_EMIT_EVENTS: {
-    AI_CHAT_ROOM_JOIN: "ai_chat_room_join",
-    AI_CHAT_ROOM_DISCONNECT: "ai_chat_room_disconnect",
-    AI_CHAT_ROOM_ID: "ai_chat_room_id",
-    AI_CHAT_USER_MESSAGE: "ai_chat_user_message",
-
-    // Agentic AI events
-    AGENT_USER_MESSAGE: "agent:user_message",
-    AGENT_DATASOURCE_APPROVAL: "agent:datasource_approval",
-    AGENT_QUERY_APPROVAL: "agent:query_approval",
-    AGENT_PROMOTE_TO_WIDGET: "agent:promote_to_widget",
-    AGENT_FOLLOW_UP: "agent:follow_up",
-    AGENT_CANCEL: "agent:cancel",
-
     // Widget-Workflow integration events (send to server)
     WIDGET_WORKFLOW_CONNECT: "widget_workflow_connect",
     WIDGET_SEND_INPUT: "widget_send_input",
@@ -49,15 +36,6 @@ export const CONSTANTS = {
   },
 
   SOCKET_RECEIVE_EVENTS: {
-    AI_CHAT_BOT_MESSAGE: "ai_chat_bot_message",
-
-    // Agentic AI events
-    AGENT_THINKING: "agent:thinking",
-    AGENT_APPROVAL_REQUIRED: "agent:approval_required",
-    AGENT_RESPONSE: "agent:response",
-    AGENT_ERROR: "agent:error",
-    AGENT_WIDGET_PROMOTED: "agent:widget_promoted",
-    AGENT_CANCELLED: "agent:cancelled",
 
     // Widget-Workflow integration events (receive from server)
     WIDGET_WORKFLOW_CONNECTED: "widget_workflow_connected",
@@ -85,7 +63,6 @@ export const CONSTANTS = {
     WORKFLOW_EDITOR_ADD_JAVASCRIPT_BUTTON_TEXT: "Add javascript",
     WORKFLOW_EDITOR_ADD_CONDITION_BUTTON_TEXT: "Add condition",
     ADD_WORKFLOW_BUTTON_TEXT: "Add workflow",
-    AI_CHAT_BUTTON_TEXT: "AI Chat",
     ADD_WORKFLOW_FORM_NAME_FIELD_LABEL: "Workflow name",
     ADD_WORKFLOW_FORM_NAME_FIELD_PLACEHOLDER: "Your workflow's name",
     ADD_WORKFLOW_FORM_TITLE: "Create workflow",
@@ -104,40 +81,19 @@ export const CONSTANTS = {
     DASHBOARD_DROPPING_ELEMENT_TAG: "__dropping-elem__",
     HIDE_QUERY_META_CONTENT_BUTTON_TEXT: "Hide metadata",
     SHOW_QUERY_META_CONTENT_BUTTON_TEXT: "Show metadata",
-    DATABASE_TABLE_VIEW_CHANGES_UPDATED_SUCCESS:
-      "Changes updated successfully!",
-    DATABASE_TABLE_VIEW_CHANGES_DELETE_ROWS_BUTTON: "Delete selected rows",
-    DATABASE_TABLE_VIEW_CHANGES_DELETE_ROWS_DIALOG_TITLE: "Delete table rows",
-    DATABASE_TABLE_VIEW_CHANGES_DELETE_ROWS_DIALOG_DESCRIPTION:
-      "Are you sure you want to delete the selected table rows?.This action cannot be undone.",
-    DATABASE_TABLE_VIEW_CHANGES_DELETED_SUCCESS: "Rows deleted successfully!",
-    DATABASE_TABLE_VIEW_CHANGES_EXPORTED_SUCCESS: "Rows exported successfully!",
-    DATABASE_TABLE_VIEW_CHANGES_SAVED_SUCCESS: "Changes saved successfully!",
-    DATABASE_TABLE_VIEW_ADD_FILTER: "Add filter",
-    DATABASE_TABLE_VIEW_ADD_ROW: "Add row",
-    ROW_EXPORT_CONFIRMATION_TITLE: "Export rows",
-    ROW_EXPORT_CONFIRMATION_BODY: "Select row export format",
-    ROW_EXPORT_CONFIRMATION_CANCEL_BUTTON: "Cancel",
-    ROW_EXPORT_CONFIRMATION_BUTTON: "Export rows",
-    EXPORT_BUTTON_TEXT: "Export data",
-    MAIN_DRAWER_DATABASE_TITLE: "Database",
     MAIN_DRAWER_DATASOURCE_TITLE: "Data sources",
     MAIN_DRAWER_DASHBOARDS_TITLE: "Dashboards",
     MAIN_DRAWER_WIDGETS_TITLE: "Widgets",
-    MAIN_DRAWER_DATABASE_NOTIFICATIONS_TITLE: "Notifications",
     MAIN_DRAWER_API_KEYS_TITLE: "API Keys",
     MAIN_DRAWER_CRON_JOBS_TITLE: "Scheduled jobs",
     MAIN_DRAWER_WORKFLOWS_TITLE: "Workflows",
-    MAIN_DRAWER_SQL_EDITOR_TITLE: "PG SQL Editor",
     MAIN_DRAWER_QUERIES_TITLE: "Queries",
-    MAIN_DRAWER_ADD_DATABASE_SCHEMA_BUTTON: "Add schema",
     MAIN_DRAWER_USER_MANAGEMENT_TITLE: "User management",
     MAIN_DRAWER_AUDIT_LOGS_TITLE: "Audit logs",
     NO_TENANT_CREATED_TILL_NOW: "Please create a tenant",
-    ADD_SUBSCRIPTION_BUTTON_TEXT: "Add subscription",
-    SUBSCRIPTION_DRAWER_LIST_NO_SUBSCRIPTION_FOUND: "No subscriptions found",
-    ADD_WEBHOOK_BUTTON_TEXT: "Add webhook",
-    WEBHOOK_DRAWER_LIST_NO_WEBHOOK_FOUND: "No webhooks found",
+    MAIN_DRAWER_LISTENERS_TITLE: "Listeners",
+    ADD_LISTENER_BUTTON_TEXT: "Add listener",
+    LISTENER_DRAWER_LIST_NO_LISTENER_FOUND: "No listeners found",
     NO_PERMISSION_TO_VIEW_TENANT_TITLE: "Permission denied!",
     NO_PERMISSION_TO_VIEW_TENANT_DESCRIPTION:
       "You do not have permissions to view the tenant details",
@@ -232,222 +188,16 @@ export const CONSTANTS = {
       "Member promoted successfully!",
     MEMBER_ACTION_MEMBER_REMOVED_SUCCESS_TOAST: "Member removed successfully!",
 
-    ADD_SCHEMA_FORM_TITLE: "Add schema",
-    ADD_SCHEMA_FORM_NAME_FIELD_LABEL: "Schema name",
-    ADD_SCHEMA_FORM_NAME_FIELD_PLACEHOLDER: "Your schema's name",
-    ADD_SCHEMA_FORM_SUBMIT_BUTTON: "Submit",
-    ADD_SCHEMA_SUCCESS_TOAST: "Schema added successfully!",
-
-    ADD_TABLE_FORM_TITLE: "Add table",
-    ADD_TABLE_FORM_NAME_FIELD_LABEL: "Table name",
-    ADD_TABLE_FORM_NAME_FIELD_PLACEHOLDER: "Your table's name",
-    ADD_TABLE_FORM_IF_NOT_EXIST_FIELD_LABEL: "Create table only if not exists",
-    ADD_TABLE_FORM_COLUMN_NAME_LABEL: "Column name",
-    ADD_TABLE_FORM_COLUMN_NAME_PLACEHOLDER: "Enter column name",
-    ADD_TABLE_FORM_COLUMN_TYPE_LABEL: "Data type",
-    ADD_TABLE_FORM_COLUMN_TYPE_PLACEHOLDER: "Select data type",
-    ADD_TABLE_FORM_COLUMN_DEFAULT_LABEL: "Default",
-    ADD_TABLE_FORM_COLUMN_DEFAULT_PLACEHOLDER:
-      "Enter the default value expression",
-    ADD_TABLE_FORM_COLUMN_CHECK_LABEL: "Checks",
-    ADD_TABLE_FORM_COLUMN_CHECK_PLACEHOLDER: "Enter the check expression",
-    ADD_TABLE_FORM_COLUMN_UNIQUE_CHECK_LABEL: "Unique",
-    ADD_TABLE_FORM_COLUMN_PRIMARY_CHECK_LABEL: "Primary",
-    ADD_TABLE_FORM_COLUMN_NOT_NULL_CHECK_LABEL: "Not null",
-    ADD_TABLE_FORM_NOT_NULL_LABEL: "NOT NULL",
-    ADD_TABLE_FORM_UNIQUE_LABEL: "UNIQUE",
-    ADD_TABLE_FORM_PRIMARY_KEY_LABEL: "Primary Key",
-    ADD_TABLE_FORM_PRIMARY_KEY_PLACEHOLDER: "Select primary key columns",
-    ADD_TABLE_FORM_FOREIGN_KEY_LABEL: "Foreign Keys",
-    ADD_TABLE_FORM_FOREIGN_KEY_NAME_LABEL: "Foreign key name (optional)",
-    ADD_TABLE_FORM_FOREIGN_KEY_SCHEMA_LABEL: "Select schema",
-    ADD_TABLE_FORM_FOREIGN_KEY_COLUMN_LABEL: "Select columns",
-    ADD_TABLE_FORM_FOREIGN_KEY_SELECTED_COLUMN_LABEL: "Selected columns",
-    ADD_TABLE_FORM_FOREIGN_KEY_REFERENCE_TABLE_PLACEHOLDER:
-      "Select reference table",
-    ADD_TABLE_FORM_FOREIGN_KEY_REFERENCE_COLUMN_PLACEHOLDER: "Reference column",
-    ADD_TABLE_FORM_FOREIGN_KEY_REFERENCE_COLUMN_LABEL: "Select ref columns",
-    ADD_TABLE_FORM_FOREIGN_KEY_ON_DELETE_LABEL: "On delete",
-    ADD_TABLE_FORM_FOREIGN_KEY_ON_UPDATE_LABEL: "On update",
-    ADD_TABLE_FORM_ADD_COLUMN_TITLE: "Columns",
-    ADD_TABLE_FORM_ADD_COLUMN_BUTTON: "Add column",
-    ADD_TABLE_FORM_REMOVE_COLUMN_BUTTON: "Remove",
-    ADD_TABLE_FORM_ADD_FOREIGN_KEY_BUTTON: "Add foreign Key",
-    ADD_TABLE_FORM_ADD_FOREIGN_KEY_TITLE: "Foreign keys",
-    ADD_TABLE_FORM_REMOVE_FOREIGN_KEY_BUTTON: "Remove",
-    ADD_TABLE_FORM_SUBMIT_BUTTON: "Save table",
-    ADD_TABLE_SUCCESS_TOAST: "Table added successfully!",
-    ADD_TABLE_BUTTON_TEXT: "Add table",
-
-    UPDATE_TABLE_FORM_TITLE: "Update table",
-    UPDATE_TABLE_FORM_NAME_FIELD_LABEL: "Table name",
-    UPDATE_TABLE_FORM_NAME_FIELD_PLACEHOLDER: "Your table's name",
-    UPDATE_TABLE_FORM_IF_NOT_EXIST_FIELD_LABEL:
-      "Create table only if not exists",
-    UPDATE_TABLE_FORM_COLUMN_NAME_LABEL: "Column name",
-    UPDATE_TABLE_FORM_COLUMN_NAME_PLACEHOLDER: "Enter column name",
-    UPDATE_TABLE_FORM_COLUMN_TYPE_LABEL: "Data type",
-    UPDATE_TABLE_FORM_COLUMN_TYPE_PLACEHOLDER: "Select data type",
-    UPDATE_TABLE_FORM_COLUMN_DEFAULT_LABEL: "Default",
-    UPDATE_TABLE_FORM_COLUMN_DEFAULT_PLACEHOLDER:
-      "Enter the default value expression",
-    UPDATE_TABLE_FORM_COLUMN_CHECK_LABEL: "Checks",
-    UPDATE_TABLE_FORM_COLUMN_CHECK_PLACEHOLDER: "Enter the check expression",
-    UPDATE_TABLE_FORM_COLUMN_UNIQUE_CHECK_LABEL: "Unique",
-    UPDATE_TABLE_FORM_COLUMN_PRIMARY_CHECK_LABEL: "Primary",
-    UPDATE_TABLE_FORM_COLUMN_NOT_NULL_CHECK_LABEL: "Not null",
-    UPDATE_TABLE_FORM_NOT_NULL_LABEL: "NOT NULL",
-    UPDATE_TABLE_FORM_UNIQUE_LABEL: "UNIQUE",
-    UPDATE_TABLE_FORM_PRIMARY_KEY_LABEL: "Primary Key",
-    UPDATE_TABLE_FORM_PRIMARY_KEY_PLACEHOLDER: "Select primary key columns",
-    UPDATE_TABLE_FORM_FOREIGN_KEY_LABEL: "Foreign Keys",
-    UPDATE_TABLE_FORM_FOREIGN_KEY_NAME_LABEL: "Foreign key name (optional)",
-    UPDATE_TABLE_FORM_FOREIGN_KEY_SCHEMA_LABEL: "Select schema",
-    UPDATE_TABLE_FORM_FOREIGN_KEY_COLUMN_LABEL: "Select columns",
-    UPDATE_TABLE_FORM_FOREIGN_KEY_SELECTED_COLUMN_LABEL: "Selected columns",
-    UPDATE_TABLE_FORM_FOREIGN_KEY_REFERENCE_TABLE_PLACEHOLDER:
-      "Select reference table",
-    UPDATE_TABLE_FORM_FOREIGN_KEY_REFERENCE_COLUMN_PLACEHOLDER:
-      "Reference column",
-    UPDATE_TABLE_FORM_FOREIGN_KEY_REFERENCE_COLUMN_LABEL: "Select ref columns",
-    UPDATE_TABLE_FORM_FOREIGN_KEY_ON_DELETE_LABEL: "On delete",
-    UPDATE_TABLE_FORM_FOREIGN_KEY_ON_UPDATE_LABEL: "On update",
-    UPDATE_TABLE_FORM_ADD_COLUMN_TITLE: "Columns",
-    UPDATE_TABLE_FORM_ADD_COLUMN_BUTTON: "Add column",
-    UPDATE_TABLE_FORM_REMOVE_COLUMN_BUTTON: "Remove",
-    UPDATE_TABLE_FORM_ADD_FOREIGN_KEY_BUTTON: "Add foreign Key",
-    UPDATE_TABLE_FORM_ADD_FOREIGN_KEY_TITLE: "Foreign keys",
-    UPDATE_TABLE_FORM_REMOVE_FOREIGN_KEY_BUTTON: "Remove",
-    UPDATE_TABLE_FORM_SUBMIT_BUTTON: "Save table",
-    UPDATE_TABLE_SUCCESS_TOAST: "Table updated successfully!",
-    UPDATE_TABLE_BUTTON_TEXT: "Update table",
-
-    TABLE_EDITOR_FORM_NAME_FIELD_LABEL: "Table name",
-    TABLE_EDITOR_FORM_NAME_FIELD_PLACEHOLDER: "Your table's name",
-    TABLE_EDITOR_FORM_IF_NOT_EXIST_FIELD_LABEL:
-      "Create table only if not exists",
-    TABLE_EDITOR_FORM_COLUMN_NAME_LABEL: "Column name",
-    TABLE_EDITOR_FORM_COLUMN_NAME_PLACEHOLDER: "Enter column name",
-    TABLE_EDITOR_FORM_COLUMN_TYPE_LABEL: "Data type",
-    TABLE_EDITOR_FORM_COLUMN_TYPE_PLACEHOLDER: "Select data type",
-    TABLE_EDITOR_FORM_COLUMN_DEFAULT_LABEL: "Default",
-    TABLE_EDITOR_FORM_COLUMN_DEFAULT_PLACEHOLDER:
-      "Enter the default value expression",
-    TABLE_EDITOR_FORM_COLUMN_CHECK_LABEL: "Checks",
-    TABLE_EDITOR_FORM_COLUMN_CHECK_PLACEHOLDER: "Enter the check expression",
-    TABLE_EDITOR_FORM_COLUMN_UNIQUE_CHECK_LABEL: "Unique",
-    TABLE_EDITOR_FORM_COLUMN_PRIMARY_CHECK_LABEL: "Primary",
-    TABLE_EDITOR_FORM_COLUMN_NOT_NULL_CHECK_LABEL: "Not null",
-    TABLE_EDITOR_FORM_NOT_NULL_LABEL: "NOT NULL",
-    TABLE_EDITOR_FORM_UNIQUE_LABEL: "UNIQUE",
-    TABLE_EDITOR_FORM_PRIMARY_KEY_LABEL: "Primary Key",
-    TABLE_EDITOR_FORM_PRIMARY_KEY_PLACEHOLDER: "Select primary key columns",
-    TABLE_EDITOR_FORM_FOREIGN_KEY_LABEL: "Foreign Keys",
-    TABLE_EDITOR_FORM_FOREIGN_KEY_NAME_LABEL: "Foreign key name (optional)",
-    TABLE_EDITOR_FORM_FOREIGN_KEY_SCHEMA_LABEL: "Select schema",
-    TABLE_EDITOR_FORM_FOREIGN_KEY_COLUMN_LABEL: "Select columns",
-    TABLE_EDITOR_FORM_FOREIGN_KEY_SELECTED_COLUMN_LABEL: "Selected columns",
-    TABLE_EDITOR_FORM_FOREIGN_KEY_REFERENCE_TABLE_PLACEHOLDER:
-      "Select reference table",
-    TABLE_EDITOR_FORM_FOREIGN_KEY_REFERENCE_COLUMN_PLACEHOLDER:
-      "Reference column",
-    TABLE_EDITOR_FORM_FOREIGN_KEY_REFERENCE_COLUMN_LABEL: "Select ref columns",
-    TABLE_EDITOR_FORM_FOREIGN_KEY_ON_DELETE_LABEL: "On delete",
-    TABLE_EDITOR_FORM_FOREIGN_KEY_ON_UPDATE_LABEL: "On update",
-    TABLE_EDITOR_FORM_ADD_COLUMN_TITLE: "Columns",
-    TABLE_EDITOR_FORM_ADD_COLUMN_BUTTON: "Add column",
-    TABLE_EDITOR_FORM_REMOVE_COLUMN_BUTTON: "Remove",
-    TABLE_EDITOR_FORM_ADD_FOREIGN_KEY_BUTTON: "Add foreign Key",
-    TABLE_EDITOR_FORM_ADD_FOREIGN_KEY_TITLE: "Foreign keys",
-    TABLE_EDITOR_FORM_REMOVE_FOREIGN_KEY_BUTTON: "Remove",
-    TABLE_EDITOR_FORM_UNIQUE_COLUMN_LABEL: "Add Unique Column",
-    TABLE_EDITOR_FORM_PRIMARY_KEY_COLUMN_LABEL: "Add Primary Key Column",
-    TABLE_EDITOR_FORM_TABLE_CONSTRAINTS_TITLE: "Table Constraints",
-    TABLE_EDITOR_FORM_PRIMARY_KEY_TITLE: "Primary Key",
-    TABLE_EDITOR_FORM_UNIQUE_TITLE: "Unique Constraint",
-    TABLE_EDITOR_FORM_CHECK_TITLE: "Check Constraint",
-    TABLE_EDITOR_FORM_CHECK_PLACEHOLDER: "Enter check constraint expression",
-    TABLE_EDITOR_FORM_EXCLUDE_TITLE: "Exclude Constraint",
-    TABLE_EDITOR_FORM_EXCLUDE_PLACEHOLDER:
-      "Enter exclude constraint expression",
-    TABLE_EDITOR_FORM_ADD_UNIQUE_CONSTRAINT_BUTTON: "Add Unique Constraint",
-    TABLE_EDITOR_FORM_ADD_UNIQUE_CONSTRAINT_COLUMN_LABEL:
-      "Add Unique Constraint Column",
-
-    DATABASE_TABLE_DELETION_SUCCESS: "Table deleted successfully!",
-    DATABASE_TABLE_DELETION_DIALOG_TITLE: "Delete table?",
-    DATABASE_TABLE_DELETION_DIALOG_MESSAGE:
-      "Are you sure you want to delete this table? This action cannot be undone.",
-
-    DATABASE_TABLE_NO_PRIMARY_KEY_TITLE: "No primary key",
-    DATABASE_TABLE_NO_PRIMARY_KEY_DESCRIPTION:
-      "Table does not have a primary. Please select a custom primary to display data",
-
-    TABLE_DRAWER_LIST_NO_TABLE: "No tables found",
-    TRIGGER_DRAWER_LIST_NO_TRIGGER: "No triggers found",
     DATASOURCE_DRAWER_LIST_NO_DATASOURCE: "No data sources found",
     QUERY_DRAWER_LIST_NO_QUERY: "No queries found",
-    NOTIFICATION_DRAWER_LIST_NO_NOTIFICATION: "No notifications found",
     API_KEY_DRAWER_LIST_NO_API_KEY: "No API Keys found",
     CRON_JOB_DRAWER_LIST_NO_CRON_JOB_FOUND: "No scheduled jobs found",
     WIDGET_DRAWER_LIST_NO_WIDGET: "No widgets found",
     DASHBOARD_DRAWER_LIST_NO_DASHBOARD: "No dashboards found",
 
-    ADD_TRIGGER_BUTTON_TEXT: "Add trigger",
-
-    TABLE_DRAWER_LIST_TITLE: "Tables",
-    TRIGGER_DRAWER_LIST_TITLE: "Triggers",
     UNTITLED: "Untitled",
 
-    ADD_TRIGGER_FORM_TITLE: "Create trigger",
-    ADD_TRIGGER_FORM_SUBMIT: "Save trigger",
 
-    // Labels
-    ADD_TRIGGER_FORM_TRIGGER_NAME_LABEL: "Trigger Name",
-    ADD_TRIGGER_FORM_TABLE_NAME_LABEL: "Table Name",
-    ADD_TRIGGER_FORM_FUNCTION_NAME_LABEL: "Function Name",
-    ADD_TRIGGER_FORM_TIMING_LABEL: "Timing",
-    ADD_TRIGGER_FORM_EVENTS_LABEL: "Events",
-    ADD_TRIGGER_FORM_FOR_EACH_LABEL: "For Each",
-    ADD_TRIGGER_FORM_WHEN_CONDITION_LABEL: "WHEN Condition (optional)",
-    ADD_TRIGGER_FORM_REF_OLD_LABEL: "REFERENCING OLD (optional)",
-    ADD_TRIGGER_FORM_REF_NEW_LABEL: "REFERENCING NEW (optional)",
-    ADD_TRIGGER_FORM_DEFERRABLE_LABEL: "DEFERRABLE",
-    ADD_TRIGGER_FORM_INITIALLY_DEFERRED_LABEL: "INITIALLY DEFERRED",
-    ADD_TRIGGER_FORM_NOTIFICATION_CHANNEL_LABEL: "Notification channel",
-
-    // Placeholders
-    ADD_TRIGGER_FORM_TRIGGER_NAME_PLACEHOLDER: "Enter trigger name",
-    ADD_TRIGGER_FORM_TABLE_NAME_PLACEHOLDER: "Select table",
-    ADD_TRIGGER_FORM_TIMING_PLACEHOLDER: "Timing",
-    ADD_TRIGGER_FORM_FOR_EACH_PLACEHOLDER: "",
-    ADD_TRIGGER_FORM_FUNCTION_NAME_PLACEHOLDER: "Enter function name",
-    ADD_TRIGGER_FORM_WHEN_CONDITION_PLACEHOLDER: "e.g., NEW.column_name > 100",
-
-    // Validation Messages
-    ADD_TRIGGER_FORM_VALIDATION_REQUIRED: "This field is required",
-    ADD_TRIGGER_FORM_VALIDATION_EVENTS_REQUIRED:
-      "At least one event must be selected",
-
-    ADD_TRIGGER_FORM_TRIGGER_CREATED: "Trigger created successfully",
-
-    TRIGGER_VIEW_TITLE: "Trigger details",
-    TRIGGER_VIEW_TRIGGER_NAME: "Trigger name",
-    TRIGGER_VIEW_TABLE_NAME: "Table name",
-    TRIGGER_VIEW_TRIGGER_TIMING: "Trigger timing",
-    TRIGGER_VIEW_FOR_EACH: "For each",
-    TRIGGER_VIEW_TRIGGER_EVENTS: "Trigger events",
-    TRIGGER_VIEW_FUNCTION_NAME: "Function name",
-    TRIGGER_VIEW_WHEN_CONDITION: "When condition",
-    TRIGGER_VIEW_REFERENCING_OLD: "Referencing old",
-    TRIGGER_VIEW_REFERENCING_NEW: "Referencing new",
-    TRIGGER_VIEW_DEFERRABLE: "Deferrable",
-    TRIGGER_VIEW_INITIALLY_DEFERRED: "Initially deferred",
-    TRIGGER_VIEW_DELETE_BUTTON: "Delete trigger",
-    TRIGGER_VIEW_DELETE_DIALOG_TITLE: "Delete trigger",
-    TRIGGER_VIEW_DELETE_DIALOG_MESSAGE:
-      "Are you sure you want to delete this item? This action cannot be undone.",
-    TRIGGER_VIEW_DELETE_SUCCESS: "Trigger deleted successfully",
 
     ADD_QUERY_BUTTON_TEXT: "Add query",
 
@@ -539,14 +289,6 @@ export const CONSTANTS = {
     DATA_QUERY_ARGS_FORM_DESCRIPTION: "Enter the query arguments",
     DATA_QUERY_ARGS_FORM_CONFIRM_BUTTON: "Confirm",
     DATA_QUERY_ARGS_FORM_CANCEL_BUTTON: "Cancel",
-
-    DATA_QUERY_AI_PROMPT_BUTTON: "AI Prompt",
-    DATA_QUERY_AI_PROMPT_FORM_TITLE: "AI Prompt",
-    DATA_QUERY_AI_PROMPT_FORM_DESCRIPTION:
-      "Enter the AI prompt to generate the query",
-    DATA_QUERY_AI_PROMPT_ACCEPT_FORM_CONFIRM_BUTTON: "Accept query",
-    DATA_QUERY_AI_PROMPT_FORM_GENERATE_BUTTON: "Generate query",
-    DATA_QUERY_AI_PROMPT_FORM_REGENERATE_BUTTON: "Re-generate query",
 
     DATABASE_TABLES_STATS_TITLE: "Database Stats",
     DATABASE_TABLES_STATS_TOTAL_TABLES_LABEL: "Total Tables",
@@ -888,43 +630,23 @@ export const CONSTANTS = {
 
     VIEW_AUDIT_LOGS_TITLE: "Audit logs",
 
-    ADD_SUBSCRIPTION_FORM_TITLE: "Create new subscription",
-    UPDATE_SUBSCRIPTION_FORM_TITLE: "Update subscription",
-    ADD_SUBSCRIPTION_SUBMIT_BUTTON_TEXT: "Add subscription",
-    UPDATE_SUBSCRIPTION_SUBMIT_BUTTON_TEXT: "Update subscription",
-    SUBSCRIPTION_ADDED_SUCCESS: "Subscription created successfully",
-    SUBSCRIPTION_UPDATED_SUCCESS: "Subscription updated successfully",
-    SUBSCRIPTION_DELETED_SUCCESS: "Subscription deleted successfully",
-    DELETE_SUBSCRIPTION_DIALOG_TITLE: "Delete subscription",
-    DELETE_SUBSCRIPTION_DIALOG_MESSAGE:
-      "Are you sure you want to delete this subscription? This action cannot be undone.",
-    SUBSCRIPTION_EDITOR_FORM_TITLE_FIELD_LABEL: "Subscription name",
-    SUBSCRIPTION_EDITOR_FORM_TITLE_FIELD_PLACEHOLDER: "Your subscription's name",
-    SUBSCRIPTION_EDITOR_FORM_DATASOURCE_FIELD_LABEL: "Target data source",
-    SUBSCRIPTION_EDITOR_FORM_TYPE_FIELD_LABEL: "Subscription type",
-    SUBSCRIPTION_EDITOR_FORM_STATUS_FIELD_LABEL: "Status",
-    SUBSCRIPTION_EDITOR_FORM_CONFIG_FIELD_LABEL: "Configuration (JSON)",
-    SUBSCRIPTION_EDITOR_FORM_CONFIG_FIELD_PLACEHOLDER: "{}",
+    ADD_LISTENER_FORM_TITLE: "Create new listener",
+    UPDATE_LISTENER_FORM_TITLE: "Update listener",
+    ADD_LISTENER_SUBMIT_BUTTON_TEXT: "Add listener",
+    UPDATE_LISTENER_SUBMIT_BUTTON_TEXT: "Update listener",
+    LISTENER_ADDED_SUCCESS: "Listener created successfully",
+    LISTENER_UPDATED_SUCCESS: "Listener updated successfully",
+    LISTENER_DELETED_SUCCESS: "Listener deleted successfully",
+    DELETE_LISTENER_DIALOG_TITLE: "Delete listener",
+    DELETE_LISTENER_DIALOG_MESSAGE:
+      "Are you sure you want to delete this listener? This action cannot be undone.",
+    LISTENER_EDITOR_FORM_TITLE_FIELD_LABEL: "Listener name",
+    LISTENER_EDITOR_FORM_TITLE_FIELD_PLACEHOLDER: "Your listener's name",
+    LISTENER_EDITOR_FORM_DATASOURCE_FIELD_LABEL: "Target data source",
+    LISTENER_EDITOR_FORM_TYPE_FIELD_LABEL: "Listener type",
+    LISTENER_EDITOR_FORM_STATUS_FIELD_LABEL: "Status",
+    LISTENER_EDITOR_FORM_CONFIG_FIELD_LABEL: "Configuration",
     VIEW_CRON_JOB_HISTORY_BUTTON_TEXT: "History",
-
-    ADD_WEBHOOK_FORM_TITLE: "Create new webhook",
-    UPDATE_WEBHOOK_FORM_TITLE: "Update webhook",
-    ADD_WEBHOOK_SUBMIT_BUTTON_TEXT: "Add webhook",
-    UPDATE_WEBHOOK_SUBMIT_BUTTON_TEXT: "Update webhook",
-    WEBHOOK_ADDED_SUCCESS: "Webhook created successfully",
-    WEBHOOK_UPDATED_SUCCESS: "Webhook updated successfully",
-    WEBHOOK_DELETED_SUCCESS: "Webhook deleted successfully",
-    DELETE_WEBHOOK_DIALOG_TITLE: "Delete webhook",
-    DELETE_WEBHOOK_DIALOG_MESSAGE:
-      "Are you sure you want to delete this webhook? This action cannot be undone.",
-    WEBHOOK_EDITOR_FORM_TITLE_FIELD_LABEL: "Webhook name",
-    WEBHOOK_EDITOR_FORM_TITLE_FIELD_PLACEHOLDER: "Your webhook's name",
-    WEBHOOK_EDITOR_FORM_PATH_FIELD_LABEL: "Endpoint path",
-    WEBHOOK_EDITOR_FORM_PATH_FIELD_PLACEHOLDER: "/my-webhook",
-    WEBHOOK_EDITOR_FORM_AUTH_TYPE_FIELD_LABEL: "Authentication type",
-    WEBHOOK_EDITOR_FORM_STATUS_FIELD_LABEL: "Status",
-    WEBHOOK_EDITOR_FORM_AUTH_CONFIG_FIELD_LABEL: "Auth configuration (JSON)",
-    WEBHOOK_EDITOR_FORM_AUTH_CONFIG_FIELD_PLACEHOLDER: "{}",
   },
 
   LOCAL_STORAGE_KEYS: {
@@ -956,19 +678,6 @@ export const CONSTANTS = {
       code: "/tenants/:tenantID/settings",
       path: (tenantID) => `/tenants/${tenantID}/settings`,
     },
-    ADD_SCHEMA: {
-      code: "/tenants/:tenantID/schemas/add",
-      path: (tenantID) => `/tenants/${tenantID}/schemas/add`,
-    },
-    VIEW_SCHEMA: {
-      code: "/tenants/:tenantID/schemas/:databaseSchemaName",
-      path: (tenantID, databaseSchemaName) =>
-        `/tenants/${tenantID}/schemas/${databaseSchemaName}`,
-    },
-    RAW_SQL_QUERY: {
-      code: "/tenants/:tenantID/raw-sql-query",
-      path: (tenantID) => `/tenants/${tenantID}/raw-sql-query`,
-    },
     VIEW_WORKFLOWS: {
       code: "/tenants/:tenantID/workflows",
       path: (tenantID) => `/tenants/${tenantID}/workflows`,
@@ -987,71 +696,18 @@ export const CONSTANTS = {
       path: (tenantID, workflowID) =>
         `/tenants/${tenantID}/workflows/${workflowID}`,
     },
-    ADD_DATABASE_TABLE: {
-      code: "/tenants/:tenantID/schemas/:databaseSchemaName/tables/add",
-      path: (tenantID, databaseSchemaName) =>
-        `/tenants/${tenantID}/schemas/${databaseSchemaName}/tables/add`,
+    VIEW_LISTENERS: {
+      code: "/tenants/:tenantID/listeners",
+      path: (tenantID) => `/tenants/${tenantID}/listeners`,
     },
-    VIEW_SUBSCRIPTIONS: {
-      code: "/tenants/:tenantID/subscriptions",
-      path: (tenantID) => `/tenants/${tenantID}/subscriptions`,
+    ADD_LISTENER: {
+      code: "/tenants/:tenantID/listeners/add",
+      path: (tenantID) => `/tenants/${tenantID}/listeners/add`,
     },
-    ADD_SUBSCRIPTION: {
-      code: "/tenants/:tenantID/subscriptions/add",
-      path: (tenantID) => `/tenants/${tenantID}/subscriptions/add`,
-    },
-    UPDATE_SUBSCRIPTION_BY_ID: {
-      code: "/tenants/:tenantID/subscriptions/:subscriptionID",
-      path: (tenantID, subscriptionID) =>
-        `/tenants/${tenantID}/subscriptions/${subscriptionID}`,
-    },
-    VIEW_WEBHOOKS: {
-      code: "/tenants/:tenantID/webhooks",
-      path: (tenantID) => `/tenants/${tenantID}/webhooks`,
-    },
-    ADD_WEBHOOK: {
-      code: "/tenants/:tenantID/webhooks/add",
-      path: (tenantID) => `/tenants/${tenantID}/webhooks/add`,
-    },
-    UPDATE_WEBHOOK_BY_ID: {
-      code: "/tenants/:tenantID/webhooks/:webhookID",
-      path: (tenantID, webhookID) =>
-        `/tenants/${tenantID}/webhooks/${webhookID}`,
-    },
-    VIEW_DATABASE_TABLES: {
-      code: "/tenants/:tenantID/schemas/:databaseSchemaName/tables",
-      path: (tenantID, databaseSchemaName) =>
-        `/tenants/${tenantID}/schemas/${databaseSchemaName}/tables`,
-    },
-    VIEW_DATABASE_TABLE_BY_NAME: {
-      code: "/tenants/:tenantID/schemas/:databaseSchemaName/tables/:databaseTableName",
-      path: (tenantID, databaseSchemaName, databaseTableName) =>
-        `/tenants/${tenantID}/schemas/${databaseSchemaName}/tables/${databaseTableName}`,
-    },
-    UPDATE_DATABASE_TABLE_BY_NAME: {
-      code: "/tenants/:tenantID/schemas/:databaseSchemaName/tables/:databaseTableName/update",
-      path: (tenantID, databaseSchemaName, databaseTableName) =>
-        `/tenants/${tenantID}/schemas/${databaseSchemaName}/tables/${databaseTableName}/update`,
-    },
-    ADD_DATABASE_TRIGGER: {
-      code: "/tenants/:tenantID/schemas/:databaseSchemaName/triggers/add",
-      path: (tenantID, databaseSchemaName) =>
-        `/tenants/${tenantID}/schemas/${databaseSchemaName}/triggers/add`,
-    },
-    VIEW_DATABASE_TRIGGERS: {
-      code: "/tenants/:tenantID/schemas/:databaseSchemaName/triggers",
-      path: (tenantID, databaseSchemaName) =>
-        `/tenants/${tenantID}/schemas/${databaseSchemaName}/triggers`,
-    },
-    VIEW_DATABASE_TRIGGER_BY_NAME: {
-      code: "/tenants/:tenantID/schemas/:databaseSchemaName/triggers/:databaseTableName/:databaseTriggerName",
-      path: (
-        tenantID,
-        databaseSchemaName,
-        databaseTableName,
-        databaseTriggerName
-      ) =>
-        `/tenants/${tenantID}/schemas/${databaseSchemaName}/triggers/${databaseTableName}/${databaseTriggerName}`,
+    UPDATE_LISTENER_BY_ID: {
+      code: "/tenants/:tenantID/listeners/:listenerID",
+      path: (tenantID, listenerID) =>
+        `/tenants/${tenantID}/listeners/${listenerID}`,
     },
     ADD_DATASOURCE: {
       code: "/tenants/:tenantID/datasources/add",
@@ -1188,29 +844,27 @@ export const CONSTANTS = {
   },
 
   APIS: {
-    AI: {
-      sendUserMessageToAIAPI: (tenantID) =>
-        `/api/v1/tenants/${tenantID}/ai/user_message`,
-    },
-    WEBHOOK: {
-      getAllWebhooksAPI: (tenantID) => `/api/v1/tenants/${tenantID}/webhooks`,
-      createWebhookAPI: (tenantID) => `/api/v1/tenants/${tenantID}/webhooks`,
-      getWebhookByIDAPI: (tenantID, webhookID) =>
-        `/api/v1/tenants/${tenantID}/webhooks/${webhookID}`,
-      updateWebhookAPI: (tenantID, webhookID) =>
-        `/api/v1/tenants/${tenantID}/webhooks/${webhookID}`,
-      deleteWebhookAPI: (tenantID, webhookID) =>
-        `/api/v1/tenants/${tenantID}/webhooks/${webhookID}`,
-    },
-    SUBSCRIPTION: {
-      getAllSubscriptionsAPI: (tenantID) => `/api/v1/tenants/${tenantID}/subscriptions`,
-      createSubscriptionAPI: (tenantID) => `/api/v1/tenants/${tenantID}/subscriptions`,
-      getSubscriptionByIDAPI: (tenantID, subscriptionID) =>
-        `/api/v1/tenants/${tenantID}/subscriptions/${subscriptionID}`,
-      updateSubscriptionAPI: (tenantID, subscriptionID) =>
-        `/api/v1/tenants/${tenantID}/subscriptions/${subscriptionID}`,
-      deleteSubscriptionAPI: (tenantID, subscriptionID) =>
-        `/api/v1/tenants/${tenantID}/subscriptions/${subscriptionID}`,
+    LISTENER: {
+      getAllListenersAPI: (tenantID) => `/api/v1/tenants/${tenantID}/listeners`,
+      createListenerAPI: (tenantID) => `/api/v1/tenants/${tenantID}/listeners`,
+      getListenerByIDAPI: (tenantID, listenerID) =>
+        `/api/v1/tenants/${tenantID}/listeners/${listenerID}`,
+      updateListenerAPI: (tenantID, listenerID) =>
+        `/api/v1/tenants/${tenantID}/listeners/${listenerID}`,
+      deleteListenerAPI: (tenantID, listenerID) =>
+        `/api/v1/tenants/${tenantID}/listeners/${listenerID}`,
+      activateListenerAPI: (tenantID, listenerID) =>
+        `/api/v1/tenants/${tenantID}/listeners/${listenerID}/activate`,
+      deactivateListenerAPI: (tenantID, listenerID) =>
+        `/api/v1/tenants/${tenantID}/listeners/${listenerID}/deactivate`,
+      addListenerActionAPI: (tenantID, listenerID) =>
+        `/api/v1/tenants/${tenantID}/listeners/${listenerID}/actions`,
+      updateListenerActionAPI: (tenantID, listenerID, actionID) =>
+        `/api/v1/tenants/${tenantID}/listeners/${listenerID}/actions/${actionID}`,
+      deleteListenerActionAPI: (tenantID, listenerID, actionID) =>
+        `/api/v1/tenants/${tenantID}/listeners/${listenerID}/actions/${actionID}`,
+      getConnectionStatusAPI: (tenantID) =>
+        `/api/v1/tenants/${tenantID}/listeners/status/connections`,
     },
     WORKFLOW: {
       getAllWorkflowsAPI: (tenantID) => `/api/v1/tenants/${tenantID}/workflows`,
@@ -1325,99 +979,6 @@ export const CONSTANTS = {
         `/api/v1/tenants/${tenantID}/datasources/${datasourceID}/clone`,
     },
     DATABASE: {
-      getDatabaseMetadataAPI: (tenantID) =>
-        `/api/v1/tenants/${tenantID}/database/metadata`,
-      createDatabaseSchemaAPI: (tenantID) =>
-        `/api/v1/tenants/${tenantID}/database/schemas`,
-      getAllDatabaseTablesAPI: (tenantID, databaseSchemaName) =>
-        `/api/v1/tenants/${tenantID}/database/schemas/${databaseSchemaName}/tables`,
-      createDatabaseTableAPI: (tenantID, databaseSchemaName) =>
-        `/api/v1/tenants/${tenantID}/database/schemas/${databaseSchemaName}/tables`,
-      getDatabaseTableByNameAPI: (
-        tenantID,
-        databaseSchemaName,
-        databaseTableName
-      ) =>
-        `/api/v1/tenants/${tenantID}/database/schemas/${databaseSchemaName}/tables/${databaseTableName}`,
-      updateDatabaseTableByNameAPI: (
-        tenantID,
-        databaseSchemaName,
-        databaseTableName
-      ) =>
-        `/api/v1/tenants/${tenantID}/database/schemas/${databaseSchemaName}/tables/${databaseTableName}`,
-      deleteDatabaseTableByNameAPI: (
-        tenantID,
-        databaseSchemaName,
-        databaseTableName
-      ) =>
-        `/api/v1/tenants/${tenantID}/database/schemas/${databaseSchemaName}/tables/${databaseTableName}`,
-      getDatabaseTableRowsAPI: ({
-        tenantID,
-        databaseSchemaName,
-        databaseTableName,
-        page,
-        pageSize,
-        filterQuery,
-        databaseTableColumnSortModel,
-      }) =>
-        `/api/v1/tenants/${tenantID}/database/schemas/${databaseSchemaName}/tables/${databaseTableName}/rows?page=${page}&pageSize=${pageSize}&q=${JSON.stringify(
-          filterQuery
-        )}&order=${encodeURIComponent(databaseTableColumnSortModel)}`,
-
-      getDatabaseTableStatisticsAPI: ({
-        tenantID,
-        databaseSchemaName,
-        databaseTableName,
-        filterQuery,
-      }) =>
-        `/api/v1/tenants/${tenantID}/database/schemas/${databaseSchemaName}/tables/${databaseTableName}/statistics?q=${JSON.stringify(
-          filterQuery
-        )}`,
-      databaseTableBulkRowAdditionAPI: ({
-        tenantID,
-        databaseSchemaName,
-        databaseTableName,
-      }) =>
-        `/api/v1/tenants/${tenantID}/database/schemas/${databaseSchemaName}/tables/${databaseTableName}/rows`,
-      databaseTableBulkRowUpdationAPI: ({
-        tenantID,
-        databaseSchemaName,
-        databaseTableName,
-      }) =>
-        `/api/v1/tenants/${tenantID}/database/schemas/${databaseSchemaName}/tables/${databaseTableName}/rows`,
-      databaseTableBulkRowDeletionAPI: ({
-        tenantID,
-        databaseSchemaName,
-        databaseTableName,
-      }) =>
-        `/api/v1/tenants/${tenantID}/database/schemas/${databaseSchemaName}/tables/${databaseTableName}/rows/delete`,
-      databaseTableBulkRowExportAPI: ({
-        tenantID,
-        databaseSchemaName,
-        databaseTableName,
-      }) =>
-        `/api/v1/tenants/${tenantID}/database/schemas/${databaseSchemaName}/tables/${databaseTableName}/rows/export`,
-
-      getAllDatabaseTriggersAPI: (tenantID, databaseSchemaName) =>
-        `/api/v1/tenants/${tenantID}/database/schemas/${databaseSchemaName}/triggers`,
-      createDatabaseTriggerAPI: (tenantID, databaseSchemaName) =>
-        `/api/v1/tenants/${tenantID}/database/schemas/${databaseSchemaName}/triggers`,
-      getDatabaseTriggerByNameAPI: (
-        tenantID,
-        databaseSchemaName,
-        databaseTableName,
-        databaseTriggerName
-      ) =>
-        `/api/v1/tenants/${tenantID}/database/schemas/${databaseSchemaName}/triggers/${databaseTableName}/${databaseTriggerName}`,
-
-      deleteDatabaseTriggerByNameAPI: (
-        tenantID,
-        databaseSchemaName,
-        databaseTableName,
-        databaseTriggerName
-      ) =>
-        `/api/v1/tenants/${tenantID}/database/schemas/${databaseSchemaName}/triggers/${databaseTableName}/${databaseTriggerName}`,
-
       getAllDataQueriesAPI: (tenantID) =>
         `/api/v1/tenants/${tenantID}/queries/`,
 
@@ -1530,8 +1091,6 @@ export const CONSTANTS = {
 
   USER_CONFIG_KEYS: {
     DEFAULT_DASHBOARD_ID: "DEFAULT_DASHBOARD_ID",
-    DEFAULT_SCHEMA_DASHBAORD_ID: "DEFAULT_SCHEMA_DASHBAORD_ID",
-    DATABASE_TABLE_CUSTOM_PRIMARY_KEY: "DATABASE_TABLE_CUSTOM_PRIMARY_KEY",
   },
   REACT_QUERY_KEYS: {
     DB_USER: "DB_USER",
@@ -1540,32 +1099,7 @@ export const CONSTANTS = {
     TENANT_USERS: (tenantID) => `${tenantID}-TENANT_USERS`,
     TENANT_ROLES: (tenantID) => `${tenantID}-TENANT_ROLES`,
     TENANT_PERMISSIONS: (tenantID) => `${tenantID}-TENANT_PERMISSIONS`,
-    DATABASE_METADATA: (tenantID) => `${tenantID}-DATABASE_METADATA`,
-    DATABASE_TABLES: (tenantID, databaseSchemaName) =>
-      `${tenantID}-${databaseSchemaName}-DATABASE_TABLES`,
-
-    DATABASE_TABLES_META: (tenantID, databaseSchemaName, databaseTableName) =>
-      `${tenantID}-${databaseSchemaName}-DATABASE_TABLES-${databaseTableName}-META`,
-    DATABASE_TABLES_STATISTICS: (
-      tenantID,
-      databaseSchemaName,
-      databaseTableName
-    ) =>
-      `${tenantID}-${databaseSchemaName}-DATABASE_TABLES-${databaseTableName}-STATISTICS`,
-    DATABASE_TABLES_ROWS: (tenantID, databaseSchemaName, databaseTableName) =>
-      `${tenantID}-${databaseSchemaName}-DATABASE_TABLES-${databaseTableName}-ROWS`,
-
-    DATABASE_TRIGGERS: (tenantID, databaseSchemaName) =>
-      `${tenantID}-${databaseSchemaName}-DATABASE_TRIGGERS`,
-    SUBSCRIPTIONS: (tenantID) => `${tenantID}-SUBSCRIPTIONS`,
-    WEBHOOKS: (tenantID) => `${tenantID}-WEBHOOKS`,
-    DATABASE_TRIGGER_BY_NAME: (
-      tenantID,
-      databaseSchemaName,
-      databaseTableName,
-      databaseTriggerName
-    ) =>
-      `${tenantID}-${databaseSchemaName}-${databaseTableName}-DATABASE_TRIGGERS-${databaseTriggerName}`,
+    LISTENERS: (tenantID) => `${tenantID}-LISTENERS`,
 
     DATASOURCES: (tenantID) => `${tenantID}-DATASOURCES`,
 
@@ -1582,13 +1116,9 @@ export const CONSTANTS = {
     CUSTOMER_PLAN: "CUSTOMER_PLAN",
     FORMS: "FORMS",
     FORM_SUBMISSIONS: "FORM_SUBMISSIONS",
-    DATABASE_NOTIFICATIONS: (tenantID) => `${tenantID}-DATABASE_NOTIFICATIONS`,
     DATABASE_API_KEYS: (tenantID) => `${tenantID}-DATABASE_API_KEYS`,
     DATABASE_CRON_JOBS: (tenantID) => `${tenantID}-DATABASE_CRON_JOBS`,
     AUDIT_LOGS: (tenantID) => `${tenantID}-AUDIT_LOGS`,
-    DATABASE_NOTIFICATION_DETAILS: "DATABASE_NOTIFICATION_DETAILS",
-    SUBSCRIPTIONS: (tenantID) => `${tenantID}-SUBSCRIPTIONS`,
-    WEBHOOKS: (tenantID) => `${tenantID}-WEBHOOKS`,
   },
 
   DATA_TYPES: {
@@ -1925,8 +1455,7 @@ export const CONSTANTS = {
       "DATABASE_NOTIFICATION_LAYOUT_SEPARATION",
     DATABASE_CRON_JOB_LAYOUT_SEPARATION: "DATABASE_CRON_JOB_LAYOUT_SEPARATION",
     DATABASE_API_KEY_LAYOUT_SEPARATION: "DATABASE_API_KEY_LAYOUT_SEPARATION",
-    WEBHOOK_LAYOUT_SEPARATION: "WEBHOOK_LAYOUT_SEPARATION",
-    SUBSCRIPTION_LAYOUT_SEPARATION: "SUBSCRIPTION_LAYOUT_SEPARATION",
+    LISTENER_LAYOUT_SEPARATION: "LISTENER_LAYOUT_SEPARATION",
   },
 
   PG_TRIGGER_FORM_TIMING_OPTIONS: ["BEFORE", "AFTER", "INSTEAD OF"],

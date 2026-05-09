@@ -50,7 +50,7 @@ export const FieldPill = ({
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
       onClick={onClick}
-      className={`flex items-center gap-1.5 rounded font-medium cursor-grab shadow-sm border transition-shadow hover:shadow-md ${typeClass} ${isCompact ? 'px-1.5 py-0.5 text-[11px]' : 'px-2.5 py-1.5 text-xs'} ${isDragging ? 'opacity-50' : ''} ${className}`}
+      className={`flex items-center gap-1.5 rounded-sm font-medium cursor-grab shadow-sm border transition-shadow hover:shadow-md ${typeClass} ${isCompact ? 'px-1.5 py-0.5 text-[11px]' : 'px-2.5 py-1.5 text-xs'} ${isDragging ? 'opacity-50' : ''} ${className}`}
       title={`${field.name} (${field.type})`}
     >
       {/* Type icon */}
@@ -61,7 +61,7 @@ export const FieldPill = ({
 
       {/* Aggregate badge */}
       {field.aggregate && field.aggregate !== 'none' && (
-        <span className="text-[9px] uppercase tracking-wider bg-white/50 px-1 rounded ml-1 font-bold" title={`Aggregate: ${field.aggregate}`}>
+        <span className="text-[9px] uppercase tracking-wider bg-brand-black/50 px-1 rounded-sm ml-1 font-bold" title={`Aggregate: ${field.aggregate}`}>
           {field.aggregate.slice(0, 3)}
         </span>
       )}
@@ -71,8 +71,7 @@ export const FieldPill = ({
         <Button
           type="button"
           variant="ghost"
-          size="sm"
-          square
+          size="icon"
           onClick={(e) => { e.stopPropagation(); onRemove(); }}
           className="ml-auto h-4 w-4 rounded-full hover:bg-black/10 text-xs text-muted-foreground"
           title="Remove"

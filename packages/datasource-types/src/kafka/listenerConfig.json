@@ -1,0 +1,52 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "topic": {
+        "type": "string",
+        "description": "Kafka topic to subscribe to"
+      },
+      "consumerGroup": {
+        "type": "string",
+        "description": "Consumer group ID for offset tracking",
+        "default": "jet-listener"
+      },
+      "fromBeginning": {
+        "type": "boolean",
+        "description": "Start consuming from the beginning of the topic",
+        "default": false
+      }
+    },
+    "required": ["topic"]
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      {
+        "type": "Control",
+        "scope": "#/properties/topic",
+        "label": "Topic"
+      },
+      {
+        "type": "HorizontalLayout",
+        "elements": [
+          {
+            "type": "Control",
+            "scope": "#/properties/consumerGroup",
+            "label": "Consumer Group"
+          },
+          {
+            "type": "Control",
+            "scope": "#/properties/fromBeginning",
+            "label": "From Beginning"
+          }
+        ]
+      }
+    ]
+  },
+  "data": {
+    "topic": "",
+    "consumerGroup": "jet-listener",
+    "fromBeginning": false
+  }
+}

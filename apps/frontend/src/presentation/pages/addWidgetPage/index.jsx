@@ -6,7 +6,7 @@ const AddWidgetPage = () => {
   const { tenantID } = useParams();
 
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden bg-background">
+    <div className="flex h-full w-full flex-col overflow-hidden bg-brand-dark">
       <WidgetAdditionForm tenantID={tenantID} />
     </div>
   );

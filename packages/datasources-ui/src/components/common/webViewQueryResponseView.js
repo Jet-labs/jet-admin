@@ -21,7 +21,7 @@ export const WebViewQueryResponseView = ({ queryResult }) => {
       <Tabs
         value={tab}
         onChange={_handleTabChange}
-        className="!w-full !border-b !border-gray-200"
+        className="!w-full !border-b !border-slate-200"
         sx={{
           "& .MuiTabs-indicator": {
             background: "#646cff !important",
@@ -34,7 +34,7 @@ export const WebViewQueryResponseView = ({ queryResult }) => {
           disableFocusRipple
           disableTouchRipple
           className={`!outline-none !border-0 hover:!outline-none hover:!border-0 focus:!outline-none !font-medium !text-sm !normal-case ${
-            tab === 0 ? "!text-[#646cff]" : "!text-slate-700"
+            tab === 0 ? "!text-[#646cff]" : "!text-[#1c1c1e]"
           }`}
         />
         <Tab
@@ -43,7 +43,7 @@ export const WebViewQueryResponseView = ({ queryResult }) => {
           disableFocusRipple
           disableTouchRipple
           className={`!outline-none !border-0 hover:!outline-none hover:!border-0 focus:!outline-none !font-medium !text-sm !normal-case ${
-            tab === 1 ? "!text-[#646cff]" : "!text-slate-700"
+            tab === 1 ? "!text-[#646cff]" : "!text-[#1c1c1e]"
           }`}
         />
         <Tab
@@ -52,7 +52,7 @@ export const WebViewQueryResponseView = ({ queryResult }) => {
           disableFocusRipple
           disableTouchRipple
           className={`!outline-none !border-0 hover:!outline-none hover:!border-0 focus:!outline-none !font-medium !text-sm !normal-case ${
-            tab === 2 ? "!text-[#646cff]" : "!text-slate-700"
+            tab === 2 ? "!text-[#646cff]" : "!text-[#1c1c1e]"
           }`}
         />
         <Tab
@@ -61,7 +61,7 @@ export const WebViewQueryResponseView = ({ queryResult }) => {
           disableFocusRipple
           disableTouchRipple
           className={`!outline-none !border-0 hover:!outline-none hover:!border-0 focus:!outline-none !font-medium !text-sm !normal-case ${
-            tab === 3 ? "!text-[#646cff]" : "!text-slate-700"
+            tab === 3 ? "!text-[#646cff]" : "!text-[#1c1c1e]"
           }`}
         />
       </Tabs>

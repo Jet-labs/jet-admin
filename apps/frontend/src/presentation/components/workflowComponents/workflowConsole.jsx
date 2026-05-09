@@ -30,7 +30,7 @@ export const WorkflowConsole = ({
       case 'start':
         return { icon: FaPlay, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10' };
       case 'node_start':
-        return { icon: FaArrowRight, color: 'text-blue-500', bgColor: 'bg-blue-500/10' };
+        return { icon: FaArrowRight, color: 'text-blue-500', bgColor: 'bg-blue-950/400/10' };
       case 'node_complete':
         return { icon: FaCheck, color: 'text-emerald-500', bgColor: 'bg-emerald-500/10' };
       case 'node_error':
@@ -59,7 +59,7 @@ export const WorkflowConsole = ({
   };
 
   return (
-    <div className={`flex flex-col bg-background overflow-hidden ${className}`}>
+    <div className={`flex flex-col bg-brand-dark overflow-hidden ${className}`}>
       {/* Header */}
       <div className="flex items-center justify-between px-3 py-1 bg-muted/30 border-b border-border">
         <div className="flex items-center gap-2">
@@ -90,7 +90,7 @@ export const WorkflowConsole = ({
       </div>
 
       {/* Logs area */}
-      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-3 font-mono text-xs bg-background/50">
+      <div ref={scrollContainerRef} className="flex-1 overflow-y-auto p-3 font-mono text-xs bg-brand-dark/50">
         {logs.length === 0 ? (
           <div className="flex items-center justify-center h-full text-muted-foreground/60">
             <span>No logs yet. Click "Test Run" to start.</span>
@@ -124,7 +124,7 @@ export const WorkflowConsole = ({
                       </span>
                     )}
                     {log.output && (
-                      <div className="mt-1.5 p-2.5 bg-background/80 rounded-md border border-border text-foreground/90 overflow-x-auto shadow-sm">
+                      <div className="mt-1.5 p-2.5 bg-brand-dark/80 rounded-md border border-border text-foreground/90 overflow-x-auto shadow-sm">
                         <pre className="whitespace-pre-wrap break-all leading-relaxed">
                           {typeof log.output === 'object' 
                             ? JSON.stringify(log.output, null, 2) 

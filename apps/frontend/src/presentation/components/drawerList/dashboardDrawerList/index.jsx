@@ -3,21 +3,20 @@ import { FaPlus } from "react-icons/fa";
 import { MdOutlineSpaceDashboard } from "react-icons/md";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { CONSTANTS } from "../../../../constants";
-import { useDashboardsState } from "../../../../logic/contexts/dashboardsContext";
+import { useDashboards } from "../../../../logic/hooks/useDashboards";
 import { NoEntityUI } from "../../ui/noEntityUI";
 import { Button } from "@jet-admin/ui";
 export const DashboardDrawerList = () => {
-  const { isLoadingDashboards, dashboards, isFetchingDashboards } =
-    useDashboardsState();
-  const routeParam = useParams();
   const { tenantID } = useParams();
+  const { isLoadingDashboards, dashboards, isFetchingDashboards } = useDashboards(tenantID);
+  const routeParam = useParams();
   const navigate = useNavigate();
   const _navigateToAddMoreDashboard = () => {
     navigate(CONSTANTS.ROUTES.ADD_DASHBOARD.path(tenantID));
   };
 
   return (
-    <div className="bg-background flex h-full w-full flex-col gap-3 overflow-hidden p-3">
+    <div className="bg-brand-dark flex h-full w-full flex-col gap-3 overflow-hidden p-3">
       <Button
         onClick={_navigateToAddMoreDashboard}
         variant="primary-ghost"

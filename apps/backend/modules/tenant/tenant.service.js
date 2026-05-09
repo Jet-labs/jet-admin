@@ -1,12 +1,7 @@
-const { Client } = require("pg");
 const { prisma } = require("../../config/prisma.config");
-const {
-  tenantAwarePostgreSQLPoolManager,
-} = require("../../config/tenant-aware-pgpool-manager.config");
 const constants = require("../../constants");
 const Logger = require("../../utils/logger");
 const { tenantRoleService } = require("../tenantRole/tenantRole.service");
-const { databaseService } = require("../database/database.service");
 const { dashboardService } = require("../dashboard/dashboard.service");
 const { dataQueryService } = require("../dataQuery/dataQuery.service");
 const { cronJobService } = require("../cronJob/cronJob.service");
@@ -23,7 +18,7 @@ const tenantService = {};
  * @param {Number} param0.tenantID
  * @returns
  */
-tenantService.getUserTenantByID = async ({ userID, tenantID, dbPool }) => {
+tenantService.getUserTenantByID = async ({ userID, tenantID }) => {
   try {
     Logger.log("info", {
       message: "tenantService:getUserTenantByID:params",
@@ -66,11 +61,7 @@ tenantService.getUserTenantByID = async ({ userID, tenantID, dbPool }) => {
         userID: userID,
         tenantID: tenantID,
       });
-      tenantDatabaseMetadata =
-        await databaseService.getDatabaseMetadataForTenant({
-          userID: userID,
-          dbPool,
-        });
+
       tenantDashboards = await dashboardService.getAllDashboards({
         userID: userID,
         tenantID: tenantID,
@@ -294,21 +285,18 @@ tenantService.getAllUserTenants = async ({ userID }) => {
  * @param {Number} param0.userID
  * @param {String} param0.tenantTitle
  * @param {String} param0.tenantLogoURL
- * @param {String} param0.tenantDBURL
  * @returns
  */
 tenantService.createTenant = async ({
   userID,
   tenantTitle,
   tenantLogoURL,
-  tenantDBURL,
-  tenantDBType,
   authContext,
 }) => {
   try {
     Logger.log("info", {
       message: "tenantService:createTenant:params",
-      params: { userID, tenantTitle, tenantLogoURL, tenantDBURL, tenantDBType, authContext },
+      params: { userID, tenantTitle, tenantLogoURL, authContext },
     });
 
     const { creatorID, createdByApiKeyID } = getCreationContextFromAuthContext(authContext);
@@ -317,10 +305,8 @@ tenantService.createTenant = async ({
         data: {
           tenantTitle,
           tenantLogoURL,
-          tenantDBURL,
           creatorID,
           createdByApiKeyID,
-          tenantDBType,
         },
       });
       // add user config
@@ -346,11 +332,7 @@ tenantService.createTenant = async ({
 
       return newTenant;
     });
-    await tenantAwarePostgreSQLPoolManager.setTenantDBURL(
-      String(newTenant.tenantID),
-      tenantDBURL,
-      false
-    );
+
     Logger.log("success", {
       message: "tenantService:createTenant:newTenantCreated",
       params: { newTenant },
@@ -365,60 +347,7 @@ tenantService.createTenant = async ({
   }
 };
 
-/**
- *
- * @param {object} param0
- * @param {Number} param0.userID
- * @param {String} param0.tenantDBURL
- * @returns
- */
-tenantService.testTenantDatabaseConnection = async ({
-  userID,
-  tenantDBURL,
-}) => {
-  try {
-    Logger.log("info", {
-      message: "tenantService:testTenantDatabaseConnection:params",
-      params: { userID, tenantDBURL },
-    });
 
-    const client = new Client({
-      connectionString: tenantDBURL,
-    });
-
-    try {
-      // Attempt to connect to the database
-      await client.connect();
-      Logger.log("info", {
-        message: "tenantService:testTenantDatabaseConnection:connected",
-        params: { userID, tenantDBURL },
-      });
-
-      await client.end();
-      Logger.log("info", {
-        message: "tenantService:testTenantDatabaseConnection:disconnected",
-        params: { userID, tenantDBURL },
-      });
-    } catch (error) {
-      Logger.log("error", {
-        message: "tenantService:testTenantDatabaseConnection:catch-2",
-        params: { userID, tenantDBURL },
-      });
-      return false;
-    }
-    Logger.log("success", {
-      message: "tenantService:testTenantDatabaseConnection:success",
-      params: { userID, tenantDBURL },
-    });
-    return true;
-  } catch (error) {
-    Logger.log("error", {
-      message: "tenantService:testTenantDatabaseConnection:catch-1",
-      params: { error },
-    });
-    throw error;
-  }
-};
 
 /**
  *
@@ -427,8 +356,6 @@ tenantService.testTenantDatabaseConnection = async ({
  * @param {Number} param0.tenantID
  * @param {String} param0.tenantTitle
  * @param {String} param0.tenantLogoURL
- * @param {String} param0.tenantDBURL
- * @param {String} param0.tenantDBType
  * @returns
  */
 tenantService.updateTenant = async ({
@@ -436,13 +363,11 @@ tenantService.updateTenant = async ({
   tenantID,
   tenantTitle,
   tenantLogoURL,
-  tenantDBURL,
-  tenantDBType,
 }) => {
   try {
     Logger.log("info", {
       message: "tenantService:updateTenant:params",
-      params: { userID, tenantID, tenantTitle, tenantLogoURL, tenantDBType },
+      params: { userID, tenantID, tenantTitle, tenantLogoURL },
     });
 
     const updatedTenant = await prisma.tblTenants.update({
@@ -452,15 +377,9 @@ tenantService.updateTenant = async ({
       data: {
         tenantTitle,
         tenantLogoURL,
-        tenantDBURL,
-        tenantDBType,
       },
     });
-    await tenantAwarePostgreSQLPoolManager.setTenantDBURL(
-      String(tenantID),
-      tenantDBURL,
-      false
-    );
+
     Logger.log("success", {
       message: "tenantService:updateTenant:updatedTenant",
       params: { userID, updatedTenant },

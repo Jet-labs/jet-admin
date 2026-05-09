@@ -45,23 +45,23 @@ const OutputParameterEditor = ({ parameters, onChange, availableVariables }) => 
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <label className="text-xs font-medium text-slate-500">Output Parameters</label>
+        <label className="text-xs font-medium text-brand-text-primary">Output Parameters</label>
         <Button
           type="button"
           onClick={addParameter}
-          className="flex items-center gap-1 px-2 py-1 text-xs bg-white text-[#646cff] hover:bg-[#646cff]/10 rounded transition-colors border border-slate-200"
+          className="flex items-center gap-1 px-2 py-1 text-xs bg-brand-black text-[#646cff] hover:bg-[#646cff]/10 rounded-sm transition-colors border border-brand-border"
         >
           <FaPlus className="w-2.5 h-2.5" />
           Add Output
         </Button>
       </div>
 
-      <p className="text-[10px] text-slate-400">
+      <p className="text-[10px] text-brand-text-primary">
         Define outputs that will be returned when the workflow completes.
       </p>
 
       {parameters.length === 0 ? (
-        <div className="text-xs text-slate-400 italic py-3 text-center border border-dashed border-slate-200 rounded">
+        <div className="text-xs text-brand-text-primary italic py-3 text-center border border-dashed border-brand-border rounded-sm">
           No output parameters defined. Workflow will complete with no output.
         </div>
       ) : (
@@ -69,7 +69,7 @@ const OutputParameterEditor = ({ parameters, onChange, availableVariables }) => 
           {parameters.map((param, index) => (
             <div
               key={param.id}
-              className="border border-slate-200 rounded p-2 bg-slate-50"
+              className="border border-brand-border rounded-sm p-2 bg-brand-dark"
             >
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
@@ -78,14 +78,14 @@ const OutputParameterEditor = ({ parameters, onChange, availableVariables }) => 
                     type="text"
                     value={param.name}
                     onChange={(e) => updateParameter(index, 'name', e.target.value.replace(/[^a-zA-Z0-9_]/g, ''))}
-                    className="text-xs font-mono font-medium text-slate-700 bg-white border border-slate-200 rounded px-2 py-1 w-28 focus:outline-none focus:border-[#646cff]"
+                    className="text-xs font-mono font-medium text-brand-text-primary bg-brand-black border border-brand-border rounded-sm px-2 py-1 w-28 focus:outline-none focus:border-[#646cff]"
                     placeholder="outputName"
                   />
                 </div>
                 <Button
                   type="button"
                   onClick={() => removeParameter(index)}
-                  className="p-1 bg-white text-slate-400 hover:text-red-500 hover:bg-red-50 rounded transition-colors"
+                  className="p-1 bg-brand-black text-brand-text-primary hover:text-red-500 hover:bg-red-50 rounded-sm transition-colors"
                   title="Remove output"
                 >
                   <FaTrash className="w-3 h-3" />
@@ -94,16 +94,16 @@ const OutputParameterEditor = ({ parameters, onChange, availableVariables }) => 
 
               {/* Source Variable */}
               <div>
-                <label className="text-[10px] text-slate-400">Source Variable</label>
+                <label className="text-[10px] text-brand-text-primary">Source Variable</label>
                 <Input
                   type="text"
                   value={param.sourceVariable}
                   onChange={(e) => updateParameter(index, 'sourceVariable', e.target.value)}
                   placeholder="{{ctx.result}} or a literal value"
-                  className="w-full text-xs text-slate-700 p-1.5 border border-slate-200 rounded font-mono bg-white focus:outline-none focus:border-[#646cff]"
+                  className="w-full text-xs text-brand-text-primary p-1.5 border border-brand-border rounded-sm font-mono bg-brand-black focus:outline-none focus:border-[#646cff]"
                 />
                 {availableVariables.length > 0 && (
-                  <p className="text-[9px] text-slate-400 mt-0.5">
+                  <p className="text-[9px] text-brand-text-primary mt-0.5">
                     Available: {availableVariables.slice(0, 5).map(v => `ctx.${v.variable}`).join(', ')}
                     {availableVariables.length > 5 && '...'}
                   </p>
@@ -112,13 +112,13 @@ const OutputParameterEditor = ({ parameters, onChange, availableVariables }) => 
 
               {/* Description */}
               <div className="mt-2">
-                <label className="text-[10px] text-slate-400">Description</label>
+                <label className="text-[10px] text-brand-text-primary">Description</label>
                 <Input
                   type="text"
                   value={param.description}
                   onChange={(e) => updateParameter(index, 'description', e.target.value)}
                   placeholder="What this output represents"
-                  className="w-full text-xs text-slate-700 p-1.5 border border-slate-200 rounded bg-white focus:outline-none focus:border-[#646cff]"
+                  className="w-full text-xs text-brand-text-primary p-1.5 border border-brand-border rounded-sm bg-brand-black focus:outline-none focus:border-[#646cff]"
                 />
               </div>
             </div>
@@ -245,7 +245,7 @@ export const EndNodeConfigurator = ({ data, onChange, nodeId }) => {
         />
 
         {/* Output parameters editor */}
-        <div className="border-t border-slate-100 pt-4">
+        <div className="border-t border-brand-border pt-4">
           <OutputParameterEditor
             parameters={formData.outputParameters}
             onChange={handleParametersChange}
@@ -254,27 +254,27 @@ export const EndNodeConfigurator = ({ data, onChange, nodeId }) => {
         </div>
 
         {/* Comprehensive instructions */}
-        <div className="p-2.5 bg-slate-50 border border-slate-200 rounded text-[10px] text-slate-600 space-y-2">
-          <div className="font-semibold text-slate-700 text-xs">📘 Workflow Output</div>
+        <div className="p-2.5 bg-brand-dark border border-brand-border rounded-sm text-[10px] text-brand-text-primary space-y-2">
+          <div className="font-semibold text-brand-text-primary text-xs">📘 Workflow Output</div>
 
           <div>
-            <span className="font-medium text-slate-700">Source Variable Format:</span>
-            <div className="ml-3 mt-0.5 text-slate-500 font-mono text-[9px] space-y-0.5">
-              <div><code className="bg-white px-1 rounded">{"{{ctx.queryResult}}"}</code> → from previous node</div>
-              <div><code className="bg-white px-1 rounded">{"{{ctx.processedData}}"}</code> → from script node</div>
+            <span className="font-medium text-brand-text-primary">Source Variable Format:</span>
+            <div className="ml-3 mt-0.5 text-brand-text-primary font-mono text-[9px] space-y-0.5">
+              <div><code className="bg-brand-black px-1 rounded-sm">{"{{ctx.queryResult}}"}</code> → from previous node</div>
+              <div><code className="bg-brand-black px-1 rounded-sm">{"{{ctx.processedData}}"}</code> → from script node</div>
             </div>
           </div>
 
           <div>
-            <span className="font-medium text-slate-700">Completion Status:</span>
-            <div className="ml-3 mt-0.5 text-slate-500">
+            <span className="font-medium text-brand-text-primary">Completion Status:</span>
+            <div className="ml-3 mt-0.5 text-brand-text-primary">
               <strong>Success:</strong> Normal completion • <strong>Failure:</strong> Ended with error • <strong>Cancelled:</strong> Manual stop
             </div>
           </div>
 
           <div>
-            <span className="font-medium text-slate-700">Multiple End Nodes:</span>
-            <div className="ml-3 mt-0.5 text-slate-500">
+            <span className="font-medium text-brand-text-primary">Multiple End Nodes:</span>
+            <div className="ml-3 mt-0.5 text-brand-text-primary">
               You can have multiple End nodes for different outcomes (e.g., success/failure branches).
             </div>
           </div>
@@ -283,7 +283,7 @@ export const EndNodeConfigurator = ({ data, onChange, nodeId }) => {
         <Button
           type="button"
           onClick={handleSave}
-          className="px-3 py-1.5 text-sm text-white bg-[#646cff] rounded hover:bg-[#5558dd] focus:ring-4 focus:outline-none focus:ring-[#646cff]/30"
+          className="px-3 py-1.5 text-sm text-white bg-[#646cff] rounded-sm hover:bg-[#5558dd] focus:ring-4 focus:outline-none focus:ring-[#646cff]/30"
         >
           Save
         </Button>
@@ -311,8 +311,8 @@ export const EndNode = memo(({ id, data, isConnectable }) => {
       case END_STATUS.SUCCESS:
         return {
           color: 'green',
-          bgColor: 'bg-green-50',
-          borderColor: 'border-green-100',
+          bgColor: 'bg-green-950/40',
+          borderColor: 'border-green-800',
           textColor: 'text-green-500',
           hoverBorder: 'hover:border-green-400',
           handleColor: '#22c55e',
@@ -322,8 +322,8 @@ export const EndNode = memo(({ id, data, isConnectable }) => {
       case END_STATUS.FAILURE:
         return {
           color: 'red',
-          bgColor: 'bg-red-50',
-          borderColor: 'border-red-100',
+          bgColor: 'bg-red-950/40',
+          borderColor: 'border-red-800',
           textColor: 'text-red-500',
           hoverBorder: 'hover:border-red-400',
           handleColor: '#ef4444',
@@ -333,7 +333,7 @@ export const EndNode = memo(({ id, data, isConnectable }) => {
       case END_STATUS.CANCELLED:
         return {
           color: 'amber',
-          bgColor: 'bg-amber-50',
+          bgColor: 'bg-amber-950/40',
           borderColor: 'border-amber-100',
           textColor: 'text-amber-500',
           hoverBorder: 'hover:border-amber-400',
@@ -344,10 +344,10 @@ export const EndNode = memo(({ id, data, isConnectable }) => {
       default:
         return {
           color: 'slate',
-          bgColor: 'bg-slate-50',
-          borderColor: 'border-slate-100',
-          textColor: 'text-slate-500',
-          hoverBorder: 'hover:border-slate-400',
+          bgColor: 'bg-brand-dark',
+          borderColor: 'border-brand-border',
+          textColor: 'text-brand-text-primary',
+          hoverBorder: 'hover:border-brand-border',
           handleColor: '#94a3b8',
           icon: VscDebugStop,
           label: 'End',
@@ -367,7 +367,7 @@ export const EndNode = memo(({ id, data, isConnectable }) => {
       case 'skipped':
         return 'border-orange-300 opacity-60';
       default:
-        return 'border-slate-200';
+        return 'border-brand-border';
     }
   };
 
@@ -408,7 +408,7 @@ export const EndNode = memo(({ id, data, isConnectable }) => {
 
   return (
     <div className={`
-      relative bg-white border rounded
+      relative bg-brand-black border rounded
       min-w-[280px] max-w-[350px]
       transition-all duration-150
       ${getExecutionStatusStyles()} ${statusConfig.hoverBorder} hover:shadow-md
@@ -440,9 +440,9 @@ export const EndNode = memo(({ id, data, isConnectable }) => {
           }}
           className={`
             flex flex-col items-center justify-center px-3 py-3 border-r
-            ${executionStatus === 'running' ? 'bg-blue-100 border-blue-200' :
-              executionStatus === 'completed' ? 'bg-green-100 border-green-200' :
-              executionStatus === 'failed' ? 'bg-red-50 border-red-100' :
+            ${executionStatus === 'running' ? 'bg-blue-950/40 border-blue-800' :
+              executionStatus === 'completed' ? 'bg-green-950/40 border-green-800' :
+              executionStatus === 'failed' ? 'bg-red-950/40 border-red-800' :
               `${statusConfig.bgColor} ${statusConfig.borderColor}`}
           `}
         >
@@ -458,16 +458,16 @@ export const EndNode = memo(({ id, data, isConnectable }) => {
         <div className="flex-1 px-3 py-2 min-w-0">
           {/* Title row */}
           <div className="flex items-center justify-between gap-2">
-            <span className="text-xs font-semibold truncate text-slate-700">
+            <span className="text-xs font-semibold truncate text-brand-text-primary">
               {data?.title || 'End'}
             </span>
-            <span className={`text-xs font-medium px-1.5 py-0.5 rounded border ${statusConfig.bgColor} ${statusConfig.textColor} ${statusConfig.borderColor}`}>
+            <span className={`text-xs font-medium px-1.5 py-0.5 rounded-sm border ${statusConfig.bgColor} ${statusConfig.textColor} ${statusConfig.borderColor}`}>
               {statusConfig.label}
             </span>
           </div>
 
           {/* Output info */}
-          <div className="text-[10px] mt-0.5 text-slate-400">
+          <div className="text-[10px] mt-0.5 text-brand-text-primary">
             {outputCount === 0 
               ? 'No outputs defined' 
               : `${outputCount} output${outputCount !== 1 ? 's' : ''}: ${outputParams.slice(0, 3).map(p => p.name).join(', ')}${outputCount > 3 ? '...' : ''}`
@@ -476,7 +476,7 @@ export const EndNode = memo(({ id, data, isConnectable }) => {
         </div>
 
         {/* Right: Status indicator */}
-        <div className="flex flex-col items-center justify-center px-2 border-l border-slate-100">
+        <div className="flex flex-col items-center justify-center px-2 border-l border-brand-border">
           <div className={`w-2 h-2 rounded-full`} style={{ backgroundColor: statusConfig.handleColor }} title={statusConfig.label} />
         </div>
       </div>

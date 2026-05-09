@@ -1,0 +1,17 @@
+{
+  "schema": {
+    "type": "object",
+    "properties": {
+      "messageFilter": { "type": "string", "description": "Optional JSONPath or regex to filter incoming messages" },
+      "parseAsJSON": { "type": "boolean", "default": true, "description": "Parse incoming messages as JSON" }
+    }
+  },
+  "uischema": {
+    "type": "VerticalLayout",
+    "elements": [
+      { "type": "Control", "scope": "#/properties/parseAsJSON", "label": "Parse as JSON" },
+      { "type": "Control", "scope": "#/properties/messageFilter", "label": "Message Filter (optional)", "options": { "placeholder": "JSONPath or regex" } }
+    ]
+  },
+  "data": { "messageFilter": "", "parseAsJSON": true }
+}

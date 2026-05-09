@@ -6,6 +6,7 @@ import "react-resizable/css/styles.css";
 import { CONSTANTS } from "../../../constants";
 import { DashboardRenderWidget } from "./dashboardRenderWidget";
 import PropTypes from "prop-types";
+import { useRuntime } from "../../../logic/hooks/useRuntime";
 
 const ResponsiveReactGridLayout = WidthProvider(Responsive);
 
@@ -27,6 +28,9 @@ export const DashboardDropzone = ({
   const [currentBreakpoint, setCurrentBreakpoint] = useState("lg");
   const defaultWidgetSize = { w: 4, h: 6 };
   const containerRef = useRef(null);
+
+  // Reactive state tree for widget data binding and event dispatching
+  const { stateTree, setQueryResult } = useRuntime({ tenantID });
   const previousWidth = useRef(0);
 
   const _handleDelete = (index) => {
@@ -163,6 +167,8 @@ export const DashboardDropzone = ({
               widget={widget}
               index={index}
               handleDelete={_handleDelete}
+              stateTree={stateTree}
+              onQueryResult={setQueryResult}
             />
           </div>
         ))}

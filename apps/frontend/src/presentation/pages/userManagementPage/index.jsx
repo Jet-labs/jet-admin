@@ -17,7 +17,7 @@ const UserManagementPage = () => {
     setIsAddTenantUserDialogOpen(false);
   };
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden bg-background">
+    <div className="flex h-full w-full flex-col overflow-hidden bg-brand-dark">
       <div className="flex items-center justify-between gap-2 border-b border-border p-3">
         <h1 className="text-xl font-bold text-foreground md:text-2xl">
           {CONSTANTS.STRINGS.TENANT_USER_MANAGEMENT_TITLE}

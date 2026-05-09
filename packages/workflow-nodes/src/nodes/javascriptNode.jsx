@@ -247,33 +247,33 @@ export const JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
         />
 
         {/* Comprehensive instructions */}
-        <div className="p-2.5 bg-slate-50 border border-slate-200 rounded text-[10px] text-slate-600 space-y-2">
-          <div className="font-semibold text-slate-700 text-xs">📘 Writing JavaScript Code</div>
+        <div className="p-2.5 bg-brand-dark border border-brand-border rounded-sm text-[10px] text-brand-text-primary space-y-2">
+          <div className="font-semibold text-brand-text-primary text-xs">📘 Writing JavaScript Code</div>
 
           <div>
-            <span className="font-medium text-slate-700">Access Context:</span>
-            <div className="ml-3 mt-0.5 text-slate-500 font-mono text-[9px] space-y-0.5">
-              <div><code className="bg-white px-1 rounded">ctx.input.paramName</code> → workflow input</div>
-              <div><code className="bg-white px-1 rounded">ctx.queryResult</code> → previous node output</div>
-              <div><code className="bg-white px-1 rounded">ctx.item</code> → current loop item</div>
+            <span className="font-medium text-brand-text-primary">Access Context:</span>
+            <div className="ml-3 mt-0.5 text-brand-text-primary font-mono text-[9px] space-y-0.5">
+              <div><code className="bg-brand-black px-1 rounded-sm">ctx.input.paramName</code> → workflow input</div>
+              <div><code className="bg-brand-black px-1 rounded-sm">ctx.queryResult</code> → previous node output</div>
+              <div><code className="bg-brand-black px-1 rounded-sm">ctx.item</code> → current loop item</div>
             </div>
           </div>
 
           <div>
-            <span className="font-medium text-slate-700">Return Value:</span>
-            <div className="ml-3 mt-0.5 text-slate-500">
-              Use <code className="bg-white px-1 py-0.5 rounded font-mono">return yourValue;</code> to store result in output variable.
+            <span className="font-medium text-brand-text-primary">Return Value:</span>
+            <div className="ml-3 mt-0.5 text-brand-text-primary">
+              Use <code className="bg-brand-black px-1 py-0.5 rounded-sm font-mono">return yourValue;</code> to store result in output variable.
             </div>
           </div>
 
           <div>
-            <span className="font-medium text-slate-700">Available Globals:</span>
-            <div className="ml-3 mt-0.5 text-slate-500">
-              <code className="bg-white px-1 rounded font-mono text-[9px]">JSON, Math, Date, Array, Object, String, Number, Boolean, parseInt, parseFloat</code>
+            <span className="font-medium text-brand-text-primary">Available Globals:</span>
+            <div className="ml-3 mt-0.5 text-brand-text-primary">
+              <code className="bg-brand-black px-1 rounded-sm font-mono text-[9px]">JSON, Math, Date, Array, Object, String, Number, Boolean, parseInt, parseFloat</code>
             </div>
           </div>
 
-          <div className="text-amber-600 bg-amber-50 border border-amber-200 rounded p-1.5 mt-2">
+          <div className="text-amber-600 bg-amber-50 border border-amber-800 rounded-sm p-1.5 mt-2">
             <strong>⚠️ Note:</strong> Code runs in a sandbox. No network access, filesystem, or require().
           </div>
         </div>
@@ -281,7 +281,7 @@ export const JavascriptNodeConfigurator = ({ data, onChange, nodeId }) => {
         <Button
           type="button"
           onClick={handleSave}
-          className="px-3 py-1.5 text-sm text-white bg-[#646cff] rounded hover:bg-[#5558dd] focus:ring-4 focus:outline-none focus:ring-[#646cff]/30"
+          className="w-full"
         >
           {strings?.WORKFLOW_EDITOR_JAVASCRIPT_NODE_SAVE_BUTTON || 'Save'}
         </Button>
@@ -319,7 +319,7 @@ export const JavascriptNode = memo(({ id, data, isConnectable }) => {
       case 'skipped':
         return 'border-orange-300 opacity-60';
       default:
-        return 'border-slate-200 hover:border-yellow-400 hover:shadow-md';
+        return 'border-brand-border hover:border-yellow-400 hover:shadow-md';
     }
   };
 
@@ -355,11 +355,11 @@ export const JavascriptNode = memo(({ id, data, isConnectable }) => {
 
   return (
     <div className={`
-      relative bg-white border rounded
+      relative bg-brand-black border rounded
       min-w-[340px] max-w-[400px]
       transition-all duration-150
       ${isDisabled
-        ? 'border-slate-200 opacity-50'
+        ? 'border-brand-border opacity-50'
         : getStatusStyles()
       }
       ${!data.code ? '!border-red-400 !bg-red-50' : ''}
@@ -377,13 +377,13 @@ export const JavascriptNode = memo(({ id, data, isConnectable }) => {
           }}
           className={`
           flex flex-col items-center justify-center px-3 py-3 border-r
-          ${isDisabled ? 'bg-slate-50 border-slate-100' :
-              executionStatus === 'running' ? 'bg-blue-100 border-blue-200' :
-                executionStatus === 'completed' ? 'bg-green-50 border-green-100' :
-                  executionStatus === 'failed' ? 'bg-red-50 border-red-100' :
-                    'bg-yellow-50 border-yellow-100'}
+          ${isDisabled ? 'bg-brand-dark border-brand-border' :
+              executionStatus === 'running' ? 'bg-blue-950/40 border-blue-800' :
+                executionStatus === 'completed' ? 'bg-green-950/40 border-green-800' :
+                  executionStatus === 'failed' ? 'bg-red-950/40 border-red-800' :
+                    'bg-yellow-950/40 border-yellow-800'}
         `}>
-          <FaJs className={`w-5 h-5 ${isDisabled ? 'text-slate-400' :
+          <FaJs className={`w-5 h-5 ${isDisabled ? 'text-brand-text-primary' :
               executionStatus === 'running' ? 'text-blue-600' :
                 executionStatus === 'completed' ? 'text-green-600' :
                   executionStatus === 'failed' ? 'text-red-600' :
@@ -395,11 +395,11 @@ export const JavascriptNode = memo(({ id, data, isConnectable }) => {
         <div className="flex-1 px-3 py-2 min-w-0">
           {/* Title row */}
           <div className="flex items-center justify-between gap-2">
-            <span className={`text-xs font-semibold truncate ${isDisabled ? 'text-slate-400 line-through' : 'text-slate-700'}`}>
+            <span className={`text-xs font-semibold truncate ${isDisabled ? 'text-brand-text-primary line-through' : 'text-brand-text-primary'}`}>
               {data?.title || 'Untitled Script'}
             </span>
             {isDisabled && (
-              <span className="inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded border border-orange-200">
+              <span className="inline-flex items-center gap-1 text-[9px] font-medium text-orange-600 bg-orange-100 px-1.5 py-0.5 rounded-sm border border-orange-800">
                 <VscDebugDisconnect className="w-2.5 h-2.5" />
                 Skip
               </span>
@@ -407,15 +407,15 @@ export const JavascriptNode = memo(({ id, data, isConnectable }) => {
           </div>
 
           {/* Code preview */}
-          <div className={`text-[10px] font-mono truncate mt-0.5 ${isDisabled ? 'text-slate-300' : 'text-slate-400'}`}>
+          <div className={`text-[10px] font-mono truncate mt-0.5 ${isDisabled ? 'text-brand-text-primary' : 'text-brand-text-primary'}`}>
             {codePreview}
           </div>
         </div>
 
         {/* Right: Outputs indicator */}
-        <div className="flex flex-col items-center justify-center px-2 border-l border-slate-100">
-          <div className={`w-2 h-2 rounded-full mb-1 ${isDisabled ? 'bg-slate-300' : 'bg-green-400'}`} title="Success" />
-          <div className={`w-2 h-2 rounded-full ${isDisabled ? 'bg-slate-300' : 'bg-red-400'}`} title="Error" />
+        <div className="flex flex-col items-center justify-center px-2 border-l border-brand-border">
+          <div className={`w-2 h-2 rounded-full mb-1 ${isDisabled ? 'bg-brand-black' : 'bg-green-400'}`} title="Success" />
+          <div className={`w-2 h-2 rounded-full ${isDisabled ? 'bg-brand-black' : 'bg-red-400'}`} title="Error" />
         </div>
       </div>
 
